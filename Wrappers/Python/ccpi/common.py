@@ -93,37 +93,77 @@ class DataSet(ABC):
             self.array = array[:]
         else:
             self.array = array
-        
+
     def as_array(self, dimensions=None):
+        '''Returns the DataSet as Numpy Array
+        
+        Returns the pointer to the array if dimensions is not set.
+        If dimensions is set, it first creates a new DataSet with the subset
+        and then it returns the pointer to the array'''
+        if dimensions is not None:
+            return self.subset(dimensions).as_array()
+        return self.array
+        
+    def subset(self, dimensions=None):
+        '''Creates a DataSet containing a subset of self according to the 
+        labels in dimensions'''
         if dimensions is None:
             return self.array
         else:
             # check that all the requested dimensions are in the array
             # this is done by checking the dimension_labels
             proceed = True
+            unknown_key = ''
+            # axis_order contains the order of the axis that the user wants
+            # in the output DataSet
             axis_order = []
             if type(dimensions) == list:
                 for dl in dimensions:
                     if dl not in self.dimension_labels.values():
                         proceed = False
+                        unknown_key = dl
                         break
                     else:
                         axis_order.append(find_key(self.dimension_labels, dl))
-                print (axis_order)        
-                # transpose the array and slice away the unwanted data
+                if not proceed:
+                    raise KeyError('Unknown key specified {0}'.format(dl))
+                    
+                # slice away the unwanted data from the array
                 unwanted_dimensions = self.dimension_labels.copy()
-                for ax in axis_order:
-                    unwanted_dimensions.pop(ax)
-                new_shape = []
-                #for i in range(axis_order):
-                #    new_shape.append(self.shape(axis_order[i]))
-                new_shape = [self.shape[ax] for ax in axis_order]
-                return numpy.reshape( 
-                        numpy.delete( self.array , unwanted_dimensions.keys() ) ,
-                        new_shape
-                        )
-                #return numpy.transpose(self.array, new_shape)
-                        
+                left_dimensions = []
+                for ax in sorted(axis_order):
+                    this_dimension = unwanted_dimensions.pop(ax)
+                    left_dimensions.append(this_dimension)
+                #print ("unwanted_dimensions {0}".format(unwanted_dimensions))
+                #print ("left_dimensions {0}".format(left_dimensions))
+                #new_shape = [self.shape[ax] for ax in axis_order]
+                #print ("new_shape {0}".format(new_shape))
+                command = "self.array"
+                for i in range(self.number_of_dimensions):
+                    if self.dimension_labels[i] in unwanted_dimensions.values():
+                        command = command + "[0]"
+                    else:
+                        command = command + "[:]"
+                #print ("command {0}".format(command))
+                cleaned = eval(command)
+                # cleaned has collapsed dimensions in the same order of
+                # self.array, but we want it in the order stated in the 
+                # "dimensions". 
+                # create axes order for numpy.transpose
+                axes = []
+                for key in dimensions:
+                    #print ("key {0}".format( key))
+                    for i in range(len( left_dimensions )):
+                        ld = left_dimensions[i]
+                        #print ("ld {0}".format( ld))
+                        if ld == key:
+                            axes.append(i)
+                #print ("axes {0}".format(axes))
+                
+                cleaned = numpy.transpose(cleaned, axes).copy()
+                
+                return DataSet(cleaned , True, dimensions)
+                    
                     
         
             
@@ -136,7 +176,14 @@ if __name__ == '__main__':
     a = numpy.asarray([i for i in range( size )])
     a = numpy.reshape(a, shape)
     ds = DataSet(a, False, ['X', 'Y','Z' ,'W'])
-    b = ds.as_array(['Z' ,'W'])    
+    print ("ds label {0}".format(ds.dimension_labels))
+    subset = ['W' ,'X']
+    b = ds.subset( subset )
+    print ("b label {0} shape {1}".format(b.dimension_labels, 
+           numpy.shape(b.as_array())))
+    c = ds.as_array(['Z','W'])
+    
+    
         
         
         

@@ -1,13 +1,25 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#   This work is part of the Core Imaging Library developed by
+#   Visual Analytics and Imaging System Group of the Science Technology
+#   Facilities Council, STFC
 
-import setuptools
+#   Copyright 2018 Edoardo Pasca
+
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+
+#       http://www.apache.org/licenses/LICENSE-2.0
+
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
 from distutils.core import setup
-from distutils.extension import Extension
-from Cython.Distutils import build_ext
-
 import os
-import numpy
-import platform	
 import sys
 
 cil_version=os.environ['CIL_VERSION']
@@ -15,62 +27,35 @@ if  cil_version == '':
     print("Please set the environmental variable CIL_VERSION")
     sys.exit(1)
 
-library_include_path = []
-library_lib_path = []
-try:
-    library_include_path = [ os.environ['LIBRARY_INC'] ]
-    library_lib_path = [ os.environ['LIBRARY_LIB'] ]
-except:
-    if platform.system() == 'Windows':
-        pass
-    else:
-        try:
-           library_include_path = [ os.environ['PREFIX']+'/include' ]
-           library_lib_path = [ os.environ['PREFiX']+'/lib' ]
-        except:
-           pass
-    pass
-extra_include_dirs = [numpy.get_include()]
-extra_library_dirs = []
-extra_compile_args = []
-extra_link_args = []
-extra_libraries = []
-
-if platform.system() == 'Windows':
-   extra_compile_args += ['/DWIN32','/EHsc','/DBOOST_ALL_NO_LIB', 
-   '/openmp','/DHAS_TIFF','/DCCPiReconstructionIterative_EXPORTS']   
-   extra_include_dirs += ["..\\..\\Core\\src\\","..\\..\\Core\\src\\Algorithms","..\\..\\Core\\src\\Readers", "."]
-   extra_include_dirs += library_include_path
-   extra_library_dirs += library_lib_path
-   extra_libraries    += ['tiff' , 'cilrec']
-   if sys.version_info.major == 3 :   
-       extra_libraries += ['boost_python3-vc140-mt-1_64', 'boost_numpy3-vc140-mt-1_64']
-   else:
-       extra_libraries += ['boost_python-vc90-mt-1_64', 'boost_numpy-vc90-mt-1_64']   
-else:
-   extra_include_dirs += ["../../Core/src/","../../Core/src/Algorithms","../../Core/src/Readers", "."]
-   extra_include_dirs += library_include_path
-   extra_compile_args += ['-fopenmp','-O2', '-funsigned-char', '-Wall','-Wl,--no-undefined','-DHAS_TIFF','-DCCPiReconstructionIterative_EXPORTS']  
-   extra_libraries    += ['tiff' , 'cilrec'] 
-   if sys.version_info.major == 3 :
-       extra_libraries += ['boost_python3', 'boost_numpy3','gomp']
-   else:
-       extra_libraries += ['boost_python', 'boost_numpy','gomp']
-
+cil_version=os.environ['CIL_VERSION']
+if  cil_version == '':
+    print("Please set the environmental variable CIL_VERSION")
+    sys.exit(1)
 
 setup(
-  name='ccpi-reconstruction',
-	description='This is a CCPi Core Imaging Library package for Iterative Reconstruction codes',
-	version=cil_version,
-    cmdclass = {'build_ext': build_ext},
-    ext_modules = [Extension("ccpi.reconstruction.parallelbeam",
-                             sources=[  "src/diamond_module.cpp",
-                                        "src/diamond_wrapper.cpp"],
-                             include_dirs=extra_include_dirs, library_dirs=extra_library_dirs, extra_compile_args=extra_compile_args, libraries=extra_libraries, extra_link_args=extra_link_args ),
-                             Extension("ccpi.reconstruction.conebeam",
-                             sources=[  "src/conebeam_module.cpp",
-                                        "src/conebeam_wrapper.cpp"],
-                             include_dirs=extra_include_dirs, library_dirs=extra_library_dirs, extra_compile_args=extra_compile_args, libraries=extra_libraries )                             ],
-	zip_safe = False,
-	packages = {'ccpi','ccpi.reconstruction'}
+    name="ccpi-common",
+    version=cil_version,
+    packages=['ccpi'],
+
+    # Project uses reStructuredText, so ensure that the docutils get
+    # installed or upgraded on the target machine
+    #install_requires=['docutils>=0.3'],
+
+#    package_data={
+#        # If any package contains *.txt or *.rst files, include them:
+#        '': ['*.txt', '*.rst'],
+#        # And include any *.msg files found in the 'hello' package, too:
+#        'hello': ['*.msg'],
+#    },
+    # zip_safe = False,
+
+    # metadata for upload to PyPI
+    author="Edoardo Pasca",
+    author_email="edoardo.pasca@stfc.ac.uk",
+    description='CCPi Core Imaging Library - Python Framework Module',
+    license="Apache v2.0",
+    keywords="Python Framework",
+    url="http://www.ccpi.ac.uk",   # project home page, if any
+
+    # could also include long_description, download_url, classifiers, etc.
 )

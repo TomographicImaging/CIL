@@ -21,6 +21,7 @@ import numpy
 import os
 import sys
 import time
+import vtk
 
 if sys.version_info[0] >= 3 and sys.version_info[1] >= 4:
     ABC = abc.ABC
@@ -31,11 +32,18 @@ def find_key(dic, val):
     """return the key of dictionary dic given the value"""
     return [k for k, v in dic.items() if v == val][0]
 
-class CCPiBaseClass(object):
+class CCPiBaseClass(ABC):
     def __init__(self, **kwargs):
         self.acceptedInputKeywords = []
         self.pars = {}
         self.debug = True
+        # add keyworded arguments as accepted input keywords and add to the
+        # parameters
+        for key, value in kwargs.items():
+            self.acceptedInputKeywords.append(key)
+            #print ("key {0}".format(key))
+            #self.setParameter(key.__name__=value)
+            self.setParameter(**{key:value})
     
     def setParameter(self, **kwargs):
         '''set named parameter for the reconstructor engine
@@ -70,8 +78,8 @@ class CCPiBaseClass(object):
         if self.debug:
             print ("{0}: {1}".format(self.__class__.__name__, msg))
             
-class DataSet(ABC):
-    '''Abstract class to hold data'''
+class DataSet():
+    '''Generic class to hold data'''
     
     def __init__ (self, array, deep_copy=True, dimension_labels=None, 
                   **kwargs):
@@ -88,11 +96,14 @@ class DataSet(ABC):
         else:
             for i in range(self.number_of_dimensions):
                 self.dimension_labels[i] = 'dimension_{0:02}'.format(i)
-            
-        if deep_copy:
-            self.array = array[:]
+        
+        if type(array) == numpy.ndarray:
+            if deep_copy:
+                self.array = array[:]
+            else:
+                self.array = array
         else:
-            self.array = array
+            raise TypeError('Array must be NumpyArray')
 
     def as_array(self, dimensions=None):
         '''Returns the DataSet as Numpy Array
@@ -163,11 +174,181 @@ class DataSet(ABC):
                 cleaned = numpy.transpose(cleaned, axes).copy()
                 
                 return DataSet(cleaned , True, dimensions)
-                    
-                    
+    
+    def fill(self, array):
+        '''fills the internal numpy array with the one provided'''
+        if numpy.shape(array) != numpy.shape(self.array):
+            raise ValueError('Cannot fill with the provided array.' + \
+                             'Expecting {0} got {1}'.format(
+                                     numpy.shape(self.array),
+                                     numpy.shape(array)))
+        self.array = array[:]
         
+                    
+class SliceData(DataSet):
+    '''DataSet for holding 2D images'''
+    def __init__(self, array, deep_copy=True, dimension_labels=None, 
+                  **kwargs):
+        
+        if type(array) == DataSet:
+            # if the array is a DataSet get the info from there
+            if array.number_of_dimensions != 2:
+                raise ValueError('Number of dimensions are != 2: {0}'\
+                                 .format(array.number_of_dimensions))
             
+            DataSet.__init__(self, array.as_array(), deep_copy,
+                             array.dimension_labels, **kwargs)
+        elif type(array) == numpy.ndarray:
+            if dimension_labels is None:
+                dimension_labels = ['horizontal_x' , 'horizontal_y' , 'vertical']
+            shape = numpy.shape(array)
+            ndims = len(shape)
+            if ndims != 3:
+                raise ValueError('Number of dimensions are != 2: {0}'.format(ndims))
             
+            DataSet.__init__(self, array, deep_copy, dimension_labels, **kwargs)
+        
+        # Metadata
+        self.origin = [0,0]
+        self.spacing = [1,1]
+        
+        # load metadata from kwargs if present
+        for key, value in kwargs.items():
+            if key == 'origin' :
+                if type(value) == list and len (value) == 2:
+                    self.origin = value
+            if key == 'spacing' :
+                if type(value) == list and len (value) == 2:
+                    self.spacing = value
+                    
+    def rotate(self, center_of_rotation, angle):
+            pass
+                
+                    
+                
+class VolumeData(DataSet):
+    '''DataSet for holding 3D images'''
+    def __init__(self, array, deep_copy=True, dimension_labels=None, 
+                  **kwargs):
+        
+        if type(array) == DataSet:
+            # if the array is a DataSet get the info from there
+            if array.number_of_dimensions != 3:
+                raise ValueError('Number of dimensions are != 3: {0}'\
+                                 .format(array.number_of_dimensions))
+            
+            DataSet.__init__(self, array.as_array(), deep_copy,
+                             array.dimension_labels, **kwargs)
+        elif type(array) == numpy.ndarray:
+            if dimension_labels is None:
+                dimension_labels = ['horizontal_x' , 'horizontal_y' , 'vertical']
+            shape = numpy.shape(array)
+            ndims = len(shape)
+            if ndims != 3:
+                raise ValueError('Number of dimensions are != 3: {0}'.format(ndims))
+            
+            DataSet.__init__(self, array, deep_copy, dimension_labels, **kwargs)
+        
+        # Metadata
+        self.origin = [0,0,0]
+        self.spacing = [1,1,1]
+        
+        # load metadata from kwargs if present
+        for key, value in kwargs.items():
+            if key == 'origin' :
+                if type(value) == list and len (value) == 3:
+                    self.origin = value
+            if key == 'spacing' :
+                if type(value) == list and len (value) == 3:
+                    self.spacing = value                
+        
+class DataSetProcessor(CCPiBaseClass):
+    '''Abstract class for a DataSetProcessor'''
+    
+    def __init__(self, number_of_inputs, number_of_outputs, **kwargs):
+        kwargs['number_of_inputs'] = number_of_inputs
+        kwargs['number_of_outputs'] = number_of_outputs
+        
+        CCPiBaseClass.__init__(self, **kwargs)
+        
+        
+        
+    def setInput(self, **inData):
+        '''set the input data for the Processor
+        
+        this calls the setParameter method'''
+        self.setParameter(**inData)
+        
+    def getOutput(self):
+        raise NotImplementedError('The getOutput method is not implemented!')
+        
+    def apply(self):
+        raise NotImplementedError('The apply method is not implemented!')
+        
+        
+    
+class AX(DataSetProcessor):
+    '''Example DataSetProcessor
+    The AXPY routines perform a vector multiplication operation defined as
+
+    y := a*x
+    where:
+
+    a is a scalar
+
+    x a DataSet.
+    '''
+    
+    def __init__(self, scalar, input_dataset):
+        kwargs = {'scalar':scalar, 
+                  'input_dataset':input_dataset, 
+                  'output_dataset': None}
+        DataSetProcessor.__init__(self, 2, 1, **kwargs)
+        
+        
+        
+    def apply(self):
+        a, x = self.getParameter(['scalar' , 'input_dataset' ])
+        
+        y = DataSet( a * x.as_array() , True, 
+                    dimension_labels=x.dimension_labels )
+        self.setParameter(output_dataset=y)
+        
+    def getOutput(self):
+        return self.getParameter( 'output_dataset' )
+    
+    
+class PixelByPixelDataSetProcessor(DataSetProcessor):
+    '''Example DataSetProcessor
+    
+    This processor applies a python function to each pixel of the DataSet
+    
+    f is a python function
+
+    x a DataSet.
+    '''
+    
+    def __init__(self, pyfunc, input_dataset):
+        kwargs = {'pyfunc':pyfunc, 
+                  'input_dataset':input_dataset, 
+                  'output_dataset': None}
+        DataSetProcessor.__init__(self, 2, 1, **kwargs)
+        
+        
+        
+    def apply(self):
+        pyfunc, x = self.getParameter(['pyfunc' , 'input_dataset' ])
+        
+        eval_func = numpy.frompyfunc(pyfunc,1,1)
+
+        
+        y = DataSet( eval_func( x.as_array() ) , True, 
+                    dimension_labels=x.dimension_labels )
+        self.setParameter(output_dataset=y)
+        
+    def getOutput(self):
+        return self.getParameter( 'output_dataset' )
+        
 if __name__ == '__main__':
     shape = (2,3,4,5)
     size = shape[0]
@@ -181,10 +362,42 @@ if __name__ == '__main__':
     b = ds.subset( subset )
     print ("b label {0} shape {1}".format(b.dimension_labels, 
            numpy.shape(b.as_array())))
-    c = ds.as_array(['Z','W'])
+    c = ds.subset(['Z','W','X'])
+    
+    # Create a VolumeData sharing the array with c
+    volume0 = VolumeData(c.as_array(), False, dimensions = c.dimension_labels)
+    volume1 = VolumeData(c, False)
+    
+    print ("volume0 {0} volume1 {1}".format(id(volume0.array),
+           id(volume1.array)))
+    
+    # Create a VolumeData copying the array from c
+    volume2 = VolumeData(c.as_array(), dimensions = c.dimension_labels)
+    volume3 = VolumeData(c)
+    
+    print ("volume2 {0} volume3 {1}".format(id(volume2.array),
+           id(volume3.array)))
+        
+    # single number DataSet
+    sn = DataSet(numpy.asarray([1]))
+    
+    ax = AX(scalar = 2 , input_dataset=c)
+    ax.apply()
+    print ("ax  in {0} out {1}".format(c.as_array().flatten(),
+           ax.getOutput().as_array().flatten()))
+    axm = AX(scalar = 0.5 , input_dataset=ax.getOutput())
+    axm.apply()
+    print ("axm in {0} out {1}".format(c.as_array(), axm.getOutput().as_array()))
+    
+    # create a PixelByPixelDataSetProcessor
+    
+    #define a python function which will take only one input (the pixel value)
+    pyfunc = lambda x: -x if x > 20 else x
+    clip = PixelByPixelDataSetProcessor(pyfunc,c)    
+    clip.apply()
+    
+    print ("clip in {0} out {1}".format(c.as_array(), clip.getOutput().as_array()))
     
     
-        
-        
         
         

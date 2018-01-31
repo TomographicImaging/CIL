@@ -13,9 +13,9 @@ import timeit
 from ccpi.filters.cpu_regularizers_boost import SplitBregman_TV , FGP_TV ,\
                                                  LLT_model, PatchBased_Regul ,\
                                                  TGV_PD
-from ccpi.framework import DataSetProcessor, DataSet
+from ccpi.framework import DataSetProcessor, DataSetProcessor1, DataSet
 
-class SplitBregmanTVRegularizer(DataSetProcessor):
+class SplitBregmanTVRegularizer(DataSetProcessor1):
     '''Regularizers DataSetProcessor
     '''
     
@@ -32,7 +32,7 @@ class SplitBregmanTVRegularizer(DataSetProcessor):
                   }
         for key, value in wargs.items():
             kwargs[key] = value
-        DataSetProcessor.__init__(self, **kwargs)
+        DataSetProcessor1.__init__(self, **kwargs)
         
         
         
@@ -50,7 +50,7 @@ class SplitBregmanTVRegularizer(DataSetProcessor):
         #self.setParameter(output_dataset=y)
         return y
     
-class FGPTVRegularizer(DataSetProcessor):
+class FGPTVRegularizer(DataSetProcessor1):
     '''Regularizers DataSetProcessor
     '''
     
@@ -67,7 +67,7 @@ class FGPTVRegularizer(DataSetProcessor):
                   }
         for key, value in wargs.items():
             kwargs[key] = value
-        DataSetProcessor.__init__(self, **kwargs)
+        DataSetProcessor1.__init__(self, **kwargs)
         
         
         
@@ -93,7 +93,106 @@ class FGPTVRegularizer(DataSetProcessor):
         if issubclass(type(other) , DataSetProcessor):
             self.setParameter(input = other.getOutput()[0])
        
-
+class SBTV(DataSetProcessor):
+    '''Regularizers DataSetProcessor
+    '''
+    
+    
+    
+    def __init__(self):
+        attributes = {'regularization_parameter':None, 
+                  'number_of_iterations': 35, 
+                  'tolerance_constant': 0.0001, 
+                  'TV_penalty':0, 
+                  'input' : None
+                  }
+        for key, value in attributes.items():
+            self.__dict__[key] = value
+            
+    def checkInput(self, dataset):
+        '''Checks number of dimensions input DataSet
+        
+        Expected input is 2D or 3D
+        '''
+        if dataset.number_of_dimensions == 2 or \
+           dataset.number_of_dimensions == 3:
+               return True
+        else:
+            raise ValueError("Expected input dimensions is 2 or 3, got {0}"\
+                             .format(dataset.number_of_dimensions))
+        
+    def process(self):
+        '''Executes the processor
+        
+        Basic checks are run in here
+        '''
+    
+        if issubclass(type(self.input), DataSetProcessor):
+            dsi = self.input.getOutput()[0]
+        else:
+            dsi = self.input
+        if None in self.__dict__.values():
+            raise ValueError('Not all parameters have been passed')
+        out = SplitBregman_TV (dsi.as_array(), 
+                               self.regularization_parameter,
+                               self.number_of_iterations,
+                               self.tolerance_constant,
+                               self.TV_penalty)  
+        print (type(out))
+        y = DataSet( out[0] , False )
+        #self.setParameter(output_dataset=y)
+        return y
+    
+class FGPTV(DataSetProcessor):
+    '''Regularizers DataSetProcessor
+    '''
+    
+    
+    
+    def __init__(self):
+        attributes = {'regularization_parameter':None, 
+                  'number_of_iterations': 35, 
+                  'tolerance_constant': 0.0001, 
+                  'TV_penalty':0, 
+                  'input' : None
+                  }
+        for key, value in attributes.items():
+            self.__dict__[key] = value
+            
+    def checkInput(self, dataset):
+        '''Checks number of dimensions input DataSet
+        
+        Expected input is 2D or 3D
+        '''
+        if dataset.number_of_dimensions == 2 or \
+           dataset.number_of_dimensions == 3:
+               return True
+        else:
+            raise ValueError("Expected input dimensions is 2 or 3, got {0}"\
+                             .format(dataset.number_of_dimensions))
+        
+    def process(self):
+        '''Executes the processor
+        
+        Basic checks are run in here
+        '''
+    
+        if issubclass(type(self.input), DataSetProcessor):
+            dsi = self.input.getOutput()
+        else:
+            dsi = self.input
+        if None in self.__dict__.values():
+            raise ValueError('Not all parameters have been passed')
+        out = FGP_TV (dsi.as_array(), 
+                               self.regularization_parameter,
+                               self.number_of_iterations,
+                               self.tolerance_constant,
+                               self.TV_penalty)  
+        print (type(out))
+        y = DataSet( out[0] , False )
+        #self.setParameter(output_dataset=y)
+        return y
+    
 if __name__ == '__main__':
     filename = os.path.join(".." , ".." , ".." , ".." , 
                             "CCPi-FISTA_Reconstruction", "data" ,
@@ -192,13 +291,18 @@ if __name__ == '__main__':
                          #cmap="gray"
                          )
     
-    reg3 = FGPTVRegularizer(reg,
-                           pars['regularization_parameter'],
-                              pars['number_of_iterations'],
-                              pars['tolerance_constant'],
-                              pars['TV_penalty'], 
-                              hold_input=False, hold_output=True)
-    chain = reg3.getOutput()
+    
+#    'regularization_parameter':40 , \
+#    'number_of_iterations' :350 ,\
+#    'tolerance_constant':0.01 , \
+#    'TV_penalty': 0
+    reg3 = SBTV()
+    reg3.number_of_iterations = 350
+    reg3.tolerance_constant = 0.01
+    reg3.regularization_parameter = 40
+    reg3.TV_penalty = 0
+    reg3.setInput(lena)
+    dataprocessoroutput = reg3.getOutput()
     
     #txtstr = printParametersToString(pars) 
     #txtstr += "%s = %.3fs" % ('elapsed time',timeit.default_timer() - start_time)
@@ -211,7 +315,53 @@ if __name__ == '__main__':
     # these are matplotlib.patch.Patch properties
     props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
     # place a text box in upper left in axes coords
-    a.text(0.05, 0.95, 'chain', transform=a.transAxes, fontsize=14,
+    a.text(0.05, 0.95, 'SBTV', transform=a.transAxes, fontsize=14,
+            verticalalignment='top', bbox=props)
+    imgplot = plt.imshow(dataprocessoroutput.as_array(),\
+                         #cmap="gray"
+                         )
+    reg4 = FGPTV()
+    reg4.number_of_iterations = 350
+    reg4.tolerance_constant = 0.01
+    reg4.regularization_parameter = 40
+    reg4.TV_penalty = 0
+    reg4.setInput(lena)
+    dataprocessoroutput2 = reg4.getOutput()
+    
+    #txtstr = printParametersToString(pars) 
+    #txtstr += "%s = %.3fs" % ('elapsed time',timeit.default_timer() - start_time)
+    #print (txtstr)
+        
+    
+    a=fig.add_subplot(2,3,5)
+    
+    
+    # these are matplotlib.patch.Patch properties
+    props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+    # place a text box in upper left in axes coords
+    a.text(0.05, 0.95, 'FGPTV', transform=a.transAxes, fontsize=14,
+            verticalalignment='top', bbox=props)
+    imgplot = plt.imshow(dataprocessoroutput2.as_array(),\
+                         #cmap="gray"
+                         )
+    
+    
+    #reg4.input = None
+    reg4.setInputProcessor(reg3)
+    chain = reg4.process()
+    
+    #txtstr = printParametersToString(pars) 
+    #txtstr += "%s = %.3fs" % ('elapsed time',timeit.default_timer() - start_time)
+    #print (txtstr)
+        
+    
+    a=fig.add_subplot(2,3,6)
+    
+    
+    # these are matplotlib.patch.Patch properties
+    props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+    # place a text box in upper left in axes coords
+    a.text(0.05, 0.95, 'SBTV + FGPTV', transform=a.transAxes, fontsize=14,
             verticalalignment='top', bbox=props)
     imgplot = plt.imshow(chain.as_array(),\
                          #cmap="gray"

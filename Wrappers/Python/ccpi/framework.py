@@ -296,7 +296,7 @@ class InstrumentGeometry(CCPiBaseClass):
         
         
         
-class DataSetProcessor(CCPiBaseClass):
+class DataSetProcessor1(CCPiBaseClass):
     '''Abstract class for a DataSetProcessor
     
     inputs: dictionary of inputs
@@ -355,7 +355,7 @@ class DataSetProcessor(CCPiBaseClass):
         
         
     
-class AX(DataSetProcessor):
+class AX(DataSetProcessor1):
     '''Example DataSetProcessor
     The AXPY routines perform a vector multiplication operation defined as
 
@@ -374,7 +374,7 @@ class AX(DataSetProcessor):
                   }
         for key, value in wargs.items():
             kwargs[key] = value
-        DataSetProcessor.__init__(self, **kwargs)
+        DataSetProcessor1.__init__(self, **kwargs)
         
         
         
@@ -388,7 +388,7 @@ class AX(DataSetProcessor):
         
     
     
-class PixelByPixelDataSetProcessor(DataSetProcessor):
+class PixelByPixelDataSetProcessor(DataSetProcessor1):
     '''Example DataSetProcessor
     
     This processor applies a python function to each pixel of the DataSet
@@ -402,7 +402,7 @@ class PixelByPixelDataSetProcessor(DataSetProcessor):
         kwargs = {'pyfunc':pyfunc, 
                   'input_dataset':input_dataset, 
                   'output_dataset': None}
-        DataSetProcessor.__init__(self, **kwargs)
+        DataSetProcessor1.__init__(self, **kwargs)
         
         
         
@@ -416,6 +416,61 @@ class PixelByPixelDataSetProcessor(DataSetProcessor):
                     dimension_labels=x.dimension_labels )
         return y
     
+class DataSetProcessor():
+    '''Defines a generic DataSet processor
+    
+    accepts DataSet as inputs and 
+    outputs DataSet
+    additional attributes can be defined with __setattr__
+    '''
+    
+    def __init__(self):
+        pass
+    
+    def __setattr__(self, name, value):
+        if name == 'input':
+            self.setInput(value)
+        elif name in self.__dict__.keys():
+            self.__dict__[name] = value
+        else:
+            raise KeyError('Attribute {0} not found'.format(name))
+        #pass
+    
+    def setInput(self, dataset):
+        print('Setting input as {0}...'.format(dataset))
+        if issubclass(type(dataset), DataSet):
+            if self.checkInput(dataset):
+                self.__dict__['input'] = dataset
+        else:
+            raise TypeError("Input type mismatch: got {0} expecting {1}"\
+                            .format(type(dataset), DataSet))
+    
+    def checkInput(self, dataset):
+        '''Checks parameters of the input DataSet
+        
+        Should raise an Error if the DataSet does not match expectation, e.g.
+        if the expected input DataSet is 3D and the Processor expects 2D.
+        '''
+        raise NotImplementedError('Implement basic checks for input DataSet')
+        
+    def getOutput(self):
+        if None in self.__dict__.values():
+            raise ValueError('Not all parameters have been passed')
+        return self.process()
+    
+    def setInputProcessor(self, processor):
+        print('Setting input as {0}...'.format(processor))
+        if issubclass(type(processor), DataSetProcessor):
+            self.__dict__['input'] = processor
+        else:
+            raise TypeError("Input type mismatch: got {0} expecting {1}"\
+                            .format(type(processor), DataSetProcessor))
+        
+    
+    def process(self):
+        raise NotImplementedError('process must be implemented')
+        
+        
         
 if __name__ == '__main__':
     shape = (2,3,4,5)
@@ -472,7 +527,9 @@ if __name__ == '__main__':
     
     print ("clip in {0} out {1}".format(c.as_array(), clip.getOutput().as_array()))
     
-    
+    dsp = DataSetProcessor()
+    dsp.setInput(ds)
+    dsp.input = a
     # pipeline
 #    Pipeline
 #    Pipeline.setProcessor(0, ax)

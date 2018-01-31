@@ -1,5 +1,5 @@
 package:
-  name: ccpi-reconstruction
+  name: ccpi-common
   version: {{ environ['CIL_VERSION'] }}
 
 
@@ -14,21 +14,11 @@ requirements:
     - python
     - numpy
     - setuptools
-    - boost ==1.64.0	
-    - boost-cpp ==1.64.0
-    - cython
-    - libtiff
-    - cil_reconstruction
 
   run:
     - python
     - numpy
-    - boost ==1.64
-    - libtiff
-    - h5py
     - scipy
-    - cil_reconstruction
-
 	
 about:
   home: http://www.ccpi.ac.uk

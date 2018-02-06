@@ -118,6 +118,7 @@ class DataSet():
         else:
             raise TypeError('Array must be NumpyArray, passed {0}'\
                             .format(type(array)))
+        
 
     def as_array(self, dimensions=None):
         '''Returns the DataSet as Numpy Array
@@ -286,136 +287,6 @@ class SinogramData(DataSet):
             # assume it is parallel beam
             pass
             
-        
-class InstrumentGeometry(CCPiBaseClass):
-    def __init__(self, **kwargs):
-        CCPiBaseClass.__init__(self, **kwargs)
-        
-    def convertToAstra():
-        pass
-        
-        
-        
-class DataSetProcessor1(CCPiBaseClass):
-    '''Abstract class for a DataSetProcessor
-    
-    inputs: dictionary of inputs
-    outputs: dictionary of outputs
-    '''
-    
-    def __init__(self, **inputs):
-        if 'hold_input' in inputs.keys():
-            hold_input = inputs.pop('hold_input')
-        else:
-            hold_input = True
-        if 'hold_output' in inputs.keys():
-            hold_output = inputs.pop('hold_output')
-        else:
-            hold_output = True
-                
-        self.number_of_inputs = len (inputs)
-        #pars = ['hold_output', 'hold_input'] 
-        wargs = {}
-        wargs['hold_output'] = hold_output
-        wargs['hold_input'] = hold_input
-        wargs['output'] = None
-        
-        # add the hold_output and hold_input to the wargs
-        for key, value in wargs.items():
-            if not key in inputs.keys():
-                inputs[key] = value
-                
-        self.runTime = None
-        self.mTime = datetime.now()
-        
-        CCPiBaseClass.__init__(self, **inputs)
-                
-    def getOutput(self):
-        shouldRun = False
-        if self.runTime is None:
-            shouldRun = True
-        elif self.mTime > self.runTime:
-            shouldRun = True
-            
-        if self.getParameter('hold_output'):
-            if shouldRun:
-                output = self.__execute__()
-                self.setParameter(output=output)
-            return self.getParameter( 'output' )
-        else:
-            return self.__execute__()
-        
-    def __execute__(self):
-        print ("__execute__")
-        self.runTime = datetime.now()
-        return self.apply()
-    
-    def apply(self):
-        raise NotImplementedError('The apply method is not implemented!')
-        
-        
-    
-class AX(DataSetProcessor1):
-    '''Example DataSetProcessor
-    The AXPY routines perform a vector multiplication operation defined as
-
-    y := a*x
-    where:
-
-    a is a scalar
-
-    x a DataSet.
-    '''
-    
-    def __init__(self, scalar, input_dataset, **wargs):
-        kwargs = {'scalar':scalar, 
-                  'input_dataset':input_dataset, 
-                  'output': None
-                  }
-        for key, value in wargs.items():
-            kwargs[key] = value
-        DataSetProcessor1.__init__(self, **kwargs)
-        
-        
-        
-    def apply(self):
-        a, x = self.getParameter(['scalar' , 'input_dataset' ])
-        y = DataSet( a * x.as_array() , True, 
-                    dimension_labels=x.dimension_labels )
-        #self.setParameter(output_dataset=y)
-        return y
-    
-        
-    
-    
-class PixelByPixelDataSetProcessor(DataSetProcessor1):
-    '''Example DataSetProcessor
-    
-    This processor applies a python function to each pixel of the DataSet
-    
-    f is a python function
-
-    x a DataSet.
-    '''
-    
-    def __init__(self, pyfunc, input_dataset):
-        kwargs = {'pyfunc':pyfunc, 
-                  'input_dataset':input_dataset, 
-                  'output_dataset': None}
-        DataSetProcessor1.__init__(self, **kwargs)
-        
-        
-        
-    def apply(self):
-        pyfunc, x = self.getParameter(['pyfunc' , 'input_dataset' ])
-        
-        eval_func = numpy.frompyfunc(pyfunc,1,1)
-
-        
-        y = DataSet( eval_func( x.as_array() ) , True, 
-                    dimension_labels=x.dimension_labels )
-        return y
-    
 class DataSetProcessor():
     '''Defines a generic DataSet processor
     
@@ -424,20 +295,28 @@ class DataSetProcessor():
     additional attributes can be defined with __setattr__
     '''
     
-    def __init__(self):
-        pass
+    def __init__(self, **attributes):
+        if not 'store_output' in attributes.keys():
+            attributes['store_output'] = True
+            attributes['output'] = False
+            attributes['runTime'] = -1
+            attributes['mTime'] = datetime.now()
+            attributes['input'] = None
+        for key, value in attributes.items():
+            self.__dict__[key] = value
+        
     
     def __setattr__(self, name, value):
         if name == 'input':
             self.setInput(value)
         elif name in self.__dict__.keys():
             self.__dict__[name] = value
+            self.__dict__['mTime'] = datetime.now()
         else:
             raise KeyError('Attribute {0} not found'.format(name))
         #pass
     
     def setInput(self, dataset):
-        print('Setting input as {0}...'.format(dataset))
         if issubclass(type(dataset), DataSet):
             if self.checkInput(dataset):
                 self.__dict__['input'] = dataset
@@ -456,20 +335,128 @@ class DataSetProcessor():
     def getOutput(self):
         if None in self.__dict__.values():
             raise ValueError('Not all parameters have been passed')
+        shouldRun = False
+        if self.runTime == -1:
+            shouldRun = True
+        elif self.mTime > self.runTime:
+            shouldRun = True
+            
+        if self.store_output and shouldRun:
+            self.runTime = datetime.now()
+            self.output = self.process()
+            return self.output
+        self.runTime = datetime.now()
         return self.process()
     
     def setInputProcessor(self, processor):
-        print('Setting input as {0}...'.format(processor))
         if issubclass(type(processor), DataSetProcessor):
             self.__dict__['input'] = processor
         else:
             raise TypeError("Input type mismatch: got {0} expecting {1}"\
                             .format(type(processor), DataSetProcessor))
         
-    
+    def getInput(self):
+        '''returns the input DataSet
+        
+        It is useful in the case the user has provided a DataSetProcessor as
+        input
+        '''
+        if issubclass(type(self.input), DataSetProcessor):
+            dsi = self.input.getOutput()
+        else:
+            dsi = self.input
+        return dsi
+        
     def process(self):
         raise NotImplementedError('process must be implemented')
+
+class DataSetProcessor23D(DataSetProcessor):
+    '''Regularizers DataSetProcessor
+    '''
+            
+    def checkInput(self, dataset):
+        '''Checks number of dimensions input DataSet
         
+        Expected input is 2D or 3D
+        '''
+        if dataset.number_of_dimensions == 2 or \
+           dataset.number_of_dimensions == 3:
+               return True
+        else:
+            raise ValueError("Expected input dimensions is 2 or 3, got {0}"\
+                             .format(dataset.number_of_dimensions))
+    
+###### Example of DataSetProcessors
+
+class AX(DataSetProcessor):
+    '''Example DataSetProcessor
+    The AXPY routines perform a vector multiplication operation defined as
+
+    y := a*x
+    where:
+
+    a is a scalar
+
+    x a DataSet.
+    '''
+    
+    def __init__(self):
+        kwargs = {'scalar':None, 
+                  'input':None, 
+                  }
+        
+        DataSetProcessor.__init__(self, **kwargs)
+        
+    
+    def checkInput(self, dataset):
+        return True
+        
+    def process(self):
+        
+        dsi = self.getInput()
+        a = self.scalar
+        
+        y = DataSet( a * dsi.as_array() , True, 
+                    dimension_labels=dsi.dimension_labels )
+        #self.setParameter(output_dataset=y)
+        return y
+    
+        
+    
+    
+class PixelByPixelDataSetProcessor(DataSetProcessor):
+    '''Example DataSetProcessor
+    
+    This processor applies a python function to each pixel of the DataSet
+    
+    f is a python function
+
+    x a DataSet.
+    '''
+    
+    def __init__(self):
+        kwargs = {'pyfunc':None, 
+                  'input':None, 
+                  }
+        DataSetProcessor.__init__(self, **kwargs)
+        
+        
+    def checkInput(self, dataset):
+        return True
+    
+    def process(self):
+        
+        pyfunc = self.pyfunc
+        dsi = self.getInput()
+        
+        eval_func = numpy.frompyfunc(pyfunc,1,1)
+
+        
+        y = DataSet( eval_func( dsi.as_array() ) , True, 
+                    dimension_labels=dsi.dimension_labels )
+        return y
+    
+
         
         
 if __name__ == '__main__':
@@ -510,11 +497,15 @@ if __name__ == '__main__':
     # single number DataSet
     sn = DataSet(numpy.asarray([1]))
     
-    ax = AX(scalar = 2 , input_dataset=c)
+    ax = AX()
+    ax.scalar = 2
+    ax.setInput(c)
     #ax.apply()
     print ("ax  in {0} out {1}".format(c.as_array().flatten(),
            ax.getOutput().as_array().flatten()))
-    axm = AX(hold_output=False, scalar = 0.5 , input_dataset=ax.getOutput())
+    axm = AX()
+    axm.scalar = 0.5
+    axm.setInput(c)
     #axm.apply()
     print ("axm in {0} out {1}".format(c.as_array(), axm.getOutput().as_array()))
     
@@ -522,17 +513,21 @@ if __name__ == '__main__':
     
     #define a python function which will take only one input (the pixel value)
     pyfunc = lambda x: -x if x > 20 else x
-    clip = PixelByPixelDataSetProcessor(pyfunc,c)    
+    clip = PixelByPixelDataSetProcessor()
+    clip.pyfunc = pyfunc 
+    clip.setInput(c)    
     #clip.apply()
     
     print ("clip in {0} out {1}".format(c.as_array(), clip.getOutput().as_array()))
     
-    dsp = DataSetProcessor()
-    dsp.setInput(ds)
-    dsp.input = a
+    #dsp = DataSetProcessor()
+    #dsp.setInput(ds)
+    #dsp.input = a
     # pipeline
-#    Pipeline
-#    Pipeline.setProcessor(0, ax)
-#    Pipeline.setProcessor(1, axm)
-#    Pipeline.execute()     
+
+    chain = AX()
+    chain.scalar = 0.5
+    chain.setInputProcessor(ax)
+    print ("chain in {0} out {1}".format(ax.getOutput().as_array(), chain.getOutput().as_array()))
+    
         

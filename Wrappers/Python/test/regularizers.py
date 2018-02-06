@@ -1,198 +1,246 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Jan 30 16:19:03 2018
+#   This work is part of the Core Imaging Library developed by
+#   Visual Analytics and Imaging System Group of the Science Technology
+#   Facilities Council, STFC
 
-@author: ofn77899
-"""
+#   Copyright 2018 Edoardo Pasca
+
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+
+#       http://www.apache.org/licenses/LICENSE-2.0
+
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
 
 import matplotlib.pyplot as plt
 import numpy as np
 import os    
-from enum import Enum
-import timeit
+from ccpi.framework import DataSetProcessor, DataSetProcessor23D , DataSet
 from ccpi.filters.cpu_regularizers_boost import SplitBregman_TV , FGP_TV ,\
-                                                 LLT_model, PatchBased_Regul ,\
-                                                 TGV_PD
-from ccpi.framework import DataSetProcessor, DataSetProcessor1, DataSet
+                                                LLT_model, PatchBased_Regul ,\
+                                                TGV_PD
+#from ccpi.filters.cpu_regularizers_cython import some
 
-class SplitBregmanTVRegularizer(DataSetProcessor1):
+try:
+    from ccpi.filter import gpu_regularizers as gpu
+    class PatchBasedRegGPU(DataSetProcessor23D):
+        '''Regularizers DataSetProcessor for PatchBasedReg
+        
+        
+        '''
+        
+        def __init__(self):
+            attributes = {'regularization_parameter':None, 
+                          'searching_window_ratio': None, 
+                          'similarity_window_ratio': None, 
+                          'PB_filtering_parameter': None
+                      }
+            DataSetProcessor.__init__(self, **attributes)
+                
+            
+        def process(self):
+            '''Executes the processor
+                
+            '''
+            dsi = self.getInput()
+            out = gpu.NML (dsi.as_array(), 
+                             self.searching_window_ratio,
+                             self.similarity_window_ratio,
+                             self.regularization_parameter,
+                             self.PB_filtering_parameter)  
+            y = DataSet( out , False )
+            return y
+    class Diff4thHajiaboli(DataSetProcessor23D):
+        '''Regularizers DataSetProcessor for PatchBasedReg
+        
+        
+        '''
+        
+        def __init__(self):
+            attributes = {'regularization_parameter':None, 
+                          'searching_window_ratio': None, 
+                          'similarity_window_ratio': None, 
+                          'PB_filtering_parameter': None
+                      }
+            DataSetProcessor.__init__(self, **attributes)
+                
+            
+        def process(self):
+            '''Executes the processor
+                
+            '''
+            dsi = self.getInput()
+            out = gpu.Diff4thHajiaboli (dsi.as_array(), 
+                                        self.regularization_parameter, 
+                                        self.number_of_iterations,
+                                        self.edge_preserving_parameter)  
+            y = DataSet( out , False )
+            return y
+
+except ImportError as ie:
+    print (ie)
+    
+
+
+class SBTV(DataSetProcessor23D):
     '''Regularizers DataSetProcessor
     '''
-    
-    
-    
-    def __init__(self, input , regularization_parameter , number_of_iterations  = 35 ,\
-                 tolerance_constant = 0.0001 , TV_penalty= 0, **wargs):
-        kwargs = {'regularization_parameter':regularization_parameter, 
-                  'number_of_iterations':number_of_iterations, 
-                  'tolerance_constant':tolerance_constant, 
-                  'TV_penalty':TV_penalty, 
-                  'input' : input,
-                  'output': None
-                  }
-        for key, value in wargs.items():
-            kwargs[key] = value
-        DataSetProcessor1.__init__(self, **kwargs)
-        
-        
-        
-    def apply(self):
-        pars = self.getParameterMap(['input' , 'regularization_parameter' ,
-                                  'number_of_iterations', 'tolerance_constant' ,
-                                  'TV_penalty' ])
-    
-        out = SplitBregman_TV (pars['input'].as_array(), pars['regularization_parameter'],
-                              pars['number_of_iterations'],
-                              pars['tolerance_constant'],
-                              pars['TV_penalty'])  
-        print (type(out))
-        y = DataSet( out[0] , False )
-        #self.setParameter(output_dataset=y)
-        return y
-    
-class FGPTVRegularizer(DataSetProcessor1):
-    '''Regularizers DataSetProcessor
-    '''
-    
-    
-    
-    def __init__(self, input , regularization_parameter , number_of_iterations  = 35 ,\
-                 tolerance_constant = 0.0001 , TV_penalty= 0, **wargs):
-        kwargs = {'regularization_parameter':regularization_parameter, 
-                  'number_of_iterations':number_of_iterations, 
-                  'tolerance_constant':tolerance_constant, 
-                  'TV_penalty':TV_penalty, 
-                  'input' : input,
-                  'output': None
-                  }
-        for key, value in wargs.items():
-            kwargs[key] = value
-        DataSetProcessor1.__init__(self, **kwargs)
-        
-        
-        
-    def apply(self):
-        
-        pars = self.getParameterMap(['input' , 'regularization_parameter' ,
-                                  'number_of_iterations', 'tolerance_constant' ,
-                                  'TV_penalty' ])
-        
-        if issubclass(type(pars['input']) , DataSetProcessor):
-            pars['input'] = pars['input'].getOutput()
-        
-        out = FGP_TV (pars['input'].as_array(), 
-              pars['regularization_parameter'],
-              pars['number_of_iterations'],
-              pars['tolerance_constant'], 
-              pars['TV_penalty'])  
-        y = DataSet( out[0] , False )
-        #self.setParameter(output_dataset=y)
-        return y
-    
-    def chain(self, other):
-        if issubclass(type(other) , DataSetProcessor):
-            self.setParameter(input = other.getOutput()[0])
-       
-class SBTV(DataSetProcessor):
-    '''Regularizers DataSetProcessor
-    '''
-    
-    
     
     def __init__(self):
         attributes = {'regularization_parameter':None, 
                   'number_of_iterations': 35, 
                   'tolerance_constant': 0.0001, 
-                  'TV_penalty':0, 
-                  'input' : None
+                  'TV_penalty':0
                   }
-        for key, value in attributes.items():
-            self.__dict__[key] = value
+        DataSetProcessor.__init__(self, **attributes)
             
-    def checkInput(self, dataset):
-        '''Checks number of dimensions input DataSet
-        
-        Expected input is 2D or 3D
-        '''
-        if dataset.number_of_dimensions == 2 or \
-           dataset.number_of_dimensions == 3:
-               return True
-        else:
-            raise ValueError("Expected input dimensions is 2 or 3, got {0}"\
-                             .format(dataset.number_of_dimensions))
-        
+            
     def process(self):
         '''Executes the processor
         
-        Basic checks are run in here
         '''
     
-        if issubclass(type(self.input), DataSetProcessor):
-            dsi = self.input.getOutput()[0]
-        else:
-            dsi = self.input
-        if None in self.__dict__.values():
-            raise ValueError('Not all parameters have been passed')
+        dsi = self.getInput()
         out = SplitBregman_TV (dsi.as_array(), 
                                self.regularization_parameter,
                                self.number_of_iterations,
                                self.tolerance_constant,
                                self.TV_penalty)  
-        print (type(out))
         y = DataSet( out[0] , False )
-        #self.setParameter(output_dataset=y)
         return y
     
-class FGPTV(DataSetProcessor):
+class FGPTV(DataSetProcessor23D):
     '''Regularizers DataSetProcessor
     '''
-    
-    
     
     def __init__(self):
         attributes = {'regularization_parameter':None, 
                   'number_of_iterations': 35, 
                   'tolerance_constant': 0.0001, 
-                  'TV_penalty':0, 
-                  'input' : None
+                  'TV_penalty':0
                   }
-        for key, value in attributes.items():
-            self.__dict__[key] = value
+        DataSetProcessor.__init__(self, **attributes)
             
-    def checkInput(self, dataset):
-        '''Checks number of dimensions input DataSet
-        
-        Expected input is 2D or 3D
-        '''
-        if dataset.number_of_dimensions == 2 or \
-           dataset.number_of_dimensions == 3:
-               return True
-        else:
-            raise ValueError("Expected input dimensions is 2 or 3, got {0}"\
-                             .format(dataset.number_of_dimensions))
         
     def process(self):
         '''Executes the processor
-        
-        Basic checks are run in here
+            
         '''
-    
-        if issubclass(type(self.input), DataSetProcessor):
-            dsi = self.input.getOutput()
-        else:
-            dsi = self.input
-        if None in self.__dict__.values():
-            raise ValueError('Not all parameters have been passed')
+        dsi = self.getInput()
         out = FGP_TV (dsi.as_array(), 
-                               self.regularization_parameter,
-                               self.number_of_iterations,
-                               self.tolerance_constant,
-                               self.TV_penalty)  
-        print (type(out))
+                      self.regularization_parameter,
+                      self.number_of_iterations,
+                      self.tolerance_constant,
+                      self.TV_penalty)  
         y = DataSet( out[0] , False )
-        #self.setParameter(output_dataset=y)
         return y
     
+class LLT(DataSetProcessor23D):
+    '''Regularizers DataSetProcessor for LLT_model
+    
+    
+    '''
+    
+    def __init__(self):
+        attributes = {'regularization_parameter':None, 
+                      'time_step': 0.0001, 
+                      'number_of_iterations': 35, 
+                      'tolerance_constant': 0, 
+                      'restrictive_Z_smoothing': None 
+                  }
+        DataSetProcessor.__init__(self, **attributes)
+            
+        
+    def process(self):
+        '''Executes the processor
+            
+        '''
+        dsi = self.getInput()
+        out = LLT_model (dsi.as_array(), 
+                         self.regularization_parameter,
+                         self.time_step,
+                         self.number_of_iterations,
+                         self.tolerance_constant,
+                         self.restrictive_Z_smoothing)  
+        y = DataSet( out[0] , False )
+        return y
+    
+class PatchBasedReg(DataSetProcessor23D):
+    '''Regularizers DataSetProcessor for PatchBasedReg
+    
+    
+    '''
+    
+    def __init__(self):
+        attributes = {'regularization_parameter':None, 
+                      'searching_window_ratio': None, 
+                      'similarity_window_ratio': None, 
+                      'PB_filtering_parameter': None
+                  }
+        DataSetProcessor.__init__(self, **attributes)
+            
+        
+    def process(self):
+        '''Executes the processor
+            
+        '''
+        dsi = self.getInput()
+        out = PatchBased_Regul (dsi.as_array(), 
+                         self.regularization_parameter,
+                         self.searching_window_ratio,
+                         self.similarity_window_ratio,
+                         self.PB_filtering_parameter)  
+        y = DataSet( out[0] , False )
+        return y
+    
+class TGVPD(DataSetProcessor23D):
+    '''Regularizers DataSetProcessor for PatchBasedReg
+    
+    
+    '''
+    
+    def __init__(self):
+        attributes = {'regularization_parameter':None, 
+                      'first_order_term': None, 
+                      'second_order_term': None, 
+                      'number_of_iterations': None
+                  }
+        DataSetProcessor.__init__(self, **attributes)
+            
+        
+    def process(self):
+        '''Executes the processor
+            
+        '''
+        dsi = self.getInput()
+        if dsi.number_of_dimensions == 2:
+            out = TGV_PD(dsi.as_array(), 
+                         self.regularization_parameter,
+                         self.first_order_term, 
+                         self.second_order_term , 
+                         self.number_of_iterations)
+            y = DataSet( out[0] , False )
+        elif len(np.shape(input)) == 3:
+            #assuming it's 3D
+            # run independent calls on each slice
+            out3d = dsi.as_array().copy()
+            for i in range(np.shape(dsi.as_array())[0]):
+                out = TGV_PD(dsi.as_array()[i], 
+                                     self.regularization_parameter,
+                                     self.first_order_term, 
+                                     self.second_order_term , 
+                                     self.number_of_iterations)
+                # copy the result in the 3D image
+                out3d[i] = out[0].copy()
+            y = DataSet (out3d , False)
+        return y
+    
+## self contained test
 if __name__ == '__main__':
     filename = os.path.join(".." , ".." , ".." , ".." , 
                             "CCPi-FISTA_Reconstruction", "data" ,
@@ -222,80 +270,7 @@ if __name__ == '__main__':
     ##############################################################################
     # Call regularizer
     
-    ####################### SplitBregman_TV #####################################
-    # u = SplitBregman_TV(single(u0), 10, 30, 1e-04);
-    
-    start_time = timeit.default_timer()
-    pars = {'algorithm' : SplitBregman_TV , \
-            'input' : lena,
-            'regularization_parameter':40 , \
-    'number_of_iterations' :350 ,\
-    'tolerance_constant':0.01 , \
-    'TV_penalty': 0
-    }
-    
-    
-    reg = SplitBregmanTVRegularizer(pars['input'],
-                                             pars['regularization_parameter'],
-                              pars['number_of_iterations'],
-                              pars['tolerance_constant'],
-                              pars['TV_penalty'], 
-                              hold_input=False, hold_output=True)
-    splitbregman = reg.getOutput()
-    
-    #txtstr = printParametersToString(pars) 
-    #txtstr += "%s = %.3fs" % ('elapsed time',timeit.default_timer() - start_time)
-    #print (txtstr)
-        
-    
-    a=fig.add_subplot(2,3,2)
-    
-    
-    # these are matplotlib.patch.Patch properties
-    props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
-    # place a text box in upper left in axes coords
-    a.text(0.05, 0.95, 'SplitBregman', transform=a.transAxes, fontsize=14,
-            verticalalignment='top', bbox=props)
-    imgplot = plt.imshow(splitbregman.as_array(),\
-                         #cmap="gray"
-                         )
-    pars = {'algorithm' : FGP_TV , \
-        'input' : lena,
-        'regularization_parameter':5e-5, \
-        'number_of_iterations' :10 ,\
-        'tolerance_constant':0.001,\
-        'TV_penalty': 0
-}
-    reg2 = FGPTVRegularizer(pars['input'],
-                              pars['regularization_parameter'],
-                              pars['number_of_iterations'],
-                              pars['tolerance_constant'],
-                              pars['TV_penalty'], 
-                              hold_input=False, hold_output=True)
-    fgp = reg2.getOutput()
-    
-    #txtstr = printParametersToString(pars) 
-    #txtstr += "%s = %.3fs" % ('elapsed time',timeit.default_timer() - start_time)
-    #print (txtstr)
-        
-    
-    a=fig.add_subplot(2,3,3)
-    
-    
-    # these are matplotlib.patch.Patch properties
-    props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
-    # place a text box in upper left in axes coords
-    a.text(0.05, 0.95, 'FGPTV', transform=a.transAxes, fontsize=14,
-            verticalalignment='top', bbox=props)
-    imgplot = plt.imshow(fgp.as_array(),\
-                         #cmap="gray"
-                         )
-    
-    
-#    'regularization_parameter':40 , \
-#    'number_of_iterations' :350 ,\
-#    'tolerance_constant':0.01 , \
-#    'TV_penalty': 0
+  
     reg3 = SBTV()
     reg3.number_of_iterations = 350
     reg3.tolerance_constant = 0.01
@@ -304,14 +279,9 @@ if __name__ == '__main__':
     reg3.setInput(lena)
     dataprocessoroutput = reg3.getOutput()
     
-    #txtstr = printParametersToString(pars) 
-    #txtstr += "%s = %.3fs" % ('elapsed time',timeit.default_timer() - start_time)
-    #print (txtstr)
-        
     
-    a=fig.add_subplot(2,3,4)
-    
-    
+    # plot
+    a=fig.add_subplot(2,3,2)
     # these are matplotlib.patch.Patch properties
     props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
     # place a text box in upper left in axes coords
@@ -320,6 +290,8 @@ if __name__ == '__main__':
     imgplot = plt.imshow(dataprocessoroutput.as_array(),\
                          #cmap="gray"
                          )
+    ##########################################################################
+    
     reg4 = FGPTV()
     reg4.number_of_iterations = 350
     reg4.tolerance_constant = 0.01
@@ -327,15 +299,9 @@ if __name__ == '__main__':
     reg4.TV_penalty = 0
     reg4.setInput(lena)
     dataprocessoroutput2 = reg4.getOutput()
-    
-    #txtstr = printParametersToString(pars) 
-    #txtstr += "%s = %.3fs" % ('elapsed time',timeit.default_timer() - start_time)
-    #print (txtstr)
-        
-    
-    a=fig.add_subplot(2,3,5)
-    
-    
+   
+    # plot
+    a=fig.add_subplot(2,3,3)    
     # these are matplotlib.patch.Patch properties
     props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
     # place a text box in upper left in axes coords
@@ -345,25 +311,82 @@ if __name__ == '__main__':
                          #cmap="gray"
                          )
     
-    
-    #reg4.input = None
-    reg4.setInputProcessor(reg3)
-    chain = reg4.process()
-    
-    #txtstr = printParametersToString(pars) 
-    #txtstr += "%s = %.3fs" % ('elapsed time',timeit.default_timer() - start_time)
-    #print (txtstr)
-        
-    
-    a=fig.add_subplot(2,3,6)
-    
-    
+    ###########################################################################
+    reg6 = LLT()
+    reg6.regularization_parameter = 25
+    reg6.time_step = 0.0003
+    reg6.number_of_iterations = 300
+    reg6.tolerance_constant = 0.001
+    reg6.restrictive_Z_smoothing = 0
+    reg6.setInput(lena)
+    llt = reg6.getOutput()
+    # plot
+    a=fig.add_subplot(2,3,4)    
     # these are matplotlib.patch.Patch properties
     props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
     # place a text box in upper left in axes coords
-    a.text(0.05, 0.95, 'SBTV + FGPTV', transform=a.transAxes, fontsize=14,
+    a.text(0.05, 0.95, 'LLT', transform=a.transAxes, fontsize=14,
             verticalalignment='top', bbox=props)
-    imgplot = plt.imshow(chain.as_array(),\
+    imgplot = plt.imshow(llt.as_array(),\
                          #cmap="gray"
                          )
+    ###########################################################################
+    
+    reg7 = PatchBasedReg()
+    reg7.regularization_parameter = 0.05
+    reg7.searching_window_ratio = 3
+    reg7.similarity_window_ratio = 1
+    reg7.PB_filtering_parameter = 0.08
+    reg7.setInput(lena)
+    pbr = reg7.getOutput()
+    # plot
+    a=fig.add_subplot(2,3,5)    
+    # these are matplotlib.patch.Patch properties
+    props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+    # place a text box in upper left in axes coords
+    a.text(0.05, 0.95, 'PatchBasedReg', transform=a.transAxes, fontsize=14,
+            verticalalignment='top', bbox=props)
+    imgplot = plt.imshow(pbr.as_array(),\
+                         #cmap="gray"
+                         )
+    ###########################################################################
+    
+    reg5 = TGVPD()
+    reg5.regularization_parameter = 0.05
+    reg5.first_order_term = 1.3
+    reg5.second_order_term = 1
+    reg5.number_of_iterations = 550
+    reg5.setInput(lena)
+    tgvpd = reg5.getOutput()
+    # plot
+    a=fig.add_subplot(2,3,6)    
+    # these are matplotlib.patch.Patch properties
+    props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+    # place a text box in upper left in axes coords
+    a.text(0.05, 0.95, 'TGVPD', transform=a.transAxes, fontsize=14,
+            verticalalignment='top', bbox=props)
+    imgplot = plt.imshow(tgvpd.as_array(),\
+                         #cmap="gray"
+                         )
+    if False:
+        #reg4.input = None
+        reg5 = FGPTV()
+        reg5.number_of_iterations = 350
+        reg5.tolerance_constant = 0.01
+        reg5.regularization_parameter = 40
+        reg5.TV_penalty = 0
+        reg5.setInputProcessor(reg3)
+        chain = reg5.process()
+       
+        a=fig.add_subplot(2,3,6)
+        
+        
+        # these are matplotlib.patch.Patch properties
+        props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+        # place a text box in upper left in axes coords
+        a.text(0.05, 0.95, 'SBTV + FGPTV', transform=a.transAxes, fontsize=14,
+                verticalalignment='top', bbox=props)
+        imgplot = plt.imshow(chain.as_array(),\
+                             #cmap="gray"
+                             )
     plt.show()

@@ -92,7 +92,9 @@ class CCPiBaseClass(ABC):
             print ("{0}: {1}".format(self.__class__.__name__, msg))
             
 class DataSet():
-    '''Generic class to hold data'''
+    '''Generic class to hold data
+    
+    Data is currently held in a numpy arrays'''
     
     def __init__ (self, array, deep_copy=True, dimension_labels=None, 
                   **kwargs):
@@ -199,8 +201,157 @@ class DataSet():
                                      numpy.shape(array)))
         self.array = array[:]
         
-                    
-
+    def checkDimensions(self, other):
+        return self.shape == other.shape
+        
+    def __add__(self, other):
+        if issubclass(type(other), DataSet):    
+            if self.checkDimensions(other):
+                out = self.as_array() + other.as_array()
+                return DataSet(out, 
+                               deep_copy=True, 
+                               dimension_labels=self.dimension_labels)
+            else:
+                raise ValueError('Wrong shape: {0} and {1}'.format(self.shape, 
+                                 other.shape))
+        elif isinstance(other, (int, float, complex)):
+            return DataSet(self.as_array() + other, 
+                               deep_copy=True, 
+                               dimension_labels=self.dimension_labels)
+        else:
+            raise TypeError('Cannot {0} DataSet with {1}'.format("add" ,
+                            type(other)))
+    # __add__
+    
+    def __sub__(self, other):
+        if issubclass(type(other), DataSet):    
+            if self.checkDimensions(other):
+                out = self.as_array() - other.as_array()
+                return DataSet(out, 
+                               deep_copy=True, 
+                               dimension_labels=self.dimension_labels)
+            else:
+                raise ValueError('Wrong shape: {0} and {1}'.format(self.shape, 
+                                 other.shape))
+        elif isinstance(other, (int, float, complex)):
+            return DataSet(self.as_array() - other, 
+                               deep_copy=True, 
+                               dimension_labels=self.dimension_labels)
+        else:
+            raise TypeError('Cannot {0} DataSet with {1}'.format("subtract" ,
+                            type(other)))
+    # __sub__
+    
+    def __mul__(self, other):
+        if issubclass(type(other), DataSet):    
+            if self.checkDimensions(other):
+                out = self.as_array() * other.as_array()
+                return DataSet(out, 
+                               deep_copy=True, 
+                               dimension_labels=self.dimension_labels)
+            else:
+                raise ValueError('Wrong shape: {0} and {1}'.format(self.shape, 
+                                 other.shape))
+        elif isinstance(other, (int, float, complex)):
+            return DataSet(self.as_array() * other, 
+                               deep_copy=True, 
+                               dimension_labels=self.dimension_labels)
+        else:
+            raise TypeError('Cannot {0} DataSet with {1}'.format("multiply" ,
+                            type(other)))
+    # __mul__
+    
+    def __div__(self, other):
+        if issubclass(type(other), DataSet):    
+            if self.checkDimensions(other):
+                out = self.as_array() / other.as_array()
+                return DataSet(out, 
+                               deep_copy=True, 
+                               dimension_labels=self.dimension_labels)
+            else:
+                raise ValueError('Wrong shape: {0} and {1}'.format(self.shape, 
+                                 other.shape))
+        elif isinstance(other, (int, float, complex)):
+            return DataSet(self.as_array() / other, 
+                               deep_copy=True, 
+                               dimension_labels=self.dimension_labels)
+        else:
+            raise TypeError('Cannot {0} DataSet with {1}'.format("divide" ,
+                            type(other)))
+    # __div__
+    
+    def __pow__(self, other):
+        if issubclass(type(other), DataSet):    
+            if self.checkDimensions(other):
+                out = self.as_array() ** other.as_array()
+                return DataSet(out, 
+                               deep_copy=True, 
+                               dimension_labels=self.dimension_labels)
+            else:
+                raise ValueError('Wrong shape: {0} and {1}'.format(self.shape, 
+                                 other.shape))
+        elif isinstance(other, (int, float, complex)):
+            return DataSet(self.as_array() ** other, 
+                               deep_copy=True, 
+                               dimension_labels=self.dimension_labels)
+        else:
+            raise TypeError('Cannot {0} DataSet with {1}'.format("power" ,
+                            type(other)))
+    # __pow__
+    
+    #def __abs__(self):
+    #    operation = FM.OPERATION.ABS
+    #    return self.callFieldMath(operation, None, self.mask, self.maskOnValue)
+    # __abs__
+    
+    # reverse operand
+    def __radd__(self, other):
+        return self + other
+    # __radd__
+    
+    def __rsub__(self, other):
+        return (-1 * self) + other
+    # __rsub__
+    
+    def __rmul__(self, other):
+        return self * other
+    # __rmul__
+    
+    def __rdiv__(self, other):
+        return pow(self / other, -1)
+    # __rdiv__
+    
+    #def __rpow__(self, other):
+    #    if isinstance(other, int) | isinstance(other, float):
+    #        fother = (self * 0 ) + other
+    #        return pow(fother, self)
+    #    elif isinstance(other, AVSImage):
+    #        if other.dims == self.dims:
+    #            return pow(other , self)
+    #        else:
+    #            raise ValueError('Dimensions do not match')
+    # __rpow__
+    
+    
+    # in-place arithmetic operators:
+    # (+=, -=, *=, /= , //=,
+    
+    def __iadd__(self, other):
+        return self + other
+    # __iadd__
+    
+    def __imul__(self, other):
+        return self * other
+    # __imul__
+    
+    def __isub__(self, other):
+        return self - other
+    # __isub__
+    
+    def __idiv__(self, other):
+        return self / other
+    # __idiv__
+    
                 
                     
                 
@@ -341,6 +492,7 @@ class DataSetProcessor():
         elif self.mTime > self.runTime:
             shouldRun = True
             
+        # CHECK this
         if self.store_output and shouldRun:
             self.runTime = datetime.now()
             self.output = self.process()
@@ -530,4 +682,20 @@ if __name__ == '__main__':
     chain.setInputProcessor(ax)
     print ("chain in {0} out {1}".format(ax.getOutput().as_array(), chain.getOutput().as_array()))
     
-        
+    # testing arithmetic operations
+    
+    print (b.as_array())
+    print ((b+1).as_array())
+    print ((1+b).as_array())
+    
+    print ((b*2).as_array())
+    print ((2*b).as_array())
+    
+    print ((b/2).as_array())
+    print ((2/b).as_array())
+    
+    print ((b**2).as_array())
+    print ((2**b).as_array())
+    
+    
+    

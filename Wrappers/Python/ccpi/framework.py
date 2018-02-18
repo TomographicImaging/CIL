@@ -330,15 +330,17 @@ class DataSet(object):
     def __rtruediv__(self, other):
         return self.__rdiv__(other)
     
-    #def __rpow__(self, other):
-    #    if isinstance(other, int) | isinstance(other, float):
-    #        fother = (self * 0 ) + other
-    #        return pow(fother, self)
-    #    elif isinstance(other, AVSImage):
-    #        if other.dims == self.dims:
-    #            return pow(other , self)
-    #        else:
-    #            raise ValueError('Dimensions do not match')
+    def __rpow__(self, other):
+        if isinstance(other, (int, float)) :
+            fother = numpy.ones(numpy.shape(self.array)) * other
+            return DataSet(fother ** self.array , 
+                           dimension_labels=self.dimension_labels)
+        elif issubclass(other, DataSet):
+            if self.checkDimensions(other):
+                return DataSet(other.as_array() ** self.array , 
+                           dimension_labels=self.dimension_labels)
+            else:
+                raise ValueError('Dimensions do not match')
     # __rpow__
     
     
@@ -708,15 +710,23 @@ if __name__ == '__main__':
     print ((b+1))
     print ((1+b))
     
+    print (b)
     print ((b*2))
+    
+    print (b)
     print ((2*b))
     
+    print (b)
     print ((b/2))
-    #print (b.__div__(2))
+    
+    print (b)
     print ((2/b))
     
+    print (b)
     print ((b**2))
-    #print ((2**b))
+    
+    print (b)
+    print ((2**b))
     
     
     

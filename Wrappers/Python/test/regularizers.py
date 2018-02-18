@@ -17,6 +17,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+from __future__ import print_function
 import matplotlib.pyplot as plt
 import numpy as np
 import os    
@@ -27,7 +28,7 @@ from ccpi.filters.cpu_regularizers_boost import SplitBregman_TV , FGP_TV ,\
 #from ccpi.filters.cpu_regularizers_cython import some
 
 try:
-    from ccpi.filter import gpu_regularizers as gpu
+    from ccpi.filters import gpu_regularizers as gpu
     class PatchBasedRegGPU(DataSetProcessor23D):
         '''Regularizers DataSetProcessor for PatchBasedReg
         
@@ -40,7 +41,7 @@ try:
                           'similarity_window_ratio': None, 
                           'PB_filtering_parameter': None
                       }
-            DataSetProcessor.__init__(self, **attributes)
+            super(PatchBasedRegGPU, self).__init__(**attributes)
                 
             
         def process(self):
@@ -67,7 +68,7 @@ try:
                           'similarity_window_ratio': None, 
                           'PB_filtering_parameter': None
                       }
-            DataSetProcessor.__init__(self, **attributes)
+            super(Diff4thHajiaboli, self).__init__(self, **attributes)
                 
             
         def process(self):
@@ -97,7 +98,7 @@ class SBTV(DataSetProcessor23D):
                   'tolerance_constant': 0.0001, 
                   'TV_penalty':0
                   }
-        DataSetProcessor.__init__(self, **attributes)
+        super(SBTV , self).__init__(**attributes)
             
             
     def process(self):
@@ -124,7 +125,7 @@ class FGPTV(DataSetProcessor23D):
                   'tolerance_constant': 0.0001, 
                   'TV_penalty':0
                   }
-        DataSetProcessor.__init__(self, **attributes)
+        super(FGPTV, self).__init__(**attributes)
             
         
     def process(self):
@@ -153,7 +154,7 @@ class LLT(DataSetProcessor23D):
                       'tolerance_constant': 0, 
                       'restrictive_Z_smoothing': None 
                   }
-        DataSetProcessor.__init__(self, **attributes)
+        super(LLT, self).__init__(**attributes)
             
         
     def process(self):
@@ -182,7 +183,7 @@ class PatchBasedReg(DataSetProcessor23D):
                       'similarity_window_ratio': None, 
                       'PB_filtering_parameter': None
                   }
-        DataSetProcessor.__init__(self, **attributes)
+        super(PatchBasedReg, self).__init__(**attributes)
             
         
     def process(self):
@@ -204,13 +205,17 @@ class TGVPD(DataSetProcessor23D):
     
     '''
     
-    def __init__(self):
+    def __init__(self,**kwargs):
         attributes = {'regularization_parameter':None, 
                       'first_order_term': None, 
                       'second_order_term': None, 
                       'number_of_iterations': None
                   }
-        DataSetProcessor.__init__(self, **attributes)
+        for key, value in kwargs.items():
+            if key in attributes.keys():
+                attributes[key] = value
+                
+        super(TGVPD, self).__init__(**attributes)
             
         
     def process(self):

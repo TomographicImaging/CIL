@@ -16,6 +16,8 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
+
+from __future__ import division
 import abc
 import numpy
 import sys
@@ -91,7 +93,7 @@ class CCPiBaseClass(ABC):
         if self.debug:
             print ("{0}: {1}".format(self.__class__.__name__, msg))
             
-class DataSet():
+class DataSet(object):
     '''Generic class to hold data
     
     Data is currently held in a numpy arrays'''
@@ -241,27 +243,11 @@ class DataSet():
             raise TypeError('Cannot {0} DataSet with {1}'.format("subtract" ,
                             type(other)))
     # __sub__
-    
-    def __mul__(self, other):
-        if issubclass(type(other), DataSet):    
-            if self.checkDimensions(other):
-                out = self.as_array() * other.as_array()
-                return DataSet(out, 
-                               deep_copy=True, 
-                               dimension_labels=self.dimension_labels)
-            else:
-                raise ValueError('Wrong shape: {0} and {1}'.format(self.shape, 
-                                 other.shape))
-        elif isinstance(other, (int, float, complex)):
-            return DataSet(self.as_array() * other, 
-                               deep_copy=True, 
-                               dimension_labels=self.dimension_labels)
-        else:
-            raise TypeError('Cannot {0} DataSet with {1}'.format("multiply" ,
-                            type(other)))
-    # __mul__
+    def __truediv__(self,other):
+        return self.__div__(other)
     
     def __div__(self, other):
+        print ("calling __div__")
         if issubclass(type(other), DataSet):    
             if self.checkDimensions(other):
                 out = self.as_array() / other.as_array()
@@ -299,6 +285,26 @@ class DataSet():
                             type(other)))
     # __pow__
     
+    def __mul__(self, other):
+        if issubclass(type(other), DataSet):    
+            if self.checkDimensions(other):
+                out = self.as_array() * other.as_array()
+                return DataSet(out, 
+                               deep_copy=True, 
+                               dimension_labels=self.dimension_labels)
+            else:
+                raise ValueError('Wrong shape: {0} and {1}'.format(self.shape, 
+                                 other.shape))
+        elif isinstance(other, (int, float, complex)):
+            return DataSet(self.as_array() * other, 
+                               deep_copy=True, 
+                               dimension_labels=self.dimension_labels)
+        else:
+            raise TypeError('Cannot {0} DataSet with {1}'.format("multiply" ,
+                            type(other)))
+    # __mul__
+    
+    
     #def __abs__(self):
     #    operation = FM.OPERATION.ABS
     #    return self.callFieldMath(operation, None, self.mask, self.maskOnValue)
@@ -318,8 +324,11 @@ class DataSet():
     # __rmul__
     
     def __rdiv__(self, other):
+        print ("call __rdiv__")
         return pow(self / other, -1)
     # __rdiv__
+    def __rtruediv__(self, other):
+        return self.__rdiv__(other)
     
     #def __rpow__(self, other):
     #    if isinstance(other, int) | isinstance(other, float):
@@ -349,9 +358,17 @@ class DataSet():
     # __isub__
     
     def __idiv__(self, other):
+        print ("call __idiv__")
         return self / other
     # __idiv__
     
+    def __str__ (self):
+        repres = ""
+        repres += "Number of dimensions: {0}\n".format(self.number_of_dimensions)
+        repres += "Shape: {0}\n".format(self.shape)
+        repres += "Axis labels: {0}\n".format(self.dimension_labels)
+        repres += "Representation: {0}\n".format(self.array)
+        return repres
                 
                     
                 
@@ -370,7 +387,9 @@ class VolumeData(DataSet):
                 raise ValueError('Number of dimensions are not 2 or 3: {0}'\
                                  .format(array.number_of_dimensions))
             
-            DataSet.__init__(self, array.as_array(), deep_copy,
+            #DataSet.__init__(self, array.as_array(), deep_copy,
+            #                 array.dimension_labels, **kwargs)
+            super(VolumeData, self).__init__(array.as_array(), deep_copy,
                              array.dimension_labels, **kwargs)
         elif type(array) == numpy.ndarray:
             if not ( array.ndim == 3 or array.ndim == 2 ):
@@ -387,8 +406,9 @@ class VolumeData(DataSet):
                     dimension_labels = ['horizontal' , 
                                         'vertical']   
             
-            DataSet.__init__(self, array, deep_copy, dimension_labels, **kwargs)
-        
+            #DataSet.__init__(self, array, deep_copy, dimension_labels, **kwargs)
+            super(VolumeData, self).__init__(array, deep_copy, 
+                 dimension_labels, **kwargs)
        
         # load metadata from kwargs if present
         for key, value in kwargs.items():
@@ -438,7 +458,7 @@ class SinogramData(DataSet):
             # assume it is parallel beam
             pass
             
-class DataSetProcessor():
+class DataSetProcessor(object):
     '''Defines a generic DataSet processor
     
     accepts DataSet as inputs and 
@@ -557,8 +577,8 @@ class AX(DataSetProcessor):
                   'input':None, 
                   }
         
-        DataSetProcessor.__init__(self, **kwargs)
-        
+        #DataSetProcessor.__init__(self, **kwargs)
+        super(AX, self).__init__(**kwargs)
     
     def checkInput(self, dataset):
         return True
@@ -590,8 +610,8 @@ class PixelByPixelDataSetProcessor(DataSetProcessor):
         kwargs = {'pyfunc':None, 
                   'input':None, 
                   }
-        DataSetProcessor.__init__(self, **kwargs)
-        
+        #DataSetProcessor.__init__(self, **kwargs)
+        super(PixelByPixelDataSetProcessor, self).__init__(**kwargs)
         
     def checkInput(self, dataset):
         return True
@@ -684,18 +704,19 @@ if __name__ == '__main__':
     
     # testing arithmetic operations
     
-    print (b.as_array())
-    print ((b+1).as_array())
-    print ((1+b).as_array())
+    print (b)
+    print ((b+1))
+    print ((1+b))
     
-    print ((b*2).as_array())
-    print ((2*b).as_array())
+    print ((b*2))
+    print ((2*b))
     
-    print ((b/2).as_array())
-    print ((2/b).as_array())
+    print ((b/2))
+    #print (b.__div__(2))
+    print ((2/b))
     
-    print ((b**2).as_array())
-    print ((2**b).as_array())
+    print ((b**2))
+    #print ((2**b))
     
     
     

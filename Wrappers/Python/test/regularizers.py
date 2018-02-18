@@ -17,6 +17,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+from __future__ import print_function
 import matplotlib.pyplot as plt
 import numpy as np
 import os    
@@ -27,7 +28,7 @@ from ccpi.filters.cpu_regularizers_boost import SplitBregman_TV , FGP_TV ,\
 #from ccpi.filters.cpu_regularizers_cython import some
 
 try:
-    from ccpi.filter import gpu_regularizers as gpu
+    from ccpi.filters import gpu_regularizers as gpu
     class PatchBasedRegGPU(DataSetProcessor23D):
         '''Regularizers DataSetProcessor for PatchBasedReg
         
@@ -40,7 +41,7 @@ try:
                           'similarity_window_ratio': None, 
                           'PB_filtering_parameter': None
                       }
-            DataSetProcessor.__init__(self, **attributes)
+            super(PatchBasedRegGPU, self).__init__(**attributes)
                 
             
         def process(self):
@@ -67,7 +68,7 @@ try:
                           'similarity_window_ratio': None, 
                           'PB_filtering_parameter': None
                       }
-            DataSetProcessor.__init__(self, **attributes)
+            super(Diff4thHajiaboli, self).__init__(self, **attributes)
                 
             
         def process(self):
@@ -97,7 +98,7 @@ class SBTV(DataSetProcessor23D):
                   'tolerance_constant': 0.0001, 
                   'TV_penalty':0
                   }
-        DataSetProcessor.__init__(self, **attributes)
+        super(SBTV , self).__init__(**attributes)
             
             
     def process(self):
@@ -124,7 +125,7 @@ class FGPTV(DataSetProcessor23D):
                   'tolerance_constant': 0.0001, 
                   'TV_penalty':0
                   }
-        DataSetProcessor.__init__(self, **attributes)
+        super(FGPTV, self).__init__(**attributes)
             
         
     def process(self):
@@ -153,7 +154,7 @@ class LLT(DataSetProcessor23D):
                       'tolerance_constant': 0, 
                       'restrictive_Z_smoothing': None 
                   }
-        DataSetProcessor.__init__(self, **attributes)
+        super(LLT, self).__init__(**attributes)
             
         
     def process(self):
@@ -182,7 +183,7 @@ class PatchBasedReg(DataSetProcessor23D):
                       'similarity_window_ratio': None, 
                       'PB_filtering_parameter': None
                   }
-        DataSetProcessor.__init__(self, **attributes)
+        super(PatchBasedReg, self).__init__(**attributes)
             
         
     def process(self):
@@ -204,13 +205,17 @@ class TGVPD(DataSetProcessor23D):
     
     '''
     
-    def __init__(self):
+    def __init__(self,**kwargs):
         attributes = {'regularization_parameter':None, 
                       'first_order_term': None, 
                       'second_order_term': None, 
                       'number_of_iterations': None
                   }
-        DataSetProcessor.__init__(self, **attributes)
+        for key, value in kwargs.items():
+            if key in attributes.keys():
+                attributes[key] = value
+                
+        super(TGVPD, self).__init__(**attributes)
             
         
     def process(self):
@@ -247,15 +252,17 @@ if __name__ == '__main__':
                             "lena_gray_512.tif")
     Im = plt.imread(filename)                     
     Im = np.asarray(Im, dtype='float32')
-    
-    perc = 0.15
+
+    Im = Im/255
+
+    perc = 0.075
     u0 = Im + np.random.normal(loc = Im ,
-                                      scale = perc * Im , 
-                                      size = np.shape(Im))
+                                  scale = perc * Im , 
+                                  size = np.shape(Im))
     # map the u0 u0->u0>0
     f = np.frompyfunc(lambda x: 0 if x < 0 else x, 1,1)
     u0 = f(u0).astype('float32')
-    
+
     lena = DataSet(u0, False, ['X','Y'])
     
     ## plot 
@@ -272,9 +279,9 @@ if __name__ == '__main__':
     
   
     reg3 = SBTV()
-    reg3.number_of_iterations = 350
-    reg3.tolerance_constant = 0.01
-    reg3.regularization_parameter = 40
+    reg3.number_of_iterations = 40
+    reg3.tolerance_constant = 0.0001
+    reg3.regularization_parameter = 15
     reg3.TV_penalty = 0
     reg3.setInput(lena)
     dataprocessoroutput = reg3.getOutput()
@@ -293,9 +300,9 @@ if __name__ == '__main__':
     ##########################################################################
     
     reg4 = FGPTV()
-    reg4.number_of_iterations = 350
-    reg4.tolerance_constant = 0.01
-    reg4.regularization_parameter = 40
+    reg4.number_of_iterations = 200
+    reg4.tolerance_constant = 1e-4
+    reg4.regularization_parameter = 0.05
     reg4.TV_penalty = 0
     reg4.setInput(lena)
     dataprocessoroutput2 = reg4.getOutput()
@@ -313,10 +320,10 @@ if __name__ == '__main__':
     
     ###########################################################################
     reg6 = LLT()
-    reg6.regularization_parameter = 25
-    reg6.time_step = 0.0003
-    reg6.number_of_iterations = 300
-    reg6.tolerance_constant = 0.001
+    reg6.regularization_parameter = 5
+    reg6.time_step = 0.00035
+    reg6.number_of_iterations = 350
+    reg6.tolerance_constant = 0.0001
     reg6.restrictive_Z_smoothing = 0
     reg6.setInput(lena)
     llt = reg6.getOutput()
@@ -336,7 +343,7 @@ if __name__ == '__main__':
     reg7.regularization_parameter = 0.05
     reg7.searching_window_ratio = 3
     reg7.similarity_window_ratio = 1
-    reg7.PB_filtering_parameter = 0.08
+    reg7.PB_filtering_parameter = 0.06
     reg7.setInput(lena)
     pbr = reg7.getOutput()
     # plot
@@ -352,7 +359,7 @@ if __name__ == '__main__':
     ###########################################################################
     
     reg5 = TGVPD()
-    reg5.regularization_parameter = 0.05
+    reg5.regularization_parameter = 0.07
     reg5.first_order_term = 1.3
     reg5.second_order_term = 1
     reg5.number_of_iterations = 550

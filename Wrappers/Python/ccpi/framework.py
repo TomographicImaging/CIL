@@ -343,6 +343,9 @@ class DataSet(object):
                 raise ValueError('Dimensions do not match')
     # __rpow__
     
+    def sum(self):
+        return DataSet(self.as_array().sum(), 
+                       dimension_labels=self.dimension_labels)
     
     # in-place arithmetic operators:
     # (+=, -=, *=, /= , //=,

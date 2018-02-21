@@ -36,16 +36,17 @@ class TV_FGP(BaseFunction):
         return 0
     def prox(self,x,Lipshitz):
         pars = {'algorithm' : FGP_TV , \
-        'input' : x.as_array(),
-        'regularization_parameter':self.lambdaReg*Lipshitz, \
-        'number_of_iterations' :self.iterationsTV ,\
-        'tolerance_constant':1e-4,\
-        'TV_penalty': 0}
+                'input' : x.as_array(),
+                'regularization_parameter':self.lambdaReg*Lipshitz, \
+                'number_of_iterations' :self.iterationsTV ,\
+                'tolerance_constant':1e-4,\
+                'TV_penalty': 0}
+        
         out = FGP_TV (pars['input'], 
-        pars['regularization_parameter'],
-        pars['number_of_iterations'],
-        pars['tolerance_constant'], 
-        pars['TV_penalty'])
+                      pars['regularization_parameter'],
+                      pars['number_of_iterations'],
+                      pars['tolerance_constant'], 
+                      pars['TV_penalty'])
         return out[0]
 
 # read IP paper data into a dictionary

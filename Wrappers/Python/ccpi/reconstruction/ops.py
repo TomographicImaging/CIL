@@ -1,6 +1,23 @@
+# -*- coding: utf-8 -*-
+#   This work is part of the Core Imaging Library developed by
+#   Visual Analytics and Imaging System Group of the Science Technology
+#   Facilities Council, STFC
 
-import numpy as np
-import astra
+#   Copyright 2018 Jakob Jorgensen, Daniil Kazantsev and Edoardo Pasca
+
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+
+#       http://www.apache.org/licenses/LICENSE-2.0
+
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+import numpy
 from scipy.sparse.linalg import svds
 from framework import DataSet, VolumeData, SinogramData, DataSetProcessor
 
@@ -8,7 +25,7 @@ from framework import DataSet, VolumeData, SinogramData, DataSetProcessor
 # to not just use generic DataSet
 
 
-class Operator:
+class Operator(object):
     def direct(self,x):
         return x
     def adjoint(self,x):
@@ -33,18 +50,20 @@ class ForwardBackProjector(Operator):
     def __init__(self):
         # do nothing
         i  = 1
+        super(ForwardBackProjector, self).__init__()
     
 
 class LinearOperatorMatrix(Operator):
     def __init__(self,A):
         self.A = A
         self.s1 = None   # Largest singular value, initially unknown
+        super(LinearOperatorMatrix, self).__init__()
         
     def direct(self,x):
-        return DataSet(np.dot(self.A,x.as_array()))
+        return DataSet(numpy.dot(self.A,x.as_array()))
     
     def adjoint(self,x):
-        return DataSet(np.dot(self.A.transpose(),x.as_array()))
+        return DataSet(numpy.dot(self.A.transpose(),x.as_array()))
     
     def size(self):
         return self.A.shape
@@ -60,6 +79,7 @@ class LinearOperatorMatrix(Operator):
 class Identity(Operator):
     def __init__(self):
         self.s1 = 1.0
+        super(Identity, self).__init__()
         
     def direct(self,x):
         return x
@@ -73,81 +93,19 @@ class Identity(Operator):
     def get_max_sing_val(self):
         return self.s1
 
-class AstraProjector:
-    """A simple 2D/3D parallel/fan beam projection/backprojection class based on ASTRA toolbox"""
-    def __init__(self, DetWidth, DetectorsDim, SourceOrig, OrigDetec, AnglesVec, ObjSize, projtype, device):
-        self.DetectorsDim = DetectorsDim
-        self.AnglesVec = AnglesVec
-        self.ProjNumb = len(AnglesVec)
-        self.ObjSize = ObjSize
-        if projtype == 'parallel':
-            self.proj_geom = astra.create_proj_geom('parallel', DetWidth, DetectorsDim, AnglesVec)
-        elif projtype == 'fanbeam':
-            self.proj_geom = astra.create_proj_geom('fanflat', DetWidth, DetectorsDim, AnglesVec, SourceOrig, OrigDetec)
-        else:
-            print ("Please select for projtype between 'parallel' and 'fanbeam'")
-        self.vol_geom = astra.create_vol_geom(ObjSize, ObjSize)
-        if device == 'cpu':
-            self.proj_id = astra.create_projector('line', self.proj_geom, self.vol_geom) # for CPU
-            self.device = 1
-        elif device == 'gpu':
-            self.proj_id = astra.create_projector('cuda', self.proj_geom, self.vol_geom) # for GPU
-            self.device = 0
-        else:
-            print ("Select between 'cpu' or 'gpu' for device")
-        self.s1 = None
-    def direct(self, IM):
-        """Applying forward projection to IM [2D or 3D array]"""
-        if np.ndim(IM.as_array()) == 3:
-            slices = np.size(IM.as_array(),np.ndim(IM.as_array())-1)
-            DATA = np.zeros((self.ProjNumb,self.DetectorsDim,slices), 'float32')
-            for i in range(0,slices):
-                sinogram_id, DATA[:,:,i] = astra.create_sino(IM[:,:,i].as_array(), self.proj_id)
-                astra.data2d.delete(sinogram_id)
-            astra.data2d.delete(self.proj_id)
-        else:
-            sinogram_id, DATA = astra.create_sino(IM.as_array(), self.proj_id)
-            astra.data2d.delete(sinogram_id)
-            astra.data2d.delete(self.proj_id)
-        return SinogramData(DATA)
-    def adjoint(self, DATA):
-        """Applying backprojection to DATA [2D or 3D]"""
-        if np.ndim(DATA) == 3:
-           slices = np.size(DATA.as_array(),np.ndim(DATA.as_array())-1)
-           IM = np.zeros((self.ObjSize,self.ObjSize,slices), 'float32')
-           for i in range(0,slices):
-               rec_id, IM[:,:,i] = astra.create_backprojection(DATA[:,:,i].as_array(), self.proj_id)
-               astra.data2d.delete(rec_id)
-           astra.data2d.delete(self.proj_id)
-        else:
-            rec_id, IM = astra.create_backprojection(DATA.as_array(), self.proj_id)        
-            astra.data2d.delete(rec_id)
-            astra.data2d.delete(self.proj_id)
-        return VolumeData(IM)
-    
-    def delete(self):
-        astra.data2d.delete(self.proj_id)
-    
-    def get_max_sing_val(self):
-        self.s1, sall, svec = PowerMethodNonsquare(self,10)
-        return self.s1
-    
-    def size(self):
-        return ( (self.AnglesVec.size, self.DetectorsDim), \
-                 (self.ObjSize, self.ObjSize) )
 
 def PowerMethodNonsquare(op,numiters):
     # Initialise random
     inputsize = op.size()[1]
-    x0 = DataSet(np.random.randn(inputsize[0],inputsize[1]))
-    s = np.zeros(numiters)
+    x0 = DataSet(numpy.random.randn(inputsize[0],inputsize[1]))
+    s = numpy.zeros(numiters)
     # Loop
-    for it in np.arange(numiters):
+    for it in numpy.arange(numiters):
         x1 = op.adjoint(op.direct(x0))
-        x1norm = np.sqrt((x1**2).sum())
+        x1norm = numpy.sqrt((x1**2).sum())
         s[it] = (x1*x0).sum() / (x0*x0).sum()
         x0 = (1.0/x1norm)*x1
-    return np.sqrt(s[-1]), np.sqrt(s), x0
+    return numpy.sqrt(s[-1]), numpy.sqrt(s), x0
 
 #def PowerMethod(op,numiters):
 #    # Initialise random

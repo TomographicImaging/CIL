@@ -2,7 +2,7 @@
 import numpy as np
 import astra
 from scipy.sparse.linalg import svds
-from framework import DataSet, VolumeData, SinogramData, DataSetProcessor
+from ccpi.framework import DataSet, VolumeData, SinogramData, DataSetProcessor
 
 # Maybe operators need to know what types they take as inputs/outputs
 # to not just use generic DataSet

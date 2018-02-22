@@ -8,13 +8,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import sys
-sys.path.append('../data/')
+#sys.path.append('../../../data/')
 from read_IPdata import read_IPdata
 
 from ccpi.reconstruction.astra_ops import AstraProjector
-from ccpi.reconstruction.funcs import Norm2sq
+from ccpi.reconstruction.funcs import Norm2sq , BaseFunction
 from ccpi.reconstruction.algs import FISTA
-from ccpi.reconstruction.ops import BaseFunction
+#from ccpi.reconstruction.funcs import BaseFunction
 
 from ccpi.framework import VolumeData, SinogramData
 

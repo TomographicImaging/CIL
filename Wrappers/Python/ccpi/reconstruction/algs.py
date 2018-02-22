@@ -20,7 +20,7 @@
 import numpy
 import time
 
-from funcs import BaseFunction
+from ccpi.reconstruction.funcs import BaseFunction
 
 def FISTA(x_init, f=None, g=None, opt=None):
 

@@ -344,8 +344,7 @@ class DataSet(object):
     # __rpow__
     
     def sum(self):
-        return DataSet(self.as_array().sum(), 
-                       dimension_labels=self.dimension_labels)
+        return self.as_array().sum()
     
     # in-place arithmetic operators:
     # (+=, -=, *=, /= , //=,

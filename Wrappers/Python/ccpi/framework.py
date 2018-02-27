@@ -192,7 +192,7 @@ class DataSet(object):
                 
                 cleaned = numpy.transpose(cleaned, axes).copy()
                 
-                return DataSet(cleaned , True, dimensions)
+                return type(self)(cleaned , True, dimensions)
     
     def fill(self, array):
         '''fills the internal numpy array with the one provided'''
@@ -210,14 +210,15 @@ class DataSet(object):
         if issubclass(type(other), DataSet):    
             if self.checkDimensions(other):
                 out = self.as_array() + other.as_array()
-                return DataSet(out, 
+                return type(self)(out, 
                                deep_copy=True, 
                                dimension_labels=self.dimension_labels)
             else:
                 raise ValueError('Wrong shape: {0} and {1}'.format(self.shape, 
                                  other.shape))
         elif isinstance(other, (int, float, complex)):
-            return DataSet(self.as_array() + other, 
+            return type(self)(
+                    self.as_array() + other, 
                                deep_copy=True, 
                                dimension_labels=self.dimension_labels)
         else:
@@ -229,14 +230,14 @@ class DataSet(object):
         if issubclass(type(other), DataSet):    
             if self.checkDimensions(other):
                 out = self.as_array() - other.as_array()
-                return DataSet(out, 
+                return type(self)(out, 
                                deep_copy=True, 
                                dimension_labels=self.dimension_labels)
             else:
                 raise ValueError('Wrong shape: {0} and {1}'.format(self.shape, 
                                  other.shape))
         elif isinstance(other, (int, float, complex)):
-            return DataSet(self.as_array() - other, 
+            return type(self)(self.as_array() - other, 
                                deep_copy=True, 
                                dimension_labels=self.dimension_labels)
         else:
@@ -251,14 +252,14 @@ class DataSet(object):
         if issubclass(type(other), DataSet):    
             if self.checkDimensions(other):
                 out = self.as_array() / other.as_array()
-                return DataSet(out, 
+                return type(self)(out, 
                                deep_copy=True, 
                                dimension_labels=self.dimension_labels)
             else:
                 raise ValueError('Wrong shape: {0} and {1}'.format(self.shape, 
                                  other.shape))
         elif isinstance(other, (int, float, complex)):
-            return DataSet(self.as_array() / other, 
+            return type(self)(self.as_array() / other, 
                                deep_copy=True, 
                                dimension_labels=self.dimension_labels)
         else:
@@ -270,14 +271,14 @@ class DataSet(object):
         if issubclass(type(other), DataSet):    
             if self.checkDimensions(other):
                 out = self.as_array() ** other.as_array()
-                return DataSet(out, 
+                return type(self)(out, 
                                deep_copy=True, 
                                dimension_labels=self.dimension_labels)
             else:
                 raise ValueError('Wrong shape: {0} and {1}'.format(self.shape, 
                                  other.shape))
         elif isinstance(other, (int, float, complex)):
-            return DataSet(self.as_array() ** other, 
+            return type(self)(self.as_array() ** other, 
                                deep_copy=True, 
                                dimension_labels=self.dimension_labels)
         else:
@@ -289,14 +290,14 @@ class DataSet(object):
         if issubclass(type(other), DataSet):    
             if self.checkDimensions(other):
                 out = self.as_array() * other.as_array()
-                return DataSet(out, 
+                return type(self)(out, 
                                deep_copy=True, 
                                dimension_labels=self.dimension_labels)
             else:
                 raise ValueError('Wrong shape: {0} and {1}'.format(self.shape, 
                                  other.shape))
         elif isinstance(other, (int, float, complex)):
-            return DataSet(self.as_array() * other, 
+            return type(self)(self.as_array() * other, 
                                deep_copy=True, 
                                dimension_labels=self.dimension_labels)
         else:
@@ -312,19 +313,19 @@ class DataSet(object):
     
     def abs(self):
         out = numpy.abs(self.as_array() )
-        return DataSet(out,
+        return type(self)(out,
                        deep_copy=True, 
                        dimension_labels=self.dimension_labels)
     
     def maximum(self,otherscalar):
         out = numpy.maximum(self.as_array(),otherscalar)
-        return DataSet(out,
+        return type(self)(out,
                        deep_copy=True, 
                        dimension_labels=self.dimension_labels)
     
     def sign(self):
         out = numpy.sign(self.as_array() )
-        return DataSet(out,
+        return type(self)(out,
                        deep_copy=True, 
                        dimension_labels=self.dimension_labels)
     
@@ -351,11 +352,11 @@ class DataSet(object):
     def __rpow__(self, other):
         if isinstance(other, (int, float)) :
             fother = numpy.ones(numpy.shape(self.array)) * other
-            return DataSet(fother ** self.array , 
+            return type(self)(fother ** self.array , 
                            dimension_labels=self.dimension_labels)
         elif issubclass(other, DataSet):
             if self.checkDimensions(other):
-                return DataSet(other.as_array() ** self.array , 
+                return type(self)(other.as_array() ** self.array , 
                            dimension_labels=self.dimension_labels)
             else:
                 raise ValueError('Dimensions do not match')
@@ -747,6 +748,8 @@ if __name__ == '__main__':
     
     print (b)
     print ((2**b))
+    
+    print (type(volume3 + 2))
     
     
     

@@ -310,6 +310,24 @@ class DataSet(object):
     #    return self.callFieldMath(operation, None, self.mask, self.maskOnValue)
     # __abs__
     
+    def abs(self):
+        out = numpy.abs(self.as_array() )
+        return DataSet(out,
+                       deep_copy=True, 
+                       dimension_labels=self.dimension_labels)
+    
+    def maximum(self,otherscalar):
+        out = numpy.maximum(self.as_array(),otherscalar)
+        return DataSet(out,
+                       deep_copy=True, 
+                       dimension_labels=self.dimension_labels)
+    
+    def sign(self):
+        out = numpy.sign(self.as_array() )
+        return DataSet(out,
+                       deep_copy=True, 
+                       dimension_labels=self.dimension_labels)
+    
     # reverse operand
     def __radd__(self, other):
         return self + other
@@ -344,8 +362,7 @@ class DataSet(object):
     # __rpow__
     
     def sum(self):
-        return DataSet(self.as_array().sum(), 
-                       dimension_labels=self.dimension_labels)
+        return self.as_array().sum()
     
     # in-place arithmetic operators:
     # (+=, -=, *=, /= , //=,

@@ -8,6 +8,7 @@ from ccpi.reconstruction.algs import *
 from ccpi.reconstruction.funcs import *
 from ccpi.reconstruction.ops import *
 from ccpi.reconstruction.astra_ops import *
+from ccpi.reconstruction.geoms import *
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -37,13 +38,18 @@ det_num = N
 SourceOrig = 500
 OrigDetec = 0
 
+# Parallelbeam geometry test
+pg = SinogramGeometry('parallel','2D',angles,det_num,(-N/2,N/2))
+
 # Set up ASTRA projector
 #Aop = AstraProjector(vg, angles, N,'gpu')
 #Aop = AstraProjector(det_w, det_num, angles, projtype='parallel',device='gpu')
 
-Aop = AstraProjector(det_w, det_num, SourceOrig, 
+Aop_old = AstraProjector(det_w, det_num, SourceOrig, 
                      OrigDetec, angles, 
                      N,'fanbeam','gpu') 
+
+Aop = AstraProjectorSimple(vg, pg, 'gpu')
 
 
 # Try forward and backprojection

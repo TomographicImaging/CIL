@@ -22,10 +22,10 @@ x[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 2.0
 plt.imshow(x)
 plt.show()
 
-#vg = VolumeGeometry(grid=(N,N), domain=((-N/2,N/2),(-N/2,N/2)))
+vg = VolumeGeometry(grid=(N,N), domain=((-N/2,N/2),(-N/2,N/2)))
 
-#Phantom = VolumeData(x,geometry=vg)
-Phantom = VolumeData(x)
+Phantom = VolumeData(x,geometry=vg)
+#Phantom = VolumeData(x)
 
 # Set up measurement geometry
 angles_num = 20; # angles number

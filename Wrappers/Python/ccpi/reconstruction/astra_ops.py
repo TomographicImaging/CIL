@@ -16,11 +16,11 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from ccpi.reconstruction.ops import Operator
-import astra
+#import astra
 import numpy
 from ccpi.framework import SinogramData, VolumeData
 from ccpi.reconstruction.ops import PowerMethodNonsquare
-from ccpi.processors import AstraForwardProjector, AstraBackProjector
+from ccpi.astra.astra_processors import AstraForwardProjector, AstraBackProjector
 
 class AstraProjectorSimple(Operator):
     """ASTRA projector modified to use DataSet and geometry."""
@@ -31,83 +31,20 @@ class AstraProjectorSimple(Operator):
         self.sinogram_geometry = geomp
         self.volume_geometry = geomv
         
-        # Set up ASTRA Volume geometry, not stored
-        if geomp.dimension == '2D':
-            vol_geom = astra.create_vol_geom(geomv.voxel_num_x, 
-                                             geomv.voxel_num_y, 
-                                             geomv.getMinX(), 
-                                             geomv.getMaxX(), 
-                                             geomv.getMinY(), 
-                                             geomv.getMaxY())
-        elif geomp.dimension == '3D':
-            vol_geom = astra.create_vol_geom(geomv.voxel_num_x, 
-                                             geomv.voxel_num_y, 
-                                             geomv.voxel_num_z, 
-                                             geomv.getMinX(), 
-                                             geomv.getMaxX(), 
-                                             geomv.getMinY(), 
-                                             geomv.getMaxY(), 
-                                             geomv.getMinZ(), 
-                                             geomv.getMaxZ())
-        else:
-            NotImplemented
-            
+        self.fp = AstraForwardProjector(volume_geometry=geomv,
+                                        sinogram_geometry=geomp,
+                                        proj_id=None,
+                                        device=device)
+        #self.fp.setVolumeGeometry(self.volume_geometry)
+        #self.fp.setSinogramGeometry(self.sinogram_geometry)
         
-        # ASTRA projection geometry
-        if geomp.dimension == '2D':
-            if geomp.geom_type == 'parallel':
-                proj_geom = astra.create_proj_geom('parallel',
-                                                   geomp.pixel_size_h,
-                                                   geomp.pixel_num_h,
-                                                   geomp.angles)
-            elif geomp.geom_type == 'cone':
-                proj_geom = astra.create_proj_geom('fanflat',
-                                                   geomp.pixel_size_h,
-                                                   geomp.pixel_num_h,
-                                                   geomp.angles,
-                                                   geomp.dist_source_center,
-                                                   geomp.dist_center_detector)
-            else:
-                NotImplemented
-        elif geomp.dimension == '3D':
-            if geomp.proj_geom == 'parallel':
-                proj_geom = astra.create_proj_geom('parallel3d',
-                                                   geomp.pixel_size_h,
-                                                   geomp.pixel_size_v,
-                                                   geomp.pixel_num_v,
-                                                   geomp.pixel_num_h,
-                                                   geomp.angles)
-            elif geomp.geom_type == 'cone':
-                proj_geom = astra.create_proj_geom('cone',
-                                                   geomp.pixel_size_h,
-                                                   geomp.pixel_size_v,
-                                                   geomp.pixel_num_v,
-                                                   geomp.pixel_num_h,
-                                                   geomp.angles,
-                                                   geomp.dist_source_center,
-                                                   geomp.dist_center_detector)
-            else:
-                NotImplemented
-        else:
-            NotImplemented
-        
-        # ASTRA projector, to be stored
-        if device == 'cpu':
-            # Note that 'line' is only for parallel (2D) and only one option
-            self.proj_id = astra.create_projector('line', proj_geom, vol_geom) 
-        elif device == 'gpu':
-            self.proj_id = astra.create_projector('cuda', proj_geom, vol_geom) 
-        else:
-            NotImplemented
-        
-        self.fp = AstraForwardProjector()
-        self.fp.setProjector(self.proj_id)
-        self.fp.setSinogramGeometry(self.sinogram_geometry)
-        
-        self.bp = AstraBackProjector()
-        self.bp.setProjector(self.proj_id)
-        self.bp.setVolumeGeometry(self.volume_geometry)
-        
+        self.bp = AstraBackProjector(volume_geometry=geomv,
+                                        sinogram_geometry=geomp,
+                                        proj_id=None,
+                                        device=device)
+        #self.bp.setVolumeGeometry(self.volume_geometry)
+        #self.bp.setSinogramGeometry(self.sinogram_geometry)
+                
         # Initialise empty for singular value.
         self.s1 = None
     

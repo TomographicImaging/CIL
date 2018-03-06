@@ -1,10 +1,39 @@
 
 class VolumeGeometry:
     
-    def __init__(self,grid,domain):
-        self.domain = domain
-        self.grid = grid
-    
+    def __init__(self, \
+                 voxel_num_x=None, \
+                 voxel_num_y=None, \
+                 voxel_num_z=None, \
+                 voxel_size_x=None, \
+                 voxel_size_y=None, \
+                 voxel_size_z=None):
+        
+        self.voxel_num_x = voxel_num_x
+        self.voxel_num_y = voxel_num_y
+        self.voxel_num_z = voxel_num_z
+        self.voxel_size_x = voxel_size_x
+        self.voxel_size_y = voxel_size_y
+        self.voxel_size_z = voxel_size_z    
+        
+    def get_min_x(self):
+        return -0.5*self.voxel_num_x*self.voxel_size_x
+        
+    def get_max_x(self):
+        return 0.5*self.voxel_num_x*self.voxel_size_x
+        
+    def get_min_y(self):
+        return -0.5*self.voxel_num_y*self.voxel_size_y
+        
+    def get_max_y(self):
+        return 0.5*self.voxel_num_y*self.voxel_size_y
+        
+    def get_min_z(self):
+        return -0.5*self.voxel_num_z*self.voxel_size_z
+        
+    def get_max_z(self):
+        return 0.5*self.voxel_num_z*self.voxel_size_z
+        
     
 class SinogramGeometry:
     

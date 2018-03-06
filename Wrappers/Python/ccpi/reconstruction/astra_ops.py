@@ -26,83 +26,80 @@ class AstraProjectorSimple(Operator):
     def __init__(self, geomv, geomp, device):
         super(AstraProjectorSimple, self).__init__()
         
-        # Store our volume and sinogram geometries. Redundant with also 
-        # storing in ASTRA format below but needed to assign to 
-        # SinogramData in "direct" method and VolumeData in "adjoint" method
+        # Store volume and sinogram geometries.
         self.sinogram_geometry = geomp
         self.volume_geometry = geomv
         
-        # ASTRA Volume geometry
+        # Set up ASTRA Volume geometry, not stored
         if geomp.dimension == '2D':
-            self.vol_geom = astra.create_vol_geom(geomv.voxel_num_x, 
-                                                  geomv.voxel_num_y, 
-                                                  geomv.getMinX(), 
-                                                  geomv.getMaxX(), 
-                                                  geomv.getMinY(), 
-                                                  geomv.getMaxY())
+            vol_geom = astra.create_vol_geom(geomv.voxel_num_x, 
+                                             geomv.voxel_num_y, 
+                                             geomv.getMinX(), 
+                                             geomv.getMaxX(), 
+                                             geomv.getMinY(), 
+                                             geomv.getMaxY())
         elif geomp.dimension == '3D':
-            self.vol_geom = astra.create_vol_geom(geomv.voxel_num_x, 
-                                                  geomv.voxel_num_y, 
-                                                  geomv.voxel_num_z, 
-                                                  geomv.getMinX(), 
-                                                  geomv.getMaxX(), 
-                                                  geomv.getMinY(), 
-                                                  geomv.getMaxY(), 
-                                                  geomv.getMinZ(), 
-                                                  geomv.getMaxZ())
+            vol_geom = astra.create_vol_geom(geomv.voxel_num_x, 
+                                             geomv.voxel_num_y, 
+                                             geomv.voxel_num_z, 
+                                             geomv.getMinX(), 
+                                             geomv.getMaxX(), 
+                                             geomv.getMinY(), 
+                                             geomv.getMaxY(), 
+                                             geomv.getMinZ(), 
+                                             geomv.getMaxZ())
         else:
             NotImplemented
             
         
-        # ASTRA Projections geometry
+        # ASTRA projection geometry
         if geomp.dimension == '2D':
             if geomp.geom_type == 'parallel':
-                self.proj_geom = astra.create_proj_geom('parallel',
-                                                        geomp.pixel_size_h,
-                                                        geomp.pixel_num_h,
-                                                        geomp.angles)
+                proj_geom = astra.create_proj_geom('parallel',
+                                                   geomp.pixel_size_h,
+                                                   geomp.pixel_num_h,
+                                                   geomp.angles)
             elif geomp.geom_type == 'cone':
-                self.proj_geom = astra.create_proj_geom('fanflat',
-                                                        geomp.pixel_size_h,
-                                                        geomp.pixel_num_h,
-                                                        geomp.angles,
-                                                        geomp.dist_source_center,
-                                                        geomp.dist_center_detector)
+                proj_geom = astra.create_proj_geom('fanflat',
+                                                   geomp.pixel_size_h,
+                                                   geomp.pixel_num_h,
+                                                   geomp.angles,
+                                                   geomp.dist_source_center,
+                                                   geomp.dist_center_detector)
             else:
                 NotImplemented
         elif geomp.dimension == '3D':
             if geomp.proj_geom == 'parallel':
-                self.proj_geom = astra.create_proj_geom('parallel3d',
-                                                        geomp.pixel_size_h,
-                                                        geomp.pixel_size_v,
-                                                        geomp.pixel_num_v,
-                                                        geomp.pixel_num_h,
-                                                        geomp.angles)
+                proj_geom = astra.create_proj_geom('parallel3d',
+                                                   geomp.pixel_size_h,
+                                                   geomp.pixel_size_v,
+                                                   geomp.pixel_num_v,
+                                                   geomp.pixel_num_h,
+                                                   geomp.angles)
             elif geomp.geom_type == 'cone':
-                self.proj_geom = astra.create_proj_geom('cone',
-                                                        geomp.pixel_size_h,
-                                                        geomp.pixel_size_v,
-                                                        geomp.pixel_num_v,
-                                                        geomp.pixel_num_h,
-                                                        geomp.angles,
-                                                        geomp.dist_source_center,
-                                                        geomp.dist_center_detector)
+                proj_geom = astra.create_proj_geom('cone',
+                                                   geomp.pixel_size_h,
+                                                   geomp.pixel_size_v,
+                                                   geomp.pixel_num_v,
+                                                   geomp.pixel_num_h,
+                                                   geomp.angles,
+                                                   geomp.dist_source_center,
+                                                   geomp.dist_center_detector)
             else:
                 NotImplemented
         else:
             NotImplemented
         
-        # ASTRA projector
+        # ASTRA projector, to be stored
         if device == 'cpu':
             # Note that 'line' is only for parallel (2D) and only one option
-            self.proj_id = astra.create_projector('line', self.proj_geom, 
-                                                  self.vol_geom) # for CPU
+            self.proj_id = astra.create_projector('line', proj_geom, vol_geom) 
         elif device == 'gpu':
-            self.proj_id = astra.create_projector('cuda', self.proj_geom, 
-                                                  self.vol_geom) # for GPU
+            self.proj_id = astra.create_projector('cuda', proj_geom, vol_geom) 
         else:
             NotImplemented
         
+        # Initialise empty for singular value.
         self.s1 = None
     
     def direct(self, IM):
@@ -124,10 +121,11 @@ class AstraProjectorSimple(Operator):
         return self.s1
     
     def size(self):
-        return ( (self.proj_geom['ProjectionAngles'].size, \
-                  self.proj_geom['DetectorCount']), \
-                 (self.vol_geom['GridColCount'], \
-                  self.vol_geom['GridRowCount']) )
+        # Only implemented for 2D
+        return ( (self.sinogram_geometry.angles.size, \
+                  self.sinogram_geometry.pixel_num_h), \
+                 (self.volume_geometry.voxel_num_x, \
+                  self.volume_geometry.voxel_num_y) )
     
 
 class AstraProjector(Operator):

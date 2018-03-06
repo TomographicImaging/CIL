@@ -48,9 +48,9 @@ class SinogramGeometry:
                  dimension, \
                  angles, \
                  pixel_num_h=None, \
-                 pixel_size_h=None, \
+                 pixel_size_h=1, \
                  pixel_num_v=None, \
-                 pixel_size_v=None, \
+                 pixel_size_v=1, \
                  dist_source_center=None, \
                  dist_center_detector=None, \
                  ):

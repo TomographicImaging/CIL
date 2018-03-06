@@ -29,10 +29,10 @@ class AstraProjectorSimple(Operator):
         # ASTRA Volume geometry
         self.vol_geom = astra.create_vol_geom(geomv.voxel_num_x, \
                                               geomv.voxel_num_y, \
-                                              geomv.get_min_x(), \
-                                              geomv.get_max_x(), \
-                                              geomv.get_min_y(), \
-                                              geomv.get_max_y())
+                                              geomv.getMinX(), \
+                                              geomv.getMaxX(), \
+                                              geomv.getMinY(), \
+                                              geomv.getMaxY())
         
         # ASTRA Projections geometry
         if geomp.dimension == '2D':

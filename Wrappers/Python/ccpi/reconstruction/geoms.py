@@ -16,22 +16,22 @@ class VolumeGeometry:
         self.voxel_size_y = voxel_size_y
         self.voxel_size_z = voxel_size_z    
         
-    def get_min_x(self):
+    def getMinX(self):
         return -0.5*self.voxel_num_x*self.voxel_size_x
         
-    def get_max_x(self):
+    def getMaxX(self):
         return 0.5*self.voxel_num_x*self.voxel_size_x
         
-    def get_min_y(self):
+    def getMinY(self):
         return -0.5*self.voxel_num_y*self.voxel_size_y
         
-    def get_max_y(self):
+    def getMaxY(self):
         return 0.5*self.voxel_num_y*self.voxel_size_y
         
-    def get_min_z(self):
+    def getMinZ(self):
         return -0.5*self.voxel_num_z*self.voxel_size_z
         
-    def get_max_z(self):
+    def getMaxZ(self):
         return 0.5*self.voxel_num_z*self.voxel_size_z
         
     

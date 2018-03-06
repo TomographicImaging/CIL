@@ -27,14 +27,19 @@ class AstraProjectorSimple(Operator):
         super(AstraProjectorSimple, self).__init__()
         
         # ASTRA Volume geometry
-        self.vol_geom = astra.create_vol_geom(geomv.grid)
+        self.vol_geom = astra.create_vol_geom(geomv.voxel_num_x, \
+                                              geomv.voxel_num_y, \
+                                              geomv.get_min_x(), \
+                                              geomv.get_max_x(), \
+                                              geomv.get_min_y(), \
+                                              geomv.get_max_y())
         
         # ASTRA Projections geometry
         if geomp.dimension == '2D':
             if geomp.geom_type == 'parallel':
                 self.proj_geom = astra.create_proj_geom('parallel', \
-                                    (geomp.domain[1]-geomp.domain[0])/geomp.grid[0], \
-                                    geomp.grid[0], \
+                                    geomp.pixel_size_h, \
+                                    geomp.pixel_num_h, \
                                     geomp.angles)
             elif geomp.geom_type == 'cone':
                 NotImplemented

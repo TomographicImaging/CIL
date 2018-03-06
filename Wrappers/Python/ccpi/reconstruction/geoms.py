@@ -81,31 +81,10 @@ class SinogramGeometry:
         self.dist_source_center = dist_source_center
         self.dist_center_detector = dist_center_detector
         
-        # Only implement 2D for now
-        #if dimension == '2D':
         self.pixel_num_h = pixel_num_h
         self.pixel_size_h = pixel_size_h
         self.pixel_num_v = pixel_num_v
         self.pixel_size_v = pixel_size_v
-        #else:
-        #   NotImplemented
-        
-        
-        #pixel_num_h
-        #pixel_size_h
-        #pixel_num_v
-        #pixel_size_v
-        
-        #self.source_x = 0.0
-        #self.detector_x = 0.0
-        #self.pixel_h_size = 1.0
-        #self.pixel_v_size = 1.0
-        #self.num_of_vertical_pixels = 0
-        #self.num_of_horizontal_pixels = 0
-        
-        #self.has_offsets = False 
-        #self.m_radius = 1.0
-        #self.experiment_name = ''
-        #self.pixels_per_voxel = pixels_per_voxel #passed as argument
+
         
                 

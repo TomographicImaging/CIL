@@ -7,32 +7,38 @@ class VolumeGeometry:
                  voxel_num_z=None, \
                  voxel_size_x=None, \
                  voxel_size_y=None, \
-                 voxel_size_z=None):
+                 voxel_size_z=None, \
+                 center_x=0, \
+                 center_y=0, \
+                 center_z=0):
         
         self.voxel_num_x = voxel_num_x
         self.voxel_num_y = voxel_num_y
         self.voxel_num_z = voxel_num_z
         self.voxel_size_x = voxel_size_x
         self.voxel_size_y = voxel_size_y
-        self.voxel_size_z = voxel_size_z    
+        self.voxel_size_z = voxel_size_z
+        self.center_x = center_x
+        self.center_y = center_y
+        self.center_z = center_z  
         
     def getMinX(self):
-        return -0.5*self.voxel_num_x*self.voxel_size_x
+        return self.center_x - 0.5*self.voxel_num_x*self.voxel_size_x
         
     def getMaxX(self):
-        return 0.5*self.voxel_num_x*self.voxel_size_x
+        return self.center_x + 0.5*self.voxel_num_x*self.voxel_size_x
         
     def getMinY(self):
-        return -0.5*self.voxel_num_y*self.voxel_size_y
+        return self.center_y - 0.5*self.voxel_num_y*self.voxel_size_y
         
     def getMaxY(self):
-        return 0.5*self.voxel_num_y*self.voxel_size_y
+        return self.center_y + 0.5*self.voxel_num_y*self.voxel_size_y
         
     def getMinZ(self):
-        return -0.5*self.voxel_num_z*self.voxel_size_z
+        return self.center_z - 0.5*self.voxel_num_z*self.voxel_size_z
         
     def getMaxZ(self):
-        return 0.5*self.voxel_num_z*self.voxel_size_z
+        return self.center_z + 0.5*self.voxel_num_z*self.voxel_size_z
         
     
 class SinogramGeometry:

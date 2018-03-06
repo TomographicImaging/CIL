@@ -105,7 +105,7 @@ class DataSet(object):
         self.shape = numpy.shape(array)
         self.number_of_dimensions = len (self.shape)
         self.dimension_labels = {}
-        
+                
         if dimension_labels is not None and \
            len (dimension_labels) == self.number_of_dimensions:
             for i in range(self.number_of_dimensions):
@@ -750,6 +750,10 @@ if __name__ == '__main__':
     print ((2**b))
     
     print (type(volume3 + 2))
+    
+    s = [i for i in range(3 * 4 * 4)]
+    s = numpy.reshape(numpy.asarray(s), (3,4,4))
+    sino = SinogramData( s )
     
     
     

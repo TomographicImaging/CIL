@@ -33,21 +33,61 @@ class AstraProjectorSimple(Operator):
         self.volume_geometry = geomv
         
         # ASTRA Volume geometry
-        self.vol_geom = astra.create_vol_geom(geomv.voxel_num_x, \
-                                              geomv.voxel_num_y, \
-                                              geomv.getMinX(), \
-                                              geomv.getMaxX(), \
-                                              geomv.getMinY(), \
-                                              geomv.getMaxY())
+        if geomp.dimension == '2D':
+            self.vol_geom = astra.create_vol_geom(geomv.voxel_num_x, 
+                                                  geomv.voxel_num_y, 
+                                                  geomv.getMinX(), 
+                                                  geomv.getMaxX(), 
+                                                  geomv.getMinY(), 
+                                                  geomv.getMaxY())
+        elif geomp.dimension == '3D':
+            self.vol_geom = astra.create_vol_geom(geomv.voxel_num_x, 
+                                                  geomv.voxel_num_y, 
+                                                  geomv.voxel_num_z, 
+                                                  geomv.getMinX(), 
+                                                  geomv.getMaxX(), 
+                                                  geomv.getMinY(), 
+                                                  geomv.getMaxY(), 
+                                                  geomv.getMinZ(), 
+                                                  geomv.getMaxZ())
+        else:
+            NotImplemented
+            
         
         # ASTRA Projections geometry
         if geomp.dimension == '2D':
             if geomp.geom_type == 'parallel':
-                self.proj_geom = astra.create_proj_geom('parallel', \
-                                    geomp.pixel_size_h, \
-                                    geomp.pixel_num_h, \
-                                    geomp.angles)
+                self.proj_geom = astra.create_proj_geom('parallel',
+                                                        geomp.pixel_size_h,
+                                                        geomp.pixel_num_h,
+                                                        geomp.angles)
             elif geomp.geom_type == 'cone':
+                self.proj_geom = astra.create_proj_geom('fanflat',
+                                                        geomp.pixel_size_h,
+                                                        geomp.pixel_num_h,
+                                                        geomp.angles,
+                                                        geomp.dist_source_center,
+                                                        geomp.dist_center_detector)
+            else:
+                NotImplemented
+        elif geomp.dimension == '3D':
+            if geomp.proj_geom == 'parallel':
+                self.proj_geom = astra.create_proj_geom('parallel3d',
+                                                        geomp.pixel_size_h,
+                                                        geomp.pixel_size_v,
+                                                        geomp.pixel_num_v,
+                                                        geomp.pixel_num_h,
+                                                        geomp.angles)
+            elif geomp.geom_type == 'cone':
+                self.proj_geom = astra.create_proj_geom('cone',
+                                                        geomp.pixel_size_h,
+                                                        geomp.pixel_size_v,
+                                                        geomp.pixel_num_v,
+                                                        geomp.pixel_num_h,
+                                                        geomp.angles,
+                                                        geomp.dist_source_center,
+                                                        geomp.dist_center_detector)
+            else:
                 NotImplemented
         else:
             NotImplemented

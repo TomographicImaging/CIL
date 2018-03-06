@@ -26,31 +26,25 @@ plt.show()
 vg = VolumeGeometry(N,N,None, 1,1,None)
 
 Phantom = VolumeData(x,geometry=vg)
-#Phantom = VolumeData(x)
 
 # Set up measurement geometry
 angles_num = 20; # angles number
 angles = np.linspace(0,np.pi,angles_num,endpoint=False)
-
 det_w = 1.0
 det_num = N
-
 SourceOrig = 500
 OrigDetec = 0
 
 # Parallelbeam geometry test
 pg = SinogramGeometry('parallel','2D',angles,det_num,det_w)
 
-# Set up ASTRA projector
-#Aop = AstraProjector(vg, angles, N,'gpu')
-#Aop = AstraProjector(det_w, det_num, angles, projtype='parallel',device='gpu')
-
-Aop_old = AstraProjector(det_w, det_num, SourceOrig, 
-                     OrigDetec, angles, 
-                     N,'fanbeam','gpu') 
-
+# ASTRA operator using volume and sinogram geometries
 Aop = AstraProjectorSimple(vg, pg, 'gpu')
 
+# Unused old astra projector without geometry
+# Aop_old = AstraProjector(det_w, det_num, SourceOrig, 
+#                      OrigDetec, angles, 
+#                      N,'fanbeam','gpu') 
 
 # Try forward and backprojection
 b = Aop.direct(Phantom)
@@ -66,7 +60,7 @@ plt.show()
 f = Norm2sq(Aop,b,c=0.5)
 
 # Initial guess
-x_init = VolumeData(np.zeros(x.shape))
+x_init = VolumeData(np.zeros(x.shape),geometry=vg)
 
 # Run FISTA for least squares without regularization
 x_fista0, it0, timing0, criter0 = FISTA(x_init, f, None)

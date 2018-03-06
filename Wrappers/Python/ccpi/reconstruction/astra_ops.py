@@ -69,12 +69,12 @@ class AstraProjectorSimple(Operator):
         
         sinogram_id, DATA = astra.create_sino(IM.as_array(), self.proj_id)
         astra.data2d.delete(sinogram_id)
-        return SinogramData(DATA,sinogram_geometry=self.sinogram_geometry)
+        return SinogramData(DATA,geometry=self.sinogram_geometry)
     
     def adjoint(self, DATA):
         rec_id, IM = astra.create_backprojection(DATA.as_array(), self.proj_id)
         astra.data2d.delete(rec_id)
-        return VolumeData(IM,volume_geometry=self.volume_geometry)
+        return VolumeData(IM,geometry=self.volume_geometry)
     
     def delete(self):
         astra.data2d.delete(self.proj_id)

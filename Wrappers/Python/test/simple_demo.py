@@ -25,7 +25,7 @@ plt.show()
 
 vg = VolumeGeometry(N,N,None, 1,1,None)
 
-Phantom = VolumeData(x,volume_geometry=vg)
+Phantom = VolumeData(x,geometry=vg)
 #Phantom = VolumeData(x)
 
 # Set up measurement geometry

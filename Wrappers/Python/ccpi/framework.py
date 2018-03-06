@@ -105,6 +105,7 @@ class DataSet(object):
         self.shape = numpy.shape(array)
         self.number_of_dimensions = len (self.shape)
         self.dimension_labels = {}
+        self.geometry = None # Only relevant for SinogramData and VolumeData
         
         if dimension_labels is not None and \
            len (dimension_labels) == self.number_of_dimensions:
@@ -122,6 +123,13 @@ class DataSet(object):
         else:
             raise TypeError('Array must be NumpyArray, passed {0}'\
                             .format(type(array)))
+        
+        # finally copy the geometry
+        if 'geometry' in kwargs.keys():
+            self.geometry = kwargs['geometry']
+        else:
+            # assume it is parallel beam
+            pass
         
 
     def as_array(self, dimensions=None):
@@ -441,13 +449,6 @@ class VolumeData(DataSet):
                         self.origin = value
                     if key == 'spacing' :
                         self.spacing = value
-        
-        # finally copy the volume geometry
-        if 'volume_geometry' in kwargs.keys():
-            self.volume_geometry = kwargs['volume_geometry']
-        else:
-            # assume it is parallel beam
-            pass
                         
 
 class SinogramData(DataSet):
@@ -480,13 +481,7 @@ class SinogramData(DataSet):
                     dimension_labels = ['angle' , 
                                         'horizontal']
             DataSet.__init__(self, array, deep_copy, dimension_labels, **kwargs)
-        
-        # finally copy the sinogram geometry
-        if 'sinogram_geometry' in kwargs.keys():
-            self.sinogram_geometry = kwargs['sinogram_geometry']
-        else:
-            # assume it is parallel beam
-            pass
+            
             
 class DataSetProcessor(object):
     '''Defines a generic DataSet processor

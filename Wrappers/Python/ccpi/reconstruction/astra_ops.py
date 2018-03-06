@@ -21,6 +21,69 @@ import numpy
 from ccpi.framework import SinogramData, VolumeData
 from ccpi.reconstruction.ops import PowerMethodNonsquare
 
+class AstraProjectorSimple(Operator):
+    """ASTRA projector modified to use DataSet and geometry."""
+    def __init__(self, geomv, geomp, device):
+        super(AstraProjectorSimple, self).__init__()
+        
+        # ASTRA Volume geometry
+        self.vol_geom = astra.create_vol_geom(geomv.voxel_num_x, \
+                                              geomv.voxel_num_y, \
+                                              geomv.getMinX(), \
+                                              geomv.getMaxX(), \
+                                              geomv.getMinY(), \
+                                              geomv.getMaxY())
+        
+        # ASTRA Projections geometry
+        if geomp.dimension == '2D':
+            if geomp.geom_type == 'parallel':
+                self.proj_geom = astra.create_proj_geom('parallel', \
+                                    geomp.pixel_size_h, \
+                                    geomp.pixel_num_h, \
+                                    geomp.angles)
+            elif geomp.geom_type == 'cone':
+                NotImplemented
+        else:
+            NotImplemented
+        
+        # ASTRA projector
+        if device == 'cpu':
+            # Note that 'line' is only for parallel (2D) and only one option
+            self.proj_id = astra.create_projector('line', self.proj_geom, 
+                                                  self.vol_geom) # for CPU
+        elif device == 'gpu':
+            self.proj_id = astra.create_projector('cuda', self.proj_geom, 
+                                                  self.vol_geom) # for GPU
+        else:
+            NotImplemented
+        
+        self.s1 = None
+    
+    def direct(self, IM):
+        
+        sinogram_id, DATA = astra.create_sino(IM.as_array(), self.proj_id)
+        astra.data2d.delete(sinogram_id)
+        return SinogramData(DATA)
+    
+    def adjoint(self, DATA):
+        rec_id, IM = astra.create_backprojection(DATA.as_array(), self.proj_id)
+        astra.data2d.delete(rec_id)
+        return VolumeData(IM)
+    
+    def delete(self):
+        astra.data2d.delete(self.proj_id)
+    
+    def get_max_sing_val(self):
+        self.s1, sall, svec = PowerMethodNonsquare(self,10)
+        return self.s1
+    
+    def size(self):
+        return ( (self.proj_geom['ProjectionAngles'].size, \
+                  self.proj_geom['DetectorCount']), \
+                 (self.vol_geom['GridColCount'], \
+                  self.vol_geom['GridRowCount']) )
+    
+
 class AstraProjector(Operator):
     """A simple 2D/3D parallel/fan beam projection/backprojection class based 
     on ASTRA toolbox"""

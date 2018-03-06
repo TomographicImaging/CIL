@@ -768,5 +768,9 @@ if __name__ == '__main__':
     
     print (type(volume3 + 2))
     
+    s = [i for i in range(3 * 4 * 4)]
+    s = numpy.reshape(numpy.asarray(s), (3,4,4))
+    sino = SinogramData( s )
+    
     
     

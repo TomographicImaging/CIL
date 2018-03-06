@@ -13,6 +13,8 @@ from ccpi.reconstruction.geoms import *
 import numpy as np
 import matplotlib.pyplot as plt
 
+test_case = 2   # 1=parallel2D, 2=cone2D
+
 # Set up phantom
 N = 128
 
@@ -29,14 +31,33 @@ Phantom = VolumeData(x,geometry=vg)
 
 # Set up measurement geometry
 angles_num = 20; # angles number
-angles = np.linspace(0,np.pi,angles_num,endpoint=False)
+
+if test_case==1:
+    angles = np.linspace(0,np.pi,angles_num,endpoint=False)
+elif test_case==2:
+    angles = np.linspace(0,2*np.pi,angles_num,endpoint=False)
+else:
+    NotImplemented
+
 det_w = 1.0
 det_num = N
-SourceOrig = 500
+SourceOrig = 200
 OrigDetec = 0
 
 # Parallelbeam geometry test
-pg = SinogramGeometry('parallel','2D',angles,det_num,det_w)
+if test_case==1:
+    pg = SinogramGeometry('parallel',
+                          '2D',
+                          angles,
+                          det_num,det_w)
+elif test_case==2:
+    pg = SinogramGeometry('cone',
+                          '2D',
+                          angles,
+                          det_num,
+                          det_w,
+                          dist_source_center=SourceOrig, 
+                          dist_center_detector=OrigDetec)
 
 # ASTRA operator using volume and sinogram geometries
 Aop = AstraProjectorSimple(vg, pg, 'gpu')

@@ -105,7 +105,8 @@ class DataSet(object):
         self.shape = numpy.shape(array)
         self.number_of_dimensions = len (self.shape)
         self.dimension_labels = {}
-                
+        self.geometry = None # Only relevant for SinogramData and VolumeData
+        
         if dimension_labels is not None and \
            len (dimension_labels) == self.number_of_dimensions:
             for i in range(self.number_of_dimensions):
@@ -122,6 +123,13 @@ class DataSet(object):
         else:
             raise TypeError('Array must be NumpyArray, passed {0}'\
                             .format(type(array)))
+        
+        # finally copy the geometry
+        if 'geometry' in kwargs.keys():
+            self.geometry = kwargs['geometry']
+        else:
+            # assume it is parallel beam
+            pass
         
 
     def as_array(self, dimensions=None):
@@ -212,7 +220,8 @@ class DataSet(object):
                 out = self.as_array() + other.as_array()
                 return type(self)(out, 
                                deep_copy=True, 
-                               dimension_labels=self.dimension_labels)
+                               dimension_labels=self.dimension_labels,
+                               geometry=self.geometry)
             else:
                 raise ValueError('Wrong shape: {0} and {1}'.format(self.shape, 
                                  other.shape))
@@ -220,7 +229,8 @@ class DataSet(object):
             return type(self)(
                     self.as_array() + other, 
                                deep_copy=True, 
-                               dimension_labels=self.dimension_labels)
+                               dimension_labels=self.dimension_labels,
+                               geometry=self.geometry)
         else:
             raise TypeError('Cannot {0} DataSet with {1}'.format("add" ,
                             type(other)))
@@ -232,14 +242,16 @@ class DataSet(object):
                 out = self.as_array() - other.as_array()
                 return type(self)(out, 
                                deep_copy=True, 
-                               dimension_labels=self.dimension_labels)
+                               dimension_labels=self.dimension_labels,
+                               geometry=self.geometry)
             else:
                 raise ValueError('Wrong shape: {0} and {1}'.format(self.shape, 
                                  other.shape))
         elif isinstance(other, (int, float, complex)):
             return type(self)(self.as_array() - other, 
                                deep_copy=True, 
-                               dimension_labels=self.dimension_labels)
+                               dimension_labels=self.dimension_labels,
+                               geometry=self.geometry)
         else:
             raise TypeError('Cannot {0} DataSet with {1}'.format("subtract" ,
                             type(other)))
@@ -254,14 +266,16 @@ class DataSet(object):
                 out = self.as_array() / other.as_array()
                 return type(self)(out, 
                                deep_copy=True, 
-                               dimension_labels=self.dimension_labels)
+                               dimension_labels=self.dimension_labels,
+                               geometry=self.geometry)
             else:
                 raise ValueError('Wrong shape: {0} and {1}'.format(self.shape, 
                                  other.shape))
         elif isinstance(other, (int, float, complex)):
             return type(self)(self.as_array() / other, 
                                deep_copy=True, 
-                               dimension_labels=self.dimension_labels)
+                               dimension_labels=self.dimension_labels,
+                               geometry=self.geometry)
         else:
             raise TypeError('Cannot {0} DataSet with {1}'.format("divide" ,
                             type(other)))
@@ -273,14 +287,16 @@ class DataSet(object):
                 out = self.as_array() ** other.as_array()
                 return type(self)(out, 
                                deep_copy=True, 
-                               dimension_labels=self.dimension_labels)
+                               dimension_labels=self.dimension_labels,
+                               geometry=self.geometry)
             else:
                 raise ValueError('Wrong shape: {0} and {1}'.format(self.shape, 
                                  other.shape))
         elif isinstance(other, (int, float, complex)):
             return type(self)(self.as_array() ** other, 
                                deep_copy=True, 
-                               dimension_labels=self.dimension_labels)
+                               dimension_labels=self.dimension_labels,
+                               geometry=self.geometry)
         else:
             raise TypeError('Cannot {0} DataSet with {1}'.format("power" ,
                             type(other)))
@@ -292,14 +308,16 @@ class DataSet(object):
                 out = self.as_array() * other.as_array()
                 return type(self)(out, 
                                deep_copy=True, 
-                               dimension_labels=self.dimension_labels)
+                               dimension_labels=self.dimension_labels,
+                               geometry=self.geometry)
             else:
                 raise ValueError('Wrong shape: {0} and {1}'.format(self.shape, 
                                  other.shape))
         elif isinstance(other, (int, float, complex)):
             return type(self)(self.as_array() * other, 
                                deep_copy=True, 
-                               dimension_labels=self.dimension_labels)
+                               dimension_labels=self.dimension_labels,
+                               geometry=self.geometry)
         else:
             raise TypeError('Cannot {0} DataSet with {1}'.format("multiply" ,
                             type(other)))
@@ -315,19 +333,22 @@ class DataSet(object):
         out = numpy.abs(self.as_array() )
         return type(self)(out,
                        deep_copy=True, 
-                       dimension_labels=self.dimension_labels)
+                       dimension_labels=self.dimension_labels,
+                       geometry=self.geometry)
     
     def maximum(self,otherscalar):
         out = numpy.maximum(self.as_array(),otherscalar)
         return type(self)(out,
                        deep_copy=True, 
-                       dimension_labels=self.dimension_labels)
+                       dimension_labels=self.dimension_labels,
+                       geometry=self.geometry)
     
     def sign(self):
         out = numpy.sign(self.as_array() )
         return type(self)(out,
                        deep_copy=True, 
-                       dimension_labels=self.dimension_labels)
+                       dimension_labels=self.dimension_labels,
+                       geometry=self.geometry)
     
     # reverse operand
     def __radd__(self, other):
@@ -353,11 +374,13 @@ class DataSet(object):
         if isinstance(other, (int, float)) :
             fother = numpy.ones(numpy.shape(self.array)) * other
             return type(self)(fother ** self.array , 
-                           dimension_labels=self.dimension_labels)
+                           dimension_labels=self.dimension_labels,
+                           geometry=self.geometry)
         elif issubclass(other, DataSet):
             if self.checkDimensions(other):
                 return type(self)(other.as_array() ** self.array , 
-                           dimension_labels=self.dimension_labels)
+                           dimension_labels=self.dimension_labels,
+                           geometry=self.geometry)
             else:
                 raise ValueError('Dimensions do not match')
     # __rpow__
@@ -473,13 +496,7 @@ class SinogramData(DataSet):
                     dimension_labels = ['angle' , 
                                         'horizontal']
             DataSet.__init__(self, array, deep_copy, dimension_labels, **kwargs)
-        
-        # finally copy the instrument geometry
-        if 'instrument_geometry' in kwargs.keys():
-            self.instrument_geometry = kwargs['instrument_geometry']
-        else:
-            # assume it is parallel beam
-            pass
+            
             
 class DataSetProcessor(object):
     '''Defines a generic DataSet processor

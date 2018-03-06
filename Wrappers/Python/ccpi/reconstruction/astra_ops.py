@@ -20,6 +20,7 @@ import astra
 import numpy
 from ccpi.framework import SinogramData, VolumeData
 from ccpi.reconstruction.ops import PowerMethodNonsquare
+from ccpi.processors import AstraForwardProjector, AstraBackProjector
 
 class AstraProjectorSimple(Operator):
     """ASTRA projector modified to use DataSet and geometry."""
@@ -99,19 +100,26 @@ class AstraProjectorSimple(Operator):
         else:
             NotImplemented
         
+        self.fp = AstraForwardProjector()
+        self.fp.setProjector(self.proj_id)
+        self.fp.setSinogramGeometry(self.sinogram_geometry)
+        
+        self.bp = AstraBackProjector()
+        self.bp.setProjector(self.proj_id)
+        self.bp.setVolumeGeometry(self.volume_geometry)
+        
         # Initialise empty for singular value.
         self.s1 = None
     
     def direct(self, IM):
-        
-        sinogram_id, DATA = astra.create_sino(IM.as_array(), self.proj_id)
-        astra.data2d.delete(sinogram_id)
-        return SinogramData(DATA,geometry=self.sinogram_geometry)
+        self.fp.setInput(IM)
+        out = self.fp.getOutput()
+        return out
     
     def adjoint(self, DATA):
-        rec_id, IM = astra.create_backprojection(DATA.as_array(), self.proj_id)
-        astra.data2d.delete(rec_id)
-        return VolumeData(IM,geometry=self.volume_geometry)
+        self.bp.setInput(DATA)
+        out = self.bp.getOutput()
+        return out
     
     def delete(self):
         astra.data2d.delete(self.proj_id)

@@ -22,6 +22,7 @@ from ccpi.reconstruction import geoms
 import numpy
 import h5py
 from scipy import ndimage
+import astra
 
 class Normalizer(DataSetProcessor):
     '''Normalization based on flat and dark
@@ -380,6 +381,82 @@ class CenterOfRotationFinder(DataSetProcessor):
         cor = CenterOfRotationFinder.find_center_vo(projections.as_array())
         
         return cor
+    
+class AstraForwardProjector(DataSetProcessor):
+    '''AstraForwardProjector
+    
+    Forward project VolumeDataSet to SinogramDataSet using ASTRA proj_id.
+    
+    Input: VolumeDataSet
+    Parameter: proj_id
+    Output: SinogramDataSet
+    '''
+    
+    def __init__(self):
+        kwargs = {
+                  'proj_id'  :None,
+                  'sinogram_geometry'  : None
+                  }
+        
+        #DataSetProcessor.__init__(self, **kwargs)
+        super(AstraForwardProjector, self).__init__(**kwargs)
+    
+    def checkInput(self, dataset):
+        if dataset.number_of_dimensions == 3 or dataset.number_of_dimensions == 2:
+               return True
+        else:
+            raise ValueError("Expected input dimensions is 2 or 3, got {0}"\
+                             .format(dataset.number_of_dimensions))
+    
+    def setProjector(self, proj_id):
+        self.proj_id = proj_id
+        
+    def setSinogramGeometry(self, sinogram_geometry):
+        self.sinogram_geometry = sinogram_geometry
+    
+    def process(self):
+        IM = self.getInput()
+        sinogram_id, DATA = astra.create_sino(IM.as_array(), self.proj_id)
+        astra.data2d.delete(sinogram_id)
+        return SinogramData(DATA,geometry=self.sinogram_geometry)
+
+class AstraBackProjector(DataSetProcessor):
+    '''AstraBackProjector
+    
+    Back project SinogramDataSet to VolumeDataSet using ASTRA proj_id.
+    
+    Input: SinogramDataSet
+    Parameter: proj_id
+    Output: VolumeDataSet 
+    '''
+    
+    def __init__(self):
+        kwargs = {
+                  'proj_id'  :None,
+                  'volume_geometry'  : None
+                  }
+        
+        #DataSetProcessor.__init__(self, **kwargs)
+        super(AstraBackProjector, self).__init__(**kwargs)
+    
+    def checkInput(self, dataset):
+        if dataset.number_of_dimensions == 3 or dataset.number_of_dimensions == 2:
+               return True
+        else:
+            raise ValueError("Expected input dimensions is 2 or 3, got {0}"\
+                             .format(dataset.number_of_dimensions))
+    
+    def setProjector(self, proj_id):
+        self.proj_id = proj_id
+        
+    def setVolumeGeometry(self, volume_geometry):
+        self.volume_geometry = volume_geometry
+    
+    def process(self):
+        DATA = self.getInput()
+        rec_id, IM = astra.create_backprojection(DATA.as_array(), self.proj_id)
+        astra.data2d.delete(rec_id)
+        return VolumeData(IM,geometry=self.volume_geometry)
 
 def loadNexus(filename):
     '''Load a dataset stored in a NeXuS file (HDF5)'''

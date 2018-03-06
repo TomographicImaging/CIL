@@ -96,8 +96,9 @@ class Normalizer(DataSetProcessor):
                         projection, flat, dark, self.tolerance) \
                  for projection in projections.as_array() ]
                 )
-        y = DataSet( a , True, 
-                    dimension_labels=projections.dimension_labels )
+        y = type(projections)( a , True, 
+                    dimension_labels=projections.dimension_labels,
+                    geometry=projections.geometry)
         return y
     
 

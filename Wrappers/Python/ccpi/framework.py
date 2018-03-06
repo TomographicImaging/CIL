@@ -441,6 +441,13 @@ class VolumeData(DataSet):
                         self.origin = value
                     if key == 'spacing' :
                         self.spacing = value
+        
+        # finally copy the volume geometry
+        if 'volume_geometry' in kwargs.keys():
+            self.volume_geometry = kwargs['volume_geometry']
+        else:
+            # assume it is parallel beam
+            pass
                         
 
 class SinogramData(DataSet):
@@ -474,9 +481,9 @@ class SinogramData(DataSet):
                                         'horizontal']
             DataSet.__init__(self, array, deep_copy, dimension_labels, **kwargs)
         
-        # finally copy the instrument geometry
-        if 'instrument_geometry' in kwargs.keys():
-            self.instrument_geometry = kwargs['instrument_geometry']
+        # finally copy the sinogram geometry
+        if 'sinogram_geometry' in kwargs.keys():
+            self.sinogram_geometry = kwargs['sinogram_geometry']
         else:
             # assume it is parallel beam
             pass

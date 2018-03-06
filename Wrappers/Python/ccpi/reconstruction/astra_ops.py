@@ -26,6 +26,12 @@ class AstraProjectorSimple(Operator):
     def __init__(self, geomv, geomp, device):
         super(AstraProjectorSimple, self).__init__()
         
+        # Store our volume and sinogram geometries. Redundant with also 
+        # storing in ASTRA format below but needed to assign to 
+        # SinogramData in "direct" method and VolumeData in "adjoint" method
+        self.sinogram_geometry = geomp
+        self.volume_geometry = geomv
+        
         # ASTRA Volume geometry
         self.vol_geom = astra.create_vol_geom(geomv.voxel_num_x, \
                                               geomv.voxel_num_y, \
@@ -63,12 +69,12 @@ class AstraProjectorSimple(Operator):
         
         sinogram_id, DATA = astra.create_sino(IM.as_array(), self.proj_id)
         astra.data2d.delete(sinogram_id)
-        return SinogramData(DATA)
+        return SinogramData(DATA,sinogram_geometry=self.sinogram_geometry)
     
     def adjoint(self, DATA):
         rec_id, IM = astra.create_backprojection(DATA.as_array(), self.proj_id)
         astra.data2d.delete(rec_id)
-        return VolumeData(IM)
+        return VolumeData(IM,volume_geometry=self.volume_geometry)
     
     def delete(self):
         astra.data2d.delete(self.proj_id)

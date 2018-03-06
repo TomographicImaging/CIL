@@ -35,15 +35,11 @@ class AstraProjectorSimple(Operator):
                                         sinogram_geometry=geomp,
                                         proj_id=None,
                                         device=device)
-        #self.fp.setVolumeGeometry(self.volume_geometry)
-        #self.fp.setSinogramGeometry(self.sinogram_geometry)
         
         self.bp = AstraBackProjector(volume_geometry=geomv,
                                         sinogram_geometry=geomp,
                                         proj_id=None,
                                         device=device)
-        #self.bp.setVolumeGeometry(self.volume_geometry)
-        #self.bp.setSinogramGeometry(self.sinogram_geometry)
                 
         # Initialise empty for singular value.
         self.s1 = None
@@ -58,8 +54,8 @@ class AstraProjectorSimple(Operator):
         out = self.bp.getOutput()
         return out
     
-    def delete(self):
-        astra.data2d.delete(self.proj_id)
+    #def delete(self):
+    #    astra.data2d.delete(self.proj_id)
     
     def get_max_sing_val(self):
         self.s1, sall, svec = PowerMethodNonsquare(self,10)

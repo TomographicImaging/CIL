@@ -1,4 +1,5 @@
 from ccpi.framework import DataSetProcessor, DataSet, VolumeData, SinogramData
+from ccpi.astra.astra_utils import convert_geometry_to_astra
 import astra
 
 
@@ -30,69 +31,16 @@ class AstraForwardProjector(DataSetProcessor):
         self.setVolumeGeometry(volume_geometry)
         self.setSinogramGeometry(sinogram_geometry)
         
-        # Set up ASTRA Volume and projection geometry, not stored
-        if self.sinogram_geometry.dimension == '2D':
-            vol_geom = astra.create_vol_geom(self.volume_geometry.voxel_num_x, 
-                                             self.volume_geometry.voxel_num_y, 
-                                             self.volume_geometry.getMinX(), 
-                                             self.volume_geometry.getMaxX(), 
-                                             self.volume_geometry.getMinY(), 
-                                             self.volume_geometry.getMaxY())
-            
-            if self.sinogram_geometry.geom_type == 'parallel':
-                proj_geom = astra.create_proj_geom('parallel',
-                                                   self.sinogram_geometry.pixel_size_h,
-                                                   self.sinogram_geometry.pixel_num_h,
-                                                   self.sinogram_geometry.angles)
-            elif self.sinogram_geometry.geom_type == 'cone':
-                proj_geom = astra.create_proj_geom('fanflat',
-                                                   self.sinogram_geometry.pixel_size_h,
-                                                   self.sinogram_geometry.pixel_num_h,
-                                                   self.sinogram_geometry.angles,
-                                                   self.sinogram_geometry.dist_source_center,
-                                                   self.sinogram_geometry.dist_center_detector)
-            else:
-                NotImplemented
-                
-        elif self.sinogram_geometry.dimension == '3D':
-            vol_geom = astra.create_vol_geom(self.volume_geometry.voxel_num_x, 
-                                             self.volume_geometry.voxel_num_y, 
-                                             self.volume_geometry.voxel_num_z, 
-                                             self.volume_geometry.getMinX(), 
-                                             self.volume_geometry.getMaxX(), 
-                                             self.volume_geometry.getMinY(), 
-                                             self.volume_geometry.getMaxY(), 
-                                             self.volume_geometry.getMinZ(), 
-                                             self.volume_geometry.getMaxZ())
-            
-            if self.sinogram_geometry.proj_geom == 'parallel':
-                proj_geom = astra.create_proj_geom('parallel3d',
-                                                   self.sinogram_geometry.pixel_size_h,
-                                                   self.sinogram_geometry.pixel_size_v,
-                                                   self.sinogram_geometry.pixel_num_v,
-                                                   self.sinogram_geometry.pixel_num_h,
-                                                   self.sinogram_geometry.angles)
-            elif self.sinogram_geometry.geom_type == 'cone':
-                proj_geom = astra.create_proj_geom('cone',
-                                                   self.sinogram_geometry.pixel_size_h,
-                                                   self.sinogram_geometry.pixel_size_v,
-                                                   self.sinogram_geometry.pixel_num_v,
-                                                   self.sinogram_geometry.pixel_num_h,
-                                                   self.sinogram_geometry.angles,
-                                                   self.sinogram_geometry.dist_source_center,
-                                                   self.sinogram_geometry.dist_center_detector)
-            else:
-                NotImplemented
-                
-        else:
-            NotImplemented
+        # Set up ASTRA Volume and projection geometry, not to be stored in self
+        vol_geom, proj_geom = convert_geometry_to_astra(self.volume_geometry,
+                                                        self.sinogram_geometry)
         
         # ASTRA projector, to be stored
         if device == 'cpu':
             # Note that 'line' is only for parallel (2D) and only one option
-            self.proj_id = astra.create_projector('line', proj_geom, vol_geom) 
+            self.setProjector(astra.create_projector('line', proj_geom, vol_geom) )
         elif device == 'gpu':
-            self.proj_id = astra.create_projector('cuda', proj_geom, vol_geom) 
+            self.setProjector(astra.create_projector('cuda', proj_geom, vol_geom) )
         else:
             NotImplemented
     
@@ -146,69 +94,16 @@ class AstraBackProjector(DataSetProcessor):
         self.setVolumeGeometry(volume_geometry)
         self.setSinogramGeometry(sinogram_geometry)
         
-        # Set up ASTRA Volume and projection geometry, not stored
-        if self.sinogram_geometry.dimension == '2D':
-            vol_geom = astra.create_vol_geom(self.volume_geometry.voxel_num_x, 
-                                             self.volume_geometry.voxel_num_y, 
-                                             self.volume_geometry.getMinX(), 
-                                             self.volume_geometry.getMaxX(), 
-                                             self.volume_geometry.getMinY(), 
-                                             self.volume_geometry.getMaxY())
-            
-            if self.sinogram_geometry.geom_type == 'parallel':
-                proj_geom = astra.create_proj_geom('parallel',
-                                                   self.sinogram_geometry.pixel_size_h,
-                                                   self.sinogram_geometry.pixel_num_h,
-                                                   self.sinogram_geometry.angles)
-            elif self.sinogram_geometry.geom_type == 'cone':
-                proj_geom = astra.create_proj_geom('fanflat',
-                                                   self.sinogram_geometry.pixel_size_h,
-                                                   self.sinogram_geometry.pixel_num_h,
-                                                   self.sinogram_geometry.angles,
-                                                   self.sinogram_geometry.dist_source_center,
-                                                   self.sinogram_geometry.dist_center_detector)
-            else:
-                NotImplemented
-                
-        elif self.sinogram_geometry.dimension == '3D':
-            vol_geom = astra.create_vol_geom(self.volume_geometry.voxel_num_x, 
-                                             self.volume_geometry.voxel_num_y, 
-                                             self.volume_geometry.voxel_num_z, 
-                                             self.volume_geometry.getMinX(), 
-                                             self.volume_geometry.getMaxX(), 
-                                             self.volume_geometry.getMinY(), 
-                                             self.volume_geometry.getMaxY(), 
-                                             self.volume_geometry.getMinZ(), 
-                                             self.volume_geometry.getMaxZ())
-            
-            if self.sinogram_geometry.proj_geom == 'parallel':
-                proj_geom = astra.create_proj_geom('parallel3d',
-                                                   self.sinogram_geometry.pixel_size_h,
-                                                   self.sinogram_geometry.pixel_size_v,
-                                                   self.sinogram_geometry.pixel_num_v,
-                                                   self.sinogram_geometry.pixel_num_h,
-                                                   self.sinogram_geometry.angles)
-            elif self.sinogram_geometry.geom_type == 'cone':
-                proj_geom = astra.create_proj_geom('cone',
-                                                   self.sinogram_geometry.pixel_size_h,
-                                                   self.sinogram_geometry.pixel_size_v,
-                                                   self.sinogram_geometry.pixel_num_v,
-                                                   self.sinogram_geometry.pixel_num_h,
-                                                   self.sinogram_geometry.angles,
-                                                   self.sinogram_geometry.dist_source_center,
-                                                   self.sinogram_geometry.dist_center_detector)
-            else:
-                NotImplemented
-                
-        else:
-            NotImplemented
+                # Set up ASTRA Volume and projection geometry, not to be stored in self
+        vol_geom, proj_geom = convert_geometry_to_astra(self.volume_geometry,
+                                                        self.sinogram_geometry)
         
         # ASTRA projector, to be stored
         if device == 'cpu':
             # Note that 'line' is only for parallel (2D) and only one option
-            self.proj_id = astra.create_projector('line', proj_geom, vol_geom) 
+            self.setProjector(astra.create_projector('line', proj_geom, vol_geom) )
         elif device == 'gpu':
-            self.proj_id = astra.create_projector('cuda', proj_geom, vol_geom) 
+            self.setProjector(astra.create_projector('cuda', proj_geom, vol_geom) )
         else:
             NotImplemented
     

@@ -380,8 +380,6 @@ class CenterOfRotationFinder(DataSetProcessor):
         cor = CenterOfRotationFinder.find_center_vo(projections.as_array())
         
         return cor
-    
-
 
 def loadNexus(filename):
     '''Load a dataset stored in a NeXuS file (HDF5)'''

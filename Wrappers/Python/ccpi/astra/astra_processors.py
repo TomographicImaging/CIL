@@ -37,8 +37,13 @@ class AstraForwardProjector(DataSetProcessor):
         
         # ASTRA projector, to be stored
         if device == 'cpu':
-            # Note that 'line' is only for parallel (2D) and only one option
-            self.setProjector(astra.create_projector('line', proj_geom, vol_geom) )
+            # Note that 'line' only one option
+            if self.sinogram_geometry.geom_type == 'parallel':
+                self.setProjector(astra.create_projector('line', proj_geom, vol_geom) )
+            elif self.sinogram_geometry.geom_type == 'cone':
+                self.setProjector(astra.create_projector('line_fanflat', proj_geom, vol_geom) )
+            else:
+                NotImplemented    
         elif device == 'gpu':
             self.setProjector(astra.create_projector('cuda', proj_geom, vol_geom) )
         else:
@@ -100,8 +105,13 @@ class AstraBackProjector(DataSetProcessor):
         
         # ASTRA projector, to be stored
         if device == 'cpu':
-            # Note that 'line' is only for parallel (2D) and only one option
-            self.setProjector(astra.create_projector('line', proj_geom, vol_geom) )
+            # Note that 'line' only one option
+            if self.sinogram_geometry.geom_type == 'parallel':
+                self.setProjector(astra.create_projector('line', proj_geom, vol_geom) )
+            elif self.sinogram_geometry.geom_type == 'cone':
+                self.setProjector(astra.create_projector('line_fanflat', proj_geom, vol_geom) )
+            else:
+                NotImplemented 
         elif device == 'gpu':
             self.setProjector(astra.create_projector('cuda', proj_geom, vol_geom) )
         else:

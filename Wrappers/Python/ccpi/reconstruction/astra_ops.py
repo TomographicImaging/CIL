@@ -19,7 +19,7 @@ from ccpi.reconstruction.ops import Operator
 import numpy
 from ccpi.framework import SinogramData, VolumeData
 from ccpi.reconstruction.ops import PowerMethodNonsquare
-from ccpi.astra.astra_processors import AstraForwardProjector, AstraBackProjector
+from ccpi.astra.astra_processors import *
 
 class AstraProjectorSimple(Operator):
     """ASTRA projector modified to use DataSet and geometry."""
@@ -36,6 +36,52 @@ class AstraProjectorSimple(Operator):
                                         device=device)
         
         self.bp = AstraBackProjector(volume_geometry=geomv,
+                                        sinogram_geometry=geomp,
+                                        proj_id=None,
+                                        device=device)
+                
+        # Initialise empty for singular value.
+        self.s1 = None
+    
+    def direct(self, IM):
+        self.fp.setInput(IM)
+        out = self.fp.getOutput()
+        return out
+    
+    def adjoint(self, DATA):
+        self.bp.setInput(DATA)
+        out = self.bp.getOutput()
+        return out
+    
+    #def delete(self):
+    #    astra.data2d.delete(self.proj_id)
+    
+    def get_max_sing_val(self):
+        self.s1, sall, svec = PowerMethodNonsquare(self,10)
+        return self.s1
+    
+    def size(self):
+        # Only implemented for 2D
+        return ( (self.sinogram_geometry.angles.size, \
+                  self.sinogram_geometry.pixel_num_h), \
+                 (self.volume_geometry.voxel_num_x, \
+                  self.volume_geometry.voxel_num_y) )
+
+class AstraProjectorMC(Operator):
+    """ASTRA Multichannel projector"""
+    def __init__(self, geomv, geomp, device):
+        super(AstraProjectorMC, self).__init__()
+        
+        # Store volume and sinogram geometries.
+        self.sinogram_geometry = geomp
+        self.volume_geometry = geomv
+        
+        self.fp = AstraForwardProjectorMC(volume_geometry=geomv,
+                                        sinogram_geometry=geomp,
+                                        proj_id=None,
+                                        device=device)
+        
+        self.bp = AstraBackProjectorMC(volume_geometry=geomv,
                                         sinogram_geometry=geomp,
                                         proj_id=None,
                                         device=device)

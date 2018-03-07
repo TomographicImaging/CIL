@@ -428,20 +428,20 @@ class VolumeData(DataSet):
         
         if type(array) == DataSet:
             # if the array is a DataSet get the info from there
-            if not ( array.number_of_dimensions == 2 or \
-                     array.number_of_dimensions == 3 ):
-                raise ValueError('Number of dimensions are not 2 or 3: {0}'\
-                                 .format(array.number_of_dimensions))
+            #if not ( array.number_of_dimensions == 2 or \
+            #         array.number_of_dimensions == 3 ):
+            #    raise ValueError('Number of dimensions are not 2 or 3: {0}'\
+            #                     .format(array.number_of_dimensions))
             
             #DataSet.__init__(self, array.as_array(), deep_copy,
             #                 array.dimension_labels, **kwargs)
             super(VolumeData, self).__init__(array.as_array(), deep_copy,
                              array.dimension_labels, **kwargs)
         elif type(array) == numpy.ndarray:
-            if not ( array.ndim == 3 or array.ndim == 2 ):
-                raise ValueError(
-                        'Number of dimensions are not 3 or 2 : {0}'\
-                        .format(array.ndim))
+            #if not ( array.ndim == 3 or array.ndim == 2 ):
+            #    raise ValueError(
+            #            'Number of dimensions are not 3 or 2 : {0}'\
+            #            .format(array.ndim))
                 
             if dimension_labels is None:
                 if array.ndim == 3:
@@ -476,17 +476,17 @@ class SinogramData(DataSet):
         
         if type(array) == DataSet:
             # if the array is a DataSet get the info from there
-            if not ( array.number_of_dimensions == 2 or \
-                     array.number_of_dimensions == 3 ):
-                raise ValueError('Number of dimensions are not 2 or 3: {0}'\
-                                 .format(array.number_of_dimensions))
+            #if not ( array.number_of_dimensions == 2 or \
+            #         array.number_of_dimensions == 3 ):
+            #    raise ValueError('Number of dimensions are not 2 or 3: {0}'\
+            #                     .format(array.number_of_dimensions))
             
             DataSet.__init__(self, array.as_array(), deep_copy,
                              array.dimension_labels, **kwargs)
         elif type(array) == numpy.ndarray:
-            if not ( array.ndim == 3 or array.ndim == 2 ):
-                raise ValueError('Number of dimensions are != 3: {0}'\
-                                 .format(array.ndim))
+            #if not ( array.ndim == 3 or array.ndim == 2 ):
+            #    raise ValueError('Number of dimensions are != 3: {0}'\
+            #                     .format(array.ndim))
             if dimension_labels is None:
                 if array.ndim == 3:
                     dimension_labels = ['angle' , 

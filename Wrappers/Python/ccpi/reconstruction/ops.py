@@ -93,6 +93,30 @@ class Identity(Operator):
     def get_max_sing_val(self):
         return self.s1
 
+class FiniteDiff2D(Operator):
+    def __init__(self):
+        self.s1 = 8.0
+        super(FiniteDiff2D, self).__init__()
+        
+    def direct(self,x):
+        '''Forward differences with Neumann BC.'''
+        d1 = numpy.zeros_like(x.as_array())
+        d1[:,:-1] = x.as_array()[:,1:] - x.as_array()[:,:-1]
+        d2 = numpy.zeros_like(x.as_array())
+        d2[:-1,:] = x.as_array()[1:,:] - x.as_array()[:-1,:]
+        d = numpy.stack((d1,d2),2)
+        
+        return type(x)(d,geometry=x.geometry)
+    
+    def adjoint(self,x):
+        return x
+    
+    def size(self):
+        return NotImplemented
+    
+    def get_max_sing_val(self):
+        return self.s1
+
 
 def PowerMethodNonsquare(op,numiters):
     # Initialise random

@@ -16,118 +16,105 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from ccpi.reconstruction.ops import Operator
-import astra
 import numpy
 from ccpi.framework import SinogramData, VolumeData
 from ccpi.reconstruction.ops import PowerMethodNonsquare
+from ccpi.astra.astra_processors import *
 
 class AstraProjectorSimple(Operator):
     """ASTRA projector modified to use DataSet and geometry."""
     def __init__(self, geomv, geomp, device):
         super(AstraProjectorSimple, self).__init__()
         
-        # Store our volume and sinogram geometries. Redundant with also 
-        # storing in ASTRA format below but needed to assign to 
-        # SinogramData in "direct" method and VolumeData in "adjoint" method
+        # Store volume and sinogram geometries.
         self.sinogram_geometry = geomp
         self.volume_geometry = geomv
         
-        # ASTRA Volume geometry
-        if geomp.dimension == '2D':
-            self.vol_geom = astra.create_vol_geom(geomv.voxel_num_x, 
-                                                  geomv.voxel_num_y, 
-                                                  geomv.getMinX(), 
-                                                  geomv.getMaxX(), 
-                                                  geomv.getMinY(), 
-                                                  geomv.getMaxY())
-        elif geomp.dimension == '3D':
-            self.vol_geom = astra.create_vol_geom(geomv.voxel_num_x, 
-                                                  geomv.voxel_num_y, 
-                                                  geomv.voxel_num_z, 
-                                                  geomv.getMinX(), 
-                                                  geomv.getMaxX(), 
-                                                  geomv.getMinY(), 
-                                                  geomv.getMaxY(), 
-                                                  geomv.getMinZ(), 
-                                                  geomv.getMaxZ())
-        else:
-            NotImplemented
-            
+        self.fp = AstraForwardProjector(volume_geometry=geomv,
+                                        sinogram_geometry=geomp,
+                                        proj_id=None,
+                                        device=device)
         
-        # ASTRA Projections geometry
-        if geomp.dimension == '2D':
-            if geomp.geom_type == 'parallel':
-                self.proj_geom = astra.create_proj_geom('parallel',
-                                                        geomp.pixel_size_h,
-                                                        geomp.pixel_num_h,
-                                                        geomp.angles)
-            elif geomp.geom_type == 'cone':
-                self.proj_geom = astra.create_proj_geom('fanflat',
-                                                        geomp.pixel_size_h,
-                                                        geomp.pixel_num_h,
-                                                        geomp.angles,
-                                                        geomp.dist_source_center,
-                                                        geomp.dist_center_detector)
-            else:
-                NotImplemented
-        elif geomp.dimension == '3D':
-            if geomp.proj_geom == 'parallel':
-                self.proj_geom = astra.create_proj_geom('parallel3d',
-                                                        geomp.pixel_size_h,
-                                                        geomp.pixel_size_v,
-                                                        geomp.pixel_num_v,
-                                                        geomp.pixel_num_h,
-                                                        geomp.angles)
-            elif geomp.geom_type == 'cone':
-                self.proj_geom = astra.create_proj_geom('cone',
-                                                        geomp.pixel_size_h,
-                                                        geomp.pixel_size_v,
-                                                        geomp.pixel_num_v,
-                                                        geomp.pixel_num_h,
-                                                        geomp.angles,
-                                                        geomp.dist_source_center,
-                                                        geomp.dist_center_detector)
-            else:
-                NotImplemented
-        else:
-            NotImplemented
-        
-        # ASTRA projector
-        if device == 'cpu':
-            # Note that 'line' is only for parallel (2D) and only one option
-            self.proj_id = astra.create_projector('line', self.proj_geom, 
-                                                  self.vol_geom) # for CPU
-        elif device == 'gpu':
-            self.proj_id = astra.create_projector('cuda', self.proj_geom, 
-                                                  self.vol_geom) # for GPU
-        else:
-            NotImplemented
-        
+        self.bp = AstraBackProjector(volume_geometry=geomv,
+                                        sinogram_geometry=geomp,
+                                        proj_id=None,
+                                        device=device)
+                
+        # Initialise empty for singular value.
         self.s1 = None
     
     def direct(self, IM):
-        
-        sinogram_id, DATA = astra.create_sino(IM.as_array(), self.proj_id)
-        astra.data2d.delete(sinogram_id)
-        return SinogramData(DATA,geometry=self.sinogram_geometry)
+        self.fp.setInput(IM)
+        out = self.fp.getOutput()
+        return out
     
     def adjoint(self, DATA):
-        rec_id, IM = astra.create_backprojection(DATA.as_array(), self.proj_id)
-        astra.data2d.delete(rec_id)
-        return VolumeData(IM,geometry=self.volume_geometry)
+        self.bp.setInput(DATA)
+        out = self.bp.getOutput()
+        return out
     
-    def delete(self):
-        astra.data2d.delete(self.proj_id)
+    #def delete(self):
+    #    astra.data2d.delete(self.proj_id)
     
     def get_max_sing_val(self):
         self.s1, sall, svec = PowerMethodNonsquare(self,10)
         return self.s1
     
     def size(self):
-        return ( (self.proj_geom['ProjectionAngles'].size, \
-                  self.proj_geom['DetectorCount']), \
-                 (self.vol_geom['GridColCount'], \
-                  self.vol_geom['GridRowCount']) )
+        # Only implemented for 2D
+        return ( (self.sinogram_geometry.angles.size, \
+                  self.sinogram_geometry.pixel_num_h), \
+                 (self.volume_geometry.voxel_num_x, \
+                  self.volume_geometry.voxel_num_y) )
+
+class AstraProjectorMC(Operator):
+    """ASTRA Multichannel projector"""
+    def __init__(self, geomv, geomp, device):
+        super(AstraProjectorMC, self).__init__()
+        
+        # Store volume and sinogram geometries.
+        self.sinogram_geometry = geomp
+        self.volume_geometry = geomv
+        
+        self.fp = AstraForwardProjectorMC(volume_geometry=geomv,
+                                        sinogram_geometry=geomp,
+                                        proj_id=None,
+                                        device=device)
+        
+        self.bp = AstraBackProjectorMC(volume_geometry=geomv,
+                                        sinogram_geometry=geomp,
+                                        proj_id=None,
+                                        device=device)
+                
+        # Initialise empty for singular value.
+        self.s1 = 50
+    
+    def direct(self, IM):
+        self.fp.setInput(IM)
+        out = self.fp.getOutput()
+        return out
+    
+    def adjoint(self, DATA):
+        self.bp.setInput(DATA)
+        out = self.bp.getOutput()
+        return out
+    
+    #def delete(self):
+    #    astra.data2d.delete(self.proj_id)
+    
+    def get_max_sing_val(self):
+        if self.s1 is None:
+            self.s1, sall, svec = PowerMethodNonsquare(self,10)
+            return self.s1
+        else:
+            return self.s1
+    
+    def size(self):
+        # Only implemented for 2D
+        return ( (self.sinogram_geometry.angles.size, \
+                  self.sinogram_geometry.pixel_num_h), \
+                 (self.volume_geometry.voxel_num_x, \
+                  self.volume_geometry.voxel_num_y) )
     
 
 class AstraProjector(Operator):

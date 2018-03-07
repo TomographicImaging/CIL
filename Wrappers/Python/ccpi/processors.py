@@ -32,19 +32,23 @@ class Normalizer(DataSetProcessor):
     Input: SinogramDataSet
     Parameter: 2D projection with flat field (or stack)
                2D projection with dark field (or stack)
-    Output: SinogramDataSet
+    Output: SinogramDataSetn
     '''
     
-    def __init__(self):
+    def __init__(self, flat_field = None, dark_field = None, tolerance = 1e-5):
         kwargs = {
-                  'flat_field'  :None, 
-                  'dark_field'  :None,
+                  'flat_field'  : None, 
+                  'dark_field'  : None,
                   # very small number. Used when there is a division by zero
-                  'tolerance'   : 1e-5
+                  'tolerance'   : tolerance
                   }
         
         #DataSetProcessor.__init__(self, **kwargs)
         super(Normalizer, self).__init__(**kwargs)
+        if not flat_field is None:
+            self.setFlatField(flat_field)
+        if not dark_field is None:
+            self.setDarkField(dark_field)
     
     def checkInput(self, dataset):
         if dataset.number_of_dimensions == 3:

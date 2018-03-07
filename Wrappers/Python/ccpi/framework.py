@@ -141,8 +141,9 @@ class DataSet(object):
         if dimensions is not None:
             return self.subset(dimensions).as_array()
         return self.array
-        
-    def subset(self, dimensions=None):
+    
+    
+    def subset(self, dimensions=None, **kw):
         '''Creates a DataSet containing a subset of self according to the 
         labels in dimensions'''
         if dimensions is None:
@@ -164,7 +165,7 @@ class DataSet(object):
                     else:
                         axis_order.append(find_key(self.dimension_labels, dl))
                 if not proceed:
-                    raise KeyError('Unknown key specified {0}'.format(dl))
+                    raise KeyError('Subset error: Unknown key specified {0}'.format(dl))
                     
                 # slice away the unwanted data from the array
                 unwanted_dimensions = self.dimension_labels.copy()
@@ -176,13 +177,21 @@ class DataSet(object):
                 #print ("left_dimensions {0}".format(left_dimensions))
                 #new_shape = [self.shape[ax] for ax in axis_order]
                 #print ("new_shape {0}".format(new_shape))
-                command = "self.array"
+                command = "self.array["
                 for i in range(self.number_of_dimensions):
                     if self.dimension_labels[i] in unwanted_dimensions.values():
-                        command = command + "[0]"
+                        value = 0
+                        for k,v in kw.items():
+                            if k == self.dimension_labels[i]:
+                                value = v
+                                
+                        command = command + str(value)
                     else:
-                        command = command + "[:]"
-                #print ("command {0}".format(command))
+                        command = command + ":"
+                    if i < self.number_of_dimensions -1:
+                        command = command + ','
+                command = command + ']'
+                
                 cleaned = eval(command)
                 # cleaned has collapsed dimensions in the same order of
                 # self.array, but we want it in the order stated in the 
@@ -413,7 +422,7 @@ class DataSet(object):
         repres += "Number of dimensions: {0}\n".format(self.number_of_dimensions)
         repres += "Shape: {0}\n".format(self.shape)
         repres += "Axis labels: {0}\n".format(self.dimension_labels)
-        repres += "Representation: {0}\n".format(self.array)
+        repres += "Representation: \n{0}\n".format(self.array)
         return repres
                 
                     
@@ -772,5 +781,22 @@ if __name__ == '__main__':
     s = numpy.reshape(numpy.asarray(s), (3,4,4))
     sino = SinogramData( s )
     
+    shape = (4,3,2)
+    a = [i for i in range(2*3*4)]
+    a = numpy.asarray(a)
+    a = numpy.reshape(a, shape)
+    print (numpy.shape(a))
+    ds = DataSet(a, True, ['X', 'Y','Z'])
+    # this means that I expect the X to be of length 2 ,
+    # y of length 3 and z of length 4
+    subset = ['Y' ,'Z']
+    b0 = ds.subset( subset )
+    print ("shape b 3,2? {0}".format(numpy.shape(b0.as_array())))
+    # expectation on b is that it is 
+    # 3x2 cut at z = 0
+    
+    subset = ['X' ,'Y']
+    b1 = ds.subset( subset , Z=1)
+    print ("shape b 2,3? {0}".format(numpy.shape(b1.as_array())))
     
     

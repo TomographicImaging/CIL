@@ -104,7 +104,7 @@ plt.show()
 
 # Run FBPD=Forward Backward Primal Dual method on least squares plus 1-norm
 opt = {'tol': 1e-4, 'iter': 10000}
-x_fbpd1, it_fbpd1, timing_fbpd1, criter_fbpd1 = FBPD(x_init, f=None, g=f, h=g0,opt=opt)
+x_fbpd1, it_fbpd1, timing_fbpd1, criter_fbpd1 = FBPD(x_init,None,f,g0,opt=opt)
 
 plt.imshow(x_fbpd1.array)
 plt.show()

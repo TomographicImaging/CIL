@@ -17,14 +17,15 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+from ccpi.reconstruction.ops import Identity
+
 
 class BaseFunction(object):
-    def __init__(self):   pass
+    def __init__(self):
+        self.op = Identity()
     def fun(self,x):      return 0
     def grad(self,x):     return 0
-    def prox(self,x,tau): return x
-    def dir_op(self,x):   return x
-    def adj_op(self,x):   return x
+    def prox(self,x,tau): return x    
 
 # Define a class for 2-norm
 class Norm2sq(BaseFunction):

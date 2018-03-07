@@ -60,7 +60,7 @@ elif test_case==2:
                           dist_center_detector=OrigDetec)
 
 # ASTRA operator using volume and sinogram geometries
-Aop = AstraProjectorSimple(vg, pg, 'cpu')
+Aop = AstraProjectorSimple(vg, pg, 'gpu')
 
 # Unused old astra projector without geometry
 # Aop_old = AstraProjector(det_w, det_num, SourceOrig, 
@@ -99,5 +99,15 @@ x_fista1, it1, timing1, criter1 = FISTA(x_init, f, g0)
 plt.imshow(x_fista1.array)
 plt.show()
 
-# Delete projector
-#Aop.delete()
+plt.semilogy(criter1)
+plt.show()
+
+# Run FBPD=Forward Backward Primal Dual method on least squares plus 1-norm
+opt = {'tol': 1e-4, 'iter': 10000}
+x_fbpd1, it_fbpd1, timing_fbpd1, criter_fbpd1 = FBPD(x_init, f=None, g=f, h=g0,opt=opt)
+
+plt.imshow(x_fbpd1.array)
+plt.show()
+
+plt.semilogy(criter_fbpd1)
+plt.show()

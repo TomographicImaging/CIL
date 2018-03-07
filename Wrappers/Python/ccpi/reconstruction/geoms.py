@@ -1,16 +1,17 @@
 
 class VolumeGeometry:
     
-    def __init__(self, \
-                 voxel_num_x=None, \
-                 voxel_num_y=None, \
-                 voxel_num_z=None, \
-                 voxel_size_x=None, \
-                 voxel_size_y=None, \
-                 voxel_size_z=None, \
-                 center_x=0, \
-                 center_y=0, \
-                 center_z=0):
+    def __init__(self, 
+                 voxel_num_x=None, 
+                 voxel_num_y=None, 
+                 voxel_num_z=None, 
+                 voxel_size_x=None, 
+                 voxel_size_y=None, 
+                 voxel_size_z=None, 
+                 center_x=0, 
+                 center_y=0, 
+                 center_z=0, 
+                 channels=1):
         
         self.voxel_num_x = voxel_num_x
         self.voxel_num_y = voxel_num_y
@@ -21,6 +22,7 @@ class VolumeGeometry:
         self.center_x = center_x
         self.center_y = center_y
         self.center_z = center_z  
+        self.channels = channels
         
     def getMinX(self):
         return self.center_x - 0.5*self.voxel_num_x*self.voxel_size_x
@@ -43,16 +45,17 @@ class VolumeGeometry:
     
 class SinogramGeometry:
     
-    def __init__(self, \
-                 geom_type, \
-                 dimension, \
-                 angles, \
-                 pixel_num_h=None, \
-                 pixel_size_h=1, \
-                 pixel_num_v=None, \
-                 pixel_size_v=1, \
-                 dist_source_center=None, \
-                 dist_center_detector=None, \
+    def __init__(self, 
+                 geom_type, 
+                 dimension, 
+                 angles, 
+                 pixel_num_h=None, 
+                 pixel_size_h=1, 
+                 pixel_num_v=None, 
+                 pixel_size_v=1, 
+                 dist_source_center=None, 
+                 dist_center_detector=None, 
+                 channels=1
                  ):
         """
         General inputs for standard type projection geometries
@@ -91,6 +94,8 @@ class SinogramGeometry:
         self.pixel_size_h = pixel_size_h
         self.pixel_num_v = pixel_num_v
         self.pixel_size_v = pixel_size_v
+        
+        self.channels = channels
 
         
                 

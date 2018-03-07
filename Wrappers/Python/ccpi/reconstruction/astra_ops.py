@@ -87,7 +87,7 @@ class AstraProjectorMC(Operator):
                                         device=device)
                 
         # Initialise empty for singular value.
-        self.s1 = None
+        self.s1 = 50
     
     def direct(self, IM):
         self.fp.setInput(IM)
@@ -103,8 +103,11 @@ class AstraProjectorMC(Operator):
     #    astra.data2d.delete(self.proj_id)
     
     def get_max_sing_val(self):
-        self.s1, sall, svec = PowerMethodNonsquare(self,10)
-        return self.s1
+        if self.s1 is None:
+            self.s1, sall, svec = PowerMethodNonsquare(self,10)
+            return self.s1
+        else:
+            return self.s1
     
     def size(self):
         # Only implemented for 2D

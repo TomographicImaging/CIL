@@ -94,3 +94,41 @@ for k in range(3):
     axarro[k].imshow(out2.as_array()[:,:,0,k],vmin=0,vmax=3500)
 plt.show()
 
+# Create least squares object instance with projector and data.
+f = Norm2sq(Aop,b,c=0.5)
+
+# Initial guess
+x_init = VolumeData(np.zeros(x.shape),geometry=vg)
+
+# FISTA options
+opt = {'tol': 1e-4, 'iter': 200}
+
+# Run FISTA for least squares without regularization
+x_fista0, it0, timing0, criter0 = FISTA(x_init, f, None, opt)
+
+
+ff0, axarrf0 = plt.subplots(1,numchannels)
+for k in numpy.arange(3):
+    axarrf0[k].imshow(x_fista0.as_array()[:,:,0,k],vmin=0,vmax=2.5)
+plt.show()
+
+plt.semilogy(criter0)
+plt.title('Criterion vs iterations, least squares')
+plt.show()
+
+# Now least squares plus 1-norm regularization
+lam = 0.1
+g0 = Norm1(lam)
+
+
+# Run FISTA for least squares plus 1-norm function.
+x_fista1, it1, timing1, criter1 = FISTA(x_init, f, g0, opt)
+
+ff1, axarrf1 = plt.subplots(1,numchannels)
+for k in numpy.arange(3):
+    axarrf1[k].imshow(x_fista1.as_array()[:,:,0,k],vmin=0,vmax=2.5)
+plt.show()
+
+plt.semilogy(criter1)
+plt.title('Criterion vs iterations, least squares plus 1-norm regu')
+plt.show()

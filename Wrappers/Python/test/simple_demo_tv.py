@@ -84,12 +84,6 @@ f = Norm2sq(Aop,b,c=0.5)
 # Initial guess
 x_init = VolumeData(np.zeros(x.shape),geometry=vg)
 
-# Run FISTA for least squares without regularization
-x_fista0, it0, timing0, criter0 = FISTA(x_init, f, None)
-
-plt.imshow(x_fista0.array)
-plt.show()
-
 # Now least squares plus 1-norm regularization
 lam = 1
 g0 = TV2D(lam)

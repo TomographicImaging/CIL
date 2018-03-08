@@ -23,6 +23,7 @@ import numpy
 import sys
 from datetime import timedelta, datetime
 import warnings
+from ccpi.reconstruction import geoms
 
 if sys.version_info[0] >= 3 and sys.version_info[1] >= 4:
     ABC = abc.ABC
@@ -119,7 +120,7 @@ class DataSet(object):
             if deep_copy:
                 self.array = array[:]
             else:
-                self.array = array
+                self.array = array    
         else:
             raise TypeError('Array must be NumpyArray, passed {0}'\
                             .format(type(array)))
@@ -430,40 +431,81 @@ class DataSet(object):
 class VolumeData(DataSet):
     '''DataSet for holding 2D or 3D dataset'''
     def __init__(self, 
-                 array, 
+                 array = None, 
                  deep_copy=True, 
                  dimension_labels=None, 
                  **kwargs):
         
-        if type(array) == DataSet:
-            # if the array is a DataSet get the info from there
-            #if not ( array.number_of_dimensions == 2 or \
-            #         array.number_of_dimensions == 3 ):
-            #    raise ValueError('Number of dimensions are not 2 or 3: {0}'\
-            #                     .format(array.number_of_dimensions))
-            
-            #DataSet.__init__(self, array.as_array(), deep_copy,
-            #                 array.dimension_labels, **kwargs)
-            super(VolumeData, self).__init__(array.as_array(), deep_copy,
-                             array.dimension_labels, **kwargs)
-        elif type(array) == numpy.ndarray:
-            #if not ( array.ndim == 3 or array.ndim == 2 ):
-            #    raise ValueError(
-            #            'Number of dimensions are not 3 or 2 : {0}'\
-            #            .format(array.ndim))
+        self.geometry = None
+        if array is None:
+            if 'geometry' in kwargs.keys():
+                geometry  = kwargs['geometry']
+                self.geometry = geometry
+                channels  = geometry.channels
+                horiz_x   = geometry.voxel_num_x
+                horiz_y   = geometry.voxel_num_y
+                vert      = 1 if geometry.voxel_num_z is None\
+                              else geometry.voxel_num_z # this should be 1 for 2D
                 
-            if dimension_labels is None:
-                if array.ndim == 3:
-                    dimension_labels = ['horizontal_x' , 
-                                        'horizontal_y' , 
-                                        'vertical']
+                if channels > 1:
+                    if vert > 1:
+                        shape = (channels, vert, horiz_y, horiz_x)
+                        dim_labels = ['channel' ,'vertical' , 'horizontal_y' , 
+                                      'horizontal_x']
+                    else:
+                        shape = (channels , horiz_y, horiz_x)
+                        dim_labels = ['channel' , 'horizontal_y' , 
+                                      'horizontal_x']
                 else:
-                    dimension_labels = ['horizontal' , 
-                                        'vertical']   
-            
-            #DataSet.__init__(self, array, deep_copy, dimension_labels, **kwargs)
-            super(VolumeData, self).__init__(array, deep_copy, 
-                 dimension_labels, **kwargs)
+                    if vert > 1:
+                        shape = (vert, horiz_y, horiz_x)
+                        dim_labels = ['vertical' , 'horizontal_y' , 
+                                      'horizontal_x']
+                    else:
+                        shape = (horiz_y, horiz_x)
+                        dim_labels = ['horizontal_y' , 
+                                      'horizontal_x']
+                        
+                array = numpy.zeros( shape , dtype=numpy.float32) 
+                super(VolumeData, self).__init__(array, deep_copy,
+                                 dim_labels, **kwargs)
+                
+            else:
+                raise ValueError('Please pass either a DataSet, ' +\
+                                 'a numpy array or a geometry')
+        else:
+            if type(array) == DataSet:
+                # if the array is a DataSet get the info from there
+                if not ( array.number_of_dimensions == 2 or \
+                         array.number_of_dimensions == 3 or \
+                         array.number_of_dimensions == 4):
+                    raise ValueError('Number of dimensions are not 2 or 3 or 4: {0}'\
+                                     .format(array.number_of_dimensions))
+                
+                #DataSet.__init__(self, array.as_array(), deep_copy,
+                #                 array.dimension_labels, **kwargs)
+                super(VolumeData, self).__init__(array.as_array(), deep_copy,
+                                 array.dimension_labels, **kwargs)
+            elif type(array) == numpy.ndarray:
+                if not ( array.ndim == 2 or array.ndim == 3 or array.ndim == 4 ):
+                    raise ValueError(
+                            'Number of dimensions are not 2 or 3 or 4 : {0}'\
+                            .format(array.ndim))
+                    
+                if dimension_labels is None:
+                    if array.ndim == 4:
+                        dimension_labels = ['channel' ,'vertical' , 'horizontal_y' , 
+                                      'horizontal_x']
+                    elif array.ndim == 3:
+                        dimension_labels = ['vertical' , 'horizontal_y' , 
+                                      'horizontal_x']
+                    else:
+                        dimension_labels = ['horizontal_y' , 
+                                      'horizontal_x']   
+                
+                #DataSet.__init__(self, array, deep_copy, dimension_labels, **kwargs)
+                super(VolumeData, self).__init__(array, deep_copy, 
+                     dimension_labels, **kwargs)
        
         # load metadata from kwargs if present
         for key, value in kwargs.items():
@@ -478,34 +520,79 @@ class VolumeData(DataSet):
 class SinogramData(DataSet):
     '''DataSet for holding 2D or 3D sinogram'''
     def __init__(self, 
-                 array, 
+                 array = None, 
                  deep_copy=True, 
                  dimension_labels=None, 
                  **kwargs):
-        
-        if type(array) == DataSet:
-            # if the array is a DataSet get the info from there
-            #if not ( array.number_of_dimensions == 2 or \
-            #         array.number_of_dimensions == 3 ):
-            #    raise ValueError('Number of dimensions are not 2 or 3: {0}'\
-            #                     .format(array.number_of_dimensions))
-            
-            DataSet.__init__(self, array.as_array(), deep_copy,
-                             array.dimension_labels, **kwargs)
-        elif type(array) == numpy.ndarray:
-            #if not ( array.ndim == 3 or array.ndim == 2 ):
-            #    raise ValueError('Number of dimensions are != 3: {0}'\
-            #                     .format(array.ndim))
-            if dimension_labels is None:
-                if array.ndim == 3:
-                    dimension_labels = ['angle' , 
-                                        'horizontal' , 
-                                        'vertical']
+        self.geometry = None
+        if array is None:
+            if 'geometry' in kwargs.keys():
+                geometry  = kwargs['geometry']
+                self.geometry = geometry
+                channels  = geometry.channels
+                horiz   = geometry.pixel_num_h
+                vert   = geometry.pixel_num_v
+                angles = geometry.angles
+                num_of_angles = numpy.shape(angles)[0]
+                
+                
+                if channels > 1:
+                    if vert > 1:
+                        shape = (channels, num_of_angles , vert, horiz)
+                        dim_labels = ['channel' , ' angle' ,
+                                      'vertical' , 'horizontal']
+                    else:
+                        shape = (channels , num_of_angles, horiz)
+                        dim_labels = ['angle' , 'angle' , 
+                                      'horizontal']
                 else:
-                    dimension_labels = ['angle' , 
-                                        'horizontal']
-            DataSet.__init__(self, array, deep_copy, dimension_labels, **kwargs)
+                    if vert > 1:
+                        shape = (num_of_angles, vert, horiz)
+                        dim_labels = ['angles' , 'vertical' , 
+                                      'horizontal']
+                    else:
+                        shape = (num_of_angles, horiz)
+                        dim_labels = ['angles' , 
+                                      'horizontal']
+                
+                array = numpy.zeros( shape , dtype=numpy.float32) 
+                super(SinogramData, self).__init__(array, deep_copy,
+                                 dim_labels, **kwargs)
+        else:
             
+            if type(array) == DataSet:
+                # if the array is a DataSet get the info from there
+                if not ( array.number_of_dimensions == 2 or \
+                         array.number_of_dimensions == 3 or \
+                         array.number_of_dimensions == 4):
+                    raise ValueError('Number of dimensions are not 2 or 3 or 4: {0}'\
+                                     .format(array.number_of_dimensions))
+                
+                #DataSet.__init__(self, array.as_array(), deep_copy,
+                #                 array.dimension_labels, **kwargs)
+                super(SinogramData, self).__init__(array.as_array(), deep_copy,
+                                 array.dimension_labels, **kwargs)
+            elif type(array) == numpy.ndarray:
+                if not ( array.ndim == 2 or array.ndim == 3 or array.ndim == 4 ):
+                    raise ValueError(
+                            'Number of dimensions are not 2 or 3 or 4 : {0}'\
+                            .format(array.ndim))
+                    
+                if dimension_labels is None:
+                    if array.ndim == 4:
+                        dimension_labels = ['channel' ,'angle' , 'vertical' , 
+                                      'horizontal']
+                    elif array.ndim == 3:
+                        dimension_labels = ['angle' , 'vertical' , 
+                                      'horizontal']
+                    else:
+                        dimension_labels = ['angle' , 
+                                      'horizontal']   
+                
+                #DataSet.__init__(self, array, deep_copy, dimension_labels, **kwargs)
+                super(SinogramData, self).__init__(array, deep_copy, 
+                     dimension_labels, **kwargs)
+                
             
 class DataSetProcessor(object):
     '''Defines a generic DataSet processor
@@ -799,4 +886,13 @@ if __name__ == '__main__':
     b1 = ds.subset( subset , Z=1)
     print ("shape b 2,3? {0}".format(numpy.shape(b1.as_array())))
     
+    
+    # create VolumeData from geometry
+    vgeometry = geoms.VolumeGeometry(voxel_num_x=2, voxel_num_y=3, channels=2)
+    vol = VolumeData(geometry=vgeometry)
+    
+    sgeometry = geoms.SinogramGeometry(dimension=2, angles=10, 
+                                       geom_type='parallel', pixel_num_v=3,
+                                       pixel_num_h=5 , channels=2)
+    sino = SinogramData(geometry=sgeometry)
     

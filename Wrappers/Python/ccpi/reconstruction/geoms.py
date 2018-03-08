@@ -2,12 +2,12 @@
 class VolumeGeometry:
     
     def __init__(self, 
-                 voxel_num_x=None, 
-                 voxel_num_y=None, 
-                 voxel_num_z=None, 
-                 voxel_size_x=None, 
-                 voxel_size_y=None, 
-                 voxel_size_z=None, 
+                 voxel_num_x=0, 
+                 voxel_num_y=0, 
+                 voxel_num_z=0, 
+                 voxel_size_x=1, 
+                 voxel_size_y=1, 
+                 voxel_size_z=1, 
                  center_x=0, 
                  center_y=0, 
                  center_z=0, 
@@ -37,10 +37,16 @@ class VolumeGeometry:
         return self.center_y + 0.5*self.voxel_num_y*self.voxel_size_y
         
     def getMinZ(self):
-        return self.center_z - 0.5*self.voxel_num_z*self.voxel_size_z
+        if not voxel_num_z == 0:
+            return self.center_z - 0.5*self.voxel_num_z*self.voxel_size_z
+        else:
+            return 0
         
     def getMaxZ(self):
-        return self.center_z + 0.5*self.voxel_num_z*self.voxel_size_z
+        if not voxel_num_z == 0:
+            return self.center_z + 0.5*self.voxel_num_z*self.voxel_size_z
+        else:
+            return 0
         
     
 class SinogramGeometry:
@@ -49,9 +55,9 @@ class SinogramGeometry:
                  geom_type, 
                  dimension, 
                  angles, 
-                 pixel_num_h=None, 
+                 pixel_num_h=0, 
                  pixel_size_h=1, 
-                 pixel_num_v=None, 
+                 pixel_num_v=0, 
                  pixel_size_v=1, 
                  dist_source_center=None, 
                  dist_center_detector=None, 

@@ -1,29 +1,34 @@
-#import sys
-#sys.path.append("..")
 
-from ccpi.framework import VolumeData
-from ccpi.reconstruction.algs import FISTA
-from ccpi.reconstruction.funcs import Norm2sq, Norm1
-from ccpi.reconstruction.astra_ops import AstraProjectorSimple
-from ccpi.reconstruction.geoms import VolumeGeometry, SinogramGeometry
+
+import sys
+
+sys.path.append("..")
+
+from ccpi.framework import *
+from ccpi.reconstruction.algs import *
+from ccpi.reconstruction.funcs import *
+from ccpi.reconstruction.ops import *
+from ccpi.reconstruction.astra_ops import *
+from ccpi.reconstruction.geoms import *
 
 import numpy as np
 import matplotlib.pyplot as plt
 
-test_case = 1   # 1=parallel2D, 2=cone2D
+test_case = 2   # 1=parallel2D, 2=cone2D
 
 # Set up phantom
 N = 128
 
-vg = VolumeGeometry(voxel_num_x=N,voxel_num_y=N)
-Phantom = VolumeData(geometry=vg)
-
-x = Phantom.as_array()
+x = np.zeros((N,N))
 x[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 1.0
 x[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 2.0
 
 plt.imshow(x)
 plt.show()
+
+vg = VolumeGeometry(N,N,None, 1,1,None)
+
+Phantom = VolumeData(x,geometry=vg)
 
 # Set up measurement geometry
 angles_num = 20; # angles number
@@ -79,24 +84,10 @@ f = Norm2sq(Aop,b,c=0.5)
 # Initial guess
 x_init = VolumeData(np.zeros(x.shape),geometry=vg)
 
-# Run FISTA for least squares without regularization
-x_fista0, it0, timing0, criter0 = FISTA(x_init, f, None)
-
-plt.imshow(x_fista0.array)
-plt.show()
-
 # Now least squares plus 1-norm regularization
-lam = 0.1
-g0 = Norm1(lam)
+lam = 1
+g0 = TV2D(lam)
 
-# Run FISTA for least squares plus 1-norm function.
-x_fista1, it1, timing1, criter1 = FISTA(x_init, f, g0)
-
-plt.imshow(x_fista1.array)
-plt.show()
-
-plt.semilogy(criter1)
-plt.show()
 
 # Run FBPD=Forward Backward Primal Dual method on least squares plus 1-norm
 opt = {'tol': 1e-4, 'iter': 10000}

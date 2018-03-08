@@ -18,16 +18,15 @@ test_case = 1   # 1=parallel2D, 2=cone2D
 # Set up phantom
 N = 128
 
-x = np.zeros((N,N))
+vg = VolumeGeometry(voxel_num_x=N,voxel_num_y=N)
+Phantom = VolumeData(geometry=vg)
+
+x = Phantom.as_array()
 x[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 1.0
 x[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 2.0
 
 plt.imshow(x)
 plt.show()
-
-vg = VolumeGeometry(N,N,None, 1,1,None)
-
-Phantom = VolumeData(x,geometry=vg)
 
 # Set up measurement geometry
 angles_num = 20; # angles number

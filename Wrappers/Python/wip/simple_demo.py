@@ -13,7 +13,7 @@ from ccpi.reconstruction.geoms import *
 import numpy as np
 import matplotlib.pyplot as plt
 
-test_case = 2   # 1=parallel2D, 2=cone2D
+test_case = 1   # 1=parallel2D, 2=cone2D
 
 # Set up phantom
 N = 128
@@ -60,7 +60,7 @@ elif test_case==2:
                           dist_center_detector=OrigDetec)
 
 # ASTRA operator using volume and sinogram geometries
-Aop = AstraProjectorSimple(vg, pg, 'gpu')
+Aop = AstraProjectorSimple(vg, pg, 'cpu')
 
 # Unused old astra projector without geometry
 # Aop_old = AstraProjector(det_w, det_num, SourceOrig, 

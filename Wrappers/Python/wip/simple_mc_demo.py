@@ -4,12 +4,12 @@ import sys
 
 sys.path.append("..")
 
-from ccpi.framework import *
+from ccpi.framework import VolumeData, SinogramData
 from ccpi.reconstruction.algs import *
 from ccpi.reconstruction.funcs import *
 from ccpi.reconstruction.ops import *
 from ccpi.reconstruction.astra_ops import *
-from ccpi.reconstruction.geoms import *
+from ccpi.reconstruction.geoms import VolumeGeometry, SinogramGeometry
 
 import numpy
 import matplotlib.pyplot as plt
@@ -89,6 +89,7 @@ elif test_case==2:
                           channels=numchannels)
 
 # ASTRA operator using volume and sinogram geometries
+print("create Projector")
 Aop = AstraProjectorMC(vg, pg, 'cpu')
 
 

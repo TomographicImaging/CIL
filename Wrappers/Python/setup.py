@@ -35,7 +35,7 @@ if  cil_version == '':
 setup(
     name="ccpi-common",
     version=cil_version,
-    packages=['ccpi' , 'ccpi.reconstruction'],
+    packages=['ccpi' , 'ccpi.reconstruction' , 'ccpi.astra'],
 
     # Project uses reStructuredText, so ensure that the docutils get
     # installed or upgraded on the target machine

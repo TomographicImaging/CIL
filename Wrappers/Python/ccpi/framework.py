@@ -543,7 +543,7 @@ class SinogramData(DataSet):
                                       'vertical' , 'horizontal']
                     else:
                         shape = (channels , num_of_angles, horiz)
-                        dim_labels = ['angle' , 'angle' , 
+                        dim_labels = ['channel' , 'angle' , 
                                       'horizontal']
                 else:
                     if vert > 1:
@@ -891,7 +891,7 @@ if __name__ == '__main__':
     vgeometry = geoms.VolumeGeometry(voxel_num_x=2, voxel_num_y=3, channels=2)
     vol = VolumeData(geometry=vgeometry)
     
-    sgeometry = geoms.SinogramGeometry(dimension=2, angles=10, 
+    sgeometry = geoms.SinogramGeometry(dimension=2, angles=numpy.linspace(0, 180, num=20), 
                                        geom_type='parallel', pixel_num_v=3,
                                        pixel_num_h=5 , channels=2)
     sino = SinogramData(geometry=sgeometry)

@@ -112,7 +112,9 @@ plt.show()
 x_CGLS, it_CGLS, timing_CGLS, criter_CGLS = CGLS(Aop, b, 200, x_init)
 
 plt.imshow(x_CGLS.array)
+plt.title('CGLS recon, compare FISTA0')
 plt.show()
 
 plt.semilogy(criter_CGLS)
+plt.title('CGLS criterion')
 plt.show()

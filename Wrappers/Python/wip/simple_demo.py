@@ -107,3 +107,12 @@ plt.show()
 
 plt.semilogy(criter_fbpd1)
 plt.show()
+
+# Run CGLS, which should agree with the FISTA0
+x_CGLS, it_CGLS, timing_CGLS, criter_CGLS = CGLS(Aop, b, 200, x_init)
+
+plt.imshow(x_CGLS.array)
+plt.show()
+
+plt.semilogy(criter_CGLS)
+plt.show()

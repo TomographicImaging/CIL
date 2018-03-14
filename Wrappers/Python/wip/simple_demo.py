@@ -1,11 +1,10 @@
 #import sys
 #sys.path.append("..")
 
-from ccpi.framework import ImageData , VolumeGeometry, SinogramGeometry
+from ccpi.framework import ImageData , ImageGeometry, AcquisitionGeometry
 from ccpi.reconstruction.algs import FISTA, FBPD, CGLS
-from ccpi.reconstruction.funcs import Norm2sq, Norm1
+from ccpi.reconstruction.funcs import Norm2sq, Norm1 , TV2D
 from ccpi.astra.astra_ops import AstraProjectorSimple
-from ccpi.reconstruction.geoms import 
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -17,7 +16,7 @@ N = 128
 
 
 vg = ImageGeometry(voxel_num_x=N,voxel_num_y=N)
-Phantom = VolumeData(geometry=vg)
+Phantom = ImageData(geometry=vg)
 
 x = Phantom.as_array()
 x[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 1.0
@@ -148,11 +147,8 @@ fig = plt.figure()
 # projections row
 a=fig.add_subplot(rows,cols,current)
 a.set_title('phantom {0}'.format(np.shape(Phantom.as_array())))
-<<<<<<< HEAD
-imgplot = plt.imshow(Phantom.as_array())
-=======
+
 imgplot = plt.imshow(Phantom.as_array(),vmin=clims[0],vmax=clims[1])
->>>>>>> origin
 
 current = current + 1
 a=fig.add_subplot(rows,cols,current)

@@ -18,7 +18,7 @@ M = 100
 numchannels = 3
 
 vg = ImageGeometry(voxel_num_x=N,voxel_num_y=N,channels=numchannels)
-Phantom = VolumeData(geometry=vg)
+Phantom = ImageData(geometry=vg)
 
 x = Phantom.as_array()
 x[0 , round(N/4):round(3*N/4) , round(N/4):round(3*N/4)  ] = 1.0

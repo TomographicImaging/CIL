@@ -3,7 +3,7 @@
 
 from ccpi.framework import VolumeData, VolumeGeometry, SinogramGeometry
 from ccpi.reconstruction.algs import *
-from ccpi.reconstruction.funcs import Norm2sq, Norm1
+from ccpi.reconstruction.funcs import Norm2sq, Norm1, TV2D
 from ccpi.reconstruction.astra_ops import AstraProjectorSimple
 
 import numpy as np
@@ -93,7 +93,7 @@ g0 = Norm1(lam)
 x_fista1, it1, timing1, criter1 = FISTA(x_init, f, g0)
 
 plt.imshow(x_fista1.array)
-plt.title('FISTA')
+plt.title('FISTA1')
 plt.show()
 
 plt.semilogy(criter1)
@@ -104,11 +104,24 @@ opt = {'tol': 1e-4, 'iter': 10000}
 x_fbpd1, it_fbpd1, timing_fbpd1, criter_fbpd1 = FBPD(x_init,None,f,g0,opt=opt)
 
 plt.imshow(x_fbpd1.array)
-plt.title('FBPD')
+plt.title('FBPD1')
 plt.show()
 
 plt.semilogy(criter_fbpd1)
 plt.show()
+
+# Now FBPD for least squares plus TV
+lamtv = 1
+gtv = TV2D(lamtv)
+
+x_fbpdtv, it_fbpdtv, timing_fbpdtv, criter_fbpdtv = FBPD(x_init,None,f,gtv,opt=opt)
+
+plt.imshow(x_fbpdtv.array)
+plt.show()
+
+plt.semilogy(criter_fbpdtv)
+plt.show()
+
 
 # Run CGLS, which should agree with the FISTA0
 x_CGLS, it_CGLS, timing_CGLS, criter_CGLS = CGLS(Aop, b, 1000, x_init)
@@ -130,7 +143,7 @@ current = 1
 fig = plt.figure()
 # projections row
 a=fig.add_subplot(rows,cols,current)
-a.set_title('phantom {0}'.format(numpy.shape(Phantom.as_array())))
+a.set_title('phantom {0}'.format(np.shape(Phantom.as_array())))
 imgplot = plt.imshow(Phantom.as_array())
 
 current = current + 1
@@ -145,7 +158,7 @@ imgplot = plt.imshow(x_fista1.as_array())
 
 current = current + 1
 a=fig.add_subplot(rows,cols,current)
-a.set_title('FBPD')
+a.set_title('FBPD1')
 imgplot = plt.imshow(x_fbpd1.as_array())
 
 current = current + 1
@@ -155,11 +168,18 @@ imgplot = plt.imshow(x_CGLS.as_array())
 
 current = current + 1
 a=fig.add_subplot(rows,cols,current)
-a.set_title('criteria')
+a.set_title('FBPD TV')
+imgplot = plt.imshow(x_fbpdtv.as_array())
+
+fig = plt.figure()
+# projections row
+b=fig.add_subplot(1,1,1)
+b.set_title('criteria')
 imgplot = plt.loglog(criter0 , label='FISTA0')
 imgplot = plt.loglog(criter1 , label='FISTA1')
-imgplot = plt.loglog(criter_fbpd1, label='FBPD')
+imgplot = plt.loglog(criter_fbpd1, label='FBPD1')
 imgplot = plt.loglog(criter_CGLS, label='CGLS')
-a.legend(loc='right')
+imgplot = plt.loglog(criter_fbpdtv, label='FBPD TV')
+b.legend(loc='right')
 plt.show()
 #%%

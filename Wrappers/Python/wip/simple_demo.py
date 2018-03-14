@@ -56,7 +56,7 @@ elif test_case==2:
                           dist_center_detector=OrigDetec)
 
 # ASTRA operator using volume and sinogram geometries
-Aop = AstraProjectorSimple(vg, pg, 'gpu')
+Aop = AstraProjectorSimple(vg, pg, 'cpu')
 
 # Unused old astra projector without geometry
 # Aop_old = AstraProjector(det_w, det_num, SourceOrig, 
@@ -83,6 +83,7 @@ x_init = VolumeData(np.zeros(x.shape),geometry=vg)
 x_fista0, it0, timing0, criter0 = FISTA(x_init, f, None)
 
 plt.imshow(x_fista0.array)
+plt.title('FISTA0')
 plt.show()
 
 # Now least squares plus 1-norm regularization
@@ -93,6 +94,7 @@ g0 = Norm1(lam)
 x_fista1, it1, timing1, criter1 = FISTA(x_init, f, g0)
 
 plt.imshow(x_fista1.array)
+plt.title('FISTA')
 plt.show()
 
 plt.semilogy(criter1)
@@ -103,7 +105,62 @@ opt = {'tol': 1e-4, 'iter': 10000}
 x_fbpd1, it_fbpd1, timing_fbpd1, criter_fbpd1 = FBPD(x_init,None,f,g0,opt=opt)
 
 plt.imshow(x_fbpd1.array)
+plt.title('FBPD')
 plt.show()
 
 plt.semilogy(criter_fbpd1)
 plt.show()
+
+# Run CGLS, which should agree with the FISTA0
+x_CGLS, it_CGLS, timing_CGLS, criter_CGLS = CGLS(Aop, b, 1000, x_init)
+
+plt.imshow(x_CGLS.array)
+plt.title('CGLS')
+plt.title('CGLS recon, compare FISTA0')
+plt.show()
+
+plt.semilogy(criter_CGLS)
+plt.title('CGLS criterion')
+plt.show()
+
+
+#%%
+cols = 3
+rows = 2
+current = 1
+fig = plt.figure()
+# projections row
+a=fig.add_subplot(rows,cols,current)
+a.set_title('phantom {0}'.format(numpy.shape(Phantom.as_array())))
+imgplot = plt.imshow(Phantom.as_array())
+
+current = current + 1
+a=fig.add_subplot(rows,cols,current)
+a.set_title('FISTA0')
+imgplot = plt.imshow(x_fista0.as_array())
+
+current = current + 1
+a=fig.add_subplot(rows,cols,current)
+a.set_title('FISTA1')
+imgplot = plt.imshow(x_fista1.as_array())
+
+current = current + 1
+a=fig.add_subplot(rows,cols,current)
+a.set_title('FBPD')
+imgplot = plt.imshow(x_fbpd1.as_array())
+
+current = current + 1
+a=fig.add_subplot(rows,cols,current)
+a.set_title('CGLS')
+imgplot = plt.imshow(x_CGLS.as_array())
+
+current = current + 1
+a=fig.add_subplot(rows,cols,current)
+a.set_title('criteria')
+imgplot = plt.loglog(criter0 , label='FISTA0')
+imgplot = plt.loglog(criter1 , label='FISTA1')
+imgplot = plt.loglog(criter_fbpd1, label='FBPD')
+imgplot = plt.loglog(criter_CGLS, label='CGLS')
+a.legend(loc='right')
+plt.show()
+#%%

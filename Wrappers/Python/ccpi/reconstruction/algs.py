@@ -21,6 +21,7 @@ import numpy
 import time
 
 from ccpi.reconstruction.funcs import BaseFunction
+from ccpi.framework import SinogramData, VolumeData
 
 def FISTA(x_init, f=None, g=None, opt=None):
 
@@ -126,3 +127,39 @@ def FBPD(x_init, f=None, g=None, h=None, opt=None):
     timing = numpy.cumsum(timing[0:it+1]);
     
     return x, it, timing, criter
+
+def CGLS(A,b,max_iter,x_init):
+    '''Conjugate Gradient Least Squares algorithm'''
+    
+    r = b.clone()
+    x = x_init.clone()
+    
+    d = A.adjoint(r)
+    
+    normr2 = (d**2).sum()
+    
+    timing = numpy.zeros(max_iter)
+    criter = numpy.zeros(max_iter)
+
+    # algorithm loop
+    for it in range(0, max_iter):
+    
+        t = time.time()
+        
+        Ad = A.direct(d)
+        alpha = normr2/( (Ad**2).sum() )
+        x  = x + alpha*d
+        r  = r - alpha*Ad
+        s  = A.adjoint(r)
+        
+        normr2_new = (s**2).sum()
+        beta = normr2_new/normr2
+        normr2 = normr2_new
+        d = s + beta*d
+        
+        # time and criterion
+        timing[it] = time.time() - t
+        criter[it] = (r**2).sum()
+    
+    return x, it, timing, criter
+    

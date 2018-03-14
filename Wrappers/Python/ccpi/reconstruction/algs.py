@@ -131,13 +131,8 @@ def FBPD(x_init, f=None, g=None, h=None, opt=None):
 def CGLS(A,b,max_iter,x_init):
     '''Conjugate Gradient Least Squares algorithm'''
     
-    r = SinogramData(b, 
-                     deep_copy=True,
-                     geometry=b.geometry)
-    
-    x = VolumeData(x_init,
-                   deep_copy=True,
-                   geometry=x_init.geometry)
+    r = b.clone()
+    x = x_init.clone()
     
     d = A.adjoint(r)
     

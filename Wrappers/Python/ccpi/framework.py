@@ -425,6 +425,15 @@ class DataSet(object):
         repres += "Axis labels: {0}\n".format(self.dimension_labels)
         repres += "Representation: \n{0}\n".format(self.array)
         return repres
+    
+    def clone(self):
+        '''returns a copy of itself'''
+        
+        return type(self)(self.array, 
+                          dimension_labels=self.dimension_labels,
+                          deep_copy=True,
+                          geometry=self.geometry )
+        
                 
                     
                 
@@ -895,4 +904,5 @@ if __name__ == '__main__':
                                        geom_type='parallel', pixel_num_v=3,
                                        pixel_num_h=5 , channels=2)
     sino = SinogramData(geometry=sgeometry)
+    sino2 = sino.clone()
     

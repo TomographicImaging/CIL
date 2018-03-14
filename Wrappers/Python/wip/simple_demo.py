@@ -137,6 +137,8 @@ plt.show()
 
 
 #%%
+
+clims = (-0.5,2.5)
 cols = 3
 rows = 2
 current = 1
@@ -144,32 +146,32 @@ fig = plt.figure()
 # projections row
 a=fig.add_subplot(rows,cols,current)
 a.set_title('phantom {0}'.format(np.shape(Phantom.as_array())))
-imgplot = plt.imshow(Phantom.as_array())
+imgplot = plt.imshow(Phantom.as_array(),vmin=clims[0],vmax=clims[1])
 
 current = current + 1
 a=fig.add_subplot(rows,cols,current)
 a.set_title('FISTA0')
-imgplot = plt.imshow(x_fista0.as_array())
+imgplot = plt.imshow(x_fista0.as_array(),vmin=clims[0],vmax=clims[1])
 
 current = current + 1
 a=fig.add_subplot(rows,cols,current)
 a.set_title('FISTA1')
-imgplot = plt.imshow(x_fista1.as_array())
+imgplot = plt.imshow(x_fista1.as_array(),vmin=clims[0],vmax=clims[1])
 
 current = current + 1
 a=fig.add_subplot(rows,cols,current)
 a.set_title('FBPD1')
-imgplot = plt.imshow(x_fbpd1.as_array())
+imgplot = plt.imshow(x_fbpd1.as_array(),vmin=clims[0],vmax=clims[1])
 
 current = current + 1
 a=fig.add_subplot(rows,cols,current)
 a.set_title('CGLS')
-imgplot = plt.imshow(x_CGLS.as_array())
+imgplot = plt.imshow(x_CGLS.as_array(),vmin=clims[0],vmax=clims[1])
 
 current = current + 1
 a=fig.add_subplot(rows,cols,current)
 a.set_title('FBPD TV')
-imgplot = plt.imshow(x_fbpdtv.as_array())
+imgplot = plt.imshow(x_fbpdtv.as_array(),vmin=clims[0],vmax=clims[1])
 
 fig = plt.figure()
 # projections row

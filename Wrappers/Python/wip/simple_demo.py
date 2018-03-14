@@ -1,10 +1,10 @@
 #import sys
 #sys.path.append("..")
 
-from ccpi.framework import VolumeData, ImageGeometry, AcquisitionGeometry
-from ccpi.reconstruction.algs import *
-from ccpi.reconstruction.funcs import Norm2sq, Norm1, TV2D
-from ccpi.reconstruction.astra_ops import AstraProjectorSimple
+from ccpi.framework import ImageData , ImageGeometry, AcquisitionGeometry
+from ccpi.reconstruction.algs import FISTA, FBPD, CGLS
+from ccpi.reconstruction.funcs import Norm2sq, Norm1 , TV2D
+from ccpi.astra.astra_ops import AstraProjectorSimple
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,8 +14,9 @@ test_case = 1   # 1=parallel2D, 2=cone2D
 # Set up phantom
 N = 128
 
+
 vg = ImageGeometry(voxel_num_x=N,voxel_num_y=N)
-Phantom = VolumeData(geometry=vg)
+Phantom = ImageData(geometry=vg)
 
 x = Phantom.as_array()
 x[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 1.0
@@ -76,7 +77,7 @@ plt.show()
 f = Norm2sq(Aop,b,c=0.5)
 
 # Initial guess
-x_init = VolumeData(np.zeros(x.shape),geometry=vg)
+x_init = ImageData(np.zeros(x.shape),geometry=vg)
 
 # Run FISTA for least squares without regularization
 x_fista0, it0, timing0, criter0 = FISTA(x_init, f, None)
@@ -146,6 +147,7 @@ fig = plt.figure()
 # projections row
 a=fig.add_subplot(rows,cols,current)
 a.set_title('phantom {0}'.format(np.shape(Phantom.as_array())))
+
 imgplot = plt.imshow(Phantom.as_array(),vmin=clims[0],vmax=clims[1])
 
 current = current + 1

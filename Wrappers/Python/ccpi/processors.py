@@ -17,7 +17,8 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License
 
-from ccpi.framework import DataSetProcessor, DataSet, VolumeData, SinogramData, ImageGeometry, AcquisitionGeometry
+from ccpi.framework import DataSetProcessor, DataSet, AcquisitionData,\
+ AcquisitionGeometry
 import numpy
 import h5py
 from scipy import ndimage
@@ -25,13 +26,13 @@ from scipy import ndimage
 class Normalizer(DataSetProcessor):
     '''Normalization based on flat and dark
     
-    This processor read in a SinogramDataSet and normalises it based on 
+    This processor read in a AcquisitionData and normalises it based on 
     the instrument reading with and without incident photons or neutrons.
     
-    Input: SinogramDataSet
+    Input: AcquisitionData
     Parameter: 2D projection with flat field (or stack)
                2D projection with dark field (or stack)
-    Output: SinogramDataSetn
+    Output: AcquisitionDataSetn
     '''
     
     def __init__(self, flat_field = None, dark_field = None, tolerance = 1e-5):
@@ -45,37 +46,37 @@ class Normalizer(DataSetProcessor):
         #DataSetProcessor.__init__(self, **kwargs)
         super(Normalizer, self).__init__(**kwargs)
         if not flat_field is None:
-            self.setFlatField(flat_field)
+            self.set_flat_field(flat_field)
         if not dark_field is None:
-            self.setDarkField(dark_field)
+            self.set_dark_field(dark_field)
     
-    def checkInput(self, dataset):
+    def check_input(self, dataset):
         if dataset.number_of_dimensions == 3:
                return True
         else:
             raise ValueError("Expected input dimensions is 2 or 3, got {0}"\
                              .format(dataset.number_of_dimensions))
     
-    def setDarkField(self, df):
+    def set_dark_field(self, df):
         if type(df) is numpy.ndarray:
             if len(numpy.shape(df)) == 3:
                 raise ValueError('Dark Field should be 2D')
             elif len(numpy.shape(df)) == 2:
                 self.dark_field = df
         elif issubclass(type(df), DataSet):
-            self.dark_field = self.setDarkField(df.as_array())
+            self.dark_field = self.set_dark_field(df.as_array())
     
-    def setFlatField(self, df):
+    def set_flat_field(self, df):
         if type(df) is numpy.ndarray:
             if len(numpy.shape(df)) == 3:
                 raise ValueError('Flat Field should be 2D')
             elif len(numpy.shape(df)) == 2:
                 self.flat_field = df
         elif issubclass(type(df), DataSet):
-            self.flat_field = self.setDarkField(df.as_array())
+            self.flat_field = self.set_flat_field(df.as_array())
     
     @staticmethod
-    def normalizeProjection(projection, flat, dark, tolerance):
+    def normalize_projection(projection, flat, dark, tolerance):
         a = (projection - dark)
         b = (flat-dark)
         with numpy.errstate(divide='ignore', invalid='ignore'):
@@ -85,7 +86,7 @@ class Normalizer(DataSetProcessor):
     
     def process(self):
         
-        projections = self.getInput()
+        projections = self.get_input()
         dark = self.dark_field
         flat = self.flat_field
         
@@ -95,7 +96,7 @@ class Normalizer(DataSetProcessor):
             
                
         a = numpy.asarray(
-                [ Normalizer.normalizeProjection(
+                [ Normalizer.normalize_projection(
                         projection, flat, dark, self.tolerance) \
                  for projection in projections.as_array() ]
                 )
@@ -108,10 +109,10 @@ class Normalizer(DataSetProcessor):
 class CenterOfRotationFinder(DataSetProcessor):
     '''Processor to find the center of rotation in a parallel beam experiment
     
-    This processor read in a SinogramDataSet and finds the center of rotation 
+    This processor read in a AcquisitionDataSet and finds the center of rotation 
     based on Nghia Vo's method. https://doi.org/10.1364/OE.22.019078
     
-    Input: SinogramDataSet
+    Input: AcquisitionDataSet
     
     Output: float. center of rotation in pixel coordinate
     '''
@@ -124,7 +125,7 @@ class CenterOfRotationFinder(DataSetProcessor):
         #DataSetProcessor.__init__(self, **kwargs)
         super(CenterOfRotationFinder, self).__init__(**kwargs)
     
-    def checkInput(self, dataset):
+    def check_input(self, dataset):
         if dataset.number_of_dimensions == 3:
             if dataset.geometry.geom_type == 'parallel':
                 return True
@@ -378,7 +379,7 @@ class CenterOfRotationFinder(DataSetProcessor):
     
     def process(self):
         
-        projections = self.getInput()
+        projections = self.get_input()
         
         cor = CenterOfRotationFinder.find_center_vo(projections.as_array())
         
@@ -436,25 +437,25 @@ if __name__ == '__main__':
                                  pixel_num_h=numpy.shape(proj)[2],
                                  pixel_num_v=numpy.shape(proj)[1],
                                  )    
-    sino = SinogramData( proj , geometry=parallelbeam)
+    sino = AcquisitionData( proj , geometry=parallelbeam)
     
     normalizer = Normalizer()
-    normalizer.setInput(sino)
-    normalizer.setFlatField(flat)
-    normalizer.setDarkField(dark)
-    norm = normalizer.getOutput()
+    normalizer.set_input(sino)
+    normalizer.set_flat_field(flat)
+    normalizer.set_dark_field(dark)
+    norm = normalizer.get_output()
     print ("Processor min {0} max {1}".format(norm.as_array().min(), norm.as_array().max()))
     
     norm1 = numpy.asarray(
-            [Normalizer.normalizeProjection( p, flat, dark, 1e-5 ) 
+            [Normalizer.normalize_projection( p, flat, dark, 1e-5 ) 
             for p in proj]
             )
     
     print ("Numpy min {0} max {1}".format(norm1.min(), norm1.max()))
     
     cor_finder = CenterOfRotationFinder()
-    cor_finder.setInput(sino)
-    cor = cor_finder.getOutput()
+    cor_finder.set_input(sino)
+    cor = cor_finder.get_output()
     print ("center of rotation {0} == 86.25?".format(cor))
     
     conebeam = AcquisitionGeometry('cone', '3D' , 
@@ -462,9 +463,9 @@ if __name__ == '__main__':
                                  pixel_num_h=numpy.shape(proj)[2],
                                  pixel_num_v=numpy.shape(proj)[1],
                                  )    
-    sino = SinogramData( proj , geometry=conebeam)
+    sino = AcquisitionData( proj , geometry=conebeam)
     try:
-        cor_finder.setInput(sino)
-        cor = cor_finder.getOutput()
+        cor_finder.set_input(sino)
+        cor = cor_finder.get_output()
     except ValueError as err:
         print (err)

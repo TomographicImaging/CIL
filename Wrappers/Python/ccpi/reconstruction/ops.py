@@ -19,10 +19,10 @@
 
 import numpy
 from scipy.sparse.linalg import svds
-from ccpi.framework import DataSet, VolumeData, SinogramData, DataSetProcessor
+from ccpi.framework import DataContainer
 
 # Maybe operators need to know what types they take as inputs/outputs
-# to not just use generic DataSet
+# to not just use generic DataContainer
 
 
 class Operator(object):
@@ -60,10 +60,10 @@ class LinearOperatorMatrix(Operator):
         super(LinearOperatorMatrix, self).__init__()
         
     def direct(self,x):
-        return DataSet(numpy.dot(self.A,x.as_array()))
+        return DataContainer(numpy.dot(self.A,x.as_array()))
     
     def adjoint(self,x):
-        return DataSet(numpy.dot(self.A.transpose(),x.as_array()))
+        return DataContainer(numpy.dot(self.A.transpose(),x.as_array()))
     
     def size(self):
         return self.A.shape
@@ -130,7 +130,7 @@ class FiniteDiff2D(Operator):
 def PowerMethodNonsquare(op,numiters):
     # Initialise random
     inputsize = op.size()[1]
-    x0 = DataSet(numpy.random.randn(inputsize[0],inputsize[1]))
+    x0 = DataContainer(numpy.random.randn(inputsize[0],inputsize[1]))
     s = numpy.zeros(numiters)
     # Loop
     for it in numpy.arange(numiters):

@@ -1,10 +1,11 @@
 #import sys
 #sys.path.append("..")
 
-from ccpi.framework import VolumeData, SinogramData, ImageGeometry, AcquisitionGeometry
+from ccpi.framework import ImageData, AcquisitionData, ImageGeometry, AcquisitionGeometry
 from ccpi.reconstruction.algs import FISTA
 from ccpi.reconstruction.funcs import Norm2sq, Norm1
-from ccpi.reconstruction.astra_ops import AstraProjectorMC
+from ccpi.astra.astra_ops import AstraProjectorMC
+from ccpi.reconstruction.geoms import VolumeGeometry, SinogramGeometry
 
 import numpy
 import matplotlib.pyplot as plt
@@ -17,7 +18,7 @@ M = 100
 numchannels = 3
 
 vg = ImageGeometry(voxel_num_x=N,voxel_num_y=N,channels=numchannels)
-Phantom = VolumeData(geometry=vg)
+Phantom = ImageData(geometry=vg)
 
 x = Phantom.as_array()
 x[0 , round(N/4):round(3*N/4) , round(N/4):round(3*N/4)  ] = 1.0
@@ -48,7 +49,7 @@ plt.show()
 #vg = ImageGeometry(N,N,None, 1,1,None,channels=numchannels)
 
 
-#Phantom = VolumeData(x,geometry=vg)
+#Phantom = ImageData(x,geometry=vg)
 
 # Set up measurement geometry
 angles_num = 20; # angles number
@@ -106,7 +107,7 @@ plt.show()
 f = Norm2sq(Aop,b,c=0.5)
 
 # Initial guess
-x_init = VolumeData(numpy.zeros(x.shape),geometry=vg)
+x_init = ImageData(numpy.zeros(x.shape),geometry=vg)
 
 # FISTA options
 opt = {'tol': 1e-4, 'iter': 200}

@@ -1,7 +1,7 @@
 #import sys
 #sys.path.append("..")
 
-from ccpi.framework import ImageData, AcquisitionData
+from ccpi.framework import ImageData, AcquisitionData, ImageGeometry, AcquisitionGeometry
 from ccpi.reconstruction.algs import FISTA
 from ccpi.reconstruction.funcs import Norm2sq, Norm1
 from ccpi.astra.astra_ops import AstraProjectorMC
@@ -17,8 +17,8 @@ N = 128
 M = 100
 numchannels = 3
 
-vg = VolumeGeometry(voxel_num_x=N,voxel_num_y=N,channels=numchannels)
-Phantom = ImageData(geometry=vg)
+vg = ImageGeometry(voxel_num_x=N,voxel_num_y=N,channels=numchannels)
+Phantom = VolumeData(geometry=vg)
 
 x = Phantom.as_array()
 x[0 , round(N/4):round(3*N/4) , round(N/4):round(3*N/4)  ] = 1.0
@@ -46,7 +46,7 @@ for k in numpy.arange(3):
     axarr[k].imshow(x[k],vmin=0,vmax=2.5)
 plt.show()
 
-#vg = VolumeGeometry(N,N,None, 1,1,None,channels=numchannels)
+#vg = ImageGeometry(N,N,None, 1,1,None,channels=numchannels)
 
 
 #Phantom = ImageData(x,geometry=vg)
@@ -68,14 +68,14 @@ OrigDetec = 0
 
 # Parallelbeam geometry test
 if test_case==1:
-    pg = SinogramGeometry('parallel',
+    pg = AcquisitionGeometry('parallel',
                           '2D',
                           angles,
                           det_num,
                           det_w,
                           channels=numchannels)
 elif test_case==2:
-    pg = SinogramGeometry('cone',
+    pg = AcquisitionGeometry('cone',
                           '2D',
                           angles,
                           det_num,

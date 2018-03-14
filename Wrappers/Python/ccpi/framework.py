@@ -23,7 +23,6 @@ import numpy
 import sys
 from datetime import timedelta, datetime
 import warnings
-from ccpi.reconstruction import geoms
 
 if sys.version_info[0] >= 3 and sys.version_info[1] >= 4:
     ABC = abc.ABC
@@ -34,65 +33,112 @@ def find_key(dic, val):
     """return the key of dictionary dic given the value"""
     return [k for k, v in dic.items() if v == val][0]
 
-class CCPiBaseClass(ABC):
-    def __init__(self, **kwargs):
-        self.acceptedInputKeywords = []
-        self.pars = {}
-        self.debug = True
-        # add keyworded arguments as accepted input keywords and add to the
-        # parameters
-        for key, value in kwargs.items():
-            self.acceptedInputKeywords.append(key)
-            #print ("key {0}".format(key))
-            #self.setParameter(key.__name__=value)
-            self.setParameter(**{key:value})
-    
-    def setParameter(self, **kwargs):
-        '''set named parameter for the reconstructor engine
-        
-        raises Exception if the named parameter is not recognized
-        
-        '''
-        for key , value in kwargs.items():
-            if key in self.acceptedInputKeywords:
-                self.pars[key] = value
-            else:
-                raise KeyError('Wrong parameter "{0}" for {1}'.format(key, 
-                               self.__class__.__name__ ))
-    # setParameter
 
-    def getParameter(self, key):
-        if type(key) is str:
-            if key in self.acceptedInputKeywords:
-                return self.pars[key]
-            else:
-                raise KeyError('Unrecongnised parameter: {0} '.format(key) )
-        elif type(key) is list:
-            outpars = []
-            for k in key:
-                outpars.append(self.getParameter(k))
-            return outpars
-        else:
-            raise Exception('Unhandled input {0}' .format(str(type(key))))
-    #getParameter
-    def getParameterMap(self, key):
-        if type(key) is str:
-            if key in self.acceptedInputKeywords:
-                return self.pars[key]
-            else:
-                raise KeyError('Unrecongnised parameter: {0} '.format(key) )
-        elif type(key) is list:
-            outpars = {}
-            for k in key:
-                outpars[k] = self.getParameter(k)
-            return outpars
-        else:
-            raise Exception('Unhandled input {0}' .format(str(type(key))))
-    #getParameter
+class ImageGeometry:
     
-    def log(self, msg):
-        if self.debug:
-            print ("{0}: {1}".format(self.__class__.__name__, msg))
+    def __init__(self, 
+                 voxel_num_x=0, 
+                 voxel_num_y=0, 
+                 voxel_num_z=0, 
+                 voxel_size_x=1, 
+                 voxel_size_y=1, 
+                 voxel_size_z=1, 
+                 center_x=0, 
+                 center_y=0, 
+                 center_z=0, 
+                 channels=1):
+        
+        self.voxel_num_x = voxel_num_x
+        self.voxel_num_y = voxel_num_y
+        self.voxel_num_z = voxel_num_z
+        self.voxel_size_x = voxel_size_x
+        self.voxel_size_y = voxel_size_y
+        self.voxel_size_z = voxel_size_z
+        self.center_x = center_x
+        self.center_y = center_y
+        self.center_z = center_z  
+        self.channels = channels
+        
+    def getMinX(self):
+        return self.center_x - 0.5*self.voxel_num_x*self.voxel_size_x
+        
+    def getMaxX(self):
+        return self.center_x + 0.5*self.voxel_num_x*self.voxel_size_x
+        
+    def getMinY(self):
+        return self.center_y - 0.5*self.voxel_num_y*self.voxel_size_y
+        
+    def getMaxY(self):
+        return self.center_y + 0.5*self.voxel_num_y*self.voxel_size_y
+        
+    def getMinZ(self):
+        if not voxel_num_z == 0:
+            return self.center_z - 0.5*self.voxel_num_z*self.voxel_size_z
+        else:
+            return 0
+        
+    def getMaxZ(self):
+        if not voxel_num_z == 0:
+            return self.center_z + 0.5*self.voxel_num_z*self.voxel_size_z
+        else:
+            return 0
+        
+    
+class AcquisitionGeometry:
+    
+    def __init__(self, 
+                 geom_type, 
+                 dimension, 
+                 angles, 
+                 pixel_num_h=0, 
+                 pixel_size_h=1, 
+                 pixel_num_v=0, 
+                 pixel_size_v=1, 
+                 dist_source_center=None, 
+                 dist_center_detector=None, 
+                 channels=1
+                 ):
+        """
+        General inputs for standard type projection geometries
+        detectorDomain or detectorpixelSize:
+            If 2D
+                If scalar: Width of detector or single detector pixel
+                If 2-vec: Error
+            If 3D
+                If scalar: Width in both dimensions
+                If 2-vec: Vertical then horizontal size
+        grid
+            If 2D
+                If scalar: number of detectors
+                If 2-vec: error
+            If 3D
+                If scalar: Square grid that size
+                If 2-vec vertical then horizontal size
+        cone or parallel
+        2D or 3D
+        parallel_parameters: ?
+        cone_parameters:
+            source_to_center_dist (if parallel: NaN)
+            center_to_detector_dist (if parallel: NaN)
+        standard or nonstandard (vec) geometry
+        angles
+        angles_format radians or degrees
+        """
+        self.geom_type = geom_type   # 'parallel' or 'cone'
+        self.dimension = dimension # 2D or 3D
+        self.angles = angles
+        
+        self.dist_source_center = dist_source_center
+        self.dist_center_detector = dist_center_detector
+        
+        self.pixel_num_h = pixel_num_h
+        self.pixel_size_h = pixel_size_h
+        self.pixel_num_v = pixel_num_v
+        self.pixel_size_v = pixel_size_v
+        
+        self.channels = channels
+
+
             
 class DataContainer(object):
     '''Generic class to hold data
@@ -896,11 +942,12 @@ if __name__ == '__main__':
     print ("shape b 2,3? {0}".format(numpy.shape(b1.as_array())))
     
     
-    # create ImageData from geometry
-    vgeometry = geoms.VolumeGeometry(voxel_num_x=2, voxel_num_y=3, channels=2)
-    vol = ImageData(geometry=vgeometry)
+
+    # create VolumeData from geometry
+    vgeometry = ImageGeometry(voxel_num_x=2, voxel_num_y=3, channels=2)
+    vol = VolumeData(geometry=vgeometry)
     
-    sgeometry = geoms.SinogramGeometry(dimension=2, angles=numpy.linspace(0, 180, num=20), 
+    sgeometry = AcquisitionGeometry(dimension=2, angles=numpy.linspace(0, 180, num=20), 
                                        geom_type='parallel', pixel_num_v=3,
                                        pixel_num_h=5 , channels=2)
     sino = AcquisitionData(geometry=sgeometry)

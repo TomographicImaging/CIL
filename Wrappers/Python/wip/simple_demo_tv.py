@@ -9,7 +9,6 @@ from ccpi.reconstruction.algs import *
 from ccpi.reconstruction.funcs import *
 from ccpi.reconstruction.ops import *
 from ccpi.reconstruction.astra_ops import *
-from ccpi.reconstruction.geoms import *
 
 import numpy as np
 import matplotlib.pyplot as plt

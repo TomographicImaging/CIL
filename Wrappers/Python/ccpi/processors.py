@@ -17,8 +17,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License
 
-from ccpi.framework import DataSetProcessor, DataSet, VolumeData, SinogramData
-from ccpi.reconstruction import geoms
+from ccpi.framework import DataSetProcessor, DataSet, VolumeData, SinogramData, VolumeGeometry, SinogramGeometry
 import numpy
 import h5py
 from scipy import ndimage
@@ -432,7 +431,7 @@ def loadNexus(filename):
 if __name__ == '__main__':
     angles, proj, dark, flat = loadNexus('../../../data/24737_fd.nxs')
     
-    parallelbeam = geoms.SinogramGeometry('parallel', '3D' , 
+    parallelbeam = SinogramGeometry('parallel', '3D' , 
                                  angles=angles, 
                                  pixel_num_h=numpy.shape(proj)[2],
                                  pixel_num_v=numpy.shape(proj)[1],
@@ -458,7 +457,7 @@ if __name__ == '__main__':
     cor = cor_finder.getOutput()
     print ("center of rotation {0} == 86.25?".format(cor))
     
-    conebeam = geoms.SinogramGeometry('cone', '3D' , 
+    conebeam = SinogramGeometry('cone', '3D' , 
                                  angles=angles, 
                                  pixel_num_h=numpy.shape(proj)[2],
                                  pixel_num_v=numpy.shape(proj)[1],

@@ -1,11 +1,10 @@
 #import sys
 #sys.path.append("..")
 
-from ccpi.framework import VolumeData, SinogramData
+from ccpi.framework import VolumeData, SinogramData, VolumeGeometry, SinogramGeometry
 from ccpi.reconstruction.algs import FISTA
 from ccpi.reconstruction.funcs import Norm2sq, Norm1
 from ccpi.reconstruction.astra_ops import AstraProjectorMC
-from ccpi.reconstruction.geoms import VolumeGeometry, SinogramGeometry
 
 import numpy
 import matplotlib.pyplot as plt

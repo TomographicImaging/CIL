@@ -21,7 +21,6 @@ import numpy
 import time
 
 from ccpi.reconstruction.funcs import BaseFunction
-from ccpi.framework import SinogramData, VolumeData
 
 def FISTA(x_init, f=None, g=None, opt=None):
 

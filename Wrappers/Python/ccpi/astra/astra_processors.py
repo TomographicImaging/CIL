@@ -1,17 +1,16 @@
-from ccpi.framework import DataSetProcessor, DataSet, VolumeData, SinogramData
+from ccpi.framework import DataSetProcessor, ImageData, AcquisitionData
 from ccpi.astra.astra_utils import convert_geometry_to_astra
 import astra
-import numpy
 
 
 class AstraForwardProjector(DataSetProcessor):
     '''AstraForwardProjector
     
-    Forward project VolumeDataSet to SinogramDataSet using ASTRA proj_id.
+    Forward project ImageData to AcquisitionData using ASTRA proj_id.
     
-    Input: VolumeDataSet
+    Input: ImageData
     Parameter: proj_id
-    Output: SinogramDataSet
+    Output: AcquisitionData
     '''
     
     def __init__(self,
@@ -50,7 +49,7 @@ class AstraForwardProjector(DataSetProcessor):
         else:
             NotImplemented
     
-    def checkInput(self, dataset):
+    def check_input(self, dataset):
         if dataset.number_of_dimensions == 3 or\
            dataset.number_of_dimensions == 2:
                return True
@@ -68,24 +67,24 @@ class AstraForwardProjector(DataSetProcessor):
         self.sinogram_geometry = sinogram_geometry
     
     def process(self):
-        IM = self.getInput()
-        DATA = SinogramData(geometry=self.sinogram_geometry)
+        IM = self.get_input()
+        DATA = AcquisitionData(geometry=self.sinogram_geometry)
         #sinogram_id, DATA = astra.create_sino( IM.as_array(), 
         #                           self.proj_id)
         sinogram_id, DATA.array = astra.create_sino(IM.as_array(), 
                                                            self.proj_id)
         astra.data2d.delete(sinogram_id)
-        #return SinogramData(array=DATA, geometry=self.sinogram_geometry)
+        #return AcquisitionData(array=DATA, geometry=self.sinogram_geometry)
         return DATA
 
 class AstraBackProjector(DataSetProcessor):
     '''AstraBackProjector
     
-    Back project SinogramDataSet to VolumeDataSet using ASTRA proj_id.
+    Back project AcquisitionData to ImageData using ASTRA proj_id.
     
-    Input: SinogramDataSet
+    Input: AcquisitionData
     Parameter: proj_id
-    Output: VolumeDataSet 
+    Output: ImageData
     '''
     
     def __init__(self,
@@ -124,7 +123,7 @@ class AstraBackProjector(DataSetProcessor):
         else:
             NotImplemented
     
-    def checkInput(self, dataset):
+    def check_input(self, dataset):
         if dataset.number_of_dimensions == 3 or dataset.number_of_dimensions == 2:
                return True
         else:
@@ -141,8 +140,8 @@ class AstraBackProjector(DataSetProcessor):
         self.sinogram_geometry = sinogram_geometry
     
     def process(self):
-        DATA = self.getInput()
-        IM = VolumeData(geometry=self.volume_geometry)
+        DATA = self.get_input()
+        IM = ImageData(geometry=self.volume_geometry)
         rec_id, IM.array = astra.create_backprojection(DATA.as_array(),
                             self.proj_id)
         astra.data2d.delete(rec_id)
@@ -151,13 +150,13 @@ class AstraBackProjector(DataSetProcessor):
 class AstraForwardProjectorMC(AstraForwardProjector):
     '''AstraForwardProjector Multi channel
     
-    Forward project VolumeDataSet to SinogramDataSet using ASTRA proj_id.
+    Forward project ImageData to AcquisitionDataSet using ASTRA proj_id.
     
-    Input: VolumeDataSet
+    Input: ImageDataSet
     Parameter: proj_id
-    Output: SinogramDataSet
+    Output: AcquisitionData
     '''
-    def checkInput(self, dataset):
+    def check_input(self, dataset):
         if dataset.number_of_dimensions == 2 or \
            dataset.number_of_dimensions == 3 or \
            dataset.number_of_dimensions == 4:
@@ -166,9 +165,9 @@ class AstraForwardProjectorMC(AstraForwardProjector):
             raise ValueError("Expected input dimensions is 2 or 3, got {0}"\
                              .format(dataset.number_of_dimensions))
     def process(self):
-        IM = self.getInput()
-        #create the output Sinogram
-        DATA = SinogramData(geometry=self.sinogram_geometry)
+        IM = self.get_input()
+        #create the output AcquisitionData
+        DATA = AcquisitionData(geometry=self.sinogram_geometry)
         
         for k in range(DATA.geometry.channels):
             sinogram_id, DATA.as_array()[k] = astra.create_sino(IM.as_array()[k], 
@@ -179,13 +178,13 @@ class AstraForwardProjectorMC(AstraForwardProjector):
 class AstraBackProjectorMC(AstraBackProjector):
     '''AstraBackProjector Multi channel
     
-    Back project SinogramDataSet to VolumeDataSet using ASTRA proj_id.
+    Back project AcquisitionData to ImageData using ASTRA proj_id.
     
-    Input: SinogramDataSet
+    Input: AcquisitionData
     Parameter: proj_id
-    Output: VolumeDataSet 
+    Output: ImageData
     '''
-    def checkInput(self, dataset):
+    def check_input(self, dataset):
         if dataset.number_of_dimensions == 2 or \
            dataset.number_of_dimensions == 3 or \
            dataset.number_of_dimensions == 4:
@@ -194,12 +193,13 @@ class AstraBackProjectorMC(AstraBackProjector):
             raise ValueError("Expected input dimensions is 2 or 3, got {0}"\
                              .format(dataset.number_of_dimensions))
     def process(self):
-        DATA = self.getInput()
+        DATA = self.get_input()
         
-        IM = VolumeData(geometry=self.volume_geometry)
+        IM = ImageData(geometry=self.volume_geometry)
         
         for k in range(IM.geometry.channels):
-            rec_id, IM.as_array()[k] = astra.create_backprojection(DATA.as_array()[k], 
-                                  self.proj_id)
+            rec_id, IM.as_array()[k] = astra.create_backprojection(
+                    DATA.as_array()[k], 
+                    self.proj_id)
             astra.data2d.delete(rec_id)
         return IM

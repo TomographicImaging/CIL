@@ -28,8 +28,8 @@ class AstraForwardProjector(DataSetProcessor):
         #DataSetProcessor.__init__(self, **kwargs)
         super(AstraForwardProjector, self).__init__(**kwargs)
         
-        self.setVolumeGeometry(volume_geometry)
-        self.setSinogramGeometry(sinogram_geometry)
+        self.set_ImageGeometry(volume_geometry)
+        self.set_AcquisitionGeometry(sinogram_geometry)
         
         # Set up ASTRA Volume and projection geometry, not to be stored in self
         vol_geom, proj_geom = convert_geometry_to_astra(self.volume_geometry,
@@ -39,13 +39,13 @@ class AstraForwardProjector(DataSetProcessor):
         if device == 'cpu':
             # Note that 'line' only one option
             if self.sinogram_geometry.geom_type == 'parallel':
-                self.setProjector(astra.create_projector('line', proj_geom, vol_geom) )
+                self.set_projector(astra.create_projector('line', proj_geom, vol_geom) )
             elif self.sinogram_geometry.geom_type == 'cone':
-                self.setProjector(astra.create_projector('line_fanflat', proj_geom, vol_geom) )
+                self.set_projector(astra.create_projector('line_fanflat', proj_geom, vol_geom) )
             else:
                 NotImplemented    
         elif device == 'gpu':
-            self.setProjector(astra.create_projector('cuda', proj_geom, vol_geom) )
+            self.set_projector(astra.create_projector('cuda', proj_geom, vol_geom) )
         else:
             NotImplemented
     
@@ -57,13 +57,13 @@ class AstraForwardProjector(DataSetProcessor):
             raise ValueError("Expected input dimensions is 2 or 3, got {0}"\
                              .format(dataset.number_of_dimensions))
     
-    def setProjector(self, proj_id):
+    def set_projector(self, proj_id):
         self.proj_id = proj_id
     
-    def setVolumeGeometry(self, volume_geometry):
+    def set_ImageGeometry(self, volume_geometry):
         self.volume_geometry = volume_geometry
     
-    def setSinogramGeometry(self, sinogram_geometry):
+    def set_AcquisitionGeometry(self, sinogram_geometry):
         self.sinogram_geometry = sinogram_geometry
     
     def process(self):
@@ -102,8 +102,8 @@ class AstraBackProjector(DataSetProcessor):
         #DataSetProcessor.__init__(self, **kwargs)
         super(AstraBackProjector, self).__init__(**kwargs)
         
-        self.setVolumeGeometry(volume_geometry)
-        self.setSinogramGeometry(sinogram_geometry)
+        self.set_ImageGeometry(volume_geometry)
+        self.set_AcquisitionGeometry(sinogram_geometry)
         
                 # Set up ASTRA Volume and projection geometry, not to be stored in self
         vol_geom, proj_geom = convert_geometry_to_astra(self.volume_geometry,
@@ -113,13 +113,13 @@ class AstraBackProjector(DataSetProcessor):
         if device == 'cpu':
             # Note that 'line' only one option
             if self.sinogram_geometry.geom_type == 'parallel':
-                self.setProjector(astra.create_projector('line', proj_geom, vol_geom) )
+                self.set_projector(astra.create_projector('line', proj_geom, vol_geom) )
             elif self.sinogram_geometry.geom_type == 'cone':
-                self.setProjector(astra.create_projector('line_fanflat', proj_geom, vol_geom) )
+                self.set_projector(astra.create_projector('line_fanflat', proj_geom, vol_geom) )
             else:
                 NotImplemented 
         elif device == 'gpu':
-            self.setProjector(astra.create_projector('cuda', proj_geom, vol_geom) )
+            self.set_projector(astra.create_projector('cuda', proj_geom, vol_geom) )
         else:
             NotImplemented
     
@@ -130,13 +130,13 @@ class AstraBackProjector(DataSetProcessor):
             raise ValueError("Expected input dimensions is 2 or 3, got {0}"\
                              .format(dataset.number_of_dimensions))
     
-    def setProjector(self, proj_id):
+    def set_projector(self, proj_id):
         self.proj_id = proj_id
         
-    def setVolumeGeometry(self, volume_geometry):
+    def set_ImageGeometry(self, volume_geometry):
         self.volume_geometry = volume_geometry
         
-    def setSinogramGeometry(self, sinogram_geometry):
+    def set_AcquisitionGeometry(self, sinogram_geometry):
         self.sinogram_geometry = sinogram_geometry
     
     def process(self):

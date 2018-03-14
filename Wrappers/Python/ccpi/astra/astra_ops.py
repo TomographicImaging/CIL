@@ -17,9 +17,11 @@
 
 from ccpi.reconstruction.ops import Operator
 import numpy
+import astra
 from ccpi.framework import AcquisitionData, ImageData
 from ccpi.reconstruction.ops import PowerMethodNonsquare
-from ccpi.astra.astra_processors import *
+from ccpi.astra.astra_processors import AstraForwardProjector, AstraBackProjector, \
+     AstraForwardProjectorMC, AstraBackProjectorMC
 
 class AstraProjectorSimple(Operator):
     """ASTRA projector modified to use DataSet and geometry."""

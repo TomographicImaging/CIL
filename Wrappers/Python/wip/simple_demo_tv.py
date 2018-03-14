@@ -25,7 +25,7 @@ x[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 2.0
 plt.imshow(x)
 plt.show()
 
-vg = VolumeGeometry(N,N,None, 1,1,None)
+vg = ImageGeometry(N,N,None, 1,1,None)
 
 Phantom = VolumeData(x,geometry=vg)
 
@@ -46,12 +46,12 @@ OrigDetec = 0
 
 # Parallelbeam geometry test
 if test_case==1:
-    pg = SinogramGeometry('parallel',
+    pg = AcquisitionGeometry('parallel',
                           '2D',
                           angles,
                           det_num,det_w)
 elif test_case==2:
-    pg = SinogramGeometry('cone',
+    pg = AcquisitionGeometry('cone',
                           '2D',
                           angles,
                           det_num,

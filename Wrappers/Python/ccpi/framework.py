@@ -34,7 +34,7 @@ def find_key(dic, val):
     return [k for k, v in dic.items() if v == val][0]
 
 
-class VolumeGeometry:
+class ImageGeometry:
     
     def __init__(self, 
                  voxel_num_x=0, 
@@ -84,7 +84,7 @@ class VolumeGeometry:
             return 0
         
     
-class SinogramGeometry:
+class AcquisitionGeometry:
     
     def __init__(self, 
                  geom_type, 
@@ -1001,10 +1001,10 @@ if __name__ == '__main__':
     
     
     # create VolumeData from geometry
-    vgeometry = VolumeGeometry(voxel_num_x=2, voxel_num_y=3, channels=2)
+    vgeometry = ImageGeometry(voxel_num_x=2, voxel_num_y=3, channels=2)
     vol = VolumeData(geometry=vgeometry)
     
-    sgeometry = SinogramGeometry(dimension=2, angles=numpy.linspace(0, 180, num=20), 
+    sgeometry = AcquisitionGeometry(dimension=2, angles=numpy.linspace(0, 180, num=20), 
                                        geom_type='parallel', pixel_num_v=3,
                                        pixel_num_h=5 , channels=2)
     sino = SinogramData(geometry=sgeometry)

@@ -17,7 +17,7 @@
 
 from ccpi.reconstruction.ops import Operator
 import numpy
-from ccpi.framework import SinogramData, VolumeData
+from ccpi.framework import AcquisitionData, ImageData
 from ccpi.reconstruction.ops import PowerMethodNonsquare
 from ccpi.astra.astra_processors import *
 
@@ -44,13 +44,13 @@ class AstraProjectorSimple(Operator):
         self.s1 = None
     
     def direct(self, IM):
-        self.fp.setInput(IM)
-        out = self.fp.getOutput()
+        self.fp.set_input(IM)
+        out = self.fp.get_output()
         return out
     
     def adjoint(self, DATA):
-        self.bp.setInput(DATA)
-        out = self.bp.getOutput()
+        self.bp.set_input(DATA)
+        out = self.bp.get_output()
         return out
     
     #def delete(self):
@@ -90,13 +90,13 @@ class AstraProjectorMC(Operator):
         self.s1 = 50
     
     def direct(self, IM):
-        self.fp.setInput(IM)
-        out = self.fp.getOutput()
+        self.fp.set_input(IM)
+        out = self.fp.get_output()
         return out
     
     def adjoint(self, DATA):
-        self.bp.setInput(DATA)
-        out = self.bp.getOutput()
+        self.bp.set_input(DATA)
+        out = self.bp.get_output()
         return out
     
     #def delete(self):
@@ -163,7 +163,7 @@ class AstraProjector(Operator):
             sinogram_id, DATA = astra.create_sino(IM.as_array(), self.proj_id)
             astra.data2d.delete(sinogram_id)
             astra.data2d.delete(self.proj_id)
-        return SinogramData(DATA)
+        return AcquisitionData(DATA)
     def adjoint(self, DATA):
         """Applying backprojection to DATA [2D or 3D]"""
         if numpy.ndim(DATA) == 3:
@@ -180,7 +180,7 @@ class AstraProjector(Operator):
                                                      self.proj_id)        
             astra.data2d.delete(rec_id)
             astra.data2d.delete(self.proj_id)
-        return VolumeData(IM)
+        return ImageData(IM)
     
     def delete(self):
         astra.data2d.delete(self.proj_id)

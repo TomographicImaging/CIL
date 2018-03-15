@@ -19,6 +19,7 @@
 
 from ccpi.framework import DataSetProcessor, DataSet, AcquisitionData,\
  AcquisitionGeometry
+from ccpi.reconstruction.parallelbeam import alg as pbalg
 import numpy
 import h5py
 from scipy import ndimage
@@ -384,6 +385,47 @@ class CenterOfRotationFinder(DataSetProcessor):
         cor = CenterOfRotationFinder.find_center_vo(projections.as_array())
         
         return cor
+
+class CCPiForwardProjector(DataSetProcessor):
+    '''Normalization based on flat and dark
+    
+    This processor read in a AcquisitionData and normalises it based on 
+    the instrument reading with and without incident photons or neutrons.
+    
+    Input: AcquisitionData
+    Parameter: 2D projection with flat field (or stack)
+               2D projection with dark field (or stack)
+    Output: AcquisitionDataSetn
+    '''
+    
+    def __init__(self, angles = None, is_cone_beam = False , 
+                 image_geometry = None, acquisition_geometry = None):
+        kwargs = {
+                  'angles'  : None,
+                  'is_cone_beam' : False
+                  'image_geometry' : image_geometry, 
+                  'acquisition_geometry' : acquisition_geometry
+                  }
+        
+        super(CCPiForwardProjector, self).__init__(**kwargs)
+        
+    def check_input(self, dataset):
+        if dataset.number_of_dimensions == 3:
+               return True
+        else:
+            raise ValueError("Expected input dimensions is 2 or 3, got {0}"\
+                             .format(dataset.number_of_dimensions))
+
+    def process(self):
+        volume = self.get_input()
+        pixel_per_voxel = 1 # should be estimated from image_geometry and acquisition_geometry
+        if not self.is_cone_beam:
+            pixels = pbalg.pb_forward_project(volume.as_array(), 
+                                                  self.angles , 
+                                                  pixel_per_voxel)
+            return ImageData(pixels, deep_copy=True, )
+        else:
+            raise ValueError('Cannot process cone beam')
 
 def loadNexus(filename):
     '''Load a dataset stored in a NeXuS file (HDF5)'''

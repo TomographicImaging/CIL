@@ -59,25 +59,25 @@ class ImageGeometry:
         self.center_z = center_z  
         self.channels = channels
         
-    def getMinX(self):
+    def get_min_x(self):
         return self.center_x - 0.5*self.voxel_num_x*self.voxel_size_x
         
-    def getMaxX(self):
+    def get_max_x(self):
         return self.center_x + 0.5*self.voxel_num_x*self.voxel_size_x
         
-    def getMinY(self):
+    def get_min_y(self):
         return self.center_y - 0.5*self.voxel_num_y*self.voxel_size_y
         
-    def getMaxY(self):
+    def get_max_y(self):
         return self.center_y + 0.5*self.voxel_num_y*self.voxel_size_y
         
-    def getMinZ(self):
+    def get_min_z(self):
         if not voxel_num_z == 0:
             return self.center_z - 0.5*self.voxel_num_z*self.voxel_size_z
         else:
             return 0
         
-    def getMaxZ(self):
+    def get_max_z(self):
         if not voxel_num_z == 0:
             return self.center_z + 0.5*self.voxel_num_z*self.voxel_size_z
         else:

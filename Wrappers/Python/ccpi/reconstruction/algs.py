@@ -95,7 +95,7 @@ def FBPD(x_init, f=None, g=None, h=None, opt=None):
 
     # initialization
     x = x_init
-    y = h.dir_op(x);
+    y = h.op.direct(x);
     
     timing = numpy.zeros(max_iter)
     criter = numpy.zeros(max_iter)
@@ -107,16 +107,16 @@ def FBPD(x_init, f=None, g=None, h=None, opt=None):
     
         # primal forward-backward step
         x_old = x;
-        x = x - tau * ( g.grad(x) + h.adj_op(y) );
+        x = x - tau * ( g.grad(x) + h.op.adjoint(y) );
         x = f.prox(x, tau);
     
         # dual forward-backward step
-        y = y + sigma * h.dir_op(2*x - x_old);
+        y = y + sigma * h.op.direct(2*x - x_old);
         y = y - sigma * h.prox(inv_sigma*y, inv_sigma);   
 
         # time and criterion
         timing[it] = time.time() - t
-        criter[it] = f.fun(x) + g.fun(x) + h.fun(h.dir_op(x));
+        criter[it] = f.fun(x) + g.fun(x) + h.fun(h.op.direct(x));
            
         # stopping rule
         #if np.linalg.norm(x - x_old) < tol * np.linalg.norm(x_old) and it > 10:
@@ -126,3 +126,39 @@ def FBPD(x_init, f=None, g=None, h=None, opt=None):
     timing = numpy.cumsum(timing[0:it+1]);
     
     return x, it, timing, criter
+
+def CGLS(A,b,max_iter,x_init):
+    '''Conjugate Gradient Least Squares algorithm'''
+    
+    r = b.clone()
+    x = x_init.clone()
+    
+    d = A.adjoint(r)
+    
+    normr2 = (d**2).sum()
+    
+    timing = numpy.zeros(max_iter)
+    criter = numpy.zeros(max_iter)
+
+    # algorithm loop
+    for it in range(0, max_iter):
+    
+        t = time.time()
+        
+        Ad = A.direct(d)
+        alpha = normr2/( (Ad**2).sum() )
+        x  = x + alpha*d
+        r  = r - alpha*Ad
+        s  = A.adjoint(r)
+        
+        normr2_new = (s**2).sum()
+        beta = normr2_new/normr2
+        normr2 = normr2_new
+        d = s + beta*d
+        
+        # time and criterion
+        timing[it] = time.time() - t
+        criter[it] = (r**2).sum()
+    
+    return x, it, timing, criter
+    

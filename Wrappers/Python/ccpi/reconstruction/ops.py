@@ -19,10 +19,10 @@
 
 import numpy
 from scipy.sparse.linalg import svds
-from ccpi.framework import DataSet, VolumeData, SinogramData, DataSetProcessor
+from ccpi.framework import DataContainer
 
 # Maybe operators need to know what types they take as inputs/outputs
-# to not just use generic DataSet
+# to not just use generic DataContainer
 
 
 class Operator(object):
@@ -60,10 +60,10 @@ class LinearOperatorMatrix(Operator):
         super(LinearOperatorMatrix, self).__init__()
         
     def direct(self,x):
-        return DataSet(numpy.dot(self.A,x.as_array()))
+        return DataContainer(numpy.dot(self.A,x.as_array()))
     
     def adjoint(self,x):
-        return DataSet(numpy.dot(self.A.transpose(),x.as_array()))
+        return DataContainer(numpy.dot(self.A.transpose(),x.as_array()))
     
     def size(self):
         return self.A.shape
@@ -93,11 +93,44 @@ class Identity(Operator):
     def get_max_sing_val(self):
         return self.s1
 
+class FiniteDiff2D(Operator):
+    def __init__(self):
+        self.s1 = 8.0
+        super(FiniteDiff2D, self).__init__()
+        
+    def direct(self,x):
+        '''Forward differences with Neumann BC.'''
+        d1 = numpy.zeros_like(x.as_array())
+        d1[:,:-1] = x.as_array()[:,1:] - x.as_array()[:,:-1]
+        d2 = numpy.zeros_like(x.as_array())
+        d2[:-1,:] = x.as_array()[1:,:] - x.as_array()[:-1,:]
+        d = numpy.stack((d1,d2),2)
+        
+        return type(x)(d,geometry=x.geometry)
+    
+    def adjoint(self,x):
+        '''Backward differences, Newumann BC.'''
+        Nrows, Ncols, Nchannels = x.as_array().shape
+        zer = numpy.zeros((Nrows,1))
+        xxx = x.as_array()[:,:-1,0]
+        h = numpy.concatenate((zer,xxx), 1) - numpy.concatenate((xxx,zer), 1)
+        
+        zer = numpy.zeros((1,Ncols))
+        xxx = x.as_array()[:-1,:,1]
+        v = numpy.concatenate((zer,xxx), 0) - numpy.concatenate((xxx,zer), 0)
+        return type(x)(h + v,geometry=x.geometry)
+    
+    def size(self):
+        return NotImplemented
+    
+    def get_max_sing_val(self):
+        return self.s1
+
 
 def PowerMethodNonsquare(op,numiters):
     # Initialise random
     inputsize = op.size()[1]
-    x0 = DataSet(numpy.random.randn(inputsize[0],inputsize[1]))
+    x0 = DataContainer(numpy.random.randn(inputsize[0],inputsize[1]))
     s = numpy.zeros(numiters)
     # Loop
     for it in numpy.arange(numiters):

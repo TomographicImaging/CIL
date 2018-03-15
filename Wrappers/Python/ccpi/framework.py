@@ -33,67 +33,114 @@ def find_key(dic, val):
     """return the key of dictionary dic given the value"""
     return [k for k, v in dic.items() if v == val][0]
 
-class CCPiBaseClass(ABC):
-    def __init__(self, **kwargs):
-        self.acceptedInputKeywords = []
-        self.pars = {}
-        self.debug = True
-        # add keyworded arguments as accepted input keywords and add to the
-        # parameters
-        for key, value in kwargs.items():
-            self.acceptedInputKeywords.append(key)
-            #print ("key {0}".format(key))
-            #self.setParameter(key.__name__=value)
-            self.setParameter(**{key:value})
-    
-    def setParameter(self, **kwargs):
-        '''set named parameter for the reconstructor engine
-        
-        raises Exception if the named parameter is not recognized
-        
-        '''
-        for key , value in kwargs.items():
-            if key in self.acceptedInputKeywords:
-                self.pars[key] = value
-            else:
-                raise KeyError('Wrong parameter "{0}" for {1}'.format(key, 
-                               self.__class__.__name__ ))
-    # setParameter
 
-    def getParameter(self, key):
-        if type(key) is str:
-            if key in self.acceptedInputKeywords:
-                return self.pars[key]
-            else:
-                raise KeyError('Unrecongnised parameter: {0} '.format(key) )
-        elif type(key) is list:
-            outpars = []
-            for k in key:
-                outpars.append(self.getParameter(k))
-            return outpars
-        else:
-            raise Exception('Unhandled input {0}' .format(str(type(key))))
-    #getParameter
-    def getParameterMap(self, key):
-        if type(key) is str:
-            if key in self.acceptedInputKeywords:
-                return self.pars[key]
-            else:
-                raise KeyError('Unrecongnised parameter: {0} '.format(key) )
-        elif type(key) is list:
-            outpars = {}
-            for k in key:
-                outpars[k] = self.getParameter(k)
-            return outpars
-        else:
-            raise Exception('Unhandled input {0}' .format(str(type(key))))
-    #getParameter
+class ImageGeometry:
     
-    def log(self, msg):
-        if self.debug:
-            print ("{0}: {1}".format(self.__class__.__name__, msg))
+    def __init__(self, 
+                 voxel_num_x=0, 
+                 voxel_num_y=0, 
+                 voxel_num_z=0, 
+                 voxel_size_x=1, 
+                 voxel_size_y=1, 
+                 voxel_size_z=1, 
+                 center_x=0, 
+                 center_y=0, 
+                 center_z=0, 
+                 channels=1):
+        
+        self.voxel_num_x = voxel_num_x
+        self.voxel_num_y = voxel_num_y
+        self.voxel_num_z = voxel_num_z
+        self.voxel_size_x = voxel_size_x
+        self.voxel_size_y = voxel_size_y
+        self.voxel_size_z = voxel_size_z
+        self.center_x = center_x
+        self.center_y = center_y
+        self.center_z = center_z  
+        self.channels = channels
+        
+    def get_min_x(self):
+        return self.center_x - 0.5*self.voxel_num_x*self.voxel_size_x
+        
+    def get_max_x(self):
+        return self.center_x + 0.5*self.voxel_num_x*self.voxel_size_x
+        
+    def get_min_y(self):
+        return self.center_y - 0.5*self.voxel_num_y*self.voxel_size_y
+        
+    def get_max_y(self):
+        return self.center_y + 0.5*self.voxel_num_y*self.voxel_size_y
+        
+    def get_min_z(self):
+        if not voxel_num_z == 0:
+            return self.center_z - 0.5*self.voxel_num_z*self.voxel_size_z
+        else:
+            return 0
+        
+    def get_max_z(self):
+        if not voxel_num_z == 0:
+            return self.center_z + 0.5*self.voxel_num_z*self.voxel_size_z
+        else:
+            return 0
+        
+    
+class AcquisitionGeometry:
+    
+    def __init__(self, 
+                 geom_type, 
+                 dimension, 
+                 angles, 
+                 pixel_num_h=0, 
+                 pixel_size_h=1, 
+                 pixel_num_v=0, 
+                 pixel_size_v=1, 
+                 dist_source_center=None, 
+                 dist_center_detector=None, 
+                 channels=1
+                 ):
+        """
+        General inputs for standard type projection geometries
+        detectorDomain or detectorpixelSize:
+            If 2D
+                If scalar: Width of detector or single detector pixel
+                If 2-vec: Error
+            If 3D
+                If scalar: Width in both dimensions
+                If 2-vec: Vertical then horizontal size
+        grid
+            If 2D
+                If scalar: number of detectors
+                If 2-vec: error
+            If 3D
+                If scalar: Square grid that size
+                If 2-vec vertical then horizontal size
+        cone or parallel
+        2D or 3D
+        parallel_parameters: ?
+        cone_parameters:
+            source_to_center_dist (if parallel: NaN)
+            center_to_detector_dist (if parallel: NaN)
+        standard or nonstandard (vec) geometry
+        angles
+        angles_format radians or degrees
+        """
+        self.geom_type = geom_type   # 'parallel' or 'cone'
+        self.dimension = dimension # 2D or 3D
+        self.angles = angles
+        
+        self.dist_source_center = dist_source_center
+        self.dist_center_detector = dist_center_detector
+        
+        self.pixel_num_h = pixel_num_h
+        self.pixel_size_h = pixel_size_h
+        self.pixel_num_v = pixel_num_v
+        self.pixel_size_v = pixel_size_v
+        
+        self.channels = channels
+
+
             
-class DataSet(object):
+class DataContainer(object):
     '''Generic class to hold data
     
     Data is currently held in a numpy arrays'''
@@ -105,7 +152,7 @@ class DataSet(object):
         self.shape = numpy.shape(array)
         self.number_of_dimensions = len (self.shape)
         self.dimension_labels = {}
-        self.geometry = None # Only relevant for SinogramData and VolumeData
+        self.geometry = None # Only relevant for AcquisitionData and ImageData
         
         if dimension_labels is not None and \
            len (dimension_labels) == self.number_of_dimensions:
@@ -119,7 +166,7 @@ class DataSet(object):
             if deep_copy:
                 self.array = array[:]
             else:
-                self.array = array
+                self.array = array    
         else:
             raise TypeError('Array must be NumpyArray, passed {0}'\
                             .format(type(array)))
@@ -133,17 +180,18 @@ class DataSet(object):
         
 
     def as_array(self, dimensions=None):
-        '''Returns the DataSet as Numpy Array
+        '''Returns the DataContainer as Numpy Array
         
         Returns the pointer to the array if dimensions is not set.
-        If dimensions is set, it first creates a new DataSet with the subset
+        If dimensions is set, it first creates a new DataContainer with the subset
         and then it returns the pointer to the array'''
         if dimensions is not None:
             return self.subset(dimensions).as_array()
         return self.array
-        
-    def subset(self, dimensions=None):
-        '''Creates a DataSet containing a subset of self according to the 
+    
+    
+    def subset(self, dimensions=None, **kw):
+        '''Creates a DataContainer containing a subset of self according to the 
         labels in dimensions'''
         if dimensions is None:
             return self.array.copy()
@@ -153,7 +201,7 @@ class DataSet(object):
             proceed = True
             unknown_key = ''
             # axis_order contains the order of the axis that the user wants
-            # in the output DataSet
+            # in the output DataContainer
             axis_order = []
             if type(dimensions) == list:
                 for dl in dimensions:
@@ -164,7 +212,7 @@ class DataSet(object):
                     else:
                         axis_order.append(find_key(self.dimension_labels, dl))
                 if not proceed:
-                    raise KeyError('Unknown key specified {0}'.format(dl))
+                    raise KeyError('Subset error: Unknown key specified {0}'.format(dl))
                     
                 # slice away the unwanted data from the array
                 unwanted_dimensions = self.dimension_labels.copy()
@@ -176,13 +224,21 @@ class DataSet(object):
                 #print ("left_dimensions {0}".format(left_dimensions))
                 #new_shape = [self.shape[ax] for ax in axis_order]
                 #print ("new_shape {0}".format(new_shape))
-                command = "self.array"
+                command = "self.array["
                 for i in range(self.number_of_dimensions):
                     if self.dimension_labels[i] in unwanted_dimensions.values():
-                        command = command + "[0]"
+                        value = 0
+                        for k,v in kw.items():
+                            if k == self.dimension_labels[i]:
+                                value = v
+                                
+                        command = command + str(value)
                     else:
-                        command = command + "[:]"
-                #print ("command {0}".format(command))
+                        command = command + ":"
+                    if i < self.number_of_dimensions -1:
+                        command = command + ','
+                command = command + ']'
+                
                 cleaned = eval(command)
                 # cleaned has collapsed dimensions in the same order of
                 # self.array, but we want it in the order stated in the 
@@ -211,12 +267,12 @@ class DataSet(object):
                                      numpy.shape(array)))
         self.array = array[:]
         
-    def checkDimensions(self, other):
+    def check_dimensions(self, other):
         return self.shape == other.shape
         
     def __add__(self, other):
-        if issubclass(type(other), DataSet):    
-            if self.checkDimensions(other):
+        if issubclass(type(other), DataContainer):    
+            if self.check_dimensions(other):
                 out = self.as_array() + other.as_array()
                 return type(self)(out, 
                                deep_copy=True, 
@@ -232,13 +288,13 @@ class DataSet(object):
                                dimension_labels=self.dimension_labels,
                                geometry=self.geometry)
         else:
-            raise TypeError('Cannot {0} DataSet with {1}'.format("add" ,
+            raise TypeError('Cannot {0} DataContainer with {1}'.format("add" ,
                             type(other)))
     # __add__
     
     def __sub__(self, other):
-        if issubclass(type(other), DataSet):    
-            if self.checkDimensions(other):
+        if issubclass(type(other), DataContainer):    
+            if self.check_dimensions(other):
                 out = self.as_array() - other.as_array()
                 return type(self)(out, 
                                deep_copy=True, 
@@ -253,7 +309,7 @@ class DataSet(object):
                                dimension_labels=self.dimension_labels,
                                geometry=self.geometry)
         else:
-            raise TypeError('Cannot {0} DataSet with {1}'.format("subtract" ,
+            raise TypeError('Cannot {0} DataContainer with {1}'.format("subtract" ,
                             type(other)))
     # __sub__
     def __truediv__(self,other):
@@ -261,8 +317,8 @@ class DataSet(object):
     
     def __div__(self, other):
         print ("calling __div__")
-        if issubclass(type(other), DataSet):    
-            if self.checkDimensions(other):
+        if issubclass(type(other), DataContainer):    
+            if self.check_dimensions(other):
                 out = self.as_array() / other.as_array()
                 return type(self)(out, 
                                deep_copy=True, 
@@ -277,13 +333,13 @@ class DataSet(object):
                                dimension_labels=self.dimension_labels,
                                geometry=self.geometry)
         else:
-            raise TypeError('Cannot {0} DataSet with {1}'.format("divide" ,
+            raise TypeError('Cannot {0} DataContainer with {1}'.format("divide" ,
                             type(other)))
     # __div__
     
     def __pow__(self, other):
-        if issubclass(type(other), DataSet):    
-            if self.checkDimensions(other):
+        if issubclass(type(other), DataContainer):    
+            if self.check_dimensions(other):
                 out = self.as_array() ** other.as_array()
                 return type(self)(out, 
                                deep_copy=True, 
@@ -298,13 +354,13 @@ class DataSet(object):
                                dimension_labels=self.dimension_labels,
                                geometry=self.geometry)
         else:
-            raise TypeError('Cannot {0} DataSet with {1}'.format("power" ,
+            raise TypeError('Cannot {0} DataContainer with {1}'.format("power" ,
                             type(other)))
     # __pow__
     
     def __mul__(self, other):
-        if issubclass(type(other), DataSet):    
-            if self.checkDimensions(other):
+        if issubclass(type(other), DataContainer):    
+            if self.check_dimensions(other):
                 out = self.as_array() * other.as_array()
                 return type(self)(out, 
                                deep_copy=True, 
@@ -319,7 +375,7 @@ class DataSet(object):
                                dimension_labels=self.dimension_labels,
                                geometry=self.geometry)
         else:
-            raise TypeError('Cannot {0} DataSet with {1}'.format("multiply" ,
+            raise TypeError('Cannot {0} DataContainer with {1}'.format("multiply" ,
                             type(other)))
     # __mul__
     
@@ -376,8 +432,8 @@ class DataSet(object):
             return type(self)(fother ** self.array , 
                            dimension_labels=self.dimension_labels,
                            geometry=self.geometry)
-        elif issubclass(other, DataSet):
-            if self.checkDimensions(other):
+        elif issubclass(other, DataContainer):
+            if self.check_dimensions(other):
                 return type(self)(other.as_array() ** self.array , 
                            dimension_labels=self.dimension_labels,
                            geometry=self.geometry)
@@ -413,48 +469,98 @@ class DataSet(object):
         repres += "Number of dimensions: {0}\n".format(self.number_of_dimensions)
         repres += "Shape: {0}\n".format(self.shape)
         repres += "Axis labels: {0}\n".format(self.dimension_labels)
-        repres += "Representation: {0}\n".format(self.array)
+        repres += "Representation: \n{0}\n".format(self.array)
         return repres
+    
+    def clone(self):
+        '''returns a copy of itself'''
+        
+        return type(self)(self.array, 
+                          dimension_labels=self.dimension_labels,
+                          deep_copy=True,
+                          geometry=self.geometry )
+        
                 
                     
                 
-class VolumeData(DataSet):
-    '''DataSet for holding 2D or 3D dataset'''
+class ImageData(DataContainer):
+    '''DataContainer for holding 2D or 3D DataContainer'''
     def __init__(self, 
-                 array, 
+                 array = None, 
                  deep_copy=True, 
                  dimension_labels=None, 
                  **kwargs):
         
-        if type(array) == DataSet:
-            # if the array is a DataSet get the info from there
-            if not ( array.number_of_dimensions == 2 or \
-                     array.number_of_dimensions == 3 ):
-                raise ValueError('Number of dimensions are not 2 or 3: {0}'\
-                                 .format(array.number_of_dimensions))
-            
-            #DataSet.__init__(self, array.as_array(), deep_copy,
-            #                 array.dimension_labels, **kwargs)
-            super(VolumeData, self).__init__(array.as_array(), deep_copy,
-                             array.dimension_labels, **kwargs)
-        elif type(array) == numpy.ndarray:
-            if not ( array.ndim == 3 or array.ndim == 2 ):
-                raise ValueError(
-                        'Number of dimensions are not 3 or 2 : {0}'\
-                        .format(array.ndim))
+        self.geometry = None
+        if array is None:
+            if 'geometry' in kwargs.keys():
+                geometry  = kwargs['geometry']
+                self.geometry = geometry
+                channels  = geometry.channels
+                horiz_x   = geometry.voxel_num_x
+                horiz_y   = geometry.voxel_num_y
+                vert      = 1 if geometry.voxel_num_z is None\
+                              else geometry.voxel_num_z # this should be 1 for 2D
                 
-            if dimension_labels is None:
-                if array.ndim == 3:
-                    dimension_labels = ['horizontal_x' , 
-                                        'horizontal_y' , 
-                                        'vertical']
+                if channels > 1:
+                    if vert > 1:
+                        shape = (channels, vert, horiz_y, horiz_x)
+                        dim_labels = ['channel' ,'vertical' , 'horizontal_y' , 
+                                      'horizontal_x']
+                    else:
+                        shape = (channels , horiz_y, horiz_x)
+                        dim_labels = ['channel' , 'horizontal_y' , 
+                                      'horizontal_x']
                 else:
-                    dimension_labels = ['horizontal' , 
-                                        'vertical']   
-            
-            #DataSet.__init__(self, array, deep_copy, dimension_labels, **kwargs)
-            super(VolumeData, self).__init__(array, deep_copy, 
-                 dimension_labels, **kwargs)
+                    if vert > 1:
+                        shape = (vert, horiz_y, horiz_x)
+                        dim_labels = ['vertical' , 'horizontal_y' , 
+                                      'horizontal_x']
+                    else:
+                        shape = (horiz_y, horiz_x)
+                        dim_labels = ['horizontal_y' , 
+                                      'horizontal_x']
+                        
+                array = numpy.zeros( shape , dtype=numpy.float32) 
+                super(ImageData, self).__init__(array, deep_copy,
+                                 dim_labels, **kwargs)
+                
+            else:
+                raise ValueError('Please pass either a DataContainer, ' +\
+                                 'a numpy array or a geometry')
+        else:
+            if type(array) == DataContainer:
+                # if the array is a DataContainer get the info from there
+                if not ( array.number_of_dimensions == 2 or \
+                         array.number_of_dimensions == 3 or \
+                         array.number_of_dimensions == 4):
+                    raise ValueError('Number of dimensions are not 2 or 3 or 4: {0}'\
+                                     .format(array.number_of_dimensions))
+                
+                #DataContainer.__init__(self, array.as_array(), deep_copy,
+                #                 array.dimension_labels, **kwargs)
+                super(ImageData, self).__init__(array.as_array(), deep_copy,
+                                 array.dimension_labels, **kwargs)
+            elif type(array) == numpy.ndarray:
+                if not ( array.ndim == 2 or array.ndim == 3 or array.ndim == 4 ):
+                    raise ValueError(
+                            'Number of dimensions are not 2 or 3 or 4 : {0}'\
+                            .format(array.ndim))
+                    
+                if dimension_labels is None:
+                    if array.ndim == 4:
+                        dimension_labels = ['channel' ,'vertical' , 'horizontal_y' , 
+                                      'horizontal_x']
+                    elif array.ndim == 3:
+                        dimension_labels = ['vertical' , 'horizontal_y' , 
+                                      'horizontal_x']
+                    else:
+                        dimension_labels = ['horizontal_y' , 
+                                      'horizontal_x']   
+                
+                #DataContainer.__init__(self, array, deep_copy, dimension_labels, **kwargs)
+                super(ImageData, self).__init__(array, deep_copy, 
+                     dimension_labels, **kwargs)
        
         # load metadata from kwargs if present
         for key, value in kwargs.items():
@@ -466,43 +572,88 @@ class VolumeData(DataSet):
                         self.spacing = value
                         
 
-class SinogramData(DataSet):
-    '''DataSet for holding 2D or 3D sinogram'''
+class AcquisitionData(DataContainer):
+    '''DataContainer for holding 2D or 3D sinogram'''
     def __init__(self, 
-                 array, 
+                 array = None, 
                  deep_copy=True, 
                  dimension_labels=None, 
                  **kwargs):
-        
-        if type(array) == DataSet:
-            # if the array is a DataSet get the info from there
-            if not ( array.number_of_dimensions == 2 or \
-                     array.number_of_dimensions == 3 ):
-                raise ValueError('Number of dimensions are not 2 or 3: {0}'\
-                                 .format(array.number_of_dimensions))
-            
-            DataSet.__init__(self, array.as_array(), deep_copy,
-                             array.dimension_labels, **kwargs)
-        elif type(array) == numpy.ndarray:
-            if not ( array.ndim == 3 or array.ndim == 2 ):
-                raise ValueError('Number of dimensions are != 3: {0}'\
-                                 .format(array.ndim))
-            if dimension_labels is None:
-                if array.ndim == 3:
-                    dimension_labels = ['angle' , 
-                                        'horizontal' , 
-                                        'vertical']
+        self.geometry = None
+        if array is None:
+            if 'geometry' in kwargs.keys():
+                geometry  = kwargs['geometry']
+                self.geometry = geometry
+                channels  = geometry.channels
+                horiz   = geometry.pixel_num_h
+                vert   = geometry.pixel_num_v
+                angles = geometry.angles
+                num_of_angles = numpy.shape(angles)[0]
+                
+                
+                if channels > 1:
+                    if vert > 1:
+                        shape = (channels, num_of_angles , vert, horiz)
+                        dim_labels = ['channel' , ' angle' ,
+                                      'vertical' , 'horizontal']
+                    else:
+                        shape = (channels , num_of_angles, horiz)
+                        dim_labels = ['channel' , 'angle' , 
+                                      'horizontal']
                 else:
-                    dimension_labels = ['angle' , 
-                                        'horizontal']
-            DataSet.__init__(self, array, deep_copy, dimension_labels, **kwargs)
+                    if vert > 1:
+                        shape = (num_of_angles, vert, horiz)
+                        dim_labels = ['angles' , 'vertical' , 
+                                      'horizontal']
+                    else:
+                        shape = (num_of_angles, horiz)
+                        dim_labels = ['angles' , 
+                                      'horizontal']
+                
+                array = numpy.zeros( shape , dtype=numpy.float32) 
+                super(AcquisitionData, self).__init__(array, deep_copy,
+                                 dim_labels, **kwargs)
+        else:
             
+            if type(array) == DataContainer:
+                # if the array is a DataContainer get the info from there
+                if not ( array.number_of_dimensions == 2 or \
+                         array.number_of_dimensions == 3 or \
+                         array.number_of_dimensions == 4):
+                    raise ValueError('Number of dimensions are not 2 or 3 or 4: {0}'\
+                                     .format(array.number_of_dimensions))
+                
+                #DataContainer.__init__(self, array.as_array(), deep_copy,
+                #                 array.dimension_labels, **kwargs)
+                super(AcquisitionData, self).__init__(array.as_array(), deep_copy,
+                                 array.dimension_labels, **kwargs)
+            elif type(array) == numpy.ndarray:
+                if not ( array.ndim == 2 or array.ndim == 3 or array.ndim == 4 ):
+                    raise ValueError(
+                            'Number of dimensions are not 2 or 3 or 4 : {0}'\
+                            .format(array.ndim))
+                    
+                if dimension_labels is None:
+                    if array.ndim == 4:
+                        dimension_labels = ['channel' ,'angle' , 'vertical' , 
+                                      'horizontal']
+                    elif array.ndim == 3:
+                        dimension_labels = ['angle' , 'vertical' , 
+                                      'horizontal']
+                    else:
+                        dimension_labels = ['angle' , 
+                                      'horizontal']   
+                
+                #DataContainer.__init__(self, array, deep_copy, dimension_labels, **kwargs)
+                super(AcquisitionData, self).__init__(array, deep_copy, 
+                     dimension_labels, **kwargs)
+                
             
 class DataSetProcessor(object):
-    '''Defines a generic DataSet processor
+    '''Defines a generic DataContainer processor
     
-    accepts DataSet as inputs and 
-    outputs DataSet
+    accepts DataContainer as inputs and 
+    outputs DataContainer
     additional attributes can be defined with __setattr__
     '''
     
@@ -519,7 +670,7 @@ class DataSetProcessor(object):
     
     def __setattr__(self, name, value):
         if name == 'input':
-            self.setInput(value)
+            self.set_input(value)
         elif name in self.__dict__.keys():
             self.__dict__[name] = value
             self.__dict__['mTime'] = datetime.now()
@@ -527,23 +678,23 @@ class DataSetProcessor(object):
             raise KeyError('Attribute {0} not found'.format(name))
         #pass
     
-    def setInput(self, dataset):
-        if issubclass(type(dataset), DataSet):
-            if self.checkInput(dataset):
+    def set_input(self, dataset):
+        if issubclass(type(dataset), DataContainer):
+            if self.check_input(dataset):
                 self.__dict__['input'] = dataset
         else:
             raise TypeError("Input type mismatch: got {0} expecting {1}"\
-                            .format(type(dataset), DataSet))
+                            .format(type(dataset), DataContainer))
     
-    def checkInput(self, dataset):
-        '''Checks parameters of the input DataSet
+    def check_input(self, dataset):
+        '''Checks parameters of the input DataContainer
         
-        Should raise an Error if the DataSet does not match expectation, e.g.
-        if the expected input DataSet is 3D and the Processor expects 2D.
+        Should raise an Error if the DataContainer does not match expectation, e.g.
+        if the expected input DataContainer is 3D and the Processor expects 2D.
         '''
-        raise NotImplementedError('Implement basic checks for input DataSet')
+        raise NotImplementedError('Implement basic checks for input DataContainer')
         
-    def getOutput(self):
+    def get_output(self):
         if None in self.__dict__.values():
             raise ValueError('Not all parameters have been passed')
         shouldRun = False
@@ -560,21 +711,21 @@ class DataSetProcessor(object):
         self.runTime = datetime.now()
         return self.process()
     
-    def setInputProcessor(self, processor):
+    def set_input_processor(self, processor):
         if issubclass(type(processor), DataSetProcessor):
             self.__dict__['input'] = processor
         else:
             raise TypeError("Input type mismatch: got {0} expecting {1}"\
                             .format(type(processor), DataSetProcessor))
         
-    def getInput(self):
-        '''returns the input DataSet
+    def get_input(self):
+        '''returns the input DataContainer
         
         It is useful in the case the user has provided a DataSetProcessor as
         input
         '''
         if issubclass(type(self.input), DataSetProcessor):
-            dsi = self.input.getOutput()
+            dsi = self.input.get_output()
         else:
             dsi = self.input
         return dsi
@@ -586,8 +737,8 @@ class DataSetProcessor23D(DataSetProcessor):
     '''Regularizers DataSetProcessor
     '''
             
-    def checkInput(self, dataset):
-        '''Checks number of dimensions input DataSet
+    def check_input(self, dataset):
+        '''Checks number of dimensions input DataContainer
         
         Expected input is 2D or 3D
         '''
@@ -609,7 +760,7 @@ class AX(DataSetProcessor):
 
     a is a scalar
 
-    x a DataSet.
+    x a DataContainer.
     '''
     
     def __init__(self):
@@ -620,15 +771,15 @@ class AX(DataSetProcessor):
         #DataSetProcessor.__init__(self, **kwargs)
         super(AX, self).__init__(**kwargs)
     
-    def checkInput(self, dataset):
+    def check_input(self, dataset):
         return True
         
     def process(self):
         
-        dsi = self.getInput()
+        dsi = self.get_input()
         a = self.scalar
         
-        y = DataSet( a * dsi.as_array() , True, 
+        y = DataContainer( a * dsi.as_array() , True, 
                     dimension_labels=dsi.dimension_labels )
         #self.setParameter(output_dataset=y)
         return y
@@ -639,7 +790,7 @@ class AX(DataSetProcessor):
 class PixelByPixelDataSetProcessor(DataSetProcessor):
     '''Example DataSetProcessor
     
-    This processor applies a python function to each pixel of the DataSet
+    This processor applies a python function to each pixel of the DataContainer
     
     f is a python function
 
@@ -653,18 +804,18 @@ class PixelByPixelDataSetProcessor(DataSetProcessor):
         #DataSetProcessor.__init__(self, **kwargs)
         super(PixelByPixelDataSetProcessor, self).__init__(**kwargs)
         
-    def checkInput(self, dataset):
+    def check_input(self, dataset):
         return True
     
     def process(self):
         
         pyfunc = self.pyfunc
-        dsi = self.getInput()
+        dsi = self.get_input()
         
         eval_func = numpy.frompyfunc(pyfunc,1,1)
 
         
-        y = DataSet( eval_func( dsi.as_array() ) , True, 
+        y = DataContainer( eval_func( dsi.as_array() ) , True, 
                     dimension_labels=dsi.dimension_labels )
         return y
     
@@ -681,7 +832,7 @@ if __name__ == '__main__':
     print("a refcount " , sys.getrefcount(a))
     a = numpy.reshape(a, shape)
     print("a refcount " , sys.getrefcount(a))
-    ds = DataSet(a, False, ['X', 'Y','Z' ,'W'])
+    ds = DataContainer(a, False, ['X', 'Y','Z' ,'W'])
     print("a refcount " , sys.getrefcount(a))
     print ("ds label {0}".format(ds.dimension_labels))
     subset = ['W' ,'X']
@@ -692,34 +843,34 @@ if __name__ == '__main__':
     c = ds.subset(['Z','W','X'])
     print("a refcount " , sys.getrefcount(a))
     
-    # Create a VolumeData sharing the array with c
-    volume0 = VolumeData(c.as_array(), False, dimensions = c.dimension_labels)
-    volume1 = VolumeData(c, False)
+    # Create a ImageData sharing the array with c
+    volume0 = ImageData(c.as_array(), False, dimensions = c.dimension_labels)
+    volume1 = ImageData(c, False)
     
     print ("volume0 {0} volume1 {1}".format(id(volume0.array),
            id(volume1.array)))
     
-    # Create a VolumeData copying the array from c
-    volume2 = VolumeData(c.as_array(), dimensions = c.dimension_labels)
-    volume3 = VolumeData(c)
+    # Create a ImageData copying the array from c
+    volume2 = ImageData(c.as_array(), dimensions = c.dimension_labels)
+    volume3 = ImageData(c)
     
     print ("volume2 {0} volume3 {1}".format(id(volume2.array),
            id(volume3.array)))
         
     # single number DataSet
-    sn = DataSet(numpy.asarray([1]))
+    sn = DataContainer(numpy.asarray([1]))
     
     ax = AX()
     ax.scalar = 2
-    ax.setInput(c)
+    ax.set_input(c)
     #ax.apply()
     print ("ax  in {0} out {1}".format(c.as_array().flatten(),
-           ax.getOutput().as_array().flatten()))
+           ax.get_output().as_array().flatten()))
     axm = AX()
     axm.scalar = 0.5
-    axm.setInput(c)
+    axm.set_input(c)
     #axm.apply()
-    print ("axm in {0} out {1}".format(c.as_array(), axm.getOutput().as_array()))
+    print ("axm in {0} out {1}".format(c.as_array(), axm.get_output().as_array()))
     
     # create a PixelByPixelDataSetProcessor
     
@@ -727,20 +878,20 @@ if __name__ == '__main__':
     pyfunc = lambda x: -x if x > 20 else x
     clip = PixelByPixelDataSetProcessor()
     clip.pyfunc = pyfunc 
-    clip.setInput(c)    
+    clip.set_input(c)    
     #clip.apply()
     
-    print ("clip in {0} out {1}".format(c.as_array(), clip.getOutput().as_array()))
+    print ("clip in {0} out {1}".format(c.as_array(), clip.get_output().as_array()))
     
     #dsp = DataSetProcessor()
-    #dsp.setInput(ds)
+    #dsp.set_input(ds)
     #dsp.input = a
     # pipeline
 
     chain = AX()
     chain.scalar = 0.5
-    chain.setInputProcessor(ax)
-    print ("chain in {0} out {1}".format(ax.getOutput().as_array(), chain.getOutput().as_array()))
+    chain.set_input_processor(ax)
+    print ("chain in {0} out {1}".format(ax.get_output().as_array(), chain.get_output().as_array()))
     
     # testing arithmetic operations
     
@@ -770,7 +921,35 @@ if __name__ == '__main__':
     
     s = [i for i in range(3 * 4 * 4)]
     s = numpy.reshape(numpy.asarray(s), (3,4,4))
-    sino = SinogramData( s )
+    sino = AcquisitionData( s )
+    
+    shape = (4,3,2)
+    a = [i for i in range(2*3*4)]
+    a = numpy.asarray(a)
+    a = numpy.reshape(a, shape)
+    print (numpy.shape(a))
+    ds = DataContainer(a, True, ['X', 'Y','Z'])
+    # this means that I expect the X to be of length 2 ,
+    # y of length 3 and z of length 4
+    subset = ['Y' ,'Z']
+    b0 = ds.subset( subset )
+    print ("shape b 3,2? {0}".format(numpy.shape(b0.as_array())))
+    # expectation on b is that it is 
+    # 3x2 cut at z = 0
+    
+    subset = ['X' ,'Y']
+    b1 = ds.subset( subset , Z=1)
+    print ("shape b 2,3? {0}".format(numpy.shape(b1.as_array())))
     
     
+
+    # create VolumeData from geometry
+    vgeometry = ImageGeometry(voxel_num_x=2, voxel_num_y=3, channels=2)
+    vol = VolumeData(geometry=vgeometry)
+    
+    sgeometry = AcquisitionGeometry(dimension=2, angles=numpy.linspace(0, 180, num=20), 
+                                       geom_type='parallel', pixel_num_v=3,
+                                       pixel_num_h=5 , channels=2)
+    sino = AcquisitionData(geometry=sgeometry)
+    sino2 = sino.clone()
     

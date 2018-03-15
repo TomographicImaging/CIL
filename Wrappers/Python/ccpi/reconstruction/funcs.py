@@ -17,16 +17,50 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+from ccpi.reconstruction.ops import Identity, FiniteDiff2D
+import numpy
+
 
 class BaseFunction(object):
-    def __init__(self):   pass
+    def __init__(self):
+        self.op = Identity()
     def fun(self,x):      return 0
     def grad(self,x):     return 0
     def prox(self,x,tau): return x
-    def dir_op(self,x):   return x
-    def adj_op(self,x):   return x
 
-# Define a class for 2-norm
+class Norm2(BaseFunction):
+    
+    def __init__(self, 
+                 gamma=1.0, 
+                 direction=None):
+        super(Norm2, self).__init__()
+        self.gamma     = gamma;
+        self.direction = direction; 
+    
+    def fun(self, x):
+        
+        xx = numpy.sqrt(numpy.sum(numpy.square(x.as_array()), self.direction, keepdims=True))
+        p  = numpy.sum(self.gamma*xx)        
+        
+        return p
+    
+    def prox(self, x, tau):
+
+        xx = numpy.sqrt(numpy.sum( numpy.square(x.as_array()), self.direction, keepdims=True ))
+        xx = numpy.maximum(0, 1 - tau*self.gamma / xx)
+        p  = x.as_array() * xx
+        
+        return type(x)(p,geometry=x.geometry)
+
+class TV2D(Norm2):
+    
+    def __init__(self, gamma):
+        super(TV2D,self).__init__(gamma, 2)
+        self.op = FiniteDiff2D()
+        self.L = self.op.get_max_sing_val()
+        
+
+# Define a class for squared 2-norm
 class Norm2sq(BaseFunction):
     '''
     f(x) = c*||A*x-b||_2^2

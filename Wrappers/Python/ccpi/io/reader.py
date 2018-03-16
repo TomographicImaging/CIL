@@ -166,13 +166,9 @@ class NexusReader(object):
         This method load the acquisition data and given dimension and returns an AcquisitionData Object
         '''
         data = self.loadProjection(dimensions)
-        return AcquisitionData(data)   
+        geometry = AcquisitionGeometry('parallel', '3D', self.getProjectionAngles())
+        return AcquisitionData(data, geometry=geometry)   
     
-    def getAcquisitionGeometry(self, dimensions=None):
-        '''
-        This method creates the acquisition geometry from a given dimension and return the created object
-        '''   
-        return AcquisitionGeometry('parallel', '3D', self.getProjectionAngles())
           
 class XTEKReader(object):
     '''
@@ -292,10 +288,5 @@ class XTEKReader(object):
         This method load the acquisition data and given dimension and returns an AcquisitionData Object
         '''
         data = self.loadProjection(dimensions)
-        return AcquisitionData(data)
+        return AcquisitionData(data, geometry=self.geometry)
     
-    def getAcquisitionGeometry(self, dimensions=None):
-        '''
-        This method creates the acquisition geometry from a given dimension and return the created object
-        '''   
-        return self.geometry

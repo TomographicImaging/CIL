@@ -178,6 +178,17 @@ class DataContainer(object):
             # assume it is parallel beam
             pass
         
+    def get_dimension_size(self, dimension_label):
+        if dimension_label in self.dimension_labels.values():
+            acq_size = -1
+            for k,v in self.dimension_labels.items():
+                if v == dimension_label:
+                    acq_size = self.shape[k]
+            return acq_size
+        else:
+            raise ValueError('Unknown dimension {0}. Should be one of'.format(dimension_label,
+                             self.dimension_labels.values()))
+       
 
     def as_array(self, dimensions=None):
         '''Returns the DataContainer as Numpy Array

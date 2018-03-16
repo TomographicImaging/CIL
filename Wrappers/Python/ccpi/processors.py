@@ -17,8 +17,8 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License
 
-from ccpi.framework import DataSetProcessor, DataSet, AcquisitionData,\
- AcquisitionGeometry
+from ccpi.framework import DataSetProcessor, DataContainer, AcquisitionData,\
+ AcquisitionGeometry, ImageGeometry, ImageData
 from ccpi.reconstruction.parallelbeam import alg as pbalg
 import numpy
 import h5py
@@ -131,7 +131,8 @@ class CenterOfRotationFinder(DataSetProcessor):
             if dataset.geometry.geom_type == 'parallel':
                 return True
             else:
-                raise ValueError('This algorithm is suitable only for parallel beam geometry')
+                raise ValueError('{0} is suitable only for parallel beam geometry'\
+                                 .format(self.__class__.__name__))
         else:
             raise ValueError("Expected input dimensions is 3, got {0}"\
                              .format(dataset.number_of_dimensions))
@@ -402,7 +403,7 @@ class CCPiForwardProjector(DataSetProcessor):
                  image_geometry = None, acquisition_geometry = None):
         kwargs = {
                   'angles'  : None,
-                  'is_cone_beam' : False
+                  'is_cone_beam' : False,
                   'image_geometry' : image_geometry, 
                   'acquisition_geometry' : acquisition_geometry
                   }
@@ -423,9 +424,121 @@ class CCPiForwardProjector(DataSetProcessor):
             pixels = pbalg.pb_forward_project(volume.as_array(), 
                                                   self.angles , 
                                                   pixel_per_voxel)
-            return ImageData(pixels, deep_copy=True, )
+            return AcquisitionData(pixels, deep_copy=True,
+                             geometry = self.image_geometry)
         else:
             raise ValueError('Cannot process cone beam')
+
+class CCPiBackwardProjector(DataSetProcessor):
+    '''Normalization based on flat and dark
+    
+    This processor read in a AcquisitionData and normalises it based on 
+    the instrument reading with and without incident photons or neutrons.
+    
+    Input: AcquisitionData
+    Parameter: 2D projection with flat field (or stack)
+               2D projection with dark field (or stack)
+    Output: AcquisitionDataSetn
+    '''
+    
+    def __init__(self, angles = None, is_cone_beam = False , 
+                 center_of_rotation = None,
+                 image_geometry = None, acquisition_geometry = None):
+        kwargs = {
+                  'angles'               : angles,
+                  'is_cone_beam'         : is_cone_beam,
+                  'image_geometry'       : image_geometry, 
+                  'acquisition_geometry' : acquisition_geometry, 
+                  'center_of_rotation'   : center_of_rotation
+                  }
+        
+        super(CCPiForwardProjector, self).__init__(**kwargs)
+        
+    def check_input(self, dataset):
+        if dataset.number_of_dimensions == 3:
+               return True
+        else:
+            raise ValueError("Expected input dimensions is 2 or 3, got {0}"\
+                             .format(dataset.number_of_dimensions))
+
+    def process(self):
+        projections = self.get_input()
+        pixel_per_voxel = 1 # should be estimated from image_geometry and acquisition_geometry
+        if not self.is_cone_beam:
+            back = pbalg.pb_backward_project(projections, 
+                                   self.angles, 
+                                   self.center_of_rotation, 
+                                   pixel_per_voxel)
+            return ImageData(back, deep_copy=True,
+                             geometry = self.image_geometry)
+        else:
+            raise ValueError('Cannot process cone beam')
+            
+class AcquisitionDataPadder(DataSetProcessor):
+    '''Normalization based on flat and dark
+    
+    This processor read in a AcquisitionData and normalises it based on 
+    the instrument reading with and without incident photons or neutrons.
+    
+    Input: AcquisitionData
+    Parameter: 2D projection with flat field (or stack)
+               2D projection with dark field (or stack)
+    Output: AcquisitionDataSetn
+    '''
+    
+    def __init__(self, 
+                 angles               = None, 
+                 is_cone_beam         = False , 
+                 center_of_rotation   = None,
+                 acquisition_geometry = None,
+                 pad_value            = 1e-5):
+        kwargs = {
+                  'angles'               : angles,
+                  'is_cone_beam'         : is_cone_beam,
+                  'acquisition_geometry' : acquisition_geometry, 
+                  'center_of_rotation'   : center_of_rotation,
+                  'pad_value'            : pad_value
+                  }
+        
+        super(AcquisitionDataPadder, self).__init__(**kwargs)
+        
+    def check_input(self, dataset):
+        if dataset.number_of_dimensions == 3:
+               return True
+        else:
+            raise ValueError("Expected input dimensions is 2 or 3, got {0}"\
+                             .format(dataset.number_of_dimensions))
+
+    def process(self):
+        projections = self.get_input()
+        w = projections.get_dimension_size('horizontal')
+        delta = w - 2 * cor
+               
+        padded_width = int (
+                numpy.ceil(abs(delta)) + w
+                )
+        delta_pix = padded_width - w
+        padded_geometry = self.acquisition_geometry.clone()
+        padded_geometry.voxel_num_x = padded_width
+        padded_geometry.voxel_num_y = padded_width
+        
+        #initialize a new AcquisitionData with values close to 0
+        out = AcquisitionData(geometry=padded_geometry)
+        out = out + pad_value
+        
+        #pad in the horizontal-vertical plane -> slice on angles
+        if delta > 0:
+            #pad left of middle
+            
+            pass
+        else:
+            #pad right of middle
+            #for i in range(projections.get_dimension_size('angles')):
+            pass    
+                
+        
+        
+        
 
 def loadNexus(filename):
     '''Load a dataset stored in a NeXuS file (HDF5)'''
@@ -479,7 +592,10 @@ if __name__ == '__main__':
                                  pixel_num_h=numpy.shape(proj)[2],
                                  pixel_num_v=numpy.shape(proj)[1],
                                  )    
-    sino = AcquisitionData( proj , geometry=parallelbeam)
+    
+    dim_labels = ['angles' , 'vertical' , 'horizontal']
+    sino = AcquisitionData( proj , geometry=parallelbeam, 
+                            dimension_labels=dim_labels)
     
     normalizer = Normalizer()
     normalizer.set_input(sino)
@@ -500,14 +616,40 @@ if __name__ == '__main__':
     cor = cor_finder.get_output()
     print ("center of rotation {0} == 86.25?".format(cor))
     
+        
+    w = sino.get_dimension_size('horizontal')
+    
+    volume_width = int (
+            numpy.ceil(abs(w - 2 * cor)) + w
+            )
+    
+    volume_geometry = ImageGeometry(
+                 voxel_num_x=volume_width, 
+                 voxel_num_y=volume_width, 
+                 voxel_num_z=sino.get_dimension_size('vertical'))
+    
+#    back = CCPiBackwardProjector(acquisition_geometry=parallelbeam, 
+#                                 image_geometry=volume_geometry)
+    
+#    int msize = ndarray_volume.shape(0) > ndarray_volume.shape(1) ? ndarray_volume.shape(0) : ndarray_volume.shape(1);#
+#	int detector_width = msize;
+
+#	double rotation_center = (double)detector_width/2.;
+#	int detector_height = ndarray_volume.shape(2);
+#	int number_of_projections = ndarray_angles.shape(0);
+#	std::cout << "pb_forward_project rotation_center " << rotation_center << std::endl;
+#		boost::extents[number_of_projections][detector_height][detector_width]);
+
+    
     conebeam = AcquisitionGeometry('cone', '3D' , 
                                  angles=angles, 
                                  pixel_num_h=numpy.shape(proj)[2],
                                  pixel_num_v=numpy.shape(proj)[1],
                                  )    
-    sino = AcquisitionData( proj , geometry=conebeam)
+    
     try:
-        cor_finder.set_input(sino)
+        sino2 = AcquisitionData( proj , geometry=conebeam)
+        cor_finder.set_input(sino2)
         cor = cor_finder.get_output()
     except ValueError as err:
         print (err)

@@ -83,6 +83,20 @@ class ImageGeometry:
         else:
             return 0
         
+    def clone(self):
+        '''returns a copy of ImageGeometry'''
+        return ImageGeometry(
+                            self.voxel_num_x, 
+                            self.voxel_num_y, 
+                            self.voxel_num_z, 
+                            self.voxel_size_x, 
+                            self.voxel_size_y, 
+                            self.voxel_size_z, 
+                            self.center_x, 
+                            self.center_y, 
+                            self.center_z, 
+                            self.channels)
+        
     
 class AcquisitionGeometry:
     
@@ -137,6 +151,31 @@ class AcquisitionGeometry:
         self.pixel_size_v = pixel_size_v
         
         self.channels = channels
+        
+    def clone(self):
+        '''returns a copy of the AcquisitionGeometry'''
+        return AcquisitionGeometry(self.geom_type,
+                                   self.dimension, 
+                                   self.angles, 
+                                   self.pixel_num_h, 
+                                   self.pixel_size_h, 
+                                   self.pixel_num_v, 
+                                   self.pixel_size_v, 
+                                   self.dist_source_center, 
+                                   self.dist_center_detector, 
+                                   self.channels)
+        
+    def __str__ (self):
+        repres = ""
+        repres += "Number of dimensions: {0}\n".format(self.dimension)
+        repres += "angles: {0}\n".format(len(self.angles))
+        repres += "voxel_num : h{0},v{1}\n".format(self.pixel_num_h, self.pixel_num_v)
+        repres += "voxel size: h{0},v{1}\n".format(self.pixel_size_h, self.pixel_size_v)
+        repres += "geometry type: {0}\n".format(self.geom_type)
+        repres += "distance source-detector: {0}\n".format(self.dist_source_center)
+        repres += "distance center-detector: {0}\n".format(self.dist_source_center)
+        repres += "number of channels: {0}\n".format(self.channels)
+        return repres
 
 
             
@@ -188,7 +227,15 @@ class DataContainer(object):
         else:
             raise ValueError('Unknown dimension {0}. Should be one of'.format(dimension_label,
                              self.dimension_labels.values()))
-       
+    def get_dimension_axis(self, dimension_label):
+        if dimension_label in self.dimension_labels.values():
+            for k,v in self.dimension_labels.items():
+                if v == dimension_label:
+                    return k
+        else:
+            raise ValueError('Unknown dimension {0}. Should be one of'.format(dimension_label,
+                             self.dimension_labels.values()))
+                        
 
     def as_array(self, dimensions=None):
         '''Returns the DataContainer as Numpy Array
@@ -593,12 +640,12 @@ class AcquisitionData(DataContainer):
         self.geometry = None
         if array is None:
             if 'geometry' in kwargs.keys():
-                geometry  = kwargs['geometry']
+                geometry      = kwargs['geometry']
                 self.geometry = geometry
-                channels  = geometry.channels
-                horiz   = geometry.pixel_num_h
-                vert   = geometry.pixel_num_v
-                angles = geometry.angles
+                channels      = geometry.channels
+                horiz         = geometry.pixel_num_h
+                vert          = geometry.pixel_num_v
+                angles        = geometry.angles
                 num_of_angles = numpy.shape(angles)[0]
                 
                 
@@ -956,7 +1003,7 @@ if __name__ == '__main__':
 
     # create VolumeData from geometry
     vgeometry = ImageGeometry(voxel_num_x=2, voxel_num_y=3, channels=2)
-    vol = VolumeData(geometry=vgeometry)
+    vol = ImageData(geometry=vgeometry)
     
     sgeometry = AcquisitionGeometry(dimension=2, angles=numpy.linspace(0, 180, num=20), 
                                        geom_type='parallel', pixel_num_v=3,

@@ -24,6 +24,9 @@ import numpy
 import h5py
 from scipy import ndimage
 
+import matplotlib.pyplot as plt
+
+
 class Normalizer(DataSetProcessor):
     '''Normalization based on flat and dark
     
@@ -399,11 +402,10 @@ class CCPiForwardProjector(DataSetProcessor):
     Output: AcquisitionDataSetn
     '''
     
-    def __init__(self, angles = None, is_cone_beam = False , 
-                 image_geometry = None, acquisition_geometry = None):
+    def __init__(self,
+                 image_geometry = None, 
+                 acquisition_geometry = None):
         kwargs = {
-                  'angles'  : None,
-                  'is_cone_beam' : False,
                   'image_geometry' : image_geometry, 
                   'acquisition_geometry' : acquisition_geometry
                   }
@@ -420,9 +422,9 @@ class CCPiForwardProjector(DataSetProcessor):
     def process(self):
         volume = self.get_input()
         pixel_per_voxel = 1 # should be estimated from image_geometry and acquisition_geometry
-        if not self.is_cone_beam:
+        if self.acquisition_geometry.geom_type == 'parallel':
             pixels = pbalg.pb_forward_project(volume.as_array(), 
-                                                  self.angles , 
+                                                  self.acquisition_geometry.angles, 
                                                   pixel_per_voxel)
             return AcquisitionData(pixels, deep_copy=True,
                              geometry = self.image_geometry)
@@ -430,10 +432,10 @@ class CCPiForwardProjector(DataSetProcessor):
             raise ValueError('Cannot process cone beam')
 
 class CCPiBackwardProjector(DataSetProcessor):
-    '''Normalization based on flat and dark
+    '''Backward projector
     
-    This processor read in a AcquisitionData and normalises it based on 
-    the instrument reading with and without incident photons or neutrons.
+    This processor reads in a AcquisitionData and performs a backward projection, 
+    i.e. project to reconstruction space.
     
     Input: AcquisitionData
     Parameter: 2D projection with flat field (or stack)
@@ -441,18 +443,15 @@ class CCPiBackwardProjector(DataSetProcessor):
     Output: AcquisitionDataSetn
     '''
     
-    def __init__(self, angles = None, is_cone_beam = False , 
-                 center_of_rotation = None,
-                 image_geometry = None, acquisition_geometry = None):
+    def __init__(self, 
+                 image_geometry = None, 
+                 acquisition_geometry = None):
         kwargs = {
-                  'angles'               : angles,
-                  'is_cone_beam'         : is_cone_beam,
                   'image_geometry'       : image_geometry, 
                   'acquisition_geometry' : acquisition_geometry, 
-                  'center_of_rotation'   : center_of_rotation
                   }
         
-        super(CCPiForwardProjector, self).__init__(**kwargs)
+        super(CCPiBackwardProjector, self).__init__(**kwargs)
         
     def check_input(self, dataset):
         if dataset.number_of_dimensions == 3:
@@ -464,11 +463,19 @@ class CCPiBackwardProjector(DataSetProcessor):
     def process(self):
         projections = self.get_input()
         pixel_per_voxel = 1 # should be estimated from image_geometry and acquisition_geometry
-        if not self.is_cone_beam:
-            back = pbalg.pb_backward_project(projections, 
-                                   self.angles, 
-                                   self.center_of_rotation, 
-                                   pixel_per_voxel)
+        image_geometry = ImageGeometry(voxel_num_x = self.acquisition_geometry.pixel_num_h,
+                                       voxel_num_y = self.acquisition_geometry.pixel_num_h,
+                                       voxel_num_z = self.acquisition_geometry.pixel_num_v)
+        # input centered/padded acquisitiondata
+        center_of_rotation = projections.get_dimension_size('horizontal') / 2
+        print (center_of_rotation)
+        if self.acquisition_geometry.geom_type == 'parallel':
+            back = pbalg.pb_backward_project(
+                         projections.as_array(), 
+                         self.acquisition_geometry.angles, 
+                         center_of_rotation, 
+                         pixel_per_voxel
+                         )
             return ImageData(back, deep_copy=True,
                              geometry = self.image_geometry)
         else:
@@ -487,14 +494,10 @@ class AcquisitionDataPadder(DataSetProcessor):
     '''
     
     def __init__(self, 
-                 angles               = None, 
-                 is_cone_beam         = False , 
                  center_of_rotation   = None,
                  acquisition_geometry = None,
                  pad_value            = 1e-5):
         kwargs = {
-                  'angles'               : angles,
-                  'is_cone_beam'         : is_cone_beam,
                   'acquisition_geometry' : acquisition_geometry, 
                   'center_of_rotation'   : center_of_rotation,
                   'pad_value'            : pad_value
@@ -503,6 +506,8 @@ class AcquisitionDataPadder(DataSetProcessor):
         super(AcquisitionDataPadder, self).__init__(**kwargs)
         
     def check_input(self, dataset):
+        if self.acquisition_geometry is None:
+            self.acquisition_geometry = dataset.geometry
         if dataset.number_of_dimensions == 3:
                return True
         else:
@@ -518,24 +523,67 @@ class AcquisitionDataPadder(DataSetProcessor):
                 numpy.ceil(abs(delta)) + w
                 )
         delta_pix = padded_width - w
-        padded_geometry = self.acquisition_geometry.clone()
-        padded_geometry.voxel_num_x = padded_width
-        padded_geometry.voxel_num_y = padded_width
         
+        voxel_per_pixel = 1
+        geom = pbalg.pb_setup_acquisition_geometry(projections.as_array(),
+                                            self.acquisition_geometry.angles,
+                                            self.center_of_rotation,
+                                            voxel_per_pixel )
+        
+        padded_geometry = self.acquisition_geometry.clone()
+        
+        padded_geometry.pixel_num_h = geom['n_h']
+        padded_geometry.pixel_num_v = geom['n_v']
+        
+        delta_pix_h = padded_geometry.pixel_num_h - self.acquisition_geometry.pixel_num_h
+        delta_pix_v = padded_geometry.pixel_num_v - self.acquisition_geometry.pixel_num_v
+        
+        if delta_pix_h == 0:
+            delta_pix_h = delta_pix
+            padded_geometry.pixel_num_h = padded_width
         #initialize a new AcquisitionData with values close to 0
         out = AcquisitionData(geometry=padded_geometry)
-        out = out + pad_value
+        out = out + self.pad_value
+        
         
         #pad in the horizontal-vertical plane -> slice on angles
         if delta > 0:
             #pad left of middle
-            
-            pass
+            command = "out.array["
+            for i in range(out.number_of_dimensions):
+                if out.dimension_labels[i] == 'horizontal':
+                    value = '{0}:{1}'.format(delta_pix_h, delta_pix_h+w)
+                    command = command + str(value)
+                else:
+                    if out.dimension_labels[i] == 'vertical' :
+                        value = '{0}:'.format(delta_pix_v)
+                        command = command + str(value)
+                    else:
+                        command = command + ":"
+                if i < out.number_of_dimensions -1:
+                    command = command + ','
+            command = command + '] = projections.array'
+            #print (command)    
         else:
             #pad right of middle
-            #for i in range(projections.get_dimension_size('angles')):
-            pass    
-                
+            command = "out.array["
+            for i in range(out.number_of_dimensions):
+                if out.dimension_labels[i] == 'horizontal':
+                    value = '{0}:{1}'.format(0, w)
+                    command = command + str(value)
+                else:
+                    if out.dimension_labels[i] == 'vertical' :
+                        value = '{0}:'.format(delta_pix_v)
+                        command = command + str(value)
+                    else:
+                        command = command + ":"
+                if i < out.number_of_dimensions -1:
+                    command = command + ','
+            command = command + '] = projections.array'
+            #print (command)    
+            #cleaned = eval(command)
+        exec(command)
+        return out
         
         
         
@@ -602,14 +650,14 @@ if __name__ == '__main__':
     normalizer.set_flat_field(flat)
     normalizer.set_dark_field(dark)
     norm = normalizer.get_output()
-    print ("Processor min {0} max {1}".format(norm.as_array().min(), norm.as_array().max()))
+    #print ("Processor min {0} max {1}".format(norm.as_array().min(), norm.as_array().max()))
     
-    norm1 = numpy.asarray(
-            [Normalizer.normalize_projection( p, flat, dark, 1e-5 ) 
-            for p in proj]
-            )
+    #norm1 = numpy.asarray(
+    #        [Normalizer.normalize_projection( p, flat, dark, 1e-5 ) 
+    #       for p in proj]
+    #        )
     
-    print ("Numpy min {0} max {1}".format(norm1.min(), norm1.max()))
+    #print ("Numpy min {0} max {1}".format(norm1.min(), norm1.max()))
     
     cor_finder = CenterOfRotationFinder()
     cor_finder.set_input(sino)
@@ -617,17 +665,47 @@ if __name__ == '__main__':
     print ("center of rotation {0} == 86.25?".format(cor))
     
         
-    w = sino.get_dimension_size('horizontal')
+    padder = AcquisitionDataPadder(center_of_rotation=cor, 
+                                   pad_value=0.75,
+                                   acquisition_geometry=normalizer.get_output().geometry)
+    #padder.set_input(normalizer.get_output())
+    padder.set_input_processor(normalizer)
     
-    volume_width = int (
-            numpy.ceil(abs(w - 2 * cor)) + w
-            )
+    #print ("padder ", padder.get_output())
     
-    volume_geometry = ImageGeometry(
-                 voxel_num_x=volume_width, 
-                 voxel_num_y=volume_width, 
-                 voxel_num_z=sino.get_dimension_size('vertical'))
+    volume_geometry = ImageGeometry()
     
+    back = CCPiBackwardProjector(acquisition_geometry=parallelbeam, 
+                                 image_geometry=volume_geometry)
+    back.set_input_processor(padder)
+    #back.set_input(padder.get_output())
+    #print (back.image_geometry)
+    forw = CCPiForwardProjector(acquisition_geometry=parallelbeam, 
+                                 image_geometry=volume_geometry)
+    forw.set_input_processor(back)
+    
+
+    out  = padder.get_output()
+    fig = plt.figure()
+    # projections row
+    a = fig.add_subplot(1,4,1)    
+    a.imshow(norm.array[80])
+    a.set_title('orig')
+    a = fig.add_subplot(1,4,2)    
+    a.imshow(out.array[80])
+    a.set_title('padded')
+    
+    a = fig.add_subplot(1,4,3)    
+    a.imshow(back.get_output().as_array()[15])
+    a.set_title('back')
+    
+    a = fig.add_subplot(1,4,4)    
+    a.imshow(forw.get_output().as_array()[80])
+    a.set_title('forw')
+    
+    
+    plt.show()
+
 #    back = CCPiBackwardProjector(acquisition_geometry=parallelbeam, 
 #                                 image_geometry=volume_geometry)
     

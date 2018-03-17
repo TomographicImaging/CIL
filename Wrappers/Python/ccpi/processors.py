@@ -413,21 +413,38 @@ class CCPiForwardProjector(DataSetProcessor):
         super(CCPiForwardProjector, self).__init__(**kwargs)
         
     def check_input(self, dataset):
-        if dataset.number_of_dimensions == 3:
-               return True
+        if dataset.number_of_dimensions == 3 or dataset.number_of_dimensions == 2:
+            # sort in the order that this projector needs it
+            return True
         else:
             raise ValueError("Expected input dimensions is 2 or 3, got {0}"\
                              .format(dataset.number_of_dimensions))
 
     def process(self):
-        volume = self.get_input()
-        pixel_per_voxel = 1 # should be estimated from image_geometry and acquisition_geometry
+        
+        volume = self.get_input().subset(['horizontal_x','horizontal_y','vertical'])
+        pixel_per_voxel = 1 # should be estimated from image_geometry and 
+                            # acquisition_geometry
         if self.acquisition_geometry.geom_type == 'parallel':
+            #int msize = ndarray_volume.shape(0) > ndarray_volume.shape(1) ? ndarray_volume.shape(0) : ndarray_volume.shape(1);
+        	  #int detector_width = msize;
+            # detector_width is the max between the shape[0] and shape[1]
+            
+            
+            #double rotation_center = (double)detector_width/2.;
+        	  #int detector_height = ndarray_volume.shape(2);
+        	  
+            #int number_of_projections = ndarray_angles.shape(0);
+        	
+            ##numpy_3d pixels(reinterpret_cast<float*>(ndarray_volume.get_data()),
+		     #boost::extents[number_of_projections][detector_height][detector_width]);
+
             pixels = pbalg.pb_forward_project(volume.as_array(), 
                                                   self.acquisition_geometry.angles, 
                                                   pixel_per_voxel)
-            return AcquisitionData(pixels, deep_copy=True,
-                             geometry = self.image_geometry)
+            out = AcquisitionData(geometry=self.acquisition_geometry)
+            out.fill(pixels)
+            return out
         else:
             raise ValueError('Cannot process cone beam')
 
@@ -436,6 +453,9 @@ class CCPiBackwardProjector(DataSetProcessor):
     
     This processor reads in a AcquisitionData and performs a backward projection, 
     i.e. project to reconstruction space.
+    Notice that it assumes that the center of rotation is in the middle
+    of the horizontal axis: in case when that's not the case it can be chained 
+    with the AcquisitionDataPadder.
     
     Input: AcquisitionData
     Parameter: 2D projection with flat field (or stack)
@@ -454,21 +474,23 @@ class CCPiBackwardProjector(DataSetProcessor):
         super(CCPiBackwardProjector, self).__init__(**kwargs)
         
     def check_input(self, dataset):
-        if dataset.number_of_dimensions == 3:
-               return True
+        if dataset.number_of_dimensions == 3 or dataset.number_of_dimensions == 2:
+            #number_of_projections][detector_height][detector_width
+            
+            return True
         else:
             raise ValueError("Expected input dimensions is 2 or 3, got {0}"\
                              .format(dataset.number_of_dimensions))
 
     def process(self):
-        projections = self.get_input()
+        projections = self.get_input().subset(['angles','vertical','horizontal'])
         pixel_per_voxel = 1 # should be estimated from image_geometry and acquisition_geometry
         image_geometry = ImageGeometry(voxel_num_x = self.acquisition_geometry.pixel_num_h,
                                        voxel_num_y = self.acquisition_geometry.pixel_num_h,
                                        voxel_num_z = self.acquisition_geometry.pixel_num_v)
         # input centered/padded acquisitiondata
         center_of_rotation = projections.get_dimension_size('horizontal') / 2
-        print (center_of_rotation)
+        #print (center_of_rotation)
         if self.acquisition_geometry.geom_type == 'parallel':
             back = pbalg.pb_backward_project(
                          projections.as_array(), 
@@ -477,7 +499,8 @@ class CCPiBackwardProjector(DataSetProcessor):
                          pixel_per_voxel
                          )
             return ImageData(back, deep_copy=True,
-                             geometry = self.image_geometry)
+                             geometry = self.image_geometry,
+                             dimension_labels=['horizontal_x','horizontal_y','vertical'])
         else:
             raise ValueError('Cannot process cone beam')
             

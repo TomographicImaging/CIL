@@ -19,7 +19,8 @@
 
 import numpy
 from scipy.sparse.linalg import svds
-from ccpi.framework import DataContainer
+from ccpi.framework import DataContainer, ImageGeometry , ImageData
+from ccpi.processors import CCPiBackwardProjector, CCPiForwardProjector
 
 # Maybe operators need to know what types they take as inputs/outputs
 # to not just use generic DataContainer
@@ -130,11 +131,21 @@ class FiniteDiff2D(Operator):
 def PowerMethodNonsquare(op,numiters):
     # Initialise random
     inputsize = op.size()[1]
-    x0 = DataContainer(numpy.random.randn(inputsize[0],inputsize[1]))
+    vg = ImageGeometry(voxel_num_x=inputsize[0],
+                       voxel_num_y=inputsize[1], 
+                       voxel_num_z=inputsize[2])
+    
+    x0 = ImageData(geometry = vg, dimension_labels=['vertical','horizontal_y','horizontal_x'])
+    print (x0)
+    x0.fill(numpy.random.randn(*x0.shape))
+    
     s = numpy.zeros(numiters)
     # Loop
     for it in numpy.arange(numiters):
-        x1 = op.adjoint(op.direct(x0))
+        s = op.direct(x0)
+        print (s)
+        x1 = op.adjoint(s)
+        print(x1)
         x1norm = numpy.sqrt((x1**2).sum())
         s[it] = (x1*x0).sum() / (x0*x0).sum()
         x0 = (1.0/x1norm)*x1
@@ -151,3 +162,48 @@ def PowerMethodNonsquare(op,numiters):
 #        s[it] = np.dot(x1,x0) / np.dot(x1,x0)
 #        x0 = (1.0/x1norm)*x1
 #    return s, x0
+    
+class CCPiProjectorSimple(Operator):
+    """ASTRA projector modified to use DataSet and geometry."""
+    def __init__(self, geomv, geomp):
+        super(CCPiProjectorSimple, self).__init__()
+        
+        # Store volume and sinogram geometries.
+        self.acquisition_geometry = geomp
+        self.volume_geometry = geomv
+        
+        self.fp = CCPiForwardProjector(image_geometry=geomv,
+                                       acquisition_geometry=geomp)
+        
+        self.bp = CCPiBackwardProjector(image_geometry=geomv,
+                                    acquisition_geometry=geomp)
+                
+        # Initialise empty for singular value.
+        self.s1 = None
+    
+    def direct(self, image_data):
+        self.fp.set_input(image_data)
+        out = self.fp.get_output()
+        return out
+    
+    def adjoint(self, acquisition_data):
+        self.bp.set_input(acquisition_data)
+        out = self.bp.get_output()
+        return out
+    
+    #def delete(self):
+    #    astra.data2d.delete(self.proj_id)
+    
+    def get_max_sing_val(self):
+        self.s1, sall, svec = PowerMethodNonsquare(self,10)
+        return self.s1
+    
+    def size(self):
+        # Only implemented for 3D
+        return ( (self.acquisition_geometry.angles.size, \
+                  self.acquisition_geometry.pixel_num_v,
+                  self.acquisition_geometry.pixel_num_h), \
+                 (self.volume_geometry.voxel_num_x, \
+                  self.volume_geometry.voxel_num_y,
+                  self.volume_geometry.voxel_num_z) )
+

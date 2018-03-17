@@ -252,7 +252,15 @@ class DataContainer(object):
         '''Creates a DataContainer containing a subset of self according to the 
         labels in dimensions'''
         if dimensions is None:
-            return self.array.copy()
+            if kw == {}:
+                return self.array.copy()
+            else:
+                reduced_dims = [v for k,v in self.dimension_labels.items()]
+                for dim_l, dim_v in kw.items():
+                    for k,v in self.dimension_labels.items():
+                        if v == dim_l:
+                            reduced_dims.pop(k)
+                return self.subset(dimensions=reduced_dims, **kw)
         else:
             # check that all the requested dimensions are in the array
             # this is done by checking the dimension_labels
@@ -316,14 +324,31 @@ class DataContainer(object):
                 
                 return type(self)(cleaned , True, dimensions)
     
-    def fill(self, array):
+    def fill(self, array, **dimension):
         '''fills the internal numpy array with the one provided'''
-        if numpy.shape(array) != numpy.shape(self.array):
-            raise ValueError('Cannot fill with the provided array.' + \
-                             'Expecting {0} got {1}'.format(
-                                     numpy.shape(self.array),
-                                     numpy.shape(array)))
-        self.array = array[:]
+        if dimension == {}:
+            if numpy.shape(array) != numpy.shape(self.array):
+                raise ValueError('Cannot fill with the provided array.' + \
+                                 'Expecting {0} got {1}'.format(
+                                         numpy.shape(self.array),
+                                         numpy.shape(array)))
+            self.array = array[:]
+        else:
+            
+            command = 'self.array['
+            i = 0
+            for k,v in self.dimension_labels.items():
+                for dim_label, dim_value in dimension.items():    
+                    if dim_label == v:
+                        command = command + str(dim_value)
+                    else:
+                        command = command + ":"
+                if i < self.number_of_dimensions -1:
+                    command = command + ','
+                i += 1
+            command = command + "] = array[:]" 
+            exec(command)
+            
         
     def check_dimensions(self, other):
         return self.shape == other.shape
@@ -522,12 +547,13 @@ class DataContainer(object):
         return self / other
     # __idiv__
     
-    def __str__ (self):
+    def __str__ (self, representation=False):
         repres = ""
         repres += "Number of dimensions: {0}\n".format(self.number_of_dimensions)
         repres += "Shape: {0}\n".format(self.shape)
         repres += "Axis labels: {0}\n".format(self.dimension_labels)
-        repres += "Representation: \n{0}\n".format(self.array)
+        if representation:
+            repres += "Representation: \n{0}\n".format(self.array)
         return repres
     
     def clone(self):
@@ -628,6 +654,12 @@ class ImageData(DataContainer):
                         self.origin = value
                     if key == 'spacing' :
                         self.spacing = value
+                        
+        def subset(self, dimensions=None, **kw):
+            out = super(ImageData, self).subset(dimensions, **kw)
+            #out.geometry = self.recalculate_geometry(dimensions , **kw)
+            out.geometry = self.geometry
+            return out
                         
 
 class AcquisitionData(DataContainer):

@@ -88,9 +88,9 @@ plt.show()
 
 # Parallelbeam geometry test
 if test_case==1:
-    Phantom_ccpi = Phantom.subset(['horizontal_x','horizontal_y','vertical'])
-    Phantom_ccpi.geometry = vg.clone()
-    center_of_rotation = Phantom_ccpi.get_dimension_size('horizontal_x') / 2
+    #Phantom_ccpi = Phantom.subset(['horizontal_x','horizontal_y','vertical'])
+    #Phantom_ccpi.geometry = vg.clone()
+    center_of_rotation = Phantom.get_dimension_size('horizontal_x') / 2
         
     pg = AcquisitionGeometry('parallel',
                           '3D',
@@ -114,7 +114,7 @@ elif test_case==2:
 Cop = CCPiProjectorSimple(vg, pg)
 
 # Try forward and backprojection
-b = Cop.direct(Phantom_ccpi)
+b = Cop.direct(Phantom)
 out2 = Cop.adjoint(b)
 
 plt.imshow(b.subset( vertical=4).array)

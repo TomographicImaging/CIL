@@ -403,11 +403,19 @@ class CCPiForwardProjector(DataSetProcessor):
     '''
     
     def __init__(self,
-                 image_geometry = None, 
-                 acquisition_geometry = None):
+                 image_geometry       = None, 
+                 acquisition_geometry = None,
+                 output_axes_order    = None):
+        if output_axes_order is None:
+            # default ccpi projector image storing order
+            output_axes_order = ['angle','vertical','horizontal']
+        
         kwargs = {
-                  'image_geometry' : image_geometry, 
-                  'acquisition_geometry' : acquisition_geometry
+                  'image_geometry'       : image_geometry, 
+                  'acquisition_geometry' : acquisition_geometry,
+                  'output_axes_order'    : output_axes_order,
+                  'default_image_axes_order' : ['horizontal_x','horizontal_y','vertical'],
+                  'default_acquisition_axes_order' : ['angle','vertical','horizontal'] 
                   }
         
         super(CCPiForwardProjector, self).__init__(**kwargs)
@@ -422,7 +430,10 @@ class CCPiForwardProjector(DataSetProcessor):
 
     def process(self):
         
-        volume = self.get_input().subset(['horizontal_x','horizontal_y','vertical'])
+        volume = self.get_input()
+        volume_axes = volume.get_data_axes_order(new_order=self.default_image_axes_order)
+        if not volume_axes == [0,1,2]:
+            volume.array = numpy.transpose(volume.array, volume_axes)
         pixel_per_voxel = 1 # should be estimated from image_geometry and 
                             # acquisition_geometry
         if self.acquisition_geometry.geom_type == 'parallel':
@@ -442,8 +453,12 @@ class CCPiForwardProjector(DataSetProcessor):
             pixels = pbalg.pb_forward_project(volume.as_array(), 
                                                   self.acquisition_geometry.angles, 
                                                   pixel_per_voxel)
-            out = AcquisitionData(geometry=self.acquisition_geometry)
+            out = AcquisitionData(geometry=self.acquisition_geometry, 
+                                  label_dimensions=self.default_acquisition_axes_order)
             out.fill(pixels)
+            out_axes = out.get_data_axes_order(new_order=self.output_axes_order)
+            if not out_axes == [0,1,2]:
+                out.array = numpy.transpose(out.array, out_axes)
             return out
         else:
             raise ValueError('Cannot process cone beam')
@@ -465,10 +480,17 @@ class CCPiBackwardProjector(DataSetProcessor):
     
     def __init__(self, 
                  image_geometry = None, 
-                 acquisition_geometry = None):
+                 acquisition_geometry = None,
+                 output_axes_order=None):
+        if output_axes_order is None:
+            # default ccpi projector image storing order
+            output_axes_order = ['horizontal_x','horizontal_y','vertical']
         kwargs = {
                   'image_geometry'       : image_geometry, 
-                  'acquisition_geometry' : acquisition_geometry, 
+                  'acquisition_geometry' : acquisition_geometry,
+                  'output_axes_order'    : output_axes_order,
+                  'default_image_axes_order' : ['horizontal_x','horizontal_y','vertical'],
+                  'default_acquisition_axes_order' : ['angle','vertical','horizontal'] 
                   }
         
         super(CCPiBackwardProjector, self).__init__(**kwargs)
@@ -483,7 +505,11 @@ class CCPiBackwardProjector(DataSetProcessor):
                              .format(dataset.number_of_dimensions))
 
     def process(self):
-        projections = self.get_input().subset(['angles','vertical','horizontal'])
+        projections = self.get_input()
+        projections_axes = projections.get_data_axes_order(new_order=self.default_acquisition_axes_order)
+        if not projections_axes == [0,1,2]:
+            projections.array = numpy.transpose(projections.array, projections_axes)
+        
         pixel_per_voxel = 1 # should be estimated from image_geometry and acquisition_geometry
         image_geometry = ImageGeometry(voxel_num_x = self.acquisition_geometry.pixel_num_h,
                                        voxel_num_y = self.acquisition_geometry.pixel_num_h,
@@ -498,10 +524,16 @@ class CCPiBackwardProjector(DataSetProcessor):
                          center_of_rotation, 
                          pixel_per_voxel
                          )
-            return ImageData(back, deep_copy=True,
-                             geometry = self.image_geometry,
-                             dimension_labels=['horizontal_x','horizontal_y','vertical'])
-                             #.subset(['vertical','horizontal_y','horizontal_x'])
+            out = ImageData(geometry=self.image_geometry, 
+                            dimension_labels=self.default_image_axes_order)
+            
+            out_axes = out.get_data_axes_order(new_order=self.output_axes_order)
+            if not out_axes == [0,1,2]:
+                back = numpy.transpose(back, out_axes)
+            out.fill(back)
+            
+            return out
+            
         else:
             raise ValueError('Cannot process cone beam')
             
@@ -549,7 +581,7 @@ class AcquisitionDataPadder(DataSetProcessor):
         delta_pix = padded_width - w
         
         voxel_per_pixel = 1
-        geom = pbalg.pb_setup_acquisition_geometry(projections.as_array(),
+        geom = pbalg.pb_setup_geometry_from_acquisition(projections.as_array(),
                                             self.acquisition_geometry.angles,
                                             self.center_of_rotation,
                                             voxel_per_pixel )

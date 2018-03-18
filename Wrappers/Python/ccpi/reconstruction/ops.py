@@ -149,6 +149,8 @@ def PowerMethodNonsquare(op,numiters):
     for it in numpy.arange(numiters):
         x1 = op.adjoint(op.direct(x0))
         x1norm = numpy.sqrt((x1**2).sum())
+        #print ("x0 **********" ,x0)
+        #print ("x1 **********" ,x1)
         s[it] = (x1*x0).sum() / (x0*x0).sum()
         x0 = (1.0/x1norm)*x1
     return numpy.sqrt(s[-1]), numpy.sqrt(s), x0
@@ -175,10 +177,12 @@ class CCPiProjectorSimple(Operator):
         self.volume_geometry = geomv
         
         self.fp = CCPiForwardProjector(image_geometry=geomv,
-                                       acquisition_geometry=geomp)
+                                       acquisition_geometry=geomp,
+                                       output_axes_order=['angle','vertical','horizontal'])
         
         self.bp = CCPiBackwardProjector(image_geometry=geomv,
-                                    acquisition_geometry=geomp)
+                                    acquisition_geometry=geomp,
+                                    output_axes_order=['horizontal_x','horizontal_y','vertical'])
                 
         # Initialise empty for singular value.
         self.s1 = None
@@ -211,8 +215,8 @@ class CCPiProjectorSimple(Operator):
                   self.volume_geometry.voxel_num_z) )
     def create_image_data(self):
         x0 = ImageData(geometry = self.volume_geometry, 
-                       dimension_labels=['vertical','horizontal_y','horizontal_x'])\
-                       .subset(['horizontal_x','horizontal_y','vertical'])
+                       dimension_labels=self.bp.output_axes_order)#\
+                       #.subset(['horizontal_x','horizontal_y','vertical'])
         print (x0)
         x0.fill(numpy.random.randn(*x0.shape))
         return x0

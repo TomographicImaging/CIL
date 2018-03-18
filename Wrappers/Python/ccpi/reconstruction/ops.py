@@ -130,22 +130,24 @@ class FiniteDiff2D(Operator):
 
 def PowerMethodNonsquare(op,numiters):
     # Initialise random
-    inputsize = op.size()[1]
-    vg = ImageGeometry(voxel_num_x=inputsize[0],
-                       voxel_num_y=inputsize[1], 
-                       voxel_num_z=inputsize[2])
+    # Jakob's
+    #inputsize = op.size()[1]
+    #x0 = ImageContainer(numpy.random.randn(*inputsize)
+    # Edo's
+    #vg = ImageGeometry(voxel_num_x=inputsize[0],
+    #                   voxel_num_y=inputsize[1], 
+    #                   voxel_num_z=inputsize[2])
+    #
+    #x0 = ImageData(geometry = vg, dimension_labels=['vertical','horizontal_y','horizontal_x'])
+    #print (x0)
+    #x0.fill(numpy.random.randn(*x0.shape))
     
-    x0 = ImageData(geometry = vg, dimension_labels=['vertical','horizontal_y','horizontal_x'])
-    print (x0)
-    x0.fill(numpy.random.randn(*x0.shape))
+    x0 = op.create_image_data()
     
     s = numpy.zeros(numiters)
     # Loop
     for it in numpy.arange(numiters):
-        s = op.direct(x0)
-        print (s)
-        x1 = op.adjoint(s)
-        print(x1)
+        x1 = op.adjoint(op.direct(x0))
         x1norm = numpy.sqrt((x1**2).sum())
         s[it] = (x1*x0).sum() / (x0*x0).sum()
         x0 = (1.0/x1norm)*x1
@@ -195,7 +197,8 @@ class CCPiProjectorSimple(Operator):
     #    astra.data2d.delete(self.proj_id)
     
     def get_max_sing_val(self):
-        self.s1, sall, svec = PowerMethodNonsquare(self,10)
+        a = PowerMethodNonsquare(self,10)
+        self.s1 = a[0] 
         return self.s1
     
     def size(self):
@@ -206,4 +209,10 @@ class CCPiProjectorSimple(Operator):
                  (self.volume_geometry.voxel_num_x, \
                   self.volume_geometry.voxel_num_y,
                   self.volume_geometry.voxel_num_z) )
-
+    def create_image_data(self):
+        x0 = ImageData(geometry = self.volume_geometry, 
+                       dimension_labels=['vertical','horizontal_y','horizontal_x'])\
+                       .subset(['horizontal_x','horizontal_y','vertical'])
+        print (x0)
+        x0.fill(numpy.random.randn(*x0.shape))
+        return x0

@@ -501,6 +501,7 @@ class CCPiBackwardProjector(DataSetProcessor):
             return ImageData(back, deep_copy=True,
                              geometry = self.image_geometry,
                              dimension_labels=['horizontal_x','horizontal_y','vertical'])
+                             #.subset(['vertical','horizontal_y','horizontal_x'])
         else:
             raise ValueError('Cannot process cone beam')
             

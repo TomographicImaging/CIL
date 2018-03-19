@@ -127,7 +127,12 @@ plt.show()
 f = Norm2sq(Cop,b,c=0.5)
 
 # Initial guess
-x_init = ImageData(geometry=vg)
+x_init = ImageData(geometry=vg, dimension_labels=['horizontal_x','horizontal_y','vertical'])
+#invL = 0.5
+#g = f.grad(x_init)
+#print (g)
+#u = x_init - invL*f.grad(x_init)
+        
 #%%
 # Run FISTA for least squares without regularization
 x_fista0, it0, timing0, criter0 = FISTA(x_init, f, None)

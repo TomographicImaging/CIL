@@ -111,7 +111,13 @@ class FiniteDiff2D(Operator):
     
     def adjoint(self,x):
         '''Backward differences, Newumann BC.'''
-        Nrows, Ncols, Nchannels = x.as_array().shape
+        #Nrows, Ncols, Nchannels = x.as_array().shape
+        print (x)
+        Nrows = x.get_dimension_size('horizontal_x')
+        Ncols = x.get_dimension_size('horizontal_x')
+        Nchannels = 1
+        if len(x.shape) == 4:
+            Nchannels = x.get_dimension_size('channel')
         zer = numpy.zeros((Nrows,1))
         xxx = x.as_array()[:,:-1,0]
         h = numpy.concatenate((zer,xxx), 1) - numpy.concatenate((xxx,zer), 1)

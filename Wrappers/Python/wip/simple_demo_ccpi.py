@@ -1,7 +1,7 @@
 #import sys
 #sys.path.append("..")
 
-from ccpi.framework import ImageData , ImageGeometry, AcquisitionGeometry
+from ccpi.framework import ImageData , AcquisitionData, ImageGeometry, AcquisitionGeometry
 from ccpi.reconstruction.algs import FISTA, FBPD, CGLS
 from ccpi.reconstruction.funcs import Norm2sq, Norm1 , TV2D
 from ccpi.astra.astra_ops import AstraProjectorSimple
@@ -16,7 +16,7 @@ test_case = 1   # 1=parallel2D, 2=cone2D, 3=parallel3D
 
 # Set up phantom
 N = 128
-vert = 8
+vert = 9
 # Set up measurement geometry
 angles_num = 20; # angles number
 det_w = 1.0
@@ -25,7 +25,10 @@ SourceOrig = 200
 OrigDetec = 0
 
 if test_case==1:
-    angles = np.linspace(0,np.pi,angles_num,endpoint=False)
+    angles = np.linspace(0,np.pi,angles_num,endpoint=False,dtype=np.float32)*180/np.pi
+    #nangles = angles_num
+    #angles = np.linspace(0,360, nangles, dtype=np.float32)
+
 elif test_case==2:
     angles = np.linspace(0,2*np.pi,angles_num,endpoint=False)
 elif test_case == 3:
@@ -34,11 +37,12 @@ else:
     NotImplemented
 
 
-def setupCCPiGeometries(voxel_num_x, voxel_num_y, voxel_num_z, counter):
+def setupCCPiGeometries(voxel_num_x, voxel_num_y, voxel_num_z, angles, counter):
     vg = ImageGeometry(voxel_num_x=voxel_num_x,voxel_num_y=voxel_num_y, voxel_num_z=voxel_num_z)
-    Phantom = ImageData(geometry=vg)#.subset(['horizontal_x','horizontal_y','vertical'])
+    Phantom_ccpi = ImageData(geometry=vg,
+                        dimension_labels=['horizontal_x','horizontal_y','vertical'])
+    #.subset(['horizontal_x','horizontal_y','vertical'])
     # ask the ccpi code what dimensions it would like
-    Phantom_ccpi = Phantom.subset(['horizontal_x','horizontal_y','vertical'])
         
     voxel_per_pixel = 1
     geoms = pbalg.pb_setup_geometry_from_image(Phantom_ccpi.as_array(),
@@ -53,22 +57,34 @@ def setupCCPiGeometries(voxel_num_x, voxel_num_y, voxel_num_z, counter):
                               )
     
     center_of_rotation = Phantom_ccpi.get_dimension_size('horizontal_x') / 2
-    geoms_i = pbalg.pb_setup_geometry_from_image(Phantom_ccpi.as_array(),
+    ad = AcquisitionData(geometry=pg,dimension_labels=['angle','vertical','horizontal'])
+    geoms_i = pbalg.pb_setup_geometry_from_acquisition(ad.as_array(),
                                                 angles,
+                                                center_of_rotation,
                                                 voxel_per_pixel )
 
+    print (counter)
     counter+=1
-    if (not ( geoms_i == geoms )) and counter < 4:
-        setupCCPiGeometries(geoms_i['output_volume_x'],geoms_i['output_volume_y'],
-                            geoms_i['output_volume_z'],)
+    print (geoms , geoms_i)
+    if counter < 4:
+        if (not ( geoms_i == geoms )):
+            print ("not equal and {0}".format(counter))
+            setupCCPiGeometries(geoms['output_volume_x'],geoms['output_volume_y'],
+                                geoms['output_volume_z'],angles, counter)
+        else:
+            print ("return geoms_i {0}".format(geoms_i))
+            return geoms_i
     else:
+        print ("return geoms_i {0}".format(geoms_i))
         return geoms_i
 
-geoms = setupCCPiGeometries(N,N,vert,0)
+#geoms = setupCCPiGeometries(N,N,vert,angles,0)
+geoms = {'n_v': 12, 'output_volume_y': 128, 'n_angles': 20, 
+ 'output_volume_x': 128, 'output_volume_z': 12, 'n_h': 128}
 vg = ImageGeometry(voxel_num_x=geoms['output_volume_x'],
                    voxel_num_y=geoms['output_volume_y'], 
                    voxel_num_z=geoms['output_volume_z'])
-Phantom = ImageData(geometry=vg)#.subset(['horizontal_x','horizontal_y','vertical'])
+Phantom = ImageData(geometry=vg,dimension_labels=['horizontal_x','horizontal_y','vertical']) + 0.1
     
 
 #x = Phantom.as_array()
@@ -76,8 +92,8 @@ i = 0
 while i < geoms['n_v']:
     #x = Phantom.subset(vertical=i, dimensions=['horizontal_x','horizontal_y']).array
     x = Phantom.subset(vertical=i).array
-    x[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 1.0
-    x[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 2.0
+    x[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
+    x[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 0.98
     Phantom.fill(x, vertical=i)
     i += 1
 
@@ -117,8 +133,13 @@ Cop = CCPiProjectorSimple(vg, pg)
 b = Cop.direct(Phantom)
 out2 = Cop.adjoint(b)
 
-plt.imshow(b.subset( vertical=4).array)
-plt.show()
+#%%
+for i in range(b.get_dimension_size('vertical')):
+    plt.imshow(b.subset(vertical=i).array)
+    #plt.imshow(Phantom.subset( vertical=i).array)
+    #plt.imshow(b.array[:,i,:])
+    plt.show()
+#%%
 
 plt.imshow(out2.subset( vertical=4).array)
 plt.show()
@@ -135,9 +156,10 @@ x_init = ImageData(geometry=vg, dimension_labels=['horizontal_x','horizontal_y',
         
 #%%
 # Run FISTA for least squares without regularization
-x_fista0, it0, timing0, criter0 = FISTA(x_init, f, None)
+opt = {'tol': 1e-4, 'iter': 10}
+x_fista0, it0, timing0, criter0 = FISTA(x_init, f, None, opt=opt)
 
-plt.imshow(x_fista0.array[0])
+plt.imshow(x_fista0.subset(vertical=0).array)
 plt.title('FISTA0')
 plt.show()
 
@@ -146,9 +168,9 @@ lam = 0.1
 g0 = Norm1(lam)
 
 # Run FISTA for least squares plus 1-norm function.
-x_fista1, it1, timing1, criter1 = FISTA(x_init, f, g0)
+x_fista1, it1, timing1, criter1 = FISTA(x_init, f, g0,opt=opt)
 
-plt.imshow(x_fista1.array[0])
+plt.imshow(x_fista0.subset(vertical=0).array)
 plt.title('FISTA1')
 plt.show()
 
@@ -156,10 +178,10 @@ plt.semilogy(criter1)
 plt.show()
 
 # Run FBPD=Forward Backward Primal Dual method on least squares plus 1-norm
-opt = {'tol': 1e-4, 'iter': 10000}
+opt = {'tol': 1e-4, 'iter': 10}
 x_fbpd1, it_fbpd1, timing_fbpd1, criter_fbpd1 = FBPD(x_init,None,f,g0,opt=opt)
 
-plt.imshow(x_fbpd1.array[0])
+plt.imshow(x_fbpd1.subset(vertical=0).array)
 plt.title('FBPD1')
 plt.show()
 
@@ -170,13 +192,13 @@ plt.show()
 lamtv = 1
 gtv = TV2D(lamtv)
 
-x_fbpdtv, it_fbpdtv, timing_fbpdtv, criter_fbpdtv = FBPD(x_init,None,f,gtv,opt=opt)
+#x_fbpdtv, it_fbpdtv, timing_fbpdtv, criter_fbpdtv = FBPD(x_init,None,f,gtv,opt=opt)
 
-plt.imshow(x_fbpdtv.array[0])
-plt.show()
+#plt.imshow(x_fbpdtv.subset(vertical=0).array)
+#plt.show()
 
-plt.semilogy(criter_fbpdtv)
-plt.show()
+#plt.semilogy(criter_fbpdtv)
+#plt.show()  
 
 
 # Run CGLS, which should agree with the FISTA0

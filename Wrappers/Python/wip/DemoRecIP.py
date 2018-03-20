@@ -60,7 +60,7 @@ Aop = AstraProjectorSimple(vg,pg,'gpu')
 f = Norm2sq(Aop,b,c=0.5)
 
 # Run FISTA for least squares without regularization
-opt = {'tol': 1e-4, 'iter': 500}
+opt = {'tol': 1e-4, 'iter': 10}
 x_fista0, it0, timing0, criter0 = FISTA(x_init, f, None, opt)
 
 plt.imshow(x_fista0.array)
@@ -103,7 +103,7 @@ f_mc = Norm2sq(Aop_mc,b_mc,c=0.5)
 # Initial guess
 x_init_mc = ImageData(np.zeros((5, N, N)),geometry=vg_mc)
 
-opt = {'tol': 1e-4, 'iter': 500}
+
 x_fista0_mc, it0_mc, timing0_mc, criter0_mc = FISTA(x_init_mc, f_mc, None, opt)
 
 plt.imshow(x_fista0_mc.as_array()[4,:,:])

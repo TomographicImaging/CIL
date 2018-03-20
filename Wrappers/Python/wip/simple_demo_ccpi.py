@@ -156,7 +156,7 @@ x_init = ImageData(geometry=vg, dimension_labels=['horizontal_x','horizontal_y',
         
 #%%
 # Run FISTA for least squares without regularization
-opt = {'tol': 1e-4, 'iter': 10}
+opt = {'tol': 1e-4, 'iter': 100}
 x_fista0, it0, timing0, criter0 = FISTA(x_init, f, None, opt=opt)
 
 plt.imshow(x_fista0.subset(vertical=0).array)
@@ -178,7 +178,6 @@ plt.semilogy(criter1)
 plt.show()
 
 # Run FBPD=Forward Backward Primal Dual method on least squares plus 1-norm
-opt = {'tol': 1e-4, 'iter': 10}
 x_fbpd1, it_fbpd1, timing_fbpd1, criter_fbpd1 = FBPD(x_init,None,f,g0,opt=opt)
 
 plt.imshow(x_fbpd1.subset(vertical=0).array)
@@ -202,9 +201,9 @@ gtv = TV2D(lamtv)
 
 
 # Run CGLS, which should agree with the FISTA0
-x_CGLS, it_CGLS, timing_CGLS, criter_CGLS = CGLS(Cop, b, 1000, x_init)
+x_CGLS, it_CGLS, timing_CGLS, criter_CGLS = CGLS(Cop, b, 100, x_init)
 
-plt.imshow(x_CGLS.array)
+plt.imshow(x_CGLS.subset(vertical=0).array)
 plt.title('CGLS')
 plt.title('CGLS recon, compare FISTA0')
 plt.show()
@@ -225,32 +224,32 @@ fig = plt.figure()
 a=fig.add_subplot(rows,cols,current)
 a.set_title('phantom {0}'.format(np.shape(Phantom.as_array())))
 
-imgplot = plt.imshow(Phantom.as_array(),vmin=clims[0],vmax=clims[1])
+imgplot = plt.imshow(Phantom.subset(vertical=0).as_array(),vmin=clims[0],vmax=clims[1])
 
 current = current + 1
 a=fig.add_subplot(rows,cols,current)
 a.set_title('FISTA0')
-imgplot = plt.imshow(x_fista0.as_array(),vmin=clims[0],vmax=clims[1])
+imgplot = plt.imshow(x_fista0.subset(vertical=0).as_array(),vmin=clims[0],vmax=clims[1])
 
 current = current + 1
 a=fig.add_subplot(rows,cols,current)
 a.set_title('FISTA1')
-imgplot = plt.imshow(x_fista1.as_array(),vmin=clims[0],vmax=clims[1])
+imgplot = plt.imshow(x_fista1.subset(vertical=0).as_array(),vmin=clims[0],vmax=clims[1])
 
 current = current + 1
 a=fig.add_subplot(rows,cols,current)
 a.set_title('FBPD1')
-imgplot = plt.imshow(x_fbpd1.as_array(),vmin=clims[0],vmax=clims[1])
+imgplot = plt.imshow(x_fbpd1.subset(vertical=0).as_array(),vmin=clims[0],vmax=clims[1])
 
 current = current + 1
 a=fig.add_subplot(rows,cols,current)
 a.set_title('CGLS')
-imgplot = plt.imshow(x_CGLS.as_array(),vmin=clims[0],vmax=clims[1])
+imgplot = plt.imshow(x_CGLS.subset(vertical=0).as_array(),vmin=clims[0],vmax=clims[1])
 
-current = current + 1
-a=fig.add_subplot(rows,cols,current)
-a.set_title('FBPD TV')
-imgplot = plt.imshow(x_fbpdtv.as_array(),vmin=clims[0],vmax=clims[1])
+#current = current + 1
+#a=fig.add_subplot(rows,cols,current)
+#a.set_title('FBPD TV')
+#imgplot = plt.imshow(x_fbpdtv.subset(vertical=0).as_array(),vmin=clims[0],vmax=clims[1])
 
 fig = plt.figure()
 # projections row
@@ -260,7 +259,7 @@ imgplot = plt.loglog(criter0 , label='FISTA0')
 imgplot = plt.loglog(criter1 , label='FISTA1')
 imgplot = plt.loglog(criter_fbpd1, label='FBPD1')
 imgplot = plt.loglog(criter_CGLS, label='CGLS')
-imgplot = plt.loglog(criter_fbpdtv, label='FBPD TV')
+#imgplot = plt.loglog(criter_fbpdtv, label='FBPD TV')
 b.legend(loc='right')
 plt.show()
 #%%

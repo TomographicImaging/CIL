@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 #sys.path.append('../../../data/')
 from read_IPdata import read_IPdata
 
-from ccpi.astra.astra_ops import AstraProjector, AstraProjectorSimple, AstraProjectorMC
+from ccpi.astra.astra_ops import AstraProjectorSimple, AstraProjectorMC
 from ccpi.reconstruction.funcs import Norm2sq, Norm1, BaseFunction
 from ccpi.reconstruction.algs import FISTA
 #from ccpi.reconstruction.funcs import BaseFunction

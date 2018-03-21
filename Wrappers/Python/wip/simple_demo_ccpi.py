@@ -188,20 +188,20 @@ plt.semilogy(criter_fbpd1)
 plt.show()
 
 # Now FBPD for least squares plus TV
-lamtv = 1
-gtv = TV2D(lamtv)
+#lamtv = 1
+#gtv = TV2D(lamtv)
 
-x_fbpdtv, it_fbpdtv, timing_fbpdtv, criter_fbpdtv = FBPD(x_init,None,f,gtv,opt=opt)
+#x_fbpdtv, it_fbpdtv, timing_fbpdtv, criter_fbpdtv = FBPD(x_init,None,f,gtv,opt=opt)
 
-plt.imshow(x_fbpdtv.subset(vertical=0).array)
-plt.show()
+#plt.imshow(x_fbpdtv.subset(vertical=0).array)
+#plt.show()
 
-plt.semilogy(criter_fbpdtv)
-plt.show()  
+#plt.semilogy(criter_fbpdtv)
+#plt.show()  
 
 
 # Run CGLS, which should agree with the FISTA0
-x_CGLS, it_CGLS, timing_CGLS, criter_CGLS = CGLS(Cop, b, 100, x_init)
+x_CGLS, it_CGLS, timing_CGLS, criter_CGLS = CGLS(x_init, Cop, b, opt=opt)
 
 plt.imshow(x_CGLS.subset(vertical=0).array)
 plt.title('CGLS')
@@ -215,7 +215,7 @@ plt.show()
 
 #%%
 
-clims = (-0.5,2.5)
+clims = (0,1)
 cols = 3
 rows = 2
 current = 1
@@ -246,6 +246,8 @@ a=fig.add_subplot(rows,cols,current)
 a.set_title('CGLS')
 imgplot = plt.imshow(x_CGLS.subset(vertical=0).as_array(),vmin=clims[0],vmax=clims[1])
 
+plt.show()
+#%%
 #current = current + 1
 #a=fig.add_subplot(rows,cols,current)
 #a.set_title('FBPD TV')

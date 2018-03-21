@@ -36,7 +36,7 @@ def convert_geometry_to_astra(volume_geometry, sinogram_geometry):
                                          volume_geometry.get_min_z(), 
                                          volume_geometry.get_max_z())
         
-        if sinogram_geometry.proj_geom == 'parallel':
+        if sinogram_geometry.geom_type == 'parallel':
             proj_geom = astra.create_proj_geom('parallel3d',
                                                sinogram_geometry.pixel_size_h,
                                                sinogram_geometry.pixel_size_v,

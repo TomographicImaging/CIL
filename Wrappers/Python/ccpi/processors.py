@@ -641,7 +641,22 @@ class AcquisitionDataPadder(DataSetProcessor):
         exec(command)
         return out
         
-        
+#class FiniteDifferentiator(DataSetProcessor):
+#    def __init__(self):
+#        kwargs = {
+#                  
+#                  }
+#        
+#        super(FiniteDifferentiator, self).__init__(**kwargs)
+#        
+#    def check_input(self, dataset):
+#        return True
+#    
+#    def process(self):
+#        axis = 0
+#        d1 = numpy.diff(x,n=1,axis=axis)
+#        d1 = numpy.resize(d1, numpy.shape(x))
+
         
 
 def loadNexus(filename):

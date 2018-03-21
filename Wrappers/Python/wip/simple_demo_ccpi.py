@@ -63,24 +63,27 @@ def setupCCPiGeometries(voxel_num_x, voxel_num_y, voxel_num_z, angles, counter):
                                                 center_of_rotation,
                                                 voxel_per_pixel )
 
-    print (counter)
+    #print (counter)
     counter+=1
-    print (geoms , geoms_i)
+    #print (geoms , geoms_i)
     if counter < 4:
         if (not ( geoms_i == geoms )):
             print ("not equal and {0}".format(counter))
-            setupCCPiGeometries(geoms['output_volume_x'],geoms['output_volume_y'],
-                                geoms['output_volume_z'],angles, counter)
+            X = max(geoms['output_volume_x'], geoms_i['output_volume_x'])
+            Y = max(geoms['output_volume_y'], geoms_i['output_volume_y'])
+            Z = max(geoms['output_volume_z'], geoms_i['output_volume_z'])
+            return setupCCPiGeometries(X,Y,Z,angles, counter)
         else:
-            print ("return geoms_i {0}".format(geoms_i))
-            return geoms_i
+            print ("return geoms {0}".format(geoms))
+            return geoms
     else:
         print ("return geoms_i {0}".format(geoms_i))
         return geoms_i
 
-#geoms = setupCCPiGeometries(N,N,vert,angles,0)
-geoms = {'n_v': 12, 'output_volume_y': 128, 'n_angles': 20, 
- 'output_volume_x': 128, 'output_volume_z': 12, 'n_h': 128}
+geoms = setupCCPiGeometries(N,N,vert,angles,0)
+#%%
+#geoms = {'n_v': 12, 'output_volume_y': 128, 'n_angles': 20, 
+# 'output_volume_x': 128, 'output_volume_z': 12, 'n_h': 128}
 vg = ImageGeometry(voxel_num_x=geoms['output_volume_x'],
                    voxel_num_y=geoms['output_volume_y'], 
                    voxel_num_z=geoms['output_volume_z'])

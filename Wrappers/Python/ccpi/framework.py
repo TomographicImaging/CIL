@@ -83,6 +83,20 @@ class ImageGeometry:
         else:
             return 0
         
+    def clone(self):
+        '''returns a copy of ImageGeometry'''
+        return ImageGeometry(
+                            self.voxel_num_x, 
+                            self.voxel_num_y, 
+                            self.voxel_num_z, 
+                            self.voxel_size_x, 
+                            self.voxel_size_y, 
+                            self.voxel_size_z, 
+                            self.center_x, 
+                            self.center_y, 
+                            self.center_z, 
+                            self.channels)
+        
     
 class AcquisitionGeometry:
     
@@ -137,6 +151,31 @@ class AcquisitionGeometry:
         self.pixel_size_v = pixel_size_v
         
         self.channels = channels
+        
+    def clone(self):
+        '''returns a copy of the AcquisitionGeometry'''
+        return AcquisitionGeometry(self.geom_type,
+                                   self.dimension, 
+                                   self.angles, 
+                                   self.pixel_num_h, 
+                                   self.pixel_size_h, 
+                                   self.pixel_num_v, 
+                                   self.pixel_size_v, 
+                                   self.dist_source_center, 
+                                   self.dist_center_detector, 
+                                   self.channels)
+        
+    def __str__ (self):
+        repres = ""
+        repres += "Number of dimensions: {0}\n".format(self.dimension)
+        repres += "angles: {0}\n".format(len(self.angles))
+        repres += "voxel_num : h{0},v{1}\n".format(self.pixel_num_h, self.pixel_num_v)
+        repres += "voxel size: h{0},v{1}\n".format(self.pixel_size_h, self.pixel_size_v)
+        repres += "geometry type: {0}\n".format(self.geom_type)
+        repres += "distance source-detector: {0}\n".format(self.dist_source_center)
+        repres += "distance center-detector: {0}\n".format(self.dist_source_center)
+        repres += "number of channels: {0}\n".format(self.channels)
+        return repres
 
 
             
@@ -178,6 +217,25 @@ class DataContainer(object):
             # assume it is parallel beam
             pass
         
+    def get_dimension_size(self, dimension_label):
+        if dimension_label in self.dimension_labels.values():
+            acq_size = -1
+            for k,v in self.dimension_labels.items():
+                if v == dimension_label:
+                    acq_size = self.shape[k]
+            return acq_size
+        else:
+            raise ValueError('Unknown dimension {0}. Should be one of'.format(dimension_label,
+                             self.dimension_labels))
+    def get_dimension_axis(self, dimension_label):
+        if dimension_label in self.dimension_labels.values():
+            for k,v in self.dimension_labels.items():
+                if v == dimension_label:
+                    return k
+        else:
+            raise ValueError('Unknown dimension {0}. Should be one of'.format(dimension_label,
+                             self.dimension_labels.values()))
+                        
 
     def as_array(self, dimensions=None):
         '''Returns the DataContainer as Numpy Array
@@ -194,7 +252,15 @@ class DataContainer(object):
         '''Creates a DataContainer containing a subset of self according to the 
         labels in dimensions'''
         if dimensions is None:
-            return self.array.copy()
+            if kw == {}:
+                return self.array.copy()
+            else:
+                reduced_dims = [v for k,v in self.dimension_labels.items()]
+                for dim_l, dim_v in kw.items():
+                    for k,v in self.dimension_labels.items():
+                        if v == dim_l:
+                            reduced_dims.pop(k)
+                return self.subset(dimensions=reduced_dims, **kw)
         else:
             # check that all the requested dimensions are in the array
             # this is done by checking the dimension_labels
@@ -258,14 +324,31 @@ class DataContainer(object):
                 
                 return type(self)(cleaned , True, dimensions)
     
-    def fill(self, array):
+    def fill(self, array, **dimension):
         '''fills the internal numpy array with the one provided'''
-        if numpy.shape(array) != numpy.shape(self.array):
-            raise ValueError('Cannot fill with the provided array.' + \
-                             'Expecting {0} got {1}'.format(
-                                     numpy.shape(self.array),
-                                     numpy.shape(array)))
-        self.array = array[:]
+        if dimension == {}:
+            if numpy.shape(array) != numpy.shape(self.array):
+                raise ValueError('Cannot fill with the provided array.' + \
+                                 'Expecting {0} got {1}'.format(
+                                         numpy.shape(self.array),
+                                         numpy.shape(array)))
+            self.array = array[:]
+        else:
+            
+            command = 'self.array['
+            i = 0
+            for k,v in self.dimension_labels.items():
+                for dim_label, dim_value in dimension.items():    
+                    if dim_label == v:
+                        command = command + str(dim_value)
+                    else:
+                        command = command + ":"
+                if i < self.number_of_dimensions -1:
+                    command = command + ','
+                i += 1
+            command = command + "] = array[:]" 
+            exec(command)
+            
         
     def check_dimensions(self, other):
         return self.shape == other.shape
@@ -301,7 +384,7 @@ class DataContainer(object):
                                dimension_labels=self.dimension_labels,
                                geometry=self.geometry)
             else:
-                raise ValueError('Wrong shape: {0} and {1}'.format(self.shape, 
+                raise ValueError('__sub__ Wrong shape: {0} and {1}'.format(self.shape, 
                                  other.shape))
         elif isinstance(other, (int, float, complex)):
             return type(self)(self.as_array() - other, 
@@ -325,7 +408,7 @@ class DataContainer(object):
                                dimension_labels=self.dimension_labels,
                                geometry=self.geometry)
             else:
-                raise ValueError('Wrong shape: {0} and {1}'.format(self.shape, 
+                raise ValueError('__div__ Wrong shape: {0} and {1}'.format(self.shape, 
                                  other.shape))
         elif isinstance(other, (int, float, complex)):
             return type(self)(self.as_array() / other, 
@@ -346,7 +429,7 @@ class DataContainer(object):
                                dimension_labels=self.dimension_labels,
                                geometry=self.geometry)
             else:
-                raise ValueError('Wrong shape: {0} and {1}'.format(self.shape, 
+                raise ValueError('__pow__ Wrong shape: {0} and {1}'.format(self.shape, 
                                  other.shape))
         elif isinstance(other, (int, float, complex)):
             return type(self)(self.as_array() ** other, 
@@ -354,7 +437,7 @@ class DataContainer(object):
                                dimension_labels=self.dimension_labels,
                                geometry=self.geometry)
         else:
-            raise TypeError('Cannot {0} DataContainer with {1}'.format("power" ,
+            raise TypeError('pow: Cannot {0} DataContainer with {1}'.format("power" ,
                             type(other)))
     # __pow__
     
@@ -367,7 +450,7 @@ class DataContainer(object):
                                dimension_labels=self.dimension_labels,
                                geometry=self.geometry)
             else:
-                raise ValueError('Wrong shape: {0} and {1}'.format(self.shape, 
+                raise ValueError('*:Wrong shape: {0} and {1}'.format(self.shape, 
                                  other.shape))
         elif isinstance(other, (int, float, complex)):
             return type(self)(self.as_array() * other, 
@@ -464,12 +547,13 @@ class DataContainer(object):
         return self / other
     # __idiv__
     
-    def __str__ (self):
+    def __str__ (self, representation=False):
         repres = ""
         repres += "Number of dimensions: {0}\n".format(self.number_of_dimensions)
         repres += "Shape: {0}\n".format(self.shape)
         repres += "Axis labels: {0}\n".format(self.dimension_labels)
-        repres += "Representation: \n{0}\n".format(self.array)
+        if representation:
+            repres += "Representation: \n{0}\n".format(self.array)
         return repres
     
     def clone(self):
@@ -479,6 +563,40 @@ class DataContainer(object):
                           dimension_labels=self.dimension_labels,
                           deep_copy=True,
                           geometry=self.geometry )
+    
+    def get_data_axes_order(self,new_order=None):
+        '''returns the axes label of self as a list
+        
+        if new_order is None returns the labels of the axes as a sorted-by-key list
+        if new_order is a list of length number_of_dimensions, returns a list
+        with the indices of the axes in new_order with respect to those in 
+        self.dimension_labels: i.e.
+          self.dimension_labels = {0:'horizontal',1:'vertical'}
+          new_order = ['vertical','horizontal']
+          returns [1,0]
+        '''
+        if new_order is None:
+            
+            axes_order = [i for i in range(len(self.shape))]
+            for k,v in self.dimension_labels.items():
+                axes_order[k] = v
+            return axes_order
+        else:
+            if len(new_order) == self.number_of_dimensions:
+                axes_order = [i for i in range(self.number_of_dimensions)]
+                
+                for i in range(len(self.shape)):
+                    found = False
+                    for k,v in self.dimension_labels.items():
+                        if new_order[i] == v:
+                            axes_order[i] = k
+                            found = True
+                    if not found:
+                        raise ValueError('Axis label {0} not found.'.format(new_order[i]))
+                return axes_order
+            else:
+                raise ValueError('Expecting {0} axes, got {2}'\
+                                 .format(len(self.shape),len(new_order)))
         
                 
                     
@@ -501,29 +619,45 @@ class ImageData(DataContainer):
                 horiz_y   = geometry.voxel_num_y
                 vert      = 1 if geometry.voxel_num_z is None\
                               else geometry.voxel_num_z # this should be 1 for 2D
-                
-                if channels > 1:
-                    if vert > 1:
-                        shape = (channels, vert, horiz_y, horiz_x)
-                        dim_labels = ['channel' ,'vertical' , 'horizontal_y' , 
-                                      'horizontal_x']
+                if dimension_labels is None:
+                    if channels > 1:
+                        if vert > 1:
+                            shape = (channels, vert, horiz_y, horiz_x)
+                            dim_labels = ['channel' ,'vertical' , 'horizontal_y' , 
+                                          'horizontal_x']
+                        else:
+                            shape = (channels , horiz_y, horiz_x)
+                            dim_labels = ['channel' , 'horizontal_y' , 
+                                          'horizontal_x']
                     else:
-                        shape = (channels , horiz_y, horiz_x)
-                        dim_labels = ['channel' , 'horizontal_y' , 
-                                      'horizontal_x']
+                        if vert > 1:
+                            shape = (vert, horiz_y, horiz_x)
+                            dim_labels = ['vertical' , 'horizontal_y' , 
+                                          'horizontal_x']
+                        else:
+                            shape = (horiz_y, horiz_x)
+                            dim_labels = ['horizontal_y' , 
+                                          'horizontal_x']
+                    dimension_labels = dim_labels
                 else:
-                    if vert > 1:
-                        shape = (vert, horiz_y, horiz_x)
-                        dim_labels = ['vertical' , 'horizontal_y' , 
-                                      'horizontal_x']
-                    else:
-                        shape = (horiz_y, horiz_x)
-                        dim_labels = ['horizontal_y' , 
-                                      'horizontal_x']
-                        
+                    shape = []
+                    for dim in dimension_labels:
+                        if dim == 'channel':
+                            shape.append(channels)
+                        elif dim == 'horizontal_y':
+                            shape.append(horiz_y)
+                        elif dim == 'vertical':
+                            shape.append(vert)
+                        elif dim == 'horizontal_x':
+                            shape.append(horiz_x)
+                    if len(shape) != len(dimension_labels):
+                        raise ValueError('Missing {0} axes'.format(
+                                len(dimension_labels) - len(shape)))
+                    shape = tuple(shape)
+                    
                 array = numpy.zeros( shape , dtype=numpy.float32) 
                 super(ImageData, self).__init__(array, deep_copy,
-                                 dim_labels, **kwargs)
+                                 dimension_labels, **kwargs)
                 
             else:
                 raise ValueError('Please pass either a DataContainer, ' +\
@@ -571,6 +705,12 @@ class ImageData(DataContainer):
                     if key == 'spacing' :
                         self.spacing = value
                         
+        def subset(self, dimensions=None, **kw):
+            out = super(ImageData, self).subset(dimensions, **kw)
+            #out.geometry = self.recalculate_geometry(dimensions , **kw)
+            out.geometry = self.geometry
+            return out
+                        
 
 class AcquisitionData(DataContainer):
     '''DataContainer for holding 2D or 3D sinogram'''
@@ -582,37 +722,54 @@ class AcquisitionData(DataContainer):
         self.geometry = None
         if array is None:
             if 'geometry' in kwargs.keys():
-                geometry  = kwargs['geometry']
+                geometry      = kwargs['geometry']
                 self.geometry = geometry
-                channels  = geometry.channels
-                horiz   = geometry.pixel_num_h
-                vert   = geometry.pixel_num_v
-                angles = geometry.angles
+                channels      = geometry.channels
+                horiz         = geometry.pixel_num_h
+                vert          = geometry.pixel_num_v
+                angles        = geometry.angles
                 num_of_angles = numpy.shape(angles)[0]
                 
-                
-                if channels > 1:
-                    if vert > 1:
-                        shape = (channels, num_of_angles , vert, horiz)
-                        dim_labels = ['channel' , ' angle' ,
-                                      'vertical' , 'horizontal']
+                if dimension_labels is None:
+                    if channels > 1:
+                        if vert > 1:
+                            shape = (channels, num_of_angles , vert, horiz)
+                            dim_labels = ['channel' , ' angle' ,
+                                          'vertical' , 'horizontal']
+                        else:
+                            shape = (channels , num_of_angles, horiz)
+                            dim_labels = ['channel' , 'angle' , 
+                                          'horizontal']
                     else:
-                        shape = (channels , num_of_angles, horiz)
-                        dim_labels = ['channel' , 'angle' , 
-                                      'horizontal']
+                        if vert > 1:
+                            shape = (num_of_angles, vert, horiz)
+                            dim_labels = ['angle' , 'vertical' , 
+                                          'horizontal']
+                        else:
+                            shape = (num_of_angles, horiz)
+                            dim_labels = ['angle' , 
+                                          'horizontal']
+                    
+                    dimension_labels = dim_labels
                 else:
-                    if vert > 1:
-                        shape = (num_of_angles, vert, horiz)
-                        dim_labels = ['angles' , 'vertical' , 
-                                      'horizontal']
-                    else:
-                        shape = (num_of_angles, horiz)
-                        dim_labels = ['angles' , 
-                                      'horizontal']
-                
+                    shape = []
+                    for dim in dimension_labels:
+                        if dim == 'channel':
+                            shape.append(channels)
+                        elif dim == 'angle':
+                            shape.append(num_of_angles)
+                        elif dim == 'vertical':
+                            shape.append(vert)
+                        elif dim == 'horizontal':
+                            shape.append(horiz)
+                    if len(shape) != len(dimension_labels):
+                        raise ValueError('Missing {0} axes'.format(
+                                len(dimension_labels) - len(shape)))
+                    shape = tuple(shape)
+                    
                 array = numpy.zeros( shape , dtype=numpy.float32) 
                 super(AcquisitionData, self).__init__(array, deep_copy,
-                                 dim_labels, **kwargs)
+                                 dimension_labels, **kwargs)
         else:
             
             if type(array) == DataContainer:
@@ -732,6 +889,9 @@ class DataSetProcessor(object):
         
     def process(self):
         raise NotImplementedError('process must be implemented')
+        
+    
+    
 
 class DataSetProcessor23D(DataSetProcessor):
     '''Regularizers DataSetProcessor
@@ -945,7 +1105,7 @@ if __name__ == '__main__':
 
     # create VolumeData from geometry
     vgeometry = ImageGeometry(voxel_num_x=2, voxel_num_y=3, channels=2)
-    vol = VolumeData(geometry=vgeometry)
+    vol = ImageData(geometry=vgeometry)
     
     sgeometry = AcquisitionGeometry(dimension=2, angles=numpy.linspace(0, 180, num=20), 
                                        geom_type='parallel', pixel_num_v=3,

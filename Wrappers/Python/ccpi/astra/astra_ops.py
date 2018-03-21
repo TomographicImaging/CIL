@@ -18,7 +18,7 @@
 from ccpi.reconstruction.ops import Operator
 import numpy
 import astra
-from ccpi.framework import AcquisitionData, ImageData
+from ccpi.framework import AcquisitionData, ImageData, DataContainer
 from ccpi.reconstruction.ops import PowerMethodNonsquare
 from ccpi.astra.astra_processors import AstraForwardProjector, AstraBackProjector, \
      AstraForwardProjectorMC, AstraBackProjectorMC
@@ -68,6 +68,10 @@ class AstraProjectorSimple(Operator):
                   self.sinogram_geometry.pixel_num_h), \
                  (self.volume_geometry.voxel_num_x, \
                   self.volume_geometry.voxel_num_y) )
+    
+    def create_image_data(self):
+        inputsize = self.size()[1]
+        return DataContainer(numpy.random.randn(inputsize[0],inputsize[1]))
 
 class AstraProjectorMC(Operator):
     """ASTRA Multichannel projector"""

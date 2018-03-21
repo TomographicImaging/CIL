@@ -573,7 +573,7 @@ class AcquisitionDataPadder(DataSetProcessor):
     def process(self):
         projections = self.get_input()
         w = projections.get_dimension_size('horizontal')
-        delta = w - 2 * cor
+        delta = w - 2 * self.center_of_rotation
                
         padded_width = int (
                 numpy.ceil(abs(delta)) + w

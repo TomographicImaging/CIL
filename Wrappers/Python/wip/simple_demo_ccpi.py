@@ -191,13 +191,13 @@ plt.show()
 lamtv = 1
 gtv = TV2D(lamtv)
 
-#x_fbpdtv, it_fbpdtv, timing_fbpdtv, criter_fbpdtv = FBPD(x_init,None,f,gtv,opt=opt)
+x_fbpdtv, it_fbpdtv, timing_fbpdtv, criter_fbpdtv = FBPD(x_init,None,f,gtv,opt=opt)
 
-#plt.imshow(x_fbpdtv.subset(vertical=0).array)
-#plt.show()
+plt.imshow(x_fbpdtv.subset(vertical=0).array)
+plt.show()
 
-#plt.semilogy(criter_fbpdtv)
-#plt.show()  
+plt.semilogy(criter_fbpdtv)
+plt.show()  
 
 
 # Run CGLS, which should agree with the FISTA0

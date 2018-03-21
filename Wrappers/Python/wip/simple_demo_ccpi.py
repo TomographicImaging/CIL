@@ -16,7 +16,7 @@ test_case = 1   # 1=parallel2D, 2=cone2D, 3=parallel3D
 
 # Set up phantom
 N = 128
-vert = 9
+vert = 1
 # Set up measurement geometry
 angles_num = 20; # angles number
 det_w = 1.0
@@ -144,7 +144,7 @@ for i in range(b.get_dimension_size('vertical')):
     plt.show()
 #%%
 
-plt.imshow(out2.subset( vertical=4).array)
+plt.imshow(out2.subset( vertical=0).array)
 plt.show()
 
 # Create least squares object instance with projector and data.

@@ -105,25 +105,25 @@ class FiniteDiff2D(Operator):
         d1[:,:-1] = x.as_array()[:,1:] - x.as_array()[:,:-1]
         d2 = numpy.zeros_like(x.as_array())
         d2[:-1,:] = x.as_array()[1:,:] - x.as_array()[:-1,:]
-        d = numpy.stack((d1,d2),0)
+        d = numpy.stack((d1,d2),2)
         
         return type(x)(d,geometry=x.geometry)
     
     def adjoint(self,x):
         '''Backward differences, Newumann BC.'''
         #Nrows, Ncols, Nchannels = x.as_array().shape
-        #print (x)
+        print (x)
         Nrows = x.get_dimension_size('horizontal_x')
         Ncols = x.get_dimension_size('horizontal_x')
         Nchannels = 1
         if len(x.shape) == 4:
             Nchannels = x.get_dimension_size('channel')
         zer = numpy.zeros((Nrows,1))
-        xxx = x.as_array()[0,:,:-1]
+        xxx = x.as_array()[:,:-1,0]
         h = numpy.concatenate((zer,xxx), 1) - numpy.concatenate((xxx,zer), 1)
         
         zer = numpy.zeros((1,Ncols))
-        xxx = x.as_array()[1,:-1,:]
+        xxx = x.as_array()[:-1,:,1]
         v = numpy.concatenate((zer,xxx), 0) - numpy.concatenate((xxx,zer), 0)
         return type(x)(h + v,geometry=x.geometry)
     

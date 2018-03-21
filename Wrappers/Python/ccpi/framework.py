@@ -226,7 +226,7 @@ class DataContainer(object):
             return acq_size
         else:
             raise ValueError('Unknown dimension {0}. Should be one of'.format(dimension_label,
-                             self.dimension_labels.values()))
+                             self.dimension_labels))
     def get_dimension_axis(self, dimension_label):
         if dimension_label in self.dimension_labels.values():
             for k,v in self.dimension_labels.items():

@@ -72,13 +72,13 @@ class ImageGeometry:
         return self.center_y + 0.5*self.voxel_num_y*self.voxel_size_y
         
     def get_min_z(self):
-        if not voxel_num_z == 0:
+        if not self.voxel_num_z == 0:
             return self.center_z - 0.5*self.voxel_num_z*self.voxel_size_z
         else:
             return 0
         
     def get_max_z(self):
-        if not voxel_num_z == 0:
+        if not self.voxel_num_z == 0:
             return self.center_z + 0.5*self.voxel_num_z*self.voxel_size_z
         else:
             return 0

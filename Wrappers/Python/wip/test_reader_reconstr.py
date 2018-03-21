@@ -19,28 +19,7 @@ import numpy
 import matplotlib.pyplot as plt
 
 import os
-
-def add_dimension(data, fill_with, axis, start=True):
-    delta = data.shape[data.get_dimension_axis(axis)] - fill_with.shape[fill_with.get_dimension_axis(axis)] 
-    command = 'data.array['
-    i = 0
-    for k,v in data.dimension_labels.items():
-        if axis == v:
-            if start:
-                command = command + str(delta) + ":"
-            else:
-                l = data.get_dimension_size(axis) - delta
-                command = command + "0:" + str(l)
-        else:
-            command = command + ":"
-            
-        if i < data.number_of_dimensions -1:
-            command = command + ','
-        i += 1
-    command = command + "] = fill_with.array[:]" 
-    #print (command)
-    exec(command)
-    #return command
+import pickle
 
 
 def avg_img(image):
@@ -51,48 +30,6 @@ def avg_img(image):
         avg += image[i] / l
     return avg
     
-def setupCCPiGeometries(voxel_num_x, voxel_num_y, voxel_num_z, angles, counter):
-    vg = ImageGeometry(voxel_num_x=voxel_num_x,voxel_num_y=voxel_num_y, voxel_num_z=voxel_num_z)
-    Phantom_ccpi = ImageData(geometry=vg,
-                        dimension_labels=['horizontal_x','horizontal_y','vertical'])
-    #.subset(['horizontal_x','horizontal_y','vertical'])
-    # ask the ccpi code what dimensions it would like
-        
-    voxel_per_pixel = 1
-    geoms = pbalg.pb_setup_geometry_from_image(Phantom_ccpi.as_array(),
-                                                angles,
-                                                voxel_per_pixel )
-    
-    pg = AcquisitionGeometry('parallel',
-                              '3D',
-                              angles,
-                              geoms['n_h'], 1,
-                              geoms['n_v'], 1 #2D in 3D is a slice 1 pixel thick
-                              )
-    
-    center_of_rotation = Phantom_ccpi.get_dimension_size('horizontal_x') / 2
-    ad = AcquisitionData(geometry=pg,dimension_labels=['angle','vertical','horizontal'])
-    geoms_i = pbalg.pb_setup_geometry_from_acquisition(ad.as_array(),
-                                                angles,
-                                                center_of_rotation,
-                                                voxel_per_pixel )
-
-    #print (counter)
-    counter+=1
-    #print (geoms , geoms_i)
-    if counter < 4:
-        if (not ( geoms_i == geoms )):
-            print ("not equal and {0}".format(counter))
-            X = max(geoms['output_volume_x'], geoms_i['output_volume_x'])
-            Y = max(geoms['output_volume_y'], geoms_i['output_volume_y'])
-            Z = max(geoms['output_volume_z'], geoms_i['output_volume_z'])
-            return setupCCPiGeometries(X,Y,Z,angles, counter)
-        else:
-            print ("return geoms {0}".format(geoms))
-            return geoms
-    else:
-        print ("return geoms_i {0}".format(geoms_i))
-        return geoms_i
 
 reader = NexusReader(os.path.join(".." ,".." ,".." , "data" , "24737_fd.nxs" ))
 
@@ -141,12 +78,14 @@ x_init = ImageData(geometry=vg, dimension_labels=['horizontal_x','horizontal_y',
 #%%
 print ("run FISTA")
 # Run FISTA for least squares without regularization
-opt = {'tol': 1e-4, 'iter': 10}
+opt = {'tol': 1e-4, 'iter': 500}
 x_fista0, it0, timing0, criter0 = FISTA(x_init, f, None, opt=opt)
+pickle.dump(x_fista0, open("fista0.pkl", "wb"))
+
 
 plt.imshow(x_fista0.subset(horizontal_x=80).array)
 plt.title('FISTA0')
-plt.show()
+#plt.show()
 
 # Now least squares plus 1-norm regularization
 lam = 0.1
@@ -154,23 +93,25 @@ g0 = Norm1(lam)
 
 # Run FISTA for least squares plus 1-norm function.
 x_fista1, it1, timing1, criter1 = FISTA(x_init, f, g0,opt=opt)
+pickle.dump(x_fista1, open("fista1.pkl", "wb"))
 
 plt.imshow(x_fista0.subset(horizontal_x=80).array)
 plt.title('FISTA1')
-plt.show()
+#plt.show()
 
 plt.semilogy(criter1)
-plt.show()
+#plt.show()
 
 # Run FBPD=Forward Backward Primal Dual method on least squares plus 1-norm
 x_fbpd1, it_fbpd1, timing_fbpd1, criter_fbpd1 = FBPD(x_init,None,f,g0,opt=opt)
+pickle.dump(x_fbpd1, open("fbpd1.pkl", "wb"))
 
 plt.imshow(x_fbpd1.subset(horizontal_x=80).array)
 plt.title('FBPD1')
-plt.show()
+#plt.show()
 
 plt.semilogy(criter_fbpd1)
-plt.show()
+#plt.show()
 
 # Now FBPD for least squares plus TV
 #lamtv = 1
@@ -187,12 +128,66 @@ plt.show()
 
 # Run CGLS, which should agree with the FISTA0
 x_CGLS, it_CGLS, timing_CGLS, criter_CGLS = CGLS(x_init, Cop, padded_data, opt=opt)
-
+pickle.dump(x_CGLS, open("cgls.pkl", "wb"))
 plt.imshow(x_CGLS.subset(horizontal_x=80).array)
 plt.title('CGLS')
 plt.title('CGLS recon, compare FISTA0')
-plt.show()
+#plt.show()
 
 plt.semilogy(criter_CGLS)
 plt.title('CGLS criterion')
+#plt.show()
+
+
+clims = (0,1)
+cols = 5
+rows = 1
+current = 1
+fig = plt.figure()
+# projections row
+
+current = current 
+a=fig.add_subplot(rows,cols,current)
+a.set_title('FISTA0')
+imgplot = plt.imshow(x_fista0.subset(horizontal_x=80).as_array())
+
+current = current + 1
+a=fig.add_subplot(rows,cols,current)
+a.set_title('FISTA1')
+imgplot = plt.imshow(x_fista1.subset(horizontal_x=80).as_array())
+
+current = current + 1
+a=fig.add_subplot(rows,cols,current)
+a.set_title('FBPD1')
+imgplot = plt.imshow(x_fbpd1.subset(horizontal_x=80).as_array())
+
+current = current + 1
+a=fig.add_subplot(rows,cols,current)
+a.set_title('CGLS')
+imgplot = plt.imshow(x_CGLS.subset(horizontal_x=80).as_array())
+
+current = current + 1
+a=fig.add_subplot(rows,cols,current)
+a.set_title('criteria')
+imgplot = plt.loglog(criter0 , label='FISTA0')
+imgplot = plt.loglog(criter1 , label='FISTA1')
+imgplot = plt.loglog(criter_fbpd1, label='FBPD1')
+imgplot = plt.loglog(criter_CGLS, label='CGLS')
+#imgplot = plt.loglog(criter_fbpdtv, label='FBPD TV')
+a.legend(loc='right')
+
+plt.show()
+
+
+#%%
+fig = plt.figure()
+# projections row
+b=fig.add_subplot(1,1,1)
+b.set_title('criteria')
+imgplot = plt.loglog(criter0 , label='FISTA0')
+imgplot = plt.loglog(criter1 , label='FISTA1')
+imgplot = plt.loglog(criter_fbpd1, label='FBPD1')
+imgplot = plt.loglog(criter_CGLS, label='CGLS')
+#imgplot = plt.loglog(criter_fbpdtv, label='FBPD TV')
+b.legend(loc='right')
 plt.show()

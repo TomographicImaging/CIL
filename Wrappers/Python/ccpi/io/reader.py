@@ -83,28 +83,28 @@ class NexusReader(object):
             print("Error reading nexus file")
             raise
         
-    def loadProjection(self, dimensions=None):
+    def load_projection(self, dimensions=None):
         '''
         Loads the projection data from the nexus file.
         returns: numpy array with projection data
         '''
         return self.load(dimensions, 0)
     
-    def loadFlat(self, dimensions=None):
+    def load_flat(self, dimensions=None):
         '''
         Loads the flat field data from the nexus file.
         returns: numpy array with flat field data
         '''        
         return self.load(dimensions, 1)
     
-    def loadDark(self, dimensions=None):
+    def load_dark(self, dimensions=None):
         '''
         Loads the Dark field data from the nexus file.
         returns: numpy array with dark field data
         '''        
         return self.load(dimensions, 2)
     
-    def getProjectionAngles(self):
+    def get_projection_angles(self):
         '''
         This function returns the projection angles
         '''
@@ -122,7 +122,7 @@ class NexusReader(object):
             raise        
 
     
-    def getSinogramDimensions(self):
+    def get_sinogram_dimensions(self):
         '''
         Return the dimensions of the dataset
         '''
@@ -142,7 +142,7 @@ class NexusReader(object):
             print("Error reading nexus file")
             raise                
         
-    def getProjectionDimensions(self):
+    def get_projection_dimensions(self):
         '''
         Return the dimensions of the dataset
         '''
@@ -161,13 +161,23 @@ class NexusReader(object):
             print("Error reading nexus file")
             raise  
         
-    def getAcquisitionData(self, dimensions=None):
+    def get_acquisition_data(self, dimensions=None):
         '''
         This method load the acquisition data and given dimension and returns an AcquisitionData Object
         '''
-        data = self.loadProjection(dimensions)
-        geometry = AcquisitionGeometry('parallel', '3D', self.getProjectionAngles())
-        return AcquisitionData(data, geometry=geometry)   
+        data = self.load_projection(dimensions)
+        dims = self.get_projection_dimensions()
+        geometry = AcquisitionGeometry('parallel', '3D', 
+                                       self.get_projection_angles(),
+                                       pixel_num_h          = dims[2],
+                                       pixel_size_h         = 1 ,
+                                       pixel_num_v          = dims[1],
+                                       pixel_size_v         = 1,
+                                       dist_source_center   = None, 
+                                       dist_center_detector = None, 
+                                       channels             = 1)
+        return AcquisitionData(data, geometry=geometry, 
+                               dimension_labels=['angle','vertical','horizontal'])   
     
           
 class XTEKReader(object):
@@ -263,7 +273,7 @@ class XTEKReader(object):
             raise RuntimeError("Can't find angles file")
         return angles  
     
-    def loadProjection(self, dimensions=None):
+    def load_projection(self, dimensions=None):
         '''
         This method reads the projection images from the directory and returns a numpy array
         '''  

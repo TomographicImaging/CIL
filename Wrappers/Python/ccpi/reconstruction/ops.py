@@ -19,7 +19,8 @@
 
 import numpy
 from scipy.sparse.linalg import svds
-from ccpi.framework import DataContainer
+from ccpi.framework import DataContainer, ImageGeometry , ImageData
+from ccpi.processors import CCPiBackwardProjector, CCPiForwardProjector
 
 # Maybe operators need to know what types they take as inputs/outputs
 # to not just use generic DataContainer
@@ -110,7 +111,13 @@ class FiniteDiff2D(Operator):
     
     def adjoint(self,x):
         '''Backward differences, Newumann BC.'''
-        Nrows, Ncols, Nchannels = x.as_array().shape
+        #Nrows, Ncols, Nchannels = x.as_array().shape
+        print (x)
+        Nrows = x.get_dimension_size('horizontal_x')
+        Ncols = x.get_dimension_size('horizontal_x')
+        Nchannels = 1
+        if len(x.shape) == 4:
+            Nchannels = x.get_dimension_size('channel')
         zer = numpy.zeros((Nrows,1))
         xxx = x.as_array()[:,:-1,0]
         h = numpy.concatenate((zer,xxx), 1) - numpy.concatenate((xxx,zer), 1)
@@ -129,13 +136,27 @@ class FiniteDiff2D(Operator):
 
 def PowerMethodNonsquareOld(op,numiters):
     # Initialise random
-    inputsize = op.size()[1]
-    x0 = DataContainer(numpy.random.randn(inputsize[0],inputsize[1]))
+    # Jakob's
+    #inputsize = op.size()[1]
+    #x0 = ImageContainer(numpy.random.randn(*inputsize)
+    # Edo's
+    #vg = ImageGeometry(voxel_num_x=inputsize[0],
+    #                   voxel_num_y=inputsize[1], 
+    #                   voxel_num_z=inputsize[2])
+    #
+    #x0 = ImageData(geometry = vg, dimension_labels=['vertical','horizontal_y','horizontal_x'])
+    #print (x0)
+    #x0.fill(numpy.random.randn(*x0.shape))
+    
+    x0 = op.create_image_data()
+    
     s = numpy.zeros(numiters)
     # Loop
     for it in numpy.arange(numiters):
         x1 = op.adjoint(op.direct(x0))
         x1norm = numpy.sqrt((x1**2).sum())
+        #print ("x0 **********" ,x0)
+        #print ("x1 **********" ,x1)
         s[it] = (x1*x0).sum() / (x0*x0).sum()
         x0 = (1.0/x1norm)*x1
     return numpy.sqrt(s[-1]), numpy.sqrt(s), x0
@@ -152,6 +173,7 @@ def PowerMethodNonsquareOld(op,numiters):
 #        x0 = (1.0/x1norm)*x1
 #    return s, x0
     
+
 def PowerMethodNonsquare(op,numiters):
     # Initialise random
     # Jakob's
@@ -178,3 +200,57 @@ def PowerMethodNonsquare(op,numiters):
         s[it] = (x1*x0).sum() / (x0*x0).sum()
         x0 = (1.0/x1norm)*x1
     return numpy.sqrt(s[-1]), numpy.sqrt(s), x0
+
+class CCPiProjectorSimple(Operator):
+    """ASTRA projector modified to use DataSet and geometry."""
+    def __init__(self, geomv, geomp):
+        super(CCPiProjectorSimple, self).__init__()
+        
+        # Store volume and sinogram geometries.
+        self.acquisition_geometry = geomp
+        self.volume_geometry = geomv
+        
+        self.fp = CCPiForwardProjector(image_geometry=geomv,
+                                       acquisition_geometry=geomp,
+                                       output_axes_order=['angle','vertical','horizontal'])
+        
+        self.bp = CCPiBackwardProjector(image_geometry=geomv,
+                                    acquisition_geometry=geomp,
+                                    output_axes_order=['horizontal_x','horizontal_y','vertical'])
+                
+        # Initialise empty for singular value.
+        self.s1 = None
+    
+    def direct(self, image_data):
+        self.fp.set_input(image_data)
+        out = self.fp.get_output()
+        return out
+    
+    def adjoint(self, acquisition_data):
+        self.bp.set_input(acquisition_data)
+        out = self.bp.get_output()
+        return out
+    
+    #def delete(self):
+    #    astra.data2d.delete(self.proj_id)
+    
+    def get_max_sing_val(self):
+        a = PowerMethodNonsquare(self,10)
+        self.s1 = a[0] 
+        return self.s1
+    
+    def size(self):
+        # Only implemented for 3D
+        return ( (self.acquisition_geometry.angles.size, \
+                  self.acquisition_geometry.pixel_num_v,
+                  self.acquisition_geometry.pixel_num_h), \
+                 (self.volume_geometry.voxel_num_x, \
+                  self.volume_geometry.voxel_num_y,
+                  self.volume_geometry.voxel_num_z) )
+    def create_image_data(self):
+        x0 = ImageData(geometry = self.volume_geometry, 
+                       dimension_labels=self.bp.output_axes_order)#\
+                       #.subset(['horizontal_x','horizontal_y','vertical'])
+        print (x0)
+        x0.fill(numpy.random.randn(*x0.shape))
+        return x0

@@ -23,14 +23,36 @@ import time
 from ccpi.reconstruction.funcs import BaseFunction
 
 def FISTA(x_init, f=None, g=None, opt=None):
-
+    '''Fast Iterative Shrinkage-Thresholding Algorithm
+    
+    Beck, A. and Teboulle, M., 2009. A fast iterative shrinkage-thresholding 
+    algorithm for linear inverse problems. 
+    SIAM journal on imaging sciences,2(1), pp.183-202.
+    
+    Parameters:
+      x_init: initial guess
+      f: data fidelity
+      g: regularizer
+      h:
+      opt: additional algorithm 
+    '''
     # default inputs
     if f   is None: f = BaseFunction()
     if g   is None: g = BaseFunction()
-    if opt is None: opt = {'tol': 1e-4, 'iter': 1000}
-
+    
     # algorithmic parameters
-    tol      = opt['tol']
+    if opt is None: 
+        opt = {'tol': 1e-4, 'iter': 1000}
+    else:
+        try:
+            max_iter = opt['iter']
+        except KeyError as ke:
+            opt[ke] = 1000
+        try:
+            opt['tol'] = 1000
+        except KeyError as ke:
+            opt[ke] = 1e-4
+    tol = opt['tol']
     max_iter = opt['iter']
     
     # initialization
@@ -76,15 +98,33 @@ def FISTA(x_init, f=None, g=None, opt=None):
     return x, it, timing, criter
 
 def FBPD(x_init, f=None, g=None, h=None, opt=None):
-
+    '''FBPD Algorithm
+    
+    Parameters:
+      x_init: initial guess
+      f: constraint
+      g: data fidelity
+      h: regularizer
+      opt: additional algorithm 
+    '''
     # default inputs
     if f   is None: f = BaseFunction()
     if g   is None: g = BaseFunction()
     if h   is None: h = BaseFunction()
-    if opt is None: opt = {'tol': 1e-4, 'iter': 1000}
-
+    
     # algorithmic parameters
-    tol      = opt['tol']
+    if opt is None: 
+        opt = {'tol': 1e-4, 'iter': 1000}
+    else:
+        try:
+            max_iter = opt['iter']
+        except KeyError as ke:
+            opt[ke] = 1000
+        try:
+            opt['tol'] = 1000
+        except KeyError as ke:
+            opt[ke] = 1e-4
+    tol = opt['tol']
     max_iter = opt['iter']
     
     # step-sizes
@@ -127,13 +167,34 @@ def FBPD(x_init, f=None, g=None, h=None, opt=None):
     
     return x, it, timing, criter
 
-def CGLS(A,b,max_iter,x_init):
-    '''Conjugate Gradient Least Squares algorithm'''
+def CGLS(x_init, operator , data , opt=None):
+    '''Conjugate Gradient Least Squares algorithm
     
-    r = b.clone()
+    Parameters:
+      x_init: initial guess
+      operator: operator for forward/backward projections
+      data: data to operate on
+      opt: additional algorithm 
+    '''
+    
+    if opt is None: 
+        opt = {'tol': 1e-4, 'iter': 1000}
+    else:
+        try:
+            max_iter = opt['iter']
+        except KeyError as ke:
+            opt[ke] = 1000
+        try:
+            opt['tol'] = 1000
+        except KeyError as ke:
+            opt[ke] = 1e-4
+    tol = opt['tol']
+    max_iter = opt['iter']
+    
+    r = data.clone()
     x = x_init.clone()
     
-    d = A.adjoint(r)
+    d = operator.adjoint(r)
     
     normr2 = (d**2).sum()
     
@@ -145,11 +206,11 @@ def CGLS(A,b,max_iter,x_init):
     
         t = time.time()
         
-        Ad = A.direct(d)
+        Ad = operator.direct(d)
         alpha = normr2/( (Ad**2).sum() )
         x  = x + alpha*d
         r  = r - alpha*Ad
-        s  = A.adjoint(r)
+        s  = operator.adjoint(r)
         
         normr2_new = (s**2).sum()
         beta = normr2_new/normr2

@@ -74,6 +74,7 @@ class AstraProjectorSimple(Operator):
         return DataContainer(numpy.random.randn(inputsize[0],
                                                 inputsize[1]))
 
+
 class AstraProjectorMC(Operator):
     """ASTRA Multichannel projector"""
     def __init__(self, geomv, geomp, device):

@@ -7,50 +7,19 @@ Reading multi-channel data and reconstruction using FISTA modular
 import numpy as np
 import matplotlib.pyplot as plt
 
-import sys
+#import sys
 #sys.path.append('../../../data/')
 from read_IPdata import read_IPdata
 
-from ccpi.reconstruction.astra_ops import AstraProjector
-from ccpi.reconstruction.funcs import Norm2sq , BaseFunction
+from ccpi.astra.astra_ops import AstraProjectorSimple, AstraProjectorMC
+from ccpi.reconstruction.funcs import Norm2sq, Norm1, BaseFunction
 from ccpi.reconstruction.algs import FISTA
 #from ccpi.reconstruction.funcs import BaseFunction
 
-from ccpi.framework import VolumeData, SinogramData
-
-
-from ccpi.filters.cpu_regularizers_boost import SplitBregman_TV , FGP_TV ,\
-                                                 LLT_model, PatchBased_Regul ,\
-                                                 TGV_PD
-
-
-# TV regularization class for FGP_TV method
-class TV_FGP(BaseFunction):
-    def __init__(self,lambdaReg,iterationsTV):
-        # set parameters
-        self.lambdaReg = lambdaReg
-        self.iterationsTV = iterationsTV
-        super(TV_FGP, self).__init__()
-    def fun(self,x):
-        # function to calculate energy from utils can be used here
-        return 0
-    def prox(self,x,Lipshitz):
-        pars = {'algorithm' : FGP_TV , \
-                'input' : x.as_array(),
-                'regularization_parameter':self.lambdaReg*Lipshitz, \
-                'number_of_iterations' :self.iterationsTV ,\
-                'tolerance_constant':1e-4,\
-                'TV_penalty': 0}
-        
-        out = FGP_TV (pars['input'], 
-                      pars['regularization_parameter'],
-                      pars['number_of_iterations'],
-                      pars['tolerance_constant'], 
-                      pars['TV_penalty'])
-        return out[0]
+from ccpi.framework import ImageData, AcquisitionData, AcquisitionGeometry, ImageGeometry
 
 # read IP paper data into a dictionary
-dataDICT = read_IPdata()
+dataDICT = read_IPdata('..\..\..\data\IP_data70channels.mat')
 
 # Set ASTRA Projection-backprojection class (fan-beam geometry)
 DetWidth = dataDICT.get('im_size')[0] * dataDICT.get('det_width')[0] / \
@@ -61,43 +30,81 @@ OrigDetec = dataDICT.get('im_size')[0] * \
             (dataDICT.get('src_to_det')[0] - dataDICT.get('src_to_rotc')[0]) /\
             dataDICT.get('dom_width')[0]
 
-# Set up ASTRA projector
-Aop = AstraProjector(DetWidth, dataDICT.get('detectors_numb')[0], SourceOrig, 
-                     OrigDetec, (np.pi/180)*dataDICT.get('theta')[0], 
-                     dataDICT.get('im_size')[0],'fanbeam','gpu') 
-# initiate a class object
+N = dataDICT.get('im_size')[0]
+
+vg = ImageGeometry(voxel_num_x=dataDICT.get('im_size')[0],
+                   voxel_num_y=dataDICT.get('im_size')[0],
+                   channels=1)
+
+pg = AcquisitionGeometry('cone',
+                         '2D',
+                         angles=(np.pi/180)*dataDICT.get('theta')[0],
+                         pixel_num_h=dataDICT.get('detectors_numb')[0],
+                         pixel_size_h=DetWidth,
+                         dist_source_center=SourceOrig, 
+                         dist_center_detector=OrigDetec,
+                         channels=1)
+
 
 sino = dataDICT.get('data_norm')[0][:,:,34] # select mid-channel 
-b = SinogramData(sino)
-# Try forward and backprojection
-#backprj = Aop.adjoint(b)
-
-# Create least squares object instance with projector and data.
-f = Norm2sq(Aop,b,c=0.5)
+b = AcquisitionData(sino,geometry=pg)
 
 # Initial guess
-x_init = VolumeData(np.zeros((dataDICT.get('im_size')[0],
-                              dataDICT.get('im_size')[0])))
+x_init = ImageData(np.zeros((N, N)),geometry=vg)
+
+
+
+
+
+Aop = AstraProjectorSimple(vg,pg,'gpu')
+f = Norm2sq(Aop,b,c=0.5)
 
 # Run FISTA for least squares without regularization
-opt = {'tol': 1e-4, 'iter': 50}
+opt = {'tol': 1e-4, 'iter': 10}
 x_fista0, it0, timing0, criter0 = FISTA(x_init, f, None, opt)
 
 plt.imshow(x_fista0.array)
 plt.show()
 
-"""
 # Now least squares plus 1-norm regularization
-#lam = 1
-#g0 = Norm1(lam)
-# using FGP_TV regularizer
-
-g0 = TV_FGP(lambdaReg = 0.01,iterationsTV=50)
+g1 = Norm1(10)
 
 # Run FISTA for least squares plus 1-norm function.
-opt = {'tol': 1e-4, 'iter': 50}
-x_fista1, it1, timing1, criter1 = FISTA(x_init, f, g0, opt)
+x_fista1, it1, timing1, criter1 = FISTA(x_init, f, g1, opt)
 
 plt.imshow(x_fista1.array)
 plt.show()
-"""
+
+# Multiple channels
+sino_mc = dataDICT.get('data_norm')[0][:,:,32:37] # select mid-channel 
+
+vg_mc = ImageGeometry(voxel_num_x=dataDICT.get('im_size')[0],
+                   voxel_num_y=dataDICT.get('im_size')[0],
+                   channels=5)
+
+pg_mc = AcquisitionGeometry('cone',
+                         '2D',
+                         angles=(np.pi/180)*dataDICT.get('theta')[0],
+                         pixel_num_h=dataDICT.get('detectors_numb')[0],
+                         pixel_size_h=DetWidth,
+                         dist_source_center=SourceOrig, 
+                         dist_center_detector=OrigDetec,
+                         channels=5)
+
+b_mc = AcquisitionData(np.transpose(sino_mc,(2,0,1)),
+                       geometry=pg_mc, 
+                       dimension_labels=("channel","angle","horizontal"))
+
+# ASTRA operator using volume and sinogram geometries
+Aop_mc = AstraProjectorMC(vg_mc, pg_mc, 'gpu')
+
+f_mc = Norm2sq(Aop_mc,b_mc,c=0.5)
+
+# Initial guess
+x_init_mc = ImageData(np.zeros((5, N, N)),geometry=vg_mc)
+
+
+x_fista0_mc, it0_mc, timing0_mc, criter0_mc = FISTA(x_init_mc, f_mc, None, opt)
+
+plt.imshow(x_fista0_mc.as_array()[4,:,:])
+plt.show()

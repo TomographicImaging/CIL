@@ -134,7 +134,7 @@ class FiniteDiff2D(Operator):
         return self.s1
 
 
-def PowerMethodNonsquare(op,numiters):
+def PowerMethodNonsquareOld(op,numiters):
     # Initialise random
     # Jakob's
     #inputsize = op.size()[1]
@@ -173,6 +173,34 @@ def PowerMethodNonsquare(op,numiters):
 #        x0 = (1.0/x1norm)*x1
 #    return s, x0
     
+
+def PowerMethodNonsquare(op,numiters):
+    # Initialise random
+    # Jakob's
+    #inputsize = op.size()[1]
+    #x0 = ImageContainer(numpy.random.randn(*inputsize)
+    # Edo's
+    #vg = ImageGeometry(voxel_num_x=inputsize[0],
+    #                   voxel_num_y=inputsize[1], 
+    #                   voxel_num_z=inputsize[2])
+    #
+    #x0 = ImageData(geometry = vg, dimension_labels=['vertical','horizontal_y','horizontal_x'])
+    #print (x0)
+    #x0.fill(numpy.random.randn(*x0.shape))
+    
+    x0 = op.create_image_data()
+    
+    s = numpy.zeros(numiters)
+    # Loop
+    for it in numpy.arange(numiters):
+        x1 = op.adjoint(op.direct(x0))
+        x1norm = numpy.sqrt((x1**2).sum())
+        #print ("x0 **********" ,x0)
+        #print ("x1 **********" ,x1)
+        s[it] = (x1*x0).sum() / (x0*x0).sum()
+        x0 = (1.0/x1norm)*x1
+    return numpy.sqrt(s[-1]), numpy.sqrt(s), x0
+
 class CCPiProjectorSimple(Operator):
     """ASTRA projector modified to use DataSet and geometry."""
     def __init__(self, geomv, geomp):

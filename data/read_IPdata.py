@@ -7,9 +7,9 @@ from scipy import io
 import numpy as np
 from collections import defaultdict
 
-def read_IPdata():
+def read_IPdata(datafile):
     # read data from mat file (specify the location)
-    alldata = io.loadmat('IP_data70channels.mat')
+    alldata = io.loadmat(datafile)
     data_raw = alldata.get('Data_raw') # here is raw projection data
     Phantom_ideal = alldata.get('Phantom_ideal') # here is 70 channels ideal phantom
     Photon_flux = alldata.get('Photon_flux') # photon flux for normalization

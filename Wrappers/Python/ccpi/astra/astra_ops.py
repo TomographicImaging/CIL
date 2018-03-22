@@ -71,7 +71,9 @@ class AstraProjectorSimple(Operator):
     
     def create_image_data(self):
         inputsize = self.size()[1]
-        return DataContainer(numpy.random.randn(inputsize[0],inputsize[1]))
+        return DataContainer(numpy.random.randn(inputsize[0],
+                                                inputsize[1]))
+
 
 class AstraProjectorMC(Operator):
     """ASTRA Multichannel projector"""
@@ -93,7 +95,7 @@ class AstraProjectorMC(Operator):
                                         device=device)
                 
         # Initialise empty for singular value.
-        self.s1 = 50
+        self.s1 = None
     
     def direct(self, IM):
         self.fp.set_input(IM)
@@ -122,80 +124,9 @@ class AstraProjectorMC(Operator):
                  (self.volume_geometry.voxel_num_x, \
                   self.volume_geometry.voxel_num_y) )
     
-
-class AstraProjector(Operator):
-    """A simple 2D/3D parallel/fan beam projection/backprojection class based 
-    on ASTRA toolbox"""
-    def __init__(self, DetWidth, DetectorsDim, SourceOrig, OrigDetec, 
-                 AnglesVec, ObjSize, projtype, device):
-        super(AstraProjector, self).__init__()
-        self.DetectorsDim = DetectorsDim
-        self.AnglesVec = AnglesVec
-        self.ProjNumb = len(AnglesVec)
-        self.ObjSize = ObjSize
-        if projtype == 'parallel':
-            self.proj_geom = astra.create_proj_geom('parallel', DetWidth, 
-                                                    DetectorsDim, AnglesVec)
-        elif projtype == 'fanbeam':
-            self.proj_geom = astra.create_proj_geom('fanflat', DetWidth,
-                                                    DetectorsDim, AnglesVec, 
-                                                    SourceOrig, OrigDetec)
-        else:
-            print ("Please select for projtype between 'parallel' and 'fanbeam'")
-        self.vol_geom = astra.create_vol_geom(ObjSize, ObjSize)
-        if device == 'cpu':
-            self.proj_id = astra.create_projector('line', self.proj_geom, 
-                                                  self.vol_geom) # for CPU
-            self.device = 1
-        elif device == 'gpu':
-            self.proj_id = astra.create_projector('cuda', self.proj_geom, 
-                                                  self.vol_geom) # for GPU
-            self.device = 0
-        else:
-            print ("Select between 'cpu' or 'gpu' for device")
-        self.s1 = None
-    def direct(self, IM):
-        """Applying forward projection to IM [2D or 3D array]"""
-        if numpy.ndim(IM.as_array()) == 3:
-            slices = numpy.size(IM.as_array(),numpy.ndim(IM.as_array())-1)
-            DATA = numpy.zeros((self.ProjNumb,self.DetectorsDim,slices), 
-                               'float32')
-            for i in range(0,slices):
-                sinogram_id, DATA[:,:,i] = \
-                    astra.create_sino(IM[:,:,i].as_array(), self.proj_id)
-                astra.data2d.delete(sinogram_id)
-            astra.data2d.delete(self.proj_id)
-        else:
-            sinogram_id, DATA = astra.create_sino(IM.as_array(), self.proj_id)
-            astra.data2d.delete(sinogram_id)
-            astra.data2d.delete(self.proj_id)
-        return AcquisitionData(DATA)
-    def adjoint(self, DATA):
-        """Applying backprojection to DATA [2D or 3D]"""
-        if numpy.ndim(DATA) == 3:
-           slices = numpy.size(DATA.as_array(),numpy.ndim(DATA.as_array())-1)
-           IM = numpy.zeros((self.ObjSize,self.ObjSize,slices), 'float32')
-           for i in range(0,slices):
-               rec_id, IM[:,:,i] = \
-                   astra.create_backprojection(DATA[:,:,i].as_array(), 
-                                               self.proj_id)
-               astra.data2d.delete(rec_id)
-           astra.data2d.delete(self.proj_id)
-        else:
-            rec_id, IM = astra.create_backprojection(DATA.as_array(), 
-                                                     self.proj_id)        
-            astra.data2d.delete(rec_id)
-            astra.data2d.delete(self.proj_id)
-        return ImageData(IM)
+    def create_image_data(self):
+        inputsize = self.size()[1]
+        return DataContainer(numpy.random.randn(self.volume_geometry.channels,
+                                                inputsize[0],
+                                                inputsize[1]))
     
-    def delete(self):
-        astra.data2d.delete(self.proj_id)
-    
-    def get_max_sing_val(self):
-        self.s1, sall, svec = PowerMethodNonsquare(self,10)
-        return self.s1
-    
-    def size(self):
-        return ( (self.AnglesVec.size, self.DetectorsDim), \
-                 (self.ObjSize, self.ObjSize) )
-

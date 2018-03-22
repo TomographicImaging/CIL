@@ -39,10 +39,9 @@ print (dims)
 flat = avg_img(reader.load_flat())
 dark = avg_img(reader.load_dark())
 
-data = reader.getAcquisitionData()
 norm = Normalizer(flat_field=flat, dark_field=dark)
 
-norm.set_input(reader.getAcquisitionData())
+norm.set_input(reader.get_acquisition_data())
 
 cor = CenterOfRotationFinder()
 cor.set_input(norm.get_output())
@@ -78,7 +77,7 @@ x_init = ImageData(geometry=vg, dimension_labels=['horizontal_x','horizontal_y',
 #%%
 print ("run FISTA")
 # Run FISTA for least squares without regularization
-opt = {'tol': 1e-4, 'iter': 500}
+opt = {'tol': 1e-4, 'iter': 10}
 x_fista0, it0, timing0, criter0 = FISTA(x_init, f, None, opt=opt)
 pickle.dump(x_fista0, open("fista0.pkl", "wb"))
 
@@ -139,8 +138,7 @@ plt.title('CGLS criterion')
 #plt.show()
 
 
-clims = (0,1)
-cols = 5
+cols = 4
 rows = 1
 current = 1
 fig = plt.figure()
@@ -165,16 +163,6 @@ current = current + 1
 a=fig.add_subplot(rows,cols,current)
 a.set_title('CGLS')
 imgplot = plt.imshow(x_CGLS.subset(horizontal_x=80).as_array())
-
-current = current + 1
-a=fig.add_subplot(rows,cols,current)
-a.set_title('criteria')
-imgplot = plt.loglog(criter0 , label='FISTA0')
-imgplot = plt.loglog(criter1 , label='FISTA1')
-imgplot = plt.loglog(criter_fbpd1, label='FBPD1')
-imgplot = plt.loglog(criter_CGLS, label='CGLS')
-#imgplot = plt.loglog(criter_fbpdtv, label='FBPD TV')
-a.legend(loc='right')
 
 plt.show()
 

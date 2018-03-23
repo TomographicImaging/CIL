@@ -19,6 +19,7 @@ requirements:
     - python
     - numpy
     - scipy
+    - ccpi-reconstruction
 	
 about:
   home: http://www.ccpi.ac.uk

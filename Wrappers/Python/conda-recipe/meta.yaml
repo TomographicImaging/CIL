@@ -13,11 +13,14 @@ requirements:
   build:
     - python
     - numpy
-    - distutils
+    - setuptools
 
   run:
     - python
     - numpy
+    - ccpi-optimisation
+    - ccpi-reconstruction
+    - matplotlib
 	
 about:
   home: http://www.ccpi.ac.uk

@@ -1,5 +1,5 @@
 package:
-  name: ccpi-common
+  name: ccpi-framework
   version: {{ environ['CIL_VERSION'] }}
 
 
@@ -13,12 +13,11 @@ requirements:
   build:
     - python
     - numpy
-    - setuptools
+    - distutils
 
   run:
     - python
     - numpy
-    - scipy
 	
 about:
   home: http://www.ccpi.ac.uk

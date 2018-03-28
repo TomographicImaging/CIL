@@ -19,8 +19,8 @@ vg = ImageGeometry(voxel_num_x=N,voxel_num_y=N)
 Phantom = ImageData(geometry=vg)
 
 x = Phantom.as_array()
-x[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 1.0
-x[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 2.0
+x[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
+x[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 1
 
 plt.imshow(x)
 plt.show()
@@ -101,7 +101,7 @@ plt.semilogy(criter1)
 plt.show()
 
 # Run FBPD=Forward Backward Primal Dual method on least squares plus 1-norm
-opt = {'tol': 1e-4, 'iter': 10000}
+opt = {'tol': 1e-4, 'iter': 100}
 x_fbpd1, it_fbpd1, timing_fbpd1, criter_fbpd1 = FBPD(x_init,None,f,g0,opt=opt)
 
 plt.imshow(x_fbpd1.array)
@@ -112,24 +112,24 @@ plt.semilogy(criter_fbpd1)
 plt.show()
 
 # Now FBPD for least squares plus TV
-lamtv = 1
-gtv = TV2D(lamtv)
+#lamtv = 1
+#gtv = TV2D(lamtv)
 
-x_fbpdtv, it_fbpdtv, timing_fbpdtv, criter_fbpdtv = FBPD(x_init,None,f,gtv,opt=opt)
+#x_fbpdtv, it_fbpdtv, timing_fbpdtv, criter_fbpdtv = FBPD(x_init,None,f,gtv,opt=opt)
 
-plt.imshow(x_fbpdtv.array)
-plt.show()
+#plt.imshow(x_fbpdtv.array)
+#plt.show()
 
-plt.semilogy(criter_fbpdtv)
-plt.show()
+#plt.semilogy(criter_fbpdtv)
+#plt.show()
 
 
 # Run CGLS, which should agree with the FISTA0
-x_CGLS, it_CGLS, timing_CGLS, criter_CGLS = CGLS(Aop, b, 1000, x_init)
+x_CGLS, it_CGLS, timing_CGLS, criter_CGLS = CGLS(x_init, Aop, b, opt )
 
 plt.imshow(x_CGLS.array)
 plt.title('CGLS')
-plt.title('CGLS recon, compare FISTA0')
+#plt.title('CGLS recon, compare FISTA0')
 plt.show()
 
 plt.semilogy(criter_CGLS)
@@ -139,7 +139,7 @@ plt.show()
 
 #%%
 
-clims = (-0.5,2.5)
+clims = (0,1)
 cols = 3
 rows = 2
 current = 1
@@ -170,10 +170,10 @@ a=fig.add_subplot(rows,cols,current)
 a.set_title('CGLS')
 imgplot = plt.imshow(x_CGLS.as_array(),vmin=clims[0],vmax=clims[1])
 
-current = current + 1
-a=fig.add_subplot(rows,cols,current)
-a.set_title('FBPD TV')
-imgplot = plt.imshow(x_fbpdtv.as_array(),vmin=clims[0],vmax=clims[1])
+#current = current + 1
+#a=fig.add_subplot(rows,cols,current)
+#a.set_title('FBPD TV')
+#imgplot = plt.imshow(x_fbpdtv.as_array(),vmin=clims[0],vmax=clims[1])
 
 fig = plt.figure()
 # projections row

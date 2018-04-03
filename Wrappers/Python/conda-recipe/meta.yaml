@@ -18,8 +18,7 @@ requirements:
   run:
     - python
     - numpy
-    - ccpi-optimisation
-    - ccpi-reconstruction
+    #- ccpi-reconstruction
     - matplotlib
 	
 about:

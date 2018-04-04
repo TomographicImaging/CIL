@@ -6,11 +6,11 @@ Created on Wed Mar 21 14:26:21 2018
 """
 
 from ccpi.framework import ImageData , AcquisitionData, ImageGeometry, AcquisitionGeometry
-from ccpi.reconstruction.algs import FISTA, FBPD, CGLS
-from ccpi.reconstruction.funcs import Norm2sq, Norm1
-from ccpi.reconstruction.ops import CCPiProjectorSimple
+from ccpi.optimisation.algs import FISTA, FBPD, CGLS
+from ccpi.optimisation.funcs import Norm2sq, Norm1
+from ccpi.reconstruction.ccpiops import CCPiProjectorSimple
 from ccpi.reconstruction.parallelbeam import alg as pbalg
-from ccpi.processors import CCPiForwardProjector, CCPiBackwardProjector , \
+from ccpi.reconstruction.processors import CCPiForwardProjector, CCPiBackwardProjector , \
 Normalizer , CenterOfRotationFinder , AcquisitionDataPadder
 
 from ccpi.io.reader import NexusReader

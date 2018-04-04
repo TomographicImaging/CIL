@@ -19,8 +19,6 @@
 
 import numpy
 from scipy.sparse.linalg import svds
-from ccpi.framework import DataContainer, ImageGeometry , ImageData
-from ccpi.processors import CCPiBackwardProjector, CCPiForwardProjector
 
 # Maybe operators need to know what types they take as inputs/outputs
 # to not just use generic DataContainer
@@ -33,49 +31,9 @@ class Operator(object):
         return x
     def size(self):
         # To be defined for specific class
-        return None
-
-# Or should we rather have an attribute isLinear instead of separate class?
-
-#class OperatorLinear(Operator):
-#    
-#    def __init__():
-
-class ForwardBackProjector(Operator):
-    
-    # The constructor should set up everything, ie at least hold equivalent of 
-    # projection geometry and volume geometry, so that when calling direct and 
-    # adjoint methods, only the volume/sinogram is needed as input. Quite 
-    # similar to opTomo operator.
-    
-    def __init__(self):
-        # do nothing
-        i  = 1
-        super(ForwardBackProjector, self).__init__()
-    
-
-class LinearOperatorMatrix(Operator):
-    def __init__(self,A):
-        self.A = A
-        self.s1 = None   # Largest singular value, initially unknown
-        super(LinearOperatorMatrix, self).__init__()
-        
-    def direct(self,x):
-        return DataContainer(numpy.dot(self.A,x.as_array()))
-    
-    def adjoint(self,x):
-        return DataContainer(numpy.dot(self.A.transpose(),x.as_array()))
-    
-    def size(self):
-        return self.A.shape
-    
+        raise NotImplementedError
     def get_max_sing_val(self):
-        # If unknown, compute and store. If known, simply return it.
-        if self.s1 is None:
-            self.s1 = svds(self.A,1,return_singular_vectors=False)[0]
-            return self.s1
-        else:
-            return self.s1
+        raise NotImplementedError
 
 class Identity(Operator):
     def __init__(self):
@@ -132,7 +90,6 @@ class FiniteDiff2D(Operator):
     
     def get_max_sing_val(self):
         return self.s1
-
 
 def PowerMethodNonsquareOld(op,numiters):
     # Initialise random
@@ -200,57 +157,3 @@ def PowerMethodNonsquare(op,numiters):
         s[it] = (x1*x0).sum() / (x0*x0).sum()
         x0 = (1.0/x1norm)*x1
     return numpy.sqrt(s[-1]), numpy.sqrt(s), x0
-
-class CCPiProjectorSimple(Operator):
-    """ASTRA projector modified to use DataSet and geometry."""
-    def __init__(self, geomv, geomp):
-        super(CCPiProjectorSimple, self).__init__()
-        
-        # Store volume and sinogram geometries.
-        self.acquisition_geometry = geomp
-        self.volume_geometry = geomv
-        
-        self.fp = CCPiForwardProjector(image_geometry=geomv,
-                                       acquisition_geometry=geomp,
-                                       output_axes_order=['angle','vertical','horizontal'])
-        
-        self.bp = CCPiBackwardProjector(image_geometry=geomv,
-                                    acquisition_geometry=geomp,
-                                    output_axes_order=['horizontal_x','horizontal_y','vertical'])
-                
-        # Initialise empty for singular value.
-        self.s1 = None
-    
-    def direct(self, image_data):
-        self.fp.set_input(image_data)
-        out = self.fp.get_output()
-        return out
-    
-    def adjoint(self, acquisition_data):
-        self.bp.set_input(acquisition_data)
-        out = self.bp.get_output()
-        return out
-    
-    #def delete(self):
-    #    astra.data2d.delete(self.proj_id)
-    
-    def get_max_sing_val(self):
-        a = PowerMethodNonsquare(self,10)
-        self.s1 = a[0] 
-        return self.s1
-    
-    def size(self):
-        # Only implemented for 3D
-        return ( (self.acquisition_geometry.angles.size, \
-                  self.acquisition_geometry.pixel_num_v,
-                  self.acquisition_geometry.pixel_num_h), \
-                 (self.volume_geometry.voxel_num_x, \
-                  self.volume_geometry.voxel_num_y,
-                  self.volume_geometry.voxel_num_z) )
-    def create_image_data(self):
-        x0 = ImageData(geometry = self.volume_geometry, 
-                       dimension_labels=self.bp.output_axes_order)#\
-                       #.subset(['horizontal_x','horizontal_y','vertical'])
-        print (x0)
-        x0.fill(numpy.random.randn(*x0.shape))
-        return x0

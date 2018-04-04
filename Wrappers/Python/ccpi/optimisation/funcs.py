@@ -17,7 +17,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from ccpi.reconstruction.ops import Identity, FiniteDiff2D
+from ccpi.optimisation.ops import Identity, FiniteDiff2D
 import numpy
 
 
@@ -39,14 +39,16 @@ class Norm2(BaseFunction):
     
     def fun(self, x):
         
-        xx = numpy.sqrt(numpy.sum(numpy.square(x.as_array()), self.direction, keepdims=True))
+        xx = numpy.sqrt(numpy.sum(numpy.square(x.as_array()), self.direction,
+                                  keepdims=True))
         p  = numpy.sum(self.gamma*xx)        
         
         return p
     
     def prox(self, x, tau):
 
-        xx = numpy.sqrt(numpy.sum( numpy.square(x.as_array()), self.direction, keepdims=True ))
+        xx = numpy.sqrt(numpy.sum( numpy.square(x.as_array()), self.direction, 
+                                  keepdims=True ))
         xx = numpy.maximum(0, 1 - tau*self.gamma / xx)
         p  = x.as_array() * xx
         
@@ -95,32 +97,7 @@ class Norm2sq(BaseFunction):
         #return self.c* np.sum(np.square((self.A.direct(x) - self.b).ravel()))
         return self.c*( ( (self.A.direct(x)-self.b)**2).sum() )
 
-## Define a class to represent a least squares data fidelity
-#class LeastSquares(BaseFunction):
-#    
-#    b     = None
-#    A     = None
-#    L     = None
-#    
-#    def __init__(self, A, b):
-#        self.A    = A
-#        #b.shape = (b.shape[0],1)
-#        self.b    = b
-#        
-#        # Compute the Lipschitz parameter from the operator
-#        # Initialise to None instead and only call when needed.
-#        self.L = self.A.get_max_sing_val()**2
-#    
-#    def grad(self, x):
-#        #return np.dot(self.A.transpose(),  (np.dot(self.A,x) - self.b)  )
-#        return self.A.adjoint( self.A.direct(x) - self.b )
-#    
-#    def fun(self, x):
-#        # p = np.dot(self.A, x)
-#        return 0.5*( ( (self.A.direct(x)-self.b)**2).sum() )
 
-# Define a class to represent the zero-function, to test pure least squares 
-# minimization using FISTA
 class ZeroFun(BaseFunction):
     
     def __init__(self,gamma=0,L=1):

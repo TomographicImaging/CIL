@@ -22,10 +22,7 @@ from distutils.core import setup
 import os
 import sys
 
-cil_version=os.environ['CIL_VERSION']
-if  cil_version == '':
-    print("Please set the environmental variable CIL_VERSION")
-    sys.exit(1)
+
 
 cil_version=os.environ['CIL_VERSION']
 if  cil_version == '':
@@ -33,9 +30,9 @@ if  cil_version == '':
     sys.exit(1)
 
 setup(
-    name="ccpi-common",
+    name="ccpi-framework",
     version=cil_version,
-    packages=['ccpi' , 'ccpi.reconstruction' , 'ccpi.io'],
+    packages=['ccpi' , 'ccpi.io', 'ccpi.optimisation'],
 
     # Project uses reStructuredText, so ensure that the docutils get
     # installed or upgraded on the target machine

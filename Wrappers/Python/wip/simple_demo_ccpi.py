@@ -2,9 +2,9 @@
 #sys.path.append("..")
 
 from ccpi.framework import ImageData , AcquisitionData, ImageGeometry, AcquisitionGeometry
-from ccpi.reconstruction.algs import FISTA, FBPD, CGLS
-from ccpi.reconstruction.funcs import Norm2sq, Norm1 , TV2D
-from ccpi.astra.astra_ops import AstraProjectorSimple
+from ccpi.optimisation.algs import FISTA, FBPD, CGLS
+from ccpi.optimisation.funcs import Norm2sq, Norm1 , TV2D
+#from ccpi.astra.astra_ops import AstraProjectorSimple
 from ccpi.reconstruction.ops import CCPiProjectorSimple
 from ccpi.reconstruction.parallelbeam import alg as pbalg
 from ccpi.processors import CCPiForwardProjector, CCPiBackwardProjector 

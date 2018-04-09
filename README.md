@@ -41,10 +41,52 @@ In `ccpi.framework` we define a number of common classes normally used in tomogr
  
  ### `ccpi.optimisation`
  
- This package allows writing of optimisation algorithms. The main actors here are:
+ This package allows rapid prototyping of optimisation-based reconstruction problems, 
+ i.e. defining and solving different optimization problems to enforce different properties 
+ on the reconstructed image.
  
-  * `Function`
-  * `Operator`
+ Firstly, it provides an object-oriented framework for defining mathematical operators and functions 
+ as well a collection of useful example operators and functions. Both smooth and 
+ non-smooth functions can be used. 
+ 
+ Further, it provides a number of high-level generic 
+ implementations of optimisation algorithms to solve genericlly formulated 
+ optimisation problems constructed from operator and function objects. 
+ 
+ The fundamental components are:
+ 
+  * `Operator`: A class specifying a (currently linear) operator
+  * `Function`: A class specifying mathematical functions such as a least squares data fidelity.
+  * `Algorithm`: Implementation of an optimisation algorithm to solve a particular generic optimisation problem. These are currently python functions by may be changed to operators in another release.
+
+ #### `Operator`
+ 
+ The two most important methods are `direct` and `adjoint` methods that describe the result of 
+ applying the operator, and its adjoint respectively, onto a compatible `DataContainer` input. 
+ The output is another `DataContainer` object or subclass hereof. An important 
+ special case is to represent the tomographic forward and backprojection operations.
+ 
+ #### `Function`
+ 
+ A `function` represents a mathematical function of one or more inputs is intended 
+ to accept `DataContainer`s as input as well as any additional parameters. 
+ Its methods reflect the properties of the function, for example, 
+ if the function represented is differentiable 
+ the `function` should contain a method `grad` which should return the gradient of the function evaluated at
+ an input point. If the function is not differentiable but allows a simple proximal operator, the method 
+ `prox` should return the proxial operator evaluated at an input point. It is also possible 
+ to evaluate the function value using the method `fun`.
+ 
+ #### `Algorithm`
+ 
+ A number of generic algorithm implementations are provided including CGLS and FISTA. An algorithm 
+ is designed for a particular generic optimisation problem accepts and number of `function`s and/or 
+ `operator`s as input to define a specific instance of the generic optimisation problem to be solved.
+ 
+ #### Examples
+ 
+ Please see the demos for examples of defining and using operators, functions and algorithms 
+ to specify and solve optimisation-based reconstruction problems.
  
  
  

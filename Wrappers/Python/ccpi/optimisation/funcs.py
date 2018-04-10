@@ -24,7 +24,7 @@ import numpy
 class BaseFunction(object):
     def __init__(self):
         self.op = Identity()
-    def fun(self,x):      return 0
+    def __call__(self,x):      return 0
     def grad(self,x):     return 0
     def prox(self,x,tau): return x
 
@@ -37,7 +37,7 @@ class Norm2(BaseFunction):
         self.gamma     = gamma;
         self.direction = direction; 
     
-    def fun(self, x):
+    def __call__(self, x):
         
         xx = numpy.sqrt(numpy.sum(numpy.square(x.as_array()), self.direction,
                                   keepdims=True))
@@ -93,7 +93,7 @@ class Norm2sq(BaseFunction):
         #return 2*self.c*self.A.adjoint( self.A.direct(x) - self.b )
         return 2.0*self.c*self.A.adjoint( self.A.direct(x) - self.b )
     
-    def fun(self,x):
+    def __call__(self,x):
         #return self.c* np.sum(np.square((self.A.direct(x) - self.b).ravel()))
         return self.c*( ( (self.A.direct(x)-self.b)**2).sum() )
 
@@ -105,7 +105,7 @@ class ZeroFun(BaseFunction):
         self.L = L
         super(ZeroFun, self).__init__()
     
-    def fun(self,x):
+    def __call__(self,x):
         return 0
     
     def prox(self,x,tau):
@@ -121,7 +121,7 @@ class Norm1(BaseFunction):
         self.L = 1
         super(Norm1, self).__init__()
     
-    def fun(self,x):
+    def __call__(self,x):
         return self.gamma*(x.abs().sum())
     
     def prox(self,x,tau):

@@ -84,7 +84,7 @@ def FISTA(x_init, f=None, g=None, opt=None):
         
         # time and criterion
         timing[it] = time.time() - time0
-        criter[it] = f.fun(x) + g.fun(x);
+        criter[it] = f(x) + g(x);
         
         # stopping rule
         #if np.linalg.norm(x - x_old) < tol * np.linalg.norm(x_old) and it > 10:
@@ -156,7 +156,7 @@ def FBPD(x_init, f=None, g=None, h=None, opt=None):
 
         # time and criterion
         timing[it] = time.time() - t
-        criter[it] = f.fun(x) + g.fun(x) + h.fun(h.op.direct(x));
+        criter[it] = f(x) + g(x) + h(h.op.direct(x));
            
         # stopping rule
         #if np.linalg.norm(x - x_old) < tol * np.linalg.norm(x_old) and it > 10:

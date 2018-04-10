@@ -68,14 +68,16 @@ In `ccpi.framework` we define a number of common classes normally used in tomogr
  
  #### `Function`
  
- A `function` represents a mathematical function of one or more inputs is intended 
+ A `function` represents a mathematical function of one or more inputs and is intended 
  to accept `DataContainer`s as input as well as any additional parameters. 
- Its methods reflect the properties of the function, for example, 
+ Fixed parameters can be passed in during the creation of the `function` object.
+ The methods of the `function` reflect the properties of it, for example, 
  if the function represented is differentiable 
  the `function` should contain a method `grad` which should return the gradient of the function evaluated at
  an input point. If the function is not differentiable but allows a simple proximal operator, the method 
- `prox` should return the proxial operator evaluated at an input point. It is also possible 
- to evaluate the function value using the method `fun`.
+ `prox` should return the proxial operator evaluated at an input point. The function value 
+ is evaluated by calling the function itself, e.g. `f(x)` for a `function` 
+ `f` and input point `x`.
  
  #### `Algorithm`
  

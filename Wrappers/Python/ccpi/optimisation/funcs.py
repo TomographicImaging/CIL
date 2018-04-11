@@ -21,14 +21,14 @@ from ccpi.optimisation.ops import Identity, FiniteDiff2D
 import numpy
 
 
-class BaseFunction(object):
+class Function(object):
     def __init__(self):
         self.op = Identity()
-    def fun(self,x):      return 0
+    def __call__(self,x):      return 0
     def grad(self,x):     return 0
     def prox(self,x,tau): return x
 
-class Norm2(BaseFunction):
+class Norm2(Function):
     
     def __init__(self, 
                  gamma=1.0, 
@@ -37,7 +37,7 @@ class Norm2(BaseFunction):
         self.gamma     = gamma;
         self.direction = direction; 
     
-    def fun(self, x):
+    def __call__(self, x):
         
         xx = numpy.sqrt(numpy.sum(numpy.square(x.as_array()), self.direction,
                                   keepdims=True))
@@ -63,7 +63,7 @@ class TV2D(Norm2):
         
 
 # Define a class for squared 2-norm
-class Norm2sq(BaseFunction):
+class Norm2sq(Function):
     '''
     f(x) = c*||A*x-b||_2^2
     
@@ -93,19 +93,19 @@ class Norm2sq(BaseFunction):
         #return 2*self.c*self.A.adjoint( self.A.direct(x) - self.b )
         return 2.0*self.c*self.A.adjoint( self.A.direct(x) - self.b )
     
-    def fun(self,x):
+    def __call__(self,x):
         #return self.c* np.sum(np.square((self.A.direct(x) - self.b).ravel()))
         return self.c*( ( (self.A.direct(x)-self.b)**2).sum() )
 
 
-class ZeroFun(BaseFunction):
+class ZeroFun(Function):
     
     def __init__(self,gamma=0,L=1):
         self.gamma = gamma
         self.L = L
         super(ZeroFun, self).__init__()
     
-    def fun(self,x):
+    def __call__(self,x):
         return 0
     
     def prox(self,x,tau):
@@ -113,7 +113,7 @@ class ZeroFun(BaseFunction):
 
 # A more interesting example, least squares plus 1-norm minimization.
 # Define class to represent 1-norm including prox function
-class Norm1(BaseFunction):
+class Norm1(Function):
     
     def __init__(self,gamma):
         # Do nothing
@@ -121,7 +121,7 @@ class Norm1(BaseFunction):
         self.L = 1
         super(Norm1, self).__init__()
     
-    def fun(self,x):
+    def __call__(self,x):
         return self.gamma*(x.abs().sum())
     
     def prox(self,x,tau):

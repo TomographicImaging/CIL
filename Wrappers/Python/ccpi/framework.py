@@ -806,7 +806,7 @@ class AcquisitionData(DataContainer):
                      dimension_labels, **kwargs)
                 
             
-class DataSetProcessor(object):
+class DataProcessor(object):
     '''Defines a generic DataContainer processor
     
     accepts DataContainer as inputs and 
@@ -869,19 +869,19 @@ class DataSetProcessor(object):
         return self.process()
     
     def set_input_processor(self, processor):
-        if issubclass(type(processor), DataSetProcessor):
+        if issubclass(type(processor), DataProcessor):
             self.__dict__['input'] = processor
         else:
             raise TypeError("Input type mismatch: got {0} expecting {1}"\
-                            .format(type(processor), DataSetProcessor))
+                            .format(type(processor), DataProcessor))
         
     def get_input(self):
         '''returns the input DataContainer
         
-        It is useful in the case the user has provided a DataSetProcessor as
+        It is useful in the case the user has provided a DataProcessor as
         input
         '''
-        if issubclass(type(self.input), DataSetProcessor):
+        if issubclass(type(self.input), DataProcessor):
             dsi = self.input.get_output()
         else:
             dsi = self.input
@@ -893,8 +893,8 @@ class DataSetProcessor(object):
     
     
 
-class DataSetProcessor23D(DataSetProcessor):
-    '''Regularizers DataSetProcessor
+class DataProcessor23D(DataProcessor):
+    '''Regularizers DataProcessor
     '''
             
     def check_input(self, dataset):
@@ -909,10 +909,10 @@ class DataSetProcessor23D(DataSetProcessor):
             raise ValueError("Expected input dimensions is 2 or 3, got {0}"\
                              .format(dataset.number_of_dimensions))
     
-###### Example of DataSetProcessors
+###### Example of DataProcessors
 
-class AX(DataSetProcessor):
-    '''Example DataSetProcessor
+class AX(DataProcessor):
+    '''Example DataProcessor
     The AXPY routines perform a vector multiplication operation defined as
 
     y := a*x
@@ -928,7 +928,7 @@ class AX(DataSetProcessor):
                   'input':None, 
                   }
         
-        #DataSetProcessor.__init__(self, **kwargs)
+        #DataProcessor.__init__(self, **kwargs)
         super(AX, self).__init__(**kwargs)
     
     def check_input(self, dataset):
@@ -947,8 +947,8 @@ class AX(DataSetProcessor):
         
     
     
-class PixelByPixelDataSetProcessor(DataSetProcessor):
-    '''Example DataSetProcessor
+class PixelByPixelDataProcessor(DataProcessor):
+    '''Example DataProcessor
     
     This processor applies a python function to each pixel of the DataContainer
     
@@ -961,8 +961,8 @@ class PixelByPixelDataSetProcessor(DataSetProcessor):
         kwargs = {'pyfunc':None, 
                   'input':None, 
                   }
-        #DataSetProcessor.__init__(self, **kwargs)
-        super(PixelByPixelDataSetProcessor, self).__init__(**kwargs)
+        #DataProcessor.__init__(self, **kwargs)
+        super(PixelByPixelDataProcessor, self).__init__(**kwargs)
         
     def check_input(self, dataset):
         return True
@@ -1032,18 +1032,18 @@ if __name__ == '__main__':
     #axm.apply()
     print ("axm in {0} out {1}".format(c.as_array(), axm.get_output().as_array()))
     
-    # create a PixelByPixelDataSetProcessor
+    # create a PixelByPixelDataProcessor
     
     #define a python function which will take only one input (the pixel value)
     pyfunc = lambda x: -x if x > 20 else x
-    clip = PixelByPixelDataSetProcessor()
+    clip = PixelByPixelDataProcessor()
     clip.pyfunc = pyfunc 
     clip.set_input(c)    
     #clip.apply()
     
     print ("clip in {0} out {1}".format(c.as_array(), clip.get_output().as_array()))
     
-    #dsp = DataSetProcessor()
+    #dsp = DataProcessor()
     #dsp.set_input(ds)
     #dsp.input = a
     # pipeline

@@ -20,7 +20,7 @@
 import numpy
 import time
 
-from ccpi.optimisation.funcs import BaseFunction
+from ccpi.optimisation.funcs import Function
 
 def FISTA(x_init, f=None, g=None, opt=None):
     '''Fast Iterative Shrinkage-Thresholding Algorithm
@@ -37,8 +37,8 @@ def FISTA(x_init, f=None, g=None, opt=None):
       opt: additional algorithm 
     '''
     # default inputs
-    if f   is None: f = BaseFunction()
-    if g   is None: g = BaseFunction()
+    if f   is None: f = Function()
+    if g   is None: g = Function()
     
     # algorithmic parameters
     if opt is None: 
@@ -108,9 +108,9 @@ def FBPD(x_init, f=None, g=None, h=None, opt=None):
       opt: additional algorithm 
     '''
     # default inputs
-    if f   is None: f = BaseFunction()
-    if g   is None: g = BaseFunction()
-    if h   is None: h = BaseFunction()
+    if f   is None: f = Function()
+    if g   is None: g = Function()
+    if h   is None: h = Function()
     
     # algorithmic parameters
     if opt is None: 

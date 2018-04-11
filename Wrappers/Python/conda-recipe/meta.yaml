@@ -23,5 +23,5 @@ requirements:
 	
 about:
   home: http://www.ccpi.ac.uk
-  license:  BSD license
-  summary: 'CCPi Toolbox'
+  license:  Apache 2.0 License
+  summary: 'CCPi Framework'

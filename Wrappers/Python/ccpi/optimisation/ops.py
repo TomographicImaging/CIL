@@ -157,3 +157,26 @@ def PowerMethodNonsquare(op,numiters):
         s[it] = (x1*x0).sum() / (x0*x0).sum()
         x0 = (1.0/x1norm)*x1
     return numpy.sqrt(s[-1]), numpy.sqrt(s), x0
+
+class LinearOperatorMatrix(Operator):
+    def __init__(self,A):
+        self.A = A
+        self.s1 = None   # Largest singular value, initially unknown
+        super(LinearOperatorMatrix, self).__init__()
+        
+    def direct(self,x):
+        return DataContainer(numpy.dot(self.A,x.as_array()))
+    
+    def adjoint(self,x):
+        return DataContainer(numpy.dot(self.A.transpose(),x.as_array()))
+    
+    def size(self):
+        return self.A.shape
+    
+    def get_max_sing_val(self):
+        # If unknown, compute and store. If known, simply return it.
+        if self.s1 is None:
+            self.s1 = svds(self.A,1,return_singular_vectors=False)[0]
+            return self.s1
+        else:
+            return self.s1

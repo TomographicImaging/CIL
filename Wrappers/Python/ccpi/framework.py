@@ -118,6 +118,7 @@ class AcquisitionGeometry:
                  dist_source_center=None, 
                  dist_center_detector=None, 
                  channels=1
+                 angle_unit='degree'
                  ):
         """
         General inputs for standard type projection geometries

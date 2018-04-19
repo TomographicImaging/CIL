@@ -96,7 +96,14 @@ class ImageGeometry:
                             self.center_y, 
                             self.center_z, 
                             self.channels)
-        
+    def __str__ (self):
+        repres = ""
+        repres += "Number of channels: {0}\n".format(self.channels)
+        repres += "voxel_num : x{0},y{1},z{2}\n".format(self.voxel_num_x, self.voxel_num_y, self.voxel_num_z)
+        repres += "voxel_size : x{0},y{1},z{2}\n".format(self.voxel_size_x, self.voxel_size_y, self.voxel_size_z)
+        repres += "center : x{0},y{1},z{2}\n".format(self.center_x, self.center_y, self.center_z)
+        return repres
+    
     
 class AcquisitionGeometry:
     
@@ -111,6 +118,7 @@ class AcquisitionGeometry:
                  dist_source_center=None, 
                  dist_center_detector=None, 
                  channels=1
+                 angle_unit='degree'
                  ):
         """
         General inputs for standard type projection geometries
@@ -168,7 +176,7 @@ class AcquisitionGeometry:
     def __str__ (self):
         repres = ""
         repres += "Number of dimensions: {0}\n".format(self.dimension)
-        repres += "angles: {0}\n".format(len(self.angles))
+        repres += "angles: {0}\n".format(self.angles)
         repres += "voxel_num : h{0},v{1}\n".format(self.pixel_num_h, self.pixel_num_v)
         repres += "voxel size: h{0},v{1}\n".format(self.pixel_size_h, self.pixel_size_v)
         repres += "geometry type: {0}\n".format(self.geom_type)

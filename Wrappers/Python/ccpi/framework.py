@@ -117,7 +117,7 @@ class AcquisitionGeometry:
                  pixel_size_v=1, 
                  dist_source_center=None, 
                  dist_center_detector=None, 
-                 channels=1
+                 channels=1,
                  angle_unit='degree'
                  ):
         """

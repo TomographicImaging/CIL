@@ -233,12 +233,12 @@ class XTEKReader(object):
                 self.mask_radius = float(line.split('=')[1])
                 
         #Read Angles
-        angles = self.readAngles()    
+        angles = self.read_angles()    
         self.geometry = AcquisitionGeometry('cone', '3D', angles, pixel_num_h, xpixel_size, pixel_num_v, ypixel_size, -1 * source_x, 
                  detector_x - source_x, 
                  )
         
-    def readAngles(self):
+    def read_angles(self):
         """
         Read the angles file .ang or _ctdata.txt file and returns the angles
         as an numpy array. 
@@ -293,10 +293,10 @@ class XTEKReader(object):
         pixels[pixels < 0.0] = 0.000001 # all negative values to approximately 0 as the std log of zero and non negative number is not defined
         return pixels
     
-    def getAcquisitionData(self, dimensions=None):
+    def get_acquisition_data(self, dimensions=None):
         '''
         This method load the acquisition data and given dimension and returns an AcquisitionData Object
         '''
-        data = self.loadProjection(dimensions)
+        data = self.load_projection(dimensions)
         return AcquisitionData(data, geometry=self.geometry)
     

@@ -44,7 +44,7 @@ class NexusReader(object):
     Reader class for loading Nexus files. 
     '''
 
-    def __init__(self, nexusFilename=None):
+    def __init__(self, nexus_filename=None):
         '''
         This takes in input as filename and loads the data dataset.
         '''
@@ -52,7 +52,7 @@ class NexusReader(object):
         self.dark = None
         self.angles = None
         self.geometry = None
-        self.filename = nexusFilename
+        self.filename = nexus_filename
         
     def load(self, dimensions=None, image_key_id=0):  
         '''
@@ -185,14 +185,14 @@ class XTEKReader(object):
     Reader class for loading XTEK files
     '''
     
-    def __init__(self, xtekConfigFilename=None):
+    def __init__(self, xtek_config_filename=None):
         '''
         This takes in the xtek config filename and loads the dataset and the
         required geometry parameters
         '''       
         self.projections = None
         self.geometry = {}
-        self.filename = xtekConfigFilename
+        self.filename = xtek_config_filename
         self.load()
         
     def load(self):
@@ -233,12 +233,12 @@ class XTEKReader(object):
                 self.mask_radius = float(line.split('=')[1])
                 
         #Read Angles
-        angles = self.readAngles()    
+        angles = self.read_angles()    
         self.geometry = AcquisitionGeometry('cone', '3D', angles, pixel_num_h, xpixel_size, pixel_num_v, ypixel_size, -1 * source_x, 
                  detector_x - source_x, 
                  )
         
-    def readAngles(self):
+    def read_angles(self):
         """
         Read the angles file .ang or _ctdata.txt file and returns the angles
         as an numpy array. 
@@ -293,10 +293,10 @@ class XTEKReader(object):
         pixels[pixels < 0.0] = 0.000001 # all negative values to approximately 0 as the std log of zero and non negative number is not defined
         return pixels
     
-    def getAcquisitionData(self, dimensions=None):
+    def get_acquisition_data(self, dimensions=None):
         '''
         This method load the acquisition data and given dimension and returns an AcquisitionData Object
         '''
-        data = self.loadProjection(dimensions)
+        data = self.load_projection(dimensions)
         return AcquisitionData(data, geometry=self.geometry)
     

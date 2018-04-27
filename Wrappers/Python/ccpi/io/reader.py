@@ -44,7 +44,7 @@ class NexusReader(object):
     Reader class for loading Nexus files. 
     '''
 
-    def __init__(self, nexusFilename=None):
+    def __init__(self, nexus_filename=None):
         '''
         This takes in input as filename and loads the data dataset.
         '''
@@ -52,7 +52,7 @@ class NexusReader(object):
         self.dark = None
         self.angles = None
         self.geometry = None
-        self.filename = nexusFilename
+        self.filename = nexus_filename
         
     def load(self, dimensions=None, image_key_id=0):  
         '''
@@ -185,14 +185,14 @@ class XTEKReader(object):
     Reader class for loading XTEK files
     '''
     
-    def __init__(self, xtekConfigFilename=None):
+    def __init__(self, xtek_config_filename=None):
         '''
         This takes in the xtek config filename and loads the dataset and the
         required geometry parameters
         '''       
         self.projections = None
         self.geometry = {}
-        self.filename = xtekConfigFilename
+        self.filename = xtek_config_filename
         self.load()
         
     def load(self):

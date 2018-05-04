@@ -57,7 +57,7 @@ class Norm2(Function):
 class TV2D(Norm2):
     
     def __init__(self, gamma):
-        super(TV2D,self).__init__(gamma, 2)
+        super(TV2D,self).__init__(gamma, 0)
         self.op = FiniteDiff2D()
         self.L = self.op.get_max_sing_val()
         

@@ -177,6 +177,7 @@ plt.imshow(x_fista1_denoise.as_array())
 plt.title('FISTA LS+1')
 plt.show()
 
+# Now denoise LS + 1-norm with FBPD
 x_fbpd1_denoise, itfbpd1_denoise, timingfbpd1_denoise, criterfbpd1_denoise = FBPD(x_init_denoise, None, f_denoise, g1_denoise)
 print(x_fbpd1_denoise)
 print(criterfbpd1_denoise[-1])
@@ -209,21 +210,20 @@ plt.imshow(x1_cvx)
 plt.title('CVX LS+1')
 plt.show()
 
-
-lam_tv = 1.0
+# Now TV with FBPD
+lam_tv = 0.1
 gtv = TV2D(lam_tv)
+gtv(gtv.op.direct(x_init_denoise))
 
-opt = {'tol': 1e-4, 'iter': 10000}
+opt_tv = {'tol': 1e-4, 'iter': 10000}
 
-x_fbpdtv_denoise, itfbpdtv_denoise, timingfbpdtv_denoise, criterfbpdtv_denoise = FBPD(x_init_denoise, None, f_denoise, gtv,opt=opt)
+x_fbpdtv_denoise, itfbpdtv_denoise, timingfbpdtv_denoise, criterfbpdtv_denoise = FBPD(x_init_denoise, None, f_denoise, gtv,opt=opt_tv)
 print(x_fbpdtv_denoise)
 print(criterfbpdtv_denoise[-1])
 
 plt.imshow(x_fbpdtv_denoise.as_array())
 plt.title('FBPD TV')
 plt.show()
-
-#obj = Minimize(tv(U))
 
 if use_cvxpy:
     # Compare to CVXPY
@@ -245,3 +245,6 @@ if use_cvxpy:
 plt.imshow(xtv_denoise.value)
 plt.title('CVX TV')
 plt.show()
+
+plt.loglog([0,opt_tv['iter']], [objectivetv_denoise.value,objectivetv_denoise.value], label='CVX TV')
+plt.loglog(criterfbpdtv_denoise, label='FBPD TV')

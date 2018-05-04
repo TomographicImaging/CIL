@@ -1,0 +1,122 @@
+
+
+
+# Requires CVXPY, see http://www.cvxpy.org/
+# CVXPY can be installed in anaconda using
+# conda install -c cvxgrp cvxpy libgcc
+
+# Whether to use or omit CVXPY
+use_cvxpy = False
+if use_cvxpy:
+    from cvxpy import *
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+from framework import *
+
+from algs import *
+from funcs import *
+
+
+
+from ops import *
+
+
+
+# Problem data.
+m = 30
+n = 20
+np.random.seed(1)
+Amat = np.random.randn(m, n)
+A = LinearOperatorMatrix(Amat)
+bmat = np.random.randn(m)
+bmat.shape = (bmat.shape[0],1)
+
+# A = Identity()
+# Change n to equal to m.
+
+b = DataSet(bmat)
+
+# Regularization parameter
+lam = 10
+
+# Create object instances with the test data A and b.
+f = Norm2sq(A,b,c=0.5)
+g0 = ZeroFun()
+
+# Initial guess
+x_init = DataSet(np.zeros((n,1)))
+
+f.grad(x_init)
+
+# Run FISTA for least squares plus zero function.
+x_fista0, it0, timing0, criter0 = FISTA(x_init, f, g0)
+
+# Print solution and final objective/criterion value for comparison
+print("FISTA least squares plus zero function solution and objective value:")
+print(x_fista0.array)
+print(criter0[-1])
+
+if use_cvxpy:
+    # Compare to CVXPY
+    
+    # Construct the problem.
+    x0 = Variable(n)
+    objective0 = Minimize(0.5*sum_squares(A*x0 - b) )
+    prob0 = Problem(objective0)
+    
+    # The optimal objective is returned by prob.solve().
+    result0 = prob0.solve(verbose=False,solver=SCS,eps=1e-9)
+    
+    # The optimal solution for x is stored in x.value and optimal objective value 
+    # is in result as well as in objective.value
+    print("CVXPY least squares plus zero function solution and objective value:")
+    print(x0.value)
+    print(objective0.value)
+
+# Create 1-norm object instance
+g1 = Norm1(lam)
+
+g1.fun(x_init)
+g1.prox(x_init,0.02)
+
+# Combine with least squares and solve using generic FISTA implementation
+x_fista1, it1, timing1, criter1 = FISTA(x_init, f, g1)
+
+# Print for comparison
+print("FISTA least squares plus 1-norm solution and objective value:")
+print(x_fista1)
+print(criter1[-1])
+
+if use_cvxpy:
+    # Compare to CVXPY
+    
+    # Construct the problem.
+    x1 = Variable(n)
+    objective1 = Minimize(0.5*sum_squares(A*x1 - b) + lam*norm(x1,1) )
+    prob1 = Problem(objective1)
+    
+    # The optimal objective is returned by prob.solve().
+    result1 = prob1.solve(verbose=False,solver=SCS,eps=1e-9)
+    
+    # The optimal solution for x is stored in x.value and optimal objective value 
+    # is in result as well as in objective.value
+    print("CVXPY least squares plus 1-norm solution and objective value:")
+    print(x1.value)
+    print(objective1.value)
+    
+# Now try another algorithm FBPD for same problem:
+    
+
+x_fbpd1, itfbpd1, timingfbpd1, criterfbpd1 = FBPD(x_init, None, f, g1)
+print(x_fbpd1)
+print(criterfbpd1[-1])
+
+# Plot criterion curve to see both FISTA and FBPD converge to same value.
+# Note that FISTA is very efficient for 1-norm minimization so it beats
+# FBPD in this test by a lot. But FBPD can handle a larger class of problems 
+# than FISTA can.
+iternum = np.arange(1,1001)
+
+plt.plot(iternum,criter1,iternum,criterfbpd1)

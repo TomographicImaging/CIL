@@ -1,28 +1,21 @@
 
+from ccpi.framework import ImageData, ImageGeometry, AcquisitionGeometry, DataContainer
+from ccpi.optimisation.algs import FISTA, FBPD, CGLS
+from ccpi.optimisation.funcs import Norm2sq, ZeroFun, Norm1
 
+from ccpi.optimisation.ops import LinearOperatorMatrix
 
 # Requires CVXPY, see http://www.cvxpy.org/
 # CVXPY can be installed in anaconda using
 # conda install -c cvxgrp cvxpy libgcc
 
 # Whether to use or omit CVXPY
-use_cvxpy = False
+use_cvxpy = True
 if use_cvxpy:
     from cvxpy import *
 
 import numpy as np
 import matplotlib.pyplot as plt
-
-from framework import *
-
-from algs import *
-from funcs import *
-
-
-
-from ops import *
-
-
 
 # Problem data.
 m = 30
@@ -36,7 +29,7 @@ bmat.shape = (bmat.shape[0],1)
 # A = Identity()
 # Change n to equal to m.
 
-b = DataSet(bmat)
+b = DataContainer(bmat)
 
 # Regularization parameter
 lam = 10
@@ -46,7 +39,7 @@ f = Norm2sq(A,b,c=0.5)
 g0 = ZeroFun()
 
 # Initial guess
-x_init = DataSet(np.zeros((n,1)))
+x_init = DataContainer(np.zeros((n,1)))
 
 f.grad(x_init)
 
@@ -63,7 +56,7 @@ if use_cvxpy:
     
     # Construct the problem.
     x0 = Variable(n)
-    objective0 = Minimize(0.5*sum_squares(A*x0 - b) )
+    objective0 = Minimize(0.5*sum_squares(Amat*x0 - bmat) )
     prob0 = Problem(objective0)
     
     # The optimal objective is returned by prob.solve().
@@ -75,10 +68,18 @@ if use_cvxpy:
     print(x0.value)
     print(objective0.value)
 
+# Plot criterion curve to see FISTA converge to same value as CVX.
+iternum = np.arange(1,1001)
+plt.figure()
+plt.loglog(iternum[[0,-1]],[objective0.value, objective0.value], label='CVX LS')
+plt.loglog(iternum,criter0,label='FISTA LS')
+plt.legend()
+plt.show()
+
 # Create 1-norm object instance
 g1 = Norm1(lam)
 
-g1.fun(x_init)
+g1(x_init)
 g1.prox(x_init,0.02)
 
 # Combine with least squares and solve using generic FISTA implementation
@@ -94,7 +95,7 @@ if use_cvxpy:
     
     # Construct the problem.
     x1 = Variable(n)
-    objective1 = Minimize(0.5*sum_squares(A*x1 - b) + lam*norm(x1,1) )
+    objective1 = Minimize(0.5*sum_squares(Amat*x1 - bmat) + lam*norm(x1,1) )
     prob1 = Problem(objective1)
     
     # The optimal objective is returned by prob.solve().
@@ -117,6 +118,15 @@ print(criterfbpd1[-1])
 # Note that FISTA is very efficient for 1-norm minimization so it beats
 # FBPD in this test by a lot. But FBPD can handle a larger class of problems 
 # than FISTA can.
-iternum = np.arange(1,1001)
+plt.figure()
+plt.loglog(iternum[[0,-1]],[objective1.value, objective1.value], label='CVX LS+1')
+plt.loglog(iternum,criter1,label='FISTA LS+1')
+plt.legend()
+plt.show()
 
-plt.plot(iternum,criter1,iternum,criterfbpd1)
+plt.figure()
+plt.loglog(iternum[[0,-1]],[objective1.value, objective1.value], label='CVX LS+1')
+plt.loglog(iternum,criter1,label='FISTA LS+1')
+plt.loglog(iternum,criterfbpd1,label='FBPD LS+1')
+plt.legend()
+plt.show()

@@ -1,9 +1,9 @@
 
 from ccpi.framework import ImageData, ImageGeometry, AcquisitionGeometry, DataContainer
 from ccpi.optimisation.algs import FISTA, FBPD, CGLS
-from ccpi.optimisation.funcs import Norm2sq, ZeroFun, Norm1
+from ccpi.optimisation.funcs import Norm2sq, ZeroFun, Norm1, TV2D
 
-from ccpi.optimisation.ops import LinearOperatorMatrix
+from ccpi.optimisation.ops import LinearOperatorMatrix, Identity
 
 # Requires CVXPY, see http://www.cvxpy.org/
 # CVXPY can be installed in anaconda using
@@ -108,8 +108,6 @@ if use_cvxpy:
     print(objective1.value)
     
 # Now try another algorithm FBPD for same problem:
-    
-
 x_fbpd1, itfbpd1, timingfbpd1, criterfbpd1 = FBPD(x_init, None, f, g1)
 print(x_fbpd1)
 print(criterfbpd1[-1])
@@ -129,4 +127,121 @@ plt.loglog(iternum[[0,-1]],[objective1.value, objective1.value], label='CVX LS+1
 plt.loglog(iternum,criter1,label='FISTA LS+1')
 plt.loglog(iternum,criterfbpd1,label='FBPD LS+1')
 plt.legend()
+plt.show()
+
+# Now try 1-norm and TV denoising with FBPD, first 1-norm.
+
+# Set up phantom size NxN by creating ImageGeometry, initialising the 
+# ImageData object with this geometry and empty array and finally put some
+# data into its array, and display as image.
+N = 64
+ig = ImageGeometry(voxel_num_x=N,voxel_num_y=N)
+Phantom = ImageData(geometry=ig)
+
+x = Phantom.as_array()
+x[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
+x[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 1
+
+plt.imshow(x)
+plt.title('Phantom image')
+plt.show()
+
+# Identity operator for denoising
+I = Identity()
+
+# Data and add noise
+y = I.direct(Phantom)
+y.array = y.array + 0.1*np.random.randn(N, N)
+
+plt.imshow(y.array)
+plt.title('Noisy image')
+plt.show()
+
+# Data fidelity term
+f_denoise = Norm2sq(I,y,c=0.5)
+
+# 1-norm regulariser
+lam1_denoise = 1.0
+g1_denoise = Norm1(lam1_denoise)
+
+# Initial guess
+x_init_denoise = ImageData(np.zeros((N,N)))
+
+# Combine with least squares and solve using generic FISTA implementation
+x_fista1_denoise, it1_denoise, timing1_denoise, criter1_denoise = FISTA(x_init_denoise, f_denoise, g1_denoise)
+
+print(x_fista1_denoise)
+print(criter1_denoise[-1])
+
+plt.imshow(x_fista1_denoise.as_array())
+plt.title('FISTA LS+1')
+plt.show()
+
+x_fbpd1_denoise, itfbpd1_denoise, timingfbpd1_denoise, criterfbpd1_denoise = FBPD(x_init_denoise, None, f_denoise, g1_denoise)
+print(x_fbpd1_denoise)
+print(criterfbpd1_denoise[-1])
+
+plt.imshow(x_fbpd1_denoise.as_array())
+plt.title('FBPD LS+1')
+plt.show()
+
+if use_cvxpy:
+    # Compare to CVXPY
+    
+    # Construct the problem.
+    x1_denoise = Variable(N**2,1)
+    objective1_denoise = Minimize(0.5*sum_squares(x1_denoise - y.array.flatten()) + lam1_denoise*norm(x1_denoise,1) )
+    prob1_denoise = Problem(objective1_denoise)
+    
+    # The optimal objective is returned by prob.solve().
+    result1_denoise = prob1_denoise.solve(verbose=False,solver=SCS,eps=1e-12)
+    
+    # The optimal solution for x is stored in x.value and optimal objective value 
+    # is in result as well as in objective.value
+    print("CVXPY least squares plus 1-norm solution and objective value:")
+    print(x1_denoise.value)
+    print(objective1_denoise.value)
+
+x1_cvx = x1_denoise.value
+x1_cvx.shape = (N,N)
+
+plt.imshow(x1_cvx)
+plt.title('CVX LS+1')
+plt.show()
+
+
+lam_tv = 1.0
+gtv = TV2D(lam_tv)
+
+opt = {'tol': 1e-4, 'iter': 10000}
+
+x_fbpdtv_denoise, itfbpdtv_denoise, timingfbpdtv_denoise, criterfbpdtv_denoise = FBPD(x_init_denoise, None, f_denoise, gtv,opt=opt)
+print(x_fbpdtv_denoise)
+print(criterfbpdtv_denoise[-1])
+
+plt.imshow(x_fbpdtv_denoise.as_array())
+plt.title('FBPD TV')
+plt.show()
+
+#obj = Minimize(tv(U))
+
+if use_cvxpy:
+    # Compare to CVXPY
+    
+    # Construct the problem.
+    xtv_denoise = Variable(N,N)
+    objectivetv_denoise = Minimize(0.5*sum_squares(xtv_denoise - y.array) + lam_tv*tv(xtv_denoise) )
+    probtv_denoise = Problem(objectivetv_denoise)
+    
+    # The optimal objective is returned by prob.solve().
+    resulttv_denoise = probtv_denoise.solve(verbose=False,solver=SCS,eps=1e-12)
+    
+    # The optimal solution for x is stored in x.value and optimal objective value 
+    # is in result as well as in objective.value
+    print("CVXPY least squares plus 1-norm solution and objective value:")
+    print(xtv_denoise.value)
+    print(objectivetv_denoise.value)
+    
+plt.imshow(xtv_denoise.value)
+plt.title('CVX TV')
 plt.show()

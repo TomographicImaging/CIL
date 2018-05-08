@@ -163,10 +163,10 @@ class LinearOperatorMatrix(Operator):
         super(LinearOperatorMatrix, self).__init__()
         
     def direct(self,x):
-        return DataContainer(numpy.dot(self.A,x.as_array()))
+        return type(x)(numpy.dot(self.A,x.as_array()))
     
     def adjoint(self,x):
-        return DataContainer(numpy.dot(self.A.transpose(),x.as_array()))
+        return type(x)(numpy.dot(self.A.transpose(),x.as_array()))
     
     def size(self):
         return self.A.shape

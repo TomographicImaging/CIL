@@ -5,7 +5,7 @@ from ccpi.framework import ImageData , ImageGeometry, AcquisitionGeometry
 from ccpi.optimisation.algs import FISTA, FBPD, CGLS
 from ccpi.optimisation.funcs import Norm2sq, Norm1, TV2D
 from ccpi.astra.ops import AstraProjectorSimple
-from ccpi.optimisation.regularisers_RGLTK import FGP_TV_regulariser, ROF_TV_regulariser
+from ccpi.plugins.regularisers import _ROF_TV_, _FGP_TV_
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -81,7 +81,7 @@ f = Norm2sq(Aop,b,c=0.5)
 x_init = ImageData(np.zeros(x.shape),geometry=vg)
 #%%
 # FISTA with ROF-TV regularisation
-g_rof = ROF_TV_regulariser(lambdaReg = 0.01,iterationsTV=50,tolerance=1e-5,time_marchstep=0.01,device='cpu')
+g_rof = _ROF_TV_(lambdaReg = 0.01,iterationsTV=50,tolerance=1e-5,time_marchstep=0.01,device='cpu')
 
 x_fista_rof, it1, timing1, criter_rof = FISTA(x_init, f, g_rof)
 
@@ -94,7 +94,7 @@ plt.semilogy(criter_rof)
 plt.show()
 #%%
 # FISTA with FGP-TV regularisation
-g_fgp = FGP_TV_regulariser(lambdaReg = 0.01,iterationsTV=50,tolerance=1e-5,methodTV=0,nonnegativity=0,printing=0,device='cpu')
+g_fgp = _FGP_TV_(lambdaReg = 0.01,iterationsTV=50,tolerance=1e-5,methodTV=0,nonnegativity=0,printing=0,device='cpu')
 
 x_fista_fgp, it1, timing1, criter_fgp = FISTA(x_init, f, g_fgp)
 

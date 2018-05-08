@@ -19,18 +19,19 @@
 
 from ccpi.filters.regularisers import ROF_TV, FGP_TV, SB_TV
 from ccpi.filters.cpu_regularisers import TV_ENERGY
+from ccpi.framework import DataContainer
 import numpy as np
 
 
-class ROF_TV_regulariser(BaseFunction):
+class ROF_TV_regulariser:
     def __init__(self,lambdaReg,iterationsTV,tolerance,time_marchstep,device):
         # set parameters
         self.lambdaReg = lambdaReg
         self.iterationsTV = iterationsTV
         self.time_marchstep = time_marchstep
         self.device = device # string for 'cpu' or 'gpu'
-    def fun(self,x):
-        # evaluate objective function of TV gradient        
+    def __call__(self,x):
+        # evaluate objective function of TV gradient
         EnergyValTV = TV_ENERGY(np.asarray(x.as_array(), dtype=np.float32), np.asarray(x.as_array(), dtype=np.float32), self.lambdaReg, 2)
         return EnergyValTV
     def prox(self,x,Lipshitz):
@@ -44,9 +45,9 @@ class ROF_TV_regulariser(BaseFunction):
               pars['regularization_parameter'],
               pars['number_of_iterations'],
               pars['time_marching_parameter'], self.device)
-        return VolumeData(out, dimension_labels=x.dimension_labels)
+        return DataContainer(out)
 
-class FGP_TV_regulariser(BaseFunction):
+class FGP_TV_regulariser:
     def __init__(self,lambdaReg,iterationsTV,tolerance,methodTV,nonnegativity,printing,device):
         # set parameters
         self.lambdaReg = lambdaReg
@@ -56,8 +57,8 @@ class FGP_TV_regulariser(BaseFunction):
         self.nonnegativity = nonnegativity
         self.printing = printing
         self.device = device # string for 'cpu' or 'gpu'
-    def fun(self,x):
-        # evaluate objective function of TV gradient        
+    def __call__(self,x):
+        # evaluate objective function of TV gradient
         EnergyValTV = TV_ENERGY(np.asarray(x.as_array(), dtype=np.float32), np.asarray(x.as_array(), dtype=np.float32), self.lambdaReg, 2)
         return EnergyValTV
     def prox(self,x,Lipshitz):
@@ -77,10 +78,10 @@ class FGP_TV_regulariser(BaseFunction):
               pars['methodTV'],
               pars['nonneg'],
               pars['printingOut'], self.device)
-        return VolumeData(out, dimension_labels=x.dimension_labels)
+        return DataContainer(out)
 
 
-class SB_TV_regulariser(BaseFunction):
+class SB_TV_regulariser:
     def __init__(self,lambdaReg,iterationsTV,tolerance,methodTV,printing,device):
         # set parameters
         self.lambdaReg = lambdaReg
@@ -89,8 +90,8 @@ class SB_TV_regulariser(BaseFunction):
         self.methodTV = methodTV
         self.printing = printing
         self.device = device # string for 'cpu' or 'gpu'
-    def fun(self,x):
-        # evaluate objective function of TV gradient        
+    def __call__(self,x):
+        # evaluate objective function of TV gradient
         EnergyValTV = TV_ENERGY(np.asarray(x.as_array(), dtype=np.float32), np.asarray(x.as_array(), dtype=np.float32), self.lambdaReg, 2)
         return EnergyValTV
     def prox(self,x,Lipshitz):
@@ -108,4 +109,4 @@ class SB_TV_regulariser(BaseFunction):
               pars['tolerance_constant'], 
               pars['methodTV'],
               pars['printingOut'], self.device)
-        return VolumeData(out, dimension_labels=x.dimension_labels)
+        return DataContainer(out)

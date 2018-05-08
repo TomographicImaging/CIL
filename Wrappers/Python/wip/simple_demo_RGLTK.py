@@ -2,9 +2,10 @@
 #sys.path.append("..")
 
 from ccpi.framework import ImageData , ImageGeometry, AcquisitionGeometry
-from ccpi.reconstruction.algs import FISTA, FBPD, CGLS
-from ccpi.reconstruction.funcs import Norm2sq, Norm1 , TV2D
-from ccpi.astra.astra_ops import AstraProjectorSimple
+from ccpi.optimisation.algs import FISTA, FBPD, CGLS
+from ccpi.optimisation.funcs import Norm2sq, Norm1, TV2D
+from ccpi.astra.ops import AstraProjectorSimple
+from ccpi.optimisation.regularisers_RGLTK import FGP_TV_regulariser, ROF_TV_regulariser
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -22,8 +23,8 @@ x = Phantom.as_array()
 x[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
 x[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 1
 
-plt.imshow(x)
-plt.show()
+#plt.imshow(x)
+#plt.show()
 
 # Set up measurement geometry
 angles_num = 20; # angles number
@@ -67,25 +68,51 @@ Aop = AstraProjectorSimple(vg, pg, 'cpu')
 b = Aop.direct(Phantom)
 out2 = Aop.adjoint(b)
 
-plt.imshow(b.array)
-plt.show()
+#plt.imshow(b.array)
+#plt.show()
 
-plt.imshow(out2.array)
-plt.show()
+#plt.imshow(out2.array)
+#plt.show()
 
 # Create least squares object instance with projector and data.
 f = Norm2sq(Aop,b,c=0.5)
 
 # Initial guess
 x_init = ImageData(np.zeros(x.shape),geometry=vg)
+#%%
+# FISTA with ROF-TV regularisation
+g_rof = ROF_TV_regulariser(lambdaReg = 0.01,iterationsTV=50,tolerance=1e-5,time_marchstep=0.01,device='cpu')
 
+x_fista_rof, it1, timing1, criter_rof = FISTA(x_init, f, g_rof)
+
+plt.figure()
+plt.subplot(121)
+plt.imshow(x_fista_rof.array,cmap="BuPu")
+plt.title('FISTA-ROF-TV')
+plt.subplot(122)
+plt.semilogy(criter_rof)
+plt.show()
+#%%
+# FISTA with FGP-TV regularisation
+g_fgp = FGP_TV_regulariser(lambdaReg = 0.01,iterationsTV=50,tolerance=1e-5,methodTV=0,nonnegativity=0,printing=0,device='cpu')
+
+x_fista_fgp, it1, timing1, criter_fgp = FISTA(x_init, f, g_fgp)
+
+plt.figure()
+plt.subplot(121)
+plt.imshow(x_fista_fgp.array,cmap="BuPu")
+plt.title('FISTA-FGP-TV')
+plt.subplot(122)
+plt.semilogy(criter_fgp)
+plt.show()
+#%%
 # Run FISTA for least squares without regularization
 x_fista0, it0, timing0, criter0 = FISTA(x_init, f, None)
 
 plt.imshow(x_fista0.array)
 plt.title('FISTA0')
 plt.show()
-
+#%%
 # Now least squares plus 1-norm regularization
 lam = 0.1
 g0 = Norm1(lam)
@@ -99,7 +126,7 @@ plt.show()
 
 plt.semilogy(criter1)
 plt.show()
-
+#%%
 # Run FBPD=Forward Backward Primal Dual method on least squares plus 1-norm
 opt = {'tol': 1e-4, 'iter': 100}
 x_fbpd1, it_fbpd1, timing_fbpd1, criter_fbpd1 = FBPD(x_init,None,f,g0,opt=opt)
@@ -110,7 +137,7 @@ plt.show()
 
 plt.semilogy(criter_fbpd1)
 plt.show()
-
+#%%
 # Now FBPD for least squares plus TV
 #lamtv = 1
 #gtv = TV2D(lamtv)
@@ -135,8 +162,6 @@ plt.show()
 plt.semilogy(criter_CGLS)
 plt.title('CGLS criterion')
 plt.show()
-
-
 #%%
 
 clims = (0,1)
@@ -183,7 +208,6 @@ imgplot = plt.loglog(criter0 , label='FISTA0')
 imgplot = plt.loglog(criter1 , label='FISTA1')
 imgplot = plt.loglog(criter_fbpd1, label='FBPD1')
 imgplot = plt.loglog(criter_CGLS, label='CGLS')
-imgplot = plt.loglog(criter_fbpdtv, label='FBPD TV')
 b.legend(loc='right')
 plt.show()
 #%%

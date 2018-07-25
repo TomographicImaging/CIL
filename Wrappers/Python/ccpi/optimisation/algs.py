@@ -222,4 +222,81 @@ def CGLS(x_init, operator , data , opt=None):
         criter[it] = (r**2).sum()
     
     return x, it, timing, criter
+
+def SIRT(x_init, operator , data , opt=None):
+    '''Simultaneous Iterative Reconstruction Technique
+    
+    Parameters:
+      x_init: initial guess
+      operator: operator for forward/backward projections
+      data: data to operate on
+      opt: additional algorithm 
+    '''
+    
+    if opt is None: 
+        opt = {'tol': 1e-4, 'iter': 1000}
+    else:
+        try:
+            max_iter = opt['iter']
+        except KeyError as ke:
+            opt[ke] = 1000
+        try:
+            opt['tol'] = 1000
+        except KeyError as ke:
+            opt[ke] = 1e-4
+    tol = opt['tol']
+    max_iter = opt['iter']
+    
+    #r = data.clone()
+    #x = x_init.clone()
+    
+    #d = operator.adjoint(r)
+    
+    #normr2 = (d**2).sum()
+    
+    timing = numpy.zeros(max_iter)
+    criter = numpy.zeros(max_iter)
+    
+    # Relaxation parameter must be strictly between 0 and 2.
+    relax_par = 1.0
+    
+    # Set up scaling matrices D and M.
+    im1 = ImageData(geometry=x_init.geometry)
+    im1.array[:] = 1.0
+    M = operator.direct(im1)
+    del im1
+    
+    aq1 = AcquisitionData(geometry=M.geometry)
+    aq1.array[:] = 1.0
+    D = operator.adjoint(aq1)
+    del aq1
+    
+
+    # algorithm loop
+    for it in range(0, max_iter):
+    
+        t = time.time()
+        
+        r = b - operator.direct(x)
+        
+        x = x + omega * (D*operator.adjoint(M*r))
+        
+        
+        
+        #Ad = operator.direct(d)
+        #alpha = normr2/( (Ad**2).sum() )
+        #x  = x + alpha*d
+        #r  = r - alpha*Ad
+        #s  = operator.adjoint(r)
+        
+        #normr2_new = (s**2).sum()
+        #beta = normr2_new/normr2
+        #normr2 = normr2_new
+        #d = s + beta*d
+        
+        # time and criterion
+        timing[it] = time.time() - t
+        #criter[it] = (r**2).sum()
+    
+    return x, it, timing, criter
     

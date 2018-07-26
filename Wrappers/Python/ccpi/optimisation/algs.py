@@ -21,6 +21,7 @@ import numpy
 import time
 
 from ccpi.optimisation.funcs import Function
+from ccpi.framework import ImageData, AcquisitionData
 
 def FISTA(x_init, f=None, g=None, opt=None):
     '''Fast Iterative Shrinkage-Thresholding Algorithm
@@ -223,7 +224,7 @@ def CGLS(x_init, operator , data , opt=None):
     
     return x, it, timing, criter
 
-def SIRT(x_init, operator , data , opt=None):
+def SIRT(x_init, operator , data , opt=None, constraint=None):
     '''Simultaneous Iterative Reconstruction Technique
     
     Parameters:
@@ -231,6 +232,7 @@ def SIRT(x_init, operator , data , opt=None):
       operator: operator for forward/backward projections
       data: data to operate on
       opt: additional algorithm 
+      constraint: func of Indicator type specifying convex constraint.
     '''
     
     if opt is None: 
@@ -247,56 +249,40 @@ def SIRT(x_init, operator , data , opt=None):
     tol = opt['tol']
     max_iter = opt['iter']
     
-    #r = data.clone()
-    #x = x_init.clone()
+    # Set default constraint to unconstrained
+    if constraint==None:
+        constraint = Function()
     
-    #d = operator.adjoint(r)
-    
-    #normr2 = (d**2).sum()
+    x = x_init.clone()
     
     timing = numpy.zeros(max_iter)
     criter = numpy.zeros(max_iter)
     
-    # Relaxation parameter must be strictly between 0 and 2.
+    # Relaxation parameter must be strictly between 0 and 2. For now fix at 1.0
     relax_par = 1.0
     
     # Set up scaling matrices D and M.
     im1 = ImageData(geometry=x_init.geometry)
     im1.array[:] = 1.0
-    M = operator.direct(im1)
+    M = 1/operator.direct(im1)
     del im1
-    
     aq1 = AcquisitionData(geometry=M.geometry)
     aq1.array[:] = 1.0
-    D = operator.adjoint(aq1)
+    D = 1/operator.adjoint(aq1)
     del aq1
     
-
     # algorithm loop
     for it in range(0, max_iter):
-    
         t = time.time()
+        r = data - operator.direct(x)
         
-        r = b - operator.direct(x)
+        x = constraint.prox(x + relax_par * (D*operator.adjoint(M*r)),None)
         
-        x = x + omega * (D*operator.adjoint(M*r))
-        
-        
-        
-        #Ad = operator.direct(d)
-        #alpha = normr2/( (Ad**2).sum() )
-        #x  = x + alpha*d
-        #r  = r - alpha*Ad
-        #s  = operator.adjoint(r)
-        
-        #normr2_new = (s**2).sum()
-        #beta = normr2_new/normr2
-        #normr2 = normr2_new
-        #d = s + beta*d
-        
-        # time and criterion
         timing[it] = time.time() - t
-        #criter[it] = (r**2).sum()
+        if it > 0:
+            criter[it-1] = (r**2).sum()
     
-    return x, it, timing, criter
+    r = data - operator.direct(x)
+    criter[it] = (r**2).sum()
+    return x, it, timing,  criter
     

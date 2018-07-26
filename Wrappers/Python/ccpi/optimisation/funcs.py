@@ -126,4 +126,28 @@ class Norm1(Function):
     
     def prox(self,x,tau):
         return (x.abs() - tau*self.gamma).maximum(0) * x.sign()
+
+# Box constraints indicator function. Calling returns 0 if argument is within 
+# the box. The prox operator is projection onto the box. Only implements one 
+# scalar lower and one upper as constraint on all elements. Should generalise 
+# to vectors to allow different constraints one elements.
+class IndicatorBox(Function):
+    
+    def __init__(self,lower=-numpy.inf,upper=numpy.inf):
+        # Do nothing
+        self.lower = lower
+        self.upper = upper
+        super(IndicatorBox, self).__init__()
+    
+    def __call__(self,x):
+        
+        if (numpy.all(x.array>=self.lower) and 
+            numpy.all(x.array <= self.upper) ):
+            val = 0
+        else:
+            val = numpy.inf
+        return val
+    
+    def prox(self,x,tau=None):
+        return  (x.maximum(self.lower)).minimum(self.upper)
     

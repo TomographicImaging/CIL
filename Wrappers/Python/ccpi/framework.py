@@ -490,6 +490,13 @@ class DataContainer(object):
                        dimension_labels=self.dimension_labels,
                        geometry=self.geometry)
     
+    def minimum(self,otherscalar):
+        out = numpy.minimum(self.as_array(),otherscalar)
+        return type(self)(out,
+                       deep_copy=True, 
+                       dimension_labels=self.dimension_labels,
+                       geometry=self.geometry)
+    
     def sign(self):
         out = numpy.sign(self.as_array() )
         return type(self)(out,

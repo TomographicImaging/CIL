@@ -1,88 +1,15 @@
-# This demo illustrates how ASTRA 2D projectors can be used with
-# the modular optimisation framework. The demo sets up a 2D test case and 
-# demonstrates reconstruction using CGLS, as well as FISTA for least squares 
-# and 1-norm regularisation and FBPD for 1-norm and TV regularisation.
+# This demo illustrates how to use the SIRT algorithm without and with 
+# nonnegativity and box constraints. The ASTRA 2D projectors are used.
 
 # First make all imports
-from ccpi.framework import ImageData , ImageGeometry, AcquisitionGeometry, AcquisitionData
-from ccpi.optimisation.algs import FISTA, FBPD, CGLS
-from ccpi.optimisation.funcs import Norm2sq, Norm1, TV2D
+from ccpi.framework import ImageData, ImageGeometry, AcquisitionGeometry, \
+    AcquisitionData
+from ccpi.optimisation.algs import FISTA, FBPD, CGLS, SIRT
+from ccpi.optimisation.funcs import Norm2sq, Norm1, TV2D, IndicatorBox
 from ccpi.astra.ops import AstraProjectorSimple
 
 import numpy as np
 import matplotlib.pyplot as plt
-
-import time
-
-def SIRT(x_init, operator , data , opt=None):
-    '''Simultaneous Iterative Reconstruction Technique
-    
-    Parameters:
-      x_init: initial guess
-      operator: operator for forward/backward projections
-      data: data to operate on
-      opt: additional algorithm 
-    '''
-    
-    if opt is None: 
-        opt = {'tol': 1e-4, 'iter': 1000}
-    else:
-        try:
-            max_iter = opt['iter']
-        except KeyError as ke:
-            opt[ke] = 1000
-        try:
-            opt['tol'] = 1000
-        except KeyError as ke:
-            opt[ke] = 1e-4
-    tol = opt['tol']
-    max_iter = opt['iter']
-    
-    #r = data.clone()
-    x = x_init.clone()
-    
-    #d = operator.adjoint(r)
-    
-    #normr2 = (d**2).sum()
-    
-    timing = np.zeros(max_iter)
-    criter = np.zeros(max_iter)
-    
-    # Relaxation parameter must be strictly between 0 and 2.
-    relax_par = 1.0
-    
-    # Set up scaling matrices D and M.
-    im1 = ImageData(geometry=x_init.geometry)
-    im1.array[:] = 1.0
-    M = 1/operator.direct(im1)
-    del im1
-    
-    aq1 = AcquisitionData(geometry=M.geometry)
-    aq1.array[:] = 1.0
-    D = 1/operator.adjoint(aq1)
-    del aq1
-    
-    # algorithm loop
-    for it in range(0, max_iter):
-        t = time.time()
-        r = b - operator.direct(x)
-        
-        x = x + relax_par * (D*operator.adjoint(M*r))
-        x.array[x.array<0] = 0.0
-        
-        timing[it] = time.time() - t
-        if it > 0:
-            criter[it-1] = (r**2).sum()
-    
-    r = b - operator.direct(x)
-    criter[it] = (r**2).sum()
-    return x, it, timing,  criter
-
-
-
-
-
-
 
 # Choose either a parallel-beam (1=parallel2D) or fan-beam (2=cone2D) test case
 test_case = 1
@@ -168,14 +95,82 @@ plt.semilogy(criter_CGLS)
 plt.title('CGLS criterion')
 plt.show()
 
-# First a CGLS reconstruction can be done:
+# A SIRT unconstrained reconstruction can be done: similarly:
 x_SIRT, it_SIRT, timing_SIRT, criter_SIRT = SIRT(x_init, Aop, b, opt)
 
 plt.imshow(x_SIRT.array)
-plt.title('SIRT')
+plt.title('SIRT unconstrained')
 plt.colorbar()
 plt.show()
 
 plt.semilogy(criter_SIRT)
-plt.title('SIRT criterion')
+plt.title('SIRT unconstrained criterion')
+plt.show()
+
+# A SIRT nonnegativity constrained reconstruction can be done using the 
+# additional input "constraint" set to a box indicator function with 0 as the 
+# lower bound and the default upper bound of infinity:
+x_SIRT0, it_SIRT0, timing_SIRT0, criter_SIRT0 = SIRT(x_init, Aop, b, opt,
+                                                      constraint=IndicatorBox(lower=0))
+
+plt.imshow(x_SIRT0.array)
+plt.title('SIRT nonneg')
+plt.colorbar()
+plt.show()
+
+plt.semilogy(criter_SIRT0)
+plt.title('SIRT nonneg criterion')
+plt.show()
+
+# A SIRT reconstruction with box constraints on [0,1] can also be done:
+x_SIRT01, it_SIRT01, timing_SIRT01, criter_SIRT01 = SIRT(x_init, Aop, b, opt,
+         constraint=IndicatorBox(lower=0,upper=1))
+
+plt.imshow(x_SIRT01.array)
+plt.title('SIRT box(0,1)')
+plt.colorbar()
+plt.show()
+
+plt.semilogy(criter_SIRT01)
+plt.title('SIRT box(0,1) criterion')
+plt.show()
+
+# The indicator function can also be used with the FISTA algorithm to do 
+# least squares with nonnegativity constraint.
+
+# Create least squares object instance with projector, test data and a constant 
+# coefficient of 0.5:
+f = Norm2sq(Aop,b,c=0.5)
+
+# Run FISTA for least squares without constraints
+x_fista, it, timing, criter = FISTA(x_init, f, None,opt)
+
+plt.imshow(x_fista.array)
+plt.title('FISTA Least squares')
+plt.show()
+
+plt.semilogy(criter)
+plt.title('FISTA Least squares criterion')
+plt.show()
+
+# Run FISTA for least squares with nonnegativity constraint
+x_fista0, it0, timing0, criter0 = FISTA(x_init, f, IndicatorBox(lower=0),opt)
+
+plt.imshow(x_fista0.array)
+plt.title('FISTA Least squares nonneg')
+plt.show()
+
+plt.semilogy(criter0)
+plt.title('FISTA Least squares nonneg criterion')
+plt.show()
+
+# Run FISTA for least squares with box constraint [0,1]
+x_fista01, it01, timing01, criter01 = FISTA(x_init, f, IndicatorBox(lower=0,upper=1),opt)
+
+plt.imshow(x_fista01.array)
+plt.title('FISTA Least squares box(0,1)')
+plt.show()
+
+plt.semilogy(criter01)
+plt.title('FISTA Least squares box(0,1) criterion')
 plt.show()

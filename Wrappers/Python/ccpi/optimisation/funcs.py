@@ -24,9 +24,11 @@ import numpy
 class Function(object):
     def __init__(self):
         self.op = Identity()
-    def __call__(self,x):      return 0
-    def grad(self,x):     return 0
-    def prox(self,x,tau): return x
+    def __call__(self,x):       return 0
+    def grad(self, x):          return 0
+    def prox(self, x, tau):     return x
+    def gradient(self, x):      return self.grad(x)
+    def proximal(self, x, tau): return self.prox(x, tau)
 
 class Norm2(Function):
     

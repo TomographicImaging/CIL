@@ -34,7 +34,7 @@ def find_key(dic, val):
     return [k for k, v in dic.items() if v == val][0]
 
 
-class ImageGeometry:
+class ImageGeometry(object):
     
     def __init__(self, 
                  voxel_num_x=0, 
@@ -105,7 +105,7 @@ class ImageGeometry:
         return repres
     
     
-class AcquisitionGeometry:
+class AcquisitionGeometry(object):
     
     def __init__(self, 
                  geom_type, 
@@ -571,6 +571,9 @@ class DataContainer(object):
                           dimension_labels=self.dimension_labels,
                           deep_copy=True,
                           geometry=self.geometry )
+    def copy(self):
+        '''alias of clone'''
+        return self.clone()
     
     def get_data_axes_order(self,new_order=None):
         '''returns the axes label of self as a list

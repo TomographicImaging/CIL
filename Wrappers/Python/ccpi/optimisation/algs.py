@@ -191,8 +191,8 @@ def CGLS(x_init, operator , data , opt=None):
     tol = opt['tol']
     max_iter = opt['iter']
     
-    r = data.clone()
-    x = x_init.clone()
+    r = data.copy()
+    x = x_init.copy()
     
     d = operator.adjoint(r)
     

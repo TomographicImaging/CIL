@@ -34,7 +34,7 @@ def find_key(dic, val):
     return [k for k, v in dic.items() if v == val][0]
 
 
-class ImageGeometry(object):
+class ImageGeometry:
     
     def __init__(self, 
                  voxel_num_x=0, 
@@ -105,7 +105,7 @@ class ImageGeometry(object):
         return repres
     
     
-class AcquisitionGeometry(object):
+class AcquisitionGeometry:
     
     def __init__(self, 
                  geom_type, 
@@ -117,8 +117,7 @@ class AcquisitionGeometry(object):
                  pixel_size_v=1, 
                  dist_source_center=None, 
                  dist_center_detector=None, 
-                 channels=1,
-                 angle_unit='degree'
+                 channels=1
                  ):
         """
         General inputs for standard type projection geometries
@@ -523,7 +522,7 @@ class DataContainer(object):
             return type(self)(fother ** self.array , 
                            dimension_labels=self.dimension_labels,
                            geometry=self.geometry)
-        elif issubclass(other, DataContainer):
+        elif issubclass(type(other), DataContainer):
             if self.check_dimensions(other):
                 return type(self)(other.as_array() ** self.array , 
                            dimension_labels=self.dimension_labels,
@@ -539,20 +538,48 @@ class DataContainer(object):
     # (+=, -=, *=, /= , //=,
     
     def __iadd__(self, other):
-        return self + other
+        if isinstance(other, (int, float)) :
+            numpy.add(self.array, other, out=self.array)
+        elif issubclass(type(other), DataContainer):
+            if self.check_dimensions(other):
+                numpy.add(self.array, other.array, out=self.array)
+            else:
+                raise ValueError('Dimensions do not match')
+        return self
     # __iadd__
     
     def __imul__(self, other):
-        return self * other
+        if isinstance(other, (int, float)) :
+            numpy.multiply(self.array, other, out=self.array)
+        elif issubclass(type(other), DataContainer):
+            if self.check_dimensions(other):
+                numpy.multiply(self.array, other.array, out=self.array)
+            else:
+                raise ValueError('Dimensions do not match')
+        return self
+        #return self * other
     # __imul__
     
     def __isub__(self, other):
-        return self - other
+        if isinstance(other, (int, float)) :
+            numpy.subtract(self.array, other, out=self.array)
+        elif issubclass(type(other), DataContainer):
+            if self.check_dimensions(other):
+                numpy.subtract(self.array, other.array, out=self.array)
+            else:
+                raise ValueError('Dimensions do not match')
+        return self
     # __isub__
     
     def __idiv__(self, other):
-        print ("call __idiv__")
-        return self / other
+        if isinstance(other, (int, float)) :
+            numpy.divide(self.array, other, out=self.array)
+        elif issubclass(type(other), DataContainer):
+            if self.check_dimensions(other):
+                numpy.divide(self.array, other.array, out=self.array)
+            else:
+                raise ValueError('Dimensions do not match')
+        return self
     # __idiv__
     
     def __str__ (self, representation=False):
@@ -571,9 +598,6 @@ class DataContainer(object):
                           dimension_labels=self.dimension_labels,
                           deep_copy=True,
                           geometry=self.geometry )
-    def copy(self):
-        '''alias of clone'''
-        return self.clone()
     
     def get_data_axes_order(self,new_order=None):
         '''returns the axes label of self as a list

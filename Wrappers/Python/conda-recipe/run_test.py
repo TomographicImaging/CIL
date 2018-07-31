@@ -3,6 +3,9 @@ import numpy
 from ccpi.framework import DataContainer, ImageData, AcquisitionData, \
   ImageGeometry, AcquisitionGeometry
 import sys
+from timeit import default_timer as timer
+def dt (steps):
+    return steps[-1] - steps[-2]
 
 class TestDataContainer(unittest.TestCase):
     
@@ -20,6 +23,28 @@ class TestDataContainer(unittest.TestCase):
         #print("a refcount " , sys.getrefcount(a))
         self.assertEqual(sys.getrefcount(a),3)
         self.assertEqual(ds.dimension_labels , {0: 'X', 1: 'Y', 2: 'Z', 3: 'W'})
+        
+    def testGb_creation_nocopy(self):
+        X,Y,Z = 1024,1024,512
+        steps = [timer()]
+        a = numpy.ones((X,Y,Z), dtype='float32')
+        steps.append(timer())
+        t0 = dt(steps)
+        print(t0)
+        #print("a refcount " , sys.getrefcount(a))
+        ds = DataContainer(a, False, ['X', 'Y','Z'])
+        #print("a refcount " , sys.getrefcount(a))
+        self.assertEqual(sys.getrefcount(a),3)
+        
+        ds += 1
+        steps.append(timer())
+        t1 = dt(steps)
+        print (dt(steps))
+        ds = ds + 1
+        steps.append(timer())
+        t2 = dt(steps)
+        print (dt(steps))
+        self.assertAlmostEqual(t2,t1+t0,delta=t0*0.1)
         
     def test_creation_copy(self):
         shape = (2,3,4,5)

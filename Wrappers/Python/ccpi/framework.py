@@ -34,7 +34,7 @@ def find_key(dic, val):
     return [k for k, v in dic.items() if v == val][0]
 
 
-class ImageGeometry:
+class ImageGeometry(object):
     
     def __init__(self, 
                  voxel_num_x=0, 
@@ -105,7 +105,7 @@ class ImageGeometry:
         return repres
     
     
-class AcquisitionGeometry:
+class AcquisitionGeometry(object):
     
     def __init__(self, 
                  geom_type, 
@@ -117,7 +117,8 @@ class AcquisitionGeometry:
                  pixel_size_v=1, 
                  dist_source_center=None, 
                  dist_center_detector=None, 
-                 channels=1
+                 channels=1,
+                 angle_unit='degree'
                  ):
         """
         General inputs for standard type projection geometries

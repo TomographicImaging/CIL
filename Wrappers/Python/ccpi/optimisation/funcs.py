@@ -19,16 +19,31 @@
 
 from ccpi.optimisation.ops import Identity, FiniteDiff2D
 import numpy
+from ccpi.framework import DataContainer
 
 
+def isSizeCorrect(data1 ,data2):
+    if issubclass(type(data1), DataContainer) and \
+       issubclass(type(data2), DataContainer):
+        # check dimensionality
+        if data1.check_dimensions(data2):
+            return True
+    elif issubclass(type(data1) , numpy.ndarray) and \
+         issubclass(type(data2) , numpy.ndarray):
+        return data1.shape == data2.shape
+    else:
+        raise ValueError("{0}: getting two incompatible types: {1} {2}"\
+                         .format('Function', type(data1), type(data2))))
+    return False
+        
 class Function(object):
     def __init__(self):
         self.op = Identity()
-    def __call__(self,x):       return 0
-    def grad(self, x):          return 0
-    def prox(self, x, tau):     return x
-    def gradient(self, x):      return self.grad(x)
-    def proximal(self, x, tau): return self.prox(x, tau)
+    def __call__(self,x, out=None):       return 0
+    def grad(self, x):                    return 0
+    def prox(self, x, tau):               return x
+    def gradient(self, x, out=None):      return self.grad(x)
+    def proximal(self, x, tau, out=None): return self.prox(x, tau)
 
 class Norm2(Function):
     
@@ -39,10 +54,25 @@ class Norm2(Function):
         self.gamma     = gamma;
         self.direction = direction; 
     
-    def __call__(self, x):
+    def __call__(self, x, out=None):
         
-        xx = numpy.sqrt(numpy.sum(numpy.square(x.as_array()), self.direction,
+        if out is None:
+            xx = numpy.sqrt(numpy.sum(numpy.square(x.as_array()), self.direction,
                                   keepdims=True))
+        else:
+            if isSizeCorrect(out, x):
+                # check dimensionality
+                if issubclass(type(out), DataContainer):
+                    arr = out.as_array()
+                    numpy.square(x.as_array(), out=arr)
+                    xx = numpy.sqrt(numpy.sum(arr, self.direction, keepdims=True))
+                        
+                elif issubclass(type(out) , numpy.ndarray):
+                    numpy.square(x.as_array(), out=out)
+                    xx = numpy.sqrt(numpy.sum(out, self.direction, keepdims=True))
+            else:
+                raise ValueError ('Wrong size: x{0} out{1}'.format(x.shape,out.shape) )
+        
         p  = numpy.sum(self.gamma*xx)        
         
         return p
@@ -55,6 +85,27 @@ class Norm2(Function):
         p  = x.as_array() * xx
         
         return type(x)(p,geometry=x.geometry)
+    def proximal(self, x, tau, out=None):
+        if out is None:
+            return self.prox(x,tau)
+        else:
+            if isSizeCorrect(out, x):
+                # check dimensionality
+                if issubclass(type(out), DataContainer):
+                    xx = numpy.sqrt(numpy.sum( numpy.square(x.as_array()), self.direction, 
+                                  keepdims=True ))
+                    xx = numpy.maximum(0, 1 - tau*self.gamma / xx)
+                    p  = x.as_array() * xx
+                    
+                    arr = out.as_array()
+                        
+                elif issubclass(type(out) , numpy.ndarray):
+                    numpy.square(x.as_array(), out=out)
+                    xx = numpy.sqrt(numpy.sum(out, self.direction, keepdims=True))
+            else:
+                raise ValueError ('Wrong size: x{0} out{1}'.format(x.shape,out.shape) )
+        
+            
 
 class TV2D(Norm2):
     

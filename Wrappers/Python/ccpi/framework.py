@@ -33,6 +33,15 @@ def find_key(dic, val):
     """return the key of dictionary dic given the value"""
     return [k for k, v in dic.items() if v == val][0]
 
+def message(cls, msg, *args):
+    msg = "{0}: " + msg
+    for i in range(len(args)):
+        msg += " {%d}" %(i+1)
+    args = list(args)
+    args.insert(0, cls.__name__ )
+    
+    return msg.format(*args )
+
 
 class ImageGeometry(object):
     
@@ -340,7 +349,8 @@ class DataContainer(object):
                                  'Expecting {0} got {1}'.format(
                                          numpy.shape(self.array),
                                          numpy.shape(array)))
-            self.array = array[:]
+            # copy by reference, does not require more memory
+            self.array = array
         else:
             
             command = 'self.array['
@@ -479,24 +489,50 @@ class DataContainer(object):
     def abs(self):
         out = numpy.abs(self.as_array() )
         return type(self)(out,
-                       deep_copy=True, 
+                       deep_copy=False, 
                        dimension_labels=self.dimension_labels,
                        geometry=self.geometry)
     
     def maximum(self,otherscalar):
         out = numpy.maximum(self.as_array(),otherscalar)
         return type(self)(out,
-                       deep_copy=True, 
+                       deep_copy=False, 
                        dimension_labels=self.dimension_labels,
                        geometry=self.geometry)
     
     def sign(self):
         out = numpy.sign(self.as_array() )
         return type(self)(out,
-                       deep_copy=True, 
+                       deep_copy=False, 
                        dimension_labels=self.dimension_labels,
                        geometry=self.geometry)
     
+    def sqrt(self, out=None):
+        if out is None:
+            out = numpy.sqrt(self.as_array() )
+            return type(self)(out,
+                       deep_copy=False, 
+                       dimension_labels=self.dimension_labels,
+                       geometry=self.geometry)
+        elif issubclass(type(out), DataContainer):
+            if self.check_dimensions(out):
+                numpy.sqrt(self.as_array(), out=out.as_array() )
+                return type(self)(out.as_array(),
+                       deep_copy=False, 
+                       dimension_labels=self.dimension_labels,
+                       geometry=self.geometry)
+            else:
+                raise ValueError(message(type(self),"Wrong size for data memory: ", out.shape,self.shape))
+        elif issubclass(type(out), numpy.ndarray):
+            if self.array.shape == out.shape and self.array.dtype == out.dtype:
+                numpy.sqrt(self.as_array(), out=out)
+                return type(self)(out,
+                       deep_copy=False, 
+                       dimension_labels=self.dimension_labels,
+                       geometry=self.geometry)
+        else:
+            raise ValueError (message(type(self), "sqrt incompatible class:" , type(out)))
+            
     # reverse operand
     def __radd__(self, other):
         return self + other
@@ -635,7 +671,9 @@ class DataContainer(object):
                                  .format(len(self.shape),len(new_order)))
         
                 
-                    
+    def copy(self):	
+        '''alias of clone'''	
+        return self.clone()
                 
 class ImageData(DataContainer):
     '''DataContainer for holding 2D or 3D DataContainer'''

@@ -4,6 +4,12 @@ from ccpi.framework import DataContainer, ImageData, AcquisitionData, \
   ImageGeometry, AcquisitionGeometry
 import sys
 from timeit import default_timer as timer
+
+def aid(x):
+    # This function returns the memory
+    # block address of an array.
+    return x.__array_interface__['data'][0]
+
 def dt (steps):
     return steps[-1] - steps[-2]
 
@@ -30,21 +36,126 @@ class TestDataContainer(unittest.TestCase):
         a = numpy.ones((X,Y,Z), dtype='float32')
         steps.append(timer())
         t0 = dt(steps)
-        print(t0)
+        print("test clone")
         #print("a refcount " , sys.getrefcount(a))
         ds = DataContainer(a, False, ['X', 'Y','Z'])
         #print("a refcount " , sys.getrefcount(a))
         self.assertEqual(sys.getrefcount(a),3)
+        ds1 = ds.copy()
+        self.assertNotEqual(aid(ds.as_array()), aid(ds1.as_array()))
+        ds1 = ds.clone()
+        self.assertNotEqual(aid(ds.as_array()), aid(ds1.as_array()))
         
-        ds += 1
+        
+    def testInlineAlgebra(self):
+        print ("Test Inline Algebra")
+        X,Y,Z = 1024,1024,512
+        steps = [timer()]
+        a = numpy.ones((X,Y,Z), dtype='float32')
+        steps.append(timer())
+        t0 = dt(steps)
+        print(t0)
+        #print("a refcount " , sys.getrefcount(a))
+        ds = DataContainer(a, False, ['X', 'Y','Z'])
+        ds += 2
+        steps.append(timer())
+        print(dt(steps))
+        self.assertEqual(ds.as_array()[0][0][0],3.)
+        ds -= 2
+        steps.append(timer())
+        print(dt(steps))
+        self.assertEqual(ds.as_array()[0][0][0],1.)
+        ds *= 2
+        steps.append(timer())
+        print(dt(steps))
+        self.assertEqual(ds.as_array()[0][0][0],2.)
+        ds /= 2
+        steps.append(timer())
+        print(dt(steps))
+        self.assertEqual(ds.as_array()[0][0][0],1.)
+        
+        ds1 = ds.copy()
+        ds1 += 1
+        ds += ds1
+        steps.append(timer())
+        print(dt(steps))
+        self.assertEqual(ds.as_array()[0][0][0],3.)
+        ds -= ds1
+        steps.append(timer())
+        print(dt(steps))
+        self.assertEqual(ds.as_array()[0][0][0],1.)
+        ds *= ds1
+        steps.append(timer())
+        print(dt(steps))
+        self.assertEqual(ds.as_array()[0][0][0],2.)
+        ds /= ds1
+        steps.append(timer())
+        print(dt(steps))
+        self.assertEqual(ds.as_array()[0][0][0],1.)
+        
+        
+    def test_unary_operations(self):
+        print ("Test unary operations")
+        X,Y,Z = 1024,1024,512
+        steps = [timer()]
+        a = -numpy.ones((X,Y,Z), dtype='float32')
+        steps.append(timer())
+        t0 = dt(steps)
+        print(t0)
+        #print("a refcount " , sys.getrefcount(a))
+        ds = DataContainer(a, False, ['X', 'Y','Z'])
+        
+        ds.sign(out=ds)
+        steps.append(timer())
+        print(dt(steps))
+        self.assertEqual(ds.as_array()[0][0][0],-1.)
+        
+        ds.abs(out=ds)
+        steps.append(timer())
+        print(dt(steps))
+        self.assertEqual(ds.as_array()[0][0][0],1.)
+        
+        ds*=2
+        ds.sqrt(out=ds)
+        steps.append(timer())
+        print(dt(steps))
+        self.assertEqual(ds.as_array()[0][0][0],numpy.sqrt(2., dtype='float32'))
+        
+    def test_binary_operations(self):
+        print ("Test binary operations")
+        X,Y,Z = 1024,1024,512
+        steps = [timer()]
+        a = numpy.ones((X,Y,Z), dtype='float32')
+        steps.append(timer())
+        t0 = dt(steps)
+        
+        #print("a refcount " , sys.getrefcount(a))
+        ds = DataContainer(a, False, ['X', 'Y','Z'])
+        ds1 = ds.copy()
+        
+        steps.append(timer())
+        ds.add(ds1, out=ds)
         steps.append(timer())
         t1 = dt(steps)
-        print (dt(steps))
-        ds = ds + 1
+        print("ds.add(ds1, out=ds)",dt(steps))
+        steps.append(timer())
+        ds2 = ds.add(ds1)
         steps.append(timer())
         t2 = dt(steps)
-        print (dt(steps))
-        self.assertAlmostEqual(t2,t1+t0,delta=t0*0.1)
+        print("ds2 = ds.add(ds1)",dt(steps))
+        
+        self.assertLess(t1,t2)
+        ds0 = ds
+        ds0.add(2,out=ds0)
+
+        steps.append(timer())
+        print ("ds0.add(2,out=ds0)", dt(steps), 3 , ds0.as_array()[0][0][0])
+        dt1 = dt(steps)       
+        ds3 = ds0.add(2)
+        steps.append(timer())
+        print ("ds3 = ds0.add(2)", dt(steps), 5 , ds3.as_array()[0][0][0])
+        dt2 = dt(steps)
+        self.assertLess(dt1,dt2)
         
     def test_creation_copy(self):
         shape = (2,3,4,5)

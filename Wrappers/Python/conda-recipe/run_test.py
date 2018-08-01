@@ -145,11 +145,14 @@ class TestDataContainer(unittest.TestCase):
         print("ds2 = ds.add(ds1)",dt(steps))
         
         self.assertLess(t1,t2)
+        self.assertEqual(ds.as_array()[0][0][0] , 2.)
+
         ds0 = ds
         ds0.add(2,out=ds0)
-
         steps.append(timer())
         print ("ds0.add(2,out=ds0)", dt(steps), 3 , ds0.as_array()[0][0][0])
+        self.assertEqual(4., ds0.as_array()[0][0][0])
+        
         dt1 = dt(steps)       
         ds3 = ds0.add(2)
         steps.append(timer())

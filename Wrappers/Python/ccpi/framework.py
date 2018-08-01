@@ -371,26 +371,28 @@ class DataContainer(object):
     def check_dimensions(self, other):
         return self.shape == other.shape
         
-    def __add__(self, other):
-        if issubclass(type(other), DataContainer):    
-            if self.check_dimensions(other):
-                out = self.as_array() + other.as_array()
-                return type(self)(out, 
-                               deep_copy=True, 
-                               dimension_labels=self.dimension_labels,
-                               geometry=self.geometry)
-            else:
-                raise ValueError('Wrong shape: {0} and {1}'.format(self.shape, 
-                                 other.shape))
-        elif isinstance(other, (int, float, complex)):
-            return type(self)(
-                    self.as_array() + other, 
-                               deep_copy=True, 
-                               dimension_labels=self.dimension_labels,
-                               geometry=self.geometry)
-        else:
-            raise TypeError('Cannot {0} DataContainer with {1}'.format("add" ,
-                            type(other)))
+    def __add__(self, other , *args, out=None, **kwargs):
+        return self.pixel_wise_binary(numpy.add, other, *args, out=out, **kwargs)
+        #if issubclass(type(other), DataContainer):    
+        #    if self.check_dimensions(other):
+        #        out = self.as_array() + other.as_array()
+        #        return type(self)(out, 
+        #                       deep_copy=True, 
+        #                       dimension_labels=self.dimension_labels,
+        #                       geometry=self.geometry)
+        #    else:
+        #        raise ValueError('Wrong shape: {0} and {1}'.format(self.shape, 
+        #                         other.shape))
+        #elif isinstance(other, (int, float, complex)):
+        #    return type(self)(
+        #            self.as_array() + other, 
+        #                       deep_copy=True, 
+        #                       dimension_labels=self.dimension_labels,
+        #                       geometry=self.geometry)
+        #else:
+        #    raise TypeError('Cannot {0} DataContainer with {1}'.format("add" ,
+        #                    type(other)))
+        
     # __add__
     
     def __sub__(self, other):
@@ -486,19 +488,12 @@ class DataContainer(object):
     #    return self.callFieldMath(operation, None, self.mask, self.maskOnValue)
     # __abs__
     
-    def abs(self):
-        out = numpy.abs(self.as_array() )
-        return type(self)(out,
-                       deep_copy=False, 
-                       dimension_labels=self.dimension_labels,
-                       geometry=self.geometry)
+    def abs(self, out=None):
+        return self.pixel_wise_operation(numpy.abs, out=out)
     
-    def maximum(self,otherscalar):
-        out = numpy.maximum(self.as_array(),otherscalar)
-        return type(self)(out,
-                       deep_copy=False, 
-                       dimension_labels=self.dimension_labels,
-                       geometry=self.geometry)
+    
+    def maximum(self,x2, out=None):
+        return self.pixel_wise_operation(numpy.maximum, x2=x2, out=out)
     
     def sign(self):
         out = numpy.sign(self.as_array() )
@@ -507,16 +502,18 @@ class DataContainer(object):
                        dimension_labels=self.dimension_labels,
                        geometry=self.geometry)
     
-    def sqrt(self, out=None):
+            
+    def pixel_wise_unary(self,pwop, *args, out=None,  **kwargs):
+        print ("args" , *args)
         if out is None:
-            out = numpy.sqrt(self.as_array() )
+            out = pwop(self.as_array() , *args, **kwargs )
             return type(self)(out,
                        deep_copy=False, 
                        dimension_labels=self.dimension_labels,
                        geometry=self.geometry)
         elif issubclass(type(out), DataContainer):
             if self.check_dimensions(out):
-                numpy.sqrt(self.as_array(), out=out.as_array() )
+                pwop(self.as_array(), *args, out=out.as_array(), **kwargs )
                 return type(self)(out.as_array(),
                        deep_copy=False, 
                        dimension_labels=self.dimension_labels,
@@ -525,14 +522,55 @@ class DataContainer(object):
                 raise ValueError(message(type(self),"Wrong size for data memory: ", out.shape,self.shape))
         elif issubclass(type(out), numpy.ndarray):
             if self.array.shape == out.shape and self.array.dtype == out.dtype:
-                numpy.sqrt(self.as_array(), out=out)
+                pwop(self.as_array(), *args, out=out, **kwargs)
                 return type(self)(out,
                        deep_copy=False, 
                        dimension_labels=self.dimension_labels,
                        geometry=self.geometry)
         else:
-            raise ValueError (message(type(self), "sqrt incompatible class:" , type(out)))
+            raise ValueError (message(type(self),  "incompatible class:" , pwop.__name__, type(out)))
+    def pixel_wise_binary(self,pwop, x2 , *args, out=None,  **kwargs):
+        
+        if out is None:
+            if isinstance(x2, (int, float, complex)):
+                out = pwop(self.as_array() , x2 , *args, **kwargs )
+                return type(self)(out,
+                       deep_copy=False, 
+                       dimension_labels=self.dimension_labels,
+                       geometry=self.geometry)
+        
+        elif issubclass(type(out), DataContainer) and issubclass(type(x2), DataContainer):
+            if self.check_dimensions(out) and self.check_dimensions(x2):
+                pwop(self.as_array(), x2.as_array(), *args, out=out.as_array(), **kwargs )
+                return type(self)(out.as_array(),
+                       deep_copy=False, 
+                       dimension_labels=self.dimension_labels,
+                       geometry=self.geometry)
+            else:
+                raise ValueError(message(type(self),"Wrong size for data memory: ", out.shape,self.shape))
+        elif issubclass(type(out), DataContainer) and isinstance(x2, (int,float,complex)):
+            if self.check_dimensions(out):
+                pwop(self.as_array(), x2, *args, out=out.as_array(), **kwargs )
+                return type(self)(out.as_array(),
+                       deep_copy=False, 
+                       dimension_labels=self.dimension_labels,
+                       geometry=self.geometry)
+            else:
+                raise ValueError(message(type(self),"Wrong size for data memory: ", out.shape,self.shape))
+        elif issubclass(type(out), numpy.ndarray):
+            if self.array.shape == out.shape and self.array.dtype == out.dtype:
+                pwop(self.as_array(), x2 , *args, out=out, **kwargs)
+                return type(self)(out,
+                       deep_copy=False, 
+                       dimension_labels=self.dimension_labels,
+                       geometry=self.geometry)
+        else:
+            raise ValueError (message(type(self),  "incompatible class:" , pwop.__name__, type(out)))
             
+    def sqrt(self, out=None):
+        return self.pixel_wise_unary(numpy.sqrt, out=out)
+    
+    
     # reverse operand
     def __radd__(self, other):
         return self + other

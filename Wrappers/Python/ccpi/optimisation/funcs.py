@@ -33,7 +33,7 @@ def isSizeCorrect(data1 ,data2):
         return data1.shape == data2.shape
     else:
         raise ValueError("{0}: getting two incompatible types: {1} {2}"\
-                         .format('Function', type(data1), type(data2))))
+                         .format('Function', type(data1), type(data2)))
     return False
         
 class Function(object):

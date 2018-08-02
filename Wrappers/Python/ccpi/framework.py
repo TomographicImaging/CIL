@@ -636,9 +636,7 @@ class DataContainer(object):
             
         
         elif issubclass(type(out), DataContainer) and issubclass(type(x2), DataContainer):
-            print ("A")
             if self.check_dimensions(out) and self.check_dimensions(x2):
-                print ("B")
                 pwop(self.as_array(), x2.as_array(), *args, out=out.as_array(), **kwargs )
                 return type(self)(out.as_array(),
                        deep_copy=False, 
@@ -686,7 +684,6 @@ class DataContainer(object):
     ## unary operations
     
     def pixel_wise_unary(self,pwop, *args, out=None,  **kwargs):
-        print ("args" , *args)
         if out is None:
             out = pwop(self.as_array() , *args, **kwargs )
             return type(self)(out,

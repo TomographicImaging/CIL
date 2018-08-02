@@ -121,8 +121,16 @@ class TestDataContainer(unittest.TestCase):
         print(dt(steps))
         self.assertEqual(ds.as_array()[0][0][0],numpy.sqrt(2., dtype='float32'))
         
+        
+    
     def test_binary_operations(self):
-        print ("Test binary operations")
+        self.binary_add()
+        self.binary_subtract()
+        self.binary_multiply()
+        self.binary_divide()
+    
+    def binary_add(self):
+        print ("Test binary add")
         X,Y,Z = 1024,1024,512
         steps = [timer()]
         a = numpy.ones((X,Y,Z), dtype='float32')
@@ -146,7 +154,7 @@ class TestDataContainer(unittest.TestCase):
         
         self.assertLess(t1,t2)
         self.assertEqual(ds.as_array()[0][0][0] , 2.)
-
+        
         ds0 = ds
         ds0.add(2,out=ds0)
         steps.append(timer())
@@ -159,7 +167,133 @@ class TestDataContainer(unittest.TestCase):
         print ("ds3 = ds0.add(2)", dt(steps), 5 , ds3.as_array()[0][0][0])
         dt2 = dt(steps)
         self.assertLess(dt1,dt2)
+    
+    def binary_subtract(self):
+        print ("Test binary subtract")
+        X,Y,Z = 1024,1024,512
+        steps = [timer()]
+        a = numpy.ones((X,Y,Z), dtype='float32')
+        steps.append(timer())
+        t0 = dt(steps)
         
+        #print("a refcount " , sys.getrefcount(a))
+        ds = DataContainer(a, False, ['X', 'Y','Z'])
+        ds1 = ds.copy()
+        
+        steps.append(timer())
+        ds.subtract(ds1, out=ds)
+        steps.append(timer())
+        t1 = dt(steps)
+        print("ds.subtract(ds1, out=ds)",dt(steps))
+        self.assertEqual(0., ds.as_array()[0][0][0])
+        
+        steps.append(timer())
+        ds2 = ds.subtract(ds1)
+        self.assertEqual(-1., ds2.as_array()[0][0][0])
+        
+        steps.append(timer())
+        t2 = dt(steps)
+        print("ds2 = ds.subtract(ds1)",dt(steps))
+        
+        self.assertLess(t1,t2)
+        
+        ds0 = ds
+        ds0.subtract(2,out=ds0)
+        steps.append(timer())
+        print ("ds0.subtract(2,out=ds0)", dt(steps), -2. , ds0.as_array()[0][0][0])
+        self.assertEqual(-2., ds0.as_array()[0][0][0])
+        
+        dt1 = dt(steps)       
+        ds3 = ds0.subtract(2)
+        steps.append(timer())
+        print ("ds3 = ds0.subtract(2)", dt(steps), 0. , ds3.as_array()[0][0][0])
+        dt2 = dt(steps)
+        self.assertLess(dt1,dt2)
+        self.assertEqual(-2., ds0.as_array()[0][0][0])
+        self.assertEqual(0., ds3.as_array()[0][0][0])
+       
+    def binary_multiply(self):
+        print ("Test binary multiply")
+        X,Y,Z = 1024,1024,512
+        steps = [timer()]
+        a = numpy.ones((X,Y,Z), dtype='float32')
+        steps.append(timer())
+        t0 = dt(steps)
+        
+        #print("a refcount " , sys.getrefcount(a))
+        ds = DataContainer(a, False, ['X', 'Y','Z'])
+        ds1 = ds.copy()
+        
+        steps.append(timer())
+        ds.multiply(ds1, out=ds)
+        steps.append(timer())
+        t1 = dt(steps)
+        print("ds.multiply(ds1, out=ds)",dt(steps))
+        steps.append(timer())
+        ds2 = ds.multiply(ds1)
+        steps.append(timer())
+        t2 = dt(steps)
+        print("ds2 = ds.multiply(ds1)",dt(steps))
+        
+        self.assertLess(t1,t2)
+        
+        ds0 = ds
+        ds0.multiply(2,out=ds0)
+        steps.append(timer())
+        print ("ds0.multiply(2,out=ds0)", dt(steps), 2. , ds0.as_array()[0][0][0])
+        self.assertEqual(2., ds0.as_array()[0][0][0])
+        
+        dt1 = dt(steps)       
+        ds3 = ds0.multiply(2)
+        steps.append(timer())
+        print ("ds3 = ds0.multiply(2)", dt(steps), 4. , ds3.as_array()[0][0][0])
+        dt2 = dt(steps)
+        self.assertLess(dt1,dt2)
+        self.assertEqual(4., ds3.as_array()[0][0][0])
+        self.assertEqual(2., ds.as_array()[0][0][0])
+    
+    def binary_divide(self):
+        print ("Test binary divide")
+        X,Y,Z = 1024,1024,512
+        steps = [timer()]
+        a = numpy.ones((X,Y,Z), dtype='float32')
+        steps.append(timer())
+        t0 = dt(steps)
+        
+        #print("a refcount " , sys.getrefcount(a))
+        ds = DataContainer(a, False, ['X', 'Y','Z'])
+        ds1 = ds.copy()
+        
+        steps.append(timer())
+        ds.divide(ds1, out=ds)
+        steps.append(timer())
+        t1 = dt(steps)
+        print("ds.divide(ds1, out=ds)",dt(steps))
+        steps.append(timer())
+        ds2 = ds.divide(ds1)
+        steps.append(timer())
+        t2 = dt(steps)
+        print("ds2 = ds.divide(ds1)",dt(steps))
+        
+        self.assertLess(t1,t2)
+        self.assertEqual(ds.as_array()[0][0][0] , 1.)
+        
+        ds0 = ds
+        ds0.divide(2,out=ds0)
+        steps.append(timer())
+        print ("ds0.divide(2,out=ds0)", dt(steps), 0.5 , ds0.as_array()[0][0][0])
+        self.assertEqual(0.5, ds0.as_array()[0][0][0])
+        
+        dt1 = dt(steps)       
+        ds3 = ds0.divide(2)
+        steps.append(timer())
+        print ("ds3 = ds0.divide(2)", dt(steps), 0.25 , ds3.as_array()[0][0][0])
+        dt2 = dt(steps)
+        self.assertLess(dt1,dt2)
+        self.assertEqual(.25, ds3.as_array()[0][0][0])
+        self.assertEqual(.5, ds.as_array()[0][0][0])
+        
+    
     def test_creation_copy(self):
         shape = (2,3,4,5)
         size = shape[0]

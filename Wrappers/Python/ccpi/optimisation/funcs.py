@@ -149,6 +149,17 @@ class Norm2sq(Function):
     def __call__(self,x):
         #return self.c* np.sum(np.square((self.A.direct(x) - self.b).ravel()))
         return self.c*( ( (self.A.direct(x)-self.b)**2).sum() )
+    
+    def gradient(self, x, out=None):
+        if out is None:
+            return self.grad(x)
+        else:
+            #return self.c*( ( (self.A.direct(x)-self.b)**2).sum() )
+            y = self.A.direct(x)
+            y -= self.b
+            y *= y
+            return y.sum() * self.c
+            
 
 
 class ZeroFun(Function):
@@ -169,7 +180,6 @@ class ZeroFun(Function):
 class Norm1(Function):
     
     def __init__(self,gamma):
-        # Do nothing
         self.gamma = gamma
         self.L = 1
         super(Norm1, self).__init__()
@@ -179,4 +189,17 @@ class Norm1(Function):
     
     def prox(self,x,tau):
         return (x.abs() - tau*self.gamma).maximum(0) * x.sign()
+    
+    def proximal(self, x, tau, out=None):
+        if out is None:
+            return self.prox(x, tau)
+        else:
+            #(x.abs() - tau*self.gamma).maximum(0) * x.sign()
+            y = x.abs()
+            # here there is a new allocation of memory for the product
+            y -= (tau*self.gamma)
+            y.maximum(0, out=y)
+            x.sign(out=x)
+            y *= x
+            return y
     

@@ -737,7 +737,7 @@ class ImageData(DataContainer):
     '''DataContainer for holding 2D or 3D DataContainer'''
     def __init__(self, 
                  array = None, 
-                 deep_copy=True, 
+                 deep_copy=False, 
                  dimension_labels=None, 
                  **kwargs):
         

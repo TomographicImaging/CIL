@@ -19,15 +19,20 @@
 
 import numpy
 from scipy.sparse.linalg import svds
+from ccpi.framework import DataContainer
+from ccpi.framework import AcquisitionData
+from ccpi.framework import ImageData
+from ccpi.framework import ImageGeometry
+from ccpi.framework import AcquisitionGeometry
 
 # Maybe operators need to know what types they take as inputs/outputs
 # to not just use generic DataContainer
 
 
 class Operator(object):
-    def direct(self,x):
+    def direct(self,x, out=None):
         return x
-    def adjoint(self,x):
+    def adjoint(self,x, out=None):
         return x
     def size(self):
         # To be defined for specific class
@@ -40,10 +45,10 @@ class Identity(Operator):
         self.s1 = 1.0
         super(Identity, self).__init__()
         
-    def direct(self,x):
+    def direct(self,x,out=None):
         return x
     
-    def adjoint(self,x):
+    def adjoint(self,x, out=None):
         return x
     
     def size(self):
@@ -65,9 +70,9 @@ class FiniteDiff2D(Operator):
         d2[:-1,:] = x.as_array()[1:,:] - x.as_array()[:-1,:]
         d = numpy.stack((d1,d2),0)
         
-        return type(x)(d,geometry=x.geometry)
+        return type(x)(d,False,geometry=x.geometry)
     
-    def adjoint(self,x):
+    def adjoint(self,x, out=None):
         '''Backward differences, Neumann BC.'''
         Nrows = x.get_dimension_size('horizontal_x')
         Ncols = x.get_dimension_size('horizontal_x')
@@ -76,12 +81,16 @@ class FiniteDiff2D(Operator):
             Nchannels = x.get_dimension_size('channel')
         zer = numpy.zeros((Nrows,1))
         xxx = x.as_array()[0,:,:-1]
-        h = numpy.concatenate((zer,xxx), 1) - numpy.concatenate((xxx,zer), 1)
+        #
+        h = numpy.concatenate((zer,xxx), 1) 
+        h -= numpy.concatenate((xxx,zer), 1)
         
         zer = numpy.zeros((1,Ncols))
         xxx = x.as_array()[1,:-1,:]
-        v = numpy.concatenate((zer,xxx), 0) - numpy.concatenate((xxx,zer), 0)
-        return type(x)(h + v,geometry=x.geometry)
+        #
+        v  = numpy.concatenate((zer,xxx), 0) 
+        v -= numpy.concatenate((xxx,zer), 0)
+        return type(x)(h + v, False, geometry=x.geometry)
     
     def size(self):
         return NotImplemented
@@ -132,18 +141,19 @@ def PowerMethodNonsquareOld(op,numiters):
 def PowerMethodNonsquare(op,numiters):
     # Initialise random
     # Jakob's
-    #inputsize = op.size()[1]
+    inputsize , outputsize = op.size()
     #x0 = ImageContainer(numpy.random.randn(*inputsize)
     # Edo's
-    #vg = ImageGeometry(voxel_num_x=inputsize[0],
-    #                   voxel_num_y=inputsize[1], 
-    #                   voxel_num_z=inputsize[2])
+    vg = ImageGeometry(voxel_num_x=inputsize[0],
+                       voxel_num_y=inputsize[1], 
+                       voxel_num_z=inputsize[2])
     #
-    #x0 = ImageData(geometry = vg, dimension_labels=['vertical','horizontal_y','horizontal_x'])
+    x0 = ImageData(geometry = vg, dimension_labels=['vertical','horizontal_y','horizontal_x'])
     #print (x0)
-    #x0.fill(numpy.random.randn(*x0.shape))
+    x0.fill(numpy.random.randn(*x0.shape))
     
-    x0 = op.create_image_data()
+    
+    #x0 = op.create_image_data()
     
     s = numpy.zeros(numiters)
     # Loop
@@ -162,11 +172,19 @@ class LinearOperatorMatrix(Operator):
         self.s1 = None   # Largest singular value, initially unknown
         super(LinearOperatorMatrix, self).__init__()
         
-    def direct(self,x):
-        return type(x)(numpy.dot(self.A,x.as_array()))
+    def direct(self,x, out=None):
+        if out is None:
+            return type(x)(numpy.dot(self.A,x.as_array()))
+        else:
+            numpy.dot(self.A, x.as_array(), out=out)
+            return type(x)(out)
     
-    def adjoint(self,x):
-        return type(x)(numpy.dot(self.A.transpose(),x.as_array()))
+    def adjoint(self,x, out=None):
+        if out is None:
+            return type(x)(numpy.dot(self.A.transpose(),x.as_array()))
+        else:
+            numpy.dot(self.A.transpose(),x.as_array(), out=out)
+            return type(x)(out)
     
     def size(self):
         return self.A.shape

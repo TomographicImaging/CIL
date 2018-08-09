@@ -144,10 +144,10 @@ def PowerMethodNonsquare(op,numiters):
     inputsize , outputsize = op.size()
     #x0 = ImageContainer(numpy.random.randn(*inputsize)
     # Edo's
-    vg = ImageGeometry(voxel_num_x=inputsize[0],
+    vg = ImageGeometry(voxel_num_x=inputsize[2],
                        voxel_num_y=inputsize[1], 
-                       voxel_num_z=inputsize[2])
-    #
+                       voxel_num_z=inputsize[0])
+    
     x0 = ImageData(geometry = vg, dimension_labels=['vertical','horizontal_y','horizontal_x'])
     #print (x0)
     x0.fill(numpy.random.randn(*x0.shape))

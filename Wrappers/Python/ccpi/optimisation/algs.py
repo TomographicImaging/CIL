@@ -42,11 +42,12 @@ def FISTA(x_init, f=None, g=None, opt=None):
     
     # algorithmic parameters
     if opt is None: 
-        opt = {'tol': 1e-4, 'iter': 1000, 'memopt':False}
+        opt = {'tol': 1e-4, 'iter': 1000, 'memopt':False, 'log':False}
     
     max_iter = opt['iter'] if 'iter' in opt.keys() else 1000
     tol = opt['tol'] if 'tol' in opt.keys() else 1e-4
     memopt = opt['memopts'] if 'memopts' in opt.keys() else False
+    log = opt['log'] if 'log' in opt.keys() else False
         
         
     # initialization
@@ -72,13 +73,13 @@ def FISTA(x_init, f=None, g=None, opt=None):
     
         time0 = time.time()
         if memopt:
-            # u = y - invL*f.grad(y)
+            #u = y - invL*f.grad(y)
             # store the result in x_old
             f.gradient(y, out=u)
             u *= -invL
             u += y
-            # x = g.prox(u,invL)
-            g.proximal(u, invL, out=x)
+            x = g.prox(u,invL)
+            #g.proximal(u, invL, out=x)
             
             t = 0.5*(1 + numpy.sqrt(1 + 4*(t_old**2)))
             
@@ -86,7 +87,8 @@ def FISTA(x_init, f=None, g=None, opt=None):
             x.subtract(x_old, out=y)
             y *= ((t_old-1)/t)
             y += x
-            
+            x.multiply(1, out=x_old)
+            t_old = t
             
         else:
             u = y - invL*f.grad(y)
@@ -103,7 +105,9 @@ def FISTA(x_init, f=None, g=None, opt=None):
         # time and criterion
         timing[it] = time.time() - time0
         criter[it] = f(x) + g(x);
-        
+        if log:
+            print ("iteration {0}: time {1} s loss {2}".format(it,timing[it] , 
+                   criter[it]))
         # stopping rule
         #if np.linalg.norm(x - x_old) < tol * np.linalg.norm(x_old) and it > 10:
         #   break
@@ -132,18 +136,12 @@ def FBPD(x_init, f=None, g=None, h=None, opt=None):
     
     # algorithmic parameters
     if opt is None: 
-        opt = {'tol': 1e-4, 'iter': 1000}
-    else:
-        try:
-            max_iter = opt['iter']
-        except KeyError as ke:
-            opt[ke] = 1000
-        try:
-            opt['tol'] = 1000
-        except KeyError as ke:
-            opt[ke] = 1e-4
-    tol = opt['tol']
-    max_iter = opt['iter']
+        opt = {'tol': 1e-4, 'iter': 1000, 'memopt':False, 'log':False}
+    
+    max_iter = opt['iter'] if 'iter' in opt.keys() else 1000
+    tol = opt['tol'] if 'tol' in opt.keys() else 1e-4
+    memopt = opt['memopts'] if 'memopts' in opt.keys() else False
+    log = opt['log'] if 'log' in opt.keys() else False
     
     # step-sizes
     tau   = 2 / (g.L + 2);
@@ -179,7 +177,9 @@ def FBPD(x_init, f=None, g=None, h=None, opt=None):
         # stopping rule
         #if np.linalg.norm(x - x_old) < tol * np.linalg.norm(x_old) and it > 10:
         #   break
-
+        if log:
+            print ("iteration {0}: time {1} s loss {2}".format(it,timing[it] , 
+                   criter[it]))
     criter = criter[0:it+1];
     timing = numpy.cumsum(timing[0:it+1]);
     
@@ -196,18 +196,12 @@ def CGLS(x_init, operator , data , opt=None):
     '''
     
     if opt is None: 
-        opt = {'tol': 1e-4, 'iter': 1000}
-    else:
-        try:
-            max_iter = opt['iter']
-        except KeyError as ke:
-            opt[ke] = 1000
-        try:
-            opt['tol'] = 1000
-        except KeyError as ke:
-            opt[ke] = 1e-4
-    tol = opt['tol']
-    max_iter = opt['iter']
+        opt = {'tol': 1e-4, 'iter': 1000, 'memopt':False, 'log':False}
+    
+    max_iter = opt['iter'] if 'iter' in opt.keys() else 1000
+    tol = opt['tol'] if 'tol' in opt.keys() else 1e-4
+    memopt = opt['memopts'] if 'memopts' in opt.keys() else False
+    log = opt['log'] if 'log' in opt.keys() else False
     
     r = data.copy()
     x = x_init.copy()
@@ -238,6 +232,8 @@ def CGLS(x_init, operator , data , opt=None):
         # time and criterion
         timing[it] = time.time() - t
         criter[it] = (r**2).sum()
-    
+        if log:
+            print ("iteration {0}: time {1} s loss {2}".format(it,timing[it] , 
+                   criter[it]))
     return x, it, timing, criter
     

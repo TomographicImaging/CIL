@@ -42,7 +42,11 @@ class Function(object):
     def __call__(self,x, out=None):       return 0
     def grad(self, x):                    return 0
     def prox(self, x, tau):               return x
-    def gradient(self, x, out=None):      return self.grad(x)
+    def gradient(self, x, out=None):      
+        if out is None:
+            return self.grad(x)
+        else:
+            return x.multiply(1,out=out)
     def proximal(self, x, tau, out=None): return self.prox(x, tau)
 
 class Norm2(Function):

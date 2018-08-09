@@ -210,7 +210,7 @@ class TestDataContainer(unittest.TestCase):
         dt2 = dt(steps)
         self.assertLess(dt1,dt2)
         self.assertEqual(-2., ds0.as_array()[0][0][0])
-        self.assertEqual(-4.., ds3.as_array()[0][0][0])
+        self.assertEqual(-4., ds3.as_array()[0][0][0])
        
     def binary_multiply(self):
         print ("Test binary multiply")

@@ -179,6 +179,48 @@ class NexusReader(object):
         return AcquisitionData(data, geometry=geometry, 
                                dimension_labels=['angle','vertical','horizontal'])   
     
+    def get_acquisition_data_subset(self, ymin=None, ymax=None):
+        '''
+        This method load the acquisition data and given dimension and returns an AcquisitionData Object
+        '''
+        if not h5pyAvailable:
+            raise Exception("Error: h5py is not installed")
+        if self.filename is None:
+            return        
+        try:
+            dims = self.get_projection_dimensions()
+            if ymin < 0:
+                raise ValueError('ymin out of range')
+            if ymax > dims[1]:
+                raise ValueError('ymax out of range')
+                
+            with NexusFile(self.filename,'r') as file:                
+                image_keys = np.array(file['entry1/tomo_entry/instrument/detector/image_key'])
+                data = np.array(file['entry1/tomo_entry/data/data']
+                       [: , ymin:ymax , :] [image_keys==0])
+                
+        except:
+            print("Error reading nexus file")
+            raise
+                
+        geometry = AcquisitionGeometry('parallel', '3D', 
+                                       self.get_projection_angles(),
+                                       pixel_num_h          = dims[2],
+                                       pixel_size_h         = 1 ,
+                                       pixel_num_v          = ymax-ymin,
+                                       pixel_size_v         = 1,
+                                       dist_source_center   = None, 
+                                       dist_center_detector = None, 
+                                       channels             = 1)
+        return AcquisitionData(data, False, geometry=geometry, 
+                               dimension_labels=['angle','vertical','horizontal']) 
+    def get_acquisition_data_slice(self, y_slice=0):
+        return self.get_acquisition_data_subset(ymin=y_slice , 
+                                                ymax=y_slice+1
+                                                ).subset(['angle','horizontal'])
+    
+         
+    
           
 class XTEKReader(object):
     '''

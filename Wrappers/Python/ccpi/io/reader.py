@@ -54,6 +54,10 @@ class NexusReader(object):
         self.geometry = None
         self.filename = nexus_filename
         
+    def get_image_keys(self):
+        with NexusFile(self.filename,'r') as file: 
+            return np.array(file['entry1/tomo_entry/instrument/detector/image_key'])
+        
     def load(self, dimensions=None, image_key_id=0):  
         '''
         This is generic loading function of flat field, dark field and projection data.
@@ -94,7 +98,9 @@ class NexusReader(object):
         '''
         Loads the flat field data from the nexus file.
         returns: numpy array with flat field data
-        '''        
+        '''
+        if 1 not in self.get_image_keys():
+            raise ValueError("Flats are not in the data. Data Path " , self.)
         return self.load(dimensions, 1)
     
     def load_dark(self, dimensions=None):
@@ -191,7 +197,7 @@ class NexusReader(object):
             dims = self.get_projection_dimensions()
             if ymin < 0:
                 raise ValueError('ymin out of range')
-            if ymax > dims[1]:
+            if ymax >= dims[1]:
                 raise ValueError('ymax out of range')
                 
             with NexusFile(self.filename,'r') as file:                

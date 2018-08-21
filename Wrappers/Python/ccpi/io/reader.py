@@ -44,7 +44,7 @@ class NexusReader(object):
     Reader class for loading Nexus files. 
     '''
 
-    def __init__(self, nexus_filename=None):
+    def __init__(self, nexusFilename=None):
         '''
         This takes in input as filename and loads the data dataset.
         '''
@@ -52,12 +52,19 @@ class NexusReader(object):
         self.dark = None
         self.angles = None
         self.geometry = None
-        self.filename = nexus_filename
-        
+        self.filename = nexusFilename
+        self.key_path = 'entry1/tomo_entry/instrument/detector/image_key'
+        self.data_path = 'entry1/tomo_entry/data/data'
+        self.angle_path = 'entry1/tomo_entry/data/rotation_angle'
+    
     def get_image_keys(self):
-        with NexusFile(self.filename,'r') as file: 
-            return np.array(file['entry1/tomo_entry/instrument/detector/image_key'])
-        
+        try:
+            with NexusFile(self.filename,'r') as file:    
+                return np.array(file[self.key_path])
+        except KeyError as ke:
+            raise KeyError("get_image_keys: " , ke.args[0] , self.key_path)
+            
+    
     def load(self, dimensions=None, image_key_id=0):  
         '''
         This is generic loading function of flat field, dark field and projection data.
@@ -68,10 +75,10 @@ class NexusReader(object):
             return        
         try:
             with NexusFile(self.filename,'r') as file:                
-                image_keys = np.array(file['entry1/tomo_entry/instrument/detector/image_key'])                
+                image_keys = np.array(file[self.key_path])                
                 projections = None
                 if dimensions == None:
-                    projections = np.array(file['entry1/tomo_entry/data/data'])
+                    projections = np.array(file[self.data_path])
                     result = projections[image_keys==image_key_id]
                     return result
                 else:
@@ -80,8 +87,8 @@ class NexusReader(object):
                     projection_indexes = index_array[0][dimensions[0]]
                     new_dimensions = list(dimensions)
                     new_dimensions[0]= projection_indexes
-                    new_dimensions = tuple(new_dimensions)              
-                    result = np.array(file['entry1/tomo_entry/data/data'][new_dimensions])
+                    new_dimensions = tuple(new_dimensions)
+                    result = np.array(file[self.data_path][new_dimensions])
                     return result
         except:
             print("Error reading nexus file")
@@ -92,15 +99,25 @@ class NexusReader(object):
         Loads the projection data from the nexus file.
         returns: numpy array with projection data
         '''
+        try:
+            if 0 not in self.get_image_keys():
+                raise ValueError("Projections are not in the data. Data Path " , 
+                                 self.data_path)
+        except KeyError as ke:
+            raise KeyError(ke.args[0] , self.data_path)
         return self.load(dimensions, 0)
     
     def load_flat(self, dimensions=None):
         '''
         Loads the flat field data from the nexus file.
         returns: numpy array with flat field data
-        '''
-        if 1 not in self.get_image_keys():
-            raise ValueError("Flats are not in the data. Data Path " , self.)
+        '''        
+        try:
+            if 1 not in self.get_image_keys():
+                raise ValueError("Flats are not in the data. Data Path " , 
+                                 self.data_path)
+        except KeyError as ke:
+            raise KeyError(ke.args[0] , self.data_path)
         return self.load(dimensions, 1)
     
     def load_dark(self, dimensions=None):
@@ -108,6 +125,12 @@ class NexusReader(object):
         Loads the Dark field data from the nexus file.
         returns: numpy array with dark field data
         '''        
+        try:
+            if 2 not in self.get_image_keys():
+                raise ValueError("Darks are not in the data. Data Path " , 
+                             self.data_path)
+        except KeyError as ke:
+            raise KeyError(ke.args[0] , self.data_path)
         return self.load(dimensions, 2)
     
     def get_projection_angles(self):
@@ -120,8 +143,8 @@ class NexusReader(object):
             return        
         try:
             with NexusFile(self.filename,'r') as file:                
-                angles = np.array(file['entry1/tomo_entry/data/rotation_angle'],np.float32)
-                image_keys = np.array(file['entry1/tomo_entry/instrument/detector/image_key'])                
+                angles = np.array(file[self.angle_path],np.float32)
+                image_keys = np.array(file[self.key_path])                
                 return angles[image_keys==0]
         except:
             print("Error reading nexus file")
@@ -138,8 +161,8 @@ class NexusReader(object):
             return
         try:
             with NexusFile(self.filename,'r') as file:                
-                projections = file['entry1/tomo_entry/data/data']
-                image_keys = np.array(file['entry1/tomo_entry/instrument/detector/image_key'])
+                projections = file[self.data_path]
+                image_keys = np.array(file[self.key_path])
                 dims = list(projections.shape)
                 dims[0] = dims[1]
                 dims[1] = np.sum(image_keys==0)
@@ -158,8 +181,8 @@ class NexusReader(object):
             return
         try:
             with NexusFile(self.filename,'r') as file:                
-                projections = file['entry1/tomo_entry/data/data']
-                image_keys = np.array(file['entry1/tomo_entry/instrument/detector/image_key'])
+                projections = file[self.data_path]
+                image_keys = np.array(file[self.key_path])
                 dims = list(projections.shape)
                 dims[0] = np.sum(image_keys==0)
                 return tuple(dims)
@@ -197,12 +220,12 @@ class NexusReader(object):
             dims = self.get_projection_dimensions()
             if ymin < 0:
                 raise ValueError('ymin out of range')
-            if ymax >= dims[1]:
+            if ymax > dims[1]:
                 raise ValueError('ymax out of range')
                 
             with NexusFile(self.filename,'r') as file:                
-                image_keys = np.array(file['entry1/tomo_entry/instrument/detector/image_key'])
-                data = np.array(file['entry1/tomo_entry/data/data']
+                image_keys = np.array(file[self.key_path])
+                data = np.array(file[self.data_path]
                        [: , ymin:ymax , :] [image_keys==0])
                 
         except:
@@ -221,10 +244,15 @@ class NexusReader(object):
         return AcquisitionData(data, False, geometry=geometry, 
                                dimension_labels=['angle','vertical','horizontal']) 
     def get_acquisition_data_slice(self, y_slice=0):
-        return self.get_acquisition_data_subset(ymin=y_slice , 
-                                                ymax=y_slice+1
-                                                ).subset(['angle','horizontal'])
+        return self.get_acquisition_data_subset(ymin=y_slice , ymax=y_slice+1).subset(['angle','horizontal'])
     
+    def list_file_content(self):
+        try:
+            with NexusFile(self.filename,'r') as file:                
+                file.visit(print)
+        except:
+            print("Error reading nexus file")
+            raise  
          
     
           

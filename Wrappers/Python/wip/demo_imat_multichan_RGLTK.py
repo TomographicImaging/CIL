@@ -32,7 +32,7 @@ ProjAngleChannels = np.zeros((totalAngles,totChannels,n,n),dtype='float32')
 
 #########################################################################
 print ("Loading the data...")
-MainPath = '/media/algol/HD-LXU3/DATA_DANIIL/' # path to data
+MainPath = '/media/algol/336F96987817D4B4/DATA/IMAT_DATA/' # path to data
 pathname0 = '{!s}{!s}'.format(MainPath,'PSI_DATA/DATA/Sample/')
 counterFileName = 4675
 # A main loop over all available angles 
@@ -105,7 +105,7 @@ for i in range(0,totChannels,1):
     f = Norm2sq(Aop,DataContainer(sino_channel),c=0.5)
     
     print ("Run FISTA-TV for least squares")
-    lamtv = 10
+    lamtv = 5
     opt = {'tol': 1e-4, 'iter': 200}
     g_fgp = FGP_TV(lambdaReg = lamtv,
                  iterationsTV=50,
@@ -138,13 +138,14 @@ for i in range(0,totChannels,1):
     plt.show()
     """
 # Saving images into fits using astrapy if required
-add_val = np.min(REC_chan[:])
-REC_chan += abs(add_val)
-REC_chan = REC_chan/np.max(REC_chan[:])*65535
 counter = 0
 filename = 'FISTA_TV_imat_slice'
 for i in range(totChannels):
+    im = REC_chan[i,:,:] 
+    add_val = np.min(im[:])
+    im += abs(add_val)
+    im = im/np.max(im[:])*65535
     outfile = '{!s}_{!s}_{!s}.fits'.format(filename,str(selectedVertical_slice),str(counter))
-    hdu = fits.PrimaryHDU(np.uint16(REC_chan[i,:,:]))
+    hdu = fits.PrimaryHDU(np.uint16(im))
     hdu.writeto(outfile, overwrite=True)
     counter += 1

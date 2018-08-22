@@ -147,7 +147,7 @@ class NexusReader(object):
                 image_keys = np.array(file[self.key_path])                
                 return angles[image_keys==0]
         except:
-            print("Error reading nexus file")
+            print("get_projection_angles Error reading nexus file")
             raise        
 
     
@@ -217,22 +217,44 @@ class NexusReader(object):
         if self.filename is None:
             return        
         try:
-            dims = self.get_projection_dimensions()
-            if ymin < 0:
-                raise ValueError('ymin out of range')
-            if ymax > dims[1]:
-                raise ValueError('ymax out of range')
+            
                 
-            with NexusFile(self.filename,'r') as file:                
-                image_keys = np.array(file[self.key_path])
-                data = np.array(file[self.data_path]
-                       [: , ymin:ymax , :] [image_keys==0])
+            with NexusFile(self.filename,'r') as file:    
+                try:
+                    dims = self.get_projection_dimensions()
+                except KeyError:
+                    pass
+                dims = file[self.data_path].shape
+                if ymin is None and ymax is None:
+                    data = np.array(file[self.data_path])
+                else:
+                    if ymin is None:
+                        ymin = 0
+                        if ymax > dims[1]:
+                            raise ValueError('ymax out of range')
+                        data = np.array(file[self.data_path][:,:ymax,:])
+                    elif ymax is None:        
+                        ymax = dims[1]
+                        if ymin < 0:
+                            raise ValueError('ymin out of range')
+                        data = np.array(file[self.data_path][:,ymin:,:])
+                    else:
+                        if ymax > dims[1]:
+                            raise ValueError('ymax out of range')
+                        if ymin < 0:
+                            raise ValueError('ymin out of range')
+                        
+                        data = np.array(file[self.data_path]
+                            [: , ymin:ymax , :] )
                 
         except:
             print("Error reading nexus file")
             raise
-                
-        geometry = AcquisitionGeometry('parallel', '3D', 
+        
+        
+        
+        if ymax-ymin > 1:        
+            geometry = AcquisitionGeometry('parallel', '3D', 
                                        self.get_projection_angles(),
                                        pixel_num_h          = dims[2],
                                        pixel_size_h         = 1 ,
@@ -241,10 +263,20 @@ class NexusReader(object):
                                        dist_source_center   = None, 
                                        dist_center_detector = None, 
                                        channels             = 1)
-        return AcquisitionData(data, False, geometry=geometry, 
+            return AcquisitionData(data, False, geometry=geometry, 
                                dimension_labels=['angle','vertical','horizontal']) 
+        elif ymax-ymin == 1:
+            geometry = AcquisitionGeometry('parallel', '2D', 
+                                       self.get_projection_angles(),
+                                       pixel_num_h          = dims[2],
+                                       pixel_size_h         = 1 ,
+                                       dist_source_center   = None, 
+                                       dist_center_detector = None, 
+                                       channels             = 1)
+            return AcquisitionData(data.squeeze(), False, geometry=geometry, 
+                               dimension_labels=['angle','horizontal']) 
     def get_acquisition_data_slice(self, y_slice=0):
-        return self.get_acquisition_data_subset(ymin=y_slice , ymax=y_slice+1).subset(['angle','horizontal'])
+        return self.get_acquisition_data_subset(ymin=y_slice , ymax=y_slice+1)
     
     def list_file_content(self):
         try:
@@ -253,7 +285,7 @@ class NexusReader(object):
         except:
             print("Error reading nexus file")
             raise  
-         
+        
     
           
 class XTEKReader(object):
@@ -261,14 +293,14 @@ class XTEKReader(object):
     Reader class for loading XTEK files
     '''
     
-    def __init__(self, xtek_config_filename=None):
+    def __init__(self, xtekConfigFilename=None):
         '''
         This takes in the xtek config filename and loads the dataset and the
         required geometry parameters
         '''       
         self.projections = None
         self.geometry = {}
-        self.filename = xtek_config_filename
+        self.filename = xtekConfigFilename
         self.load()
         
     def load(self):
@@ -309,12 +341,12 @@ class XTEKReader(object):
                 self.mask_radius = float(line.split('=')[1])
                 
         #Read Angles
-        angles = self.read_angles()    
+        angles = self.readAngles()    
         self.geometry = AcquisitionGeometry('cone', '3D', angles, pixel_num_h, xpixel_size, pixel_num_v, ypixel_size, -1 * source_x, 
                  detector_x - source_x, 
                  )
         
-    def read_angles(self):
+    def readAngles(self):
         """
         Read the angles file .ang or _ctdata.txt file and returns the angles
         as an numpy array. 
@@ -369,10 +401,10 @@ class XTEKReader(object):
         pixels[pixels < 0.0] = 0.000001 # all negative values to approximately 0 as the std log of zero and non negative number is not defined
         return pixels
     
-    def get_acquisition_data(self, dimensions=None):
+    def getAcquisitionData(self, dimensions=None):
         '''
         This method load the acquisition data and given dimension and returns an AcquisitionData Object
         '''
-        data = self.load_projection(dimensions)
+        data = self.loadProjection(dimensions)
         return AcquisitionData(data, geometry=self.geometry)
     

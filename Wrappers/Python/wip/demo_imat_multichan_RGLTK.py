@@ -1,8 +1,7 @@
 # This script demonstrates how to load IMAT fits data
 # into the CIL optimisation framework and run reconstruction methods.
 #
-# This demo loads the summedImg files which are the non-spectral images 
-# resulting from summing projections over all spectral channels.
+# Demo to reconstruct energy-discretized channels of IMAT data
 
 # needs dxchange: conda install -c conda-forge dxchange
 # needs astropy: conda install astropy
@@ -10,189 +9,142 @@
 
 # All third-party imports.
 import numpy as np
-from scipy.io import loadmat
 import matplotlib.pyplot as plt
 from dxchange.reader import read_fits
+from astropy.io import fits
 
 # All own imports.
-from ccpi.framework import AcquisitionData, AcquisitionGeometry, ImageGeometry, ImageData
+from ccpi.framework import AcquisitionData, AcquisitionGeometry, ImageGeometry, ImageData, DataContainer
 from ccpi.astra.ops import AstraProjectorSimple, AstraProjector3DSimple
 from ccpi.optimisation.algs import CGLS, FISTA
 from ccpi.optimisation.funcs import Norm2sq, Norm1
-from ccpi.plugins.regularisers import ROF_TV, FGP_TV, SB_TV
+from ccpi.plugins.regularisers import FGP_TV
 
-
-pathname0 = '/media/algol/HD-LXU3/DATA_DANIIL/PSI_DATA/DATA/Sample/angle0/'
-filenameG = "IMAT00004675_Tomo_test_000_"
-
+# set main parameters here
 n = 512 
 totalAngles = 250 # total number of projection angles
 # spectral discretization parameter
-num_average = 120
-numChannels = 2970
-totChannels = round(numChannels/num_average) # total no. of averaged channels
+num_average = 145 # channel discretization frequency (total number of averaged channels)
+numChannels = 2970 # 2970
+totChannels = round(numChannels/num_average) # the resulting number of channels
 Projections_stack = np.zeros((num_average,n,n),dtype='uint16')
 ProjAngleChannels = np.zeros((totalAngles,totChannels,n,n),dtype='float32')
 
-counterT = 0
-for i in range(0,2,1):
-    for j in range(0,num_average,1):
-        if counterT < 10:
-            outfile = '{!s}{!s}{!s}{!s}.fits'.format(pathname0,filenameG,'0000',str(counterT))
-        if ((counterT  >= 10) & (counterT < 100)):
-            outfile = '{!s}{!s}{!s}{!s}.fits'.format(pathname0,filenameG,'000',str(counterT))
-        if ((counterT  >= 100) & (counterT < 1000)):
-            outfile = '{!s}{!s}{!s}{!s}.fits'.format(pathname0,filenameG,'00',str(counterT))
-        if ((counterT  >= 1000) & (counterT < 10000)):
-            outfile = '{!s}{!s}{!s}{!s}.fits'.format(pathname0,filenameG,'0',str(counterT))
-        Projections_stack[j,:,:] = read_fits(outfile)
-        counterT = counterT + 1
-    AverageProj=np.mean(Projections_stack,axis=0) # averaged projection
-ProjAngleChannels[0,i,:,:] = AverageProj
+#########################################################################
+print ("Loading the data...")
+MainPath = '/media/algol/HD-LXU3/DATA_DANIIL/' # path to data
+pathname0 = '{!s}{!s}'.format(MainPath,'PSI_DATA/DATA/Sample/')
+counterFileName = 4675
+# A main loop over all available angles 
+for ll in range(0,totalAngles,1):
+    pathnameData = '{!s}{!s}{!s}/'.format(pathname0,'angle',str(ll))
+    filenameCurr = '{!s}{!s}{!s}'.format('IMAT0000',str(counterFileName),'_Tomo_test_000_')
+    counterT = 0
+    # loop over reduced channels (discretized)
+    for i in range(0,totChannels,1):
+        sumCount = 0
+        # loop over actual channels to obtain averaged one
+        for j in range(0,num_average,1):
+            if counterT < 10:
+                outfile = '{!s}{!s}{!s}{!s}.fits'.format(pathnameData,filenameCurr,'0000',str(counterT))
+            if ((counterT  >= 10) & (counterT < 100)):
+                outfile = '{!s}{!s}{!s}{!s}.fits'.format(pathnameData,filenameCurr,'000',str(counterT))
+            if ((counterT  >= 100) & (counterT < 1000)):
+                outfile = '{!s}{!s}{!s}{!s}.fits'.format(pathnameData,filenameCurr,'00',str(counterT))
+            if ((counterT  >= 1000) & (counterT < 10000)):
+                outfile = '{!s}{!s}{!s}{!s}.fits'.format(pathnameData,filenameCurr,'0',str(counterT))
+            try:
+                Projections_stack[j,:,:] = read_fits(outfile)
+            except:
+                print("Fits is corrupted, skipping no.", counterT)
+                sumCount -= 1
+            counterT += 1
+            sumCount += 1
+        AverageProj=np.sum(Projections_stack,axis=0)/sumCount # averaged projection over "num_average" channels
+        ProjAngleChannels[ll,i,:,:] = AverageProj
+    print("Angle is processed", ll)
+    counterFileName += 1
+#########################################################################
 
-
-filename0 = 'IMAT00004675_Tomo_test_000_SummedImg.fits'
-
-data0 = read_fits(pathname0 + filename0)
-
-pathname10 = '/media/algol/HD-LXU3/DATA_DANIIL/PSI_DATA/DATA/Sample/angle10/'
-filename10 = 'IMAT00004685_Tomo_test_000_SummedImg.fits'
-
-data10 = read_fits(pathname10 + filename10)
-
-# Load a flat field (more are available, should we average over them?)
-flat1 = read_fits('/media/algol/HD-LXU3/DATA_DANIIL/PSI_DATA/DATA/OpenBeam_aft1/IMAT00004932_Tomo_test_000_SummedImg.fits')
-
-# Apply flat field and display after flat-field correction and negative log
-data0_rel = np.zeros(np.shape(flat1), dtype = float)
+flat1 = read_fits('{!s}{!s}{!s}'.format(MainPath,'PSI_DATA/DATA/','OpenBeam_aft1/IMAT00004932_Tomo_test_000_SummedImg.fits'))
 nonzero = flat1 > 0
-data0_rel[nonzero] = data0[nonzero] / flat1[nonzero]
-data10_rel =  np.zeros(np.shape(flat1), dtype = float)
-data10_rel[nonzero] = data10[nonzero] / flat1[nonzero]
-
-plt.figure()
-plt.imshow(data0_rel)
-plt.colorbar()
-plt.show()
-
-plt.figure()
-plt.imshow(-np.log(data0_rel))
-plt.colorbar()
-plt.show()
-
-plt.figure()
-plt.imshow(data10_rel)
-plt.colorbar()
-plt.show()
-
-plt.figure()
-plt.imshow(-np.log(data10_rel))
-plt.colorbar()
-plt.show()
-
-# Set up for loading all summed images at 250 angles.
-pathname = '/media/algol/HD-LXU3/DATA_DANIIL/PSI_DATA/DATA/Sample/angle{}/'
-filename = 'IMAT0000{}_Tomo_test_000_SummedImg.fits'
-
-# Dimensions
-num_angles = 250
-imsize = 512
-
-# Initialise array
-data = np.zeros((num_angles,imsize,imsize))
-
-# Load only 0-249, as 250 is at repetition of zero degrees just like image 0
-for i in range(0,250):
-    curimfile = (pathname + filename).format(i, i+4675)
-    data[i,:,:] = read_fits(curimfile)
-
 # Apply flat field and take negative log
-nonzero = flat1 > 0
-for i in range(0,250):
-    data[i,nonzero] = data[i,nonzero]/flat1[nonzero]
+for ll in range(0,totalAngles,1):
+    for i in range(0,totChannels,1):
+        ProjAngleChannels[ll,i,nonzero] = ProjAngleChannels[ll,i,nonzero]/flat1[nonzero]
 
-eqzero = data == 0
-data[eqzero] = 1
+eqzero = ProjAngleChannels == 0
+ProjAngleChannels[eqzero] = 1
+ProjAngleChannels_NormLog = -np.log(ProjAngleChannels) # normalised and neg-log data
 
-data_rel = -np.log(data)
-
-# Permute order to get: angles, vertical, horizontal, as default in framework.
-data_rel = np.transpose(data_rel,(0,2,1))
-
+# extact sinogram over energy channels
+selectedVertical_slice = 256
+sino_all_channels = ProjAngleChannels_NormLog[:,:,:,selectedVertical_slice]
 # Set angles to use
-angles = np.linspace(-np.pi,np.pi,num_angles,endpoint=False)
+angles = np.linspace(-np.pi,np.pi,totalAngles,endpoint=False)
 
-# Create 3D acquisition geometry and acquisition data
+# set the geometry
+ig = ImageGeometry(n,n)
 ag = AcquisitionGeometry('parallel',
-                         '3D',
-                         angles,
-                         pixel_num_h=imsize,
-                         pixel_num_v=imsize)
-b = AcquisitionData(data_rel, geometry=ag)
-
-# Reduce to single (noncentral) slice by extracting relevant parameters from data and its
-# geometry. Perhaps create function to extract central slice automatically?
-b2d = b.subset(vertical=128)
-ag2d = AcquisitionGeometry('parallel',
-                         '2D',
-                         ag.angles,
-                         pixel_num_h=ag.pixel_num_h)
-b2d.geometry = ag2d
-
-# Create 2D image geometry
-ig2d = ImageGeometry(voxel_num_x=ag2d.pixel_num_h, 
-                     voxel_num_y=ag2d.pixel_num_h)
-
-# Create GPU projector/backprojector operator with ASTRA.
-Aop = AstraProjectorSimple(ig2d,ag2d,'gpu')
-
-# Demonstrate operator is working by applying simple backprojection.
-z = Aop.adjoint(b2d)
-plt.figure()
-plt.imshow(z.array)
-plt.title('Simple backprojection')
-plt.colorbar()
-plt.show()
-
-# Set initial guess ImageData with zeros for algorithms, and algorithm options.
-x_init = ImageData(np.zeros((imsize,imsize)),
-                   geometry=ig2d)
-opt_CGLS = {'tol': 1e-4, 'iter': 20}
-
-# Run CGLS algorithm and display reconstruction.
-x_CGLS, it_CGLS, timing_CGLS, criter_CGLS = CGLS(x_init, Aop, b2d, opt_CGLS)
-plt.figure()
-plt.imshow(x_CGLS.array)
-plt.title('CGLS')
-plt.colorbar()
-plt.show()
-
-plt.figure()
-plt.semilogy(criter_CGLS)
-plt.title('CGLS Criterion vs iterations')
-plt.show()
+                             '2D',
+                             angles,
+                             n,1)
+Aop = AstraProjectorSimple(ig, ag, 'gpu')
 
 
-f = Norm2sq(Aop,b2d,c=0.5)
+# loop to reconstruct energy channels
+REC_chan = np.zeros((totChannels, n, n), 'float32')
+for i in range(0,totChannels,1):
+    sino_channel = sino_all_channels[:,i,:] # extract a sinogram for i-th channel
 
-opt = {'tol': 1e-4, 'iter': 50}
-
-lamtv = 1.0
-# Repeat for FGP variant.
-g_fgp = FGP_TV(lambdaReg = lamtv,
+    print ("Initial guess")
+    x_init = ImageData(geometry=ig)
+    
+    # Create least squares object instance with projector and data.
+    print ("Create least squares object instance with projector and data.")
+    f = Norm2sq(Aop,DataContainer(sino_channel),c=0.5)
+    
+    print ("Run FISTA-TV for least squares")
+    lamtv = 10
+    opt = {'tol': 1e-4, 'iter': 200}
+    g_fgp = FGP_TV(lambdaReg = lamtv,
                  iterationsTV=50,
-                 tolerance=1e-5,
+                 tolerance=1e-6,
                  methodTV=0,
                  nonnegativity=0,
                  printing=0,
-                 device='cpu')
-
-x_fista_fgp, it1, timing1, criter_fgp = FISTA(x_init, f, g_fgp,opt)
-
-plt.figure()
-plt.subplot(121)
-plt.imshow(x_fista_fgp.array)
-plt.title('FISTA FGP TV')
-plt.subplot(122)
-plt.semilogy(criter_fgp)
-plt.show()
+                 device='gpu')
+    
+    x_fista_fgp, it1, timing1, criter_fgp = FISTA(x_init, f, g_fgp, opt)
+    REC_chan[i,:,:] = x_fista_fgp.array
+    """
+    plt.figure()
+    plt.subplot(121)
+    plt.imshow(x_fista_fgp.array, vmin=0, vmax=0.05)
+    plt.title('FISTA FGP TV')
+    plt.subplot(122)
+    plt.semilogy(criter_fgp)
+    plt.show()
+    """
+    """
+    print ("Run CGLS for least squares")
+    opt = {'tol': 1e-4, 'iter': 20}
+    x_init = ImageData(geometry=ig)
+    x_CGLS, it_CGLS, timing_CGLS, criter_CGLS = CGLS(x_init, Aop, DataContainer(sino_channel), opt=opt)
+    
+    plt.figure()
+    plt.imshow(x_CGLS.array,vmin=0, vmax=0.05)
+    plt.title('CGLS')
+    plt.show()
+    """
+# Saving images into fits using astrapy if required
+add_val = np.min(REC_chan[:])
+REC_chan += abs(add_val)
+REC_chan = REC_chan/np.max(REC_chan[:])*65535
+counter = 0
+filename = 'FISTA_TV_imat_slice'
+for i in range(totChannels):
+    outfile = '{!s}_{!s}_{!s}.fits'.format(filename,str(selectedVertical_slice),str(counter))
+    hdu = fits.PrimaryHDU(np.uint16(REC_chan[i,:,:]))
+    hdu.writeto(outfile, overwrite=True)
+    counter += 1

@@ -188,6 +188,7 @@ class NexusReader(object):
                 return tuple(dims)
         except:
             print("Error reading nexus file")
+            #dims = file[self.data_path].shape
             raise  
         
     def get_acquisition_data(self, dimensions=None):
@@ -252,10 +253,16 @@ class NexusReader(object):
             raise
         
         
+        try:
+            angles = self.get_projection_angles()
+        except KeyError as ke:
+            n = data.shape[0]
+            angles = np.linspace(0, n, n+1, dtype=np.float32)
         
         if ymax-ymin > 1:        
+            
             geometry = AcquisitionGeometry('parallel', '3D', 
-                                       self.get_projection_angles(),
+                                       angles,
                                        pixel_num_h          = dims[2],
                                        pixel_size_h         = 1 ,
                                        pixel_num_v          = ymax-ymin,
@@ -267,7 +274,7 @@ class NexusReader(object):
                                dimension_labels=['angle','vertical','horizontal']) 
         elif ymax-ymin == 1:
             geometry = AcquisitionGeometry('parallel', '2D', 
-                                       self.get_projection_angles(),
+                                       angles,
                                        pixel_num_h          = dims[2],
                                        pixel_size_h         = 1 ,
                                        dist_source_center   = None, 
@@ -277,6 +284,19 @@ class NexusReader(object):
                                dimension_labels=['angle','horizontal']) 
     def get_acquisition_data_slice(self, y_slice=0):
         return self.get_acquisition_data_subset(ymin=y_slice , ymax=y_slice+1)
+    def get_acquisition_data_whole(self):
+        with NexusFile(self.filename,'r') as file:    
+            try:
+                dims = self.get_projection_dimensions()
+            except KeyError:
+                dims = file[self.data_path].shape
+                
+            ymin = 0 
+            ymax = dims[1] - 1
+            
+            return self.get_acquisition_data_subset(ymin=ymin, ymax=ymax)
+            
+        
     
     def list_file_content(self):
         try:
@@ -285,6 +305,62 @@ class NexusReader(object):
         except:
             print("Error reading nexus file")
             raise  
+    def get_acquisition_data_batch(self, bmin=None, bmax=None):
+        if not h5pyAvailable:
+            raise Exception("Error: h5py is not installed")
+        if self.filename is None:
+            return        
+        try:
+            
+                
+            with NexusFile(self.filename,'r') as file:    
+                try:
+                    dims = self.get_projection_dimensions()
+                except KeyError:
+                    pass
+                dims = file[self.data_path].shape
+                if bmin is None or bmax is None:
+                    raise ValueError('get_acquisition_data_batch: please specify fastest index batch limits')
+                    
+                if bmin >= 0 and bmax < dims[0]:
+                    data = np.array(file[self.data_path][bmin:bmax])
+                else:
+                    raise ValueError('get_acquisition_data_batch: bmin {0}>0 bmax {1}<{2}'.format(bmin, bmax, dims[0]))
+                    
+        except:
+            print("Error reading nexus file")
+            raise
+        
+        
+        try:
+            angles = self.get_projection_angles()[bmin:bmax]
+        except KeyError as ke:
+            n = data.shape[0]
+            angles = np.linspace(0, n, n+1, dtype=np.float32)[bmin:bmax]
+        
+        if bmax-bmin > 1:        
+            
+            geometry = AcquisitionGeometry('parallel', '3D', 
+                                       angles,
+                                       pixel_num_h          = dims[2],
+                                       pixel_size_h         = 1 ,
+                                       pixel_num_v          = bmax-bmin,
+                                       pixel_size_v         = 1,
+                                       dist_source_center   = None, 
+                                       dist_center_detector = None, 
+                                       channels             = 1)
+            return AcquisitionData(data, False, geometry=geometry, 
+                               dimension_labels=['angle','vertical','horizontal']) 
+        elif ymax-ymin == 1:
+            geometry = AcquisitionGeometry('parallel', '2D', 
+                                       angles,
+                                       pixel_num_h          = dims[2],
+                                       pixel_size_h         = 1 ,
+                                       dist_source_center   = None, 
+                                       dist_center_detector = None, 
+                                       channels             = 1)
+            return AcquisitionData(data.squeeze(), False, geometry=geometry, 
+                               dimension_labels=['angle','horizontal']) 
         
     
           

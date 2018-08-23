@@ -229,7 +229,7 @@ total_size = read_dark.get_projection_dimensions()[0]
 
 ## darks are very many so we proceed in batches
 batchsize = 40
-batchlimits = [batchsize * (i+1) for i in range(int(total_size/batchsize))] + [total_size]
+batchlimits = [batchsize * (i+1) for i in range(int(total_size/batchsize))] + [total_size-1]
 #avg.N = 0
 avg.offset = 0
 N = 0
@@ -252,7 +252,7 @@ for batch in range(len(batchlimits)):
     i = bmin
     while i < bmax:
         stats , i = DataStatMoments.add_sample(darksslice, i, 'angle', stats, bmin)
-        print ("{0}-{1}-{2}".format(bmin, i , bmax ) )
+        print ("{0}-{1}-{2}".fcygormat(bmin, i , bmax ) )
     
 darks = stats
 #%%
@@ -262,9 +262,9 @@ fig.imshow(flats.subset(StatisticalMoments=0).array)
 fig = plt.subplot(2,2,2)
 fig.imshow(numpy.sqrt(flats.subset(StatisticalMoments=1).array))
 fig = plt.subplot(2,2,3)
-fig.imshow(darks.subset(StatisticalMoments=0).array)
+fig.imshow(darks[0])
 fig = plt.subplot(2,2,4)
-fig.imshow(numpy.sqrt(darks.subset(StatisticalMoments=1).array))
+fig.imshow(numpy.sqrt(darks[1]))
 plt.show()
 
 

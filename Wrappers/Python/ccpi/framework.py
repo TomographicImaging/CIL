@@ -330,7 +330,7 @@ class DataContainer(object):
                 
                 cleaned = numpy.transpose(cleaned, axes).copy()
                 
-                return type(self)(cleaned , True, dimensions)
+                return type(self)(cleaned , False, dimensions)
     
     def fill(self, array, **dimension):
         '''fills the internal numpy array with the one provided'''
@@ -1112,6 +1112,9 @@ if __name__ == '__main__':
     subset = ['X' ,'Y']
     b1 = ds.subset( subset , Z=1)
     print ("shape b 2,3? {0}".format(numpy.shape(b1.as_array())))
+    
+    b2 = ds.subset( Z=1)
+    print ("shape c 2,3? {0}".format(numpy.shape(b2.as_array())))
     
     
 

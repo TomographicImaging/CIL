@@ -65,7 +65,7 @@ class Normalizer(DataProcessor):
                 raise ValueError('Dark Field should be 2D')
             elif len(numpy.shape(df)) == 2:
                 self.dark_field = df
-        elif issubclass(type(df), DataSet):
+        elif issubclass(type(df), DataContainer):
             self.dark_field = self.set_dark_field(df.as_array())
     
     def set_flat_field(self, df):
@@ -74,7 +74,7 @@ class Normalizer(DataProcessor):
                 raise ValueError('Flat Field should be 2D')
             elif len(numpy.shape(df)) == 2:
                 self.flat_field = df
-        elif issubclass(type(df), DataSet):
+        elif issubclass(type(df), DataContainer):
             self.flat_field = self.set_flat_field(df.as_array())
     
     @staticmethod

@@ -225,11 +225,17 @@ print ("var" , ave.var, flats.array[1][0][0])
 
 print ("read dark")
 read_dark = NexusReader(os.path.join( os.path.abspath(directory) , '74243.nxs'))
-total_size = read_dark.get_projection_dimensions()[0]
+read_dark.data_path = data_path
 
 ## darks are very many so we proceed in batches
+total_size = read_dark.get_projection_dimensions()[0]
+print ("total_size", total_size)
+
 batchsize = 40
-batchlimits = [batchsize * (i+1) for i in range(int(total_size/batchsize))] + [total_size-1]
+if batchsize > total_size:
+    batchlimits = [batchsize * (i+1) for i in range(int(total_size/batchsize))] + [total_size-1]
+else:
+    batchlimits = [total_size]
 #avg.N = 0
 avg.offset = 0
 N = 0
@@ -252,7 +258,7 @@ for batch in range(len(batchlimits)):
     i = bmin
     while i < bmax:
         stats , i = DataStatMoments.add_sample(darksslice, i, 'angle', stats, bmin)
-        print ("{0}-{1}-{2}".fcygormat(bmin, i , bmax ) )
+        print ("{0}-{1}-{2}".format(bmin, i , bmax ) )
     
 darks = stats
 #%%
@@ -269,13 +275,14 @@ plt.show()
 
 
 #%%
-norm = Normalizer(flat_field=flats.array[0,200,:], dark_field=darks.array[0,200,:])
+norm = Normalizer(flat_field=flats.array[0,200,:], dark_field=darks[0,200,:])
 #norm.set_flat_field(flats.array[0,200,:])
 #norm.set_dark_field(darks.array[0,200,:])
 norm.set_input(reader.get_acquisition_data_slice(200))
 
-n = Normalizer.normalize_projection(norm.get_input().as_array(), flats.array[0,200,:], darks.array[0,200,:], 1e-5)
-
+n = Normalizer.normalize_projection(norm.get_input().as_array(), flats.array[0,200,:], darks[0,200,:], 1e-5)
+#dn_n= Normalizer.estimate_normalised_error(norm.get_input().as_array(), flats.array[0,200,:], darks[0,200,:],
+#                                           numpy.sqrt(flats.array[1,200,:]), numpy.sqrt(darks[1,200,:]))
 #%%
 
 
@@ -285,7 +292,10 @@ fig = plt.subplot(2,1,1)
 
 fig.imshow(norm.get_input().as_array())
 fig = plt.subplot(2,1,2)
-fig.imshow(norm.get_output().as_array())
+fig.imshow(n)
+
+#fig = plt.subplot(3,1,3)
+#fig.imshow(dn_n)
 
 
 plt.show()

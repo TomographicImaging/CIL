@@ -180,16 +180,25 @@ class NexusReader(object):
         if self.filename is None:
             return
         try:
-            with NexusFile(self.filename,'r') as file:                
-                projections = file[self.data_path]
-                image_keys = np.array(file[self.key_path])
+            with NexusFile(self.filename,'r') as file:
+                try:                
+                    projections = file[self.data_path]
+                except KeyError as ke:
+                    raise KeyError('Error: data path {0} not found\n{1}'\
+                                   .format(self.data_path, 
+                                           ke.args[0]))
+                #image_keys = np.array(file[self.key_path])
+                image_keys = self.get_image_keys()
                 dims = list(projections.shape)
                 dims[0] = np.sum(image_keys==0)
                 return tuple(dims)
         except:
-            print("Error reading nexus file")
-            #dims = file[self.data_path].shape
-            raise  
+            print("Warning: Error reading image_keys trying accessing data on " , self.data_path)
+            with NexusFile(self.filename,'r') as file:
+                dims = file[self.data_path].shape
+                return tuple(dims)
+            
+              
         
     def get_acquisition_data(self, dimensions=None):
         '''
@@ -289,6 +298,7 @@ class NexusReader(object):
             try:
                 dims = self.get_projection_dimensions()
             except KeyError:
+                print ("Warning: ")
                 dims = file[self.data_path].shape
                 
             ymin = 0 
@@ -317,12 +327,11 @@ class NexusReader(object):
                 try:
                     dims = self.get_projection_dimensions()
                 except KeyError:
-                    pass
-                dims = file[self.data_path].shape
+                    dims = file[self.data_path].shape
                 if bmin is None or bmax is None:
                     raise ValueError('get_acquisition_data_batch: please specify fastest index batch limits')
                     
-                if bmin >= 0 and bmax < dims[0]:
+                if bmin >= 0 and bmin < bmax and bmax <= dims[0]:
                     data = np.array(file[self.data_path][bmin:bmax])
                 else:
                     raise ValueError('get_acquisition_data_batch: bmin {0}>0 bmax {1}<{2}'.format(bmin, bmax, dims[0]))
@@ -351,7 +360,7 @@ class NexusReader(object):
                                        channels             = 1)
             return AcquisitionData(data, False, geometry=geometry, 
                                dimension_labels=['angle','vertical','horizontal']) 
-        elif ymax-ymin == 1:
+        elif bmax-bmin == 1:
             geometry = AcquisitionGeometry('parallel', '2D', 
                                        angles,
                                        pixel_num_h          = dims[2],

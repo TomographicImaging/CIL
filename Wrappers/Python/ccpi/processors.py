@@ -88,6 +88,20 @@ class Normalizer(DataProcessor):
             c[ ~ numpy.isfinite( c )] = tolerance # set to not zero if 0/0 
         return c
     
+    @staticmethod
+    def estimate_normalised_error(projection, flat, dark, delta_flat, delta_dark):
+        '''returns the estimated relative error of the normalised projection
+        
+        n = (projection - dark) / (flat - dark)
+        Dn/n = (flat-dark + projection-dark)/((flat-dark)*(projection-dark))*(Df/f + Dd/d)
+        ''' 
+        a = (projection - dark)
+        b = (flat-dark)
+        df = delta_flat / flat
+        dd = delta_dark / dark
+        rel_norm_error = (b + a) / (b * a) * (df + dd)
+        return rel_norm_error
+        
     def process(self):
         
         projections = self.get_input()

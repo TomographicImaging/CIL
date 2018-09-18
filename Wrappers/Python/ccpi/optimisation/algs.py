@@ -21,6 +21,7 @@ import numpy
 import time
 
 from ccpi.optimisation.funcs import Function
+from ccpi.framework import ImageData, AcquisitionData
 
 def FISTA(x_init, f=None, g=None, opt=None):
     '''Fast Iterative Shrinkage-Thresholding Algorithm
@@ -222,4 +223,66 @@ def CGLS(x_init, operator , data , opt=None):
         criter[it] = (r**2).sum()
     
     return x, it, timing, criter
+
+def SIRT(x_init, operator , data , opt=None, constraint=None):
+    '''Simultaneous Iterative Reconstruction Technique
+    
+    Parameters:
+      x_init: initial guess
+      operator: operator for forward/backward projections
+      data: data to operate on
+      opt: additional algorithm 
+      constraint: func of Indicator type specifying convex constraint.
+    '''
+    
+    if opt is None: 
+        opt = {'tol': 1e-4, 'iter': 1000}
+    else:
+        try:
+            max_iter = opt['iter']
+        except KeyError as ke:
+            opt[ke] = 1000
+        try:
+            opt['tol'] = 1000
+        except KeyError as ke:
+            opt[ke] = 1e-4
+    tol = opt['tol']
+    max_iter = opt['iter']
+    
+    # Set default constraint to unconstrained
+    if constraint==None:
+        constraint = Function()
+    
+    x = x_init.clone()
+    
+    timing = numpy.zeros(max_iter)
+    criter = numpy.zeros(max_iter)
+    
+    # Relaxation parameter must be strictly between 0 and 2. For now fix at 1.0
+    relax_par = 1.0
+    
+    # Set up scaling matrices D and M.
+    im1 = ImageData(geometry=x_init.geometry)
+    im1.array[:] = 1.0
+    M = 1/operator.direct(im1)
+    del im1
+    aq1 = AcquisitionData(geometry=M.geometry)
+    aq1.array[:] = 1.0
+    D = 1/operator.adjoint(aq1)
+    del aq1
+    
+    # algorithm loop
+    for it in range(0, max_iter):
+        t = time.time()
+        r = data - operator.direct(x)
+        
+        x = constraint.prox(x + relax_par * (D*operator.adjoint(M*r)),None)
+        
+        timing[it] = time.time() - t
+        if it > 0:
+            criter[it-1] = (r**2).sum()
+    
+    r = data - operator.direct(x)
+    criter[it] = (r**2).sum()
+    return x, it, timing,  criter
     

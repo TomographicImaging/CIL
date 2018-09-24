@@ -21,18 +21,18 @@ from ccpi.optimisation.algs import CGLS, FISTA
 from ccpi.optimisation.funcs import Norm2sq, Norm1
 
 # Load and display a couple of summed projection as examples
-pathname0 = '/media/algol/HD-LXU3/DATA_DANIIL/PSI_DATA/DATA/Sample/angle0/'
+pathname0 = '/media/jakob/050d8d45-fab3-4285-935f-260e6c5f162c1/Data/neutrondata/PSI_phantom_IMAT/DATA/Sample/angle0/'
 filename0 = 'IMAT00004675_Tomo_test_000_SummedImg.fits'
 
 data0 = read_fits(pathname0 + filename0)
 
-pathname10 = '/media/algol/HD-LXU3/DATA_DANIIL/PSI_DATA/DATA/Sample/angle10/'
+pathname10 = '/media/jakob/050d8d45-fab3-4285-935f-260e6c5f162c1/Data/neutrondata/PSI_phantom_IMAT/DATA/Sample/angle10/'
 filename10 = 'IMAT00004685_Tomo_test_000_SummedImg.fits'
 
 data10 = read_fits(pathname10 + filename10)
 
 # Load a flat field (more are available, should we average over them?)
-flat1 = read_fits('/media/algol/HD-LXU3/DATA_DANIIL/PSI_DATA/DATA/OpenBeam_aft1/IMAT00004932_Tomo_test_000_SummedImg.fits')
+flat1 = read_fits('/media/jakob/050d8d45-fab3-4285-935f-260e6c5f162c1/Data/neutrondata/PSI_phantom_IMAT/DATA/OpenBeam_aft1/IMAT00004932_Tomo_test_000_SummedImg.fits')
 
 # Apply flat field and display after flat-field correction and negative log
 data0_rel = numpy.zeros(numpy.shape(flat1), dtype = float)
@@ -58,7 +58,7 @@ plt.colorbar()
 plt.show()
 
 # Set up for loading all summed images at 250 angles.
-pathname = '/media/algol/HD-LXU3/DATA_DANIIL/PSI_DATA/DATA/Sample/angle{}/'
+pathname = '/media/jakob/050d8d45-fab3-4285-935f-260e6c5f162c1/Data/neutrondata/PSI_phantom_IMAT/DATA/Sample/angle{}/'
 filename = 'IMAT0000{}_Tomo_test_000_SummedImg.fits'
 
 # Dimensions

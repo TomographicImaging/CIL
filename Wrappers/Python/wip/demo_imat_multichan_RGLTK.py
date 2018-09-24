@@ -32,8 +32,9 @@ ProjAngleChannels = np.zeros((totalAngles,totChannels,n,n),dtype='float32')
 
 #########################################################################
 print ("Loading the data...")
-MainPath = '/media/algol/336F96987817D4B4/DATA/IMAT_DATA/' # path to data
-pathname0 = '{!s}{!s}'.format(MainPath,'PSI_DATA/DATA/Sample/')
+#MainPath = '/media/algol/336F96987817D4B4/DATA/IMAT_DATA/' # path to data
+MainPath = '/media/jakob/050d8d45-fab3-4285-935f-260e6c5f162c1/Data/neutrondata/' # path to data
+pathname0 = '{!s}{!s}'.format(MainPath,'PSI_phantom_IMAT/DATA/Sample/')
 counterFileName = 4675
 # A main loop over all available angles 
 for ll in range(0,totalAngles,1):
@@ -66,7 +67,7 @@ for ll in range(0,totalAngles,1):
     counterFileName += 1
 #########################################################################
 
-flat1 = read_fits('{!s}{!s}{!s}'.format(MainPath,'PSI_DATA/DATA/','OpenBeam_aft1/IMAT00004932_Tomo_test_000_SummedImg.fits'))
+flat1 = read_fits('{!s}{!s}{!s}'.format(MainPath,'PSI_phantom_IMAT/DATA/','OpenBeam_aft1/IMAT00004932_Tomo_test_000_SummedImg.fits'))
 nonzero = flat1 > 0
 # Apply flat field and take negative log
 for ll in range(0,totalAngles,1):

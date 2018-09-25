@@ -46,10 +46,16 @@ class Identity(Operator):
         super(Identity, self).__init__()
         
     def direct(self,x,out=None):
-        return x
+        if out is None:
+            return x.copy()
+        else:
+            out.fill(x)
     
     def adjoint(self,x, out=None):
-        return x
+        if out is None:
+            return x.copy()
+        else:
+            out.fill(x)
     
     def size(self):
         return NotImplemented
@@ -62,8 +68,9 @@ class FiniteDiff2D(Operator):
         self.s1 = 8.0
         super(FiniteDiff2D, self).__init__()
         
-    def direct(self,x):
+    def direct(self,x, out=None):
         '''Forward differences with Neumann BC.'''
+        # FIXME this seems to be working only with numpy arrays
         d1 = numpy.zeros_like(x.as_array())
         d1[:,:-1] = x.as_array()[:,1:] - x.as_array()[:,:-1]
         d2 = numpy.zeros_like(x.as_array())
@@ -144,16 +151,16 @@ def PowerMethodNonsquare(op,numiters):
     inputsize , outputsize = op.size()
     #x0 = ImageContainer(numpy.random.randn(*inputsize)
     # Edo's
-    vg = ImageGeometry(voxel_num_x=inputsize[2],
-                       voxel_num_y=inputsize[1], 
-                       voxel_num_z=inputsize[0])
-    
-    x0 = ImageData(geometry = vg, dimension_labels=['vertical','horizontal_y','horizontal_x'])
+    #vg = ImageGeometry(voxel_num_x=inputsize[0],
+    #                   voxel_num_y=inputsize[1], 
+    #                   voxel_num_z=inputsize[2])
+    #
+    #x0 = ImageData(geometry = vg, dimension_labels=['vertical','horizontal_y','horizontal_x'])
     #print (x0)
-    x0.fill(numpy.random.randn(*x0.shape))
+    #x0.fill(numpy.random.randn(*x0.shape))
     
     
-    #x0 = op.create_image_data()
+    x0 = op.create_image_data()
     
     s = numpy.zeros(numiters)
     # Loop

@@ -42,11 +42,7 @@ class Function(object):
     def __call__(self,x, out=None):       return 0
     def grad(self, x):                    return 0
     def prox(self, x, tau):               return x
-    def gradient(self, x, out=None):      
-        if out is None:
-            return self.grad(x)
-        else:
-            return x.multiply(1,out=out)
+    def gradient(self, x, out=None):      return self.grad(x)
     def proximal(self, x, tau, out=None): return self.prox(x, tau)
 
 class Norm2(Function):
@@ -96,16 +92,19 @@ class Norm2(Function):
             if isSizeCorrect(out, x):
                 # check dimensionality
                 if issubclass(type(out), DataContainer):
-                    xx = numpy.sqrt(numpy.sum( numpy.square(x.as_array()), self.direction, 
+                    numpy.square(x.as_array(), out = out.as_array())
+                    xx = numpy.sqrt(numpy.sum( out.as_array() , self.direction, 
                                   keepdims=True ))
                     xx = numpy.maximum(0, 1 - tau*self.gamma / xx)
-                    p  = x.as_array() * xx
+                    x.multiply(xx, out= out.as_array())
                     
-                    arr = out.as_array()
                         
                 elif issubclass(type(out) , numpy.ndarray):
                     numpy.square(x.as_array(), out=out)
                     xx = numpy.sqrt(numpy.sum(out, self.direction, keepdims=True))
+                    
+                    xx = numpy.maximum(0, 1 - tau*self.gamma / xx)
+                    x.multiply(xx, out= out)
             else:
                 raise ValueError ('Wrong size: x{0} out{1}'.format(x.shape,out.shape) )
         
@@ -136,10 +135,15 @@ class Norm2sq(Function):
     
     '''
     
-    def __init__(self,A,b,c=1.0):
+    def __init__(self,A,b,c=1.0,memopt=False):
         self.A = A  # Should be an operator, default identity
         self.b = b  # Default zero DataSet?
         self.c = c  # Default 1.
+        self.memopt = memopt
+        if memopt:
+            self.direct_placehold = A.adjoint(b)
+            self.adjoint_placehold = b.copy()
+            
         
         # Compute the Lipschitz parameter from the operator.
         # Initialise to None instead and only call when needed.
@@ -152,17 +156,26 @@ class Norm2sq(Function):
     
     def __call__(self,x):
         #return self.c* np.sum(np.square((self.A.direct(x) - self.b).ravel()))
-        return self.c*( ( (self.A.direct(x)-self.b)**2).sum() )
+        #if out is None:
+        #    return self.c*( ( (self.A.direct(x)-self.b)**2).sum() )
+        #else:
+        y = self.A.direct(x)
+        y -= self.b
+        y *= y
+        return y.sum() * self.c
     
-    def gradient(self, x, out=None):
-        if out is None:
-            return self.grad(x)
+    def gradient(self, x, out = None):
+        if self.memopt:
+            #return 2.0*self.c*self.A.adjoint( self.A.direct(x) - self.b )
+            
+            self.A.direct(x, out=self.adjoint_placehold)
+            self.adjoint_placehold -= self.b
+            self.A.adjoint(self.adjoint_placehold, out=self.direct_placehold)
+            self.direct_placehold *= (2.0 * self.c)
+            # can this be avoided?
+            out.fill(self.direct_placehold)
         else:
-            #return self.c*( ( (self.A.direct(x)-self.b)**2).sum() )
-            y = self.A.direct(x)
-            y -= self.b
-            y *= y
-            return y.sum() * self.c
+            return self.grad(x)
             
 
 
@@ -177,7 +190,13 @@ class ZeroFun(Function):
         return 0
     
     def prox(self,x,tau):
-        return x
+        return x.copy()
+    
+    def proximal(self, x, tau, out=None):
+        if out is None:
+            return self.prox(x, tau)
+        else:
+            out.fill(x)
 
 # A more interesting example, least squares plus 1-norm minimization.
 # Define class to represent 1-norm including prox function
@@ -188,8 +207,12 @@ class Norm1(Function):
         self.L = 1
         super(Norm1, self).__init__()
     
-    def __call__(self,x):
-        return self.gamma*(x.abs().sum())
+    def __call__(self,x,out=None):
+        if out is None:
+            return self.gamma*(x.abs().sum())
+        else:
+            x.abs(out=out)
+            return out.sum() * self.gamma
     
     def prox(self,x,tau):
         return (x.abs() - tau*self.gamma).maximum(0) * x.sign()
@@ -199,11 +222,10 @@ class Norm1(Function):
             return self.prox(x, tau)
         else:
             #(x.abs() - tau*self.gamma).maximum(0) * x.sign()
-            y = x.abs()
+            x.abs(out = out)
             # here there is a new allocation of memory for the product
-            y -= (tau*self.gamma)
-            y.maximum(0, out=y)
+            out -= (tau*self.gamma)
+            out.maximum(0, out=out)
             x.sign(out=x)
-            y *= x
-            return y
+            out *= x
     

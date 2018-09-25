@@ -33,7 +33,7 @@ b = DataContainer(bmat)
 lam = 10
 
 # Create object instances with the test data A and b.
-f = Norm2sq(A,b,c=0.5)
+f = Norm2sq(A,b,c=0.5, memopt=True)
 g0 = ZeroFun()
 
 # Initial guess
@@ -122,6 +122,7 @@ I = Identity()
 y = I.direct(Phantom)
 y.array +=  0.1*np.random.randn(N, N)
 
+plt.figure()
 plt.imshow(y.array)
 plt.title('Noisy image')
 plt.show()
@@ -145,10 +146,12 @@ x_fista1_denoise_m, it1_denoise_m, timing1_denoise_m, \
 print(x_fista1_denoise)
 print(criter1_denoise[-1])
 
+plt.figure()
 plt.imshow(x_fista1_denoise.as_array())
 plt.title('FISTA LS+1')
 plt.show()
 
+plt.figure()
 plt.imshow(x_fista1_denoise_m.as_array())
 plt.title('FISTA LS+1 memopt')
 plt.show()
@@ -158,6 +161,7 @@ x_fbpd1_denoise, itfbpd1_denoise, timingfbpd1_denoise, criterfbpd1_denoise = FBP
 print(x_fbpd1_denoise)
 print(criterfbpd1_denoise[-1])
 
+plt.figure()
 plt.imshow(x_fbpd1_denoise.as_array())
 plt.title('FBPD LS+1')
 plt.show()

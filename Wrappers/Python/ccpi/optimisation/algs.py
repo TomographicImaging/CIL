@@ -46,7 +46,7 @@ def FISTA(x_init, f=None, g=None, opt=None):
     
     max_iter = opt['iter'] if 'iter' in opt.keys() else 1000
     tol = opt['tol'] if 'tol' in opt.keys() else 1e-4
-    memopt = opt['memopts'] if 'memopts' in opt.keys() else False
+    memopt = opt['memopt'] if 'memopt' in opt.keys() else False
         
         
     # initialization
@@ -66,6 +66,7 @@ def FISTA(x_init, f=None, g=None, opt=None):
     
     t_old = 1
     
+    c = f(x_init) + g(x_init)
 
     # algorithm loop
     for it in range(0, max_iter):
@@ -75,8 +76,8 @@ def FISTA(x_init, f=None, g=None, opt=None):
             # u = y - invL*f.grad(y)
             # store the result in x_old
             f.gradient(y, out=u)
-            u *= -invL
-            u += y
+            u.__imul__( -invL )
+            u.__iadd__( y )
             # x = g.prox(u,invL)
             g.proximal(u, invL, out=x)
             
@@ -84,8 +85,11 @@ def FISTA(x_init, f=None, g=None, opt=None):
             
             # y = x + (t_old-1)/t*(x-x_old)
             x.subtract(x_old, out=y)
-            y *= ((t_old-1)/t)
-            y += x
+            y.__imul__ ((t_old-1)/t)
+            y.__iadd__( x )
+            
+            x_old.fill(x)
+            t_old = t
             
             
         else:

@@ -141,8 +141,9 @@ class Norm2sq(Function):
         self.c = c  # Default 1.
         self.memopt = memopt
         if memopt:
-            self.direct_placehold = A.adjoint(b)
-            self.adjoint_placehold = b.copy()
+            #self.direct_placehold = A.adjoint(b)
+            self.direct_placehold = A.allocate_direct()
+            self.adjoint_placehold = A.allocate_adjoint()
             
         
         # Compute the Lipschitz parameter from the operator.
@@ -160,8 +161,8 @@ class Norm2sq(Function):
         #    return self.c*( ( (self.A.direct(x)-self.b)**2).sum() )
         #else:
         y = self.A.direct(x)
-        y -= self.b
-        y *= y
+        y.__isub__(self.b)
+        y.__imul__(y)
         return y.sum() * self.c
     
     def gradient(self, x, out = None):
@@ -169,9 +170,9 @@ class Norm2sq(Function):
             #return 2.0*self.c*self.A.adjoint( self.A.direct(x) - self.b )
             
             self.A.direct(x, out=self.adjoint_placehold)
-            self.adjoint_placehold -= self.b
+            self.adjoint_placehold.__isub__( self.b )
             self.A.adjoint(self.adjoint_placehold, out=self.direct_placehold)
-            self.direct_placehold *= (2.0 * self.c)
+            self.direct_placehold.__imul__(2.0 * self.c)
             # can this be avoided?
             out.fill(self.direct_placehold)
         else:
@@ -205,12 +206,16 @@ class Norm1(Function):
     def __init__(self,gamma):
         self.gamma = gamma
         self.L = 1
+        self.sign_x = None
         super(Norm1, self).__init__()
     
     def __call__(self,x,out=None):
         if out is None:
             return self.gamma*(x.abs().sum())
         else:
+            if not x.shape == out.shape:
+                raise ValueError('Norm1 Incompatible size:',
+                                 x.shape, out.shape)
             x.abs(out=out)
             return out.sum() * self.gamma
     
@@ -221,11 +226,17 @@ class Norm1(Function):
         if out is None:
             return self.prox(x, tau)
         else:
+            if not x.shape == out.shape:
+                raise ValueError('Norm1 Incompatible size:',
+                                 x.shape, out.shape)
             #(x.abs() - tau*self.gamma).maximum(0) * x.sign()
             x.abs(out = out)
-            # here there is a new allocation of memory for the product
-            out -= (tau*self.gamma)
+            out.__isub__(tau*self.gamma)
             out.maximum(0, out=out)
-            x.sign(out=x)
-            out *= x
+            if self.sign_x is None or not x.shape == self.sign_x.shape:
+                self.sign_x = x.sign()
+            else:
+                x.sign(out=self.sign_x)
+                
+            out.__imul__( self.sign_x )
     

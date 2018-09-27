@@ -344,13 +344,16 @@ class DataContainer(object):
     def fill(self, array, **dimension):
         '''fills the internal numpy array with the one provided'''
         if dimension == {}:
-            if numpy.shape(array) != numpy.shape(self.array):
-                raise ValueError('Cannot fill with the provided array.' + \
-                                 'Expecting {0} got {1}'.format(
-                                         numpy.shape(self.array),
-                                         numpy.shape(array)))
-            # copy by reference, does not require more memory
-            self.array = array
+            if issubclass(type(array), DataContainer) or\
+               issubclass(type(array), numpy.ndarray):
+                if array.shape != self.array.shape:
+                    raise ValueError('Cannot fill with the provided array.' + \
+                                     'Expecting {0} got {1}'.format(
+                                     self.array.shape,array.shape))
+                if issubclass(type(array), DataContainer):
+                    self.array = array.array[:]
+                else:
+                    self.array = array[:]
         else:
             
             command = 'self.array['
@@ -522,24 +525,30 @@ class DataContainer(object):
     
     def __iadd__(self, other):
         if isinstance(other, (int, float)) :
+            #print ("__iadd__", self.array.shape)
             numpy.add(self.array, other, out=self.array)
         elif issubclass(type(other), DataContainer):
             if self.check_dimensions(other):
                 numpy.add(self.array, other.array, out=self.array)
             else:
                 raise ValueError('Dimensions do not match')
-        return self
+        #return self
     # __iadd__
     
     def __imul__(self, other):
         if isinstance(other, (int, float)) :
-            numpy.multiply(self.array, other, out=self.array)
+            #print ("__imul__", self.array.shape)
+            #print ("type(self)", type(self))
+            #print ("self.array", self.array, other)
+            arr = self.as_array()
+            #print ("arr", arr)
+            numpy.multiply(arr, other, out=arr)
         elif issubclass(type(other), DataContainer):
             if self.check_dimensions(other):
                 numpy.multiply(self.array, other.array, out=self.array)
             else:
                 raise ValueError('Dimensions do not match')
-        return self
+        #return self
         #return self * other
     # __imul__
     
@@ -551,7 +560,7 @@ class DataContainer(object):
                 numpy.subtract(self.array, other.array, out=self.array)
             else:
                 raise ValueError('Dimensions do not match')
-        return self
+        #return self
     # __isub__
     
     def __idiv__(self, other):
@@ -562,7 +571,7 @@ class DataContainer(object):
                 numpy.divide(self.array, other.array, out=self.array)
             else:
                 raise ValueError('Dimensions do not match')
-        return self
+        #return self
     # __idiv__
     
     def __str__ (self, representation=False):

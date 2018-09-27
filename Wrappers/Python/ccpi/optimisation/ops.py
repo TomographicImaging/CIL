@@ -160,7 +160,9 @@ def PowerMethodNonsquare(op,numiters):
     #x0.fill(numpy.random.randn(*x0.shape))
     
     
-    x0 = op.create_image_data()
+    #x0 = op.create_image_data()
+    x0 = op.allocate_direct()
+    x0.fill(numpy.random.randn(*x0.shape))
     
     s = numpy.zeros(numiters)
     # Loop
@@ -183,15 +185,15 @@ class LinearOperatorMatrix(Operator):
         if out is None:
             return type(x)(numpy.dot(self.A,x.as_array()))
         else:
-            numpy.dot(self.A, x.as_array(), out=out)
-            return type(x)(out)
+            numpy.dot(self.A, x.as_array(), out=out.as_array())
+            
     
     def adjoint(self,x, out=None):
         if out is None:
             return type(x)(numpy.dot(self.A.transpose(),x.as_array()))
         else:
-            numpy.dot(self.A.transpose(),x.as_array(), out=out)
-            return type(x)(out)
+            numpy.dot(self.A.transpose(),x.as_array(), out=out.as_array())
+            
     
     def size(self):
         return self.A.shape
@@ -203,3 +205,15 @@ class LinearOperatorMatrix(Operator):
             return self.s1
         else:
             return self.s1
+    def allocate_direct(self):
+        '''allocates the memory to hold the result of adjoint'''
+        #numpy.dot(self.A.transpose(),x.as_array())
+        M_A, N_A = self.A.shape
+        out = numpy.zeros((N_A,1))
+        return DataContainer(out)
+    def allocate_adjoint(self):
+        '''allocate the memory to hold the result of direct'''
+        #numpy.dot(self.A.transpose(),x.as_array())
+        M_A, N_A = self.A.shape
+        out = numpy.zeros((M_A,1))
+        return DataContainer(out)

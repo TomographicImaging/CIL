@@ -522,6 +522,7 @@ class DataContainer(object):
     
     # in-place arithmetic operators:
     # (+=, -=, *=, /= , //=,
+    # must return self
     
     
     def __iadd__(self, other):
@@ -533,7 +534,7 @@ class DataContainer(object):
                 numpy.add(self.array, other.array, out=self.array)
             else:
                 raise ValueError('Dimensions do not match')
-        #return self
+        return self
     # __iadd__
     
     def __imul__(self, other):
@@ -549,8 +550,7 @@ class DataContainer(object):
                 numpy.multiply(self.array, other.array, out=self.array)
             else:
                 raise ValueError('Dimensions do not match')
-        #return self
-        #return self * other
+        return self
     # __imul__
     
     def __isub__(self, other):
@@ -561,7 +561,7 @@ class DataContainer(object):
                 numpy.subtract(self.array, other.array, out=self.array)
             else:
                 raise ValueError('Dimensions do not match')
-        #return self
+        return self
     # __isub__
     
     def __idiv__(self, other):
@@ -572,7 +572,7 @@ class DataContainer(object):
                 numpy.divide(self.array, other.array, out=self.array)
             else:
                 raise ValueError('Dimensions do not match')
-        #return self
+        return self
     # __idiv__
     
     def __str__ (self, representation=False):

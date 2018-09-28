@@ -31,7 +31,7 @@ class TestDataContainer(unittest.TestCase):
         self.assertEqual(ds.dimension_labels , {0: 'X', 1: 'Y', 2: 'Z', 3: 'W'})
         
     def testGb_creation_nocopy(self):
-        X,Y,Z = (self.X, self.Y, self.Z)
+        X,Y,Z = 512,512,512
         steps = [timer()]
         a = numpy.ones((X,Y,Z), dtype='float32')
         steps.append(timer())
@@ -57,18 +57,18 @@ class TestDataContainer(unittest.TestCase):
         print(t0)
         #print("a refcount " , sys.getrefcount(a))
         ds = DataContainer(a, False, ['X', 'Y','Z'])
-        ds.__iadd__( 2 )
-        #ds += 2
+        #ds.__iadd__( 2 )
+        ds += 2
         steps.append(timer())
         print(dt(steps))
         self.assertEqual(ds.as_array()[0][0][0],3.)
-        ds.__isub__( 2 ) 
-        #ds -= 2
+        #ds.__isub__( 2 ) 
+        ds -= 2
         steps.append(timer())
         print(dt(steps))
         self.assertEqual(ds.as_array()[0][0][0],1.)
-        ds.__imul__( 2 )
-        #ds *= 2
+        #ds.__imul__( 2 )
+        ds *= 2
         steps.append(timer())
         print(dt(steps))
         self.assertEqual(ds.as_array()[0][0][0],2.)
@@ -79,20 +79,20 @@ class TestDataContainer(unittest.TestCase):
         self.assertEqual(ds.as_array()[0][0][0],1.)
         
         ds1 = ds.copy()
-        ds1.__iadd__( 1 )
-        #ds1 += 1
-        ds.__iadd__( ds1 )
-        #ds += ds1
+        #ds1.__iadd__( 1 )
+        ds1 += 1
+        #ds.__iadd__( ds1 )
+        ds += ds1
         steps.append(timer())
         print(dt(steps))
         self.assertEqual(ds.as_array()[0][0][0],3.)
-        ds.__isub__( ds1 )
-        #ds -= ds1
+        #ds.__isub__( ds1 )
+        ds -= ds1
         steps.append(timer())
         print(dt(steps))
         self.assertEqual(ds.as_array()[0][0][0],1.)
-        ds.__imul__( ds1 )
-        #ds *= ds1
+        #ds.__imul__( ds1 )
+        ds *= ds1
         steps.append(timer())
         print(dt(steps))
         self.assertEqual(ds.as_array()[0][0][0],2.)

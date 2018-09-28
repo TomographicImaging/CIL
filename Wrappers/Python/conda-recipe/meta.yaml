@@ -19,6 +19,10 @@ requirements:
     - python
     - numpy
     - matplotlib
+  run:
+    - python
+    - numpy
+    - cvxpy
 	
 about:
   home: http://www.ccpi.ac.uk

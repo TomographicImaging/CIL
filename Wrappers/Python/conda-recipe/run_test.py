@@ -1,9 +1,24 @@
 import unittest
 import numpy
-from ccpi.framework import DataContainer, ImageData, AcquisitionData, \
-  ImageGeometry, AcquisitionGeometry
+import numpy as np
+from ccpi.framework import DataContainer
+from ccpi.framework import ImageData
+from ccpi.framework import AcquisitionData
+from ccpi.framework import ImageGeometry
+from ccpi.framework import AcquisitionGeometry
 import sys
 from timeit import default_timer as timer
+from ccpi.optimisation.algs import FISTA
+from ccpi.optimisation.funcs import Norm2sq
+from ccpi.optimisation.funcs import ZeroFun
+from ccpi.optimisation.funcs import Norm1
+from ccpi.optimisation.funcs import TV2D
+
+from ccpi.optimisation.ops import LinearOperatorMatrix
+from ccpi.optimisation.ops import TomoIdentity
+
+from cvxpy import *
+
 
 def aid(x):
     # This function returns the memory
@@ -432,6 +447,70 @@ class TestDataContainer(unittest.TestCase):
             res = False
             print (err)
         self.assertTrue(res)
+
+    
+    def assertNumpyArrayAlmostEqual(self, first, second, decimal=6):
+        res = True
+        try:
+            numpy.testing.assert_array_almost_equal(first, second, decimal)
+        except AssertionError as err:
+            res = False
+            print (err)
+        self.assertTrue(res)
+    def test_FISTA(self):
+        # Problem data.
+        m = 30
+        n = 20
+        np.random.seed(1)
+        Amat = np.random.randn(m, n)
+        A = LinearOperatorMatrix(Amat)
+        bmat = np.random.randn(m)
+        bmat.shape = (bmat.shape[0],1)
+        
+        # A = Identity()
+        # Change n to equal to m.
+        
+        b = DataContainer(bmat)
+        
+        # Regularization parameter
+        lam = 10
+        opt = {'memopt':True}
+        # Create object instances with the test data A and b.
+        f = Norm2sq(A,b,c=0.5, memopt=True)
+        g0 = ZeroFun()
+        
+        # Initial guess
+        x_init = DataContainer(np.zeros((n,1)))
+        
+        f.grad(x_init)
+        
+        # Run FISTA for least squares plus zero function.
+        x_fista0, it0, timing0, criter0 = FISTA(x_init, f, g0 , opt=opt)
+        
+        # Print solution and final objective/criterion value for comparison
+        print("FISTA least squares plus zero function solution and objective value:")
+        print(x_fista0.array)
+        print(criter0[-1])
+        
+        # Compare to CVXPY
+          
+        # Construct the problem.
+        x0 = Variable(n)
+        objective0 = Minimize(0.5*sum_squares(Amat*x0 - bmat.T[0]) )
+        prob0 = Problem(objective0)
+          
+        # The optimal objective is returned by prob.solve().
+        result0 = prob0.solve(verbose=False,solver=SCS,eps=1e-9)
+            
+        # The optimal solution for x is stored in x.value and optimal objective value 
+        # is in result as well as in objective.value
+        print("CVXPY least squares plus zero function solution and objective value:")
+        print(x0.value)
+        print(objective0.value)
+        self.assertTrue(True)
+        self.assertNumpyArrayAlmostEqual(
+                 numpy.squeeze(x_fista0.array),x0.value,6)
+        
 # =============================================================================
 #     def test_upper(self):
 #         self.assertEqual('foo'.upper(), 'FOO')

@@ -3,7 +3,7 @@ from ccpi.framework import ImageData, ImageGeometry, AcquisitionGeometry, DataCo
 from ccpi.optimisation.algs import FISTA, FBPD, CGLS
 from ccpi.optimisation.funcs import Norm2sq, ZeroFun, Norm1, TV2D
 
-from ccpi.optimisation.ops import LinearOperatorMatrix, Identity
+from ccpi.optimisation.ops import LinearOperatorMatrix, TomoIdentity
 
 # Requires CVXPY, see http://www.cvxpy.org/
 # CVXPY can be installed in anaconda using
@@ -33,9 +33,9 @@ b = DataContainer(bmat)
 
 # Regularization parameter
 lam = 10
-
+opt = {'memopt':True}
 # Create object instances with the test data A and b.
-f = Norm2sq(A,b,c=0.5)
+f = Norm2sq(A,b,c=0.5, memopt=True)
 g0 = ZeroFun()
 
 # Initial guess
@@ -44,7 +44,7 @@ x_init = DataContainer(np.zeros((n,1)))
 f.grad(x_init)
 
 # Run FISTA for least squares plus zero function.
-x_fista0, it0, timing0, criter0 = FISTA(x_init, f, g0)
+x_fista0, it0, timing0, criter0 = FISTA(x_init, f, g0 , opt=opt)
 
 # Print solution and final objective/criterion value for comparison
 print("FISTA least squares plus zero function solution and objective value:")
@@ -56,7 +56,7 @@ if use_cvxpy:
     
     # Construct the problem.
     x0 = Variable(n)
-    objective0 = Minimize(0.5*sum_squares(Amat*x0 - bmat) )
+    objective0 = Minimize(0.5*sum_squares(Amat*x0 - bmat.T[0]) )
     prob0 = Problem(objective0)
     
     # The optimal objective is returned by prob.solve().
@@ -83,7 +83,7 @@ g1(x_init)
 g1.prox(x_init,0.02)
 
 # Combine with least squares and solve using generic FISTA implementation
-x_fista1, it1, timing1, criter1 = FISTA(x_init, f, g1)
+x_fista1, it1, timing1, criter1 = FISTA(x_init, f, g1,opt=opt)
 
 # Print for comparison
 print("FISTA least squares plus 1-norm solution and objective value:")
@@ -95,7 +95,7 @@ if use_cvxpy:
     
     # Construct the problem.
     x1 = Variable(n)
-    objective1 = Minimize(0.5*sum_squares(Amat*x1 - bmat) + lam*norm(x1,1) )
+    objective1 = Minimize(0.5*sum_squares(Amat*x1 - bmat.T[0]) + lam*norm(x1,1) )
     prob1 = Problem(objective1)
     
     # The optimal objective is returned by prob.solve().
@@ -147,7 +147,7 @@ plt.title('Phantom image')
 plt.show()
 
 # Identity operator for denoising
-I = Identity()
+I = TomoIdentity(ig)
 
 # Data and add noise
 y = I.direct(Phantom)
@@ -158,7 +158,7 @@ plt.title('Noisy image')
 plt.show()
 
 # Data fidelity term
-f_denoise = Norm2sq(I,y,c=0.5)
+f_denoise = Norm2sq(I,y,c=0.5,memopt=True)
 
 # 1-norm regulariser
 lam1_denoise = 1.0
@@ -168,7 +168,7 @@ g1_denoise = Norm1(lam1_denoise)
 x_init_denoise = ImageData(np.zeros((N,N)))
 
 # Combine with least squares and solve using generic FISTA implementation
-x_fista1_denoise, it1_denoise, timing1_denoise, criter1_denoise = FISTA(x_init_denoise, f_denoise, g1_denoise)
+x_fista1_denoise, it1_denoise, timing1_denoise, criter1_denoise = FISTA(x_init_denoise, f_denoise, g1_denoise, opt=opt)
 
 print(x_fista1_denoise)
 print(criter1_denoise[-1])

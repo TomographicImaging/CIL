@@ -346,14 +346,15 @@ class DataContainer(object):
         if dimension == {}:
             if issubclass(type(array), DataContainer) or\
                issubclass(type(array), numpy.ndarray):
-                if array.shape != self.array.shape:
+                if array.shape != self.shape:
                     raise ValueError('Cannot fill with the provided array.' + \
                                      'Expecting {0} got {1}'.format(
-                                     self.array.shape,array.shape))
+                                     self.shape,array.shape))
                 if issubclass(type(array), DataContainer):
-                    self.array = array.array[:]
+                    numpy.copyto(self.array, array.array)
                 else:
-                    self.array = array[:]
+                    #self.array[:] = array
+                    numpy.copyto(self.array, array)
         else:
             
             command = 'self.array['

@@ -153,7 +153,7 @@ class Norm2sq(Function):
     
     def grad(self,x):
         #return 2*self.c*self.A.adjoint( self.A.direct(x) - self.b )
-        return 2.0*self.c*self.A.adjoint( self.A.direct(x) - self.b )
+        return (2.0*self.c)*self.A.adjoint( self.A.direct(x) - self.b )
     
     def __call__(self,x):
         #return self.c* np.sum(np.square((self.A.direct(x) - self.b).ravel()))

@@ -4,6 +4,7 @@ from ccpi.optimisation.algs import FISTA, FBPD, CGLS
 from ccpi.optimisation.funcs import Norm2sq, ZeroFun, Norm1, TV2D
 
 from ccpi.optimisation.ops import LinearOperatorMatrix, Identity
+from ccpi.optimisation.ops import TomoIdentity
 
 # Requires CVXPY, see http://www.cvxpy.org/
 # CVXPY can be installed in anaconda using
@@ -103,7 +104,7 @@ plt.show()
 # Set up phantom size NxN by creating ImageGeometry, initialising the 
 # ImageData object with this geometry and empty array and finally put some
 # data into its array, and display as image.
-N = 64
+N = 1000
 ig = ImageGeometry(voxel_num_x=N,voxel_num_y=N)
 Phantom = ImageData(geometry=ig)
 
@@ -116,7 +117,7 @@ plt.title('Phantom image')
 plt.show()
 
 # Identity operator for denoising
-I = Identity()
+I = TomoIdentity(ig)
 
 # Data and add noise
 y = I.direct(Phantom)
@@ -128,7 +129,7 @@ plt.title('Noisy image')
 plt.show()
 
 # Data fidelity term
-f_denoise = Norm2sq(I,y,c=0.5)
+f_denoise = Norm2sq(I,y,c=0.5, memopt=True)
 
 # 1-norm regulariser
 lam1_denoise = 1.0
@@ -136,10 +137,13 @@ g1_denoise = Norm1(lam1_denoise)
 
 # Initial guess
 x_init_denoise = ImageData(np.zeros((N,N)))
-
+opt = {'memopt': False, 'iter' : 50}
 # Combine with least squares and solve using generic FISTA implementation
+print ("no memopt")
 x_fista1_denoise, it1_denoise, timing1_denoise, \
-        criter1_denoise = FISTA(x_init_denoise, f_denoise, g1_denoise)
+        criter1_denoise = FISTA(x_init_denoise, f_denoise, g1_denoise, opt=opt)
+opt = {'memopt': True, 'iter' : 50}        
+print ("yes memopt")
 x_fista1_denoise_m, it1_denoise_m, timing1_denoise_m, \
       criter1_denoise_m = FISTA(x_init_denoise, f_denoise, g1_denoise, opt=opt)
 
@@ -154,6 +158,12 @@ plt.show()
 plt.figure()
 plt.imshow(x_fista1_denoise_m.as_array())
 plt.title('FISTA LS+1 memopt')
+plt.show()
+
+plt.figure()
+plt.loglog(iternum,criter1_denoise,label='FISTA LS+1')
+plt.loglog(iternum,criter1_denoise_m,label='FISTA LS+1 memopt')
+plt.legend()
 plt.show()
 #%%
 # Now denoise LS + 1-norm with FBPD

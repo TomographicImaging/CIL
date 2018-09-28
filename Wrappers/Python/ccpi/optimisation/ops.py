@@ -39,6 +39,10 @@ class Operator(object):
         raise NotImplementedError
     def get_max_sing_val(self):
         raise NotImplementedError
+    def allocate_direct(self):
+        raise NotImplementedError
+    def allocate_adjoint(self):
+        raise NotImplementedError
 
 class Identity(Operator):
     def __init__(self):
@@ -62,6 +66,41 @@ class Identity(Operator):
     
     def get_max_sing_val(self):
         return self.s1
+
+class TomoIdentity(Operator):
+    def __init__(self, geometry, **kwargs):
+        self.s1 = 1.0
+        self.geometry = geometry
+        super(TomoIdentity, self).__init__()
+        
+    def direct(self,x,out=None):
+        if out is None:
+            return x.copy()
+        else:
+            out.fill(x)
+    
+    def adjoint(self,x, out=None):
+        if out is None:
+            return x.copy()
+        else:
+            out.fill(x)
+    
+    def size(self):
+        return NotImplemented
+    
+    def get_max_sing_val(self):
+        return self.s1
+    def allocate_direct(self):
+        if issubclass(type(self.geometry), ImageGeometry):
+            return ImageData(geometry=self.geometry)
+        elif issubclass(type(self.geometry), AcquisitionGeometry):
+            return AcquisitionData(geometry=self.geometry)
+        else:
+            raise ValueError("Wrong geometry type: expected ImageGeometry of AcquisitionGeometry, got ", type(self.geometry))
+    def allocate_adjoint(self):
+        return self.allocate_direct()
+    
+    
 
 class FiniteDiff2D(Operator):
     def __init__(self):

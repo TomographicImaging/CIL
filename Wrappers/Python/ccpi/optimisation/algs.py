@@ -101,7 +101,7 @@ def FISTA(x_init, f=None, g=None, opt=None):
             
             y = x + (t_old-1)/t*(x-x_old)
             
-            x_old = x
+            x_old = x.copy()
             t_old = t
         
         # time and criterion

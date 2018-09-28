@@ -31,7 +31,7 @@ class TestDataContainer(unittest.TestCase):
         self.assertEqual(ds.dimension_labels , {0: 'X', 1: 'Y', 2: 'Z', 3: 'W'})
         
     def testGb_creation_nocopy(self):
-        X,Y,Z = 1024,1024,512
+        X,Y,Z = (self.X, self.Y, self.Z)
         steps = [timer()]
         a = numpy.ones((X,Y,Z), dtype='float32')
         steps.append(timer())
@@ -49,7 +49,7 @@ class TestDataContainer(unittest.TestCase):
         
     def testInlineAlgebra(self):
         print ("Test Inline Algebra")
-        X,Y,Z = 1024,1024,512
+        X,Y,Z = 1024,512,512
         steps = [timer()]
         a = numpy.ones((X,Y,Z), dtype='float32')
         steps.append(timer())
@@ -57,37 +57,46 @@ class TestDataContainer(unittest.TestCase):
         print(t0)
         #print("a refcount " , sys.getrefcount(a))
         ds = DataContainer(a, False, ['X', 'Y','Z'])
-        ds += 2
+        ds.__iadd__( 2 )
+        #ds += 2
         steps.append(timer())
         print(dt(steps))
         self.assertEqual(ds.as_array()[0][0][0],3.)
-        ds -= 2
+        ds.__isub__( 2 ) 
+        #ds -= 2
         steps.append(timer())
         print(dt(steps))
         self.assertEqual(ds.as_array()[0][0][0],1.)
-        ds *= 2
+        ds.__imul__( 2 )
+        #ds *= 2
         steps.append(timer())
         print(dt(steps))
         self.assertEqual(ds.as_array()[0][0][0],2.)
+        #ds.__idiv__( 2 )
         ds /= 2
         steps.append(timer())
         print(dt(steps))
         self.assertEqual(ds.as_array()[0][0][0],1.)
         
         ds1 = ds.copy()
-        ds1 += 1
-        ds += ds1
+        ds1.__iadd__( 1 )
+        #ds1 += 1
+        ds.__iadd__( ds1 )
+        #ds += ds1
         steps.append(timer())
         print(dt(steps))
         self.assertEqual(ds.as_array()[0][0][0],3.)
-        ds -= ds1
+        ds.__isub__( ds1 )
+        #ds -= ds1
         steps.append(timer())
         print(dt(steps))
         self.assertEqual(ds.as_array()[0][0][0],1.)
-        ds *= ds1
+        ds.__imul__( ds1 )
+        #ds *= ds1
         steps.append(timer())
         print(dt(steps))
         self.assertEqual(ds.as_array()[0][0][0],2.)
+        #ds.__idiv__( ds1 )
         ds /= ds1
         steps.append(timer())
         print(dt(steps))
@@ -96,7 +105,7 @@ class TestDataContainer(unittest.TestCase):
         
     def test_unary_operations(self):
         print ("Test unary operations")
-        X,Y,Z = 1024,1024,512
+        X,Y,Z = 1024,512,512
         steps = [timer()]
         a = -numpy.ones((X,Y,Z), dtype='float32')
         steps.append(timer())
@@ -115,7 +124,7 @@ class TestDataContainer(unittest.TestCase):
         print(dt(steps))
         self.assertEqual(ds.as_array()[0][0][0],1.)
         
-        ds*=2
+        ds.__imul__( 2 )
         ds.sqrt(out=ds)
         steps.append(timer())
         print(dt(steps))
@@ -131,7 +140,7 @@ class TestDataContainer(unittest.TestCase):
     
     def binary_add(self):
         print ("Test binary add")
-        X,Y,Z = 1024,1024,512
+        X,Y,Z = 512,512,512
         steps = [timer()]
         a = numpy.ones((X,Y,Z), dtype='float32')
         steps.append(timer())
@@ -170,7 +179,7 @@ class TestDataContainer(unittest.TestCase):
     
     def binary_subtract(self):
         print ("Test binary subtract")
-        X,Y,Z = 1024,1024,512
+        X,Y,Z = 512,512,512
         steps = [timer()]
         a = numpy.ones((X,Y,Z), dtype='float32')
         steps.append(timer())
@@ -197,8 +206,11 @@ class TestDataContainer(unittest.TestCase):
         
         self.assertLess(t1,t2)
         
-        ds0 = ds
+        del ds1
+        ds0 = ds.copy()
+        steps.append(timer())
         ds0.subtract(2,out=ds0)
+        #ds0.__isub__( 2 )
         steps.append(timer())
         print ("ds0.subtract(2,out=ds0)", dt(steps), -2. , ds0.as_array()[0][0][0])
         self.assertEqual(-2., ds0.as_array()[0][0][0])
@@ -214,7 +226,7 @@ class TestDataContainer(unittest.TestCase):
        
     def binary_multiply(self):
         print ("Test binary multiply")
-        X,Y,Z = 1024,1024,512
+        X,Y,Z = 1024,512,512
         steps = [timer()]
         a = numpy.ones((X,Y,Z), dtype='float32')
         steps.append(timer())
@@ -254,7 +266,7 @@ class TestDataContainer(unittest.TestCase):
     
     def binary_divide(self):
         print ("Test binary divide")
-        X,Y,Z = 1024,1024,512
+        X,Y,Z = 1024,512,512
         steps = [timer()]
         a = numpy.ones((X,Y,Z), dtype='float32')
         steps.append(timer())

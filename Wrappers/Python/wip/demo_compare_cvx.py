@@ -229,7 +229,8 @@ if use_cvxpy:
     # Compare to CVXPY
     
     # Construct the problem.
-    xtv_denoise = Variable(N,N)
+    xtv_denoise = Variable((N,N))
+    print (xtv_denoise.shape)
     objectivetv_denoise = Minimize(0.5*sum_squares(xtv_denoise - y.array) + lam_tv*tv(xtv_denoise) )
     probtv_denoise = Problem(objectivetv_denoise)
     

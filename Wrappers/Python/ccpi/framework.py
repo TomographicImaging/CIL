@@ -994,8 +994,9 @@ class DataProcessor(object):
         raise NotImplementedError('Implement basic checks for input DataContainer')
         
     def get_output(self):
-        if None in self.__dict__.values():
-            raise ValueError('Not all parameters have been passed')
+        for k,v in self.__dict__.items():
+            if v is None:
+                raise ValueError('Key {0} is None'.format(k))
         shouldRun = False
         if self.runTime == -1:
             shouldRun = True

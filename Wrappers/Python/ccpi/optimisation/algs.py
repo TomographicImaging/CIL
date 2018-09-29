@@ -43,22 +43,22 @@ def FISTA(x_init, f=None, g=None, opt=None):
     
     # algorithmic parameters
     if opt is None: 
-        opt = {'tol': 1e-4, 'iter': 1000}
-    else:
-        try:
-            max_iter = opt['iter']
-        except KeyError as ke:
-            opt[ke] = 1000
-        try:
-            opt['tol'] = 1000
-        except KeyError as ke:
-            opt[ke] = 1e-4
-    tol = opt['tol']
-    max_iter = opt['iter']
+        opt = {'tol': 1e-4, 'iter': 1000, 'memopt':False}
     
+    max_iter = opt['iter'] if 'iter' in opt.keys() else 1000
+    tol = opt['tol'] if 'tol' in opt.keys() else 1e-4
+    memopt = opt['memopt'] if 'memopt' in opt.keys() else False
+        
+        
     # initialization
-    x_old = x_init
-    y = x_init;
+    if memopt:
+        y = x_init.clone()
+        x_old = x_init.clone()
+        x = x_init.clone()
+        u = x_init.clone()
+    else:
+        x_old = x_init
+        y = x_init;
     
     timing = numpy.zeros(max_iter)
     criter = numpy.zeros(max_iter)
@@ -66,22 +66,44 @@ def FISTA(x_init, f=None, g=None, opt=None):
     invL = 1/f.L
     
     t_old = 1
+    
+    c = f(x_init) + g(x_init)
 
     # algorithm loop
     for it in range(0, max_iter):
     
         time0 = time.time()
-        
-        u = y - invL*f.grad(y)
-        
-        x = g.prox(u,invL)
-        
-        t = 0.5*(1 + numpy.sqrt(1 + 4*(t_old**2)))
-        
-        y = x + (t_old-1)/t*(x-x_old)
-        
-        x_old = x
-        t_old = t
+        if memopt:
+            # u = y - invL*f.grad(y)
+            # store the result in x_old
+            f.gradient(y, out=u)
+            u.__imul__( -invL )
+            u.__iadd__( y )
+            # x = g.prox(u,invL)
+            g.proximal(u, invL, out=x)
+            
+            t = 0.5*(1 + numpy.sqrt(1 + 4*(t_old**2)))
+            
+            # y = x + (t_old-1)/t*(x-x_old)
+            x.subtract(x_old, out=y)
+            y.__imul__ ((t_old-1)/t)
+            y.__iadd__( x )
+            
+            x_old.fill(x)
+            t_old = t
+            
+            
+        else:
+            u = y - invL*f.grad(y)
+            
+            x = g.prox(u,invL)
+            
+            t = 0.5*(1 + numpy.sqrt(1 + 4*(t_old**2)))
+            
+            y = x + (t_old-1)/t*(x-x_old)
+            
+            x_old = x.copy()
+            t_old = t
         
         # time and criterion
         timing[it] = time.time() - time0
@@ -93,7 +115,7 @@ def FISTA(x_init, f=None, g=None, opt=None):
     
         #print(it, 'out of', 10, 'iterations', end='\r');
 
-    criter = criter[0:it+1];
+    #criter = criter[0:it+1];
     timing = numpy.cumsum(timing[0:it+1]);
     
     return x, it, timing, criter
@@ -127,6 +149,7 @@ def FBPD(x_init, f=None, g=None, h=None, opt=None):
             opt[ke] = 1e-4
     tol = opt['tol']
     max_iter = opt['iter']
+    memopt = opt['memopts'] if 'memopts' in opt.keys() else False
     
     # step-sizes
     tau   = 2 / (g.L + 2);
@@ -141,6 +164,9 @@ def FBPD(x_init, f=None, g=None, h=None, opt=None):
     timing = numpy.zeros(max_iter)
     criter = numpy.zeros(max_iter)
 
+    
+    
+        
     # algorithm loop
     for it in range(0, max_iter):
     

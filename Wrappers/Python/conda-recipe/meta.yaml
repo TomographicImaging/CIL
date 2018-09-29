@@ -20,6 +20,10 @@ requirements:
     - numpy
     - scipy
     - matplotlib
+  run:
+    - python
+    - numpy
+    - cvxpy
 	
 about:
   home: http://www.ccpi.ac.uk

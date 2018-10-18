@@ -38,12 +38,12 @@ def isSizeCorrect(data1 ,data2):
         
 class Function(object):
     def __init__(self):
-        self.op = Identity()
-    def __call__(self,x, out=None):       return 0
-    def grad(self, x):                    return 0
-    def prox(self, x, tau):               return x
-    def gradient(self, x, out=None):      return self.grad(x)
-    def proximal(self, x, tau, out=None): return self.prox(x, tau)
+        pass
+    def __call__(self,x, out=None):       raise NotImplementedError 
+    def grad(self, x):                    raise NotImplementedError
+    def prox(self, x, tau):               raise NotImplementedError
+    def gradient(self, x, out=None):      raise NotImplementedError
+    def proximal(self, x, tau, out=None): raise NotImplementedError
 
 class Norm2(Function):
     

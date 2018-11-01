@@ -221,6 +221,13 @@ class Norm1(Function):
     
     def prox(self,x,tau):
         return (x.abs() - tau*self.gamma).maximum(0) * x.sign()
+    def proximal(self,x,tau, out=None):
+        if out is None:
+            return self.prox(x,tau)
+        else:
+            y = (x.abs() - tau*self.gamma).maximum(0) * x.sign()
+            out.fill (x)
+
 
 # Box constraints indicator function. Calling returns 0 if argument is within 
 # the box. The prox operator is projection onto the box. Only implements one 

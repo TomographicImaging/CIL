@@ -159,7 +159,7 @@ def FBPD(x_init, f=None, g=None, h=None, opt=None):
 
     # initialization
     x = x_init
-    y = h.op.direct(x);
+    y = f.A.direct(x);
     
     timing = numpy.zeros(max_iter)
     criter = numpy.zeros(max_iter)
@@ -174,16 +174,16 @@ def FBPD(x_init, f=None, g=None, h=None, opt=None):
     
         # primal forward-backward step
         x_old = x;
-        x = x - tau * ( g.grad(x) + h.op.adjoint(y) );
+        x = x - tau * ( g.grad(x) + f.A.adjoint(y) );
         x = f.prox(x, tau);
     
         # dual forward-backward step
-        y = y + sigma * h.op.direct(2*x - x_old);
+        y = y + sigma * f.A.direct(2*x - x_old);
         y = y - sigma * h.prox(inv_sigma*y, inv_sigma);   
 
         # time and criterion
         timing[it] = time.time() - t
-        criter[it] = f(x) + g(x) + h(h.op.direct(x));
+        criter[it] = f(x) + g(x) + h(f.A.direct(x));
            
         # stopping rule
         #if np.linalg.norm(x - x_old) < tol * np.linalg.norm(x_old) and it > 10:

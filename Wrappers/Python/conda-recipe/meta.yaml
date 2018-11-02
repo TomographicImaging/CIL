@@ -1,6 +1,6 @@
 package:
   name: ccpi-framework
-  version: 0.11.0
+  version: 0.11.1
 
 
 build:
@@ -12,7 +12,6 @@ build:
 requirements:
   build:
     - python
-    - numpy
     - setuptools
 
   run:
@@ -23,7 +22,7 @@ requirements:
   run:
     - python
     - numpy
-    - cvxpy
+    - cvxpy # [not win]
     - scipy
     - matplotlib
 	

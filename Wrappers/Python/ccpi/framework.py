@@ -344,13 +344,17 @@ class DataContainer(object):
     def fill(self, array, **dimension):
         '''fills the internal numpy array with the one provided'''
         if dimension == {}:
-            if numpy.shape(array) != numpy.shape(self.array):
-                raise ValueError('Cannot fill with the provided array.' + \
-                                 'Expecting {0} got {1}'.format(
-                                         numpy.shape(self.array),
-                                         numpy.shape(array)))
-            # copy by reference, does not require more memory
-            self.array = array
+            if issubclass(type(array), DataContainer) or\
+               issubclass(type(array), numpy.ndarray):
+                if array.shape != self.shape:
+                    raise ValueError('Cannot fill with the provided array.' + \
+                                     'Expecting {0} got {1}'.format(
+                                     self.shape,array.shape))
+                if issubclass(type(array), DataContainer):
+                    numpy.copyto(self.array, array.array)
+                else:
+                    #self.array[:] = array
+                    numpy.copyto(self.array, array)
         else:
             
             command = 'self.array['
@@ -373,7 +377,8 @@ class DataContainer(object):
     
     ## algebra 
     
-    def __add__(self, other , *args, out=None, **kwargs):
+
+    def __add__(self, other , out=None, *args, **kwargs):
         if issubclass(type(other), DataContainer):    
             if self.check_dimensions(other):
                 out = self.as_array() + other.as_array()
@@ -518,6 +523,8 @@ class DataContainer(object):
     
     # in-place arithmetic operators:
     # (+=, -=, *=, /= , //=,
+    # must return self
+    
     
     
     def __iadd__(self, other):
@@ -533,14 +540,18 @@ class DataContainer(object):
     
     def __imul__(self, other):
         if isinstance(other, (int, float)) :
-            numpy.multiply(self.array, other, out=self.array)
+            #print ("__imul__", self.array.shape)
+            #print ("type(self)", type(self))
+            #print ("self.array", self.array, other)
+            arr = self.as_array()
+            #print ("arr", arr)
+            numpy.multiply(arr, other, out=arr)
         elif issubclass(type(other), DataContainer):
             if self.check_dimensions(other):
                 numpy.multiply(self.array, other.array, out=self.array)
             else:
                 raise ValueError('Dimensions do not match')
         return self
-        #return self * other
     # __imul__
     
     def __isub__(self, other):
@@ -623,7 +634,8 @@ class DataContainer(object):
     
     ## binary operations
             
-    def pixel_wise_binary(self,pwop, x2 , *args, out=None,  **kwargs):    
+
+    def pixel_wise_binary(self,pwop, x2 , out=None, *args,  **kwargs):    
         if out is None:
             if isinstance(x2, (int, float, complex)):
                 out = pwop(self.as_array() , x2 , *args, **kwargs )
@@ -663,19 +675,20 @@ class DataContainer(object):
         else:
             raise ValueError (message(type(self),  "incompatible class:" , pwop.__name__, type(out)))
     
-    def add(self, other , *args, out=None, **kwargs):
+
+    def add(self, other , out=None, *args, **kwargs):
         return self.pixel_wise_binary(numpy.add, other, *args, out=out, **kwargs)
     
-    def subtract(self, other , *args, out=None, **kwargs):
+    def subtract(self, other, out=None , *args, **kwargs):
         return self.pixel_wise_binary(numpy.subtract, other, *args, out=out, **kwargs)
 
-    def multiply(self, other , *args, out=None, **kwargs):
+    def multiply(self, other , out=None, *args, **kwargs):
         return self.pixel_wise_binary(numpy.multiply, other, *args, out=out, **kwargs)
     
-    def divide(self, other , *args, out=None, **kwargs):
+    def divide(self, other , out=None ,*args, **kwargs):
         return self.pixel_wise_binary(numpy.divide, other, *args, out=out, **kwargs)
     
-    def power(self, other , *args, out=None, **kwargs):
+    def power(self, other , out=None, *args, **kwargs):
         return self.pixel_wise_binary(numpy.power, other, *args, out=out, **kwargs)
     
     def maximum(self,x2, out=None):
@@ -683,7 +696,8 @@ class DataContainer(object):
     
     ## unary operations
     
-    def pixel_wise_unary(self,pwop, *args, out=None,  **kwargs):
+
+    def pixel_wise_unary(self,pwop, out=None, *args,  **kwargs):
         if out is None:
             out = pwop(self.as_array() , *args, **kwargs )
             return type(self)(out,

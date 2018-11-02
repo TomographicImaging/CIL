@@ -4,6 +4,7 @@ from ccpi.optimisation.algs import FISTA, FBPD, CGLS
 from ccpi.optimisation.funcs import Norm2sq, ZeroFun, Norm1, TV2D
 
 from ccpi.optimisation.ops import LinearOperatorMatrix, TomoIdentity
+from ccpi.optimisation.ops import Identity
 
 # Requires CVXPY, see http://www.cvxpy.org/
 # CVXPY can be installed in anaconda using
@@ -80,8 +81,22 @@ plt.show()
 g1 = Norm1(lam)
 
 g1(x_init)
-g1.prox(x_init,0.02)
+x_rand = DataContainer(np.reshape(np.random.rand(n),(n,1)))
+x_rand2 = DataContainer(np.reshape(np.random.rand(n-1),(n-1,1)))
+v = g1.prox(x_rand,0.02)
+#vv = g1.prox(x_rand2,0.02)
+vv = v.copy() 
+vv *= 0
+print (">>>>>>>>>>vv" , vv.as_array())
+vv.fill(v)
+print (">>>>>>>>>>fill" , vv.as_array())
+g1.proximal(x_rand, 0.02, out=vv)
+print (">>>>>>>>>>v" , v.as_array())
+print (">>>>>>>>>>gradient" , vv.as_array())
 
+print (">>>>>>>>>>" , (v-vv).as_array())
+import sys
+#sys.exit(0)
 # Combine with least squares and solve using generic FISTA implementation
 x_fista1, it1, timing1, criter1 = FISTA(x_init, f, g1,opt=opt)
 
@@ -108,7 +123,7 @@ if use_cvxpy:
     print(objective1.value)
     
 # Now try another algorithm FBPD for same problem:
-x_fbpd1, itfbpd1, timingfbpd1, criterfbpd1 = FBPD(x_init, None, f, g1)
+x_fbpd1, itfbpd1, timingfbpd1, criterfbpd1 = FBPD(x_init,Identity(), None, f, g1)
 print(x_fbpd1)
 print(criterfbpd1[-1])
 
@@ -178,7 +193,8 @@ plt.title('FISTA LS+1')
 plt.show()
 
 # Now denoise LS + 1-norm with FBPD
-x_fbpd1_denoise, itfbpd1_denoise, timingfbpd1_denoise, criterfbpd1_denoise = FBPD(x_init_denoise, None, f_denoise, g1_denoise)
+x_fbpd1_denoise, itfbpd1_denoise, timingfbpd1_denoise, \
+  criterfbpd1_denoise = FBPD(x_init_denoise, I, None, f_denoise, g1_denoise)
 print(x_fbpd1_denoise)
 print(criterfbpd1_denoise[-1])
 
@@ -217,7 +233,8 @@ gtv(gtv.op.direct(x_init_denoise))
 
 opt_tv = {'tol': 1e-4, 'iter': 10000}
 
-x_fbpdtv_denoise, itfbpdtv_denoise, timingfbpdtv_denoise, criterfbpdtv_denoise = FBPD(x_init_denoise, None, f_denoise, gtv,opt=opt_tv)
+x_fbpdtv_denoise, itfbpdtv_denoise, timingfbpdtv_denoise, \
+ criterfbpdtv_denoise = FBPD(x_init_denoise, gtv.op, None, f_denoise, gtv,opt=opt_tv)
 print(x_fbpdtv_denoise)
 print(criterfbpdtv_denoise[-1])
 
@@ -230,7 +247,7 @@ if use_cvxpy:
     
     # Construct the problem.
     xtv_denoise = Variable((N,N))
-    print (xtv_denoise.shape)
+    #print (xtv_denoise.value.shape)
     objectivetv_denoise = Minimize(0.5*sum_squares(xtv_denoise - y.array) + lam_tv*tv(xtv_denoise) )
     probtv_denoise = Problem(objectivetv_denoise)
     

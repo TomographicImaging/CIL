@@ -21,6 +21,7 @@ import numpy
 import time
 
 from ccpi.optimisation.funcs import Function
+from ccpi.optimisation.funcs import ZeroFun
 from ccpi.framework import ImageData, AcquisitionData
 
 def FISTA(x_init, f=None, g=None, opt=None):
@@ -38,8 +39,8 @@ def FISTA(x_init, f=None, g=None, opt=None):
       opt: additional algorithm 
     '''
     # default inputs
-    if f   is None: f = Function()
-    if g   is None: g = Function()
+    if f   is None: f = ZeroFun()
+    if g   is None: g = ZeroFun()
     
     # algorithmic parameters
     if opt is None: 
@@ -120,7 +121,8 @@ def FISTA(x_init, f=None, g=None, opt=None):
     
     return x, it, timing, criter
 
-def FBPD(x_init, f=None, g=None, h=None, opt=None):
+def FBPD(x_init, operator=None, constraint=None, data_fidelity=None,\
+         regulariser=None, opt=None):
     '''FBPD Algorithm
     
     Parameters:
@@ -131,9 +133,9 @@ def FBPD(x_init, f=None, g=None, h=None, opt=None):
       opt: additional algorithm 
     '''
     # default inputs
-    if f   is None: f = Function()
-    if g   is None: g = Function()
-    if h   is None: h = Function()
+    if constraint    is None: constraint    = ZeroFun()
+    if data_fidelity is None: data_fidelity = ZeroFun()
+    if regulariser   is None: regulariser   = ZeroFun()
     
     # algorithmic parameters
     if opt is None: 
@@ -152,14 +154,14 @@ def FBPD(x_init, f=None, g=None, h=None, opt=None):
     memopt = opt['memopts'] if 'memopts' in opt.keys() else False
     
     # step-sizes
-    tau   = 2 / (g.L + 2);
-    sigma = (1/tau - g.L/2) / h.L;
+    tau   = 2 / (data_fidelity.L + 2);
+    sigma = (1/tau - data_fidelity.L/2) / regulariser.L;
     
     inv_sigma = 1/sigma
 
     # initialization
     x = x_init
-    y = h.op.direct(x);
+    y = operator.direct(x);
     
     timing = numpy.zeros(max_iter)
     criter = numpy.zeros(max_iter)
@@ -174,23 +176,23 @@ def FBPD(x_init, f=None, g=None, h=None, opt=None):
     
         # primal forward-backward step
         x_old = x;
-        x = x - tau * ( g.grad(x) + h.op.adjoint(y) );
-        x = f.prox(x, tau);
+        x = x - tau * ( data_fidelity.grad(x) + operator.adjoint(y) );
+        x = constraint.prox(x, tau);
     
         # dual forward-backward step
-        y = y + sigma * h.op.direct(2*x - x_old);
-        y = y - sigma * h.prox(inv_sigma*y, inv_sigma);   
+        y = y + sigma * operator.direct(2*x - x_old);
+        y = y - sigma * regulariser.prox(inv_sigma*y, inv_sigma);   
 
         # time and criterion
         timing[it] = time.time() - t
-        criter[it] = f(x) + g(x) + h(h.op.direct(x));
+        criter[it] = constraint(x) + data_fidelity(x) + regulariser(operator.direct(x))
            
         # stopping rule
         #if np.linalg.norm(x - x_old) < tol * np.linalg.norm(x_old) and it > 10:
         #   break
 
-    criter = criter[0:it+1];
-    timing = numpy.cumsum(timing[0:it+1]);
+    criter = criter[0:it+1]
+    timing = numpy.cumsum(timing[0:it+1])
     
     return x, it, timing, criter
 

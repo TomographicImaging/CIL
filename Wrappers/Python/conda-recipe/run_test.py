@@ -17,6 +17,7 @@ from ccpi.optimisation.funcs import TV2D
 
 from ccpi.optimisation.ops import LinearOperatorMatrix
 from ccpi.optimisation.ops import TomoIdentity
+from ccpi.optimisation.ops import Identity
 
 from cvxpy import *
 
@@ -48,6 +49,7 @@ class TestDataContainer(unittest.TestCase):
         
     def testGb_creation_nocopy(self):
         X,Y,Z = 512,512,512
+        X,Y,Z = 256,512,512
         steps = [timer()]
         a = numpy.ones((X,Y,Z), dtype='float32')
         steps.append(timer())
@@ -66,6 +68,7 @@ class TestDataContainer(unittest.TestCase):
     def testInlineAlgebra(self):
         print ("Test Inline Algebra")
         X,Y,Z = 1024,512,512
+        X,Y,Z = 256,512,512
         steps = [timer()]
         a = numpy.ones((X,Y,Z), dtype='float32')
         steps.append(timer())
@@ -122,6 +125,7 @@ class TestDataContainer(unittest.TestCase):
     def test_unary_operations(self):
         print ("Test unary operations")
         X,Y,Z = 1024,512,512
+        X,Y,Z = 256,512,512
         steps = [timer()]
         a = -numpy.ones((X,Y,Z), dtype='float32')
         steps.append(timer())
@@ -157,6 +161,7 @@ class TestDataContainer(unittest.TestCase):
     def binary_add(self):
         print ("Test binary add")
         X,Y,Z = 512,512,512
+        X,Y,Z = 256,512,512
         steps = [timer()]
         a = numpy.ones((X,Y,Z), dtype='float32')
         steps.append(timer())
@@ -243,6 +248,7 @@ class TestDataContainer(unittest.TestCase):
     def binary_multiply(self):
         print ("Test binary multiply")
         X,Y,Z = 1024,512,512
+        X,Y,Z = 256,512,512
         steps = [timer()]
         a = numpy.ones((X,Y,Z), dtype='float32')
         steps.append(timer())
@@ -283,6 +289,7 @@ class TestDataContainer(unittest.TestCase):
     def binary_divide(self):
         print ("Test binary divide")
         X,Y,Z = 1024,512,512
+        X,Y,Z = 256,512,512
         steps = [timer()]
         a = numpy.ones((X,Y,Z), dtype='float32')
         steps.append(timer())
@@ -530,6 +537,33 @@ class TestAlgorithms(unittest.TestCase):
         print(objective0.value)
         self.assertNumpyArrayAlmostEqual(
                  numpy.squeeze(x_fista0.array),x0.value,6)
+    def test_FISTA_Norm1(self):
+
+        opt = {'memopt':True}
+        # Problem data.
+        m = 30
+        n = 20
+        np.random.seed(1)
+        Amat = np.random.randn(m, n)
+        A = LinearOperatorMatrix(Amat)
+        bmat = np.random.randn(m)
+        bmat.shape = (bmat.shape[0],1)
+        
+        # A = Identity()
+        # Change n to equal to m.
+        
+        b = DataContainer(bmat)
+        
+        # Regularization parameter
+        lam = 10
+        opt = {'memopt':True}
+        # Create object instances with the test data A and b.
+        f = Norm2sq(A,b,c=0.5, memopt=True)
+        g0 = ZeroFun()
+        
+        # Initial guess
+        x_init = DataContainer(np.zeros((n,1)))
+        
         # Create 1-norm object instance
         g1 = Norm1(lam)
         
@@ -541,7 +575,7 @@ class TestAlgorithms(unittest.TestCase):
         
         # Print for comparison
         print("FISTA least squares plus 1-norm solution and objective value:")
-        print(x_fista1)
+        print(x_fista1.as_array().squeeze())
         print(criter1[-1])
         
         # Compare to CVXPY
@@ -563,8 +597,56 @@ class TestAlgorithms(unittest.TestCase):
         self.assertNumpyArrayAlmostEqual(
                  numpy.squeeze(x_fista1.array),x1.value,6)
 
+    def test_FBPD_Norm1(self):
+
+        opt = {'memopt':True}
+        # Problem data.
+        m = 30
+        n = 20
+        np.random.seed(1)
+        Amat = np.random.randn(m, n)
+        A = LinearOperatorMatrix(Amat)
+        bmat = np.random.randn(m)
+        bmat.shape = (bmat.shape[0],1)
+        
+        # A = Identity()
+        # Change n to equal to m.
+        
+        b = DataContainer(bmat)
+        
+        # Regularization parameter
+        lam = 10
+        opt = {'memopt':True}
+        # Create object instances with the test data A and b.
+        f = Norm2sq(A,b,c=0.5, memopt=True)
+        g0 = ZeroFun()
+        
+        # Initial guess
+        x_init = DataContainer(np.zeros((n,1)))
+        
+        # Create 1-norm object instance
+        g1 = Norm1(lam)
+        
+        
+        # Compare to CVXPY
+            
+        # Construct the problem.
+        x1 = Variable(n)
+        objective1 = Minimize(0.5*sum_squares(Amat*x1 - bmat.T[0]) + lam*norm(x1,1) )
+        prob1 = Problem(objective1)
+            
+        # The optimal objective is returned by prob.solve().
+        result1 = prob1.solve(verbose=False,solver=SCS,eps=1e-9)
+            
+        # The optimal solution for x is stored in x.value and optimal objective value 
+        # is in result as well as in objective.value
+        print("CVXPY least squares plus 1-norm solution and objective value:")
+        print(x1.value)
+        print(objective1.value)
+            
         # Now try another algorithm FBPD for same problem:
-        x_fbpd1, itfbpd1, timingfbpd1, criterfbpd1 = FBPD(x_init, None, f, g1)
+        x_fbpd1, itfbpd1, timingfbpd1, criterfbpd1 = FBPD(x_init, 
+	   Identity(), None, f, g1)
         print(x_fbpd1)
         print(criterfbpd1[-1])
         
@@ -581,6 +663,8 @@ class TestAlgorithms(unittest.TestCase):
         # Set up phantom size NxN by creating ImageGeometry, initialising the 
         # ImageData object with this geometry and empty array and finally put some
         # data into its array, and display as image.
+    def test_FISTA_denoise(self):
+        opt = {'memopt':True}
         N = 64
         ig = ImageGeometry(voxel_num_x=N,voxel_num_y=N)
         Phantom = ImageData(geometry=ig)
@@ -609,14 +693,18 @@ class TestAlgorithms(unittest.TestCase):
         x_init_denoise = ImageData(np.zeros((N,N)))
         
         # Combine with least squares and solve using generic FISTA implementation
-        x_fista1_denoise, it1_denoise, timing1_denoise, criter1_denoise = FISTA(x_init_denoise, f_denoise, g1_denoise, opt=opt)
+        x_fista1_denoise, it1_denoise, timing1_denoise, \
+	   criter1_denoise = \
+	     FISTA(x_init_denoise, f_denoise, g1_denoise, opt=opt)
         
         print(x_fista1_denoise)
         print(criter1_denoise[-1])
         
         
         # Now denoise LS + 1-norm with FBPD
-        x_fbpd1_denoise, itfbpd1_denoise, timingfbpd1_denoise, criterfbpd1_denoise = FBPD(x_init_denoise, None, f_denoise, g1_denoise)
+        x_fbpd1_denoise, itfbpd1_denoise, timingfbpd1_denoise,\
+	  criterfbpd1_denoise = \
+	    FBPD(x_init_denoise, I, None, f_denoise, g1_denoise)
         print(x_fbpd1_denoise)
         print(criterfbpd1_denoise[-1])
         
@@ -652,7 +740,9 @@ class TestAlgorithms(unittest.TestCase):
         
         opt_tv = {'tol': 1e-4, 'iter': 10000}
         
-        x_fbpdtv_denoise, itfbpdtv_denoise, timingfbpdtv_denoise, criterfbpdtv_denoise = FBPD(x_init_denoise, None, f_denoise, gtv,opt=opt_tv)
+        x_fbpdtv_denoise, itfbpdtv_denoise, timingfbpdtv_denoise,\
+	  criterfbpdtv_denoise = \
+	    FBPD(x_init_denoise, gtv.op, None, f_denoise, gtv,opt=opt_tv)
         print(x_fbpdtv_denoise)
         print(criterfbpdtv_denoise[-1])
         

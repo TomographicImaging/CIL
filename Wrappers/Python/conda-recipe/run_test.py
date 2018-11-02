@@ -17,6 +17,7 @@ from ccpi.optimisation.funcs import TV2D
 
 from ccpi.optimisation.ops import LinearOperatorMatrix
 from ccpi.optimisation.ops import TomoIdentity
+from ccpi.optimisation.ops import Identity
 
 from cvxpy import *
 
@@ -644,7 +645,8 @@ class TestAlgorithms(unittest.TestCase):
         print(objective1.value)
             
         # Now try another algorithm FBPD for same problem:
-        x_fbpd1, itfbpd1, timingfbpd1, criterfbpd1 = FBPD(x_init, None, f, g1)
+        x_fbpd1, itfbpd1, timingfbpd1, criterfbpd1 = FBPD(x_init, 
+	   Identity(), None, f, g1)
         print(x_fbpd1)
         print(criterfbpd1[-1])
         
@@ -691,14 +693,18 @@ class TestAlgorithms(unittest.TestCase):
         x_init_denoise = ImageData(np.zeros((N,N)))
         
         # Combine with least squares and solve using generic FISTA implementation
-        x_fista1_denoise, it1_denoise, timing1_denoise, criter1_denoise = FISTA(x_init_denoise, f_denoise, g1_denoise, opt=opt)
+        x_fista1_denoise, it1_denoise, timing1_denoise, \
+	   criter1_denoise = \
+	     FISTA(x_init_denoise, f_denoise, g1_denoise, opt=opt)
         
         print(x_fista1_denoise)
         print(criter1_denoise[-1])
         
         
         # Now denoise LS + 1-norm with FBPD
-        x_fbpd1_denoise, itfbpd1_denoise, timingfbpd1_denoise, criterfbpd1_denoise = FBPD(x_init_denoise, None, f_denoise, g1_denoise)
+        x_fbpd1_denoise, itfbpd1_denoise, timingfbpd1_denoise,\
+	  criterfbpd1_denoise = \
+	    FBPD(x_init_denoise, I, None, f_denoise, g1_denoise)
         print(x_fbpd1_denoise)
         print(criterfbpd1_denoise[-1])
         
@@ -734,7 +740,9 @@ class TestAlgorithms(unittest.TestCase):
         
         opt_tv = {'tol': 1e-4, 'iter': 10000}
         
-        x_fbpdtv_denoise, itfbpdtv_denoise, timingfbpdtv_denoise, criterfbpdtv_denoise = FBPD(x_init_denoise, None, f_denoise, gtv,opt=opt_tv)
+        x_fbpdtv_denoise, itfbpdtv_denoise, timingfbpdtv_denoise,\
+	  criterfbpdtv_denoise = \
+	    FBPD(x_init_denoise, gtv.op, None, f_denoise, gtv,opt=opt_tv)
         print(x_fbpdtv_denoise)
         print(criterfbpdtv_denoise[-1])
         

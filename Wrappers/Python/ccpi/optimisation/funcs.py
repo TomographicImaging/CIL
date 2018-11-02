@@ -193,12 +193,20 @@ class ZeroFun(Function):
     def prox(self,x,tau):
         return x.copy()
     
+
     def proximal(self, x, tau, out=None):
         if out is None:
-            return self.prox(x, tau)
+            return self.prox(x,tau)
         else:
-            out.fill(x)
-
+            if isSizeCorrect(out, x):
+                # check dimensionality
+                if issubclass(type(out), DataContainer):
+                    out.fill(x)
+                        
+                elif issubclass(type(out) , numpy.ndarray):
+                    out[:] = x
+            else:
+                raise ValueError ('Wrong size: x{0} out{1}'.format(x.shape,out.shape) )
 # A more interesting example, least squares plus 1-norm minimization.
 # Define class to represent 1-norm including prox function
 class Norm1(Function):
@@ -221,12 +229,24 @@ class Norm1(Function):
     
     def prox(self,x,tau):
         return (x.abs() - tau*self.gamma).maximum(0) * x.sign()
-    def proximal(self,x,tau, out=None):
+    def proximal(self, x, tau, out=None):
         if out is None:
             return self.prox(x,tau)
         else:
-            y = (x.abs() - tau*self.gamma).maximum(0) * x.sign()
-            out.fill (x)
+            if isSizeCorrect(out, x):
+                # check dimensionality
+                if issubclass(type(out), DataContainer):
+                    v = (x.abs() - tau*self.gamma).maximum(0)
+                    x.sign(out=out)
+                    out *= v
+                    #out.fill(self.prox(x,tau))    
+                elif issubclass(type(out) , numpy.ndarray):
+                    v = (x.abs() - tau*self.gamma).maximum(0)
+                    out[:] = x.sign()
+                    out *= v
+                    #out[:] = self.prox(x,tau)
+            else:
+                raise ValueError ('Wrong size: x{0} out{1}'.format(x.shape,out.shape) )
 
 
 # Box constraints indicator function. Calling returns 0 if argument is within 

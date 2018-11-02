@@ -670,8 +670,11 @@ class TestAlgorithms(unittest.TestCase):
         Phantom = ImageData(geometry=ig)
         
         x = Phantom.as_array()
-        x[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
-        x[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 1
+        
+        x[int(round(N/4)):int(round(3*N/4)),
+          int(round(N/4)):int(round(3*N/4))] = 0.5
+        x[int(round(N/8)):int(round(7*N/8)),
+          int(round(3*N/8)):int(round(5*N/8))] = 1
         
         
         # Identity operator for denoising

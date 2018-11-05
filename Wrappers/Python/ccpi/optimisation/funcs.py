@@ -38,12 +38,12 @@ def isSizeCorrect(data1 ,data2):
         
 class Function(object):
     def __init__(self):
-        pass
-    def __call__(self,x, out=None):       raise NotImplementedError 
-    def grad(self, x):                    raise NotImplementedError
-    def prox(self, x, tau):               raise NotImplementedError
-    def gradient(self, x, out=None):      raise NotImplementedError
-    def proximal(self, x, tau, out=None): raise NotImplementedError
+        self.op = Identity()
+    def __call__(self,x, out=None):       return 0
+    def grad(self, x):                    return 0
+    def prox(self, x, tau):               return x
+    def gradient(self, x, out=None):      return self.grad(x)
+    def proximal(self, x, tau, out=None): return self.prox(x, tau)
 
 class Norm2(Function):
     
@@ -54,24 +54,23 @@ class Norm2(Function):
         self.gamma     = gamma;
         self.direction = direction; 
     
-    def __call__(self, x, out=None):
+    def __call__(self, x):
         
-        if out is None:
-            xx = numpy.sqrt(numpy.sum(numpy.square(x.as_array()), self.direction,
-                                  keepdims=True))
-        else:
-            if isSizeCorrect(out, x):
-                # check dimensionality
-                if issubclass(type(out), DataContainer):
-                    arr = out.as_array()
-                    numpy.square(x.as_array(), out=arr)
-                    xx = numpy.sqrt(numpy.sum(arr, self.direction, keepdims=True))
-                        
-                elif issubclass(type(out) , numpy.ndarray):
-                    numpy.square(x.as_array(), out=out)
-                    xx = numpy.sqrt(numpy.sum(out, self.direction, keepdims=True))
-            else:
-                raise ValueError ('Wrong size: x{0} out{1}'.format(x.shape,out.shape) )
+        #if out is None:
+        #    xx = numpy.sqrt(numpy.sum(numpy.square(x.as_array()), self.direction,
+        #                          keepdims=True))
+        if issubclass(type(x), DataContainer):
+            #arr = out.as_array()
+            #numpy.square(x.as_array(), out=arr)
+            #xx = numpy.sqrt(numpy.sum(arr, self.direction, keepdims=True))
+            
+            xx = numpy.sqrt(
+                    x.power(2)
+                     .sum(axis=self.direction, keepdims=False)
+                )    
+        elif issubclass(type(x) , numpy.ndarray):
+            
+            xx = numpy.sqrt(numpy.sum(numpy.square(x), self.direction, keepdims=False))
         
         p  = numpy.sum(self.gamma*xx)        
         
@@ -79,12 +78,18 @@ class Norm2(Function):
     
     def prox(self, x, tau):
 
-        xx = numpy.sqrt(numpy.sum( numpy.square(x.as_array()), self.direction, 
-                                  keepdims=True ))
+        #xx = numpy.sqrt(numpy.sum( numpy.square(x.as_array()), self.direction, 
+        #                          keepdims=True ))
+        xx = self.__call__(x)
         xx = numpy.maximum(0, 1 - tau*self.gamma / xx)
-        p  = x.as_array() * xx
+
+        p  = x * xx
         
-        return type(x)(p,geometry=x.geometry)
+        if issubclass(type(x), DataContainer):
+            print ("type(x)", type(x))
+            return type(x)(p,geometry=x.geometry)
+        elif issubclass(type(x) , numpy.ndarray):
+            return p
     def proximal(self, x, tau, out=None):
         if out is None:
             return self.prox(x,tau)
@@ -92,19 +97,27 @@ class Norm2(Function):
             if isSizeCorrect(out, x):
                 # check dimensionality
                 if issubclass(type(out), DataContainer):
-                    numpy.square(x.as_array(), out = out.as_array())
-                    xx = numpy.sqrt(numpy.sum( out.as_array() , self.direction, 
-                                  keepdims=True ))
-                    xx = numpy.maximum(0, 1 - tau*self.gamma / xx)
-                    x.multiply(xx, out= out.as_array())
+                    #numpy.square(x.as_array(), out = out.as_array())
                     
-                        
+                    #xx = numpy.sqrt(numpy.sum( out.as_array() , self.direction, 
+                    #              keepdims=True ))
+                    #xx = numpy.maximum(0, 1 - tau*self.gamma / xx)
+                    #x.multiply(xx, out= out.as_array())
+                    x.power(2, out=out)
+                    xx = numpy.sqrt(
+                      out.sum(axis=self.direction, keepdims=False)
+                    ) 
+                    xx = numpy.maximum(xx, tau*self.gamma)
+                    xx = 1 - tau*self.gamma/xx
+                    x.multiply( xx , out = out)
+                    return out    
                 elif issubclass(type(out) , numpy.ndarray):
                     numpy.square(x.as_array(), out=out)
                     xx = numpy.sqrt(numpy.sum(out, self.direction, keepdims=True))
                     
                     xx = numpy.maximum(0, 1 - tau*self.gamma / xx)
                     x.multiply(xx, out= out)
+                    return out
             else:
                 raise ValueError ('Wrong size: x{0} out{1}'.format(x.shape,out.shape) )
         
@@ -193,20 +206,12 @@ class ZeroFun(Function):
     def prox(self,x,tau):
         return x.copy()
     
-
     def proximal(self, x, tau, out=None):
         if out is None:
-            return self.prox(x,tau)
+            return self.prox(x, tau)
         else:
-            if isSizeCorrect(out, x):
-                # check dimensionality
-                if issubclass(type(out), DataContainer):
-                    out.fill(x)
-                        
-                elif issubclass(type(out) , numpy.ndarray):
-                    out[:] = x
-            else:
-                raise ValueError ('Wrong size: x{0} out{1}'.format(x.shape,out.shape) )
+            out.fill(x)
+
 # A more interesting example, least squares plus 1-norm minimization.
 # Define class to represent 1-norm including prox function
 class Norm1(Function):
@@ -229,49 +234,6 @@ class Norm1(Function):
     
     def prox(self,x,tau):
         return (x.abs() - tau*self.gamma).maximum(0) * x.sign()
-    def proximal(self, x, tau, out=None):
-        if out is None:
-            return self.prox(x,tau)
-        else:
-            if isSizeCorrect(out, x):
-                # check dimensionality
-                if issubclass(type(out), DataContainer):
-                    v = (x.abs() - tau*self.gamma).maximum(0)
-                    x.sign(out=out)
-                    out *= v
-                    #out.fill(self.prox(x,tau))    
-                elif issubclass(type(out) , numpy.ndarray):
-                    v = (x.abs() - tau*self.gamma).maximum(0)
-                    out[:] = x.sign()
-                    out *= v
-                    #out[:] = self.prox(x,tau)
-            else:
-                raise ValueError ('Wrong size: x{0} out{1}'.format(x.shape,out.shape) )
-
-
-# Box constraints indicator function. Calling returns 0 if argument is within 
-# the box. The prox operator is projection onto the box. Only implements one 
-# scalar lower and one upper as constraint on all elements. Should generalise 
-# to vectors to allow different constraints one elements.
-class IndicatorBox(Function):
-    
-    def __init__(self,lower=-numpy.inf,upper=numpy.inf):
-        # Do nothing
-        self.lower = lower
-        self.upper = upper
-        super(IndicatorBox, self).__init__()
-    
-    def __call__(self,x):
-        
-        if (numpy.all(x.array>=self.lower) and 
-            numpy.all(x.array <= self.upper) ):
-            val = 0
-        else:
-            val = numpy.inf
-        return val
-    
-    def prox(self,x,tau=None):
-        return  (x.maximum(self.lower)).minimum(self.upper)
     
     def proximal(self, x, tau, out=None):
         if out is None:

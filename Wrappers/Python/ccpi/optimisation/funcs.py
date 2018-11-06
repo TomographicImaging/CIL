@@ -38,12 +38,12 @@ def isSizeCorrect(data1 ,data2):
         
 class Function(object):
     def __init__(self):
-        self.op = Identity()
-    def __call__(self,x, out=None):       return 0
-    def grad(self, x):                    return 0
-    def prox(self, x, tau):               return x
-    def gradient(self, x, out=None):      return self.grad(x)
-    def proximal(self, x, tau, out=None): return self.prox(x, tau)
+        pass
+    def __call__(self,x, out=None):       raise NotImplementedError 
+    def grad(self, x):                    raise NotImplementedError
+    def prox(self, x, tau):               raise NotImplementedError
+    def gradient(self, x, out=None):      raise NotImplementedError
+    def proximal(self, x, tau, out=None): raise NotImplementedError
 
 class Norm2(Function):
     
@@ -210,7 +210,16 @@ class ZeroFun(Function):
         if out is None:
             return self.prox(x, tau)
         else:
-            out.fill(x)
+            if isSizeCorrect(out, x):
+                # check dimensionality  
+                if issubclass(type(out), DataContainer):    
+                    out.fill(x) 
+                            
+                elif issubclass(type(out) , numpy.ndarray): 
+                    out[:] = x  
+            else:   
+                raise ValueError ('Wrong size: x{0} out{1}'
+                                    .format(x.shape,out.shape) )
 
 # A more interesting example, least squares plus 1-norm minimization.
 # Define class to represent 1-norm including prox function
@@ -239,6 +248,49 @@ class Norm1(Function):
         if out is None:
             return self.prox(x, tau)
         else:
+            if isSizeCorrect(x,out):
+                # check dimensionality
+                if issubclass(type(out), DataContainer):
+                    v = (x.abs() - tau*self.gamma).maximum(0)
+                    x.sign(out=out)
+                    out *= v
+                    #out.fill(self.prox(x,tau))    
+                elif issubclass(type(out) , numpy.ndarray):
+                    v = (x.abs() - tau*self.gamma).maximum(0)
+                    out[:] = x.sign()
+                    out *= v
+                    #out[:] = self.prox(x,tau)
+            else:
+                raise ValueError ('Wrong size: x{0} out{1}'.format(x.shape,out.shape) )
+
+# Box constraints indicator function. Calling returns 0 if argument is within 
+# the box. The prox operator is projection onto the box. Only implements one 
+# scalar lower and one upper as constraint on all elements. Should generalise 
+# to vectors to allow different constraints one elements.
+class IndicatorBox(Function):
+    
+    def __init__(self,lower=-numpy.inf,upper=numpy.inf):
+        # Do nothing
+        self.lower = lower
+        self.upper = upper
+        super(IndicatorBox, self).__init__()
+    
+    def __call__(self,x):
+        
+        if (numpy.all(x.array>=self.lower) and 
+            numpy.all(x.array <= self.upper) ):
+            val = 0
+        else:
+            val = numpy.inf
+        return val
+    
+    def prox(self,x,tau=None):
+        return  (x.maximum(self.lower)).minimum(self.upper)
+    
+    def proximal(self, x, tau, out=None):
+        if out is None:
+            return self.prox(x, tau)
+        else:
             if not x.shape == out.shape:
                 raise ValueError('Norm1 Incompatible size:',
                                  x.shape, out.shape)
@@ -252,4 +304,3 @@ class Norm1(Function):
                 x.sign(out=self.sign_x)
                 
             out.__imul__( self.sign_x )
-    

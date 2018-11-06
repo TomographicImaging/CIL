@@ -38,6 +38,28 @@ def dt(steps):
 
 
 class TestDataContainer(unittest.TestCase):
+    def create_simple_ImageData(self):
+        N = 64
+        ig = ImageGeometry(voxel_num_x=N, voxel_num_y=N)
+        Phantom = ImageData(geometry=ig)
+
+        x = Phantom.as_array()
+
+        x[int(round(N/4)):int(round(3*N/4)),
+          int(round(N/4)):int(round(3*N/4))] = 0.5
+        x[int(round(N/8)):int(round(7*N/8)),
+          int(round(3*N/8)):int(round(5*N/8))] = 1
+
+        return (ig, Phantom)
+
+    def create_DataContainer(self, X,Y,Z, value=1):
+        steps = [timer()]
+        a = value * numpy.ones((X, Y, Z), dtype='float32')
+        steps.append(timer())
+        t0 = dt(steps)
+        #print("a refcount " , sys.getrefcount(a))
+        ds = DataContainer(a, False, ['X', 'Y', 'Z'])
+        return ds
 
     def test_creation_nocopy(self):
         shape = (2, 3, 4, 5)
@@ -466,6 +488,14 @@ class TestDataContainer(unittest.TestCase):
             res = False
             print(err)
         self.assertTrue(res)
+    def test_DataContainerChaining(self):
+        dc = self.create_DataContainer(256,256,256,1)
+
+        dc.add(9,out=dc)\
+          .subtract(1,out=dc)
+        self.assertEqual(1+9-1,dc.as_array().flatten()[0])
+
+
 
 
 class TestAlgorithms(unittest.TestCase):

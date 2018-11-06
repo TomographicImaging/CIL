@@ -86,7 +86,6 @@ class Norm2(Function):
         p  = x * xx
         
         if issubclass(type(x), DataContainer):
-            print ("type(x)", type(x))
             return type(x)(p,geometry=x.geometry)
         elif issubclass(type(x) , numpy.ndarray):
             return p

@@ -172,6 +172,8 @@ plt.imshow(y.array)
 plt.title('Noisy image')
 plt.show()
 
+
+###################
 # Data fidelity term
 f_denoise = Norm2sq(I,y,c=0.5,memopt=True)
 
@@ -188,9 +190,9 @@ x_fista1_denoise, it1_denoise, timing1_denoise, criter1_denoise = FISTA(x_init_d
 print(x_fista1_denoise)
 print(criter1_denoise[-1])
 
-plt.imshow(x_fista1_denoise.as_array())
-plt.title('FISTA LS+1')
-plt.show()
+#plt.imshow(x_fista1_denoise.as_array())
+#plt.title('FISTA LS+1')
+#plt.show()
 
 # Now denoise LS + 1-norm with FBPD
 x_fbpd1_denoise, itfbpd1_denoise, timingfbpd1_denoise, \
@@ -198,9 +200,9 @@ x_fbpd1_denoise, itfbpd1_denoise, timingfbpd1_denoise, \
 print(x_fbpd1_denoise)
 print(criterfbpd1_denoise[-1])
 
-plt.imshow(x_fbpd1_denoise.as_array())
-plt.title('FBPD LS+1')
-plt.show()
+#plt.imshow(x_fbpd1_denoise.as_array())
+#plt.title('FBPD LS+1')
+#plt.show()
 
 if use_cvxpy:
     # Compare to CVXPY
@@ -222,25 +224,44 @@ if use_cvxpy:
 x1_cvx = x1_denoise.value
 x1_cvx.shape = (N,N)
 
+
+
+#plt.imshow(x1_cvx)
+#plt.title('CVX LS+1')
+#plt.show()
+
+fig = plt.figure()
+plt.subplot(1,4,1)
+plt.imshow(y.array)
+plt.title("LS+1")
+plt.subplot(1,4,2)
+plt.imshow(x_fista1_denoise.as_array())
+plt.title("fista")
+plt.subplot(1,4,3)
+plt.imshow(x_fbpd1_denoise.as_array())
+plt.title("fbpd")
+plt.subplot(1,4,4)
 plt.imshow(x1_cvx)
-plt.title('CVX LS+1')
+plt.title("cvx")
 plt.show()
 
+##############################################################
 # Now TV with FBPD
 lam_tv = 0.1
 gtv = TV2D(lam_tv)
-gtv(gtv.op.direct(x_init_denoise))
+#gtv(gtv.op.direct(x_init_denoise))
 
 opt_tv = {'tol': 1e-4, 'iter': 10000}
 
 x_fbpdtv_denoise, itfbpdtv_denoise, timingfbpdtv_denoise, \
- criterfbpdtv_denoise = FBPD(x_init_denoise, gtv.op, None, f_denoise, gtv,opt=opt_tv)
+ criterfbpdtv_denoise = FBPD(x_init_denoise, gtv.op, None, \
+                             f_denoise, gtv,opt=opt_tv)
 print(x_fbpdtv_denoise)
 print(criterfbpdtv_denoise[-1])
 
 plt.imshow(x_fbpdtv_denoise.as_array())
 plt.title('FBPD TV')
-plt.show()
+#plt.show()
 
 if use_cvxpy:
     # Compare to CVXPY
@@ -262,7 +283,21 @@ if use_cvxpy:
     
 plt.imshow(xtv_denoise.value)
 plt.title('CVX TV')
+#plt.show()
+
+fig = plt.figure()
+plt.subplot(1,3,1)
+plt.imshow(y.array)
+plt.title("TV2D")
+plt.subplot(1,3,2)
+plt.imshow(x_fbpdtv_denoise.as_array())
+plt.title("fbpd tv denoise")
+plt.subplot(1,3,3)
+plt.imshow(xtv_denoise.value)
+plt.title("CVX tv")
 plt.show()
+
+
 
 plt.loglog([0,opt_tv['iter']], [objectivetv_denoise.value,objectivetv_denoise.value], label='CVX TV')
 plt.loglog(criterfbpdtv_denoise, label='FBPD TV')

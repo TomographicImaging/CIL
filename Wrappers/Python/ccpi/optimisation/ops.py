@@ -110,6 +110,7 @@ class FiniteDiff2D(Operator):
     def direct(self,x, out=None):
         '''Forward differences with Neumann BC.'''
         # FIXME this seems to be working only with numpy arrays
+        
         d1 = numpy.zeros_like(x.as_array())
         d1[:,:-1] = x.as_array()[:,1:] - x.as_array()[:,:-1]
         d2 = numpy.zeros_like(x.as_array())
@@ -121,7 +122,7 @@ class FiniteDiff2D(Operator):
     def adjoint(self,x, out=None):
         '''Backward differences, Neumann BC.'''
         Nrows = x.get_dimension_size('horizontal_x')
-        Ncols = x.get_dimension_size('horizontal_x')
+        Ncols = x.get_dimension_size('horizontal_y')
         Nchannels = 1
         if len(x.shape) == 4:
             Nchannels = x.get_dimension_size('channel')

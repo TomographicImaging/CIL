@@ -807,6 +807,7 @@ class TestAlgorithms(unittest.TestCase):
 
             self.assertNumpyArrayAlmostEqual(
                 x_fbpdtv_denoise.as_array(), xtv_denoise.value, 1)
+
         else:
             self.assertTrue(cvx_not_installable)
 
@@ -836,6 +837,7 @@ class TestFunction(unittest.TestCase):
         return (ig, Phantom)
 
     def test_Norm2(self):
+        print("test Norm2")
         opt = {'memopt': True}
         ig, Phantom = self.create_simple_ImageData()
         x = Phantom.as_array()

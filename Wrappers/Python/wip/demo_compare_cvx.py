@@ -1,10 +1,11 @@
 
 from ccpi.framework import ImageData, ImageGeometry, AcquisitionGeometry, DataContainer
 from ccpi.optimisation.algs import FISTA, FBPD, CGLS
-from ccpi.optimisation.funcs import Norm2sq, ZeroFun, Norm1, TV2D
+from ccpi.optimisation.funcs import Norm2sq, ZeroFun, Norm1, TV2D, Norm2
 
 from ccpi.optimisation.ops import LinearOperatorMatrix, TomoIdentity
 from ccpi.optimisation.ops import Identity
+from ccpi.optimisation.ops import FiniteDiff2D
 
 # Requires CVXPY, see http://www.cvxpy.org/
 # CVXPY can be installed in anaconda using
@@ -246,16 +247,18 @@ plt.title("cvx")
 plt.show()
 
 ##############################################################
-# Now TV with FBPD
+# Now TV with FBPD and Norm2
 lam_tv = 0.1
 gtv = TV2D(lam_tv)
+norm2 = Norm2(lam_tv)
+op = FiniteDiff2D()
 #gtv(gtv.op.direct(x_init_denoise))
 
 opt_tv = {'tol': 1e-4, 'iter': 10000}
 
 x_fbpdtv_denoise, itfbpdtv_denoise, timingfbpdtv_denoise, \
- criterfbpdtv_denoise = FBPD(x_init_denoise, gtv.op, None, \
-                             f_denoise, gtv,opt=opt_tv)
+ criterfbpdtv_denoise = FBPD(x_init_denoise, op, None, \
+                             f_denoise, norm2 ,opt=opt_tv)
 print(x_fbpdtv_denoise)
 print(criterfbpdtv_denoise[-1])
 

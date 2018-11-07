@@ -44,7 +44,7 @@ class Function(object):
     def prox(self, x, tau):               raise NotImplementedError
     def gradient(self, x, out=None):      raise NotImplementedError
     def proximal(self, x, tau, out=None): raise NotImplementedError
-
+        
 class Norm2(Function):
     
     def __init__(self, 
@@ -60,14 +60,14 @@ class Norm2(Function):
         #    xx = numpy.sqrt(numpy.sum(numpy.square(x.as_array()), self.direction,
         #                          keepdims=True))
         if issubclass(type(x), DataContainer):
-            #arr = out.as_array()
-            #numpy.square(x.as_array(), out=arr)
-            #xx = numpy.sqrt(numpy.sum(arr, self.direction, keepdims=True))
+                
+            xx = numpy.sqrt(numpy.sum(numpy.square(x.as_array()),\
+                        self.direction, keepdims=True))
             
-            xx = numpy.sqrt(
-                    x.power(2)
-                     .sum(axis=self.direction, keepdims=False)
-                )    
+            #xx = numpy.sqrt(
+            #        x.power(2)
+            #         .sum(axis=self.direction, keepdims=False)
+            #    )    
         elif issubclass(type(x) , numpy.ndarray):
             
             xx = numpy.sqrt(numpy.sum(numpy.square(x), self.direction, keepdims=False))
@@ -96,19 +96,22 @@ class Norm2(Function):
             if isSizeCorrect(out, x):
                 # check dimensionality
                 if issubclass(type(out), DataContainer):
-                    #numpy.square(x.as_array(), out = out.as_array())
+                    if True:
+                        numpy.square(x.as_array(), out = out.as_array())
                     
-                    #xx = numpy.sqrt(numpy.sum( out.as_array() , self.direction, 
-                    #              keepdims=True ))
-                    #xx = numpy.maximum(0, 1 - tau*self.gamma / xx)
-                    #x.multiply(xx, out= out.as_array())
-                    x.power(2, out=out)
-                    xx = numpy.sqrt(
-                      out.sum(axis=self.direction, keepdims=False)
-                    ) 
-                    xx = numpy.maximum(xx, tau*self.gamma)
-                    xx = 1 - tau*self.gamma/xx
-                    x.multiply( xx , out = out)
+                        xx = numpy.sqrt(numpy.sum( out.as_array() , self.direction, 
+                                  keepdims=True ))
+                        xx = numpy.maximum(0, 1 - tau*self.gamma / xx)
+                        x.multiply(xx, out= out.as_array())
+                    else:
+                        x.power(2, out=out)
+                        xx = numpy.sqrt(
+                          out.sum(axis=self.direction, keepdims=False)
+                        ) 
+                        #xx = numpy.maximum(xx, tau*self.gamma)
+                        #xx = 1 - tau*self.gamma/xx
+                        xx = numpy.maximum(0, 1 - tau*self.gamma / xx)
+                        x.multiply( xx , out = out)
                     return out    
                 elif issubclass(type(out) , numpy.ndarray):
                     numpy.square(x.as_array(), out=out)
@@ -120,7 +123,6 @@ class Norm2(Function):
             else:
                 raise ValueError ('Wrong size: x{0} out{1}'.format(x.shape,out.shape) )
         
-            
 
 class TV2D(Norm2):
     

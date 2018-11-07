@@ -23,7 +23,7 @@ import os
 import sys
 
 
-cil_version='0.11.1'
+cil_version='0.11.2'
 
 setup(
     name="ccpi-framework",

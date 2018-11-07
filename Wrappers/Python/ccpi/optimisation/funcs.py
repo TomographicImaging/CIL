@@ -44,7 +44,9 @@ class Function(object):
     def prox(self, x, tau):               raise NotImplementedError
     def gradient(self, x, out=None):      raise NotImplementedError
     def proximal(self, x, tau, out=None): raise NotImplementedError
-        
+
+
+'''        
 class Norm2(Function):
     
     def __init__(self, 
@@ -120,6 +122,71 @@ class Norm2(Function):
                     xx = numpy.maximum(0, 1 - tau*self.gamma / xx)
                     x.multiply(xx, out= out)
                     return out
+            else:
+                raise ValueError ('Wrong size: x{0} out{1}'.format(x.shape,out.shape) )
+        
+'''
+
+class Norm2(Function):
+    
+    def __init__(self, 
+                 gamma=1.0, 
+                 direction=None):
+        super(Norm2, self).__init__()
+        self.gamma     = gamma;
+        self.direction = direction; 
+    
+    def __call__(self, x, out=None):
+        
+        if out is None:
+            xx = numpy.sqrt(numpy.sum(numpy.square(x.as_array()), self.direction,
+                                  keepdims=True))
+        else:
+            if isSizeCorrect(out, x):
+                # check dimensionality
+                if issubclass(type(out), DataContainer):
+                    arr = out.as_array()
+                    numpy.square(x.as_array(), out=arr)
+                    xx = numpy.sqrt(numpy.sum(arr, self.direction, keepdims=True))
+                        
+                elif issubclass(type(out) , numpy.ndarray):
+                    numpy.square(x.as_array(), out=out)
+                    xx = numpy.sqrt(numpy.sum(out, self.direction, keepdims=True))
+            else:
+                raise ValueError ('Wrong size: x{0} out{1}'.format(x.shape,out.shape) )
+        
+        p  = numpy.sum(self.gamma*xx)        
+        
+        return p
+    
+    def prox(self, x, tau):
+
+        xx = numpy.sqrt(numpy.sum( numpy.square(x.as_array()), self.direction, 
+                                  keepdims=True ))
+        xx = numpy.maximum(0, 1 - tau*self.gamma / xx)
+        p  = x.as_array() * xx
+        
+        return type(x)(p,geometry=x.geometry)
+    def proximal(self, x, tau, out=None):
+        if out is None:
+            return self.prox(x,tau)
+        else:
+            if isSizeCorrect(out, x):
+                # check dimensionality
+                if issubclass(type(out), DataContainer):
+                    numpy.square(x.as_array(), out = out.as_array())
+                    xx = numpy.sqrt(numpy.sum( out.as_array() , self.direction, 
+                                  keepdims=True ))
+                    xx = numpy.maximum(0, 1 - tau*self.gamma / xx)
+                    x.multiply(xx, out= out.as_array())
+                    
+                        
+                elif issubclass(type(out) , numpy.ndarray):
+                    numpy.square(x.as_array(), out=out)
+                    xx = numpy.sqrt(numpy.sum(out, self.direction, keepdims=True))
+                    
+                    xx = numpy.maximum(0, 1 - tau*self.gamma / xx)
+                    x.multiply(xx, out= out)
             else:
                 raise ValueError ('Wrong size: x{0} out{1}'.format(x.shape,out.shape) )
         

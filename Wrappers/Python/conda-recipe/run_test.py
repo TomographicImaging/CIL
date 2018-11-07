@@ -836,7 +836,7 @@ class TestFunction(unittest.TestCase):
 
         return (ig, Phantom)
 
-    def test_Norm2(self):
+    def _test_Norm2(self):
         print("test Norm2")
         opt = {'memopt': True}
         ig, Phantom = self.create_simple_ImageData()

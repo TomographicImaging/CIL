@@ -47,6 +47,7 @@ class Operator(object):
 class Identity(Operator):
     def __init__(self):
         self.s1 = 1.0
+        self.L = 1
         super(Identity, self).__init__()
         
     def direct(self,x,out=None):

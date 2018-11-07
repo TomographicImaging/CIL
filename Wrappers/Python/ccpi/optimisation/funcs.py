@@ -45,6 +45,7 @@ class Function(object):
     def gradient(self, x, out=None):      raise NotImplementedError
     def proximal(self, x, tau, out=None): raise NotImplementedError
 
+
 class Norm2(Function):
     
     def __init__(self, 
@@ -108,7 +109,6 @@ class Norm2(Function):
             else:
                 raise ValueError ('Wrong size: x{0} out{1}'.format(x.shape,out.shape) )
         
-            
 
 class TV2D(Norm2):
     
@@ -193,20 +193,21 @@ class ZeroFun(Function):
     def prox(self,x,tau):
         return x.copy()
     
-
     def proximal(self, x, tau, out=None):
         if out is None:
-            return self.prox(x,tau)
+            return self.prox(x, tau)
         else:
             if isSizeCorrect(out, x):
-                # check dimensionality
-                if issubclass(type(out), DataContainer):
-                    out.fill(x)
-                        
-                elif issubclass(type(out) , numpy.ndarray):
-                    out[:] = x
-            else:
-                raise ValueError ('Wrong size: x{0} out{1}'.format(x.shape,out.shape) )
+                # check dimensionality  
+                if issubclass(type(out), DataContainer):    
+                    out.fill(x) 
+                            
+                elif issubclass(type(out) , numpy.ndarray): 
+                    out[:] = x  
+            else:   
+                raise ValueError ('Wrong size: x{0} out{1}'
+                                    .format(x.shape,out.shape) )
+
 # A more interesting example, least squares plus 1-norm minimization.
 # Define class to represent 1-norm including prox function
 class Norm1(Function):
@@ -229,11 +230,12 @@ class Norm1(Function):
     
     def prox(self,x,tau):
         return (x.abs() - tau*self.gamma).maximum(0) * x.sign()
+    
     def proximal(self, x, tau, out=None):
         if out is None:
-            return self.prox(x,tau)
+            return self.prox(x, tau)
         else:
-            if isSizeCorrect(out, x):
+            if isSizeCorrect(x,out):
                 # check dimensionality
                 if issubclass(type(out), DataContainer):
                     v = (x.abs() - tau*self.gamma).maximum(0)
@@ -247,7 +249,6 @@ class Norm1(Function):
                     #out[:] = self.prox(x,tau)
             else:
                 raise ValueError ('Wrong size: x{0} out{1}'.format(x.shape,out.shape) )
-
 
 # Box constraints indicator function. Calling returns 0 if argument is within 
 # the box. The prox operator is projection onto the box. Only implements one 
@@ -290,4 +291,3 @@ class IndicatorBox(Function):
                 x.sign(out=self.sign_x)
                 
             out.__imul__( self.sign_x )
-    

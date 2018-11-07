@@ -47,6 +47,7 @@ class Operator(object):
 class Identity(Operator):
     def __init__(self):
         self.s1 = 1.0
+        self.L = 1
         super(Identity, self).__init__()
         
     def direct(self,x,out=None):
@@ -110,18 +111,19 @@ class FiniteDiff2D(Operator):
     def direct(self,x, out=None):
         '''Forward differences with Neumann BC.'''
         # FIXME this seems to be working only with numpy arrays
+        
         d1 = numpy.zeros_like(x.as_array())
         d1[:,:-1] = x.as_array()[:,1:] - x.as_array()[:,:-1]
         d2 = numpy.zeros_like(x.as_array())
         d2[:-1,:] = x.as_array()[1:,:] - x.as_array()[:-1,:]
         d = numpy.stack((d1,d2),0)
-        
+        #x.geometry.voxel_num_z = 2
         return type(x)(d,False,geometry=x.geometry)
     
     def adjoint(self,x, out=None):
         '''Backward differences, Neumann BC.'''
         Nrows = x.get_dimension_size('horizontal_x')
-        Ncols = x.get_dimension_size('horizontal_x')
+        Ncols = x.get_dimension_size('horizontal_y')
         Nchannels = 1
         if len(x.shape) == 4:
             Nchannels = x.get_dimension_size('channel')

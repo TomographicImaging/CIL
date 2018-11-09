@@ -376,7 +376,6 @@ class DataContainer(object):
         return self.shape == other.shape
     
     ## algebra 
-    
     def __add__(self, other , out=None, *args, **kwargs):
         if issubclass(type(other), DataContainer):    
             if self.check_dimensions(other):
@@ -688,7 +687,6 @@ class DataContainer(object):
         return self.pixel_wise_binary(numpy.maximum, x2=x2, out=out, *args, **kwargs)
     
     ## unary operations
-    
     def pixel_wise_unary(self,pwop, out=None, *args,  **kwargs):
         if out is None:
             out = pwop(self.as_array() , *args, **kwargs )

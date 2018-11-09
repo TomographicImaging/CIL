@@ -1,23 +1,28 @@
 package:
   name: ccpi-framework
-  version: {{ environ['CIL_VERSION'] }}
+  version: 0.11.3
 
 
 build:
   preserve_egg_dir: False
-  script_env:
-    - CIL_VERSION   
-#  number: 0
+#script_env:
+#    - CIL_VERSION   
+  number: 0
   
 requirements:
   build:
     - python
-    - numpy
     - setuptools
 
   run:
     - python
     - numpy
+    - scipy
+    - matplotlib
+  run:
+    - python
+    - numpy
+    - cvxpy # [not win]
     - scipy
     - matplotlib
 	

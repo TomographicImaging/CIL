@@ -19,16 +19,32 @@
 
 from ccpi.optimisation.ops import Identity, FiniteDiff2D
 import numpy
+from ccpi.framework import DataContainer
 
 
+def isSizeCorrect(data1 ,data2):
+    if issubclass(type(data1), DataContainer) and \
+       issubclass(type(data2), DataContainer):
+        # check dimensionality
+        if data1.check_dimensions(data2):
+            return True
+    elif issubclass(type(data1) , numpy.ndarray) and \
+         issubclass(type(data2) , numpy.ndarray):
+        return data1.shape == data2.shape
+    else:
+        raise ValueError("{0}: getting two incompatible types: {1} {2}"\
+                         .format('Function', type(data1), type(data2)))
+    return False
+        
 class Function(object):
     def __init__(self):
-        self.op = Identity()
-    def __call__(self,x):       return 0
-    def grad(self, x):          return 0
-    def prox(self, x, tau):     return x
-    def gradient(self, x):      return self.grad(x)
-    def proximal(self, x, tau): return self.prox(x, tau)
+        pass
+    def __call__(self,x, out=None):       raise NotImplementedError 
+    def grad(self, x):                    raise NotImplementedError
+    def prox(self, x, tau):               raise NotImplementedError
+    def gradient(self, x, out=None):      raise NotImplementedError
+    def proximal(self, x, tau, out=None): raise NotImplementedError
+
 
 class Norm2(Function):
     
@@ -39,10 +55,25 @@ class Norm2(Function):
         self.gamma     = gamma;
         self.direction = direction; 
     
-    def __call__(self, x):
+    def __call__(self, x, out=None):
         
-        xx = numpy.sqrt(numpy.sum(numpy.square(x.as_array()), self.direction,
+        if out is None:
+            xx = numpy.sqrt(numpy.sum(numpy.square(x.as_array()), self.direction,
                                   keepdims=True))
+        else:
+            if isSizeCorrect(out, x):
+                # check dimensionality
+                if issubclass(type(out), DataContainer):
+                    arr = out.as_array()
+                    numpy.square(x.as_array(), out=arr)
+                    xx = numpy.sqrt(numpy.sum(arr, self.direction, keepdims=True))
+                        
+                elif issubclass(type(out) , numpy.ndarray):
+                    numpy.square(x.as_array(), out=out)
+                    xx = numpy.sqrt(numpy.sum(out, self.direction, keepdims=True))
+            else:
+                raise ValueError ('Wrong size: x{0} out{1}'.format(x.shape,out.shape) )
+        
         p  = numpy.sum(self.gamma*xx)        
         
         return p
@@ -55,6 +86,29 @@ class Norm2(Function):
         p  = x.as_array() * xx
         
         return type(x)(p,geometry=x.geometry)
+    def proximal(self, x, tau, out=None):
+        if out is None:
+            return self.prox(x,tau)
+        else:
+            if isSizeCorrect(out, x):
+                # check dimensionality
+                if issubclass(type(out), DataContainer):
+                    numpy.square(x.as_array(), out = out.as_array())
+                    xx = numpy.sqrt(numpy.sum( out.as_array() , self.direction, 
+                                  keepdims=True ))
+                    xx = numpy.maximum(0, 1 - tau*self.gamma / xx)
+                    x.multiply(xx, out= out.as_array())
+                    
+                        
+                elif issubclass(type(out) , numpy.ndarray):
+                    numpy.square(x.as_array(), out=out)
+                    xx = numpy.sqrt(numpy.sum(out, self.direction, keepdims=True))
+                    
+                    xx = numpy.maximum(0, 1 - tau*self.gamma / xx)
+                    x.multiply(xx, out= out)
+            else:
+                raise ValueError ('Wrong size: x{0} out{1}'.format(x.shape,out.shape) )
+        
 
 class TV2D(Norm2):
     
@@ -81,10 +135,16 @@ class Norm2sq(Function):
     
     '''
     
-    def __init__(self,A,b,c=1.0):
+    def __init__(self,A,b,c=1.0,memopt=False):
         self.A = A  # Should be an operator, default identity
         self.b = b  # Default zero DataSet?
         self.c = c  # Default 1.
+        self.memopt = memopt
+        if memopt:
+            #self.direct_placehold = A.adjoint(b)
+            self.direct_placehold = A.allocate_direct()
+            self.adjoint_placehold = A.allocate_adjoint()
+            
         
         # Compute the Lipschitz parameter from the operator.
         # Initialise to None instead and only call when needed.
@@ -93,11 +153,31 @@ class Norm2sq(Function):
     
     def grad(self,x):
         #return 2*self.c*self.A.adjoint( self.A.direct(x) - self.b )
-        return 2.0*self.c*self.A.adjoint( self.A.direct(x) - self.b )
+        return (2.0*self.c)*self.A.adjoint( self.A.direct(x) - self.b )
     
     def __call__(self,x):
         #return self.c* np.sum(np.square((self.A.direct(x) - self.b).ravel()))
-        return self.c*( ( (self.A.direct(x)-self.b)**2).sum() )
+        #if out is None:
+        #    return self.c*( ( (self.A.direct(x)-self.b)**2).sum() )
+        #else:
+        y = self.A.direct(x)
+        y.__isub__(self.b)
+        y.__imul__(y)
+        return y.sum() * self.c
+    
+    def gradient(self, x, out = None):
+        if self.memopt:
+            #return 2.0*self.c*self.A.adjoint( self.A.direct(x) - self.b )
+            
+            self.A.direct(x, out=self.adjoint_placehold)
+            self.adjoint_placehold.__isub__( self.b )
+            self.A.adjoint(self.adjoint_placehold, out=self.direct_placehold)
+            self.direct_placehold.__imul__(2.0 * self.c)
+            # can this be avoided?
+            out.fill(self.direct_placehold)
+        else:
+            return self.grad(x)
+            
 
 
 class ZeroFun(Function):
@@ -111,21 +191,103 @@ class ZeroFun(Function):
         return 0
     
     def prox(self,x,tau):
-        return x
+        return x.copy()
+    
+    def proximal(self, x, tau, out=None):
+        if out is None:
+            return self.prox(x, tau)
+        else:
+            if isSizeCorrect(out, x):
+                # check dimensionality  
+                if issubclass(type(out), DataContainer):    
+                    out.fill(x) 
+                            
+                elif issubclass(type(out) , numpy.ndarray): 
+                    out[:] = x  
+            else:   
+                raise ValueError ('Wrong size: x{0} out{1}'
+                                    .format(x.shape,out.shape) )
 
 # A more interesting example, least squares plus 1-norm minimization.
 # Define class to represent 1-norm including prox function
 class Norm1(Function):
     
     def __init__(self,gamma):
-        # Do nothing
         self.gamma = gamma
         self.L = 1
+        self.sign_x = None
         super(Norm1, self).__init__()
     
-    def __call__(self,x):
-        return self.gamma*(x.abs().sum())
+    def __call__(self,x,out=None):
+        if out is None:
+            return self.gamma*(x.abs().sum())
+        else:
+            if not x.shape == out.shape:
+                raise ValueError('Norm1 Incompatible size:',
+                                 x.shape, out.shape)
+            x.abs(out=out)
+            return out.sum() * self.gamma
     
     def prox(self,x,tau):
         return (x.abs() - tau*self.gamma).maximum(0) * x.sign()
     
+    def proximal(self, x, tau, out=None):
+        if out is None:
+            return self.prox(x, tau)
+        else:
+            if isSizeCorrect(x,out):
+                # check dimensionality
+                if issubclass(type(out), DataContainer):
+                    v = (x.abs() - tau*self.gamma).maximum(0)
+                    x.sign(out=out)
+                    out *= v
+                    #out.fill(self.prox(x,tau))    
+                elif issubclass(type(out) , numpy.ndarray):
+                    v = (x.abs() - tau*self.gamma).maximum(0)
+                    out[:] = x.sign()
+                    out *= v
+                    #out[:] = self.prox(x,tau)
+            else:
+                raise ValueError ('Wrong size: x{0} out{1}'.format(x.shape,out.shape) )
+
+# Box constraints indicator function. Calling returns 0 if argument is within 
+# the box. The prox operator is projection onto the box. Only implements one 
+# scalar lower and one upper as constraint on all elements. Should generalise 
+# to vectors to allow different constraints one elements.
+class IndicatorBox(Function):
+    
+    def __init__(self,lower=-numpy.inf,upper=numpy.inf):
+        # Do nothing
+        self.lower = lower
+        self.upper = upper
+        super(IndicatorBox, self).__init__()
+    
+    def __call__(self,x):
+        
+        if (numpy.all(x.array>=self.lower) and 
+            numpy.all(x.array <= self.upper) ):
+            val = 0
+        else:
+            val = numpy.inf
+        return val
+    
+    def prox(self,x,tau=None):
+        return  (x.maximum(self.lower)).minimum(self.upper)
+    
+    def proximal(self, x, tau, out=None):
+        if out is None:
+            return self.prox(x, tau)
+        else:
+            if not x.shape == out.shape:
+                raise ValueError('Norm1 Incompatible size:',
+                                 x.shape, out.shape)
+            #(x.abs() - tau*self.gamma).maximum(0) * x.sign()
+            x.abs(out = out)
+            out.__isub__(tau*self.gamma)
+            out.maximum(0, out=out)
+            if self.sign_x is None or not x.shape == self.sign_x.shape:
+                self.sign_x = x.sign()
+            else:
+                x.sign(out=self.sign_x)
+                
+            out.__imul__( self.sign_x )

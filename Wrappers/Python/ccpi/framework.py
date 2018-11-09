@@ -344,13 +344,17 @@ class DataContainer(object):
     def fill(self, array, **dimension):
         '''fills the internal numpy array with the one provided'''
         if dimension == {}:
-            if numpy.shape(array) != numpy.shape(self.array):
-                raise ValueError('Cannot fill with the provided array.' + \
-                                 'Expecting {0} got {1}'.format(
-                                         numpy.shape(self.array),
-                                         numpy.shape(array)))
-            # copy by reference, does not require more memory
-            self.array = array
+            if issubclass(type(array), DataContainer) or\
+               issubclass(type(array), numpy.ndarray):
+                if array.shape != self.shape:
+                    raise ValueError('Cannot fill with the provided array.' + \
+                                     'Expecting {0} got {1}'.format(
+                                     self.shape,array.shape))
+                if issubclass(type(array), DataContainer):
+                    numpy.copyto(self.array, array.array)
+                else:
+                    #self.array[:] = array
+                    numpy.copyto(self.array, array)
         else:
             
             command = 'self.array['
@@ -373,7 +377,7 @@ class DataContainer(object):
     
     ## algebra 
     
-    def __add__(self, other , *args, out=None, **kwargs):
+    def __add__(self, other , out=None, *args, **kwargs):
         if issubclass(type(other), DataContainer):    
             if self.check_dimensions(other):
                 out = self.as_array() + other.as_array()
@@ -518,6 +522,8 @@ class DataContainer(object):
     
     # in-place arithmetic operators:
     # (+=, -=, *=, /= , //=,
+    # must return self
+    
     
     
     def __iadd__(self, other):
@@ -533,14 +539,14 @@ class DataContainer(object):
     
     def __imul__(self, other):
         if isinstance(other, (int, float)) :
-            numpy.multiply(self.array, other, out=self.array)
+            arr = self.as_array()
+            numpy.multiply(arr, other, out=arr)
         elif issubclass(type(other), DataContainer):
             if self.check_dimensions(other):
                 numpy.multiply(self.array, other.array, out=self.array)
             else:
                 raise ValueError('Dimensions do not match')
         return self
-        #return self * other
     # __imul__
     
     def __isub__(self, other):
@@ -617,13 +623,14 @@ class DataContainer(object):
                                  .format(len(self.shape),len(new_order)))
         
                 
-    def copy(self):	
-        '''alias of clone'''	
+    def copy(self):
+        '''alias of clone'''    
         return self.clone()
     
     ## binary operations
             
-    def pixel_wise_binary(self,pwop, x2 , *args, out=None,  **kwargs):    
+    def pixel_wise_binary(self,pwop, x2 , out=None, *args,  **kwargs):    
+
         if out is None:
             if isinstance(x2, (int, float, complex)):
                 out = pwop(self.as_array() , x2 , *args, **kwargs )
@@ -637,53 +644,52 @@ class DataContainer(object):
         
         elif issubclass(type(out), DataContainer) and issubclass(type(x2), DataContainer):
             if self.check_dimensions(out) and self.check_dimensions(x2):
-                pwop(self.as_array(), x2.as_array(), *args, out=out.as_array(), **kwargs )
-                return type(self)(out.as_array(),
-                       deep_copy=False, 
-                       dimension_labels=self.dimension_labels,
-                       geometry=self.geometry)
+                pwop(self.as_array(), x2.as_array(), out=out.as_array(), *args, **kwargs )
+                #return type(self)(out.as_array(),
+                #       deep_copy=False, 
+                #       dimension_labels=self.dimension_labels,
+                #       geometry=self.geometry)
+                return out
             else:
                 raise ValueError(message(type(self),"Wrong size for data memory: ", out.shape,self.shape))
         elif issubclass(type(out), DataContainer) and isinstance(x2, (int,float,complex)):
             if self.check_dimensions(out):
-                pwop(self.as_array(), x2, *args, out=out.as_array(), **kwargs )
-                return type(self)(out.as_array(),
-                       deep_copy=False, 
-                       dimension_labels=self.dimension_labels,
-                       geometry=self.geometry)
+
+                pwop(self.as_array(), x2, out=out.as_array(), *args, **kwargs )
+                return out
             else:
                 raise ValueError(message(type(self),"Wrong size for data memory: ", out.shape,self.shape))
         elif issubclass(type(out), numpy.ndarray):
             if self.array.shape == out.shape and self.array.dtype == out.dtype:
-                pwop(self.as_array(), x2 , *args, out=out, **kwargs)
-                return type(self)(out,
-                       deep_copy=False, 
-                       dimension_labels=self.dimension_labels,
-                       geometry=self.geometry)
+                pwop(self.as_array(), x2 , out=out, *args, **kwargs)
+                #return type(self)(out,
+                #       deep_copy=False, 
+                #       dimension_labels=self.dimension_labels,
+                #       geometry=self.geometry)
         else:
             raise ValueError (message(type(self),  "incompatible class:" , pwop.__name__, type(out)))
     
-    def add(self, other , *args, out=None, **kwargs):
-        return self.pixel_wise_binary(numpy.add, other, *args, out=out, **kwargs)
+    def add(self, other , out=None, *args, **kwargs):
+        return self.pixel_wise_binary(numpy.add, other, out=out, *args, **kwargs)
     
-    def subtract(self, other , *args, out=None, **kwargs):
-        return self.pixel_wise_binary(numpy.subtract, other, *args, out=out, **kwargs)
+    def subtract(self, other, out=None , *args, **kwargs):
+        return self.pixel_wise_binary(numpy.subtract, other, out=out, *args, **kwargs)
 
-    def multiply(self, other , *args, out=None, **kwargs):
-        return self.pixel_wise_binary(numpy.multiply, other, *args, out=out, **kwargs)
+    def multiply(self, other , out=None, *args, **kwargs):
+        return self.pixel_wise_binary(numpy.multiply, other, out=out, *args, **kwargs)
     
-    def divide(self, other , *args, out=None, **kwargs):
-        return self.pixel_wise_binary(numpy.divide, other, *args, out=out, **kwargs)
+    def divide(self, other , out=None ,*args, **kwargs):
+        return self.pixel_wise_binary(numpy.divide, other, out=out, *args, **kwargs)
     
-    def power(self, other , *args, out=None, **kwargs):
-        return self.pixel_wise_binary(numpy.power, other, *args, out=out, **kwargs)
+    def power(self, other , out=None, *args, **kwargs):
+        return self.pixel_wise_binary(numpy.power, other, out=out, *args, **kwargs)
     
-    def maximum(self,x2, out=None):
-        return self.pixel_wise_binary(numpy.maximum, x2=x2, out=out)
+    def maximum(self,x2, out=None, *args, **kwargs):
+        return self.pixel_wise_binary(numpy.maximum, x2=x2, out=out, *args, **kwargs)
     
     ## unary operations
     
-    def pixel_wise_unary(self,pwop, *args, out=None,  **kwargs):
+    def pixel_wise_unary(self,pwop, out=None, *args,  **kwargs):
         if out is None:
             out = pwop(self.as_array() , *args, **kwargs )
             return type(self)(out,
@@ -692,36 +698,23 @@ class DataContainer(object):
                        geometry=self.geometry)
         elif issubclass(type(out), DataContainer):
             if self.check_dimensions(out):
-                pwop(self.as_array(), *args, out=out.as_array(), **kwargs )
-                return type(self)(out.as_array(),
-                       deep_copy=False, 
-                       dimension_labels=self.dimension_labels,
-                       geometry=self.geometry)
+                pwop(self.as_array(), out=out.as_array(), *args, **kwargs )
             else:
                 raise ValueError(message(type(self),"Wrong size for data memory: ", out.shape,self.shape))
         elif issubclass(type(out), numpy.ndarray):
             if self.array.shape == out.shape and self.array.dtype == out.dtype:
-                pwop(self.as_array(), *args, out=out, **kwargs)
-                return type(self)(out,
-                       deep_copy=False, 
-                       dimension_labels=self.dimension_labels,
-                       geometry=self.geometry)
+                pwop(self.as_array(), out=out, *args, **kwargs)
         else:
             raise ValueError (message(type(self),  "incompatible class:" , pwop.__name__, type(out)))
     
-    def abs(self, out=None):
-        return self.pixel_wise_unary(numpy.abs, out=out)
+    def abs(self, out=None, *args,  **kwargs):
+        return self.pixel_wise_unary(numpy.abs, out=out, *args,  **kwargs)
     
-    def sign(self, out=None):
-        #out = numpy.sign(self.as_array() )
-        #return type(self)(out,
-        #               deep_copy=False, 
-        #               dimension_labels=self.dimension_labels,
-        #               geometry=self.geometry)
-        return self.pixel_wise_unary(numpy.sign , out=out)
+    def sign(self, out=None, *args,  **kwargs):
+        return self.pixel_wise_unary(numpy.sign , out=out, *args,  **kwargs)
     
-    def sqrt(self, out=None):
-        return self.pixel_wise_unary(numpy.sqrt, out=out)
+    def sqrt(self, out=None, *args,  **kwargs):
+        return self.pixel_wise_unary(numpy.sqrt, out=out, *args,  **kwargs)
     
     #def __abs__(self):
     #    operation = FM.OPERATION.ABS
@@ -729,9 +722,8 @@ class DataContainer(object):
     # __abs__
     
     ## reductions
-    def sum(self):
-        return self.as_array().sum()
-    
+    def sum(self, out=None, *args, **kwargs):
+        return self.as_array().sum(*args, **kwargs)
     
 class ImageData(DataContainer):
     '''DataContainer for holding 2D or 3D DataContainer'''
@@ -795,7 +787,7 @@ class ImageData(DataContainer):
                 raise ValueError('Please pass either a DataContainer, ' +\
                                  'a numpy array or a geometry')
         else:
-            if type(array) == DataContainer:
+            if issubclass(type(array) , DataContainer):
                 # if the array is a DataContainer get the info from there
                 if not ( array.number_of_dimensions == 2 or \
                          array.number_of_dimensions == 3 or \
@@ -807,7 +799,7 @@ class ImageData(DataContainer):
                 #                 array.dimension_labels, **kwargs)
                 super(ImageData, self).__init__(array.as_array(), deep_copy,
                                  array.dimension_labels, **kwargs)
-            elif type(array) == numpy.ndarray:
+            elif issubclass(type(array) , numpy.ndarray):
                 if not ( array.ndim == 2 or array.ndim == 3 or array.ndim == 4 ):
                     raise ValueError(
                             'Number of dimensions are not 2 or 3 or 4 : {0}'\
@@ -904,7 +896,7 @@ class AcquisitionData(DataContainer):
                                  dimension_labels, **kwargs)
         else:
             
-            if type(array) == DataContainer:
+            if issubclass(type(array) ,DataContainer):
                 # if the array is a DataContainer get the info from there
                 if not ( array.number_of_dimensions == 2 or \
                          array.number_of_dimensions == 3 or \
@@ -916,7 +908,7 @@ class AcquisitionData(DataContainer):
                 #                 array.dimension_labels, **kwargs)
                 super(AcquisitionData, self).__init__(array.as_array(), deep_copy,
                                  array.dimension_labels, **kwargs)
-            elif type(array) == numpy.ndarray:
+            elif issubclass(type(array) ,numpy.ndarray):
                 if not ( array.ndim == 2 or array.ndim == 3 or array.ndim == 4 ):
                     raise ValueError(
                             'Number of dimensions are not 2 or 3 or 4 : {0}'\

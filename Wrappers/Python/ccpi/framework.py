@@ -22,16 +22,10 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import abc
 import numpy
 import sys
 from datetime import timedelta, datetime
 import warnings
-
-if sys.version_info[0] >= 3 and sys.version_info[1] >= 4:
-    ABC = abc.ABC
-else:
-    ABC = abc.ABCMeta('ABC', (), {})
 
 def find_key(dic, val):
     """return the key of dictionary dic given the value"""

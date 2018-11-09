@@ -9,6 +9,13 @@ build:
 #    - CIL_VERSION   
   number: 0
   
+  
+test:
+  requires:
+    - python-wget
+    - cvxpy # [not win]
+    - h5py
+    
 requirements:
   build:
     - python
@@ -19,13 +26,8 @@ requirements:
     - numpy
     - scipy
     - matplotlib
-  run:
-    - python
-    - numpy
-    - cvxpy # [not win]
-    - scipy
-    - matplotlib
-	
+    - h5py
+  
 about:
   home: http://www.ccpi.ac.uk
   license:  Apache 2.0 License

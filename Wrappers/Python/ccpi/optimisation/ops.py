@@ -186,10 +186,10 @@ def PowerMethodNonsquareOld(op,numiters):
 #    return s, x0
     
 
-def PowerMethodNonsquare(op,numiters):
+def PowerMethodNonsquare(op,numiters , x0=None):
     # Initialise random
     # Jakob's
-    inputsize , outputsize = op.size()
+    # inputsize , outputsize = op.size()
     #x0 = ImageContainer(numpy.random.randn(*inputsize)
     # Edo's
     #vg = ImageGeometry(voxel_num_x=inputsize[0],
@@ -200,16 +200,16 @@ def PowerMethodNonsquare(op,numiters):
     #print (x0)
     #x0.fill(numpy.random.randn(*x0.shape))
     
-    
-    #x0 = op.create_image_data()
-    x0 = op.allocate_direct()
-    x0.fill(numpy.random.randn(*x0.shape))
+    if x0 is None:
+        #x0 = op.create_image_data()
+        x0 = op.allocate_direct()
+        x0.fill(numpy.random.randn(*x0.shape))
     
     s = numpy.zeros(numiters)
     # Loop
     for it in numpy.arange(numiters):
         x1 = op.adjoint(op.direct(x0))
-        x1norm = numpy.sqrt((x1**2).sum())
+        x1norm = numpy.sqrt((x1*x1).sum())
         #print ("x0 **********" ,x0)
         #print ("x1 **********" ,x1)
         s[it] = (x1*x0).sum() / (x0*x0).sum()

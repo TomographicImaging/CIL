@@ -1,4 +1,4 @@
-# CCPi-PythonFramework
+# CCPi-Framework
 Basic Python Framework for CIL
 
 This package aims at ensuring a longer life and easy extensibility of the CIL software. This package provides a common framework, hence the name, for the analysis of data in the CT pipeline and quick development of novel reconstruction algorithms.

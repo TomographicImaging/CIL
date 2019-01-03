@@ -1,14 +1,13 @@
 package:
   name: ccpi-framework
-  version: 0.11.3
+  version: {{ environ['CIL_VERSION'] }}
 
 
 build:
   preserve_egg_dir: False
-#script_env:
-#    - CIL_VERSION   
-  number: 0
-  
+  script_env:
+    - CIL_VERSION   
+  #number: 0  
   
 test:
   requires:

@@ -1,4 +1,4 @@
-# This script demonstrates how to load a mat-file with UoM colour-bay data 
+v# This script demonstrates how to load a mat-file with UoM colour-bay data 
 # into the CIL optimisation framework and run (simple) multichannel 
 # reconstruction methods.
 
@@ -15,7 +15,7 @@ from ccpi.optimisation.funcs import Norm2sq, Norm1
 
 # Load full data and permute to expected ordering. Change path as necessary.
 # The loaded X has dims 80x60x80x150, which is pix x angle x pix x channel.
-# Permute (numpy.transpose) puts into our default ordering which is 
+# Permute (numpy.transpose) puts into our default ordering which is
 # (channel, angle, vertical, horizontal).
 
 pathname = '/media/jakob/050d8d45-fab3-4285-935f-260e6c5f162c1/Data/ColourBay/spectral_data_sets/CarbonPd/'

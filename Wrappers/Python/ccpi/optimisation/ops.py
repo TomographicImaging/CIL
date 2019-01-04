@@ -30,6 +30,7 @@ from ccpi.framework import AcquisitionGeometry
 
 
 class Operator(object):
+    
     def direct(self,x, out=None):
         return x
     def adjoint(self,x, out=None):
@@ -104,6 +105,7 @@ class TomoIdentity(Operator):
     
 
 class FiniteDiff2D(Operator):
+    
     def __init__(self):
         self.s1 = 8.0
         super(FiniteDiff2D, self).__init__()
@@ -117,6 +119,7 @@ class FiniteDiff2D(Operator):
         d2 = numpy.zeros_like(x.as_array())
         d2[:-1,:] = x.as_array()[1:,:] - x.as_array()[:-1,:]
         d = numpy.stack((d1,d2),0)
+        
         #x.geometry.voxel_num_z = 2
         return type(x)(d,False,geometry=x.geometry)
     

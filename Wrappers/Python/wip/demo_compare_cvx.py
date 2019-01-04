@@ -19,6 +19,7 @@ if use_cvxpy:
 import numpy as np
 import matplotlib.pyplot as plt
 
+##
 # Problem data.
 m = 30
 n = 20
@@ -35,7 +36,8 @@ b = DataContainer(bmat)
 
 # Regularization parameter
 lam = 10
-opt = {'memopt':True}
+#opt = {'memopt':True}
+opt = {'tol': 1e-6, 'iter': 5000, 'memopt':True}
 # Create object instances with the test data A and b.
 f = Norm2sq(A,b,c=0.5, memopt=True)
 g0 = ZeroFun()
@@ -52,6 +54,7 @@ x_fista0, it0, timing0, criter0 = FISTA(x_init, f, g0 , opt=opt)
 print("FISTA least squares plus zero function solution and objective value:")
 print(x_fista0.array)
 print(criter0[-1])
+
 
 if use_cvxpy:
     # Compare to CVXPY
@@ -71,12 +74,14 @@ if use_cvxpy:
     print(objective0.value)
 
 # Plot criterion curve to see FISTA converge to same value as CVX.
-iternum = np.arange(1,1001)
+iternum = np.arange(1,opt['iter']+1)
 plt.figure()
 plt.loglog(iternum[[0,-1]],[objective0.value, objective0.value], label='CVX LS')
 plt.loglog(iternum,criter0,label='FISTA LS')
 plt.legend()
 plt.show()
+
+#%%
 
 # Create 1-norm object instance
 g1 = Norm1(lam)
@@ -124,10 +129,10 @@ if use_cvxpy:
     print(objective1.value)
     
 # Now try another algorithm FBPD for same problem:
-x_fbpd1, itfbpd1, timingfbpd1, criterfbpd1 = FBPD(x_init,Identity(), None, f, g1)
+x_fbpd1, itfbpd1, timingfbpd1, criterfbpd1 = FBPD(x_init,Identity(), None, f, g1, opt=opt)
 print(x_fbpd1)
 print(criterfbpd1[-1])
-
+#%%
 # Plot criterion curve to see both FISTA and FBPD converge to same value.
 # Note that FISTA is very efficient for 1-norm minimization so it beats
 # FBPD in this test by a lot. But FBPD can handle a larger class of problems 
@@ -138,6 +143,7 @@ plt.loglog(iternum,criter1,label='FISTA LS+1')
 plt.legend()
 plt.show()
 
+#%%
 plt.figure()
 plt.loglog(iternum[[0,-1]],[objective1.value, objective1.value], label='CVX LS+1')
 plt.loglog(iternum,criter1,label='FISTA LS+1')
@@ -145,6 +151,7 @@ plt.loglog(iternum,criterfbpd1,label='FBPD LS+1')
 plt.legend()
 plt.show()
 
+#%%
 # Now try 1-norm and TV denoising with FBPD, first 1-norm.
 
 # Set up phantom size NxN by creating ImageGeometry, initialising the 
@@ -167,19 +174,25 @@ I = TomoIdentity(ig)
 
 # Data and add noise
 y = I.direct(Phantom)
-y.array = y.array + 0.1*np.random.randn(N, N)
+y.array = y.array + 0.2*np.random.randn(N, N)
 
-plt.imshow(y.array)
+fig = plt.figure()
+im = plt.imshow(y.array)
 plt.title('Noisy image')
+fig.subplots_adjust(right=0.8)
+cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
+fig.colorbar(im, cax=cbar_ax)
 plt.show()
 
+
+#%%
 
 ###################
 # Data fidelity term
 f_denoise = Norm2sq(I,y,c=0.5,memopt=True)
 
 # 1-norm regulariser
-lam1_denoise = 1.0
+lam1_denoise = 1000
 g1_denoise = Norm1(lam1_denoise)
 
 # Initial guess
@@ -214,7 +227,8 @@ if use_cvxpy:
     prob1_denoise = Problem(objective1_denoise)
     
     # The optimal objective is returned by prob.solve().
-    result1_denoise = prob1_denoise.solve(verbose=False,solver=SCS,eps=1e-12)
+#    result1_denoise = prob1_denoise.solve(verbose=False,solver=SCS,eps=1e-12)
+    result1_denoise = prob1_denoise.solve(verbose=True,solver=MOSEK)
     
     # The optimal solution for x is stored in x.value and optimal objective value 
     # is in result as well as in objective.value
@@ -233,38 +247,43 @@ x1_cvx.shape = (N,N)
 
 fig = plt.figure()
 plt.subplot(1,4,1)
-plt.imshow(y.array)
+im = plt.imshow(y.array)
 plt.title("LS+1")
 plt.subplot(1,4,2)
-plt.imshow(x_fista1_denoise.as_array())
+im = plt.imshow(x_fista1_denoise.as_array())
 plt.title("fista")
 plt.subplot(1,4,3)
-plt.imshow(x_fbpd1_denoise.as_array())
+im = plt.imshow(x_fbpd1_denoise.as_array())
 plt.title("fbpd")
 plt.subplot(1,4,4)
-plt.imshow(x1_cvx)
+im = plt.imshow(x1_cvx)
 plt.title("cvx")
+fig.subplots_adjust(right=0.8)
+cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
+fig.colorbar(im, cax=cbar_ax)
 plt.show()
 
+#%%
 ##############################################################
 # Now TV with FBPD and Norm2
-lam_tv = 0.1
-gtv = TV2D(lam_tv)
-norm2 = Norm2(lam_tv)
-op = FiniteDiff2D()
+lam_tv = 10
+#gtv = TV2D(lam_tv)
+#norm2 = Norm2(lam_tv)
+#op = FiniteDiff2D()
 #gtv(gtv.op.direct(x_init_denoise))
 
-opt_tv = {'tol': 1e-4, 'iter': 10000}
+#opt_tv = {'tol': 1e-4, 'iter': 10000}
 
-x_fbpdtv_denoise, itfbpdtv_denoise, timingfbpdtv_denoise, \
- criterfbpdtv_denoise = FBPD(x_init_denoise, op, None, \
-                             f_denoise, norm2 ,opt=opt_tv)
-print(x_fbpdtv_denoise)
-print(criterfbpdtv_denoise[-1])
+#x_fbpdtv_denoise, itfbpdtv_denoise, timingfbpdtv_denoise, \
+# criterfbpdtv_denoise = FBPD(x_init_denoise, op, None, \
+#                             f_denoise, norm2 ,opt=opt_tv)
+#print(x_fbpdtv_denoise)
+#print(criterfbpdtv_denoise[-1])
 
-plt.imshow(x_fbpdtv_denoise.as_array())
-plt.title('FBPD TV')
+#plt.imshow(x_fbpdtv_denoise.as_array())
+#plt.title('FBPD TV')
 #plt.show()
+
 
 if use_cvxpy:
     # Compare to CVXPY

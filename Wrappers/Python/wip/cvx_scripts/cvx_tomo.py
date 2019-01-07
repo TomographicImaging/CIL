@@ -113,22 +113,16 @@ cfg = astra.astra_dict('FBP')
 cfg['ReconstructionDataId'] = rec_id
 cfg['ProjectionDataId'] = noisy_sin_id
 cfg['ProjectorId'] = proj_id
-cfg['FilterType'] = 'ram-lak' 
+cfg['FilterType'] = 'ram-lak' # none, shepp-logan, cosine, hamming, hann, tukey
 
-# possible values for FilterType:
-# none, ram-lak, shepp-logan, cosine, hamming, hann, tukey, lanczos,
-# triangular, gaussian, barlett-hann, blackman, nuttall, blackman-harris,
-# blackman-nuttall, flat-top, kaiser, parzen
 
-# config for iterative reconstructions
-#cfg = astra.astra_dict('ART')
-#cfg['ReconstructionDataId'] = rec_id
-#cfg['ProjectionDataId'] = noisy_sin_id
-#cfg['ProjectorId'] = proj_id
+cfg1 = astra.astra_dict('SART')
+cfg1['ReconstructionDataId'] = rec_id
+cfg1['ProjectionDataId'] = noisy_sin_id
+cfg1['ProjectorId'] = proj_id
 
 # Create the algorithm object from the configuration structure
 alg_id = astra.algorithm.create(cfg)
-
 astra.algorithm.run(alg_id, 10)
 
 # Get the result
@@ -140,10 +134,22 @@ plt.colorbar()
 plt.show()
 
 # Clean up.
-astra.algorithm.delete(alg_id)
-astra.data2d.delete(rec_id)
-#astra.data2d.delete(noisy_sin_id)
-#astra.projector.delete(proj_id)
+#astra.algorithm.delete(alg_id)
+#astra.data2d.delete(rec_id)
+
+
+alg_id = astra.algorithm.create(cfg1)
+astra.algorithm.run(alg_id, 100)
+
+# Get the result
+rec = astra.data2d.get(rec_id)
+
+plt.imshow(rec, cmap = 'viridis')
+plt.title('Reconstruction SIRT')
+plt.colorbar()
+plt.show()
+
+
 
 #%%
 

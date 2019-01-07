@@ -29,7 +29,7 @@ plt.imshow(rec_fbp[0], cmap = 'viridis')
 plt.title('Object')
 plt.show()
 
-rec_sirt = tomopy.recon(t1, ang, algorithm = 'sirt', num_iter = 10, sinogram_order = True, num_gridx = 50, num_gridy = 50)
+rec_sirt = tomopy.recon(t1, ang, algorithm = 'tv', num_iter = 100, sinogram_order = True, num_gridx = 50, num_gridy = 50)
 plt.imshow(rec_sirt[0], cmap = 'viridis')
 plt.title('Object')
 plt.show()

@@ -38,7 +38,7 @@ def isSizeCorrect(data1 ,data2):
         
 class Function(object):
     def __init__(self):
-        pass
+        self.L = None
     def __call__(self,x, out=None):       raise NotImplementedError 
     def grad(self, x):                    raise NotImplementedError
     def prox(self, x, tau):               raise NotImplementedError

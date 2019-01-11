@@ -24,12 +24,10 @@ fi
 # presume that git clone is done before this script is launched, if not, uncomment
 # git clone https://github.com/vais-ral/CCPi-Regularisation-Toolkit
 conda install -y conda-build
-#export CIL_VERSION=0.10.2
-#cd CCPi-Regularisation-Toolkit # already there by jenkins
+
 # need to call first build
-conda build Wrappers/Python/conda-recipe
+conda build Wrappers/Python/conda-recipe -c conda-forge -c ccpi
 # then need to call the same with --output 
-#- otherwise no build is done :-(, just fake file names are generated
 export REG_FILES=`conda build Wrappers/Python/conda-recipe --output`
 # REG_FILES variable should contain output files
 echo files created: $REG_FILES

@@ -17,6 +17,7 @@ test:
 requirements:
   build:
     - python
+    - numpy {{ numpy }}
     - setuptools
 
   run:

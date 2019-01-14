@@ -21,6 +21,7 @@ requirements:
     - setuptools
 
   run:
+    - {{ pin_compatible('numpy', max_pin='x.x') }}
     - python
     - numpy
     - scipy

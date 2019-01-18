@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+# define CIL_VERSION if not defined by calling environment
 if [[ -n ${CIL_VERSION} ]]
 then
   echo Using defined version: $CIL_VERSION
@@ -6,12 +8,10 @@ else
   export CIL_VERSION=0.10.4
   echo Defining version: $CIL_VERSION
 fi
-# Script to builds source code in Jenkins environment
-# module try-load conda
 
-# install miniconda if the module is not present
+# install miniconda if it is not already present
 if hash conda 2>/dev/null; then
-  echo using conda
+  echo using preinstalled conda
 else
   if [ ! -f Miniconda3-latest-Linux-x86_64.sh ]; then
     wget -q https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh

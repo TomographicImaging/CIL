@@ -4,4 +4,4 @@ python:
   - 3.6
 numpy:
   - 1.12
-  - 1.15
+  # doesn't build with - 1.15

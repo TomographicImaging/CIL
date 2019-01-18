@@ -3,5 +3,6 @@ python:
   - 3.5
   - 3.6
 numpy:
-  - 1.12
-  # doesn't build with - 1.15
+  # doesn't build with, cvxp requires >1.14
+  #- 1.12
+  - 1.15

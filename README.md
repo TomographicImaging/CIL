@@ -1,5 +1,5 @@
 # CCPi-Framework
-[![Build Status](https://anvil.softeng-support.ac.uk/jenkins/buildStatus/icon?job=CILsingle/CCPi-Framework&build=6)](https://anvil.softeng-support.ac.uk/jenkins/job/CILsingle/CCPi-Framework/6/)
+[![Build Status](https://anvil.softeng-support.ac.uk/jenkins/buildStatus/icon?job=CILsingle/CCPi-Framework)](https://anvil.softeng-support.ac.uk/jenkins/job/CILsingle/job/CCPi-Framework/)
 
 Basic Python Framework for CIL
 

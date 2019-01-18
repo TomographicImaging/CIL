@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
 # define CIL_VERSION if not defined by calling environment
-if [[ -n ${CIL_VERSION} ]]
-then
+if [[ -n ${CIL_VERSION} ]]; then
   echo Using defined version: $CIL_VERSION
 else
   export CIL_VERSION=0.10.4
@@ -13,6 +12,7 @@ fi
 if hash conda 2>/dev/null; then
   echo using preinstalled conda
 else
+  echo installing miniconda
   if [ ! -f Miniconda3-latest-Linux-x86_64.sh ]; then
     wget -q https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
     chmod +x Miniconda3-latest-Linux-x86_64.sh
@@ -22,7 +22,7 @@ else
 fi
 
 # presume that git clone is done before this script is launched, if not, uncomment
-# git clone https://github.com/vais-ral/CCPi-Regularisation-Toolkit
+# git clone https://github.com/vais-ral/CCPi-Framework.git
 conda install -y conda-build
 
 # need to call first build

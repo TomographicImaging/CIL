@@ -1,4 +1,3 @@
-
 from ccpi.framework import ImageData, ImageGeometry, AcquisitionGeometry, DataContainer
 from ccpi.optimisation.algs import FISTA, FBPD, CGLS
 from ccpi.optimisation.funcs import Norm2sq, ZeroFun, Norm1, TV2D, Norm2
@@ -56,6 +55,7 @@ print(x_fista0.array)
 print(criter0[-1])
 
 
+#%%
 if use_cvxpy:
     # Compare to CVXPY
     

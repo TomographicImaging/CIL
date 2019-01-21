@@ -112,7 +112,7 @@ def FISTA(x_init, f=None, g=None, opt=None):
         
         # time and criterion
         timing[it] = time.time() - time0
-        criter[it] = f(x) + g(x);
+        criter[it] = f(x) + g(x)
         
         # stopping rule
         #if np.linalg.norm(x - x_old) < tol * np.linalg.norm(x_old) and it > 10:

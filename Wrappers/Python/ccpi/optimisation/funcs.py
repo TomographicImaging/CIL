@@ -108,7 +108,7 @@ class Norm2(Function):
                     x.multiply(xx, out= out)
             else:
                 raise ValueError ('Wrong size: x{0} out{1}'.format(x.shape,out.shape) )
-        
+             
 
 class TV2D(Norm2):
     
@@ -116,8 +116,8 @@ class TV2D(Norm2):
         super(TV2D,self).__init__(gamma, 0)
         self.op = FiniteDiff2D()
         self.L = self.op.get_max_sing_val()
+                     
         
-
 # Define a class for squared 2-norm
 class Norm2sq(Function):
     '''
@@ -177,9 +177,13 @@ class Norm2sq(Function):
             out.fill(self.direct_placehold)
         else:
             return self.grad(x)
-            
-
-
+        
+    def prox_l2(self, x, tau):
+        tmp = numpy.sqrt(numpy.sum(x**2, 0)) 
+        res = x.as_array()/numpy.maximum(1, tmp / tau)
+        return type(x)(res,geometry=x.geometry)        
+        
+        
 class ZeroFun(Function):
     
     def __init__(self,gamma=0,L=1):

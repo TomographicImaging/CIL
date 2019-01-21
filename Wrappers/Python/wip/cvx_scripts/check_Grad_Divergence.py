@@ -76,7 +76,10 @@ for i in range(len(u.shape)):
 
 
 
-
+#%%
+    
+u = np.random.randint(10, size = (2,3))    
+H = GradOper(u.shape, [1,1], 'for', '2', 'Neum')
 
 
 

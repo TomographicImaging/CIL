@@ -15,7 +15,7 @@ import tomopy
 
 #%%
 
-N = 50
+N = 75
 
 # Create phantom
 x = np.zeros((N,N))
@@ -38,32 +38,24 @@ matrix_id = astra.projector.matrix(proj_id)
 # Get the projection matrix as a Scipy sparse matrix.
 ProjMat = astra.matrix.get(matrix_id)
 
-# add Noise
+# Poisson noise to the sinogram
 np.random.seed(1)
 
-#noisy_sin = sin + 2 * np.random.randn(len(proj_geom['ProjectionAngles']),proj_geom['DetectorCount'])
-noisy_sin = 0.5 * np.random.poisson(sin/0.5)
+scale = 0.5
+noisy_sin = scale * np.random.poisson(sin/scale)
 
 # Note, need to create an ID for the noisy sinogram and apply it to the rec object
 noisy_sin_id = astra.data2d.create('-sino', proj_geom, noisy_sin);
 
-plt.figure()
-plt.imshow(x, cmap = 'viridis')
-plt.colorbar()
-plt.show()
+fig, ax = plt.subplots(1, 2, figsize=(10, 10))
+# Display the in-painted image.
+ax[0].imshow(x, cmap='viridis');
+ax[0].set_title("Phantom")
+ax[0].axis('off')
 
-plt.figure()
-plt.imshow(sin, cmap = 'viridis')
-plt.title('Sinogram')
-plt.colorbar()
-plt.show()
-
-
-plt.figure()
-plt.imshow(noisy_sin, cmap = 'viridis')
-plt.title('Noisy Sinogram')
-plt.colorbar()
-plt.show()
+ax[1].imshow(noisy_sin, cmap='viridis');
+ax[1].set_title("Noisy sinogram")
+ax[1].axis('off');
 
 
 #%%
@@ -81,9 +73,9 @@ alpha_tvCT = 50
 
 # Define the problem
 u_tvCT = Variable( N*N, 1)
-
-obj_tvCT =  Minimize( 0.5 * sum_squares(ProjMat * u_tvCT - noisy_sin.ravel()) + \
-                    alpha_tvCT * tv_fun(reshape(u_tvCT, (N,N))) )
+z = noisy_sin.ravel()
+obj_tvCT =  Minimize( 0.5 * sum_squares(ProjMat * u_tvCT - z) + \
+                    alpha_tvCT * tv(reshape(u_tvCT, (N,N))) )
 
 prob_tvCT = Problem(obj_tvCT)
 

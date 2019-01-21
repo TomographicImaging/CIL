@@ -17,7 +17,8 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import numpy
+import numpy 
+import numpy as np
 from scipy.sparse.linalg import svds
 from ccpi.framework import DataContainer
 from ccpi.framework import AcquisitionData
@@ -101,8 +102,6 @@ class TomoIdentity(Operator):
             raise ValueError("Wrong geometry type: expected ImageGeometry of AcquisitionGeometry, got ", type(self.geometry))
     def allocate_adjoint(self):
         return self.allocate_direct()
-    
-    
 
 class FiniteDiff2D(Operator):
     
@@ -189,7 +188,7 @@ def PowerMethodNonsquareOld(op,numiters):
 #    return s, x0
     
 
-def PowerMethodNonsquare(op,numiters , x0=None):
+def PowerMethodNonsquare(op, numiters , x0=None):
     # Initialise random
     # Jakob's
     # inputsize , outputsize = op.size()

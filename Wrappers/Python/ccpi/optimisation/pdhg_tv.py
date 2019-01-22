@@ -27,7 +27,7 @@ data = data/np.max(data)
 N, M = data.shape
 np.random.seed(10)
 
-noise = 's&p'
+noise = 'gaussian'
 
 if noise == 'gaussian':
     noisy_data = DataContainer(random_noise(data,'gaussian', mean = 0, var = 0.01))
@@ -54,7 +54,7 @@ sigma = 0.95/regulariser.L
 operator = regulariser.op
 
 # Options
-opt = {'tol': 1e-7, 'iter': 1000, 'show_iter': 100, 'memopt':False}
+opt = {'tol': 1e-7, 'iter': 500, 'show_iter': 100, 'memopt':False}
 
 regulariser.memopt = False
 FiniteDiff.memopt = False

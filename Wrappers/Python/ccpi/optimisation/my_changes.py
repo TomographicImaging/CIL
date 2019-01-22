@@ -78,8 +78,8 @@ class TV(Norm2):
             out.fill(type(x)(res,geometry = x.geometry))       
         else:
             return type(x)(res,geometry = x.geometry)
-                                    
         
+
 # Define a class for squared 2-norm
 class Norm2sq_new(Function):
     '''
@@ -159,7 +159,7 @@ class L1Norm(Function):
         self.c = c
         super(L1Norm, self).__init__()      
             
-    def proximal(self, x, tau):             
+    def proximal(self, x, tau, out = None):                     
         return self.b + (x - self.b).sign() * ((x - self.b).abs() - tau).maximum(0)
     
     def __call__(self,x):
@@ -188,20 +188,20 @@ def PDHG(data, regulariser, fidelity, operator, tau = None, sigma = None, opt = 
     # initialization
     if memopt:
         
-        x_init = DataContainer(np.zeros(data.shape))
-        y_init = DataContainer(np.zeros([len(data.shape), ] + list(data.shape) )) 
+        x_init = DataContainer(np.ones(data.shape))
+        y_init = DataContainer(np.ones([len(data.shape), ] + list(data.shape) )) 
 ##        
+        x = x_init.copy()        
         x_old = x_init.copy()
-        y_old = y_init.copy()
-##        
-        x_tilde = x_old.copy()
-        x = x_old.copy()
-        x_tmp = x_old.copy()        
-        y = y_old.copy()
-        y_tmp = y_old.copy()
-#                       
+        x_tmp = x_init.copy() 
+        xbar = x_init.copy()        
+        
+        y = y_init.copy()
+        y_old = y_init.copy()        
+        y_tmp = y_init.copy()
+                    
     else:
-#        
+        
         x_old = DataContainer(np.zeros(data.shape))
         xbar = DataContainer(np.zeros(data.shape))
         y_old = DataContainer(np.zeros([len(data.shape), ] + list(data.shape) )) 
@@ -221,36 +221,65 @@ def PDHG(data, regulariser, fidelity, operator, tau = None, sigma = None, opt = 
     
     for it in range(max_iter):
         
-        y_tmp = y_old + sigma * operator.direct(xbar)  
-        y = regulariser.proximal(y_tmp, regulariser.gamma)
-    
-        x_tmp = x_old - tau * operator.adjoint(y)
-        x = fidelity.proximal(x_tmp, tau)        
-
-        xbar = x + theta * (x - x_old) 
+        if memopt:
+            
+            operator.direct(xbar, out = y_tmp)
+            y_tmp *= sigma
+            y_tmp += y_old
+                     
+            regulariser.proximal(y_tmp, out = y)
+            
+            operator.adjoint(y, out = x_tmp)
+            x_tmp *=tau
+            x_tmp -= x_old
+                        
+            fidelity.proximal(x_tmp, tau, out = x)
+            
+            x.subtract(x_old, out = xbar)
+            xbar *= theta
+            xbar += x
+            
+            x_old.fill(x)
+            y_old.fill(y)
+                    
+        else:
+            
+           y_tmp = y_old + sigma * operator.direct(xbar)                      
+           y = regulariser.proximal(y_tmp, regulariser.gamma)
+           x_tmp = x_old - tau * operator.adjoint(y)
+           x = fidelity.proximal(x_tmp, tau)
+           xbar = x + theta * (x - x_old) 
+           x_old = x
+           y_old = y
+                   
         
-        error = error_cmp(x-x_old)     
+#        error = error_cmp(x-x_old)     
       
-        x_old = x
-        y_old = y
+
                     
         # Compute objective ( primal function ) 
-        obj_value.append(regulariser(x_old) + fidelity(x_old))
+#        obj_value.append(regulariser(x_old) + fidelity(x_old))
          
-        if error < tol:
-           break
+#        if error < tol:
+#           break
         
-        if it % show_iter==0:
-            print('{} {:<5} || {:<5} {:.4f} {:<5} || {:<5} {:.4g}'.format(it,' ',' ',obj_value[it],' ',' ',error))                 
+#        if it % show_iter==0:
+#            print('{} {:<5} || {:<5} {:.4f} {:<5} || {:<5} {:.4g}'.format(it,' ',' ',obj_value[it],' ',' ',error))                 
             
-#        plt.imshow(x.as_array())
-#        plt.show()        
+        plt.imshow(x.as_array())
+        plt.show()        
 
 
     # End time        
-    t_end = time.time()        
+#    t_end = time.time()        
         
     return x, t_end - t, obj_value, error    
+
+
+   
+
+
+
 
 
 

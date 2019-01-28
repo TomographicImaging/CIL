@@ -38,7 +38,7 @@ def isSizeCorrect(data1 ,data2):
         
 class Function(object):
     def __init__(self):
-        pass
+        self.L = None
     def __call__(self,x, out=None):       raise NotImplementedError 
     def grad(self, x):                    raise NotImplementedError
     def prox(self, x, tau):               raise NotImplementedError
@@ -136,6 +136,8 @@ class Norm2sq(Function):
     '''
     
     def __init__(self,A,b,c=1.0,memopt=False):
+        super(Norm2sq, self).__init__()
+    
         self.A = A  # Should be an operator, default identity
         self.b = b  # Default zero DataSet?
         self.c = c  # Default 1.
@@ -146,11 +148,13 @@ class Norm2sq(Function):
             self.adjoint_placehold = A.allocate_adjoint()
             
         
-        # Compute the Lipschitz parameter from the operator.
-        # Initialise to None instead and only call when needed.
-        self.L = 2.0*self.c*(self.A.get_max_sing_val()**2)
-        super(Norm2sq, self).__init__()
-    
+        # Compute the Lipschitz parameter from the operator if possible
+        # Leave it initialised to None otherwise
+        try:
+            self.L = 2.0*self.c*(self.A.get_max_sing_val()**2)
+        except AttributeError as ae:
+            pass
+        
     def grad(self,x):
         #return 2*self.c*self.A.adjoint( self.A.direct(x) - self.b )
         return (2.0*self.c)*self.A.adjoint( self.A.direct(x) - self.b )

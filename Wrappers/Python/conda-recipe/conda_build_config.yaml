@@ -3,6 +3,6 @@ python:
   - 3.5
   - 3.6
 numpy:
-  # doesn't build with, cvxp requires >1.14
+  # TODO investigage, as it doesn't currently build with cvxp, requires >1.14
   #- 1.12
   - 1.15

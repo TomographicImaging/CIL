@@ -28,6 +28,88 @@ from ccpi.optimisation.spdhg import spdhg
 from ccpi.optimisation.spdhg import KullbackLeibler
 from ccpi.optimisation.spdhg import KullbackLeiblerConvexConjugate
 
+
+
+class Algorithm(object):
+    def __init__(self, *args, **kwargs):
+        pass
+    def set_up(self, *args, **kwargs):
+        raise NotImplementedError()
+    def update(self):
+        raise NotImplementedError()
+    
+    def should_stop(self):
+        raise NotImplementedError()
+    
+    def __iter__(self):
+        return self
+    
+    def __next__(self):
+        if self.should_stop():
+            raise StopIteration()
+        else:
+            self.update()
+        
+class GradientDescent(Algorithm):
+    x = None
+    rate = 0
+    objective_function = None
+    regulariser = None
+    iteration = 0
+    stop_cryterion = 'max_iter'
+    __max_iteration = 0
+    __loss = []
+    memopt = False
+    def __init__(self, **kwargs):
+        args = ['x_init', 'objective_function', 'rate']
+        present = True
+        for k,v in kwargs.items():
+            if k in args:
+                args.pop(args.index(k))
+        if len(args) == 0:
+            return self.set_up(x_init=kwargs['x_init'],
+                               objective_function=kwargs['objective_function'],
+                               rate=kwargs['rate'])
+    
+    def should_stop(self):
+        return self.iteration >= self.max_iteration
+    
+    def set_up(self, x_init, objective_function, rate):
+        self.x = x_init.copy()
+        self.x_update = x_init.copy()
+        self.objective_function = objective_function
+        self.rate = rate
+        self.__loss.append(objective_function(x_init))
+        
+    def update(self):
+        if self.memopt:
+            self.objective_function.gradient(self.x, out=self.x_update)
+            self.x_update *= -self.rate
+            self.x += self.x_update
+        else:
+            self.x += -self.rate * self.objective_function.grad(self.x)
+            
+        self.__loss.append(self.objective_function(self.x))
+        self.iteration += 1
+        
+    def get_output(self):
+        return self.x
+    def get_current_loss(self):
+        return self.__loss[-1]
+    @property
+    def loss(self):
+        return self.__loss
+    @property
+    def max_iteration(self):
+        return self.__max_iteration
+    @max_iteration.setter
+    def max_iteration(self, value):
+        assert isinstance(value, int)
+        self.__max_iteration = value
+            
+        
+    
+
 def FISTA(x_init, f=None, g=None, opt=None):
     '''Fast Iterative Shrinkage-Thresholding Algorithm
     

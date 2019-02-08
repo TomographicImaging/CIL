@@ -971,7 +971,7 @@ class DataProcessor(object):
         '''
         raise NotImplementedError('Implement basic checks for input DataContainer')
         
-    def get_output(self):
+    def get_output(self, out=None):
         for k,v in self.__dict__.items():
             if v is None:
                 raise ValueError('Key {0} is None'.format(k))
@@ -987,7 +987,7 @@ class DataProcessor(object):
             self.output = self.process()
             return self.output
         self.runTime = datetime.now()
-        return self.process()
+        return self.process(out)
     
     def set_input_processor(self, processor):
         if issubclass(type(processor), DataProcessor):
@@ -1008,7 +1008,7 @@ class DataProcessor(object):
             dsi = self.input
         return dsi
         
-    def process(self):
+    def process(self, out=None):
         raise NotImplementedError('process must be implemented')
         
     

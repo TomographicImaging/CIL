@@ -32,7 +32,6 @@ ProjAngleChannels = np.zeros((totalAngles,totChannels,n,n),dtype='float32')
 
 #########################################################################
 print ("Loading the data...")
-#MainPath = '/media/algol/336F96987817D4B4/DATA/IMAT_DATA/' # path to data
 MainPath = '/media/jakob/050d8d45-fab3-4285-935f-260e6c5f162c1/Data/neutrondata/' # path to data
 pathname0 = '{!s}{!s}'.format(MainPath,'PSI_phantom_IMAT/DATA/Sample/')
 counterFileName = 4675

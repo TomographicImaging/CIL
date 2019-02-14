@@ -19,32 +19,48 @@
 
 import numpy
 from scipy.sparse.linalg import svds
+from ccpi.framework import DataContainer
+from ccpi.framework import AcquisitionData
+from ccpi.framework import ImageData
+from ccpi.framework import ImageGeometry
+from ccpi.framework import AcquisitionGeometry
 
 # Maybe operators need to know what types they take as inputs/outputs
 # to not just use generic DataContainer
 
 
 class Operator(object):
-    def direct(self,x):
+    def direct(self,x, out=None):
         return x
-    def adjoint(self,x):
+    def adjoint(self,x, out=None):
         return x
     def size(self):
         # To be defined for specific class
         raise NotImplementedError
     def get_max_sing_val(self):
         raise NotImplementedError
+    def allocate_direct(self):
+        raise NotImplementedError
+    def allocate_adjoint(self):
+        raise NotImplementedError
 
 class Identity(Operator):
     def __init__(self):
         self.s1 = 1.0
+        self.L = 1
         super(Identity, self).__init__()
         
-    def direct(self,x):
-        return x
+    def direct(self,x,out=None):
+        if out is None:
+            return x.copy()
+        else:
+            out.fill(x)
     
-    def adjoint(self,x):
-        return x
+    def adjoint(self,x, out=None):
+        if out is None:
+            return x.copy()
+        else:
+            out.fill(x)
     
     def size(self):
         return NotImplemented
@@ -52,36 +68,77 @@ class Identity(Operator):
     def get_max_sing_val(self):
         return self.s1
 
+class TomoIdentity(Operator):
+    def __init__(self, geometry, **kwargs):
+        self.s1 = 1.0
+        self.geometry = geometry
+        super(TomoIdentity, self).__init__()
+        
+    def direct(self,x,out=None):
+        if out is None:
+            return x.copy()
+        else:
+            out.fill(x)
+    
+    def adjoint(self,x, out=None):
+        if out is None:
+            return x.copy()
+        else:
+            out.fill(x)
+    
+    def size(self):
+        return NotImplemented
+    
+    def get_max_sing_val(self):
+        return self.s1
+    def allocate_direct(self):
+        if issubclass(type(self.geometry), ImageGeometry):
+            return ImageData(geometry=self.geometry)
+        elif issubclass(type(self.geometry), AcquisitionGeometry):
+            return AcquisitionData(geometry=self.geometry)
+        else:
+            raise ValueError("Wrong geometry type: expected ImageGeometry of AcquisitionGeometry, got ", type(self.geometry))
+    def allocate_adjoint(self):
+        return self.allocate_direct()
+    
+    
+
 class FiniteDiff2D(Operator):
     def __init__(self):
         self.s1 = 8.0
         super(FiniteDiff2D, self).__init__()
         
-    def direct(self,x):
+    def direct(self,x, out=None):
         '''Forward differences with Neumann BC.'''
+        # FIXME this seems to be working only with numpy arrays
+        
         d1 = numpy.zeros_like(x.as_array())
         d1[:,:-1] = x.as_array()[:,1:] - x.as_array()[:,:-1]
         d2 = numpy.zeros_like(x.as_array())
         d2[:-1,:] = x.as_array()[1:,:] - x.as_array()[:-1,:]
         d = numpy.stack((d1,d2),0)
-        
-        return type(x)(d,geometry=x.geometry)
+        #x.geometry.voxel_num_z = 2
+        return type(x)(d,False,geometry=x.geometry)
     
-    def adjoint(self,x):
+    def adjoint(self,x, out=None):
         '''Backward differences, Neumann BC.'''
         Nrows = x.get_dimension_size('horizontal_x')
-        Ncols = x.get_dimension_size('horizontal_x')
+        Ncols = x.get_dimension_size('horizontal_y')
         Nchannels = 1
         if len(x.shape) == 4:
             Nchannels = x.get_dimension_size('channel')
         zer = numpy.zeros((Nrows,1))
         xxx = x.as_array()[0,:,:-1]
-        h = numpy.concatenate((zer,xxx), 1) - numpy.concatenate((xxx,zer), 1)
+        #
+        h = numpy.concatenate((zer,xxx), 1) 
+        h -= numpy.concatenate((xxx,zer), 1)
         
         zer = numpy.zeros((1,Ncols))
         xxx = x.as_array()[1,:-1,:]
-        v = numpy.concatenate((zer,xxx), 0) - numpy.concatenate((xxx,zer), 0)
-        return type(x)(h + v,geometry=x.geometry)
+        #
+        v  = numpy.concatenate((zer,xxx), 0) 
+        v -= numpy.concatenate((xxx,zer), 0)
+        return type(x)(h + v, False, geometry=x.geometry)
     
     def size(self):
         return NotImplemented
@@ -129,10 +186,10 @@ def PowerMethodNonsquareOld(op,numiters):
 #    return s, x0
     
 
-def PowerMethodNonsquare(op,numiters):
+def PowerMethodNonsquare(op,numiters , x0=None):
     # Initialise random
     # Jakob's
-    #inputsize = op.size()[1]
+    # inputsize , outputsize = op.size()
     #x0 = ImageContainer(numpy.random.randn(*inputsize)
     # Edo's
     #vg = ImageGeometry(voxel_num_x=inputsize[0],
@@ -143,13 +200,16 @@ def PowerMethodNonsquare(op,numiters):
     #print (x0)
     #x0.fill(numpy.random.randn(*x0.shape))
     
-    x0 = op.create_image_data()
+    if x0 is None:
+        #x0 = op.create_image_data()
+        x0 = op.allocate_direct()
+        x0.fill(numpy.random.randn(*x0.shape))
     
     s = numpy.zeros(numiters)
     # Loop
     for it in numpy.arange(numiters):
         x1 = op.adjoint(op.direct(x0))
-        x1norm = numpy.sqrt((x1**2).sum())
+        x1norm = numpy.sqrt((x1*x1).sum())
         #print ("x0 **********" ,x0)
         #print ("x1 **********" ,x1)
         s[it] = (x1*x0).sum() / (x0*x0).sum()
@@ -162,11 +222,19 @@ class LinearOperatorMatrix(Operator):
         self.s1 = None   # Largest singular value, initially unknown
         super(LinearOperatorMatrix, self).__init__()
         
-    def direct(self,x):
-        return type(x)(numpy.dot(self.A,x.as_array()))
+    def direct(self,x, out=None):
+        if out is None:
+            return type(x)(numpy.dot(self.A,x.as_array()))
+        else:
+            numpy.dot(self.A, x.as_array(), out=out.as_array())
+            
     
-    def adjoint(self,x):
-        return type(x)(numpy.dot(self.A.transpose(),x.as_array()))
+    def adjoint(self,x, out=None):
+        if out is None:
+            return type(x)(numpy.dot(self.A.transpose(),x.as_array()))
+        else:
+            numpy.dot(self.A.transpose(),x.as_array(), out=out.as_array())
+            
     
     def size(self):
         return self.A.shape
@@ -178,3 +246,15 @@ class LinearOperatorMatrix(Operator):
             return self.s1
         else:
             return self.s1
+    def allocate_direct(self):
+        '''allocates the memory to hold the result of adjoint'''
+        #numpy.dot(self.A.transpose(),x.as_array())
+        M_A, N_A = self.A.shape
+        out = numpy.zeros((N_A,1))
+        return DataContainer(out)
+    def allocate_adjoint(self):
+        '''allocate the memory to hold the result of direct'''
+        #numpy.dot(self.A.transpose(),x.as_array())
+        M_A, N_A = self.A.shape
+        out = numpy.zeros((M_A,1))
+        return DataContainer(out)

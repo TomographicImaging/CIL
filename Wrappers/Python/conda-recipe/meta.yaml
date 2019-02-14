@@ -2,24 +2,31 @@ package:
   name: ccpi-framework
   version: {{ environ['CIL_VERSION'] }}
 
-
 build:
   preserve_egg_dir: False
   script_env:
     - CIL_VERSION   
-#  number: 0
+  #number: 0  
   
+test:
+  requires:
+    - python-wget
+    - cvxpy # [not win]
+    
 requirements:
   build:
     - python
-    - numpy
+    - numpy {{ numpy }}
     - setuptools
 
   run:
+    - {{ pin_compatible('numpy', max_pin='x.x') }}
     - python
     - numpy
+    - scipy
     - matplotlib
-	
+    - h5py
+  
 about:
   home: http://www.ccpi.ac.uk
   license:  Apache 2.0 License

@@ -558,6 +558,8 @@ class DataContainer(object):
     # __isub__
     
     def __idiv__(self, other):
+        return self.__itruediv__(other)
+    def __itruediv__(self, other):
         if isinstance(other, (int, float)) :
             numpy.divide(self.array, other, out=self.array)
         elif issubclass(type(other), DataContainer):
@@ -720,6 +722,7 @@ class DataContainer(object):
     ## reductions
     def sum(self, out=None, *args, **kwargs):
         return self.as_array().sum(*args, **kwargs)
+    
     
 class ImageData(DataContainer):
     '''DataContainer for holding 2D or 3D DataContainer'''

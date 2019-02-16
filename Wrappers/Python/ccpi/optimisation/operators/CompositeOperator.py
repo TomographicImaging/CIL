@@ -219,26 +219,19 @@ class CompositeDataContainer(object):
             for el,ot in zip(self.containers, other):
                 el *= ot
         return self
-    # __rmul__
+    # __imul__
     
     def __idiv__(self, other):
         if isinstance (other, CompositeDataContainer):
-            for i,el,ot in enumerate(zip(self.containers, other.containers)):
-                print ('__idiv__', i, el.as_array()[0][0][0], ot.as_array()[0][0][0])
+            for el,ot in zip(self.containers, other.containers):
                 el /= ot
-                print ("fatto", el.as_array()[0][0][0])
         elif isinstance(other, Number):
             for el in self.containers:
-                print ("prima", el)
-                print ('__idiv__', el.as_array()[0][0][0], other)
                 el /= other
-                print ("fatto", el.as_array()[0][0][0])
         elif isinstance(other, list) or isinstance(other, numpy.ndarray):
             assert self.is_compatible(other)
             for el,ot in zip(self.containers, other):
-                print ('__idiv__', el.as_array()[0][0][0], ot[0][0][0])
                 el /= ot
-                print ("fatto", el.as_array()[0][0][0])
         return self
     # __rdiv__
     def __itruediv__(self, other):
@@ -486,24 +479,20 @@ if __name__ == '__main__':
     numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0] , 0.5, decimal = 5)
     
     cp2 += 1
-    print ("cp2" , cp2[0].as_array()[0][0][0],cp2[1].as_array()[0][0][0])
-    print ("cp1" , cp1[0].as_array()[0][0][0],cp1[1].as_array()[0][0][0])
-    #cp2 /= cp1
+    cp2 /= cp1
     # TODO fix inplace division
-    cp2 /= 0.5
-    print (cp2[0].as_array()[0][0][0],cp2[1].as_array()[0][0][0])
-    
-    numpy.testing.assert_almost_equal(cp2[0].as_array()[0][0][0] , 1./0.5 , decimal=5)
-    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0] , .2, decimal = 5)
+     
+    numpy.testing.assert_almost_equal(cp2[0].as_array()[0][0][0] , 1./2 , decimal=5)
+    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0] , 1.5/3., decimal = 5)
     
     cp2 /= 1
-    numpy.testing.assert_almost_equal(cp2[0].as_array()[0][0][0] , 0. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0] , 0.5/3., decimal = 5)
+    numpy.testing.assert_almost_equal(cp2[0].as_array()[0][0][0] , 0.5 , decimal=5)
+    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0] , 0.5, decimal = 5)
     
     cp2 /= [-2,-1]
-    numpy.testing.assert_almost_equal(cp2[0].as_array()[0][0][0] , 0. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0] , -0.5/3., decimal = 5)
-    
+    numpy.testing.assert_almost_equal(cp2[0].as_array()[0][0][0] , -0.5/2. , decimal=5)
+    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0] , -0.5, decimal = 5)
+    ####
     
     cp2 = cp0.power(cp1)
     assert (cp2[0].as_array()[0][0][0] == 0.)
@@ -656,6 +645,6 @@ if __name__ == '__main__':
 #    
 #    for _ in gd:
 #        pass
-    
-        
-    
+#    
+#        
+#    

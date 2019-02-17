@@ -7,6 +7,7 @@ Created on Thu Feb 14 12:36:40 2019
 #from ccpi.optimisation.ops import Operator
 import numpy
 from numbers import Number
+import functools
 class Operator(object):
     '''Operator that maps from a space X -> Y'''
     def is_linear(self):
@@ -40,9 +41,25 @@ class LinearOperator(Operator):
         
 class CompositeDataContainer(object):
     '''Class to hold a composite operator'''
-    def __init__(self, *args):
+    def __init__(self, *args, shape=None):
+        '''containers must be passed row by row'''
         self.containers = args
         self.index = 0
+        if shape is None:
+            shape = (len(args),1)
+        self.shape = shape
+        n_elements = functools.reduce(lambda x,y: x*y, shape, 1)
+        if len(args) != n_elements:
+            raise ValueError(
+                    'Dimension and size do not match: expected {} got {}'
+                    .format(n_elements,len(args)))
+#        for i in range(shape[0]):
+#            b.append([])
+#            for j in range(shape[1]):
+#                b[-1].append(args[i*shape[1]+j])
+#                indices.append(i*shape[1]+j)
+#        self.containers = b
+        
     def __iter__(self):
         return self
     def next(self):
@@ -67,7 +84,13 @@ class CompositeDataContainer(object):
                     raise ValueError('List/ numpy array can only contain numbers')
             return len(self.containers) == len(other)
         return len(self.containers) == len(other.containers)
-    def __getitem__(self, index):
+    def get_item(self, row, col=0):
+        if row > self.shape[0]:
+            raise ValueError('Requested row {} > max {}'.format(row, self.shape[0]))
+        if col > self.shape[1]:
+            raise ValueError('Requested col {} > max {}'.format(col, self.shape[1]))
+        
+        index = row*self.shape[1]+col
         return self.containers[index]
                 
     def add(self, other, out=None, *args, **kwargs):
@@ -128,7 +151,7 @@ class CompositeDataContainer(object):
     
     ## reductions
     def sum(self, out=None, *args, **kwargs):
-        return [ el.sum(*args, **kwargs) for el in self.containers]
+        return numpy.asarray([ el.sum(*args, **kwargs) for el in self.containers])
     
     def copy(self):
         '''alias of clone'''    
@@ -236,6 +259,9 @@ class CompositeDataContainer(object):
     # __rdiv__
     def __itruediv__(self, other):
         return self.__idiv__(other)
+    def norm(self):
+        y = numpy.asarray([el.norm() for el in self.containers])
+        return numpy.reshape(y, self.shape)
 
 import time
 from ccpi.optimisation.funcs import ZeroFun
@@ -348,19 +374,65 @@ class GradientDescent(Algorithm):
     
 class CompositeOperator(Operator):
     '''Class to hold a composite operator'''
-    def __init__(self, *args):
+    def __init__(self, *args, shape=None):
         self.operators = args
+        if shape is None:
+            shape = (len(args),1)
+        self.shape = shape
+        n_elements = functools.reduce(lambda x,y: x*y, shape, 1)
+        if len(args) != n_elements:
+            raise ValueError(
+                    'Dimension and size do not match: expected {} got {}'
+                    .format(n_elements,len(args)))
+    def get_item(self, row, col):
+        if row > self.shape[0]:
+            raise ValueError('Requested row {} > max {}'.format(row, self.shape[0]))
+        if col > self.shape[1]:
+            raise ValueError('Requested col {} > max {}'.format(col, self.shape[1]))
         
+        index = row*self.shape[1]+col
+        return self.operators[index]
+    
     def norm(self):
-        return [op.norm() for op in self.operators]
+        norm = [op.norm() for op in self.operators]
+        b = []
+        for i in range(self.shape[0]):
+            b.append([])
+            for j in range(self.shape[1]):
+                b[-1].append(norm[i*self.shape[1]+j])
+        return numpy.asarray(b)
     
     def direct(self, x, out=None):
-        return CompositeDataContainer(*[op.direct(X) for op,X in zip(self.operators, x)])
+        shape = self.get_output_shape(x.shape)
+        res = []
+        for row in range(self.shape[0]):
+            for col in range(self.shape[1]):
+                if col == 0:
+                    prod = self.get_item(row,col).direct(x.get_item(col))
+                else:
+                    prod += self.get_item(row,col).direct(x.get_item(col))
+            res.append(prod)
+        print ("len res" , len(res))
+        return CompositeDataContainer(*res, shape=shape)
     
     def adjoint(self, x, out=None):
-        return CompositeDataContainer(*[op.adjoint(X) for op,X in zip(self.operators, x)])
+        shape = self.get_output_shape(x.shape)
+        res = []
+        for row in range(self.shape[0]):
+            for col in range(self.shape[1]):
+                if col == 0:
+                    prod = self.get_item(row,col).adjoint(x.get_item(col))
+                else:
+                    prod += self.get_item(row,col).adjoint(x.get_item(col))
+            res.append(prod)
+        return CompositeDataContainer(*res, shape=shape)
     
-    
+    def get_output_shape(self, xshape):
+        print ("operator shape {} data shape {}".format(self.shape, xshape))
+        if self.shape[1] != xshape[0]:
+            raise ValueError('Incompatible shapes {} {}'.format(self.shape, xshape))
+        print ((self.shape[0], xshape[-1]))
+        return (self.shape[0], xshape[-1])
 if __name__ == '__main__':
     #from ccpi.optimisation.Algorithms import GradientDescent
     from ccpi.plugins.ops import CCPiProjectorSimple
@@ -385,155 +457,155 @@ if __name__ == '__main__':
     print  (a[0][0].shape)
     #cp2 = CompositeDataContainer(*a)
     cp2 = cp0.add(cp1)
-    assert (cp2[0].as_array()[0][0][0] == 2.)
-    assert (cp2[1].as_array()[0][0][0] == 4.)
+    assert (cp2.get_item(0,0).as_array()[0][0][0] == 2.)
+    assert (cp2.get_item(1,0).as_array()[0][0][0] == 4.)
     
     cp2 = cp0 + cp1 
-    assert (cp2[0].as_array()[0][0][0] == 2.)
-    assert (cp2[1].as_array()[0][0][0] == 4.)
+    assert (cp2.get_item(0,0).as_array()[0][0][0] == 2.)
+    assert (cp2.get_item(1,0).as_array()[0][0][0] == 4.)
     cp2 = cp0 + 1 
-    numpy.testing.assert_almost_equal(cp2[0].as_array()[0][0][0] , 1. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0] , 2., decimal = 5)
+    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 1. , decimal=5)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 2., decimal = 5)
     cp2 = cp0 + [1 ,2]
-    numpy.testing.assert_almost_equal(cp2[0].as_array()[0][0][0] , 1. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0] , 3., decimal = 5)
+    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 1. , decimal=5)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 3., decimal = 5)
     cp2 += cp1
-    numpy.testing.assert_almost_equal(cp2[0].as_array()[0][0][0] , +3. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0] , +6., decimal = 5)
+    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , +3. , decimal=5)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , +6., decimal = 5)
     
     cp2 += 1
-    numpy.testing.assert_almost_equal(cp2[0].as_array()[0][0][0] , +4. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0] , +7., decimal = 5)
+    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , +4. , decimal=5)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , +7., decimal = 5)
     
     cp2 += [-2,-1]
-    numpy.testing.assert_almost_equal(cp2[0].as_array()[0][0][0] , 2. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0] , 6., decimal = 5)
+    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 2. , decimal=5)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 6., decimal = 5)
     
     
     cp2 = cp0.subtract(cp1)
-    assert (cp2[0].as_array()[0][0][0] == -2.)
-    assert (cp2[1].as_array()[0][0][0] == -2.)
+    assert (cp2.get_item(0,0).as_array()[0][0][0] == -2.)
+    assert (cp2.get_item(1,0).as_array()[0][0][0] == -2.)
     cp2 = cp0 - cp1
-    assert (cp2[0].as_array()[0][0][0] == -2.)
-    assert (cp2[1].as_array()[0][0][0] == -2.)
+    assert (cp2.get_item(0,0).as_array()[0][0][0] == -2.)
+    assert (cp2.get_item(1,0).as_array()[0][0][0] == -2.)
     
     cp2 = cp0 - 1 
-    numpy.testing.assert_almost_equal(cp2[0].as_array()[0][0][0] , -1. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0] , 0, decimal = 5)
+    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , -1. , decimal=5)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 0, decimal = 5)
     cp2 = cp0 - [1 ,2]
-    numpy.testing.assert_almost_equal(cp2[0].as_array()[0][0][0] , -1. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0] , -1., decimal = 5)
+    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , -1. , decimal=5)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , -1., decimal = 5)
     
     cp2 -= cp1
-    numpy.testing.assert_almost_equal(cp2[0].as_array()[0][0][0] , -3. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0] , -4., decimal = 5)
+    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , -3. , decimal=5)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , -4., decimal = 5)
     
     cp2 -= 1
-    numpy.testing.assert_almost_equal(cp2[0].as_array()[0][0][0] , -4. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0] , -5., decimal = 5)
+    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , -4. , decimal=5)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , -5., decimal = 5)
     
     cp2 -= [-2,-1]
-    numpy.testing.assert_almost_equal(cp2[0].as_array()[0][0][0] , -2. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0] , -4., decimal = 5)
+    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , -2. , decimal=5)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , -4., decimal = 5)
     
     
     cp2 = cp0.multiply(cp1)
-    assert (cp2[0].as_array()[0][0][0] == 0.)
-    assert (cp2[1].as_array()[0][0][0] == 3.)
+    assert (cp2.get_item(0,0).as_array()[0][0][0] == 0.)
+    assert (cp2.get_item(1,0).as_array()[0][0][0] == 3.)
     cp2 = cp0 * cp1
-    assert (cp2[0].as_array()[0][0][0] == 0.)
-    assert (cp2[1].as_array()[0][0][0] == 3.)
+    assert (cp2.get_item(0,0).as_array()[0][0][0] == 0.)
+    assert (cp2.get_item(1,0).as_array()[0][0][0] == 3.)
     
     cp2 = cp0 * 2 
-    numpy.testing.assert_almost_equal(cp2[0].as_array()[0][0][0] , 0. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0] , 2, decimal = 5)
+    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0. , decimal=5)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 2, decimal = 5)
     cp2 = cp0 * [3 ,2]
-    numpy.testing.assert_almost_equal(cp2[0].as_array()[0][0][0] , 0. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0] , 2., decimal = 5)
+    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0. , decimal=5)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 2., decimal = 5)
     
     cp2 *= cp1
-    numpy.testing.assert_almost_equal(cp2[0].as_array()[0][0][0] , 0 , decimal=5)
-    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0] , +6., decimal = 5)
+    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0 , decimal=5)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , +6., decimal = 5)
     
     cp2 *= 1
-    numpy.testing.assert_almost_equal(cp2[0].as_array()[0][0][0] , 0. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0] , +6., decimal = 5)
+    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0. , decimal=5)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , +6., decimal = 5)
     
     cp2 *= [-2,-1]
-    numpy.testing.assert_almost_equal(cp2[0].as_array()[0][0][0] , 0. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0] , -6., decimal = 5)
+    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0. , decimal=5)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , -6., decimal = 5)
     
     
     cp2 = cp0.divide(cp1)
-    assert (cp2[0].as_array()[0][0][0] == 0.)
-    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0], 1./3., decimal=4)
+    assert (cp2.get_item(0,0).as_array()[0][0][0] == 0.)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0], 1./3., decimal=4)
     cp2 = cp0/cp1
-    assert (cp2[0].as_array()[0][0][0] == 0.)
-    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0], 1./3., decimal=4)
+    assert (cp2.get_item(0,0).as_array()[0][0][0] == 0.)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0], 1./3., decimal=4)
     
     cp2 = cp0 / 2 
-    numpy.testing.assert_almost_equal(cp2[0].as_array()[0][0][0] , 0. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0] , 0.5, decimal = 5)
+    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0. , decimal=5)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 0.5, decimal = 5)
     cp2 = cp0 / [3 ,2]
-    numpy.testing.assert_almost_equal(cp2[0].as_array()[0][0][0] , 0. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0] , 0.5, decimal = 5)
+    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0. , decimal=5)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 0.5, decimal = 5)
     
     cp2 += 1
     cp2 /= cp1
     # TODO fix inplace division
      
-    numpy.testing.assert_almost_equal(cp2[0].as_array()[0][0][0] , 1./2 , decimal=5)
-    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0] , 1.5/3., decimal = 5)
+    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 1./2 , decimal=5)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 1.5/3., decimal = 5)
     
     cp2 /= 1
-    numpy.testing.assert_almost_equal(cp2[0].as_array()[0][0][0] , 0.5 , decimal=5)
-    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0] , 0.5, decimal = 5)
+    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0.5 , decimal=5)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 0.5, decimal = 5)
     
     cp2 /= [-2,-1]
-    numpy.testing.assert_almost_equal(cp2[0].as_array()[0][0][0] , -0.5/2. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0] , -0.5, decimal = 5)
+    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , -0.5/2. , decimal=5)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , -0.5, decimal = 5)
     ####
     
     cp2 = cp0.power(cp1)
-    assert (cp2[0].as_array()[0][0][0] == 0.)
-    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0], 1., decimal=4)
+    assert (cp2.get_item(0,0).as_array()[0][0][0] == 0.)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0], 1., decimal=4)
     cp2 = cp0**cp1
-    assert (cp2[0].as_array()[0][0][0] == 0.)
-    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0], 1., decimal=4)
+    assert (cp2.get_item(0,0).as_array()[0][0][0] == 0.)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0], 1., decimal=4)
     
     cp2 = cp0 ** 2 
-    numpy.testing.assert_almost_equal(cp2[0].as_array()[0][0][0] , 0., decimal=5)
-    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0] , 1., decimal = 5)
+    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0., decimal=5)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 1., decimal = 5)
     
     cp2 = cp0.maximum(cp1)
-    assert (cp2[0].as_array()[0][0][0] == cp1[0].as_array()[0][0][0])
-    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0], cp2[1].as_array()[0][0][0], decimal=4)
+    assert (cp2.get_item(0,0).as_array()[0][0][0] == cp1.get_item(0,0).as_array()[0][0][0])
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0], cp2.get_item(1,0).as_array()[0][0][0], decimal=4)
     
     
     cp2 = cp0.abs()
-    numpy.testing.assert_almost_equal(cp2[0].as_array()[0][0][0], 0., decimal=4)
-    numpy.testing.assert_almost_equal(cp2[1].as_array()[0][0][0], 1., decimal=4)
+    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0], 0., decimal=4)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0], 1., decimal=4)
     
     cp2 = cp0.subtract(cp1)
     s = cp2.sign()
-    numpy.testing.assert_almost_equal(s[0].as_array()[0][0][0], -1., decimal=4)
-    numpy.testing.assert_almost_equal(s[1].as_array()[0][0][0], -1., decimal=4)
+    numpy.testing.assert_almost_equal(s.get_item(0,0).as_array()[0][0][0], -1., decimal=4)
+    numpy.testing.assert_almost_equal(s.get_item(1,0).as_array()[0][0][0], -1., decimal=4)
     
     cp2 = cp0.add(cp1)
     s = cp2.sqrt()
-    numpy.testing.assert_almost_equal(s[0].as_array()[0][0][0], numpy.sqrt(2), decimal=4)
-    numpy.testing.assert_almost_equal(s[1].as_array()[0][0][0], numpy.sqrt(4), decimal=4)
+    numpy.testing.assert_almost_equal(s.get_item(0,0).as_array()[0][0][0], numpy.sqrt(2), decimal=4)
+    numpy.testing.assert_almost_equal(s.get_item(1,0).as_array()[0][0][0], numpy.sqrt(4), decimal=4)
     
     s = cp0.sum()
     numpy.testing.assert_almost_equal(s[0], 0, decimal=4)
     s0 = 1
     s1 = 1
-    for i in cp0[0].shape:
+    for i in cp0.get_item(0,0).shape:
         s0 *= i
-    for i in cp0[1].shape:
+    for i in cp0.get_item(1,0).shape:
         s1 *= i
         
-    numpy.testing.assert_almost_equal(s[1], cp0[0].as_array()[0][0][0]*s0 +cp0[1].as_array()[0][0][0]*s1, decimal=4)
+    numpy.testing.assert_almost_equal(s[1], cp0.get_item(0,0).as_array()[0][0][0]*s0 +cp0.get_item(1,0).as_array()[0][0][0]*s1, decimal=4)
     
     # Set up phantom size N x N x vert by creating ImageGeometry, initialising the 
     # ImageData object with this geometry and empty array and finally put some
@@ -622,9 +694,7 @@ if __name__ == '__main__':
     # needed if one wants to obtain a converged solution.
     x_init = ImageData(geometry=ig, 
                        dimension_labels=['horizontal_x','horizontal_y','vertical'])
-    x_init1 = ImageData(geometry=ig, 
-                       dimension_labels=['horizontal_x','horizontal_y','vertical'])
-    X_init = CompositeDataContainer(x_init, x_init1)
+    X_init = CompositeDataContainer(x_init)
     B = CompositeDataContainer(b, 
                                ImageData(geometry=ig, dimension_labels=['horizontal_x','horizontal_y','vertical']))
     
@@ -636,15 +706,18 @@ if __name__ == '__main__':
     
     out = K.direct(X_init)
     
-#    f = Norm2sq(K,B)
-#    f.L = 0.001
-#    
-#    gd = GradientDescent()
-#    gd.set_up(X_init, f, 0.001 )
-#    gd.max_iteration = 2
-#    
-#    for _ in gd:
-#        pass
-#    
-#        
-#    
+    f = Norm2sq(K,B)
+    f.L = 0.001
+    
+    gd = GradientDescent()
+    gd.set_up(X_init, f, 0.001 )
+    gd.max_iteration = 2
+    
+    out.__isub__(B)
+    out2 = K.adjoint(out)
+    
+    #(2.0*self.c)*self.A.adjoint( self.A.direct(x) - self.b )
+    
+    for _ in gd:
+        print ("iteration {} {}".format(gd.iteration, gd.get_current_loss()))
+    

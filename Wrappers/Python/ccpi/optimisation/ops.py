@@ -98,20 +98,20 @@ class TomoIdentity(Operator):
         super(TomoIdentity, self).__init__()
         
     def direct(self,x,out=None):
-        if self.scalar != 1:
-            x *= self.scalar
+        
         if out is None:
+            if self.scalar != 1:
+                return x * self.scalar
             return x.copy()
         else:
+            if self.scalar != 1:
+                out.fill(x * self.scalar)
+                return
             out.fill(x)
+            return
     
     def adjoint(self,x, out=None):
-        if self.scalar != 1:
-            x *= self.scalar
-        if out is None:
-            return x.copy()
-        else:
-            out.fill(x)
+        return self.direct(x, out)
     
     def size(self):
         return NotImplemented

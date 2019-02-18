@@ -242,7 +242,7 @@ class FISTA(Algorithm):
     def update_objective(self):
         self.loss.append( self.f(self.x) + self.g(self.x) )
         
-class FBPD(Algorithm)
+class FBPD(Algorithm):
     '''FBPD Algorithm
     
     Parameters:
@@ -293,7 +293,7 @@ class FBPD(Algorithm)
         # primal forward-backward step
         x_old = self.x
         self.x = self.x - self.tau * ( self.data_fidelity.grad(self.x) + self.operator.adjoint(self.y) )
-        self.x = constraint.prox(self.x, self.tau);
+        self.x = self.constraint.prox(self.x, self.tau);
     
         # dual forward-backward step
         self.y = self.y + self.sigma * self.operator.direct(2*self.x - x_old);

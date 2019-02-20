@@ -51,6 +51,7 @@ class LinearOperator(Operator):
         
 class CompositeDataContainer(object):
     '''Class to hold a composite operator'''
+    __array_priority__ = 1
     def __init__(self, *args, shape=None):
         '''containers must be passed row by row'''
         self.containers = args
@@ -87,12 +88,18 @@ class CompositeDataContainer(object):
         '''basic check if the size of the 2 objects fit'''
         if isinstance(other, Number):
             return True   
-        elif isinstance(other, list) or isinstance(other, numpy.ndarray):
+        elif isinstance(other, list):
             # TODO look elements should be numbers
             for ot in other:
-                if not isinstance(ot, Number):
-                    raise ValueError('List/ numpy array can only contain numbers')
+                if not isinstance(ot, (Number,\
+                                 numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64,\
+                                 numpy.float, numpy.float16, numpy.float32, numpy.float64, \
+                                 numpy.complex)):
+                    raise ValueError('List/ numpy array can only contain numbers {}'\
+                                     .format(type(ot)))
             return len(self.containers) == len(other)
+        elif isinstance(other, numpy.ndarray):
+            return self.shape == other.shape
         return len(self.containers) == len(other.containers)
     def get_item(self, row, col=0):
         if row > self.shape[0]:
@@ -107,7 +114,7 @@ class CompositeDataContainer(object):
         assert self.is_compatible(other)
         if isinstance(other, Number):
             return type(self)(*[ el.add(other, out, *args, **kwargs) for el in self.containers])
-        elif isinstance(other, list):
+        elif isinstance(other, list) or isinstance(other, numpy.ndarray):
             return type(self)(*[ el.add(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other)])
         return type(self)(*[ el.add(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other.containers)])
         
@@ -115,23 +122,25 @@ class CompositeDataContainer(object):
         assert self.is_compatible(other)
         if isinstance(other, Number):
             return type(self)(*[ el.subtract(other, out, *args, **kwargs) for el in self.containers])
-        elif isinstance(other, list):
+        elif isinstance(other, list) or isinstance(other, numpy.ndarray):
             return type(self)(*[ el.subtract(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other)])
         return type(self)(*[ el.subtract(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other.containers)])
 
     def multiply(self, other , out=None, *args, **kwargs):
-        assert self.is_compatible(other)
+        self.is_compatible(other)
         if isinstance(other, Number):
             return type(self)(*[ el.multiply(other, out, *args, **kwargs) for el in self.containers])
         elif isinstance(other, list):
             return type(self)(*[ el.multiply(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other)])
+        elif isinstance(other, numpy.ndarray):           
+            return type(self)(*[ el.multiply(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other)])
         return type(self)(*[ el.multiply(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other.containers)])
     
     def divide(self, other , out=None ,*args, **kwargs):
-        assert self.is_compatible(other)
+        self.is_compatible(other)
         if isinstance(other, Number):
             return type(self)(*[ el.divide(other, out, *args, **kwargs) for el in self.containers])
-        elif isinstance(other, list):
+        elif isinstance(other, list) or isinstance(other, numpy.ndarray):
             return type(self)(*[ el.divide(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other)])
         return type(self)(*[ el.divide(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other.containers)])
     
@@ -139,7 +148,7 @@ class CompositeDataContainer(object):
         assert self.is_compatible(other)
         if isinstance(other, Number):
             return type(self)(*[ el.power(other, out, *args, **kwargs) for el in self.containers])
-        elif isinstance(other, list):
+        elif isinstance(other, list) or isinstance(other, numpy.ndarray):
             return type(self)(*[ el.power(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other)])
         return type(self)(*[ el.power(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other.containers)])
     
@@ -147,7 +156,7 @@ class CompositeDataContainer(object):
         assert self.is_compatible(other)
         if isinstance(other, Number):
             return type(self)(*[ el.maximum(other, out, *args, **kwargs) for el in self.containers])
-        elif isinstance(other, list):
+        elif isinstance(other, list) or isinstance(other, numpy.ndarray):
             return type(self)(*[ el.maximum(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other)])
         return type(self)(*[ el.maximum(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other.containers)])
     
@@ -158,11 +167,15 @@ class CompositeDataContainer(object):
         return type(self)(*[ el.sign(out, *args, **kwargs) for el in self.containers])
     def sqrt(self, out=None, *args,  **kwargs):
         return type(self)(*[ el.sqrt(out, *args, **kwargs) for el in self.containers])
+    def conjugate(self, out=None):
+        return type(self)(*[el.conjugate() for el in self.containers])
     
     ## reductions
     def sum(self, out=None, *args, **kwargs):
         return numpy.asarray([ el.sum(*args, **kwargs) for el in self.containers])
-    
+    def norm(self):
+        y = numpy.asarray([el**2 for el in self.containers])
+        return y.sum()    
     def copy(self):
         '''alias of clone'''    
         return self.clone()
@@ -199,11 +212,16 @@ class CompositeDataContainer(object):
     # __rsub__
     
     def __rmul__(self, other):
+        '''Reverse multiplication
+        
+        to make sure that this method is called rather than the __mul__ of a numpy array
+        the class constant __array_priority__ must be set > 0
+        https://docs.scipy.org/doc/numpy-1.15.1/reference/arrays.classes.html#numpy.class.__array_priority__
+        '''
         return self * other
     # __rmul__
     
     def __rdiv__(self, other):
-        print ("call __rdiv__")
         return pow(self / other, -1)
     # __rdiv__
     def __rtruediv__(self, other):
@@ -220,7 +238,7 @@ class CompositeDataContainer(object):
             for el in self.containers:
                 el += other
         elif isinstance(other, list) or isinstance(other, numpy.ndarray):
-            assert self.is_compatible(other)
+            self.is_compatible(other)
             for el,ot in zip(self.containers, other):
                 el += ot
         return self
@@ -269,9 +287,8 @@ class CompositeDataContainer(object):
     # __rdiv__
     def __itruediv__(self, other):
         return self.__idiv__(other)
-    def norm(self):
-        y = numpy.asarray([el.norm().sum() for el in self.containers])
-        return y.sum()
+    
+
        
 class CompositeOperator(Operator):
     '''Class to hold a composite operator'''
@@ -313,7 +330,6 @@ class CompositeOperator(Operator):
                 else:
                     prod += self.get_item(row,col).direct(x.get_item(col))
             res.append(prod)
-        print ("len res" , len(res))
         return CompositeDataContainer(*res, shape=shape)
     
     def adjoint(self, x, out=None):
@@ -329,7 +345,6 @@ class CompositeOperator(Operator):
         return CompositeDataContainer(*res, shape=shape)
     
     def get_output_shape(self, xshape, adjoint=False):
-        print ("operator shape {} data shape {}".format(self.shape, xshape))
         sshape = self.shape[1]
         oshape = self.shape[0]
         if adjoint:
@@ -337,8 +352,105 @@ class CompositeOperator(Operator):
             oshape = self.shape[1]
         if sshape != xshape[0]:
             raise ValueError('Incompatible shapes {} {}'.format(self.shape, xshape))
-        print ((oshape, xshape[-1]))
         return (oshape, xshape[-1])
+    
+'''    
+    def direct(self, x, out=None):
+        
+        out = [None]*self.dimension[0]
+        for i in range(self.dimension[0]):
+            z1 = ImageData(np.zeros(self.compMat[i][0].range_dim()))
+            for j in range(self.dimension[1]):
+                z1 += self.compMat[i][j].direct(x[j])
+            out[i] = z1    
+                                
+        return out          
+        
+    
+    def adjoint(self, x, out=None):        
+        
+        out = [None]*self.dimension[1]
+        for i in range(self.dimension[1]):
+            z2 = ImageData(np.zeros(self.compMat[0][i].domain_dim()))
+            for j in range(self.dimension[0]):
+                z2 += self.compMat[j][i].adjoint(x[j])
+            out[i] = z2
+'''
+from ccpi.optimisation.Algorithms import Algorithm
+from collections.abc import Iterable
+class CGLS(Algorithm):
+
+    '''Conjugate Gradient Least Squares algorithm
+
+    Parameters:
+      x_init: initial guess
+      operator: operator for forward/backward projections
+      data: data to operate on
+    '''
+    def __init__(self, **kwargs):
+        super(CGLS, self).__init__()
+        self.x        = kwargs.get('x_init', None)
+        self.operator = kwargs.get('operator', None)
+        self.data     = kwargs.get('data', None)
+        if self.x is not None and self.operator is not None and \
+           self.data is not None:
+            print ("Calling from creator")
+            return self.set_up(x_init  =kwargs['x_init'],
+                               operator=kwargs['operator'],
+                               data    =kwargs['data'])
+
+    def set_up(self, x_init, operator , data ):
+
+        self.r = data.copy()
+        self.x = x_init.copy()
+
+        self.operator = operator
+        self.d = operator.adjoint(self.r)
+
+        
+        self.normr2 = (self.d * self.d).sum()
+        if isinstance(self.normr2, Iterable):
+            self.normr2 = sum(self.normr2)
+        #self.normr2 = numpy.sqrt(self.normr2)
+        print ("set_up" , self.normr2)
+
+    def should_stop(self):
+        '''stopping cryterion, currently only based on number of iterations'''
+        return self.iteration >= self.max_iteration
+
+    def update(self):
+
+        Ad = self.operator.direct(self.d)
+        norm = (Ad*Ad).sum()
+        if isinstance(norm, Iterable):
+            norm = sum(norm)
+        #norm = numpy.sqrt(norm)
+        print (norm)
+        alpha = self.normr2/norm
+        self.x += (self.d * alpha)
+        self.r -= (Ad * alpha)
+        s  = self.operator.adjoint(self.r)
+
+        normr2_new = (s*s).sum()
+        if isinstance(normr2_new, Iterable):
+            normr2_new = sum(normr2_new)
+        #normr2_new = numpy.sqrt(normr2_new)
+        print (normr2_new)
+        
+        beta = normr2_new/self.normr2
+        self.normr2 = normr2_new
+        self.d = s + beta*self.d
+
+    def update_objective(self):
+        self.loss.append((self.r*self.r).sum())
+        
+    def run(self, iterations, callback=None):
+        self.max_iteration += iterations
+        for _ in self:
+            if callback is not None:
+                callback(self.iteration, self.get_current_loss())
+
+    
 if __name__ == '__main__':
     #from ccpi.optimisation.Algorithms import GradientDescent
     from ccpi.plugins.ops import CCPiProjectorSimple
@@ -346,7 +458,8 @@ if __name__ == '__main__':
     from ccpi.optimisation.ops import TomoIdentity
     from ccpi.optimisation.funcs import Norm2sq, Norm1
     from ccpi.framework import ImageGeometry, AcquisitionGeometry
-    from ccpi.optimisation.Algorithms import CGLS
+    from ccpi.optimisation.Algorithms import GradientDescent
+    #from ccpi.optimisation.Algorithms import CGLS
     import matplotlib.pyplot as plt
 
     ig0 = ImageGeometry(2,3,4)
@@ -427,7 +540,23 @@ if __name__ == '__main__':
     cp2 = cp0 * 2 
     numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0. , decimal=5)
     numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 2, decimal = 5)
+    cp2 = 2 * cp0  
+    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0. , decimal=5)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 2, decimal = 5)
     cp2 = cp0 * [3 ,2]
+    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0. , decimal=5)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 2., decimal = 5)
+    cp2 = cp0 * numpy.asarray([3 ,2])
+    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0. , decimal=5)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 2., decimal = 5)
+    
+    cp2 = [3,2] * cp0 
+    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0. , decimal=5)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 2., decimal = 5)
+    cp2 = numpy.asarray([3,2]) * cp0 
+    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0. , decimal=5)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 2., decimal = 5)
+    cp2 = [3,2,3] * cp0 
     numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0. , decimal=5)
     numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 2., decimal = 5)
     
@@ -457,6 +586,12 @@ if __name__ == '__main__':
     cp2 = cp0 / [3 ,2]
     numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0. , decimal=5)
     numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 0.5, decimal = 5)
+    cp2 = cp0 / numpy.asarray([3 ,2])
+    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0. , decimal=5)
+    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 0.5, decimal = 5)
+    cp3 = numpy.asarray([3 ,2]) / (cp0+1)
+    numpy.testing.assert_almost_equal(cp3.get_item(0,0).as_array()[0][0][0] , 3. , decimal=5)
+    numpy.testing.assert_almost_equal(cp3.get_item(1,0).as_array()[0][0][0] , 1, decimal = 5)
     
     cp2 += 1
     cp2 /= cp1
@@ -533,7 +668,7 @@ if __name__ == '__main__':
                         dimension_labels=['horizontal_x',
                                           'horizontal_y',
                                           'vertical'])
-    
+    Phantom += 0.05
     # Populate image data by looping over and filling slices
     i = 0
     while i < vert:
@@ -542,18 +677,21 @@ if __name__ == '__main__':
         else:
             x = Phantom.array
         x[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
-        x[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 0.98
+        x[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 0.94
         if vert > 1 :
             Phantom.fill(x, vertical=i)
         i += 1
     
-    # Display slice of phantom
-    if vert > 1:
-        plt.imshow(Phantom.subset(vertical=0).as_array())
-    else:
-        plt.imshow(Phantom.as_array())
-    plt.show()
     
+    perc = 0.02
+    # Set up empty image data
+    noise = ImageData(numpy.random.normal(loc = 0.04 ,
+                             scale = perc , 
+                             size = Phantom.shape), geometry=ig,
+                        dimension_labels=['horizontal_x',
+                                          'horizontal_y',
+                                          'vertical'])
+    Phantom += noise
     
     # Set up AcquisitionGeometry object to hold the parameters of the measurement
     # setup geometry: # Number of angles, the actual angles from 0 to 
@@ -582,18 +720,13 @@ if __name__ == '__main__':
     A = CCPiProjectorSimple(ig, ag)
     
     # Forward and backprojection are available as methods direct and adjoint. Here 
-    # generate test data b and do simple backprojection to obtain z. Display all
-    #  data slices as images, and a single backprojected slice.
+    # generate test data b and some noise
+    
     b = A.direct(Phantom)
-    z = A.adjoint(b)
     
-    for i in range(b.get_dimension_size('vertical')):
-        plt.imshow(b.subset(vertical=i).array)
-        plt.show()
     
-    plt.imshow(z.subset(vertical=0).array)
-    plt.title('Backprojected data')
-    plt.show()
+    #z = A.adjoint(b)
+    
     
     # Using the test data b, different reconstruction methods can now be set up as
     # demonstrated in the rest of this file. In general all methods need an initial 
@@ -607,41 +740,80 @@ if __name__ == '__main__':
                                ImageData(geometry=ig, dimension_labels=['horizontal_x','horizontal_y','vertical']))
     
     # setup a tomo identity
-    I = 0.3 * TomoIdentity(geometry=ig)
+    Ibig = 1e5 * TomoIdentity(geometry=ig)
+    Ismall = 1e-5 * TomoIdentity(geometry=ig)
     
     # composite operator
-    K = CompositeOperator(A, I, shape=(2,1))
+    Kbig = CompositeOperator(A, Ibig, shape=(2,1))
+    Ksmall = CompositeOperator(A, Ismall, shape=(2,1))
     
-    out = K.direct(X_init)
+    #out = K.direct(X_init)
     
-    f = Norm2sq(K,B)
-    f.L = 0.1
+    f = Norm2sq(Kbig,B)
+    f.L = 0.00003
+    
+    fsmall = Norm2sq(Ksmall,B)
+    f.L = 0.00003
+    
+    simplef = Norm2sq(A, b)
+    simplef.L = 0.00003
+    
+    gd = GradientDescent( x_init=x_init, objective_function=simplef,
+                         rate=simplef.L)
+    gd.max_iteration = 10
     
     cg = CGLS()
-    cg.set_up(X_init, K, B )
+    cg.set_up(X_init, Kbig, B )
     cg.max_iteration = 1
+    
+    cgsmall = CGLS()
+    cgsmall.set_up(X_init, Ksmall, B )
+    cgsmall.max_iteration = 1
+    
     
     cgs = CGLS()
     cgs.set_up(x_init, A, b )
-    cgs.max_iteration = 2
-    
-    out.__isub__(B)
-    out2 = K.adjoint(out)
+    cgs.max_iteration = 6
+#    
+    #out.__isub__(B)
+    #out2 = K.adjoint(out)
     
     #(2.0*self.c)*self.A.adjoint( self.A.direct(x) - self.b )
     
-    for _ in cg:
-        print ("iteration {} {}".format(cg.iteration, cg.get_current_loss()))
+    for _ in gd:
+        print ("iteration {} {}".format(gd.iteration, gd.get_current_loss()))
     
+    cg.run(10, lambda it,val: print ("iteration {} objective {}".format(it,val)))
+    
+    cgs.run(10, lambda it,val: print ("iteration {} objective {}".format(it,val)))
+    
+    cgsmall.run(10, lambda it,val: print ("iteration {} objective {}".format(it,val)))
+    cgsmall.run(10, lambda it,val: print ("iteration {} objective {}".format(it,val)))
+#    for _ in cg:
+#        print ("iteration {} {}".format(cg.iteration, cg.get_current_loss()))
+#    
+#    fig = plt.figure()
+#    plt.imshow(cg.get_output().get_item(0,0).subset(vertical=0).as_array())
+#    plt.title('Composite CGLS')
+#    plt.show()
+#    
+#    for _ in cgs:
+#        print ("iteration {} {}".format(cgs.iteration, cgs.get_current_loss()))
+#    
     fig = plt.figure()
-    plt.imshow(cg.get_output().get_item(0,0).subset(vertical=0).as_array())
-    plt.title('Composite CGLS')
-    plt.show()
-    
-    for _ in cgs:
-        print ("iteration {} {}".format(cgs.iteration, cgs.get_current_loss()))
-    
-    fig = plt.figure()
+    plt.subplot(1,5,1)
+    plt.imshow(Phantom.subset(vertical=0).as_array())
+    plt.title('Simulated Phantom')
+    plt.subplot(1,5,2)
+    plt.imshow(gd.get_output().subset(vertical=0).as_array())
+    plt.title('Simple Gradient Descent')
+    plt.subplot(1,5,3)
     plt.imshow(cgs.get_output().subset(vertical=0).as_array())
     plt.title('Simple CGLS')
+    plt.subplot(1,5,4)
+    plt.imshow(cg.get_output().get_item(0,0).subset(vertical=0).as_array())
+    plt.title('Composite CGLS\nbig lambda')
+    plt.subplot(1,5,5)
+    plt.imshow(cgsmall.get_output().get_item(0,0).subset(vertical=0).as_array())
+    plt.title('Composite CGLS\nsmall lambda')
     plt.show()

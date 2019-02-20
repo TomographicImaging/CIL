@@ -472,7 +472,10 @@ class DataContainer(object):
             else:
                 raise ValueError('*:Wrong shape: {0} and {1}'.format(self.shape, 
                                  other.shape))
-        elif isinstance(other, (int, float, complex)):
+        elif isinstance(other, (int, float, complex,\
+                                numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64,\
+                                numpy.float, numpy.float16, numpy.float32, numpy.float64, \
+                                numpy.complex)):
             return type(self)(self.as_array() * other, 
                                deep_copy=True, 
                                dimension_labels=self.dimension_labels,
@@ -632,6 +635,10 @@ class DataContainer(object):
 
         if out is None:
             if isinstance(x2, (int, float, complex)):
+                out = pwop(self.as_array() , x2 , *args, **kwargs )
+            elif isinstance(x2, (numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64,\
+                                 numpy.float, numpy.float16, numpy.float32, numpy.float64, \
+                                 numpy.complex)):
                 out = pwop(self.as_array() , x2 , *args, **kwargs )
             elif issubclass(type(x2) , DataContainer):
                 out = pwop(self.as_array() , x2.as_array() , *args, **kwargs )

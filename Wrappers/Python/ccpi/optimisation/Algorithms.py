@@ -43,8 +43,8 @@ class Algorithm(object):
         raise NotImplementedError()
     
     def should_stop(self):
-        '''stopping cryterion'''
-        raise NotImplementedError()
+        '''default stopping cryterion: number of iterations'''
+        return self.iteration >= self.max_iteration
     
     def __iter__(self):
         return self
@@ -58,6 +58,7 @@ class Algorithm(object):
             time0 = time.time()
             self.update()
             self.timing.append( time.time() - time0 )
+            # TODO update every N iterations
             self.update_objective()
             self.iteration += 1
     def get_output(self):
@@ -66,10 +67,15 @@ class Algorithm(object):
     def get_current_loss(self):
         '''Returns the current value of the loss function'''
         return self.__loss[-1]
+    def get_current_objective(self):
+        return self.get_current_loss()
     def update_objective(self):
         raise NotImplementedError()
     @property
     def loss(self):
+        return self.__loss
+    @property
+    def objective(self):
         return self.__loss
     @property
     def max_iteration(self):
@@ -198,11 +204,7 @@ class FISTA(Algorithm):
         self.invL = 1/f.L
         
         self.t_old = 1
-        
-    def should_stop(self):
-        '''stopping cryterion, currently only based on number of iterations'''
-        return self.iteration >= self.max_iteration
-    
+            
     def update(self):
     # algorithm loop
     #for it in range(0, max_iter):

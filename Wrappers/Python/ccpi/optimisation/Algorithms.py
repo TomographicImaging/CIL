@@ -84,6 +84,12 @@ class Algorithm(object):
     def max_iteration(self, value):
         assert isinstance(value, int)
         self.__max_iteration = value
+    def run(self, iterations, callback=None):
+        '''run n iterations and update the user with the callback if specified'''
+        self.max_iteration += iterations
+        for _ in self:
+            if callback is not None:
+                callback(self.iteration, self.get_current_loss())
     
 class GradientDescent(Algorithm):
     '''Implementation of a simple Gradient Descent algorithm

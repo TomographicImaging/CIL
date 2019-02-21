@@ -23,12 +23,16 @@ import os
 import sys
 
 
-cil_version='0.11.3'
+cil_version=os.environ['CIL_VERSION']
+if  cil_version == '':
+    print("Please set the environmental variable CIL_VERSION")
+    sys.exit(1)
 
 setup(
     name="ccpi-framework",
     version=cil_version,
-    packages=['ccpi' , 'ccpi.io', 'ccpi.optimisation', 'ccpi.optimisation.operators'],
+    packages=['ccpi' , 'ccpi.io', 'ccpi.optimisation', 
+              'ccpi.optimisation.operators', 'ccpi.optimisation.algorithms'],
 
     # Project uses reStructuredText, so ensure that the docutils get
     # installed or upgraded on the target machine

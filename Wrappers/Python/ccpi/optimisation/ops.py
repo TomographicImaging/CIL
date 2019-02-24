@@ -17,7 +17,8 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import numpy
+import numpy 
+import numpy as np
 from scipy.sparse.linalg import svds
 from ccpi.framework import DataContainer
 from ccpi.framework import AcquisitionData
@@ -30,6 +31,7 @@ from ccpi.framework import AcquisitionGeometry
 
 
 class Operator(object):
+    
     def direct(self,x, out=None):
         return x
     def adjoint(self,x, out=None):
@@ -91,6 +93,7 @@ class TomoIdentity(Operator):
     
     def get_max_sing_val(self):
         return self.s1
+    
     def allocate_direct(self):
         if issubclass(type(self.geometry), ImageGeometry):
             return ImageData(geometry=self.geometry)
@@ -100,10 +103,9 @@ class TomoIdentity(Operator):
             raise ValueError("Wrong geometry type: expected ImageGeometry of AcquisitionGeometry, got ", type(self.geometry))
     def allocate_adjoint(self):
         return self.allocate_direct()
-    
-    
 
 class FiniteDiff2D(Operator):
+    
     def __init__(self):
         self.s1 = 8.0
         super(FiniteDiff2D, self).__init__()
@@ -117,6 +119,7 @@ class FiniteDiff2D(Operator):
         d2 = numpy.zeros_like(x.as_array())
         d2[:-1,:] = x.as_array()[1:,:] - x.as_array()[:-1,:]
         d = numpy.stack((d1,d2),0)
+        
         #x.geometry.voxel_num_z = 2
         return type(x)(d,False,geometry=x.geometry)
     
@@ -186,7 +189,7 @@ def PowerMethodNonsquareOld(op,numiters):
 #    return s, x0
     
 
-def PowerMethodNonsquare(op,numiters , x0=None):
+def PowerMethodNonsquare(op, numiters , x0=None):
     # Initialise random
     # Jakob's
     # inputsize , outputsize = op.size()
@@ -201,8 +204,8 @@ def PowerMethodNonsquare(op,numiters , x0=None):
     #x0.fill(numpy.random.randn(*x0.shape))
     
     if x0 is None:
-        #x0 = op.create_image_data()
-        x0 = op.allocate_direct()
+        x0 = op.create_image_data()
+#        x0 = op.allocate_direct()
         x0.fill(numpy.random.randn(*x0.shape))
     
     s = numpy.zeros(numiters)

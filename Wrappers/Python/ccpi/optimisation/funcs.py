@@ -38,7 +38,7 @@ def isSizeCorrect(data1 ,data2):
         
 class Function(object):
     def __init__(self):
-        self.L = None
+        pass
     def __call__(self,x, out=None):       raise NotImplementedError 
     def grad(self, x):                    raise NotImplementedError
     def prox(self, x, tau):               raise NotImplementedError
@@ -108,7 +108,7 @@ class Norm2(Function):
                     x.multiply(xx, out= out)
             else:
                 raise ValueError ('Wrong size: x{0} out{1}'.format(x.shape,out.shape) )
-        
+             
 
 class TV2D(Norm2):
     
@@ -116,8 +116,8 @@ class TV2D(Norm2):
         super(TV2D,self).__init__(gamma, 0)
         self.op = FiniteDiff2D()
         self.L = self.op.get_max_sing_val()
+                     
         
-
 # Define a class for squared 2-norm
 class Norm2sq(Function):
     '''
@@ -136,8 +136,6 @@ class Norm2sq(Function):
     '''
     
     def __init__(self,A,b,c=1.0,memopt=False):
-        super(Norm2sq, self).__init__()
-    
         self.A = A  # Should be an operator, default identity
         self.b = b  # Default zero DataSet?
         self.c = c  # Default 1.
@@ -148,13 +146,11 @@ class Norm2sq(Function):
             self.adjoint_placehold = A.allocate_adjoint()
             
         
-        # Compute the Lipschitz parameter from the operator if possible
-        # Leave it initialised to None otherwise
-        try:
-            self.L = 2.0*self.c*(self.A.get_max_sing_val()**2)
-        except AttributeError as ae:
-            pass
-        
+        # Compute the Lipschitz parameter from the operator.
+        # Initialise to None instead and only call when needed.
+        self.L = 2.0*self.c*(self.A.get_max_sing_val()**2)
+        super(Norm2sq, self).__init__()
+    
     def grad(self,x):
         #return 2*self.c*self.A.adjoint( self.A.direct(x) - self.b )
         return (2.0*self.c)*self.A.adjoint( self.A.direct(x) - self.b )
@@ -181,9 +177,13 @@ class Norm2sq(Function):
             out.fill(self.direct_placehold)
         else:
             return self.grad(x)
-            
-
-
+        
+    def prox_l2(self, x, tau):
+        tmp = numpy.sqrt(numpy.sum(x**2, 0)) 
+        res = x.as_array()/numpy.maximum(1, tmp / tau)
+        return type(x)(res,geometry=x.geometry)        
+        
+        
 class ZeroFun(Function):
     
     def __init__(self,gamma=0,L=1):
@@ -196,7 +196,7 @@ class ZeroFun(Function):
     
     def prox(self,x,tau):
         return x.copy()
-    
+        
     def proximal(self, x, tau, out=None):
         if out is None:
             return self.prox(x, tau)

@@ -11,18 +11,12 @@ Created on Thu Feb  7 13:10:56 2019
 import numpy as np
 from ccpi.optimisation.funcs import Function
 from ccpi.framework import DataContainer, ImageData, ImageGeometry
+from operators import CompositeDataContainer
 
-import sys
-sys.path.insert(0,'/Users/evangelos/Desktop/Projects/CCPi/edo_CompOpBranch/CCPi-Framework/Wrappers/Python/ccpi/optimisation/operators/')
-from CompositeOperator import CompositeDataContainer
 
 
 #%%  
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> 50e992f2a293b7f49fc995400f02a116439c00d2
 class L1Norm(Function):
 
     def __init__(self, A, alpha, **kwargs):

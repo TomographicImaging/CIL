@@ -28,7 +28,7 @@ import scipy.misc
 from skimage.transform import resize
 
 from algorithms import PDHG, PDHG_Composite
-from operators import CompositeOperator, Identity
+from operators import CompositeOperator, Identity, CompositeDataContainer
 from GradientOperators import Gradient
 from functions import L1Norm, ZeroFun, L2NormSq, CompositeFunction
 

@@ -729,6 +729,10 @@ class DataContainer(object):
     ## reductions
     def sum(self, out=None, *args, **kwargs):
         return self.as_array().sum(*args, **kwargs)
+    def norm(self):
+        '''return the norm of the DataContainer'''
+        y = self.as_array()
+        return numpy.dot(y, y.conjugate())
     
     
 class ImageData(DataContainer):

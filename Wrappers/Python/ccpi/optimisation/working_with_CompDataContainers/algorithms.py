@@ -68,7 +68,7 @@ def PDHG(data, f, g, operator, ig, ag, tau = None, sigma = None, opt = None):
         
     return x[0], t_end - t, i
 
-def PDHG_Composite(data, f, g, operator, ig, ag, tau = None, sigma = None, opt = None):
+def PDHG_Composite(data, f, g, operator, ig, ag, tau = None, sigma = None, opt = None, **kwargs):
         
     # algorithmic parameters
     if opt is None: 
@@ -83,6 +83,11 @@ def PDHG_Composite(data, f, g, operator, ig, ag, tau = None, sigma = None, opt =
     memopt = opt['memopt'] if 'memopt' in opt.keys() else False  
     show_iter = opt['show_iter'] if 'show_iter' in opt.keys() else False 
     stop_crit = opt['stop_crit'] if 'stop_crit' in opt.keys() else False 
+    
+#    self.diagonal_preconditioning = kwargs.get('diagonal_preconditioning',False) 
+#    
+#    if self.diagonal_preconditioning:
+        
     
     x_old = operator.alloc_domain_dim()
     y_old = operator.alloc_range_dim()
@@ -115,6 +120,8 @@ def PDHG_Composite(data, f, g, operator, ig, ag, tau = None, sigma = None, opt =
                                 
         x_old = x
         y_old = y   
+        
+        print(f(x) + g(x))
 
                            
     t_end = time.time()        

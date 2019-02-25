@@ -12,13 +12,12 @@ import numpy as np
 from ccpi.optimisation.funcs import Function
 from ccpi.framework import DataContainer, ImageData, ImageGeometry
 from operators import CompositeDataContainer
-
-
+from numbers import Number
 
 #%%  
 
-class L1Norm(Function):
-
+class mixed_L12Norm(Function):
+    
     def __init__(self, A, alpha, **kwargs):
         self.A = A    
         self.alpha = alpha
@@ -27,27 +26,16 @@ class L1Norm(Function):
         self.memopt = kwargs.get('memopt',False)
         self.sym_grad = kwargs.get('sym_grad',False)
 
-        super(L1Norm, self).__init__() 
-    
-    def __call__(self,x):
-        y = self.A.direct(x)
-        tmp = np.sqrt(np.sum([y.as_array()[i]**2 for i in range(len(y.shape))]))
-        eucl_norm = ImageData(tmp)        
-        eucl_norm.__isub__(self.b)
-        return y.abs().sum() * self.alpha 
-                   
-    def proximal(self, x, tau, out=None):      
+        super(mixed_L12Norm, self).__init__() 
         
-        res = x.divide(x.abs()) * (x.abs() - tau).maximum(0)
-        if self.b is not None:
-            return res + self.b
-        else:
-            return res
-            
-    def gradient():
-        pass
-                
-    def proximal_conj(self, x, tau, out = None): 
+    def __call__(self,x):
+        
+        y = self.A.direct(x)     
+        eucl_norm = ImageData(y.power(2).sum(axis=0)).sqrt()       
+        eucl_norm.__isub__(self.b)
+        return eucl_norm.sum() * self.alpha 
+    
+    def proximal_conjugate(self, x, tau, out = None): 
         
         if self.b==None:  
               
@@ -58,83 +46,98 @@ class L1Norm(Function):
                 res = x.divide((ImageData(x.power(2).sum(axis=0)).sqrt()/self.alpha).maximum(1.0))  
                                                    
         else:            
-            res =  (x - tau*self.b)/ ((x - tau*self.b)).abs().maximum(1.0)
+            res =  self.b + (x - tau*self.b)/ ((x - tau*self.b)).abs().maximum(1.0)
 
         if self.memopt:    
             out.fill(type(x)(res, geometry = x.geometry))  
         else:
-            return type(x)(res, geometry = x.geometry)  
+            return type(x)(res, geometry = x.geometry)    
+    
+    
+class L1Norm(Function):
+    
+    '''     
+        f(x) = alpha * ||Ax-b||_{1} = sum |Ax-b|, |.| is absolute value        
+    '''
+
+    def __init__(self, A, alpha=1, **kwargs):
+        
+        self.A = A    
+        self.alpha = alpha
+        
+        self.b = kwargs.get('b',None)
+        self.memopt = kwargs.get('memopt',False)
+
+        super(L1Norm, self).__init__() 
+    
+    def __call__(self,x):
+        
+        '''
+          Returns f(x) = alpha * ||Ax-b||_{1}
+        '''
+        
+        y = self.A.direct(x)      
+        y.__isub__(self.b)
+        y.__imul__(y)
+        
+        return y.abs().sum() * self.alpha 
+    
+    def gradient(self):        
+        pass
+                   
+    def proximal(self, x, tau, out=None): 
+        
+        '''
+         z = Ax
+         proximal_tau(u) = argmin_{z}{ 0.5 * ||z - u||_{2}^{2} + tau * f(z) }
+        
+        '''
+        
+        SoftThresholdOperator = x.divide(x.abs()) * (x.abs() - tau).maximum(0)        
+        return self.b + SoftThresholdOperator
+        
+                            
+    def proximal_conjugate(self, x, tau, out = None): 
+        
+        ''' 
+         z = Ax
+         proximal_tau(u) = argmin_{z}{ 0.5 * ||z - u||_{2}^{2} + tau * f^{*}(z)}
+        
+        '''
+        return (x + tau*self.b).divide(((x + tau*self.b)).abs().maximum(1.0))
+        
+#        if self.b==None:  
+#            
+#            res = x.divide((ImageData(x.power(2).sum(axis=0)).sqrt()/self.alpha).maximum(1.0))  
+#                                                   
+#        else:            
+#            res =  (x - tau*self.b)/ ((x - tau*self.b)).abs().maximum(1.0)
+#            
+#        res =     
+#
+#        if self.memopt:    
+#            out.fill(type(x)(res, geometry = x.geometry))  
+#        else:
+#            return type(x)(res, geometry = x.geometry)  
                                                                 
         
-class L1NormOld(Function):
-
-    def __init__(self,A,b=0,alpha=1.0,memopt = False):
-        self.A = A
-        self.b = b
-        self.alpha = alpha
-        self.memopt = memopt
-        super(L1NormOld, self).__init__() 
-        
-    def __call__(self,x):
-        y = self.A.direct(x)
-        y.__isub__(self.b)
-        return y.abs().sum() * self.alpha        
-        
-    def proximal(self, x, tau, out = None):
-        
-        res = x.divide((ImageData(x.power(2).sum(axis=0)).sqrt()/self.alpha).maximum(1.0))
-                
-        if self.memopt:    
-            out.fill(type(x)(res, geometry = x.geometry))  
-        else:
-            return type(x)(res, geometry = x.geometry)
-            
-    # it is the same as proximal
-    def proximal_conj(self, x, tau, out = None):  
-                
-        res = x.divide((ImageData(x.power(2).sum(axis=0)).sqrt()/self.alpha).maximum(1.0))
-        
-        if self.memopt:    
-            out.fill(type(x)(res, geometry = x.geometry))  
-        else:
-            return type(x)(res, geometry = x.geometry)   
-        
-        
 class L2NormSq(Function):
-    '''
-    f(x) = c*||A*x-b||_2^2
+
     
-    which has 
-    
-    grad[f](x) = 2*c*A^T*(A*x-b)
-    
-    and Lipschitz constant
-    
-    L = 2*c*||A||_2^2 = 2*s1(A)^2
-    
-    where s1(A) is the largest singular value of A.
-    
-    '''
-    
-    def __init__(self,A,b,c=1.0,memopt=False):
-        self.A = A  # Should be an operator, default identity
-        self.b = b  # Default zero DataSet?
-        self.c = c  # Default 1.
-        self.memopt = memopt
-        if memopt:
-            #self.direct_placehold = A.adjoint(b)
-            self.direct_placehold = A.allocate_direct()
-            self.adjoint_placehold = A.allocate_adjoint()
-            
+    def __init__(self, A, alpha=1, **kwargs):
         
-        # Compute the Lipschitz parameter from the operator.
-        # Initialise to None instead and only call when needed.
-#        self.L = 2.0*self.c*(self.A.get_max_sing_val()**2)
-        super(L2NormSq, self).__init__()
+        self.A = A    
+        self.alpha = alpha
+        
+        self.b = kwargs.get('b',None)
+        self.memopt = kwargs.get('memopt',False)
+
+        super(L2NormSq, self).__init__() 
+        
     
     def grad(self,x):
         #return 2*self.c*self.A.adjoint( self.A.direct(x) - self.b )
-        return (2.0*self.c)*self.A.adjoint( self.A.direct(x) - self.b )
+        return (2.0*self.alpha)*self.A.adjoint( self.A.direct(x) - self.b )
     
     def __call__(self,x):
         #return self.c* np.sum(np.square((self.A.direct(x) - self.b).ravel()))
@@ -144,7 +147,7 @@ class L2NormSq(Function):
         y = self.A.direct(x)
         y.__isub__(self.b)
         y.__imul__(y)
-        return y.sum() * self.c
+        return y.sum() * self.alpha
     
     def convex_conj(self, x):        
         return (self.b * self.A.direct(x)).sum() + 0.5 * x.power(2).sum()
@@ -173,7 +176,7 @@ class L2NormSq(Function):
             res = ( x + tau * self.b )/(1 + tau)
             return type(x)(res.as_array(),geometry=x.geometry)
         
-    def proximal_conj(self, x, tau, out = None):
+    def proximal_conjugate(self, x, tau, out = None):
         
         res = ( x - tau * self.b )/(1 + tau)
         if self.memopt:            
@@ -205,12 +208,21 @@ class CompositeFunction(Function):
     def __init__(self, *args):
         self.functions = args
         self.length = len(self.functions)
+                
+    def __call__(self,x):
+
+        t = 0
+        for i in range(self.length):
+            t +=self.functions[i](x.get_item(0))
+        return t            
+                            
+    def proximal_conjugate(self, x, tau, out = None):
         
-    def proximal_conj(self, x, tau, out = None):
-        
+        if isinstance(tau, Number):
+            tau = CompositeDataContainer(tau)
         out = [None]*self.length
         for i in range(self.length):
-            out[i] = self.functions[i].proximal_conj(x.get_item(i), tau)
+            out[i] = self.functions[i].proximal_conjugate(x.get_item(i), tau.get_item(0))
         return CompositeDataContainer(*out)    
             
         

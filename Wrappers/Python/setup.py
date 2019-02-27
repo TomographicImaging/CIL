@@ -32,7 +32,7 @@ setup(
     name="ccpi-framework",
     version=cil_version,
     packages=['ccpi' , 'ccpi.io', 'ccpi.optimisation', 
-              'ccpi.optimisation.operators', 'ccpi.optimisation.algorithms'],
+              'ccpi.optimisation.algorithms'],
 
     # Project uses reStructuredText, so ensure that the docutils get
     # installed or upgraded on the target machine

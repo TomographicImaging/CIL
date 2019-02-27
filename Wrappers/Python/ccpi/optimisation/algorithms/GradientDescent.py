@@ -56,6 +56,7 @@ class GradientDescent(Algorithm):
         self.objective_function = objective_function
         self.rate = rate
         self.loss.append(objective_function(x_init))
+        self.iteration = 0
         
     def update(self):
         '''Single iteration'''

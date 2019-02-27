@@ -158,9 +158,8 @@ def FBPD(x_init, operator=None, constraint=None, data_fidelity=None,\
     memopt = opt['memopts'] if 'memopts' in opt.keys() else False
     
     # step-sizes
-    tau   = 2 / (data_fidelity.L + 2);
-    sigma = (1/tau - data_fidelity.L/2) / regulariser.L;
-    
+    tau   = 2 / (data_fidelity.L + 2)
+    sigma = (1/tau - data_fidelity.L/2) / regulariser.L
     inv_sigma = 1/sigma
 
     # initialization

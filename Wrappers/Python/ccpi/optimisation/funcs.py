@@ -217,10 +217,10 @@ class ZeroFun(Function):
 class Norm1(Function):
     
     def __init__(self,gamma):
+        super(Norm1, self).__init__()
         self.gamma = gamma
         self.L = 1
         self.sign_x = None
-        super(Norm1, self).__init__()
     
     def __call__(self,x,out=None):
         if out is None:

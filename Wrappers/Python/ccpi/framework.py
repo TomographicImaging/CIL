@@ -3,7 +3,7 @@
 #   Visual Analytics and Imaging System Group of the Science Technology
 #   Facilities Council, STFC
 
-#   Copyright 2018 Edoardo Pasca
+#   Copyright 2018-2019 Edoardo Pasca
 
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import numpy
 import sys
 from datetime import timedelta, datetime
 import warnings
+from functools import reduce
 
 def find_key(dic, val):
     """return the key of dictionary dic given the value"""
@@ -720,10 +721,15 @@ class DataContainer(object):
     ## reductions
     def sum(self, out=None, *args, **kwargs):
         return self.as_array().sum(*args, **kwargs)
-    def norm(self):
-        '''return the norm of the DataContainer'''
-        y = self.as_array()
+    def squared_norm(self):
+        '''return the squared euclidean norm of the DataContainer viewed as a vector'''
+        shape = self.shape
+        size = reduce(lambda x,y:x*y, shape, 1)
+        y = numpy.reshape(self.as_array(), (size, ))
         return numpy.dot(y, y.conjugate())
+    def norm(self):
+        '''return the euclidean norm of the DataContainer viewed as a vector'''
+        return numpy.sqrt(self.squared_norm())
     
 class ImageData(DataContainer):
     '''DataContainer for holding 2D or 3D DataContainer'''

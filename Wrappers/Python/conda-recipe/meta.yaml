@@ -12,6 +12,12 @@ test:
   requires:
     - python-wget
     - cvxpy # [not win]
+
+  source_files:
+    - ./test
+
+  commands:
+    - python -m unittest discover
     
 requirements:
   build:

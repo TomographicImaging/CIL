@@ -54,40 +54,34 @@ class CGLS(Algorithm):
         self.d = operator.adjoint(self.r)
 
         
-        self.normr2 = (self.d * self.d).sum()
-        if isinstance(self.normr2, Iterable):
-            self.normr2 = sum(self.normr2)
+        self.normr2 = self.d.squared_norm()
+        #if isinstance(self.normr2, Iterable):
+        #    self.normr2 = sum(self.normr2)
         #self.normr2 = numpy.sqrt(self.normr2)
-        print ("set_up" , self.normr2)
+        #print ("set_up" , self.normr2)
 
     def update(self):
 
         Ad = self.operator.direct(self.d)
-        norm = (Ad*Ad).sum()
-        if isinstance(norm, Iterable):
-            norm = sum(norm)
-        #norm = numpy.sqrt(norm)
-        print (norm)
+        #norm = (Ad*Ad).sum()
+        #if isinstance(norm, Iterable):
+        #    norm = sum(norm)
+        norm = Ad.squared_norm()
+        
         alpha = self.normr2/norm
         self.x += (self.d * alpha)
         self.r -= (Ad * alpha)
         s  = self.operator.adjoint(self.r)
 
-        normr2_new = (s*s).sum()
-        if isinstance(normr2_new, Iterable):
-            normr2_new = sum(normr2_new)
+        normr2_new = s.squared_norm()
+        #if isinstance(normr2_new, Iterable):
+        #    normr2_new = sum(normr2_new)
         #normr2_new = numpy.sqrt(normr2_new)
-        print (normr2_new)
+        #print (normr2_new)
         
         beta = normr2_new/self.normr2
         self.normr2 = normr2_new
         self.d = s + beta*self.d
 
     def update_objective(self):
-        self.loss.append((self.r*self.r).sum())
-        
-    def run(self, iterations, callback=None):
-        self.max_iteration += iterations
-        for _ in self:
-            if callback is not None:
-                callback(self.iteration, self.get_current_loss())
+        self.loss.append(self.r.squared_norm())

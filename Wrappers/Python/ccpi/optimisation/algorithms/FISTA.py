@@ -37,7 +37,7 @@ class FISTA(Algorithm):
             if k in args:
                 args.pop(args.index(k))
         if len(args) == 0:
-            return self.set_up(x_init=kwargs['x_init'],
+            return self.set_up(kwargs['x_init'],
                                f=kwargs['f'],
                                g=kwargs['g'],
                                opt=kwargs['opt'])
@@ -51,14 +51,14 @@ class FISTA(Algorithm):
             self.f = f
         if g   is None:
             g = ZeroFun()
+            self.g = g
         else:
             self.g = g
         
         # algorithmic parameters
         if opt is None: 
-            opt = {'tol': 1e-4, 'iter': 1000, 'memopt':False}
+            opt = {'tol': 1e-4, 'memopt':False}
         
-        self.max_iteration = opt['iter'] if 'iter' in opt.keys() else 1000
         self.tol = opt['tol'] if 'tol' in opt.keys() else 1e-4
         memopt = opt['memopt'] if 'memopt' in opt.keys() else False
         self.memopt = memopt

@@ -93,9 +93,10 @@ class Identity(Operator):
 
 class TomoIdentity(Operator):
     def __init__(self, geometry, **kwargs):
+        super(TomoIdentity, self).__init__()
         self.s1 = 1.0
         self.geometry = geometry
-        super(TomoIdentity, self).__init__()
+        
         
     def direct(self,x,out=None):
         

@@ -103,7 +103,7 @@ class Algorithm(object):
         return self.__loss[-1]
     def get_last_objective(self):
         '''alias to get_last_loss'''
-        return self.get_current_loss()
+        return self.get_last_loss()
     def update_objective(self):
         '''calculates the objective with the current solution'''
         raise NotImplementedError()
@@ -144,10 +144,14 @@ class Algorithm(object):
         '''run n iterations and update the user with the callback if specified'''
         if self.should_stop():
             print ("Stop cryterion has been reached.")
-        for _ in range(iterations):
+        i = 0
+        for _ in self:
             if verbose:
                 print ("Iteration {}/{}, objective {}".format(self.iteration, 
-                       self.max_iteration, self.get_current_loss()) )
+                       self.max_iteration, self.get_last_objective()) )
             if callback is not None:
-                callback(self.iteration, self.get_current_loss())
+                callback(self.iteration, self.get_last_objective())
+            i += 1
+            if i == iterations:
+                break
     

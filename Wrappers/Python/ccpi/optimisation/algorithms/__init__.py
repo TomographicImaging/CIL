@@ -22,3 +22,8 @@ Created on Thu Feb 21 11:03:13 2019
 @author: ofn77899
 """
 
+from .Algorithm import Algorithm
+from .CGLS import CGLS
+from .GradientDescent import GradientDescent
+from .FISTA import FISTA
+from .FBPD import FBPD

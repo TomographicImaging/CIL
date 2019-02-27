@@ -213,7 +213,7 @@ def PowerMethodNonsquare(op,numiters , x0=None):
         x1norm = x1.norm()
         #print ("x0 **********" ,x0)
         #print ("x1 **********" ,x1)
-        s[it] = (x1*x0).sum() / (x0.norm())
+        s[it] = (x1*x0).sum() / (x0.squared_norm())
         x0 = (1.0/x1norm)*x1
     return numpy.sqrt(s[-1]), numpy.sqrt(s), x0
 

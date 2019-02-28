@@ -56,23 +56,23 @@ op1 = Gradient(ig)
 op2 = Identity(ig, ag)
 
 # Form Composite Operator
-#operator = CompositeOperator((2,1), op1, op2 ) 
+operator = CompositeOperator((2,1), op1, op2 ) 
 
 # Create functions
-#f = CompositeFunction(mixed_L12Norm(op1,None,alpha), \
-#                      L2NormSq(op2, noisy_data, c = 0.5) )
+f = CompositeFunction(mixed_L12Norm(op1,None,alpha), \
+                      L2NormSq(op2, noisy_data, c = 0.5) )
 
 #f = CompositeFunction(mixed_L12Norm(op1, None, alpha), \
 #                      L1Norm(op2, noisy_data, c = 1) )
 #
-#g = ZeroFun()
+g = ZeroFun()
 
 ###############################################################################
 #         No Composite #
 ###############################################################################
-operator = op1
-f = mixed_L12Norm(op1,None,alpha)
-g = L2NormSq(op2, noisy_data, c = 0.5)
+#operator = op1
+#f = mixed_L12Norm(op1,None,alpha)
+#g = L2NormSq(op2, noisy_data, c = 0.5)
 ###############################################################################
 
 # Compute operator Norm
@@ -80,7 +80,7 @@ normK = operator.norm()
 
 # Primal & dual stepsizes
 
-diagonal_preconditioning = True
+diagonal_preconditioning = False
 
 if diagonal_preconditioning:
     
@@ -122,8 +122,8 @@ res, total_time, objective = PDHG_Composite(noisy_data, f, g, operator, \
                                   ig, ag, tau = tau, sigma = sigma, opt = opt)
 #
 ##Show results
-#solution = res.get_item(0).as_array()
-solution = res.as_array()
+solution = res.get_item(0).as_array()
+#solution = res.as_array()
 
 plt.imshow(solution)
 plt.colorbar()

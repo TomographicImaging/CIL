@@ -41,7 +41,7 @@ class CGLS(Algorithm):
         if self.x is not None and self.operator is not None and \
            self.data is not None:
             print ("Calling from creator")
-            return self.set_up(x_init  =kwargs['x_init'],
+            self.set_up(x_init  =kwargs['x_init'],
                                operator=kwargs['operator'],
                                data    =kwargs['data'])
 

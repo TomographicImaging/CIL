@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+p# -*- coding: utf-8 -*-
 #   This work is part of the Core Imaging Library developed by
 #   Visual Analytics and Imaging System Group of the Science Technology
 #   Facilities Council, STFC

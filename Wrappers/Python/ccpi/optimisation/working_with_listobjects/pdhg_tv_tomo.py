@@ -79,7 +79,7 @@ plt.title('Backprojected data')
 plt.show()
 
 #%%
-alpha = 20 
+alpha = 100 
 
 # Create operators
 op1 = Gradient((ig.voxel_num_x,ig.voxel_num_y))

@@ -22,11 +22,11 @@ from skimage.transform import resize
 from algorithms import PDHG, PDHG_Composite
 from operators import CompositeOperator, Identity, AstraProjectorSimple
 from GradientOperators import Gradient
-from functions import L1Norm, ZeroFun, L2NormSq, CompositeFunction
+from functions import L1Norm, ZeroFun, L2NormSq, CompositeFunction, mixed_L12Norm
 
 #%% # Create phantom
 
-N = 200
+N = 100
 ig = ImageGeometry(voxel_num_x = N, voxel_num_y=N)
 
 data = np.zeros((N,N))
@@ -58,7 +58,8 @@ np.random.seed(1)
 noise = 'gaussian'
 
 if noise == 'gaussian':
-    noisy_data = AcquisitionData(sin.as_array() + np.random.normal(0, 2, sin.shape))
+    noisy_data = AcquisitionData(sin.as_array() + np.random.normal(0, 4, sin.shape))    
+    
 elif noise == 'poisson':
     scale = 0.5
     noisy_data = AcquisitionData(scale * np.random.poisson(sin.as_array()/scale))
@@ -68,14 +69,17 @@ backproj = Aop.adjoint(noisy_data)
 
 plt.imshow(data.as_array())
 plt.title('Phantom image')
+plt.colorbar()
 plt.show()
 
-plt.imshow(noisy_data.array)
+plt.imshow(noisy_data.as_array())
 plt.title('Simulated data')
+plt.colorbar()
 plt.show()
 
 plt.imshow(backproj.array)
 plt.title('Backprojected data')
+plt.colorbar()
 plt.show()
 
 #%%
@@ -89,8 +93,9 @@ op2 = Aop
 operator = CompositeOperator((2,1), op1, op2 ) 
 
 # Create functions
-f = CompositeFunction(L1Norm(op1,alpha), \
-                      L2NormSq(op2, noisy_data, c = 0.5, memopt = False) )
+f = CompositeFunction(mixed_L12Norm(op1,None,alpha), \
+                      L2NormSq(op2, noisy_data, c = 0.5) )
+
 g = ZeroFun()
 
 #Aop.norm = Aop.get_max_sing_val()
@@ -98,7 +103,7 @@ normK = operator.norm()
 #normK = compute_opNorm(operator)
 
 # Primal & dual stepsizes
-sigma = 10
+sigma = 1
 tau = 1/(sigma*normK**2)
 
 opt = {'niter':1000}

@@ -31,14 +31,15 @@ from skimage.transform import resize
 from algorithms import PDHG, PDHG_Composite
 from operators import CompositeOperator, Identity, CompositeDataContainer
 from GradientOperators import Gradient
-from functions import L1Norm, ZeroFun, L2NormSq, CompositeFunction, mixed_L12Norm
+from functions import L1Norm, ZeroFun, CompositeFunction, mixed_L12Norm, L2NormSq
+
 
 from Sparse_GradMat import GradOper
 
 #%%###############################################################################
 # Create phantom for TV
 
-N = 200
+N = 100
 data = np.zeros((N,N))
 data[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
 data[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 1
@@ -55,24 +56,31 @@ op1 = Gradient(ig)
 op2 = Identity(ig, ag)
 
 # Form Composite Operator
-operator = CompositeOperator((2,1), op1, op2 ) 
+#operator = CompositeOperator((2,1), op1, op2 ) 
 
 # Create functions
-#f = CompositeFunction(L1Norm(op1,alpha), \
-#                      L2NormSq(op2, noisy_data, c = 0.5, memopt = False) )
+#f = CompositeFunction(mixed_L12Norm(op1,None,alpha), \
+#                      L2NormSq(op2, noisy_data, c = 0.5) )
 
-f = CompositeFunction(mixed_L12Norm(op1,alpha), \
-                      L2NormSq(op2, noisy_data, c = 0.5, memopt = False) )
+#f = CompositeFunction(mixed_L12Norm(op1, None, alpha), \
+#                      L1Norm(op2, noisy_data, c = 1) )
+#
+#g = ZeroFun()
 
-
-g = ZeroFun()
+###############################################################################
+#         No Composite #
+###############################################################################
+operator = op1
+f = mixed_L12Norm(op1,None,alpha)
+g = L2NormSq(op2, noisy_data, c = 0.5)
+###############################################################################
 
 # Compute operator Norm
 normK = operator.norm()
 
 # Primal & dual stepsizes
 
-diagonal_preconditioning = False
+diagonal_preconditioning = True
 
 if diagonal_preconditioning:
     
@@ -100,8 +108,8 @@ if diagonal_preconditioning:
             
 else:
     
-    sigma = 1/normK
-    tau = 1/normK
+    sigma = 10
+    tau = 1/(sigma*normK**2)
     
     
 
@@ -110,15 +118,17 @@ else:
 opt = {'niter':1000}
 #
 ## Run algorithm
-res, total_time, its = PDHG_Composite(noisy_data, f, g, operator, \
+res, total_time, objective = PDHG_Composite(noisy_data, f, g, operator, \
                                   ig, ag, tau = tau, sigma = sigma, opt = opt)
 #
 ##Show results
-solution = res.get_item(0).as_array()
+#solution = res.get_item(0).as_array()
+solution = res.as_array()
 
 plt.imshow(solution)
 plt.colorbar()
 plt.show()
+
 ##
 plt.imshow(noisy_data.as_array())
 plt.colorbar()
@@ -127,3 +137,6 @@ plt.show()
 plt.plot(np.linspace(0,N,N), data[int(N/2),:], label = 'GTruth')
 plt.plot(np.linspace(0,N,N), solution[int(N/2),:], label = 'Recon')
 plt.legend()
+
+#%%
+

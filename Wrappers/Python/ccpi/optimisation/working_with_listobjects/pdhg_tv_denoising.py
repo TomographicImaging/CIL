@@ -61,7 +61,7 @@ tau = 1/(sigma*normK**2)
 opt = {'niter':1000}
 
 # Run algorithm
-res, total_time, its = PDHG(noisy_data, f, g, operator, \
+res, total_time, its = PDHG_testGeneric(noisy_data, f, g, operator, \
                                   ig, ag, tau = tau, sigma = sigma, opt = opt)
 
 plt.imshow(res.as_array())

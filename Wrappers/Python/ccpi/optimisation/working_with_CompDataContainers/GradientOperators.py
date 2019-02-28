@@ -17,6 +17,8 @@ class Gradient(Operator):
     
     def __init__(self, gm_domain, gm_range=None, bnd_cond = 'Neumann', **kwargs):
         
+        super(Gradient, self).__init__() 
+        
         self.gm_domain = gm_domain # Domain of Grad Operator
         self.gm_range = gm_range # Range of Grad Operator
         self.bnd_cond = bnd_cond # Boundary conditions of Finite Differences
@@ -33,7 +35,7 @@ class Gradient(Operator):
         self.voxel_size = kwargs.get('voxel_size',[1]*len(gm_domain))  
         
                             
-        super(Gradient, self).__init__()  
+         
         
     def direct(self, x, out=None):
         

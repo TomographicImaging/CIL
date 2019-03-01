@@ -111,8 +111,12 @@ class ImageGeometry(object):
         repres += "voxel_size : x{0},y{1},z{2}\n".format(self.voxel_size_x, self.voxel_size_y, self.voxel_size_z)
         repres += "center : x{0},y{1},z{2}\n".format(self.center_x, self.center_y, self.center_z)
         return repres
-    
-    
+    def allocate(self, value=0, dimension_labels=None):
+        '''allocates an ImageData according to the size expressed in the instance'''
+        out = ImageData(geometry=self, dimension_labels=dimension_labels)
+        if value != 0:
+            out += value
+        return out
 class AcquisitionGeometry(object):
     
     def __init__(self, 
@@ -192,9 +196,12 @@ class AcquisitionGeometry(object):
         repres += "distance center-detector: {0}\n".format(self.dist_source_center)
         repres += "number of channels: {0}\n".format(self.channels)
         return repres
-
-
-            
+    def allocate(self, value=0, dimension_labels=None):
+        '''allocates an AcquisitionData according to the size expressed in the instance'''
+        out = AcquisitionData(geometry=self, dimension_labels=dimension_labels)
+        if value != 0:
+            out += value
+        return out
 class DataContainer(object):
     '''Generic class to hold data
     
@@ -741,6 +748,7 @@ class DataContainer(object):
         return numpy.sqrt(self.squared_norm())
     
     
+    
 class ImageData(DataContainer):
     '''DataContainer for holding 2D or 3D DataContainer'''
     def __init__(self, 
@@ -903,8 +911,11 @@ class AcquisitionData(DataContainer):
                         elif dim == 'horizontal':
                             shape.append(horiz)
                     if len(shape) != len(dimension_labels):
-                        raise ValueError('Missing {0} axes'.format(
-                                len(dimension_labels) - len(shape)))
+                        raise ValueError('Missing {0} axes.\nExpected{1} got {2}}'\
+                            .format(
+                                len(dimension_labels) - len(shape),
+                                dimension_labels, shape) 
+                            )
                     shape = tuple(shape)
                     
                 array = numpy.zeros( shape , dtype=numpy.float32) 

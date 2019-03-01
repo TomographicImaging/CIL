@@ -24,12 +24,6 @@ class Operator(object):
         raise NotImplementedError
     def norm(self):
         raise NotImplementedError
-    def allocate_direct(self):
-        '''Allocates memory on the Y space'''
-        raise NotImplementedError
-    def allocate_adjoint(self):
-        '''Allocates memory on the X space'''
-        raise NotImplementedError
     def range_dim(self):
         raise NotImplementedError
     def domain_dim(self):
@@ -49,7 +43,7 @@ class LinearOperator(Operator):
 
 # this should go in the framework
         
-class CompositeDataContainer(object):
+class BlockDataContainer(object):
     '''Class to hold a composite operator'''
     __array_priority__ = 1
     def __init__(self, *args, shape=None):
@@ -173,8 +167,11 @@ class CompositeDataContainer(object):
     ## reductions
     def sum(self, out=None, *args, **kwargs):
         return numpy.asarray([ el.sum(*args, **kwargs) for el in self.containers])
+    def squared_norm(self):
+        y = numpy.asarray([el.squared_norm() for el in self.containers])
+        return y.sum() 
     def norm(self):
-        y = numpy.asarray([el**2 for el in self.containers])
+        y = numpy.asarray([el.norm() for el in self.containers])
         return y.sum()    
     def copy(self):
         '''alias of clone'''    
@@ -231,7 +228,7 @@ class CompositeDataContainer(object):
         return other.power(self)
     
     def __iadd__(self, other):
-        if isinstance (other, CompositeDataContainer):
+        if isinstance (other, BlockDataContainer):
             for el,ot in zip(self.containers, other.containers):
                 el += ot
         elif isinstance(other, Number):
@@ -245,7 +242,7 @@ class CompositeDataContainer(object):
     # __radd__
     
     def __isub__(self, other):
-        if isinstance (other, CompositeDataContainer):
+        if isinstance (other, BlockDataContainer):
             for el,ot in zip(self.containers, other.containers):
                 el -= ot
         elif isinstance(other, Number):
@@ -259,7 +256,7 @@ class CompositeDataContainer(object):
     # __rsub__
     
     def __imul__(self, other):
-        if isinstance (other, CompositeDataContainer):
+        if isinstance (other, BlockDataContainer):
             for el,ot in zip(self.containers, other.containers):
                 el *= ot
         elif isinstance(other, Number):
@@ -273,7 +270,7 @@ class CompositeDataContainer(object):
     # __imul__
     
     def __idiv__(self, other):
-        if isinstance (other, CompositeDataContainer):
+        if isinstance (other, BlockDataContainer):
             for el,ot in zip(self.containers, other.containers):
                 el /= ot
         elif isinstance(other, Number):
@@ -290,8 +287,8 @@ class CompositeDataContainer(object):
     
 
        
-class CompositeOperator(Operator):
-    '''Class to hold a composite operator'''
+class BlockOperator(Operator):
+    '''Class to hold a block operator'''
     def __init__(self, *args, shape=None):
         self.operators = args
         if shape is None:
@@ -330,7 +327,7 @@ class CompositeOperator(Operator):
                 else:
                     prod += self.get_item(row,col).direct(x.get_item(col))
             res.append(prod)
-        return CompositeDataContainer(*res, shape=shape)
+        return BlockDataContainer(*res, shape=shape)
     
     def adjoint(self, x, out=None):
         shape = self.get_output_shape(x.shape, adjoint=True)
@@ -342,7 +339,7 @@ class CompositeOperator(Operator):
                 else:
                     prod += self.get_item(row,col).adjoint(x.get_item(col))
             res.append(prod)
-        return CompositeDataContainer(*res, shape=shape)
+        return BlockDataContainer(*res, shape=shape)
     
     def get_output_shape(self, xshape, adjoint=False):
         sshape = self.shape[1]
@@ -376,79 +373,7 @@ class CompositeOperator(Operator):
                 z2 += self.compMat[j][i].adjoint(x[j])
             out[i] = z2
 '''
-from ccpi.optimisation.Algorithms import Algorithm
-from collections.abc import Iterable
-class CGLS(Algorithm):
-
-    '''Conjugate Gradient Least Squares algorithm
-
-    Parameters:
-      x_init: initial guess
-      operator: operator for forward/backward projections
-      data: data to operate on
-    '''
-    def __init__(self, **kwargs):
-        super(CGLS, self).__init__()
-        self.x        = kwargs.get('x_init', None)
-        self.operator = kwargs.get('operator', None)
-        self.data     = kwargs.get('data', None)
-        if self.x is not None and self.operator is not None and \
-           self.data is not None:
-            print ("Calling from creator")
-            return self.set_up(x_init  =kwargs['x_init'],
-                               operator=kwargs['operator'],
-                               data    =kwargs['data'])
-
-    def set_up(self, x_init, operator , data ):
-
-        self.r = data.copy()
-        self.x = x_init.copy()
-
-        self.operator = operator
-        self.d = operator.adjoint(self.r)
-
-        
-        self.normr2 = (self.d * self.d).sum()
-        if isinstance(self.normr2, Iterable):
-            self.normr2 = sum(self.normr2)
-        #self.normr2 = numpy.sqrt(self.normr2)
-        print ("set_up" , self.normr2)
-
-    def should_stop(self):
-        '''stopping cryterion, currently only based on number of iterations'''
-        return self.iteration >= self.max_iteration
-
-    def update(self):
-
-        Ad = self.operator.direct(self.d)
-        norm = (Ad*Ad).sum()
-        if isinstance(norm, Iterable):
-            norm = sum(norm)
-        #norm = numpy.sqrt(norm)
-        print (norm)
-        alpha = self.normr2/norm
-        self.x += (self.d * alpha)
-        self.r -= (Ad * alpha)
-        s  = self.operator.adjoint(self.r)
-
-        normr2_new = (s*s).sum()
-        if isinstance(normr2_new, Iterable):
-            normr2_new = sum(normr2_new)
-        #normr2_new = numpy.sqrt(normr2_new)
-        print (normr2_new)
-        
-        beta = normr2_new/self.normr2
-        self.normr2 = normr2_new
-        self.d = s + beta*self.d
-
-    def update_objective(self):
-        self.loss.append((self.r*self.r).sum())
-        
-    def run(self, iterations, callback=None):
-        self.max_iteration += iterations
-        for _ in self:
-            if callback is not None:
-                callback(self.iteration, self.get_current_loss())
+from ccpi.optimisation.algorithms import CGLS
 
     
 if __name__ == '__main__':
@@ -471,12 +396,12 @@ if __name__ == '__main__':
     data2 = ImageData(geometry=ig0) + 2
     data3 = ImageData(geometry=ig1) + 3
     
-    cp0 = CompositeDataContainer(data0,data1)
-    cp1 = CompositeDataContainer(data2,data3)
+    cp0 = BlockDataContainer(data0,data1)
+    cp1 = BlockDataContainer(data2,data3)
 #    
     a = [ (el, ot) for el,ot in zip(cp0.containers,cp1.containers)]
     print  (a[0][0].shape)
-    #cp2 = CompositeDataContainer(*a)
+    #cp2 = BlockDataContainer(*a)
     cp2 = cp0.add(cp1)
     assert (cp2.get_item(0,0).as_array()[0][0][0] == 2.)
     assert (cp2.get_item(1,0).as_array()[0][0][0] == 4.)
@@ -735,8 +660,8 @@ if __name__ == '__main__':
     # needed if one wants to obtain a converged solution.
     x_init = ImageData(geometry=ig, 
                        dimension_labels=['horizontal_x','horizontal_y','vertical'])
-    X_init = CompositeDataContainer(x_init)
-    B = CompositeDataContainer(b, 
+    X_init = BlockDataContainer(x_init)
+    B = BlockDataContainer(b, 
                                ImageData(geometry=ig, dimension_labels=['horizontal_x','horizontal_y','vertical']))
     
     # setup a tomo identity
@@ -744,8 +669,8 @@ if __name__ == '__main__':
     Ismall = 1e-5 * TomoIdentity(geometry=ig)
     
     # composite operator
-    Kbig = CompositeOperator(A, Ibig, shape=(2,1))
-    Ksmall = CompositeOperator(A, Ismall, shape=(2,1))
+    Kbig = BlockOperator(A, Ibig, shape=(2,1))
+    Ksmall = BlockOperator(A, Ismall, shape=(2,1))
     
     #out = K.direct(X_init)
     

@@ -31,12 +31,9 @@ if  cil_version == '':
 setup(
     name="ccpi-framework",
     version=cil_version,
-<<<<<<< HEAD
-    packages=['ccpi' , 'ccpi.io', 'ccpi.optimisation', 'ccpi.optimisation.operators'],
-=======
     packages=['ccpi' , 'ccpi.io', 'ccpi.optimisation', 
+              'ccpi.optimisation.operators',
               'ccpi.optimisation.algorithms'],
->>>>>>> master
 
     # Project uses reStructuredText, so ensure that the docutils get
     # installed or upgraded on the target machine

@@ -48,15 +48,9 @@ class Operator(object):
         raise NotImplementedError
     def allocate_adjoint(self):
         '''Allocates memory on the X space'''
-<<<<<<< HEAD
         raise NotImplementedError
     def range_dim(self):
         raise NotImplementedError
-=======
-        raise NotImplementedError
-    def range_dim(self):
-        raise NotImplementedError
->>>>>>> master
     def domain_dim(self):
         raise NotImplementedError
     def __rmul__(self, other):

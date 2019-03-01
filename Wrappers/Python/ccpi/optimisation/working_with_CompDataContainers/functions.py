@@ -13,7 +13,6 @@ from ccpi.optimisation.funcs import Function
 from ccpi.framework import DataContainer, ImageData, ImageGeometry 
 from operators import CompositeDataContainer, Identity, CompositeOperator
 from numbers import Number
-from GradientOperators import Gradient
 
 
 ############################   L2NORM FUNCTIONS   #############################
@@ -162,9 +161,7 @@ class L1Norm(SimpleL1Norm):
             return SimpleL1Norm.proximal_conjugate(self, x, tau)
         else:
             return SimpleL1Norm.proximal_conjugate(self, x - tau*self.b, tau)
-        
-        
-        
+                        
 
 ############################   mixed_L1,2NORM FUNCTIONS   #############################
 class mixed_L12Norm(Function):

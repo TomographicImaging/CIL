@@ -289,9 +289,7 @@ class CompositeDataContainer(object):
     # __rdiv__
     def __itruediv__(self, other):
         return self.__idiv__(other)
-    
-        
-                                
+                                            
 class CompositeOperator(Operator):
     
     def __init__(self, shape, *operators):
@@ -679,7 +677,7 @@ class Identity(Operator):
     
     def __init__(self, gm_domain, gm_range=None):
 
-        self.gm_domain = [gm_domain]
+        self.gm_domain = gm_domain
         self.gm_range = gm_range  
         if self.gm_range is None:
             self.gm_range = self.gm_domain

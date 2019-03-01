@@ -12,7 +12,7 @@ import sys
 sys.path.insert(0, '/Users/evangelos/Desktop/Projects/CCPi/CCPi-Framework/Wrappers/Python/ccpi/optimisation/working_with_CompDataContainers')
 
 from ccpi.framework import ImageData
-from GradientOperators import Gradient
+from GradientOperator import Gradient
 
 
 

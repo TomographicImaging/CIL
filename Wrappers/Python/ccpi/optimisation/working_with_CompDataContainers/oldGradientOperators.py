@@ -12,7 +12,6 @@ import numpy as np
 
 #%%
 
-
 class Gradient(Operator):
     
     def __init__(self, gm_domain, gm_range=None, bnd_cond = 'Neumann', **kwargs):
@@ -33,19 +32,10 @@ class Gradient(Operator):
         
         #TODO not tested yet, operator norm???
         self.voxel_size = kwargs.get('voxel_size',[1]*len(gm_domain))  
-        
-                            
-         
+                                             
         
     def direct(self, x, out=None):
         
-#        tmp = [ [] for i in range(len(self.gm_range))]
-#        tmp = []
-#        for i in range(len(self.gm_domain)):
-#            tmp.append(ImageData(FiniteDiff(self.gm_domain, direction = i, bnd_cond = self.bnd_cond).direct(x)))
-#        return tmp
-        
-        # with numpy ImageData
         tmp = np.zeros(self.gm_range)
         for i in range(len(self.gm_domain)):
             tmp[i] = FiniteDiff(self.gm_domain, direction = i, bnd_cond = self.bnd_cond).direct(x.as_array())/self.voxel_size[i]            
@@ -54,10 +44,6 @@ class Gradient(Operator):
     
     def adjoint(self, x, out=None):
             
-#        tmp = []
-#        for i in range(len(self.gm_domain)):
-#            tmp.append(FiniteDiff(self.gm_domain, direction = i, bnd_cond = self.bnd_cond).adjoint(x[i]))
-#        return [type(x[0])(sum(tmp))]
         tmp = np.zeros(self.gm_domain)
         for i in range(len(self.gm_domain)):
             tmp+=FiniteDiff(self.gm_domain, direction = i, bnd_cond = self.bnd_cond).adjoint(x.as_array()[i])/self.voxel_size[i]  
@@ -83,59 +69,68 @@ class Gradient(Operator):
         self.s1, sall, svec = PowerMethodNonsquare(self, 25, x0)
         return self.s1
     
-    
 class SymmetrizedGradient(Operator):
     
-    def __init__(self, gm_domain, gm_range=None, bnd_cond = 'Neumann', **kwargs):
-        pass
-
+    def __init__(self, gm_domain, gm_range, bnd_cond = 'Neumann', **kwargs):
         
+        super(SymmetrizedGradient, self).__init__() 
+        
+        self.gm_domain = gm_domain # Domain of Grad Operator
+        self.gm_range = gm_range # Range of Grad Operator
+        self.bnd_cond = bnd_cond # Boundary conditions of Finite Differences
     
-#class gradient_numpy(Operator):
-#            
-#    def __init__(self, gm_domain, gm_range=None, **kwargs):
-#        
-#        self.gm_domain = gm_domain
-#        self.gm_range = gm_range
-#        
-#        if self.gm_range is None:
-#            self.gm_range = self.range_dim()
-#        
-#        self.memopt = kwargs.get('memopt',False)
-#        self.correlation = kwargs.get('correlation','Space')  
-#        
-#        super(gradient, self).__init__()  
-#                                      
-#    def domain_dim(self):       
-#        return self.gm_domain
-#                   
-#    def range_dim(self):                 
-#        return (len(self.domain_dim()),) + self.domain_dim() 
-#                                         
-#    def direct(self, x, out=None):
-#                         
-#        grad = np.zeros(self.range_dim())
-#
-#        for i in range(self.range_dim()[0]):
-#            grad[i]=finite_diff(x.as_array(), i, method='for')
-#        
-#        return type(x)(grad)
-##    
-#    def adjoint(self, x, out=None):
-#        
-#        div = np.zeros(x.shape[1:])
-#        for i in range(len(x.shape[1:])):
-#            div += finite_diff(x.as_array()[i], direction = i, method = 'back')
-#        
-#        return type(x)(-div)
-#    
-#    def norm(self):
-##        return np.sqrt(4*len(self.domainDim()))        
-#        #TODO this takes time for big ImageData
-#        # for 2D ||grad|| = sqrt(8), 3D ||grad|| = sqrt(12)        
-#        x0 = ImageData(np.random.random_sample(self.domain_dim()))
-#        self.s1, sall, svec = PowerMethodNonsquare(self, 25, x0)
-#        return self.s1    
+        # Kwargs Default options            
+        self.memopt = kwargs.get('memopt',False)
+        self.correlation = kwargs.get('correlation','Space') 
+        
+        #TODO not tested yet, operator norm???
+        self.voxel_size = kwargs.get('voxel_size',[1]*len(gm_domain))  
+                                             
+        
+    def direct(self, x, out=None):
+        
+        tmp = np.zeros(self.gm_range)
+        tmp[0] = FiniteDiff(self.gm_domain[1:], direction = 1, bnd_cond = self.bnd_cond).adjoint(x.as_array()[0])
+        tmp[1] = FiniteDiff(self.gm_domain[1:], direction = 0, bnd_cond = self.bnd_cond).adjoint(x.as_array()[1])
+        tmp[2] = 0.5 * (FiniteDiff(self.gm_domain[1:], direction = 0, bnd_cond = self.bnd_cond).adjoint(x.as_array()[0]) +
+                        FiniteDiff(self.gm_domain[1:], direction = 1, bnd_cond = self.bnd_cond).adjoint(x.as_array()[1]) )
+        
+        return type(x)(tmp)
+    
+    
+    def adjoint(self, x, out=None):
+        
+        tmp = np.zeros(self.gm_domain)
+        
+        tmp[0] = FiniteDiff(self.gm_domain[1:], direction = 1, bnd_cond = self.bnd_cond).direct(x.as_array()[0]) +  \
+                 FiniteDiff(self.gm_domain[1:], direction = 0, bnd_cond = self.bnd_cond).direct(x.as_array()[2])
+                 
+        tmp[1] = FiniteDiff(self.gm_domain[1:], direction = 1, bnd_cond = self.bnd_cond).direct(x.as_array()[2]) +  \
+                 FiniteDiff(self.gm_domain[1:], direction = 0, bnd_cond = self.bnd_cond).direct(x.as_array()[1])                 
+
+        return type(x)(-tmp)          
+            
+    def alloc_domain_dim(self):
+        return ImageData(np.zeros(self.gm_domain))
+    
+    def alloc_range_dim(self):
+        return ImageData(np.zeros(self.range_dim))
+    
+    def domain_dim(self):
+        return self.gm_domain
+    
+    def range_dim(self):
+        return self.gm_range
+                                   
+    def norm(self):
+#        return np.sqrt(4*len(self.domainDim()))        
+        #TODO this takes time for big ImageData
+        # for 2D ||grad|| = sqrt(8), 3D ||grad|| = sqrt(12)        
+        x0 = ImageData(np.random.random_sample(self.domain_dim()))
+        self.s1, sall, svec = PowerMethodNonsquare(self, 25, x0)
+        return self.s1    
+    
+ 
     
 class FiniteDiff(Operator):
     
@@ -470,6 +465,11 @@ if __name__ == '__main__':
 #    
     print(LHS,RHS)
     print(G.norm())
+    
+  
+    
+    
+    
     
     
     

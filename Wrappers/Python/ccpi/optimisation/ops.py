@@ -48,9 +48,15 @@ class Operator(object):
         raise NotImplementedError
     def allocate_adjoint(self):
         '''Allocates memory on the X space'''
+<<<<<<< HEAD
         raise NotImplementedError
     def range_dim(self):
         raise NotImplementedError
+=======
+        raise NotImplementedError
+    def range_dim(self):
+        raise NotImplementedError
+>>>>>>> master
     def domain_dim(self):
         raise NotImplementedError
     def __rmul__(self, other):
@@ -93,9 +99,10 @@ class Identity(Operator):
 
 class TomoIdentity(Operator):
     def __init__(self, geometry, **kwargs):
+        super(TomoIdentity, self).__init__()
         self.s1 = 1.0
         self.geometry = geometry
-        super(TomoIdentity, self).__init__()
+        
         
     def direct(self,x,out=None):
         
@@ -236,10 +243,11 @@ def PowerMethodNonsquare(op,numiters , x0=None):
     # Loop
     for it in numpy.arange(numiters):
         x1 = op.adjoint(op.direct(x0))
-        x1norm = numpy.sqrt((x1*x1).sum())
+        #x1norm = numpy.sqrt((x1*x1).sum())
+        x1norm = x1.norm()
         #print ("x0 **********" ,x0)
         #print ("x1 **********" ,x1)
-        s[it] = (x1*x0).sum() / (x0*x0).sum()
+        s[it] = (x1*x0).sum() / (x0.squared_norm())
         x0 = (1.0/x1norm)*x1
     return numpy.sqrt(s[-1]), numpy.sqrt(s), x0
 

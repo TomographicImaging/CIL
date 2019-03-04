@@ -746,6 +746,13 @@ class DataContainer(object):
     def norm(self):
         '''return the euclidean norm of the DataContainer viewed as a vector'''
         return numpy.sqrt(self.squared_norm())
+    def dot(self, other, *args, **kwargs):
+        '''return the inner product of 2 DataContainers viewed as vectors'''
+        if self.shape == other.shape:
+            return numpy.dot(self.as_array().ravel(), other.as_array().ravel())
+        else:
+            raise ValueError('Shapes are not aligned: {} != {}'.format(self.shape, other.shape))
+    
     
     
     
@@ -1264,4 +1271,23 @@ if __name__ == '__main__':
                                        pixel_num_h=5 , channels=2)
     sino = AcquisitionData(geometry=sgeometry)
     sino2 = sino.clone()
+    
+    a0 = numpy.asarray([i for i in range(2*3*4)])
+    a1 = numpy.asarray([2*i for i in range(2*3*4)])
+    
+            
+    ds0 = DataContainer(numpy.reshape(a0,(2,3,4)))
+    ds1 = DataContainer(numpy.reshape(a1,(2,3,4)))
+    
+    numpy.testing.assert_equal(ds0.dot(ds1), a0.dot(a1))
+    
+    a2 = numpy.asarray([2*i for i in range(2*3*5)])
+    ds2 = DataContainer(numpy.reshape(a2,(2,3,5)))
+    
+#    # it should fail if the shape is wrong
+#    try:
+#        ds2.dot(ds0)
+#        self.assertTrue(False)
+#    except ValueError as ve:
+#        self.assertTrue(True)
     

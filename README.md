@@ -95,9 +95,9 @@ In `ccpi.framework` we define a number of common classes normally used in tomogr
  
  New algorithms can be easily created by extending the `Algorithm` class. The user is required to implement only 4 methods: `set_up`, `__init__`, `update` and `update_objective`.
  
-   #. `set_up` and `__init__` are used to configure the algorithm
-   #. `update` is the actual iteration updating the solution
-   #. `update_objective` defines how the objective is calculated. 
+   * `set_up` and `__init__` are used to configure the algorithm
+   * `update` is the actual iteration updating the solution
+   * `update_objective` defines how the objective is calculated. 
  
  For example, the implementation of the `update` of the Gradient Descent algorithm to minimise a `Function` will only be:
  ```python

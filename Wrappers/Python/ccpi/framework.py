@@ -3,7 +3,7 @@
 #   Visual Analytics and Imaging System Group of the Science Technology
 #   Facilities Council, STFC
 
-#   Copyright 2018 Edoardo Pasca
+#   Copyright 2018-2019 Edoardo Pasca
 
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import numpy
 import sys
 from datetime import timedelta, datetime
 import warnings
+from functools import reduce
 
 def find_key(dic, val):
     """return the key of dictionary dic given the value"""
@@ -110,8 +111,12 @@ class ImageGeometry(object):
         repres += "voxel_size : x{0},y{1},z{2}\n".format(self.voxel_size_x, self.voxel_size_y, self.voxel_size_z)
         repres += "center : x{0},y{1},z{2}\n".format(self.center_x, self.center_y, self.center_z)
         return repres
-    
-    
+    def allocate(self, value=0, dimension_labels=None):
+        '''allocates an ImageData according to the size expressed in the instance'''
+        out = ImageData(geometry=self, dimension_labels=dimension_labels)
+        if value != 0:
+            out += value
+        return out
 class AcquisitionGeometry(object):
     
     def __init__(self, 
@@ -191,9 +196,12 @@ class AcquisitionGeometry(object):
         repres += "distance center-detector: {0}\n".format(self.dist_source_center)
         repres += "number of channels: {0}\n".format(self.channels)
         return repres
-
-
-            
+    def allocate(self, value=0, dimension_labels=None):
+        '''allocates an AcquisitionData according to the size expressed in the instance'''
+        out = AcquisitionData(geometry=self, dimension_labels=dimension_labels)
+        if value != 0:
+            out += value
+        return out
 class DataContainer(object):
     '''Generic class to hold data
     
@@ -472,7 +480,10 @@ class DataContainer(object):
             else:
                 raise ValueError('*:Wrong shape: {0} and {1}'.format(self.shape, 
                                  other.shape))
-        elif isinstance(other, (int, float, complex)):
+        elif isinstance(other, (int, float, complex,\
+                                numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64,\
+                                numpy.float, numpy.float16, numpy.float32, numpy.float64, \
+                                numpy.complex)):
             return type(self)(self.as_array() * other, 
                                deep_copy=True, 
                                dimension_labels=self.dimension_labels,
@@ -558,6 +569,8 @@ class DataContainer(object):
     # __isub__
     
     def __idiv__(self, other):
+        return self.__itruediv__(other)
+    def __itruediv__(self, other):
         if isinstance(other, (int, float)) :
             numpy.divide(self.array, other, out=self.array)
         elif issubclass(type(other), DataContainer):
@@ -630,6 +643,10 @@ class DataContainer(object):
 
         if out is None:
             if isinstance(x2, (int, float, complex)):
+                out = pwop(self.as_array() , x2 , *args, **kwargs )
+            elif isinstance(x2, (numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64,\
+                                 numpy.float, numpy.float16, numpy.float32, numpy.float64, \
+                                 numpy.complex)):
                 out = pwop(self.as_array() , x2 , *args, **kwargs )
             elif issubclass(type(x2) , DataContainer):
                 out = pwop(self.as_array() , x2.as_array() , *args, **kwargs )
@@ -720,6 +737,24 @@ class DataContainer(object):
     ## reductions
     def sum(self, out=None, *args, **kwargs):
         return self.as_array().sum(*args, **kwargs)
+    def squared_norm(self):
+        '''return the squared euclidean norm of the DataContainer viewed as a vector'''
+        shape = self.shape
+        size = reduce(lambda x,y:x*y, shape, 1)
+        y = numpy.reshape(self.as_array(), (size, ))
+        return numpy.dot(y, y.conjugate())
+    def norm(self):
+        '''return the euclidean norm of the DataContainer viewed as a vector'''
+        return numpy.sqrt(self.squared_norm())
+    def dot(self, other, *args, **kwargs):
+        '''return the inner product of 2 DataContainers viewed as vectors'''
+        if self.shape == other.shape:
+            return numpy.dot(self.as_array().ravel(), other.as_array().ravel())
+        else:
+            raise ValueError('Shapes are not aligned: {} != {}'.format(self.shape, other.shape))
+    
+    
+    
     
 class ImageData(DataContainer):
     '''DataContainer for holding 2D or 3D DataContainer'''
@@ -883,8 +918,11 @@ class AcquisitionData(DataContainer):
                         elif dim == 'horizontal':
                             shape.append(horiz)
                     if len(shape) != len(dimension_labels):
-                        raise ValueError('Missing {0} axes'.format(
-                                len(dimension_labels) - len(shape)))
+                        raise ValueError('Missing {0} axes.\nExpected{1} got {2}}'\
+                            .format(
+                                len(dimension_labels) - len(shape),
+                                dimension_labels, shape) 
+                            )
                     shape = tuple(shape)
                     
                 array = numpy.zeros( shape , dtype=numpy.float32) 
@@ -1233,4 +1271,23 @@ if __name__ == '__main__':
                                        pixel_num_h=5 , channels=2)
     sino = AcquisitionData(geometry=sgeometry)
     sino2 = sino.clone()
+    
+    a0 = numpy.asarray([i for i in range(2*3*4)])
+    a1 = numpy.asarray([2*i for i in range(2*3*4)])
+    
+            
+    ds0 = DataContainer(numpy.reshape(a0,(2,3,4)))
+    ds1 = DataContainer(numpy.reshape(a1,(2,3,4)))
+    
+    numpy.testing.assert_equal(ds0.dot(ds1), a0.dot(a1))
+    
+    a2 = numpy.asarray([2*i for i in range(2*3*5)])
+    ds2 = DataContainer(numpy.reshape(a2,(2,3,5)))
+    
+#    # it should fail if the shape is wrong
+#    try:
+#        ds2.dot(ds0)
+#        self.assertTrue(False)
+#    except ValueError as ve:
+#        self.assertTrue(True)
     

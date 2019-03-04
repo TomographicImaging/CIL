@@ -24,26 +24,49 @@ from ccpi.framework import AcquisitionData
 from ccpi.framework import ImageData
 from ccpi.framework import ImageGeometry
 from ccpi.framework import AcquisitionGeometry
-
+from numbers import Number
 # Maybe operators need to know what types they take as inputs/outputs
 # to not just use generic DataContainer
 
 
 class Operator(object):
+    '''Operator that maps from a space X -> Y'''
+    def __init__(self, **kwargs):
+        self.scalar = 1
+    def is_linear(self):
+        '''Returns if the operator is linear'''
+        return False
     def direct(self,x, out=None):
-        return x
-    def adjoint(self,x, out=None):
-        return x
+        raise NotImplementedError
     def size(self):
         # To be defined for specific class
         raise NotImplementedError
-    def get_max_sing_val(self):
+    def norm(self):
         raise NotImplementedError
     def allocate_direct(self):
+        '''Allocates memory on the Y space'''
         raise NotImplementedError
     def allocate_adjoint(self):
+        '''Allocates memory on the X space'''
         raise NotImplementedError
+    def range_dim(self):
+        raise NotImplementedError
+    def domain_dim(self):
+        raise NotImplementedError
+    def __rmul__(self, other):
+        '''reverse multiplication of Operator with number sets the variable scalar in the Operator'''
+        assert isinstance(other, Number)
+        self.scalar = other
+        return self
 
+class LinearOperator(Operator):
+    '''Operator that maps from a space X -> Y'''
+    def is_linear(self):
+        '''Returns if the operator is linear'''
+        return True
+    def adjoint(self,x, out=None):
+        raise NotImplementedError
+        
 class Identity(Operator):
     def __init__(self):
         self.s1 = 1.0
@@ -70,21 +93,26 @@ class Identity(Operator):
 
 class TomoIdentity(Operator):
     def __init__(self, geometry, **kwargs):
+        super(TomoIdentity, self).__init__()
         self.s1 = 1.0
         self.geometry = geometry
-        super(TomoIdentity, self).__init__()
+        
         
     def direct(self,x,out=None):
+        
         if out is None:
+            if self.scalar != 1:
+                return x * self.scalar
             return x.copy()
         else:
+            if self.scalar != 1:
+                out.fill(x * self.scalar)
+                return
             out.fill(x)
+            return
     
     def adjoint(self,x, out=None):
-        if out is None:
-            return x.copy()
-        else:
-            out.fill(x)
+        return self.direct(x, out)
     
     def size(self):
         return NotImplemented
@@ -209,10 +237,11 @@ def PowerMethodNonsquare(op,numiters , x0=None):
     # Loop
     for it in numpy.arange(numiters):
         x1 = op.adjoint(op.direct(x0))
-        x1norm = numpy.sqrt((x1*x1).sum())
+        #x1norm = numpy.sqrt((x1*x1).sum())
+        x1norm = x1.norm()
         #print ("x0 **********" ,x0)
         #print ("x1 **********" ,x1)
-        s[it] = (x1*x0).sum() / (x0*x0).sum()
+        s[it] = (x1*x0).sum() / (x0.squared_norm())
         x0 = (1.0/x1norm)*x1
     return numpy.sqrt(s[-1]), numpy.sqrt(s), x0
 

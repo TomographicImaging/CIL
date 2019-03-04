@@ -43,7 +43,7 @@ class L2NormSq(SimpleL2NormSq):
     
     def __init__(self, A, b = None, alpha=1, **kwargs):
         
-        super(L2NormSq, self).__init__()         
+        super(L2NormSq, self).__init__(alpha=alpha)         
         self.alpha = alpha        
         self.A = A
         self.b = b
@@ -168,13 +168,18 @@ class mixed_L12Norm(Function):
     
     def __init__(self, A, b=None, alpha=1, **kwargs):
 
+        super(mixed_L12Norm, self).__init__() 
         self.alpha = alpha        
         self.A = A
         self.b = b
         
         self.sym_grad = kwargs.get('sym_grad',False)
 
-        super(mixed_L12Norm, self).__init__() 
+        
+            
+    def gradient(self,x):
+        return ValueError('Not Differentiable')
+        
         
     def __call__(self,x):
         
@@ -271,6 +276,7 @@ class CompositeFunction(Function):
         for i in range(self.length):
             out[i] = self.functions[i].proximal_conjugate(x.get_item(i), tau.get_item(0))
         return CompositeDataContainer(*out)    
+    
             
  
     

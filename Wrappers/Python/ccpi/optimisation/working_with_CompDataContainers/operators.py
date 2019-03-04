@@ -42,7 +42,9 @@ class Operator(object):
         assert isinstance(other, Number)
         self.scalar = other
         return self    
-        
+
+#%%
+    
 class LinearOperator(Operator):
     '''Operator that maps from a space X -> Y'''
     def is_linear(self):

@@ -28,10 +28,12 @@ from skimage.util import random_noise
 import scipy.misc
 from skimage.transform import resize
 
-from algorithms import PDHG, PDHG_Composite
+from algorithms import PDHG
 from operators import CompositeOperator, Identity, CompositeDataContainer
-from GradientOperators import Gradient
-from functions import L1Norm, ZeroFun, CompositeFunction, mixed_L12Norm, L2NormSq
+from GradientOperator import Gradient
+from functions import L1Norm, ZeroFun, mixed_L12Norm, L2NormSq ,CompositeFunction
+#from test_functions import L1Norm, ZeroFun, mixed_L12Norm, L2NormSq ,CompositeFunction
+
 
 
 from Sparse_GradMat import GradOper
@@ -48,7 +50,9 @@ ig = (N,N)
 ag = ig
 
 # Create noisy data. Add Gaussian noise
-noisy_data = ImageData(random_noise(data,'gaussian', mean = 0, var = 0.01))
+np.random.seed(10)
+n1 = random_noise(data,'gaussian', mean = 0, var = 0.01)
+noisy_data = ImageData(n1)
 alpha = 1
 
 # Create operators
@@ -60,7 +64,7 @@ operator = CompositeOperator((2,1), op1, op2 )
 
 # Create functions
 f = CompositeFunction(mixed_L12Norm(op1,None,alpha), \
-                      L2NormSq(op2, noisy_data, c = 0.5) )
+                                L2NormSq(op2, noisy_data, c = 0.5) )
 
 #f = CompositeFunction(mixed_L12Norm(op1, None, alpha), \
 #                      L1Norm(op2, noisy_data, c = 1) )
@@ -72,7 +76,7 @@ g = ZeroFun()
 ###############################################################################
 #operator = op1
 #f = mixed_L12Norm(op1,None,alpha)
-#g = L2NormSq(op2, noisy_data, c = 0.5)
+#g = L2NormSq(op2, noisy_data, alpha = 0.5)
 ###############################################################################
 
 # Compute operator Norm
@@ -118,8 +122,8 @@ else:
 opt = {'niter':1000}
 #
 ## Run algorithm
-res, total_time, objective = PDHG_Composite(noisy_data, f, g, operator, \
-                                  ig, ag, tau = tau, sigma = sigma, opt = opt)
+res, total_time, objective = PDHG(f, g, operator, \
+                                  tau = tau, sigma = sigma, opt = opt)
 #
 ##Show results
 solution = res.get_item(0).as_array()

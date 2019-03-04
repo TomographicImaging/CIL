@@ -19,7 +19,7 @@ from skimage.util import random_noise
 import scipy.misc
 from skimage.transform import resize
 
-from algorithms import PDHG, PDHG_Composite
+from algorithms import PDHG
 from operators import CompositeOperator, Identity, AstraProjectorSimple
 from GradientOperators import Gradient
 from functions import L1Norm, ZeroFun, L2NormSq, CompositeFunction, mixed_L12Norm
@@ -107,7 +107,7 @@ sigma = 1
 tau = 1/(sigma*normK**2)
 
 opt = {'niter':1000}
-res, total_time, its = PDHG_Composite(noisy_data, f, g, operator, \
+res, total_time, its = PDHG(noisy_data, f, g, operator, \
                                   ig, ag, tau = tau, sigma = sigma, opt = opt)
 
 solution = res.get_item(0).as_array()

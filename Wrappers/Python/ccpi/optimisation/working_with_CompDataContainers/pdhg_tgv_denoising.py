@@ -82,8 +82,8 @@ normK = operator.norm()
 alpha = 0.2
 beta = 1
 
-f = CompositeFunction(mixed_L12Norm(Grad,None,alpha), \
-                      mixed_L12Norm(SymGrad,None,beta, sym_grad=True),\
+f = CompositeFunction(mixed_L12Norm(Grad, None, alpha), \
+                      mixed_L12Norm(SymGrad, None, beta, sym_grad=True),\
                       L2NormSq(Aop, noisy_data, c = 0.5) )
 g = ZeroFun()
 ## Primal & dual stepsizes
@@ -91,8 +91,18 @@ sigma = 1.0/normK
 tau = 1.0/normK
 #
 opt = {'niter':1000}
-result, total_time, its = PDHG(noisy_data, f, g, operator, \
-                                  tau = tau, sigma = sigma, opt = opt)
+#result, total_time, its = PDHG(noisy_data, f, g, operator, \
+#                                  tau = tau, sigma = sigma, opt = opt)
+
+
+#%%
+
+z = operator.direct(operator.alloc_domain_dim())
+f.get_item(0)
+
+
+
+
 
 
 #%%

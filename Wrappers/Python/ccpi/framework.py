@@ -1011,7 +1011,7 @@ class DataProcessor(object):
         
     def get_output(self, out=None):
         for k,v in self.__dict__.items():
-            if v is None:
+            if v is None and k != 'output':
                 raise ValueError('Key {0} is None'.format(k))
         shouldRun = False
         if self.runTime == -1:
@@ -1022,10 +1022,18 @@ class DataProcessor(object):
         # CHECK this
         if self.store_output and shouldRun:
             self.runTime = datetime.now()
-            self.output = self.process()
-            return self.output
+            try:
+                self.output = self.process(out=out)
+                return self.output
+            except TypeError as te:
+                self.output = self.process()
+                return self.output
         self.runTime = datetime.now()
-        return self.process(out)
+        try:
+            return self.process(out=out)
+        except TypeError as te:
+            return self.process()
+            
     
     def set_input_processor(self, processor):
         if issubclass(type(processor), DataProcessor):
@@ -1093,16 +1101,57 @@ class AX(DataProcessor):
     def check_input(self, dataset):
         return True
         
-    def process(self):
+    def process(self, out=None):
         
         dsi = self.get_input()
         a = self.scalar
-        
-        y = DataContainer( a * dsi.as_array() , True, 
-                    dimension_labels=dsi.dimension_labels )
-        #self.setParameter(output_dataset=y)
-        return y
+        if out is None:
+            y = DataContainer( a * dsi.as_array() , True, 
+                        dimension_labels=dsi.dimension_labels )
+            #self.setParameter(output_dataset=y)
+            return y
+        else:
+            out.fill(a * dsi.as_array())
     
+
+###### Example of DataProcessors
+
+class CastDataContainer(DataProcessor):
+    '''Example DataProcessor
+    Cast a DataContainer array to a different type.
+
+    y := a*x
+    where:
+
+    a is a scalar
+
+    x a DataContainer.
+    '''
+    
+    def __init__(self, dtype=None):
+        kwargs = {'dtype':dtype, 
+                  'input':None, 
+                  }
+        
+        #DataProcessor.__init__(self, **kwargs)
+        super(CastDataContainer, self).__init__(**kwargs)
+    
+    def check_input(self, dataset):
+        return True
+        
+    def process(self, out=None):
+        
+        dsi = self.get_input()
+        dtype = self.dtype
+        if out is None:
+            y = numpy.asarray(dsi.as_array(), dtype=dtype)
+            
+            return type(dsi)(numpy.asarray(dsi.as_array(), dtype=dtype),
+                                dimension_labels=dsi.dimension_labels )
+        else:
+            out.fill(numpy.asarray(dsi.as_array(), dtype=dtype))
+    
+        
         
     
     
@@ -1126,7 +1175,7 @@ class PixelByPixelDataProcessor(DataProcessor):
     def check_input(self, dataset):
         return True
     
-    def process(self):
+    def process(self, out=None):
         
         pyfunc = self.pyfunc
         dsi = self.get_input()
@@ -1185,12 +1234,22 @@ if __name__ == '__main__':
     #ax.apply()
     print ("ax  in {0} out {1}".format(c.as_array().flatten(),
            ax.get_output().as_array().flatten()))
+    
+    cast = CastDataContainer(dtype=numpy.float32)
+    cast.set_input(c)
+    out = cast.get_output()
+    out *= 0 
     axm = AX()
     axm.scalar = 0.5
-    axm.set_input(c)
+    axm.set_input_processor(cast)
+    axm.get_output(out)
     #axm.apply()
     print ("axm in {0} out {1}".format(c.as_array(), axm.get_output().as_array()))
     
+    # check out in DataSetProcessor
+   #a = numpy.asarray([i for i in range( size )])
+    
+        
     # create a PixelByPixelDataProcessor
     
     #define a python function which will take only one input (the pixel value)

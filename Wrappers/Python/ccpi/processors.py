@@ -102,7 +102,7 @@ class Normalizer(DataProcessor):
         rel_norm_error = (b + a) / (b * a) * (df + dd)
         return rel_norm_error
         
-    def process(self):
+    def process(self, out=None):
         
         projections = self.get_input()
         dark = self.dark_field
@@ -400,7 +400,7 @@ class CenterOfRotationFinder(DataProcessor):
         mask[:,centercol-1:centercol+2] = numpy.zeros((nrow, 3), dtype='float32')
         return mask
     
-    def process(self):
+    def process(self, out=None):
         
         projections = self.get_input()
         
@@ -442,7 +442,7 @@ class AcquisitionDataPadder(DataProcessor):
             raise ValueError("Expected input dimensions is 2 or 3, got {0}"\
                              .format(dataset.number_of_dimensions))
 
-    def process(self):
+    def process(self, out=None):
         projections = self.get_input()
         w = projections.get_dimension_size('horizontal')
         delta = w - 2 * self.center_of_rotation

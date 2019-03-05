@@ -247,7 +247,7 @@ for i in range(slices_to_recon.size):
     # Run CGLS algorithm and display reconstruction.
     x_CGLS, it_CGLS, timing_CGLS, criter_CGLS = CGLS(x_init, Aop, b2d, opt_CGLS)
 
-    plt.imshow(x_CGLS.array, 'cmap' = 'gray')
+    plt.imshow(x_CGLS.array, cmap = 'gray')
     plt.title('CGLS slice {}'.format(slices_to_recon[i]))
     plt.colorbar()
     plt.show()

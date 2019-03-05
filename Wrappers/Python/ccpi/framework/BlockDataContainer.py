@@ -18,7 +18,7 @@ import functools
 class BlockDataContainer(object):
     '''Class to hold a composite operator'''
     __array_priority__ = 1
-    def __init__(self, *args, shape=None):
+    def __init__(self, shape=None, *args):
         '''containers must be passed row by row'''
         self.containers = args
         self.index = 0

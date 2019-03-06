@@ -27,11 +27,14 @@ class BlockOperator(Operator):
             Do not include the `self` parameter in the ``Args`` section.
 
         Args:
-            vararg (Operator): Operators in the block. varargs are passed in a 
-                  row-by-row fashion.
-            shape (:obj:`tuple`, optional): If passed the Operators listed
-                  in the vararg are laid out as described. Shape and number
-                  of Operators must match. 
+            vararg (Operator): Operators in the block.
+            shape (:obj:`tuple`, optional): If shape is passed the Operators in 
+                  vararg are considered input in a row-by-row fashion. 
+                  Shape and number of Operators must match.
+                  
+        Example:
+            BlockOperator(op0,op1) results in a row block
+            BlockOperator(op0,op1,shape=(1,2)) results in a column block
         '''
         self.operators = args
         shape = kwargs.get('shape', None)
@@ -95,33 +98,63 @@ class BlockOperator(Operator):
             raise ValueError('Incompatible shapes {} {}'.format(self.shape, xshape))
         return (oshape, xshape[-1])
     
-'''    
-    def direct(self, x, out=None):
-        
-        out = [None]*self.dimension[0]
-        for i in range(self.dimension[0]):
-            z1 = ImageData(np.zeros(self.compMat[i][0].range_dim()))
-            for j in range(self.dimension[1]):
-                z1 += self.compMat[i][j].direct(x[j])
-            out[i] = z1    
-                                
-        return out          
-        
     
-    def adjoint(self, x, out=None):        
+    
+class BlockLinearOperator(BlockOperator):
+    '''Class to hold a block operator
+
+    Class to hold a number of Operators in a block. 
+    User may specify the shape of the block, by default is a row vector
+    '''
+    def __init__(self, *args, **kwargs):
+        '''
+        Class creator
+
+        Note:
+            Do not include the `self` parameter in the ``Args`` section.
+
+        Args:
+            vararg (Operator): LinearOperators in the block.
+            shape (:obj:`tuple`, optional): If shape is passed the Operators in 
+                  vararg are considered input in a row-by-row fashion. 
+                  Shape and number of Operators must match.
+                  
+        Example:
+            BlockLinearOperator(op0,op1) results in a row block
+            BlockLinearOperator(op0,op1,shape=(1,2)) results in a column block
+        '''
+        for i,op in enumerate(args):
+            if not op.is_linear():
+                raise ValueError('Operator {} must be LinearOperator'.format(i))
+        super(BlockLinearOperator, self).__init__(*args, **kwargs)
+    
+    def adjoint(self, x, out=None):
+        '''Adjoint operation for the BlockOperator
         
-        out = [None]*self.dimension[1]
-        for i in range(self.dimension[1]):
-            z2 = ImageData(np.zeros(self.compMat[0][i].domain_dim()))
-            for j in range(self.dimension[0]):
-                z2 += self.compMat[j][i].adjoint(x[j])
-            out[i] = z2
-'''
-from ccpi.optimisation.algorithms import CGLS
+        only available on BlockLinearOperator
+        '''
+        shape = self.get_output_shape(x.shape, adjoint=True)
+        res = []
+        for row in range(self.shape[1]):
+            for col in range(self.shape[0]):
+                if col == 0:
+                    prod = self.get_item(col,row).adjoint(x.get_item(row))
+                else:
+                    prod += self.get_item(col,row).adjoint(x.get_item(row))
+            res.append(prod)
+        return BlockDataContainer(*res, shape=shape)
+
+
+
+
+
+
 
     
 if __name__ == '__main__':
     #from ccpi.optimisation.Algorithms import GradientDescent
+    from ccpi.optimisation.algorithms import CGLS
+
     from ccpi.plugins.ops import CCPiProjectorSimple
     from ccpi.optimisation.ops import PowerMethodNonsquare
     from ccpi.optimisation.ops import TomoIdentity
@@ -131,193 +164,6 @@ if __name__ == '__main__':
     #from ccpi.optimisation.Algorithms import CGLS
     import matplotlib.pyplot as plt
 
-    ig0 = ImageGeometry(2,3,4)
-    ig1 = ImageGeometry(12,42,55,32)
-    
-    data0 = ImageData(geometry=ig0)
-    data1 = ImageData(geometry=ig1) + 1
-    
-    data2 = ImageData(geometry=ig0) + 2
-    data3 = ImageData(geometry=ig1) + 3
-    
-    cp0 = BlockDataContainer(data0,data1)
-    cp1 = BlockDataContainer(data2,data3)
-#    
-    a = [ (el, ot) for el,ot in zip(cp0.containers,cp1.containers)]
-    print  (a[0][0].shape)
-    #cp2 = BlockDataContainer(*a)
-    cp2 = cp0.add(cp1)
-    assert (cp2.get_item(0,0).as_array()[0][0][0] == 2.)
-    assert (cp2.get_item(1,0).as_array()[0][0][0] == 4.)
-    
-    cp2 = cp0 + cp1 
-    assert (cp2.get_item(0,0).as_array()[0][0][0] == 2.)
-    assert (cp2.get_item(1,0).as_array()[0][0][0] == 4.)
-    cp2 = cp0 + 1 
-    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 1. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 2., decimal = 5)
-    cp2 = cp0 + [1 ,2]
-    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 1. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 3., decimal = 5)
-    cp2 += cp1
-    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , +3. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , +6., decimal = 5)
-    
-    cp2 += 1
-    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , +4. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , +7., decimal = 5)
-    
-    cp2 += [-2,-1]
-    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 2. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 6., decimal = 5)
-    
-    
-    cp2 = cp0.subtract(cp1)
-    assert (cp2.get_item(0,0).as_array()[0][0][0] == -2.)
-    assert (cp2.get_item(1,0).as_array()[0][0][0] == -2.)
-    cp2 = cp0 - cp1
-    assert (cp2.get_item(0,0).as_array()[0][0][0] == -2.)
-    assert (cp2.get_item(1,0).as_array()[0][0][0] == -2.)
-    
-    cp2 = cp0 - 1 
-    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , -1. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 0, decimal = 5)
-    cp2 = cp0 - [1 ,2]
-    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , -1. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , -1., decimal = 5)
-    
-    cp2 -= cp1
-    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , -3. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , -4., decimal = 5)
-    
-    cp2 -= 1
-    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , -4. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , -5., decimal = 5)
-    
-    cp2 -= [-2,-1]
-    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , -2. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , -4., decimal = 5)
-    
-    
-    cp2 = cp0.multiply(cp1)
-    assert (cp2.get_item(0,0).as_array()[0][0][0] == 0.)
-    assert (cp2.get_item(1,0).as_array()[0][0][0] == 3.)
-    cp2 = cp0 * cp1
-    assert (cp2.get_item(0,0).as_array()[0][0][0] == 0.)
-    assert (cp2.get_item(1,0).as_array()[0][0][0] == 3.)
-    
-    cp2 = cp0 * 2 
-    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 2, decimal = 5)
-    cp2 = 2 * cp0  
-    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 2, decimal = 5)
-    cp2 = cp0 * [3 ,2]
-    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 2., decimal = 5)
-    cp2 = cp0 * numpy.asarray([3 ,2])
-    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 2., decimal = 5)
-    
-    cp2 = [3,2] * cp0 
-    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 2., decimal = 5)
-    cp2 = numpy.asarray([3,2]) * cp0 
-    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 2., decimal = 5)
-    cp2 = [3,2,3] * cp0 
-    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 2., decimal = 5)
-    
-    cp2 *= cp1
-    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0 , decimal=5)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , +6., decimal = 5)
-    
-    cp2 *= 1
-    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , +6., decimal = 5)
-    
-    cp2 *= [-2,-1]
-    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , -6., decimal = 5)
-    
-    
-    cp2 = cp0.divide(cp1)
-    assert (cp2.get_item(0,0).as_array()[0][0][0] == 0.)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0], 1./3., decimal=4)
-    cp2 = cp0/cp1
-    assert (cp2.get_item(0,0).as_array()[0][0][0] == 0.)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0], 1./3., decimal=4)
-    
-    cp2 = cp0 / 2 
-    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 0.5, decimal = 5)
-    cp2 = cp0 / [3 ,2]
-    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 0.5, decimal = 5)
-    cp2 = cp0 / numpy.asarray([3 ,2])
-    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 0.5, decimal = 5)
-    cp3 = numpy.asarray([3 ,2]) / (cp0+1)
-    numpy.testing.assert_almost_equal(cp3.get_item(0,0).as_array()[0][0][0] , 3. , decimal=5)
-    numpy.testing.assert_almost_equal(cp3.get_item(1,0).as_array()[0][0][0] , 1, decimal = 5)
-    
-    cp2 += 1
-    cp2 /= cp1
-    # TODO fix inplace division
-     
-    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 1./2 , decimal=5)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 1.5/3., decimal = 5)
-    
-    cp2 /= 1
-    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0.5 , decimal=5)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 0.5, decimal = 5)
-    
-    cp2 /= [-2,-1]
-    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , -0.5/2. , decimal=5)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , -0.5, decimal = 5)
-    ####
-    
-    cp2 = cp0.power(cp1)
-    assert (cp2.get_item(0,0).as_array()[0][0][0] == 0.)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0], 1., decimal=4)
-    cp2 = cp0**cp1
-    assert (cp2.get_item(0,0).as_array()[0][0][0] == 0.)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0], 1., decimal=4)
-    
-    cp2 = cp0 ** 2 
-    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0] , 0., decimal=5)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0] , 1., decimal = 5)
-    
-    cp2 = cp0.maximum(cp1)
-    assert (cp2.get_item(0,0).as_array()[0][0][0] == cp1.get_item(0,0).as_array()[0][0][0])
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0], cp2.get_item(1,0).as_array()[0][0][0], decimal=4)
-    
-    
-    cp2 = cp0.abs()
-    numpy.testing.assert_almost_equal(cp2.get_item(0,0).as_array()[0][0][0], 0., decimal=4)
-    numpy.testing.assert_almost_equal(cp2.get_item(1,0).as_array()[0][0][0], 1., decimal=4)
-    
-    cp2 = cp0.subtract(cp1)
-    s = cp2.sign()
-    numpy.testing.assert_almost_equal(s.get_item(0,0).as_array()[0][0][0], -1., decimal=4)
-    numpy.testing.assert_almost_equal(s.get_item(1,0).as_array()[0][0][0], -1., decimal=4)
-    
-    cp2 = cp0.add(cp1)
-    s = cp2.sqrt()
-    numpy.testing.assert_almost_equal(s.get_item(0,0).as_array()[0][0][0], numpy.sqrt(2), decimal=4)
-    numpy.testing.assert_almost_equal(s.get_item(1,0).as_array()[0][0][0], numpy.sqrt(4), decimal=4)
-    
-    s = cp0.sum()
-    numpy.testing.assert_almost_equal(s[0], 0, decimal=4)
-    s0 = 1
-    s1 = 1
-    for i in cp0.get_item(0,0).shape:
-        s0 *= i
-    for i in cp0.get_item(1,0).shape:
-        s1 *= i
-        
-    numpy.testing.assert_almost_equal(s[1], cp0.get_item(0,0).as_array()[0][0][0]*s0 +cp0.get_item(1,0).as_array()[0][0][0]*s1, decimal=4)
     
     # Set up phantom size N x N x vert by creating ImageGeometry, initialising the 
     # ImageData object with this geometry and empty array and finally put some

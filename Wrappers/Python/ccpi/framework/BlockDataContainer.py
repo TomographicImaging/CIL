@@ -23,7 +23,6 @@ class BlockDataContainer(object):
         self.containers = args
         self.index = 0
         shape = kwargs.get('shape', None)
-        print (shape)
         if shape is None:
             shape = (len(args),1)
         self.shape = shape
@@ -151,8 +150,7 @@ class BlockDataContainer(object):
         y = numpy.asarray([el.squared_norm() for el in self.containers])
         return y.sum() 
     def norm(self):
-        y = numpy.asarray([el.norm() for el in self.containers])
-        return y.sum()    
+        return numpy.sqrt(self.squared_norm())    
     def copy(self):
         '''alias of clone'''    
         return self.clone()

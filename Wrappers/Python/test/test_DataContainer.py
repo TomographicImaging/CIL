@@ -174,7 +174,7 @@ class TestDataContainer(unittest.TestCase):
     def binary_add(self):
         print("Test binary add")
         X, Y, Z = 512, 512, 512
-        X, Y, Z = 256, 512, 512
+        X, Y, Z = 1024, 512, 512
         steps = [timer()]
         a = numpy.ones((X, Y, Z), dtype='float32')
         steps.append(timer())

@@ -14,9 +14,27 @@ from ccpi.optimisation.operators import Operator, LinearOperator
 
        
 class BlockOperator(Operator):
-    '''Class to hold a block operator'''
-    def __init__(self, *args, shape=None):
+    '''Class to hold a block operator
+
+    Class to hold a number of Operators in a block. 
+    User may specify the shape of the block, by default is a row vector
+    '''
+    def __init__(self, *args, **kwargs):
+        '''
+        Class creator
+
+        Note:
+            Do not include the `self` parameter in the ``Args`` section.
+
+        Args:
+            vararg (Operator): Operators in the block. varargs are passed in a 
+                  row-by-row fashion.
+            shape (:obj:`tuple`, optional): If passed the Operators listed
+                  in the vararg are laid out as described. Shape and number
+                  of Operators must match. 
+        '''
         self.operators = args
+        shape = kwargs.get('shape', None)
         if shape is None:
             shape = (len(args),1)
         self.shape = shape
@@ -61,9 +79,9 @@ class BlockOperator(Operator):
         for row in range(self.shape[1]):
             for col in range(self.shape[0]):
                 if col == 0:
-                    prod = self.get_item(row,col).adjoint(x.get_item(col))
+                    prod = self.get_item(col,row).adjoint(x.get_item(row))
                 else:
-                    prod += self.get_item(row,col).adjoint(x.get_item(col))
+                    prod += self.get_item(col,row).adjoint(x.get_item(row))
             res.append(prod)
         return BlockDataContainer(*res, shape=shape)
     

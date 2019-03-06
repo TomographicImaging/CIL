@@ -652,7 +652,8 @@ class DataContainer(object):
         
         elif issubclass(type(out), DataContainer) and issubclass(type(x2), DataContainer):
             if self.check_dimensions(out) and self.check_dimensions(x2):
-                pwop(self.as_array(), x2.as_array(), out=out.as_array(), *args, **kwargs )
+                kwargs['out'] = out.as_array()
+                pwop(self.as_array(), x2.as_array(), *args, **kwargs )
                 #return type(self)(out.as_array(),
                 #       deep_copy=False, 
                 #       dimension_labels=self.dimension_labels,
@@ -662,14 +663,15 @@ class DataContainer(object):
                 raise ValueError(message(type(self),"Wrong size for data memory: ", out.shape,self.shape))
         elif issubclass(type(out), DataContainer) and isinstance(x2, (int,float,complex)):
             if self.check_dimensions(out):
-
-                pwop(self.as_array(), x2, out=out.as_array(), *args, **kwargs )
+                kwargs['out']=out.as_array()
+                pwop(self.as_array(), x2, *args, **kwargs )
                 return out
             else:
                 raise ValueError(message(type(self),"Wrong size for data memory: ", out.shape,self.shape))
         elif issubclass(type(out), numpy.ndarray):
             if self.array.shape == out.shape and self.array.dtype == out.dtype:
-                pwop(self.as_array(), x2 , out=out, *args, **kwargs)
+                kwargs['out'] = out
+                pwop(self.as_array(), x2, *args, **kwargs)
                 #return type(self)(out,
                 #       deep_copy=False, 
                 #       dimension_labels=self.dimension_labels,
@@ -693,7 +695,7 @@ class DataContainer(object):
         return self.pixel_wise_binary(numpy.power, other, *args, **kwargs)
     
     def maximum(self, x2, *args, **kwargs):
-        return self.pixel_wise_binary(numpy.maximum, x2=x2, *args, **kwargs)
+        return self.pixel_wise_binary(numpy.maximum, x2, *args, **kwargs)
     
     ## unary operations
     def pixel_wise_unary(self, pwop, *args,  **kwargs):
@@ -706,12 +708,14 @@ class DataContainer(object):
                        geometry=self.geometry)
         elif issubclass(type(out), DataContainer):
             if self.check_dimensions(out):
-                pwop(self.as_array(), out=out.as_array(), *args, **kwargs )
+                kwargs['out'] = out.as_array()
+                pwop(self.as_array(), *args, **kwargs )
             else:
                 raise ValueError(message(type(self),"Wrong size for data memory: ", out.shape,self.shape))
         elif issubclass(type(out), numpy.ndarray):
             if self.array.shape == out.shape and self.array.dtype == out.dtype:
-                pwop(self.as_array(), out=out, *args, **kwargs)
+                kwargs['out'] = out
+                pwop(self.as_array(), *args, **kwargs)
         else:
             raise ValueError (message(type(self),  "incompatible class:" , pwop.__name__, type(out)))
     

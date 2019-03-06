@@ -678,28 +678,22 @@ class DataContainer(object):
             raise ValueError (message(type(self),  "incompatible class:" , pwop.__name__, type(out)))
     
     def add(self, other, *args, **kwargs):
-        out = kwargs.get('out', None)
-        return self.pixel_wise_binary(numpy.add, other, out=out, *args, **kwargs)
+        return self.pixel_wise_binary(numpy.add, other, *args, **kwargs)
     
     def subtract(self, other, *args, **kwargs):
-        out = kwargs.get('out', None)
-        return self.pixel_wise_binary(numpy.subtract, other, out=out, *args, **kwargs)
+        return self.pixel_wise_binary(numpy.subtract, other, *args, **kwargs)
 
     def multiply(self, other, *args, **kwargs):
-        out = kwargs.get('out', None)
-        return self.pixel_wise_binary(numpy.multiply, other, out=out, *args, **kwargs)
+        return self.pixel_wise_binary(numpy.multiply, other, *args, **kwargs)
     
     def divide(self, other, *args, **kwargs):
-        out = kwargs.get('out', None)
-        return self.pixel_wise_binary(numpy.divide, other, out=out, *args, **kwargs)
+        return self.pixel_wise_binary(numpy.divide, other, *args, **kwargs)
     
     def power(self, other, *args, **kwargs):
-        out = kwargs.get('out', None)
-        return self.pixel_wise_binary(numpy.power, other, out=out, *args, **kwargs)
+        return self.pixel_wise_binary(numpy.power, other, *args, **kwargs)
     
     def maximum(self, x2, *args, **kwargs):
-        out = kwargs.get('out', None)
-        return self.pixel_wise_binary(numpy.maximum, x2=x2, out=out, *args, **kwargs)
+        return self.pixel_wise_binary(numpy.maximum, x2=x2, *args, **kwargs)
     
     ## unary operations
     def pixel_wise_unary(self, pwop, *args,  **kwargs):
@@ -722,16 +716,13 @@ class DataContainer(object):
             raise ValueError (message(type(self),  "incompatible class:" , pwop.__name__, type(out)))
     
     def abs(self, *args,  **kwargs):
-        out = kwargs.get('out', None)
-        return self.pixel_wise_unary(numpy.abs, out=out, *args,  **kwargs)
+        return self.pixel_wise_unary(numpy.abs, *args,  **kwargs)
     
     def sign(self, *args,  **kwargs):
-        out = kwargs.get('out', None)
-        return self.pixel_wise_unary(numpy.sign , out=out, *args,  **kwargs)
+        return self.pixel_wise_unary(numpy.sign, *args,  **kwargs)
     
     def sqrt(self, *args,  **kwargs):
-        out = kwargs.get('out', None)
-        return self.pixel_wise_unary(numpy.sqrt, out=out, *args,  **kwargs)
+        return self.pixel_wise_unary(numpy.sqrt, *args,  **kwargs)
     
     #def __abs__(self):
     #    operation = FM.OPERATION.ABS

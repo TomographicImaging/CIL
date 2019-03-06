@@ -8,7 +8,7 @@ Created on Thu Feb  7 13:10:56 2019
 @author: evangelos
 """
 
-#import numpy as np
+import numpy as np
 from ccpi.optimisation.funcs import Function
 from ccpi.framework import DataContainer, ImageData, ImageGeometry
 #from operators import *

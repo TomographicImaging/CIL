@@ -66,64 +66,27 @@ def PDHG(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
                                 
         x_old = x
         y_old = y   
+        
+#        print(f(operator.direct(x)) + g(x))#+f.convex_conjugate(y) + g.convex_conjugate(-1*operator.adjoint(y)))
             
-#        a1 = ImageData(operator.direct(x).power(2).sum(axis=0)).sqrt().sum()
-#        a2 = 0.5*(x - g.b).power(2).sum()      
-#        a3 = 0.5*(-1*operator.adjoint(y).power(2).sum()) + (g.b * -1*operator.adjoint(y)).sum()
-#        print(a3, g.convex_conjugate(-1*operator.adjoint(y)))
-        
-#        print(a1+a2, f(x) + g(x))
-        
-#        d = -1*operator.adjoint(y)
-#        a3 = 0.5 * d.power(2).sum() + (d*g.b).sum()
-        
-#        print(a3, g.convex_conjugate(-1*operator.adjoint(y)))
-        
-#        print( f(operator.direct(x)) + g(x) + g.convex_conjugate(-1*operator.adjoint(y)))
-        
-#        print(g.convex_conjugate(-1*operator.adjoint(y)))
-#        print( f(x) + g(x) + f.convex_conjugate(y) + g.convex_conjugate(-1*operator.adjoint(y)))
-        
-        
-#        print(f(x) + g(x) + f.convex_conjugate(y) + g.convex_conjugate(-1*operator.adjoint(y)))
-        
-        # check gap with tomo
-        
-        tv_term = 30*ImageData(operator.compMat[0][0].direct(x.get_item(0)).power(2).sum(axis=0)).sqrt().sum()
-        l2_norm_sq = 0.5*((operator.compMat[1][0].direct(x.get_item(0)) - f.get_item(1).b).power(2).sum()) 
-        
-        tv_term_conj = 0
-        l2_norm_sq_conj = 0.5 * y.get_item(1).power(2).sum() + (f.get_item(1).b * y.get_item(1)).sum()
-        
-                
-        print( (tv_term + l2_norm_sq + tv_term_conj + l2_norm_sq_conj) /(50*50) )
-        
-#        a = 30*ImageData(operator.compMat[0][0].direct(x.get_item(0)).power(2).sum(axis=0)).sqrt().sum()+\
-#            0.5*(operator.compMat[1][0].direct(x.get_item(0)) - f.get_item(1).b).power(2).sum() 
-            
-#        d = 0.5 * y.get_item(1).power(2).sum() + (f.get_item(1).b*y.get_item(1)).sum()
-
-#            
-#        d1 = -1* operator.compMat[0][0].adjoint(y.get_item(0)) - \
-#                 operator.compMat[1][0].adjoint(y.get_item(1))
-            
-                                        
-#        print(a + d + d1.maximum(0).sum())
-            
-        
-        
-        
-        
-        
-#        print( f.convex_conjugate(y) )
-#        print( g.convex_conjugate(-1*operator.adjoint(y)))
-        
-        
-        
-#        print( f(x), g(x), f.convex_conjugate(y), g.convex_conjugate(-1*operator.adjoint(y)) )
-                
+#        # TV denoising, pdgap with composite
 #        
-#        print(f(x) + g(x) + f.convex_conjugate(y) + g.convex_conjugate(-1*operator.adjoint(y)))
+#        primal_obj = f.get_item(0).alpha * ImageData(operator.compMat[0][0].direct(x.get_item(0)).power(2).sum(axis=0)).sqrt().sum() +\
+#                     0.5*( (operator.compMat[1][0].direct(x.get_item(0)) - f.get_item(1).b).power(2).sum()) 
+#        dual_obj =  0.5 * ((y.get_item(1).power(2)).sum()) + ( y.get_item(1)*f.get_item(1).b ).sum() 
+        
+        # TV denoising, pdgap with no composite
+        
+        
+        
+#        primal_obj = f.get_item(0).alpha * ImageData(operator.compMat[0][0].direct(x.get_item(0)).power(2).sum(axis=0)).sqrt().sum() +\
+#                     0.5*( (operator.compMat[1][0].direct(x.get_item(0)) - f.get_item(1).b).power(2).sum()) 
+#        dual_obj =  0.5 * ((y.get_item(1).power(2)).sum()) + ( y.get_item(1)*f.get_item(1).b ).sum()         
+                    
+                   
+#        print(primal_obj)
+#        objective = primal_obj
+#       
    
 
                            

@@ -17,7 +17,7 @@ from my_changes import *
 
 
 import sys
-sys.path.insert(0, '/Users/evangelos/Desktop/Projects/CCPi/CCPi-Framework/Wrappers/Python/wip/cvx_scripts/')
+sys.path.insert(0, '/Users/evangelos/Desktop/Projects/CCPi/CCPi-Framework/Wrappers/Python/ccpi/optimisation/cvx_scripts/')
 from cvx_functions import *
 
 
@@ -96,18 +96,18 @@ ProjMat1 = astra.OpTomo(proj_id)
 #%%
 
 # Define the problem
-u_cvx = Variable( N*N, 1)
-obj_cvx =  Minimize( 0.5 * sum_squares(ProjMat * u_cvx - noisy_sin.as_array().ravel()) + \
-                    alpha * TV_cvx(reshape(u_cvx, (N,N))) )
-
-prob_cvx = Problem(obj_cvx)
-
-# Choose solver, SCS is fast but less accurate than MOSEK
-#res_tvCT = prob_tvCT.solve(verbose = True,solver = SCS,eps=1e-12)
-res_cvx = prob_cvx.solve(verbose = True, solver = MOSEK)
-
-print()
-print('Objective value is {} '.format(obj_cvx.value))
+#u_cvx = Variable( N*N, 1)
+#obj_cvx =  Minimize( 0.5 * sum_squares(ProjMat * u_cvx - noisy_sin.as_array().ravel()) + \
+#                    alpha * TV_cvx(reshape(u_cvx, (N,N))) )
+#
+#prob_cvx = Problem(obj_cvx)
+#
+## Choose solver, SCS is fast but less accurate than MOSEK
+##res_tvCT = prob_tvCT.solve(verbose = True,solver = SCS,eps=1e-12)
+#res_cvx = prob_cvx.solve(verbose = True, solver = MOSEK)
+#
+#print()
+#print('Objective value is {} '.format(obj_cvx.value))
 
 #%% Solve with pdhg
 
@@ -124,7 +124,7 @@ tau = 1/(sigma*normK**2)
 
 alpha = 50  
 
-f = [TV(alpha), Norm2sq_new(Aop, noisy_sin, c = 0.5, memopt = False)]
+f = [L1Norm(alpha), Norm2sq_new(Aop, noisy_sin, c = 0.5, memopt = False)]
 g = ZeroFun()
 
 cProfile.run('res, total_time, its = PDHG(noisy_sin, f, g, operator, \

@@ -50,10 +50,12 @@ ig = (N,N)
 ag = ig
 
 # Create noisy data. Add Gaussian noise
+
 np.random.seed(10)
-n1 = random_noise(data,'gaussian', mean = 0, var = 0.01)
+z = np.random.rand(N,N)
+n1 = data + 0.25 * z
 noisy_data = ImageData(n1)
-alpha = 1
+alpha = 10
 
 # Create operators
 op1 = Gradient(ig)
@@ -119,7 +121,7 @@ else:
 
 #%%
 # Number of iterations
-opt = {'niter':1000}
+opt = {'niter':3000}
 #
 ## Run algorithm
 res, total_time, objective = PDHG(f, g, operator, \

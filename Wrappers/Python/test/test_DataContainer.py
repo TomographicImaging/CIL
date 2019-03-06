@@ -425,6 +425,28 @@ class TestDataContainer(unittest.TestCase):
             res = False
             print(err)
         self.assertTrue(res)
+        
+    def test_dot(self):
+        a0 = numpy.asarray([i for i in range(2*3*4)])
+        a1 = numpy.asarray([2*i for i in range(2*3*4)])
+        
+                
+        ds0 = DataContainer(numpy.reshape(a0,(2,3,4)))
+        ds1 = DataContainer(numpy.reshape(a1,(2,3,4)))
+        
+        numpy.testing.assert_equal(ds0.dot(ds1), a0.dot(a1))
+        
+        a2 = numpy.asarray([2*i for i in range(2*3*5)])
+        ds2 = DataContainer(numpy.reshape(a2,(2,3,5)))
+        
+        # it should fail if the shape is wrong
+        try:
+            ds2.dot(ds0)
+            self.assertTrue(False)
+        except ValueError as ve:
+            self.assertTrue(True)
+        
+        
 
     def test_ImageData(self):
         # create ImageData from geometry
@@ -457,6 +479,49 @@ class TestDataContainer(unittest.TestCase):
                                         pixel_num_h=5, channels=2)
         sino = AcquisitionData(geometry=sgeometry)
         self.assertEqual(sino.shape, (2, 10, 3, 5))
+    def test_ImageGeometry_allocate(self):
+        vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)
+        image = vgeometry.allocate()
+        self.assertEqual(0,image.as_array()[0][0][0])
+        image = vgeometry.allocate(1)
+        self.assertEqual(1,image.as_array()[0][0][0])
+        default_order = ['channel' , 'horizontal_y' , 'horizontal_x']
+        self.assertEqual(default_order[0], image.dimension_labels[0])
+        self.assertEqual(default_order[1], image.dimension_labels[1])
+        self.assertEqual(default_order[2], image.dimension_labels[2])
+        order = [ 'horizontal_x' , 'horizontal_y', 'channel' ]
+        image = vgeometry.allocate(0,dimension_labels=order)
+        self.assertEqual(order[0], image.dimension_labels[0])
+        self.assertEqual(order[1], image.dimension_labels[1])
+        self.assertEqual(order[2], image.dimension_labels[2])
+    def test_AcquisitionGeometry_allocate(self):
+        ageometry = AcquisitionGeometry(dimension=2, angles=numpy.linspace(0, 180, num=10),
+                                        geom_type='parallel', pixel_num_v=3,
+                                        pixel_num_h=5, channels=2)
+        sino = ageometry.allocate()
+        shape = sino.shape
+        print ("shape", shape)
+        self.assertEqual(0,sino.as_array()[0][0][0][0])
+        self.assertEqual(0,sino.as_array()[shape[0]-1][shape[1]-1][shape[2]-1][shape[3]-1])
+        
+        sino = ageometry.allocate(1)
+        self.assertEqual(1,sino.as_array()[0][0][0][0])
+        self.assertEqual(1,sino.as_array()[shape[0]-1][shape[1]-1][shape[2]-1][shape[3]-1])
+        print (sino.dimension_labels, sino.shape, ageometry)
+        
+        default_order = ['channel' , ' angle' ,
+                                          'vertical' , 'horizontal']
+        self.assertEqual(default_order[0], sino.dimension_labels[0])
+        self.assertEqual(default_order[1], sino.dimension_labels[1])
+        self.assertEqual(default_order[2], sino.dimension_labels[2])
+        self.assertEqual(default_order[3], sino.dimension_labels[3])
+        order = ['vertical' , 'horizontal', 'channel' , 'angle' ]
+        sino = ageometry.allocate(0,dimension_labels=order)
+        print (sino.dimension_labels, sino.shape, ageometry)
+        self.assertEqual(order[0], sino.dimension_labels[0])
+        self.assertEqual(order[1], sino.dimension_labels[1])
+        self.assertEqual(order[2], sino.dimension_labels[2])
+        self.assertEqual(order[2], sino.dimension_labels[2])
 
     def assertNumpyArrayEqual(self, first, second):
         res = True

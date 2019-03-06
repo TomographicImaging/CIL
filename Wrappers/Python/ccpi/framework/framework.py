@@ -111,8 +111,12 @@ class ImageGeometry(object):
         repres += "voxel_size : x{0},y{1},z{2}\n".format(self.voxel_size_x, self.voxel_size_y, self.voxel_size_z)
         repres += "center : x{0},y{1},z{2}\n".format(self.center_x, self.center_y, self.center_z)
         return repres
-    
-    
+    def allocate(self, value=0, dimension_labels=None):
+        '''allocates an ImageData according to the size expressed in the instance'''
+        out = ImageData(geometry=self, dimension_labels=dimension_labels)
+        if value != 0:
+            out += value
+        return out
 class AcquisitionGeometry(object):
     
     def __init__(self, 
@@ -192,9 +196,12 @@ class AcquisitionGeometry(object):
         repres += "distance center-detector: {0}\n".format(self.dist_source_center)
         repres += "number of channels: {0}\n".format(self.channels)
         return repres
-
-
-            
+    def allocate(self, value=0, dimension_labels=None):
+        '''allocates an AcquisitionData according to the size expressed in the instance'''
+        out = AcquisitionData(geometry=self, dimension_labels=dimension_labels)
+        if value != 0:
+            out += value
+        return out
 class DataContainer(object):
     '''Generic class to hold data
     
@@ -745,6 +752,14 @@ class DataContainer(object):
     def norm(self):
         '''return the euclidean norm of the DataContainer viewed as a vector'''
         return numpy.sqrt(self.squared_norm())
+    def dot(self, other, *args, **kwargs):
+        '''return the inner product of 2 DataContainers viewed as vectors'''
+        if self.shape == other.shape:
+            return numpy.dot(self.as_array().ravel(), other.as_array().ravel())
+        else:
+            raise ValueError('Shapes are not aligned: {} != {}'.format(self.shape, other.shape))
+    
+    
     
     
     
@@ -910,8 +925,11 @@ class AcquisitionData(DataContainer):
                         elif dim == 'horizontal':
                             shape.append(horiz)
                     if len(shape) != len(dimension_labels):
-                        raise ValueError('Missing {0} axes'.format(
-                                len(dimension_labels) - len(shape)))
+                        raise ValueError('Missing {0} axes.\nExpected{1} got {2}}'\
+                            .format(
+                                len(dimension_labels) - len(shape),
+                                dimension_labels, shape) 
+                            )
                     shape = tuple(shape)
                     
                 array = numpy.zeros( shape , dtype=numpy.float32) 
@@ -998,9 +1016,9 @@ class DataProcessor(object):
         '''
         raise NotImplementedError('Implement basic checks for input DataContainer')
         
-    def get_output(self):
+    def get_output(self, out=None):
         for k,v in self.__dict__.items():
-            if v is None:
+            if v is None and k != 'output':
                 raise ValueError('Key {0} is None'.format(k))
         shouldRun = False
         if self.runTime == -1:
@@ -1011,10 +1029,18 @@ class DataProcessor(object):
         # CHECK this
         if self.store_output and shouldRun:
             self.runTime = datetime.now()
-            self.output = self.process()
-            return self.output
+            try:
+                self.output = self.process(out=out)
+                return self.output
+            except TypeError as te:
+                self.output = self.process()
+                return self.output
         self.runTime = datetime.now()
-        return self.process()
+        try:
+            return self.process(out=out)
+        except TypeError as te:
+            return self.process()
+            
     
     def set_input_processor(self, processor):
         if issubclass(type(processor), DataProcessor):
@@ -1035,7 +1061,7 @@ class DataProcessor(object):
             dsi = self.input
         return dsi
         
-    def process(self):
+    def process(self, out=None):
         raise NotImplementedError('process must be implemented')
         
     
@@ -1082,16 +1108,57 @@ class AX(DataProcessor):
     def check_input(self, dataset):
         return True
         
-    def process(self):
+    def process(self, out=None):
         
         dsi = self.get_input()
         a = self.scalar
-        
-        y = DataContainer( a * dsi.as_array() , True, 
-                    dimension_labels=dsi.dimension_labels )
-        #self.setParameter(output_dataset=y)
-        return y
+        if out is None:
+            y = DataContainer( a * dsi.as_array() , True, 
+                        dimension_labels=dsi.dimension_labels )
+            #self.setParameter(output_dataset=y)
+            return y
+        else:
+            out.fill(a * dsi.as_array())
     
+
+###### Example of DataProcessors
+
+class CastDataContainer(DataProcessor):
+    '''Example DataProcessor
+    Cast a DataContainer array to a different type.
+
+    y := a*x
+    where:
+
+    a is a scalar
+
+    x a DataContainer.
+    '''
+    
+    def __init__(self, dtype=None):
+        kwargs = {'dtype':dtype, 
+                  'input':None, 
+                  }
+        
+        #DataProcessor.__init__(self, **kwargs)
+        super(CastDataContainer, self).__init__(**kwargs)
+    
+    def check_input(self, dataset):
+        return True
+        
+    def process(self, out=None):
+        
+        dsi = self.get_input()
+        dtype = self.dtype
+        if out is None:
+            y = numpy.asarray(dsi.as_array(), dtype=dtype)
+            
+            return type(dsi)(numpy.asarray(dsi.as_array(), dtype=dtype),
+                                dimension_labels=dsi.dimension_labels )
+        else:
+            out.fill(numpy.asarray(dsi.as_array(), dtype=dtype))
+    
+        
         
     
     
@@ -1115,7 +1182,7 @@ class PixelByPixelDataProcessor(DataProcessor):
     def check_input(self, dataset):
         return True
     
-    def process(self):
+    def process(self, out=None):
         
         pyfunc = self.pyfunc
         dsi = self.get_input()
@@ -1174,12 +1241,22 @@ if __name__ == '__main__':
     #ax.apply()
     print ("ax  in {0} out {1}".format(c.as_array().flatten(),
            ax.get_output().as_array().flatten()))
+    
+    cast = CastDataContainer(dtype=numpy.float32)
+    cast.set_input(c)
+    out = cast.get_output()
+    out *= 0 
     axm = AX()
     axm.scalar = 0.5
-    axm.set_input(c)
+    axm.set_input_processor(cast)
+    axm.get_output(out)
     #axm.apply()
     print ("axm in {0} out {1}".format(c.as_array(), axm.get_output().as_array()))
     
+    # check out in DataSetProcessor
+   #a = numpy.asarray([i for i in range( size )])
+    
+        
     # create a PixelByPixelDataProcessor
     
     #define a python function which will take only one input (the pixel value)
@@ -1260,4 +1337,23 @@ if __name__ == '__main__':
                                        pixel_num_h=5 , channels=2)
     sino = AcquisitionData(geometry=sgeometry)
     sino2 = sino.clone()
+    
+    a0 = numpy.asarray([i for i in range(2*3*4)])
+    a1 = numpy.asarray([2*i for i in range(2*3*4)])
+    
+            
+    ds0 = DataContainer(numpy.reshape(a0,(2,3,4)))
+    ds1 = DataContainer(numpy.reshape(a1,(2,3,4)))
+    
+    numpy.testing.assert_equal(ds0.dot(ds1), a0.dot(a1))
+    
+    a2 = numpy.asarray([2*i for i in range(2*3*5)])
+    ds2 = DataContainer(numpy.reshape(a2,(2,3,5)))
+    
+#    # it should fail if the shape is wrong
+#    try:
+#        ds2.dot(ds0)
+#        self.assertTrue(False)
+#    except ValueError as ve:
+#        self.assertTrue(True)
     

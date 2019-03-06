@@ -63,7 +63,7 @@ In `ccpi.framework` we define a number of common classes normally used in tomogr
  
   * `Operator`: A class specifying a (currently linear) operator
   * `Function`: A class specifying mathematical functions such as a least squares data fidelity.
-  * `Algorithm`: Implementation of an optimisation algorithm to solve a particular generic optimisation problem. These are currently python functions by may be changed to operators in another release.
+  * `Algorithm`: Implementation of an iterative optimisation algorithm to solve a particular generic optimisation problem. Algorithms are iterable Python object which can be run in a for loop. Can be stopped and warm restarted. 
 
  #### `Operator`
  
@@ -87,9 +87,27 @@ In `ccpi.framework` we define a number of common classes normally used in tomogr
  
  #### `Algorithm`
  
- A number of generic algorithm implementations are provided including CGLS and FISTA. An algorithm 
- is designed for a particular generic optimisation problem accepts and number of `function`s and/or 
- `operator`s as input to define a specific instance of the generic optimisation problem to be solved.
+ A number of generic algorithm implementations are provided including Gradient Descent CGLS and FISTA. An algorithm 
+ is designed for a particular generic optimisation problem accepts and number of `Function`s and/or 
+ `Operator`s as input to define a specific instance of the generic optimisation problem to be solved.
+ 
+ They are iterable objects which can be run in a `for` loop. The user can provide a stopping cryterion different than the default max_iteration.
+ 
+ New algorithms can be easily created by extending the `Algorithm` class. The user is required to implement only 4 methods: `set_up`, `__init__`, `update` and `update_objective`.
+ 
+   * `set_up` and `__init__` are used to configure the algorithm
+   * `update` is the actual iteration updating the solution
+   * `update_objective` defines how the objective is calculated. 
+ 
+ For example, the implementation of the `update` of the Gradient Descent algorithm to minimise a `Function` will only be:
+ ```python
+ def update(self):
+    self.x += -self.rate * self.objective_function.gradient(self.x)
+ def update_objective(self):
+        self.loss.append(self.objective_function(self.x))
+ ```
+ 
+ The `Algorithm` provides the infrastructure to continue iteration, to access the values of the objective function in subsequent iterations, the time for each iteration. 
  
  #### Examples
  

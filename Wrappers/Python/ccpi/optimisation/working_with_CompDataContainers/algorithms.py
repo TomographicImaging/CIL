@@ -67,7 +67,8 @@ def PDHG(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
         x_old = x
         y_old = y   
         
-#        print(f(operator.direct(x)) + g(x))#+f.convex_conjugate(y) + g.convex_conjugate(-1*operator.adjoint(y)))
+#        pdgap
+        print(f(operator.direct(x)) + g(x) )#+ f.convex_conjugate(y) + g.convex_conjugate(-1*operator.adjoint(y)) )
             
 #        # TV denoising, pdgap with composite
 #        

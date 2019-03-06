@@ -375,7 +375,8 @@ class DataContainer(object):
         return self.shape == other.shape
     
     ## algebra 
-    def __add__(self, other , out=None, *args, **kwargs):
+    def __add__(self, other, *args, **kwargs):
+        out = kwargs.get('out', None)
         if issubclass(type(other), DataContainer):    
             if self.check_dimensions(other):
                 out = self.as_array() + other.as_array()
@@ -632,8 +633,8 @@ class DataContainer(object):
     
     ## binary operations
             
-    def pixel_wise_binary(self,pwop, x2 , out=None, *args,  **kwargs):    
-
+    def pixel_wise_binary(self, pwop, x2, *args,  **kwargs):    
+        out = kwargs.get('out', None)
         if out is None:
             if isinstance(x2, (int, float, complex)):
                 out = pwop(self.as_array() , x2 , *args, **kwargs )
@@ -676,26 +677,33 @@ class DataContainer(object):
         else:
             raise ValueError (message(type(self),  "incompatible class:" , pwop.__name__, type(out)))
     
-    def add(self, other , out=None, *args, **kwargs):
+    def add(self, other, *args, **kwargs):
+        out = kwargs.get('out', None)
         return self.pixel_wise_binary(numpy.add, other, out=out, *args, **kwargs)
     
-    def subtract(self, other, out=None , *args, **kwargs):
+    def subtract(self, other, *args, **kwargs):
+        out = kwargs.get('out', None)
         return self.pixel_wise_binary(numpy.subtract, other, out=out, *args, **kwargs)
 
-    def multiply(self, other , out=None, *args, **kwargs):
+    def multiply(self, other, *args, **kwargs):
+        out = kwargs.get('out', None)
         return self.pixel_wise_binary(numpy.multiply, other, out=out, *args, **kwargs)
     
-    def divide(self, other , out=None ,*args, **kwargs):
+    def divide(self, other, *args, **kwargs):
+        out = kwargs.get('out', None)
         return self.pixel_wise_binary(numpy.divide, other, out=out, *args, **kwargs)
     
-    def power(self, other , out=None, *args, **kwargs):
+    def power(self, other, *args, **kwargs):
+        out = kwargs.get('out', None)
         return self.pixel_wise_binary(numpy.power, other, out=out, *args, **kwargs)
     
-    def maximum(self,x2, out=None, *args, **kwargs):
+    def maximum(self, x2, *args, **kwargs):
+        out = kwargs.get('out', None)
         return self.pixel_wise_binary(numpy.maximum, x2=x2, out=out, *args, **kwargs)
     
     ## unary operations
-    def pixel_wise_unary(self,pwop, out=None, *args,  **kwargs):
+    def pixel_wise_unary(self, pwop, *args,  **kwargs):
+        out = kwargs.get('out', None)
         if out is None:
             out = pwop(self.as_array() , *args, **kwargs )
             return type(self)(out,
@@ -713,13 +721,16 @@ class DataContainer(object):
         else:
             raise ValueError (message(type(self),  "incompatible class:" , pwop.__name__, type(out)))
     
-    def abs(self, out=None, *args,  **kwargs):
+    def abs(self, *args,  **kwargs):
+        out = kwargs.get('out', None)
         return self.pixel_wise_unary(numpy.abs, out=out, *args,  **kwargs)
     
-    def sign(self, out=None, *args,  **kwargs):
+    def sign(self, *args,  **kwargs):
+        out = kwargs.get('out', None)
         return self.pixel_wise_unary(numpy.sign , out=out, *args,  **kwargs)
     
-    def sqrt(self, out=None, *args,  **kwargs):
+    def sqrt(self, *args,  **kwargs):
+        out = kwargs.get('out', None)
         return self.pixel_wise_unary(numpy.sqrt, out=out, *args,  **kwargs)
     
     #def __abs__(self):
@@ -728,7 +739,7 @@ class DataContainer(object):
     # __abs__
     
     ## reductions
-    def sum(self, out=None, *args, **kwargs):
+    def sum(self, *args, **kwargs):
         return self.as_array().sum(*args, **kwargs)
     def squared_norm(self):
         '''return the squared euclidean norm of the DataContainer viewed as a vector'''

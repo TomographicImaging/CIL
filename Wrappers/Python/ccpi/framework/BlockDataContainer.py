@@ -16,28 +16,27 @@ import functools
 #from ccpi.optimisation.operators import Operator, LinearOperator
  
 class BlockDataContainer(object):
-    '''Class to hold a composite operator'''
+    '''Class to hold DataContainers as blocks'''
     __array_priority__ = 1
-    def __init__(self, shape=None, *args):
+    def __init__(self, *args, **kwargs):
         '''containers must be passed row by row'''
         self.containers = args
         self.index = 0
+        shape = kwargs.get('shape', None)
+        print (shape)
         if shape is None:
             shape = (len(args),1)
         self.shape = shape
+        
         n_elements = functools.reduce(lambda x,y: x*y, shape, 1)
         if len(args) != n_elements:
             raise ValueError(
                     'Dimension and size do not match: expected {} got {}'
                     .format(n_elements,len(args)))
-#        for i in range(shape[0]):
-#            b.append([])
-#            for j in range(shape[1]):
-#                b[-1].append(args[i*shape[1]+j])
-#                indices.append(i*shape[1]+j)
-#        self.containers = b
+
         
     def __iter__(self):
+        '''BlockDataContainer is Iterable'''
         return self
     def next(self):
         '''python2 backwards compatibility'''
@@ -76,24 +75,27 @@ class BlockDataContainer(object):
         index = row*self.shape[1]+col
         return self.containers[index]
                 
-    def add(self, other, out=None, *args, **kwargs):
+    def add(self, other, *args, **kwargs):
         assert self.is_compatible(other)
+        out = kwargs.get('out', None)
         if isinstance(other, Number):
             return type(self)(*[ el.add(other, out, *args, **kwargs) for el in self.containers])
         elif isinstance(other, list) or isinstance(other, numpy.ndarray):
             return type(self)(*[ el.add(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other)])
         return type(self)(*[ el.add(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other.containers)])
         
-    def subtract(self, other, out=None , *args, **kwargs):
+    def subtract(self, other, *args, **kwargs):
         assert self.is_compatible(other)
+        out = kwargs.get('out', None)
         if isinstance(other, Number):
             return type(self)(*[ el.subtract(other, out, *args, **kwargs) for el in self.containers])
         elif isinstance(other, list) or isinstance(other, numpy.ndarray):
             return type(self)(*[ el.subtract(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other)])
         return type(self)(*[ el.subtract(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other.containers)])
 
-    def multiply(self, other , out=None, *args, **kwargs):
+    def multiply(self, other, *args, **kwargs):
         self.is_compatible(other)
+        out = kwargs.get('out', None)
         if isinstance(other, Number):
             return type(self)(*[ el.multiply(other, out, *args, **kwargs) for el in self.containers])
         elif isinstance(other, list):
@@ -102,24 +104,27 @@ class BlockDataContainer(object):
             return type(self)(*[ el.multiply(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other)])
         return type(self)(*[ el.multiply(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other.containers)])
     
-    def divide(self, other , out=None ,*args, **kwargs):
+    def divide(self, other, *args, **kwargs):
         self.is_compatible(other)
+        out = kwargs.get('out', None)
         if isinstance(other, Number):
             return type(self)(*[ el.divide(other, out, *args, **kwargs) for el in self.containers])
         elif isinstance(other, list) or isinstance(other, numpy.ndarray):
             return type(self)(*[ el.divide(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other)])
         return type(self)(*[ el.divide(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other.containers)])
     
-    def power(self, other , out=None, *args, **kwargs):
+    def power(self, other, *args, **kwargs):
         assert self.is_compatible(other)
+        out = kwargs.get('out', None)
         if isinstance(other, Number):
             return type(self)(*[ el.power(other, out, *args, **kwargs) for el in self.containers])
         elif isinstance(other, list) or isinstance(other, numpy.ndarray):
             return type(self)(*[ el.power(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other)])
         return type(self)(*[ el.power(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other.containers)])
     
-    def maximum(self,other, out=None, *args, **kwargs):
+    def maximum(self,other, *args, **kwargs):
         assert self.is_compatible(other)
+        out = kwargs.get('out', None)
         if isinstance(other, Number):
             return type(self)(*[ el.maximum(other, out, *args, **kwargs) for el in self.containers])
         elif isinstance(other, list) or isinstance(other, numpy.ndarray):
@@ -127,17 +132,20 @@ class BlockDataContainer(object):
         return type(self)(*[ el.maximum(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other.containers)])
     
     ## unary operations    
-    def abs(self, out=None, *args,  **kwargs):
+    def abs(self, *args,  **kwargs):
+        out = kwargs.get('out', None)
         return type(self)(*[ el.abs(out, *args, **kwargs) for el in self.containers]) 
-    def sign(self, out=None, *args,  **kwargs):
+    def sign(self, *args,  **kwargs):
+        out = kwargs.get('out', None)
         return type(self)(*[ el.sign(out, *args, **kwargs) for el in self.containers])
-    def sqrt(self, out=None, *args,  **kwargs):
+    def sqrt(self, *args,  **kwargs):
+        out = kwargs.get('out', None)
         return type(self)(*[ el.sqrt(out, *args, **kwargs) for el in self.containers])
     def conjugate(self, out=None):
         return type(self)(*[el.conjugate() for el in self.containers])
     
     ## reductions
-    def sum(self, out=None, *args, **kwargs):
+    def sum(self, *args, **kwargs):
         return numpy.asarray([ el.sum(*args, **kwargs) for el in self.containers])
     def squared_norm(self):
         y = numpy.asarray([el.squared_norm() for el in self.containers])

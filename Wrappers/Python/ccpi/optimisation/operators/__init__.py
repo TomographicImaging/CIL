@@ -7,4 +7,6 @@ Created on Tue Mar  5 15:56:27 2019
 
 from .Operator import Operator
 from .LinearOperator import LinearOperator
+from .ScaledOperator import ScaledOperator
 from .BlockOperator import BlockOperator
+from .BlockScaledOperator import BlockScaledOperator

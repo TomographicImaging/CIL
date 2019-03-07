@@ -4,6 +4,7 @@ Created on Tue Mar  5 15:55:56 2019
 
 @author: ofn77899
 """
+from ccpi.framework,operators import ScaledOperator
 
 class Operator(object):
     '''Operator that maps from a space X -> Y'''
@@ -23,3 +24,6 @@ class Operator(object):
         raise NotImplementedError
     def domain_geometry(self):
         raise NotImplementedError
+    def __rmul__(self, scalar):
+        return ScaledOperator(self, scalar)
+    

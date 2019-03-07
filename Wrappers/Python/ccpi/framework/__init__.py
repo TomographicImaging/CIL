@@ -20,5 +20,5 @@ from .framework import ImageData, AcquisitionData
 from .framework import ImageGeometry, AcquisitionGeometry
 from .framework import find_key, message
 from .framework import DataProcessor
-from .framework import AX, PixelByPixelDataProcessor
+from .framework import AX, PixelByPixelDataProcessor, CastDataContainer
 from .BlockDataContainer import BlockDataContainer

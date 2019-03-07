@@ -4,12 +4,8 @@ Created on Thu Feb 14 12:36:40 2019
 
 @author: ofn77899
 """
-#from ccpi.optimisation.ops import Operator
 import numpy
-from numbers import Number
-import functools
-from ccpi.framework import AcquisitionData, ImageData, BlockDataContainer
-from ccpi.optimisation.operators import Operator, LinearOperator
+from ccpi.optimisation.operators import BlockOperator
 
 
        

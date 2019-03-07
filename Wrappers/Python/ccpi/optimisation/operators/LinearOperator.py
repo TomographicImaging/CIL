@@ -7,8 +7,11 @@ Created on Tue Mar  5 15:57:52 2019
 
 from ccpi.optimisation.operators import Operator
 
+
 class LinearOperator(Operator):
-    '''Operator that maps from a space X -> Y'''
+    '''A Linear Operator that maps from a space X <-> Y'''
+    def __init__(self):
+        super(LinearOperator, self).__init__()
     def is_linear(self):
         '''Returns if the operator is linear'''
         return True

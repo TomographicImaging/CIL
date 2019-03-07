@@ -734,7 +734,9 @@ class DataContainer(object):
     
     def sqrt(self, *args,  **kwargs):
         return self.pixel_wise_unary(numpy.sqrt, *args,  **kwargs)
-    
+
+    def conjugate(self, *args,  **kwargs):
+        return self.pixel_wise_unary(numpy.conjugate, *args,  **kwargs)
     #def __abs__(self):
     #    operation = FM.OPERATION.ABS
     #    return self.callFieldMath(operation, None, self.mask, self.maskOnValue)

@@ -66,9 +66,11 @@ class BlockOperator(Operator):
     
     def direct(self, x, out=None):
         shape = self.get_output_shape(x.shape)
+        print ("direct output shape", shape)
         res = []
         for row in range(self.shape[0]):
             for col in range(self.shape[1]):
+                print ("row {} col {}".format(row, col))
                 if col == 0:
                     prod = self.get_item(row,col).direct(x.get_item(col))
                 else:
@@ -76,19 +78,8 @@ class BlockOperator(Operator):
             res.append(prod)
         return BlockDataContainer(*res, shape=shape)
     
-    def adjoint(self, x, out=None):
-        shape = self.get_output_shape(x.shape, adjoint=True)
-        res = []
-        for row in range(self.shape[1]):
-            for col in range(self.shape[0]):
-                if col == 0:
-                    prod = self.get_item(col,row).adjoint(x.get_item(row))
-                else:
-                    prod += self.get_item(col,row).adjoint(x.get_item(row))
-            res.append(prod)
-        return BlockDataContainer(*res, shape=shape)
-    
     def get_output_shape(self, xshape, adjoint=False):
+        print ("get_output_shape", self.shape, xshape)
         sshape = self.shape[1]
         oshape = self.shape[0]
         if adjoint:
@@ -98,8 +89,27 @@ class BlockOperator(Operator):
             raise ValueError('Incompatible shapes {} {}'.format(self.shape, xshape))
         return (oshape, xshape[-1])
     
-    
-    
+    def __rmul__(self, scalar):
+        '''Defines the left multiplication with a scalar
+
+        Args: scalar (number or iterable containing numbers):
+
+        Returns: a block operator with Scaled Operators inside'''
+        if isinstance (scalar, list) or isinstance(scalar, tuple) or \
+                isinstance(scalar, numpy.ndarray):
+            if len(scalar) != len(self.operators):
+                raise ValueError('dimensions of scalars and operators do not match')
+            scalars = scalar
+        else:
+            scalars = [scalar for _ in self.operators]
+        # create a list of ScaledOperator-s
+        ops = [ v * op for v,op in zip(scalars, self.operators)]
+        return BlockOperator(*ops, shape=self.shape)
+    def T(self):
+        '''Return the transposed of self'''
+        shape = (self.shape[1], self.shape[0])
+        return type(self)(*self.operators, shape=shape)
+
 class BlockLinearOperator(BlockOperator):
     '''Class to hold a block operator
 

@@ -26,7 +26,7 @@ class BlockDataContainer(object):
         if shape is None:
             shape = (len(args),1)
         self.shape = shape
-        
+        print (self.shape)
         n_elements = functools.reduce(lambda x,y: x*y, shape, 1)
         if len(args) != n_elements:
             raise ValueError(
@@ -78,74 +78,79 @@ class BlockDataContainer(object):
         assert self.is_compatible(other)
         out = kwargs.get('out', None)
         if isinstance(other, Number):
-            return type(self)(*[ el.add(other, out, *args, **kwargs) for el in self.containers])
+            return type(self)(*[ el.add(other, out, *args, **kwargs) for el in self.containers], shape=self.shape)
         elif isinstance(other, list) or isinstance(other, numpy.ndarray):
-            return type(self)(*[ el.add(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other)])
-        return type(self)(*[ el.add(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other.containers)])
+            return type(self)(*[ el.add(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
+        return type(self)(
+            *[ el.add(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other.containers)],
+            shape=self.shape)
         
     def subtract(self, other, *args, **kwargs):
         assert self.is_compatible(other)
         out = kwargs.get('out', None)
         if isinstance(other, Number):
-            return type(self)(*[ el.subtract(other, out, *args, **kwargs) for el in self.containers])
+            return type(self)(*[ el.subtract(other, out, *args, **kwargs) for el in self.containers], shape=self.shape)
         elif isinstance(other, list) or isinstance(other, numpy.ndarray):
-            return type(self)(*[ el.subtract(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other)])
-        return type(self)(*[ el.subtract(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other.containers)])
+            return type(self)(*[ el.subtract(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
+        return type(self)(*[ el.subtract(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other.containers)],
+                          shape=self.shape)
 
     def multiply(self, other, *args, **kwargs):
         self.is_compatible(other)
         out = kwargs.get('out', None)
         if isinstance(other, Number):
-            return type(self)(*[ el.multiply(other, out, *args, **kwargs) for el in self.containers])
+            return type(self)(*[ el.multiply(other, out, *args, **kwargs) for el in self.containers], shape=self.shape)
         elif isinstance(other, list):
-            return type(self)(*[ el.multiply(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other)])
+            return type(self)(*[ el.multiply(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
         elif isinstance(other, numpy.ndarray):           
-            return type(self)(*[ el.multiply(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other)])
-        return type(self)(*[ el.multiply(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other.containers)])
+            return type(self)(*[ el.multiply(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
+        return type(self)(*[ el.multiply(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other.containers)],
+                          shape=self.shape)
     
     def divide(self, other, *args, **kwargs):
         self.is_compatible(other)
         out = kwargs.get('out', None)
         if isinstance(other, Number):
-            return type(self)(*[ el.divide(other, out, *args, **kwargs) for el in self.containers])
+            return type(self)(*[ el.divide(other, out, *args, **kwargs) for el in self.containers], shape=self.shape)
         elif isinstance(other, list) or isinstance(other, numpy.ndarray):
-            return type(self)(*[ el.divide(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other)])
-        return type(self)(*[ el.divide(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other.containers)])
+            return type(self)(*[ el.divide(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
+        return type(self)(*[ el.divide(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other.containers)],
+                          shape=self.shape)
     
     def power(self, other, *args, **kwargs):
         assert self.is_compatible(other)
         out = kwargs.get('out', None)
         if isinstance(other, Number):
-            return type(self)(*[ el.power(other, out, *args, **kwargs) for el in self.containers])
+            return type(self)(*[ el.power(other, out, *args, **kwargs) for el in self.containers], shape=self.shape)
         elif isinstance(other, list) or isinstance(other, numpy.ndarray):
-            return type(self)(*[ el.power(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other)])
-        return type(self)(*[ el.power(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other.containers)])
+            return type(self)(*[ el.power(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
+        return type(self)(*[ el.power(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other.containers)], shape=self.shape)
     
     def maximum(self,other, *args, **kwargs):
         assert self.is_compatible(other)
         out = kwargs.get('out', None)
         if isinstance(other, Number):
-            return type(self)(*[ el.maximum(other, out, *args, **kwargs) for el in self.containers])
+            return type(self)(*[ el.maximum(other, out, *args, **kwargs) for el in self.containers], shape=self.shape)
         elif isinstance(other, list) or isinstance(other, numpy.ndarray):
-            return type(self)(*[ el.maximum(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other)])
-        return type(self)(*[ el.maximum(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other.containers)])
+            return type(self)(*[ el.maximum(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
+        return type(self)(*[ el.maximum(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other.containers)], shape=self.shape)
     
     ## unary operations    
     def abs(self, *args,  **kwargs):
         out = kwargs.get('out', None)
-        return type(self)(*[ el.abs(out, *args, **kwargs) for el in self.containers]) 
+        return type(self)(*[ el.abs(out, *args, **kwargs) for el in self.containers], shape=self.shape)
     def sign(self, *args,  **kwargs):
         out = kwargs.get('out', None)
-        return type(self)(*[ el.sign(out, *args, **kwargs) for el in self.containers])
+        return type(self)(*[ el.sign(out, *args, **kwargs) for el in self.containers], shape=self.shape)
     def sqrt(self, *args,  **kwargs):
         out = kwargs.get('out', None)
-        return type(self)(*[ el.sqrt(out, *args, **kwargs) for el in self.containers])
+        return type(self)(*[ el.sqrt(out, *args, **kwargs) for el in self.containers], shape=self.shape)
     def conjugate(self, out=None):
-        return type(self)(*[el.conjugate() for el in self.containers])
+        return type(self)(*[el.conjugate() for el in self.containers], shape=self.shape)
     
     ## reductions
     def sum(self, *args, **kwargs):
-        return numpy.asarray([ el.sum(*args, **kwargs) for el in self.containers])
+        return numpy.sum([ el.sum(*args, **kwargs) for el in self.containers])
     def squared_norm(self):
         y = numpy.asarray([el.squared_norm() for el in self.containers])
         return y.sum() 
@@ -155,7 +160,7 @@ class BlockDataContainer(object):
         '''alias of clone'''    
         return self.clone()
     def clone(self):
-        return type(self)(*[el.copy() for el in self.containers])
+        return type(self)(*[el.copy() for el in self.containers], shape=self.shape)
     
     def __add__(self, other):
         return self.add( other )
@@ -297,4 +302,8 @@ class BlockDataContainer(object):
     def __itruediv__(self, other):
         '''Inline truedivision'''
         return self.__idiv__(other)
-    
+    @property
+    def T(self):
+       '''return the transposed of self'''
+       shape = (self.shape[1], self.shape[0])
+       return type(self)(*self.containers, shape=shape)

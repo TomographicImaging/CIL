@@ -16,8 +16,80 @@ from ccpi.framework import ImageData, AcquisitionData
 #from ccpi.optimisation.algorithms import GradientDescent
 from ccpi.framework import BlockDataContainer
 #from ccpi.optimisation.Algorithms import CGLS
+import functools
 
 class TestBlockDataContainer(unittest.TestCase):
+    def test_BlockDataContainerShape(self):
+        print ("test block data container")
+        ig0 = ImageGeometry(2,3,4)
+        ig1 = ImageGeometry(12,42,55,32)
+
+        data0 = ImageData(geometry=ig0)
+        data1 = ImageData(geometry=ig1) + 1
+
+        data2 = ImageData(geometry=ig0) + 2
+        data3 = ImageData(geometry=ig1) + 3
+
+        cp0 = BlockDataContainer(data0,data1)
+        cp1 = BlockDataContainer(data2,data3)
+        transpose_shape = (cp0.shape[1], cp0.shape[0])
+        self.assertTrue(cp0.T.shape == transpose_shape)
+    def test_BlockDataContainerShapeArithmetic(self):
+        print ("test block data container")
+        ig0 = ImageGeometry(2,3,4)
+        ig1 = ImageGeometry(12,42,55,32)
+
+        data0 = ImageData(geometry=ig0)
+        data1 = ImageData(geometry=ig1) + 1
+
+        data2 = ImageData(geometry=ig0) + 2
+        data3 = ImageData(geometry=ig1) + 3
+
+        cp0 = BlockDataContainer(data0,data1)
+        #cp1 = BlockDataContainer(data2,data3)
+        cp1 = cp0 + 1
+        self.assertTrue(cp1.shape == cp0.shape)
+        cp1 = cp0.T + 1
+
+        transpose_shape = (cp0.shape[1], cp0.shape[0])
+        self.assertTrue(cp1.shape == transpose_shape)
+
+        cp1 = cp0.T - 1
+        transpose_shape = (cp0.shape[1], cp0.shape[0])
+        self.assertTrue(cp1.shape == transpose_shape)
+
+        cp1 = (cp0.T + 1)*2
+        transpose_shape = (cp0.shape[1], cp0.shape[0])
+        self.assertTrue(cp1.shape == transpose_shape)
+
+        cp1 = (cp0.T + 1)/2
+        transpose_shape = (cp0.shape[1], cp0.shape[0])
+        self.assertTrue(cp1.shape == transpose_shape)
+
+        cp1 = cp0.T.power(2.2)
+        transpose_shape = (cp0.shape[1], cp0.shape[0])
+        self.assertTrue(cp1.shape == transpose_shape)
+
+        cp1 = cp0.T.maximum(3)
+        transpose_shape = (cp0.shape[1], cp0.shape[0])
+        self.assertTrue(cp1.shape == transpose_shape)
+
+        cp1 = cp0.T.abs()
+        transpose_shape = (cp0.shape[1], cp0.shape[0])
+        self.assertTrue(cp1.shape == transpose_shape)
+
+        cp1 = cp0.T.sign()
+        transpose_shape = (cp0.shape[1], cp0.shape[0])
+        self.assertTrue(cp1.shape == transpose_shape)
+
+        cp1 = cp0.T.sqrt()
+        transpose_shape = (cp0.shape[1], cp0.shape[0])
+        self.assertTrue(cp1.shape == transpose_shape)
+
+        cp1 = cp0.T.conjugate()
+        transpose_shape = (cp0.shape[1], cp0.shape[0])
+        self.assertTrue(cp1.shape == transpose_shape)
+
     def test_BlockDataContainer(self):
         print ("test block data container")
         ig0 = ImageGeometry(2,3,4)
@@ -198,7 +270,9 @@ class TestBlockDataContainer(unittest.TestCase):
         numpy.testing.assert_almost_equal(s.get_item(1,0).as_array()[0][0][0], numpy.sqrt(4), decimal=4)
         
         s = cp0.sum()
-        numpy.testing.assert_almost_equal(s[0], 0, decimal=4)
+        size = functools.reduce(lambda x,y: x*y, data1.shape, 1)
+        print ("size" , size)
+        numpy.testing.assert_almost_equal(s, 0 + size, decimal=4)
         s0 = 1
         s1 = 1
         for i in cp0.get_item(0,0).shape:
@@ -206,5 +280,5 @@ class TestBlockDataContainer(unittest.TestCase):
         for i in cp0.get_item(1,0).shape:
             s1 *= i
             
-        numpy.testing.assert_almost_equal(s[1], cp0.get_item(0,0).as_array()[0][0][0]*s0 +cp0.get_item(1,0).as_array()[0][0][0]*s1, decimal=4)
+        #numpy.testing.assert_almost_equal(s[1], cp0.get_item(0,0).as_array()[0][0][0]*s0 +cp0.get_item(1,0).as_array()[0][0][0]*s1, decimal=4)
     

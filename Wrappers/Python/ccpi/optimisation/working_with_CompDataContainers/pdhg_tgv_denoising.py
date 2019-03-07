@@ -6,35 +6,30 @@ Created on Fri Mar  1 23:16:44 2019
 @author: evangelos
 """
 
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Jan 31 21:41:25 2019
 
-@author: evangelos
-"""
-from ccpi.framework import ImageData, ImageGeometry, \
-                           AcquisitionGeometry, AcquisitionData
-from ccpi.optimisation.ops import PowerMethodNonsquare
+from ccpi.framework import ImageData 
+import numpy as np                           
 
-
-import numpy as np
 from numpy import inf
-import numpy
 import matplotlib.pyplot as plt
 from cvxpy import *
 from skimage.util import random_noise
 import scipy.misc
 from skimage.transform import resize
 
-from algorithms import PDHG
-from operators import CompositeOperator, Identity, CompositeDataContainer, ZeroOp
-from GradientOperator import Gradient
-from SymmetrizedGradientOperator import SymmetrizedGradient
-#from functions import L1Norm, ZeroFun, CompositeFunction, mixed_L12Norm, L2NormSq
-from test_functions import L1Norm, ZeroFun, mixed_L12Norm, L2NormSq, CompositeFunction, FunctionComposition_new
 
-from Sparse_GradMat import GradOper
+from Algorithms.PDHG import PDHG
+from Operators.CompositeOperator_DataContainer import CompositeOperator, CompositeDataContainer
+from Operators.IdentityOperator import *
+from Operators.GradientOperator import Gradient
+from Operators.SymmetrizedGradientOperator import SymmetrizedGradient
+from Operators.ZeroOperator import ZeroOp
+
+from Functions.FunctionComposition import FunctionComposition_new
+from Functions.mixed_L12Norm import mixed_L12Norm
+from Functions.L2NormSquared import L2NormSq
+from Functions.ZeroFun import ZeroFun
+
 
 from skimage.util import random_noise
 
@@ -69,7 +64,8 @@ plt.show()
 n1 = random_noise(phantom, mode='gaussian', seed=10)
 noisy_data = ImageData(n1)
 
-# Define block operator
+alpha = 0.2
+beta = 1
 
 ig = (N,N)
 ag = ig
@@ -83,19 +79,36 @@ ZeroOp1 = ZeroOp( ig, SymGrad.range_dim())
 ZeroOp2 = ZeroOp( SymGrad.domain_dim(), ag)
 Aop = Identity(ig, ag)
 
-operator = CompositeOperator( (3,2), Grad, -1*Id1,\
-                                     ZeroOp1, SymGrad,\
-                                     Aop, ZeroOp2)
+#method = input("Enter structure of PDHG (0=Composite or 1=NotComposite): ")
+method = '1'
+if method == '0':
+    # Define block operator
+    operator = CompositeOperator( (3,2), Grad, -1*Id1,\
+                                         ZeroOp1, SymGrad,\
+                                         Aop, ZeroOp2)
 
-normK = operator.norm()  
+    f = FunctionComposition_new(operator, mixed_L12Norm(alpha), \
+                                          mixed_L12Norm(beta, sym_grad=True),\
+                                          L2NormSq(0.5, b=noisy_data) )
+    g = ZeroFun()
+    
+else:
+    ###########################################################################
+    #         No Composite #
+    ###########################################################################    
+    operator = CompositeOperator( (2,2), Grad, -1*Id1,\
+                                         ZeroOp1, SymGrad)
+    
+    operator1 = CompositeOperator( (2,1), Aop, ZeroOp1)
+    
+    f = FunctionComposition_new(operator, mixed_L12Norm(alpha), \
+                                          mixed_L12Norm(beta, sym_grad=True))  
+    
+    g = FunctionComposition_new(operator1, L2NormSq(0.5, b=noisy_data), \
+                                           ZeroFun())      
 
-alpha = 0.2
-beta = 1
-
-f = FunctionComposition_new(operator, mixed_L12Norm(alpha), \
-                                      mixed_L12Norm(beta, sym_grad=True),\
-                                      L2NormSq(0.5, b=noisy_data) )
-g = ZeroFun()
+        
+normK = operator.norm()      
 ## Primal & dual stepsizes
 sigma = 1.0/normK
 tau = 1.0/normK
@@ -119,59 +132,60 @@ plt.show()
 plt.plot(np.linspace(0,N,N), phantom[int(N/2),:], label = 'GTruth')
 plt.plot(np.linspace(0,N,N), result.get_item(0).as_array()[int(N/2),:], label = 'Recon')
 plt.legend()
-################################################################################
+###############################################################################
 #%%  Compare with CVX
 
-from cvxpy import *
-import sys
-sys.path.insert(0,'/Users/evangelos/Desktop/Projects/CCPi/CCPi-Framework/Wrappers/Python/ccpi/optimisation/cvx_scripts')
-from cvx_functions import tgv
+try_cvx = input("Do you want CVX comparison (0/1)")
 
-##Construct problem
-u = Variable((N, N))
-w1 = Variable((N, N))
-w2 = Variable((N, N))
+if try_cvx=='0':
 
-constraints = []
-fidelity = 0.5 * sum_squares(u - noisy_data.as_array())
-solver = MOSEK
-regulariser = tgv(u,w1,w2,alpha,beta)
+    from cvxpy import *
+    import sys
+    sys.path.insert(0,'/Users/evangelos/Desktop/Projects/CCPi/CCPi-Framework/Wrappers/Python/ccpi/optimisation/cvx_scripts')
+    from cvx_functions import tgv
 
-obj =  Minimize( regulariser +  fidelity )
-prob = Problem( obj, constraints)
+    ###Construct problem
+    u = Variable((N, N))
+    w1 = Variable((N, N))
+    w2 = Variable((N, N))
 
-resCVX = prob.solve(verbose = True, solver = solver)
-print()
-print('Objective value is {} '.format(obj.value))
+    constraints = []
+    fidelity = 0.5 * sum_squares(u - noisy_data.as_array())
+    solver = MOSEK
+    regulariser = tgv(u,w1,w2,alpha,beta)
 
-#%%
-# Show results
-plt.imshow(u.value)
-plt.title('CVX-denoising')
-plt.colorbar()
-plt.show()
+    obj =  Minimize( regulariser +  fidelity )
+    prob = Problem( obj, constraints)
 
-plt.imshow(result.get_item(0).as_array())
-plt.title('PDHG-denoising')
-plt.colorbar()
-plt.show()
+    resCVX = prob.solve(verbose = True, solver = solver)
+    print()
+    print('Objective value is {} '.format(obj.value))
 
-dif = np.abs( result.get_item(0).as_array() - u.value)
-plt.imshow(dif)
-plt.title('Difference')
-plt.colorbar()
-plt.show()
-
-plt.plot(np.linspace(0,N,N), result.get_item(0).as_array()[50,:], label = 'CVX')
-plt.plot(np.linspace(0,N,N), u[50,:].value, label = 'PDHG')
-plt.plot(np.linspace(0,N,N), phantom[50,:], label = 'phantom')
-#plt.plot(np.linspace(0,N,N), noisy_data.as_array()[50,:], label = 'noisy')
-plt.legend()
-plt.show()
+##%%
+    # Show results
+    plt.imshow(u.value)
+    plt.title('CVX-denoising')
+    plt.colorbar()
+    plt.show()
 #
+    plt.imshow(result.get_item(0).as_array())
+    plt.title('PDHG-denoising')
+    plt.colorbar()
+    plt.show()
 #
-
-
-
-
+    dif = np.abs( result.get_item(0).as_array() - u.value)
+    plt.imshow(dif)
+    plt.title('Difference')
+    plt.colorbar()
+    plt.show()
+#
+    plt.plot(np.linspace(0,N,N), result.get_item(0).as_array()[50,:], label = 'CVX')
+    plt.plot(np.linspace(0,N,N), u[50,:].value, label = 'PDHG')
+    plt.plot(np.linspace(0,N,N), phantom[50,:], label = 'phantom')
+#    plt.plot(np.linspace(0,N,N), noisy_data.as_array()[50,:], label = 'noisy')
+    plt.legend()
+    plt.show()
+    
+else:
+    print('No CVX solution available')    
 

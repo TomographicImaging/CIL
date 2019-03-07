@@ -124,9 +124,9 @@ if use_cvxpy:
     print(objective1.value)
     
 # Now try another algorithm FBPD for same problem:
-x_fbpd1, itfbpd1, timingfbpd1, criterfbpd1 = FBPD(x_init,Identity(), None, f, g1)
-print(x_fbpd1)
-print(criterfbpd1[-1])
+#x_fbpd1, itfbpd1, timingfbpd1, criterfbpd1 = FBPD(x_init,Identity(), None, f, g1)
+#print(x_fbpd1)
+#print(criterfbpd1[-1])
 
 # Plot criterion curve to see both FISTA and FBPD converge to same value.
 # Note that FISTA is very efficient for 1-norm minimization so it beats
@@ -138,13 +138,14 @@ plt.loglog(iternum,criter1,label='FISTA LS+1')
 plt.legend()
 plt.show()
 
-plt.figure()
-plt.loglog(iternum[[0,-1]],[objective1.value, objective1.value], label='CVX LS+1')
-plt.loglog(iternum,criter1,label='FISTA LS+1')
-plt.loglog(iternum,criterfbpd1,label='FBPD LS+1')
-plt.legend()
+#plt.figure()
+#plt.loglog(iternum[[0,-1]],[objective1.value, objective1.value], label='CVX LS+1')
+#plt.loglog(iternum,criter1,label='FISTA LS+1')
+#plt.loglog(iternum,criterfbpd1,label='FBPD LS+1')
+#plt.legend()
 plt.show()
 
+#%%
 # Now try 1-norm and TV denoising with FBPD, first 1-norm.
 
 # Set up phantom size NxN by creating ImageGeometry, initialising the 
@@ -245,6 +246,8 @@ plt.subplot(1,4,4)
 plt.imshow(x1_cvx)
 plt.title("cvx")
 plt.show()
+
+#%%
 
 ##############################################################
 # Now TV with FBPD and Norm2

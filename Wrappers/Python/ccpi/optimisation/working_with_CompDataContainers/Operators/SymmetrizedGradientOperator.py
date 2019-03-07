@@ -102,24 +102,8 @@ if __name__ == '__main__':
     
     print(LHS, RHS, E.norm())
     
-    import sys
-    sys.path.insert(0, '/Users/evangelos/Desktop/Projects/CCPi/CCPi-Framework/Wrappers/Python/ccpi/optimisation')
-    from operators import finite_diff
     
-    Eu11 = finite_diff(u1.as_array()[0], direction = 1, method = 'back')
-    Eu22 = finite_diff(u1.as_array()[1], direction = 0, method = 'back')
-    Eu12 = 0.5 * (finite_diff(u1.as_array()[0], direction = 0, method = 'back') + \
-              finite_diff(u1.as_array()[1], direction = 1, method = 'back') )
-
-    divE1 = finite_diff(w1.as_array()[0], direction = 1, method = 'for') + \
-         finite_diff(w1.as_array()[2], direction = 0, method = 'for')
-         
-    divE2 = finite_diff(w1.as_array()[2], direction = 1, method = 'for') + \
-        finite_diff(w1.as_array()[1], direction = 0, method = 'for')        
-
-    print(np.sum( Eu11 * w1.as_array()[0] + Eu22 * w1.as_array()[1] +  2*Eu12 * w1.as_array()[2]))
-    print(-np.sum( u1.as_array()[0] * divE1 + u1.as_array()[1] * divE2))
-    
+#    
     
     
     

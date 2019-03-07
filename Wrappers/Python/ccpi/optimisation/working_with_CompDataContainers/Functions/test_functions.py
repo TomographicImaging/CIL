@@ -315,34 +315,34 @@ class CompositeFunction(Function):
         return CompositeDataContainer(*out)    
     
 #    
-#class  FunctionComposition(Function):
-#    
-#    def __init__(self, function, operator):
-#        
-#        self.function = function
-#        self.alpha = self.function.alpha
-#        self.b  = self.function.b         
-#        self.operator = operator
-#        
-#    
-#        super(FunctionComposition, self).__init__()
-#    
-#    '''    overide call and gradient '''
-#    def __call__(self, x):        
-#        return self.function(x)
-#    
-#    def gradient(self,x):        
-#        return self.operator.adjoint(self.function.gradient(self.operator.direct(x)))
-#    
-#    ''' Same as in the parent class'''
-#    def proximal(self,x, tau):
-#        return self.function.proximal(x, tau)
-#    
-#    def proximal_conjugate(self,x, tau):
-#        return self.function.proximal_conjugate(x, tau)
-#
-#    def convex_conjugate(self,x):
-#        return self.function.convex_conjugate(x)    
+class  FunctionComposition(Function):
+    
+    def __init__(self, function, operator):
+        
+        self.function = function
+        self.alpha = self.function.alpha
+        self.b  = self.function.b         
+        self.operator = operator
+        
+    
+        super(FunctionComposition, self).__init__()
+    
+    '''    overide call and gradient '''
+    def __call__(self, x):        
+        return self.function(x)
+    
+    def gradient(self,x):        
+        return self.operator.adjoint(self.function.gradient(self.operator.direct(x)))
+    
+    ''' Same as in the parent class'''
+    def proximal(self,x, tau):
+        return self.function.proximal(x, tau)
+    
+    def proximal_conjugate(self,x, tau):
+        return self.function.proximal_conjugate(x, tau)
+
+    def convex_conjugate(self,x):
+        return self.function.convex_conjugate(x)    
     
                     
 class FunctionComposition_new(Function):

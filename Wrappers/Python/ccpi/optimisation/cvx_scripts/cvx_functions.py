@@ -1,19 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sat Feb 16 12:44:05 2019
+Created on Tue Dec 18 16:26:06 2018
 
 @author: evangelos
 """
 
 import scipy.sparse as sp
 import numpy as np
-import sys
-sys.path.insert(0, '/Users/evangelos/Desktop/Projects/CCPi/CCPi-Framework/Wrappers/Python/ccpi/optimisation/working_with_CompDataContainers')
-
-from ccpi.framework import ImageData
-from GradientOperator import Gradient
-
+from cvxpy import *
 
 
 def GradOper(size, discStep, direction, order, bndrs): 
@@ -33,7 +28,8 @@ def GradOper(size, discStep, direction, order, bndrs):
 #    DXu = np.reshape(D[0] * u.flatten('F'), u.shape, order = 'F')
 #    
 #    ''''
-
+    
+    # TODO central differences
     # TODO labelling the output matrices i.e, DX, DY
     
     allMat = dict.fromkeys((range(len(discStep))))
@@ -52,18 +48,18 @@ def GradOper(size, discStep, direction, order, bndrs):
                 
                 mat = 1/discStep[i] * sp.spdiags(np.vstack([-np.ones((1,size[i])),np.ones((1,size[i]))]), [0,1], size[i], size[i], format = 'lil')
 
-                if bndrs == 'Neumann':
+                if bndrs == 'Neum':
                     mat[-1,:] = 0
-                elif bndrs == 'Periodic':
+                elif bndrs == 'Per':
                     mat[-1,0] = 1
 
             elif direction == 'back':
                 
                 mat = 1/discStep[i] * sp.spdiags(np.vstack([-np.ones((1,size[i])),np.ones((1,size[i]))]), [-1,0], size[i], size[i], format = 'lil')
 
-                if bndrs == 'Neumann':
+                if bndrs == 'Neum':
                     mat[:,-1] = 0
-                elif bndrs == 'Periodic':
+                elif bndrs == 'Per':
                     mat[0,-1] = -1
                                      
             tmpGrad = mat if i == 0 else sp.eye(size[0])
@@ -89,17 +85,17 @@ def GradOper(size, discStep, direction, order, bndrs):
                 mat[i] = 1/discStep[i] * sp.spdiags(np.vstack([-np.ones((1,size[i])),np.ones((1,size[i]))]), [0,1], size[i], size[i], format = 'lil')
                 mat1[i] = 1/discStep[i] * sp.spdiags(np.vstack([-np.ones((1,size[i])),np.ones((1,size[i]))]), [0,1], size[i], size[i], format = 'lil')
             
-            if bndrs == 'Neumann':
+            if bndrs == 'Neum':
                 mat[i][-1,:] = 0 # zero last row
                 mat1[i][:,0] = 0 # zero first col
                 
-            if bndrs == 'Periodic':
+            if bndrs == 'Per':
                 mat[i][-1,0] = 1 # zero last row
                 mat1[i][-1,0] = 1 # zero first col                 
                                                   
         for i in range(0,len(discStep)):
                         
-            if bndrs == 'Neumann':
+            if bndrs == 'Neum':
                 tmpGrad1 = -mat1[i].T                 
                 tmpGrad = -mat[i].T * mat[i] if i == 0 else sp.eye(size[0])
             
@@ -107,7 +103,7 @@ def GradOper(size, discStep, direction, order, bndrs):
                     tmpGrad = sp.kron(-mat[j].T * mat[j], tmpGrad ) if j == i else sp.kron(sp.eye(size[j]), tmpGrad )
                     tmpGrad1 = sp.kron(tmpGrad1,mat[j-1]) if j == i else sp.kron(mat[j], tmpGrad1)
                                                   
-            if bndrs == 'Periodic': 
+            if bndrs == 'Per': 
                 tmpGrad1 = mat1[i]
                 tmpGrad = -mat[i].T * mat[i] if i == 0 else sp.eye(size[0])
               
@@ -123,66 +119,94 @@ def GradOper(size, discStep, direction, order, bndrs):
                                                
         allMat.update(allMat1)
 
-    return allMat #######  H22, H11, H12, H21  
+    return allMat #######  H22, H11, H12, H21   
+                
+def TV_cvx(u):
+        
+    discStep = np.ones(len(u.shape))
+    tmp = GradOper(u.shape, discStep, direction = 'for', order = '1', bndrs = 'Neum')    
+    DX, DY = tmp[1], tmp[0]
+  
+    return sum(norm(vstack([DX * vec(u), DY * vec(u)]), 2, axis = 0))
 
+def L2GradientSq(u):
+        
+    discStep = np.ones(len(u.shape))
+    tmp = GradOper(u.shape, discStep, direction = 'for', order = '1', bndrs = 'Neum')    
+    DX, DY = tmp[1], tmp[0]
+  
+    return sum_squares(norm(vstack([DX * vec(u), DY * vec(u)]), 2, axis = 0))
 
-if __name__ == '__main__':
+def tv2(u):
+        
+    discStep = np.ones(len(u.shape))
+    tmp = GradOper(u.shape, [1,1], 'for', '2', 'Neum')
+    H11, H22, H12, H21 = tmp[1], tmp[0], tmp[2], tmp[3]
+    return sum(norm(vstack([H11 * vec(u), H22 * vec(u), H12 * vec(u), H21 * vec(u)]), 2, axis = 0))
+
+def ictv(u, v, alpha0, alpha1):
     
+    discStep = np.ones(len(u.shape))
+    tmp0 = GradOper(u.shape, discStep, 'for', '1', 'Neum') 
+    tmp1 = GradOper(u.shape, discStep, 'for', '2', 'Neum')
+    DX, DY = tmp0[1], tmp0[0]
+    H11, H22, H12, H21 = tmp1[1], tmp1[0], tmp1[2], tmp1[3]
+    return alpha0 * sum(norm(vstack([DX * vec(u), DY * vec(u)]), 2, axis = 0))  + \
+           alpha1 * sum(norm(vstack([H11 * vec(v), H22 * vec(v), H12 * vec(v), H21 * vec(v)]), 2, axis = 0))
     
-    # Compare Forward difference with Sparse Matrices represent the finite differences
+
+def tv_funVec(variable_cvx, method):
     
-    #2D  forward
-    u = ImageData(np.random.randint(10, size = (4,5)))
+#    Ref: See "Collaborative Total Variation: A General Framework for Vectorial TV Models"
+        
+    if method == 'aniso':
+        tmp = 0
+        for i in range(0,len(variable_cvx)):
+            tmp += tv_fun(variable_cvx[i])
+        return tmp
     
-    forGrad = GradOper(u.shape, [1]*len(u.shape), direction = 'for', order = '1', bndrs = 'Neumann')
+    if  method == 'iso':
+        tmp = []
+        for i in range(0, len(variable_cvx)):
+            tmp.append(tv_fun(variable_cvx[i]))      
+        return sum( norm(vstack(tmp), 2, axis = 0 ))
     
-    grad_sparse = np.zeros((len(u.shape),)+u.shape)
-    for i in range(len(u.shape)):
-        grad_sparse[i] = np.reshape(forGrad[i]*u.as_array().flatten('F'), u.shape, 'F')
+    if method == 'isol2':
+        
+        discStep = [1, 1]
+        grad = GradOper(variable_cvx[0].shape, discStep, direction = 'for', order = '1', bndrs = 'Neum')            
+        
+        tmp = []
+        for i in range(0, len(variable_cvx)):
+            for j in range(0, len(grad)):
+                tmp.append(grad[j]*vec(variable_cvx[i]))
+        return sum(norm(vstack(tmp), 2, axis = 0))
+    
+    if method == 'anis_linf':
+        
+        discStep = [1, 1]
+        grad = GradOper(variable_cvx[0].shape, discStep, direction = 'for', order = '1', bndrs = 'Neum')            
+                
+        a = 0
+        for j in range(0, len(grad)):
+            tmp = []
+            for i in range(0, len(variable_cvx)):
+                tmp.append(grad[j]*vec(variable_cvx[i]))
+            a += sum(norm ( vstack(tmp), 'inf')) 
             
-    G = Gradient(u.shape)
-    
-    z = G.direct(u)
-    
-    np.testing.assert_array_equal(grad_sparse, z.as_array())
-    
-    #3D forward
-    u1 = ImageData(np.random.randint(10, size = (2,2,3)))
-    
-    forGrad1 = GradOper(u1.shape, [1]*len(u1.shape), direction = 'for', order = '1', bndrs = 'Periodic')
-    
-    grad_sparse1 = np.zeros((len(u1.shape),)+u1.shape)
-    for i in range(len(u1.shape)):
-        grad_sparse1[i] = np.reshape(forGrad1[i]*u1.as_array().flatten('F'), u1.shape, 'F')
-            
-    G1 = Gradient(u1.shape, bnd_cond='Periodic')
-    
-    z1 = G1.direct(u1)
-    
-    np.testing.assert_array_equal(grad_sparse1, z1.as_array())  
-    
-    
-    # Compute preconditioning sigma, tau 
-    # ref: http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.381.6056&rep=rep1&type=pdf
-    
-    u2 = ImageData(np.random.randint(10, size = (2,3)))
-    
-    forGrad2 = GradOper(u2.shape, [1]*len(u2.shape), direction = 'for', order = '1', bndrs = 'Neumann')
-    
-    tau = np.zeros(u2.shape)
-    sigma = np.zeros((len(u2.shape),)+u2.shape)
-    for i in range(len(forGrad2)):        
-        tau +=  np.reshape(np.abs(forGrad2[i]).sum(axis=0), u2.shape, 'F')
-        sigma[i] = np.reshape(np.abs(forGrad2[i]).sum(axis=1), u2.shape, 'F')
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+        return a      
+        
+        
+def tgv(u, w1, w2, alpha0, alpha1):
 
+    discStep = np.ones(len(u.shape))
+    tmp = GradOper(u.shape, discStep, direction = 'for', order = '1', bndrs = 'Neum') 
+    DX, DY = tmp[1], tmp[0]
+    
+    tmp1 = GradOper(u.shape, discStep, direction = 'back', order = '1', bndrs = 'Neum')    
+    divX, divY = tmp1[1], tmp1[0]
+  
+    return alpha0 * sum(norm(vstack([DX * vec(u) - vec(w1), DY * vec(u) - vec(w2)]), 2, axis = 0)) + \
+           alpha1 * sum(norm(vstack([ divX * vec(w1), divY * vec(w2), \
+                                      0.5 * ( divX * vec(w2) + divY * vec(w1) ), \
+                                      0.5 * ( divX * vec(w2) + divY * vec(w1) ) ]), 2, axis = 0  ) )

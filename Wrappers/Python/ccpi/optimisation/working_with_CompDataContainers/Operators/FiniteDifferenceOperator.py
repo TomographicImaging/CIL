@@ -6,7 +6,7 @@ Created on Fri Mar  1 22:51:17 2019
 @author: evangelos
 """
 
-from operators import Operator
+from Operators.operators import Operator
 from ccpi.optimisation.ops import PowerMethodNonsquare
 from ccpi.framework import ImageData, DataContainer
 import numpy as np

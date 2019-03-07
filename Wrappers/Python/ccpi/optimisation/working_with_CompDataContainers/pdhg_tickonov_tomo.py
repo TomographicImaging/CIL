@@ -26,7 +26,7 @@ from Operators.AstraProjectorSimpleOperator import AstraProjectorSimple
 from Functions.FunctionComposition import FunctionComposition_new
 from Functions.mixed_L12Norm import mixed_L12Norm
 from Functions.L2NormSquared import L2NormSq
-#from Functions.ZeroFun import ZeroFun
+from Functions.ZeroFun import ZeroFun
 
 from skimage.util import random_noise
 
@@ -74,8 +74,8 @@ op2 = Aop
 operator = CompositeOperator((2,1), op1, op2 ) 
 
 alpha = 50
-f = FunctionComposition_new(operator, mixed_L12Norm(alpha), \
-                                     L2NormSq(0.5, b = noisy_data) )
+f = FunctionComposition_new(operator, L2NormSq(alpha), \
+                                      L2NormSq(0.5, b = noisy_data) )
 g = ZeroFun()
 
 # Compute operator Norm
@@ -84,7 +84,7 @@ normK = operator.norm()
 #%%
 ## Primal & dual stepsizes
 #
-sigma = 10
+sigma = 1
 tau = 1/(sigma*normK**2)
 
 ##%%
@@ -94,75 +94,94 @@ opt = {'niter':1000}
 #### Run algorithm
 res, total_time, objective = PDHG(f, g, operator, \
                                   tau = tau, sigma = sigma, opt = opt)
-#%%
-####Show results
+#%% #Show results
 sol = res.get_item(0).as_array()
-###solution = res.as_array()
-###
+
 plt.imshow(sol)
 plt.colorbar()
 plt.show()
-##
+
 ####
-#plt.imshow(noisy_data.as_array())
-#plt.colorbar()
-#plt.show()
+plt.imshow(noisy_data.as_array())
+plt.colorbar()
+plt.show()
 ###
 plt.plot(np.linspace(0,N,N), data.as_array()[int(N/2),:], label = 'GTruth')
 plt.plot(np.linspace(0,N,N), sol[int(N/2),:], label = 'Recon')
 plt.legend()
 plt.show()
 #%% CVX TV - tomo solution
-
+#
 try_cvx = input("Do you want CVX comparison (0/1)")
-
+#
 if try_cvx=='0':
-
+#
     from cvxpy import *
     import sys
     sys.path.insert(0,'/Users/evangelos/Desktop/Projects/CCPi/CCPi-Framework/Wrappers/Python/ccpi/optimisation/cvx_scripts')
-    from cvx_functions import TV_cvx
-
+    from cvx_functions import L2GradientSq
+#
     # Create volume, geometry,
     vol_geom = astra.create_vol_geom(N, N)
     proj_geom = astra.create_proj_geom('parallel', 1.0, 100, np.linspace(0,np.pi,100,False))
-
-    # create projector
+#
+#    # create projector
     proj_id = astra.create_projector('strip', proj_geom, vol_geom)
-
-    # create sinogram
+#
+#    # create sinogram
     sin_id, sin = astra.create_sino(data.as_array(), proj_id, 'False') 
-
-    # create projection matrix
+#
+#    # create projection matrix
     matrix_id = astra.projector.matrix(proj_id)
-
-    # Get the projection matrix as a Scipy sparse matrix.
+#
+#    # Get the projection matrix as a Scipy sparse matrix.
     ProjMat = astra.matrix.get(matrix_id)
 
-
-    alpha_tvCT = alpha
-
-    # Define the problem
-    u_tvCT = Variable( N*N, 1)
+    u = Variable( N*N, 1)
     z = noisy_data.as_array().ravel()
-    obj_tvCT =  Minimize( 0.5 * sum_squares(ProjMat * u_tvCT - z) + \
-                        alpha_tvCT * tv(reshape(u_tvCT, (N,N))) )
-    #
-    prob_tvCT = Problem(obj_tvCT)
-    #
-    ## Choose solver, SCS is fast but less accurate than MOSEK
-    ##res_tvCT = prob_tvCT.solve(verbose = True,solver = SCS,eps=1e-12)
-    res_tvCT = prob_tvCT.solve(verbose = True, solver = MOSEK)
-    #
-    #print()
-    print('Objective value is {} '.format(obj_tvCT.value))
+    fidelity = 0.5 * sum_squares(ProjMat * u - z)
+    regulariser = alpha * L2GradientSq(reshape(u, (N,N)))  
+    solver = MOSEK
+    obj =  Minimize( regulariser +  fidelity)
+    constraints = []
+    prob = Problem(obj, constraints)
 
-    diff_pdhg_cvx = np.abs(np.reshape(u_tvCT.value, (N,N)) - sol)
+    # Choose solver (SCS is fast but less accurate than MOSEK)
+    res = prob.solve(verbose = True, solver = solver)
+    print()
+    print('Objective value is {} '.format(obj.value))
+    
+#    # Define the problem
+#    u_tvCT = Variable( N*N, 1)
+#    z = noisy_data.as_array().ravel()
+#    obj_tvCT =  Minimize( 0.5 * sum_squares(ProjMat * u_tvCT - z) + \
+#                        alpha_tvCT * tv(reshape(u_tvCT, (N,N))) )
+#    #
+#    prob_tvCT = Problem(obj_tvCT)
+#    #
+#    ## Choose solver, SCS is fast but less accurate than MOSEK
+#    ##res_tvCT = prob_tvCT.solve(verbose = True,solver = SCS,eps=1e-12)
+#    res_tvCT = prob_tvCT.solve(verbose = True, solver = MOSEK)
+#    #
+#    #print()
+#    print('Objective value is {} '.format(obj_tvCT.value))
+#
+    diff_pdhg_cvx = np.abs(np.reshape(u.value, (N,N)) - sol)
     plt.imshow(diff_pdhg_cvx)
     plt.colorbar()
     plt.show()
-    #
-    plt.plot(np.linspace(0,N,N), np.reshape(u_tvCT.value, (N,N))[int(N/2),:], label = 'CVX')
+#    #
+    plt.plot(np.linspace(0,N,N), np.reshape(u.value, (N,N))[int(N/2),:], label = 'CVX')
     plt.plot(np.linspace(0,N,N), sol[int(N/2),:], label = 'PDHG')
     plt.legend()
     plt.show()
+    
+    plt.imshow(np.reshape(u.value, (N,N)))
+    plt.colorbar()
+    plt.show()
+    
+    plt.imshow(sol)
+    plt.colorbar()
+    plt.show()    
+    
+    

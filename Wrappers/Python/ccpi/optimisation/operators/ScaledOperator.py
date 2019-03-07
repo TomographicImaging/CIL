@@ -12,3 +12,12 @@ class ScaledOperator(LinearOperator):
     def adjoint(self, x, out=None):
         if self.operator.is_linear():
             return self.scalar * self.operator.adjoint(x, out=out)
+    def size(self):
+        return self.operator.size()
+    def norm(self):
+        return self.operator.norm()
+    def range_geometry(self):
+        return self.operator.range_geometry()
+    def domain_geometry(self):
+        return self.operator.domain_geometry()
+    

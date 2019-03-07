@@ -19,7 +19,7 @@ from ccpi.framework import BlockDataContainer
 import functools
 
 class TestBlockDataContainer(unittest.TestCase):
-    def test_BlockDataContainerShape(self):
+    def skiptest_BlockDataContainerShape(self):
         print ("test block data container")
         ig0 = ImageGeometry(2,3,4)
         ig1 = ImageGeometry(12,42,55,32)
@@ -34,7 +34,7 @@ class TestBlockDataContainer(unittest.TestCase):
         cp1 = BlockDataContainer(data2,data3)
         transpose_shape = (cp0.shape[1], cp0.shape[0])
         self.assertTrue(cp0.T.shape == transpose_shape)
-    def test_BlockDataContainerShapeArithmetic(self):
+    def skiptest_BlockDataContainerShapeArithmetic(self):
         print ("test block data container")
         ig0 = ImageGeometry(2,3,4)
         ig1 = ImageGeometry(12,42,55,32)

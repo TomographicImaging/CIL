@@ -16,17 +16,24 @@ import functools
 #from ccpi.optimisation.operators import Operator, LinearOperator
  
 class BlockDataContainer(object):
-    '''Class to hold DataContainers as blocks'''
+    '''Class to hold DataContainers as column vector'''
     __array_priority__ = 1
     def __init__(self, *args, **kwargs):
-        '''containers must be passed row by row'''
+        '''containers must be consistent in shape'''
         self.containers = args
+        for i, co in enumerate(args):
+            if i == 0:
+                shape = co.shape
+            else:
+                if shape != co.shape:
+                    raise ValueError('Expected shape is {} got {}'.format(shape, co.shape))
         self.index = 0
-        shape = kwargs.get('shape', None)
-        if shape is None:
-            shape = (len(args),1)
+        #shape = kwargs.get('shape', None)
+        #if shape is None:
+        #   shape = (len(args),1)
+        shape = (len(args),1)
         self.shape = shape
-        print (self.shape)
+        #print (self.shape)
         n_elements = functools.reduce(lambda x,y: x*y, shape, 1)
         if len(args) != n_elements:
             raise ValueError(
@@ -65,14 +72,12 @@ class BlockDataContainer(object):
         elif isinstance(other, numpy.ndarray):
             return self.shape == other.shape
         return len(self.containers) == len(other.containers)
-    def get_item(self, row, col=0):
+    def get_item(self, row):
         if row > self.shape[0]:
             raise ValueError('Requested row {} > max {}'.format(row, self.shape[0]))
-        if col > self.shape[1]:
-            raise ValueError('Requested col {} > max {}'.format(col, self.shape[1]))
-        
-        index = row*self.shape[1]+col
-        return self.containers[index]
+        return self.containers[row]
+    def __getitem__(self, row):
+        return self.get_item(row)
                 
     def add(self, other, *args, **kwargs):
         assert self.is_compatible(other)
@@ -96,6 +101,7 @@ class BlockDataContainer(object):
                           shape=self.shape)
 
     def multiply(self, other, *args, **kwargs):
+        print ("BlockDataContainer" , other)
         self.is_compatible(other)
         out = kwargs.get('out', None)
         if isinstance(other, Number):
@@ -302,8 +308,8 @@ class BlockDataContainer(object):
     def __itruediv__(self, other):
         '''Inline truedivision'''
         return self.__idiv__(other)
-    @property
-    def T(self):
-       '''return the transposed of self'''
-       shape = (self.shape[1], self.shape[0])
-       return type(self)(*self.containers, shape=shape)
+    #@property
+    #def T(self):
+    #   '''return the transposed of self'''
+    #   shape = (self.shape[1], self.shape[0])
+    #   return type(self)(*self.containers, shape=shape)

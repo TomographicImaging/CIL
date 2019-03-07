@@ -10,7 +10,7 @@ from numbers import Number
 import functools
 from ccpi.framework import AcquisitionData, ImageData, BlockDataContainer
 from ccpi.optimisation.operators import Operator, LinearOperator
-
+from ccpi.optimisation.operators.BlockScaledOperator import BlockScaledOperator
 
        
 class BlockOperator(Operator):
@@ -18,7 +18,13 @@ class BlockOperator(Operator):
 
     Class to hold a number of Operators in a block. 
     User may specify the shape of the block, by default is a row vector
+    
+    BlockOperators have a generic shape M x N, and when applied on an 
+    Nx1 BlockDataContainer, will yield and Mx1 BlockDataContainer.
+    Notice: BlockDatacontainer are only allowed to have the shape of N x 1, with
+    N rows and 1 column.
     '''
+    __array_priority__ = 1
     def __init__(self, *args, **kwargs):
         '''
         Class creator
@@ -66,11 +72,9 @@ class BlockOperator(Operator):
     
     def direct(self, x, out=None):
         shape = self.get_output_shape(x.shape)
-        print ("direct output shape", shape)
         res = []
         for row in range(self.shape[0]):
             for col in range(self.shape[1]):
-                print ("row {} col {}".format(row, col))
                 if col == 0:
                     prod = self.get_item(row,col).direct(x.get_item(col))
                 else:
@@ -79,7 +83,6 @@ class BlockOperator(Operator):
         return BlockDataContainer(*res, shape=shape)
     
     def get_output_shape(self, xshape, adjoint=False):
-        print ("get_output_shape", self.shape, xshape)
         sshape = self.shape[1]
         oshape = self.shape[0]
         if adjoint:
@@ -104,7 +107,9 @@ class BlockOperator(Operator):
             scalars = [scalar for _ in self.operators]
         # create a list of ScaledOperator-s
         ops = [ v * op for v,op in zip(scalars, self.operators)]
-        return BlockOperator(*ops, shape=self.shape)
+        #return BlockScaledOperator(self, scalars ,shape=self.shape)
+        return type(self)(*ops, shape=self.shape)
+    @property
     def T(self):
         '''Return the transposed of self'''
         shape = (self.shape[1], self.shape[0])

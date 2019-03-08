@@ -34,7 +34,8 @@ setup(
     packages=['ccpi' , 'ccpi.io', 
               'ccpi.framework', 'ccpi.optimisation', 
               'ccpi.optimisation.operators',
-              'ccpi.optimisation.algorithms'],
+              'ccpi.optimisation.algorithms',
+              'ccpi.optimisation.functions'],
 
     # Project uses reStructuredText, so ensure that the docutils get
     # installed or upgraded on the target machine

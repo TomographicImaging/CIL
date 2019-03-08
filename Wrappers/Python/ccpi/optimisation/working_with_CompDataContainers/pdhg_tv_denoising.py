@@ -15,16 +15,15 @@ from cvxpy import *
 
 from Algorithms import PDHG
 
-from Operators import CompositeOperator, Identity, Gradient
-from Functions import ZeroFun, L2NormSq, mixed_L12Norm, FunctionComposition_new
+from Operators import CompositeOperator, Identity, Gradient, CompositeDataContainer
+from Functions import ZeroFun, L2NormSq, mixed_L12Norm, FunctionOperatorComposition, BlockFunction
 
 from skimage.util import random_noise
-
 
 #%%############################################################################
 # Create phantom for TV denoising
 
-N = 100
+N = 200
 data = np.zeros((N,N))
 data[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
 data[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 1
@@ -39,8 +38,7 @@ noisy_data = ImageData(n1)
 # Regularisation Parameter
 alpha = 2
 
-#method = input("Enter structure of PDHG (0=Composite or 1=NotComposite): ")
-method = '0'
+method = input("Enter structure of PDHG (0=Composite or 1=NotComposite): ")
 
 if method == '0':
 
@@ -52,17 +50,22 @@ if method == '0':
     operator = CompositeOperator((2,1), op1, op2 ) 
 
     #### Create functions
-    f = FunctionComposition_new(operator, mixed_L12Norm(alpha), \
-                                    L2NormSq(0.5, b = noisy_data) )
-
+#    f = FunctionComposition_new(operator, mixed_L12Norm(alpha), \
+#                                    L2NormSq(0.5, b = noisy_data) )    
+    
+    f1 = mixed_L12Norm(alpha)
+    f2 = L2NormSq(0.5, b = noisy_data)
+    
+    f = BlockFunction( operator, f1, f2 )                                        
     g = ZeroFun()
     
 else:
+    
     ###########################################################################
     #         No Composite #
     ###########################################################################
     operator = Gradient(ig)
-    f = FunctionComposition_new(operator, mixed_L12Norm(alpha))
+    f = FunctionOperatorComposition(operator, mixed_L12Norm(alpha))
     g = L2NormSq(0.5, b=noisy_data)
     ###########################################################################
 #%%

@@ -13,23 +13,12 @@ import numpy as np
 from numpy import inf
 import matplotlib.pyplot as plt
 from cvxpy import *
-from skimage.util import random_noise
-import scipy.misc
-from skimage.transform import resize
 
-
-from Algorithms.PDHG import PDHG
-from Operators.CompositeOperator_DataContainer import CompositeOperator, CompositeDataContainer
-from Operators.IdentityOperator import *
-from Operators.GradientOperator import Gradient
-from Operators.SymmetrizedGradientOperator import SymmetrizedGradient
-from Operators.ZeroOperator import ZeroOp
-
-from Functions.FunctionComposition import FunctionComposition_new
-from Functions.mixed_L12Norm import mixed_L12Norm
-from Functions.L2NormSquared import L2NormSq
-from Functions.ZeroFun import ZeroFun
-
+from Algorithms import PDHG
+from Operators import CompositeOperator, Identity, Gradient, \
+                     SymmetrizedGradient, CompositeDataContainer, ZeroOp
+from Functions import ZeroFun, L2NormSq, mixed_L12Norm, \
+                      FunctionOperatorComposition, BlockFunction
 
 from skimage.util import random_noise
 
@@ -56,10 +45,6 @@ plt.show()
 
 #%%
 # Add noise
-#np.random.seed(10)
-#z = np.random.random((N,N))
-#n1 = phantom + 0.25 * z
-#n1 = phantom + 0.4 * phantom.std() * np.random.random(phantom.shape)
 
 n1 = random_noise(phantom, mode='gaussian', seed=10)
 noisy_data = ImageData(n1)
@@ -79,16 +64,16 @@ ZeroOp1 = ZeroOp( ig, SymGrad.range_dim())
 ZeroOp2 = ZeroOp( SymGrad.domain_dim(), ag)
 Aop = Identity(ig, ag)
 
-#method = input("Enter structure of PDHG (0=Composite or 1=NotComposite): ")
-method = '1'
+method = input("Enter structure of PDHG (0=Composite or 1=NotComposite): ")
+
 if method == '0':
     # Define block operator
     operator = CompositeOperator( (3,2), Grad, -1*Id1,\
                                          ZeroOp1, SymGrad,\
                                          Aop, ZeroOp2)
 
-    f = FunctionComposition_new(operator, mixed_L12Norm(alpha), \
-                                          mixed_L12Norm(beta, sym_grad=True),\
+    f = BlockFunction(operator, mixed_L12Norm(alpha), \
+                                mixed_L12Norm(beta, sym_grad=True),\
                                           L2NormSq(0.5, b=noisy_data) )
     g = ZeroFun()
     
@@ -101,10 +86,10 @@ else:
     
     operator1 = CompositeOperator( (2,1), Aop, ZeroOp1)
     
-    f = FunctionComposition_new(operator, mixed_L12Norm(alpha), \
+    f = BlockFunction(operator, mixed_L12Norm(alpha), \
                                           mixed_L12Norm(beta, sym_grad=True))  
     
-    g = FunctionComposition_new(operator1, L2NormSq(0.5, b=noisy_data), \
+    g = BlockFunction(operator1, L2NormSq(0.5, b=noisy_data), \
                                            ZeroFun())      
 
         

@@ -295,7 +295,7 @@ class FiniteDiff(Operator):
             raise NotImplementedError
             
         res = out
-        return -res
+        return res
             
     def range_dim(self):
         return self.gm_range
@@ -307,3 +307,8 @@ class FiniteDiff(Operator):
         x0 = ImageData(np.random.random_sample(self.domain_dim()))
         self.s1, sall, svec = PowerMethodNonsquare(self, 25, x0)
         return self.s1
+    
+    
+
+    
+    

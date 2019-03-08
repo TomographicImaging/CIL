@@ -44,21 +44,15 @@ class L1Norm(SimpleL1Norm):
         
         super(L1Norm, self).__init__()         
         self.alpha = alpha 
-        
-        self.A = kwargs.get('A',None)
         self.b = kwargs.get('b',None)
         
     def __call__(self, x):
         
         if self.b is None:
-            return SimpleL1Norm.__call__(self, self.A.direct(x))
+            return SimpleL1Norm.__call__(self, x)
         else:
-            return SimpleL1Norm.__call__(self, self.A.direct(x) - self.b)
-        
-    def eval_norm(self, x):
-        
-        return SimpleL1Norm.__call__(self, x)        
-    
+            return SimpleL1Norm.__call__(self, x - self.b)
+            
     def gradient(self, x):
         return ValueError('Not Differentiable')
             
@@ -73,7 +67,7 @@ class L1Norm(SimpleL1Norm):
         if self.b is None:
             return SimpleL1Norm.proximal(self, x, tau)
         else:
-            return self.b + SimpleL1Norm.proximal(self, x + self.b , tau)
+            return self.b + SimpleL1Norm.proximal(self, x - self.b , tau)
         
     def proximal_conjugate(self, x, tau):
         

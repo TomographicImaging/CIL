@@ -6,11 +6,14 @@ Created on Fri Mar  1 22:53:55 2019
 @author: evangelos
 """
 
-from operators import Operator
+from Operators.FiniteDifferenceOperator import FiniteDiff
+from Operators.operators import Operator
+#from operators import Operator
 from ccpi.optimisation.ops import PowerMethodNonsquare
 from ccpi.framework import ImageData, DataContainer
 import numpy as np
-from FiniteDifferenceOperator import FiniteDiff
+#fro
+#from FiniteDifferenceOperator import FiniteDiff
 
 class SymmetrizedGradient(Operator):
     

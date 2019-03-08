@@ -1,10 +1,6 @@
-# -*- coding: utf-8 -*-
-
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import numpy as np
-import numpy
 from ccpi.framework import DataContainer, ImageData, ImageGeometry, AcquisitionData
 from ccpi.astra.processors import AstraForwardProjector, AstraBackProjector
 from ccpi.optimisation.ops import PowerMethodNonsquare

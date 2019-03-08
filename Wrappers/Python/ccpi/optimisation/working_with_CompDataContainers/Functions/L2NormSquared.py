@@ -25,6 +25,9 @@ class SimpleL2NormSq(Function):
         super(SimpleL2NormSq, self).__init__()         
         self.alpha = alpha
         
+        # Lispchitz constant of gradient
+        self.L = 2*self.alpha
+        
     def __call__(self, x):
         return self.alpha * x.power(2).sum()
     
@@ -48,8 +51,7 @@ class L2NormSq(SimpleL2NormSq):
                  
         super(L2NormSq, self).__init__(alpha)
         self.alpha = alpha
-        self.b = kwargs.get('b',None)
-        self.L = 1        
+        self.b = kwargs.get('b',None)              
         
     def __call__(self, x):
         
@@ -64,14 +66,7 @@ class L2NormSq(SimpleL2NormSq):
             return 2*self.alpha * x 
         else:
             return 2*self.alpha * (x - self.b) 
-                    
-    def composition_with(self, operator):        
-        
-        if self.b is None:
-            return FunctionComposition(L2NormSq(self.alpha), operator)
-        else:
-            return FunctionComposition(L2NormSq(self.alpha, b=self.b), operator)
-                                             
+                                                                 
     def convex_conjugate(self, x):
         
         ''' The convex conjugate corresponds to the simple functional i.e., 

@@ -9,6 +9,8 @@ Created on Wed Mar  6 19:30:51 2019
 import numpy as np
 from ccpi.framework import ImageData
 from Operators.operators import Operator
+#from operators import Operator
+#from Operators import Operator
 
 class Identity(Operator):
     

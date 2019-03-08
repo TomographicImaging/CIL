@@ -12,7 +12,7 @@ from ccpi.astra.processors import AstraForwardProjector, AstraBackProjector
 from ccpi.optimisation.ops import PowerMethodNonsquare
 #from numbers import Number
 #import functools
-from operators import Operator
+from Operators.operators import Operator
 
 class AstraProjectorSimple(Operator):
     

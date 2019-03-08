@@ -7,8 +7,8 @@ from ccpi.framework import DataContainer, ImageData, ImageGeometry, AcquisitionD
 from ccpi.astra.processors import AstraForwardProjector, AstraBackProjector
 from ccpi.optimisation.ops import PowerMethodNonsquare
 
-from operators import Operator
-from CompositeDataContainer import CompositeDataContainer
+from Operators.operators import Operator
+from Operators.CompositeDataContainer import CompositeDataContainer
 
 from numbers import Number
 import functools

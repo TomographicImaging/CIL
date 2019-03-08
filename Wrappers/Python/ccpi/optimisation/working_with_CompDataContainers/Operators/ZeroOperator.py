@@ -8,9 +8,7 @@ Created on Wed Mar  6 19:25:53 2019
 
 import numpy as np
 from ccpi.framework import ImageData
-from operators import Operator
-
-
+from Operators.operators import Operator
 
 class ZeroOp(Operator):
     

@@ -8,7 +8,8 @@ Created on Wed Mar  6 19:44:10 2019
 
 import numpy as np
 from ccpi.optimisation.funcs import Function
-from ccpi.framework import DataContainer, ImageData 
+from ccpi.framework import DataContainer, ImageData
+from Operators.CompositeDataContainer import CompositeDataContainer
 #from operators import CompositeDataContainer, Identity, CompositeOperator
 #from numbers import Number
 
@@ -29,7 +30,10 @@ class ZeroFun(Function):
         if x.shape[0]==1:
             return x.maximum(0).sum()
         else:
-            return x.get_item(0).maximum(0).sum() + x.get_item(1).maximum(0).sum()
+            if isinstance(x, CompositeDataContainer):
+                return x.get_item(0).maximum(0).sum() + x.get_item(1).maximum(0).sum()
+            else:
+                return x.maximum(0).sum() + x.maximum(0).sum()
     
     def proximal(self,x,tau):
         return x.copy()

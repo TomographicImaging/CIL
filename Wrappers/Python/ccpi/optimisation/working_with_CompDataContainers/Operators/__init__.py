@@ -17,6 +17,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+
 from .operators import Operator
 from .CompositeOperator import CompositeOperator
 from .CompositeDataContainer import CompositeDataContainer
@@ -25,3 +26,14 @@ from .GradientOperator import Gradient
 from .SymmetrizedGradientOperator import SymmetrizedGradient
 from .IdentityOperator import Identity
 from .ZeroOperator import ZeroOp
+from .AstraProjectorSimpleOperator import AstraProjectorSimple
+
+
+
+#import operators.Operator
+
+#from .operators import Operator
+#from .CompositeOperator import CompositeOperator
+#from .CompositeDataContainer import CompositeDataContainer
+
+

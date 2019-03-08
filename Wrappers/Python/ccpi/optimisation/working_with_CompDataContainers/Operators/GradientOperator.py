@@ -49,7 +49,7 @@ class Gradient(Operator):
         tmp = np.zeros(self.gm_domain)
         for i in range(len(self.gm_domain)):
             tmp+=FiniteDiff(self.gm_domain, direction = i, bnd_cond = self.bnd_cond).adjoint(x.as_array()[i])/self.voxel_size[i]  
-        return type(x)(tmp)
+        return type(x)(-tmp)
         
     def alloc_domain_dim(self):
         return ImageData(np.zeros(self.gm_domain))
@@ -74,7 +74,7 @@ class Gradient(Operator):
     
 if __name__ == '__main__':
     
-    N, M = (2,3)
+    N, M = (200,300)
     ig = (N,M)
     G = Gradient(ig)
     u = DataContainer(np.random.randint(10, size=G.domain_dim()))
@@ -102,6 +102,8 @@ if __name__ == '__main__':
 #    
     print(LHS,RHS)
     print(G.norm())
+    
+#    print(G.adjoint(G.direct(u)))
     
       
     

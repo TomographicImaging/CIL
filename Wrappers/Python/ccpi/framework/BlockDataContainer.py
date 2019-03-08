@@ -19,14 +19,8 @@ class BlockDataContainer(object):
     '''Class to hold DataContainers as column vector'''
     __array_priority__ = 1
     def __init__(self, *args, **kwargs):
-        '''containers must be consistent in shape'''
+        ''''''
         self.containers = args
-        for i, co in enumerate(args):
-            if i == 0:
-                shape = co.shape
-            else:
-                if shape != co.shape:
-                    raise ValueError('Expected shape is {} got {}'.format(shape, co.shape))
         self.index = 0
         #shape = kwargs.get('shape', None)
         #if shape is None:
@@ -38,7 +32,7 @@ class BlockDataContainer(object):
         if len(args) != n_elements:
             raise ValueError(
                     'Dimension and size do not match: expected {} got {}'
-                    .format(n_elements,len(args)))
+                    .format(n_elements, len(args)))
 
         
     def __iter__(self):
@@ -60,7 +54,6 @@ class BlockDataContainer(object):
         if isinstance(other, Number):
             return True   
         elif isinstance(other, list):
-            # TODO look elements should be numbers
             for ot in other:
                 if not isinstance(ot, (Number,\
                                  numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64,\
@@ -72,10 +65,12 @@ class BlockDataContainer(object):
         elif isinstance(other, numpy.ndarray):
             return self.shape == other.shape
         return len(self.containers) == len(other.containers)
+
     def get_item(self, row):
         if row > self.shape[0]:
             raise ValueError('Requested row {} > max {}'.format(row, self.shape[0]))
         return self.containers[row]
+
     def __getitem__(self, row):
         return self.get_item(row)
                 
@@ -308,8 +303,4 @@ class BlockDataContainer(object):
     def __itruediv__(self, other):
         '''Inline truedivision'''
         return self.__idiv__(other)
-    #@property
-    #def T(self):
-    #   '''return the transposed of self'''
-    #   shape = (self.shape[1], self.shape[0])
-    #   return type(self)(*self.containers, shape=shape)
+

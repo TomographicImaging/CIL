@@ -105,46 +105,57 @@ B = BlockDataContainer(b,
 # setup a tomo identity
 Ibig = 1e5 * TomoIdentity(geometry=ig)
 Ismall = 1e-5 * TomoIdentity(geometry=ig)
+Iok = 1e1 * TomoIdentity(geometry=ig)
     
 # composite operator
 Kbig = BlockOperator(A, Ibig, shape=(2,1))
 Ksmall = BlockOperator(A, Ismall, shape=(2,1))
-    
+Kok = BlockOperator(A, Iok, shape=(2,1))
+
 #out = K.direct(X_init)
     
 f = Norm2sq(Kbig,B)
 f.L = 0.00003
     
 fsmall = Norm2sq(Ksmall,B)
-f.L = 0.00003
-    
+fsmall.L = 0.00003
+
+fok = Norm2sq(Kok,B)
+fok.L = 0.00003
+
 simplef = Norm2sq(A, b)
 simplef.L = 0.00003
     
 gd = GradientDescent( x_init=x_init, objective_function=simplef,
                      rate=simplef.L)
 gd.max_iteration = 10
-    
+
+Kbig.direct(X_init)
+Kbig.adjoint(B)
 cg = CGLS()
 cg.set_up(X_init, Kbig, B )
-cg.max_iteration = 1
+cg.max_iteration = 5
     
 cgsmall = CGLS()
 cgsmall.set_up(X_init, Ksmall, B )
-cgsmall.max_iteration = 1
+cgsmall.max_iteration = 5
     
     
 cgs = CGLS()
 cgs.set_up(x_init, A, b )
 cgs.max_iteration = 6
-# #    
+
+cgok = CGLS()
+cgok.set_up(X_init, Kok, B )
+cgok.max_iteration = 6
+# #
 #out.__isub__(B)
 #out2 = K.adjoint(out)
     
 #(2.0*self.c)*self.A.adjoint( self.A.direct(x) - self.b )
     
 for _ in gd:
-    print ("iteration {} {}".format(gd.iteration, gd.get_current_loss()))
+    print ("iteration {} {}".format(gd.iteration, gd.get_last_loss()))
     
 cg.run(10, lambda it,val: print ("iteration {} objective {}".format(it,val)))
     
@@ -152,6 +163,7 @@ cgs.run(10, lambda it,val: print ("iteration {} objective {}".format(it,val)))
     
 cgsmall.run(10, lambda it,val: print ("iteration {} objective {}".format(it,val)))
 cgsmall.run(10, lambda it,val: print ("iteration {} objective {}".format(it,val)))
+cgok.run(10, verbose=True)
 # #    for _ in cg:
 #    print ("iteration {} {}".format(cg.iteration, cg.get_current_loss()))
 # #    
@@ -164,19 +176,22 @@ cgsmall.run(10, lambda it,val: print ("iteration {} objective {}".format(it,val)
 #    print ("iteration {} {}".format(cgs.iteration, cgs.get_current_loss()))
 # #    
 fig = plt.figure()
-plt.subplot(1,5,1)
+plt.subplot(1,6,1)
 plt.imshow(Phantom.subset(vertical=0).as_array())
 plt.title('Simulated Phantom')
-plt.subplot(1,5,2)
+plt.subplot(1,6,2)
 plt.imshow(gd.get_output().subset(vertical=0).as_array())
 plt.title('Simple Gradient Descent')
-plt.subplot(1,5,3)
+plt.subplot(1,6,3)
 plt.imshow(cgs.get_output().subset(vertical=0).as_array())
 plt.title('Simple CGLS')
-plt.subplot(1,5,4)
-plt.imshow(cg.get_output().get_item(0,0).subset(vertical=0).as_array())
+plt.subplot(1,6,4)
+plt.imshow(cg.get_output().get_item(0).subset(vertical=0).as_array())
 plt.title('Composite CGLS\nbig lambda')
-plt.subplot(1,5,5)
-plt.imshow(cgsmall.get_output().get_item(0,0).subset(vertical=0).as_array())
+plt.subplot(1,6,5)
+plt.imshow(cgsmall.get_output().get_item(0).subset(vertical=0).as_array())
 plt.title('Composite CGLS\nsmall lambda')
+plt.subplot(1,6,6)
+plt.imshow(cgok.get_output().get_item(0).subset(vertical=0).as_array())
+plt.title('Composite CGLS\nok lambda')
 plt.show()

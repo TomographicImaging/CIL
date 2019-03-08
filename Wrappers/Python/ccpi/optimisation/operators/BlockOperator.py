@@ -81,6 +81,28 @@ class BlockOperator(Operator):
                     prod += self.get_item(row,col).direct(x.get_item(col))
             res.append(prod)
         return BlockDataContainer(*res, shape=shape)
+
+    def adjoint(self, x, out=None):
+        '''Adjoint operation for the BlockOperator
+
+        BlockOperator may contain both LinearOperator and Operator
+        This method exists in BlockOperator as it is not known what type of
+        Operator it will contain.
+
+        Raises: ValueError if the contained Operators are not linear
+        '''
+        if not functools.reduce(lambda x,y: x and y, self.operators.is_linear(), True):
+            raise ValueError('Not all operators in Block are linear.')
+        shape = self.get_output_shape(x.shape, adjoint=True)
+        res = []
+        for row in range(self.shape[1]):
+            for col in range(self.shape[0]):
+                if col == 0:
+                    prod = self.get_item(col,row).adjoint(x.get_item(row))
+                else:
+                    prod += self.get_item(col,row).adjoint(x.get_item(row))
+            res.append(prod)
+        return BlockDataContainer(*res, shape=shape)
     
     def get_output_shape(self, xshape, adjoint=False):
         sshape = self.shape[1]
@@ -142,22 +164,7 @@ class BlockLinearOperator(BlockOperator):
             if not op.is_linear():
                 raise ValueError('Operator {} must be LinearOperator'.format(i))
         super(BlockLinearOperator, self).__init__(*args, **kwargs)
-    
-    def adjoint(self, x, out=None):
-        '''Adjoint operation for the BlockOperator
-        
-        only available on BlockLinearOperator
-        '''
-        shape = self.get_output_shape(x.shape, adjoint=True)
-        res = []
-        for row in range(self.shape[1]):
-            for col in range(self.shape[0]):
-                if col == 0:
-                    prod = self.get_item(col,row).adjoint(x.get_item(row))
-                else:
-                    prod += self.get_item(col,row).adjoint(x.get_item(row))
-            res.append(prod)
-        return BlockDataContainer(*res, shape=shape)
+
 
 
 

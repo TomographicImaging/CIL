@@ -33,7 +33,7 @@ class SimpleL1Norm(Function):
     
     def proximal(self, x, tau):
         ''' Soft Threshold'''
-        return x.sign() * (x.abs() - tau * self.alpha).maximum(1.0)
+        return x.sign() * (x.abs() - tau * self.alpha).maximum(0)
         
     def proximal_conjugate(self, x, tau):
         return x.divide((x.abs()/self.alpha).maximum(1.0))

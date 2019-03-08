@@ -6,13 +6,6 @@ Created on Fri Mar  8 13:03:12 2019
 @author: evangelos
 """
 
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Feb 22 14:53:03 2019
-
-@author: evangelos
-"""
 
 from ccpi.framework import ImageData, ImageGeometry, \
                            AcquisitionGeometry, AcquisitionData
@@ -35,7 +28,7 @@ from skimage.util import random_noise
 #%%###############################################################################
 # Create phantom for TV tomography
 
-N = 75
+N = 100
 x = np.zeros((N,N))
 x[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
 x[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 1
@@ -58,19 +51,19 @@ plt.show()
 # Add Gaussian noise to the sinogram data
 np.random.seed(10)
 n1 = np.random.random(sin.shape)
-noisy_data = ImageData(sin.as_array() + 5*n1)
+noisy_data = ImageData(sin.as_array() + 0.25*n1)
 
 plt.imshow(noisy_data.as_array())
 plt.title('Noisy Sinogram')
 plt.colorbar()
 plt.show()
 
-alpha = 0.1
-f = FunctionOperatorComposition(Aop, L2NormSq(0.5, b=noisy_data))
-#g0 = L2NormSq(alpha)
-g0 = L1Norm(alpha)
+alpha = 80
+f = FunctionOperatorComposition(Aop, L2NormSq(0.5, b=sin))
+g0 = L2NormSq(alpha)
+#g0 = L1Norm(alpha)
 
-opt = { 'iter': 300}
+opt = { 'iter': 400}
 
 x_init = ImageData(np.zeros((N,N)))
 

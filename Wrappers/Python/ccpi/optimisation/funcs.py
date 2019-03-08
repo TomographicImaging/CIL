@@ -154,6 +154,8 @@ class Norm2sq(Function):
             self.L = 2.0*self.c*(self.A.get_max_sing_val()**2)
         except AttributeError as ae:
             pass
+        except NotImplementedError as noe:
+            pass
         
     def grad(self,x):
         #return 2*self.c*self.A.adjoint( self.A.direct(x) - self.b )

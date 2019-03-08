@@ -96,7 +96,6 @@ class BlockDataContainer(object):
                           shape=self.shape)
 
     def multiply(self, other, *args, **kwargs):
-        print ("BlockDataContainer" , other)
         self.is_compatible(other)
         out = kwargs.get('out', None)
         if isinstance(other, Number):

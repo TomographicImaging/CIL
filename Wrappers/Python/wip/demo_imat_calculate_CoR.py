@@ -30,16 +30,16 @@ from ccpi.optimisation.algs import CGLS
 
 # path to 0 degree
 pathname_0 = '/media/newhd/shared/Data/neutrondata/IMAT_beamtime_feb_2019_raw_final/RB1820541/Tomo/Angle_0.0/'
-projection_0_channel_prefix = 'IMAT00010699_Tomo_000_0'
+projection_0_channel_prefix = 'IMAT00010699_Tomo_000_'
 
 # path to 180 degree
 pathname_180 = '/media/newhd/shared/Data/neutrondata/IMAT_beamtime_feb_2019_raw_final/RB1820541/Tomo/180/'
-projection_180_channel_prefix = 'IMAT00010886_ Tomo_000_0'
+projection_180_channel_prefix = 'IMAT00010886_ Tomo_000_'
 
 # path to flats
 pathname = '/media/newhd/shared/Data/neutrondata/IMAT_beamtime_feb_2019_raw_final/RB1820541/Tomo/'
 flat_prefix = 'Flat{}'
-flat_channel_prefix = 'IMAT000{}_ Tomo_000_0'
+flat_channel_prefix = 'IMAT000{}_ Tomo_000_'
 flat_counter = 10887
 image_format = 'fits'
 
@@ -55,7 +55,13 @@ for j in range(n_channels-1):
     
     # Load a flat field image
     # generate filename
-    filename_flat = (pathname + flat_prefix + '/' + flat_channel_prefix + '{:04d}' + '.' + image_format).format(1, flat_counter, j + 1)
+    filename_flat = (pathname + 
+                     flat_prefix + 
+                     '/' + 
+                     flat_channel_prefix + 
+                     '{:05d}' + 
+                     '.' + 
+                     image_format).format(1, flat_counter, j + 1)
     
     # load flat
     flat_handler = fits.open(filename_flat)
@@ -66,7 +72,11 @@ for j in range(n_channels-1):
     
     # 0 degree
     # generate filename
-    filename_0_projection  = (pathname_0 + projection_0_channel_prefix + '{:04d}' + '.' + image_format).format(j + 1)
+    filename_0_projection  = (pathname_0 + 
+                              projection_0_channel_prefix + 
+                              '{:05d}' + 
+                              '.' + 
+                              image_format).format(j + 1)
 
     # load projection
     projection_handler = fits.open(filename_0_projection)
@@ -78,10 +88,13 @@ for j in range(n_channels-1):
     nonzero = flat_tmp > 0
     sum_image_0[nonzero] += (projection_tmp[nonzero] / flat_tmp[nonzero]) * (flat_n_triggers / projection_n_triggers)
     
-    
     # 180 degree
     # generate filename
-    filename_180_projection  = (pathname_180 + projection_180_channel_prefix + '{:04d}' + '.' + image_format).format(j + 1)
+    filename_180_projection  = (pathname_180 + 
+                                projection_180_channel_prefix + 
+                                '{:05d}' + 
+                                '.' + 
+                                image_format).format(j + 1)
 
     # load projection
     projection_handler = fits.open(filename_180_projection)
@@ -197,7 +210,11 @@ sum_image = numpy.zeros((imsize, imsize, n_angles), dtype = float)
 
 for i in range(n_angles):
     
-    filename_sum_image  = (path_to_sum_images + 'sum_image_' + projection_prefix + '.' + image_format).format(angles[i])
+    filename_sum_image  = (path_to_sum_images + 
+                           'sum_image_' + 
+                           projection_prefix + 
+                           '.' + 
+                           image_format).format(angles[i])
     
     # load projection
     projection_handler = fits.open(filename_sum_image)
@@ -247,7 +264,7 @@ for i in range(slices_to_recon.size):
     # Run CGLS algorithm and display reconstruction.
     x_CGLS, it_CGLS, timing_CGLS, criter_CGLS = CGLS(x_init, Aop, b2d, opt_CGLS)
 
-    plt.imshow(x_CGLS.array, 'cmap' = 'gray')
+    plt.imshow(x_CGLS.array, cmap = 'gray')
     plt.title('CGLS slice {}'.format(slices_to_recon[i]))
     plt.colorbar()
     plt.show()

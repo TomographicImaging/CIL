@@ -7,8 +7,8 @@ Created on Fri Feb 22 14:53:03 2019
 """
 
 from ccpi.framework import ImageData 
-import numpy as np                           
 
+import numpy as np                           
 from numpy import inf
 import matplotlib.pyplot as plt
 from cvxpy import *

@@ -50,11 +50,15 @@ class BlockFunction(Function):
     def proximal_conjugate(self, x, tau, out = None):
          
         ''' proximal_conjugate does not take into account the BlockOperator'''
-        out = [None]*self.length
+        tmp = [None]*self.length
         for i in range(self.length):
-            out[i] = self.functions[i].proximal_conjugate(x.get_item(i), tau)
-
-        return CompositeDataContainer(*out) 
+            tmp[i] = self.functions[i].proximal_conjugate(x.get_item(i), tau)
+        
+        if out is None:
+            return CompositeDataContainer(*tmp) 
+        else:
+            out = tmp
+            return CompositeDataContainer(*out)  
     
     def proximal(self, x, tau, out = None):
      

@@ -42,14 +42,21 @@ class Gradient(Operator):
         for i in range(len(self.gm_domain)):
             tmp[i] = FiniteDiff(self.gm_domain, direction = i, bnd_cond = self.bnd_cond).direct(x.as_array())/self.voxel_size[i]            
 #        return type(x)(tmp)
-        return type(x)(tmp)
+        if out is None:    
+            return type(x)(tmp)
+        else:
+            return out.fill(tmp)
     
     def adjoint(self, x, out=None):
             
         tmp = np.zeros(self.gm_domain)
         for i in range(len(self.gm_domain)):
             tmp+=FiniteDiff(self.gm_domain, direction = i, bnd_cond = self.bnd_cond).adjoint(x.as_array()[i])/self.voxel_size[i]  
-        return type(x)(-tmp)
+        if out is None:    
+            return type(x)(-tmp)
+        else:
+            return out.fill(tmp)            
+  
         
     def alloc_domain_dim(self):
         return ImageData(np.zeros(self.gm_domain))
@@ -74,7 +81,7 @@ class Gradient(Operator):
     
 if __name__ == '__main__':
     
-    N, M = (200,300)
+    N, M = (500,500)
     ig = (N,M)
     G = Gradient(ig)
     u = DataContainer(np.random.randint(10, size=G.domain_dim()))
@@ -102,6 +109,31 @@ if __name__ == '__main__':
 #    
     print(LHS,RHS)
     print(G.norm())
+    
+    ##########################################################################
+    ## with out
+    import time
+    
+    t = time.time()
+    for i in range(5000):
+        z = G.direct(u)
+        w = G.adjoint(z)
+#        print(id(z))
+    t1 = time.time()    
+    print(t1-t)    
+        
+    zout = ImageData(np.zeros((2,N,M)))
+    zout1 = ImageData(np.zeros((N,M)))
+    
+    t2 = time.time()
+    for i in range(5000):
+        G.direct(u, out=zout)
+        G.adjoint(zout, out=zout1)
+    t3 = time.time()    
+    print(t3-t2)     
+
+    
+    
     
 #    print(G.adjoint(G.direct(u)))
     

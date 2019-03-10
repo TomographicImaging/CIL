@@ -16,17 +16,11 @@ import numpy as np
 from numpy import inf
 import matplotlib.pyplot as plt
 from cvxpy import *
-from skimage.util import random_noise
 
-from Algorithms.PDHG import PDHG
-from Operators.CompositeOperator_DataContainer import CompositeOperator, CompositeDataContainer
-from Operators.GradientOperator import Gradient
-from Operators.AstraProjectorSimpleOperator import AstraProjectorSimple
+from Algorithms import PDHG
 
-from Functions.FunctionComposition import FunctionComposition_new
-from Functions.mixed_L12Norm import mixed_L12Norm
-from Functions.L2NormSquared import L2NormSq
-#from Functions.ZeroFun import ZeroFun
+from Operators import CompositeOperator, Identity, Gradient, CompositeDataContainer, AstraProjectorSimple
+from Functions import ZeroFun, L2NormSq, mixed_L12Norm, FunctionOperatorComposition, BlockFunction
 
 from skimage.util import random_noise
 
@@ -74,7 +68,7 @@ op2 = Aop
 operator = CompositeOperator((2,1), op1, op2 ) 
 
 alpha = 50
-f = FunctionComposition_new(operator, mixed_L12Norm(alpha), \
+f = BlockFunction(operator, mixed_L12Norm(alpha), \
                                      L2NormSq(0.5, b = noisy_data) )
 g = ZeroFun()
 

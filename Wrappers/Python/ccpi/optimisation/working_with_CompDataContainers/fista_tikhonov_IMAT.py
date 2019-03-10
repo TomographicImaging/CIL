@@ -1,19 +1,24 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+
 from ccpi.framework import ImageData, ImageGeometry, AcquisitionGeometry, AcquisitionData
 from astropy.io import fits
+from ccpi.optimisation.ops import PowerMethodNonsquare
+from ccpi.optimisation.algs import CGLS
 
 import astra
 
-import numpy as np
+import numpy
+from numpy import inf
 import matplotlib.pyplot as plt
+from cvxpy import *
 
 from Algorithms import PDHG
-from Operators.CompositeOperator_DataContainer import CompositeOperator, CompositeDataContainer
-from Operators.GradientOperator import Gradient
-from Operators.AstraProjectorSimpleOperator import AstraProjectorSimple
 
-from Functions.FunctionComposition import FunctionComposition_new
-from Functions.mixed_L12Norm import mixed_L12Norm
-from Functions.L2NormSquared import L2NormSq
+from Operators import CompositeOperator, Identity, Gradient, CompositeDataContainer, AstraProjectorSimple
+from Functions import ZeroFun, L2NormSq, mixed_L12Norm, FunctionOperatorComposition, BlockFunction
+
 #%%
 
 filename = '/Users/evangelos/Desktop/Projects/CCPi/CCPi-Framework/Wrappers/Python/ccpi/optimisation/working_with_CompDataContainers/IMAT_recon/sino_0_sum.fits'
@@ -36,7 +41,7 @@ cor = (imsize / 2 + 52 / 2)
 
 # padding
 delta = imsize - 2 * numpy.abs(cor)
-padded_width = int(numpy.ceil(abs(delta)) + imsize)
+padded_width = int(numpy.ceil(np.abs(delta)) + imsize)
 delta_pix = padded_width - imsize
 
 data_rel_padded = numpy.zeros((n_angles, padded_width), dtype = float)
@@ -49,6 +54,11 @@ data_rel[nonzero] = -numpy.log(sino[nonzero] / numpy.amax(sino))
     
 data_rel_padded[:, :-delta_pix] = data_rel
 
+#%%
+
+with open("/Users/evangelos/Desktop/Projects/CCPi/CCPi-Framework/Wrappers/Python/ccpi/optimisation/working_with_CompDataContainers/IMAT_recon/golden_angles.txt") as f:
+    angles_string = [line.rstrip() for line in f]
+    angles = np.array(angles_string).astype(float)
 #%%
 
 # Create 2D acquisition geometry and acquisition data
@@ -64,15 +74,19 @@ ig2d = ImageGeometry(voxel_num_x = ag2d.pixel_num_h,
 b2d = AcquisitionData(data_rel_padded, geometry = ag2d)
     
     # Create GPU projector/backprojector operator with ASTRA.
-Aop = AstraProjectorSimple(ig2d,ag2d,'gpu')
-    
-# Set initial guess ImageData with zeros for algorithms, and algorithm options.
-x_init = ImageData(numpy.zeros((padded_width, padded_width)),
-                       geometry=ig2d)
-    
-opt_CGLS = {'tol': 1e-4, 'iter': 100}
+Aop = AstraProjectorSimple(ig2d,ag2d,'cpu')
 
-    # Run CGLS algorithm and display reconstruction.
-x_CGLS, it_CGLS, timing_CGLS, criter_CGLS = CGLS(x_init, Aop, b2d, opt_CGLS)
-    
+alpha = 80
+f = FunctionOperatorComposition(Aop, L2NormSq(0.5, b=b2d))
+g0 = L2NormSq(alpha)
 
+
+opt = { 'iter': 400}
+
+x_init = ImageData(np.zeros((564,564)))
+
+x_fista1, it1, timing1, criter1 = FISTA(x_init, f, g0, opt)
+
+plt.imshow(x_fista1.as_array())
+plt.colorbar()
+plt.show()

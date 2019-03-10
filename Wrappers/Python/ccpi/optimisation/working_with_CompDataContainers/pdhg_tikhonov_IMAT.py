@@ -9,7 +9,7 @@ from ccpi.optimisation.algs import CGLS
 
 import astra
 
-import numpy as np
+import numpy
 from numpy import inf
 import matplotlib.pyplot as plt
 from cvxpy import *
@@ -41,7 +41,7 @@ cor = (imsize / 2 + 52 / 2)
 
 # padding
 delta = imsize - 2 * numpy.abs(cor)
-padded_width = int(np.ceil(np.abs(delta)) + imsize)
+padded_width = int(numpy.ceil(np.abs(delta)) + imsize)
 delta_pix = padded_width - imsize
 
 data_rel_padded = numpy.zeros((n_angles, padded_width), dtype = float)
@@ -77,7 +77,8 @@ b2d = AcquisitionData(data_rel_padded, geometry = ag2d)
 Aop = AstraProjectorSimple(ig2d,ag2d,'cpu')
 
 
-#%%  PDHG TV reconstruction    
+#%% Works only with Composite Operator Structure of PDHG
+
 # Create operators
 op1 = Gradient((ig2d.voxel_num_x,ig2d.voxel_num_y))
 op2 = Aop
@@ -85,14 +86,17 @@ op2 = Aop
 # Form Composite Operator
 operator = CompositeOperator((2,1), op1, op2 ) 
 
-alpha = 100
-f = BlockFunction(operator, mixed_L12Norm(alpha), \
-                                     L2NormSq(0.5, b = b2d) )
+alpha = 50
+f = BlockFunction(operator, L2NormSq(alpha), \
+                            L2NormSq(0.5, b = b2d) )
 g = ZeroFun()
 
 # Compute operator Norm
 normK = operator.norm()
-
+#
+#%%
+## Primal & dual stepsizes
+#
 sigma = 1
 tau = 1/(sigma*normK**2)
 
@@ -103,15 +107,14 @@ opt = {'niter':1000}
 #### Run algorithm
 res, total_time, objective = PDHG(f, g, operator, \
                                   tau = tau, sigma = sigma, opt = opt)
-
-#%%
-####Show results
+#%% #Show results
 sol = res.get_item(0).as_array()
-###solution = res.as_array()
-###
-plt.imshow(np.maximum(sol,0))
+
+plt.imshow(sol)
 plt.colorbar()
 plt.show()
-##
 
 
+
+    
+    

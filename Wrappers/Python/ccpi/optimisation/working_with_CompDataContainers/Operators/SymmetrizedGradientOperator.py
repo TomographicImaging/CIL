@@ -54,7 +54,7 @@ class SymmetrizedGradient(Operator):
         tmp[1] = FiniteDiff(self.gm_domain[1:], direction = 1, bnd_cond = self.bnd_cond).direct(x.as_array()[2]) +  \
                  FiniteDiff(self.gm_domain[1:], direction = 0, bnd_cond = self.bnd_cond).direct(x.as_array()[1])                 
 
-        return type(x)(tmp)          
+        return type(x)(-tmp)          
             
     def alloc_domain_dim(self):
         return ImageData(np.zeros(self.gm_domain))

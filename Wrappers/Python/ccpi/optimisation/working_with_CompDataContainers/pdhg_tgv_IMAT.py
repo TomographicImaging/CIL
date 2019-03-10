@@ -16,7 +16,9 @@ from cvxpy import *
 
 from Algorithms import PDHG
 
-from Operators import CompositeOperator, Identity, Gradient, CompositeDataContainer, AstraProjectorSimple
+from Operators import CompositeOperator, Identity, Gradient, CompositeDataContainer, \
+                      AstraProjectorSimple, SymmetrizedGradient, ZeroOp
+    
 from Functions import ZeroFun, L2NormSq, mixed_L12Norm, FunctionOperatorComposition, BlockFunction
 
 #%%
@@ -25,7 +27,7 @@ filename = '/Users/evangelos/Desktop/Projects/CCPi/CCPi-Framework/Wrappers/Pytho
         
 # load file
 file_handler = fits.open(filename)
-sino = numpy.array(file_handler[0].data, dtype = float)
+sino = np.array(file_handler[0].data, dtype = float)
 file_handler.close()
 
 #sino is in float32 format, dimensions are 187 x 512
@@ -40,17 +42,17 @@ n_angles = 187
 cor = (imsize / 2 + 52 / 2) 
 
 # padding
-delta = imsize - 2 * numpy.abs(cor)
+delta = imsize - 2 * np.abs(cor)
 padded_width = int(np.ceil(np.abs(delta)) + imsize)
 delta_pix = padded_width - imsize
 
-data_rel_padded = numpy.zeros((n_angles, padded_width), dtype = float)
+data_rel_padded = np.zeros((n_angles, padded_width), dtype = float)
 
 nonzero = sino > 0
 #%%
 # take negative logarithm and pad image
 data_rel = np.zeros(sino.shape)
-data_rel[nonzero] = -numpy.log(sino[nonzero] / numpy.amax(sino))
+data_rel[nonzero] = -np.log(sino[nonzero] / np.amax(sino))
     
 data_rel_padded[:, :-delta_pix] = data_rel
 
@@ -64,7 +66,7 @@ with open("/Users/evangelos/Desktop/Projects/CCPi/CCPi-Framework/Wrappers/Python
 # Create 2D acquisition geometry and acquisition data
 ag2d = AcquisitionGeometry('parallel',
                            '2D',
-                            angles * numpy.pi / 180,
+                            angles * np.pi / 180,
                             pixel_num_h = padded_width)
 
 # Create 2D image geometry
@@ -77,41 +79,47 @@ b2d = AcquisitionData(data_rel_padded, geometry = ag2d)
 Aop = AstraProjectorSimple(ig2d,ag2d,'cpu')
 
 
-#%%  PDHG TV reconstruction    
-# Create operators
-op1 = Gradient((ig2d.voxel_num_x,ig2d.voxel_num_y))
-op2 = Aop
+#%%
+alpha = 50
+beta = 100
 
-# Form Composite Operator
-operator = CompositeOperator((2,1), op1, op2 ) 
+ig = (ig2d.voxel_num_x,ig2d.voxel_num_y)
 
-alpha = 100
+Grad = Gradient(ig)
+SymGrad = SymmetrizedGradient( ((2,)+ig), ((3,)+ig))
+
+Id1 = Identity( Grad.range_dim(), Grad.range_dim() )
+ZeroOp1 = ZeroOp( ig, SymGrad.range_dim())
+
+ZeroOp2 = ZeroOp( SymGrad.domain_dim(), Aop.range_dim())
+
+
+operator = CompositeOperator( (3,2), Grad, -1*Id1,\
+                                         ZeroOp1, SymGrad,\
+                                         Aop, ZeroOp2)
+
 f = BlockFunction(operator, mixed_L12Norm(alpha), \
-                                     L2NormSq(0.5, b = b2d) )
+                            mixed_L12Norm(beta, sym_grad=True),\
+                            L2NormSq(0.5, b=b2d) )
 g = ZeroFun()
-
-# Compute operator Norm
-normK = operator.norm()
-
-sigma = 1
-tau = 1/(sigma*normK**2)
-
-##%%
-### Number of iterations
-opt = {'niter':1000}
-###
-#### Run algorithm
-res, total_time, objective = PDHG(f, g, operator, \
+            
+normK = operator.norm()      
+## Primal & dual stepsizes
+sigma = 10
+tau = 1.0/(sigma*normK**2)
+#
+opt = {'niter':3000}
+result, total_time, its = PDHG(f, g, operator, \
                                   tau = tau, sigma = sigma, opt = opt)
 
-#%%
-####Show results
-sol = res.get_item(0).as_array()
-###solution = res.as_array()
+#
+##%%
+#####Show results
+#sol = res.get_item(0).as_array()
+####solution = res.as_array()
+####
+#plt.imshow(np.maximum(sol,0))
+#plt.colorbar()
+#plt.show()
 ###
-plt.imshow(np.maximum(sol,0))
-plt.colorbar()
-plt.show()
-##
-
-
+##%%

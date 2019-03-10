@@ -55,7 +55,7 @@ def PDHG(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
     for i in range(niter):
         
         # Gradient descent, Dual problem solution
-        y_tmp = y_old + sigma * operator.direct(xbar)
+        y_tmp = y_old + sigma * operator.direct(xbar)                
         y = f.proximal_conjugate(y_tmp, sigma)
         
         # Gradient ascent, Primal problem solution
@@ -63,13 +63,19 @@ def PDHG(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
         x = g.proximal(x_tmp, tau)
         
         #Update
-        xbar = x + theta * (x - x_old)
-                                
+        xbar = x + theta * (x - x_old)   
         x_old = x
-        y_old = y   
-        
+        y_old = y 
+                
+    
+#        plt.imshow(x.get_item(0).as_array())
+#        plt.show()
 #        pdgap
-        print(f(x) + g(x) + f.convex_conjugate(y) + g.convex_conjugate(-1*operator.adjoint(y)) )
+        if i%100==0:
+            print(f(x) + g(x) + f.convex_conjugate(y) + g.convex_conjugate(-1*operator.adjoint(y)) )
+            plt.imshow(x.get_item(0).as_array())
+            plt.colorbar()
+            plt.show()
         
         
         

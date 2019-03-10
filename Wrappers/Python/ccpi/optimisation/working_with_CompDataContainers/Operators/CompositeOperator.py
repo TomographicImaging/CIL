@@ -51,25 +51,32 @@ class CompositeOperator(Operator):
 
     def direct(self, x, out=None):
         
-        out = [None]*self.shape[0]
+        tmp = [None]*self.shape[0]
         for i in range(self.shape[0]):                        
             z1 = ImageData(np.zeros(self.compMat[i][0].range_dim()))
             for j in range(self.shape[1]):
                 z1 += self.compMat[i][j].direct(x.get_item(j))
-            out[i] = z1    
-                                
-        return CompositeDataContainer(*out)
+            tmp[i] = z1    
+        if out is None:                        
+            return CompositeDataContainer(*tmp)
+        else:
+            out = CompositeDataContainer(*tmp)
+            return out
                                           
     def adjoint(self, x, out=None):        
         
-        out = [None]*self.shape[1]
+        tmp = [None]*self.shape[1]
         for i in range(self.shape[1]):
             z2 = ImageData(np.zeros(self.compMat[0][i].domain_dim()))
             for j in range(self.shape[0]):
                 z2 += self.compMat[j][i].adjoint(x.get_item(j))
-            out[i] = z2
-                                
-        return CompositeDataContainer(*out)
+            tmp[i] = z2
+        if out is None:                        
+            return CompositeDataContainer(*tmp)
+        else:
+            out = CompositeDataContainer(*tmp)
+            return out          
+        
             
     def range_dim(self):
 

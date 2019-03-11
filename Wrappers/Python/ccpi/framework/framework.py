@@ -54,7 +54,8 @@ class ImageGeometry(object):
                  center_x=0, 
                  center_y=0, 
                  center_z=0, 
-                 channels=1):
+                 channels=1,
+                 dimension_labels=None):
         
         self.voxel_num_x = voxel_num_x
         self.voxel_num_y = voxel_num_y
@@ -66,6 +67,7 @@ class ImageGeometry(object):
         self.center_y = center_y
         self.center_z = center_z  
         self.channels = channels
+        self.dimension_labels = dimension_labels
         
     def get_min_x(self):
         return self.center_x - 0.5*self.voxel_num_x*self.voxel_size_x
@@ -113,6 +115,8 @@ class ImageGeometry(object):
         return repres
     def allocate(self, value=0, dimension_labels=None):
         '''allocates an ImageData according to the size expressed in the instance'''
+        if dimension_labels is None:
+            dimension_labels = self.dimension_labels
         out = ImageData(geometry=self, dimension_labels=dimension_labels)
         if value != 0:
             out += value
@@ -130,7 +134,8 @@ class AcquisitionGeometry(object):
                  dist_source_center=None, 
                  dist_center_detector=None, 
                  channels=1,
-                 angle_unit='degree'
+                 angle_unit='degree',
+                 dimension_labels=None
                  ):
         """
         General inputs for standard type projection geometries
@@ -171,6 +176,7 @@ class AcquisitionGeometry(object):
         self.pixel_size_v = pixel_size_v
         
         self.channels = channels
+        self.dimension_labels = dimension_labels
         
     def clone(self):
         '''returns a copy of the AcquisitionGeometry'''
@@ -198,6 +204,8 @@ class AcquisitionGeometry(object):
         return repres
     def allocate(self, value=0, dimension_labels=None):
         '''allocates an AcquisitionData according to the size expressed in the instance'''
+        if dimension_labels is None:
+            dimension_labels = self.dimension_labels
         out = AcquisitionData(geometry=self, dimension_labels=dimension_labels)
         if value != 0:
             out += value

@@ -91,7 +91,7 @@ class BlockOperator(Operator):
 
         Raises: ValueError if the contained Operators are not linear
         '''
-        if not functools.reduce(lambda x,y: x and y, self.operators.is_linear(), True):
+        if not functools.reduce(lambda x, y: x and y.is_linear(), self.operators, True):
             raise ValueError('Not all operators in Block are linear.')
         shape = self.get_output_shape(x.shape, adjoint=True)
         res = []

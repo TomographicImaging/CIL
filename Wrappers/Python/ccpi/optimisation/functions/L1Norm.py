@@ -7,12 +7,13 @@ Created on Wed Mar  6 19:42:34 2019
 """
 
 import numpy as np
-from ccpi.optimisation.funcs import Function
+#from ccpi.optimisation.funcs import Function
+from ccpi.optimisation.functions import Function
 from ccpi.framework import DataContainer, ImageData, ImageGeometry 
 
 
 ############################   L1NORM FUNCTIONS   #############################
-class SimpleL1NormEdo(Function):
+class SimpleL1Norm(Function):
     
     def __init__(self, alpha=1):
         
@@ -35,7 +36,7 @@ class SimpleL1NormEdo(Function):
     def proximal_conjugate(self, x, tau):
         return x.divide((x.abs()/self.alpha).maximum(1.0))
     
-class L1Norm(SimpleL1NormEdo):
+class L1Norm(SimpleL1Norm):
     
     def __init__(self, alpha=1, **kwargs):
         

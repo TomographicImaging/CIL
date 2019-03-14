@@ -7,7 +7,8 @@ Created on Fri Mar  8 10:01:31 2019
 """
 
 import numpy as np
-from ccpi.optimisation.funcs import Function
+#from ccpi.optimisation.funcs import Function
+from ccpi.optimisation.functions import Function
 from ccpi.framework import BlockDataContainer
 
 class BlockFunction(Function):

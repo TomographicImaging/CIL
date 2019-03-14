@@ -7,7 +7,8 @@ Created on Fri Mar  8 09:55:36 2019
 """
 
 import numpy as np
-from ccpi.optimisation.funcs import Function
+#from ccpi.optimisation.funcs import Function
+from ccpi.optimisation.functions import Function
 
 
 class FunctionOperatorComposition(Function):

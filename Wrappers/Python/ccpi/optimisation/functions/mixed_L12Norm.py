@@ -7,9 +7,10 @@ Created on Wed Mar  6 19:43:12 2019
 """
 
 import numpy as np
-from ccpi.optimisation.funcs import Function
+#from ccpi.optimisation.funcs import Function
+from ccpi.optimisation.functions import Function
 from ccpi.framework import DataContainer, ImageData, ImageGeometry 
-
+from ccpi.optimisation.functions.FunctionOperatorComposition import FunctionOperatorComposition
 
 
 ############################   mixed_L1,2NORM FUNCTIONS   #############################
@@ -59,7 +60,7 @@ class mixed_L12Norm(Function):
     def composition_with(self, operator):
         
         if self.b is None:
-            return FunctionComposition(mixed_L12Norm(self.alpha), operator)
+            return FunctionOperatorComposition(operator, mixed_L12Norm(self.alpha))
         else:
-            return FunctionComposition(mixed_L12Norm(self.alpha, b=self.b), operator)    
+            return FunctionOperatorComposition(operator, mixed_L12Norm(self.alpha, b=self.b))
     

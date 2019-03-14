@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-
+from .Function import Function
 from .ZeroFun import ZeroFun
 from .L1Norm import *
 from .L2NormSquared import *

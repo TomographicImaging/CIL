@@ -9,7 +9,8 @@ Created on Thu Feb  7 13:10:56 2019
 """
 
 import numpy as np
-from ccpi.optimisation.funcs import Function
+#from ccpi.optimisation.funcs import Function
+from ccpi.optimisation.functions import Function
 from ccpi.framework import DataContainer, ImageData, ImageGeometry 
 
     

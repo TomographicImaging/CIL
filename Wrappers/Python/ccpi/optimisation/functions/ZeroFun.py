@@ -7,7 +7,8 @@ Created on Wed Mar  6 19:44:10 2019
 """
 
 import numpy as np
-from ccpi.optimisation.funcs import Function
+#from ccpi.optimisation.funcs import Function
+from ccpi.optimisation.functions import Function
 from ccpi.framework import DataContainer, ImageData
 from ccpi.framework import BlockDataContainer 
 
@@ -33,8 +34,11 @@ class ZeroFun(Function):
             else:
                 return x.maximum(0).sum() + x.maximum(0).sum()
     
-    def proximal(self,x,tau):
-        return x.copy()
+    def proximal(self,x,tau, out=None):
+        if out is None:
+            return x.copy()
+        else:
+            out.fill(x)
         
     def proximal_conjugate(self, x, tau):
         return 0

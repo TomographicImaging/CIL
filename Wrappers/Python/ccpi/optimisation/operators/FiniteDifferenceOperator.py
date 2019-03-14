@@ -24,9 +24,9 @@ class FiniteDiff(Operator):
     # Grad_order = ['channels', 'direction_z', 'direction_y', 'direction_x']
     
     def __init__(self, gm_domain, gm_range=None, direction=0, bnd_cond = 'Neumann'):
-        
+        ''''''
         super(FiniteDiff, self).__init__() 
-        
+        '''FIXME: domain and range should be geometries'''
         self.gm_domain = gm_domain
         self.gm_range = gm_range
         self.direction = direction
@@ -297,14 +297,16 @@ class FiniteDiff(Operator):
         res = out
         return res
             
-    def range_dim(self):
+    def range_geometry(self):
         return self.gm_range
     
-    def domain_dim(self):
+    def domain_geometry(self):
+        '''currently is a tuple'''
         return self.gm_domain
        
     def norm(self):
-        x0 = ImageData(np.random.random_sample(self.domain_dim()))
+        x0 = self.gm_domain.allocate()
+        x0 = np.random.random_sample(x0.shape)
         self.s1, sall, svec = PowerMethodNonsquare(self, 25, x0)
         return self.s1
     

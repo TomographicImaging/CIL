@@ -11,6 +11,7 @@ from ccpi.optimisation.ops import PowerMethodNonsquare
 from ccpi.framework import ImageData, BlockDataContainer
 import numpy as np
 from ccpi.optimisation.operators import FiniteDiff
+from ccpi.framework import BlockGeometry
 
 #%%
 
@@ -57,11 +58,12 @@ class Gradient(Operator):
     def alloc_range_dim(self):
         return ImageData(np.zeros(self.range_dim))
     
-    def domain_dim(self):
+    def domain_geometry(self):
         return self.gm_domain
     
-    def range_dim(self):
-        return self.gm_range
+    def range_geometry(self):
+        '''fix this'''
+        return BlockGeometry(self.gm_range, self.gm_range)
                                    
     def norm(self):
 #        return np.sqrt(4*len(self.domainDim()))        
@@ -83,10 +85,10 @@ if __name__ == '__main__':
 #         DataContainer(np.random.randint(10, size=G.domain_dim()))]
 
     # domain_dim
-    print('Domain {}'.format(G.domain_dim()))
+    print('Domain {}'.format(G.domain_geometry()))
     
     # range_dim
-    print('Range {}'.format(G.range_dim()))
+    print('Range {}'.format(G.range_geometry()))
     
     # Direct
     z = G.direct(u)
@@ -104,7 +106,8 @@ if __name__ == '__main__':
     print(G.norm())
     
 #    print(G.adjoint(G.direct(u)))
-    
+
+
       
     
     

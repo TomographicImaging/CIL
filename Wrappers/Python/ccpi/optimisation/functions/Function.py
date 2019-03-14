@@ -22,7 +22,9 @@ import warnings
 class Function(object):
     '''Abstract class representing a function
     
-    
+    Members:
+    L is the Lipschitz constant of the gradient of the Function
+    alpha is scaling parameter of the function. 
     '''
     def __init__(self):
         self.L = None

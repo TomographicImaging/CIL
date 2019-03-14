@@ -10,8 +10,6 @@ import numpy as np
 #from ccpi.optimisation.funcs import Function
 from ccpi.optimisation.functions import Function
 from ccpi.framework import DataContainer, ImageData, ImageGeometry 
-from ccpi.optimisation.functions.FunctionOperatorComposition import FunctionOperatorComposition
-
 
 ############################   mixed_L1,2NORM FUNCTIONS   #############################
 class mixed_L12Norm(Function):
@@ -56,11 +54,3 @@ class mixed_L12Norm(Function):
                 res = x.divide((ImageData(x.power(2).sum(axis=0)).sqrt()/self.alpha).maximum(1.0))  
                                                    
         return res 
-    
-    def composition_with(self, operator):
-        
-        if self.b is None:
-            return FunctionOperatorComposition(operator, mixed_L12Norm(self.alpha))
-        else:
-            return FunctionOperatorComposition(operator, mixed_L12Norm(self.alpha, b=self.b))
-    

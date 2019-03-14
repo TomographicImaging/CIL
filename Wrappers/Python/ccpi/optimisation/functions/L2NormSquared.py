@@ -19,34 +19,41 @@ class SimpleL2NormSq(Function):
     def __init__(self, alpha=1):
         
         super(SimpleL2NormSq, self).__init__()         
-        self.alpha = alpha
-        
         # Lispchitz constant of gradient
-        self.L = 2*self.alpha
+        self.L = 2
         
     def __call__(self, x):
         return self.alpha * x.power(2).sum()
     
-    def gradient(self,x):
-        return 2 * self.alpha * x
+    def gradient(self,x, out=None):
+        if out is None:
+            return 2 * x
+        else:
+            out.fill(2*x)
     
     def convex_conjugate(self,x):
-        return (1/(4*self.alpha)) * x.power(2).sum()
+        return (1/4) * x.squared_norm()
+        
+    def proximal(self, x, tau, out=None):
+        if out is None:
+            return x.divide(1+2*tau)
+        else:
+            x.divide(1+2*tau, out=out)
     
-    def proximal(self, x, tau):
-        return x.divide(1+2*tau*self.alpha)
-    
-    def proximal_conjugate(self, x, tau):
-        return x.divide(1 + tau/(2*self.alpha) )    
+    def proximal_conjugate(self, x, tau, out=None):
+        if out is None:
+            return x.divide(1 + tau/2)    
+        else:
+            x.divide(1+tau/2, out=out)
+
 
 
 ############################   L2NORM FUNCTIONS   #############################
 class L2NormSq(SimpleL2NormSq):
     
-    def __init__(self, alpha, **kwargs):
+    def __init__(self, **kwargs):
                  
-        super(L2NormSq, self).__init__(alpha)
-        self.alpha = alpha
+        super(L2NormSq, self).__init__()
         self.b = kwargs.get('b',None)              
         
     def __call__(self, x):
@@ -59,9 +66,9 @@ class L2NormSq(SimpleL2NormSq):
     def gradient(self, x):
         
         if self.b is None:
-            return 2*self.alpha * x 
+            return 2 * x 
         else:
-            return 2*self.alpha * (x - self.b) 
+            return 2 * (x - self.b) 
                                                                  
     def convex_conjugate(self, x):
         

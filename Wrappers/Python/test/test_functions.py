@@ -50,13 +50,7 @@ class TestFunction(unittest.TestCase):
         
         d = ImageData(np.random.randint(10, size=ag))
         
-        f = mixed_L12Norm(alpha = 1).composition_with(op1)
         g = L2NormSq(alpha=0.5, b=noisy_data)
-        
-        # Compare call of f
-        a1 = ImageData(op1.direct(d).power(2).sum(axis=0)).sqrt().sum()
-        #print(a1, f(d))
-        self.assertEqual (a1, f(d))
         
         # Compare call of g
         a2 = g.alpha*(d - noisy_data).power(2).sum()

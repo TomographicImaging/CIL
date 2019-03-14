@@ -9,16 +9,20 @@ Created on Fri Mar  8 09:55:36 2019
 import numpy as np
 #from ccpi.optimisation.funcs import Function
 from ccpi.optimisation.functions import Function
+from ccpi.optimisation.functions import ScaledFunction
 
 
 class FunctionOperatorComposition(Function):
     
     def __init__(self, operator, function):
-        
+        super(FunctionOperatorComposition, self).__init__()
         self.function = function     
         self.operator = operator
-        self.L = 2*self.function.alpha*operator.norm()**2
-        super(FunctionOperatorComposition, self).__init__()
+        alpha = 1
+        if isinstance (function, ScaledFunction):
+            alpha = function.scalar
+        self.L = 2 * alpha * operator.norm()**2
+        
         
     def __call__(self, x):
     
@@ -45,10 +49,17 @@ class FunctionOperatorComposition(Function):
         
         return self.function.proximal_conjugate(x, tau) 
 
-    def gradient(self, x):
+    def gradient(self, x, out=None):
         
         ''' Gradient takes into account the Operator'''
-        
-        return self.operator.adjoint(self.function.gradient(self.operator.direct(x)))
+        if out is None:
+            return self.operator.adjoint(
+                self.function.gradient(self.operator.direct(x))
+                )
+        else:
+            self.operator.adjoint(
+                self.function.gradient(self.operator.direct(x), 
+                out=out)
+            )
         
                        

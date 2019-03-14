@@ -49,9 +49,9 @@ class Operator(object):
     def allocate_adjoint(self):
         '''Allocates memory on the X space'''
         raise NotImplementedError
-    def range_dim(self):
+    def range_geometry(self):
         raise NotImplementedError
-    def domain_dim(self):
+    def domain_geometry(self):
         raise NotImplementedError
     def __rmul__(self, other):
         '''reverse multiplication of Operator with number sets the variable scalar in the Operator'''
@@ -97,7 +97,8 @@ class TomoIdentity(Operator):
         self.s1 = 1.0
         self.geometry = geometry
         
-        
+    def is_linear(self):
+        return True
     def direct(self,x,out=None):
         
         if out is None:
@@ -128,6 +129,10 @@ class TomoIdentity(Operator):
             raise ValueError("Wrong geometry type: expected ImageGeometry of AcquisitionGeometry, got ", type(self.geometry))
     def allocate_adjoint(self):
         return self.allocate_direct()
+    def range_geometry(self):
+        return self.geometry
+    def domain_geometry(self):
+        return self.geometry
     
     
 

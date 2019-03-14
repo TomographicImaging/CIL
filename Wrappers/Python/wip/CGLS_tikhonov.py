@@ -11,8 +11,7 @@ import matplotlib.pyplot as plt
 import numpy
 from ccpi.framework import BlockDataContainer
 from ccpi.optimisation.operators import BlockOperator
-from ccpi.optimisation.operators.BlockOperator import BlockLinearOperator
-    
+
 # Set up phantom size N x N x vert by creating ImageGeometry, initialising the 
 # ImageData object with this geometry and empty array and finally put some
 # data into its array, and display one slice as image.
@@ -128,26 +127,26 @@ simplef.L = 0.00003
     
 gd = GradientDescent( x_init=x_init, objective_function=simplef,
                      rate=simplef.L)
-gd.max_iteration = 10
+gd.max_iteration = 50
 
 Kbig.direct(X_init)
 Kbig.adjoint(B)
 cg = CGLS()
 cg.set_up(X_init, Kbig, B )
-cg.max_iteration = 5
+cg.max_iteration = 10
     
 cgsmall = CGLS()
 cgsmall.set_up(X_init, Ksmall, B )
-cgsmall.max_iteration = 5
+cgsmall.max_iteration = 10
     
     
 cgs = CGLS()
 cgs.set_up(x_init, A, b )
-cgs.max_iteration = 6
+cgs.max_iteration = 10
 
 cgok = CGLS()
 cgok.set_up(X_init, Kok, B )
-cgok.max_iteration = 6
+cgok.max_iteration = 10
 # #
 #out.__isub__(B)
 #out2 = K.adjoint(out)
@@ -176,22 +175,22 @@ cgok.run(10, verbose=True)
 #    print ("iteration {} {}".format(cgs.iteration, cgs.get_current_loss()))
 # #    
 fig = plt.figure()
-plt.subplot(1,6,1)
+plt.subplot(2,3,1)
 plt.imshow(Phantom.subset(vertical=0).as_array())
 plt.title('Simulated Phantom')
-plt.subplot(1,6,2)
+plt.subplot(2,3,2)
 plt.imshow(gd.get_output().subset(vertical=0).as_array())
 plt.title('Simple Gradient Descent')
-plt.subplot(1,6,3)
+plt.subplot(2,3,3)
 plt.imshow(cgs.get_output().subset(vertical=0).as_array())
 plt.title('Simple CGLS')
-plt.subplot(1,6,4)
+plt.subplot(2,3,5)
 plt.imshow(cg.get_output().get_item(0).subset(vertical=0).as_array())
 plt.title('Composite CGLS\nbig lambda')
-plt.subplot(1,6,5)
+plt.subplot(2,3,6)
 plt.imshow(cgsmall.get_output().get_item(0).subset(vertical=0).as_array())
 plt.title('Composite CGLS\nsmall lambda')
-plt.subplot(1,6,6)
+plt.subplot(2,3,4)
 plt.imshow(cgok.get_output().get_item(0).subset(vertical=0).as_array())
 plt.title('Composite CGLS\nok lambda')
 plt.show()

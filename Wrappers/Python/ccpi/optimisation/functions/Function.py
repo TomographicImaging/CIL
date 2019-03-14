@@ -23,28 +23,40 @@ class Function(object):
     '''Abstract class representing a function
     
     Members:
-    L is the Lipschitz constant of the gradient of the Function
-    alpha is scaling parameter of the function. 
+    L is the Lipschitz constant of the gradient of the Function 
     '''
     def __init__(self):
         self.L = None
+
     def __call__(self,x, out=None):
+        '''Evaluates the function at x '''
         raise NotImplementedError
-    def call_adjoint(self, x, out=None):
+
+    def gradient(self, x, out=None):
+        '''Returns the gradient of the function at x, if the function is differentiable'''
         raise NotImplementedError
+
+    def proximal(self, x, tau, out=None):
+        '''This returns the proximal operator for the function at x, tau'''
+        raise NotImplementedError
+
     def convex_conjugate(self, x, out=None):
+        '''This evaluates the convex conjugate of the function at x'''
         raise NotImplementedError
+
     def proximal_conjugate(self, x, tau, out = None):
+        '''This returns the proximal operator for the convex conjugate of the function at x, tau'''
         raise NotImplementedError
+
     def grad(self, x):
+        '''Alias of gradient(x,None)'''
         warnings.warn('''This method will disappear in following 
         versions of the CIL. Use gradient instead''', DeprecationWarning)
         return self.gradient(x, out=None)
+
     def prox(self, x, tau):
+        '''Alias of proximal(x, tau, None)'''
         warnings.warn('''This method will disappear in following 
         versions of the CIL. Use proximal instead''', DeprecationWarning)
         return self.proximal(x, out=None)
-    def gradient(self, x, out=None):
-        raise NotImplementedError
-    def proximal(self, x, tau, out=None):
-        raise NotImplementedError
+

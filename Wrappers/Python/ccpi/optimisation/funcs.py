@@ -166,8 +166,13 @@ class Norm2sq(Function):
         #else:
         y = self.A.direct(x)
         y.__isub__(self.b)
-        y.__imul__(y)
-        return y.sum() * self.c
+        #y.__imul__(y)
+        #return y.sum() * self.c
+        try:
+            return y.squared_norm() * self.c
+        except AttributeError as ae:
+            # added for compatibility with SIRF 
+            return (y.norm()**2) * self.c
     
     def gradient(self, x, out = None):
         if self.memopt:

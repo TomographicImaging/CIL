@@ -755,10 +755,11 @@ class DataContainer(object):
         return self.as_array().sum(*args, **kwargs)
     def squared_norm(self):
         '''return the squared euclidean norm of the DataContainer viewed as a vector'''
-        shape = self.shape
-        size = reduce(lambda x,y:x*y, shape, 1)
-        y = numpy.reshape(self.as_array(), (size, ))
-        return numpy.dot(y, y.conjugate())
+        #shape = self.shape
+        #size = reduce(lambda x,y:x*y, shape, 1)
+        #y = numpy.reshape(self.as_array(), (size, ))
+        #return numpy.dot(y, y.conjugate())
+        return self.dot(self)
     def norm(self):
         '''return the euclidean norm of the DataContainer viewed as a vector'''
         return numpy.sqrt(self.squared_norm())

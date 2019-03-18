@@ -23,25 +23,29 @@ class FiniteDiff(Operator):
     # Grad_order = ['direction_z', 'direction_y', 'direction_x']
     # Grad_order = ['channels', 'direction_z', 'direction_y', 'direction_x']
     
-    def __init__(self, gm_domain, gm_range=None, direction=0, bnd_cond = 'Neumann'):
+    def __init__(self, gm_domain, gm_range=None, direction=0, bnd_cond = 'Neumann', **kwargs):
         ''''''
         super(FiniteDiff, self).__init__() 
-        '''FIXME: domain and range should be geometries'''
+
         self.gm_domain = gm_domain
         self.gm_range = gm_range
+        
         self.direction = direction
         self.bnd_cond = bnd_cond
-        
+                
+        ''' Domain Geometry = Range Geometry'''
         if self.gm_range is None:
             self.gm_range = self.gm_domain
-            
-        if self.direction + 1 > len(gm_domain):
-            raise ValueError('Gradient directions more than geometry domain')      
-                         
+        
+        ''' check direction and "length" of geometry  '''
+        if self.direction + 1 > len(self.gm_domain):
+            raise ValueError('Gradient directions more than geometry length') 
+
+        self.voxel_size = kwargs.get('voxel_size',1)            
+                                                 
     def direct(self, x, out=None):
                         
-#        x_asarr = x.as_array()
-        x_asarr = x
+        x_asarr = x.as_array()
         x_sz = len(x.shape)
         
         if out is None:        
@@ -157,13 +161,12 @@ class FiniteDiff(Operator):
         else:
             raise NotImplementedError                
          
-        res = out  
-        return res
+        res = out/self.voxel_size 
+        return type(x)(res)
                     
     def adjoint(self, x, out=None):
         
-#        x_asarr = x.as_array()
-        x_asarr = x
+        x_asarr = x.as_array()
         x_sz = len(x.shape)
         
         if out is None:        
@@ -294,22 +297,49 @@ class FiniteDiff(Operator):
         else:
             raise NotImplementedError
             
-        res = out
-        return res
+        res = out/self.voxel_size 
+        return type(x)(-res)
             
     def range_geometry(self):
+        ''' Returns the range geometry '''
         return self.gm_range
     
     def domain_geometry(self):
-        '''currently is a tuple'''
+        ''' Returns the domain geometry '''
         return self.gm_domain
        
-    def norm(self):
-        x0 = self.gm_domain.allocate()
-        x0 = np.random.random_sample(x0.shape)
-        self.s1, sall, svec = PowerMethodNonsquare(self, 25, x0)
+    def norm(self):     
+        ''' Computes the operator norm using PowerMethod
+            Can we avoid it since it is always 2??? '''            
+        ''' Need ImageData to allocate random array '''           
+        x0 = self.gm_domain.allocate('random')
+#        x = ImageData(np.random.random_sample(x0.shape))
+        self.s1, sall, svec = PowerMethodNonsquare(self, 50, x0)
         return self.s1
     
+if __name__ == '__main__':
+    
+    N, M = 200, 300
+    
+    from ccpi.framework import ImageGeometry
+    
+    ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N)    
+    u = ig.allocate('random_int')
+    G = FiniteDiff(ig, direction=0, bnd_cond = 'Neumann')
+    print(u.as_array())    
+    print(G.direct(u).as_array())
+    
+    # Gradient Operator norm, for one direction should be close to 2
+    np.testing.assert_allclose(G.norm(), np.sqrt(4), atol=0.1)
+        
+    M1, N1, K1 = 200, 300, 2
+    ig1 = ImageGeometry(voxel_num_x = M1, voxel_num_y = N1, channels = K1)
+    u1 = ig1.allocate('random_int')
+    G1 = FiniteDiff(ig1, direction=2, bnd_cond = 'Periodic')
+    print(ig1.shape==u1.shape)
+    np.testing.assert_allclose(G1.norm(), np.sqrt(4), atol=0.1)
+
+
     
 
     

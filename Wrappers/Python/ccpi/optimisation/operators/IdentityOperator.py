@@ -35,8 +35,8 @@ class Identity(Operator):
     def norm(self):
         return 1.0
         
-    def domain_dim(self):       
+    def domain_geometry(self):       
         return self.gm_domain
         
-    def range_dim(self):
+    def range_geometry(self):
         return self.gm_range

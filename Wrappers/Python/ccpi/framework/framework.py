@@ -28,6 +28,8 @@ from datetime import timedelta, datetime
 import warnings
 from functools import reduce
 
+from inspect import signature
+
 def find_key(dic, val):
     """return the key of dictionary dic given the value"""
     return [k for k, v in dic.items() if v == val][0]
@@ -68,6 +70,21 @@ class ImageGeometry(object):
         self.center_z = center_z  
         self.channels = channels
         self.dimension_labels = dimension_labels
+                
+        if self.channels > 1:            
+            if self.voxel_num_z>1:
+                self.length = 4
+                self.shape = (self.channels, self.voxel_num_z, self.voxel_num_y, self.voxel_num_x)
+            else:
+                self.length = 3
+                self.shape = (self.channels, self.voxel_num_y, self.voxel_num_x)
+        else:
+            if self.voxel_num_z>1:
+                self.length = 3
+                self.shape = (self.channels, self.voxel_num_y, self.voxel_num_x)
+            else:
+                self.length = 2  
+                self.shape = (self.voxel_num_y, self.voxel_num_x)
         
     def get_min_x(self):
         return self.center_x - 0.5*self.voxel_num_x*self.voxel_size_x
@@ -113,14 +130,51 @@ class ImageGeometry(object):
         repres += "voxel_size : x{0},y{1},z{2}\n".format(self.voxel_size_x, self.voxel_size_y, self.voxel_size_z)
         repres += "center : x{0},y{1},z{2}\n".format(self.center_x, self.center_y, self.center_z)
         return repres
-    def allocate(self, value=0, dimension_labels=None):
+    
+    def allocate(self, value=None, dimension_labels=None):
         '''allocates an ImageData according to the size expressed in the instance'''
         if dimension_labels is None:
             dimension_labels = self.dimension_labels
-        out = ImageData(geometry=self, dimension_labels=dimension_labels)
-        if value != 0:
-            out += value
+        out = ImageData(geometry=self, dimension_labels=dimension_labels)        
+        if value == 'ones':
+            out += ImageData(np.ones(self.shape))
+        elif value == 'random':
+            out += ImageData(np.random.random_sample(self.shape))
+        elif value == 'random_int':
+            out += ImageData(np.random.random_int(10, self.shape))
         return out
+    
+    def __len__(self):
+        return self.length
+    
+    def shape(self):
+        return self.shape
+            
+ 
+class BlockGeometry(object):
+    '''Class to hold Geometry as column vector'''
+    #__array_priority__ = 1
+    def __init__(self, *args, **kwargs):
+        ''''''
+        self.geometries = args
+        self.index = 0
+        #shape = kwargs.get('shape', None)
+        #if shape is None:
+        #   shape = (len(args),1)
+        shape = (len(args),1)
+        self.shape = shape
+        #print (self.shape)
+        n_elements = functools.reduce(lambda x,y: x*y, shape, 1)
+        if len(args) != n_elements:
+            raise ValueError(
+                    'Dimension and size do not match: expected {} got {}'
+                    .format(n_elements, len(args)))
+
+    def allocate(self):
+        containers = [geom.allocate() for geom in self.geometries]
+        return BlockDataContainer(*containers)
+                   
+        
 class AcquisitionGeometry(object):
     
     def __init__(self, 

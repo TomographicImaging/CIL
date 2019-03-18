@@ -281,4 +281,52 @@ class TestBlockDataContainer(unittest.TestCase):
             s1 *= i
             
         #numpy.testing.assert_almost_equal(s[1], cp0.get_item(0,0).as_array()[0][0][0]*s0 +cp0.get_item(1,0).as_array()[0][0][0]*s1, decimal=4)
-    
+    def test_Nested_BlockDataContainer(self):
+        print ("test_Nested_BlockDataContainer")
+        ig0 = ImageGeometry(2,3,4)
+        ig1 = ImageGeometry(2,3,4)
+        
+        data0 = ImageData(geometry=ig0)
+        data1 = ImageData(geometry=ig1) + 1
+        
+        data2 = ImageData(geometry=ig0) + 2
+        data3 = ImageData(geometry=ig1) + 3
+        
+        cp0 = BlockDataContainer(data0,data1)
+        cp1 = BlockDataContainer(data2,data3)
+
+        nbdc = BlockDataContainer(cp0, cp1)
+        nbdc2 = nbdc + 2 
+        numpy.testing.assert_almost_equal(nbdc2.get_item(0).get_item(0).as_array()[0][0][0] , 2. , decimal=5)
+        numpy.testing.assert_almost_equal(nbdc2.get_item(0).get_item(1).as_array()[0][0][0] , 3. , decimal=5)
+        numpy.testing.assert_almost_equal(nbdc2.get_item(1).get_item(0).as_array()[0][0][0] , 4. , decimal=5)
+        numpy.testing.assert_almost_equal(nbdc2.get_item(1).get_item(1).as_array()[0][0][0] , 5. , decimal=5)
+
+        nbdc2 = 2 + nbdc
+        numpy.testing.assert_almost_equal(nbdc2.get_item(0).get_item(0).as_array()[0][0][0] , 2. , decimal=5)
+        numpy.testing.assert_almost_equal(nbdc2.get_item(0).get_item(1).as_array()[0][0][0] , 3. , decimal=5)
+        numpy.testing.assert_almost_equal(nbdc2.get_item(1).get_item(0).as_array()[0][0][0] , 4. , decimal=5)
+        numpy.testing.assert_almost_equal(nbdc2.get_item(1).get_item(1).as_array()[0][0][0] , 5. , decimal=5)
+
+
+        nbdc2 = nbdc * 2 
+        numpy.testing.assert_almost_equal(nbdc2.get_item(0).get_item(0).as_array()[0][0][0] , 0. , decimal=5)
+        numpy.testing.assert_almost_equal(nbdc2.get_item(0).get_item(1).as_array()[0][0][0] , 2. , decimal=5)
+        numpy.testing.assert_almost_equal(nbdc2.get_item(1).get_item(0).as_array()[0][0][0] , 4. , decimal=5)
+        numpy.testing.assert_almost_equal(nbdc2.get_item(1).get_item(1).as_array()[0][0][0] , 6. , decimal=5)
+
+        nbdc2 = 2 * nbdc
+        numpy.testing.assert_almost_equal(nbdc2.get_item(0).get_item(0).as_array()[0][0][0] , 0. , decimal=5)
+        numpy.testing.assert_almost_equal(nbdc2.get_item(0).get_item(1).as_array()[0][0][0] , 2. , decimal=5)
+        numpy.testing.assert_almost_equal(nbdc2.get_item(1).get_item(0).as_array()[0][0][0] , 4. , decimal=5)
+        numpy.testing.assert_almost_equal(nbdc2.get_item(1).get_item(1).as_array()[0][0][0] , 6. , decimal=5)
+
+        nbdc2 = nbdc / 2 
+        numpy.testing.assert_almost_equal(nbdc2.get_item(0).get_item(0).as_array()[0][0][0] , 0. , decimal=5)
+        numpy.testing.assert_almost_equal(nbdc2.get_item(0).get_item(1).as_array()[0][0][0] , .5 , decimal=5)
+        numpy.testing.assert_almost_equal(nbdc2.get_item(1).get_item(0).as_array()[0][0][0] , 1. , decimal=5)
+        numpy.testing.assert_almost_equal(nbdc2.get_item(1).get_item(1).as_array()[0][0][0] , 3./2 , decimal=5)
+
+        
+        print ("test_Nested_BlockDataContainer OK")
+        

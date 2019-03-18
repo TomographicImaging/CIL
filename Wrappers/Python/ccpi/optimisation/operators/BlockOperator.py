@@ -8,9 +8,10 @@ Created on Thu Feb 14 12:36:40 2019
 import numpy
 from numbers import Number
 import functools
-from ccpi.framework import AcquisitionData, ImageData, BlockDataContainer
+from ccpi.framework import AcquisitionData, ImageData, BlockDataContainer, BlockGeometry
 from ccpi.optimisation.operators import Operator, LinearOperator
 from ccpi.optimisation.operators.BlockScaledOperator import BlockScaledOperator
+
 
        
 class BlockOperator(Operator):
@@ -75,10 +76,16 @@ class BlockOperator(Operator):
         res = []
         for row in range(self.shape[0]):
             for col in range(self.shape[1]):
-                if col == 0:
-                    prod = self.get_item(row,col).direct(x.get_item(col))
+                
+                if isinstance(x, ImageData):
+                    get_x = x
                 else:
-                    prod += self.get_item(row,col).direct(x.get_item(col))
+                    get_x = x.get_item(col)
+                    
+                if col == 0:
+                    prod = self.get_item(row,col).direct(get_x)
+                else:
+                    prod += self.get_item(row,col).direct(get_x)
             res.append(prod)
         return BlockDataContainer(*res, shape=shape)
 
@@ -110,7 +117,9 @@ class BlockOperator(Operator):
         if adjoint:
             sshape = self.shape[0]
             oshape = self.shape[1]
-        if sshape != xshape[0]:
+        
+        # check xshape[0]<1, to work with ImageData and not BlockDataContainer
+        if sshape != xshape[0] and xshape[0]<1:
             raise ValueError('Incompatible shapes {} {}'.format(self.shape, xshape))
         return (oshape, xshape[-1])
     
@@ -131,6 +140,30 @@ class BlockOperator(Operator):
         ops = [ v * op for v,op in zip(scalars, self.operators)]
         #return BlockScaledOperator(self, scalars ,shape=self.shape)
         return type(self)(*ops, shape=self.shape)
+    
+    
+    def domain_geometry(self):
+        
+        tmp = []
+        if self.shape[1]==1:
+            return self.get_item(0,0).domain_geometry()
+        else:
+            for i in range(self.shape[1]):
+                tmp.append(self.get_item(0, i).domain_geometry())
+            return BlockGeometry(*tmp)
+
+            
+    def range_geometry(self):
+        
+        tmp = []
+        for i in range(self.shape[0]):
+                tmp.append(self.get_item(i,0).range_geometry())
+        return BlockGeometry(*tmp)        
+        
+        
+#        containers = [op.domain_geometry() for op in self.operators]
+#        return BlockGeometry(*containers)
+    
     @property
     def T(self):
         '''Return the transposed of self'''

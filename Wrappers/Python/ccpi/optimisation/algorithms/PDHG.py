@@ -10,8 +10,8 @@ from ccpi.framework import ImageData
 import numpy as np
 import matplotlib.pyplot as plt
 import time
-from Operators.CompositeOperator import CompositeOperator
-from Operators.CompositeDataContainer import CompositeDataContainer
+from operators import BlockOperator
+from ccpi.framework import BlockDataContainer
 
 def PDHG(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
         
@@ -29,10 +29,9 @@ def PDHG(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
     show_iter = opt['show_iter'] if 'show_iter' in opt.keys() else False 
     stop_crit = opt['stop_crit'] if 'stop_crit' in opt.keys() else False 
 
-    if isinstance(operator, CompositeOperator):
-#    if isinstance(operator, CompositeOperator_DataContainer):
-        x_old = operator.alloc_domain_dim()
-        y_old = operator.alloc_range_dim()
+    if isinstance(operator, BlockOperator):
+        x_old = operator.domain_geometry().allocate()
+        y_old = operator.range_geometry().allocate()
     else:
         x_old = ImageData(np.zeros(operator.domain_dim()))
         y_old = ImageData(np.zeros(operator.range_dim()))        

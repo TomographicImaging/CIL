@@ -23,7 +23,7 @@ class SimpleL2NormSq(Function):
         self.L = 2
         
     def __call__(self, x):
-        return self.alpha * x.power(2).sum()
+        return x.power(2).sum()
     
     def gradient(self,x, out=None):
         if out is None:
@@ -61,7 +61,7 @@ class L2NormSq(SimpleL2NormSq):
         else:
             return SimpleL2NormSq.__call__(self, x - self.b) 
         
-    def gradient(self, x):
+    def gradient(self, x, out=None):
         if self.b is None:
             return 2 * x 
         else:

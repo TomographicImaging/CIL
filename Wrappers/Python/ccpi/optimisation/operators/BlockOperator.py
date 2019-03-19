@@ -11,7 +11,7 @@ import functools
 from ccpi.framework import AcquisitionData, ImageData, BlockDataContainer
 from ccpi.optimisation.operators import Operator, LinearOperator
 from ccpi.optimisation.operators.BlockScaledOperator import BlockScaledOperator
-
+from ccpi.framework import BlockGeometry
        
 class BlockOperator(Operator):
     '''Class to hold a block operator
@@ -71,14 +71,23 @@ class BlockOperator(Operator):
         return numpy.asarray(b)
     
     def direct(self, x, out=None):
-        shape = self.get_output_shape(x.shape)
+        '''Direct operation for the BlockOperator
+
+        BlockOperator work on BlockDataContainer, but they will work on DataContainers
+        and inherited classes by simple wrapping the input in a BlockDataContainer of shape (1,1)
+        '''
+        if not isinstance (x, BlockDataContainer):
+            x_b = BlockDataContainer(x)
+        else:
+            x_b = x
+        shape = self.get_output_shape(x_b.shape)
         res = []
         for row in range(self.shape[0]):
             for col in range(self.shape[1]):
                 if col == 0:
-                    prod = self.get_item(row,col).direct(x.get_item(col))
+                    prod = self.get_item(row,col).direct(x_b.get_item(col))
                 else:
-                    prod += self.get_item(row,col).direct(x.get_item(col))
+                    prod += self.get_item(row,col).direct(x_b.get_item(col))
             res.append(prod)
         return BlockDataContainer(*res, shape=shape)
 
@@ -89,18 +98,25 @@ class BlockOperator(Operator):
         This method exists in BlockOperator as it is not known what type of
         Operator it will contain.
 
+        BlockOperator work on BlockDataContainer, but they will work on DataContainers
+        and inherited classes by simple wrapping the input in a BlockDataContainer of shape (1,1)
+
         Raises: ValueError if the contained Operators are not linear
         '''
         if not functools.reduce(lambda x, y: x and y.is_linear(), self.operators, True):
             raise ValueError('Not all operators in Block are linear.')
-        shape = self.get_output_shape(x.shape, adjoint=True)
+        if not isinstance (x, BlockDataContainer):
+            x_b = BlockDataContainer(x)
+        else:
+            x_b = x
+        shape = self.get_output_shape(x_b.shape, adjoint=True)
         res = []
         for row in range(self.shape[1]):
             for col in range(self.shape[0]):
                 if col == 0:
-                    prod = self.get_item(row, col).adjoint(x.get_item(col))
+                    prod = self.get_item(row, col).adjoint(x_b.get_item(col))
                 else:
-                    prod += self.get_item(row, col).adjoint(x.get_item(col))
+                    prod += self.get_item(row, col).adjoint(x_b.get_item(col))
             res.append(prod)
         return BlockDataContainer(*res, shape=shape)
     

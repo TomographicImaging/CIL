@@ -18,6 +18,7 @@
 #   limitations under the License.
 
 import warnings
+from ccpi.optimisation.functions.ScaledFunction import ScaledFunction
 
 class Function(object):
     '''Abstract class representing a function
@@ -59,4 +60,10 @@ class Function(object):
         warnings.warn('''This method will disappear in following 
         versions of the CIL. Use proximal instead''', DeprecationWarning)
         return self.proximal(x, out=None)
+
+    def __rmul__(self, scalar):
+        '''Defines the multiplication by a scalar on the left
+
+        returns a ScaledFunction'''
+        return ScaledFunction(self, scalar)
 

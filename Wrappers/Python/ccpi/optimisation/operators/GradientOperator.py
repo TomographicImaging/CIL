@@ -27,6 +27,7 @@ class Gradient(Operator):
 
         
         if self.gm_range is None:
+            #FIXME this should be a BlockGeometry
            self.gm_range =  ((len(self.gm_domain),)+self.gm_domain)
     
         # Kwargs Default options            
@@ -39,9 +40,16 @@ class Gradient(Operator):
         
     def direct(self, x, out=None):
         
-        tmp = np.zeros(self.gm_range)
+        #tmp = np.zeros(self.gm_range)
+        tmp = self.gm_range.allocate()
         for i in range(len(self.gm_domain)):
-            tmp[i] = FiniteDiff(self.gm_domain, direction = i, bnd_cond = self.bnd_cond).direct(x.as_array())/self.voxel_size[i]            
+            #tmp[i] = FiniteDiff(self.gm_domain, direction = i, bnd_cond = self.bnd_cond).direct(x.as_array())/self.voxel_size[i]
+            if self.correlation == 'Space':
+                if i == 0 :
+                    i+=1
+            tmp[i].fill(
+                FiniteDiff(self.gm_domain, direction = i, bnd_cond = self.bnd_cond).direct(x.as_array())/self.voxel_size[i]
+                )
 #        return type(x)(tmp)
         return type(x)(tmp)
     

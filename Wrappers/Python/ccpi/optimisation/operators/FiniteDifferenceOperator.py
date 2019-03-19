@@ -32,16 +32,21 @@ class FiniteDiff(Operator):
         self.direction = direction
         self.bnd_cond = bnd_cond
         
+        # Domain Geometry = Range Geometry if not stated
         if self.gm_range is None:
             self.gm_range = self.gm_domain
-            
-        if self.direction + 1 > len(gm_domain):
+        # check direction and "length" of geometry
+        if self.direction + 1 > len(self.gm_domain.shape):
             raise ValueError('Gradient directions more than geometry domain')      
-                         
+        
+        #self.voxel_size = kwargs.get('voxel_size',1)
+        # this wrongly assumes a homogeneous voxel size
+        self.voxel_size = self.gm_domain.voxel_size_x
+
+
     def direct(self, x, out=None):
-                        
-#        x_asarr = x.as_array()
-        x_asarr = x
+        
+        x_asarr = x.as_array()
         x_sz = len(x.shape)
         
         if out is None:        
@@ -157,13 +162,13 @@ class FiniteDiff(Operator):
         else:
             raise NotImplementedError                
          
-        res = out  
-        return res
+        res = out/self.voxel_size 
+        return type(x)(res)
                     
     def adjoint(self, x, out=None):
         
-#        x_asarr = x.as_array()
-        x_asarr = x
+        x_asarr = x.as_array()
+        #x_asarr = x
         x_sz = len(x.shape)
         
         if out is None:        
@@ -294,19 +299,20 @@ class FiniteDiff(Operator):
         else:
             raise NotImplementedError
             
-        res = out
-        return res
+        res = out/self.voxel_size
+        return type(x)(-res)
             
     def range_geometry(self):
+        '''Returns the range geometry'''
         return self.gm_range
     
     def domain_geometry(self):
-        '''currently is a tuple'''
+        '''Returns the domain geometry'''
         return self.gm_domain
        
     def norm(self):
         x0 = self.gm_domain.allocate()
-        x0 = np.random.random_sample(x0.shape)
+        x0.fill( np.random.random_sample(x0.shape) )
         self.s1, sall, svec = PowerMethodNonsquare(self, 25, x0)
         return self.s1
     

@@ -28,13 +28,14 @@ class ScaledFunction(object):
         '''Evaluates the function at x '''
         return self.scalar * self.function(x)
 
-    def convex_conjugate(self, x, out=None):
+    def convex_conjugate(self, x):
         '''returns the convex_conjugate of the scaled function '''
-        if out is None:
-            return self.scalar * self.function.convex_conjugate(x/self.scalar, out=out)
-        else:
-            out.fill(self.function.convex_conjugate(x/self.scalar))
-            out *= self.scalar
+        # if out is None:
+        #     return self.scalar * self.function.convex_conjugate(x/self.scalar)
+        # else:
+        #     out.fill(self.function.convex_conjugate(x/self.scalar))
+        #     out *= self.scalar
+        return self.scalar * self.function.convex_conjugate(x/self.scalar)
 
     def proximal_conjugate(self, x, tau, out = None):
         '''This returns the proximal operator for the function at x, tau

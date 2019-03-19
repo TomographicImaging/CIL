@@ -6,4 +6,5 @@ from .L1Norm import SimpleL1Norm, L1Norm
 from .L2NormSquared import L2NormSq, SimpleL2NormSq
 from .mixed_L12Norm import mixed_L12Norm
 from .BlockFunction import BlockFunction
+from .ScaledFunction import ScaledFunction
 from .FunctionOperatorComposition import FunctionOperatorComposition

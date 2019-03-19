@@ -495,9 +495,10 @@ class TestDataContainer(unittest.TestCase):
         self.assertEqual(order[1], image.dimension_labels[1])
         self.assertEqual(order[2], image.dimension_labels[2])
     def test_AcquisitionGeometry_allocate(self):
-        ageometry = AcquisitionGeometry(dimension=2, angles=numpy.linspace(0, 180, num=10),
-                                        geom_type='parallel', pixel_num_v=3,
-                                        pixel_num_h=5, channels=2)
+        ageometry = AcquisitionGeometry(dimension=2, 
+                            angles=numpy.linspace(0, 180, num=10),
+                            geom_type='parallel', pixel_num_v=3,
+                            pixel_num_h=5, channels=2)
         sino = ageometry.allocate()
         shape = sino.shape
         print ("shape", shape)
@@ -509,8 +510,8 @@ class TestDataContainer(unittest.TestCase):
         self.assertEqual(1,sino.as_array()[shape[0]-1][shape[1]-1][shape[2]-1][shape[3]-1])
         print (sino.dimension_labels, sino.shape, ageometry)
         
-        default_order = ['channel' , ' angle' ,
-                                          'vertical' , 'horizontal']
+        default_order = ['channel' , 'angle' ,
+                         'vertical' , 'horizontal']
         self.assertEqual(default_order[0], sino.dimension_labels[0])
         self.assertEqual(default_order[1], sino.dimension_labels[1])
         self.assertEqual(default_order[2], sino.dimension_labels[2])

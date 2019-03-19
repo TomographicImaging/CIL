@@ -4,6 +4,7 @@ from ccpi.framework import BlockDataContainer
 from ccpi.optimisation.ops import TomoIdentity
 from ccpi.framework import ImageGeometry, ImageData
 import numpy
+from ccpi.optimisation.operators import FiniteDiff
 
 class TestBlockOperator(unittest.TestCase):
 
@@ -102,6 +103,7 @@ class TestBlockOperator(unittest.TestCase):
     def test_TomoIdentity(self):
         ig = ImageGeometry(10,20,30)
         img = ig.allocate()
+        print (img.shape, ig.shape)
         self.assertTrue(img.shape == (30,20,10))
         self.assertEqual(img.sum(), 0)
         Id = TomoIdentity(ig)
@@ -288,3 +290,24 @@ class TestBlockOperator(unittest.TestCase):
         plt.imshow(cgsmall.get_output().get_item(0,0).subset(vertical=0).as_array())
         plt.title('Composite CGLS\nsmall lambda')
         plt.show()
+
+    def test_FiniteDiffOperator(self):
+        N, M = 200, 300
+
+        
+        ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N)    
+        u = ig.allocate('random_int')
+        G = FiniteDiff(ig, direction=0, bnd_cond = 'Neumann')
+        print(type(u), u.as_array())    
+        print(G.direct(u).as_array())
+
+        # Gradient Operator norm, for one direction should be close to 2
+        numpy.testing.assert_allclose(G.norm(), numpy.sqrt(4), atol=0.1)
+
+        M1, N1, K1 = 200, 300, 2
+        ig1 = ImageGeometry(voxel_num_x = M1, voxel_num_y = N1, channels = K1)
+        u1 = ig1.allocate('random_int')
+        G1 = FiniteDiff(ig1, direction=2, bnd_cond = 'Periodic')
+        print(ig1.shape==u1.shape)
+        print (G1.norm())
+        numpy.testing.assert_allclose(G1.norm(), numpy.sqrt(4), atol=0.1)

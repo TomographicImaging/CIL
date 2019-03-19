@@ -49,11 +49,12 @@ class TestFunction(unittest.TestCase):
         noisy_data = ImageData(np.random.randint(10, size=ag))
         
         d = ImageData(np.random.randint(10, size=ag))
-        
-        g = L2NormSq(alpha=0.5, b=noisy_data)
+        alpha = 0.5
+        # scaled function
+        g = alpha * L2NormSq(b=noisy_data)
         
         # Compare call of g
-        a2 = g.alpha*(d - noisy_data).power(2).sum()
+        a2 = alpha*(d - noisy_data).power(2).sum()
         #print(a2, g(d)) 
         self.assertEqual(a2, g(d))
         
@@ -63,7 +64,11 @@ class TestFunction(unittest.TestCase):
         #print( a3, g.convex_conjugate(d))
     
     
-    
+    def stest_ScaledFunctin(self):
+        ig = (N,N)
+        ag = ig       
+        op1 = Gradient(ig)
+        op2 = Identity(ig, ag)
     
     
 #    

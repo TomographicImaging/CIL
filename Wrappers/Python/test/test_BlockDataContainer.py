@@ -18,6 +18,8 @@ from ccpi.framework import BlockDataContainer
 #from ccpi.optimisation.Algorithms import CGLS
 import functools
 
+from ccpi.optimisation.operators import Gradient, Identity, BlockOperator
+
 class TestBlockDataContainer(unittest.TestCase):
     def skiptest_BlockDataContainerShape(self):
         print ("test block data container")
@@ -327,6 +329,39 @@ class TestBlockDataContainer(unittest.TestCase):
         numpy.testing.assert_almost_equal(nbdc2.get_item(1).get_item(0).as_array()[0][0][0] , 1. , decimal=5)
         numpy.testing.assert_almost_equal(nbdc2.get_item(1).get_item(1).as_array()[0][0][0] , 3./2 , decimal=5)
 
-        
+        c5 = nbdc.get_item(0).power(2).sum()
+        c5a = nbdc.power(2).sum()
+        print ("sum", c5a, c5)
+
         print ("test_Nested_BlockDataContainer OK")
-        
+    def stest_NestedBlockDataContainer2(self):
+        M, N = 2, 3
+        ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N) 
+        ag = ig
+        u = ig.allocate(1)
+        op1 = Gradient(ig)
+        op2 = Identity(ig, ag)
+
+        operator = BlockOperator(op1, op2, shape=(2,1)) 
+
+        d1 = op1.direct(u)
+        d2 = op2.direct(u)
+
+        d = operator.direct(u)
+
+        dd = operator.domain_geometry()
+        ww = operator.range_geometry()
+
+        print(d.get_item(0).get_item(0).as_array())
+        print(d.get_item(0).get_item(1).as_array())
+        print(d.get_item(1).as_array())
+
+        c1 = d + d
+
+        c2 = 2*d
+
+        c3 = d / (d+0.0001)
+
+
+        c5 = d.get_item(0).power(2).sum()
+

@@ -1,7 +1,7 @@
 
-| master build | pull request build |
-|--------|-------------|
-| [![Build Status](https://anvil.softeng-support.ac.uk/jenkins/buildStatus/icon?job=CILsingle/CCPi-Framework)](https://anvil.softeng-support.ac.uk/jenkins/job/CILsingle/job/CCPi-Framework/) | [![Build Status](https://anvil.softeng-support.ac.uk/jenkins/buildStatus/icon?job=CILsingle/CCPi-Framework-dev)](https://anvil.softeng-support.ac.uk/jenkins/job/CILsingle/job/CCPi-Framework-dev/) |
+| Master | Development | Anaconda binaries |
+|--------|-------------|-------------------|
+| [![Build Status](https://anvil.softeng-support.ac.uk/jenkins/buildStatus/icon?job=CILsingle/CCPi-Framework)](https://anvil.softeng-support.ac.uk/jenkins/job/CILsingle/job/CCPi-Framework/) | [![Build Status](https://anvil.softeng-support.ac.uk/jenkins/buildStatus/icon?job=CILsingle/CCPi-Framework-dev)](https://anvil.softeng-support.ac.uk/jenkins/job/CILsingle/job/CCPi-Framework-dev/) ||![conda version](https://anaconda.org/ccpi/ccpi-framework/badges/version.svg) ![conda last release](https://anaconda.org/ccpi/ccpi-framework/badges/latest_release_date.svg) [![conda platforms](https://anaconda.org/ccpi/ccpi-framework/badges/platforms.svg) ![conda dowloads](https://anaconda.org/ccpi/ccpi-framework/badges/downloads.svg)](https://anaconda.org/ccpi/ccpi-framework) |
 
 # CCPi-Framework
 

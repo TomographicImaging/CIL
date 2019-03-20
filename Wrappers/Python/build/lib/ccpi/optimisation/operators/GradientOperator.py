@@ -6,18 +6,19 @@ Created on Fri Mar  1 22:50:04 2019
 @author: evangelos
 """
 
-from ccpi.optimisation.operators import Operator
+from ccpi.optimisation.operators import Operator, LinearOperator
 from ccpi.optimisation.ops import PowerMethodNonsquare
 from ccpi.framework import ImageData
 import numpy as np
 from ccpi.optimisation.operators import FiniteDiff
 from ccpi.framework import ImageGeometry, BlockGeometry
 from ccpi.framework import BlockDataContainer
+import functools
 
 
 #%%
 
-class Gradient(Operator):
+class Gradient(LinearOperator):
     
     def __init__(self, gm_domain, bnd_cond = 'Neumann', **kwargs):
         

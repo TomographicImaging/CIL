@@ -7,37 +7,36 @@ Created on Fri Mar  8 10:01:31 2019
 """
 
 import numpy as np
-#from ccpi.optimisation.funcs import Function
 from ccpi.optimisation.functions import Function
 from ccpi.framework import BlockDataContainer
 
 class BlockFunction(Function):
     
-    def __init__(self, operator, *functions):
+    def __init__(self, *functions):
                 
         self.functions = functions      
-        self.operator = operator
         self.length = len(self.functions)
         
         super(BlockFunction, self).__init__()
         
+    def get_item(self, index):
+        return self.functions[index]       
+        
     def __call__(self, x):
-    
-        tmp = self.operator.direct(x)       
-                
+                         
         t = 0                
-        for i in range(tmp.shape[0]):
+        for i in range(x.shape[0]):
             t += self.functions[i](tmp.get_item(i))               
         return t
     
-    def call_adjoint(self, x):
-    
-        tmp = operator.adjoint(x)       
-                
-        t = 0                
-        for i in range(tmp.shape[0]):
-            t += self.functions[i](tmp.get_item(i))               
-        return t 
+#    def call_adjoint(self, x):
+#    
+#        tmp = operator.adjoint(x)       
+#                
+#        t = 0                
+#        for i in range(tmp.shape[0]):
+#            t += self.functions[i](tmp.get_item(i))               
+#        return t 
     
     def convex_conjugate(self, x):
                

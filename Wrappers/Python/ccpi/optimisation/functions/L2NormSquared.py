@@ -101,8 +101,8 @@ if __name__ == '__main__':
     
     # TESTS for L2 and scalar * L2
     
-    M, N = 2,3
-    ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
+    M, N, K = 2,3,5
+    ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N, voxel_num_z = K)
     u = ig.allocate('random_int')
     b = ig.allocate('random_int') 
     

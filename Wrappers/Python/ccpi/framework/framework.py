@@ -27,8 +27,7 @@ import sys
 from datetime import timedelta, datetime
 import warnings
 from functools import reduce
-
-from inspect import signature
+from numbers import Number
 
 def find_key(dic, val):
     """return the key of dictionary dic given the value"""
@@ -56,8 +55,7 @@ class ImageGeometry(object):
                  center_x=0, 
                  center_y=0, 
                  center_z=0, 
-                 channels=1,
-                 dimension_labels=None):
+                 channels=1):
         
         self.voxel_num_x = voxel_num_x
         self.voxel_num_y = voxel_num_y
@@ -69,22 +67,28 @@ class ImageGeometry(object):
         self.center_y = center_y
         self.center_z = center_z  
         self.channels = channels
-        self.dimension_labels = dimension_labels
-                
+        
+        # this is some code repetition
         if self.channels > 1:            
             if self.voxel_num_z>1:
                 self.length = 4
                 self.shape = (self.channels, self.voxel_num_z, self.voxel_num_y, self.voxel_num_x)
+                dim_labels = ['channel' ,'vertical' , 'horizontal_y' , 'horizontal_x']
             else:
                 self.length = 3
                 self.shape = (self.channels, self.voxel_num_y, self.voxel_num_x)
+                dim_labels = ['channel' , 'horizontal_y' , 'horizontal_x']
         else:
             if self.voxel_num_z>1:
                 self.length = 3
-                self.shape = (self.channels, self.voxel_num_y, self.voxel_num_x)
+                self.shape = (self.voxel_num_z, self.voxel_num_y, self.voxel_num_x)
+                dim_labels = ['vertical', 'horizontal_y' , 'horizontal_x']
             else:
                 self.length = 2  
                 self.shape = (self.voxel_num_y, self.voxel_num_x)
+                dim_labels = ['horizontal_y' , 'horizontal_x']
+        
+        self.dimension_labels = dim_labels
         
     def get_min_x(self):
         return self.center_x - 0.5*self.voxel_num_x*self.voxel_size_x
@@ -130,18 +134,20 @@ class ImageGeometry(object):
         repres += "voxel_size : x{0},y{1},z{2}\n".format(self.voxel_size_x, self.voxel_size_y, self.voxel_size_z)
         repres += "center : x{0},y{1},z{2}\n".format(self.center_x, self.center_y, self.center_z)
         return repres
-    
-    def allocate(self, value=None, dimension_labels=None):
+    def allocate(self, value=0, dimension_labels=None):
         '''allocates an ImageData according to the size expressed in the instance'''
-        if dimension_labels is None:
-            dimension_labels = self.dimension_labels
-        out = ImageData(geometry=self, dimension_labels=dimension_labels)        
-        if value == 'ones':
-            out += ImageData(np.ones(self.shape))
-        elif value == 'random':
-            out += ImageData(np.random.random_sample(self.shape))
-        elif value == 'random_int':
-            out += ImageData(np.random.random_int(10, self.shape))
+        out = ImageData(geometry=self)
+        if isinstance(value, Number):
+            if value != 0:
+                out += value
+        else:
+            if value == 'random':
+                out.fill(numpy.random.random_sample(self.shape))
+            elif value == 'random_int':
+                out.fill(numpy.random.randint(1, 10 + 1,size=self.shape))
+        if dimension_labels is not None:
+            if dimension_labels != self.dimension_labels:
+                return out.subset(dimensions=dimension_labels)
         return out
     
     def __len__(self):
@@ -149,32 +155,12 @@ class ImageGeometry(object):
     
     def shape(self):
         return self.shape
-            
- 
-class BlockGeometry(object):
-    '''Class to hold Geometry as column vector'''
-    #__array_priority__ = 1
-    def __init__(self, *args, **kwargs):
-        ''''''
-        self.geometries = args
-        self.index = 0
-        #shape = kwargs.get('shape', None)
-        #if shape is None:
-        #   shape = (len(args),1)
-        shape = (len(args),1)
-        self.shape = shape
-        #print (self.shape)
-        n_elements = functools.reduce(lambda x,y: x*y, shape, 1)
-        if len(args) != n_elements:
-            raise ValueError(
-                    'Dimension and size do not match: expected {} got {}'
-                    .format(n_elements, len(args)))
-
-    def allocate(self):
-        containers = [geom.allocate() for geom in self.geometries]
-        return BlockDataContainer(*containers)
-                   
-        
+    
+    
+    
+    
+    
+    
 class AcquisitionGeometry(object):
     
     def __init__(self, 
@@ -189,7 +175,6 @@ class AcquisitionGeometry(object):
                  dist_center_detector=None, 
                  channels=1,
                  angle_unit='degree',
-                 dimension_labels=None
                  ):
         """
         General inputs for standard type projection geometries
@@ -220,6 +205,7 @@ class AcquisitionGeometry(object):
         self.geom_type = geom_type   # 'parallel' or 'cone'
         self.dimension = dimension # 2D or 3D
         self.angles = angles
+        num_of_angles = len (angles)
         
         self.dist_source_center = dist_source_center
         self.dist_center_detector = dist_center_detector
@@ -230,7 +216,24 @@ class AcquisitionGeometry(object):
         self.pixel_size_v = pixel_size_v
         
         self.channels = channels
-        self.dimension_labels = dimension_labels
+
+        if channels > 1:
+            if pixel_num_v > 1:
+                shape = (channels, num_of_angles , pixel_num_v, pixel_num_h)
+                dim_labels = ['channel' , 'angle' , 'vertical' , 'horizontal']
+            else:
+                shape = (channels , num_of_angles, pixel_num_h)
+                dim_labels = ['channel' , 'angle' , 'horizontal']
+        else:
+            if pixel_num_v > 1:
+                shape = (num_of_angles, pixel_num_v, pixel_num_h)
+                dim_labels = ['angle' , 'vertical' , 'horizontal']
+            else:
+                shape = (num_of_angles, pixel_num_h)
+                dim_labels = ['angle' , 'horizontal']
+        self.shape = shape
+
+        self.dimension_labels = dim_labels
         
     def clone(self):
         '''returns a copy of the AcquisitionGeometry'''
@@ -258,11 +261,18 @@ class AcquisitionGeometry(object):
         return repres
     def allocate(self, value=0, dimension_labels=None):
         '''allocates an AcquisitionData according to the size expressed in the instance'''
-        if dimension_labels is None:
-            dimension_labels = self.dimension_labels
-        out = AcquisitionData(geometry=self, dimension_labels=dimension_labels)
-        if value != 0:
-            out += value
+        out = AcquisitionData(geometry=self)
+        if isinstance(value, Number):
+            if value != 0:
+                out += value
+        else:
+            if value == 'random':
+                out.fill(numpy.random.random_sample(self.shape))
+            elif value == 'random_int':
+                out.fill(numpy.random.out.fill(numpy.random.randint(1, 10 + 1,size=self.shape)))
+        if dimension_labels is not None:
+            if dimension_labels != self.dimension_labels:
+                return out.subset(dimensions=dimension_labels)
         return out
 class DataContainer(object):
     '''Generic class to hold data
@@ -809,10 +819,11 @@ class DataContainer(object):
         return self.as_array().sum(*args, **kwargs)
     def squared_norm(self):
         '''return the squared euclidean norm of the DataContainer viewed as a vector'''
-        shape = self.shape
-        size = reduce(lambda x,y:x*y, shape, 1)
-        y = numpy.reshape(self.as_array(), (size, ))
-        return numpy.dot(y, y.conjugate())
+        #shape = self.shape
+        #size = reduce(lambda x,y:x*y, shape, 1)
+        #y = numpy.reshape(self.as_array(), (size, ))
+        #return numpy.dot(y, y.conjugate())
+        return self.dot(self)
     def norm(self):
         '''return the euclidean norm of the DataContainer viewed as a vector'''
         return numpy.sqrt(self.squared_norm())
@@ -960,7 +971,7 @@ class AcquisitionData(DataContainer):
                     if channels > 1:
                         if vert > 1:
                             shape = (channels, num_of_angles , vert, horiz)
-                            dim_labels = ['channel' , ' angle' ,
+                            dim_labels = ['channel' , 'angle' ,
                                           'vertical' , 'horizontal']
                         else:
                             shape = (channels , num_of_angles, horiz)
@@ -989,7 +1000,7 @@ class AcquisitionData(DataContainer):
                         elif dim == 'horizontal':
                             shape.append(horiz)
                     if len(shape) != len(dimension_labels):
-                        raise ValueError('Missing {0} axes.\nExpected{1} got {2}}'\
+                        raise ValueError('Missing {0} axes.\nExpected{1} got {2}'\
                             .format(
                                 len(dimension_labels) - len(shape),
                                 dimension_labels, shape) 
@@ -1152,12 +1163,9 @@ class DataProcessor23D(DataProcessor):
 class AX(DataProcessor):
     '''Example DataProcessor
     The AXPY routines perform a vector multiplication operation defined as
-
     y := a*x
     where:
-
     a is a scalar
-
     x a DataContainer.
     '''
     
@@ -1190,12 +1198,9 @@ class AX(DataProcessor):
 class CastDataContainer(DataProcessor):
     '''Example DataProcessor
     Cast a DataContainer array to a different type.
-
     y := a*x
     where:
-
     a is a scalar
-
     x a DataContainer.
     '''
     
@@ -1232,7 +1237,6 @@ class PixelByPixelDataProcessor(DataProcessor):
     This processor applies a python function to each pixel of the DataContainer
     
     f is a python function
-
     x a DataSet.
     '''
     
@@ -1420,4 +1424,3 @@ if __name__ == '__main__':
 #        self.assertTrue(False)
 #    except ValueError as ve:
 #        self.assertTrue(True)
-    

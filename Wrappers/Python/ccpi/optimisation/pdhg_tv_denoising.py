@@ -11,14 +11,19 @@ from ccpi.framework import ImageData, BlockDataContainer, ImageGeometry
 import numpy as np                           
 from numpy import inf
 import matplotlib.pyplot as plt
-from cvxpy import *
 
 from algorithms import PDHG
 
-from operators import BlockOperator, Identity, Gradient
-from functions import ZeroFun, L2NormSq, mixed_L12Norm, FunctionOperatorComposition, BlockFunction
+from operators import BlockOperator, BlockOperatorOLD, Identity, Gradient
+from functions import ZeroFun, L2NormSquared, \
+                      MixedL21Norm, FunctionOperatorComposition, BlockFunction
 
 from skimage.util import random_noise
+
+from cvxpy import *
+import sys
+sys.path.insert(0,'/Users/evangelos/Desktop/Projects/CCPi/block_function/CCPi-Framework/Wrappers/Python/ccpi/optimisation/cvx_scripts')
+from cvx_functions import TV_cvx
 
 #%%############################################################################
 # Create phantom for TV denoising
@@ -38,8 +43,7 @@ noisy_data = ImageData(n1)
 # Regularisation Parameter
 alpha = 2
 
-#method = input("Enter structure of PDHG (0=Composite or 1=NotComposite): ")
-method = '0'
+method = input("Enter structure of PDHG (0=Composite or 1=NotComposite): ")
 if method == '0':
 
     # Create operators
@@ -47,16 +51,16 @@ if method == '0':
     op2 = Identity(ig, ag)
 
     # Form Composite Operator
-    operator = BlockOperator(op1, op2, shape=(2,1) ) 
+    operator = BlockOperatorOLD(op1, op2, shape=(2,1) ) 
 
     #### Create functions
 #    f = FunctionComposition_new(operator, mixed_L12Norm(alpha), \
 #                                    L2NormSq(0.5, b = noisy_data) )    
     
-    f1 = mixed_L12Norm(alpha)
-    f2 = 0.5 * L2NormSq(b = noisy_data)
+    f1 = MixedL21Norm()
+    f2 = 10 * L2NormSquared(b = noisy_data)
     
-    f = BlockFunction( operator, f1, f2 )                                        
+    f = BlockFunction(f1, f2 )                                        
     g = ZeroFun()
     
 else:
@@ -65,8 +69,8 @@ else:
     #         No Composite #
     ###########################################################################
     operator = Gradient(ig)
-    f = FunctionOperatorComposition(operator, mixed_L12Norm(alpha))
-    g = L2NormSq(0.5, b=noisy_data)
+    f = FunctionOperatorComposition(operator, MixedL21Norm())
+    g = 10 * L2NormSquared(b = noisy_data)
     ###########################################################################
 #%%
     
@@ -87,7 +91,7 @@ result, total_time, objective = PDHG(f, g, operator, \
                                   tau = tau, sigma = sigma, opt = opt)
 #%%
 ###Show results
-if isinstance(result, CompositeDataContainer):
+if isinstance(result, BlockDataContainer):
     sol = result.get_item(0).as_array()
 else:
     sol = result.as_array()
@@ -108,20 +112,16 @@ plt.plot(np.linspace(0,N,N), sol[int(N/2),:], label = 'Recon')
 plt.legend()
 plt.show()
 
-#%% 
+
+#%%
 
 try_cvx = input("Do you want CVX comparison (0/1)")
 
 if try_cvx=='0':
 
-    from cvxpy import *
-    import sys
-    sys.path.insert(0,'/Users/evangelos/Desktop/Projects/CCPi/CCPi-Framework/Wrappers/Python/ccpi/optimisation/cvx_scripts')
-    from cvx_functions import TV_cvx
-
-    u = Variable((N, N))
-    fidelity = 0.5 * sum_squares(u - noisy_data.as_array())
-    regulariser = alpha * TV_cvx(u)
+    uu = Variable((N, N))
+    fidelity = 0.5 * sum_squares(uu - noisy_data.as_array())
+    regulariser = alpha * TV_cvx(uu)
     solver = MOSEK
     obj =  Minimize( regulariser +  fidelity)
     constraints = []
@@ -133,7 +133,7 @@ if try_cvx=='0':
     print('Objective value is {} '.format(obj.value))
 
 
-    diff_pdhg_cvx = np.abs(u.value - sol)
+    diff_pdhg_cvx = np.abs(uu.value - sol)
     plt.imshow(diff_pdhg_cvx)
     plt.colorbar()
     plt.title('|CVX-PDHG|')

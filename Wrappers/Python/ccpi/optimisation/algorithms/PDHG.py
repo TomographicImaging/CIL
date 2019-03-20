@@ -10,7 +10,7 @@ from ccpi.framework import ImageData
 import numpy as np
 import matplotlib.pyplot as plt
 import time
-from operators import BlockOperator
+from operators import BlockOperator, BlockOperatorOLD
 from ccpi.framework import BlockDataContainer
 
 def PDHG(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
@@ -29,12 +29,12 @@ def PDHG(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
     show_iter = opt['show_iter'] if 'show_iter' in opt.keys() else False 
     stop_crit = opt['stop_crit'] if 'stop_crit' in opt.keys() else False 
 
-    if isinstance(operator, BlockOperator):
+    if isinstance(operator, BlockOperatorOLD):
         x_old = operator.domain_geometry().allocate()
         y_old = operator.range_geometry().allocate()
     else:
-        x_old = ImageData(np.zeros(operator.domain_dim()))
-        y_old = ImageData(np.zeros(operator.range_dim()))        
+        x_old = operator.domain_geometry().allocate()
+        y_old = operator.range_geometry().allocate()       
         
     
     xbar = x_old
@@ -68,7 +68,7 @@ def PDHG(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
         y_old = y   
         
 #        pdgap
-        print(f(x) + g(x) + f.convex_conjugate(y) + g.convex_conjugate(-1*operator.adjoint(y)) )
+#        print(f(x) + g(x) + f.convex_conjugate(y) + g.convex_conjugate(-1*operator.adjoint(y)) )
         
         
         

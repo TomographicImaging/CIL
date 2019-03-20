@@ -9,8 +9,8 @@ from .Operator import Operator
 from .LinearOperator import LinearOperator
 from .ScaledOperator import ScaledOperator
 from .BlockOperator import BlockOperator
+from .BlockOperatorOLD import BlockOperatorOLD
 from .BlockScaledOperator import BlockScaledOperator
-
 
 from .FiniteDifferenceOperator import FiniteDiff
 from .GradientOperator import Gradient

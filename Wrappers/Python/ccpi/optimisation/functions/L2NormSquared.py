@@ -11,49 +11,13 @@ Created on Thu Feb  7 13:10:56 2019
 import numpy
 from ccpi.optimisation.functions import Function
 from ccpi.framework import DataContainer, ImageData, ImageGeometry 
-from ccpi.optimisation.functions import ScaledFunction
+from ccpi.optimisation.functions import ScaledFunction 
 
-#%%
-    
-class SimpleL2NormSq(Function):
-    
-    def __init__(self, alpha=1):
-        self.alpha = alpha
-        super(SimpleL2NormSq, self).__init__()         
-        # Lispchitz constant of gradient
-        self.L = 2
-        
-    def __call__(self, x):
-        return self.alpha * x.power(2).sum()
-    
-    def gradient(self,x, out=None):
-        if out is None:
-            return 2 * x
-        else:
-            out.fill(2*x)
-    
-    def convex_conjugate(self,x):
-        return (1/4) * x.squared_norm()
-        
-    def proximal(self, x, tau, out=None):
-        if out is None:
-            return x.divide(1+2*tau)
-        else:
-            x.divide(1+2*tau, out=out)
-    
-    def proximal_conjugate(self, x, tau, out=None):
-        if out is None:
-            return x.divide(1 + tau/2)    
-        else:
-            x.divide(1+tau/2, out=out)
-
-
-
-############################   L2NORM FUNCTIONS   #############################
-class L2NormSq(Function):
+############################   L2NORM FUNCTION   #############################
+class L2NormSquared(Function):
     
     def __init__(self, **kwargs):
-        super(L2NormSq, self).__init__()
+        super(L2NormSquared, self).__init__()
         self.b = kwargs.get('b',None)              
 
     def __call__(self, x, out=None):
@@ -102,7 +66,6 @@ class L2NormSq(Function):
         ''' The proximal operator ( prox_\{tau * f\}(x) ) evaluates i.e., 
                 argmin_x { 0.5||x - u||^{2} + tau f(x) }
         '''        
-        # TODO Can we do it recursively?
         
         if out is None:
             if self.b is not None:
@@ -118,15 +81,17 @@ class L2NormSq(Function):
     
     def proximal_conjugate(self, x, tau, out=None):
         
-        
-        return x - tau * self.proximal(x/tau, 1/tau)
-
-    
-#        if self.b is None:
-#            return SimpleL2NormSq.proximal_conjugate(self, x, tau)
-#        else:
-#            return SimpleL2NormSq.proximal_conjugate(self, x - tau * self.b, tau)
-        
+        if out is None:
+            if self.b is not None:
+                return (x - tau*self.b)/(1 + tau/2) 
+            else:
+                return x/(1 + tau/2 )
+        else:
+            if self.b is not None:
+                out.fill((x - tau*self.b)/(1 + tau/2))
+            else:
+                out.fill(x/(1 + tau/2 ))
+                                        
     def __rmul__(self, scalar):
         return ScaledFunction(self, scalar)        
 
@@ -134,20 +99,22 @@ class L2NormSq(Function):
 if __name__ == '__main__':
     
     
-    M, N = 200,300
+    # TESTS for L2 and scalar * L2
+    
+    M, N = 2,3
     ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
-    u = ig.allocate('random')
-    b = ig.allocate('random') 
+    u = ig.allocate('random_int')
+    b = ig.allocate('random_int') 
     
     # check grad/call no data
-    f = L2NormSq()
+    f = L2NormSquared()
     a1 = f.gradient(u)
     a2 = 2 * u
     numpy.testing.assert_array_almost_equal(a1.as_array(), a2.as_array(), decimal=4)
     numpy.testing.assert_equal(f(u), u.squared_norm())
 
     # check grad/call with data
-    f1 = L2NormSq(b=b)
+    f1 = L2NormSquared(b=b)
     b1 = f1.gradient(u)
     b2 = 2 * (u-b)
         
@@ -187,10 +154,44 @@ if __name__ == '__main__':
     l2 = (u - tau * b)/(1 + tau/2 )
     numpy.testing.assert_array_almost_equal(l1.as_array(), l2.as_array(), decimal=4)     
     
+        
+    # check scaled function properties
+    
+    # scalar 
+    scalar = 100
+    f_scaled_no_data = scalar * L2NormSquared()
+    f_scaled_data = scalar * L2NormSquared(b=b)
+    
+    # call
+    numpy.testing.assert_equal(f_scaled_no_data(u), scalar*f(u))
+    numpy.testing.assert_equal(f_scaled_data(u), scalar*f1(u))
+    
+    # grad
+    numpy.testing.assert_array_almost_equal(f_scaled_no_data.gradient(u).as_array(), scalar*f.gradient(u).as_array(), decimal=4)
+    numpy.testing.assert_array_almost_equal(f_scaled_data.gradient(u).as_array(), scalar*f1.gradient(u).as_array(), decimal=4)
+    
+    # conj
+    numpy.testing.assert_almost_equal(f_scaled_no_data.convex_conjugate(u), \
+                               f.convex_conjugate(u/scalar) * scalar, decimal=4)
+    
+    numpy.testing.assert_almost_equal(f_scaled_data.convex_conjugate(u), \
+                               scalar * f1.convex_conjugate(u/scalar), decimal=4)
+    
+    # proximal
+    numpy.testing.assert_array_almost_equal(f_scaled_no_data.proximal(u, tau).as_array(), \
+                                            f.proximal(u, tau*scalar).as_array())
     
     
+    numpy.testing.assert_array_almost_equal(f_scaled_data.proximal(u, tau).as_array(), \
+                                            f1.proximal(u, tau*scalar).as_array())
+                               
     
-#
+    # proximal conjugate
+    numpy.testing.assert_array_almost_equal(f_scaled_no_data.proximal_conjugate(u, tau).as_array(), \
+                                            (u/(1 + tau/(2*scalar) )).as_array(), decimal=4)
+    
+    numpy.testing.assert_array_almost_equal(f_scaled_data.proximal_conjugate(u, tau).as_array(), \
+                                            ((u - tau * b)/(1 + tau/(2*scalar) )).as_array(), decimal=4)    
     
     
     

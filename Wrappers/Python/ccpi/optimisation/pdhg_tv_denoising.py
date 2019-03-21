@@ -9,7 +9,6 @@ Created on Fri Feb 22 14:53:03 2019
 from ccpi.framework import ImageData, BlockDataContainer, ImageGeometry 
 
 import numpy as np                           
-from numpy import inf
 import matplotlib.pyplot as plt
 
 from algorithms import PDHG
@@ -20,10 +19,10 @@ from functions import ZeroFun, L2NormSquared, \
 
 from skimage.util import random_noise
 
-from cvxpy import *
-import sys
-sys.path.insert(0,'/Users/evangelos/Desktop/Projects/CCPi/block_function/CCPi-Framework/Wrappers/Python/ccpi/optimisation/cvx_scripts')
-from cvx_functions import TV_cvx
+#from cvxpy import *
+#import sys
+#sys.path.insert(0,'/Users/evangelos/Desktop/Projects/CCPi/block_function/CCPi-Framework/Wrappers/Python/ccpi/optimisation/cvx_scripts')
+#from cvx_functions import TV_cvx
 
 #%%
 # ############################################################################
@@ -115,35 +114,35 @@ plt.show()
 
 
 #%%
-
-try_cvx = input("Do you want CVX comparison (0/1)")
-
-if try_cvx=='0':
-
-    uu = Variable((N, N))
-    fidelity = 0.5 * sum_squares(uu - noisy_data.as_array())
-    regulariser = alpha * TV_cvx(uu)
-    solver = MOSEK
-    obj =  Minimize( regulariser +  fidelity)
-    constraints = []
-    prob = Problem(obj, constraints)
-
-    # Choose solver (SCS is fast but less accurate than MOSEK)
-    res = prob.solve(verbose = True, solver = solver)
-
-    print('Objective value is {} '.format(obj.value))
-
-
-    diff_pdhg_cvx = np.abs(uu.value - sol)
-    plt.imshow(diff_pdhg_cvx)
-    plt.colorbar()
-    plt.title('|CVX-PDHG|')
-    plt.show()
-
-    plt.plot(np.linspace(0,N,N), u.value[int(N/2),:], label = 'CVX')
-    plt.plot(np.linspace(0,N,N), sol[int(N/2),:], label = 'PDHG')
-    plt.legend()
-    plt.show()
-
-else:
-    print('No CVX solution available')
+#
+#try_cvx = input("Do you want CVX comparison (0/1)")
+#
+#if try_cvx=='0':
+#
+#    uu = Variable((N, N))
+#    fidelity = 0.5 * sum_squares(uu - noisy_data.as_array())
+#    regulariser = alpha * TV_cvx(uu)
+#    solver = MOSEK
+#    obj =  Minimize( regulariser +  fidelity)
+#    constraints = []
+#    prob = Problem(obj, constraints)
+#
+#    # Choose solver (SCS is fast but less accurate than MOSEK)
+#    res = prob.solve(verbose = True, solver = solver)
+#
+#    print('Objective value is {} '.format(obj.value))
+#
+#
+#    diff_pdhg_cvx = np.abs(uu.value - sol)
+#    plt.imshow(diff_pdhg_cvx)
+#    plt.colorbar()
+#    plt.title('|CVX-PDHG|')
+#    plt.show()
+#
+#    plt.plot(np.linspace(0,N,N), u.value[int(N/2),:], label = 'CVX')
+#    plt.plot(np.linspace(0,N,N), sol[int(N/2),:], label = 'PDHG')
+#    plt.legend()
+#    plt.show()
+#
+#else:
+#    print('No CVX solution available')

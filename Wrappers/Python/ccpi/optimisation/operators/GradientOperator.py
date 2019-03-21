@@ -11,8 +11,7 @@ from ccpi.optimisation.ops import PowerMethodNonsquare
 from ccpi.framework import ImageData
 import numpy as np
 from ccpi.optimisation.operators import FiniteDiff
-from ccpi.framework import ImageGeometry, BlockGeometry
-from ccpi.framework import BlockDataContainer
+from ccpi.framework import ImageGeometry, BlockGeometry, BlockDataContainer
 import functools
 
 

@@ -28,7 +28,7 @@ class BlockGeometry(object):
                     'Dimension and size do not match: expected {} got {}'
                     .format(n_elements, len(args)))
 
-    def allocate(self):
-        containers = [geom.allocate() for geom in self.geometries]
+    def allocate(self, value=0):
+        containers = [geom.allocate(value) for geom in self.geometries]
         BlockDataContainer(*containers)
          

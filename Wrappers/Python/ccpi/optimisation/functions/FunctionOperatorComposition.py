@@ -37,17 +37,17 @@ class FunctionOperatorComposition(Function):
         ''' convex_conjugate does not take into account the Operator'''
         return self.function.convex_conjugate(x)
 
-    def proximal(self, x, tau):
+    def proximal(self, x, tau, out=None):
         
-        ''' proximal does not take into account the Operator'''
+        '''proximal does not take into account the Operator'''
         
-        return self.function.proximal(x, tau, out=None)
+        return self.function.proximal(x, tau, out=out)
 
     def proximal_conjugate(self, x, tau, out=None):    
 
         ''' proximal conjugate does not take into account the Operator'''
         
-        return self.function.proximal_conjugate(x, tau) 
+        return self.function.proximal_conjugate(x, tau, out=out) 
 
     def gradient(self, x, out=None):
         

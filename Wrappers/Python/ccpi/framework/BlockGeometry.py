@@ -11,7 +11,9 @@ from numbers import Number
 import functools
 from ccpi.framework import BlockDataContainer
  
+
 class BlockGeometry(object):
+    
     '''Class to hold Geometry as column vector'''
     #__array_priority__ = 1
     def __init__(self, *args, **kwargs):
@@ -30,7 +32,10 @@ class BlockGeometry(object):
                     'Dimension and size do not match: expected {} got {}'
                     .format(n_elements, len(args)))
 
-    def allocate(self):
-        containers = [geom.allocate() for geom in self.geometries]
-        BlockDataContainer(*containers)
+    def get_item(self, index):
+        return self.geometries[index]
+
+    def allocate(self,value=0, dimension_labels=None):
+        containers = [geom.allocate(value) for geom in self.geometries]
+        return BlockDataContainer(*containers)
          

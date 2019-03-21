@@ -21,8 +21,12 @@ class MixedL21Norm(Function):
         
     def __call__(self,x):
         
-        ''' Evaluates L1,2Norm at point x'''
+        ''' Evaluates L1,2Norm at point x
+            
+            :param: x is a DataContainer
         
+        '''
+                
         if self.sym_grad:
             tmp = np.sqrt(tmp1.as_array()[0]**2 +  tmp1.as_array()[1]**2 +  2*tmp1.as_array()[2]**2)
         else:

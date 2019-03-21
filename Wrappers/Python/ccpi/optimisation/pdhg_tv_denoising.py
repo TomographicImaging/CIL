@@ -25,7 +25,8 @@ import sys
 sys.path.insert(0,'/Users/evangelos/Desktop/Projects/CCPi/block_function/CCPi-Framework/Wrappers/Python/ccpi/optimisation/cvx_scripts')
 from cvx_functions import TV_cvx
 
-#%%############################################################################
+#%%
+# ############################################################################
 # Create phantom for TV denoising
 
 N = 200
@@ -58,7 +59,7 @@ if method == '0':
 #                                    L2NormSq(0.5, b = noisy_data) )    
     
     f1 = MixedL21Norm()
-    f2 = 10 * L2NormSquared(b = noisy_data)
+    f2 = 0.5 * L2NormSquared(b = noisy_data)
     
     f = BlockFunction(f1, f2 )                                        
     g = ZeroFun()

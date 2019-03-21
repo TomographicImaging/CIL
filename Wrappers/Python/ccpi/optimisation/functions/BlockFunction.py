@@ -26,7 +26,7 @@ class BlockFunction(Function):
                          
         t = 0                
         for i in range(x.shape[0]):
-            t += self.functions[i](tmp.get_item(i))               
+            t += self.functions[i](x.get_item(i))               
         return t
     
 #    def call_adjoint(self, x):

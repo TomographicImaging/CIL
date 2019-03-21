@@ -161,8 +161,6 @@ class BlockOperator(Operator):
         return BlockGeometry(*tmp)        
         
         
-#        containers = [op.domain_geometry() for op in self.operators]
-#        return BlockGeometry(*containers)
     
     @property
     def T(self):

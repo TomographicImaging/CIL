@@ -27,7 +27,6 @@ class Gradient(LinearOperator):
         self.gm_domain = gm_domain # Domain of Grad Operator
         
         self.correlation = kwargs.get('correlation','Space')
-#        self.gm_range = kwargs.get('gm_range',None)
         
         if self.correlation=='Space':
             if self.gm_domain.channels>1:
@@ -153,14 +152,16 @@ if __name__ == '__main__':
     print(G7.range_geometry().shape, '3D with channels with corr')
     
     
-    u = ig1.allocate('random_int')
+    u = ig1.allocate('random')
     w = G1.range_geometry().allocate('random_int')
-#    g1 = G1.range_geometry()
+
     LHS = (G1.direct(u)*w).sum()
     RHS = (u * G1.adjoint(w)).sum()
-    
+#    
     print(LHS,RHS)
     print(G1.norm())
+    
+    ##############################################
     
 #    d1 = G1.direct(u)
 #    d2 = G1.adjoint(d1)
@@ -178,7 +179,7 @@ if __name__ == '__main__':
 #    u = DataContainer(np.random.randint(10, size=G.domain_dim()))
 #    w = DataContainer(np.random.randint(10, size=G.range_dim()))
 ##    w = [DataContainer(np.random.randint(10, size=G.domain_dim())),\
-##         DataContainer(np.random.randint(10, size=G.domain_dim()))]
+##         DataContainer(np.random.randint(10, asize=G.domain_dim()))]
 #
 #    # domain_dim
 #    print('Domain {}'.format(G.domain_geometry()))

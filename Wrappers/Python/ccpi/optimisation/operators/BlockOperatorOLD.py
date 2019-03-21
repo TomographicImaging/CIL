@@ -177,9 +177,6 @@ class BlockOperatorOLD(Operator):
                 tmp.append(self.get_item(i,0).range_geometry())
         return BlockGeometry(*tmp)        
         
-        
-#        containers = [op.domain_geometry() for op in self.operators]
-#        return BlockGeometry(*containers)
     
     @property
     def T(self):

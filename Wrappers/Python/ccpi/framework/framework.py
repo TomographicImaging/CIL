@@ -134,6 +134,7 @@ class ImageGeometry(object):
         repres += "voxel_size : x{0},y{1},z{2}\n".format(self.voxel_size_x, self.voxel_size_y, self.voxel_size_z)
         repres += "center : x{0},y{1},z{2}\n".format(self.center_x, self.center_y, self.center_z)
         return repres
+    
     def allocate(self, value=0, dimension_labels=None):
         '''allocates an ImageData according to the size expressed in the instance'''
         out = ImageData(geometry=self)
@@ -144,7 +145,7 @@ class ImageGeometry(object):
             if value == 'random':
                 out.fill(numpy.random.random_sample(self.shape))
             elif value == 'random_int':
-                out.fill(numpy.random.randint(1, 10 + 1,size=self.shape))
+                out.fill(numpy.random.randint(100, size=self.shape))
         if dimension_labels is not None:
             if dimension_labels != self.dimension_labels:
                 return out.subset(dimensions=dimension_labels)

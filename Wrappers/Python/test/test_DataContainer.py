@@ -494,6 +494,8 @@ class TestDataContainer(unittest.TestCase):
         self.assertEqual(order[0], image.dimension_labels[0])
         self.assertEqual(order[1], image.dimension_labels[1])
         self.assertEqual(order[2], image.dimension_labels[2])
+
+        #vgeometry.allocate('')
     def test_AcquisitionGeometry_allocate(self):
         ageometry = AcquisitionGeometry(dimension=2, 
                             angles=numpy.linspace(0, 180, num=10),
@@ -523,6 +525,17 @@ class TestDataContainer(unittest.TestCase):
         self.assertEqual(order[1], sino.dimension_labels[1])
         self.assertEqual(order[2], sino.dimension_labels[2])
         self.assertEqual(order[2], sino.dimension_labels[2])
+    
+    def test_ImageGeometry_equal(self):
+        vg1 = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)
+        vg2 = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)
+        self.assertTrue(vg1 == vg2)
+        self.assertFalse(vg1 != vg2)
+
+        vg2 = ImageGeometry(voxel_num_z=3,voxel_num_x=4, voxel_num_y=3, channels=2)
+        self.assertTrue(vg1 != vg2)
+        self.assertFalse(vg1 == vg2)
+
 
     def assertNumpyArrayEqual(self, first, second):
         res = True

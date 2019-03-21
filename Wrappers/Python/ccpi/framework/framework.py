@@ -175,6 +175,15 @@ class ImageGeometry(object):
     #def shape(self):
     #    '''Returns the shape of the array of the ImageData it describes'''
     #    return self.shape
+    def __eq__(self, other):
+        '''Returns whether two geometries are equal'''
+        if isinstance(other, self.__class__):
+            return self.__dict__ == other.__dict__
+        else:
+            return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
 class AcquisitionGeometry(object):
     RANDOM = 'random'
@@ -309,6 +318,16 @@ class AcquisitionGeometry(object):
             if dimension_labels != self.dimension_labels:
                 return out.subset(dimensions=dimension_labels)
         return out
+    def __eq__(self, other):
+        '''Returns whether two geometries are equal'''
+        if isinstance(other, self.__class__):
+            return self.__dict__ == other.__dict__
+        else:
+            return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
 class DataContainer(object):
     '''Generic class to hold data
     

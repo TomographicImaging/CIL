@@ -72,10 +72,11 @@ class Gradient(LinearOperator):
     
 if __name__ == '__main__':
     
-    N, M = 200, 300
+    N, M, K = 200, 200, 3
+    channels = 5
     
     # check range geometry, examples
-    K=2
+    
     ig1 = ImageGeometry(voxel_num_x = M, voxel_num_y = N) 
     ig2 = ImageGeometry(voxel_num_x = M, voxel_num_y = N, voxel_num_z = K) 
     ig3 = ImageGeometry(voxel_num_x = M, voxel_num_y = N, channels = 2) 
@@ -95,35 +96,34 @@ if __name__ == '__main__':
     print(G7.range_geometry().shape, '3D with channels with corr')
     
     
-    u = ig1.allocate('random')
+    u = ig1.allocate('random_int')
     w = G1.range_geometry().allocate('random_int')
 
     LHS = (G1.direct(u)*w).sum()
     RHS = (u * G1.adjoint(w)).sum()
+    numpy.testing.assert_almost_equal(LHS, RHS, decimal = 4)
+    numpy.testing.assert_almost_equal(G1.norm(), np.sqrt(2*4), decimal = 2)
         
-    print(LHS,RHS)
-    print(G1.norm())
     
-    
-    u1 = ig3.allocate('random')
+    u1 = ig3.allocate('random_int')
     w1 = G4.range_geometry().allocate('random_int')
     LHS1 = (G4.direct(u1) * w1).sum()
     RHS1 = (u1 * G4.adjoint(w1)).sum() 
-    print(G4.norm())
-    print(LHS1, RHS1)
+    numpy.testing.assert_almost_equal(LHS1, RHS1, decimal = 2)
+    numpy.testing.assert_almost_equal(G4.norm(), np.sqrt(2*4), decimal = 4)
     
-    u2 = ig4.allocate('random')
+    u2 = ig4.allocate('random_int')
     w2 = G7.range_geometry().allocate('random_int')
     LHS2 = (G7.direct(u2) * w2).sum()
     RHS2 = (u2 * G7.adjoint(w2)).sum() 
-    print(LHS2, RHS2)    
-    print(G7.norm())
+    numpy.testing.assert_almost_equal(LHS2, RHS2, decimal = 4)
+    numpy.testing.assert_almost_equal(G7.norm(), np.sqrt(3*4), decimal = 4)
     
     
     
 
       
-    
+#    
     
     
     

@@ -44,6 +44,13 @@ def message(cls, msg, *args):
 
 
 class ImageGeometry(object):
+    RANDOM = 'random'
+    RANDOM_INT = 'random_int'
+    CHANNEL = 'channel'
+    ANGLE = 'angle'
+    VERTICAL = 'vertical'
+    HORIZONTAL_X = 'horizontal_x'
+    HORIZONTAL_Y = 'horizontal_y'
     
     def __init__(self, 
                  voxel_num_x=0, 
@@ -73,20 +80,22 @@ class ImageGeometry(object):
             if self.voxel_num_z>1:
                 self.length = 4
                 self.shape = (self.channels, self.voxel_num_z, self.voxel_num_y, self.voxel_num_x)
-                dim_labels = ['channel' ,'vertical' , 'horizontal_y' , 'horizontal_x']
+                dim_labels = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL,
+                ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
             else:
                 self.length = 3
                 self.shape = (self.channels, self.voxel_num_y, self.voxel_num_x)
-                dim_labels = ['channel' , 'horizontal_y' , 'horizontal_x']
+                dim_labels = [ImageGeometry.CHANNEL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
         else:
             if self.voxel_num_z>1:
                 self.length = 3
                 self.shape = (self.voxel_num_z, self.voxel_num_y, self.voxel_num_x)
-                dim_labels = ['vertical', 'horizontal_y' , 'horizontal_x']
+                dim_labels = [ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y,
+                 ImageGeometry.HORIZONTAL_X]
             else:
                 self.length = 2  
                 self.shape = (self.voxel_num_y, self.voxel_num_x)
-                dim_labels = ['horizontal_y' , 'horizontal_x']
+                dim_labels = [ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
         
         self.dimension_labels = dim_labels
         
@@ -134,23 +143,49 @@ class ImageGeometry(object):
         repres += "voxel_size : x{0},y{1},z{2}\n".format(self.voxel_size_x, self.voxel_size_y, self.voxel_size_z)
         repres += "center : x{0},y{1},z{2}\n".format(self.center_x, self.center_y, self.center_z)
         return repres
-    def allocate(self, value=0, dimension_labels=None):
+    def allocate(self, value=0, dimension_labels=None, **kwargs):
         '''allocates an ImageData according to the size expressed in the instance'''
         out = ImageData(geometry=self)
         if isinstance(value, Number):
             if value != 0:
                 out += value
         else:
-            if value == 'random':
+            if value == ImageData.RANDOM:
+                seed = kwargs.get('seed', None)
+                if seed is not None:
+                    numpy.random.seed(seed) 
                 out.fill(numpy.random.random_sample(self.shape))
-            elif value == 'random_int':
-                out.fill(numpy.random.randint(1, 10 + 1,size=self.shape))
+            elif value == ImageData.RANDOM_INT:
+                seed = kwargs.get('seed', None)
+                if seed is not None:
+                    numpy.random.seed(seed)
+                max_value = kwargs.get('max_value', 100)
+                out.fill(numpy.random.randint(max_value,size=self.shape))
         if dimension_labels is not None:
             if dimension_labels != self.dimension_labels:
                 return out.subset(dimensions=dimension_labels)
         return out
+    # The following methods return 2 members of the class, therefore I 
+    # don't think we need to implement them. 
+    # Additionally using __len__ is confusing as one would think this is 
+    # an iterable. 
+    #def __len__(self):
+    #    '''returns the length of the geometry'''
+    #    return self.length
+    #def shape(self):
+    #    '''Returns the shape of the array of the ImageData it describes'''
+    #    return self.shape
+
 class AcquisitionGeometry(object):
-    
+    RANDOM = 'random'
+    RANDOM_INT = 'random_int'
+    ANGLE_UNIT = 'angle_unit'
+    DEGREE = 'degree'
+    RADIAN = 'radian'
+    CHANNEL = 'channel'
+    ANGLE = 'angle'
+    VERTICAL = 'vertical'
+    HORIZONTAL = 'horizontal'
     def __init__(self, 
                  geom_type, 
                  dimension, 
@@ -162,7 +197,7 @@ class AcquisitionGeometry(object):
                  dist_source_center=None, 
                  dist_center_detector=None, 
                  channels=1,
-                 angle_unit='degree',
+                 **kwargs
                  ):
         """
         General inputs for standard type projection geometries
@@ -204,21 +239,26 @@ class AcquisitionGeometry(object):
         self.pixel_size_v = pixel_size_v
         
         self.channels = channels
-
+        self.angle_unit=kwargs.get(AcquisitionGeometry.ANGLE_UNIT, 
+                               AcquisitionGeometry.DEGREE)
         if channels > 1:
             if pixel_num_v > 1:
                 shape = (channels, num_of_angles , pixel_num_v, pixel_num_h)
-                dim_labels = ['channel' , 'angle' , 'vertical' , 'horizontal']
+                dim_labels = [AcquisitionGeometry.CHANNEL ,
+                 AcquisitionGeometry.ANGLE , AcquisitionGeometry.VERTICAL ,
+                 AcquisitionGeometry.HORIZONTAL]
             else:
                 shape = (channels , num_of_angles, pixel_num_h)
-                dim_labels = ['channel' , 'angle' , 'horizontal']
+                dim_labels = [AcquisitionGeometry.CHANNEL ,
+                 AcquisitionGeometry.ANGLE, AcquisitionGeometry.HORIZONTAL]
         else:
             if pixel_num_v > 1:
                 shape = (num_of_angles, pixel_num_v, pixel_num_h)
-                dim_labels = ['angle' , 'vertical' , 'horizontal']
+                dim_labels = [AcquisitionGeometry.ANGLE , AcquisitionGeometry.VERTICAL ,
+                 AcquisitionGeometry.HORIZONTAL]
             else:
                 shape = (num_of_angles, pixel_num_h)
-                dim_labels = ['angle' , 'horizontal']
+                dim_labels = [AcquisitionGeometry.ANGLE, AcquisitionGeometry.HORIZONTAL]
         self.shape = shape
 
         self.dimension_labels = dim_labels
@@ -254,10 +294,17 @@ class AcquisitionGeometry(object):
             if value != 0:
                 out += value
         else:
-            if value == 'random':
+            if value == AcquisitionData.RANDOM:
+                seed = kwargs.get('seed', None)
+                if seed is not None:
+                    numpy.random.seed(seed) 
                 out.fill(numpy.random.random_sample(self.shape))
-            elif value == 'random_int':
-                out.fill(numpy.random.out.fill(numpy.random.randint(1, 10 + 1,size=self.shape)))
+            elif value == AcquisitionData.RANDOM_INT:
+                seed = kwargs.get('seed', None)
+                if seed is not None:
+                    numpy.random.seed(seed)
+                max_value = kwargs.get('max_value', 100)
+                out.fill(numpy.random.randint(max_value,size=self.shape))
         if dimension_labels is not None:
             if dimension_labels != self.dimension_labels:
                 return out.subset(dimensions=dimension_labels)
@@ -810,8 +857,8 @@ class DataContainer(object):
         #shape = self.shape
         #size = reduce(lambda x,y:x*y, shape, 1)
         #y = numpy.reshape(self.as_array(), (size, ))
-        #return numpy.dot(y, y.conjugate())
-        return self.dot(self)
+        return self.dot(self.conjugate())
+        #return self.dot(self)
     def norm(self):
         '''return the euclidean norm of the DataContainer viewed as a vector'''
         return numpy.sqrt(self.squared_norm())
@@ -828,6 +875,7 @@ class DataContainer(object):
     
 class ImageData(DataContainer):
     '''DataContainer for holding 2D or 3D DataContainer'''
+    
     def __init__(self, 
                  array = None, 
                  deep_copy=False, 
@@ -939,6 +987,7 @@ class ImageData(DataContainer):
 
 class AcquisitionData(DataContainer):
     '''DataContainer for holding 2D or 3D sinogram'''
+    
     def __init__(self, 
                  array = None, 
                  deep_copy=True, 

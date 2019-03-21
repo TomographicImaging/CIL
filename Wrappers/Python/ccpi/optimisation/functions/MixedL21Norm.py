@@ -25,8 +25,7 @@ class MixedL21Norm(Function):
             
             :param: x is a BlockDataContainer
                                 
-        '''
-                        
+        '''                        
         if self.sym_tensor:
             tmp = np.sqrt(tmp1.as_array()[0]**2 +  tmp1.as_array()[1]**2 +  2*tmp1.as_array()[2]**2)            
         else:
@@ -45,11 +44,19 @@ class MixedL21Norm(Function):
         return 0.0
     
     def proximal(self, x, tau, out=None):
+        
+        '''
+            For this we need to define a MixedL2,2 norm acting on BDC,
+            different form L2NormSquared which acts on DC
+        
+        '''
+        
         pass
     
     def proximal_conjugate(self, x, tau, out=None): 
         
         if self.sym_tensor:
+            
                 tmp2 = np.sqrt(x.as_array()[0]**2 +  x.as_array()[1]**2 +  2*x.as_array()[2]**2)/self.alpha
                 res = x.divide(ImageData(tmp2).maximum(1.0))                                
         else:

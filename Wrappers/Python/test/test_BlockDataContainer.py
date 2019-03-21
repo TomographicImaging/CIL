@@ -95,7 +95,7 @@ class TestBlockDataContainer(unittest.TestCase):
     def test_BlockDataContainer(self):
         print ("test block data container")
         ig0 = ImageGeometry(2,3,4)
-        ig1 = ImageGeometry(2,3,4)
+        ig1 = ImageGeometry(2,3,5)
         
         data0 = ImageData(geometry=ig0)
         data1 = ImageData(geometry=ig1) + 1
@@ -105,7 +105,33 @@ class TestBlockDataContainer(unittest.TestCase):
         
         cp0 = BlockDataContainer(data0,data1)
         cp1 = BlockDataContainer(data2,data3)
-    #    
+
+        cp2 = BlockDataContainer(data0+1, data2+1)
+        d = cp2 + data0
+        self.assertEqual(d.get_item(0).as_array()[0][0][0], 1) 
+        try:
+            d = cp2 + data1
+            self.assertTrue(False)
+        except ValueError as ve:
+            print (ve)
+            self.assertTrue(True)
+        d = cp2 - data0
+        self.assertEqual(d.get_item(0).as_array()[0][0][0], 1) 
+        try:
+            d = cp2 - data1
+            self.assertTrue(False)
+        except ValueError as ve:
+            print (ve)
+            self.assertTrue(True)
+        d = cp2 * data2
+        self.assertEqual(d.get_item(0).as_array()[0][0][0], 2) 
+        try:
+            d = cp2 * data1
+            self.assertTrue(False)
+        except ValueError as ve:
+            print (ve)
+            self.assertTrue(True)
+            
         a = [ (el, ot) for el,ot in zip(cp0.containers,cp1.containers)]
         print  (a[0][0].shape)
         #cp2 = BlockDataContainer(*a)

@@ -17,8 +17,19 @@ from ccpi.optimisation.functions import ScaledFunction
 class L2NormSquared(Function):
     
     def __init__(self, **kwargs):
+        
+        ''' L2NormSquared class
+            f : ImageGeometry --> R
+            
+            Cases: f(x) = ||x||^{2}_{2}
+                   f(x) = || x - b ||^{2}_{2}     
+        
+        '''
+        
+        #TODO need x, b to live in the same geometry if b is not None
+                        
         super(L2NormSquared, self).__init__()
-        self.b = kwargs.get('b',None)              
+        self.b = kwargs.get('b',None)  
 
     def __call__(self, x, out=None):
         

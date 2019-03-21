@@ -896,32 +896,36 @@ class ImageData(DataContainer):
                     if channels > 1:
                         if vert > 1:
                             shape = (channels, vert, horiz_y, horiz_x)
-                            dim_labels = ['channel' ,'vertical' , 'horizontal_y' , 
-                                          'horizontal_x']
+                            dim_labels = [ImageGeometry.CHANNEL, 
+                                          ImageGeometry.VERTICAL,
+                                          ImageGeometry.HORIZONTAL_Y,
+                                          ImageGeometry.HORIZONTAL_X]
                         else:
                             shape = (channels , horiz_y, horiz_x)
-                            dim_labels = ['channel' , 'horizontal_y' , 
-                                          'horizontal_x']
+                            dim_labels = [ImageGeometry.CHANNEL,
+                                          ImageGeometry.HORIZONTAL_Y,
+                                          ImageGeometry.HORIZONTAL_X]
                     else:
                         if vert > 1:
                             shape = (vert, horiz_y, horiz_x)
-                            dim_labels = ['vertical' , 'horizontal_y' , 
-                                          'horizontal_x']
+                            dim_labels = [ImageGeometry.VERTICAL,
+                                          ImageGeometry.HORIZONTAL_Y,
+                                          ImageGeometry.HORIZONTAL_X]
                         else:
                             shape = (horiz_y, horiz_x)
-                            dim_labels = ['horizontal_y' , 
-                                          'horizontal_x']
+                            dim_labels = [ImageGeometry.HORIZONTAL_Y,
+                                          ImageGeometry.HORIZONTAL_X]
                     dimension_labels = dim_labels
                 else:
                     shape = []
                     for dim in dimension_labels:
-                        if dim == 'channel':
+                        if dim == ImageGeometry.CHANNEL:
                             shape.append(channels)
-                        elif dim == 'horizontal_y':
+                        elif dim == ImageGeometry.HORIZONTAL_Y:
                             shape.append(horiz_y)
-                        elif dim == 'vertical':
+                        elif dim == ImageGeometry.VERTICAL:
                             shape.append(vert)
-                        elif dim == 'horizontal_x':
+                        elif dim == ImageGeometry.HORIZONTAL_X:
                             shape.append(horiz_x)
                     if len(shape) != len(dimension_labels):
                         raise ValueError('Missing {0} axes'.format(
@@ -956,14 +960,17 @@ class ImageData(DataContainer):
                     
                 if dimension_labels is None:
                     if array.ndim == 4:
-                        dimension_labels = ['channel' ,'vertical' , 'horizontal_y' , 
-                                      'horizontal_x']
+                        dimension_labels = [ImageGeometry.CHANNEL, 
+                                            ImageGeometry.VERTICAL,
+                                            ImageGeometry.HORIZONTAL_Y,
+                                            ImageGeometry.HORIZONTAL_X]
                     elif array.ndim == 3:
-                        dimension_labels = ['vertical' , 'horizontal_y' , 
-                                      'horizontal_x']
+                        dimension_labels = [ImageGeometry.VERTICAL,
+                                            ImageGeometry.HORIZONTAL_Y,
+                                            ImageGeometry.HORIZONTAL_X]
                     else:
-                        dimension_labels = ['horizontal_y' , 
-                                      'horizontal_x']   
+                        dimension_labels = [ ImageGeometry.HORIZONTAL_Y,
+                                             ImageGeometry.HORIZONTAL_X]   
                 
                 #DataContainer.__init__(self, array, deep_copy, dimension_labels, **kwargs)
                 super(ImageData, self).__init__(array, deep_copy, 
@@ -979,6 +986,10 @@ class ImageData(DataContainer):
                         self.spacing = value
                         
         def subset(self, dimensions=None, **kw):
+            # FIXME: this is clearly not rigth
+            # it should be something like 
+            # out = DataContainer.subset(self, dimensions, **kw)
+            # followed by regeneration of the proper geometry. 
             out = super(ImageData, self).subset(dimensions, **kw)
             #out.geometry = self.recalculate_geometry(dimensions , **kw)
             out.geometry = self.geometry

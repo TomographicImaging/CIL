@@ -11,13 +11,14 @@ from ccpi.framework import ImageData, BlockDataContainer, ImageGeometry
 import numpy as np                           
 import matplotlib.pyplot as plt
 
-from algorithms import PDHG
+from ccpi.optimisation.algorithms import PDHG
 
-from operators import BlockOperator, BlockOperatorOLD, Identity, Gradient
-from functions import ZeroFun, L2NormSquared, \
-                      MixedL21Norm, FunctionOperatorComposition, BlockFunction
+from ccpi.optimisation.operators import BlockOperator, BlockOperatorOLD, Identity, Gradient
+from ccpi.optimisation.functions import ZeroFun, L2NormSquared, \
+                      MixedL21Norm, FunctionOperatorComposition, BlockFunction, ScaledFunction
 
 from skimage.util import random_noise
+
 
 #from cvxpy import *
 #import sys
@@ -41,9 +42,10 @@ n1 = random_noise(data, mode='gaussian', seed=10)
 noisy_data = ImageData(n1)
 
 # Regularisation Parameter
-alpha = 2
+alpha = 20
 
-method = input("Enter structure of PDHG (0=Composite or 1=NotComposite): ")
+#method = input("Enter structure of PDHG (0=Composite or 1=NotComposite): ")
+method = '0'
 if method == '0':
 
     # Create operators
@@ -57,7 +59,7 @@ if method == '0':
 #    f = FunctionComposition_new(operator, mixed_L12Norm(alpha), \
 #                                    L2NormSq(0.5, b = noisy_data) )    
     
-    f1 = MixedL21Norm()
+    f1 = alpha * MixedL21Norm()
     f2 = 0.5 * L2NormSquared(b = noisy_data)
     
     f = BlockFunction(f1, f2 )                                        
@@ -69,8 +71,8 @@ else:
     #         No Composite #
     ###########################################################################
     operator = Gradient(ig)
-    f = FunctionOperatorComposition(operator, MixedL21Norm())
-    g = 10 * L2NormSquared(b = noisy_data)
+    f = alpha * FunctionOperatorComposition(operator, MixedL21Norm())
+    g = 0.5 * L2NormSquared(b = noisy_data)
     ###########################################################################
 #%%
     

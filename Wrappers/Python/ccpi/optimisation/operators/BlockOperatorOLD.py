@@ -71,7 +71,7 @@ class BlockOperatorOLD(Operator):
         return self.operators[index]
     
     def norm(self):
-        norm = [op.norm() for op in self.operators]
+        norm = [op.norm()**2 for op in self.operators]
         return numpy.sqrt(sum(*norm))    
     
 #    def norm(self):

@@ -8,10 +8,9 @@ Created on Fri Mar  1 22:50:04 2019
 
 from ccpi.optimisation.operators import Operator, LinearOperator
 from ccpi.optimisation.ops import PowerMethodNonsquare
-from ccpi.framework import ImageData
+from ccpi.framework import ImageData, ImageGeometry, BlockGeometry
 import numpy as np
 from ccpi.optimisation.operators import FiniteDiff
-from ccpi.framework import ImageGeometry, BlockGeometry, BlockDataContainer
 import functools
 
 

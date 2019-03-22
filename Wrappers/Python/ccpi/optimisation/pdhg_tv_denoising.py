@@ -6,7 +6,7 @@ Created on Fri Feb 22 14:53:03 2019
 @author: evangelos
 """
 
-from ccpi.framework import ImageData, BlockDataContainer, ImageGeometry 
+from ccpi.framework import ImageData, ImageGeometry, BlockDataContainer
 
 import numpy as np                           
 import matplotlib.pyplot as plt
@@ -19,13 +19,6 @@ from ccpi.optimisation.functions import ZeroFun, L2NormSquared, \
 
 from skimage.util import random_noise
 
-
-#from cvxpy import *
-#import sys
-#sys.path.insert(0,'/Users/evangelos/Desktop/Projects/CCPi/block_function/CCPi-Framework/Wrappers/Python/ccpi/optimisation/cvx_scripts')
-#from cvx_functions import TV_cvx
-
-#%%
 # ############################################################################
 # Create phantom for TV denoising
 
@@ -41,11 +34,14 @@ ag = ig
 n1 = random_noise(data, mode='gaussian', seed=10)
 noisy_data = ImageData(n1)
 
+
+#%%
+
 # Regularisation Parameter
-alpha = 20
+alpha = 2
 
 #method = input("Enter structure of PDHG (0=Composite or 1=NotComposite): ")
-method = '0'
+method = '1'
 if method == '0':
 
     # Create operators

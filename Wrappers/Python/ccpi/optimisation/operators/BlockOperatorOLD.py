@@ -72,12 +72,16 @@ class BlockOperatorOLD(Operator):
     
     def norm(self):
         norm = [op.norm() for op in self.operators]
-        b = []
-        for i in range(self.shape[0]):
-            b.append([])
-            for j in range(self.shape[1]):
-                b[-1].append(norm[i*self.shape[1]+j])
-        return numpy.asarray(b).sum()
+        return numpy.sqrt(sum(*norm))    
+    
+#    def norm(self):
+#        norm = [op.norm() for op in self.operators]
+#        b = []
+#        for i in range(self.shape[0]):
+#            b.append([])
+#            for j in range(self.shape[1]):
+#                b[-1].append(norm[i*self.shape[1]+j])
+#        return numpy.asarray(b).sum()
     
     def direct(self, x, out=None):
         shape = self.get_output_shape(x.shape)

@@ -15,13 +15,10 @@ from ccpi.optimisation.functions import ScaledFunction
 class FunctionOperatorComposition(Function):
     
     def __init__(self, operator, function):
-        
         super(FunctionOperatorComposition, self).__init__()
-        
         self.function = function     
         self.operator = operator
         alpha = 1
-        
         if isinstance (function, ScaledFunction):
             alpha = function.scalar
         self.L = 2 * alpha * operator.norm()**2
@@ -64,8 +61,7 @@ class FunctionOperatorComposition(Function):
                 self.function.gradient(self.operator.direct(x), 
                 out=out)
             )
-                
-    def __rmul__(self, scalar):
-        return ScaledFunction(self, scalar)                  
         
-                       
+                                        
+    def __rmul__(self, scalar):
+        return ScaledFunction(self, scalar)                         

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -7,8 +9,8 @@ Created on Thu Feb  7 13:10:56 2019
 """
 
 import numpy
-from ccpi.optimisation.functions import Function, ScaledFunction
-from ccpi.framework import DataContainer, ImageData, ImageGeometry 
+from ccpi.optimisation.functions import *
+from ccpi.framework import DataContainer, ImageData, ImageGeometry  
 
 ############################   L2NORM FUNCTION   #############################
 class L2NormSquared(Function):

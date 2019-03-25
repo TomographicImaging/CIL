@@ -7,7 +7,6 @@ Created on Wed Mar  6 19:44:10 2019
 """
 
 import numpy as np
-#from ccpi.optimisation.funcs import Function
 from ccpi.optimisation.functions import Function
 from ccpi.framework import DataContainer, ImageData
 from ccpi.framework import BlockDataContainer 
@@ -26,13 +25,8 @@ class ZeroFun(Function):
         So 0 if x=0, or inf if x neq 0                
         '''
         
-        if x.shape[0]==1:
-            return x.maximum(0).sum()
-        else:
-            if isinstance(x, CompositeDataContainer):
-                return x.get_item(0).maximum(0).sum() + x.get_item(1).maximum(0).sum()
-            else:
-                return x.maximum(0).sum() + x.maximum(0).sum()
+        return x.maximum(0).sum()
+        
     
     def proximal(self,x,tau, out=None):
         if out is None:

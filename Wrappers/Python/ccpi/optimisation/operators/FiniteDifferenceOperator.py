@@ -317,6 +317,20 @@ class FiniteDiff(Operator):
         self.s1, sall, svec = PowerMethodNonsquare(self, 50, x0)
         return self.s1
     
+#    def matrix(self):
+#        
+#        '''' 
+#        Create Sparse matrix for direction and boundaries
+#        ''''
+#        pass
+#    
+#    def matrix_row_abs_sum(self):
+#        pass
+#    
+#    def matrix_row_abs_sum(self):
+#        pass
+    
+    
 if __name__ == '__main__':
     
     N, M = 200, 300

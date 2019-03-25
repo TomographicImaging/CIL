@@ -41,7 +41,7 @@ noisy_data = ImageData(n1)
 alpha = 2
 
 #method = input("Enter structure of PDHG (0=Composite or 1=NotComposite): ")
-method = '1'
+method = '0'
 if method == '0':
 
     # Create operators
@@ -82,7 +82,7 @@ tau = 1/(sigma*normK**2)
 
 #%%
 ## Number of iterations
-opt = {'niter':1000}
+opt = {'niter':5000}
 ##
 ### Run algorithm
 result, total_time, objective = PDHG(f, g, operator, \
@@ -113,34 +113,40 @@ plt.show()
 
 #%%
 #
-#try_cvx = input("Do you want CVX comparison (0/1)")
+
+from cvxpy import *
+import sys
+sys.path.insert(0, '/Users/evangelos/Desktop/Projects/CCPi/test_block/CCPi-Framework/Wrappers/Python/ccpi/optimisation/cvx_scripts')
+from cvx_functions import TV_cvx
+
+try_cvx = input("Do you want CVX comparison (0/1)")
 #
-#if try_cvx=='0':
+if try_cvx=='0':
 #
-#    uu = Variable((N, N))
-#    fidelity = 0.5 * sum_squares(uu - noisy_data.as_array())
-#    regulariser = alpha * TV_cvx(uu)
-#    solver = MOSEK
-#    obj =  Minimize( regulariser +  fidelity)
-#    constraints = []
-#    prob = Problem(obj, constraints)
-#
-#    # Choose solver (SCS is fast but less accurate than MOSEK)
-#    res = prob.solve(verbose = True, solver = solver)
-#
-#    print('Objective value is {} '.format(obj.value))
-#
-#
-#    diff_pdhg_cvx = np.abs(uu.value - sol)
-#    plt.imshow(diff_pdhg_cvx)
-#    plt.colorbar()
-#    plt.title('|CVX-PDHG|')
-#    plt.show()
-#
-#    plt.plot(np.linspace(0,N,N), u.value[int(N/2),:], label = 'CVX')
-#    plt.plot(np.linspace(0,N,N), sol[int(N/2),:], label = 'PDHG')
-#    plt.legend()
-#    plt.show()
-#
-#else:
-#    print('No CVX solution available')
+    uu = Variable((N, N))
+    fidelity = 0.5 * sum_squares(uu - noisy_data.as_array())
+    regulariser = alpha * TV_cvx(uu)
+    solver = MOSEK
+    obj =  Minimize( regulariser +  fidelity)
+    constraints = []
+    prob = Problem(obj, constraints)
+
+    # Choose solver (SCS is fast but less accurate than MOSEK)
+    res = prob.solve(verbose = True, solver = solver)
+
+    print('Objective value is {} '.format(obj.value))
+
+
+    diff_pdhg_cvx = np.abs(uu.value - sol)
+    plt.imshow(diff_pdhg_cvx)
+    plt.colorbar()
+    plt.title('|CVX-PDHG|')
+    plt.show()
+
+    plt.plot(np.linspace(0,N,N), uu.value[int(N/2),:], label = 'CVX')
+    plt.plot(np.linspace(0,N,N), sol[int(N/2),:], label = 'PDHG')
+    plt.legend()
+    plt.show()
+
+else:
+    print('No CVX solution available')

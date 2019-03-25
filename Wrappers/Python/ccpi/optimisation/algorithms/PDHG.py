@@ -67,8 +67,7 @@ def PDHG(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
         x_old = x
         y_old = y   
         
-#        pdgap
-#        print(f(x) + g(x) + f.convex_conjugate(y) + g.convex_conjugate(-1*operator.adjoint(y)) )
+        print(f(operator.direct(x)) + g(x) + f.convex_conjugate(y) + g.convex_conjugate(-1*operator.adjoint(y)) )
         
         
         

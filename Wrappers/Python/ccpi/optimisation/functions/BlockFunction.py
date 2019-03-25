@@ -23,11 +23,13 @@ class BlockFunction(Function):
         return self.functions[index]       
         
     def __call__(self, x):
-                         
-        t = 0                
-        for i in range(x.shape[0]):
-            t += self.functions[i](x.get_item(i))               
-        return t
+         
+        return sum([self.functions[i](x[i]) for i in range(x.shape[0])])  
+                    
+#        t = 0                
+#        for i in range(x.shape[0]):
+#            t += self.functions[i](x.get_item(i))               
+#        return t
     
 #    def call_adjoint(self, x):
 #    

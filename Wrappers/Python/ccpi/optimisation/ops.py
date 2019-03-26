@@ -19,7 +19,7 @@
 
 import numpy
 from scipy.sparse.linalg import svds
-from ccpi.framework import DataContainer
+from ccpi.framework import DataContainer, BlockDataContainer
 from ccpi.framework import AcquisitionData
 from ccpi.framework import ImageData
 from ccpi.framework import ImageGeometry

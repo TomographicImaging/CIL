@@ -13,7 +13,6 @@ from .BlockOperatorOLD import BlockOperatorOLD
 from .BlockScaledOperator import BlockScaledOperator
 from .FiniteDifferenceOperator import FiniteDiff
 from .GradientOperator import Gradient
-from .SymmetrizedGradientOperator import SymmetrizedGradient
+#from .SymmetrizedGradient import SymmetrizedGradient
 from .IdentityOperator import Identity
 from .ZeroOperator import ZeroOp
-from .AstraProjectorSimple import AstraProjectorSimple

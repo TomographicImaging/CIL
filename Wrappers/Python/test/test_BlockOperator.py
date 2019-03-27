@@ -6,6 +6,13 @@ from ccpi.framework import ImageGeometry, ImageData
 import numpy
 from ccpi.optimisation.operators import FiniteDiff
 
+class TestOperator(TomoIdentity):
+    def __init__(self, *args, **kwargs):
+        super(TestOperator, self).__init__(*args, **kwargs)
+        self.range = kwargs.get('range', self.geometry)
+    def range_geometry(self):
+        return self.range
+
 class TestBlockOperator(unittest.TestCase):
 
     def test_BlockOperator(self):
@@ -32,7 +39,47 @@ class TestBlockOperator(unittest.TestCase):
         zero = numpy.zeros(X.get_item(0).shape)
         numpy.testing.assert_array_equal(Y.get_item(0).as_array(),len(x)+zero)
         
-
+        try:
+            # this should fail as the domain is not compatible
+            ig = [ ImageGeometry(10,20,31) , \
+                ImageGeometry(10,20,30) , \
+                ImageGeometry(10,20,30) ]
+            x = [ g.allocate() for g in ig ]
+            ops = [ TomoIdentity(g) for g in ig ]
+            
+            K = BlockOperator(*ops)
+            self.assertTrue(False)
+        except ValueError as ve:
+            print (ve)
+            self.assertTrue(True)
+        
+        try:
+            # this should fail as the range is not compatible
+            ig = [ ImageGeometry(10,20,30) , \
+                ImageGeometry(10,20,30) , \
+                ImageGeometry(10,20,30) ]
+            rg0 = [ ImageGeometry(10,20,31) , \
+                ImageGeometry(10,20,31) , \
+                ImageGeometry(10,20,31) ]
+            rg1 = [ ImageGeometry(10,22,31) , \
+                   ImageGeometry(10,22,31) , \
+                   ImageGeometry(10,20,31) ]
+            x = [ g.allocate() for g in ig ]
+            ops = [ TestOperator(g, range=r) for g,r in zip(ig, rg0) ]
+            ops += [ TestOperator(g, range=r) for g,r in zip(ig, rg1) ]
+            print (len(ops))
+            K = BlockOperator(*ops)
+            print ("K col comp? " , K.column_wise_compatible())
+            print ("K row comp? " , K.row_wise_compatible())
+            for op in ops:
+                print ("range" , op.range_geometry().shape)
+            for op in ops:
+                print ("domain" , op.domain_geometry().shape)
+            self.assertTrue(False)
+        except ValueError as ve:
+            print (ve)
+            self.assertTrue(True)
+            
     def test_ScaledBlockOperatorSingleScalar(self):
         ig = [ ImageGeometry(10,20,30) , \
                ImageGeometry(10,20,30) , \

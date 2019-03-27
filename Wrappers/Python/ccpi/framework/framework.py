@@ -150,12 +150,12 @@ class ImageGeometry(object):
             if value != 0:
                 out += value
         else:
-            if value == ImageData.RANDOM:
+            if value == ImageGeometry.RANDOM:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed) 
                 out.fill(numpy.random.random_sample(self.shape))
-            elif value == ImageData.RANDOM_INT:
+            elif value == ImageGeometry.RANDOM_INT:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)

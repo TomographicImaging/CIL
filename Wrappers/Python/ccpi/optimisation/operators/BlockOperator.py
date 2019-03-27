@@ -23,6 +23,9 @@ class BlockOperator(Operator):
     Nx1 BlockDataContainer, will yield and Mx1 BlockDataContainer.
     Notice: BlockDatacontainer are only allowed to have the shape of N x 1, with
     N rows and 1 column.
+
+    Operators in a Block are required to have the same domain column-wise and the
+    same range row-wise.
     '''
     __array_priority__ = 1
     def __init__(self, *args, **kwargs):
@@ -52,6 +55,39 @@ class BlockOperator(Operator):
             raise ValueError(
                     'Dimension and size do not match: expected {} got {}'
                     .format(n_elements,len(args)))
+        # test if operators are compatible
+        if not self.column_wise_compatible():
+            raise ValueError('Operators in each column must have the same domain')
+        if not self.row_wise_compatible():
+            raise ValueError('Operators in each row must have the same range')
+    
+    def column_wise_compatible(self):
+        '''Operators in a Block should have the same domain per column'''
+        rows, cols = self.shape
+        compatible = True
+        for col in range(cols):
+            row_compatible = True
+            for row in range(1,rows):
+                dg0 = self.get_item(row-1,col).domain_geometry()
+                dg1 = self.get_item(row,col).domain_geometry()
+                row_compatible = dg0.__dict__ == dg1.__dict__ and row_compatible
+            compatible = compatible and row_compatible
+        return compatible
+    
+    def row_wise_compatible(self):
+        '''Operators in a Block should have the same range per row'''
+        rows, cols = self.shape
+        compatible = True
+        for row in range(rows):
+            column_compatible = True
+            for col in range(1,cols):
+                dg0 = self.get_item(row,col-1).range_geometry()
+                dg1 = self.get_item(row,col).range_geometry()
+                column_compatible = dg0.__dict__ == dg1.__dict__ and column_compatible
+                print ("column_compatible" , column_compatible, dg0.shape, dg1.shape)
+            compatible = compatible and column_compatible
+        return compatible
+
     def get_item(self, row, col):
         if row > self.shape[0]:
             raise ValueError('Requested row {} > max {}'.format(row, self.shape[0]))
@@ -153,5 +189,18 @@ class BlockOperator(Operator):
         shape = (self.shape[1], self.shape[0])
         return type(self)(*self.operators, shape=shape)
 
+    def domain_geometry(self):
+        if self.shape[1] == 1:
+            # column BlockOperator
+            return self[0].domain_geometry()
+        else:
+            shape = (self.shape[0], 1)
+            return BlockGeometry(*[el.domain_geometry() for el in self.operators],
+                    shape=shape)
+
+    def range_geometry(self):
+        shape = (self.shape[1], 1)
+        return BlockGeometry(*[el.range_geometry() for el in self.operators],
+                    shape=shape)
 if __name__ == '__main__':
     pass

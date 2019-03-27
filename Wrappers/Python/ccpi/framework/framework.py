@@ -175,15 +175,6 @@ class ImageGeometry(object):
     #def shape(self):
     #    '''Returns the shape of the array of the ImageData it describes'''
     #    return self.shape
-    def __eq__(self, other):
-        '''Returns whether two geometries are equal'''
-        if isinstance(other, self.__class__):
-            return self.__dict__ == other.__dict__
-        else:
-            return False
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
 
 class AcquisitionGeometry(object):
     RANDOM = 'random'
@@ -318,16 +309,7 @@ class AcquisitionGeometry(object):
             if dimension_labels != self.dimension_labels:
                 return out.subset(dimensions=dimension_labels)
         return out
-    def __eq__(self, other):
-        '''Returns whether two geometries are equal'''
-        if isinstance(other, self.__class__):
-            return self.__dict__ == other.__dict__
-        else:
-            return False
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
+    
 class DataContainer(object):
     '''Generic class to hold data
     
@@ -1038,33 +1020,39 @@ class AcquisitionData(DataContainer):
                     if channels > 1:
                         if vert > 1:
                             shape = (channels, num_of_angles , vert, horiz)
-                            dim_labels = ['channel' , 'angle' ,
-                                          'vertical' , 'horizontal']
+                            dim_labels = [AcquisitionGeometry.CHANNEL,
+                                          AcquisitionGeometry.ANGLE,
+                                          AcquisitionGeometry.VERTICAL,
+                                          AcquisitionGeometry.HORIZONTAL]
                         else:
                             shape = (channels , num_of_angles, horiz)
-                            dim_labels = ['channel' , 'angle' , 
-                                          'horizontal']
+                            dim_labels = [AcquisitionGeometry.CHANNEL,
+                                          AcquisitionGeometry.ANGLE,
+                                          AcquisitionGeometry.HORIZONTAL]
                     else:
                         if vert > 1:
                             shape = (num_of_angles, vert, horiz)
-                            dim_labels = ['angle' , 'vertical' , 
-                                          'horizontal']
+                            dim_labels = [AcquisitionGeometry.ANGLE,
+                                          AcquisitionGeometry.VERTICAL,
+                                          AcquisitionGeometry.HORIZONTAL
+                                          ]
                         else:
                             shape = (num_of_angles, horiz)
-                            dim_labels = ['angle' , 
-                                          'horizontal']
+                            dim_labels = [AcquisitionGeometry.ANGLE,
+                                          AcquisitionGeometry.HORIZONTAL
+                                          ]
                     
                     dimension_labels = dim_labels
                 else:
                     shape = []
                     for dim in dimension_labels:
-                        if dim == 'channel':
+                        if dim == AcquisitionGeometry.CHANNEL:
                             shape.append(channels)
-                        elif dim == 'angle':
+                        elif dim == AcquisitionGeometry.ANGLE:
                             shape.append(num_of_angles)
-                        elif dim == 'vertical':
+                        elif dim == AcquisitionGeometry.VERTICAL:
                             shape.append(vert)
-                        elif dim == 'horizontal':
+                        elif dim == AcquisitionGeometry.HORIZONTAL:
                             shape.append(horiz)
                     if len(shape) != len(dimension_labels):
                         raise ValueError('Missing {0} axes.\nExpected{1} got {2}'\

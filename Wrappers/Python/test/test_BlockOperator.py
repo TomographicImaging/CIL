@@ -67,8 +67,8 @@ class TestBlockOperator(unittest.TestCase):
             x = [ g.allocate() for g in ig ]
             ops = [ TestOperator(g, range=r) for g,r in zip(ig, rg0) ]
             ops += [ TestOperator(g, range=r) for g,r in zip(ig, rg1) ]
-            print (len(ops))
-            K = BlockOperator(*ops)
+
+            K = BlockOperator(*ops, shape=(2,3))
             print ("K col comp? " , K.column_wise_compatible())
             print ("K row comp? " , K.row_wise_compatible())
             for op in ops:

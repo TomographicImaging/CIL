@@ -14,15 +14,22 @@ from ccpi.optimisation.operators.BlockScaledOperator import BlockScaledOperator
 from ccpi.framework import BlockGeometry
        
 class BlockOperator(Operator):
-    '''Class to hold a block operator
+    '''A Block matrix containing Operators
 
-    Class to hold a number of Operators in a block. 
-    User may specify the shape of the block, by default is a row vector
+    The Block Framework is a generic strategy to treat variational problems in the
+    following form:
+
+    .. math::
+    
+      min Regulariser + Fidelity
+
     
     BlockOperators have a generic shape M x N, and when applied on an 
     Nx1 BlockDataContainer, will yield and Mx1 BlockDataContainer.
     Notice: BlockDatacontainer are only allowed to have the shape of N x 1, with
     N rows and 1 column.
+    
+    User may specify the shape of the block, by default is a row vector
 
     Operators in a Block are required to have the same domain column-wise and the
     same range row-wise.
@@ -36,8 +43,8 @@ class BlockOperator(Operator):
             Do not include the `self` parameter in the ``Args`` section.
 
         Args:
-            vararg (Operator): Operators in the block.
-            shape (:obj:`tuple`, optional): If shape is passed the Operators in 
+            :param: vararg (Operator): Operators in the block.
+            :param: shape (:obj:`tuple`, optional): If shape is passed the Operators in 
                   vararg are considered input in a row-by-row fashion. 
                   Shape and number of Operators must match.
                   
@@ -66,12 +73,12 @@ class BlockOperator(Operator):
         rows, cols = self.shape
         compatible = True
         for col in range(cols):
-            row_compatible = True
+            column_compatible = True
             for row in range(1,rows):
                 dg0 = self.get_item(row-1,col).domain_geometry()
                 dg1 = self.get_item(row,col).domain_geometry()
-                row_compatible = dg0.__dict__ == dg1.__dict__ and row_compatible
-            compatible = compatible and row_compatible
+                column_compatible = dg0.__dict__ == dg1.__dict__ and column_compatible
+            compatible = compatible and column_compatible
         return compatible
     
     def row_wise_compatible(self):
@@ -79,16 +86,16 @@ class BlockOperator(Operator):
         rows, cols = self.shape
         compatible = True
         for row in range(rows):
-            column_compatible = True
+            row_compatible = True
             for col in range(1,cols):
                 dg0 = self.get_item(row,col-1).range_geometry()
                 dg1 = self.get_item(row,col).range_geometry()
-                column_compatible = dg0.__dict__ == dg1.__dict__ and column_compatible
-                print ("column_compatible" , column_compatible, dg0.shape, dg1.shape)
-            compatible = compatible and column_compatible
+                row_compatible = dg0.__dict__ == dg1.__dict__ and row_compatible
+            compatible = compatible and row_compatible
         return compatible
 
     def get_item(self, row, col):
+        '''returns the Operator at specified row and col'''
         if row > self.shape[0]:
             raise ValueError('Requested row {} > max {}'.format(row, self.shape[0]))
         if col > self.shape[1]:
@@ -190,6 +197,11 @@ class BlockOperator(Operator):
         return type(self)(*self.operators, shape=shape)
 
     def domain_geometry(self):
+        '''returns the domain of the BlockOperator
+
+        If the shape of the BlockOperator is (N,1) the domain is a ImageGeometry or AcquisitionGeometry.
+        Otherwise it is a BlockGeometry.
+        '''
         if self.shape[1] == 1:
             # column BlockOperator
             return self[0].domain_geometry()
@@ -199,6 +211,7 @@ class BlockOperator(Operator):
                     shape=shape)
 
     def range_geometry(self):
+        '''returns the range of the BlockOperator'''
         shape = (self.shape[1], 1)
         return BlockGeometry(*[el.range_geometry() for el in self.operators],
                     shape=shape)

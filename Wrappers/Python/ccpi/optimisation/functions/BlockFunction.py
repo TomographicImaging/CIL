@@ -12,16 +12,30 @@ from ccpi.optimisation.functions import Function
 from ccpi.framework import BlockDataContainer
 
 class BlockFunction(Function):
-    '''missing docstring'''
-    def __init__(self, operator, *functions):
-        '''missing docstring'''
+    '''A Block vector of Functions
+    
+    .. math::
+
+      f = [f_1,f_2,f_3]
+      f([x_1,x_2,x_3]) = f_1(x_1) + f_2(x_2) + f_3(x_3)
+
+    '''
+    def __init__(self, *functions):
+        '''Creator'''
         self.functions = functions      
         self.length = len(self.functions)
         
         super(BlockFunction, self).__init__()
         
     def __call__(self, x):
-        '''missing docstring'''
+        '''evaluates the BlockFunction on the BlockDataContainer
+        
+        :param: x (BlockDataContainer): must have as many rows as self.length
+
+        returns sum(f_i(x_i))
+        '''
+        if self.length != x.shape[0]:
+            raise ValueError('BlockFunction and BlockDataContainer have incompatible size')
         t = 0                
         for i in range(x.shape[0]):
             t += self.functions[i](x.get_item(i))
@@ -52,5 +66,5 @@ class BlockFunction(Function):
         return BlockDataContainer(*out)     
     
     def gradient(self,x, out=None):
-        '''missing docstring'''
+        '''gradient returns pass'''
         pass

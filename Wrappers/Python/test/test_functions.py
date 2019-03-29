@@ -37,13 +37,13 @@ class TestFunction(unittest.TestCase):
     
     
         N = 3
-        ig = (N,N)
+        ig = ImageGeometry(N,N)
         ag = ig       
         op1 = Gradient(ig)
         op2 = Identity(ig, ag)
 
         # Form Composite Operator
-        operator = BlockOperator((2,1), op1, op2 ) 
+        operator = BlockOperator(op1, op2 , shape=(2,1) )
         
         # Create functions
         noisy_data = ImageData(np.random.randint(10, size=ag))

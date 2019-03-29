@@ -64,7 +64,7 @@ class BlockDataContainer(object):
                                      .format(type(ot)))
             return len(self.containers) == len(other)
         elif isinstance(other, numpy.ndarray):
-            return self.shape == other.shape
+            return len(self.containers) == len(other)
         elif issubclass(other.__class__, DataContainer):
             return self.get_item(0).shape == other.shape
         return len(self.containers) == len(other.containers)
@@ -91,25 +91,26 @@ class BlockDataContainer(object):
             return type(self)(*[ el.add(other, *args, **kwargs) for el in self.containers], shape=self.shape)
         
         return type(self)(
-            *[ el.add(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other.containers)],
+            *[ el.add(ot, *args, **kwargs) for el,ot in zip(self.containers,other.containers)],
             shape=self.shape)
         
     def subtract(self, other, *args, **kwargs):
         if not self.is_compatible(other):
-            raise ValueError('Incompatible for add')
+            raise ValueError('Incompatible for subtract')
         out = kwargs.get('out', None)
         if isinstance(other, Number):
-            return type(self)(*[ el.subtract(other, out, *args, **kwargs) for el in self.containers], shape=self.shape)
+            return type(self)(*[ el.subtract(other,  *args, **kwargs) for el in self.containers], shape=self.shape)
         elif isinstance(other, list) or isinstance(other, numpy.ndarray):
-            return type(self)(*[ el.subtract(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
+            return type(self)(*[ el.subtract(ot,  *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
         elif issubclass(other.__class__, DataContainer):
             # try to do algebra with one DataContainer. Will raise error if not compatible
             return type(self)(*[ el.subtract(other, *args, **kwargs) for el in self.containers], shape=self.shape)
-        return type(self)(*[ el.subtract(ot, out, *args, **kwargs) for el,ot in zip(self.containers,other.containers)],
+        return type(self)(*[ el.subtract(ot,  *args, **kwargs) for el,ot in zip(self.containers,other.containers)],
                           shape=self.shape)
 
     def multiply(self, other, *args, **kwargs):
-        self.is_compatible(other)
+        if not self.is_compatible(other):
+            raise ValueError('{} Incompatible for multiply'.format(other))
         out = kwargs.get('out', None)
         if isinstance(other, Number):
             return type(self)(*[ el.multiply(other, *args, **kwargs) for el in self.containers], shape=self.shape)
@@ -124,7 +125,8 @@ class BlockDataContainer(object):
                           shape=self.shape)
     
     def divide(self, other, *args, **kwargs):
-        self.is_compatible(other)
+        if not self.is_compatible(other):
+            raise ValueError('Incompatible for divide')
         out = kwargs.get('out', None)
         if isinstance(other, Number):
             return type(self)(*[ el.divide(other, *args, **kwargs) for el in self.containers], shape=self.shape)
@@ -137,7 +139,8 @@ class BlockDataContainer(object):
                           shape=self.shape)
     
     def power(self, other, *args, **kwargs):
-        assert self.is_compatible(other)
+        if not self.is_compatible(other):
+            raise ValueError('Incompatible for power')
         out = kwargs.get('out', None)
         if isinstance(other, Number):
             return type(self)(*[ el.power(other, *args, **kwargs) for el in self.containers], shape=self.shape)
@@ -146,7 +149,8 @@ class BlockDataContainer(object):
         return type(self)(*[ el.power(ot, *args, **kwargs) for el,ot in zip(self.containers,other.containers)], shape=self.shape)
     
     def maximum(self,other, *args, **kwargs):
-        assert self.is_compatible(other)
+        if not self.is_compatible(other):
+            raise ValueError('Incompatible for maximum')
         out = kwargs.get('out', None)
         if isinstance(other, Number):
             return type(self)(*[ el.maximum(other, *args, **kwargs) for el in self.containers], shape=self.shape)
@@ -265,7 +269,8 @@ class BlockDataContainer(object):
             for el in self.containers:
                 el += other
         elif isinstance(other, list) or isinstance(other, numpy.ndarray):
-            self.is_compatible(other)
+            if not self.is_compatible(other):
+                raise ValueError('Incompatible for __iadd__')
             for el,ot in zip(self.containers, other):
                 el += ot
         return self
@@ -280,7 +285,8 @@ class BlockDataContainer(object):
             for el in self.containers:
                 el -= other
         elif isinstance(other, list) or isinstance(other, numpy.ndarray):
-            assert self.is_compatible(other)
+            if not self.is_compatible(other):
+                raise ValueError('Incompatible for __isub__')
             for el,ot in zip(self.containers, other):
                 el -= ot
         return self
@@ -295,7 +301,8 @@ class BlockDataContainer(object):
             for el in self.containers:
                 el *= other
         elif isinstance(other, list) or isinstance(other, numpy.ndarray):
-            assert self.is_compatible(other)
+            if not self.is_compatible(other):
+                raise ValueError('Incompatible for __imul__')
             for el,ot in zip(self.containers, other):
                 el *= ot
         return self
@@ -310,7 +317,8 @@ class BlockDataContainer(object):
             for el in self.containers:
                 el /= other
         elif isinstance(other, list) or isinstance(other, numpy.ndarray):
-            assert self.is_compatible(other)
+            if not self.is_compatible(other):
+                raise ValueError('Incompatible for __idiv__')
             for el,ot in zip(self.containers, other):
                 el /= ot
         return self

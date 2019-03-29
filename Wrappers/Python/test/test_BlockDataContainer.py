@@ -214,10 +214,15 @@ class TestBlockDataContainer(unittest.TestCase):
         cp2 = numpy.asarray([3,2]) * cp0 
         numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0. , decimal=5)
         numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 2., decimal = 5)
-        cp2 = [3,2,3] * cp0 
-        numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0. , decimal=5)
-        numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 2., decimal = 5)
         
+        try:
+            cp2 = [3,2,3] * cp0 
+            #numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0. , decimal=5)
+            #numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 2., decimal = 5)
+            self.assertTrue(False)
+        except ValueError as ve:
+            print (ve)
+            self.assertTrue(True)
         cp2 *= cp1
         numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0 , decimal=5)
         numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , +6., decimal = 5)
@@ -230,6 +235,12 @@ class TestBlockDataContainer(unittest.TestCase):
         numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 0. , decimal=5)
         numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , -6., decimal = 5)
         
+        try:
+            cp2 *= [2,3,5]
+            self.assertTrue(False)
+        except ValueError as ve:
+            print (ve)
+            self.assertTrue(True)
         
         cp2 = cp0.divide(cp1)
         assert (cp2.get_item(0).as_array()[0][0][0] == 0.)

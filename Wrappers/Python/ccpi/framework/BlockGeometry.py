@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 import numpy
 from numbers import Number
 import functools
-#from ccpi.framework import AcquisitionData, ImageData
+from ccpi.framework import BlockDataContainer
 #from ccpi.optimisation.operators import Operator, LinearOperator
  
 class BlockGeometry(object):
@@ -28,7 +28,7 @@ class BlockGeometry(object):
                     'Dimension and size do not match: expected {} got {}'
                     .format(n_elements, len(args)))
 
-    def allocate(self, value=0):
+    def allocate(self, value=0, dimension_labels=None):
         containers = [geom.allocate(value) for geom in self.geometries]
-        BlockDataContainer(*containers)
+        return BlockDataContainer(*containers)
          

@@ -161,6 +161,8 @@ class ImageGeometry(object):
                     numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
                 out.fill(numpy.random.randint(max_value,size=self.shape))
+            else:
+                raise ValueError('Value {} unknown'.format(value))
         if dimension_labels is not None:
             if dimension_labels != self.dimension_labels:
                 return out.subset(dimensions=dimension_labels)
@@ -305,6 +307,8 @@ class AcquisitionGeometry(object):
                     numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
                 out.fill(numpy.random.randint(max_value,size=self.shape))
+            else:
+                raise ValueError('Value {} unknown'.format(value))
         if dimension_labels is not None:
             if dimension_labels != self.dimension_labels:
                 return out.subset(dimensions=dimension_labels)

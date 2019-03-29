@@ -39,9 +39,11 @@ class ScaledFunction(object):
 
     def proximal_conjugate(self, x, tau, out = None):
         '''This returns the proximal operator for the function at x, tau
-        
-        TODO check if this is mathematically correct'''
-        return self.function.proximal_conjugate(x, tau, out=out)
+        '''
+        if out is None:
+            return self.scalar  * self.function.proximal_conjugate(x/self.scalar, tau/self.scalar)
+        else:
+            out.fill(self.scalar  * self.function.proximal_conjugate(x/self.scalar, tau/self.scalar))
 
     def grad(self, x):
         '''Alias of gradient(x,None)'''
@@ -57,10 +59,15 @@ class ScaledFunction(object):
 
     def gradient(self, x, out=None):
         '''Returns the gradient of the function at x, if the function is differentiable'''
-        return self.scalar * self.function.gradient(x, out=out)
+        if out is None:            
+            return self.scalar * self.function.gradient(x)    
+        else:
+            out.fill( self.scalar * self.function.gradient(x) )
 
     def proximal(self, x, tau, out=None):
         '''This returns the proximal operator for the function at x, tau
-        
-        TODO check if this is mathematically correct'''
-        return self.function.proximal(x, tau, out=out)
+        '''
+        if out is None:
+            return self.function.proximal(x, tau*self.scalar)     
+        else:
+            out.fill( self.function.proximal(x, tau*self.scalar) )

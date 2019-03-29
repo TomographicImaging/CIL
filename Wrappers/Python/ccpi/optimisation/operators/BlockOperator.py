@@ -105,13 +105,8 @@ class BlockOperator(Operator):
         return self.operators[index]
     
     def norm(self):
-        norm = [op.norm() for op in self.operators]
-        b = []
-        for i in range(self.shape[0]):
-            b.append([])
-            for j in range(self.shape[1]):
-                b[-1].append(norm[i*self.shape[1]+j])
-        return numpy.asarray(b)
+        norm = [op.norm()**2 for op in self.operators]
+        return numpy.sqrt(sum(norm))    
     
     def direct(self, x, out=None):
         '''Direct operation for the BlockOperator
@@ -161,7 +156,10 @@ class BlockOperator(Operator):
                 else:
                     prod += self.get_item(row, col).adjoint(x_b.get_item(col))
             res.append(prod)
-        return BlockDataContainer(*res, shape=shape)
+        if self.shape[1]==1:
+            return ImageData(*res)
+        else:
+            return BlockDataContainer(*res, shape=shape)
     
     def get_output_shape(self, xshape, adjoint=False):
         sshape = self.shape[1]
@@ -204,7 +202,7 @@ class BlockOperator(Operator):
         '''
         if self.shape[1] == 1:
             # column BlockOperator
-            return self[0].domain_geometry()
+            return self.get_item(0,0).domain_geometry()
         else:
             shape = (self.shape[0], 1)
             return BlockGeometry(*[el.domain_geometry() for el in self.operators],

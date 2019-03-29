@@ -17,4 +17,3 @@ from .GradientOperator import Gradient
 from .SymmetrizedGradientOperator import SymmetrizedGradient
 from .IdentityOperator import Identity
 from .ZeroOperator import ZeroOp
-

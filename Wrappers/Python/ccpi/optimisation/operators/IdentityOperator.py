@@ -6,10 +6,10 @@ Created on Wed Mar  6 19:30:51 2019
 @author: evangelos
 """
 
-from ccpi.optimisation.operators import Operator
+from ccpi.optimisation.operators import LinearOperator
 
 
-class Identity(Operator):
+class Identity(LinearOperator):
     
     def __init__(self, gm_domain, gm_range=None):
 
@@ -35,8 +35,8 @@ class Identity(Operator):
     def norm(self):
         return 1.0
         
-    def domain_dim(self):       
+    def domain_geometry(self):       
         return self.gm_domain
         
-    def range_dim(self):
+    def range_geometry(self):
         return self.gm_range

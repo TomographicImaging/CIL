@@ -66,5 +66,5 @@ class BlockFunction(Function):
         return BlockDataContainer(*out)     
     
     def gradient(self,x, out=None):
-        '''gradient returns pass'''
+        '''FIXME: gradient returns pass'''
         pass

@@ -9,7 +9,7 @@ from ccpi.framework import AcquisitionGeometry
 from ccpi.optimisation.algs import FISTA
 from ccpi.optimisation.algs import FBPD
 from ccpi.optimisation.funcs import Norm2sq
-from ccpi.optimisation.funcs import ZeroFun
+from ccpi.optimisation.functions import ZeroFun
 from ccpi.optimisation.funcs import Norm1
 from ccpi.optimisation.funcs import TV2D
 from ccpi.optimisation.funcs import Norm2

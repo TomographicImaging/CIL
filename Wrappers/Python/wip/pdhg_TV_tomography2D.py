@@ -26,6 +26,22 @@ from skimage.util import random_noise
 #%%###############################################################################
 # Create phantom for TV tomography
 
+import os
+import tomophantom
+from tomophantom import TomoP2D
+from tomophantom.supp.qualitymetrics import QualityTools
+
+#model = 1 # select a model number from the library
+#N = 150 # set dimension of the phantom
+## one can specify an exact path to the parameters file
+## path_library2D = '../../../PhantomLibrary/models/Phantom2DLibrary.dat'
+#path = os.path.dirname(tomophantom.__file__)
+#path_library2D = os.path.join(path, "Phantom2DLibrary.dat")
+##This will generate a N_size x N_size phantom (2D)
+#phantom_2D = TomoP2D.Model(model, N, path_library2D)
+#ig = ImageGeometry(voxel_num_x = N, voxel_num_y = N)
+#data = ImageData(phantom_2D, geometry=ig)
+
 N = 150
 x = np.zeros((N,N))
 x[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
@@ -34,7 +50,8 @@ x[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 1
 data = ImageData(x)
 ig = ImageGeometry(voxel_num_x = N, voxel_num_y = N)
 
-detectors = 100
+
+detectors = 150
 angles = np.linspace(0,np.pi,100)
 
 ag = AcquisitionGeometry('parallel','2D',angles, detectors)
@@ -57,9 +74,10 @@ plt.title('Noisy Sinogram')
 plt.colorbar()
 plt.show()
 
+
 #%% Works only with Composite Operator Structure of PDHG
 
-ig = ImageGeometry(voxel_num_x = N, voxel_num_y = N)
+#ig = ImageGeometry(voxel_num_x = N, voxel_num_y = N)
 
 # Create operators
 op1 = Gradient(ig)
@@ -83,7 +101,7 @@ tau = 1/(sigma*normK**2)
 
 pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
 pdhg.max_iteration = 5000
-pdhg.update_objective_interval = 500
+pdhg.update_objective_interval = 250
 
 pdhg.run(5000)
 

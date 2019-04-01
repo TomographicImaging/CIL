@@ -6,7 +6,7 @@ Created on Thu Feb 21 11:07:30 2019
 """
 
 from ccpi.optimisation.algorithms import Algorithm
-from ccpi.optimisation.funcs import ZeroFun
+from ccpi.optimisation.functions import ZeroFun
 import numpy
 
 class FISTA(Algorithm):

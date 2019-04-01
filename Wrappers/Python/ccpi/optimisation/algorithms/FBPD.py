@@ -23,7 +23,7 @@ Created on Thu Feb 21 11:09:03 2019
 """
 
 from ccpi.optimisation.algorithms import Algorithm
-from ccpi.optimisation.funcs import ZeroFun
+from ccpi.optimisation.functions import ZeroFun
         
 class FBPD(Algorithm):
     '''FBPD Algorithm

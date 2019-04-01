@@ -190,9 +190,15 @@ class BlockOperator(Operator):
         return type(self)(*ops, shape=self.shape)
     @property
     def T(self):
-        '''Return the transposed of self'''
-        shape = (self.shape[1], self.shape[0])
-        return type(self)(*self.operators, shape=shape)
+        '''Return the transposed of self
+        
+        input in a row-by-row'''
+        newshape = (self.shape[1], self.shape[0])
+        oplist = []
+        for col in range(newshape[1]):
+            for row in range(newshape[0]):
+                oplist.append(self.get_item(col,row))
+        return type(self)(*oplist, shape=newshape)
 
     def domain_geometry(self):
         '''returns the domain of the BlockOperator

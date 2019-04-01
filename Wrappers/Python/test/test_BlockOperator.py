@@ -39,6 +39,11 @@ class TestBlockOperator(unittest.TestCase):
         zero = numpy.zeros(X.get_item(0).shape)
         numpy.testing.assert_array_equal(Y.get_item(0).as_array(),len(x)+zero)
         
+        K2 = BlockOperator(*(ops+ops), shape=(3,2))
+        Y = K2.T.direct(X)
+        # K.T (2,3) X (3,1) => output shape (2,1)
+        self.assertTrue(Y.shape == (2,1))
+
         try:
             # this should fail as the domain is not compatible
             ig = [ ImageGeometry(10,20,31) , \

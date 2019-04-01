@@ -31,8 +31,7 @@ class L2NormSquared(Function):
         super(L2NormSquared, self).__init__()
         self.b = kwargs.get('b',None)  
 
-    def __call__(self, x, out=None):
-        
+    def __call__(self, x):
         ''' Evaluates L2NormSq at point x'''
         
         y = x
@@ -44,33 +43,41 @@ class L2NormSquared(Function):
 #        if out is None:
 #            return x.squared_norm()
 #        else:
-        return y.squared_norm()
-
+        try:
+            return y.squared_norm()
+        except AttributeError as ae:
+            # added for compatibility with SIRF 
+            return (y.norm()**2)
+        
             
         
     def gradient(self, x, out=None):
-        
         ''' Evaluates gradient of L2NormSq at point x'''
-        
+        if out is not None:
+            out.fill(x)
+            if self.b is not None:
+                out -= self.b
+            out *= 2
+        else:
+            y = x
         if self.b is not None:
 #            x.subtract(self.b, out=x)
             y = x - self.b
-        if out is None:
-            return 2*y
-        else:
-            return out.fill(2*y) 
+        return 2*y
+        
                                                        
     def convex_conjugate(self, x, out=None):
-        
-        ''' Evaluate convex conjugate of L2NormSq '''
+        ''' Evaluate convex conjugate of L2NormSq'''
             
         tmp = 0
         if self.b is not None:
             tmp = (self.b * x).sum()
             
         if out is None:
+            # FIXME: this is a number
             return (1/4) * x.squared_norm() + tmp
         else:
+            # FIXME: this is a DataContainer
             out.fill((1/4) * x.squared_norm() + tmp)
                     
 
@@ -86,10 +93,15 @@ class L2NormSquared(Function):
             else:
                 return x/(1+2*tau)
         else:
+            out.fill(x)
             if self.b is not None:
-                out.fill((x - self.b)/(1+2*tau) + self.b)
-            else:
-                out.fill(x/(1+2*tau))                
+                out -= self.b
+            out /= (1+2*tau)
+            if self.b is not None:
+                out += self.b
+                #out.fill((x - self.b)/(1+2*tau) + self.b)
+            #else:
+            #    out.fill(x/(1+2*tau))                
 
     
     def proximal_conjugate(self, x, tau, out=None):

@@ -29,7 +29,7 @@ class ZeroFun(Function):
         if x.shape[0]==1:
             return x.maximum(0).sum()
         else:
-            if isinstance(x, CompositeDataContainer):
+            if isinstance(x, BlockDataContainer):
                 return x.get_item(0).maximum(0).sum() + x.get_item(1).maximum(0).sum()
             else:
                 return x.maximum(0).sum() + x.maximum(0).sum()

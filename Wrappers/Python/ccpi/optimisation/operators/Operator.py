@@ -4,7 +4,7 @@ Created on Tue Mar  5 15:55:56 2019
 
 @author: ofn77899
 """
-from ccpi.optimisation.operators import ScaledOperator
+from ccpi.optimisation.operators.ScaledOperator import ScaledOperator
 
 class Operator(object):
     '''Operator that maps from a space X -> Y'''

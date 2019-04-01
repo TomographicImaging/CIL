@@ -181,6 +181,9 @@ class BlockDataContainer(object):
         return self.clone()
     def clone(self):
         return type(self)(*[el.copy() for el in self.containers], shape=self.shape)
+    def fill(self, x):
+        for el,ot in zip(self.containers, x):
+            el.fill(ot)
     
     def __add__(self, other):
         return self.add( other )

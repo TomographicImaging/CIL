@@ -146,7 +146,7 @@ class Algorithm(object):
             print ("Stop cryterion has been reached.")
         i = 0
         for _ in self:
-            if verbose:
+            if verbose and self.iteration % self.update_objective_interval == 0:
                 print ("Iteration {}/{}, objective {}".format(self.iteration, 
                        self.max_iteration, self.get_last_objective()) )
             else:

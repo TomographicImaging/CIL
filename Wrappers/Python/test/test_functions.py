@@ -62,7 +62,7 @@ class TestFunction(unittest.TestCase):
         self.assertEqual(a2, g(d))
         
         # Compare convex conjugate of g
-        a3 = 0.5 * d.power(2).sum() + (d*noisy_data).sum()
+        a3 = 0.5 * d.squared_norm() + d.dot(noisy_data)
         self.assertEqual(a3, g.convex_conjugate(d))
         #print( a3, g.convex_conjugate(d))
     
@@ -91,12 +91,12 @@ class TestFunction(unittest.TestCase):
         
         #check convex conjuagate no data
         c1 = f.convex_conjugate(u)
-        c2 = 1/4 * u.squared_norm()
+        c2 = 1/4. * u.squared_norm()
         numpy.testing.assert_equal(c1, c2)
         
         #check convex conjuagate with data
         d1 = f1.convex_conjugate(u)
-        d2 = (1/4) * u.squared_norm() + (u*b).sum()
+        d2 = (1./4.) * u.squared_norm() + (u*b).sum()
         numpy.testing.assert_equal(d1, d2)  
         
         # check proximal no data

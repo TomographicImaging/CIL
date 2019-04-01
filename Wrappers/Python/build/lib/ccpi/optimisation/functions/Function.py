@@ -59,7 +59,7 @@ class Function(object):
         '''Alias of proximal(x, tau, None)'''
         warnings.warn('''This method will disappear in following 
         versions of the CIL. Use proximal instead''', DeprecationWarning)
-        return self.proximal(x, tau, out=None)
+        return self.proximal(x, out=None)
 
     def __rmul__(self, scalar):
         '''Defines the multiplication by a scalar on the left

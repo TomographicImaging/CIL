@@ -6,11 +6,9 @@ Created on Mon Feb  4 16:18:06 2019
 @author: evangelos
 """
 from ccpi.optimisation.algorithms import Algorithm
-
-
 from ccpi.framework import ImageData
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import time
 from ccpi.optimisation.operators import BlockOperator
 from ccpi.framework import BlockDataContainer

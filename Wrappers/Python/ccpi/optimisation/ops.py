@@ -115,8 +115,8 @@ class TomoIdentity(Operator):
     def adjoint(self,x, out=None):
         return self.direct(x, out)
     
-    def size(self):
-        return NotImplemented
+    def norm(self):
+        return self.s1
     
     def get_max_sing_val(self):
         return self.s1

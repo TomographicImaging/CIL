@@ -9,4 +9,5 @@ from .BlockFunction import BlockFunction
 from .ScaledFunction import ScaledFunction
 from .FunctionOperatorComposition import FunctionOperatorComposition
 from .MixedL21Norm import MixedL21Norm
-
+from .IndicatorBox import IndicatorBox
+from .Norm2Sq import Norm2sq

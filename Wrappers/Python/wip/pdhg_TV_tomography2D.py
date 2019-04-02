@@ -55,7 +55,7 @@ detectors = 150
 angles = np.linspace(0,np.pi,100)
 
 ag = AcquisitionGeometry('parallel','2D',angles, detectors)
-Aop = AstraProjectorSimple(ig, ag, 'cpu')
+Aop = AstraProjectorSimple(ig, ag, 'gpu')
 sin = Aop.direct(data)
 
 plt.imshow(sin.as_array())

@@ -219,5 +219,55 @@ class BlockOperator(Operator):
         shape = (self.shape[1], 1)
         return BlockGeometry(*[el.range_geometry() for el in self.operators],
                     shape=shape)
+        
+    def sum_abs_row(self):
+        
+        res = []
+        for row in range(self.shape[0]):
+            for col in range(self.shape[1]):
+                if col == 0:
+                    prod = self.get_item(row,col).sum_abs_row()
+                else:
+                    prod += self.get_item(row,col).sum_abs_row()
+            res.append(prod)
+            
+        if self.shape[1]==1:
+            tmp = sum(res)
+            return ImageData(tmp)
+        else:
+            return BlockDataContainer(*res)
+                 
+        
 if __name__ == '__main__':
-    pass
+    
+    from ccpi.framework import ImageGeometry
+    from ccpi.optimisation.operators import Gradient, Identity, SparseFiniteDiff
+
+    from ccpi.framework import AcquisitionData, ImageData, BlockDataContainer
+    from ccpi.optimisation.operators import Operator, LinearOperator
+    
+    
+    M, N= 4, 3
+    ig = ImageGeometry(M, N)
+    arr = ig.allocate('random_int')    
+    G = Gradient(ig)
+    Id = Identity(ig)
+    
+    B = BlockOperator(G, Id)
+    
+    print(B.sum_abs_row().as_array())
+    
+    Gx = SparseFiniteDiff(ig, direction=1, bnd_cond='Neumann')
+    Gy = SparseFiniteDiff(ig, direction=0, bnd_cond='Neumann')
+    
+    d1 = abs(Gx.matrix()).toarray().sum(axis=0)
+    d2 = abs(Gy.matrix()).toarray().sum(axis=0)
+    d3 = abs(Id.matrix()).toarray().sum(axis=0)
+    
+    d_res = numpy.reshape(d1 + d2 + d3, ig.shape, 'F')
+    
+    print(d_res)
+    
+    
+    
+    

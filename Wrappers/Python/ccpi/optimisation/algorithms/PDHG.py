@@ -72,9 +72,10 @@ class PDHG(Algorithm):
         self.xbar *= self.theta
         self.xbar += self.x
                         
-        self.x_old.fill(self.x)
-        self.y_old.fill(self.y)
-        #self.y_old = y.copy()
+#        self.x_old.fill(self.x)
+#        self.y_old.fill(self.y)
+        self.y_old = self.y.copy()
+        self.x_old = self.x.copy()
         #self.y = self.y_old
 
     def update_objective(self):

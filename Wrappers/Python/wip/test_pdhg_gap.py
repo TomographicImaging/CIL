@@ -102,22 +102,33 @@ pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
 pdhg.max_iteration = 2000
 pdhg.update_objective_interval = 100
 
-#pdhg.run(5000)
+pdhg.run(5000)
+#%%
 
 opt = {'niter':2000}
 
 res = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt)
 
 #%%
-#sol = pdhg.get_output().as_array()
-#fig = plt.figure()
-#plt.subplot(1,2,1)
-#plt.imshow(noisy_data.as_array())
-##plt.colorbar()
-#plt.subplot(1,2,2)
-#plt.imshow(sol)
-##plt.colorbar()
-#plt.show()
+sol = pdhg.get_output().as_array()
+sol_old = res[0].as_array()
+fig = plt.figure(figsize=(20,10))
+plt.subplot(1,3,1)
+plt.imshow(noisy_data.as_array())
+#plt.colorbar()
+plt.subplot(1,3,2)
+plt.imshow(sol)
+#plt.colorbar()
+
+plt.subplot(1,3,3)
+plt.imshow(sol_old)
+plt.show()
+
+plt.imshow(np.abs(sol-sol_old))
+plt.colorbar()
+plt.show()
+
+
 #
 #
 ##%%

@@ -7,6 +7,9 @@ Created on Wed Mar  6 19:30:51 2019
 """
 
 from ccpi.optimisation.operators import LinearOperator
+import scipy.sparse as sp
+import numpy as np
+from ccpi.framework import ImageData
 
 
 class Identity(LinearOperator):
@@ -40,3 +43,37 @@ class Identity(LinearOperator):
         
     def range_geometry(self):
         return self.gm_range
+    
+    def matrix(self):
+        
+        return sp.eye(np.prod(self.gm_domain.shape))
+    
+    def sum_abs_row(self):
+        
+        return ImageData(np.array(np.reshape(abs(self.matrix()).sum(axis=0), self.gm_domain.shape, 'F')))
+ 
+    def sum_abs_col(self):
+        
+        return ImageData(np.array(np.reshape(abs(self.matrix()).sum(axis=1), self.gm_domain.shape, 'F')))
+            
+    
+if __name__ == '__main__':
+    
+    from ccpi.framework import ImageGeometry
+
+    M, N = 2, 3
+    ig = ImageGeometry(M, N)
+    arr = ig.allocate('random_int')
+    
+    Id = Identity(ig)
+    d = Id.matrix()
+    print(d.toarray())
+    
+    d1 = Id.sum_abs_col()
+    print(d1.as_array())
+    
+    
+
+            
+    
+    

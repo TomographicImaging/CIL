@@ -61,7 +61,7 @@ if __name__ == '__main__':
     
     from ccpi.framework import ImageGeometry
 
-    M, N= 2, 3
+    M, N = 2, 3
     ig = ImageGeometry(M, N)
     arr = ig.allocate('random_int')
     

@@ -122,6 +122,7 @@ if __name__ == '__main__':
     d2 = G_neum.sum_abs_col()
     print(d2)    
     
+    d1 * d2
     
     
     

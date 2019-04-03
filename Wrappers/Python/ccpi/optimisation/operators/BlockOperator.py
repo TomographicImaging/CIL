@@ -8,7 +8,7 @@ Created on Thu Feb 14 12:36:40 2019
 import numpy
 from numbers import Number
 import functools
-from ccpi.framework import AcquisitionData, ImageData, BlockDataContainer
+from ccpi.framework import AcquisitionData, ImageData, BlockDataContainer, DataContainer
 from ccpi.optimisation.operators import Operator, LinearOperator
 from ccpi.optimisation.operators.BlockScaledOperator import BlockScaledOperator
 from ccpi.framework import BlockGeometry
@@ -224,7 +224,7 @@ class BlockOperator(Operator):
         
         res = []
         for row in range(self.shape[0]):
-            for col in range(self.shape[1]):
+            for col in range(self.shape[1]):                            
                 if col == 0:
                     prod = self.get_item(row,col).sum_abs_row()
                 else:
@@ -269,8 +269,8 @@ if __name__ == '__main__':
     
     B = BlockOperator(G, Id)
     
-    print(B.sum_abs_row().as_array())
-    
+    print(B.sum_abs_row())
+#    
     Gx = SparseFiniteDiff(ig, direction=1, bnd_cond='Neumann')
     Gy = SparseFiniteDiff(ig, direction=0, bnd_cond='Neumann')
     
@@ -282,17 +282,17 @@ if __name__ == '__main__':
     d_res = numpy.reshape(d1 + d2 + d3, ig.shape, 'F')
     
     print(d_res)
-    
+#    
     z1 = abs(Gx.matrix()).toarray().sum(axis=1)
     z2 = abs(Gy.matrix()).toarray().sum(axis=1)
     z3 = abs(Id.matrix()).toarray().sum(axis=1)
-
+#
     z_res = BlockDataContainer(BlockDataContainer(ImageData(numpy.reshape(z2, ig.shape, 'F')),\
                                                   ImageData(numpy.reshape(z1, ig.shape, 'F'))),\
                                                   ImageData(numpy.reshape(z3, ig.shape, 'F')))
-
+#
     ttt = B.sum_abs_col()
-    
+#    
     numpy.testing.assert_array_almost_equal(z_res[0][0].as_array(), ttt[0][0].as_array(), decimal=4)    
     numpy.testing.assert_array_almost_equal(z_res[0][1].as_array(), ttt[0][1].as_array(), decimal=4)    
     numpy.testing.assert_array_almost_equal(z_res[1].as_array(), ttt[1].as_array(), decimal=4)    

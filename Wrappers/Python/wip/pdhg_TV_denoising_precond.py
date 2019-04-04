@@ -24,7 +24,7 @@ from skimage.util import random_noise
 # ############################################################################
 # Create phantom for TV denoising
 
-N = 500
+N = 100
 data = np.zeros((N,N))
 data[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
 data[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 1
@@ -78,16 +78,14 @@ diag_precon = False
 
 if diag_precon:
     
-    tmp_tau = 1/operator.sum_abs_row()
-    tmp_sigma = 1/operator.sum_abs_col()
+    def tau_sigma_precond(operator):
+        tau = 1/operator.sum_abs_row()
+        sigma = 1/ operator.sum_abs_col()
     
-    tmp_sigma[0][0].as_array()[tmp_sigma[0][0].as_array()==np.inf]=0
-    tmp_sigma[0][1].as_array()[tmp_sigma[0][1].as_array()==np.inf]=0
-    tmp_sigma[1].as_array()[tmp_sigma[1].as_array()==np.inf]=0
-    
-    tau = tmp_tau
-    sigma = tmp_sigma    
-        
+        return tau, sigma
+
+    tau, sigma = tau_sigma_precond(operator)
+             
 else:
     # Compute operator Norm
     normK = operator.norm()

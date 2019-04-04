@@ -64,11 +64,15 @@ class SparseFiniteDiff():
     
     def sum_abs_row(self):
         
-        return ImageData(np.array(np.reshape(abs(self.matrix()).sum(axis=0), self.gm_domain.shape, 'F')))
+        res = np.array(np.reshape(abs(self.matrix()).sum(axis=0), self.gm_domain.shape, 'F'))
+        res[res==0]=1
+        return ImageData(res)
     
     def sum_abs_col(self):
         
-        return ImageData(np.array(np.reshape(abs(self.matrix()).sum(axis=1), self.gm_domain.shape, 'C')))
+        res = np.array(np.reshape(abs(self.matrix()).sum(axis=1), self.gm_domain.shape, 'C'))
+        res[res==0]=1
+        return ImageData(res)
         
 if __name__ == '__main__':
     

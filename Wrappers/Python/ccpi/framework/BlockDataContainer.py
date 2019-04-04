@@ -57,7 +57,6 @@ class BlockDataContainer(object):
             if type(self.containers[i])==type(self):
                 self = self.containers[i]
         
-        
         if isinstance(other, Number):
             return True   
         elif isinstance(other, list):

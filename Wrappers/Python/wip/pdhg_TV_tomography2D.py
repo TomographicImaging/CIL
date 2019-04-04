@@ -26,10 +26,10 @@ from skimage.util import random_noise
 #%%###############################################################################
 # Create phantom for TV tomography
 
-import os
-import tomophantom
-from tomophantom import TomoP2D
-from tomophantom.supp.qualitymetrics import QualityTools
+#import os
+#import tomophantom
+#from tomophantom import TomoP2D
+#from tomophantom.supp.qualitymetrics import QualityTools
 
 #model = 1 # select a model number from the library
 #N = 150 # set dimension of the phantom
@@ -55,7 +55,7 @@ detectors = 150
 angles = np.linspace(0,np.pi,100)
 
 ag = AcquisitionGeometry('parallel','2D',angles, detectors)
-Aop = AstraProjectorSimple(ig, ag, 'gpu')
+Aop = AstraProjectorSimple(ig, ag, 'cpu')
 sin = Aop.direct(data)
 
 plt.imshow(sin.as_array())
@@ -95,32 +95,55 @@ g = ZeroFun()
 normK = operator.norm()
 
 ## Primal & dual stepsizes
+diag_precon = False 
 
-sigma = 10
-tau = 1/(sigma*normK**2)
+if diag_precon:
+    
+    def tau_sigma_precond(operator):
+        
+        tau = 1/operator.sum_abs_row()
+        sigma = 1/ operator.sum_abs_col()
+    
+        return tau, sigma
 
-pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
-pdhg.max_iteration = 5000
-pdhg.update_objective_interval = 250
+    tau, sigma = tau_sigma_precond(operator)
+    
+else:    
+    sigma = 10
+    tau = 1/(sigma*normK**2)
 
-pdhg.run(5000)
+#pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
+#pdhg.max_iteration = 5000
+#pdhg.update_objective_interval = 250
+#
+#pdhg.run(5000)
+    
+opt = {'niter':2000}
+#
+res = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt) 
+
+aaa = res[0].as_array()
+#    
+plt.imshow(aaa)
+plt.colorbar()
+plt.show()    
 
 #%%
-sol = pdhg.get_output().as_array()
-fig = plt.figure()
-plt.subplot(1,2,1)
-plt.imshow(noisy_data.as_array())
-#plt.colorbar()
-plt.subplot(1,2,2)
-plt.imshow(sol)
-#plt.colorbar()
-plt.show()
-
-
-#%%
-plt.plot(np.linspace(0,N,N), data.as_array()[int(N/2),:], label = 'GTruth')
-plt.plot(np.linspace(0,N,N), sol[int(N/2),:], label = 'Recon')
-plt.legend()
-plt.show()
+#sol = pdhg.get_output().as_array()
+#fig = plt.figure()
+#plt.subplot(1,2,1)
+#plt.imshow(noisy_data.as_array())
+##plt.colorbar()
+#plt.subplot(1,2,2)
+#plt.imshow(sol)
+##plt.colorbar()
+#plt.show()
+#
+#
+##%%
+#plt.plot(np.linspace(0,N,N), data.as_array()[int(N/2),:], label = 'GTruth')
+#plt.plot(np.linspace(0,N,N), sol[int(N/2),:], label = 'Recon')
+#plt.legend()
+#plt.show()
 
 

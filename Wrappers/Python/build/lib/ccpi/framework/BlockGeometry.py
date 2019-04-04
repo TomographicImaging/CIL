@@ -27,6 +27,10 @@ class BlockGeometry(object):
             raise ValueError(
                     'Dimension and size do not match: expected {} got {}'
                     .format(n_elements, len(args)))
+            
+    def get_item(self, index):
+        '''returns the Geometry in the BlockGeometry located at position index'''
+        return self.geometries[index]            
 
     def allocate(self, value=0, dimension_labels=None):
         containers = [geom.allocate(value) for geom in self.geometries]

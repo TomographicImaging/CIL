@@ -74,11 +74,12 @@ else:
     ###########################################################################
 #%%
 
-diag_precon = False 
+diag_precon = True 
 
 if diag_precon:
     
     def tau_sigma_precond(operator):
+        
         tau = 1/operator.sum_abs_row()
         sigma = 1/ operator.sum_abs_col()
     

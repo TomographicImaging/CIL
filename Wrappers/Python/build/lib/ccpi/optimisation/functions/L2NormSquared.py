@@ -1,12 +1,21 @@
 # -*- coding: utf-8 -*-
+#   This work is part of the Core Imaging Library developed by
+#   Visual Analytics and Imaging System Group of the Science Technology
+#   Facilities Council, STFC
 
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Feb  7 13:10:56 2019
+#   Copyright 2018-2019 Evangelos Papoutsellis and Edoardo Pasca
 
-@author: evangelos
-"""
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+
+#       http://www.apache.org/licenses/LICENSE-2.0
+
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
 
 import numpy
 from ccpi.optimisation.functions import Function
@@ -71,14 +80,15 @@ class L2NormSquared(Function):
             
         tmp = 0
         if self.b is not None:
-            tmp = (self.b * x).sum()
+#            tmp = (self.b * x).sum()
+            tmp = (x * self.b).sum()
             
         if out is None:
             # FIXME: this is a number
-            return (1/4) * x.squared_norm() + tmp
+            return (1./4.) * x.squared_norm() + tmp
         else:
             # FIXME: this is a DataContainer
-            out.fill((1/4) * x.squared_norm() + tmp)
+            out.fill((1./4.) * x.squared_norm() + tmp)
                     
 
     def proximal(self, x, tau, out = None):
@@ -108,7 +118,8 @@ class L2NormSquared(Function):
         
         if out is None:
             if self.b is not None:
-                return (x - tau*self.b)/(1 + tau/2) 
+                # change the order cannot add ImageData + NestedBlock
+                return (-1* tau*self.b + x)/(1 + tau/2) 
             else:
                 return x/(1 + tau/2 )
         else:

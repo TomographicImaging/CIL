@@ -29,6 +29,7 @@ import warnings
 from functools import reduce
 from numbers import Number
 
+
 def find_key(dic, val):
     """return the key of dictionary dic given the value"""
     return [k for k, v in dic.items() if v == val][0]
@@ -496,6 +497,7 @@ class DataContainer(object):
     ## algebra 
     def __add__(self, other, *args, **kwargs):
         out = kwargs.get('out', None)
+        
         if issubclass(type(other), DataContainer):    
             if self.check_dimensions(other):
                 out = self.as_array() + other.as_array()
@@ -601,6 +603,7 @@ class DataContainer(object):
                                deep_copy=True, 
                                dimension_labels=self.dimension_labels,
                                geometry=self.geometry)
+            
         else:
             raise TypeError('Cannot {0} DataContainer with {1}'.format("multiply" ,
                             type(other)))

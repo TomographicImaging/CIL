@@ -24,7 +24,7 @@ from skimage.util import random_noise
 # ############################################################################
 # Create phantom for TV denoising
 
-N = 100
+N = 500
 data = np.zeros((N,N))
 data[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
 data[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 1
@@ -74,34 +74,52 @@ else:
     ###########################################################################
 #%%
 
-diag_precon = True 
+diag_precon = False 
 
 if diag_precon:
-    tmp_tau = operator.sum_abs_row()
-    tmp_sigma = operator.sum_abs_col()
     
-    tmp_sigma[0][0].as_array()[tmp_sigma[0][0].as_array()==0]=1
-    tmp_sigma[0][1].as_array()[tmp_sigma[0][1].as_array()==0]=1
-    tmp_sigma[1].as_array()[tmp_sigma[1].as_array()==0]=1
+    tmp_tau = 1/operator.sum_abs_row()
+    tmp_sigma = 1/operator.sum_abs_col()
     
-    tau = 1/tmp_tau
-    sigma = 1/tmp_sigma
+    tmp_sigma[0][0].as_array()[tmp_sigma[0][0].as_array()==np.inf]=0
+    tmp_sigma[0][1].as_array()[tmp_sigma[0][1].as_array()==np.inf]=0
+    tmp_sigma[1].as_array()[tmp_sigma[1].as_array()==np.inf]=0
     
+    tau = tmp_tau
+    sigma = tmp_sigma    
+        
 else:
     # Compute operator Norm
     normK = operator.norm()
     print ("normK", normK)
     # Primal & dual stepsizes
-    sigma = 1
-    tau = 1/(sigma*normK**2)
+    sigma = 1/normK
+    tau = 1/normK
+#    tau = 1/(sigma*normK**2)
 
 #%%
     
-#opt = {'niter':2000}
+opt = {'niter':2000}
+#
+res = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt) 
+ 
+aaa = res[0].as_array()
+#    
+plt.imshow(aaa)
+plt.colorbar()
+plt.show()
+#c2 = aaa
+#del aaa
+#%%
 
-#res = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt)    
-    
-    
+#c2 = aaa
+##%%    
+#%%
+z = c1 - c2
+plt.imshow(np.abs(z[0:95,0:95]))
+plt.colorbar()
+
+#%%
 #pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
 #pdhg.max_iteration = 2000
 #pdhg.update_objective_interval = 10

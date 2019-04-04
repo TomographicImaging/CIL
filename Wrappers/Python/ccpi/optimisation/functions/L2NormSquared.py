@@ -80,7 +80,8 @@ class L2NormSquared(Function):
             
         tmp = 0
         if self.b is not None:
-            tmp = (self.b * x).sum()
+#            tmp = (self.b * x).sum()
+            tmp = (x * self.b).sum()
             
         if out is None:
             # FIXME: this is a number
@@ -117,7 +118,8 @@ class L2NormSquared(Function):
         
         if out is None:
             if self.b is not None:
-                return (x - tau*self.b)/(1 + tau/2) 
+                # change the order cannot add ImageData + NestedBlock
+                return (-1* tau*self.b + x)/(1 + tau/2) 
             else:
                 return x/(1 + tau/2 )
         else:

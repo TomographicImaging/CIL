@@ -8,7 +8,7 @@ Created on Mon Feb  4 16:18:06 2019
 from ccpi.optimisation.algorithms import Algorithm
 from ccpi.framework import ImageData
 import numpy as np
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import time
 from ccpi.optimisation.operators import BlockOperator
 from ccpi.framework import BlockDataContainer
@@ -120,12 +120,13 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
     
     objective = []
     
+    
     for i in range(niter):
         
         # Gradient descent, Dual problem solution
         y_tmp = y_old + sigma * operator.direct(xbar)
         y = f.proximal_conjugate(y_tmp, sigma)
-        
+
         # Gradient ascent, Primal problem solution
         x_tmp = x_old - tau * operator.adjoint(y)
         x = g.proximal(x_tmp, tau)
@@ -135,15 +136,15 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
                                 
         x_old = x
         y_old = y   
-        
+                
         if i%100==0:
             
             primal = f(operator.direct(x)) + g(x)
             dual = -(f.convex_conjugate(y) + g(-1*operator.adjoint(y)))
-            print( i, primal, dual)
+            print( i, primal, dual, primal-dual)
             
-            plt.imshow(x.as_array())
-            plt.show()
+#            plt.imshow(x.as_array())
+#            plt.show()
 #            print(f(operator.direct(x)) + g(x), i)
                          
     t_end = time.time()        

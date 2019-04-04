@@ -52,6 +52,12 @@ class BlockDataContainer(object):
     
     def is_compatible(self, other):
         '''basic check if the size of the 2 objects fit'''
+        
+        for i in range(len(self.containers)):
+            if type(self.containers[i])==type(self):
+                self = self.containers[i]
+        
+        
         if isinstance(other, Number):
             return True   
         elif isinstance(other, list):

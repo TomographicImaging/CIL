@@ -119,7 +119,7 @@ class L2NormSquared(Function):
         if out is None:
             if self.b is not None:
                 # change the order cannot add ImageData + NestedBlock
-                return (-1* tau*self.b + x)/(1 + tau/2) 
+                return (x - tau*self.b)/(1 + tau/2) 
             else:
                 return x/(1 + tau/2 )
         else:

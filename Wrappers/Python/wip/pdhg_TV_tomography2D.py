@@ -13,7 +13,7 @@ from ccpi.framework import ImageData, ImageGeometry, BlockDataContainer, Acquisi
 import numpy as np                           
 import matplotlib.pyplot as plt
 
-from ccpi.optimisation.algorithms import PDHG
+from ccpi.optimisation.algorithms import PDHG, PDHG_old
 
 from ccpi.optimisation.operators import BlockOperator, Identity, Gradient
 from ccpi.optimisation.functions import ZeroFun, L2NormSquared, \
@@ -109,7 +109,7 @@ if diag_precon:
     tau, sigma = tau_sigma_precond(operator)
     
 else:    
-    sigma = 10
+    sigma = 1
     tau = 1/(sigma*normK**2)
 
 #pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
@@ -120,13 +120,12 @@ else:
     
 opt = {'niter':2000}
 #
-res = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt) 
+res, time, primal, dual, pdgap = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt) 
 
-aaa = res[0].as_array()
-#    
-plt.imshow(aaa)
+plt.figure(figsize=(5,5))
+plt.imshow(res.as_array())
 plt.colorbar()
-plt.show()    
+plt.show() 
 
 #%%
 #sol = pdhg.get_output().as_array()

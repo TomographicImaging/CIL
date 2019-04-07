@@ -43,8 +43,7 @@ class Gradient(LinearOperator):
         
     def direct(self, x, out=None):
         
-        tmp = self.gm_range.allocate()
-        
+        tmp = self.gm_range.allocate()        
         for i in range(tmp.shape[0]):
             tmp.get_item(i).fill(FiniteDiff(self.gm_domain, direction = self.ind[i], bnd_cond = self.bnd_cond).direct(x))
         return tmp    

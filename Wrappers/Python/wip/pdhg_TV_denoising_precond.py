@@ -74,7 +74,7 @@ else:
     ###########################################################################
 #%%
 
-diag_precon = True 
+diag_precon =  False
 
 if diag_precon:
     
@@ -82,7 +82,7 @@ if diag_precon:
         
         tau = 1/operator.sum_abs_row()
         sigma = 1/ operator.sum_abs_col()
-    
+               
         return tau, sigma
 
     tau, sigma = tau_sigma_precond(operator)
@@ -99,14 +99,19 @@ else:
 #%%
     
 opt = {'niter':2000}
-#
-res = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt) 
+
+res, time, primal, dual, pdgap = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt) 
  
-aaa = res[0].as_array()
-#    
-plt.imshow(aaa)
+plt.figure(figsize=(5,5))
+plt.imshow(res.as_array())
 plt.colorbar()
 plt.show()
+
+#aaa = res[0].as_array()
+#    
+#plt.imshow(aaa)
+#plt.colorbar()
+#plt.show()
 #c2 = aaa
 #del aaa
 #%%
@@ -114,9 +119,9 @@ plt.show()
 #c2 = aaa
 ##%%    
 #%%
-z = c1 - c2
-plt.imshow(np.abs(z[0:95,0:95]))
-plt.colorbar()
+#z = c1 - c2
+#plt.imshow(np.abs(z[0:95,0:95]))
+#plt.colorbar()
 
 #%%
 #pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)

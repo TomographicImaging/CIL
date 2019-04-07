@@ -104,8 +104,7 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
 
     x_old = operator.domain_geometry().allocate()
     y_old = operator.range_geometry().allocate()       
-        
-    
+            
     xbar = x_old
     x_tmp = x_old
     x = x_old
@@ -118,7 +117,9 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
     
     t = time.time()
     
-    objective = []
+    primal = []
+    dual = []
+    pdgap = []
     
     
     for i in range(niter):
@@ -137,11 +138,18 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
         x_old = x
         y_old = y   
                 
-        if i%100==0:
+#        if i%100==0:
             
-            primal = f(operator.direct(x)) + g(x)
-            dual = -(f.convex_conjugate(y) + g(-1*operator.adjoint(y)))
-            print( i, primal, dual, primal-dual)
+        p1 = f(operator.direct(x)) + g(x)
+        d1 = -(f.convex_conjugate(y) + g(-1*operator.adjoint(y)))
+        pd1 = p1 - d1
+        
+        primal.append(p1)
+        dual.append(d1)
+        pdgap.append(pd1)
+        
+            
+#            print( i, primal, dual, primal-dual)
             
 #            plt.imshow(x.as_array())
 #            plt.show()
@@ -149,7 +157,7 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
                          
     t_end = time.time()        
         
-    return x, t_end - t, objective
+    return x, t_end - t, primal, dual, pdgap
 
 
 

@@ -6,12 +6,12 @@ Created on Fri Mar  1 22:51:17 2019
 @author: evangelos
 """
 
-from ccpi.optimisation.operators import Operator
+from ccpi.optimisation.operators import LinearOperator
 from ccpi.optimisation.ops import PowerMethodNonsquare
 from ccpi.framework import ImageData, BlockDataContainer
 import numpy as np
 
-class FiniteDiff(Operator):
+class FiniteDiff(LinearOperator):
     
     # Works for Neum/Symmetric &  periodic boundary conditions
     # TODO add central differences???

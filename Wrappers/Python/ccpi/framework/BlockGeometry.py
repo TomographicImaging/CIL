@@ -16,17 +16,16 @@ class BlockGeometry(object):
         ''''''
         self.geometries = args
         self.index = 0
-        #shape = kwargs.get('shape', None)
-        #if shape is None:
-        #   shape = (len(args),1)
+
         shape = (len(args),1)
         self.shape = shape
-        #print (self.shape)
+
         n_elements = functools.reduce(lambda x,y: x*y, shape, 1)
         if len(args) != n_elements:
             raise ValueError(
                     'Dimension and size do not match: expected {} got {}'
                     .format(n_elements, len(args)))
+                      
             
     def get_item(self, index):
         '''returns the Geometry in the BlockGeometry located at position index'''

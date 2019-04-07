@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+    # -*- coding: utf-8 -*-
 """
 Created on Tue Mar  5 16:04:45 2019
 
@@ -23,12 +23,12 @@ class BlockDataContainer(object):
         ''''''
         self.containers = args
         self.index = 0
-        #shape = kwargs.get('shape', None)
-        #if shape is None:
-        #   shape = (len(args),1)
-        shape = (len(args),1)
+        shape = kwargs.get('shape', None)
+        if shape is None:
+           shape = (len(args),1)
+#        shape = (len(args),1)
         self.shape = shape
-        #print (self.shape)
+
         n_elements = functools.reduce(lambda x,y: x*y, shape, 1)
         if len(args) != n_elements:
             raise ValueError(

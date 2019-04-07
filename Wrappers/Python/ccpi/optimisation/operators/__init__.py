@@ -12,6 +12,7 @@ from .BlockOperator import BlockOperator
 from .BlockScaledOperator import BlockScaledOperator
 
 from .SparseFiniteDiff import SparseFiniteDiff
+from .ShrinkageOperator import ShrinkageOperator
 
 from .FiniteDifferenceOperator import FiniteDiff
 from .GradientOperator import Gradient

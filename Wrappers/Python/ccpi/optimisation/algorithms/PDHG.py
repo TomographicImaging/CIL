@@ -140,18 +140,18 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
         y_old = y   
                 
 #        if isinstance(f, FunctionOperatorComposition):
-        p1 = f(x) + g(x)
+#        p1 = f(x) + g(x)
 #        else:
-#            p1 = f(operator.direct(x)) + g(x)
-        d1 = -(f.convex_conjugate(y) + g(-1*operator.adjoint(y)))
-        pd1 = p1 - d1
+#        p1 = f(operator.direct(x)) + g(x)
+#        d1 = -(f.convex_conjugate(y) + g(-1*operator.adjoint(y)))
+#        pd1 = p1 - d1
         
-        primal.append(p1)
-        dual.append(d1)
-        pdgap.append(pd1)
+#        primal.append(p1)
+#        dual.append(d1)
+#        pdgap.append(pd1)
         
-        if i%100==0:
-            print(p1, d1, pd1)
+#        if i%100==0:
+#            print(p1, d1, pd1)
 #        if isinstance(f, FunctionOperatorComposition):
 #            p1 = f(x) + g(x)
 #        else:        

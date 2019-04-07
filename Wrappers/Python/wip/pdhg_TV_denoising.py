@@ -24,7 +24,7 @@ from skimage.util import random_noise
 # ############################################################################
 # Create phantom for TV denoising
 
-N = 600
+N = 200
 data = np.zeros((N,N))
 data[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
 data[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 1
@@ -33,9 +33,11 @@ ig = ImageGeometry(voxel_num_x = N, voxel_num_y = N)
 ag = ig
 
 # Create noisy data. Add Gaussian noise
-n1 = random_noise(data, mode = 'gaussian', seed=10)
+n1 = random_noise(data, mode = 'gaussian', mean=0, var = 0.05, seed=10)
 noisy_data = ImageData(n1)
 
+plt.imshow(noisy_data.as_array())
+plt.show()
 
 #%%
 
@@ -55,9 +57,7 @@ if method == '0':
     operator = BlockOperator(op1, op2, shape=(2,1) ) 
 
     #### Create functions
-#    f = FunctionComposition_new(operator, mixed_L12Norm(alpha), \
-#                                    L2NormSq(0.5, b = noisy_data) )    
-    
+      
     f1 = alpha * MixedL21Norm()
     f2 = 0.5 * L2NormSquared(b = noisy_data)
     
@@ -72,6 +72,7 @@ else:
     operator = Gradient(ig)
     f = alpha * FunctionOperatorComposition(operator, MixedL21Norm())
     g = L2NormSquared(b = noisy_data)
+    
     ###########################################################################
 #%%
     

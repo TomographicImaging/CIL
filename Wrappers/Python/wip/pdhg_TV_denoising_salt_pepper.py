@@ -25,7 +25,7 @@ from skimage.util import random_noise
 # ############################################################################
 # Create phantom for TV denoising
 
-N = 200
+N = 100
 data = np.zeros((N,N))
 data[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
 data[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 1
@@ -34,7 +34,7 @@ ig = ImageGeometry(voxel_num_x = N, voxel_num_y = N)
 ag = ig
 
 # Create noisy data. Add Gaussian noise
-n1 = random_noise(data, mode = 's&p', seed=10)
+n1 = random_noise(data, mode = 's&p', salt_vs_pepper = 0.9)
 noisy_data = ImageData(n1)
 
 plt.imshow(noisy_data.as_array())
@@ -44,7 +44,7 @@ plt.show()
 #%%
 
 # Regularisation Parameter
-alpha = 1000
+alpha = 10
 
 #method = input("Enter structure of PDHG (0=Composite or 1=NotComposite): ")
 method = '1'
@@ -73,8 +73,8 @@ else:
     #         No Composite #
     ###########################################################################
     operator = Gradient(ig)
-    f = alpha * FunctionOperatorComposition(operator, MixedL21Norm())
-    g = 0.5 * L1Norm(b = noisy_data)
+    f = alpha *  FunctionOperatorComposition(operator, MixedL21Norm())
+    g = L1Norm(b = noisy_data)
     ###########################################################################
 #%%
     
@@ -82,8 +82,11 @@ else:
 normK = operator.norm()
 print ("normK", normK)
 # Primal & dual stepsizes
-sigma = 1
-tau = 1/(sigma*normK**2)
+#sigma = 1
+#tau = 1/(sigma*normK**2)
+
+sigma = 1/normK
+tau = 1/normK
 
 opt = {'niter':2000}
 
@@ -122,5 +125,44 @@ plt.show()
 #plt.show()
 
 
-#%%
-#
+#%% Compare with cvx
+
+try_cvx = input("Do you want CVX comparison (0/1)")
+
+if try_cvx=='0':
+
+    from cvxpy import *
+    import sys
+    sys.path.insert(0,'/Users/evangelos/Desktop/Projects/CCPi/CCPi-Framework/Wrappers/Python/ccpi/optimisation/cvx_scripts')
+    from cvx_functions import TV_cvx
+
+    u = Variable((N, N))
+    fidelity = pnorm( u - noisy_data.as_array(),1)
+    regulariser = alpha * TV_cvx(u)
+    solver = MOSEK
+    obj =  Minimize( regulariser +  fidelity)
+    constraints = []
+    prob = Problem(obj, constraints)
+
+    # Choose solver (SCS is fast but less accurate than MOSEK)
+    result = prob.solve(verbose = True, solver = solver)
+
+    print('Objective value is {} '.format(obj.value))
+
+    diff_pdhg_cvx = np.abs(u.value - res.as_array())
+    plt.imshow(diff_pdhg_cvx)
+    plt.colorbar()
+    plt.title('|CVX-PDHG|')        
+    plt.show()
+
+    plt.plot(np.linspace(0,N,N), u.value[int(N/2),:], label = 'CVX')
+    plt.plot(np.linspace(0,N,N), res.as_array()[int(N/2),:], label = 'PDHG')
+    plt.legend()
+    plt.show()
+
+else:
+    print('No CVX solution available')
+
+
+
+

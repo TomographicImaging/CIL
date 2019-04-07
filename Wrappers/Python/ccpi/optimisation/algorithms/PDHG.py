@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import time
 from ccpi.optimisation.operators import BlockOperator
 from ccpi.framework import BlockDataContainer
+from ccpi.optimisation.functions import FunctionOperatorComposition
 
 
 import matplotlib.pyplot as plt
@@ -138,9 +139,10 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
         x_old = x
         y_old = y   
                 
-#        if i%100==0:
-            
-        p1 = f(operator.direct(x)) + g(x)
+#        if isinstance(f, FunctionOperatorComposition):
+        p1 = f(x) + g(x)
+#        else:
+#            p1 = f(operator.direct(x)) + g(x)
         d1 = -(f.convex_conjugate(y) + g(-1*operator.adjoint(y)))
         pd1 = p1 - d1
         
@@ -148,12 +150,12 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
         dual.append(d1)
         pdgap.append(pd1)
         
-            
-#            print( i, primal, dual, primal-dual)
-            
-#            plt.imshow(x.as_array())
-#            plt.show()
-#            print(f(operator.direct(x)) + g(x), i)
+        if i%100==0:
+            print(p1, d1, pd1)
+#        if isinstance(f, FunctionOperatorComposition):
+#            p1 = f(x) + g(x)
+#        else:        
+        
                          
     t_end = time.time()        
         

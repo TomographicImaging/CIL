@@ -126,11 +126,10 @@ if __name__ == '__main__':
     a1 = f_no_scaled(U)
     a2 = f_scaled(U)    
     
-    z = f_no_scaled.proximal_conjugate(U, 1)
+    z1 = f_no_scaled.proximal_conjugate(U, 1)
+    z2 = f_scaled.proximal_conjugate(U, 1)
     
-    f_no_scaled = MixedL21Norm()
-    
-    tmp = [el*el for el in U]
+
     
 
     

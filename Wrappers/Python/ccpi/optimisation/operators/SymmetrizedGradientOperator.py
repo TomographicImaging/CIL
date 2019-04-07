@@ -61,8 +61,9 @@ class SymmetrizedGradient(Gradient):
                 tmp[i][j]=FiniteDiff(self.gm_domain.get_item(0), direction = i, bnd_cond = self.bnd_cond).adjoint(x.get_item(j))
         tmp = numpy.array(tmp)
         z = 0.5 * (tmp.T + tmp)
+        z = z.to
         
-        return BlockDataContainer(z.tolist())
+        return BlockDataContainer(*z.tolist())
 
     
     def adjoint(self, x, out=None):
@@ -70,9 +71,11 @@ class SymmetrizedGradient(Gradient):
         
         res = []
         for i in range(2):
-            for j in range(2):
-                
-                restmpFiniteDiff(self.gm_domain.get_item(0), direction = i, bnd_cond = self.bnd_cond).direct(x.get_item(j))
+            tmp = ImageData(np.zeros(x.get_item(0)))
+            for j in range(2):                
+                tmp += FiniteDiff(self.gm_domain.get_item(0), direction = i, bnd_cond = self.bnd_cond).direct(x.get_item(j))
+            res.append(tmp)   
+        return res            
                 
                 
         
@@ -136,13 +139,15 @@ if __name__ == '__main__':
     
     res = E1.direct(u1) 
     
-    Dx = FiniteDiff(ig1, direction = 1, bnd_cond = 'Neumann')
-    Dy = FiniteDiff(ig1, direction = 0, bnd_cond = 'Neumann')
+    res1 = E1.adjoint(res)
     
-    B = BlockOperator(Dy, Dx)
-    V = BlockDataContainer(u1,u2)
-    
-    res = B.adjoint(V)
+#    Dx = FiniteDiff(ig1, direction = 1, bnd_cond = 'Neumann')
+#    Dy = FiniteDiff(ig1, direction = 0, bnd_cond = 'Neumann')
+#    
+#    B = BlockOperator(Dy, Dx)
+#    V = BlockDataContainer(u1,u2)
+#    
+#    res = B.adjoint(V)
     
 #    ig = (N,M)
 #    ig2 = (2,) + ig

@@ -179,7 +179,7 @@ if __name__ == '__main__':
     
     a1 = BlockDataContainer( arr, BlockDataContainer(arr, arr))
 #    
-#    c1 = arr + a
+    c1 = arr + a
 #    c2 = arr + a
 #    c2 = a1 + arr
 #    

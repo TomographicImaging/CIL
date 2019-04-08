@@ -27,6 +27,9 @@ import sys
 from datetime import timedelta, datetime
 import warnings
 from functools import reduce
+import csv
+import os
+import math
 
 def find_key(dic, val):
     """return the key of dictionary dic given the value"""
@@ -1244,3 +1247,297 @@ if __name__ == '__main__':
     sino = AcquisitionData(geometry=sgeometry)
     sino2 = sino.clone()
     
+
+class SpectralData(object):
+    
+    def __init__(self,
+               energy_type='xray',
+               n_bins=1,
+               bin_edges=None,
+               bin_width=None,
+               units='Angstrom'
+               ):
+        '''
+        Constructor
+        General input for standard spectral data:
+            energy_type default: 'xray', 'neutron'
+            n_bins      number of energy bins
+            bin_edges   [n_bins x 2] array with bin edges
+            bin_width   [n_bins x 1] array with width of every bin
+            units       string with associated units 
+                        (default: 'Angstrom', 
+                        'meters'
+                        'keV', 
+                        'meV', 
+                        'seconds')
+        '''
+        
+        self.energy_type = energy_type
+        self.n_bins = n_bins
+        self.bin_edges = bin_edges
+        self.bin_width = bin_width
+        self.units = units
+        
+        self.supported_units = ['Angstrom', 'meters', 'keV', 'meV', 'seconds']
+        
+        # check input
+        if (self.energy_type not in ['xray', 'neutron']):
+            raise Exception('Attribute energy_type must be either xray or neutron')
+        
+        if (self.units not in self.supported_units):
+            raise Exception('Unit is not supported. Supported units are Angstrom (A), meters (m), keV, meV, and seconds (s)')
+            
+        if (type(self.bin_edges) != numpy.ndarray):
+            TypeError('Array bin_edges must be NumpyArray')
+        
+        if (self.bin_edges.shape != (self.n_bins, 2)):
+            raise Exception('bin_edges must be (n_bins x 2) NumpyArray')
+            
+        if ((numpy.isscalar(self.bin_width) == False) and (type(self.bin_width) != numpy.ndarray)):
+            raise Exception('bin_width must be either scalar or NumpyArray')
+            
+        if ((type(self.bin_width) == numpy.ndarray) and (self.bin_width.shape != (self.n_bins,))):
+            raise Exception('bin_width must be (n_bins x 1) NumpyArray')
+        
+    def clone(self):
+        '''
+        Returns a copy of SpectralData
+        '''
+        return SpectralData(self.energy_type,
+                            self.n_bins,
+                            self.bin_edges,
+                            self.bin_width,
+                            self.units)
+    
+    def __str__ (self):
+        '''
+        Print basic information about spectral data
+        '''
+        repres = ""
+        repres += "Energy type: {}\n".format(self.energy_type)
+        repres += "Number of channels: {0}\n".format(self.n_bins)
+        repres += "Units: {}\n".format(self.units)
+        return repres 
+    
+    def export(self, 
+               path, 
+               filename):
+        '''
+        Export SpectralData as CSV file. 
+        CSV format (spaces below are added for readability):
+            bin[i] \t bin_edges[i, 0] \t bin_edges[i, 1] \t bin_width[i] \n
+        '''
+        
+        if not os.path.isdir(path):
+            raise Exception("Folder " + path + " does not exist")
+        
+        with open(path + '/' + filename, mode='w') as spectral_data_file:
+            spectral_data_writer = csv.writer(spectral_data_file, delimiter='\t')
+            
+            if (numpy.isscalar(self.bin_width) == True):
+                for i in range(self.n_bins):
+                    spectral_data_writer.writerow([i, self.bin_edges[i, 0], self.bin_edges[i, 1], self.bin_width])
+            else:
+                for i in range(self.n_bins):
+                    spectral_data_writer.writerow([i, self.bin_edges[i, 0], self.bin_edges[i, 1], self.bin_width[i]])            
+    
+    def clone_as(self, 
+                 new_units, 
+                 flight_path=None):
+        '''
+        Convert spectral data in different units.
+        Following convertions are possible:
+            
+            energy_type = 'neutron'
+            1. TOF (in seconds) to wavelength (in Angstrom)
+            flight path (in meters) is required
+            
+            conversion equation
+            m_n – neutron mass = 1.67*10e-27 kg,
+            h – Planck’s constant = 6.63*10-34 Js 
+            flight_path- flight path
+            wavelength = (tof * h) / (m_n * flight_path) * 1e10
+            simplified form
+            wavelength = (tof * 3957) / flight_path
+            
+            2. Wavelength (in Angstrom) to TOF (in seconds)
+            flight path flight_path(in meters) is required
+            
+            conversion equation
+            tof = wavelength * flight_path / 3957
+            
+            3. Wavelength (in Angstrom) to energy (in meV)
+            
+            conversion equation
+            m_n – neutron mass = 1.67*10e-27 kg,
+            h – Planck’s constant = 6.63*10-34 Js
+            energy = h^2 / (2 * m_n * wavelength^2)
+            simplified form
+            energy = 81.82 / (wavelength^2)
+            
+            4. Energy (in meV) to wavelength (in Angstrom)
+            
+            conversion equation
+            wavelength = sqrt(energy / 81.82)
+            
+            5. TOF (in seconds) to energy (in meV)
+            flight path (in meters) is required
+            
+            6. Energy (in meV) to TOF (in seconds)
+            flight path (in meters) is required
+            
+            
+            energy type = 'xray'
+            1. Wavelength (in Angstrom) to energy (in keV)
+            
+            conversion equation
+            h – Planck’s constant = 4.14*10e-15 eV*s
+            c - speed of light = 299 792 458 m/s
+            energy = h * c / wavelength
+            
+            simplified form
+            energy = 12.3984 / wavelength
+            
+            2. Energy (in keV) to wavelength (in Angstrom) 
+            
+            conversion equation
+            wavelength = energy / 12.3984
+       '''
+       
+        if new_units not in self.supported_units:
+            raise Exception('Unit is not supported. Supported units are Angstrom, meters, keV, meV, and seconds')
+        else:
+            if (new_units == self.units):
+                # nothing happens
+                print('Data is in ' + self.units + '. Spectral data is cloned.')
+                return SpectralData(self.energy_type,
+                            self.n_bins,
+                            self.bin_edges,
+                            self.bin_width,
+                            self.units)
+            else: 
+                
+                if ((self.energy_type == 'neutron') and 
+                    (self.units == 'seconds') and ((new_units == 'Angstrom') or (new_units == 'meters'))):
+                        
+                    if flight_path == None:
+                        raise Exception('flight_path in meters is required for conversion') 
+                    
+                    if (new_units == 'Angstrom'):
+                        bin_edges = (self.bin_edges * 3957) / flight_path
+                        bin_width = (self.bin_width * 3957) / flight_path
+                    else:
+                        bin_edges = (self.bin_edges * 3957) / flight_path* 1e-10
+                        bin_width = (self.bin_width * 3957) / flight_path* 1e-10
+                    
+                elif ((self.energy_type == 'neutron') and
+                      ((self.units == 'Angstrom') or (self.units == 'meters')) and 
+                      (new_units == 'seconds')):
+                        
+                    if flight_path == None:
+                        raise Exception('flight_path in meters is required for conversion') 
+                       
+                    if (self.units == 'Angstrom'):
+                        bin_edges = self.bin_edges * flight_path / 3957
+                        bin_width = self.bin_width * flight_path / 3957
+                    else:
+                        bin_edges = self.bin_edges * 1e10 * flight_path / 3957
+                        bin_width = self.bin_width * 1e10 * flight_path/ 3957
+                    
+                elif ((self.energy_type == 'neutron') and
+                      ((self.units == 'Angstrom') or (self.units == 'meters')) and 
+                      ((new_units == 'meV') or (new_units == 'keV'))):
+                        
+                    if (((self.units == 'Angstrom') or (self.units == 'A')) and (new_units == 'meV')):
+                        bin_edges = 81.82 / (self.bin_edges**2)
+                        bin_width = 81.82 / (self.bin_width**2)
+                    elif (((self.units == 'Angstrom') or (self.units == 'A')) and (new_units == 'keV')):
+                        bin_edges = 81.82 / (self.bin_edges**2) * 1e3
+                        bin_width = 81.82 / (self.bin_width**2) * 1e3
+                    elif (((self.units == 'meters') or (self.units == 'm')) and new_units == 'meV'):
+                        bin_edges = 81.82 / ((self.bin_edges * 1e10)**2)
+                        bin_width = 81.82 / ((self.bin_width * 1e10)**2)
+                    elif (((self.units == 'meters') or (self.units == 'm')) and new_units == 'keV'):
+                        bin_edges = 81.82 / ((self.bin_edges * 1e10)**2) * 1e3
+                        bin_width = 81.82 / ((self.bin_width * 1e10)**2) * 1e3
+                    
+                elif ((self.energy_type == 'neutron') and
+                      ((self.units == 'meV') or (self.units == 'keV')) and 
+                      ((new_units == 'Angstrom') or (new_units == 'meters'))):
+                
+                    if ((self.units == 'meV') and (new_units == 'Angstrom')):
+                        bin_edges = math.sqrt(self.bin_edges / 81.82)
+                        bin_width = math.sqrt(self.bin_width / 81.82)
+                    elif ((self.units == 'keV') and (new_units == 'Angstrom')):
+                        bin_edges = math.sqrt(self.bin_edges * 1e-3 / 81.82)
+                        bin_width = math.sqrt(self.bin_width * 1e-3 / 81.82)
+                    elif ((self.units == 'meV') and (new_units == 'meters')):
+                        bin_edges = math.sqrt(self.bin_edges / 81.82) * 1e-10
+                        bin_width = math.sqrt(self.bin_width / 81.82)  * 1e-10
+                    elif ((self.units == 'keV') and (new_units == 'meters')):
+                        bin_edges = math.sqrt(self.bin_edges * 1e-3 / 81.82) * 1e-10
+                        bin_width = math.sqrt(self.bin_width * 1e-3 / 81.82) * 1e-10
+                                                
+                elif ((self.energy_type == 'xray') and 
+                      ((self.units == 'Angstrom')  or (self.units == 'meters')) and 
+                      ((new_units == 'keV') or (new_units == 'meV'))):
+                        
+                    if ((self.units == 'Angstrom') and (new_units == 'keV')):
+                        bin_edges = 12.3984 / self.bin_edges
+                        bin_width = 12.3984 / self.bin_width
+                    elif ((self.units == 'Angstrom') and (new_units == 'meV')):
+                        bin_edges = 12.3984 / self.bin_edges * 1e-3
+                        bin_width = 12.3984 / self.bin_width * 1e-3
+                    elif ((self.units == 'meters') and (new_units == 'keV')):
+                        bin_edges = 12.3984 / self.bin_edges * 1e-10
+                        bin_width = 12.3984 / self.bin_width * 1e-10
+                    elif ((self.units == 'meters') and (new_units == 'meV')):
+                        bin_edges = 12.3984 / self.bin_edges * 1e-13
+                        bin_width = 12.3984 / self.bin_width * 1e-13
+                                    
+                elif ((self.energy_type == 'xray') and 
+                      ((self.units == 'keV') or (self.units == 'meV')) and 
+                      ((new_units == 'Angstrom') or (new_units == 'meters'))):
+                    
+                    if ((self.units == 'keV') and (new_units == 'Angstrom')):
+                        bin_edges = self.bin_edges / 12.3984
+                        bin_width = self.bin_width / 12.3984
+                    elif ((self.units == 'meV') and (new_units == 'Angstrom')):
+                        bin_edges = self.bin_edges * 1e3 / 12.3984
+                        bin_width = self.bin_width * 1e3 / 12.3984
+                    elif ((self.units == 'keV') and (new_units == 'meters')):
+                        bin_edges = self.bin_edges / 12.3984 * 1e-10
+                        bin_width = self.bin_width / 12.3984 * 1e-10
+                    elif ((self.units == 'meV') and (new_units == 'meters')):
+                        bin_edges = self.bin_edges / 12.3984 * 1e-7
+                        bin_width = self.bin_width / 12.3984 * 1e-7
+                           
+                elif ((self.units == 'keV') and 
+                      (new_units == 'meV')):
+                        bin_edges = self.bin_edges * 1e-3
+                        bin_width = self.bin_width * 1e-3
+                        
+                elif ((self.units == 'meV') and 
+                      (new_units == 'keV')):
+                    bin_edges = self.bin_edges * 1e3
+                    bin_width = self.bin_width * 1e3    
+                    
+                elif ((self.units == 'Angstrom') and 
+                      (new_units == 'meters')):
+                    bin_edges = self.bin_edges * 1e-10
+                    bin_width = self.bin_width * 1e-10
+                    
+                    
+                elif ((self.units == 'meters') and 
+                      (new_units == 'Angstrom')):
+                    bin_edges = self.bin_edges * 1e10
+                    bin_width = self.bin_width * 1e10
+                
+                else:
+                    raise Exception('Conversion is not supported')
+                
+                return SpectralData(self.energy_type,
+                                    self.n_bins,
+                                    bin_edges,
+                                    bin_width,
+                                    new_units)

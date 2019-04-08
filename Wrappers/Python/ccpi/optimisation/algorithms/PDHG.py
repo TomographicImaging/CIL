@@ -139,6 +139,8 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
         x_old = x
         y_old = y   
                 
+
+
 #        if isinstance(f, FunctionOperatorComposition):
 #        p1 = f(x) + g(x)
 #        else:

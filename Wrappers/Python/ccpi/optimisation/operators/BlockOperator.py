@@ -235,6 +235,7 @@ class BlockOperator(Operator):
             tmp = sum(res)
             return ImageData(tmp)
         else:
+            
             return BlockDataContainer(*res)
         
     def sum_abs_col(self):

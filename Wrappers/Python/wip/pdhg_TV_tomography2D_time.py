@@ -13,7 +13,7 @@ from ccpi.framework import ImageData, ImageGeometry, BlockDataContainer, Acquisi
 import numpy as np                           
 import matplotlib.pyplot as plt
 
-from ccpi.optimisation.algorithms import PDHG
+from ccpi.optimisation.algorithms import PDHG, PDHG_old
 
 from ccpi.optimisation.operators import BlockOperator, Identity, Gradient
 from ccpi.optimisation.functions import ZeroFun, L2NormSquared, \
@@ -107,25 +107,40 @@ normK = operator.norm()
 
 ## Primal & dual stepsizes
 
-sigma = 10
+sigma = 1
 tau = 1/(sigma*normK**2)
 
-pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
-pdhg.max_iteration = 5000
-pdhg.update_objective_interval = 20
+#sigma = 1/normK
+#tau = 1/normK
 
-pdhg.run(5000)
+opt = {'niter':2000}
 
-#%%
-sol = pdhg.get_output().as_array()
-fig = plt.figure()
-plt.subplot(1,2,1)
-plt.imshow(noisy_data.as_array())
-#plt.colorbar()
-plt.subplot(1,2,2)
-plt.imshow(sol)
-#plt.colorbar()
+res, time, primal, dual, pdgap = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt) 
+ 
+plt.figure(figsize=(5,5))
+plt.imshow(res.as_array())
+plt.colorbar()
 plt.show()
+
+#sigma = 10
+#tau = 1/(sigma*normK**2)
+#
+#pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
+#pdhg.max_iteration = 5000
+#pdhg.update_objective_interval = 20
+#
+#pdhg.run(5000)
+#
+##%%
+#sol = pdhg.get_output().as_array()
+#fig = plt.figure()
+#plt.subplot(1,2,1)
+#plt.imshow(noisy_data.as_array())
+##plt.colorbar()
+#plt.subplot(1,2,2)
+#plt.imshow(sol)
+##plt.colorbar()
+#plt.show()
 
 
 #%%

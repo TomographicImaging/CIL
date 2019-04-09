@@ -143,7 +143,7 @@ class BlockOperator(Operator):
                                                       x_b.get_item(col),
                                                       out=out.get_item(row))                        
                     else:
-                        a= out.get_item(row) 
+                        a = out.get_item(row)
                         self.get_item(row,col).direct(
                                                       x_b.get_item(col), 
                                                       out=tmp.get_item(row))
@@ -168,19 +168,44 @@ class BlockOperator(Operator):
         else:
             x_b = x
         shape = self.get_output_shape(x_b.shape, adjoint=True)
-        res = []
-        for row in range(self.shape[1]):
-            for col in range(self.shape[0]):
-                if col == 0:
-                    prod = self.get_item(row, col).adjoint(x_b.get_item(col))
-                else:
-                    prod += self.get_item(row, col).adjoint(x_b.get_item(col))
-            res.append(prod)
-        if self.shape[1]==1:
-            return ImageData(*res)
+        if out is None:
+            res = []
+            for col in range(self.shape[1]):
+                for row in range(self.shape[0]):
+                    if row == 0:
+                        prod = self.get_item(row, col).adjoint(x_b.get_item(row))
+                    else:
+                        prod += self.get_item(row, col).adjoint(x_b.get_item(row))
+                res.append(prod)
+            if self.shape[1]==1:
+                return ImageData(*res)
+            else:
+                return BlockDataContainer(*res, shape=shape)
         else:
-            return BlockDataContainer(*res, shape=shape)
-    
+            #tmp = self.domain_geometry().allocate()
+
+            for col in range(self.shape[1]):
+                for row in range(self.shape[0]):
+                    if row == 0:
+                        if issubclass(out.__class__, DataContainer):
+                            self.get_item(row, col).adjoint(
+                                                x_b.get_item(row),
+                                                out=out)
+                        else:
+                            op = self.get_item(row,col)
+                            self.get_item(row, col).adjoint(
+                                                x_b.get_item(row),
+                                                out=out.get_item(col))
+                    else:
+                        if issubclass(out.__class__, DataContainer):
+                            out += self.get_item(row,col).adjoint(
+                                                        x_b.get_item(row))
+                        else:
+                            a = out.get_item(col)
+                            a += self.get_item(row,col).adjoint(
+                                                        x_b.get_item(row),
+                                                        )
+
     def get_output_shape(self, xshape, adjoint=False):
         sshape = self.shape[1]
         oshape = self.shape[0]

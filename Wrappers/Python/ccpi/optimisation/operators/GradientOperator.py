@@ -38,22 +38,47 @@ class Gradient(LinearOperator):
             else:
                 raise ValueError('No channels to correlate')
          
-        self.bnd_cond = bnd_cond    
+        self.bnd_cond = bnd_cond 
+        
+        # Call FiniteDiff operator
+        
+        self.FD = FiniteDiff(self.gm_domain, direction = 0, bnd_cond = self.bnd_cond)
                                                          
         
     def direct(self, x, out=None):
         
-        tmp = self.gm_range.allocate()        
-        for i in range(tmp.shape[0]):
-            tmp.get_item(i).fill(FiniteDiff(self.gm_domain, direction = self.ind[i], bnd_cond = self.bnd_cond).direct(x))
-        return tmp    
+                
+        if out is not None:
+            for i in range(self.gm_range.shape[0]):
+                self.FD.direction=self.ind[i]
+                self.FD.direct(x, out = out[i])
+#                FiniteDiff(self.gm_domain, direction = self.ind[i], bnd_cond = self.bnd_cond).direct(x, out=out[i])
+            return out
+        else:
+            tmp = self.gm_range.allocate()        
+            for i in range(tmp.shape[0]):
+                self.FD.direction=self.ind[i]
+                tmp.get_item(i).fill(self.FD.direct(x))
+#                tmp.get_item(i).fill(FiniteDiff(self.gm_domain, direction = self.ind[i], bnd_cond = self.bnd_cond).direct(x))
+            return tmp    
         
     def adjoint(self, x, out=None):
         
-        tmp = self.gm_domain.allocate()
-        for i in range(x.shape[0]):
-            tmp+=FiniteDiff(self.gm_domain, direction = self.ind[i], bnd_cond = self.bnd_cond).adjoint(x.get_item(i))
-        return tmp    
+        if out is not None:
+          
+            tmp = self.gm_domain.allocate()            
+            for i in range(x.shape[0]):
+                self.FD.direction=self.ind[i] 
+                self.FD.adjoint(x.get_item(i), out = tmp)
+#                FiniteDiff(self.gm_domain, direction = self.ind[i], bnd_cond = self.bnd_cond).adjoint(x.get_item(i), out=tmp)
+                out-=tmp               
+        else:            
+            tmp = self.gm_domain.allocate()
+            for i in range(x.shape[0]):
+                self.FD.direction=self.ind[i]
+                tmp+=self.FD.adjoint(x.get_item(i))
+#                tmp+=FiniteDiff(self.gm_domain, direction = self.ind[i], bnd_cond = self.bnd_cond).adjoint(x.get_item(i))
+            return tmp    
             
     
     def domain_geometry(self):
@@ -108,6 +133,7 @@ if __name__ == '__main__':
     
     
     from ccpi.optimisation.operators import Identity, BlockOperator
+    
     
     M, N = 2, 3
     ig = ImageGeometry(M, N)
@@ -179,7 +205,32 @@ if __name__ == '__main__':
     
     a1 = BlockDataContainer( arr, BlockDataContainer(arr, arr))
 #    
-    c1 = arr + a
+#    c1 = arr + a
 #    c2 = arr + a
 #    c2 = a1 + arr
+    
+    from ccpi.framework import ImageGeometry
+#    from ccpi.optimisation.operators import Gradient
+#
+    N, M = 2, 3
+#    
+    ig = ImageGeometry(N, M)
+#
+    G = Gradient(ig)
+#
+    u = G.domain_geometry().allocate('random_int')
+    w = G.range_geometry().allocate('random_int')
+#
+#
+    res = G.range_geometry().allocate()
+#    
+    G.direct(u, out=res)
+    z = G.direct(u)
+#    
+    print(res[0].as_array())
+    print(z[0].as_array())
+#
+##    LHS = (G.direct(u)*w).sum()
+##    RHS = (u * G.adjoint(w)).sum()
+    
 #    

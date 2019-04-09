@@ -29,6 +29,7 @@ class FiniteDiff(LinearOperator):
         '''FIXME: domain and range should be geometries'''
         self.gm_domain = gm_domain
         self.gm_range = gm_range
+        
         self.direction = direction
         self.bnd_cond = bnd_cond
         
@@ -50,9 +51,16 @@ class FiniteDiff(LinearOperator):
         x_sz = len(x.shape)
         
         if out is None:        
-            out = np.zeros(x.shape)
+            out = np.zeros_like(x_asarr)
+            fd_arr = out
+        else:
+            fd_arr = out.as_array()        
         
-        fd_arr = out
+#        if out is None:        
+#            out = self.gm_domain.allocate().as_array()
+#        
+#        fd_arr = out.as_array()
+#        fd_arr = self.gm_domain.allocate().as_array()
           
         ######################## Direct for 2D  ###############################
         if x_sz == 2:
@@ -162,8 +170,9 @@ class FiniteDiff(LinearOperator):
         else:
             raise NotImplementedError                
          
-        res = out/self.voxel_size 
-        return type(x)(res)
+#        res = out #/self.voxel_size 
+        return type(x)(out)
+
                     
     def adjoint(self, x, out=None):
         
@@ -172,9 +181,17 @@ class FiniteDiff(LinearOperator):
         x_sz = len(x.shape)
         
         if out is None:        
-            out = np.zeros(x.shape)
+            out = np.zeros_like(x_asarr)
+            fd_arr = out
+        else:
+            fd_arr = out.as_array()          
         
-        fd_arr = out
+#        if out is None:        
+#            out = self.gm_domain.allocate().as_array()
+#            fd_arr = out
+#        else:
+#            fd_arr = out.as_array()
+##        fd_arr = self.gm_domain.allocate().as_array()
         
         ######################## Adjoint for 2D  ###############################
         if x_sz == 2:        
@@ -299,8 +316,8 @@ class FiniteDiff(LinearOperator):
         else:
             raise NotImplementedError
             
-        res = out/self.voxel_size
-        return type(x)(-res)
+        out *= -1 #/self.voxel_size
+        return type(x)(out)
             
     def range_geometry(self):
         '''Returns the range geometry'''
@@ -316,6 +333,29 @@ class FiniteDiff(LinearOperator):
         self.s1, sall, svec = PowerMethodNonsquare(self, 25, x0)
         return self.s1
     
+    
+if __name__ == '__main__':
+    
+    from ccpi.framework import ImageGeometry
+    
+    N, M = 2, 3
+
+    ig = ImageGeometry(N, M)
+
+
+    FD = FiniteDiff(ig, direction = 0, bnd_cond = 'Neumann')
+    u = FD.domain_geometry().allocate('random_int')
+    
+    
+    res = FD.domain_geometry().allocate()
+    FD.direct(u, out=res)
+    print(res.as_array())
+#    z = FD.direct(u)
+    
+#    print(z.as_array(), res.as_array())
+
+    
+#    w = G.range_geometry().allocate('random_int')
     
 
     

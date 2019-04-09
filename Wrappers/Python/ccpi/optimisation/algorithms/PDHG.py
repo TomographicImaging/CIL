@@ -125,19 +125,39 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
     
     for i in range(niter):
         
-        # Gradient descent, Dual problem solution
-        y_tmp = y_old + sigma * operator.direct(xbar)
+#        # Gradient descent, Dual problem solution
+#        y_tmp = y_old + sigma * operator.direct(xbar)
+        y_tmp = operator.direct(xbar)
+        y_tmp *= sigma
+        y_tmp +=y_old        
+                        
         y = f.proximal_conjugate(y_tmp, sigma)
 
         # Gradient ascent, Primal problem solution
-        x_tmp = x_old - tau * operator.adjoint(y)
+#        x_tmp = x_old - tau * operator.adjoint(y)
+        
+        x_tmp = operator.adjoint(y)
+        x_tmp *=-tau
+        x_tmp +=x_old
+        
         x = g.proximal(x_tmp, tau)
         
         #Update
-        xbar = x + theta * (x - x_old)
+#        xbar = x + theta * (x - x_old)
+        xbar = x - x_old
+        xbar *= theta
+        xbar += x
                                 
         x_old = x
-        y_old = y   
+        y_old = y
+        
+#        operator.direct(xbar, out = y_tmp)
+#        y_tmp *= sigma
+#        y_tmp +=y_old
+        
+        
+        
+        
                 
 
 

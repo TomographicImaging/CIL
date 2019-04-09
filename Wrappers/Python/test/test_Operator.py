@@ -4,6 +4,12 @@ from ccpi.optimisation.ops import TomoIdentity
 from ccpi.framework import ImageGeometry, ImageData, BlockDataContainer, DataContainer
 from ccpi.optimisation.operators import BlockOperator, BlockScaledOperator
 import numpy
+from timeit import default_timer as timer
+from ccpi.framework import ImageGeometry
+from ccpi.optimisation.operators import Gradient, Identity, SparseFiniteDiff
+
+def dt(steps):
+    return steps[-1] - steps[-2]
 
 class TestOperator(unittest.TestCase):
     def test_ScaledOperator(self):
@@ -61,11 +67,9 @@ class TestBlockOperator(unittest.TestCase):
         self.assertTrue(res)
 
     def test_BlockOperator(self):
-        from ccpi.framework import ImageGeometry
-        from ccpi.optimisation.operators import Gradient, Identity, SparseFiniteDiff
-
         
-        M, N = 4, 3
+        
+        M, N  = 3, 4
         ig = ImageGeometry(M, N)
         arr = ig.allocate('random_int')  
         
@@ -73,41 +77,15 @@ class TestBlockOperator(unittest.TestCase):
         Id = Identity(ig)
         
         B = BlockOperator(G, Id)
-        
-    #     Gx = SparseFiniteDiff(ig, direction=1, bnd_cond='Neumann')
-    #     Gy = SparseFiniteDiff(ig, direction=0, bnd_cond='Neumann')
-        
-    #     d1 = abs(Gx.matrix()).toarray().sum(axis=0)
-    #     d2 = abs(Gy.matrix()).toarray().sum(axis=0)
-    #     d3 = abs(Id.matrix()).toarray().sum(axis=0)
-        
-        
-    #     d_res = numpy.reshape(d1 + d2 + d3, ig.shape, 'F')
-        
-    #     print(d_res)
-    # #    
-    #     z1 = abs(Gx.matrix()).toarray().sum(axis=1)
-    #     z2 = abs(Gy.matrix()).toarray().sum(axis=1)
-    #     z3 = abs(Id.matrix()).toarray().sum(axis=1)
-    # #
-    #     z_res = BlockDataContainer(BlockDataContainer(ImageData(numpy.reshape(z2, ig.shape, 'F')),\
-    #                                                 ImageData(numpy.reshape(z1, ig.shape, 'F'))),\
-    #                                                 ImageData(numpy.reshape(z3, ig.shape, 'F')))
-    #
-        # ttt = B.sum_abs_col()
-    #    
-        #TODO this is not working
-    #    numpy.testing.assert_array_almost_equal(z_res[0][0].as_array(), ttt[0][0].as_array(), decimal=4)    
-    #    numpy.testing.assert_array_almost_equal(z_res[0][1].as_array(), ttt[0][1].as_array(), decimal=4)    
-    #    numpy.testing.assert_array_almost_equal(z_res[1].as_array(), ttt[1].as_array(), decimal=4)    
-
         # Nx1 case
         u = ig.allocate('random_int')
-        
         z1 = B.direct(u)
         
-        res = B.range_geometry().allocate()    
-        B.direct(u, out = res)
+        res = B.range_geometry().allocate()
+        #res = z1.copy()
+        B.direct(u, out=res)
+        
+        
         print (type(z1), type(res))
         print (z1.shape)
         print(z1[0][0].as_array())
@@ -127,9 +105,27 @@ class TestBlockOperator(unittest.TestCase):
                     a.as_array(), 
                     b.as_array()
                     )
+        z1 = B.direct(u)
+        res1 = B.adjoint(z1)
+        res2 = B.domain_geometry().allocate()
+        B.adjoint(z1, out=res2)
+        #self.assertNumpyArrayEqual(res1.as_array(), res2.as_array())
+
+        BB = BlockOperator( Id, 2 * Id)
+        B = BlockOperator( BB, Id)
+        v = B.domain_geometry().allocate()
+        B.adjoint(res,out=v)
+        vv = B.adjoint(res)
+        el1 = B.get_item(0,0).adjoint(z1.get_item(0)) +\
+              B.get_item(1,0).adjoint(z1.get_item(1)) 
+        print ("el1" , el1.as_array())
+        print ("vv" , vv.as_array())
+        print ("v" , v.as_array())
+        
+        self.assertNumpyArrayEqual(v.as_array(),vv.as_array())
         # test adjoint
         print ("############ 2x1 #############")
-        
+
         BB = BlockOperator( Id, 2 * Id)
         u = ig.allocate(1)
         z1 = BB.direct(u)
@@ -249,4 +245,73 @@ class TestBlockOperator(unittest.TestCase):
             print("RES1", RES1[0][0].as_array())
             print("Z1", Z1[0][1].as_array())
             print("RES1", RES1[0][1].as_array())
+    def stest_timedifference(self):
+        
+        M, N ,W = 512, 512, 512
+        ig = ImageGeometry(M, N, W)
+        arr = ig.allocate('random_int')  
+        
+        G = Gradient(ig)
+        Id = Identity(ig)
+        
+        B = BlockOperator(G, Id)
+        
+    
+        # Nx1 case
+        u = ig.allocate('random_int')
+        steps = [timer()]
+        i = 0
+        n = 2.
+        t1 = t2 = 0
+        res = B.range_geometry().allocate()
+            
+        while (i < n):
+            print ("i ", i)
+            z1 = B.direct(u)
+            steps.append(timer())
+            t = dt(steps)
+            print ("B.direct(u) " ,t)
+            t1 += t/n
+            
+            steps.append(timer())
+            B.direct(u, out = res)
+            steps.append(timer())
+            t = dt(steps)
+            print ("B.direct(u, out=res) " ,t)
+            t2 += t/n
+            i += 1
+
+        print ("Time difference ", t1,t2)
+        self.assertGreater(t1,t2)
+
+        # steps = [timer()]
+        # i = 0
+        # #n = 50.
+        # t1 = t2 = 0
+        # res = B.domain_geometry().allocate()
+        # print("type res", type(res))
+        # z1 = B.direct(u)
+        # B.adjoint(z1, out=res)
+        
+        # print (type(res))
+        # while (i < n):
+        #     print ("i ", i)
+        #     z1 = B.adjoint(z1)
+        #     steps.append(timer())
+        #     t = dt(steps)
+        #     print ("B.adjoint(z1) " ,t)
+        #     t1 += t/n
+            
+        #     steps.append(timer())
+        #     B.adjoint(z1, out=res)
+        #     steps.append(timer())
+        #     t = dt(steps)
+        #     print ("B.adjoint(z1, out=res) " ,t)
+        #     t2 += t/n
+        #     i += 1
+
+        # print ("Time difference ", t1,t2)
+        # self.assertGreater(t1,t2)
+
+
 

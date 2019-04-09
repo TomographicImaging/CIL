@@ -161,7 +161,7 @@ class BlockOperator(Operator):
 
         Raises: ValueError if the contained Operators are not linear
         '''
-        if not functools.reduce(lambda x, y: x and y.is_linear(), self.operators, True):
+        if not self.is_linear():
             raise ValueError('Not all operators in Block are linear.')
         if not isinstance (x, BlockDataContainer):
             x_b = BlockDataContainer(x)
@@ -205,17 +205,28 @@ class BlockOperator(Operator):
                             a += self.get_item(row,col).adjoint(
                                                         x_b.get_item(row),
                                                         )
+    def is_linear(self):
+        '''returns whether all the elements of the BlockOperator are linear'''
+        return functools.reduce(lambda x, y: x and y.is_linear(), self.operators, True)
 
     def get_output_shape(self, xshape, adjoint=False):
-        sshape = self.shape[1]
-        oshape = self.shape[0]
+        '''returns the shape of the output BlockDataContainer
+        
+        A(N,M) direct u(M,1) -> N,1
+        A(N,M)^T adjoint u(N,1) -> M,1
+        '''
+        rows , cols = self.shape
+        xrows, xcols = xshape
+        if xcols != 1:
+            raise ValueError('BlockDataContainer cannot have more than 1 column')
         if adjoint:
-            sshape = self.shape[0]
-            oshape = self.shape[1]
-        if sshape != xshape[0]:
-            raise ValueError('Incompatible shapes {} {}'.format(self.shape, xshape))
-        return (oshape, xshape[-1])
-    
+            if rows != xrows:
+                raise ValueError('Incompatible shapes {} {}'.format(self.shape, xshape))
+            return (cols,xcols)
+        if cols != xrows:
+            raise ValueError('Incompatible shapes {} {}'.format((rows,cols), xshape))
+        return (rows,xcols)
+        
     def __rmul__(self, scalar):
         '''Defines the left multiplication with a scalar
 

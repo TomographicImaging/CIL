@@ -139,11 +139,16 @@ class BlockOperator(Operator):
             for row in range(self.shape[0]):
                 for col in range(self.shape[1]):
                     if col == 0:       
-                        self.get_item(row,col).direct(x_b.get_item(col), out=tmp.get_item(col))                        
+                        self.get_item(row,col).direct(
+                                                      x_b.get_item(col),
+                                                      out=out.get_item(row))                        
                     else:
-                        self.get_item(row,col).direct(x_b.get_item(col), out=out)
-                        out+=tmp
-
+                        a= out.get_item(row) 
+                        self.get_item(row,col).direct(
+                                                      x_b.get_item(col), 
+                                                      out=tmp.get_item(row))
+                        a += tmp.get_item(row)
+                
     def adjoint(self, x, out=None):
         '''Adjoint operation for the BlockOperator
 

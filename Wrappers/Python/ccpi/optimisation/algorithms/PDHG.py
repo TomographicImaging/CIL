@@ -6,7 +6,7 @@ Created on Mon Feb  4 16:18:06 2019
 @author: evangelos
 """
 from ccpi.optimisation.algorithms import Algorithm
-from ccpi.framework import ImageData
+from ccpi.framework import ImageData, DataContainer
 import numpy as np
 import time
 from ccpi.optimisation.operators import BlockOperator
@@ -23,6 +23,7 @@ class PDHG(Algorithm):
         self.g        = kwargs.get('g', None)
         self.tau      = kwargs.get('tau', None)
         self.sigma    = kwargs.get('sigma', None)
+        self.memopt   = kwargs.get('memopt', False)
 
         if self.f is not None and self.operator is not None and \
            self.g is not None:
@@ -76,11 +77,32 @@ class PDHG(Algorithm):
         #self.y = self.y_old
 
     def update_objective(self):
-        self.loss.append([self.f(self.operator.direct(self.x)) + self.g(self.x),
-            -(self.f.convex_conjugate(self.y) + self.g.convex_conjugate(- 1 * self.operator.adjoint(self.y)))
-        ])
+        p1 = self.f(self.operator.direct(self.x)) + self.g(self.x)
+        d1 = -(self.f.convex_conjugate(self.y) + self.g(-1*self.operator.adjoint(self.y)))
+
+        self.loss.append([p1,d1,p1-d1])
 
 
+def assertBlockDataContainerEqual(container1, container2):
+    print ("assert Block Data Container Equal")
+    assert issubclass(container1.__class__, container2.__class__)
+    for col in range(container1.shape[0]):
+        if issubclass(container1.get_item(col).__class__, DataContainer):
+            assertNumpyArrayEqual(
+                container1.get_item(col).as_array(), 
+                container2.get_item(col).as_array()
+                )
+        else:
+            assertBlockDataContainerEqual(container1.get_item(col),container2.get_item(col))
+
+def assertNumpyArrayEqual(first, second):
+    res = True
+    try:
+        np.testing.assert_array_equal(first, second)
+    except AssertionError as err:
+        res = False
+        print(err)
+    assert res
 
 def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
         
@@ -98,16 +120,19 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
     show_iter = opt['show_iter'] if 'show_iter' in opt.keys() else False 
     stop_crit = opt['stop_crit'] if 'stop_crit' in opt.keys() else False 
 
-
+    if memopt:
+        print ("memopt")
+    else:
+        print("no memopt")
     x_old = operator.domain_geometry().allocate()
     y_old = operator.range_geometry().allocate()       
             
-    xbar = x_old
-    x_tmp = x_old
-    x = x_old
+    xbar = x_old.copy()
+    x_tmp = x_old.copy()
+    x = x_old.copy()
     
-    y_tmp = y_old
-    y = y_tmp
+    y_tmp = y_old.copy()
+    y = y_tmp.copy()
         
     # relaxation parameter
     theta = 1
@@ -120,36 +145,72 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
     
     
     for i in range(niter):
-        
-#        # Gradient descent, Dual problem solution
-#        y_tmp = y_old + sigma * operator.direct(xbar)
-        y_tmp = operator.direct(xbar)
-        y_tmp *= sigma
-        y_tmp +=y_old        
-                        
-        y = f.proximal_conjugate(y_tmp, sigma)
+        if memopt:
+    #        # Gradient descent, Dual problem solution
+    #        y_tmp = y_old + sigma * operator.direct(xbar)
+            #y_tmp = operator.direct(xbar)
+            operator.direct(xbar, out=y_tmp)
+            y_tmp *= sigma
+            y_tmp +=y_old        
+                            
+            y = f.proximal_conjugate(y_tmp, sigma)
+            #f.proximal_conjugate(y_tmp, sigma, out=y)
 
-        # Gradient ascent, Primal problem solution
-#        x_tmp = x_old - tau * operator.adjoint(y)
-        
-        x_tmp = operator.adjoint(y)
-        x_tmp *=-tau
-        x_tmp +=x_old
-        
-        x = g.proximal(x_tmp, tau)
-        
-        #Update
-#        xbar = x + theta * (x - x_old)
-        xbar = x - x_old
-        xbar *= theta
-        xbar += x
-                                
-        x_old = x
-        y_old = y
-        
-#        operator.direct(xbar, out = y_tmp)
-#        y_tmp *= sigma
-#        y_tmp +=y_old
+            # Gradient ascent, Primal problem solution
+    #        x_tmp = x_old - tau * operator.adjoint(y)
+            
+            #x_tmp = operator.adjoint(y)
+            operator.adjoint(y, out=x_tmp)
+            x_tmp *=-tau
+            x_tmp +=x_old
+            
+            #x = g.proximal(x_tmp, tau)
+            g.proximal(x_tmp, tau, out=x)
+            
+            #Update
+    #        xbar = x + theta * (x - x_old)
+            x.subtract(x_old, out=xbar)
+            xbar *= theta
+            xbar += x
+                                    
+            x_old.fill(x)
+            y_old.fill(y)
+        else:
+            
+    #        # Gradient descent, Dual problem solution
+            y_tmp1 = y_old + sigma * operator.direct(xbar)
+            # y_tmp = operator.direct(xbar)
+            operator.direct(xbar, out=y_tmp)
+            y_tmp *= sigma
+            y_tmp +=y_old
+            #print ("y_tmp1 equale y_tmp?")
+            #assertBlockDataContainerEqual(y_tmp1, y_tmp)
+
+            y = f.proximal_conjugate(y_tmp, sigma)
+            #f.proximal_conjugate(y_tmp, sigma, out=y)
+            #print ("y1 equale y?")
+            #assertBlockDataContainerEqual(y1, y)
+            # Gradient ascent, Primal problem solution
+            x_tmp1 = x_old - tau * operator.adjoint(y)
+            
+            # x_tmp = operator.adjoint(y)
+            operator.adjoint(y, out=x_tmp)
+            x_tmp *=-tau
+            x_tmp +=x_old
+            
+            assertNumpyArrayEqual(x_tmp.as_array(),x_tmp1.as_array())
+
+            x = g.proximal(x_tmp, tau)
+            # g.proximal(x_tmp, tau, out=x)
+            
+            #Update
+            xbar = x + theta * (x - x_old)
+            # xbar = x - x_old
+            # xbar *= theta
+            # xbar += x
+                                    
+            x_old = x
+            y_old = y
         
         
         

@@ -41,18 +41,22 @@ data0_rel[nonzero] = data0[nonzero] / flat1[nonzero]
 data10_rel =  numpy.zeros(numpy.shape(flat1), dtype = float)
 data10_rel[nonzero] = data10[nonzero] / flat1[nonzero]
 
+plt.figure()
 plt.imshow(data0_rel)
 plt.colorbar()
 plt.show()
 
+plt.figure()
 plt.imshow(-numpy.log(data0_rel))
 plt.colorbar()
 plt.show()
 
+plt.figure()
 plt.imshow(data10_rel)
 plt.colorbar()
 plt.show()
 
+plt.figure()
 plt.imshow(-numpy.log(data10_rel))
 plt.colorbar()
 plt.show()
@@ -115,6 +119,7 @@ Aop = AstraProjectorSimple(ig2d,ag2d,'gpu')
 
 # Demonstrate operator is working by applying simple backprojection.
 z = Aop.adjoint(b2d)
+plt.figure()
 plt.imshow(z.array)
 plt.title('Simple backprojection')
 plt.colorbar()
@@ -128,11 +133,13 @@ opt_CGLS = {'tol': 1e-4, 'iter': 20}
 # Run CGLS algorithm and display reconstruction.
 x_CGLS, it_CGLS, timing_CGLS, criter_CGLS = CGLS(x_init, Aop, b2d, opt_CGLS)
 
+plt.figure()
 plt.imshow(x_CGLS.array)
 plt.title('CGLS')
 plt.colorbar()
 plt.show()
 
+plt.figure()
 plt.semilogy(criter_CGLS)
 plt.title('CGLS Criterion vs iterations')
 plt.show()

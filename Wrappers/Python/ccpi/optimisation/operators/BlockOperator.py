@@ -139,11 +139,16 @@ class BlockOperator(Operator):
             for row in range(self.shape[0]):
                 for col in range(self.shape[1]):
                     if col == 0:       
-                        self.get_item(row,col).direct(x_b.get_item(col), out=tmp.get_item(col))                        
+                        self.get_item(row,col).direct(
+                                                      x_b.get_item(col),
+                                                      out=out.get_item(row))                        
                     else:
-                        self.get_item(row,col).direct(x_b.get_item(col), out=out)
-                        out+=tmp
-
+                        a = out.get_item(row)
+                        self.get_item(row,col).direct(
+                                                      x_b.get_item(col), 
+                                                      out=tmp.get_item(row))
+                        a += tmp.get_item(row)
+                
     def adjoint(self, x, out=None):
         '''Adjoint operation for the BlockOperator
 
@@ -156,36 +161,72 @@ class BlockOperator(Operator):
 
         Raises: ValueError if the contained Operators are not linear
         '''
-        if not functools.reduce(lambda x, y: x and y.is_linear(), self.operators, True):
+        if not self.is_linear():
             raise ValueError('Not all operators in Block are linear.')
         if not isinstance (x, BlockDataContainer):
             x_b = BlockDataContainer(x)
         else:
             x_b = x
         shape = self.get_output_shape(x_b.shape, adjoint=True)
-        res = []
-        for row in range(self.shape[1]):
-            for col in range(self.shape[0]):
-                if col == 0:
-                    prod = self.get_item(row, col).adjoint(x_b.get_item(col))
-                else:
-                    prod += self.get_item(row, col).adjoint(x_b.get_item(col))
-            res.append(prod)
-        if self.shape[1]==1:
-            return ImageData(*res)
+        if out is None:
+            res = []
+            for col in range(self.shape[1]):
+                for row in range(self.shape[0]):
+                    if row == 0:
+                        prod = self.get_item(row, col).adjoint(x_b.get_item(row))
+                    else:
+                        prod += self.get_item(row, col).adjoint(x_b.get_item(row))
+                res.append(prod)
+            if self.shape[1]==1:
+                return ImageData(*res)
+            else:
+                return BlockDataContainer(*res, shape=shape)
         else:
-            return BlockDataContainer(*res, shape=shape)
-    
+            #tmp = self.domain_geometry().allocate()
+
+            for col in range(self.shape[1]):
+                for row in range(self.shape[0]):
+                    if row == 0:
+                        if issubclass(out.__class__, DataContainer):
+                            self.get_item(row, col).adjoint(
+                                                x_b.get_item(row),
+                                                out=out)
+                        else:
+                            op = self.get_item(row,col)
+                            self.get_item(row, col).adjoint(
+                                                x_b.get_item(row),
+                                                out=out.get_item(col))
+                    else:
+                        if issubclass(out.__class__, DataContainer):
+                            out += self.get_item(row,col).adjoint(
+                                                        x_b.get_item(row))
+                        else:
+                            a = out.get_item(col)
+                            a += self.get_item(row,col).adjoint(
+                                                        x_b.get_item(row),
+                                                        )
+    def is_linear(self):
+        '''returns whether all the elements of the BlockOperator are linear'''
+        return functools.reduce(lambda x, y: x and y.is_linear(), self.operators, True)
+
     def get_output_shape(self, xshape, adjoint=False):
-        sshape = self.shape[1]
-        oshape = self.shape[0]
+        '''returns the shape of the output BlockDataContainer
+        
+        A(N,M) direct u(M,1) -> N,1
+        A(N,M)^T adjoint u(N,1) -> M,1
+        '''
+        rows , cols = self.shape
+        xrows, xcols = xshape
+        if xcols != 1:
+            raise ValueError('BlockDataContainer cannot have more than 1 column')
         if adjoint:
-            sshape = self.shape[0]
-            oshape = self.shape[1]
-        if sshape != xshape[0]:
-            raise ValueError('Incompatible shapes {} {}'.format(self.shape, xshape))
-        return (oshape, xshape[-1])
-    
+            if rows != xrows:
+                raise ValueError('Incompatible shapes {} {}'.format(self.shape, xshape))
+            return (cols,xcols)
+        if cols != xrows:
+            raise ValueError('Incompatible shapes {} {}'.format((rows,cols), xshape))
+        return (rows,xcols)
+        
     def __rmul__(self, scalar):
         '''Defines the left multiplication with a scalar
 

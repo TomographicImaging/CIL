@@ -141,21 +141,25 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
         
         else:
             
-#            operator.direct(xbar, out = y_tmp)
+            operator.direct(xbar, out = y_tmp) 
+            
+            y_tmp.multiply(sigma, out = y_tmp)
+            y_tmp.add(y_old, out = y_tmp)
 #            y_tmp.__imul__(sigma)
 #            y_tmp.__iadd__(y_old)
             
 #            y_tmp *= sigma
 #            y_tmp += y_old
             
-            y_tmp = y_old + sigma * operator.direct(xbar)                        
+#            y_tmp = y_old + sigma * operator.direct(xbar)                        
             f.proximal_conjugate(y_tmp, sigma, out=y)
             
-            x_tmp = x_old - tau * operator.adjoint(y)
+#            x_tmp = x_old - tau * operator.adjoint(y)
             
-#            operator.adjoint(y, out = x_tmp)
-#            z = x_tmp
-#            x_tmp = x_old - tau * z
+            operator.adjoint(y, out = x_tmp)   
+            x_tmp.multiply(-tau, out = x_tmp)
+            x_tmp.add(x_old, out = x_tmp)
+            
             
 #            x_tmp *= -tau
 #            x_tmp += x_old
@@ -166,7 +170,8 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
             xbar *= theta
             xbar += x
             
-            
+            x_old.fill(x)
+            y_old.fill(y)
             
 #            pass
 #        

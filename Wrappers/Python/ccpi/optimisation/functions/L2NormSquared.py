@@ -121,12 +121,12 @@ class L2NormSquared(Function):
                 # change the order cannot add ImageData + NestedBlock
                 return (x - tau*self.b)/(1 + tau/2) 
             else:
-                return x/(1 + tau/2 )
+                return x/(1 + tau/2)
         else:
             if self.b is not None:
-                out.fill((x - tau*self.b)/(1 + tau/2))
+                out.fill( (x - tau*self.b)/(1 + tau/2) )
             else:
-                out.fill(x/(1 + tau/2 ))
+                out.fill( x/(1 + tau/2) )
                                         
     def __rmul__(self, scalar):
         return ScaledFunction(self, scalar)        
@@ -227,7 +227,29 @@ if __name__ == '__main__':
                                             (u/(1 + tau/(2*scalar) )).as_array(), decimal=4)
     
     numpy.testing.assert_array_almost_equal(f_scaled_data.proximal_conjugate(u, tau).as_array(), \
-                                            ((u - tau * b)/(1 + tau/(2*scalar) )).as_array(), decimal=4)    
+                                            ((u - tau * b)/(1 + tau/(2*scalar) )).as_array(), decimal=4)   
+    
+    
+    
+    print( " ####### check without out ######### " )
+          
+          
+    u_out_no_out = ig.allocate('random_int')         
+    res_no_out = f_scaled_data.proximal_conjugate(u_out_no_out, 0.5)          
+    print(res_no_out.as_array())
+    
+    print( " ####### check with out ######### " ) 
+          
+    res_out = ig.allocate()        
+    f_scaled_data.proximal_conjugate(u_out_no_out, 0.5, out = res_out)
+    
+    print(res_out.as_array())   
+
+    numpy.testing.assert_array_almost_equal(res_no_out.as_array(), \
+                                            res_out.as_array(), decimal=4)        
+          
+          
+        
     
     
     

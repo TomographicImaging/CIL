@@ -24,7 +24,7 @@ from skimage.util import random_noise
 # ############################################################################
 # Create phantom for TV denoising
 
-N = 200
+N = 500
 data = np.zeros((N,N))
 data[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
 data[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 1
@@ -45,7 +45,7 @@ plt.show()
 alpha = 2
 
 #method = input("Enter structure of PDHG (0=Composite or 1=NotComposite): ")
-method = '1'
+method = '0'
 
 if method == '0':
 
@@ -83,12 +83,25 @@ print ("normK", normK)
 sigma = 1
 tau = 1/(sigma*normK**2)
 
-opt = {'niter':2000}
+opt = {'niter':100}
+opt1 = {'niter':100, 'memopt': True}
 
+res1, time1, primal1, dual1, pdgap1 = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt1) 
 res, time, primal, dual, pdgap = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt) 
- 
+
 plt.figure(figsize=(5,5))
 plt.imshow(res.as_array())
+plt.colorbar()
+plt.show()
+ 
+plt.figure(figsize=(5,5))
+plt.imshow(res1.as_array())
+plt.colorbar()
+plt.show()
+
+
+plt.figure(figsize=(5,5))
+plt.imshow(np.abs(res1.as_array()-res.as_array()))
 plt.colorbar()
 plt.show()
 

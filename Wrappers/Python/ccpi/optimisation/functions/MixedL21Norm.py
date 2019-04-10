@@ -78,26 +78,44 @@ class MixedL21Norm(Function):
     
     def proximal_conjugate(self, x, tau, out=None): 
         
+        
+        
         if self.SymTensor:
             
-            param = [1]*x.shape[0]
-            param[-1] = 2
-            tmp = [param[i]*(x[i] ** 2) for i in range(x.shape[0])]
-            frac = [x[i]/(sum(tmp).sqrt()).maximum(1.0) for i in range(x.shape[0])]
-            res = BlockDataContainer(*frac) 
+            if out is None:
             
-            return res
-            
+                param = [1]*x.shape[0]
+                param[-1] = 2
+                tmp = [param[i]*(x[i] ** 2) for i in range(x.shape[0])]
+                frac = [x[i]/(sum(tmp).sqrt()).maximum(1.0) for i in range(x.shape[0])]
+                res = BlockDataContainer(*frac) 
+                return res
+            else:
+                pass
+                        
 #                tmp2 = np.sqrt(x.as_array()[0]**2 +  x.as_array()[1]**2 +  2*x.as_array()[2]**2)/self.alpha
 #                res = x.divide(ImageData(tmp2).maximum(1.0))                                
         else:
             
+            if out is None:
+                
                 tmp = [ el*el for el in x]
                 res = (sum(tmp).sqrt()).maximum(1.0) 
                 frac = [x[i]/res for i in range(x.shape[0])]
                 res = BlockDataContainer(*frac)
-                                                   
-        return res 
+                
+                return res 
+            
+            else:
+                
+                tmp = [ el*el for el in x]
+                res = (sum(tmp).sqrt()).maximum(1.0) 
+                frac = [x[i]/res for i in range(x.shape[0])]                
+#                res = (sum(x**2).sqrt()).maximum(1.0) 
+#                return x/res
+                out.fill(frac)
+
+
     
     def __rmul__(self, scalar):
         return ScaledFunction(self, scalar) 
@@ -111,11 +129,14 @@ class MixedL21Norm(Function):
 if __name__ == '__main__':
     
     M, N, K = 2,3,5
-    ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
-    u1 = ig.allocate('random_int')
-    u2 = ig.allocate('random_int')
+    from ccpi.framework import BlockGeometry
+    import numpy
     
-    U = BlockDataContainer(u1, u2, shape=(2,1))
+    ig = ImageGeometry(M, N)
+    
+    BG = BlockGeometry(ig, ig)
+    
+    U = BG.allocate('random_int')
     
     # Define no scale and scaled
     f_no_scaled = MixedL21Norm() 
@@ -125,9 +146,31 @@ if __name__ == '__main__':
     
     a1 = f_no_scaled(U)
     a2 = f_scaled(U)    
+    print(a1, 2*a2)
+        
     
-    z1 = f_no_scaled.proximal_conjugate(U, 1)
-    z2 = f_scaled.proximal_conjugate(U, 1)
+    print( " ####### check without out ######### " )
+          
+          
+    u_out_no_out = BG.allocate('random_int')         
+    res_no_out = f_scaled.proximal_conjugate(u_out_no_out, 0.5)          
+    print(res_no_out[0].as_array())
+    
+    print( " ####### check with out ######### " ) 
+#          
+    res_out = BG.allocate()        
+    f_scaled.proximal_conjugate(u_out_no_out, 0.5, out = res_out)
+#    
+    print(res_out[0].as_array())   
+#
+    numpy.testing.assert_array_almost_equal(res_no_out[0].as_array(), \
+                                            res_out[0].as_array(), decimal=4)
+
+    numpy.testing.assert_array_almost_equal(res_no_out[1].as_array(), \
+                                            res_out[1].as_array(), decimal=4)     
+#    
+    
+    
     
 
     

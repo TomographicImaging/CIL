@@ -71,7 +71,7 @@ class Gradient(LinearOperator):
                 self.FD.direction=self.ind[i] 
                 self.FD.adjoint(x.get_item(i), out = tmp)
 #                FiniteDiff(self.gm_domain, direction = self.ind[i], bnd_cond = self.bnd_cond).adjoint(x.get_item(i), out=tmp)
-                out-=tmp               
+                out+=tmp               
         else:            
             tmp = self.gm_domain.allocate()
             for i in range(x.shape[0]):
@@ -220,16 +220,38 @@ if __name__ == '__main__':
 #
     u = G.domain_geometry().allocate('random_int')
     w = G.range_geometry().allocate('random_int')
-#
-#
+    
+    
+    print( "################   without out #############")
+          
+    print( (G.direct(u)*w).sum(),  (u*G.adjoint(w)).sum() ) 
+        
+
+    print( "################   with out #############")
+    
     res = G.range_geometry().allocate()
-#    
-    G.direct(u, out=res)
-    z = G.direct(u)
-#    
-    print(res[0].as_array())
-    print(z[0].as_array())
+    res1 = G.domain_geometry().allocate()
+    G.direct(u, out = res)          
+    G.adjoint(w, out = res1)
+          
+    print( (res*w).sum(),  (u*res1).sum() )     
+    
+    
+    
 #
+#
+#    res = G.range_geometry().allocate()
+##    
+#    G.direct(u, out=res)
+#    z = G.direct(u)
+##    
+#    print(res[0].as_array())
+#    print(z[0].as_array())
+#
+    
+    
+    
+    
 ##    LHS = (G.direct(u)*w).sum()
 ##    RHS = (u * G.adjoint(w)).sum()
     

@@ -3,12 +3,10 @@ import numpy
 
 class ScaledOperator(object):
     '''ScaledOperator
-
     A class to represent the scalar multiplication of an Operator with a scalar.
     It holds an operator and a scalar. Basically it returns the multiplication
     of the result of direct and adjoint of the operator with the scalar.
     For the rest it behaves like the operator it holds.
-
     Args:
        operator (Operator): a Operator or LinearOperator
        scalar (Number): a scalar multiplier
@@ -28,10 +26,18 @@ class ScaledOperator(object):
         self.scalar = scalar
         self.operator = operator
     def direct(self, x, out=None):
-        return self.scalar * self.operator.direct(x, out=out)
+        if out is None:
+            return self.scalar * self.operator.direct(x, out=out)
+        else:
+            self.operator.direct(x, out=out)
+            out *= self.scalar
     def adjoint(self, x, out=None):
         if self.operator.is_linear():
-            return self.scalar * self.operator.adjoint(x, out=out)
+            if out is None:
+                return self.scalar * self.operator.adjoint(x, out=out)
+            else:
+                self.operator.adjoint(x, out=out)
+                out *= self.scalar
         else:
             raise TypeError('Operator is not linear')
     def norm(self):
@@ -40,3 +46,5 @@ class ScaledOperator(object):
         return self.operator.range_geometry()
     def domain_geometry(self):
         return self.operator.domain_geometry()
+    def is_linear(self):
+        return self.operator.is_linear()

@@ -111,7 +111,7 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
     x = x_old
     
     y_tmp = y_old
-    y = y_tmp
+    y = y_old
         
     # relaxation parameter
     theta = 1
@@ -125,35 +125,82 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
     
     for i in range(niter):
         
-#        # Gradient descent, Dual problem solution
-#        y_tmp = y_old + sigma * operator.direct(xbar)
-        y_tmp = operator.direct(xbar)
-        y_tmp *= sigma
-        y_tmp +=y_old        
-                        
-        y = f.proximal_conjugate(y_tmp, sigma)
+        if not memopt:
+            
+            y_tmp = y_old + sigma * operator.direct(xbar)
+            y = f.proximal_conjugate(y_tmp, sigma)
+            
+            x_tmp = x_old - tau * operator.adjoint(y)
+            x = g.proximal(x_tmp, tau)
+            
+            xbar = x + theta * (x - x_old)
+            
+            x_old = x
+            y_old = y            
+        
+        
+        else:
+            
+#            operator.direct(xbar, out = y_tmp)
+#            y_tmp.__imul__(sigma)
+#            y_tmp.__iadd__(y_old)
+            
+#            y_tmp *= sigma
+#            y_tmp += y_old
+            
+            y_tmp = y_old + sigma * operator.direct(xbar)                        
+            f.proximal_conjugate(y_tmp, sigma, out=y)
+            
+            x_tmp = x_old - tau * operator.adjoint(y)
+            
+#            operator.adjoint(y, out = x_tmp)
+#            z = x_tmp
+#            x_tmp = x_old - tau * z
+            
+#            x_tmp *= -tau
+#            x_tmp += x_old
 
-        # Gradient ascent, Primal problem solution
-#        x_tmp = x_old - tau * operator.adjoint(y)
-        
-        x_tmp = operator.adjoint(y)
-        x_tmp *=-tau
-        x_tmp +=x_old
-        
-        x = g.proximal(x_tmp, tau)
-        
-        #Update
-#        xbar = x + theta * (x - x_old)
-        xbar = x - x_old
-        xbar *= theta
-        xbar += x
-                                
-        x_old = x
-        y_old = y
-        
-#        operator.direct(xbar, out = y_tmp)
+            g.proximal(x_tmp, tau, out = x)
+            
+            xbar = x - x_old
+            xbar *= theta
+            xbar += x
+            
+            
+            
+#            pass
+#        
+##        # Gradient descent, Dual problem solution
+##        y_tmp = y_old + sigma * operator.direct(xbar)
+#        y_tmp = operator.direct(xbar)
 #        y_tmp *= sigma
-#        y_tmp +=y_old
+#        y_tmp +=y_old        
+#                        
+#        y = f.proximal_conjugate(y_tmp, sigma)
+##        f.proximal_conjugate(y_tmp, sigma, out = y)
+#
+#        # Gradient ascent, Primal problem solution
+##        x_tmp = x_old - tau * operator.adjoint(y)
+#        
+#        x_tmp = operator.adjoint(y)
+#        x_tmp *=-tau
+#        x_tmp +=x_old
+#        
+#        x = g.proximal(x_tmp, tau)
+##        g.proximal(x_tmp, tau, out = x)
+#        
+#        #Update
+##        xbar = x + theta * (x - x_old)
+#        xbar = x - x_old
+#        xbar *= theta
+#        xbar += x
+#                                
+#        x_old = x
+#        y_old = y
+#        
+##        operator.direct(xbar, out = y_tmp)
+##        y_tmp *= sigma
+##        y_tmp +=y_old
         
         
         

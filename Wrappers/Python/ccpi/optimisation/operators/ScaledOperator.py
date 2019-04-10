@@ -48,3 +48,4 @@ class ScaledOperator(object):
         return self.operator.domain_geometry()
     def is_linear(self):
         return self.operator.is_linear()
+

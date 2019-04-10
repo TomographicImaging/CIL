@@ -19,7 +19,7 @@ from ccpi.optimisation.operators import Gradient
 
 #from ccpi.optimisation.functions import SimpleL2NormSq
 from ccpi.optimisation.functions import L2NormSquared
-from ccpi.optimisation.functions import SimpleL1Norm
+#from ccpi.optimisation.functions import SimpleL1Norm
 from ccpi.optimisation.functions import L1Norm
 
 from ccpi.optimisation.funcs import Norm2sq

@@ -124,8 +124,14 @@ if __name__ == '__main__':
     res_out = B.range_geometry().allocate()
     f.proximal_conjugate( U, tau, out = res_out)
     
-    numpy.testing.assert_array_almost_equal(res_no_out[0].as_array(), \
-                                            res_out[0].as_array(), decimal=4) 
+    numpy.testing.assert_array_almost_equal(res_no_out[0][0].as_array(), \
+                                            res_out[0][0].as_array(), decimal=4) 
+    
+    numpy.testing.assert_array_almost_equal(res_no_out[0][1].as_array(), \
+                                            res_out[0][1].as_array(), decimal=4) 
+
+    numpy.testing.assert_array_almost_equal(res_no_out[1].as_array(), \
+                                            res_out[1].as_array(), decimal=4)     
     
     
     

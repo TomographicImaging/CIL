@@ -54,7 +54,9 @@ class FiniteDiff(LinearOperator):
             out = np.zeros_like(x_asarr)
             fd_arr = out
         else:
-            fd_arr = out.as_array()        
+            fd_arr = out.as_array()
+            # set the array to 0
+            fd_arr[:] = 0
         
 #        if out is None:        
 #            out = self.gm_domain.allocate().as_array()
@@ -70,7 +72,7 @@ class FiniteDiff(LinearOperator):
                 np.subtract( x_asarr[:,1:], x_asarr[:,0:-1], out = fd_arr[:,0:-1] )
                 
                 if self.bnd_cond == 'Neumann':
-                    pass                                        
+                    pass
                 elif self.bnd_cond == 'Periodic':
                     np.subtract( x_asarr[:,0], x_asarr[:,-1], out = fd_arr[:,-1] )
                 else: 

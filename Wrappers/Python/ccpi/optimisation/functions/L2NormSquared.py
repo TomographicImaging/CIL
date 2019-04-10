@@ -69,10 +69,10 @@ class L2NormSquared(Function):
             out *= 2
         else:
             y = x
-        if self.b is not None:
-#            x.subtract(self.b, out=x)
-            y = x - self.b
-        return 2*y
+            if self.b is not None:
+    #            x.subtract(self.b, out=x)
+                y = x - self.b
+            return 2*y
         
                                                        
     def convex_conjugate(self, x, out=None):

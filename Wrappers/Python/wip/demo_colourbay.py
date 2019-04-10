@@ -31,6 +31,7 @@ num_pixels_v = X.shape[2]
 num_angles = X.shape[1]
 
 # Display a single projection in a single channel
+plt.figure()
 plt.imshow(X[100,5,:,:])
 plt.title('Example of a projection image in one channel' )
 plt.show()
@@ -82,6 +83,7 @@ Aall = AstraProjectorMC(ig2d,ag2d,'gpu')
 
 # Compute and simple backprojction and display one channel as image.
 Xbp = Aall.adjoint(data2d)
+plt.figure()
 plt.imshow(Xbp.subset(channel=100).array)
 plt.show()
 
@@ -94,10 +96,12 @@ opt_CGLS = {'tol': 1e-4, 'iter': 5}
 # Run CGLS algorithm and display one channel.
 x_CGLS, it_CGLS, timing_CGLS, criter_CGLS = CGLS(x_init, Aall, data2d, opt_CGLS)
 
+plt.figure()
 plt.imshow(x_CGLS.subset(channel=100).array)
 plt.title('CGLS')
 plt.show()
 
+plt.figure()
 plt.semilogy(criter_CGLS)
 plt.title('CGLS Criterion vs iterations')
 plt.show()
@@ -113,10 +117,12 @@ opt = {'tol': 1e-4, 'iter': 100}
 # reconstruction as image.
 x_fista0, it0, timing0, criter0 = FISTA(x_init, f, None, opt)
 
+plt.figure()
 plt.imshow(x_fista0.subset(channel=100).array)
 plt.title('FISTA LS')
 plt.show()
 
+plt.figure()
 plt.semilogy(criter0)
 plt.title('FISTA LS Criterion vs iterations')
 plt.show()
@@ -128,10 +134,12 @@ g0 = Norm1(lam)
 
 x_fista1, it1, timing1, criter1 = FISTA(x_init, f, g0, opt)
 
+plt.figure()
 plt.imshow(x_fista1.subset(channel=100).array)
 plt.title('FISTA LS+1')
 plt.show()
 
+plt.figure()
 plt.semilogy(criter1)
 plt.title('FISTA LS+1 Criterion vs iterations')
 plt.show()

@@ -52,15 +52,25 @@ class BlockFunction(Function):
     
     def proximal_conjugate(self, x, tau, out = None):
         '''proximal_conjugate does not take into account the BlockOperator'''
-        out = [None]*self.length
-        if isinstance(tau, Number):
-            for i in range(self.length):
-                out[i] = self.functions[i].proximal_conjugate(x.get_item(i), tau)
+        if out is not None:
+            if isinstance(tau, Number):
+                for i in range(self.length):
+                    self.functions[i].proximal_conjugate(x.get_item(i), tau, out=out.get_item(i))
+            else:
+                for i in range(self.length):
+                    self.functions[i].proximal_conjugate(x.get_item(i), tau.get_item(i),out=out.get_item(i))
+            
         else:
-            for i in range(self.length):
-                out[i] = self.functions[i].proximal_conjugate(x.get_item(i), tau.get_item(i))
-
-        return BlockDataContainer(*out) 
+                
+            out = [None]*self.length
+            if isinstance(tau, Number):
+                for i in range(self.length):
+                    out[i] = self.functions[i].proximal_conjugate(x.get_item(i), tau)
+            else:
+                for i in range(self.length):
+                    out[i] = self.functions[i].proximal_conjugate(x.get_item(i), tau.get_item(i))
+            
+            return BlockDataContainer(*out) 
     
     def proximal(self, x, tau, out = None):
         '''proximal does not take into account the BlockOperator'''

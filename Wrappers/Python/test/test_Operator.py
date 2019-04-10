@@ -109,10 +109,11 @@ class TestBlockOperator(unittest.TestCase):
         res1 = B.adjoint(z1)
         res2 = B.domain_geometry().allocate()
         B.adjoint(z1, out=res2)
-        #self.assertNumpyArrayEqual(res1.as_array(), res2.as_array())
+        
+        self.assertNumpyArrayEqual(res1.as_array(), res2.as_array())
 
         BB = BlockOperator( Id, 2 * Id)
-        B = BlockOperator( BB, Id)
+        B = BlockOperator( BB, Id )
         v = B.domain_geometry().allocate()
         B.adjoint(res,out=v)
         vv = B.adjoint(res)
@@ -154,7 +155,9 @@ class TestBlockOperator(unittest.TestCase):
         res1 = BB.domain_geometry().allocate()
         BB.adjoint(z1, out=res1)
         print("res1\n",res1.as_array())
-
+        self.assertNumpyArrayEqual(x1.as_array(),
+                                   res1.as_array())
+        
         self.assertNumpyArrayEqual(x1.as_array(),
                                    5 * u.as_array())
         self.assertNumpyArrayEqual(res1.as_array(),
@@ -245,9 +248,9 @@ class TestBlockOperator(unittest.TestCase):
             print("RES1", RES1[0][0].as_array())
             print("Z1", Z1[0][1].as_array())
             print("RES1", RES1[0][1].as_array())
-    def stest_timedifference(self):
+    def test_timedifference(self):
         
-        M, N ,W = 512, 512, 512
+        M, N ,W = 100, 512, 512
         ig = ImageGeometry(M, N, W)
         arr = ig.allocate('random_int')  
         
@@ -261,57 +264,77 @@ class TestBlockOperator(unittest.TestCase):
         u = ig.allocate('random_int')
         steps = [timer()]
         i = 0
-        n = 2.
+        n = 25.
         t1 = t2 = 0
         res = B.range_geometry().allocate()
             
         while (i < n):
             print ("i ", i)
+            steps.append(timer())
             z1 = B.direct(u)
             steps.append(timer())
             t = dt(steps)
-            print ("B.direct(u) " ,t)
+            #print ("B.direct(u) " ,t)
             t1 += t/n
             
             steps.append(timer())
             B.direct(u, out = res)
             steps.append(timer())
             t = dt(steps)
-            print ("B.direct(u, out=res) " ,t)
+            #print ("B.direct(u, out=res) " ,t)
             t2 += t/n
             i += 1
 
         print ("Time difference ", t1,t2)
         self.assertGreater(t1,t2)
 
-        # steps = [timer()]
-        # i = 0
-        # #n = 50.
-        # t1 = t2 = 0
-        # res = B.domain_geometry().allocate()
-        # print("type res", type(res))
-        # z1 = B.direct(u)
-        # B.adjoint(z1, out=res)
+        steps = [timer()]
+        i = 0
+        #n = 50.
+        t1 = t2 = 0
+        resd = B.domain_geometry().allocate()
+        z1 = B.direct(u)
+        #B.adjoint(z1, out=resd)
         
-        # print (type(res))
-        # while (i < n):
-        #     print ("i ", i)
-        #     z1 = B.adjoint(z1)
-        #     steps.append(timer())
-        #     t = dt(steps)
-        #     print ("B.adjoint(z1) " ,t)
-        #     t1 += t/n
+        print (type(res))
+        while (i < n):
+            print ("i ", i)
+            steps.append(timer())
+            w1 = B.adjoint(z1)
+            steps.append(timer())
+            t = dt(steps)
+            #print ("B.adjoint(z1) " ,t)
+            t1 += t/n
             
-        #     steps.append(timer())
-        #     B.adjoint(z1, out=res)
-        #     steps.append(timer())
-        #     t = dt(steps)
-        #     print ("B.adjoint(z1, out=res) " ,t)
-        #     t2 += t/n
-        #     i += 1
+            steps.append(timer())
+            B.adjoint(z1, out=resd)
+            steps.append(timer())
+            t = dt(steps)
+            #print ("B.adjoint(z1, out=res) " ,t)
+            t2 += t/n
+            i += 1
 
-        # print ("Time difference ", t1,t2)
-        # self.assertGreater(t1,t2)
+        print ("Time difference ", t1,t2)
+        self.assertGreater(t1,t2)
+    
+    def test_BlockOperatorLinearValidity(self):
+        
+        
+        M, N  = 3, 4
+        ig = ImageGeometry(M, N)
+        arr = ig.allocate('random_int')  
+        
+        G = Gradient(ig)
+        Id = Identity(ig)
+        
+        B = BlockOperator(G, Id)
+        # Nx1 case
+        u = ig.allocate('random_int')
+        w = B.range_geometry().allocate(ImageGeometry.RANDOM_INT)
+        w1 = B.direct(u)
+        u1 = B.adjoint(w)
+        self.assertEqual((w * w1).sum() , (u1*u).sum())
 
+    
 
 

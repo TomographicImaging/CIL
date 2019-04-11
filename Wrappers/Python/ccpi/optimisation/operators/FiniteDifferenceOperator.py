@@ -186,7 +186,9 @@ class FiniteDiff(LinearOperator):
             out = np.zeros_like(x_asarr)
             fd_arr = out
         else:
-            fd_arr = out.as_array()          
+            #out *= 0
+            fd_arr = out.as_array()
+            fd_arr[:] = 0
         
 #        if out is None:        
 #            out = self.gm_domain.allocate().as_array()

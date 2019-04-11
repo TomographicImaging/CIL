@@ -99,27 +99,8 @@ class MixedL21Norm(Function):
             else:
                 res1 = functools.reduce(lambda a,b: a + b*b, x.containers, x.get_item(0) * 0 )
                 res = res1.sqrt().maximum(1.0)
-                
-                if False:
-                    # works but not memory efficient as allocating a new BlockDataContainer
-                    a = x / res
-                    out.fill(a)
-                elif False:
-                    # this leads to error
-#   File "ccpi\framework\BlockDataContainer.py", line 142, in divide
-#     return type(self)(*[ el.divide(other, *args, **kwargs) for el in self.containers], shape=self.shape)
-#   File "ccpi\framework\BlockDataContainer.py", line 142, in <listcomp>
-#     return type(self)(*[ el.divide(other, *args, **kwargs) for el in self.containers], shape=self.shape)
-#   File "ccpi\framework\framework.py", line 814, in divide
-#     return self.pixel_wise_binary(numpy.divide, other, *args, **kwargs)
-#   File "ccpi\framework\framework.py", line 802, in pixel_wise_binary
-#     raise ValueError (message(type(self),  "incompatible class:" , pwop.__name__, type(out)))
-# ValueError: ImageData: incompatible class: true_divide <class 'ccpi.framework.BlockDataContainer.BlockDataContainer'>
-                    x.divide(res, out=out)
-                else:
-                    for i,el in enumerate(x.containers):
-                        #a = out.get_item(i)
-                        el.divide(res, out=out.get_item(i))
+                for i,el in enumerate(x.containers):
+                    el.divide(res, out=out.get_item(i))
 
     def __rmul__(self, scalar):
         return ScaledFunction(self, scalar) 

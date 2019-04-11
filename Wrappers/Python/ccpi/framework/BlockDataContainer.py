@@ -70,8 +70,17 @@ class BlockDataContainer(object):
             return len(self.containers) == len(other)
         elif isinstance(other, numpy.ndarray):
             return len(self.containers) == len(other)
+        
         elif issubclass(other.__class__, DataContainer):
-            return self.get_item(0).shape == other.shape
+            ret = True
+            for i, el in enumerate(self.containers):
+                if isinstance(el, BlockDataContainer):
+                    a = el.is_compatible(other)
+                else:
+                    a = el.shape == other.shape
+                ret = ret and a
+            return ret
+
         return len(self.containers) == len(other.containers)
 
     def get_item(self, row):
@@ -344,7 +353,7 @@ class BlockDataContainer(object):
 if __name__ == '__main__':
     
     M, N, K = 2,3,5
-    from ccpi.framework import ImageGeometry, BlockGeometry, BlockDataContainer
+    from ccpi.framework import ImageGeometry, BlockGeometry
     
     ig = ImageGeometry(N, M)
     u = ig.allocate('random_int')

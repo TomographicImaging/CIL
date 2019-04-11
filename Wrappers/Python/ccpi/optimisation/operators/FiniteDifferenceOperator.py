@@ -57,6 +57,7 @@ class FiniteDiff(LinearOperator):
             out[:]=0
 
                   
+
         ######################## Direct for 2D  ###############################
         if x_sz == 2:
             
@@ -65,7 +66,7 @@ class FiniteDiff(LinearOperator):
                 np.subtract( x_asarr[:,1:], x_asarr[:,0:-1], out = out[:,0:-1] )
                 
                 if self.bnd_cond == 'Neumann':
-                    pass                                        
+                    pass
                 elif self.bnd_cond == 'Periodic':
                     np.subtract( x_asarr[:,0], x_asarr[:,-1], out = out[:,-1] )
                 else: 
@@ -178,19 +179,8 @@ class FiniteDiff(LinearOperator):
             out = np.zeros_like(x_asarr)
         else:
             out = out.as_array()        
-        
-#        if out is None:        
-#            out = np.zeros_like(x_asarr)
-#            fd_arr = out
-#        else:
-#            fd_arr = out.as_array()          
-        
-#        if out is None:        
-#            out = self.gm_domain.allocate().as_array()
-#            fd_arr = out
-#        else:
-#            fd_arr = out.as_array()
-##        fd_arr = self.gm_domain.allocate().as_array()
+            out[:]=0
+
         
         ######################## Adjoint for 2D  ###############################
         if x_sz == 2:        

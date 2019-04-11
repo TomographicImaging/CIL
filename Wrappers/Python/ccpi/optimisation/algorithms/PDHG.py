@@ -24,6 +24,7 @@ class PDHG(Algorithm):
         self.g        = kwargs.get('g', None)
         self.tau      = kwargs.get('tau', None)
         self.sigma    = kwargs.get('sigma', None)
+        self.memopt   = kwargs.get('memopt', False)
 
         if self.f is not None and self.operator is not None and \
            self.g is not None:
@@ -45,65 +46,73 @@ class PDHG(Algorithm):
         self.y_old = self.operator.range_geometry().allocate()
         
         self.xbar = self.x_old.copy()
-        #x_tmp = x_old
+        
         self.x = self.x_old.copy()
         self.y = self.y_old.copy()
-        #y_tmp = y_old
+        if self.memopt:
+            self.y_tmp = self.y_old.copy()
+            self.x_tmp = self.x_old.copy()
         #y = y_tmp
             
         # relaxation parameter
         self.theta = 1
 
     def update(self):
-        # Gradient descent, Dual problem solution
-        self.y_old += self.sigma * self.operator.direct(self.xbar)
-        self.y = self.f.proximal_conjugate(self.y_old, self.sigma)
-        
-        # Gradient ascent, Primal problem solution
-        self.x_old -= self.tau * self.operator.adjoint(self.y)
-        self.x = self.g.proximal(self.x_old, self.tau)
-        
-        #Update
-        #xbar = x + theta * (x - x_old)
-        self.xbar.fill(self.x)
-        self.xbar -= self.x_old 
-        self.xbar *= self.theta
-        self.xbar += self.x
-                        
-#        self.x_old.fill(self.x)
-#        self.y_old.fill(self.y)
-        self.y_old = self.y.copy()
-        self.x_old = self.x.copy()
-        #self.y = self.y_old
+        if self.memopt:
+            # Gradient descent, Dual problem solution
+            # self.y_old += self.sigma * self.operator.direct(self.xbar)
+            self.operator.direct(self.xbar, out=self.y_tmp)
+            self.y_tmp *= self.sigma
+            self.y_old += self.y_tmp
+
+            #self.y = self.f.proximal_conjugate(self.y_old, self.sigma)
+            self.f.proximal_conjugate(self.y_old, self.sigma, out=self.y)
+            
+            # Gradient ascent, Primal problem solution
+            self.operator.adjoint(self.y, out=self.x_tmp)
+            self.x_tmp *= self.tau
+            self.x_old -= self.x_tmp
+            
+            self.g.proximal(self.x_old, self.tau, out=self.x)
+            
+            #Update
+            self.x.subtract(self.x_old, out=self.xbar)
+            #self.xbar -= self.x_old 
+            self.xbar *= self.theta
+            self.xbar += self.x
+                            
+            self.x_old.fill(self.x)
+            self.y_old.fill(self.y)
+            #self.y_old = self.y.copy()
+            #self.x_old = self.x.copy()
+        else:
+            # Gradient descent, Dual problem solution
+            self.y_old += self.sigma * self.operator.direct(self.xbar)
+            self.y = self.f.proximal_conjugate(self.y_old, self.sigma)
+            
+            # Gradient ascent, Primal problem solution
+            self.x_old -= self.tau * self.operator.adjoint(self.y)
+            self.x = self.g.proximal(self.x_old, self.tau)
+            
+            #Update
+            #xbar = x + theta * (x - x_old)
+            self.xbar.fill(self.x)
+            self.xbar -= self.x_old 
+            self.xbar *= self.theta
+            self.xbar += self.x
+                            
+            self.x_old.fill(self.x)
+            self.y_old.fill(self.y)
+            #self.y_old = self.y.copy()
+            #self.x_old = self.x.copy()
+            #self.y = self.y_old
 
     def update_objective(self):
-        self.loss.append([self.f(self.operator.direct(self.x)) + self.g(self.x),
-            -(self.f.convex_conjugate(self.y) + self.g.convex_conjugate(- 1 * self.operator.adjoint(self.y)))
-        ])
+        p1 = self.f(self.operator.direct(self.x)) + self.g(self.x)
+        d1 = -(self.f.convex_conjugate(self.y) + self.g(-1*self.operator.adjoint(self.y)))
 
-    
-    
-def assertBlockDataContainerEqual( container1, container2):
-    print ("assert Block Data Container Equal")
-    assert issubclass(container1.__class__, container2.__class__)
-    for col in range(container1.shape[0]):
-        if issubclass(container1.get_item(col).__class__, DataContainer):
-            print ("Checking col ", col)
-            assertNumpyArrayEqual(
-                container1.get_item(col).as_array(), 
-                container2.get_item(col).as_array()
-                )
-        else:
-            assertBlockDataContainerEqual(container1.get_item(col),container2.get_item(col))    
+        self.loss.append([p1,d1,p1-d1])
 
-def assertNumpyArrayEqual(first, second):
-    res = True
-    try:
-        numpy.testing.assert_array_equal(first, second)
-    except AssertionError as err:
-        res = False
-        print(err)
-    assert res
 
 
 def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
@@ -122,7 +131,10 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
     show_iter = opt['show_iter'] if 'show_iter' in opt.keys() else False 
     stop_crit = opt['stop_crit'] if 'stop_crit' in opt.keys() else False 
 
-
+    if memopt:
+        print ("memopt")
+    else:
+        print("no memopt")
     x_old = operator.domain_geometry().allocate()
     y_old = operator.range_geometry().allocate()       
             
@@ -131,7 +143,8 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
     x = x_old.copy()
     
     y_tmp = y_old.copy()
-    y = y_old.copy()
+    y = y_tmp.copy()
+
         
     # relaxation parameter
     theta = 1
@@ -144,6 +157,7 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
     
     
     for i in range(niter):
+
         
         if not memopt:
             
@@ -214,13 +228,6 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
 ##        operator.direct(xbar, out = y_tmp)
 ##        y_tmp *= sigma
 ##        y_tmp +=y_old
-        
-        
-        
-        
-                
-
-
 #        if isinstance(f, FunctionOperatorComposition):
 #        p1 = f(x) + g(x)
 #        else:

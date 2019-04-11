@@ -82,57 +82,51 @@ class MixedL21Norm(Function):
         
         if self.SymTensor:
             
-            if out is None:
+            param = [1]*x.shape[0]
+            param[-1] = 2
+            tmp = [param[i]*(x[i] ** 2) for i in range(x.shape[0])]
+            frac = [x[i]/(sum(tmp).sqrt()).maximum(1.0) for i in range(x.shape[0])]
+            res = BlockDataContainer(*frac) 
             
-                param = [1]*x.shape[0]
-                param[-1] = 2
-                tmp = [param[i]*(x[i] ** 2) for i in range(x.shape[0])]
-                frac = [x[i]/(sum(tmp).sqrt()).maximum(1.0) for i in range(x.shape[0])]
-                res = BlockDataContainer(*frac) 
-                return res
-            else:
-                
-                
-                pass
-                        
-#                tmp2 = np.sqrt(x.as_array()[0]**2 +  x.as_array()[1]**2 +  2*x.as_array()[2]**2)/self.alpha
-#                res = x.divide(ImageData(tmp2).maximum(1.0))                                
+            return res
+        
         else:
-            
-            if out is None:
-                
-                tmp = [ el*el for el in x]
-                res = (sum(tmp).sqrt()).maximum(1.0) 
-                
-#                res = sum(x**2).sqrt().maximum(1.0) 
-                
-                #frac = [x[i]/res for i in range(x.shape[0])]
-                #res = BlockDataContainer(*frac)
-                
-                return x/res 
-            
-            else:
-                
-                tmp = x**2 #[ el*el for el in x]
-                res = (sum(tmp).sqrt()).maximum(1.0) 
-                
-#                res = sum(x**2).sqrt().maximum(1.0)
-#                frac = [x[i]/res for i in range(x.shape[0])]
-#                res = BlockDataContainer(*frac)
-#                res = sum(x**2).sqrt().maximum(1.0) 
-                out.fill(x/res)
-#                return res 
+#             pass
 
+    
+# #                tmp2 = np.sqrt(x.as_array()[0]**2 +  x.as_array()[1]**2 +  2*x.as_array()[2]**2)/self.alpha
+# #                res = x.divide(ImageData(tmp2).maximum(1.0))                                
+         if out is None:
+            
+            tmp = [ el*el for el in x]
+            res = (sum(tmp).sqrt()).maximum(1.0) 
+            frac = [x[i]/res for i in range(x.shape[0])]
+            res = BlockDataContainer(*frac)
+                                                   
+            return res
+        
+         else:
+             
+            tmp = [ el*el for el in x]
+            res = (sum(tmp).sqrt()).maximum(1.0)             
+            out.fill(x/res)             
+             
+             
+             
+        #     tmp = [ el*el for el in x]
+        #     res = (sum(tmp).sqrt()).maximum(1.0) 
+        #     #frac = [x[i]/res for i in range(x.shape[0])]
+        #     for i in range(x.shape[0]):
+        #         a = out.get_item(i)
+        #         b = x.get_item(i)
+        #         b /= res
+        #         a.fill( b )
 
     
     def __rmul__(self, scalar):
         return ScaledFunction(self, scalar) 
 
-#class MixedL21Norm_tensor(Function):
-#    
-#    def __init__(self):
-#        print("feerf")
-#    
+
 #
 if __name__ == '__main__':
     

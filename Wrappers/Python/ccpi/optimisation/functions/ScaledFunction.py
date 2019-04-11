@@ -61,8 +61,7 @@ class ScaledFunction(object):
         if out is None:
             return self.scalar * self.function.proximal_conjugate(x/self.scalar, tau/self.scalar)
         else:
-            out.fill(self.scalar * self.function.proximal_conjugate(x/self.scalar, tau/self.scalar))
-            
+            out.fill(self.scalar*self.function.proximal_conjugate(x/self.scalar, tau/self.scalar))
 
     def grad(self, x):
         '''Alias of gradient(x,None)'''

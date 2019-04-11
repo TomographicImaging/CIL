@@ -59,10 +59,10 @@ class ScaledFunction(object):
         '''This returns the proximal operator for the function at x, tau
         '''
         if out is None:
-            return self.scalar  * self.function.proximal_conjugate(x/self.scalar, tau/self.scalar)
+            return self.scalar * self.function.proximal_conjugate(x/self.scalar, tau/self.scalar)
         else:
-            self.function.proximal_conjugate(x/self.scalar, tau/self.scalar, out = out)
-            out *= self.scalar 
+            out.fill(self.scalar * self.function.proximal_conjugate(x/self.scalar, tau/self.scalar))
+            
 
     def grad(self, x):
         '''Alias of gradient(x,None)'''

@@ -65,19 +65,19 @@ class Gradient(LinearOperator):
     def adjoint(self, x, out=None):
         
         if out is not None:
-          
             tmp = self.gm_domain.allocate()            
             for i in range(x.shape[0]):
                 self.FD.direction=self.ind[i] 
                 self.FD.adjoint(x.get_item(i), out = tmp)
-#                FiniteDiff(self.gm_domain, direction = self.ind[i], bnd_cond = self.bnd_cond).adjoint(x.get_item(i), out=tmp)
-                out+=tmp               
+                if i == 0:
+                    out.fill(tmp)
+                else:
+                    out += tmp
         else:            
             tmp = self.gm_domain.allocate()
             for i in range(x.shape[0]):
                 self.FD.direction=self.ind[i]
-                tmp+=self.FD.adjoint(x.get_item(i))
-#                tmp+=FiniteDiff(self.gm_domain, direction = self.ind[i], bnd_cond = self.bnd_cond).adjoint(x.get_item(i))
+                tmp += self.FD.adjoint(x.get_item(i))
             return tmp    
             
     

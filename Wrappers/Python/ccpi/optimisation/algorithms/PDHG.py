@@ -161,7 +161,6 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
         
         else:
             
-
             operator.direct(xbar, out = y_tmp)             
             y_tmp *= sigma
             y_tmp += y_old                      
@@ -178,8 +177,8 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
             xbar += x
                         
                         
-            x_old = x.copy()
-            y_old = y.copy()
+            x_old.fill(x)
+            y_old.fill(y)
 
             
 #            pass

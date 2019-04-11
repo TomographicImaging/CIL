@@ -6,8 +6,9 @@ Created on Mon Feb  4 16:18:06 2019
 @author: evangelos
 """
 from ccpi.optimisation.algorithms import Algorithm
-from ccpi.framework import ImageData
+from ccpi.framework import ImageData, DataContainer
 import numpy as np
+import numpy
 import time
 from ccpi.optimisation.operators import BlockOperator
 from ccpi.framework import BlockDataContainer
@@ -80,6 +81,29 @@ class PDHG(Algorithm):
             -(self.f.convex_conjugate(self.y) + self.g.convex_conjugate(- 1 * self.operator.adjoint(self.y)))
         ])
 
+    
+    
+def assertBlockDataContainerEqual( container1, container2):
+    print ("assert Block Data Container Equal")
+    assert issubclass(container1.__class__, container2.__class__)
+    for col in range(container1.shape[0]):
+        if issubclass(container1.get_item(col).__class__, DataContainer):
+            print ("Checking col ", col)
+            assertNumpyArrayEqual(
+                container1.get_item(col).as_array(), 
+                container2.get_item(col).as_array()
+                )
+        else:
+            assertBlockDataContainerEqual(container1.get_item(col),container2.get_item(col))    
+
+def assertNumpyArrayEqual(first, second):
+    res = True
+    try:
+        numpy.testing.assert_array_equal(first, second)
+    except AssertionError as err:
+        res = False
+        print(err)
+    assert res
 
 
 def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
@@ -102,12 +126,12 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
     x_old = operator.domain_geometry().allocate()
     y_old = operator.range_geometry().allocate()       
             
-    xbar = x_old
-    x_tmp = x_old
-    x = x_old
+    xbar = x_old.copy()
+    x_tmp = x_old.copy()
+    x = x_old.copy()
     
-    y_tmp = y_old
-    y = y_old
+    y_tmp = y_old.copy()
+    y = y_old.copy()
         
     # relaxation parameter
     theta = 1
@@ -137,37 +161,26 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
         
         else:
             
-            operator.direct(xbar, out = y_tmp) 
-            
-            y_tmp.multiply(sigma, out = y_tmp)
-            y_tmp.add(y_old, out = y_tmp)
-#            y_tmp.__imul__(sigma)
-#            y_tmp.__iadd__(y_old)
-            
-#            y_tmp *= sigma
-#            y_tmp += y_old
-            
-#            y_tmp = y_old + sigma * operator.direct(xbar)                        
+
+            operator.direct(xbar, out = y_tmp)             
+            y_tmp *= sigma
+            y_tmp += y_old                      
             f.proximal_conjugate(y_tmp, sigma, out=y)
-            
-#            x_tmp = x_old - tau * operator.adjoint(y)
-            
+
             operator.adjoint(y, out = x_tmp)   
-            x_tmp.multiply(-tau, out = x_tmp)
-            x_tmp.add(x_old, out = x_tmp)
-            
-            
-#            x_tmp *= -tau
-#            x_tmp += x_old
+            x_tmp *= -tau
+            x_tmp += x_old
 
             g.proximal(x_tmp, tau, out = x)
             
             xbar = x - x_old
             xbar *= theta
             xbar += x
-            
-            x_old.fill(x)
-            y_old.fill(y)
+                        
+                        
+            x_old = x.copy()
+            y_old = y.copy()
+
             
 #            pass
 #        

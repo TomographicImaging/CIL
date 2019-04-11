@@ -91,6 +91,8 @@ class MixedL21Norm(Function):
                 res = BlockDataContainer(*frac) 
                 return res
             else:
+                
+                
                 pass
                         
 #                tmp2 = np.sqrt(x.as_array()[0]**2 +  x.as_array()[1]**2 +  2*x.as_array()[2]**2)/self.alpha
@@ -101,19 +103,25 @@ class MixedL21Norm(Function):
                 
                 tmp = [ el*el for el in x]
                 res = (sum(tmp).sqrt()).maximum(1.0) 
-                frac = [x[i]/res for i in range(x.shape[0])]
-                res = BlockDataContainer(*frac)
                 
-                return res 
+#                res = sum(x**2).sqrt().maximum(1.0) 
+                
+                #frac = [x[i]/res for i in range(x.shape[0])]
+                #res = BlockDataContainer(*frac)
+                
+                return x/res 
             
             else:
                 
-                tmp = [ el*el for el in x]
+                tmp = x**2 #[ el*el for el in x]
                 res = (sum(tmp).sqrt()).maximum(1.0) 
-                frac = [x[i]/res for i in range(x.shape[0])]                
-#                res = (sum(x**2).sqrt()).maximum(1.0) 
-#                return x/res
-                out.fill(frac)
+                
+#                res = sum(x**2).sqrt().maximum(1.0)
+#                frac = [x[i]/res for i in range(x.shape[0])]
+#                res = BlockDataContainer(*frac)
+#                res = sum(x**2).sqrt().maximum(1.0) 
+                out.fill(x/res)
+#                return res 
 
 
     

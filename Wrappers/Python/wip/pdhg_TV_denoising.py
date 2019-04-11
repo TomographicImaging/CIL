@@ -58,10 +58,10 @@ if method == '0':
 
     #### Create functions
       
-    f1 = alpha * MixedL21Norm()
-    f2 = 0.5 * L2NormSquared(b = noisy_data)
-    
-    f = BlockFunction(f1, f2 )                                        
+    f1 = MixedL21Norm()
+    f2 = L2NormSquared(b = noisy_data)    
+    f = BlockFunction(f1, f2)  
+                                      
     g = ZeroFun()
     
 else:
@@ -79,6 +79,7 @@ else:
 # Compute operator Norm
 normK = operator.norm()
 print ("normK", normK)
+
 # Primal & dual stepsizes
 sigma = 1
 tau = 1/(sigma*normK**2)
@@ -86,8 +87,11 @@ tau = 1/(sigma*normK**2)
 opt = {'niter':100}
 opt1 = {'niter':100, 'memopt': True}
 
-res1, time1, primal1, dual1, pdgap1 = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt1) 
 res, time, primal, dual, pdgap = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt) 
+
+print("with memopt \n")
+
+res1, time1, primal1, dual1, pdgap1 = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt1) 
 
 plt.figure(figsize=(5,5))
 plt.imshow(res.as_array())

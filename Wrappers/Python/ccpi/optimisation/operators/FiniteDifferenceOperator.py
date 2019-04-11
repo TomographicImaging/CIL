@@ -52,38 +52,33 @@ class FiniteDiff(LinearOperator):
         
         if out is None:        
             out = np.zeros_like(x_asarr)
-            fd_arr = out
         else:
-            fd_arr = out.as_array()        
-        
-#        if out is None:        
-#            out = self.gm_domain.allocate().as_array()
-#        
-#        fd_arr = out.as_array()
-#        fd_arr = self.gm_domain.allocate().as_array()
-          
+            out = out.as_array()
+            out[:]=0
+
+                  
         ######################## Direct for 2D  ###############################
         if x_sz == 2:
             
             if self.direction == 1:
                 
-                np.subtract( x_asarr[:,1:], x_asarr[:,0:-1], out = fd_arr[:,0:-1] )
+                np.subtract( x_asarr[:,1:], x_asarr[:,0:-1], out = out[:,0:-1] )
                 
                 if self.bnd_cond == 'Neumann':
                     pass                                        
                 elif self.bnd_cond == 'Periodic':
-                    np.subtract( x_asarr[:,0], x_asarr[:,-1], out = fd_arr[:,-1] )
+                    np.subtract( x_asarr[:,0], x_asarr[:,-1], out = out[:,-1] )
                 else: 
                     raise ValueError('No valid boundary conditions')
                 
             if self.direction == 0:
                 
-                np.subtract( x_asarr[1:], x_asarr[0:-1], out = fd_arr[0:-1,:] )
+                np.subtract( x_asarr[1:], x_asarr[0:-1], out = out[0:-1,:] )
 
                 if self.bnd_cond == 'Neumann':
                     pass                                        
                 elif self.bnd_cond == 'Periodic':
-                    np.subtract( x_asarr[0,:], x_asarr[-1,:], out = fd_arr[-1,:] ) 
+                    np.subtract( x_asarr[0,:], x_asarr[-1,:], out = out[-1,:] ) 
                 else:    
                     raise ValueError('No valid boundary conditions') 
                     
@@ -92,35 +87,35 @@ class FiniteDiff(LinearOperator):
                     
             if self.direction == 0:  
                 
-                np.subtract( x_asarr[1:,:,:], x_asarr[0:-1,:,:], out = fd_arr[0:-1,:,:] )
+                np.subtract( x_asarr[1:,:,:], x_asarr[0:-1,:,:], out = out[0:-1,:,:] )
                 
                 if self.bnd_cond == 'Neumann':
                     pass
                 elif self.bnd_cond == 'Periodic':
-                    np.subtract( x_asarr[0,:,:], x_asarr[-1,:,:], out = fd_arr[-1,:,:] ) 
+                    np.subtract( x_asarr[0,:,:], x_asarr[-1,:,:], out = out[-1,:,:] ) 
                 else:    
                     raise ValueError('No valid boundary conditions')                      
                                                              
             if self.direction == 1:
                 
-                np.subtract( x_asarr[:,1:,:], x_asarr[:,0:-1,:], out = fd_arr[:,0:-1,:] ) 
+                np.subtract( x_asarr[:,1:,:], x_asarr[:,0:-1,:], out = out[:,0:-1,:] ) 
                 
                 if self.bnd_cond == 'Neumann':
                     pass
                 elif self.bnd_cond == 'Periodic':
-                    np.subtract( x_asarr[:,0,:], x_asarr[:,-1,:], out = fd_arr[:,-1,:] )
+                    np.subtract( x_asarr[:,0,:], x_asarr[:,-1,:], out = out[:,-1,:] )
                 else:    
                     raise ValueError('No valid boundary conditions')                      
                                 
              
             if self.direction == 2:
                 
-                np.subtract( x_asarr[:,:,1:], x_asarr[:,:,0:-1], out = fd_arr[:,:,0:-1] ) 
+                np.subtract( x_asarr[:,:,1:], x_asarr[:,:,0:-1], out = out[:,:,0:-1] ) 
                 
                 if self.bnd_cond == 'Neumann':
                     pass
                 elif self.bnd_cond == 'Periodic':
-                    np.subtract( x_asarr[:,:,0], x_asarr[:,:,-1], out = fd_arr[:,:,-1] )
+                    np.subtract( x_asarr[:,:,0], x_asarr[:,:,-1], out = out[:,:,-1] )
                 else:    
                     raise ValueError('No valid boundary conditions')  
                     
@@ -128,42 +123,42 @@ class FiniteDiff(LinearOperator):
         elif x_sz == 4:
                     
             if self.direction == 0:                            
-                np.subtract( x_asarr[1:,:,:,:], x_asarr[0:-1,:,:,:], out = fd_arr[0:-1,:,:,:] )
+                np.subtract( x_asarr[1:,:,:,:], x_asarr[0:-1,:,:,:], out = out[0:-1,:,:,:] )
                 
                 if self.bnd_cond == 'Neumann':
                     pass
                 elif self.bnd_cond == 'Periodic':
-                    np.subtract( x_asarr[0,:,:,:], x_asarr[-1,:,:,:], out = fd_arr[-1,:,:,:] )
+                    np.subtract( x_asarr[0,:,:,:], x_asarr[-1,:,:,:], out = out[-1,:,:,:] )
                 else:    
                     raise ValueError('No valid boundary conditions') 
                                                 
             if self.direction == 1:
-                np.subtract( x_asarr[:,1:,:,:], x_asarr[:,0:-1,:,:], out = fd_arr[:,0:-1,:,:] ) 
+                np.subtract( x_asarr[:,1:,:,:], x_asarr[:,0:-1,:,:], out = out[:,0:-1,:,:] ) 
                 
                 if self.bnd_cond == 'Neumann':
                     pass
                 elif self.bnd_cond == 'Periodic':
-                    np.subtract( x_asarr[:,0,:,:], x_asarr[:,-1,:,:], out = fd_arr[:,-1,:,:] )
+                    np.subtract( x_asarr[:,0,:,:], x_asarr[:,-1,:,:], out = out[:,-1,:,:] )
                 else:    
                     raise ValueError('No valid boundary conditions')                 
                 
             if self.direction == 2:
-                np.subtract( x_asarr[:,:,1:,:], x_asarr[:,:,0:-1,:], out = fd_arr[:,:,0:-1,:] ) 
+                np.subtract( x_asarr[:,:,1:,:], x_asarr[:,:,0:-1,:], out = out[:,:,0:-1,:] ) 
                 
                 if self.bnd_cond == 'Neumann':
                     pass
                 elif self.bnd_cond == 'Periodic':
-                    np.subtract( x_asarr[:,:,0,:], x_asarr[:,:,-1,:], out = fd_arr[:,:,-1,:] )
+                    np.subtract( x_asarr[:,:,0,:], x_asarr[:,:,-1,:], out = out[:,:,-1,:] )
                 else:    
                     raise ValueError('No valid boundary conditions')                   
                 
             if self.direction == 3:
-                np.subtract( x_asarr[:,:,:,1:], x_asarr[:,:,:,0:-1], out = fd_arr[:,:,:,0:-1] )                 
+                np.subtract( x_asarr[:,:,:,1:], x_asarr[:,:,:,0:-1], out = out[:,:,:,0:-1] )                 
 
                 if self.bnd_cond == 'Neumann':
                     pass
                 elif self.bnd_cond == 'Periodic':
-                    np.subtract( x_asarr[:,:,:,0], x_asarr[:,:,:,-1], out = fd_arr[:,:,:,-1] )
+                    np.subtract( x_asarr[:,:,:,0], x_asarr[:,:,:,-1], out = out[:,:,:,-1] )
                 else:    
                     raise ValueError('No valid boundary conditions')                   
                                 
@@ -177,14 +172,18 @@ class FiniteDiff(LinearOperator):
     def adjoint(self, x, out=None):
         
         x_asarr = x.as_array()
-        #x_asarr = x
         x_sz = len(x.shape)
         
         if out is None:        
             out = np.zeros_like(x_asarr)
-            fd_arr = out
         else:
-            fd_arr = out.as_array()          
+            out = out.as_array()        
+        
+#        if out is None:        
+#            out = np.zeros_like(x_asarr)
+#            fd_arr = out
+#        else:
+#            fd_arr = out.as_array()          
         
 #        if out is None:        
 #            out = self.gm_domain.allocate().as_array()
@@ -198,28 +197,28 @@ class FiniteDiff(LinearOperator):
         
             if self.direction == 1:
                 
-                np.subtract( x_asarr[:,1:], x_asarr[:,0:-1], out = fd_arr[:,1:] )
+                np.subtract( x_asarr[:,1:], x_asarr[:,0:-1], out = out[:,1:] )
                 
                 if self.bnd_cond == 'Neumann':
-                    np.subtract( x_asarr[:,0], 0, out = fd_arr[:,0] )
-                    np.subtract( -x_asarr[:,-2], 0, out = fd_arr[:,-1] )
+                    np.subtract( x_asarr[:,0], 0, out = out[:,0] )
+                    np.subtract( -x_asarr[:,-2], 0, out = out[:,-1] )
                     
                 elif self.bnd_cond == 'Periodic':
-                    np.subtract( x_asarr[:,0], x_asarr[:,-1], out = fd_arr[:,0] )                                        
+                    np.subtract( x_asarr[:,0], x_asarr[:,-1], out = out[:,0] )                                        
                     
                 else:   
                     raise ValueError('No valid boundary conditions') 
                                     
             if self.direction == 0:
                 
-                np.subtract( x_asarr[1:,:], x_asarr[0:-1,:], out = fd_arr[1:,:] )
+                np.subtract( x_asarr[1:,:], x_asarr[0:-1,:], out = out[1:,:] )
                 
                 if self.bnd_cond == 'Neumann':
-                    np.subtract( x_asarr[0,:], 0, out = fd_arr[0,:] )
-                    np.subtract( -x_asarr[-2,:], 0, out = fd_arr[-1,:] ) 
+                    np.subtract( x_asarr[0,:], 0, out = out[0,:] )
+                    np.subtract( -x_asarr[-2,:], 0, out = out[-1,:] ) 
                     
                 elif self.bnd_cond == 'Periodic':  
-                    np.subtract( x_asarr[0,:], x_asarr[-1,:], out = fd_arr[0,:] ) 
+                    np.subtract( x_asarr[0,:], x_asarr[-1,:], out = out[0,:] ) 
                     
                 else:   
                     raise ValueError('No valid boundary conditions')     
@@ -229,35 +228,35 @@ class FiniteDiff(LinearOperator):
                 
             if self.direction == 0:          
                   
-                np.subtract( x_asarr[1:,:,:], x_asarr[0:-1,:,:], out = fd_arr[1:,:,:] )
+                np.subtract( x_asarr[1:,:,:], x_asarr[0:-1,:,:], out = out[1:,:,:] )
                 
                 if self.bnd_cond == 'Neumann':
-                    np.subtract( x_asarr[0,:,:], 0, out = fd_arr[0,:,:] )
-                    np.subtract( -x_asarr[-2,:,:], 0, out = fd_arr[-1,:,:] )
+                    np.subtract( x_asarr[0,:,:], 0, out = out[0,:,:] )
+                    np.subtract( -x_asarr[-2,:,:], 0, out = out[-1,:,:] )
                 elif self.bnd_cond == 'Periodic':                     
-                    np.subtract( x_asarr[0,:,:], x_asarr[-1,:,:], out = fd_arr[0,:,:] )
+                    np.subtract( x_asarr[0,:,:], x_asarr[-1,:,:], out = out[0,:,:] )
                 else:   
                     raise ValueError('No valid boundary conditions')                     
                                     
             if self.direction == 1:
-                np.subtract( x_asarr[:,1:,:], x_asarr[:,0:-1,:], out = fd_arr[:,1:,:] )
+                np.subtract( x_asarr[:,1:,:], x_asarr[:,0:-1,:], out = out[:,1:,:] )
                 
                 if self.bnd_cond == 'Neumann':
-                    np.subtract( x_asarr[:,0,:], 0, out = fd_arr[:,0,:] )
-                    np.subtract( -x_asarr[:,-2,:], 0, out = fd_arr[:,-1,:] )
+                    np.subtract( x_asarr[:,0,:], 0, out = out[:,0,:] )
+                    np.subtract( -x_asarr[:,-2,:], 0, out = out[:,-1,:] )
                 elif self.bnd_cond == 'Periodic':                     
-                    np.subtract( x_asarr[:,0,:], x_asarr[:,-1,:], out = fd_arr[:,0,:] )
+                    np.subtract( x_asarr[:,0,:], x_asarr[:,-1,:], out = out[:,0,:] )
                 else:   
                     raise ValueError('No valid boundary conditions')                                 
                 
             if self.direction == 2:
-                np.subtract( x_asarr[:,:,1:], x_asarr[:,:,0:-1], out = fd_arr[:,:,1:] )
+                np.subtract( x_asarr[:,:,1:], x_asarr[:,:,0:-1], out = out[:,:,1:] )
                 
                 if self.bnd_cond == 'Neumann':
-                    np.subtract( x_asarr[:,:,0], 0, out = fd_arr[:,:,0] ) 
-                    np.subtract( -x_asarr[:,:,-2], 0, out = fd_arr[:,:,-1] ) 
+                    np.subtract( x_asarr[:,:,0], 0, out = out[:,:,0] ) 
+                    np.subtract( -x_asarr[:,:,-2], 0, out = out[:,:,-1] ) 
                 elif self.bnd_cond == 'Periodic':                     
-                    np.subtract( x_asarr[:,:,0], x_asarr[:,:,-1], out = fd_arr[:,:,0] )
+                    np.subtract( x_asarr[:,:,0], x_asarr[:,:,-1], out = out[:,:,0] )
                 else:   
                     raise ValueError('No valid boundary conditions')                                 
         
@@ -265,51 +264,51 @@ class FiniteDiff(LinearOperator):
         elif x_sz == 4:                
                 
             if self.direction == 0:                            
-                np.subtract( x_asarr[1:,:,:,:], x_asarr[0:-1,:,:,:], out = fd_arr[1:,:,:,:] )
+                np.subtract( x_asarr[1:,:,:,:], x_asarr[0:-1,:,:,:], out = out[1:,:,:,:] )
                 
                 if self.bnd_cond == 'Neumann':
-                    np.subtract( x_asarr[0,:,:,:], 0, out = fd_arr[0,:,:,:] )
-                    np.subtract( -x_asarr[-2,:,:,:], 0, out = fd_arr[-1,:,:,:] )
+                    np.subtract( x_asarr[0,:,:,:], 0, out = out[0,:,:,:] )
+                    np.subtract( -x_asarr[-2,:,:,:], 0, out = out[-1,:,:,:] )
                     
                 elif self.bnd_cond == 'Periodic':
-                    np.subtract( x_asarr[0,:,:,:], x_asarr[-1,:,:,:], out = fd_arr[0,:,:,:] )
+                    np.subtract( x_asarr[0,:,:,:], x_asarr[-1,:,:,:], out = out[0,:,:,:] )
                 else:    
                     raise ValueError('No valid boundary conditions') 
                                 
             if self.direction == 1:
-                np.subtract( x_asarr[:,1:,:,:], x_asarr[:,0:-1,:,:], out = fd_arr[:,1:,:,:] )
+                np.subtract( x_asarr[:,1:,:,:], x_asarr[:,0:-1,:,:], out = out[:,1:,:,:] )
                 
                 if self.bnd_cond == 'Neumann':
-                   np.subtract( x_asarr[:,0,:,:], 0, out = fd_arr[:,0,:,:] )
-                   np.subtract( -x_asarr[:,-2,:,:], 0, out = fd_arr[:,-1,:,:] )
+                   np.subtract( x_asarr[:,0,:,:], 0, out = out[:,0,:,:] )
+                   np.subtract( -x_asarr[:,-2,:,:], 0, out = out[:,-1,:,:] )
                     
                 elif self.bnd_cond == 'Periodic':
-                    np.subtract( x_asarr[:,0,:,:], x_asarr[:,-1,:,:], out = fd_arr[:,0,:,:] )
+                    np.subtract( x_asarr[:,0,:,:], x_asarr[:,-1,:,:], out = out[:,0,:,:] )
                 else:    
                     raise ValueError('No valid boundary conditions') 
                     
                 
             if self.direction == 2:
-                np.subtract( x_asarr[:,:,1:,:], x_asarr[:,:,0:-1,:], out = fd_arr[:,:,1:,:] )
+                np.subtract( x_asarr[:,:,1:,:], x_asarr[:,:,0:-1,:], out = out[:,:,1:,:] )
                 
                 if self.bnd_cond == 'Neumann':
-                    np.subtract( x_asarr[:,:,0,:], 0, out = fd_arr[:,:,0,:] ) 
-                    np.subtract( -x_asarr[:,:,-2,:], 0, out = fd_arr[:,:,-1,:] ) 
+                    np.subtract( x_asarr[:,:,0,:], 0, out = out[:,:,0,:] ) 
+                    np.subtract( -x_asarr[:,:,-2,:], 0, out = out[:,:,-1,:] ) 
                     
                 elif self.bnd_cond == 'Periodic':
-                    np.subtract( x_asarr[:,:,0,:], x_asarr[:,:,-1,:], out = fd_arr[:,:,0,:] )
+                    np.subtract( x_asarr[:,:,0,:], x_asarr[:,:,-1,:], out = out[:,:,0,:] )
                 else:    
                     raise ValueError('No valid boundary conditions')                 
                 
             if self.direction == 3:
-                np.subtract( x_asarr[:,:,:,1:], x_asarr[:,:,:,0:-1], out = fd_arr[:,:,:,1:] )
+                np.subtract( x_asarr[:,:,:,1:], x_asarr[:,:,:,0:-1], out = out[:,:,:,1:] )
                 
                 if self.bnd_cond == 'Neumann':
-                    np.subtract( x_asarr[:,:,:,0], 0, out = fd_arr[:,:,:,0] ) 
-                    np.subtract( -x_asarr[:,:,:,-2], 0, out = fd_arr[:,:,:,-1] )   
+                    np.subtract( x_asarr[:,:,:,0], 0, out = out[:,:,:,0] ) 
+                    np.subtract( -x_asarr[:,:,:,-2], 0, out = out[:,:,:,-1] )   
                     
                 elif self.bnd_cond == 'Periodic':
-                    np.subtract( x_asarr[:,:,:,0], x_asarr[:,:,:,-1], out = fd_arr[:,:,:,0] )
+                    np.subtract( x_asarr[:,:,:,0], x_asarr[:,:,:,-1], out = out[:,:,:,0] )
                 else:    
                     raise ValueError('No valid boundary conditions')                  
                               
@@ -328,8 +327,7 @@ class FiniteDiff(LinearOperator):
         return self.gm_domain
        
     def norm(self):
-        x0 = self.gm_domain.allocate()
-        x0.fill( np.random.random_sample(x0.shape) )
+        x0 = self.gm_domain.allocate('random_int')
         self.s1, sall, svec = PowerMethodNonsquare(self, 25, x0)
         return self.s1
     
@@ -337,23 +335,46 @@ class FiniteDiff(LinearOperator):
 if __name__ == '__main__':
     
     from ccpi.framework import ImageGeometry
+    import numpy
     
     N, M = 2, 3
 
     ig = ImageGeometry(N, M)
 
 
-    FD = FiniteDiff(ig, direction = 0, bnd_cond = 'Neumann')
+    FD = FiniteDiff(ig, direction = 1, bnd_cond = 'Neumann')
     u = FD.domain_geometry().allocate('random_int')
-    
-    
+        
     res = FD.domain_geometry().allocate()
+    res1 = FD.range_geometry().allocate()
     FD.direct(u, out=res)
-    print(res.as_array())
-#    z = FD.direct(u)
-    
+
+    z = FD.direct(u)    
 #    print(z.as_array(), res.as_array())
 
+    for i in range(10):
+#        
+        z1 = FD.direct(u) 
+        FD.direct(u, out=res)
+        
+        u = ig.allocate('random_int')
+        res = u
+        z1  = u
+        numpy.testing.assert_array_almost_equal(z1.as_array(), \
+                                                res.as_array(), decimal=4)
+        
+#        print(z1.as_array(), res.as_array())
+        z2 = FD.adjoint(z1) 
+        FD.adjoint(z1, out=res1)  
+        numpy.testing.assert_array_almost_equal(z2.as_array(), \
+                                                res1.as_array(), decimal=4)        
+        
+        
+        
+
+        
+        
+        
     
 #    w = G.range_geometry().allocate('random_int')
     

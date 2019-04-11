@@ -10,58 +10,75 @@ Created on Mon Apr  8 13:57:46 2019
 
 from ccpi.framework import ImageGeometry
 from ccpi.optimisation.operators import Gradient, BlockOperator, Identity
+from ccpi.optimisation.functions import MixedL21Norm, L2NormSquared, BlockFunction
+import numpy
 
-N, M, K = 200, 300, 100
+N, M, K = 2, 3, 2
 
-ig = ImageGeometry(N, M, K)
+ig = ImageGeometry(N, M)
+b = ig.allocate('random_int')
 
 G = Gradient(ig)
 Id = Identity(ig)
 
-u = G.domain_geometry().allocate('random_int')
-w = G.range_geometry().allocate('random_int')
+#operator = BlockOperator(G, Id)
+operator = G
+
+f1 = MixedL21Norm()
+f2 = L2NormSquared(b = b)
+
+f = BlockFunction( f1, f2)
 
 
-res = G.range_geometry().allocate()
-res1 = G.domain_geometry().allocate()
-#
-#
-#LHS = (G.direct(u)*w).sum()
-#RHS = (u * G.adjoint(w)).sum()
-#
-#print(G.norm())
-#print(LHS, RHS)
-#
-##%%%re
-##
-#G.direct(u, out=res)
-#G.adjoint(w, out=res1)
-##
-#LHS1 = (res * w).sum()
-#RHS1 = (u * res1).sum()
-##
-#print(LHS1, RHS1)
+x_old = operator.domain_geometry().allocate()
+y_old = operator.range_geometry().allocate('random_int') 
+  
 
-B = BlockOperator(2*G, 3*Id)
-uB = B.domain_geometry().allocate('random_int')
-resB = B.range_geometry().allocate()
+xbar = operator.domain_geometry().allocate('random_int')
 
-#z2 = B.direct(uB)
-#B.direct(uB, out = resB)
+x_tmp = x_old.copy()
+x = x_old.copy()
+    
+y_tmp = operator.range_geometry().allocate()
+y = y_old.copy()
 
-#%%
+y1 = y.copy()
+
+sigma = 20
 
 for i in range(100):
-#    
-#    z2 = B.direct(uB)
-#    
-    B.direct(uB, out = resB)
     
-#    z1 = G.adjoint(w)
-#    z = G.direct(u)
+    operator.direct(xbar, out = y_tmp)  
+    y_tmp *= sigma
+    y_tmp += y_old
+
     
-#    G.adjoint(w, out=res1)
+    y_tmp1 =  sigma * operator.direct(xbar) + y_old
     
-#    G.direct(u, out=res)
+    print(i)    
+    print(" y_old :", y_old[0].as_array(), "\n")
+    print(" y_tmp[0] :", y_tmp[0].as_array(),"\n")
+    print(" y_tmp1[0] :", y_tmp1[0].as_array())
+    
+    
+    numpy.testing.assert_array_equal(y_tmp[0].as_array(), \
+                                            y_tmp1[0].as_array())
+    
+    numpy.testing.assert_array_equal(y_tmp[1].as_array(), \
+                                            y_tmp1[1].as_array()) 
+    
+    
+    y1 = f.proximal_conjugate(y_tmp1, sigma)
+    f.proximal_conjugate(y_tmp, sigma, y)
+    
+
+    
+    
+ 
+    
+
+    
+    
+    
     
     

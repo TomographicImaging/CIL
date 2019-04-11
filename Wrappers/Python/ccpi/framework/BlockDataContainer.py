@@ -186,9 +186,14 @@ class BlockDataContainer(object):
         return self.clone()
     def clone(self):
         return type(self)(*[el.copy() for el in self.containers], shape=self.shape)
-    def fill(self, x):
-        for el,ot in zip(self.containers, x):
-            el.fill(ot)
+    def fill(self, other):
+        if isinstance (other, BlockDataContainer):
+            if not self.is_compatible(other):
+                raise ValueError('Incompatible containers')
+            for el,ot in zip(self.containers, other.containers):
+                el.fill(ot)
+        else:
+            return ValueError('Cannot fill with object provided {}'.format(type(other)))
     
     def __add__(self, other):
         return self.add( other )

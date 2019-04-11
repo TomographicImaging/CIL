@@ -65,6 +65,9 @@ class TestFunction(unittest.TestCase):
         a3 = 0.5 * d.squared_norm() + d.dot(noisy_data)
         self.assertEqual(a3, g.convex_conjugate(d))
         #print( a3, g.convex_conjugate(d))
+
+        #test proximal conjugate
+
     
     def test_L2NormSquared(self):
         # TESTS for L2 and scalar * L2
@@ -94,7 +97,7 @@ class TestFunction(unittest.TestCase):
         c2 = 1/4. * u.squared_norm()
         numpy.testing.assert_equal(c1, c2)
         
-        #check convex conjuagate with data
+        #check convex conjugate with data
         d1 = f1.convex_conjugate(u)
         d2 = (1./4.) * u.squared_norm() + (u*b).sum()
         numpy.testing.assert_equal(d1, d2)  
@@ -121,10 +124,9 @@ class TestFunction(unittest.TestCase):
         l1 = f1.proximal_conjugate(u, tau)
         l2 = (u - tau * b)/(1 + tau/2 )
         numpy.testing.assert_array_almost_equal(l1.as_array(), l2.as_array(), decimal=4)     
-        
-            
+
         # check scaled function properties
-        
+
         # scalar 
         scalar = 100
         f_scaled_no_data = scalar * L2NormSquared()
@@ -161,7 +163,105 @@ class TestFunction(unittest.TestCase):
         numpy.testing.assert_array_almost_equal(f_scaled_data.proximal_conjugate(u, tau).as_array(), \
                                                 ((u - tau * b)/(1 + tau/(2*scalar) )).as_array(), decimal=4)    
         
+    def test_L2NormSquaredOut(self):
+        # TESTS for L2 and scalar * L2
+    
+        M, N, K = 2,3,5
+        ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N, voxel_num_z = K)
+        u = ig.allocate(ImageGeometry.RANDOM_INT)
+        b = ig.allocate(ImageGeometry.RANDOM_INT) 
         
+        # check grad/call no data
+        f = L2NormSquared()
+        a1 = f.gradient(u)
+        a2 = a1 * 0.
+        f.gradient(u, out=a2)
+        numpy.testing.assert_array_almost_equal(a1.as_array(), a2.as_array(), decimal=4)
+        #numpy.testing.assert_equal(f(u), u.squared_norm())
+
+        # check grad/call with data
+        f1 = L2NormSquared(b=b)
+        b1 = f1.gradient(u)
+        b2 = b1 * 0.
+        f1.gradient(u, out=b2)
+            
+        numpy.testing.assert_array_almost_equal(b1.as_array(), b2.as_array(), decimal=4)
+        #numpy.testing.assert_equal(f1(u), (u-b).squared_norm())
+        
+        # check proximal no data
+        tau = 5
+        e1 = f.proximal(u, tau)
+        e2 = e1 * 0.
+        f.proximal(u, tau, out=e2)
+        numpy.testing.assert_array_almost_equal(e1.as_array(), e2.as_array(), decimal=4)
+        
+        # check proximal with data
+        tau = 5
+        h1 = f1.proximal(u, tau)
+        h2 = h1 * 0.
+        f1.proximal(u, tau, out=h2)
+        numpy.testing.assert_array_almost_equal(h1.as_array(), h2.as_array(), decimal=4)    
+        
+        # check proximal conjugate no data
+        tau = 0.2
+        k1 = f.proximal_conjugate(u, tau)
+        k2 = k1 * 0.
+        f.proximal_conjugate(u, tau, out=k2)
+
+        numpy.testing.assert_array_almost_equal(k1.as_array(), k2.as_array(), decimal=4) 
+        
+        # check proximal conjugate with data
+        l1 = f1.proximal_conjugate(u, tau)
+        l2 = l1 * 0.
+        f1.proximal_conjugate(u, tau, out=l2)
+        numpy.testing.assert_array_almost_equal(l1.as_array(), l2.as_array(), decimal=4)     
+
+        # check scaled function properties
+
+        # scalar 
+        scalar = 100
+        f_scaled_no_data = scalar * L2NormSquared()
+        f_scaled_data = scalar * L2NormSquared(b=b)
+        
+        # grad
+        w = f_scaled_no_data.gradient(u)
+        ww = w * 0
+        f_scaled_no_data.gradient(u, out=ww)
+
+        numpy.testing.assert_array_almost_equal(w.as_array(), 
+            ww.as_array(), decimal=4)
+
+        # numpy.testing.assert_array_almost_equal(f_scaled_data.gradient(u).as_array(), scalar*f1.gradient(u).as_array(), decimal=4)
+        
+        # # conj
+        # numpy.testing.assert_almost_equal(f_scaled_no_data.convex_conjugate(u), \
+        #                         f.convex_conjugate(u/scalar) * scalar, decimal=4)
+        
+        # numpy.testing.assert_almost_equal(f_scaled_data.convex_conjugate(u), \
+        #                         scalar * f1.convex_conjugate(u/scalar), decimal=4)
+        
+        # # proximal
+        w = f_scaled_no_data.proximal(u, tau)
+        ww = w * 0
+        f_scaled_no_data.proximal(u, tau, out=ww)
+        numpy.testing.assert_array_almost_equal(w.as_array(), \
+                                                ww.as_array())
+        
+        
+        # numpy.testing.assert_array_almost_equal(f_scaled_data.proximal(u, tau).as_array(), \
+        #                                         f1.proximal(u, tau*scalar).as_array())
+                                
+        
+        # proximal conjugate
+        w = f_scaled_no_data.proximal_conjugate(u, tau)
+        ww = w * 0
+        f_scaled_no_data.proximal_conjugate(u, tau, out=ww)
+        numpy.testing.assert_array_almost_equal(w.as_array(), \
+                                                ww.as_array(), decimal=4)
+        
+        # numpy.testing.assert_array_almost_equal(f_scaled_data.proximal_conjugate(u, tau).as_array(), \
+        #                                         ((u - tau * b)/(1 + tau/(2*scalar) )).as_array(), decimal=4)    
+           
     def test_Norm2sq_as_FunctionOperatorComposition(self):
         M, N, K = 2,3,5
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N, voxel_num_z = K)

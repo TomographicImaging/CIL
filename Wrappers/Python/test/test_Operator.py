@@ -2,7 +2,8 @@ import unittest
 #from ccpi.optimisation.operators import Operator
 from ccpi.optimisation.ops import TomoIdentity
 from ccpi.framework import ImageGeometry, ImageData, BlockDataContainer, DataContainer
-from ccpi.optimisation.operators import BlockOperator, BlockScaledOperator
+from ccpi.optimisation.operators import BlockOperator, BlockScaledOperator,\
+    FiniteDiff
 import numpy
 from timeit import default_timer as timer
 from ccpi.framework import ImageGeometry
@@ -11,7 +12,43 @@ from ccpi.optimisation.operators import Gradient, Identity, SparseFiniteDiff
 def dt(steps):
     return steps[-1] - steps[-2]
 
-class TestOperator(unittest.TestCase):
+class CCPiTestClass(unittest.TestCase):
+    def assertBlockDataContainerEqual(self, container1, container2):
+        print ("assert Block Data Container Equal")
+        self.assertTrue(issubclass(container1.__class__, container2.__class__))
+        for col in range(container1.shape[0]):
+            if issubclass(container1.get_item(col).__class__, DataContainer):
+                print ("Checking col ", col)
+                self.assertNumpyArrayEqual(
+                    container1.get_item(col).as_array(), 
+                    container2.get_item(col).as_array()
+                    )
+            else:
+                self.assertBlockDataContainerEqual(container1.get_item(col),container2.get_item(col))
+    
+    def assertNumpyArrayEqual(self, first, second):
+        res = True
+        try:
+            numpy.testing.assert_array_equal(first, second)
+        except AssertionError as err:
+            res = False
+            print(err)
+        self.assertTrue(res)
+
+    def assertNumpyArrayAlmostEqual(self, first, second, decimal=6):
+        res = True
+        try:
+            numpy.testing.assert_array_almost_equal(first, second, decimal)
+        except AssertionError as err:
+            res = False
+            print(err)
+            print("expected " , second)
+            print("actual " , first)
+
+        self.assertTrue(res)
+
+
+class TestOperator(CCPiTestClass):
     def test_ScaledOperator(self):
         ig = ImageGeometry(10,20,30)
         img = ig.allocate()
@@ -28,6 +65,40 @@ class TestOperator(unittest.TestCase):
         Id = TomoIdentity(ig)
         y = Id.direct(img)
         numpy.testing.assert_array_equal(y.as_array(), img.as_array())
+
+    def test_FiniteDifference(self):
+        ##
+        N, M = 2, 3
+
+        ig = ImageGeometry(N, M)
+        Id = Identity(ig)
+
+        FD = FiniteDiff(ig, direction = 0, bnd_cond = 'Neumann')
+        u = FD.domain_geometry().allocate('random_int')
+        
+        
+        res = FD.domain_geometry().allocate(ImageGeometry.RANDOM_INT)
+        FD.adjoint(u, out=res)
+        w = FD.adjoint(u)
+
+        self.assertNumpyArrayEqual(res.as_array(), w.as_array())
+        
+        res = Id.domain_geometry().allocate(ImageGeometry.RANDOM_INT)
+        Id.adjoint(u, out=res)
+        w = Id.adjoint(u)
+
+        self.assertNumpyArrayEqual(res.as_array(), w.as_array())
+        self.assertNumpyArrayEqual(u.as_array(), w.as_array())
+
+        G = Gradient(ig)
+
+        u = G.range_geometry().allocate(ImageGeometry.RANDOM_INT)
+        res = G.domain_geometry().allocate(ImageGeometry.RANDOM_INT)
+        G.adjoint(u, out=res)
+        w = G.adjoint(u)
+        self.assertNumpyArrayEqual(res.as_array(), w.as_array())
+        
+
 
 
 
@@ -90,22 +161,23 @@ class TestBlockOperator(unittest.TestCase):
         print (z1.shape)
         print(z1[0][0].as_array())
         print(res[0][0].as_array())   
+        self.assertBlockDataContainerEqual(z1, res)
+        # for col in range(z1.shape[0]):
+        #     a = z1.get_item(col)
+        #     b = res.get_item(col)
+        #     if isinstance(a, BlockDataContainer):
+        #         for col2 in range(a.shape[0]):
+        #             self.assertNumpyArrayEqual(
+        #                 a.get_item(col2).as_array(), 
+        #                 b.get_item(col2).as_array()
+        #                 )        
+        #     else:
+        #         self.assertNumpyArrayEqual(
+        #             a.as_array(), 
+        #             b.as_array()
+        #             )
+        z1 = B.range_geometry().allocate(ImageGeometry.RANDOM_INT)
 
-        for col in range(z1.shape[0]):
-            a = z1.get_item(col)
-            b = res.get_item(col)
-            if isinstance(a, BlockDataContainer):
-                for col2 in range(a.shape[0]):
-                    self.assertNumpyArrayEqual(
-                        a.get_item(col2).as_array(), 
-                        b.get_item(col2).as_array()
-                        )        
-            else:
-                self.assertNumpyArrayEqual(
-                    a.as_array(), 
-                    b.as_array()
-                    )
-        z1 = B.direct(u)
         res1 = B.adjoint(z1)
         res2 = B.domain_geometry().allocate()
         B.adjoint(z1, out=res2)
@@ -264,7 +336,7 @@ class TestBlockOperator(unittest.TestCase):
         u = ig.allocate('random_int')
         steps = [timer()]
         i = 0
-        n = 25.
+        n = 2.
         t1 = t2 = 0
         res = B.range_geometry().allocate()
             

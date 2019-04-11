@@ -161,18 +161,20 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
         
         if not memopt:
             
-            y_tmp = y_old + sigma * operator.direct(xbar)
-            y = f.proximal_conjugate(y_tmp, sigma)
+            y_old += sigma * operator.direct(xbar)            
+            y = f.proximal_conjugate(y_old, sigma)
             
-            x_tmp = x_old - tau * operator.adjoint(y)
-            x = g.proximal(x_tmp, tau)
+            x_old -= tau*operator.adjoint(y)
+            x = g.proximal(x_old, tau)
+             
+            xbar.fill(x)
+            xbar -= x_old
+            xbar *= theta
+            xbar += x
             
-            xbar = x + theta * (x - x_old)
-            
-            x_old = x
-            y_old = y            
-        
-        
+            x_old.fill(x)
+            y_old.fill(y)            
+                               
         else:
             
             operator.direct(xbar, out = y_tmp)             

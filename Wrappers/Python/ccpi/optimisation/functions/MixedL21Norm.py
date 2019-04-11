@@ -77,9 +77,7 @@ class MixedL21Norm(Function):
         pass
     
     def proximal_conjugate(self, x, tau, out=None): 
-        
-        
-        
+
         if self.SymTensor:
             
             param = [1]*x.shape[0]
@@ -91,38 +89,22 @@ class MixedL21Norm(Function):
             return res
         
         else:
-#             pass
 
-    
-# #                tmp2 = np.sqrt(x.as_array()[0]**2 +  x.as_array()[1]**2 +  2*x.as_array()[2]**2)/self.alpha
-# #                res = x.divide(ImageData(tmp2).maximum(1.0))                                
+                              
          if out is None:
             
-            tmp = [ el*el for el in x]
-            res = (sum(tmp).sqrt()).maximum(1.0) 
-            frac = [x[i]/res for i in range(x.shape[0])]
-            res = BlockDataContainer(*frac)
-                                                   
-            return res
+            tmp = [ el*el for el in x.containers]
+            res = (sum(tmp).sqrt()).maximum(1.0)                                                                
+            return x/res
         
          else:
-             
-            tmp = [ el*el for el in x]
-            res = (sum(tmp).sqrt()).maximum(1.0)             
-            out.fill(x/res)             
-             
-             
-             
-        #     tmp = [ el*el for el in x]
-        #     res = (sum(tmp).sqrt()).maximum(1.0) 
-        #     #frac = [x[i]/res for i in range(x.shape[0])]
-        #     for i in range(x.shape[0]):
-        #         a = out.get_item(i)
-        #         b = x.get_item(i)
-        #         b /= res
-        #         a.fill( b )
+                         
+            res = (sum(x**2).sqrt()).maximum(1.0)             
+            out.fill(x/res)
 
-    
+            
+
+
     def __rmul__(self, scalar):
         return ScaledFunction(self, scalar) 
 

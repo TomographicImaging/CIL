@@ -53,9 +53,9 @@ class BlockDataContainer(object):
     def is_compatible(self, other):
         '''basic check if the size of the 2 objects fit'''
         
-        for i in range(len(self.containers)):
-            if type(self.containers[i])==type(self):
-                self = self.containers[i]
+#        for i in range(len(self.containers)):
+#            if type(self.containers[i])==type(self):
+#                self = self.containers[i]
         
         if isinstance(other, Number):
             return True   
@@ -341,3 +341,32 @@ class BlockDataContainer(object):
         '''Inline truedivision'''
         return self.__idiv__(other)
 
+if __name__ == '__main__':
+    
+    M, N, K = 2,3,5
+    from ccpi.framework import ImageGeometry, BlockGeometry, BlockDataContainer
+    
+    ig = ImageGeometry(N, M)
+    u = ig.allocate('random_int')
+    
+    BG = BlockGeometry(ig, ig)
+    U = BG.allocate('random_int')
+    
+    U_nested = BlockDataContainer(BlockDataContainer(u, u), u)
+    
+    
+    res1 = U + u
+    res2 = U_nested + u
+#    res2 = u + U
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

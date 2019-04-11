@@ -21,6 +21,7 @@ from ccpi.optimisation.functions import ZeroFun, L2NormSquared, \
 
 from ccpi.astra.ops import AstraProjectorSimple
 from skimage.util import random_noise
+from timeit import default_timer as timer
 
 
 #%%###############################################################################
@@ -118,15 +119,37 @@ else:
 #
 #pdhg.run(5000)
     
-opt = {'niter':2000}
-#
+opt = {'niter':300}
+opt1 = {'niter':300, 'memopt': True}
+
+
+t1 = timer()
 res, time, primal, dual, pdgap = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt) 
 
+print(timer()-t1)
 plt.figure(figsize=(5,5))
 plt.imshow(res.as_array())
 plt.colorbar()
-plt.show() 
-
+plt.show()
+ 
+#%%
+print("with memopt \n")
+#
+t2 = timer()
+res1, time1, primal1, dual1, pdgap1 = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt1) 
+#print(timer()-t2)
+#
+#
+plt.figure(figsize=(5,5))
+plt.imshow(res1.as_array())
+plt.colorbar()
+plt.show()
+#
+#%%
+plt.figure(figsize=(5,5))
+plt.imshow(np.abs(res1.as_array()-res.as_array()))
+plt.colorbar()
+plt.show()
 #%%
 #sol = pdhg.get_output().as_array()
 #fig = plt.figure()

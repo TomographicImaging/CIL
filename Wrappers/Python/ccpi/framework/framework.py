@@ -1109,6 +1109,7 @@ class AcquisitionData(DataContainer):
                 
             
 class DataProcessor(object):
+    
     '''Defines a generic DataContainer processor
     
     accepts DataContainer as inputs and 
@@ -1154,6 +1155,7 @@ class DataProcessor(object):
         raise NotImplementedError('Implement basic checks for input DataContainer')
         
     def get_output(self, out=None):
+        
         for k,v in self.__dict__.items():
             if v is None and k != 'output':
                 raise ValueError('Key {0} is None'.format(k))

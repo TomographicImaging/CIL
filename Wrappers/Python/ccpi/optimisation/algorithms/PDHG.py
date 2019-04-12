@@ -98,8 +98,6 @@ class PDHG(Algorithm):
             self.xbar *= self.theta
             self.xbar += self.x
 
-            #self.x_old.fill(self.x)
-            #self.y_old.fill(self.y)
             self.x_old = self.x
             self.y_old = self.y
 

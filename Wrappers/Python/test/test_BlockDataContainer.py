@@ -136,12 +136,12 @@ class TestBlockDataContainer(unittest.TestCase):
         print  (a[0][0].shape)
         #cp2 = BlockDataContainer(*a)
         cp2 = cp0.add(cp1)
-        assert (cp2.get_item(0).as_array()[0][0][0] == 2.)
-        assert (cp2.get_item(1).as_array()[0][0][0] == 4.)
+        self.assertEqual (cp2.get_item(0).as_array()[0][0][0] , 2.)
+        self.assertEqual (cp2.get_item(1).as_array()[0][0][0] , 4.)
         
         cp2 = cp0 + cp1 
-        assert (cp2.get_item(0).as_array()[0][0][0] == 2.)
-        assert (cp2.get_item(1).as_array()[0][0][0] == 4.)
+        self.assertTrue (cp2.get_item(0).as_array()[0][0][0] == 2.)
+        self.assertTrue (cp2.get_item(1).as_array()[0][0][0] == 4.)
         cp2 = cp0 + 1 
         numpy.testing.assert_almost_equal(cp2.get_item(0).as_array()[0][0][0] , 1. , decimal=5)
         numpy.testing.assert_almost_equal(cp2.get_item(1).as_array()[0][0][0] , 2., decimal = 5)
@@ -426,6 +426,21 @@ class TestBlockDataContainer(unittest.TestCase):
             print (el.shape, ot.shape)
         cp0.fill(cp2)
         self.assertBlockDataContainerEqual(cp0, cp2)
+
+    def test_NestedBlockDataContainer(self):
+        ig0 = ImageGeometry(2,3,4)
+        ig1 = ImageGeometry(2,3,5)
+        
+        data0 = ig0.allocate(0)
+        data2 = ig0.allocate(1)
+        
+        cp0 = BlockDataContainer(data0,data2)
+        #cp1 = BlockDataContainer(data2,data3)
+
+        nested = BlockDataContainer(cp0, data2, data2)
+        out = BlockDataContainer(BlockDataContainer(data0 , data0), data0, data0)
+        nested.divide(data2,out=out)
+        self.assertBlockDataContainerEqual(out, nested)
 
 
     def assertBlockDataContainerEqual(self, container1, container2):

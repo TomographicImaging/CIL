@@ -40,12 +40,7 @@ class L2NormSquared(Function):
 
     def __call__(self, x):
         
-        """ 
-        
-        Evaluate L2NormSquared at x: f(x)
-        
-        
-        """
+        ''' Evaluate L2NormSquared at x: f(x) '''
             
         y = x
         if self.b is not None: 
@@ -58,43 +53,43 @@ class L2NormSquared(Function):
         
             
         
-    def gradient(self, x, out=None):
+    def gradient(self, x, out=None):        
         
-        
-        ''' Evaluates gradient of L2NormSq at point x'''
+        ''' Evaluate gradient of L2NormSquared at x: f'(x) '''
+                
         if out is not None:
+            
             out.fill(x)
             if self.b is not None:
                 out -= self.b
             out *= 2
+            
         else:
+            
             y = x
             if self.b is not None:
-    #            x.subtract(self.b, out=x)
                 y = x - self.b
             return 2*y
         
                                                        
-    def convex_conjugate(self, x, out=None):
-        ''' Evaluate convex conjugate of L2NormSq'''
+    def convex_conjugate(self, x):
+        
+        ''' Evaluate convex conjugate of L2NormSquared at x: f^{*}(x)'''
             
         tmp = 0
+        
         if self.b is not None:
-#            tmp = (self.b * x).sum()
             tmp = (x * self.b).sum()
             
-        if out is None:
-            # FIXME: this is a number
-            return (1./4.) * x.squared_norm() + tmp
-        else:
-            # FIXME: this is a DataContainer
-            out.fill((1./4.) * x.squared_norm() + tmp)
-                    
+        return (1./4.) * x.squared_norm() + tmp
+
 
     def proximal(self, x, tau, out = None):
 
-        ''' The proximal operator ( prox_\{tau * f\}(x) ) evaluates i.e., 
-                argmin_x { 0.5||x - u||^{2} + tau f(x) }
+        ''' Evaluate Proximal Operator of tau * f(\cdot) at x:
+        
+            prox_{tau*f(\cdot)}(x) = \argmin_{z} \frac{1}{2}|| z - x ||^{2}_{2} + tau * f(z)
+        
         '''        
         
         if out is None:
@@ -108,17 +103,19 @@ class L2NormSquared(Function):
                 out -= self.b
             out /= (1+2*tau)
             if self.b is not None:
-                out += self.b
-                #out.fill((x - self.b)/(1+2*tau) + self.b)
-            #else:
-            #    out.fill(x/(1+2*tau))                
+                out += self.b             
 
     
     def proximal_conjugate(self, x, tau, out=None):
         
+        ''' Evaluate Proximal Operator of tau * f^{*}(\cdot) at x (i.e., the convex conjugate of f) :
+        
+            prox_{tau*f(\cdot)}(x) = \argmin_{z} \frac{1}{2}|| z - x ||^{2}_{2} + tau * f^{*}(z)
+        
+        '''         
+        
         if out is None:
             if self.b is not None:
-                # change the order cannot add ImageData + NestedBlock
                 return (x - tau*self.b)/(1 + tau/2) 
             else:
                 return x/(1 + tau/2)
@@ -129,6 +126,14 @@ class L2NormSquared(Function):
                 out.fill( x/(1 + tau/2) )
                                         
     def __rmul__(self, scalar):
+        
+        ''' Allows multiplication of L2NormSquared with a scalar
+        
+        Returns: ScaledFunction
+        
+                
+        '''
+        
         return ScaledFunction(self, scalar)        
 
 

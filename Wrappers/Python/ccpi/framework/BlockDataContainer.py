@@ -97,7 +97,7 @@ class BlockDataContainer(object):
                     a = el.is_compatible(other)
                 else:
                     a = el.shape == other.shape
-                print ("current element" , el.shape, "other ", other.shape, "same shape" , a)
+#                print ("current element" , el.shape, "other ", other.shape, "same shape" , a)
                 ret = ret and a
             return ret
             #return self.get_item(0).shape == other.shape
@@ -467,4 +467,8 @@ class BlockDataContainer(object):
     def __itruediv__(self, other):
         '''Inline truedivision'''
         return self.__idiv__(other)
+
+
+
+
 

@@ -99,11 +99,12 @@ class MixedL21Norm(Function):
                 res = BlockDataContainer(*frac)    
                 return res
             else:
+                
+                
                 res1 = functools.reduce(lambda a,b: a + b*b, x.containers, x.get_item(0) * 0 )
                 res = res1.sqrt().maximum(1.0)
                 x.divide(res, out=out)
-                #for i,el in enumerate(x.containers):
-                #    el.divide(res, out=out.get_item(i))
+                              
 
     def __rmul__(self, scalar):
         return ScaledFunction(self, scalar) 

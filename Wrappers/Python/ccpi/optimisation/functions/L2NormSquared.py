@@ -20,38 +20,31 @@
 import numpy
 from ccpi.optimisation.functions import Function
 from ccpi.optimisation.functions.ScaledFunction import ScaledFunction
-from ccpi.framework import DataContainer, ImageData, ImageGeometry  
 
-############################   L2NORM FUNCTION   #############################
 class L2NormSquared(Function):
     
+    ''' 
+    
+    Class: L2NormSquared 
+        
+    Cases:  a) f(x) = ||x||^{2}
+    
+            b) f(x) = ||x - b||^{2}, b
+                             
+    '''    
+    
     def __init__(self, **kwargs):
-        
-        ''' L2NormSquared class
-            f : ImageGeometry --> R
-            
-            Cases: f(x) = ||x||^{2}_{2}
-                   f(x) = || x - b ||^{2}_{2}     
-        
-        '''
-        
-        #TODO need x, b to live in the same geometry if b is not None
-                        
+                                
         super(L2NormSquared, self).__init__()
         self.b = kwargs.get('b',None)  
 
     def __call__(self, x):
-        ''' Evaluates L2NormSq at point x'''
         
+        ''' Evaluate L2NormSquared at x: f(x) '''
+            
         y = x
         if self.b is not None: 
-#            x.subtract(self.b, out = x)
             y = x - self.b
-#        else:
-#            y
-#        if out is None:
-#            return x.squared_norm()
-#        else:
         try:
             return y.squared_norm()
         except AttributeError as ae:
@@ -60,41 +53,43 @@ class L2NormSquared(Function):
         
             
         
-    def gradient(self, x, out=None):
-        ''' Evaluates gradient of L2NormSq at point x'''
+    def gradient(self, x, out=None):        
+        
+        ''' Evaluate gradient of L2NormSquared at x: f'(x) '''
+                
         if out is not None:
+            
             out.fill(x)
             if self.b is not None:
                 out -= self.b
             out *= 2
+            
         else:
+            
             y = x
             if self.b is not None:
-    #            x.subtract(self.b, out=x)
                 y = x - self.b
             return 2*y
         
                                                        
-    def convex_conjugate(self, x, out=None):
-        ''' Evaluate convex conjugate of L2NormSq'''
+    def convex_conjugate(self, x):
+        
+        ''' Evaluate convex conjugate of L2NormSquared at x: f^{*}(x)'''
             
         tmp = 0
+        
         if self.b is not None:
-#            tmp = (self.b * x).sum()
             tmp = (x * self.b).sum()
             
-        if out is None:
-            # FIXME: this is a number
-            return (1./4.) * x.squared_norm() + tmp
-        else:
-            # FIXME: this is a DataContainer
-            out.fill((1./4.) * x.squared_norm() + tmp)
-                    
+        return (1./4.) * x.squared_norm() + tmp
+
 
     def proximal(self, x, tau, out = None):
 
-        ''' The proximal operator ( prox_\{tau * f\}(x) ) evaluates i.e., 
-                argmin_x { 0.5||x - u||^{2} + tau f(x) }
+        ''' Evaluate Proximal Operator of tau * f(\cdot) at x:
+        
+            prox_{tau*f(\cdot)}(x) = \argmin_{z} \frac{1}{2}|| z - x ||^{2}_{2} + tau * f(z)
+        
         '''        
         
         if out is None:
@@ -108,27 +103,37 @@ class L2NormSquared(Function):
                 out -= self.b
             out /= (1+2*tau)
             if self.b is not None:
-                out += self.b
-                #out.fill((x - self.b)/(1+2*tau) + self.b)
-            #else:
-            #    out.fill(x/(1+2*tau))                
+                out += self.b             
 
     
     def proximal_conjugate(self, x, tau, out=None):
         
+        ''' Evaluate Proximal Operator of tau * f^{*}(\cdot) at x (i.e., the convex conjugate of f) :
+        
+            prox_{tau*f(\cdot)}(x) = \argmin_{z} \frac{1}{2}|| z - x ||^{2}_{2} + tau * f^{*}(z)
+        
+        '''         
+        
         if out is None:
             if self.b is not None:
-                # change the order cannot add ImageData + NestedBlock
                 return (x - tau*self.b)/(1 + tau/2) 
             else:
-                return x/(1 + tau/2 )
+                return x/(1 + tau/2)
         else:
             if self.b is not None:
-                out.fill((x - tau*self.b)/(1 + tau/2))
+                out.fill( (x - tau*self.b)/(1 + tau/2) )
             else:
-                out.fill(x/(1 + tau/2 ))
+                out.fill( x/(1 + tau/2) )
                                         
     def __rmul__(self, scalar):
+        
+        ''' Allows multiplication of L2NormSquared with a scalar
+        
+        Returns: ScaledFunction
+        
+                
+        '''
+        
         return ScaledFunction(self, scalar)        
 
 
@@ -227,7 +232,29 @@ if __name__ == '__main__':
                                             (u/(1 + tau/(2*scalar) )).as_array(), decimal=4)
     
     numpy.testing.assert_array_almost_equal(f_scaled_data.proximal_conjugate(u, tau).as_array(), \
-                                            ((u - tau * b)/(1 + tau/(2*scalar) )).as_array(), decimal=4)    
+                                            ((u - tau * b)/(1 + tau/(2*scalar) )).as_array(), decimal=4)   
+    
+    
+    
+    print( " ####### check without out ######### " )
+          
+          
+    u_out_no_out = ig.allocate('random_int')         
+    res_no_out = f_scaled_data.proximal_conjugate(u_out_no_out, 0.5)          
+    print(res_no_out.as_array())
+    
+    print( " ####### check with out ######### " ) 
+          
+    res_out = ig.allocate()        
+    f_scaled_data.proximal_conjugate(u_out_no_out, 0.5, out = res_out)
+    
+    print(res_out.as_array())   
+
+    numpy.testing.assert_array_almost_equal(res_no_out.as_array(), \
+                                            res_out.as_array(), decimal=4)        
+          
+          
+        
     
     
     

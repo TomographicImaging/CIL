@@ -45,14 +45,17 @@ class ZeroFun(Function):
             else:
                 return x.maximum(0).sum() + x.maximum(0).sum()
     
-    def proximal(self,x,tau, out=None):
+    def proximal(self, x, tau, out=None):
         if out is None:
             return x.copy()
         else:
             out.fill(x)
         
-    def proximal_conjugate(self, x, tau):
-        return 0
+    def proximal_conjugate(self, x, tau, out = None):
+        if out is None:
+            return 0
+        else:
+            return 0
 
     def domain_geometry(self):
         pass

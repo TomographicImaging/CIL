@@ -34,7 +34,7 @@ ig = ImageGeometry(voxel_num_x = N, voxel_num_y = N)
 ag = ig
 
 # Create noisy data. Add Gaussian noise
-n1 = random_noise(data, mode = 's&p', salt_vs_pepper = 0.9)
+n1 = random_noise(data, mode = 's&p', salt_vs_pepper = 0.9, amount=0.2)
 noisy_data = ImageData(n1)
 
 plt.imshow(noisy_data.as_array())
@@ -44,10 +44,10 @@ plt.show()
 #%%
 
 # Regularisation Parameter
-alpha = 10
+alpha = 2
 
 #method = input("Enter structure of PDHG (0=Composite or 1=NotComposite): ")
-method = '1'
+method = '0'
 if method == '0':
 
     # Create operators
@@ -78,15 +78,27 @@ else:
     ###########################################################################
 #%%
     
-# Compute operator Norm
-normK = operator.norm()
-print ("normK", normK)
-# Primal & dual stepsizes
-#sigma = 1
-#tau = 1/(sigma*normK**2)
+diag_precon =  True
 
-sigma = 1/normK
-tau = 1/normK
+if diag_precon:
+    
+    def tau_sigma_precond(operator):
+        
+        tau = 1/operator.sum_abs_row()
+        sigma = 1/ operator.sum_abs_col()
+               
+        return tau, sigma
+
+    tau, sigma = tau_sigma_precond(operator)
+             
+else:
+    # Compute operator Norm
+    normK = operator.norm()
+    print ("normK", normK)
+    # Primal & dual stepsizes
+    sigma = 1/normK
+    tau = 1/normK
+#    tau = 1/(sigma*normK**2)
 
 opt = {'niter':2000}
 

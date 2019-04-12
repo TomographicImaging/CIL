@@ -59,11 +59,9 @@ class ScaledFunction(object):
         '''This returns the proximal operator for the function at x, tau
         '''
         if out is None:
-            return self.scalar  * self.function.proximal_conjugate(x/self.scalar, tau/self.scalar)
+            return self.scalar * self.function.proximal_conjugate(x/self.scalar, tau/self.scalar)
         else:
             out.fill(self.scalar*self.function.proximal_conjugate(x/self.scalar, tau/self.scalar))
-            #self.function.proximal_conjugate(x/self.scalar, tau/self.scalar, out=out)
-            #out *= self.scalar
 
     def grad(self, x):
         '''Alias of gradient(x,None)'''
@@ -91,3 +89,59 @@ class ScaledFunction(object):
             return self.function.proximal(x, tau*self.scalar)     
         else:
             out.fill( self.function.proximal(x, tau*self.scalar) )
+            
+if __name__ == '__main__':        
+
+    from ccpi.optimisation.functions import L2NormSquared, MixedL21Norm
+    from ccpi.framework import ImageGeometry, BlockGeometry
+    
+    M, N, K = 2,3,5
+    ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N, voxel_num_z = K)
+    
+    u = ig.allocate('random_int')
+    b = ig.allocate('random_int') 
+    
+    BG = BlockGeometry(ig, ig)
+    U = BG.allocate('random_int')
+        
+    f2 = 0.5 * L2NormSquared(b=b)
+    f1 = 30 * MixedL21Norm()
+    tau = 0.355
+    
+    res_no_out1 =  f1.proximal_conjugate(U, tau)
+    res_no_out2 =  f2.proximal_conjugate(u, tau)    
+    
+    
+#    print( " ######## with out ######## ")
+    res_out1 = BG.allocate()
+    res_out2 = ig.allocate()
+    
+    f1.proximal_conjugate(U, tau, out = res_out1)
+    f2.proximal_conjugate(u, tau, out = res_out2)
+
+
+    numpy.testing.assert_array_almost_equal(res_no_out1[0].as_array(), \
+                                            res_out1[0].as_array(), decimal=4) 
+    
+    numpy.testing.assert_array_almost_equal(res_no_out2.as_array(), \
+                                            res_out2.as_array(), decimal=4)     
+      
+          
+          
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+    

@@ -49,22 +49,21 @@ class Gradient(LinearOperator):
         
                 
         if out is not None:
+            
             for i in range(self.gm_range.shape[0]):
-                self.FD.direction=self.ind[i]
+                self.FD.direction = self.ind[i]
                 self.FD.direct(x, out = out[i])
-#                FiniteDiff(self.gm_domain, direction = self.ind[i], bnd_cond = self.bnd_cond).direct(x, out=out[i])
-            return out
         else:
             tmp = self.gm_range.allocate()        
             for i in range(tmp.shape[0]):
                 self.FD.direction=self.ind[i]
                 tmp.get_item(i).fill(self.FD.direct(x))
-#                tmp.get_item(i).fill(FiniteDiff(self.gm_domain, direction = self.ind[i], bnd_cond = self.bnd_cond).direct(x))
             return tmp    
         
     def adjoint(self, x, out=None):
         
         if out is not None:
+
             tmp = self.gm_domain.allocate()            
             for i in range(x.shape[0]):
                 self.FD.direction=self.ind[i] 
@@ -77,6 +76,7 @@ class Gradient(LinearOperator):
             tmp = self.gm_domain.allocate()
             for i in range(x.shape[0]):
                 self.FD.direction=self.ind[i]
+
                 tmp += self.FD.adjoint(x.get_item(i))
             return tmp    
             
@@ -96,7 +96,9 @@ class Gradient(LinearOperator):
     def __rmul__(self, scalar):
         return ScaledOperator(self, scalar) 
     
-    
+    ###########################################################################
+    ###############  For preconditioning ######################################
+    ###########################################################################
     def matrix(self):
         
         tmp = self.gm_range.allocate()
@@ -220,17 +222,22 @@ if __name__ == '__main__':
 #
     u = G.domain_geometry().allocate('random_int')
     w = G.range_geometry().allocate('random_int')
-#
-#
-    res = G.range_geometry().allocate()
-#    
-    G.direct(u, out=res)
-    z = G.direct(u)
-#    
-    print(res[0].as_array())
-    print(z[0].as_array())
-#
-##    LHS = (G.direct(u)*w).sum()
-##    RHS = (u * G.adjoint(w)).sum()
     
-#    
+    
+    print( "################   without out #############")
+          
+    print( (G.direct(u)*w).sum(),  (u*G.adjoint(w)).sum() ) 
+        
+
+    print( "################   with out #############")
+    
+    res = G.range_geometry().allocate()
+    res1 = G.domain_geometry().allocate()
+    G.direct(u, out = res)          
+    G.adjoint(w, out = res1)
+          
+    print( (res*w).sum(),  (u*res1).sum() )     
+    
+    
+    
+

@@ -25,8 +25,6 @@ def dt(steps):
 
 #%%
 
-
-# ############################################################################
 # Create phantom for TV denoising
 
 N = 200
@@ -90,8 +88,8 @@ print ("normK", normK)
 sigma = 1
 tau = 1/(sigma*normK**2)
 
-opt = {'niter':1000}
-opt1 = {'niter':1000, 'memopt': True}
+opt = {'niter':2000}
+opt1 = {'niter':2000, 'memopt': True}
 
 t1 = timer()
 res, time, primal, dual, pdgap = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt) 
@@ -114,10 +112,15 @@ plt.colorbar()
 plt.show()
 
 
+diff = np.abs(res1.as_array()-res.as_array())
 plt.figure(figsize=(5,5))
-plt.imshow(np.abs(res1.as_array()-res.as_array()))
+plt.imshow(diff)
 plt.colorbar()
 plt.show()
+
+diff = (res-res1)
+print ("diff norm {} max {}".format(diff.norm(), diff.abs().as_array().max()))
+print ("Sum ( abs(diff) )  {}".format(diff.abs().sum()))
 #=======
 ## opt = {'niter':2000, 'memopt': True}
 #

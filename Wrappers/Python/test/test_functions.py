@@ -323,13 +323,15 @@ class TestFunction(unittest.TestCase):
         
         # Define no scale and scaled
         f_no_scaled = MixedL21Norm() 
-        #f_scaled = 0.5 * MixedL21Norm()  
+        f_scaled = 1 * MixedL21Norm()  
         
         # call
         
-        # a1 = f_no_scaled(U)
-        # a2 = f_scaled(U)
-        # self.assertBlockDataContainerEqual(a1,a2)
+        a1 = f_no_scaled(U)
+        a2 = f_scaled(U)
+        self.assertAlmostEqual(a1,a2)
+        
+        
         tmp = [ el**2 for el in U.containers ]
         self.assertBlockDataContainerEqual(BlockDataContainer(*tmp),
                                            U.power(2))

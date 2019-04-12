@@ -93,28 +93,58 @@ tau = 1/(sigma*normK**2)
 opt = {'niter':1000}
 opt1 = {'niter':1000, 'memopt': True}
 
-t1 = timer()
-res, time, primal, dual, pdgap = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt) 
-print(timer()-t1)
+#t1 = timer()
+#res, time, primal, dual, pdgap = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt) 
+#print(timer()-t1)
+#
+#print("with memopt \n")
+#
+#t2 = timer()
+#res1, time1, primal1, dual1, pdgap1 = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt1) 
+#print(timer()-t2)
 
-print("with memopt \n")
+pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
+pdhg.max_iteration = 2000
+pdhg.update_objective_interval = 100
 
-t2 = timer()
-res1, time1, primal1, dual1, pdgap1 = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt1) 
-print(timer()-t2)
+
+pdhgo = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma, memopt=True)
+pdhgo.max_iteration = 2000
+pdhgo.update_objective_interval = 100
+
+steps = [timer()]
+pdhgo.run(2000)
+steps.append(timer())
+t1 = dt(steps)
+
+pdhg.run(2000)
+steps.append(timer())
+t2 = dt(steps)
+
+print ("Time difference {}s {}s {}s Speedup {:.2f}".format(t1,t2,t2-t1, t2/t1))
+res = pdhg.get_output()
+res1 = pdhgo.get_output()
+
+diff = (res-res1)
+print ("diff norm {} max {}".format(diff.norm(), diff.abs().as_array().max()))
+print ("Sum ( abs(diff) )  {}".format(diff.abs().sum()))
+
 
 plt.figure(figsize=(5,5))
+plt.subplot(1,3,1)
 plt.imshow(res.as_array())
 plt.colorbar()
-plt.show()
+#plt.show()
  
-plt.figure(figsize=(5,5))
+#plt.figure(figsize=(5,5))
+plt.subplot(1,3,2)
 plt.imshow(res1.as_array())
 plt.colorbar()
-plt.show()
+#plt.show()
 
 
-plt.figure(figsize=(5,5))
+#plt.figure(figsize=(5,5))
+plt.subplot(1,3,3)
 plt.imshow(np.abs(res1.as_array()-res.as_array()))
 plt.colorbar()
 plt.show()

@@ -98,7 +98,6 @@ class BlockDataContainer(object):
                     a = el.is_compatible(other)
                 else:
                     a = el.shape == other.shape
-                print ("current element" , el.shape, "other ", other.shape, "same shape" , a)
                 ret = ret and a
             return ret
             #return self.get_item(0).shape == other.shape

@@ -17,7 +17,33 @@ from ccpi.framework import DataContainer
 #from ccpi.optimisation.operators import Operator, LinearOperator
  
 class BlockDataContainer(object):
-    '''Class to hold DataContainers as column vector'''
+    '''Class to hold DataContainers as column vector
+    
+    Provides basic algebra between BlockDataContainer's, DataContainer's and
+    subclasses and Numbers
+
+    1) algebra between `BlockDataContainer`s will be element-wise, only if 
+       the shape of the 2 `BlockDataContainer`s is the same, otherwise it 
+       will fail 
+    2) algebra between `BlockDataContainer`s and `list` or `numpy array` will 
+       work as long as the number of `rows` and element of the arrays match,
+       indipendently on the fact that the `BlockDataContainer` could be nested
+    3) algebra between `BlockDataContainer` and one `DataContainer` is possible.
+       It will require that all the `DataContainers` in the block to be
+       compatible with the `DataContainer` we want to algebra with. Should we 
+       require that the `DataContainer` is the same type? Like `ImageData` or `AcquisitionData`?
+    4) algebra between `BlockDataContainer` and a `Number` is possible and it
+       will be done with each element of the `BlockDataContainer` even if nested
+
+    A = [ [B,C] , D] 
+    A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]
+    
+    '''
+    ADD = 'add'
+    SUBTRACT = 'subtract'
+    MULTIPLY = 'multiply'
+    DIVIDE = 'divide'
+    POWER = 'power'
     __array_priority__ = 1
     def __init__(self, *args, **kwargs):
         ''''''
@@ -52,14 +78,10 @@ class BlockDataContainer(object):
     
     def is_compatible(self, other):
         '''basic check if the size of the 2 objects fit'''
-        
-#        for i in range(len(self.containers)):
-#            if type(self.containers[i])==type(self):
-#                self = self.containers[i]
-        
+
         if isinstance(other, Number):
             return True   
-        elif isinstance(other, list):
+        elif isinstance(other, (list, numpy.ndarray)) :
             for ot in other:
                 if not isinstance(ot, (Number,\
                                  numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64,\
@@ -68,9 +90,6 @@ class BlockDataContainer(object):
                     raise ValueError('List/ numpy array can only contain numbers {}'\
                                      .format(type(ot)))
             return len(self.containers) == len(other)
-        elif isinstance(other, numpy.ndarray):
-            return len(self.containers) == len(other)
-        
         elif issubclass(other.__class__, DataContainer):
             ret = True
             for i, el in enumerate(self.containers):
@@ -78,13 +97,10 @@ class BlockDataContainer(object):
                     a = el.is_compatible(other)
                 else:
                     a = el.shape == other.shape
-#                print ("current element" , el.shape, "other ", other.shape, "same shape" , a)
+                print ("current element" , el.shape, "other ", other.shape, "same shape" , a)
                 ret = ret and a
             return ret
-        
-        
-#        elif issubclass(other.__class__, DataContainer):
-#            return self.get_item(0).shape == other.shape
+            #return self.get_item(0).shape == other.shape
         return len(self.containers) == len(other.containers)
 
     def get_item(self, row):
@@ -95,67 +111,166 @@ class BlockDataContainer(object):
     def __getitem__(self, row):
         return self.get_item(row)
                 
+#    def add(self, other, *args, **kwargs):
+#        if not self.is_compatible(other):
+#            raise ValueError('Incompatible for add')
+#        out = kwargs.get('out', None)
+#        #print ("args" , *args)
+#        if isinstance(other, Number):
+#            return type(self)(*[ el.add(other, *args, **kwargs) for el in self.containers], shape=self.shape)
+#        elif isinstance(other, list) or isinstance(other, numpy.ndarray):
+#            return type(self)(*[ el.add(ot, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
+#        elif issubclass(other.__class__, DataContainer):
+#            # try to do algebra with one DataContainer. Will raise error if not compatible
+#            return type(self)(*[ el.add(other, *args, **kwargs) for el in self.containers], shape=self.shape)
+#        
+#        return type(self)(
+#            *[ el.add(ot, *args, **kwargs) for el,ot in zip(self.containers,other.containers)],
+#            shape=self.shape)
+#        
+#    def subtract(self, other, *args, **kwargs):
+#        if not self.is_compatible(other):
+#            raise ValueError('Incompatible for subtract')
+#        out = kwargs.get('out', None)
+#        if isinstance(other, Number):
+#            return type(self)(*[ el.subtract(other,  *args, **kwargs) for el in self.containers], shape=self.shape)
+#        elif isinstance(other, list) or isinstance(other, numpy.ndarray):
+#            return type(self)(*[ el.subtract(ot,  *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
+#        elif issubclass(other.__class__, DataContainer):
+#            # try to do algebra with one DataContainer. Will raise error if not compatible
+#            return type(self)(*[ el.subtract(other, *args, **kwargs) for el in self.containers], shape=self.shape)
+#        return type(self)(*[ el.subtract(ot,  *args, **kwargs) for el,ot in zip(self.containers,other.containers)],
+#                          shape=self.shape)
+#
+#    def multiply(self, other, *args, **kwargs):
+#        if not self.is_compatible(other):
+#            raise ValueError('{} Incompatible for multiply'.format(other))
+#        out = kwargs.get('out', None)
+#        if isinstance(other, Number):
+#            return type(self)(*[ el.multiply(other, *args, **kwargs) for el in self.containers], shape=self.shape)
+#        elif isinstance(other, list):
+#            return type(self)(*[ el.multiply(ot, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
+#        elif isinstance(other, numpy.ndarray):           
+#            return type(self)(*[ el.multiply(ot, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
+#        elif issubclass(other.__class__, DataContainer):
+#            # try to do algebra with one DataContainer. Will raise error if not compatible
+#            return type(self)(*[ el.multiply(other, *args, **kwargs) for el in self.containers], shape=self.shape)
+#        return type(self)(*[ el.multiply(ot, *args, **kwargs) for el,ot in zip(self.containers,other.containers)],
+#                          shape=self.shape)
+#    
+#    def divide_old(self, other, *args, **kwargs):
+#        if not self.is_compatible(other):
+#            raise ValueError('Incompatible for divide')
+#        out = kwargs.get('out', None)
+#        if isinstance(other, Number):
+#            return type(self)(*[ el.divide(other, *args, **kwargs) for el in self.containers], shape=self.shape)
+#        elif isinstance(other, list) or isinstance(other, numpy.ndarray):
+#            return type(self)(*[ el.divide(ot, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
+#        elif issubclass(other.__class__, DataContainer):
+#            # try to do algebra with one DataContainer. Will raise error if not compatible
+#            if out is not None:
+#                kw = kwargs.copy()
+#                for i,el in enumerate(self.containers):
+#                    kw['out'] = out.get_item(i)
+#                    el.divide(other, *args, **kw)
+#                return
+#            else:
+#                return type(self)(*[ el.divide(other, *args, **kwargs) for el in self.containers], shape=self.shape)
+#        return type(self)(*[ el.divide(ot, *args, **kwargs) for el,ot in zip(self.containers,other.containers)],
+#                          shape=self.shape)
     def add(self, other, *args, **kwargs):
-        if not self.is_compatible(other):
-            raise ValueError('Incompatible for add')
         out = kwargs.get('out', None)
-        #print ("args" , *args)
-        if isinstance(other, Number):
-            return type(self)(*[ el.add(other, *args, **kwargs) for el in self.containers], shape=self.shape)
-        elif isinstance(other, list) or isinstance(other, numpy.ndarray):
-            return type(self)(*[ el.add(ot, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
-        elif issubclass(other.__class__, DataContainer):
-            # try to do algebra with one DataContainer. Will raise error if not compatible
-            return type(self)(*[ el.add(other, *args, **kwargs) for el in self.containers], shape=self.shape)
-        
-        return type(self)(
-            *[ el.add(ot, *args, **kwargs) for el,ot in zip(self.containers,other.containers)],
-            shape=self.shape)
-        
+        if out is not None:
+            self.binary_operations(BlockDataContainer.ADD, other, *args, **kwargs)
+        else:
+            return self.binary_operations(BlockDataContainer.ADD, other, *args, **kwargs)
     def subtract(self, other, *args, **kwargs):
-        if not self.is_compatible(other):
-            raise ValueError('Incompatible for subtract')
         out = kwargs.get('out', None)
-        if isinstance(other, Number):
-            return type(self)(*[ el.subtract(other,  *args, **kwargs) for el in self.containers], shape=self.shape)
-        elif isinstance(other, list) or isinstance(other, numpy.ndarray):
-            return type(self)(*[ el.subtract(ot,  *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
-        elif issubclass(other.__class__, DataContainer):
-            # try to do algebra with one DataContainer. Will raise error if not compatible
-            return type(self)(*[ el.subtract(other, *args, **kwargs) for el in self.containers], shape=self.shape)
-        return type(self)(*[ el.subtract(ot,  *args, **kwargs) for el,ot in zip(self.containers,other.containers)],
-                          shape=self.shape)
-
+        if out is not None:
+            self.binary_operations(BlockDataContainer.SUBTRACT, other, *args, **kwargs)
+        else:
+            return self.binary_operations(BlockDataContainer.SUBTRACT, other, *args, **kwargs)
     def multiply(self, other, *args, **kwargs):
-        if not self.is_compatible(other):
-            raise ValueError('{} Incompatible for multiply'.format(other))
         out = kwargs.get('out', None)
-        if isinstance(other, Number):
-            return type(self)(*[ el.multiply(other, *args, **kwargs) for el in self.containers], shape=self.shape)
-        elif isinstance(other, list):
-            return type(self)(*[ el.multiply(ot, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
-        elif isinstance(other, numpy.ndarray):           
-            return type(self)(*[ el.multiply(ot, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
-        elif issubclass(other.__class__, DataContainer):
-            # try to do algebra with one DataContainer. Will raise error if not compatible
-            return type(self)(*[ el.multiply(other, *args, **kwargs) for el in self.containers], shape=self.shape)
-        return type(self)(*[ el.multiply(ot, *args, **kwargs) for el,ot in zip(self.containers,other.containers)],
-                          shape=self.shape)
-    
+        if out is not None:
+            self.binary_operations(BlockDataContainer.MULTIPLY, other, *args, **kwargs)
+        else:
+            return self.binary_operations(BlockDataContainer.MULTIPLY, other, *args, **kwargs)
     def divide(self, other, *args, **kwargs):
+        out = kwargs.get('out', None)
+        if out is not None:
+            self.binary_operations(BlockDataContainer.DIVIDE, other, *args, **kwargs)
+        else:
+            return self.binary_operations(BlockDataContainer.DIVIDE, other, *args, **kwargs)
+    
+
+    def binary_operations(self, operation, other, *args, **kwargs):
         if not self.is_compatible(other):
             raise ValueError('Incompatible for divide')
         out = kwargs.get('out', None)
-        if isinstance(other, Number):
-            return type(self)(*[ el.divide(other, *args, **kwargs) for el in self.containers], shape=self.shape)
-        elif isinstance(other, list) or isinstance(other, numpy.ndarray):
-            return type(self)(*[ el.divide(ot, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
-        elif issubclass(other.__class__, DataContainer):
+        if isinstance(other, Number) or issubclass(other.__class__, DataContainer):
             # try to do algebra with one DataContainer. Will raise error if not compatible
-            return type(self)(*[ el.divide(other, *args, **kwargs) for el in self.containers], shape=self.shape)
-        return type(self)(*[ el.divide(ot, *args, **kwargs) for el,ot in zip(self.containers,other.containers)],
-                          shape=self.shape)
+            kw = kwargs.copy()
+            res = []
+            for i,el in enumerate(self.containers):
+                if operation == BlockDataContainer.ADD:
+                    op = el.add
+                elif operation == BlockDataContainer.SUBTRACT:
+                    op = el.subtract
+                elif operation == BlockDataContainer.MULTIPLY:
+                    op = el.multiply
+                elif operation == BlockDataContainer.DIVIDE:
+                    op = el.divide
+                elif operation == BlockDataContainer.POWER:
+                    op = el.power
+                else:
+                    raise ValueError('Unsupported operation', operation)
+                if out is not None:
+                    kw['out'] = out.get_item(i)
+                    op(other, *args, **kw)
+                else:
+                    res.append(op(other, *args, **kw))
+            if out is not None:
+                return
+            else:
+                return type(self)(*res, shape=self.shape)
+        elif isinstance(other, (list, numpy.ndarray, BlockDataContainer)):
+            # try to do algebra with one DataContainer. Will raise error if not compatible
+            kw = kwargs.copy()
+            res = []
+            if isinstance(other, BlockDataContainer):
+                the_other = other.containers
+            else:
+                the_other = other
+            for i,zel in enumerate(zip ( self.containers, the_other) ):
+                el = zel[0]
+                ot = zel[1]
+                if operation == BlockDataContainer.ADD:
+                    op = el.add
+                elif operation == BlockDataContainer.SUBTRACT:
+                    op = el.subtract
+                elif operation == BlockDataContainer.MULTIPLY:
+                    op = el.multiply
+                elif operation == BlockDataContainer.DIVIDE:
+                    op = el.divide
+                elif operation == BlockDataContainer.POWER:
+                    op = el.power
+                else:
+                    raise ValueError('Unsupported operation', operation)
+                if out is not None:
+                    kw['out'] = out.get_item(i)
+                    op(ot, *args, **kw)
+                else:
+                    res.append(op(ot, *args, **kw))
+            if out is not None:
+                return
+            else:
+                return type(self)(*res, shape=self.shape)
+            return type(self)(*[ operation(ot, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
+        else:
+            raise ValueError('Incompatible type {}'.format(type(other)))
     
+
     def power(self, other, *args, **kwargs):
         if not self.is_compatible(other):
             raise ValueError('Incompatible for power')
@@ -199,7 +314,6 @@ class BlockDataContainer(object):
         return self.clone()
     def clone(self):
         return type(self)(*[el.copy() for el in self.containers], shape=self.shape)
-
     def fill(self, other):
         if isinstance (other, BlockDataContainer):
             if not self.is_compatible(other):

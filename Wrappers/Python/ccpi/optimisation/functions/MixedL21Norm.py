@@ -21,6 +21,7 @@ import numpy as np
 from ccpi.optimisation.functions import Function, ScaledFunction
 from ccpi.framework import DataContainer, ImageData, \
                            ImageGeometry, BlockDataContainer 
+import functools
 
 ############################   mixed_L1,2NORM FUNCTIONS   #####################
 class MixedL21Norm(Function):
@@ -36,7 +37,9 @@ class MixedL21Norm(Function):
             
             :param: x is a BlockDataContainer
                                 
-        '''                        
+        '''
+        if not isinstance(x, BlockDataContainer):
+            raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x)))                      
         if self.SymTensor:
             
             param = [1]*x.shape[0]
@@ -73,7 +76,6 @@ class MixedL21Norm(Function):
             different form L2NormSquared which acts on DC
         
         '''
-        
         pass
     
     def proximal_conjugate(self, x, tau, out=None): 
@@ -90,17 +92,18 @@ class MixedL21Norm(Function):
         
         else:
 
-                              
-         if out is None:
-            
-            tmp = [ el*el for el in x.containers]
-            res = (sum(tmp).sqrt()).maximum(1.0)                                                                
-            return x/res
-        
-         else:
-                         
-            res = (sum(x**2).sqrt()).maximum(1.0)             
-            out.fill(x/res)
+            if out is None:                                        
+                tmp = [ el*el for el in x.containers]
+                res = sum(tmp).sqrt().maximum(1.0) 
+                frac = [el/res for el in x.containers]
+                res = BlockDataContainer(*frac)    
+                return res
+            else:
+                res1 = functools.reduce(lambda a,b: a + b*b, x.containers, x.get_item(0) * 0 )
+                res = res1.sqrt().maximum(1.0)
+                x.divide(res, out=out)
+                #for i,el in enumerate(x.containers):
+                #    el.divide(res, out=out.get_item(i))
 
     def __rmul__(self, scalar):
         return ScaledFunction(self, scalar) 

@@ -320,6 +320,7 @@ class DataContainer(object):
     
     Data is currently held in a numpy arrays'''
     
+    __container_priority__ = 1
     def __init__ (self, array, deep_copy=True, dimension_labels=None, 
                   **kwargs):
         '''Holds the data'''
@@ -495,119 +496,134 @@ class DataContainer(object):
         return self.shape == other.shape
     
     ## algebra 
-    def __add__(self, other, *args, **kwargs):
-        out = kwargs.get('out', None)
-        
-        if issubclass(type(other), DataContainer):    
-            if self.check_dimensions(other):
-                out = self.as_array() + other.as_array()
-                return type(self)(out, 
-                               deep_copy=True, 
-                               dimension_labels=self.dimension_labels,
-                               geometry=self.geometry)
-            else:
-                raise ValueError('Wrong shape: {0} and {1}'.format(self.shape, 
-                                 other.shape))
-        elif isinstance(other, (int, float, complex)):
-            return type(self)(
-                    self.as_array() + other, 
-                               deep_copy=True, 
-                               dimension_labels=self.dimension_labels,
-                               geometry=self.geometry)
-        else:
-            raise TypeError('Cannot {0} DataContainer with {1}'.format("add" ,
-                            type(other)))
-    # __add__
+#    def __add__(self, other, *args, **kwargs):
+#        out = kwargs.get('out', None)
+#        
+#        if issubclass(type(other), DataContainer):    
+#            if self.check_dimensions(other):
+#                out = self.as_array() + other.as_array()
+#                return type(self)(out, 
+#                               deep_copy=True, 
+#                               dimension_labels=self.dimension_labels,
+#                               geometry=self.geometry)
+#            else:
+#                raise ValueError('Wrong shape: {0} and {1}'.format(self.shape, 
+#                                 other.shape))
+#        elif isinstance(other, (int, float, complex)):
+#            return type(self)(
+#                    self.as_array() + other, 
+#                               deep_copy=True, 
+#                               dimension_labels=self.dimension_labels,
+#                               geometry=self.geometry)
+#        else:
+#            raise TypeError('Cannot {0} DataContainer with {1}'.format("add" ,
+#                            type(other)))
+#    # __add__
+#    
+#    def __sub__(self, other):
+#        if issubclass(type(other), DataContainer):    
+#            if self.check_dimensions(other):
+#                out = self.as_array() - other.as_array()
+#                return type(self)(out, 
+#                               deep_copy=True, 
+#                               dimension_labels=self.dimension_labels,
+#                               geometry=self.geometry)
+#            else:
+#                raise ValueError('__sub__ Wrong shape: {0} and {1}'.format(self.shape, 
+#                                 other.shape))
+#        elif isinstance(other, (int, float, complex)):
+#            return type(self)(self.as_array() - other, 
+#                               deep_copy=True, 
+#                               dimension_labels=self.dimension_labels,
+#                               geometry=self.geometry)
+#        else:
+#            raise TypeError('Cannot {0} DataContainer with {1}'.format("subtract" ,
+#                            type(other)))
+#    # __sub__
+#    def __truediv__(self,other):
+#        return self.__div__(other)
+#    
+#    def __div__(self, other):
+#        if issubclass(type(other), DataContainer):    
+#            if self.check_dimensions(other):
+#                out = self.as_array() / other.as_array()
+#                return type(self)(out, 
+#                               deep_copy=True, 
+#                               dimension_labels=self.dimension_labels,
+#                               geometry=self.geometry)
+#            else:
+#                raise ValueError('__div__ Wrong shape: {0} and {1}'.format(self.shape, 
+#                                 other.shape))
+#        elif isinstance(other, (int, float, complex)):
+#            return type(self)(self.as_array() / other, 
+#                               deep_copy=True, 
+#                               dimension_labels=self.dimension_labels,
+#                               geometry=self.geometry)
+#        else:
+#            raise TypeError('Cannot {0} DataContainer with {1}'.format("divide" ,
+#                            type(other)))
+#    # __div__
+#    
+#    def __pow__(self, other):
+#        if issubclass(type(other), DataContainer):    
+#            if self.check_dimensions(other):
+#                out = self.as_array() ** other.as_array()
+#                return type(self)(out, 
+#                               deep_copy=True, 
+#                               dimension_labels=self.dimension_labels,
+#                               geometry=self.geometry)
+#            else:
+#                raise ValueError('__pow__ Wrong shape: {0} and {1}'.format(self.shape, 
+#                                 other.shape))
+#        elif isinstance(other, (int, float, complex)):
+#            return type(self)(self.as_array() ** other, 
+#                               deep_copy=True, 
+#                               dimension_labels=self.dimension_labels,
+#                               geometry=self.geometry)
+#        else:
+#            raise TypeError('pow: Cannot {0} DataContainer with {1}'.format("power" ,
+#                            type(other)))
+#    # __pow__
+#    
+#    def __mul__(self, other):
+#        if issubclass(type(other), DataContainer):    
+#            if self.check_dimensions(other):
+#                out = self.as_array() * other.as_array()
+#                return type(self)(out, 
+#                               deep_copy=True, 
+#                               dimension_labels=self.dimension_labels,
+#                               geometry=self.geometry)
+#            else:
+#                raise ValueError('*:Wrong shape: {0} and {1}'.format(self.shape, 
+#                                 other.shape))
+#        elif isinstance(other, (int, float, complex,\
+#                                numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64,\
+#                                numpy.float, numpy.float16, numpy.float32, numpy.float64, \
+#                                numpy.complex)):
+#            return type(self)(self.as_array() * other, 
+#                               deep_copy=True, 
+#                               dimension_labels=self.dimension_labels,
+#                               geometry=self.geometry)
+#            
+#        else:
+#            raise TypeError('Cannot {0} DataContainer with {1}'.format("multiply" ,
+#                            type(other)))
+#    # __mul__
     
-    def __sub__(self, other):
-        if issubclass(type(other), DataContainer):    
-            if self.check_dimensions(other):
-                out = self.as_array() - other.as_array()
-                return type(self)(out, 
-                               deep_copy=True, 
-                               dimension_labels=self.dimension_labels,
-                               geometry=self.geometry)
-            else:
-                raise ValueError('__sub__ Wrong shape: {0} and {1}'.format(self.shape, 
-                                 other.shape))
-        elif isinstance(other, (int, float, complex)):
-            return type(self)(self.as_array() - other, 
-                               deep_copy=True, 
-                               dimension_labels=self.dimension_labels,
-                               geometry=self.geometry)
-        else:
-            raise TypeError('Cannot {0} DataContainer with {1}'.format("subtract" ,
-                            type(other)))
-    # __sub__
-    def __truediv__(self,other):
-        return self.__div__(other)
-    
-    def __div__(self, other):
-        if issubclass(type(other), DataContainer):    
-            if self.check_dimensions(other):
-                out = self.as_array() / other.as_array()
-                return type(self)(out, 
-                               deep_copy=True, 
-                               dimension_labels=self.dimension_labels,
-                               geometry=self.geometry)
-            else:
-                raise ValueError('__div__ Wrong shape: {0} and {1}'.format(self.shape, 
-                                 other.shape))
-        elif isinstance(other, (int, float, complex)):
-            return type(self)(self.as_array() / other, 
-                               deep_copy=True, 
-                               dimension_labels=self.dimension_labels,
-                               geometry=self.geometry)
-        else:
-            raise TypeError('Cannot {0} DataContainer with {1}'.format("divide" ,
-                            type(other)))
-    # __div__
-    
-    def __pow__(self, other):
-        if issubclass(type(other), DataContainer):    
-            if self.check_dimensions(other):
-                out = self.as_array() ** other.as_array()
-                return type(self)(out, 
-                               deep_copy=True, 
-                               dimension_labels=self.dimension_labels,
-                               geometry=self.geometry)
-            else:
-                raise ValueError('__pow__ Wrong shape: {0} and {1}'.format(self.shape, 
-                                 other.shape))
-        elif isinstance(other, (int, float, complex)):
-            return type(self)(self.as_array() ** other, 
-                               deep_copy=True, 
-                               dimension_labels=self.dimension_labels,
-                               geometry=self.geometry)
-        else:
-            raise TypeError('pow: Cannot {0} DataContainer with {1}'.format("power" ,
-                            type(other)))
-    # __pow__
-    
+    def __add__(self, other):
+        return self.add(other)
     def __mul__(self, other):
-        if issubclass(type(other), DataContainer):    
-            if self.check_dimensions(other):
-                out = self.as_array() * other.as_array()
-                return type(self)(out, 
-                               deep_copy=True, 
-                               dimension_labels=self.dimension_labels,
-                               geometry=self.geometry)
-            else:
-                raise ValueError('*:Wrong shape: {0} and {1}'.format(self.shape, 
-                                 other.shape))
-        elif isinstance(other, (int, float, complex,\
-                                numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64,\
-                                numpy.float, numpy.float16, numpy.float32, numpy.float64, \
-                                numpy.complex)):
-            return type(self)(self.as_array() * other, 
-                               deep_copy=True, 
-                               dimension_labels=self.dimension_labels,
-                               geometry=self.geometry)
-            
-        else:
-            raise TypeError('Cannot {0} DataContainer with {1}'.format("multiply" ,
-                            type(other)))
-    # __mul__
+        return self.multiply(other)
+    def __sub__(self, other):
+        return self.subtract(other)
+    def __div__(self, other):
+        return self.divide(other)
+    def __truediv__(self, other):
+        return self.divide(other)
+    def __pow__(self, other):
+        return self.power(other)
+    
+    
     
     # reverse operand
     def __radd__(self, other):
@@ -648,54 +664,72 @@ class DataContainer(object):
     # (+=, -=, *=, /= , //=,
     # must return self
     
-    
-    
     def __iadd__(self, other):
-        if isinstance(other, (int, float)) :
-            numpy.add(self.array, other, out=self.array)
-        elif issubclass(type(other), DataContainer):
-            if self.check_dimensions(other):
-                numpy.add(self.array, other.array, out=self.array)
-            else:
-                raise ValueError('Dimensions do not match')
-        return self
-    # __iadd__
+        kw = {'out':self}
+        return self.add(other, **kw)
     
     def __imul__(self, other):
-        if isinstance(other, (int, float)) :
-            arr = self.as_array()
-            numpy.multiply(arr, other, out=arr)
-        elif issubclass(type(other), DataContainer):
-            if self.check_dimensions(other):
-                numpy.multiply(self.array, other.array, out=self.array)
-            else:
-                raise ValueError('Dimensions do not match')
-        return self
-    # __imul__
+        kw = {'out':self}
+        return self.multiply(other, **kw)
     
     def __isub__(self, other):
-        if isinstance(other, (int, float)) :
-            numpy.subtract(self.array, other, out=self.array)
-        elif issubclass(type(other), DataContainer):
-            if self.check_dimensions(other):
-                numpy.subtract(self.array, other.array, out=self.array)
-            else:
-                raise ValueError('Dimensions do not match')
-        return self
-    # __isub__
+        kw = {'out':self}
+        return self.subtract(other, **kw)
     
     def __idiv__(self, other):
-        return self.__itruediv__(other)
+        kw = {'out':self}
+        return self.divide(other, **kw)
+    
     def __itruediv__(self, other):
-        if isinstance(other, (int, float)) :
-            numpy.divide(self.array, other, out=self.array)
-        elif issubclass(type(other), DataContainer):
-            if self.check_dimensions(other):
-                numpy.divide(self.array, other.array, out=self.array)
-            else:
-                raise ValueError('Dimensions do not match')
-        return self
-    # __idiv__
+        kw = {'out':self}
+        return self.divide(other, **kw)
+    
+#    def __iadd__(self, other):
+#        if isinstance(other, (int, float)) :
+#            numpy.add(self.array, other, out=self.array)
+#        elif issubclass(type(other), DataContainer):
+#            if self.check_dimensions(other):
+#                numpy.add(self.array, other.array, out=self.array)
+#            else:
+#                raise ValueError('Dimensions do not match')
+#        return self
+#    # __iadd__
+#    
+#    def __imul__(self, other):
+#        if isinstance(other, (int, float)) :
+#            arr = self.as_array()
+#            numpy.multiply(arr, other, out=arr)
+#        elif issubclass(type(other), DataContainer):
+#            if self.check_dimensions(other):
+#                numpy.multiply(self.array, other.array, out=self.array)
+#            else:
+#                raise ValueError('Dimensions do not match')
+#        return self
+#    # __imul__
+#    
+#    def __isub__(self, other):
+#        if isinstance(other, (int, float)) :
+#            numpy.subtract(self.array, other, out=self.array)
+#        elif issubclass(type(other), DataContainer):
+#            if self.check_dimensions(other):
+#                numpy.subtract(self.array, other.array, out=self.array)
+#            else:
+#                raise ValueError('Dimensions do not match')
+#        return self
+#    # __isub__
+#    
+#    def __idiv__(self, other):
+#        return self.__itruediv__(other)
+#    def __itruediv__(self, other):
+#        if isinstance(other, (int, float)) :
+#            numpy.divide(self.array, other, out=self.array)
+#        elif issubclass(type(other), DataContainer):
+#            if self.check_dimensions(other):
+#                numpy.divide(self.array, other.array, out=self.array)
+#            else:
+#                raise ValueError('Dimensions do not match')
+#        return self
+#    # __idiv__
     
     def __str__ (self, representation=False):
         repres = ""
@@ -802,15 +836,27 @@ class DataContainer(object):
             raise ValueError (message(type(self),  "incompatible class:" , pwop.__name__, type(out)))
     
     def add(self, other, *args, **kwargs):
+        if hasattr(other, '__container_priority__') and \
+           self.__class__.__container_priority__ < other.__class__.__container_priority__:
+            return other.add(self, *args, **kwargs)
         return self.pixel_wise_binary(numpy.add, other, *args, **kwargs)
     
     def subtract(self, other, *args, **kwargs):
+        if hasattr(other, '__container_priority__') and \
+           self.__class__.__container_priority__ < other.__class__.__container_priority__:
+            return other.subtract(self, *args, **kwargs)
         return self.pixel_wise_binary(numpy.subtract, other, *args, **kwargs)
 
     def multiply(self, other, *args, **kwargs):
+        if hasattr(other, '__container_priority__') and \
+           self.__class__.__container_priority__ < other.__class__.__container_priority__:
+            return other.multiply(self, *args, **kwargs)
         return self.pixel_wise_binary(numpy.multiply, other, *args, **kwargs)
     
     def divide(self, other, *args, **kwargs):
+        if hasattr(other, '__container_priority__') and \
+           self.__class__.__container_priority__ < other.__class__.__container_priority__:
+            return other.divide(self, *args, **kwargs)
         return self.pixel_wise_binary(numpy.divide, other, *args, **kwargs)
     
     def power(self, other, *args, **kwargs):
@@ -883,7 +929,7 @@ class DataContainer(object):
     
 class ImageData(DataContainer):
     '''DataContainer for holding 2D or 3D DataContainer'''
-    
+    __container_priority__ = 1
     def __init__(self, 
                  array = None, 
                  deep_copy=False, 
@@ -1006,7 +1052,7 @@ class ImageData(DataContainer):
 
 class AcquisitionData(DataContainer):
     '''DataContainer for holding 2D or 3D sinogram'''
-    
+    __container_priority__ = 1
     def __init__(self, 
                  array = None, 
                  deep_copy=True, 

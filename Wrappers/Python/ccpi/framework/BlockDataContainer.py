@@ -45,6 +45,7 @@ class BlockDataContainer(object):
     DIVIDE = 'divide'
     POWER = 'power'
     __array_priority__ = 1
+    __container_priority__ = 2
     def __init__(self, *args, **kwargs):
         ''''''
         self.containers = args

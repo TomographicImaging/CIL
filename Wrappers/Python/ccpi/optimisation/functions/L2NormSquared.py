@@ -20,38 +20,36 @@
 import numpy
 from ccpi.optimisation.functions import Function
 from ccpi.optimisation.functions.ScaledFunction import ScaledFunction
-from ccpi.framework import DataContainer, ImageData, ImageGeometry  
 
-############################   L2NORM FUNCTION   #############################
 class L2NormSquared(Function):
     
+    ''' 
+    
+    Class: L2NormSquared 
+        
+    Cases:  a) f(x) = ||x||^{2}
+    
+            b) f(x) = ||x - b||^{2}, b
+                             
+    '''    
+    
     def __init__(self, **kwargs):
-        
-        ''' L2NormSquared class
-            f : ImageGeometry --> R
-            
-            Cases: f(x) = ||x||^{2}_{2}
-                   f(x) = || x - b ||^{2}_{2}     
-        
-        '''
-        
-        #TODO need x, b to live in the same geometry if b is not None
-                        
+                                
         super(L2NormSquared, self).__init__()
         self.b = kwargs.get('b',None)  
 
     def __call__(self, x):
-        ''' Evaluates L2NormSq at point x'''
         
+        """ 
+        
+        Evaluate L2NormSquared at x: f(x)
+        
+        
+        """
+            
         y = x
         if self.b is not None: 
-#            x.subtract(self.b, out = x)
             y = x - self.b
-#        else:
-#            y
-#        if out is None:
-#            return x.squared_norm()
-#        else:
         try:
             return y.squared_norm()
         except AttributeError as ae:
@@ -61,6 +59,8 @@ class L2NormSquared(Function):
             
         
     def gradient(self, x, out=None):
+        
+        
         ''' Evaluates gradient of L2NormSq at point x'''
         if out is not None:
             out.fill(x)

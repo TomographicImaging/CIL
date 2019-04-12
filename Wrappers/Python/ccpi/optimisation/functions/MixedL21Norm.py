@@ -102,9 +102,6 @@ class MixedL21Norm(Function):
             res = (sum(x**2).sqrt()).maximum(1.0)             
             out.fill(x/res)
 
-            
-
-
     def __rmul__(self, scalar):
         return ScaledFunction(self, scalar) 
 

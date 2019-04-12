@@ -78,9 +78,13 @@ class BlockDataContainer(object):
                     a = el.is_compatible(other)
                 else:
                     a = el.shape == other.shape
+#                print ("current element" , el.shape, "other ", other.shape, "same shape" , a)
                 ret = ret and a
             return ret
-
+        
+        
+#        elif issubclass(other.__class__, DataContainer):
+#            return self.get_item(0).shape == other.shape
         return len(self.containers) == len(other.containers)
 
     def get_item(self, row):
@@ -350,32 +354,3 @@ class BlockDataContainer(object):
         '''Inline truedivision'''
         return self.__idiv__(other)
 
-if __name__ == '__main__':
-    
-    M, N, K = 2,3,5
-    from ccpi.framework import ImageGeometry, BlockGeometry
-    
-    ig = ImageGeometry(N, M)
-    u = ig.allocate('random_int')
-    
-    BG = BlockGeometry(ig, ig)
-    U = BG.allocate('random_int')
-    
-    U_nested = BlockDataContainer(BlockDataContainer(u, u), u)
-    
-    
-    res1 = U + u
-    res2 = U_nested + u
-#    res2 = u + U
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    

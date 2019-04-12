@@ -90,8 +90,8 @@ print ("normK", normK)
 sigma = 1
 tau = 1/(sigma*normK**2)
 
-opt = {'niter':100}
-opt1 = {'niter':100, 'memopt': True}
+opt = {'niter':1000}
+opt1 = {'niter':1000, 'memopt': True}
 
 t1 = timer()
 res, time, primal, dual, pdgap = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt) 

@@ -302,13 +302,26 @@ class BlockDataContainer(object):
         return type(self)(*[el.conjugate() for el in self.containers], shape=self.shape)
     
     ## reductions
+    
     def sum(self, *args, **kwargs):
         return numpy.sum([ el.sum(*args, **kwargs) for el in self.containers])
+    
     def squared_norm(self):
         y = numpy.asarray([el.squared_norm() for el in self.containers])
         return y.sum() 
+    
     def norm(self):
-        return numpy.sqrt(self.squared_norm())    
+        return numpy.sqrt(self.squared_norm())   
+    
+    def pnorm(self, p=2):
+                        
+        if p==1:            
+            return sum(self.abs())        
+        elif p==2:                    
+            return sum([el*el for el in self.containers]).sqrt()
+        else:
+            return ValueError('Not implemented')
+                
     def copy(self):
         '''alias of clone'''    
         return self.clone()
@@ -467,7 +480,38 @@ class BlockDataContainer(object):
     def __itruediv__(self, other):
         '''Inline truedivision'''
         return self.__idiv__(other)
+    
+    
 
+    
+    
+if __name__ == '__main__':
+    
+    from ccpi.framework import ImageGeometry, BlockGeometry
+    import numpy
+
+    N, M = 2, 3
+    ig = ImageGeometry(N, M)    
+    BG = BlockGeometry(ig, ig)
+    
+    U = BG.allocate('random_int')
+    
+    
+    print ("test sum BDC " )
+    w = U[0].as_array() + U[1].as_array()    
+    w1 = sum(U).as_array()    
+    numpy.testing.assert_array_equal(w, w1)
+    
+    print ("test sum BDC " )
+    z = numpy.sqrt(U[0].as_array()**2 + U[1].as_array()**2)
+    z1 = sum(U**2).sqrt().as_array()    
+    numpy.testing.assert_array_equal(z, z1)   
+    
+    
+
+    z2 = U.pnorm(2)
+    
+   
 
 
 

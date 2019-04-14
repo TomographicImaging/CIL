@@ -138,6 +138,7 @@ plt.colorbar()
 plt.subplot(1,3,2)
 plt.imshow(res1.as_array())
 plt.colorbar()
+
 #plt.show()
 
 

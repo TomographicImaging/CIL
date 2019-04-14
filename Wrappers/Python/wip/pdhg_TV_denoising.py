@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 from ccpi.optimisation.algorithms import PDHG, PDHG_old
 
 from ccpi.optimisation.operators import BlockOperator, Identity, Gradient
-from ccpi.optimisation.functions import ZeroFun, L2NormSquared, \
+from ccpi.optimisation.functions import ZeroFunction, L2NormSquared, \
                       MixedL21Norm, FunctionOperatorComposition, BlockFunction, ScaledFunction
 
 from skimage.util import random_noise
@@ -66,7 +66,7 @@ if method == '0':
     f2 = 0.5 * L2NormSquared(b = noisy_data)    
     f = BlockFunction(f1, f2)  
                                       
-    g = ZeroFun()
+    g = ZeroFunction()
     
 else:
     

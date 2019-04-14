@@ -6,36 +6,35 @@ Created on Fri Mar  8 10:01:31 2019
 @author: evangelos
 """
 
-import numpy as np
-
 from ccpi.optimisation.functions import Function
 from ccpi.framework import BlockDataContainer
 from numbers import Number
 
 class BlockFunction(Function):
     
-    '''A Block vector of Functions
+    '''BlockFunction acts as a separable sum function, i.e.,
     
-    .. math::
-
-      f = [f_1,f_2,f_3]
-      f([x_1,x_2,x_3]) = f_1(x_1) + f_2(x_2) + f_3(x_3)
+      f = [f_1,...,f_n]
+      
+      f([x_1,...,x_n]) = f_1(x_1) +  .... + f_n(x_n)
 
     '''
     def __init__(self, *functions):
-        '''Creator'''
+        
         self.functions = functions      
         self.length = len(self.functions)
         
         super(BlockFunction, self).__init__()
         
     def __call__(self, x):
-        '''evaluates the BlockFunction on the BlockDataContainer
+        
+        '''Evaluates the BlockFunction at a BlockDataContainer x
         
         :param: x (BlockDataContainer): must have as many rows as self.length
 
         returns sum(f_i(x_i))
         '''
+        
         if self.length != x.shape[0]:
             raise ValueError('BlockFunction and BlockDataContainer have incompatible size')
         t = 0                
@@ -44,7 +43,12 @@ class BlockFunction(Function):
         return t
     
     def convex_conjugate(self, x):
-        '''Convex_conjugate does not take into account the BlockOperator'''        
+        
+        ''' Evaluate convex conjugate of BlockFunction at x
+        
+        returns sum(f_i^{*}(x_i))
+        
+        '''       
         t = 0                
         for i in range(x.shape[0]):
             t += self.functions[i].convex_conjugate(x.get_item(i))
@@ -52,7 +56,13 @@ class BlockFunction(Function):
     
     
     def proximal_conjugate(self, x, tau, out = None):
-        '''proximal_conjugate does not take into account the BlockOperator'''
+        
+        ''' Evaluate Proximal Operator of tau * f(\cdot) at x
+        
+        prox_{tau*f}(x) = sum_{i} prox_{tau*f_{i}}(x_{i}) 
+        
+        
+        '''
 
         if out is not None:
             if isinstance(tau, Number):
@@ -76,7 +86,14 @@ class BlockFunction(Function):
 
     
     def proximal(self, x, tau, out = None):
-        '''proximal does not take into account the BlockOperator'''
+        
+        ''' Evaluate Proximal Operator of tau * f^{*}(\cdot) at x
+        
+        prox_{tau*f^{*}}(x) = sum_{i} prox_{tau*f^{*}_{i}}(x_{i}) 
+        
+        
+        '''
+                
         out = [None]*self.length
         if isinstance(tau, Number):
             for i in range(self.length):
@@ -88,8 +105,19 @@ class BlockFunction(Function):
         return BlockDataContainer(*out)     
     
     def gradient(self,x, out=None):
-        '''FIXME: gradient returns pass'''
-        pass
+        
+        ''' Evaluate gradient of f at x: f'(x) 
+        
+        returns: BlockDataContainer [f_{1}'(x_{1}), ... , f_{n}'(x_{n})]
+                
+        '''
+        
+        out = [None]*self.length
+        for i in range(self.length):
+            out[i] = self.functions[i].gradient(x.get_item(i))
+            
+        return  BlockDataContainer(*out)           
+                            
     
     
 if __name__ == '__main__':
@@ -100,6 +128,7 @@ if __name__ == '__main__':
     from ccpi.framework import ImageGeometry, BlockGeometry
     from ccpi.optimisation.operators import Gradient, Identity, BlockOperator
     import numpy
+    import numpy as np
     
     
     ig = ImageGeometry(M, N)
@@ -131,11 +160,7 @@ if __name__ == '__main__':
     numpy.testing.assert_array_almost_equal(res_no_out[1].as_array(), \
                                             res_out[1].as_array(), decimal=4)     
     
-    
-    
-    
-    
-    
+                    
     
     ##########################################################################
     

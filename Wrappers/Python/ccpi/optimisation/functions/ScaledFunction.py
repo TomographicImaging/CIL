@@ -20,6 +20,7 @@ from numbers import Number
 import numpy
 
 class ScaledFunction(object):
+    
     '''ScaledFunction
 
     A class to represent the scalar multiplication of an Function with a scalar.
@@ -48,12 +49,22 @@ class ScaledFunction(object):
 
     def convex_conjugate(self, x):
         '''returns the convex_conjugate of the scaled function '''
-        # if out is None:
-        #     return self.scalar * self.function.convex_conjugate(x/self.scalar)
-        # else:
-        #     out.fill(self.function.convex_conjugate(x/self.scalar))
-        #     out *= self.scalar
         return self.scalar * self.function.convex_conjugate(x/self.scalar)
+    
+    def gradient(self, x, out=None):
+        '''Returns the gradient of the function at x, if the function is differentiable'''
+        if out is None:            
+            return self.scalar * self.function.gradient(x)    
+        else:
+            out.fill( self.scalar * self.function.gradient(x) )
+
+    def proximal(self, x, tau, out=None):
+        '''This returns the proximal operator for the function at x, tau
+        '''
+        if out is None:
+            return self.function.proximal(x, tau*self.scalar)     
+        else:
+            out.fill( self.function.proximal(x, tau*self.scalar) )
 
     def proximal_conjugate(self, x, tau, out = None):
         '''This returns the proximal operator for the function at x, tau
@@ -76,20 +87,7 @@ class ScaledFunction(object):
         versions of the CIL. Use proximal instead''', DeprecationWarning)
         return self.proximal(x, out=None)
 
-    def gradient(self, x, out=None):
-        '''Returns the gradient of the function at x, if the function is differentiable'''
-        if out is None:            
-            return self.scalar * self.function.gradient(x)    
-        else:
-            out.fill( self.scalar * self.function.gradient(x) )
 
-    def proximal(self, x, tau, out=None):
-        '''This returns the proximal operator for the function at x, tau
-        '''
-        if out is None:
-            return self.function.proximal(x, tau*self.scalar)     
-        else:
-            out.fill( self.function.proximal(x, tau*self.scalar) )
             
 if __name__ == '__main__':        
 

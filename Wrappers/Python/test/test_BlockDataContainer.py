@@ -369,6 +369,12 @@ class TestBlockDataContainer(unittest.TestCase):
         c5 = nbdc.get_item(0).power(2).sum()
         c5a = nbdc.power(2).sum()
         print ("sum", c5a, c5)
+        
+        cp0 = BlockDataContainer(data0,data2)
+        a = cp0 * data2
+        b = data2 * cp0
+        self.assertBlockDataContainerEqual(a,b)
+        
 
         print ("test_Nested_BlockDataContainer OK")
     def stest_NestedBlockDataContainer2(self):

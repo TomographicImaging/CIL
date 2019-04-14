@@ -45,6 +45,7 @@ class BlockDataContainer(object):
     DIVIDE = 'divide'
     POWER = 'power'
     __array_priority__ = 1
+    __container_priority__ = 2
     def __init__(self, *args, **kwargs):
         ''''''
         self.containers = args
@@ -97,7 +98,6 @@ class BlockDataContainer(object):
                     a = el.is_compatible(other)
                 else:
                     a = el.shape == other.shape
-#                print ("current element" , el.shape, "other ", other.shape, "same shape" , a)
                 ret = ret and a
             return ret
             #return self.get_item(0).shape == other.shape
@@ -111,92 +111,45 @@ class BlockDataContainer(object):
     def __getitem__(self, row):
         return self.get_item(row)
                 
-#    def add(self, other, *args, **kwargs):
-#        if not self.is_compatible(other):
-#            raise ValueError('Incompatible for add')
-#        out = kwargs.get('out', None)
-#        #print ("args" , *args)
-#        if isinstance(other, Number):
-#            return type(self)(*[ el.add(other, *args, **kwargs) for el in self.containers], shape=self.shape)
-#        elif isinstance(other, list) or isinstance(other, numpy.ndarray):
-#            return type(self)(*[ el.add(ot, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
-#        elif issubclass(other.__class__, DataContainer):
-#            # try to do algebra with one DataContainer. Will raise error if not compatible
-#            return type(self)(*[ el.add(other, *args, **kwargs) for el in self.containers], shape=self.shape)
-#        
-#        return type(self)(
-#            *[ el.add(ot, *args, **kwargs) for el,ot in zip(self.containers,other.containers)],
-#            shape=self.shape)
-#        
-#    def subtract(self, other, *args, **kwargs):
-#        if not self.is_compatible(other):
-#            raise ValueError('Incompatible for subtract')
-#        out = kwargs.get('out', None)
-#        if isinstance(other, Number):
-#            return type(self)(*[ el.subtract(other,  *args, **kwargs) for el in self.containers], shape=self.shape)
-#        elif isinstance(other, list) or isinstance(other, numpy.ndarray):
-#            return type(self)(*[ el.subtract(ot,  *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
-#        elif issubclass(other.__class__, DataContainer):
-#            # try to do algebra with one DataContainer. Will raise error if not compatible
-#            return type(self)(*[ el.subtract(other, *args, **kwargs) for el in self.containers], shape=self.shape)
-#        return type(self)(*[ el.subtract(ot,  *args, **kwargs) for el,ot in zip(self.containers,other.containers)],
-#                          shape=self.shape)
-#
-#    def multiply(self, other, *args, **kwargs):
-#        if not self.is_compatible(other):
-#            raise ValueError('{} Incompatible for multiply'.format(other))
-#        out = kwargs.get('out', None)
-#        if isinstance(other, Number):
-#            return type(self)(*[ el.multiply(other, *args, **kwargs) for el in self.containers], shape=self.shape)
-#        elif isinstance(other, list):
-#            return type(self)(*[ el.multiply(ot, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
-#        elif isinstance(other, numpy.ndarray):           
-#            return type(self)(*[ el.multiply(ot, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
-#        elif issubclass(other.__class__, DataContainer):
-#            # try to do algebra with one DataContainer. Will raise error if not compatible
-#            return type(self)(*[ el.multiply(other, *args, **kwargs) for el in self.containers], shape=self.shape)
-#        return type(self)(*[ el.multiply(ot, *args, **kwargs) for el,ot in zip(self.containers,other.containers)],
-#                          shape=self.shape)
-#    
-#    def divide_old(self, other, *args, **kwargs):
-#        if not self.is_compatible(other):
-#            raise ValueError('Incompatible for divide')
-#        out = kwargs.get('out', None)
-#        if isinstance(other, Number):
-#            return type(self)(*[ el.divide(other, *args, **kwargs) for el in self.containers], shape=self.shape)
-#        elif isinstance(other, list) or isinstance(other, numpy.ndarray):
-#            return type(self)(*[ el.divide(ot, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
-#        elif issubclass(other.__class__, DataContainer):
-#            # try to do algebra with one DataContainer. Will raise error if not compatible
-#            if out is not None:
-#                kw = kwargs.copy()
-#                for i,el in enumerate(self.containers):
-#                    kw['out'] = out.get_item(i)
-#                    el.divide(other, *args, **kw)
-#                return
-#            else:
-#                return type(self)(*[ el.divide(other, *args, **kwargs) for el in self.containers], shape=self.shape)
-#        return type(self)(*[ el.divide(ot, *args, **kwargs) for el,ot in zip(self.containers,other.containers)],
-#                          shape=self.shape)
     def add(self, other, *args, **kwargs):
+        '''Algebra: add method of BlockDataContainer with number/DataContainer or BlockDataContainer
+        
+        :param: other (number, DataContainer or subclasses or BlockDataContainer
+        :param: out (optional): provides a placehold for the resul.
+        '''
         out = kwargs.get('out', None)
         if out is not None:
             self.binary_operations(BlockDataContainer.ADD, other, *args, **kwargs)
         else:
             return self.binary_operations(BlockDataContainer.ADD, other, *args, **kwargs)
     def subtract(self, other, *args, **kwargs):
+        '''Algebra: subtract method of BlockDataContainer with number/DataContainer or BlockDataContainer
+        
+        :param: other (number, DataContainer or subclasses or BlockDataContainer
+        :param: out (optional): provides a placehold for the resul.
+        '''
         out = kwargs.get('out', None)
         if out is not None:
             self.binary_operations(BlockDataContainer.SUBTRACT, other, *args, **kwargs)
         else:
             return self.binary_operations(BlockDataContainer.SUBTRACT, other, *args, **kwargs)
     def multiply(self, other, *args, **kwargs):
+        '''Algebra: multiply method of BlockDataContainer with number/DataContainer or BlockDataContainer
+        
+        :param: other (number, DataContainer or subclasses or BlockDataContainer
+        :param: out (optional): provides a placehold for the resul.
+        '''
         out = kwargs.get('out', None)
         if out is not None:
             self.binary_operations(BlockDataContainer.MULTIPLY, other, *args, **kwargs)
         else:
             return self.binary_operations(BlockDataContainer.MULTIPLY, other, *args, **kwargs)
     def divide(self, other, *args, **kwargs):
+        '''Algebra: divide method of BlockDataContainer with number/DataContainer or BlockDataContainer
+        
+        :param: other (number, DataContainer or subclasses or BlockDataContainer
+        :param: out (optional): provides a placehold for the resul.
+        '''
         out = kwargs.get('out', None)
         if out is not None:
             self.binary_operations(BlockDataContainer.DIVIDE, other, *args, **kwargs)
@@ -205,6 +158,14 @@ class BlockDataContainer(object):
     
 
     def binary_operations(self, operation, other, *args, **kwargs):
+        '''Algebra: generic method of algebric operation with BlockDataContainer with number/DataContainer or BlockDataContainer
+        
+        Provides commutativity with DataContainer and subclasses, i.e. this 
+        class's reverse algebric methods take precedence w.r.t. direct algebric
+        methods of DataContainer and subclasses.
+        
+        This method is not to be used directly
+        '''
         if not self.is_compatible(other):
             raise ValueError('Incompatible for divide')
         out = kwargs.get('out', None)

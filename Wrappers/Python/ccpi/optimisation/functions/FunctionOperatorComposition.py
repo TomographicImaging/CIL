@@ -6,31 +6,46 @@ Created on Fri Mar  8 09:55:36 2019
 @author: evangelos
 """
 
-import numpy as np
-#from ccpi.optimisation.funcs import Function
 from ccpi.optimisation.functions import Function
 from ccpi.optimisation.functions import ScaledFunction
 
 
 class FunctionOperatorComposition(Function):
     
+    ''' Function composition with Operator, i.e., f(Ax)
+    
+        A: operator
+        f: function
+    
+    '''
+    
     def __init__(self, operator, function):
+        
         super(FunctionOperatorComposition, self).__init__()
         self.function = function     
         self.operator = operator
         alpha = 1
+        
         if isinstance (function, ScaledFunction):
             alpha = function.scalar
         self.L = 2 * alpha * operator.norm()**2
         
         
     def __call__(self, x):
+        
+        ''' Evaluate FunctionOperatorComposition at x
+        
+        returns f(Ax)
+        
+        '''
     
         return self.function(self.operator.direct(x))   
 
+    #TODO do not know if we need it
     def call_adjoint(self, x):
     
         return self.function(self.operator.adjoint(x))  
+
 
     def convex_conjugate(self, x):
         

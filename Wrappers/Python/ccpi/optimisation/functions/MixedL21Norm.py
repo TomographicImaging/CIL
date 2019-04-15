@@ -17,47 +17,48 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import numpy as np
 from ccpi.optimisation.functions import Function, ScaledFunction
-from ccpi.framework import DataContainer, ImageData, \
-                           ImageGeometry, BlockDataContainer 
+from ccpi.framework import BlockDataContainer
+
 import functools
 
-############################   mixed_L1,2NORM FUNCTIONS   #####################
 class MixedL21Norm(Function):
+    
+    
+    '''
+        f(x) = ||x||_{2,1} = \sum |x|_{2}                   
+    '''      
     
     def __init__(self, **kwargs):
 
         super(MixedL21Norm, self).__init__()                      
         self.SymTensor = kwargs.get('SymTensor',False)
         
-    def __call__(self, x, out=None):
+    def __call__(self, x):
         
-        ''' Evaluates L1,2Norm at point x
+        ''' Evaluates L2,1Norm at point x
             
             :param: x is a BlockDataContainer
                                 
         '''
         if not isinstance(x, BlockDataContainer):
-            raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x)))                      
+            raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 
+                     
         if self.SymTensor:
             
+            #TODO fix this case
             param = [1]*x.shape[0]
             param[-1] = 2
             tmp = [param[i]*(x[i] ** 2) for i in range(x.shape[0])]
-            res = sum(tmp).sqrt().sum()           
+            res = sum(tmp).sqrt().sum()   
+            
         else:
-            
-#            tmp = [ x[i]**2 for i in range(x.shape[0])]
-            tmp = [ el**2 for el in x.containers ]
-            
-#            print(x.containers)
-#            print(tmp)
-#            print(type(sum(tmp)))
-#            print(type(tmp))
-            res = sum(tmp).sqrt().sum()
-#            print(res)
-        return res           
+                        
+            #tmp = [ el**2 for el in x.containers ]
+            #res = sum(tmp).sqrt().sum()
+            res = x.pnorm()
+
+        return res
                             
     def gradient(self, x, out=None):
         return ValueError('Not Differentiable')
@@ -93,19 +94,28 @@ class MixedL21Norm(Function):
         else:
 
             if out is None:                                        
-                tmp = [ el*el for el in x.containers]
-                res = sum(tmp).sqrt().maximum(1.0) 
-                frac = [el/res for el in x.containers]
-                res = BlockDataContainer(*frac)    
-                return res
+#                tmp = [ el*el for el in x.containers]
+#                res = sum(tmp).sqrt().maximum(1.0) 
+#                frac = [el/res for el in x.containers]
+#                res = BlockDataContainer(*frac)    
+#                return res
+                                
+                return x.divide(x.pnorm().maximum(1.0))
             else:
-                res1 = functools.reduce(lambda a,b: a + b*b, x.containers, x.get_item(0) * 0 )
-                res = res1.sqrt().maximum(1.0)
-                x.divide(res, out=out)
-                #for i,el in enumerate(x.containers):
-                #    el.divide(res, out=out.get_item(i))
+                                
+#                res1 = functools.reduce(lambda a,b: a + b*b, x.containers, x.get_item(0) * 0 )
+#                res = res1.sqrt().maximum(1.0)
+#                x.divide(res, out=out)
+                 x.divide(x.pnorm().maximum(1.0), out=out)
+                              
 
     def __rmul__(self, scalar):
+        
+        ''' Multiplication of L2NormSquared with a scalar
+        
+        Returns: ScaledFunction
+             
+        '''         
         return ScaledFunction(self, scalar) 
 
 

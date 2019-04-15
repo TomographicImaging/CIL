@@ -17,21 +17,24 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import numpy as np
-#from ccpi.optimisation.funcs import Function
 from ccpi.optimisation.functions import Function
-from ccpi.framework import DataContainer, ImageData
 from ccpi.framework import BlockDataContainer 
 
-class ZeroFun(Function):
+class ZeroFunction(Function):
+    
+    ''' ZeroFunction: f(x) = 0
+    
+    
+    '''
     
     def __init__(self):
-        super(ZeroFun, self).__init__()
+        super(ZeroFunction, self).__init__()
               
     def __call__(self,x):
         return 0
     
     def convex_conjugate(self, x):
+        
         ''' This is the support function sup <x, x^{*}>  which in fact is the 
         indicator function for the set = {0}
         So 0 if x=0, or inf if x neq 0                
@@ -56,8 +59,3 @@ class ZeroFun(Function):
             return 0
         else:
             return 0
-
-    def domain_geometry(self):
-        pass
-    def range_geometry(self):
-        pass

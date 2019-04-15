@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 from ccpi.optimisation.algorithms import PDHG, PDHG_old
 
 from ccpi.optimisation.operators import BlockOperator, Identity, Gradient
-from ccpi.optimisation.functions import ZeroFun, L2NormSquared, \
+from ccpi.optimisation.functions import ZeroFunction, L2NormSquared, \
                       MixedL21Norm, FunctionOperatorComposition, BlockFunction, ScaledFunction
 
 from skimage.util import random_noise
@@ -25,8 +25,6 @@ def dt(steps):
 
 #%%
 
-
-# ############################################################################
 # Create phantom for TV denoising
 
 N = 200
@@ -68,7 +66,7 @@ if method == '0':
     f2 = 0.5 * L2NormSquared(b = noisy_data)    
     f = BlockFunction(f1, f2)  
                                       
-    g = ZeroFun()
+    g = ZeroFunction()
     
 else:
     
@@ -90,8 +88,8 @@ print ("normK", normK)
 sigma = 1
 tau = 1/(sigma*normK**2)
 
-opt = {'niter':1000}
-opt1 = {'niter':1000, 'memopt': True}
+opt = {'niter':2000}
+opt1 = {'niter':2000, 'memopt': True}
 
 #t1 = timer()
 #res, time, primal, dual, pdgap = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt) 
@@ -140,14 +138,11 @@ plt.colorbar()
 plt.subplot(1,3,2)
 plt.imshow(res1.as_array())
 plt.colorbar()
+
 #plt.show()
 
 
-#plt.figure(figsize=(5,5))
-plt.subplot(1,3,3)
-plt.imshow(np.abs(res1.as_array()-res.as_array()))
-plt.colorbar()
-plt.show()
+
 #=======
 ## opt = {'niter':2000, 'memopt': True}
 #

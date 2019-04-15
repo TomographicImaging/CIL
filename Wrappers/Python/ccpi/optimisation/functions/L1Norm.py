@@ -16,11 +16,82 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-"""
-Created on Wed Mar  6 19:42:34 2019
 
-@author: evangelos
-"""
+
+from ccpi.optimisation.functions import Function
+from ccpi.optimisation.functions.ScaledFunction import ScaledFunction        
+from ccpi.optimisation.operators import ShrinkageOperator 
+ 
+
+class L1Norm(Function):
+    
+    ''' 
+    
+    Class: L1Norm
+        
+    Cases:  a) f(x) = ||x||_{1}
+    
+            b) f(x) = ||x - b||_{1}
+                             
+    '''      
+    
+    def __init__(self, **kwargs):
+        
+        super(L1Norm, self).__init__()
+        self.b = kwargs.get('b',None) 
+        
+    def __call__(self, x):
+        
+        ''' Evaluate L1Norm at x: f(x) '''
+        
+        y = x
+        if self.b is not None: 
+            y = x - self.b
+        return y.abs().sum()  
+    
+    def gradient(self,x):
+        #TODO implement subgradient???
+        return ValueError('Not Differentiable')   
+    
+    def convex_conjugate(self,x):
+        #TODO implement Indicator infty???
+
+        y = 0        
+        if self.b is not None:
+            y =  0 + (self.b * x).sum()
+        return y  
+    
+    def proximal(self, x, tau, out=None):
+        
+        # TODO implement shrinkage operator, we will need it later e.g SplitBregman
+        
+        if out is None:
+            if self.b is not None:
+                return self.b + ShrinkageOperator.__call__(self, x - self.b, tau)
+            else:
+                return ShrinkageOperator.__call__(self, x, tau)             
+        else:
+            if self.b is not None:
+                out.fill(self.b + ShrinkageOperator.__call__(self, x - self.b, tau))
+            else:
+                out.fill(ShrinkageOperator.__call__(self, x, tau))
+                                    
+    def proximal_conjugate(self, x, tau, out=None):
+        
+        if out is None:
+            if self.b is not None:
+                return (x - tau*self.b).divide((x - tau*self.b).abs().maximum(1.0))
+            else:
+                return x.divide(x.abs().maximum(1.0))
+        else:
+            if self.b is not None:
+                out.fill((x - tau*self.b).divide((x - tau*self.b).abs().maximum(1.0)))
+            else:
+                out.fill(x.divide(x.abs().maximum(1.0)) )                
+            
+    def __rmul__(self, scalar):
+        return ScaledFunction(self, scalar)
+
 
 #import numpy as np
 ##from ccpi.optimisation.funcs import Function
@@ -92,67 +163,7 @@ Created on Wed Mar  6 19:42:34 2019
 #        
 
 ###############################################################################                
-from ccpi.optimisation.functions import Function
-from ccpi.optimisation.functions.ScaledFunction import ScaledFunction        
-from ccpi.optimisation.operators import ShrinkageOperator 
- 
-
-class L1Norm(Function):
-    
-    def __init__(self, **kwargs):
-        
-        super(L1Norm, self).__init__()
-        self.b = kwargs.get('b',None) 
-        
-    def __call__(self, x):
-        
-        y = x
-        if self.b is not None: 
-            y = x - self.b
-        return y.abs().sum()  
-    
-    def gradient(self,x):
-        #TODO implement subgradient???
-        return ValueError('Not Differentiable')   
-    
-    def convex_conjugate(self,x):
-        #TODO implement Indicator infty???
-
-        y = 0        
-        if self.b is not None:
-            y =  0 + (self.b * x).sum()
-        return y  
-    
-    def proximal(self, x, tau, out=None):
-        
-        # TODO implement shrinkage operator, we will need it later e.g SplitBregman
-        
-        if out is None:
-            if self.b is not None:
-                return self.b + ShrinkageOperator.__call__(self, x - self.b, tau)
-            else:
-                return ShrinkageOperator.__call__(self, x, tau)             
-        else:
-            if self.b is not None:
-                out.fill(self.b + ShrinkageOperator.__call__(self, x - self.b, tau))
-            else:
-                out.fill(ShrinkageOperator.__call__(self, x, tau))
-                                    
-    def proximal_conjugate(self, x, tau, out=None):
-        
-        if out is None:
-            if self.b is not None:
-                return (x - tau*self.b).divide((x - tau*self.b).abs().maximum(1.0))
-            else:
-                return x.divide(x.abs().maximum(1.0))
-        else:
-            if self.b is not None:
-                out.fill((x - tau*self.b).divide((x - tau*self.b).abs().maximum(1.0)))
-            else:
-                out.fill(x.divide(x.abs().maximum(1.0)) )                
-            
-    def __rmul__(self, scalar):
-        return ScaledFunction(self, scalar)             
+             
                 
 
 

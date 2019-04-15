@@ -17,19 +17,16 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import numpy
 from ccpi.optimisation.functions import Function
 from ccpi.optimisation.functions.ScaledFunction import ScaledFunction
 
 class L2NormSquared(Function):
     
-    ''' 
+    '''
+            
+    Cases:  a) f(x) = \|x\|^{2}_{2}
     
-    Class: L2NormSquared 
-        
-    Cases:  a) f(x) = ||x||^{2}
-    
-            b) f(x) = ||x - b||^{2}, b
+            b) f(x) = ||x - b||^{2}_{2}
                              
     '''    
     
@@ -50,9 +47,7 @@ class L2NormSquared(Function):
         except AttributeError as ae:
             # added for compatibility with SIRF 
             return (y.norm()**2)
-        
-            
-        
+                
     def gradient(self, x, out=None):        
         
         ''' Evaluate gradient of L2NormSquared at x: f'(x) '''
@@ -127,11 +122,10 @@ class L2NormSquared(Function):
                                         
     def __rmul__(self, scalar):
         
-        ''' Allows multiplication of L2NormSquared with a scalar
+        ''' Multiplication of L2NormSquared with a scalar
         
         Returns: ScaledFunction
-        
-                
+                        
         '''
         
         return ScaledFunction(self, scalar)        
@@ -139,7 +133,8 @@ class L2NormSquared(Function):
 
 if __name__ == '__main__':
     
-    
+    from ccpi.framework import ImageGeometry
+    import numpy
     # TESTS for L2 and scalar * L2
     
     M, N, K = 2,3,5

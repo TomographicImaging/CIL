@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 from ccpi.optimisation.algorithms import PDHG, PDHG_old
 
 from ccpi.optimisation.operators import BlockOperator, Identity, Gradient
-from ccpi.optimisation.functions import ZeroFun, L2NormSquared, \
+from ccpi.optimisation.functions import ZeroFunction, L2NormSquared, \
                       MixedL21Norm, BlockFunction, ScaledFunction
 
 from ccpi.astra.ops import AstraProjectorSimple
@@ -90,7 +90,7 @@ operator = BlockOperator(op1, op2, shape=(2,1) )
 alpha = 50
 f = BlockFunction( alpha * MixedL21Norm(), \
                    0.5 * L2NormSquared(b = noisy_data) )
-g = ZeroFun()
+g = ZeroFunction()
 
 # Compute operator Norm
 normK = operator.norm()

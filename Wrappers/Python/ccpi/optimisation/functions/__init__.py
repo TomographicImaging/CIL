@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from .Function import Function
-from .ZeroFun import ZeroFun
+from .ZeroFunction import ZeroFunction
 from .L1Norm import L1Norm
 from .L2NormSquared import L2NormSquared
 from .ScaledFunction import ScaledFunction

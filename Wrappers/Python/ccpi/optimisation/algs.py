@@ -21,7 +21,7 @@ import numpy
 import time
 
 from ccpi.optimisation.functions import Function
-from ccpi.optimisation.functions import ZeroFun
+from ccpi.optimisation.functions import ZeroFunction
 from ccpi.framework import ImageData 
 from ccpi.framework import AcquisitionData
 from ccpi.optimisation.spdhg import spdhg 

@@ -494,6 +494,14 @@ class TestDataContainer(unittest.TestCase):
         self.assertEqual(order[0], image.dimension_labels[0])
         self.assertEqual(order[1], image.dimension_labels[1])
         self.assertEqual(order[2], image.dimension_labels[2])
+        
+        ig = ImageGeometry(2,3,2)
+        try:
+            z = ImageData(numpy.random.randint(10, size=(2,3)), geometry=ig)
+            self.assertTrue(False)
+        except ValueError as ve:
+            print (ve)
+            self.assertTrue(True)
 
         #vgeometry.allocate('')
     def test_AcquisitionGeometry_allocate(self):
@@ -525,6 +533,14 @@ class TestDataContainer(unittest.TestCase):
         self.assertEqual(order[1], sino.dimension_labels[1])
         self.assertEqual(order[2], sino.dimension_labels[2])
         self.assertEqual(order[2], sino.dimension_labels[2])
+        
+        
+        try:
+            z = AcquisitionData(numpy.random.randint(10, size=(2,3)), geometry=ageometry)
+            self.assertTrue(False)
+        except ValueError as ve:
+            print (ve)
+            self.assertTrue(True)
     
     def assertNumpyArrayEqual(self, first, second):
         res = True

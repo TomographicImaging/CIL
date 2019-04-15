@@ -8,6 +8,7 @@ import numpy
 from timeit import default_timer as timer
 from ccpi.framework import ImageGeometry
 from ccpi.optimisation.operators import Gradient, Identity, SparseFiniteDiff
+from ccpi.optimisation.operators import LinearOperator
 
 def dt(steps):
     return steps[-1] - steps[-2]
@@ -97,7 +98,35 @@ class TestOperator(CCPiTestClass):
         G.adjoint(u, out=res)
         w = G.adjoint(u)
         self.assertNumpyArrayEqual(res.as_array(), w.as_array())
+    def test_PowerMethod(self):
         
+        N, M = 2, 3
+
+        ig = ImageGeometry(N, M)
+        Id = Identity(ig)
+        
+        G = Gradient(ig)
+        
+        uid = Id.domain_geometry().allocate(ImageGeometry.RANDOM_INT)
+        
+        a = LinearOperator.PowerMethod(Id, 10, uid)
+        b = LinearOperator.PowerMethodNonsquare(Id, 10, uid)
+        
+        print ("Edo impl", a[0])
+        print ("old impl", b[0])
+        
+        #self.assertAlmostEqual(a[0], b[0])
+        self.assertNumpyArrayAlmostEqual(a[0],b[0],decimal=6)
+        
+        a = LinearOperator.PowerMethod(G, 10, uid)
+        b = LinearOperator.PowerMethodNonsquare(G, 10, uid)
+        
+        print ("Edo impl", a[0])
+        print ("old impl", b[0])
+        self.assertNumpyArrayAlmostEqual(a[0],b[0],decimal=2)
+        #self.assertAlmostEqual(a[0], b[0])
+        
+
 
 
 

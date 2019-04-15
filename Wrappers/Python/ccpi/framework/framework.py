@@ -913,7 +913,7 @@ class AcquisitionData(DataContainer):
                  deep_copy=True, 
                  dimension_labels=None, 
                  **kwargs):
-        self.geometry = None
+        self.geometry = kwargs.get('geometry', None)
         if array is None:
             if 'geometry' in kwargs.keys():
                 geometry      = kwargs['geometry']
@@ -928,7 +928,6 @@ class AcquisitionData(DataContainer):
         else:
             if self.geometry is not None:
                 shape, labels = self.get_shape_labels(self.geometry, dimension_labels)
-                print('Shape mismatch {} {}'.format(shape, array.shape))
                 if array.shape != shape:
                     raise ValueError('Shape mismatch {} {}'.format(shape, array.shape))
                     
@@ -952,16 +951,18 @@ class AcquisitionData(DataContainer):
                     
                 if dimension_labels is None:
                     if array.ndim == 4:
-                        dimension_labels = ['channel' ,'angle' , 'vertical' , 
-                                      'horizontal']
+                        dimension_labels = [AcquisitionGeometry.CHANNEL,
+                                            AcquisitionGeometry.ANGLE,
+                                            AcquisitionGeometry.VERTICAL,
+                                            AcquisitionGeometry.HORIZONTAL]
                     elif array.ndim == 3:
-                        dimension_labels = ['angle' , 'vertical' , 
-                                      'horizontal']
+                        dimension_labels = [AcquisitionGeometry.ANGLE,
+                                            AcquisitionGeometry.VERTICAL,
+                                            AcquisitionGeometry.HORIZONTAL]
                     else:
-                        dimension_labels = ['angle' , 
-                                      'horizontal']   
-                
-                #DataContainer.__init__(self, array, deep_copy, dimension_labels, **kwargs)
+                        dimension_labels = [AcquisitionGeometry.ANGLE,
+                                            AcquisitionGeometry.HORIZONTAL]
+
                 super(AcquisitionData, self).__init__(array, deep_copy, 
                      dimension_labels, **kwargs)
                 

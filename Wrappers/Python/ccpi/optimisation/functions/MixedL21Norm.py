@@ -54,9 +54,8 @@ class MixedL21Norm(Function):
             
         else:
                         
-            #tmp = [ el**2 for el in x.containers ]
-            #res = sum(tmp).sqrt().sum()
-            res = x.pnorm()
+            tmp = [ el**2 for el in x.containers ]
+            res = sum(tmp).sqrt().sum()
 
         return res
                             
@@ -109,7 +108,7 @@ class MixedL21Norm(Function):
                 
 #                x.divide(sum([el*el for el in x.containers]).sqrt().maximum(1.0), out=out)
                 #TODO this is slow, why ???
-#                 x.divide(x.norm().maximum(1.0), out=out)
+#                 x.divide(x.pnorm().maximum(1.0), out=out)
                               
 
     def __rmul__(self, scalar):

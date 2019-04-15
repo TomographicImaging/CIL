@@ -34,6 +34,7 @@ class L2NormSquared(Function):
                                 
         super(L2NormSquared, self).__init__()
         self.b = kwargs.get('b',None)  
+        self.L = 2
 
     def __call__(self, x):
         
@@ -247,7 +248,38 @@ if __name__ == '__main__':
     print(res_out.as_array())   
 
     numpy.testing.assert_array_almost_equal(res_no_out.as_array(), \
-                                            res_out.as_array(), decimal=4)        
+                                            res_out.as_array(), decimal=4)  
+    
+    
+    
+    ig1 = ImageGeometry(2,3)
+    
+    tau = 0.1
+    
+    u = ig1.allocate('random_int')
+    b = ig1.allocate('random_int')
+    
+    scalar = 0.5
+    f_scaled = scalar * L2NormSquared(b=b)
+    f_noscaled = L2NormSquared(b=b)
+    
+    
+    res1 = f_scaled.proximal(u, tau)
+    res2 = f_noscaled.proximal(u, tau*scalar)
+    
+#    res2 = (u + tau*b)/(1+tau)
+    
+    numpy.testing.assert_array_almost_equal(res1.as_array(), \
+                                            res2.as_array(), decimal=4)
+                                            
+                                            
+    
+    
+    
+
+
+
+      
           
           
         

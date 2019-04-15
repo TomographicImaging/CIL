@@ -54,15 +54,20 @@ class FunctionOperatorComposition(Function):
 
     def proximal(self, x, tau, out=None):
         
-        '''proximal does not take into account the Operator'''
-        
-        return self.function.proximal(x, tau, out=out)
+        '''proximal does not take into account the Operator'''                
+        if out is None:
+            return self.function.proximal(x, tau)
+        else:
+            self.function.proximal(x, tau, out=out)
+            
 
     def proximal_conjugate(self, x, tau, out=None):    
 
         ''' proximal conjugate does not take into account the Operator'''
-        
-        return self.function.proximal_conjugate(x, tau, out=out) 
+        if out is None:
+            return self.function.proximal_conjugate(x, tau)
+        else:
+            self.function.proximal_conjugate(x, tau, out=out) 
 
     def gradient(self, x, out=None):
         

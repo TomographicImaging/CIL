@@ -158,14 +158,24 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
             x_old -= tau*operator.adjoint(y)
             x = g.proximal(x_old, tau)
              
-            xbar.fill(x)
-            xbar -= x_old
+            x.subtract(x_old, out=xbar)
             xbar *= theta
             xbar += x
-            
+                                                
             x_old.fill(x)
-            y_old.fill(y)            
+            y_old.fill(y)       
+            
+            
+#            if i%100==0:
+#                
+#                p1 = f(operator.direct(x)) + g(x)
+#                d1 = - ( f.convex_conjugate(y) + g(-1*operator.adjoint(y)) )
+#                primal.append(p1)
+#                dual.append(d1)
+#                pdgap.append(p1-d1)      
+#                print(p1, d1, p1-d1)
                                
+            
         else:
             
             operator.direct(xbar, out = y_tmp)             
@@ -185,6 +195,15 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
                                                 
             x_old.fill(x)
             y_old.fill(y)
+            
+#            if i%100==0:
+#                
+#                p1 = f(operator.direct(x)) + g(x)
+#                d1 = - ( f.convex_conjugate(y) + g(-1*operator.adjoint(y)) )
+#                primal.append(p1)
+#                dual.append(d1)
+#                pdgap.append(p1-d1)      
+#                print(p1, d1, p1-d1)
             
                          
     t_end = time.time()        

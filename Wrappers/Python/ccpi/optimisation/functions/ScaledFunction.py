@@ -37,11 +37,14 @@ class ScaledFunction(object):
     '''
     def __init__(self, function, scalar):
         super(ScaledFunction, self).__init__()
-        self.L = None
+
         if not isinstance (scalar, Number):
             raise TypeError('expected scalar: got {}'.format(type(scalar)))
         self.scalar = scalar
         self.function = function
+        
+        if self.function.L is not None:        
+            self.L = self.scalar * self.function.L         
 
     def __call__(self,x, out=None):
         '''Evaluates the function at x '''
@@ -64,7 +67,7 @@ class ScaledFunction(object):
         if out is None:
             return self.function.proximal(x, tau*self.scalar)     
         else:
-            out.fill( self.function.proximal(x, tau*self.scalar) )
+            self.function.proximal(x, tau*self.scalar, out = out)
 
     def proximal_conjugate(self, x, tau, out = None):
         '''This returns the proximal operator for the function at x, tau

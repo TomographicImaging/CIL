@@ -772,61 +772,18 @@ class DataContainer(object):
 class ImageData(DataContainer):
     '''DataContainer for holding 2D or 3D DataContainer'''
     __container_priority__ = 1
+    
+    
     def __init__(self, 
                  array = None, 
                  deep_copy=False, 
                  dimension_labels=None, 
                  **kwargs):
         
-        self.geometry = None
+        self.geometry = kwargs.get('geometry', None)
         if array is None:
-            if 'geometry' in kwargs.keys():
-                geometry  = kwargs['geometry']
-                self.geometry = geometry
-                channels  = geometry.channels
-                horiz_x   = geometry.voxel_num_x
-                horiz_y   = geometry.voxel_num_y
-                vert      = 1 if geometry.voxel_num_z is None\
-                              else geometry.voxel_num_z # this should be 1 for 2D
-                if dimension_labels is None:
-                    if channels > 1:
-                        if vert > 1:
-                            shape = (channels, vert, horiz_y, horiz_x)
-                            dim_labels = [ImageGeometry.CHANNEL, 
-                                          ImageGeometry.VERTICAL,
-                                          ImageGeometry.HORIZONTAL_Y,
-                                          ImageGeometry.HORIZONTAL_X]
-                        else:
-                            shape = (channels , horiz_y, horiz_x)
-                            dim_labels = [ImageGeometry.CHANNEL,
-                                          ImageGeometry.HORIZONTAL_Y,
-                                          ImageGeometry.HORIZONTAL_X]
-                    else:
-                        if vert > 1:
-                            shape = (vert, horiz_y, horiz_x)
-                            dim_labels = [ImageGeometry.VERTICAL,
-                                          ImageGeometry.HORIZONTAL_Y,
-                                          ImageGeometry.HORIZONTAL_X]
-                        else:
-                            shape = (horiz_y, horiz_x)
-                            dim_labels = [ImageGeometry.HORIZONTAL_Y,
-                                          ImageGeometry.HORIZONTAL_X]
-                    dimension_labels = dim_labels
-                else:
-                    shape = []
-                    for dim in dimension_labels:
-                        if dim == ImageGeometry.CHANNEL:
-                            shape.append(channels)
-                        elif dim == ImageGeometry.HORIZONTAL_Y:
-                            shape.append(horiz_y)
-                        elif dim == ImageGeometry.VERTICAL:
-                            shape.append(vert)
-                        elif dim == ImageGeometry.HORIZONTAL_X:
-                            shape.append(horiz_x)
-                    if len(shape) != len(dimension_labels):
-                        raise ValueError('Missing {0} axes'.format(
-                                len(dimension_labels) - len(shape)))
-                    shape = tuple(shape)
+            if self.geometry is not None:
+                shape, dimension_labels = self.get_shape_labels(self.geometry)
                     
                 array = numpy.zeros( shape , dtype=numpy.float32) 
                 super(ImageData, self).__init__(array, deep_copy,
@@ -836,6 +793,11 @@ class ImageData(DataContainer):
                 raise ValueError('Please pass either a DataContainer, ' +\
                                  'a numpy array or a geometry')
         else:
+            if self.geometry is not None:
+                shape, labels = self.get_shape_labels(self.geometry, dimension_labels)
+                if array.shape != shape:
+                    raise ValueError('Shape mismatch {} {}'.format(shape, array.shape))
+            
             if issubclass(type(array) , DataContainer):
                 # if the array is a DataContainer get the info from there
                 if not ( array.number_of_dimensions == 2 or \
@@ -890,78 +852,85 @@ class ImageData(DataContainer):
             #out.geometry = self.recalculate_geometry(dimensions , **kw)
             out.geometry = self.geometry
             return out
-                        
+
+    def get_shape_labels(self, geometry, dimension_labels=None):
+        channels  = geometry.channels
+        horiz_x   = geometry.voxel_num_x
+        horiz_y   = geometry.voxel_num_y
+        vert      = 1 if geometry.voxel_num_z is None\
+                      else geometry.voxel_num_z # this should be 1 for 2D
+        if dimension_labels is None:
+            if channels > 1:
+                if vert > 1:
+                    shape = (channels, vert, horiz_y, horiz_x)
+                    dim_labels = [ImageGeometry.CHANNEL, 
+                                  ImageGeometry.VERTICAL,
+                                  ImageGeometry.HORIZONTAL_Y,
+                                  ImageGeometry.HORIZONTAL_X]
+                else:
+                    shape = (channels , horiz_y, horiz_x)
+                    dim_labels = [ImageGeometry.CHANNEL,
+                                  ImageGeometry.HORIZONTAL_Y,
+                                  ImageGeometry.HORIZONTAL_X]
+            else:
+                if vert > 1:
+                    shape = (vert, horiz_y, horiz_x)
+                    dim_labels = [ImageGeometry.VERTICAL,
+                                  ImageGeometry.HORIZONTAL_Y,
+                                  ImageGeometry.HORIZONTAL_X]
+                else:
+                    shape = (horiz_y, horiz_x)
+                    dim_labels = [ImageGeometry.HORIZONTAL_Y,
+                                  ImageGeometry.HORIZONTAL_X]
+            dimension_labels = dim_labels
+        else:
+            shape = []
+            for i in range(len(dimension_labels)):
+                dim = dimension_labels[i]
+                if dim == ImageGeometry.CHANNEL:
+                    shape.append(channels)
+                elif dim == ImageGeometry.HORIZONTAL_Y:
+                    shape.append(horiz_y)
+                elif dim == ImageGeometry.VERTICAL:
+                    shape.append(vert)
+                elif dim == ImageGeometry.HORIZONTAL_X:
+                    shape.append(horiz_x)
+            if len(shape) != len(dimension_labels):
+                raise ValueError('Missing {0} axes {1} shape {2}'.format(
+                        len(dimension_labels) - len(shape), dimension_labels, shape))
+            shape = tuple(shape)
+            
+        return (shape, dimension_labels)
+                            
 
 class AcquisitionData(DataContainer):
     '''DataContainer for holding 2D or 3D sinogram'''
     __container_priority__ = 1
+    
+    
     def __init__(self, 
                  array = None, 
                  deep_copy=True, 
                  dimension_labels=None, 
                  **kwargs):
-        self.geometry = None
+        self.geometry = kwargs.get('geometry', None)
         if array is None:
             if 'geometry' in kwargs.keys():
                 geometry      = kwargs['geometry']
                 self.geometry = geometry
-                channels      = geometry.channels
-                horiz         = geometry.pixel_num_h
-                vert          = geometry.pixel_num_v
-                angles        = geometry.angles
-                num_of_angles = numpy.shape(angles)[0]
                 
-                if dimension_labels is None:
-                    if channels > 1:
-                        if vert > 1:
-                            shape = (channels, num_of_angles , vert, horiz)
-                            dim_labels = [AcquisitionGeometry.CHANNEL,
-                                          AcquisitionGeometry.ANGLE,
-                                          AcquisitionGeometry.VERTICAL,
-                                          AcquisitionGeometry.HORIZONTAL]
-                        else:
-                            shape = (channels , num_of_angles, horiz)
-                            dim_labels = [AcquisitionGeometry.CHANNEL,
-                                          AcquisitionGeometry.ANGLE,
-                                          AcquisitionGeometry.HORIZONTAL]
-                    else:
-                        if vert > 1:
-                            shape = (num_of_angles, vert, horiz)
-                            dim_labels = [AcquisitionGeometry.ANGLE,
-                                          AcquisitionGeometry.VERTICAL,
-                                          AcquisitionGeometry.HORIZONTAL
-                                          ]
-                        else:
-                            shape = (num_of_angles, horiz)
-                            dim_labels = [AcquisitionGeometry.ANGLE,
-                                          AcquisitionGeometry.HORIZONTAL
-                                          ]
-                    
-                    dimension_labels = dim_labels
-                else:
-                    shape = []
-                    for dim in dimension_labels:
-                        if dim == AcquisitionGeometry.CHANNEL:
-                            shape.append(channels)
-                        elif dim == AcquisitionGeometry.ANGLE:
-                            shape.append(num_of_angles)
-                        elif dim == AcquisitionGeometry.VERTICAL:
-                            shape.append(vert)
-                        elif dim == AcquisitionGeometry.HORIZONTAL:
-                            shape.append(horiz)
-                    if len(shape) != len(dimension_labels):
-                        raise ValueError('Missing {0} axes.\nExpected{1} got {2}'\
-                            .format(
-                                len(dimension_labels) - len(shape),
-                                dimension_labels, shape) 
-                            )
-                    shape = tuple(shape)
+                shape, dimension_labels = self.get_shape_labels(geometry, dimension_labels)
+                
                     
                 array = numpy.zeros( shape , dtype=numpy.float32) 
                 super(AcquisitionData, self).__init__(array, deep_copy,
                                  dimension_labels, **kwargs)
         else:
-            
+            if self.geometry is not None:
+                shape, labels = self.get_shape_labels(self.geometry, dimension_labels)
+                if array.shape != shape:
+                    raise ValueError('Shape mismatch {} {}'.format(shape, array.shape))
+                    
             if issubclass(type(array) ,DataContainer):
                 # if the array is a DataContainer get the info from there
                 if not ( array.number_of_dimensions == 2 or \
@@ -982,18 +951,77 @@ class AcquisitionData(DataContainer):
                     
                 if dimension_labels is None:
                     if array.ndim == 4:
-                        dimension_labels = ['channel' ,'angle' , 'vertical' , 
-                                      'horizontal']
+                        dimension_labels = [AcquisitionGeometry.CHANNEL,
+                                            AcquisitionGeometry.ANGLE,
+                                            AcquisitionGeometry.VERTICAL,
+                                            AcquisitionGeometry.HORIZONTAL]
                     elif array.ndim == 3:
-                        dimension_labels = ['angle' , 'vertical' , 
-                                      'horizontal']
+                        dimension_labels = [AcquisitionGeometry.ANGLE,
+                                            AcquisitionGeometry.VERTICAL,
+                                            AcquisitionGeometry.HORIZONTAL]
                     else:
-                        dimension_labels = ['angle' , 
-                                      'horizontal']   
-                
-                #DataContainer.__init__(self, array, deep_copy, dimension_labels, **kwargs)
+                        dimension_labels = [AcquisitionGeometry.ANGLE,
+                                            AcquisitionGeometry.HORIZONTAL]
+
                 super(AcquisitionData, self).__init__(array, deep_copy, 
                      dimension_labels, **kwargs)
+                
+    def get_shape_labels(self, geometry, dimension_labels=None):
+        channels      = geometry.channels
+        horiz         = geometry.pixel_num_h
+        vert          = geometry.pixel_num_v
+        angles        = geometry.angles
+        num_of_angles = numpy.shape(angles)[0]
+        
+        if dimension_labels is None:
+            if channels > 1:
+                if vert > 1:
+                    shape = (channels, num_of_angles , vert, horiz)
+                    dim_labels = [AcquisitionGeometry.CHANNEL,
+                                  AcquisitionGeometry.ANGLE,
+                                  AcquisitionGeometry.VERTICAL,
+                                  AcquisitionGeometry.HORIZONTAL]
+                else:
+                    shape = (channels , num_of_angles, horiz)
+                    dim_labels = [AcquisitionGeometry.CHANNEL,
+                                  AcquisitionGeometry.ANGLE,
+                                  AcquisitionGeometry.HORIZONTAL]
+            else:
+                if vert > 1:
+                    shape = (num_of_angles, vert, horiz)
+                    dim_labels = [AcquisitionGeometry.ANGLE,
+                                  AcquisitionGeometry.VERTICAL,
+                                  AcquisitionGeometry.HORIZONTAL
+                                  ]
+                else:
+                    shape = (num_of_angles, horiz)
+                    dim_labels = [AcquisitionGeometry.ANGLE,
+                                  AcquisitionGeometry.HORIZONTAL
+                                  ]
+            
+            dimension_labels = dim_labels
+        else:
+            shape = []
+            for i in range(len(dimension_labels)):
+                dim = dimension_labels[i]
+                
+                if dim == AcquisitionGeometry.CHANNEL:
+                    shape.append(channels)
+                elif dim == AcquisitionGeometry.ANGLE:
+                    shape.append(num_of_angles)
+                elif dim == AcquisitionGeometry.VERTICAL:
+                    shape.append(vert)
+                elif dim == AcquisitionGeometry.HORIZONTAL:
+                    shape.append(horiz)
+            if len(shape) != len(dimension_labels):
+                raise ValueError('Missing {0} axes.\nExpected{1} got {2}'\
+                    .format(
+                        len(dimension_labels) - len(shape),
+                        dimension_labels, shape) 
+                    )
+            shape = tuple(shape)
+        return (shape, dimension_labels)
+    
                 
             
 class DataProcessor(object):

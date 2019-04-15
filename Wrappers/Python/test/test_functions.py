@@ -26,7 +26,7 @@ from ccpi.optimisation.funcs import Norm2sq
 # from ccpi.optimisation.functions.L2NormSquared import SimpleL2NormSq, L2NormSq
 # from ccpi.optimisation.functions.L1Norm import SimpleL1Norm, L1Norm
 #from ccpi.optimisation.functions import mixed_L12Norm
-from ccpi.optimisation.functions import ZeroFun
+from ccpi.optimisation.functions import ZeroFunction
 
 from ccpi.optimisation.functions import FunctionOperatorComposition
 import unittest
@@ -329,7 +329,7 @@ class TestFunction(unittest.TestCase):
         
         a1 = f_no_scaled(U)
         a2 = f_scaled(U)
-        self.assertAlmostEqual(a1,a2)
+        self.assertNumpyArrayAlmostEqual(a1.as_array(),a2.as_array())
         
         
         tmp = [ el**2 for el in U.containers ]

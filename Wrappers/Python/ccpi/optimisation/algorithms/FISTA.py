@@ -106,9 +106,9 @@ class FISTA(Algorithm):
             
             
         else:
-            u = self.y - self.invL*self.f.grad(self.y)
+            u = self.y - self.invL*self.f.gradient(self.y)
             
-            self.x = self.g.prox(u,self.invL)
+            self.x = self.g.proximal(u,self.invL)
             
             self.t = 0.5*(1 + numpy.sqrt(1 + 4*(self.t_old**2)))
             

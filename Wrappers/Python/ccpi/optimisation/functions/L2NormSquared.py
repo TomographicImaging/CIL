@@ -116,9 +116,10 @@ class L2NormSquared(Function):
                 return x/(1 + tau/2)
         else:
             if self.b is not None:
-                out.fill( (x - tau*self.b)/(1 + tau/2) )
+                x.subtract(tau*self.b, out=out)
+                out.divide(1+tau/2, out=out)
             else:
-                out.fill( x/(1 + tau/2) )
+                x.divide(1 + tau/2, out=out)
                                         
     def __rmul__(self, scalar):
         

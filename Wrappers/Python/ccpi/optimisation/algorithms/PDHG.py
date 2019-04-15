@@ -126,10 +126,6 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
     show_iter = opt['show_iter'] if 'show_iter' in opt.keys() else False 
     stop_crit = opt['stop_crit'] if 'stop_crit' in opt.keys() else False 
 
-    if memopt:
-        print ("memopt")
-    else:
-        print("no memopt")
     x_old = operator.domain_geometry().allocate()
     y_old = operator.range_geometry().allocate()       
             
@@ -183,65 +179,13 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
 
             g.proximal(x_tmp, tau, out = x)
             
-            xbar = x - x_old
+            x.subtract(x_old, out=xbar)
             xbar *= theta
             xbar += x
-                        
-                        
+                                                
             x_old.fill(x)
             y_old.fill(y)
-
             
-#            pass
-#        
-##        # Gradient descent, Dual problem solution
-##        y_tmp = y_old + sigma * operator.direct(xbar)
-#        y_tmp = operator.direct(xbar)
-#        y_tmp *= sigma
-#        y_tmp +=y_old        
-#                        
-#        y = f.proximal_conjugate(y_tmp, sigma)
-##        f.proximal_conjugate(y_tmp, sigma, out = y)
-#
-#        # Gradient ascent, Primal problem solution
-##        x_tmp = x_old - tau * operator.adjoint(y)
-#        
-#        x_tmp = operator.adjoint(y)
-#        x_tmp *=-tau
-#        x_tmp +=x_old
-#        
-#        x = g.proximal(x_tmp, tau)
-##        g.proximal(x_tmp, tau, out = x)
-#        
-#        #Update
-##        xbar = x + theta * (x - x_old)
-#        xbar = x - x_old
-#        xbar *= theta
-#        xbar += x
-#                                
-#        x_old = x
-#        y_old = y
-#        
-##        operator.direct(xbar, out = y_tmp)
-##        y_tmp *= sigma
-##        y_tmp +=y_old
-#        if isinstance(f, FunctionOperatorComposition):
-#        p1 = f(x) + g(x)
-#        else:
-#        p1 = f(operator.direct(x)) + g(x)
-#        d1 = -(f.convex_conjugate(y) + g(-1*operator.adjoint(y)))
-#        pd1 = p1 - d1
-        
-#        primal.append(p1)
-#        dual.append(d1)
-#        pdgap.append(pd1)
-        
-#        if i%100==0:
-#            print(p1, d1, pd1)
-#        if isinstance(f, FunctionOperatorComposition):
-#            p1 = f(x) + g(x)
-#        else:        
-        
                          
     t_end = time.time()        
         

@@ -94,19 +94,22 @@ class MixedL21Norm(Function):
         else:
 
             if out is None:                                        
-#                tmp = [ el*el for el in x.containers]
-#                res = sum(tmp).sqrt().maximum(1.0) 
-#                frac = [el/res for el in x.containers]
-#                res = BlockDataContainer(*frac)    
-#                return res
-                                
-                return x.divide(x.pnorm().maximum(1.0))
+                tmp = [ el*el for el in x.containers]
+                res = sum(tmp).sqrt().maximum(1.0) 
+                frac = [el/res for el in x.containers]
+                return  BlockDataContainer(*frac)    
+                
+            #TODO this is slow, why???
+#                return x.divide(x.pnorm().maximum(1.0))
             else:
                                 
-#                res1 = functools.reduce(lambda a,b: a + b*b, x.containers, x.get_item(0) * 0 )
-#                res = res1.sqrt().maximum(1.0)
-#                x.divide(res, out=out)
-                 x.divide(x.pnorm().maximum(1.0), out=out)
+                res1 = functools.reduce(lambda a,b: a + b*b, x.containers, x.get_item(0) * 0 )
+                res = res1.sqrt().maximum(1.0)
+                x.divide(res, out=out)
+                
+#                x.divide(sum([el*el for el in x.containers]).sqrt().maximum(1.0), out=out)
+                #TODO this is slow, why ???
+#                 x.divide(x.norm().maximum(1.0), out=out)
                               
 
     def __rmul__(self, scalar):

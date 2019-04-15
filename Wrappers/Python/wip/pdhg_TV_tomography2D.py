@@ -56,7 +56,7 @@ detectors = 150
 angles = np.linspace(0,np.pi,100)
 
 ag = AcquisitionGeometry('parallel','2D',angles, detectors)
-Aop = AstraProjectorSimple(ig, ag, 'cpu')
+Aop = AstraProjectorSimple(ig, ag, 'gpu')
 sin = Aop.direct(data)
 
 plt.imshow(sin.as_array())
@@ -113,43 +113,28 @@ else:
     sigma = 1
     tau = 1/(sigma*normK**2)
 
-#pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
-#pdhg.max_iteration = 5000
-#pdhg.update_objective_interval = 250
-#
-#pdhg.run(5000)
-    
-opt = {'niter':300}
-opt1 = {'niter':300, 'memopt': True}
+# Compute operator Norm
+normK = operator.norm()
 
+# Primal & dual stepsizes
+sigma = 1
+tau = 1/(sigma*normK**2)
+
+opt = {'niter':2000}
+opt1 = {'niter':2000, 'memopt': True}
 
 t1 = timer()
 res, time, primal, dual, pdgap = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt) 
-
-print(timer()-t1)
-plt.figure(figsize=(5,5))
-plt.imshow(res.as_array())
-plt.colorbar()
-plt.show()
- 
-#%%
-print("with memopt \n")
-#
 t2 = timer()
+
+
+t3 = timer()
 res1, time1, primal1, dual1, pdgap1 = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt1) 
-#print(timer()-t2)
+t4 = timer()
 #
-#
-plt.figure(figsize=(5,5))
-plt.imshow(res1.as_array())
-plt.colorbar()
-plt.show()
-#
-#%%
-plt.figure(figsize=(5,5))
-plt.imshow(np.abs(res1.as_array()-res.as_array()))
-plt.colorbar()
-plt.show()
+print ("No memopt in {}s, memopt in  {}s ".format(t2-t1, t4 -t3))
+
+
 #%%
 #sol = pdhg.get_output().as_array()
 #fig = plt.figure()

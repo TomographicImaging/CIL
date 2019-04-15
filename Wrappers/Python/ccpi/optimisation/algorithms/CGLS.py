@@ -23,7 +23,6 @@ Created on Thu Feb 21 11:11:23 2019
 """
 
 from ccpi.optimisation.algorithms import Algorithm
-#from collections.abc import Iterable
 class CGLS(Algorithm):
 
     '''Conjugate Gradient Least Squares algorithm

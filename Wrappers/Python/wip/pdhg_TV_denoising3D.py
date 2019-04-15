@@ -15,7 +15,7 @@ from ccpi.optimisation.algorithms import PDHG, PDHG_old
 
 from ccpi.optimisation.operators import BlockOperator, Identity, Gradient
 from ccpi.optimisation.functions import ZeroFunction, L2NormSquared, \
-                      MixedL21Norm, FunctionOperatorComposition, BlockFunction, ScaledFunction
+                      MixedL21Norm, FunctionOperatorComposition, BlockFunction
 
 from skimage.util import random_noise
 
@@ -27,26 +27,52 @@ def dt(steps):
 
 # Create phantom for TV denoising
 
-N = 500
+import timeit
+import os
+from tomophantom import TomoP3D
+import tomophantom
 
-data = np.zeros((N,N))
-data[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
-data[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 1
+print ("Building 3D phantom using TomoPhantom software")
+tic=timeit.default_timer()
+model = 13 # select a model number from the library
+N_size = 64 # Define phantom dimensions using a scalar value (cubic phantom)
+path = os.path.dirname(tomophantom.__file__)
+path_library3D = os.path.join(path, "Phantom3DLibrary.dat")
+#This will generate a N_size x N_size x N_size phantom (3D)
+phantom_tm = TomoP3D.Model(model, N_size, path_library3D)
+#toc=timeit.default_timer()
+#Run_time = toc - tic
+#print("Phantom has been built in {} seconds".format(Run_time))
+#
+#sliceSel = int(0.5*N_size)
+##plt.gray()
+#plt.figure() 
+#plt.subplot(131)
+#plt.imshow(phantom_tm[sliceSel,:,:],vmin=0, vmax=1)
+#plt.title('3D Phantom, axial view')
+#
+#plt.subplot(132)
+#plt.imshow(phantom_tm[:,sliceSel,:],vmin=0, vmax=1)
+#plt.title('3D Phantom, coronal view')
+#
+#plt.subplot(133)
+#plt.imshow(phantom_tm[:,:,sliceSel],vmin=0, vmax=1)
+#plt.title('3D Phantom, sagittal view')
+#plt.show()
 
-ig = ImageGeometry(voxel_num_x = N, voxel_num_y = N)
-ag = ig
+#%%
 
-# Create noisy data. Add Gaussian noise
-n1 = random_noise(data, mode = 'gaussian', mean=0, var = 0.05, seed=10)
+N = N_size
+ig = ImageGeometry(voxel_num_x=N, voxel_num_y=N, voxel_num_z=N)
+
+n1 = random_noise(phantom_tm, mode = 'gaussian', mean=0, var = 0.001, seed=10)
 noisy_data = ImageData(n1)
-
-plt.imshow(noisy_data.as_array())
-plt.show()
+#plt.imshow(noisy_data.as_array()[:,:,32])
 
 #%%
 
 # Regularisation Parameter
-alpha = 2
+alpha = 0.02
 
 #method = input("Enter structure of PDHG (0=Composite or 1=NotComposite): ")
 method = '0'
@@ -55,7 +81,7 @@ if method == '0':
 
     # Create operators
     op1 = Gradient(ig)
-    op2 = Identity(ig, ag)
+    op2 = Identity(ig)
 
     # Form Composite Operator
     operator = BlockOperator(op1, op2, shape=(2,1) ) 
@@ -90,27 +116,88 @@ tau = 1/(sigma*normK**2)
 opt = {'niter':2000}
 opt1 = {'niter':2000, 'memopt': True}
 
-t1 = timer()
-res, time, primal, dual, pdgap = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt) 
-t2 = timer()
+#t1 = timer()
+#res, time, primal, dual, pdgap = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt) 
+#t2 = timer()
 
 
 t3 = timer()
 res1, time1, primal1, dual1, pdgap1 = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt1) 
 t4 = timer()
-#
-print ("No memopt in {}s, memopt in  {}s ".format(t2-t1, t4 -t3))
 
-#    
-#%%
+#import cProfile
+#cProfile.run('res1, time1, primal1, dual1, pdgap1 = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt1) ')
+###
+print ("No memopt in {}s, memopt in  {}s ".format(t2-t1, t4 -t3))
+#
+##    
+##%%
+#
+#plt.figure(figsize=(10,10)) 
+#plt.subplot(311)
+#plt.imshow(res1.as_array()[sliceSel,:,:])
+#plt.colorbar()
+#plt.title('3D Phantom, axial view')
+#
+#plt.subplot(312)
+#plt.imshow(res1.as_array()[:,sliceSel,:])
+#plt.colorbar()
+#plt.title('3D Phantom, coronal view')
+#
+#plt.subplot(313)
+#plt.imshow(res1.as_array()[:,:,sliceSel])
+#plt.colorbar()
+#plt.title('3D Phantom, sagittal view')
+#plt.show()
+#
+#plt.figure(figsize=(10,10)) 
+#plt.subplot(311)
+#plt.imshow(res.as_array()[sliceSel,:,:])
+#plt.colorbar()
+#plt.title('3D Phantom, axial view')
+#
+#plt.subplot(312)
+#plt.imshow(res.as_array()[:,sliceSel,:])
+#plt.colorbar()
+#plt.title('3D Phantom, coronal view')
+#
+#plt.subplot(313)
+#plt.imshow(res.as_array()[:,:,sliceSel])
+#plt.colorbar()
+#plt.title('3D Phantom, sagittal view')
+#plt.show()
+#
+#diff  =  (res1 - res).abs()
+#
+#plt.figure(figsize=(10,10)) 
+#plt.subplot(311)
+#plt.imshow(diff.as_array()[sliceSel,:,:])
+#plt.colorbar()
+#plt.title('3D Phantom, axial view')
+#
+#plt.subplot(312)
+#plt.imshow(diff.as_array()[:,sliceSel,:])
+#plt.colorbar()
+#plt.title('3D Phantom, coronal view')
+#
+#plt.subplot(313)
+#plt.imshow(diff.as_array()[:,:,sliceSel])
+#plt.colorbar()
+#plt.title('3D Phantom, sagittal view')
+#plt.show()
+#
+#
+#
+#
+##%%
 #pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
 #pdhg.max_iteration = 2000
 #pdhg.update_objective_interval = 100
-##
+####
 #pdhgo = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma, memopt=True)
 #pdhgo.max_iteration = 2000
 #pdhgo.update_objective_interval = 100
-##
+####
 #steps = [timer()]
 #pdhgo.run(2000)
 #steps.append(timer())

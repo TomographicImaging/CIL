@@ -89,10 +89,25 @@ class L2NormSquared(Function):
         '''        
         
         if out is None:
-            if self.b is not None:
-                return (x - self.b)/(1+2*tau) + self.b
-            else:
+            
+            if self.b is None:
                 return x/(1+2*tau)
+            else:
+                tmp = x
+                tmp -= self.b
+                tmp /= (1+2*tau)
+                tmp += self.b
+                return tmp
+#                return (x-self.b)/(1+2*tau) + self.b
+            
+#            if self.b is not None:
+#            out=x
+#            if self.b is not None:
+#                out -= self.b
+#            out /= (1+2*tau)
+#            if self.b is not None:
+#                out += self.b
+#            return out
         else:
             out.fill(x)
             if self.b is not None:

@@ -7,7 +7,6 @@ Created on Fri Mar  1 22:51:17 2019
 """
 
 from ccpi.optimisation.operators import LinearOperator
-from ccpi.optimisation.ops import PowerMethodNonsquare
 from ccpi.framework import ImageData, BlockDataContainer
 import numpy as np
 
@@ -318,7 +317,7 @@ class FiniteDiff(LinearOperator):
        
     def norm(self):
         x0 = self.gm_domain.allocate('random_int')
-        self.s1, sall, svec = PowerMethodNonsquare(self, 25, x0)
+        self.s1, sall, svec = LinearOperator.PowerMethod(self, 25, x0)
         return self.s1
     
     

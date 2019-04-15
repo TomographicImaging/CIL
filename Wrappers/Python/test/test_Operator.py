@@ -1,6 +1,6 @@
 import unittest
 #from ccpi.optimisation.operators import Operator
-from ccpi.optimisation.ops import TomoIdentity
+#from ccpi.optimisation.ops import TomoIdentity
 from ccpi.framework import ImageGeometry, ImageData, BlockDataContainer, DataContainer
 from ccpi.optimisation.operators import BlockOperator, BlockScaledOperator,\
     FiniteDiff
@@ -54,7 +54,7 @@ class TestOperator(CCPiTestClass):
         ig = ImageGeometry(10,20,30)
         img = ig.allocate()
         scalar = 0.5
-        sid = scalar * TomoIdentity(ig)
+        sid = scalar * Identity(ig)
         numpy.testing.assert_array_equal(scalar * img.as_array(), sid.direct(img).as_array())
         
 
@@ -63,7 +63,7 @@ class TestOperator(CCPiTestClass):
         img = ig.allocate()
         self.assertTrue(img.shape == (30,20,10))
         self.assertEqual(img.sum(), 0)
-        Id = TomoIdentity(ig)
+        Id = Identity(ig)
         y = Id.direct(img)
         numpy.testing.assert_array_equal(y.as_array(), img.as_array())
 
@@ -107,10 +107,10 @@ class TestOperator(CCPiTestClass):
         
         G = Gradient(ig)
         
-        uid = Id.domain_geometry().allocate(ImageGeometry.RANDOM_INT)
+        uid = Id.domain_geometry().allocate(ImageGeometry.RANDOM_INT, seed=1)
         
-        a = LinearOperator.PowerMethod(Id, 10, uid)
-        b = LinearOperator.PowerMethodNonsquare(Id, 10, uid)
+        a = LinearOperator.PowerMethod(Id, 1000, uid)
+        b = LinearOperator.PowerMethodNonsquare(Id, 1000, uid)
         
         print ("Edo impl", a[0])
         print ("old impl", b[0])
@@ -118,8 +118,8 @@ class TestOperator(CCPiTestClass):
         #self.assertAlmostEqual(a[0], b[0])
         self.assertNumpyArrayAlmostEqual(a[0],b[0],decimal=6)
         
-        a = LinearOperator.PowerMethod(G, 10, uid)
-        b = LinearOperator.PowerMethodNonsquare(G, 10, uid)
+        a = LinearOperator.PowerMethod(G, 1000, uid)
+        b = LinearOperator.PowerMethodNonsquare(G, 1000, uid)
         
         print ("Edo impl", a[0])
         print ("old impl", b[0])

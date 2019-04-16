@@ -416,7 +416,7 @@ class TestBlockOperator(unittest.TestCase):
             i += 1
 
         print ("Time difference ", t1,t2)
-        #self.assertGreater(t1,t2)
+        self.assertGreater(t1,t2)
     
     def test_BlockOperatorLinearValidity(self):
         

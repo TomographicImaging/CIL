@@ -343,11 +343,9 @@ class TestFunction(unittest.TestCase):
         self.assertBlockDataContainerEqual(z3,z1)
 
     def test_KullbackLeibler(self):
+        print ("test_KullbackLeibler")
         N, M = 2,3
         ig  = ImageGeometry(N, M)
-        #data = ImageData(numpy.random.randint(-10, 100, size=(M, N)))
-        #x = ImageData(numpy.random.randint(-10, 100, size=(M, N)))
-        #bnoise = ImageData(numpy.random.randint(-100, 100, size=(M, N)))
         data = ig.allocate(ImageGeometry.RANDOM_INT)
         x = ig.allocate(ImageGeometry.RANDOM_INT)
         bnoise = ig.allocate(ImageGeometry.RANDOM_INT)
@@ -355,14 +353,11 @@ class TestFunction(unittest.TestCase):
         out = ig.allocate()
         
         f = KullbackLeibler(data, bnoise=bnoise)
-        print(f.sum_value)
         
-        print(f(x))
         grad = f.gradient(x)
         f.gradient(x, out=out)
         numpy.testing.assert_array_equal(grad.as_array(), out.as_array())
         
         prox = f.proximal(x,1.2)
-        #print(grad.as_array())
         f.proximal(x, 1.2, out=out)
         numpy.testing.assert_array_equal(prox.as_array(), out.as_array())

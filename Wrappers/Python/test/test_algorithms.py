@@ -86,6 +86,7 @@ class TestAlgorithms(unittest.TestCase):
         identity = TomoIdentity(geometry=ig)
         
         norm2sq = Norm2sq(identity, b)
+        norm2sq.L = 2 * norm2sq.c * identity.norm()**2
         opt = {'tol': 1e-4, 'memopt':False}
         alg = FISTA(x_init=x_init, f=norm2sq, g=None, opt=opt)
         alg.max_iteration = 2

@@ -140,17 +140,18 @@ class Algorithm(object):
                 raise ValueError('Update objective interval must be an integer >= 1')
         else:
             raise ValueError('Update objective interval must be an integer >= 1')
-    def run(self, iterations, verbose=False, callback=None):
+    def run(self, iterations, verbose=True, callback=None):
         '''run n iterations and update the user with the callback if specified'''
         if self.should_stop():
             print ("Stop cryterion has been reached.")
         i = 0
         for _ in self:
-            if verbose:
+            if verbose and self.iteration % self.update_objective_interval == 0:
                 print ("Iteration {}/{}, objective {}".format(self.iteration, 
                        self.max_iteration, self.get_last_objective()) )
-            if callback is not None:
-                callback(self.iteration, self.get_last_objective())
+            else:
+                if callback is not None:
+                    callback(self.iteration, self.get_last_objective())
             i += 1
             if i == iterations:
                 break

@@ -20,8 +20,8 @@
 import numpy
 import time
 
-from ccpi.optimisation.funcs import Function
-from ccpi.optimisation.funcs import ZeroFun
+from ccpi.optimisation.functions import Function
+from ccpi.optimisation.functions import ZeroFunction
 from ccpi.framework import ImageData 
 from ccpi.framework import AcquisitionData
 from ccpi.optimisation.spdhg import spdhg 
@@ -72,7 +72,7 @@ def FISTA(x_init, f=None, g=None, opt=None):
     
     t_old = 1
     
-    c = f(x_init) + g(x_init)
+#    c = f(x_init) + g(x_init)
 
     # algorithm loop
     for it in range(0, max_iter):
@@ -99,9 +99,9 @@ def FISTA(x_init, f=None, g=None, opt=None):
             
             
         else:
-            u = y - invL*f.grad(y)
+            u = y - invL*f.gradient(y)
             
-            x = g.prox(u,invL)
+            x = g.proximal(u,invL)
             
             t = 0.5*(1 + numpy.sqrt(1 + 4*(t_old**2)))
             
@@ -111,8 +111,8 @@ def FISTA(x_init, f=None, g=None, opt=None):
             t_old = t
         
         # time and criterion
-        timing[it] = time.time() - time0
-        criter[it] = f(x) + g(x);
+#        timing[it] = time.time() - time0
+#        criter[it] = f(x) + g(x);
         
         # stopping rule
         #if np.linalg.norm(x - x_old) < tol * np.linalg.norm(x_old) and it > 10:
@@ -121,9 +121,9 @@ def FISTA(x_init, f=None, g=None, opt=None):
         #print(it, 'out of', 10, 'iterations', end='\r');
 
     #criter = criter[0:it+1];
-    timing = numpy.cumsum(timing[0:it+1]);
+#    timing = numpy.cumsum(timing[0:it+1]);
     
-    return x, it, timing, criter
+    return x #, it, timing, criter
 
 def FBPD(x_init, operator=None, constraint=None, data_fidelity=None,\
          regulariser=None, opt=None):

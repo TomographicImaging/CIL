@@ -174,7 +174,7 @@ class TestDataContainer(unittest.TestCase):
     def binary_add(self):
         print("Test binary add")
         X, Y, Z = 512, 512, 512
-        X, Y, Z = 256, 512, 512
+        X, Y, Z = 1024, 512, 512
         steps = [timer()]
         a = numpy.ones((X, Y, Z), dtype='float32')
         steps.append(timer())
@@ -494,10 +494,21 @@ class TestDataContainer(unittest.TestCase):
         self.assertEqual(order[0], image.dimension_labels[0])
         self.assertEqual(order[1], image.dimension_labels[1])
         self.assertEqual(order[2], image.dimension_labels[2])
+        
+        ig = ImageGeometry(2,3,2)
+        try:
+            z = ImageData(numpy.random.randint(10, size=(2,3)), geometry=ig)
+            self.assertTrue(False)
+        except ValueError as ve:
+            print (ve)
+            self.assertTrue(True)
+
+        #vgeometry.allocate('')
     def test_AcquisitionGeometry_allocate(self):
-        ageometry = AcquisitionGeometry(dimension=2, angles=numpy.linspace(0, 180, num=10),
-                                        geom_type='parallel', pixel_num_v=3,
-                                        pixel_num_h=5, channels=2)
+        ageometry = AcquisitionGeometry(dimension=2, 
+                            angles=numpy.linspace(0, 180, num=10),
+                            geom_type='parallel', pixel_num_v=3,
+                            pixel_num_h=5, channels=2)
         sino = ageometry.allocate()
         shape = sino.shape
         print ("shape", shape)
@@ -509,8 +520,8 @@ class TestDataContainer(unittest.TestCase):
         self.assertEqual(1,sino.as_array()[shape[0]-1][shape[1]-1][shape[2]-1][shape[3]-1])
         print (sino.dimension_labels, sino.shape, ageometry)
         
-        default_order = ['channel' , ' angle' ,
-                                          'vertical' , 'horizontal']
+        default_order = ['channel' , 'angle' ,
+                         'vertical' , 'horizontal']
         self.assertEqual(default_order[0], sino.dimension_labels[0])
         self.assertEqual(default_order[1], sino.dimension_labels[1])
         self.assertEqual(default_order[2], sino.dimension_labels[2])
@@ -522,7 +533,15 @@ class TestDataContainer(unittest.TestCase):
         self.assertEqual(order[1], sino.dimension_labels[1])
         self.assertEqual(order[2], sino.dimension_labels[2])
         self.assertEqual(order[2], sino.dimension_labels[2])
-
+        
+        
+        try:
+            z = AcquisitionData(numpy.random.randint(10, size=(2,3)), geometry=ageometry)
+            self.assertTrue(False)
+        except ValueError as ve:
+            print (ve)
+            self.assertTrue(True)
+    
     def assertNumpyArrayEqual(self, first, second):
         res = True
         try:

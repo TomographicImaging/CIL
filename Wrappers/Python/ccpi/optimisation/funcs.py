@@ -20,8 +20,8 @@
 from ccpi.optimisation.ops import Identity, FiniteDiff2D
 import numpy
 from ccpi.framework import DataContainer
-
-
+import warnings
+from ccpi.optimisation.functions import Function
 def isSizeCorrect(data1 ,data2):
     if issubclass(type(data1), DataContainer) and \
        issubclass(type(data2), DataContainer):
@@ -35,17 +35,6 @@ def isSizeCorrect(data1 ,data2):
         raise ValueError("{0}: getting two incompatible types: {1} {2}"\
                          .format('Function', type(data1), type(data2)))
     return False
-        
-class Function(object):
-    def __init__(self):
-        self.L = None
-    def __call__(self,x, out=None):       raise NotImplementedError 
-    def grad(self, x):                    raise NotImplementedError
-    def prox(self, x, tau):               raise NotImplementedError
-    def gradient(self, x, out=None):      raise NotImplementedError
-    def proximal(self, x, tau, out=None): raise NotImplementedError
-
-
 class Norm2(Function):
     
     def __init__(self, 
@@ -141,24 +130,33 @@ class Norm2sq(Function):
         self.A = A  # Should be an operator, default identity
         self.b = b  # Default zero DataSet?
         self.c = c  # Default 1.
-        self.memopt = memopt
         if memopt:
-            #self.direct_placehold = A.adjoint(b)
-            self.direct_placehold = A.allocate_direct()
-            self.adjoint_placehold = A.allocate_adjoint()
-            
+            try:
+                self.range_tmp = A.range_geometry().allocate()
+                self.domain_tmp = A.domain_geometry().allocate()
+                self.memopt = True
+            except NameError as ne:
+                warnings.warn(str(ne))
+                self.memopt = False
+            except NotImplementedError as nie:
+                print (nie)
+                warnings.warn(str(nie))
+                self.memopt = False
+        else:
+            self.memopt = False
         
         # Compute the Lipschitz parameter from the operator if possible
         # Leave it initialised to None otherwise
         try:
-            self.L = 2.0*self.c*(self.A.get_max_sing_val()**2)
+            self.L = 2.0*self.c*(self.A.norm()**2)
         except AttributeError as ae:
             pass
+        except NotImplementedError as noe:
+            pass
         
-    def grad(self,x):
-        #return 2*self.c*self.A.adjoint( self.A.direct(x) - self.b )
-        return (2.0*self.c)*self.A.adjoint( self.A.direct(x) - self.b )
-    
+    #def grad(self,x):
+    #    return self.gradient(x, out=None)
+
     def __call__(self,x):
         #return self.c* np.sum(np.square((self.A.direct(x) - self.b).ravel()))
         #if out is None:
@@ -178,44 +176,58 @@ class Norm2sq(Function):
         if self.memopt:
             #return 2.0*self.c*self.A.adjoint( self.A.direct(x) - self.b )
             
-            self.A.direct(x, out=self.adjoint_placehold)
-            self.adjoint_placehold.__isub__( self.b )
-            self.A.adjoint(self.adjoint_placehold, out=self.direct_placehold)
-            self.direct_placehold.__imul__(2.0 * self.c)
-            # can this be avoided?
-            out.fill(self.direct_placehold)
+            self.A.direct(x, out=self.range_tmp)
+            self.range_tmp -= self.b 
+            self.A.adjoint(self.range_tmp, out=out)
+            #self.direct_placehold.multiply(2.0*self.c, out=out)
+            out *= (self.c * 2.0)
         else:
-            return self.grad(x)
-            
+            return (2.0*self.c)*self.A.adjoint( self.A.direct(x) - self.b )
 
 
-class ZeroFun(Function):
+
+# Box constraints indicator function. Calling returns 0 if argument is within 
+# the box. The prox operator is projection onto the box. Only implements one 
+# scalar lower and one upper as constraint on all elements. Should generalise 
+# to vectors to allow different constraints one elements.
+class IndicatorBox(Function):
     
-    def __init__(self,gamma=0,L=1):
-        self.gamma = gamma
-        self.L = L
-        super(ZeroFun, self).__init__()
+    def __init__(self,lower=-numpy.inf,upper=numpy.inf):
+        # Do nothing
+        super(IndicatorBox, self).__init__()
+        self.lower = lower
+        self.upper = upper
+        
     
     def __call__(self,x):
-        return 0
+        
+        if (numpy.all(x.array>=self.lower) and 
+            numpy.all(x.array <= self.upper) ):
+            val = 0
+        else:
+            val = numpy.inf
+        return val
     
-    def prox(self,x,tau):
-        return x.copy()
+    def prox(self,x,tau=None):
+        return  (x.maximum(self.lower)).minimum(self.upper)
     
     def proximal(self, x, tau, out=None):
         if out is None:
             return self.prox(x, tau)
         else:
-            if isSizeCorrect(out, x):
-                # check dimensionality  
-                if issubclass(type(out), DataContainer):    
-                    out.fill(x) 
-                            
-                elif issubclass(type(out) , numpy.ndarray): 
-                    out[:] = x  
-            else:   
-                raise ValueError ('Wrong size: x{0} out{1}'
-                                    .format(x.shape,out.shape) )
+            if not x.shape == out.shape:
+                raise ValueError('Norm1 Incompatible size:',
+                                 x.shape, out.shape)
+            #(x.abs() - tau*self.gamma).maximum(0) * x.sign()
+            x.abs(out = out)
+            out.__isub__(tau*self.gamma)
+            out.maximum(0, out=out)
+            if self.sign_x is None or not x.shape == self.sign_x.shape:
+                self.sign_x = x.sign()
+            else:
+                x.sign(out=self.sign_x)
+                
+            out.__imul__( self.sign_x )
 
 # A more interesting example, least squares plus 1-norm minimization.
 # Define class to represent 1-norm including prox function
@@ -258,45 +270,3 @@ class Norm1(Function):
                     #out[:] = self.prox(x,tau)
             else:
                 raise ValueError ('Wrong size: x{0} out{1}'.format(x.shape,out.shape) )
-
-# Box constraints indicator function. Calling returns 0 if argument is within 
-# the box. The prox operator is projection onto the box. Only implements one 
-# scalar lower and one upper as constraint on all elements. Should generalise 
-# to vectors to allow different constraints one elements.
-class IndicatorBox(Function):
-    
-    def __init__(self,lower=-numpy.inf,upper=numpy.inf):
-        # Do nothing
-        self.lower = lower
-        self.upper = upper
-        super(IndicatorBox, self).__init__()
-    
-    def __call__(self,x):
-        
-        if (numpy.all(x.array>=self.lower) and 
-            numpy.all(x.array <= self.upper) ):
-            val = 0
-        else:
-            val = numpy.inf
-        return val
-    
-    def prox(self,x,tau=None):
-        return  (x.maximum(self.lower)).minimum(self.upper)
-    
-    def proximal(self, x, tau, out=None):
-        if out is None:
-            return self.prox(x, tau)
-        else:
-            if not x.shape == out.shape:
-                raise ValueError('Norm1 Incompatible size:',
-                                 x.shape, out.shape)
-            #(x.abs() - tau*self.gamma).maximum(0) * x.sign()
-            x.abs(out = out)
-            out.__isub__(tau*self.gamma)
-            out.maximum(0, out=out)
-            if self.sign_x is None or not x.shape == self.sign_x.shape:
-                self.sign_x = x.sign()
-            else:
-                x.sign(out=self.sign_x)
-                
-            out.__imul__( self.sign_x )

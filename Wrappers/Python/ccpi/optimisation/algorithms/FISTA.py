@@ -6,7 +6,7 @@ Created on Thu Feb 21 11:07:30 2019
 """
 
 from ccpi.optimisation.algorithms import Algorithm
-from ccpi.optimisation.funcs import ZeroFun
+from ccpi.optimisation.functions import ZeroFunction
 import numpy
 
 class FISTA(Algorithm):
@@ -46,11 +46,11 @@ class FISTA(Algorithm):
         
         # default inputs
         if f   is None: 
-            self.f = ZeroFun()
+            self.f = ZeroFunction()
         else:
             self.f = f
         if g   is None:
-            g = ZeroFun()
+            g = ZeroFunction()
             self.g = g
         else:
             self.g = g
@@ -106,9 +106,9 @@ class FISTA(Algorithm):
             
             
         else:
-            u = self.y - self.invL*self.f.grad(self.y)
+            u = self.y - self.invL*self.f.gradient(self.y)
             
-            self.x = self.g.prox(u,self.invL)
+            self.x = self.g.proximal(u,self.invL)
             
             self.t = 0.5*(1 + numpy.sqrt(1 + 4*(self.t_old**2)))
             

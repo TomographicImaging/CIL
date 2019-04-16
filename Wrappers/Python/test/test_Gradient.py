@@ -1,9 +1,5 @@
 import unittest
 import numpy
-#from ccpi.plugins.ops import CCPiProjectorSimple
-from ccpi.optimisation.ops import PowerMethodNonsquare
-from ccpi.optimisation.ops import TomoIdentity
-from ccpi.optimisation.funcs import Norm2sq, Norm1
 from ccpi.framework import ImageGeometry, AcquisitionGeometry
 from ccpi.framework import ImageData, AcquisitionData
 #from ccpi.optimisation.algorithms import GradientDescent

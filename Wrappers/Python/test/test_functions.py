@@ -17,15 +17,10 @@ from ccpi.framework import BlockDataContainer
 from numbers import Number
 from ccpi.optimisation.operators import Gradient
 
-#from ccpi.optimisation.functions import SimpleL2NormSq
 from ccpi.optimisation.functions import L2NormSquared
-#from ccpi.optimisation.functions import SimpleL1Norm
 from ccpi.optimisation.functions import L1Norm, MixedL21Norm
 
-from ccpi.optimisation.funcs import Norm2sq
-# from ccpi.optimisation.functions.L2NormSquared import SimpleL2NormSq, L2NormSq
-# from ccpi.optimisation.functions.L1Norm import SimpleL1Norm, L1Norm
-#from ccpi.optimisation.functions import mixed_L12Norm
+from ccpi.optimisation.functions import Norm2sq
 from ccpi.optimisation.functions import ZeroFunction
 
 from ccpi.optimisation.functions import FunctionOperatorComposition

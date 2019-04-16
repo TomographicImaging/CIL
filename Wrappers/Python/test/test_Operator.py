@@ -68,6 +68,7 @@ class TestOperator(CCPiTestClass):
         numpy.testing.assert_array_equal(y.as_array(), img.as_array())
 
     def test_FiniteDifference(self):
+        print ("test FiniteDifference")
         ##
         N, M = 2, 3
 
@@ -94,10 +95,17 @@ class TestOperator(CCPiTestClass):
         G = Gradient(ig)
 
         u = G.range_geometry().allocate(ImageGeometry.RANDOM_INT)
-        res = G.domain_geometry().allocate(ImageGeometry.RANDOM_INT)
+        res = G.domain_geometry().allocate()
         G.adjoint(u, out=res)
         w = G.adjoint(u)
         self.assertNumpyArrayEqual(res.as_array(), w.as_array())
+        
+        u = G.domain_geometry().allocate(ImageGeometry.RANDOM_INT)
+        res = G.range_geometry().allocate()
+        G.direct(u, out=res)
+        w = G.direct(u)
+        self.assertBlockDataContainerEqual(res, w)
+        
     def test_PowerMethod(self):
         
         N, M = 200, 300

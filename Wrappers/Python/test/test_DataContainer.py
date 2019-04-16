@@ -174,7 +174,7 @@ class TestDataContainer(unittest.TestCase):
     def binary_add(self):
         print("Test binary add")
         X, Y, Z = 512, 512, 512
-        X, Y, Z = 1024, 512, 512
+        #X, Y, Z = 1024, 512, 512
         steps = [timer()]
         a = numpy.ones((X, Y, Z), dtype='float32')
         steps.append(timer())
@@ -183,9 +183,10 @@ class TestDataContainer(unittest.TestCase):
         #print("a refcount " , sys.getrefcount(a))
         ds = DataContainer(a, False, ['X', 'Y', 'Z'])
         ds1 = ds.copy()
+        out = ds.copy()
 
         steps.append(timer())
-        ds.add(ds1, out=ds)
+        ds.add(ds1, out=out)
         steps.append(timer())
         t1 = dt(steps)
         print("ds.add(ds1, out=ds)", dt(steps))
@@ -196,20 +197,25 @@ class TestDataContainer(unittest.TestCase):
         print("ds2 = ds.add(ds1)", dt(steps))
 
         self.assertLess(t1, t2)
-        self.assertEqual(ds.as_array()[0][0][0], 2.)
-
+        self.assertEqual(out.as_array()[0][0][0], 2.)
+        self.assertNumpyArrayEqual(out.as_array(), ds2.as_array())
+        
         ds0 = ds
-        ds0.add(2, out=ds0)
         steps.append(timer())
-        print("ds0.add(2,out=ds0)", dt(steps), 3, ds0.as_array()[0][0][0])
-        self.assertEqual(4., ds0.as_array()[0][0][0])
+        ds0.add(2, out=out)
+        steps.append(timer())
+        print("ds0.add(2,out=out)", dt(steps), 3, ds0.as_array()[0][0][0])
+        self.assertEqual(3., out.as_array()[0][0][0])
 
         dt1 = dt(steps)
+        steps.append(timer())
         ds3 = ds0.add(2)
         steps.append(timer())
         print("ds3 = ds0.add(2)", dt(steps), 5, ds3.as_array()[0][0][0])
         dt2 = dt(steps)
         self.assertLess(dt1, dt2)
+        
+        self.assertNumpyArrayEqual(out.as_array(), ds3.as_array())
 
     def binary_subtract(self):
         print("Test binary subtract")
@@ -222,16 +228,17 @@ class TestDataContainer(unittest.TestCase):
         #print("a refcount " , sys.getrefcount(a))
         ds = DataContainer(a, False, ['X', 'Y', 'Z'])
         ds1 = ds.copy()
+        out = ds.copy()
 
         steps.append(timer())
-        ds.subtract(ds1, out=ds)
+        ds.subtract(ds1, out=out)
         steps.append(timer())
         t1 = dt(steps)
         print("ds.subtract(ds1, out=ds)", dt(steps))
-        self.assertEqual(0., ds.as_array()[0][0][0])
+        self.assertEqual(0., out.as_array()[0][0][0])
 
         steps.append(timer())
-        ds2 = ds.subtract(ds1)
+        ds2 = out.subtract(ds1)
         self.assertEqual(-1., ds2.as_array()[0][0][0])
 
         steps.append(timer())
@@ -247,8 +254,8 @@ class TestDataContainer(unittest.TestCase):
         #ds0.__isub__( 2 )
         steps.append(timer())
         print("ds0.subtract(2,out=ds0)", dt(
-            steps), -2., ds0.as_array()[0][0][0])
-        self.assertEqual(-2., ds0.as_array()[0][0][0])
+            steps), -1., ds0.as_array()[0][0][0])
+        self.assertEqual(-1., ds0.as_array()[0][0][0])
 
         dt1 = dt(steps)
         ds3 = ds0.subtract(2)
@@ -256,8 +263,8 @@ class TestDataContainer(unittest.TestCase):
         print("ds3 = ds0.subtract(2)", dt(steps), 0., ds3.as_array()[0][0][0])
         dt2 = dt(steps)
         self.assertLess(dt1, dt2)
-        self.assertEqual(-2., ds0.as_array()[0][0][0])
-        self.assertEqual(-4., ds3.as_array()[0][0][0])
+        self.assertEqual(-1., ds0.as_array()[0][0][0])
+        self.assertEqual(-3., ds3.as_array()[0][0][0])
 
     def binary_multiply(self):
         print("Test binary multiply")
@@ -300,6 +307,9 @@ class TestDataContainer(unittest.TestCase):
         self.assertLess(dt1, dt2)
         self.assertEqual(4., ds3.as_array()[0][0][0])
         self.assertEqual(2., ds.as_array()[0][0][0])
+        
+        ds.multiply(2.5, out=ds0)
+        self.assertEqual(2.5*2., ds0.as_array()[0][0][0])
 
     def binary_divide(self):
         print("Test binary divide")
@@ -575,6 +585,32 @@ class TestDataContainer(unittest.TestCase):
         norm = dc.norm()
         self.assertEqual(sqnorm, 8.0)
         numpy.testing.assert_almost_equal(norm, numpy.sqrt(8.0), decimal=7)
+        
+    def test_multiply_out(self):
+        print ("test multiply_out")
+        import functools
+        ig = ImageGeometry(10,11,12)
+        u = ig.allocate()
+        a = numpy.ones(u.shape)
+        
+        u.fill(a)
+        
+        numpy.testing.assert_array_equal(a, u.as_array())
+        
+        #u = ig.allocate(ImageGeometry.RANDOM_INT, seed=1)
+        l = functools.reduce(lambda x,y: x*y, (10,11,12), 1)
+        
+        a = numpy.zeros((l, ), dtype=numpy.float32)
+        for i in range(l):
+            a[i] = numpy.sin(2 * i* 3.1415/l)
+        b = numpy.reshape(a, u.shape)
+        u.fill(b)
+        numpy.testing.assert_array_equal(b, u.as_array())
+        
+        u.multiply(2, out=u)
+        c = b * 2
+        numpy.testing.assert_array_equal(u.as_array(), c)
+        
 
 
 

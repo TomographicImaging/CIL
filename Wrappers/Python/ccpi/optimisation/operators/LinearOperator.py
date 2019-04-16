@@ -44,8 +44,9 @@ class LinearOperator(Operator):
             #s[it] = (x1*x0).sum() / (x0.squared_norm())
             s[it] = x1.dot(x0) / x0.squared_norm()
             #x0 = (1.0/x1norm)*x1
-            x1 *= (1.0 / x1norm)
-            x0.fill(x1)
+            #x1 *= (1.0 / x1norm)
+            #x0.fill(x1)
+            x1.multiply((1.0/x1norm), out=x0)
         return numpy.sqrt(s[-1]), numpy.sqrt(s), x0
 
     @staticmethod

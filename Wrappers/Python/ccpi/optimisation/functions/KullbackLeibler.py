@@ -20,6 +20,7 @@
 import numpy
 from ccpi.optimisation.functions import Function
 from ccpi.optimisation.functions.ScaledFunction import ScaledFunction 
+from ccpi.framework import ImageData
 
 class KullbackLeibler(Function):
     
@@ -39,14 +40,17 @@ class KullbackLeibler(Function):
         
         # TODO check
         
-        self.sum_value = self.b + self.bnoise        
+        self.sum_value = x + self.bnoise        
         if  (self.sum_value.as_array()<0).any():
             self.sum_value = numpy.inf
         
         if self.sum_value==numpy.inf:
             return numpy.inf
         else:
-            return numpy.sum( x.as_array() - self.b.as_array() * numpy.log(self.sum_value.as_array()))
+            tmp = self.sum_value.as_array()            
+            return (x - self.b * ImageData( numpy.log(tmp))).sum()
+            
+#            return numpy.sum( x.as_array() - self.b.as_array() * numpy.log(self.sum_value.as_array()))
 
         
     def gradient(self, x, out=None):
@@ -60,7 +64,10 @@ class KullbackLeibler(Function):
     
     def convex_conjugate(self, x):
         
-        return self.b * ( numpy.log(self.b/(1-x)) - 1 ) - self.bnoise * (x - 1)
+        tmp = self.b.as_array()/( 1 - x.as_array() )
+        
+        return (self.b * ( ImageData( numpy.log(tmp) ) - 1 ) - self.bnoise * (x - 1)).sum()
+#        return self.b * ( ImageData(numpy.log(self.b/(1-x)) - 1 )) - self.bnoise * (x - 1)
     
     def proximal(self, x, tau, out=None):
         

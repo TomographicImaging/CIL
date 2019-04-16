@@ -1,12 +1,12 @@
 import unittest
 from ccpi.optimisation.operators import BlockOperator
 from ccpi.framework import BlockDataContainer
-from ccpi.optimisation.ops import TomoIdentity
+from ccpi.optimisation.ops import Identity
 from ccpi.framework import ImageGeometry, ImageData
 import numpy
 from ccpi.optimisation.operators import FiniteDiff
 
-class TestOperator(TomoIdentity):
+class TestOperator(Identity):
     def __init__(self, *args, **kwargs):
         super(TestOperator, self).__init__(*args, **kwargs)
         self.range = kwargs.get('range', self.geometry)
@@ -21,7 +21,7 @@ class TestBlockOperator(unittest.TestCase):
                ImageGeometry(10,20,30) , \
                ImageGeometry(10,20,30) ]
         x = [ g.allocate() for g in ig ]
-        ops = [ TomoIdentity(g) for g in ig ]
+        ops = [ Identity(g) for g in ig ]
 
         K = BlockOperator(*ops)
         X = BlockDataContainer(x[0])
@@ -50,7 +50,7 @@ class TestBlockOperator(unittest.TestCase):
                 ImageGeometry(10,20,30) , \
                 ImageGeometry(10,20,30) ]
             x = [ g.allocate() for g in ig ]
-            ops = [ TomoIdentity(g) for g in ig ]
+            ops = [ Identity(g) for g in ig ]
             
             K = BlockOperator(*ops)
             self.assertTrue(False)
@@ -90,7 +90,7 @@ class TestBlockOperator(unittest.TestCase):
                ImageGeometry(10,20,30) , \
                ImageGeometry(10,20,30) ]
         x = [ g.allocate() for g in ig ]
-        ops = [ TomoIdentity(g) for g in ig ]
+        ops = [ Identity(g) for g in ig ]
 
         val = 1
         # test limit as non Scaled
@@ -121,7 +121,7 @@ class TestBlockOperator(unittest.TestCase):
                #ImageGeometry(10,20,30) , \
                ImageGeometry(2,3    ) ]
         x = [ g.allocate() for g in ig ]
-        ops = [ TomoIdentity(g) for g in ig ]
+        ops = [ Identity(g) for g in ig ]
 
 
         # test limit as non Scaled
@@ -158,7 +158,7 @@ class TestBlockOperator(unittest.TestCase):
         print (img.shape, ig.shape)
         self.assertTrue(img.shape == (30,20,10))
         self.assertEqual(img.sum(), 0)
-        Id = TomoIdentity(ig)
+        Id = Identity(ig)
         y = Id.direct(img)
         numpy.testing.assert_array_equal(y.as_array(), img.as_array())
 
@@ -167,7 +167,7 @@ class TestBlockOperator(unittest.TestCase):
 
         from ccpi.plugins.ops import CCPiProjectorSimple
         from ccpi.optimisation.ops import PowerMethodNonsquare
-        from ccpi.optimisation.ops import TomoIdentity
+        from ccpi.optimisation.operators import Identity
         from ccpi.optimisation.funcs import Norm2sq, Norm1
         from ccpi.framework import ImageGeometry, AcquisitionGeometry
         from ccpi.optimisation.Algorithms import GradientDescent
@@ -265,8 +265,8 @@ class TestBlockOperator(unittest.TestCase):
                                 ImageData(geometry=ig, dimension_labels=['horizontal_x','horizontal_y','vertical']))
         
         # setup a tomo identity
-        Ibig = 1e5 * TomoIdentity(geometry=ig)
-        Ismall = 1e-5 * TomoIdentity(geometry=ig)
+        Ibig = 1e5 * Identity(ig)
+        Ismall = 1e-5 * Identity(ig)
         
         # composite operator
         Kbig = BlockOperator(A, Ibig, shape=(2,1))

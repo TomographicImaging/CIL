@@ -1,17 +1,11 @@
 import unittest
 from ccpi.optimisation.operators import BlockOperator
 from ccpi.framework import BlockDataContainer
-from ccpi.optimisation.ops import Identity
+from ccpi.optimisation.operators import Identity
 from ccpi.framework import ImageGeometry, ImageData
 import numpy
 from ccpi.optimisation.operators import FiniteDiff
 
-class TestOperator(Identity):
-    def __init__(self, *args, **kwargs):
-        super(TestOperator, self).__init__(*args, **kwargs)
-        self.range = kwargs.get('range', self.geometry)
-    def range_geometry(self):
-        return self.range
 
 class TestBlockOperator(unittest.TestCase):
 
@@ -70,8 +64,8 @@ class TestBlockOperator(unittest.TestCase):
                    ImageGeometry(10,22,31) , \
                    ImageGeometry(10,20,31) ]
             x = [ g.allocate() for g in ig ]
-            ops = [ TestOperator(g, range=r) for g,r in zip(ig, rg0) ]
-            ops += [ TestOperator(g, range=r) for g,r in zip(ig, rg1) ]
+            ops = [ Identity(g, gm_range=r) for g,r in zip(ig, rg0) ]
+            ops += [ Identity(g, gm_range=r) for g,r in zip(ig, rg1) ]
 
             K = BlockOperator(*ops, shape=(2,3))
             print ("K col comp? " , K.column_wise_compatible())

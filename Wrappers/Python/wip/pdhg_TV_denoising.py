@@ -20,10 +20,10 @@ from ccpi.optimisation.functions import ZeroFunction, L2NormSquared, \
 from skimage.util import random_noise
 
 from timeit import default_timer as timer
-def dt(steps):
-    return steps[-1] - steps[-2]
+#def dt(steps):
+#    return steps[-1] - steps[-2]
 
-# Create phantom for TV denoising
+# Create phantom for TV Gaussian denoising
 
 N = 100
 

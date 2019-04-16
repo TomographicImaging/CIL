@@ -96,7 +96,8 @@ class MixedL21Norm(Function):
                 tmp = [ el*el for el in x.containers]
                 res = sum(tmp).sqrt().maximum(1.0) 
                 frac = [el/res for el in x.containers]
-                return  BlockDataContainer(*frac)    
+                return  BlockDataContainer(*frac)   
+            
                 
             #TODO this is slow, why???
 #                return x.divide(x.pnorm().maximum(1.0))

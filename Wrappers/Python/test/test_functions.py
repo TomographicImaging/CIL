@@ -9,7 +9,7 @@ Created on Sat Mar  2 19:24:37 2019
 
 import numpy as np
 #from ccpi.optimisation.funcs import Function
-from ccpi.optimisation.functions import Function
+from ccpi.optimisation.functions import Function, KullbackLeibler
 from ccpi.framework import DataContainer, ImageData, ImageGeometry 
 from ccpi.optimisation.operators import  Identity
 from ccpi.optimisation.operators import BlockOperator
@@ -341,32 +341,27 @@ class TestFunction(unittest.TestCase):
         f_no_scaled.proximal_conjugate(U, 1, out=z3)
         self.assertBlockDataContainerEqual(z3,z1)
 
-#    
-#    f1 = L2NormSq(alpha=1, b=noisy_data)
-#    print(f1(noisy_data))
-#    
-#    f2 =  L2NormSq(alpha=5, b=noisy_data).composition_with(op2)
-#    print(f2(noisy_data))
-#    
-#    print(f1.gradient(noisy_data).as_array())
-#    print(f2.gradient(noisy_data).as_array())
-##    
-#    print(f1.proximal(noisy_data,1).as_array())
-#    print(f2.proximal(noisy_data,1).as_array())
-#    
-#    
-#    f3 = mixed_L12Norm(alpha = 1).composition_with(op1)
-#    print(f3(noisy_data))
-#            
-#    print(ImageData(op1.direct(noisy_data).power(2).sum(axis=0)).sqrt().sum())
-#    
-#    print( 5*(op2.direct(d) - noisy_data).power(2).sum(), f2(d))
-#    
-#    from functions import mixed_L12Norm as mixed_L12Norm_old
-#    
-#    print(mixed_L12Norm_old(op1,None,alpha)(noisy_data))
-    
-    
-    #        
-
+    def test_KullbackLeibler(self):
+        N, M = 2,3
+        ig  = ImageGeometry(N, M)
+        #data = ImageData(numpy.random.randint(-10, 100, size=(M, N)))
+        #x = ImageData(numpy.random.randint(-10, 100, size=(M, N)))
+        #bnoise = ImageData(numpy.random.randint(-100, 100, size=(M, N)))
+        data = ig.allocate(ImageGeometry.RANDOM_INT)
+        x = ig.allocate(ImageGeometry.RANDOM_INT)
+        bnoise = ig.allocate(ImageGeometry.RANDOM_INT)
         
+        out = ig.allocate()
+        
+        f = KullbackLeibler(data, bnoise=bnoise)
+        print(f.sum_value)
+        
+        print(f(x))
+        grad = f.gradient(x)
+        f.gradient(x, out=out)
+        numpy.testing.assert_array_equal(grad.as_array(), out.as_array())
+        
+        prox = f.proximal(x,1.2)
+        #print(grad.as_array())
+        f.proximal(x, 1.2, out=out)
+        numpy.testing.assert_array_equal(prox.as_array(), out.as_array())

@@ -43,20 +43,35 @@ class KullbackLeibler(Function):
             return numpy.sum( x.as_array() - self.b.as_array() * numpy.log(self.sum_value.as_array()))
 
         
-    def gradient(self, x):
-        
-        #TODO Division check
-        return 1 - self.b/(x + self.bnoise)
+    def gradient(self, x, out=None):
+        if out is None:
+            #TODO Division check
+            return 1 - self.b/(x + self.bnoise)
+        else:
+            x.add(self.bnoise, out=out)
+            self.b.divide(out, out=out)
+            out *= -1
+            out += 1
     
     def convex_conjugate(self, x, out=None):
         pass
     
     def proximal(self, x, tau, out=None):
-        
-        z = x + tau * self.bnoise
-        return (z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt()
-
-    
+        if out is None:
+            z = x + tau * self.bnoise
+            return (z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt()
+        else:
+            z_m = x + tau * self.bnoise - 1
+            self.b.multiply(4*tau, out=out)
+            z_m.multiply(z_m, out=z_m)
+            out += z_m
+            out.sqrt(out=out)
+            # z = z_m + 2
+            z_m.sqrt(out=z_m)
+            z_m += 2
+            out *= -1
+            out += z_m
+                
     def proximal_conjugate(self, x, tau, out=None):
         pass
         
@@ -67,15 +82,28 @@ if __name__ == '__main__':
     
     N, M = 2,3
     ig  = ImageGeometry(N, M)
-    data = ImageData(numpy.random.randint(-10, 100, size=(M, N)))
-    x = ImageData(numpy.random.randint(-10, 100, size=(M, N)))
+    #data = ImageData(numpy.random.randint(-10, 100, size=(M, N)))
+    #x = ImageData(numpy.random.randint(-10, 100, size=(M, N)))
+    #bnoise = ImageData(numpy.random.randint(-100, 100, size=(M, N)))
+    data = ig.allocate(ImageGeometry.RANDOM_INT)
+    x = ig.allocate(ImageGeometry.RANDOM_INT)
+    bnoise = ig.allocate(ImageGeometry.RANDOM_INT)
     
-    bnoise = ImageData(numpy.random.randint(-100, 100, size=(M, N)))
+    out = ig.allocate()
     
     f = KullbackLeibler(data, bnoise=bnoise)
     print(f.sum_value)
     
     print(f(x))
+    grad = f.gradient(x)
+    f.gradient(x, out=out)
+    numpy.testing.assert_array_equal(grad.as_array(), out.as_array())
+    
+    prox = f.proximal(x,1.2)
+    #print(grad.as_array())
+    f.proximal(x, 1.2, out=out)
+    numpy.testing.assert_array_equal(prox.as_array(), out.as_array())
+    
 
 
     

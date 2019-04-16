@@ -5,7 +5,7 @@
 from ccpi.framework import ImageData, ImageGeometry, AcquisitionGeometry, \
     AcquisitionData
 from ccpi.optimisation.algs import FISTA, FBPD, CGLS, SIRT
-from ccpi.optimisation.funcs import Norm2sq, Norm1, TV2D, IndicatorBox
+from ccpi.optimisation.funcs import Norm2sq, Norm1, IndicatorBox
 from ccpi.astra.ops import AstraProjectorSimple
 
 from ccpi.optimisation.algorithms import CGLS as CGLSALG

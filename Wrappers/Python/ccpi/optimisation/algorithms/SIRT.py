@@ -28,15 +28,15 @@ Created on Thu Feb 21 11:11:23 2019
  @author: ofn77899
 """
 
- from ccpi.optimisation.algorithms import Algorithm
+from ccpi.optimisation.algorithms import Algorithm
 from ccpi.framework import ImageData, AcquisitionData
 
  #from collections.abc import Iterable
 class SIRT(Algorithm):
 
-     '''Simultaneous Iterative Reconstruction Technique
-     Parameters:
-      x_init: initial guess
+    '''Simultaneous Iterative Reconstruction Technique
+    Parameters:
+     x_init: initial guess
       operator: operator for forward/backward projections
       data: data to operate on
       constraint: Function with prox-method, for example IndicatorBox to 

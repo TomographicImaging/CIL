@@ -19,23 +19,29 @@
 
 import numpy
 from ccpi.optimisation.functions import Function
-from ccpi.optimisation.functions.ScaledFunction import ScaledFunction
-from ccpi.framework import DataContainer, ImageData, ImageGeometry  
+from ccpi.optimisation.functions.ScaledFunction import ScaledFunction 
 
 class KullbackLeibler(Function):
     
-    def __init__(self,data,**kwargs):
+    ''' Assume that data > 0
+                
+    '''
+    
+    def __init__(self,data, **kwargs):
         
         super(KullbackLeibler, self).__init__()
         
         self.b = data        
         self.bnoise = kwargs.get('bnoise', 0)
 
+                                                
+    def __call__(self, x):
+        
+        # TODO check
+        
         self.sum_value = self.b + self.bnoise        
         if  (self.sum_value.as_array()<0).any():
             self.sum_value = numpy.inf
-                                                
-    def __call__(self, x):
         
         if self.sum_value==numpy.inf:
             return numpy.inf
@@ -43,22 +49,50 @@ class KullbackLeibler(Function):
             return numpy.sum( x.as_array() - self.b.as_array() * numpy.log(self.sum_value.as_array()))
 
         
-    def gradient(self, x):
+    def gradient(self, x, out=None):
         
         #TODO Division check
-        return 1 - self.b/(x + self.bnoise)
+        if out is None:
+            return 1 - self.b/(x + self.bnoise)
+        else:
+            self.b.divide(x+self.bnoise, out=out)
+            out.subtract(1, out=out)
     
-    def convex_conjugate(self, x, out=None):
-        pass
+    def convex_conjugate(self, x):
+        
+        return self.b * ( numpy.log(self.b/(1-x)) - 1 ) - self.bnoise * (x - 1)
     
     def proximal(self, x, tau, out=None):
         
-        z = x + tau * self.bnoise
-        return (z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt()
-
+        if out is None:        
+            return 0.5 *( (x - self.bnoise - tau) + ( (x + self.bnoise - tau)**2 + 4*tau*self.b   ) .sqrt() )
+        else:
+            tmp =  0.5 *( (x - self.bnoise - tau) + ( (x + self.bnoise - tau)**2 + 4*tau*self.b   ) .sqrt() )
+            out.fill(tmp)
+            
     
     def proximal_conjugate(self, x, tau, out=None):
-        pass
+
+                
+        if out is None:
+            z = x + tau * self.bnoise
+            return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
+        else:
+            z = x + tau * self.bnoise
+            res = 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
+            out.fill(res)
+            
+        
+    
+    def __rmul__(self, scalar):
+        
+        ''' Multiplication of L2NormSquared with a scalar
+        
+        Returns: ScaledFunction
+                        
+        '''
+        
+        return ScaledFunction(self, scalar)     
         
         
     

@@ -152,28 +152,28 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
         
         if not memopt:
             
-            y_old += sigma * operator.direct(xbar)            
-            y = f.proximal_conjugate(y_old, sigma)
-            
-            x_old -= tau*operator.adjoint(y)
-            x = g.proximal(x_old, tau)
-             
+            y_tmp = y_old +  sigma * operator.direct(xbar)            
+            y = f.proximal_conjugate(y_tmp, sigma)
+                
+            x_tmp = x_old - tau*operator.adjoint(y)
+            x = g.proximal(x_tmp, tau)
+                 
             x.subtract(x_old, out=xbar)
             xbar *= theta
             xbar += x
-                                                
+                                                  
             x_old.fill(x)
-            y_old.fill(y)       
+            y_old.fill(y)
             
             
-#            if i%100==0:
-#                
-#                p1 = f(operator.direct(x)) + g(x)
-#                d1 = - ( f.convex_conjugate(y) + g(-1*operator.adjoint(y)) )
-#                primal.append(p1)
-#                dual.append(d1)
-#                pdgap.append(p1-d1)      
-#                print(p1, d1, p1-d1)
+            if i%100==0:
+                
+                p1 = f(operator.direct(x)) + g(x)
+                d1 = - ( f.convex_conjugate(y) + g(-1*operator.adjoint(y)) )
+                primal.append(p1)
+                dual.append(d1)
+                pdgap.append(p1-d1)      
+                print(p1, d1, p1-d1)
                                
             
         else:
@@ -196,14 +196,14 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
             x_old.fill(x)
             y_old.fill(y)
             
-#            if i%100==0:
-#                
-#                p1 = f(operator.direct(x)) + g(x)
-#                d1 = - ( f.convex_conjugate(y) + g(-1*operator.adjoint(y)) )
-#                primal.append(p1)
-#                dual.append(d1)
-#                pdgap.append(p1-d1)      
-#                print(p1, d1, p1-d1)
+            if i%100==0:
+                
+                p1 = f(operator.direct(x)) + g(x)
+                d1 = - ( f.convex_conjugate(y) + g(-1*operator.adjoint(y)) )
+                primal.append(p1)
+                dual.append(d1)
+                pdgap.append(p1-d1)      
+                print(p1, d1, p1-d1)
             
                          
     t_end = time.time()        

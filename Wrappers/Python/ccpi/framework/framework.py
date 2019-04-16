@@ -707,6 +707,10 @@ class DataContainer(object):
     def maximum(self, x2, *args, **kwargs):
         return self.pixel_wise_binary(numpy.maximum, x2, *args, **kwargs)
     
+    def minimum(self,x2, out=None, *args, **kwargs):
+        return self.pixel_wise_binary(numpy.minimum, x2=x2, out=out, *args, **kwargs)
+
+    
     ## unary operations
     def pixel_wise_unary(self, pwop, *args,  **kwargs):
         out = kwargs.get('out', None)

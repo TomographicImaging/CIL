@@ -280,10 +280,6 @@ def SIRT(x_init, operator , data , opt=None, constraint=None):
     tol = opt['tol']
     max_iter = opt['iter']
     
-    # Set default constraint to unconstrained
-    if constraint==None:
-        constraint = Function()
-    
     x = x_init.clone()
     
     timing = numpy.zeros(max_iter)
@@ -307,7 +303,10 @@ def SIRT(x_init, operator , data , opt=None, constraint=None):
         t = time.time()
         r = data - operator.direct(x)
         
-        x = constraint.prox(x + relax_par * (D*operator.adjoint(M*r)),None)
+        x = x + relax_par * (D*operator.adjoint(M*r))
+
+        if constraint != None:
+            x = constraint.prox(x,None)
         
         timing[it] = time.time() - t
         if it > 0:

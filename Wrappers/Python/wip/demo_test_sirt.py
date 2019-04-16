@@ -8,6 +8,9 @@ from ccpi.optimisation.algs import FISTA, FBPD, CGLS, SIRT
 from ccpi.optimisation.funcs import Norm2sq, Norm1, TV2D, IndicatorBox
 from ccpi.astra.ops import AstraProjectorSimple
 
+from ccpi.optimisation.algorithms import CGLS as CGLSALG
+from ccpi.optimisation.algorithms import SIRT as SIRTALG
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -25,6 +28,7 @@ x = Phantom.as_array()
 x[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
 x[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 1
 
+plt.figure()
 plt.imshow(x)
 plt.title('Phantom image')
 plt.show()
@@ -69,10 +73,12 @@ Aop = AstraProjectorSimple(ig, ag, 'gpu')
 b = Aop.direct(Phantom)
 z = Aop.adjoint(b)
 
+plt.figure()
 plt.imshow(b.array)
 plt.title('Simulated data')
 plt.show()
 
+plt.figure()
 plt.imshow(z.array)
 plt.title('Backprojected data')
 plt.show()
@@ -81,30 +87,62 @@ plt.show()
 # demonstrated in the rest of this file. In general all methods need an initial 
 # guess and some algorithm options to be set:
 x_init = ImageData(np.zeros(x.shape),geometry=ig)
-opt = {'tol': 1e-4, 'iter': 1000}
+opt = {'tol': 1e-4, 'iter': 100}
 
 # First a CGLS reconstruction can be done:
 x_CGLS, it_CGLS, timing_CGLS, criter_CGLS = CGLS(x_init, Aop, b, opt)
 
+plt.figure()
 plt.imshow(x_CGLS.array)
 plt.title('CGLS')
 plt.colorbar()
 plt.show()
 
+plt.figure()
 plt.semilogy(criter_CGLS)
 plt.title('CGLS criterion')
 plt.show()
 
+
+my_CGLS_alg = CGLSALG()
+my_CGLS_alg.set_up(x_init, Aop, b )
+my_CGLS_alg.max_iteration = 2000
+my_CGLS_alg.run(opt['iter'])
+x_CGLS_alg = my_CGLS_alg.get_output()
+
+plt.figure()
+plt.imshow(x_CGLS_alg.array)
+plt.title('CGLS ALG')
+plt.colorbar()
+plt.show()
+
+
 # A SIRT unconstrained reconstruction can be done: similarly:
 x_SIRT, it_SIRT, timing_SIRT, criter_SIRT = SIRT(x_init, Aop, b, opt)
 
+plt.figure()
 plt.imshow(x_SIRT.array)
 plt.title('SIRT unconstrained')
 plt.colorbar()
 plt.show()
 
+plt.figure()
 plt.semilogy(criter_SIRT)
 plt.title('SIRT unconstrained criterion')
+plt.show()
+
+
+
+my_SIRT_alg = SIRTALG()
+my_SIRT_alg.set_up(x_init, Aop, b )
+my_SIRT_alg.max_iteration = 2000
+my_SIRT_alg.run(opt['iter'])
+x_SIRT_alg = my_SIRT_alg.get_output()
+
+plt.figure()
+plt.imshow(x_SIRT_alg.array)
+plt.title('SIRT ALG')
+plt.colorbar()
 plt.show()
 
 # A SIRT nonnegativity constrained reconstruction can be done using the 
@@ -112,65 +150,93 @@ plt.show()
 # lower bound and the default upper bound of infinity:
 x_SIRT0, it_SIRT0, timing_SIRT0, criter_SIRT0 = SIRT(x_init, Aop, b, opt,
                                                       constraint=IndicatorBox(lower=0))
-
+plt.figure()
 plt.imshow(x_SIRT0.array)
 plt.title('SIRT nonneg')
 plt.colorbar()
 plt.show()
 
+plt.figure()
 plt.semilogy(criter_SIRT0)
 plt.title('SIRT nonneg criterion')
 plt.show()
+
+
+my_SIRT_alg0 = SIRTALG()
+my_SIRT_alg0.set_up(x_init, Aop, b, constraint=IndicatorBox(lower=0) )
+my_SIRT_alg0.max_iteration = 2000
+my_SIRT_alg0.run(opt['iter'])
+x_SIRT_alg0 = my_SIRT_alg0.get_output()
+
+plt.figure()
+plt.imshow(x_SIRT_alg0.array)
+plt.title('SIRT ALG0')
+plt.colorbar()
+plt.show()
+
 
 # A SIRT reconstruction with box constraints on [0,1] can also be done:
 x_SIRT01, it_SIRT01, timing_SIRT01, criter_SIRT01 = SIRT(x_init, Aop, b, opt,
          constraint=IndicatorBox(lower=0,upper=1))
 
+plt.figure()
 plt.imshow(x_SIRT01.array)
 plt.title('SIRT box(0,1)')
 plt.colorbar()
 plt.show()
 
+plt.figure()
 plt.semilogy(criter_SIRT01)
 plt.title('SIRT box(0,1) criterion')
+plt.show()
+
+my_SIRT_alg01 = SIRTALG()
+my_SIRT_alg01.set_up(x_init, Aop, b, constraint=IndicatorBox(lower=0,upper=1) )
+my_SIRT_alg01.max_iteration = 2000
+my_SIRT_alg01.run(opt['iter'])
+x_SIRT_alg01 = my_SIRT_alg01.get_output()
+
+plt.figure()
+plt.imshow(x_SIRT_alg01.array)
+plt.title('SIRT ALG01')
+plt.colorbar()
 plt.show()
 
 # The indicator function can also be used with the FISTA algorithm to do 
 # least squares with nonnegativity constraint.
 
+'''
 # Create least squares object instance with projector, test data and a constant 
 # coefficient of 0.5:
 f = Norm2sq(Aop,b,c=0.5)
-
 # Run FISTA for least squares without constraints
 x_fista, it, timing, criter = FISTA(x_init, f, None,opt)
-
+plt.figure()
 plt.imshow(x_fista.array)
 plt.title('FISTA Least squares')
 plt.show()
-
+plt.figure()
 plt.semilogy(criter)
 plt.title('FISTA Least squares criterion')
 plt.show()
-
 # Run FISTA for least squares with nonnegativity constraint
 x_fista0, it0, timing0, criter0 = FISTA(x_init, f, IndicatorBox(lower=0),opt)
-
+plt.figure()
 plt.imshow(x_fista0.array)
 plt.title('FISTA Least squares nonneg')
 plt.show()
-
+plt.figure()
 plt.semilogy(criter0)
 plt.title('FISTA Least squares nonneg criterion')
 plt.show()
-
 # Run FISTA for least squares with box constraint [0,1]
 x_fista01, it01, timing01, criter01 = FISTA(x_init, f, IndicatorBox(lower=0,upper=1),opt)
-
+plt.figure()
 plt.imshow(x_fista01.array)
 plt.title('FISTA Least squares box(0,1)')
 plt.show()
-
+plt.figure()
 plt.semilogy(criter01)
 plt.title('FISTA Least squares box(0,1) criterion')
 plt.show()
+'''

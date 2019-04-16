@@ -99,6 +99,7 @@ class TestFunction(unittest.TestCase):
     
     def test_L2NormSquared(self):
         # TESTS for L2 and scalar * L2
+        print ("Test L2NormSquared")
     
         M, N, K = 2,3,5
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N, voxel_num_z = K)
@@ -324,7 +325,7 @@ class TestFunction(unittest.TestCase):
         
         a1 = f_no_scaled(U)
         a2 = f_scaled(U)
-        self.assertNumpyArrayAlmostEqual(a1.as_array(),a2.as_array())
+        self.assertNumpyArrayAlmostEqual(a1,a2)
         
         
         tmp = [ el**2 for el in U.containers ]

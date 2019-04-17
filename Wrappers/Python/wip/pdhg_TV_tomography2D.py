@@ -43,7 +43,7 @@ from timeit import default_timer as timer
 #ig = ImageGeometry(voxel_num_x = N, voxel_num_y = N)
 #data = ImageData(phantom_2D, geometry=ig)
 
-N = 150
+N = 75
 x = np.zeros((N,N))
 x[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
 x[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 1

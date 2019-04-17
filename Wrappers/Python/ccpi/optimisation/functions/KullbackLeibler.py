@@ -20,12 +20,8 @@
 import numpy
 from ccpi.optimisation.functions import Function
 from ccpi.optimisation.functions.ScaledFunction import ScaledFunction 
-<<<<<<< HEAD
-from ccpi.framework import ImageData
-=======
 from ccpi.framework import ImageData, ImageGeometry
 import functools
->>>>>>> composite_operator_datacontainer
 
 class KullbackLeibler(Function):
     

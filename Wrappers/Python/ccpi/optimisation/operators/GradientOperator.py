@@ -7,7 +7,6 @@ Created on Fri Mar  1 22:50:04 2019
 """
 
 from ccpi.optimisation.operators import Operator, LinearOperator, ScaledOperator
-from ccpi.optimisation.ops import PowerMethodNonsquare
 from ccpi.framework import ImageData, ImageGeometry, BlockGeometry, BlockDataContainer
 import numpy 
 from ccpi.optimisation.operators import FiniteDiff, SparseFiniteDiff
@@ -90,7 +89,7 @@ class Gradient(LinearOperator):
     def norm(self):
 
         x0 = self.gm_domain.allocate('random')
-        self.s1, sall, svec = PowerMethodNonsquare(self, 10, x0)
+        self.s1, sall, svec = LinearOperator.PowerMethod(self, 10, x0)
         return self.s1
     
     def __rmul__(self, scalar):

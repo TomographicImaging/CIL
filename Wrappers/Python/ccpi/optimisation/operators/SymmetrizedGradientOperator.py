@@ -7,7 +7,6 @@ Created on Fri Mar  1 22:53:55 2019
 """
 
 from ccpi.optimisation.operators import Gradient, Operator, LinearOperator, ScaledOperator
-from ccpi.optimisation.ops import PowerMethodNonsquare
 from ccpi.framework import ImageData, ImageGeometry, BlockGeometry, BlockDataContainer
 import numpy 
 from ccpi.optimisation.operators import FiniteDiff, SparseFiniteDiff
@@ -108,7 +107,7 @@ class SymmetrizedGradient(Gradient):
         #TODO this takes time for big ImageData
         # for 2D ||grad|| = sqrt(8), 3D ||grad|| = sqrt(12)        
         x0 = ImageData(np.random.random_sample(self.domain_dim()))
-        self.s1, sall, svec = PowerMethodNonsquare(self, 25, x0)
+        self.s1, sall, svec = LinearOperator.PowerMethod(self, 25, x0)
         return self.s1 
     
 

@@ -7,15 +7,9 @@ Created on Tue Mar  5 16:08:23 2019
 
 import unittest
 import numpy
-#from ccpi.plugins.ops import CCPiProjectorSimple
-from ccpi.optimisation.ops import PowerMethodNonsquare
-from ccpi.optimisation.ops import TomoIdentity
-from ccpi.optimisation.funcs import Norm2sq, Norm1
 from ccpi.framework import ImageGeometry, AcquisitionGeometry
 from ccpi.framework import ImageData, AcquisitionData
-#from ccpi.optimisation.algorithms import GradientDescent
 from ccpi.framework import BlockDataContainer, DataContainer
-#from ccpi.optimisation.Algorithms import CGLS
 import functools
 
 from ccpi.optimisation.operators import Gradient, Identity, BlockOperator

@@ -8,16 +8,15 @@ from ccpi.framework import ImageGeometry
 from ccpi.framework import AcquisitionGeometry
 from ccpi.optimisation.algorithms import FISTA
 #from ccpi.optimisation.algs import FBPD
-from ccpi.optimisation.funcs import Norm2sq
+from ccpi.optimisation.functions import Norm2sq
 from ccpi.optimisation.functions import ZeroFunction
 from ccpi.optimisation.funcs import Norm1
-from ccpi.optimisation.funcs import TV2D
 from ccpi.optimisation.funcs import Norm2
 
-from ccpi.optimisation.ops import LinearOperatorMatrix
-from ccpi.optimisation.ops import TomoIdentity
-from ccpi.optimisation.ops import Identity
-from ccpi.optimisation.ops import PowerMethodNonsquare
+from ccpi.optimisation.operators import LinearOperatorMatrix
+from ccpi.optimisation.operators import Identity
+#from ccpi.optimisation.ops import PowerMethodNonsquare
+from ccpi.optimisation.operators import LinearOperator
 
 
 import numpy.testing
@@ -220,7 +219,7 @@ class TestAlgorithms(unittest.TestCase):
 
             # Create object instances with the test data A and b.
             f = Norm2sq(A, b, c=0.5, memopt=True)
-            f.L = PowerMethodNonsquare(A, 25, x_init)[0]
+            f.L = LinearOperator.PowerMethod(A, 25, x_init)[0]
             print ("Lipschitz", f.L)
             g0 = ZeroFun()
 
@@ -289,7 +288,7 @@ class TestAlgorithms(unittest.TestCase):
             # Data fidelity term
             f_denoise = Norm2sq(I, y, c=0.5, memopt=True)
             x_init = ImageData(geometry=ig)
-            f_denoise.L = PowerMethodNonsquare(I, 25, x_init)[0]
+            f_denoise.L = LinearOperator.PowerMethod(I, 25, x_init)[0]
 
             # 1-norm regulariser
             lam1_denoise = 1.0
@@ -335,43 +334,6 @@ class TestAlgorithms(unittest.TestCase):
 
             self.assertNumpyArrayAlmostEqual(
                 x_fbpd1_denoise.array.flatten(), x1_denoise.value, 5)
-            x1_cvx = x1_denoise.value
-            x1_cvx.shape = (N, N)
-
-            # Now TV with FBPD
-            lam_tv = 0.1
-            gtv = TV2D(lam_tv)
-            gtv(gtv.op.direct(x_init_denoise))
-
-            opt_tv = {'tol': 1e-4, 'iter': 10000}
-
-            x_fbpdtv_denoise, itfbpdtv_denoise, timingfbpdtv_denoise,\
-                criterfbpdtv_denoise = \
-                FBPD(x_init_denoise, gtv.op, None, f_denoise, gtv, opt=opt_tv)
-            print(x_fbpdtv_denoise)
-            print(criterfbpdtv_denoise[-1])
-
-            # Compare to CVXPY
-
-            # Construct the problem.
-            xtv_denoise = Variable((N, N))
-            objectivetv_denoise = Minimize(
-                0.5*sum_squares(xtv_denoise - y.array) + lam_tv*tv(xtv_denoise))
-            probtv_denoise = Problem(objectivetv_denoise)
-
-            # The optimal objective is returned by prob.solve().
-            resulttv_denoise = probtv_denoise.solve(
-                verbose=False, solver=SCS, eps=1e-12)
-
-            # The optimal solution for x is stored in x.value and optimal objective value
-            # is in result as well as in objective.value
-            print("CVXPY least squares plus 1-norm solution and objective value:")
-            print(xtv_denoise.value)
-            print(objectivetv_denoise.value)
-
-            self.assertNumpyArrayAlmostEqual(
-                x_fbpdtv_denoise.as_array(), xtv_denoise.value, 1)
-
         else:
             self.assertTrue(cvx_not_installable)
 

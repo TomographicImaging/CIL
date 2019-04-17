@@ -182,7 +182,7 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
             f.proximal_conjugate(y_tmp, sigma, out=y)
 
             operator.adjoint(y, out = x_tmp)   
-            x_tmp *= -tau
+            x_tmp *= -1*tau
             x_tmp += x_old
 
             g.proximal(x_tmp, tau, out = x)

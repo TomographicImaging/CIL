@@ -94,12 +94,12 @@ class L2NormSquared(Function):
                 return x/(1+2*tau)
             else:
 
-                tmp = x.subtract(self.b)
-                #tmp -= self.b
-                tmp /= (1+2*tau)
-                tmp += self.b
-                return tmp
-#                return (x-self.b)/(1+2*tau) + self.b
+#                tmp = x.subtract(self.b)
+#                tmp -= self.b
+#                tmp /= (1+2*tau)
+#                tmp += self.b
+#                return tmp
+                return (x-self.b)/(1+2*tau) + self.b
             
 #            if self.b is not None:
 #            out=x

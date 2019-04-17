@@ -45,7 +45,7 @@ plt.title('Noisy data')
 plt.show()
 
 # Regularisation Parameter
-alpha = 2
+alpha = 0.5
 
 #method = input("Enter structure of PDHG (0=Composite or 1=NotComposite): ")
 method = '1'
@@ -83,8 +83,8 @@ normK = operator.norm()
 sigma = 1
 tau = 1/(sigma*normK**2)
 
-opt = {'niter':2000}
-opt1 = {'niter':2000, 'memopt': True}
+opt = {'niter':5000}
+opt1 = {'niter':5000, 'memopt': True}
 
 t1 = timer()
 res, time, primal, dual, pdgap = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt) 
@@ -149,7 +149,8 @@ if cvx_not_installable:
     if 'MOSEK' in installed_solvers():
         solver = MOSEK
     else:
-        solver = SCS    
+        solver = SCS  
+        
     obj =  Minimize( regulariser +  fidelity)
     prob = Problem(obj)
     result = prob.solve(verbose = True, solver = solver)
@@ -172,6 +173,14 @@ if cvx_not_installable:
     plt.imshow(diff_cvx)
     plt.title('Difference')
     plt.colorbar()
+    plt.show()
+    
+    plt.plot(np.linspace(0,N,N), res1.as_array()[int(N/2),:], label = 'PDHG')
+    plt.plot(np.linspace(0,N,N), u.value[int(N/2),:], label = 'CVX')
+    plt.legend()
+    
+
+    
     
     print('Primal Objective (CVX) {} '.format(obj.value))
     print('Primal Objective (PDHG) {} '.format(primal[-1]))

@@ -54,13 +54,8 @@ if method == '0':
     op1 = Gradient(ig)
     op2 = Identity(ig, ag)
 
-    # Form Composite Operator
     operator = BlockOperator(op1, op2, shape=(2,1) ) 
 
-    #### Create functions
-#    f = FunctionComposition_new(operator, mixed_L12Norm(alpha), \
-#                                    L2NormSq(0.5, b = noisy_data) )    
-    
     f1 = alpha * MixedL21Norm()
     f2 = L1Norm(b = noisy_data)
     
@@ -73,12 +68,12 @@ else:
     #         No Composite #
     ###########################################################################
     operator = Gradient(ig)
-    f = alpha *  FunctionOperatorComposition(operator, MixedL21Norm())
+    f = alpha * MixedL21Norm()
     g = L1Norm(b = noisy_data)
     ###########################################################################
 #%%
     
-diag_precon =  True
+diag_precon =  False
 
 if diag_precon:
     

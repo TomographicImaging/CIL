@@ -9,7 +9,7 @@ Created on Sat Mar  2 19:24:37 2019
 
 import numpy as np
 #from ccpi.optimisation.funcs import Function
-from ccpi.optimisation.functions import Function
+from ccpi.optimisation.functions import Function, KullbackLeibler
 from ccpi.framework import DataContainer, ImageData, ImageGeometry 
 from ccpi.optimisation.operators import  Identity
 from ccpi.optimisation.operators import BlockOperator
@@ -99,6 +99,7 @@ class TestFunction(unittest.TestCase):
     
     def test_L2NormSquared(self):
         # TESTS for L2 and scalar * L2
+        print ("Test L2NormSquared")
     
         M, N, K = 2,3,5
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N, voxel_num_z = K)
@@ -324,7 +325,7 @@ class TestFunction(unittest.TestCase):
         
         a1 = f_no_scaled(U)
         a2 = f_scaled(U)
-        self.assertNumpyArrayAlmostEqual(a1.as_array(),a2.as_array())
+        self.assertNumpyArrayAlmostEqual(a1,a2)
         
         
         tmp = [ el**2 for el in U.containers ]
@@ -341,32 +342,26 @@ class TestFunction(unittest.TestCase):
         f_no_scaled.proximal_conjugate(U, 1, out=z3)
         self.assertBlockDataContainerEqual(z3,z1)
 
-#    
-#    f1 = L2NormSq(alpha=1, b=noisy_data)
-#    print(f1(noisy_data))
-#    
-#    f2 =  L2NormSq(alpha=5, b=noisy_data).composition_with(op2)
-#    print(f2(noisy_data))
-#    
-#    print(f1.gradient(noisy_data).as_array())
-#    print(f2.gradient(noisy_data).as_array())
-##    
-#    print(f1.proximal(noisy_data,1).as_array())
-#    print(f2.proximal(noisy_data,1).as_array())
-#    
-#    
-#    f3 = mixed_L12Norm(alpha = 1).composition_with(op1)
-#    print(f3(noisy_data))
-#            
-#    print(ImageData(op1.direct(noisy_data).power(2).sum(axis=0)).sqrt().sum())
-#    
-#    print( 5*(op2.direct(d) - noisy_data).power(2).sum(), f2(d))
-#    
-#    from functions import mixed_L12Norm as mixed_L12Norm_old
-#    
-#    print(mixed_L12Norm_old(op1,None,alpha)(noisy_data))
-    
-    
-    #        
-
+    def test_KullbackLeibler(self):
+        print ("test_KullbackLeibler")
+        N, M = 2,3
+        ig  = ImageGeometry(N, M)
+        data = ig.allocate(ImageGeometry.RANDOM_INT)
+        x = ig.allocate(ImageGeometry.RANDOM_INT)
+        bnoise = ig.allocate(ImageGeometry.RANDOM_INT)
         
+        out = ig.allocate()
+        
+        f = KullbackLeibler(data, bnoise=bnoise)
+        
+        grad = f.gradient(x)
+        f.gradient(x, out=out)
+        numpy.testing.assert_array_equal(grad.as_array(), out.as_array())
+        
+        prox = f.proximal(x,1.2)
+        f.proximal(x, 1.2, out=out)
+        numpy.testing.assert_array_equal(prox.as_array(), out.as_array())
+        
+        proxc = f.proximal_conjugate(x,1.2)
+        f.proximal_conjugate(x, 1.2, out=out)
+        numpy.testing.assert_array_equal(proxc.as_array(), out.as_array())

@@ -35,7 +35,9 @@ setup(
               'ccpi.framework', 'ccpi.optimisation', 
               'ccpi.optimisation.operators',
               'ccpi.optimisation.algorithms',
-              'ccpi.optimisation.functions'],
+              'ccpi.optimisation.functions',
+              'ccpi.contrib','ccpi.contrib.optimisation',
+              'ccpi.contrib.optimisation.algorithms'],
 
     # Project uses reStructuredText, so ensure that the docutils get
     # installed or upgraded on the target machine

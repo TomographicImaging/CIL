@@ -1,6 +1,6 @@
 import unittest
 #from ccpi.optimisation.operators import Operator
-from ccpi.optimisation.ops import TomoIdentity
+#from ccpi.optimisation.ops import TomoIdentity
 from ccpi.framework import ImageGeometry, ImageData, BlockDataContainer, DataContainer
 from ccpi.optimisation.operators import BlockOperator, BlockScaledOperator,\
     FiniteDiff
@@ -8,6 +8,7 @@ import numpy
 from timeit import default_timer as timer
 from ccpi.framework import ImageGeometry
 from ccpi.optimisation.operators import Gradient, Identity, SparseFiniteDiff
+from ccpi.optimisation.operators import LinearOperator
 
 def dt(steps):
     return steps[-1] - steps[-2]
@@ -53,7 +54,7 @@ class TestOperator(CCPiTestClass):
         ig = ImageGeometry(10,20,30)
         img = ig.allocate()
         scalar = 0.5
-        sid = scalar * TomoIdentity(ig)
+        sid = scalar * Identity(ig)
         numpy.testing.assert_array_equal(scalar * img.as_array(), sid.direct(img).as_array())
         
 
@@ -62,11 +63,12 @@ class TestOperator(CCPiTestClass):
         img = ig.allocate()
         self.assertTrue(img.shape == (30,20,10))
         self.assertEqual(img.sum(), 0)
-        Id = TomoIdentity(ig)
+        Id = Identity(ig)
         y = Id.direct(img)
         numpy.testing.assert_array_equal(y.as_array(), img.as_array())
 
     def test_FiniteDifference(self):
+        print ("test FiniteDifference")
         ##
         N, M = 2, 3
 
@@ -93,11 +95,46 @@ class TestOperator(CCPiTestClass):
         G = Gradient(ig)
 
         u = G.range_geometry().allocate(ImageGeometry.RANDOM_INT)
-        res = G.domain_geometry().allocate(ImageGeometry.RANDOM_INT)
+        res = G.domain_geometry().allocate()
         G.adjoint(u, out=res)
         w = G.adjoint(u)
         self.assertNumpyArrayEqual(res.as_array(), w.as_array())
         
+        u = G.domain_geometry().allocate(ImageGeometry.RANDOM_INT)
+        res = G.range_geometry().allocate()
+        G.direct(u, out=res)
+        w = G.direct(u)
+        self.assertBlockDataContainerEqual(res, w)
+        
+    def test_PowerMethod(self):
+        
+        N, M = 200, 300
+        niter = 1000
+        ig = ImageGeometry(N, M)
+        Id = Identity(ig)
+        
+        G = Gradient(ig)
+        
+        uid = Id.domain_geometry().allocate(ImageGeometry.RANDOM_INT, seed=1)
+        
+        a = LinearOperator.PowerMethod(Id, niter, uid)
+        b = LinearOperator.PowerMethodNonsquare(Id, niter, uid)
+        
+        print ("Edo impl", a[0])
+        print ("old impl", b[0])
+        
+        #self.assertAlmostEqual(a[0], b[0])
+        self.assertNumpyArrayAlmostEqual(a[0],b[0],decimal=6)
+        
+        a = LinearOperator.PowerMethod(G, niter, uid)
+        b = LinearOperator.PowerMethodNonsquare(G, niter, uid)
+        
+        print ("Edo impl", a[0])
+        print ("old impl", b[0])
+        self.assertNumpyArrayAlmostEqual(a[0],b[0],decimal=2)
+        #self.assertAlmostEqual(a[0], b[0])
+        
+
 
 
 

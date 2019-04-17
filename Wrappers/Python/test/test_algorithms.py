@@ -12,7 +12,7 @@ from ccpi.framework import ImageData
 from ccpi.framework import AcquisitionData
 from ccpi.framework import ImageGeometry
 from ccpi.framework import AcquisitionGeometry
-from ccpi.optimisation.ops import TomoIdentity
+from ccpi.optimisation.operators import Identity
 from ccpi.optimisation.funcs import Norm2sq
 from ccpi.optimisation.algorithms import GradientDescent
 from ccpi.optimisation.algorithms import CGLS
@@ -26,7 +26,7 @@ class TestAlgorithms(unittest.TestCase):
     def setUp(self):
         #wget.download('https://github.com/DiamondLightSource/Savu/raw/master/test_data/data/24737_fd.nxs')
         #self.filename = '24737_fd.nxs'
-        # we use TomoIdentity as the operator and solve the simple least squares 
+        # we use Identity as the operator and solve the simple least squares 
         # problem for a random-valued ImageData or AcquisitionData b?  
         # Then we know the minimiser is b itself
         
@@ -48,7 +48,7 @@ class TestAlgorithms(unittest.TestCase):
         # fill with random numbers
         b.fill(numpy.random.random(x_init.shape))
         
-        identity = TomoIdentity(geometry=ig)
+        identity = Identity(ig)
         
         norm2sq = Norm2sq(identity, b)
         
@@ -66,7 +66,7 @@ class TestAlgorithms(unittest.TestCase):
         # fill with random numbers
         b.fill(numpy.random.random(x_init.shape))
         
-        identity = TomoIdentity(geometry=ig)
+        identity = Identity(ig)
         
         alg = CGLS(x_init=x_init, operator=identity, data=b)
         alg.max_iteration = 1
@@ -83,7 +83,7 @@ class TestAlgorithms(unittest.TestCase):
         x_init = ImageData(geometry=ig)
         x_init.fill(numpy.random.random(x_init.shape))
         
-        identity = TomoIdentity(geometry=ig)
+        identity = Identity(ig)
         
         norm2sq = Norm2sq(identity, b)
         norm2sq.L = 2 * norm2sq.c * identity.norm()**2

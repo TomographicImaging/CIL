@@ -48,7 +48,7 @@ class KullbackLeibler(Function):
         if self.sum_value==numpy.inf:
             return numpy.inf
         else:
-            tmp = self.sum_value
+            tmp = self.sum_value.copy()
             #tmp.fill( numpy.log(tmp.as_array()) )            
             self.log(tmp)
             return (x - self.b * tmp ).sum()

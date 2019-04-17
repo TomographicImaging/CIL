@@ -19,44 +19,94 @@
 
 import numpy
 from ccpi.optimisation.functions import Function
-from ccpi.optimisation.functions.ScaledFunction import ScaledFunction
-from ccpi.framework import DataContainer, ImageData, ImageGeometry  
+from ccpi.optimisation.functions.ScaledFunction import ScaledFunction 
+from ccpi.framework import ImageData, ImageGeometry
+import functools
 
 class KullbackLeibler(Function):
     
-    def __init__(self,data,**kwargs):
+    ''' Assume that data > 0
+                
+    '''
+    
+    def __init__(self,data, **kwargs):
         
         super(KullbackLeibler, self).__init__()
         
         self.b = data        
         self.bnoise = kwargs.get('bnoise', 0)
 
-        self.sum_value = self.b + self.bnoise        
-        if  (self.sum_value.as_array()<0).any():
-            self.sum_value = numpy.inf
                                                 
     def __call__(self, x):
+        
+        # TODO check
+        
+        self.sum_value = x + self.bnoise        
+        if  (self.sum_value.as_array()<0).any():
+            self.sum_value = numpy.inf
         
         if self.sum_value==numpy.inf:
             return numpy.inf
         else:
-            return numpy.sum( x.as_array() - self.b.as_array() * numpy.log(self.sum_value.as_array()))
+            tmp = self.sum_value
+            #tmp.fill( numpy.log(tmp.as_array()) )            
+            self.log(tmp)
+            return (x - self.b * tmp ).sum()
+            
+#            return numpy.sum( x.as_array() - self.b.as_array() * numpy.log(self.sum_value.as_array()))
 
+    def log(self, datacontainer):
+        '''calculates the in-place log of the datacontainer'''
+        if not functools.reduce(lambda x,y: x and y>0,
+                                datacontainer.as_array().ravel(), True):
+            raise ValueError('KullbackLeibler. Cannot calculate log of negative number')
+        datacontainer.fill( numpy.log(datacontainer.as_array()) )
         
     def gradient(self, x, out=None):
+        
+        #TODO Division check
         if out is None:
-            #TODO Division check
             return 1 - self.b/(x + self.bnoise)
         else:
             x.add(self.bnoise, out=out)
             self.b.divide(out, out=out)
+            out.subtract(1, out=out)
             out *= -1
-            out += 1
-    
-    def convex_conjugate(self, x, out=None):
-        pass
+            
+    def convex_conjugate(self, x):
+        
+        tmp = self.b/( 1 - x )
+        self.log(tmp)
+        return (self.b * ( tmp - 1 ) - self.bnoise * (x - 1)).sum()
+#        return self.b * ( ImageData(numpy.log(self.b/(1-x)) - 1 )) - self.bnoise * (x - 1)
     
     def proximal(self, x, tau, out=None):
+        
+        if out is None:        
+            return 0.5 *( (x - self.bnoise - tau) + ( (x + self.bnoise - tau)**2 + 4*tau*self.b   ) .sqrt() )
+        else:
+            tmp =  0.5 *( (x - self.bnoise - tau) + 
+                        ( (x + self.bnoise - tau)**2 + 4*tau*self.b   ) .sqrt()
+                        )
+            x.add(self.bnoise, out=out)
+            out -= tau
+            out *= out
+            tmp = self.b * (4 * tau)
+            out.add(tmp, out=out)
+            out.sqrt(out=out)
+            
+            x.subtract(self.bnoise, out=tmp)
+            tmp -= tau
+            
+            out += tmp
+            
+            out *= 0.5
+            
+            
+    
+    def proximal_conjugate(self, x, tau, out=None):
+
+                
         if out is None:
             z = x + tau * self.bnoise
             return (z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt()
@@ -71,9 +121,17 @@ class KullbackLeibler(Function):
             z_m += 2
             out *= -1
             out += z_m
-                
-    def proximal_conjugate(self, x, tau, out=None):
-        pass
+        
+    
+    def __rmul__(self, scalar):
+        
+        ''' Multiplication of L2NormSquared with a scalar
+        
+        Returns: ScaledFunction
+                        
+        '''
+        
+        return ScaledFunction(self, scalar)     
         
         
     
@@ -82,28 +140,15 @@ if __name__ == '__main__':
     
     N, M = 2,3
     ig  = ImageGeometry(N, M)
-    #data = ImageData(numpy.random.randint(-10, 100, size=(M, N)))
-    #x = ImageData(numpy.random.randint(-10, 100, size=(M, N)))
-    #bnoise = ImageData(numpy.random.randint(-100, 100, size=(M, N)))
-    data = ig.allocate(ImageGeometry.RANDOM_INT)
-    x = ig.allocate(ImageGeometry.RANDOM_INT)
-    bnoise = ig.allocate(ImageGeometry.RANDOM_INT)
+    data = ImageData(numpy.random.randint(-10, 100, size=(M, N)))
+    x = ImageData(numpy.random.randint(-10, 100, size=(M, N)))
     
-    out = ig.allocate()
+    bnoise = ImageData(numpy.random.randint(-100, 100, size=(M, N)))
     
     f = KullbackLeibler(data, bnoise=bnoise)
     print(f.sum_value)
     
     print(f(x))
-    grad = f.gradient(x)
-    f.gradient(x, out=out)
-    numpy.testing.assert_array_equal(grad.as_array(), out.as_array())
-    
-    prox = f.proximal(x,1.2)
-    #print(grad.as_array())
-    f.proximal(x, 1.2, out=out)
-    numpy.testing.assert_array_equal(prox.as_array(), out.as_array())
-    
 
 
     

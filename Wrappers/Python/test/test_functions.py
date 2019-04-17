@@ -361,3 +361,7 @@ class TestFunction(unittest.TestCase):
         prox = f.proximal(x,1.2)
         f.proximal(x, 1.2, out=out)
         numpy.testing.assert_array_equal(prox.as_array(), out.as_array())
+        
+        proxc = f.proximal_conjugate(x,1.2)
+        f.proximal_conjugate(x, 1.2, out=out)
+        numpy.testing.assert_array_equal(proxc.as_array(), out.as_array())

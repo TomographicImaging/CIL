@@ -24,11 +24,6 @@ Created on Wed Apr 10 13:39:35 2019
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-"""
-Created on Thu Feb 21 11:11:23 2019
-
-@author: ofn77899
-"""
 
 from ccpi.optimisation.algorithms import Algorithm
 from ccpi.framework import ImageData, AcquisitionData
@@ -43,20 +38,21 @@ class SIRT(Algorithm):
       operator: operator for forward/backward projections
       data: data to operate on
       constraint: Function with prox-method, for example IndicatorBox to 
-                  enforce box constraints.
+                  enforce box constraints, default is None).
     '''
     def __init__(self, **kwargs):
         super(SIRT, self).__init__()
         self.x          = kwargs.get('x_init', None)
         self.operator   = kwargs.get('operator', None)
         self.data       = kwargs.get('data', None)
-        self.constraint = kwargs.get('data', None)
+        self.constraint = kwargs.get('constraint', None)
         if self.x is not None and self.operator is not None and \
            self.data is not None:
             print ("Calling from creator")
-            self.set_up(x_init  =kwargs['x_init'],
-                               operator=kwargs['operator'],
-                               data    =kwargs['data'])
+            self.set_up(x_init=kwargs['x_init'],
+                        operator=kwargs['operator'],
+                        data=kwargs['data'],
+                        constraint=kwargs['constraint'])
 
     def set_up(self, x_init, operator , data, constraint=None ):
         
@@ -70,12 +66,8 @@ class SIRT(Algorithm):
         self.relax_par = 1.0
         
         # Set up scaling matrices D and M.
-        im1 = ImageData(geometry=self.x.geometry)
-        im1.array[:] = 1.0
-        self.M = 1/operator.direct(im1)
-        aq1 = AcquisitionData(geometry=self.M.geometry)
-        aq1.array[:] = 1.0
-        self.D = 1/operator.adjoint(aq1)
+        self.M = 1/self.operator.direct(self.operator.domain_geometry().allocate(value=1.0))        
+        self.D = 1/self.operator.adjoint(self.operator.range_geometry().allocate(value=1.0))
 
 
     def update(self):

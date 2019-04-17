@@ -289,14 +289,8 @@ def SIRT(x_init, operator , data , opt=None, constraint=None):
     relax_par = 1.0
     
     # Set up scaling matrices D and M.
-    im1 = ImageData(geometry=x_init.geometry)
-    im1.array[:] = 1.0
-    M = 1/operator.direct(im1)
-    del im1
-    aq1 = AcquisitionData(geometry=M.geometry)
-    aq1.array[:] = 1.0
-    D = 1/operator.adjoint(aq1)
-    del aq1
+    M = 1/operator.direct(operator.domain_geometry().allocate(value=1.0))
+    D = 1/operator.adjoint(operator.range_geometry().allocate(value=1.0))
     
     # algorithm loop
     for it in range(0, max_iter):

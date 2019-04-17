@@ -11,6 +11,8 @@ from ccpi.astra.ops import AstraProjectorSimple
 from ccpi.optimisation.algorithms import CGLS as CGLSALG
 from ccpi.optimisation.algorithms import SIRT as SIRTALG
 
+from ccpi.optimisation.operators import Identity
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -68,6 +70,8 @@ else:
 # wrapping calls to ASTRA as well as specifying whether to use CPU or GPU.
 Aop = AstraProjectorSimple(ig, ag, 'gpu')
 
+Aop = Identity(ig,ig)
+
 # Forward and backprojection are available as methods direct and adjoint. Here 
 # generate test data b and do simple backprojection to obtain z.
 b = Aop.direct(Phantom)
@@ -88,6 +92,7 @@ plt.show()
 # guess and some algorithm options to be set:
 x_init = ImageData(np.zeros(x.shape),geometry=ig)
 opt = {'tol': 1e-4, 'iter': 100}
+
 
 # First a CGLS reconstruction can be done:
 x_CGLS, it_CGLS, timing_CGLS, criter_CGLS = CGLS(x_init, Aop, b, opt)
@@ -132,7 +137,6 @@ plt.title('SIRT unconstrained criterion')
 plt.show()
 
 
-
 my_SIRT_alg = SIRTALG()
 my_SIRT_alg.set_up(x_init, Aop, b )
 my_SIRT_alg.max_iteration = 2000
@@ -144,6 +148,7 @@ plt.imshow(x_SIRT_alg.array)
 plt.title('SIRT ALG')
 plt.colorbar()
 plt.show()
+
 
 # A SIRT nonnegativity constrained reconstruction can be done using the 
 # additional input "constraint" set to a box indicator function with 0 as the 
@@ -201,42 +206,3 @@ plt.imshow(x_SIRT_alg01.array)
 plt.title('SIRT ALG01')
 plt.colorbar()
 plt.show()
-
-# The indicator function can also be used with the FISTA algorithm to do 
-# least squares with nonnegativity constraint.
-
-'''
-# Create least squares object instance with projector, test data and a constant 
-# coefficient of 0.5:
-f = Norm2sq(Aop,b,c=0.5)
-# Run FISTA for least squares without constraints
-x_fista, it, timing, criter = FISTA(x_init, f, None,opt)
-plt.figure()
-plt.imshow(x_fista.array)
-plt.title('FISTA Least squares')
-plt.show()
-plt.figure()
-plt.semilogy(criter)
-plt.title('FISTA Least squares criterion')
-plt.show()
-# Run FISTA for least squares with nonnegativity constraint
-x_fista0, it0, timing0, criter0 = FISTA(x_init, f, IndicatorBox(lower=0),opt)
-plt.figure()
-plt.imshow(x_fista0.array)
-plt.title('FISTA Least squares nonneg')
-plt.show()
-plt.figure()
-plt.semilogy(criter0)
-plt.title('FISTA Least squares nonneg criterion')
-plt.show()
-# Run FISTA for least squares with box constraint [0,1]
-x_fista01, it01, timing01, criter01 = FISTA(x_init, f, IndicatorBox(lower=0,upper=1),opt)
-plt.figure()
-plt.imshow(x_fista01.array)
-plt.title('FISTA Least squares box(0,1)')
-plt.show()
-plt.figure()
-plt.semilogy(criter01)
-plt.title('FISTA Least squares box(0,1) criterion')
-plt.show()
-'''

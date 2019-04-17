@@ -56,7 +56,7 @@ detectors = 150
 angles = np.linspace(0,np.pi,100)
 
 ag = AcquisitionGeometry('parallel','2D',angles, detectors)
-Aop = AstraProjectorSimple(ig, ag, 'gpu')
+Aop = AstraProjectorSimple(ig, ag, 'cpu')
 sin = Aop.direct(data)
 
 plt.imshow(sin.as_array())
@@ -134,23 +134,29 @@ t4 = timer()
 #
 print ("No memopt in {}s, memopt in  {}s ".format(t2-t1, t4 -t3))
 
-
 #%%
-#sol = pdhg.get_output().as_array()
-#fig = plt.figure()
-#plt.subplot(1,2,1)
-#plt.imshow(noisy_data.as_array())
-##plt.colorbar()
-#plt.subplot(1,2,2)
-#plt.imshow(sol)
-##plt.colorbar()
-#plt.show()
+plt.figure(figsize=(15,15))
+plt.subplot(3,1,1)
+plt.imshow(res.as_array())
+plt.title('no memopt')
+plt.colorbar()
+plt.subplot(3,1,2)
+plt.imshow(res1.as_array())
+plt.title('memopt')
+plt.colorbar()
+plt.subplot(3,1,3)
+plt.imshow((res1 - res).abs().as_array())
+plt.title('diff')
+plt.colorbar()
+plt.show()
+# 
+plt.plot(np.linspace(0,N,N), res1.as_array()[int(N/2),:], label = 'memopt')
+plt.plot(np.linspace(0,N,N), res.as_array()[int(N/2),:], label = 'no memopt')
+plt.legend()
+plt.show()
 #
+print ("Time: No memopt in {}s, \n Time: Memopt in  {}s ".format(t2-t1, t4 -t3))
+diff = (res1 - res).abs().as_array().max()
 #
-##%%
-#plt.plot(np.linspace(0,N,N), data.as_array()[int(N/2),:], label = 'GTruth')
-#plt.plot(np.linspace(0,N,N), sol[int(N/2),:], label = 'Recon')
-#plt.legend()
-#plt.show()
-
+print(" Max of abs difference is {}".format(diff))
 

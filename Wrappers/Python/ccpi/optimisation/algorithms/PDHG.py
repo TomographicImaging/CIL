@@ -169,12 +169,10 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
             if i%10==0:
 #                
                 p1 = f(operator.direct(x)) + g(x)
-                print(p1)
-#                d1 = - ( f.convex_conjugate(y) + g(-1*operator.adjoint(y)) )
-#                primal.append(p1)
-#                dual.append(d1)
-#                pdgap.append(p1-d1)      
-#                print(p1, d1, p1-d1)
+                d1 = - ( f.convex_conjugate(y) + g(-1*operator.adjoint(y)) )
+                primal.append(p1)
+                dual.append(d1)
+                pdgap.append(p1-d1)      
             
         else:
             
@@ -199,11 +197,10 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
             if i%10==0:
 #                
                 p1 = f(operator.direct(x)) + g(x)
-                print(p1)
-#                d1 = - ( f.convex_conjugate(y) + g(-1*operator.adjoint(y)) )
-#                primal.append(p1)
-#                dual.append(d1)
-#                pdgap.append(p1-d1)      
+                d1 = - ( f.convex_conjugate(y) + g(-1*operator.adjoint(y)) )
+                primal.append(p1)
+                dual.append(d1)
+                pdgap.append(p1-d1)      
 #                print(p1, d1, p1-d1)
             
                          

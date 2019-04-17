@@ -39,19 +39,14 @@ class KullbackLeibler(Function):
     def __call__(self, x):
         
         # TODO check
-        
-        self.sum_value = x + self.bnoise        
-        if  (self.sum_value.as_array()<0).any():
-            self.sum_value = numpy.inf
-        
-        if self.sum_value==numpy.inf:
-            return numpy.inf
-        else:
-            tmp = self.sum_value.as_array()            
-            return (x - self.b * ImageData( numpy.log(tmp))).sum()
-            
-#            return numpy.sum( x.as_array() - self.b.as_array() * numpy.log(self.sum_value.as_array()))
+                
+        tmp = x + self.bnoise  
+        ind = tmp.as_array()>0
 
+        res = x.as_array()[ind] - self.b.as_array()[ind] * numpy.log(tmp.as_array()[ind])
+            
+        return sum(res)
+    
         
     def gradient(self, x, out=None):
         
@@ -64,10 +59,12 @@ class KullbackLeibler(Function):
     
     def convex_conjugate(self, x):
         
-        tmp = self.b.as_array()/( 1 - x.as_array() )
+        tmp = self.b/( 1 - x ) 
+        ind = tmp.as_array()>0
+        
+        sel
         
         return (self.b * ( ImageData( numpy.log(tmp) ) - 1 ) - self.bnoise * (x - 1)).sum()
-#        return self.b * ( ImageData(numpy.log(self.b/(1-x)) - 1 )) - self.bnoise * (x - 1)
     
     def proximal(self, x, tau, out=None):
         
@@ -105,19 +102,39 @@ class KullbackLeibler(Function):
     
 
 if __name__ == '__main__':
+   
     
+    from ccpi.framework import ImageGeometry
+    import numpy
     N, M = 2,3
     ig  = ImageGeometry(N, M)
-    data = ImageData(numpy.random.randint(-10, 100, size=(M, N)))
-    x = ImageData(numpy.random.randint(-10, 100, size=(M, N)))
+    data = ImageData(numpy.random.randint(-10, 10, size=(M, N)))
+    x = ImageData(numpy.random.randint(-10, 10, size=(M, N)))
     
-    bnoise = ImageData(numpy.random.randint(-100, 100, size=(M, N)))
+    bnoise = ImageData(numpy.random.randint(-10, 10, size=(M, N)))
     
-    f = KullbackLeibler(data, bnoise=bnoise)
-    print(f.sum_value)
-    
-    print(f(x))
+    f = KullbackLeibler(data)
 
+    print(f(x))
+    
+#    numpy.random.seed(10)
+#    
+#    
+#    x = numpy.random.randint(-10, 10, size = (2,3))
+#    b = numpy.random.randint(1, 10, size = (2,3))
+#    
+#    ind1 = x>0
+#        
+#    res = x[ind1] - b * numpy.log(x[ind1])
+#    
+##    ind = x>0
+#    
+##    y = x[ind]
+#    
+#    
+#    
+#    
+#    
 
     
         

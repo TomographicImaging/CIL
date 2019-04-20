@@ -93,6 +93,7 @@ class KullbackLeibler(Function):
         if out is None:        
             return 0.5 *( (x - self.bnoise - tau) + ( (x + self.bnoise - tau)**2 + 4*tau*self.b   ) .sqrt() )
         else:
+            
             tmp =  0.5 *( (x - self.bnoise - tau) + 
                         ( (x + self.bnoise - tau)**2 + 4*tau*self.b   ) .sqrt()
                         )
@@ -152,6 +153,7 @@ if __name__ == '__main__':
     
     from ccpi.framework import ImageGeometry
     import numpy
+    
     N, M = 2,3
     ig  = ImageGeometry(N, M)
     data = ImageData(numpy.random.randint(-10, 10, size=(M, N)))

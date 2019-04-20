@@ -71,7 +71,7 @@ class L2NormSquared(Function):
     def convex_conjugate(self, x):
         
         ''' Evaluate convex conjugate of L2NormSquared at x: f^{*}(x)'''
-            
+        
         tmp = 0
         
         if self.b is not None:

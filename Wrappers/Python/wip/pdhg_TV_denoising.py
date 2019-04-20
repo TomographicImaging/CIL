@@ -26,7 +26,7 @@ from timeit import default_timer as timer
 
 # Create phantom for TV Gaussian denoising
 
-N = 100
+N = 500
 
 data = np.zeros((N,N))
 data[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
@@ -48,7 +48,7 @@ plt.show()
 alpha = 0.5
 
 #method = input("Enter structure of PDHG (0=Composite or 1=NotComposite): ")
-method = '1'
+method = '0'
 
 if method == '0':
 
@@ -73,29 +73,43 @@ else:
     #         No Composite #
     ###########################################################################
     operator = Gradient(ig)
-    f = alpha * MixedL21Norm()
-    g = 0.5 * L2NormSquared(b = noisy_data)
+    f =  alpha * MixedL21Norm()
+    g =  0.5 * L2NormSquared(b = noisy_data)
         
-# Compute operator Norm
-normK = operator.norm()
+    
+diag_precon =  False
 
-# Primal & dual stepsizes
-sigma = 1
-tau = 1/(sigma*normK**2)
+if diag_precon:
+    
+    def tau_sigma_precond(operator):
+        
+        tau = 1/operator.sum_abs_row()
+        sigma = 1/ operator.sum_abs_col()
+               
+        return tau, sigma
 
-opt = {'niter':5000}
-opt1 = {'niter':5000, 'memopt': True}
+    tau, sigma = tau_sigma_precond(operator)
+             
+else:
+    # Compute operator Norm
+    normK = operator.norm()
+    
+    # Primal & dual stepsizes
+    sigma = 1
+    tau = 1/(sigma*normK**2)
+
+
+opt = {'niter':2000}
+opt1 = {'niter':2000, 'memopt': True}
 
 t1 = timer()
 res, time, primal, dual, pdgap = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt) 
 t2 = timer()
 
-
 t3 = timer()
 res1, time1, primal1, dual1, pdgap1 = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt1) 
 t4 = timer()
-#
-##%%
+
 plt.figure(figsize=(15,15))
 plt.subplot(3,1,1)
 plt.imshow(res.as_array())
@@ -124,66 +138,66 @@ print(" Max of abs difference is {}".format(diff))
 
 #%% Check with CVX solution
 
-from ccpi.optimisation.operators import SparseFiniteDiff
-
-try:
-    from cvxpy import *
-    cvx_not_installable = True
-except ImportError:
-    cvx_not_installable = False
-
-
-if cvx_not_installable:
-
-    ##Construct problem    
-    u = Variable(ig.shape)
-    
-    DY = SparseFiniteDiff(ig, direction=0, bnd_cond='Neumann')
-    DX = SparseFiniteDiff(ig, direction=1, bnd_cond='Neumann')
-    
-    # Define Total Variation as a regulariser
-    regulariser = alpha * sum(norm(vstack([DX.matrix() * vec(u), DY.matrix() * vec(u)]), 2, axis = 0))
-    fidelity = 0.5 * sum_squares(u - noisy_data.as_array())
-    
-    # choose solver
-    if 'MOSEK' in installed_solvers():
-        solver = MOSEK
-    else:
-        solver = SCS  
-        
-    obj =  Minimize( regulariser +  fidelity)
-    prob = Problem(obj)
-    result = prob.solve(verbose = True, solver = solver)
-    
-    diff_cvx = numpy.abs( res.as_array() - u.value )
-    
-    # Show result
-    plt.figure(figsize=(15,15))
-    plt.subplot(3,1,1)
-    plt.imshow(res.as_array())
-    plt.title('PDHG solution')
-    plt.colorbar()
-    
-    plt.subplot(3,1,2)
-    plt.imshow(u.value)
-    plt.title('CVX solution')
-    plt.colorbar()
-    
-    plt.subplot(3,1,3)
-    plt.imshow(diff_cvx)
-    plt.title('Difference')
-    plt.colorbar()
-    plt.show()
-    
-    plt.plot(np.linspace(0,N,N), res1.as_array()[int(N/2),:], label = 'PDHG')
-    plt.plot(np.linspace(0,N,N), u.value[int(N/2),:], label = 'CVX')
-    plt.legend()
-    
-
-    
-    
-    print('Primal Objective (CVX) {} '.format(obj.value))
-    print('Primal Objective (PDHG) {} '.format(primal[-1]))
+#from ccpi.optimisation.operators import SparseFiniteDiff
+#
+#try:
+#    from cvxpy import *
+#    cvx_not_installable = True
+#except ImportError:
+#    cvx_not_installable = False
+#
+#
+#if cvx_not_installable:
+#
+#    ##Construct problem    
+#    u = Variable(ig.shape)
+#    
+#    DY = SparseFiniteDiff(ig, direction=0, bnd_cond='Neumann')
+#    DX = SparseFiniteDiff(ig, direction=1, bnd_cond='Neumann')
+#    
+#    # Define Total Variation as a regulariser
+#    regulariser = alpha * sum(norm(vstack([DX.matrix() * vec(u), DY.matrix() * vec(u)]), 2, axis = 0))
+#    fidelity = 0.5 * sum_squares(u - noisy_data.as_array())
+#    
+#    # choose solver
+#    if 'MOSEK' in installed_solvers():
+#        solver = MOSEK
+#    else:
+#        solver = SCS  
+#        
+#    obj =  Minimize( regulariser +  fidelity)
+#    prob = Problem(obj)
+#    result = prob.solve(verbose = True, solver = solver)
+#    
+#    diff_cvx = numpy.abs( res.as_array() - u.value )
+#    
+#    # Show result
+#    plt.figure(figsize=(15,15))
+#    plt.subplot(3,1,1)
+#    plt.imshow(res.as_array())
+#    plt.title('PDHG solution')
+#    plt.colorbar()
+#    
+#    plt.subplot(3,1,2)
+#    plt.imshow(u.value)
+#    plt.title('CVX solution')
+#    plt.colorbar()
+#    
+#    plt.subplot(3,1,3)
+#    plt.imshow(diff_cvx)
+#    plt.title('Difference')
+#    plt.colorbar()
+#    plt.show()
+#    
+#    plt.plot(np.linspace(0,N,N), res1.as_array()[int(N/2),:], label = 'PDHG')
+#    plt.plot(np.linspace(0,N,N), u.value[int(N/2),:], label = 'CVX')
+#    plt.legend()
+#    
+#
+#    
+#    
+#    print('Primal Objective (CVX) {} '.format(obj.value))
+#    print('Primal Objective (PDHG) {} '.format(primal[-1]))
 
 
 

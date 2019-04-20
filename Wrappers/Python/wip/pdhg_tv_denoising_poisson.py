@@ -48,7 +48,7 @@ alpha = 2
 
 #method = input("Enter structure of PDHG (0=Composite or 1=NotComposite): ")
 
-method = '0'
+method = '1'
 if method == '0':
 
     # Create operators
@@ -81,8 +81,8 @@ normK = operator.norm()
 sigma = 1
 tau = 1/(sigma*normK**2)
 
-opt = {'niter':2000}
-opt1 = {'niter':2000, 'memopt': True}
+opt = {'niter':5000}
+opt1 = {'niter':5000, 'memopt': True}
 
 t1 = timer()
 res, time, primal, dual, pdgap = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt) 
@@ -91,6 +91,8 @@ t2 = timer()
 t3 = timer()
 res1, time1, primal1, dual1, pdgap1 = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt1) 
 t4 = timer()
+
+print(pdgap[-1])
 
 
 plt.figure(figsize=(15,15))

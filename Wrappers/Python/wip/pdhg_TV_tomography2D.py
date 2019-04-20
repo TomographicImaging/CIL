@@ -43,7 +43,7 @@ from timeit import default_timer as timer
 #ig = ImageGeometry(voxel_num_x = N, voxel_num_y = N)
 #data = ImageData(phantom_2D, geometry=ig)
 
-N = 50
+N = 75
 x = np.zeros((N,N))
 x[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
 x[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 1
@@ -52,8 +52,8 @@ data = ImageData(x)
 ig = ImageGeometry(voxel_num_x = N, voxel_num_y = N)
 
 
-detectors = 50
-angles = np.linspace(0,np.pi,50)
+detectors = N
+angles = np.linspace(0,np.pi,N)
 
 ag = AcquisitionGeometry('parallel','2D',angles, detectors)
 Aop = AstraProjectorSimple(ig, ag, 'cpu')
@@ -82,7 +82,7 @@ op2 = Aop
 # Form Composite Operator
 operator = BlockOperator(op1, op2, shape=(2,1) ) 
 
-alpha = 50
+alpha = 10
 f = BlockFunction( alpha * MixedL21Norm(), \
                    0.5 * L2NormSquared(b = noisy_data) )
 g = ZeroFunction()
@@ -114,8 +114,8 @@ else:
 
 # Primal & dual stepsizes
 
-opt = {'niter':5000}
-opt1 = {'niter':5000, 'memopt': True}
+opt = {'niter':2000}
+opt1 = {'niter':2000, 'memopt': True}
 
 t1 = timer()
 res, time, primal, dual, pdgap = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt) 
@@ -155,78 +155,78 @@ print(" Max of abs difference is {}".format(diff))
 
 #%% Check with CVX solution
 
-from ccpi.optimisation.operators import SparseFiniteDiff
-import astra
-import numpy
-
-try:
-    from cvxpy import *
-    cvx_not_installable = True
-except ImportError:
-    cvx_not_installable = False
-
-
-if cvx_not_installable:
-    
-
-    u = Variable( N*N)
-    
-    DY = SparseFiniteDiff(ig, direction=0, bnd_cond='Neumann')
-    DX = SparseFiniteDiff(ig, direction=1, bnd_cond='Neumann')
-
-    regulariser = alpha * sum(norm(vstack([DX.matrix() * vec(u), DY.matrix() * vec(u)]), 2, axis = 0))
-    
-    # create matrix representation for Astra operator
-
-    vol_geom = astra.create_vol_geom(N, N)
-    proj_geom = astra.create_proj_geom('parallel', 1.0, detectors, angles)
-
-    proj_id = astra.create_projector('strip', proj_geom, vol_geom)
-
-    matrix_id = astra.projector.matrix(proj_id)
-
-    ProjMat = astra.matrix.get(matrix_id)
-    
-    fidelity = 0.5 * sum_squares(ProjMat * u - noisy_data.as_array().ravel())
-    
-    # choose solver
-    if 'MOSEK' in installed_solvers():
-        solver = MOSEK
-    else:
-        solver = SCS  
-    
-    obj =  Minimize( regulariser +  fidelity)
-    prob = Problem(obj)
-    result = prob.solve(verbose = True, solver = solver)    
-
-#%%
-    
-    u_rs = np.reshape(u.value, (N,N))
-        
-    diff_cvx = numpy.abs( res.as_array() - u_rs )
-    
-    # Show result
-    plt.figure(figsize=(15,15))
-    plt.subplot(3,1,1)
-    plt.imshow(res.as_array())
-    plt.title('PDHG solution')
-    plt.colorbar()
-    
-    plt.subplot(3,1,2)
-    plt.imshow(u_rs)
-    plt.title('CVX solution')
-    plt.colorbar()
-    
-    plt.subplot(3,1,3)
-    plt.imshow(diff_cvx)
-    plt.title('Difference')
-    plt.colorbar()
-    plt.show()
-    
-    plt.plot(np.linspace(0,N,N), res1.as_array()[int(N/2),:], label = 'PDHG')
-    plt.plot(np.linspace(0,N,N), u_rs[int(N/2),:], label = 'CVX')
-    plt.legend()
-    
-    
-    print('Primal Objective (CVX) {} '.format(obj.value))
-    print('Primal Objective (PDHG) {} '.format(primal[-1]))
+#from ccpi.optimisation.operators import SparseFiniteDiff
+#import astra
+#import numpy
+#
+#try:
+#    from cvxpy import *
+#    cvx_not_installable = True
+#except ImportError:
+#    cvx_not_installable = False
+#
+#
+#if cvx_not_installable:
+#    
+#
+#    u = Variable( N*N)
+#    
+#    DY = SparseFiniteDiff(ig, direction=0, bnd_cond='Neumann')
+#    DX = SparseFiniteDiff(ig, direction=1, bnd_cond='Neumann')
+#
+#    regulariser = alpha * sum(norm(vstack([DX.matrix() * vec(u), DY.matrix() * vec(u)]), 2, axis = 0))
+#    
+#    # create matrix representation for Astra operator
+#
+#    vol_geom = astra.create_vol_geom(N, N)
+#    proj_geom = astra.create_proj_geom('parallel', 1.0, detectors, angles)
+#
+#    proj_id = astra.create_projector('strip', proj_geom, vol_geom)
+#
+#    matrix_id = astra.projector.matrix(proj_id)
+#
+#    ProjMat = astra.matrix.get(matrix_id)
+#    
+#    fidelity = 0.5 * sum_squares(ProjMat * u - noisy_data.as_array().ravel())
+#    
+#    # choose solver
+#    if 'MOSEK' in installed_solvers():
+#        solver = MOSEK
+#    else:
+#        solver = SCS  
+#    
+#    obj =  Minimize( regulariser +  fidelity)
+#    prob = Problem(obj)
+#    result = prob.solve(verbose = True, solver = solver)    
+#
+##%%
+#    
+#    u_rs = np.reshape(u.value, (N,N))
+#        
+#    diff_cvx = numpy.abs( res.as_array() - u_rs )
+#    
+#    # Show result
+#    plt.figure(figsize=(15,15))
+#    plt.subplot(3,1,1)
+#    plt.imshow(res.as_array())
+#    plt.title('PDHG solution')
+#    plt.colorbar()
+#    
+#    plt.subplot(3,1,2)
+#    plt.imshow(u_rs)
+#    plt.title('CVX solution')
+#    plt.colorbar()
+#    
+#    plt.subplot(3,1,3)
+#    plt.imshow(diff_cvx)
+#    plt.title('Difference')
+#    plt.colorbar()
+#    plt.show()
+#    
+#    plt.plot(np.linspace(0,N,N), res1.as_array()[int(N/2),:], label = 'PDHG')
+#    plt.plot(np.linspace(0,N,N), u_rs[int(N/2),:], label = 'CVX')
+#    plt.legend()
+#    
+#    
+#    print('Primal Objective (CVX) {} '.format(obj.value))
+#    print('Primal Objective (PDHG) {} '.format(primal[-1]))

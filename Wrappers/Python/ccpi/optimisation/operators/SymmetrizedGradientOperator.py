@@ -21,94 +21,105 @@ class SymmetrizedGradient(Gradient):
         '''
          Domain of SymGrad is the Range of Gradient
         '''
+        
         self.gm_domain = self.gm_range 
         self.bnd_cond = bnd_cond
         
         self.channels = self.gm_range.get_item(0).channels
         
-        if self.correlation=='Space':
-            if self.channels>1:
-                pass
-            else: 
-#                # 2D image ---> Dx v1, Dyv2, Dx
-                tmp = self.gm_domain.geometries + (self.gm_domain.get_item(0),)
-                self.gm_range = BlockGeometry(*tmp )
-                self.ind1 = range(self.gm_domain.get_item(0).length)
-                self.ind2 = range(self.gm_domain.get_item(0).length-1, -1, -1)
-#                self.order = myorder = [0,1,2 3]
-                
-        elif self.correlation=='SpaceChannels':
-            if self.channels>1:
-                pass
-            else:
-                raise ValueError('No channels to correlate')        
+        tmp_gm = len(self.gm_domain.geometries)*self.gm_domain.geometries
+        
+        self.gm_range = BlockGeometry(*tmp_gm)
+        
+        self.FD = FiniteDiff(self.gm_domain, direction = 0, bnd_cond = self.bnd_cond)
+        
+        if self.gm_domain.shape[0]==2:
+            self.order_ind = [0,2,1,3]
+        else:
+            self.order_ind = [0,3,6,1,4,7,2,5,8]            
+            
+        
+#        if self.correlation=='Space':
+#            if self.channels>1:
+#                pass
+#            else: 
+##                # 2D image ---> Dx v1, Dyv2, Dx
+#                tmp = self.gm_domain.geometries + (self.gm_domain.get_item(0),)
+#                self.gm_range = BlockGeometry(*tmp )
+#                self.ind1 = range(self.gm_domain.get_item(0).length)
+#                self.ind2 = range(self.gm_domain.get_item(0).length-1, -1, -1)
+##                self.order = myorder = [0,1,2 3]
+#                
+#        elif self.correlation=='SpaceChannels':
+#            if self.channels>1:
+#                pass
+#            else:
+#                raise ValueError('No channels to correlate')        
                                                      
         
     def direct(self, x, out=None):
         
-#        tmp = numpy.zeros(self.gm_range)
-#        tmp[0] = FiniteDiff(self.gm_domain[1:], direction = 1, bnd_cond = self.bnd_cond).adjoint(x.as_array()[0])
-#        tmp[1] = FiniteDiff(self.gm_domain[1:], direction = 0, bnd_cond = self.bnd_cond).adjoint(x.as_array()[1])
-#        tmp[2] = 0.5 * (FiniteDiff(self.gm_domain[1:], direction = 0, bnd_cond = self.bnd_cond).adjoint(x.as_array()[0]) +
-#                        FiniteDiff(self.gm_domain[1:], direction = 1, bnd_cond = self.bnd_cond).adjoint(x.as_array()[1]) )
-#        
-#        return type(x)(tmp)
-
-        tmp = [[None]*2]*2
-        for i in range(2):
-            for j in range(2):  
-                tmp[i][j]=FiniteDiff(self.gm_domain.get_item(0), direction = i, bnd_cond = self.bnd_cond).adjoint(x.get_item(j))
-        tmp = numpy.array(tmp)
-        z = 0.5 * (tmp.T + tmp)
-        z = z.to
-        
-        return BlockDataContainer(*z.tolist())
+        if out is None:
+            
+            tmp = []
+            for i in range(self.gm_domain.shape[0]):
+                for j in range(x.shape[0]):
+                    self.FD.direction = i
+                    tmp.append(self.FD.adjoint(x.get_item(j)))
+                    
+            tmp1 = [tmp[i] for i in self.order_ind]        
+                    
+            res = [0.5 * sum(x) for x in zip(tmp, tmp1)]   
+                    
+            return BlockDataContainer(*res)                    
+                                     
 
     
     def adjoint(self, x, out=None):
-        pass
         
-        res = []
-        for i in range(2):
-            tmp = ImageData(np.zeros(x.get_item(0)))
-            for j in range(2):                
-                tmp += FiniteDiff(self.gm_domain.get_item(0), direction = i, bnd_cond = self.bnd_cond).direct(x.get_item(j))
-            res.append(tmp)   
-        return res            
-                
-                
-        
-#        for 
-        
-#        tmp = numpy.zeros(self.gm_domain)
-#        
-#        tmp[0] = FiniteDiff(self.gm_domain[1:], direction = 1, bnd_cond = self.bnd_cond).direct(x.as_array()[0]) +  \
-#                 FiniteDiff(self.gm_domain[1:], direction = 0, bnd_cond = self.bnd_cond).direct(x.as_array()[2])
-#                 
-#        tmp[1] = FiniteDiff(self.gm_domain[1:], direction = 1, bnd_cond = self.bnd_cond).direct(x.as_array()[2]) +  \
-#                 FiniteDiff(self.gm_domain[1:], direction = 0, bnd_cond = self.bnd_cond).direct(x.as_array()[1])                 
-#
-#        return type(x)(tmp)          
+        if out is None:
             
-    def alloc_domain_dim(self):
-        return ImageData(numpy.zeros(self.gm_domain))
-    
-    def alloc_range_dim(self):
-        return ImageData(numpy.zeros(self.range_dim))
-    
-    def domain_dim(self):
+            tmp = [None]*self.gm_domain.shape[0]
+            i = 0
+            
+            for k in range(self.gm_domain.shape[0]):
+                tmp1 = 0
+                for j in range(self.gm_domain.shape[0]):
+                    self.FD.direction = j
+                    tmp1 += self.FD.direct(x[i])                    
+                    i+=1
+                tmp[k] = tmp1  
+            return BlockDataContainer(*tmp)
+            
+#            i = 0
+#            
+#            tmp = self.gm_domain.allocate()
+#            for k in range(tmp.shape[0]):
+#                tmp1 = 0
+#                for j in range(tmp.shape[0]):
+#                    self.FD.direction = j
+#                    tmp1 += self.FD.direct(x[i])                    
+#                    i+=1
+#                tmp.get_item(k).fill(tmp1)  
+#            return tmp                
+                    
+        else:
+            pass
+         
+            
+    def domain_geometry(self):
         return self.gm_domain
     
-    def range_dim(self):
+    def range_geometry(self):
         return self.gm_range
                                    
     def norm(self):
-#        return np.sqrt(4*len(self.domainDim()))        
-        #TODO this takes time for big ImageData
-        # for 2D ||grad|| = sqrt(8), 3D ||grad|| = sqrt(12)        
-        x0 = ImageData(np.random.random_sample(self.domain_dim()))
-        self.s1, sall, svec = LinearOperator.PowerMethod(self, 25, x0)
-        return self.s1 
+
+        #TODO need dot method for BlockDataContainer
+        return numpy.sqrt(4*self.gm_domain.shape[0])
+#        x0 = self.gm_domain.allocate('random_int')
+#        self.s1, sall, svec = LinearOperator.PowerMethod(self, 10, x0)
+#        return self.s1
     
 
 
@@ -124,56 +135,100 @@ if __name__ == '__main__':
     K = 2
     
     ig1 = ImageGeometry(N, M)
-    ig2 = ImageGeometry(N, M, channels=K)
+    ig2 = ImageGeometry(N, M, K)
     
     E1 = SymmetrizedGradient(ig1, correlation = 'Space', bnd_cond='Neumann')
-    E2 = SymmetrizedGradient(ig2, correlation = 'SpaceChannels', bnd_cond='Periodic')
+    E2 = SymmetrizedGradient(ig2, correlation = 'Space', bnd_cond='Periodic')
     
-    print(E1.domain_geometry().shape)
-    print(E2.domain_geometry().shape)
+    print(E1.domain_geometry().shape, E1.range_geometry().shape)
+    print(E2.domain_geometry().shape, E2.range_geometry().shape)
     
-    u1 = E1.gm_domain.allocate('random_int')
-    u2 = E2.gm_domain.allocate('random_int')
+    u1 = E1.gm_domain.allocate('random_int')    
+    a1 = ig1.allocate('random_int')
+    a2 = ig1.allocate('random_int')
+    a3 = ig1.allocate('random_int')
+    w1 = BlockDataContainer(*[a1, a2, a3])
+    w11 = BlockDataContainer(*[a1, a2, a2, a3])   
         
+    sym_direct = [None]*3
     
-    res = E1.direct(u1) 
+    sym_direct[0] = FiniteDiff(ig1, direction = 1, bnd_cond = 'Neumann').adjoint(u1[0])
+    sym_direct[1] = FiniteDiff(ig1, direction = 0, bnd_cond = 'Neumann').adjoint(u1[1])
+    sym_direct[2] = 0.5 * (FiniteDiff(ig1, direction = 0, bnd_cond = 'Neumann').adjoint(u1[0]) + \
+                    FiniteDiff(ig1, direction = 1, bnd_cond = 'Neumann').adjoint(u1[1]))
     
-    res1 = E1.adjoint(res)
+    sym_direct1 = [None]*4
     
-#    Dx = FiniteDiff(ig1, direction = 1, bnd_cond = 'Neumann')
-#    Dy = FiniteDiff(ig1, direction = 0, bnd_cond = 'Neumann')
-#    
-#    B = BlockOperator(Dy, Dx)
-#    V = BlockDataContainer(u1,u2)
-#    
-#    res = B.adjoint(V)
+    sym_direct1[0] = FiniteDiff(ig1, direction = 0, bnd_cond = 'Neumann').adjoint(u1[0])
     
-#    ig = (N,M)
-#    ig2 = (2,) + ig
-#    ig3 = (3,) + ig
-#    u1 = ig.allocate('random_int')
-#    w1 = E.gm_range.allocate('random_int')
-#    DataContainer(np.random.randint(10, size=ig3))
+    sym_direct1[1] = 0.5 * (FiniteDiff(ig1, direction = 0, bnd_cond = 'Neumann').adjoint(u1[1]) + \
+                    FiniteDiff(ig1, direction = 1, bnd_cond = 'Neumann').adjoint(u1[0])) 
+    
+    sym_direct1[2] = 0.5 * (FiniteDiff(ig1, direction = 0, bnd_cond = 'Neumann').adjoint(u1[1]) + \
+                    FiniteDiff(ig1, direction = 1, bnd_cond = 'Neumann').adjoint(u1[0]))
+       
+    sym_direct1[3] = FiniteDiff(ig1, direction = 1, bnd_cond = 'Neumann').adjoint(u1[1])   
+    
+
+        
+    sym_adjoint = [None]*2
+    
+    sym_adjoint[0] = FiniteDiff(ig1, direction = 1, bnd_cond = 'Neumann').direct(w1[0]) + \
+                     FiniteDiff(ig1, direction = 0, bnd_cond = 'Neumann').direct(w1[2])
+    sym_adjoint[1] = FiniteDiff(ig1, direction = 1, bnd_cond = 'Neumann').direct(w1[2]) + \
+                     FiniteDiff(ig1, direction = 0, bnd_cond = 'Neumann').direct(w1[1])  
+                     
+    sym_adjoint1 = [None]*2
+    
+    sym_adjoint1[0] = FiniteDiff(ig1, direction = 0, bnd_cond = 'Neumann').direct(w11[0]) + \
+                     FiniteDiff(ig1, direction = 1, bnd_cond = 'Neumann').direct(w11[1])
+    sym_adjoint1[1] = FiniteDiff(ig1, direction = 0, bnd_cond = 'Neumann').direct(w11[2]) + \
+                     FiniteDiff(ig1, direction = 1, bnd_cond = 'Neumann').direct(w11[3])  
+                 
+    
+    LHS = (sym_direct[0] * w1[0] + \
+          sym_direct[1] * w1[1] + \
+          2*sym_direct[2] * w1[2]).sum()
+    
+    RHS = (u1[0]*sym_adjoint[0] + u1[1]*sym_adjoint[1]).sum()
+    
+    print(LHS, RHS)
+    
+    LHS = (sym_direct1[0] * w11[0] + \
+          sym_direct1[1] * w11[1] + \
+          sym_direct1[2] * w11[2] + \
+          sym_direct1[3] * w11[3] ).sum()
+    
+    RHS = (u1[0]*sym_adjoint1[0] + u1[1]*sym_adjoint1[1]).sum()
+    
+    print(LHS, RHS)    
     
     
     
-#    d1 = E.direct(u1)
-#    d2 = E.adjoint(w1)
-    
-#    LHS = (d1.as_array()[0]*w1.as_array()[0] + \
-#           d1.as_array()[1]*w1.as_array()[1] + \
-#           2*d1.as_array()[2]*w1.as_array()[2]).sum()
-#    
-#    RHS = (u1.as_array()[0]*d2.as_array()[0] + \
-#           u1.as_array()[1]*d2.as_array()[1]).sum()   
-#    
-#    
-#    print(LHS, RHS, E.norm())
-#    
-    
-#    
+    a1 = (E1.direct(u1) * w11).sum()
+    b1 = (u1 * E1.adjoint(w11)).sum()
+    print(a1, b1)
     
     
+    u2 = E2.gm_domain.allocate('random_int')
+    
+    aa1 = ig2.allocate('random_int')
+    aa2 = ig2.allocate('random_int')
+    aa3 = ig2.allocate('random_int')
+    aa4 = ig2.allocate('random_int')
+    aa5 = ig2.allocate('random_int')
+    aa6 = ig2.allocate('random_int')  
+    
+    w2 = BlockDataContainer(*[aa1, aa2, aa3, \
+                              aa2, aa4, aa5, \
+                              aa3, aa5, aa6])     
+    
+    tmp1 = E2.direct(u2)
+    tmp2 = E2.adjoint(w2)
+    c1 = (tmp1 * w2).sum()
+    d1 = (u2 * tmp2).sum() 
+    
+    print(c1, d1)
     
     
     
@@ -181,5 +236,4 @@ if __name__ == '__main__':
     
     
     
-    
-    
+   

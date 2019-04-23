@@ -48,7 +48,7 @@ alpha = 2
 
 #method = input("Enter structure of PDHG (0=Composite or 1=NotComposite): ")
 
-method = '1'
+method = '0'
 if method == '0':
 
     # Create operators

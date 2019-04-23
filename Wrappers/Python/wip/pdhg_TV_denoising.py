@@ -16,7 +16,7 @@ from ccpi.optimisation.algorithms import PDHG, PDHG_old
 
 from ccpi.optimisation.operators import BlockOperator, Identity, Gradient
 from ccpi.optimisation.functions import ZeroFunction, L2NormSquared, \
-                      MixedL21Norm, FunctionOperatorComposition, BlockFunction, ScaledFunction
+                      MixedL21Norm, BlockFunction
 
 from skimage.util import random_noise
 
@@ -26,7 +26,7 @@ from timeit import default_timer as timer
 
 # Create phantom for TV Gaussian denoising
 
-N = 500
+N = 100
 
 data = np.zeros((N,N))
 data[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
@@ -48,7 +48,7 @@ plt.show()
 alpha = 0.5
 
 #method = input("Enter structure of PDHG (0=Composite or 1=NotComposite): ")
-method = '0'
+method = '1'
 
 if method == '0':
 
@@ -138,66 +138,66 @@ print(" Max of abs difference is {}".format(diff))
 
 #%% Check with CVX solution
 
-#from ccpi.optimisation.operators import SparseFiniteDiff
-#
-#try:
-#    from cvxpy import *
-#    cvx_not_installable = True
-#except ImportError:
-#    cvx_not_installable = False
-#
-#
-#if cvx_not_installable:
-#
-#    ##Construct problem    
-#    u = Variable(ig.shape)
-#    
-#    DY = SparseFiniteDiff(ig, direction=0, bnd_cond='Neumann')
-#    DX = SparseFiniteDiff(ig, direction=1, bnd_cond='Neumann')
-#    
-#    # Define Total Variation as a regulariser
-#    regulariser = alpha * sum(norm(vstack([DX.matrix() * vec(u), DY.matrix() * vec(u)]), 2, axis = 0))
-#    fidelity = 0.5 * sum_squares(u - noisy_data.as_array())
-#    
-#    # choose solver
-#    if 'MOSEK' in installed_solvers():
-#        solver = MOSEK
-#    else:
-#        solver = SCS  
-#        
-#    obj =  Minimize( regulariser +  fidelity)
-#    prob = Problem(obj)
-#    result = prob.solve(verbose = True, solver = solver)
-#    
-#    diff_cvx = numpy.abs( res.as_array() - u.value )
-#    
-#    # Show result
-#    plt.figure(figsize=(15,15))
-#    plt.subplot(3,1,1)
-#    plt.imshow(res.as_array())
-#    plt.title('PDHG solution')
-#    plt.colorbar()
-#    
-#    plt.subplot(3,1,2)
-#    plt.imshow(u.value)
-#    plt.title('CVX solution')
-#    plt.colorbar()
-#    
-#    plt.subplot(3,1,3)
-#    plt.imshow(diff_cvx)
-#    plt.title('Difference')
-#    plt.colorbar()
-#    plt.show()
-#    
-#    plt.plot(np.linspace(0,N,N), res1.as_array()[int(N/2),:], label = 'PDHG')
-#    plt.plot(np.linspace(0,N,N), u.value[int(N/2),:], label = 'CVX')
-#    plt.legend()
-#    
-#
-#    
-#    
-#    print('Primal Objective (CVX) {} '.format(obj.value))
-#    print('Primal Objective (PDHG) {} '.format(primal[-1]))
+from ccpi.optimisation.operators import SparseFiniteDiff
+
+try:
+    from cvxpy import *
+    cvx_not_installable = True
+except ImportError:
+    cvx_not_installable = False
+
+
+if cvx_not_installable:
+
+    ##Construct problem    
+    u = Variable(ig.shape)
+    
+    DY = SparseFiniteDiff(ig, direction=0, bnd_cond='Neumann')
+    DX = SparseFiniteDiff(ig, direction=1, bnd_cond='Neumann')
+    
+    # Define Total Variation as a regulariser
+    regulariser = alpha * sum(norm(vstack([DX.matrix() * vec(u), DY.matrix() * vec(u)]), 2, axis = 0))
+    fidelity = 0.5 * sum_squares(u - noisy_data.as_array())
+    
+    # choose solver
+    if 'MOSEK' in installed_solvers():
+        solver = MOSEK
+    else:
+        solver = SCS  
+        
+    obj =  Minimize( regulariser +  fidelity)
+    prob = Problem(obj)
+    result = prob.solve(verbose = True, solver = solver)
+    
+    diff_cvx = numpy.abs( res.as_array() - u.value )
+    
+    # Show result
+    plt.figure(figsize=(15,15))
+    plt.subplot(3,1,1)
+    plt.imshow(res.as_array())
+    plt.title('PDHG solution')
+    plt.colorbar()
+    
+    plt.subplot(3,1,2)
+    plt.imshow(u.value)
+    plt.title('CVX solution')
+    plt.colorbar()
+    
+    plt.subplot(3,1,3)
+    plt.imshow(diff_cvx)
+    plt.title('Difference')
+    plt.colorbar()
+    plt.show()
+    
+    plt.plot(np.linspace(0,N,N), res1.as_array()[int(N/2),:], label = 'PDHG')
+    plt.plot(np.linspace(0,N,N), u.value[int(N/2),:], label = 'CVX')
+    plt.legend()
+    
+
+    
+    
+    print('Primal Objective (CVX) {} '.format(obj.value))
+    print('Primal Objective (PDHG) {} '.format(primal[-1]))
 
 
 

@@ -14,6 +14,12 @@ from ccpi.optimisation.operators import FiniteDiff, SparseFiniteDiff
 
 class SymmetrizedGradient(Gradient):
     
+    ''' Symmetrized Gradient, denoted by E: V --> W
+        where V is the Range of the Gradient Operator
+        and W is the Range of the Symmetrized Gradient.                        
+    '''
+    
+    
     def __init__(self, gm_domain, bnd_cond = 'Neumann', **kwargs):
         
         super(SymmetrizedGradient, self).__init__(gm_domain, bnd_cond, **kwargs) 
@@ -37,25 +43,7 @@ class SymmetrizedGradient(Gradient):
             self.order_ind = [0,2,1,3]
         else:
             self.order_ind = [0,3,6,1,4,7,2,5,8]            
-            
-        
-#        if self.correlation=='Space':
-#            if self.channels>1:
-#                pass
-#            else: 
-##                # 2D image ---> Dx v1, Dyv2, Dx
-#                tmp = self.gm_domain.geometries + (self.gm_domain.get_item(0),)
-#                self.gm_range = BlockGeometry(*tmp )
-#                self.ind1 = range(self.gm_domain.get_item(0).length)
-#                self.ind2 = range(self.gm_domain.get_item(0).length-1, -1, -1)
-##                self.order = myorder = [0,1,2 3]
-#                
-#        elif self.correlation=='SpaceChannels':
-#            if self.channels>1:
-#                pass
-#            else:
-#                raise ValueError('No channels to correlate')        
-                                                     
+                
         
     def direct(self, x, out=None):
         
@@ -71,10 +59,21 @@ class SymmetrizedGradient(Gradient):
                     
             res = [0.5 * sum(x) for x in zip(tmp, tmp1)]   
                     
-            return BlockDataContainer(*res)                    
-                                     
-
+            return BlockDataContainer(*res) 
     
+        else:
+            
+            ind = 0
+            for i in range(self.gm_domain.shape[0]):
+                for j in range(x.shape[0]):
+                    self.FD.direction = i
+                    self.FD.adjoint(x.get_item(j), out=out[ind])
+                    ind+=1                    
+            out1 = [out[i] for i in self.order_ind]            
+            res = [0.5 * sum(x) for x in zip(out, out1)]            
+            out.fill(BlockDataContainer(*res))
+            
+                                               
     def adjoint(self, x, out=None):
         
         if out is None:
@@ -91,20 +90,20 @@ class SymmetrizedGradient(Gradient):
                 tmp[k] = tmp1  
             return BlockDataContainer(*tmp)
             
-#            i = 0
-#            
-#            tmp = self.gm_domain.allocate()
-#            for k in range(tmp.shape[0]):
-#                tmp1 = 0
-#                for j in range(tmp.shape[0]):
-#                    self.FD.direction = j
-#                    tmp1 += self.FD.direct(x[i])                    
-#                    i+=1
-#                tmp.get_item(k).fill(tmp1)  
-#            return tmp                
-                    
+
         else:
-            pass
+            
+            tmp = self.gm_domain.allocate() 
+            i = 0
+            for k in range(self.gm_domain.shape[0]):
+                tmp1 = 0
+                for j in range(self.gm_domain.shape[0]):
+                    self.FD.direction = j
+                    self.FD.direct(x[i], out=tmp[j])
+                    i+=1
+                    tmp1+=tmp[j]
+                out[k].fill(tmp1)    
+                    
          
             
     def domain_geometry(self):
@@ -117,6 +116,7 @@ class SymmetrizedGradient(Gradient):
 
         #TODO need dot method for BlockDataContainer
         return numpy.sqrt(4*self.gm_domain.shape[0])
+    
 #        x0 = self.gm_domain.allocate('random_int')
 #        self.s1, sall, svec = LinearOperator.PowerMethod(self, 10, x0)
 #        return self.s1
@@ -126,114 +126,112 @@ class SymmetrizedGradient(Gradient):
 if __name__ == '__main__':   
     
     ###########################################################################  
-    ## Symmetrized Gradient
+    ## Symmetrized Gradient Tests
     from ccpi.framework import DataContainer
     from ccpi.optimisation.operators import Gradient, BlockOperator, FiniteDiff
     import numpy as np
     
     N, M = 2, 3
     K = 2
+    C = 2
     
     ig1 = ImageGeometry(N, M)
-    ig2 = ImageGeometry(N, M, K)
+    ig2 = ImageGeometry(N, M, channels=C)
     
     E1 = SymmetrizedGradient(ig1, correlation = 'Space', bnd_cond='Neumann')
-    E2 = SymmetrizedGradient(ig2, correlation = 'Space', bnd_cond='Periodic')
     
-    print(E1.domain_geometry().shape, E1.range_geometry().shape)
-    print(E2.domain_geometry().shape, E2.range_geometry().shape)
-    
-    u1 = E1.gm_domain.allocate('random_int')    
-    a1 = ig1.allocate('random_int')
-    a2 = ig1.allocate('random_int')
-    a3 = ig1.allocate('random_int')
-    w1 = BlockDataContainer(*[a1, a2, a3])
-    w11 = BlockDataContainer(*[a1, a2, a2, a3])   
+    try:
+        E1 = SymmetrizedGradient(ig1, correlation = 'SpaceChannels', bnd_cond='Neumann')
+    except:
+        print("No Channels to correlate")
         
-    sym_direct = [None]*3
-    
-    sym_direct[0] = FiniteDiff(ig1, direction = 1, bnd_cond = 'Neumann').adjoint(u1[0])
-    sym_direct[1] = FiniteDiff(ig1, direction = 0, bnd_cond = 'Neumann').adjoint(u1[1])
-    sym_direct[2] = 0.5 * (FiniteDiff(ig1, direction = 0, bnd_cond = 'Neumann').adjoint(u1[0]) + \
-                    FiniteDiff(ig1, direction = 1, bnd_cond = 'Neumann').adjoint(u1[1]))
-    
-    sym_direct1 = [None]*4
-    
-    sym_direct1[0] = FiniteDiff(ig1, direction = 0, bnd_cond = 'Neumann').adjoint(u1[0])
-    
-    sym_direct1[1] = 0.5 * (FiniteDiff(ig1, direction = 0, bnd_cond = 'Neumann').adjoint(u1[1]) + \
-                    FiniteDiff(ig1, direction = 1, bnd_cond = 'Neumann').adjoint(u1[0])) 
-    
-    sym_direct1[2] = 0.5 * (FiniteDiff(ig1, direction = 0, bnd_cond = 'Neumann').adjoint(u1[1]) + \
-                    FiniteDiff(ig1, direction = 1, bnd_cond = 'Neumann').adjoint(u1[0]))
-       
-    sym_direct1[3] = FiniteDiff(ig1, direction = 1, bnd_cond = 'Neumann').adjoint(u1[1])   
-    
+    E2 = SymmetrizedGradient(ig2, correlation = 'SpaceChannels', bnd_cond='Neumann')  
 
-        
-    sym_adjoint = [None]*2
+    print(E1.domain_geometry().shape, E1.range_geometry().shape)
+    print(E2.domain_geometry().shape, E2.range_geometry().shape)   
     
-    sym_adjoint[0] = FiniteDiff(ig1, direction = 1, bnd_cond = 'Neumann').direct(w1[0]) + \
-                     FiniteDiff(ig1, direction = 0, bnd_cond = 'Neumann').direct(w1[2])
-    sym_adjoint[1] = FiniteDiff(ig1, direction = 1, bnd_cond = 'Neumann').direct(w1[2]) + \
-                     FiniteDiff(ig1, direction = 0, bnd_cond = 'Neumann').direct(w1[1])  
-                     
-    sym_adjoint1 = [None]*2
+    #check Linear operator property
     
-    sym_adjoint1[0] = FiniteDiff(ig1, direction = 0, bnd_cond = 'Neumann').direct(w11[0]) + \
-                     FiniteDiff(ig1, direction = 1, bnd_cond = 'Neumann').direct(w11[1])
-    sym_adjoint1[1] = FiniteDiff(ig1, direction = 0, bnd_cond = 'Neumann').direct(w11[2]) + \
-                     FiniteDiff(ig1, direction = 1, bnd_cond = 'Neumann').direct(w11[3])  
-                 
+    u1 = E1.domain_geometry().allocate('random_int')
+    u2 = E2.domain_geometry().allocate('random_int')
     
-    LHS = (sym_direct[0] * w1[0] + \
-          sym_direct[1] * w1[1] + \
-          2*sym_direct[2] * w1[2]).sum()
+    # Need to allocate random_int at the Range of SymGradient
     
-    RHS = (u1[0]*sym_adjoint[0] + u1[1]*sym_adjoint[1]).sum()
+    #a1 = ig1.allocate('random_int')
+    #a2 = ig1.allocate('random_int')
+    #a3 = ig1.allocate('random_int')
     
-    print(LHS, RHS)
+    #a4 = ig1.allocate('random_int')
+    #a5 = ig1.allocate('random_int')    
+    #a6 = ig1.allocate('random_int')
     
-    LHS = (sym_direct1[0] * w11[0] + \
-          sym_direct1[1] * w11[1] + \
-          sym_direct1[2] * w11[2] + \
-          sym_direct1[3] * w11[3] ).sum()
+    # TODO allocate has to create this symmetry by default!!!!!
+    #w1 = BlockDataContainer(*[a1, a2, \
+    #                           a2, a3]) 
+    w1 = E1.range_geometry().allocate('random_int',symmetry=True)
     
-    RHS = (u1[0]*sym_adjoint1[0] + u1[1]*sym_adjoint1[1]).sum()
+    LHS = (E1.direct(u1) * w1).sum()
+    RHS = (u1 * E1.adjoint(w1)).sum()
     
-    print(LHS, RHS)    
-    
-    
-    
-    a1 = (E1.direct(u1) * w11).sum()
-    b1 = (u1 * E1.adjoint(w11)).sum()
-    print(a1, b1)
-    
+    numpy.testing.assert_equal(LHS, RHS)     
     
     u2 = E2.gm_domain.allocate('random_int')
     
-    aa1 = ig2.allocate('random_int')
-    aa2 = ig2.allocate('random_int')
-    aa3 = ig2.allocate('random_int')
-    aa4 = ig2.allocate('random_int')
-    aa5 = ig2.allocate('random_int')
-    aa6 = ig2.allocate('random_int')  
+    #aa1 = ig2.allocate('random_int')
+    #aa2 = ig2.allocate('random_int')
+    #aa3 = ig2.allocate('random_int')
+    #aa4 = ig2.allocate('random_int')
+    #aa5 = ig2.allocate('random_int')
+    #aa6 = ig2.allocate('random_int')  
     
-    w2 = BlockDataContainer(*[aa1, aa2, aa3, \
-                              aa2, aa4, aa5, \
-                              aa3, aa5, aa6])     
+    #w2 = BlockDataContainer(*[aa1, aa2, aa3, \
+    #                          aa2, aa4, aa5, \
+    #                          aa3, aa5, aa6])     
+    w2 = E2.range_geometry().allocate('random_int',symmetry=True)
+ 
     
-    tmp1 = E2.direct(u2)
-    tmp2 = E2.adjoint(w2)
-    c1 = (tmp1 * w2).sum()
-    d1 = (u2 * tmp2).sum() 
+    LHS1 = (E2.direct(u2) * w2).sum()
+    RHS1 = (u2 * E2.adjoint(w2)).sum()
     
-    print(c1, d1)
+    numpy.testing.assert_equal(LHS1, RHS1)      
+    
+    out = E1.range_geometry().allocate()
+    E1.direct(u1, out=out)
+    a1 = E1.direct(u1)
+    numpy.testing.assert_array_equal(a1[0].as_array(), out[0].as_array()) 
+    numpy.testing.assert_array_equal(a1[1].as_array(), out[1].as_array()) 
+    numpy.testing.assert_array_equal(a1[2].as_array(), out[2].as_array()) 
+    numpy.testing.assert_array_equal(a1[3].as_array(), out[3].as_array()) 
+    
+    
+    out1 = E1.domain_geometry().allocate()
+    E1.adjoint(w1, out=out1)
+    b1 = E1.adjoint(w1)    
+    
+    LHS_out = (out * w1).sum()
+    RHS_out = (u1 * out1).sum()
+    print(LHS_out, RHS_out)
+    
+    
+    out2 = E2.range_geometry().allocate()
+    E2.direct(u2, out=out2)
+    a2 = E2.direct(u2)
+    
+    out21 = E2.domain_geometry().allocate()
+    E2.adjoint(w2, out=out21)
+    b2 = E2.adjoint(w2)    
+    
+    LHS_out = (out2 * w2).sum()
+    RHS_out = (u2 * out21).sum()
+    print(LHS_out, RHS_out)    
     
     
     
     
     
     
-    
-   
+
+#    
+#    
+#    
+#   

@@ -37,7 +37,12 @@ class PDHG(Algorithm):
 
     def set_up(self, f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
         # algorithmic parameters
-            
+        self.operator = operator
+        self.f = f
+        self.g = g
+        self.tau = tau
+        self.sigma = sigma
+        self.opt = opt
         if sigma is None and tau is None:
             raise ValueError('Need sigma*tau||K||^2<1') 
                     

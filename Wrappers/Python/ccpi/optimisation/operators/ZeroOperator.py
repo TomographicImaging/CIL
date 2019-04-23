@@ -13,25 +13,26 @@ from ccpi.optimisation.operators import LinearOperator
 class ZeroOperator(LinearOperator):
     
     def __init__(self, gm_domain, gm_range=None):
+        
+        super(ZeroOperator, self).__init__()             
 
         self.gm_domain = gm_domain
         self.gm_range = gm_range  
         if self.gm_range is None:
             self.gm_range = self.gm_domain
-            
-        super(ZeroOperator, self).__init__()            
+                   
         
     def direct(self,x,out=None):
         if out is None:
             return self.gm_range.allocate()
         else:
-            return self.gm_range.allocate()
+            out.fill(self.gm_range.allocate())
     
     def adjoint(self,x, out=None):
         if out is None:
             return self.gm_domain.allocate()
         else:
-            return self.gm_domain.allocate()
+            out.fill(self.gm_domain.allocate())
         
     def norm(self):
         return 0

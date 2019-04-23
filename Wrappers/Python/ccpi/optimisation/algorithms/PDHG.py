@@ -13,6 +13,7 @@ import time
 from ccpi.optimisation.operators import BlockOperator
 from ccpi.framework import BlockDataContainer
 from ccpi.optimisation.functions import FunctionOperatorComposition
+import matplotlib.pyplot as plt
 
 class PDHG(Algorithm):
     '''Primal Dual Hybrid Gradient'''
@@ -104,7 +105,7 @@ class PDHG(Algorithm):
 
     def update_objective(self):
         p1 = self.f(self.operator.direct(self.x)) + self.g(self.x)
-        d1 = -(self.f.convex_conjugate(self.y) + self.g(-1*self.operator.adjoint(self.y)))
+        d1 = -(self.f.convex_conjugate(self.y) + self.g.convex_conjugate(-1*self.operator.adjoint(self.y)))
 
         self.loss.append([p1,d1,p1-d1])
 
@@ -152,7 +153,7 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
         
         if not memopt:
             
-            y_tmp = y_old +  sigma * operator.direct(xbar)            
+            y_tmp = y_old +  sigma * operator.direct(xbar)                        
             y = f.proximal_conjugate(y_tmp, sigma)
                 
             x_tmp = x_old - tau*operator.adjoint(y)
@@ -164,15 +165,15 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
                                                   
             x_old.fill(x)
             y_old.fill(y)
-            
-            
+                        
             if i%10==0:
-#                
+                
                 p1 = f(operator.direct(x)) + g(x)
-                d1 = - ( f.convex_conjugate(y) + g(-1*operator.adjoint(y)) )
+                d1 = - ( f.convex_conjugate(y) + g.convex_conjugate(-1*operator.adjoint(y)) )            
                 primal.append(p1)
                 dual.append(d1)
-                pdgap.append(p1-d1)      
+                pdgap.append(p1-d1) 
+                print(p1, d1, p1-d1)
             
         else:
             
@@ -190,18 +191,18 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
             x.subtract(x_old, out=xbar)
             xbar *= theta
             xbar += x
-                                                
+                                    
             x_old.fill(x)
             y_old.fill(y)
             
             if i%10==0:
-#                
+                
                 p1 = f(operator.direct(x)) + g(x)
-                d1 = - ( f.convex_conjugate(y) + g(-1*operator.adjoint(y)) )
+                d1 = - ( f.convex_conjugate(y) + g.convex_conjugate(-1*operator.adjoint(y)) )  
                 primal.append(p1)
                 dual.append(d1)
-                pdgap.append(p1-d1)      
-#                print(p1, d1, p1-d1)
+                pdgap.append(p1-d1)  
+                print(p1, d1, p1-d1)
             
                          
     t_end = time.time()        

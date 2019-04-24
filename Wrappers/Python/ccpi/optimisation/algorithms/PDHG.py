@@ -104,6 +104,7 @@ class PDHG(Algorithm):
             self.y_old = self.y
 
     def update_objective(self):
+        
         p1 = self.f(self.operator.direct(self.x)) + self.g(self.x)
         d1 = -(self.f.convex_conjugate(self.y) + self.g.convex_conjugate(-1*self.operator.adjoint(self.y)))
 
@@ -166,7 +167,7 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
             x_old.fill(x)
             y_old.fill(y)
                         
-            if i%10==0:
+            if i%50==0:
                 
                 p1 = f(operator.direct(x)) + g(x)
                 d1 = - ( f.convex_conjugate(y) + g.convex_conjugate(-1*operator.adjoint(y)) )            
@@ -194,8 +195,8 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
                                     
             x_old.fill(x)
             y_old.fill(y)
-            
-            if i%10==0:
+                    
+            if i%50==0:
                 
                 p1 = f(operator.direct(x)) + g(x)
                 d1 = - ( f.convex_conjugate(y) + g.convex_conjugate(-1*operator.adjoint(y)) )  

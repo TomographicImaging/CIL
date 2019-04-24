@@ -69,9 +69,8 @@ class SymmetrizedGradient(Gradient):
                     self.FD.direction = i
                     self.FD.adjoint(x.get_item(j), out=out[ind])
                     ind+=1                    
-            out1 = [out[i] for i in self.order_ind]            
-            res = [0.5 * sum(x) for x in zip(out, out1)]            
-            out.fill(BlockDataContainer(*res))
+            out1 = BlockDataContainer(*[out[i] for i in self.order_ind])          
+            out.fill( 0.5 * (out + out1) )
             
                                                
     def adjoint(self, x, out=None):
@@ -102,10 +101,11 @@ class SymmetrizedGradient(Gradient):
                     self.FD.direct(x[i], out=tmp[j])
                     i+=1
                     tmp1+=tmp[j]
-                out[k].fill(tmp1)    
+                out[k].fill(tmp1)
+#            tmp = self.adjoint(x)
+#            out.fill(tmp)
                     
-         
-            
+                     
     def domain_geometry(self):
         return self.gm_domain
     
@@ -114,12 +114,12 @@ class SymmetrizedGradient(Gradient):
                                    
     def norm(self):
 
-        #TODO need dot method for BlockDataContainer
-        return numpy.sqrt(4*self.gm_domain.shape[0])
+#        TODO need dot method for BlockDataContainer
+#        return numpy.sqrt(4*self.gm_domain.shape[0])
     
-#        x0 = self.gm_domain.allocate('random_int')
-#        self.s1, sall, svec = LinearOperator.PowerMethod(self, 10, x0)
-#        return self.s1
+#        x0 = self.gm_domain.allocate('random')
+        self.s1, sall, svec = LinearOperator.PowerMethod(self, 50)        
+        return self.s1
     
 
 
@@ -225,6 +225,13 @@ if __name__ == '__main__':
     RHS_out = (u2 * out21).sum()
     print(LHS_out, RHS_out)    
     
+    
+    out = E1.range_geometry().allocate()
+    E1.direct(u1, out=out)
+    E1.adjoint(out, out=out1)
+    
+    print(E1.norm())
+    print(E2.norm())
     
     
     

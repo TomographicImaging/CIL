@@ -8,16 +8,16 @@ Created on Fri Feb 22 14:53:03 2019
 @author: evangelos
 """
 
-from ccpi.framework import ImageData, ImageGeometry, BlockDataContainer, AcquisitionGeometry, AcquisitionData
+from ccpi.framework import ImageData, ImageGeometry, AcquisitionGeometry, AcquisitionData
 
 import numpy as np                           
 import matplotlib.pyplot as plt
 
 from ccpi.optimisation.algorithms import PDHG, PDHG_old
 
-from ccpi.optimisation.operators import BlockOperator, Identity, Gradient
+from ccpi.optimisation.operators import BlockOperator, Gradient
 from ccpi.optimisation.functions import ZeroFunction, L2NormSquared, \
-                      MixedL21Norm, BlockFunction, ScaledFunction
+                      MixedL21Norm, BlockFunction
 
 from ccpi.astra.ops import AstraProjectorSimple
 from skimage.util import random_noise

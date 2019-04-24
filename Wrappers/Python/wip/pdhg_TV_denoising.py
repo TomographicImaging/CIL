@@ -6,7 +6,7 @@ Created on Fri Feb 22 14:53:03 2019
 @author: evangelos
 """
 
-from ccpi.framework import ImageData, ImageGeometry, BlockDataContainer
+from ccpi.framework import ImageData, ImageGeometry
 
 import numpy as np 
 import numpy                          

@@ -126,7 +126,7 @@ t3 = timer()
 res1, time1, primal1, dual1, pdgap1 = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt1) 
 t4 = timer()
 #
-
+#
 plt.figure(figsize=(15,15))
 plt.subplot(3,1,1)
 plt.imshow(res.as_array())

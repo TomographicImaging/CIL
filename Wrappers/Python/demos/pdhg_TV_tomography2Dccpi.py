@@ -46,7 +46,7 @@ from timeit import default_timer as timer
 #ig = ImageGeometry(voxel_num_x = N, voxel_num_y = N)
 #data = ImageData(phantom_2D, geometry=ig)
 
-N = 150
+N = 75
 #x = np.zeros((N,N))
 
 vert = 4
@@ -70,13 +70,14 @@ while i < vert:
 #%%
 #detectors = N
 #angles = np.linspace(0,np.pi,100)
-angles_num = 100
+#angles_num = 100
+angles_num = N
 det_w = 1.0
 det_num = N
 
 angles = np.linspace(0,np.pi,angles_num,endpoint=False,dtype=np.float32)*\
              180/np.pi
-
+angles = np.linspace(-90.,90.,N, dtype=np.float32) 
 # Inputs: Geometry, 2D or 3D, angles, horz detector pixel count, 
 #         horz detector pixel size, vert detector pixel count, 
 #         vert detector pixel size.
@@ -220,53 +221,73 @@ normK = operator.norm()
 # Primal & dual stepsizes
 sigma = 1
 tau = 1/(sigma*normK**2)
+niter = 3
+opt = {'niter':niter}
+opt1 = {'niter':niter, 'memopt': True}
 
-opt = {'niter':2000}
-opt1 = {'niter':2000, 'memopt': True}
 
 
 pdhg1 = PDHG(f=f,g=g, operator=operator, tau=tau, sigma=sigma)
 pdhg1.max_iteration = 2000
-pdhg1.update_objective_interval = 200
+pdhg1.update_objective_interval = 10
 pdhg2 = PDHG(f=f,g=g, operator=operator, tau=tau, sigma=sigma, memopt=True)
 pdhg2.max_iteration = 2000
-pdhg2.update_objective_interval = 200
-t1 = timer()
-#res, time, primal, dual, pdgap = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt) 
-pdhg1.run(200)
+pdhg2.update_objective_interval = 100
+
+t1_old = timer()
+resold, time, primal, dual, pdgap = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt) 
+t2_old = timer()
+
+pdhg1.run(niter)
+print (sum(pdhg1.timing))
 res = pdhg1.get_output().subset(vertical=0)
-t2 = timer()
 
 t3 = timer()
 #res1, time1, primal1, dual1, pdgap1 = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt1) 
-pdhg2.run(200)
+pdhg2.run(niter)
+print (sum(pdhg2.timing))
 res1 = pdhg2.get_output().subset(vertical=0)
 t4 = timer()
 #
-print ("No memopt in {}s, memopt in  {}s ".format(t2-t1, t4 -t3))
+print ("No memopt in {}s, memopt in  {}/{}s old {}s".format(sum(pdhg1.timing),
+       sum(pdhg2.timing),t4-t3, t2_old-t1_old))
+
+t1_old = timer()
+resold1, time, primal, dual, pdgap = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt1) 
+t2_old = timer()
 
 #%%
-plt.figure(figsize=(15,15))
-plt.subplot(3,1,1)
+plt.figure()
+plt.subplot(2,3,1)
 plt.imshow(res.as_array())
 plt.title('no memopt')
 plt.colorbar()
-plt.subplot(3,1,2)
+plt.subplot(2,3,2)
 plt.imshow(res1.as_array())
 plt.title('memopt')
 plt.colorbar()
-plt.subplot(3,1,3)
-plt.imshow((res1 - res).abs().as_array())
+plt.subplot(2,3,3)
+plt.imshow((res1 - resold1.subset(vertical=0)).abs().as_array())
 plt.title('diff')
 plt.colorbar()
-plt.show()
-# 
-plt.plot(np.linspace(0,N,N), res1.as_array()[int(N/2),:], label = 'memopt')
-plt.plot(np.linspace(0,N,N), res.as_array()[int(N/2),:], label = 'no memopt')
-plt.legend()
+plt.subplot(2,3,4)
+plt.imshow(resold.subset(vertical=0).as_array())
+plt.title('old nomemopt')
+plt.colorbar()
+plt.subplot(2,3,5)
+plt.imshow(resold1.subset(vertical=0).as_array())
+plt.title('old memopt')
+plt.colorbar()
+plt.subplot(2,3,6)
+plt.imshow((resold1 - resold).subset(vertical=0).as_array())
+plt.title('diff old')
+plt.colorbar()
+#plt.plot(np.linspace(0,N,N), res1.as_array()[int(N/2),:], label = 'memopt')
+#plt.plot(np.linspace(0,N,N), res.as_array()[int(N/2),:], label = 'no memopt')
+#plt.legend()
 plt.show()
 #
-print ("Time: No memopt in {}s, \n Time: Memopt in  {}s ".format(t2-t1, t4 -t3))
+print ("Time: No memopt in {}s, \n Time: Memopt in  {}s ".format(sum(pdhg1.timing), t4 -t3))
 diff = (res1 - res).abs().as_array().max()
 #
 print(" Max of abs difference is {}".format(diff))

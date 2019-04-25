@@ -71,7 +71,7 @@ class L2NormSquared(Function):
     def convex_conjugate(self, x):
         
         ''' Evaluate convex conjugate of L2NormSquared at x: f^{*}(x)'''
-            
+        
         tmp = 0
         
         if self.b is not None:
@@ -93,30 +93,19 @@ class L2NormSquared(Function):
             if self.b is None:
                 return x/(1+2*tau)
             else:
-
                 tmp = x.subtract(self.b)
-                #tmp -= self.b
                 tmp /= (1+2*tau)
                 tmp += self.b
                 return tmp
 #                return (x-self.b)/(1+2*tau) + self.b
-            
-#            if self.b is not None:
-#            out=x
-#            if self.b is not None:
-#                out -= self.b
-#            out /= (1+2*tau)
-#            if self.b is not None:
-#                out += self.b
-#            return out
-        else:
-            out.fill(x)
-            if self.b is not None:
-                out -= self.b
-            out /= (1+2*tau)
-            if self.b is not None:
-                out += self.b             
 
+        else:
+            if self.b is not None:
+                x.subtract(self.b, out=out)
+                out /= (1+2*tau)
+                out += self.b
+            else:
+                x.divide((1+2*tau), out=out)
     
     def proximal_conjugate(self, x, tau, out=None):
         

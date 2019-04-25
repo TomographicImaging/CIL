@@ -38,22 +38,15 @@ class KullbackLeibler(Function):
 
                                                 
     def __call__(self, x):
+                
+        res_tmp = numpy.zeros(x.shape)
         
-        # TODO check
+        tmp = x + self.bnoise 
+        ind = x.as_array()>0
         
-        self.sum_value = x + self.bnoise        
-        if  (self.sum_value.as_array()<0).any():
-            self.sum_value = numpy.inf
+        res_tmp[ind] = x.as_array()[ind] - self.b.as_array()[ind] * numpy.log(tmp.as_array()[ind])
         
-        if self.sum_value==numpy.inf:
-            return numpy.inf
-        else:
-            tmp = self.sum_value.copy()
-            #tmp.fill( numpy.log(tmp.as_array()) )            
-            self.log(tmp)
-            return (x - self.b * tmp ).sum()
-            
-#            return numpy.sum( x.as_array() - self.b.as_array() * numpy.log(self.sum_value.as_array()))
+        return res_tmp.sum()
 
     def log(self, datacontainer):
         '''calculates the in-place log of the datacontainer'''
@@ -61,6 +54,7 @@ class KullbackLeibler(Function):
                                 datacontainer.as_array().ravel(), True):
             raise ValueError('KullbackLeibler. Cannot calculate log of negative number')
         datacontainer.fill( numpy.log(datacontainer.as_array()) )
+
         
     def gradient(self, x, out=None):
         
@@ -68,6 +62,7 @@ class KullbackLeibler(Function):
         if out is None:
             return 1 - self.b/(x + self.bnoise)
         else:
+
             x.add(self.bnoise, out=out)
             self.b.divide(out, out=out)
             out.subtract(1, out=out)
@@ -75,16 +70,18 @@ class KullbackLeibler(Function):
             
     def convex_conjugate(self, x):
         
-        tmp = self.b/( 1 - x )
-        self.log(tmp)
-        return (self.b * ( tmp - 1 ) - self.bnoise * (x - 1)).sum()
-#        return self.b * ( ImageData(numpy.log(self.b/(1-x)) - 1 )) - self.bnoise * (x - 1)
+        tmp = self.b/(1-x)
+        ind = tmp.as_array()>0
+        
+        return (self.b.as_array()[ind] * (numpy.log(tmp.as_array()[ind])-1)).sum()
+
     
     def proximal(self, x, tau, out=None):
         
         if out is None:        
             return 0.5 *( (x - self.bnoise - tau) + ( (x + self.bnoise - tau)**2 + 4*tau*self.b   ) .sqrt() )
         else:
+            
             tmp =  0.5 *( (x - self.bnoise - tau) + 
                         ( (x + self.bnoise - tau)**2 + 4*tau*self.b   ) .sqrt()
                         )
@@ -101,25 +98,29 @@ class KullbackLeibler(Function):
             out += tmp
             
             out *= 0.5
-            
-    
+                            
     def proximal_conjugate(self, x, tau, out=None):
 
                 
         if out is None:
             z = x + tau * self.bnoise
-            return (z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt()
+
+            return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
         else:
-            z_m = x + tau * self.bnoise - 1
+#            z = x + tau * self.bnoise
+#            res = 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
+#            out.fill(res)
+#        else:
+            z_m = x + tau * self.bnoise -1
             self.b.multiply(4*tau, out=out)
             z_m.multiply(z_m, out=z_m)
             out += z_m
             out.sqrt(out=out)
-            # z = z_m + 2
-            z_m.sqrt(out=z_m)
+            z_m.sqrt(out=z_m) 
             z_m += 2
             out *= -1
             out += z_m
+            out *= 0.5
         
     
     def __rmul__(self, scalar):
@@ -140,6 +141,7 @@ if __name__ == '__main__':
     
     from ccpi.framework import ImageGeometry
     import numpy
+    
     N, M = 2,3
     ig  = ImageGeometry(N, M)
     data = ImageData(numpy.random.randint(-10, 10, size=(M, N)))
@@ -150,25 +152,5 @@ if __name__ == '__main__':
     f = KullbackLeibler(data)
 
     print(f(x))
-    
-#    numpy.random.seed(10)
-#    
-#    
-#    x = numpy.random.randint(-10, 10, size = (2,3))
-#    b = numpy.random.randint(1, 10, size = (2,3))
-#    
-#    ind1 = x>0
-#        
-#    res = x[ind1] - b * numpy.log(x[ind1])
-#    
-##    ind = x>0
-#    
-##    y = x[ind]
-#    
-#    
-#    
-#    
-#    
-
     
         

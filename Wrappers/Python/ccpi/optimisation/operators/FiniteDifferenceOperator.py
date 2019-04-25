@@ -41,7 +41,7 @@ class FiniteDiff(LinearOperator):
         
         #self.voxel_size = kwargs.get('voxel_size',1)
         # this wrongly assumes a homogeneous voxel size
-        self.voxel_size = self.gm_domain.voxel_size_x
+#        self.voxel_size = self.gm_domain.voxel_size_x
 
 
     def direct(self, x, out=None):

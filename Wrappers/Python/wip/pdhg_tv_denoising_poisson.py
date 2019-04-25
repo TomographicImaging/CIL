@@ -27,7 +27,7 @@ from timeit import default_timer as timer
 # ############################################################################
 # Create phantom for TV Poisson denoising
 
-N = 100
+N = 200
 data = np.zeros((N,N))
 data[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
 data[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 1
@@ -36,7 +36,7 @@ ig = ImageGeometry(voxel_num_x = N, voxel_num_y = N)
 ag = ig
 
 # Create noisy data. Add Gaussian noise
-n1 = random_noise(data, mode = 'poisson')
+n1 = random_noise(data, mode = 'poisson', seed = 10)
 noisy_data = ImageData(n1)
 
 plt.imshow(noisy_data.as_array())
@@ -59,7 +59,7 @@ if method == '0':
     operator = BlockOperator(op1, op2, shape=(2,1) ) 
 
     f1 = alpha * MixedL21Norm()
-    f2 = 0.5 * KullbackLeibler(noisy_data)
+    f2 = KullbackLeibler(noisy_data)
     
     f = BlockFunction(f1, f2 )                                        
     g = ZeroFunction()
@@ -71,7 +71,7 @@ else:
     ###########################################################################
     operator = Gradient(ig)
     f = alpha * MixedL21Norm()
-    g = 0.5 * KullbackLeibler(noisy_data)
+    g = KullbackLeibler(noisy_data)
     ###########################################################################
     
 # Compute operator Norm
@@ -81,8 +81,8 @@ normK = operator.norm()
 sigma = 1
 tau = 1/(sigma*normK**2)
 
-opt = {'niter':2000}
-opt1 = {'niter':2000, 'memopt': True}
+opt = {'niter':5000}
+opt1 = {'niter':5000, 'memopt': True}
 
 t1 = timer()
 res, time, primal, dual, pdgap = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt) 
@@ -91,6 +91,8 @@ t2 = timer()
 t3 = timer()
 res1, time1, primal1, dual1, pdgap1 = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt1) 
 t4 = timer()
+
+print(pdgap[-1])
 
 
 plt.figure(figsize=(15,15))
@@ -133,22 +135,25 @@ except ImportError:
 if cvx_not_installable:
 
     ##Construct problem    
-    u = Variable(ig.shape)
+    u1 = Variable(ig.shape)
+    q = Variable()
     
     DY = SparseFiniteDiff(ig, direction=0, bnd_cond='Neumann')
     DX = SparseFiniteDiff(ig, direction=1, bnd_cond='Neumann')
     
     # Define Total Variation as a regulariser
-    regulariser = alpha * sum(norm(vstack([DX.matrix() * vec(u), DY.matrix() * vec(u)]), 2, axis = 0))
-    fidelity = 0.5 * sum_squares(u - noisy_data.as_array())
+    regulariser = alpha * sum(norm(vstack([DX.matrix() * vec(u1), DY.matrix() * vec(u1)]), 2, axis = 0))
     
-    
-    solver = SCS    
-    obj =  Minimize( regulariser +  fidelity)
-    prob = Problem(obj)
+    fidelity = sum( u1 - multiply(noisy_data.as_array(), log(u1)) )
+    constraints = [q>= fidelity, u1>=0]
+        
+    solver = ECOS
+    obj =  Minimize( regulariser +  q)
+    prob = Problem(obj, constraints)
     result = prob.solve(verbose = True, solver = solver)
+
     
-    diff_cvx = numpy.abs( res.as_array() - u.value )
+    diff_cvx = numpy.abs( res.as_array() - u1.value )
     
     # Show result
     plt.figure(figsize=(15,15))
@@ -158,7 +163,7 @@ if cvx_not_installable:
     plt.colorbar()
     
     plt.subplot(3,1,2)
-    plt.imshow(u.value)
+    plt.imshow(u1.value)
     plt.title('CVX solution')
     plt.colorbar()
     
@@ -166,78 +171,17 @@ if cvx_not_installable:
     plt.imshow(diff_cvx)
     plt.title('Difference')
     plt.colorbar()
+    plt.show()
+    
+    plt.plot(np.linspace(0,N,N), res1.as_array()[int(N/2),:], label = 'PDHG')
+    plt.plot(np.linspace(0,N,N), u1.value[int(N/2),:], label = 'CVX')
+    plt.legend()  
+    
     
     print('Primal Objective (CVX) {} '.format(obj.value))
     print('Primal Objective (PDHG) {} '.format(primal[-1]))
-
-
-
-#pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
-#pdhg.max_iteration = 2000
-#pdhg.update_objective_interval = 10
-#
-#pdhg.run(2000)
-
     
-
-#sol = pdhg.get_output().as_array()
-##sol = result.as_array()
-##
-#fig = plt.figure()
-#plt.subplot(1,2,1)
-#plt.imshow(noisy_data.as_array())
-##plt.colorbar()
-#plt.subplot(1,2,2)
-#plt.imshow(sol)
-##plt.colorbar()
-#plt.show()
-##
-
-##
-#plt.plot(np.linspace(0,N,N), data[int(N/2),:], label = 'GTruth')
-#plt.plot(np.linspace(0,N,N), sol[int(N/2),:], label = 'Recon')
-#plt.legend()
-#plt.show()
-
-
-#%% Compare with cvx
-
-#try_cvx = input("Do you want CVX comparison (0/1)")
-#
-#if try_cvx=='0':
-#
-#    from cvxpy import *
-#    import sys
-#    sys.path.insert(0,'/Users/evangelos/Desktop/Projects/CCPi/CCPi-Framework/Wrappers/Python/ccpi/optimisation/cvx_scripts')
-#    from cvx_functions import TV_cvx
-#
-#    u = Variable((N, N))
-#    fidelity = pnorm( u - noisy_data.as_array(),1)
-#    regulariser = alpha * TV_cvx(u)
-#    solver = MOSEK
-#    obj =  Minimize( regulariser +  fidelity)
-#    constraints = []
-#    prob = Problem(obj, constraints)
-#
-#    # Choose solver (SCS is fast but less accurate than MOSEK)
-#    result = prob.solve(verbose = True, solver = solver)
-#
-#    print('Objective value is {} '.format(obj.value))
-#
-#    diff_pdhg_cvx = np.abs(u.value - res.as_array())
-#    plt.imshow(diff_pdhg_cvx)
-#    plt.colorbar()
-#    plt.title('|CVX-PDHG|')        
-#    plt.show()
-#
-#    plt.plot(np.linspace(0,N,N), u.value[int(N/2),:], label = 'CVX')
-#    plt.plot(np.linspace(0,N,N), res.as_array()[int(N/2),:], label = 'PDHG')
-#    plt.legend()
-#    plt.show()
-#
-#else:
-#    print('No CVX solution available')
-
+  
 
 
 

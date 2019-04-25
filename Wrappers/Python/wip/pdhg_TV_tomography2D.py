@@ -114,8 +114,8 @@ else:
 
 # Primal & dual stepsizes
 
-opt = {'niter':2000}
-opt1 = {'niter':2000, 'memopt': True}
+opt = {'niter':200}
+opt1 = {'niter':200, 'memopt': True}
 
 t1 = timer()
 res, time, primal, dual, pdgap = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt) 

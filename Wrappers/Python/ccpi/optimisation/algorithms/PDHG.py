@@ -57,14 +57,14 @@ class PDHG(Algorithm):
         self.y = self.y_old.copy()
     
         self.xbar = self.x_old.copy()
-        
-        
+
             
         # relaxation parameter
         self.theta = 1
 
     def update(self):
         
+
         # Gradient descent, Dual problem solution
         self.operator.direct(self.xbar, out=self.y_tmp)
         self.y_tmp *= self.sigma
@@ -77,6 +77,7 @@ class PDHG(Algorithm):
         self.operator.adjoint(self.y, out=self.x_tmp)
         self.x_tmp *= -1*self.tau
         self.x_tmp += self.x_old
+
             
         self.g.proximal(self.x_tmp, self.tau, out=self.x)
 
@@ -89,6 +90,7 @@ class PDHG(Algorithm):
         self.y_old.fill(self.y)
 
     def update_objective(self):
+        
         p1 = self.f(self.operator.direct(self.x)) + self.g(self.x)
         d1 = -(self.f.convex_conjugate(self.y) + self.g.convex_conjugate(-1*self.operator.adjoint(self.y)))
 
@@ -135,6 +137,7 @@ def PDHG_old(f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
     
     for i in range(niter):
         
+
         
         if memopt:
             operator.direct(xbar, out = y_tmp)             

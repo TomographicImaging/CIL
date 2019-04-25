@@ -104,13 +104,9 @@ class KullbackLeibler(Function):
                 
         if out is None:
             z = x + tau * self.bnoise
-
             return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
         else:
-#            z = x + tau * self.bnoise
-#            res = 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
-#            out.fill(res)
-#        else:
+
             z_m = x + tau * self.bnoise -1
             self.b.multiply(4*tau, out=out)
             z_m.multiply(z_m, out=z_m)
@@ -121,6 +117,7 @@ class KullbackLeibler(Function):
             out *= -1
             out += z_m
             out *= 0.5
+
         
     
     def __rmul__(self, scalar):

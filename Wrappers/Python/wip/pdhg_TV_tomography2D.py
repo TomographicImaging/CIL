@@ -8,16 +8,16 @@ Created on Fri Feb 22 14:53:03 2019
 @author: evangelos
 """
 
-from ccpi.framework import ImageData, ImageGeometry, BlockDataContainer, AcquisitionGeometry, AcquisitionData
+from ccpi.framework import ImageData, ImageGeometry, AcquisitionGeometry, AcquisitionData
 
 import numpy as np                           
 import matplotlib.pyplot as plt
 
 from ccpi.optimisation.algorithms import PDHG, PDHG_old
 
-from ccpi.optimisation.operators import BlockOperator, Identity, Gradient
+from ccpi.optimisation.operators import BlockOperator, Gradient
 from ccpi.optimisation.functions import ZeroFunction, L2NormSquared, \
-                      MixedL21Norm, BlockFunction, ScaledFunction
+                      MixedL21Norm, BlockFunction
 
 from ccpi.astra.ops import AstraProjectorSimple
 from skimage.util import random_noise
@@ -114,8 +114,8 @@ else:
 
 # Primal & dual stepsizes
 
-opt = {'niter':2000}
-opt1 = {'niter':2000, 'memopt': True}
+opt = {'niter':200}
+opt1 = {'niter':200, 'memopt': True}
 
 t1 = timer()
 res, time, primal, dual, pdgap = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt) 
@@ -126,7 +126,7 @@ t3 = timer()
 res1, time1, primal1, dual1, pdgap1 = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt1) 
 t4 = timer()
 #
-
+#
 plt.figure(figsize=(15,15))
 plt.subplot(3,1,1)
 plt.imshow(res.as_array())

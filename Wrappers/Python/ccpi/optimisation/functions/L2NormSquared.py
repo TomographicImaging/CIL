@@ -146,7 +146,13 @@ class L2NormSquared(Function):
                         
         '''
         
-        return ScaledFunction(self, scalar)        
+        return ScaledFunction(self, scalar)  
+
+
+    def operator_composition(self, operator):
+        
+        return FunctionOperatorComposition
+      
 
 
 if __name__ == '__main__':

@@ -149,23 +149,30 @@ class Algorithm(object):
         print("Iteration {:<5} Primal {:<5} Dual {:<5} PDgap".format('','',''))
         for _ in self:
             
+
+            if self.iteration % self.update_objective_interval == 0:
+                if verbose:
             
-            if verbose and self.iteration % self.update_objective_interval == 0:
+#            if verbose and self.iteration % self.update_objective_interval == 0:
                 #pass
-                print( "{}/{} {:<5} {:.4f} {:<5} {:.4f} {:<5} {:.4f}".\
-                      format(self.iteration, self.max_iteration,'', \
-                             self.get_last_objective()[0],'',\
-                             self.get_last_objective()[1],'',\
-                             self.get_last_objective()[2]))
+                # \t for tab
+#                print( "{:04}/{:04} {:<5} {:.4f} {:<5} {:.4f} {:<5} {:.4f}".\
+#                      format(self.iteration, self.max_iteration,'', \
+#                             self.get_last_objective()[0],'',\
+#                             self.get_last_objective()[1],'',\
+#                             self.get_last_objective()[2]))
                 
+                
+                    print ("Iteration {}/{}, {}".format(self.iteration, 
+                           self.max_iteration, self.get_last_objective()) )                
                 
                 #print ("Iteration {}/{}, Primal, Dual, PDgap = {}".format(self.iteration, 
                 #       self.max_iteration, self.get_last_objective()) )
                 
                 
-            else:
-                if callback is not None:
-                    callback(self.iteration, self.get_last_objective(), self.x)
+                else:
+                    if callback is not None:
+                        callback(self.iteration, self.get_last_objective(), self.x)
             i += 1
             if i == iterations:
                 break

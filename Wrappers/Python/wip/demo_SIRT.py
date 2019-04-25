@@ -4,14 +4,9 @@
 # First make all imports
 from ccpi.framework import ImageData, ImageGeometry, AcquisitionGeometry, \
     AcquisitionData
-from ccpi.optimisation.algs import FISTA, FBPD, CGLS, SIRT
-from ccpi.optimisation.funcs import Norm2sq, Norm1, IndicatorBox
+from ccpi.optimisation.functions import IndicatorBox
 from ccpi.astra.ops import AstraProjectorSimple
-
-from ccpi.optimisation.algorithms import CGLS as CGLSALG
-from ccpi.optimisation.algorithms import SIRT as SIRTALG
-
-from ccpi.optimisation.operators import Identity
+from ccpi.optimisation.algorithms import SIRT, CGLS
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -70,8 +65,6 @@ else:
 # wrapping calls to ASTRA as well as specifying whether to use CPU or GPU.
 Aop = AstraProjectorSimple(ig, ag, 'gpu')
 
-Aop = Identity(ig,ig)
-
 # Forward and backprojection are available as methods direct and adjoint. Here 
 # generate test data b and do simple backprojection to obtain z.
 b = Aop.direct(Phantom)
@@ -94,26 +87,12 @@ x_init = ImageData(np.zeros(x.shape),geometry=ig)
 opt = {'tol': 1e-4, 'iter': 100}
 
 
-# First a CGLS reconstruction can be done:
-x_CGLS, it_CGLS, timing_CGLS, criter_CGLS = CGLS(x_init, Aop, b, opt)
-
-plt.figure()
-plt.imshow(x_CGLS.array)
-plt.title('CGLS')
-plt.colorbar()
-plt.show()
-
-plt.figure()
-plt.semilogy(criter_CGLS)
-plt.title('CGLS criterion')
-plt.show()
-
-
-my_CGLS_alg = CGLSALG()
-my_CGLS_alg.set_up(x_init, Aop, b )
-my_CGLS_alg.max_iteration = 2000
-my_CGLS_alg.run(opt['iter'])
-x_CGLS_alg = my_CGLS_alg.get_output()
+# First run a simple CGLS reconstruction:
+CGLS_alg = CGLS()
+CGLS_alg.set_up(x_init, Aop, b )
+CGLS_alg.max_iteration = 2000
+CGLS_alg.run(opt['iter'])
+x_CGLS_alg = CGLS_alg.get_output()
 
 plt.figure()
 plt.imshow(x_CGLS_alg.array)
@@ -121,88 +100,106 @@ plt.title('CGLS ALG')
 plt.colorbar()
 plt.show()
 
+plt.figure()
+plt.semilogy(CGLS_alg.loss)
+plt.title('CGLS criterion')
+plt.show()
 
-# A SIRT unconstrained reconstruction can be done: similarly:
-x_SIRT, it_SIRT, timing_SIRT, criter_SIRT = SIRT(x_init, Aop, b, opt)
+
+# A SIRT reconstruction can be done simply by replacing CGLS by SIRT.
+# In the first instance, no constraints are enforced.
+SIRT_alg = SIRT()
+SIRT_alg.set_up(x_init, Aop, b )
+SIRT_alg.max_iteration = 2000
+SIRT_alg.run(opt['iter'])
+x_SIRT_alg = SIRT_alg.get_output()
 
 plt.figure()
-plt.imshow(x_SIRT.array)
+plt.imshow(x_SIRT_alg.array)
 plt.title('SIRT unconstrained')
 plt.colorbar()
 plt.show()
 
 plt.figure()
-plt.semilogy(criter_SIRT)
+plt.semilogy(SIRT_alg.loss)
 plt.title('SIRT unconstrained criterion')
 plt.show()
 
-
-my_SIRT_alg = SIRTALG()
-my_SIRT_alg.set_up(x_init, Aop, b )
-my_SIRT_alg.max_iteration = 2000
-my_SIRT_alg.run(opt['iter'])
-x_SIRT_alg = my_SIRT_alg.get_output()
+# The SIRT algorithm is stopped after the specified number of iterations has 
+# been run. It can be resumed by calling the run command again, which will run 
+# it for the specificed number of iterations
+SIRT_alg.run(opt['iter'])
+x_SIRT_alg2 = SIRT_alg.get_output()
 
 plt.figure()
-plt.imshow(x_SIRT_alg.array)
-plt.title('SIRT ALG')
+plt.imshow(x_SIRT_alg2.array)
+plt.title('SIRT unconstrained, extra iterations')
 plt.colorbar()
+plt.show()
+
+plt.figure()
+plt.semilogy(SIRT_alg.loss)
+plt.title('SIRT unconstrained criterion, extra iterations')
 plt.show()
 
 
 # A SIRT nonnegativity constrained reconstruction can be done using the 
 # additional input "constraint" set to a box indicator function with 0 as the 
-# lower bound and the default upper bound of infinity:
-x_SIRT0, it_SIRT0, timing_SIRT0, criter_SIRT0 = SIRT(x_init, Aop, b, opt,
-                                                      constraint=IndicatorBox(lower=0))
-plt.figure()
-plt.imshow(x_SIRT0.array)
-plt.title('SIRT nonneg')
-plt.colorbar()
-plt.show()
-
-plt.figure()
-plt.semilogy(criter_SIRT0)
-plt.title('SIRT nonneg criterion')
-plt.show()
-
-
-my_SIRT_alg0 = SIRTALG()
-my_SIRT_alg0.set_up(x_init, Aop, b, constraint=IndicatorBox(lower=0) )
-my_SIRT_alg0.max_iteration = 2000
-my_SIRT_alg0.run(opt['iter'])
-x_SIRT_alg0 = my_SIRT_alg0.get_output()
+# lower bound and the default upper bound of infinity. First setup a new 
+# instance of the SIRT algorithm.
+SIRT_alg0 = SIRT()
+SIRT_alg0.set_up(x_init, Aop, b, constraint=IndicatorBox(lower=0) )
+SIRT_alg0.max_iteration = 2000
+SIRT_alg0.run(opt['iter'])
+x_SIRT_alg0 = SIRT_alg0.get_output()
 
 plt.figure()
 plt.imshow(x_SIRT_alg0.array)
-plt.title('SIRT ALG0')
-plt.colorbar()
-plt.show()
-
-
-# A SIRT reconstruction with box constraints on [0,1] can also be done:
-x_SIRT01, it_SIRT01, timing_SIRT01, criter_SIRT01 = SIRT(x_init, Aop, b, opt,
-         constraint=IndicatorBox(lower=0,upper=1))
-
-plt.figure()
-plt.imshow(x_SIRT01.array)
-plt.title('SIRT box(0,1)')
+plt.title('SIRT nonnegativity constrained')
 plt.colorbar()
 plt.show()
 
 plt.figure()
-plt.semilogy(criter_SIRT01)
-plt.title('SIRT box(0,1) criterion')
+plt.semilogy(SIRT_alg0.loss)
+plt.title('SIRT nonnegativity criterion')
 plt.show()
 
-my_SIRT_alg01 = SIRTALG()
-my_SIRT_alg01.set_up(x_init, Aop, b, constraint=IndicatorBox(lower=0,upper=1) )
-my_SIRT_alg01.max_iteration = 2000
-my_SIRT_alg01.run(opt['iter'])
-x_SIRT_alg01 = my_SIRT_alg01.get_output()
+
+# A SIRT reconstruction with box constraints on [0,1] can also be done. 
+SIRT_alg01 = SIRT()
+SIRT_alg01.set_up(x_init, Aop, b, constraint=IndicatorBox(lower=0,upper=1) )
+SIRT_alg01.max_iteration = 2000
+SIRT_alg01.run(opt['iter'])
+x_SIRT_alg01 = SIRT_alg01.get_output()
 
 plt.figure()
 plt.imshow(x_SIRT_alg01.array)
-plt.title('SIRT ALG01')
+plt.title('SIRT boc(0,1)')
 plt.colorbar()
+plt.show()
+
+plt.figure()
+plt.semilogy(SIRT_alg01.loss)
+plt.title('SIRT box(0,1) criterion')
+plt.show()
+
+# The test image has values in the range [0,1], so enforcing values in the 
+# reconstruction to be within this interval improves a lot. Just for fun
+# we can also easily see what happens if we choose a narrower interval as 
+# constrint in the reconstruction, lower bound 0.2, upper bound 0.8. 
+SIRT_alg0208 = SIRT()
+SIRT_alg0208.set_up(x_init,Aop,b,constraint=IndicatorBox(lower=0.2,upper=0.8))
+SIRT_alg0208.max_iteration = 2000
+SIRT_alg0208.run(opt['iter'])
+x_SIRT_alg0208 = SIRT_alg0208.get_output()
+
+plt.figure()
+plt.imshow(x_SIRT_alg0208.array)
+plt.title('SIRT boc(0.2,0.8)')
+plt.colorbar()
+plt.show()
+
+plt.figure()
+plt.semilogy(SIRT_alg0208.loss)
+plt.title('SIRT box(0.2,0.8) criterion')
 plt.show()

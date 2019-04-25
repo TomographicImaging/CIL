@@ -1,12 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Apr 10 13:39:35 2019
-
-@author: jakob
-"""
-
-# -*- coding: utf-8 -*-
 #   This work is part of the Core Imaging Library developed by
 #   Visual Analytics and Imaging System Group of the Science Technology
 #   Facilities Council, STFC
@@ -26,9 +19,7 @@ Created on Wed Apr 10 13:39:35 2019
 #   limitations under the License.
 
 from ccpi.optimisation.algorithms import Algorithm
-from ccpi.framework import ImageData, AcquisitionData
 
-#from collections.abc import Iterable
 class SIRT(Algorithm):
 
     '''Simultaneous Iterative Reconstruction Technique

@@ -62,19 +62,6 @@ class KullbackLeibler(Function):
         if out is None:
             return 1 - self.b/(x + self.bnoise)
         else:
-#<<<<<<< HEAD
-#            self.b.divide(x+self.bnoise, out=out)
-#            out.subtract(1, out=out)
-#    
-#    def convex_conjugate(self, x):
-#        
-#        tmp = self.b/( 1 - x ) 
-#        ind = tmp.as_array()>0
-#        
-#        sel
-#        
-#        return (self.b * ( ImageData( numpy.log(tmp) ) - 1 ) - self.bnoise * (x - 1)).sum()
-#=======
             x.add(self.bnoise, out=out)
             self.b.divide(out, out=out)
             out.subtract(1, out=out)
@@ -116,23 +103,19 @@ class KullbackLeibler(Function):
                 
         if out is None:
             z = x + tau * self.bnoise
-
             return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
         else:
-            z = x + tau * self.bnoise
-            res = 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
-            out.fill(res)
-#        else:
-#            z_m = x + tau * self.bnoise -1
-#            self.b.multiply(4*tau, out=out)
-#            z_m.multiply(z_m, out=z_m)
-#            out += z_m
-#            out.sqrt(out=out)
-#            z = z_m + 2
-#            z_m.sqrt(out=z_m)
-#            z_m += 2
-#            out *= -1
-#            out += z_m
+            z_m = x + tau * self.bnoise -1
+            self.b.multiply(4*tau, out=out)
+            z_m.multiply(z_m, out=z_m)
+            out += z_m
+            out.sqrt(out=out)
+            z_m.sqrt(out=z_m) 
+            z_m += 2
+            out *= -1
+            out += z_m
+            out *= 0.5
+
         
     
     def __rmul__(self, scalar):

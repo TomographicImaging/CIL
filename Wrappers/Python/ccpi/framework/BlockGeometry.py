@@ -37,16 +37,15 @@ class BlockGeometry(object):
         containers = [geom.allocate(value) for geom in self.geometries]
         
         if symmetry == True:
-            
-            # TODO works but needs better coding
-            
+                        
             # for 2x2       
             # [ ig11, ig12\
             #   ig21, ig22]
+            
             # Row-wise Order
             
             if len(containers)==4:
-                containers[1] = containers[2]
+                containers[1]=containers[2]
             
             # for 3x3  
             # [ ig11, ig12, ig13\

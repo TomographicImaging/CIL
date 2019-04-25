@@ -32,7 +32,7 @@ from ccpi.optimisation.functions import ZeroFunction, L1Norm, \
 from skimage.util import random_noise
 
 # Create phantom for TV Salt & Pepper denoising
-N = 300
+N = 100
 
 data = np.zeros((N,N))
 data[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
@@ -48,7 +48,7 @@ noisy_data = ImageData(n1)
 # Regularisation Parameter
 alpha = 2
 
-method = '0'
+method = '1'
 
 if method == '0':
 

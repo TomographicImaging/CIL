@@ -23,7 +23,7 @@ from skimage.util import random_noise
 
 # Create phantom for TGV SaltPepper denoising
 
-N = 300
+N = 100
 
 data = np.zeros((N,N))
 
@@ -47,7 +47,7 @@ noisy_data = ImageData(n1)
 alpha = 0.8
 beta = numpy.sqrt(2)* alpha
 
-method = '0'
+method = '1'
 
 if method == '0':
 
@@ -83,7 +83,7 @@ else:
     f2 = beta * MixedL21Norm()     
     
     f = BlockFunction(f1, f2)         
-    g = BlockFunction(0.5 * L1Norm(b=noisy_data), ZeroFunction())
+    g = BlockFunction(L1Norm(b=noisy_data), ZeroFunction())
      
 ## Compute operator Norm
 normK = operator.norm()
@@ -122,75 +122,73 @@ plt.title('Middle Line Profiles')
 plt.show()
 
 
-
-
-
-
-
-
-
-
 #%% Check with CVX solution
 
-#from ccpi.optimisation.operators import SparseFiniteDiff
-#
-#try:
-#    from cvxpy import *
-#    cvx_not_installable = True
-#except ImportError:
-#    cvx_not_installable = False
-#
-#if cvx_not_installable:    
-#    
-#    u = Variable(ig.shape)
-#    w1 = Variable((N, N))
-#    w2 = Variable((N, N))
-#    
-#    # create TGV regulariser
-#    DY = SparseFiniteDiff(ig, direction=0, bnd_cond='Neumann')
-#    DX = SparseFiniteDiff(ig, direction=1, bnd_cond='Neumann')
-#    
-#    regulariser = alpha * sum(norm(vstack([DX.matrix() * vec(u) - vec(w1), \
-#                                           DY.matrix() * vec(u) - vec(w2)]), 2, axis = 0)) + \
-#                  beta * sum(norm(vstack([ DX.matrix().transpose() * vec(w1), DY.matrix().transpose() * vec(w2), \
-#                                      0.5 * ( DX.matrix().transpose() * vec(w2) + DY.matrix().transpose() * vec(w1) ), \
-#                                      0.5 * ( DX.matrix().transpose() * vec(w2) + DY.matrix().transpose() * vec(w1) ) ]), 2, axis = 0  ) )  
-#    
-#    constraints = []
-#    fidelity = 0.5 * sum_squares(u - noisy_data.as_array())    
-#    solver = MOSEK
-#
-#    obj =  Minimize( regulariser +  fidelity)
-#    prob = Problem(obj)
-#    result = prob.solve(verbose = True, solver = solver)
-#    
-#    diff_cvx = numpy.abs( res[0].as_array() - u.value )   
-#    
-#    # Show result
-#    plt.figure(figsize=(15,15))
-#    plt.subplot(3,1,1)
-#    plt.imshow(res[0].as_array())
-#    plt.title('PDHG solution')
-#    plt.colorbar()
-#    
-#    plt.subplot(3,1,2)
-#    plt.imshow(u.value)
-#    plt.title('CVX solution')
-#    plt.colorbar()
-#    
-#    plt.subplot(3,1,3)
-#    plt.imshow(diff_cvx)
-#    plt.title('Difference')
-#    plt.colorbar()
-#    plt.show()
-#    
-#    plt.plot(np.linspace(0,N,N), res[0].as_array()[int(N/2),:], label = 'PDHG')
-#    plt.plot(np.linspace(0,N,N), u.value[int(N/2),:], label = 'CVX')
-#    plt.legend()   
-#    
-#    print('Primal Objective (CVX) {} '.format(obj.value))
-#    print('Primal Objective (PDHG) {} '.format(primal[-1])) 
-#    print('Min/Max of absolute difference {}/{}'.format(diff_cvx.min(), diff_cvx.max()))
-#    
+from ccpi.optimisation.operators import SparseFiniteDiff
+
+try:
+    from cvxpy import *
+    cvx_not_installable = True
+except ImportError:
+    cvx_not_installable = False
+
+if cvx_not_installable:    
     
-   
+    u = Variable(ig.shape)
+    w1 = Variable((N, N))
+    w2 = Variable((N, N))
+    
+    # create TGV regulariser
+    DY = SparseFiniteDiff(ig, direction=0, bnd_cond='Neumann')
+    DX = SparseFiniteDiff(ig, direction=1, bnd_cond='Neumann')
+    
+    regulariser = alpha * sum(norm(vstack([DX.matrix() * vec(u) - vec(w1), \
+                                           DY.matrix() * vec(u) - vec(w2)]), 2, axis = 0)) + \
+                  beta * sum(norm(vstack([ DX.matrix().transpose() * vec(w1), DY.matrix().transpose() * vec(w2), \
+                                      0.5 * ( DX.matrix().transpose() * vec(w2) + DY.matrix().transpose() * vec(w1) ), \
+                                      0.5 * ( DX.matrix().transpose() * vec(w2) + DY.matrix().transpose() * vec(w1) ) ]), 2, axis = 0  ) )  
+    
+    constraints = []
+    fidelity = pnorm(u - noisy_data.as_array(),1)    
+    solver = MOSEK
+
+        # choose solver
+    if 'MOSEK' in installed_solvers():
+        solver = MOSEK
+    else:
+        solver = SCS  
+        
+    obj =  Minimize( regulariser +  fidelity)
+    prob = Problem(obj)
+    result = prob.solve(verbose = True, solver = solver)
+    
+    diff_cvx = numpy.abs( pdhg.get_output()[0].as_array() - u.value )
+        
+    plt.figure(figsize=(15,15))
+    plt.subplot(3,1,1)
+    plt.imshow(pdhg.get_output()[0].as_array())
+    plt.title('PDHG solution')
+    plt.colorbar()
+    plt.subplot(3,1,2)
+    plt.imshow(u.value)
+    plt.title('CVX solution')
+    plt.colorbar()
+    plt.subplot(3,1,3)
+    plt.imshow(diff_cvx)
+    plt.title('Difference')
+    plt.colorbar()
+    plt.show()    
+    
+    plt.plot(np.linspace(0,N,N), pdhg.get_output()[0].as_array()[int(N/2),:], label = 'PDHG')
+    plt.plot(np.linspace(0,N,N), u.value[int(N/2),:], label = 'CVX')
+    plt.legend()
+    plt.title('Middle Line Profiles')
+    plt.show()
+            
+    print('Primal Objective (CVX) {} '.format(obj.value))
+    print('Primal Objective (PDHG) {} '.format(pdhg.objective[-1][0]))
+
+
+
+
+

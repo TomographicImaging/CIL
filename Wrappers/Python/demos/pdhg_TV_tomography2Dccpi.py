@@ -21,7 +21,8 @@ from ccpi.optimisation.functions import ZeroFunction, L2NormSquared, \
                       MixedL21Norm, BlockFunction, ScaledFunction
 
 #from ccpi.astra.ops import AstraProjectorSimple
-from ccpi.plugins.ops import CCPiProjectorSimple
+#from ccpi.plugins.ops import CCPiProjectorSimple
+from ccpi.plugins.operators import CCPiProjectorSimple
 #from skimage.util import random_noise
 from timeit import default_timer as timer
 
@@ -90,8 +91,8 @@ ag = AcquisitionGeometry('parallel',
                          det_w)
 
 from ccpi.reconstruction.parallelbeam import alg as pbalg
-#from ccpi.plugins.processors import setupCCPiGeometries
-def setupCCPiGeometries(ig, ag, counter):
+from ccpi.plugins.processors import setupCCPiGeometries
+def ssetupCCPiGeometries(ig, ag, counter):
     
     #vg = ImageGeometry(voxel_num_x=voxel_num_x,voxel_num_y=voxel_num_y, voxel_num_z=voxel_num_z)
     #Phantom_ccpi = ImageData(geometry=vg,
@@ -221,16 +222,16 @@ normK = operator.norm()
 # Primal & dual stepsizes
 sigma = 1
 tau = 1/(sigma*normK**2)
-niter = 3
+niter = 50
 opt = {'niter':niter}
 opt1 = {'niter':niter, 'memopt': True}
 
 
 
-pdhg1 = PDHG(f=f,g=g, operator=operator, tau=tau, sigma=sigma)
-pdhg1.max_iteration = 2000
-pdhg1.update_objective_interval = 10
-pdhg2 = PDHG(f=f,g=g, operator=operator, tau=tau, sigma=sigma, memopt=True)
+pdhg1 = PDHG(f=f,g=g, operator=operator, tau=tau, sigma=sigma, memopt=True, max_iteration=niter)
+#pdhg1.max_iteration = 2000
+pdhg1.update_objective_interval = 100
+pdhg2 = PDHG(f=f,g=g, operator=operator, tau=tau, sigma=sigma, memopt=False)
 pdhg2.max_iteration = 2000
 pdhg2.update_objective_interval = 100
 
@@ -238,12 +239,14 @@ t1_old = timer()
 resold, time, primal, dual, pdgap = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt) 
 t2_old = timer()
 
+print ("memopt = False, shouldn't matter")
 pdhg1.run(niter)
 print (sum(pdhg1.timing))
 res = pdhg1.get_output().subset(vertical=0)
-
+print (pdhg1.objective)
 t3 = timer()
 #res1, time1, primal1, dual1, pdgap1 = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt1) 
+print ("memopt = True, shouldn't matter")
 pdhg2.run(niter)
 print (sum(pdhg2.timing))
 res1 = pdhg2.get_output().subset(vertical=0)

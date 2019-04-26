@@ -13,7 +13,6 @@ import time
 from ccpi.optimisation.operators import BlockOperator
 from ccpi.framework import BlockDataContainer
 from ccpi.optimisation.functions import FunctionOperatorComposition
-import matplotlib.pyplot as plt
 
 class PDHG(Algorithm):
     '''Primal Dual Hybrid Gradient'''

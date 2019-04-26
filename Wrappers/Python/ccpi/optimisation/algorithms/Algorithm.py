@@ -34,7 +34,7 @@ class Algorithm(object):
       method will stop when the stopping cryterion is met. 
    '''
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         '''Constructor
         
         Set the minimal number of parameters:
@@ -48,7 +48,7 @@ class Algorithm(object):
                                        when evaluating the objective is computationally expensive.
         '''
         self.iteration = 0
-        self.__max_iteration = 0
+        self.__max_iteration = kwargs.get('max_iteration', 0)
         self.__loss = []
         self.memopt = False
         self.timing = []
@@ -91,9 +91,11 @@ class Algorithm(object):
             if self.iteration % self.update_objective_interval == 0:
                 self.update_objective()
             self.iteration += 1
+        
     def get_output(self):
         '''Returns the solution found'''
         return self.x
+    
     def get_last_loss(self):
         '''Returns the last stored value of the loss function
         
@@ -146,21 +148,10 @@ class Algorithm(object):
             print ("Stop cryterion has been reached.")
         i = 0
         
-        print("Iteration {:<5} Primal {:<5} Dual {:<5} PDgap".format('','',''))
         for _ in self:
-            
-            
-            if verbose and self.iteration % self.update_objective_interval == 0:
-                #pass
-                print( "{}/{} {:<5} {:.4f} {:<5} {:.4f} {:<5} {:.4f}".\
-                      format(self.iteration, self.max_iteration,'', \
-                             self.get_last_objective()[0],'',\
-                             self.get_last_objective()[1],'',\
-                             self.get_last_objective()[2]))
-                
-                
-                #print ("Iteration {}/{}, Primal, Dual, PDgap = {}".format(self.iteration, 
-                #       self.max_iteration, self.get_last_objective()) )
+            if verbose and (self.iteration -1) % self.update_objective_interval == 0:
+                print ("Iteration {}/{}, = {}".format(self.iteration-1, 
+                       self.max_iteration, self.get_last_objective()) )
                 
                 
             else:

@@ -19,14 +19,13 @@ class PDHG(Algorithm):
     '''Primal Dual Hybrid Gradient'''
 
     def __init__(self, **kwargs):
-        super(PDHG, self).__init__()
+        super(PDHG, self).__init__(max_iteration=kwargs.get('max_iteration',0))
         self.f        = kwargs.get('f', None)
         self.operator = kwargs.get('operator', None)
         self.g        = kwargs.get('g', None)
         self.tau      = kwargs.get('tau', None)
         self.sigma    = kwargs.get('sigma', None)
-        self.memopt   = kwargs.get('memopt', False)
-
+        
         if self.f is not None and self.operator is not None and \
            self.g is not None:
             print ("Calling from creator")
@@ -46,25 +45,22 @@ class PDHG(Algorithm):
         self.opt = opt
         if sigma is None and tau is None:
             raise ValueError('Need sigma*tau||K||^2<1') 
-                    
-    
+
         self.x_old = self.operator.domain_geometry().allocate()
         self.x_tmp = self.x_old.copy()
         self.x = self.x_old.copy()
-        
+    
         self.y_old = self.operator.range_geometry().allocate()
         self.y_tmp = self.y_old.copy()
         self.y = self.y_old.copy()
-    
+
         self.xbar = self.x_old.copy()
 
-            
         # relaxation parameter
         self.theta = 1
 
     def update(self):
         
-
         # Gradient descent, Dual problem solution
         self.operator.direct(self.xbar, out=self.y_tmp)
         self.y_tmp *= self.sigma
@@ -90,7 +86,7 @@ class PDHG(Algorithm):
         self.y_old.fill(self.y)
 
     def update_objective(self):
-        
+
         p1 = self.f(self.operator.direct(self.x)) + self.g(self.x)
         d1 = -(self.f.convex_conjugate(self.y) + self.g.convex_conjugate(-1*self.operator.adjoint(self.y)))
 

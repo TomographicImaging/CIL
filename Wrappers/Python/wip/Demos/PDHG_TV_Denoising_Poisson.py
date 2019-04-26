@@ -87,7 +87,19 @@ opt = {'niter':2000, 'memopt': True}
 pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma, memopt=True)
 pdhg.max_iteration = 2000
 pdhg.update_objective_interval = 50
-pdhg.run(2000)
+
+def pdgap_print(niter, objective, solution):
+    
+
+     print( "{:04}/{:04} {:<5} {:.4f} {:<5} {:.4f} {:<5} {:.4f}".\
+                      format(niter, pdhg.max_iteration,'', \
+                             objective[0],'',\
+                             objective[1],'',\
+                             objective[2]))
+
+#pdhg.run(2000)
+
+pdhg.run(2000, callback = pdgap_print)
 
 
 plt.figure(figsize=(15,15))

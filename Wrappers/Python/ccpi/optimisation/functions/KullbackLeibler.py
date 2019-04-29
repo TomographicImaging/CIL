@@ -107,8 +107,7 @@ class KullbackLeibler(Function):
         else:
 #            z = x + tau * self.bnoise
 #            out.fill( 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt()) )
-            
-            
+                        
             tmp1 = x + tau * self.bnoise - 1
             tmp2 = tmp1 + 2
             

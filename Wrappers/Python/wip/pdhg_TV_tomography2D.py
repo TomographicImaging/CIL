@@ -91,7 +91,7 @@ g = ZeroFunction()
 normK = operator.norm()
 
 ## Primal & dual stepsizes
-diag_precon = False 
+diag_precon = True 
 
 if diag_precon:
     

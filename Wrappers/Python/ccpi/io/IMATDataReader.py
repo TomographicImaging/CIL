@@ -321,14 +321,17 @@ class IMATDataReader(object):
             self._idx_right = next(x for x, val in enumerate(angstrom_channels[:, 1]) \
                                    if val > self.wavelength_range[1])
             self._idx_right -= 1
+            self._channel_edges = angstrom_channels[self._idx_left:(self._idx_right+1), :]
             
         elif (self.intervals != -1):
             self._idx_left = numpy.sum(n_channels_per_interval[:self.intervals[0]])
             self._idx_right = numpy.sum(n_channels_per_interval[:self.intervals[1]]) - 1
+            self._channel_edges = angstrom_channels[self._idx_left:(self._idx_right+1), :]
             
         else:
             self._idx_left = 0
             self._idx_right = n_channels_total - 1
+            self._channel_edges = angstrom_channels
         
         # calculate number of pixels and pixel size
         if ((self.binning == [1, 1]) and (self.roi == -1)):
@@ -367,11 +370,18 @@ class IMATDataReader(object):
                                        angle_unit = 'degree')
     
     
+    def get_channel_edges(self):
+        '''
+        Return edges of every energy bin in Angstroms
+        '''
+        return self._channel_edges
+    
+    
     def get_acquisition_geometry(self):
         '''
         Return AcquisitionGeometry object
         '''
-        return(self._ag)
+        return self._ag
         
     
     def get_shutter_interval_id(self):

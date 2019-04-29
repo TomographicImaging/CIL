@@ -59,7 +59,8 @@ class ScaledFunction(object):
         if out is None:            
             return self.scalar * self.function.gradient(x)    
         else:
-            out.fill( self.scalar * self.function.gradient(x) )
+            self.function.gradient(x, out=out)
+            out *= self.scalar
 
     def proximal(self, x, tau, out=None):
         '''This returns the proximal operator for the function at x, tau

@@ -7,12 +7,13 @@ Created on Wed Apr  3 10:30:25 2019
 """
 
 from ccpi.framework import AcquisitionData, AcquisitionGeometry
-
+import numpy
+import matplotlib.pyplot as plt
+import os
 
 pilAvailable = True
 try:    
     from PIL import Image
-#    from PIL.TiffTags import TAGS
 except:
     pilAvailable = False
     
@@ -23,11 +24,34 @@ class NIKONDataReader(object):
                  **kwargs):
         '''
         Constructor
+        
+        Input:
+            
+            xtek_file       full path to .xtexct file
+            
+            roi             region-of-interest to load. If roi = -1 (default), 
+                            full projections will be loaded. Otherwise roi is 
+                            given by [row0, column0, row1, column1], where 
+                            row0, column0 are coordinates of top left corner and 
+                            row1, column1 are coordinates of bottom right corner.
+                            
+            binning         number of pixels to bin (combine) along 0 (column) 
+                            and 1 (row) dimension. If binning = [1, 1] (default),
+                            projections in original resolution are loaded. Note, 
+                            if binning[0] != binning[1], then loaded projections
+                            will have anisotropic pixels, which are currently not 
+                            supported by the Framework
+            
+            normalize       normalize loaded projections by detector 
+                            white level (I_0). Default value is False, 
+                            i.e. no normalization.
+                    
         '''
         
         self.xtek_file = kwargs.get('xtek_file', None)
         self.roi = kwargs.get('roi', -1)
         self.binning = kwargs.get('binning', [1, 1])
+        self.normalize = kwargs.get('normalize', False)
         
         if self.xtek_file is not None:
             self.set_up(xtek_file = self.xtek_file,
@@ -37,11 +61,13 @@ class NIKONDataReader(object):
     def set_up(self, 
                xtek_file, 
                roi = -1, 
-               binning = [1, 1]):
+               binning = [1, 1],
+               normalize = False):
         
         self.xtek_file = xtek_file
         self.roi = roi
         self.binning = binning
+        self.normalize = normalize
         
         if self.xtek_file == None:
             raise Exception('Path to xtek file is required.')
@@ -82,23 +108,31 @@ class NIKONDataReader(object):
             # number of projections
             elif line.startswith("Projections"):
                 num_projections = int(line.split('=')[1])
-            # white level
-            #elif line.startswith("WhiteLevel"):
-            #    self._white_level = float(line.split('=')[1])
+            # white level - used for normalization
+            elif line.startswith("WhiteLevel"):
+                self._white_level = float(line.split('=')[1])
+            # number of pixels along Y axis
             elif line.startswith("DetectorPixelsY"):
                 pixel_num_v_0 = int(line.split('=')[1])
+            # number of pixels along X axis
             elif line.startswith("DetectorPixelsX"):
                 pixel_num_h_0 = int(line.split('=')[1])
+            # pixel size along X axis
             elif line.startswith("DetectorPixelSizeX"):
                 pixel_size_h_0 = float(line.split('=')[1])
+            # pixel size along Y axis
             elif line.startswith("DetectorPixelSizeY"):
                 pixel_size_v_0 = float(line.split('=')[1])
+            # source to center of rotation distance
             elif line.startswith("SrcToObject"):
                 source_x = float(line.split('=')[1])
+            # source to detector distance
             elif line.startswith("SrcToDetector"):
                 detector_x = float(line.split('=')[1])
+            # initial angular position of a rotation stage
             elif line.startswith("InitialAngle"):
                 initial_angle = float(line.split('=')[1])
+            # angular increment (in degrees)
             elif line.startswith("AngularStep"):
                 angular_step = float(line.split('=')[1])
     
@@ -109,7 +143,7 @@ class NIKONDataReader(object):
             pixel_size_v = pixel_size_v_0
             pixel_size_h = pixel_size_h_0
             
-        elif ((self.binning == [1,1]) and (self.roi != -1)):
+        elif ((self.binning == [1, 1]) and (self.roi != -1)):
             pixel_num_v = self.roi[2] - self.roi[0]
             pixel_num_h = self.roi[3] - self.roi[1]
             pixel_size_v = pixel_size_v_0
@@ -221,17 +255,25 @@ class NIKONDataReader(object):
                          self._ag.pixel_num_h, self.binning[1])
                 data[i, :, :] = tmp[self.roi[0]:(self.roi[0] + (((self.roi[2] - self.roi[0]) // self.binning[0]) * self.binning[0])), \
                                     self.roi[1]:(self.roi[1] + (((self.roi[3] - self.roi[1]) // self.binning[1]) * self.binning[1]))].reshape(shape).mean(-1).mean(1)
+        
+        if (self.normalize):
+            data /= self._white_level
+            data[data > 1] = 1
             
         return AcquisitionData(array = data, 
                                geometry = self._ag,
                                dimension_labels = ['angle', 'vertical', 'horizontal'])
 
+
 '''
+# usage example
+
 xtek_file = '/home/evelina/nikon_data/SophiaBeads_256_averaged.xtekct'
 reader = NIKONDataReader()
 reader.set_up(xtek_file = xtek_file,
               binning = [3, 1],
-              roi = [200, 500, 1500, 2000])
+              roi = [200, 500, 1500, 2000],
+              normalize = True)
 
 data = reader.load_projections()
 ag = reader.get_acquisition_geometry()
@@ -239,4 +281,4 @@ print(ag)
 
 plt.imshow(data.as_array()[1, :, :])
 plt.show()
-
+'''

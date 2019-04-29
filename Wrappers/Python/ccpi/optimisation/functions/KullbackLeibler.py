@@ -105,18 +105,21 @@ class KullbackLeibler(Function):
             z = x + tau * self.bnoise
             return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
         else:
-            z = x + tau * self.bnoise
-            out.fill( 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt()) )
-            #z_m = x + tau * self.bnoise -1
-            #self.b.multiply(4*tau, out=out)
-            #z_m.multiply(z_m, out=z_m)
-            #out += z_m
-            #out.sqrt(out=out)
-            #z_m.sqrt(out=z_m) 
-            #z_m += 2
-            #out *= -1
-            #out += z_m
-            #out *= 0.5
+#            z = x + tau * self.bnoise
+#            out.fill( 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt()) )
+            
+            
+            tmp1 = x + tau * self.bnoise - 1
+            tmp2 = tmp1 + 2
+            
+            self.b.multiply(4*tau, out=out)       
+            tmp1.multiply(tmp1, out=tmp1)
+            out += tmp1
+            out.sqrt(out=out)
+                        
+            out *= -1
+            out += tmp2
+            out *= 0.5
 
         
     

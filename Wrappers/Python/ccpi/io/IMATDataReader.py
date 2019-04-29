@@ -372,7 +372,8 @@ class IMATDataReader(object):
     
     def get_channel_edges(self):
         '''
-        Return edges of every energy bin in Angstroms
+        Return edges of every energy bin in Angstroms as a numpy array with 
+        shape (channels x 2)
         '''
         return self._channel_edges
     
@@ -576,9 +577,9 @@ class IMATDataReader(object):
     def load_flats_before(self):
         '''
         Loads flats before and returns numpy array with shape
-        (num_flat_before, n_channels, pixel_num_v, ag.pixel_num_h) if num_flat_before > 1
+        (num_flat_before, n_channels, pixel_num_v, pixel_num_h) if num_flat_before > 1
         or
-        (n_channels, pixel_num_v, ag.pixel_num_h) if num_flat_before = 1
+        (n_channels, pixel_num_v, pixel_num_h) if num_flat_before = 1
         '''
         
         if ((self.flat_before_path == None) or 
@@ -632,9 +633,9 @@ class IMATDataReader(object):
         
         '''
         Loads flats after and returns numpy array with shape
-        (num_flat_after, n_channels, pixel_num_v, ag.pixel_num_h) if num_flat_after > 1
+        (num_flat_after, n_channels, pixel_num_v, pixel_num_h) if num_flat_after > 1
         or
-        (n_channels, pixel_num_v, ag.pixel_num_h) if num_flat_after = 1
+        (n_channels, pixel_num_v, pixel_num_h) if num_flat_after = 1
         '''
         
         if ((self.flat_after_path == None) or 
@@ -682,9 +683,9 @@ class IMATDataReader(object):
             
         return data
     
-    
+        
     def _load(self,
-             filename_mask):
+        filename_mask):
         '''
         generic loader: loads projections or flats
         '''
@@ -698,26 +699,31 @@ class IMATDataReader(object):
             # generate filename
             filename = filename_mask.format(self._idx_left + i)
             
-            with fits.open(filename) as file_handler:
-                tmp = numpy.flipud(numpy.transpose(numpy.asarray(file_handler[0].data, dtype = float)))
-            
             if ((self.binning == [1, 1]) and (self.roi == -1)):
-                data[i, :, :] = tmp
+                with fits.open(filename) as file_handler:
+                    data[i, :, :] = numpy.flipud(numpy.transpose(numpy.asarray(file_handler[0].data, dtype = float)))
                 
             elif ((self.binning == [1, 1]) and (self.roi != -1)):
-                data[i, :, :] = tmp[self.roi[0]:self.roi[2], self.roi[1]:self.roi[3]]
+                with fits.open(filename) as file_handler:
+                    tmp = numpy.asarray(file_handler[0].data[self.roi[1]:self.roi[3], 
+                                                             (self.pixel_num_v_0 - self.roi[2]):(self.pixel_num_v_0 - self.roi[0])], dtype = float)
+                    data[i, :, :] = numpy.flipud(numpy.transpose(tmp))
                 
             elif ((self.binning > [1, 1]) and (self.roi == -1)):
                 shape = (self._ag.pixel_num_v, self.binning[0], 
                          self._ag.pixel_num_h, self.binning[1])
-                data[i, :, :] = tmp[:(self._ag.pixel_num_v * self.binning[0]), \
-                                    :(self._ag.pixel_num_h * self.binning[1])].reshape(shape).mean(-1).mean(1)
+                with fits.open(filename) as file_handler:
+                    tmp = numpy.asarray(file_handler[0].data[:self._ag.pixel_num_h * self.binning[1],
+                                                             self.pixel_num_v_0 - (self._ag.pixel_num_v * self.binning[0]):], dtype = float)
+                    data[i, :, :] = (numpy.flipud(numpy.transpose(tmp))).reshape(shape).mean(-1).mean(1)
                         
             elif ((self.binning > [1, 1]) and (self.roi != -1)):
                 shape = (self._ag.pixel_num_v, self.binning[0], 
                          self._ag.pixel_num_h, self.binning[1])
-                data[i, :, :] = tmp[self.roi[0]:(self.roi[0] + (((self.roi[2] - self.roi[0]) // self.binning[0]) * self.binning[0])), \
-                                    self.roi[1]:(self.roi[1] + (((self.roi[3] - self.roi[1]) // self.binning[1]) * self.binning[1]))].reshape(shape).mean(-1).mean(1)
+                with fits.open(filename) as file_handler:
+                    tmp = numpy.asarray(file_handler[0].data[self.roi[1]:(self.roi[1] + (((self.roi[3] - self.roi[1]) // self.binning[1]) * self.binning[1])),
+                                                             (self.pixel_num_v_0 - (self.roi[0] + (((self.roi[2] - self.roi[0]) // self.binning[0]) * self.binning[0]))):(self.pixel_num_v_0 - self.roi[0])], dtype = float)
+                    data[i, :, :] = (numpy.flipud(numpy.transpose(tmp))).reshape(shape).mean(-1).mean(1)
         
         return data
 
@@ -736,11 +742,11 @@ reader.set_up(projection_path = '/media/newhd/shared/Data/neutrondata/IMAT_beamt
               projection_prefix = 'Angle_', 
               projection_channel_prefix = 'Tomo_000',
               projection_counter = 10699,
-              angles = angles[0:2],
+              angles = angles[0:10],
               binning = [7, 8],
               roi = [100, 150, 450, 480],
               shutter_values_file = '/media/newhd/shared/Data/neutrondata/IMAT_beamtime_feb_2019_raw_final/RB1820541/Tomo/ShutterValues.txt',
-              intervals = [0, 2],
+              intervals = -1,
               flat_after_path = '/media/newhd/shared/Data/neutrondata/IMAT_beamtime_feb_2019_raw_final/RB1820541/Tomo/',
               flat_after_prefix = 'Flat',
               flat_after_channel_prefix = ' Tomo_000',
@@ -753,12 +759,12 @@ reader.set_up(projection_path = '/media/newhd/shared/Data/neutrondata/IMAT_beamt
               num_flat_before = 5) 
 
 
-#shutter_counts = reader.get_shutter_counts()
+shutter_counts = reader.get_shutter_counts()
 ag = reader.get_acquisition_geometry()
 data = reader.load_projections()
 flat_before = reader.load_flats_before()
+flat_after = reader.load_flats_after()
 
 plt.imshow(data.as_array()[1, 100, :, :])
 plt.show()
 '''
-    

@@ -88,7 +88,7 @@ pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma, memopt=True)
 pdhg.max_iteration = 2000
 pdhg.update_objective_interval = 50
 
-def pdgap_print(niter, objective, solution):
+def pdgap_objectives(niter, objective, solution):
     
 
      print( "{:04}/{:04} {:<5} {:.4f} {:<5} {:.4f} {:<5} {:.4f}".\
@@ -97,9 +97,7 @@ def pdgap_print(niter, objective, solution):
                              objective[1],'',\
                              objective[2]))
 
-#pdhg.run(2000)
-
-pdhg.run(2000, callback = pdgap_print)
+pdhg.run(2000, callback = pdgap_objectives)
 
 
 plt.figure(figsize=(15,15))
@@ -124,66 +122,65 @@ plt.title('Middle Line Profiles')
 plt.show()
 
 
-##%% Check with CVX solution
 #%% Check with CVX solution
 
-from ccpi.optimisation.operators import SparseFiniteDiff
-
-try:
-    from cvxpy import *
-    cvx_not_installable = True
-except ImportError:
-    cvx_not_installable = False
-
-
-if cvx_not_installable:
-
-    ##Construct problem    
-    u1 = Variable(ig.shape)
-    q = Variable()
-    
-    DY = SparseFiniteDiff(ig, direction=0, bnd_cond='Neumann')
-    DX = SparseFiniteDiff(ig, direction=1, bnd_cond='Neumann')
-    
-    # Define Total Variation as a regulariser
-    regulariser = alpha * sum(norm(vstack([DX.matrix() * vec(u1), DY.matrix() * vec(u1)]), 2, axis = 0))
-    
-    fidelity = sum( u1 - multiply(noisy_data.as_array(), log(u1)) )
-    constraints = [q>= fidelity, u1>=0]
-        
-    solver = ECOS
-    obj =  Minimize( regulariser +  q)
-    prob = Problem(obj, constraints)
-    result = prob.solve(verbose = True, solver = solver)
-
-    
-    diff_cvx = numpy.abs( pdhg.get_output().as_array() - u1.value )
-        
-    plt.figure(figsize=(15,15))
-    plt.subplot(3,1,1)
-    plt.imshow(pdhg.get_output().as_array())
-    plt.title('PDHG solution')
-    plt.colorbar()
-    plt.subplot(3,1,2)
-    plt.imshow(u1.value)
-    plt.title('CVX solution')
-    plt.colorbar()
-    plt.subplot(3,1,3)
-    plt.imshow(diff_cvx)
-    plt.title('Difference')
-    plt.colorbar()
-    plt.show()    
-    
-    plt.plot(np.linspace(0,N,N), pdhg.get_output().as_array()[int(N/2),:], label = 'PDHG')
-    plt.plot(np.linspace(0,N,N), u1.value[int(N/2),:], label = 'CVX')
-    plt.legend()
-    plt.title('Middle Line Profiles')
-    plt.show()
-            
-    print('Primal Objective (CVX) {} '.format(obj.value))
-    print('Primal Objective (PDHG) {} '.format(pdhg.objective[-1][0]))
-
-
-
-
-
+#from ccpi.optimisation.operators import SparseFiniteDiff
+#
+#try:
+#    from cvxpy import *
+#    cvx_not_installable = True
+#except ImportError:
+#    cvx_not_installable = False
+#
+#
+#if cvx_not_installable:
+#
+#    ##Construct problem    
+#    u1 = Variable(ig.shape)
+#    q = Variable()
+#    
+#    DY = SparseFiniteDiff(ig, direction=0, bnd_cond='Neumann')
+#    DX = SparseFiniteDiff(ig, direction=1, bnd_cond='Neumann')
+#    
+#    # Define Total Variation as a regulariser
+#    regulariser = alpha * sum(norm(vstack([DX.matrix() * vec(u1), DY.matrix() * vec(u1)]), 2, axis = 0))
+#    
+#    fidelity = sum( u1 - multiply(noisy_data.as_array(), log(u1)) )
+#    constraints = [q>= fidelity, u1>=0]
+#        
+#    solver = ECOS
+#    obj =  Minimize( regulariser +  q)
+#    prob = Problem(obj, constraints)
+#    result = prob.solve(verbose = True, solver = solver)
+#
+#    
+#    diff_cvx = numpy.abs( pdhg.get_output().as_array() - u1.value )
+#        
+#    plt.figure(figsize=(15,15))
+#    plt.subplot(3,1,1)
+#    plt.imshow(pdhg.get_output().as_array())
+#    plt.title('PDHG solution')
+#    plt.colorbar()
+#    plt.subplot(3,1,2)
+#    plt.imshow(u1.value)
+#    plt.title('CVX solution')
+#    plt.colorbar()
+#    plt.subplot(3,1,3)
+#    plt.imshow(diff_cvx)
+#    plt.title('Difference')
+#    plt.colorbar()
+#    plt.show()    
+#    
+#    plt.plot(np.linspace(0,N,N), pdhg.get_output().as_array()[int(N/2),:], label = 'PDHG')
+#    plt.plot(np.linspace(0,N,N), u1.value[int(N/2),:], label = 'CVX')
+#    plt.legend()
+#    plt.title('Middle Line Profiles')
+#    plt.show()
+#            
+#    print('Primal Objective (CVX) {} '.format(obj.value))
+#    print('Primal Objective (PDHG) {} '.format(pdhg.objective[-1][0]))
+#
+#
+#
+#
+#

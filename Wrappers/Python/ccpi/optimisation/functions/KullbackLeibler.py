@@ -63,6 +63,7 @@ class KullbackLeibler(Function):
             return 1 - self.b/(x + self.bnoise)
         else:
             x.add(self.bnoise, out=out)
+            
             self.b.divide(out, out=out)
             out.subtract(1, out=out)
             out *= -1

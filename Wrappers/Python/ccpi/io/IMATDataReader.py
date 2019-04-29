@@ -27,6 +27,76 @@ class IMATDataReader(object):
                  **kwargs):
         '''
         Constructor
+        
+        Input:
+            Projections loader relies on following namimg convention:
+            pathname_projection + projection_prefix + angle + / + IMAT + \
+            projection_counter + projection_channel_prefix + channel_number.fits
+            Example:
+            /pathname_projection/Angle_0.0/IMAT00010699_Tomo_000_00008.fits
+            where:
+                projection_prefix = "Angle_"
+                angle = 0.0 (taken from angles list)
+                projection_counter = 10699
+                projection_channel_prefix = "Tomo_000"
+                channel_number = 8 (we loop through channels depending on user's input)
+            
+            Flats (before and after) loader relies on following namimg convention:
+            flat_path + flat_prefix + flat_number + / + IMAT + \
+            flat_counter + flat_channel_prefix + channel_number.fits
+            Example:
+            /flat_path/Flat1/IMAT00010887_ Tomo_000_00003.fits
+            where:
+                flat_prefix = "Flat"
+                flat_number = 1 (we loop through flats depending on 
+                                 num_flat_before/ num_flat_after, 
+                                 relies on 1-based indexing)
+                flat_counter = 10887
+                projection_channel_prefix = " Tomo_000"
+                channel number = 3 (we loop through channels depending on user's input)
+            
+            angles                  list of angles to load. 
+            
+            shutter_values_file     full path to a text file with shutter values
+            
+            pixel_num_h_0           number of pixels along X axis, default is 512
+            
+            pixel_size_h_0          pixel size along X axis, default is 0.055 mm
+            
+            pixel_num_v_0           number of pixels along Y axis, default is 512
+            
+            pixel_size_v_0          pixel size along Y axis, default is 0.055 mm
+            
+            fligt_path              flight path used to convert TOF to Angstroms,
+                                    default 56.4 m
+                                    
+            roi                     region-of-interest to load. If roi = -1 (default), 
+                                    full projections will be loaded. Otherwise roi is 
+                                    given by [row0, column0, row1, column1], where 
+                                    row0, column0 are coordinates of top left corner and 
+                                    row1, column1 are coordinates of bottom right corner.
+                            
+            binning                 number of pixels to bin (combine) along 0 (column) 
+                                    and 1 (row) dimension. If binning = [1, 1] (default),
+                                    projections in original resolution are loaded. Note, 
+                                    if binning[0] != binning[1], then loaded projections
+                                    will have anisotropic pixels, which are currently not 
+                                    supported by the Framework
+            
+            wavelength_range        wavelength range (in Angstroms) to load. 
+                                    If wavelength_range = -1 (default), 
+                                    all channels will be loaded. Otherwise, 
+                                    wavelength_range should be given as [float0, float1],
+                                    where float1 > float0, (Python-style inclusive-lower-bound, 
+                                    exclusive-upper-bound).
+                                    Note, if wavelength_range != -1, then intervals must be equal -1.
+            
+            intervals               shutter intervals to load. If intervals = -1 (default), 
+                                    all channels will be loaded. Otherwise, intervals
+                                    should be given as [int0, int1], where int1 > int0 
+                                    (Python-style inclusive-lower-bound, exclusive-upper-bound).
+                                    Note, if intervals != -1, then wavelength_range must be equal -1.
+                                    
         '''
 
         self.projection_path = kwargs.get('pathname_projection', None)
@@ -228,8 +298,8 @@ class IMATDataReader(object):
         n_channels_total = numpy.sum(n_channels_per_interval)
         
         # calculate edges of each energy channel in TOF
-        tof_channels = numpy.zeros((n_channels_total, 2), dtype = float)
         # and interval id for every channel
+        tof_channels = numpy.zeros((n_channels_total, 2), dtype = float)
         self._interval_id = numpy.zeros((n_channels_total), dtype = 'int_')
         counter = 0
         for i in range(self._n_intervals):
@@ -244,6 +314,7 @@ class IMATDataReader(object):
         angstrom_channels = (tof_channels * 3957) / self.fligt_path
         
         # calculate indeces of channels to be loaded based on self.wavelength_range
+        # or self.intervals
         if (self.wavelength_range != -1):
             self._idx_left = next(x for x, val in enumerate(angstrom_channels[:, 0]) \
                                   if val > self.wavelength_range[0])
@@ -304,14 +375,28 @@ class IMATDataReader(object):
         
     
     def get_shutter_interval_id(self):
+        '''
+        Return numpy array with shutter interval ID for every channel 
+        (required for overlap correction)
+        '''
         return self._interval_id
     
     
     def get_n_shutter_intervals(self):
+        '''
+        Return number of shutter intervals (required for overlap correction)
+        '''
         return self._n_intervals
     
     
     def get_shutter_counts(self):
+        '''
+        Parse text files with shutter counts and return dictionary:
+            {"projection_shutter_counts": numpy array with shape (n_channels, n_angles),
+             "flat_before_shutter_counts": numpy array with shape (n_channels, num_flat_before),
+             "flat_after_shutter_counts": numpy array with shape (n_channels, num_flat_after)}
+        (required for overlap correction)
+        '''
         
         n_angles = numpy.shape(self.angles)[0]
         n_channels = self._idx_right - self._idx_left + 1
@@ -431,6 +516,9 @@ class IMATDataReader(object):
 
     
     def load_projections(self):
+        '''
+        Load projections and returns AcquisitionData object
+        '''
         
         n_angles = numpy.shape(self.angles)[0]
         n_channels = self._idx_right - self._idx_left + 1
@@ -476,6 +564,12 @@ class IMATDataReader(object):
     
     
     def load_flats_before(self):
+        '''
+        Loads flats before and returns numpy array with shape
+        (num_flat_before, n_channels, pixel_num_v, ag.pixel_num_h) if num_flat_before > 1
+        or
+        (n_channels, pixel_num_v, ag.pixel_num_h) if num_flat_before = 1
+        '''
         
         if ((self.flat_before_path == None) or 
             (self.flat_before_prefix == None) or 
@@ -525,6 +619,13 @@ class IMATDataReader(object):
     
     
     def load_flats_after(self):
+        
+        '''
+        Loads flats after and returns numpy array with shape
+        (num_flat_after, n_channels, pixel_num_v, ag.pixel_num_h) if num_flat_after > 1
+        or
+        (n_channels, pixel_num_v, ag.pixel_num_h) if num_flat_after = 1
+        '''
         
         if ((self.flat_after_path == None) or 
             (self.flat_after_prefix == None) or 

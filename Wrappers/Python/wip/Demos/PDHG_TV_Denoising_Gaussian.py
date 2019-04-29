@@ -32,7 +32,7 @@ from ccpi.optimisation.functions import ZeroFunction, L2NormSquared, \
 from skimage.util import random_noise
 
 # Create phantom for TV Gaussian denoising
-N = 300
+N = 100
 
 data = np.zeros((N,N))
 data[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
@@ -46,9 +46,9 @@ n1 = random_noise(data.as_array(), mode = 'gaussian', mean=0, var = 0.05, seed=1
 noisy_data = ImageData(n1)
 
 # Regularisation Parameter
-alpha = 0.5
+alpha = 2
 
-method = '0'
+method = '1'
 
 if method == '0':
 

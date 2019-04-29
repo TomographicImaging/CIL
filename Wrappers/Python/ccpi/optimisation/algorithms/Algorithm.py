@@ -149,12 +149,12 @@ class Algorithm(object):
         i = 0
         
         for _ in self:
-            if verbose and (self.iteration -1) % self.update_objective_interval == 0:
-                print ("Iteration {}/{}, = {}".format(self.iteration-1, 
+            if (self.iteration -1) % self.update_objective_interval == 0:                
+                if verbose:
+                    print ("Iteration {}/{}, = {}".format(self.iteration-1, 
                        self.max_iteration, self.get_last_objective()) )
-                else:
-                    if callback is not None:
-                        callback(self.iteration, self.get_last_objective(), self.x)
+                if callback is not None:
+                    callback(self.iteration -1, self.get_last_objective(), self.x)
             i += 1
             if i == iterations:
                 break

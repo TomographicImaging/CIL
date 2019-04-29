@@ -6,10 +6,12 @@ Created on Wed Apr  3 10:30:25 2019
 @author: evelina
 """
 
+
 from ccpi.framework import AcquisitionData, AcquisitionGeometry
 import numpy
 import matplotlib.pyplot as plt
 import os
+
 
 pilAvailable = True
 try:    
@@ -56,7 +58,8 @@ class NIKONDataReader(object):
         if self.xtek_file is not None:
             self.set_up(xtek_file = self.xtek_file,
                         roi = self.roi,
-                        binning = self.binning)
+                        binning = self.binning,
+                        normalize = self.normalize)
             
     def set_up(self, 
                xtek_file, 
@@ -216,9 +219,10 @@ class NIKONDataReader(object):
         Return AcquisitionGeometry object
         '''
         
-        return(self._ag)
+        return self._ag
         
-        
+    
+    
     def load_projections(self):
         '''
         Load projections in AcquisitionData container

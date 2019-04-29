@@ -48,7 +48,7 @@ noisy_data = ImageData(n1)
 # Regularisation Parameter
 alpha = 2
 
-method = '1'
+method = '0'
 
 if method == '0':
 

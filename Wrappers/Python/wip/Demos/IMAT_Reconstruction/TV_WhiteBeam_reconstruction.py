@@ -56,7 +56,7 @@ with open("golden_angles.txt") as f:
     angles_string = [line.rstrip() for line in f]
     angles = numpy.array(angles_string).astype(float)
 agWB = AcquisitionGeometry('parallel', '2D',  angles * numpy.pi / 180, pixh)
-op_WB = AstraProjectorSimple(igWB, agWB, 'cpu')
+op_WB = AstraProjectorSimple(igWB, agWB, 'gpu')
 sinogram_aqdata = AcquisitionData(sinogram_wb, agWB)
 
 # BackProjection
@@ -71,7 +71,7 @@ plt.show()
 #%%
 
 # Regularisation Parameter
-alpha = 10
+alpha = 2000
 
 # Create operators
 op1 = Gradient(igWB)
@@ -89,7 +89,7 @@ f = BlockFunction(f1, f2)
                                       
 g = ZeroFunction()
 
-diag_precon =  True
+diag_precon =  False
 
 if diag_precon:
     
@@ -114,8 +114,8 @@ else:
 
 
 ## Primal & dual stepsizes
-sigma = 0.1
-tau = 1/(sigma*normK**2)
+#sigma = 0.1
+#tau = 1/(sigma*normK**2)
 #
 #
 ## Setup and run the PDHG algorithm

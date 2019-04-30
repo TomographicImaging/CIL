@@ -31,6 +31,9 @@ class TestDataProcessor(unittest.TestCase):
         cf = CenterOfRotationFinder()
         cf.set_input(ad)
         print ("Center of rotation", cf.get_output())
+        self.assertAlmostEqual(86.25, cf.get_output())
+    def test_Normalizer(self):
+        pass
         
         
         

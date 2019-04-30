@@ -36,7 +36,7 @@ setup(
               'ccpi.optimisation.operators',
               'ccpi.optimisation.algorithms',
               'ccpi.optimisation.functions',
-              'ccpi.optimisation.processors',
+              'ccpi.processors',
               'ccpi.contrib','ccpi.contrib.optimisation',
               'ccpi.contrib.optimisation.algorithms'],
 

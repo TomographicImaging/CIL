@@ -106,7 +106,9 @@ class L2NormSquared(Function):
                 out -= self.b
             out /= (1+2*tau)
             if self.b is not None:
-                out += self.b             
+                out += self.b     
+                
+                
 
     
     def proximal_conjugate(self, x, tau, out=None):

@@ -266,15 +266,30 @@ class BlockOperator(Operator):
             # column BlockOperator
             return self.get_item(0,0).domain_geometry()
         else:
-            shape = (self.shape[0], 1)
-            return BlockGeometry(*[el.domain_geometry() for el in self.operators],
-                    shape=shape)
+            # get the geometries column wise
+            # we need only the geometries from the first row
+            # since it is compatible from __init__
+            tmp = []
+            for i in range(self.shape[1]):
+                tmp.append(self.get_item(0,i).domain_geometry())
+            return BlockGeometry(*tmp)                
+                                    
+            #shape = (self.shape[0], 1)
+            #return BlockGeometry(*[el.domain_geometry() for el in self.operators],
+            #        shape=self.shape)
 
     def range_geometry(self):
         '''returns the range of the BlockOperator'''
-        shape = (self.shape[1], 1)
-        return BlockGeometry(*[el.range_geometry() for el in self.operators],
-                    shape=shape)
+        
+        tmp = []
+        for i in range(self.shape[0]):
+            tmp.append(self.get_item(i,0).range_geometry())
+        return BlockGeometry(*tmp)            
+        
+        
+        #shape = (self.shape[1], 1)
+        #return BlockGeometry(*[el.range_geometry() for el in self.operators],
+        #            shape=shape)
         
     def sum_abs_row(self):
         
@@ -312,7 +327,8 @@ class BlockOperator(Operator):
 if __name__ == '__main__':
     
     from ccpi.framework import ImageGeometry
-    from ccpi.optimisation.operators import Gradient, Identity, SparseFiniteDiff
+    from ccpi.optimisation.operators import Gradient, Identity, \
+                            SparseFiniteDiff, SymmetrizedGradient, ZeroOperator
 
         
     M, N = 4, 3
@@ -360,6 +376,41 @@ if __name__ == '__main__':
     res = B.range_geometry().allocate()
     
     B.direct(u, out = res)
+    
+    
+    
+    ###########################################################################
+    # Block Operator for TGV reconstruction
+    
+    M, N = 2,3
+    ig = ImageGeometry(M, N)
+    ag = ig
+    
+    op11 = Gradient(ig)
+    op12 = Identity(op11.range_geometry())
+    
+    op22 = SymmetrizedGradient(op11.domain_geometry())
+    
+    op21 = ZeroOperator(ig, op22.range_geometry())
+    
+    
+    op31 = Identity(ig, ag)
+    op32 = ZeroOperator(op22.domain_geometry(), ag)
+    
+    operator = BlockOperator(op11, -1*op12, op21, op22, op31, op32, shape=(3,2) )    
+    
+    z1 = operator.domain_geometry()
+    z2 = operator.range_geometry()
+    
+    print(z1.shape)
+    print(z2.shape)
+    
+    
+    
+    
+    
+    
+    
     
     
     

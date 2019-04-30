@@ -39,14 +39,8 @@ class ZeroFunction(Function):
         indicator function for the set = {0}
         So 0 if x=0, or inf if x neq 0                
         '''
+        return x.maximum(0).sum()
         
-        if x.shape[0]==1:
-            return x.maximum(0).sum()
-        else:
-            if isinstance(x, BlockDataContainer):
-                return x.get_item(0).maximum(0).sum() + x.get_item(1).maximum(0).sum()
-            else:
-                return x.maximum(0).sum() + x.maximum(0).sum()
     
     def proximal(self, x, tau, out=None):
         if out is None:

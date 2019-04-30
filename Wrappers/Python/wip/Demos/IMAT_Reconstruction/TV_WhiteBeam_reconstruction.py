@@ -52,11 +52,11 @@ pixv = sinogram_wb.shape[1] # detectors
 igWB = ImageGeometry(voxel_num_x = pixh, voxel_num_y = pixv)
 
 # Load Golden angles
-with open("/media/newhd/vaggelis/CCPi/CCPi-Block/CCPi-Framework/Wrappers/Python/wip/Demos/IMAT_Reconstruction/golden_angles.txt") as f:
+with open("golden_angles.txt") as f:
     angles_string = [line.rstrip() for line in f]
     angles = numpy.array(angles_string).astype(float)
 agWB = AcquisitionGeometry('parallel', '2D',  angles * numpy.pi / 180, pixh)
-op_WB = AstraProjectorSimple(igWB, agWB, 'gpu')
+op_WB = AstraProjectorSimple(igWB, agWB, 'cpu')
 sinogram_aqdata = AcquisitionData(sinogram_wb, agWB)
 
 # BackProjection

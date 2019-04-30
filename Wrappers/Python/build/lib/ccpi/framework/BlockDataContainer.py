@@ -270,6 +270,7 @@ class BlockDataContainer(object):
     def squared_norm(self):
         y = numpy.asarray([el.squared_norm() for el in self.containers])
         return y.sum() 
+        
     
     def norm(self):
         return numpy.sqrt(self.squared_norm())   
@@ -442,9 +443,12 @@ class BlockDataContainer(object):
         '''Inline truedivision'''
         return self.__idiv__(other)
     
+    def dot(self, other):
+#        
+        tmp = [ self.containers[i].dot(other.containers[i]) for i in range(self.shape[0])]
+        return sum(tmp)
     
-
-    
+       
     
 if __name__ == '__main__':
     
@@ -456,6 +460,7 @@ if __name__ == '__main__':
     BG = BlockGeometry(ig, ig)
     
     U = BG.allocate('random_int')
+    V = BG.allocate('random_int')
     
     
     print ("test sum BDC " )
@@ -468,9 +473,9 @@ if __name__ == '__main__':
     z1 = sum(U**2).sqrt().as_array()    
     numpy.testing.assert_array_equal(z, z1)   
     
-    
-
     z2 = U.pnorm(2)
+    
+    zzz = U.dot(V)
     
    
 

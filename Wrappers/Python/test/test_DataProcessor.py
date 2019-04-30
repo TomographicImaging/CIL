@@ -11,8 +11,29 @@ from timeit import default_timer as timer
 
 from ccpi.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 
-class TestDataProcessor(unittest.TestCase):
+from ccpi.io.reader import NexusReader
+from ccpi.processors import CenterOfRotationFinder
+import wget
+import os
 
+class TestDataProcessor(unittest.TestCase):
+    def setUp(self):
+        wget.download('https://github.com/DiamondLightSource/Savu/raw/master/test_data/data/24737_fd.nxs')
+        self.filename = '24737_fd.nxs'
+
+    def tearDown(self):
+        os.remove(self.filename)
+
+    def test_CenterOfRotation(self):
+        reader = NexusReader(self.filename)
+        ad = reader.get_acquisition_data_whole()
+        print (ad.geometry)
+        cf = CenterOfRotationFinder()
+        cf.set_input(ad)
+        print ("Center of rotation", cf.get_output())
+        
+        
+        
     def test_DataProcessorChaining(self):
         shape = (2,3,4,5)
         size = shape[0]

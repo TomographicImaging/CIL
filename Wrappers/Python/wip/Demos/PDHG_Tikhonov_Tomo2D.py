@@ -43,7 +43,7 @@ detectors = N
 angles = np.linspace(0, np.pi, N, dtype=np.float32)
 
 ag = AcquisitionGeometry('parallel','2D',angles, detectors)
-Aop = AstraProjectorSimple(ig, ag, 'cpu')
+Aop = AstraProjectorSimple(ig, ag, 'gpu')
 sin = Aop.direct(data)
 
 # Create noisy data. Apply Gaussian noise

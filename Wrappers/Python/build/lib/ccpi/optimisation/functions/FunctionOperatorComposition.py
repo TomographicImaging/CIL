@@ -19,16 +19,13 @@ class FunctionOperatorComposition(Function):
     
     '''
     
-    def __init__(self, operator, function):
+    def __init__(self, function, operator):
         
         super(FunctionOperatorComposition, self).__init__()
+        
         self.function = function     
         self.operator = operator
-        alpha = 1
-        
-        if isinstance (function, ScaledFunction):
-            alpha = function.scalar
-        self.L = 2 * alpha * operator.norm()**2
+        self.L = function.L * operator.norm()**2 
         
         
     def __call__(self, x):
@@ -39,47 +36,57 @@ class FunctionOperatorComposition(Function):
         
         '''
     
-        return self.function(self.operator.direct(x))   
-
-    #TODO do not know if we need it
-    def call_adjoint(self, x):
+        return self.function(self.operator.direct(x))  
     
-        return self.function(self.operator.adjoint(x))  
-
-
-    def convex_conjugate(self, x):
-        
-        ''' convex_conjugate does not take into account the Operator'''
-        return self.function.convex_conjugate(x)
-
-    def proximal(self, x, tau, out=None):
-        
-        '''proximal does not take into account the Operator'''                
-        if out is None:
-            return self.function.proximal(x, tau)
-        else:
-            self.function.proximal(x, tau, out=out)
-            
-
-    def proximal_conjugate(self, x, tau, out=None):    
-
-        ''' proximal conjugate does not take into account the Operator'''
-        if out is None:
-            return self.function.proximal_conjugate(x, tau)
-        else:
-            self.function.proximal_conjugate(x, tau, out=out) 
-
     def gradient(self, x, out=None):
-        
+#        
         ''' Gradient takes into account the Operator'''
         if out is None:
-            return self.operator.adjoint(
-                self.function.gradient(self.operator.direct(x))
-                )
-        else:
-            self.operator.adjoint(
-                self.function.gradient(self.operator.direct(x), 
-                out=out)
-            )
+            return self.operator.adjoint(self.function.gradient(self.operator.direct(x)))
+        else: 
+            tmp = self.operator.range_geometry().allocate()
+            self.operator.direct(x, out=tmp)
+            self.function.gradient(tmp, out=tmp)
+            self.operator.adjoint(tmp, out=out)
+
+    
+    
+
+    #TODO do not know if we need it
+    #def call_adjoint(self, x):
+    #
+    #    return self.function(self.operator.adjoint(x))  
+
+
+    #def convex_conjugate(self, x):
+    #    
+    #        ''' convex_conjugate does not take into account the Operator'''
+    #    return self.function.convex_conjugate(x)
+
+    
+
+
+                
+if __name__ == '__main__':   
+
+    from ccpi.framework import ImageGeometry
+    from ccpi.optimisation.operators import Gradient
+    from ccpi.optimisation.functions import L2NormSquared
+    
+    M, N, K = 2,3
+    ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
+    
+    G = Gradient(ig)
+    alpha = 0.5
+    
+    f = L2NormSquared()    
+    f_comp = FunctionOperatorComposition(G, alpha * f)
+    x = ig.allocate('random_int')
+    print(f_comp.gradient(x).shape
+          
+          )
+    
+
+             
         
                        

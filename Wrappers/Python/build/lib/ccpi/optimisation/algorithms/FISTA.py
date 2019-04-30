@@ -65,10 +65,10 @@ class FISTA(Algorithm):
             
         # initialization
         if memopt:
-            self.y = x_init.clone()
-            self.x_old = x_init.clone()
-            self.x = x_init.clone()
-            self.u = x_init.clone()
+            self.y = x_init.copy()
+            self.x_old = x_init.copy()
+            self.x = x_init.copy()
+            self.u = x_init.copy()            
         else:
             self.x_old = x_init.copy()
             self.y = x_init.copy()

@@ -17,7 +17,6 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from ccpi.optimisation.ops import Identity, FiniteDiff2D
 import numpy
 from ccpi.framework import DataContainer
 import warnings
@@ -99,12 +98,6 @@ class Norm2(Function):
                 raise ValueError ('Wrong size: x{0} out{1}'.format(x.shape,out.shape) )
         
 
-class TV2D(Norm2):
-    
-    def __init__(self, gamma):
-        super(TV2D,self).__init__(gamma, 0)
-        self.op = FiniteDiff2D()
-        self.L = self.op.get_max_sing_val()
         
 
 # Define a class for squared 2-norm

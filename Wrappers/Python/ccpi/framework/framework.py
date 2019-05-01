@@ -765,6 +765,9 @@ class DataContainer(object):
     def dot(self, other, *args, **kwargs):
         '''return the inner product of 2 DataContainers viewed as vectors'''
         method = kwargs.get('method', 'reduce')
+        if method not in ['numpy','reduce']:
+            raise ValueError('dot: specified method not valid. Expecting numpy or reduce got {} '.format(
+                    method))
         if self.shape == other.shape:
             # return (self*other).sum()
             if method == 'numpy':

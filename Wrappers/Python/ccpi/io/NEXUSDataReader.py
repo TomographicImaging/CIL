@@ -9,6 +9,7 @@ Created on Wed Apr  3 10:30:25 2019
 
 import numpy
 import os
+import matplotlib.pyplot as plt
 from ccpi.framework import AcquisitionData, AcquisitionGeometry
 
 
@@ -19,17 +20,24 @@ except:
     h5pyAvailable = False
     
 
-''' 
+'''
 filename = '/media/newhd/shared/Data/CCPi-data/CIL-demodata/24737_fd.nxs'
 f = h5py.File(filename, 'r')
-print(list(f.keys()))
+#print(list(f.keys()))
+#print(list(f['entry1']['instrument'].keys()))
+#print(type(f['entry1']['tomo_entry']['data']['data']).__name__)
+#print((f['entry1']['tomo_entry']['data']).__dict__)
+import unicodedata
+print(unicodedata(f['entry1/tomo_entry/instrument/detector/x_pixel_size']).encode('ascii', 'ignore'))
+
 tmp = numpy.array(f['entry1/tomo_entry/instrument/detector/image_key'])
-print(tmp)
+#print(tmp)
 data = numpy.array(f['entry1/tomo_entry/data/data/'])
-print(data)
+#print(data)
 rotation_angle = numpy.array(f['entry1/tomo_entry/data/rotation_angle/'])
-print(rotation_angle)
+#print(rotation_angle)
 '''
+
 
 class NEXUSDataReader(object):
     
@@ -39,6 +47,9 @@ class NEXUSDataReader(object):
         self.nexus_file = kwargs.get('nexus_file', None)
         self.pixel_size_h_0 = kwargs.get('pixel_size_h_0', 1)
         self.pixel_size_v_0 = kwargs.get('pixel_size_v_0', 1)
+        self.key_path = kwargs.get('key_path', 'entry1/tomo_entry/instrument/detector/image_key')
+        self.data_path = kwargs.get('data_path', 'entry1/tomo_entry/data/data')
+        self.angle_path =  kwargs.get('angle_path', 'entry1/tomo_entry/data/rotation_angle')
         self.roi = kwargs.get('roi', -1)
         self.binning = kwargs.get('binning', [1, 1])
         
@@ -46,6 +57,9 @@ class NEXUSDataReader(object):
             self.set_up(nexus_file = self.nexus_file,
                         pixel_size_h_0 = self.pixel_size_h_0,
                         pixel_size_v_0 = self.pixel_size_v_0,
+                        key_path = self.key_path,
+                        data_path = self.data_path,
+                        angle_path = self.angle_path,
                         roi = self.roi,
                         binning = self.binning)
             
@@ -53,19 +67,21 @@ class NEXUSDataReader(object):
                nexus_file = None, 
                pixel_size_h_0 = 1,
                pixel_size_v_0 = 1,
+               key_path = 'entry1/tomo_entry/instrument/detector/image_key',
+               data_path = 'entry1/tomo_entry/data/data',
+               angle_path = 'entry1/tomo_entry/data/rotation_angle',
                roi = -1, 
                binning = [1, 1]):
         
         self.nexus_file = nexus_file
         self.pixel_size_h_0 = pixel_size_h_0
         self.pixel_size_v_0 = pixel_size_v_0
+        self.key_path = key_path
+        self.data_path = data_path
+        self.angle_path = angle_path
         self.roi = roi
         self.binning = binning
         
-        self._key_path = 'entry1/tomo_entry/instrument/detector/image_key'
-        self._data_path = 'entry1/tomo_entry/data/data'
-        self._angle_path = 'entry1/tomo_entry/data/rotation_angle'
-
         if self.nexus_file == None:
             raise Exception('Path to nexus file is required.')
         
@@ -90,13 +106,17 @@ class NEXUSDataReader(object):
         
         # check that h5py library is installed
         if (h5pyAvailable == False):
-            raise Exception("h5py is not available, cannot load nexus files")
+            raise Exception('h5py is not available, cannot read NEXUS files')
         
-        # read metadata    
-        with h5py.File(self.nexus_file,'r') as file: 
-                image_keys = numpy.array(file[self._key_path])                
-                angles = numpy.array(file[self._angle_path], dtype = float)[image_keys==0]
-                pixel_num_v_0, pixel_num_h_0 =  list(file['entry1/tomo_entry/data/data/'].shape[1,2])
+        # read metadata
+        try:
+            with h5py.File(self.nexus_file,'r') as file:        
+                self._image_keys = numpy.array(file[self.key_path])                
+                angles = numpy.array(file[self.angle_path], dtype = float)[self._image_keys == 0]
+                pixel_num_v_0, pixel_num_h_0 =  file['entry1/tomo_entry/data/data/'].shape[1:]
+        except:
+            print('Error reading NEXUS file')
+            raise
         
         # calculate number of pixels and pixel size
         if ((self.binning == [1, 1]) and (self.roi == -1)):
@@ -139,3 +159,74 @@ class NEXUSDataReader(object):
         '''
         
         return self._ag
+    
+    def load_projections(self):
+        '''
+        Load projections and returns AcquisitionData object
+        '''
+        
+        if 0 not in self._image_keys:
+            raise ValueError('Projections are not in the data. Data Path ', self._data_path)
+        
+        data = self._load(0)
+        
+        return AcquisitionData(array = data, 
+                               geometry = self._ag,
+                               dimension_labels = ['angle', 'vertical', 'horizontal'])
+        
+    def _load(self, key_id = 0):
+        '''
+        Generic loader for projections, flat and dark images. Returns numpy array.
+        '''
+        
+        try:
+            with h5py.File(self.nexus_file,'r') as file:
+                if ((self.binning == [1, 1]) and (self.roi == -1)):
+                    data = numpy.array(file[self.data_path][self._image_keys == 0, :, :])
+                
+                elif ((self.binning == [1, 1]) and (self.roi != -1)):
+                    data = numpy.array(file[self.data_path][self._image_keys == 0, self.roi[0]:self.roi[2], self.roi[1]:self.roi[3]])
+                
+                elif ((self.binning > [1, 1]) and (self.roi == -1)):
+                    shape = (self._ag.angles.shape[0],
+                             self._ag.pixel_num_v, self.binning[0], 
+                             self._ag.pixel_num_h, self.binning[1])
+                    print(self._ag.angles.shape[0])
+                    data = numpy.array(file[self.data_path][self._image_keys == 0, \
+                                                            :(self._ag.pixel_num_v * self.binning[0]), \
+                                                            :(self._ag.pixel_num_h * self.binning[1])]).reshape(shape).mean(-1).mean(2)
+                
+                elif ((self.binning > [1, 1]) and (self.roi != -1)):
+                    shape = (self._ag.angles.shape[0],
+                             self._ag.pixel_num_v, self.binning[0], 
+                             self._ag.pixel_num_h, self.binning[1])
+                    
+                    data = numpy.array(file[self.data_path])[self._image_keys == 0, \
+                                                             self.roi[0]:(self.roi[0] + (((self.roi[2] - self.roi[0]) // self.binning[0]) * self.binning[0])), \
+                                                             self.roi[1]:(self.roi[1] + (((self.roi[3] - self.roi[1]) // self.binning[1]) * self.binning[1]))].reshape(shape).mean(-1).mean(2)
+                    
+        except:
+            print('Error reading NEXUS file')
+            raise
+            
+        return data
+
+        
+        
+        
+        
+        
+   
+
+nexus_file = '/media/newhd/shared/Data/CCPi-data/CIL-demodata/24737_fd.nxs'
+reader = NEXUSDataReader()
+reader.set_up(nexus_file = nexus_file,
+              roi = -1,
+              binning = [2, 7])
+
+ag = reader.get_acquisition_geometry()
+print(ag)
+data = reader.load_projections()
+
+plt.imshow(data.as_array()[0, :, :])
+plt.show()

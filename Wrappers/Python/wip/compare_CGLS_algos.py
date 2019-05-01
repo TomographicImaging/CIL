@@ -5,7 +5,7 @@
 from ccpi.framework import ImageData, ImageGeometry, AcquisitionGeometry, \
     AcquisitionData
 from ccpi.optimisation.algs import FISTA, FBPD, CGLS, SIRT
-from ccpi.astra.ops import AstraProjectorSimple
+from ccpi.astra.operators import AstraProjectorSimple
 
 from ccpi.optimisation.algorithms import CGLS as CGLSalg
 

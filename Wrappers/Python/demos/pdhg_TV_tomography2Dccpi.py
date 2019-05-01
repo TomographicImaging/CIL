@@ -20,11 +20,17 @@ from ccpi.optimisation.operators import BlockOperator, Identity, Gradient
 from ccpi.optimisation.functions import ZeroFunction, L2NormSquared, \
                       MixedL21Norm, BlockFunction, ScaledFunction
 
-#from ccpi.astra.ops import AstraProjectorSimple
-#from ccpi.plugins.ops import CCPiProjectorSimple
 from ccpi.plugins.operators import CCPiProjectorSimple
-#from skimage.util import random_noise
 from timeit import default_timer as timer
+from ccpi.reconstruction.parallelbeam import alg as pbalg
+import os
+
+try:
+    import tomophantom
+    from tomophantom import TomoP3D
+    no_tomophantom = False
+except ImportError as ie:
+    no_tomophantom = True
 
 #%%
 
@@ -52,32 +58,11 @@ N = 75
 
 vert = 4
 ig = ImageGeometry(voxel_num_x = N, voxel_num_y = N, voxel_num_z=vert)
-data = ig.allocate()
-Phantom = data
-# Populate image data by looping over and filling slices
-i = 0
-while i < vert:
-    if vert > 1:
-        x = Phantom.subset(vertical=i).array
-    else:
-        x = Phantom.array
-    x[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
-    x[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 0.98
-    if vert > 1 :
-        Phantom.fill(x, vertical=i)
-    i += 1
 
-
-#%%
-#detectors = N
-#angles = np.linspace(0,np.pi,100)
-#angles_num = 100
-angles_num = N
+angles_num = 100
 det_w = 1.0
 det_num = N
 
-angles = np.linspace(0,np.pi,angles_num,endpoint=False,dtype=np.float32)*\
-             180/np.pi
 angles = np.linspace(-90.,90.,N, dtype=np.float32) 
 # Inputs: Geometry, 2D or 3D, angles, horz detector pixel count, 
 #         horz detector pixel size, vert detector pixel count, 
@@ -90,73 +75,59 @@ ag = AcquisitionGeometry('parallel',
                          vert,
                          det_w)
 
-from ccpi.reconstruction.parallelbeam import alg as pbalg
-from ccpi.plugins.processors import setupCCPiGeometries
-def ssetupCCPiGeometries(ig, ag, counter):
-    
-    #vg = ImageGeometry(voxel_num_x=voxel_num_x,voxel_num_y=voxel_num_y, voxel_num_z=voxel_num_z)
-    #Phantom_ccpi = ImageData(geometry=vg,
-    #                    dimension_labels=['horizontal_x','horizontal_y','vertical'])
-    ##.subset(['horizontal_x','horizontal_y','vertical'])
-    ## ask the ccpi code what dimensions it would like
-    Phantom_ccpi = ig.allocate(dimension_labels=[ImageGeometry.HORIZONTAL_X, 
-                                                 ImageGeometry.HORIZONTAL_Y,
-                                                 ImageGeometry.VERTICAL])    
-    
-    voxel_per_pixel = 1
-    angles = ag.angles
-    geoms = pbalg.pb_setup_geometry_from_image(Phantom_ccpi.as_array(),
-                                                angles,
-                                                voxel_per_pixel )
-    
-    pg = AcquisitionGeometry('parallel',
-                              '3D',
-                              angles,
-                              geoms['n_h'], 1.0,
-                              geoms['n_v'], 1.0 #2D in 3D is a slice 1 pixel thick
-                              )
-    
-    center_of_rotation = Phantom_ccpi.get_dimension_size('horizontal_x') / 2
-    #ad = AcquisitionData(geometry=pg,dimension_labels=['angle','vertical','horizontal'])
-    ad = pg.allocate(dimension_labels=[AcquisitionGeometry.ANGLE, 
-                                       AcquisitionGeometry.VERTICAL,
-                                       AcquisitionGeometry.HORIZONTAL])
-    geoms_i = pbalg.pb_setup_geometry_from_acquisition(ad.as_array(),
-                                                angles,
-                                                center_of_rotation,
-                                                voxel_per_pixel )
-    
-    counter+=1
-    
-    if counter < 4:
-        print (geoms, geoms_i)
-        if (not ( geoms_i == geoms )):
-            print ("not equal and {} {} {}".format(counter, geoms['output_volume_z'], geoms_i['output_volume_z']))
-            X = max(geoms['output_volume_x'], geoms_i['output_volume_x'])
-            Y = max(geoms['output_volume_y'], geoms_i['output_volume_y'])
-            Z = max(geoms['output_volume_z'], geoms_i['output_volume_z'])
-            return setupCCPiGeometries(X,Y,Z,angles, counter)
+#no_tomophantom = True
+if no_tomophantom:
+    data = ig.allocate()
+    Phantom = data
+    # Populate image data by looping over and filling slices
+    i = 0
+    while i < vert:
+        if vert > 1:
+            x = Phantom.subset(vertical=i).array
         else:
-            print ("happy now {} {} {}".format(counter, geoms['output_volume_z'], geoms_i['output_volume_z']))
-            
-            return geoms
-    else:
-        return geoms_i
-
-
-
-#voxel_num_x, voxel_num_y, voxel_num_z, angles, counter
-print ("###############################################")
-print (ig)
-print (ag)
-g = setupCCPiGeometries(ig, ag, 0)
-print (g)
-print ("###############################################")
-print ("###############################################")
-#ag = AcquisitionGeometry('parallel','2D',angles, detectors)
-#Aop = AstraProjectorSimple(ig, ag, 'cpu')
-Aop = CCPiProjectorSimple(ig, ag, 'cpu')
-sin = Aop.direct(data)
+            x = Phantom.array
+        x[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
+        x[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 0.98
+        if vert > 1 :
+            Phantom.fill(x, vertical=i)
+        i += 1
+    
+    Aop = CCPiProjectorSimple(ig, ag, 'cpu')
+    sin = Aop.direct(data)
+else:
+        
+    model = 13 # select a model number from the library
+    N_size = N # Define phantom dimensions using a scalar value (cubic phantom)
+    path = os.path.dirname(tomophantom.__file__)
+    path_library3D = os.path.join(path, "Phantom3DLibrary.dat")
+    #This will generate a N_size x N_size x N_size phantom (3D)
+    phantom_tm = TomoP3D.Model(model, N_size, path_library3D)
+    
+    #%%
+    Horiz_det = int(np.sqrt(2)*N_size) # detector column count (horizontal)
+    Vert_det = N_size # detector row count (vertical) (no reason for it to be > N)
+    #angles_num = int(0.5*np.pi*N_size); # angles number
+    #angles = np.linspace(0.0,179.9,angles_num,dtype='float32') # in degrees
+    
+    print ("Building 3D analytical projection data with TomoPhantom")
+    projData3D_analyt = TomoP3D.ModelSino(model, 
+                                                      N_size, 
+                                                      Horiz_det, 
+                                                      Vert_det, 
+                                                      angles, 
+                                                      path_library3D)
+    
+    # tomophantom outputs in [vert,angles,horiz]
+    # we want [angle,vert,horiz]
+    data = np.transpose(projData3D_analyt, [1,0,2])
+    ag.pixel_num_h = Horiz_det
+    ag.pixel_num_v = Vert_det
+    sin = ag.allocate()
+    sin.fill(data)
+    ig.voxel_num_y = Vert_det
+    
+    Aop = CCPiProjectorSimple(ig, ag, 'cpu')
+    
 
 plt.imshow(sin.subset(vertical=0).as_array())
 plt.title('Sinogram')
@@ -228,70 +199,40 @@ opt1 = {'niter':niter, 'memopt': True}
 
 
 
-pdhg1 = PDHG(f=f,g=g, operator=operator, tau=tau, sigma=sigma, memopt=True, max_iteration=niter)
+pdhg1 = PDHG(f=f,g=g, operator=operator, tau=tau, sigma=sigma, max_iteration=niter)
 #pdhg1.max_iteration = 2000
 pdhg1.update_objective_interval = 100
-pdhg2 = PDHG(f=f,g=g, operator=operator, tau=tau, sigma=sigma, memopt=False)
-pdhg2.max_iteration = 2000
-pdhg2.update_objective_interval = 100
 
 t1_old = timer()
 resold, time, primal, dual, pdgap = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt) 
 t2_old = timer()
 
-print ("memopt = False, shouldn't matter")
 pdhg1.run(niter)
 print (sum(pdhg1.timing))
 res = pdhg1.get_output().subset(vertical=0)
-print (pdhg1.objective)
-t3 = timer()
-#res1, time1, primal1, dual1, pdgap1 = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt1) 
-print ("memopt = True, shouldn't matter")
-pdhg2.run(niter)
-print (sum(pdhg2.timing))
-res1 = pdhg2.get_output().subset(vertical=0)
-t4 = timer()
-#
-print ("No memopt in {}s, memopt in  {}/{}s old {}s".format(sum(pdhg1.timing),
-       sum(pdhg2.timing),t4-t3, t2_old-t1_old))
-
-t1_old = timer()
-resold1, time, primal, dual, pdgap = PDHG_old(f, g, operator, tau = tau, sigma = sigma, opt = opt1) 
-t2_old = timer()
 
 #%%
 plt.figure()
-plt.subplot(2,3,1)
+plt.subplot(1,4,1)
 plt.imshow(res.as_array())
-plt.title('no memopt')
+plt.title('Algorithm')
 plt.colorbar()
-plt.subplot(2,3,2)
-plt.imshow(res1.as_array())
-plt.title('memopt')
+plt.subplot(1,4,2)
+plt.imshow(resold.subset(vertical=0).as_array())
+plt.title('function')
 plt.colorbar()
-plt.subplot(2,3,3)
-plt.imshow((res1 - resold1.subset(vertical=0)).abs().as_array())
+plt.subplot(1,4,3)
+plt.imshow((res - resold.subset(vertical=0)).abs().as_array())
 plt.title('diff')
 plt.colorbar()
-plt.subplot(2,3,4)
-plt.imshow(resold.subset(vertical=0).as_array())
-plt.title('old nomemopt')
-plt.colorbar()
-plt.subplot(2,3,5)
-plt.imshow(resold1.subset(vertical=0).as_array())
-plt.title('old memopt')
-plt.colorbar()
-plt.subplot(2,3,6)
-plt.imshow((resold1 - resold).subset(vertical=0).as_array())
-plt.title('diff old')
-plt.colorbar()
-#plt.plot(np.linspace(0,N,N), res1.as_array()[int(N/2),:], label = 'memopt')
-#plt.plot(np.linspace(0,N,N), res.as_array()[int(N/2),:], label = 'no memopt')
-#plt.legend()
+plt.subplot(1,4,4)
+plt.plot(np.linspace(0,N,N), res.as_array()[int(N/2),:], label = 'Algorithm')
+plt.plot(np.linspace(0,N,N), resold.subset(vertical=0).as_array()[int(N/2),:], label = 'function')
+plt.legend()
 plt.show()
 #
-print ("Time: No memopt in {}s, \n Time: Memopt in  {}s ".format(sum(pdhg1.timing), t4 -t3))
-diff = (res1 - res).abs().as_array().max()
+print ("Time: No memopt in {}s, \n Time: Memopt in  {}s ".format(sum(pdhg1.timing), t2_old -t1_old))
+diff = (res - resold.subset(vertical=0)).abs().as_array().max()
 #
 print(" Max of abs difference is {}".format(diff))
 

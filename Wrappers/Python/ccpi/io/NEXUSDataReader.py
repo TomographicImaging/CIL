@@ -18,25 +18,6 @@ try:
     import h5py 
 except:
     h5pyAvailable = False
-    
-
-'''
-filename = '/media/newhd/shared/Data/CCPi-data/CIL-demodata/24737_fd.nxs'
-f = h5py.File(filename, 'r')
-#print(list(f.keys()))
-#print(list(f['entry1']['instrument'].keys()))
-#print(type(f['entry1']['tomo_entry']['data']['data']).__name__)
-#print((f['entry1']['tomo_entry']['data']).__dict__)
-import unicodedata
-print(unicodedata(f['entry1/tomo_entry/instrument/detector/x_pixel_size']).encode('ascii', 'ignore'))
-
-tmp = numpy.array(f['entry1/tomo_entry/instrument/detector/image_key'])
-#print(tmp)
-data = numpy.array(f['entry1/tomo_entry/data/data/'])
-#print(data)
-rotation_angle = numpy.array(f['entry1/tomo_entry/data/rotation_angle/'])
-#print(rotation_angle)
-'''
 
 
 class NEXUSDataReader(object):
@@ -174,6 +155,30 @@ class NEXUSDataReader(object):
                                geometry = self._ag,
                                dimension_labels = ['angle', 'vertical', 'horizontal'])
         
+    def load_flat_images(self):
+        '''
+        Load flat field images and returns numpy array
+        '''
+        
+        if 1 not in self._image_keys:
+            raise ValueError('Flat field images are not in the data. Data Path ', self._data_path)
+        
+        data = self._load(1)
+        
+        return data
+    
+    def load_dark_images(self):
+        '''
+        Load dark field images and returns numpy array
+        '''
+        
+        if 2 not in self._image_keys:
+            raise ValueError('Dark field images are not in the data. Data Path ', self._data_path)
+        
+        data = self._load(2)
+        
+        return data
+    
     def _load(self, key_id = 0):
         '''
         Generic loader for projections, flat and dark images. Returns numpy array.
@@ -182,26 +187,24 @@ class NEXUSDataReader(object):
         try:
             with h5py.File(self.nexus_file,'r') as file:
                 if ((self.binning == [1, 1]) and (self.roi == -1)):
-                    data = numpy.array(file[self.data_path][self._image_keys == 0, :, :])
+                    data = numpy.array(file[self.data_path][self._image_keys == key_id, :, :])
                 
                 elif ((self.binning == [1, 1]) and (self.roi != -1)):
-                    data = numpy.array(file[self.data_path][self._image_keys == 0, self.roi[0]:self.roi[2], self.roi[1]:self.roi[3]])
+                    data = numpy.array(file[self.data_path][self._image_keys == key_id, self.roi[0]:self.roi[2], self.roi[1]:self.roi[3]])
                 
                 elif ((self.binning > [1, 1]) and (self.roi == -1)):
-                    shape = (self._ag.angles.shape[0],
+                    shape = (len(self._image_keys[self._image_keys == key_id]),
                              self._ag.pixel_num_v, self.binning[0], 
                              self._ag.pixel_num_h, self.binning[1])
-                    print(self._ag.angles.shape[0])
-                    data = numpy.array(file[self.data_path][self._image_keys == 0, \
+                    data = numpy.array(file[self.data_path][self._image_keys == key_id, \
                                                             :(self._ag.pixel_num_v * self.binning[0]), \
                                                             :(self._ag.pixel_num_h * self.binning[1])]).reshape(shape).mean(-1).mean(2)
                 
                 elif ((self.binning > [1, 1]) and (self.roi != -1)):
-                    shape = (self._ag.angles.shape[0],
+                    shape = (len(self._image_keys[self._image_keys == key_id]),
                              self._ag.pixel_num_v, self.binning[0], 
                              self._ag.pixel_num_h, self.binning[1])
-                    
-                    data = numpy.array(file[self.data_path])[self._image_keys == 0, \
+                    data = numpy.array(file[self.data_path])[self._image_keys == key_id, \
                                                              self.roi[0]:(self.roi[0] + (((self.roi[2] - self.roi[0]) // self.binning[0]) * self.binning[0])), \
                                                              self.roi[1]:(self.roi[1] + (((self.roi[3] - self.roi[1]) // self.binning[1]) * self.binning[1]))].reshape(shape).mean(-1).mean(2)
                     
@@ -211,22 +214,27 @@ class NEXUSDataReader(object):
             
         return data
 
-        
-        
-        
-        
-        
-   
-
+# usage example
 nexus_file = '/media/newhd/shared/Data/CCPi-data/CIL-demodata/24737_fd.nxs'
 reader = NEXUSDataReader()
 reader.set_up(nexus_file = nexus_file,
-              roi = -1,
-              binning = [2, 7])
+              roi = [10, 30, 120, 110],
+              binning = [2, 2])
 
 ag = reader.get_acquisition_geometry()
 print(ag)
+
 data = reader.load_projections()
 
 plt.imshow(data.as_array()[0, :, :])
+plt.show()
+
+flat = reader.load_flat_images()
+
+plt.imshow(flat[0, :, :])
+plt.show()
+
+dark = reader.load_dark_images()
+
+plt.imshow(dark[0, :, :])
 plt.show()

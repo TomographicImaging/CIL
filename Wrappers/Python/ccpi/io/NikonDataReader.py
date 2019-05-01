@@ -62,7 +62,7 @@ class NIKONDataReader(object):
                         normalize = self.normalize)
             
     def set_up(self, 
-               xtek_file, 
+               xtek_file = None, 
                roi = -1, 
                binning = [1, 1],
                normalize = False):
@@ -77,7 +77,7 @@ class NIKONDataReader(object):
         
         # check if xtek file exists
         if not(os.path.isfile(self.xtek_file)):
-            raise Exception('File {} does not exist'.format(self.xtek_file))  
+            raise Exception('File\n {}\n does not exist.'.format(self.xtek_file))  
         
         # check ROI
         if (self.roi != -1): 
@@ -86,17 +86,17 @@ class NIKONDataReader(object):
                     (self.roi[0] < self.roi[2]) or 
                     (self.roi[1] < self.roi[3])):
                 raise Exception('Not valid ROI. ROI must be defined as [row0, column0, row1, column1] \
-                                such that ((row0 < row1) and (column0 < column1))')
+                                such that ((row0 < row1) and (column0 < column1)).')
         
         # check binning parameters
         if (not(isinstance(self.binning, list)) or 
             (len(self.binning) != 2)):
             raise Exception('Not valid binning parameters. \
-                            Binning must be defined as [int, int]')
+                            Binning must be defined as [int, int].')
         
         # check that PIL library is installed
         if (pilAvailable == False):
-            raise Exception("PIL (pillow) is not available, cannot load TIFF files")
+            raise Exception("PIL (pillow) is not available, cannot load TIFF files.")
                 
         # parse xtek file
         with open(self.xtek_file, 'r') as f:
@@ -138,7 +138,14 @@ class NIKONDataReader(object):
             # angular increment (in degrees)
             elif line.startswith("AngularStep"):
                 angular_step = float(line.split('=')[1])
-    
+        
+        if (self.roi != -1): 
+            if ((self.roi[0] < 0) or
+                (self.roi[1] < 0) or
+                (self.roi[2] > pixel_num_v_0) or 
+                (self.roi[3] > pixel_num_h_0)):
+                raise Exception('ROI is out of range. Image size is (v{} x h{}).'.format(pixel_num_v_0, pixel_num_h_0))
+                
         # calculate number of pixels and pixel size
         if ((self.binning == [1, 1]) and (self.roi == -1)):
             pixel_num_v = pixel_num_v_0
@@ -239,8 +246,13 @@ class NIKONDataReader(object):
         
         for i in range(num_projections):
             
-            file = (path_projection + '/' + self._experiment_name + '_{:04d}.tif').format(i + 1)
-            tmp = numpy.asarray(Image.open(file), dtype = float)
+            filename = (path_projection + '/' + self._experiment_name + '_{:04d}.tif').format(i + 1)
+            
+            try:
+                tmp = numpy.asarray(Image.open(filename), dtype = float)
+            except:
+                print('Error reading\n {}\n file.'.format(filename))
+                raise
             
             if ((self.binning == [1, 1]) and (self.roi == -1)):
                 data[i, :, :] = tmp

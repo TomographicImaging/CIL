@@ -68,7 +68,7 @@ class NEXUSDataReader(object):
         
         # check if nexus file exists
         if not(os.path.isfile(self.nexus_file)):
-            raise Exception('File {} does not exist'.format(self.nexus_file))  
+            raise Exception('File\n {}\n does not exist.'.format(self.nexus_file))  
         
         # check ROI
         if (self.roi != -1): 
@@ -76,18 +76,16 @@ class NEXUSDataReader(object):
                     (len(self.roi) == 4) or 
                     (self.roi[0] < self.roi[2]) or 
                     (self.roi[1] < self.roi[3])):
-                raise Exception('Not valid ROI. ROI must be defined as [row0, column0, row1, column1] \
-                                such that ((row0 < row1) and (column0 < column1))')
+                raise Exception('Not valid ROI. ROI must be defined as [row0, column0, row1, column1], such that ((row0 < row1) and (column0 < column1)).')
         
         # check binning parameters
         if (not(isinstance(self.binning, list)) or 
             (len(self.binning) != 2)):
-            raise Exception('Not valid binning parameters. \
-                            Binning must be defined as [int, int]')
+            raise Exception('Not valid binning parameters. Binning must be defined as [int, int].')
         
         # check that h5py library is installed
         if (h5pyAvailable == False):
-            raise Exception('h5py is not available, cannot read NEXUS files')
+            raise Exception('h5py is not available, cannot read NEXUS files.')
         
         # read metadata
         try:
@@ -96,8 +94,15 @@ class NEXUSDataReader(object):
                 angles = numpy.array(file[self.angle_path], dtype = float)[self._image_keys == 0]
                 pixel_num_v_0, pixel_num_h_0 =  file['entry1/tomo_entry/data/data/'].shape[1:]
         except:
-            print('Error reading NEXUS file')
+            print('Error reading NEXUS file\n{}'.format(self.nexus_file))
             raise
+        
+        if (self.roi != -1): 
+            if ((self.roi[0] < 0) or
+                (self.roi[1] < 0) or
+                (self.roi[2] > pixel_num_v_0) or 
+                (self.roi[3] > pixel_num_h_0)):
+                raise Exception('ROI is out of range. Image size is (v{} x h{}).'.format(pixel_num_v_0, pixel_num_h_0))
         
         # calculate number of pixels and pixel size
         if ((self.binning == [1, 1]) and (self.roi == -1)):
@@ -222,7 +227,7 @@ reader.set_up(nexus_file = nexus_file,
               binning = [2, 2])
 
 ag = reader.get_acquisition_geometry()
-print(ag)
+print(ag) 
 
 data = reader.load_projections()
 

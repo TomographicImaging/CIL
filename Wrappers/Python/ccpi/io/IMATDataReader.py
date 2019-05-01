@@ -217,10 +217,7 @@ class IMATDataReader(object):
             (self.projection_counter == None) or
             (self.angles == None) or
             (self.shutter_values_file == None)):
-            raise Exception('A minimal set of following parameters is required \
-                            to set up the IMATDataReader: projection_path, \
-                            projection_prefix, projection_channel_prefix, \
-                            projection_counter, angles and shutter_values_file')
+            raise Exception('A minimal set of following parameters is required to set up the IMATDataReader:\n - projection_path,\n - projection_prefix,\n - projection_channel_prefix,\n - projection_counter,\n angles,\n - shutter_values_file.')
             
         # check ROI
         if (self.roi != -1): 
@@ -228,32 +225,32 @@ class IMATDataReader(object):
                     (len(self.roi) == 4) or 
                     (self.roi[0] < self.roi[2]) or 
                     (self.roi[1] < self.roi[3])):
-                raise Exception('Not valid ROI. \
-                                ROI must be defined as [row0, column0, row1, column1] \
-                                such that ((row0 < row1) and (column0 < column1))')
+                raise Exception('Not valid ROI. ROI must be defined as [row0, column0, row1, column1], such that ((row0 < row1) and (column0 < column1)).')
         
+        if (self.roi != -1): 
+            if ((self.roi[0] < 0) or
+                (self.roi[1] < 0) or
+                (self.roi[2] > self.pixel_num_v_0) or 
+                (self.roi[3] > self.pixel_num_h_0)):
+                raise Exception('ROI is out of range. Image size is (v{} x h{}).'.format(self.pixel_num_v_0, self.pixel_num_h_0))
+                
         # check binning parameters
         if not ((isinstance(self.binning, list)) or 
                 (len(self.binning) == 2)):
-            raise Exception('Not valid binning parameters. \
-                            Binning must be defined as [int, int]')
+            raise Exception('Not valid binning parameters. Binning must be defined as [int, int].')
             
         # check wavelength range
         if (self.wavelength_range != -1):
             if not ((len(self.wavelength_range) == 2) or 
                     (self.wavelength_range[1] > self.wavelength_range[0])):
-                raise Exception('Not valid wavelength range. \
-                                Wavelength range must be defined as [float0, float1] \
-                                such that (float1 > float0)')
+                raise Exception('Not valid wavelength range. Wavelength range must be defined as [float0, float1] such that (float1 > float0).')
                 
         # check wavelength range
         if (self.intervals != -1):
             if not ((isinstance(self.intervals, list)) or 
                     (len(self.intervals) == 2) or
                     (self.intervals[1] > self.intervals[0])):
-                raise Exception('Not valid intervals range. \
-                                Intervals must be defined as [int0, int1] \
-                                such that (int1 > int0)')
+                raise Exception('Not valid intervals range. Intervals must be defined as [int0, int1], such that (int1 > int0).')
         
         # check wavelength_range or intervals is given
         if ((self.wavelength_range != -1) and (self.intervals != -1)):
@@ -261,37 +258,41 @@ class IMATDataReader(object):
         
         # check that astropy library is installed
         if (astropyAvailable == False):
-            raise Exception("ASTROPY is not available, cannot load FITS files")
+            raise Exception("ASTROPY is not available, cannot load FITS files.")
             
         # check if shutter values file exists
         if not(os.path.isfile(self.shutter_values_file)):
             raise Exception('File {} does not exist'.format(self.shutter_values_file)) 
-            
-        # parse file with shutter values
-        with open(self.shutter_values_file, 'r') as shutter_values_csv:
-            csv_reader = csv.reader(shutter_values_csv, delimiter = '\t')
-            
-            # number of shutter intervals
-            self._n_intervals = sum([1 for row in csv_reader])
-           
-            shutter_values_csv.seek(0)
-            
-            # read limits of each shutter interval
-            counter = 0
-            # left limit
-            tof_lim_1 = numpy.zeros(self._n_intervals, dtype = float)
-            # right limit
-            tof_lim_2 = numpy.zeros(self._n_intervals, dtype = float)
-            # channel width
-            tof_channel_width = numpy.zeros(self._n_intervals, dtype = float)
-            
-            for row in csv_reader:
-                tof_lim_1[counter] = float(row[0])
-                tof_lim_2[counter] = float(row[1])
-                tof_channel_width[counter] = float(row[3])
-                
-                counter += 1
         
+        try:
+            # parse file with shutter values
+            with open(self.shutter_values_file, 'r') as shutter_values_csv:
+                csv_reader = csv.reader(shutter_values_csv, delimiter = '\t')
+                
+                # number of shutter intervals
+                self._n_intervals = sum([1 for row in csv_reader])
+               
+                shutter_values_csv.seek(0)
+                
+                # read limits of each shutter interval
+                counter = 0
+                # left limit
+                tof_lim_1 = numpy.zeros(self._n_intervals, dtype = float)
+                # right limit
+                tof_lim_2 = numpy.zeros(self._n_intervals, dtype = float)
+                # channel width
+                tof_channel_width = numpy.zeros(self._n_intervals, dtype = float)
+                
+                for row in csv_reader:
+                    tof_lim_1[counter] = float(row[0])
+                    tof_lim_2[counter] = float(row[1])
+                    tof_channel_width[counter] = float(row[3])
+                    
+                    counter += 1
+        except:
+            print('Error reading {} file.'.format(self.shutter_values_file))
+            raise
+            
         # calculate number of channels in each shutter interval
         # TOF is in seconds, channels in microseconds
         n_channels_per_interval = numpy.int_(numpy.floor((tof_lim_2 - tof_lim_1) / (tof_channel_width * 1e-6)))
@@ -434,16 +435,20 @@ class IMATDataReader(object):
                 
                 # check if file with shutter counts exists
                 if not(os.path.isfile(filename_shutter_counts)):
-                    raise Exception('File {} does not exist'.format(filename_shutter_counts)) 
+                    raise Exception('File\n {}\n does not exist'.format(filename_shutter_counts)) 
                 
-                with open(filename_shutter_counts) as shutter_counts_csv:
-                    csv_reader = csv.reader(shutter_counts_csv, delimiter = '\t')
-                
-                    counter = 0
-                
-                    for row in csv_reader:
-                        shutter_counts[counter] = float(row[1])
-                        counter += 1            
+                try:
+                    with open(filename_shutter_counts, 'r') as shutter_counts_csv:
+                        csv_reader = csv.reader(shutter_counts_csv, delimiter = '\t')
+                    
+                        counter = 0
+                    
+                        for row in csv_reader:
+                            shutter_counts[counter] = float(row[1])
+                            counter += 1   
+                except:
+                    print('Error reading\n {}\n file.'.format(filename_shutter_counts))
+                    raise
         
                 projection_shutter_counts[j, i] = shutter_counts[self._interval_id[idx]]
         
@@ -471,16 +476,20 @@ class IMATDataReader(object):
                     
                     # check if file with shutter counts exists
                     if not(os.path.isfile(filename_shutter_counts)):
-                        raise Exception('File {} does not exist'.format(filename_shutter_counts)) 
+                        raise Exception('File\n {}\n does not exist'.format(filename_shutter_counts)) 
                     
-                    with open(filename_shutter_counts) as shutter_counts_csv:
-                        csv_reader = csv.reader(shutter_counts_csv, delimiter = '\t')
-                    
-                        counter = 0
-                    
-                        for row in csv_reader:
-                            shutter_counts[counter] = float(row[1])
-                            counter += 1            
+                    try:
+                        with open(filename_shutter_counts, 'r') as shutter_counts_csv:
+                            csv_reader = csv.reader(shutter_counts_csv, delimiter = '\t')
+                        
+                            counter = 0
+                        
+                            for row in csv_reader:
+                                shutter_counts[counter] = float(row[1])
+                                counter += 1
+                    except:
+                        print('Error reading\n {}\n file.'.format(filename_shutter_counts))
+                        raise
             
                     flat_before_shutter_counts[j, i] = shutter_counts[self._interval_id[idx]]
             
@@ -508,16 +517,20 @@ class IMATDataReader(object):
                     
                     # check if file with shutter counts exists
                     if not(os.path.isfile(filename_shutter_counts)):
-                        raise Exception('File {} does not exist'.format(filename_shutter_counts)) 
+                        raise Exception('File\n {}\n does not exist'.format(filename_shutter_counts)) 
                     
-                    with open(filename_shutter_counts) as shutter_counts_csv:
-                        csv_reader = csv.reader(shutter_counts_csv, delimiter = '\t')
-                    
-                        counter = 0
-                    
-                        for row in csv_reader:
-                            shutter_counts[counter] = float(row[1])
-                            counter += 1            
+                    try:
+                        with open(filename_shutter_counts, 'r') as shutter_counts_csv:
+                            csv_reader = csv.reader(shutter_counts_csv, delimiter = '\t')
+                        
+                            counter = 0
+                        
+                            for row in csv_reader:
+                                shutter_counts[counter] = float(row[1])
+                                counter += 1
+                    except:
+                        print('Error reading {} file.'.format(filename_shutter_counts))
+                        raise
             
                     flat_after_shutter_counts[j, i] = shutter_counts[self._interval_id[idx]]
             
@@ -587,10 +600,7 @@ class IMATDataReader(object):
             (self.flat_before_channel_prefix == None) or 
             (self.flat_before_counter == None) or
             (self.num_flat_before == 0)):
-            raise Exception('A minimal set of following parameters is required \
-                            to load flats acquired before scan: flat_before_path, \
-                            flat_before_prefix, flat_before_channel_prefix, \
-                            flat_before_counter and num_flat_before')
+            raise Exception('A minimal set of following parameters is required to load flats acquired before scan:\n - flat_before_path,\n - flat_before_prefix\n, - flat_before_channel_prefix,\n - flat_before_counter, \n - num_flat_before.')
     
         n_channels = self._idx_right - self._idx_left + 1
         
@@ -643,10 +653,7 @@ class IMATDataReader(object):
             (self.flat_after_channel_prefix == None) or 
             (self.flat_after_counter == None) or
             (self.num_flat_after == 0)):
-            raise Exception('A minimal set of following parameters is required \
-                            to load flats acquired after scan: flat_after_path, \
-                            flat_after_prefix, flat_after_channel_prefix, \
-                            flat_after_counter and num_flat_after')
+            raise Exception('A minimal set of following parameters is required to load flats acquired after scan:\n - flat_after_path,\n - flat_after_prefix,\n - flat_after_channel_prefix,\n - flat_after_counter,\n - and num_flat_after.')
     
         n_channels = self._idx_right - self._idx_left + 1
         
@@ -687,7 +694,7 @@ class IMATDataReader(object):
     def _load(self,
         filename_mask):
         '''
-        generic loader: loads projections or flats
+        Generic loader: loads projections or flats. Returns numpy array.
         '''
         n_channels = self._idx_right - self._idx_left + 1
         
@@ -700,30 +707,46 @@ class IMATDataReader(object):
             filename = filename_mask.format(self._idx_left + i)
             
             if ((self.binning == [1, 1]) and (self.roi == -1)):
-                with fits.open(filename) as file_handler:
-                    data[i, :, :] = numpy.flipud(numpy.transpose(numpy.asarray(file_handler[0].data, dtype = float)))
+                try:
+                    with fits.open(filename) as file_handler:
+                        data[i, :, :] = numpy.flipud(numpy.transpose(numpy.asarray(file_handler[0].data, dtype = float)))
+                except:
+                    print('Error reading\n {}\n file.'.format(filename))
+                    raise
                 
             elif ((self.binning == [1, 1]) and (self.roi != -1)):
-                with fits.open(filename) as file_handler:
-                    tmp = numpy.asarray(file_handler[0].data[self.roi[1]:self.roi[3], 
-                                                             (self.pixel_num_v_0 - self.roi[2]):(self.pixel_num_v_0 - self.roi[0])], dtype = float)
-                    data[i, :, :] = numpy.flipud(numpy.transpose(tmp))
+                try:
+                    with fits.open(filename) as file_handler:
+                        tmp = numpy.asarray(file_handler[0].data[self.roi[1]:self.roi[3], 
+                                                                 (self.pixel_num_v_0 - self.roi[2]):(self.pixel_num_v_0 - self.roi[0])], dtype = float)
+                        data[i, :, :] = numpy.flipud(numpy.transpose(tmp))
+                except:
+                    print('Error reading {} file.'.format(filename))
+                    raise
                 
             elif ((self.binning > [1, 1]) and (self.roi == -1)):
                 shape = (self._ag.pixel_num_v, self.binning[0], 
                          self._ag.pixel_num_h, self.binning[1])
-                with fits.open(filename) as file_handler:
-                    tmp = numpy.asarray(file_handler[0].data[:self._ag.pixel_num_h * self.binning[1],
-                                                             self.pixel_num_v_0 - (self._ag.pixel_num_v * self.binning[0]):], dtype = float)
-                    data[i, :, :] = (numpy.flipud(numpy.transpose(tmp))).reshape(shape).mean(-1).mean(1)
+                try:
+                    with fits.open(filename) as file_handler:
+                        tmp = numpy.asarray(file_handler[0].data[:self._ag.pixel_num_h * self.binning[1],
+                                                                 self.pixel_num_v_0 - (self._ag.pixel_num_v * self.binning[0]):], dtype = float)
+                        data[i, :, :] = (numpy.flipud(numpy.transpose(tmp))).reshape(shape).mean(-1).mean(1)
+                except:
+                    print('Error reading\n {}\n file.'.format(filename))
+                    raise
                         
             elif ((self.binning > [1, 1]) and (self.roi != -1)):
                 shape = (self._ag.pixel_num_v, self.binning[0], 
                          self._ag.pixel_num_h, self.binning[1])
-                with fits.open(filename) as file_handler:
-                    tmp = numpy.asarray(file_handler[0].data[self.roi[1]:(self.roi[1] + (((self.roi[3] - self.roi[1]) // self.binning[1]) * self.binning[1])),
-                                                             (self.pixel_num_v_0 - (self.roi[0] + (((self.roi[2] - self.roi[0]) // self.binning[0]) * self.binning[0]))):(self.pixel_num_v_0 - self.roi[0])], dtype = float)
-                    data[i, :, :] = (numpy.flipud(numpy.transpose(tmp))).reshape(shape).mean(-1).mean(1)
+                try:
+                    with fits.open(filename) as file_handler:
+                        tmp = numpy.asarray(file_handler[0].data[self.roi[1]:(self.roi[1] + (((self.roi[3] - self.roi[1]) // self.binning[1]) * self.binning[1])),
+                                                                 (self.pixel_num_v_0 - (self.roi[0] + (((self.roi[2] - self.roi[0]) // self.binning[0]) * self.binning[0]))):(self.pixel_num_v_0 - self.roi[0])], dtype = float)
+                        data[i, :, :] = (numpy.flipud(numpy.transpose(tmp))).reshape(shape).mean(-1).mean(1)
+                except:
+                    print('Error reading\n {}\n file.'.format(filename))
+                    raise
         
         return data
 

@@ -20,7 +20,7 @@ except:
     pilAvailable = False
     
         
-class NIKONDataReader(object):
+class NikonDataReader(object):
     
     def __init__(self, 
                  **kwargs):
@@ -85,8 +85,9 @@ class NIKONDataReader(object):
                     (len(self.roi) == 4) or 
                     (self.roi[0] < self.roi[2]) or 
                     (self.roi[1] < self.roi[3])):
-                raise Exception('Not valid ROI. ROI must be defined as [row0, column0, row1, column1] \
-                                such that ((row0 < row1) and (column0 < column1)).')
+                raise Exception('Not valid ROI. ROI must be defined as '+
+                                '[row0, column0, row1, column1] ' +
+                                'such that ((row0 < row1) and (column0 < column1)).')
         
         # check binning parameters
         if (not(isinstance(self.binning, list)) or 
@@ -144,7 +145,8 @@ class NIKONDataReader(object):
                 (self.roi[1] < 0) or
                 (self.roi[2] > pixel_num_v_0) or 
                 (self.roi[3] > pixel_num_h_0)):
-                raise Exception('ROI is out of range. Image size is (v{} x h{}).'.format(pixel_num_v_0, pixel_num_h_0))
+                raise Exception('ROI is out of range. Image size is (v{} x h{}).'\
+                                .format(pixel_num_v_0, pixel_num_h_0))
                 
         # calculate number of pixels and pixel size
         if ((self.binning == [1, 1]) and (self.roi == -1)):
@@ -278,14 +280,16 @@ class NIKONDataReader(object):
             
         return AcquisitionData(array = data, 
                                geometry = self._ag,
-                               dimension_labels = ['angle', 'vertical', 'horizontal'])
+                               dimension_labels = ['angle', \
+                                                   'vertical', \
+                                                   'horizontal'])
 
 
 '''
 # usage example
 
 xtek_file = '/home/evelina/nikon_data/SophiaBeads_256_averaged.xtekct'
-reader = NIKONDataReader()
+reader = NikonDataReader()
 reader.set_up(xtek_file = xtek_file,
               binning = [3, 1],
               roi = [200, 500, 1500, 2000],

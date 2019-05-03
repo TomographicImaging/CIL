@@ -20,13 +20,8 @@
 import numpy
 import time
 
-from ccpi.optimisation.functions import Function
-from ccpi.optimisation.functions import ZeroFunction
-from ccpi.framework import ImageData 
-from ccpi.framework import AcquisitionData
-from ccpi.optimisation.spdhg import spdhg 
-from ccpi.optimisation.spdhg import KullbackLeibler
-from ccpi.optimisation.spdhg import KullbackLeiblerConvexConjugate
+
+
 
 def FISTA(x_init, f=None, g=None, opt=None):
     '''Fast Iterative Shrinkage-Thresholding Algorithm

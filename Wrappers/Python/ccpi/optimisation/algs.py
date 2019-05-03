@@ -20,13 +20,8 @@
 import numpy
 import time
 
-from ccpi.optimisation.functions import Function
-from ccpi.optimisation.functions import ZeroFunction
-from ccpi.framework import ImageData 
-from ccpi.framework import AcquisitionData
-from ccpi.optimisation.spdhg import spdhg 
-from ccpi.optimisation.spdhg import KullbackLeibler
-from ccpi.optimisation.spdhg import KullbackLeiblerConvexConjugate
+
+
 
 def FISTA(x_init, f=None, g=None, opt=None):
     '''Fast Iterative Shrinkage-Thresholding Algorithm
@@ -280,10 +275,6 @@ def SIRT(x_init, operator , data , opt=None, constraint=None):
     tol = opt['tol']
     max_iter = opt['iter']
     
-    # Set default constraint to unconstrained
-    if constraint==None:
-        constraint = Function()
-    
     x = x_init.clone()
     
     timing = numpy.zeros(max_iter)
@@ -293,21 +284,18 @@ def SIRT(x_init, operator , data , opt=None, constraint=None):
     relax_par = 1.0
     
     # Set up scaling matrices D and M.
-    im1 = ImageData(geometry=x_init.geometry)
-    im1.array[:] = 1.0
-    M = 1/operator.direct(im1)
-    del im1
-    aq1 = AcquisitionData(geometry=M.geometry)
-    aq1.array[:] = 1.0
-    D = 1/operator.adjoint(aq1)
-    del aq1
+    M = 1/operator.direct(operator.domain_geometry().allocate(value=1.0))
+    D = 1/operator.adjoint(operator.range_geometry().allocate(value=1.0))
     
     # algorithm loop
     for it in range(0, max_iter):
         t = time.time()
         r = data - operator.direct(x)
         
-        x = constraint.prox(x + relax_par * (D*operator.adjoint(M*r)),None)
+        x = x + relax_par * (D*operator.adjoint(M*r))
+
+        if constraint != None:
+            x = constraint.prox(x,None)
         
         timing[it] = time.time() - t
         if it > 0:

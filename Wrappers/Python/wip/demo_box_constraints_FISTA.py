@@ -1,18 +1,25 @@
-# This demo illustrates how to use the SIRT algorithm without and with 
-# nonnegativity and box constraints. The ASTRA 2D projectors are used.
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Apr 17 14:46:21 2019
+
+@author: jakob
+
+Demonstrate the use of box constraints in FISTA
+"""
 
 # First make all imports
 from ccpi.framework import ImageData, ImageGeometry, AcquisitionGeometry, \
     AcquisitionData
-from ccpi.optimisation.algs import FISTA, FBPD, CGLS, SIRT
-from ccpi.optimisation.funcs import Norm2sq, Norm1, TV2D, IndicatorBox
+from ccpi.optimisation.algorithms import FISTA
+from ccpi.optimisation.functions import Norm2sq, IndicatorBox
 from ccpi.astra.ops import AstraProjectorSimple
+
+from ccpi.optimisation.operators import Identity
 
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Choose either a parallel-beam (1=parallel2D) or fan-beam (2=cone2D) test case
-test_case = 1
 
 # Set up phantom size NxN by creating ImageGeometry, initialising the 
 # ImageData object with this geometry and empty array and finally put some
@@ -25,6 +32,7 @@ x = Phantom.as_array()
 x[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
 x[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 1
 
+plt.figure()
 plt.imshow(x)
 plt.title('Phantom image')
 plt.show()
@@ -41,6 +49,8 @@ det_w = 1.0
 det_num = N
 SourceOrig = 200
 OrigDetec = 0
+
+test_case = 1
 
 if test_case==1:
     angles = np.linspace(0,np.pi,angles_num,endpoint=False)
@@ -64,15 +74,19 @@ else:
 # wrapping calls to ASTRA as well as specifying whether to use CPU or GPU.
 Aop = AstraProjectorSimple(ig, ag, 'gpu')
 
+Aop = Identity(ig,ig)
+
 # Forward and backprojection are available as methods direct and adjoint. Here 
 # generate test data b and do simple backprojection to obtain z.
 b = Aop.direct(Phantom)
 z = Aop.adjoint(b)
 
+plt.figure()
 plt.imshow(b.array)
 plt.title('Simulated data')
 plt.show()
 
+plt.figure()
 plt.imshow(z.array)
 plt.title('Backprojected data')
 plt.show()
@@ -81,96 +95,64 @@ plt.show()
 # demonstrated in the rest of this file. In general all methods need an initial 
 # guess and some algorithm options to be set:
 x_init = ImageData(np.zeros(x.shape),geometry=ig)
-opt = {'tol': 1e-4, 'iter': 1000}
+opt = {'tol': 1e-4, 'iter': 100}
 
-# First a CGLS reconstruction can be done:
-x_CGLS, it_CGLS, timing_CGLS, criter_CGLS = CGLS(x_init, Aop, b, opt)
 
-plt.imshow(x_CGLS.array)
-plt.title('CGLS')
-plt.colorbar()
-plt.show()
-
-plt.semilogy(criter_CGLS)
-plt.title('CGLS criterion')
-plt.show()
-
-# A SIRT unconstrained reconstruction can be done: similarly:
-x_SIRT, it_SIRT, timing_SIRT, criter_SIRT = SIRT(x_init, Aop, b, opt)
-
-plt.imshow(x_SIRT.array)
-plt.title('SIRT unconstrained')
-plt.colorbar()
-plt.show()
-
-plt.semilogy(criter_SIRT)
-plt.title('SIRT unconstrained criterion')
-plt.show()
-
-# A SIRT nonnegativity constrained reconstruction can be done using the 
-# additional input "constraint" set to a box indicator function with 0 as the 
-# lower bound and the default upper bound of infinity:
-x_SIRT0, it_SIRT0, timing_SIRT0, criter_SIRT0 = SIRT(x_init, Aop, b, opt,
-                                                      constraint=IndicatorBox(lower=0))
-
-plt.imshow(x_SIRT0.array)
-plt.title('SIRT nonneg')
-plt.colorbar()
-plt.show()
-
-plt.semilogy(criter_SIRT0)
-plt.title('SIRT nonneg criterion')
-plt.show()
-
-# A SIRT reconstruction with box constraints on [0,1] can also be done:
-x_SIRT01, it_SIRT01, timing_SIRT01, criter_SIRT01 = SIRT(x_init, Aop, b, opt,
-         constraint=IndicatorBox(lower=0,upper=1))
-
-plt.imshow(x_SIRT01.array)
-plt.title('SIRT box(0,1)')
-plt.colorbar()
-plt.show()
-
-plt.semilogy(criter_SIRT01)
-plt.title('SIRT box(0,1) criterion')
-plt.show()
-
-# The indicator function can also be used with the FISTA algorithm to do 
-# least squares with nonnegativity constraint.
 
 # Create least squares object instance with projector, test data and a constant 
 # coefficient of 0.5:
 f = Norm2sq(Aop,b,c=0.5)
 
 # Run FISTA for least squares without constraints
-x_fista, it, timing, criter = FISTA(x_init, f, None,opt)
+FISTA_alg = FISTA()
+FISTA_alg.set_up(x_init=x_init, f=f, opt=opt)
+FISTA_alg.max_iteration = 2000
+FISTA_alg.run(opt['iter'])
+x_FISTA = FISTA_alg.get_output()
 
-plt.imshow(x_fista.array)
-plt.title('FISTA Least squares')
+plt.figure()
+plt.imshow(x_FISTA.array)
+plt.title('FISTA unconstrained')
+plt.colorbar()
 plt.show()
 
-plt.semilogy(criter)
-plt.title('FISTA Least squares criterion')
+plt.figure()
+plt.semilogy(FISTA_alg.objective)
+plt.title('FISTA unconstrained criterion')
 plt.show()
 
-# Run FISTA for least squares with nonnegativity constraint
-x_fista0, it0, timing0, criter0 = FISTA(x_init, f, IndicatorBox(lower=0),opt)
+# Run FISTA for least squares with lower bound 0.1
+FISTA_alg0 = FISTA()
+FISTA_alg0.set_up(x_init=x_init, f=f, g=IndicatorBox(lower=0.1), opt=opt)
+FISTA_alg0.max_iteration = 2000
+FISTA_alg0.run(opt['iter'])
+x_FISTA0 = FISTA_alg0.get_output()
 
-plt.imshow(x_fista0.array)
-plt.title('FISTA Least squares nonneg')
+plt.figure()
+plt.imshow(x_FISTA0.array)
+plt.title('FISTA lower bound 0.1')
+plt.colorbar()
 plt.show()
 
-plt.semilogy(criter0)
-plt.title('FISTA Least squares nonneg criterion')
+plt.figure()
+plt.semilogy(FISTA_alg0.objective)
+plt.title('FISTA criterion, lower bound 0.1')
 plt.show()
 
-# Run FISTA for least squares with box constraint [0,1]
-x_fista01, it01, timing01, criter01 = FISTA(x_init, f, IndicatorBox(lower=0,upper=1),opt)
+# Run FISTA for least squares with box constraint [0.1,0.8]
+FISTA_alg0 = FISTA()
+FISTA_alg0.set_up(x_init=x_init, f=f, g=IndicatorBox(lower=0.1,upper=0.8), opt=opt)
+FISTA_alg0.max_iteration = 2000
+FISTA_alg0.run(opt['iter'])
+x_FISTA0 = FISTA_alg0.get_output()
 
-plt.imshow(x_fista01.array)
-plt.title('FISTA Least squares box(0,1)')
+plt.figure()
+plt.imshow(x_FISTA0.array)
+plt.title('FISTA box(0.1,0.8) constrained')
+plt.colorbar()
 plt.show()
 
-plt.semilogy(criter01)
-plt.title('FISTA Least squares box(0,1) criterion')
+plt.figure()
+plt.semilogy(FISTA_alg0.objective)
+plt.title('FISTA criterion, box(0.1,0.8) constrained criterion')
 plt.show()

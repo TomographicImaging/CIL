@@ -52,7 +52,7 @@ class Algorithm(object):
         self.__loss = []
         self.memopt = False
         self.timing = []
-        self.update_objective_interval = 1
+        self.update_objective_interval = kwargs.get('update_objective_interval', 1)
     def set_up(self, *args, **kwargs):
         '''Set up the algorithm'''
         raise NotImplementedError()

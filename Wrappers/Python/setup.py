@@ -31,7 +31,7 @@ if  cil_version == '':
 setup(
     name="ccpi-framework",
     version=cil_version,
-    packages=['ccpi' , 'ccpi.io', 
+    packages=['ccpi' , 'ccpi.io', 'ccpi.data',
               'ccpi.framework', 'ccpi.optimisation', 
               'ccpi.optimisation.operators',
               'ccpi.optimisation.algorithms',

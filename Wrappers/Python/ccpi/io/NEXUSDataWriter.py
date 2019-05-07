@@ -77,13 +77,14 @@ class NEXUSDataWriter(object):
             
     
     def write_file(self):
-        # if a folder not exists, create the folder
+        # if the folder does not exist, create the folder
         if not os.path.isdir(os.path.dirname(self.file_name)):
             os.mkdir(os.path.dirname(self.file_name))
             
-        # create a file
+        # create the file
         with h5py.File(self.file_name, "w") as f:
             
+            # give the file some important attributes
             f.attrs['file_name'] = self.file_name
             f.attrs['file_time'] = str(datetime.datetime.utcnow())
             f.attrs['creator'] = 'NEXUSDataWriter.py'
@@ -91,14 +92,17 @@ class NEXUSDataWriter(object):
             f.attrs['HDF5_Version'] = h5py.version.hdf5_version
             f.attrs['h5py_version'] = h5py.version.version
             
+            # create the NXentry group
             nxentry = f.create_group('entry1/tomo_entry')
             nxentry.attrs['NX_class'] = 'NXentry'
             
+            # create dataset to store data
             ds_data = f.create_dataset('entry1/tomo_entry/data/data', 
                                        (self.data_container.as_array().shape), 
                                        dtype = 'float32', 
                                        data = self.data_container.as_array())
             
+            # set up dataset attributes
             if (isinstance(self.data_container, ImageData)):
                 ds_data.attrs['data_type'] = 'ImageData'
             else:
@@ -119,6 +123,7 @@ class NEXUSDataWriter(object):
                 ds_data.attrs['channels'] = self.acquisition_geometry.channels
                 ds_data.attrs['n_angles'] = self.acquisition_geometry.angles.shape[0]
                 
+                # create the dataset to store rotation angles
                 ds_angles = f.create_dataset('entry1/tomo_entry/data/rotation_angle', 
                                              (self.acquisition_geometry.angles.shape), 
                                              dtype = 'float32', 
@@ -126,55 +131,56 @@ class NEXUSDataWriter(object):
                 
                 #ds_angles.attrs['units'] = self.acquisition_geometry.angle_unit
                 
-            if (self.flat_images is not None):
-                ds_flat = f.create_dataset('entry1/tomo_entry/flat/data',
-                                           (self.flat_images.as_array().shape), 
-                                           dtype = 'float32', 
-                                           data = self.flat_images.as_array())
+                # create the dataset to store the flat images
+                if (self.flat_images is not None):
+                    ds_flat = f.create_dataset('entry1/tomo_entry/flat/data',
+                                               (self.flat_images.as_array().shape), 
+                                               dtype = 'float32', 
+                                               data = self.flat_images.as_array())
+                    
+                    ds_flat.attrs['data_type'] = 'AcquisitionData'
+                    
+                    for i in range(self.flat_images.as_array().ndim):
+                        ds_flat.attrs['dim{}'.format(i)] = self.flat_images.dimension_labels[i]
+                    
+                    ds_flat.attrs['pixel_num_h'] = self.acquisition_geometry.pixel_num_h
+                    ds_flat.attrs['pixel_size_h'] = self.acquisition_geometry.pixel_size_h
+                    ds_flat.attrs['pixel_num_v'] = self.acquisition_geometry.pixel_num_v
+                    ds_flat.attrs['pixel_size_v'] = self.acquisition_geometry.pixel_size_v
+                    ds_flat.attrs['channels'] = self.acquisition_geometry.channels
+                    ds_flat.attrs['n_flat_images'] = self.flat_images.as_array().shape[self.flat_images.dimension_labels == 'angle']
                 
-                ds_flat.attrs['data_type'] = 'AcquisitionData'
-                
-                for i in range(self.flat_images.as_array().ndim):
-                    ds_flat.attrs['dim{}'.format(i)] = self.flat_images.dimension_labels[i]
-                
-                ds_flat.attrs['pixel_num_h'] = self.acquisition_geometry.pixel_num_h
-                ds_flat.attrs['pixel_size_h'] = self.acquisition_geometry.pixel_size_h
-                ds_flat.attrs['pixel_num_v'] = self.acquisition_geometry.pixel_num_v
-                ds_flat.attrs['pixel_size_v'] = self.acquisition_geometry.pixel_size_v
-                ds_flat.attrs['channels'] = self.acquisition_geometry.channels
-                ds_flat.attrs['n_flats'] = self.flat_images.as_array().shape[self.flat_images.dimension_labels == 'angle']
+                # create the dataset to store dark images
+                if (self.dark_images is not None):
+                    ds_dark = f.create_dataset('entry1/tomo_entry/dark/data',
+                                               (self.dark_images.as_array().shape), 
+                                               dtype = 'float32', 
+                                               data = self.dark_images.as_array())
+                    
+                    ds_dark.attrs['data_type'] = 'AcquisitionData'
+                    
+                    for i in range(self.dark_images.as_array().ndim):
+                        ds_dark.attrs['dim{}'.format(i)] = self.dark_images.dimension_labels[i]
+                    
+                    ds_dark.attrs['pixel_num_h'] = self.acquisition_geometry.pixel_num_h
+                    ds_dark.attrs['pixel_size_h'] = self.acquisition_geometry.pixel_size_h
+                    ds_dark.attrs['pixel_num_v'] = self.acquisition_geometry.pixel_num_v
+                    ds_dark.attrs['pixel_size_v'] = self.acquisition_geometry.pixel_size_v
+                    ds_dark.attrs['channels'] = self.acquisition_geometry.channels
+                    ds_dark.attrs['n_dark_images'] = self.dark_images.as_array().shape[self.dark_images.dimension_labels == 'angle']
             
-            if (self.dark_images is not None):
-                ds_dark = f.create_dataset('entry1/tomo_entry/dark/data',
-                                           (self.dark_images.as_array().shape), 
-                                           dtype = 'float32', 
-                                           data = self.dark_images.as_array())
+            else:   # ImageData
                 
-                ds_dark.attrs['data_type'] = 'AcquisitionData'
-                
-                for i in range(self.dark_images.as_array().ndim):
-                    ds_dark.attrs['dim{}'.format(i)] = self.dark_images.dimension_labels[i]
-                
-                ds_dark.attrs['pixel_num_h'] = self.acquisition_geometry.pixel_num_h
-                ds_dark.attrs['pixel_size_h'] = self.acquisition_geometry.pixel_size_h
-                ds_dark.attrs['pixel_num_v'] = self.acquisition_geometry.pixel_num_v
-                ds_dark.attrs['pixel_size_v'] = self.acquisition_geometry.pixel_size_v
-                ds_dark.attrs['channels'] = self.acquisition_geometry.channels
-                ds_dark.attrs['n_flats'] = self.dark_images.as_array().shape[self.dark_images.dimension_labels == 'angle']
-            
-            if (isinstance(self.data_container, ImageData)):   
                 ds_data.attrs['voxel_num_x'] = self.image_geometry.voxel_num_x
                 ds_data.attrs['voxel_num_y'] = self.image_geometry.voxel_num_y
-                ds_data.attrs['voxel_num_z'] = self.image_geometry.voxel_size_x
-                ds_data.attrs['voxel_size_x'] = self.image_geometry.voxel_size_y
+                ds_data.attrs['voxel_num_z'] = self.image_geometry.voxel_num_z
+                ds_data.attrs['voxel_size_x'] = self.image_geometry.voxel_size_x
                 ds_data.attrs['voxel_size_y'] = self.image_geometry.voxel_size_y
                 ds_data.attrs['voxel_size_z'] = self.image_geometry.voxel_size_z
                 ds_data.attrs['center_x'] = self.image_geometry.center_x
                 ds_data.attrs['center_y'] = self.image_geometry.center_y
                 ds_data.attrs['center_z'] = self.image_geometry.center_z
                 ds_data.attrs['channels'] = self.image_geometry.channels
-                
-                
             
             
 # usage example

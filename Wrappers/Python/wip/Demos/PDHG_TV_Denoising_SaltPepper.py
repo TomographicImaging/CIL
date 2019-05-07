@@ -17,6 +17,27 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+""" 
+
+Total Variation Denoising using PDHG algorithm:
+
+             min_{x} max_{y} < K x, y > + g(x) - f^{*}(y) 
+
+
+Problem:     min_x, x>0  \alpha * ||\nabla x||_{1} + ||x-g||_{1}
+
+             \nabla: Gradient operator 
+             g: Noisy Data with Salt & Pepper Noise
+             \alpha: Regularization parameter
+             
+             Method = 0:  K = [ \nabla,
+                                 Identity]
+                                                                    
+             Method = 1:  K = \nabla    
+             
+             
+"""
+
 from ccpi.framework import ImageData, ImageGeometry
 
 import numpy as np 

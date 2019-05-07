@@ -31,6 +31,25 @@ from ccpi.optimisation.functions import ZeroFunction, KullbackLeibler, \
 
 from ccpi.astra.ops import AstraProjectorSimple
 
+""" 
+
+Total Variation Denoising using PDHG algorithm:
+
+             min_{x} max_{y} < K x, y > + g(x) - f^{*}(y) 
+
+
+Problem:     min_x, x>0  \alpha * ||\nabla x||_{1} + int A x -g log(Ax + \eta)
+
+             \nabla: Gradient operator 
+             
+             A: Projection Matrix
+             g: Noisy sinogram corrupted with Poisson Noise
+             
+             \eta: Background Noise
+             \alpha: Regularization parameter
+ 
+"""
+
 # Create phantom for TV 2D tomography 
 N = 75
 x = np.zeros((N,N))
@@ -70,12 +89,26 @@ f = BlockFunction(f1, f2)
                                       
 g = ZeroFunction()
     
-# Compute operator Norm
-normK = operator.norm()
+diag_precon =  True
 
-# Primal & dual stepsizes
-sigma = 1
-tau = 1/(sigma*normK**2)
+if diag_precon:
+    
+    def tau_sigma_precond(operator):
+        
+        tau = 1/operator.sum_abs_row()
+        sigma = 1/ operator.sum_abs_col()
+               
+        return tau, sigma
+
+    tau, sigma = tau_sigma_precond(operator)
+             
+else:
+    # Compute operator Norm
+    normK = operator.norm()
+    # Primal & dual stepsizes
+    sigma = 10
+    tau = 1/(sigma*normK**2)
+
 
 
 # Setup and run the PDHG algorithm
@@ -84,6 +117,8 @@ pdhg.max_iteration = 2000
 pdhg.update_objective_interval = 50
 pdhg.run(2000)
 
+
+#%%
 plt.figure(figsize=(15,15))
 plt.subplot(3,1,1)
 plt.imshow(data.as_array())
@@ -108,104 +143,104 @@ plt.show()
 
 #%% Check with CVX solution
 
-from ccpi.optimisation.operators import SparseFiniteDiff
-import astra
-import numpy
-
-try:
-    from cvxpy import *
-    cvx_not_installable = True
-except ImportError:
-    cvx_not_installable = False
-
-
-if cvx_not_installable:
-    
-
-    ##Construct problem    
-    u = Variable(N*N)
-    #q = Variable()
-    
-    DY = SparseFiniteDiff(ig, direction=0, bnd_cond='Neumann')
-    DX = SparseFiniteDiff(ig, direction=1, bnd_cond='Neumann')
-
-    regulariser = alpha * sum(norm(vstack([DX.matrix() * vec(u), DY.matrix() * vec(u)]), 2, axis = 0))
-    
-    # create matrix representation for Astra operator
-
-    vol_geom = astra.create_vol_geom(N, N)
-    proj_geom = astra.create_proj_geom('parallel', 1.0, detectors, angles)
-
-    proj_id = astra.create_projector('strip', proj_geom, vol_geom)
-
-    matrix_id = astra.projector.matrix(proj_id)
-
-    ProjMat = astra.matrix.get(matrix_id)
-    
-    fidelity = sum( ProjMat * u - noisy_data.as_array().ravel() * log(ProjMat * u)) 
-    #constraints = [q>= fidelity, u>=0]
-    constraints = [u>=0]
-        
-    solver = SCS
-    obj =  Minimize( regulariser +  fidelity)
-    prob = Problem(obj, constraints)
-    result = prob.solve(verbose = True, solver = solver)    
-     
-
-##%% Check with CVX solution
-
-from ccpi.optimisation.operators import SparseFiniteDiff
-
-try:
-    from cvxpy import *
-    cvx_not_installable = True
-except ImportError:
-    cvx_not_installable = False
-
-
-if cvx_not_installable:
-
-    ##Construct problem    
-    u = Variable(ig.shape)
-    
-    DY = SparseFiniteDiff(ig, direction=0, bnd_cond='Neumann')
-    DX = SparseFiniteDiff(ig, direction=1, bnd_cond='Neumann')
-    
-    # Define Total Variation as a regulariser
-    regulariser = alpha * sum(norm(vstack([DX.matrix() * vec(u), DY.matrix() * vec(u)]), 2, axis = 0))
-    fidelity = pnorm( u - noisy_data.as_array(),1)
-    
-    # choose solver
-    if 'MOSEK' in installed_solvers():
-        solver = MOSEK
-    else:
-        solver = SCS  
-        
-    obj =  Minimize( regulariser +  fidelity)
-    prob = Problem(obj)
-    result = prob.solve(verbose = True, solver = solver)
-    
-           
-    plt.figure(figsize=(15,15))
-    plt.subplot(3,1,1)
-    plt.imshow(pdhg.get_output().as_array())
-    plt.title('PDHG solution')
-    plt.colorbar()
-    plt.subplot(3,1,2)
-    plt.imshow(np.reshape(u.value, (N, N)))
-    plt.title('CVX solution')
-    plt.colorbar()
-    plt.subplot(3,1,3)
-    plt.imshow(diff_cvx)
-    plt.title('Difference')
-    plt.colorbar()
-    plt.show()    
-    
-    plt.plot(np.linspace(0,N,N), pdhg.get_output().as_array()[int(N/2),:], label = 'PDHG')
-    plt.plot(np.linspace(0,N,N), u.value[int(N/2),:], label = 'CVX')
-    plt.legend()
-    plt.title('Middle Line Profiles')
-    plt.show()
-            
-    print('Primal Objective (CVX) {} '.format(obj.value))
-    print('Primal Objective (PDHG) {} '.format(pdhg.objective[-1][0]))
+#from ccpi.optimisation.operators import SparseFiniteDiff
+#import astra
+#import numpy
+#
+#try:
+#    from cvxpy import *
+#    cvx_not_installable = True
+#except ImportError:
+#    cvx_not_installable = False
+#
+#
+#if cvx_not_installable:
+#    
+#
+#    ##Construct problem    
+#    u = Variable(N*N)
+#    #q = Variable()
+#    
+#    DY = SparseFiniteDiff(ig, direction=0, bnd_cond='Neumann')
+#    DX = SparseFiniteDiff(ig, direction=1, bnd_cond='Neumann')
+#
+#    regulariser = alpha * sum(norm(vstack([DX.matrix() * vec(u), DY.matrix() * vec(u)]), 2, axis = 0))
+#    
+#    # create matrix representation for Astra operator
+#
+#    vol_geom = astra.create_vol_geom(N, N)
+#    proj_geom = astra.create_proj_geom('parallel', 1.0, detectors, angles)
+#
+#    proj_id = astra.create_projector('strip', proj_geom, vol_geom)
+#
+#    matrix_id = astra.projector.matrix(proj_id)
+#
+#    ProjMat = astra.matrix.get(matrix_id)
+#    
+#    fidelity = sum( ProjMat * u - noisy_data.as_array().ravel() * log(ProjMat * u)) 
+#    #constraints = [q>= fidelity, u>=0]
+#    constraints = [u>=0]
+#        
+#    solver = SCS
+#    obj =  Minimize( regulariser +  fidelity)
+#    prob = Problem(obj, constraints)
+#    result = prob.solve(verbose = True, solver = solver)    
+#     
+#
+###%% Check with CVX solution
+#
+#from ccpi.optimisation.operators import SparseFiniteDiff
+#
+#try:
+#    from cvxpy import *
+#    cvx_not_installable = True
+#except ImportError:
+#    cvx_not_installable = False
+#
+#
+#if cvx_not_installable:
+#
+#    ##Construct problem    
+#    u = Variable(ig.shape)
+#    
+#    DY = SparseFiniteDiff(ig, direction=0, bnd_cond='Neumann')
+#    DX = SparseFiniteDiff(ig, direction=1, bnd_cond='Neumann')
+#    
+#    # Define Total Variation as a regulariser
+#    regulariser = alpha * sum(norm(vstack([DX.matrix() * vec(u), DY.matrix() * vec(u)]), 2, axis = 0))
+#    fidelity = pnorm( u - noisy_data.as_array(),1)
+#    
+#    # choose solver
+#    if 'MOSEK' in installed_solvers():
+#        solver = MOSEK
+#    else:
+#        solver = SCS  
+#        
+#    obj =  Minimize( regulariser +  fidelity)
+#    prob = Problem(obj)
+#    result = prob.solve(verbose = True, solver = solver)
+#    
+#           
+#    plt.figure(figsize=(15,15))
+#    plt.subplot(3,1,1)
+#    plt.imshow(pdhg.get_output().as_array())
+#    plt.title('PDHG solution')
+#    plt.colorbar()
+#    plt.subplot(3,1,2)
+#    plt.imshow(np.reshape(u.value, (N, N)))
+#    plt.title('CVX solution')
+#    plt.colorbar()
+#    plt.subplot(3,1,3)
+#    plt.imshow(diff_cvx)
+#    plt.title('Difference')
+#    plt.colorbar()
+#    plt.show()    
+#    
+#    plt.plot(np.linspace(0,N,N), pdhg.get_output().as_array()[int(N/2),:], label = 'PDHG')
+#    plt.plot(np.linspace(0,N,N), u.value[int(N/2),:], label = 'CVX')
+#    plt.legend()
+#    plt.title('Middle Line Profiles')
+#    plt.show()
+#            
+#    print('Primal Objective (CVX) {} '.format(obj.value))
+#    print('Primal Objective (PDHG) {} '.format(pdhg.objective[-1][0]))

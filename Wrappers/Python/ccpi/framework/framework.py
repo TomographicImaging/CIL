@@ -760,13 +760,6 @@ class DataContainer(object):
         return numpy.sqrt(self.squared_norm())
     
     
-#    def dot(self, other, *args, **kwargs):
-#        '''return the inner product of 2 DataContainers viewed as vectors'''
-#        if self.shape == other.shape:
-#            return numpy.dot(self.as_array().ravel(), other.as_array().ravel())
-#        else:
-#            raise ValueError('Shapes are not aligned: {} != {}'.format(self.shape, other.shape))
-
     def dot(self, other, *args, **kwargs):
         '''return the inner product of 2 DataContainers viewed as vectors'''
         method = kwargs.get('method', 'reduce')

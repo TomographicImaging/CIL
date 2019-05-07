@@ -111,7 +111,7 @@ class Gradient(LinearOperator):
         return BlockDataContainer(*mat)    
 
 
-    def sum_abs_row(self):
+    def sum_abs_col(self):
         
         tmp = self.gm_range.allocate()
         res = self.gm_domain.allocate()
@@ -120,7 +120,7 @@ class Gradient(LinearOperator):
             res += spMat.sum_abs_row()
         return res
     
-    def sum_abs_col(self):
+    def sum_abs_row(self):
         
         tmp = self.gm_range.allocate()
         res = []

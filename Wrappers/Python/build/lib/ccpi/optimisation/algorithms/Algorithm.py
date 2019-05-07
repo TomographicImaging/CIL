@@ -34,7 +34,7 @@ class Algorithm(object):
       method will stop when the stopping cryterion is met. 
    '''
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         '''Constructor
         
         Set the minimal number of parameters:
@@ -48,11 +48,11 @@ class Algorithm(object):
                                        when evaluating the objective is computationally expensive.
         '''
         self.iteration = 0
-        self.__max_iteration = 0
+        self.__max_iteration = kwargs.get('max_iteration', 0)
         self.__loss = []
         self.memopt = False
         self.timing = []
-        self.update_objective_interval = 1
+        self.update_objective_interval = kwargs.get('update_objective_interval', 1)
     def set_up(self, *args, **kwargs):
         '''Set up the algorithm'''
         raise NotImplementedError()
@@ -91,9 +91,11 @@ class Algorithm(object):
             if self.iteration % self.update_objective_interval == 0:
                 self.update_objective()
             self.iteration += 1
+        
     def get_output(self):
         '''Returns the solution found'''
         return self.x
+    
     def get_last_loss(self):
         '''Returns the last stored value of the loss function
         
@@ -146,39 +148,13 @@ class Algorithm(object):
             print ("Stop cryterion has been reached.")
         i = 0
         
-#        print("Iteration {:<5} Primal {:<5} Dual {:<5} PDgap".format('','',''))
         for _ in self:
-            
-            
-            if self.iteration % self.update_objective_interval == 0:
-            
+            if (self.iteration -1) % self.update_objective_interval == 0:                
+                if verbose:
+                    print ("Iteration {}/{}, = {}".format(self.iteration-1, 
+                       self.max_iteration, self.get_last_objective()) )
                 if callback is not None:
-                    callback(self.iteration, self.get_last_objective(), self.x)
-            
-                else:
-                    
-                    if verbose:
-            
-#            if verbose and self.iteration % self.update_objective_interval == 0:
-                #pass
-                # \t for tab
-#                print( "{:04}/{:04} {:<5} {:.4f} {:<5} {:.4f} {:<5} {:.4f}".\
-#                      format(self.iteration, self.max_iteration,'', \
-#                             self.get_last_objective()[0],'',\
-#                             self.get_last_objective()[1],'',\
-#                             self.get_last_objective()[2]))
-                
-                
-                        print ("Iteration {}/{}, {}".format(self.iteration, 
-                               self.max_iteration, self.get_last_objective()) )                
-                
-                #print ("Iteration {}/{}, Primal, Dual, PDgap = {}".format(self.iteration, 
-                #       self.max_iteration, self.get_last_objective()) )
-                
-                
-#                else:
-#                    if callback is not None:
-#                        callback(self.iteration, self.get_last_objective(), self.x)
+                    callback(self.iteration -1, self.get_last_objective(), self.x)
             i += 1
             if i == iterations:
                 break

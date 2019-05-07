@@ -61,7 +61,6 @@ sin = Aop.direct(data)
 noisy_data = sin 
 
 # Setup and run Astra CGLS algorithm
-
 vol_geom = astra.create_vol_geom(N, N)
 proj_geom = astra.create_proj_geom('parallel', 1.0, detectors, angles)
 

@@ -54,37 +54,23 @@ from ccpi.optimisation.algorithms import PDHG
 from ccpi.optimisation.operators import BlockOperator, Identity, Gradient
 from ccpi.optimisation.functions import ZeroFunction, L2NormSquared, \
                       MixedL21Norm, BlockFunction
-                      
   
 
-
-from Data import *
-
-#%%
+from ccpi.data import camera
 
 
-data = ImageData(plt.imread('camera.png'))
+# Load Data
+data = camera(size=(256,256))                    
 
-#
-## Create phantom for TV Gaussian denoising
-#N = 200
-#
-#data = np.zeros((N,N))
-#data[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
-#data[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 1
-#data = ImageData(data)
-#ig = ImageGeometry(voxel_num_x = N, voxel_num_y = N)
-#ag = ig
-#
-#
-#
-## Replace with http://sipi.usc.edu/database/database.php?volume=misc&image=36#top
+N, M = data.shape
 
+# Image and Acquitition Geometries
+ig = ImageGeometry(voxel_num_x = N, voxel_num_y = N)
+ag = ig
 
-
-# Create noisy data. Add Gaussian noise
+# Create Noisy data. Add Gaussian noise
 np.random.seed(10)
-noisy_data = ImageData( data.as_array() + np.random.normal(0, 0.05, size=ig.shape) )
+noisy_data = ImageData( data.as_array() + np.random.normal(0, 0.1, size=ig.shape) )
 
 # Show Ground Truth and Noisy Data
 plt.figure(figsize=(15,15))
@@ -99,7 +85,7 @@ plt.colorbar()
 plt.show()
 
 # Regularisation Parameter
-alpha = 2
+alpha = 0.2
 
 method = '0'
 

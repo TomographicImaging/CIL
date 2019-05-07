@@ -94,21 +94,18 @@ class L2NormSquared(Function):
             if self.b is None:
                 return x/(1+2*tau)
             else:
-
                 tmp = x.subtract(self.b)
                 tmp /= (1+2*tau)
                 tmp += self.b
                 return tmp
 
         else:
-            out.fill(x)
             if self.b is not None:
-                out -= self.b
-            out /= (1+2*tau)
-            if self.b is not None:
-                out += self.b     
-                
-                
+                x.subtract(self.b, out=out)
+                out /= (1+2*tau)
+                out += self.b
+            else:
+                x.divide((1+2*tau), out=out)
 
     
     def proximal_conjugate(self, x, tau, out=None):
@@ -287,17 +284,3 @@ if __name__ == '__main__':
     numpy.testing.assert_array_almost_equal(res1.as_array(), \
                                             res2.as_array(), decimal=4)
                                             
-                                            
-    
-    
-    
-
-
-
-      
-          
-          
-        
-    
-    
-    

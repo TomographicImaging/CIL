@@ -62,6 +62,7 @@ class KullbackLeibler(Function):
         if out is None:
             return 1 - self.b/(x + self.bnoise)
         else:
+
             x.add(self.bnoise, out=out)
             self.b.divide(out, out=out)
             out.subtract(1, out=out)
@@ -105,15 +106,12 @@ class KullbackLeibler(Function):
             z = x + tau * self.bnoise
             return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
         else:
-#            z = x + tau * self.bnoise
-#            out.fill( 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt()) )
-                        
-            tmp1 = x + tau * self.bnoise - 1
-            tmp2 = tmp1 + 2
-            
-            self.b.multiply(4*tau, out=out)       
-            tmp1.multiply(tmp1, out=tmp1)
-            out += tmp1
+
+            z_m = x + tau * self.bnoise -1
+            self.b.multiply(4*tau, out=out)
+            z_m.multiply(z_m, out=z_m)
+            out += z_m
+
             out.sqrt(out=out)
                         
             out *= -1
@@ -133,43 +131,6 @@ class KullbackLeibler(Function):
         return ScaledFunction(self, scalar)     
         
         
-    
-
-if __name__ == '__main__':
-   
-    
-    from ccpi.framework import ImageGeometry
-    import numpy
-    
-    N, M = 2,3
-    ig  = ImageGeometry(N, M)
-    data = ImageData(numpy.random.randint(-10, 10, size=(M, N)))
-    x = ImageData(numpy.random.randint(-10, 10, size=(M, N)))
-    
-    bnoise = ImageData(numpy.random.randint(-10, 10, size=(M, N)))
-    
-    f = KullbackLeibler(data)
-
-    print(f(x))
-    
-#    numpy.random.seed(10)
-#    
-#    
-#    x = numpy.random.randint(-10, 10, size = (2,3))
-#    b = numpy.random.randint(1, 10, size = (2,3))
-#    
-#    ind1 = x>0
-#        
-#    res = x[ind1] - b * numpy.log(x[ind1])
-#    
-##    ind = x>0
-#    
-##    y = x[ind]
-#    
-#    
-#    
-#    
-#    
 
     
         

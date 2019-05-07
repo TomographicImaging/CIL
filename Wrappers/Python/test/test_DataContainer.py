@@ -455,6 +455,11 @@ class TestDataContainer(unittest.TestCase):
             self.assertTrue(False)
         except ValueError as ve:
             self.assertTrue(True)
+            
+        print ("test dot numpy")
+        n0 = (ds0 * ds1).sum()
+        n1 = ds0.as_array().ravel().dot(ds1.as_array().ravel())
+        self.assertEqual(n0, n1)
         
         
 

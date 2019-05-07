@@ -707,6 +707,10 @@ class DataContainer(object):
     def maximum(self, x2, *args, **kwargs):
         return self.pixel_wise_binary(numpy.maximum, x2, *args, **kwargs)
     
+    def minimum(self,x2, out=None, *args, **kwargs):
+        return self.pixel_wise_binary(numpy.minimum, x2=x2, out=out, *args, **kwargs)
+
+    
     ## unary operations
     def pixel_wise_unary(self, pwop, *args,  **kwargs):
         out = kwargs.get('out', None)
@@ -763,6 +767,11 @@ class DataContainer(object):
     def dot(self, other, *args, **kwargs):
         '''return the inner product of 2 DataContainers viewed as vectors'''
         method = kwargs.get('method', 'reduce')
+
+        if method not in ['numpy','reduce']:
+            raise ValueError('dot: specified method not valid. Expecting numpy or reduce got {} '.format(
+                    method))
+
         if self.shape == other.shape:
             # return (self*other).sum()
             if method == 'numpy':
@@ -777,9 +786,9 @@ class DataContainer(object):
                             0)
                 return sf
         else:
-            raise ValueError('Shapes are not aligned: {} != {}'.format(self.shape, other.shape))    
-    
-    
+            raise ValueError('Shapes are not aligned: {} != {}'.format(self.shape, other.shape))
+   
+
     
     
     

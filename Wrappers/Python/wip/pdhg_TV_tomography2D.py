@@ -19,8 +19,7 @@ from ccpi.optimisation.operators import BlockOperator, Gradient
 from ccpi.optimisation.functions import ZeroFunction, L2NormSquared, \
                       MixedL21Norm, BlockFunction
 
-from ccpi.astra.ops import AstraProjectorSimple
-from skimage.util import random_noise
+from ccpi.astra.operators import AstraProjectorSimple
 from timeit import default_timer as timer
 
 

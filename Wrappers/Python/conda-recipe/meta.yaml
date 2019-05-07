@@ -33,6 +33,7 @@ requirements:
     - python
     - numpy
     - scipy
+    - matplotlib
     - h5py
   
 about:

@@ -114,20 +114,7 @@ class KullbackLeibler(Function):
             out *= -1
             out.add(tmp+1, out=out)
             out *= 0.5
-            
-            
-
-#            z_m = x + tau * self.bnoise -1
-#            self.b.multiply(4*tau, out=out)
-#            z_m.multiply(z_m, out=z_m)
-#            out += z_m
-#
-#            out.sqrt(out=out)
-#                        
-#            out *= -1
-#            out += tmp2
-#            out *= 0.5
-
+                    
         
     
     def __rmul__(self, scalar):

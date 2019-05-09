@@ -1,9 +1,48 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Feb 22 14:53:03 2019
+#========================================================================
+# Copyright 2019 Science Technology Facilities Council
+# Copyright 2019 University of Manchester
+#
+# This work is part of the Core Imaging Library developed by Science Technology
+# Facilities Council and University of Manchester
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+#=========================================================================
+""" 
 
-@author: evangelos
+Total Generalised Variation (TGV) Denoising using PDHG algorithm:
+
+
+Problem:     min_{x} \alpha * ||\nabla x - w||_{2,1} +
+                     \beta *  || E w ||_{2,1} +
+                     \frac{1}{2} * || x - g ||_{2}^{2}
+
+             \alpha: Regularization parameter
+             \alpha: Regularization parameter
+             
+             \nabla: Gradient operator 
+              E: Symmetrized Gradient operator
+             
+             g: Noisy Data with Salt & Pepper Noise
+                          
+             Method = 0 ( PDHG - split ) :  K = [ \nabla, - Identity
+                                                  ZeroOperator, E 
+                                                  Identity, ZeroOperator]
+                          
+                                                                    
+             Method = 1 (PDHG - explicit ):  K = [ \nabla, - Identity
+                                                  ZeroOperator, E ] 
+                                                                
 """
 
 from ccpi.framework import ImageData, ImageGeometry
@@ -42,6 +81,18 @@ ag = ig
 # Create noisy data. Add Gaussian noise
 n1 = random_noise(data.as_array(), mode = 's&p', salt_vs_pepper = 0.9, amount=0.2)
 noisy_data = ImageData(n1)
+
+# Show Ground Truth and Noisy Data
+plt.figure(figsize=(15,15))
+plt.subplot(2,1,1)
+plt.imshow(data.as_array())
+plt.title('Ground Truth')
+plt.colorbar()
+plt.subplot(2,1,2)
+plt.imshow(noisy_data.as_array())
+plt.title('Noisy Data')
+plt.colorbar()
+plt.show()
 
 # Regularisation Parameters
 alpha = 0.8
@@ -94,10 +145,10 @@ tau = 1/(sigma*normK**2)
 
 
 # Setup and run the PDHG algorithm
-pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma, memopt=True)
+pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
 pdhg.max_iteration = 2000
 pdhg.update_objective_interval = 50
-pdhg.run(2000)
+pdhg.run(2000, verbose = False)
 
 #%%
 plt.figure(figsize=(15,15))

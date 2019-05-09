@@ -1,39 +1,43 @@
-# -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library developed by
-#   Visual Analytics and Imaging System Group of the Science Technology
-#   Facilities Council, STFC
-
-#   Copyright 2018-2019 Evangelos Papoutsellis and Edoardo Pasca
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#       http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#========================================================================
+# Copyright 2019 Science Technology Facilities Council
+# Copyright 2019 University of Manchester
+#
+# This work is part of the Core Imaging Library developed by Science Technology
+# Facilities Council and University of Manchester
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+#=========================================================================
 
 """ 
 
 Total Variation Denoising using PDHG algorithm:
 
-             min_{x} max_{y} < K x, y > + g(x) - f^{*}(y) 
 
+Problem:     min_x, x>0  \alpha * ||\nabla x||_{2,1} + ||x-g||_{1}
 
-Problem:     min_x, x>0  \alpha * ||\nabla x||_{1} + ||x-g||_{1}
-
-             \nabla: Gradient operator 
-             g: Noisy Data with Salt & Pepper Noise
              \alpha: Regularization parameter
              
-             Method = 0:  K = [ \nabla,
-                                 Identity]
+             \nabla: Gradient operator 
+             
+             g: Noisy Data with Salt & Pepper Noise
+             
+             
+             Method = 0 ( PDHG - split ) :  K = [ \nabla,
+                                                 Identity]
+                          
                                                                     
-             Method = 1:  K = \nabla    
+             Method = 1 (PDHG - explicit ):  K = \nabla    
              
              
 """
@@ -66,6 +70,18 @@ ag = ig
 n1 = random_noise(data.as_array(), mode = 's&p', salt_vs_pepper = 0.9, amount=0.2)
 noisy_data = ImageData(n1)
 
+# Show Ground Truth and Noisy Data
+plt.figure(figsize=(15,15))
+plt.subplot(2,1,1)
+plt.imshow(data.as_array())
+plt.title('Ground Truth')
+plt.colorbar()
+plt.subplot(2,1,2)
+plt.imshow(noisy_data.as_array())
+plt.title('Noisy Data')
+plt.colorbar()
+plt.show()
+
 # Regularisation Parameter
 alpha = 2
 
@@ -80,8 +96,7 @@ if method == '0':
     # Create BlockOperator
     operator = BlockOperator(op1, op2, shape=(2,1) ) 
 
-    # Create functions
-      
+    # Create functions      
     f1 = alpha * MixedL21Norm()
     f2 = L1Norm(b = noisy_data)    
     f = BlockFunction(f1, f2)  

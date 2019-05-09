@@ -1,21 +1,43 @@
-# -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library developed by
-#   Visual Analytics and Imaging System Group of the Science Technology
-#   Facilities Council, STFC
+#========================================================================
+# Copyright 2019 Science Technology Facilities Council
+# Copyright 2019 University of Manchester
+#
+# This work is part of the Core Imaging Library developed by Science Technology
+# Facilities Council and University of Manchester
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+#=========================================================================
+""" 
 
-#   Copyright 2018-2019 Evangelos Papoutsellis and Edoardo Pasca
+Tikhonov Denoising using PDHG algorithm:
 
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
 
-#       http://www.apache.org/licenses/LICENSE-2.0
+Problem:     min_{x} \alpha * ||\nabla x||_{2}^{2} + \frac{1}{2} * || x - g ||_{2}^{2}
 
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+             \alpha: Regularization parameter
+             
+             \nabla: Gradient operator 
+             
+             g: Noisy Data with Gaussian Noise
+                          
+             Method = 0 ( PDHG - split ) :  K = [ \nabla,
+                                                 Identity]
+                          
+                                                                    
+             Method = 1 (PDHG - explicit ):  K = \nabla  
+                                                                
+"""
 
 from ccpi.framework import ImageData, ImageGeometry
 
@@ -41,13 +63,25 @@ ig = ImageGeometry(voxel_num_x = N, voxel_num_y = N)
 ag = ig
 
 # Create noisy data. Apply Salt & Pepper noise
-n1 = random_noise(data.as_array(), mode = 'gaussian', mean=0, var = 0.05, seed=10)
+n1 = random_noise(data.as_array(), mode = 's&p', salt_vs_pepper = 0.9, amount=0.2)
 noisy_data = ImageData(n1)
+
+# Show Ground Truth and Noisy Data
+plt.figure(figsize=(15,15))
+plt.subplot(2,1,1)
+plt.imshow(data.as_array())
+plt.title('Ground Truth')
+plt.colorbar()
+plt.subplot(2,1,2)
+plt.imshow(noisy_data.as_array())
+plt.title('Noisy Data')
+plt.colorbar()
+plt.show()
 
 # Regularisation Parameter
 alpha = 4
 
-method = '0'
+method = '1'
 
 if method == '0':
 

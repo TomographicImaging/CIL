@@ -1,41 +1,43 @@
-# -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library developed by
-#   Visual Analytics and Imaging System Group of the Science Technology
-#   Facilities Council, STFC
-
-#   Copyright 2018-2019 STFC,  University of Manchester
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#       http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#========================================================================
+# Copyright 2019 Science Technology Facilities Council
+# Copyright 2019 University of Manchester
+#
+# This work is part of the Core Imaging Library developed by Science Technology
+# Facilities Council and University of Manchester
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+#=========================================================================
 
 """ 
 
 Total Variation Denoising using PDHG algorithm:
 
-             min_{x} max_{y} < K x, y > + g(x) - f^{*}(y) 
+Problem:     min_x, x>0  \alpha * ||\nabla x||_{2,1} + \int x - g * log(x)
 
-
-Problem:     min_x, x>0  \alpha * ||\nabla x||_{1} + \int x - g * log(x)
-
-             \nabla: Gradient operator              
-             g: Noisy Data with Poisson Noise
              \alpha: Regularization parameter
              
-             Method = 0:  K = [ \nabla,
-                                 Identity]
+             \nabla: Gradient operator  
+             
+             g: Noisy Data with Poisson Noise
+             
+             
+             Method = 0 ( PDHG - split ) :  K = [ \nabla,
+                                                 Identity]
+                          
                                                                     
-             Method = 1:  K = \nabla    
-             
-             
+             Method = 1 (PDHG - explicit ):  K = \nabla     
+                       
 """
 
 from ccpi.framework import ImageData, ImageGeometry
@@ -66,10 +68,25 @@ ag = ig
 n1 = random_noise(data.as_array(), mode = 'poisson', seed = 10)
 noisy_data = ImageData(n1)
 
+
+# Show Ground Truth and Noisy Data
+plt.figure(figsize=(15,15))
+plt.subplot(2,1,1)
+plt.imshow(data.as_array())
+plt.title('Ground Truth')
+plt.colorbar()
+plt.subplot(2,1,2)
+plt.imshow(noisy_data.as_array())
+plt.title('Noisy Data')
+plt.colorbar()
+plt.show()
+
+#%%
+
 # Regularisation Parameter
 alpha = 2
 
-method = '1'
+method = '0'
 
 if method == '0':
 
@@ -99,26 +116,15 @@ else:
 # Compute operator Norm
 normK = operator.norm()
 
-# Primal & dual stepsizes
+# Primal & Dual stepsizes
 sigma = 1
 tau = 1/(sigma*normK**2)
-opt = {'niter':2000, 'memopt': True}
 
-# Setup and run the PDHG algorithm
-pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma, memopt=True)
-pdhg.max_iteration = 2000
-pdhg.update_objective_interval = 50
-
-def pdgap_objectives(niter, objective, solution):
-    
-
-     print( "{:04}/{:04} {:<5} {:.4f} {:<5} {:.4f} {:<5} {:.4f}".\
-                      format(niter, pdhg.max_iteration,'', \
-                             objective[0],'',\
-                             objective[1],'',\
-                             objective[2]))
-
-pdhg.run(2000, callback = pdgap_objectives)
+# Setup and Run the PDHG algorithm
+pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
+pdhg.max_iteration = 3000
+pdhg.update_objective_interval = 200
+pdhg.run(3000, verbose=False)
 
 
 plt.figure(figsize=(15,15))

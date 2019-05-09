@@ -299,7 +299,7 @@ class TestFunction(unittest.TestCase):
         
         A = 0.5 * Identity(ig)
         old_chisq = Norm2sq(A, b, 1.0)
-        new_chisq = FunctionOperatorComposition(A, L2NormSquared(b=b))
+        new_chisq = FunctionOperatorComposition(L2NormSquared(b=b),A)
 
         yold = old_chisq(u)
         ynew = new_chisq(u)

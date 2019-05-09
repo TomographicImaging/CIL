@@ -31,7 +31,7 @@ if  cil_version == '':
 setup(
     name="ccpi-framework",
     version=cil_version,
-    packages=['ccpi' , 'ccpi.io', 'ccpi.data',
+    packages=['ccpi' , 'ccpi.io',
               'ccpi.framework', 'ccpi.optimisation', 
               'ccpi.optimisation.operators',
               'ccpi.optimisation.algorithms',
@@ -39,6 +39,8 @@ setup(
               'ccpi.processors',
               'ccpi.contrib','ccpi.contrib.optimisation',
               'ccpi.contrib.optimisation.algorithms'],
+    data_file = [('share/ccpi', ['data/boat.tiff', 'data/peppers.tiff',
+                                 'data/camera.png'])],
 
     # Project uses reStructuredText, so ensure that the docutils get
     # installed or upgraded on the target machine
@@ -53,8 +55,9 @@ setup(
     # zip_safe = False,
 
     # metadata for upload to PyPI
-    author="Edoardo Pasca",
-    author_email="edoardo.pasca@stfc.ac.uk",
+    author="CCPi developers",
+    maintainer="Edoardo Pasca",
+    maintainer_email="edoardo.pasca@stfc.ac.uk",
     description='CCPi Core Imaging Library - Python Framework Module',
     license="Apache v2.0",
     keywords="Python Framework",

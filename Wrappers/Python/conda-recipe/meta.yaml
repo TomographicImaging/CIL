@@ -35,6 +35,7 @@ requirements:
     - scipy
     - matplotlib
     - h5py
+    - pillow
   
 about:
   home: http://www.ccpi.ac.uk

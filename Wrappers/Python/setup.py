@@ -39,7 +39,7 @@ setup(
               'ccpi.processors',
               'ccpi.contrib','ccpi.contrib.optimisation',
               'ccpi.contrib.optimisation.algorithms'],
-    data_file = [('share/ccpi', ['data/boat.tiff', 'data/peppers.tiff',
+    data_files = [('share/ccpi', ['data/boat.tiff', 'data/peppers.tiff',
                                  'data/camera.png'])],
 
     # Project uses reStructuredText, so ensure that the docutils get

@@ -1,0 +1,15 @@
+CCPi Core Imaging Library.
+Copyright 2017 Rutherford Appleton Laboratory STFC
+Copyright 2017 University of Manchester
+
+This software product is developed for the Collaborative Computational 
+Project in Tomographic Imaging CCPi (http://www.ccpi.ac.uk/) at RAL STFC (http://www.stfc.ac.uk), University of Manchester (http://www.ucl.ac.uk/)
+and other contributing institutions.
+
+Main contributors:
+Edoardo Pasca (STFC)
+Jakob Jorgensen (UoM)
+Evangelos Papoutsellis (UoM)
+Evelina Ametova (UoM)
+Daniil Kazantsev (Diamond Light Source)
+Gemma Fardell (STFC)

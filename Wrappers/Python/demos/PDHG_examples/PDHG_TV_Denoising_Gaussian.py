@@ -18,26 +18,25 @@
 # limitations under the License.
 #
 #=========================================================================
-
 """ 
 
 Total Variation Denoising using PDHG algorithm:
 
-Problem:     min_x, x>0  \alpha * ||\nabla x||_{1} + \int x - g * log(x)
+
+Problem:     min_{x} \alpha * ||\nabla x||_{2,1} + \frac{1}{2} * || x - g ||_{2}^{2}
 
              \alpha: Regularization parameter
              
-             \nabla: Gradient operator  
+             \nabla: Gradient operator 
              
-             g: Noisy Data with Poisson Noise
-             
-             
+             g: Noisy Data with Gaussian Noise
+                          
              Method = 0 ( PDHG - split ) :  K = [ \nabla,
                                                  Identity]
                           
                                                                     
-             Method = 1 (PDHG - explicit ):  K = \nabla     
-                       
+             Method = 1 (PDHG - explicit ):  K = \nabla  
+                                                                
 """
 
 from ccpi.framework import ImageData, ImageGeometry
@@ -49,12 +48,10 @@ import matplotlib.pyplot as plt
 from ccpi.optimisation.algorithms import PDHG
 
 from ccpi.optimisation.operators import BlockOperator, Identity, Gradient
-from ccpi.optimisation.functions import ZeroFunction, KullbackLeibler, \
+from ccpi.optimisation.functions import ZeroFunction, L2NormSquared, \
                       MixedL21Norm, BlockFunction
-
-from skimage.util import random_noise
-
-# Create phantom for TV Poisson denoising
+      
+# Load Data                      
 N = 100
 
 data = np.zeros((N,N))
@@ -63,11 +60,10 @@ data[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 1
 data = ImageData(data)
 ig = ImageGeometry(voxel_num_x = N, voxel_num_y = N)
 ag = ig
-
-# Create noisy data. Apply Poisson noise
-n1 = random_noise(data.as_array(), mode = 'poisson', seed = 10)
-noisy_data = ImageData(n1)
-
+                      
+# Create Noisy data. Add Gaussian noise
+np.random.seed(10)
+noisy_data = ImageData( data.as_array() + np.random.normal(0, 0.1, size=ig.shape) )
 
 # Show Ground Truth and Noisy Data
 plt.figure(figsize=(15,15))
@@ -81,10 +77,8 @@ plt.title('Noisy Data')
 plt.colorbar()
 plt.show()
 
-#%%
-
 # Regularisation Parameter
-alpha = 2
+alpha = 0.2
 
 method = '0'
 
@@ -97,10 +91,9 @@ if method == '0':
     # Create BlockOperator
     operator = BlockOperator(op1, op2, shape=(2,1) ) 
 
-    # Create functions
-      
+    # Create functions      
     f1 = alpha * MixedL21Norm()
-    f2 = KullbackLeibler(noisy_data)    
+    f2 = 0.5 * L2NormSquared(b = noisy_data)    
     f = BlockFunction(f1, f2)  
                                       
     g = ZeroFunction()
@@ -108,12 +101,11 @@ if method == '0':
 else:
     
     # Without the "Block Framework"
-    operator = Gradient(ig)
+    operator =  Gradient(ig)
     f =  alpha * MixedL21Norm()
-    g =  KullbackLeibler(noisy_data)   
+    g =  0.5 * L2NormSquared(b = noisy_data)
         
-    
-# Compute operator Norm
+# Compute Operator Norm
 normK = operator.norm()
 
 # Primal & Dual stepsizes
@@ -126,7 +118,7 @@ pdhg.max_iteration = 3000
 pdhg.update_objective_interval = 200
 pdhg.run(3000, verbose=False)
 
-
+# Show Results
 plt.figure(figsize=(15,15))
 plt.subplot(3,1,1)
 plt.imshow(data.as_array())
@@ -141,7 +133,7 @@ plt.imshow(pdhg.get_output().as_array())
 plt.title('TV Reconstruction')
 plt.colorbar()
 plt.show()
-## 
+
 plt.plot(np.linspace(0,N,N), data.as_array()[int(N/2),:], label = 'GTruth')
 plt.plot(np.linspace(0,N,N), pdhg.get_output().as_array()[int(N/2),:], label = 'TV reconstruction')
 plt.legend()
@@ -163,25 +155,26 @@ except ImportError:
 if cvx_not_installable:
 
     ##Construct problem    
-    u1 = Variable(ig.shape)
-    q = Variable()
+    u = Variable(ig.shape)
     
     DY = SparseFiniteDiff(ig, direction=0, bnd_cond='Neumann')
     DX = SparseFiniteDiff(ig, direction=1, bnd_cond='Neumann')
     
     # Define Total Variation as a regulariser
-    regulariser = alpha * sum(norm(vstack([DX.matrix() * vec(u1), DY.matrix() * vec(u1)]), 2, axis = 0))
+    regulariser = alpha * sum(norm(vstack([DX.matrix() * vec(u), DY.matrix() * vec(u)]), 2, axis = 0))
+    fidelity = 0.5 * sum_squares(u - noisy_data.as_array())
     
-    fidelity = sum( u1 - multiply(noisy_data.as_array(), log(u1)) )
-    constraints = [q>= fidelity, u1>=0]
+    # choose solver
+    if 'MOSEK' in installed_solvers():
+        solver = MOSEK
+    else:
+        solver = SCS  
         
-    solver = ECOS
-    obj =  Minimize( regulariser +  q)
-    prob = Problem(obj, constraints)
-    result = prob.solve(verbose = True, solver = solver)
-
+    obj =  Minimize( regulariser +  fidelity)
+    prob = Problem(obj)
+    result = prob.solve(verbose = True, solver = MOSEK)
     
-    diff_cvx = numpy.abs( pdhg.get_output().as_array() - u1.value )
+    diff_cvx = numpy.abs( pdhg.get_output().as_array() - u.value )
         
     plt.figure(figsize=(15,15))
     plt.subplot(3,1,1)
@@ -189,7 +182,7 @@ if cvx_not_installable:
     plt.title('PDHG solution')
     plt.colorbar()
     plt.subplot(3,1,2)
-    plt.imshow(u1.value)
+    plt.imshow(u.value)
     plt.title('CVX solution')
     plt.colorbar()
     plt.subplot(3,1,3)
@@ -199,15 +192,13 @@ if cvx_not_installable:
     plt.show()    
     
     plt.plot(np.linspace(0,N,N), pdhg.get_output().as_array()[int(N/2),:], label = 'PDHG')
-    plt.plot(np.linspace(0,N,N), u1.value[int(N/2),:], label = 'CVX')
+    plt.plot(np.linspace(0,N,N), u.value[int(N/2),:], label = 'CVX')
+    plt.plot(np.linspace(0,N,N), data.as_array()[int(N/2),:], label = 'Truth')
+    
     plt.legend()
     plt.title('Middle Line Profiles')
     plt.show()
             
     print('Primal Objective (CVX) {} '.format(obj.value))
     print('Primal Objective (PDHG) {} '.format(pdhg.objective[-1][0]))
-
-
-
-
 

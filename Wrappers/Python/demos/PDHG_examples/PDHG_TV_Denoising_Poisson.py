@@ -23,7 +23,7 @@
 
 Total Variation Denoising using PDHG algorithm:
 
-Problem:     min_x, x>0  \alpha * ||\nabla x||_{1} + \int x - g * log(x)
+Problem:     min_x, x>0  \alpha * ||\nabla x||_{2,1} + \int x - g * log(x)
 
              \alpha: Regularization parameter
              

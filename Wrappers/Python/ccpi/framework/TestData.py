@@ -21,7 +21,7 @@ class TestData(object):
     def load(self, which, size=(512,512), scale=(0,1), **kwargs):
         if which not in [TestData.BOAT, TestData.CAMERA, TestData.PEPPERS]:
             raise ValueError('Unknown TestData {}.'.format(which))
-        tmp = Image.open(os.path.join(data_dir, which))
+        tmp = Image.open(os.path.join(self.data_dir, which))
         
         data = numpy.array(tmp.resize(size))
         

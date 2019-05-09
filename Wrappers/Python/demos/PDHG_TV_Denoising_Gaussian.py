@@ -18,13 +18,9 @@
 # limitations under the License.
 #
 #=========================================================================
-
-
 """ 
 
 Total Variation Denoising using PDHG algorithm:
-
-             min_{x} max_{y} < K x, y > + g(x) - f^{*}(y) 
 
 
 Problem:     min_{x} \alpha * ||\nabla x||_{2,1} + \frac{1}{2} * || x - g ||_{2}^{2}
@@ -35,12 +31,12 @@ Problem:     min_{x} \alpha * ||\nabla x||_{2,1} + \frac{1}{2} * || x - g ||_{2}
              
              g: Noisy Data with Gaussian Noise
                           
-             Method = 0:  K = [ \nabla,
-                                 Identity]
+             Method = 0 ( PDHG - split ) :  K = [ \nabla,
+                                                 Identity]
+                          
                                                                     
-             Method = 1:  K = \nabla    
-             
-             
+             Method = 1 (PDHG - explicit ):  K = \nabla  
+                                                                
 """
 
 from ccpi.framework import ImageData, ImageGeometry
@@ -54,20 +50,17 @@ from ccpi.optimisation.algorithms import PDHG
 from ccpi.optimisation.operators import BlockOperator, Identity, Gradient
 from ccpi.optimisation.functions import ZeroFunction, L2NormSquared, \
                       MixedL21Norm, BlockFunction
-  
+      
+# Load Data                      
+N = 100
 
-from ccpi.data import camera
-
-
-# Load Data
-data = camera(size=(256,256))                    
-
-N, M = data.shape
-
-# Image and Acquitition Geometries
+data = np.zeros((N,N))
+data[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
+data[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 1
+data = ImageData(data)
 ig = ImageGeometry(voxel_num_x = N, voxel_num_y = N)
 ag = ig
-
+                      
 # Create Noisy data. Add Gaussian noise
 np.random.seed(10)
 noisy_data = ImageData( data.as_array() + np.random.normal(0, 0.1, size=ig.shape) )

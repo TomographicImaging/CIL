@@ -57,13 +57,16 @@ loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
 N = 256
 M = 300
 
-data = np.zeros((N,N))
-data[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
-data[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 1
-data = ImageData(data)
+
+# user can change the size of the input data
+# you can choose between 
+# TestData.PEPPERS 2D + Channel
+# TestData.BOAT 2D 
+# TestData.CAMERA 2D
+# TestData.RESOLUTION_CHART 2D 
+# TestData.SIMPLE_PHANTOM_2D 2D
 data = loader.load(TestData.PEPPERS, size=(N,M), scale=(0,1))
-#ig = ImageGeometry(voxel_num_x = N, voxel_num_y = N)
-print (data)
+
 ig = data.geometry
 ag = ig
                       
@@ -129,7 +132,7 @@ tau = 1/(sigma*normK**2)
 pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
 pdhg.max_iteration = 10000
 pdhg.update_objective_interval = 100
-pdhg.run(200, verbose=True)
+pdhg.run(1000, verbose=True)
 
 # Show Results
 plt.figure()
@@ -150,9 +153,10 @@ plt.clim(0,1)
 plt.colorbar()
 plt.show()
 
+plt.plot(np.linspace(0,N,M), noisy_data.as_array()[int(N/2),:], label = 'Noisy data')
 plt.plot(np.linspace(0,N,M), data.as_array()[int(N/2),:], label = 'GTruth')
 plt.plot(np.linspace(0,N,M), pdhg.get_output().as_array()[int(N/2),:], label = 'TV reconstruction')
-plt.plot(np.linspace(0,N,M), noisy_data.as_array()[int(N/2),:], label = 'Noisy data')
+
 plt.legend()
 plt.title('Middle Line Profiles')
 plt.show()

@@ -300,13 +300,13 @@ class AcquisitionGeometry(object):
                 self.dimension_labels = labels
         
         def get_order_by_label(self, dimension_labels, default_dimension_labels):
-        order = []
-        for i, el in enumerate(dimension_labels):
-            for j, ek in enumerate(default_dimension_labels):
-                if el == ek:
-                    order.append(j)
-                    break
-        return order
+            order = []
+            for i, el in enumerate(dimension_labels):
+                for j, ek in enumerate(default_dimension_labels):
+                    if el == ek:
+                        order.append(j)
+                        break
+            return order
 
 
 

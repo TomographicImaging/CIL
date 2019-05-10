@@ -26,9 +26,9 @@ class Gradient(LinearOperator):
                 
         self.gm_domain = gm_domain # Domain of Grad Operator
         
-        self.correlation = kwargs.get('correlation',Gredient.CORRELATION_SPACE)
+        self.correlation = kwargs.get('correlation',Gradient.CORRELATION_SPACE)
         
-        if self.correlation==Gredient.CORRELATION_SPACE:
+        if self.correlation==Gradient.CORRELATION_SPACE:
             if self.gm_domain.channels>1:
                 self.gm_range = BlockGeometry(*[self.gm_domain for _ in range(self.gm_domain.length-1)] )
                 if self.gm_domain.length == 4:
@@ -54,7 +54,7 @@ class Gradient(LinearOperator):
                     expected_order = [ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]    
                 self.ind = self.gm_domain.get_order_by_label(self.gm_domain.dimension_labels, expected_order)
                 # self.ind = numpy.arange(self.gm_domain.length)
-        elif self.correlation==Gredient.CORRELATION_SPACECHANNEL:
+        elif self.correlation==Gradient.CORRELATION_SPACECHANNEL:
             if self.gm_domain.channels>1:
                 self.gm_range = BlockGeometry(*[self.gm_domain for _ in range(self.gm_domain.length)])
                 self.ind = range(self.gm_domain.length)

@@ -93,14 +93,14 @@ plt.colorbar()
 plt.show()
 
 # Regularisation Parameter
-alpha = 2.
+alpha = .1
 
 method = '0'
 
 if method == '0':
 
     # Create operators
-    op1 = Gradient(ig, correlation='SpaceChannels')
+    op1 = Gradient(ig, correlation=Gradient.CORRELATION_SPACE)
     op2 = Identity(ig, ag)
 
     # Create BlockOperator
@@ -131,7 +131,7 @@ tau = 1/(sigma*normK**2)
 pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
 pdhg.max_iteration = 10000
 pdhg.update_objective_interval = 100
-pdhg.run(1000, verbose=True)
+pdhg.run(200, verbose=True)
 
 # Show Results
 plt.figure()

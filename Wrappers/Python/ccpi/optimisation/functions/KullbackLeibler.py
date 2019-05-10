@@ -25,7 +25,7 @@ import functools
 
 class KullbackLeibler(Function):
     
-    ''' Assume that data > 0
+    ''' Assume that data >= 0
                 
     '''
     
@@ -125,7 +125,18 @@ class KullbackLeibler(Function):
                         
         '''
         
-        return ScaledFunction(self, scalar)     
+        return ScaledFunction(self, scalar) 
+
+
+if __name__ == '__main__':
+    
+    from ccpi.framework import ImageGeometry
+    import numpy
+    
+    M, N =  2,3
+    ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
+    u = ig.allocate('random_int')
+    b = np.random.normal(0, 0.1, size=ig.shape)  
         
         
 

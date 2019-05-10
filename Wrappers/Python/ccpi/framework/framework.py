@@ -63,7 +63,8 @@ class ImageGeometry(object):
                  center_x=0, 
                  center_y=0, 
                  center_z=0, 
-                 channels=1):
+                 channels=1, 
+                 **kwargs):
         
         self.voxel_num_x = voxel_num_x
         self.voxel_num_y = voxel_num_y
@@ -80,25 +81,44 @@ class ImageGeometry(object):
         if self.channels > 1:            
             if self.voxel_num_z>1:
                 self.length = 4
-                self.shape = (self.channels, self.voxel_num_z, self.voxel_num_y, self.voxel_num_x)
+                shape = (self.channels, self.voxel_num_z, self.voxel_num_y, self.voxel_num_x)
                 dim_labels = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL,
                 ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
             else:
                 self.length = 3
-                self.shape = (self.channels, self.voxel_num_y, self.voxel_num_x)
+                shape = (self.channels, self.voxel_num_y, self.voxel_num_x)
                 dim_labels = [ImageGeometry.CHANNEL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
         else:
             if self.voxel_num_z>1:
                 self.length = 3
-                self.shape = (self.voxel_num_z, self.voxel_num_y, self.voxel_num_x)
+                shape = (self.voxel_num_z, self.voxel_num_y, self.voxel_num_x)
                 dim_labels = [ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y,
                  ImageGeometry.HORIZONTAL_X]
             else:
                 self.length = 2  
-                self.shape = (self.voxel_num_y, self.voxel_num_x)
+                shape = (self.voxel_num_y, self.voxel_num_x)
                 dim_labels = [ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
         
-        self.dimension_labels = dim_labels
+        labels = kwargs.get('dimension_labels', None)
+        if labels is None:
+            self.shape = shape
+            self.dimension_labels = dim_labels
+        else:
+            order = self.get_order_by_label(labels, dim_labels)
+            if order != [0,1,2]:
+                # resort
+                self.shape = tuple([shape[i] for i in order])
+                self.dimension_labels = labels
+                
+    def get_order_by_label(self, dimension_labels, default_dimension_labels):
+        order = []
+        for i, el in enumerate(dimension_labels):
+            for j, ek in enumerate(default_dimension_labels):
+                if el == ek:
+                    order.append(j)
+                    break
+        return order
+
         
     def get_min_x(self):
         return self.center_x - 0.5*self.voxel_num_x*self.voxel_size_x
@@ -146,7 +166,10 @@ class ImageGeometry(object):
         return repres
     def allocate(self, value=0, dimension_labels=None, **kwargs):
         '''allocates an ImageData according to the size expressed in the instance'''
-        out = ImageData(geometry=self)
+        if dimension_labels is None:
+            out = ImageData(geometry=self, dimension_labels=self.dimension_labels)
+        else:
+            out = ImageData(geometry=self, dimension_labels=dimension_labels)
         if isinstance(value, Number):
             if value != 0:
                 out += value
@@ -164,9 +187,7 @@ class ImageGeometry(object):
                 out.fill(numpy.random.randint(max_value,size=self.shape))
             else:
                 raise ValueError('Value {} unknown'.format(value))
-        if dimension_labels is not None:
-            if dimension_labels != self.dimension_labels:
-                return out.subset(dimensions=dimension_labels)
+
         return out
     # The following methods return 2 members of the class, therefore I 
     # don't think we need to implement them. 
@@ -244,6 +265,8 @@ class AcquisitionGeometry(object):
         self.channels = channels
         self.angle_unit=kwargs.get(AcquisitionGeometry.ANGLE_UNIT, 
                                AcquisitionGeometry.DEGREE)
+
+        # default labels
         if channels > 1:
             if pixel_num_v > 1:
                 shape = (channels, num_of_angles , pixel_num_v, pixel_num_h)
@@ -262,9 +285,31 @@ class AcquisitionGeometry(object):
             else:
                 shape = (num_of_angles, pixel_num_h)
                 dim_labels = [AcquisitionGeometry.ANGLE, AcquisitionGeometry.HORIZONTAL]
-        self.shape = shape
+        
+        labels = kwargs.get('dimension_labels', None)
+        if labels is None:
+            self.shape = shape
+            self.dimension_labels = dim_labels
+        else:
+            if len(labels) != len(dim_labels):
+                raise ValueError('Wrong number of labels. Expected {} got {}'.format(len(dim_labels), len(labels)))
+            order = self.get_order_by_label(labels, dim_labels)
+            if order != [0,1,2]:
+                # resort
+                self.shape = tuple([shape[i] for i in order])
+                self.dimension_labels = labels
+        
+    def get_order_by_label(self, dimension_labels, default_dimension_labels):
+        order = []
+        for i, el in enumerate(dimension_labels):
+            for j, ek in enumerate(default_dimension_labels):
+                if el == ek:
+                    order.append(j)
+                    break
+        return order
 
-        self.dimension_labels = dim_labels
+
+
         
     def clone(self):
         '''returns a copy of the AcquisitionGeometry'''
@@ -292,7 +337,10 @@ class AcquisitionGeometry(object):
         return repres
     def allocate(self, value=0, dimension_labels=None):
         '''allocates an AcquisitionData according to the size expressed in the instance'''
-        out = AcquisitionData(geometry=self)
+        if dimension_labels is None:
+            out = AcquisitionData(geometry=self, dimension_labels=self.dimension_labels)
+        else:
+            out = AcquisitionData(geometry=self, dimension_labels=dimension_labels)
         if isinstance(value, Number):
             if value != 0:
                 out += value
@@ -310,9 +358,7 @@ class AcquisitionGeometry(object):
                 out.fill(numpy.random.randint(max_value,size=self.shape))
             else:
                 raise ValueError('Value {} unknown'.format(value))
-        if dimension_labels is not None:
-            if dimension_labels != self.dimension_labels:
-                return out.subset(dimensions=dimension_labels)
+        
         return out
     
 class DataContainer(object):
@@ -658,7 +704,7 @@ class DataContainer(object):
                 #       geometry=self.geometry)
                 return out
             else:
-                raise ValueError(message(type(self),"Wrong size for data memory: ", out.shape,self.shape))
+                raise ValueError(message(type(self),"Wrong size for data memory: out {} x2 {} expected {}".format( out.shape,x2.shape ,self.shape)))
         elif issubclass(type(out), DataContainer) and isinstance(x2, (int,float,complex)):
             if self.check_dimensions(out):
                 kwargs['out']=out.as_array()
@@ -806,7 +852,7 @@ class ImageData(DataContainer):
         self.geometry = kwargs.get('geometry', None)
         if array is None:
             if self.geometry is not None:
-                shape, dimension_labels = self.get_shape_labels(self.geometry)
+                shape, dimension_labels = self.get_shape_labels(self.geometry, dimension_labels)
                     
                 array = numpy.zeros( shape , dtype=numpy.float32) 
                 super(ImageData, self).__init__(array, deep_copy,

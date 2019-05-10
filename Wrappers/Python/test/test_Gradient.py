@@ -84,3 +84,18 @@ class TestGradient(unittest.TestCase):
         res = G2D.direct(u4)  
         print(res[0].as_array())
         print(res[1].as_array())
+
+        M, N = 20, 30
+        ig = ImageGeometry(M, N)
+        arr = ig.allocate('random_int' )
+        
+        # check direct of Gradient and sparse matrix
+        G = Gradient(ig)
+        norm1 = G.norm(iterations=300)
+        print ("should be sqrt(8) {} {}".format(numpy.sqrt(8), norm1))
+        numpy.testing.assert_almost_equal(norm1, numpy.sqrt(8), decimal=1)
+        ig4 = ImageGeometry(M,N, channels=3)
+        G4 = Gradient(ig4, correlation=Gradient.CORRELATION_SPACECHANNEL)
+        norm4 = G4.norm(iterations=300)
+        print ("should be sqrt(12) {} {}".format(numpy.sqrt(12), norm4))
+        numpy.testing.assert_almost_equal(norm4, numpy.sqrt(12), decimal=1)

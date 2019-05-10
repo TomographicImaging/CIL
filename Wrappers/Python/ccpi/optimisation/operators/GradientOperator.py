@@ -51,7 +51,7 @@ class Gradient(LinearOperator):
                     expected_order = [ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
                 else:
                     # 2D
-                    expected_order = [ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]    
+                    expected_order = [ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]    
                 self.ind = self.gm_domain.get_order_by_label(self.gm_domain.dimension_labels, expected_order)
                 # self.ind = numpy.arange(self.gm_domain.length)
         elif self.correlation==Gradient.CORRELATION_SPACECHANNEL:

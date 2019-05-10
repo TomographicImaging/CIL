@@ -33,44 +33,30 @@ class TestData(object):
             sdata[round(M/8):round(7*M/8),round(3*M/8):round(5*M/8)] = 1
             ig = ImageGeometry(voxel_num_x = N, voxel_num_y = M, dimension_labels=[ImageGeometry.HORIZONTAL_X, ImageGeometry.HORIZONTAL_Y])
             data = ig.allocate()
-            #data.geometry = ig
             data.fill(sdata)
         else:
             tmp = Image.open(os.path.join(self.data_dir, which))
             print (tmp)
             bands = tmp.getbands()
             if len(bands) > 1:
-                # convert to greyscale
-                #tmp = tmp.convert('L')
                 ig = ImageGeometry(voxel_num_x=size[0], voxel_num_y=size[1], channels=len(bands), 
                 dimension_labels=[ImageGeometry.HORIZONTAL_X, ImageGeometry.HORIZONTAL_Y, ImageGeometry.CHANNEL])
-                
                 data = ig.allocate()
-                #data.geometry = ig
-                #newsize = (size[0], size[1], len(bands))
             else:
                 ig = ImageGeometry(voxel_num_x = size[0], voxel_num_y = size[1], dimension_labels=[ImageGeometry.HORIZONTAL_X, ImageGeometry.HORIZONTAL_Y])
                 data = ig.allocate()
-                #data.geometry = ig
-                #newsize = size
-            
             data.fill(numpy.array(tmp.resize((size[1],size[0]))))
-            
             if scale is not None:
                 dmax = data.as_array().max()
                 dmin = data.as_array().min()
-            
                 # scale 0,1
                 data = (data -dmin) / (dmax - dmin)
-                
                 if scale != (0,1):
                     #data = (data-dmin)/(dmax-dmin) * (scale[1]-scale[0]) +scale[0])
                     data *= (scale[1]-scale[0])
                     data += scale[0]
-        
         print ("data.geometry", data.geometry)
         return data
-        
 
     def camera(**kwargs):
     

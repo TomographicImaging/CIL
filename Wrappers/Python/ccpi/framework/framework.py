@@ -104,18 +104,21 @@ class ImageGeometry(object):
             self.shape = shape
             self.dimension_labels = dim_labels
         else:
-            order = []
-            for i, el in enumerate(labels):
-                for j, ek in enumerate(dim_labels):
-                    if el == ek:
-                        order.append(j)
-                        break
+            order = self.get_order_by_label(labels, dim_labels)
             if order != [0,1,2]:
                 # resort
                 self.shape = tuple([shape[i] for i in order])
                 self.dimension_labels = labels
                 
-        
+    def get_order_by_label(self, dimension_labels, default_dimension_labels):
+        order = []
+        for i, el in enumerate(dimension_labels):
+            for j, ek in enumerate(default_dimension_labels):
+                if el == ek:
+                    order.append(j)
+                    break
+        return order
+
         
     def get_min_x(self):
         return self.center_x - 0.5*self.voxel_num_x*self.voxel_size_x
@@ -290,16 +293,20 @@ class AcquisitionGeometry(object):
         else:
             if len(labels) != len(dim_labels):
                 raise ValueError('Wrong number of labels. Expected {} got {}'.format(len(dim_labels), len(labels)))
-            order = []
-            for i, el in enumerate(labels):
-                for j, ek in enumerate(dim_labels):
-                    if el == ek:
-                        order.append(j)
-                        break
+            order = self.get_order_by_label(labels, dim_labels)
             if order != [0,1,2]:
                 # resort
                 self.shape = tuple([shape[i] for i in order])
                 self.dimension_labels = labels
+        
+        def get_order_by_label(self, dimension_labels, default_dimension_labels):
+        order = []
+        for i, el in enumerate(dimension_labels):
+            for j, ek in enumerate(default_dimension_labels):
+                if el == ek:
+                    order.append(j)
+                    break
+        return order
 
 
 

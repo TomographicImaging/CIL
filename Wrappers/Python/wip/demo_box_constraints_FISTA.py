@@ -72,7 +72,7 @@ else:
 
 # Set up Operator object combining the ImageGeometry and AcquisitionGeometry
 # wrapping calls to ASTRA as well as specifying whether to use CPU or GPU.
-Aop = AstraProjectorSimple(ig, ag, 'gpu')
+Aop = AstraProjectorSimple(ig, ag, 'cpu')
 
 Aop = Identity(ig,ig)
 

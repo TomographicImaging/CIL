@@ -120,21 +120,7 @@ class KullbackLeibler(Function):
             tmp += 2
             out += tmp
             out *= 0.5
-            
-#            z_m = x + tau * self.bnoise - 1
-#            self.b.multiply(4*tau, out=out)
-#            z_m.multiply(z_m, out=z_m)
-#            out += z_m
-#            out.sqrt(out=out)
-#            # z = z_m + 2
-#            z_m.sqrt(out=z_m)
-#            z_m += 2
-#            out *= -1
-#            out += z_m
 
-
-        
-    
     def __rmul__(self, scalar):
         
         ''' Multiplication of L2NormSquared with a scalar

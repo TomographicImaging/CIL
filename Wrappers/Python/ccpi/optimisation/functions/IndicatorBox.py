@@ -84,39 +84,32 @@ if __name__ == '__main__':
     ig = ImageGeometry(voxel_num_x = N, voxel_num_y = M)            
     
     u = ig.allocate('random_int')
-    tau = 10
+    tau = 2
     
     f = IndicatorBox(2, 3)
     
     lower = 10
     upper = 30
+        
+    z1 = f.proximal(u, tau)
     
-    x = u
+    z2 = f.proximal_conjugate(u/tau, 1/tau)
     
-    z1 = (x.maximum(lower)).minimum(upper)
+    z = z1 + tau * z2
     
-    z2 = x - tau * ((x/tau).maximum(lower)).minimum(upper)
-    
-    z = z1 + z2/tau
-    
-    print(z.array, x.array)
-    
-    
-#    prox = f.proximal(u, tau)
-#    prox_conj = f.proximal_conjugate(u/tau, tau) 
-#    
-#    
-#    z = prox + tau * prox_conj
-#    print(z.as_array(), u.array)
-    
-    
-#    x - tau * ((x/tau).maximum(self.lower)).minimum(self.upper) + 
-            
-            
-            
+    numpy.testing.assert_array_equal(z.as_array(), u.as_array())  
 
-
-                
-            
-            
+    out1 = ig.allocate()
+    out2 = ig.allocate()
+    
+    f.proximal(u, tau, out=out1)
+    f.proximal_conjugate(u/tau, 1/tau, out = out2)
+    
+    p = out1 + tau * out2
+    
+    numpy.testing.assert_array_equal(p.as_array(), u.as_array()) 
+    
+    
+    
+    
     

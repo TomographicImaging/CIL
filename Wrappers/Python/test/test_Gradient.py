@@ -98,4 +98,4 @@ class TestGradient(unittest.TestCase):
         G4 = Gradient(ig4, correlation=Gradient.CORRELATION_SPACECHANNEL)
         norm4 = G4.norm(iterations=300)
         print ("should be sqrt(12) {} {}".format(numpy.sqrt(12), norm4))
-        numpy.testing.assert_almost_equal(norm4, numpy.sqrt(12), decimal=1)
+        self.assertTrue((norm4 - numpy.sqrt(12))/norm4 < 0.2)

@@ -67,6 +67,8 @@ path_library3D = os.path.join(path, "Phantom3DLibrary.dat")
 #This will generate a N x N x N phantom (3D)
 phantom_tm = TomoP3D.Model(model, N, path_library3D)
 
+#%%
+
 # Create noisy data. Add Gaussian noise
 ig = ImageGeometry(voxel_num_x=N, voxel_num_y=N, voxel_num_z=N)
 ag = ig
@@ -89,6 +91,7 @@ plt.title('Sagittal View')
 plt.colorbar()
 plt.show()   
 
+#%%
 
 # Regularisation Parameter
 alpha = 0.05

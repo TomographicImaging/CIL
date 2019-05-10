@@ -6,10 +6,10 @@ This software product is developed for the Collaborative Computational
 Project in Tomographic Imaging CCPi (http://www.ccpi.ac.uk/) at RAL STFC (http://www.stfc.ac.uk), University of Manchester
 and other contributing institutions.
 
-Main contributors:
-Edoardo Pasca (STFC)
-Jakob Jorgensen (UoM)
-Evangelos Papoutsellis (UoM)
+Main contributors in alphabetical order:
 Evelina Ametova (UoM)
+Jakob Jorgensen (UoM)
 Daniil Kazantsev (Diamond Light Source)
-Gemma Fardell (STFC)
+Srikanth Nagella (STFC)
+Edoardo Pasca (STFC)
+Evangelos Papoutsellis (UoM)

@@ -110,10 +110,11 @@ class Gradient(LinearOperator):
     def range_geometry(self):
         return self.gm_range
                                    
-    def norm(self):
+    def norm(self, **kwargs):
 
         x0 = self.gm_domain.allocate('random')
-        self.s1, sall, svec = LinearOperator.PowerMethod(self, 10, x0)
+        iterations = kwargs.get('iterations', 10)
+        self.s1, sall, svec = LinearOperator.PowerMethod(self, iterations, x0)
         return self.s1
     
     def __rmul__(self, scalar):
@@ -160,14 +161,21 @@ if __name__ == '__main__':
     from ccpi.optimisation.operators import Identity, BlockOperator
     
     
-    M, N = 2, 3
+    M, N = 20, 30
     ig = ImageGeometry(M, N)
     arr = ig.allocate('random_int' )
     
     # check direct of Gradient and sparse matrix
     G = Gradient(ig)
+    norm1 = G.norm(iterations=300)
+    print ("should be sqrt(8) {} {}".format(numpy.sqrt(8), norm1))
     G_sp = G.matrix()
+    ig4 = ImageGeometry(M,N, channels=3)
+    G4 = Gradient(ig4, correlation=Gradient.CORRELATION_SPACECHANNEL)
+    norm4 = G4.norm(iterations=300)
+    print ("should be sqrt(12) {} {}".format(numpy.sqrt(12), norm4))
     
+
     res1 = G.direct(arr)
     res1y = numpy.reshape(G_sp[0].toarray().dot(arr.as_array().flatten('F')), ig.shape, 'F')
     

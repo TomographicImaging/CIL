@@ -54,7 +54,7 @@ import os, sys
 loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
 
 # Load Data                      
-N = 256
+N = 200
 M = 300
 
 
@@ -65,7 +65,7 @@ M = 300
 # TestData.CAMERA 2D
 # TestData.RESOLUTION_CHART 2D 
 # TestData.SIMPLE_PHANTOM_2D 2D
-data = loader.load(TestData.PEPPERS, size=(N,M), scale=(0,1))
+data = loader.load(TestData.BOAT, size=(N,M), scale=(0,1))
 
 ig = data.geometry
 ag = ig
@@ -212,9 +212,9 @@ if cvx_not_installable:
     plt.colorbar()
     plt.show()    
     
-    plt.plot(np.linspace(0,N,N), pdhg.get_output().as_array()[int(N/2),:], label = 'PDHG')
-    plt.plot(np.linspace(0,N,N), u.value[int(N/2),:], label = 'CVX')
-    plt.plot(np.linspace(0,N,N), data.as_array()[int(N/2),:], label = 'Truth')
+    plt.plot(np.linspace(0,N,M), pdhg.get_output().as_array()[int(N/2),:], label = 'PDHG')
+    plt.plot(np.linspace(0,N,M), u.value[int(N/2),:], label = 'CVX')
+    plt.plot(np.linspace(0,N,M), data.as_array()[int(N/2),:], label = 'Truth')
     
     plt.legend()
     plt.title('Middle Line Profiles')

@@ -27,8 +27,8 @@ import matplotlib.pyplot as plt
 
 from ccpi.optimisation.algorithms import PDHG
 
-from ccpi.optimisation.operators import BlockOperator, Gradient, Identity
-from ccpi.optimisation.functions import ZeroFunction, KullbackLeibler, \
+from ccpi.optimisation.operators import BlockOperator, Gradient
+from ccpi.optimisation.functions import KullbackLeibler, \
                       MixedL21Norm, BlockFunction, IndicatorBox
 
 from ccpi.astra.ops import AstraProjectorSimple
@@ -68,6 +68,14 @@ detectors = N
 angles = np.linspace(0, np.pi, N)
 
 ag = AcquisitionGeometry('parallel','2D',angles, detectors)
+
+device = input('Available device: GPU==1 / CPU==0 ')
+
+if device=='1':
+    dev = 'gpu'
+else:
+    dev = 'cpu'
+
 Aop = AstraProjectorSimple(ig, ag, 'cpu')
 sin = Aop.direct(data)
 

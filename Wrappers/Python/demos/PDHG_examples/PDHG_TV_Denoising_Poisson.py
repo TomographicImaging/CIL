@@ -49,7 +49,7 @@ import matplotlib.pyplot as plt
 from ccpi.optimisation.algorithms import PDHG
 
 from ccpi.optimisation.operators import BlockOperator, Identity, Gradient
-from ccpi.optimisation.functions import ZeroFunction, KullbackLeibler, \
+from ccpi.optimisation.functions import ZeroFunction, KullbackLeibler, IndicatorBox, \
                       MixedL21Norm, BlockFunction
 
 from skimage.util import random_noise
@@ -70,7 +70,7 @@ noisy_data = ImageData(n1)
 
 
 # Show Ground Truth and Noisy Data
-plt.figure(figsize=(15,15))
+plt.figure(figsize=(10,10))
 plt.subplot(2,1,1)
 plt.imshow(data.as_array())
 plt.title('Ground Truth')
@@ -81,7 +81,6 @@ plt.title('Noisy Data')
 plt.colorbar()
 plt.show()
 
-#%%
 
 # Regularisation Parameter
 alpha = 2
@@ -101,9 +100,8 @@ if method == '0':
       
     f1 = alpha * MixedL21Norm()
     f2 = KullbackLeibler(noisy_data)    
-    f = BlockFunction(f1, f2)  
-                                      
-    g = ZeroFunction()
+    f = BlockFunction(f1, f2)                                        
+    g = IndicatorBox(lower=0)
     
 else:
     
@@ -124,7 +122,7 @@ tau = 1/(sigma*normK**2)
 pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
 pdhg.max_iteration = 3000
 pdhg.update_objective_interval = 200
-pdhg.run(3000, verbose=False)
+pdhg.run(3000, verbose=True)
 
 
 plt.figure(figsize=(15,15))
@@ -165,16 +163,17 @@ if cvx_not_installable:
     ##Construct problem    
     u1 = Variable(ig.shape)
     q = Variable()
+    w = Variable()
     
     DY = SparseFiniteDiff(ig, direction=0, bnd_cond='Neumann')
     DX = SparseFiniteDiff(ig, direction=1, bnd_cond='Neumann')
     
     # Define Total Variation as a regulariser
-    regulariser = alpha * sum(norm(vstack([DX.matrix() * vec(u1), DY.matrix() * vec(u1)]), 2, axis = 0))
+    regulariser = alpha * sum(norm(vstack([DX.matrix() * vec(u1), DY.matrix() * vec(u1)]), 2, axis = 0))    
+    fidelity = sum(kl_div(noisy_data.as_array(), u1)) 
     
-    fidelity = sum( u1 - multiply(noisy_data.as_array(), log(u1)) )
-    constraints = [q>= fidelity, u1>=0]
-        
+    constraints = [q>=fidelity, u1>=0]    
+    
     solver = ECOS
     obj =  Minimize( regulariser +  q)
     prob = Problem(obj, constraints)

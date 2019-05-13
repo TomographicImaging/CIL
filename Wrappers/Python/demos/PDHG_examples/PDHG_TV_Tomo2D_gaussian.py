@@ -35,7 +35,7 @@ Problem:     min_x, x>0  \alpha * ||\nabla x||_{2,1} + \frac{1}{2}||Ax - g||^{2}
  
 """
 
-from ccpi.framework import ImageData, ImageGeometry, AcquisitionGeometry, AcquisitionData
+from ccpi.framework import ImageData, ImageGeometry, AcquisitionGeometry, AcquisitionData, TestData
 
 import numpy as np 
 import numpy                          
@@ -47,48 +47,97 @@ from ccpi.optimisation.operators import BlockOperator, Gradient
 from ccpi.optimisation.functions import ZeroFunction, L2NormSquared, \
                       MixedL21Norm, BlockFunction
 
-from ccpi.astra.ops import AstraProjectorSimple
+from ccpi.astra.operators import AstraProjectorSimple
+import sys, os
+
+# Create phantom for TV Gaussian denoising
+import tomophantom
+from tomophantom import TomoP2D
+
+import sys
+if int(numpy.version.version.split('.')[1]) > 12:
+    from skimage.util import random_noise
+else:
+    from demoutil import random_noise
 
 
+if len(sys.argv) > 1:
+    which_noise = int(sys.argv[1])
+else:
+    which_noise = 0
 
 # Create phantom for TV 2D tomography 
 N = 100
-x = np.zeros((N,N))
-x[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
-x[round(N/8):round(7*N/8),round(3*N/8):round(5*N/8)] = 1
+loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
+data = loader.load(TestData.SIMPLE_PHANTOM_2D, size=(N,N))
+ig = data.geometry
 
-data = ImageData(x)
-ig = ImageGeometry(voxel_num_x = N, voxel_num_y = N)
+detectors = int( N * numpy.sqrt(2) )
+angles = np.linspace(0, 180., N, dtype=numpy.float32)
 
-detectors = N
-angles = np.linspace(0, np.pi, N)
+ag = AcquisitionGeometry('parallel','2D',angles / 180. * numpy.pi, detectors)
 
-ag = AcquisitionGeometry('parallel','2D',angles, detectors)
 
+print ("Building 2D phantom using TomoPhantom software")
+model = 1 # select a model number from the library
+#N = 64 # Define phantom dimensions using a scalar value (cubic phantom)
+path = os.path.dirname(tomophantom.__file__)
+path_library = os.path.join(path, "Phantom2DLibrary.dat")
+
+#This will generate a N x N x N phantom (3D)
+phantom_tm = TomoP2D.ModelSino(model, N, detectors, angles, path_library)
+
+# Create noisy data. 
+# Apply Salt & Pepper noise
+# gaussian
+# poisson
+noises = ['gaussian', 'poisson', 's&p']
+noise = noises[which_noise]
+if noise == 's&p':
+    n1 = random_noise(phantom_tm, mode = noise, salt_vs_pepper = 0.9, amount=0.2)
+elif noise == 'poisson':
+    n1 = random_noise(phantom_tm, mode = noise, seed = 10)
+elif noise == 'gaussian':
+    n1 = random_noise(phantom_tm, mode = noise, seed = 10)
+else:
+    raise ValueError('Unsupported Noise ', noise)
+#phantom_tm = ImageData(n1)
+phantom_tm += n1
+#%%
 device = input('Available device: GPU==1 / CPU==0 ')
 
+#sin = ag.allocate()
+data = ImageData(TomoP2D.Model(1, N, path_library))
 if device=='1':
     dev = 'gpu'
 else:
     dev = 'cpu'
     
 Aop = AstraProjectorSimple(ig, ag, dev)
-sin = Aop.direct(data)
+sinastra = Aop.direct(data)
 
 # Create noisy data. Apply Poisson noise
-n1 = np.random.normal(0, 3, size=ig.shape)
-noisy_data = AcquisitionData(n1 + sin.as_array(), ag)
+#n1 = np.random.normal(0, 3, size=ig.shape)
+#np.random.normal(0, 3, size=ag.shape)
+noisy_data = ag.allocate()
+noisy_data.fill(phantom_tm)
+#noisy_data = sin
 
 # Show Ground Truth and Noisy Data
 plt.figure(figsize=(10,10))
-plt.subplot(2,1,1)
+plt.subplot(1,3,1)
 plt.imshow(data.as_array())
 plt.title('Ground Truth')
 plt.colorbar()
-plt.subplot(2,1,2)
+plt.subplot(1,3,2)
 plt.imshow(noisy_data.as_array())
 plt.title('Noisy Data')
 plt.colorbar()
+plt.subplot(1,3,3)
+plt.imshow(sinastra.as_array())
+plt.title('Astra Sinogram')
+plt.colorbar()
+
 plt.show()
 
 # Regularisation Parameter
@@ -122,16 +171,16 @@ pdhg.max_iteration = 2000
 pdhg.update_objective_interval = 200
 pdhg.run(2000)
 
-plt.figure(figsize=(15,15))
-plt.subplot(3,1,1)
+plt.figure(figsize=(15,5))
+plt.subplot(1,3,1)
 plt.imshow(data.as_array())
 plt.title('Ground Truth')
 plt.colorbar()
-plt.subplot(3,1,2)
+plt.subplot(1,3,2)
 plt.imshow(noisy_data.as_array())
 plt.title('Noisy Data')
 plt.colorbar()
-plt.subplot(3,1,3)
+plt.subplot(1,3,3)
 plt.imshow(pdhg.get_output().as_array())
 plt.title('TV Reconstruction')
 plt.colorbar()

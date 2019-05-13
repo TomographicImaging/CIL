@@ -25,7 +25,6 @@ class BlockFunction(Function):
         self.functions = functions      
         self.length = len(self.functions)
         
-        self.L = self.functions.L
         
         
         

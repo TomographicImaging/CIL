@@ -48,9 +48,12 @@ from ccpi.optimisation.algorithms import PDHG
 from ccpi.optimisation.operators import BlockOperator, Identity, Gradient
 from ccpi.optimisation.functions import ZeroFunction, L2NormSquared, \
                       MixedL21Norm, BlockFunction
-
-from skimage.util import random_noise
-
+import numpy
+if int(numpy.version.version.split('.')[1]) > 12:
+    from skimage.util import random_noise
+    skimage_working = True
+else:
+    skimage_working = False
 # Create phantom for TV Gaussian denoising
 import timeit
 import os
@@ -72,7 +75,10 @@ phantom_tm = TomoP3D.Model(model, N, path_library3D)
 # Create noisy data. Add Gaussian noise
 ig = ImageGeometry(voxel_num_x=N, voxel_num_y=N, voxel_num_z=N)
 ag = ig
-n1 = random_noise(phantom_tm, mode = 'gaussian', mean=0, var = 0.001, seed=10)
+if not skimage_working:
+    n1 = phantom_tm + numpy.random.normal(0, 0.1, size=phantom_tm.shape)
+else:
+    n1 = random_noise(phantom_tm, mode = 'gaussian', mean=0, var = 0.001, seed=10)
 noisy_data = ImageData(n1)
 
 sliceSel = int(0.5*N)

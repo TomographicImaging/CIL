@@ -31,7 +31,7 @@ from ccpi.optimisation.operators import BlockOperator, Gradient, Identity
 from ccpi.optimisation.functions import ZeroFunction, L2NormSquared, \
                       MixedL21Norm, BlockFunction
 
-from ccpi.astra.ops import AstraProjectorMC
+from ccpi.astra.operators import AstraProjectorMC
 
 import os
 import tomophantom

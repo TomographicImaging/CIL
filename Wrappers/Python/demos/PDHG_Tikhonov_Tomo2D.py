@@ -50,6 +50,8 @@ from ccpi.optimisation.operators import BlockOperator, Gradient
 from ccpi.optimisation.functions import IndicatorBox, L2NormSquared, BlockFunction
 from skimage.util import random_noise
 from ccpi.astra.ops import AstraProjectorSimple
+from ccpi.framework import TestData
+import os, sys
 
 loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
 
@@ -97,9 +99,9 @@ plt.title('Noisy Data')
 plt.colorbar()
 plt.show()
 
-#%%
+
 # Regularisation Parameter
-alpha = 100
+alpha = 500
 
 # Create operators
 op1 = Gradient(ig)

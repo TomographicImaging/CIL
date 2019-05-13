@@ -60,7 +60,7 @@ class IndicatorBox(Function):
         
         if out is None:
             return (x.maximum(self.lower)).minimum(self.upper)        
-        else:                   
+        else:               
             x.maximum(self.lower, out=out)
             out.minimum(self.upper, out=out) 
             

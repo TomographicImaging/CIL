@@ -27,7 +27,7 @@ from ccpi.optimisation.algorithms import PDHG
 
 from ccpi.optimisation.operators import BlockOperator, Gradient, Identity, \
                                     SymmetrizedGradient, ZeroOperator
-from ccpi.optimisation.functions import ZeroFunction, KullbackLeibler, \
+from ccpi.optimisation.functions import ZeroFunction, IndicatorBox, KullbackLeibler, \
                       MixedL21Norm, BlockFunction
 
 from ccpi.astra.ops import AstraProjectorSimple
@@ -84,13 +84,16 @@ f1 = alpha * MixedL21Norm()
 f2 = beta * MixedL21Norm() 
 f3 = KullbackLeibler(noisy_data)    
 f = BlockFunction(f1, f2, f3)         
-g = ZeroFunction()
+
+g =  BlockFunction(-1 * IndicatorBox(lower=0), ZeroFunction())
+#g = IndicatorBox(lower=0)
+#g = ZeroFunction()
     
 # Compute operator Norm
 normK = operator.norm()
 
 # Primal & dual stepsizes
-sigma = 1
+sigma = 10
 tau = 1/(sigma*normK**2)
 
 

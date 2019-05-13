@@ -46,6 +46,8 @@ class NikonDataReader(object):
             normalize       normalize loaded projections by detector 
                             white level (I_0). Default value is False, 
                             i.e. no normalization.
+                            
+            flip            default = False, flip projections in the left-right direction
                     
         '''
         
@@ -53,23 +55,27 @@ class NikonDataReader(object):
         self.roi = kwargs.get('roi', -1)
         self.binning = kwargs.get('binning', [1, 1])
         self.normalize = kwargs.get('normalize', False)
+        self.flip = kwargs.get('flip', False)
         
         if self.xtek_file is not None:
             self.set_up(xtek_file = self.xtek_file,
                         roi = self.roi,
                         binning = self.binning,
-                        normalize = self.normalize)
+                        normalize = self.normalize,
+                        flip = self.flip)
             
     def set_up(self, 
                xtek_file = None, 
                roi = -1, 
                binning = [1, 1],
-               normalize = False):
+               normalize = False,
+               flip = False):
         
         self.xtek_file = xtek_file
         self.roi = roi
         self.binning = binning
         self.normalize = normalize
+        self.flip = flip
         
         if self.xtek_file == None:
             raise Exception('Path to xtek file is required.')
@@ -222,7 +228,7 @@ class NikonDataReader(object):
                                        channels = 1,
                                        angle_unit = 'degree')
 
-    def get_acquisition_geometry(self):
+    def get_geometry(self):
         '''
         Return AcquisitionGeometry object
         '''
@@ -276,13 +282,21 @@ class NikonDataReader(object):
         if (self.normalize):
             data /= self._white_level
             data[data > 1] = 1
-            
-        return AcquisitionData(array = data, 
-                               deep_copy = False,
-                               geometry = self._ag,
-                               dimension_labels = ['angle', \
-                                                   'vertical', \
-                                                   'horizontal'])
+        
+        if self.flip:
+            return AcquisitionData(array = data[:, :, ::-1], 
+                                   deep_copy = False,
+                                   geometry = self._ag,
+                                   dimension_labels = ['angle', \
+                                                       'vertical', \
+                                                       'horizontal'])
+        else:
+            return AcquisitionData(array = data, 
+                                   deep_copy = False,
+                                   geometry = self._ag,
+                                   dimension_labels = ['angle', \
+                                                       'vertical', \
+                                                       'horizontal'])
 
 
 '''
@@ -293,10 +307,11 @@ reader = NikonDataReader()
 reader.set_up(xtek_file = xtek_file,
               binning = [3, 1],
               roi = [200, 500, 1500, 2000],
-              normalize = True)
+              normalize = True,
+              flip = True)
 
 data = reader.load_projections()
-ag = reader.get_acquisition_geometry()
+ag = reader.get_geometry()
 print(ag)
 
 plt.imshow(data.as_array()[1, :, :])

@@ -38,30 +38,25 @@ Problem:     min_{x} \alpha * ||\nabla x||_{2,1} + \frac{1}{2} * || x - g ||_{2}
              Method = 1 (PDHG - explicit ):  K = \nabla  
                                                                 
 """
+import os
 
 from ccpi.framework import ImageData, ImageGeometry
-                         
-import matplotlib.pyplot as plt
-
 from ccpi.optimisation.algorithms import PDHG
-
 from ccpi.optimisation.operators import BlockOperator, Identity, Gradient
 from ccpi.optimisation.functions import ZeroFunction, L2NormSquared, \
                       MixedL21Norm, BlockFunction
 import numpy
+import matplotlib.pyplot as plt
 if int(numpy.version.version.split('.')[1]) > 12:
     from skimage.util import random_noise
-    skimage_working = True
 else:
-    skimage_working = False
+    from demoutil import random_noise
+
 # Create phantom for TV Gaussian denoising
-import timeit
-import os
-from tomophantom import TomoP3D
 import tomophantom
+from tomophantom import TomoP3D
 
 print ("Building 3D phantom using TomoPhantom software")
-tic=timeit.default_timer()
 model = 13 # select a model number from the library
 N = 64 # Define phantom dimensions using a scalar value (cubic phantom)
 path = os.path.dirname(tomophantom.__file__)
@@ -75,11 +70,9 @@ phantom_tm = TomoP3D.Model(model, N, path_library3D)
 # Create noisy data. Add Gaussian noise
 ig = ImageGeometry(voxel_num_x=N, voxel_num_y=N, voxel_num_z=N)
 ag = ig
-if not skimage_working:
-    n1 = phantom_tm + numpy.random.normal(0, 0.1, size=phantom_tm.shape)
-else:
-    n1 = random_noise(phantom_tm, mode = 'gaussian', mean=0, var = 0.001, seed=10)
-noisy_data = ImageData(n1)
+
+n1 = random_noise(phantom_tm, mode = 'gaussian', mean=0, var = 0.001, seed=10)
+noisy_data = ImageData(n1, geometry=ig)
 
 sliceSel = int(0.5*N)
 plt.figure(figsize=(15,15))

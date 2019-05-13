@@ -33,9 +33,19 @@ from ccpi.optimisation.functions import ZeroFunction, L2NormSquared, \
 
 from ccpi.astra.operators import AstraProjectorMC
 
-import os
+if int(numpy.version.version.split('.')[1]) > 12:
+    from skimage.util import random_noise
+else:
+    from demoutil import random_noise
+
+import os ,sys
 import tomophantom
 from tomophantom import TomoP2D
+
+if len(sys.argv) > 1:
+    which_noise = int(sys.argv[1])
+else:
+    which_noise = 0
 
 # Create phantom for TV 2D dynamic tomography 
 
@@ -64,8 +74,24 @@ data = ImageData(phantom_2Dt, geometry=ig)
 ag = ig
                       
 # Create Noisy data. Add Gaussian noise
-np.random.seed(10)
-noisy_data = ImageData( data.as_array() + np.random.normal(0, 0.25, size=ig.shape) )
+# Create noisy data. 
+# Apply Salt & Pepper noise
+# gaussian
+# poisson
+noises = ['gaussian', 'poisson', 's&p']
+noise = noises[which_noise]
+if noise == 's&p':
+    n1 = random_noise(data.as_array(), mode = noise, salt_vs_pepper = 0.9, amount=0.2)
+elif noise == 'poisson':
+    n1 = random_noise(data.as_array(), mode = noise, seed = 10)
+elif noise == 'gaussian':
+    n1 = random_noise(data.as_array(), mode = noise, seed = 10, var = 0.25*0.25)
+else:
+    raise ValueError('Unsupported Noise ', noise)
+noisy_data = ImageData(n1)
+
+#np.random.seed(10)
+#noisy_data = ImageData( data.as_array() + np.random.normal(0, 0.25, size=ig.shape) )
 
 tindex = [3, 6, 10]
 

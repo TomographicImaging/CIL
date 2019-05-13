@@ -6,7 +6,6 @@ Created on Wed Apr  3 10:30:25 2019
 @author: evelina
 """
 
-
 from ccpi.framework import AcquisitionData, AcquisitionGeometry
 import numpy
 import matplotlib.pyplot as plt
@@ -279,6 +278,7 @@ class NikonDataReader(object):
             data[data > 1] = 1
             
         return AcquisitionData(array = data, 
+                               deep_copy = False,
                                geometry = self._ag,
                                dimension_labels = ['angle', \
                                                    'vertical', \

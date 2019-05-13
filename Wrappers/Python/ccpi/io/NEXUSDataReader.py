@@ -10,7 +10,7 @@ Created on Wed Apr  3 10:30:25 2019
 import numpy
 import os
 import matplotlib.pyplot as plt
-from ccpi.framework import AcquisitionData, AcquisitionGeometry
+from ccpi.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
 
 
 h5pyAvailable = True
@@ -31,59 +31,24 @@ class NEXUSDataReader(object):
         Input:
             
             nexus_file      full path to NEXUS file
-            
-            roi             region-of-interest to load. If roi = -1 (default), 
-                            full projections will be loaded. Otherwise roi is 
-                            given by [row0, column0, row1, column1], where 
-                            row0, column0 are coordinates of top left corner and 
-                            row1, column1 are coordinates of bottom right corner.
-                            
-            binning         number of pixels to bin (combine) along 0 (column) 
-                            and 1 (row) dimension. If binning = [1, 1] (default),
-                            projections in original resolution are loaded. Note, 
-                            if binning[0] != binning[1], then loaded projections
-                            will have anisotropic pixels, which are currently not 
-                            supported by the Framework
         '''
         
         self.nexus_file = kwargs.get('nexus_file', None)
-        self.pixel_size_h_0 = kwargs.get('pixel_size_h_0', 1)
-        self.pixel_size_v_0 = kwargs.get('pixel_size_v_0', 1)
-        self.key_path = kwargs.get('key_path', 'entry1/tomo_entry/instrument/detector/image_key')
-        self.data_path = kwargs.get('data_path', 'entry1/tomo_entry/data/data')
-        self.angle_path =  kwargs.get('angle_path', 'entry1/tomo_entry/data/rotation_angle')
-        self.roi = kwargs.get('roi', -1)
-        self.binning = kwargs.get('binning', [1, 1])
         
         if self.nexus_file is not None:
             self.set_up(nexus_file = self.nexus_file,
-                        pixel_size_h_0 = self.pixel_size_h_0,
-                        pixel_size_v_0 = self.pixel_size_v_0,
-                        key_path = self.key_path,
-                        data_path = self.data_path,
-                        angle_path = self.angle_path,
                         roi = self.roi,
                         binning = self.binning)
             
     def set_up(self, 
-               nexus_file = None, 
-               pixel_size_h_0 = 1,
-               pixel_size_v_0 = 1,
-               key_path = 'entry1/tomo_entry/instrument/detector/image_key',
-               data_path = 'entry1/tomo_entry/data/data',
-               angle_path = 'entry1/tomo_entry/data/rotation_angle',
-               roi = -1, 
-               binning = [1, 1]):
+               nexus_file = None):
         
         self.nexus_file = nexus_file
-        self.pixel_size_h_0 = pixel_size_h_0
-        self.pixel_size_v_0 = pixel_size_v_0
-        self.key_path = key_path
-        self.data_path = data_path
-        self.angle_path = angle_path
-        self.roi = roi
-        self.binning = binning
         
+        # check that h5py library is installed
+        if (h5pyAvailable == False):
+            raise Exception('h5py is not available, cannot load NEXUS files.')
+            
         if self.nexus_file == None:
             raise Exception('Path to nexus file is required.')
         
@@ -91,211 +56,65 @@ class NEXUSDataReader(object):
         if not(os.path.isfile(self.nexus_file)):
             raise Exception('File\n {}\n does not exist.'.format(self.nexus_file))  
         
-        # check ROI
-        if (self.roi != -1): 
-            if not ((isinstance(self.roi, list)) or 
-                    (len(self.roi) == 4) or 
-                    (self.roi[0] < self.roi[2]) or 
-                    (self.roi[1] < self.roi[3])):
-                raise Exception('Not valid ROI. ROI must be defined as ' +
-                                '[row0, column0, row1, column1], such that ' +
-                                '((row0 < row1) and (column0 < column1)).')
-        
-        # check binning parameters
-        if (not(isinstance(self.binning, list)) or 
-            (len(self.binning) != 2)):
-            raise Exception('Not valid binning parameters. ' +
-                            'Binning must be defined as [int, int].')
-        
-        # check that h5py library is installed
-        if (h5pyAvailable == False):
-            raise Exception('h5py is not available, cannot read NEXUS files.')
-        
-        # read metadata
-        try:
-            with h5py.File(self.nexus_file,'r') as file:        
-                self._image_keys = numpy.array(file[self.key_path])                
-                angles = numpy.array(file[self.angle_path], dtype = float)[self._image_keys == 0]
-                pixel_num_v_0, pixel_num_h_0 =  file['entry1/tomo_entry/data/data/'].shape[1:]
-        except:
-            print('Error reading NEXUS file\n{}'.format(self.nexus_file))
-            raise
-        
-        if (self.roi != -1): 
-            if ((self.roi[0] < 0) or
-                (self.roi[1] < 0) or
-                (self.roi[2] > pixel_num_v_0) or 
-                (self.roi[3] > pixel_num_h_0)):
-                raise Exception('ROI is out of range. Image size is (v{} x h{}).'\
-                                .format(pixel_num_v_0, pixel_num_h_0))
-        
-        # calculate number of pixels and pixel size
-        if ((self.binning == [1, 1]) and (self.roi == -1)):
-            pixel_num_v = pixel_num_v_0
-            pixel_num_h = pixel_num_h_0
-            pixel_size_v = pixel_size_v_0
-            pixel_size_h = pixel_size_h_0
-            
-        elif ((self.binning == [1, 1]) and (self.roi != -1)):
-            pixel_num_v = self.roi[2] - self.roi[0]
-            pixel_num_h = self.roi[3] - self.roi[1]
-            pixel_size_v = pixel_size_v_0
-            pixel_size_h = pixel_size_h_0
-            
-        elif ((self.binning > [1, 1]) and (self.roi == -1)):
-            pixel_num_v = pixel_num_v_0 // self.binning[0]
-            pixel_num_h = pixel_num_h_0 // self.binning[1]
-            pixel_size_v = pixel_size_v_0 * self.binning[0]
-            pixel_size_h = pixel_size_h_0 * self.binning[1]
-            
-        elif ((self.binning > [1, 1]) and (self.roi != -1)):
-            pixel_num_v = (self.roi[2] - self.roi[0]) // self.binning[0]
-            pixel_num_h = (self.roi[3] - self.roi[1]) // self.binning[1]
-            pixel_size_v = pixel_size_v_0 * self.binning[0]
-            pixel_size_h = pixel_size_h_0 * self.binning[1]
-            
-        if (pixel_num_v > 1):
-            self._ag = AcquisitionGeometry(geom_type = 'parallel', 
-                                       dimension = '3D', 
-                                       angles = angles, 
-                                       pixel_num_h = pixel_num_h, 
-                                       pixel_size_h = pixel_size_h, 
-                                       pixel_num_v = pixel_num_v, 
-                                       pixel_size_v = pixel_size_v,
-                                       channels = 1,
-                                       angle_unit = 'degree')
-        else:
-            self._ag = AcquisitionGeometry(geom_type = 'parallel', 
-                                       dimension = '2D', 
-                                       angles = angles, 
-                                       pixel_num_h = pixel_num_h, 
-                                       pixel_size_h = pixel_size_h, 
-                                       pixel_num_v = pixel_num_v, 
-                                       pixel_size_v = pixel_size_v,
-                                       channels = 1,
-                                       angle_unit = 'degree')
-    
-    def get_acquisition_geometry(self):
-        '''
-        Return AcquisitionGeometry object
-        '''
-        
-        return self._ag
-    
-    def load_projections(self):
-        '''
-        Load projections and returns AcquisitionData object
-        '''
-        
-        if 0 not in self._image_keys:
-            raise ValueError('Projections are not in the data. Data Path ', self._data_path)
-        
-        data = self._load(0)
-        
-        return AcquisitionData(array = data, 
-                               geometry = self._ag,
-                               dimension_labels = ['angle', \
-                                                   'vertical', \
-                                                   'horizontal'])
-        
-    def load_flat_images(self):
-        '''
-        Load flat field images and returns numpy array
-        '''
-        
-        if 1 not in self._image_keys:
-            raise ValueError('Flat field images are not in the data. Data Path ', self._data_path)
-        
-        data = self._load(1)
-        
-        return data
-    
-    def load_dark_images(self):
-        '''
-        Load dark field images and returns numpy array
-        '''
-        
-        if 2 not in self._image_keys:
-            raise ValueError('Dark field images are not in the data. Data Path ', self._data_path)
-        
-        data = self._load(2)
-        
-        return data
-    
-    def _load(self, key_id = 0):
-        '''
-        Generic loader for projections, flat and dark images. Returns numpy array.
-        '''
+    def load_data(self):
         
         try:
             with h5py.File(self.nexus_file,'r') as file:
-                if ((self.binning == [1, 1]) and (self.roi == -1)):
-                    data = numpy.array(file[self.data_path][self._image_keys == key_id, :, :])
+                ds_data = file['entry1/tomo_entry/data/data']
+                data = numpy.array(ds_data, dtype = 'float32')
                 
-                elif ((self.binning == [1, 1]) and (self.roi != -1)):
-                    data = numpy.array(file[self.data_path][self._image_keys == key_id, self.roi[0]:self.roi[2], self.roi[1]:self.roi[3]])
+                dimension_labels = []
                 
-                elif ((self.binning > [1, 1]) and (self.roi == -1)):
-                    shape = (len(self._image_keys[self._image_keys == key_id]),
-                             self._ag.pixel_num_v, self.binning[0], 
-                             self._ag.pixel_num_h, self.binning[1])
-                    data = numpy.array(file[self.data_path][self._image_keys == key_id, \
-                                                            :(self._ag.pixel_num_v * self.binning[0]), \
-                                                            :(self._ag.pixel_num_h * self.binning[1])]).reshape(shape).mean(-1).mean(2)
+                for i in range(data.ndim):
+                    dimension_labels.append(ds_data.attrs['dim{}'.format(i)])
                 
-                elif ((self.binning > [1, 1]) and (self.roi != -1)):
-                    shape = (len(self._image_keys[self._image_keys == key_id]),
-                             self._ag.pixel_num_v, self.binning[0], 
-                             self._ag.pixel_num_h, self.binning[1])
-                    data = numpy.array(file[self.data_path])[self._image_keys == key_id, \
-                                                             self.roi[0]:(self.roi[0] + (((self.roi[2] - self.roi[0]) // self.binning[0]) * self.binning[0])), \
-                                                             self.roi[1]:(self.roi[1] + (((self.roi[3] - self.roi[1]) // self.binning[1]) * self.binning[1]))].reshape(shape).mean(-1).mean(2)
+                if ds_data.attrs['data_type'] == 'ImageData':
+                    self._geometry = ImageGeometry(voxel_num_x = ds_data.attrs['voxel_num_x'],
+                                                   voxel_num_y = ds_data.attrs['voxel_num_y'],
+                                                   voxel_num_z = ds_data.attrs['voxel_num_z'],
+                                                   voxel_size_x = ds_data.attrs['voxel_size_x'],
+                                                   voxel_size_y = ds_data.attrs['voxel_size_y'],
+                                                   voxel_size_z = ds_data.attrs['voxel_size_z'],
+                                                   center_x = ds_data.attrs['center_x'],
+                                                   center_y = ds_data.attrs['center_y'],
+                                                   center_z = ds_data.attrs['center_z'],
+                                                   channels = ds_data.attrs['channels'])
+                    
+                    return ImageData(array = data,
+                                     deep_copy = False,
+                                     geometry = self._geometry,
+                                     dimension_labels = dimension_labels)
+                    
+                else:   # AcquisitionData
+                    self._geometry = AcquisitionGeometry(geom_type = ds_data.attrs['geom_type'],
+                                                         dimension = ds_data.attrs['dimension'],
+                                                         dist_source_center = ds_data.attrs['dist_source_center'],
+                                                         dist_center_detector = ds_data.attrs['dist_center_detector'],
+                                                         pixel_num_h = ds_data.attrs['pixel_num_h'],
+                                                         pixel_size_h = ds_data.attrs['pixel_size_h'],
+                                                         pixel_num_v = ds_data.attrs['pixel_num_v'],
+                                                         pixel_size_v = ds_data.attrs['pixel_size_v'],
+                                                         channels = ds_data.attrs['channels'],
+                                                         angles = numpy.array(file['entry1/tomo_entry/data/rotation_angle'], dtype = 'float32'))
+                                                         #angle_unit = file['entry1/tomo_entry/data/rotation_angle'].attrs['units'])
+                                             
+                    return AcquisitionData(array = data,
+                                           deep_copy = False,
+                                           geometry = self._geometry,
+                                           dimension_labels = dimension_labels)
                     
         except:
-            print('Error reading NEXUS file')
+            print("Error reading nexus file")
             raise
-            
-        return data
-'''
+                
+    def get_geometry(self):
+        return self._geometry
+
+
 # usage example
-nexus_file = '/media/newhd/shared/Data/CCPi-data/CIL-demodata/24737_fd.nxs'
 reader = NEXUSDataReader()
-reader.set_up(nexus_file = nexus_file,
-              roi = [10, 30, 120, 110],
-              binning = [2, 2])
-
-ag = reader.get_acquisition_geometry()
-print(ag) 
-
-data = reader.load_projections()
-
-plt.imshow(data.as_array()[0, :, :])
-plt.show()
-
-flat = reader.load_flat_images()
-
-plt.imshow(flat[0, :, :])
-plt.show()
-
-dark = reader.load_dark_images()
-
-plt.imshow(dark[0, :, :])
-plt.show()
-'''
-import uuid
-
-with h5py.File('/media/newhd/shared/Data/CCPi-data/CIL-demodata/24737_fd.nxs', 'r') as f:  
-    print(list(f['entry1/tomo_entry/instrument/source/']))
-
-    print((f['entry1/tomo_entry/instrument/detector/x_pixel_size'][0]))
-    pixsize = f['entry1/tomo_entry/instrument/detector/x_pixel_size/']
-    print(type(pixsize))
-    print(list(pixsize))
-    '''
-    print((f['entry1/tomo_entry/instrument/detector/x_pixel_size'][0]).decode('utf-16'))
-    print((f['entry1/tomo_entry/instrument/detector/y_pixel_size'][0]))
-    print((f['entry1/tomo_entry/instrument/detector/y_pixel_size'][0]).decode())
-    for item in f['entry1/tomo_entry/instrument'].attrs.keys():
-        print(item + ":", f['entry1/tomo_entry/instrument'].attrs[item])
-    print(uuid.UUID(bytes=f['entry1/tomo_entry/instrument/detector/x_pixel_size'][0].decode(), version=4))
-    '''
+reader.set_up(nexus_file = '/home/evelina/test_nexus.nxs')
+acquisition_data = reader.load_data()
+print(acquisition_data)
+ag = reader.get_geometry()
+print(ag)

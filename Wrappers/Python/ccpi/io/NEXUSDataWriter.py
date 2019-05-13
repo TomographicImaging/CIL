@@ -31,43 +31,32 @@ class NEXUSDataWriter(object):
         self.file_name = kwargs.get('file_name', None)
         self.image_geometry = kwargs.get('image_geometry', None)
         self.acquisition_geometry = kwargs.get('acquisition_geometry', None)
-        self.flat_images = kwargs.get('flat_images', None)
-        self.dark_images = kwargs.get('dark_images', None)
         
         if ((self.data_container is not None) and (self.file_name is not None)):
             self.set_up(data_container = self.data_container,
                         file_name = self.file_name,
                         image_geometry = self.image_geometry,
-                        acquisition_geometry = self.acquisition_geometry,
-                        flat_images = self.flat_images,
-                        dark_images = self.dark_images)
+                        acquisition_geometry = self.acquisition_geometry)
         
     def set_up(self,
                data_container = None,
                file_name = None,
                image_geometry = None,
-               acquisition_geometry = None,
-               flat_images = None,
-               dark_images = None):
+               acquisition_geometry = None):
         
         self.data_container = data_container
         self.file_name = file_name
         self.image_geometry = image_geometry
         self.acquisition_geometry = acquisition_geometry
-        self.flat_images = flat_images
-        self.dark_images = dark_images
         
         if not ((isinstance(self.data_container, ImageData)) or 
-                (isinstance(self.data_container, AcquisitionData)) or 
-                ((self.flat_images is not None) and (isinstance(self.flat_images, AcquisitionData))) or
-                ((self.dark_images is not None) and (isinstance(self.dark_images, AcquisitionData)))):
+                (isinstance(self.data_container, AcquisitionData))):
             raise Exception('Writer supports only following data types:\n' +
                             ' - ImageData\n - AcquisitionData')
-            
-        if ((isinstance(self.data_container, ImageData) and 
-             ((self.flat_images is not None) or (self.dark_images is not None)))):
-            raise Exception('ImageData and flat/ dark images are not compatible.\n' +
-                            'Please pass AcquisitionData')
+        
+        # check that h5py library is installed
+        if (h5pyAvailable == False):
+            raise Exception('h5py is not available, cannot load NEXUS files.')
         
         if ((isinstance(self.data_container, ImageData)) and (self.image_geometry == None)):
             raise Exception('image_geometry is required.')
@@ -82,7 +71,7 @@ class NEXUSDataWriter(object):
             os.mkdir(os.path.dirname(self.file_name))
             
         # create the file
-        with h5py.File(self.file_name, "w") as f:
+        with h5py.File(self.file_name, 'w') as f:
             
             # give the file some important attributes
             f.attrs['file_name'] = self.file_name
@@ -130,44 +119,6 @@ class NEXUSDataWriter(object):
                                              data = self.acquisition_geometry.angles)
                 
                 #ds_angles.attrs['units'] = self.acquisition_geometry.angle_unit
-                
-                # create the dataset to store the flat images
-                if (self.flat_images is not None):
-                    ds_flat = f.create_dataset('entry1/tomo_entry/flat/data',
-                                               (self.flat_images.as_array().shape), 
-                                               dtype = 'float32', 
-                                               data = self.flat_images.as_array())
-                    
-                    ds_flat.attrs['data_type'] = 'AcquisitionData'
-                    
-                    for i in range(self.flat_images.as_array().ndim):
-                        ds_flat.attrs['dim{}'.format(i)] = self.flat_images.dimension_labels[i]
-                    
-                    ds_flat.attrs['pixel_num_h'] = self.acquisition_geometry.pixel_num_h
-                    ds_flat.attrs['pixel_size_h'] = self.acquisition_geometry.pixel_size_h
-                    ds_flat.attrs['pixel_num_v'] = self.acquisition_geometry.pixel_num_v
-                    ds_flat.attrs['pixel_size_v'] = self.acquisition_geometry.pixel_size_v
-                    ds_flat.attrs['channels'] = self.acquisition_geometry.channels
-                    ds_flat.attrs['n_flat_images'] = self.flat_images.as_array().shape[self.flat_images.dimension_labels == 'angle']
-                
-                # create the dataset to store dark images
-                if (self.dark_images is not None):
-                    ds_dark = f.create_dataset('entry1/tomo_entry/dark/data',
-                                               (self.dark_images.as_array().shape), 
-                                               dtype = 'float32', 
-                                               data = self.dark_images.as_array())
-                    
-                    ds_dark.attrs['data_type'] = 'AcquisitionData'
-                    
-                    for i in range(self.dark_images.as_array().ndim):
-                        ds_dark.attrs['dim{}'.format(i)] = self.dark_images.dimension_labels[i]
-                    
-                    ds_dark.attrs['pixel_num_h'] = self.acquisition_geometry.pixel_num_h
-                    ds_dark.attrs['pixel_size_h'] = self.acquisition_geometry.pixel_size_h
-                    ds_dark.attrs['pixel_num_v'] = self.acquisition_geometry.pixel_num_v
-                    ds_dark.attrs['pixel_size_v'] = self.acquisition_geometry.pixel_size_v
-                    ds_dark.attrs['channels'] = self.acquisition_geometry.channels
-                    ds_dark.attrs['n_dark_images'] = self.dark_images.as_array().shape[self.dark_images.dimension_labels == 'angle']
             
             else:   # ImageData
                 
@@ -193,16 +144,10 @@ reader.set_up(xtek_file = xtek_file,
 
 data = reader.load_projections()
 ag = reader.get_acquisition_geometry()
-flat = AcquisitionData(array = numpy.zeros((10,10,10), dtype = float),
-                       dimension_lables = ['angles', 'vertical', 'horizontal'])
-dark = AcquisitionData(array = numpy.zeros((10,20,30), dtype = float),
-                       dimension_lables = ['angles', 'vertical', 'horizontal'])
 
 writer = NEXUSDataWriter()
 writer.set_up(file_name = '/home/evelina/test_nexus.nxs',
               data_container = data,
-              acquisition_geometry = ag,
-              flat_images = flat,
-              dark_images = dark)
+              acquisition_geometry = ag)
 
 writer.write_file()

@@ -22,6 +22,7 @@
 
 from ccpi.optimisation.functions import Function
 import numpy
+from ccpi.framework import ImageData
 
 class IndicatorBox(Function):
     '''Box constraints indicator function. 
@@ -39,7 +40,7 @@ class IndicatorBox(Function):
         
     
     def __call__(self,x):
-        
+                
         if (numpy.all(x.array>=self.lower) and 
             numpy.all(x.array <= self.upper) ):
             val = 0
@@ -51,14 +52,15 @@ class IndicatorBox(Function):
         return ValueError('Not Differentiable') 
     
     def convex_conjugate(self,x):
-        # support function sup <x^*, x>
-        return 0 
+        # support function sup <x, z>, z \in [lower, upper]
+        # ????
+        return x.maximum(0).sum()
     
     def proximal(self, x, tau, out=None):
         
         if out is None:
             return (x.maximum(self.lower)).minimum(self.upper)        
-        else:                   
+        else:               
             x.maximum(self.lower, out=out)
             out.minimum(self.upper, out=out) 
             
@@ -78,7 +80,7 @@ class IndicatorBox(Function):
             
 if __name__ == '__main__':  
 
-    from ccpi.framework import ImageGeometry
+    from ccpi.framework import ImageGeometry, BlockDataContainer
 
     N, M = 2,3
     ig = ImageGeometry(voxel_num_x = N, voxel_num_y = M)            
@@ -108,6 +110,23 @@ if __name__ == '__main__':
     p = out1 + tau * out2
     
     numpy.testing.assert_array_equal(p.as_array(), u.as_array()) 
+    
+    d = f.convex_conjugate(u)
+    print(d)
+    
+    
+    
+    # what about n-dimensional Block
+    #uB = BlockDataContainer(u,u,u)
+    #lowerB = BlockDataContainer(1,2,3)
+    #upperB = BlockDataContainer(10,21,30)
+    
+    #fB = IndicatorBox(lowerB, upperB)
+    
+    #z1B = fB.proximal(uB, tau)
+    
+    
+    
     
     
     

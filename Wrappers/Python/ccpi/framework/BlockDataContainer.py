@@ -251,6 +251,18 @@ class BlockDataContainer(object):
         elif isinstance(other, list) or isinstance(other, numpy.ndarray):
             return type(self)(*[ el.maximum(ot, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
         return type(self)(*[ el.maximum(ot, *args, **kwargs) for el,ot in zip(self.containers,other.containers)], shape=self.shape)
+
+
+    def minimum(self,other, *args, **kwargs):
+        if not self.is_compatible(other):
+            raise ValueError('Incompatible for maximum')
+        out = kwargs.get('out', None)
+        if isinstance(other, Number):
+            return type(self)(*[ el.minimum(other, *args, **kwargs) for el in self.containers], shape=self.shape)
+        elif isinstance(other, list) or isinstance(other, numpy.ndarray):
+            return type(self)(*[ el.minimum(ot, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
+        return type(self)(*[ el.minimum(ot, *args, **kwargs) for el,ot in zip(self.containers,other.containers)], shape=self.shape)
+
     
     ## unary operations    
     def abs(self, *args,  **kwargs):

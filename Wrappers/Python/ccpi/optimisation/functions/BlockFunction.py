@@ -20,11 +20,13 @@ class BlockFunction(Function):
 
     '''
     def __init__(self, *functions):
-        
+                
+        super(BlockFunction, self).__init__()
         self.functions = functions      
         self.length = len(self.functions)
         
-        super(BlockFunction, self).__init__()
+        
+        
         
     def __call__(self, x):
         

@@ -28,7 +28,7 @@ Problem:     min_{x} \alpha * ||\nabla x - w||_{2,1} +
                      \frac{1}{2} * || x - g ||_{2}^{2}
 
              \alpha: Regularization parameter
-             \alpha: Regularization parameter
+             \beta: Regularization parameter
              
              \nabla: Gradient operator 
               E: Symmetrized Gradient operator

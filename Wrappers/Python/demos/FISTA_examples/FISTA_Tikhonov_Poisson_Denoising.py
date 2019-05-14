@@ -52,8 +52,8 @@ from skimage.util import random_noise
 loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
 
 # Load Data                      
-N = 50
-M = 50
+N = 150
+M = 150
 data = loader.load(TestData.SIMPLE_PHANTOM_2D, size=(N,M), scale=(0,1))
 
 ig = data.geometry
@@ -74,6 +74,7 @@ plt.imshow(noisy_data.as_array())
 plt.title('Noisy Data')
 plt.colorbar()
 plt.show()
+
 #%%
 # Regularisation Parameter
 alpha = 10

@@ -19,40 +19,210 @@
 
 from ccpi.framework import DataProcessor, DataContainer, AcquisitionData,\
  AcquisitionGeometry, ImageGeometry, ImageData
-from ccpi.reconstruction.parallelbeam import alg as pbalg
+#from ccpi.reconstruction.parallelbeam import alg as pbalg
 import numpy
 from scipy import ndimage
 
 import matplotlib.pyplot as plt
 
 
+class Resizer(DataProcessor):
+
+    def __init__(self,
+                 roi = None,
+                 binning = None,
+                 resize = None):
+
+        kwargs = {'roi': roi,
+                  'binning': binning,
+                  'resize': resize}
+
+        super(Resizer, self).__init__(**kwargs)
+    
+    def check_input(self, data):
+        return True
+    
+    def process(self):
+
+        data = self.get_input()
+        ndim = len(data.dimension_labels)
+        geometry_0 = data.geometry
+        geometry = geometry_0.clone()
+        roi = self.roi.copy()
+
+        if (isinstance(data, ImageData)):
+            if ((all(x == -1 for x in roi)) and (all(x == 1 for x in self.binning))):
+                for key in data.dimension_labels:
+                    if data.dimension_labels[key] == 'channel':
+                        geometry.channels = geometry_0.channels
+                        roi[key] = (0, geometry.channels)
+                    elif data.dimension_labels[key] == 'horizontal_y':
+                        geometry.voxel_size_y = geometry_0.voxel_size_y
+                        geometry.voxel_num_y = geometry_0.voxel_num_y
+                        roi[key] = (0, geometry.voxel_num_y)
+                    elif data.dimension_labels[key] == 'vertical':
+                        geometry.voxel_size_z = geometry_0.voxel_size_z
+                        geometry.voxel_num_z = geometry_0.voxel_num_z
+                        roi[key] = (0, geometry.voxel_num_z)
+                    elif data.dimension_labels[key] == 'horizontal_x':
+                        geometry.voxel_size_x = geometry_0.voxel_size_x
+                        geometry.voxel_num_x = geometry_0.voxel_num_x
+                        roi[key] = (0, geometry.voxel_num_x)
+            else:
+                for key in data.dimension_labels:
+                    if data.dimension_labels[key] == 'channel':
+                        if (roi[key] != -1):
+                            geometry.channels = (roi[key][1] - roi[key][0]) // self.binning[key]
+                            roi[key] = (roi[key][0], roi[key][0] + ((roi[key][1] - roi[key][0]) // self.binning[key]) * self.binning[key])
+                        else:
+                            geometry.channels = geometry_0.channels // self.binning[key]
+                            roi[key] = (0, geometry.channels * self.binning[key])
+                    elif data.dimension_labels[key] == 'horizontal_y':
+                        if (roi[key] != -1):
+                            geometry.voxel_num_y = (roi[key][1] - roi[key][0]) // self.binning[key]
+                            geometry.voxel_size_y = geometry_0.voxel_size_y * self.binning[key]
+                            roi[key] = (roi[key][0], roi[key][0] + ((roi[key][1] - roi[key][0]) // self.binning[key]) * self.binning[key])
+                        else:
+                            geometry.voxel_num_y = geometry_0.voxel_num_y // self.binning[key]
+                            geometry.voxel_size_y = geometry_0.voxel_size_y * self.binning[key]
+                            roi[key] = (0, geometry.voxel_num_y * self.binning[key])
+                    elif data.dimension_labels[key] == 'vertical':
+                        if (roi[key] != -1):
+                            geometry.voxel_num_z = (roi[key][1] - roi[key][0]) // self.binning[key]
+                            geometry.voxel_size_z = geometry_0.voxel_size_z * self.binning[key]
+                            roi[key] = (roi[key][0], roi[key][0] + ((roi[key][1] - roi[key][0]) // self.binning[key]) * self.binning[key])
+                        else:
+                            geometry.voxel_num_z = geometry_0.voxel_num_z // self.binning[key]
+                            geometry.voxel_size_z = geometry_0.voxel_size_z * self.binning[key]
+                            roi[key] = (0, geometry.voxel_num_z * self.binning[key])
+                    elif data.dimension_labels[key] == 'horizontal_x':
+                        if (roi[key] != -1):
+                            geometry.voxel_num_x = (roi[key][1] - roi[key][0]) // self.binning[key]
+                            geometry.voxel_size_x = geometry_0.voxel_size_x * self.binning[key]
+                            roi[key] = (roi[key][0], roi[key][0]+ ((roi[key][1] - roi[key][0]) // self.binning[key]) * self.binning[key])
+                        else:
+                            geometry.voxel_num_x = geometry_0.voxel_num_x // self.binning[key]
+                            geometry.voxel_size_x = geometry_0.voxel_size_x * self.binning[key]
+                            roi[key] = (0, geometry.voxel_num_x * self.binning[key])
+            
+        else: # AcquisitionData
+            if ((all(x == -1 for x in roi)) and (all(x == 1 for x in self.binning))):
+                for key in data.dimension_labels:
+                    if data.dimension_labels[key] == 'channel':
+                        geometry.channels = geometry_0.channels
+                        roi[key] = (0, geometry.channels)
+                    elif data.dimension_labels[key] == 'angle':
+                        geometry.angles = geometry_0.angles
+                        roi[key] = (0, len(geometry.angles))
+                    elif data.dimension_labels[key] == 'vertical':
+                        geometry.pixel_size_v = geometry_0.pixel_size_v
+                        geometry.pixel_num_v = geometry_0.pixel_num_v
+                        roi[key] = (0, geometry.pixel_num_v)
+                    elif data.dimension_labels[key] == 'horizontal':
+                        geometry.pixel_size_h = geometry_0.pixel_size_h
+                        geometry.pixel_num_h = geometry_0.pixel_num_h
+                        roi[key] = (0, geometry.pixel_num_h)
+            else:
+                for key in data.dimension_labels:
+                    if data.dimension_labels[key] == 'channel':
+                        if (roi[key] != -1):
+                            geometry.channels = (roi[key][1] - roi[key][0]) // self.binning[key]
+                            roi[key] = (roi[key][0], roi[key][0] + ((roi[key][1] - roi[key][0]) // self.binning[key]) * self.binning[key])
+                        else:
+                            geometry.channels = geometry_0.channels // self.binning[key]
+                            roi[key] = (0, geometry.channels * self.binning[key])
+                    elif data.dimension_labels[key] == 'angle':
+                        if (roi[key] != -1):
+                            geometry.angles = geometry_0.angles[roi[key][0]:roi[key][1]]
+                        else:
+                            geometry.angles = geometry_0.angles
+                            roi[key] = (0, len(geometry.angles))
+                    elif data.dimension_labels[key] == 'vertical':
+                        if (roi[key] != -1):
+                            geometry.pixel_num_v = (roi[key][1] - roi[key][0]) // self.binning[key]
+                            geometry.pixel_size_v = geometry_0.pixel_size_v * self.binning[key]
+                            roi[key] = (roi[key][0], roi[key][0] + ((roi[key][1] - roi[key][0]) // self.binning[key]) * self.binning[key])
+                        else:
+                            geometry.pixel_num_v = geometry_0.pixel_num_v // self.binning[key]
+                            geometry.pixel_size_v = geometry_0.pixel_size_v * self.binning[key]
+                            roi[key] = (0, geometry.pixel_num_v * self.binning[key])
+                    elif data.dimension_labels[key] == 'horizontal':
+                        if (roi[key] != -1):
+                            geometry.pixel_num_h = (roi[key][1] - roi[key][0]) // self.binning[key]
+                            geometry.pixel_size_h = geometry_0.pixel_size_h * self.binning[key]
+                            roi[key] = (roi[key][0], roi[key][0] + ((roi[key][1] - roi[key][0]) // self.binning[key]) * self.binning[key])
+                        else:
+                            geometry.pixel_num_h = geometry_0.pixel_num_h // self.binning[key]
+                            geometry.pixel_size_h = geometry_0.pixel_size_h * self.binning[key]
+                            roi[key] = (0, geometry.pixel_num_h * self.binning[key])
+                            
+        if ndim == 2:
+            n_pix_0 = (roi[0][1] - roi[0][0]) // self.binning[0]
+            n_pix_1 = (roi[1][1] - roi[1][0]) // self.binning[1]
+            shape = (n_pix_0, self.binning[0], 
+                     n_pix_1, self.binning[1])
+            data_resized = data.as_array()[roi[0][0]:(roi[0][0] + n_pix_0 * self.binning[0]), \
+                                           roi[1][0]:(roi[1][0] + n_pix_1 * self.binning[1])].reshape(shape).mean(-1).mean(1)
+        if ndim == 3:
+            n_pix_0 = (roi[0][1] - roi[0][0]) // self.binning[0]
+            n_pix_1 = (roi[1][1] - roi[1][0]) // self.binning[1]
+            n_pix_2 = (roi[2][1] - roi[2][0]) // self.binning[2]
+            shape = (n_pix_0, self.binning[0], 
+                     n_pix_1, self.binning[1],
+                     n_pix_2, self.binning[2])
+            data_resized = data.as_array()[roi[0][0]:(roi[0][0] + n_pix_0 * self.binning[0]), \
+                                           roi[1][0]:(roi[1][0] + n_pix_1 * self.binning[1]), \
+                                           roi[2][0]:(roi[2][0] + n_pix_2 * self.binning[2])].reshape(shape).mean(-1).mean(1).mean(2)
+        if ndim == 4:
+            n_pix_0 = (roi[0][1] - roi[0][0]) // self.binning[0]
+            n_pix_1 = (roi[1][1] - roi[1][0]) // self.binning[1]
+            n_pix_2 = (roi[2][1] - roi[2][0]) // self.binning[2]
+            n_pix_3 = (roi[3][1] - roi[3][0]) // self.binning[3]
+            shape = (n_pix_0, self.binning[0], 
+                     n_pix_1, self.binning[1],
+                     n_pix_2, self.binning[2],
+                     n_pix_3, self.binning[3])
+            data_resized = data.as_array()[roi[0][0]:(roi[0][0] + n_pix_0 * self.binning[0]), \
+                                           roi[1][0]:(roi[1][0] + n_pix_1 * self.binning[1]), \
+                                           roi[2][0]:(roi[2][0] + n_pix_2 * self.binning[2]), \
+                                           roi[3][0]:(roi[3][0] + n_pix_3 * self.binning[3])].reshape(shape).mean(-1).mean(1).mean(2).mean(3)
+
+        out = type(data)(array = data_resized, 
+                          deep_copy = False,
+                          dimension_labels = data.dimension_labels,
+                          geometry = geometry)
+        
+        return out
+
+
+
 class Normalizer(DataProcessor):
     '''Normalization based on flat and dark
-    
-    This processor read in a AcquisitionData and normalises it based on 
+
+    This processor read in a AcquisitionData and normalises it based on
     the instrument reading with and without incident photons or neutrons.
-    
+
     Input: AcquisitionData
     Parameter: 2D projection with flat field (or stack)
                2D projection with dark field (or stack)
     Output: AcquisitionDataSetn
     '''
-    
+
     def __init__(self, flat_field = None, dark_field = None, tolerance = 1e-5):
         kwargs = {
-                  'flat_field'  : flat_field, 
+                  'flat_field'  : flat_field,
                   'dark_field'  : dark_field,
                   # very small number. Used when there is a division by zero
                   'tolerance'   : tolerance
                   }
-        
+
         #DataProcessor.__init__(self, **kwargs)
         super(Normalizer, self).__init__(**kwargs)
         if not flat_field is None:
             self.set_flat_field(flat_field)
         if not dark_field is None:
             self.set_dark_field(dark_field)
-    
+
     def check_input(self, dataset):
         if dataset.number_of_dimensions == 3 or\
            dataset.number_of_dimensions == 2:
@@ -60,7 +230,7 @@ class Normalizer(DataProcessor):
         else:
             raise ValueError("Expected input dimensions is 2 or 3, got {0}"\
                              .format(dataset.number_of_dimensions))
-    
+
     def set_dark_field(self, df):
         if type(df) is numpy.ndarray:
             if len(numpy.shape(df)) == 3:
@@ -69,7 +239,7 @@ class Normalizer(DataProcessor):
                 self.dark_field = df
         elif issubclass(type(df), DataContainer):
             self.dark_field = self.set_dark_field(df.as_array())
-    
+
     def set_flat_field(self, df):
         if type(df) is numpy.ndarray:
             if len(numpy.shape(df)) == 3:
@@ -78,75 +248,75 @@ class Normalizer(DataProcessor):
                 self.flat_field = df
         elif issubclass(type(df), DataContainer):
             self.flat_field = self.set_flat_field(df.as_array())
-    
+
     @staticmethod
     def normalize_projection(projection, flat, dark, tolerance):
         a = (projection - dark)
         b = (flat-dark)
         with numpy.errstate(divide='ignore', invalid='ignore'):
             c = numpy.true_divide( a, b )
-            c[ ~ numpy.isfinite( c )] = tolerance # set to not zero if 0/0 
+            c[ ~ numpy.isfinite( c )] = tolerance # set to not zero if 0/0
         return c
-    
+
     @staticmethod
     def estimate_normalised_error(projection, flat, dark, delta_flat, delta_dark):
         '''returns the estimated relative error of the normalised projection
-        
+
         n = (projection - dark) / (flat - dark)
         Dn/n = (flat-dark + projection-dark)/((flat-dark)*(projection-dark))*(Df/f + Dd/d)
-        ''' 
+        '''
         a = (projection - dark)
         b = (flat-dark)
         df = delta_flat / flat
         dd = delta_dark / dark
         rel_norm_error = (b + a) / (b * a) * (df + dd)
         return rel_norm_error
-        
+
     def process(self):
-        
+
         projections = self.get_input()
         dark = self.dark_field
         flat = self.flat_field
-        
+
         if projections.number_of_dimensions == 3:
             if not (projections.shape[1:] == dark.shape and \
                projections.shape[1:] == flat.shape):
                 raise ValueError('Flats/Dark and projections size do not match.')
-                
-                   
+
+
             a = numpy.asarray(
                     [ Normalizer.normalize_projection(
                             projection, flat, dark, self.tolerance) \
                      for projection in projections.as_array() ]
                     )
         elif projections.number_of_dimensions == 2:
-            a = Normalizer.normalize_projection(projections.as_array(), 
+            a = Normalizer.normalize_projection(projections.as_array(),
                                                 flat, dark, self.tolerance)
-        y = type(projections)( a , True, 
+        y = type(projections)( a , True,
                     dimension_labels=projections.dimension_labels,
                     geometry=projections.geometry)
         return y
-    
+
 
 class CenterOfRotationFinder(DataProcessor):
     '''Processor to find the center of rotation in a parallel beam experiment
-    
-    This processor read in a AcquisitionDataSet and finds the center of rotation 
+
+    This processor read in a AcquisitionDataSet and finds the center of rotation
     based on Nghia Vo's method. https://doi.org/10.1364/OE.22.019078
-    
+
     Input: AcquisitionDataSet
-    
+
     Output: float. center of rotation in pixel coordinate
     '''
-    
+
     def __init__(self):
         kwargs = {
-                  
+
                   }
-        
+
         #DataProcessor.__init__(self, **kwargs)
         super(CenterOfRotationFinder, self).__init__(**kwargs)
-    
+
     def check_input(self, dataset):
         if dataset.number_of_dimensions == 3:
             if dataset.geometry.geom_type == 'parallel':
@@ -157,8 +327,8 @@ class CenterOfRotationFinder(DataProcessor):
         else:
             raise ValueError("Expected input dimensions is 3, got {0}"\
                              .format(dataset.number_of_dimensions))
-        
-    
+
+
     # #########################################################################
     # Copyright (c) 2015, UChicago Argonne, LLC. All rights reserved.         #
     #                                                                         #
@@ -203,33 +373,33 @@ class CenterOfRotationFinder(DataProcessor):
     # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE         #
     # POSSIBILITY OF SUCH DAMAGE.                                             #
     # #########################################################################
-    
+
     @staticmethod
     def as_ndarray(arr, dtype=None, copy=False):
         if not isinstance(arr, numpy.ndarray):
             arr = numpy.array(arr, dtype=dtype, copy=copy)
         return arr
-    
+
     @staticmethod
     def as_dtype(arr, dtype, copy=False):
         if not arr.dtype == dtype:
             arr = numpy.array(arr, dtype=dtype, copy=copy)
         return arr
-    
+
     @staticmethod
     def as_float32(arr):
         arr = CenterOfRotationFinder.as_ndarray(arr, numpy.float32)
         return CenterOfRotationFinder.as_dtype(arr, numpy.float32)
-    
-    
-    
-    
+
+
+
+
     @staticmethod
     def find_center_vo(tomo, ind=None, smin=-40, smax=40, srad=10, step=0.5,
                        ratio=2., drop=20):
         """
         Find rotation axis location using Nghia Vo's method. :cite:`Vo:14`.
-    
+
         Parameters
         ----------
         tomo : ndarray
@@ -247,59 +417,59 @@ class CenterOfRotationFinder(DataProcessor):
             It's used to generate the mask.
         drop : int, optional
             Drop lines around vertical center of the mask.
-    
+
         Returns
         -------
         float
             Rotation axis location.
-            
+
         Notes
         -----
         The function may not yield a correct estimate, if:
-        
-        - the sample size is bigger than the field of view of the camera. 
+
+        - the sample size is bigger than the field of view of the camera.
           In this case the ``ratio`` argument need to be set larger
           than the default of 2.0.
-        
-        - there is distortion in the imaging hardware. If there's 
-          no correction applied, the center of the projection image may 
+
+        - there is distortion in the imaging hardware. If there's
+          no correction applied, the center of the projection image may
           yield a better estimate.
-        
-        - the sample contrast is weak. Paganin's filter need to be applied 
-          to overcome this. 
-       
-        - the sample was changed during the scan. 
+
+        - the sample contrast is weak. Paganin's filter need to be applied
+          to overcome this.
+
+        - the sample was changed during the scan.
         """
         tomo = CenterOfRotationFinder.as_float32(tomo)
-    
+
         if ind is None:
             ind = tomo.shape[1] // 2
         _tomo = tomo[:, ind, :]
-    
-        
-    
-        # Reduce noise by smooth filters. Use different filters for coarse and fine search 
+
+
+
+        # Reduce noise by smooth filters. Use different filters for coarse and fine search
         _tomo_cs = ndimage.filters.gaussian_filter(_tomo, (3, 1))
         _tomo_fs = ndimage.filters.median_filter(_tomo, (2, 2))
-    
+
         # Coarse and fine searches for finding the rotation center.
         if _tomo.shape[0] * _tomo.shape[1] > 4e6:  # If data is large (>2kx2k)
             #_tomo_coarse = downsample(numpy.expand_dims(_tomo_cs,1), level=2)[:, 0, :]
             #init_cen = _search_coarse(_tomo_coarse, smin, smax, ratio, drop)
             #fine_cen = _search_fine(_tomo_fs, srad, step, init_cen*4, ratio, drop)
-            init_cen = CenterOfRotationFinder._search_coarse(_tomo_cs, smin, 
+            init_cen = CenterOfRotationFinder._search_coarse(_tomo_cs, smin,
                                                              smax, ratio, drop)
-            fine_cen = CenterOfRotationFinder._search_fine(_tomo_fs, srad, 
-                                                           step, init_cen, 
+            fine_cen = CenterOfRotationFinder._search_fine(_tomo_fs, srad,
+                                                           step, init_cen,
                                                            ratio, drop)
         else:
-            init_cen = CenterOfRotationFinder._search_coarse(_tomo_cs, 
-                                                             smin, smax, 
+            init_cen = CenterOfRotationFinder._search_coarse(_tomo_cs,
+                                                             smin, smax,
                                                              ratio, drop)
-            fine_cen = CenterOfRotationFinder._search_fine(_tomo_fs, srad, 
-                                                           step, init_cen, 
+            fine_cen = CenterOfRotationFinder._search_fine(_tomo_fs, srad,
+                                                           step, init_cen,
                                                            ratio, drop)
-    
+
         #logger.debug('Rotation center search finished: %i', fine_cen)
         return fine_cen
 
@@ -311,19 +481,19 @@ class CenterOfRotationFinder(DataProcessor):
         """
         (Nrow, Ncol) = sino.shape
         centerfliplr = (Ncol - 1.0) / 2.0
-    
+
         # Copy the sinogram and flip left right, the purpose is to
         # make a full [0;2Pi] sinogram
         _copy_sino = numpy.fliplr(sino[1:])
-    
+
         # This image is used for compensating the shift of sinogram 2
         temp_img = numpy.zeros((Nrow - 1, Ncol), dtype='float32')
         temp_img[:] = sino[-1]
-    
+
         # Start coarse search in which the shift step is 1
         listshift = numpy.arange(smin, smax + 1)
         listmetric = numpy.zeros(len(listshift), dtype='float32')
-        mask = CenterOfRotationFinder._create_mask(2 * Nrow - 1, Ncol, 
+        mask = CenterOfRotationFinder._create_mask(2 * Nrow - 1, Ncol,
                                                    0.5 * ratio * Ncol, drop)
         for i in listshift:
             _sino = numpy.roll(_copy_sino, i, axis=1)
@@ -338,7 +508,7 @@ class CenterOfRotationFinder(DataProcessor):
                 )) * mask)
         minpos = numpy.argmin(listmetric)
         return centerfliplr + listshift[minpos] / 2.0
-    
+
     @staticmethod
     def _search_fine(sino, srad, step, init_cen, ratio, drop):
         """
@@ -357,7 +527,7 @@ class CenterOfRotationFinder(DataProcessor):
                 init_cen - (Ncol - 1 - init_cen) + srad + 1))
             righttake = numpy.int16(numpy.floor(Ncol - 1 - srad - 1))
         Ncol1 = righttake - lefttake + 1
-        mask = CenterOfRotationFinder._create_mask(2 * Nrow - 1, Ncol1, 
+        mask = CenterOfRotationFinder._create_mask(2 * Nrow - 1, Ncol1,
                                                    0.5 * ratio * Ncol, drop)
         numshift = numpy.int16((2 * srad) / step) + 1
         listshift = numpy.linspace(-srad, srad, num=numshift)
@@ -378,7 +548,7 @@ class CenterOfRotationFinder(DataProcessor):
             num1 = num1 + 1
         minpos = numpy.argmin(listmetric)
         return init_cen + listshift[minpos] / 2.0
-    
+
     @staticmethod
     def _create_mask(nrow, ncol, radius, drop):
         du = 1.0 / ncol
@@ -399,40 +569,40 @@ class CenterOfRotationFinder(DataProcessor):
                  :] = numpy.zeros((2 * drop + 1, ncol), dtype='float32')
         mask[:,centercol-1:centercol+2] = numpy.zeros((nrow, 3), dtype='float32')
         return mask
-    
+
     def process(self):
-        
+
         projections = self.get_input()
-        
+
         cor = CenterOfRotationFinder.find_center_vo(projections.as_array())
-        
+
         return cor
 
-            
+
 class AcquisitionDataPadder(DataProcessor):
     '''Normalization based on flat and dark
-    
-    This processor read in a AcquisitionData and normalises it based on 
+
+    This processor read in a AcquisitionData and normalises it based on
     the instrument reading with and without incident photons or neutrons.
-    
+
     Input: AcquisitionData
     Parameter: 2D projection with flat field (or stack)
                2D projection with dark field (or stack)
     Output: AcquisitionDataSetn
     '''
-    
-    def __init__(self, 
+
+    def __init__(self,
                  center_of_rotation   = None,
                  acquisition_geometry = None,
                  pad_value            = 1e-5):
         kwargs = {
-                  'acquisition_geometry' : acquisition_geometry, 
+                  'acquisition_geometry' : acquisition_geometry,
                   'center_of_rotation'   : center_of_rotation,
                   'pad_value'            : pad_value
                   }
-        
+
         super(AcquisitionDataPadder, self).__init__(**kwargs)
-        
+
     def check_input(self, dataset):
         if self.acquisition_geometry is None:
             self.acquisition_geometry = dataset.geometry
@@ -446,34 +616,34 @@ class AcquisitionDataPadder(DataProcessor):
         projections = self.get_input()
         w = projections.get_dimension_size('horizontal')
         delta = w - 2 * self.center_of_rotation
-               
+
         padded_width = int (
                 numpy.ceil(abs(delta)) + w
                 )
         delta_pix = padded_width - w
-        
+
         voxel_per_pixel = 1
         geom = pbalg.pb_setup_geometry_from_acquisition(projections.as_array(),
                                             self.acquisition_geometry.angles,
                                             self.center_of_rotation,
                                             voxel_per_pixel )
-        
+
         padded_geometry = self.acquisition_geometry.clone()
-        
+
         padded_geometry.pixel_num_h = geom['n_h']
         padded_geometry.pixel_num_v = geom['n_v']
-        
+
         delta_pix_h = padded_geometry.pixel_num_h - self.acquisition_geometry.pixel_num_h
         delta_pix_v = padded_geometry.pixel_num_v - self.acquisition_geometry.pixel_num_v
-        
+
         if delta_pix_h == 0:
             delta_pix_h = delta_pix
             padded_geometry.pixel_num_h = padded_width
         #initialize a new AcquisitionData with values close to 0
         out = AcquisitionData(geometry=padded_geometry)
         out = out + self.pad_value
-        
-        
+
+
         #pad in the horizontal-vertical plane -> slice on angles
         if delta > 0:
             #pad left of middle
@@ -491,7 +661,7 @@ class AcquisitionDataPadder(DataProcessor):
                 if i < out.number_of_dimensions -1:
                     command = command + ','
             command = command + '] = projections.array'
-            #print (command)    
+            #print (command)
         else:
             #pad right of middle
             command = "out.array["
@@ -508,7 +678,7 @@ class AcquisitionDataPadder(DataProcessor):
                 if i < out.number_of_dimensions -1:
                     command = command + ','
             command = command + '] = projections.array'
-            #print (command)    
+            #print (command)
             #cleaned = eval(command)
         exec(command)
         return out

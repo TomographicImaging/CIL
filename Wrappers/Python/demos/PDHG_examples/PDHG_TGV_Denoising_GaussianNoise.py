@@ -73,13 +73,7 @@ else:
 
 # user supplied input
 if len(sys.argv) > 1:
-    which_noise = int(sys.argv[1])
-else:
-    which_noise = 0
-print ("Applying {} noise")
-
-if len(sys.argv) > 2:
-    method = sys.argv[2]
+    method = sys.argv[1]
 else:
     method = '1'
 print ("method ", method)
@@ -101,18 +95,7 @@ data.fill(xv/xv.max())
 ag = ig
 
 # Create noisy data. 
-# Apply Salt & Pepper noise
-# gaussian
-# poisson
-noise = noises[which_noise]
-if noise == 's&p':
-    n1 = random_noise(data.as_array(), mode = noise, salt_vs_pepper = 0.9, amount=0.2, seed=10)
-elif noise == 'poisson':
-    n1 = random_noise(data.as_array(), mode = noise, seed = 10)
-elif noise == 'gaussian':
-    n1 = random_noise(data.as_array(), mode = noise, seed = 10)
-else:
-    raise ValueError('Unsupported Noise ', noise)
+n1 = random_noise(data.as_array(), mode = 'gaussian', seed = 10)
 noisy_data = ImageData(n1)
 
 # Show Ground Truth and Noisy Data
@@ -128,22 +111,13 @@ plt.colorbar()
 plt.show()
 
 # Regularisation Parameters
-if noise == 's&p':
-    alpha = 0.8
-elif noise == 'poisson':
-    alpha = .1
-elif noise == 'gaussian':
-    alpha = .3
+alpha = .3
 
 beta = numpy.sqrt(2)* alpha
 
 # fidelity
-if noise == 's&p':
-    f3 = L1Norm(b=noisy_data)
-elif noise == 'poisson':
-    f3 = KullbackLeibler(noisy_data)
-elif noise == 'gaussian':
-    f3 = L2NormSquared(b=noisy_data)
+
+    
 
 if method == '0':
     
@@ -160,7 +134,8 @@ if method == '0':
     operator = BlockOperator(op11, -1*op12, op21, op22, op31, op32, shape=(3,2) ) 
         
     f1 = alpha * MixedL21Norm()
-    f2 = beta * MixedL21Norm() 
+    f2 = beta * MixedL21Norm()
+    f3 = L2NormSquared(b=noisy_data) 
     # f3 depends on the noise characteristics
     
     f = BlockFunction(f1, f2, f3)         
@@ -177,7 +152,8 @@ else:
     operator = BlockOperator(op11, -1*op12, op21, op22, shape=(2,2) )      
     
     f1 = alpha * MixedL21Norm()
-    f2 = beta * MixedL21Norm()     
+    f2 = beta * MixedL21Norm()
+    f3 = L2NormSquared(b=noisy_data)     
     
     f = BlockFunction(f1, f2)         
     g = BlockFunction(f3, ZeroFunction())

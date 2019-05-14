@@ -48,7 +48,8 @@ import matplotlib.pyplot as plt
 from ccpi.optimisation.algorithms import PDHG
 
 from ccpi.optimisation.operators import BlockOperator, Identity, Gradient
-from ccpi.optimisation.functions import ZeroFunction, L2NormSquared,  BlockFunction
+from ccpi.optimisation.functions import ZeroFunction, L2NormSquared,\
+      BlockFunction, KullbackLeibler, L1Norm
 
 import sys, os
 if int(numpy.version.version.split('.')[1]) > 12:
@@ -57,10 +58,18 @@ else:
     from demoutil import random_noise
 
 
+# user supplied input
 if len(sys.argv) > 1:
     which_noise = int(sys.argv[1])
 else:
-    which_noise = 2
+    which_noise = 0
+print ("Applying {} noise")
+
+if len(sys.argv) > 2:
+    method = sys.argv[2]
+else:
+    method = '0'
+print ("method ", method)
 
 # Create phantom for TV Salt & Pepper denoising
 N = 100
@@ -87,22 +96,35 @@ else:
     raise ValueError('Unsupported Noise ', noise)
 noisy_data = ImageData(n1)
 
+# fidelity
+if noise == 's&p':
+    f2 = L1Norm(b=noisy_data)
+elif noise == 'poisson':
+    f2 = KullbackLeibler(noisy_data)
+elif noise == 'gaussian':
+    f2 = 0.5 * L2NormSquared(b=noisy_data)
+
 # Show Ground Truth and Noisy Data
-plt.figure(figsize=(15,15))
-plt.subplot(2,1,1)
+plt.figure(figsize=(10,5))
+plt.subplot(1,2,1)
 plt.imshow(data.as_array())
 plt.title('Ground Truth')
 plt.colorbar()
-plt.subplot(2,1,2)
+plt.subplot(1,2,2)
 plt.imshow(noisy_data.as_array())
 plt.title('Noisy Data')
 plt.colorbar()
 plt.show()
 
-# Regularisation Parameter
-alpha = 4
 
-method = '1'
+# Regularisation Parameter
+# no edge preservation alpha is big
+if noise == 's&p':
+    alpha = 8.
+elif noise == 'poisson':
+    alpha = 8.
+elif noise == 'gaussian':
+    alpha = 8.
 
 if method == '0':
 
@@ -116,7 +138,8 @@ if method == '0':
     # Create functions
       
     f1 = alpha * L2NormSquared()
-    f2 = 0.5 * L2NormSquared(b = noisy_data)    
+    # f2 must change according to noise
+    #f2 = 0.5 * L2NormSquared(b = noisy_data)
     f = BlockFunction(f1, f2)                                       
     g = ZeroFunction()
     
@@ -125,7 +148,9 @@ else:
     # Without the "Block Framework"
     operator = Gradient(ig)
     f =  alpha * L2NormSquared()
-    g =  0.5 * L2NormSquared(b = noisy_data)
+    # g must change according to noise
+    #g =  0.5 * L2NormSquared(b = noisy_data)
+    g = f2
         
     
 # Compute operator Norm
@@ -140,7 +165,7 @@ opt = {'niter':2000, 'memopt': True}
 pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma, memopt=True)
 pdhg.max_iteration = 2000
 pdhg.update_objective_interval = 50
-pdhg.run(2000)
+pdhg.run(1500)
 
 
 plt.figure(figsize=(20,5))
@@ -157,12 +182,12 @@ plt.imshow(pdhg.get_output().as_array())
 plt.title('Tikhonov Reconstruction')
 plt.colorbar()
 plt.subplot(1,4,4)
-## 
 plt.plot(np.linspace(0,N,N), data.as_array()[int(N/2),:], label = 'GTruth')
-plt.plot(np.linspace(0,N,N), pdhg.get_output().as_array()[int(N/2),:], label = 'Tikhonov reconstruction')
+plt.plot(np.linspace(0,N,N), pdhg.get_output().as_array()[int(N/2),:], label = 'TV reconstruction')
 plt.legend()
 plt.title('Middle Line Profiles')
 plt.show()
+
 
 
 ##%% Check with CVX solution

@@ -24,22 +24,20 @@
 Total Variation Denoising using PDHG algorithm:
 
 
-Problem:     min_x, x>0  \alpha * ||\nabla x||_{2,1} + ||x-g||_{1}
+Problem:     min_{x} \alpha * ||\nabla x||_{2,1} + \frac{1}{2} * || x - g ||_{2}^{2}
 
              \alpha: Regularization parameter
              
              \nabla: Gradient operator 
              
-             g: Noisy Data with Salt & Pepper Noise
-             
-             
+             g: Noisy Data with Gaussian Noise
+                          
              Method = 0 ( PDHG - split ) :  K = [ \nabla,
                                                  Identity]
                           
                                                                     
-             Method = 1 (PDHG - explicit ):  K = \nabla    
-             
-             
+             Method = 1 (PDHG - explicit ):  K = \nabla  
+                                                                
 """
 
 from ccpi.framework import ImageData, ImageGeometry
@@ -51,9 +49,8 @@ import matplotlib.pyplot as plt
 from ccpi.optimisation.algorithms import PDHG
 
 from ccpi.optimisation.operators import BlockOperator, Identity, Gradient
-from ccpi.optimisation.functions import ZeroFunction, L1Norm, \
-                      MixedL21Norm, BlockFunction, L2NormSquared,\
-                          KullbackLeibler
+from ccpi.optimisation.functions import ZeroFunction, \
+                      MixedL21Norm, BlockFunction, L2NormSquared
 from ccpi.framework import TestData
 import os, sys
 if int(numpy.version.version.split('.')[1]) > 12:
@@ -61,19 +58,8 @@ if int(numpy.version.version.split('.')[1]) > 12:
 else:
     from demoutil import random_noise
 
-# user supplied input
-if len(sys.argv) > 1:
-    which_noise = int(sys.argv[1])
-else:
-    which_noise = 0
-print ("Applying {} noise")
 
-if len(sys.argv) > 2:
-    method = sys.argv[2]
-else:
-    method = '0'
-print ("method ", method)
-# Create phantom for TV Salt & Pepper denoising
+# Create phantom for TV Gaussian denoising
 N = 100
 
 loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
@@ -85,17 +71,10 @@ ag = ig
 # Apply Salt & Pepper noise
 # gaussian
 # poisson
-noises = ['gaussian', 'poisson', 's&p']
-noise = noises[which_noise]
-if noise == 's&p':
-    n1 = random_noise(data.as_array(), mode = noise, salt_vs_pepper = 0.9, amount=0.2)
-elif noise == 'poisson':
-    n1 = random_noise(data.as_array(), mode = noise, seed = 10)
-elif noise == 'gaussian':
-    n1 = random_noise(data.as_array(), mode = noise, seed = 10)
-else:
-    raise ValueError('Unsupported Noise ', noise)
-noisy_data = ImageData(n1)
+
+n1 = random_noise(data.as_array(), mode = 'gaussian', seed = 10)
+noisy_data = ig.allocate()
+noisy_data.fill(n1)
 
 # Show Ground Truth and Noisy Data
 plt.figure(figsize=(10,5))
@@ -112,13 +91,7 @@ plt.show()
 # Regularisation Parameter
 alpha = 2
 
-# fidelity
-if noise == 's&p':
-    f2 = L1Norm(b=noisy_data)
-elif noise == 'poisson':
-    f2 = KullbackLeibler(noisy_data)
-elif noise == 'gaussian':
-    f2 = L2NormSquared(b=noisy_data)
+method = '0'
 
 if method == '0':
 
@@ -131,7 +104,7 @@ if method == '0':
 
     # Create functions      
     f1 = alpha * MixedL21Norm()
-    #f2 = L1Norm(b = noisy_data)    
+    f2 = L2NormSquared(b=noisy_data)    
     f = BlockFunction(f1, f2)  
                                       
     g = ZeroFunction()
@@ -141,8 +114,7 @@ else:
     # Without the "Block Framework"
     operator = Gradient(ig)
     f =  alpha * MixedL21Norm()
-    #g =  L1Norm(b = noisy_data)
-    g = f2
+    g = L2NormSquared(b=noisy_data)
         
     
 # Compute operator Norm

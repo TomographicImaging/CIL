@@ -55,7 +55,7 @@ class IndicatorBox(Function):
         # support function sup <x, z>, z \in [lower, upper]
         # ????
         return x.maximum(0).sum()
-    
+         
     def proximal(self, x, tau, out=None):
         
         if out is None:

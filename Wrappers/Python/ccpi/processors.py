@@ -22,6 +22,7 @@ from ccpi.framework import DataProcessor, DataContainer, AcquisitionData,\
 #from ccpi.reconstruction.parallelbeam import alg as pbalg
 import numpy
 from scipy import ndimage
+import warnings
 
 import matplotlib.pyplot as plt
 
@@ -40,7 +41,12 @@ class Resizer(DataProcessor):
         super(Resizer, self).__init__(**kwargs)
     
     def check_input(self, data):
-        return True
+        if not ((isinstance(data, ImageData)) or 
+                (isinstance(data, AcquisitionData))):
+            raise Exception('Writer supports only following data types:\n' +
+                            ' - ImageData\n - AcquisitionData')
+        else:
+            return True
     
     def process(self):
 
@@ -137,6 +143,10 @@ class Resizer(DataProcessor):
                         else:
                             geometry.angles = geometry_0.angles
                             roi[key] = (0, len(geometry.angles))
+                        if (self.binning[key] != 1):
+                            self.binning[key] = 1
+                            warnings.warn('Rebinning in angular dimensions is not supported: \n' +
+                                          'binning[{}] is set to 1.'.format(key)))
                     elif data.dimension_labels[key] == 'vertical':
                         if (roi[key] != -1):
                             geometry.pixel_num_v = (roi[key][1] - roi[key][0]) // self.binning[key]
@@ -188,9 +198,9 @@ class Resizer(DataProcessor):
                                            roi[3][0]:(roi[3][0] + n_pix_3 * self.binning[3])].reshape(shape).mean(-1).mean(1).mean(2).mean(3)
 
         out = type(data)(array = data_resized, 
-                          deep_copy = False,
-                          dimension_labels = data.dimension_labels,
-                          geometry = geometry)
+                         deep_copy = False,
+                         dimension_labels = data.dimension_labels,
+                         geometry = geometry)
         
         return out
 

@@ -29,25 +29,17 @@ class NEXUSDataWriter(object):
         
         self.data_container = kwargs.get('data_container', None)
         self.file_name = kwargs.get('file_name', None)
-        self.image_geometry = kwargs.get('image_geometry', None)
-        self.acquisition_geometry = kwargs.get('acquisition_geometry', None)
         
         if ((self.data_container is not None) and (self.file_name is not None)):
             self.set_up(data_container = self.data_container,
-                        file_name = self.file_name,
-                        image_geometry = self.image_geometry,
-                        acquisition_geometry = self.acquisition_geometry)
+                        file_name = self.file_name)
         
     def set_up(self,
                data_container = None,
-               file_name = None,
-               image_geometry = None,
-               acquisition_geometry = None):
+               file_name = None):
         
         self.data_container = data_container
         self.file_name = file_name
-        self.image_geometry = image_geometry
-        self.acquisition_geometry = acquisition_geometry
         
         if not ((isinstance(self.data_container, ImageData)) or 
                 (isinstance(self.data_container, AcquisitionData))):
@@ -57,15 +49,9 @@ class NEXUSDataWriter(object):
         # check that h5py library is installed
         if (h5pyAvailable == False):
             raise Exception('h5py is not available, cannot load NEXUS files.')
-        
-        if ((isinstance(self.data_container, ImageData)) and (self.image_geometry == None)):
-            raise Exception('image_geometry is required.')
-        
-        if ((isinstance(self.data_container, AcquisitionData)) and (self.acquisition_geometry == None)):
-            raise Exception('acquisition_geometry is required.')
-            
     
     def write_file(self):
+        
         # if the folder does not exist, create the folder
         if not os.path.isdir(os.path.dirname(self.file_name)):
             os.mkdir(os.path.dirname(self.file_name))
@@ -101,39 +87,40 @@ class NEXUSDataWriter(object):
                 ds_data.attrs['dim{}'.format(i)] = self.data_container.dimension_labels[i]
             
             if (isinstance(self.data_container, AcquisitionData)):      
-                ds_data.attrs['geom_type'] = self.acquisition_geometry.geom_type
-                ds_data.attrs['dimension'] = self.acquisition_geometry.dimension
-                ds_data.attrs['dist_source_center'] = self.acquisition_geometry.dist_source_center
-                ds_data.attrs['dist_center_detector'] = self.acquisition_geometry.dist_center_detector
-                ds_data.attrs['pixel_num_h'] = self.acquisition_geometry.pixel_num_h
-                ds_data.attrs['pixel_size_h'] = self.acquisition_geometry.pixel_size_h
-                ds_data.attrs['pixel_num_v'] = self.acquisition_geometry.pixel_num_v
-                ds_data.attrs['pixel_size_v'] = self.acquisition_geometry.pixel_size_v
-                ds_data.attrs['channels'] = self.acquisition_geometry.channels
-                ds_data.attrs['n_angles'] = self.acquisition_geometry.angles.shape[0]
+                ds_data.attrs['geom_type'] = self.data_container.geometry.geom_type
+                ds_data.attrs['dimension'] = self.data_container.geometry.dimension
+                ds_data.attrs['dist_source_center'] = self.data_container.geometry.dist_source_center
+                ds_data.attrs['dist_center_detector'] = self.data_container.geometry.dist_center_detector
+                ds_data.attrs['pixel_num_h'] = self.data_container.geometry.pixel_num_h
+                ds_data.attrs['pixel_size_h'] = self.data_container.geometry.pixel_size_h
+                ds_data.attrs['pixel_num_v'] = self.data_container.geometry.pixel_num_v
+                ds_data.attrs['pixel_size_v'] = self.data_container.geometry.pixel_size_v
+                ds_data.attrs['channels'] = self.data_container.geometry.channels
+                ds_data.attrs['n_angles'] = self.data_container.geometry.angles.shape[0]
                 
                 # create the dataset to store rotation angles
                 ds_angles = f.create_dataset('entry1/tomo_entry/data/rotation_angle', 
-                                             (self.acquisition_geometry.angles.shape), 
+                                             (self.data_container.geometry.angles.shape), 
                                              dtype = 'float32', 
-                                             data = self.acquisition_geometry.angles)
+                                             data = self.data_container.geometry.angles)
                 
-                #ds_angles.attrs['units'] = self.acquisition_geometry.angle_unit
+                #ds_angles.attrs['units'] = self.data_container.geometry.angle_unit
             
             else:   # ImageData
                 
-                ds_data.attrs['voxel_num_x'] = self.image_geometry.voxel_num_x
-                ds_data.attrs['voxel_num_y'] = self.image_geometry.voxel_num_y
-                ds_data.attrs['voxel_num_z'] = self.image_geometry.voxel_num_z
-                ds_data.attrs['voxel_size_x'] = self.image_geometry.voxel_size_x
-                ds_data.attrs['voxel_size_y'] = self.image_geometry.voxel_size_y
-                ds_data.attrs['voxel_size_z'] = self.image_geometry.voxel_size_z
-                ds_data.attrs['center_x'] = self.image_geometry.center_x
-                ds_data.attrs['center_y'] = self.image_geometry.center_y
-                ds_data.attrs['center_z'] = self.image_geometry.center_z
-                ds_data.attrs['channels'] = self.image_geometry.channels
-            
-            
+                ds_data.attrs['voxel_num_x'] = self.data_container.geometry.voxel_num_x
+                ds_data.attrs['voxel_num_y'] = self.data_container.geometry.voxel_num_y
+                ds_data.attrs['voxel_num_z'] = self.data_container.geometry.voxel_num_z
+                ds_data.attrs['voxel_size_x'] = self.data_container.geometry.voxel_size_x
+                ds_data.attrs['voxel_size_y'] = self.data_container.geometry.voxel_size_y
+                ds_data.attrs['voxel_size_z'] = self.data_container.geometry.voxel_size_z
+                ds_data.attrs['center_x'] = self.data_container.geometry.center_x
+                ds_data.attrs['center_y'] = self.data_container.geometry.center_y
+                ds_data.attrs['center_z'] = self.data_container.geometry.center_z
+                ds_data.attrs['channels'] = self.data_container.geometry.channels
+
+
+'''
 # usage example
 xtek_file = '/home/evelina/nikon_data/SophiaBeads_256_averaged.xtekct'
 reader = NikonDataReader()
@@ -143,11 +130,24 @@ reader.set_up(xtek_file = xtek_file,
               normalize = True)
 
 data = reader.load_projections()
-ag = reader.get_acquisition_geometry()
+ag = reader.get_geometry()
 
 writer = NEXUSDataWriter()
 writer.set_up(file_name = '/home/evelina/test_nexus.nxs',
-              data_container = data,
-              acquisition_geometry = ag)
+              data_container = data)
 
 writer.write_file()
+
+ig = ImageGeometry(voxel_num_x = 100,
+                   voxel_num_y = 100)
+
+im = ImageData(array = numpy.zeros((100, 100), dtype = 'float'),
+               geometry = ig)
+
+im_writer = NEXUSDataWriter()
+
+writer.set_up(file_name = '/home/evelina/test_nexus_im.nxs',
+              data_container = im)
+
+writer.write_file()
+'''

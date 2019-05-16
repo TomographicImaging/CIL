@@ -83,23 +83,7 @@ class NikonDataReader(object):
         # check if xtek file exists
         if not(os.path.isfile(self.xtek_file)):
             raise Exception('File\n {}\n does not exist.'.format(self.xtek_file))  
-        
-        # check ROI
-        if (self.roi != -1): 
-            if not ((isinstance(self.roi, list)) or 
-                    (len(self.roi) == 4) or 
-                    (self.roi[0] < self.roi[2]) or 
-                    (self.roi[1] < self.roi[3])):
-                raise Exception('Not valid ROI. ROI must be defined as '+
-                                '[row0, column0, row1, column1] ' +
-                                'such that ((row0 < row1) and (column0 < column1)).')
-        
-        # check binning parameters
-        if (not(isinstance(self.binning, list)) or 
-            (len(self.binning) != 2)):
-            raise Exception('Not valid binning parameters. \
-                            Binning must be defined as [int, int].')
-        
+                
         # check that PIL library is installed
         if (pilAvailable == False):
             raise Exception("PIL (pillow) is not available, cannot load TIFF files.")
@@ -144,37 +128,26 @@ class NikonDataReader(object):
             # angular increment (in degrees)
             elif line.startswith("AngularStep"):
                 angular_step = float(line.split('=')[1])
-        
-        if (self.roi != -1): 
-            if ((self.roi[0] < 0) or
-                (self.roi[1] < 0) or
-                (self.roi[2] > pixel_num_v_0) or 
-                (self.roi[3] > pixel_num_h_0)):
-                raise Exception('ROI is out of range. Image size is (v{} x h{}).'\
-                                .format(pixel_num_v_0, pixel_num_h_0))
+                
+        if self.roi == -1:
+            self._roi_par = [(0, pixel_num_v_0), \
+                              (0, pixel_num_h_0)]
+        else:
+            self._roi_par = self.roi.copy()
+            if self._roi_par[0] == -1:
+                self._roi_par[0] = (0, pixel_num_v_0)
+            if self._roi_par[1] == -1:
+                self._roi_par[1] = (0, pixel_num_h_0)
                 
         # calculate number of pixels and pixel size
-        if ((self.binning == [1, 1]) and (self.roi == -1)):
-            pixel_num_v = pixel_num_v_0
-            pixel_num_h = pixel_num_h_0
+        if (self.binning == [1, 1]):
+            pixel_num_v = self._roi_par[0][1] - self._roi_par[0][0]
+            pixel_num_h = self._roi_par[1][1] - self._roi_par[1][0]
             pixel_size_v = pixel_size_v_0
             pixel_size_h = pixel_size_h_0
-            
-        elif ((self.binning == [1, 1]) and (self.roi != -1)):
-            pixel_num_v = self.roi[2] - self.roi[0]
-            pixel_num_h = self.roi[3] - self.roi[1]
-            pixel_size_v = pixel_size_v_0
-            pixel_size_h = pixel_size_h_0
-            
-        elif ((self.binning > [1, 1]) and (self.roi == -1)):
-            pixel_num_v = pixel_num_v_0 // self.binning[0]
-            pixel_num_h = pixel_num_h_0 // self.binning[1]
-            pixel_size_v = pixel_size_v_0 * self.binning[0]
-            pixel_size_h = pixel_size_h_0 * self.binning[1]
-            
-        elif ((self.binning > [1, 1]) and (self.roi != -1)):
-            pixel_num_v = (self.roi[2] - self.roi[0]) // self.binning[0]
-            pixel_num_h = (self.roi[3] - self.roi[1]) // self.binning[1]
+        else:
+            pixel_num_v = (self._roi_par[0][1] - self._roi_par[0][0]) // self.binning[0]
+            pixel_num_h = (self._roi_par[1][1] - self._roi_par[1][0]) // self.binning[1]
             pixel_size_v = pixel_size_v_0 * self.binning[0]
             pixel_size_h = pixel_size_h_0 * self.binning[1]
         
@@ -229,19 +202,19 @@ class NikonDataReader(object):
                                        angle_unit = 'degree')
 
     def get_geometry(self):
+        
         '''
         Return AcquisitionGeometry object
         '''
         
         return self._ag
         
-    
-    
     def load_projections(self):
-        '''
-        Load projections in AcquisitionData container
-        '''
         
+        '''
+        Load projections and return AcquisitionData container
+        '''
+            
         # get path to projections
         path_projection = os.path.dirname(self.xtek_file)
         
@@ -260,24 +233,14 @@ class NikonDataReader(object):
             except:
                 print('Error reading\n {}\n file.'.format(filename))
                 raise
-            
-            if ((self.binning == [1, 1]) and (self.roi == -1)):
-                data[i, :, :] = tmp
                 
-            elif ((self.binning == [1, 1]) and (self.roi != -1)):
-                data[i, :, :] = tmp[self.roi[0]:self.roi[2], self.roi[1]:self.roi[3]]
-                
-            elif ((self.binning > [1, 1]) and (self.roi == -1)):
+            if (self.binning == [1, 1]):
+                data[i, :, :] = tmp[self._roi_par[0][0]:self._roi_par[0][1], self._roi_par[1][0]:self._roi_par[1][1]]
+            else:
                 shape = (self._ag.pixel_num_v, self.binning[0], 
                          self._ag.pixel_num_h, self.binning[1])
-                data[i, :, :] = tmp[:(self._ag.pixel_num_v * self.binning[0]), \
-                                    :(self._ag.pixel_num_h * self.binning[1])].reshape(shape).mean(-1).mean(1)
-                        
-            elif ((self.binning > [1, 1]) and (self.roi != -1)):
-                shape = (self._ag.pixel_num_v, self.binning[0], 
-                         self._ag.pixel_num_h, self.binning[1])
-                data[i, :, :] = tmp[self.roi[0]:(self.roi[0] + (((self.roi[2] - self.roi[0]) // self.binning[0]) * self.binning[0])), \
-                                    self.roi[1]:(self.roi[1] + (((self.roi[3] - self.roi[1]) // self.binning[1]) * self.binning[1]))].reshape(shape).mean(-1).mean(1)
+                data[i, :, :] = tmp[self._roi_par[0][0]:(self._roi_par[0][0] + (((self._roi_par[0][1] - self._roi_par[0][0]) // self.binning[0]) * self.binning[0])), \
+                                    self._roi_par[1][0]:(self._roi_par[1][0] + (((self._roi_par[1][1] - self._roi_par[1][0]) // self.binning[1]) * self.binning[1]))].reshape(shape).mean(-1).mean(1)
         
         if (self.normalize):
             data /= self._white_level
@@ -301,16 +264,16 @@ class NikonDataReader(object):
 
 '''
 # usage example
-
 xtek_file = '/home/evelina/nikon_data/SophiaBeads_256_averaged.xtekct'
 reader = NikonDataReader()
 reader.set_up(xtek_file = xtek_file,
-              binning = [3, 1],
-              roi = [200, 500, 1500, 2000],
+              binning = [1, 1],
+              roi = -1,
               normalize = True,
               flip = True)
 
 data = reader.load_projections()
+print(data)
 ag = reader.get_geometry()
 print(ag)
 

@@ -58,8 +58,17 @@ class NEXUSDataReader(object):
         
     def load_data(self):
         
+        '''
+        Parse NEXUS file and returns either ImageData or Acquisition Data 
+        depending on file content
+        '''
+        
         try:
             with h5py.File(self.nexus_file,'r') as file:
+                
+                if (file.attrs['creator'] != 'NEXUSDataWriter.py'):
+                    raise Exception('We can parse only files created by NEXUSDataWriter.py')
+                
                 ds_data = file['entry1/tomo_entry/data/data']
                 data = numpy.array(ds_data, dtype = 'float32')
                 
@@ -108,9 +117,16 @@ class NEXUSDataReader(object):
             raise
                 
     def get_geometry(self):
+        
+        '''
+        Return either ImageGeometry or AcquisitionGeometry 
+        depepnding on file content
+        '''
+        
         return self._geometry
 
 
+'''
 # usage example
 reader = NEXUSDataReader()
 reader.set_up(nexus_file = '/home/evelina/test_nexus.nxs')
@@ -118,3 +134,11 @@ acquisition_data = reader.load_data()
 print(acquisition_data)
 ag = reader.get_geometry()
 print(ag)
+
+reader = NEXUSDataReader()
+reader.set_up(nexus_file = '/home/evelina/test_nexus_im.nxs')
+image_data = reader.load_data()
+print(image_data)
+ig = reader.get_geometry()
+print(ig)
+'''

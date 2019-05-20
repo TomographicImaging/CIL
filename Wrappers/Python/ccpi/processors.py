@@ -30,8 +30,29 @@ import matplotlib.pyplot as plt
 class Resizer(DataProcessor):
 
     def __init__(self,
-                 roi = None,
-                 binning = None):
+                 roi = -1,
+                 binning = 1):
+        
+        '''
+        Constructor
+        
+        Input:
+            
+            roi             region-of-interest to crop. If roi = -1 (default), then no crop. 
+                            Otherwise roi is given by a list with ndim elements, 
+                            where each element is either -1 if no crop along this 
+                            dimension or a tuple with beginning and end coodinates to crop to.
+                            Example:
+                                to crop 4D array along 2nd dimension:
+                                roi = [-1, -1, (100, 900), -1]
+                            
+            binning         number of pixels to bin (combine) along each dimension.
+                            If binning = 1, then projections in original resolution are loaded. 
+                            Otherwise, binning is given by a list with ndim integers. 
+                            Example:
+                                to rebin 3D array along 1st direction:
+                                binning = [1, 5, 1]
+        '''
 
         kwargs = {'roi': roi,
                   'binning': binning}
@@ -41,7 +62,7 @@ class Resizer(DataProcessor):
     def check_input(self, data):
         if not ((isinstance(data, ImageData)) or 
                 (isinstance(data, AcquisitionData))):
-            raise Exception('Writer supports only following data types:\n' +
+            raise Exception('Processor supports only following data types:\n' +
                             ' - ImageData\n - AcquisitionData')
         elif (data.geometry == None):
             raise Exception('Geometry is not defined.')
@@ -63,11 +84,15 @@ class Resizer(DataProcessor):
             if (len(roi_par) != ndim):
                 raise Exception('Number of dimensions and number of elements in roi parameter do not match')
 
-        if (len(self.binning) != ndim):
-            raise Exception('Number of dimensions and number of elements in binning parameter do not match')
+        if (self.binning == 1):
+            binning = [1] * ndim
+        else:
+            binning = self.binning.copy()
+            if (len(binning) != ndim):
+                raise Exception('Number of dimensions and number of elements in binning parameter do not match')
                 
         if (isinstance(data, ImageData)):
-            if ((all(x == -1 for x in roi_par)) and (all(x == 1 for x in self.binning))):
+            if ((all(x == -1 for x in roi_par)) and (all(x == 1 for x in binning))):
                 for key in data.dimension_labels:
                     if data.dimension_labels[key] == 'channel':
                         geometry.channels = geometry_0.channels
@@ -88,41 +113,41 @@ class Resizer(DataProcessor):
                 for key in data.dimension_labels:
                     if data.dimension_labels[key] == 'channel':
                         if (roi_par[key] != -1):
-                            geometry.channels = (roi_par[key][1] - roi_par[key][0]) // self.binning[key]
-                            roi_par[key] = (roi_par[key][0], roi_par[key][0] + ((roi_par[key][1] - roi_par[key][0]) // self.binning[key]) * self.binning[key])
+                            geometry.channels = (roi_par[key][1] - roi_par[key][0]) // binning[key]
+                            roi_par[key] = (roi_par[key][0], roi_par[key][0] + ((roi_par[key][1] - roi_par[key][0]) // binning[key]) * binning[key])
                         else:
-                            geometry.channels = geometry_0.channels // self.binning[key]
-                            roi_par[key] = (0, geometry.channels * self.binning[key])
+                            geometry.channels = geometry_0.channels // binning[key]
+                            roi_par[key] = (0, geometry.channels * binning[key])
                     elif data.dimension_labels[key] == 'horizontal_y':
                         if (roi_par[key] != -1):
-                            geometry.voxel_num_y = (roi_par[key][1] - roi_par[key][0]) // self.binning[key]
-                            geometry.voxel_size_y = geometry_0.voxel_size_y * self.binning[key]
-                            roi_par[key] = (roi_par[key][0], roi_par[key][0] + ((roi_par[key][1] - roi_par[key][0]) // self.binning[key]) * self.binning[key])
+                            geometry.voxel_num_y = (roi_par[key][1] - roi_par[key][0]) // binning[key]
+                            geometry.voxel_size_y = geometry_0.voxel_size_y * binning[key]
+                            roi_par[key] = (roi_par[key][0], roi_par[key][0] + ((roi_par[key][1] - roi_par[key][0]) // binning[key]) * binning[key])
                         else:
-                            geometry.voxel_num_y = geometry_0.voxel_num_y // self.binning[key]
-                            geometry.voxel_size_y = geometry_0.voxel_size_y * self.binning[key]
-                            roi_par[key] = (0, geometry.voxel_num_y * self.binning[key])
+                            geometry.voxel_num_y = geometry_0.voxel_num_y // binning[key]
+                            geometry.voxel_size_y = geometry_0.voxel_size_y * binning[key]
+                            roi_par[key] = (0, geometry.voxel_num_y * binning[key])
                     elif data.dimension_labels[key] == 'vertical':
                         if (roi_par[key] != -1):
-                            geometry.voxel_num_z = (roi_par[key][1] - roi_par[key][0]) // self.binning[key]
-                            geometry.voxel_size_z = geometry_0.voxel_size_z * self.binning[key]
-                            roi_par[key] = (roi_par[key][0], roi_par[key][0] + ((roi_par[key][1] - roi_par[key][0]) // self.binning[key]) * self.binning[key])
+                            geometry.voxel_num_z = (roi_par[key][1] - roi_par[key][0]) // binning[key]
+                            geometry.voxel_size_z = geometry_0.voxel_size_z * binning[key]
+                            roi_par[key] = (roi_par[key][0], roi_par[key][0] + ((roi_par[key][1] - roi_par[key][0]) // binning[key]) * binning[key])
                         else:
-                            geometry.voxel_num_z = geometry_0.voxel_num_z // self.binning[key]
-                            geometry.voxel_size_z = geometry_0.voxel_size_z * self.binning[key]
-                            roi_par[key] = (0, geometry.voxel_num_z * self.binning[key])
+                            geometry.voxel_num_z = geometry_0.voxel_num_z // binning[key]
+                            geometry.voxel_size_z = geometry_0.voxel_size_z * binning[key]
+                            roi_par[key] = (0, geometry.voxel_num_z * binning[key])
                     elif data.dimension_labels[key] == 'horizontal_x':
                         if (roi_par[key] != -1):
-                            geometry.voxel_num_x = (roi_par[key][1] - roi_par[key][0]) // self.binning[key]
-                            geometry.voxel_size_x = geometry_0.voxel_size_x * self.binning[key]
-                            roi_par[key] = (roi_par[key][0], roi_par[key][0]+ ((roi_par[key][1] - roi_par[key][0]) // self.binning[key]) * self.binning[key])
+                            geometry.voxel_num_x = (roi_par[key][1] - roi_par[key][0]) // binning[key]
+                            geometry.voxel_size_x = geometry_0.voxel_size_x * binning[key]
+                            roi_par[key] = (roi_par[key][0], roi_par[key][0]+ ((roi_par[key][1] - roi_par[key][0]) // binning[key]) * binning[key])
                         else:
-                            geometry.voxel_num_x = geometry_0.voxel_num_x // self.binning[key]
-                            geometry.voxel_size_x = geometry_0.voxel_size_x * self.binning[key]
-                            roi_par[key] = (0, geometry.voxel_num_x * self.binning[key])
+                            geometry.voxel_num_x = geometry_0.voxel_num_x // binning[key]
+                            geometry.voxel_size_x = geometry_0.voxel_size_x * binning[key]
+                            roi_par[key] = (0, geometry.voxel_num_x * binning[key])
             
         else: # AcquisitionData
-            if ((all(x == -1 for x in roi_par)) and (all(x == 1 for x in self.binning))):
+            if ((all(x == -1 for x in roi_par)) and (all(x == 1 for x in binning))):
                 for key in data.dimension_labels:
                     if data.dimension_labels[key] == 'channel':
                         geometry.channels = geometry_0.channels
@@ -142,69 +167,69 @@ class Resizer(DataProcessor):
                 for key in data.dimension_labels:
                     if data.dimension_labels[key] == 'channel':
                         if (roi_par[key] != -1):
-                            geometry.channels = (roi_par[key][1] - roi_par[key][0]) // self.binning[key]
-                            roi_par[key] = (roi_par[key][0], roi_par[key][0] + ((roi_par[key][1] - roi_par[key][0]) // self.binning[key]) * self.binning[key])
+                            geometry.channels = (roi_par[key][1] - roi_par[key][0]) // binning[key]
+                            roi_par[key] = (roi_par[key][0], roi_par[key][0] + ((roi_par[key][1] - roi_par[key][0]) // binning[key]) * binning[key])
                         else:
-                            geometry.channels = geometry_0.channels // self.binning[key]
-                            roi_par[key] = (0, geometry.channels * self.binning[key])
+                            geometry.channels = geometry_0.channels // binning[key]
+                            roi_par[key] = (0, geometry.channels * binning[key])
                     elif data.dimension_labels[key] == 'angle':
                         if (roi_par[key] != -1):
                             geometry.angles = geometry_0.angles[roi_par[key][0]:roi_par[key][1]]
                         else:
                             geometry.angles = geometry_0.angles
                             roi_par[key] = (0, len(geometry.angles))
-                        if (self.binning[key] != 1):
-                            self.binning[key] = 1
+                        if (binning[key] != 1):
+                            binning[key] = 1
                             warnings.warn('Rebinning in angular dimensions is not supported: \n binning[{}] is set to 1.'.format(key))
                     elif data.dimension_labels[key] == 'vertical':
                         if (roi_par[key] != -1):
-                            geometry.pixel_num_v = (roi_par[key][1] - roi_par[key][0]) // self.binning[key]
-                            geometry.pixel_size_v = geometry_0.pixel_size_v * self.binning[key]
-                            roi_par[key] = (roi_par[key][0], roi_par[key][0] + ((roi_par[key][1] - roi_par[key][0]) // self.binning[key]) * self.binning[key])
+                            geometry.pixel_num_v = (roi_par[key][1] - roi_par[key][0]) // binning[key]
+                            geometry.pixel_size_v = geometry_0.pixel_size_v * binning[key]
+                            roi_par[key] = (roi_par[key][0], roi_par[key][0] + ((roi_par[key][1] - roi_par[key][0]) // binning[key]) * binning[key])
                         else:
-                            geometry.pixel_num_v = geometry_0.pixel_num_v // self.binning[key]
-                            geometry.pixel_size_v = geometry_0.pixel_size_v * self.binning[key]
-                            roi_par[key] = (0, geometry.pixel_num_v * self.binning[key])
+                            geometry.pixel_num_v = geometry_0.pixel_num_v // binning[key]
+                            geometry.pixel_size_v = geometry_0.pixel_size_v * binning[key]
+                            roi_par[key] = (0, geometry.pixel_num_v * binning[key])
                     elif data.dimension_labels[key] == 'horizontal':
                         if (roi_par[key] != -1):
-                            geometry.pixel_num_h = (roi_par[key][1] - roi_par[key][0]) // self.binning[key]
-                            geometry.pixel_size_h = geometry_0.pixel_size_h * self.binning[key]
-                            roi_par[key] = (roi_par[key][0], roi_par[key][0] + ((roi_par[key][1] - roi_par[key][0]) // self.binning[key]) * self.binning[key])
+                            geometry.pixel_num_h = (roi_par[key][1] - roi_par[key][0]) // binning[key]
+                            geometry.pixel_size_h = geometry_0.pixel_size_h * binning[key]
+                            roi_par[key] = (roi_par[key][0], roi_par[key][0] + ((roi_par[key][1] - roi_par[key][0]) // binning[key]) * binning[key])
                         else:
-                            geometry.pixel_num_h = geometry_0.pixel_num_h // self.binning[key]
-                            geometry.pixel_size_h = geometry_0.pixel_size_h * self.binning[key]
-                            roi_par[key] = (0, geometry.pixel_num_h * self.binning[key])
+                            geometry.pixel_num_h = geometry_0.pixel_num_h // binning[key]
+                            geometry.pixel_size_h = geometry_0.pixel_size_h * binning[key]
+                            roi_par[key] = (0, geometry.pixel_num_h * binning[key])
                             
         if ndim == 2:
-            n_pix_0 = (roi_par[0][1] - roi_par[0][0]) // self.binning[0]
-            n_pix_1 = (roi_par[1][1] - roi_par[1][0]) // self.binning[1]
-            shape = (n_pix_0, self.binning[0], 
-                     n_pix_1, self.binning[1])
-            data_resized = data.as_array()[roi_par[0][0]:(roi_par[0][0] + n_pix_0 * self.binning[0]), 
-                                           roi_par[1][0]:(roi_par[1][0] + n_pix_1 * self.binning[1])].reshape(shape).mean(-1).mean(1)
+            n_pix_0 = (roi_par[0][1] - roi_par[0][0]) // binning[0]
+            n_pix_1 = (roi_par[1][1] - roi_par[1][0]) // binning[1]
+            shape = (n_pix_0, binning[0], 
+                     n_pix_1, binning[1])
+            data_resized = data.as_array()[roi_par[0][0]:(roi_par[0][0] + n_pix_0 * binning[0]), 
+                                           roi_par[1][0]:(roi_par[1][0] + n_pix_1 * binning[1])].reshape(shape).mean(-1).mean(1)
         if ndim == 3:
-            n_pix_0 = (roi_par[0][1] - roi_par[0][0]) // self.binning[0]
-            n_pix_1 = (roi_par[1][1] - roi_par[1][0]) // self.binning[1]
-            n_pix_2 = (roi_par[2][1] - roi_par[2][0]) // self.binning[2]
-            shape = (n_pix_0, self.binning[0], 
-                     n_pix_1, self.binning[1],
-                     n_pix_2, self.binning[2])
-            data_resized = data.as_array()[roi_par[0][0]:(roi_par[0][0] + n_pix_0 * self.binning[0]), 
-                                           roi_par[1][0]:(roi_par[1][0] + n_pix_1 * self.binning[1]), 
-                                           roi_par[2][0]:(roi_par[2][0] + n_pix_2 * self.binning[2])].reshape(shape).mean(-1).mean(1).mean(2)
+            n_pix_0 = (roi_par[0][1] - roi_par[0][0]) // binning[0]
+            n_pix_1 = (roi_par[1][1] - roi_par[1][0]) // binning[1]
+            n_pix_2 = (roi_par[2][1] - roi_par[2][0]) // binning[2]
+            shape = (n_pix_0, binning[0], 
+                     n_pix_1, binning[1],
+                     n_pix_2, binning[2])
+            data_resized = data.as_array()[roi_par[0][0]:(roi_par[0][0] + n_pix_0 * binning[0]), 
+                                           roi_par[1][0]:(roi_par[1][0] + n_pix_1 * binning[1]), 
+                                           roi_par[2][0]:(roi_par[2][0] + n_pix_2 * binning[2])].reshape(shape).mean(-1).mean(1).mean(2)
         if ndim == 4:
-            n_pix_0 = (roi_par[0][1] - roi_par[0][0]) // self.binning[0]
-            n_pix_1 = (roi_par[1][1] - roi_par[1][0]) // self.binning[1]
-            n_pix_2 = (roi_par[2][1] - roi_par[2][0]) // self.binning[2]
-            n_pix_3 = (roi_par[3][1] - roi_par[3][0]) // self.binning[3]
-            shape = (n_pix_0, self.binning[0], 
-                     n_pix_1, self.binning[1],
-                     n_pix_2, self.binning[2],
-                     n_pix_3, self.binning[3])
-            data_resized = data.as_array()[roi_par[0][0]:(roi_par[0][0] + n_pix_0 * self.binning[0]), 
-                                           roi_par[1][0]:(roi_par[1][0] + n_pix_1 * self.binning[1]), 
-                                           roi_par[2][0]:(roi_par[2][0] + n_pix_2 * self.binning[2]), 
-                                           roi_par[3][0]:(roi_par[3][0] + n_pix_3 * self.binning[3])].reshape(shape).mean(-1).mean(1).mean(2).mean(3)
+            n_pix_0 = (roi_par[0][1] - roi_par[0][0]) // binning[0]
+            n_pix_1 = (roi_par[1][1] - roi_par[1][0]) // binning[1]
+            n_pix_2 = (roi_par[2][1] - roi_par[2][0]) // binning[2]
+            n_pix_3 = (roi_par[3][1] - roi_par[3][0]) // binning[3]
+            shape = (n_pix_0, binning[0], 
+                     n_pix_1, binning[1],
+                     n_pix_2, binning[2],
+                     n_pix_3, binning[3])
+            data_resized = data.as_array()[roi_par[0][0]:(roi_par[0][0] + n_pix_0 * binning[0]), 
+                                           roi_par[1][0]:(roi_par[1][0] + n_pix_1 * binning[1]), 
+                                           roi_par[2][0]:(roi_par[2][0] + n_pix_2 * binning[2]), 
+                                           roi_par[3][0]:(roi_par[3][0] + n_pix_3 * binning[3])].reshape(shape).mean(-1).mean(1).mean(2).mean(3)
 
         out = type(data)(array = data_resized, 
                          deep_copy = False,
@@ -213,8 +238,9 @@ class Resizer(DataProcessor):
         
         return out
 
-'''
 
+'''
+#usage exaample
 ig = ImageGeometry(voxel_num_x = 200, 
                    voxel_num_y = 200, 
                    voxel_num_z = 200, 

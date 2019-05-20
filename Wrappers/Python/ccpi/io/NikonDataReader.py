@@ -32,7 +32,7 @@ class NikonDataReader(object):
             
             roi             region-of-interest to load. If roi = -1 (default), 
                             full projections will be loaded. Otherwise roi is 
-                            given by [row0, column0, row1, column1], where 
+                            given by [(row0, row1), (column0, column1)], where 
                             row0, column0 are coordinates of top left corner and 
                             row1, column1 are coordinates of bottom right corner.
                             

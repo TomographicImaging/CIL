@@ -16,7 +16,7 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-import time
+import time, functools
 from numbers import Integral
 
 class Algorithm(object):
@@ -34,7 +34,7 @@ class Algorithm(object):
       method will stop when the stopping cryterion is met. 
    '''
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         '''Constructor
         
         Set the minimal number of parameters:
@@ -48,11 +48,11 @@ class Algorithm(object):
                                        when evaluating the objective is computationally expensive.
         '''
         self.iteration = 0
-        self.__max_iteration = 0
+        self.__max_iteration = kwargs.get('max_iteration', 0)
         self.__loss = []
         self.memopt = False
         self.timing = []
-        self.update_objective_interval = 1
+        self.update_objective_interval = kwargs.get('update_objective_interval', 1)
     def set_up(self, *args, **kwargs):
         '''Set up the algorithm'''
         raise NotImplementedError()
@@ -91,9 +91,11 @@ class Algorithm(object):
             if self.iteration % self.update_objective_interval == 0:
                 self.update_objective()
             self.iteration += 1
+        
     def get_output(self):
         '''Returns the solution found'''
         return self.x
+    
     def get_last_loss(self):
         '''Returns the last stored value of the loss function
         
@@ -145,14 +147,38 @@ class Algorithm(object):
         if self.should_stop():
             print ("Stop cryterion has been reached.")
         i = 0
+        
+        if verbose:
+            print ("{:>9} {:>10} {:>11} {:>20}".format('Iter', 
+                                                      'Max Iter',
+                                                      's/Iter',
+                                                      'Objective Value'))
         for _ in self:
-            if verbose and self.iteration % self.update_objective_interval == 0:
-                print ("Iteration {}/{}, objective {}".format(self.iteration, 
-                       self.max_iteration, self.get_last_objective()) )
-            else:
+            if (self.iteration -1) % self.update_objective_interval == 0:                
+                if verbose:
+                    #print ("Iteration {:>7} max: {:>7}, = {}".format(self.iteration-1, 
+                    #   self.max_iteration, self.get_last_objective()) )
+                    print (self.verbose_output())
                 if callback is not None:
-                    callback(self.iteration, self.get_last_objective())
+                    callback(self.iteration -1, self.get_last_objective(), self.x)
             i += 1
             if i == iterations:
                 break
-    
+    def verbose_output(self):
+        '''Creates a nice tabulated output'''
+        timing = self.timing[-self.update_objective_interval-1:-1]
+        if len (timing) == 0:
+            t = 0
+        else:
+            t = sum(timing)/len(timing)
+        el = [ self.iteration-1, 
+               self.max_iteration,
+               "{:.3f} s/it".format(t), 
+               self.get_last_objective() ]
+        
+        if type(el[-1] ) == list:
+            string = functools.reduce(lambda x,y: x+' {:>15.5e}'.format(y), el[-1],'')
+            out = "{:>9} {:>10} {:>11} {}".format(*el[:-1] , string)
+        else:
+            out = "{:>9} {:>10} {:>11} {:>20.5e}".format(*el)
+        return out

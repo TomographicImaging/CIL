@@ -18,28 +18,31 @@
 # limitations under the License.
 #
 #=========================================================================
+
 """ 
 
-Tikhonov Denoising using PDHG algorithm:
+Total Variation Denoising using PDHG algorithm:
 
 
-Problem:     min_{x} \alpha * ||\nabla x||_{2}^{2} + \frac{1}{2} * || x - g ||_{2}^{2}
+Problem:     min_x, x>0  \alpha * ||\nabla x||_{2,1} + ||x-g||_{1}
 
              \alpha: Regularization parameter
              
              \nabla: Gradient operator 
              
-             g: Noisy Data with Gaussian Noise
-                          
+             g: Noisy Data with Salt & Pepper Noise
+             
+             
              Method = 0 ( PDHG - split ) :  K = [ \nabla,
                                                  Identity]
                           
                                                                     
-             Method = 1 (PDHG - explicit ):  K = \nabla  
-                                                                
+             Method = 1 (PDHG - explicit ):  K = \nabla    
+             
+             
 """
 
-from ccpi.framework import ImageData, ImageGeometry, TestData
+from ccpi.framework import ImageData, ImageGeometry
 
 import numpy as np 
 import numpy                          
@@ -48,15 +51,15 @@ import matplotlib.pyplot as plt
 from ccpi.optimisation.algorithms import PDHG
 
 from ccpi.optimisation.operators import BlockOperator, Identity, Gradient
-from ccpi.optimisation.functions import ZeroFunction, L2NormSquared,\
-      BlockFunction, KullbackLeibler, L1Norm
-
-import sys, os
+from ccpi.optimisation.functions import ZeroFunction, L1Norm, \
+                      MixedL21Norm, BlockFunction, L2NormSquared,\
+                          KullbackLeibler
+from ccpi.framework import TestData
+import os, sys
 if int(numpy.version.version.split('.')[1]) > 12:
     from skimage.util import random_noise
 else:
     from demoutil import random_noise
-
 
 # user supplied input
 if len(sys.argv) > 1:
@@ -70,16 +73,15 @@ if len(sys.argv) > 2:
 else:
     method = '0'
 print ("method ", method)
-
 # Create phantom for TV Salt & Pepper denoising
 N = 100
 
 loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
 data = loader.load(TestData.SIMPLE_PHANTOM_2D, size=(N,N))
+data = loader.load(TestData.PEPPERS, size=(N,N))
 ig = data.geometry
 ag = ig
 
-# Create noisy data. Apply Salt & Pepper noise
 # Create noisy data. 
 # Apply Salt & Pepper noise
 # gaussian
@@ -94,15 +96,9 @@ elif noise == 'gaussian':
     n1 = random_noise(data.as_array(), mode = noise, seed = 10)
 else:
     raise ValueError('Unsupported Noise ', noise)
-noisy_data = ImageData(n1)
-
-# fidelity
-if noise == 's&p':
-    f2 = L1Norm(b=noisy_data)
-elif noise == 'poisson':
-    f2 = KullbackLeibler(noisy_data)
-elif noise == 'gaussian':
-    f2 = 0.5 * L2NormSquared(b=noisy_data)
+noisy_data = ig.allocate()
+noisy_data.fill(n1)
+#noisy_data = ImageData(n1)
 
 # Show Ground Truth and Noisy Data
 plt.figure(figsize=(10,5))
@@ -116,40 +112,39 @@ plt.title('Noisy Data')
 plt.colorbar()
 plt.show()
 
-
 # Regularisation Parameter
-# no edge preservation alpha is big
+alpha = .2
+
+# fidelity
 if noise == 's&p':
-    alpha = 8.
+    f2 = L1Norm(b=noisy_data)
 elif noise == 'poisson':
-    alpha = 8.
+    f2 = KullbackLeibler(noisy_data)
 elif noise == 'gaussian':
-    alpha = 8.
+    f2 = L2NormSquared(b=noisy_data)
 
 if method == '0':
 
     # Create operators
-    op1 = Gradient(ig)
+    op1 = Gradient(ig, correlation=Gradient.CORRELATION_SPACECHANNEL)
     op2 = Identity(ig, ag)
 
     # Create BlockOperator
     operator = BlockOperator(op1, op2, shape=(2,1) ) 
 
-    # Create functions
-      
-    f1 = alpha * L2NormSquared()
-    # f2 must change according to noise
-    #f2 = 0.5 * L2NormSquared(b = noisy_data)
-    f = BlockFunction(f1, f2)                                       
+    # Create functions      
+    f1 = alpha * MixedL21Norm()
+    #f2 = L1Norm(b = noisy_data)    
+    f = BlockFunction(f1, f2)  
+                                      
     g = ZeroFunction()
     
 else:
     
     # Without the "Block Framework"
     operator = Gradient(ig)
-    f =  alpha * L2NormSquared()
-    # g must change according to noise
-    #g =  0.5 * L2NormSquared(b = noisy_data)
+    f =  alpha * MixedL21Norm()
+    #g =  L1Norm(b = noisy_data)
     g = f2
         
     
@@ -165,29 +160,50 @@ opt = {'niter':2000, 'memopt': True}
 pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma, memopt=True)
 pdhg.max_iteration = 2000
 pdhg.update_objective_interval = 50
-pdhg.run(1500)
+pdhg.run(2000)
 
-
-plt.figure(figsize=(20,5))
-plt.subplot(1,4,1)
-plt.imshow(data.as_array())
-plt.title('Ground Truth')
-plt.colorbar()
-plt.subplot(1,4,2)
-plt.imshow(noisy_data.as_array())
-plt.title('Noisy Data')
-plt.colorbar()
-plt.subplot(1,4,3)
-plt.imshow(pdhg.get_output().as_array())
-plt.title('Tikhonov Reconstruction')
-plt.colorbar()
-plt.subplot(1,4,4)
-plt.plot(np.linspace(0,N,N), data.as_array()[int(N/2),:], label = 'GTruth')
-plt.plot(np.linspace(0,N,N), pdhg.get_output().as_array()[int(N/2),:], label = 'TV reconstruction')
-plt.legend()
-plt.title('Middle Line Profiles')
-plt.show()
-
+if data.geometry.channels > 1:
+    plt.figure(figsize=(20,15))
+    for row in range(data.geometry.channels):
+        
+        plt.subplot(3,4,1+row*4)
+        plt.imshow(data.subset(channel=row).as_array())
+        plt.title('Ground Truth')
+        plt.colorbar()
+        plt.subplot(3,4,2+row*4)
+        plt.imshow(noisy_data.subset(channel=row).as_array())
+        plt.title('Noisy Data')
+        plt.colorbar()
+        plt.subplot(3,4,3+row*4)
+        plt.imshow(pdhg.get_output().subset(channel=row).as_array())
+        plt.title('TV Reconstruction')
+        plt.colorbar()
+        plt.subplot(3,4,4+row*4)
+        plt.plot(np.linspace(0,N,N), data.subset(channel=row).as_array()[int(N/2),:], label = 'GTruth')
+        plt.plot(np.linspace(0,N,N), pdhg.get_output().subset(channel=row).as_array()[int(N/2),:], label = 'TV reconstruction')
+        plt.legend()
+        plt.title('Middle Line Profiles')
+    plt.show()
+else:
+    plt.figure(figsize=(20,5))
+    plt.subplot(1,4,1)
+    plt.imshow(data.subset(channel=0).as_array())
+    plt.title('Ground Truth')
+    plt.colorbar()
+    plt.subplot(1,4,2)
+    plt.imshow(noisy_data.subset(channel=0).as_array())
+    plt.title('Noisy Data')
+    plt.colorbar()
+    plt.subplot(1,4,3)
+    plt.imshow(pdhg.get_output().subset(channel=0).as_array())
+    plt.title('TV Reconstruction')
+    plt.colorbar()
+    plt.subplot(1,4,4)
+    plt.plot(np.linspace(0,N,N), data.as_array()[int(N/2),:], label = 'GTruth')
+    plt.plot(np.linspace(0,N,N), pdhg.get_output().as_array()[int(N/2),:], label = 'TV reconstruction')
+    plt.legend()
+    plt.title('Middle Line Profiles')
+    plt.show()
 
 
 ##%% Check with CVX solution
@@ -210,9 +226,8 @@ if cvx_not_installable:
     DX = SparseFiniteDiff(ig, direction=1, bnd_cond='Neumann')
     
     # Define Total Variation as a regulariser
-    
-    regulariser = alpha * sum_squares(norm(vstack([DX.matrix() * vec(u), DY.matrix() * vec(u)]), 2, axis = 0))
-    fidelity = 0.5 * sum_squares(u - noisy_data.as_array())    
+    regulariser = alpha * sum(norm(vstack([DX.matrix() * vec(u), DY.matrix() * vec(u)]), 2, axis = 0))
+    fidelity = pnorm( u - noisy_data.as_array(),1)
     
     # choose solver
     if 'MOSEK' in installed_solvers():
@@ -249,8 +264,3 @@ if cvx_not_installable:
             
     print('Primal Objective (CVX) {} '.format(obj.value))
     print('Primal Objective (PDHG) {} '.format(pdhg.objective[-1][0]))
-
-
-
-
-

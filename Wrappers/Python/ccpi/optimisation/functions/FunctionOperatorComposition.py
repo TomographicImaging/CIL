@@ -76,8 +76,8 @@ if __name__ == '__main__':
     
     Aop = AstraProjectorSimple(ig, ag, 'cpu')    
 
-    u = ig.allocate('random_int')
-    u1 = ig.allocate('random_int')
+    u = ig.allocate('random_int', seed=15)
+    u1 = ig.allocate('random_int', seed=10)
     b = Aop.direct(u1)
     
         

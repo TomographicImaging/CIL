@@ -59,7 +59,7 @@ if __name__ == '__main__':
     from ccpi.optimisation.functions import L2NormSquared
     from ccpi.astra.ops import AstraProjectorSimple
     import numpy as np
-    
+        
     M, N= 50, 50
     ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
     

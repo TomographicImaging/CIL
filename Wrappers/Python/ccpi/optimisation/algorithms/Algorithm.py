@@ -147,10 +147,9 @@ class Algorithm(object):
         if self.should_stop():
             print ("Stop cryterion has been reached.")
         i = 0
-        
-        if verbose:
-            print (self.verbose_header())
         for _ in self:
+            if i == 0 and verbose:
+                print (self.verbose_header())
             if (self.iteration -1) % self.update_objective_interval == 0:                
                 if verbose:
                     #print ("Iteration {:>7} max: {:>7}, = {}".format(self.iteration-1, 
@@ -178,7 +177,7 @@ class Algorithm(object):
         return out
 
     def objective_to_string(self):
-        el = self.get_last_objective()[0]
+        el = self.get_last_objective()
         if type(el) == list:
             string = functools.reduce(lambda x,y: x+' {:>13.5e}'.format(y), el[:-1],'')
             string += '{:>15.5e}'.format(el[-1])
@@ -186,7 +185,7 @@ class Algorithm(object):
             string = "{:>20.5e}".format(el)
         return string
     def verbose_header(self):
-        el = 1
+        el = self.get_last_objective()
         if type(el) == list:
             out = "{:>9} {:>10} {:>13} {:>13} {:>13} {:>15}\n".format('Iter', 
                                                       'Max Iter',
@@ -197,7 +196,7 @@ class Algorithm(object):
                                                       '[s]',
                                                       'Objective' , 'Objective', 'Gap')
         else:
-            out = "{:>9} {:>10} {:>13} {:>20}".format('Iter', 
+            out = "{:>9} {:>10} {:>13} {:>20}\n".format('Iter', 
                                                       'Max Iter',
                                                       'Time/Iter',
                                                       'Objective')

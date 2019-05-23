@@ -50,41 +50,59 @@ class FunctionOperatorComposition(Function):
             self.operator.adjoint(tmp, out=out)
 
     
-    
-
-    #TODO do not know if we need it
-    #def call_adjoint(self, x):
-    #
-    #    return self.function(self.operator.adjoint(x))  
-
-
-    #def convex_conjugate(self, x):
-    #    
-    #        ''' convex_conjugate does not take into account the Operator'''
-    #    return self.function.convex_conjugate(x)
-
-    
-
 
                 
 if __name__ == '__main__':   
 
-    from ccpi.framework import ImageGeometry
+    from ccpi.framework import ImageGeometry, AcquisitionGeometry
     from ccpi.optimisation.operators import Gradient
     from ccpi.optimisation.functions import L2NormSquared
+    from ccpi.astra.ops import AstraProjectorSimple
+    import numpy as np
     
-    M, N, K = 2,3
+    M, N= 50, 50
     ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
     
-    G = Gradient(ig)
+    detectors = N
+    angles_num = N    
+    det_w = 1.0
+    
+    angles = np.linspace(0, np.pi, angles_num, endpoint=False)
+    ag = AcquisitionGeometry('parallel',
+                             '2D',
+                             angles,
+                             detectors,det_w)
+    
+    
+    Aop = AstraProjectorSimple(ig, ag, 'cpu')    
+
+    u = ig.allocate('random_int')
+    u1 = ig.allocate('random_int')
+    b = Aop.direct(u1)
+    
+        
+#    G = Gradient(ig)
     alpha = 0.5
     
-    f = L2NormSquared()    
-    f_comp = FunctionOperatorComposition(G, alpha * f)
-    x = ig.allocate('random_int')
-    print(f_comp.gradient(x).shape
+    f1 =  alpha * L2NormSquared(b=b)    
+
+    f_comp = FunctionOperatorComposition(f1, Aop)
+    
+    print(f_comp(u))
+    
+    
+    z1 = Aop.direct(u)
+    tmp = 0.5 * ((z1 - b)**2).sum()
+    
+   
+    print(tmp)
+    
+    
+    
+    
+    
+    
           
-          )
     
 
              

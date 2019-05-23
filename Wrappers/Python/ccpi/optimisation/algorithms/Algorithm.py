@@ -149,10 +149,7 @@ class Algorithm(object):
         i = 0
         
         if verbose:
-            print ("{:>9} {:>10} {:>11} {:>20}".format('Iter', 
-                                                      'Max Iter',
-                                                      's/Iter',
-                                                      'Objective Value'))
+            print (self.verbose_header())
         for _ in self:
             if (self.iteration -1) % self.update_objective_interval == 0:                
                 if verbose:
@@ -173,12 +170,39 @@ class Algorithm(object):
             t = sum(timing)/len(timing)
         el = [ self.iteration-1, 
                self.max_iteration,
-               "{:.3f} s/it".format(t), 
+               "{:.3f}".format(t), 
                self.get_last_objective() ]
         
-        if type(el[-1] ) == list:
-            string = functools.reduce(lambda x,y: x+' {:>15.5e}'.format(y), el[-1],'')
-            out = "{:>9} {:>10} {:>11} {}".format(*el[:-1] , string)
+        string = self.objective_to_string()
+        out = "{:>9} {:>10} {:>13} {}".format(*el[:-1] , string)
+        return out
+
+    def objective_to_string(self):
+        el = self.get_last_objective()[0]
+        if type(el) == list:
+            string = functools.reduce(lambda x,y: x+' {:>13.5e}'.format(y), el[:-1],'')
+            string += '{:>15.5e}'.format(el[-1])
         else:
-            out = "{:>9} {:>10} {:>11} {:>20.5e}".format(*el)
+            string = "{:>20.5e}".format(el)
+        return string
+    def verbose_header(self):
+        el = 1
+        if type(el) == list:
+            out = "{:>9} {:>10} {:>13} {:>13} {:>13} {:>15}\n".format('Iter', 
+                                                      'Max Iter',
+                                                      'Time/Iter',
+                                                      'Primal' , 'Dual', 'Primal-Dual')
+            out += "{:>9} {:>10} {:>13} {:>13} {:>13} {:>15}".format('', 
+                                                      '',
+                                                      '[s]',
+                                                      'Objective' , 'Objective', 'Gap')
+        else:
+            out = "{:>9} {:>10} {:>13} {:>20}".format('Iter', 
+                                                      'Max Iter',
+                                                      'Time/Iter',
+                                                      'Objective')
+            out += "{:>9} {:>10} {:>13} {:>20}".format('', 
+                                                      '',
+                                                      '[s]',
+                                                      '')
         return out

@@ -101,12 +101,12 @@ Aop = AstraProjectorSimple(ig, ag, dev)
 sin = Aop.direct(data)
 back_proj = Aop.adjoint(sin)
 
-plt.figure()
+plt.figure(figsize=(5,5))
 plt.imshow(sin.array)
 plt.title('Simulated data')
 plt.show()
 
-plt.figure()
+plt.figure(figsize=(5,5))
 plt.imshow(back_proj.array)
 plt.title('Backprojected data')
 plt.show()
@@ -117,7 +117,7 @@ plt.show()
 # demonstrated in the rest of this file. In general all methods need an initial 
 # guess and some algorithm options to be set:
 
-f = FunctionOperatorComposition(L2NormSquared(b=sin), Aop)
+f = FunctionOperatorComposition(0.5 * L2NormSquared(b=sin), Aop)
 g = ZeroFunction()
 
 x_init = ig.allocate()
@@ -126,7 +126,7 @@ opt = {'memopt':True}
 fista = FISTA(x_init=x_init, f=f, g=g, opt=opt)
 fista.max_iteration = 100
 fista.update_objective_interval = 1
-fista.run(100, verbose=False)
+fista.run(100, verbose=True)
 
 plt.figure()
 plt.imshow(fista.get_output().as_array())
@@ -141,11 +141,11 @@ plt.show()
 
 #%%
 
-# Run FISTA for least squares with lower bound 0.1
-fista0 = FISTA(x_init=x_init, f=f, g=IndicatorBox(lower=0, upper=1), opt=opt)
+# Run FISTA for least squares with lower/upper bound 
+fista0 = FISTA(x_init=x_init, f=f, g=IndicatorBox(lower=0,upper=1), opt=opt)
 fista0.max_iteration = 100
 fista0.update_objective_interval = 1
-fista0.run(100, verbose=False)
+fista0.run(100, verbose=True)
 
 plt.figure()
 plt.imshow(fista0.get_output().as_array())

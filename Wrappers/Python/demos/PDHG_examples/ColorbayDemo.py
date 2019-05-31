@@ -45,6 +45,7 @@ if phantom == 'carbon':
     filename = 'carbonPd_full_sinogram_stripes_removed.mat'
     X = loadmat(pathname + filename)
     X = numpy.transpose(X['SS'],(3,1,2,0))
+    X = X[80:100] # delete this to take all channels
     
 elif phantom == 'powder':
     pathname = '/media/newhd/shared/DataProcessed/' 
@@ -56,7 +57,7 @@ elif phantom == 'powder':
         arrays[k] = numpy.array(v)
     XX = arrays['S']    
     X = numpy.transpose(XX,(0,2,1,3))
-    X = X[0:250]
+    X = X[0:20]
     
         
     
@@ -68,7 +69,7 @@ num_pixels_v = X.shape[2]
 num_angles = X.shape[1]
 
 # Display a single projection in a single channel
-plt.imshow(X[100,5,:,:])
+plt.imshow(X[5,5,:,:])
 plt.title('Example of a projection image in one channel' )
 plt.show()
 
@@ -119,7 +120,7 @@ Aall = AstraProjectorMC(ig2d,ag2d,'gpu')
 
 # Compute and simple backprojction and display one channel as image.
 Xbp = Aall.adjoint(data2d)
-plt.imshow(Xbp.subset(channel=100).array)
+plt.imshow(Xbp.subset(channel=5).array)
 plt.show()
 
 #%% CGLS
@@ -130,7 +131,7 @@ cgls1.max_iteration = 100
 cgls1.update_objective_interval = 1
 cgls1.run(5,verbose=True)
 
-plt.imshow(cgls1.get_output().subset(channel=100).array)
+plt.imshow(cgls1.get_output().subset(channel=5).array)
 plt.title('CGLS')
 plt.show()
 
@@ -149,14 +150,15 @@ cgls2.update_objective_interval = 1
 
 cgls2.run(10,verbose=True)
 
-plt.imshow(cgls2.get_output().subset(channel=100).array)
+plt.imshow(cgls2.get_output().subset(channel=5).array)
 plt.title('Tikhonov')
 plt.show()
 
 #%% Total Variation
 
 # Regularisation Parameter
-alpha_TV = 50
+#alpha_TV = 0.08 # for carbon
+alpha_TV = 0.08 # for powder
 
 # Create operators
 op1 = Gradient(ig2d, correlation=Gradient.CORRELATION_SPACE)
@@ -166,7 +168,7 @@ op2 = Aall
 operator = BlockOperator(op1, op2, shape=(2,1) ) 
 
 # Create functions      
-f1 = alpha * MixedL21Norm()
+f1 = alpha_TV * MixedL21Norm()
 f2 = 0.5 * L2NormSquared(b=data2d)    
 f = BlockFunction(f1, f2)  
 g = ZeroFunction()
@@ -175,7 +177,7 @@ g = ZeroFunction()
 normK = 8.70320267279591 # Run one time no need to compute again takes time
     
 # Primal & dual stepsizes
-sigma = 10
+sigma = 1
 tau = 1/(sigma*normK**2)
 
 # Setup and run the PDHG algorithm
@@ -186,7 +188,7 @@ pdhg.run(1000, verbose =True)
 
 
 #%% Show sinograms
-channel_ind = [25,75,125]
+channel_ind = [10,15,15]
 
 plt.figure(figsize=(15,15))
 

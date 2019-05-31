@@ -7,3 +7,4 @@ Created on Tue Apr 30 13:51:09 2019
 
 from .CenterOfRotationFinder import CenterOfRotationFinder
 from .Normalizer import Normalizer
+from .Resizer import Resizer

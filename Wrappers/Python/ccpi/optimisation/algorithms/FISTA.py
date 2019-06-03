@@ -20,40 +20,28 @@ class FISTA(Algorithm):
       x_init: initial guess
       f: data fidelity
       g: regularizer
-      h:
-      opt: additional algorithm 
+      opt: additional options 
     '''
-
+    
+    
     def __init__(self, **kwargs):
         '''initialisation can be done at creation time if all 
         proper variables are passed or later with set_up'''
         super(FISTA, self).__init__()
-        self.f = None
-        self.g = None
+        self.f = kwargs.get('f', None)
+        self.g = kwargs.get('g', None)
+        self.x_init = kwargs.get('x_init',None)
         self.invL = None
         self.t_old = 1
-        args = ['x_init', 'f', 'g', 'opt']
-        for k,v in kwargs.items():
-            if k in args:
-                args.pop(args.index(k))
-        if len(args) == 0:
-            return self.set_up(kwargs['x_init'],
-                               f=kwargs['f'],
-                               g=kwargs['g'],
-                               opt=kwargs['opt'])
+        if self.f is not None and self.g is not None:
+            print ("Calling from creator")
+            self.set_up(self.x_init, self.f, self.g)        
+
     
-    def set_up(self, x_init, f=None, g=None, opt=None):
+    def set_up(self, x_init, f, g, opt=None, **kwargs):
         
-        # default inputs
-        if f   is None: 
-            self.f = ZeroFunction()
-        else:
-            self.f = f
-        if g   is None:
-            g = ZeroFunction()
-            self.g = g
-        else:
-            self.g = g
+        self.f = f
+        self.g = g
         
         # algorithmic parameters
         if opt is None: 
@@ -87,4 +75,6 @@ class FISTA(Algorithm):
         self.t_old = self.t            
         
     def update_objective(self):
-        self.loss.append( self.f(self.x) + self.g(self.x) )
+        self.loss.append( self.f(self.x) + self.g(self.x) )    
+    
+

@@ -185,65 +185,73 @@ plt.show()
 
 
 
-###%% Check with CVX solution
-#
-#from ccpi.optimisation.operators import SparseFiniteDiff
-#
-#try:
-#    from cvxpy import *
-#    cvx_not_installable = True
-#except ImportError:
-#    cvx_not_installable = False
-#
-#
-#if cvx_not_installable:
-#
-#    ##Construct problem    
-#    u = Variable(ig.shape)
-#    
-#    DY = SparseFiniteDiff(ig, direction=0, bnd_cond='Neumann')
-#    DX = SparseFiniteDiff(ig, direction=1, bnd_cond='Neumann')
-#    
-#    # Define Total Variation as a regulariser
-#    
-#    regulariser = alpha * sum_squares(norm(vstack([DX.matrix() * vec(u), DY.matrix() * vec(u)]), 2, axis = 0))
-#    fidelity = 0.5 * sum_squares(u - noisy_data.as_array())    
-#    
-#    # choose solver
-#    if 'MOSEK' in installed_solvers():
-#        solver = MOSEK
-#    else:
-#        solver = SCS  
-#        
-#    obj =  Minimize( regulariser +  fidelity)
-#    prob = Problem(obj)
-#    result = prob.solve(verbose = True, solver = solver)
-#    
-#    diff_cvx = numpy.abs( pdhg.get_output().as_array() - u.value )
-#        
-#    plt.figure(figsize=(15,15))
-#    plt.subplot(3,1,1)
-#    plt.imshow(pdhg.get_output().as_array())
-#    plt.title('PDHG solution')
-#    plt.colorbar()
-#    plt.subplot(3,1,2)
-#    plt.imshow(u.value)
-#    plt.title('CVX solution')
-#    plt.colorbar()
-#    plt.subplot(3,1,3)
-#    plt.imshow(diff_cvx)
-#    plt.title('Difference')
-#    plt.colorbar()
-#    plt.show()    
-#    
-#    plt.plot(np.linspace(0,N,N), pdhg.get_output().as_array()[int(N/2),:], label = 'PDHG')
-#    plt.plot(np.linspace(0,N,N), u.value[int(N/2),:], label = 'CVX')
-#    plt.legend()
-#    plt.title('Middle Line Profiles')
-#    plt.show()
-#            
-#    print('Primal Objective (CVX) {} '.format(obj.value))
-#    print('Primal Objective (PDHG) {} '.format(pdhg.objective[-1][0]))
+##%% Check with CVX solution
+
+from ccpi.optimisation.operators import SparseFiniteDiff
+
+try:
+    from cvxpy import *
+    cvx_not_installable = True
+except ImportError:
+    cvx_not_installable = False
+
+
+if cvx_not_installable:
+
+    ##Construct problem    
+    u = Variable(ig.shape)
+    
+    DY = SparseFiniteDiff(ig, direction=0, bnd_cond='Neumann')
+    DX = SparseFiniteDiff(ig, direction=1, bnd_cond='Neumann')
+    
+    # Define Total Variation as a regulariser
+    
+    regulariser = alpha * sum_squares(norm(vstack([DX.matrix() * vec(u), DY.matrix() * vec(u)]), 2, axis = 0))
+    
+    # choose solver
+    if 'MOSEK' in installed_solvers():
+        solver = MOSEK
+    else:
+        solver = SCS      
+    
+    # fidelity
+    if noise == 's&p':
+        fidelity = pnorm( u - noisy_data.as_array(),1)
+    elif noise == 'poisson':
+        fidelity = sum(kl_div(noisy_data.as_array(), u)) 
+        solver = SCS
+    elif noise == 'gaussian':
+        fidelity = 0.5 * sum_squares(noisy_data.as_array() - u)
+        
+    obj =  Minimize( regulariser +  fidelity)
+    prob = Problem(obj)
+    result = prob.solve(verbose = True, solver = solver)
+    
+    diff_cvx = numpy.abs( pdhg.get_output().as_array() - u.value )
+        
+    plt.figure(figsize=(15,15))
+    plt.subplot(3,1,1)
+    plt.imshow(pdhg.get_output().as_array())
+    plt.title('PDHG solution')
+    plt.colorbar()
+    plt.subplot(3,1,2)
+    plt.imshow(u.value)
+    plt.title('CVX solution')
+    plt.colorbar()
+    plt.subplot(3,1,3)
+    plt.imshow(diff_cvx)
+    plt.title('Difference')
+    plt.colorbar()
+    plt.show()    
+    
+    plt.plot(np.linspace(0,ig.shape[1],ig.shape[1]), pdhg.get_output().as_array()[int(ig.shape[0]/2),:], label = 'PDHG')
+    plt.plot(np.linspace(0,ig.shape[1],ig.shape[1]), u.value[int(ig.shape[0]/2),:], label = 'CVX')
+    plt.legend()
+    plt.title('Middle Line Profiles')
+    plt.show()
+            
+    print('Primal Objective (CVX) {} '.format(obj.value))
+    print('Primal Objective (PDHG) {} '.format(pdhg.objective[-1][0]))
 #
 #
 #

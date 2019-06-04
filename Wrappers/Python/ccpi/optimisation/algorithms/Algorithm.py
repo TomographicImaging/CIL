@@ -167,13 +167,12 @@ class Algorithm(object):
             t = 0
         else:
             t = sum(timing)/len(timing)
-        el = [ self.iteration-1, 
-               self.max_iteration,
-               "{:.3f}".format(t), 
-               self.get_last_objective() ]
-        
-        string = self.objective_to_string()
-        out = "{:>9} {:>10} {:>13} {}".format(*el[:-1] , string)
+        out = "{:>9} {:>10} {:>13} {}".format(
+                 self.iteration-1, 
+                 self.max_iteration,
+                 "{:.3f}".format(t), 
+                 self.objective_to_string()
+               )
         return out
 
     def objective_to_string(self):

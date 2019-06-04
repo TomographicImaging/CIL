@@ -88,7 +88,7 @@ class Norm2Sq(Function):
     def gradient(self, x, out = None):
         if self.memopt:
             #return 2.0*self.c*self.A.adjoint( self.A.direct(x) - self.b )
-            
+            print (self.range_tmp, self.range_tmp.as_array())           
             self.A.direct(x, out=self.range_tmp)
             self.range_tmp -= self.b 
             self.A.adjoint(self.range_tmp, out=out)

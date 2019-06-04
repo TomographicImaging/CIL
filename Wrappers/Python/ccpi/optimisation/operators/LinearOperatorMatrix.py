@@ -10,6 +10,9 @@ from ccpi.optimisation.operators import LinearOperator
 class LinearOperatorMatrix(LinearOperator):
     def __init__(self,A):
         self.A = A
+        M_A, N_A = self.A.shape
+        self.gm_domain = ImageGeometry(0, N_A)
+        self.gm_range = ImageGeometry(M_A,0)
         self.s1 = None   # Largest singular value, initially unknown
         super(LinearOperatorMatrix, self).__init__()
         
@@ -30,22 +33,14 @@ class LinearOperatorMatrix(LinearOperator):
     def size(self):
         return self.A.shape
     
-    def get_max_sing_val(self):
+    def norm(self):
         # If unknown, compute and store. If known, simply return it.
         if self.s1 is None:
             self.s1 = svds(self.A,1,return_singular_vectors=False)[0]
             return self.s1
         else:
             return self.s1
-    def allocate_direct(self):
-        '''allocates the memory to hold the result of adjoint'''
-        #numpy.dot(self.A.transpose(),x.as_array())
-        M_A, N_A = self.A.shape
-        out = numpy.zeros((N_A,1))
-        return DataContainer(out)
-    def allocate_adjoint(self):
-        '''allocate the memory to hold the result of direct'''
-        #numpy.dot(self.A.transpose(),x.as_array())
-        M_A, N_A = self.A.shape
-        out = numpy.zeros((M_A,1))
-        return DataContainer(out)
+    def domain_geometry(self):
+        return self.gm_domain
+    def range_geometry(self):
+        return self.gm_range

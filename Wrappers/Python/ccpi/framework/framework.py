@@ -29,7 +29,6 @@ import warnings
 from functools import reduce
 from numbers import Number
 
-
 def find_key(dic, val):
     """return the key of dictionary dic given the value"""
     return [k for k, v in dic.items() if v == val][0]

@@ -62,28 +62,18 @@ class FISTA(Algorithm):
     def update(self):
 
         self.f.gradient(self.y, out=self.u)
-        print ('update, self.u' , self.u.as_array())
         self.u.__imul__( -self.invL )
         self.u.__iadd__( self.y )
-        print ('update, self.u' , self.u.as_array())
-        
         # x = g.prox(u,invL)
-        print ('update, self.x pre prox' , self.x.as_array())
         self.g.proximal(self.u, self.invL, out=self.x)
-        print ('update, self.x post prox' , self.x.as_array())
         
         self.t = 0.5*(1 + numpy.sqrt(1 + 4*(self.t_old**2)))
         
         self.x.subtract(self.x_old, out=self.y)
-        print ('update, self.y' , self.y.as_array())
-        
         self.y.__imul__ ((self.t_old-1)/self.t)
-        print ('update, self.x' , self.x.as_array())
         self.y.__iadd__( self.x )
-        print ('update, self.y' , self.y.as_array())
         
         self.x_old.fill(self.x)
-        print ('update, self.x_old' , self.x_old.as_array())
         self.t_old = self.t            
         
     def update_objective(self):

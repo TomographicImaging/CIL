@@ -329,7 +329,7 @@ class DataContainer(object):
         self.dimension_labels = {}
         self.geometry = None # Only relevant for AcquisitionData and ImageData
         
-        if dimension_labels is not None and \
+        if dimension_labels != {} and \
            len (dimension_labels) == self.number_of_dimensions:
             for i in range(self.number_of_dimensions):
                 self.dimension_labels[i] = dimension_labels[i]
@@ -632,6 +632,7 @@ class DataContainer(object):
             
     def pixel_wise_binary(self, pwop, x2, *args,  **kwargs):    
         out = kwargs.get('out', None)
+        
         if out is None:
             if isinstance(x2, (int, float, complex)):
                 out = pwop(self.as_array() , x2 , *args, **kwargs )

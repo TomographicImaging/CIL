@@ -60,11 +60,11 @@ class Norm1(Function):
 
 opt = {'memopt': True}
 # Problem data.
-m = 3
-n = 3
+m = 30
+n = 30
 np.random.seed(1)
-#Amat = np.asarray( np.random.randn(m, n), dtype=numpy.float32)
-Amat = np.asarray(np.eye(m), dtype=np.float32) * 2
+Amat = np.asarray( np.random.randn(m, n), dtype=numpy.float32)
+#Amat = np.asarray(np.eye(m), dtype=np.float32) * 2
 A = LinearOperatorMatrix(Amat)
 bmat = np.asarray( np.random.randn(m), dtype=numpy.float32)
 bmat *= 0 
@@ -92,8 +92,15 @@ g0 = ZeroFunction()
 #f.L = 30.003
 x_init = vgx.allocate(VectorGeometry.RANDOM, dtype=numpy.float32)
 
+a = VectorData(x_init.as_array(), deep_copy=True)
+
+assert id(x_init.as_array()) != id(a.as_array())
+
+#%%
 f.L = LinearOperator.PowerMethod(A, 25, x_init)[0] * 2
 print ('f.L', f.L)
+rate = (1 / f.L) / 3
+f.L *= 6
 
 # Initial guess
 #x_init = DataContainer(np.zeros((n, 1)))
@@ -102,6 +109,7 @@ print ('b', b.as_array())
 # Create 1-norm object instance
 g1_new = lam * L1Norm()
 g1 = Norm1(lam)
+
 g1 = ZeroFunction()
 #g1(x_init) 
 x = g1.prox(x_init, 1/f.L ) 
@@ -112,6 +120,16 @@ print ("g1.proximal ", x.as_array())
 x = g1_new.proximal(x_init, 0.03 ) 
 print ("g1.proximal ", x.as_array())
 
+x1 = vgx.allocate(VectorGeometry.RANDOM, dtype=numpy.float32)
+pippo = vgx.allocate()
+
+print ("x_init", x_init.as_array())
+print ("x1", x1.as_array())
+a = x_init.subtract(x1, out=pippo)
+
+print ("pippo", pippo.as_array())
+print ("x_init", x_init.as_array())
+print ("x1", x1.as_array())
 
 
 # Combine with least squares and solve using generic FISTA implementation
@@ -120,8 +138,14 @@ def callback(it,  objective, solution):
     print (it, objective, solution.as_array())
 
 fa = FISTA(x_init=x_init, f=f, g=g1)
-fa.max_iteration = 10
-fa.run(3, callback = callback, verbose=False)
+fa.max_iteration = 1000
+fa.update_objective_interval = int( fa.max_iteration / 10 ) 
+fa.run(fa.max_iteration, callback = None, verbose=True)
+
+gd = GradientDescent(x_init=x_init, objective_function=f, rate = rate )
+gd.max_iteration = 100000
+gd.update_objective_interval = 10000
+gd.run(gd.max_iteration, callback = None, verbose=True)
 
 
 # Print for comparison
@@ -131,3 +155,4 @@ print(fa.get_last_objective())
 
 print (A.direct(fa.get_output()).as_array())
 print (b.as_array())
+print (A.direct(gd.get_output()).as_array())

@@ -54,5 +54,5 @@ class VectorData(DataContainer):
                     out = array
                 else:
                     raise ValueError('Incompatible size: expecting {} got {}'.format((self.length,), array.shape))
-        deep_copy = False
+        deep_copy = True
         super(VectorData, self).__init__(out, deep_copy, None)

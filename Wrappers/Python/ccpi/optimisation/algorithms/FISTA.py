@@ -67,7 +67,8 @@ class FISTA(Algorithm):
         
         self.t = 0.5*(1 + numpy.sqrt(1 + 4*(self.t_old**2)))
         
-        self.x.subtract(self.x_old, out=self.y)
+#        self.x.subtract(self.x_old, out=self.y)
+        self.y = self.x - self.x_old
         self.y.__imul__ ((self.t_old-1)/self.t)
         self.y.__iadd__( self.x )
         

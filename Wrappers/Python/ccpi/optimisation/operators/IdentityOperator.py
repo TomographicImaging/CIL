@@ -35,7 +35,7 @@ class Identity(LinearOperator):
         else:
             out.fill(x)
         
-    def norm(self):
+    def calculate_norm(self):
         return 1.0
         
     def domain_geometry(self):       

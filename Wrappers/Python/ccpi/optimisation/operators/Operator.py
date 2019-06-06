@@ -8,6 +8,9 @@ from ccpi.optimisation.operators.ScaledOperator import ScaledOperator
 
 class Operator(object):
     '''Operator that maps from a space X -> Y'''
+    def __init__(self, **kwargs):
+        self.__norm = None
+
     def is_linear(self):
         '''Returns if the operator is linear'''
         return False
@@ -16,6 +19,11 @@ class Operator(object):
         raise NotImplementedError
     def norm(self):
         '''Returns the norm of the Operator'''
+        if self.__norm is None:
+            self.__norm = self.calculate_norm()
+        return self.__norm
+    def calculate_norm(self):
+        '''Calculates the norm of the Operator'''
         raise NotImplementedError
     def range_geometry(self):
         '''Returns the range of the Operator: Y space'''

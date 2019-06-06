@@ -102,7 +102,7 @@ class SymmetrizedGradient(Gradient):
     def range_dim(self):
         return self.gm_range
                                    
-    def norm(self):
+    def calculate_norm(self):
 #        return np.sqrt(4*len(self.domainDim()))        
         #TODO this takes time for big ImageData
         # for 2D ||grad|| = sqrt(8), 3D ||grad|| = sqrt(12)        

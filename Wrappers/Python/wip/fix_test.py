@@ -1,4 +1,5 @@
 import numpy as np
+import numpy
 from ccpi.optimisation.operators import *
 from ccpi.optimisation.algorithms import *
 from ccpi.optimisation.functions import *
@@ -97,10 +98,10 @@ a = VectorData(x_init.as_array(), deep_copy=True)
 assert id(x_init.as_array()) != id(a.as_array())
 
 #%%
-f.L = LinearOperator.PowerMethod(A, 25, x_init)[0] * 2
+f.L = LinearOperator.PowerMethod(A, 25, x_init)[0] 
 print ('f.L', f.L)
-rate = (1 / f.L) / 3
-f.L *= 6
+rate = (1 / f.L) / 6
+f.L *= 12
 
 # Initial guess
 #x_init = DataContainer(np.zeros((n, 1)))
@@ -138,7 +139,7 @@ def callback(it,  objective, solution):
     print (it, objective, solution.as_array())
 
 fa = FISTA(x_init=x_init, f=f, g=g1)
-fa.max_iteration = 1000
+fa.max_iteration = 10000
 fa.update_objective_interval = int( fa.max_iteration / 10 ) 
 fa.run(fa.max_iteration, callback = None, verbose=True)
 
@@ -147,12 +148,28 @@ gd.max_iteration = 100000
 gd.update_objective_interval = 10000
 gd.run(gd.max_iteration, callback = None, verbose=True)
 
+cgls = CGLS(x_init= x_init, operator=A, data=b)
+cgls.max_iteration = 200
+cgls.update_objective_interval = 1
+def stop_criterion(alg):
+    try:
+        x = alg.get_last_objective()
+        print (x)
+        a = True if x < numpy.finfo(numpy.float32).eps else False
+    except IndexError as ie:
+        a = False
+    def f ():
+        return a or alg.max_iteration_stop_cryterion()
+    return f
+#cgls.should_stop = stop_criterion(cgls)
+cgls.run(cgls.max_iteration, callback = None, verbose=True)
 
 # Print for comparison
 print("FISTA least squares plus 1-norm solution and objective value:")
 print(fa.get_output().as_array())
 print(fa.get_last_objective())
 
-print (A.direct(fa.get_output()).as_array())
-print (b.as_array())
-print (A.direct(gd.get_output()).as_array())
+print ("data           ", b.as_array())
+print ('FISTA          ', A.direct(fa.get_output()).as_array())
+print ('GradientDescent', A.direct(gd.get_output()).as_array())
+print ('CGLS           ', A.direct(cgls.get_output()).as_array())

@@ -12,6 +12,8 @@ from ccpi.optimisation.algorithms import CGLS as CGLSalg
 import numpy as np
 import matplotlib.pyplot as plt
 
+from ccpi.optimisation.functions import Norm2Sq
+
 # Choose either a parallel-beam (1=parallel2D) or fan-beam (2=cone2D) test case
 test_case = 1
 
@@ -101,25 +103,29 @@ x_CGLS, it_CGLS, timing_CGLS, criter_CGLS = CGLS(x_init, Aop, b, opt)
 #plt.title('CGLS criterion')
 #plt.show()
 
+f = Norm2Sq(Aop, b, c=1.)
 
+def callback(it,  objective, solution):
+    print (objective, f(solution))
 
 # Now CLGS using the algorithm class
 CGLS_alg = CGLSalg()
 CGLS_alg.set_up(x_init, Aop, b )
-CGLS_alg.max_iteration = 2000
-CGLS_alg.run(opt['iter'])
+CGLS_alg.max_iteration = 500
+CGLS_alg.update_objective_interval = 10
+CGLS_alg.run(300, callback=callback)
 x_CGLS_alg = CGLS_alg.get_output()
 
-#plt.figure()
-#plt.imshow(x_CGLS_alg.as_array())
-#plt.title('CGLS ALG')
-#plt.colorbar()
-#plt.show()
+plt.figure()
+plt.imshow(x_CGLS_alg.as_array())
+plt.title('CGLS ALG')
+plt.colorbar()
+plt.show()
 
-#plt.figure()
-#plt.semilogy(CGLS_alg.objective)
-#plt.title('CGLS criterion')
-#plt.show()
+plt.figure()
+plt.semilogy(CGLS_alg.objective)
+plt.title('CGLS criterion')
+plt.show()
 
 print(criter_CGLS)
 print(CGLS_alg.objective)

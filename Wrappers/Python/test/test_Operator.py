@@ -112,7 +112,7 @@ class TestOperator(CCPiTestClass):
         print ("test_BlockOperator")
         
         N, M = 200, 300
-        niter = 1000
+        niter = 10
         ig = ImageGeometry(N, M)
         Id = Identity(ig)
         
@@ -150,6 +150,7 @@ class TestOperator(CCPiTestClass):
         norm2 = G.norm()
         t2 = timer()
         print ("Norm dT1 {} dT2 {}".format(t1-t0,t2-t1))
+        self.assertLess(t2-t1, t1-t0)
 
 
 

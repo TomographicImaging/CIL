@@ -29,7 +29,7 @@ class ZeroOp(Operator):
         else:
             return ImageData(np.zeros(self.gm_domain))
         
-    def norm(self):
+    def calculate_norm(self):
         return 0
     
     def domain_dim(self):       

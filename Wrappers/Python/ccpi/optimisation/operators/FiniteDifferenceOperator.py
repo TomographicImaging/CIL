@@ -315,7 +315,7 @@ class FiniteDiff(LinearOperator):
         '''Returns the domain geometry'''
         return self.gm_domain
        
-    def norm(self):
+    def calculate_norm(self):
         x0 = self.gm_domain.allocate('random_int')
         self.s1, sall, svec = LinearOperator.PowerMethod(self, 25, x0)
         return self.s1

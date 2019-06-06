@@ -51,6 +51,7 @@ class CCPiTestClass(unittest.TestCase):
 
 class TestOperator(CCPiTestClass):
     def test_ScaledOperator(self):
+        print ("test_ScaledOperator")
         ig = ImageGeometry(10,20,30)
         img = ig.allocate()
         scalar = 0.5
@@ -58,7 +59,8 @@ class TestOperator(CCPiTestClass):
         numpy.testing.assert_array_equal(scalar * img.as_array(), sid.direct(img).as_array())
         
 
-    def test_TomoIdentity(self):
+    def test_Identity(self):
+        print ("test_Identity")
         ig = ImageGeometry(10,20,30)
         img = ig.allocate()
         self.assertTrue(img.shape == (30,20,10))
@@ -107,6 +109,7 @@ class TestOperator(CCPiTestClass):
         self.assertBlockDataContainerEqual(res, w)
         
     def test_PowerMethod(self):
+        print ("test_BlockOperator")
         
         N, M = 200, 300
         niter = 1000
@@ -134,7 +137,19 @@ class TestOperator(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(a[0],b[0],decimal=2)
         #self.assertAlmostEqual(a[0], b[0])
         
+    def test_Norm(self):
+        print ("test_BlockOperator")
+        ##
+        N, M = 200, 300
 
+        ig = ImageGeometry(N, M)
+        G = Gradient(ig)
+        t0 = timer()
+        norm = G.norm()
+        t1 = timer()
+        norm2 = G.norm()
+        t2 = timer()
+        print ("Norm dT1 {} dT2 {}".format(t1-t0,t2-t1))
 
 
 
@@ -175,7 +190,7 @@ class TestBlockOperator(unittest.TestCase):
         self.assertTrue(res)
 
     def test_BlockOperator(self):
-        
+        print ("test_BlockOperator")
         
         M, N  = 3, 4
         ig = ImageGeometry(M, N)
@@ -358,7 +373,7 @@ class TestBlockOperator(unittest.TestCase):
             print("Z1", Z1[0][1].as_array())
             print("RES1", RES1[0][1].as_array())
     def test_timedifference(self):
-        
+        print ("test_timedifference")
         M, N ,W = 100, 512, 512
         ig = ImageGeometry(M, N, W)
         arr = ig.allocate('random_int')  
@@ -427,7 +442,7 @@ class TestBlockOperator(unittest.TestCase):
         self.assertGreater(t1,t2)
     
     def test_BlockOperatorLinearValidity(self):
-        
+        print ("test_BlockOperatorLinearValidity")
         
         M, N  = 3, 4
         ig = ImageGeometry(M, N)

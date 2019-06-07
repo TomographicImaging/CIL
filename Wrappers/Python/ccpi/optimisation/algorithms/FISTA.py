@@ -58,6 +58,7 @@ class FISTA(Algorithm):
         
         self.t_old = 1
         self.update_objective()
+        self.configured = True
             
     def update(self):
 

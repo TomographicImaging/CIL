@@ -13,6 +13,7 @@ from ccpi.optimisation.functions import ZeroFunction
 from ccpi.optimisation.functions import L1Norm
 # This was removed
 #from ccpi.optimisation.funcs import Norm2
+#from ccpi.optimisation.funcs import Norm1
 
 from ccpi.optimisation.operators import LinearOperatorMatrix
 from ccpi.optimisation.operators import Identity
@@ -82,6 +83,7 @@ class TestAlgorithms(unittest.TestCase):
                 opt = {'memopt': True}
                 # Create object instances with the test data A and b.
                 f = Norm2Sq(A, b, c=0.5, memopt=True)
+                f.L = LinearOperator.PowerMethod(A, 10)
                 g0 = ZeroFunction()
 
                 # Initial guess
@@ -124,6 +126,7 @@ class TestAlgorithms(unittest.TestCase):
             self.assertTrue(cvx_not_installable)
 
     def test_FISTA_Norm1_cvx(self):
+        print ("test_FISTA_Norm1_cvx")
         if not cvx_not_installable:
             try:
                 opt = {'memopt': True}

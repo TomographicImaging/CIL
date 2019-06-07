@@ -29,7 +29,6 @@ import warnings
 from functools import reduce
 from numbers import Number
 
-
 def find_key(dic, val):
     """return the key of dictionary dic given the value"""
     return [k for k, v in dic.items() if v == val][0]
@@ -679,6 +678,7 @@ class DataContainer(object):
             
     def pixel_wise_binary(self, pwop, x2, *args,  **kwargs):    
         out = kwargs.get('out', None)
+        
         if out is None:
             if isinstance(x2, (int, float, complex)):
                 out = pwop(self.as_array() , x2 , *args, **kwargs )

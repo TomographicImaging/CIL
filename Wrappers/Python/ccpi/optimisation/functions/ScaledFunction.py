@@ -18,6 +18,7 @@
 #   limitations under the License.
 from numbers import Number
 import numpy
+import warnings
 
 class ScaledFunction(object):
     
@@ -89,7 +90,7 @@ class ScaledFunction(object):
         '''Alias of proximal(x, tau, None)'''
         warnings.warn('''This method will disappear in following 
         versions of the CIL. Use proximal instead''', DeprecationWarning)
-        return self.proximal(x, out=None)
+        return self.proximal(x, tau, out=None)
 
 
             

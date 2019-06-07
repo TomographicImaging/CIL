@@ -18,7 +18,6 @@ from ccpi.optimisation.functions import Norm2Sq, ZeroFunction, \
 from ccpi.optimisation.algorithms import GradientDescent
 from ccpi.optimisation.algorithms import CGLS
 from ccpi.optimisation.algorithms import FISTA
-from ccpi.optimisation.algorithms import FBPD
 
 
 

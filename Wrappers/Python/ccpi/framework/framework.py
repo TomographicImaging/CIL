@@ -329,7 +329,7 @@ class DataContainer(object):
         self.dimension_labels = {}
         self.geometry = None # Only relevant for AcquisitionData and ImageData
         
-        if dimension_labels != {} and \
+        if dimension_labels is not None and \
            len (dimension_labels) == self.number_of_dimensions:
             for i in range(self.number_of_dimensions):
                 self.dimension_labels[i] = dimension_labels[i]

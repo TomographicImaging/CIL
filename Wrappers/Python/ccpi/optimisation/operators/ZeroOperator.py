@@ -29,8 +29,8 @@ class ZeroOp(Operator):
         else:
             return ImageData(np.zeros(self.gm_domain))
         
-    def calculate_norm(self):
-        return 0
+    def calculate_norm(self, **kwargs):
+        return 0.
     
     def domain_dim(self):       
         return self.gm_domain  

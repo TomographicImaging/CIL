@@ -17,12 +17,12 @@ class Operator(object):
     def direct(self,x, out=None):
         '''Returns the application of the Operator on x'''
         raise NotImplementedError
-    def norm(self):
+    def norm(self, **kwargs):
         '''Returns the norm of the Operator'''
         if self.__norm is None:
-            self.__norm = self.calculate_norm()
+            self.__norm = self.calculate_norm(**kwargs)
         return self.__norm
-    def calculate_norm(self):
+    def calculate_norm(self, **kwargs):
         '''Calculates the norm of the Operator'''
         raise NotImplementedError
     def range_geometry(self):

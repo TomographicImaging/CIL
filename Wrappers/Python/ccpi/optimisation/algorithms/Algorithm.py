@@ -51,6 +51,7 @@ class Algorithm(object):
         self.__max_iteration = kwargs.get('max_iteration', 0)
         self.__loss = []
         self.memopt = False
+        self.configured = False
         self.timing = []
         self.update_objective_interval = kwargs.get('update_objective_interval', 1)
     def set_up(self, *args, **kwargs):
@@ -86,6 +87,8 @@ class Algorithm(object):
             raise StopIteration()
         else:
             time0 = time.time()
+            if not self.configured:
+                raise ValueError('Algorithm not configured correctly. Please run set_up.')
             self.update()
             self.timing.append( time.time() - time0 )
             if self.iteration % self.update_objective_interval == 0:

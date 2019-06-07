@@ -314,13 +314,8 @@ class FiniteDiff(LinearOperator):
     def domain_geometry(self):
         '''Returns the domain geometry'''
         return self.gm_domain
-       
-    def calculate_norm(self):
-        x0 = self.gm_domain.allocate('random_int')
-        self.s1, sall, svec = LinearOperator.PowerMethod(self, 25, x0)
-        return self.s1
-    
-    
+
+
 if __name__ == '__main__':
     
     from ccpi.framework import ImageGeometry

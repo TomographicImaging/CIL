@@ -85,12 +85,7 @@ class Gradient(LinearOperator):
     
     def range_geometry(self):
         return self.gm_range
-                                   
-    def calculate_norm(self):
 
-        x0 = self.gm_domain.allocate('random')
-        self.s1, sall, svec = LinearOperator.PowerMethod(self, 10, x0)
-        return self.s1
     
     def __rmul__(self, scalar):
         return ScaledOperator(self, scalar) 

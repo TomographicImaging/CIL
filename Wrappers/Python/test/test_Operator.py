@@ -121,19 +121,20 @@ class TestOperator(CCPiTestClass):
         uid = Id.domain_geometry().allocate(ImageGeometry.RANDOM_INT, seed=1)
         
         a = LinearOperator.PowerMethod(Id, niter, uid)
-        b = LinearOperator.PowerMethodNonsquare(Id, niter, uid)
-        
+        #b = LinearOperator.PowerMethodNonsquare(Id, niter, uid)
+        b = LinearOperator.PowerMethod(Id, niter)
         print ("Edo impl", a[0])
-        print ("old impl", b[0])
+        print ("None impl", b[0])
         
         #self.assertAlmostEqual(a[0], b[0])
         self.assertNumpyArrayAlmostEqual(a[0],b[0],decimal=6)
         
         a = LinearOperator.PowerMethod(G, niter, uid)
-        b = LinearOperator.PowerMethodNonsquare(G, niter, uid)
+        b = LinearOperator.PowerMethod(G, niter)
+        #b = LinearOperator.PowerMethodNonsquare(G, niter, uid)
         
         print ("Edo impl", a[0])
-        print ("old impl", b[0])
+        #print ("old impl", b[0])
         self.assertNumpyArrayAlmostEqual(a[0],b[0],decimal=2)
         #self.assertAlmostEqual(a[0], b[0])
         

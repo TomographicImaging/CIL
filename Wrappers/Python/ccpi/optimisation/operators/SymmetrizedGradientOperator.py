@@ -75,42 +75,12 @@ class SymmetrizedGradient(Gradient):
                 tmp += FiniteDiff(self.gm_domain.get_item(0), direction = i, bnd_cond = self.bnd_cond).direct(x.get_item(j))
             res.append(tmp)   
         return res            
-                
-                
-        
-#        for 
-        
-#        tmp = numpy.zeros(self.gm_domain)
-#        
-#        tmp[0] = FiniteDiff(self.gm_domain[1:], direction = 1, bnd_cond = self.bnd_cond).direct(x.as_array()[0]) +  \
-#                 FiniteDiff(self.gm_domain[1:], direction = 0, bnd_cond = self.bnd_cond).direct(x.as_array()[2])
-#                 
-#        tmp[1] = FiniteDiff(self.gm_domain[1:], direction = 1, bnd_cond = self.bnd_cond).direct(x.as_array()[2]) +  \
-#                 FiniteDiff(self.gm_domain[1:], direction = 0, bnd_cond = self.bnd_cond).direct(x.as_array()[1])                 
-#
-#        return type(x)(tmp)          
-            
-    def alloc_domain_dim(self):
-        return ImageData(numpy.zeros(self.gm_domain))
-    
-    def alloc_range_dim(self):
-        return ImageData(numpy.zeros(self.range_dim))
-    
+
     def domain_dim(self):
         return self.gm_domain
     
     def range_dim(self):
         return self.gm_range
-                                   
-    def calculate_norm(self):
-#        return np.sqrt(4*len(self.domainDim()))        
-        #TODO this takes time for big ImageData
-        # for 2D ||grad|| = sqrt(8), 3D ||grad|| = sqrt(12)        
-        x0 = ImageData(np.random.random_sample(self.domain_dim()))
-        self.s1, sall, svec = LinearOperator.PowerMethod(self, 25, x0)
-        return self.s1 
-    
-
 
 if __name__ == '__main__':   
     

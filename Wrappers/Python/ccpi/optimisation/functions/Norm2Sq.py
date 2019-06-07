@@ -21,7 +21,7 @@ import numpy
 import warnings
 
 # Define a class for squared 2-norm
-class Norm2sq(Function):
+class Norm2Sq(Function):
     '''
     f(x) = c*||A*x-b||_2^2
     
@@ -38,7 +38,7 @@ class Norm2sq(Function):
     '''
     
     def __init__(self,A,b,c=1.0,memopt=False):
-        super(Norm2sq, self).__init__()
+        super(Norm2Sq, self).__init__()
     
         self.A = A  # Should be an operator, default identity
         self.b = b  # Default zero DataSet?

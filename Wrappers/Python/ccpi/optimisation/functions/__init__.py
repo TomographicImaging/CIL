@@ -10,4 +10,4 @@ from .FunctionOperatorComposition import FunctionOperatorComposition
 from .MixedL21Norm import MixedL21Norm
 from .IndicatorBox import IndicatorBox
 from .KullbackLeibler import KullbackLeibler
-from .Norm2Sq import Norm2sq
+from .Norm2Sq import Norm2Sq

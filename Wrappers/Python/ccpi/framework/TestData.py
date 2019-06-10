@@ -16,6 +16,7 @@ class TestData(object):
     PEPPERS = 'peppers.tiff'
     RESOLUTION_CHART = 'resolution_chart.tiff'
     SIMPLE_PHANTOM_2D = 'simple_jakobs_phantom'
+    SHAPES =  'shapes.png'
     
     def __init__(self, **kwargs):
         self.data_dir = kwargs.get('data_dir', data_dir)
@@ -23,7 +24,7 @@ class TestData(object):
     def load(self, which, size=(512,512), scale=(0,1), **kwargs):
         if which not in [TestData.BOAT, TestData.CAMERA, 
                          TestData.PEPPERS, TestData.RESOLUTION_CHART,
-                         TestData.SIMPLE_PHANTOM_2D]:
+                         TestData.SIMPLE_PHANTOM_2D, TestData.SHAPES]:
             raise ValueError('Unknown TestData {}.'.format(which))
         if which == TestData.SIMPLE_PHANTOM_2D:
             N = size[0]
@@ -34,6 +35,16 @@ class TestData(object):
             ig = ImageGeometry(voxel_num_x = N, voxel_num_y = M, dimension_labels=[ImageGeometry.HORIZONTAL_X, ImageGeometry.HORIZONTAL_Y])
             data = ig.allocate()
             data.fill(sdata)
+            
+        elif which == TestData.SHAPES:
+            
+            tmp = numpy.array(Image.open(os.path.join(self.data_dir, which)).convert('L'))
+            N = 200
+            M = 300   
+            ig = ImageGeometry(voxel_num_x = N, voxel_num_y = M, dimension_labels=[ImageGeometry.HORIZONTAL_X, ImageGeometry.HORIZONTAL_Y])
+            data = ig.allocate()
+            data.fill(tmp/numpy.max(tmp))
+            
         else:
             tmp = Image.open(os.path.join(self.data_dir, which))
             print (tmp)
@@ -94,5 +105,17 @@ class TestData(object):
             
         data = data/data.max()
         
-        return ImageData(data)    
+        return ImageData(data) 
+    
+    def shapes(**kwargs):
+    
+        tmp = Image.open(os.path.join(data_dir, 'shapes.png')).convert('LA')
+        
+        size = kwargs.get('size',(300, 200))
+        
+        data = numpy.array(tmp.resize(size))
+            
+        data = data/data.max()
+        
+        return ImageData(data)     
     

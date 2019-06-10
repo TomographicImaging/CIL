@@ -85,15 +85,8 @@ data = ImageData(data/data.max())
 ig = ImageGeometry(voxel_num_x = N, voxel_num_y = N)
 ag = ig
 
-# Create noisy data. Add Gaussian noise
-scale = 0.5
-eta = 0 
-n1 = scale * np.random.poisson(eta + sin.as_array()/scale)
-
-noisy_data = AcquisitionData(n1, ag)
 
 #Create Acquisition Data and apply poisson noise
-
 detectors = N
 angles = np.linspace(0, np.pi, N)
 

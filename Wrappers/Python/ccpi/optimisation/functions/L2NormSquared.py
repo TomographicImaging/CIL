@@ -76,7 +76,7 @@ class L2NormSquared(Function):
         tmp = 0
         
         if self.b is not None:
-            tmp = (x * self.b).sum()
+            tmp = x.dot(self.b) #(x * self.b).sum()
             
         return (1./4.) * x.squared_norm() + tmp
 
@@ -151,7 +151,7 @@ if __name__ == '__main__':
     import numpy
     # TESTS for L2 and scalar * L2
     
-    M, N, K = 2,3,5
+    M, N, K = 20,30,50
     ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N, voxel_num_z = K)
     u = ig.allocate('random_int')
     b = ig.allocate('random_int') 
@@ -178,7 +178,7 @@ if __name__ == '__main__':
     
     #check convex conjuagate with data
     d1 = f1.convex_conjugate(u)
-    d2 = (1/4) * u.squared_norm() + (u*b).sum()
+    d2 = (1/4) * u.squared_norm() + u.dot(b)
     numpy.testing.assert_equal(d1, d2)  
     
     # check proximal no data

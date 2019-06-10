@@ -24,15 +24,18 @@
 Total Variation Denoising using PDHG algorithm:
 
 
-Problem:     min_x, x>0  \alpha * ||\nabla x||_{2,1} + ||x-g||_{1}
+Problem:     min_{u},   \alpha * ||\nabla u||_{2,1} + Fidelity(u, g)
 
              \alpha: Regularization parameter
              
              \nabla: Gradient operator 
              
-             g: Noisy Data with Salt & Pepper Noise
-             
-             
+             g: Noisy Data 
+                          
+             Fidelity =  1) L2NormSquarred ( \frac{1}{2} * || u - g ||_{2}^{2} ) if Noise is Gaussian
+                         2) L1Norm ( ||u - g||_{1} )if Noise is Salt & Pepper
+                         3) Kullback Leibler (\int u - g * log(u) + Id_{u>0})  if Noise is Poisson
+                                                       
              Method = 0 ( PDHG - split ) :  K = [ \nabla,
                                                  Identity]
                           
@@ -40,9 +43,13 @@ Problem:     min_x, x>0  \alpha * ||\nabla x||_{2,1} + ||x-g||_{1}
              Method = 1 (PDHG - explicit ):  K = \nabla    
              
              
+             Default: ROF denoising
+             noise = Gaussian
+             Fidelity = L2NormSquarred 
+             method = 0
+             
+             
 """
-
-from ccpi.framework import ImageData, ImageGeometry
 
 import numpy as np 
 import numpy                          
@@ -73,32 +80,27 @@ if len(sys.argv) > 2:
 else:
     method = '0'
 print ("method ", method)
-# Create phantom for TV Salt & Pepper denoising
-N = 100
+
 
 loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
-data = loader.load(TestData.SIMPLE_PHANTOM_2D, size=(N,N))
-data = loader.load(TestData.PEPPERS, size=(N,N))
+data = loader.load(TestData.SHAPES, size=(50,50))
 ig = data.geometry
 ag = ig
 
 # Create noisy data. 
-# Apply Salt & Pepper noise
-# gaussian
-# poisson
 noises = ['gaussian', 'poisson', 's&p']
 noise = noises[which_noise]
 if noise == 's&p':
     n1 = random_noise(data.as_array(), mode = noise, salt_vs_pepper = 0.9, amount=0.2)
 elif noise == 'poisson':
-    n1 = random_noise(data.as_array(), mode = noise, seed = 10)
+    scale = 5
+    n1 = random_noise( data.as_array()/scale, mode = noise, seed = 10)*scale
 elif noise == 'gaussian':
     n1 = random_noise(data.as_array(), mode = noise, seed = 10)
 else:
     raise ValueError('Unsupported Noise ', noise)
 noisy_data = ig.allocate()
 noisy_data.fill(n1)
-#noisy_data = ImageData(n1)
 
 # Show Ground Truth and Noisy Data
 plt.figure(figsize=(10,5))
@@ -112,8 +114,14 @@ plt.title('Noisy Data')
 plt.colorbar()
 plt.show()
 
-# Regularisation Parameter
-alpha = .2
+
+# Regularisation Parameter depending on the noise distribution
+if noise == 's&p':
+    alpha = 0.8
+elif noise == 'poisson':
+    alpha = 1
+elif noise == 'gaussian':
+    alpha = .3
 
 # fidelity
 if noise == 's&p':
@@ -121,30 +129,25 @@ if noise == 's&p':
 elif noise == 'poisson':
     f2 = KullbackLeibler(noisy_data)
 elif noise == 'gaussian':
-    f2 = L2NormSquared(b=noisy_data)
+    f2 = 0.5 * L2NormSquared(b=noisy_data)
 
 if method == '0':
 
     # Create operators
-    op1 = Gradient(ig, correlation=Gradient.CORRELATION_SPACECHANNEL)
+    op1 = Gradient(ig, correlation=Gradient.CORRELATION_SPACE)
     op2 = Identity(ig, ag)
 
     # Create BlockOperator
     operator = BlockOperator(op1, op2, shape=(2,1) ) 
 
     # Create functions      
-    f1 = alpha * MixedL21Norm()
-    #f2 = L1Norm(b = noisy_data)    
-    f = BlockFunction(f1, f2)  
-                                      
+    f = BlockFunction(alpha * MixedL21Norm(), f2) 
     g = ZeroFunction()
     
 else:
     
-    # Without the "Block Framework"
     operator = Gradient(ig)
     f =  alpha * MixedL21Norm()
-    #g =  L1Norm(b = noisy_data)
     g = f2
         
     
@@ -154,13 +157,14 @@ normK = operator.norm()
 # Primal & dual stepsizes
 sigma = 1
 tau = 1/(sigma*normK**2)
-opt = {'niter':2000, 'memopt': True}
+
 
 # Setup and run the PDHG algorithm
-pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma, memopt=True)
+pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
 pdhg.max_iteration = 2000
-pdhg.update_objective_interval = 50
+pdhg.update_objective_interval = 100
 pdhg.run(2000)
+
 
 if data.geometry.channels > 1:
     plt.figure(figsize=(20,15))
@@ -179,11 +183,12 @@ if data.geometry.channels > 1:
         plt.title('TV Reconstruction')
         plt.colorbar()
         plt.subplot(3,4,4+row*4)
-        plt.plot(np.linspace(0,N,N), data.subset(channel=row).as_array()[int(N/2),:], label = 'GTruth')
-        plt.plot(np.linspace(0,N,N), pdhg.get_output().subset(channel=row).as_array()[int(N/2),:], label = 'TV reconstruction')
+        plt.plot(np.linspace(0,ig.shape[1],ig.shape[1]), data.subset(channel=row).as_array()[int(N/2),:], label = 'GTruth')
+        plt.plot(np.linspace(0,ig.shape[1],ig.shape[1]), pdhg.get_output().subset(channel=row).as_array()[int(N/2),:], label = 'TV reconstruction')
         plt.legend()
         plt.title('Middle Line Profiles')
     plt.show()
+    
 else:
     plt.figure(figsize=(20,5))
     plt.subplot(1,4,1)
@@ -199,8 +204,8 @@ else:
     plt.title('TV Reconstruction')
     plt.colorbar()
     plt.subplot(1,4,4)
-    plt.plot(np.linspace(0,N,N), data.as_array()[int(N/2),:], label = 'GTruth')
-    plt.plot(np.linspace(0,N,N), pdhg.get_output().as_array()[int(N/2),:], label = 'TV reconstruction')
+    plt.plot(np.linspace(0,ig.shape[1],ig.shape[1]), data.as_array()[int(ig.shape[0]/2),:], label = 'GTruth')
+    plt.plot(np.linspace(0,ig.shape[1],ig.shape[1]), pdhg.get_output().as_array()[int(ig.shape[0]/2),:], label = 'TV reconstruction')
     plt.legend()
     plt.title('Middle Line Profiles')
     plt.show()
@@ -233,8 +238,17 @@ if cvx_not_installable:
     if 'MOSEK' in installed_solvers():
         solver = MOSEK
     else:
-        solver = SCS  
-        
+        solver = SCS      
+
+    # fidelity
+    if noise == 's&p':
+        fidelity = pnorm( u - noisy_data.as_array(),1)
+    elif noise == 'poisson':
+        fidelity = sum(kl_div(noisy_data.as_array(), u)) 
+        solver = SCS
+    elif noise == 'gaussian':
+        fidelity = 0.5 * sum_squares(noisy_data.as_array() - u)
+                
     obj =  Minimize( regulariser +  fidelity)
     prob = Problem(obj)
     result = prob.solve(verbose = True, solver = solver)
@@ -256,8 +270,8 @@ if cvx_not_installable:
     plt.colorbar()
     plt.show()    
     
-    plt.plot(np.linspace(0,N,N), pdhg.get_output().as_array()[int(N/2),:], label = 'PDHG')
-    plt.plot(np.linspace(0,N,N), u.value[int(N/2),:], label = 'CVX')
+    plt.plot(np.linspace(0,ig.shape[1],ig.shape[1]), pdhg.get_output().as_array()[int(ig.shape[0]/2),:], label = 'PDHG')
+    plt.plot(np.linspace(0,ig.shape[1],ig.shape[1]), u.value[int(ig.shape[0]/2),:], label = 'CVX')
     plt.legend()
     plt.title('Middle Line Profiles')
     plt.show()

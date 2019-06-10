@@ -82,18 +82,18 @@ plt.colorbar()
 plt.show()
 
 # Setup and run the CGLS algorithm  
-alpha = 50
-Grad = Gradient(ig)
-
-# Form Tikhonov as a Block CGLS structure
-op_CGLS = BlockOperator( Aop, alpha * Grad, shape=(2,1))
-block_data = BlockDataContainer(noisy_data, Grad.range_geometry().allocate())
-
-x_init = ig.allocate()      
-cgls = CGLS(x_init=x_init, operator=op_CGLS, data=block_data)
-cgls.max_iteration = 1000
-cgls.update_objective_interval = 200
-cgls.run(1000,verbose=False)
+#alpha = 50
+#Grad = Gradient(ig)
+#
+## Form Tikhonov as a Block CGLS structure
+#op_CGLS = BlockOperator( Aop, alpha * Grad, shape=(2,1))
+#block_data = BlockDataContainer(noisy_data, Grad.range_geometry().allocate())
+#
+#x_init = ig.allocate()      
+#cgls = CGLS(x_init=x_init, operator=op_CGLS, data=block_data)
+#cgls.max_iteration = 1000
+#cgls.update_objective_interval = 200
+#cgls.run(1000,verbose=False)
 
 #%%
 # Show results

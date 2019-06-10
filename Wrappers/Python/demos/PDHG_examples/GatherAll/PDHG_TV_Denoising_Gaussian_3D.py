@@ -20,7 +20,7 @@
 #=========================================================================
 """ 
 
-Total Variation (3D) Denoising using PDHG algorithm:
+Total Variation (3D) Denoising using PDHG algorithm and Tomophantom:
 
 
 Problem:     min_{x} \alpha * ||\nabla x||_{2,1} + \frac{1}{2} * || x - g ||_{2}^{2}
@@ -39,19 +39,14 @@ Problem:     min_{x} \alpha * ||\nabla x||_{2,1} + \frac{1}{2} * || x - g ||_{2}
                                                                 
 """
 
-from ccpi.framework import ImageData, ImageGeometry
-                         
+from ccpi.framework import ImageData, ImageGeometry                       
 import matplotlib.pyplot as plt
-
 from ccpi.optimisation.algorithms import PDHG
-
-from ccpi.optimisation.operators import BlockOperator, Identity, Gradient
-from ccpi.optimisation.functions import ZeroFunction, L2NormSquared, \
-                      MixedL21Norm, BlockFunction
+from ccpi.optimisation.operators import Gradient
+from ccpi.optimisation.functions import L2NormSquared, MixedL21Norm
 
 from skimage.util import random_noise
 
-# Create phantom for TV Gaussian denoising
 import timeit
 import os
 from tomophantom import TomoP3D
@@ -105,9 +100,9 @@ sigma = 1
 tau = 1/(sigma*normK**2)
 
 pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma, memopt=True)
-pdhg.max_iteration = 2000
+pdhg.max_iteration = 1000
 pdhg.update_objective_interval = 200
-pdhg.run(2000, verbose = True)
+pdhg.run(1000, verbose = True)
 
 # Show results
 fig, axes = plt.subplots(nrows=2, ncols=3, figsize=(10, 8))

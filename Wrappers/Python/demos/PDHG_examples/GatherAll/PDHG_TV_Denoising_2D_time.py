@@ -18,8 +18,24 @@
 # limitations under the License.
 #
 #=========================================================================
+""" 
 
-from ccpi.framework import ImageData, ImageGeometry, AcquisitionGeometry, AcquisitionData
+Total Variation (Dynamic) Denoising using PDHG algorithm and Tomophantom:
+
+
+Problem:     min_{x} \alpha * ||\nabla x||_{2,1} + \frac{1}{2} * || x - g ||_{2}^{2}
+
+             \alpha: Regularization parameter
+             
+             \nabla: Gradient operator 
+             
+             g: 2D Dynamic noisy data with Gaussian Noise
+                          
+             K = \nabla  
+                                                                
+"""
+
+from ccpi.framework import ImageData, ImageGeometry
 
 import numpy as np 
 import numpy                          
@@ -28,7 +44,7 @@ import matplotlib.pyplot as plt
 from ccpi.optimisation.algorithms import PDHG
 
 from ccpi.optimisation.operators import BlockOperator, Gradient, Identity
-from ccpi.optimisation.functions import ZeroFunction, L2NormSquared, \
+from ccpi.optimisation.functions import ZeroFunction, L2NormSquared,  \
                       MixedL21Norm, BlockFunction
 
 from ccpi.astra.ops import AstraProjectorMC
@@ -41,11 +57,9 @@ from tomophantom import TomoP2D
 
 model = 102  # note that the selected model is temporal (2D + time)
 N = 128 # set dimension of the phantom
-# one can specify an exact path to the parameters file
-# path_library2D = '../../../PhantomLibrary/models/Phantom2DLibrary.dat'
+
 path = os.path.dirname(tomophantom.__file__)
 path_library2D = os.path.join(path, "Phantom2DLibrary.dat")
-#This will generate a N_size x N_size x Time frames phantom (2D + time)
 phantom_2Dt = TomoP2D.ModelTemporal(model, N, path_library2D)
 
 plt.close('all')
@@ -58,16 +72,17 @@ for sl in range(0,np.shape(phantom_2Dt)[0]):
 #    plt.pause(.1)
 #    plt.draw
 
-    
+# Setup geometries    
 ig = ImageGeometry(voxel_num_x = N, voxel_num_y = N, channels = np.shape(phantom_2Dt)[0])
 data = ImageData(phantom_2Dt, geometry=ig)
 ag = ig
                       
-# Create Noisy data. Add Gaussian noise
+# Create noisy data. Apply Gaussian noise
 np.random.seed(10)
 noisy_data = ImageData( data.as_array() + np.random.normal(0, 0.25, size=ig.shape) )
 
-tindex = [3, 6, 10]
+# time-frames index
+tindex = [8, 16, 24]
 
 fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(10, 10))
 plt.subplot(1,3,1)
@@ -88,15 +103,12 @@ fig.subplots_adjust(bottom=0.1, top=0.9, left=0.1, right=0.8,
 
 plt.show()   
 
-#%%
 # Regularisation Parameter
 alpha = 0.3
 
 # Create operators
-#op1 = Gradient(ig)
 op1 = Gradient(ig, correlation='Space')
 op2 = Gradient(ig, correlation='SpaceChannels')
-
 op3 = Identity(ig, ag)
 
 # Create BlockOperator
@@ -138,7 +150,7 @@ pdhg2.run(2000)
 
 #%%
 
-tindex = [3, 6, 10]
+tindex = [8, 16, 24]
 fig, axes = plt.subplots(nrows=2, ncols=3, figsize=(10, 8))
 
 plt.subplot(3,3,1)
@@ -177,7 +189,7 @@ plt.subplot(3,3,9)
 plt.imshow(pdhg2.get_output().as_array()[tindex[2],:,:])
 plt.axis('off')
 
-#%%
+
 im = plt.imshow(pdhg1.get_output().as_array()[tindex[0],:,:])
 
 
@@ -186,7 +198,46 @@ fig.subplots_adjust(bottom=0.1, top=0.9, left=0.1, right=0.8,
 
 cb_ax = fig.add_axes([0.83, 0.1, 0.02, 0.8])
 cbar = fig.colorbar(im, cax=cb_ax)
-
-
 plt.show()
+
+#%%
+import matplotlib.animation as animation
+fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(10, 30))
+ims1 = []
+ims2 = []
+ims3 = []
+for sl in range(0,np.shape(phantom_2Dt)[0]):
+    
+    plt.subplot(1,3,1)
+    im1 = plt.imshow(phantom_2Dt[sl,:,:], animated=True)
+    
+    plt.subplot(1,3,2)
+    im2 = plt.imshow(pdhg1.get_output().as_array()[sl,:,:])
+    
+    plt.subplot(1,3,3)
+    im3 = plt.imshow(pdhg2.get_output().as_array()[sl,:,:])
+    
+    ims1.append([im1])
+    ims2.append([im2])
+    ims3.append([im3])
+    
+    
+ani1 = animation.ArtistAnimation(fig, ims1, interval=500,
+                                repeat_delay=10)
+
+ani2 = animation.ArtistAnimation(fig, ims2, interval=500,
+                                repeat_delay=10)
+
+ani3 = animation.ArtistAnimation(fig, ims3, interval=500,
+                                repeat_delay=10)
+plt.show()        
+#    plt.pause(0.25)
+#    plt.show()
+
+
+
+
+
+
+
 

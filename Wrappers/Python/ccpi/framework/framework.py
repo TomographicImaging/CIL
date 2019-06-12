@@ -764,14 +764,14 @@ class DataContainer(object):
         return numpy.sqrt(self.squared_norm())
     def dot(self, other, *args, **kwargs):
         '''return the inner product of 2 DataContainers viewed as vectors'''
-        method = kwargs.get('method', 'reduce')
+        method = kwargs.get('method', 'numpy')
         if method not in ['numpy','reduce']:
             raise ValueError('dot: specified method not valid. Expecting numpy or reduce got {} '.format(
                     method))
         if self.shape == other.shape:
             # return (self*other).sum()
             if method == 'numpy':
-                return numpy.dot(self.as_array().ravel(), other.as_array())
+                return numpy.dot(self.as_array().ravel(), other.as_array().ravel())
             elif method == 'reduce':
                 # see https://github.com/vais-ral/CCPi-Framework/pull/273
                 # notice that Python seems to be smart enough to use

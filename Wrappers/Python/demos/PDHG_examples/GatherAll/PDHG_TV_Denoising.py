@@ -63,6 +63,7 @@ from ccpi.optimisation.functions import ZeroFunction, L1Norm, \
                           KullbackLeibler
 from ccpi.framework import TestData
 import os, sys
+#import scipy.io
 if int(numpy.version.version.split('.')[1]) > 12:
     from skimage.util import random_noise
 else:
@@ -211,7 +212,7 @@ else:
     plt.show()
 
 
-##%% Check with CVX solution
+#%% Check with CVX solution
 
 from ccpi.optimisation.operators import SparseFiniteDiff
 
@@ -231,8 +232,7 @@ if cvx_not_installable:
     DX = SparseFiniteDiff(ig, direction=1, bnd_cond='Neumann')
     
     # Define Total Variation as a regulariser
-    regulariser = alpha * sum(norm(vstack([DX.matrix() * vec(u), DY.matrix() * vec(u)]), 2, axis = 0))
-    fidelity = pnorm( u - noisy_data.as_array(),1)
+    regulariser = alpha * sum(norm(vstack([Constant(DX.matrix()) * vec(u), Constant(DY.matrix()) * vec(u)]), 2, axis = 0))
     
     # choose solver
     if 'MOSEK' in installed_solvers():

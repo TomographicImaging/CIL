@@ -21,14 +21,15 @@
 
 from ccpi.framework import AcquisitionGeometry
 from ccpi.optimisation.algorithms import FISTA
-from ccpi.optimisation.functions import IndicatorBox, ZeroFunction, L2NormSquared, FunctionOperatorComposition
-from ccpi.astra.ops import AstraProjectorSimple
+from ccpi.optimisation.functions import IndicatorBox, ZeroFunction, \
+                         L2NormSquared, FunctionOperatorComposition
+from ccpi.astra.operators import AstraProjectorSimple
 
 import numpy as np
 import matplotlib.pyplot as plt
 from ccpi.framework import TestData
 import os, sys
-
+from ccpi.optimisation.funcs import Norm2sq
 
 # Load Data 
 loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
@@ -117,16 +118,15 @@ plt.show()
 # demonstrated in the rest of this file. In general all methods need an initial 
 # guess and some algorithm options to be set:
 
-f = FunctionOperatorComposition(0.5 * L2NormSquared(b=sin), Aop)
+f = FunctionOperatorComposition(L2NormSquared(b=sin), Aop)
+#f = Norm2sq(Aop, sin, c=0.5, memopt=True)
 g = ZeroFunction()
 
 x_init = ig.allocate()
-opt = {'memopt':True}
-
-fista = FISTA(x_init=x_init, f=f, g=g, opt=opt)
-fista.max_iteration = 100
-fista.update_objective_interval = 1
-fista.run(100, verbose=True)
+fista = FISTA(x_init=x_init, f=f, g=g)
+fista.max_iteration = 1000
+fista.update_objective_interval = 100
+fista.run(1000, verbose=True)
 
 plt.figure()
 plt.imshow(fista.get_output().as_array())
@@ -134,18 +134,12 @@ plt.title('FISTA unconstrained')
 plt.colorbar()
 plt.show()
 
-plt.figure()
-plt.semilogy(fista.objective)
-plt.title('FISTA objective')
-plt.show()
-
-#%%
 
 # Run FISTA for least squares with lower/upper bound 
-fista0 = FISTA(x_init=x_init, f=f, g=IndicatorBox(lower=0,upper=1), opt=opt)
-fista0.max_iteration = 100
-fista0.update_objective_interval = 1
-fista0.run(100, verbose=True)
+fista0 = FISTA(x_init=x_init, f=f, g=IndicatorBox(lower=0,upper=1))
+fista0.max_iteration = 1000
+fista0.update_objective_interval = 100
+fista0.run(1000, verbose=True)
 
 plt.figure()
 plt.imshow(fista0.get_output().as_array())
@@ -153,10 +147,10 @@ plt.title('FISTA constrained in [0,1]')
 plt.colorbar()
 plt.show()
 
-plt.figure()
-plt.semilogy(fista0.objective)
-plt.title('FISTA constrained in [0,1]')
-plt.show()
+#plt.figure()
+#plt.semilogy(fista0.objective)
+#plt.title('FISTA constrained in [0,1]')
+#plt.show()
 
 #%% Check with CVX solution
 
@@ -178,10 +172,10 @@ if cvx_not_installable:
     vol_geom = astra.create_vol_geom(N, N)
     proj_geom = astra.create_proj_geom('parallel', 1.0, detectors, angles)
 
-    proj_id = astra.create_projector('strip', proj_geom, vol_geom)
+    proj_id = astra.create_projector('linear', proj_geom, vol_geom)
 
     matrix_id = astra.projector.matrix(proj_id)
-
+    
     ProjMat = astra.matrix.get(matrix_id)
     
     tmp = sin.as_array().ravel()
@@ -217,3 +211,5 @@ if cvx_not_installable:
     plt.title('Middle Line Profiles')
     plt.show()
             
+    print('Primal Objective (CVX) {} '.format(obj.value))
+    print('Primal Objective (FISTA) {} '.format(fista0.loss[1]))    

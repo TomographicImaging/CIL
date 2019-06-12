@@ -57,9 +57,8 @@ elif phantom == 'powder':
         arrays[k] = numpy.array(v)
     XX = arrays['S']    
     X = numpy.transpose(XX,(0,2,1,3))
-    X = X[0:20]
+    X = X[100:120]
     
-        
     
 #%% Setup Geometry of Colorbay
 
@@ -125,11 +124,16 @@ plt.show()
 
 #%% CGLS
 
+def callback(iteration, objective, x):
+    plt.imshow(x.as_array()[5])
+    plt.colorbar()
+    plt.show()
+
 x_init = ig2d.allocate()      
 cgls1 = CGLS(x_init=x_init, operator=Aall, data=data2d)
 cgls1.max_iteration = 100
 cgls1.update_objective_interval = 1
-cgls1.run(5,verbose=True)
+cgls1.run(5,verbose=True, callback = callback)
 
 plt.imshow(cgls1.get_output().subset(channel=5).array)
 plt.title('CGLS')
@@ -148,7 +152,7 @@ cgls2 = CGLS(x_init=x_init, operator=op_CGLS, data=block_data)
 cgls2.max_iteration = 100
 cgls2.update_objective_interval = 1
 
-cgls2.run(10,verbose=True)
+cgls2.run(10,verbose=True, callback=callback)
 
 plt.imshow(cgls2.get_output().subset(channel=5).array)
 plt.title('Tikhonov')
@@ -174,8 +178,9 @@ f = BlockFunction(f1, f2)
 g = ZeroFunction()
 
 # Compute operator Norm
-normK = 8.70320267279591 # Run one time no need to compute again takes time
-    
+#normK = 8.70320267279591 # For powder Run one time no need to compute again takes time
+normK = 14.60320657253632 # for carbon
+
 # Primal & dual stepsizes
 sigma = 1
 tau = 1/(sigma*normK**2)
@@ -184,11 +189,11 @@ tau = 1/(sigma*normK**2)
 pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
 pdhg.max_iteration = 2000
 pdhg.update_objective_interval = 100
-pdhg.run(1000, verbose =True)
+pdhg.run(1000, verbose =True, callback=callback)
 
 
 #%% Show sinograms
-channel_ind = [10,15,15]
+channel_ind = [10,15,19]
 
 plt.figure(figsize=(15,15))
 

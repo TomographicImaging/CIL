@@ -241,7 +241,7 @@ if cvx_not_installable:
         solver = MOSEK
     else:
         solver = SCS      
-    
+        
     # fidelity
     if noise == 's&p':
         fidelity = pnorm( u - noisy_data.as_array(),1)

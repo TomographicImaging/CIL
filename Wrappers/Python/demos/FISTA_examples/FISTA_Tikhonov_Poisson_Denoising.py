@@ -21,7 +21,7 @@
 
 """ 
 
-Tikhonov for Poisson denoising using FISTA algorithm:
+"Tikhonov regularization" for Poisson denoising using FISTA algorithm:
 
 Problem:     min_x, x>0  \alpha * ||\nabla x||_{2}^{2} + \int x - g * log(x) 
 
@@ -52,14 +52,14 @@ from skimage.util import random_noise
 loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
 
 # Load Data                      
-N = 150
-M = 150
+N = 100
+M = 100
 data = loader.load(TestData.SIMPLE_PHANTOM_2D, size=(N,M), scale=(0,1))
 
 ig = data.geometry
 ag = ig
 
-# Create Noisy data. Add Gaussian noise
+# Create Noisy data with Poisson noise
 n1 = random_noise(data.as_array(), mode = 'poisson', seed = 10)
 noisy_data = ImageData(n1)
 
@@ -75,7 +75,6 @@ plt.title('Noisy Data')
 plt.colorbar()
 plt.show()
 
-#%%
 # Regularisation Parameter
 alpha = 10
 
@@ -114,8 +113,7 @@ fid.proximal = KL_Prox_PosCone
 reg = FunctionOperatorComposition(alpha * L2NormSquared(), operator)
 
 x_init = ig.allocate()
-opt = {'memopt':True}
-fista = FISTA(x_init=x_init , f=reg, g=fid, opt=opt)
+fista = FISTA(x_init=x_init , f=reg, g=fid)
 fista.max_iteration = 2000
 fista.update_objective_interval = 500
 fista.run(2000, verbose=True)
@@ -196,7 +194,6 @@ if cvx_not_installable:
     plt.title('Middle Line Profiles')
     plt.show()
             
-    #TODO what is the output of fista.objective, fista.loss
     print('Primal Objective (CVX) {} '.format(obj.value))
     print('Primal Objective (FISTA) {} '.format(fista.loss[1]))
 

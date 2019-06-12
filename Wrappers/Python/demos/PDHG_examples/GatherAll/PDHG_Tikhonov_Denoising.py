@@ -195,7 +195,6 @@ try:
 except ImportError:
     cvx_not_installable = False
 
-
 if cvx_not_installable:
 
     ##Construct problem    

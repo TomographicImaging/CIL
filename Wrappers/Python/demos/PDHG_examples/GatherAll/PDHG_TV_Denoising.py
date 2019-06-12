@@ -239,7 +239,7 @@ if cvx_not_installable:
         solver = MOSEK
     else:
         solver = SCS      
-    
+
     # fidelity
     if noise == 's&p':
         fidelity = pnorm( u - noisy_data.as_array(),1)
@@ -248,8 +248,7 @@ if cvx_not_installable:
         solver = SCS
     elif noise == 'gaussian':
         fidelity = 0.5 * sum_squares(noisy_data.as_array() - u)
-    
-            
+                
     obj =  Minimize( regulariser +  fidelity)
     prob = Problem(obj)
     result = prob.solve(verbose = True, solver = solver)

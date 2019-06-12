@@ -55,50 +55,41 @@ from ccpi.optimisation.algorithms import PDHG
 from ccpi.optimisation.operators import BlockOperator, Gradient, Identity, \
                                     SymmetrizedGradient, ZeroOperator
 from ccpi.optimisation.functions import IndicatorBox, KullbackLeibler, ZeroFunction,\
-                      MixedL21Norm, BlockFunction
+                      MixedL21Norm, BlockFunction, L2NormSquared
 
 from ccpi.astra.ops import AstraProjectorSimple
-from ccpi.framework import TestData
 import os, sys
-if int(numpy.version.version.split('.')[1]) > 12:
-    from skimage.util import random_noise
+
+
+import tomophantom
+from tomophantom import TomoP2D
+
+# user supplied input
+if len(sys.argv) > 1:
+    which_noise = int(sys.argv[1])
 else:
-    from demoutil import random_noise
-
-#loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
-
-# Load Data                      
-#N = 50
-#M = 50
-#data = loader.load(TestData.SIMPLE_PHANTOM_2D, size=(N,M), scale=(0,1))
-#
-#ig = data.geometry
-#ag = ig
-N = 100
-
-data = np.zeros((N,N))
-
-x1 = np.linspace(0, int(N/2), N)
-x2 = np.linspace(int(N/2), 0., N)
-xv, yv = np.meshgrid(x1, x2)
-
-xv[int(N/4):int(3*N/4)-1, int(N/4):int(3*N/4)-1] = yv[int(N/4):int(3*N/4)-1, int(N/4):int(3*N/4)-1].T
-
-data = xv
-data = ImageData(data/data.max())
+    which_noise = 1 
+    
+# Load Piecewise smooth Shepp-Logan phantom 
+model = 2 # select a model number from the library
+N = 128 # set dimension of the phantom
+# one can specify an exact path to the parameters file
+# path_library2D = '../../../PhantomLibrary/models/Phantom2DLibrary.dat'
+path = os.path.dirname(tomophantom.__file__)
+path_library2D = os.path.join(path, "Phantom2DLibrary.dat")
+#This will generate a N_size x N_size phantom (2D)
+phantom_2D = TomoP2D.Model(model, N, path_library2D)
 
 ig = ImageGeometry(voxel_num_x = N, voxel_num_y = N)
-ag = ig
+data = ImageData(phantom_2D)
 
-
-#Create Acquisition Data and apply poisson noise
+#Create Acquisition Data 
 detectors = N
 angles = np.linspace(0, np.pi, N)
-
 ag = AcquisitionGeometry('parallel','2D',angles, detectors)
 
 #device = input('Available device: GPU==1 / CPU==0 ')
-device = '0'
+device = '1'
 if device=='1':
     dev = 'gpu'
 else:
@@ -107,7 +98,7 @@ else:
 Aop = AstraProjectorSimple(ig, ag, 'cpu')
 sin = Aop.direct(data)
 
-# Create noisy data.
+# Create noisy sinogram.
 noises = ['gaussian', 'poisson']
 noise = noises[which_noise]
 
@@ -144,11 +135,12 @@ op31 = Aop
 op32 = ZeroOperator(op22.domain_geometry(), ag)
 
 operator = BlockOperator(op11, -1*op12, op21, op22, op31, op32, shape=(3,2) ) 
+normK = operator.norm()
 
 # Create functions
 if noise == 'poisson':
-    alpha = 1
-    beta = 5
+    alpha = 3
+    beta = 6
     f3 = KullbackLeibler(noisy_data)    
     g =  BlockFunction(IndicatorBox(lower=0), ZeroFunction()) 
     
@@ -158,6 +150,7 @@ if noise == 'poisson':
     
 elif noise == 'gaussian':   
     alpha = 20
+    beta = 50
     f3 = 0.5 * L2NormSquared(b=noisy_data)                                         
     g = BlockFunction(ZeroFunction(), ZeroFunction())
     
@@ -177,7 +170,6 @@ pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
 pdhg.max_iteration = 3000
 pdhg.update_objective_interval = 500
 pdhg.run(3000)
-
 #%%
 plt.figure(figsize=(15,15))
 plt.subplot(3,1,1)
@@ -193,8 +185,8 @@ plt.imshow(pdhg.get_output()[0].as_array())
 plt.title('TGV Reconstruction')
 plt.colorbar()
 plt.show()
-plt.plot(np.linspace(0,ig.shape[1],ig.shape[1]), data.as_array()[int(N/2),:], label = 'GTruth')
-plt.plot(np.linspace(0,ig.shape[1],ig.shape[1]), pdhg.get_output()[0].as_array()[int(N/2),:], label = 'TGV reconstruction')
+plt.plot(np.linspace(0,ig.shape[1],ig.shape[1]), data.as_array()[:, int(N/2)], label = 'GTruth')
+plt.plot(np.linspace(0,ig.shape[1],ig.shape[1]), pdhg.get_output()[0].as_array()[:, int(N/2)], label = 'TGV reconstruction')
 plt.legend()
 plt.title('Middle Line Profiles')
 plt.show()

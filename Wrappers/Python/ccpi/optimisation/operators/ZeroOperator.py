@@ -34,8 +34,8 @@ class ZeroOperator(LinearOperator):
         else:
             out.fill(self.gm_domain.allocate())
         
-    def norm(self):
-        return 0
+    def calculate_norm(self, **kwargs):
+        return 0.
     
     def domain_geometry(self):       
         return self.gm_domain  

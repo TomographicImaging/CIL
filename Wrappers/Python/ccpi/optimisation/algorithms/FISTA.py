@@ -29,12 +29,13 @@ class FISTA(Algorithm):
         proper variables are passed or later with set_up'''
         super(FISTA, self).__init__()
         self.f = kwargs.get('f', None)
-        self.g = kwargs.get('g', None)
+        self.g = kwargs.get('g', ZeroFunction())
         self.x_init = kwargs.get('x_init',None)
         self.invL = None
         self.t_old = 1
-        if self.f is not None and self.g is not None:
-            print ("Calling from creator")
+        if self.x_init is not None and \
+           self.f is not None and self.g is not None:
+            print ("FISTA set_up called from creator")
             self.set_up(self.x_init, self.f, self.g)        
 
     
@@ -56,6 +57,8 @@ class FISTA(Algorithm):
         self.invL = 1/f.L
         
         self.t_old = 1
+        self.update_objective()
+        self.configured = True
             
     def update(self):
 

@@ -29,7 +29,7 @@ class LinearOperator(Operator):
         
         # Initialise random
         if x_init is None:
-            x0 = operator.domain_geometry().allocate(ImageGeometry.RANDOM_INT)
+            x0 = operator.domain_geometry().allocate(type(operator.domain_geometry()).RANDOM_INT)
         else:
             x0 = x_init.copy()
             
@@ -45,23 +45,11 @@ class LinearOperator(Operator):
             x1.multiply((1.0/x1norm), out=x0)
         return numpy.sqrt(s[-1]), numpy.sqrt(s), x0
 
-    @staticmethod
-    def PowerMethodNonsquare(op,numiters , x_init=None):
-        '''Power method to calculate iteratively the Lipschitz constant'''
-        
-        if x_init is None:
-            x0 = op.allocate_direct()
-            x0.fill(numpy.random.randn(*x0.shape))
-        else:
-            x0 = x_init.copy()
-        
-        s = numpy.zeros(numiters)
-        # Loop
-        for it in numpy.arange(numiters):
-            x1 = op.adjoint(op.direct(x0))
-            x1norm = x1.norm()
-            s[it] = (x1*x0).sum() / (x0.squared_norm())
-            x0 = (1.0/x1norm)*x1
-        return numpy.sqrt(s[-1]), numpy.sqrt(s), x0
+    def calculate_norm(self, **kwargs):
+        '''Returns the norm of the LinearOperator as calculated by the PowerMethod'''
+        x0 = kwargs.get('x0', None)
+        iterations = kwargs.get('iterations', 25)
+        s1, sall, svec = LinearOperator.PowerMethod(self, iterations, x_init=x0)
+        return s1
 
 

@@ -23,10 +23,16 @@ class PDHG(Algorithm):
         self.operator = kwargs.get('operator', None)
         self.g        = kwargs.get('g', None)
         self.tau      = kwargs.get('tau', None)
-        self.sigma    = kwargs.get('sigma', None)
+        self.sigma    = kwargs.get('sigma', 1.)
+        
         
         if self.f is not None and self.operator is not None and \
            self.g is not None:
+            if self.tau is None:
+                # Compute operator Norm
+                normK = self.operator.norm()
+                # Primal & dual stepsizes
+                self.tau = 1/(self.sigma*normK**2)
             print ("Calling from creator")
             self.set_up(self.f,
                         self.g,
@@ -57,6 +63,8 @@ class PDHG(Algorithm):
 
         # relaxation parameter
         self.theta = 1
+        self.update_objective()
+        self.configured = True
 
     def update(self):
         

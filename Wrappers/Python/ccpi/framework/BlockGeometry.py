@@ -10,6 +10,12 @@ from ccpi.framework import BlockDataContainer
 #from ccpi.optimisation.operators import Operator, LinearOperator
  
 class BlockGeometry(object):
+    
+    RANDOM = 'random'
+    RANDOM_INT = 'random_int'
+    
+    
+    
     '''Class to hold Geometry as column vector'''
     #__array_priority__ = 1
     def __init__(self, *args, **kwargs):

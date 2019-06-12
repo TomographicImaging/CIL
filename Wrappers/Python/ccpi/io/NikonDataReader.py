@@ -8,7 +8,6 @@ Created on Wed Apr  3 10:30:25 2019
 
 from ccpi.framework import AcquisitionData, AcquisitionGeometry
 import numpy
-import matplotlib.pyplot as plt
 import os
 
 

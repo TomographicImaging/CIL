@@ -9,7 +9,6 @@ Created on Wed Apr  3 10:30:25 2019
 
 import numpy
 import os
-import matplotlib.pyplot as plt
 from ccpi.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
 
 

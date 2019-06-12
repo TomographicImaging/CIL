@@ -9,9 +9,7 @@ Created on Thu May  2 10:11:20 2019
 
 import numpy
 import os
-import matplotlib.pyplot as plt
 from ccpi.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
-from NikonDataReader import NikonDataReader
 import datetime
 
 

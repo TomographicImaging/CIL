@@ -28,7 +28,8 @@ from datetime import timedelta, datetime
 import warnings
 from functools import reduce
 from numbers import Number
-from ccpi.framework import DataContainer, VectorGeometry
+from ccpi.framework import DataContainer
+from ccpi.framework import VectorGeometry
 
 class VectorData(DataContainer):
     def __init__(self, array=None, **kwargs):

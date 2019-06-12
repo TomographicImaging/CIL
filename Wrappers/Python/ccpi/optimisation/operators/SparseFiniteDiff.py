@@ -10,7 +10,7 @@ import scipy.sparse as sp
 import numpy as np
 from ccpi.framework import ImageData
 
-class SparseFiniteDiff():
+class SparseFiniteDiff(object):
     
     def __init__(self, gm_domain, gm_range=None, direction=0, bnd_cond = 'Neumann'):
         

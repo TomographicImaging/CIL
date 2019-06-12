@@ -51,6 +51,7 @@ class Algorithm(object):
         self.__max_iteration = kwargs.get('max_iteration', 0)
         self.__loss = []
         self.memopt = False
+        self.configured = False
         self.timing = []
         self.update_objective_interval = kwargs.get('update_objective_interval', 1)
     def set_up(self, *args, **kwargs):
@@ -86,6 +87,8 @@ class Algorithm(object):
             raise StopIteration()
         else:
             time0 = time.time()
+            if not self.configured:
+                raise ValueError('Algorithm not configured correctly. Please run set_up.')
             self.update()
             self.timing.append( time.time() - time0 )
             if self.iteration % self.update_objective_interval == 0:
@@ -147,13 +150,9 @@ class Algorithm(object):
         if self.should_stop():
             print ("Stop cryterion has been reached.")
         i = 0
-        
-        if verbose:
-            print ("{:>9} {:>10} {:>11} {:>20}".format('Iter', 
-                                                      'Max Iter',
-                                                      's/Iter',
-                                                      'Objective Value'))
         for _ in self:
+            if i == 0 and verbose:
+                print (self.verbose_header())
             if (self.iteration -1) % self.update_objective_interval == 0:                
                 if verbose:
                     print (self.verbose_output())
@@ -170,14 +169,40 @@ class Algorithm(object):
             t = 0
         else:
             t = sum(timing)/len(timing)
-        el = [ self.iteration-1, 
-               self.max_iteration,
-               "{:.3f} s/it".format(t), 
-               self.get_last_objective() ]
-        
-        if type(el[-1] ) == list:
-            string = functools.reduce(lambda x,y: x+' {:>15.5e}'.format(y), el[-1],'')
-            out = "{:>9} {:>10} {:>11} {}".format(*el[:-1] , string)
+        out = "{:>9} {:>10} {:>13} {}".format(
+                 self.iteration-1, 
+                 self.max_iteration,
+                 "{:.3f}".format(t), 
+                 self.objective_to_string()
+               )
+        return out
+
+    def objective_to_string(self):
+        el = self.get_last_objective()
+        if type(el) == list:
+            string = functools.reduce(lambda x,y: x+' {:>13.5e}'.format(y), el[:-1],'')
+            string += '{:>15.5e}'.format(el[-1])
         else:
-            out = "{:>9} {:>10} {:>11} {:>20.5e}".format(*el)
+            string = "{:>20.5e}".format(el)
+        return string
+    def verbose_header(self):
+        el = self.get_last_objective()
+        if type(el) == list:
+            out = "{:>9} {:>10} {:>13} {:>13} {:>13} {:>15}\n".format('Iter', 
+                                                      'Max Iter',
+                                                      'Time/Iter',
+                                                      'Primal' , 'Dual', 'Primal-Dual')
+            out += "{:>9} {:>10} {:>13} {:>13} {:>13} {:>15}".format('', 
+                                                      '',
+                                                      '[s]',
+                                                      'Objective' , 'Objective', 'Gap')
+        else:
+            out = "{:>9} {:>10} {:>13} {:>20}\n".format('Iter', 
+                                                      'Max Iter',
+                                                      'Time/Iter',
+                                                      'Objective')
+            out += "{:>9} {:>10} {:>13} {:>20}".format('', 
+                                                      '',
+                                                      '[s]',
+                                                      '')
         return out

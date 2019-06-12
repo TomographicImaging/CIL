@@ -59,6 +59,7 @@ class SIRT(Algorithm):
         # Set up scaling matrices D and M.
         self.M = 1/self.operator.direct(self.operator.domain_geometry().allocate(value=1.0))        
         self.D = 1/self.operator.adjoint(self.operator.range_geometry().allocate(value=1.0))
+        self.configured = True
 
 
     def update(self):
@@ -67,8 +68,9 @@ class SIRT(Algorithm):
         
         self.x += self.relax_par * (self.D*self.operator.adjoint(self.M*self.r))
         
-        if self.constraint != None:
-            self.x = self.constraint.prox(self.x,None)
+        if self.constraint is not None:
+            self.x = self.constraint.proximal(self.x,None)
+            # self.constraint.proximal(self.x,None, out=self.x)
 
     def update_objective(self):
         self.loss.append(self.r.squared_norm())

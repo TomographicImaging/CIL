@@ -23,6 +23,7 @@ Created on Thu Feb 21 11:11:23 2019
 """
 
 from ccpi.optimisation.algorithms import Algorithm
+from ccpi.optimisation.functions import Norm2Sq
 
 class CGLS(Algorithm):
 
@@ -59,6 +60,9 @@ class CGLS(Algorithm):
         #    self.normr2 = sum(self.normr2)
         #self.normr2 = numpy.sqrt(self.normr2)
         #print ("set_up" , self.normr2)
+        n = Norm2Sq(operator, self.data)
+        self.loss.append(n(x_init))
+        self.configured = True
 
     def update(self):
 

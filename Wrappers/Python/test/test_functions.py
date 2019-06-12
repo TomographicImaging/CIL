@@ -20,7 +20,7 @@ from ccpi.optimisation.operators import Gradient
 from ccpi.optimisation.functions import L2NormSquared
 from ccpi.optimisation.functions import L1Norm, MixedL21Norm
 
-from ccpi.optimisation.functions import Norm2sq
+from ccpi.optimisation.functions import Norm2Sq
 from ccpi.optimisation.functions import ZeroFunction
 
 from ccpi.optimisation.functions import FunctionOperatorComposition
@@ -298,7 +298,7 @@ class TestFunction(unittest.TestCase):
         b = ig.allocate(ImageGeometry.RANDOM_INT) 
         
         A = 0.5 * Identity(ig)
-        old_chisq = Norm2sq(A, b, 1.0)
+        old_chisq = Norm2Sq(A, b, 1.0)
         new_chisq = FunctionOperatorComposition(L2NormSquared(b=b),A)
 
         yold = old_chisq(u)

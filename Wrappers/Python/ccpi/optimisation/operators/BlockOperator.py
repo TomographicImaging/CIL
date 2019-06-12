@@ -104,8 +104,8 @@ class BlockOperator(Operator):
         index = row*self.shape[1]+col
         return self.operators[index]
     
-    def norm(self):
-        norm = [op.norm()**2 for op in self.operators]
+    def calculate_norm(self, **kwargs):
+        norm = [op.norm(**kwargs)**2 for op in self.operators]
         return numpy.sqrt(sum(norm))    
     
     def direct(self, x, out=None):

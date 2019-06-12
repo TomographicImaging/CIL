@@ -111,17 +111,6 @@ class SymmetrizedGradient(Gradient):
     
     def range_geometry(self):
         return self.gm_range
-                                   
-    def norm(self):
-
-#        TODO need dot method for BlockDataContainer
-#        return numpy.sqrt(4*self.gm_domain.shape[0])
-    
-#        x0 = self.gm_domain.allocate('random')
-        self.s1, sall, svec = LinearOperator.PowerMethod(self, 50)        
-        return self.s1
-    
-
 
 if __name__ == '__main__':   
     

@@ -49,8 +49,8 @@ class BlockScaledOperator(ScaledOperator):
             return self.scalar * self.operator.adjoint(x, out=out)
         else:
             raise TypeError('Operator is not linear')
-    def norm(self):
-        return numpy.abs(self.scalar) * self.operator.norm()
+    def norm(self, **kwargs):
+        return numpy.abs(self.scalar) * self.operator.norm(**kwargs)
     def range_geometry(self):
         return self.operator.range_geometry()
     def domain_geometry(self):

@@ -8,10 +8,11 @@ from ccpi.framework import ImageGeometry
 from ccpi.framework import AcquisitionGeometry
 from ccpi.optimisation.algorithms import FISTA
 #from ccpi.optimisation.algs import FBPD
-from ccpi.optimisation.functions import Norm2sq
+from ccpi.optimisation.functions import Norm2Sq
 from ccpi.optimisation.functions import ZeroFunction
-from ccpi.optimisation.funcs import Norm1
-from ccpi.optimisation.funcs import Norm2
+from ccpi.optimisation.functions import L1Norm
+# This was removed
+#from ccpi.optimisation.funcs import Norm2
 
 from ccpi.optimisation.operators import LinearOperatorMatrix
 from ccpi.optimisation.operators import Identity
@@ -80,7 +81,7 @@ class TestAlgorithms(unittest.TestCase):
                 lam = 10
                 opt = {'memopt': True}
                 # Create object instances with the test data A and b.
-                f = Norm2sq(A, b, c=0.5, memopt=True)
+                f = Norm2Sq(A, b, c=0.5, memopt=True)
                 g0 = ZeroFunction()
 
                 # Initial guess
@@ -144,14 +145,14 @@ class TestAlgorithms(unittest.TestCase):
                 lam = 10
                 opt = {'memopt': True}
                 # Create object instances with the test data A and b.
-                f = Norm2sq(A, b, c=0.5, memopt=True)
+                f = Norm2Sq(A, b, c=0.5, memopt=True)
                 g0 = ZeroFunction()
 
                 # Initial guess
                 x_init = DataContainer(np.zeros((n, 1)))
 
                 # Create 1-norm object instance
-                g1 = Norm1(lam)
+                g1 = lam * L1Norm()
 
                 g1(x_init)
                 g1.prox(x_init, 0.02)
@@ -218,14 +219,14 @@ class TestAlgorithms(unittest.TestCase):
             x_init = DataContainer(np.random.randn(n, 1))
 
             # Create object instances with the test data A and b.
-            f = Norm2sq(A, b, c=0.5, memopt=True)
+            f = Norm2Sq(A, b, c=0.5, memopt=True)
             f.L = LinearOperator.PowerMethod(A, 25, x_init)[0]
             print ("Lipschitz", f.L)
             g0 = ZeroFun()
 
 
             # Create 1-norm object instance
-            g1 = Norm1(lam)
+            g1 = lam * L1Norm()
 
             # Compare to CVXPY
 
@@ -286,13 +287,13 @@ class TestAlgorithms(unittest.TestCase):
             y.array = y.array + 0.1*np.random.randn(N, N)
 
             # Data fidelity term
-            f_denoise = Norm2sq(I, y, c=0.5, memopt=True)
+            f_denoise = Norm2Sq(I, y, c=0.5, memopt=True)
             x_init = ImageData(geometry=ig)
             f_denoise.L = LinearOperator.PowerMethod(I, 25, x_init)[0]
 
             # 1-norm regulariser
             lam1_denoise = 1.0
-            g1_denoise = Norm1(lam1_denoise)
+            g1_denoise = lam1_denoise * L1Norm()
 
             # Initial guess
             x_init_denoise = ImageData(np.zeros((N, N)))

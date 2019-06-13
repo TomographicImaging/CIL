@@ -94,10 +94,20 @@ class NEXUSDataReader(object):
                                      dimension_labels = dimension_labels)
                     
                 else:   # AcquisitionData
+                    if ds_data.attrs.__contains__('dist_source_center'):
+                        dist_source_center = ds_data.attrs['dist_source_center']
+                    else:
+                        dist_source_center = None
+                    
+                    if ds_data.attrs.__contains__('dist_center_detector'):
+                        dist_center_detector = ds_data.attrs['dist_center_detector']
+                    else:
+                        dist_center_detector = None
+                    
                     self._geometry = AcquisitionGeometry(geom_type = ds_data.attrs['geom_type'],
                                                          dimension = ds_data.attrs['dimension'],
-                                                         dist_source_center = ds_data.attrs['dist_source_center'],
-                                                         dist_center_detector = ds_data.attrs['dist_center_detector'],
+                                                         dist_source_center = dist_source_center,
+                                                         dist_center_detector = dist_center_detector,
                                                          pixel_num_h = ds_data.attrs['pixel_num_h'],
                                                          pixel_size_h = ds_data.attrs['pixel_size_h'],
                                                          pixel_num_v = ds_data.attrs['pixel_num_v'],
@@ -140,4 +150,11 @@ image_data = reader.load_data()
 print(image_data)
 ig = reader.get_geometry()
 print(ig)
+
+reader = NEXUSDataReader()
+reader.set_up(nexus_file = '/home/evelina/test_nexus_ag.nxs')
+ad = reader.load_data()
+print(ad)
+ad = reader.get_geometry()
+print(ad)
 '''

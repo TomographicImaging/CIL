@@ -225,12 +225,15 @@ class AcquisitionGeometry(object):
             source_to_center_dist (if parallel: NaN)
             center_to_detector_dist (if parallel: NaN)
         standard or nonstandard (vec) geometry
-        angles
+        angles is expected numpy array, dtype - float32
         angles_format radians or degrees
         """
         self.geom_type = geom_type   # 'parallel' or 'cone'
         self.dimension = dimension # 2D or 3D
-        self.angles = angles
+        if isinstance(angles, numpy.ndarray):
+            self.angles = angles
+        else:
+            raise ValueError('numpy array is expected')
         num_of_angles = len (angles)
         
         self.dist_source_center = dist_source_center

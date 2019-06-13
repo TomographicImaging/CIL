@@ -50,7 +50,7 @@ class CGLS(Algorithm):
     def set_up(self, x_init, operator , data ):
 
         self.r = data.copy()
-        self.x = x_init.copy()
+        self.x = x_init * 0
 
         self.operator = operator
         self.d = operator.adjoint(self.r)
@@ -96,11 +96,12 @@ class CGLS(Algorithm):
         Ad = self.operator.direct(self.d)
         norm = Ad.squared_norm()
         if norm == 0.:
-            print ('cannot update solution')
+            print ('norm = 0, cannot update solution')
+            print ("self.d norm", self.d.squared_norm(), self.d.as_array())
             raise StopIteration()
         alpha = self.normr2/norm
         if alpha == 0.:
-            print ('cannot update solution')
+            print ('alpha = 0, cannot update solution')
             raise StopIteration()
         self.d *= alpha
         Ad *= alpha

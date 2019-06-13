@@ -61,15 +61,20 @@ class Norm1(Function):
 
 opt = {'memopt': True}
 # Problem data.
-m = 4
-n = 10
-np.random.seed(1)
+m = 500
+n = 200
+
+# if m < n then the problem is under-determined and algorithms will struggle to find a solution. 
+# One approach is to add regularisation
+
+#np.random.seed(1)
 Amat = np.asarray( np.random.randn(m, n), dtype=numpy.float32)
+Amat = np.asarray( np.random.random_integers(1,10, (m, n)), dtype=numpy.float32)
 #Amat = np.asarray(np.eye(m), dtype=np.float32) * 2
 A = LinearOperatorMatrix(Amat)
 bmat = np.asarray( np.random.randn(m), dtype=numpy.float32)
-bmat *= 0 
-bmat += 2
+#bmat *= 0 
+#bmat += 2
 print ("bmat", bmat.shape)
 print ("A", A.A)
 #bmat.shape = (bmat.shape[0], 1)
@@ -78,7 +83,7 @@ print ("A", A.A)
 # Change n to equal to m.
 vgb = VectorGeometry(m)
 vgx = VectorGeometry(n)
-b = vgb.allocate(2, dtype=numpy.float32)
+b = vgb.allocate(VectorGeometry.RANDOM_INT, dtype=numpy.float32)
 # b.fill(bmat)
 #b = DataContainer(bmat)
 
@@ -99,11 +104,12 @@ a = VectorData(x_init.as_array(), deep_copy=True)
 assert id(x_init.as_array()) != id(a.as_array())
 
 #%%
-f.L = LinearOperator.PowerMethod(A, 25, x_init)[0] 
-print ('f.L', f.L)
+# f.L = LinearOperator.PowerMethod(A, 25, x_init)[0] 
+# print ('f.L', f.L)
 rate = (1 / f.L) / 6
 f.L *= 12
-
+print (f.L)
+# rate = f.L / 1000
 # Initial guess
 #x_init = DataContainer(np.zeros((n, 1)))
 print ('x_init', x_init.as_array())
@@ -133,28 +139,35 @@ print ("pippo", pippo.as_array())
 print ("x_init", x_init.as_array())
 print ("x1", x1.as_array())
 
+y = A.direct(x_init)
+y *= 0
+A.direct(x_init, out=y)
 
 # Combine with least squares and solve using generic FISTA implementation
 #x_fista1, it1, timing1, criter1 = FISTA(x_init, f, g1, opt=opt)
 def callback(it,  objective, solution):
-    print (objective, f(solution))
+    print ("callback " , it , objective, f(solution))
 
 fa = FISTA(x_init=x_init, f=f, g=g1)
-fa.max_iteration = 100
+fa.max_iteration = 1000
 fa.update_objective_interval = int( fa.max_iteration / 10 ) 
 fa.run(fa.max_iteration, callback = None, verbose=True)
 
 gd = GradientDescent(x_init=x_init, objective_function=f, rate = rate )
-gd.max_iteration = 100
+gd.max_iteration = 10000
 gd.update_objective_interval = int( gd.max_iteration / 10 ) 
 gd.run(gd.max_iteration, callback = None, verbose=True)
 
+
+
 cgls = CGLS(x_init= x_initcgls, operator=A, data=b)
 cgls.max_iteration = 1000
-cgls.update_objective_interval = 2
+cgls.update_objective_interval = int( cgls.max_iteration / 10 ) 
 
 #cgls.should_stop = stop_criterion(cgls)
-cgls.run(10, callback = callback, verbose=True)
+cgls.run(cgls.max_iteration, callback = callback, verbose=True)
+
+
 
 # Print for comparison
 print("FISTA least squares plus 1-norm solution and objective value:")
@@ -165,3 +178,7 @@ print ("data           ", b.as_array())
 print ('FISTA          ', A.direct(fa.get_output()).as_array())
 print ('GradientDescent', A.direct(gd.get_output()).as_array())
 print ('CGLS           ', A.direct(cgls.get_output()).as_array())
+
+cond = numpy.linalg.cond(A.A)
+
+print ("cond" , cond)

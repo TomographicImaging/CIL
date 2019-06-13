@@ -103,13 +103,12 @@ a = VectorData(x_init.as_array(), deep_copy=True)
 
 assert id(x_init.as_array()) != id(a.as_array())
 
-#%%
-# f.L = LinearOperator.PowerMethod(A, 25, x_init)[0] 
-# print ('f.L', f.L)
+
+#f.L = LinearOperator.PowerMethod(A, 25, x_init)[0] 
+#print ('f.L', f.L)
 rate = (1 / f.L) / 6
-f.L *= 12
-print (f.L)
-# rate = f.L / 1000
+#f.L *= 12
+
 # Initial guess
 #x_init = DataContainer(np.zeros((n, 1)))
 print ('x_init', x_init.as_array())
@@ -154,7 +153,7 @@ fa.update_objective_interval = int( fa.max_iteration / 10 )
 fa.run(fa.max_iteration, callback = None, verbose=True)
 
 gd = GradientDescent(x_init=x_init, objective_function=f, rate = rate )
-gd.max_iteration = 10000
+gd.max_iteration = 5000
 gd.update_objective_interval = int( gd.max_iteration / 10 ) 
 gd.run(gd.max_iteration, callback = None, verbose=True)
 
@@ -182,3 +181,28 @@ print ('CGLS           ', A.direct(cgls.get_output()).as_array())
 cond = numpy.linalg.cond(A.A)
 
 print ("cond" , cond)
+
+#%%
+try:
+    import cvxpy as cp
+    # Construct the problem.
+    x = cp.Variable(n)
+    objective = cp.Minimize(cp.sum_squares(A.A*x - bmat))
+    prob = cp.Problem(objective)
+    # The optimal objective is returned by prob.solve().
+    result = prob.solve(solver = cp.MOSEK)
+
+    print ('CGLS           ', cgls.get_output().as_array())
+    print ('CVX           ', x.value)
+
+    print ('FISTA           ', fa.get_output().as_array())
+    print ('GD           ', gd.get_output().as_array())
+except ImportError as ir:
+    pass
+
+    #%%
+
+
+
+
+

@@ -10,10 +10,9 @@ from ccpi.optimisation.algorithms import FISTA
 #from ccpi.optimisation.algs import FBPD
 from ccpi.optimisation.functions import Norm2Sq
 from ccpi.optimisation.functions import ZeroFunction
+# from ccpi.optimisation.funcs import Norm1
 from ccpi.optimisation.functions import L1Norm
-# This was removed
-#from ccpi.optimisation.funcs import Norm2
-#from ccpi.optimisation.funcs import Norm1
+from ccpi.optimisation.funcs import Norm2
 
 from ccpi.optimisation.operators import LinearOperatorMatrix
 from ccpi.optimisation.operators import Identity
@@ -83,7 +82,6 @@ class TestAlgorithms(unittest.TestCase):
                 opt = {'memopt': True}
                 # Create object instances with the test data A and b.
                 f = Norm2Sq(A, b, c=0.5, memopt=True)
-                f.L = LinearOperator.PowerMethod(A, 10)
                 g0 = ZeroFunction()
 
                 # Initial guess
@@ -126,7 +124,6 @@ class TestAlgorithms(unittest.TestCase):
             self.assertTrue(cvx_not_installable)
 
     def test_FISTA_Norm1_cvx(self):
-        print ("test_FISTA_Norm1_cvx")
         if not cvx_not_installable:
             try:
                 opt = {'memopt': True}
@@ -141,8 +138,11 @@ class TestAlgorithms(unittest.TestCase):
 
                 # A = Identity()
                 # Change n to equal to m.
-
-                b = DataContainer(bmat)
+                vgb = VectorGeometry(m)
+                vgx = VectorGeometry(n)
+                b = vgb.allocate()
+                b.fill(bmat)
+                #b = DataContainer(bmat)
 
                 # Regularization parameter
                 lam = 10
@@ -152,10 +152,11 @@ class TestAlgorithms(unittest.TestCase):
                 g0 = ZeroFunction()
 
                 # Initial guess
-                x_init = DataContainer(np.zeros((n, 1)))
+                #x_init = DataContainer(np.zeros((n, 1)))
+                x_init = vgx.allocate()
 
                 # Create 1-norm object instance
-                g1 = lam * L1Norm()
+                g1 = Norm1(lam)
 
                 g1(x_init)
                 g1.prox(x_init, 0.02)
@@ -229,7 +230,7 @@ class TestAlgorithms(unittest.TestCase):
 
 
             # Create 1-norm object instance
-            g1 = lam * L1Norm()
+            g1 = Norm1(lam)
 
             # Compare to CVXPY
 
@@ -296,7 +297,7 @@ class TestAlgorithms(unittest.TestCase):
 
             # 1-norm regulariser
             lam1_denoise = 1.0
-            g1_denoise = lam1_denoise * L1Norm()
+            g1_denoise = Norm1(lam1_denoise)
 
             # Initial guess
             x_init_denoise = ImageData(np.zeros((N, N)))

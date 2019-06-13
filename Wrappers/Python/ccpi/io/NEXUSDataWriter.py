@@ -87,8 +87,10 @@ class NEXUSDataWriter(object):
             if (isinstance(self.data_container, AcquisitionData)):      
                 ds_data.attrs['geom_type'] = self.data_container.geometry.geom_type
                 ds_data.attrs['dimension'] = self.data_container.geometry.dimension
-                ds_data.attrs['dist_source_center'] = self.data_container.geometry.dist_source_center
-                ds_data.attrs['dist_center_detector'] = self.data_container.geometry.dist_center_detector
+                if self.data_container.geometry.dist_source_center is not None:
+                    ds_data.attrs['dist_source_center'] = self.data_container.geometry.dist_source_center
+                if self.data_container.geometry.dist_center_detector is not None:
+                    ds_data.attrs['dist_center_detector'] = self.data_container.geometry.dist_center_detector
                 ds_data.attrs['pixel_num_h'] = self.data_container.geometry.pixel_num_h
                 ds_data.attrs['pixel_size_h'] = self.data_container.geometry.pixel_size_h
                 ds_data.attrs['pixel_num_v'] = self.data_container.geometry.pixel_num_v
@@ -138,14 +140,25 @@ writer.write_file()
 
 ig = ImageGeometry(voxel_num_x = 100,
                    voxel_num_y = 100)
-
 im = ImageData(array = numpy.zeros((100, 100), dtype = 'float'),
                geometry = ig)
-
 im_writer = NEXUSDataWriter()
 
-writer.set_up(file_name = '/home/evelina/test_nexus_im.nxs',
-              data_container = im)
+im_writer.set_up(file_name = '/home/evelina/test_nexus_im.nxs',
+                 data_container = im)
+im_writer.write_file()
 
-writer.write_file()
+ag = AcquisitionGeometry(geom_type = 'parallel', 
+                         dimension = '2D', 
+                         angles = numpy.array([0, 1]), 
+                         pixel_num_h = 200, 
+                         pixel_size_h = 1, 
+                         pixel_num_v = 100, 
+                         pixel_size_v = 1)
+
+ad = ag.allocate()
+ag_writer = NEXUSDataWriter()
+ag_writer.set_up(file_name = '/home/evelina/test_nexus_ag.nxs',
+                 data_container = ad)
+ag_writer.write_file()
 '''

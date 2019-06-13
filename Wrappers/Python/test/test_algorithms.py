@@ -64,10 +64,11 @@ class TestAlgorithms(unittest.TestCase):
         print ("Test CGLS")
         ig = ImageGeometry(124,153,154)
         x_init = ImageData(geometry=ig)
+        x_init = ig.allocate()
         b = x_init.copy()
         # fill with random numbers
         b.fill(numpy.random.random(x_init.shape))
-        
+        b = ig.allocate('random')
         identity = Identity(ig)
         
         alg = CGLS(x_init=x_init, operator=identity, data=b)

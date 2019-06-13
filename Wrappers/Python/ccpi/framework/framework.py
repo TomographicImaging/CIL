@@ -708,7 +708,11 @@ class DataContainer(object):
                 return out
             else:
                 raise ValueError(message(type(self),"Wrong size for data memory: out {} x2 {} expected {}".format( out.shape,x2.shape ,self.shape)))
-        elif issubclass(type(out), DataContainer) and isinstance(x2, (int,float,complex)):
+        elif issubclass(type(out), DataContainer) and \
+             isinstance(x2, (int,float,complex, numpy.int, numpy.int8, \
+                             numpy.int16, numpy.int32, numpy.int64,\
+                             numpy.float, numpy.float16, numpy.float32,\
+                             numpy.float64, numpy.complex)):
             if self.check_dimensions(out):
                 kwargs['out']=out.as_array()
                 pwop(self.as_array(), x2, *args, **kwargs )

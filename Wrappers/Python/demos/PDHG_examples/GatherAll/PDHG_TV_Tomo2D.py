@@ -52,12 +52,12 @@ from ccpi.astra.ops import AstraProjectorSimple
 from ccpi.framework import TestData
 from PIL import Image
 import os, sys
-if int(numpy.version.version.split('.')[1]) > 12:
-    from skimage.util import random_noise
-else:
-    from demoutil import random_noise
+#if int(numpy.version.version.split('.')[1]) > 12:
+from skimage.util import random_noise
+#else:
+#    from demoutil import random_noise
 
-import scipy.io
+#import scipy.io
 
 # user supplied input
 if len(sys.argv) > 1:

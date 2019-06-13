@@ -14,23 +14,47 @@ from ccpi.optimisation.operators import FiniteDiff, SparseFiniteDiff
 #%%
 
 class Gradient(LinearOperator):
-    
+    CORRELATION_SPACE = "Space"
+    CORRELATION_SPACECHANNEL = "SpaceChannels"
+    # Grad_order = ['channels', 'direction_z', 'direction_y', 'direction_x']
+    # Grad_order = ['channels', 'direction_y', 'direction_x']
+    # Grad_order = ['direction_z', 'direction_y', 'direction_x']
+    # Grad_order = ['channels', 'direction_z', 'direction_y', 'direction_x']
     def __init__(self, gm_domain, bnd_cond = 'Neumann', **kwargs):
         
         super(Gradient, self).__init__() 
                 
         self.gm_domain = gm_domain # Domain of Grad Operator
         
-        self.correlation = kwargs.get('correlation','Space')
+        self.correlation = kwargs.get('correlation',Gradient.CORRELATION_SPACE)
         
-        if self.correlation=='Space':
+        if self.correlation==Gradient.CORRELATION_SPACE:
             if self.gm_domain.channels>1:
-                self.gm_range = BlockGeometry(*[self.gm_domain for _ in range(self.gm_domain.length-1)] ) 
-                self.ind = numpy.arange(1,self.gm_domain.length)
-            else:    
+                self.gm_range = BlockGeometry(*[self.gm_domain for _ in range(self.gm_domain.length-1)] )
+                if self.gm_domain.length == 4:
+                    # 3D + Channel
+                    # expected Grad_order = ['channels', 'direction_z', 'direction_y', 'direction_x']
+                    expected_order = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+                else:
+                    # 2D + Channel
+                    # expected Grad_order = ['channels', 'direction_y', 'direction_x']
+                    expected_order = [ImageGeometry.CHANNEL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+                order = self.gm_domain.get_order_by_label(self.gm_domain.dimension_labels, expected_order)
+                self.ind = order[1:]
+                #self.ind = numpy.arange(1,self.gm_domain.length)
+            else:
+                # no channel info
                 self.gm_range = BlockGeometry(*[self.gm_domain for _ in range(self.gm_domain.length) ] )
-                self.ind = numpy.arange(self.gm_domain.length)
-        elif self.correlation=='SpaceChannels':
+                if self.gm_domain.length == 3:
+                    # 3D
+                    # expected Grad_order = ['direction_z', 'direction_y', 'direction_x']
+                    expected_order = [ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+                else:
+                    # 2D
+                    expected_order = [ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]    
+                self.ind = self.gm_domain.get_order_by_label(self.gm_domain.dimension_labels, expected_order)
+                # self.ind = numpy.arange(self.gm_domain.length)
+        elif self.correlation==Gradient.CORRELATION_SPACECHANNEL:
             if self.gm_domain.channels>1:
                 self.gm_range = BlockGeometry(*[self.gm_domain for _ in range(self.gm_domain.length)])
                 self.ind = range(self.gm_domain.length)
@@ -85,7 +109,6 @@ class Gradient(LinearOperator):
     
     def range_geometry(self):
         return self.gm_range
-
     
     def __rmul__(self, scalar):
         return ScaledOperator(self, scalar) 
@@ -106,7 +129,7 @@ class Gradient(LinearOperator):
         return BlockDataContainer(*mat)    
 
 
-    def sum_abs_row(self):
+    def sum_abs_col(self):
         
         tmp = self.gm_range.allocate()
         res = self.gm_domain.allocate()
@@ -115,7 +138,7 @@ class Gradient(LinearOperator):
             res += spMat.sum_abs_row()
         return res
     
-    def sum_abs_col(self):
+    def sum_abs_row(self):
         
         tmp = self.gm_range.allocate()
         res = []
@@ -131,14 +154,21 @@ if __name__ == '__main__':
     from ccpi.optimisation.operators import Identity, BlockOperator
     
     
-    M, N = 2, 3
+    M, N = 20, 30
     ig = ImageGeometry(M, N)
     arr = ig.allocate('random_int' )
     
     # check direct of Gradient and sparse matrix
     G = Gradient(ig)
+    norm1 = G.norm(iterations=300)
+    print ("should be sqrt(8) {} {}".format(numpy.sqrt(8), norm1))
     G_sp = G.matrix()
+    ig4 = ImageGeometry(M,N, channels=3)
+    G4 = Gradient(ig4, correlation=Gradient.CORRELATION_SPACECHANNEL)
+    norm4 = G4.norm(iterations=300)
+    print ("should be sqrt(12) {} {}".format(numpy.sqrt(12), norm4))
     
+
     res1 = G.direct(arr)
     res1y = numpy.reshape(G_sp[0].toarray().dot(arr.as_array().flatten('F')), ig.shape, 'F')
     

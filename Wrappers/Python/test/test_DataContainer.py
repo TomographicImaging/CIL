@@ -201,21 +201,25 @@ class TestDataContainer(unittest.TestCase):
         self.assertNumpyArrayEqual(out.as_array(), ds2.as_array())
         
         ds0 = ds
-        steps.append(timer())
-        ds0.add(2, out=out)
-        steps.append(timer())
-        print("ds0.add(2,out=out)", dt(steps), 3, ds0.as_array()[0][0][0])
-        self.assertEqual(3., out.as_array()[0][0][0])
+        dt1 = 0
+        dt2 = 0
+        for i in range(10):
+            steps.append(timer())
+            ds0.add(2, out=out)
+            steps.append(timer())
+            print("ds0.add(2,out=out)", dt(steps), 3, ds0.as_array()[0][0][0])
+            self.assertEqual(3., out.as_array()[0][0][0])
 
-        dt1 = dt(steps)
-        steps.append(timer())
-        ds3 = ds0.add(2)
-        steps.append(timer())
-        print("ds3 = ds0.add(2)", dt(steps), 5, ds3.as_array()[0][0][0])
-        dt2 = dt(steps)
-        self.assertLess(dt1, dt2)
+            dt1 += dt(steps)/10
+            steps.append(timer())
+            ds3 = ds0.add(2)
+            steps.append(timer())
+            print("ds3 = ds0.add(2)", dt(steps), 5, ds3.as_array()[0][0][0])
+            dt2 += dt(steps)/10
         
         self.assertNumpyArrayEqual(out.as_array(), ds3.as_array())
+        self.assertLess(dt1, dt2)
+        
 
     def binary_subtract(self):
         print("Test binary subtract")
@@ -324,16 +328,19 @@ class TestDataContainer(unittest.TestCase):
         ds = DataContainer(a, False, ['X', 'Y', 'Z'])
         ds1 = ds.copy()
 
-        steps.append(timer())
-        ds.divide(ds1, out=ds)
-        steps.append(timer())
-        t1 = dt(steps)
-        print("ds.divide(ds1, out=ds)", dt(steps))
-        steps.append(timer())
-        ds2 = ds.divide(ds1)
-        steps.append(timer())
-        t2 = dt(steps)
-        print("ds2 = ds.divide(ds1)", dt(steps))
+        t1 = 0 
+        t2 = 0
+        for i in range(10):
+            steps.append(timer())
+            ds.divide(ds1, out=ds)
+            steps.append(timer())
+            t1 += dt(steps)/10.
+            print("ds.divide(ds1, out=ds)", dt(steps))
+            steps.append(timer())
+            ds2 = ds.divide(ds1)
+            steps.append(timer())
+            t2 += dt(steps)/10.
+            print("ds2 = ds.divide(ds1)", dt(steps))
 
         self.assertLess(t1, t2)
         self.assertEqual(ds.as_array()[0][0][0], 1.)
@@ -487,6 +494,13 @@ class TestDataContainer(unittest.TestCase):
         self.assertNumpyArrayEqual(vol1.as_array(), numpy.ones(vol.shape) * 4)
 
         self.assertEqual(vol.number_of_dimensions, 3)
+        
+        ig2 = ImageGeometry (voxel_num_x=2,voxel_num_y=3,voxel_num_z=4, 
+                     dimension_labels=[ImageGeometry.HORIZONTAL_X, ImageGeometry.HORIZONTAL_Y,
+                 ImageGeometry.VERTICAL])
+        data = ig2.allocate()
+        self.assertNumpyArrayEqual(numpy.asarray(data.shape), numpy.asarray(ig2.shape))
+        self.assertNumpyArrayEqual(numpy.asarray(data.shape), data.as_array().shape)
 
     def test_AcquisitionData(self):
         sgeometry = AcquisitionGeometry(dimension=2, angles=numpy.linspace(0, 180, num=10),
@@ -494,6 +508,29 @@ class TestDataContainer(unittest.TestCase):
                                         pixel_num_h=5, channels=2)
         sino = AcquisitionData(geometry=sgeometry)
         self.assertEqual(sino.shape, (2, 10, 3, 5))
+        
+        ag = AcquisitionGeometry (pixel_num_h=2,pixel_num_v=3,channels=4, dimension=2, angles=numpy.linspace(0, 180, num=10),
+                                        geom_type='parallel', )
+        print (ag.shape)
+        print (ag.dimension_labels)
+        
+        data = ag.allocate()
+        self.assertNumpyArrayEqual(numpy.asarray(data.shape), numpy.asarray(ag.shape))
+        self.assertNumpyArrayEqual(numpy.asarray(data.shape), data.as_array().shape)
+        
+        print (data.shape, ag.shape, data.as_array().shape)
+        
+        ag2 = AcquisitionGeometry (pixel_num_h=2,pixel_num_v=3,channels=4, dimension=2, angles=numpy.linspace(0, 180, num=10),
+                                                geom_type='parallel', 
+                                                dimension_labels=[AcquisitionGeometry.VERTICAL ,
+                         AcquisitionGeometry.ANGLE, AcquisitionGeometry.HORIZONTAL, AcquisitionGeometry.CHANNEL])
+        
+        data = ag2.allocate()
+        print (data.shape, ag2.shape, data.as_array().shape)
+        self.assertNumpyArrayEqual(numpy.asarray(data.shape), numpy.asarray(ag2.shape))
+        self.assertNumpyArrayEqual(numpy.asarray(data.shape), data.as_array().shape)
+
+
     def test_ImageGeometry_allocate(self):
         vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)
         image = vgeometry.allocate()

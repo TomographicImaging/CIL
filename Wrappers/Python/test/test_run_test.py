@@ -10,8 +10,8 @@ from ccpi.optimisation.algorithms import FISTA
 #from ccpi.optimisation.algs import FBPD
 from ccpi.optimisation.functions import Norm2Sq
 from ccpi.optimisation.functions import ZeroFunction
-from ccpi.optimisation.funcs import Norm1
-from ccpi.optimisation.funcs import Norm2
+# from ccpi.optimisation.funcs import Norm1
+from ccpi.optimisation.functions import L1Norm
 
 from ccpi.optimisation.operators import LinearOperatorMatrix
 from ccpi.optimisation.operators import Identity
@@ -137,8 +137,11 @@ class TestAlgorithms(unittest.TestCase):
 
                 # A = Identity()
                 # Change n to equal to m.
-
-                b = DataContainer(bmat)
+                vgb = VectorGeometry(m)
+                vgx = VectorGeometry(n)
+                b = vgb.allocate()
+                b.fill(bmat)
+                #b = DataContainer(bmat)
 
                 # Regularization parameter
                 lam = 10
@@ -148,7 +151,8 @@ class TestAlgorithms(unittest.TestCase):
                 g0 = ZeroFunction()
 
                 # Initial guess
-                x_init = DataContainer(np.zeros((n, 1)))
+                #x_init = DataContainer(np.zeros((n, 1)))
+                x_init = vgx.allocate()
 
                 # Create 1-norm object instance
                 g1 = Norm1(lam)

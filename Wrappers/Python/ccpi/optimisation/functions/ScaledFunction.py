@@ -18,6 +18,7 @@
 #   limitations under the License.
 from numbers import Number
 import numpy
+import warnings
 
 class ScaledFunction(object):
     
@@ -59,7 +60,8 @@ class ScaledFunction(object):
         if out is None:            
             return self.scalar * self.function.gradient(x)    
         else:
-            out.fill( self.scalar * self.function.gradient(x) )
+            self.function.gradient(x, out=out)
+            out *= self.scalar
 
     def proximal(self, x, tau, out=None):
         '''This returns the proximal operator for the function at x, tau
@@ -88,7 +90,7 @@ class ScaledFunction(object):
         '''Alias of proximal(x, tau, None)'''
         warnings.warn('''This method will disappear in following 
         versions of the CIL. Use proximal instead''', DeprecationWarning)
-        return self.proximal(x, out=None)
+        return self.proximal(x, tau, out=None)
 
 
             

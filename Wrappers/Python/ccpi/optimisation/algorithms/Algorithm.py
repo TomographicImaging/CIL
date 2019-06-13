@@ -51,6 +51,7 @@ class Algorithm(object):
         self.__max_iteration = kwargs.get('max_iteration', 0)
         self.__loss = []
         self.memopt = False
+        self.configured = False
         self.timing = []
         self.update_objective_interval = kwargs.get('update_objective_interval', 1)
     def set_up(self, *args, **kwargs):
@@ -86,6 +87,8 @@ class Algorithm(object):
             raise StopIteration()
         else:
             time0 = time.time()
+            if not self.configured:
+                raise ValueError('Algorithm not configured correctly. Please run set_up.')
             self.update()
             self.timing.append( time.time() - time0 )
             if self.iteration % self.update_objective_interval == 0:
@@ -152,14 +155,13 @@ class Algorithm(object):
                 print (self.verbose_header())
             if (self.iteration -1) % self.update_objective_interval == 0:                
                 if verbose:
-                    #print ("Iteration {:>7} max: {:>7}, = {}".format(self.iteration-1, 
-                    #   self.max_iteration, self.get_last_objective()) )
                     print (self.verbose_output())
                 if callback is not None:
                     callback(self.iteration -1, self.get_last_objective(), self.x)
             i += 1
             if i == iterations:
                 break
+
     def verbose_output(self):
         '''Creates a nice tabulated output'''
         timing = self.timing[-self.update_objective_interval-1:-1]

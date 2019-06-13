@@ -20,11 +20,13 @@ class BlockFunction(Function):
 
     '''
     def __init__(self, *functions):
-        
+                
+        super(BlockFunction, self).__init__()
         self.functions = functions      
         self.length = len(self.functions)
         
-        super(BlockFunction, self).__init__()
+        
+        
         
     def __call__(self, x):
         
@@ -93,16 +95,28 @@ class BlockFunction(Function):
         
         
         '''
+        
+        if out is None:
                 
-        out = [None]*self.length
-        if isinstance(tau, Number):
-            for i in range(self.length):
-                out[i] = self.functions[i].proximal(x.get_item(i), tau)
+            out = [None]*self.length
+            if isinstance(tau, Number):
+                for i in range(self.length):
+                    out[i] = self.functions[i].proximal(x.get_item(i), tau)
+            else:
+                for i in range(self.length):
+                    out[i] = self.functions[i].proximal(x.get_item(i), tau.get_item(i))                        
+            
+            return BlockDataContainer(*out)  
+        
         else:
-            for i in range(self.length):
-                out[i] = self.functions[i].proximal(x.get_item(i), tau.get_item(i))                        
-
-        return BlockDataContainer(*out)     
+            if isinstance(tau, Number):
+                for i in range(self.length):
+                    self.functions[i].proximal(x.get_item(i), tau, out[i])
+            else:
+                for i in range(self.length):
+                    self.functions[i].proximal(x.get_item(i), tau.get_item(i), out[i])
+            
+            
     
     def gradient(self,x, out=None):
         

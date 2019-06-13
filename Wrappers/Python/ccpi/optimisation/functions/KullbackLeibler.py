@@ -20,40 +20,42 @@
 import numpy
 from ccpi.optimisation.functions import Function
 from ccpi.optimisation.functions.ScaledFunction import ScaledFunction 
-from ccpi.framework import ImageData, ImageGeometry
 import functools
+import scipy.special
 
 class KullbackLeibler(Function):
     
-    ''' Assume that data > 0
+    ''' 
+    
+    KL_div(x, y + back) = int x * log(x/(y+back)) - x + (y+back)
+    
+    Assumption: y>=0
+                back>=0
                 
     '''
     
-    def __init__(self,data, **kwargs):
+    def __init__(self, data, **kwargs):
         
         super(KullbackLeibler, self).__init__()
         
-        self.b = data        
-        self.bnoise = kwargs.get('bnoise', 0)
-
-                                                
+        self.b = data    
+        self.bnoise = 0
+        
+                                                    
     def __call__(self, x):
         
-        # TODO check
         
-        self.sum_value = x + self.bnoise        
-        if  (self.sum_value.as_array()<0).any():
-            self.sum_value = numpy.inf
+        '''
         
-        if self.sum_value==numpy.inf:
-            return numpy.inf
-        else:
-            tmp = self.sum_value.copy()
-            #tmp.fill( numpy.log(tmp.as_array()) )            
-            self.log(tmp)
-            return (x - self.b * tmp ).sum()
-            
-#            return numpy.sum( x.as_array() - self.b.as_array() * numpy.log(self.sum_value.as_array()))
+            x - y * log( x + bnoise) + y * log(y) - y + bnoise
+        
+        
+        '''
+        
+        ind = x.as_array()>0
+        tmp = scipy.special.kl_div(self.b.as_array()[ind], x.as_array()[ind])                
+        return numpy.sum(tmp) 
+          
 
     def log(self, datacontainer):
         '''calculates the in-place log of the datacontainer'''
@@ -61,13 +63,14 @@ class KullbackLeibler(Function):
                                 datacontainer.as_array().ravel(), True):
             raise ValueError('KullbackLeibler. Cannot calculate log of negative number')
         datacontainer.fill( numpy.log(datacontainer.as_array()) )
+
         
     def gradient(self, x, out=None):
         
-        #TODO Division check
         if out is None:
             return 1 - self.b/(x + self.bnoise)
         else:
+
             x.add(self.bnoise, out=out)
             self.b.divide(out, out=out)
             out.subtract(1, out=out)
@@ -75,16 +78,15 @@ class KullbackLeibler(Function):
             
     def convex_conjugate(self, x):
         
-        tmp = self.b/( 1 - x )
-        self.log(tmp)
-        return (self.b * ( tmp - 1 ) - self.bnoise * (x - 1)).sum()
-#        return self.b * ( ImageData(numpy.log(self.b/(1-x)) - 1 )) - self.bnoise * (x - 1)
-    
+        xlogy = - scipy.special.xlogy(self.b.as_array(), 1 - x.as_array())
+        return numpy.sum(xlogy)
+            
     def proximal(self, x, tau, out=None):
         
         if out is None:        
             return 0.5 *( (x - self.bnoise - tau) + ( (x + self.bnoise - tau)**2 + 4*tau*self.b   ) .sqrt() )
         else:
+            
             tmp =  0.5 *( (x - self.bnoise - tau) + 
                         ( (x + self.bnoise - tau)**2 + 4*tau*self.b   ) .sqrt()
                         )
@@ -101,28 +103,29 @@ class KullbackLeibler(Function):
             out += tmp
             
             out *= 0.5
-            
-            
-    
+                            
     def proximal_conjugate(self, x, tau, out=None):
 
                 
         if out is None:
             z = x + tau * self.bnoise
-            return (z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt()
+            return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
         else:
-            z_m = x + tau * self.bnoise - 1
-            self.b.multiply(4*tau, out=out)
-            z_m.multiply(z_m, out=z_m)
-            out += z_m
+            
+            #tmp = x + tau * self.bnoise
+            tmp = tau * self.bnoise
+            tmp += x
+            tmp -= 1
+            
+            self.b.multiply(4*tau, out=out)    
+            
+            out.add((tmp)**2, out=out)
             out.sqrt(out=out)
-            # z = z_m + 2
-            z_m.sqrt(out=z_m)
-            z_m += 2
             out *= -1
-            out += z_m
-        
-    
+            tmp += 2
+            out += tmp
+            out *= 0.5
+
     def __rmul__(self, scalar):
         
         ''' Multiplication of L2NormSquared with a scalar
@@ -131,25 +134,98 @@ class KullbackLeibler(Function):
                         
         '''
         
-        return ScaledFunction(self, scalar)     
-        
-        
-    
+        return ScaledFunction(self, scalar) 
+
 
 if __name__ == '__main__':
     
-    N, M = 2,3
-    ig  = ImageGeometry(N, M)
-    data = ImageData(numpy.random.randint(-10, 100, size=(M, N)))
-    x = ImageData(numpy.random.randint(-10, 100, size=(M, N)))
+    from ccpi.framework import ImageGeometry
+    import numpy
     
-    bnoise = ImageData(numpy.random.randint(-100, 100, size=(M, N)))
+    M, N =  2,3
+    ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
+    u = ig.allocate('random_int')
+    b = ig.allocate('random_int')
+    u.as_array()[1,1]=0
+    u.as_array()[2,0]=0
+    b.as_array()[1,1]=0
+    b.as_array()[2,0]=0    
     
-    f = KullbackLeibler(data, bnoise=bnoise)
-    print(f.sum_value)
+    f = KullbackLeibler(b)
     
-    print(f(x))
+    
+#    longest = reduce(lambda x, y: len(x) if len(x) > len(y) else len(y), strings)
 
+
+#    tmp = functools.reduce(lambda x, y: \
+#                           0 if x==0 and not numpy.isnan(y) else x * numpy.log(y), \
+#                           zip(b.as_array().ravel(), u.as_array().ravel()),0)
+    
+    
+#    np.multiply.reduce(X, 0)
+    
+    
+#                sf = reduce(lambda x,y: x + y[0]*y[1],
+#                            zip(self.as_array().ravel(),
+#                                other.as_array().ravel()),
+#                            0)        
+#cdef inline number_t xlogy(number_t x, number_t y) nogil:
+#    if x == 0 and not zisnan(y):
+#        return 0
+#    else:
+#        return x * zlog(y)        
+    
+#    if npy_isnan(x):
+#        return x
+#    elif x > 0:
+#        return -x * log(x)
+#    elif x == 0:
+#        return 0
+#    else:
+#        return -inf    
+    
+#        cdef inline double kl_div(double x, double y) nogil:
+#    if npy_isnan(x) or npy_isnan(y):
+#        return nan
+#    elif x > 0 and y > 0:
+#        return x * log(x / y) - x + y
+#    elif x == 0 and y >= 0:
+#        return y
+#    else:
+#        return inf    
+
+    
+    
+    
+#    def xlogy(self, dc1, dc2):
+        
+#        return numpy.sum(numpy.where(dc1.as_array() != 0, dc2.as_array() * numpy.log(dc2.as_array() / dc1.as_array()), 0))
+        
+           
+    
+#    f.xlog(u, b)
+    
+            
+
+    
+#    tmp1 = b.as_array()
+#    tmp2 = u.as_array()
+#    
+#    zz = scipy.special.xlogy(tmp1, tmp2)
+#
+#    print(np.sum(zz))
+    
+    
+#    ww = f.xlogy(b, u)
+    
+#    print(ww)
+    
+    
+#cdef inline double kl_div(double x, double y) nogil:
+  
+    
+    
+        
 
     
         

@@ -1,21 +1,23 @@
-# -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library developed by
-#   Visual Analytics and Imaging System Group of the Science Technology
-#   Facilities Council, STFC
-
-#   Copyright 2018-2019 Evangelos Papoutsellis and Edoardo Pasca
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#       http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#========================================================================
+# Copyright 2019 Science Technology Facilities Council
+# Copyright 2019 University of Manchester
+#
+# This work is part of the Core Imaging Library developed by Science Technology
+# Facilities Council and University of Manchester
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+#=========================================================================
 
 
 from ccpi.optimisation.functions import Function
@@ -58,7 +60,7 @@ class L1Norm(Function):
 
         y = 0        
         if self.b is not None:
-            y =  0 + (self.b * x).sum()
+            y =  0 + self.b.dot(x)
         return y  
     
     def proximal(self, x, tau, out=None):
@@ -93,98 +95,24 @@ class L1Norm(Function):
         return ScaledFunction(self, scalar)
 
 
-#import numpy as np
-##from ccpi.optimisation.funcs import Function
-#from ccpi.optimisation.functions import Function
-#from ccpi.framework import DataContainer, ImageData 
-#
-#
-#############################   L1NORM FUNCTIONS   #############################
-#class SimpleL1Norm(Function):
-#    
-#    def __init__(self, alpha=1):
-#        
-#        super(SimpleL1Norm, self).__init__()         
-#        self.alpha = alpha
-#        
-#    def __call__(self, x):
-#        return self.alpha * x.abs().sum()
-#    
-#    def gradient(self,x):
-#        return ValueError('Not Differentiable')
-#            
-#    def convex_conjugate(self,x):
-#        return 0
-#    
-#    def proximal(self, x, tau):
-#        ''' Soft Threshold'''
-#        return x.sign() * (x.abs() - tau * self.alpha).maximum(0)
-#        
-#    def proximal_conjugate(self, x, tau):
-#        return x.divide((x.abs()/self.alpha).maximum(1.0))
-    
-#class L1Norm(SimpleL1Norm):
-#    
-#    def __init__(self, alpha=1, **kwargs):
-#        
-#        super(L1Norm, self).__init__()         
-#        self.alpha = alpha 
-#        self.b = kwargs.get('b',None)
-#        
-#    def __call__(self, x):
-#        
-#        if self.b is None:
-#            return SimpleL1Norm.__call__(self, x)
-#        else:
-#            return SimpleL1Norm.__call__(self, x - self.b)
-#            
-#    def gradient(self, x):
-#        return ValueError('Not Differentiable')
-#            
-#    def convex_conjugate(self,x):
-#        if self.b is None:
-#            return SimpleL1Norm.convex_conjugate(self, x)
-#        else:
-#            return SimpleL1Norm.convex_conjugate(self, x) + (self.b * x).sum()
-#    
-#    def proximal(self, x, tau):
-#        
-#        if self.b is None:
-#            return SimpleL1Norm.proximal(self, x, tau)
-#        else:
-#            return self.b + SimpleL1Norm.proximal(self, x - self.b , tau)
-#        
-#    def proximal_conjugate(self, x, tau):
-#        
-#        if self.b is None:
-#            return SimpleL1Norm.proximal_conjugate(self, x, tau)
-#        else:
-#            return SimpleL1Norm.proximal_conjugate(self, x - tau*self.b, tau)
-#        
-
-###############################################################################                
-             
-                
-
-
 if __name__ == '__main__':   
     
     from ccpi.framework import ImageGeometry
     import numpy
-    N, M = 40,40
+    N, M = 400,400
     ig = ImageGeometry(N, M)
     scalar = 10
-    b = ig.allocate('random_int')
-    u = ig.allocate('random_int') 
+    b = ig.allocate('random')
+    u = ig.allocate('random') 
     
     f = L1Norm()
     f_scaled = scalar * L1Norm()
-    
+
     f_b = L1Norm(b=b)
     f_scaled_b = scalar * L1Norm(b=b)
     
-    # call
-    
+    # call  
+        
     a1 = f(u)
     a2 = f_scaled(u)
     numpy.testing.assert_equal(scalar * a1, a2)

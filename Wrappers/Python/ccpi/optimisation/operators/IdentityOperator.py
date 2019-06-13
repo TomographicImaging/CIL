@@ -50,7 +50,7 @@ class Identity(LinearOperator):
     
     def sum_abs_row(self):
         
-        return self.gm_domain.allocate(1)#ImageData(np.array(np.reshape(abs(self.matrix()).sum(axis=0), self.gm_domain.shape, 'F')))
+        return self.gm_range.allocate(1)#ImageData(np.array(np.reshape(abs(self.matrix()).sum(axis=0), self.gm_domain.shape, 'F')))
  
     def sum_abs_col(self):
         

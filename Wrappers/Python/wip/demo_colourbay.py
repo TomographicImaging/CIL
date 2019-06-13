@@ -18,7 +18,7 @@ from ccpi.optimisation.funcs import Norm2sq, Norm1
 # Permute (numpy.transpose) puts into our default ordering which is 
 # (channel, angle, vertical, horizontal).
 
-pathname = '/media/jakob/050d8d45-fab3-4285-935f-260e6c5f162c1/Data/ColourBay/spectral_data_sets/CarbonPd/'
+pathname = '/media/newhd/shared/Data/ColourBay/spectral_data_sets/CarbonPd/'
 filename = 'carbonPd_full_sinogram_stripes_removed.mat'
 
 X = loadmat(pathname + filename)

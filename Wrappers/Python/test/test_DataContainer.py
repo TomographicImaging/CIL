@@ -324,16 +324,19 @@ class TestDataContainer(unittest.TestCase):
         ds = DataContainer(a, False, ['X', 'Y', 'Z'])
         ds1 = ds.copy()
 
-        steps.append(timer())
-        ds.divide(ds1, out=ds)
-        steps.append(timer())
-        t1 = dt(steps)
-        print("ds.divide(ds1, out=ds)", dt(steps))
-        steps.append(timer())
-        ds2 = ds.divide(ds1)
-        steps.append(timer())
-        t2 = dt(steps)
-        print("ds2 = ds.divide(ds1)", dt(steps))
+        t1 = 0 
+        t2 = 0
+        for i in range(10):
+            steps.append(timer())
+            ds.divide(ds1, out=ds)
+            steps.append(timer())
+            t1 += dt(steps)/10.
+            print("ds.divide(ds1, out=ds)", dt(steps))
+            steps.append(timer())
+            ds2 = ds.divide(ds1)
+            steps.append(timer())
+            t2 += dt(steps)/10.
+            print("ds2 = ds.divide(ds1)", dt(steps))
 
         self.assertLess(t1, t2)
         self.assertEqual(ds.as_array()[0][0][0], 1.)

@@ -25,7 +25,4 @@ from .framework import AX, PixelByPixelDataProcessor, CastDataContainer
 from .BlockDataContainer import BlockDataContainer
 from .BlockGeometry import BlockGeometry
 from .TestData import TestData
-#from .VectorGeometry import VectorGeometry
-#from .VectorData import VectorData
-#from .pippo import pippo, pupi
 from .Vector import VectorGeometry, VectorData

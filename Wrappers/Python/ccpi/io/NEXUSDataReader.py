@@ -35,9 +35,7 @@ class NEXUSDataReader(object):
         self.nexus_file = kwargs.get('nexus_file', None)
         
         if self.nexus_file is not None:
-            self.set_up(nexus_file = self.nexus_file,
-                        roi = self.roi,
-                        binning = self.binning)
+            self.set_up(nexus_file = self.nexus_file)
             
     def set_up(self, 
                nexus_file = None):

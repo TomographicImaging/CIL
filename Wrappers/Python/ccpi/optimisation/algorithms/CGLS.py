@@ -24,6 +24,7 @@ Created on Thu Feb 21 11:11:23 2019
 
 from ccpi.optimisation.algorithms import Algorithm
 from ccpi.optimisation.functions import Norm2Sq
+import numpy
 
 class CGLS(Algorithm):
 
@@ -49,13 +50,15 @@ class CGLS(Algorithm):
     def set_up(self, x_init, operator , data ):
 
         self.r = data.copy()
-        self.x = x_init.copy()
+        self.x = x_init * 0
 
         self.operator = operator
         self.d = operator.adjoint(self.r)
 
         
         self.normr2 = self.d.squared_norm()
+        
+        self.s = self.operator.domain_geometry().allocate()
         #if isinstance(self.normr2, Iterable):
         #    self.normr2 = sum(self.normr2)
         #self.normr2 = numpy.sqrt(self.normr2)
@@ -65,7 +68,8 @@ class CGLS(Algorithm):
         self.configured = True
 
     def update(self):
-
+        self.update_new()
+    def update_old(self):
         Ad = self.operator.direct(self.d)
         #norm = (Ad*Ad).sum()
         #if isinstance(norm, Iterable):
@@ -87,5 +91,44 @@ class CGLS(Algorithm):
         self.normr2 = normr2_new
         self.d = s + beta*self.d
 
+    def update_new(self):
+
+        Ad = self.operator.direct(self.d)
+        norm = Ad.squared_norm()
+        if norm == 0.:
+            print ('norm = 0, cannot update solution')
+            print ("self.d norm", self.d.squared_norm(), self.d.as_array())
+            raise StopIteration()
+        alpha = self.normr2/norm
+        if alpha == 0.:
+            print ('alpha = 0, cannot update solution')
+            raise StopIteration()
+        self.d *= alpha
+        Ad *= alpha
+        self.r -= Ad
+        
+        self.x += self.d
+        
+        self.operator.adjoint(self.r, out=self.s)
+        s = self.s
+
+        normr2_new = s.squared_norm()
+        
+        beta = normr2_new/self.normr2
+        self.normr2 = normr2_new
+        self.d *= (beta/alpha) 
+        self.d += s
+
     def update_objective(self):
-        self.loss.append(self.r.squared_norm())
+        a = self.r.squared_norm()
+        if a is numpy.nan:
+            raise StopIteration()
+        self.loss.append(a)
+        
+#    def should_stop(self):
+#        if self.iteration > 0:
+#            x = self.get_last_objective()
+#            a = x > 0
+#            return self.max_iteration_stop_cryterion() or (not a)
+#        else:
+#            return False

@@ -24,5 +24,5 @@ from .framework import DataProcessor
 from .framework import AX, PixelByPixelDataProcessor, CastDataContainer
 from .BlockDataContainer import BlockDataContainer
 from .BlockGeometry import BlockGeometry
-
 from .TestData import TestData
+from .Vector import VectorGeometry, VectorData

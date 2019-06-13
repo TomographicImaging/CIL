@@ -12,7 +12,6 @@ from ccpi.optimisation.functions import Norm2Sq
 from ccpi.optimisation.functions import ZeroFunction
 # from ccpi.optimisation.funcs import Norm1
 from ccpi.optimisation.functions import L1Norm
-from ccpi.optimisation.funcs import Norm2
 
 from ccpi.optimisation.operators import LinearOperatorMatrix
 from ccpi.optimisation.operators import Identity

@@ -42,7 +42,7 @@ class VectorData(DataContainer):
                 if len(array.shape) > 1:
                     raise ValueError('Incompatible size: expected 1D got {}'.format(array.shape))
                 out = array
-                self.geometry = VectorGeometry.VectorGeometry(array.shape[0])
+                self.geometry = VectorGeometry(array.shape[0])
                 self.length = self.geometry.length
         else:
             self.length = self.geometry.length

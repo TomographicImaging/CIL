@@ -61,15 +61,15 @@ class Norm1(Function):
 
 opt = {'memopt': True}
 # Problem data.
-m = 4
+m = 10
 n = 10
 np.random.seed(1)
 Amat = np.asarray( np.random.randn(m, n), dtype=numpy.float32)
 #Amat = np.asarray(np.eye(m), dtype=np.float32) * 2
 A = LinearOperatorMatrix(Amat)
 bmat = np.asarray( np.random.randn(m), dtype=numpy.float32)
-bmat *= 0 
-bmat += 2
+#bmat *= 0 
+#bmat += 2
 print ("bmat", bmat.shape)
 print ("A", A.A)
 #bmat.shape = (bmat.shape[0], 1)
@@ -78,8 +78,8 @@ print ("A", A.A)
 # Change n to equal to m.
 vgb = VectorGeometry(m)
 vgx = VectorGeometry(n)
-b = vgb.allocate(2, dtype=numpy.float32)
-# b.fill(bmat)
+b = vgb.allocate(0, dtype=numpy.float32)
+b.fill(bmat)
 #b = DataContainer(bmat)
 
 # Regularization parameter
@@ -98,11 +98,11 @@ a = VectorData(x_init.as_array(), deep_copy=True)
 
 assert id(x_init.as_array()) != id(a.as_array())
 
-#%%
-f.L = LinearOperator.PowerMethod(A, 25, x_init)[0] 
-print ('f.L', f.L)
+
+#f.L = LinearOperator.PowerMethod(A, 25, x_init)[0] 
+#print ('f.L', f.L)
 rate = (1 / f.L) / 6
-f.L *= 12
+#f.L *= 12
 
 # Initial guess
 #x_init = DataContainer(np.zeros((n, 1)))
@@ -145,16 +145,16 @@ fa.update_objective_interval = int( fa.max_iteration / 10 )
 fa.run(fa.max_iteration, callback = None, verbose=True)
 
 gd = GradientDescent(x_init=x_init, objective_function=f, rate = rate )
-gd.max_iteration = 100
+gd.max_iteration = 5000
 gd.update_objective_interval = int( gd.max_iteration / 10 ) 
 gd.run(gd.max_iteration, callback = None, verbose=True)
 
 cgls = CGLS(x_init= x_initcgls, operator=A, data=b)
 cgls.max_iteration = 1000
-cgls.update_objective_interval = 2
+cgls.update_objective_interval = 100
 
 #cgls.should_stop = stop_criterion(cgls)
-cgls.run(10, callback = callback, verbose=True)
+cgls.run(1000, callback = callback, verbose=True)
 
 # Print for comparison
 print("FISTA least squares plus 1-norm solution and objective value:")
@@ -165,3 +165,28 @@ print ("data           ", b.as_array())
 print ('FISTA          ', A.direct(fa.get_output()).as_array())
 print ('GradientDescent', A.direct(gd.get_output()).as_array())
 print ('CGLS           ', A.direct(cgls.get_output()).as_array())
+
+
+#%%
+
+import cvxpy as cp
+# Construct the problem.
+x = cp.Variable(n)
+objective = cp.Minimize(cp.sum_squares(A.A*x - bmat))
+prob = cp.Problem(objective)
+# The optimal objective is returned by prob.solve().
+result = prob.solve(solver = cp.MOSEK)
+
+print ('CGLS           ', cgls.get_output().as_array())
+print ('CVX           ', x.value)
+
+print ('FISTA           ', fa.get_output().as_array())
+print ('GD           ', gd.get_output().as_array())
+
+
+#%%
+
+
+
+
+

@@ -6,18 +6,17 @@ from ccpi.framework import ImageData
 from ccpi.framework import AcquisitionData
 from ccpi.framework import ImageGeometry
 from ccpi.framework import AcquisitionGeometry
-from ccpi.optimisation.algs import FISTA
-from ccpi.optimisation.algs import FBPD
-from ccpi.optimisation.funcs import Norm2sq
-from ccpi.optimisation.funcs import ZeroFun
-from ccpi.optimisation.funcs import Norm1
-from ccpi.optimisation.funcs import TV2D
-from ccpi.optimisation.funcs import Norm2
+from ccpi.optimisation.algorithms import FISTA
+#from ccpi.optimisation.algs import FBPD
+from ccpi.optimisation.functions import Norm2Sq
+from ccpi.optimisation.functions import ZeroFunction
+# from ccpi.optimisation.funcs import Norm1
+from ccpi.optimisation.functions import L1Norm
 
-from ccpi.optimisation.ops import LinearOperatorMatrix
-from ccpi.optimisation.ops import TomoIdentity
-from ccpi.optimisation.ops import Identity
-from ccpi.optimisation.ops import PowerMethodNonsquare
+from ccpi.optimisation.operators import LinearOperatorMatrix
+from ccpi.optimisation.operators import Identity
+#from ccpi.optimisation.ops import PowerMethodNonsquare
+from ccpi.optimisation.operators import LinearOperator
 
 
 import numpy.testing
@@ -81,8 +80,8 @@ class TestAlgorithms(unittest.TestCase):
                 lam = 10
                 opt = {'memopt': True}
                 # Create object instances with the test data A and b.
-                f = Norm2sq(A, b, c=0.5, memopt=True)
-                g0 = ZeroFun()
+                f = Norm2Sq(A, b, c=0.5, memopt=True)
+                g0 = ZeroFunction()
 
                 # Initial guess
                 x_init = DataContainer(np.zeros((n, 1)))
@@ -90,12 +89,15 @@ class TestAlgorithms(unittest.TestCase):
                 f.grad(x_init)
 
                 # Run FISTA for least squares plus zero function.
-                x_fista0, it0, timing0, criter0 = FISTA(x_init, f, g0, opt=opt)
-
+                #x_fista0, it0, timing0, criter0 = FISTA(x_init, f, g0, opt=opt)
+                fa = FISTA(x_init=x_init, f=f, g=g0)
+                fa.max_iteration = 10
+                fa.run(10)
+                
                 # Print solution and final objective/criterion value for comparison
                 print("FISTA least squares plus zero function solution and objective value:")
-                print(x_fista0.array)
-                print(criter0[-1])
+                print(fa.get_output())
+                print(fa.get_last_objective())
 
                 # Compare to CVXPY
 
@@ -135,18 +137,22 @@ class TestAlgorithms(unittest.TestCase):
 
                 # A = Identity()
                 # Change n to equal to m.
-
-                b = DataContainer(bmat)
+                vgb = VectorGeometry(m)
+                vgx = VectorGeometry(n)
+                b = vgb.allocate()
+                b.fill(bmat)
+                #b = DataContainer(bmat)
 
                 # Regularization parameter
                 lam = 10
                 opt = {'memopt': True}
                 # Create object instances with the test data A and b.
-                f = Norm2sq(A, b, c=0.5, memopt=True)
-                g0 = ZeroFun()
+                f = Norm2Sq(A, b, c=0.5, memopt=True)
+                g0 = ZeroFunction()
 
                 # Initial guess
-                x_init = DataContainer(np.zeros((n, 1)))
+                #x_init = DataContainer(np.zeros((n, 1)))
+                x_init = vgx.allocate()
 
                 # Create 1-norm object instance
                 g1 = Norm1(lam)
@@ -155,12 +161,16 @@ class TestAlgorithms(unittest.TestCase):
                 g1.prox(x_init, 0.02)
 
                 # Combine with least squares and solve using generic FISTA implementation
-                x_fista1, it1, timing1, criter1 = FISTA(x_init, f, g1, opt=opt)
+                #x_fista1, it1, timing1, criter1 = FISTA(x_init, f, g1, opt=opt)
+                fa = FISTA(x_init=x_init, f=f, g=g1)
+                fa.max_iteration = 10
+                fa.run(10)
+                
 
                 # Print for comparison
                 print("FISTA least squares plus 1-norm solution and objective value:")
-                print(x_fista1.as_array().squeeze())
-                print(criter1[-1])
+                print(fa.get_output())
+                print(fa.get_last_objective())
 
                 # Compare to CVXPY
 
@@ -212,8 +222,8 @@ class TestAlgorithms(unittest.TestCase):
             x_init = DataContainer(np.random.randn(n, 1))
 
             # Create object instances with the test data A and b.
-            f = Norm2sq(A, b, c=0.5, memopt=True)
-            f.L = PowerMethodNonsquare(A, 25, x_init)[0]
+            f = Norm2Sq(A, b, c=0.5, memopt=True)
+            f.L = LinearOperator.PowerMethod(A, 25, x_init)[0]
             print ("Lipschitz", f.L)
             g0 = ZeroFun()
 
@@ -280,9 +290,9 @@ class TestAlgorithms(unittest.TestCase):
             y.array = y.array + 0.1*np.random.randn(N, N)
 
             # Data fidelity term
-            f_denoise = Norm2sq(I, y, c=0.5, memopt=True)
+            f_denoise = Norm2Sq(I, y, c=0.5, memopt=True)
             x_init = ImageData(geometry=ig)
-            f_denoise.L = PowerMethodNonsquare(I, 25, x_init)[0]
+            f_denoise.L = LinearOperator.PowerMethod(I, 25, x_init)[0]
 
             # 1-norm regulariser
             lam1_denoise = 1.0
@@ -328,43 +338,6 @@ class TestAlgorithms(unittest.TestCase):
 
             self.assertNumpyArrayAlmostEqual(
                 x_fbpd1_denoise.array.flatten(), x1_denoise.value, 5)
-            x1_cvx = x1_denoise.value
-            x1_cvx.shape = (N, N)
-
-            # Now TV with FBPD
-            lam_tv = 0.1
-            gtv = TV2D(lam_tv)
-            gtv(gtv.op.direct(x_init_denoise))
-
-            opt_tv = {'tol': 1e-4, 'iter': 10000}
-
-            x_fbpdtv_denoise, itfbpdtv_denoise, timingfbpdtv_denoise,\
-                criterfbpdtv_denoise = \
-                FBPD(x_init_denoise, gtv.op, None, f_denoise, gtv, opt=opt_tv)
-            print(x_fbpdtv_denoise)
-            print(criterfbpdtv_denoise[-1])
-
-            # Compare to CVXPY
-
-            # Construct the problem.
-            xtv_denoise = Variable((N, N))
-            objectivetv_denoise = Minimize(
-                0.5*sum_squares(xtv_denoise - y.array) + lam_tv*tv(xtv_denoise))
-            probtv_denoise = Problem(objectivetv_denoise)
-
-            # The optimal objective is returned by prob.solve().
-            resulttv_denoise = probtv_denoise.solve(
-                verbose=False, solver=SCS, eps=1e-12)
-
-            # The optimal solution for x is stored in x.value and optimal objective value
-            # is in result as well as in objective.value
-            print("CVXPY least squares plus 1-norm solution and objective value:")
-            print(xtv_denoise.value)
-            print(objectivetv_denoise.value)
-
-            self.assertNumpyArrayAlmostEqual(
-                x_fbpdtv_denoise.as_array(), xtv_denoise.value, 1)
-
         else:
             self.assertTrue(cvx_not_installable)
 

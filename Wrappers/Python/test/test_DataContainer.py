@@ -174,7 +174,7 @@ class TestDataContainer(unittest.TestCase):
     def binary_add(self):
         print("Test binary add")
         X, Y, Z = 512, 512, 512
-        X, Y, Z = 256, 512, 512
+        #X, Y, Z = 1024, 512, 512
         steps = [timer()]
         a = numpy.ones((X, Y, Z), dtype='float32')
         steps.append(timer())
@@ -183,9 +183,10 @@ class TestDataContainer(unittest.TestCase):
         #print("a refcount " , sys.getrefcount(a))
         ds = DataContainer(a, False, ['X', 'Y', 'Z'])
         ds1 = ds.copy()
+        out = ds.copy()
 
         steps.append(timer())
-        ds.add(ds1, out=ds)
+        ds.add(ds1, out=out)
         steps.append(timer())
         t1 = dt(steps)
         print("ds.add(ds1, out=ds)", dt(steps))
@@ -196,20 +197,29 @@ class TestDataContainer(unittest.TestCase):
         print("ds2 = ds.add(ds1)", dt(steps))
 
         self.assertLess(t1, t2)
-        self.assertEqual(ds.as_array()[0][0][0], 2.)
-
+        self.assertEqual(out.as_array()[0][0][0], 2.)
+        self.assertNumpyArrayEqual(out.as_array(), ds2.as_array())
+        
         ds0 = ds
-        ds0.add(2, out=ds0)
-        steps.append(timer())
-        print("ds0.add(2,out=ds0)", dt(steps), 3, ds0.as_array()[0][0][0])
-        self.assertEqual(4., ds0.as_array()[0][0][0])
+        dt1 = 0
+        dt2 = 0
+        for i in range(10):
+            steps.append(timer())
+            ds0.add(2, out=out)
+            steps.append(timer())
+            print("ds0.add(2,out=out)", dt(steps), 3, ds0.as_array()[0][0][0])
+            self.assertEqual(3., out.as_array()[0][0][0])
 
-        dt1 = dt(steps)
-        ds3 = ds0.add(2)
-        steps.append(timer())
-        print("ds3 = ds0.add(2)", dt(steps), 5, ds3.as_array()[0][0][0])
-        dt2 = dt(steps)
+            dt1 += dt(steps)/10
+            steps.append(timer())
+            ds3 = ds0.add(2)
+            steps.append(timer())
+            print("ds3 = ds0.add(2)", dt(steps), 5, ds3.as_array()[0][0][0])
+            dt2 += dt(steps)/10
+        
+        self.assertNumpyArrayEqual(out.as_array(), ds3.as_array())
         self.assertLess(dt1, dt2)
+        
 
     def binary_subtract(self):
         print("Test binary subtract")
@@ -222,16 +232,17 @@ class TestDataContainer(unittest.TestCase):
         #print("a refcount " , sys.getrefcount(a))
         ds = DataContainer(a, False, ['X', 'Y', 'Z'])
         ds1 = ds.copy()
+        out = ds.copy()
 
         steps.append(timer())
-        ds.subtract(ds1, out=ds)
+        ds.subtract(ds1, out=out)
         steps.append(timer())
         t1 = dt(steps)
         print("ds.subtract(ds1, out=ds)", dt(steps))
-        self.assertEqual(0., ds.as_array()[0][0][0])
+        self.assertEqual(0., out.as_array()[0][0][0])
 
         steps.append(timer())
-        ds2 = ds.subtract(ds1)
+        ds2 = out.subtract(ds1)
         self.assertEqual(-1., ds2.as_array()[0][0][0])
 
         steps.append(timer())
@@ -247,8 +258,8 @@ class TestDataContainer(unittest.TestCase):
         #ds0.__isub__( 2 )
         steps.append(timer())
         print("ds0.subtract(2,out=ds0)", dt(
-            steps), -2., ds0.as_array()[0][0][0])
-        self.assertEqual(-2., ds0.as_array()[0][0][0])
+            steps), -1., ds0.as_array()[0][0][0])
+        self.assertEqual(-1., ds0.as_array()[0][0][0])
 
         dt1 = dt(steps)
         ds3 = ds0.subtract(2)
@@ -256,8 +267,8 @@ class TestDataContainer(unittest.TestCase):
         print("ds3 = ds0.subtract(2)", dt(steps), 0., ds3.as_array()[0][0][0])
         dt2 = dt(steps)
         self.assertLess(dt1, dt2)
-        self.assertEqual(-2., ds0.as_array()[0][0][0])
-        self.assertEqual(-4., ds3.as_array()[0][0][0])
+        self.assertEqual(-1., ds0.as_array()[0][0][0])
+        self.assertEqual(-3., ds3.as_array()[0][0][0])
 
     def binary_multiply(self):
         print("Test binary multiply")
@@ -300,6 +311,9 @@ class TestDataContainer(unittest.TestCase):
         self.assertLess(dt1, dt2)
         self.assertEqual(4., ds3.as_array()[0][0][0])
         self.assertEqual(2., ds.as_array()[0][0][0])
+        
+        ds.multiply(2.5, out=ds0)
+        self.assertEqual(2.5*2., ds0.as_array()[0][0][0])
 
     def binary_divide(self):
         print("Test binary divide")
@@ -314,16 +328,19 @@ class TestDataContainer(unittest.TestCase):
         ds = DataContainer(a, False, ['X', 'Y', 'Z'])
         ds1 = ds.copy()
 
-        steps.append(timer())
-        ds.divide(ds1, out=ds)
-        steps.append(timer())
-        t1 = dt(steps)
-        print("ds.divide(ds1, out=ds)", dt(steps))
-        steps.append(timer())
-        ds2 = ds.divide(ds1)
-        steps.append(timer())
-        t2 = dt(steps)
-        print("ds2 = ds.divide(ds1)", dt(steps))
+        t1 = 0 
+        t2 = 0
+        for i in range(10):
+            steps.append(timer())
+            ds.divide(ds1, out=ds)
+            steps.append(timer())
+            t1 += dt(steps)/10.
+            print("ds.divide(ds1, out=ds)", dt(steps))
+            steps.append(timer())
+            ds2 = ds.divide(ds1)
+            steps.append(timer())
+            t2 += dt(steps)/10.
+            print("ds2 = ds.divide(ds1)", dt(steps))
 
         self.assertLess(t1, t2)
         self.assertEqual(ds.as_array()[0][0][0], 1.)
@@ -445,6 +462,11 @@ class TestDataContainer(unittest.TestCase):
             self.assertTrue(False)
         except ValueError as ve:
             self.assertTrue(True)
+            
+        print ("test dot numpy")
+        n0 = (ds0 * ds1).sum()
+        n1 = ds0.as_array().ravel().dot(ds1.as_array().ravel())
+        self.assertEqual(n0, n1)
         
         
 
@@ -472,6 +494,13 @@ class TestDataContainer(unittest.TestCase):
         self.assertNumpyArrayEqual(vol1.as_array(), numpy.ones(vol.shape) * 4)
 
         self.assertEqual(vol.number_of_dimensions, 3)
+        
+        ig2 = ImageGeometry (voxel_num_x=2,voxel_num_y=3,voxel_num_z=4, 
+                     dimension_labels=[ImageGeometry.HORIZONTAL_X, ImageGeometry.HORIZONTAL_Y,
+                 ImageGeometry.VERTICAL])
+        data = ig2.allocate()
+        self.assertNumpyArrayEqual(numpy.asarray(data.shape), numpy.asarray(ig2.shape))
+        self.assertNumpyArrayEqual(numpy.asarray(data.shape), data.as_array().shape)
 
     def test_AcquisitionData(self):
         sgeometry = AcquisitionGeometry(dimension=2, angles=numpy.linspace(0, 180, num=10),
@@ -479,6 +508,29 @@ class TestDataContainer(unittest.TestCase):
                                         pixel_num_h=5, channels=2)
         sino = AcquisitionData(geometry=sgeometry)
         self.assertEqual(sino.shape, (2, 10, 3, 5))
+        
+        ag = AcquisitionGeometry (pixel_num_h=2,pixel_num_v=3,channels=4, dimension=2, angles=numpy.linspace(0, 180, num=10),
+                                        geom_type='parallel', )
+        print (ag.shape)
+        print (ag.dimension_labels)
+        
+        data = ag.allocate()
+        self.assertNumpyArrayEqual(numpy.asarray(data.shape), numpy.asarray(ag.shape))
+        self.assertNumpyArrayEqual(numpy.asarray(data.shape), data.as_array().shape)
+        
+        print (data.shape, ag.shape, data.as_array().shape)
+        
+        ag2 = AcquisitionGeometry (pixel_num_h=2,pixel_num_v=3,channels=4, dimension=2, angles=numpy.linspace(0, 180, num=10),
+                                                geom_type='parallel', 
+                                                dimension_labels=[AcquisitionGeometry.VERTICAL ,
+                         AcquisitionGeometry.ANGLE, AcquisitionGeometry.HORIZONTAL, AcquisitionGeometry.CHANNEL])
+        
+        data = ag2.allocate()
+        print (data.shape, ag2.shape, data.as_array().shape)
+        self.assertNumpyArrayEqual(numpy.asarray(data.shape), numpy.asarray(ag2.shape))
+        self.assertNumpyArrayEqual(numpy.asarray(data.shape), data.as_array().shape)
+
+
     def test_ImageGeometry_allocate(self):
         vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)
         image = vgeometry.allocate()
@@ -494,10 +546,21 @@ class TestDataContainer(unittest.TestCase):
         self.assertEqual(order[0], image.dimension_labels[0])
         self.assertEqual(order[1], image.dimension_labels[1])
         self.assertEqual(order[2], image.dimension_labels[2])
+        
+        ig = ImageGeometry(2,3,2)
+        try:
+            z = ImageData(numpy.random.randint(10, size=(2,3)), geometry=ig)
+            self.assertTrue(False)
+        except ValueError as ve:
+            print (ve)
+            self.assertTrue(True)
+
+        #vgeometry.allocate('')
     def test_AcquisitionGeometry_allocate(self):
-        ageometry = AcquisitionGeometry(dimension=2, angles=numpy.linspace(0, 180, num=10),
-                                        geom_type='parallel', pixel_num_v=3,
-                                        pixel_num_h=5, channels=2)
+        ageometry = AcquisitionGeometry(dimension=2, 
+                            angles=numpy.linspace(0, 180, num=10),
+                            geom_type='parallel', pixel_num_v=3,
+                            pixel_num_h=5, channels=2)
         sino = ageometry.allocate()
         shape = sino.shape
         print ("shape", shape)
@@ -509,8 +572,8 @@ class TestDataContainer(unittest.TestCase):
         self.assertEqual(1,sino.as_array()[shape[0]-1][shape[1]-1][shape[2]-1][shape[3]-1])
         print (sino.dimension_labels, sino.shape, ageometry)
         
-        default_order = ['channel' , ' angle' ,
-                                          'vertical' , 'horizontal']
+        default_order = ['channel' , 'angle' ,
+                         'vertical' , 'horizontal']
         self.assertEqual(default_order[0], sino.dimension_labels[0])
         self.assertEqual(default_order[1], sino.dimension_labels[1])
         self.assertEqual(default_order[2], sino.dimension_labels[2])
@@ -522,7 +585,15 @@ class TestDataContainer(unittest.TestCase):
         self.assertEqual(order[1], sino.dimension_labels[1])
         self.assertEqual(order[2], sino.dimension_labels[2])
         self.assertEqual(order[2], sino.dimension_labels[2])
-
+        
+        
+        try:
+            z = AcquisitionData(numpy.random.randint(10, size=(2,3)), geometry=ageometry)
+            self.assertTrue(False)
+        except ValueError as ve:
+            print (ve)
+            self.assertTrue(True)
+    
     def assertNumpyArrayEqual(self, first, second):
         res = True
         try:
@@ -556,6 +627,32 @@ class TestDataContainer(unittest.TestCase):
         norm = dc.norm()
         self.assertEqual(sqnorm, 8.0)
         numpy.testing.assert_almost_equal(norm, numpy.sqrt(8.0), decimal=7)
+        
+    def test_multiply_out(self):
+        print ("test multiply_out")
+        import functools
+        ig = ImageGeometry(10,11,12)
+        u = ig.allocate()
+        a = numpy.ones(u.shape)
+        
+        u.fill(a)
+        
+        numpy.testing.assert_array_equal(a, u.as_array())
+        
+        #u = ig.allocate(ImageGeometry.RANDOM_INT, seed=1)
+        l = functools.reduce(lambda x,y: x*y, (10,11,12), 1)
+        
+        a = numpy.zeros((l, ), dtype=numpy.float32)
+        for i in range(l):
+            a[i] = numpy.sin(2 * i* 3.1415/l)
+        b = numpy.reshape(a, u.shape)
+        u.fill(b)
+        numpy.testing.assert_array_equal(b, u.as_array())
+        
+        u.multiply(2, out=u)
+        c = b * 2
+        numpy.testing.assert_array_equal(u.as_array(), c)
+        
 
 
 

@@ -40,7 +40,7 @@ class GradientDescent(Algorithm):
             if k in args:
                 args.pop(args.index(k))
         if len(args) == 0:
-            return self.set_up(x_init=kwargs['x_init'],
+            self.set_up(x_init=kwargs['x_init'],
                                objective_function=kwargs['objective_function'],
                                rate=kwargs['rate'])
     
@@ -51,13 +51,18 @@ class GradientDescent(Algorithm):
     def set_up(self, x_init, objective_function, rate):
         '''initialisation of the algorithm'''
         self.x = x_init.copy()
-        if self.memopt:
-            self.x_update = x_init.copy()
         self.objective_function = objective_function
         self.rate = rate
         self.loss.append(objective_function(x_init))
         self.iteration = 0
-        
+        try:
+            self.memopt = self.objective_function.memopt
+        except AttributeError as ae:
+            self.memopt = False
+        if self.memopt:
+            self.x_update = x_init.copy()
+        self.configured = True
+
     def update(self):
         '''Single iteration'''
         if self.memopt:
@@ -65,7 +70,7 @@ class GradientDescent(Algorithm):
             self.x_update *= -self.rate
             self.x += self.x_update
         else:
-            self.x += -self.rate * self.objective_function.grad(self.x)
+            self.x += -self.rate * self.objective_function.gradient(self.x)
 
     def update_objective(self):
         self.loss.append(self.objective_function(self.x))

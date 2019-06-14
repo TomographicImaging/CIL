@@ -16,6 +16,7 @@ Some concepts are so much overlapping with the CCPPETMR project that we have cho
 This package consists of the following Python modules:
 1. `ccpi.framework`
 2. `ccpi.optimisation`
+3. `ccpi.io`
 
 ### `ccpi.framework`
 
@@ -25,6 +26,7 @@ In `ccpi.framework` we define a number of common classes normally used in tomogr
  * `DataSetProcessor`
  * `ImageData`
  * `AcquisitionData`
+ * `BlockDataContainer`
  
  #### `DataContainer`
  Generic class to hold data. Currently the data is currently held in a numpy arrays, but we are currently planning to create a `GPUDataContainer` and `BoostDataContainer` which will hold the data in an array on GPU or in a boost multidimensional array respectively. 
@@ -79,9 +81,9 @@ In `ccpi.framework` we define a number of common classes normally used in tomogr
  Fixed parameters can be passed in during the creation of the `function` object.
  The methods of the `function` reflect the properties of it, for example, 
  if the function represented is differentiable 
- the `function` should contain a method `grad` which should return the gradient of the function evaluated at
+ the `function` should contain a method `gradient` which should return the gradient of the function evaluated at
  an input point. If the function is not differentiable but allows a simple proximal operator, the method 
- `prox` should return the proxial operator evaluated at an input point. The function value 
+ `proximal` should return the proxial operator evaluated at an input point. The function value 
  is evaluated by calling the function itself, e.g. `f(x)` for a `function` 
  `f` and input point `x`.
  
@@ -91,7 +93,7 @@ In `ccpi.framework` we define a number of common classes normally used in tomogr
  is designed for a particular generic optimisation problem accepts and number of `Function`s and/or 
  `Operator`s as input to define a specific instance of the generic optimisation problem to be solved.
  
- They are iterable objects which can be run in a `for` loop. The user can provide a stopping cryterion different than the default max_iteration.
+ They are iterable objects which can be run in a `for` loop. The user can provide a stopping criterion different than the default max_iteration. `Algorithm`s provide a courtesy method `run(number_of_iterations, verbose)` which allows the user to easily run a `number_of_iterations` and receive a print to screen.
  
  New algorithms can be easily created by extending the `Algorithm` class. The user is required to implement only 4 methods: `set_up`, `__init__`, `update` and `update_objective`.
  

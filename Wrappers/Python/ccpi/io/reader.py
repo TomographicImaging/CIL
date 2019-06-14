@@ -241,26 +241,37 @@ class NexusReader(object):
                     pass
                 dims = file[self.data_path].shape
                 if ymin is None and ymax is None:
-                    data = np.array(file[self.data_path])
+                    
+                    try:
+                        image_keys = self.get_image_keys()
+                        print ("image_keys", image_keys)
+                        projections = np.array(file[self.data_path])
+                        data = projections[image_keys==0]
+                    except KeyError as ke:
+                        print (ke)
+                        data = np.array(file[self.data_path])
+                    
                 else:
+                    image_keys = self.get_image_keys()
+                    print ("image_keys", image_keys)
+                    projections = np.array(file[self.data_path])[image_keys==0]
                     if ymin is None:
                         ymin = 0
                         if ymax > dims[1]:
                             raise ValueError('ymax out of range')
-                        data = np.array(file[self.data_path][:,:ymax,:])
+                        data = projections[:,:ymax,:]
                     elif ymax is None:        
                         ymax = dims[1]
                         if ymin < 0:
                             raise ValueError('ymin out of range')
-                        data = np.array(file[self.data_path][:,ymin:,:])
+                        data = projections[:,ymin:,:]
                     else:
                         if ymax > dims[1]:
                             raise ValueError('ymax out of range')
                         if ymin < 0:
                             raise ValueError('ymin out of range')
                         
-                        data = np.array(file[self.data_path]
-                            [: , ymin:ymax , :] )
+                        data = projections[: , ymin:ymax , :] 
                 
         except:
             print("Error reading nexus file")

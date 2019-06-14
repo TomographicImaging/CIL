@@ -12,12 +12,12 @@ from ccpi.framework import ImageData
 from ccpi.framework import AcquisitionData
 from ccpi.framework import ImageGeometry
 from ccpi.framework import AcquisitionGeometry
-from ccpi.optimisation.ops import TomoIdentity
-from ccpi.optimisation.funcs import Norm2sq
+from ccpi.optimisation.operators import Identity
+from ccpi.optimisation.functions import Norm2Sq, ZeroFunction, \
+   L2NormSquared, FunctionOperatorComposition
 from ccpi.optimisation.algorithms import GradientDescent
 from ccpi.optimisation.algorithms import CGLS
 from ccpi.optimisation.algorithms import FISTA
-from ccpi.optimisation.algorithms import FBPD
 
 
 
@@ -26,7 +26,7 @@ class TestAlgorithms(unittest.TestCase):
     def setUp(self):
         #wget.download('https://github.com/DiamondLightSource/Savu/raw/master/test_data/data/24737_fd.nxs')
         #self.filename = '24737_fd.nxs'
-        # we use TomoIdentity as the operator and solve the simple least squares 
+        # we use Identity as the operator and solve the simple least squares 
         # problem for a random-valued ImageData or AcquisitionData b?  
         # Then we know the minimiser is b itself
         
@@ -48,13 +48,15 @@ class TestAlgorithms(unittest.TestCase):
         # fill with random numbers
         b.fill(numpy.random.random(x_init.shape))
         
-        identity = TomoIdentity(geometry=ig)
+        identity = Identity(ig)
         
-        norm2sq = Norm2sq(identity, b)
+        norm2sq = Norm2Sq(identity, b)
+        rate = 0.3
+        rate = norm2sq.L / 3.
         
         alg = GradientDescent(x_init=x_init, 
                               objective_function=norm2sq, 
-                              rate=0.3)
+                              rate=rate)
         alg.max_iteration = 20
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
@@ -62,11 +64,12 @@ class TestAlgorithms(unittest.TestCase):
         print ("Test CGLS")
         ig = ImageGeometry(124,153,154)
         x_init = ImageData(geometry=ig)
+        x_init = ig.allocate()
         b = x_init.copy()
         # fill with random numbers
         b.fill(numpy.random.random(x_init.shape))
-        
-        identity = TomoIdentity(geometry=ig)
+        b = ig.allocate('random')
+        identity = Identity(ig)
         
         alg = CGLS(x_init=x_init, operator=identity, data=b)
         alg.max_iteration = 1
@@ -80,17 +83,17 @@ class TestAlgorithms(unittest.TestCase):
         b = x_init.copy()
         # fill with random numbers
         b.fill(numpy.random.random(x_init.shape))
-        x_init = ImageData(geometry=ig)
-        x_init.fill(numpy.random.random(x_init.shape))
+        x_init = ig.allocate(ImageGeometry.RANDOM)
+        identity = Identity(ig)
         
-        identity = TomoIdentity(geometry=ig)
-        
-        norm2sq = Norm2sq(identity, b)
+	#### it seems FISTA does not work with Nowm2Sq
+        # norm2sq = Norm2Sq(identity, b)
+        # norm2sq.L = 2 * norm2sq.c * identity.norm()**2
+        norm2sq = FunctionOperatorComposition(L2NormSquared(b=b), identity)
         opt = {'tol': 1e-4, 'memopt':False}
-        alg = FISTA(x_init=x_init, f=norm2sq, g=None, opt=opt)
+        print ("initial objective", norm2sq(x_init))
+        alg = FISTA(x_init=x_init, f=norm2sq, g=ZeroFunction())
         alg.max_iteration = 2
-        alg.run(20, verbose=True)
-        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
                

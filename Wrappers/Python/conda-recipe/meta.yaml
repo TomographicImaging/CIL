@@ -11,7 +11,7 @@ build:
 test:
   requires:
     - python-wget
-    - cvxpy # [not win]
+    - cvxpy # [ unix and py36 and np115 ]
 
   source_files:
     - ./test # [win]
@@ -24,8 +24,8 @@ test:
     
 requirements:
   build:
+    - {{ pin_compatible('numpy', max_pin='x.x') }}
     - python
-    - numpy {{ numpy }}
     - setuptools
 
   run:
@@ -35,6 +35,7 @@ requirements:
     - scipy
     - matplotlib
     - h5py
+    - pillow
   
 about:
   home: http://www.ccpi.ac.uk

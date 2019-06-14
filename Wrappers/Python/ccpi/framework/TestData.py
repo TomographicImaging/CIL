@@ -15,7 +15,7 @@ class TestData(object):
     CAMERA = 'camera.png'
     PEPPERS = 'peppers.tiff'
     RESOLUTION_CHART = 'resolution_chart.tiff'
-    SIMPLE_PHANTOM_2D = 'simple_jakobs_phantom'
+    SIMPLE_PHANTOM_2D = 'hotdog'
     SHAPES =  'shapes.png'
     
     def __init__(self, **kwargs):

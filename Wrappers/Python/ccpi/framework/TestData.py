@@ -1,13 +1,19 @@
 # -*- coding: utf-8 -*-
-from ccpi.framework import ImageData, ImageGeometry
+from ccpi.framework import ImageData, ImageGeometry, DataContainer
 import numpy
+import numpy as np
 from PIL import Image
 import os
 import os.path 
+import sys
 
 data_dir = os.path.abspath(os.path.join(
         os.path.dirname(__file__),
         '../data/')
+)
+
+data_dir = os.path.abspath(
+    os.path.join(sys.prefix, 'share','ccpi')
 )
 
 class TestData(object):
@@ -72,13 +78,13 @@ class TestData(object):
     @staticmethod
     def random_noise(image, mode='gaussian', seed=None, clip=True, **kwargs):
         if issubclass(type(image), DataContainer):
-            arr = scikit_random_noise(image, mode=mode, seed=seed, clip=clip,
+            arr = TestData.scikit_random_noise(image.as_array(), mode=mode, seed=seed, clip=clip,
                   **kwargs)
             out = image.copy()
             out.fill(arr)
             return out
         elif issubclass(type(image), numpy.ndarray):
-            return scikit_random_noise(image, mode=mode, seed=seed, clip=clip, 
+            return TestData.scikit_random_noise(image, mode=mode, seed=seed, clip=clip, 
                    **kwargs)
 
     @staticmethod

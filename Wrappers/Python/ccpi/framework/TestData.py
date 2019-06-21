@@ -12,6 +12,7 @@ data_dir = os.path.abspath(os.path.join(
         '../data/')
 )
 
+# this is the default location after a conda install
 data_dir = os.path.abspath(
     os.path.join(sys.prefix, 'share','ccpi')
 )

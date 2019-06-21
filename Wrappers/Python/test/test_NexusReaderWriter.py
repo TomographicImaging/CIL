@@ -20,6 +20,7 @@ class TestNexusReaderWriter(unittest.TestCase):
         writer.set_up(file_name = os.path.join(os.getcwd(), 'test_nexus_im.nxs'),
                       data_container = im)
         writer.write_file()
+        self.stestreadImageData()
         
     def testwriteAcquisitionData(self):
         im_size = 5
@@ -51,8 +52,10 @@ class TestNexusReaderWriter(unittest.TestCase):
         writer.set_up(file_name = os.path.join(os.getcwd(), 'test_nexus_ad3d.nxs'),
                       data_container = ad3d)
         writer.write_file()
+
+        self.stestreadAcquisitionData()
 	
-    def testreadImageData(self):
+    def stestreadImageData(self):
         
         im_size = 5
         ig_test = ImageGeometry(voxel_num_x = im_size,
@@ -67,7 +70,7 @@ class TestNexusReaderWriter(unittest.TestCase):
         self.assertEqual(ig.voxel_num_x, ig_test.voxel_num_x, 'ImageGeometry is not correct')
         self.assertEqual(ig.voxel_num_y, ig_test.voxel_num_y, 'ImageGeometry is not correct')
         
-    def testreadAcquisitionData(self):
+    def stestreadAcquisitionData(self):
         im_size = 5
         ag2d_test = AcquisitionGeometry(geom_type = 'parallel', 
                                         dimension = '2D', 

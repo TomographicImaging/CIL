@@ -1,8 +1,9 @@
-from .testclass import CCPiTestClass
+
 import numpy
 from ccpi.framework import TestData
-import os
-
+import os, sys
+sys.path.append( os.path.dirname( os.path.abspath(__file__) ) )
+from testclass import CCPiTestClass
 
 
 class TestTestData(CCPiTestClass):

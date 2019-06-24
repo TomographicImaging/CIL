@@ -36,9 +36,9 @@ class TestData(object):
         if which == TestData.SIMPLE_PHANTOM_2D:
             N = size[0]
             M = size[1]
-            sdata = numpy.zeros((N,M))
-            sdata[round(N/4):round(3*N/4),round(N/4):round(3*N/4)] = 0.5
-            sdata[round(M/8):round(7*M/8),round(3*M/8):round(5*M/8)] = 1
+            sdata = numpy.zeros((N, M))
+            sdata[int(round(N/4)):int(round(3*N/4)), int(round(N/4)):int(round(3*N/4))] = 0.5
+            sdata[int(round(M/8)):int(round(7*M/8)), int(round(3*M/8)):int(round(5*M/8))] = 1
             ig = ImageGeometry(voxel_num_x = N, voxel_num_y = M, dimension_labels=[ImageGeometry.HORIZONTAL_X, ImageGeometry.HORIZONTAL_Y])
             data = ig.allocate()
             data.fill(sdata)

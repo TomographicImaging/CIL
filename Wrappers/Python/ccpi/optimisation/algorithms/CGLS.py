@@ -46,78 +46,94 @@ class CGLS(Algorithm):
             self.set_up(x_init  =kwargs['x_init'],
                                operator=kwargs['operator'],
                                data    =kwargs['data'])
-
+            
     def set_up(self, x_init, operator , data ):
 
-        self.r = data.copy()
-        self.x = x_init * 0
-
-        self.operator = operator
-        self.d = operator.adjoint(self.r)
-
+        self.x = x_init
+        self.r = data - self.operator.direct(self.x)
+        self.s = self.operator.adjoint(self.r)
         
-        self.normr2 = self.d.squared_norm()
-        
-        self.s = self.operator.domain_geometry().allocate()
-        #if isinstance(self.normr2, Iterable):
-        #    self.normr2 = sum(self.normr2)
-        #self.normr2 = numpy.sqrt(self.normr2)
-        #print ("set_up" , self.normr2)
-        n = Norm2Sq(operator, self.data)
-        self.loss.append(n(x_init))
-        self.configured = True
+        self.p = self.s
+        self.norms0 = self.s.norm()
+        self.gamma = self.norms0**2
+        self.normx = self.x.norm()
+        self.xmax = self.normx   
+        self.configured = True          
+
+#    def set_up(self, x_init, operator , data ):
+#
+#        self.r = data.copy()
+#        self.x = x_init * 0
+#
+#        self.operator = operator
+#        self.d = operator.adjoint(self.r)
+#
+#        
+#        self.normr2 = self.d.squared_norm()
+#        
+#        self.s = self.operator.domain_geometry().allocate()
+#        #if isinstance(self.normr2, Iterable):
+#        #    self.normr2 = sum(self.normr2)
+#        #self.normr2 = numpy.sqrt(self.normr2)
+#        #print ("set_up" , self.normr2)
+#        n = Norm2Sq(operator, self.data)
+#        self.loss.append(n(x_init))
+#        self.configured = True
 
     def update(self):
         self.update_new()
-    def update_old(self):
-        Ad = self.operator.direct(self.d)
-        #norm = (Ad*Ad).sum()
-        #if isinstance(norm, Iterable):
-        #    norm = sum(norm)
-        norm = Ad.squared_norm()
         
-        alpha = self.normr2/norm
-        self.x += (self.d * alpha)
-        self.r -= (Ad * alpha)
-        s  = self.operator.adjoint(self.r)
-
-        normr2_new = s.squared_norm()
-        #if isinstance(normr2_new, Iterable):
-        #    normr2_new = sum(normr2_new)
-        #normr2_new = numpy.sqrt(normr2_new)
-        #print (normr2_new)
-        
-        beta = normr2_new/self.normr2
-        self.normr2 = normr2_new
-        self.d = s + beta*self.d
-
     def update_new(self):
-
-        Ad = self.operator.direct(self.d)
-        norm = Ad.squared_norm()
-        if norm == 0.:
-            print ('norm = 0, cannot update solution')
-            print ("self.d norm", self.d.squared_norm(), self.d.as_array())
-            raise StopIteration()
-        alpha = self.normr2/norm
-        if alpha == 0.:
-            print ('alpha = 0, cannot update solution')
-            raise StopIteration()
-        self.d *= alpha
-        Ad *= alpha
-        self.r -= Ad
         
-        self.x += self.d
+        self.q = self.operator.direct(self.p)
+        delta = self.q.squared_norm()
+        alpha = self.gamma/delta
         
-        self.operator.adjoint(self.r, out=self.s)
-        s = self.s
-
-        normr2_new = s.squared_norm()
+        self.x += alpha * self.p
+        self.r -= alpha * self.q
         
-        beta = normr2_new/self.normr2
-        self.normr2 = normr2_new
-        self.d *= (beta/alpha) 
-        self.d += s
+        self.s = self.operator.adjoint(self.r)
+        
+        self.norms = self.s.norm()
+        self.gamma1 = self.gamma
+        self.gamma = self.norms**2
+        self.beta = self.gamma/self.gamma1
+        self.p = self.s + self.beta * self.p   
+        
+        self.normx = self.x.norm()
+        self.xmax = numpy.maximum(self.xmax, self.normx)
+        
+        
+        if self.gamma<=1e-6:
+            raise StopIteration()           
+#    def update_new(self):
+#
+#        Ad = self.operator.direct(self.d)
+#        norm = Ad.squared_norm()
+#        
+#        if norm <= 1e-3:
+#            print ('norm = 0, cannot update solution')
+#            #print ("self.d norm", self.d.squared_norm(), self.d.as_array())
+#            raise StopIteration()
+#        alpha = self.normr2/norm
+#        if alpha <= 1e-3:
+#            print ('alpha = 0, cannot update solution')
+#            raise StopIteration()
+#        self.d *= alpha
+#        Ad *= alpha
+#        self.r -= Ad
+#        
+#        self.x += self.d
+#        
+#        self.operator.adjoint(self.r, out=self.s)
+#        s = self.s
+#
+#        normr2_new = s.squared_norm()
+#        
+#        beta = normr2_new/self.normr2
+#        self.normr2 = normr2_new
+#        self.d *= (beta/alpha) 
+#        self.d += s
 
     def update_objective(self):
         a = self.r.squared_norm()

@@ -47,8 +47,8 @@ from ccpi.astra.ops import AstraProjectorSimple
 
 # Load Data  
 loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))                 
-N = 150
-M = 150
+N = 64
+M = 64
 data = loader.load(TestData.SIMPLE_PHANTOM_2D, size=(N,M), scale=(0,1))
 
 ig = data.geometry
@@ -82,25 +82,72 @@ plt.colorbar()
 plt.show()
 
 # Setup and run the CGLS algorithm  
-#alpha = 50
-#Grad = Gradient(ig)
+alpha = 5
+Grad = Gradient(ig)
 #
 ## Form Tikhonov as a Block CGLS structure
-#op_CGLS = BlockOperator( Aop, alpha * Grad, shape=(2,1))
-#block_data = BlockDataContainer(noisy_data, Grad.range_geometry().allocate())
+op_CGLS = BlockOperator( Aop, alpha * Grad, shape=(2,1))
+block_data = BlockDataContainer(noisy_data, Grad.range_geometry().allocate())
 #
-#x_init = ig.allocate()      
-#cgls = CGLS(x_init=x_init, operator=op_CGLS, data=block_data)
-#cgls.max_iteration = 1000
-#cgls.update_objective_interval = 200
-#cgls.run(1000,verbose=False)
+x_init = ig.allocate()      
+cgls = CGLS(x_init=x_init, operator=op_CGLS, data=block_data)
+cgls.max_iteration = 1000
+cgls.update_objective_interval = 200
+cgls.run(1000,verbose=True)
 
-#%%
 # Show results
 plt.figure(figsize=(5,5))
 plt.imshow(cgls.get_output().as_array())
 plt.title('CGLS reconstruction')
 plt.colorbar()
 plt.show()
+
+#%%
+from ccpi.optimisation.operators import SparseFiniteDiff
+import astra
+import numpy
+
+try:
+    from cvxpy import *
+    cvx_not_installable = True
+except ImportError:
+    cvx_not_installable = False
+
+
+if cvx_not_installable:
+    
+
+    ##Construct problem    
+    u = Variable(N*M)
+    #q = Variable()
+    
+    DY = SparseFiniteDiff(ig, direction=0, bnd_cond='Neumann')
+    DX = SparseFiniteDiff(ig, direction=1, bnd_cond='Neumann')
+
+    regulariser = alpha * sum_squares(norm(vstack([DX.matrix() * vec(u), DY.matrix() * vec(u)]), 2, axis = 0))
+    
+    # create matrix representation for Astra operator
+
+    vol_geom = astra.create_vol_geom(N, N)
+    proj_geom = astra.create_proj_geom('parallel', 1.0, detectors, angles)
+
+    proj_id = astra.create_projector('strip', proj_geom, vol_geom)
+
+    matrix_id = astra.projector.matrix(proj_id)
+
+    ProjMat = astra.matrix.get(matrix_id)
+    
+    fidelity = sum_squares( ProjMat * u - noisy_data.as_array().ravel()) 
+        
+    solver = SCS
+    obj =  Minimize( regulariser +  fidelity)
+    prob = Problem(obj, constraints)
+    result = prob.solve(verbose = True, solver = solver)    
+
+
+
+
+
+
 
             

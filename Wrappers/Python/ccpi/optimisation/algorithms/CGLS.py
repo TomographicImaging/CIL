@@ -34,19 +34,31 @@ class CGLS(Algorithm):
       x_init: initial guess
       operator: operator for forward/backward projections
       data: data to operate on
+      tolerance: tolerance to stop algorithm
+      
+    Reference:
+        https://web.stanford.edu/group/SOL/software/cgls/
+      
     '''
+    
+    
+    
     def __init__(self, **kwargs):
+        
         super(CGLS, self).__init__()
         self.x        = kwargs.get('x_init', None)
         self.operator = kwargs.get('operator', None)
         self.data     = kwargs.get('data', None)
+        self.tolerance     = kwargs.get('tolerance', None)
         if self.x is not None and self.operator is not None and \
            self.data is not None:
-            print ("Calling from creator")
             self.set_up(x_init  =kwargs['x_init'],
                                operator=kwargs['operator'],
                                data    =kwargs['data'])
             
+        if self.tolerance is None:
+            self.tolerance = 1e-6            
+                                    
     def set_up(self, x_init, operator , data ):
 
         self.x = x_init
@@ -55,10 +67,19 @@ class CGLS(Algorithm):
         
         self.p = self.s
         self.norms0 = self.s.norm()
+        
+        ##
+        self.norms = self.s.norm()
+        ##
+        
+        
         self.gamma = self.norms0**2
         self.normx = self.x.norm()
         self.xmax = self.normx   
-        self.configured = True          
+        
+        n = Norm2Sq(self.operator, self.data)
+        self.loss.append(n(self.x))
+        self.configured = True         
 
 #    def set_up(self, x_init, operator , data ):
 #
@@ -80,15 +101,15 @@ class CGLS(Algorithm):
 #        self.loss.append(n(x_init))
 #        self.configured = True
 
-    def update(self):
-        self.update_new()
+    #def update(self):
+    #    self.update_new()
         
-    def update_new(self):
+    def update(self):
         
         self.q = self.operator.direct(self.p)
         delta = self.q.squared_norm()
         alpha = self.gamma/delta
-        
+                        
         self.x += alpha * self.p
         self.r -= alpha * self.q
         
@@ -102,10 +123,7 @@ class CGLS(Algorithm):
         
         self.normx = self.x.norm()
         self.xmax = numpy.maximum(self.xmax, self.normx)
-        
-        
-        if self.gamma<=1e-6:
-            raise StopIteration()           
+                    
 #    def update_new(self):
 #
 #        Ad = self.operator.direct(self.d)
@@ -141,7 +159,20 @@ class CGLS(Algorithm):
             raise StopIteration()
         self.loss.append(a)
         
-#    def should_stop(self):
+    def should_stop(self):
+        
+        flag  = (self.norms <= self.norms0 * self.tolerance) or (self.normx * self.tolerance >= 1);
+         
+        #if self.gamma<=self.tolerance:
+        if flag == 1 or self.max_iteration_stop_cryterion():
+            print('Tolerance is reached: Iter: {}'.format(self.iteration))
+            self.update_objective()
+            return True
+        
+            
+            #raise StopIteration()  
+        
+        
 #        if self.iteration > 0:
 #            x = self.get_last_objective()
 #            a = x > 0

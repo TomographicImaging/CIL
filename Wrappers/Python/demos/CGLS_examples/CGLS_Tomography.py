@@ -50,7 +50,7 @@ import os
 
 # Load  Shepp-Logan phantom 
 model = 1 # select a model number from the library
-N = 64 # set dimension of the phantom
+N = 128 # set dimension of the phantom
 path = os.path.dirname(tomophantom.__file__)
 path_library2D = os.path.join(path, "Phantom2DLibrary.dat")
 phantom_2D = TomoP2D.Model(model, N, path_library2D)
@@ -59,7 +59,7 @@ ig = ImageGeometry(voxel_num_x = N, voxel_num_y = N)
 data = ImageData(phantom_2D)
 
 detectors =  N
-angles = np.linspace(0, np.pi, 90, dtype=np.float32)
+angles = np.linspace(0, np.pi, 180, dtype=np.float32)
 
 ag = AcquisitionGeometry('parallel','2D', angles, detectors)
 

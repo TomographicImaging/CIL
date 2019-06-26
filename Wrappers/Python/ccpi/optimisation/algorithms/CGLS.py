@@ -161,12 +161,12 @@ class CGLS(Algorithm):
         
     def should_stop(self):
         
+        self.update_objective()
         flag  = (self.norms <= self.norms0 * self.tolerance) or (self.normx * self.tolerance >= 1);
          
         #if self.gamma<=self.tolerance:
         if flag == 1 or self.max_iteration_stop_cryterion():
-            print('Tolerance is reached: Iter: {}'.format(self.iteration))
-            self.update_objective()
+            print('Tolerance is reached: Iter: {}'.format(self.iteration))            
             return True
         
             

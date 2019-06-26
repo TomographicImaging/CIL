@@ -50,7 +50,7 @@ import os
 
 # Load  Shepp-Logan phantom 
 model = 1 # select a model number from the library
-N = 128 # set dimension of the phantom
+N = 64 # set dimension of the phantom
 path = os.path.dirname(tomophantom.__file__)
 path_library2D = os.path.join(path, "Phantom2DLibrary.dat")
 phantom_2D = TomoP2D.Model(model, N, path_library2D)
@@ -75,7 +75,6 @@ sin = Aop.direct(data)
 
 np.random.seed(10)
 noisy_data = AcquisitionData( sin.as_array() + np.random.normal(0,1,ag.shape))
-#noisy_data = AcquisitionData( sin.as_array() )
 
 # Show Ground Truth and Noisy Data
 plt.figure(figsize=(10,10))
@@ -89,7 +88,6 @@ plt.title('Noisy Data')
 plt.colorbar()
 plt.show()
 
-
 # Setup and run the simple CGLS algorithm  
 x_init = ig.allocate()  
 
@@ -97,7 +95,6 @@ cgls1 = CGLS(x_init = x_init, operator = Aop, data = noisy_data)
 cgls1.max_iteration = 20
 cgls1.update_objective_interval = 5
 cgls1.run(20, verbose = True)
-
 
 # Setup and run the regularised CGLS algorithm  (Tikhonov with Identity)
 

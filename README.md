@@ -7,11 +7,20 @@
 
 Basic Python Framework for CIL
 
-This package aims at ensuring a longer life and easy extensibility of the CIL software. This package provides a common framework, hence the name, for the analysis of data in the CT pipeline and quick development of novel reconstruction algorithms.
+This package provides a common framework, hence the name, for the analysis of data in the CT pipeline and quick development of novel reconstruction algorithms.
 
-Some concepts are so much overlapping with the CCPPETMR project that we have chosen to stick to their naming and conventions, in the hope that we may be able to complement each other (at least in Python).
+## Installation
+
+Binary installation of the CCPi Framework can be done with `conda`. Install a new environment as in the following. Some packages are optional (cvxpy and ccpi-astra)
+
+```bash
+
+conda create -y --name cil python=3.6.7 cvxpy=1.0.15 lapack numpy=1.14 ccpi-framework ccpi-astra tomophantom ccpi-plugins -c oxfordcontrol -c conda-forge –c astra-toolbox –c ccpi/label/dev
+```
 
 ### Components
+
+Some concepts are so much overlapping with the CCPPETMR [SIRF](https://github.com/CCPPETMR/SIRF) project that we have chosen to stick to their naming and conventions, in the hope that we may be able to complement each other (at least in Python).
 
 This package consists of the following Python modules:
 1. `ccpi.framework`
@@ -41,11 +50,11 @@ In `ccpi.framework` we define a number of common classes normally used in tomogr
  C = A.subset(temperature = 20)
  ```
  
- #### `DataSetProcessor`
+ #### `DataProcessor`
  Defines a generic DataContainer processor, it accepts `DataContainer` as inputs and outputs `DataContainer`.
  The aim of this class is to simplify the writing of processing pipelines. 
  
- A `DataSetProcessor` does calculate its output only when needed and can return a copy of its output (if available) when none of its inputs have changed. Normally it is important to overwrite the `process` method and the `__init__` to describe all the parameter that are specific to the processor.
+ A `DataProcessor` does calculate its output only when needed and can return a copy of its output (if available) when none of its inputs have changed. Normally it is important to overwrite the `process` method and the `__init__` to describe all the parameter that are specific to the processor.
  
  ### `ccpi.optimisation`
  
@@ -63,7 +72,7 @@ In `ccpi.framework` we define a number of common classes normally used in tomogr
  
  The fundamental components are:
  
-  * `Operator`: A class specifying a (currently linear) operator
+  * `Operator`: A class specifying a operator
   * `Function`: A class specifying mathematical functions such as a least squares data fidelity.
   * `Algorithm`: Implementation of an iterative optimisation algorithm to solve a particular generic optimisation problem. Algorithms are iterable Python object which can be run in a for loop. Can be stopped and warm restarted. 
 
@@ -113,8 +122,6 @@ In `ccpi.framework` we define a number of common classes normally used in tomogr
  
  #### Examples
  
- Please see the demos for examples of defining and using operators, functions and algorithms 
+ Please see the [demos](https://github.com/vais-ral/CIL-Demos) for examples of defining and using operators, functions and algorithms 
  to specify and solve optimisation-based reconstruction problems.
- 
- 
  

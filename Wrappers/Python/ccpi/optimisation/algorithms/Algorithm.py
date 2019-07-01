@@ -161,8 +161,7 @@ class Algorithm(object):
             if verbose:
                 print(self.verbose_output())
         for _ in self:
-            if (self.iteration) % self.update_objective_interval == 0 or \
-                self.iteration == 0: 
+            if (self.iteration) % self.update_objective_interval == 0: 
                 if verbose:
                     print (self.verbose_output())
                 if callback is not None:

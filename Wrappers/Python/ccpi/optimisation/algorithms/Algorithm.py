@@ -53,6 +53,7 @@ class Algorithm(object):
         self.memopt = False
         self.configured = False
         self.timing = []
+        self._iteration = []
         self.update_objective_interval = kwargs.get('update_objective_interval', 1)
     def set_up(self, *args, **kwargs):
         '''Set up the algorithm'''
@@ -89,6 +90,10 @@ class Algorithm(object):
             time0 = time.time()
             if not self.configured:
                 raise ValueError('Algorithm not configured correctly. Please run set_up.')
+            if self.iteration == 0:
+                self.update_objective()
+                self._iteration.append(self.iteration)
+                
             self.update()
             self.timing.append( time.time() - time0 )
             if self.iteration % self.update_objective_interval == 0:
@@ -150,27 +155,36 @@ class Algorithm(object):
         if self.should_stop():
             print ("Stop cryterion has been reached.")
         i = 0
+        if verbose:
+            print (self.verbose_header())
+        if self.iteration == 0:
+            if verbose:
+                print(self.verbose_output())
         for _ in self:
-            if i == 0 and verbose:
-                print (self.verbose_header())
-            if (self.iteration -1) % self.update_objective_interval == 0:                
+            if (self.iteration) % self.update_objective_interval == 0 or \
+                self.iteration == 0: 
                 if verbose:
                     print (self.verbose_output())
                 if callback is not None:
-                    callback(self.iteration -1, self.get_last_objective(), self.x)
+                    callback(self.iteration, self.get_last_objective(), self.x)
             i += 1
             if i == iterations:
+                if self.iteration != self._iteration[-1]:
+                    self.update_objective()
+                    if verbose:
+                        print (self.verbose_output())
                 break
 
     def verbose_output(self):
         '''Creates a nice tabulated output'''
         timing = self.timing[-self.update_objective_interval-1:-1]
+        self._iteration.append(self.iteration)
         if len (timing) == 0:
             t = 0
         else:
             t = sum(timing)/len(timing)
         out = "{:>9} {:>10} {:>13} {}".format(
-                 self.iteration-1, 
+                 self.iteration, 
                  self.max_iteration,
                  "{:.3f}".format(t), 
                  self.objective_to_string()

@@ -60,7 +60,7 @@ class CGLS(Algorithm):
                                     
     def set_up(self, x_init, operator , data ):
 
-        self.x = x_init.copy()
+        self.x = x_init * 0.
         self.r = data - self.operator.direct(self.x)
         self.s = self.operator.adjoint(self.r)
         
@@ -79,28 +79,6 @@ class CGLS(Algorithm):
         self.loss.append(self.r.squared_norm())
         self.configured = True         
 
-#    def set_up(self, x_init, operator , data ):
-#
-#        self.r = data.copy()
-#        self.x = x_init * 0
-#
-#        self.operator = operator
-#        self.d = operator.adjoint(self.r)
-#
-#        
-#        self.normr2 = self.d.squared_norm()
-#        
-#        self.s = self.operator.domain_geometry().allocate()
-#        #if isinstance(self.normr2, Iterable):
-#        #    self.normr2 = sum(self.normr2)
-#        #self.normr2 = numpy.sqrt(self.normr2)
-#        #print ("set_up" , self.normr2)
-#        n = Norm2Sq(operator, self.data)
-#        self.loss.append(n(x_init))
-#        self.configured = True
-
-    #def update(self):
-    #    self.update_new()
         
     def update(self):
         
@@ -122,34 +100,6 @@ class CGLS(Algorithm):
         self.normx = self.x.norm()
         self.xmax = numpy.maximum(self.xmax, self.normx)
                     
-#    def update_new(self):
-#
-#        Ad = self.operator.direct(self.d)
-#        norm = Ad.squared_norm()
-#        
-#        if norm <= 1e-3:
-#            print ('norm = 0, cannot update solution')
-#            #print ("self.d norm", self.d.squared_norm(), self.d.as_array())
-#            raise StopIteration()
-#        alpha = self.normr2/norm
-#        if alpha <= 1e-3:
-#            print ('alpha = 0, cannot update solution')
-#            raise StopIteration()
-#        self.d *= alpha
-#        Ad *= alpha
-#        self.r -= Ad
-#        
-#        self.x += self.d
-#        
-#        self.operator.adjoint(self.r, out=self.s)
-#        s = self.s
-#
-#        normr2_new = s.squared_norm()
-#        
-#        beta = normr2_new/self.normr2
-#        self.normr2 = normr2_new
-#        self.d *= (beta/alpha) 
-#        self.d += s
 
     def update_objective(self):
         a = self.r.squared_norm()
@@ -167,13 +117,4 @@ class CGLS(Algorithm):
             self.update_objective()
             print (self.verbose_output())
         return flag
-        
-            #raise StopIteration()  
-        
-        
-#        if self.iteration > 0:
-#            x = self.get_last_objective()
-#            a = x > 0
-#            return self.max_iteration_stop_cryterion() or (not a)
-#        else:
-#            return False
+ 

@@ -85,8 +85,6 @@ class Algorithm(object):
         calling this method triggers update and update_objective
         '''
         if self.should_stop():
-            self.update_objective()
-            print(self.verbose_output())            
             raise StopIteration()
         else:
             time0 = time.time()

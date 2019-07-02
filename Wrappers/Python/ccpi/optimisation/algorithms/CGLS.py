@@ -115,6 +115,9 @@ class CGLS(Algorithm):
 
         if flag:
             self.update_objective()
-            print (self.verbose_output())
+            if self.iteration > self._iteration[-1]:
+                print (self.verbose_output())
+            print('Tolerance is reached: {}'.format(self.tolerance))
+
         return flag
  

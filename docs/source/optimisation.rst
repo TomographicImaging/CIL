@@ -16,7 +16,11 @@ Algorithm
 =========
 
 A number of generic algorithm implementations are provided including 
-Gradient Descent CGLS and FISTA. An algorithm is designed for a 
+Gradient Descent (GD), Conjugate Gradient Least Squares (CGLS), 
+Simultaneous Iterative Reconstruction Technique (SIRT), Primal Dual Hybrid 
+Gradient (PDHG) and Fast Iterative Shrinkage Thresholding Algorithm (FISTA).
+
+An algorithm is designed for a 
 particular generic optimisation problem accepts and number of 
 Functions and/or Operators as input to define a specific instance of 
 the generic optimisation problem to be solved.
@@ -67,6 +71,25 @@ forward and backprojection operations.
    :members:
 .. autoclass:: ccpi.optimisation.operators.ScaledOperator
    :members:
+.. autoclass:: ccpi.optimisation.operators.GradientOperator
+   :members:
+.. autoclass:: ccpi.optimisation.operators.Identity
+   :members:
+.. autoclass:: ccpi.optimisation.operators.LinearOperatorMatrix
+   :members:
+.. autoclass:: ccpi.optimisation.operators.ShrinkageOperator
+   :members:
+.. autoclass:: ccpi.optimisation.operators.SparseFiniteDiff
+   :members:
+.. autoclass:: ccpi.optimisation.operators.SymmetrizedGradientOperator
+   :members:
+.. autoclass:: ccpi.optimisation.operators.ZeroOperator
+   :members:
+.. autoclass:: ccpi.optimisation.operators.BlockOperator
+   :members:
+.. autoclass:: ccpi.optimisation.operators.BlockScaledOperator
+   :members:
+
 
 Function
 ========
@@ -86,6 +109,24 @@ e.g. :code:`f(x)` for a :code:`Function f` and input point :code:`x`.
 
 
 .. autoclass:: ccpi.optimisation.functions.Function
+   :members:
+.. autoclass:: ccpi.optimisation.functions.FunctionOperatorComposition
+   :members:
+.. autoclass:: ccpi.optimisation.functions.IndicatorBox
+   :members:
+.. autoclass:: ccpi.optimisation.functions.KullbackLeibler
+   :members:
+.. autoclass:: ccpi.optimisation.functions.L1Norm
+   :members:
+.. autoclass:: ccpi.optimisation.functions.L2NormSquared
+   :members:
+.. autoclass:: ccpi.optimisation.functions.MixedL21Norm
+   :members:
+.. autoclass:: ccpi.optimisation.functions.Norm2Sq
+   :members:
+.. autoclass:: ccpi.optimisation.functions.ScaledFunction
+   :members:
+.. autoclass:: ccpi.optimisation.functions.ZeroFunction
    :members:
 
 

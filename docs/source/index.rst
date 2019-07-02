@@ -14,6 +14,10 @@ Welcome to CCPi-Framework's documentation!
 
    framework
    optimisation
+   io
+   plugins
+   astra
+   contrib
 
 Indices and tables
 ==================

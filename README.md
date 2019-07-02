@@ -15,7 +15,7 @@ Binary installation of the CCPi Framework can be done with `conda`. Install a ne
 
 ```bash
 
-conda create -y --name cil python=3.6.7 cvxpy=1.0.15 lapack numpy=1.14 ccpi-framework ccpi-astra tomophantom ccpi-plugins -c oxfordcontrol -c conda-forge –c astra-toolbox –c ccpi/label/dev
+conda create -y --name cil python=3.6.7 cvxpy=1.0.15 lapack numpy=1.14 ccpi-framework ccpi-astra tomophantom ccpi-plugins -c oxfordcontrol -c conda-forge -c astra-toolbox -c ccpi/label/dev
 ```
 
 ### Components

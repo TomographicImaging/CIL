@@ -72,7 +72,7 @@ class TestAlgorithms(unittest.TestCase):
         identity = Identity(ig)
         
         alg = CGLS(x_init=x_init, operator=identity, data=b)
-        alg.max_iteration = 1
+        alg.max_iteration = 200
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
         

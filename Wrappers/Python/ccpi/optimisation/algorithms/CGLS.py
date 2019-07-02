@@ -34,90 +34,72 @@ class CGLS(Algorithm):
       x_init: initial guess
       operator: operator for forward/backward projections
       data: data to operate on
+      tolerance: tolerance to stop algorithm
+      
+    Reference:
+        https://web.stanford.edu/group/SOL/software/cgls/
+      
     '''
+    
+    
+    
     def __init__(self, **kwargs):
+        
         super(CGLS, self).__init__()
         self.x        = kwargs.get('x_init', None)
         self.operator = kwargs.get('operator', None)
         self.data     = kwargs.get('data', None)
+        self.tolerance     = kwargs.get('tolerance', 1e-6)
         if self.x is not None and self.operator is not None and \
            self.data is not None:
-            print ("Calling from creator")
+            print (self.__class__.__name__ , "set_up called from creator")
             self.set_up(x_init  =kwargs['x_init'],
                                operator=kwargs['operator'],
                                data    =kwargs['data'])
-
+            
+                                    
     def set_up(self, x_init, operator , data ):
 
-        self.r = data.copy()
-        self.x = x_init * 0
-
-        self.operator = operator
-        self.d = operator.adjoint(self.r)
+        self.x = x_init * 0.
+        self.r = data - self.operator.direct(self.x)
+        self.s = self.operator.adjoint(self.r)
+        
+        self.p = self.s
+        self.norms0 = self.s.norm()
+        
+        ##
+        self.norms = self.s.norm()
+        ##
+        
+        
+        self.gamma = self.norms0**2
+        self.normx = self.x.norm()
+        self.xmax = self.normx   
+        
+        self.loss.append(self.r.squared_norm())
+        self.configured = True         
 
         
-        self.normr2 = self.d.squared_norm()
-        
-        self.s = self.operator.domain_geometry().allocate()
-        #if isinstance(self.normr2, Iterable):
-        #    self.normr2 = sum(self.normr2)
-        #self.normr2 = numpy.sqrt(self.normr2)
-        #print ("set_up" , self.normr2)
-        n = Norm2Sq(operator, self.data)
-        self.loss.append(n(x_init))
-        self.configured = True
-
     def update(self):
-        self.update_new()
-    def update_old(self):
-        Ad = self.operator.direct(self.d)
-        #norm = (Ad*Ad).sum()
-        #if isinstance(norm, Iterable):
-        #    norm = sum(norm)
-        norm = Ad.squared_norm()
         
-        alpha = self.normr2/norm
-        self.x += (self.d * alpha)
-        self.r -= (Ad * alpha)
-        s  = self.operator.adjoint(self.r)
-
-        normr2_new = s.squared_norm()
-        #if isinstance(normr2_new, Iterable):
-        #    normr2_new = sum(normr2_new)
-        #normr2_new = numpy.sqrt(normr2_new)
-        #print (normr2_new)
+        self.q = self.operator.direct(self.p)
+        delta = self.q.squared_norm()
+        alpha = self.gamma/delta
+                        
+        self.x += alpha * self.p
+        self.r -= alpha * self.q
         
-        beta = normr2_new/self.normr2
-        self.normr2 = normr2_new
-        self.d = s + beta*self.d
-
-    def update_new(self):
-
-        Ad = self.operator.direct(self.d)
-        norm = Ad.squared_norm()
-        if norm == 0.:
-            print ('norm = 0, cannot update solution')
-            print ("self.d norm", self.d.squared_norm(), self.d.as_array())
-            raise StopIteration()
-        alpha = self.normr2/norm
-        if alpha == 0.:
-            print ('alpha = 0, cannot update solution')
-            raise StopIteration()
-        self.d *= alpha
-        Ad *= alpha
-        self.r -= Ad
+        self.s = self.operator.adjoint(self.r)
         
-        self.x += self.d
+        self.norms = self.s.norm()
+        self.gamma1 = self.gamma
+        self.gamma = self.norms**2
+        self.beta = self.gamma/self.gamma1
+        self.p = self.s + self.beta * self.p   
         
-        self.operator.adjoint(self.r, out=self.s)
-        s = self.s
-
-        normr2_new = s.squared_norm()
-        
-        beta = normr2_new/self.normr2
-        self.normr2 = normr2_new
-        self.d *= (beta/alpha) 
-        self.d += s
+        self.normx = self.x.norm()
+        self.xmax = numpy.maximum(self.xmax, self.normx)
+                    
 
     def update_objective(self):
         a = self.r.squared_norm()
@@ -125,10 +107,17 @@ class CGLS(Algorithm):
             raise StopIteration()
         self.loss.append(a)
         
-#    def should_stop(self):
-#        if self.iteration > 0:
-#            x = self.get_last_objective()
-#            a = x > 0
-#            return self.max_iteration_stop_cryterion() or (not a)
-#        else:
-#            return False
+    def should_stop(self):
+        return self.flag() or self.max_iteration_stop_cryterion()
+ 
+    def flag(self):
+        flag  = (self.norms <= self.norms0 * self.tolerance) or (self.normx * self.tolerance >= 1)
+
+        if flag:
+            self.update_objective()
+            if self.iteration > self._iteration[-1]:
+                print (self.verbose_output())
+            print('Tolerance is reached: {}'.format(self.tolerance))
+
+        return flag
+ 

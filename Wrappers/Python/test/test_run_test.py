@@ -1,3 +1,20 @@
+# -*- coding: utf-8 -*-
+#  CCP in Tomographic Imaging (CCPi) Core Imaging Library (CIL).
+
+#   Copyright 2017 UKRI-STFC
+#   Copyright 2017 University of Manchester
+
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+
+#   http://www.apache.org/licenses/LICENSE-2.0
+
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
 import unittest
 import numpy
 import numpy as np
@@ -7,17 +24,13 @@ from ccpi.framework import AcquisitionData
 from ccpi.framework import ImageGeometry
 from ccpi.framework import AcquisitionGeometry
 from ccpi.optimisation.algorithms import FISTA
-#from ccpi.optimisation.algs import FBPD
 from ccpi.optimisation.functions import Norm2Sq
 from ccpi.optimisation.functions import ZeroFunction
-# from ccpi.optimisation.funcs import Norm1
 from ccpi.optimisation.functions import L1Norm
 
 from ccpi.optimisation.operators import LinearOperatorMatrix
 from ccpi.optimisation.operators import Identity
-#from ccpi.optimisation.ops import PowerMethodNonsquare
 from ccpi.optimisation.operators import LinearOperator
-
 
 import numpy.testing
 

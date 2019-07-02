@@ -67,28 +67,40 @@ forward and backprojection operations.
 
 .. autoclass:: ccpi.optimisation.operators.Operator
    :members:
+   :special-members:
 .. autoclass:: ccpi.optimisation.operators.LinearOperator
    :members:
+   :special-members:
 .. autoclass:: ccpi.optimisation.operators.ScaledOperator
    :members:
+   :special-members:
 .. autoclass:: ccpi.optimisation.operators.GradientOperator
    :members:
+   :special-members:
 .. autoclass:: ccpi.optimisation.operators.Identity
    :members:
+   :special-members:
 .. autoclass:: ccpi.optimisation.operators.LinearOperatorMatrix
    :members:
+   :special-members:
 .. autoclass:: ccpi.optimisation.operators.ShrinkageOperator
    :members:
+   :special-members:
 .. autoclass:: ccpi.optimisation.operators.SparseFiniteDiff
    :members:
+   :special-members:
 .. autoclass:: ccpi.optimisation.operators.SymmetrizedGradientOperator
    :members:
+   :special-members:
 .. autoclass:: ccpi.optimisation.operators.ZeroOperator
    :members:
+   :special-members:
 .. autoclass:: ccpi.optimisation.operators.BlockOperator
    :members:
+   :special-members:
 .. autoclass:: ccpi.optimisation.operators.BlockScaledOperator
    :members:
+   :special-members:
 
 
 Function
@@ -110,24 +122,34 @@ e.g. :code:`f(x)` for a :code:`Function f` and input point :code:`x`.
 
 .. autoclass:: ccpi.optimisation.functions.Function
    :members:
+   :special-members:
 .. autoclass:: ccpi.optimisation.functions.FunctionOperatorComposition
    :members:
+   :special-members:
 .. autoclass:: ccpi.optimisation.functions.IndicatorBox
    :members:
+   :special-members:
 .. autoclass:: ccpi.optimisation.functions.KullbackLeibler
    :members:
+   :special-members:
 .. autoclass:: ccpi.optimisation.functions.L1Norm
    :members:
+   :special-members:
 .. autoclass:: ccpi.optimisation.functions.L2NormSquared
    :members:
+   :special-members:
 .. autoclass:: ccpi.optimisation.functions.MixedL21Norm
    :members:
+   :special-members:
 .. autoclass:: ccpi.optimisation.functions.Norm2Sq
    :members:
+   :special-members:
 .. autoclass:: ccpi.optimisation.functions.ScaledFunction
    :members:
+   :special-members:
 .. autoclass:: ccpi.optimisation.functions.ZeroFunction
    :members:
+   :special-members:
 
 
 :ref:`Return Home <mastertoc>`

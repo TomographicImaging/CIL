@@ -1,21 +1,23 @@
-# -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library developed by
-#   Visual Analytics and Imaging System Group of the Science Technology
-#   Facilities Council, STFC
-
-#   Copyright 2018-2019 Evangelos Papoutsellis and Edoardo Pasca
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#       http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#========================================================================
+# Copyright 2019 Science Technology Facilities Council
+# Copyright 2019 University of Manchester
+#
+# This work is part of the Core Imaging Library developed by Science Technology
+# Facilities Council and University of Manchester
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+#=========================================================================
 
 from ccpi.optimisation.functions import Function, ScaledFunction
 from ccpi.framework import BlockDataContainer
@@ -26,7 +28,10 @@ class MixedL21Norm(Function):
     
     
     '''
-        f(x) = ||x||_{2,1} = \sum |x|_{2}                   
+    
+        MixedL21Norm: f(x) = ||x||_{2,1} = \int \|x\|_{2} dx         
+        where x is a vector/tensor vield
+                
     '''      
     
     def __init__(self, **kwargs):
@@ -36,9 +41,11 @@ class MixedL21Norm(Function):
         
     def __call__(self, x):
         
-        ''' Evaluates L2,1Norm at point x
-            
+        ''' 
+        
+            Evaluates MixedL21Norm at point x
             :param: x is a BlockDataContainer
+            
                                 
         '''
         if not isinstance(x, BlockDataContainer):
@@ -54,26 +61,35 @@ class MixedL21Norm(Function):
                             
     def convex_conjugate(self,x):
         
-        ''' This is the Indicator function of ||\cdot||_{2, \infty}
-            which is either 0 if ||x||_{2, \infty} or \infty        
+        ''' 
+        
+            Convex conjugate of of MixedL21Norm: Indicator function of ||\cdot||_{2, \infty}
+            which is either 0 if ||x||_{2, \infty}<1 or \infty 
+            
         '''
         
         return 0.0
         
-        #tmp = [ el**2 for el in x.containers ]
-        #print(sum(tmp).sqrt().as_array().max())
-        #return sum(tmp).sqrt().as_array().max()
     
     def proximal(self, x, tau, out=None):
         
         '''
-            For this we need to define a MixedL2,2 norm acting on BDC,
-            different form L2NormSquared which acts on DC
         
-        '''
+            Proximal operator of MixedL21Norm at x:
+                prox_{\tau * f(x)
+                
+        '''          
+        
         pass
     
     def proximal_conjugate(self, x, tau, out=None): 
+        
+        '''
+        
+            Proximal operator of the convex conjugate of MixedL21Norm at x:
+                prox_{\tau * f^{*}}(x)
+                
+        '''           
 
 
         if out is None:                                        
@@ -81,26 +97,20 @@ class MixedL21Norm(Function):
             res = sum(tmp).sqrt().maximum(1.0) 
             frac = [el/res for el in x.containers]
             return  BlockDataContainer(*frac)   
-        
-            
-        #TODO this is slow, why???
-#                return x.divide(x.pnorm().maximum(1.0))
+                
         else:
                             
             res1 = functools.reduce(lambda a,b: a + b*b, x.containers, x.get_item(0) * 0 )
             res = res1.sqrt().maximum(1.0)
             x.divide(res, out=out)
-            
-#                x.divide(sum([el*el for el in x.containers]).sqrt().maximum(1.0), out=out)
-            #TODO this is slow, why ???
-#                 x.divide(x.pnorm().maximum(1.0), out=out)
-                              
+                                          
 
     def __rmul__(self, scalar):
         
-        ''' Multiplication of L2NormSquared with a scalar
+        ''' 
         
-        Returns: ScaledFunction
+            Multiplication of MixedL21Norm with a scalar        
+            Returns: ScaledFunction
              
         '''         
         return ScaledFunction(self, scalar) 

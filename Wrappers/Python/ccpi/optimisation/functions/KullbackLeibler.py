@@ -1,21 +1,23 @@
-# -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library developed by
-#   Visual Analytics and Imaging System Group of the Science Technology
-#   Facilities Council, STFC
-
-#   Copyright 2018-2019 Evangelos Papoutsellis and Edoardo Pasca
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#       http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#========================================================================
+# Copyright 2019 Science Technology Facilities Council
+# Copyright 2019 University of Manchester
+#
+# This work is part of the Core Imaging Library developed by Science Technology
+# Facilities Council and University of Manchester
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+#=========================================================================
 
 import numpy
 from ccpi.optimisation.functions import Function
@@ -27,11 +29,13 @@ class KullbackLeibler(Function):
     
     ''' 
     
-    KL_div(x, y + back) = int x * log(x/(y+back)) - x + (y+back)
+        Kullback-Leibler divergence function
     
-    Assumption: y>=0
-                back>=0
-                
+            f(x, y) = \begin{cases} x \log(x / y) - x + y & x > 0, y > 0 \\ 
+                                    y & x = 0, y \ge 0 \\
+                                    \infty & \text{otherwise} 
+                       \end{cases}
+            
     '''
     
     def __init__(self, data, **kwargs):
@@ -44,14 +48,13 @@ class KullbackLeibler(Function):
                                                     
     def __call__(self, x):
         
+
+        '''  
         
+            Evaluates KullbackLeibler at x             
+            
         '''
-        
-            x - y * log( x + bnoise) + y * log(y) - y + bnoise
-        
-        
-        '''
-        
+                                           
         ind = x.as_array()>0
         tmp = scipy.special.kl_div(self.b.as_array()[ind], x.as_array()[ind])                
         return numpy.sum(tmp) 
@@ -59,13 +62,18 @@ class KullbackLeibler(Function):
 
     def log(self, datacontainer):
         '''calculates the in-place log of the datacontainer'''
-        if not functools.reduce(lambda x,y: x and y>0,
-                                datacontainer.as_array().ravel(), True):
+        if not functools.reduce(lambda x,y: x and y>0, datacontainer.as_array().ravel(), True):
             raise ValueError('KullbackLeibler. Cannot calculate log of negative number')
         datacontainer.fill( numpy.log(datacontainer.as_array()) )
 
         
     def gradient(self, x, out=None):
+        
+        ''' 
+        
+            Evaluates gradient of KullbackLeibler at x
+            
+        '''        
         
         if out is None:
             return 1 - self.b/(x + self.bnoise)
@@ -78,10 +86,23 @@ class KullbackLeibler(Function):
             
     def convex_conjugate(self, x):
         
+        ''' 
+        
+            Convex conjugate of KullbackLeibler at x
+            
+        '''        
+        
         xlogy = - scipy.special.xlogy(self.b.as_array(), 1 - x.as_array())
         return numpy.sum(xlogy)
             
     def proximal(self, x, tau, out=None):
+        
+        '''
+        
+            Proximal operator of KullbackLeibler at x
+                prox_{\tau * f}(x)
+                
+        '''        
         
         if out is None:        
             return 0.5 *( (x - self.bnoise - tau) + ( (x + self.bnoise - tau)**2 + 4*tau*self.b   ) .sqrt() )
@@ -105,6 +126,13 @@ class KullbackLeibler(Function):
             out *= 0.5
                             
     def proximal_conjugate(self, x, tau, out=None):
+        
+        '''
+        
+            Proximal operator of the convex conjugate of KullbackLeibler at x:
+                prox_{\tau * f^{*}}(x)
+                
+        '''        
 
                 
         if out is None:
@@ -112,7 +140,6 @@ class KullbackLeibler(Function):
             return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
         else:
             
-            #tmp = x + tau * self.bnoise
             tmp = tau * self.bnoise
             tmp += x
             tmp -= 1
@@ -128,10 +155,11 @@ class KullbackLeibler(Function):
 
     def __rmul__(self, scalar):
         
-        ''' Multiplication of L2NormSquared with a scalar
+        ''' 
         
-        Returns: ScaledFunction
-                        
+            Multiplication of KullbackLeibler with a scalar        
+            Returns: ScaledFunction
+             
         '''
         
         return ScaledFunction(self, scalar) 

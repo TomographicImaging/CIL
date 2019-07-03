@@ -19,7 +19,6 @@
 #
 #=========================================================================
 
-
 from ccpi.optimisation.functions import Function
 from ccpi.optimisation.functions.ScaledFunction import ScaledFunction        
 from ccpi.optimisation.operators import ShrinkageOperator 
@@ -27,16 +26,16 @@ from ccpi.optimisation.operators import ShrinkageOperator
 
 class L1Norm(Function):
     
-    ''' 
+    '''
     
-    Class: L1Norm
-        
-    Cases:  a) f(x) = ||x||_{1}
-    
-            b) f(x) = ||x - b||_{1}
-                             
-    '''      
-    
+        L1Norm function: 
+            
+            Cases considered (with/without data):            
+                a) f(x) = ||x||_{1}
+                b) f(x) = ||x - b||_{1}
+                                
+    '''   
+           
     def __init__(self, **kwargs):
         
         super(L1Norm, self).__init__()
@@ -44,7 +43,11 @@ class L1Norm(Function):
         
     def __call__(self, x):
         
-        ''' Evaluate L1Norm at x: f(x) '''
+        '''  
+        
+            Evaluates L1Norm at x             
+            
+        '''
         
         y = x
         if self.b is not None: 
@@ -52,11 +55,16 @@ class L1Norm(Function):
         return y.abs().sum()  
     
     def gradient(self,x):
-        #TODO implement subgradient???
+        
         return ValueError('Not Differentiable')   
     
     def convex_conjugate(self,x):
-        #TODO implement Indicator infty???
+        
+        ''' 
+        
+            Convex conjugate of L1Norm at x
+            
+        '''        
 
         y = 0        
         if self.b is not None:
@@ -65,7 +73,12 @@ class L1Norm(Function):
     
     def proximal(self, x, tau, out=None):
         
-        # TODO implement shrinkage operator, we will need it later e.g SplitBregman
+        '''
+        
+            Proximal operator of L1Norm at x
+                prox_{\tau * f}(x)
+                
+        ''' 
         
         if out is None:
             if self.b is not None:
@@ -80,6 +93,13 @@ class L1Norm(Function):
                                     
     def proximal_conjugate(self, x, tau, out=None):
         
+        '''
+        
+            Proximal operator of the convex conjugate of L1Norm at x:
+                prox_{\tau * f^{*}}(x)
+                
+        '''          
+        
         if out is None:
             if self.b is not None:
                 return (x - tau*self.b).divide((x - tau*self.b).abs().maximum(1.0))
@@ -92,6 +112,14 @@ class L1Norm(Function):
                 out.fill(x.divide(x.abs().maximum(1.0)) )                
             
     def __rmul__(self, scalar):
+        
+        ''' 
+        
+            Multiplication of L2NormSquared with a scalar        
+            Returns: ScaledFunction
+             
+        '''
+        
         return ScaledFunction(self, scalar)
 
 

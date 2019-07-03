@@ -22,24 +22,35 @@
 
 from ccpi.optimisation.functions import Function
 import numpy
-from ccpi.framework import ImageData
 
 class IndicatorBox(Function):
-    '''Box constraints indicator function. 
     
-    Calling returns 0 if argument is within the box. The prox operator is projection onto the box. 
-    Only implements one scalar lower and one upper as constraint on all elements. Should generalise
-    to vectors to allow different constraints one elements.
-'''
+    
+    '''
+    
+        Indicator function for box constraint:  
+            
+            f(x) = \mathbb{I}_{[a, b]} = \begin{cases}
+            
+                                            0, if x\in[a, b]
+                                            \infty, otherwise                            
+    
+    '''
     
     def __init__(self,lower=-numpy.inf,upper=numpy.inf):
-        # Do nothing
+
         super(IndicatorBox, self).__init__()
         self.lower = lower
         self.upper = upper
         
-    
+
     def __call__(self,x):
+        
+        '''  
+        
+            Evaluates IndicatorBox at x             
+            
+        '''        
                 
         if (numpy.all(x.array>=self.lower) and 
             numpy.all(x.array <= self.upper) ):
@@ -52,11 +63,23 @@ class IndicatorBox(Function):
         return ValueError('Not Differentiable') 
     
     def convex_conjugate(self,x):
-        # support function sup <x, z>, z \in [lower, upper]
-        # ????
+        
+        ''' 
+        
+            Convex conjugate of IndicatorBox at x
+            
+        '''                        
+
         return x.maximum(0).sum()
          
     def proximal(self, x, tau, out=None):
+        
+        '''
+        
+            Proximal operator of IndicatorBox at x
+                prox_{\tau * f}(x)
+                
+        '''        
         
         if out is None:
             return (x.maximum(self.lower)).minimum(self.upper)        
@@ -65,6 +88,13 @@ class IndicatorBox(Function):
             out.minimum(self.upper, out=out) 
             
     def proximal_conjugate(self, x, tau, out=None):
+        
+        '''
+        
+            Proximal operator of the convex conjugate of IndicatorBox at x:
+                prox_{\tau * f^{*}}(x)
+                
+        '''        
 
         if out is None:
             

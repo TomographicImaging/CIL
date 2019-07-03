@@ -1,31 +1,52 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Mar  1 22:51:17 2019
-
-@author: evangelos
-"""
+#========================================================================
+# Copyright 2019 Science Technology Facilities Council
+# Copyright 2019 University of Manchester
+#
+# This work is part of the Core Imaging Library developed by Science Technology
+# Facilities Council and University of Manchester
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+#=========================================================================
 
 from ccpi.optimisation.operators import LinearOperator
-from ccpi.framework import ImageData, BlockDataContainer
 import numpy as np
 
 class FiniteDiff(LinearOperator):
     
-    # Works for Neum/Symmetric &  periodic boundary conditions
-    # TODO add central differences???
-    # TODO not very well optimised, too many conditions
-    # TODO add discretisation step, should get that from imageGeometry
+    '''
     
-    # Grad_order = ['channels', 'direction_z', 'direction_y', 'direction_x']
-    # Grad_order = ['channels', 'direction_y', 'direction_x']
-    # Grad_order = ['direction_z', 'direction_y', 'direction_x']
-    # Grad_order = ['channels', 'direction_z', 'direction_y', 'direction_x']
+        Finite Difference Operator:
+            
+            Computes first-order forward/backward differences 
+                     on 2D, 3D, 4D ImageData
+                     under Neumann/Periodic boundary conditions
+
+        Order of the Gradient ( ImageGeometry may contain channels ):
+                            
+            Grad_order = ['channels', 'direction_z', 'direction_y', 'direction_x']
+            Grad_order = ['channels', 'direction_y', 'direction_x']
+            Grad_order = ['direction_z', 'direction_y', 'direction_x']
+            Grad_order = ['channels', 'direction_z', 'direction_y', 'direction_x']  
+                                        
     
+    '''
+
+        
     def __init__(self, gm_domain, gm_range=None, direction=0, bnd_cond = 'Neumann'):
-        ''''''
+
         super(FiniteDiff, self).__init__() 
-        '''FIXME: domain and range should be geometries'''
+
         self.gm_domain = gm_domain
         self.gm_range = gm_range
         
@@ -35,6 +56,7 @@ class FiniteDiff(LinearOperator):
         # Domain Geometry = Range Geometry if not stated
         if self.gm_range is None:
             self.gm_range = self.gm_domain
+            
         # check direction and "length" of geometry
         if self.direction + 1 > len(self.gm_domain.shape):
             raise ValueError('Gradient directions more than geometry domain')      
@@ -54,9 +76,7 @@ class FiniteDiff(LinearOperator):
         else:
             out = out.as_array()
             out[:]=0
-
                   
-
         ######################## Direct for 2D  ###############################
         if x_sz == 2:
             
@@ -308,11 +328,22 @@ class FiniteDiff(LinearOperator):
         return type(x)(out)
             
     def range_geometry(self):
-        '''Returns the range geometry'''
+        
+        '''
+        
+            Returns the range_geometry of FiniteDiff
+        
+        '''
+        
         return self.gm_range
     
     def domain_geometry(self):
-        '''Returns the domain geometry'''
+        
+        '''
+        
+            Returns the domain_geometry of FiniteDiff
+        
+        '''        
         return self.gm_domain
 
 

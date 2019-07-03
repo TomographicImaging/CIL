@@ -102,7 +102,10 @@ class Identity(LinearOperator):
         
         return self.gm_range
     
-            
+    
+    ###########################################################################
+    ###############  For preconditioning ######################################
+    ###########################################################################                    
     def matrix(self):
         
         return sp.eye(np.prod(self.gm_domain.shape))

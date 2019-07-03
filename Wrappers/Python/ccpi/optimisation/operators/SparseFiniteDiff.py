@@ -1,16 +1,38 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Apr  2 14:06:15 2019
-
-@author: vaggelis
-"""
+#========================================================================
+# Copyright 2019 Science Technology Facilities Council
+# Copyright 2019 University of Manchester
+#
+# This work is part of the Core Imaging Library developed by Science Technology
+# Facilities Council and University of Manchester
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+#=========================================================================
 
 import scipy.sparse as sp
 import numpy as np
 from ccpi.framework import ImageData
 
 class SparseFiniteDiff(object):
+    
+    
+    '''
+    
+        Create Sparse Matrices for the Finite Difference Operator
+    
+    
+    '''
+    
     
     def __init__(self, gm_domain, gm_range=None, direction=0, bnd_cond = 'Neumann'):
         

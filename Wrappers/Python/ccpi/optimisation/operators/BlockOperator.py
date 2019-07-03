@@ -4,13 +4,10 @@ Created on Thu Feb 14 12:36:40 2019
 
 @author: ofn77899
 """
-#from ccpi.optimisation.ops import Operator
 import numpy
-from numbers import Number
 import functools
-from ccpi.framework import AcquisitionData, ImageData, BlockDataContainer, DataContainer
-from ccpi.optimisation.operators import Operator, LinearOperator
-from ccpi.optimisation.operators.BlockScaledOperator import BlockScaledOperator
+from ccpi.framework import ImageData, BlockDataContainer, DataContainer
+from ccpi.optimisation.operators import Operator
 from ccpi.framework import BlockGeometry
        
 class BlockOperator(Operator):
@@ -182,7 +179,6 @@ class BlockOperator(Operator):
             else:
                 return BlockDataContainer(*res, shape=shape)
         else:
-            #tmp = self.domain_geometry().allocate()
 
             for col in range(self.shape[1]):
                 for row in range(self.shape[0]):

@@ -25,14 +25,18 @@ class GradientDescent(Algorithm):
         '''initialisation can be done at creation time if all 
         proper variables are passed or later with set_up'''
         super(GradientDescent, self).__init__()
-
-        x_init               = kwargs.get('x_init', None)
-        objective_function   = kwargs.get('objective_function', None)
-        rate                 = kwargs.get('rate', None)
-
-        if x_init is not None and objective_function is not None and rate is not None:
-            print(self.__class__.__name__, "set_up called from creator")
-            self.set_up(x_init=x_init, objective_function=objective_function, rate=rate)
+        self.x = None
+        self.rate = 0
+        self.objective_function = None
+        self.regulariser = None
+        args = ['x_init', 'objective_function', 'rate']
+        for k,v in kwargs.items():
+            if k in args:
+                args.pop(args.index(k))
+        if len(args) == 0:
+            self.set_up(x_init=kwargs['x_init'],
+                               objective_function=kwargs['objective_function'],
+                               rate=kwargs['rate'])
     
     def should_stop(self):
         '''stopping cryterion, currently only based on number of iterations'''
@@ -43,17 +47,14 @@ class GradientDescent(Algorithm):
         self.x = x_init.copy()
         self.objective_function = objective_function
         self.rate = rate
-
         self.loss.append(objective_function(x_init))
         self.iteration = 0
-
         try:
             self.memopt = self.objective_function.memopt
         except AttributeError as ae:
             self.memopt = False
         if self.memopt:
             self.x_update = x_init.copy()
-
         self.configured = True
 
     def update(self):
@@ -67,3 +68,4 @@ class GradientDescent(Algorithm):
 
     def update_objective(self):
         self.loss.append(self.objective_function(self.x))
+        

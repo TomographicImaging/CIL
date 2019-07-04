@@ -36,14 +36,27 @@ class Norm2Sq(Function):
     
     '''
     
-    def __init__(self, A, b, c=1.0):
+    def __init__(self,A,b,c=1.0,memopt=False):
         super(Norm2Sq, self).__init__()
     
         self.A = A  # Should be an operator, default identity
         self.b = b  # Default zero DataSet?
         self.c = c  # Default 1.
-        self.range_tmp = A.range_geometry().allocate()
-
+        if memopt:
+            try:
+                self.range_tmp = A.range_geometry().allocate()
+                self.domain_tmp = A.domain_geometry().allocate()
+                self.memopt = True
+            except NameError as ne:
+                warnings.warn(str(ne))
+                self.memopt = False
+            except NotImplementedError as nie:
+                print (nie)
+                warnings.warn(str(nie))
+                self.memopt = False
+        else:
+            self.memopt = False
+        
         # Compute the Lipschitz parameter from the operator if possible
         # Leave it initialised to None otherwise
         try:
@@ -56,7 +69,7 @@ class Norm2Sq(Function):
     #def grad(self,x):
     #    return self.gradient(x, out=None)
 
-    def __call__(self, x):
+    def __call__(self,x):
         #return self.c* np.sum(np.square((self.A.direct(x) - self.b).ravel()))
         #if out is None:
         #    return self.c*( ( (self.A.direct(x)-self.b)**2).sum() )
@@ -71,8 +84,8 @@ class Norm2Sq(Function):
             # added for compatibility with SIRF 
             return (y.norm()**2) * self.c
     
-    def gradient(self, x, out=None):
-        if out is not None:
+    def gradient(self, x, out = None):
+        if self.memopt:
             #return 2.0*self.c*self.A.adjoint( self.A.direct(x) - self.b )
             self.A.direct(x, out=self.range_tmp)
             self.range_tmp -= self.b 
@@ -80,4 +93,4 @@ class Norm2Sq(Function):
             #self.direct_placehold.multiply(2.0*self.c, out=out)
             out *= (self.c * 2.0)
         else:
-            return (2.0*self.c)*self.A.adjoint(self.A.direct(x) - self.b)
+            return (2.0*self.c)*self.A.adjoint( self.A.direct(x) - self.b )

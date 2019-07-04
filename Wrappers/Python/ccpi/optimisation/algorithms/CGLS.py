@@ -34,25 +34,27 @@ class CGLS(Algorithm):
         https://web.stanford.edu/group/SOL/software/cgls/
       
     '''
-
+    
+    
+    
     def __init__(self, **kwargs):
         
         super(CGLS, self).__init__()
-        x_init    = kwargs.get('x_init', None)
-        operator  = kwargs.get('operator', None)
-        data      = kwargs.get('data', None)
-        tolerance = kwargs.get('tolerance', 1e-6)
-
-        if x_init is not None and operator is not None and data is not None:
-            print(self.__class__.__name__ , "set_up called from creator")
-            self.set_up(x_init=x_init, operator=operator, data=data, tolerance=tolerance)
-
-    def set_up(self, x_init, operator, data, tolerance=1e-6):
+        self.x        = kwargs.get('x_init', None)
+        self.operator = kwargs.get('operator', None)
+        self.data     = kwargs.get('data', None)
+        self.tolerance     = kwargs.get('tolerance', 1e-6)
+        if self.x is not None and self.operator is not None and \
+           self.data is not None:
+            print (self.__class__.__name__ , "set_up called from creator")
+            self.set_up(x_init  =kwargs['x_init'],
+                               operator=kwargs['operator'],
+                               data    =kwargs['data'])
+            
+                                    
+    def set_up(self, x_init, operator , data ):
 
         self.x = x_init * 0.
-        self.operator = operator
-        self.tolerance = tolerance
-
         self.r = data - self.operator.direct(self.x)
         self.s = self.operator.adjoint(self.r)
         
@@ -62,7 +64,8 @@ class CGLS(Algorithm):
         ##
         self.norms = self.s.norm()
         ##
-
+        
+        
         self.gamma = self.norms0**2
         self.normx = self.x.norm()
         self.xmax = self.normx   

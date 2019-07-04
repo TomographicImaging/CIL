@@ -16,7 +16,6 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 from ccpi.optimisation.functions import Function
-import numpy
 import warnings
 
 # Define a class for squared 2-norm
@@ -42,6 +41,8 @@ class Norm2Sq(Function):
         self.A = A  # Should be an operator, default identity
         self.b = b  # Default zero DataSet?
         self.c = c  # Default 1.
+        self.range_tmp = self.A.range_geometry().allocate()
+        
         if memopt:
             try:
                 self.range_tmp = A.range_geometry().allocate()
@@ -85,7 +86,7 @@ class Norm2Sq(Function):
             return (y.norm()**2) * self.c
     
     def gradient(self, x, out = None):
-        if self.memopt:
+        if out is not None:
             #return 2.0*self.c*self.A.adjoint( self.A.direct(x) - self.b )
             self.A.direct(x, out=self.range_tmp)
             self.range_tmp -= self.b 

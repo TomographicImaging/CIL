@@ -31,19 +31,17 @@ class SIRT(Algorithm):
     '''
     def __init__(self, **kwargs):
         super(SIRT, self).__init__()
-        self.x          = kwargs.get('x_init', None)
-        self.operator   = kwargs.get('operator', None)
-        self.data       = kwargs.get('data', None)
-        self.constraint = kwargs.get('constraint', None)
-        if self.x is not None and self.operator is not None and \
-           self.data is not None:
-            print ("Calling from creator")
-            self.set_up(x_init=kwargs['x_init'],
-                        operator=kwargs['operator'],
-                        data=kwargs['data'],
-                        constraint=kwargs['constraint'])
 
-    def set_up(self, x_init, operator , data, constraint=None ):
+        x_init     = kwargs.get('x_init', None)
+        operator   = kwargs.get('operator', None)
+        data       = kwargs.get('data', None)
+        constraint = kwargs.get('constraint', None)
+
+        if x_init is not None and operator is not None and data is not None:
+            print(self.__class__.__name__, "set_up called from creator")
+            self.set_up(x_init=x_init, operator=operator, data=data, constraint=constraint)
+
+    def set_up(self, x_init, operator, data, constraint=None):
         
         self.x = x_init.copy()
         self.operator = operator
@@ -57,6 +55,7 @@ class SIRT(Algorithm):
         # Set up scaling matrices D and M.
         self.M = 1/self.operator.direct(self.operator.domain_geometry().allocate(value=1.0))        
         self.D = 1/self.operator.adjoint(self.operator.range_geometry().allocate(value=1.0))
+        self.update_objective()
         self.configured = True
 
 
@@ -67,7 +66,7 @@ class SIRT(Algorithm):
         self.x += self.relax_par * (self.D*self.operator.adjoint(self.M*self.r))
         
         if self.constraint is not None:
-            self.x = self.constraint.proximal(self.x,None)
+            self.x = self.constraint.proximal(self.x, None)
             # self.constraint.proximal(self.x,None, out=self.x)
 
     def update_objective(self):

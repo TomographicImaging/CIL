@@ -1,4 +1,4 @@
-#========================================================================
+# -*- coding: utf-8 -*-
 # Copyright 2019 Science Technology Facilities Council
 # Copyright 2019 University of Manchester
 #
@@ -16,8 +16,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-#=========================================================================
+
 
 from numbers import Number
 import numpy
@@ -26,9 +25,7 @@ import functools
 
 class BlockScaledOperator(ScaledOperator):
     
-    '''
-    
-    ScaledOperator
+    '''ScaledOperator
 
         A class to represent the scalar multiplication of an Operator with a scalar.
         It holds an operator and a scalar. Basically it returns the multiplication
@@ -83,10 +80,4 @@ class BlockScaledOperator(ScaledOperator):
     @property
     def T(self):
         '''Return the transposed of self'''
-        #print ("transpose before" , self.shape)
-        #shape = (self.shape[1], self.shape[0])
-        ##self.shape = shape
-        ##self.operator.shape = shape
-        #print ("transpose" , shape)
-        #return self
         return type(self)(self.operator.T, self.scalar)

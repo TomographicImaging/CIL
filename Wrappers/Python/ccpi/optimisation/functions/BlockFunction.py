@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #========================================================================
 # Copyright 2019 Science Technology Facilities Council
 # Copyright 2019 University of Manchester
@@ -25,12 +26,11 @@ from numbers import Number
 
 class BlockFunction(Function):
     
-    '''
-        
-        BlockFunction acts as a separable sum function: f = [f_1,...,f_n]
+    '''BlockFunction acts as a separable sum function: f = [f_1,...,f_n]
     
-      
+      .. math::
           f([x_1,...,x_n]) = f_1(x_1) +  .... + f_n(x_n)
+      |
 
     '''
     
@@ -42,13 +42,11 @@ class BlockFunction(Function):
                                 
     def __call__(self, x):
         
-        '''
-        
-            Evaluates the BlockFunction at a BlockDataContainer x
+        '''Evaluates the BlockFunction at a BlockDataContainer x
         
             :param: x (BlockDataContainer): must have as many rows as self.length
 
-            returns sum(f_i(x_i))
+            returns ..math:: sum(f_i(x_i))
             
         '''
         
@@ -61,11 +59,9 @@ class BlockFunction(Function):
     
     def convex_conjugate(self, x):
         
-        ''' 
-    
-            Convex conjugate of BlockFunction at x            
+        '''Convex conjugate of BlockFunction at x            
         
-            returns sum(f_i^{*}(x_i))
+            .. math:: returns sum(f_i^{*}(x_i))
         
         '''       
         t = 0                
@@ -76,11 +72,9 @@ class BlockFunction(Function):
     
     def proximal_conjugate(self, x, tau, out = None):
         
-        ''' 
-            
-             Proximal operator of BlockFunction at x: 
+        '''Proximal operator of BlockFunction at x: 
                  
-                 prox_{tau*f}(x) = sum_{i} prox_{tau*f_{i}}(x_{i}) 
+                 .. math:: prox_{tau*f}(x) = sum_{i} prox_{tau*f_{i}}(x_{i}) 
         
         
         '''
@@ -108,13 +102,9 @@ class BlockFunction(Function):
     
     def proximal(self, x, tau, out = None):
         
-        ''' 
+        '''Proximal operator of the convex conjugate of BlockFunction at x:
         
-            Proximal operator of the convex conjugate of BlockFunction at x:
-        
-                prox_{tau*f^{*}}(x) = sum_{i} prox_{tau*f^{*}_{i}}(x_{i}) 
-        
-        
+            .. math:: prox_{tau*f^{*}}(x) = sum_{i} prox_{tau*f^{*}_{i}}(x_{i}) 
         '''
         
         if out is None:
@@ -141,11 +131,9 @@ class BlockFunction(Function):
     
     def gradient(self,x, out=None):
         
-        ''' 
+        '''Evaluates gradient of BlockFunction at x
         
-            Evaluates gradient of BlockFunction at x
-        
-            returns: BlockDataContainer [f_{1}'(x_{1}), ... , f_{n}'(x_{n})]
+            returns: BlockDataContainer .. math:: [f_{1}'(x_{1}), ... , f_{n}'(x_{n})]
                 
         '''
         

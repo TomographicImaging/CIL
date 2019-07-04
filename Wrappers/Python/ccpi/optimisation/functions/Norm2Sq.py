@@ -1,4 +1,4 @@
-#========================================================================
+# -*- coding: utf-8 -*-
 # Copyright 2019 Science Technology Facilities Council
 # Copyright 2019 University of Manchester
 #
@@ -16,24 +16,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-#=========================================================================
+
 
 from ccpi.optimisation.functions import Function
 import warnings
 
 # Define a class for squared 2-norm
 class Norm2Sq(Function):
-    '''
-    f(x) = c*||A*x-b||_2^2
+    '''.. math:: f(x) = c*||A*x-b||_2^2
     
     which has 
     
-    grad[f](x) = 2*c*A^T*(A*x-b)
+    .. math:: grad[f](x) = 2*c*A^T*(A*x-b)
     
     and Lipschitz constant
     
-    L = 2*c*||A||_2^2 = 2*s1(A)^2
+    .. math:: L = 2*c*||A||_2^2 = 2*s1(A)^2
     
     where s1(A) is the largest singular value of A.
     

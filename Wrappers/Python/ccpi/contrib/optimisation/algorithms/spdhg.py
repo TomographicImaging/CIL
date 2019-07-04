@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 
 import numpy
 
-from ccpi.optimisation.funcs import Function
+from ccpi.optimisation.functions import Function
 from ccpi.framework import ImageData 
 from ccpi.framework import AcquisitionData
 

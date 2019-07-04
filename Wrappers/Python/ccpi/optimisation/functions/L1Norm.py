@@ -1,4 +1,4 @@
-#========================================================================
+# -*- coding: utf-8 -*-
 # Copyright 2019 Science Technology Facilities Council
 # Copyright 2019 University of Manchester
 #
@@ -16,8 +16,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-#=========================================================================
 
 from ccpi.optimisation.functions import Function
 from ccpi.optimisation.functions.ScaledFunction import ScaledFunction        
@@ -26,13 +24,11 @@ from ccpi.optimisation.operators import ShrinkageOperator
 
 class L1Norm(Function):
     
-    '''
-    
-        L1Norm function: 
+    '''L1Norm function: 
             
             Cases considered (with/without data):            
-                a) f(x) = ||x||_{1}
-                b) f(x) = ||x - b||_{1}
+                a) .. math:: f(x) = ||x||_{1}
+                b) .. math:: f(x) = ||x - b||_{1}
                                 
     '''   
            
@@ -43,11 +39,7 @@ class L1Norm(Function):
         
     def __call__(self, x):
         
-        '''  
-        
-            Evaluates L1Norm at x             
-            
-        '''
+        '''Evaluates L1Norm at x'''
         
         y = x
         if self.b is not None: 
@@ -60,11 +52,7 @@ class L1Norm(Function):
     
     def convex_conjugate(self,x):
         
-        ''' 
-        
-            Convex conjugate of L1Norm at x
-            
-        '''        
+        '''Convex conjugate of L1Norm at x'''
 
         y = 0        
         if self.b is not None:
@@ -73,10 +61,9 @@ class L1Norm(Function):
     
     def proximal(self, x, tau, out=None):
         
-        '''
-        
-            Proximal operator of L1Norm at x
-                prox_{\tau * f}(x)
+        '''Proximal operator of L1Norm at x
+           
+           ..math::     prox_{\tau * f}(x)
                 
         ''' 
         
@@ -93,10 +80,9 @@ class L1Norm(Function):
                                     
     def proximal_conjugate(self, x, tau, out=None):
         
-        '''
-        
-            Proximal operator of the convex conjugate of L1Norm at x:
-                prox_{\tau * f^{*}}(x)
+        '''Proximal operator of the convex conjugate of L1Norm at x:
+                
+            .. math:: prox_{\tau * f^{*}}(x)
                 
         '''          
         
@@ -113,11 +99,9 @@ class L1Norm(Function):
             
     def __rmul__(self, scalar):
         
-        ''' 
-        
-            Multiplication of L2NormSquared with a scalar        
+        '''Multiplication of L2NormSquared with a scalar        
+            
             Returns: ScaledFunction
-             
         '''
         
         return ScaledFunction(self, scalar)

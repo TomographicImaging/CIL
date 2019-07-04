@@ -1,26 +1,22 @@
-#========================================================================
-# Copyright 2019 Science Technology Facilities Council
-# Copyright 2019 University of Manchester
-#
-# This work is part of the Core Imaging Library developed by Science Technology
-# Facilities Council and University of Manchester
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#         http://www.apache.org/licenses/LICENSE-2.0.txt
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-#=========================================================================
+# -*- coding: utf-8 -*-
+#  CCP in Tomographic Imaging (CCPi) Core Imaging Library (CIL).
 
-from ccpi.optimisation.operators import LinearOperator, ScaledOperator
-from ccpi.framework import ImageGeometry, BlockGeometry, BlockDataContainer
+#   Copyright 2017 UKRI-STFC
+#   Copyright 2017 University of Manchester
+
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+
+#   http://www.apache.org/licenses/LICENSE-2.0
+
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+from ccpi.optimisation.operators import Operator, LinearOperator, ScaledOperator
+from ccpi.framework import ImageData, ImageGeometry, BlockGeometry, BlockDataContainer
 import numpy 
 from ccpi.optimisation.operators import FiniteDiff, SparseFiniteDiff
 
@@ -29,9 +25,7 @@ from ccpi.optimisation.operators import FiniteDiff, SparseFiniteDiff
 class Gradient(LinearOperator):
     
     
-    '''
-
-        Gradient Operator: \nabla : X -> Y           
+    '''Gradient Operator: \nabla : X -> Y           
             
             Computes first-order forward/backward differences 
                      on 2D, 3D, 4D ImageData
@@ -137,31 +131,21 @@ class Gradient(LinearOperator):
     
     def domain_geometry(self):
         
-        '''
-        
-            Returns domain_geometry of Gradient
-        
-        '''
+        '''Returns domain_geometry of Gradient'''
         
         return self.gm_domain
     
     def range_geometry(self):
         
-        '''
-        
-            Returns range_geometry of Gradient
-        
-        '''        
+        '''Returns range_geometry of Gradient'''
         
         return self.gm_range
     
     def __rmul__(self, scalar):
         
-        ''' 
-        
-            Multiplication of Gradient with a scalar        
+        '''Multiplication of Gradient with a scalar        
+            
             Returns: ScaledOperator
-             
         '''        
         
         return ScaledOperator(self, scalar) 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #========================================================================
 # Copyright 2019 Science Technology Facilities Council
 # Copyright 2019 University of Manchester
@@ -24,17 +25,16 @@ from ccpi.optimisation.algorithms import Algorithm
 class SIRT(Algorithm):
 
     '''
-    
     Simultaneous Iterative Reconstruction Technique
     
-    Problem:  A x = b
+    Problem: ..math:: A x = b
 
     Parameters:
         
-      operator : Linear operator for the inverse problem
-      x_init : Initial guess
-      data : Acquired data to reconstruct       
-      constraint : Function proximal method
+      :parameter operator : Linear operator for the inverse problem
+      :parameter x_init : Initial guess
+      :parameter data : Acquired data to reconstruct       
+      :parameter constraint : Function proximal method
                    e.g.  x\in[0, 1], IndicatorBox to enforce box constraints
                          Default is None).
     '''

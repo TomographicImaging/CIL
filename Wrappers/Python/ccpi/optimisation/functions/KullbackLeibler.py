@@ -1,4 +1,4 @@
-#========================================================================
+# -*- coding: utf-8 -*-
 # Copyright 2019 Science Technology Facilities Council
 # Copyright 2019 University of Manchester
 #
@@ -16,8 +16,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-#=========================================================================
 
 import numpy
 from ccpi.optimisation.functions import Function
@@ -29,7 +27,8 @@ class KullbackLeibler(Function):
     
     '''Kullback-Leibler divergence function
     
-            f(x, y) = \begin{cases} x \log(x / y) - x + y & x > 0, y > 0 \\ 
+         .. math::
+              f(x, y) = \begin{cases} x \log(x / y) - x + y & x > 0, y > 0 \\ 
                                     y & x = 0, y \ge 0 \\
                                     \infty & \text{otherwise} 
                        \end{cases}
@@ -47,16 +46,11 @@ class KullbackLeibler(Function):
     def __call__(self, x):
         
 
-        '''  
-        
-            Evaluates KullbackLeibler at x             
-            
-        '''
-                                           
+        '''Evaluates KullbackLeibler at x'''
+
         ind = x.as_array()>0
         tmp = scipy.special.kl_div(self.b.as_array()[ind], x.as_array()[ind])                
         return numpy.sum(tmp) 
-          
 
     def log(self, datacontainer):
         '''calculates the in-place log of the datacontainer'''
@@ -67,11 +61,7 @@ class KullbackLeibler(Function):
         
     def gradient(self, x, out=None):
         
-        ''' 
-        
-            Evaluates gradient of KullbackLeibler at x
-            
-        '''        
+        '''Evaluates gradient of KullbackLeibler at x'''
         
         if out is None:
             return 1 - self.b/(x + self.bnoise)
@@ -84,24 +74,19 @@ class KullbackLeibler(Function):
             
     def convex_conjugate(self, x):
         
-        ''' 
-        
-            Convex conjugate of KullbackLeibler at x
-            
-        '''        
+        '''Convex conjugate of KullbackLeibler at x'''
         
         xlogy = - scipy.special.xlogy(self.b.as_array(), 1 - x.as_array())
         return numpy.sum(xlogy)
             
     def proximal(self, x, tau, out=None):
         
+        '''Proximal operator of KullbackLeibler at x
+           
+           .. math::     prox_{\tau * f}(x)
+
         '''
-        
-            Proximal operator of KullbackLeibler at x
-                prox_{\tau * f}(x)
-                
-        '''        
-        
+
         if out is None:        
             return 0.5 *( (x - self.bnoise - tau) + ( (x + self.bnoise - tau)**2 + 4*tau*self.b   ) .sqrt() )
         else:
@@ -125,12 +110,10 @@ class KullbackLeibler(Function):
                             
     def proximal_conjugate(self, x, tau, out=None):
         
+        '''Proximal operator of the convex conjugate of KullbackLeibler at x:
+           
+           .. math::     prox_{\tau * f^{*}}(x)
         '''
-        
-            Proximal operator of the convex conjugate of KullbackLeibler at x:
-                prox_{\tau * f^{*}}(x)
-                
-        '''        
 
                 
         if out is None:
@@ -153,11 +136,9 @@ class KullbackLeibler(Function):
 
     def __rmul__(self, scalar):
         
-        ''' 
-        
-            Multiplication of KullbackLeibler with a scalar        
+        '''Multiplication of KullbackLeibler with a scalar        
+            
             Returns: ScaledFunction
-             
         '''
         
         return ScaledFunction(self, scalar) 

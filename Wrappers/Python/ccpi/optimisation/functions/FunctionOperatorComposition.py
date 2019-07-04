@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #========================================================================
 # Copyright 2019 Science Technology Facilities Council
 # Copyright 2019 University of Manchester
@@ -25,12 +26,10 @@ from ccpi.optimisation.functions import ScaledFunction
 
 class FunctionOperatorComposition(Function):
     
-    ''' 
+    '''Function composition with Operator: (f o A)(x) = f(Ax)
     
-        Function composition with Operator: (f o A)(x) = f(Ax)
-    
-            A: operator
-            f: function
+            : parameter A: operator
+            : parameter f: function
     
     '''
     
@@ -45,19 +44,15 @@ class FunctionOperatorComposition(Function):
         
     def __call__(self, x):
         
-        '''  
-        
-            Evaluates f(Ax)             
-            
-        '''
+        '''Evaluates f(Ax)'''
     
         return self.function(self.operator.direct(x))  
     
     def gradient(self, x, out=None):
         
-        ''' 
+        '''Evaluates gradient of f(Ax):
         
-            Evaluates gradient of f(Ax):  A^{T}f'(Ax)
+        ..math ::  A^{T}f'(Ax)
             
         '''
         

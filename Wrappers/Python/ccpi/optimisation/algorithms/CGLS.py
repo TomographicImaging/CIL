@@ -1,4 +1,5 @@
-#========================================================================
+# -*- coding: utf-8 -*-
+# #========================================================================
 # Copyright 2019 Science Technology Facilities Council
 # Copyright 2019 University of Manchester
 #
@@ -24,22 +25,22 @@ import numpy
 
 class CGLS(Algorithm):
 
-    '''
+    r'''Conjugate Gradient Least Squares algorithm 
     
-    Conjugate Gradient Least Squares algorithm 
-    
-    Problem:  A x = b
+    Problem:  
+    .. math:: 
+      A x = b
+    |
 
     Parameters :
         
-      operator : Linear operator for the inverse problem
-      x_init : Initial guess ( Default x_init = 0)
-      data : Acquired data to reconstruct       
-      tolerance: Tolerance/ Stopping Criterion to end CGLS algorithm
+      :parameter operator : Linear operator for the inverse problem
+      :parameter x_init : Initial guess ( Default x_init = 0)
+      :parameter data : Acquired data to reconstruct       
+      :parameter tolerance: Tolerance/ Stopping Criterion to end CGLS algorithm
       
     Reference:
         https://web.stanford.edu/group/SOL/software/cgls/
-      
     '''
     
     def __init__(self, **kwargs):
@@ -111,6 +112,9 @@ class CGLS(Algorithm):
 
         if flag:
             self.update_objective()
-            print (self.verbose_output())
+            if self.iteration > self._iteration[-1]:
+                print (self.verbose_output())
+            print('Tolerance is reached: {}'.format(self.tolerance))
+
         return flag
  

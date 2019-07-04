@@ -24,9 +24,9 @@ copyright = '2019, Edoardo Pasca'
 author = 'Edoardo Pasca'
 
 # The short X.Y version
-version = ''
+version = '19.07'
 # The full version, including alpha/beta/rc tags
-release = '19.02'
+release = '19.07'
 
 
 # -- General configuration ---------------------------------------------------

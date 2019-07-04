@@ -1,23 +1,20 @@
-#========================================================================
-# Copyright 2019 Science Technology Facilities Council
-# Copyright 2019 University of Manchester
-#
-# This work is part of the Core Imaging Library developed by Science Technology
-# Facilities Council and University of Manchester
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#         http://www.apache.org/licenses/LICENSE-2.0.txt
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-#=========================================================================
+# -*- coding: utf-8 -*-
+#  CCP in Tomographic Imaging (CCPi) Core Imaging Library (CIL).
+
+#   Copyright 2017 UKRI-STFC
+#   Copyright 2017 University of Manchester
+
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+
+#   http://www.apache.org/licenses/LICENSE-2.0
+
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
 
 from ccpi.optimisation.operators import LinearOperator
 import scipy.sparse as sp
@@ -26,9 +23,7 @@ import numpy as np
 
 class Identity(LinearOperator):
     
-    '''
-
-        Identity:  Id: X -> Y,  Id(x) = x\in Y
+    '''Identity:  Id: X -> Y,  Id(x) = x\in Y
                        
                    X : gm_domain
                    Y : gm_range ( Default: Y = X )
@@ -47,11 +42,7 @@ class Identity(LinearOperator):
         
     def direct(self,x,out=None):
         
-        '''
-        
-            Returns Id(x)
-        
-        '''
+        '''Returns Id(x)'''
         
         if out is None:
             return x.copy()
@@ -60,11 +51,7 @@ class Identity(LinearOperator):
     
     def adjoint(self,x, out=None):
         
-        '''
-        
-            Returns Id(x)
-        
-        '''         
+        '''Returns Id(x)'''         
         
         
         if out is None:
@@ -74,31 +61,19 @@ class Identity(LinearOperator):
         
     def calculate_norm(self, **kwargs):
         
-        '''
-        
-            Evaluates operator norm of Identity
-        
-        '''        
+        '''Evaluates operator norm of Identity'''        
         
         return 1.0
         
     def domain_geometry(self): 
         
-        '''
-        
-            Returns domain_geometry of Identity
-        
-        '''        
+        '''Returns domain_geometry of Identity'''
         
         return self.gm_domain
         
     def range_geometry(self):
         
-        '''
-        
-            Returns range_geometry of Identity
-        
-        '''         
+        '''Returns range_geometry of Identity'''         
         
         return self.gm_range
     

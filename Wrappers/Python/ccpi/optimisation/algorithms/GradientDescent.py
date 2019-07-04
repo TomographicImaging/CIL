@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #========================================================================
 # Copyright 2019 Science Technology Facilities Council
 # Copyright 2019 University of Manchester
@@ -47,7 +48,7 @@ class GradientDescent(Algorithm):
                                rate=kwargs['rate'])
     
     def should_stop(self):
-        '''stopping cryterion, currently only based on number of iterations'''
+        '''stopping criterion, currently only based on number of iterations'''
         return self.iteration >= self.max_iteration
     
     def set_up(self, x_init, objective_function, rate):

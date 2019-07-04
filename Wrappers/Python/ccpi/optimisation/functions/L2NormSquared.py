@@ -1,4 +1,4 @@
-#========================================================================
+# -*- coding: utf-8 -*-
 # Copyright 2019 Science Technology Facilities Council
 # Copyright 2019 University of Manchester
 #
@@ -16,21 +16,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-#=========================================================================
+
 
 from ccpi.optimisation.functions import Function
 from ccpi.optimisation.functions.ScaledFunction import ScaledFunction
 
 class L2NormSquared(Function):
     
-    '''
-    
-        L2NormSquared function: 
+    '''L2NormSquared function: 
             
             Cases considered (with/without data):            
-                a) f(x) = \|x\|^{2}_{2} 
-                b) f(x) = \|\|x - b\|\|^{2}_{2}
+                a) .. math:: f(x) = \|x\|^{2}_{2} 
+                b) .. math:: f(x) = \|\|x - b\|\|^{2}_{2}
                                 
     '''    
     
@@ -44,11 +41,7 @@ class L2NormSquared(Function):
 
     def __call__(self, x):
         
-        '''  
-        
-            Evaluates L2NormSquared at x             
-            
-        '''
+        '''Evaluates L2NormSquared at x'''
             
         y = x
         if self.b is not None: 
@@ -61,11 +54,7 @@ class L2NormSquared(Function):
                 
     def gradient(self, x, out=None):        
         
-        ''' 
-        
-            Evaluates gradient of L2NormSquared at x
-            
-        '''
+        '''Evaluates gradient of L2NormSquared at x'''
                 
         if out is not None:
             
@@ -84,11 +73,7 @@ class L2NormSquared(Function):
                                                        
     def convex_conjugate(self, x):
         
-        ''' 
-        
-            Convex conjugate of L2NormSquared at x
-            
-        '''
+        '''Convex conjugate of L2NormSquared at x'''
         
         tmp = 0
         
@@ -100,11 +85,9 @@ class L2NormSquared(Function):
 
     def proximal(self, x, tau, out = None):
 
-        '''
-        
-            Proximal operator of L2NormSquared at x
-                prox_{\tau * f}(x)
-                
+        '''Proximal operator of L2NormSquared at x
+            
+            .. math:: prox_{\tau * f}(x)
         '''          
         
         if out is None:
@@ -128,12 +111,9 @@ class L2NormSquared(Function):
     
     def proximal_conjugate(self, x, tau, out=None):
         
-        '''
-        
-            Proximal operator of the convex conjugate of L2NormSquared at x:
-                prox_{\tau * f^{*}}(x)
-                
-        '''        
+        '''Proximal operator of the convex conjugate of L2NormSquared at x:
+           
+           .. math::  prox_{\tau * f^{*}}(x)'''
         
         if out is None:
             if self.b is not None:
@@ -149,12 +129,9 @@ class L2NormSquared(Function):
                                         
     def __rmul__(self, scalar):
         
-        ''' 
-        
-            Multiplication of L2NormSquared with a scalar        
-            Returns: ScaledFunction
-             
-        '''
+        '''Multiplication of L2NormSquared with a scalar        
+           
+           Returns: ScaledFunction'''
         
         return ScaledFunction(self, scalar)  
 

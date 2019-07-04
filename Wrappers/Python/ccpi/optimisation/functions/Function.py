@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #========================================================================
 # Copyright 2019 Science Technology Facilities Council
 # Copyright 2019 University of Manchester

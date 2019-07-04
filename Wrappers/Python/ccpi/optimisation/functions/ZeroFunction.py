@@ -1,4 +1,4 @@
-#========================================================================
+# -*- coding: utf-8 -*-
 # Copyright 2019 Science Technology Facilities Council
 # Copyright 2019 University of Manchester
 #
@@ -16,18 +16,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-#=========================================================================
+
 
 from ccpi.optimisation.functions import Function
 
 class ZeroFunction(Function):
     
-    ''' 
-    
-        ZeroFunction: f(x) = 0,         
-        Maps evely element x\in X to zero
+    '''ZeroFunction: .. math:: f(x) = 0,         
         
+        Maps evely element x\in X to zero
     '''
     
     def __init__(self):
@@ -35,21 +32,13 @@ class ZeroFunction(Function):
               
     def __call__(self,x):
         
-        '''
-        
-            Evaluates ZeroFunction at x
-            
-        '''
+        '''Evaluates ZeroFunction at x'''
         return 0
     
     
     def gradient(self, x, out=None):
         
-        ''' 
-        
-            Evaluates gradient of ZeroFunction at x
-            
-        '''        
+        '''Evaluates gradient of ZeroFunction at x'''        
         
         if out is None:
             return 0
@@ -58,8 +47,7 @@ class ZeroFunction(Function):
     
     def convex_conjugate(self, x):
         
-        ''' 
-            Convex conjugate of ZeroFunction: support function sup <x, x^{*}>  
+        ''' Convex conjugate of ZeroFunction: support function .. math:: sup <x, x^{*}>  
             
             In fact is the  indicator function for the set = {0}
             So 0 if x=0, or inf if x neq 0  
@@ -70,12 +58,10 @@ class ZeroFunction(Function):
     
     def proximal(self, x, tau, out=None):
         
+        '''Proximal operator of ZeroFunction at x
+           
+            .. math:: prox_{\tau * f}(x)
         '''
-        
-            Proximal operator of ZeroFunction at x
-                prox_{\tau * f}(x)
-                
-        '''        
         
         if out is None:
             return x.copy()
@@ -84,11 +70,10 @@ class ZeroFunction(Function):
         
     def proximal_conjugate(self, x, tau, out = None):
         
-        '''
-        
-            Proximal operator of the convex conjugate of ZeroFunction at x:
-                prox_{\tau * f^{*}}(x)
-                
+        '''Proximal operator of the convex conjugate of ZeroFunction at x:
+           
+           .. math:: prox_{\tau * f^{*}}(x)
+
         '''         
         
         if out is None:

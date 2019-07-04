@@ -1,40 +1,37 @@
-#========================================================================
-# Copyright 2019 Science Technology Facilities Council
-# Copyright 2019 University of Manchester
-#
-# This work is part of the Core Imaging Library developed by Science Technology
-# Facilities Council and University of Manchester
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#         http://www.apache.org/licenses/LICENSE-2.0.txt
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-#=========================================================================
+# -*- coding: utf-8 -*-
+#  CCP in Tomographic Imaging (CCPi) Core Imaging Library (CIL).
 
-from ccpi.optimisation.operators import Gradient
-from ccpi.framework import  ImageGeometry, BlockGeometry, BlockDataContainer
+#   Copyright 2017 UKRI-STFC
+#   Copyright 2017 University of Manchester
+
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+
+#   http://www.apache.org/licenses/LICENSE-2.0
+
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+from ccpi.optimisation.operators import Gradient, Operator, LinearOperator, ScaledOperator
+from ccpi.framework import ImageData, ImageGeometry, BlockGeometry, BlockDataContainer
 import numpy 
 from ccpi.optimisation.operators import FiniteDiff
 
 
 class SymmetrizedGradient(Gradient):
     
-    ''' 
-    
-        Symmetrized Gradient Operator:  E: V -> W
+    r'''Symmetrized Gradient Operator:  E: V -> W
         
             V : range of the Gradient Operator
             W : range of the Symmetrized Gradient          
         
-            Example (2D):  v = (v1, v2), 
+            Example (2D): 
+            .. math::
+               v = (v1, v2), 
             
                            Ev = 0.5 * ( \nabla\cdot v + (\nabla\cdot c)^{T} )
                            
@@ -42,7 +39,7 @@ class SymmetrizedGradient(Gradient):
                                \partial_{y} v1 & 0.5 * (\partial_{x} v1 + \partial_{y} v2) \\
                                0.5 * (\partial_{x} v1 + \partial_{y} v2) & \partial_{x} v2 
                            \end{matrix}
-                                                                    
+              |                                                      
     '''
     
     
@@ -69,11 +66,7 @@ class SymmetrizedGradient(Gradient):
         
     def direct(self, x, out=None):
         
-        '''
-        
-            Returns E(v)
-        
-        '''        
+        '''Returns E(v)'''        
         
         if out is None:
             

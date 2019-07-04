@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #========================================================================
 # Copyright 2019 Science Technology Facilities Council
 # Copyright 2019 University of Manchester
@@ -23,22 +24,24 @@ from ccpi.optimisation.algorithms import Algorithm
 
 
 class PDHG(Algorithm):
-    '''
+    '''Primal Dual Hybrid Gradient
     
-    Primal Dual Hybrid Gradient
-    
-    Problem : min_{x} f(Kx) + g(x)
-    
+    Problem : 
+    .. math::
+      min_{x} f(Kx) + g(x)
+    |
+
     Parameters : 
         
-        operator : Linear Operator = K
-        f : Convex function with "simple" proximal of its conjugate. 
-        g : Convex function with "simple" proximal 
-        sigma : Step size parameter for Primal problem
-        tau : Step size parameter for Dual problem
+        :parameter operator : Linear Operator = K
+        :parameter f : Convex function with "simple" proximal of its conjugate. 
+        :parameter g : Convex function with "simple" proximal 
+        :parameter sigma : Step size parameter for Primal problem
+        :parameter tau : Step size parameter for Dual problem
+        
         Remark: Convergence is guaranted provided that
         
-                \tau \sigma \|K\|^{2} <1
+        .. math: \tau \sigma \|K\|^{2} <1
         
             
     Reference :
@@ -50,9 +53,7 @@ class PDHG(Algorithm):
         
         (b) E. Esser, X. Zhang and T. F. Chan (2010), "A general framework for a class of first
         order primal–dual algorithms for convex optimization in imaging science",
-        SIAM J. Imaging Sci. 3, 1015–1046.        
-          
-    
+        SIAM J. Imaging Sci. 3, 1015–1046.
     '''
 
     def __init__(self, **kwargs):

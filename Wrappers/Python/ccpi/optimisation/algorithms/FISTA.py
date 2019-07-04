@@ -1,4 +1,5 @@
-#========================================================================
+# -*- coding: utf-8 -*-
+# #========================================================================
 # Copyright 2019 Science Technology Facilities Council
 # Copyright 2019 University of Manchester
 #
@@ -25,32 +26,33 @@ import numpy
 
 class FISTA(Algorithm):
     
-    '''
+    r'''Fast Iterative Shrinkage-Thresholding Algorithm 
     
-    Fast Iterative Shrinkage-Thresholding Algorithm 
-    
-    Problem : \min_{x} f(x) + g(x)
-    
+    Problem : 
+    .. math::
+      \min_{x} f(x) + g(x)
+    |
     
     Parameters :
         
-      x_init : Initial guess ( Default x_init = 0)
-      f : Differentiable function
-      g : Convex function with " simple " proximal operator
+      :parameter x_init : Initial guess ( Default x_init = 0)
+      :parameter f : Differentiable function
+      :parameter g : Convex function with " simple " proximal operator
 
 
     Reference:
       
         Beck, A. and Teboulle, M., 2009. A fast iterative shrinkage-thresholding 
         algorithm for linear inverse problems. 
-        SIAM journal on imaging sciences,2(1), pp.183-202.      
-            
+        SIAM journal on imaging sciences,2(1), pp.183-202.
     '''
     
     
     def __init__(self, **kwargs):
         
-        '''initialisation can be done at creation time if all 
+        '''creator 
+        
+        initialisation can be done at creation time if all 
         proper variables are passed or later with set_up'''
         
         super(FISTA, self).__init__()

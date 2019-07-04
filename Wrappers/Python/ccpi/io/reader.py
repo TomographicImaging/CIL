@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library developed by
-#   Visual Analytics and Imaging System Group of the Science Technology
-#   Facilities Council, STFC
+#  CCP in Tomographic Imaging (CCPi) Core Imaging Library (CIL).
 
-#   Copyright 2018 Jakob Jorgensen, Daniil Kazantsev, Edoardo Pasca and Srikanth Nagella
+#   Copyright 2017 UKRI-STFC
+#   Copyright 2017 University of Manchester
 
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
 #   You may obtain a copy of the License at
 
-#       http://www.apache.org/licenses/LICENSE-2.0
+#   http://www.apache.org/licenses/LICENSE-2.0
 
 #   Unless required by applicable law or agreed to in writing, software
 #   distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,11 +16,6 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-'''
-This is a reader module with classes for loading 3D datasets. 
-
-@author: Mr. Srikanth Nagella
-'''
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function

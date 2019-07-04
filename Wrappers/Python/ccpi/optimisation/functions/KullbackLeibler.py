@@ -27,9 +27,7 @@ import scipy.special
 
 class KullbackLeibler(Function):
     
-    ''' 
-    
-        Kullback-Leibler divergence function
+    '''Kullback-Leibler divergence function
     
             f(x, y) = \begin{cases} x \log(x / y) - x + y & x > 0, y > 0 \\ 
                                     y & x = 0, y \ge 0 \\

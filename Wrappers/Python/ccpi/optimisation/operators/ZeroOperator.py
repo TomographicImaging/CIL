@@ -31,10 +31,11 @@ class ZeroOperator(LinearOperator):
                        
                        Note: 
                        .. math::
+
                               O^{*}: Y^{*} -> X^{*} (Adjoint)
                        
                               < O(x), y > = < x, O^{*}(y) >
-                       |
+                       
      '''
     
     def __init__(self, gm_domain, gm_range=None):

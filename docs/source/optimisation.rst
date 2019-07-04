@@ -55,6 +55,10 @@ The :code:`Algorithm` provides the infrastructure to continue iteration, to acce
    :members:
 .. autoclass:: ccpi.optimisation.algorithms.FISTA
    :members:
+.. autoclass:: ccpi.optimisation.algorithms.PDHG
+   :members:
+.. autoclass:: ccpi.optimisation.algorithms.SIRT
+   :members:
 
 Operator
 ========

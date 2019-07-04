@@ -22,7 +22,7 @@ from ccpi.optimisation.functions import Function
 
 class ZeroFunction(Function):
     
-    '''ZeroFunction: .. math:: f(x) = 0,         
+    r'''ZeroFunction: .. math:: f(x) = 0,         
         
         Maps evely element x\in X to zero
     '''
@@ -47,7 +47,7 @@ class ZeroFunction(Function):
     
     def convex_conjugate(self, x):
         
-        ''' Convex conjugate of ZeroFunction: support function .. math:: sup <x, x^{*}>  
+        r''' Convex conjugate of ZeroFunction: support function .. math:: sup <x, x^{*}>  
             
             In fact is the  indicator function for the set = {0}
             So 0 if x=0, or inf if x neq 0  
@@ -58,7 +58,7 @@ class ZeroFunction(Function):
     
     def proximal(self, x, tau, out=None):
         
-        '''Proximal operator of ZeroFunction at x
+        r'''Proximal operator of ZeroFunction at x
            
             .. math:: prox_{\tau * f}(x)
         '''
@@ -70,7 +70,7 @@ class ZeroFunction(Function):
         
     def proximal_conjugate(self, x, tau, out = None):
         
-        '''Proximal operator of the convex conjugate of ZeroFunction at x:
+        r'''Proximal operator of the convex conjugate of ZeroFunction at x:
            
            .. math:: prox_{\tau * f^{*}}(x)
 

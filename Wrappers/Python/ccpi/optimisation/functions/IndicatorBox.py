@@ -22,7 +22,7 @@ import numpy
 class IndicatorBox(Function):
     
     
-    '''Indicator function for box constraint
+    r'''Indicator function for box constraint
             
       .. math:: 
          f(x) = \mathbb{I}_{[a, b]} = \begin{cases}
@@ -62,7 +62,7 @@ class IndicatorBox(Function):
          
     def proximal(self, x, tau, out=None):
         
-        '''Proximal operator of IndicatorBox at x
+        r'''Proximal operator of IndicatorBox at x
 
             .. math:: prox_{\tau * f}(x)
         '''
@@ -75,9 +75,9 @@ class IndicatorBox(Function):
             
     def proximal_conjugate(self, x, tau, out=None):
         
-        '''Proximal operator of the convex conjugate of IndicatorBox at x:
+        r'''Proximal operator of the convex conjugate of IndicatorBox at x:
 
-          .. math:: prox_{\tau * f^{*}}(x)
+          ..math:: prox_{\tau * f^{*}}(x)
         '''
 
         if out is None:

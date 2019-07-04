@@ -24,10 +24,14 @@ from ccpi.optimisation.algorithms import Algorithm
 
 class SIRT(Algorithm):
 
-    '''
-    Simultaneous Iterative Reconstruction Technique
+    r'''Simultaneous Iterative Reconstruction Technique
     
-    Problem: ..math:: A x = b
+    Problem: 
+    
+    .. math::  
+    
+    A x = b
+    |
 
     Parameters:
         

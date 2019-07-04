@@ -24,11 +24,13 @@ from ccpi.optimisation.algorithms import Algorithm
 
 
 class PDHG(Algorithm):
-    '''Primal Dual Hybrid Gradient
+    r'''Primal Dual Hybrid Gradient
     
-    Problem : 
+    Problem: 
+    
     .. math::
-      min_{x} f(Kx) + g(x)
+    
+      \min_{x} f(Kx) + g(x)
     |
 
     Parameters : 
@@ -41,7 +43,7 @@ class PDHG(Algorithm):
         
         Remark: Convergence is guaranted provided that
         
-        .. math: \tau \sigma \|K\|^{2} <1
+        .. math:: \tau \sigma \|K\|^{2} <1
         
             
     Reference :

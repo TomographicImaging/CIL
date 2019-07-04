@@ -23,7 +23,7 @@ from ccpi.optimisation.functions.ScaledFunction import ScaledFunction
 
 class L2NormSquared(Function):
     
-    '''L2NormSquared function: 
+    r'''L2NormSquared function: 
             
             Cases considered (with/without data):            
                 a) .. math:: f(x) = \|x\|^{2}_{2} 
@@ -85,7 +85,7 @@ class L2NormSquared(Function):
 
     def proximal(self, x, tau, out = None):
 
-        '''Proximal operator of L2NormSquared at x
+        r'''Proximal operator of L2NormSquared at x
             
             .. math:: prox_{\tau * f}(x)
         '''          
@@ -111,7 +111,7 @@ class L2NormSquared(Function):
     
     def proximal_conjugate(self, x, tau, out=None):
         
-        '''Proximal operator of the convex conjugate of L2NormSquared at x:
+        r'''Proximal operator of the convex conjugate of L2NormSquared at x:
            
            .. math::  prox_{\tau * f^{*}}(x)'''
         

@@ -24,7 +24,7 @@ from ccpi.optimisation.operators import ShrinkageOperator
 
 class L1Norm(Function):
     
-    '''L1Norm function: 
+    r'''L1Norm function: 
             
             Cases considered (with/without data):            
                 a) .. math:: f(x) = ||x||_{1}
@@ -61,7 +61,7 @@ class L1Norm(Function):
     
     def proximal(self, x, tau, out=None):
         
-        '''Proximal operator of L1Norm at x
+        r'''Proximal operator of L1Norm at x
            
            ..math::     prox_{\tau * f}(x)
                 
@@ -80,7 +80,7 @@ class L1Norm(Function):
                                     
     def proximal_conjugate(self, x, tau, out=None):
         
-        '''Proximal operator of the convex conjugate of L1Norm at x:
+        r'''Proximal operator of the convex conjugate of L1Norm at x:
                 
             .. math:: prox_{\tau * f^{*}}(x)
                 

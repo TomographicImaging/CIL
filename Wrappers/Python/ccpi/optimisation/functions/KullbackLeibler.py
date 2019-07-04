@@ -25,7 +25,7 @@ import scipy.special
 
 class KullbackLeibler(Function):
     
-    '''Kullback-Leibler divergence function
+    r'''Kullback-Leibler divergence function
     
          .. math::
               f(x, y) = \begin{cases} x \log(x / y) - x + y & x > 0, y > 0 \\ 
@@ -81,7 +81,7 @@ class KullbackLeibler(Function):
             
     def proximal(self, x, tau, out=None):
         
-        '''Proximal operator of KullbackLeibler at x
+        r'''Proximal operator of KullbackLeibler at x
            
            .. math::     prox_{\tau * f}(x)
 
@@ -110,7 +110,7 @@ class KullbackLeibler(Function):
                             
     def proximal_conjugate(self, x, tau, out=None):
         
-        '''Proximal operator of the convex conjugate of KullbackLeibler at x:
+        r'''Proximal operator of the convex conjugate of KullbackLeibler at x:
            
            .. math::     prox_{\tau * f^{*}}(x)
         '''

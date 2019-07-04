@@ -25,7 +25,7 @@ from ccpi.optimisation.operators import FiniteDiff, SparseFiniteDiff
 class Gradient(LinearOperator):
     
     
-    '''Gradient Operator: \nabla : X -> Y           
+    r'''Gradient Operator: .. math:: \nabla : X -> Y           
             
             Computes first-order forward/backward differences 
                      on 2D, 3D, 4D ImageData

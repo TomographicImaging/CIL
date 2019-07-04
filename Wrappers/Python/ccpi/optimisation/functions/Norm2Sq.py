@@ -23,7 +23,7 @@ import warnings
 
 # Define a class for squared 2-norm
 class Norm2Sq(Function):
-    '''.. math:: f(x) = c*||A*x-b||_2^2
+    r'''.. math:: f(x) = c*||A*x-b||_2^2
     
     which has 
     

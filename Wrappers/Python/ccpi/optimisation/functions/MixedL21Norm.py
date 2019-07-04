@@ -26,7 +26,7 @@ import functools
 class MixedL21Norm(Function):
     
     
-    '''MixedL21Norm: .. math:: f(x) = ||x||_{2,1} = \int \|x\|_{2} dx
+    r'''MixedL21Norm: .. math:: f(x) = ||x||_{2,1} = \int \|x\|_{2} dx
 
         where x is a vector/tensor vield
                 
@@ -56,7 +56,7 @@ class MixedL21Norm(Function):
                             
     def convex_conjugate(self,x):
         
-        '''Convex conjugate of of MixedL21Norm: 
+        r'''Convex conjugate of of MixedL21Norm: 
         
         Indicator function of .. math:: ||\cdot||_{2, \infty}
             which is either 0 if .. math:: ||x||_{2, \infty}<1 or \infty 
@@ -68,7 +68,7 @@ class MixedL21Norm(Function):
     
     def proximal(self, x, tau, out=None):
         
-        '''Proximal operator of MixedL21Norm at x:
+        r'''Proximal operator of MixedL21Norm at x:
            
            .. math:: prox_{\tau * f(x)
         '''
@@ -76,7 +76,7 @@ class MixedL21Norm(Function):
     
     def proximal_conjugate(self, x, tau, out=None): 
         
-        '''Proximal operator of the convex conjugate of MixedL21Norm at x:
+        r'''Proximal operator of the convex conjugate of MixedL21Norm at x:
            
            .. math:: prox_{\tau * f^{*}}(x)
 

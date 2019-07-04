@@ -29,8 +29,11 @@ class FISTA(Algorithm):
     r'''Fast Iterative Shrinkage-Thresholding Algorithm 
     
     Problem : 
+    
     .. math::
+    
       \min_{x} f(x) + g(x)
+    
     |
     
     Parameters :

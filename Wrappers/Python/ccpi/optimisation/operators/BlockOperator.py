@@ -24,14 +24,14 @@ from ccpi.optimisation.operators import Operator
 from ccpi.framework import BlockGeometry
        
 class BlockOperator(Operator):
-    '''A Block matrix containing Operators
+    r'''A Block matrix containing Operators
 
     The Block Framework is a generic strategy to treat variational problems in the
     following form:
 
     .. math::
     
-      min Regulariser + Fidelity
+      \min Regulariser + Fidelity
 
     
     BlockOperators have a generic shape M x N, and when applied on an 

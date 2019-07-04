@@ -28,8 +28,11 @@ class CGLS(Algorithm):
     r'''Conjugate Gradient Least Squares algorithm 
     
     Problem:  
-    .. math:: 
-      A x = b
+
+    .. math::
+
+      \min || A x - b ||^2_2
+    
     |
 
     Parameters :

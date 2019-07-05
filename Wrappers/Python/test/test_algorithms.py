@@ -170,7 +170,7 @@ class TestAlgorithms(unittest.TestCase):
         
         def setup(data, noise):
             if noise == 's&p':
-                n1 = TestData.random_noise(data.as_array(), mode = noise, salt_vs_pepper = 0.9, amount=0.2)
+                n1 = TestData.random_noise(data.as_array(), mode = noise, salt_vs_pepper = 0.9, amount=0.2, seed=10)
             elif noise == 'poisson':
                 scale = 5
                 n1 = TestData.random_noise( data.as_array()/scale, mode = noise, seed = 10)*scale

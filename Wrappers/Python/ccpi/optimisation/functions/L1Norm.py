@@ -35,7 +35,8 @@ class L1Norm(Function):
     def __init__(self, **kwargs):
         
         super(L1Norm, self).__init__()
-        self.b = kwargs.get('b',None) 
+        self.b = kwargs.get('b',None)
+        self.shinkage_operator = ShrinkageOperator()
         
     def __call__(self, x):
         
@@ -69,14 +70,14 @@ class L1Norm(Function):
         
         if out is None:
             if self.b is not None:
-                return self.b + ShrinkageOperator.__call__(self, x - self.b, tau)
+                return self.b + self.shinkage_operator(x - self.b, tau)
             else:
-                return ShrinkageOperator.__call__(self, x, tau)             
+                return self.shinkage_operator(x, tau)             
         else:
             if self.b is not None:
-                out.fill(self.b + ShrinkageOperator.__call__(self, x - self.b, tau))
+                out.fill(self.b + self.shinkage_operator(x - self.b, tau))
             else:
-                out.fill(ShrinkageOperator.__call__(self, x, tau))
+                out.fill(self.shinkage_operator(x, tau))
                                     
     def proximal_conjugate(self, x, tau, out=None):
         

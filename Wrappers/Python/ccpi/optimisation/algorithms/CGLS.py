@@ -1,40 +1,47 @@
 # -*- coding: utf-8 -*-
-#  CCP in Tomographic Imaging (CCPi) Core Imaging Library (CIL).
-
-#   Copyright 2017 UKRI-STFC
-#   Copyright 2017 University of Manchester
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+# Copyright 2019 Science Technology Facilities Council
+# Copyright 2019 University of Manchester
+#
+# This work is part of the Core Imaging Library developed by Science Technology
+# Facilities Council and University of Manchester
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from ccpi.optimisation.algorithms import Algorithm
-from ccpi.optimisation.functions import Norm2Sq
 import numpy
 
 class CGLS(Algorithm):
 
-    '''Conjugate Gradient Least Squares algorithm
+    r'''Conjugate Gradient Least Squares algorithm 
+    
+    Problem:  
 
-    Parameters:
-      x_init: initial guess
-      operator: operator for forward/backward projections
-      data: data to operate on
-      tolerance: tolerance to stop algorithm
+    .. math::
+
+      \min || A x - b ||^2_2
+    
+    |
+
+    Parameters :
+        
+      :parameter operator : Linear operator for the inverse problem
+      :parameter x_init : Initial guess ( Default x_init = 0)
+      :parameter data : Acquired data to reconstruct       
+      :parameter tolerance: Tolerance/ Stopping Criterion to end CGLS algorithm
       
     Reference:
         https://web.stanford.edu/group/SOL/software/cgls/
-      
     '''
-
     def __init__(self, **kwargs):
         
         super(CGLS, self).__init__()
@@ -59,9 +66,7 @@ class CGLS(Algorithm):
         self.p = self.s
         self.norms0 = self.s.norm()
         
-        ##
         self.norms = self.s.norm()
-        ##
 
         self.gamma = self.norms0**2
         self.normx = self.x.norm()

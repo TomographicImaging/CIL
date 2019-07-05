@@ -1,32 +1,60 @@
 # -*- coding: utf-8 -*-
-#  CCP in Tomographic Imaging (CCPi) Core Imaging Library (CIL).
+# Copyright 2019 Science Technology Facilities Council
+# Copyright 2019 University of Manchester
+#
+# This work is part of the Core Imaging Library developed by Science Technology
+# Facilities Council and University of Manchester
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-#   Copyright 2017 UKRI-STFC
-#   Copyright 2017 University of Manchester
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
 from ccpi.optimisation.algorithms import Algorithm
-from ccpi.framework import ImageData, DataContainer
-import numpy as np
-import numpy
-import time
-from ccpi.optimisation.operators import BlockOperator
-from ccpi.framework import BlockDataContainer
-from ccpi.optimisation.functions import FunctionOperatorComposition
+
 
 
 class PDHG(Algorithm):
-    '''Primal Dual Hybrid Gradient'''
+    r'''Primal Dual Hybrid Gradient
+    
+    Problem: 
+    
+    .. math::
+    
+      \min_{x} f(Kx) + g(x)
+    |
+
+    Parameters : 
+        
+        :parameter operator : Linear Operator = K
+        :parameter f : Convex function with "simple" proximal of its conjugate. 
+        :parameter g : Convex function with "simple" proximal 
+        :parameter sigma : Step size parameter for Primal problem
+        :parameter tau : Step size parameter for Dual problem
+        
+        Remark: Convergence is guaranted provided that
+        
+        .. math:: \tau \sigma \|K\|^{2} <1
+        
+            
+    Reference :
+        
+        
+        (a) A. Chambolle and T. Pock (2011), "A first-order primal–dual algorithm for convex
+        problems with applications to imaging", J. Math. Imaging Vision 40, 120–145.        
+        
+        
+        (b) E. Esser, X. Zhang and T. F. Chan (2010), "A general framework for a class of first
+        order primal–dual algorithms for convex optimization in imaging science",
+        SIAM J. Imaging Sci. 3, 1015–1046.
+    '''
 
     def __init__(self, **kwargs):
         super(PDHG, self).__init__(max_iteration=kwargs.get('max_iteration',0))
@@ -78,7 +106,7 @@ class PDHG(Algorithm):
 
     def update(self):
         
-        # Gradient descent, Dual problem solution
+        # Gradient ascent for the dual variable
         self.operator.direct(self.xbar, out=self.y_tmp)
         self.y_tmp *= self.sigma
         self.y_tmp += self.y_old
@@ -86,7 +114,7 @@ class PDHG(Algorithm):
         # self.y = self.f.proximal_conjugate(self.y_old, self.sigma)
         self.f.proximal_conjugate(self.y_tmp, self.sigma, out=self.y)
         
-        # Gradient ascent, Primal problem solution
+        # Gradient descent for the primal variable
         self.operator.adjoint(self.y, out=self.x_tmp)
         self.x_tmp *= -1*self.tau
         self.x_tmp += self.x_old
@@ -98,6 +126,7 @@ class PDHG(Algorithm):
         self.xbar *= self.theta
         self.xbar += self.x
 
+        
         self.x_old.fill(self.x)
         self.y_old.fill(self.y)
 

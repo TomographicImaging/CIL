@@ -22,6 +22,10 @@ from ccpi.framework import ImageData
 
 class SparseFiniteDiff(object):
     
+    
+    '''Create Sparse Matrices for the Finite Difference Operator'''
+    
+    
     def __init__(self, gm_domain, gm_range=None, direction=0, bnd_cond = 'Neumann'):
         
         super(SparseFiniteDiff, self).__init__() 

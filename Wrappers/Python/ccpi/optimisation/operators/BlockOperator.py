@@ -1,37 +1,37 @@
 # -*- coding: utf-8 -*-
-#  CCP in Tomographic Imaging (CCPi) Core Imaging Library (CIL).
+# Copyright 2019 Science Technology Facilities Council
+# Copyright 2019 University of Manchester
+#
+# This work is part of the Core Imaging Library developed by Science Technology
+# Facilities Council and University of Manchester
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-#   Copyright 2017 UKRI-STFC
-#   Copyright 2017 University of Manchester
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
 import numpy
-from numbers import Number
 import functools
-from ccpi.framework import AcquisitionData, ImageData, BlockDataContainer, DataContainer
-from ccpi.optimisation.operators import Operator, LinearOperator
-from ccpi.optimisation.operators.BlockScaledOperator import BlockScaledOperator
+from ccpi.framework import ImageData, BlockDataContainer, DataContainer
+from ccpi.optimisation.operators import Operator
 from ccpi.framework import BlockGeometry
        
 class BlockOperator(Operator):
-    '''A Block matrix containing Operators
+    r'''A Block matrix containing Operators
 
     The Block Framework is a generic strategy to treat variational problems in the
     following form:
 
     .. math::
     
-      min Regulariser + Fidelity
+      \min Regulariser + Fidelity
 
     
     BlockOperators have a generic shape M x N, and when applied on an 
@@ -192,7 +192,6 @@ class BlockOperator(Operator):
             else:
                 return BlockDataContainer(*res, shape=shape)
         else:
-            #tmp = self.domain_geometry().allocate()
 
             for col in range(self.shape[1]):
                 for row in range(self.shape[0]):
@@ -240,7 +239,7 @@ class BlockOperator(Operator):
     def __rmul__(self, scalar):
         '''Defines the left multiplication with a scalar
 
-        Args: scalar (number or iterable containing numbers):
+        :paramer scalar: (number or iterable containing numbers):
 
         Returns: a block operator with Scaled Operators inside'''
         if isinstance (scalar, list) or isinstance(scalar, tuple) or \

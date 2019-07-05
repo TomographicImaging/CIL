@@ -20,6 +20,11 @@ from ccpi.framework import DataContainer
 
 class ShrinkageOperator():
     
+    r'''Proximal Operator for .. math:: f(x) = \|\| x \|\|_{1}
+        
+            prox_{\tau * f}(x) = x.sign() * \max( |x| - \tau, 0 )
+    '''
+    
     def __init__(self):
         pass
 

@@ -1,33 +1,46 @@
 # -*- coding: utf-8 -*-
-#  CCP in Tomographic Imaging (CCPi) Core Imaging Library (CIL).
-
-#   Copyright 2017 UKRI-STFC
-#   Copyright 2017 University of Manchester
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#========================================================================
+# Copyright 2019 Science Technology Facilities Council
+# Copyright 2019 University of Manchester
+#
+# This work is part of the Core Imaging Library developed by Science Technology
+# Facilities Council and University of Manchester
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+#=========================================================================
 
 from ccpi.optimisation.algorithms import Algorithm
 
 class SIRT(Algorithm):
 
-    '''Simultaneous Iterative Reconstruction Technique
+    r'''Simultaneous Iterative Reconstruction Technique
+    
+    Problem: 
+    
+    .. math::  
+    
+    A x = b
+    |
 
     Parameters:
-      x_init: initial guess
-      operator: operator for forward/backward projections
-      data: data to operate on
-      constraint: Function with prox-method, for example IndicatorBox to 
-                  enforce box constraints, default is None).
+        
+      :parameter operator : Linear operator for the inverse problem
+      :parameter x_init : Initial guess
+      :parameter data : Acquired data to reconstruct       
+      :parameter constraint : Function proximal method
+                   e.g.  x\in[0, 1], IndicatorBox to enforce box constraints
+                         Default is None).
     '''
     def __init__(self, **kwargs):
         super(SIRT, self).__init__()

@@ -17,14 +17,12 @@
 #   limitations under the License.
 import numpy
 from scipy.sparse.linalg import svds
-from ccpi.framework import DataContainer
-from ccpi.framework import AcquisitionData
-from ccpi.framework import VectorData
 from ccpi.framework import VectorGeometry
-from ccpi.framework import AcquisitionGeometry
-from numbers import Number
 from ccpi.optimisation.operators import LinearOperator
+
 class LinearOperatorMatrix(LinearOperator):
+    '''Matrix wrapped into a LinearOperator'''
+    
     def __init__(self,A):
         self.A = A
         M_A, N_A = self.A.shape

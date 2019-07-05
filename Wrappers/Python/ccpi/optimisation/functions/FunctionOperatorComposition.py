@@ -1,30 +1,35 @@
 # -*- coding: utf-8 -*-
-#  CCP in Tomographic Imaging (CCPi) Core Imaging Library (CIL).
+#========================================================================
+# Copyright 2019 Science Technology Facilities Council
+# Copyright 2019 University of Manchester
+#
+# This work is part of the Core Imaging Library developed by Science Technology
+# Facilities Council and University of Manchester
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+#=========================================================================
 
-#   Copyright 2017 UKRI-STFC
-#   Copyright 2017 University of Manchester
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
 from ccpi.optimisation.functions import Function
 from ccpi.optimisation.functions import ScaledFunction
 
 
 class FunctionOperatorComposition(Function):
     
-    ''' Function composition with Operator, i.e., f(Ax)
+    '''Function composition with Operator: (f o A)(x) = f(Ax)
     
-        A: operator
-        f: function
+            : parameter A: operator
+            : parameter f: function
     
     '''
     
@@ -39,17 +44,18 @@ class FunctionOperatorComposition(Function):
         
     def __call__(self, x):
         
-        ''' Evaluate FunctionOperatorComposition at x
-        
-        returns f(Ax)
-        
-        '''
+        '''Evaluates f(Ax)'''
     
         return self.function(self.operator.direct(x))  
     
     def gradient(self, x, out=None):
-#        
-        ''' Gradient takes into account the Operator'''
+        
+        '''Evaluates gradient of f(Ax):
+        
+        ..math ::  A^{T}f'(Ax)
+            
+        '''
+        
         if out is None:
             return self.operator.adjoint(self.function.gradient(self.operator.direct(x)))
         else: 

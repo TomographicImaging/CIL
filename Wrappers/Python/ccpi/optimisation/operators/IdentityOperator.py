@@ -19,10 +19,17 @@
 from ccpi.optimisation.operators import LinearOperator
 import scipy.sparse as sp
 import numpy as np
-from ccpi.framework import ImageData
 
 
 class Identity(LinearOperator):
+    
+    '''Identity:  Id: X -> Y,  Id(x) = x\in Y
+                       
+                   X : gm_domain
+                   Y : gm_range ( Default: Y = X )
+                                                                                                                                   
+    '''    
+    
     
     def __init__(self, gm_domain, gm_range=None):
 
@@ -34,38 +41,58 @@ class Identity(LinearOperator):
         super(Identity, self).__init__()
         
     def direct(self,x,out=None):
+        
+        '''Returns Id(x)'''
+        
         if out is None:
             return x.copy()
         else:
             out.fill(x)
     
     def adjoint(self,x, out=None):
+        
+        '''Returns Id(x)'''         
+        
+        
         if out is None:
             return x.copy()
         else:
             out.fill(x)
         
     def calculate_norm(self, **kwargs):
+        
+        '''Evaluates operator norm of Identity'''        
+        
         return 1.0
         
-    def domain_geometry(self):       
+    def domain_geometry(self): 
+        
+        '''Returns domain_geometry of Identity'''
+        
         return self.gm_domain
         
     def range_geometry(self):
+        
+        '''Returns range_geometry of Identity'''         
+        
         return self.gm_range
     
+    
+    ###########################################################################
+    ###############  For preconditioning ######################################
+    ###########################################################################                    
     def matrix(self):
         
         return sp.eye(np.prod(self.gm_domain.shape))
     
     def sum_abs_row(self):
         
-        return self.gm_range.allocate(1)#ImageData(np.array(np.reshape(abs(self.matrix()).sum(axis=0), self.gm_domain.shape, 'F')))
- 
+        return self.gm_range.allocate(1)
+    
     def sum_abs_col(self):
         
-        return self.gm_domain.allocate(1)#ImageData(np.array(np.reshape(abs(self.matrix()).sum(axis=1), self.gm_domain.shape, 'F')))
-            
+        return self.gm_domain.allocate(1)
+    
     
 if __name__ == '__main__':
     

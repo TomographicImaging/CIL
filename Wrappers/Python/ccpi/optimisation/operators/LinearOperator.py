@@ -17,7 +17,6 @@
 #   limitations under the License.
 
 from ccpi.optimisation.operators import Operator
-from ccpi.framework import ImageGeometry
 import numpy
 
 

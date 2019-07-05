@@ -19,25 +19,34 @@
 from ccpi.optimisation.operators import Gradient, Operator, LinearOperator, ScaledOperator
 from ccpi.framework import ImageData, ImageGeometry, BlockGeometry, BlockDataContainer
 import numpy 
-from ccpi.optimisation.operators import FiniteDiff, SparseFiniteDiff
+from ccpi.optimisation.operators import FiniteDiff
 
 
 class SymmetrizedGradient(Gradient):
     
-    ''' Symmetrized Gradient, denoted by E: V --> W
-        where V is the Range of the Gradient Operator
-        and W is the Range of the Symmetrized Gradient.                        
+    r'''Symmetrized Gradient Operator:  E: V -> W
+        
+            V : range of the Gradient Operator
+            W : range of the Symmetrized Gradient          
+        
+            Example (2D): 
+            .. math::
+               v = (v1, v2), 
+            
+                           Ev = 0.5 * ( \nabla\cdot v + (\nabla\cdot c)^{T} )
+                           
+                           \begin{matrix} 
+                               \partial_{y} v1 & 0.5 * (\partial_{x} v1 + \partial_{y} v2) \\
+                               0.5 * (\partial_{x} v1 + \partial_{y} v2) & \partial_{x} v2 
+                           \end{matrix}
+              |                                                      
     '''
     
     
     def __init__(self, gm_domain, bnd_cond = 'Neumann', **kwargs):
         
         super(SymmetrizedGradient, self).__init__(gm_domain, bnd_cond, **kwargs) 
-        
-        '''
-         Domain of SymGrad is the Range of Gradient
-        '''
-        
+                
         self.gm_domain = self.gm_range 
         self.bnd_cond = bnd_cond
         
@@ -56,6 +65,8 @@ class SymmetrizedGradient(Gradient):
                 
         
     def direct(self, x, out=None):
+        
+        '''Returns E(v)'''        
         
         if out is None:
             
@@ -232,12 +243,4 @@ if __name__ == '__main__':
     print(E1.norm())
     print(E2.norm())
     
-    
-    
-    
-    
-
-#    
-#    
-#    
-#   
+  

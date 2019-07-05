@@ -1,36 +1,37 @@
 # -*- coding: utf-8 -*-
-#  CCP in Tomographic Imaging (CCPi) Core Imaging Library (CIL).
+# Copyright 2019 Science Technology Facilities Council
+# Copyright 2019 University of Manchester
+#
+# This work is part of the Core Imaging Library developed by Science Technology
+# Facilities Council and University of Manchester
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-#   Copyright 2017 UKRI-STFC
-#   Copyright 2017 University of Manchester
 
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
 from ccpi.optimisation.functions import Function
-import numpy
 import warnings
 
 # Define a class for squared 2-norm
 class Norm2Sq(Function):
-    '''
-    f(x) = c*||A*x-b||_2^2
+    r'''.. math:: f(x) = c*||A*x-b||_2^2
     
     which has 
     
-    grad[f](x) = 2*c*A^T*(A*x-b)
+    .. math:: grad[f](x) = 2*c*A^T*(A*x-b)
     
     and Lipschitz constant
     
-    L = 2*c*||A||_2^2 = 2*s1(A)^2
+    .. math:: L = 2*c*||A||_2^2 = 2*s1(A)^2
     
     where s1(A) is the largest singular value of A.
     

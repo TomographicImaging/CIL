@@ -1,20 +1,24 @@
 # -*- coding: utf-8 -*-
-#  CCP in Tomographic Imaging (CCPi) Core Imaging Library (CIL).
-
-#   Copyright 2017 UKRI-STFC
-#   Copyright 2017 University of Manchester
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+#========================================================================
+# Copyright 2019 Science Technology Facilities Council
+# Copyright 2019 University of Manchester
+#
+# This work is part of the Core Imaging Library developed by Science Technology
+# Facilities Council and University of Manchester
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+#=========================================================================
 
 from ccpi.optimisation.functions import Function
 from ccpi.framework import BlockDataContainer
@@ -22,29 +26,29 @@ from numbers import Number
 
 class BlockFunction(Function):
     
-    '''BlockFunction acts as a separable sum function, i.e.,
+    r'''BlockFunction acts as a separable sum function: f = [f_1,...,f_n]
     
-      f = [f_1,...,f_n]
-      
-      f([x_1,...,x_n]) = f_1(x_1) +  .... + f_n(x_n)
+      .. math::
+
+          f([x_1,...,x_n]) = f_1(x_1) +  .... + f_n(x_n)
+      |
 
     '''
+    
     def __init__(self, *functions):
                 
         super(BlockFunction, self).__init__()
         self.functions = functions      
         self.length = len(self.functions)
-        
-        
-        
-        
+                                
     def __call__(self, x):
         
-        '''Evaluates the BlockFunction at a BlockDataContainer x
+        r'''Evaluates the BlockFunction at a BlockDataContainer x
         
-        :param: x (BlockDataContainer): must have as many rows as self.length
+            :param: x (BlockDataContainer): must have as many rows as self.length
 
-        returns sum(f_i(x_i))
+            returns ..math:: sum(f_i(x_i))
+            
         '''
         
         if self.length != x.shape[0]:
@@ -56,9 +60,9 @@ class BlockFunction(Function):
     
     def convex_conjugate(self, x):
         
-        ''' Evaluate convex conjugate of BlockFunction at x
+        r'''Convex conjugate of BlockFunction at x            
         
-        returns sum(f_i^{*}(x_i))
+            .. math:: returns sum(f_i^{*}(x_i))
         
         '''       
         t = 0                
@@ -69,9 +73,9 @@ class BlockFunction(Function):
     
     def proximal_conjugate(self, x, tau, out = None):
         
-        ''' Evaluate Proximal Operator of tau * f(\cdot) at x
-        
-        prox_{tau*f}(x) = sum_{i} prox_{tau*f_{i}}(x_{i}) 
+        r'''Proximal operator of BlockFunction at x: 
+                 
+                 .. math:: prox_{tau*f}(x) = sum_{i} prox_{tau*f_{i}}(x_{i}) 
         
         
         '''
@@ -99,11 +103,9 @@ class BlockFunction(Function):
     
     def proximal(self, x, tau, out = None):
         
-        ''' Evaluate Proximal Operator of tau * f^{*}(\cdot) at x
+        r'''Proximal operator of the convex conjugate of BlockFunction at x:
         
-        prox_{tau*f^{*}}(x) = sum_{i} prox_{tau*f^{*}_{i}}(x_{i}) 
-        
-        
+            .. math:: prox_{tau*f^{*}}(x) = sum_{i} prox_{tau*f^{*}_{i}}(x_{i}) 
         '''
         
         if out is None:
@@ -130,9 +132,9 @@ class BlockFunction(Function):
     
     def gradient(self,x, out=None):
         
-        ''' Evaluate gradient of f at x: f'(x) 
+        r'''Evaluates gradient of BlockFunction at x
         
-        returns: BlockDataContainer [f_{1}'(x_{1}), ... , f_{n}'(x_{n})]
+            returns: BlockDataContainer .. math:: [f_{1}'(x_{1}), ... , f_{n}'(x_{n})]
                 
         '''
         

@@ -1,20 +1,21 @@
 # -*- coding: utf-8 -*-
-#  CCP in Tomographic Imaging (CCPi) Core Imaging Library (CIL).
-
-#   Copyright 2017 UKRI-STFC
-#   Copyright 2017 University of Manchester
-
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-
-#   http://www.apache.org/licenses/LICENSE-2.0
-
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+# Copyright 2019 Science Technology Facilities Council
+# Copyright 2019 University of Manchester
+#
+# This work is part of the Core Imaging Library developed by Science Technology
+# Facilities Council and University of Manchester
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from ccpi.optimisation.functions import Function
 from ccpi.optimisation.functions.ScaledFunction import ScaledFunction        
@@ -23,16 +24,14 @@ from ccpi.optimisation.operators import ShrinkageOperator
 
 class L1Norm(Function):
     
-    ''' 
-    
-    Class: L1Norm
-        
-    Cases:  a) f(x) = ||x||_{1}
-    
-            b) f(x) = ||x - b||_{1}
-                             
-    '''      
-    
+    r'''L1Norm function: 
+            
+            Cases considered (with/without data):            
+                a) .. math:: f(x) = ||x||_{1}
+                b) .. math:: f(x) = ||x - b||_{1}
+                                
+    '''   
+           
     def __init__(self, **kwargs):
         
         super(L1Norm, self).__init__()
@@ -40,7 +39,7 @@ class L1Norm(Function):
         
     def __call__(self, x):
         
-        ''' Evaluate L1Norm at x: f(x) '''
+        '''Evaluates L1Norm at x'''
         
         y = x
         if self.b is not None: 
@@ -48,11 +47,12 @@ class L1Norm(Function):
         return y.abs().sum()  
     
     def gradient(self,x):
-        #TODO implement subgradient???
+        
         return ValueError('Not Differentiable')   
     
     def convex_conjugate(self,x):
-        #TODO implement Indicator infty???
+        
+        '''Convex conjugate of L1Norm at x'''
 
         y = 0        
         if self.b is not None:
@@ -61,7 +61,11 @@ class L1Norm(Function):
     
     def proximal(self, x, tau, out=None):
         
-        # TODO implement shrinkage operator, we will need it later e.g SplitBregman
+        r'''Proximal operator of L1Norm at x
+           
+           ..math::     prox_{\tau * f}(x)
+                
+        ''' 
         
         if out is None:
             if self.b is not None:
@@ -76,6 +80,12 @@ class L1Norm(Function):
                                     
     def proximal_conjugate(self, x, tau, out=None):
         
+        r'''Proximal operator of the convex conjugate of L1Norm at x:
+                
+            .. math:: prox_{\tau * f^{*}}(x)
+                
+        '''          
+        
         if out is None:
             if self.b is not None:
                 return (x - tau*self.b).divide((x - tau*self.b).abs().maximum(1.0))
@@ -88,6 +98,12 @@ class L1Norm(Function):
                 out.fill(x.divide(x.abs().maximum(1.0)) )                
             
     def __rmul__(self, scalar):
+        
+        '''Multiplication of L2NormSquared with a scalar        
+            
+            Returns: ScaledFunction
+        '''
+        
         return ScaledFunction(self, scalar)
 
 

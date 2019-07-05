@@ -23,12 +23,29 @@ from ccpi.optimisation.operators import FiniteDiff, SparseFiniteDiff
 #%%
 
 class Gradient(LinearOperator):
+    
+    
+    r'''Gradient Operator: .. math:: \nabla : X -> Y           
+            
+            Computes first-order forward/backward differences 
+                     on 2D, 3D, 4D ImageData
+                     under Neumann/Periodic boundary conditions
+                                                             
+                Example (2D): u\in X, \nabla(u) = [\partial_{y} u, \partial_{x} u]
+                              u^{*}\in Y, \nabla^{*}(u^{*}) = \partial_{y} v1 + \partial_{x} v2
+        
+                Grad_order = ['channels', 'direction_z', 'direction_y', 'direction_x']
+                Grad_order = ['channels', 'direction_y', 'direction_x']
+                Grad_order = ['direction_z', 'direction_y', 'direction_x']
+                Grad_order = ['channels', 'direction_z', 'direction_y', 'direction_x']
+                
+
+    '''
+    
+                    
     CORRELATION_SPACE = "Space"
     CORRELATION_SPACECHANNEL = "SpaceChannels"
-    # Grad_order = ['channels', 'direction_z', 'direction_y', 'direction_x']
-    # Grad_order = ['channels', 'direction_y', 'direction_x']
-    # Grad_order = ['direction_z', 'direction_y', 'direction_x']
-    # Grad_order = ['channels', 'direction_z', 'direction_y', 'direction_x']
+
     def __init__(self, gm_domain, bnd_cond = 'Neumann', **kwargs):
         
         super(Gradient, self).__init__() 
@@ -72,8 +89,7 @@ class Gradient(LinearOperator):
          
         self.bnd_cond = bnd_cond 
         
-        # Call FiniteDiff operator
-        
+        # Call FiniteDiff operator        
         self.FD = FiniteDiff(self.gm_domain, direction = 0, bnd_cond = self.bnd_cond)
                                                          
         
@@ -114,12 +130,24 @@ class Gradient(LinearOperator):
             
     
     def domain_geometry(self):
+        
+        '''Returns domain_geometry of Gradient'''
+        
         return self.gm_domain
     
     def range_geometry(self):
+        
+        '''Returns range_geometry of Gradient'''
+        
         return self.gm_range
     
     def __rmul__(self, scalar):
+        
+        '''Multiplication of Gradient with a scalar        
+            
+            Returns: ScaledOperator
+        '''        
+        
         return ScaledOperator(self, scalar) 
     
     ###########################################################################

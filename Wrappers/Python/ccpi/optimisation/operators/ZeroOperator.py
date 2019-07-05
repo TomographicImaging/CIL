@@ -22,6 +22,22 @@ from ccpi.optimisation.operators import LinearOperator
 
 class ZeroOperator(LinearOperator):
     
+    r'''ZeroOperator:  O: X -> Y,  maps any element of x\in X into the zero element in Y
+                       O(x) = O_{Y}
+                       
+                       X : gm_domain
+                       Y : gm_range ( Default: Y = X )
+                       
+                       
+                       Note: 
+                       .. math::
+
+                              O^{*}: Y^{*} -> X^{*} (Adjoint)
+                       
+                              < O(x), y > = < x, O^{*}(y) >
+                       
+     '''
+    
     def __init__(self, gm_domain, gm_range=None):
         
         super(ZeroOperator, self).__init__()             
@@ -33,22 +49,39 @@ class ZeroOperator(LinearOperator):
                    
         
     def direct(self,x,out=None):
+        
+        '''Returns O(x)'''
+        
+        
         if out is None:
             return self.gm_range.allocate()
         else:
             out.fill(self.gm_range.allocate())
     
     def adjoint(self,x, out=None):
+        
+        '''Returns O^{*}(y)'''        
+        
         if out is None:
             return self.gm_domain.allocate()
         else:
             out.fill(self.gm_domain.allocate())
         
     def calculate_norm(self, **kwargs):
-        return 0.
+        
+        '''Evaluates operator norm of ZeroOperator'''
+        
+        return 0
     
-    def domain_geometry(self):       
+    def domain_geometry(self): 
+        
+        '''Returns domain_geometry of ZeroOperator'''
+        
+        
         return self.gm_domain  
         
     def range_geometry(self):
+        
+        '''Returns domain_geometry of ZeroOperator'''
+        
         return self.gm_range

@@ -50,9 +50,11 @@ class Norm2Sq(Function):
         try:
             self.L = 2.0*self.c*(self.A.norm()**2)
         except AttributeError as ae:
-            pass
+            warnings.warn('{} could not calculate Lipschitz Constant. {}'.format(
+                self.__class__.__name__, ae))
         except NotImplementedError as noe:
-            pass
+            warnings.warn('{} could not calculate Lipschitz Constant. {}'.format(
+                self.__class__.__name__, noe))
         
     #def grad(self,x):
     #    return self.gradient(x, out=None)

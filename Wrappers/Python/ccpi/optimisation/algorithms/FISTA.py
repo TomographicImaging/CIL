@@ -73,7 +73,8 @@ class FISTA(Algorithm):
 
         self.f = f
         self.g = g
-
+        if f.L is None:
+            raise ValueError('Error: Fidelity Function\'s Lipschitz constant is set to None')
         self.invL = 1/f.L
         self.t = 1
         self.update_objective()

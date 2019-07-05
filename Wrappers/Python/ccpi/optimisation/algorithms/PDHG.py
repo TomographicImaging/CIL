@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-#========================================================================
 # Copyright 2019 Science Technology Facilities Council
 # Copyright 2019 University of Manchester
 #
@@ -17,10 +16,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-#=========================================================================
 
 from ccpi.optimisation.algorithms import Algorithm
+
 
 
 class PDHG(Algorithm):
@@ -60,37 +58,36 @@ class PDHG(Algorithm):
 
     def __init__(self, **kwargs):
         super(PDHG, self).__init__(max_iteration=kwargs.get('max_iteration',0))
-        self.f        = kwargs.get('f', None)
-        self.operator = kwargs.get('operator', None)
-        self.g        = kwargs.get('g', None)
-        self.tau      = kwargs.get('tau', None)
-        self.sigma    = kwargs.get('sigma', 1.)
-        
-        
-        if self.f is not None and self.operator is not None and \
-           self.g is not None:
-            if self.tau is None:
-                # Compute operator Norm
-                normK = self.operator.norm()
-                # Primal & dual stepsizes
-                self.tau = 1/(self.sigma*normK**2)
-            print ("Calling from creator")
-            self.set_up(self.f,
-                        self.g,
-                        self.operator,
-                        self.tau, 
-                        self.sigma)
+        f        = kwargs.get('f', None)
+        operator = kwargs.get('operator', None)
+        g        = kwargs.get('g', None)
+        tau      = kwargs.get('tau', None)
+        sigma    = kwargs.get('sigma', 1.)
 
-    def set_up(self, f, g, operator, tau = None, sigma = None, opt = None, **kwargs):
+        if f is not None and operator is not None and g is not None:
+            print(self.__class__.__name__ , "set_up called from creator")
+            self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma)
+
+    def set_up(self, f, g, operator, tau=None, sigma=1.):
+
+        # can't happen with default sigma
+        if sigma is None and tau is None:
+            raise ValueError('Need sigma*tau||K||^2<1')
+
         # algorithmic parameters
-        self.operator = operator
         self.f = f
         self.g = g
+        self.operator = operator
+
         self.tau = tau
         self.sigma = sigma
-        self.opt = opt
-        if sigma is None and tau is None:
-            raise ValueError('Need sigma*tau||K||^2<1') 
+
+        if self.tau is None:
+            # Compute operator Norm
+            normK = self.operator.norm()
+            # Primal & dual stepsizes
+            self.tau = 1 / (self.sigma * normK ** 2)
+
 
         self.x_old = self.operator.domain_geometry().allocate()
         self.x_tmp = self.x_old.copy()
@@ -114,15 +111,17 @@ class PDHG(Algorithm):
         self.y_tmp *= self.sigma
         self.y_tmp += self.y_old
 
+        # self.y = self.f.proximal_conjugate(self.y_old, self.sigma)
         self.f.proximal_conjugate(self.y_tmp, self.sigma, out=self.y)
         
         # Gradient descent for the primal variable
         self.operator.adjoint(self.y, out=self.x_tmp)
         self.x_tmp *= -1*self.tau
-        self.x_tmp += self.x_old            
+        self.x_tmp += self.x_old
+
         self.g.proximal(self.x_tmp, self.tau, out=self.x)
 
-        # Over-relaxation step
+        # Update
         self.x.subtract(self.x_old, out=self.xbar)
         self.xbar *= self.theta
         self.xbar += self.x
@@ -136,5 +135,4 @@ class PDHG(Algorithm):
         p1 = self.f(self.operator.direct(self.x)) + self.g(self.x)
         d1 = -(self.f.convex_conjugate(self.y) + self.g.convex_conjugate(-1*self.operator.adjoint(self.y)))
 
-        self.loss.append([p1,d1,p1-d1])
-
+        self.loss.append([p1, d1, p1-d1])

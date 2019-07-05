@@ -330,7 +330,7 @@ class TestAlgorithms(unittest.TestCase):
         fista.run(3000, verbose=True)
         rmse = (fista.get_output() - data).norm() / data.as_array().size
         print ("RMSE", rmse)
-        self.assertLess(rmse, 4e-4)
+        self.assertLess(rmse, 4.2e-4)
 
     def assertNumpyArrayEqual(self, first, second):
         res = True

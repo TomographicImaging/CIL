@@ -120,6 +120,19 @@ In `ccpi.framework` we define a number of common classes normally used in tomogr
  
  The `Algorithm` provides the infrastructure to continue iteration, to access the values of the objective function in subsequent iterations, the time for each iteration. 
  
+ ### Block Framework
+
+Block Framework is a generic strategy to treat variational problems in the following form: `\min \text{Regulariser} + \text{Fidelity} `
+where Regulariser and Fidelity are convex functions. While Fidelity is differentiable Regulariser may not.
+
+We have now a number of algorithms that can address this:
+
+ * GradientDescent
+ * CGLS
+ * SIRT
+ * FISTA
+ * PDHG
+
  #### Examples
  
  Please see the [demos](https://github.com/vais-ral/CIL-Demos) for examples of defining and using operators, functions and algorithms 

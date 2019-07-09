@@ -21,7 +21,6 @@ DataContainer and subclasses
    :members:
 .. autoclass:: ccpi.framework.VectorGeometry
    :members:
-|
 
 Block Framework 
 ===============
@@ -34,7 +33,6 @@ Block Framework
    :private-members:
    :special-members:
 
-|
 DataProcessor
 =============
 .. autoclass:: ccpi.framework.DataProcessor
@@ -46,6 +44,5 @@ DataProcessor
    :members:
 .. autoclass:: ccpi.processors.Resizer
    :members:
-|
 
 :ref:`Return Home <mastertoc>`

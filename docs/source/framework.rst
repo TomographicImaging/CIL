@@ -1,9 +1,15 @@
 Framework 
 *********
-|
+
+``DataContainer`` and subclasses ``AcquisitionData`` and ``ImageData`` are 
+meant to contain data and meta-data in ``AcquisitionGeometry`` and 
+``ImageGeometry`` respectively.
 
 DataContainer and subclasses
 ============================
+
+
+
 .. autoclass:: ccpi.framework.DataContainer
    :members:
    :private-members:
@@ -24,6 +30,11 @@ DataContainer and subclasses
 
 Block Framework 
 ===============
+
+The block framework allows writing complex `optimisation problems`_. These 
+classes are required for it to work. They provide a base class that will 
+behave as normal ``DataContainer``.
+
 .. autoclass:: ccpi.framework.BlockDataContainer
    :members:
    :private-members:
@@ -37,6 +48,8 @@ DataProcessor
 =============
 .. autoclass:: ccpi.framework.DataProcessor
    :members:
+   :no-undoc-members:
+   :special-members:
 
 .. autoclass:: ccpi.processors.CenterOfRotationFinder
    :members:
@@ -46,3 +59,5 @@ DataProcessor
    :members:
 
 :ref:`Return Home <mastertoc>`
+
+.. _optimisation problems: optimisation.html

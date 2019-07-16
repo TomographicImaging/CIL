@@ -67,7 +67,7 @@ class FiniteDiff(LinearOperator):
         outnone = False
         if out is None:
             outnone = True
-            out = self.domain_geometry().allocate()
+            ret = self.domain_geometry().allocate()
             outa = ret.as_array()
         else:
             outa = out.as_array()

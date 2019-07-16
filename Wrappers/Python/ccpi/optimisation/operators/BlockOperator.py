@@ -187,10 +187,11 @@ class BlockOperator(Operator):
                     else:
                         prod += self.get_item(row, col).adjoint(x_b.get_item(row))
                 res.append(prod)
-            if self.shape[1]==1:
-                return ImageData(*res)
-            else:
-                return BlockDataContainer(*res, shape=shape)
+            #if self.shape[1]==1:
+            #    return res[0]
+            #else:
+            #    return BlockDataContainer(*res, shape=shape)
+            return BlockDataContainer(*res, shape=shape)
         else:
 
             for col in range(self.shape[1]):

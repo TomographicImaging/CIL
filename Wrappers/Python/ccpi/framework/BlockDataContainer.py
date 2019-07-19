@@ -111,8 +111,26 @@ class BlockDataContainer(object):
                     a = el.shape == other.shape
                 ret = ret and a
             return ret
+        elif isinstance(other, BlockDataContainer):
             #return self.get_item(0).shape == other.shape
-        return len(self.containers) == len(other.containers)
+            return len(self.containers) == len(other.containers)
+        else:
+            if hasattr(other, 'shape'):
+                ret = True
+                for i, el in enumerate(self.containers):
+                    if isinstance(el, BlockDataContainer):
+                        a = el.is_compatible(other)
+                    else:
+                        a = el.shape == other.shape
+                    print ("el.shape {} other.shape {}".format(el.shape, other.shape))
+                    ret = ret and a
+                print ("hasattr shape", ret)
+                return ret
+            else:
+                raise ValueError('Unexpected input type: expected {}, got {}'
+                    .format(['BlockDataContainer','numpy.ndarray', 
+                        'Number' , 'DataContainer and subclasses' ],
+                        type(other)))
 
     def get_item(self, row):
         if row > self.shape[0]:
@@ -178,9 +196,13 @@ class BlockDataContainer(object):
         This method is not to be used directly
         '''
         if not self.is_compatible(other):
-            raise ValueError('Incompatible for divide')
+            raise ValueError('{} Incompatible for {}'.format(type(other), operation))
         out = kwargs.get('out', None)
-        if isinstance(other, Number) or issubclass(other.__class__, DataContainer):
+        if isinstance(other, Number) or\
+           issubclass(other.__class__, DataContainer) or \
+           ( hasattr(other, 'add') and hasattr(other, 'subtract') and \
+             hasattr(other, 'divide') and hasattr(other, 'multiply') and\
+             hasattr(other, 'power') ):
             # try to do algebra with one DataContainer. Will raise error if not compatible
             kw = kwargs.copy()
             res = []
@@ -240,7 +262,8 @@ class BlockDataContainer(object):
                 return type(self)(*res, shape=self.shape)
             return type(self)(*[ operation(ot, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
         else:
-            raise ValueError('Incompatible type {}'.format(type(other)))
+            raise ValueError('Incompatible type {} for {}'.format(
+                type(other), str(operation)))
     
 
     def power(self, other, *args, **kwargs):

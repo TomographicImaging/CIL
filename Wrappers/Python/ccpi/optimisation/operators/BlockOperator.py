@@ -272,7 +272,7 @@ class BlockOperator(Operator):
         If the shape of the BlockOperator is (N,1) the domain is a ImageGeometry or AcquisitionGeometry.
         Otherwise it is a BlockGeometry.
         '''
-        if self.shape[1] == 1:
+        if self.shape[1] == 1 and False:
             # column BlockOperator
             return self.get_item(0,0).domain_geometry()
         else:

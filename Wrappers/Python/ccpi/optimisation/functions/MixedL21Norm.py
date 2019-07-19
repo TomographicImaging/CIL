@@ -46,10 +46,15 @@ class MixedL21Norm(Function):
         if not isinstance(x, BlockDataContainer):
             raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 
                                          
-        tmp = [ el**2 for el in x.containers ]
-        res = sum(tmp).sqrt().sum()
+        tmp = [ el.power(2) for el in x.containers ]
+        #res = sum(tmp)
+        res = tmp[0]
+        for i in range(len(tmp)-1):
+            res += tmp[i]
+        
+        
+        return res.sqrt().sum()
 
-        return res
                             
     def gradient(self, x, out=None):
         return ValueError('Not Differentiable')

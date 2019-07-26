@@ -20,6 +20,7 @@
 from ccpi.optimisation.algorithms import Algorithm
 from ccpi.optimisation.functions import ZeroFunction
 import numpy
+from numbers import Number
 
 class ADMM(Algorithm):
     
@@ -58,17 +59,58 @@ class ADMM(Algorithm):
         super(ADMM, self).__init__()
 
         self.x_init = kwargs.get('x_init', None)
-        self.tau = kwargs.get('tau', -1.)
+        tau_f = kwargs.get('tau_f', -1.)
+        tau_g = kwargs.get('tau_g', -1.)
         f = kwargs.get('f', None)
         g = kwargs.get('g', None)
 
-        if self.x_init is not None and self.tau > 0. and \
+        if self.x_init is not None and \
+            tau_f > 0. and tau_g > 0. and \
             f is not None and g is not None:
-            print (self.__name__ , 'set_up called from creator.')
-            self.set_up(x_init, tau, f, g)
-
-    def set_up(self, x_init, tau, f, g,  **kwargs):
+            print (self.__class__.__name__ , 'set_up called from creator.')
+            self.set_up(self.x_init, f, g, tau_f, tau_g)
+    def check_tau(self, tau):
+        if isinstance(tau, Number):
+            if tau < 0. :
+                raise ValueError('Tau is expected to be positive. Got', tau)
+        else:
+            raise TypeError('Tau is expected to be a number. Got', type(tau))
+        return tau
+    def set_up(self, x_init, f, g, tau_f, tau_g,  **kwargs):
+        self.tau_f = self.check_tau(tau_f)
+        self.tau_g = self.check_tau(tau_g)
+        self.f = f
+        self.g = g
+        
+        # allocate memory
         self.u = x_init * 0.
         self.y = x_init.copy()
+        self.x = x_init.copy()
+        self.x_previous = x_init.copy()
+        self.v = self.x.add(self.u)
+        self.g.proximal(self.v, self.tau_g, out=self.v)
+
+        
+        self.update_objective()
+        self.configured = True
+
+    def update(self):
+        # update solution
+        # x_{k+1} = prox_tf (v_k -u_k)
+        self.v -= self.u
+        self.f.proximal(self.v, self.tau_f, out=self.x)
+
+        # v_{k+1} = prox_tg (x_{k+1} +u_k)
+        self.x.add(self.u, out = self.v)
+        self.g.proximal(self.v, self.tau_g, out=self.v)
+
+        # u_{k+1} = u_k + x_{k+1} -v_{k+1}
+        self.u += self.x
+        self.u -= self.v
+
+        self.x_previous.fill(self.x)
+
+
 
     def update_objective(self):
+        self.loss.append( self.f(self.x) + self.g(self.x) )

@@ -471,7 +471,19 @@ class BlockDataContainer(object):
         tmp = [ self.containers[i].dot(other.containers[i]) for i in range(self.shape[0])]
         return sum(tmp)
     
-       
+    @staticmethod
+    def assert_almost_equal(container1, container2):
+        print ("assert Block Data Container Equal")
+        assert (issubclass(container1.__class__, container2.__class__))
+        for col in range(container1.shape[0]):
+            if issubclass(container1.get_item(col).__class__, DataContainer):
+                print ("Checking col ", col)
+                numpy.testing.assert_array_almost_equal(
+                    container1.get_item(col).as_array(), 
+                    container2.get_item(col).as_array()
+                    )
+            else:
+                return BlockDataContainer.assert_almost_equal(container1.get_item(col),container2.get_item(col))
     
 if __name__ == '__main__':
     

@@ -22,7 +22,8 @@
 
 from ccpi.optimisation.functions import Function
 from ccpi.optimisation.functions import ScaledFunction
-
+from ccpi.framework import DataContainer, BlockDataContainer
+import numpy
 
 class FunctionOperatorComposition(Function):
     
@@ -39,7 +40,32 @@ class FunctionOperatorComposition(Function):
         
         self.function = function     
         self.operator = operator
-        self.L = function.L * operator.norm()**2 
+
+        # test operator ortogonality
+        y = operator.range_geometry().allocate('random')
+        v = operator.direct(operator.adjoint(y))
+        #y = operator.domain_geometry().allocate('random')
+        #v = operator.adjoint(operator.direct(y))
+        
+        try:
+            a = v/y
+                
+            if issubclass(y.__class__, DataContainer):
+                numpy.testing.assert_array_almost_equal(numpy.ones(v.shape) * a.as_array().flat[0], v.as_array())
+            elif isinstance (y, BlockDataContainer):
+                for i in range(a.shape[0]):
+                    numpy.testing.assert_array_almost_equal(
+                        numpy.ones(v.get_item(i).shape) * a.get_item(0).as_array().flat[0], v.get_item(0).as_array())
+                
+            self.operator_is_orthogonal = True
+            print ("Operator is orthogonal")
+        except AssertionError as ae:
+            self.operator_is_orthogonal = False
+        try:
+            self.L = function.L * operator.norm()**2 
+        except AttributeError as ae:
+            print (ae)
+            pass
         
         
     def __call__(self, x):
@@ -63,6 +89,37 @@ class FunctionOperatorComposition(Function):
             self.operator.direct(x, out=tmp)
             self.function.gradient(tmp, out=tmp)
             self.operator.adjoint(tmp, out=out)
+
+    def proximal(self, x, tau, out=None):
+        
+        '''Evaluates proximal of f(Ax):
+
+        http://proximity-operator.net/proximityoperator.html
+        
+        ..math ::  
+          \psi(Ax+b) \texttt{with} A A^*=\nu \, {\rm Id}
+          x + \dfrac{1}{\nu} A^*\left( \texttt{prox}_{\nu\gamma\psi}(Ax+b) - Ax - b \right)
+            
+        '''
+        if self.operator_is_orthogonal:
+            nu = numpy.sqrt(self.operator.norm())
+            tau_f = tau * nu 
+            if out is None:
+                Ax = self(x)
+                return self.operator.adjoint(
+                    (self.function.proximal(Ax, tau_f) - Ax)
+                    ) / nu + x
+            else: 
+                Ax = self.operator.range_geometry().allocate()
+                self.operator.direct(x, out=Ax)
+                self.function.proximal(Ax, tau=tau_f, out=out)
+                out -= Ax
+                
+                self.operator.adjoint(out, out=out)
+                out /= nu
+                out += x
+        else:
+            return NotImplementedError('Operator is not orthogonal')
 
     
 

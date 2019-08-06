@@ -35,7 +35,6 @@ class PDHG(Algorithm):
         g        = kwargs.get('g', None)
         tau      = kwargs.get('tau', None)
         sigma    = kwargs.get('sigma', 1.)
-        acceleration = kwargs.get('acceleration',off)
 
         if f is not None and operator is not None and g is not None:
             print(self.__class__.__name__ , "set_up called from creator")

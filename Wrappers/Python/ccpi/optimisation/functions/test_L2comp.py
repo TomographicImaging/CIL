@@ -20,7 +20,7 @@ from ccpi.optimisation.functions import Function
 from ccpi.optimisation.functions.ScaledFunction import ScaledFunction
 from ccpi.optimisation.functions import FunctionOperatorComposition
 
-class L2NormSquared(Function):
+class testL2NormSquared(Function):
     
     '''
             
@@ -32,15 +32,14 @@ class L2NormSquared(Function):
     
     def __init__(self, **kwargs):
                                 
-        super(L2NormSquared, self).__init__()
+        super(testL2NormSquared, self).__init__()
         self.b = kwargs.get('b',None)  
         self.L = 2
-        
-        
-    @property
-    def strongly_convex(self):
-        return True
 
+    def composition(self, operator):
+        
+        return FunctionOperatorComposition(self,operator)
+    
     def __call__(self, x):
         
         ''' Evaluate L2NormSquared at x: f(x) '''
@@ -143,11 +142,6 @@ class L2NormSquared(Function):
         return ScaledFunction(self, scalar)  
 
 
-    def composition(self, operator):
-        
-        return FunctionOperatorComposition(operator)
-    
-    
 
       
 
@@ -155,6 +149,7 @@ class L2NormSquared(Function):
 if __name__ == '__main__':
     
     from ccpi.framework import ImageGeometry
+    from ccpi.optimisation.functions import L2NormSquared
     import numpy
     # TESTS for L2 and scalar * L2
     
@@ -290,4 +285,17 @@ if __name__ == '__main__':
     
     numpy.testing.assert_array_almost_equal(res1.as_array(), \
                                             res2.as_array(), decimal=4)
+    
+    
+    
+    from ccpi.optimisation.operators import Identity
+    
+    f1 = 0.5 * testL2NormSquared(b=b).composition(Identity(ig))
+
+    
+    
+    
+    
+    
+    
                                             

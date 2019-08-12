@@ -339,8 +339,6 @@ class TestData(object):
 if __name__ == '__main__':
     
     import matplotlib.pyplot as plt
-    # import TestData and recover geometry
-#    from ccpi.framework import TestData
     import os, sys
     import numpy as np
 

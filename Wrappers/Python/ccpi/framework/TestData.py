@@ -15,7 +15,7 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-from ccpi.framework import ImageData, ImageGeometry, DataContainer
+from ccpi.framework import ImageGeometry, DataContainer
 import numpy
 import numpy as np
 from PIL import Image
@@ -41,54 +41,59 @@ class TestData(object):
     CAMERA = 'camera.png'
     PEPPERS = 'peppers.tiff'
     RESOLUTION_CHART = 'resolution_chart.tiff'
-    SIMPLE_PHANTOM_2D = 'hotdog'
+    SIMPLE_PHANTOM_2D = '2rectangles'
     SHAPES =  'shapes.png'
     
     '''
+        
     BOAT = 'boat.tiff'
     CAMERA = 'camera.png'
     PEPPERS = 'peppers.tiff'
     RESOLUTION_CHART = 'resolution_chart.tiff'
-    SIMPLE_PHANTOM_2D = 'hotdog'
+    SIMPLE_PHANTOM_2D = '2rectangles'
     SHAPES =  'shapes.png'
     
     def __init__(self, **kwargs):
         self.data_dir = kwargs.get('data_dir', data_dir)
         
-    def load(self, which, size=(512,512), scale=(0,1), **kwargs):
+    def load(self, which, size=(512, 512), scale=(0,1), **kwargs):
         if which not in [TestData.BOAT, TestData.CAMERA, 
                          TestData.PEPPERS, TestData.RESOLUTION_CHART,
                          TestData.SIMPLE_PHANTOM_2D, TestData.SHAPES]:
             raise ValueError('Unknown TestData {}.'.format(which))
+            
         if which == TestData.SIMPLE_PHANTOM_2D:
             N = size[0]
             M = size[1]
             sdata = numpy.zeros((N, M))
             sdata[int(round(N/4)):int(round(3*N/4)), int(round(N/4)):int(round(3*N/4))] = 0.5
             sdata[int(round(M/8)):int(round(7*M/8)), int(round(3*M/8)):int(round(5*M/8))] = 1
-            ig = ImageGeometry(voxel_num_x = N, voxel_num_y = M, dimension_labels=[ImageGeometry.HORIZONTAL_X, ImageGeometry.HORIZONTAL_Y])
+            ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageGeometry.LABEL_Y, ImageGeometry.LABEL_X])
             data = ig.allocate()
             data.fill(sdata)
             
         elif which == TestData.SHAPES:
-            
-            tmp = numpy.array(Image.open(os.path.join(self.data_dir, which)).convert('L'))
+                   
+            # Default size
             N = 200
-            M = 300   
-            ig = ImageGeometry(voxel_num_x = N, voxel_num_y = M, dimension_labels=[ImageGeometry.HORIZONTAL_X, ImageGeometry.HORIZONTAL_Y])
+            M = 300
+            
+            tmp = numpy.array(Image.open(os.path.join(self.data_dir, which)).convert('L').resize(size))
+            N, M = tmp.shape
+            ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageGeometry.LABEL_Y, ImageGeometry.LABEL_X])
             data = ig.allocate()
             data.fill(tmp/numpy.max(tmp))
             
         else:
+            
             tmp = Image.open(os.path.join(self.data_dir, which))
-            print (tmp)
             bands = tmp.getbands()
             if len(bands) > 1:
-                ig = ImageGeometry(voxel_num_x=size[0], voxel_num_y=size[1], channels=len(bands), 
-                dimension_labels=[ImageGeometry.HORIZONTAL_X, ImageGeometry.HORIZONTAL_Y, ImageGeometry.CHANNEL])
+                ig = ImageGeometry(voxel_num_x=size[1], voxel_num_y=size[0], channels=len(bands), 
+                dimension_labels=[ImageGeometry.LABEL_Y, ImageGeometry.LABEL_X, ImageGeometry.CHANNEL])
                 data = ig.allocate()
             else:
-                ig = ImageGeometry(voxel_num_x = size[0], voxel_num_y = size[1], dimension_labels=[ImageGeometry.HORIZONTAL_X, ImageGeometry.HORIZONTAL_Y])
+                ig = ImageGeometry(voxel_num_x = size[1], voxel_num_y = size[0], dimension_labels=[ImageGeometry.LABEL_Y, ImageGeometry.LABEL_X])
                 data = ig.allocate()
             data.fill(numpy.array(tmp.resize((size[1],size[0]))))
             if scale is not None:
@@ -100,9 +105,9 @@ class TestData(object):
                     #data = (data-dmin)/(dmax-dmin) * (scale[1]-scale[0]) +scale[0])
                     data *= (scale[1]-scale[0])
                     data += scale[0]
-        print ("data.geometry", data.geometry)
         return data
-
+                
+    
     @staticmethod
     def random_noise(image, mode='gaussian', seed=None, clip=True, **kwargs):
         '''Function to add noise to input image
@@ -335,3 +340,34 @@ class TestData(object):
             out = np.clip(out, low_clip, 1.0)
 
         return out
+    
+    
+if __name__ == '__main__':
+    
+    import matplotlib.pyplot as plt
+    # import TestData and recover geometry
+#    from ccpi.framework import TestData
+    import os, sys
+    import numpy as np
+
+    loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
+    
+    data = loader.load(TestData.PEPPERS, size=(100,200))
+    ig2 = data.geometry
+    
+    print(ig2)
+    
+    plt.imshow(data.as_array())
+    plt.show()
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    

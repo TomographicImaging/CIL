@@ -27,6 +27,8 @@ import warnings
 from functools import reduce
 from numbers import Number
 
+from PIL import Image
+
 def find_key(dic, val):
     """return the key of dictionary dic given the value"""
     return [k for k, v in dic.items() if v == val][0]
@@ -46,9 +48,14 @@ class ImageGeometry(object):
     RANDOM_INT = 'random_int'
     CHANNEL = 'channel'
     ANGLE = 'angle'
-    VERTICAL = 'vertical'
-    HORIZONTAL_X = 'horizontal_x'
-    HORIZONTAL_Y = 'horizontal_y'
+    
+    LABEL_Z = 'z'
+    LABEL_X = 'x'
+    LABEL_Y = 'y'    
+    
+#    VERTICAL = 'vertical'
+#    HORIZONTAL_X = 'horizontal_x'
+#    HORIZONTAL_Y = 'horizontal_y'
     
     def __init__(self, 
                  voxel_num_x=0, 
@@ -79,22 +86,30 @@ class ImageGeometry(object):
             if self.voxel_num_z>1:
                 self.length = 4
                 shape = (self.channels, self.voxel_num_z, self.voxel_num_y, self.voxel_num_x)
-                dim_labels = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL,
-                ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+                dim_labels = [ImageGeometry.CHANNEL, ImageGeometry.LABEL_Z,
+                ImageGeometry.LABEL_Y, ImageGeometry.LABEL_X]
+                self.voxel_size_order =[self.voxel_size_z, self.voxel_size_y, self.voxel_size_x]
+                self.center_order = [self.center_z, self.center_y, self.center_x]
             else:
                 self.length = 3
                 shape = (self.channels, self.voxel_num_y, self.voxel_num_x)
-                dim_labels = [ImageGeometry.CHANNEL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+                dim_labels = [ImageGeometry.CHANNEL, ImageGeometry.LABEL_Y, ImageGeometry.LABEL_X]
+                self.voxel_size_order =[self.voxel_size_y, self.voxel_size_x]
+                self.center_order = [self.center_y, self.center_x]
         else:
             if self.voxel_num_z>1:
                 self.length = 3
                 shape = (self.voxel_num_z, self.voxel_num_y, self.voxel_num_x)
-                dim_labels = [ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y,
-                 ImageGeometry.HORIZONTAL_X]
+                dim_labels = [ImageGeometry.LABEL_Z, ImageGeometry.LABEL_Y,
+                 ImageGeometry.LABEL_X]
+                self.voxel_size_order =[self.voxel_size_z, self.voxel_size_y, self.voxel_size_x]
+                self.center_order = [self.center_z, self.center_y, self.center_x]
             else:
                 self.length = 2  
                 shape = (self.voxel_num_y, self.voxel_num_x)
-                dim_labels = [ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+                dim_labels = [ImageGeometry.LABEL_Y, ImageGeometry.LABEL_X]
+                self.voxel_size_order = [self.voxel_size_y, self.voxel_size_x]
+                self.center_order = [self.center_y, self.center_x]
         
         labels = kwargs.get('dimension_labels', None)
         if labels is None:
@@ -155,12 +170,23 @@ class ImageGeometry(object):
                             self.center_z, 
                             self.channels)
     def __str__ (self):
+        
         repres = ""
         repres += "Number of channels: {0}\n".format(self.channels)
-        repres += "voxel_num : x{0},y{1},z{2}\n".format(self.voxel_num_x, self.voxel_num_y, self.voxel_num_z)
-        repres += "voxel_size : x{0},y{1},z{2}\n".format(self.voxel_size_x, self.voxel_size_y, self.voxel_size_z)
-        repres += "center : x{0},y{1},z{2}\n".format(self.center_x, self.center_y, self.center_z)
-        return repres
+        repres += "voxel_num : {} = {}\n".format(self.dimension_labels, self.shape)
+        repres += "voxel_size : {}\n".format(self.voxel_size_order)
+        repres += "center : {}".format(self.center_order) 
+        return repres        
+                
+#        repres = ""
+#        repres += "Number of channels: {0}\n".format(self.channels)
+#        repres += "voxel_num : x{0},y{1},z{2}\n".format(self.voxel_num_x, self.voxel_num_y, self.voxel_num_z)
+#        repres += "voxel_size : x{0},y{1},z{2}\n".format(self.voxel_size_x, self.voxel_size_y, self.voxel_size_z)
+#        repres += "center : x{0},y{1},z{2}\n".format(self.center_x, self.center_y, self.center_z)
+#        return repres
+    
+    
+    
     def allocate(self, value=0, dimension_labels=None, **kwargs):
         '''allocates an ImageData according to the size expressed in the instance'''
         if dimension_labels is None:
@@ -892,16 +918,16 @@ class ImageData(DataContainer):
                 if dimension_labels is None:
                     if array.ndim == 4:
                         dimension_labels = [ImageGeometry.CHANNEL, 
-                                            ImageGeometry.VERTICAL,
-                                            ImageGeometry.HORIZONTAL_Y,
-                                            ImageGeometry.HORIZONTAL_X]
+                                            ImageGeometry.LABEL_Z,
+                                            ImageGeometry.LABEL_Y,
+                                            ImageGeometry.LABEL_X]
                     elif array.ndim == 3:
-                        dimension_labels = [ImageGeometry.VERTICAL,
-                                            ImageGeometry.HORIZONTAL_Y,
-                                            ImageGeometry.HORIZONTAL_X]
+                        dimension_labels = [ImageGeometry.LABEL_Z,
+                                            ImageGeometry.LABEL_Y,
+                                            ImageGeometry.LABEL_X]
                     else:
-                        dimension_labels = [ ImageGeometry.HORIZONTAL_Y,
-                                             ImageGeometry.HORIZONTAL_X]   
+                        dimension_labels = [ ImageGeometry.LABEL_Y,
+                                             ImageGeometry.LABEL_X]   
                 
                 #DataContainer.__init__(self, array, deep_copy, dimension_labels, **kwargs)
                 super(ImageData, self).__init__(array, deep_copy, 
@@ -937,24 +963,24 @@ class ImageData(DataContainer):
                 if vert > 1:
                     shape = (channels, vert, horiz_y, horiz_x)
                     dim_labels = [ImageGeometry.CHANNEL, 
-                                  ImageGeometry.VERTICAL,
-                                  ImageGeometry.HORIZONTAL_Y,
-                                  ImageGeometry.HORIZONTAL_X]
+                                  ImageGeometry.LABEL_Z,
+                                  ImageGeometry.LABEL_Y,
+                                  ImageGeometry.LABEL_X]
                 else:
                     shape = (channels , horiz_y, horiz_x)
                     dim_labels = [ImageGeometry.CHANNEL,
-                                  ImageGeometry.HORIZONTAL_Y,
-                                  ImageGeometry.HORIZONTAL_X]
+                                  ImageGeometry.LABEL_Y,
+                                  ImageGeometry.LABEL_X]
             else:
                 if vert > 1:
                     shape = (vert, horiz_y, horiz_x)
-                    dim_labels = [ImageGeometry.VERTICAL,
-                                  ImageGeometry.HORIZONTAL_Y,
-                                  ImageGeometry.HORIZONTAL_X]
+                    dim_labels = [ImageGeometry.LABEL_Z,
+                                  ImageGeometry.LABEL_Y,
+                                  ImageGeometry.LABEL_X]
                 else:
                     shape = (horiz_y, horiz_x)
-                    dim_labels = [ImageGeometry.HORIZONTAL_Y,
-                                  ImageGeometry.HORIZONTAL_X]
+                    dim_labels = [ImageGeometry.LABEL_Y,
+                                  ImageGeometry.LABEL_X]
             dimension_labels = dim_labels
         else:
             shape = []
@@ -962,11 +988,11 @@ class ImageData(DataContainer):
                 dim = dimension_labels[i]
                 if dim == ImageGeometry.CHANNEL:
                     shape.append(channels)
-                elif dim == ImageGeometry.HORIZONTAL_Y:
+                elif dim == ImageGeometry.LABEL_Y:
                     shape.append(horiz_y)
-                elif dim == ImageGeometry.VERTICAL:
+                elif dim == ImageGeometry.LABEL_Z:
                     shape.append(vert)
-                elif dim == ImageGeometry.HORIZONTAL_X:
+                elif dim == ImageGeometry.LABEL_X:
                     shape.append(horiz_x)
             if len(shape) != len(dimension_labels):
                 raise ValueError('Missing {0} axes {1} shape {2}'.format(
@@ -974,8 +1000,8 @@ class ImageData(DataContainer):
             shape = tuple(shape)
             
         return (shape, dimension_labels)
-                            
-
+            
+    
 class AcquisitionData(DataContainer):
     '''DataContainer for holding 2D or 3D sinogram'''
     __container_priority__ = 1

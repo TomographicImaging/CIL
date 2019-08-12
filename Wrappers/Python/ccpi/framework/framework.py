@@ -28,6 +28,7 @@ from functools import reduce
 from numbers import Number
 
 from PIL import Image
+from skimage.transform import resize
 
 def find_key(dic, val):
     """return the key of dictionary dic given the value"""
@@ -1000,8 +1001,27 @@ class ImageData(DataContainer):
             shape = tuple(shape)
             
         return (shape, dimension_labels)
-            
     
+    def resize(self, size):
+        
+        tmp = resize(self.as_array(), size, order=1, mode='reflect', cval=0, clip=True, preserve_range=False, anti_aliasing=True, anti_aliasing_sigma=None)        
+        return ImageData(tmp)
+    
+    def togray(self):
+                
+        tmp = self.as_array()    
+        tmp[..., 0] *= 0.2126
+        tmp[..., 1] *= 0.7152
+        tmp[..., 2] *= 0.0722
+        tmp = ImageData(numpy.sum(tmp, axis=2))
+        
+        return tmp  
+
+    def rescale(self):
+
+        tmp = self.as_array()
+        return ImageData(tmp/numpy.max(tmp))           
+        
 class AcquisitionData(DataContainer):
     '''DataContainer for holding 2D or 3D sinogram'''
     __container_priority__ = 1
@@ -1510,4 +1530,9 @@ if __name__ == '__main__':
 #        self.assertTrue(False)
 #    except ValueError as ve:
 #        self.assertTrue(True)
+    
+
+    
+    
+    
     

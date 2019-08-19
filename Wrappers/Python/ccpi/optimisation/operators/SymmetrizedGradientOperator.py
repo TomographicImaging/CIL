@@ -58,10 +58,18 @@ class SymmetrizedGradient(Gradient):
         
         self.FD = FiniteDiff(self.gm_domain, direction = 0, bnd_cond = self.bnd_cond)
         
-        if self.gm_domain.shape[0]==2:
+        tmp_sh = self.gm_domain.shape[0]
+        if tmp_sh==2:
             self.order_ind = [0,2,1,3]
+        elif tmp_sh==3:
+            self.order_ind = [0,3,6,1,4,7,2,5,8]     
+        elif tmp_sh==4:
+            self.order_ind = [0,4,8,12,
+                              1,5,9,13,
+                              2,6,10,14,
+                              3,7,11,15]
         else:
-            self.order_ind = [0,3,6,1,4,7,2,5,8]            
+            print(" Not the correct dimension ")          
                 
         
     def direct(self, x, out=None):

@@ -72,7 +72,10 @@ class MixedL21Norm(Function):
            
            .. math:: prox_{\tau * f(x)
         '''
-        pass
+        res1 = functools.reduce(lambda a,b: a + b*b, x.containers, x.get_item(0) * 0 ).sqrt()
+        res = (res1 - tau).maximum(0)
+        tmp = [el * res/res1 for el in x.containers]
+        return BlockDataContainer(*tmp) 
     
     def proximal_conjugate(self, x, tau, out=None): 
         

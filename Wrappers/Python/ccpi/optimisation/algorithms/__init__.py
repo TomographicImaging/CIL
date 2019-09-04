@@ -22,4 +22,5 @@ from .SIRT import SIRT
 from .GradientDescent import GradientDescent
 from .FISTA import FISTA
 from .PDHG import PDHG
+from .ADMM_linearized import ADMM_linearized
 

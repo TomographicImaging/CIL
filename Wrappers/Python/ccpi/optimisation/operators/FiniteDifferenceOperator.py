@@ -66,7 +66,9 @@ class FiniteDiff(LinearOperator):
         x_sz = len(x.shape)
         
         if out is None:        
-            out = np.zeros_like(x_asarr)
+            res = x * 0
+            #out = np.zeros_like(x_asarr)
+            out = res.as_array()
         else:
             out = out.as_array()
             out[:]=0
@@ -180,7 +182,9 @@ class FiniteDiff(LinearOperator):
             raise NotImplementedError                
          
 #        res = out #/self.voxel_size 
-        return type(x)(out)
+        #return type(x)(out)
+        res.fill(out)
+        return res
 
                     
     def adjoint(self, x, out=None):
@@ -189,7 +193,9 @@ class FiniteDiff(LinearOperator):
         x_sz = len(x.shape)
         
         if out is None:        
-            out = np.zeros_like(x_asarr)
+            #out = np.zeros_like(x_asarr)
+            res = x * 0
+            out = res.as_array()
         else:
             out = out.as_array()        
             out[:]=0
@@ -319,7 +325,9 @@ class FiniteDiff(LinearOperator):
             raise NotImplementedError
             
         out *= -1 #/self.voxel_size
-        return type(x)(out)
+        #return type(x)(out)
+        res.fill(out)
+        return res
             
     def range_geometry(self):
         

@@ -70,6 +70,7 @@ class FiniteDiff(LinearOperator):
             #out = np.zeros_like(x_asarr)
             out = res.as_array()
         else:
+            res = out
             out = out.as_array()
             out[:]=0
                   
@@ -197,6 +198,7 @@ class FiniteDiff(LinearOperator):
             res = x * 0
             out = res.as_array()
         else:
+            res = out
             out = out.as_array()        
             out[:]=0
 

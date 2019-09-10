@@ -26,6 +26,12 @@ import functools
 from ccpi.framework import DataContainer
 #from ccpi.framework import AcquisitionData, ImageData
 #from ccpi.optimisation.operators import Operator, LinearOperator
+
+try:
+    from sirf import DataContainer as SIRFDataContainer
+    has_sirf = True
+except ImportError as ie:
+    has_sirf = False
  
 class BlockDataContainer(object):
     '''Class to hold DataContainers as column vector
@@ -111,6 +117,19 @@ class BlockDataContainer(object):
                     a = el.shape == other.shape
                 ret = ret and a
             return ret
+        elif has_sirf and issubclass(other.__class__, SIRFDataContainer):
+            # test as above
+            ret = True
+            for i, el in enumerate(self.containers):
+                if isinstance(el, BlockDataContainer):
+                    a = el.is_compatible(other)
+                else:
+                    a = el.shape == other.shape
+                ret = ret and a
+            return ret
+
+        else:
+            raise TypeError('Unsupported type. Expected number, numpy array, CIL DataContainer and subclass or SIRF DataContainer and subclasses. Got {}'. format(type(other)))
             #return self.get_item(0).shape == other.shape
         return len(self.containers) == len(other.containers)
 

@@ -127,11 +127,12 @@ class BlockDataContainer(object):
                     a = el.shape == other.shape
                 ret = ret and a
             return ret
+        elif isinstance(other, BlockDataContainer): 
+            return len(self.containers) == len(other.containers)
 
         else:
             raise TypeError('Unsupported type. Expected number, numpy array, CIL DataContainer and subclass or SIRF DataContainer and subclasses. Got {}'. format(type(other)))
             #return self.get_item(0).shape == other.shape
-        return len(self.containers) == len(other.containers)
 
     def get_item(self, row):
         if row > self.shape[0]:

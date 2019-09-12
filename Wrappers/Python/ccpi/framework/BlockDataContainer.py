@@ -28,7 +28,8 @@ from ccpi.framework import DataContainer
 #from ccpi.optimisation.operators import Operator, LinearOperator
 
 try:
-    from sirf import DataContainer as SIRFDataContainer
+    from sirf import SIRF
+    from sirf.SIRF import DataContainer as SIRFDataContainer
     has_sirf = True
 except ImportError as ie:
     has_sirf = False
@@ -117,7 +118,8 @@ class BlockDataContainer(object):
                     a = el.shape == other.shape
                 ret = ret and a
             return ret
-        elif has_sirf and issubclass(other.__class__, SIRFDataContainer):
+        elif has_sirf and \
+                issubclass(other.__class__, SIRFDataContainer ):
             # test as above
             ret = True
             for i, el in enumerate(self.containers):
@@ -259,6 +261,33 @@ class BlockDataContainer(object):
             else:
                 return type(self)(*res, shape=self.shape)
             return type(self)(*[ operation(ot, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
+        elif has_sirf and ( isinstance(other, Number) or \
+                issubclass(other.__class__, SIRFDataContainer ) ) :
+            # try to do algebra with one DataContainer. Will raise error if not compatible
+            kw = kwargs.copy()
+            res = []
+            for i,el in enumerate(self.containers):
+                if operation == BlockDataContainer.ADD:
+                    op = el.add
+                elif operation == BlockDataContainer.SUBTRACT:
+                    op = el.subtract
+                elif operation == BlockDataContainer.MULTIPLY:
+                    op = el.multiply
+                elif operation == BlockDataContainer.DIVIDE:
+                    op = el.divide
+                elif operation == BlockDataContainer.POWER:
+                    op = el.power
+                else:
+                    raise ValueError('Unsupported operation', operation)
+                if out is not None:
+                    kw['out'] = out.get_item(i)
+                    op(other, *args, **kw)
+                else:
+                    res.append(op(other, *args, **kw))
+            if out is not None:
+                return
+            else:
+                return type(self)(*res, shape=self.shape)
         else:
             raise ValueError('Incompatible type {}'.format(type(other)))
     

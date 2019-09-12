@@ -15,7 +15,7 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-
+from __future__ import division
 from ccpi.optimisation.operators import Operator
 import numpy
 
@@ -39,7 +39,7 @@ class LinearOperator(Operator):
         
         # Initialise random
         if x_init is None:
-            x0 = operator.domain_geometry().allocate(type(operator.domain_geometry()).RANDOM_INT)
+            x0 = operator.domain_geometry().allocate('random_int')
         else:
             x0 = x_init.copy()
             

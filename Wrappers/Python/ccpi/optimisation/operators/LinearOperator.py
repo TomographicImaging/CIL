@@ -15,7 +15,12 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
+
+from __future__ import absolute_import
 from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 from ccpi.optimisation.operators import Operator
 import numpy
 
@@ -39,7 +44,7 @@ class LinearOperator(Operator):
         
         # Initialise random
         if x_init is None:
-            x0 = operator.domain_geometry().allocate('random_int')
+            x0 = operator.domain_geometry().allocate('random')
         else:
             x0 = x_init.copy()
             
@@ -51,7 +56,11 @@ class LinearOperator(Operator):
             operator.direct(x0,out=y_tmp)
             operator.adjoint(y_tmp,out=x1)
             x1norm = x1.norm()
-            s[it] = x1.dot(x0) / x0.squared_norm()
+            if hasattr(x0, 'squared_norm'):
+                s[it] = x1.dot(x0) / x0.squared_norm()
+            else:
+                x0norm = x0.norm()
+                s[it] = x1.dot(x0) / (x0norm * x0norm) 
             x1.multiply((1.0/x1norm), out=x0)
         return numpy.sqrt(s[-1]), numpy.sqrt(s), x0
 

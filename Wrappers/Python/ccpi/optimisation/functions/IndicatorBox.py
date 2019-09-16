@@ -49,8 +49,8 @@ class IndicatorBox(Function):
         
         '''Evaluates IndicatorBox at x'''
                 
-        if (numpy.all(x.array>=self.lower) and 
-            numpy.all(x.array <= self.upper) ):
+        if (numpy.all(x.as_array()>=self.lower) and 
+            numpy.all(x.as_array() <= self.upper) ):
             val = 0
         else:
             val = numpy.inf

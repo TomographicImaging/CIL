@@ -44,8 +44,9 @@ class KullbackLeibler(Function):
         
         super(KullbackLeibler, self).__init__()
         
-        self.b = data    
-        self.bnoise = 0
+        self.b = data  
+        self.bnoise = kwargs.get('bnoise',data.allocate())
+        #self.bnoise = 0
         
                                                     
     def __call__(self, x):
@@ -132,7 +133,7 @@ class KullbackLeibler(Function):
             
             self.b.multiply(4*tau, out=out)    
             
-            out.add((tmp)**2, out=out)
+            out.add(tmp.power(2), out=out)
             out.sqrt(out=out)
             out *= -1
             tmp += 2

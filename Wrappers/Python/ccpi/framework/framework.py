@@ -335,7 +335,7 @@ class AcquisitionGeometry(object):
         repres += "distance center-detector: {0}\n".format(self.dist_source_center)
         repres += "number of channels: {0}\n".format(self.channels)
         return repres
-    def allocate(self, value=0, dimension_labels=None):
+    def allocate(self, value=0, dimension_labels=None, **kwargs):
         '''allocates an AcquisitionData according to the size expressed in the instance'''
         if dimension_labels is None:
             out = AcquisitionData(geometry=self, dimension_labels=self.dimension_labels)

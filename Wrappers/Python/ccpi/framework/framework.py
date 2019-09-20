@@ -153,7 +153,8 @@ class ImageGeometry(object):
                             self.center_x, 
                             self.center_y, 
                             self.center_z, 
-                            self.channels)
+                            self.channels,
+                            dimension_labels=self.dimension_labels)
     def __str__ (self):
         repres = ""
         repres += "Number of channels: {0}\n".format(self.channels)
@@ -322,7 +323,8 @@ class AcquisitionGeometry(object):
                                    self.pixel_size_v, 
                                    self.dist_source_center, 
                                    self.dist_center_detector, 
-                                   self.channels)
+                                   self.channels,
+                                   dimension_labels=self.dimension_labels)
         
     def __str__ (self):
         repres = ""

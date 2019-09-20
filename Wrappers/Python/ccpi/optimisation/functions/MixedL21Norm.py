@@ -60,9 +60,6 @@ class MixedL21Norm(Function):
         
         return 0.0
         
-        #tmp = [ el**2 for el in x.containers ]
-        #print(sum(tmp).sqrt().as_array().max())
-        #return sum(tmp).sqrt().as_array().max()
     
     def proximal(self, x, tau, out=None):
         
@@ -92,18 +89,13 @@ class MixedL21Norm(Function):
             frac = [el/res for el in x.containers]
             return  BlockDataContainer(*frac)   
         
-            
-        #TODO this is slow, why???
-#                return x.divide(x.pnorm().maximum(1.0))
+    
         else:
                             
             res1 = functools.reduce(lambda a,b: a + b*b, x.containers, x.get_item(0) * 0 )
             res = res1.sqrt().maximum(1.0)
             x.divide(res, out=out)
             
-#                x.divide(sum([el*el for el in x.containers]).sqrt().maximum(1.0), out=out)
-            #TODO this is slow, why ???
-#                 x.divide(x.pnorm().maximum(1.0), out=out)
                               
 
     def __rmul__(self, scalar):

@@ -266,29 +266,22 @@ class AcquisitionGeometry(object):
         self.angle_unit=kwargs.get(AcquisitionGeometry.ANGLE_UNIT, 
                                AcquisitionGeometry.DEGREE)
 
-                # default labels
+        # default labels
         if channels > 1:
             if pixel_num_v > 1:
-                shape = (channels,  pixel_num_v, num_of_angles , pixel_num_h)
+                shape = (channels, num_of_angles , pixel_num_v, pixel_num_h)
                 dim_labels = [AcquisitionGeometry.CHANNEL ,
-                 AcquisitionGeometry.VERTICAL, AcquisitionGeometry.ANGLE ,
-                 AcquisitionGeometry.HORIZONTAL]               
-#                shape = (channels, num_of_angles , pixel_num_v, pixel_num_h)
-#                dim_labels = [AcquisitionGeometry.CHANNEL ,
-#                 AcquisitionGeometry.ANGLE , AcquisitionGeometry.VERTICAL ,
-#                 AcquisitionGeometry.HORIZONTAL]
+                 AcquisitionGeometry.ANGLE , AcquisitionGeometry.VERTICAL ,
+                 AcquisitionGeometry.HORIZONTAL]
             else:
                 shape = (channels , num_of_angles, pixel_num_h)
                 dim_labels = [AcquisitionGeometry.CHANNEL ,
                  AcquisitionGeometry.ANGLE, AcquisitionGeometry.HORIZONTAL]
         else:
-            if pixel_num_v > 1:     
-                shape = (pixel_num_v, num_of_angles, pixel_num_h)
-                dim_labels = [AcquisitionGeometry.VERTICAL, AcquisitionGeometry.ANGLE  ,
-                 AcquisitionGeometry.HORIZONTAL]                
-#                shape = (num_of_angles, pixel_num_v, pixel_num_h)
-#                dim_labels = [AcquisitionGeometry.ANGLE , AcquisitionGeometry.VERTICAL ,
-#                 AcquisitionGeometry.HORIZONTAL]
+            if pixel_num_v > 1:
+                shape = (num_of_angles, pixel_num_v, pixel_num_h)
+                dim_labels = [AcquisitionGeometry.ANGLE , AcquisitionGeometry.VERTICAL ,
+                 AcquisitionGeometry.HORIZONTAL]
             else:
                 shape = (num_of_angles, pixel_num_h)
                 dim_labels = [AcquisitionGeometry.ANGLE, AcquisitionGeometry.HORIZONTAL]

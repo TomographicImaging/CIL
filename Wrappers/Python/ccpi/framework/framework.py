@@ -153,7 +153,8 @@ class ImageGeometry(object):
                             self.center_x, 
                             self.center_y, 
                             self.center_z, 
-                            self.channels)
+                            self.channels,
+                            dimension_labels=self.dimension_labels)
     def __str__ (self):
         repres = ""
         repres += "Number of channels: {0}\n".format(self.channels)
@@ -322,7 +323,8 @@ class AcquisitionGeometry(object):
                                    self.pixel_size_v, 
                                    self.dist_source_center, 
                                    self.dist_center_detector, 
-                                   self.channels)
+                                   self.channels,
+                                   dimension_labels=self.dimension_labels)
         
     def __str__ (self):
         repres = ""
@@ -335,6 +337,7 @@ class AcquisitionGeometry(object):
         repres += "distance center-detector: {0}\n".format(self.dist_source_center)
         repres += "number of channels: {0}\n".format(self.channels)
         return repres
+    
     def allocate(self, value=0, dimension_labels=None, **kwargs):
         '''allocates an AcquisitionData according to the size expressed in the instance'''
         if dimension_labels is None:
@@ -345,12 +348,12 @@ class AcquisitionGeometry(object):
             if value != 0:
                 out += value
         else:
-            if value == AcquisitionData.RANDOM:
+            if value == AcquisitionGeometry.RANDOM:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed) 
                 out.fill(numpy.random.random_sample(self.shape))
-            elif value == AcquisitionData.RANDOM_INT:
+            elif value == AcquisitionGeometry.RANDOM_INT:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)

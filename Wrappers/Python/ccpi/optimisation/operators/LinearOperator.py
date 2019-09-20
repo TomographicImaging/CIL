@@ -71,4 +71,41 @@ class LinearOperator(Operator):
         s1, sall, svec = LinearOperator.PowerMethod(self, iterations, x_init=x0)
         return s1
 
-
+    @staticmethod
+    def dot_test(operator, domain_init=None, range_init=None, verbose=False):
+        '''Does a dot linearity test on the operator
+        
+        Evaluates if the following equivalence holds
+        
+        :math: ..
+        
+          Ax\times y = y \times A^Tx
+        
+        :param operator: operator to test
+        :param range_init: optional initialisation container in the operator range 
+        :param domain_init: optional initialisation container in the operator domain 
+        :returns: boolean, True if the test is passed.
+        '''
+        if range_init is None:
+            y = operator.range_geometry().allocate('random_int')
+        else:
+            y = range_init
+        if domain_init is None:
+            x = operator.domain_geometry().allocate('random_int')
+        else:
+            x = domain_init
+            
+        fx = operator.direct(x)
+        by = operator.adjoint(y)
+        a = fx.dot(y)
+        b = by.dot(x)
+        if verbose:
+            print ('Left hand side  {}, \nRight hand side {}'.format(a, b))
+        try:
+            numpy.testing.assert_almost_equal(abs((a-b)/a), 0, decimal=4)
+            return True
+        except AssertionError as ae:
+            print (ae)
+            return False
+        
+        

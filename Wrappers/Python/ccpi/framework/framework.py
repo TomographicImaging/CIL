@@ -506,8 +506,10 @@ class DataContainer(object):
                 #print ("axes {0}".format(axes))
                 
                 cleaned = numpy.transpose(cleaned, axes).copy()
-                
-                return type(self)(cleaned , True, dimensions)
+                if cleaned.ndim > 1:
+                    return type(self)(cleaned , True, dimensions)
+                else:
+                    return VectorData(cleaned)
     
     def fill(self, array, **dimension):
         '''fills the internal numpy array with the one provided'''
@@ -1325,165 +1327,71 @@ class PixelByPixelDataProcessor(DataProcessor):
         return y
     
 
+class VectorData(DataContainer):
+    '''DataContainer to contain 1D array'''
+    def __init__(self, array=None, **kwargs):
+        self.geometry = kwargs.get('geometry', None)
+        self.dtype = kwargs.get('dtype', numpy.float32)
         
-        
-if __name__ == '__main__':
-    shape = (2,3,4,5)
-    size = shape[0]
-    for i in range(1, len(shape)):
-        size = size * shape[i]
-    #print("a refcount " , sys.getrefcount(a))
-    a = numpy.asarray([i for i in range( size )])
-    print("a refcount " , sys.getrefcount(a))
-    a = numpy.reshape(a, shape)
-    print("a refcount " , sys.getrefcount(a))
-    ds = DataContainer(a, False, ['X', 'Y','Z' ,'W'])
-    print("a refcount " , sys.getrefcount(a))
-    print ("ds label {0}".format(ds.dimension_labels))
-    subset = ['W' ,'X']
-    b = ds.subset( subset )
-    print("a refcount " , sys.getrefcount(a))
-    print ("b label {0} shape {1}".format(b.dimension_labels, 
-           numpy.shape(b.as_array())))
-    c = ds.subset(['Z','W','X'])
-    print("a refcount " , sys.getrefcount(a))
-    
-    # Create a ImageData sharing the array with c
-    volume0 = ImageData(c.as_array(), False, dimensions = c.dimension_labels)
-    volume1 = ImageData(c, False)
-    
-    print ("volume0 {0} volume1 {1}".format(id(volume0.array),
-           id(volume1.array)))
-    
-    # Create a ImageData copying the array from c
-    volume2 = ImageData(c.as_array(), dimensions = c.dimension_labels)
-    volume3 = ImageData(c)
-    
-    print ("volume2 {0} volume3 {1}".format(id(volume2.array),
-           id(volume3.array)))
-        
-    # single number DataSet
-    sn = DataContainer(numpy.asarray([1]))
-    
-    ax = AX()
-    ax.scalar = 2
-    ax.set_input(c)
-    #ax.apply()
-    print ("ax  in {0} out {1}".format(c.as_array().flatten(),
-           ax.get_output().as_array().flatten()))
-    
-    cast = CastDataContainer(dtype=numpy.float32)
-    cast.set_input(c)
-    out = cast.get_output()
-    out *= 0 
-    axm = AX()
-    axm.scalar = 0.5
-    axm.set_input_processor(cast)
-    axm.get_output(out)
-    #axm.apply()
-    print ("axm in {0} out {1}".format(c.as_array(), axm.get_output().as_array()))
-    
-    # check out in DataSetProcessor
-   #a = numpy.asarray([i for i in range( size )])
-    
-        
-    # create a PixelByPixelDataProcessor
-    
-    #define a python function which will take only one input (the pixel value)
-    pyfunc = lambda x: -x if x > 20 else x
-    clip = PixelByPixelDataProcessor()
-    clip.pyfunc = pyfunc 
-    clip.set_input(c)    
-    #clip.apply()
-    
-    print ("clip in {0} out {1}".format(c.as_array(), clip.get_output().as_array()))
-    
-    #dsp = DataProcessor()
-    #dsp.set_input(ds)
-    #dsp.input = a
-    # pipeline
+        if self.geometry is None:
+            if array is None:
+                raise ValueError('Please specify either a geometry or an array')
+            else:
+                if len(array.shape) > 1:
+                    raise ValueError('Incompatible size: expected 1D got {}'.format(array.shape))
+                out = array
+                self.geometry = VectorGeometry(array.shape[0])
+                self.length = self.geometry.length
+        else:
+            self.length = self.geometry.length
+                
+            if array is None:
+                out = numpy.zeros((self.length,), dtype=self.dtype)
+            else:
+                if self.length == array.shape[0]:
+                    out = array
+                else:
+                    raise ValueError('Incompatible size: expecting {} got {}'.format((self.length,), array.shape))
+        deep_copy = True
+        super(VectorData, self).__init__(out, deep_copy, None)
 
-    chain = AX()
-    chain.scalar = 0.5
-    chain.set_input_processor(ax)
-    print ("chain in {0} out {1}".format(ax.get_output().as_array(), chain.get_output().as_array()))
-    
-    # testing arithmetic operations
-    
-    print (b)
-    print ((b+1))
-    print ((1+b))
-    
-    print (b)
-    print ((b*2))
-    
-    print (b)
-    print ((2*b))
-    
-    print (b)
-    print ((b/2))
-    
-    print (b)
-    print ((2/b))
-    
-    print (b)
-    print ((b**2))
-    
-    print (b)
-    print ((2**b))
-    
-    print (type(volume3 + 2))
-    
-    s = [i for i in range(3 * 4 * 4)]
-    s = numpy.reshape(numpy.asarray(s), (3,4,4))
-    sino = AcquisitionData( s )
-    
-    shape = (4,3,2)
-    a = [i for i in range(2*3*4)]
-    a = numpy.asarray(a)
-    a = numpy.reshape(a, shape)
-    print (numpy.shape(a))
-    ds = DataContainer(a, True, ['X', 'Y','Z'])
-    # this means that I expect the X to be of length 2 ,
-    # y of length 3 and z of length 4
-    subset = ['Y' ,'Z']
-    b0 = ds.subset( subset )
-    print ("shape b 3,2? {0}".format(numpy.shape(b0.as_array())))
-    # expectation on b is that it is 
-    # 3x2 cut at z = 0
-    
-    subset = ['X' ,'Y']
-    b1 = ds.subset( subset , Z=1)
-    print ("shape b 2,3? {0}".format(numpy.shape(b1.as_array())))
-    
-    
+class VectorGeometry(object):
+    '''Geometry describing VectorData to contain 1D array'''
+    RANDOM = 'random'
+    RANDOM_INT = 'random_int'
+        
+    def __init__(self, 
+                 length):
+        
+        self.length = length
+        self.shape = (length, )
+        
+        
+    def clone(self):
+        '''returns a copy of VectorGeometry'''
+        return VectorGeometry(self.length)
 
-    # create VolumeData from geometry
-    vgeometry = ImageGeometry(voxel_num_x=2, voxel_num_y=3, channels=2)
-    vol = ImageData(geometry=vgeometry)
-    
-    sgeometry = AcquisitionGeometry(dimension=2, angles=numpy.linspace(0, 180, num=20), 
-                                       geom_type='parallel', pixel_num_v=3,
-                                       pixel_num_h=5 , channels=2)
-    sino = AcquisitionData(geometry=sgeometry)
-    sino2 = sino.clone()
-    
-    a0 = numpy.asarray([i for i in range(2*3*4)])
-    a1 = numpy.asarray([2*i for i in range(2*3*4)])
-    
-            
-    ds0 = DataContainer(numpy.reshape(a0,(2,3,4)))
-    ds1 = DataContainer(numpy.reshape(a1,(2,3,4)))
-    
-    numpy.testing.assert_equal(ds0.dot(ds1), a0.dot(a1))
-    
-    a2 = numpy.asarray([2*i for i in range(2*3*5)])
-    ds2 = DataContainer(numpy.reshape(a2,(2,3,5)))
-    
-#    # it should fail if the shape is wrong
-#    try:
-#        ds2.dot(ds0)
-#        self.assertTrue(False)
-#    except ValueError as ve:
-#        self.assertTrue(True)
+    def allocate(self, value=0, **kwargs):
+        '''allocates an VectorData according to the size expressed in the instance'''
+        self.dtype = kwargs.get('dtype', numpy.float32)
+        out = VectorData(geometry=self, dtype=self.dtype)
+        if isinstance(value, Number):
+            if value != 0:
+                out += value
+        else:
+            if value == VectorGeometry.RANDOM:
+                seed = kwargs.get('seed', None)
+                if seed is not None:
+                    numpy.random.seed(seed) 
+                out.fill(numpy.random.random_sample(self.shape))
+            elif value == VectorGeometry.RANDOM_INT:
+                seed = kwargs.get('seed', None)
+                if seed is not None:
+                    numpy.random.seed(seed)
+                max_value = kwargs.get('max_value', 100)
+                out.fill(numpy.random.randint(max_value,size=self.shape))
+            else:
+                raise ValueError('Value {} unknown'.format(value))
+        return out
+
     

@@ -405,7 +405,7 @@ class TestBlockOperator(unittest.TestCase):
         u = ig.allocate('random_int')
         steps = [timer()]
         i = 0
-        n = 2.
+        n = 10.
         t1 = t2 = 0
         res = B.range_geometry().allocate()
             

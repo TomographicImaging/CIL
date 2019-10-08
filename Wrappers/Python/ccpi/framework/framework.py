@@ -920,15 +920,34 @@ class ImageData(DataContainer):
                     if key == 'spacing' :
                         self.spacing = value
                         
-        def subset(self, dimensions=None, **kw):
-            # FIXME: this is clearly not rigth
-            # it should be something like 
-            # out = DataContainer.subset(self, dimensions, **kw)
-            # followed by regeneration of the proper geometry. 
-            out = super(ImageData, self).subset(dimensions, **kw)
-            #out.geometry = self.recalculate_geometry(dimensions , **kw)
-            out.geometry = self.geometry
-            return out
+    def subset(self, dimensions=None, **kw):
+        # FIXME: this is clearly not rigth
+        # it should be something like 
+        out = DataContainer.subset(self, dimensions, **kw)
+        # followed by regeneration of the proper geometry. 
+        #out = super(ImageData, self).subset(dimensions, **kw)
+        #out.geometry = self.recalculate_geometry(dimensions , **kw)
+        
+        if out.number_of_dimensions > 1:
+        
+            out.geometry = ImageGeometry()
+            
+            for key in out.dimension_labels:
+                if out.dimension_labels[key] == 'channel':
+                    out.geometry.channels = self.geometry.channels
+                elif out.dimension_labels[key] == 'horizontal_y':
+                    out.geometry.voxel_size_y = self.geometry.voxel_size_y
+                    out.geometry.voxel_num_y = self.geometry.voxel_num_y
+                    out.geometry.center_y = self.geometry.center_y
+                elif out.dimension_labels[key] == 'vertical':
+                    out.geometry.voxel_size_z = self.geometry.voxel_size_z
+                    out.geometry.voxel_num_z = self.geometry.voxel_num_z
+                    out.geometry.center_z = self.geometry.center_z
+                elif out.dimension_labels[key] == 'horizontal_x':
+                    out.geometry.voxel_size_x = self.geometry.voxel_size_x
+                    out.geometry.voxel_num_x = self.geometry.voxel_num_x
+                    out.geometry.center_x = self.geometry.center_x
+        return out
 
     def get_shape_labels(self, geometry, dimension_labels=None):
         channels  = geometry.channels
@@ -1395,3 +1414,25 @@ class VectorGeometry(object):
         return out
 
     
+
+
+ig = ImageGeometry(voxel_num_x=100, 
+                 voxel_num_y=200, 
+                 voxel_num_z=300, 
+                 voxel_size_x=1, 
+                 voxel_size_y=1, 
+                 voxel_size_z=1, 
+                 center_x=0, 
+                 center_y=0, 
+                 center_z=0, 
+                 channels=50)
+
+id = ig.allocate(2)
+
+print(id.geometry)
+print(id.dimension_labels)
+
+sid = id.subset(channel = 20)
+
+print(sid.dimension_labels)
+print(sid.geometry)

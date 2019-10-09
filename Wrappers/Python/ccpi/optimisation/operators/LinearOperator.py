@@ -16,6 +16,11 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 from ccpi.optimisation.operators import Operator
 import numpy
 
@@ -39,7 +44,7 @@ class LinearOperator(Operator):
         
         # Initialise random
         if x_init is None:
-            x0 = operator.domain_geometry().allocate(type(operator.domain_geometry()).RANDOM_INT)
+            x0 = operator.domain_geometry().allocate('random')
         else:
             x0 = x_init.copy()
             
@@ -51,7 +56,11 @@ class LinearOperator(Operator):
             operator.direct(x0,out=y_tmp)
             operator.adjoint(y_tmp,out=x1)
             x1norm = x1.norm()
-            s[it] = x1.dot(x0) / x0.squared_norm()
+            if hasattr(x0, 'squared_norm'):
+                s[it] = x1.dot(x0) / x0.squared_norm()
+            else:
+                x0norm = x0.norm()
+                s[it] = x1.dot(x0) / (x0norm * x0norm) 
             x1.multiply((1.0/x1norm), out=x0)
         return numpy.sqrt(s[-1]), numpy.sqrt(s), x0
 
@@ -62,4 +71,41 @@ class LinearOperator(Operator):
         s1, sall, svec = LinearOperator.PowerMethod(self, iterations, x_init=x0)
         return s1
 
-
+    @staticmethod
+    def dot_test(operator, domain_init=None, range_init=None, verbose=False):
+        '''Does a dot linearity test on the operator
+        
+        Evaluates if the following equivalence holds
+        
+        :math: ..
+        
+          Ax\times y = y \times A^Tx
+        
+        :param operator: operator to test
+        :param range_init: optional initialisation container in the operator range 
+        :param domain_init: optional initialisation container in the operator domain 
+        :returns: boolean, True if the test is passed.
+        '''
+        if range_init is None:
+            y = operator.range_geometry().allocate('random_int')
+        else:
+            y = range_init
+        if domain_init is None:
+            x = operator.domain_geometry().allocate('random_int')
+        else:
+            x = domain_init
+            
+        fx = operator.direct(x)
+        by = operator.adjoint(y)
+        a = fx.dot(y)
+        b = by.dot(x)
+        if verbose:
+            print ('Left hand side  {}, \nRight hand side {}'.format(a, b))
+        try:
+            numpy.testing.assert_almost_equal(abs((a-b)/a), 0, decimal=4)
+            return True
+        except AssertionError as ae:
+            print (ae)
+            return False
+        
+        

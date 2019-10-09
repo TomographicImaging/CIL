@@ -17,11 +17,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import numpy
 import functools
 from ccpi.framework import ImageData, BlockDataContainer, DataContainer
-from ccpi.optimisation.operators import Operator
+from ccpi.optimisation.operators import Operator, LinearOperator
 from ccpi.framework import BlockGeometry
+try:
+    from sirf import SIRF
+    from sirf.SIRF import DataContainer as SIRFDataContainer
+    has_sirf = True
+except ImportError as ie:
+    has_sirf = False
        
 class BlockOperator(Operator):
     r'''A Block matrix containing Operators
@@ -115,7 +126,23 @@ class BlockOperator(Operator):
         return self.operators[index]
     
     def norm(self, **kwargs):
-        norm = [op.norm(**kwargs)**2 for op in self.operators]
+        '''Returns the norm of the BlockOperator
+
+        if the operator in the block do not have method norm defined, i.e. they are SIRF
+        AcquisitionModel's we use PowerMethod if applicable, otherwise we raise an Error
+        '''
+        norm = []
+        for op in self.operators:
+            if hasattr(op, 'norm'):
+                norm.append(op.norm(**kwargs) ** 2.)
+            else:
+                # use Power method
+                if op.is_linear():
+                    norm.append(
+                            LinearOperator.PowerMethod(op, 20)[0]
+                            )
+                else:
+                    raise TypeError('Operator {} does not have a norm method and is not linear'.format(op))
         return numpy.sqrt(sum(norm))    
     
     def direct(self, x, out=None):
@@ -188,7 +215,8 @@ class BlockOperator(Operator):
                         prod += self.get_item(row, col).adjoint(x_b.get_item(row))
                 res.append(prod)
             if self.shape[1]==1:
-                return ImageData(*res)
+                # the output is a single DataContainer, so we can take it out
+                return res[0]
             else:
                 return BlockDataContainer(*res, shape=shape)
         else:
@@ -196,7 +224,8 @@ class BlockOperator(Operator):
             for col in range(self.shape[1]):
                 for row in range(self.shape[0]):
                     if row == 0:
-                        if issubclass(out.__class__, DataContainer):
+                        if issubclass(out.__class__, DataContainer) or \
+                ( has_sirf and issubclass(out.__class__, SIRFDataContainer) ):
                             self.get_item(row, col).adjoint(
                                                 x_b.get_item(row),
                                                 out=out)
@@ -206,7 +235,8 @@ class BlockOperator(Operator):
                                                 x_b.get_item(row),
                                                 out=out.get_item(col))
                     else:
-                        if issubclass(out.__class__, DataContainer):
+                        if issubclass(out.__class__, DataContainer) or \
+                ( has_sirf and issubclass(out.__class__, SIRFDataContainer) ):
                             out += self.get_item(row,col).adjoint(
                                                         x_b.get_item(row))
                         else:

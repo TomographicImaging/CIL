@@ -27,13 +27,7 @@ from ccpi.framework import DataContainer
 #from ccpi.framework import AcquisitionData, ImageData
 #from ccpi.optimisation.operators import Operator, LinearOperator
 
-try:
-    from sirf import SIRF
-    from sirf.SIRF import DataContainer as SIRFDataContainer
-    has_sirf = True
-except ImportError as ie:
-    has_sirf = False
- 
+
 class BlockDataContainer(object):
     '''Class to hold DataContainers as column vector
     
@@ -109,32 +103,20 @@ class BlockDataContainer(object):
                     raise ValueError('List/ numpy array can only contain numbers {}'\
                                      .format(type(ot)))
             return len(self.containers) == len(other)
-        elif issubclass(other.__class__, DataContainer):
-            ret = True
-            for i, el in enumerate(self.containers):
-                if isinstance(el, BlockDataContainer):
-                    a = el.is_compatible(other)
-                else:
-                    a = el.shape == other.shape
-                ret = ret and a
-            return ret
-        elif has_sirf and \
-                issubclass(other.__class__, SIRFDataContainer ):
-            # test as above
-            ret = True
-            for i, el in enumerate(self.containers):
-                if isinstance(el, BlockDataContainer):
-                    a = el.is_compatible(other)
-                else:
-                    a = el.shape == other.shape
-                ret = ret and a
-            return ret
         elif isinstance(other, BlockDataContainer): 
             return len(self.containers) == len(other.containers)
-
         else:
-            raise TypeError('Unsupported type. Expected number, numpy array, CIL DataContainer and subclass or SIRF DataContainer and subclasses. Got {}'. format(type(other)))
-            #return self.get_item(0).shape == other.shape
+            # this should work for other as DataContainers and children
+            ret = True
+            for i, el in enumerate(self.containers):
+                if isinstance(el, BlockDataContainer):
+                    a = el.is_compatible(other)
+                else:
+                    a = el.shape == other.shape
+                ret = ret and a
+            # probably will raise 
+            return ret
+
 
     def get_item(self, row):
         if row > self.shape[0]:

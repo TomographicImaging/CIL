@@ -484,7 +484,8 @@ class TestDataContainer(unittest.TestCase):
     def test_ImageData(self):
         # create ImageData from geometry
         vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)
-        vol = ImageData(geometry=vgeometry)
+        #vol = ImageData(geometry=vgeometry)
+        vol = vgeometry.allocate()
         self.assertEqual(vol.shape, (2, 3, 4))
 
         vol1 = vol + 1
@@ -517,7 +518,8 @@ class TestDataContainer(unittest.TestCase):
         sgeometry = AcquisitionGeometry(dimension=2, angles=numpy.linspace(0, 180, num=10),
                                         geom_type='parallel', pixel_num_v=3,
                                         pixel_num_h=5, channels=2)
-        sino = AcquisitionData(geometry=sgeometry)
+        #sino = AcquisitionData(geometry=sgeometry)
+        sino = sgeometry.allocate()
         self.assertEqual(sino.shape, (2, 10, 3, 5))
         
         ag = AcquisitionGeometry (pixel_num_h=2,pixel_num_v=3,channels=4, dimension=2, angles=numpy.linspace(0, 180, num=10),
@@ -604,7 +606,63 @@ class TestDataContainer(unittest.TestCase):
         except ValueError as ve:
             print (ve)
             self.assertTrue(True)
-    
+    def test_AcquisitionDataSubset(self):
+        sgeometry = AcquisitionGeometry(dimension=2, angles=numpy.linspace(0, 180, num=10),
+                                        geom_type='parallel', pixel_num_v=3,
+                                        pixel_num_h=5, channels=2)
+        # expected dimension_labels
+        
+        self.assertListEqual([AcquisitionGeometry.CHANNEL ,
+                 AcquisitionGeometry.ANGLE , AcquisitionGeometry.VERTICAL ,
+                 AcquisitionGeometry.HORIZONTAL],
+                              sgeometry.dimension_labels)
+        sino = sgeometry.allocate()
+
+        # test reshape
+        new_order = [AcquisitionGeometry.HORIZONTAL ,
+                 AcquisitionGeometry.CHANNEL , AcquisitionGeometry.VERTICAL ,
+                 AcquisitionGeometry.ANGLE]
+        ss = sino.subset(new_order)
+
+        self.assertListEqual(new_order, ss.geometry.dimension_labels)
+
+        ss1 = ss.subset(vertical = 0)
+        self.assertListEqual([AcquisitionGeometry.HORIZONTAL ,
+                 AcquisitionGeometry.CHANNEL  ,
+                 AcquisitionGeometry.ANGLE], ss1.geometry.dimension_labels)
+        ss2 = ss.subset(vertical = 0, channel=0)
+        self.assertListEqual([AcquisitionGeometry.HORIZONTAL ,
+                 AcquisitionGeometry.ANGLE], ss2.geometry.dimension_labels)
+
+    def test_ImageDataSubset(self):
+        new_order = ['horizontal_x', 'channel', 'horizontal_y', ]
+
+
+        vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2, dimension_labels=new_order)
+        # expected dimension_labels
+        
+        self.assertListEqual(new_order,
+                              vgeometry.dimension_labels)
+        vol = vgeometry.allocate()
+
+        # test reshape
+        new_order = [ 'channel', 'horizontal_x','horizontal_y']
+        ss = vol.subset(new_order)
+
+        self.assertListEqual(new_order, ss.geometry.dimension_labels)
+
+        ss1 = ss.subset(horizontal_x = 0)
+        self.assertListEqual([ 'channel', 'horizontal_y'], ss1.geometry.dimension_labels)
+
+        vg = ImageGeometry(3,4,5,channels=2)
+        self.assertListEqual([ImageGeometry.CHANNEL, ImageGeometry.VERTICAL,
+                ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X],
+                              vg.dimension_labels)
+        ss = vg.allocate()
+        ss2 = ss.subset(vertical = 0, channel=0)
+        self.assertListEqual([ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X], ss2.geometry.dimension_labels)
+
+
     def assertNumpyArrayEqual(self, first, second):
         res = True
         try:

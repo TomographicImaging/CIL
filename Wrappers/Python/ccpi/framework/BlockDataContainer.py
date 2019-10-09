@@ -184,7 +184,7 @@ class BlockDataContainer(object):
         if not self.is_compatible(other):
             raise ValueError('Incompatible for divide')
         out = kwargs.get('out', None)
-        if isinstance(other, Number) or issubclass(other.__class__, DataContainer):
+        if isinstance(other, Number):
             # try to do algebra with one DataContainer. Will raise error if not compatible
             kw = kwargs.copy()
             res = []
@@ -243,8 +243,7 @@ class BlockDataContainer(object):
             else:
                 return type(self)(*res, shape=self.shape)
             return type(self)(*[ operation(ot, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
-        elif has_sirf and ( isinstance(other, Number) or \
-                issubclass(other.__class__, SIRFDataContainer ) ) :
+        else:
             # try to do algebra with one DataContainer. Will raise error if not compatible
             kw = kwargs.copy()
             res = []
@@ -270,9 +269,7 @@ class BlockDataContainer(object):
                 return
             else:
                 return type(self)(*res, shape=self.shape)
-        else:
-            raise ValueError('Incompatible type {}'.format(type(other)))
-    
+        
 
     def power(self, other, *args, **kwargs):
         if not self.is_compatible(other):

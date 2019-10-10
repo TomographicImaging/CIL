@@ -77,19 +77,22 @@ class TestAlgorithms(unittest.TestCase):
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
     def test_CGLS(self):
         print ("Test CGLS")
-        ig = ImageGeometry(124,153,154)
+        #ig = ImageGeometry(124,153,154)
+        ig = ImageGeometry(10,2)
         numpy.random.seed(2)
         x_init = ig.allocate(0.)
         # b = x_init.copy()
         # fill with random numbers
         # b.fill(numpy.random.random(x_init.shape))
-        b = ig.allocate('random', seed=2)
+        b = ig.allocate()
+        bdata = numpy.reshape(numpy.asarray([i for i in range(20)]), (2,10))
+        b.fill(bdata)
         identity = Identity(ig)
         
         alg = CGLS(x_init=x_init, operator=identity, data=b)
         alg.max_iteration = 200
         alg.run(20, verbose=True)
-        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array(), decimal=4)
         
     def test_FISTA(self):
         print ("Test FISTA")

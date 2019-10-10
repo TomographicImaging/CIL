@@ -45,7 +45,6 @@ class ImageGeometry(object):
     RANDOM = 'random'
     RANDOM_INT = 'random_int'
     CHANNEL = 'channel'
-    ANGLE = 'angle'
     VERTICAL = 'vertical'
     HORIZONTAL_X = 'horizontal_x'
     HORIZONTAL_Y = 'horizontal_y'

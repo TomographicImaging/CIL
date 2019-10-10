@@ -15,6 +15,11 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 from ccpi.optimisation.operators import LinearOperator
 import numpy as np
 
@@ -66,8 +71,11 @@ class FiniteDiff(LinearOperator):
         x_sz = len(x.shape)
         
         if out is None:        
-            out = np.zeros_like(x_asarr)
+            res = x * 0
+            #out = np.zeros_like(x_asarr)
+            out = res.as_array()
         else:
+            res = out
             out = out.as_array()
             out[:]=0
                   
@@ -180,7 +188,9 @@ class FiniteDiff(LinearOperator):
             raise NotImplementedError                
          
 #        res = out #/self.voxel_size 
-        return type(x)(out)
+        #return type(x)(out)
+        res.fill(out)
+        return res
 
                     
     def adjoint(self, x, out=None):
@@ -189,8 +199,11 @@ class FiniteDiff(LinearOperator):
         x_sz = len(x.shape)
         
         if out is None:        
-            out = np.zeros_like(x_asarr)
+            #out = np.zeros_like(x_asarr)
+            res = x * 0
+            out = res.as_array()
         else:
+            res = out
             out = out.as_array()        
             out[:]=0
 
@@ -319,7 +332,9 @@ class FiniteDiff(LinearOperator):
             raise NotImplementedError
             
         out *= -1 #/self.voxel_size
-        return type(x)(out)
+        #return type(x)(out)
+        res.fill(out)
+        return res
             
     def range_geometry(self):
         

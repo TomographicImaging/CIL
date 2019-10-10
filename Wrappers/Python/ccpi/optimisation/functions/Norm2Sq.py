@@ -17,7 +17,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
 
+from ccpi.optimisation.operators import LinearOperator
 from ccpi.optimisation.functions import Function
 import warnings
 
@@ -50,8 +55,13 @@ class Norm2Sq(Function):
         try:
             self.L = 2.0*self.c*(self.A.norm()**2)
         except AttributeError as ae:
-            warnings.warn('{} could not calculate Lipschitz Constant. {}'.format(
+            if self.A.is_linear():
+                Anorm = LinearOperator.PowerMethod(self.A, 10)[0]
+                self.L = 2.0 * self.c * (Anorm*Anorm)
+            else:
+                warnings.warn('{} could not calculate Lipschitz Constant. {}'.format(
                 self.__class__.__name__, ae))
+            
         except NotImplementedError as noe:
             warnings.warn('{} could not calculate Lipschitz Constant. {}'.format(
                 self.__class__.__name__, noe))
@@ -65,22 +75,28 @@ class Norm2Sq(Function):
         #    return self.c*( ( (self.A.direct(x)-self.b)**2).sum() )
         #else:
         y = self.A.direct(x)
-        y.__isub__(self.b)
+        y.subtract(self.b, out=y)
         #y.__imul__(y)
         #return y.sum() * self.c
         try:
+            if self.c == 1:
+                return y.squared_norm()
             return y.squared_norm() * self.c
         except AttributeError as ae:
-            # added for compatibility with SIRF 
-            return (y.norm()**2) * self.c
+            # added for compatibility with SIRF
+            warnings.warn('squared_norm method not found! Proceeding with norm.')
+            yn = y.norm()
+            if self.c == 1:
+                return yn * yn
+            return (yn * yn) * self.c
     
     def gradient(self, x, out=None):
         if out is not None:
             #return 2.0*self.c*self.A.adjoint( self.A.direct(x) - self.b )
             self.A.direct(x, out=self.range_tmp)
-            self.range_tmp -= self.b 
+            self.range_tmp.subtract(self.b , out=self.range_tmp)
             self.A.adjoint(self.range_tmp, out=out)
             #self.direct_placehold.multiply(2.0*self.c, out=out)
-            out *= (self.c * 2.0)
+            out.multiply (self.c * 2.0, out=out)
         else:
             return (2.0*self.c)*self.A.adjoint(self.A.direct(x) - self.b)

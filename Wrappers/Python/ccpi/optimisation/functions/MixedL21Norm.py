@@ -18,10 +18,16 @@
 # limitations under the License.
 
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 from ccpi.optimisation.functions import Function, ScaledFunction
 from ccpi.framework import BlockDataContainer
 
 import functools
+import numpy
 
 class MixedL21Norm(Function):
     
@@ -45,11 +51,11 @@ class MixedL21Norm(Function):
         '''
         if not isinstance(x, BlockDataContainer):
             raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 
-                                         
-        tmp = [ el**2 for el in x.containers ]
-        res = sum(tmp).sqrt().sum()
+        tmp = x.get_item(0) * 0
+        for el in x.containers:
+            tmp += el.power(2.)
+        return tmp.sqrt().sum()
 
-        return res
                             
     def gradient(self, x, out=None):
         return ValueError('Not Differentiable')
@@ -84,16 +90,29 @@ class MixedL21Norm(Function):
 
 
         if out is None:                                        
-            tmp = [ el*el for el in x.containers]
-            res = sum(tmp).sqrt().maximum(1.0) 
-            frac = [el/res for el in x.containers]
-            return  BlockDataContainer(*frac)   
+            # tmp = [ el*el for el in x.containers]
+            # res = sum(tmp).sqrt().maximum(1.0) 
+            # frac = [el/res for el in x.containers]
+            # return  BlockDataContainer(*frac)   
+            tmp = x.get_item(0) * 0
+            for el in x.containers:
+                tmp += el.power(2.)
+            tmp.sqrt(out=tmp)
+            tmp.maximum(1.0, out=tmp)
+            frac = [ el.divide(tmp) for el in x.containers ]
+            return BlockDataContainer(*frac)
+            
                 
         else:
                             
             res1 = functools.reduce(lambda a,b: a + b*b, x.containers, x.get_item(0) * 0 )
-            res = res1.sqrt().maximum(1.0)
-            x.divide(res, out=out)
+            if False:
+                res = res1.sqrt().maximum(1.0)
+                x.divide(res, out=out)
+            else:
+                res1.sqrt(out=res1)
+                res1.maximum(1.0, out=res1)
+                x.divide(res1, out=out)
                                           
 
     def __rmul__(self, scalar):
@@ -106,6 +125,12 @@ class MixedL21Norm(Function):
         return ScaledFunction(self, scalar) 
 
 
+def sqrt_maximum(x, a):
+    y = numpy.sqrt(x)
+    if y >= a:
+        return y
+    else:
+        return a
 #
 if __name__ == '__main__':
     

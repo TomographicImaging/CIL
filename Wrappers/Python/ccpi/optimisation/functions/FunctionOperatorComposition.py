@@ -39,8 +39,11 @@ class FunctionOperatorComposition(Function):
         
         self.function = function     
         self.operator = operator
-        self.L = function.L * operator.norm()**2 
-        
+        try:
+            self.L = function.L * operator.norm()**2 
+        except Error as er:
+            self.L = None
+            warnings.warn("Lipschitz constant was not calculated")
         
     def __call__(self, x):
         
@@ -56,12 +59,13 @@ class FunctionOperatorComposition(Function):
             
         '''
         
+        tmp = self.operator.range_geometry().allocate()
+        self.operator.direct(x, out=tmp)
+        self.function.gradient(tmp, out=tmp)
         if out is None:
-            return self.operator.adjoint(self.function.gradient(self.operator.direct(x)))
+            #return self.operator.adjoint(self.function.gradient(self.operator.direct(x)))
+            return self.operator.adjoint(tmp)
         else: 
-            tmp = self.operator.range_geometry().allocate()
-            self.operator.direct(x, out=tmp)
-            self.function.gradient(tmp, out=tmp)
             self.operator.adjoint(tmp, out=out)
 
     

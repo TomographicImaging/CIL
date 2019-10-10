@@ -102,12 +102,16 @@ class TestBlockDataContainer(unittest.TestCase):
         ig0 = ImageGeometry(2,3,4)
         ig1 = ImageGeometry(2,3,5)
         
-        data0 = ImageData(geometry=ig0)
-        data1 = ImageData(geometry=ig1) + 1
-        
-        data2 = ImageData(geometry=ig0) + 2
-        data3 = ImageData(geometry=ig1) + 3
-        
+        # data0 = ImageData(geometry=ig0)
+        # data1 = ImageData(geometry=ig1) + 1
+        data0 = ig0.allocate(0.)
+        data1 = ig1.allocate(1.)
+    
+        # data2 = ImageData(geometry=ig0) + 2
+        # data3 = ImageData(geometry=ig1) + 3
+        data2 = ig0.allocate(2.)
+        data3 = ig1.allocate(3.)
+
         cp0 = BlockDataContainer(data0,data1)
         cp1 = BlockDataContainer(data2,data3)
 
@@ -330,12 +334,17 @@ class TestBlockDataContainer(unittest.TestCase):
         ig0 = ImageGeometry(2,3,4)
         ig1 = ImageGeometry(2,3,4)
         
-        data0 = ImageData(geometry=ig0)
-        data1 = ImageData(geometry=ig1) + 1
+        # data0 = ImageData(geometry=ig0)
+        # data1 = ImageData(geometry=ig1) + 1
         
-        data2 = ImageData(geometry=ig0) + 2
-        data3 = ImageData(geometry=ig1) + 3
+        # data2 = ImageData(geometry=ig0) + 2
+        # data3 = ImageData(geometry=ig1) + 3
+        data0 = ig0.allocate(0.)
+        data1 = ig1.allocate(1.)
         
+        data2 = ig0.allocate(2.)
+        data3 = ig1.allocate(3.)
+
         cp0 = BlockDataContainer(data0,data1)
         cp1 = BlockDataContainer(data2,data3)
 

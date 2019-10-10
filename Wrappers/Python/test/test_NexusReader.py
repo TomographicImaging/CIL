@@ -96,9 +96,22 @@ class TestNexusReader(unittest.TestCase):
         nr = NexusReader(self.filename)
         key = nr.get_image_keys()
         sl = nr.get_acquisition_data_subset(0,10)
-        data = nr.get_acquisition_data().subset(['vertical','horizontal'])
+        data = nr.get_acquisition_data()
+        print (data.geometry)
+        print (data.geometry.dimension_labels)
+        print (data.dimension_labels)
+        rdata = data.subset(channel=0)
         
-        self.assertTrue(sl.shape , (10,data.shape[1]))
+        #
+        
+        self.assertTrue(sl.shape , (10,rdata.shape[1]))
+
+        try:
+            data.subset(['vertical','horizontal'])
+            self.assertTrue(False)
+        except ValueError as ve:
+            print ("Exception catched", ve)
+            self.assertTrue(True)
 
 
 

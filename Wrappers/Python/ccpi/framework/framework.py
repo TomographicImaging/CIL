@@ -107,10 +107,10 @@ class ImageGeometry(object):
                     raise ValueError('Requested axis are not possible. Expected {},\ngot {}'.format(
                                     allowed_labels,labels))
             order = self.get_order_by_label(labels, dim_labels)
-            if order != [0,1,2]:
+            if order != [i for i in range(len(dim_labels))]:
                 # resort
                 self.shape = tuple([shape[i] for i in order])
-                self.dimension_labels = labels
+            self.dimension_labels = labels
                 
     def get_order_by_label(self, dimension_labels, default_dimension_labels):
         order = []
@@ -310,7 +310,7 @@ class AcquisitionGeometry(object):
             if len(labels) != len(dim_labels):
                 raise ValueError('Wrong number of labels. Expected {} got {}'.format(len(dim_labels), len(labels)))
             order = self.get_order_by_label(labels, dim_labels)
-            if order != [0,1,2]:
+            if order != [i for i in range(len(dim_labels))]:
                 # resort
                 self.shape = tuple([shape[i] for i in order])
             self.dimension_labels = labels
@@ -593,7 +593,6 @@ class DataContainer(object):
     # __rmul__
     
     def __rdiv__(self, other):
-        print ("call __rdiv__")
         return pow(self / other, -1)
     # __rdiv__
     def __rtruediv__(self, other):
@@ -883,7 +882,8 @@ class ImageData(DataContainer):
                  **kwargs):
         
         if not kwargs.get('suppress_warning', False):
-            warnings.warn('Direct invocation is deprecated and will be removed in following version. Use allocate from ImageGeometry instead')
+            warnings.warn('Direct invocation is deprecated and will be removed in following version. Use allocate from ImageGeometry instead',
+                   DeprecationWarning)
         self.geometry = kwargs.get('geometry', None)
         if array is None:
             if self.geometry is not None:
@@ -1063,7 +1063,8 @@ class AcquisitionData(DataContainer):
                  dimension_labels=None, 
                  **kwargs):
         if not kwargs.get('suppress_warning', False):
-            warnings.warn('Direct invocation is deprecated and will be removed in following version. Use allocate from AcquisitionGeometry instead')
+            warnings.warn('Direct invocation is deprecated and will be removed in following version. Use allocate from AcquisitionGeometry instead',
+              DeprecationWarning)
         
         self.geometry = kwargs.get('geometry', None)
         if array is None:

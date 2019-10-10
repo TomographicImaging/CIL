@@ -171,10 +171,12 @@ class ImageGeometry(object):
     def allocate(self, value=0, dimension_labels=None, **kwargs):
         '''allocates an ImageData according to the size expressed in the instance'''
         if dimension_labels is None:
-            out = ImageData(geometry=self, dimension_labels=self.dimension_labels)
+            out = ImageData(geometry=self, dimension_labels=self.dimension_labels, suppress_warning=True)
         else:
-            out = ImageData(geometry=self, dimension_labels=dimension_labels)
+            out = ImageData(geometry=self, dimension_labels=dimension_labels, suppress_warning=True)
         if isinstance(value, Number):
+            # it's created empty, so we make it 0
+            out *= 0.
             if value != 0:
                 out += value
         else:
@@ -189,6 +191,8 @@ class ImageGeometry(object):
                     numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
                 out.fill(numpy.random.randint(max_value,size=self.shape))
+            elif value is None:
+                pass
             else:
                 raise ValueError('Value {} unknown'.format(value))
 
@@ -354,10 +358,12 @@ class AcquisitionGeometry(object):
     def allocate(self, value=0, dimension_labels=None, **kwargs):
         '''allocates an AcquisitionData according to the size expressed in the instance'''
         if dimension_labels is None:
-            out = AcquisitionData(geometry=self, dimension_labels=self.dimension_labels)
+            out = AcquisitionData(geometry=self, dimension_labels=self.dimension_labels, suppress_warning=True)
         else:
-            out = AcquisitionData(geometry=self, dimension_labels=dimension_labels)
+            out = AcquisitionData(geometry=self, dimension_labels=dimension_labels, suppress_warning=True)
         if isinstance(value, Number):
+            # it's created empty, so we make it 0
+            out *= 0.
             if value != 0:
                 out += value
         else:
@@ -372,6 +378,8 @@ class AcquisitionGeometry(object):
                     numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
                 out.fill(numpy.random.randint(max_value,size=self.shape))
+            elif value is None:
+                pass
             else:
                 raise ValueError('Value {} unknown'.format(value))
         
@@ -459,7 +467,8 @@ class DataContainer(object):
                     for k,v in self.dimension_labels.items():
                         if v == dim_l:
                             reduced_dims.pop(k)
-                return self.subset(dimensions=reduced_dims, **kw)
+                #return self.subset(dimensions=reduced_dims, **kw)
+                return DataContainer.subset(self, dimensions=reduced_dims, **kw)
         else:
             # check that all the requested dimensions are in the array
             # this is done by checking the dimension_labels
@@ -648,10 +657,18 @@ class DataContainer(object):
     def clone(self):
         '''returns a copy of itself'''
         
-        return type(self)(self.array, 
-                          dimension_labels=self.dimension_labels,
-                          deep_copy=True,
-                          geometry=self.geometry )
+        if self.geometry is None:
+            if not isinstance(self, DataContainer):
+                warnings.warn("Geometry is None in {}".format( self.__class__.__name__) )
+            return type(self)(self.array, 
+                            dimension_labels=self.dimension_labels,
+                            deep_copy=True,
+                            geometry=self.geometry,
+                            suppress_warning=True )
+        else:
+            out = self.geometry.allocate(None)
+            out.fill(self.array)
+            return out
     
     def get_data_axes_order(self,new_order=None):
         '''returns the axes label of self as a list
@@ -870,12 +887,15 @@ class ImageData(DataContainer):
                  dimension_labels=None, 
                  **kwargs):
         
+        if not kwargs.get('suppress_warning', False):
+            warnings.warn('Direct invocation is deprecated and will be removed in following version. Use allocate from ImageGeometry instead')
         self.geometry = kwargs.get('geometry', None)
         if array is None:
             if self.geometry is not None:
                 shape, dimension_labels = self.get_shape_labels(self.geometry, dimension_labels)
                     
-                array = numpy.zeros( shape , dtype=numpy.float32) 
+                # array = numpy.zeros( shape, dtype=numpy.float32) 
+                array = numpy.empty( shape, dtype=numpy.float32)
                 super(ImageData, self).__init__(array, deep_copy,
                                  dimension_labels, **kwargs)
                 
@@ -935,7 +955,10 @@ class ImageData(DataContainer):
                         
     def subset(self, dimensions=None, **kw):
         '''returns a subset of ImageData and regenerates the geometry'''
-        
+        # Check that this is actually a resorting
+        if dimensions is not None and \
+            (len(dimensions) != len(self.shape) ):
+            raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
         #out = DataContainer.subset(self, dimensions, **kw)
         out = super(ImageData, self).subset(dimensions, **kw)
         
@@ -1044,6 +1067,9 @@ class AcquisitionData(DataContainer):
                  deep_copy=True, 
                  dimension_labels=None, 
                  **kwargs):
+        if not kwargs.get('suppress_warning', False):
+            warnings.warn('Direct invocation is deprecated and will be removed in following version. Use allocate from AcquisitionGeometry instead')
+        
         self.geometry = kwargs.get('geometry', None)
         if array is None:
             if 'geometry' in kwargs.keys():
@@ -1053,7 +1079,8 @@ class AcquisitionData(DataContainer):
                 shape, dimension_labels = self.get_shape_labels(geometry, dimension_labels)
                 
                     
-                array = numpy.zeros( shape , dtype=numpy.float32) 
+                # array = numpy.zeros( shape , dtype=numpy.float32) 
+                array = numpy.empty( shape, dtype=numpy.float32)
                 super(AcquisitionData, self).__init__(array, deep_copy,
                                  dimension_labels, **kwargs)
         else:
@@ -1154,6 +1181,12 @@ class AcquisitionData(DataContainer):
         return (shape, dimension_labels)
     def subset(self, dimensions=None, **kw):
         '''returns a subset of the AcquisitionData and regenerates the geometry'''
+
+        # Check that this is actually a resorting
+        if dimensions is not None and \
+            (len(dimensions) != len(self.shape) ):
+            raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
+
         requested_labels = kw.get('dimension_labels', None)
         if requested_labels is not None:
             allowed_labels = [AcquisitionGeometry.CHANNEL,

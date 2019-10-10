@@ -175,9 +175,7 @@ class ImageGeometry(object):
             out = ImageData(geometry=self, dimension_labels=dimension_labels, suppress_warning=True)
         if isinstance(value, Number):
             # it's created empty, so we make it 0
-            out *= 0.
-            if value != 0:
-                out += value
+            out.array.fill(value)
         else:
             if value == ImageGeometry.RANDOM:
                 seed = kwargs.get('seed', None)
@@ -362,9 +360,7 @@ class AcquisitionGeometry(object):
             out = AcquisitionData(geometry=self, dimension_labels=dimension_labels, suppress_warning=True)
         if isinstance(value, Number):
             # it's created empty, so we make it 0
-            out *= 0.
-            if value != 0:
-                out += value
+            out.array.fill(value)
         else:
             if value == AcquisitionGeometry.RANDOM:
                 seed = kwargs.get('seed', None)

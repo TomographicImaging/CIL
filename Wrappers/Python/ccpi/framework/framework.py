@@ -722,7 +722,8 @@ class DataContainer(object):
             return type(self)(out,
                    deep_copy=False, 
                    dimension_labels=self.dimension_labels,
-                   geometry=self.geometry)
+                   geometry=self.geometry, 
+                   suppress_warning=True)
             
         
         elif issubclass(type(out), DataContainer) and issubclass(type(x2), DataContainer):
@@ -800,7 +801,8 @@ class DataContainer(object):
             return type(self)(out,
                        deep_copy=False, 
                        dimension_labels=self.dimension_labels,
-                       geometry=self.geometry)
+                       geometry=self.geometry, 
+                       suppress_warning=True)
         elif issubclass(type(out), DataContainer):
             if self.check_dimensions(out):
                 kwargs['out'] = out.as_array()
@@ -885,7 +887,7 @@ class ImageData(DataContainer):
         
         if not kwargs.get('suppress_warning', False):
             warnings.warn('Direct invocation is deprecated and will be removed in following version. Use allocate from ImageGeometry instead',
-                   DeprecationWarning)
+                   DeprecationWarning, stacklevel=4)
         self.geometry = kwargs.get('geometry', None)
         if array is None:
             if self.geometry is not None:

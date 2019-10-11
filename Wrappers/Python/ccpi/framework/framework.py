@@ -459,9 +459,11 @@ class DataContainer(object):
             else:
                 reduced_dims = [v for k,v in self.dimension_labels.items()]
                 for dim_l, dim_v in kw.items():
-                    for k,v in self.dimension_labels.items():
+                    #for k,v in self.dimension_labels.items():
+                    for k,v in enumerate(reduced_dims):
                         if v == dim_l:
                             reduced_dims.pop(k)
+                            break
                 #return self.subset(dimensions=reduced_dims, **kw)
                 return DataContainer.subset(self, dimensions=reduced_dims, **kw)
         else:

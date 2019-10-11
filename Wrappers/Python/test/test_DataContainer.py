@@ -478,6 +478,17 @@ class TestDataContainer(unittest.TestCase):
         n0 = (ds0 * ds1).sum()
         n1 = ds0.as_array().ravel().dot(ds1.as_array().ravel())
         self.assertEqual(n0, n1)
+
+    def test_exp_log(self):
+        a0 = numpy.asarray([1 for i in range(2*3*4)])
+                
+        ds0 = DataContainer(numpy.reshape(a0,(2,3,4)), suppress_warning=True)
+        # ds1 = DataContainer(numpy.reshape(a1,(2,3,4)), suppress_warning=True)
+        b = ds0.exp().log()
+        self.assertNumpyArrayEqual(ds0.as_array(), b.as_array())
+        
+        self.assertEqual(ds0.exp().as_array()[0][0][0], numpy.exp(1))
+        self.assertEqual(ds0.log().as_array()[0][0][0], 0.)
         
         
 

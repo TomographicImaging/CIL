@@ -827,6 +827,14 @@ class DataContainer(object):
 
     def conjugate(self, *args,  **kwargs):
         return self.pixel_wise_unary(numpy.conjugate, *args,  **kwargs)
+
+    def exp(self, *args, **kwargs):
+        '''Applies exp pixel-wise to the DataContainer'''
+        return self.pixel_wise_unary(numpy.exp, *args, **kwargs)
+    
+    def log(self, *args, **kwargs):
+        '''Applies log pixel-wise to the DataContainer'''
+        return self.pixel_wise_unary(numpy.log, *args, **kwargs)
     #def __abs__(self):
     #    operation = FM.OPERATION.ABS
     #    return self.callFieldMath(operation, None, self.mask, self.maskOnValue)

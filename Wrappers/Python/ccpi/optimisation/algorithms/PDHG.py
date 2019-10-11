@@ -61,20 +61,31 @@ class PDHG(Algorithm):
         SIAM J. Imaging Sci. 3, 1015–1046.
     '''
 
-    def __init__(self, **kwargs):
-        super(PDHG, self).__init__(max_iteration=kwargs.get('max_iteration',0))
-        f        = kwargs.get('f', None)
-        operator = kwargs.get('operator', None)
-        g        = kwargs.get('g', None)
-        tau      = kwargs.get('tau', None)
-        sigma    = kwargs.get('sigma', 1.)
+    def __init__(self, f=None, g=None, operator=None, tau=None, sigma=1.,**kwargs):
+        '''PDHG algorithm creator
+
+        :param operator : Linear Operator = K
+        :param f : Convex function with "simple" proximal of its conjugate. 
+        :param g : Convex function with "simple" proximal 
+        :param sigma : Step size parameter for Primal problem
+        :param tau : Step size parameter for Dual problem'''
+        super(PDHG, self).__init__(**kwargs)
+        
 
         if f is not None and operator is not None and g is not None:
-            print(self.__class__.__name__ , "set_up called from creator")
             self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma)
 
     def set_up(self, f, g, operator, tau=None, sigma=1.):
+        '''initialisation of the algorithm
 
+        :param operator : Linear Operator = K
+        :param f : Convex function with "simple" proximal of its conjugate. 
+        :param g : Convex function with "simple" proximal 
+        :param sigma : Step size parameter for Primal problem
+        :param tau : Step size parameter for Dual problem'''
+
+        print("{} setting up".format(self.__class__.__name__, ))
+        
         # can't happen with default sigma
         if sigma is None and tau is None:
             raise ValueError('Need sigma*tau||K||^2<1')
@@ -108,6 +119,8 @@ class PDHG(Algorithm):
         self.theta = 1
         self.update_objective()
         self.configured = True
+        print("{} configured".format(self.__class__.__name__, ))
+
 
     def update(self):
         

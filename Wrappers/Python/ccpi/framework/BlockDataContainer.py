@@ -26,7 +26,8 @@ import functools
 from ccpi.framework import DataContainer
 #from ccpi.framework import AcquisitionData, ImageData
 #from ccpi.optimisation.operators import Operator, LinearOperator
- 
+
+
 class BlockDataContainer(object):
     '''Class to hold DataContainers as column vector
     
@@ -102,7 +103,10 @@ class BlockDataContainer(object):
                     raise ValueError('List/ numpy array can only contain numbers {}'\
                                      .format(type(ot)))
             return len(self.containers) == len(other)
-        elif issubclass(other.__class__, DataContainer):
+        elif isinstance(other, BlockDataContainer): 
+            return len(self.containers) == len(other.containers)
+        else:
+            # this should work for other as DataContainers and children
             ret = True
             for i, el in enumerate(self.containers):
                 if isinstance(el, BlockDataContainer):
@@ -110,9 +114,9 @@ class BlockDataContainer(object):
                 else:
                     a = el.shape == other.shape
                 ret = ret and a
+            # probably will raise 
             return ret
-            #return self.get_item(0).shape == other.shape
-        return len(self.containers) == len(other.containers)
+
 
     def get_item(self, row):
         if row > self.shape[0]:
@@ -178,9 +182,9 @@ class BlockDataContainer(object):
         This method is not to be used directly
         '''
         if not self.is_compatible(other):
-            raise ValueError('Incompatible for divide')
+            raise ValueError('Incompatible for operation {}'.format(operation))
         out = kwargs.get('out', None)
-        if isinstance(other, Number) or issubclass(other.__class__, DataContainer):
+        if isinstance(other, Number):
             # try to do algebra with one DataContainer. Will raise error if not compatible
             kw = kwargs.copy()
             res = []
@@ -240,8 +244,32 @@ class BlockDataContainer(object):
                 return type(self)(*res, shape=self.shape)
             return type(self)(*[ operation(ot, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
         else:
-            raise ValueError('Incompatible type {}'.format(type(other)))
-    
+            # try to do algebra with one DataContainer. Will raise error if not compatible
+            kw = kwargs.copy()
+            res = []
+            for i,el in enumerate(self.containers):
+                if operation == BlockDataContainer.ADD:
+                    op = el.add
+                elif operation == BlockDataContainer.SUBTRACT:
+                    op = el.subtract
+                elif operation == BlockDataContainer.MULTIPLY:
+                    op = el.multiply
+                elif operation == BlockDataContainer.DIVIDE:
+                    op = el.divide
+                elif operation == BlockDataContainer.POWER:
+                    op = el.power
+                else:
+                    raise ValueError('Unsupported operation', operation)
+                if out is not None:
+                    kw['out'] = out.get_item(i)
+                    op(other, *args, **kw)
+                else:
+                    res.append(op(other, *args, **kw))
+            if out is not None:
+                return
+            else:
+                return type(self)(*res, shape=self.shape)
+        
 
     def power(self, other, *args, **kwargs):
         if not self.is_compatible(other):

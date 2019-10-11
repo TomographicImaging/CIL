@@ -58,11 +58,11 @@ class TestAlgorithms(unittest.TestCase):
     def test_GradientDescent(self):
         print ("Test GradientDescent")
         ig = ImageGeometry(12,13,14)
-        x_init = ImageData(geometry=ig)
-        b = x_init.copy()
+        x_init = ig.allocate()
+        # b = x_init.copy()
         # fill with random numbers
-        b.fill(numpy.random.random(x_init.shape))
-        
+        # b.fill(numpy.random.random(x_init.shape))
+        b = ig.allocate('random')
         identity = Identity(ig)
         
         norm2sq = Norm2Sq(identity, b)
@@ -86,18 +86,22 @@ class TestAlgorithms(unittest.TestCase):
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
     def test_CGLS(self):
         print ("Test CGLS")
-        ig = ImageGeometry(124,153,154)
-        x_init = ImageData(geometry=ig)
-        x_init = ig.allocate()
-        b = x_init.copy()
+        #ig = ImageGeometry(124,153,154)
+        ig = ImageGeometry(10,2)
+        numpy.random.seed(2)
+        x_init = ig.allocate(0.)
+        # b = x_init.copy()
         # fill with random numbers
-        b.fill(numpy.random.random(x_init.shape))
-        b = ig.allocate('random')
+        # b.fill(numpy.random.random(x_init.shape))
+        b = ig.allocate()
+        bdata = numpy.reshape(numpy.asarray([i for i in range(20)]), (2,10))
+        b.fill(bdata)
         identity = Identity(ig)
         
         alg = CGLS(x_init=x_init, operator=identity, data=b)
         alg.max_iteration = 200
         alg.run(20, verbose=True)
+<<<<<<< HEAD
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
         alg = CGLS(x_init=x_init, operator=identity, data=b, max_iteration=200, update_objective_interval=2)
@@ -105,11 +109,14 @@ class TestAlgorithms(unittest.TestCase):
         self.assertTrue(alg.update_objective_interval=2)
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+=======
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array(), decimal=4)
+>>>>>>> origin/master
         
     def test_FISTA(self):
         print ("Test FISTA")
         ig = ImageGeometry(127,139,149)
-        x_init = ImageData(geometry=ig)
+        x_init = ig.allocate()
         b = x_init.copy()
         # fill with random numbers
         b.fill(numpy.random.random(x_init.shape))
@@ -139,10 +146,8 @@ class TestAlgorithms(unittest.TestCase):
     def test_FISTA_Norm2Sq(self):
         print ("Test FISTA Norm2Sq")
         ig = ImageGeometry(127,139,149)
-        x_init = ImageData(geometry=ig)
-        b = x_init.copy()
+        b = ig.allocate(ImageGeometry.RANDOM)
         # fill with random numbers
-        b.fill(numpy.random.random(x_init.shape))
         x_init = ig.allocate(ImageGeometry.RANDOM)
         identity = Identity(ig)
         
@@ -168,6 +173,7 @@ class TestAlgorithms(unittest.TestCase):
         print ("Test FISTA catch Lipschitz")
         ig = ImageGeometry(127,139,149)
         x_init = ImageData(geometry=ig)
+        x_init = ig.allocate()
         b = x_init.copy()
         # fill with random numbers
         b.fill(numpy.random.random(x_init.shape))

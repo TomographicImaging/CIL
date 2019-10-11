@@ -81,7 +81,7 @@ class TestAlgorithms(unittest.TestCase):
                               update_objective_interval=2)
         alg.max_iteration = 20
         self.assertTrue(alg.max_iteration == 20)
-        self.assertTrue(alg.update_objective_interval=2)
+        self.assertTrue(alg.update_objective_interval==2)
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
     def test_CGLS(self):
@@ -90,12 +90,13 @@ class TestAlgorithms(unittest.TestCase):
         ig = ImageGeometry(10,2)
         numpy.random.seed(2)
         x_init = ig.allocate(0.)
+        b = ig.allocate('random')
         # b = x_init.copy()
         # fill with random numbers
         # b.fill(numpy.random.random(x_init.shape))
-        b = ig.allocate()
-        bdata = numpy.reshape(numpy.asarray([i for i in range(20)]), (2,10))
-        b.fill(bdata)
+        # b = ig.allocate()
+        # bdata = numpy.reshape(numpy.asarray([i for i in range(20)]), (2,10))
+        # b.fill(bdata)
         identity = Identity(ig)
         
         alg = CGLS(x_init=x_init, operator=identity, data=b)
@@ -105,7 +106,7 @@ class TestAlgorithms(unittest.TestCase):
 
         alg = CGLS(x_init=x_init, operator=identity, data=b, max_iteration=200, update_objective_interval=2)
         self.assertTrue(alg.max_iteration == 200)
-        self.assertTrue(alg.update_objective_interval=2)
+        self.assertTrue(alg.update_objective_interval==2)
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
         
@@ -133,7 +134,7 @@ class TestAlgorithms(unittest.TestCase):
         alg = FISTA(x_init=x_init, f=norm2sq, g=ZeroFunction(), max_iteration=2, update_objective_interval=2)
         
         self.assertTrue(alg.max_iteration == 2)
-        self.assertTrue(alg.update_objective_interval=2)
+        self.assertTrue(alg.update_objective_interval==2)
 
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
@@ -160,7 +161,7 @@ class TestAlgorithms(unittest.TestCase):
 
         alg = FISTA(x_init=x_init, f=norm2sq, g=ZeroFunction(), max_iteration=2, update_objective_interval=3)
         self.assertTrue(alg.max_iteration == 2)
-        self.assertTrue(alg.update_objective_interval=3)
+        self.assertTrue(alg.update_objective_interval== 3)
 
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())

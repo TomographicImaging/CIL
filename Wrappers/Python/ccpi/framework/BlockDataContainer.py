@@ -182,7 +182,7 @@ class BlockDataContainer(object):
         This method is not to be used directly
         '''
         if not self.is_compatible(other):
-            raise ValueError('Incompatible for divide')
+            raise ValueError('Incompatible for operation {}'.format(operation))
         out = kwargs.get('out', None)
         if isinstance(other, Number):
             # try to do algebra with one DataContainer. Will raise error if not compatible

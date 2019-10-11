@@ -213,9 +213,11 @@ class NexusReader(object):
                                        pixel_size_v         = 1,
                                        dist_source_center   = None, 
                                        dist_center_detector = None, 
-                                       channels             = 1)
-        return AcquisitionData(data, geometry=geometry, 
-                               dimension_labels=['angle','vertical','horizontal'])   
+                                       channels             = 1,
+                                       dimension_labels=['angle','vertical','horizontal'])
+        out = geometry.allocate()
+        out.fill(data)
+        return out
     
     def get_acquisition_data_subset(self, ymin=None, ymax=None):
         '''
@@ -288,9 +290,11 @@ class NexusReader(object):
                                        pixel_size_v         = 1,
                                        dist_source_center   = None, 
                                        dist_center_detector = None, 
-                                       channels             = 1)
-            return AcquisitionData(data, False, geometry=geometry, 
-                               dimension_labels=['angle','vertical','horizontal']) 
+                                       channels             = 1,
+                                       dimension_labels=['angle','vertical','horizontal'])
+            out = geometry.allocate()
+            out.fill(data)
+            return out
         elif ymax-ymin == 1:
             geometry = AcquisitionGeometry('parallel', '2D', 
                                        angles,
@@ -298,9 +302,11 @@ class NexusReader(object):
                                        pixel_size_h         = 1 ,
                                        dist_source_center   = None, 
                                        dist_center_detector = None, 
-                                       channels             = 1)
-            return AcquisitionData(data.squeeze(), False, geometry=geometry, 
-                               dimension_labels=['angle','horizontal']) 
+                                       channels             = 1,
+                                       dimension_labels=['angle','horizontal'])
+            out = geometry.allocate()
+            out.fill(data.squeeze())
+            return out
     def get_acquisition_data_slice(self, y_slice=0):
         return self.get_acquisition_data_subset(ymin=y_slice , ymax=y_slice+1)
     def get_acquisition_data_whole(self):
@@ -367,9 +373,12 @@ class NexusReader(object):
                                        pixel_size_v         = 1,
                                        dist_source_center   = None, 
                                        dist_center_detector = None, 
-                                       channels             = 1)
-            return AcquisitionData(data, False, geometry=geometry, 
-                               dimension_labels=['angle','vertical','horizontal']) 
+                                       channels             = 1,
+                                       dimension_labels=['angle','vertical','horizontal'])
+            out = geometry.allocate()
+            out.fill(data)
+            return out
+            
         elif bmax-bmin == 1:
             geometry = AcquisitionGeometry('parallel', '2D', 
                                        angles,
@@ -377,9 +386,11 @@ class NexusReader(object):
                                        pixel_size_h         = 1 ,
                                        dist_source_center   = None, 
                                        dist_center_detector = None, 
-                                       channels             = 1)
-            return AcquisitionData(data.squeeze(), False, geometry=geometry, 
-                               dimension_labels=['angle','horizontal']) 
+                                       channels             = 1,
+                                       dimension_labels=['angle','horizontal'])
+            out = geometry.allocate()
+            out.fill(data.squeeze())
+            return out
         
     
           
@@ -481,9 +492,9 @@ class XTEKReader(object):
         This method reads the projection images from the directory and returns a numpy array
         '''  
         if not pilAvailable:
-            raise('Image library pillow is not installed')
+            raise ImportError('Image library pillow is not installed')
         if dimensions != None:
-            raise('Extracting subset of data is not implemented')
+            raise NotImplementedError('Extracting subset of data is not implemented')
         input_path = os.path.dirname(self.filename)
         pixels = np.zeros((self.num_projections, self.geometry.pixel_num_h, self.geometry.pixel_num_v), dtype='float32')
         for i in range(1, self.num_projections+1):
@@ -501,5 +512,8 @@ class XTEKReader(object):
         This method load the acquisition data and given dimension and returns an AcquisitionData Object
         '''
         data = self.load_projection(dimensions)
-        return AcquisitionData(data, geometry=self.geometry)
+        out = self.geometry.allocate()
+        out.fill(data)
+        return out
+        
     

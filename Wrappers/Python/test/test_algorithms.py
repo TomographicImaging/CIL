@@ -101,7 +101,6 @@ class TestAlgorithms(unittest.TestCase):
         alg = CGLS(x_init=x_init, operator=identity, data=b)
         alg.max_iteration = 200
         alg.run(20, verbose=True)
-<<<<<<< HEAD
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
         alg = CGLS(x_init=x_init, operator=identity, data=b, max_iteration=200, update_objective_interval=2)
@@ -109,9 +108,6 @@ class TestAlgorithms(unittest.TestCase):
         self.assertTrue(alg.update_objective_interval=2)
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-=======
-        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array(), decimal=4)
->>>>>>> origin/master
         
     def test_FISTA(self):
         print ("Test FISTA")

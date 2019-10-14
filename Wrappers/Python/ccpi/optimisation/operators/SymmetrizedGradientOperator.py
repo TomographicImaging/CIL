@@ -61,7 +61,7 @@ class SymmetrizedGradient(LinearOperator):
         
         self.gm_range = BlockGeometry(*tmp_gm)
         
-        self.FD = FiniteDiff(self.gm_domain, direction = 0, bnd_cond = self.bnd_cond)
+        self.FD = FiniteDiff(self.gm_domain.get_item(0), direction = 0, bnd_cond = self.bnd_cond)
         
         if self.gm_domain.shape[0]==2:
             self.order_ind = [0,2,1,3]
@@ -159,43 +159,40 @@ if __name__ == '__main__':
     print(E1.domain_geometry().shape, E1.range_geometry().shape)
     u1 = E1.domain_geometry().allocate('random_int')
     w1 = E1.range_geometry().allocate('random_int', symmetry = True)
+       
     
+    lhs = E1.direct(u1).dot(w1)
+    rhs = u1.dot(E1.adjoint(w1))
+    np.testing.assert_almost_equal(lhs, rhs)
     
-    aa = E1.direct(u1)
+    ###########################################################################
+    # 2D geometry with channels
+    ig2 = ImageGeometry(N, M, channels = C)
+    Grad2 = Gradient(ig2, correlation = 'Space')
     
+    E2 = SymmetrizedGradient(Grad2.range_geometry())
+    np.testing.assert_almost_equal(E2.norm(), np.sqrt(12), 1e-6)
     
-#    lhs = E1.direct(u1).dot(w1)
-#    rhs = u1.dot(E1.adjoint(w1))
-#    np.testing.assert_almost_equal(lhs, rhs)
+    print(E2.domain_geometry().shape, E2.range_geometry().shape)
+    u2 = E2.domain_geometry().allocate('random_int')
+    w2 = E2.range_geometry().allocate('random_int', symmetry = True)
 #    
-#    ###########################################################################
-#    # 2D geometry with channels
-#    ig2 = ImageGeometry(N, M, channels = C)
-#    Grad2 = Gradient(ig2, correlation = 'Space')
+    lhs2 = E2.direct(u2).dot(w2)
+    rhs2 = u2.dot(E2.adjoint(w2))
+    np.testing.assert_almost_equal(lhs2, rhs2)
+    
+    ###########################################################################
+    # 3D geometry no channels
+    ig3 = ImageGeometry(N, M, K)
+    Grad3 = Gradient(ig3, correlation = 'Space')
+    
+    E3 = SymmetrizedGradient(Grad3.range_geometry())
+    np.testing.assert_almost_equal(E3.norm(), np.sqrt(12), 1e-6)
+    
+    print(E3.domain_geometry().shape, E3.range_geometry().shape)
+    u3 = E3.domain_geometry().allocate('random_int')
+    w3 = E3.range_geometry().allocate('random_int', symmetry = True)
 #    
-#    E2 = SymmetrizedGradient(Grad2.range_geometry())
-#    np.testing.assert_almost_equal(E2.norm(), np.sqrt(12), 1e-6)
-#    
-#    print(E2.domain_geometry().shape, E2.range_geometry().shape)
-#    u2 = E2.domain_geometry().allocate('random_int')
-#    w2 = E2.range_geometry().allocate('random_int', symmetry = True)
-##    
-#    lhs2 = E2.direct(u2).dot(w2)
-#    rhs2 = u2.dot(E2.adjoint(w2))
-#    np.testing.assert_almost_equal(lhs2, rhs2)
-#    
-#    ###########################################################################
-#    # 3D geometry no channels
-#    ig3 = ImageGeometry(N, M, K)
-#    Grad3 = Gradient(ig3, correlation = 'Space')
-#    
-#    E3 = SymmetrizedGradient(Grad3.range_geometry())
-#    np.testing.assert_almost_equal(E3.norm(), np.sqrt(12), 1e-6)
-#    
-#    print(E3.domain_geometry().shape, E3.range_geometry().shape)
-#    u3 = E3.domain_geometry().allocate('random_int')
-#    w3 = E3.range_geometry().allocate('random_int', symmetry = True)
-##    
-#    lhs3 = E3.direct(u3).dot(w3)
-#    rhs3 = u3.dot(E3.adjoint(w3))
-#    np.testing.assert_almost_equal(lhs3, rhs3)  
+    lhs3 = E3.direct(u3).dot(w3)
+    rhs3 = u3.dot(E3.adjoint(w3))
+    np.testing.assert_almost_equal(lhs3, rhs3)  

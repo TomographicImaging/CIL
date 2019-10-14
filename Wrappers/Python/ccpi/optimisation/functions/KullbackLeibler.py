@@ -44,10 +44,10 @@ class KullbackLeibler(Function):
         
         super(KullbackLeibler, self).__init__()
         
-        self.b = data    
-        self.bnoise = kwargs.get('background_noise',data * 0.0)
+        self.data = data    
+        self.background_noise = kwargs.get('background_noise',data * 0.0)
         
-        if data is None:
+        if self.data is None:
             raise ValueError('Please define data')
         
                                                     
@@ -57,7 +57,7 @@ class KullbackLeibler(Function):
         '''Evaluates KullbackLeibler at x'''
 
         ind = x.as_array()>0
-        tmp = scipy.special.kl_div(self.b.as_array()[ind], x.as_array()[ind])                
+        tmp = scipy.special.kl_div(self.data.as_array()[ind], x.as_array()[ind])                
         return numpy.sum(tmp) 
 
     def log(self, datacontainer):
@@ -72,11 +72,11 @@ class KullbackLeibler(Function):
         '''Evaluates gradient of KullbackLeibler at x'''
         
         if out is None:
-            return 1 - self.b/(x + self.bnoise)
+            return 1 - self.data/(x + self.background_noise)
         else:
 
-            x.add(self.bnoise, out=out)
-            self.b.divide(out, out=out)
+            x.add(self.background_noise, out=out)
+            self.data.divide(out, out=out)
             out.subtract(1, out=out)
             out *= -1
             
@@ -84,7 +84,7 @@ class KullbackLeibler(Function):
         
         '''Convex conjugate of KullbackLeibler at x'''
         
-        xlogy = - scipy.special.xlogy(self.b.as_array(), 1 - x.as_array())
+        xlogy = - scipy.special.xlogy(self.data.as_array(), 1 - x.as_array())
         return numpy.sum(xlogy)
             
     def proximal(self, x, tau, out=None):
@@ -96,20 +96,20 @@ class KullbackLeibler(Function):
         '''
 
         if out is None:        
-            return 0.5 *( (x - self.bnoise - tau) + ( (x + self.bnoise - tau)**2 + 4*tau*self.b   ) .sqrt() )
+            return 0.5 *( (x - self.background_noise - tau) + ( (x + self.background_noise - tau)**2 + 4*tau*self.data   ) .sqrt() )
         else:
             
-            tmp =  0.5 *( (x - self.bnoise - tau) + 
-                        ( (x + self.bnoise - tau)**2 + 4*tau*self.b   ) .sqrt()
+            tmp =  0.5 *( (x - self.background_noise - tau) + 
+                        ( (x + self.background_noise - tau)**2 + 4*tau*self.data   ) .sqrt()
                         )
-            x.add(self.bnoise, out=out)
+            x.add(self.background_noise, out=out)
             out -= tau
             out *= out
-            tmp = self.b * (4 * tau)
+            tmp = self.data * (4 * tau)
             out.add(tmp, out=out)
             out.sqrt(out=out)
             
-            x.subtract(self.bnoise, out=tmp)
+            x.subtract(self.background_noise, out=tmp)
             tmp -= tau
             
             out += tmp
@@ -125,15 +125,15 @@ class KullbackLeibler(Function):
 
                 
         if out is None:
-            z = x + tau * self.bnoise
-            return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
+            z = x + tau * self.background_noise
+            return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.data).sqrt())
         else:
             
-            tmp = tau * self.bnoise
+            tmp = tau * self.background_noise
             tmp += x
             tmp -= 1
             
-            self.b.multiply(4*tau, out=out)    
+            self.data.multiply(4*tau, out=out)    
             
             out.add((tmp)**2, out=out)
             out.sqrt(out=out)

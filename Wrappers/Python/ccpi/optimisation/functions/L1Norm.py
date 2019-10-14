@@ -40,7 +40,7 @@ class L1Norm(Function):
     def __init__(self, data = None, **kwargs):
         
         super(L1Norm, self).__init__()
-        self.b = data
+        self.data = data
         self.shinkage_operator = ShrinkageOperator()
         
     def __call__(self, x):
@@ -48,8 +48,8 @@ class L1Norm(Function):
         '''Evaluates L1Norm at x'''
         
         y = x
-        if self.b is not None: 
-            y = x - self.b
+        if self.data is not None: 
+            y = x - self.data
         return y.abs().sum()  
     
     def gradient(self,x):
@@ -61,8 +61,8 @@ class L1Norm(Function):
         '''Convex conjugate of L1Norm at x'''
 
         y = 0        
-        if self.b is not None:
-            y =  0 + self.b.dot(x)
+        if self.data is not None:
+            y =  0 + self.data.dot(x)
         return y  
     
     def proximal(self, x, tau, out=None):
@@ -74,13 +74,13 @@ class L1Norm(Function):
         ''' 
         
         if out is None:
-            if self.b is not None:
-                return self.b + self.shinkage_operator(x - self.b, tau)
+            if self.data is not None:
+                return self.data + self.shinkage_operator(x - self.data, tau)
             else:
                 return self.shinkage_operator(x, tau)             
         else:
             if self.b is not None:
-                out.fill(self.b + self.shinkage_operator(x - self.b, tau))
+                out.fill(self.data + self.shinkage_operator(x - self.data, tau))
             else:
                 out.fill(self.shinkage_operator(x, tau))
                                     
@@ -93,13 +93,13 @@ class L1Norm(Function):
         '''          
         
         if out is None:
-            if self.b is not None:
-                return (x - tau*self.b).divide((x - tau*self.b).abs().maximum(1.0))
+            if self.data is not None:
+                return (x - tau*self.data).divide((x - tau*self.data).abs().maximum(1.0))
             else:
                 return x.divide(x.abs().maximum(1.0))
         else:
             if self.b is not None:
-                out.fill((x - tau*self.b).divide((x - tau*self.b).abs().maximum(1.0)))
+                out.fill((x - tau*self.data).divide((x - tau*self.data).abs().maximum(1.0)))
             else:
                 out.fill(x.divide(x.abs().maximum(1.0)) )                
             
@@ -126,8 +126,8 @@ if __name__ == '__main__':
     f = L1Norm()
     f_scaled = scalar * L1Norm()
 
-    f_b = L1Norm(b=b)
-    f_scaled_b = scalar * L1Norm(b=b)
+    f_b = L1Norm(b)
+    f_scaled_b = scalar * L1Norm(b)
     
     # call  
         

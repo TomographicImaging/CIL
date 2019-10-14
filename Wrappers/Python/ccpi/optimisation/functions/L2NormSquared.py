@@ -39,7 +39,7 @@ class L2NormSquared(Function):
     def __init__(self, data = None,  **kwargs):
                                 
         super(L2NormSquared, self).__init__()
-        self.b = data
+        self.data = data
         # Lipschitz constant
         self.L = 2
 
@@ -48,8 +48,8 @@ class L2NormSquared(Function):
         '''Evaluates L2NormSquared at x'''
             
         y = x
-        if self.b is not None: 
-            y = x - self.b
+        if self.data is not None: 
+            y = x - self.data
         try:
             return y.squared_norm()
         except AttributeError as ae:
@@ -63,15 +63,15 @@ class L2NormSquared(Function):
         if out is not None:
             
             out.fill(x)
-            if self.b is not None:
-                out -= self.b
+            if self.data is not None:
+                out -= self.data
             out *= 2
             
         else:
             
             y = x
-            if self.b is not None:
-                y = x - self.b
+            if self.data is not None:
+                y = x - self.data
             return 2*y
         
                                                        
@@ -81,8 +81,8 @@ class L2NormSquared(Function):
         
         tmp = 0
         
-        if self.b is not None:
-            tmp = x.dot(self.b) #(x * self.b).sum()
+        if self.data is not None:
+            tmp = x.dot(self.data) #(x * self.b).sum()
             
         return (1./4.) * x.squared_norm() + tmp
 
@@ -96,19 +96,19 @@ class L2NormSquared(Function):
         
         if out is None:
             
-            if self.b is None:
+            if self.data is None:
                 return x/(1+2*tau)
             else:
-                tmp = x.subtract(self.b)
+                tmp = x.subtract(self.data)
                 tmp /= (1+2*tau)
-                tmp += self.b
+                tmp += self.data
                 return tmp
 
         else:
-            if self.b is not None:
-                x.subtract(self.b, out=out)
+            if self.data is not None:
+                x.subtract(self.dat, out=out)
                 out /= (1+2*tau)
-                out += self.b
+                out += self.data
             else:
                 x.divide((1+2*tau), out=out)
 
@@ -120,13 +120,13 @@ class L2NormSquared(Function):
            .. math::  prox_{\tau * f^{*}}(x)'''
         
         if out is None:
-            if self.b is not None:
-                return (x - tau*self.b)/(1 + tau/2) 
+            if self.data is not None:
+                return (x - tau*self.data)/(1 + tau/2) 
             else:
                 return x/(1 + tau/2)
         else:
-            if self.b is not None:
-                x.subtract(tau*self.b, out=out)
+            if self.data is not None:
+                x.subtract(tau*self.data, out=out)
                 out.divide(1+tau/2, out=out)
             else:
                 x.divide(1 + tau/2, out=out)
@@ -160,7 +160,7 @@ if __name__ == '__main__':
     numpy.testing.assert_equal(f(u), u.squared_norm())
 
     # check grad/call with data
-    f1 = L2NormSquared(b=b)
+    f1 = L2NormSquared(b)
     b1 = f1.gradient(u)
     b2 = 2 * (u-b)
         
@@ -206,7 +206,7 @@ if __name__ == '__main__':
     # scalar 
     scalar = 100
     f_scaled_no_data = scalar * L2NormSquared()
-    f_scaled_data = scalar * L2NormSquared(b=b)
+    f_scaled_data = scalar * L2NormSquared(b)
     
     # call
     numpy.testing.assert_equal(f_scaled_no_data(u), scalar*f(u))
@@ -268,8 +268,8 @@ if __name__ == '__main__':
     b = ig1.allocate('random_int')
     
     scalar = 0.5
-    f_scaled = scalar * L2NormSquared(b=b)
-    f_noscaled = L2NormSquared(b=b)
+    f_scaled = scalar * L2NormSquared(b)
+    f_noscaled = L2NormSquared(b)
     
     
     res1 = f_scaled.proximal(u, tau)

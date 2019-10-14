@@ -58,11 +58,11 @@ class TestAlgorithms(unittest.TestCase):
     def test_GradientDescent(self):
         print ("Test GradientDescent")
         ig = ImageGeometry(12,13,14)
-        x_init = ImageData(geometry=ig)
-        b = x_init.copy()
+        x_init = ig.allocate()
+        # b = x_init.copy()
         # fill with random numbers
-        b.fill(numpy.random.random(x_init.shape))
-        
+        # b.fill(numpy.random.random(x_init.shape))
+        b = ig.allocate('random')
         identity = Identity(ig)
         
         norm2sq = Norm2Sq(identity, b)
@@ -75,26 +75,45 @@ class TestAlgorithms(unittest.TestCase):
         alg.max_iteration = 20
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+        alg = GradientDescent(x_init=x_init, 
+                              objective_function=norm2sq, 
+                              rate=rate, max_iteration=20,
+                              update_objective_interval=2)
+        alg.max_iteration = 20
+        self.assertTrue(alg.max_iteration == 20)
+        self.assertTrue(alg.update_objective_interval==2)
+        alg.run(20, verbose=True)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
     def test_CGLS(self):
         print ("Test CGLS")
-        ig = ImageGeometry(124,153,154)
-        x_init = ImageData(geometry=ig)
-        x_init = ig.allocate()
-        b = x_init.copy()
-        # fill with random numbers
-        b.fill(numpy.random.random(x_init.shape))
+        #ig = ImageGeometry(124,153,154)
+        ig = ImageGeometry(10,2)
+        numpy.random.seed(2)
+        x_init = ig.allocate(0.)
         b = ig.allocate('random')
+        # b = x_init.copy()
+        # fill with random numbers
+        # b.fill(numpy.random.random(x_init.shape))
+        # b = ig.allocate()
+        # bdata = numpy.reshape(numpy.asarray([i for i in range(20)]), (2,10))
+        # b.fill(bdata)
         identity = Identity(ig)
         
         alg = CGLS(x_init=x_init, operator=identity, data=b)
         alg.max_iteration = 200
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+
+        alg = CGLS(x_init=x_init, operator=identity, data=b, max_iteration=200, update_objective_interval=2)
+        self.assertTrue(alg.max_iteration == 200)
+        self.assertTrue(alg.update_objective_interval==2)
+        alg.run(20, verbose=True)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
         
     def test_FISTA(self):
         print ("Test FISTA")
         ig = ImageGeometry(127,139,149)
-        x_init = ImageData(geometry=ig)
+        x_init = ig.allocate()
         b = x_init.copy()
         # fill with random numbers
         b.fill(numpy.random.random(x_init.shape))
@@ -111,14 +130,21 @@ class TestAlgorithms(unittest.TestCase):
         alg.max_iteration = 2
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+
+        alg = FISTA(x_init=x_init, f=norm2sq, g=ZeroFunction(), max_iteration=2, update_objective_interval=2)
+        
+        self.assertTrue(alg.max_iteration == 2)
+        self.assertTrue(alg.update_objective_interval==2)
+
+        alg.run(20, verbose=True)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+
                
     def test_FISTA_Norm2Sq(self):
         print ("Test FISTA Norm2Sq")
         ig = ImageGeometry(127,139,149)
-        x_init = ImageData(geometry=ig)
-        b = x_init.copy()
+        b = ig.allocate(ImageGeometry.RANDOM)
         # fill with random numbers
-        b.fill(numpy.random.random(x_init.shape))
         x_init = ig.allocate(ImageGeometry.RANDOM)
         identity = Identity(ig)
         
@@ -132,10 +158,19 @@ class TestAlgorithms(unittest.TestCase):
         alg.max_iteration = 2
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+
+        alg = FISTA(x_init=x_init, f=norm2sq, g=ZeroFunction(), max_iteration=2, update_objective_interval=3)
+        self.assertTrue(alg.max_iteration == 2)
+        self.assertTrue(alg.update_objective_interval== 3)
+
+        alg.run(20, verbose=True)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+
     def test_FISTA_catch_Lipschitz(self):
         print ("Test FISTA catch Lipschitz")
         ig = ImageGeometry(127,139,149)
         x_init = ImageData(geometry=ig)
+        x_init = ig.allocate()
         b = x_init.copy()
         # fill with random numbers
         b.fill(numpy.random.random(x_init.shape))
@@ -240,9 +275,9 @@ class TestAlgorithms(unittest.TestCase):
         tau = 1/(sigma*normK**2)
 
         # Setup and run the PDHG algorithm
-        pdhg1 = PDHG(f=f1,g=g,operator=operator, tau=tau, sigma=sigma)
-        pdhg1.max_iteration = 2000
-        pdhg1.update_objective_interval = 200
+        pdhg1 = PDHG(f=f1,g=g,operator=operator, tau=tau, sigma=sigma, 
+                     max_iteration=2000, update_objective_interval=200)
+        
         pdhg1.run(1000)
 
         rmse = (pdhg1.get_output() - data).norm() / data.as_array().size

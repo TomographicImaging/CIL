@@ -20,6 +20,11 @@
 #
 #=========================================================================
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 from ccpi.optimisation.algorithms import Algorithm
 
 class GradientDescent(Algorithm):
@@ -30,17 +35,20 @@ class GradientDescent(Algorithm):
         
     '''
 
-    def __init__(self, **kwargs):
-        '''initialisation can be done at creation time if all 
-        proper variables are passed or later with set_up'''
-        super(GradientDescent, self).__init__()
+    def __init__(self, x_init=None, objective_function=None, rate=None, **kwargs):
+        '''GradientDescent algorithm creator
+        
+        initialisation can be done at creation time if all 
+        proper variables are passed or later with set_up
+        
+        :param x_init: initial guess
+        :param objective_function: objective function to be minimised
+        :param rate: step rate
+        '''
+        super(GradientDescent, self).__init__(**kwargs)
 
-        x_init               = kwargs.get('x_init', None)
-        objective_function   = kwargs.get('objective_function', None)
-        rate                 = kwargs.get('rate', None)
-
+        
         if x_init is not None and objective_function is not None and rate is not None:
-            print(self.__class__.__name__, "set_up called from creator")
             self.set_up(x_init=x_init, objective_function=objective_function, rate=rate)
     
     def should_stop(self):
@@ -48,7 +56,13 @@ class GradientDescent(Algorithm):
         return self.iteration >= self.max_iteration
     
     def set_up(self, x_init, objective_function, rate):
-        '''initialisation of the algorithm'''
+        '''initialisation of the algorithm
+        
+        :param x_init: initial guess
+        :param objective_function: objective function to be minimised
+        :param rate: step rate'''
+        print("{} setting up".format(self.__class__.__name__, ))
+            
         self.x = x_init.copy()
         self.objective_function = objective_function
         self.rate = rate
@@ -64,6 +78,7 @@ class GradientDescent(Algorithm):
             self.x_update = x_init.copy()
 
         self.configured = True
+        print("{} configured".format(self.__class__.__name__, ))
 
     def update(self):
         '''Single iteration'''

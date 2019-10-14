@@ -17,6 +17,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 from ccpi.optimisation.algorithms import Algorithm
 import numpy
 
@@ -42,20 +47,30 @@ class CGLS(Algorithm):
     Reference:
         https://web.stanford.edu/group/SOL/software/cgls/
     '''
-    def __init__(self, **kwargs):
+    def __init__(self, x_init=None, operator=None, data=None, tolerance=1e-6, **kwargs):
+        '''initialisation of the algorithm
+
+        :param operator : Linear operator for the inverse problem
+        :param x_init : Initial guess ( Default x_init = 0)
+        :param data : Acquired data to reconstruct       
+        :param tolerance: Tolerance/ Stopping Criterion to end CGLS algorithm
+        '''
+        super(CGLS, self).__init__(**kwargs)
         
-        super(CGLS, self).__init__()
-        x_init    = kwargs.get('x_init', None)
-        operator  = kwargs.get('operator', None)
-        data      = kwargs.get('data', None)
-        tolerance = kwargs.get('tolerance', 1e-6)
 
         if x_init is not None and operator is not None and data is not None:
-            print(self.__class__.__name__ , "set_up called from creator")
             self.set_up(x_init=x_init, operator=operator, data=data, tolerance=tolerance)
 
     def set_up(self, x_init, operator, data, tolerance=1e-6):
+        '''initialisation of the algorithm
 
+        :param operator : Linear operator for the inverse problem
+        :param x_init : Initial guess ( Default x_init = 0)
+        :param data : Acquired data to reconstruct       
+        :param tolerance: Tolerance/ Stopping Criterion to end CGLS algorithm
+        '''
+        print("{} setting up".format(self.__class__.__name__, ))
+        
         self.x = x_init * 0.
         self.operator = operator
         self.tolerance = tolerance
@@ -73,7 +88,9 @@ class CGLS(Algorithm):
         self.xmax = self.normx   
         
         self.loss.append(self.r.squared_norm())
-        self.configured = True         
+        self.configured = True
+        print("{} configured".format(self.__class__.__name__, ))
+     
 
         
     def update(self):

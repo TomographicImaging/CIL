@@ -17,6 +17,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 from ccpi.optimisation.algorithms import Algorithm
 from ccpi.optimisation.functions import ZeroFunction
 import numpy
@@ -48,24 +53,31 @@ class FISTA(Algorithm):
     '''
     
     
-    def __init__(self, **kwargs):
+    def __init__(self, x_init=None, f=None, g=ZeroFunction(), **kwargs):
         
-        '''creator 
+        '''FISTA algorithm creator 
         
         initialisation can be done at creation time if all 
-        proper variables are passed or later with set_up'''
+        proper variables are passed or later with set_up
         
-        super(FISTA, self).__init__()
-        f = kwargs.get('f', None)
-        g = kwargs.get('g', ZeroFunction())
-        x_init = kwargs.get('x_init', None)
-
+        :param x_init : Initial guess ( Default x_init = 0)
+        :param f : Differentiable function
+        :param g : Convex function with " simple " proximal operator'''
+        
+        super(FISTA, self).__init__(**kwargs)
+        
         if x_init is not None and f is not None:
-            print(self.__class__.__name__ , "set_up called from creator")
             self.set_up(x_init=x_init, f=f, g=g)
 
     def set_up(self, x_init, f, g=ZeroFunction()):
+        '''initialisation of the algorithm
 
+        :param x_init : Initial guess ( Default x_init = 0)
+        :param f : Differentiable function
+        :param g : Convex function with " simple " proximal operator'''
+
+        print("{} setting up".format(self.__class__.__name__, ))
+        
         self.y = x_init.copy()
         self.x_old = x_init.copy()
         self.x = x_init.copy()
@@ -79,6 +91,8 @@ class FISTA(Algorithm):
         self.t = 1
         self.update_objective()
         self.configured = True
+        print("{} configured".format(self.__class__.__name__, ))
+
             
     def update(self):
         self.t_old = self.t

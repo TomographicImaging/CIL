@@ -45,7 +45,6 @@ class ImageGeometry(object):
     RANDOM = 'random'
     RANDOM_INT = 'random_int'
     CHANNEL = 'channel'
-    ANGLE = 'angle'
     VERTICAL = 'vertical'
     HORIZONTAL_X = 'horizontal_x'
     HORIZONTAL_Y = 'horizontal_y'
@@ -101,11 +100,17 @@ class ImageGeometry(object):
             self.shape = shape
             self.dimension_labels = dim_labels
         else:
+            if labels is not None:
+                allowed_labels = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL,
+                                  ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+                if not reduce(lambda x,y: (y in allowed_labels) and x, labels , True):
+                    raise ValueError('Requested axis are not possible. Expected {},\ngot {}'.format(
+                                    allowed_labels,labels))
             order = self.get_order_by_label(labels, dim_labels)
-            if order != [0,1,2]:
+            if order != [i for i in range(len(dim_labels))]:
                 # resort
                 self.shape = tuple([shape[i] for i in order])
-                self.dimension_labels = labels
+            self.dimension_labels = labels
                 
     def get_order_by_label(self, dimension_labels, default_dimension_labels):
         order = []
@@ -153,7 +158,8 @@ class ImageGeometry(object):
                             self.center_x, 
                             self.center_y, 
                             self.center_z, 
-                            self.channels)
+                            self.channels,
+                            dimension_labels=self.dimension_labels)
     def __str__ (self):
         repres = ""
         repres += "Number of channels: {0}\n".format(self.channels)
@@ -164,12 +170,12 @@ class ImageGeometry(object):
     def allocate(self, value=0, dimension_labels=None, **kwargs):
         '''allocates an ImageData according to the size expressed in the instance'''
         if dimension_labels is None:
-            out = ImageData(geometry=self, dimension_labels=self.dimension_labels)
+            out = ImageData(geometry=self, dimension_labels=self.dimension_labels, suppress_warning=True)
         else:
-            out = ImageData(geometry=self, dimension_labels=dimension_labels)
+            out = ImageData(geometry=self, dimension_labels=dimension_labels, suppress_warning=True)
         if isinstance(value, Number):
-            if value != 0:
-                out += value
+            # it's created empty, so we make it 0
+            out.array.fill(value)
         else:
             if value == ImageGeometry.RANDOM:
                 seed = kwargs.get('seed', None)
@@ -182,6 +188,8 @@ class ImageGeometry(object):
                     numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
                 out.fill(numpy.random.randint(max_value,size=self.shape))
+            elif value is None:
+                pass
             else:
                 raise ValueError('Value {} unknown'.format(value))
 
@@ -291,13 +299,21 @@ class AcquisitionGeometry(object):
             self.shape = shape
             self.dimension_labels = dim_labels
         else:
+            if labels is not None:
+                allowed_labels = [AcquisitionGeometry.CHANNEL,
+                                    AcquisitionGeometry.ANGLE,
+                                    AcquisitionGeometry.VERTICAL,
+                                    AcquisitionGeometry.HORIZONTAL]
+                if not reduce(lambda x,y: (y in allowed_labels) and x, labels , True):
+                    raise ValueError('Requested axis are not possible. Expected {},\ngot {}'.format(
+                                    allowed_labels,labels))
             if len(labels) != len(dim_labels):
                 raise ValueError('Wrong number of labels. Expected {} got {}'.format(len(dim_labels), len(labels)))
             order = self.get_order_by_label(labels, dim_labels)
-            if order != [0,1,2]:
+            if order != [i for i in range(len(dim_labels))]:
                 # resort
                 self.shape = tuple([shape[i] for i in order])
-                self.dimension_labels = labels
+            self.dimension_labels = labels
         
     def get_order_by_label(self, dimension_labels, default_dimension_labels):
         order = []
@@ -322,7 +338,8 @@ class AcquisitionGeometry(object):
                                    self.pixel_size_v, 
                                    self.dist_source_center, 
                                    self.dist_center_detector, 
-                                   self.channels)
+                                   self.channels,
+                                   dimension_labels=self.dimension_labels)
         
     def __str__ (self):
         repres = ""
@@ -335,27 +352,29 @@ class AcquisitionGeometry(object):
         repres += "distance center-detector: {0}\n".format(self.dist_source_center)
         repres += "number of channels: {0}\n".format(self.channels)
         return repres
-    def allocate(self, value=0, dimension_labels=None):
+    def allocate(self, value=0, dimension_labels=None, **kwargs):
         '''allocates an AcquisitionData according to the size expressed in the instance'''
         if dimension_labels is None:
-            out = AcquisitionData(geometry=self, dimension_labels=self.dimension_labels)
+            out = AcquisitionData(geometry=self, dimension_labels=self.dimension_labels, suppress_warning=True)
         else:
-            out = AcquisitionData(geometry=self, dimension_labels=dimension_labels)
+            out = AcquisitionData(geometry=self, dimension_labels=dimension_labels, suppress_warning=True)
         if isinstance(value, Number):
-            if value != 0:
-                out += value
+            # it's created empty, so we make it 0
+            out.array.fill(value)
         else:
-            if value == AcquisitionData.RANDOM:
+            if value == AcquisitionGeometry.RANDOM:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed) 
                 out.fill(numpy.random.random_sample(self.shape))
-            elif value == AcquisitionData.RANDOM_INT:
+            elif value == AcquisitionGeometry.RANDOM_INT:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
                 out.fill(numpy.random.randint(max_value,size=self.shape))
+            elif value is None:
+                pass
             else:
                 raise ValueError('Value {} unknown'.format(value))
         
@@ -440,15 +459,17 @@ class DataContainer(object):
             else:
                 reduced_dims = [v for k,v in self.dimension_labels.items()]
                 for dim_l, dim_v in kw.items():
-                    for k,v in self.dimension_labels.items():
+                    #for k,v in self.dimension_labels.items():
+                    for k,v in enumerate(reduced_dims):
                         if v == dim_l:
                             reduced_dims.pop(k)
-                return self.subset(dimensions=reduced_dims, **kw)
+                            break
+                #return self.subset(dimensions=reduced_dims, **kw)
+                return DataContainer.subset(self, dimensions=reduced_dims, **kw)
         else:
             # check that all the requested dimensions are in the array
             # this is done by checking the dimension_labels
             proceed = True
-            unknown_key = ''
             # axis_order contains the order of the axis that the user wants
             # in the output DataContainer
             axis_order = []
@@ -504,8 +525,10 @@ class DataContainer(object):
                 #print ("axes {0}".format(axes))
                 
                 cleaned = numpy.transpose(cleaned, axes).copy()
-                
-                return type(self)(cleaned , True, dimensions)
+                if cleaned.ndim > 1:
+                    return type(self)(cleaned , True, dimensions)
+                else:
+                    return VectorData(cleaned)
     
     def fill(self, array, **dimension):
         '''fills the internal numpy array with the one provided'''
@@ -572,7 +595,6 @@ class DataContainer(object):
     # __rmul__
     
     def __rdiv__(self, other):
-        print ("call __rdiv__")
         return pow(self / other, -1)
     # __rdiv__
     def __rtruediv__(self, other):
@@ -631,10 +653,18 @@ class DataContainer(object):
     def clone(self):
         '''returns a copy of itself'''
         
-        return type(self)(self.array, 
-                          dimension_labels=self.dimension_labels,
-                          deep_copy=True,
-                          geometry=self.geometry )
+        if self.geometry is None:
+            if not isinstance(self, DataContainer):
+                warnings.warn("Geometry is None in {}".format( self.__class__.__name__) )
+            return type(self)(self.array, 
+                            dimension_labels=self.dimension_labels,
+                            deep_copy=True,
+                            geometry=self.geometry,
+                            suppress_warning=True )
+        else:
+            out = self.geometry.allocate(None)
+            out.fill(self.array)
+            return out
     
     def get_data_axes_order(self,new_order=None):
         '''returns the axes label of self as a list
@@ -692,7 +722,8 @@ class DataContainer(object):
             return type(self)(out,
                    deep_copy=False, 
                    dimension_labels=self.dimension_labels,
-                   geometry=self.geometry)
+                   geometry=self.geometry, 
+                   suppress_warning=True)
             
         
         elif issubclass(type(out), DataContainer) and issubclass(type(x2), DataContainer):
@@ -770,7 +801,8 @@ class DataContainer(object):
             return type(self)(out,
                        deep_copy=False, 
                        dimension_labels=self.dimension_labels,
-                       geometry=self.geometry)
+                       geometry=self.geometry, 
+                       suppress_warning=True)
         elif issubclass(type(out), DataContainer):
             if self.check_dimensions(out):
                 kwargs['out'] = out.as_array()
@@ -795,6 +827,14 @@ class DataContainer(object):
 
     def conjugate(self, *args,  **kwargs):
         return self.pixel_wise_unary(numpy.conjugate, *args,  **kwargs)
+
+    def exp(self, *args, **kwargs):
+        '''Applies exp pixel-wise to the DataContainer'''
+        return self.pixel_wise_unary(numpy.exp, *args, **kwargs)
+    
+    def log(self, *args, **kwargs):
+        '''Applies log pixel-wise to the DataContainer'''
+        return self.pixel_wise_unary(numpy.log, *args, **kwargs)
     #def __abs__(self):
     #    operation = FM.OPERATION.ABS
     #    return self.callFieldMath(operation, None, self.mask, self.maskOnValue)
@@ -853,12 +893,16 @@ class ImageData(DataContainer):
                  dimension_labels=None, 
                  **kwargs):
         
+        if not kwargs.get('suppress_warning', False):
+            warnings.warn('Direct invocation is deprecated and will be removed in following version. Use allocate from ImageGeometry instead',
+                   DeprecationWarning, stacklevel=4)
         self.geometry = kwargs.get('geometry', None)
         if array is None:
             if self.geometry is not None:
                 shape, dimension_labels = self.get_shape_labels(self.geometry, dimension_labels)
                     
-                array = numpy.zeros( shape , dtype=numpy.float32) 
+                # array = numpy.zeros( shape, dtype=numpy.float32) 
+                array = numpy.empty( shape, dtype=numpy.float32)
                 super(ImageData, self).__init__(array, deep_copy,
                                  dimension_labels, **kwargs)
                 
@@ -916,15 +960,59 @@ class ImageData(DataContainer):
                     if key == 'spacing' :
                         self.spacing = value
                         
-        def subset(self, dimensions=None, **kw):
-            # FIXME: this is clearly not rigth
-            # it should be something like 
-            # out = DataContainer.subset(self, dimensions, **kw)
-            # followed by regeneration of the proper geometry. 
-            out = super(ImageData, self).subset(dimensions, **kw)
-            #out.geometry = self.recalculate_geometry(dimensions , **kw)
-            out.geometry = self.geometry
-            return out
+    def subset(self, dimensions=None, **kw):
+        '''returns a subset of ImageData and regenerates the geometry'''
+        # Check that this is actually a resorting
+        if dimensions is not None and \
+            (len(dimensions) != len(self.shape) ):
+            raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
+        #out = DataContainer.subset(self, dimensions, **kw)
+        out = super(ImageData, self).subset(dimensions, **kw)
+        
+        if out.number_of_dimensions > 1:
+            channels = 1
+            
+            voxel_num_x = 0
+            voxel_num_y = 0
+            voxel_num_z = 0
+            
+            voxel_size_x = 1
+            voxel_size_y = 1
+            voxel_size_z = 1
+            
+            center_x = 0 
+            center_y = 0 
+            center_z = 0 
+            for key in out.dimension_labels.keys():
+                if out.dimension_labels[key] == 'channel':
+                    channels = self.geometry.channels
+                elif out.dimension_labels[key] == 'horizontal_y':
+                    voxel_size_y = self.geometry.voxel_size_y
+                    voxel_num_y = self.geometry.voxel_num_y
+                    center_y = self.geometry.center_y
+                elif out.dimension_labels[key] == 'vertical':
+                    voxel_size_z = self.geometry.voxel_size_z
+                    voxel_num_z = self.geometry.voxel_num_z
+                    center_z = self.geometry.center_z
+                elif out.dimension_labels[key] == 'horizontal_x':
+                    voxel_size_x = self.geometry.voxel_size_x
+                    voxel_num_x = self.geometry.voxel_num_x
+                    center_x = self.geometry.center_x
+            dim_lab = [ out.dimension_labels[k] for k in range(len(out.dimension_labels.items()))]
+            out.geometry = ImageGeometry(
+                                    voxel_num_x=voxel_num_x, 
+                                    voxel_num_y=voxel_num_y, 
+                                    voxel_num_z=voxel_num_z, 
+                                    voxel_size_x=voxel_size_x, 
+                                    voxel_size_y=voxel_size_y, 
+                                    voxel_size_z=voxel_size_z, 
+                                    center_x=center_x, 
+                                    center_y=center_y, 
+                                    center_z=center_z, 
+                                    channels = channels,
+                                    dimension_labels = dim_lab
+                                    )
+        return out
 
     def get_shape_labels(self, geometry, dimension_labels=None):
         channels  = geometry.channels
@@ -986,6 +1074,10 @@ class AcquisitionData(DataContainer):
                  deep_copy=True, 
                  dimension_labels=None, 
                  **kwargs):
+        if not kwargs.get('suppress_warning', False):
+            warnings.warn('Direct invocation is deprecated and will be removed in following version. Use allocate from AcquisitionGeometry instead',
+              DeprecationWarning)
+        
         self.geometry = kwargs.get('geometry', None)
         if array is None:
             if 'geometry' in kwargs.keys():
@@ -995,7 +1087,8 @@ class AcquisitionData(DataContainer):
                 shape, dimension_labels = self.get_shape_labels(geometry, dimension_labels)
                 
                     
-                array = numpy.zeros( shape , dtype=numpy.float32) 
+                # array = numpy.zeros( shape , dtype=numpy.float32) 
+                array = numpy.empty( shape, dtype=numpy.float32)
                 super(AcquisitionData, self).__init__(array, deep_copy,
                                  dimension_labels, **kwargs)
         else:
@@ -1094,6 +1187,64 @@ class AcquisitionData(DataContainer):
                     )
             shape = tuple(shape)
         return (shape, dimension_labels)
+    def subset(self, dimensions=None, **kw):
+        '''returns a subset of the AcquisitionData and regenerates the geometry'''
+
+        # Check that this is actually a resorting
+        if dimensions is not None and \
+            (len(dimensions) != len(self.shape) ):
+            raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
+
+        requested_labels = kw.get('dimension_labels', None)
+        if requested_labels is not None:
+            allowed_labels = [AcquisitionGeometry.CHANNEL,
+                                  AcquisitionGeometry.ANGLE,
+                                  AcquisitionGeometry.VERTICAL,
+                                  AcquisitionGeometry.HORIZONTAL]
+            if not reduce(lambda x,y: (y in allowed_labels) and x, requested_labels , True):
+                raise ValueError('Requested axis are not possible. Expected {},\ngot {}'.format(
+                                allowed_labels,requested_labels))
+        out = super(AcquisitionData, self).subset(dimensions, **kw)
+        
+        if out.number_of_dimensions > 1:
+            
+            dim = str (len(out.shape)) + "D"
+            
+            channels = 1
+            pixel_num_h = 0
+            pixel_size_h = 1
+            pixel_num_v = 0
+            pixel_size_v = 1
+            dist_source_center = self.geometry.dist_source_center
+            dist_center_detector = self.geometry.dist_center_detector
+            for key in out.dimension_labels.keys():
+                if out.dimension_labels[key] == AcquisitionGeometry.CHANNEL:
+                    channels = self.geometry.channels
+                elif out.dimension_labels[key] == AcquisitionGeometry.ANGLE:
+                    pass
+                elif out.dimension_labels[key] == AcquisitionGeometry.VERTICAL:
+                    pixel_num_v = self.geometry.pixel_num_v
+                    pixel_size_v = self.geometry.pixel_size_v
+                elif out.dimension_labels[key] == AcquisitionGeometry.HORIZONTAL:
+                    pixel_num_h = self.geometry.pixel_num_h
+                    pixel_size_h = self.geometry.pixel_size_h
+                
+            
+            dim_lab = [ out.dimension_labels[k] for k in range(len(out.dimension_labels.items()))]
+            
+            out.geometry = AcquisitionGeometry(geom_type=self.geometry.geom_type, 
+                                    dimension=dim,
+                                    angles=self.geometry.angles,
+                                    pixel_num_h=pixel_num_h,
+                                    pixel_size_h = pixel_size_h,
+                                    pixel_num_v = pixel_num_v,
+                                    pixel_size_v = pixel_size_v,
+                                    dist_source_center = dist_source_center,
+                                    dist_center_detector = dist_center_detector,
+                                    channels = channels,
+                                    dimension_labels = dim_lab
+                                    )
+        return out
     
                 
             
@@ -1323,165 +1474,93 @@ class PixelByPixelDataProcessor(DataProcessor):
         return y
     
 
+class VectorData(DataContainer):
+    '''DataContainer to contain 1D array'''
+    def __init__(self, array=None, **kwargs):
+        self.geometry = kwargs.get('geometry', None)
+        self.dtype = kwargs.get('dtype', numpy.float32)
         
-        
-if __name__ == '__main__':
-    shape = (2,3,4,5)
-    size = shape[0]
-    for i in range(1, len(shape)):
-        size = size * shape[i]
-    #print("a refcount " , sys.getrefcount(a))
-    a = numpy.asarray([i for i in range( size )])
-    print("a refcount " , sys.getrefcount(a))
-    a = numpy.reshape(a, shape)
-    print("a refcount " , sys.getrefcount(a))
-    ds = DataContainer(a, False, ['X', 'Y','Z' ,'W'])
-    print("a refcount " , sys.getrefcount(a))
-    print ("ds label {0}".format(ds.dimension_labels))
-    subset = ['W' ,'X']
-    b = ds.subset( subset )
-    print("a refcount " , sys.getrefcount(a))
-    print ("b label {0} shape {1}".format(b.dimension_labels, 
-           numpy.shape(b.as_array())))
-    c = ds.subset(['Z','W','X'])
-    print("a refcount " , sys.getrefcount(a))
-    
-    # Create a ImageData sharing the array with c
-    volume0 = ImageData(c.as_array(), False, dimensions = c.dimension_labels)
-    volume1 = ImageData(c, False)
-    
-    print ("volume0 {0} volume1 {1}".format(id(volume0.array),
-           id(volume1.array)))
-    
-    # Create a ImageData copying the array from c
-    volume2 = ImageData(c.as_array(), dimensions = c.dimension_labels)
-    volume3 = ImageData(c)
-    
-    print ("volume2 {0} volume3 {1}".format(id(volume2.array),
-           id(volume3.array)))
-        
-    # single number DataSet
-    sn = DataContainer(numpy.asarray([1]))
-    
-    ax = AX()
-    ax.scalar = 2
-    ax.set_input(c)
-    #ax.apply()
-    print ("ax  in {0} out {1}".format(c.as_array().flatten(),
-           ax.get_output().as_array().flatten()))
-    
-    cast = CastDataContainer(dtype=numpy.float32)
-    cast.set_input(c)
-    out = cast.get_output()
-    out *= 0 
-    axm = AX()
-    axm.scalar = 0.5
-    axm.set_input_processor(cast)
-    axm.get_output(out)
-    #axm.apply()
-    print ("axm in {0} out {1}".format(c.as_array(), axm.get_output().as_array()))
-    
-    # check out in DataSetProcessor
-   #a = numpy.asarray([i for i in range( size )])
-    
-        
-    # create a PixelByPixelDataProcessor
-    
-    #define a python function which will take only one input (the pixel value)
-    pyfunc = lambda x: -x if x > 20 else x
-    clip = PixelByPixelDataProcessor()
-    clip.pyfunc = pyfunc 
-    clip.set_input(c)    
-    #clip.apply()
-    
-    print ("clip in {0} out {1}".format(c.as_array(), clip.get_output().as_array()))
-    
-    #dsp = DataProcessor()
-    #dsp.set_input(ds)
-    #dsp.input = a
-    # pipeline
+        if self.geometry is None:
+            if array is None:
+                raise ValueError('Please specify either a geometry or an array')
+            else:
+                if len(array.shape) > 1:
+                    raise ValueError('Incompatible size: expected 1D got {}'.format(array.shape))
+                out = array
+                self.geometry = VectorGeometry(array.shape[0])
+                self.length = self.geometry.length
+        else:
+            self.length = self.geometry.length
+                
+            if array is None:
+                out = numpy.zeros((self.length,), dtype=self.dtype)
+            else:
+                if self.length == array.shape[0]:
+                    out = array
+                else:
+                    raise ValueError('Incompatible size: expecting {} got {}'.format((self.length,), array.shape))
+        deep_copy = True
+        super(VectorData, self).__init__(out, deep_copy, None)
 
-    chain = AX()
-    chain.scalar = 0.5
-    chain.set_input_processor(ax)
-    print ("chain in {0} out {1}".format(ax.get_output().as_array(), chain.get_output().as_array()))
-    
-    # testing arithmetic operations
-    
-    print (b)
-    print ((b+1))
-    print ((1+b))
-    
-    print (b)
-    print ((b*2))
-    
-    print (b)
-    print ((2*b))
-    
-    print (b)
-    print ((b/2))
-    
-    print (b)
-    print ((2/b))
-    
-    print (b)
-    print ((b**2))
-    
-    print (b)
-    print ((2**b))
-    
-    print (type(volume3 + 2))
-    
-    s = [i for i in range(3 * 4 * 4)]
-    s = numpy.reshape(numpy.asarray(s), (3,4,4))
-    sino = AcquisitionData( s )
-    
-    shape = (4,3,2)
-    a = [i for i in range(2*3*4)]
-    a = numpy.asarray(a)
-    a = numpy.reshape(a, shape)
-    print (numpy.shape(a))
-    ds = DataContainer(a, True, ['X', 'Y','Z'])
-    # this means that I expect the X to be of length 2 ,
-    # y of length 3 and z of length 4
-    subset = ['Y' ,'Z']
-    b0 = ds.subset( subset )
-    print ("shape b 3,2? {0}".format(numpy.shape(b0.as_array())))
-    # expectation on b is that it is 
-    # 3x2 cut at z = 0
-    
-    subset = ['X' ,'Y']
-    b1 = ds.subset( subset , Z=1)
-    print ("shape b 2,3? {0}".format(numpy.shape(b1.as_array())))
-    
-    
+class VectorGeometry(object):
+    '''Geometry describing VectorData to contain 1D array'''
+    RANDOM = 'random'
+    RANDOM_INT = 'random_int'
+        
+    def __init__(self, 
+                 length):
+        
+        self.length = length
+        self.shape = (length, )
+        
+        
+    def clone(self):
+        '''returns a copy of VectorGeometry'''
+        return VectorGeometry(self.length)
 
-    # create VolumeData from geometry
-    vgeometry = ImageGeometry(voxel_num_x=2, voxel_num_y=3, channels=2)
-    vol = ImageData(geometry=vgeometry)
+    def allocate(self, value=0, **kwargs):
+        '''allocates an VectorData according to the size expressed in the instance'''
+        self.dtype = kwargs.get('dtype', numpy.float32)
+        out = VectorData(geometry=self, dtype=self.dtype)
+        if isinstance(value, Number):
+            if value != 0:
+                out += value
+        else:
+            if value == VectorGeometry.RANDOM:
+                seed = kwargs.get('seed', None)
+                if seed is not None:
+                    numpy.random.seed(seed) 
+                out.fill(numpy.random.random_sample(self.shape))
+            elif value == VectorGeometry.RANDOM_INT:
+                seed = kwargs.get('seed', None)
+                if seed is not None:
+                    numpy.random.seed(seed)
+                max_value = kwargs.get('max_value', 100)
+                out.fill(numpy.random.randint(max_value,size=self.shape))
+            else:
+                raise ValueError('Value {} unknown'.format(value))
+        return out
+
     
-    sgeometry = AcquisitionGeometry(dimension=2, angles=numpy.linspace(0, 180, num=20), 
-                                       geom_type='parallel', pixel_num_v=3,
-                                       pixel_num_h=5 , channels=2)
-    sino = AcquisitionData(geometry=sgeometry)
-    sino2 = sino.clone()
-    
-    a0 = numpy.asarray([i for i in range(2*3*4)])
-    a1 = numpy.asarray([2*i for i in range(2*3*4)])
-    
-            
-    ds0 = DataContainer(numpy.reshape(a0,(2,3,4)))
-    ds1 = DataContainer(numpy.reshape(a1,(2,3,4)))
-    
-    numpy.testing.assert_equal(ds0.dot(ds1), a0.dot(a1))
-    
-    a2 = numpy.asarray([2*i for i in range(2*3*5)])
-    ds2 = DataContainer(numpy.reshape(a2,(2,3,5)))
-    
-#    # it should fail if the shape is wrong
-#    try:
-#        ds2.dot(ds0)
-#        self.assertTrue(False)
-#    except ValueError as ve:
-#        self.assertTrue(True)
-    
+if __name__ == "__main__":
+
+    ig = ImageGeometry(voxel_num_x=100, 
+                    voxel_num_y=200, 
+                    voxel_num_z=300, 
+                    voxel_size_x=1, 
+                    voxel_size_y=1, 
+                    voxel_size_z=1, 
+                    center_x=0, 
+                    center_y=0, 
+                    center_z=0, 
+                    channels=50)
+
+    id = ig.allocate(2)
+
+    print(id.geometry)
+    print(id.dimension_labels)
+
+    sid = id.subset(channel = 20)
+
+    print(sid.dimension_labels)
+    print(sid.geometry)

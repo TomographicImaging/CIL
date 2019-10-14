@@ -20,6 +20,11 @@
 #
 #=========================================================================
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 from ccpi.optimisation.algorithms import Algorithm
 
 class SIRT(Algorithm):
@@ -42,19 +47,30 @@ class SIRT(Algorithm):
                    e.g.  x\in[0, 1], IndicatorBox to enforce box constraints
                          Default is None).
     '''
-    def __init__(self, **kwargs):
-        super(SIRT, self).__init__()
+    def __init__(self, x_init=None, operator=None, data=None, constraint=None, **kwargs):
+        '''SIRT algorithm creator
 
-        x_init     = kwargs.get('x_init', None)
-        operator   = kwargs.get('operator', None)
-        data       = kwargs.get('data', None)
-        constraint = kwargs.get('constraint', None)
+        :param x_init : Initial guess
+        :param operator : Linear operator for the inverse problem
+        :param data : Acquired data to reconstruct       
+        :param constraint : Function proximal method
+                   e.g.  x\in[0, 1], IndicatorBox to enforce box constraints
+                         Default is None).'''
+        super(SIRT, self).__init__(**kwargs)
 
         if x_init is not None and operator is not None and data is not None:
-            print(self.__class__.__name__, "set_up called from creator")
             self.set_up(x_init=x_init, operator=operator, data=data, constraint=constraint)
 
     def set_up(self, x_init, operator, data, constraint=None):
+        '''initialisation of the algorithm
+
+        :param operator : Linear operator for the inverse problem
+        :param x_init : Initial guess
+        :param data : Acquired data to reconstruct       
+        :param constraint : Function proximal method
+                   e.g.  x\in[0, 1], IndicatorBox to enforce box constraints
+                         Default is None).'''
+        print("{} setting up".format(self.__class__.__name__, ))
         
         self.x = x_init.copy()
         self.operator = operator
@@ -70,6 +86,8 @@ class SIRT(Algorithm):
         self.D = 1/self.operator.adjoint(self.operator.range_geometry().allocate(value=1.0))
         self.update_objective()
         self.configured = True
+        print("{} configured".format(self.__class__.__name__, ))
+
 
 
     def update(self):

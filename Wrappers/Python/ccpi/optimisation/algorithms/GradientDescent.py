@@ -44,10 +44,11 @@ class GradientDescent(Algorithm):
         :param x_init: initial guess
         :param objective_function: objective function to be minimised
         :param rate: step rate
+        :param alpha: optional parameter to start the backtracking algorithm
         '''
         super(GradientDescent, self).__init__(**kwargs)
 
-        
+        self.alpha = kwargs.get('alpha' , 1e6)
         if x_init is not None and objective_function is not None :
             self.set_up(x_init=x_init, objective_function=objective_function, rate=rate)
     
@@ -65,16 +66,15 @@ class GradientDescent(Algorithm):
             
         self.x = x_init.copy()
         self.objective_function = objective_function
-        self.rate = rate
-        self.alpha = 1e6
-        self.k = 0
-
+        
 
         if rate is None:
+            self.k = 0
             self.update_rate = True
             self.rate = self.armijo_rule() * 2
             print (self.rate)
         else:
+            self.rate = rate
             self.update_rate = False
         
         
@@ -113,7 +113,10 @@ class GradientDescent(Algorithm):
         self.loss.append(self.objective_function(self.x))
 
     def armijo_rule(self):
-        # armijo rule
+        '''Applies the Armijo rule to calculate the step size (rate)
+
+        https://projecteuclid.org/download/pdf_1/euclid.pjm/1102995080
+        '''
         f_x = self.objective_function(self.x)
         if not hasattr(self, 'x_update'):
             self.x_update = self.objective_function.gradient(self.x)

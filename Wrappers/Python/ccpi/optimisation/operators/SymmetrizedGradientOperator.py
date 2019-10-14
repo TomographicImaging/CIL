@@ -61,6 +61,7 @@ class SymmetrizedGradient(LinearOperator):
         
         self.gm_range = BlockGeometry(*tmp_gm)
         
+        # Define FD operator. We need one geometry from the BlockGeometry of the domain
         self.FD = FiniteDiff(self.gm_domain.get_item(0), direction = 0, bnd_cond = self.bnd_cond)
         
         if self.gm_domain.shape[0]==2:

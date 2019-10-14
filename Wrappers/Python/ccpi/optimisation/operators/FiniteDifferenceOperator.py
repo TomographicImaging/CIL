@@ -69,38 +69,37 @@ class FiniteDiff(LinearOperator):
         
         x_asarr = x.as_array()
         x_sz = len(x.shape)
-        
-        if out is None:        
-            res = x * 0
-            #out = np.zeros_like(x_asarr)
-            out = res.as_array()
+        outnone = False
+        if out is None:
+            outnone = True
+            ret = self.domain_geometry().allocate()
+            outa = ret.as_array()
         else:
-            res = out
-            out = out.as_array()
-            out[:]=0
+            outa = out.as_array()
+            outa[:]=0
                   
         ######################## Direct for 2D  ###############################
         if x_sz == 2:
             
             if self.direction == 1:
                 
-                np.subtract( x_asarr[:,1:], x_asarr[:,0:-1], out = out[:,0:-1] )
+                np.subtract( x_asarr[:,1:], x_asarr[:,0:-1], out = outa[:,0:-1] )
                 
                 if self.bnd_cond == 'Neumann':
                     pass
                 elif self.bnd_cond == 'Periodic':
-                    np.subtract( x_asarr[:,0], x_asarr[:,-1], out = out[:,-1] )
+                    np.subtract( x_asarr[:,0], x_asarr[:,-1], out = outa[:,-1] )
                 else: 
                     raise ValueError('No valid boundary conditions')
                 
             if self.direction == 0:
                 
-                np.subtract( x_asarr[1:], x_asarr[0:-1], out = out[0:-1,:] )
+                np.subtract( x_asarr[1:], x_asarr[0:-1], out = outa[0:-1,:] )
 
                 if self.bnd_cond == 'Neumann':
                     pass                                        
                 elif self.bnd_cond == 'Periodic':
-                    np.subtract( x_asarr[0,:], x_asarr[-1,:], out = out[-1,:] ) 
+                    np.subtract( x_asarr[0,:], x_asarr[-1,:], out = outa[-1,:] ) 
                 else:    
                     raise ValueError('No valid boundary conditions') 
                     
@@ -109,35 +108,35 @@ class FiniteDiff(LinearOperator):
                     
             if self.direction == 0:  
                 
-                np.subtract( x_asarr[1:,:,:], x_asarr[0:-1,:,:], out = out[0:-1,:,:] )
+                np.subtract( x_asarr[1:,:,:], x_asarr[0:-1,:,:], out = outa[0:-1,:,:] )
                 
                 if self.bnd_cond == 'Neumann':
                     pass
                 elif self.bnd_cond == 'Periodic':
-                    np.subtract( x_asarr[0,:,:], x_asarr[-1,:,:], out = out[-1,:,:] ) 
+                    np.subtract( x_asarr[0,:,:], x_asarr[-1,:,:], out = outa[-1,:,:] ) 
                 else:    
                     raise ValueError('No valid boundary conditions')                      
                                                              
             if self.direction == 1:
                 
-                np.subtract( x_asarr[:,1:,:], x_asarr[:,0:-1,:], out = out[:,0:-1,:] ) 
+                np.subtract( x_asarr[:,1:,:], x_asarr[:,0:-1,:], out = outa[:,0:-1,:] ) 
                 
                 if self.bnd_cond == 'Neumann':
                     pass
                 elif self.bnd_cond == 'Periodic':
-                    np.subtract( x_asarr[:,0,:], x_asarr[:,-1,:], out = out[:,-1,:] )
+                    np.subtract( x_asarr[:,0,:], x_asarr[:,-1,:], out = outa[:,-1,:] )
                 else:    
                     raise ValueError('No valid boundary conditions')                      
                                 
              
             if self.direction == 2:
                 
-                np.subtract( x_asarr[:,:,1:], x_asarr[:,:,0:-1], out = out[:,:,0:-1] ) 
+                np.subtract( x_asarr[:,:,1:], x_asarr[:,:,0:-1], out = outa[:,:,0:-1] ) 
                 
                 if self.bnd_cond == 'Neumann':
                     pass
                 elif self.bnd_cond == 'Periodic':
-                    np.subtract( x_asarr[:,:,0], x_asarr[:,:,-1], out = out[:,:,-1] )
+                    np.subtract( x_asarr[:,:,0], x_asarr[:,:,-1], out = outa[:,:,-1] )
                 else:    
                     raise ValueError('No valid boundary conditions')  
                     
@@ -145,42 +144,42 @@ class FiniteDiff(LinearOperator):
         elif x_sz == 4:
                     
             if self.direction == 0:                            
-                np.subtract( x_asarr[1:,:,:,:], x_asarr[0:-1,:,:,:], out = out[0:-1,:,:,:] )
+                np.subtract( x_asarr[1:,:,:,:], x_asarr[0:-1,:,:,:], out = outa[0:-1,:,:,:] )
                 
                 if self.bnd_cond == 'Neumann':
                     pass
                 elif self.bnd_cond == 'Periodic':
-                    np.subtract( x_asarr[0,:,:,:], x_asarr[-1,:,:,:], out = out[-1,:,:,:] )
+                    np.subtract( x_asarr[0,:,:,:], x_asarr[-1,:,:,:], out = outa[-1,:,:,:] )
                 else:    
                     raise ValueError('No valid boundary conditions') 
                                                 
             if self.direction == 1:
-                np.subtract( x_asarr[:,1:,:,:], x_asarr[:,0:-1,:,:], out = out[:,0:-1,:,:] ) 
+                np.subtract( x_asarr[:,1:,:,:], x_asarr[:,0:-1,:,:], out = outa[:,0:-1,:,:] ) 
                 
                 if self.bnd_cond == 'Neumann':
                     pass
                 elif self.bnd_cond == 'Periodic':
-                    np.subtract( x_asarr[:,0,:,:], x_asarr[:,-1,:,:], out = out[:,-1,:,:] )
+                    np.subtract( x_asarr[:,0,:,:], x_asarr[:,-1,:,:], out = outa[:,-1,:,:] )
                 else:    
                     raise ValueError('No valid boundary conditions')                 
                 
             if self.direction == 2:
-                np.subtract( x_asarr[:,:,1:,:], x_asarr[:,:,0:-1,:], out = out[:,:,0:-1,:] ) 
+                np.subtract( x_asarr[:,:,1:,:], x_asarr[:,:,0:-1,:], out = outa[:,:,0:-1,:] ) 
                 
                 if self.bnd_cond == 'Neumann':
                     pass
                 elif self.bnd_cond == 'Periodic':
-                    np.subtract( x_asarr[:,:,0,:], x_asarr[:,:,-1,:], out = out[:,:,-1,:] )
+                    np.subtract( x_asarr[:,:,0,:], x_asarr[:,:,-1,:], out = outa[:,:,-1,:] )
                 else:    
                     raise ValueError('No valid boundary conditions')                   
                 
             if self.direction == 3:
-                np.subtract( x_asarr[:,:,:,1:], x_asarr[:,:,:,0:-1], out = out[:,:,:,0:-1] )                 
+                np.subtract( x_asarr[:,:,:,1:], x_asarr[:,:,:,0:-1], out = outa[:,:,:,0:-1] )                 
 
                 if self.bnd_cond == 'Neumann':
                     pass
                 elif self.bnd_cond == 'Periodic':
-                    np.subtract( x_asarr[:,:,:,0], x_asarr[:,:,:,-1], out = out[:,:,:,-1] )
+                    np.subtract( x_asarr[:,:,:,0], x_asarr[:,:,:,-1], out = outa[:,:,:,-1] )
                 else:    
                     raise ValueError('No valid boundary conditions')                   
                                 
@@ -189,23 +188,24 @@ class FiniteDiff(LinearOperator):
          
 #        res = out #/self.voxel_size 
         #return type(x)(out)
-        res.fill(out)
-        return res
+        if outnone:
+            ret.fill(outa)
+            return ret
 
                     
     def adjoint(self, x, out=None):
         
         x_asarr = x.as_array()
         x_sz = len(x.shape)
-        
-        if out is None:        
+        outnone = False 
+        if out is None:
+            outnone = True
+            ret = self.range_geometry().allocate()
+            outa = ret.as_array()
             #out = np.zeros_like(x_asarr)
-            res = x * 0
-            out = res.as_array()
         else:
-            res = out
-            out = out.as_array()        
-            out[:]=0
+            outa = out.as_array()        
+            outa[:]=0
 
         
         ######################## Adjoint for 2D  ###############################
@@ -213,28 +213,28 @@ class FiniteDiff(LinearOperator):
         
             if self.direction == 1:
                 
-                np.subtract( x_asarr[:,1:], x_asarr[:,0:-1], out = out[:,1:] )
+                np.subtract( x_asarr[:,1:], x_asarr[:,0:-1], out = outa[:,1:] )
                 
                 if self.bnd_cond == 'Neumann':
-                    np.subtract( x_asarr[:,0], 0, out = out[:,0] )
-                    np.subtract( -x_asarr[:,-2], 0, out = out[:,-1] )
+                    np.subtract( x_asarr[:,0], 0, out = outa[:,0] )
+                    np.subtract( -x_asarr[:,-2], 0, out = outa[:,-1] )
                     
                 elif self.bnd_cond == 'Periodic':
-                    np.subtract( x_asarr[:,0], x_asarr[:,-1], out = out[:,0] )                                        
+                    np.subtract( x_asarr[:,0], x_asarr[:,-1], out = outa[:,0] )                                        
                     
                 else:   
                     raise ValueError('No valid boundary conditions') 
                                     
             if self.direction == 0:
                 
-                np.subtract( x_asarr[1:,:], x_asarr[0:-1,:], out = out[1:,:] )
+                np.subtract( x_asarr[1:,:], x_asarr[0:-1,:], out = outa[1:,:] )
                 
                 if self.bnd_cond == 'Neumann':
-                    np.subtract( x_asarr[0,:], 0, out = out[0,:] )
-                    np.subtract( -x_asarr[-2,:], 0, out = out[-1,:] ) 
+                    np.subtract( x_asarr[0,:], 0, out = outa[0,:] )
+                    np.subtract( -x_asarr[-2,:], 0, out = outa[-1,:] ) 
                     
                 elif self.bnd_cond == 'Periodic':  
-                    np.subtract( x_asarr[0,:], x_asarr[-1,:], out = out[0,:] ) 
+                    np.subtract( x_asarr[0,:], x_asarr[-1,:], out = outa[0,:] ) 
                     
                 else:   
                     raise ValueError('No valid boundary conditions')     
@@ -244,35 +244,35 @@ class FiniteDiff(LinearOperator):
                 
             if self.direction == 0:          
                   
-                np.subtract( x_asarr[1:,:,:], x_asarr[0:-1,:,:], out = out[1:,:,:] )
+                np.subtract( x_asarr[1:,:,:], x_asarr[0:-1,:,:], out = outa[1:,:,:] )
                 
                 if self.bnd_cond == 'Neumann':
-                    np.subtract( x_asarr[0,:,:], 0, out = out[0,:,:] )
-                    np.subtract( -x_asarr[-2,:,:], 0, out = out[-1,:,:] )
+                    np.subtract( x_asarr[0,:,:], 0, out = outa[0,:,:] )
+                    np.subtract( -x_asarr[-2,:,:], 0, out = outa[-1,:,:] )
                 elif self.bnd_cond == 'Periodic':                     
-                    np.subtract( x_asarr[0,:,:], x_asarr[-1,:,:], out = out[0,:,:] )
+                    np.subtract( x_asarr[0,:,:], x_asarr[-1,:,:], out = outa[0,:,:] )
                 else:   
                     raise ValueError('No valid boundary conditions')                     
                                     
             if self.direction == 1:
-                np.subtract( x_asarr[:,1:,:], x_asarr[:,0:-1,:], out = out[:,1:,:] )
+                np.subtract( x_asarr[:,1:,:], x_asarr[:,0:-1,:], out = outa[:,1:,:] )
                 
                 if self.bnd_cond == 'Neumann':
-                    np.subtract( x_asarr[:,0,:], 0, out = out[:,0,:] )
-                    np.subtract( -x_asarr[:,-2,:], 0, out = out[:,-1,:] )
+                    np.subtract( x_asarr[:,0,:], 0, out = outa[:,0,:] )
+                    np.subtract( -x_asarr[:,-2,:], 0, out = outa[:,-1,:] )
                 elif self.bnd_cond == 'Periodic':                     
-                    np.subtract( x_asarr[:,0,:], x_asarr[:,-1,:], out = out[:,0,:] )
+                    np.subtract( x_asarr[:,0,:], x_asarr[:,-1,:], out = outa[:,0,:] )
                 else:   
                     raise ValueError('No valid boundary conditions')                                 
                 
             if self.direction == 2:
-                np.subtract( x_asarr[:,:,1:], x_asarr[:,:,0:-1], out = out[:,:,1:] )
+                np.subtract( x_asarr[:,:,1:], x_asarr[:,:,0:-1], out = outa[:,:,1:] )
                 
                 if self.bnd_cond == 'Neumann':
-                    np.subtract( x_asarr[:,:,0], 0, out = out[:,:,0] ) 
-                    np.subtract( -x_asarr[:,:,-2], 0, out = out[:,:,-1] ) 
+                    np.subtract( x_asarr[:,:,0], 0, out = outa[:,:,0] ) 
+                    np.subtract( -x_asarr[:,:,-2], 0, out = outa[:,:,-1] ) 
                 elif self.bnd_cond == 'Periodic':                     
-                    np.subtract( x_asarr[:,:,0], x_asarr[:,:,-1], out = out[:,:,0] )
+                    np.subtract( x_asarr[:,:,0], x_asarr[:,:,-1], out = outa[:,:,0] )
                 else:   
                     raise ValueError('No valid boundary conditions')                                 
         
@@ -280,61 +280,63 @@ class FiniteDiff(LinearOperator):
         elif x_sz == 4:                
                 
             if self.direction == 0:                            
-                np.subtract( x_asarr[1:,:,:,:], x_asarr[0:-1,:,:,:], out = out[1:,:,:,:] )
+                np.subtract( x_asarr[1:,:,:,:], x_asarr[0:-1,:,:,:], out = outa[1:,:,:,:] )
                 
                 if self.bnd_cond == 'Neumann':
-                    np.subtract( x_asarr[0,:,:,:], 0, out = out[0,:,:,:] )
-                    np.subtract( -x_asarr[-2,:,:,:], 0, out = out[-1,:,:,:] )
+                    np.subtract( x_asarr[0,:,:,:], 0, out = outa[0,:,:,:] )
+                    np.subtract( -x_asarr[-2,:,:,:], 0, out = outa[-1,:,:,:] )
                     
                 elif self.bnd_cond == 'Periodic':
-                    np.subtract( x_asarr[0,:,:,:], x_asarr[-1,:,:,:], out = out[0,:,:,:] )
+                    np.subtract( x_asarr[0,:,:,:], x_asarr[-1,:,:,:], out = outa[0,:,:,:] )
                 else:    
                     raise ValueError('No valid boundary conditions') 
                                 
             if self.direction == 1:
-                np.subtract( x_asarr[:,1:,:,:], x_asarr[:,0:-1,:,:], out = out[:,1:,:,:] )
+                np.subtract( x_asarr[:,1:,:,:], x_asarr[:,0:-1,:,:], out = outa[:,1:,:,:] )
                 
                 if self.bnd_cond == 'Neumann':
-                   np.subtract( x_asarr[:,0,:,:], 0, out = out[:,0,:,:] )
-                   np.subtract( -x_asarr[:,-2,:,:], 0, out = out[:,-1,:,:] )
+                   np.subtract( x_asarr[:,0,:,:], 0, out = outa[:,0,:,:] )
+                   np.subtract( -x_asarr[:,-2,:,:], 0, out = outa[:,-1,:,:] )
                     
                 elif self.bnd_cond == 'Periodic':
-                    np.subtract( x_asarr[:,0,:,:], x_asarr[:,-1,:,:], out = out[:,0,:,:] )
+                    np.subtract( x_asarr[:,0,:,:], x_asarr[:,-1,:,:], out = outa[:,0,:,:] )
                 else:    
                     raise ValueError('No valid boundary conditions') 
                     
                 
             if self.direction == 2:
-                np.subtract( x_asarr[:,:,1:,:], x_asarr[:,:,0:-1,:], out = out[:,:,1:,:] )
+                np.subtract( x_asarr[:,:,1:,:], x_asarr[:,:,0:-1,:], out = outa[:,:,1:,:] )
                 
                 if self.bnd_cond == 'Neumann':
-                    np.subtract( x_asarr[:,:,0,:], 0, out = out[:,:,0,:] ) 
-                    np.subtract( -x_asarr[:,:,-2,:], 0, out = out[:,:,-1,:] ) 
+                    np.subtract( x_asarr[:,:,0,:], 0, out = outa[:,:,0,:] ) 
+                    np.subtract( -x_asarr[:,:,-2,:], 0, out = outa[:,:,-1,:] ) 
                     
                 elif self.bnd_cond == 'Periodic':
-                    np.subtract( x_asarr[:,:,0,:], x_asarr[:,:,-1,:], out = out[:,:,0,:] )
+                    np.subtract( x_asarr[:,:,0,:], x_asarr[:,:,-1,:], out = outa[:,:,0,:] )
                 else:    
                     raise ValueError('No valid boundary conditions')                 
                 
             if self.direction == 3:
-                np.subtract( x_asarr[:,:,:,1:], x_asarr[:,:,:,0:-1], out = out[:,:,:,1:] )
+                np.subtract( x_asarr[:,:,:,1:], x_asarr[:,:,:,0:-1], out = outa[:,:,:,1:] )
                 
                 if self.bnd_cond == 'Neumann':
-                    np.subtract( x_asarr[:,:,:,0], 0, out = out[:,:,:,0] ) 
-                    np.subtract( -x_asarr[:,:,:,-2], 0, out = out[:,:,:,-1] )   
+                    np.subtract( x_asarr[:,:,:,0], 0, out = outa[:,:,:,0] ) 
+                    np.subtract( -x_asarr[:,:,:,-2], 0, out = outa[:,:,:,-1] )   
                     
                 elif self.bnd_cond == 'Periodic':
-                    np.subtract( x_asarr[:,:,:,0], x_asarr[:,:,:,-1], out = out[:,:,:,0] )
+                    np.subtract( x_asarr[:,:,:,0], x_asarr[:,:,:,-1], out = outa[:,:,:,0] )
                 else:    
                     raise ValueError('No valid boundary conditions')                  
                               
         else:
             raise NotImplementedError
             
-        out *= -1 #/self.voxel_size
-        #return type(x)(out)
-        res.fill(out)
-        return res
+        outa *= -1 #/self.voxel_size
+        if outnone:
+            ret.fill(outa)
+            return ret
+        #else:
+        #    out.fill(outa)
             
     def range_geometry(self):
         

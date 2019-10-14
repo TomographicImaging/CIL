@@ -40,12 +40,15 @@ class KullbackLeibler(Function):
             
     '''
     
-    def __init__(self, data, **kwargs):
+    def __init__(self, data = None, **kwargs):
         
         super(KullbackLeibler, self).__init__()
         
         self.b = data    
-        self.bnoise = kwargs.get('bnoise',data * 0.0)
+        self.bnoise = kwargs.get('background_noise',data * 0.0)
+        
+        if data is None:
+            raise ValueError('Please define data')
         
                                                     
     def __call__(self, x):

@@ -195,7 +195,8 @@ class TestAlgorithms(unittest.TestCase):
         print ("PDHG Denoising with 3 noises")
         # adapted from demo PDHG_TV_Color_Denoising.py in CIL-Demos repository
         
-        loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
+        # loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
+        loader = TestData()
         data = loader.load(TestData.PEPPERS, size=(256,256))
         ig = data.geometry
         ag = ig
@@ -314,7 +315,7 @@ class TestAlgorithms(unittest.TestCase):
     def test_FISTA_Denoising(self):
         print ("FISTA Denoising Poisson Noise Tikhonov")
         # adapted from demo FISTA_Tikhonov_Poisson_Denoising.py in CIL-Demos repository
-        loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
+        loader = TestData()
         data = loader.load(TestData.SHAPES)
         ig = data.geometry
         ag = ig

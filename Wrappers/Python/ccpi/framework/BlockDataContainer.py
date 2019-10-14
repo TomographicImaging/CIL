@@ -114,9 +114,7 @@ class BlockDataContainer(object):
                         a = el.is_compatible(other)
                     else:
                         a = el.shape == other.shape
-                    print ("el.shape {} other.shape {}".format(el.shape, other.shape))
                     ret = ret and a
-                print ("hasattr shape", ret)
                 return ret
             else:
                 raise ValueError('Unexpected input type: expected {}, got {}'
@@ -190,37 +188,7 @@ class BlockDataContainer(object):
         if not self.is_compatible(other):
             raise ValueError('{} Incompatible for {}'.format(type(other), operation))
         out = kwargs.get('out', None)
-        if isinstance(other, Number) or\
-           issubclass(other.__class__, DataContainer) or \
-           ( hasattr(other, 'add') and hasattr(other, 'subtract') and \
-             hasattr(other, 'divide') and hasattr(other, 'multiply') and\
-             hasattr(other, 'power') ):
-            # try to do algebra with one DataContainer. Will raise error if not compatible
-            kw = kwargs.copy()
-            res = []
-            for i,el in enumerate(self.containers):
-                if operation == BlockDataContainer.ADD:
-                    op = el.add
-                elif operation == BlockDataContainer.SUBTRACT:
-                    op = el.subtract
-                elif operation == BlockDataContainer.MULTIPLY:
-                    op = el.multiply
-                elif operation == BlockDataContainer.DIVIDE:
-                    op = el.divide
-                elif operation == BlockDataContainer.POWER:
-                    op = el.power
-                else:
-                    raise ValueError('Unsupported operation', operation)
-                if out is not None:
-                    kw['out'] = out.get_item(i)
-                    op(other, *args, **kw)
-                else:
-                    res.append(op(other, *args, **kw))
-            if out is not None:
-                return
-            else:
-                return type(self)(*res, shape=self.shape)
-        elif isinstance(other, (list, numpy.ndarray, BlockDataContainer)):
+        if isinstance(other, (list, numpy.ndarray, BlockDataContainer)):
             # try to do algebra with one DataContainer. Will raise error if not compatible
             kw = kwargs.copy()
             res = []
@@ -253,6 +221,37 @@ class BlockDataContainer(object):
             else:
                 return type(self)(*res, shape=self.shape)
             return type(self)(*[ operation(ot, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
+
+        elif isinstance(other, Number) or\
+           issubclass(other.__class__, DataContainer) or \
+           ( hasattr(other, 'add') and hasattr(other, 'subtract') and \
+             hasattr(other, 'divide') and hasattr(other, 'multiply') and\
+             hasattr(other, 'power') ):
+            # try to do algebra with one DataContainer. Will raise error if not compatible
+            kw = kwargs.copy()
+            res = []
+            for i,el in enumerate(self.containers):
+                if operation == BlockDataContainer.ADD:
+                    op = el.add
+                elif operation == BlockDataContainer.SUBTRACT:
+                    op = el.subtract
+                elif operation == BlockDataContainer.MULTIPLY:
+                    op = el.multiply
+                elif operation == BlockDataContainer.DIVIDE:
+                    op = el.divide
+                elif operation == BlockDataContainer.POWER:
+                    op = el.power
+                else:
+                    raise ValueError('Unsupported operation', operation)
+                if out is not None:
+                    kw['out'] = out.get_item(i)
+                    op(other, *args, **kw)
+                else:
+                    res.append(op(other, *args, **kw))
+            if out is not None:
+                return
+            else:
+                return type(self)(*res, shape=self.shape)
         else:
             raise ValueError('Incompatible type {} for {}'.format(
                 type(other), str(operation)))

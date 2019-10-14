@@ -253,20 +253,24 @@ class TestBlockOperator(unittest.TestCase):
         res2 = B.domain_geometry().allocate()
         B.adjoint(z1, out=res2)
         
-        self.assertNumpyArrayEqual(res1.as_array(), res2.as_array())
+        self.assertNumpyArrayEqual(res1.get_item(0).as_array(), res2.get_item(0).as_array())
 
         BB = BlockOperator( Id, 2 * Id)
+        print (Id.domain_geometry())
+
+        print (BB.shape, BB.domain_geometry())
+        
         B = BlockOperator( BB, Id )
         v = B.domain_geometry().allocate()
         B.adjoint(res,out=v)
         vv = B.adjoint(res)
         el1 = B.get_item(0,0).adjoint(z1.get_item(0)) +\
               B.get_item(1,0).adjoint(z1.get_item(1)) 
-        print ("el1" , el1.as_array())
-        print ("vv" , vv.as_array())
-        print ("v" , v.as_array())
+        print ("el1" , el1.get_item(0).as_array())
+        print ("vv" , vv.get_item(0).get_item(0).as_array())
+        print ("v" , v.get_item(0).get_item(0).as_array())
         
-        self.assertNumpyArrayEqual(v.as_array(),vv.as_array())
+        self.assertNumpyArrayEqual(v.get_item(0).get_item(0).as_array(),vv.get_item(0).get_item(0).as_array())
         # test adjoint
         print ("############ 2x1 #############")
 

@@ -333,7 +333,6 @@ class FiniteDiff(LinearOperator):
             
         outa *= -1 #/self.voxel_size
         if outnone:
-            print ("outnone", outnone, "type(ret)", type(ret))
             ret.fill(outa)
             return ret
         #else:

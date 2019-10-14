@@ -197,15 +197,24 @@ class FiniteDiff(LinearOperator):
         
         x_asarr = x.as_array()
         x_sz = len(x.shape)
-        outnone = False 
-        if out is None:
-            outnone = True
-            ret = self.range_geometry().allocate()
-            outa = ret.as_array()
-            #out = np.zeros_like(x_asarr)
+        
+        if out is None:        
+            out = np.zeros_like(x_asarr)
         else:
-            outa = out.as_array()        
-            outa[:]=0
+            out = out.as_array()        
+            out[:]=0        
+        
+#        x_asarr = x.as_array()
+#        x_sz = len(x.shape)
+#        outnone = False 
+#        if out is None:
+#            outnone = True
+#            ret = self.range_geometry().allocate()
+#            outa = ret.as_array()
+#            #out = np.zeros_like(x_asarr)
+#        else:
+#            outa = out.as_array()        
+#            outa[:]=0
 
         
         ######################## Adjoint for 2D  ###############################

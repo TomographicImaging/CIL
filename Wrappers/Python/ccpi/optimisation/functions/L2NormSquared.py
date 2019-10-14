@@ -36,10 +36,11 @@ class L2NormSquared(Function):
                                 
     '''    
     
-    def __init__(self, data = None,  **kwargs):
+    def __init__(self, **kwargs):
                                 
         super(L2NormSquared, self).__init__()
-        self.b = data
+        self.b = kwargs.get('b',None) 
+        
         # Lipschitz constant
         self.L = 2
 

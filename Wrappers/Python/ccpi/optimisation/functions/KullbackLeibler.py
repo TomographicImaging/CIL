@@ -45,7 +45,7 @@ class KullbackLeibler(Function):
         super(KullbackLeibler, self).__init__()
         
         self.b = data    
-        self.bnoise = kwargs.get('bnoise',data * 0.0)
+        self.bnoise = 0
         
                                                     
     def __call__(self, x):

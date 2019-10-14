@@ -368,7 +368,7 @@ class TestAlgorithms(unittest.TestCase):
         fista = FISTA(x_init=x_init , f=reg, g=fid)
         fista.max_iteration = 3000
         fista.update_objective_interval = 500
-        fista.run(3000, verbose=True)
+        fista.run(verbose=True)
         rmse = (fista.get_output() - data).norm() / data.as_array().size
         print ("RMSE", rmse)
         self.assertLess(rmse, 4.2e-4)

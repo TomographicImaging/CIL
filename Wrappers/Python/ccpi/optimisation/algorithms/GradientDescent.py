@@ -48,7 +48,7 @@ class GradientDescent(Algorithm):
         super(GradientDescent, self).__init__(**kwargs)
 
         
-        if x_init is not None and objective_function is not None and rate is not None:
+        if x_init is not None and objective_function is not None :
             self.set_up(x_init=x_init, objective_function=objective_function, rate=rate)
     
     def should_stop(self):
@@ -66,16 +66,28 @@ class GradientDescent(Algorithm):
         self.x = x_init.copy()
         self.objective_function = objective_function
         self.rate = rate
+        self.alpha = 1e6
+        self.k = 0
 
-        self.loss.append(objective_function(x_init))
+
+        if rate is None:
+            self.update_rate = True
+            self.rate = self.armijo_rule() * 2
+            print (self.rate)
+        else:
+            self.update_rate = False
+        
+        
+        self.update_objective()
         self.iteration = 0
 
-        try:
-            self.memopt = self.objective_function.memopt
-        except AttributeError as ae:
-            self.memopt = False
-        if self.memopt:
-            self.x_update = x_init.copy()
+        # try:
+        #     self.memopt = self.objective_function.memopt
+        # except AttributeError as ae:
+        #     self.memopt = False
+        # if self.memopt:
+        self.memopt = True
+        self.x_update = x_init.copy()
 
         self.configured = True
         print("{} configured".format(self.__class__.__name__, ))
@@ -84,10 +96,33 @@ class GradientDescent(Algorithm):
         '''Single iteration'''
         if self.memopt:
             self.objective_function.gradient(self.x, out=self.x_update)
+            
+            if self.update_rate:
+                self.rate = self.armijo_rule() * 2.
+
             self.x_update *= -self.rate
             self.x += self.x_update
         else:
-            self.x += -self.rate * self.objective_function.gradient(self.x)
+            if self.update_rate:
+                self.rate = self.armijo_rule() * 2.
+            
+            self.x_update = self.objective_function.gradient(self.x)
+            self.x += -self.rate * self.x_update
 
     def update_objective(self):
         self.loss.append(self.objective_function(self.x))
+
+    def armijo_rule(self):
+        # armijo rule
+        f_x = self.objective_function(self.x)
+        if not hasattr(self, 'x_update'):
+            self.x_update = self.objective_function.gradient(self.x)
+        while True:
+            f_x_a = self.objective_function(self.x - self.alpha * self.x_update)
+            sqnorm = self.x_update.squared_norm()
+            if f_x_a - f_x <= - ( self.alpha/2. ) * sqnorm:
+                break
+            else:
+                self.k += 1.
+                self.alpha = self.alpha / 2.**(self.k)
+        return self.alpha

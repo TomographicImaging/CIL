@@ -37,10 +37,10 @@ class L1Norm(Function):
                                 
     '''   
            
-    def __init__(self, **kwargs):
+    def __init__(self, data = None, **kwargs):
         
         super(L1Norm, self).__init__()
-        self.b = kwargs.get('b',None)
+        self.b = data
         self.shinkage_operator = ShrinkageOperator()
         
     def __call__(self, x):

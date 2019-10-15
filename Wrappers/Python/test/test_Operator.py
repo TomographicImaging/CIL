@@ -174,18 +174,18 @@ class TestOperator(CCPiTestClass):
     def test_SymmetrizedGradient(self):
         ###########################################################################  
         ## Symmetrized Gradient Tests
-        
+        print ("Test SymmetrizedGradient")
         N, M = 2, 3
         K = 2
         C = 2
-        
+        decimal = 3
         ###########################################################################
         # 2D geometry no channels
         ig = ImageGeometry(N, M)
         Grad = Gradient(ig)
         
         E1 = SymmetrizedGradient(Grad.range_geometry())
-        numpy.testing.assert_almost_equal(E1.norm(), numpy.sqrt(8), 1e-5)
+        numpy.testing.assert_almost_equal(E1.norm(), numpy.sqrt(8), decimal = decimal)
         
         # self.assertAlmostEqual(E1.norm(), numpy.sqrt(8), 2)
         
@@ -205,7 +205,7 @@ class TestOperator(CCPiTestClass):
         Grad2 = Gradient(ig2, correlation = 'Space')
         
         E2 = SymmetrizedGradient(Grad2.range_geometry())
-        numpy.testing.assert_almost_equal(E2.norm(), numpy.sqrt(12), 1e-6)
+        numpy.testing.assert_almost_equal(E2.norm(), numpy.sqrt(12), decimal = decimal)
         # self.assertAlmostEqual(E2.norm(), numpy.sqrt(12), 7)
         
         print(E2.domain_geometry().shape, E2.range_geometry().shape)
@@ -214,6 +214,8 @@ class TestOperator(CCPiTestClass):
     #    
         lhs2 = E2.direct(u2).dot(w2)
         rhs2 = u2.dot(E2.adjoint(w2))
+        # self.assertTrue( LinearOperator.dot_test(E2) )
+            
         numpy.testing.assert_almost_equal(lhs2, rhs2)
         # self.assertAlmostEqual(lhs2, rhs2)
 
@@ -223,7 +225,7 @@ class TestOperator(CCPiTestClass):
         Grad3 = Gradient(ig3, correlation = 'Space')
         
         E3 = SymmetrizedGradient(Grad3.range_geometry())
-        numpy.testing.assert_almost_equal(E3.norm(), numpy.sqrt(12), 1e-6)
+        numpy.testing.assert_almost_equal(E3.norm(), numpy.sqrt(12), decimal = decimal)
         # self.assertAlmostEqual(E3.norm(), numpy.sqrt(12), 7)
         
         print(E3.domain_geometry().shape, E3.range_geometry().shape)
@@ -234,6 +236,7 @@ class TestOperator(CCPiTestClass):
         rhs3 = u3.dot(E3.adjoint(w3))
         numpy.testing.assert_almost_equal(lhs3, rhs3)  
         # self.assertAlmostEqual(lhs3, rhs3)
+        # self.assertTrue( LinearOperator.dot_test(E3) )
 
 
 

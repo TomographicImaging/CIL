@@ -82,7 +82,7 @@ class L2NormSquared(Function):
         tmp = 0
         
         if self.data is not None:
-            tmp = x.dot(self.data) #(x * self.b).sum()
+            tmp = x.dot(self.data) 
             
         return (1./4.) * x.squared_norm() + tmp
 
@@ -241,22 +241,22 @@ if __name__ == '__main__':
     
     
     
-    print( " ####### check without out ######### " )
-          
-          
-    u_out_no_out = ig.allocate('random_int')         
-    res_no_out = f_scaled_data.proximal_conjugate(u_out_no_out, 0.5)          
-    print(res_no_out.as_array())
-    
-    print( " ####### check with out ######### " ) 
-          
-    res_out = ig.allocate()        
-    f_scaled_data.proximal_conjugate(u_out_no_out, 0.5, out = res_out)
-    
-    print(res_out.as_array())   
-
-    numpy.testing.assert_array_almost_equal(res_no_out.as_array(), \
-                                            res_out.as_array(), decimal=4)  
+#    print( " ####### check without out ######### " )
+#          
+#          
+#    u_out_no_out = ig.allocate('random_int')         
+#    res_no_out = f_scaled_data.proximal_conjugate(u_out_no_out, 0.5)          
+#    print(res_no_out.as_array())
+#    
+#    print( " ####### check with out ######### " ) 
+#          
+#    res_out = ig.allocate()        
+#    f_scaled_data.proximal_conjugate(u_out_no_out, 0.5, out = res_out)
+#    
+#    print(res_out.as_array())   
+#
+#    numpy.testing.assert_array_almost_equal(res_no_out.as_array(), \
+#                                            res_out.as_array(), decimal=4)  
     
     
     

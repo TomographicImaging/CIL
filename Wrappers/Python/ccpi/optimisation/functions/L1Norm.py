@@ -79,7 +79,7 @@ class L1Norm(Function):
             else:
                 return self.shinkage_operator(x, tau)             
         else:
-            if self.b is not None:
+            if self.data is not None:
                 out.fill(self.data + self.shinkage_operator(x - self.data, tau))
             else:
                 out.fill(self.shinkage_operator(x, tau))
@@ -98,7 +98,7 @@ class L1Norm(Function):
             else:
                 return x.divide(x.abs().maximum(1.0))
         else:
-            if self.b is not None:
+            if self.data is not None:
                 out.fill((x - tau*self.data).divide((x - tau*self.data).abs().maximum(1.0)))
             else:
                 out.fill(x.divide(x.abs().maximum(1.0)) )                

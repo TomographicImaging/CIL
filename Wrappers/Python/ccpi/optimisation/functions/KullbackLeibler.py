@@ -49,15 +49,20 @@ class KullbackLeibler(Function):
         
         if self.data is None:
             raise ValueError('Please define data')
+            
+        if True in self.data<0:
+            raise ValueError('Data is larger or equal to 0')
+            
         
                                                     
     def __call__(self, x):
         
 
         '''Evaluates KullbackLeibler at x'''
-
-        ind = x.as_array()>0
-        tmp = scipy.special.kl_div(self.data.as_array()[ind], x.as_array()[ind])                
+        
+        tmp_sum = (x + self.background_noise).as_array()
+        ind = tmp_sum > 0
+        tmp = scipy.special.kl_div(self.data.as_array()[ind], tmp_sum[ind])                
         return numpy.sum(tmp) 
 
     def log(self, datacontainer):
@@ -71,10 +76,14 @@ class KullbackLeibler(Function):
         
         '''Evaluates gradient of KullbackLeibler at x'''
         
-        if out is None:
-            return 1 - self.data/(x + self.background_noise)
+        tmp_sum = (x + self.background_noise).as_array()
+        ind = tmp_sum>0 
+        
+        if out is None:            
+            return 1 - self.data[ind]/tmp_sum[ind]
         else:
-
+            
+            # TODO not working with ind
             x.add(self.background_noise, out=out)
             self.data.divide(out, out=out)
             out.subtract(1, out=out)
@@ -84,8 +93,8 @@ class KullbackLeibler(Function):
         
         '''Convex conjugate of KullbackLeibler at x'''
         
-        xlogy = - scipy.special.xlogy(self.data.as_array(), 1 - x.as_array())
-        return numpy.sum(xlogy)
+        xlogy = - scipy.special.xlogy(self.data.as_array(), 1 - x.as_array()) 
+        return numpy.sum(xlogy) - (self.background_noise * x).sum()
             
     def proximal(self, x, tau, out=None):
         
@@ -159,86 +168,21 @@ if __name__ == '__main__':
     
     M, N =  2,3
     ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
-    u = ig.allocate('random_int')
-    b = ig.allocate('random_int')
-    u.as_array()[1,1]=0
-    u.as_array()[2,0]=0
-    b.as_array()[1,1]=0
-    b.as_array()[2,0]=0    
     
-    f = KullbackLeibler(b)
+    # if both u1, g1 > 0
+    u1 = ig.allocate('random_int', seed = 5)
+    g1 = ig.allocate('random_int', seed = 10)
     
+    f = KullbackLeibler(g1)
+#    print(f(g1))
+#    print(f(u1))
     
-#    longest = reduce(lambda x, y: len(x) if len(x) > len(y) else len(y), strings)
+    g2 = g1.clone()
+    g2.as_array()[0,1] = 0
+#    print(f(g2))
 
 
-#    tmp = functools.reduce(lambda x, y: \
-#                           0 if x==0 and not numpy.isnan(y) else x * numpy.log(y), \
-#                           zip(b.as_array().ravel(), u.as_array().ravel()),0)
-    
-    
-#    np.multiply.reduce(X, 0)
-    
-    
-#                sf = reduce(lambda x,y: x + y[0]*y[1],
-#                            zip(self.as_array().ravel(),
-#                                other.as_array().ravel()),
-#                            0)        
-#cdef inline number_t xlogy(number_t x, number_t y) nogil:
-#    if x == 0 and not zisnan(y):
-#        return 0
-#    else:
-#        return x * zlog(y)        
-    
-#    if npy_isnan(x):
-#        return x
-#    elif x > 0:
-#        return -x * log(x)
-#    elif x == 0:
-#        return 0
-#    else:
-#        return -inf    
-    
-#        cdef inline double kl_div(double x, double y) nogil:
-#    if npy_isnan(x) or npy_isnan(y):
-#        return nan
-#    elif x > 0 and y > 0:
-#        return x * log(x / y) - x + y
-#    elif x == 0 and y >= 0:
-#        return y
-#    else:
-#        return inf    
-
-    
-    
-    
-#    def xlogy(self, dc1, dc2):
-        
-#        return numpy.sum(numpy.where(dc1.as_array() != 0, dc2.as_array() * numpy.log(dc2.as_array() / dc1.as_array()), 0))
-        
-           
-    
-#    f.xlog(u, b)
-    
-            
-
-    
-#    tmp1 = b.as_array()
-#    tmp2 = u.as_array()
-#    
-#    zz = scipy.special.xlogy(tmp1, tmp2)
-#
-#    print(np.sum(zz))
-    
-    
-#    ww = f.xlogy(b, u)
-    
-#    print(ww)
-    
-    
-#cdef inline double kl_div(double x, double y) nogil:
-  
-    
+    tmp = scipy.special.kl_div(g1.as_array(), g2.as_array())  
     
         
 

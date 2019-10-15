@@ -173,10 +173,11 @@ class TestOperator(CCPiTestClass):
 
 class TestGradients(CCPiTestClass): 
     def setUp(self):
-        N, M = 2, 3
-        K = 2
-        C = 2
-        self.decimal = 3
+        N, M = 20, 30
+        K = 20
+        C = 20
+        self.decimal = 1
+        self.iterations = 50
         ###########################################################################
         # 2D geometry no channels
         self.ig = ImageGeometry(N, M)
@@ -193,7 +194,7 @@ class TestGradients(CCPiTestClass):
         Grad = Gradient(self.ig)
         
         E1 = SymmetrizedGradient(Grad.range_geometry())
-        numpy.testing.assert_almost_equal(E1.norm(), numpy.sqrt(8), decimal = self.decimal)
+        numpy.testing.assert_almost_equal(E1.norm(iterations=self.iterations), numpy.sqrt(8), decimal = self.decimal)
         
     def test_SymmetrizedGradient1b(self):
         ###########################################################################  
@@ -237,7 +238,8 @@ class TestGradients(CCPiTestClass):
         Grad2 = Gradient(self.ig2, correlation = 'Space')
         
         E2 = SymmetrizedGradient(Grad2.range_geometry())
-        numpy.testing.assert_almost_equal(E2.norm(), numpy.sqrt(12), decimal = self.decimal)
+        numpy.testing.assert_almost_equal(E2.norm(iterations=self.iterations), 
+           numpy.sqrt(8), decimal = self.decimal)
         
     
     def test_SymmetrizedGradient3a(self):
@@ -247,7 +249,11 @@ class TestGradients(CCPiTestClass):
         Grad3 = Gradient(self.ig3, correlation = 'Space')
         
         E3 = SymmetrizedGradient(Grad3.range_geometry())
-        numpy.testing.assert_almost_equal(E3.norm(), numpy.sqrt(12), decimal = self.decimal)
+
+        norm1 = E3.norm()
+        norm2 = E3.calculate_norm(iterations=100)
+        print (norm1,norm2)
+        numpy.testing.assert_almost_equal(norm2, numpy.sqrt(12), decimal = self.decimal)
         
     def test_SymmetrizedGradient3b(self):
         ###########################################################################

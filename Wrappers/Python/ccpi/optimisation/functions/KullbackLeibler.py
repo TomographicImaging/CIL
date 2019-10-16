@@ -81,8 +81,7 @@ class KullbackLeibler(Function):
         
         if out is None:            
             return 1 - self.data[ind]/tmp_sum[ind]
-        else:
-            
+        else:            
             # TODO not working with ind
             x.add(self.background_term, out=out)
             self.data.divide(out, out=out)

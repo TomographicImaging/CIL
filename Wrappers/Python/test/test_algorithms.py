@@ -75,24 +75,40 @@ class TestAlgorithms(unittest.TestCase):
         alg.max_iteration = 20
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+        alg = GradientDescent(x_init=x_init, 
+                              objective_function=norm2sq, 
+                              rate=rate, max_iteration=20,
+                              update_objective_interval=2)
+        alg.max_iteration = 20
+        self.assertTrue(alg.max_iteration == 20)
+        self.assertTrue(alg.update_objective_interval==2)
+        alg.run(20, verbose=True)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
     def test_CGLS(self):
         print ("Test CGLS")
         #ig = ImageGeometry(124,153,154)
         ig = ImageGeometry(10,2)
         numpy.random.seed(2)
         x_init = ig.allocate(0.)
+        b = ig.allocate('random')
         # b = x_init.copy()
         # fill with random numbers
         # b.fill(numpy.random.random(x_init.shape))
-        b = ig.allocate()
-        bdata = numpy.reshape(numpy.asarray([i for i in range(20)]), (2,10))
-        b.fill(bdata)
+        # b = ig.allocate()
+        # bdata = numpy.reshape(numpy.asarray([i for i in range(20)]), (2,10))
+        # b.fill(bdata)
         identity = Identity(ig)
         
         alg = CGLS(x_init=x_init, operator=identity, data=b)
         alg.max_iteration = 200
         alg.run(20, verbose=True)
-        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array(), decimal=4)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+
+        alg = CGLS(x_init=x_init, operator=identity, data=b, max_iteration=200, update_objective_interval=2)
+        self.assertTrue(alg.max_iteration == 200)
+        self.assertTrue(alg.update_objective_interval==2)
+        alg.run(20, verbose=True)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
         
     def test_FISTA(self):
         print ("Test FISTA")
@@ -114,6 +130,15 @@ class TestAlgorithms(unittest.TestCase):
         alg.max_iteration = 2
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+
+        alg = FISTA(x_init=x_init, f=norm2sq, g=ZeroFunction(), max_iteration=2, update_objective_interval=2)
+        
+        self.assertTrue(alg.max_iteration == 2)
+        self.assertTrue(alg.update_objective_interval==2)
+
+        alg.run(20, verbose=True)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+
                
     def test_FISTA_Norm2Sq(self):
         print ("Test FISTA Norm2Sq")
@@ -133,6 +158,14 @@ class TestAlgorithms(unittest.TestCase):
         alg.max_iteration = 2
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+
+        alg = FISTA(x_init=x_init, f=norm2sq, g=ZeroFunction(), max_iteration=2, update_objective_interval=3)
+        self.assertTrue(alg.max_iteration == 2)
+        self.assertTrue(alg.update_objective_interval== 3)
+
+        alg.run(20, verbose=True)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+
     def test_FISTA_catch_Lipschitz(self):
         print ("Test FISTA catch Lipschitz")
         ig = ImageGeometry(127,139,149)
@@ -162,7 +195,9 @@ class TestAlgorithms(unittest.TestCase):
         print ("PDHG Denoising with 3 noises")
         # adapted from demo PDHG_TV_Color_Denoising.py in CIL-Demos repository
         
-        loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
+        # loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
+        loader = TestData()
+        
         data = loader.load(TestData.PEPPERS, size=(256,256))
         ig = data.geometry
         ag = ig
@@ -242,9 +277,9 @@ class TestAlgorithms(unittest.TestCase):
         tau = 1/(sigma*normK**2)
 
         # Setup and run the PDHG algorithm
-        pdhg1 = PDHG(f=f1,g=g,operator=operator, tau=tau, sigma=sigma)
-        pdhg1.max_iteration = 2000
-        pdhg1.update_objective_interval = 200
+        pdhg1 = PDHG(f=f1,g=g,operator=operator, tau=tau, sigma=sigma, 
+                     max_iteration=2000, update_objective_interval=200)
+        
         pdhg1.run(1000)
 
         rmse = (pdhg1.get_output() - data).norm() / data.as_array().size
@@ -281,7 +316,8 @@ class TestAlgorithms(unittest.TestCase):
     def test_FISTA_Denoising(self):
         print ("FISTA Denoising Poisson Noise Tikhonov")
         # adapted from demo FISTA_Tikhonov_Poisson_Denoising.py in CIL-Demos repository
-        loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
+        #loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
+        loader = TestData()
         data = loader.load(TestData.SHAPES)
         ig = data.geometry
         ag = ig
@@ -332,7 +368,7 @@ class TestAlgorithms(unittest.TestCase):
         fista = FISTA(x_init=x_init , f=reg, g=fid)
         fista.max_iteration = 3000
         fista.update_objective_interval = 500
-        fista.run(3000, verbose=True)
+        fista.run(verbose=True)
         rmse = (fista.get_output() - data).norm() / data.as_array().size
         print ("RMSE", rmse)
         self.assertLess(rmse, 4.2e-4)

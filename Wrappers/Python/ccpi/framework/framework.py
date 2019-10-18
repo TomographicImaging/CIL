@@ -722,7 +722,8 @@ class DataContainer(object):
             return type(self)(out,
                    deep_copy=False, 
                    dimension_labels=self.dimension_labels,
-                   geometry=self.geometry)
+                   geometry=self.geometry, 
+                   suppress_warning=True)
             
         
         elif issubclass(type(out), DataContainer) and issubclass(type(x2), DataContainer):
@@ -800,7 +801,8 @@ class DataContainer(object):
             return type(self)(out,
                        deep_copy=False, 
                        dimension_labels=self.dimension_labels,
-                       geometry=self.geometry)
+                       geometry=self.geometry, 
+                       suppress_warning=True)
         elif issubclass(type(out), DataContainer):
             if self.check_dimensions(out):
                 kwargs['out'] = out.as_array()
@@ -825,6 +827,14 @@ class DataContainer(object):
 
     def conjugate(self, *args,  **kwargs):
         return self.pixel_wise_unary(numpy.conjugate, *args,  **kwargs)
+
+    def exp(self, *args, **kwargs):
+        '''Applies exp pixel-wise to the DataContainer'''
+        return self.pixel_wise_unary(numpy.exp, *args, **kwargs)
+    
+    def log(self, *args, **kwargs):
+        '''Applies log pixel-wise to the DataContainer'''
+        return self.pixel_wise_unary(numpy.log, *args, **kwargs)
     #def __abs__(self):
     #    operation = FM.OPERATION.ABS
     #    return self.callFieldMath(operation, None, self.mask, self.maskOnValue)
@@ -885,7 +895,7 @@ class ImageData(DataContainer):
         
         if not kwargs.get('suppress_warning', False):
             warnings.warn('Direct invocation is deprecated and will be removed in following version. Use allocate from ImageGeometry instead',
-                   DeprecationWarning)
+                   DeprecationWarning, stacklevel=4)
         self.geometry = kwargs.get('geometry', None)
         if array is None:
             if self.geometry is not None:

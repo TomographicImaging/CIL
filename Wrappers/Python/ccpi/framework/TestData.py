@@ -105,7 +105,7 @@ class TestData(object):
                     #data = (data-dmin)/(dmax-dmin) * (scale[1]-scale[0]) +scale[0])
                     data *= (scale[1]-scale[0])
                     data += scale[0]
-        print ("data.geometry", data.geometry)
+        # print ("data.geometry", data.geometry)
         return data
 
     @staticmethod

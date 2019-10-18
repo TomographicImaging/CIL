@@ -18,12 +18,13 @@
 import unittest
 from ccpi.framework import ImageGeometry, ImageData, BlockDataContainer, DataContainer
 from ccpi.optimisation.operators import BlockOperator, BlockScaledOperator,\
-    FiniteDiff
+    FiniteDiff, SymmetrizedGradient
 import numpy
 from timeit import default_timer as timer
 from ccpi.framework import ImageGeometry
 from ccpi.optimisation.operators import Gradient, Identity, SparseFiniteDiff
 from ccpi.optimisation.operators import LinearOperator
+
 
 def dt(steps):
     return steps[-1] - steps[-2]
@@ -169,6 +170,107 @@ class TestOperator(CCPiTestClass):
         t2 = timer()
         print ("Norm dT1 {} dT2 {}".format(t1-t0,t2-t1))
         self.assertLess(t2-t1, t1-t0)
+
+class TestGradients(CCPiTestClass): 
+    def setUp(self):
+        N, M = 20, 30
+        K = 20
+        C = 20
+        self.decimal = 1
+        self.iterations = 50
+        ###########################################################################
+        # 2D geometry no channels
+        self.ig = ImageGeometry(N, M)
+        self.ig2 = ImageGeometry(N, M, channels = C)
+        self.ig3 = ImageGeometry(N, M, K)
+
+    def test_SymmetrizedGradient1a(self):
+        ###########################################################################  
+        ## Symmetrized Gradient Tests
+        print ("Test SymmetrizedGradient")
+        ###########################################################################
+        # 2D geometry no channels
+        # ig = ImageGeometry(N, M)
+        Grad = Gradient(self.ig)
+        
+        E1 = SymmetrizedGradient(Grad.range_geometry())
+        numpy.testing.assert_almost_equal(E1.norm(iterations=self.iterations), numpy.sqrt(8), decimal = self.decimal)
+        
+    def test_SymmetrizedGradient1b(self):
+        ###########################################################################  
+        ## Symmetrized Gradient Tests
+        print ("Test SymmetrizedGradient")
+        ###########################################################################
+        # 2D geometry no channels
+        # ig = ImageGeometry(N, M)
+        Grad = Gradient(self.ig)
+        
+        E1 = SymmetrizedGradient(Grad.range_geometry())
+        u1 = E1.domain_geometry().allocate('random_int')
+        w1 = E1.range_geometry().allocate('random_int', symmetry = True)
+        
+        
+        lhs = E1.direct(u1).dot(w1)
+        rhs = u1.dot(E1.adjoint(w1))
+        # self.assertAlmostEqual(lhs, rhs)
+        numpy.testing.assert_almost_equal(lhs, rhs)
+            
+    def test_SymmetrizedGradient2(self):        
+        ###########################################################################
+        # 2D geometry with channels
+        # ig2 = ImageGeometry(N, M, channels = C)
+        Grad2 = Gradient(self.ig2, correlation = 'Space')
+        
+        E2 = SymmetrizedGradient(Grad2.range_geometry())
+        
+        u2 = E2.domain_geometry().allocate('random_int')
+        w2 = E2.range_geometry().allocate('random_int', symmetry = True)
+    #    
+        lhs2 = E2.direct(u2).dot(w2)
+        rhs2 = u2.dot(E2.adjoint(w2))
+            
+        numpy.testing.assert_almost_equal(lhs2, rhs2)
+        
+    def test_SymmetrizedGradient2a(self):        
+        ###########################################################################
+        # 2D geometry with channels
+        # ig2 = ImageGeometry(N, M, channels = C)
+        Grad2 = Gradient(self.ig2, correlation = 'Space')
+        
+        E2 = SymmetrizedGradient(Grad2.range_geometry())
+        numpy.testing.assert_almost_equal(E2.norm(iterations=self.iterations), 
+           numpy.sqrt(8), decimal = self.decimal)
+        
+    
+    def test_SymmetrizedGradient3a(self):
+        ###########################################################################
+        # 3D geometry no channels
+        #ig3 = ImageGeometry(N, M, K)
+        Grad3 = Gradient(self.ig3, correlation = 'Space')
+        
+        E3 = SymmetrizedGradient(Grad3.range_geometry())
+
+        norm1 = E3.norm()
+        norm2 = E3.calculate_norm(iterations=100)
+        print (norm1,norm2)
+        numpy.testing.assert_almost_equal(norm2, numpy.sqrt(12), decimal = self.decimal)
+        
+    def test_SymmetrizedGradient3b(self):
+        ###########################################################################
+        # 3D geometry no channels
+        #ig3 = ImageGeometry(N, M, K)
+        Grad3 = Gradient(self.ig3, correlation = 'Space')
+        
+        E3 = SymmetrizedGradient(Grad3.range_geometry())
+        
+        u3 = E3.domain_geometry().allocate('random_int')
+        w3 = E3.range_geometry().allocate('random_int', symmetry = True)
+    #    
+        lhs3 = E3.direct(u3).dot(w3)
+        rhs3 = u3.dot(E3.adjoint(w3))
+        numpy.testing.assert_almost_equal(lhs3, rhs3)  
+        # self.assertAlmostEqual(lhs3, rhs3)
+        # self.assertTrue( LinearOperator.dot_test(E3) )
 
 
 

@@ -51,7 +51,7 @@ class ScaledFunction(object):
         self.function = function
         
         if self.function.L is not None:        
-            self.L = self.scalar * self.function.L         
+            self.L = abs(self.scalar) * self.function.L         
 
     def __call__(self,x, out=None):
         '''Evaluates the function at x '''

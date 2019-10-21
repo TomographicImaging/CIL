@@ -347,27 +347,115 @@ class TestFunction(unittest.TestCase):
         
         f_no_scaled.proximal_conjugate(U, 1, out=z3)
         self.assertBlockDataContainerEqual(z3,z1)
-
-    def test_KullbackLeibler(self):
+class TestKullbackLeibler(unittest.TestCase):
+    def setUp(self):
         print ("test_KullbackLeibler")
         N, M = 2,3
         ig  = ImageGeometry(N, M)
-        data = ig.allocate(ImageGeometry.RANDOM_INT)
-        x = ig.allocate(ImageGeometry.RANDOM_INT)
-        bnoise = ig.allocate(ImageGeometry.RANDOM_INT)
+        numpy.random.seed(3)
+        self.data = ig.allocate(ImageGeometry.RANDOM_INT)
+        self.x = ig.allocate(ImageGeometry.RANDOM_INT)
+        #self.bnoise = ig.allocate(ImageGeometry.RANDOM_INT)
+        self.bnoise = self.data * 0.
+        self.tau = 1.2
+        self.ig = ig
         
-        out = ig.allocate()
+    def test_gradient(self):
+        tau = self.tau
+        x = self.x
+        data = self.data
+        bnoise = self.bnoise
+        ig = self.ig
+        out = ig.allocate(None)
         
         f = KullbackLeibler(data, bnoise=bnoise)
+
+        numpy_res = 1 - data/(x + bnoise)
+
+        def gradient_with_python(x,b,bnoise, out):
+            for i in range(x.size):
+                out.flat[i] = 1 - b.flat[i]/(x.flat[i] + bnoise.flat[i])
+        outp = ig.allocate(None)
+        gradient_with_python(x.as_array(), data.as_array(), bnoise.as_array(), outp.as_array())
+        numpy.testing.assert_array_equal(outp.as_array(), numpy_res.as_array())
         
         grad = f.gradient(x)
         f.gradient(x, out=out)
+        
+        numpy.testing.assert_array_equal(grad.as_array(), numpy_res.as_array())
         numpy.testing.assert_array_equal(grad.as_array(), out.as_array())
+    
+    def test_proximal(self):
+        ig = self.ig
+        tau = self.tau
+        x = self.x
+        data = self.data
+        bnoise = self.bnoise
         
-        prox = f.proximal(x,1.2)
-        f.proximal(x, 1.2, out=out)
-        numpy.testing.assert_array_equal(prox.as_array(), out.as_array())
+        f = KullbackLeibler(data, bnoise=bnoise)
         
-        proxc = f.proximal_conjugate(x,1.2)
-        f.proximal_conjugate(x, 1.2, out=out)
+        out = ig.allocate(None)        
+        out = ig.allocate(None)
+
+
+        prox = f.proximal(x,tau)
+        prox1 = f.proximal(x,tau)
+        
+        numpy_res = 0.5 *( (x - bnoise - tau) + 
+                     ( (x + bnoise - tau)**2 + 4*tau* data   ) .sqrt() 
+                      )
+
+        outp = ig.allocate(None)
+        def proximal_with_python(x,b, bnoise, tau, out):
+            for i in range(x.size):
+                out.flat[i] = 0.5 *  ( 
+                    ( x.flat[i] - bnoise.flat[i] - tau ) +\
+                    numpy.sqrt( (x.flat[i] + bnoise.flat[i] - tau)**2. + \
+                        (4. * tau * b.flat[i]) 
+                    )
+                )
+        proximal_with_python(x.as_array(), data.as_array(), bnoise.as_array(), tau, outp.as_array())
+        numpy.testing.assert_array_almost_equal(numpy_res.as_array(), outp.as_array(), decimal=5)
+        
+        numpy.testing.assert_array_equal(prox.as_array(), prox1.as_array())
+        
+        f.proximal(x, tau, out=out)
+        numpy.testing.assert_array_almost_equal(prox.as_array(), outp.as_array(), decimal=5)
+        
+    def test_proximal_conjugate(self):
+        ig = self.ig
+        tau = self.tau
+        x = self.x
+        data = self.data
+        bnoise = self.bnoise
+
+
+
+        def proximal_conjugate_with_python(x, b, bnoise, tau, out):
+        #z = x + tau * self.bnoise
+        #return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
+
+            for i in range(x.size):
+                z = x.flat[i] + ( tau * bnoise.flat[i] )
+                out.flat[i] = 0.5 * ( 
+                    (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * tau * b.flat[i])
+                    )
+        outp = ig.allocate(None)
+        proximal_conjugate_with_python(x.as_array(), data.as_array(), bnoise.as_array(), tau, outp.as_array())
+
+        z = x + tau * bnoise
+        numpy_res =  0.5*((z + 1) - ((z-1)**2 + 4 * tau * data).sqrt())
+        numpy.testing.assert_array_almost_equal(numpy_res.as_array(), outp.as_array(), decimal=5)
+        
+        f = KullbackLeibler(data, bnoise=bnoise)
+        
+
+        out = ig.allocate(None)
+        out = ig.allocate(None)
+        proxc = f.proximal_conjugate(x, tau)
+        f.proximal_conjugate(x, tau, out=out)
+
+        
+        numpy.testing.assert_array_almost_equal(proxc.as_array(), numpy_res.as_array(), decimal=5)
+
         numpy.testing.assert_array_equal(proxc.as_array(), out.as_array())

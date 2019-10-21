@@ -27,6 +27,11 @@ from ccpi.optimisation.functions import Function
 from ccpi.optimisation.functions.ScaledFunction import ScaledFunction 
 import functools
 import scipy.special
+try:
+    import numba
+    has_numba = True
+except ImportError as ie:
+    has_numba = False
 
 class KullbackLeibler(Function):
     
@@ -67,15 +72,26 @@ class KullbackLeibler(Function):
     def gradient(self, x, out=None):
         
         '''Evaluates gradient of KullbackLeibler at x'''
-        
-        if out is None:
-            return 1 - self.b/(x + self.bnoise)
+        if has_numba:
+            if out is None:
+                out = (x * 0.)
+                out_np = out.as_array()
+                kl_gradient(x.as_array(), self.b.as_array(), self.bnoise.as_array(), out_np)
+                # out.fill(out_np)
+                return out
+            else:
+                out_np = out.as_array()
+                kl_gradient(x.as_array(), self.b.as_array(), self.bnoise.as_array(), out_np)
+                # out.fill(out_np)
         else:
+            if out is None:
+                return 1 - self.b/(x + self.bnoise)
+            else:
 
-            x.add(self.bnoise, out=out)
-            self.b.divide(out, out=out)
-            out.subtract(1, out=out)
-            out *= -1
+                x.add(self.bnoise, out=out)
+                self.b.divide(out, out=out)
+                out.subtract(1, out=out)
+                out *= -1
             
     def convex_conjugate(self, x):
         
@@ -91,28 +107,40 @@ class KullbackLeibler(Function):
            .. math::     prox_{\tau * f}(x)
 
         '''
-
-        if out is None:        
-            return 0.5 *( (x - self.bnoise - tau) + ( (x + self.bnoise - tau)**2 + 4*tau*self.b   ) .sqrt() )
+        if has_numba:
+            if out is None:
+                out = (x * 0.)
+                # out_np = numpy.empty_like(out.as_array(), dtype=numpy.float64)
+                out_np = out.as_array()
+                kl_proximal(x.as_array(), self.b.as_array(), self.bnoise.as_array(), tau, out_np)
+                out.fill(out_np)
+                return out
+            else:
+                out_np = out.as_array()
+                kl_proximal(x.as_array(), self.b.as_array(), self.bnoise.as_array(), tau, out_np)
+                # out.fill(out_np)                    
         else:
-            
-            tmp =  0.5 *( (x - self.bnoise - tau) + 
-                        ( (x + self.bnoise - tau)**2 + 4*tau*self.b   ) .sqrt()
-                        )
-            x.add(self.bnoise, out=out)
-            out -= tau
-            out *= out
-            tmp = self.b * (4 * tau)
-            out.add(tmp, out=out)
-            out.sqrt(out=out)
-            
-            x.subtract(self.bnoise, out=tmp)
-            tmp -= tau
-            
-            out += tmp
-            
-            out *= 0.5
-                            
+            if out is None:        
+                return 0.5 *( (x - self.bnoise - tau) + ( (x + self.bnoise - tau)**2 + 4*tau*self.b   ) .sqrt() )
+            else:
+                
+                tmp =  0.5 *( (x - self.bnoise - tau) + 
+                            ( (x + self.bnoise - tau)**2 + 4*tau*self.b   ) .sqrt()
+                            )
+                x.add(self.bnoise, out=out)
+                out -= tau
+                out *= out
+                tmp = self.b * (4 * tau)
+                out.add(tmp, out=out)
+                out.sqrt(out=out)
+                
+                x.subtract(self.bnoise, out=tmp)
+                tmp -= tau
+                
+                out += tmp
+                
+                out *= 0.5
+                         
     def proximal_conjugate(self, x, tau, out=None):
         
         r'''Proximal operator of the convex conjugate of KullbackLeibler at x:
@@ -120,24 +148,35 @@ class KullbackLeibler(Function):
            .. math::     prox_{\tau * f^{*}}(x)
         '''
 
-                
-        if out is None:
-            z = x + tau * self.bnoise
-            return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
+        if has_numba:
+            if out is None:
+                out = (x * 0.)
+                out_np = out.as_array()
+                kl_proximal_conjugate(x.as_array(), self.b.as_array(), self.bnoise.as_array(), tau, out_np)
+                # out.fill(out_np)
+                return out
+            else:
+                out_np = out.as_array()
+                kl_proximal_conjugate(x.as_array(), self.b.as_array(), self.bnoise.as_array(), tau, out_np)
+                # out.fill(out_np)                    
         else:
-            
-            tmp = tau * self.bnoise
-            tmp += x
-            tmp -= 1
-            
-            self.b.multiply(4*tau, out=out)    
-            
-            out.add((tmp)**2, out=out)
-            out.sqrt(out=out)
-            out *= -1
-            tmp += 2
-            out += tmp
-            out *= 0.5
+            if out is None:
+                z = x + tau * self.bnoise
+                return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
+            else:
+                
+                tmp = tau * self.bnoise
+                tmp += x
+                tmp -= 1
+                
+                self.b.multiply(4*tau, out=out)    
+                
+                out.add(tmp.power(2), out=out)
+                out.sqrt(out=out)
+                out *= -1
+                tmp += 2
+                out += tmp
+                out *= 0.5
 
     def __rmul__(self, scalar):
         
@@ -148,6 +187,31 @@ class KullbackLeibler(Function):
         
         return ScaledFunction(self, scalar) 
 
+if has_numba:
+    '''Some parallelisation of KL calls'''
+    @numba.jit(nopython=True)
+    def kl_proximal(x,b, bnoise, tau, out):
+            for i in numba.prange(x.size):
+                out.flat[i] = 0.5 *  ( 
+                    ( x.flat[i] - bnoise.flat[i] - tau ) +\
+                    numpy.sqrt( (x.flat[i] + bnoise.flat[i] - tau)**2. + \
+                        (4. * tau * b.flat[i]) 
+                    )
+                )
+    @numba.jit(nopython=True)
+    def kl_proximal_conjugate(x, b, bnoise, tau, out):
+        #z = x + tau * self.bnoise
+        #return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
+
+        for i in numba.prange(x.size):
+            z = x.flat[i] + ( tau * bnoise.flat[i] )
+            out.flat[i] = 0.5 * ( 
+                (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * tau * b.flat[i])
+                )
+    @numba.jit(nopython=True)
+    def kl_gradient(x, b, bnoise, out):
+        for i in numba.prange(x.size):
+            out.flat[i] = 1 - b.flat[i]/(x.flat[i] + bnoise.flat[i])
 
 if __name__ == '__main__':
     

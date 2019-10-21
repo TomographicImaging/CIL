@@ -29,7 +29,56 @@ import functools
 import scipy.special
 try:
     import numba
+    from numba import jit, prange
     has_numba = True
+    '''Some parallelisation of KL calls'''
+    @jit(nopython=True)
+    def kl_proximal(x,b, bnoise, tau, out):
+            for i in prange(x.size):
+                out.flat[i] = 0.5 *  ( 
+                    ( x.flat[i] - bnoise.flat[i] - tau ) +\
+                    numpy.sqrt( (x.flat[i] + bnoise.flat[i] - tau)**2. + \
+                        (4. * tau * b.flat[i]) 
+                    )
+                )
+    @jit(nopython=True)
+    def kl_proximal_conjugate(x, b, bnoise, tau, out):
+        #z = x + tau * self.bnoise
+        #return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
+
+        for i in prange(x.size):
+            z = x.flat[i] + ( tau * bnoise.flat[i] )
+            out.flat[i] = 0.5 * ( 
+                (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * tau * b.flat[i])
+                )
+    @jit(nopython=True)
+    def kl_gradient(x, b, bnoise, out):
+        for i in prange(x.size):
+            out.flat[i] = 1 - b.flat[i]/(x.flat[i] + bnoise.flat[i])
+
+    @jit(nopython=True)
+    def kl_div(x, y, out):
+        for i in prange(x.size):
+            X = x.flat[i]
+            Y = y.flat[i]    
+            if x.flat[i] > 0 and y.flat[i] > 0:
+                out.flat[i] = X * numpy.log(X/Y) - X + Y
+            elif X == 0 and Y >= 0:
+                out.flat[i] = Y
+            else:
+                out.flat[i] = numpy.inf
+    
+    # force a jit
+    x = numpy.asarray(numpy.random.random((10,10)), dtype=numpy.float32)
+    b = numpy.asarray(numpy.random.random((10,10)), dtype=numpy.float32)
+    bnoise = numpy.zeros_like(x)
+    out = numpy.empty_like(x)
+    tau = 1.
+    kl_div(b,x,out)
+    kl_gradient(x,b,bnoise,out)
+    kl_proximal(x,b, bnoise, tau, out)
+    kl_proximal_conjugate(x,b, bnoise, tau, out)
+    
 except ImportError as ie:
     has_numba = False
 
@@ -51,15 +100,19 @@ class KullbackLeibler(Function):
         
         self.b = data    
         self.bnoise = data * 0.
+        print ("has numba", has_numba)
         
                                                     
     def __call__(self, x):
         
 
         '''Evaluates KullbackLeibler at x'''
-
-        ind = x.as_array()>0
-        tmp = scipy.special.kl_div(self.b.as_array()[ind], x.as_array()[ind])                
+        if has_numba:
+            tmp = numpy.empty_like(x.as_array())
+            kl_div(self.b.as_array(), x.as_array(), tmp)
+        else:
+            ind = x.as_array()>0
+            tmp = scipy.special.kl_div(self.b.as_array()[ind], x.as_array()[ind])                
         return numpy.sum(tmp) 
 
     def log(self, datacontainer):
@@ -187,31 +240,6 @@ class KullbackLeibler(Function):
         
         return ScaledFunction(self, scalar) 
 
-if has_numba:
-    '''Some parallelisation of KL calls'''
-    @numba.jit(nopython=True)
-    def kl_proximal(x,b, bnoise, tau, out):
-            for i in numba.prange(x.size):
-                out.flat[i] = 0.5 *  ( 
-                    ( x.flat[i] - bnoise.flat[i] - tau ) +\
-                    numpy.sqrt( (x.flat[i] + bnoise.flat[i] - tau)**2. + \
-                        (4. * tau * b.flat[i]) 
-                    )
-                )
-    @numba.jit(nopython=True)
-    def kl_proximal_conjugate(x, b, bnoise, tau, out):
-        #z = x + tau * self.bnoise
-        #return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
-
-        for i in numba.prange(x.size):
-            z = x.flat[i] + ( tau * bnoise.flat[i] )
-            out.flat[i] = 0.5 * ( 
-                (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * tau * b.flat[i])
-                )
-    @numba.jit(nopython=True)
-    def kl_gradient(x, b, bnoise, out):
-        for i in numba.prange(x.size):
-            out.flat[i] = 1 - b.flat[i]/(x.flat[i] + bnoise.flat[i])
 
 if __name__ == '__main__':
     

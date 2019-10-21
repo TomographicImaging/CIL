@@ -459,3 +459,20 @@ class TestKullbackLeibler(unittest.TestCase):
         numpy.testing.assert_array_almost_equal(proxc.as_array(), numpy_res.as_array(), decimal=5)
 
         numpy.testing.assert_array_equal(proxc.as_array(), out.as_array())
+
+
+    def test_call(self):
+        tau = self.tau
+        x = self.x
+        data = self.data
+        bnoise = self.bnoise
+        ig = self.ig
+        out = ig.allocate(None)
+        
+        f = KullbackLeibler(data, bnoise=bnoise)
+        import scipy.special
+        a = f(x)
+        ind = x.as_array()>0
+        tmp = scipy.special.kl_div(data.as_array()[ind], x.as_array()[ind])                
+        b = numpy.sum(tmp) 
+        assert a == b

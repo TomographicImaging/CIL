@@ -100,7 +100,6 @@ class KullbackLeibler(Function):
         
         self.b = data    
         self.bnoise = data * 0.
-        print ("has numba", has_numba)
         
                                                     
     def __call__(self, x):

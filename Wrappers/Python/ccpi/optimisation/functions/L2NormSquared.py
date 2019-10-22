@@ -106,7 +106,7 @@ class L2NormSquared(Function):
 
         else:
             if self.data is not None:
-                x.subtract(self.dat, out=out)
+                x.subtract(self.data, out=out)
                 out /= (1+2*tau)
                 out += self.data
             else:

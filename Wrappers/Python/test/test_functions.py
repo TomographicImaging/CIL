@@ -88,7 +88,7 @@ class TestFunction(unittest.TestCase):
         d = ag.allocate(ImageGeometry.RANDOM_INT)
         alpha = 0.5
         # scaled function
-        g = alpha * L2NormSquared(b=noisy_data)
+        g = alpha * L2NormSquared(noisy_data)
         
         # Compare call of g
         a2 = alpha*(d - noisy_data).power(2).sum()
@@ -120,7 +120,7 @@ class TestFunction(unittest.TestCase):
         numpy.testing.assert_equal(f(u), u.squared_norm())
 
         # check grad/call with data
-        f1 = L2NormSquared(b=b)
+        f1 = L2NormSquared(b)
         b1 = f1.gradient(u)
         b2 = 2 * (u-b)
             
@@ -165,7 +165,7 @@ class TestFunction(unittest.TestCase):
         # scalar 
         scalar = 100
         f_scaled_no_data = scalar * L2NormSquared()
-        f_scaled_data = scalar * L2NormSquared(b=b)
+        f_scaled_data = scalar * L2NormSquared(b)
         
         # call
         numpy.testing.assert_equal(f_scaled_no_data(u), scalar*f(u))
@@ -215,7 +215,7 @@ class TestFunction(unittest.TestCase):
         #numpy.testing.assert_equal(f(u), u.squared_norm())
 
         # check grad/call with data
-        f1 = L2NormSquared(b=b)
+        f1 = L2NormSquared(b)
         b1 = f1.gradient(u)
         b2 = b1 * 0.
         f1.gradient(u, out=b2)
@@ -256,7 +256,7 @@ class TestFunction(unittest.TestCase):
         # scalar 
         scalar = 100
         f_scaled_no_data = scalar * L2NormSquared()
-        f_scaled_data = scalar * L2NormSquared(b=b)
+        f_scaled_data = scalar * L2NormSquared(b)
         
         # grad
         w = f_scaled_no_data.gradient(u)
@@ -305,7 +305,7 @@ class TestFunction(unittest.TestCase):
         
         A = 0.5 * Identity(ig)
         old_chisq = Norm2Sq(A, b, 1.0)
-        new_chisq = FunctionOperatorComposition(L2NormSquared(b=b),A)
+        new_chisq = FunctionOperatorComposition(L2NormSquared(b),A)
 
         yold = old_chisq(u)
         ynew = new_chisq(u)
@@ -358,7 +358,7 @@ class TestFunction(unittest.TestCase):
         
         out = ig.allocate()
         
-        f = KullbackLeibler(data, bnoise=bnoise)
+        f = KullbackLeibler(data, background_term = bnoise)
         
         grad = f.gradient(x)
         f.gradient(x, out=out)

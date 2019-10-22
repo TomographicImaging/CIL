@@ -52,8 +52,7 @@ class KullbackLeibler(Function):
             
         if self.data.as_array().any()<0:
             raise ValueError('Data is larger or equal to 0')
-            
-        
+                                        
                                                     
     def __call__(self, x):
         
@@ -76,17 +75,26 @@ class KullbackLeibler(Function):
         
         '''Evaluates gradient of KullbackLeibler at x'''
         
-        tmp_sum = (x + self.background_term).as_array()
-        ind = tmp_sum>0 
+        tmp_sum = x + self.background_term
+        tmp_sum_array = tmp_sum.as_array()  
+        tmp_out = x.geometry.allocate()
+        tmp_out.as_array()[tmp_sum_array>0] = 1 - self.data.as_array()[tmp_sum_array>0]/tmp_sum_array[tmp_sum_array>0]        
+                             
+        if out is None: 
+                          
+            return type(x)(tmp_out)
         
-        if out is None:            
-            return 1 - self.data[ind]/tmp_sum[ind]
-        else:            
-            # TODO not working with ind
-            x.add(self.background_term, out=out)
-            self.data.divide(out, out=out)
-            out.subtract(1, out=out)
-            out *= -1
+        else:    
+            
+            out.fill(tmp_out)
+            
+#            # TODO not working with ind
+#            x.add(self.background_term, out = out)            
+#            self.data.divide(out, out=out)
+#            out.as_array()[np.isinf(out.as_array())]=0
+#            out.subtract(1, out=out)
+#            out *= -1
+            
             
     def convex_conjugate(self, x):
         
@@ -163,7 +171,7 @@ class KullbackLeibler(Function):
 if __name__ == '__main__':
     
     from ccpi.framework import ImageGeometry
-    import numpy
+    import numpy as np
     
     M, N =  2,3
     ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
@@ -171,17 +179,86 @@ if __name__ == '__main__':
     # if both u1, g1 > 0
     u1 = ig.allocate('random_int', seed = 5)
     g1 = ig.allocate('random_int', seed = 10)
+    b1 = ig.allocate('random_int', seed = 100)
     
-    f = KullbackLeibler(g1)
+    f = KullbackLeibler(g1)        
+    numpy.testing.assert_equal(0.0, f(g1)) 
+    
+    background_term = b1
+    background_term.as_array()[0,0] = -10000
+    background_term.as_array()[0,1] = - u1.as_array()[0,1]    
+    
+    f1 = KullbackLeibler(g1, background_term = background_term)   
+    res_gradient = f1.gradient(u1)
+    print(res_gradient.as_array())
+    
+    res_gradient_out = u1.geometry.allocate()
+    f1.gradient(u1, out = res_gradient_out)
+    print(res_gradient_out.as_array())
+    
+#    u1.add(background_term, out = div)
+#    g1.divide(div, out=div)
+#    div.subtract(1, out=div)
+#    div *= -1
+#    div.as_array()[numpy.isinf(div.as_array())] = 0
+
+#    
+#    tmp_sum = u1 + background_term
+#    tmp_sum_array = tmp_sum.as_array()
+
+#    
+##    div.as_array()[tmp_sum_array>0] = g1.as_array()[tmp_sum_array>0]/tmp_sum_array[tmp_sum_array>0]
+##    
+##        
+#    g1.divide(tmp_sum, out=g1)
+#    g1.add(1)
+#    print(g1.as_array())
+    
+    
+#    np.copyto(div.as_array(),g1.as_array()[tmp_sum_array>0]/tmp_sum_array[tmp_sum_array>0])
+    
+    
+#    div.as_array()[tmp_sum_array>0].fill((g1.as_array()[tmp_sum_array>0]/tmp_sum_array[tmp_sum_array>0]))
+            
+#            )
+    
+#    np.copyto(tmp.array[k], t.array)
+    
+#    print(div.as_array())
+#    
+    
+#    ind = tmp_sum>0 
+#    
+#    out_grad = u1.geometry.allocate()
+#    
+#    np.copyto(out_grad.as_array()[ind], (1 - (g1.as_array()/tmp_sum))[ind])
+#    
+    
+#        ind = tmp_sum>0 
+#        
+#        if out is None: 
+#            
+#            self.out_grad.fill(1 - self.data.as_array()[ind]/tmp_sum[ind])
+#    
+    
+    
+#    f1 = KullbackLeibler(g1, background_term = u1)        
+#    numpy.testing.assert_equal(0.0, f1(g1))     
+    
+    
+    
 #    print(f(g1))
 #    print(f(u1))
     
-    g2 = g1.clone()
-    g2.as_array()[0,1] = 0
-#    print(f(g2))
-
-
-    tmp = scipy.special.kl_div(g1.as_array(), g2.as_array())  
+#    g2 = g1.clone()
+#    g2.as_array()[0,1] = 0
+##    print(f(g2))
+#
+#
+#    tmp = scipy.special.kl_div(g1.as_array(), g2.as_array())  
+#    
+#    
+#    res_grad = f.gradient()
     
         
 

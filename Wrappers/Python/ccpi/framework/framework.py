@@ -318,8 +318,6 @@ class AcquisitionGeometry(object):
                 if not reduce(lambda x,y: (y in allowed_labels) and x, labels , True):
                     raise ValueError('Requested axis are not possible. Expected {},\ngot {}'.format(
                                     allowed_labels,labels))
-            if len(labels) != len(dim_labels):
-                raise ValueError('Wrong number of labels. Expected {} got {}'.format(len(dim_labels), len(labels)))
             order = self.get_order_by_label(labels, dim_labels)
             if order != [i for i in range(len(dim_labels))]:
                 # resort

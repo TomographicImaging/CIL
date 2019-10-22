@@ -123,7 +123,7 @@ class TestAlgorithms(unittest.TestCase):
 	#### it seems FISTA does not work with Nowm2Sq
         # norm2sq = Norm2Sq(identity, b)
         # norm2sq.L = 2 * norm2sq.c * identity.norm()**2
-        norm2sq = FunctionOperatorComposition(L2NormSquared(b=b), identity)
+        norm2sq = FunctionOperatorComposition(L2NormSquared(b), identity)
         opt = {'tol': 1e-4, 'memopt':False}
         print ("initial objective", norm2sq(x_init))
         alg = FISTA(x_init=x_init, f=norm2sq, g=ZeroFunction())
@@ -227,11 +227,11 @@ class TestAlgorithms(unittest.TestCase):
                 alpha = .3
                 # fidelity
             if noise == 's&p':
-                g = L1Norm(b=noisy_data)
+                g = L1Norm(noisy_data)
             elif noise == 'poisson':
                 g = KullbackLeibler(noisy_data)
             elif noise == 'gaussian':
-                g = 0.5 * L2NormSquared(b=noisy_data)
+                g = 0.5 * L2NormSquared(noisy_data)
             return noisy_data, alpha, g
 
         noisy_data, alpha, g = setup(data, noise)
@@ -334,20 +334,20 @@ class TestAlgorithms(unittest.TestCase):
         def KL_Prox_PosCone(x, tau, out=None):
                 
             if out is None: 
-                tmp = 0.5 *( (x - fid.bnoise - tau) + ( (x + fid.bnoise - tau)**2 + 4*tau*fid.b   ) .sqrt() )
+                tmp = 0.5 *( (x - fid.background_term - tau) + ( (x + fid.background_term - tau)**2 + 4*tau*fid.data   ) .sqrt() )
                 return tmp.maximum(0)
             else:            
-                tmp =  0.5 *( (x - fid.bnoise - tau) + 
-                            ( (x + fid.bnoise - tau)**2 + 4*tau*fid.b   ) .sqrt()
+                tmp =  0.5 *( (x - fid.background_term - tau) + 
+                            ( (x + fid.background_term - tau)**2 + 4*tau*fid.data   ) .sqrt()
                             )
-                x.add(fid.bnoise, out=out)
+                x.add(fid.background_term, out=out)
                 out -= tau
                 out *= out
-                tmp = fid.b * (4 * tau)
+                tmp = fid.data * (4 * tau)
                 out.add(tmp, out=out)
                 out.sqrt(out=out)
                 
-                x.subtract(fid.bnoise, out=tmp)
+                x.subtract(fid.background_term, out=tmp)
                 tmp -= tau
                 
                 out += tmp

@@ -172,7 +172,7 @@ if __name__ == '__main__':
     b = ig.allocate('random_int')
     
     f1 =  10 * MixedL21Norm()
-    f2 =  0.5 * L2NormSquared(b=b)    
+    f2 =  0.5 * L2NormSquared(b)    
     
     f = BlockFunction(f1, f2)
     tau = 0.3

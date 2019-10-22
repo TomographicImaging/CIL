@@ -114,7 +114,7 @@ if __name__ == '__main__':
     BG = BlockGeometry(ig, ig)
     U = BG.allocate('random_int')
         
-    f2 = 0.5 * L2NormSquared(b=b)
+    f2 = 0.5 * L2NormSquared(b)
     f1 = 30 * MixedL21Norm()
     tau = 0.355
     

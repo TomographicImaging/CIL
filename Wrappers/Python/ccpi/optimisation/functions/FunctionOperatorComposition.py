@@ -103,7 +103,7 @@ if __name__ == '__main__':
 #    G = Gradient(ig)
     alpha = 0.5
     
-    f1 =  alpha * L2NormSquared(b=b)    
+    f1 =  alpha * L2NormSquared(b)    
 
     f_comp = FunctionOperatorComposition(f1, Aop)
     

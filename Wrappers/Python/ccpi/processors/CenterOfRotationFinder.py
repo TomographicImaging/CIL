@@ -27,30 +27,55 @@ class CenterOfRotationFinder(DataProcessor):
     This processor read in a AcquisitionDataSet and finds the center of rotation 
     based on Nghia Vo's method. https://doi.org/10.1364/OE.22.019078
     
-    Input: AcquisitionDataSet
+    Input: AcquisitionDataSet, slice number to run over
     
     Output: float. center of rotation in pixel coordinate
     '''
     
     def __init__(self):
+
         kwargs = {
-                  
-                  }
-        
+            'slice_number' : 0
+                 }
+
+
         #DataProcessor.__init__(self, **kwargs)
         super(CenterOfRotationFinder, self).__init__(**kwargs)
     
-    def check_input(self, dataset):
-        if dataset.number_of_dimensions == 3:
-            if dataset.geometry.geom_type == 'parallel':
-                return True
-            else:
-                raise ValueError('{0} is suitable only for parallel beam geometry'\
-                                 .format(self.__class__.__name__))
+    #redefining to take slice_number
+    def set_input(self, dataset, slice_number = None):
+
+        if issubclass(type(dataset), DataContainer):
+            if self.check_input(dataset):
+                self.__dict__['input'] = dataset
+
+            if slice_number == None:
+                if dataset.number_of_dimensions == 3:
+                    #if undefined use centre slice
+                    slice_number = dataset.get_dimension_size('vertical')//2
+                else:
+                    #can't leave as None
+                    slice_number = 0
+
         else:
-            raise ValueError("Expected input dimensions is 3, got {0}"\
-                             .format(dataset.number_of_dimensions))
-        
+            raise TypeError("Input type mismatch: got {0} expecting {1}"\
+                            .format(type(dataset), DataContainer))
+
+        self.slice_number = slice_number
+
+    def check_input(self, dataset):
+
+        if dataset.number_of_dimensions < 2 or dataset.number_of_dimensions > 3:
+            raise ValueError("{0} is suitable only for 2D or 3D parallel beam geometry"\
+                     .format(self.__class__.__name__, dataset.number_of_dimensions))   
+
+        if dataset.geometry.geom_type == 'parallel':
+            return True
+        else:
+            raise ValueError('{0} is suitable only for parallel beam geometry'\
+                            .format(self.__class__.__name__))
+
+
     
     # #########################################################################
     # Copyright (c) 2015, UChicago Argonne, LLC. All rights reserved.         #
@@ -165,10 +190,11 @@ class CenterOfRotationFinder(DataProcessor):
         """
         tomo = CenterOfRotationFinder.as_float32(tomo)
     
-        if ind is None:
-            ind = tomo.shape[1] // 2
-        _tomo = tomo[:, ind, :]
-    
+        #if ind is None:
+        #    ind = tomo.shape[1] // 2
+        
+        _tomo = tomo#[:, ind, :]
+     
         
     
         # Reduce noise by smooth filters. Use different filters for coarse and fine search 
@@ -297,8 +323,14 @@ class CenterOfRotationFinder(DataProcessor):
         
         projections = self.get_input()
         
+        if projections.number_of_dimensions==3:
+            projections = projections.subset(vertical=self.slice_number).subset(['angle','horizontal'])
+
+        else:
+            projections = projections.subset(['angle','horizontal'])   
+
         cor = CenterOfRotationFinder.find_center_vo(projections.as_array())
-        
+
         return cor
 
             

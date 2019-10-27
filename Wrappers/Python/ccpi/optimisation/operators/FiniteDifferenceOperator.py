@@ -194,7 +194,7 @@ class FiniteDiff(LinearOperator):
 
                     
     def adjoint(self, x, out=None):
-        
+                      
         x_asarr = x.as_array()
         x_sz = len(x.shape)
         outnone = False 

@@ -195,6 +195,7 @@ class TestAlgorithms(unittest.TestCase):
         print ("PDHG Denoising with 3 noises")
         # adapted from demo PDHG_TV_Color_Denoising.py in CIL-Demos repository
         
+        # loader = TestData(data_dir=os.path.join(os.environ['SIRF_INSTALL_PATH'], 'share','ccpi'))
         # loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
         loader = TestData()
         
@@ -254,7 +255,7 @@ class TestAlgorithms(unittest.TestCase):
         pdhg1 = PDHG(f=f1,g=g,operator=operator, tau=tau, sigma=sigma)
         pdhg1.max_iteration = 2000
         pdhg1.update_objective_interval = 200
-        pdhg1.run(1000)
+        pdhg1.run(1000, very_verbose=True)
 
         rmse = (pdhg1.get_output() - data).norm() / data.as_array().size
         print ("RMSE", rmse)

@@ -458,7 +458,7 @@ class DataContainer(object):
         and then it returns the pointer to the array'''
         if dimensions is not None:
             return self.subset(dimensions).as_array()
-        return self.array
+        return self.array.copy()
     
     
     def subset(self, dimensions=None, **kw):
@@ -1201,20 +1201,24 @@ class AcquisitionData(DataContainer):
     def subset(self, dimensions=None, **kw):
         '''returns a subset of the AcquisitionData and regenerates the geometry'''
 
+        # # Check that this is actually a resorting
+        # if dimensions is not None and \
+        #     (len(dimensions) != len(self.shape) ):
+        #     raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
+
+        # requested_labels = kw.get('dimension_labels', None)
+        # if requested_labels is not None:
+        #     allowed_labels = [AcquisitionGeometry.CHANNEL,
+        #                           AcquisitionGeometry.ANGLE,
+        #                           AcquisitionGeometry.VERTICAL,
+        #                           AcquisitionGeometry.HORIZONTAL]
+        #     if not reduce(lambda x,y: (y in allowed_labels) and x, requested_labels , True):
+        #         raise ValueError('Requested axis are not possible. Expected {},\ngot {}'.format(
+        #                         allowed_labels,requested_labels))
         # Check that this is actually a resorting
         if dimensions is not None and \
             (len(dimensions) != len(self.shape) ):
             raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
-
-        requested_labels = kw.get('dimension_labels', None)
-        if requested_labels is not None:
-            allowed_labels = [AcquisitionGeometry.CHANNEL,
-                                  AcquisitionGeometry.ANGLE,
-                                  AcquisitionGeometry.VERTICAL,
-                                  AcquisitionGeometry.HORIZONTAL]
-            if not reduce(lambda x,y: (y in allowed_labels) and x, requested_labels , True):
-                raise ValueError('Requested axis are not possible. Expected {},\ngot {}'.format(
-                                allowed_labels,requested_labels))
         out = super(AcquisitionData, self).subset(dimensions, **kw)
         
         if out.number_of_dimensions > 1:
@@ -1228,6 +1232,14 @@ class AcquisitionData(DataContainer):
             pixel_size_v = 1
             dist_source_center = self.geometry.dist_source_center
             dist_center_detector = self.geometry.dist_center_detector
+
+            # update the angles if necessary
+            sliceme = kw.get(AcquisitionGeometry.ANGLE, None)
+            if sliceme is not None:
+                angles = numpy.asarray([ self.geometry.angles[sliceme] ] , numpy.float32)
+            else:
+                angles = self.geometry.angles.copy()
+            
             for key in out.dimension_labels.keys():
                 if out.dimension_labels[key] == AcquisitionGeometry.CHANNEL:
                     channels = self.geometry.channels
@@ -1245,7 +1257,7 @@ class AcquisitionData(DataContainer):
             
             out.geometry = AcquisitionGeometry(geom_type=self.geometry.geom_type, 
                                     dimension=dim,
-                                    angles=self.geometry.angles,
+                                    angles=angles,
                                     pixel_num_h=pixel_num_h,
                                     pixel_size_h = pixel_size_h,
                                     pixel_num_v = pixel_num_v,

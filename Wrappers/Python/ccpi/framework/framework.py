@@ -110,6 +110,8 @@ class ImageGeometry(object):
             if order != [i for i in range(len(dim_labels))]:
                 # resort
                 self.shape = tuple([shape[i] for i in order])
+            else:
+                self.shape = tuple(order)
             self.dimension_labels = labels
                 
     def get_order_by_label(self, dimension_labels, default_dimension_labels):
@@ -217,8 +219,8 @@ class AcquisitionGeometry(object):
     HORIZONTAL = 'horizontal'
     def __init__(self, 
                  geom_type, 
-                 dimension, 
-                 angles, 
+                 dimension=None, 
+                 angles=None, 
                  pixel_num_h=0, 
                  pixel_size_h=1, 
                  pixel_num_v=0, 
@@ -255,6 +257,15 @@ class AcquisitionGeometry(object):
         angles_format radians or degrees
         """
         self.geom_type = geom_type   # 'parallel' or 'cone'
+        # Override the parameter passed as dimension
+        # determine if the geometry is 2D or 3D
+        if pixel_num_v >= 1:
+            dimension = '3D'
+        elif pixel_num_v == 0:
+            dimension = '2D'
+        else:
+            raise ValueError('Number of pixels at detector on the vertical axis must be >= 0. Got {}'.format(vert))
+    
         self.dimension = dimension # 2D or 3D
         if isinstance(angles, numpy.ndarray):
             self.angles = angles
@@ -307,12 +318,12 @@ class AcquisitionGeometry(object):
                 if not reduce(lambda x,y: (y in allowed_labels) and x, labels , True):
                     raise ValueError('Requested axis are not possible. Expected {},\ngot {}'.format(
                                     allowed_labels,labels))
-            if len(labels) != len(dim_labels):
-                raise ValueError('Wrong number of labels. Expected {} got {}'.format(len(dim_labels), len(labels)))
             order = self.get_order_by_label(labels, dim_labels)
             if order != [i for i in range(len(dim_labels))]:
                 # resort
                 self.shape = tuple([shape[i] for i in order])
+            else:
+                self.shape = tuple(order)
             self.dimension_labels = labels
         
     def get_order_by_label(self, dimension_labels, default_dimension_labels):
@@ -438,7 +449,6 @@ class DataContainer(object):
             raise ValueError('Unknown dimension {0}. Should be one of'.format(dimension_label,
                              self.dimension_labels.values()))
                         
-
     def as_array(self, dimensions=None):
         '''Returns the DataContainer as Numpy Array
         
@@ -1190,20 +1200,24 @@ class AcquisitionData(DataContainer):
     def subset(self, dimensions=None, **kw):
         '''returns a subset of the AcquisitionData and regenerates the geometry'''
 
+        # # Check that this is actually a resorting
+        # if dimensions is not None and \
+        #     (len(dimensions) != len(self.shape) ):
+        #     raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
+
+        # requested_labels = kw.get('dimension_labels', None)
+        # if requested_labels is not None:
+        #     allowed_labels = [AcquisitionGeometry.CHANNEL,
+        #                           AcquisitionGeometry.ANGLE,
+        #                           AcquisitionGeometry.VERTICAL,
+        #                           AcquisitionGeometry.HORIZONTAL]
+        #     if not reduce(lambda x,y: (y in allowed_labels) and x, requested_labels , True):
+        #         raise ValueError('Requested axis are not possible. Expected {},\ngot {}'.format(
+        #                         allowed_labels,requested_labels))
         # Check that this is actually a resorting
         if dimensions is not None and \
             (len(dimensions) != len(self.shape) ):
             raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
-
-        requested_labels = kw.get('dimension_labels', None)
-        if requested_labels is not None:
-            allowed_labels = [AcquisitionGeometry.CHANNEL,
-                                  AcquisitionGeometry.ANGLE,
-                                  AcquisitionGeometry.VERTICAL,
-                                  AcquisitionGeometry.HORIZONTAL]
-            if not reduce(lambda x,y: (y in allowed_labels) and x, requested_labels , True):
-                raise ValueError('Requested axis are not possible. Expected {},\ngot {}'.format(
-                                allowed_labels,requested_labels))
         out = super(AcquisitionData, self).subset(dimensions, **kw)
         
         if out.number_of_dimensions > 1:
@@ -1217,6 +1231,14 @@ class AcquisitionData(DataContainer):
             pixel_size_v = 1
             dist_source_center = self.geometry.dist_source_center
             dist_center_detector = self.geometry.dist_center_detector
+
+            # update the angles if necessary
+            sliceme = kw.get(AcquisitionGeometry.ANGLE, None)
+            if sliceme is not None:
+                angles = numpy.asarray([ self.geometry.angles[sliceme] ] , numpy.float32)
+            else:
+                angles = self.geometry.angles.copy()
+            
             for key in out.dimension_labels.keys():
                 if out.dimension_labels[key] == AcquisitionGeometry.CHANNEL:
                     channels = self.geometry.channels
@@ -1234,7 +1256,7 @@ class AcquisitionData(DataContainer):
             
             out.geometry = AcquisitionGeometry(geom_type=self.geometry.geom_type, 
                                     dimension=dim,
-                                    angles=self.geometry.angles,
+                                    angles=angles,
                                     pixel_num_h=pixel_num_h,
                                     pixel_size_h = pixel_size_h,
                                     pixel_num_v = pixel_num_v,

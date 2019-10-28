@@ -449,7 +449,6 @@ class DataContainer(object):
             raise ValueError('Unknown dimension {0}. Should be one of'.format(dimension_label,
                              self.dimension_labels.values()))
                         
-
     def as_array(self, dimensions=None):
         '''Returns the DataContainer as Numpy Array
         

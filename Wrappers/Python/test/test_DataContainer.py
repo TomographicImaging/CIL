@@ -733,7 +733,30 @@ class TestDataContainer(unittest.TestCase):
         c = b * 2
         numpy.testing.assert_array_equal(u.as_array(), c)
         
+class TestSubset(unittest.TestCase):
+    def setUp(self):
+        self.ig = ImageGeometry(1,2,3,channels=4)
+        angles = numpy.asarray([90.,0.,-90.], dtype=numpy.float32)
 
+        self.ag = AcquisitionGeometry('cone', 'edo', pixel_num_h=20, pixel_num_v=2, angles=angles, 
+                         dist_source_center = 312.2, 
+                         dist_center_detector = 123.,
+                         channels=4 )
+
+    def test_AcquisitionDataAllocate1(self):
+        data = self.ag.allocate()
+        default_dimension_labels = [AcquisitionGeometry.CHANNEL ,
+                 AcquisitionGeometry.ANGLE , AcquisitionGeometry.VERTICAL ,
+                 AcquisitionGeometry.HORIZONTAL]
+        self.assertTrue(  default_dimension_labels == list(data.dimension_labels) )
+        self.assertTrue( data.shape = (4,3,2,20))
+    def test_AcquisitionDataAllocate2(self):
+        non_default_dimension_labels = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.HORIZONTAL,
+         AcquisitionGeometry.VERTICAL, AcquisitionGeometry.ANGLE]
+        data = self.ig.allocate(dimension_labels=non_default_dimension_labels)
+        self.assertTrue(  non_default_dimension_labels == list(data.dimension_labels) )
+        self.assertTrue( data.shape = (4,20,2,3))
+        
 
 
 if __name__ == '__main__':

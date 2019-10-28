@@ -458,7 +458,7 @@ class DataContainer(object):
         and then it returns the pointer to the array'''
         if dimensions is not None:
             return self.subset(dimensions).as_array()
-        return self.array.copy()
+        return self.array
     
     
     def subset(self, dimensions=None, **kw):

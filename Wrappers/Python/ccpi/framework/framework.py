@@ -217,8 +217,8 @@ class AcquisitionGeometry(object):
     HORIZONTAL = 'horizontal'
     def __init__(self, 
                  geom_type, 
-                 dimension, 
-                 angles, 
+                 dimension=None, 
+                 angles=None, 
                  pixel_num_h=0, 
                  pixel_size_h=1, 
                  pixel_num_v=0, 
@@ -255,6 +255,15 @@ class AcquisitionGeometry(object):
         angles_format radians or degrees
         """
         self.geom_type = geom_type   # 'parallel' or 'cone'
+        # Override the parameter passed as dimension
+        # determine if the geometry is 2D or 3D
+        if pixel_num_v >= 1:
+            dimension = '3D'
+        elif pixel_num_v == 0:
+            dimension = '2D'
+        else:
+            raise ValueError('Number of pixels at detector on the vertical axis must be >= 0. Got {}'.format(vert))
+    
         self.dimension = dimension # 2D or 3D
         if isinstance(angles, numpy.ndarray):
             self.angles = angles

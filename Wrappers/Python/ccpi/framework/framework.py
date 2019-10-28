@@ -1272,8 +1272,13 @@ class DataProcessor(object):
         if name == 'input':
             self.set_input(value)
         elif name in self.__dict__.keys():
-            self.__dict__[name] = value
-            self.__dict__['mTime'] = datetime.now()
+            if name == 'runTime': #doesn't change mtime
+                self.__dict__[name] = value
+            elif name == 'output': #doesn't change mtime
+                self.__dict__[name] = value        
+            else:            
+                self.__dict__[name] = value
+                self.__dict__['mTime'] = datetime.now()
         else:
             raise KeyError('Attribute {0} not found'.format(name))
         #pass
@@ -1299,26 +1304,38 @@ class DataProcessor(object):
         for k,v in self.__dict__.items():
             if v is None and k != 'output':
                 raise ValueError('Key {0} is None'.format(k))
+
+
+        #run if 1st time, if modified since last run, or if output not stored
         shouldRun = False
+
         if self.runTime == -1:
             shouldRun = True
         elif self.mTime > self.runTime:
             shouldRun = True
-            
-        # CHECK this
-        if self.store_output and shouldRun:
+        elif not self.store_output:
+            shouldRun = True
+
+        if shouldRun:
             self.runTime = datetime.now()
-            try:
-                self.output = self.process(out=out)
-                return self.output
-            except TypeError as te:
-                self.output = self.process()
-                return self.output
-        self.runTime = datetime.now()
-        try:
-            return self.process(out=out)
-        except TypeError as te:
-            return self.process()
+
+            if self.store_output: 
+                try:
+                    self.output = self.process(out=out)
+                    return self.output
+
+                except TypeError as te:
+                    self.output = self.process()
+                    return self.output
+            else:            
+                try:
+                    return self.process(out=out)
+                
+                except TypeError as te:
+                    return self.process()
+
+        else:
+            return self.output
             
     
     def set_input_processor(self, processor):

@@ -27,7 +27,8 @@ class CenterOfRotationFinder(DataProcessor):
     This processor read in a AcquisitionDataSet and finds the center of rotation 
     based on Nghia Vo's method. https://doi.org/10.1364/OE.22.019078
     
-    Input: AcquisitionDataSet, slice number to run over
+    Input: AcquisitionDataSet
+    Set_slice: Slice index or 'centre'
     
     Output: float. center of rotation in pixel coordinate
     '''
@@ -35,45 +36,56 @@ class CenterOfRotationFinder(DataProcessor):
     def __init__(self):
 
         kwargs = {
-            'slice_number' : 0
+            'slice_number' : None
                  }
-
-
+        
+        
         #DataProcessor.__init__(self, **kwargs)
         super(CenterOfRotationFinder, self).__init__(**kwargs)
-    
-    #redefining to take slice_number
-    def set_input(self, dataset, slice_number = None):
+        
+    def set_slice(self, slice):
+        """
+        Set the slice to run over in a 3D data set.
 
-        if issubclass(type(dataset), DataContainer):
-            if self.check_input(dataset):
-                self.__dict__['input'] = dataset
+        Input is any valid slice index or 'centre'
+        """
+        dataset = self.get_input()
 
-            if slice_number == None:
-                if dataset.number_of_dimensions == 3:
-                    #if undefined use centre slice
-                    slice_number = dataset.get_dimension_size('vertical')//2
-                else:
-                    #can't leave as None
-                    slice_number = 0
+        if dataset is None:
+            raise ValueError('Please set input data before slice selection')    
 
-        else:
-            raise TypeError("Input type mismatch: got {0} expecting {1}"\
-                            .format(type(dataset), DataContainer))
+        #check slice number is valid
+        if dataset.number_of_dimensions == 3:
+            if slice == 'centre':
+                slice = dataset.get_dimension_size('vertical')//2 
 
-        self.slice_number = slice_number
+            elif slice >= dataset.get_dimension_size('vertical'):
+                raise ValueError("Slice out of range must be less than {0}"\
+                    .format(dataset.get_dimension_size('vertical')))
+
+        elif dataset.number_of_dimensions == 2:
+            if slice is not None:
+                raise ValueError('Slice number not a valid parameter of a 2D data set')
+
+        self.slice_number = slice
 
     def check_input(self, dataset):
-
+        #check dataset
         if dataset.number_of_dimensions < 2 or dataset.number_of_dimensions > 3:
             raise ValueError("{0} is suitable only for 2D or 3D parallel beam geometry"\
                      .format(self.__class__.__name__, dataset.number_of_dimensions))   
 
-        if dataset.geometry.geom_type == 'parallel':
-            return True
-        else:
+        if dataset.geometry.geom_type != 'parallel':
             raise ValueError('{0} is suitable only for parallel beam geometry'\
                             .format(self.__class__.__name__))
+
+        #set default to centre slice
+        if dataset.number_of_dimensions == 3:
+            self.slice_number = dataset.get_dimension_size('vertical')//2
+        else:
+            self.slice_number = 0
+
+        return True
 
 
     
@@ -320,7 +332,7 @@ class CenterOfRotationFinder(DataProcessor):
         return mask
     
     def process(self, out=None):
-        
+    
         projections = self.get_input()
         
         if projections.number_of_dimensions==3:

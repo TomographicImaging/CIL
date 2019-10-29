@@ -43,16 +43,56 @@ class TestDataProcessor(unittest.TestCase):
 
     def test_CenterOfRotation(self):
         reader = NexusReader(self.filename)
-        ad = reader.get_acquisition_data_whole()
-        print (ad.geometry)
+        data = reader.get_acquisition_data_whole()
+
+        ad = data.clone()
+        print (ad)
         cf = CenterOfRotationFinder()
         cf.set_input(ad)
         print ("Center of rotation", cf.get_output())
         self.assertAlmostEqual(86.25, cf.get_output())
+
+    #def test_CenterOfRotation_transpose(self):
+        #reader = NexusReader(self.filename)
+        #data = reader.get_acquisition_data_whole()
+
+        ad = data.clone()
+        ad = ad.subset(['vertical','angle','horizontal'])
+        print (ad)
+        cf = CenterOfRotationFinder()
+        cf.set_input(ad)
+        print ("Center of rotation", cf.get_output())
+        self.assertAlmostEqual(86.25, cf.get_output())
+
+    #def test_CenterOfRotation_slice(self):
+        #reader = NexusReader(self.filename)
+        #data = reader.get_acquisition_data_whole()
+        
+        ad = data.clone()
+        ad = ad.subset(vertical=67)
+        print (ad)
+        cf = CenterOfRotationFinder()
+        cf.set_input(ad)
+        print ("Center of rotation", cf.get_output())
+        self.assertAlmostEqual(86.25, cf.get_output())
+
+    #def test_CenterOfRotation_slice(self):
+        #reader = NexusReader(self.filename)
+        #data = reader.get_acquisition_data_whole()
+
+        ad = data.clone()
+        print (ad)
+        cf = CenterOfRotationFinder()
+        cf.set_input(ad)
+        cf.set_slice(80)
+        print ("Center of rotation", cf.get_output())
+        self.assertAlmostEqual(86.25, cf.get_output())
+        cf.set_slice('centre')
+        print ("Center of rotation", cf.get_output())
+        self.assertAlmostEqual(86.25, cf.get_output())
+
     def test_Normalizer(self):
-        pass
-        
-        
+        pass         
         
     def test_DataProcessorChaining(self):
         shape = (2,3,4,5)

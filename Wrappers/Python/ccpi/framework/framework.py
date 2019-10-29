@@ -1309,6 +1309,9 @@ class DataProcessor(object):
         if issubclass(type(dataset), DataContainer):
             if self.check_input(dataset):
                 self.__dict__['input'] = dataset
+                self.__dict__['mTime'] = datetime.now()
+            else:
+                raise ValueError('Input data not compatible')
         else:
             raise TypeError("Input type mismatch: got {0} expecting {1}"\
                             .format(type(dataset), DataContainer))

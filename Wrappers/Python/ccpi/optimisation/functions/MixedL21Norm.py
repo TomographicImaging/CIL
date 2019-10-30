@@ -44,10 +44,11 @@ class MixedL21Norm(Function):
         if not isinstance(x, BlockDataContainer):
             raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 
                                          
-        tmp = [ el**2 for el in x.containers ]
-        res = sum(tmp).sqrt().sum()
+        tmp = x.get_item(0) * 0	
+        for el in x.containers:
+            tmp += el.power(2.)	
+        return tmp.sqrt().sum()
 
-        return res
                             
     def gradient(self, x, out=None):
         return ValueError('Not Differentiable')
@@ -82,25 +83,28 @@ class MixedL21Norm(Function):
     
     def proximal_conjugate(self, x, tau, out=None): 
 
-
+        
         if out is None:                                        
-            tmp = [ el*el for el in x.containers]
-            res = sum(tmp).sqrt().maximum(1.0) 
-            frac = [el/res for el in x.containers]
-            return  BlockDataContainer(*frac)   
+            tmp = x.get_item(0) * 0	
+            for el in x.containers:	
+                tmp += el.power(2.)	
+            tmp.sqrt(out=tmp)	
+            tmp.maximum(1.0, out=tmp)	
+            frac = [ el.divide(tmp) for el in x.containers ]	
+            return BlockDataContainer(*frac)
         
     
         else:
                             
             res1 = functools.reduce(lambda a,b: a + b*b, x.containers, x.get_item(0) * 0 )
-            res = res1.sqrt().maximum(1.0)
-            x.divide(res, out=out)
-            
+            res1.sqrt(out=res1)	
+            res1.maximum(1.0, out=res1)	
+            x.divide(res1, out=out)
                               
 
     def __rmul__(self, scalar):
         
-        ''' Multiplication of L2NormSquared with a scalar
+        ''' Multiplication of MixedL21Norm with a scalar
         
         Returns: ScaledFunction
              

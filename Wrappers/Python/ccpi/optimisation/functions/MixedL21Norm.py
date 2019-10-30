@@ -16,6 +16,11 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 from ccpi.optimisation.functions import Function, ScaledFunction
 from ccpi.framework import BlockDataContainer
 import numpy as np
@@ -44,9 +49,9 @@ class MixedL21Norm(Function):
         if not isinstance(x, BlockDataContainer):
             raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 
                                          
-        tmp = x.get_item(0) * 0	
+        tmp = x.get_item(0) * 0.
         for el in x.containers:
-            tmp += el.power(2.)	
+            tmp += el.power(2.)
         return tmp.sqrt().sum()
 
                             

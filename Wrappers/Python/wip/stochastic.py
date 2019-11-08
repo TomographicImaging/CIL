@@ -141,8 +141,9 @@ def generate_acquisition_geometry_for_random_subset(ag, subset_id, number_of_sub
 def random_indices(angles, subset_id, number_of_subsets):
     N = int(numpy.floor(float(len(angles))/float(number_of_subsets)))
     print ("How many angles?? ", N)
-    shape = (N,)
-    indices = numpy.random.choice(range(len(angles)),size=shape)
+    indices = numpy.asarray(range(len(angles)))
+    numpy.random.shuffle(indices)
+    indices = indices[:N]
     ret = numpy.asarray(numpy.zeros_like(angles), dtype=numpy.bool)
     for i,el in enumerate(indices):
         ret[el] = True
@@ -291,11 +292,30 @@ subs = 10
 A_os = AstraSubsetProjectorSimple(ig, ag, device = 'gpu')
 A_os.notify_new_subset(1, 10)
 data_os = A_os.direct(im_data)
+A_os.notify_new_subset(2, 10)
+data_os_1 = A_os.direct(im_data)
 
 A_os1 = AstraSubsetProjectorSimple(ig, ag, device = 'gpu')
 A_os1.notify_new_subset(1, 1)
 data_os1 = A_os1.direct(im_data)
 
 
-plotter2D([data, data_os, data_os1], titles=['No subsets', '{} subsets'.format(subs), '1 subset'])
+plotter2D([data, data_os1, data_os, data_os_1], titles=['No subsets', '1 subset' , 'subset {} / {} subsets'.format(1,subs),'subset {} / {} subsets'.format(2,subs) ])
 
+subset_id = 1
+number_of_subsets = 1
+ag_new , indices_new = generate_acquisition_geometry_for_random_subset(
+            ag, 
+            subset_id, 
+            number_of_subsets)
+
+print ("Indices new" , indices_new)
+ags = ag.clone()
+angles = ags.angles
+    
+indices = random_indices(angles, subset_id, number_of_subsets)
+print ("random_indices" , indices)
+
+N = 10
+indices = numpy.random.choice(range(N),size=(N,))
+print ("random choice" , indices)

@@ -86,3 +86,4 @@ def plotter2D(datacontainers, titles=None, fix_range=False, stretch_y=False, cma
         
         if fix_range == True:
             sp.set_clim(range_min,range_max)
+    plt.show()

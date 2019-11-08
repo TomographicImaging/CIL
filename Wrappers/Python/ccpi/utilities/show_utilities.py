@@ -46,7 +46,8 @@ def show2D(x, title='', **kwargs):
     ax.set_ylabel(labels[1], fontsize = font_size[1]) 
     divider = make_axes_locatable(ax) 
     cax1 = divider.append_axes("right", size="5%", pad=0.1)  
-    fig.colorbar(im, ax=ax, cax = cax1)    
+    fig.colorbar(im, ax=ax, cax = cax1)
+    plt.show()    
     
 
     
@@ -100,6 +101,7 @@ def show3D(x, title , **kwargs):
     
     fig.suptitle(title, fontsize = font_size[0])
     plt.tight_layout(h_pad=1)
+    plt.show()
     
          
 def show2D_channels(x, title, show_channels = [1], **kwargs):
@@ -132,6 +134,7 @@ def show2D_channels(x, title, show_channels = [1], **kwargs):
         axs[0].set_ylabel(labels[1], fontsize = font_size[1]) 
         fig.suptitle(title, fontsize = font_size[0])
         plt.tight_layout(h_pad=1)
+    plt.show()
         
 def show3D_channels(x, title = None, show_channels = 0, **kwargs):
     
@@ -156,7 +159,7 @@ def show(x, title = None, show_channels = [1], **kwargs):
             
         elif len(x.shape[1:]) == 3:
             show3D_channels(x, title, show_channels,  **kwargs)  
-            
+    plt.show()
             
             
         

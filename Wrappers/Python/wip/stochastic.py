@@ -65,7 +65,7 @@ ag = AcquisitionGeometry('parallel','2D', angles, detectors,
                         pixel_size_h = 0.1)
 
 # Create projection operator using Astra-Toolbox. Available CPU/CPU
-A = AstraProjectorSimple(ig, ag, device = 'gpu')
+A = AstraProjectorSimple(ig, ag, device = 'cpu')
 data = A.direct(im_data)
 
 
@@ -82,11 +82,11 @@ class StochasticAlgorithm(Algorithm):
         self.epoch = 0
         
     def update_subset(self):
-        if (self.iteration % self.number_of_subsets) == 0:
+        if self.iteration % 1 == 0:
             # increment epoch
             self.epoch += 1
-            self.iteration = 0
-            self.current_subset_id = 0
+            # self.iteration = 0
+            # self.current_subset_id = 0
         self.current_subset_id += 1
         # this callback must be defined by the concrete implementation of the 
         # algorithm to link to the appropriate object dealing with subsets
@@ -113,121 +113,17 @@ class StochasticGradientDescent(StochasticAlgorithm, GradientDescent):
         super(StochasticGradientDescent, self).__init__(**kwargs)
         
     def notify_new_subset(self, subset_id, number_of_subsets):
-        print ('StochasticGradientDescent notify_new_subset')
+        # print ('StochasticGradientDescent notify_new_subset')
         
         self.objective_function.notify_new_subset(subset_id, number_of_subsets)
         
         
 
 
-# In[47]:
-
-#
-#def notify_new_subset(self, subset_id, number_of_subsets):
-#    self.A.notify_new_subset(subset_id, number_of_subsets)
-#
-#setattr(Norm2Sq, 'notify_new_subset', notify_new_subset)
-
-
-
-### Changes in the Operator required to work as OS operator
-
-def generate_acquisition_geometry_for_random_subset(ag, subset_id, number_of_subsets):
-    ags = ag.clone()
-    angles = ags.angles
-    
-    indices = random_indices(angles, subset_id, number_of_subsets)
-    ags.angles = ags.angles[indices]
-    return ags , indices
-    
-def random_indices(angles, subset_id, number_of_subsets):
-    N = int(numpy.floor(float(len(angles))/float(number_of_subsets)))
-    print ("How many angles?? ", N)
-    indices = numpy.asarray(range(len(angles)))
-    numpy.random.shuffle(indices)
-    indices = indices[:N]
-    ret = numpy.asarray(numpy.zeros_like(angles), dtype=numpy.bool)
-    for i,el in enumerate(indices):
-        ret[el] = True
-    return ret
-
-
-def operator_notify_new_subset(self, subset_id, number_of_subsets):
-    # updates the sinogram geometry and updates the projectors
-    ag , indices = generate_acquisition_geometry_for_subset(self.sinogram_geometry, subset_id, number_of_subsets)
-    self.indices = indices
-    device = self.fp.device
-    
-    self.fp = AstraForwardProjector(volume_geometry=geomv,
-                                    sinogram_geometry=ag,
-                                    proj_id = None,
-                                    device=device)
-
-    self.bp = AstraBackProjector(volume_geometry = ag,
-                                    sinogram_geometry = geomp,
-                                    proj_id = None,
-                                    device = device)
-
-def os_direct(self, IM, out=None):
-    self.fp.set_input(IM)
-    ret = self.fp.get_output()
-        
-    if out is None:
-        out = self.sinogram_geometry.allocate(0)
-        out.as_array()[self.indices] = ret
-        return out
-    else:
-        out.as_array()[self.indices] = ret
-        
-
-def os_adjoint(self, DATA, out=None):
-    self.bp.set_input(DATA)
-
-    if out is None:
-        return self.bp.get_output()
-    else:
-        out.fill(self.bp.get_output())
-
-    
-N = 10
-angles = numpy.asarray([i for i in range(N)], dtype=numpy.float32) / 180. * numpy.pi
-random_indices(angles, 0, 3)
-
-print (len(ag.angles))
-print (ag)
-
-ags, indices = generate_acquisition_geometry_for_random_subset(ag, 0, 20)
-
-print (len(ags.angles), indices)
-print (ags)
-
-
-# modify the AstraProjectorSimple to be with OS
-
-
-# In[40]:
 
 
 f = Norm2Sq(A, data)
 
-
-
-# In[48]:
-
-
-a = angles.copy()
-b = a[random_indices(angles, 0,3)]
-print (b)
-
-
-# In[53]:
-
-
-# idx = random_indices(angles, 0,3)
-# a[idx] = [1,2,3]
-
-
-# In[54]:
 
 
 class AcquisitionGeometrySubsetGenerator(object):
@@ -268,7 +164,7 @@ class AstraSubsetProjectorSimple(AstraProjectorSimple):
         super(AstraSubsetProjectorSimple, self).__init__(geomv, geomp, device)
         
     def notify_new_subset(self, subset_id, number_of_subsets):
-        print ('AstraSubsetProjectorSimple notify_new_subset')
+        # print ('AstraSubsetProjectorSimple notify_new_subset')
         # updates the sinogram geometry and updates the projectors
         self.subset_id = subset_id
         self.number_of_subsets = number_of_subsets
@@ -312,9 +208,8 @@ class AstraSubsetProjectorSimple(AstraProjectorSimple):
         self.subs.fill(acquisition_data.as_array()[self.indices])
         self.bp.set_input(self.subs)
         
-        ret = self.bp.get_output()
         if out is None:
-            return ret
+            return self.bp.get_output()
         else:
             # out.as_array()[self.indices] = ret.as_array()[:]
             out.fill(self.bp.get_output())
@@ -323,30 +218,37 @@ class AstraSubsetProjectorSimple(AstraProjectorSimple):
 
 
 # Create projection operator using Astra-Toolbox. Available CPU/CPU
-
+#%%
+            
 subs = 10
 A_os = AstraSubsetProjectorSimple(ig, ag, device = 'cpu')
 A_os.notify_new_subset(1, 10)
 data_os = A_os.direct(im_data)
+im_b = A_os.adjoint(data)
+
 A_os.notify_new_subset(2, 10)
 data_os_1 = A_os.direct(im_data)
 
-A_os1 = AstraSubsetProjectorSimple(ig, ag, device = 'cpu')
-A_os1.notify_new_subset(1, 1)
+im_b_1 = A_os.adjoint(data)
+
+A_os1 = AstraSubsetProjectorSimple(ig, ag, device = 'gpu')
+A_os1.notify_new_subset(1, 20)
 data_os1 = A_os1.direct(im_data)
 
-im_b = A_os.adjoint(data_os)
+im_b = A_os1.adjoint(data)
+
 bp = A_os.bp
 
 im_back = A.adjoint(data)
 
 
-plotter2D([data, data_os1, data_os, data_os_1], 
-  titles=['No subsets', '1 subset' , 'subset {} / {} subsets'.format(1,subs),'subset {} / {} subsets'.format(2,subs) ],
-  cmap='viridis')
+#plotter2D([data, data_os1, data_os, data_os_1], 
+#  titles=['No subsets', '1 subset' , 'subset {} / {} subsets'.format(1,subs),'subset {} / {} subsets'.format(2,subs) ],
+#  cmap='viridis')
 
-plotter2D([im_back, im_b])
+plotter2D([im_back, im_b, im_b_1], titles=['Full data', '20 subsets', '10 subsets'])
 
+#%%
 l2 = Norm2Sq(A=A, b=data)
 gd = GradientDescent(x_init=im_data*0., objective_function=l2, rate=1e-3 , 
      update_objective_interval=10, max_iteration=100)
@@ -366,8 +268,32 @@ class StochasticNorm2Sq(Norm2Sq):
 sl2 = StochasticNorm2Sq(A=A_os, b=data, number_of_subsets=10)
 sgd = StochasticGradientDescent(x_init=im_data*0., 
                                 objective_function=sl2, rate=1e-3, 
-                                update_objective_interval=10, max_iteration=10)
+                                update_objective_interval=10, max_iteration=50)
 sgd.run()
 
 plotter2D([gd.get_output(), im_data, sgd.get_output()], titles=['gd', 'ground truth', 'sgd'])
+
+
+#%%
+
+import time
+
+N = 100
+
+t0 = time.time()
+for i in range(N):
+    A_os.adjoint(
+            A_os.direct(im_data)
+            )
+t1 = time.time()
+for i in range(N):
+    A.adjoint(
+            A.direct(im_data)
+            )
+t2 = time.time()
+
+print ("A {}\nA_os {}".format(t2-t1, t1-t0))
+
+
+    
 

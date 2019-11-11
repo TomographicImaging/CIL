@@ -113,6 +113,8 @@ class StochasticGradientDescent(StochasticAlgorithm, GradientDescent):
         super(StochasticGradientDescent, self).__init__(**kwargs)
         
     def notify_new_subset(self, subset_id, number_of_subsets):
+        print ('StochasticGradientDescent notify_new_subset')
+        
         self.objective_function.notify_new_subset(subset_id, number_of_subsets)
         
         
@@ -120,11 +122,11 @@ class StochasticGradientDescent(StochasticAlgorithm, GradientDescent):
 
 # In[47]:
 
-
-def notify_new_subset(self, subset_id, number_of_subsets):
-    self.A.notify_new_subset(subset_id, number_of_subsets)
-
-setattr(Norm2Sq, 'notify_new_subset', notify_new_subset)
+#
+#def notify_new_subset(self, subset_id, number_of_subsets):
+#    self.A.notify_new_subset(subset_id, number_of_subsets)
+#
+#setattr(Norm2Sq, 'notify_new_subset', notify_new_subset)
 
 
 
@@ -238,7 +240,7 @@ class AcquisitionGeometrySubsetGenerator(object):
         ags = ag.clone()
         angles = ags.angles
         if method == 'random':
-            indices = random_indices(angles, subset_id, number_of_subsets)
+            indices = AcquisitionGeometrySubsetGenerator.random_indices(angles, subset_id, number_of_subsets)
         else:
             raise ValueError('Can only do '.format('random'))
         ags.angles = ags.angles[indices]
@@ -266,6 +268,7 @@ class AstraSubsetProjectorSimple(AstraProjectorSimple):
         super(AstraSubsetProjectorSimple, self).__init__(geomv, geomp, device)
         
     def notify_new_subset(self, subset_id, number_of_subsets):
+        print ('AstraSubsetProjectorSimple notify_new_subset')
         # updates the sinogram geometry and updates the projectors
         self.subset_id = subset_id
         self.number_of_subsets = number_of_subsets
@@ -289,6 +292,8 @@ class AstraSubsetProjectorSimple(AstraProjectorSimple):
                                         sinogram_geometry = ag,
                                         proj_id = None,
                                         device = device)
+        self.subs = self.subset_acquisition_geometry.allocate(0)
+        
 
     def direct(self, image_data, out=None):
         self.fp.set_input(image_data)
@@ -304,9 +309,8 @@ class AstraSubsetProjectorSimple(AstraProjectorSimple):
             
 
     def adjoint(self, acquisition_data, out=None):
-        subs = self.subset_acquisition_geometry.allocate(0)
-        subs.fill(acquisition_data.as_array()[self.indices])
-        self.bp.set_input(subs)
+        self.subs.fill(acquisition_data.as_array()[self.indices])
+        self.bp.set_input(self.subs)
         
         ret = self.bp.get_output()
         if out is None:
@@ -321,13 +325,13 @@ class AstraSubsetProjectorSimple(AstraProjectorSimple):
 # Create projection operator using Astra-Toolbox. Available CPU/CPU
 
 subs = 10
-A_os = AstraSubsetProjectorSimple(ig, ag, device = 'gpu')
+A_os = AstraSubsetProjectorSimple(ig, ag, device = 'cpu')
 A_os.notify_new_subset(1, 10)
 data_os = A_os.direct(im_data)
 A_os.notify_new_subset(2, 10)
 data_os_1 = A_os.direct(im_data)
 
-A_os1 = AstraSubsetProjectorSimple(ig, ag, device = 'gpu')
+A_os1 = AstraSubsetProjectorSimple(ig, ag, device = 'cpu')
 A_os1.notify_new_subset(1, 1)
 data_os1 = A_os1.direct(im_data)
 
@@ -362,7 +366,7 @@ class StochasticNorm2Sq(Norm2Sq):
 sl2 = StochasticNorm2Sq(A=A_os, b=data, number_of_subsets=10)
 sgd = StochasticGradientDescent(x_init=im_data*0., 
                                 objective_function=sl2, rate=1e-3, 
-                                objective_update_interval=10, max_iteration=100)
+                                update_objective_interval=10, max_iteration=10)
 sgd.run()
 
 plotter2D([gd.get_output(), im_data, sgd.get_output()], titles=['gd', 'ground truth', 'sgd'])

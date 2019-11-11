@@ -79,10 +79,10 @@ class StochasticAlgorithm(Algorithm):
         super(StochasticAlgorithm, self).__init__(**kwargs)
         self.number_of_subsets = kwargs.get('number_of_subsets', 1)
         self.current_subset_id = 0
-        self.epoch = kwargs.get('max_iteration',0)
+        self.epoch = 0
         
     def update_subset(self):
-        if self.number_of_subsets == self.current_subset_id + 1:
+        if (self.iteration % self.number_of_subsets) == 0:
             # increment epoch
             self.epoch += 1
             self.iteration = 0
@@ -100,7 +100,7 @@ class StochasticAlgorithm(Algorithm):
     
     def max_epoch_stop_cryterion(self):
         '''default stop cryterion for iterative algorithm: max_iteration reached'''
-        return self.iteration >= self.max_iteration
+        return self.epoch >= self.max_iteration
     def notify_new_subset(self, subset_id, number_of_subsets):
         raise NotImplemented('This callback must be implemented by the concrete algorithm')
     
@@ -228,25 +228,53 @@ print (b)
 # In[54]:
 
 
+class AcquisitionGeometrySubsetGenerator(object):
+    RANDOM='random'
+    UNIFORM_SAMPLING='uniform'
+    
+    ### Changes in the Operator required to work as OS operator
+    @staticmethod
+    def generate_subset(ag, subset_id, number_of_subsets, method='random'):
+        ags = ag.clone()
+        angles = ags.angles
+        if method == 'random':
+            indices = random_indices(angles, subset_id, number_of_subsets)
+        else:
+            raise ValueError('Can only do '.format('random'))
+        ags.angles = ags.angles[indices]
+        return ags , indices
+    @staticmethod
+    def random_indices(angles, subset_id, number_of_subsets):
+        N = int(numpy.floor(float(len(angles))/float(number_of_subsets)))
+        indices = numpy.asarray(range(len(angles)))
+        numpy.random.shuffle(indices)
+        indices = indices[:N]
+        ret = numpy.asarray(numpy.zeros_like(angles), dtype=numpy.bool)
+        for i,el in enumerate(indices):
+            ret[el] = True
+        return ret
+
 class AstraSubsetProjectorSimple(AstraProjectorSimple):
-    def __init__(self, geomv, geomp, device):
+    
+    def __init__(self, geomv, geomp, device, **kwargs):
         kwargs = {'indices':None, 
                   'subset_acquisition_geometry':None,
                   'subset_id' : 0,
-                  'number_of_subsets' : 1
+                  'number_of_subsets' : kwargs.get('number_of_subsets', 1)
                   }
         # This does not forward to its parent class :(
         super(AstraSubsetProjectorSimple, self).__init__(geomv, geomp, device)
-
+        
     def notify_new_subset(self, subset_id, number_of_subsets):
         # updates the sinogram geometry and updates the projectors
         self.subset_id = subset_id
         self.number_of_subsets = number_of_subsets
 
-        ag , indices = generate_acquisition_geometry_for_random_subset(
+        ag , indices = AcquisitionGeometrySubsetGenerator.generate_subset(
             self.sinogram_geometry, 
             subset_id, 
-            number_of_subsets)
+            number_of_subsets,
+            AcquisitionGeometrySubsetGenerator.RANDOM)
 
         self.indices = indices
         device = self.fp.device
@@ -268,7 +296,7 @@ class AstraSubsetProjectorSimple(AstraProjectorSimple):
             
         if out is None:
             out = self.sinogram_geometry.allocate(0)
-            print (self.indices)
+            #print (self.indices)
             out.as_array()[self.indices] = ret.as_array()[:]
             return out
         else:
@@ -276,13 +304,17 @@ class AstraSubsetProjectorSimple(AstraProjectorSimple):
             
 
     def adjoint(self, acquisition_data, out=None):
-        self.bp.set_input(acquisition_data)
-
+        subs = self.subset_acquisition_geometry.allocate(0)
+        subs.fill(acquisition_data.as_array()[self.indices])
+        self.bp.set_input(subs)
+        
+        ret = self.bp.get_output()
         if out is None:
-            return self.bp.get_output()
+            return ret
         else:
+            # out.as_array()[self.indices] = ret.as_array()[:]
             out.fill(self.bp.get_output())
-
+    
 # In[ ]:
 
 
@@ -299,23 +331,39 @@ A_os1 = AstraSubsetProjectorSimple(ig, ag, device = 'gpu')
 A_os1.notify_new_subset(1, 1)
 data_os1 = A_os1.direct(im_data)
 
+im_b = A_os.adjoint(data_os)
+bp = A_os.bp
 
-plotter2D([data, data_os1, data_os, data_os_1], titles=['No subsets', '1 subset' , 'subset {} / {} subsets'.format(1,subs),'subset {} / {} subsets'.format(2,subs) ])
+im_back = A.adjoint(data)
 
-subset_id = 1
-number_of_subsets = 1
-ag_new , indices_new = generate_acquisition_geometry_for_random_subset(
-            ag, 
-            subset_id, 
-            number_of_subsets)
 
-print ("Indices new" , indices_new)
-ags = ag.clone()
-angles = ags.angles
-    
-indices = random_indices(angles, subset_id, number_of_subsets)
-print ("random_indices" , indices)
+plotter2D([data, data_os1, data_os, data_os_1], 
+  titles=['No subsets', '1 subset' , 'subset {} / {} subsets'.format(1,subs),'subset {} / {} subsets'.format(2,subs) ],
+  cmap='viridis')
 
-N = 10
-indices = numpy.random.choice(range(N),size=(N,))
-print ("random choice" , indices)
+plotter2D([im_back, im_b])
+
+l2 = Norm2Sq(A=A, b=data)
+gd = GradientDescent(x_init=im_data*0., objective_function=l2, rate=1e-3 , 
+     update_objective_interval=10, max_iteration=100)
+
+gd.run()
+
+print ("######################################")
+
+class StochasticNorm2Sq(Norm2Sq):
+    def __init__(self, A, b, c=1.0, number_of_subsets=1):
+        super(StochasticNorm2Sq, self).__init__(A, b, c)
+        self.number_of_subsets = number_of_subsets
+        
+    def notify_new_subset(self, subset_id, number_of_subsets):
+        self.A.notify_new_subset(subset_id, number_of_subsets)
+
+sl2 = StochasticNorm2Sq(A=A_os, b=data, number_of_subsets=10)
+sgd = StochasticGradientDescent(x_init=im_data*0., 
+                                objective_function=sl2, rate=1e-3, 
+                                objective_update_interval=10, max_iteration=100)
+sgd.run()
+
+plotter2D([gd.get_output(), im_data, sgd.get_output()], titles=['gd', 'ground truth', 'sgd'])
+

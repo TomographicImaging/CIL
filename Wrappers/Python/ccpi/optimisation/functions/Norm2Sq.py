@@ -96,7 +96,6 @@ class Norm2Sq(Function):
             self.A.direct(x, out=self.range_tmp)
             self.range_tmp.subtract(self.b , out=self.range_tmp)
             self.A.adjoint(self.range_tmp, out=out)
-            #self.direct_placehold.multiply(2.0*self.c, out=out)
             out.multiply (self.c * 2.0, out=out)
         else:
             return (2.0*self.c)*self.A.adjoint(self.A.direct(x) - self.b)

@@ -20,7 +20,7 @@ from ccpi.astra.processors import FBP, AstraForwardProjector, AstraBackProjector
 
 import tomophantom
 from tomophantom import TomoP2D
-import os, sys
+import os, sys, time
 
 import matplotlib.pyplot as plt
 
@@ -77,16 +77,16 @@ data = A.direct(im_data)
 class StochasticAlgorithm(Algorithm):
     def __init__(self, **kwargs):
         super(StochasticAlgorithm, self).__init__(**kwargs)
+        self.epoch = 0
         self.number_of_subsets = kwargs.get('number_of_subsets', 1)
         self.current_subset_id = 0
-        self.epoch = 0
+        self.update_subset_interval = kwargs.get('update_subset_interval' , 1)
         
     def update_subset(self):
-        if self.iteration % 1 == 0:
+        if self.iteration % self.update_subset_interval == 0:
             # increment epoch
             self.epoch += 1
-            # self.iteration = 0
-            # self.current_subset_id = 0
+            
         self.current_subset_id += 1
         # this callback must be defined by the concrete implementation of the 
         # algorithm to link to the appropriate object dealing with subsets
@@ -113,10 +113,7 @@ class StochasticGradientDescent(StochasticAlgorithm, GradientDescent):
         super(StochasticGradientDescent, self).__init__(**kwargs)
         
     def notify_new_subset(self, subset_id, number_of_subsets):
-        # print ('StochasticGradientDescent notify_new_subset')
-        
         self.objective_function.notify_new_subset(subset_id, number_of_subsets)
-        
         
 
 
@@ -162,6 +159,7 @@ class AstraSubsetProjectorSimple(AstraProjectorSimple):
                   }
         # This does not forward to its parent class :(
         super(AstraSubsetProjectorSimple, self).__init__(geomv, geomp, device)
+        self.notify_new_subset(0, kwargs.get('number_of_subsets',1))
         
     def notify_new_subset(self, subset_id, number_of_subsets):
         # print ('AstraSubsetProjectorSimple notify_new_subset')
@@ -212,7 +210,7 @@ class AstraSubsetProjectorSimple(AstraProjectorSimple):
             return self.bp.get_output()
         else:
             # out.as_array()[self.indices] = ret.as_array()[:]
-            out.fill(self.bp.get_output())
+            out += self.bp.get_output()
     
 # In[ ]:
 
@@ -221,7 +219,7 @@ class AstraSubsetProjectorSimple(AstraProjectorSimple):
 #%%
             
 subs = 10
-A_os = AstraSubsetProjectorSimple(ig, ag, device = 'cpu')
+A_os = AstraSubsetProjectorSimple(ig, ag, device = 'cpu', number_of_subsets=10)
 A_os.notify_new_subset(1, 10)
 data_os = A_os.direct(im_data)
 im_b = A_os.adjoint(data)
@@ -252,47 +250,158 @@ plotter2D([im_back, im_b, im_b_1], titles=['Full data', '20 subsets', '10 subset
 l2 = Norm2Sq(A=A, b=data)
 gd = GradientDescent(x_init=im_data*0., objective_function=l2, rate=1e-3 , 
      update_objective_interval=10, max_iteration=100)
-
+tgd0 = time.time()
 gd.run()
-
+tgd1 = time.time()
+#%%
 print ("######################################")
 
 class StochasticNorm2Sq(Norm2Sq):
     def __init__(self, A, b, c=1.0, number_of_subsets=1):
         super(StochasticNorm2Sq, self).__init__(A, b, c)
-        self.number_of_subsets = number_of_subsets
+#        self.number_of_subsets = number_of_subsets
+#        self.notify_new_subset(0,number_of_subsets)
         
     def notify_new_subset(self, subset_id, number_of_subsets):
         self.A.notify_new_subset(subset_id, number_of_subsets)
+        
+#    
+#    def gradient(self, x, out=None):
+#        if out is not None:
+#            #return 2.0*self.c*self.A.adjoint( self.A.direct(x) - self.b )
+#            self.A.direct(x, out=self.range_tmp)
+#            self.range_tmp.subtract(self.b , out=self.range_tmp)
+#            self.A.adjoint(self.range_tmp, out=out)
+#            #self.direct_placehold.multiply(2.0*self.c, out=out)
+#            out.multiply (self.c * 2.0, out=out)
+#        else:
+#            return (2.0*self.c)*self.A.adjoint(self.A.direct(x) - self.b)
 
-sl2 = StochasticNorm2Sq(A=A_os, b=data, number_of_subsets=10)
+#    def __call__(self, x):
+#        self.notify_new_subset(0, 1)
+#        return super(StochasticNorm2Sq, self).__call__(x)
+
+nsubs = 10
+theA = AstraSubsetProjectorSimple(ig, ag, device = 'cpu', number_of_subsets=10)
+
+theA.notify_new_subset(0,nsubs)
+sl2 = StochasticNorm2Sq(A=theA,
+                        b=data, number_of_subsets=nsubs)
+
+
+sl2.memopt = True
+
+
+rnd_data = im_data.copy()
+grad = im_data * 0.
+N = 10
+rnd_data = im_data.copy()
+numpy.random.shuffle(rnd_data.as_array())
+
+solution = rnd_data *0.
+rate = 1e-3
+t0 = time.time()
+for i in range (N):
+    if i % 100==0:
+        plotter2D([solution])
+    sl2.A.direct(solution, out=sl2.range_tmp)
+    #plotter2D([sl2.A.direct(rnd_data), sl2.range_tmp])
+    sl2.range_tmp.subtract(sl2.b, out=sl2.range_tmp)
+    #plotter2D([sl2.A.direct(rnd_data), sl2.range_tmp])
+    sl2.A.adjoint(sl2.range_tmp, out=grad)
+    #plotter2D([out, sl2.range_tmp])
+    grad.multiply (sl2.c * 2.0, out=grad)
+    #plotter2D([grad, sl2.range_tmp])
+    grad *= -rate
+    solution += grad
+    
+    sl2.notify_new_subset(i,nsubs)
+    
+print ("decomposed ", time.time()-t0)
+#%%
+
+sl2_a = StochasticNorm2Sq(A=A_os,
+                          b=data, number_of_subsets=10)
+sl2_a.memopt = True
+
+def update_sgd(x, x_update, objective_function, rate):
+    objective_function.gradient(x, out=x_update)
+    x_update *= -rate
+    x += x_update
+    
+
+
+niter=N
+nsubs=10
+sol = im_data * 0.
+tmp = im_data * 0.
+import time
+t0 = time.time()
+for i in range(niter):
+    #update_sgd(sol, tmp, sl2_a, 1e-3)
+    sl2.gradient(sol, out=tmp)
+    #plotter2D([grad, sl2.range_tmp])
+    tmp *= -rate
+    sol += tmp
+    sl2.notify_new_subset(i, nsubs)
+    if i % 10 == 0:
+        print ("iter {} objective {:.3e}".format(i, sl2(sol)))
+        # plotter2D([sol])
+        #print ("id(sol) {} id(tmp) {}".format(id(sol), id(tmp)))
+t1 = time.time()
+
+#%%
+sl2 = StochasticNorm2Sq(A=AstraSubsetProjectorSimple(ig, ag, device = 'cpu'),
+                        b=data, number_of_subsets=nsubs)
 sgd = StochasticGradientDescent(x_init=im_data*0., 
                                 objective_function=sl2, rate=1e-3, 
-                                update_objective_interval=10, max_iteration=50)
+                                update_objective_interval=10, max_iteration=1000, 
+                                number_of_subsets=10)
+
+#tsgd0 = time.time()
+#sgd.run()
+#tsgd1 = time.time()
+
+
+
+#sgd = GradientDescent(x_init=im_data*0., 
+#                    objective_function=sl2, rate=1e-3, 
+#                    update_objective_interval=10, max_iteration=1000)
+
+tsgd0 = time.time()
 sgd.run()
+tsgd1 = time.time()
+#%%
+plotter2D([im_data, gd.get_output(), sgd.get_output(), sol], titles=['ground truth', 
+           'gd {}'.format(tgd1-tgd0), 'sgd {}'.format(tsgd1-tsgd0), 'hack {}'.format((t1-t0))])
 
-plotter2D([gd.get_output(), im_data, sgd.get_output()], titles=['gd', 'ground truth', 'sgd'])
 
+def print_minmax(x):
+    print (x.as_array().min(), x.as_array().max())
+    
 
 #%%
 
 import time
 
-N = 100
-
+N = 10
+x0 = im_data *0.
 t0 = time.time()
 for i in range(N):
-    A_os.adjoint(
-            A_os.direct(im_data)
+    sl2_a.A.adjoint(
+            sl2_a.A.direct(im_data)
             )
+    sl2_a.A.notify_new_subset(i, 10)
+#    sl2.gradient(x0)
 t1 = time.time()
 for i in range(N):
-    A.adjoint(
-            A.direct(im_data)
+    sl2.A.adjoint(
+            sl2.A.direct(im_data)
             )
+#    l2.gradient(x0)
 t2 = time.time()
 
-print ("A {}\nA_os {}".format(t2-t1, t1-t0))
+print ("Norm2Sq {}\nStochasticNorm2Sq {}".format(t2-t1, t1-t0))
 
 
     

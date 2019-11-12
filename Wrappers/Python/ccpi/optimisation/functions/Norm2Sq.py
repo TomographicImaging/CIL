@@ -99,3 +99,10 @@ class Norm2Sq(Function):
             out.multiply (self.c * 2.0, out=out)
         else:
             return (2.0*self.c)*self.A.adjoint(self.A.direct(x) - self.b)
+
+class StochasticNorm2Sq(Norm2Sq):
+    def __init__(self, A, b, c=1.0, number_of_subsets=1):
+        super(StochasticNorm2Sq, self).__init__(A, b, c)
+       
+    def notify_new_subset(self, subset_id, number_of_subsets):
+        self.A.notify_new_subset(subset_id, number_of_subsets)

@@ -390,7 +390,33 @@ class AcquisitionGeometry(object):
                 raise ValueError('Value {} unknown'.format(value))
         
         return out
+
+class AcquisitionGeometrySubsetGenerator(object):
+    RANDOM='random'
+    UNIFORM_SAMPLING='uniform'
     
+    ### Changes in the Operator required to work as OS operator
+    @staticmethod
+    def generate_subset(ag, subset_id, number_of_subsets, method='random'):
+        ags = ag.clone()
+        angles = ags.angles
+        if method == 'random':
+            indices = AcquisitionGeometrySubsetGenerator.random_indices(angles, subset_id, number_of_subsets)
+        else:
+            raise ValueError('Can only do '.format('random'))
+        ags.angles = ags.angles[indices]
+        return ags , indices
+    @staticmethod
+    def random_indices(angles, subset_id, number_of_subsets):
+        N = int(numpy.floor(float(len(angles))/float(number_of_subsets)))
+        indices = numpy.asarray(range(len(angles)))
+        numpy.random.shuffle(indices)
+        indices = indices[:N]
+        ret = numpy.asarray(numpy.zeros_like(angles), dtype=numpy.bool)
+        for i,el in enumerate(indices):
+            ret[el] = True
+        return ret
+
 class DataContainer(object):
     '''Generic class to hold data
     

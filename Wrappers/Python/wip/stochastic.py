@@ -44,7 +44,8 @@ from ccpi.utilities import plotter2D
 
 
 model = 12 # select a model number from the library
-N = 256 # set dimension of the phantom
+N = 512 # set dimension of the phantom
+device = 'gpu'
 path = os.path.dirname(tomophantom.__file__)
 path_library2D = os.path.join(path, "Phantom2DLibrary.dat")
 
@@ -65,7 +66,7 @@ ag = AcquisitionGeometry('parallel','2D', angles, detectors,
                         pixel_size_h = 0.1)
 
 # Create projection operator using Astra-Toolbox. Available CPU/CPU
-A = AstraProjectorSimple(ig, ag, device = 'cpu')
+A = AstraProjectorSimple(ig, ag, device = device)
 data = A.direct(im_data)
 
 
@@ -219,7 +220,7 @@ class AstraSubsetProjectorSimple(AstraProjectorSimple):
 #%%
             
 subs = 10
-A_os = AstraSubsetProjectorSimple(ig, ag, device = 'cpu', number_of_subsets=10)
+A_os = AstraSubsetProjectorSimple(ig, ag, device = 'gpu', number_of_subsets=10)
 A_os.notify_new_subset(1, 10)
 data_os = A_os.direct(im_data)
 im_b = A_os.adjoint(data)
@@ -248,7 +249,7 @@ plotter2D([im_back, im_b, im_b_1], titles=['Full data', '20 subsets', '10 subset
 
 #%%
 l2 = Norm2Sq(A=A, b=data)
-gd = GradientDescent(x_init=im_data*0., objective_function=l2, rate=1e-3 , 
+gd = GradientDescent(x_init=im_data*0., objective_function=l2, rate=1e-4 , 
      update_objective_interval=10, max_iteration=100)
 tgd0 = time.time()
 gd.run()
@@ -282,7 +283,7 @@ class StochasticNorm2Sq(Norm2Sq):
 #        return super(StochasticNorm2Sq, self).__call__(x)
 
 nsubs = 10
-theA = AstraSubsetProjectorSimple(ig, ag, device = 'cpu', number_of_subsets=10)
+theA = AstraSubsetProjectorSimple(ig, ag, device = device, number_of_subsets=10)
 
 theA.notify_new_subset(0,nsubs)
 sl2 = StochasticNorm2Sq(A=theA,
@@ -351,11 +352,11 @@ for i in range(niter):
 t1 = time.time()
 
 #%%
-sl2 = StochasticNorm2Sq(A=AstraSubsetProjectorSimple(ig, ag, device = 'cpu'),
+sl2 = StochasticNorm2Sq(A=AstraSubsetProjectorSimple(ig, ag, device = 'gpu'),
                         b=data, number_of_subsets=nsubs)
 sgd = StochasticGradientDescent(x_init=im_data*0., 
                                 objective_function=sl2, rate=1e-3, 
-                                update_objective_interval=10, max_iteration=1000, 
+                                update_objective_interval=10, max_iteration=100, 
                                 number_of_subsets=10)
 
 #tsgd0 = time.time()

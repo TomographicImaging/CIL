@@ -25,7 +25,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from ccpi.optimisation.algorithms import Algorithm
+from ccpi.optimisation.algorithms import Algorithm, StochasticAlgorithm
 
 class GradientDescent(Algorithm):
     ''' 
@@ -91,3 +91,11 @@ class GradientDescent(Algorithm):
 
     def update_objective(self):
         self.loss.append(self.objective_function(self.x))
+
+
+class StochasticGradientDescent(StochasticAlgorithm, GradientDescent):
+    def __init__(self, **kwargs):
+        super(StochasticGradientDescent, self).__init__(**kwargs)
+        
+    def notify_new_subset(self, subset_id, number_of_subsets):
+        self.objective_function.notify_new_subset(subset_id, number_of_subsets)

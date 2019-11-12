@@ -16,10 +16,10 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from .Algorithm import Algorithm
+from .Algorithm import Algorithm, StochasticAlgorithm
 from .CGLS import CGLS
 from .SIRT import SIRT
-from .GradientDescent import GradientDescent
+from .GradientDescent import GradientDescent, StochasticGradientDescent
 from .FISTA import FISTA
 from .PDHG import PDHG
 

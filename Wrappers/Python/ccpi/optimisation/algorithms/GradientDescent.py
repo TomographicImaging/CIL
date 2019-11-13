@@ -24,8 +24,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
+<<<<<<< HEAD
 
 from ccpi.optimisation.algorithms import Algorithm, StochasticAlgorithm
+=======
+import numpy
+from ccpi.optimisation.algorithms import Algorithm
+>>>>>>> armijo_rule
 
 class GradientDescent(Algorithm):
     ''' 
@@ -44,11 +49,21 @@ class GradientDescent(Algorithm):
         :param x_init: initial guess
         :param objective_function: objective function to be minimised
         :param rate: step rate
+        :param alpha: optional parameter to start the backtracking algorithm
+        :param beta: optional parameter defining the reduction of step, default 0.5.
+                    It's value can be in (0,1)
+        :param rtol: optional parameter defining the relative tolerance comparing the 
+                     current objective function to 0, default 1e-5, see numpy.isclose
+        :param atol: optional parameter defining the absolute tolerance comparing the 
+                     current objective function to 0, default 1e-8, see numpy.isclose
         '''
         super(GradientDescent, self).__init__(**kwargs)
 
-        
-        if x_init is not None and objective_function is not None and rate is not None:
+        self.alpha = kwargs.get('alpha' , 1e6)
+        self.beta = kwargs.get('beta', 0.5)
+        self.rtol = kwargs.get('rtol', 1e-5)
+        self.atol = kwargs.get('atol', 1e-8)
+        if x_init is not None and objective_function is not None :
             self.set_up(x_init=x_init, objective_function=objective_function, rate=rate)
     
     def should_stop(self):
@@ -65,32 +80,70 @@ class GradientDescent(Algorithm):
             
         self.x = x_init.copy()
         self.objective_function = objective_function
-        self.rate = rate
+        
 
-        self.loss.append(objective_function(x_init))
+        if rate is None:
+            self.k = 0
+            self.update_rate = True
+            self.x_armijo = x_init.copy()
+            # self.rate = self.armijo_rule() * 2
+            # print (self.rate)
+        else:
+            self.rate = rate
+            self.update_rate = False
+        
+        
+        self.update_objective()
         self.iteration = 0
 
-        try:
-            self.memopt = self.objective_function.memopt
-        except AttributeError as ae:
-            self.memopt = False
-        if self.memopt:
-            self.x_update = x_init.copy()
+        self.x_update = x_init.copy()
 
         self.configured = True
         print("{} configured".format(self.__class__.__name__, ))
 
     def update(self):
         '''Single iteration'''
-        if self.memopt:
-            self.objective_function.gradient(self.x, out=self.x_update)
+        
+        self.objective_function.gradient(self.x, out=self.x_update)
+        
+        if self.update_rate:
+            # the next update and solution are calculated within the armijo_rule
+            self.rate = self.armijo_rule() * 2.
+        else:
             self.x_update *= -self.rate
             self.x += self.x_update
-        else:
-            self.x += -self.rate * self.objective_function.gradient(self.x)
+        
+    
 
     def update_objective(self):
         self.loss.append(self.objective_function(self.x))
+
+    def armijo_rule(self):
+        '''Applies the Armijo rule to calculate the step size (rate)
+
+        https://projecteuclid.org/download/pdf_1/euclid.pjm/1102995080
+        '''
+        f_x = self.objective_function(self.x)
+        if not hasattr(self, 'x_update'):
+            self.x_update = self.objective_function.gradient(self.x)
+        while True:
+            # self.x - alpha * self.x_update
+            self.x_update.multiply(self.alpha, out=self.x_armijo)
+            self.x.subtract(self.x_armijo, out=self.x_armijo)
+            
+            f_x_a = self.objective_function(self.x_armijo)
+            sqnorm = self.x_update.squared_norm()
+            if f_x_a - f_x <= - ( self.alpha/2. ) * sqnorm:
+                self.x.fill(self.x_armijo)
+                break
+            else:
+                self.k += 1.
+                self.alpha *= self.beta
+        return self.alpha
+
+    def should_stop(self):
+        return self.max_iteration_stop_cryterion() or \
+            numpy.isclose(self.get_last_objective(), 0., rtol=self.rtol, atol=self.atol, equal_nan=False)
 
 
 class StochasticGradientDescent(StochasticAlgorithm, GradientDescent):

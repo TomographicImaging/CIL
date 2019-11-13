@@ -197,6 +197,10 @@ class Algorithm(object):
                     if verbose:
                         print (self.verbose_output(very_verbose))
                 break
+        if verbose:
+            if self.update_objective_interval != 1:
+                print (self.verbose_output(very_verbose))
+            print ("Stop criterion has been reached.")
 
     def verbose_output(self, verbose=False):
         '''Creates a nice tabulated output'''

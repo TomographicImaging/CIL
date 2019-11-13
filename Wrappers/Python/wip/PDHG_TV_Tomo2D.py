@@ -36,7 +36,8 @@ Problem:     min_u  \alpha * ||\nabla u||_{2,1} + \frac{1}{2}||Au - g||^{2}
  
 """
 
-from ccpi.framework import ImageData, ImageGeometry, AcquisitionGeometry, AcquisitionData
+from ccpi.framework import ImageData, ImageGeometry, AcquisitionGeometry,\
+     AcquisitionData, AcquisitionGeometrySubsetGenerator
 
 import numpy as np 
 import numpy                          
@@ -49,10 +50,13 @@ from ccpi.optimisation.functions import ZeroFunction, L2NormSquared, \
                       MixedL21Norm, BlockFunction, KullbackLeibler, IndicatorBox
                       
 from ccpi.astra.operators import AstraProjectorSimple
+from ccpi.astra.processors import AstraForwardProjector, AstraBackProjector
 
 import os, sys
 import tomophantom
 from tomophantom import TomoP2D
+
+from ccpi.utilities.display import plotter2D
 
 
 class AstraSubsetProjectorSimple(AstraProjectorSimple):
@@ -123,7 +127,7 @@ class SPDHG(StochasticAlgorithm, PDHG):
         super(SPDHG, self).__init__(**kwargs)
         
     def notify_new_subset(self, subset_id, number_of_subsets):
-        self.objective_function.notify_new_subset(subset_id, number_of_subsets)
+        self.operator.notify_new_subset(subset_id, number_of_subsets)
 # user supplied input
 if len(sys.argv) > 1:
     which_noise = int(sys.argv[1])
@@ -152,6 +156,8 @@ else:
     dev = 'cpu'
     
 Aop = AstraProjectorSimple(ig, ag, dev)
+Aos = AstraSubsetProjectorSimple(ig, ag, dev)
+
 sin = Aop.direct(data)
 
 # Create noisy data. Apply Gaussian noise
@@ -170,16 +176,17 @@ else:
     raise ValueError('Unsupported Noise ', noise)
 
 # Show Ground Truth and Noisy Data
-plt.figure(figsize=(10,10))
-plt.subplot(1,2,2)
-plt.imshow(data.as_array())
-plt.title('Ground Truth')
-plt.colorbar()
-plt.subplot(1,2,1)
-plt.imshow(noisy_data.as_array())
-plt.title('Noisy Data')
-plt.colorbar()
-plt.show()
+plotter2D([data, noisy_data], titles=['Ground Truth', 'Noisy Data'])
+
+
+def bo_notify(self, subset_id, number_of_subsets):
+    for el in self.operators:
+        el.notify_new_subset(subset_id, number_of_subsets)
+def do_nothing(self, subset_id, number_of_subsets):
+    pass
+setattr(BlockOperator, 'notify_new_subset', bo_notify)
+
+setattr(Gradient, 'notify_new_subset', do_nothing)
 
 # Create operators
 op1 = Gradient(ig)
@@ -215,27 +222,43 @@ f = BlockFunction(f1, f2)
 pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
 pdhg.max_iteration = 1000
 pdhg.update_objective_interval = 200
-pdhg.run(1000)
+pdhg.run()
 
-plt.figure(figsize=(15,15))
-plt.subplot(3,1,1)
-plt.imshow(data.as_array())
-plt.title('Ground Truth')
-plt.colorbar()
-plt.subplot(3,1,2)
-plt.imshow(noisy_data.as_array())
-plt.title('Noisy Data')
-plt.colorbar()
-plt.subplot(3,1,3)
-plt.imshow(pdhg.get_output().as_array())
-plt.title('TV Reconstruction')
-plt.colorbar()
-plt.show()
-plt.plot(np.linspace(0,ig.shape[1],ig.shape[1]), data.as_array()[int(N/2),:], label = 'GTruth')
-plt.plot(np.linspace(0,ig.shape[1],ig.shape[1]), pdhg.get_output().as_array()[int(N/2),:], label = 'TV reconstruction')
-plt.legend()
-plt.title('Middle Line Profiles')
-plt.show()
+
+# Setup and run the SPDHG algorithm
+# Create BlockOperator
+operator_os = BlockOperator(op1, Aos, shape=(2,1) ) 
+
+# Compute operator Norm
+
+nsubs = 10
+spdhg = SPDHG(f=f,g=g,operator=operator_os, tau=tau, sigma=sigma, number_of_subsets=nsubs)
+spdhg.max_iteration = int(pdhg.max_iteration / nsubs)
+spdhg.update_objective_interval = int(pdhg.update_objective_interval / nsubs)
+spdhg.run(20)
+
+plotter2D([data, noisy_data, pdhg.get_output(), spdhg.get_output()], 
+   titles=['Ground Truth', 'Noisy Data', 'PDHG TV', 'SPDHG TV'])
+
+# plt.figure(figsize=(15,15))
+# plt.subplot(3,1,1)
+# plt.imshow(data.as_array())
+# plt.title('Ground Truth')
+# plt.colorbar()
+# plt.subplot(3,1,2)
+# plt.imshow(noisy_data.as_array())
+# plt.title('Noisy Data')
+# plt.colorbar()
+# plt.subplot(3,1,3)
+# plt.imshow(pdhg.get_output().as_array())
+# plt.title('TV Reconstruction')
+# plt.colorbar()
+# plt.show()
+# plt.plot(np.linspace(0,ig.shape[1],ig.shape[1]), data.as_array()[int(N/2),:], label = 'GTruth')
+# plt.plot(np.linspace(0,ig.shape[1],ig.shape[1]), pdhg.get_output().as_array()[int(N/2),:], label = 'TV reconstruction')
+# plt.legend()
+# plt.title('Middle Line Profiles')
+# plt.show()
 
 
 

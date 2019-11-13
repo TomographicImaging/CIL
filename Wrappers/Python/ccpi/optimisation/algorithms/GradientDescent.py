@@ -24,7 +24,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
-
+import numpy
 from ccpi.optimisation.algorithms import Algorithm
 
 class GradientDescent(Algorithm):
@@ -47,11 +47,17 @@ class GradientDescent(Algorithm):
         :param alpha: optional parameter to start the backtracking algorithm
         :param beta: optional parameter defining the reduction of step, default 0.5.
                     It's value can be in (0,1)
+        :param rtol: optional parameter defining the relative tolerance comparing the 
+                     current objective function to 0, default 1e-5, see numpy.isclose
+        :param atol: optional parameter defining the absolute tolerance comparing the 
+                     current objective function to 0, default 1e-8, see numpy.isclose
         '''
         super(GradientDescent, self).__init__(**kwargs)
 
         self.alpha = kwargs.get('alpha' , 1e6)
         self.beta = kwargs.get('beta', 0.5)
+        self.rtol = kwargs.get('rtol', 1e-5)
+        self.atol = kwargs.get('atol', 1e-8)
         if x_init is not None and objective_function is not None :
             self.set_up(x_init=x_init, objective_function=objective_function, rate=rate)
     
@@ -129,3 +135,7 @@ class GradientDescent(Algorithm):
                 self.k += 1.
                 self.alpha *= self.beta
         return self.alpha
+
+    def should_stop(self):
+        return self.max_iteration_stop_cryterion() or \
+            numpy.isclose(self.get_last_objective(), 0., rtol=self.rtol, atol=self.atol, equal_nan=False)

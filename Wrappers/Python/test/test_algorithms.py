@@ -66,8 +66,7 @@ class TestAlgorithms(unittest.TestCase):
         identity = Identity(ig)
         
         norm2sq = Norm2Sq(identity, b)
-        rate = 0.3
-        rate = norm2sq.L / 3.
+        rate = norm2sq.L / 2.1
         
         alg = GradientDescent(x_init=x_init, 
                               objective_function=norm2sq, 
@@ -84,6 +83,34 @@ class TestAlgorithms(unittest.TestCase):
         self.assertTrue(alg.update_objective_interval==2)
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+    def test_GradientDescentArmijo(self):
+        print ("Test GradientDescent")
+        ig = ImageGeometry(12,13,14)
+        x_init = ig.allocate()
+        # b = x_init.copy()
+        # fill with random numbers
+        # b.fill(numpy.random.random(x_init.shape))
+        b = ig.allocate('random')
+        identity = Identity(ig)
+        
+        norm2sq = Norm2Sq(identity, b)
+        rate = norm2sq.L / 2.1
+        
+        alg = GradientDescent(x_init=x_init, 
+                              objective_function=norm2sq)
+        alg.max_iteration = 20
+        alg.run(20, verbose=True)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+        alg = GradientDescent(x_init=x_init, 
+                              objective_function=norm2sq, 
+                              max_iteration=20,
+                              update_objective_interval=2)
+        #alg.max_iteration = 20
+        self.assertTrue(alg.max_iteration == 20)
+        self.assertTrue(alg.update_objective_interval==2)
+        alg.run(20, verbose=True)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+
     def test_CGLS(self):
         print ("Test CGLS")
         #ig = ImageGeometry(124,153,154)

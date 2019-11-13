@@ -20,7 +20,9 @@
 #
 #=========================================================================
 
-
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 import time, functools
 from numbers import Integral
 
@@ -60,6 +62,7 @@ class Algorithm(object):
         self.timing = []
         self._iteration = []
         self.update_objective_interval = kwargs.get('update_objective_interval', 1)
+        self.x = None
     def set_up(self, *args, **kwargs):
         '''Set up the algorithm'''
         raise NotImplementedError()
@@ -109,16 +112,23 @@ class Algorithm(object):
         '''Returns the solution found'''
         return self.x
     
-    def get_last_loss(self):
+    def get_last_loss(self, **kwargs):
         '''Returns the last stored value of the loss function
         
         if update_objective_interval is 1 it is the value of the objective at the current
         iteration. If update_objective_interval > 1 it is the last stored value. 
         '''
-        return self.__loss[-1]
-    def get_last_objective(self):
+        return_all =  kwargs.get('return_all', False)
+        objective = self.__loss[-1]
+        if return_all:
+            return list(objective)
+        if isinstance(objective, list):
+            return objective[0]
+        else:
+            return objective
+    def get_last_objective(self, **kwargs):
         '''alias to get_last_loss'''
-        return self.get_last_loss()
+        return self.get_last_loss(**kwargs)
     def update_objective(self):
         '''calculates the objective with the current solution'''
         raise NotImplementedError()
@@ -155,31 +165,40 @@ class Algorithm(object):
                 raise ValueError('Update objective interval must be an integer >= 1')
         else:
             raise ValueError('Update objective interval must be an integer >= 1')
-    def run(self, iterations, verbose=True, callback=None):
-        '''run n iterations and update the user with the callback if specified'''
+    def run(self, iterations=None, verbose=True, callback=None, very_verbose=False):
+        '''run n iterations and update the user with the callback if specified
+        
+        :param iterations: number of iterations to run. If not set the algorithm will
+          run until max_iteration or until stop criterion is reached
+        :param verbose: toggles verbose output to screen
+        :param callback: is a function that receives: current iteration number, 
+          last objective function value and the current solution
+        :param very_verbose: bool, useful for algorithms with primal and dual objectives (PDHG), 
+                            prints to screen both primal and dual
+        '''
         if self.should_stop():
             print ("Stop cryterion has been reached.")
         i = 0
         if verbose:
-            print (self.verbose_header())
+            print (self.verbose_header(very_verbose))
         if self.iteration == 0:
             if verbose:
-                print(self.verbose_output())
+                print(self.verbose_output(very_verbose))
         for _ in self:
             if (self.iteration) % self.update_objective_interval == 0: 
                 if verbose:
-                    print (self.verbose_output())
+                    print (self.verbose_output(very_verbose))
                 if callback is not None:
-                    callback(self.iteration, self.get_last_objective(), self.x)
+                    callback(self.iteration, self.get_last_objective(return_all=very_verbose), self.x)
             i += 1
             if i == iterations:
                 if self.iteration != self._iteration[-1]:
                     self.update_objective()
                     if verbose:
-                        print (self.verbose_output())
+                        print (self.verbose_output(very_verbose))
                 break
 
-    def verbose_output(self):
+    def verbose_output(self, verbose=False):
         '''Creates a nice tabulated output'''
         timing = self.timing[-self.update_objective_interval-1:-1]
         self._iteration.append(self.iteration)
@@ -191,20 +210,20 @@ class Algorithm(object):
                  self.iteration, 
                  self.max_iteration,
                  "{:.3f}".format(t), 
-                 self.objective_to_string()
+                 self.objective_to_string(verbose)
                )
         return out
 
-    def objective_to_string(self):
-        el = self.get_last_objective()
+    def objective_to_string(self, verbose=False):
+        el = self.get_last_objective(return_all=verbose)
         if type(el) == list:
             string = functools.reduce(lambda x,y: x+' {:>13.5e}'.format(y), el[:-1],'')
             string += '{:>15.5e}'.format(el[-1])
         else:
             string = "{:>20.5e}".format(el)
         return string
-    def verbose_header(self):
-        el = self.get_last_objective()
+    def verbose_header(self, verbose=False):
+        el = self.get_last_objective(return_all=verbose)
         if type(el) == list:
             out = "{:>9} {:>10} {:>13} {:>13} {:>13} {:>15}\n".format('Iter', 
                                                       'Max Iter',

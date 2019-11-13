@@ -35,6 +35,7 @@ setup(
               'ccpi.optimisation.algorithms',
               'ccpi.optimisation.functions',
               'ccpi.processors',
+              'ccpi.utilities', 'ccpi.utilities.jupyter',
               'ccpi.contrib','ccpi.contrib.optimisation',
               'ccpi.contrib.optimisation.algorithms'],
     data_files = [('share/ccpi', ['data/boat.tiff',

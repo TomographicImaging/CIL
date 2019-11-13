@@ -45,7 +45,7 @@ class KullbackLeibler(Function):
         super(KullbackLeibler, self).__init__()
         
         self.b = data    
-        self.bnoise = 0
+        self.bnoise = data * 0.
         
                                                     
     def __call__(self, x):
@@ -240,4 +240,4 @@ if __name__ == '__main__':
         
 
     
-        
+    

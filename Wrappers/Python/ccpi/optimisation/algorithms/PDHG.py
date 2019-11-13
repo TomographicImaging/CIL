@@ -123,7 +123,10 @@ class PDHG(Algorithm):
 
 
     def update(self):
-        
+        # save previous iteration
+        self.x_old.fill(self.x)
+        self.y_old.fill(self.y)
+
         # Gradient ascent for the dual variable
         self.operator.direct(self.xbar, out=self.y_tmp)
         self.y_tmp *= self.sigma
@@ -145,9 +148,7 @@ class PDHG(Algorithm):
         self.xbar += self.x
 
         
-        self.x_old.fill(self.x)
-        self.y_old.fill(self.y)
-
+        
     def update_objective(self):
 
         p1 = self.f(self.operator.direct(self.x)) + self.g(self.x)

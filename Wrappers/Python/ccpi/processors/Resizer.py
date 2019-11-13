@@ -72,14 +72,14 @@ class Resizer(DataProcessor):
         if (self.roi == -1):
             roi_par = [-1] * ndim
         else:
-            roi_par = self.roi.copy()
+            roi_par = list(self.roi)
             if (len(roi_par) != ndim):
                 raise Exception('Number of dimensions and number of elements in roi parameter do not match')
 
         if (self.binning == 1):
             binning = [1] * ndim
         else:
-            binning = self.binning.copy()
+            binning = list(self.binning)
             if (len(binning) != ndim):
                 raise Exception('Number of dimensions and number of elements in binning parameter do not match')
                 

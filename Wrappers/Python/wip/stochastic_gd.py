@@ -28,14 +28,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # from utilities import islicer, link_islicer, psnr, plotter2D
-from ccpi.utilities.show_utilities import show
+from ccpi.utilities.display import show
 
 from ccpi.optimisation.algorithms import Algorithm, GradientDescent   
 import numpy
 
 
 from ccpi.optimisation.functions import Norm2Sq
-from ccpi.utilities import plotter2D
+from ccpi.utilities.display import plotter2D
 
 
 # stochastic imports

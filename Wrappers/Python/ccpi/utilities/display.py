@@ -20,7 +20,7 @@
 from __future__ import print_function, division
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
-
+import numpy
 from ccpi.framework import ImageGeometry
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 

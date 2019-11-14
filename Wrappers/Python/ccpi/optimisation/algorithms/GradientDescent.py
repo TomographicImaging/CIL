@@ -61,10 +61,6 @@ class GradientDescent(Algorithm):
         if x_init is not None and objective_function is not None :
             self.set_up(x_init=x_init, objective_function=objective_function, rate=rate)
     
-    def should_stop(self):
-        '''stopping criterion, currently only based on number of iterations'''
-        return self.iteration >= self.max_iteration
-    
     def set_up(self, x_init, objective_function, rate):
         '''initialisation of the algorithm
         

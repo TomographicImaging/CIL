@@ -66,18 +66,19 @@ class TestAlgorithms(unittest.TestCase):
         identity = Identity(ig)
         
         norm2sq = Norm2Sq(identity, b)
-        rate = norm2sq.L / 2.1
+        rate = norm2sq.L / 3.
         
         alg = GradientDescent(x_init=x_init, 
                               objective_function=norm2sq, 
-                              rate=rate)
-        alg.max_iteration = 20
-        alg.run(20, verbose=True)
+                              rate=rate, atol=1e-9, rtol=1e-6)
+        alg.max_iteration = 1000
+        alg.run()
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
         alg = GradientDescent(x_init=x_init, 
                               objective_function=norm2sq, 
                               rate=rate, max_iteration=20,
-                              update_objective_interval=2)
+                              update_objective_interval=2,
+                              atol=1e-9, rtol=1e-6)
         alg.max_iteration = 20
         self.assertTrue(alg.max_iteration == 20)
         self.assertTrue(alg.update_objective_interval==2)
@@ -97,9 +98,9 @@ class TestAlgorithms(unittest.TestCase):
         rate = norm2sq.L / 2.1
         
         alg = GradientDescent(x_init=x_init, 
-                              objective_function=norm2sq)
-        alg.max_iteration = 20
-        alg.run(20, verbose=True)
+                              objective_function=norm2sq, rate=rate)
+        alg.max_iteration = 100
+        alg.run()
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
         alg = GradientDescent(x_init=x_init, 
                               objective_function=norm2sq, 

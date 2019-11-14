@@ -794,8 +794,8 @@ class DataContainer(object):
         return self.pixel_wise_binary(numpy.divide, other, *args, **kwargs)
     
     def power(self, other, *args, **kwargs):
-        return self.pixel_wise_binary(numpy.power, other, *args, **kwargs)
-    
+        return self.pixel_wise_binary(numpy.power, other, *args, **kwargs)    
+          
     def maximum(self, x2, *args, **kwargs):
         return self.pixel_wise_binary(numpy.maximum, x2, *args, **kwargs)
     
@@ -828,6 +828,12 @@ class DataContainer(object):
     
     def abs(self, *args,  **kwargs):
         return self.pixel_wise_unary(numpy.abs, *args,  **kwargs)
+    
+    def max(self, *args,  **kwargs):
+        return self.pixel_wise_unary(numpy.max, *args,  **kwargs) 
+    
+    def min(self, *args,  **kwargs):
+        return self.pixel_wise_unary(numpy.min, *args,  **kwargs)     
     
     def sign(self, *args,  **kwargs):
         return self.pixel_wise_unary(numpy.sign, *args,  **kwargs)

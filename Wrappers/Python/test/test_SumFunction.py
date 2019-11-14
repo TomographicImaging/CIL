@@ -116,5 +116,5 @@ class TestFunction(unittest.TestCase):
                 f2.gradient(tmp, out = out_right2)                
                 self.assertNumpyArrayAlmostEqual(out_left.as_array(), out_right1.as_array() + out_right2.as_array())
             except NotImplementedError:
-                print("It's not differentiable")                
-                              
+                print("It's not differentiable") 
+   

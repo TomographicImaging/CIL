@@ -95,7 +95,7 @@ class TestAlgorithms(unittest.TestCase):
         identity = Identity(ig)
         
         norm2sq = Norm2Sq(identity, b)
-        rate = norm2sq.L / 2.1
+        rate = None
         
         alg = GradientDescent(x_init=x_init, 
                               objective_function=norm2sq, rate=rate)

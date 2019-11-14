@@ -156,7 +156,7 @@ class GradientDescent(Algorithm):
                 self._alpha *= self.beta
 
         if self.k == self.kmax -1:
-            raise ValueError('Could not find a proper rate in {} loops. Consider increasing alpha.')
+            raise ValueError('Could not find a proper rate in {} loops. Consider increasing alpha.'.format(self.kmax))
         return self.alpha
     
     @property

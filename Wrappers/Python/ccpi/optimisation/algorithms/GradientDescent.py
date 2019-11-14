@@ -119,10 +119,12 @@ class GradientDescent(Algorithm):
 
         https://projecteuclid.org/download/pdf_1/euclid.pjm/1102995080
         '''
+        run_a_lot = 100
+        counter = 0
         f_x = self.objective_function(self.x)
         if not hasattr(self, 'x_update'):
             self.x_update = self.objective_function.gradient(self.x)
-        while True:
+        while counter < run_a_lot:
             # self.x - alpha * self.x_update
             self.x_update.multiply(self.alpha, out=self.x_armijo)
             self.x.subtract(self.x_armijo, out=self.x_armijo)
@@ -135,6 +137,9 @@ class GradientDescent(Algorithm):
             else:
                 self.k += 1.
                 self.alpha *= self.beta
+            counter += 1
+        if counter == run_a_lot:
+            raise ValueError('Could not find a proper rate in {} iterations. Try to raise alpha.'.format(run_a_lot))
         return self.alpha
 
     def should_stop(self):
@@ -144,6 +149,8 @@ class GradientDescent(Algorithm):
 
 class StochasticGradientDescent(StochasticAlgorithm, GradientDescent):
     def __init__(self, **kwargs):
+        # if kwargs.get('rate', None) is None:
+        #     raise ValueError('Please specify a rate.')
         super(StochasticGradientDescent, self).__init__(**kwargs)
         
     def notify_new_subset(self, subset_id, number_of_subsets):

@@ -51,7 +51,7 @@ from ccpi.framework import AcquisitionGeometrySubsetGenerator
 
 
 model = 12 # select a model number from the library
-N = 512 # set dimension of the phantom
+N = 1024 # set dimension of the phantom
 device = 'gpu'
 path = os.path.dirname(tomophantom.__file__)
 path_library2D = os.path.join(path, "Phantom2DLibrary.dat")
@@ -153,12 +153,12 @@ class AstraSubsetProjectorSimple(AstraProjectorSimple):
 
 #%%
 l2 = Norm2Sq(A=A, b=data)
-gd = GradientDescent(x_init=im_data*0., objective_function=l2, rate=1e-4 , 
+gd = GradientDescent(x_init=im_data*0., objective_function=l2, rate=None , 
      update_objective_interval=10, max_iteration=100)
 tgd0 = time.time()
 gd.run()
 tgd1 = time.time()
-
+print (gd.rate)
 #%%
 
 #%%
@@ -167,8 +167,8 @@ sl2 = StochasticNorm2Sq(A=AstraSubsetProjectorSimple(ig, ag, device = 'gpu'),
                         b=data, number_of_subsets=nsubs)
 
 sgd = StochasticGradientDescent(x_init=im_data*0., 
-                                objective_function=sl2, rate=1e-3, 
-                                update_objective_interval=10, max_iteration=100, 
+                                objective_function=sl2, rate=None, alpha=1e1,
+                                update_objective_interval=10, max_iteration=200, 
                                 number_of_subsets=nsubs)
 
 
@@ -177,7 +177,7 @@ sgd.run()
 tsgd1 = time.time()
 #%%
 plotter2D([im_data, gd.get_output(), sgd.get_output()], titles=['ground truth', 
-           'gd {}'.format(tgd1-tgd0), 'sgd {}'.format(tsgd1-tsgd0)])
+           'gd {} {}'.format(tgd1-tgd0, l2(gd.get_output())), 'sgd {} {}'.format(tsgd1-tsgd0, l2(sgd.get_output())) ])
 
 
 

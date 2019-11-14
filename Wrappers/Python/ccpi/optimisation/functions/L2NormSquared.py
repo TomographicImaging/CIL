@@ -24,7 +24,6 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 from ccpi.optimisation.functions import Function
-from ccpi.optimisation.functions.ScaledFunction import ScaledFunction
 
 class L2NormSquared(Function):
     
@@ -36,13 +35,14 @@ class L2NormSquared(Function):
                                 
     '''    
     
-    def __init__(self, data = None,  **kwargs):
+    def __init__(self, **kwargs):
                                 
-        super(L2NormSquared, self).__init__()
-        self.b = data
-        # Lipschitz constant
-        self.L = 2
-
+        super(L2NormSquared, self).__init__(L = 2)        
+        self.b = kwargs.get('b', None)                             
+        
+        #if self.b is not None:
+        #    self.domain = self.b.geometry  
+                            
     def __call__(self, x):
         
         '''Evaluates L2NormSquared at x'''
@@ -82,7 +82,7 @@ class L2NormSquared(Function):
         tmp = 0
         
         if self.b is not None:
-            tmp = x.dot(self.b) #(x * self.b).sum()
+            tmp = x.dot(self.b) 
             
         return (1./4.) * x.squared_norm() + tmp
 
@@ -113,33 +113,23 @@ class L2NormSquared(Function):
                 x.divide((1+2*tau), out=out)
 
     
-    def proximal_conjugate(self, x, tau, out=None):
-        
-        r'''Proximal operator of the convex conjugate of L2NormSquared at x:
-           
-           .. math::  prox_{\tau * f^{*}}(x)'''
-        
-        if out is None:
-            if self.b is not None:
-                return (x - tau*self.b)/(1 + tau/2) 
-            else:
-                return x/(1 + tau/2)
-        else:
-            if self.b is not None:
-                x.subtract(tau*self.b, out=out)
-                out.divide(1+tau/2, out=out)
-            else:
-                x.divide(1 + tau/2, out=out)
-                                        
-    def __rmul__(self, scalar):
-        
-        '''Multiplication of L2NormSquared with a scalar        
-           
-           Returns: ScaledFunction'''
-        
-        return ScaledFunction(self, scalar)  
-
-
+#    def proximal_conjugate(self, x, tau, out=None):
+#        
+#        r'''Proximal operator of the convex conjugate of L2NormSquared at x:
+#           
+#           .. math::  prox_{\tau * f^{*}}(x)'''
+#        
+#        if out is None:
+#            if self.b is not None:
+#                return (x - tau*self.b)/(1 + tau/2) 
+#            else:
+#                return x/(1 + tau/2)
+#        else:
+#            if self.b is not None:
+#                x.subtract(tau*self.b, out=out)
+#                out.divide(1+tau/2, out=out)
+#            else:
+#                x.divide(1 + tau/2, out=out)                                        
 
 if __name__ == '__main__':
     
@@ -147,7 +137,7 @@ if __name__ == '__main__':
     import numpy
     # TESTS for L2 and scalar * L2
     
-    M, N, K = 20,30,50
+    M, N, K = 2,3,1
     ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N, voxel_num_z = K)
     u = ig.allocate('random_int')
     b = ig.allocate('random_int') 
@@ -160,12 +150,14 @@ if __name__ == '__main__':
     numpy.testing.assert_equal(f(u), u.squared_norm())
 
     # check grad/call with data
+    
+    igggg = ImageGeometry(4,4)
     f1 = L2NormSquared(b=b)
     b1 = f1.gradient(u)
     b2 = 2 * (u-b)
         
     numpy.testing.assert_array_almost_equal(b1.as_array(), b2.as_array(), decimal=4)
-    numpy.testing.assert_equal(f1(u), (u-b).squared_norm())
+    numpy.testing.assert_equal(f1(u), (5*(u-b)).squared_norm())
     
     #check convex conjuagate no data
     c1 = f.convex_conjugate(u)

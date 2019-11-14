@@ -121,7 +121,26 @@ class GradientDescent(Algorithm):
         f_x = self.objective_function(self.x)
         if not hasattr(self, 'x_update'):
             self.x_update = self.objective_function.gradient(self.x)
-        while True:
+
+        ''' if
+        gamma = 6 
+        alpha = numpy.power(10,gamma)
+        delta = 3
+        rate = numpy.power(10, -delta)
+        with armijo rule we can get to rate from initial alpha by repeating the while loop k times 
+        where 
+        alpha / 2^k = rate
+        10^gamma / 2^k = 10^-delta 
+        2^k = 10^(gamma+delta)
+        k = gamma+delta / log10(2) \\approx 3.3 * (gamma+delta)
+
+        if we would take by default delta = gamma
+        kmax = numpy.ceil ( 2 * gamma / numpy.log10(2) )
+        kmax = numpy.ceil (2 * numpy.log10(alpha) / numpy.log10(2))
+
+        '''
+        
+        while self.k < self.kmax:
             # self.x - alpha * self.x_update
             self.x_update.multiply(self.alpha, out=self.x_armijo)
             self.x.subtract(self.x_armijo, out=self.x_armijo)
@@ -133,9 +152,21 @@ class GradientDescent(Algorithm):
                 break
             else:
                 self.k += 1.
-                self.alpha *= self.beta
-        return self.alpha
+                # we don't want to update kmax
+                self._alpha *= self.beta
 
+        if self.k == self.kmax -1:
+            raise ValueError('Could not find a proper rate in {} loops. Consider increasing alpha.')
+        return self.alpha
+    
+    @property
+    def alpha(self):
+        return self._alpha
+    @alpha.setter
+    def alpha(self, alpha):
+        self._alpha = alpha
+        self.kmax = numpy.ceil (2 * numpy.log10(alpha) / numpy.log10(2))
+        
     def should_stop(self):
         return self.max_iteration_stop_cryterion() or \
             numpy.isclose(self.get_last_objective(), 0., rtol=self.rtol, atol=self.atol, equal_nan=False)

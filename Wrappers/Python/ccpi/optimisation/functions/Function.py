@@ -159,11 +159,20 @@ class SumFunction(Function):
     def gradient(self, x, out=None):
         
         '''Returns the gradient of the sum of functions at x, if both of them are differentiable'''
+        
+#        try: 
         if out is None:            
             return self.function1.gradient(x) +  self.function2.gradient(x)  
         else:
+            out_tmp = out.copy()
+            out_tmp *=0
             self.function1.gradient(x, out=out)
-            out.add(self.function2.gradient(x, out=out))
+            self.function2.gradient(x, out=out_tmp)
+            out_tmp.add(out, out=out)
+#            out.add(self.function2.gradient(x, out=out), out=out)
+#        except NotImplementedError:
+#            print("Either {} or {} is not differentiable".format(type(self.function1).__name__), type(self.function1).__name__)) 
+                            
             
         
 class ScaledFunction(Function):
@@ -206,11 +215,14 @@ class ScaledFunction(Function):
     def gradient(self, x, out=None):
         '''Returns the gradient of the function at x, if the function is differentiable'''
         
+#        try:
         if out is None:            
             return self.scalar * self.function.gradient(x)
         else:
             self.function.gradient(x, out=out)
-            out *= self.scalar                            
+            out *= self.scalar  
+#        except NotImplementedError:
+#            print("{} is not differentiable".format(type(self.function).__name__))                         
 
     def proximal(self, x, tau, out=None):
         '''This returns the proximal operator for the function at x, tau
@@ -292,7 +304,7 @@ class ConstantFunction(Function):
         
         '''Evaluates gradient of ConstantFunction at x: Returns a number'''        
         
-        return ZeroOperator(x.geometry).direct(x)
+        return ZeroOperator(x.geometry).direct(x, out=out)
     
     def convex_conjugate(self, x):
         
@@ -314,17 +326,13 @@ class ConstantFunction(Function):
         
         ''' This returns the proximal of a constnat function which is the same as x'''
         
-        if out is None:
-            return Identity(x.geometry).direct(x)
-        else:
-            Identity(x.geometry).direct(x, out = out)
+        return Identity(x.geometry).direct(x, out=out)
+
                        
     def proximal_conjugate(self, x, tau, out = None):
         
-        if out is None:
-            return ZeroOperator(x.geometry).direct(x)
-        else:
-            ZeroOperator(x.geometry).direct(x, out = out)
+        return ZeroOperator(x.geometry).direct(x, out=out)
+
 
 class ZeroFunction(ConstantFunction):
     

@@ -16,8 +16,9 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import numpy as np
-from ccpi.optimisation.functions import Function, L1Norm, LeastSquares, MixedL21Norm, L2NormSquared, KullbackLeibler, ZeroFunction, ConstantFunction
+from ccpi.optimisation.functions import L1Norm, ScaledFunction, \
+                                        LeastSquares, MixedL21Norm, L2NormSquared, \
+                                        KullbackLeibler, ZeroFunction, ConstantFunction
 from ccpi.optimisation.operators import Identity                                        
 from ccpi.framework import ImageGeometry, BlockGeometry
 
@@ -60,7 +61,7 @@ class TestFunction(unittest.TestCase):
 
         self.assertTrue(res)
         
-    def test_SumFunctionCall(self):
+    def test_SumFunction(self):
         
         M, N, K = 3,4,5
         ig = ImageGeometry(M, N, K)
@@ -70,7 +71,7 @@ class TestFunction(unittest.TestCase):
         bg_tmp = bg.allocate('random_int')
         b = ig.allocate('random_int')
         
-        Id = Identity(ig)
+        operator = Identity(ig)
 
         scalar = 0.25
         f1 = L2NormSquared()
@@ -81,40 +82,90 @@ class TestFunction(unittest.TestCase):
         f6 = scalar * L1Norm(b=b)  
         f7 = ZeroFunction()
         f8 = 5 *  ConstantFunction(10)             
-        f9 = LeastSquares(Id, b, c=scalar)
+        f9 = LeastSquares(operator, b, c=scalar)
         f10 = 0.5 * MixedL21Norm()
         
         list1 = [f1, f2, f3, f4, f5, f6, f7, f8, f9]
-        
-        out_left = ig.allocate()
-        out_right1 = ig.allocate()
-        out_right2 = ig.allocate()
+                
+        print('###################  Check sum of two functions ################## \n')
         
         for func in list1:
-                        
-            # check sum
-            sumf = f1 + f2 + func           
-            self.assertNumpyArrayAlmostEqual(sumf(tmp), f1(tmp) + f2(tmp) + func(tmp) )
+               
             
-            sumf1 = func + f1 + f2
-            self.assertNumpyArrayAlmostEqual(sumf1(tmp), func(tmp) + f1(tmp) + f2(tmp))
+            # check sum of two functions   
             
-            sumf2 = sumf1(tmp) + f10
-            self.assertNumpyArrayAlmostEqual(sumf2(bg_tmp) ,  sumf1(tmp) + f10(bg_tmp))
-                        
-            # check gradient 
-            print(type(sumf).__name__, type(func).__name__)            
+            if isinstance(func, ScaledFunction):
+                type_fun = ' scalar * ' + type(func.function).__name__
+            else:    
+                type_fun = type(func).__name__
+
+            sumf = f1 + func           
+            self.assertNumpyArrayAlmostEqual(sumf(tmp), f1(tmp) + func(tmp) )
+            print('{} = ( {} + {} ) is OK'.format(type(sumf).__name__, type(f1).__name__, type_fun))
+            
+            sumf1 = func + f1 
+            self.assertNumpyArrayAlmostEqual(sumf1(tmp), func(tmp) + f1(tmp))
+            print('Checking commutative')
+            print('{} + ( {} + {} ) is OK\n'.format(type(sumf1).__name__, type_fun, type(f1).__name__))
+            
+        print('###################  Lispchitz constant ################## \n')
+        
+        for func in list1:
+            
+            if isinstance(func, ScaledFunction):
+                type_fun = ' scalar * ' + type(func.function).__name__
+            else:    
+                type_fun = type(func).__name__            
+               
+            
+            # check Lispchitz sum of two functions   
+            
+            sumf = f1 + func   
+            
+            try:
+                sumf.L==f1.L + func.L
+            except TypeError:
+                print('Function {} has L = None'.format(type_fun))
+                
+        print('\n###################  Check Gradient ################## \n')   
+              
+              
+        for func in list1:
+              
+            if isinstance(func, ScaledFunction):
+                type_fun = ' scalar * ' + type(func.function).__name__
+            else:    
+                type_fun = type(func).__name__
+          
+            sumf = f1 + func
+            # check gradient          
             try:
                 self.assertNumpyArrayAlmostEqual(sumf.gradient(tmp).as_array(), (f1.gradient(tmp) + func.gradient(tmp)).as_array())
             except NotImplementedError:
-                print("It's not differentiable")
+                print("{} is not differentiable".format(type_fun))
                 
+        print('\n###################  Check Gradient Out ################## \n')  
+         
+        out_left = ig.allocate()
+        out_right1 = ig.allocate()
+        out_right2 = ig.allocate()  
+            
+        for func in list1:               
+                
+            if isinstance(func, ScaledFunction):
+                type_fun = ' scalar * ' + type(func.function).__name__
+            else:    
+                type_fun = type(func).__name__
+            
+            sumf = f1 + func
+                                    
             # check gradient out    
             try:
+                print('Check {} + {}\n'.format(type(f1).__name__, type_fun))
                 sumf.gradient(tmp, out = out_left)
                 f1.gradient(tmp, out = out_right1)
-                f2.gradient(tmp, out = out_right2)                
+                func.gradient(tmp, out = out_right2)    
                 self.assertNumpyArrayAlmostEqual(out_left.as_array(), out_right1.as_array() + out_right2.as_array())
             except NotImplementedError:
-                print("It's not differentiable") 
-   
+                print("{} is not differentiable".format(type_fun))  
+

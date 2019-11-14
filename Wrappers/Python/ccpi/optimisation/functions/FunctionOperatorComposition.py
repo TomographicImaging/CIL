@@ -21,8 +21,8 @@
 #=========================================================================
 
 from ccpi.optimisation.functions import Function
-from ccpi.optimisation.functions import ScaledFunction
 
+import warnings
 
 class FunctionOperatorComposition(Function):
     
@@ -63,7 +63,6 @@ class FunctionOperatorComposition(Function):
         self.operator.direct(x, out=tmp)
         self.function.gradient(tmp, out=tmp)
         if out is None:
-            #return self.operator.adjoint(self.function.gradient(self.operator.direct(x)))
             return self.operator.adjoint(tmp)
         else: 
             self.operator.adjoint(tmp, out=out)

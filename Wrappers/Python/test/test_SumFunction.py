@@ -20,7 +20,7 @@ from ccpi.optimisation.functions import L1Norm, ScaledFunction, \
                                         LeastSquares, L2NormSquared, \
                                         KullbackLeibler, ZeroFunction, ConstantFunction
 from ccpi.optimisation.operators import Identity                                        
-from ccpi.framework import ImageGeometry, BlockGeometry
+from ccpi.framework import ImageGeometry
 
 import unittest
 import numpy
@@ -254,13 +254,14 @@ class TestFunction(unittest.TestCase):
         f.proximal_conjugate(tmp, tau, out = res1_out)
         f1.proximal_conjugate(tmp, tau, out = res2_out)             
         self.assertNumpyArrayAlmostEqual(res1_out.as_array(), res2_out.as_array())        
-                    
+            
+        
                 
-if __name__ == '__main__':
-    
-    t = TestFunction()
-    t.test_SumFunction()
-    t.test_SumFunctionScalar()
+#if __name__ == '__main__':
+#    
+#    t = TestFunction()
+#    t.test_SumFunction()
+#    t.test_SumFunctionScalar()
 
                 
 

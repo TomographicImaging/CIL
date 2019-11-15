@@ -315,12 +315,18 @@ class ConstantFunction(Function):
         
         '''        
         
-        tmp = x.as_array()
-                   
-        if not np.any(tmp):
+        if x.norm()==0:
             return 0.
         else:
             return np.inf
+        
+        # not working with BlockDataContainer
+#        tmp = x.as_array()
+#                   
+#        if not np.any(tmp):
+#            return 0.
+#        else:
+#            return np.inf
                 
     def proximal(self, x, tau, out=None):
         

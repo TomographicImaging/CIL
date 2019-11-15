@@ -42,15 +42,15 @@ class KullbackLeibler(Function):
     
     def __init__(self,  **kwargs):
         
-        super(KullbackLeibler, self).__init__(L=None)
+        super(KullbackLeibler, self).__init__(L = None)
         
-        self.x = kwargs.get('b', None)           
-        self.eta = kwargs.get('eta',self.x * 0.0)
+        self.b = kwargs.get('b', None)           
+        self.eta = kwargs.get('eta',self.b * 0.0)
         
-        if self.x is None:
+        if self.b is None:
             raise ValueError('Please define data')
                 
-        if self.x.as_array().any()<0:
+        if self.b.as_array().any()<0:
             raise ValueError('Data should be is larger or equal to 0')                                        
                                                     
     def __call__(self, x):
@@ -60,7 +60,7 @@ class KullbackLeibler(Function):
         
         tmp_sum = (x + self.eta).as_array()
         ind = tmp_sum > 0
-        tmp = scipy.special.kl_div(self.x.as_array()[ind], tmp_sum[ind])                
+        tmp = scipy.special.kl_div(self.b.as_array()[ind], tmp_sum[ind])                
         return numpy.sum(tmp) 
 
     def log(self, datacontainer):
@@ -76,12 +76,12 @@ class KullbackLeibler(Function):
         
         tmp_sum = x + self.eta
         tmp_sum_array = tmp_sum.as_array()  
-        tmp_out = x.geometry.allocate()
-        tmp_out.as_array()[tmp_sum_array>0] = 1 - self.x.as_array()[tmp_sum_array>0]/tmp_sum_array[tmp_sum_array>0]        
+        tmp_out = x.geometry.allocate()        
+        tmp_out.as_array()[tmp_sum_array>0] = 1 - self.b.as_array()[tmp_sum_array>0]/tmp_sum_array[tmp_sum_array>0]        
                              
         if out is None: 
                           
-            return type(x)(tmp_out)
+            return tmp_out
         
         else:    
             
@@ -99,7 +99,7 @@ class KullbackLeibler(Function):
         
         '''Convex conjugate of KullbackLeibler at x'''
         
-        xlogy = - scipy.special.xlogy(self.x.as_array(), 1 - x.as_array())         
+        xlogy = - scipy.special.xlogy(self.b.as_array(), 1 - x.as_array())         
         return numpy.sum(xlogy) - (self.eta * x).sum()
             
     def proximal(self, x, tau, out=None):
@@ -111,16 +111,16 @@ class KullbackLeibler(Function):
         '''
 
         if out is None:        
-            return 0.5 *( (x - self.eta - tau) + ( (x + self.eta - tau)**2 + 4*tau*self.x   ) .sqrt() )
+            return 0.5 *( (x - self.eta - tau) + ( (x + self.eta - tau)**2 + 4*tau*self.b   ) .sqrt() )
         else:
             
             tmp =  0.5 *( (x - self.eta - tau) + 
-                        ( (x + self.eta - tau)**2 + 4*tau*self.x   ) .sqrt()
+                        ( (x + self.eta - tau)**2 + 4*tau*self.b  ) .sqrt()
                         )
             x.add(self.eta, out=out)
             out -= tau
             out *= out
-            tmp = self.x * (4 * tau)
+            tmp = self.b * (4 * tau)
             out.add(tmp, out=out)
             out.sqrt(out=out)
             

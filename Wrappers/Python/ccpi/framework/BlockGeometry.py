@@ -94,9 +94,6 @@ class BlockGeometry(object):
                 containers[6]=containers[9]
                 containers[7]=containers[10]
                 containers[11]=containers[15]
-                
-                
-                
-        
+
         return BlockDataContainer(*containers)
            

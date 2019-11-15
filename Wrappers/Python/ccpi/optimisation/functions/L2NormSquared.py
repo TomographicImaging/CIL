@@ -157,7 +157,7 @@ if __name__ == '__main__':
     b2 = 2 * (u-b)
         
     numpy.testing.assert_array_almost_equal(b1.as_array(), b2.as_array(), decimal=4)
-    numpy.testing.assert_equal(f1(u), (5*(u-b)).squared_norm())
+    numpy.testing.assert_equal(f1(u), ((u-b)).squared_norm())
     
     #check convex conjuagate no data
     c1 = f.convex_conjugate(u)

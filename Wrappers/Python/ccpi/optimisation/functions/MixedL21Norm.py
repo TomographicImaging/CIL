@@ -25,7 +25,6 @@ from ccpi.optimisation.functions import Function
 from ccpi.framework import BlockDataContainer
 import numpy as np
 
-import functools
 
 class MixedL21Norm(Function):
     

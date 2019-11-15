@@ -125,6 +125,10 @@ class Function(object):
         '''Defines the multiplication by a scalar on the left returns a ScaledFunction'''                
         return ScaledFunction(self, scalar)
     
+    def __mul__(self, scalar):
+        '''Defines the multiplication by a scalar on the left returns a ScaledFunction'''                
+        return scalar * ScaledFunction(self, 1)   
+    
     def centered_at(self, center):
         '''This returns the proximal operator for the convex conjugate of the function at x, tau'''
         return TranslateFunction(self, center)  
@@ -240,7 +244,9 @@ class ScaledFunction(Function):
 #        else:
 #            self.function.proximal_conjugate(x/self.scalar, tau/self.scalar, out=out)
 #            out *= self.scalar
-   
+
+    def function(self):
+        return self.function
 
 class SumFunctionScalar(SumFunction):
     
@@ -276,10 +282,14 @@ class SumFunctionScalar(SumFunction):
 #    def proximal_conjugate(self, x, tau, out = None):
 #        
 #        self.function.proximal_conjugate(x, tau, out = out) 
+        
+    def function(self):       
+       return self.function    
     
                         
 class ConstantFunction(Function):
     
+            
     r'''ConstantFunction: .. math:: f(x) = constant, constant\in\mathbb{R}         
         
     '''
@@ -305,24 +315,18 @@ class ConstantFunction(Function):
         return ZeroOperator(x.geometry).direct(x, out=out)
     
     def convex_conjugate(self, x):
+                        
+        ''' This is the Indicator of singleton {constant}. It is either -constnat if x^* = 0
+        or infinity.
+        However, x^{*} = 0 only in the limit of iterations, so in fact this can be infinity.
+        We do not want to have inf values in the convex conjugate, so we have to peanalise this value 
+        along the iterations
         
-        ''' This is the IndicatorSingleton function that returns 0 if x^* = 0 and inf otherwise 
-
-            We can implment IndicatorSingleton but then we need it to add it also here, 
-            and increase the size of this file
+        '''       
         
-        '''        
-        
-        if x.norm()==0:
-            return 0.
-        else:
-            return np.inf
-        
-        # not working with BlockDataContainer
-#        tmp = x.as_array()
-#                   
-#        if not np.any(tmp):
-#            return 0.
+        return (x-self.constant).maximum(0).sum()
+#        if x.norm()<1e-6:            
+#            return -self.constant
 #        else:
 #            return np.inf
                 
@@ -345,8 +349,8 @@ class ZeroFunction(ConstantFunction):
     '''
     
     def __init__(self):
-        super(ZeroFunction, self).__init__(constant = 0) 
-
+        super(ZeroFunction, self).__init__(constant = 0.) 
+        
 class TranslateFunction(Function):
     
     r'''TranslateFunction: Let Function f(x), here we compute f(x - center)
@@ -355,7 +359,7 @@ class TranslateFunction(Function):
     
     def __init__(self, function, center):
         
-        super(TranslateFunction, self).__init__() 
+        super(TranslateFunction, self).__init__(L = function.L) 
                         
         self.function = function
         self.center = center
@@ -398,115 +402,48 @@ class TranslateFunction(Function):
 #        else:            
 #            self.function.proximal(x/tau, 1/tau, out = out)
 #            out*=-tau
-#            out.add(x)                    
+#            out.add(x)       
+        
+    def function(self):       
+       return self.function             
     
+
 if __name__ == '__main__':
     
-    from ccpi.framework import ImageGeometry
+
+    from ccpi.optimisation.functions import L1Norm, ScaledFunction, \
+                                            LeastSquares, L2NormSquared, \
+                                            KullbackLeibler, FunctionOperatorComposition, ZeroFunction, ConstantFunction, TranslateFunction
+    from ccpi.optimisation.operators import Identity                                        
+    from ccpi.framework import ImageGeometry, BlockGeometry
+    
+    import unittest
     import numpy
-    from ccpi.optimisation.functions import L2NormSquared, L1Norm, KullbackLeibler
-                
-    # Test TranslationFunction
+    from numbers import Number
 
     ig = ImageGeometry(4,4)
     tmp = ig.allocate('random_int')
     b = ig.allocate('random_int')
     scalar = 0.4
-    list_functions = [L2NormSquared(), L1Norm()]
-    decimal = 5
+               
+    f = L2NormSquared().centered_at(b) * scalar
     
-    for i in list_functions:
-        
-        print('Test Translation for Function {} '.format(type(i).__name__))
-        
-        if isinstance(i, L2NormSquared):
-            
-            f = L2NormSquared(b = b)    
-            g = TranslateFunction(L2NormSquared(), b)
-            
-        elif isinstance(i, L1Norm):
-            
-            f = L1Norm(b = b)    
-            g = TranslateFunction(L1Norm(), b)
-            
-        elif isinstance(i, ScaledFunction):
-
-            if isinstance(i.function, L2NormSquared):
-                f = scalar * L2NormSquared(b = b)    
-                g = scalar * TranslateFunction(L2NormSquared(), b)
-                
-            if isinstance(i.function, L1Norm):
-                f = scalar * L1Norm(b = b)    
-                g = scalar * TranslateFunction(L1Norm(), b)                
-                        
-        # check call
-        res1 = f(tmp)
-        res2 = g(tmp)    
-        numpy.testing.assert_equal(res1, res2)
-        
-        # check gradient
-            
-        if not isinstance(i, L1Norm):
-        
-            res1 = f.gradient(tmp)
-            res2 = g.gradient(tmp) 
-            numpy.testing.assert_equal(res1.as_array(), res2.as_array()) 
-        
-            # check gradient out
-            res3 = ig.allocate()
-            res4 = ig.allocate()
-            f.gradient(tmp, out = res3)
-            g.gradient(tmp, out = res4)
-            numpy.testing.assert_equal(res3.as_array(), res4.as_array())
-        
-        # check convex conjugate
-        res1 = f.convex_conjugate(tmp)
-        res2 = g.convex_conjugate(tmp)
-        numpy.testing.assert_equal(res1, res2) 
-        
-        # check proximal    
-        tau = 0.5
-        res1 = f.proximal(tmp, tau)
-        res2 = g.proximal(tmp, tau)
-        numpy.testing.assert_equal(res1.as_array(), res2.as_array()) 
-        
-        # check proximal out           
-        res3 = ig.allocate()
-        res4 = ig.allocate()
-        f.proximal(tmp, tau, out = res3)
-        g.proximal(tmp, tau, out = res4)
-        numpy.testing.assert_array_almost_equal(res3.as_array(), res4.as_array(),decimal = decimal)     
-        
-        # check proximal conjugate  
-        tau = 0.4
-        res1 = f.proximal_conjugate(tmp, tau)
-        res2 = g.proximal_conjugate(tmp, tau)
-        numpy.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(),decimal = decimal)  
-                            
-        # check proximal out           
-        res3 = ig.allocate()
-        res4 = ig.allocate()
-        f.proximal_conjugate(tmp, tau, out = res3)
-        g.proximal_conjugate(tmp, tau, out = res4)
-        numpy.testing.assert_array_almost_equal(res3.as_array(), res4.as_array(),decimal = decimal)          
-        
-        
-        f = L2NormSquared() + 1
-        print(f(tmp))
-        
-        
+    res1 = f(tmp)
     
-#    tau = 0.5    
-#    f = L2NormSquared(b=b) 
-#    g = TranslateFunction(f, b)
-#    res1 = f.proximal_conjugate(tmp, tau)    
-#    res2 = tmp - tau * f.proximal(tmp/tau, 1/tau)
-#    res3 = g.proximal_conjugate(tmp, tau)
+    res2 = scalar * (tmp-b).squared_norm()
     
-#    print(res1.as_array())
-#    print(res3.as_array())
-#    numpy.testing.assert_equal(res1.as_array(), res2.as_array()) 
-#    numpy.testing.assert_equal(res1.as_array(), res3.as_array()) 
+#    f = L2NormSquared()
+    print(type(f).__name__)
+    
+    print(f.function)
+    
+    
+    f = L2NormSquared().centered_at(b) 
+    print(f(tmp))
+    
+    Id = Identity(ig)
+    f = FunctionOperatorComposition(L2NormSquared().centered_at(b), Id)
+    print(f(tmp))
     
     
     

@@ -99,8 +99,8 @@ class KullbackLeibler(Function):
         
         '''Convex conjugate of KullbackLeibler at x'''
         
-        xlogy = - scipy.special.xlogy(self.data.as_array(), 1 - x.as_array())         
-        return numpy.sum(xlogy) - (self.background_term * x).sum()
+        xlogy = - scipy.special.xlogy(self.x.as_array(), 1 - x.as_array())         
+        return numpy.sum(xlogy) - (self.eta * x).sum()
             
     def proximal(self, x, tau, out=None):
         

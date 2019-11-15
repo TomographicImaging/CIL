@@ -28,9 +28,6 @@ from __future__ import unicode_literals
 import warnings
 
 from numbers import Number
-
-import numpy as np
-
 from ccpi.optimisation.operators import ZeroOperator, Identity
 
 class Function(object):

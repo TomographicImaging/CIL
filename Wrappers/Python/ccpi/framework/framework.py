@@ -817,6 +817,7 @@ class DataContainer(object):
 
     @staticmethod
     def axpby(x,y,out,A,B,dtype=numpy.float32):
+        '''performs axpby with cilacc C library'''
 
         c_float_p = ctypes.POINTER(ctypes.c_float)
         c_double_p = ctypes.POINTER(ctypes.c_double)

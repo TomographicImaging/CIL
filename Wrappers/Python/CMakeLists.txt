@@ -28,24 +28,26 @@ if (BUILD_PYTHON_WRAPPER)
   if (PYTHONINTERP_FOUND)
       message("Python found " ${PYTHON_EXECUTABLE})
       set(SETUP_PY_IN "${CMAKE_CURRENT_SOURCE_DIR}/setup-cil.py.in")
-      set(SETUP_PY    "${CMAKE_CURRENT_BINARY_DIR}/setup-cil.py")
+      set(SETUP_PY    "${CMAKE_CURRENT_BINARY_DIR}/setup.py")
       #set(DEPS        "${CMAKE_CURRENT_SOURCE_DIR}/module/__init__.py")
       set (DEPS       "${CMAKE_BINARY_DIR}/")
       set(OUTPUT      "${CMAKE_CURRENT_BINARY_DIR}/build/timestamp")
 
-      configure_file(${SETUP_PY_IN} ${SETUP_PY})
+      #configure_file(${SETUP_PY_IN} ${SETUP_PY})
 
       message("Core binary dir " ${CMAKE_BINARY_DIR}/Core/${CMAKE_BUILD_TYPE})
       
       if (CONDA_BUILD)
         add_custom_command(OUTPUT ${OUTPUT}
+                        #COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
                         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
-                        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/ccpi ${CMAKE_CURRENT_BINARY_DIR}/ccpi
                         COMMAND ${CMAKE_COMMAND} -E env CIL_VERSION=${CIL_VERSION}
-                                                        PREFIX=${CMAKE_SOURCE_DIR}/src/Core
-                                                        LIBRARY_INC=${CMAKE_SOURCE_DIR}/src/Core
-                                                        LIBRARY_LIB=${CMAKE_BINARY_DIR}/src/Core
-                                                        ${PYTHON_EXECUTABLE} ${SETUP_PY} install
+                                                        #PREFIX=${CMAKE_SOURCE_DIR}/src/Core
+                                                        #LIBRARY_INC=${CMAKE_SOURCE_DIR}/src/Core
+                                                        #LIBRARY_LIB=${CMAKE_BINARY_DIR}/src/Core
+                                                        ${PYTHON_EXECUTABLE} ${SETUP_PY} -vv install
+                                                        #echo "EDO"
+                        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                         COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT}
                         DEPENDS cilacc)
 
@@ -55,7 +57,7 @@ if (BUILD_PYTHON_WRAPPER)
                         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
                         COMMAND ${CMAKE_COMMAND} -E env CIL_VERSION=${CIL_VERSION}
                                                         PREFIX=${CMAKE_SOURCE_DIR}/src/
-                                                       LIBRARY_INC=${CMAKE_SOURCE_DIR}/src/include
+                                                        LIBRARY_INC=${CMAKE_SOURCE_DIR}/src/include
                                                         LIBRARY_LIB=${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}
                                                         ${PYTHON_EXECUTABLE} ${SETUP_PY} build_ext --inplace
                         COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT}

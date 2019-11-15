@@ -44,11 +44,13 @@ add_definitions(${OpenMP_C_FLAGS})
   else()
     if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.9.0") 
       set (OpenMP_EXE_LINKER_FLAGS OpenMP::OpenMP_CXX)
+      set (OpenMP_EXE_LINKER_FLAGS OpenMP::OpenMP_C)
     else()
       message(WARNING "Your CMake version is old. OpenMP linking flags  might be incorrect.")
       # need to explicitly set this. Definitely for gcc, hopefully also for other systems.
       # See https://gitlab.kitware.com/cmake/cmake/issues/15392
       set (OpenMP_EXE_LINKER_FLAGS ${OpenMP_CXX_FLAGS})
+      set (OpenMP_EXE_LINKER_FLAGS ${OpenMP_C_FLAGS})
     endif()
   endif()
 
@@ -86,21 +88,36 @@ message("CMAKE_STATIC_LINKER_FLAGS ${CMAKE_STATIC_LINKER_FLAGS}")
 
 add_library(cilacc SHARED ${CMAKE_CURRENT_SOURCE_DIR}/axpby.c)
 
-target_link_libraries(cilacc ${EXTRA_LIBRARIES} )
+target_link_libraries(cilacc ${OpenMP_C_LIB_NAMES} )
 include_directories(cilacc PUBLIC 
 				  ${CMAKE_CURRENT_SOURCE_DIR}/include
 		          )
 
 ## Install
-include(GNUInstallDirs)
+#include(GNUInstallDirs)
+#install(TARGETS cilacc
+#	RUNTIME DESTINATION bin
+#    LIBRARY DESTINATION lib
+#    ARCHIVE DESTINATION lib
+#	CONFIGURATIONS ${CMAKE_BUILD_TYPE} 
+#	)
+
+if (UNIX)
+message ("I'd install into ${CMAKE_INSTALL_PREFIX}/lib")
 install(TARGETS cilacc
-	RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
+	LIBRARY DESTINATION lib
 	CONFIGURATIONS ${CMAKE_BUILD_TYPE} 
 	)
+elseif(WIN32)
+message ("I'd install into ${CMAKE_INSTALL_PREFIX} lib bin")
+  install(TARGETS cilacc 
+	RUNTIME DESTINATION bin
+	ARCHIVE DESTINATION lib
+	CONFIGURATIONS ${CMAKE_BUILD_TYPE} 
+	)
+endif()
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/src/Core/include/
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}) 
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/include/cil) 
 
 

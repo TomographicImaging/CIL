@@ -732,6 +732,18 @@ class TestDataContainer(unittest.TestCase):
         u.multiply(2, out=u)
         c = b * 2
         numpy.testing.assert_array_equal(u.as_array(), c)
+
+    def test_axpby(self):
+        print ("test axpby")
+        ig = ImageGeometry(10,10)                                               
+        d1 = ig.allocate(1)                                                     
+        d2 = ig.allocate(2)                                                     
+        out = ig.allocate(None)                                                 
+        # equals to 2 * [1] + 1 * [2] = [4]
+        DataContainer.axpby(d1,d2,out,2,1)
+        res = numpy.ones_like(d1.as_array()) * 4.
+        numpy.testing.assert_array_equal(res, out.as_array())
+
         
 
 

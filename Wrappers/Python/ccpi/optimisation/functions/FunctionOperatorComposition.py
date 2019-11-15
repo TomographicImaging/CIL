@@ -21,6 +21,7 @@
 #=========================================================================
 
 from ccpi.optimisation.functions import Function
+from ccpi.optimisation.operators import Operator
 
 import warnings
 
@@ -39,6 +40,13 @@ class FunctionOperatorComposition(Function):
         
         self.function = function     
         self.operator = operator
+        
+        if not isinstance(self.function, Function):
+            raise ValueError('{} is not function '.format(type(self.function)))
+            
+        if not isinstance(self.operator, Operator):
+            raise ValueError('{} is not function '.format(type(self.function)))            
+        
         try:
             self.L = function.L * operator.norm()**2 
         except Error as er:

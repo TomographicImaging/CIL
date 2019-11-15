@@ -358,7 +358,7 @@ class TestFunction(unittest.TestCase):
         
         out = ig.allocate()
         
-        f = KullbackLeibler(data, bnoise=bnoise)
+        f = KullbackLeibler(b=data, bnoise=bnoise)
         
         grad = f.gradient(x)
         f.gradient(x, out=out)
@@ -370,4 +370,4 @@ class TestFunction(unittest.TestCase):
         
         proxc = f.proximal_conjugate(x,1.2)
         f.proximal_conjugate(x, 1.2, out=out)
-        numpy.testing.assert_array_equal(proxc.as_array(), out.as_array())
+        numpy.testing.assert_array_almost_equal(proxc.as_array(), out.as_array())

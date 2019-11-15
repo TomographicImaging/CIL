@@ -69,8 +69,8 @@ class MixedL21Norm(Function):
         if not isinstance(x, BlockDataContainer):
             raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 
                     
-        tmp = (x.pnorm(2).as_array().max()-1)
-#
+        tmp = (x.pnorm(2).as_array().max() - 1)
+
         if tmp<=1e-5:
             return 0.
         else:

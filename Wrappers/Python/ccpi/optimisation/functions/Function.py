@@ -108,7 +108,7 @@ class Function(object):
         
         if isinstance(other, Function):
             return SumFunction(self, other)
-        elif isinstance(other, Number):
+        elif isinstance(other, (SumFunctionScalar, ConstantFunction, Number)):
             return SumFunctionScalar(self, other)
         else:
             raise ValueError('Not implemented')   
@@ -227,10 +227,10 @@ class ScaledFunction(Function):
     def proximal(self, x, tau, out=None):
         '''This returns the proximal operator for the function at x, tau
         '''
-        if out is None:
-            return self.function.proximal(x, tau*self.scalar)     
-        else:
-            self.function.proximal(x, tau*self.scalar, out = out)
+#        if out is None:
+        return self.function.proximal(x, tau*self.scalar, out=out)     
+#        else:
+#            self.function.proximal(x, tau*self.scalar, out = out)
 
 #    def proximal_conjugate(self, x, tau, out = None):
 #        '''This returns the proximal operator for the function at x, tau
@@ -263,6 +263,7 @@ class SumFunctionScalar(SumFunction):
         
         super(SumFunctionScalar, self).__init__(function, ConstantFunction(constant))        
         self.constant = constant
+        self.function = function
         
     def convex_conjugate(self,x):
         
@@ -270,10 +271,7 @@ class SumFunctionScalar(SumFunction):
     
     def proximal(self, x, tau, out=None):
         
-        if out is None:
-            return self.function.proximal(x, tau)
-        else:
-            self.function.proximal(x, tau, out = out)
+        return self.function.proximal(x, tau, out=out)        
     
 #    def proximal_conjugate(self, x, tau, out = None):
 #        
@@ -491,6 +489,12 @@ if __name__ == '__main__':
         f.proximal_conjugate(tmp, tau, out = res3)
         g.proximal_conjugate(tmp, tau, out = res4)
         numpy.testing.assert_array_almost_equal(res3.as_array(), res4.as_array(),decimal = decimal)          
+        
+        
+        f = L2NormSquared() + 1
+        print(f(tmp))
+        
+        
     
 #    tau = 0.5    
 #    f = L2NormSquared(b=b) 

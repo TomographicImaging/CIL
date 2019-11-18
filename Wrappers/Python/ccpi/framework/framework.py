@@ -26,7 +26,7 @@ from datetime import timedelta, datetime
 import warnings
 from functools import reduce
 from numbers import Number
-import ctypes
+import ctypes, platform
 
 # dll = os.path.abspath(os.path.join( 
 #          os.path.abspath(os.path.dirname(__file__)),
@@ -34,7 +34,14 @@ import ctypes
 # )
 
 # check for the extension
-dll = 'libcilacc.so'
+if platform.system() == 'Linux':
+    dll = 'libcilacc.so'
+elif platform.system() == 'Windows':
+    dll = 'cilacc.dll'
+elif platform.system() == 'Darwin':
+    dll = 'libcilacc.dylib'
+else:
+    raise ValueError('Not supported platform, ', platform.system())
 
 #print ("dll location", dll)
 cilacc = ctypes.cdll.LoadLibrary(dll)

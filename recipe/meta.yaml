@@ -37,6 +37,7 @@ requirements:
     - matplotlib
     - h5py
     - pillow
+    - libgcc-bg # [not win]
   
 about:
   home: http://www.ccpi.ac.uk

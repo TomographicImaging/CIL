@@ -17,7 +17,7 @@
 #   limitations under the License.
 
 import numpy as np
-from ccpi.optimisation.functions import Function, KullbackLeibler
+from ccpi.optimisation.functions import Function, KullbackLeibler, Rosenbrock
 from ccpi.framework import DataContainer, ImageData, ImageGeometry , VectorData
 from ccpi.optimisation.operators import  Identity
 from ccpi.optimisation.operators import BlockOperator

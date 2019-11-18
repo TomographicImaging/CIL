@@ -76,17 +76,3 @@ class Rosenbrock(Function):
         else:
             return VectorData(res) 
 
-if __name__ == '__main__':
-    from ccpi.framework import VectorGeometry
-    f = Rosenbrock (alpha = 1, beta=100)
-    vg = VectorGeometry(2)
-    x = vg.allocate(1.)
-    assert f(x) == 0.
-    numpy.testing.assert_array_almost_equal( f.gradient(x).as_array(), numpy.zeros(shape=(2,), dtype=numpy.float32))
-
-    x_rnd = vg.allocate('random', seed=1)
-    out = vg.allocate(0)
-    grad = f.gradient(x_rnd)
-    f.gradient(x_rnd, out=out)
-    print ("Gradient test", out.as_array(), grad.as_array())
-    numpy.testing.assert_array_equal(out.as_array(), grad.as_array())

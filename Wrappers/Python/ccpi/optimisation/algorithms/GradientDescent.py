@@ -175,34 +175,3 @@ class GradientDescent(Algorithm):
                 atol=self.atol, equal_nan=False)
 
 
-if __name__ == '__main__':
-    from ccpi.optimisation.functions import Rosenbrock
-    from ccpi.framework import VectorData, VectorGeometry
-
-    f = Rosenbrock (alpha = 1., beta=100.)
-    print ("Rosenbrock Lipschitz ", f.L)
-    vg = VectorGeometry(2)
-    x = vg.allocate('random_int', seed=2)
-    # x = vg.allocate('random', seed=1) 
-    x.fill(numpy.asarray([10.,-3.]))
-    
-    max_iter = 1000000
-    update_interval = 100000
-
-    alg = GradientDescent(x, f, max_iteration=max_iter, update_objective_interval=update_interval, alpha=1e6)
-    
-    alg.run(callback=lambda x,y,z: print (z.as_array(), alg.alpha))
-    
-    print (alg.get_output().as_array(), alg.step_size, alg.kmax, alg.k)
-
-    numpy.testing.assert_array_almost_equal(alg.get_output().as_array(), [1,1], decimal = 1)
-    numpy.testing.assert_array_almost_equal(alg.get_output().as_array(), [0.982744, 0.965725], decimal = 6)
-    
-    # alg = GradientDescent(x, f, max_iteration=max_iter, update_objective_interval=update_interval, step_size=1e-5)
-    # alg.run(callback=lambda x,y,z: print (z.as_array()))
-
-    # print (alg.get_output().as_array())
-    
-
-
-

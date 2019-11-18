@@ -18,7 +18,7 @@
 
 import numpy as np
 from ccpi.optimisation.functions import Function, KullbackLeibler
-from ccpi.framework import DataContainer, ImageData, ImageGeometry 
+from ccpi.framework import DataContainer, ImageData, ImageGeometry , VectorData
 from ccpi.optimisation.operators import  Identity
 from ccpi.optimisation.operators import BlockOperator
 from ccpi.framework import BlockDataContainer
@@ -371,3 +371,10 @@ class TestFunction(unittest.TestCase):
         proxc = f.proximal_conjugate(x,1.2)
         f.proximal_conjugate(x, 1.2, out=out)
         numpy.testing.assert_array_equal(proxc.as_array(), out.as_array())
+
+    def test_Rosenbrock(self):
+        f = Rosenbrock (alpha = 1, beta=100)
+        x = VectorData(numpy.asarray([1,1]))
+        assert f(x) == 0.
+        numpy.testing.assert_array_almost_equal( f.gradient(x).as_array(), numpy.zeros(shape=(2,), dtype=numpy.float32))
+

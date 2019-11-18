@@ -111,6 +111,27 @@ class TestAlgorithms(unittest.TestCase):
         self.assertTrue(alg.update_objective_interval==2)
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+    def test_GradientDescentArmijo2(self):
+        from ccpi.optimisation.functions import Rosenbrock
+        from ccpi.framework import VectorData, VectorGeometry
+
+        f = Rosenbrock (alpha = 1., beta=100.)
+        vg = VectorGeometry(2)
+        x = vg.allocate('random_int', seed=2)
+        # x = vg.allocate('random', seed=1) 
+        x.fill(numpy.asarray([10.,-3.]))
+        
+        max_iter = 1000000
+        update_interval = 100000
+
+        alg = GradientDescent(x, f, max_iteration=max_iter, update_objective_interval=update_interval, alpha=1e6)
+        
+        alg.run()
+        
+        print (alg.get_output().as_array(), alg.step_size, alg.kmax, alg.k)
+
+        numpy.testing.assert_array_almost_equal(alg.get_output().as_array(), [1,1], decimal = 1)
+        numpy.testing.assert_array_almost_equal(alg.get_output().as_array(), [0.982744, 0.965725], decimal = 6)
 
     def test_CGLS(self):
         print ("Test CGLS")

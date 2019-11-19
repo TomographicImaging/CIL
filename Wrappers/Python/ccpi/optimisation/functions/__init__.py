@@ -26,3 +26,4 @@ from .MixedL21Norm import MixedL21Norm
 from .IndicatorBox import IndicatorBox
 from .KullbackLeibler import KullbackLeibler
 from .Norm2Sq import Norm2Sq
+from .Rosenbrock import Rosenbrock

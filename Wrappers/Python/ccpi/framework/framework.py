@@ -823,32 +823,42 @@ class DataContainer(object):
         return self.pixel_wise_binary(numpy.minimum, x2=x2, out=out, *args, **kwargs)
 
     @staticmethod
-    def axpby(x,y,out,A,B,dtype=numpy.float32):
-        '''performs axpby with cilacc C library'''
+    def axpby(a,x,b,y,out,dtype=numpy.float32):
+        '''performs axpby with cilacc C library
+        
+        Does the operation .. math:: a*x+b*y and stores the result in out
+
+        :param a: scalar
+        :param x: DataContainer
+        :param b: scalar
+        :param y: DataContainer
+        :param out: DataContainer to store the result
+        :param dtype: optional, data type of the DataContainers
+        '''
 
         c_float_p = ctypes.POINTER(ctypes.c_float)
         c_double_p = ctypes.POINTER(ctypes.c_double)
         # get the reference to the data
-        a = x.as_array()
-        b = y.as_array()
+        ndx = x.as_array()
+        ndy = y.as_array()
         ndout = out.as_array()
 
-        if a.dtype != dtype:
-            a = a.astype(dtype)
-        if b.dtype != dtype:
-            b = b.astype(dtype)
+        if ndx.dtype != dtype:
+            ndx = ndx.astype(dtype)
+        if ndy.dtype != dtype:
+            ndy = ndy.astype(dtype)
         
         if dtype == numpy.float32:
-            a_p = a.ctypes.data_as(c_float_p)
-            b_p = b.ctypes.data_as(c_float_p)
+            x_p = ndx.ctypes.data_as(c_float_p)
+            y_p = ndy.ctypes.data_as(c_float_p)
             out_p = ndout.ctypes.data_as(c_float_p)
             f = cilacc.saxpby
 
         elif dtype == numpy.float64:
-            a = a.astype(numpy.float64)
+            ndx = ndx.astype(numpy.float64)
             b = b.astype(numpy.float64)
-            a_p = a.ctypes.data_as(c_double_p)
-            b_p = b.ctypes.data_as(c_double_p)
+            x_p = ndx.ctypes.data_as(c_double_p)
+            y_p = ndy.ctypes.data_as(c_double_p)
             out_p = ndout.ctypes.data_as(c_double_p)
             f = cilacc.daxpby
         else:
@@ -871,7 +881,7 @@ class DataContainer(object):
                                   ctypes.c_double,                 # type of B (c_double)
                                   ctypes.c_long]                   # type of size of first array 
 
-        if f(a_p, b_p, out_p, A, B, a.size) != 0:
+        if f(x_p, y_p, out_p, a, b, ndx.size) != 0:
             raise RuntimeError('axpby execution failed')
         
 

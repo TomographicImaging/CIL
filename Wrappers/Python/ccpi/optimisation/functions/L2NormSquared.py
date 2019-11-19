@@ -27,9 +27,10 @@ from ccpi.optimisation.functions import Function
 
 class L2NormSquared(Function):
     
-    r'''L2NormSquared function: 
-            
-            Cases considered (with/without data):            
+    r'''L2NormSquared function: :math `F(x) = \| x \|^{2}_{2} = \underset{i}{\sum}x_{i}^{2}
+          
+        We consider the following cases:
+                
                 a) .. math:: f(x) = \|x\|^{2}_{2} 
                 b) .. math:: f(x) = \|\|x - b\|\|^{2}_{2}
                                 
@@ -45,7 +46,9 @@ class L2NormSquared(Function):
                             
     def __call__(self, x):
         
-        '''Evaluates L2NormSquared at x'''
+        r"""Returns the value of the L2NormSquared function at x.
+                
+        """          
             
         y = x
         if self.b is not None: 
@@ -58,7 +61,9 @@ class L2NormSquared(Function):
                 
     def gradient(self, x, out=None):        
         
-        '''Evaluates gradient of L2NormSquared at x'''
+        r"""Returns the value of the gradient of the L2NormSquared function at x.
+                
+        """
                 
         if out is not None:
             
@@ -77,8 +82,9 @@ class L2NormSquared(Function):
                                                        
     def convex_conjugate(self, x):
         
-        '''Convex conjugate of L2NormSquared at x'''
-        
+        r"""Returns the value of the convex conjugate of the L2NormSquared function at x.
+                
+        """                
         tmp = 0
         
         if self.b is not None:
@@ -88,12 +94,11 @@ class L2NormSquared(Function):
 
 
     def proximal(self, x, tau, out = None):
-
-        r'''Proximal operator of L2NormSquared at x
-            
-            .. math:: prox_{\tau * f}(x)
-        '''          
         
+        r"""Returns the value of the proximal operator of the L2NormSquared function at x.
+                
+        """            
+
         if out is None:
             
             if self.b is None:

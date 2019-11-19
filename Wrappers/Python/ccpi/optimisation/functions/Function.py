@@ -32,12 +32,17 @@ from ccpi.optimisation.operators import ZeroOperator, Identity
 
 class Function(object):
     
-    ''' Abstract class representing a function
+    """ Abstract class representing a function
     
-            :param L: Lipschitz constant of the gradient of the function, when it is differentiable.
-            :param domain: The domain of the function.
+            Parameters:
+    
+                L: Lipschitz constant of the gradient of the function F(x), when it is differentiable.
             
-    '''
+                domain: The domain of the function.
+            
+    """
+    
+    
     def __init__(self, domain = None, L = None):
         
         self.L = L
@@ -45,30 +50,55 @@ class Function(object):
 
     def __call__(self,x):
         
-        '''Returns the value of the function at x : .. math:: $f(x)$ '''
+        r"""Returns the value of the function F at x
+        
+        .. math:: F(x)
+        
+        """        
+        
         raise NotImplementedError
 
     def gradient(self, x, out=None):
         
-        ''' Returns the value of the gradient of the function at x : .. math:: $f'(x)$ '''
+        r"""Returns the value of the gradient of function F at x, if it is differentiable
+        
+        .. math:: F'(x)
+        
+        """
         raise NotImplementedError
 
     def proximal(self, x, tau, out=None):
-        r''' Returns the value of the proximal operator of \tau * f at x:  \mathrm{prox}_{\tau f}(x)'''
+        
+        r"""Returns the proximal operator of function :math:`\tau * F` at x
+        
+        .. math:: \mathrm{prox}_{\tau F}(x) = \underset{\mathrm{argmin}}{z} \frac{1}{2}\|z - x\|^{2} + \tau F(z)
+                
+        """
         raise NotImplementedError
 
     def convex_conjugate(self, x):
-        '''This evaluates the convex conjugate of the function at x'''
+        r""" Returns the convex conjugate of function :math:`F` at :math:`x^{*}`
+        
+        .. math:: F^{*}(x^{*}) = \underset{x^{*}}{\sup} <x^{*}, x> - F(x)
+                
+        """
         raise NotImplementedError
 
     def proximal_conjugate(self, x, tau, out = None):
         
-        '''This returns the proximal operator for the convex conjugate of the function at x, tau
+        r"""Returns the proximal operator of the convex conjugate of function :math `\tau F` at :math `x^{*}`
         
-            Due to Moreau Identity, we have an analytic formula (that depends on the proximal) 
-            for this and there is no need to compute using the convex_conjugate
+        .. math:: \mathrm{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\mathrm{argmin}} \frac{1}{2}\|z - x\|^{2} + \tau F^{*}(z^{*})
         
-        '''
+        Due to Moreau’s identity 
+        
+        .. math:: \mathrm{prox}_{\tau F^{*}}(x) = x - \tau\mathrm{prox}_{\tau^{-1} F}(\tau^{-1}x)
+        
+        we have an analytic formula to compute the proximal operator of the convex conjugate :math `F^{*}`
+        
+        .. math:: \mathrm{prox}_{\tau F^{*}}(x) = x - \tau\mathrm{prox}_{\tau^{-1} F}(\tau^{-1}x)
+                
+        """
         if out is None:
             return x - tau * self.proximal(x/tau, 1/tau)
         else:            
@@ -405,44 +435,44 @@ class TranslateFunction(Function):
        return self.function             
     
 
-if __name__ == '__main__':
-    
-
-    from ccpi.optimisation.functions import L1Norm, ScaledFunction, \
-                                            LeastSquares, L2NormSquared, \
-                                            KullbackLeibler, FunctionOperatorComposition, ZeroFunction, ConstantFunction, TranslateFunction
-    from ccpi.optimisation.operators import Identity                                        
-    from ccpi.framework import ImageGeometry, BlockGeometry
-    
-    import unittest
-    import numpy
-    from numbers import Number
-
-    ig = ImageGeometry(4,4)
-    tmp = ig.allocate('random_int')
-    b = ig.allocate('random_int')
-    scalar = 0.4
-               
-    f = L2NormSquared().centered_at(b) * scalar
-    
-    res1 = f(tmp)
-    
-    res2 = scalar * (tmp-b).squared_norm()
-    
-#    f = L2NormSquared()
-    print(type(f).__name__)
-    
-    print(f.function)
-    
-    
-    f = L2NormSquared().centered_at(b) 
-    print(f(tmp))
-    
-    Id = Identity(ig)
-    f = FunctionOperatorComposition(L2NormSquared().centered_at(b), Id)
-    print(f(tmp))
-    
-    
-    
-    
-         
+#if __name__ == '__main__':
+#    
+#
+#    from ccpi.optimisation.functions import L1Norm, ScaledFunction, \
+#                                            LeastSquares, L2NormSquared, \
+#                                            KullbackLeibler, FunctionOperatorComposition, ZeroFunction, ConstantFunction, TranslateFunction
+#    from ccpi.optimisation.operators import Identity                                        
+#    from ccpi.framework import ImageGeometry, BlockGeometry
+#    
+#    import unittest
+#    import numpy
+#    from numbers import Number
+#
+#    ig = ImageGeometry(4,4)
+#    tmp = ig.allocate('random_int')
+#    b = ig.allocate('random_int')
+#    scalar = 0.4
+#               
+#    f = L2NormSquared().centered_at(b) * scalar
+#    
+#    res1 = f(tmp)
+#    
+#    res2 = scalar * (tmp-b).squared_norm()
+#    
+##    f = L2NormSquared()
+#    print(type(f).__name__)
+#    
+#    print(f.function)
+#    
+#    
+#    f = L2NormSquared().centered_at(b) 
+#    print(f(tmp))
+#    
+#    Id = Identity(ig)
+#    f = FunctionOperatorComposition(L2NormSquared().centered_at(b), Id)
+#    print(f(tmp))
+#    
+#    
+#    
+#    
+#         

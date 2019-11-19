@@ -31,17 +31,23 @@ class MixedL21Norm(Function):
     
     '''
         f(x) = ||x||_{2,1} = \sum |x|_{2}                   
+        f(x) = ||x - b||_{2,1} = \sum |x - b|_{2}  
     '''      
     
     def __init__(self, **kwargs):
 
         super(MixedL21Norm, self).__init__()  
+        self.b = kwargs.get('b', None)  
 
         # This is to handle tensor for Total Generalised Variation                    
         self.SymTensor = kwargs.get('SymTensor',False)
         
         # We use this parameter to make MixedL21Norm differentiable
         #self.epsilon = kwargs.get('epsilon',0)
+        
+        if self.b is not None and not isinstance(self.b, BlockDataContainer):
+            raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(self.b)))
+            
         
     def __call__(self, x):
         
@@ -53,7 +59,10 @@ class MixedL21Norm(Function):
         if not isinstance(x, BlockDataContainer):
             raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 
          
-        return x.pnorm(p=2).sum()                                
+        y = x
+        if self.b is not None:
+            y = x - self.b    
+        return y.pnorm(p=2).sum()                                
 #        tmp = x.get_item(0) * 0.
 #        for el in x.containers:
 #            tmp += el.power(2.)
@@ -68,11 +77,14 @@ class MixedL21Norm(Function):
         '''
         if not isinstance(x, BlockDataContainer):
             raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 
-                    
+                
         tmp = (x.pnorm(2).as_array().max() - 1)
+        tmp1 = 0
+        if self.b is not None:
+            tmp1 = self.b.dot(x)
 
         if tmp<=1e-5:
-            return 0.
+            return tmp1
         else:
             return np.inf
                     
@@ -133,8 +145,6 @@ class MixedL21Norm(Function):
 #            x.divide(res1, out=out)
                               
 
-
-#
 if __name__ == '__main__':
     
     M, N, K = 2,3,50

@@ -54,7 +54,7 @@ class L1Norm(Function):
     def convex_conjugate(self,x):
         
         '''Convex conjugate of L1Norm at x'''
-
+        
         y = 0        
         if self.b is not None:
             y =  0 + self.b.dot(x)

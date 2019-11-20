@@ -218,19 +218,17 @@ class SumFunction(Function):
         
 class ScaledFunction(Function):
     
-    """ScaledFunction
-
-    A class to represent the scalar multiplication of an Function with a scalar. 
-    It holds a function and a scalar. Basically it returns the multiplication
-    of the product of the function __call__, convex_conjugate and gradient with the scalar.
-    For the rest it behaves like the function it holds.
-
-    Args:
-       function (Function): a Function or BlockOperator
-       scalar (Number): a scalar multiplier
-    Example:
-       The scaled operator behaves like the following: ewfwefwfefw
-       
+    r""" ScaledFunction represents the scalar multiplication with a Function.
+    
+    Let a function F then and a scalar :math:`\alpha`.
+    
+    If :math:`G(x) = \alpha F(x)` then:
+    
+    1. :math:`G(x) = \alpha  F(x)` ( __call__ method )
+    2. :math:`G'(x) = \alpha  F'(x)` ( gradient method ) 
+    3. :math:`G^{*}(x^{*}) = \alpha  F^{*}(\frac{x^{*}}{\alpha})` ( convex_conjugate method )   
+    4. :math:`\mathrm{prox}_{\tau G}(x) = \mathrm{prox}_{(\tau\alpha) F}(x) ( proximal method ) 
+           
     """
     def __init__(self, function, scalar):
         
@@ -246,15 +244,27 @@ class ScaledFunction(Function):
         self.function = function       
               
     def __call__(self,x, out=None):
-        '''Evaluates the function at x '''
+        r"""Returns the value of the scaled function.
+        
+        .. math:: G(x) = \alpha F(x)
+        
+        """
         return self.scalar * self.function(x)
 
     def convex_conjugate(self, x):
-        '''returns the convex_conjugate of the scaled function '''
+        r"""Returns the convex conjugate of the scaled function.
+        
+        .. math:: G^{*}(x^{*}) = \alpha  F^{*}(\frac{x^{*}}{\alpha})
+        
+        """
         return self.scalar * self.function.convex_conjugate(x/self.scalar)
     
     def gradient(self, x, out=None):
-        '''Returns the gradient of the function at x, if the function is differentiable'''
+        r"""Returns the gradient of the scaled function.
+        
+        .. math:: G'(x) = \alpha  F'(x)
+        
+        """
         
 #        try:
         if out is None:            
@@ -266,8 +276,12 @@ class ScaledFunction(Function):
 #            print("{} is not differentiable".format(type(self.function).__name__))                         
 
     def proximal(self, x, tau, out=None):
-        '''This returns the proximal operator for the function at x, tau
-        '''
+        
+        r"""Returns the proximal operator of the scaled function.
+        
+        .. math:: \mathrm{prox}_{\tau G}(x) = \mathrm{prox}_{(\tau\alpha) F}(x)
+        
+        """        
 #        if out is None:
         return self.function.proximal(x, tau*self.scalar, out=out)     
 #        else:

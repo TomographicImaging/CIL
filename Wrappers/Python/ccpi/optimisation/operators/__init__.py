@@ -26,7 +26,7 @@ from .SparseFiniteDiff import SparseFiniteDiff
 from .ShrinkageOperator import ShrinkageOperator
 
 from .FiniteDifferenceOperator import FiniteDiff
-from .GradientOperator import Gradient
+from .GradientOperator import Gradient, GradientOperator
 from .SymmetrizedGradientOperator import SymmetrizedGradient
 from .IdentityOperator import Identity
 from .ZeroOperator import ZeroOperator

@@ -27,6 +27,10 @@ from ccpi.optimisation.operators import FiniteDiff, SparseFiniteDiff
 
 #%%
 
+NEUMANN = 'Neumann'
+PERIODIC = 'periodic'
+
+
 class Gradient(LinearOperator):
     
     
@@ -189,6 +193,129 @@ class Gradient(LinearOperator):
             res.append(spMat.sum_abs_col())
         return BlockDataContainer(*res)
    
+import ctypes, platform
+
+# check for the extension
+if platform.system() == 'Linux':
+    dll = 'libcilacc.so'
+elif platform.system() == 'Windows':
+    dll = 'cilacc.dll'
+elif platform.system() == 'Darwin':
+    dll = 'libcilacc.dylib'
+else:
+    raise ValueError('Not supported platform, ', platform.system())
+
+#print ("dll location", dll)
+cilacc = ctypes.cdll.LoadLibrary(dll)
+
+#FD = ctypes.CDLL(dll)
+
+c_float_p = ctypes.POINTER(ctypes.c_float)
+
+cilacc.openMPtest.restypes = ctypes.c_int32
+
+cilacc.fdiff4D.argtypes = [ctypes.POINTER(ctypes.c_float),
+                       ctypes.POINTER(ctypes.c_float),
+                       ctypes.POINTER(ctypes.c_float),
+                       ctypes.POINTER(ctypes.c_float),
+                       ctypes.POINTER(ctypes.c_float),
+                       ctypes.c_long,
+                       ctypes.c_long,
+                       ctypes.c_long,
+                       ctypes.c_long,
+                       ctypes.c_int32,
+                       ctypes.c_int32]
+
+cilacc.fdiff3D.argtypes = [ctypes.POINTER(ctypes.c_float),
+                       ctypes.POINTER(ctypes.c_float),
+                       ctypes.POINTER(ctypes.c_float),
+                       ctypes.POINTER(ctypes.c_float),
+                       ctypes.c_long,
+                       ctypes.c_long,
+                       ctypes.c_long,
+                       ctypes.c_int32,
+                       ctypes.c_int32]
+
+cilacc.fdiff2D.argtypes = [ctypes.POINTER(ctypes.c_float),
+                       ctypes.POINTER(ctypes.c_float),
+                       ctypes.POINTER(ctypes.c_float),
+                       ctypes.c_long,
+                       ctypes.c_long,
+                       ctypes.c_int32,
+                       ctypes.c_int32]
+
+
+class GradientOperator(LinearOperator):
+    
+    '''Finite Difference Operator:
+            
+            Computes first-order forward/backward differences 
+                     on 2D, 3D, 4D ImageData
+                     under Neumann/Periodic boundary conditions'''
+
+    def __init__(self, gm_domain, gm_range=None, bnd_cond = NEUMANN):
+
+        super(GradientOperator, self).__init__() 
+
+        self.gm_domain = gm_domain
+        self.gm_range = gm_range
+        
+        if bnd_cond == NEUMANN:
+            self.bnd_cond = 0
+        elif bnd_cond == PERIODIC:
+            self.bnd_cond = 1
+        
+        # Domain Geometry = Range Geometry if not stated
+        if self.gm_range is None:
+            self.gm_range = BlockGeometry(*[gm_domain for _ in range(len(gm_domain.shape))])
+        
+
+        if len(gm_domain.shape) == 4:
+            self.fd = cilacc.fdiff4D
+        elif len(gm_domain.shape) == 3:
+            self.fd = cilacc.fdiff3D
+        elif len(gm_domain.shape) == 2:
+            self.fd = cilacc.fdiff2D
+        else:
+            raise ValueError('Number of dimensions not supported, expected 2, 3 or 4, got {}'.format(len(gm_domain.shape)))
+        
+                        
+            
+    def datacontainer_as_c_pointer(x):
+        ndx = x.as_array()
+        return ndx, ndx.ctypes.data_as(c_float_p)
+    def direct(self, x, out=None):
+        ndx , x_p = GradientOperator.datacontainer_as_c_pointer(x)
+        
+        if out is None:
+            out = self.gm_range.allocate(None)
+            ndx , x_p = GradientOperator.datacontainer_as_c_pointer(x)
+            self.fd(x_p, 
+                    *[GradientOperator.datacontainer_as_c_pointer(out.get_item(i))[1] for i in range(self.gm_range.shape[0])], 
+                    *[el for el in x.shape], self.bnd_cond, 1)
+            return out
+        else:
+            self.fd(x_p, 
+                    *[GradientOperator.datacontainer_as_c_pointer(out.get_item(i))[1] for i in range(self.gm_range.shape[0])], 
+                    *[el for el in x.shape], self.bnd_cond, 1)
+    def adjoint(self, x, out=None):
+        if out is None:
+            out = self.gm_domain.allocate(None)
+            ndout , out_p = GradientOperator.datacontainer_as_c_pointer(out)
+            self.fd(out_p, 
+                    *[GradientOperator.datacontainer_as_c_pointer(x.get_item(i))[1] for i in range(self.gm_range.shape[0])], 
+                    *[el for el in out.shape], self.bnd_cond, 0)
+            return out
+        else:
+            ndout , out_p = GradientOperator.datacontainer_as_c_pointer(out)
+            
+            self.fd(out_p, 
+                    *[GradientOperator.datacontainer_as_c_pointer(x.get_item(i))[1] for i in range(self.gm_range.shape[0])], 
+                    *[el for el in out.shape], self.bnd_cond, 0)
+
+
+            
+
        
 if __name__ == '__main__':
     

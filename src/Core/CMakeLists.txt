@@ -86,7 +86,8 @@ message("CMAKE_STATIC_LINKER_FLAGS ${CMAKE_STATIC_LINKER_FLAGS}")
 
 
 
-add_library(cilacc SHARED ${CMAKE_CURRENT_SOURCE_DIR}/axpby.c)
+add_library(cilacc SHARED ${CMAKE_CURRENT_SOURCE_DIR}/axpby.c
+                          ${CMAKE_CURRENT_SOURCE_DIR}/FiniteDifferenceLibrary.c )
 
 target_link_libraries(cilacc ${OpenMP_C_LIB_NAMES} )
 include_directories(cilacc PUBLIC 

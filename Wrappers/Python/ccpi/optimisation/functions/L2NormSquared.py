@@ -27,14 +27,14 @@ from ccpi.optimisation.functions import Function
 
 class L2NormSquared(Function):
     
-    r'''L2NormSquared function: :math `F(x) = \| x \|^{2}_{2} = \underset{i}{\sum}x_{i}^{2}
+    r"""L2NormSquared function: :math:`F(x) = \| x\|^{2}_{2} = \underset{i}{\sum}x_{i}^{2}`
           
-        We consider the following cases:
+        Consider the following cases:
                 
-                a) .. math:: f(x) = \|x\|^{2}_{2} 
-                b) .. math:: f(x) = \|\|x - b\|\|^{2}_{2}
+                a) .. math:: F(x) = \|x\|^{2}_{2} 
+                b) .. math:: F(x) = \|x - b\|^{2}_{2}
                                 
-    '''    
+    """    
     
     def __init__(self, **kwargs):
                                 
@@ -47,6 +47,11 @@ class L2NormSquared(Function):
     def __call__(self, x):
         
         r"""Returns the value of the L2NormSquared function at x.
+        
+        Consider the following cases:
+                
+                a) .. math:: F(x) = \|x\|^{2}_{2} 
+                b) .. math:: F(x) = \|x - b\|^{2}_{2}
                 
         """          
             
@@ -62,6 +67,11 @@ class L2NormSquared(Function):
     def gradient(self, x, out=None):        
         
         r"""Returns the value of the gradient of the L2NormSquared function at x.
+        
+        Consider the following cases:
+                
+                a) .. math:: F'(x) = 2x
+                b) .. math:: F'(x) = 2(x-b)
                 
         """
                 
@@ -83,6 +93,11 @@ class L2NormSquared(Function):
     def convex_conjugate(self, x):
         
         r"""Returns the value of the convex conjugate of the L2NormSquared function at x.
+        
+        Consider the following cases:
+                
+                a) .. math:: F^{*}(x^{*}) = \frac{1}{4}\|x^{*}\|^{2}_{2} 
+                b) .. math:: F^{*}(x^{*}) = \frac{1}{4}\|x^{*}\|^{2}_{2} + <x^{*}, b>
                 
         """                
         tmp = 0
@@ -96,7 +111,13 @@ class L2NormSquared(Function):
     def proximal(self, x, tau, out = None):
         
         r"""Returns the value of the proximal operator of the L2NormSquared function at x.
+        
+        
+        Consider the following cases:
                 
+                a) .. math:: \mathrm{prox}_{\tau F}(x) = \frac{x}{1+2\tau}
+                b) .. math:: \mathrm{prox}_{\tau F}(x) = \frac{x-b}{1+2\tau} + b      
+                        
         """            
 
         if out is None:

@@ -24,17 +24,18 @@ from __future__ import unicode_literals
 
 from ccpi.optimisation.functions import Function       
 from ccpi.optimisation.operators import ShrinkageOperator 
+import numpy as np
  
 
 class L1Norm(Function):
     
-    r'''L1Norm function: 
+    r"""L2NormSquared function: :math:`F(x) = \| x\|_{1} = \underset{i}{\sum}|x_{i}|`
             
-            Cases considered (with/without data):            
-                a) .. math:: f(x) = ||x||_{1}
-                b) .. math:: f(x) = ||x - b||_{1}
+        Consider the following cases:           
+            a) .. math:: F(x) = ||x||_{1}
+            b) .. math:: F(x) = ||x - b||_{1}
                                 
-    '''   
+    """   
            
     def __init__(self, **kwargs):
         
@@ -44,7 +45,13 @@ class L1Norm(Function):
         
     def __call__(self, x):
         
-        '''Evaluates L1Norm at x'''
+        r"""Returns the value of the L1Norm function at x.
+        
+        Consider the following cases:           
+            a) .. math:: F(x) = ||x||_{1}
+            b) .. math:: F(x) = ||x - b||_{1}        
+        
+        """
         
         y = x
         if self.b is not None: 
@@ -53,21 +60,47 @@ class L1Norm(Function):
           
     def convex_conjugate(self,x):
         
-        '''Convex conjugate of L1Norm at x'''
+        r"""Returns the value of the convex conjugate of the L1Norm function at x.
+        Here, we need to use the convex conjugate of L1Norm, which is the Indicator of the unit 
+        :math:`L^{\infty}` norm
         
-        y = 0        
-        if self.b is not None:
-            y =  0 + self.b.dot(x)
-        return y  
+        Consider the following cases:
+                
+                a) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*}) 
+                b) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*}) + <x^{*},b>      
+        
     
+        .. math:: \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*}) 
+            = \begin{cases} 
+            0, \mbox{if } \|x^{*}\|_{\infty}\leq1\\
+            \infty, \mbox{otherwise}
+            \end{cases}
+    
+        """        
+        tmp = (np.abs(x.as_array()).max() - 1)
+        if tmp<=1e-5:            
+            if self.b is not None:
+                return self.b.dot(x)
+            else:
+                return 0.
+        return np.inf        
+                    
     def proximal(self, x, tau, out=None):
         
-        r'''Proximal operator of L1Norm at x
-           
-           ..math::     prox_{\tau * f}(x)
-                
-        ''' 
+        r"""Returns the value of the proximal operator of the L1Norm function at x.
         
+        
+        Consider the following cases:
+                
+                a) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x)
+                b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) + b   
+    
+        where,
+        
+        .. math :: \mathrm{ShinkOperator}(x) = sgn(x) * \max\{ |x| - tau, 0 \}
+                            
+        """  
+            
         if out is None:
             if self.b is not None:
                 return self.b + self.shinkage_operator(x - self.b, tau)

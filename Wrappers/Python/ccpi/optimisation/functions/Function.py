@@ -32,14 +32,11 @@ from ccpi.optimisation.operators import ZeroOperator, Identity
 
 class Function(object):
     
-    """ Abstract class representing a function
+    """ Abstract class representing a function 
     
-            Parameters:
-    
-                L: Lipschitz constant of the gradient of the function F(x), when it is differentiable.
-            
-                domain: The domain of the function.
-            
+        :param L: Lipschitz constant of the gradient of the function F(x), when it is differentiable.
+        :param domain: The domain of the function.
+
     """
     
     
@@ -50,9 +47,7 @@ class Function(object):
 
     def __call__(self,x):
         
-        r"""Returns the value of the function F at x
-        
-        .. math:: F(x)
+        r"""Returns the value of the function F at x: :math:`F(x)`
         
         """        
         
@@ -71,13 +66,13 @@ class Function(object):
         
         r"""Returns the proximal operator of function :math:`\tau * F` at x
         
-        .. math:: \mathrm{prox}_{\tau F}(x) = \underset{\mathrm{argmin}}{z} \frac{1}{2}\|z - x\|^{2} + \tau F(z)
+        .. math:: \mathrm{prox}_{\tau F}(x) = \underset{z}{\mathrm{argmin}} \frac{1}{2}\|z - x\|^{2} + \tau F(z)
                 
         """
         raise NotImplementedError
 
     def convex_conjugate(self, x):
-        r""" Returns the convex conjugate of function :math:`F` at :math:`x^{*}`
+        r""" Returns the convex conjugate of function :math:`F` at :math:`x^{*}`,
         
         .. math:: F^{*}(x^{*}) = \underset{x^{*}}{\sup} <x^{*}, x> - F(x)
                 
@@ -86,15 +81,11 @@ class Function(object):
 
     def proximal_conjugate(self, x, tau, out = None):
         
-        r"""Returns the proximal operator of the convex conjugate of function :math `\tau F` at :math `x^{*}`
+        r"""Returns the proximal operator of the convex conjugate of function :math:`\tau F` at :math:`x^{*}`
         
-        .. math:: \mathrm{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\mathrm{argmin}} \frac{1}{2}\|z - x\|^{2} + \tau F^{*}(z^{*})
+        .. math:: \mathrm{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\mathrm{argmin}} \frac{1}{2}\|z^{*} - x^{*}\|^{2} + \tau F^{*}(z^{*})
         
-        Due to Moreau’s identity 
-        
-        .. math:: \mathrm{prox}_{\tau F^{*}}(x) = x - \tau\mathrm{prox}_{\tau^{-1} F}(\tau^{-1}x)
-        
-        we have an analytic formula to compute the proximal operator of the convex conjugate :math `F^{*}`
+        Due to Moreau’s identity, we have an analytic formula to compute the proximal operator of the convex conjugate :math:`F^{*}`
         
         .. math:: \mathrm{prox}_{\tau F^{*}}(x) = x - \tau\mathrm{prox}_{\tau^{-1} F}(\tau^{-1}x)
                 
@@ -107,19 +98,21 @@ class Function(object):
             out.add(x, out = out) 
 
     def grad(self, x):
-        '''Alias of gradient(x,None)'''
+        """Alias of gradient(x,None)"""
         warnings.warn('''This method will disappear in following 
         versions of the CIL. Use gradient instead''', DeprecationWarning)
         return self.gradient(x, out=None)
 
     def prox(self, x, tau):
-        '''Alias of proximal(x, tau, None)'''
+        """ Alias of proximal(x, tau, None)"""
         warnings.warn('''This method will disappear in following 
         versions of the CIL. Use proximal instead''', DeprecationWarning)
         return self.proximal(x, tau, out=None)
     
     def domain(self):
-        ''' This returns the domain of the function. '''
+        """  Returns the domain of the function :math:`F`. 
+        Although, it is mathematically correct to setup a function based on the domain, 
+        we do not use this information at the moment. """
         return self.domain
     
     # Algebra for Function Class
@@ -131,7 +124,12 @@ class Function(object):
     
     def __add__(self, other):
         
-        ''' This returns a sum of functions'''
+        """ Returns the sum of the functions.
+        
+            Cases: a) the sum of two functions :math:`(F_{1}+F_{2})(x) = F_{1}(x) + F_{2}(x)`
+                   b) the sum of a function with a scalar :math:`(F_{1}+scalar)(x) = F_{1}(x) + scalar`
+
+        """
         
         if isinstance(other, Function):
             return SumFunction(self, other)
@@ -142,32 +140,35 @@ class Function(object):
             
     def __radd__(self, other):
         
+        """ Making addition commutative. """
         return self + other 
                           
     def __sub__(self, other):
-        ''' This returns a subtract of functions '''
+        """ Returns the subtraction of the functions."""
         return self + (-1) * other    
 
     def __rmul__(self, scalar):
-        '''Defines the multiplication by a scalar on the left returns a ScaledFunction'''                
+        """Returns a function multiplied by a scalar."""               
         return ScaledFunction(self, scalar)
     
     def __mul__(self, scalar):
-        '''Defines the multiplication by a scalar on the left returns a ScaledFunction'''                
+        """ Returns a function multiplied by a scalar from the left."""                    
         return scalar * ScaledFunction(self, 1)   
     
     def centered_at(self, center):
-        '''This returns the proximal operator for the convex conjugate of the function at x, tau'''
+        """ Returns a translated function, namely if we have a function :math:`F(x)` the center is at the origin. 
+        
+            TranslateFunction is :math:`F(x - b)` and the center is at point b."""
         return TranslateFunction(self, center)  
     
 class SumFunction(Function):
     
-    '''SumFunction
-
-    A class to represent the sum of two Functions
-   
-       
-    '''    
+    """ SumFunction represents the sum of two functions
+    
+    .. math:: (F_{1} + F_{2})(x)  = F_{1}(x) + F_{2}(x)
+    
+    """
+    
     def __init__(self, function1, function2 ):
                 
         super(SumFunction, self).__init__()        
@@ -184,12 +185,21 @@ class SumFunction(Function):
         self.function2 = function2               
             
     def __call__(self,x):
-        '''Evaluates the function at x '''
+        r"""Returns the value of the sum of functions :math:`F_{1}` and :math:`F_{2}` at x
+        
+        .. math:: (F_{1} + F_{2})(x) = F_{1}(x) + F_{2}(x)
+        
+        """  
         return self.function1(x) + self.function2(x)
     
     def gradient(self, x, out=None):
         
-        '''Returns the gradient of the sum of functions at x, if both of them are differentiable'''
+        r"""Returns the value of the sum of the gradient of functions :math:`F_{1}` and :math:`F_{2}` at x, 
+        if both of them are differentiable
+        
+        .. math:: (F'_{1} + F'_{2})(x)  = F'_{1}(x) + F'_{2}(x)
+        
+        """
         
 #        try: 
         if out is None:            
@@ -208,9 +218,9 @@ class SumFunction(Function):
         
 class ScaledFunction(Function):
     
-    '''ScaledFunction
+    """ScaledFunction
 
-    A class to represent the scalar multiplication of an Function with a scalar.
+    A class to represent the scalar multiplication of an Function with a scalar. 
     It holds a function and a scalar. Basically it returns the multiplication
     of the product of the function __call__, convex_conjugate and gradient with the scalar.
     For the rest it behaves like the function it holds.
@@ -219,9 +229,9 @@ class ScaledFunction(Function):
        function (Function): a Function or BlockOperator
        scalar (Number): a scalar multiplier
     Example:
-       The scaled operator behaves like the following:
+       The scaled operator behaves like the following: ewfwefwfefw
        
-    '''
+    """
     def __init__(self, function, scalar):
         
         super(ScaledFunction, self).__init__() 
@@ -276,21 +286,20 @@ class ScaledFunction(Function):
         return self.function
 
 class SumFunctionScalar(SumFunction):
-    
-    '''SumFunctionScalar
-
-    A class to represent the sum a Function and a scalar
           
+    """ SumFunctionScalar represents the sum a function with a scalar. 
     
-    This is child of SumFunction where the second function is a ConstantFunction
+        .. math:: (F + scalar)(x)  = F(x) + scalar
     
-    Although SumFunction has no general expressions for i) convex_conjugate
-                                                        ii) proximal
-                                                        iii) proximal_conjugate
+        Although SumFunction has no general expressions for 
+        
+        i) convex_conjugate
+        ii) proximal
+        iii) proximal_conjugate
             
-    if the second argument is a ConstantFunction then we can derive the above analytically
+        if the second argument is a ConstantFunction then we can derive the above analytically.
     
-    '''    
+    """    
     
     def __init__(self, function, constant):
         
@@ -300,26 +309,31 @@ class SumFunctionScalar(SumFunction):
         
     def convex_conjugate(self,x):
         
+        r""" Returns the convex conjugate of a :math:`(F+scalar)`
+                
+        .. math:: (F+scalar)^{*}(x^{*}) = F^{*}(x^{*}) - scalar
+                        
+        """        
         return self.function.convex_conjugate(x) - self.constant
     
     def proximal(self, x, tau, out=None):
         
+        """ Returns the proximal operator of :math:`F+scalar`
+
+        .. math:: \mathrm{prox}_{\tau (F+scalar)}(x) = \mathrm{prox}_{\tau F}
+                        
+        """                
         return self.function.proximal(x, tau, out=out)        
-    
-#    def proximal_conjugate(self, x, tau, out = None):
-#        
-#        self.function.proximal_conjugate(x, tau, out = out) 
-        
+            
     def function(self):       
        return self.function    
-    
-                        
+
 class ConstantFunction(Function):
     
             
-    r'''ConstantFunction: .. math:: f(x) = constant, constant\in\mathbb{R}         
+    r""" ConstantFunction: :math:`F(x) = constant, constant\in\mathbb{R}`         
         
-    '''
+    """
     
     def __init__(self, constant = 0):
         
@@ -332,57 +346,61 @@ class ConstantFunction(Function):
               
     def __call__(self,x):
         
-        '''Evaluates ConstantFunction at x'''
+        """ Returns the value of the function, :math:`F(x) = constant`"""
         return self.constant
         
     def gradient(self, x, out=None):
         
-        '''Evaluates gradient of ConstantFunction at x: Returns a number'''        
+        """ Returns the value of the gradient of the function, :math:`F'(x)=0`"""       
         
         return ZeroOperator(x.geometry).direct(x, out=out)
     
     def convex_conjugate(self, x):
                         
-        ''' This is the Indicator of singleton {constant}. It is either -constnat if x^* = 0
-        or infinity.
-        However, x^{*} = 0 only in the limit of iterations, so in fact this can be infinity.
-        We do not want to have inf values in the convex conjugate, so we have to peanalise this value 
-        along the iterations
+        """ The convex conjugate of constant function :math:`F(x) = constant\in\mathbb{R}` is
         
-        '''       
+        .. math:: 
+            F(x^{*}) 
+            =
+            \begin{cases}
+                -constant, & if x^{*} = constant\\
+                \infty, & \mbox{otherwise}
+            \end{cases}
+                                                          
+                    
+        However, :math:`x^{*} = constant` only in the limit of iterations, so in fact this can be infinity.
+        We do not want to have inf values in the convex conjugate, so we have to penalise this value accordingly.
+        The following penalisation is useful in the PDHG algorithm, when we compute primal & dual objectives
+        for convergence purposes.
         
+        .. math:: F^{*}(x^{*}) = \sum \max\{x^{*}-b, 0\}
+        
+        """               
         return (x-self.constant).maximum(0).sum()
-#        if x.norm()<1e-6:            
-#            return -self.constant
-#        else:
-#            return np.inf
                 
     def proximal(self, x, tau, out=None):
         
-        ''' This returns the proximal of a constnat function which is the same as x'''
+        """Returns the proximal operator of the constant function, which is the same element, i.e.,
+        
+        .. math:: \mathrm{prox}_{\tau F}(x) = x 
+        
+        """
         
         return Identity(x.geometry).direct(x, out=out)
 
-                       
-    def proximal_conjugate(self, x, tau, out = None):
-        
-        return ZeroOperator(x.geometry).direct(x, out=out)
-
-
 class ZeroFunction(ConstantFunction):
     
-    r'''ZeroFunction: .. math:: f(x) = 0,         
-        
-    '''
+    """ ZeroFunction represents the zero function, :math:`F(x) = 0`        
+    """
     
     def __init__(self):
         super(ZeroFunction, self).__init__(constant = 0.) 
         
 class TranslateFunction(Function):
     
-    r'''TranslateFunction: Let Function f(x), here we compute f(x - center)
-                
-    '''
+    r"""TranslateFunction: Let function :math:`F(x)`, we consider :math:`F( x - b)`
+                                
+    """
     
     def __init__(self, function, center):
         
@@ -409,7 +427,7 @@ class TranslateFunction(Function):
             out.subtract(self.center, out = out)
             self.function.gradient(out, out = out)           
     
-    def proximal(self, x, tau, out=None):
+    def proximal(self, x, tau, out = None):
         
         if out is None:
             return self.function.proximal(x - self.center, tau) + self.center
@@ -421,58 +439,27 @@ class TranslateFunction(Function):
     def convex_conjugate(self, x):
         
         return self.function.convex_conjugate(x) + self.center.dot(x)
-    
-#    def proximal_conjugate(self, x, tau, out=None):
-#        
-#        if out is None:
-#            return x - tau * self.function.proximal(x/tau, 1/tau)
-#        else:            
-#            self.function.proximal(x/tau, 1/tau, out = out)
-#            out*=-tau
-#            out.add(x)       
-        
+                 
     def function(self):       
        return self.function             
-    
 
-#if __name__ == '__main__':
+#### Do we want it????
+#class IndicatorSingleton(Function):
 #    
-#
-#    from ccpi.optimisation.functions import L1Norm, ScaledFunction, \
-#                                            LeastSquares, L2NormSquared, \
-#                                            KullbackLeibler, FunctionOperatorComposition, ZeroFunction, ConstantFunction, TranslateFunction
-#    from ccpi.optimisation.operators import Identity                                        
-#    from ccpi.framework import ImageGeometry, BlockGeometry
+#    """ Indicator funtion for the singleton C = {0}
+#        
+#    """
 #    
-#    import unittest
-#    import numpy
-#    from numbers import Number
-#
-#    ig = ImageGeometry(4,4)
-#    tmp = ig.allocate('random_int')
-#    b = ig.allocate('random_int')
-#    scalar = 0.4
-#               
-#    f = L2NormSquared().centered_at(b) * scalar
+#    def __init__(self, constant = 0):
+#        
+#        super(IndicatorSingleton, self).__init__()
+#        
+#    def __call__(self):
+#        pass
+#                
+#    def convex_conjugate(self):
+#        pass
 #    
-#    res1 = f(tmp)
-#    
-#    res2 = scalar * (tmp-b).squared_norm()
-#    
-##    f = L2NormSquared()
-#    print(type(f).__name__)
-#    
-#    print(f.function)
-#    
-#    
-#    f = L2NormSquared().centered_at(b) 
-#    print(f(tmp))
-#    
-#    Id = Identity(ig)
-#    f = FunctionOperatorComposition(L2NormSquared().centered_at(b), Id)
-#    print(f(tmp))
-#    
-#    
-#    
-#    
-#         
+#    def proximal_conjugate(self):
+#        pass
+    

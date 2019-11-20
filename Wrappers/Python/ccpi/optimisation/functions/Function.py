@@ -412,8 +412,19 @@ class ZeroFunction(ConstantFunction):
         
 class TranslateFunction(Function):
     
-    r"""TranslateFunction: Let function :math:`F(x)`, we consider :math:`F( x - b)`
-                                
+    r""" TranslateFunction represents the translation of function F with respect to the center b.
+    
+    Let a function F and consider :math:`G(x) = F(x - center)`. 
+    
+    Function F is centered at 0, whereas G is centered at point b.
+    
+    If :math:`G(x) = F(x - b)` then:
+    
+    1. :math:`G(x) = F(x - b)` ( __call__ method )
+    2. :math:`G'(x) = F'(x - b)` ( gradient method ) 
+    3. :math:`G^{*}(x^{*}) = F^{*}(x^{*}) + <x^{*}, b >` ( convex_conjugate method )   
+    4. :math:`\mathrm{prox}_{\tau G}(x) = \mathrm{prox}_{\tau F}(x - b)  + b` ( proximal method ) 
+               
     """
     
     def __init__(self, function, center):
@@ -422,17 +433,24 @@ class TranslateFunction(Function):
                         
         self.function = function
         self.center = center
-        
-        '''
-            slope should be DataContainer
-        
-        '''
-        
+                
     def __call__(self, x):
+        
+        r"""Returns the value of the translated function.
+        
+        .. math:: G(x) = F(x - b)
+        
+        """        
         
         return self.function(x - self.center)
     
     def gradient(self, x, out = None):
+        
+        r"""Returns the gradient of the translated function.
+        
+        .. math:: G'(x) =  F'(x - b)
+        
+        """        
         
         if out is None:
             return self.function.gradient(Identity(x.geometry).direct(x) - self.center)
@@ -443,6 +461,12 @@ class TranslateFunction(Function):
     
     def proximal(self, x, tau, out = None):
         
+        r"""Returns the proximal operator of the translated function.
+        
+        .. math:: \mathrm{prox}_{\tau G}(x) = \mathrm{prox}_{\tau F}(x-b) + b
+        
+        """        
+        
         if out is None:
             return self.function.proximal(x - self.center, tau) + self.center
         else:                    
@@ -451,6 +475,12 @@ class TranslateFunction(Function):
             out.add(self.center, out = out)
                     
     def convex_conjugate(self, x):
+        
+        r"""Returns the convex conjugate of the translated function.
+        
+        .. math:: G^{*}(x^{*}) = F^{*}(x^{*}) + <x^{*}, b >
+        
+        """        
         
         return self.function.convex_conjugate(x) + self.center.dot(x)
                  

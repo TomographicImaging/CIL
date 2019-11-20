@@ -97,7 +97,7 @@ class L1Norm(Function):
     
         where,
         
-        .. math :: \mathrm{ShinkOperator}(x) = sgn(x) * \max\{ |x| - tau, 0 \}
+        .. math :: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) = sgn(x) * \max\{ |x| - \tau, 0 \}
                             
         """  
             

@@ -151,9 +151,21 @@ e.g. :code:`f(x)` for a :code:`Function f` and input point :code:`x`.
 .. autoclass:: ccpi.optimisation.functions.ScaledFunction
    :members:
    :special-members:
+.. autoclass:: ccpi.optimisation.functions.ConstantFunction
+   :members:
+   :special-members:   
+.. autoclass:: ccpi.optimisation.functions.SumFunctionScalar
+   :members:
+   :special-members:   
+.. autoclass:: ccpi.optimisation.functions.SumFunction
+   :members:
+   :special-members:   
 .. autoclass:: ccpi.optimisation.functions.ZeroFunction
    :members:
    :special-members:
+.. autoclass:: ccpi.optimisation.functions.TranslateFunction
+   :members:
+   :special-members:   
 
 
 :ref:`Return Home <mastertoc>`

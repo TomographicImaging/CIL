@@ -11,7 +11,6 @@ Welcome to CCPi-Framework's documentation!
    :caption: Contents:
    :name: mastertoc
 
-
    framework
    optimisation
    io

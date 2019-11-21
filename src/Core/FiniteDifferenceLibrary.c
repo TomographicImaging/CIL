@@ -439,17 +439,16 @@ int fdiff_adjoint_neumann(float *outimagefull, const float *inimageXfull, const 
 			if (z_dim)
 			{
 #pragma omp for
-				for (ind = nx * ny; ind < nx * ny * nz; ind++)
-				{
-					tempZ[ind] = -inimageZ[ind] + inimageZ[ind - nx * ny];
-				}
-#pragma omp for
 				for (ind = 0; ind < ny * nx; ind++)
 				{
 					tempZ[ind] = -inimageZ[ind];
 					tempZ[nx * ny * (nz - 1) + ind] = inimageZ[nx * ny * (nz - 2) + ind];
 				}
-
+#pragma omp for
+				for (ind = nx * ny; ind < nx * ny * nz; ind++)
+				{
+					tempZ[ind] = -inimageZ[ind] + inimageZ[ind - nx * ny];
+				}
 #pragma omp for
 				for (ind = 0; ind < volume; ind++)
 				{

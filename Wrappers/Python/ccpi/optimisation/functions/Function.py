@@ -371,26 +371,26 @@ class ConstantFunction(Function):
     
     def convex_conjugate(self, x):
                         
-        """ The convex conjugate of constant function :math:`F(x) = constant\in\mathbb{R}` is
+        r""" The convex conjugate of constant function :math:`F(x) = c\in\mathbb{R}` is
         
         .. math:: 
             F(x^{*}) 
             =
             \begin{cases}
-                -constant, & if x^{*} = constant\\
+                -c, & if x^{*} = 0\\
                 \infty, & \mbox{otherwise}
             \end{cases}
                                                           
                     
-        However, :math:`x^{*} = constant` only in the limit of iterations, so in fact this can be infinity.
+        However, :math:`x^{*} = 0` only in the limit of iterations, so in fact this can be infinity.
         We do not want to have inf values in the convex conjugate, so we have to penalise this value accordingly.
         The following penalisation is useful in the PDHG algorithm, when we compute primal & dual objectives
         for convergence purposes.
         
-        .. math:: F^{*}(x^{*}) = \sum \max\{x^{*}-b, 0\}
+        .. math:: F^{*}(x^{*}) = \sum \max\{x^{*}, 0\}
         
         """               
-        return (x-self.constant).maximum(0).sum()
+        return x.maximum(0).sum()
                 
     def proximal(self, x, tau, out=None):
         
@@ -486,7 +486,9 @@ class TranslateFunction(Function):
                  
     def function(self):       
        return self.function             
-
+   
+    
+###############################################################################
 #### Do we want it????
 #class IndicatorSingleton(Function):
 #    

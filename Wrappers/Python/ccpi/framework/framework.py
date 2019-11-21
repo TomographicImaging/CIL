@@ -162,6 +162,10 @@ class ImageGeometry(object):
                             self.center_z, 
                             self.channels,
                             dimension_labels=self.dimension_labels)
+    def copy(self):
+        '''alias of clone'''
+        return self.clone()
+    
     def __str__ (self):
         repres = ""
         repres += "Number of channels: {0}\n".format(self.channels)
@@ -172,9 +176,9 @@ class ImageGeometry(object):
     def allocate(self, value=0, dimension_labels=None, **kwargs):
         '''allocates an ImageData according to the size expressed in the instance'''
         if dimension_labels is None:
-            out = ImageData(geometry=self, dimension_labels=self.dimension_labels, suppress_warning=True)
+            out = ImageData(geometry=self.copy(), dimension_labels=self.dimension_labels, suppress_warning=True)
         else:
-            out = ImageData(geometry=self, dimension_labels=dimension_labels, suppress_warning=True)
+            out = ImageData(geometry=self.copy(), dimension_labels=dimension_labels, suppress_warning=True)
         if isinstance(value, Number):
             # it's created empty, so we make it 0
             out.array.fill(value)
@@ -268,7 +272,7 @@ class AcquisitionGeometry(object):
     
         self.dimension = dimension # 2D or 3D
         if isinstance(angles, numpy.ndarray):
-            self.angles = angles
+            self.angles = angles.copy()
         else:
             raise ValueError('numpy array is expected')
         num_of_angles = len (angles)
@@ -325,6 +329,13 @@ class AcquisitionGeometry(object):
             else:
                 self.shape = tuple(order)
             self.dimension_labels = labels
+
+
+        self.number_of_subsets = kwargs.get('number_of_subsets', 1)
+        self.subset_id = kwargs.get('subset_id', 0)
+        self.generate_subset_method = kwargs.get('generate_subset_method', 'random')
+        if self.number_of_subsets > 1:
+            self.generate_subsets(self.number_of_subsets, self.generate_subset_method)
         
     def get_order_by_label(self, dimension_labels, default_dimension_labels):
         order = []
@@ -339,10 +350,23 @@ class AcquisitionGeometry(object):
 
         
     def clone(self):
-        '''returns a copy of the AcquisitionGeometry'''
-        return AcquisitionGeometry(self.geom_type,
+        '''returns a copy of the AcquisitionGeometry
+        
+        if the geometry represents a subset copy returns the geometry relative to the subset
+        '''
+        if self.number_of_subsets > 1:
+            number_of_subsets = 1
+            subset = self.subsets[self.subset_id]
+            angles = self.angles[subset]
+        else:
+            number_of_subsets = self.number_of_subsets
+            angles = self.angles[:]
+            subset = numpy.asarray(numpy.ones_like(angles), dtype=numpy.bool)
+            
+
+        ag = AcquisitionGeometry(self.geom_type,
                                    self.dimension, 
-                                   self.angles, 
+                                   angles, 
                                    self.pixel_num_h, 
                                    self.pixel_size_h, 
                                    self.pixel_num_v, 
@@ -350,7 +374,13 @@ class AcquisitionGeometry(object):
                                    self.dist_source_center, 
                                    self.dist_center_detector, 
                                    self.channels,
-                                   dimension_labels=self.dimension_labels)
+                                   dimension_labels=self.dimension_labels, 
+                                   number_of_subsets=number_of_subsets,
+                                   subset_id=0)
+        return ag
+    def copy(self):
+        '''alias of clone'''
+        return self.clone()
         
     def __str__ (self):
         repres = ""
@@ -363,12 +393,21 @@ class AcquisitionGeometry(object):
         repres += "distance center-detector: {0}\n".format(self.dist_source_center)
         repres += "number of channels: {0}\n".format(self.channels)
         return repres
+
+    def generate_subsets(self, number_of_subsets, method):
+        self.number_of_subsets = number_of_subsets
+        subsets = [AcquisitionGeometrySubsetGenerator.random_indices(
+                        self.angles, subset_id, number_of_subsets) 
+                                        for subset_id in range(number_of_subsets)]
+        self.subsets = subsets[:]
+        return subsets
+        
     def allocate(self, value=0, dimension_labels=None, **kwargs):
         '''allocates an AcquisitionData according to the size expressed in the instance'''
         if dimension_labels is None:
-            out = AcquisitionData(geometry=self, dimension_labels=self.dimension_labels, suppress_warning=True)
+            out = AcquisitionData(geometry=self.copy(), dimension_labels=self.dimension_labels, suppress_warning=True)
         else:
-            out = AcquisitionData(geometry=self, dimension_labels=dimension_labels, suppress_warning=True)
+            out = AcquisitionData(geometry=self.copy(), dimension_labels=dimension_labels, suppress_warning=True)
         if isinstance(value, Number):
             # it's created empty, so we make it 0
             out.array.fill(value)
@@ -755,10 +794,13 @@ class DataContainer(object):
                 out = pwop(self.as_array() , x2 , *args, **kwargs )
             elif issubclass(type(x2) , DataContainer):
                 out = pwop(self.as_array() , x2.as_array() , *args, **kwargs )
+            geometry = None
+            if self.geometry is not None:
+                geometry = self.geometry.copy()
             return type(self)(out,
                    deep_copy=False, 
                    dimension_labels=self.dimension_labels,
-                   geometry=self.geometry, 
+                   geometry=geometry, 
                    suppress_warning=True)
             
         
@@ -834,10 +876,13 @@ class DataContainer(object):
         out = kwargs.get('out', None)
         if out is None:
             out = pwop(self.as_array() , *args, **kwargs )
+            geometry = None
+            if self.geometry is not None:
+                geometry = self.geometry.copy()
             return type(self)(out,
                        deep_copy=False, 
                        dimension_labels=self.dimension_labels,
-                       geometry=self.geometry, 
+                       geometry=geometry, 
                        suppress_warning=True)
         elif issubclass(type(out), DataContainer):
             if self.check_dimensions(out):
@@ -1294,6 +1339,12 @@ class AcquisitionData(DataContainer):
                                     )
         return out
     
+    def as_array(self, **kwargs):
+        if self.geometry.number_of_subsets is None or self.geometry.number_of_subsets == 1:
+            return super(AcquisitionData, self).as_array(**kwargs)
+        else:
+            return super(AcquisitionData, self).as_array(**kwargs)[self.geometry.subsets[self.geometry.subset_id]]
+    
                 
             
 class DataProcessor(object):
@@ -1585,6 +1636,9 @@ class VectorGeometry(object):
     def clone(self):
         '''returns a copy of VectorGeometry'''
         return VectorGeometry(self.length)
+    def copy(self):
+        '''alias of clone'''
+        return self.clone()
 
     def allocate(self, value=0, **kwargs):
         '''allocates an VectorData according to the size expressed in the instance'''

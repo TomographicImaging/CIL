@@ -66,11 +66,7 @@ class TestAlgorithms(unittest.TestCase):
         identity = Identity(ig)
         
         norm2sq = Norm2Sq(identity, b)
-<<<<<<< HEAD
-        rate = norm2sq.L / 2.1
-=======
         rate = norm2sq.L / 3.
->>>>>>> origin/master
         
         alg = GradientDescent(x_init=x_init, 
                               objective_function=norm2sq, 
@@ -115,35 +111,6 @@ class TestAlgorithms(unittest.TestCase):
         self.assertTrue(alg.update_objective_interval==2)
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-<<<<<<< HEAD
-    def test_GradientDescentArmijo(self):
-        print ("Test GradientDescent")
-        ig = ImageGeometry(12,13,14)
-        x_init = ig.allocate()
-        # b = x_init.copy()
-        # fill with random numbers
-        # b.fill(numpy.random.random(x_init.shape))
-        b = ig.allocate('random')
-        identity = Identity(ig)
-        
-        norm2sq = Norm2Sq(identity, b)
-        rate = norm2sq.L / 2.1
-        
-        alg = GradientDescent(x_init=x_init, 
-                              objective_function=norm2sq)
-        alg.max_iteration = 20
-        alg.run(20, verbose=True)
-        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-        alg = GradientDescent(x_init=x_init, 
-                              objective_function=norm2sq, 
-                              max_iteration=20,
-                              update_objective_interval=2)
-        #alg.max_iteration = 20
-        self.assertTrue(alg.max_iteration == 20)
-        self.assertTrue(alg.update_objective_interval==2)
-        alg.run(20, verbose=True)
-        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-=======
     def test_GradientDescentArmijo2(self):
         from ccpi.optimisation.functions import Rosenbrock
         from ccpi.framework import VectorData, VectorGeometry
@@ -165,7 +132,6 @@ class TestAlgorithms(unittest.TestCase):
 
         numpy.testing.assert_array_almost_equal(alg.get_output().as_array(), [1,1], decimal = 1)
         numpy.testing.assert_array_almost_equal(alg.get_output().as_array(), [0.982744, 0.965725], decimal = 6)
->>>>>>> origin/master
 
     def test_CGLS(self):
         print ("Test CGLS")

@@ -494,6 +494,12 @@ class DataContainer(object):
         else:
             # assume it is parallel beam
             pass
+    @property
+    def shape(self):
+        return self._shape
+    @shape.setter
+    def shape(self, shape):
+        self._shape = shape
         
     def get_dimension_size(self, dimension_label):
         if dimension_label in self.dimension_labels.values():
@@ -1170,6 +1176,7 @@ class AcquisitionData(DataContainer):
                     
                 # array = numpy.zeros( shape , dtype=numpy.float32) 
                 array = numpy.empty( shape, dtype=numpy.float32)
+                self.shape = shape
                 super(AcquisitionData, self).__init__(array, deep_copy,
                                  dimension_labels, **kwargs)
         else:
@@ -1177,6 +1184,7 @@ class AcquisitionData(DataContainer):
                 shape, labels = self.get_shape_labels(self.geometry, dimension_labels)
                 if array.shape != shape:
                     raise ValueError('Shape mismatch {} {}'.format(shape, array.shape))
+                self.shape = shape
                     
             if issubclass(type(array) ,DataContainer):
                 # if the array is a DataContainer get the info from there
@@ -1188,6 +1196,7 @@ class AcquisitionData(DataContainer):
                 
                 #DataContainer.__init__(self, array.as_array(), deep_copy,
                 #                 array.dimension_labels, **kwargs)
+                self.shape = array.shape
                 super(AcquisitionData, self).__init__(array.as_array(), deep_copy,
                                  array.dimension_labels, **kwargs)
             elif issubclass(type(array) ,numpy.ndarray):
@@ -1209,7 +1218,7 @@ class AcquisitionData(DataContainer):
                     else:
                         dimension_labels = [AcquisitionGeometry.ANGLE,
                                             AcquisitionGeometry.HORIZONTAL]
-
+                self.shape = array.shape
                 super(AcquisitionData, self).__init__(array, deep_copy, 
                      dimension_labels, **kwargs)
                 
@@ -1341,10 +1350,28 @@ class AcquisitionData(DataContainer):
     
     def as_array(self, **kwargs):
         if self.geometry.number_of_subsets is None or self.geometry.number_of_subsets == 1:
-            return super(AcquisitionData, self).as_array(**kwargs)
+            return DataContainer.as_array(self, **kwargs)
         else:
-            return super(AcquisitionData, self).as_array(**kwargs)[self.geometry.subsets[self.geometry.subset_id]]
-    
+            return DataContainer.as_array(self, **kwargs)[self.geometry.subsets[self.geometry.subset_id]]
+    @property
+    def shape(self, **kwargs):
+        if self.geometry is None or self.geometry.number_of_subsets is None or self.geometry.number_of_subsets == 1:
+            return self._shape
+        else:
+            # number of angles in the subset
+            idx = self.geometry.subsets[self.geometry.subset_id].sum()
+            for i,el in enumerate(self.geometry.dimension_labels):
+                if el == 'angle':
+                    break
+            updated_shape = list(self._shape)
+            updated_shape[i] = idx
+            return tuple(updated_shape)
+            
+            
+    @shape.setter
+    def shape(self, shape):
+        self._shape = shape
+        
                 
             
 class DataProcessor(object):
@@ -1619,7 +1646,7 @@ class VectorData(DataContainer):
                 else:
                     raise ValueError('Incompatible size: expecting {} got {}'.format((self.length,), array.shape))
         deep_copy = True
-        super(VectorData, self).__init__(out, deep_copy, None)
+        super(VectorData, self).__init__(out, deep_copy, geometry=self.geometry.copy())
 
 class VectorGeometry(object):
     '''Geometry describing VectorData to contain 1D array'''
@@ -1659,6 +1686,8 @@ class VectorGeometry(object):
                     numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
                 out.fill(numpy.random.randint(max_value,size=self.shape))
+            elif value is None:
+                pass
             else:
                 raise ValueError('Value {} unknown'.format(value))
         return out

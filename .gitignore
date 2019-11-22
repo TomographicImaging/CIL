@@ -63,4 +63,7 @@ $RECYCLE.BIN/
 \#*
 .#*
 
-
+build/
+Wrappers/Python/build/
+# Visual Studio Code
+.vscode/

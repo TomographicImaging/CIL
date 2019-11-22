@@ -1349,7 +1349,7 @@ class AcquisitionData(DataContainer):
         return out
     
     def as_array(self, **kwargs):
-        if self.geometry.number_of_subsets is None or self.geometry.number_of_subsets == 1:
+        if self.geometry is None or self.geometry.number_of_subsets is None or self.geometry.number_of_subsets == 1:
             return DataContainer.as_array(self, **kwargs)
         else:
             return DataContainer.as_array(self, **kwargs)[self.geometry.subsets[self.geometry.subset_id]]

@@ -227,7 +227,7 @@ class ScaledFunction(Function):
     1. :math:`G(x) = \alpha  F(x)` ( __call__ method )
     2. :math:`G'(x) = \alpha  F'(x)` ( gradient method ) 
     3. :math:`G^{*}(x^{*}) = \alpha  F^{*}(\frac{x^{*}}{\alpha})` ( convex_conjugate method )   
-    4. :math:`\mathrm{prox}_{\tau G}(x) = \mathrm{prox}_{(\tau\alpha) F}(x) ( proximal method ) 
+    4. :math:`\mathrm{prox}_{\tau G}(x) = \mathrm{prox}_{(\tau\alpha) F}(x)` ( proximal method ) 
            
     """
     def __init__(self, function, scalar):

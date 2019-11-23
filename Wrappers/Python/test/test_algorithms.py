@@ -334,35 +334,6 @@ class TestAlgorithms(unittest.TestCase):
         # Setup and run the FISTA algorithm
         operator = Gradient(ig)
         fid = KullbackLeibler(b=noisy_data)
-
-        def KL_Prox_PosCone(x, tau, out=None):
-                
-            if out is None: 
-                tmp = 0.5 *( (x - fid.eta - tau) + ( (x + fid.eta - tau)**2 + 4*tau*fid.x   ) .sqrt() )
-                return tmp.maximum(0)
-            else:            
-                tmp =  0.5 *( (x - fid.eta - tau) + 
-                            ( (x + fid.eta - tau)**2 + 4*tau*fid.x   ) .sqrt()
-                            )
-                x.add(fid.eta, out=out)
-                out -= tau
-                out *= out
-                tmp = fid.x * (4 * tau)
-                out.add(tmp, out=out)
-                out.sqrt(out=out)
-                
-                x.subtract(fid.eta, out=tmp)
-                tmp -= tau
-                
-                out += tmp
-                
-                out *= 0.5
-                
-                # ADD the constraint here
-                out.maximum(0, out=out)
-                
-        fid.proximal = KL_Prox_PosCone
-
         reg = FunctionOperatorComposition(alpha * L2NormSquared(), operator)
 
         x_init = ig.allocate()

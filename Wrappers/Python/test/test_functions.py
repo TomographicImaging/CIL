@@ -28,6 +28,7 @@ from ccpi.optimisation.functions import Function, KullbackLeibler, L2NormSquared
 
 import unittest
 import numpy
+import scipy.special
 
                     
 class TestFunction(unittest.TestCase):
@@ -371,24 +372,62 @@ class TestFunction(unittest.TestCase):
 
     def test_KullbackLeibler(self):
         print ("test_KullbackLeibler")
-        N, M = 2,3
-        ig  = ImageGeometry(N, M)
-        data = ig.allocate(ImageGeometry.RANDOM_INT)
-        x = ig.allocate(ImageGeometry.RANDOM_INT)
-        bnoise = ig.allocate(ImageGeometry.RANDOM_INT)
         
-        out = ig.allocate()
+        M, N, K =  20, 30, 40
+        ig = ImageGeometry(N, M, K)
         
-        f = KullbackLeibler(b=data, bnoise=bnoise)
+        u1 = ig.allocate('random_int', seed = 500)    
+        g1 = ig.allocate('random_int', seed = 100)
         
-        grad = f.gradient(x)
-        f.gradient(x, out=out)
-        numpy.testing.assert_array_equal(grad.as_array(), out.as_array())
+        # with no data
+        try:
+            f = KullbackLeibler()   
+        except ValueError:
+            print('Give data b=...\n')
+            
+        print('With negative data, no background\n')   
+        try:        
+            f = KullbackLeibler(b=-1*g1)
+        except ValueError:
+            print('We have negative data\n') 
+            
+        f = KullbackLeibler(b=g1)        
+            
+        print('Check KullbackLeibler(x,x)=0\n') 
+        self.assertNumpyArrayAlmostEqual(0.0, f(g1))
+                
+        print('Check gradient .... is OK \n')
+        res_gradient = f.gradient(u1)
+        res_gradient_out = u1.geometry.allocate()
+        f.gradient(u1, out = res_gradient_out) 
+        self.assertNumpyArrayAlmostEqual(res_gradient.as_array(), \
+                                                res_gradient_out.as_array(),decimal = 4)  
         
-        prox = f.proximal(x,1.2)
-        f.proximal(x, 1.2, out=out)
-        numpy.testing.assert_array_equal(prox.as_array(), out.as_array())
+        print('Check proximal ... is OK\n')        
+        tau = 0.4
+        res_proximal = f.proximal(u1, tau)
+        res_proximal_out = u1.geometry.allocate()   
+        f.proximal(u1, tau, out = res_proximal_out)
+        self.assertNumpyArrayAlmostEqual(res_proximal.as_array(), \
+                                                res_proximal_out.as_array(), decimal =5)  
         
-        proxc = f.proximal_conjugate(x,1.2)
-        f.proximal_conjugate(x, 1.2, out=out)
-        numpy.testing.assert_array_almost_equal(proxc.as_array(), out.as_array())    
+        print('Check conjugate ... is OK\n')  
+        
+        if (1 - u1.as_array()).all():
+            print('If 1-x<=0, Convex conjugate returns 0.0')
+            
+        self.assertNumpyArrayAlmostEqual(0.0, f.convex_conjugate(u1))   
+
+
+        print('Check KullbackLeibler with background\n')      
+        eta = b1
+        
+        f1 = KullbackLeibler(b=g1, eta=b1) 
+            
+        tmp_sum = (u1 + eta).as_array()
+        ind = tmp_sum >= 0
+        tmp = scipy.special.kl_div(f1.b.as_array()[ind], tmp_sum[ind])                 
+        self.assertNumpyArrayAlmostEqual(f1(u1), numpy.sum(tmp) )          
+        
+
+            

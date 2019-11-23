@@ -7,7 +7,6 @@
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
 #   You may obtain a copy of the License at
-
 #   http://www.apache.org/licenses/LICENSE-2.0
 
 #   Unless required by applicable law or agreed to in writing, software
@@ -17,21 +16,16 @@
 #   limitations under the License.
 
 import numpy as np
-from ccpi.optimisation.functions import Function, KullbackLeibler
-from ccpi.framework import DataContainer, ImageData, ImageGeometry 
-from ccpi.optimisation.operators import  Identity
-from ccpi.optimisation.operators import BlockOperator
+
+from ccpi.framework import DataContainer, ImageData, ImageGeometry, VectorGeometry
+from ccpi.optimisation.operators import  Identity, LinearOperatorMatrix, BlockOperator
 from ccpi.framework import BlockDataContainer
 from numbers import Number
 from ccpi.optimisation.operators import Gradient
 
-from ccpi.optimisation.functions import L2NormSquared
-from ccpi.optimisation.functions import L1Norm, MixedL21Norm
+from ccpi.optimisation.functions import Function, KullbackLeibler, L2NormSquared,\
+                                         L1Norm, MixedL21Norm, LeastSquares, ZeroFunction, FunctionOperatorComposition
 
-from ccpi.optimisation.functions import LeastSquares
-from ccpi.optimisation.functions import ZeroFunction
-
-from ccpi.optimisation.functions import FunctionOperatorComposition
 import unittest
 import numpy
 
@@ -298,23 +292,48 @@ class TestFunction(unittest.TestCase):
         #                                         ((u - tau * b)/(1 + tau/(2*scalar) )).as_array(), decimal=4)    
            
     def test_Norm2sq_as_FunctionOperatorComposition(self):
-        M, N, K = 2,3,5
-        ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N, voxel_num_z = K)
-        u = ig.allocate(ImageGeometry.RANDOM_INT)
-        b = ig.allocate(ImageGeometry.RANDOM_INT) 
         
-        A = 0.5 * Identity(ig)
-        old_chisq = LeastSquares(A, b, 1.0)
-        new_chisq = FunctionOperatorComposition(L2NormSquared(b=b),A)
-
-        yold = old_chisq(u)
-        ynew = new_chisq(u)
-        self.assertEqual(yold, ynew)
-
-        yold = old_chisq.gradient(u)
-        ynew = new_chisq.gradient(u)
-        numpy.testing.assert_array_equal(yold.as_array(), ynew.as_array())
+        print('Test for FunctionOperatorComposition')         
+            
+        M, N = 50, 50
+        ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
+        b = ig.allocate('random_int')
         
+        print('Check call with Identity operator... OK\n')
+        operator = 3 * Identity(ig)
+            
+        u = ig.allocate('random_int', seed = 50)
+        
+        func1 = FunctionOperatorComposition(0.5 * L2NormSquared(b = b), operator)
+        func2 = LeastSquares(operator, b, 0.5)
+            
+        self.assertNumpyArrayAlmostEqual(func1(u), func2(u))
+        
+        
+        print('Check gradient with Identity operator... OK\n')
+        
+        tmp1 = ig.allocate()
+        tmp2 = ig.allocate()
+        res_gradient1 = func1.gradient(u)
+        res_gradient2 = func2.gradient(u)    
+        func1.gradient(u, out = tmp1)
+        func2.gradient(u, out = tmp2)
+            
+        self.assertNumpyArrayAlmostEqual(tmp1.as_array(), tmp2.as_array())
+        self.assertNumpyArrayAlmostEqual(res_gradient1.as_array(), res_gradient2.as_array())
+        
+        print('Check call with LinearOperatorMatrix... OK\n')  
+        mat = np.random.randn(M, N)
+        operator = LinearOperatorMatrix(mat)   
+        vg = VectorGeometry(N)
+        b = vg.allocate('random_int')    
+        u = vg.allocate('random_int')
+          
+        func1 = FunctionOperatorComposition(0.5 * L2NormSquared(b = b), operator)
+        func2 = LeastSquares(operator, b, 0.5)
+         
+        self.assertNumpyArrayAlmostEqual(func1(u), func2(u))         
+            
     def test_mixedL12Norm(self):
         M, N, K = 2,3,5
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
@@ -370,4 +389,4 @@ class TestFunction(unittest.TestCase):
         
         proxc = f.proximal_conjugate(x,1.2)
         f.proximal_conjugate(x, 1.2, out=out)
-        numpy.testing.assert_array_almost_equal(proxc.as_array(), out.as_array())
+        numpy.testing.assert_array_almost_equal(proxc.as_array(), out.as_array())    

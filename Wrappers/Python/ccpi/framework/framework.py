@@ -1548,6 +1548,7 @@ class VectorData(DataContainer):
                 else:
                     raise ValueError('Incompatible size: expecting {} got {}'.format((self.length,), array.shape))
         deep_copy = True
+        # need to pass the geometry, othewise None
         super(VectorData, self).__init__(out, deep_copy, None, geometry = self.geometry)
 
 class VectorGeometry(object):

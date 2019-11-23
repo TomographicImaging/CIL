@@ -145,7 +145,7 @@ e.g. :code:`f(x)` for a :code:`Function f` and input point :code:`x`.
 .. autoclass:: ccpi.optimisation.functions.MixedL21Norm
    :members:
    :special-members:
-.. autoclass:: ccpi.optimisation.functions.Norm2Sq
+.. autoclass:: ccpi.optimisation.functions.LeastSquares
    :members:
    :special-members:
 .. autoclass:: ccpi.optimisation.functions.ScaledFunction

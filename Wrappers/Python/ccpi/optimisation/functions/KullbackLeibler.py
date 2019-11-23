@@ -104,7 +104,7 @@ class KullbackLeibler(Function):
         
         .. math:: F'(b, x + \eta) = 1 - \frac{b}{x+\eta}
         
-        We require the :math:`x+\eta\geq0` otherwise we have inf values.
+        We require the :math:`x+\eta>0` otherwise we have inf values.
         
         """     
                                    
@@ -157,32 +157,32 @@ class KullbackLeibler(Function):
             out *= 0.5            
         
                             
-    def proximal_conjugate(self, x, tau, out=None):
-        
-        r'''Proximal operator of the convex conjugate of KullbackLeibler at x:
-           
-           .. math::     prox_{\tau * f^{*}}(x)
-        '''
-
-                
-        if out is None:
-            z = x + tau * self.background_term
-            return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.data).sqrt())
-        else:
-            
-            tmp = tau * self.background_term
-            tmp += x
-            tmp -= 1
-            
-            self.data.multiply(4*tau, out=out)    
-            
-            out.add((tmp)**2, out=out)
-            out.sqrt(out=out)
-            out *= -1
-            tmp += 2
-            out += tmp
-            out *= 0.5
+#    def proximal_conjugate(self, x, tau, out=None):
+#        
+#        r'''Proximal operator of the convex conjugate of KullbackLeibler at x:
+#           
+#           .. math::     prox_{\tau * f^{*}}(x)
+#        '''
 #
+#                
+#        if out is None:
+#            z = x + tau * self.background_term
+#            return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.data).sqrt())
+#        else:
+#            
+#            tmp = tau * self.background_term
+#            tmp += x
+#            tmp -= 1
+#            
+#            self.data.multiply(4*tau, out=out)    
+#            
+#            out.add((tmp)**2, out=out)
+#            out.sqrt(out=out)
+#            out *= -1
+#            tmp += 2
+#            out += tmp
+#            out *= 0.5
+##
 #    def __rmul__(self, scalar):
 #        
 #        '''Multiplication of KullbackLeibler with a scalar        
@@ -256,8 +256,7 @@ if __name__ == '__main__':
     tmp = scipy.special.kl_div(f1.b.as_array()[ind], tmp_sum[ind])                 
     numpy.testing.assert_equal(f1(u1), numpy.sum(tmp) )
     
-    
-    res_conv_conj = f1.convex_conjugate(u1)
+
     
     
         

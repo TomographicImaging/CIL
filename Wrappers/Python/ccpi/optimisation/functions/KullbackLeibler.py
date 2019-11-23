@@ -38,14 +38,27 @@ class KullbackLeibler(Function):
             v & \mbox{ if } u = 0, v \ge 0 \\
             \infty, & \mbox{otherwise}
             \end{cases}  
-       
-    For data :math:`b` that follow Poisson distribution and a background term :math:`\eta`,
-    we use the above definition, provided that :math:`v+\eta>0`.
+            
+    where we use the :math:`0\log0 := 0` convention. 
+
+    At the moment, we use build-in implemention of scipy, see
+    https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.kl_div.html
     
-    .. math:: F(b, v + \eta)
+    The Kullback-Leibler function is used as a fidelity term in minimisation problems where the
+    acquired data follow Poisson distribution. If we denote the acquired data with :math:`b`
+    then, we write
     
-    This is related to PoissonLogLikelihoodWithLinearModelForMean definition that is used in PET reconstruction
-    in the PET-MR software , see https://github.com/CCPPETMR and for more details in
+     .. math:: \underset{i}{\sum} F(b_{i}, (v + \eta)_{i})
+     
+     where, :math:`\eta` is an additional noise. 
+     
+     Example: In the case of Positron Emission Tomography reconstruction :math:`\eta` represents 
+     scatter and random events contribution during the PET acquisition. Hence, in that case the KullbackLeibler
+     fidelity measures the distance between :math:`\mathcal{A}v + \eta` and acquisition data :math:`b`, where
+     :math:`\mathcal{A}` is the projection operator.
+     
+     This is related to PoissonLogLikelihoodWithLinearModelForMean definition that is used in PET reconstruction
+     in the PET-MR software , see https://github.com/CCPPETMR and for more details in
     
     http://stir.sourceforge.net/documentation/doxy/html/classstir_1_1PoissonLogLikelihoodWithLinearModelForMean.html
                         
@@ -54,14 +67,13 @@ class KullbackLeibler(Function):
     
     def __init__(self,  **kwargs):
         
-        super(KullbackLeibler, self).__init__(L = None)  
-        
+        super(KullbackLeibler, self).__init__(L = None)          
         self.b = kwargs.get('b', None)
         
         if self.b is None:
             raise ValueError('Please define data, as b = ...')
             
-        if self.b.as_array().any()<0:
+        if (self.b.as_array() < 0).any():            
             raise ValueError('Data should be larger or equal to 0')              
          
         self.eta = kwargs.get('eta',self.b * 0.0)
@@ -71,11 +83,12 @@ class KullbackLeibler(Function):
         
 
         r"""Returns the value of the KullbackLeibler function at :math:`(b, x + \eta)`.
+        To avoid infinity values, we consider only pixels/voxels for :math:`x+\eta\geq0`.
         """
-                
+                        
         tmp_sum = (x + self.eta).as_array()
-        ind = tmp_sum > 0
-        tmp = scipy.special.kl_div(self.b.as_array()[ind], tmp_sum[ind])                
+        ind = tmp_sum >= 0
+        tmp = scipy.special.kl_div(self.b.as_array()[ind], tmp_sum[ind])             
         return numpy.sum(tmp)         
         
     def log(self, datacontainer):
@@ -91,8 +104,10 @@ class KullbackLeibler(Function):
         
         .. math:: F'(b, x + \eta) = 1 - \frac{b}{x+\eta}
         
-        """        
+        We require the :math:`x+\eta\geq0` otherwise we have inf values.
         
+        """     
+                                   
         tmp_sum_array = (x + self.eta).as_array()
         if out is None:   
             tmp_out = x.geometry.allocate() 
@@ -110,8 +125,9 @@ class KullbackLeibler(Function):
         .. math:: F^{*}(b, x + \eta) = - b \log(1-x^{*}) - <x^{*}, \eta> 
         
         """  
-        
-        xlogy = - scipy.special.xlogy(self.b.as_array(), 1 - x.as_array())         
+        tmp = 1 - x.as_array()
+        ind = tmp>0
+        xlogy = - scipy.special.xlogy(self.b.as_array()[ind], tmp[ind])  
         return numpy.sum(xlogy) - self.eta.dot(x)
             
     def proximal(self, x, tau, out=None):
@@ -124,7 +140,7 @@ class KullbackLeibler(Function):
         
         .. math:: \mathrm{prox}_{\tau F^{*}}(x) = 0.5*((z + 1) - \sqrt{(z-1)^2 + 4 * \tau b})
         
-        where :math:`z = x + \tau * \eta`
+        where :math:`z = x + \tau \eta`
                     
         """
           
@@ -141,31 +157,31 @@ class KullbackLeibler(Function):
             out *= 0.5            
         
                             
-#    def proximal_conjugate(self, x, tau, out=None):
-#        
-#        r'''Proximal operator of the convex conjugate of KullbackLeibler at x:
-#           
-#           .. math::     prox_{\tau * f^{*}}(x)
-#        '''
-#
-#                
-#        if out is None:
-#            z = x + tau * self.background_term
-#            return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.data).sqrt())
-#        else:
-#            
-#            tmp = tau * self.background_term
-#            tmp += x
-#            tmp -= 1
-#            
-#            self.data.multiply(4*tau, out=out)    
-#            
-#            out.add((tmp)**2, out=out)
-#            out.sqrt(out=out)
-#            out *= -1
-#            tmp += 2
-#            out += tmp
-#            out *= 0.5
+    def proximal_conjugate(self, x, tau, out=None):
+        
+        r'''Proximal operator of the convex conjugate of KullbackLeibler at x:
+           
+           .. math::     prox_{\tau * f^{*}}(x)
+        '''
+
+                
+        if out is None:
+            z = x + tau * self.background_term
+            return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.data).sqrt())
+        else:
+            
+            tmp = tau * self.background_term
+            tmp += x
+            tmp -= 1
+            
+            self.data.multiply(4*tau, out=out)    
+            
+            out.add((tmp)**2, out=out)
+            out.sqrt(out=out)
+            out *= -1
+            tmp += 2
+            out += tmp
+            out *= 0.5
 #
 #    def __rmul__(self, scalar):
 #        
@@ -185,9 +201,9 @@ if __name__ == '__main__':
     M, N, K =  20, 30, 40
     ig = ImageGeometry(N, M, K)
     
-    u1 = ig.allocate('random_int', seed = 5)    
-    g1 = ig.allocate('random_int', seed = 10)
-    b1 = ig.allocate('random_int', seed = 100)
+    u1 = ig.allocate('random_int', seed = 500)    
+    g1 = ig.allocate('random_int', seed = 100)
+    b1 = ig.allocate('random_int', seed = 1000)
     
     # with no data
     try:
@@ -195,128 +211,55 @@ if __name__ == '__main__':
     except ValueError:
         print('Give data b=...\n')
         
-    print('With data, no background\n')        
-    f = KullbackLeibler(b=g1)
-    
+    print('With negative data, no background\n')   
+    try:        
+        f = KullbackLeibler(b=-1*g1)
+    except ValueError:
+        print('We have negative data\n') 
+        
+    f = KullbackLeibler(b=g1)        
+        
     print('Check KullbackLeibler(x,x)=0\n') 
     numpy.testing.assert_equal(0.0, f(g1))
-    
-    print('Check gradient\n')
+            
+    print('Check gradient .... is OK \n')
     res_gradient = f.gradient(u1)
     res_gradient_out = u1.geometry.allocate()
     f.gradient(u1, out = res_gradient_out) 
     numpy.testing.assert_array_almost_equal(res_gradient.as_array(), \
                                             res_gradient_out.as_array(),decimal = 4)  
     
-    print('Check proximal\n')    
-    
+    print('Check proximal ... is OK\n')        
     tau = 0.4
     res_proximal = f.proximal(u1, tau)
     res_proximal_out = u1.geometry.allocate()   
     f.proximal(u1, tau, out = res_proximal_out)
     numpy.testing.assert_array_almost_equal(res_proximal.as_array(), \
-                                            res_proximal_out.as_array(), decimal =5)        
+                                            res_proximal_out.as_array(), decimal =5)  
     
+    print('Check conjugate ... is OK\n')  
+    res_conj = f.convex_conjugate(u1) 
     
+    if (1 - u1.as_array()).all():
+        print('If 1-x<=0, Convex conjugate returns 0.0')
+        
+    numpy.testing.assert_equal(0.0, f.convex_conjugate(u1))   
 
-               
-                
+
+    print('Check KullbackLeibler with background\n')      
+    eta = b1
+    
+    f1 = KullbackLeibler(b=g1, eta=b1) 
+        
+    tmp_sum = (u1 + eta).as_array()
+    ind = tmp_sum >= 0
+    tmp = scipy.special.kl_div(f1.b.as_array()[ind], tmp_sum[ind])                 
+    numpy.testing.assert_equal(f1(u1), numpy.sum(tmp) )
     
     
-#    
-#    res = f(g1)     
-#    numpy.testing.assert_equal(0.0, f(g1)) 
-#    
-##    eta = b1
-##    eta.as_array()[0,0] = -10000
-##    eta.as_array()[0,1] = - u1.as_array()[0,1]    
-#    
-#    res_gradient = f.gradient(u1)
-#    
-#    res_gradient_out = u1.geometry.allocate()
-#    f.gradient(u1, out = res_gradient_out)
-#    
-#    numpy.testing.assert_array_almost_equal(res_gradient.as_array(), \
-#                                            res_gradient_out.as_array(),decimal = 4)  
-#
-#    tau = 0.4
-#    res_proximal = f.proximal(u1, tau)
-#    res_proximal_out = u1.geometry.allocate()   
-#    f.proximal(u1, tau, out = res_proximal_out)
-#    numpy.testing.assert_array_almost_equal(res_proximal.as_array(), \
-#                                            res_proximal_out.as_array(), decimal =5)      
-#    
-#    
-#    
-#    
-#    
-##    print(res_gradient_out.as_array())
-##    
-##    u1.add(background_term, out = div)
-##    g1.divide(div, out=div)
-###    div.subtract(1, out=div)
-###    div *= -1
-###    div.as_array()[numpy.isinf(div.as_array())] = 0
-##
-###    
-###    tmp_sum = u1 + background_term
-###    tmp_sum_array = tmp_sum.as_array()
-##
-###    
-####    div.as_array()[tmp_sum_array>0] = g1.as_array()[tmp_sum_array>0]/tmp_sum_array[tmp_sum_array>0]
-####    
-####        
-###    g1.divide(tmp_sum, out=g1)
-###    g1.add(1)
-###    print(g1.as_array())
-##    
-##    
-###    np.copyto(div.as_array(),g1.as_array()[tmp_sum_array>0]/tmp_sum_array[tmp_sum_array>0])
-##    
-##    
-###    div.as_array()[tmp_sum_array>0].fill((g1.as_array()[tmp_sum_array>0]/tmp_sum_array[tmp_sum_array>0]))
-##            
-###            )
-##    
-###    np.copyto(tmp.array[k], t.array)
-##    
-###    print(div.as_array())
-###    
-##    
-###    ind = tmp_sum>0 
-###    
-###    out_grad = u1.geometry.allocate()
-###    
-###    np.copyto(out_grad.as_array()[ind], (1 - (g1.as_array()/tmp_sum))[ind])
-###    
-##    
-###        ind = tmp_sum>0 
-###        
-###        if out is None: 
-###            
-###            self.out_grad.fill(1 - self.data.as_array()[ind]/tmp_sum[ind])
-###    
-##    
-##    
-###    f1 = KullbackLeibler(g1, background_term = u1)        
-###    numpy.testing.assert_equal(0.0, f1(g1))     
-##    
-##    
-##    
-###    print(f(g1))
-###    print(f(u1))
-##    
-###    g2 = g1.clone()
-###    g2.as_array()[0,1] = 0
-####    print(f(g2))
-###
-###
-###    tmp = scipy.special.kl_div(g1.as_array(), g2.as_array())  
-###    
-###    
-###    res_grad = f.gradient()
-##    
-##        
-##
-##    
-##        
+    res_conv_conj = f1.convex_conjugate(u1)
+    
+    
+        
+        
+

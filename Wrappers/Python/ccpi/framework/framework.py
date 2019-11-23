@@ -1548,7 +1548,7 @@ class VectorData(DataContainer):
                 else:
                     raise ValueError('Incompatible size: expecting {} got {}'.format((self.length,), array.shape))
         deep_copy = True
-        super(VectorData, self).__init__(out, deep_copy, None)
+        super(VectorData, self).__init__(out, deep_copy, None, geometry = self.geometry)
 
 class VectorGeometry(object):
     '''Geometry describing VectorData to contain 1D array'''
@@ -1591,24 +1591,28 @@ class VectorGeometry(object):
 
     
 if __name__ == "__main__":
+    
+    
+    vg = VectorGeometry(10)    
+    b = vg.allocate('random_int')
 
-    ig = ImageGeometry(voxel_num_x=100, 
-                    voxel_num_y=200, 
-                    voxel_num_z=300, 
-                    voxel_size_x=1, 
-                    voxel_size_y=1, 
-                    voxel_size_z=1, 
-                    center_x=0, 
-                    center_y=0, 
-                    center_z=0, 
-                    channels=50)
-
-    id = ig.allocate(2)
-
-    print(id.geometry)
-    print(id.dimension_labels)
-
-    sid = id.subset(channel = 20)
-
-    print(sid.dimension_labels)
-    print(sid.geometry)
+#    ig = ImageGeometry(voxel_num_x=100, 
+#                    voxel_num_y=200, 
+#                    voxel_num_z=300, 
+#                    voxel_size_x=1, 
+#                    voxel_size_y=1, 
+#                    voxel_size_z=1, 
+#                    center_x=0, 
+#                    center_y=0, 
+#                    center_z=0, 
+#                    channels=50)
+#
+#    id = ig.allocate(2)
+#
+#    print(id.geometry)
+#    print(id.dimension_labels)
+#
+#    sid = id.subset(channel = 20)
+#
+#    print(sid.dimension_labels)
+#    print(sid.geometry)

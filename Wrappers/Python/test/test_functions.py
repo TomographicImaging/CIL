@@ -332,7 +332,9 @@ class TestFunction(unittest.TestCase):
         func1 = FunctionOperatorComposition(0.5 * L2NormSquared(b = b), operator)
         func2 = LeastSquares(operator, b, 0.5)
          
-        self.assertNumpyArrayAlmostEqual(func1(u), func2(u))         
+        self.assertNumpyArrayAlmostEqual(func1(u), func2(u))   
+        
+        self.assertNumpyArrayAlmostEqual(func1.L, func2.L)
             
     def test_mixedL12Norm(self):
         M, N, K = 2,3,5

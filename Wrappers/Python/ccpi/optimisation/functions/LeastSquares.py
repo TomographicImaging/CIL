@@ -28,19 +28,24 @@ import warnings
 
 # Define a class for squared 2-norm
 class LeastSquares(Function):
-    r'''.. math:: f(x) = c*||A*x-b||_2^2
+    r"""Least Squares function
     
-    which has 
+    .. math:: F(x) = c\|Ax-b\|_2^2
     
-    .. math:: grad[f](x) = 2*c*A^T*(A*x-b)
-    
-    and Lipschitz constant
-    
-    .. math:: L = 2*c*||A||_2^2 = 2*s1(A)^2
+    Parameters:
+        
+        A : Operator
+        
+        c : Scaling Constant
+        
+        b : Data
+        
+    L : Lipshitz Constant of the gradient of :math:`F` which is :math:`2c||A||_2^2 = 2s1(A)^2`,
     
     where s1(A) is the largest singular value of A.
+        
     
-    '''
+    """
     
     def __init__(self, A, b, c=1.0):
         super(LeastSquares, self).__init__()
@@ -66,21 +71,16 @@ class LeastSquares(Function):
             warnings.warn('{} could not calculate Lipschitz Constant. {}'.format(
                 self.__class__.__name__, noe))
         
-    #def grad(self,x):
-    #    return self.gradient(x, out=None)
-
     def __call__(self, x):
-        #return self.c* np.sum(np.square((self.A.direct(x) - self.b).ravel()))
-        #if out is None:
-        #    return self.c*( ( (self.A.direct(x)-self.b)**2).sum() )
-        #else:
+        
+        r""" Returns the value of :math:`F(x) = c\|Ax-b\|_2^2`
+        """
+
         y = self.A.direct(x)
         y.subtract(self.b, out=y)
-        #y.__imul__(y)
-        #return y.sum() * self.c
         try:
-            if self.c == 1:
-                return y.squared_norm()
+#            if self.c == 1:
+#                return y.squared_norm()
             return y.squared_norm() * self.c
         except AttributeError as ae:
             # added for compatibility with SIRF
@@ -91,6 +91,13 @@ class LeastSquares(Function):
             return (yn * yn) * self.c
     
     def gradient(self, x, out=None):
+        
+        r""" Returns the value of the gradient of :math:`F(x) = c*\|A*x-b\|_2^2`
+        
+             .. math:: F'(x) = 2cA^T(Ax-b)
+
+        """
+        
         if out is not None:
             #return 2.0*self.c*self.A.adjoint( self.A.direct(x) - self.b )
             self.A.direct(x, out=self.range_tmp)

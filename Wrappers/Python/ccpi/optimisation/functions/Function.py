@@ -64,10 +64,8 @@ class Function(object):
 
     def proximal(self, x, tau, out=None):
         
-        r"""Returns the proximal operator of function :math:`\tau * F` at x
-        
+        r"""Returns the proximal operator of function :math:`\tau F` at x        
         .. math:: \mathrm{prox}_{\tau F}(x) = \underset{z}{\mathrm{argmin}} \frac{1}{2}\|z - x\|^{2} + \tau F(z)
-                
         """
         raise NotImplementedError
 
@@ -288,8 +286,8 @@ class ScaledFunction(Function):
 #            self.function.proximal(x, tau*self.scalar, out = out)
 
     def proximal_conjugate(self, x, tau, out = None):
-        '''This returns the proximal operator for the function at x, tau
-        '''
+        r"""This returns the proximal operator for the function at x, tau
+        """
         if out is None:
             return self.scalar * self.function.proximal_conjugate(x/self.scalar, tau/self.scalar)
         else:

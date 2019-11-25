@@ -95,7 +95,7 @@ class Function(object):
         else:            
             self.proximal(x/tau, 1/tau, out = out)
             out*=-tau
-            out.add(x, out = out) 
+            out.add(x, out = out)                       
 
     def grad(self, x):
         """Alias of gradient(x,None)"""
@@ -287,14 +287,14 @@ class ScaledFunction(Function):
 #        else:
 #            self.function.proximal(x, tau*self.scalar, out = out)
 
-#    def proximal_conjugate(self, x, tau, out = None):
-#        '''This returns the proximal operator for the function at x, tau
-#        '''
-#        if out is None:
-#            return self.scalar * self.function.proximal_conjugate(x/self.scalar, tau/self.scalar)
-#        else:
-#            self.function.proximal_conjugate(x/self.scalar, tau/self.scalar, out=out)
-#            out *= self.scalar
+    def proximal_conjugate(self, x, tau, out = None):
+        '''This returns the proximal operator for the function at x, tau
+        '''
+        if out is None:
+            return self.scalar * self.function.proximal_conjugate(x/self.scalar, tau/self.scalar)
+        else:
+            self.function.proximal_conjugate(x/self.scalar, tau/self.scalar, out=out)
+            out *= self.scalar
 
     def function(self):
         return self.function
@@ -508,4 +508,6 @@ class TranslateFunction(Function):
 #    
 #    def proximal_conjugate(self):
 #        pass
+       
+   
     

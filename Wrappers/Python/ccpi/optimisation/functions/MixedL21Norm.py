@@ -228,8 +228,24 @@ if __name__ == '__main__':
                                             d1.get_item(0).as_array(), decimal=4) 
 
     numpy.testing.assert_array_almost_equal(out1.get_item(1).as_array(), \
-                                            d1.get_item(1).as_array(), decimal=4)      
-#    
+                                            d1.get_item(1).as_array(), decimal=4)   
+    
+    f_scaled.proximal_conjugate(U, tau, out = out1)
+    x = U
+    tmp = x.get_item(0) * 0	
+    for el in x.containers:	
+        tmp += el.power(2.)	
+    tmp.sqrt(out=tmp)	
+    (tmp/f_scaled.scalar).maximum(1.0, out=tmp)	
+    frac = [ el.divide(tmp) for el in x.containers ]	
+    out2 = BlockDataContainer(*frac)   
+    
+    numpy.testing.assert_array_almost_equal(out1.get_item(0).as_array(), \
+                                            out2.get_item(0).as_array(), decimal=4)       
+    
+    
+
+      
     
     
     

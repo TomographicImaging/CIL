@@ -28,8 +28,7 @@ import functools
 
 class smoothMixedL21Norm(Function):
     
-
-    
+        
     def __init__(self, epsilon):
 
         super(smoothMixedL21Norm, self).__init__(L=1)          
@@ -99,7 +98,10 @@ class smoothMixedL21Norm(Function):
         else:
             return np.inf
         
-    def proximal(self, x, tau, out=None):                    
+    def proximal(self, x, tau, out=None):    
+        
+        # This has no closed form solution and need to be computed numerically
+                
         raise NotImplementedError
             
     def proximal_conjugate(self, x, tau, out=None): 

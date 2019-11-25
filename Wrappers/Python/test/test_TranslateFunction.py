@@ -121,8 +121,7 @@ class TestFunction(unittest.TestCase):
                 
             except NotImplementedError:
                 print('Function is not differentiable')
-                
-             
+                             
             # check proximal     
             func.proximal(tmp, tau, out = out_proximal1)
             func_shift.proximal(tmp, tau, out = out_proximal2)

@@ -31,14 +31,16 @@ from numbers import Number
 
 class BlockFunction(Function):
     
-    r'''BlockFunction acts as a separable sum function: f = [f_1,...,f_n]
+    r""" BlockFunction represents a separable sum function. 
     
-      .. math::
+    Let :math:`F: X_{1}\times X_{2}\cdots\X_{m} \rightarrow (-\infty, \infty]` defined as
+    
+    .. math:: F(x_{1}, x_{2}, \cdots, x_{m}) = \overset{m}{\underset{i=1}{\sum}}f_{i}(x_{i})}
+    
+    where :math:`f_{i}: X_{i} \rightarrow (-\infty, \infty]`
+    
 
-          f([x_1,...,x_n]) = f_1(x_1) +  .... + f_n(x_n)
-      |
-
-    '''
+    """
     
     def __init__(self, *functions):
                 
@@ -106,11 +108,11 @@ class BlockFunction(Function):
     
     def gradient(self,x, out=None):
         
-        r'''Evaluates gradient of BlockFunction at x
+        r"""Evaluates gradient of BlockFunction at x
         
             returns: BlockDataContainer .. math:: [f_{1}'(x_{1}), ... , f_{n}'(x_{n})]
                 
-        '''
+        """
         
         out = [None]*self.length
         for i in range(self.length):
@@ -120,12 +122,12 @@ class BlockFunction(Function):
 
     def proximal_conjugate(self, x, tau, out = None):
         
-        r'''Proximal operator of BlockFunction at x: 
+        r""" Proximal operator of BlockFunction at x: 
                  
                  .. math:: prox_{tau*f}(x) = sum_{i} prox_{tau*f_{i}}(x_{i}) 
         
         
-        '''
+        """
 
         if out is not None:
             if isinstance(tau, Number):

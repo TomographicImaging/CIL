@@ -31,6 +31,10 @@ class FunctionOperatorComposition(Function):
     
             : parameter function : function F
             : parameter operator : operator A
+            
+            
+        For general operator, we have no explicit formulas for convex_conjugate,
+        proximal and proximal_conjugate            
     
     """
     
@@ -50,7 +54,7 @@ class FunctionOperatorComposition(Function):
         
         try:
             self.L = function.L * operator.norm()**2 
-        except Error as er:
+        except ValueError as er:
             self.L = None
             warnings.warn("Lipschitz constant was not calculated")
         

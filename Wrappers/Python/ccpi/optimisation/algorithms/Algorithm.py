@@ -262,6 +262,8 @@ class StochasticAlgorithm(Algorithm):
             self.epoch += 1
             
         self.current_subset_id += 1
+        if self.current_subset_id == self.number_of_subsets:
+            self.current_subset_id = 0
         # this callback must be defined by the concrete implementation of the 
         # algorithm to link to the appropriate object dealing with subsets
         self.notify_new_subset(self.current_subset_id, self.number_of_subsets)

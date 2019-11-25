@@ -118,34 +118,34 @@ class BlockFunction(Function):
             
         return  BlockDataContainer(*out)     
 
-#    def proximal_conjugate(self, x, tau, out = None):
-#        
-#        r'''Proximal operator of BlockFunction at x: 
-#                 
-#                 .. math:: prox_{tau*f}(x) = sum_{i} prox_{tau*f_{i}}(x_{i}) 
-#        
-#        
-#        '''
-#
-#        if out is not None:
-#            if isinstance(tau, Number):
-#                for i in range(self.length):
-#                    self.functions[i].proximal_conjugate(x.get_item(i), tau, out=out.get_item(i))
-#            else:
-#                for i in range(self.length):
-#                    self.functions[i].proximal_conjugate(x.get_item(i), tau.get_item(i),out=out.get_item(i))
-#            
-#        else:
-#                
-#            out = [None]*self.length
-#            if isinstance(tau, Number):
-#                for i in range(self.length):
-#                    out[i] = self.functions[i].proximal_conjugate(x.get_item(i), tau)
-#            else:
-#                for i in range(self.length):
-#                    out[i] = self.functions[i].proximal_conjugate(x.get_item(i), tau.get_item(i))
-#            
-#            return BlockDataContainer(*out)       
+    def proximal_conjugate(self, x, tau, out = None):
+        
+        r'''Proximal operator of BlockFunction at x: 
+                 
+                 .. math:: prox_{tau*f}(x) = sum_{i} prox_{tau*f_{i}}(x_{i}) 
+        
+        
+        '''
+
+        if out is not None:
+            if isinstance(tau, Number):
+                for i in range(self.length):
+                    self.functions[i].proximal_conjugate(x.get_item(i), tau, out=out.get_item(i))
+            else:
+                for i in range(self.length):
+                    self.functions[i].proximal_conjugate(x.get_item(i), tau.get_item(i),out=out.get_item(i))
+            
+        else:
+                
+            out = [None]*self.length
+            if isinstance(tau, Number):
+                for i in range(self.length):
+                    out[i] = self.functions[i].proximal_conjugate(x.get_item(i), tau)
+            else:
+                for i in range(self.length):
+                    out[i] = self.functions[i].proximal_conjugate(x.get_item(i), tau.get_item(i))
+            
+            return BlockDataContainer(*out)       
                             
     
     

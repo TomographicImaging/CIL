@@ -165,7 +165,10 @@ e.g. :code:`f(x)` for a :code:`Function f` and input point :code:`x`.
    :special-members:
 .. autoclass:: ccpi.optimisation.functions.TranslateFunction
    :members:
-   :special-members:   
+   :special-members: 
+.. autoclass:: ccpi.optimisation.functions.BlockFunction
+   :members:
+   :special-members:      
 
 
 :ref:`Return Home <mastertoc>`

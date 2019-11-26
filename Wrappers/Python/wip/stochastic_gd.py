@@ -26,8 +26,7 @@ import matplotlib.pyplot as plt
 
 
 import numpy as np
-
-# from utilities import islicer, link_islicer, psnr, plotter2D
+#import islicer, link_islicer, psnr, plotter2D
 from ccpi.utilities.display import show
 
 from ccpi.optimisation.algorithms import Algorithm, GradientDescent   
@@ -76,6 +75,8 @@ ag = AcquisitionGeometry('parallel','2D', angles, detectors,
 A = AstraProjectorSimple(ig, ag, device = device)
 data = A.direct(im_data)
 
+data_no_subset = data.copy()
+
 
 # In[ ]:
 
@@ -87,14 +88,15 @@ class AstraSubsetProjectorSimple(AstraProjectorSimple):
     def __init__(self, geomv, geomp, device, **kwargs):
         kwargs = {'indices':None, 
                   'subset_acquisition_geometry':None,
-                  'subset_id' : 0,
-                  'number_of_subsets' : kwargs.get('number_of_subsets', 1)
+                  #'subset_id' : 0,
+                  #'number_of_subsets' : kwargs.get('number_of_subsets', 1)
                   }
         # This does not forward to its parent class :(
         super(AstraSubsetProjectorSimple, self).__init__(geomv, geomp, device)
         number_of_subsets = kwargs.get('number_of_subsets',1)
-        #self.sinogram_geometry.generate_subsets(number_of_subsets, 'random')
-        self.notify_new_subset(0, number_of_subsets)
+        # self.sinogram_geometry.generate_subsets(number_of_subsets, 'random')
+        if geomp.number_of_subsets > 1:
+            self.notify_new_subset(0, geomp.number_of_subsets)
         
     def notify_new_subset(self, subset_id, number_of_subsets):
         # print ('AstraSubsetProjectorSimple notify_new_subset')
@@ -102,12 +104,13 @@ class AstraSubsetProjectorSimple(AstraProjectorSimple):
         self.subset_id = subset_id
         self.number_of_subsets = number_of_subsets
 
-        self.sinogram_geometry.subset_id = subset_id
+        # self.sinogram_geometry.subset_id = subset_id
 
         #self.indices = self.sinogram_geometry.subsets[subset_id]
         device = self.fp.device
         # this will only copy the subset geometry
         ag = self.sinogram_geometry.copy()
+        #print (ag.shape)
         
         self.fp = AstraForwardProjector(volume_geometry=self.volume_geometry,
                                         sinogram_geometry=ag,
@@ -119,80 +122,124 @@ class AstraSubsetProjectorSimple(AstraProjectorSimple):
                                         proj_id = None,
                                         device = device)
     
-        
 
-    # def direct(self, image_data, out=None):
-    #     self.fp.set_input(image_data)
-    #     ret = self.fp.get_output()
-            
-    #     if out is None:
-    #         out = self.sinogram_geometry.allocate(0)
-    #         #print (self.indices)
-    #         out.as_array()[self.indices] = ret.as_array()[:]
-    #         return out
-    #     else:
-    #         out.as_array()[self.indices] = ret.as_array()[:]
-            
-
-    # def adjoint(self, acquisition_data, out=None):
-    #     self.subs.fill(acquisition_data.as_array()[self.indices])
-    #     self.bp.set_input(self.subs)
-        
-    #     if out is None:
-    #         return self.bp.get_output()
-    #     else:
-    #         # out.as_array()[self.indices] = ret.as_array()[:]
-    #         out += self.bp.get_output()
     
 # In[ ]:
 
 
 # Create projection operator using Astra-Toolbox. Available CPU/CPU
 
-class StochasticNorm2Sq(Norm2Sq):
-    def __init__(self, A, b, c=1.0, number_of_subsets=1):
-        super(StochasticNorm2Sq, self).__init__(A, b, c)
-        self.b.geometry.generate_subsets(number_of_subsets, 'random')
-#        self.number_of_subsets = number_of_subsets
-#        self.notify_new_subset(0,number_of_subsets)
-        
-    def notify_new_subset(self, subset_id, number_of_subsets):
-        self.A.notify_new_subset(subset_id, number_of_subsets)
-        self.b.geometry.subset_id = subset_id
+
 #%%
+nsubs = 10
+step_rate = 0.0002328
+
+data.geometry.generate_subsets(nsubs,'uniform')
+
+OS_A = AstraSubsetProjectorSimple(ig, data.geometry, device = 'gpu')
+### Check single steps
+
+# GD does A.adjoint(A.direct(x) - b)
+print (data.geometry.subset_id)
+
+x = OS_A.domain_geometry().allocate(0)
+tmp = OS_A.domain_geometry().allocate(0)
+
+#%%
+for j in range(100):
+    for i in range(nsubs):
+        data.geometry.subset_id = i
+        OS_A.notify_new_subset(i, nsubs)
+        #print(numpy.where(data.geometry.subsets[i]>0))
+        axmb = OS_A.direct(x)
+        # print (data.geometry.angles)
+        # print (axmb.geometry.angles)
+    #    print (axmb.shape)
+        numpy.testing.assert_array_equal(data.geometry.angles[data.geometry.subsets[i]], axmb.geometry.angles)
+        axmb -= data
+        
+    #    print (diff.geometry.angles)
+    #    print (diff.shape)
+        
+        OS_A.adjoint(axmb, out=tmp)
+        tmp *= -step_rate
+        
+        x+=tmp
+    
+    
+plotter2D(x)
+
+
+
+#%%
+#%%
+data.geometry.generate_subsets(1, 'random')
 l2 = Norm2Sq(A=A, b=data)
 gd = GradientDescent(x_init=im_data*0., objective_function=l2, step_size=None , 
      update_objective_interval=10, max_iteration=100)
 tgd0 = time.time()
-gd.run()
+gd.run(100)
 tgd1 = time.time()
 print (gd.step_size)
 #%%
 
+plotter2D([x, gd.get_output(), x - gd.get_output()], titles=['stochastic', 'GD', 'diff'], cmap='viridis')
+#%%
+
+#print (OS_A.direct(im_data).shape)
+
+
+#OS_A_orig = AstraSubsetProjectorSimpleOrig(ig, data_no_subset.geometry, device = 'gpu',
+#                                           number_of_subsets=nsubs)
+
+
+#%%
+#y = OS_A.direct(im_data*0)
+#
+#
+##%%
+#y.subtract(data, out=y)
 #%%
 nsubs = 10
-data.geometry.generate_subsets(nsubs,'random')
-OS_A = AstraSubsetProjectorSimple(ig, data.geometry, device = 'gpu')
-print (OS_A.direct(im_data).shape)
+data.generate_subsets(nsubs, 'uniform')
+
+class StochasticNorm2Sq(Norm2Sq):
+    def __init__(self, A, b, c=1.0):
+        super(StochasticNorm2Sq, self).__init__(A, b, c)
+        
+    def notify_new_subset(self, subset_id, number_of_subsets):
+        self.b.geometry.subset_id = subset_id
+        self.A.notify_new_subset(subset_id, number_of_subsets)
+        
+
 
 sl2 = StochasticNorm2Sq(A=OS_A,
-                        b=data, number_of_subsets=nsubs)
-
+                        b=data)
 
 sgd = StochasticGradientDescent(x_init=im_data*0., 
-                                objective_function=sl2, rate=None, alpha=1e6,
-                                update_objective_interval=10, max_iteration=10, 
+                                objective_function=sl2, alpha=1e6,
+                                update_objective_interval=10, max_iteration=1000, 
                                 number_of_subsets=nsubs)
 
-b = OS_A.direct(im_data)
+#b = OS_A.direct(im_data)
+#
+#print ('direct ->' , b.shape)
+#b.subtract(data, out=b)
+#
+#x = OS_A.adjoint(b)
+#print (x.shape)
 
-print (b.shape)
 tsgd0 = time.time()
-sgd.run()
+sgd.run(100)
 tsgd1 = time.time()
 #%%
-plotter2D([im_data, gd.get_output(), sgd.get_output()], titles=['ground truth', 
-           'gd {} {}'.format(tgd1-tgd0, l2(gd.get_output())), 'sgd {} {}'.format(tsgd1-tsgd0, l2(sgd.get_output())) ])
+plotter2D([im_data, gd.get_output(), x, sgd.get_output()], titles=\
+          ['ground truth', 'GD', 'inline stochastic GD', 'stochastic GD'],
+          cmap='viridis')
+#
+# , titles=['ground truth', 
+#           'gd {} {}'.format(tgd1-tgd0, l2(gd.get_output())), 'sgd {} {}'.format(tsgd1-tsgd0, sl2(sgd.get_output())) ])
+
 
 
 

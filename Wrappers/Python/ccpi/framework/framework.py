@@ -349,12 +349,15 @@ class AcquisitionGeometry(object):
 
 
         
-    def clone(self):
+    def clone(self, **kwargs):
         '''returns a copy of the AcquisitionGeometry
         
         if the geometry represents a subset copy returns the geometry relative to the subset
         '''
-        if self.number_of_subsets > 1:
+        copy_whole = kwargs.get('whole', False)
+        
+        
+        if self.number_of_subsets > 1 and not copy_whole:
             number_of_subsets = 1
             subset = self.subsets[self.subset_id]
             angles = self.angles[subset]
@@ -378,7 +381,7 @@ class AcquisitionGeometry(object):
                                    number_of_subsets=number_of_subsets,
                                    subset_id=0)
         return ag
-    def copy(self):
+    def copy(self, **kwargs):
         '''alias of clone'''
         return self.clone()
         
@@ -396,11 +399,10 @@ class AcquisitionGeometry(object):
 
     def generate_subsets(self, number_of_subsets, method):
         self.number_of_subsets = number_of_subsets
-        subsets = [AcquisitionGeometrySubsetGenerator.random_indices(
-                        self.angles, subset_id, number_of_subsets) 
-                                        for subset_id in range(number_of_subsets)]
+        subsets = AcquisitionGeometrySubsetGenerator.generate_subset(
+                        self, 0, number_of_subsets, method) 
         self.subsets = subsets[:]
-        return subsets
+        
         
     def allocate(self, value=0, dimension_labels=None, **kwargs):
         '''allocates an AcquisitionData according to the size expressed in the instance'''
@@ -437,14 +439,35 @@ class AcquisitionGeometrySubsetGenerator(object):
     ### Changes in the Operator required to work as OS operator
     @staticmethod
     def generate_subset(ag, subset_id, number_of_subsets, method='random'):
-        ags = ag.clone()
-        angles = ags.angles
+        
+        angles = ag.angles.copy()
         if method == 'random':
             indices = AcquisitionGeometrySubsetGenerator.random_indices(angles, subset_id, number_of_subsets)
+            
+        elif method == 'random-permutation':
+            rndidx = numpy.asarray(range(len(angles)))
+            numpy.random.shuffle(rndidx)
+            indices = AcquisitionGeometrySubsetGenerator.uniform_groups_indices(rndidx, number_of_subsets)
+            
+        elif method == 'uniform':
+            rndidx = numpy.asarray(range(len(angles)))
+            indices = AcquisitionGeometrySubsetGenerator.uniform_groups_indices(rndidx, number_of_subsets)
+            
         else:
             raise ValueError('Can only do '.format('random'))
-        ags.angles = ags.angles[indices]
-        return ags , indices
+        return indices
+    
+    @staticmethod
+    def uniform_groups_indices(idx, number_of_subsets):
+        indices = []
+        groups = int(len(idx)/number_of_subsets)
+        for i in range(number_of_subsets):
+            ret = numpy.asarray(numpy.zeros_like(idx), dtype=numpy.bool)
+            for j,el in enumerate(idx[i*groups:(i+1)*groups]):
+                ret[el] = True
+                
+            indices.append(ret)
+        return indices
     @staticmethod
     def random_indices(angles, subset_id, number_of_subsets):
         N = int(numpy.floor(float(len(angles))/float(number_of_subsets)))
@@ -1349,7 +1372,9 @@ class AcquisitionData(DataContainer):
         return out
     
     def as_array(self, **kwargs):
-        if self.geometry is None or self.geometry.number_of_subsets is None or self.geometry.number_of_subsets == 1:
+        if self.geometry is None or \
+           self.geometry.number_of_subsets is None or\
+           self.geometry.number_of_subsets == 1:
             return DataContainer.as_array(self, **kwargs)
         else:
             return DataContainer.as_array(self, **kwargs)[self.geometry.subsets[self.geometry.subset_id]]
@@ -1371,6 +1396,14 @@ class AcquisitionData(DataContainer):
     @shape.setter
     def shape(self, shape):
         self._shape = shape
+        
+    def generate_subsets(self, number_of_subsets, method='uniform'):
+        '''generates indices for the subset
+        
+        calls the geometry.generate_subsets method
+        '''
+        if self.geometry is not None and number_of_subsets > 1:
+            self.geometry.generate_subsets(number_of_subsets, method)
         
                 
             

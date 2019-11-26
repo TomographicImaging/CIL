@@ -184,3 +184,4 @@ class StochasticGradientDescent(StochasticAlgorithm, GradientDescent):
         
     def notify_new_subset(self, subset_id, number_of_subsets):
         self.objective_function.notify_new_subset(subset_id, number_of_subsets)
+        

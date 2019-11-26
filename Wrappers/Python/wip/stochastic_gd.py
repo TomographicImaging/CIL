@@ -170,8 +170,6 @@ for j in range(100):
 plotter2D(x)
 
 
-
-#%%
 #%%
 data.geometry.generate_subsets(1, 'random')
 l2 = Norm2Sq(A=A, b=data)
@@ -181,27 +179,10 @@ tgd0 = time.time()
 gd.run(100)
 tgd1 = time.time()
 print (gd.step_size)
-#%%
 
 plotter2D([x, gd.get_output(), x - gd.get_output()], titles=['stochastic', 'GD', 'diff'], cmap='viridis')
 #%%
 
-#print (OS_A.direct(im_data).shape)
-
-
-#OS_A_orig = AstraSubsetProjectorSimpleOrig(ig, data_no_subset.geometry, device = 'gpu',
-#                                           number_of_subsets=nsubs)
-
-
-#%%
-#y = OS_A.direct(im_data*0)
-#
-#
-##%%
-#y.subtract(data, out=y)
-#%%
-nsubs = 10
-data.generate_subsets(nsubs, 'uniform')
 
 class StochasticNorm2Sq(Norm2Sq):
     def __init__(self, A, b, c=1.0):
@@ -212,6 +193,8 @@ class StochasticNorm2Sq(Norm2Sq):
         self.A.notify_new_subset(subset_id, number_of_subsets)
         
 
+nsubs = 10
+data.generate_subsets(nsubs, 'uniform')
 
 sl2 = StochasticNorm2Sq(A=OS_A,
                         b=data)

@@ -176,8 +176,10 @@ plotter2D(x)
 # use the whole dataset -> reset to 1 subset.
 data.geometry.generate_subsets(1, 'random')
 l2 = Norm2Sq(A=A, b=data)
-gd = GradientDescent(x_init=im_data*0., objective_function=l2, step_size=None , 
-     update_objective_interval=10, max_iteration=100)
+gd = GradientDescent(x_init=im_data*0., 
+                     objective_function=l2, 
+                     step_size=None, 
+                     update_objective_interval=10, max_iteration=100)
 tgd0 = time.time()
 gd.run(100)
 tgd1 = time.time()
@@ -202,9 +204,9 @@ data.generate_subsets(nsubs, 'uniform')
 sl2 = StochasticNorm2Sq(A=OS_A, b=data)
 
 sgd = StochasticGradientDescent(x_init=im_data*0., 
-                                objective_function=sl2, alpha=1e6,
-                                update_objective_interval=10, max_iteration=1000, 
-                                number_of_subsets=nsubs)
+                                objective_function=sl2, 
+                                number_of_subsets=nsubs,
+                                update_objective_interval=10, max_iteration=100)
 
 #b = OS_A.direct(im_data)
 #
@@ -225,9 +227,9 @@ plotter2D([im_data,
            #x
            ], titles=\
           ['ground truth', 
-           'GD {}'.format(tgd1- tgd0), 
+           'GD {:.2f}s'.format(tgd1- tgd0), 
            'GD - SGD',
-           'stochastic GD {}'.format(tsgd1 - tsgd0),
+           'stochastic GD {:.2f}s'.format(tsgd1 - tsgd0),
            #'inline GD {}'.format(inline1-inline0)
            ],
           cmap='viridis')

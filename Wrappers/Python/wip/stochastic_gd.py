@@ -146,6 +146,7 @@ x = OS_A.domain_geometry().allocate(0)
 tmp = OS_A.domain_geometry().allocate(0)
 
 #%%
+inline0 = time.time()
 for j in range(100):
     for i in range(nsubs):
         data.geometry.subset_id = i
@@ -165,12 +166,14 @@ for j in range(100):
         tmp *= -step_rate
         
         x+=tmp
-    
+inline1 = time.time()
     
 plotter2D(x)
 
 
 #%%
+
+# use the whole dataset -> reset to 1 subset.
 data.geometry.generate_subsets(1, 'random')
 l2 = Norm2Sq(A=A, b=data)
 gd = GradientDescent(x_init=im_data*0., objective_function=l2, step_size=None , 
@@ -196,8 +199,7 @@ class StochasticNorm2Sq(Norm2Sq):
 nsubs = 10
 data.generate_subsets(nsubs, 'uniform')
 
-sl2 = StochasticNorm2Sq(A=OS_A,
-                        b=data)
+sl2 = StochasticNorm2Sq(A=OS_A, b=data)
 
 sgd = StochasticGradientDescent(x_init=im_data*0., 
                                 objective_function=sl2, alpha=1e6,
@@ -216,8 +218,18 @@ tsgd0 = time.time()
 sgd.run(100)
 tsgd1 = time.time()
 #%%
-plotter2D([im_data, gd.get_output(), x, sgd.get_output()], titles=\
-          ['ground truth', 'GD', 'inline stochastic GD', 'stochastic GD'],
+plotter2D([im_data, 
+           gd.get_output(), 
+           gd.get_output()-sgd.get_output(), 
+           sgd.get_output() ,
+           #x
+           ], titles=\
+          ['ground truth', 
+           'GD {}'.format(tgd1- tgd0), 
+           'GD - SGD',
+           'stochastic GD {}'.format(tsgd1 - tsgd0),
+           #'inline GD {}'.format(inline1-inline0)
+           ],
           cmap='viridis')
 #
 # , titles=['ground truth', 

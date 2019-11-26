@@ -23,7 +23,7 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from __future__ import unicode_literals
+#from __future__ import unicode_literals
 
 import warnings
 
@@ -154,10 +154,13 @@ class Function(object):
         return scalar * ScaledFunction(self, 1)   
     
     def centered_at(self, center):
-        """ Returns a translated function, namely if we have a function :math:`F(x)` the center is at the origin. 
-        
+        """ Returns a translated function, namely if we have a function :math:`F(x)` the center is at the origin.         
             TranslateFunction is :math:`F(x - b)` and the center is at point b."""
-        return TranslateFunction(self, center)  
+            
+        if center is None:
+            return self
+        else:
+            return TranslateFunction(self, center)  
     
 class SumFunction(Function):
     
@@ -186,7 +189,7 @@ class SumFunction(Function):
         r"""Returns the value of the sum of functions :math:`F_{1}` and :math:`F_{2}` at x
         
         .. math:: (F_{1} + F_{2})(x) = F_{1}(x) + F_{2}(x)
-        
+                
         """  
         return self.function1(x) + self.function2(x)
     
@@ -431,6 +434,8 @@ class TranslateFunction(Function):
                         
         self.function = function
         self.center = center
+        
+        
                 
     def __call__(self, x):
         

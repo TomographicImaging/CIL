@@ -231,9 +231,6 @@ plotter2D([im_data,
            #'inline GD {}'.format(inline1-inline0)
            ],
           cmap='viridis')
-#
-# , titles=['ground truth', 
-#           'gd {} {}'.format(tgd1-tgd0, l2(gd.get_output())), 'sgd {} {}'.format(tsgd1-tsgd0, sl2(sgd.get_output())) ])
 
 
 

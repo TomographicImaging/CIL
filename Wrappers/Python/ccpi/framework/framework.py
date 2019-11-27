@@ -20,6 +20,8 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+from typing import Union, List, Tuple
+
 import numpy
 import sys
 from datetime import timedelta, datetime
@@ -207,7 +209,9 @@ class ImageGeometry(object):
     #    '''Returns the shape of the array of the ImageData it describes'''
     #    return self.shape
 
+
 class AcquisitionGeometry(object):
+
     RANDOM = 'random'
     RANDOM_INT = 'random_int'
     ANGLE_UNIT = 'angle_unit'
@@ -217,19 +221,18 @@ class AcquisitionGeometry(object):
     ANGLE = 'angle'
     VERTICAL = 'vertical'
     HORIZONTAL = 'horizontal'
-    def __init__(self, 
-                 geom_type, 
-                 dimension=None, 
-                 angles=None, 
-                 pixel_num_h=0, 
-                 pixel_size_h=1, 
-                 pixel_num_v=0, 
-                 pixel_size_v=1, 
-                 dist_source_center=None, 
-                 dist_center_detector=None, 
-                 channels=1,
-                 **kwargs
-                 ):
+
+    def __init__(self,
+                 geom_type: str,
+                 num_pixels: Tuple[int, int],
+                 pixel_size: Tuple[float, float],
+                 obj_to_src: List[Tuple[float, float, float]],
+                 obj_to_det: List[Tuple[float, float, float]],
+                 det_orientation: List[Tuple[float, float, float]],
+                 pixel_theta: float = 90.,
+                 num_channels: int = 1,
+                 ** kwargs):
+
         """
         General inputs for standard type projection geometries
         detectorDomain or detectorpixelSize:
@@ -256,32 +259,70 @@ class AcquisitionGeometry(object):
         angles is expected numpy array, dtype - float32
         angles_format radians or degrees
         """
-        self.geom_type = geom_type   # 'parallel' or 'cone'
-        # Override the parameter passed as dimension
-        # determine if the geometry is 2D or 3D
-        if pixel_num_v >= 1:
+
+        @property
+        def num_pixels(self):
+            return self._num_pixels
+
+        @num_pixel.setter
+        def num_pixel(self, pixels):
+            self._num_pixels = tuple(pixels[1], pixels[0])
+
+        num_pixels.setter(num_pixels)
+
+        #check inputs all make sense
+        if geom_type != 'cone' and geom_type != 'parallel':
+            raise ValueError('geom_type = {} not recognised please specify \'cone\' or \'parallel\''.format(geom_type))
+
+        if num_pixels < (1,1):
+            raise ValueError('Number of pixels (y,x) must be > (0,0). Got {}'.format(num_pixels))
+        
+        if pixel_size <= (0,0):
+            raise ValueError('Pixel sixe (y,x) at must be > (0.,0.). Got {}'.format(pixel_size))
+        
+        if isinstance(obj_to_src, list) and  isinstance(obj_to_det, list) and  isinstance(det_orientation, list):
+            if len(obj_to_src) != len(obj_to_det) != len(det_orientation):
+                raise ValueError('obj_to_src[], obj_to_det[] and det_orientation[] must have the same length')
+        else:
+            raise ValueError('obj_to_src[], obj_to_det[] and det_orientation[] must be of type list')
+
+        if num_pixels[0] > 1:
             dimension = '3D'
-        elif pixel_num_v == 0:
+        elif num_pixels[0] == 1:
             dimension = '2D'
-        else:
-            raise ValueError('Number of pixels at detector on the vertical axis must be >= 0. Got {}'.format(vert))
-    
-        self.dimension = dimension # 2D or 3D
-        if isinstance(angles, numpy.ndarray):
-            self.angles = angles
-        else:
-            raise ValueError('numpy array is expected')
-        num_of_angles = len (angles)
+
+        self.geom_type  = geom_type        
+        ##self.num_pixels = num_pixels
+        self.pixel_size = pixel_size
+        self.obj_to_src = obj_to_src
+        self.obj_to_det = obj_to_det
+        self.det_orientation = det_orientation
+        self.pixel_theta = pixel_theta
+        self.num_channels = num_channels
+        self.dimension = dimension 
+
         
-        self.dist_source_center = dist_source_center
-        self.dist_center_detector = dist_center_detector
-        
-        self.pixel_num_h = pixel_num_h
-        self.pixel_size_h = pixel_size_h
-        self.pixel_num_v = pixel_num_v
-        self.pixel_size_v = pixel_size_v
-        
-        self.channels = channels
+        #and make it work with current projector style for
+        num_of_angles = len (obj_to_src)
+        angles = numpy.ndarray(num_of_angles)
+        AcquisitionGeometry.ANGLE_UNIT = AcquisitionGeometry.RADIAN
+
+        for i in range(num_of_angles):
+            angles[i] = numpy.arctan2(obj_to_src[i][0], -obj_to_src[i][1])
+
+        self.dist_source_center = -self.obj_to_src[0][1]
+        self.dist_center_detector = self.obj_to_det[0][1]        
+        self.pixel_num_h = self.num_pixels[1]
+        self.pixel_size_h = self.pixel_size[0]
+        self.pixel_num_v = self.num_pixels[0]
+        self.pixel_size_v = self.pixel_size[1]    
+        self.channels = self.num_channels
+        self.angles = angles
+
+        channels = self.channels
+        pixel_num_v = self.pixel_size_v
+        pixel_num_h = self.pixel_size_h
+
         self.angle_unit=kwargs.get(AcquisitionGeometry.ANGLE_UNIT, 
                                AcquisitionGeometry.DEGREE)
 
@@ -360,7 +401,7 @@ class AcquisitionGeometry(object):
         repres += "voxel size: h{0},v{1}\n".format(self.pixel_size_h, self.pixel_size_v)
         repres += "geometry type: {0}\n".format(self.geom_type)
         repres += "distance source-detector: {0}\n".format(self.dist_source_center)
-        repres += "distance center-detector: {0}\n".format(self.dist_source_center)
+        repres += "distance center-detector: {0}\n".format(self.dist_center_detector)
         repres += "number of channels: {0}\n".format(self.channels)
         return repres
     def allocate(self, value=0, dimension_labels=None, **kwargs):

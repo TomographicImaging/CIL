@@ -442,9 +442,10 @@ class AcquisitionGeometrySubsetGenerator(object):
         
         angles = ag.angles.copy()
         if method == 'random':
-            indices = AcquisitionGeometrySubsetGenerator.random_indices(angles, subset_id, number_of_subsets)
+            indices = [ AcquisitionGeometrySubsetGenerator.random_indices(angles, subset_id, number_of_subsets) 
+              for _ in range(number_of_subsets) ] 
             
-        elif method == 'random-permutation':
+        elif method == 'random_permutation':
             rndidx = numpy.asarray(range(len(angles)))
             numpy.random.shuffle(rndidx)
             indices = AcquisitionGeometrySubsetGenerator.uniform_groups_indices(rndidx, number_of_subsets)
@@ -454,7 +455,7 @@ class AcquisitionGeometrySubsetGenerator(object):
             indices = AcquisitionGeometrySubsetGenerator.uniform_groups_indices(rndidx, number_of_subsets)
             
         else:
-            raise ValueError('Can only do '.format('random'))
+            raise ValueError('Can only do {}. got {}'.format(['random', 'random_permutation', 'uniform'], method))
         return indices
     
     @staticmethod

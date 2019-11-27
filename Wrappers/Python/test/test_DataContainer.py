@@ -777,8 +777,23 @@ class TestStochasticSubset(unittest.TestCase):
 
         numpy.testing.assert_array_equal(s1,s2)
         
-        data2.geometry.subset_id = 8
+        numpy.random.seed(1)
+        data.geometry.generate_subsets(n_subsets, 'random_permutation')
+        data.geometry.subset_id = 0
 
+        numpy.random.seed(1)
+        data2.geometry.generate_subsets(n_subsets, 'random_permutation')
+        data2.geometry.subset_id = 0
+
+        s1 = data2.geometry.subsets[3]
+        s2 = data.geometry.subsets[3]
+
+        numpy.testing.assert_array_equal(s1,s2)
+        
+
+        data2.geometry.subset_id = 8
+        print (data.shape)
+        print (data2.shape)
         self.assertTrue(data.shape == (18,128))
         self.assertTrue(data2.shape == (18,128))
 
@@ -817,11 +832,11 @@ class TestStochasticSubset(unittest.TestCase):
         # numpy.testing.assert_array_equal(out.as_array(), 3 * numpy.ones((180,128)))
 
         numpy.random.seed(1)
-        data.geometry.generate_subsets(n_subsets, 'random')
+        data.geometry.generate_subsets(n_subsets, 'uniform')
         data.geometry.subset_id = 0
 
         numpy.random.seed(1)
-        data2.geometry.generate_subsets(n_subsets, 'random')
+        data2.geometry.generate_subsets(n_subsets, 'uniform')
         data2.geometry.subset_id = 2
 
         shape = (18,128)

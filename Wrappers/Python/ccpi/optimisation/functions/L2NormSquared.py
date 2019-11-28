@@ -27,16 +27,34 @@ from ccpi.optimisation.functions import Function
 
 class L2NormSquared(Function):
     
-    r"""L2NormSquared function: :math:`F(x) = \| x\|^{2}_{2} = \underset{i}{\sum}x_{i}^{2}`
+    r"""
+    
+    |
+    
+    L2NormSquared function: :math:`F(x) = \| x\|^{2}_{2} = \underset{i}{\sum}x_{i}^{2}`
           
-        Consider the following cases:
+    Following cases are considered:
                 
-                a) .. math:: F(x) = \|x\|^{2}_{2} 
-                b) .. math:: F(x) = \|x - b\|^{2}_{2}
-                                
+        a) :math:`F(x) = \|x\|^{2}_{2}`
+        b) :math:`F(x) = \|x - b\|^{2}_{2}`
+        
+    Notes
+    -----
+        In the b) case we can also use *TranslateFunction* with
+        :math:`F = L2NormSquared().centered\_at(b)`
+        
+    Example
+    -------
+        
+        >>> F = L2NormSquared()
+        >>> F = L2NormSquared(b=b) 
+        >>> F = L2NormSquared().centered_at(b)
+                                                          
     """    
     
     def __init__(self, **kwargs):
+        
+        
                                 
         super(L2NormSquared, self).__init__(L = 2)        
         self.b = kwargs.get('b', None)                             
@@ -45,15 +63,46 @@ class L2NormSquared(Function):
         #    self.domain = self.b.geometry  
                             
     def __call__(self, x):
+                        
+        r"""   
         
-        r"""Returns the value of the L2NormSquared function at x.
+        Parameters
+        ----------
         
-        Consider the following cases:
+            x : DataContainer
+            
+        Returns
+        -------
+            Value of :
+                :math:`F(x) = \|x\|^{2}_{2}`, 
+                :math:`F(x) = \|x - b\|^{2}_{2}`   
                 
-                a) .. math:: F(x) = \|x\|^{2}_{2} 
-                b) .. math:: F(x) = \|x - b\|^{2}_{2}
-                
-        """          
+        Returns
+        -------
+        type
+            Explanation of anonymous return value of type ``type``.
+        describe : type
+            Explanation of return value named `describe`.
+        out : type
+            Explanation of `out`.
+        type_without_description                
+        
+                                                
+        """
+        
+        
+        
+        
+        
+        
+#        r"""Returns the value of the L2NormSquared function at x.
+#        
+#        Consider the following cases:
+#                
+#                a) .. math:: F(x) = \|x\|^{2}_{2} 
+#                b) .. math:: F(x) = \|x - b\|^{2}_{2}
+#                
+#        """          
             
         y = x
         if self.b is not None: 

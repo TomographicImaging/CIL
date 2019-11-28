@@ -759,7 +759,9 @@ class TestStochasticSubset(unittest.TestCase):
         data2 = self.data2
         n_subsets = self.n_subsets
 
-        self.assertFalse (id (data.as_array()) == id(data2.as_array()))
+        a1 = data.as_array()
+        a2 = data2.as_array()
+        self.assertFalse (id (a1) == id(a2))
 
         self.assertTrue(data.shape == (180,128))
         self.assertTrue(data2.shape == (180,128))
@@ -799,11 +801,14 @@ class TestStochasticSubset(unittest.TestCase):
 
         print ("data.as_array().shape", data.as_array().shape)
         print ("data2.as_array().shape", data2.as_array().shape)
-
-        self.assertFalse (id (data.as_array()) == id(data2.as_array()))
-        self.assertFalse (id (data.array) == id(data.as_array()))
-        self.assertFalse (id (data2.array) == id(data2.as_array()))
-
+        
+        a1 = data.as_array()
+        a2 = data2.as_array()
+        
+        self.assertFalse (id (data.array) == id(a1))
+        self.assertFalse (id (data2.array) == id(a2))
+        self.assertFalse (id (a1) == id(a2))
+        
     def test_AcquisitionData_subsets_algebra(self):
         data = self.data # [1]
         data2 = self.data2 # [2]

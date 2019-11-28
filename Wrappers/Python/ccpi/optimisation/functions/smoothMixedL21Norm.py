@@ -98,11 +98,14 @@ class smoothMixedL21Norm(Function):
         else:
             return np.inf
         
-    def proximal(self, x, tau, out=None):    
+    def proximal(self, x, tau, out=None):   
+        
+        
+        return x - tau * self.proximal_conjugate(x/tau, 1/tau, out=None)
         
         # This has no closed form solution and need to be computed numerically
                 
-        raise NotImplementedError
+#        raise NotImplementedError
             
     def proximal_conjugate(self, x, tau, out=None): 
         

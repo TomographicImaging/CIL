@@ -68,15 +68,17 @@ class L2NormSquared(Function):
         
         Parameters
         ----------
-        
-            x : DataContainer
-            
-        Returns
-        -------
-            Value of :
-                :math:`F(x) = \|x\|^{2}_{2}`, 
-                :math:`F(x) = \|x - b\|^{2}_{2}`   
-                
+            var1 : array_like
+                Array_like means all those objects -- lists, nested lists, etc. --
+                that can be converted to an array.  We can also refer to
+                variables like `var1`.
+            var2 : int
+                The type above can either refer to an actual Python type
+                (e.g. ``int``), or describe the type of the variable in more
+                detail, e.g. ``(N,) ndarray`` or ``array_like``.
+            long_var_name : {'hi', 'ho'}, optional
+                Choices in brackets, default first when optional.
+                                  
         Returns
         -------
         type

@@ -35,7 +35,7 @@ class MixedL21Norm(Function):
     
     """      
     
-    def __init__(self, **kwargs):
+    def __init__(self, epsilon = 0, **kwargs):
 
         super(MixedL21Norm, self).__init__()  
         self.b = kwargs.get('b', None)  
@@ -44,7 +44,7 @@ class MixedL21Norm(Function):
         self.SymTensor = kwargs.get('SymTensor',False)
         
         # We use this parameter to make MixedL21Norm differentiable
-        #self.epsilon = kwargs.get('epsilon',0)
+        self.epsilon = epsilon
         
         if self.b is not None and not isinstance(self.b, BlockDataContainer):
             raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(self.b)))
@@ -56,11 +56,19 @@ class MixedL21Norm(Function):
         """
         if not isinstance(x, BlockDataContainer):
             raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 
+            
+        tmp_cont = x.containers                        
+        tmp = x.get_item(0) * 0.
+        for el in tmp_cont:
+            tmp += el.power(2.)
+        tmp.add(self.epsilon**2, out = tmp)    
+        return tmp.sqrt().sum()            
          
-        y = x
-        if self.b is not None:
-            y = x - self.b    
-        return y.pnorm(p=2).sum()                                
+#        y = x
+#        if self.b is not None:
+#            y = x - self.b    
+#        return y.pnorm(p=2).sum()                                
+            
 #        tmp = x.get_item(0) * 0.
 #        for el in x.containers:
 #            tmp += el.power(2.)
@@ -90,11 +98,22 @@ class MixedL21Norm(Function):
         if not isinstance(x, BlockDataContainer):
             raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 
                 
-        tmp = (x.pnorm(2).as_array().max() - 1)
-        if tmp<=1e-5:
+        tmp1 = x.get_item(0) * 0.
+        for el in x.containers:
+            tmp1 += el.power(2.)
+        tmp1.add(self.epsilon**2, out = tmp1)
+        tmp = tmp1.sqrt().as_array().max() - 1
+                    
+        if tmp<=1e-6:
             return 0
         else:
-            return np.inf
+            return np.inf            
+                
+#        tmp = (x.pnorm(2).as_array().max() - 1)
+#        if tmp<=1e-5:
+#            return 0
+#        else:
+#            return np.inf
                     
     def proximal(self, x, tau, out=None):
         
@@ -106,29 +125,47 @@ class MixedL21Norm(Function):
         
         """
         
-        if out is None:
-            
-            tmp = x.pnorm(2)
-            res = (tmp - tau).maximum(0.0) * x/tmp
-            
-            for el in res.containers:
-                el.as_array()[np.isnan(el.as_array())]=0            
-            
-            return res            
-            
-#            tmp = sum([ el*el for el in x.containers]).sqrt()
-#            res = (tmp - tau).maximum(0.0) * x/tmp
-#            return res
-            
-        else:
-            
-            tmp = x.pnorm(2)
-            res = (tmp - tau).maximum(0.0) * x/tmp
+        if out is not None:
+                                  
+            tmp = x.get_item(0) * 0.
+            for el in x.containers:
+                tmp += el.power(2.)
+            tmp.add(self.epsilon**2, out = tmp)  
 
+            res = (tmp - tau).maximum(0.0) * x/tmp   
+            
             for el in res.containers:
                 el.as_array()[np.isnan(el.as_array())]=0
 
-            out.fill(res)            
+            out.fill(res)              
+            
+            
+            
+            
+        
+#        if out is None:
+#            
+#            tmp = x.pnorm(2)
+#            res = (tmp - tau).maximum(0.0) * x/tmp
+#            
+#            for el in res.containers:
+#                el.as_array()[np.isnan(el.as_array())]=0            
+#            
+#            return res            
+#            
+##            tmp = sum([ el*el for el in x.containers]).sqrt()
+##            res = (tmp - tau).maximum(0.0) * x/tmp
+##            return res
+#            
+#        else:
+#            
+#            tmp = x.pnorm(2)
+#            res = (tmp - tau).maximum(0.0) * x/tmp
+#
+#            for el in res.containers:
+#                el.as_array()[np.isnan(el.as_array())]=0
+#
+#            out.fill(res)            
             
                         
 #            tmp = functools.reduce(lambda a,b: a + b*b, x.containers, x.get_item(0) * 0 ).sqrt()
@@ -139,7 +176,8 @@ class MixedL21Norm(Function):
 #
 #            out.fill(res)
         
-    
+##############################################################################
+        ##############################################################################
 #    def proximal_conjugate(self, x, tau, out=None): 
 #
 #        

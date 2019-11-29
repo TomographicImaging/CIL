@@ -28,7 +28,7 @@ from ccpi.optimisation.operators import FiniteDiff, SparseFiniteDiff
 #%%
 
 NEUMANN = 'Neumann'
-PERIODIC = 'periodic'
+PERIODIC = 'Periodic'
 
 
 class Gradient(LinearOperator):
@@ -260,9 +260,10 @@ class GradientOperator(LinearOperator):
         self.gm_domain = gm_domain
         self.gm_range = gm_range
         
-        if bnd_cond == NEUMANN:
-            self.bnd_cond = 0
-        elif bnd_cond == PERIODIC:
+        #default is 'Neumann'
+        self.bnd_cond = 0
+        
+        if bnd_cond == PERIODIC:
             self.bnd_cond = 1
         
         # Domain Geometry = Range Geometry if not stated
@@ -313,6 +314,17 @@ class GradientOperator(LinearOperator):
                     *[GradientOperator.datacontainer_as_c_pointer(x.get_item(i))[1] for i in range(self.gm_range.shape[0])], 
                     *[el for el in out.shape], self.bnd_cond, 0)
 
+    def domain_geometry(self):
+        
+        '''Returns domain_geometry of Gradient'''
+        
+        return self.gm_domain
+    
+    def range_geometry(self):
+        
+        '''Returns range_geometry of Gradient'''
+        
+        return self.gm_range
 
             
 

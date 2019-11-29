@@ -26,6 +26,11 @@ from ccpi.framework import BlockDataContainer
 import numpy as np
 import functools
 
+
+# promxial conjugate, proximal no closed-form solutions
+# convex conjugate closed form solution, not implemented
+
+
 class smoothMixedL21Norm(Function):
     
         
@@ -65,63 +70,63 @@ class smoothMixedL21Norm(Function):
             out.fill(x.divide(tmp.sqrt()))
                         
                             
-    def convex_conjugate(self,x):
-        
-        r"""Returns the value of the convex conjugate of the MixedL21Norm function at x.
-        
-        This is the Indicator function of :math:`\mathbb{I}_{\{\|\cdot\|_{2,\infty}\leq1\}}(x^{*})`,
-        
-        i.e., 
-        
-        .. math:: \mathbb{I}_{\{\|\cdot\|_{2, \infty}\leq1\}}(x^{*}) 
-            = \begin{cases} 
-            0, \mbox{if } \|x\|_{2, \infty}\leq1\\
-            \infty, \mbox{otherwise}
-            \end{cases}
-        
-        where, 
-        
-        .. math:: \|x\|_{2,\infty} = \max\{ \|x\|_{2} \} = \max\{ \sqrt{ (x^{1})^{2} + (x^{2})^{2} + \dots}\}
-        
-        """
-        if not isinstance(x, BlockDataContainer):
-            raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 
-                
-        tmp1 = x.get_item(0) * 0.
-        for el in x.containers:
-            tmp1 += el.power(2.)
-        tmp1.add(self.epsilon**2, out = tmp1)
-        tmp = tmp1.sqrt().as_array().max() - 1
-                    
-        if tmp<=1e-6:
-            return 0
-        else:
-            return np.inf
-        
-    def proximal(self, x, tau, out=None):   
-        
-        
-        return x - tau * self.proximal_conjugate(x/tau, 1/tau, out=None)
-        
-        # This has no closed form solution and need to be computed numerically
-                
-#        raise NotImplementedError
-            
-    def proximal_conjugate(self, x, tau, out=None): 
-        
-        if out is None:                                        
-            tmp = x.get_item(0) * 0	
-            for el in x.containers:	
-                tmp += el.power(2.)	
-            tmp+=self.epsilon**2                
-            tmp.sqrt(out=tmp)	
-            tmp.maximum(1.0, out=tmp)	
-            frac = [ el.divide(tmp) for el in x.containers ]	
-            return BlockDataContainer(*frac)        
-        else:                            
-            res1 = functools.reduce(lambda a,b: a + b*b, x.containers, x.get_item(0) * 0 )
-            res1+=self.epsilon**2
-            res1.sqrt(out=res1)	
-            res1.maximum(1.0, out=res1)	
-            x.divide(res1, out=out)
-                             
+#    def convex_conjugate(self,x):
+#        
+#        r"""Returns the value of the convex conjugate of the MixedL21Norm function at x.
+#        
+#        This is the Indicator function of :math:`\mathbb{I}_{\{\|\cdot\|_{2,\infty}\leq1\}}(x^{*})`,
+#        
+#        i.e., 
+#        
+#        .. math:: \mathbb{I}_{\{\|\cdot\|_{2, \infty}\leq1\}}(x^{*}) 
+#            = \begin{cases} 
+#            0, \mbox{if } \|x\|_{2, \infty}\leq1\\
+#            \infty, \mbox{otherwise}
+#            \end{cases}
+#        
+#        where, 
+#        
+#        .. math:: \|x\|_{2,\infty} = \max\{ \|x\|_{2} \} = \max\{ \sqrt{ (x^{1})^{2} + (x^{2})^{2} + \dots}\}
+#        
+#        """
+#        if not isinstance(x, BlockDataContainer):
+#            raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 
+#                
+#        tmp1 = x.get_item(0) * 0.
+#        for el in x.containers:
+#            tmp1 += el.power(2.)
+#        tmp1.add(self.epsilon**2, out = tmp1)
+#        tmp = tmp1.sqrt().as_array().max() - 1
+#                    
+#        if tmp<=1e-6:
+#            return 0
+#        else:
+#            return np.inf
+#        
+#    def proximal(self, x, tau, out=None):   
+#        
+#        
+#        return x - tau * self.proximal_conjugate(x/tau, 1/tau, out=None)
+#        
+#        # This has no closed form solution and need to be computed numerically
+#                
+##        raise NotImplementedError
+#            
+#    def proximal_conjugate(self, x, tau, out=None): 
+#        
+#        if out is None:                                        
+#            tmp = x.get_item(0) * 0	
+#            for el in x.containers:	
+#                tmp += el.power(2.)	
+#            tmp+=self.epsilon**2                
+#            tmp.sqrt(out=tmp)	
+#            tmp.maximum(1.0, out=tmp)	
+#            frac = [ el.divide(tmp) for el in x.containers ]	
+#            return BlockDataContainer(*frac)        
+#        else:                            
+#            res1 = functools.reduce(lambda a,b: a + b*b, x.containers, x.get_item(0) * 0 )
+#            res1+=self.epsilon**2
+#            res1.sqrt(out=res1)	
+#            res1.maximum(1.0, out=res1)	
+#            x.divide(res1, out=out)
+#                             

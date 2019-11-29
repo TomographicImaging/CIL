@@ -377,7 +377,7 @@ int fdiff_direct_periodic(const float *inimagefull, float *outimageXfull, float 
 }
 int fdiff_adjoint_neumann(float *outimagefull, const float *inimageXfull, const float *inimageYfull, const float *inimageZfull, const float *inimageCfull, long nx, long ny, long nz, long nc)
 {
-	//runs over full data in x, y, z. then correctects elements for bounday conditions and sums
+	//runs over full data in x, y, z. then corrects elements for bounday conditions and sums
 	size_t volume = nx * ny * nz;
 
 	//assumes nx and ny > 1
@@ -764,7 +764,7 @@ int fdiff_adjoint_periodic(float *outimagefull, const float *inimageXfull, const
 }
 
 
-DLL_EXPORT int fdiff4D(float *imagefull, float *gradXfull, float *gradYfull, float *gradZfull, float *gradCfull, long nx, long ny, long nz, long nc, int boundary, int direction)
+DLL_EXPORT int fdiff4D(float *imagefull, float *gradCfull, float *gradZfull, float *gradYfull, float *gradXfull, long nc, long nz, long ny, long nx, int boundary, int direction)
 {
 	if (boundary)
 	{
@@ -783,7 +783,7 @@ DLL_EXPORT int fdiff4D(float *imagefull, float *gradXfull, float *gradYfull, flo
 	
 	return 0;
 }
-DLL_EXPORT int fdiff3D(float *imagefull, float *gradXfull, float *gradYfull, float *gradZfull, long nx, long ny, long nz, int boundary, int direction)
+DLL_EXPORT int fdiff3D(float *imagefull, float *gradZfull, float *gradYfull, float *gradXfull, long nz, long ny, long nx, int boundary, int direction)
 {
 	if (boundary)
 	{
@@ -802,7 +802,7 @@ DLL_EXPORT int fdiff3D(float *imagefull, float *gradXfull, float *gradYfull, flo
 
 	return 0;
 }
-DLL_EXPORT int fdiff2D(float *imagefull, float *gradXfull, float *gradYfull, long nx, long ny, int boundary, int direction)
+DLL_EXPORT int fdiff2D(float *imagefull, float *gradYfull, float *gradXfull, long ny, long nx, int boundary, int direction)
 {
 	if (boundary)
 	{

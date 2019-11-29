@@ -22,7 +22,8 @@ from ccpi.framework import ImageData, AcquisitionData
 from ccpi.framework import BlockDataContainer
 import functools
 
-from ccpi.optimisation.operators import Gradient, Identity, BlockOperator
+from ccpi.optimisation.operators import Gradient, GradientOperator, Identity, BlockOperator
+from ccpi.optimisation.operators import LinearOperator
 
 class TestGradient(unittest.TestCase):
     def test_Gradient(self): 
@@ -40,7 +41,7 @@ class TestGradient(unittest.TestCase):
         print(G1.range_geometry().shape, '2D no channels')
             
         G4 = Gradient(ig3, correlation = 'SpaceChannels')
-        print(G4.range_geometry().shape, '2D with channels corr')
+        print(G4.range_geometry().shape, '2D with channels corr')  
         G5 = Gradient(ig3, correlation = 'Space')
         print(G5.range_geometry().shape, '2D with channels no corr')
         
@@ -112,5 +113,65 @@ class TestGradient(unittest.TestCase):
         ig4 = ImageGeometry(M,N, channels=3)
         G4 = Gradient(ig4, correlation=Gradient.CORRELATION_SPACECHANNEL)
         norm4 = G4.norm(iterations=300)
-        print ("should be sqrt(12) {} {}".format(numpy.sqrt(12), norm4))
+        print("should be sqrt(12) {} {}".format(numpy.sqrt(12), norm4))
         self.assertTrue((norm4 - numpy.sqrt(12))/norm4 < 0.2)
+
+    def test_GradientOperator_4D(self):
+
+        nc, nz, ny, nx = 3, 4, 5, 6
+        size = nc * nz * ny * nx
+        dim = [nc, nz, ny, nx]
+
+        ig = ImageGeometry(voxel_num_x=nx, voxel_num_y=ny, voxel_num_z=nz, channels=nc)
+
+        arr = numpy.arange(size).reshape(dim).astype(numpy.float32)**2
+
+        data = ig.allocate()
+        data.fill(arr)
+
+        #neumann
+        grad_py = Gradient(ig, bnd_cond='Neumann', correlation='SpaceChannels')
+        gold_direct = grad_py.direct(data)
+        gold_adjoint = grad_py.adjoint(gold_direct)
+
+        grad_c = GradientOperator(ig, bnd_cond='Neumann')
+        out_direct = grad_c.direct(data)
+        out_adjoint = grad_c.adjoint(out_direct)
+
+        #print("GradientOperator, 4D, bnd_cond='Neumann', direct")
+        numpy.testing.assert_array_equal(out_direct.get_item(0).as_array(), gold_direct.get_item(0).as_array())
+        numpy.testing.assert_array_equal(out_direct.get_item(1).as_array(), gold_direct.get_item(1).as_array())
+        numpy.testing.assert_array_equal(out_direct.get_item(2).as_array(), gold_direct.get_item(2).as_array())
+        numpy.testing.assert_array_equal(out_direct.get_item(3).as_array(), gold_direct.get_item(3).as_array())
+
+        #print("GradientOperator, 4D, bnd_cond='Neumann', adjoint")
+        numpy.testing.assert_array_equal(out_adjoint.as_array(), gold_adjoint.as_array())
+
+        #periodic
+        grad_py = Gradient(ig, bnd_cond='Periodic', correlation='SpaceChannels')
+        gold_direct = grad_py.direct(data)
+        gold_adjoint = grad_py.adjoint(gold_direct)
+
+        grad_c = GradientOperator(ig, bnd_cond='Periodic')
+        out_direct = grad_c.direct(data)
+        out_adjoint = grad_c.adjoint(out_direct)
+
+        #print("GradientOperator, 4D, bnd_cond='Periodic', direct")
+        numpy.testing.assert_array_equal(out_direct.get_item(0).as_array(), gold_direct.get_item(0).as_array())
+        numpy.testing.assert_array_equal(out_direct.get_item(1).as_array(), gold_direct.get_item(1).as_array())
+        numpy.testing.assert_array_equal(out_direct.get_item(2).as_array(), gold_direct.get_item(2).as_array())
+        numpy.testing.assert_array_equal(out_direct.get_item(3).as_array(), gold_direct.get_item(3).as_array())
+
+        #print("GradientOperator, 4D, bnd_cond='Periodic', adjoint")
+        numpy.testing.assert_array_equal(out_adjoint.as_array(), gold_adjoint.as_array())
+
+    def test_GradientOperator_linearity(self):
+
+        nc, nz, ny, nx = 3, 4, 5, 6
+        ig = ImageGeometry(voxel_num_x=nx, voxel_num_y=ny, voxel_num_z=nz, channels=nc)
+
+        grad = GradientOperator(ig, bnd_cond='Neumann')
+        self.assertTrue(LinearOperator.dot_test(grad))
+
+        grad = GradientOperator(ig, bnd_cond='Periodic')
+        self.assertTrue(LinearOperator.dot_test(grad))

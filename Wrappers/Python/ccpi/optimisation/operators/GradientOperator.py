@@ -289,26 +289,26 @@ class GradientOperator(LinearOperator):
     def direct(self, x, out=None):
         ndx , x_p = GradientOperator.datacontainer_as_c_pointer(x)
         
-        return_val = 0
+        return_val = False
         if out is None:
             out = self.gm_range.allocate(None)
-            return_val = 1
+            return_val = True
 
         arg1 = [GradientOperator.datacontainer_as_c_pointer(out.get_item(i))[1] for i in range(self.gm_range.shape[0])]
         arg2 = [el for el in x.shape]
         args = arg1 + arg2 + [self.bnd_cond, 1]
         self.fd(x_p, *args)
         
-        if return_val:
+        if return_val is True:
             return out
 
 
     def adjoint(self, x, out=None):
 
-        return_val = 0
+        return_val = False
         if out is None:
             out = self.gm_domain.allocate(None)
-            return_val = 1
+            return_val = True
 
         ndout , out_p = GradientOperator.datacontainer_as_c_pointer(out)
 
@@ -318,7 +318,7 @@ class GradientOperator(LinearOperator):
 
         self.fd(out_p, *args)
 
-        if return_val:
+        if return_val is True
             return out
 
     def domain_geometry(self):

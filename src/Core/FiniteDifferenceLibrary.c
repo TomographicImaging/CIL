@@ -439,15 +439,15 @@ int fdiff_adjoint_neumann(float *outimagefull, const float *inimageXfull, const 
 			if (z_dim)
 			{
 #pragma omp for
+				for (ind = nx * ny; ind < nx * ny * nz; ind++)
+				{
+					tempZ[ind] = -inimageZ[ind] + inimageZ[ind - nx * ny];
+				}				
+#pragma omp for
 				for (ind = 0; ind < ny * nx; ind++)
 				{
 					tempZ[ind] = -inimageZ[ind];
 					tempZ[nx * ny * (nz - 1) + ind] = inimageZ[nx * ny * (nz - 2) + ind];
-				}
-#pragma omp for
-				for (ind = nx * ny; ind < nx * ny * nz; ind++)
-				{
-					tempZ[ind] = -inimageZ[ind] + inimageZ[ind - nx * ny];
 				}
 #pragma omp for
 				for (ind = 0; ind < volume; ind++)
@@ -503,137 +503,6 @@ int fdiff_adjoint_neumann(float *outimagefull, const float *inimageXfull, const 
 
 	}
 
-	return 0;
-}
-int fdiff_adjoint_neumann_test(float *outimagefull_float, const float *inimageXfull, const float *inimageYfull, const float *inimageZfull, const float *inimageCfull, long nx, long ny, long nz, long nc)
-{
-	//runs over full data in x, y, z. then correctects elements for bounday conditions and sums
-	long volume = nx * ny * nz;
-	long slice = nx * ny;
-
-
-	//assumes nx and ny > 1
-	int z_dim = nz - 1;
-
-
-	const float * inimageX = inimageXfull;
-	const float * inimageY = inimageYfull;
-	const float * inimageZ = inimageZfull;
-
-	int offset_x = -1;
-	int offset_y = -nx;
-	int offset_z = -nx * ny;
-
-	double * outimagefull = (double*) malloc(nc*volume * sizeof(double));
-	double * outimage = outimagefull;
-
-	if (z_dim)
-	{
-		long ind;
-#pragma omp parallel for
-		for (ind = 0; ind < volume * nc; ind++)
-		{
-			outimage[ind] = -inimageX[ind] - inimageY[ind] - inimageZ[ind];
-		}
-
-	}
-	else
-	{
-		long ind;
-#pragma omp parallel for
-		for (ind = 0; ind < volume * nc; ind++)
-		{
-			outimage[ind] = -inimageX[ind] - inimageY[ind];
-		}
-	}
-
-	long c;
-	for (c = 0; c < nc; c++) //just calculating x, y and z in each channel here
-	{
-
-#pragma omp parallel
-		{
-			long ind, k;
-
-#pragma omp for
-			for (ind = 0; ind < nz * ny; ind++)
-			{ 
-				int row_start = ind * nx;
-				for (int i = 1; i < nx; i++)
-				{
-					outimage[row_start + i] += inimageX[row_start + offset_x + i];
-				}
-			
-			}
-
-
-			for (k = 0; k < nz; k++)
-			{
-				for (int j = 1; j < ny; j++)
-				{
-					int row_start = k * slice + j * nx;
-
-#pragma omp for
-					for (ind = 0; ind < nx; ind++)
-					{
-						outimage[row_start + ind] += inimageY[row_start + offset_y + ind];
-					}
-				}
-			}
-
-			for (k = 1; k < nz; k++)
-			{
-				int slice_num = k * slice;
-
-#pragma omp for
-				for (ind = 0; ind < nx * ny; ind++)
-				{
-					outimage[slice_num + ind] += inimageZ[slice_num + ind + offset_z];
-				}
-			}
-
-		}
-
-		outimage += volume;
-		inimageX += volume;
-		inimageY += volume;
-		inimageZ += volume;
-	}
-
-	
-
-	//	//now the rest of the channels
-	if (nc > 1)
-	{
-		long ind;
-
-		for (c = 1; c < nc - 1; c++)
-		{
-
-#pragma omp parallel for
-			for (ind = 0; ind < volume; ind++)
-			{
-				outimagefull[ind + c * volume] += -inimageCfull[ind + c * volume] + inimageCfull[ind + (c - 1) * volume];
-			}
-		}
-
-#pragma omp parallel for
-		for (ind = 0; ind < volume; ind++)
-		{
-			outimagefull[ind] += -inimageCfull[ind];
-			outimagefull[(nc - 1) * volume + ind] += inimageCfull[(nc - 2) * volume + ind];
-		}
-
-	}
-	
-	long ind;
-#pragma omp parallel for
-	for (ind = 0; ind < volume * nc; ind++)
-	{
-		outimagefull_float[ind] = (float)outimagefull[ind];
-	}
-
-	free(outimagefull);
 	return 0;
 }
 int fdiff_adjoint_periodic(float *outimagefull, const float *inimageXfull, const float *inimageYfull, const float *inimageZfull, const float *inimageCfull, long nx, long ny, long nz, long nc)
@@ -778,7 +647,7 @@ DLL_EXPORT int fdiff4D(float *imagefull, float *gradCfull, float *gradZfull, flo
 		if (direction)
 			fdiff_direct_neumann(imagefull, gradXfull, gradYfull, gradZfull, gradCfull, nx, ny, nz, nc);
 		else
-			fdiff_adjoint_neumann_test(imagefull, gradXfull, gradYfull, gradZfull, gradCfull, nx, ny, nz, nc);
+			fdiff_adjoint_neumann(imagefull, gradXfull, gradYfull, gradZfull, gradCfull, nx, ny, nz, nc);
 	}
 	
 	return 0;
@@ -797,7 +666,7 @@ DLL_EXPORT int fdiff3D(float *imagefull, float *gradZfull, float *gradYfull, flo
 		if (direction)
 			fdiff_direct_neumann(imagefull, gradXfull, gradYfull, gradZfull, NULL, nx, ny, nz, 1);
 		else
-			fdiff_adjoint_neumann_test(imagefull, gradXfull, gradYfull, gradZfull, NULL, nx, ny, nz, 1);
+			fdiff_adjoint_neumann(imagefull, gradXfull, gradYfull, gradZfull, NULL, nx, ny, nz, 1);
 	}
 
 	return 0;

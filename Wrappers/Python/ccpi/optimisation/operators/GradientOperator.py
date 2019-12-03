@@ -281,38 +281,45 @@ class GradientOperator(LinearOperator):
             raise ValueError('Number of dimensions not supported, expected 2, 3 or 4, got {}'.format(len(gm_domain.shape)))
         
                         
-            
+    @staticmethod 
     def datacontainer_as_c_pointer(x):
         ndx = x.as_array()
         return ndx, ndx.ctypes.data_as(c_float_p)
+        
     def direct(self, x, out=None):
         ndx , x_p = GradientOperator.datacontainer_as_c_pointer(x)
         
+        return_val = False
         if out is None:
             out = self.gm_range.allocate(None)
-            ndx , x_p = GradientOperator.datacontainer_as_c_pointer(x)
-            self.fd(x_p, 
-                    *[GradientOperator.datacontainer_as_c_pointer(out.get_item(i))[1] for i in range(self.gm_range.shape[0])], 
-                    *[el for el in x.shape], self.bnd_cond, 1)
+            return_val = True
+
+        arg1 = [GradientOperator.datacontainer_as_c_pointer(out.get_item(i))[1] for i in range(self.gm_range.shape[0])]
+        arg2 = [el for el in x.shape]
+        args = arg1 + arg2 + [self.bnd_cond, 1]
+        self.fd(x_p, *args)
+        
+        if return_val is True:
             return out
-        else:
-            self.fd(x_p, 
-                    *[GradientOperator.datacontainer_as_c_pointer(out.get_item(i))[1] for i in range(self.gm_range.shape[0])], 
-                    *[el for el in x.shape], self.bnd_cond, 1)
+
+
     def adjoint(self, x, out=None):
+
+        return_val = False
         if out is None:
             out = self.gm_domain.allocate(None)
-            ndout , out_p = GradientOperator.datacontainer_as_c_pointer(out)
-            self.fd(out_p, 
-                    *[GradientOperator.datacontainer_as_c_pointer(x.get_item(i))[1] for i in range(self.gm_range.shape[0])], 
-                    *[el for el in out.shape], self.bnd_cond, 0)
+            return_val = True
+
+        ndout , out_p = GradientOperator.datacontainer_as_c_pointer(out)
+
+        arg1 = [GradientOperator.datacontainer_as_c_pointer(x.get_item(i))[1] for i in range(self.gm_range.shape[0])]
+        arg2 = [el for el in out.shape]
+        args = arg1 + arg2 + [self.bnd_cond, 0]
+
+        self.fd(out_p, *args)
+
+        if return_val is True:
             return out
-        else:
-            ndout , out_p = GradientOperator.datacontainer_as_c_pointer(out)
-            
-            self.fd(out_p, 
-                    *[GradientOperator.datacontainer_as_c_pointer(x.get_item(i))[1] for i in range(self.gm_range.shape[0])], 
-                    *[el for el in out.shape], self.bnd_cond, 0)
 
     def domain_geometry(self):
         

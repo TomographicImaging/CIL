@@ -25,13 +25,75 @@ from ccpi.framework import ImageData, ImageGeometry, BlockGeometry, BlockDataCon
 import numpy 
 from ccpi.optimisation.operators import FiniteDiff, SparseFiniteDiff
 
-#%%
-
 NEUMANN = 'Neumann'
 PERIODIC = 'Periodic'
-
+C = 'c'
+NUMPY = 'numpy'
+CORRELATION_SPACE = "Space"
+CORRELATION_SPACECHANNEL = "SpaceChannels"
 
 class Gradient(LinearOperator):
+
+    r'''Gradient Operator: .. math:: \nabla : X -> Y           
+            
+            Computes first-order forward/backward differences 
+                     on 2D, 3D, 4D ImageData
+                     under Neumann/Periodic boundary conditions
+                                                             
+                Example (2D): u\in X, \nabla(u) = [\partial_{y} u, \partial_{x} u]
+                              u^{*}\in Y, \nabla^{*}(u^{*}) = \partial_{y} v1 + \partial_{x} v2           
+    '''
+
+    #kept here for backwards compatability
+    CORRELATION_SPACE = CORRELATION_SPACE
+    CORRELATION_SPACECHANNEL = CORRELATION_SPACECHANNEL
+
+    def __init__(self, gm_domain, bnd_cond = 'Neumann', **kwargs):
+        
+        super(Gradient, self).__init__() 
+
+        backend = kwargs.get('backend',C)
+
+        correlation = kwargs.get('correlation',CORRELATION_SPACE)
+
+        if correlation == CORRELATION_SPACE and gm_domain.channels > 1:
+            #numpy implementation only for now
+            backend = NUMPY
+
+        if backend == NUMPY:
+            self.Operator = Gradient_numpy(gm_domain, bnd_cond=bnd_cond, **kwargs)
+        else:
+            self.Operator = Gradient_C(gm_domain, bnd_cond=bnd_cond)
+
+
+    def direct(self, x, out=None):
+        if out is None:
+            out = self.Operator.direct(x, out=out)
+            return out
+        else:
+            self.Operator.direct(x, out=out)
+        
+        
+    def adjoint(self, x, out=None):
+        if out is None:
+            out = self.Operator.adjoint(x, out=out)
+            return out
+        else:
+            self.Operator.adjoint(x, out=out)
+
+    def domain_geometry(self):
+        
+        '''Returns domain_geometry of Gradient'''
+        
+        return self.Operator.gm_domain
+    
+    def range_geometry(self):
+        
+        '''Returns range_geometry of Gradient'''
+        
+        return self.Operator.gm_range
+
+class Gradient_numpy(LinearOperator):
     
     
     r'''Gradient Operator: .. math:: \nabla : X -> Y           
@@ -50,22 +112,19 @@ class Gradient(LinearOperator):
                 
 
     '''
-    
-                    
-    CORRELATION_SPACE = "Space"
-    CORRELATION_SPACECHANNEL = "SpaceChannels"
 
     def __init__(self, gm_domain, bnd_cond = 'Neumann', **kwargs):
         
-        super(Gradient, self).__init__() 
+        super(Gradient_numpy, self).__init__() 
                 
         self.gm_domain = gm_domain # Domain of Grad Operator
         
-        self.correlation = kwargs.get('correlation',Gradient.CORRELATION_SPACE)
+        self.correlation = kwargs.get('correlation',CORRELATION_SPACE)
         
-        if self.correlation==Gradient.CORRELATION_SPACE:
-            if self.gm_domain.channels>1:
+        if self.correlation==CORRELATION_SPACE:
+            if self.gm_domain.channels > 1:
                 self.gm_range = BlockGeometry(*[self.gm_domain for _ in range(self.gm_domain.length-1)] )
+
                 if self.gm_domain.length == 4:
                     # 3D + Channel
                     # expected Grad_order = ['channels', 'direction_z', 'direction_y', 'direction_x']
@@ -74,6 +133,7 @@ class Gradient(LinearOperator):
                     # 2D + Channel
                     # expected Grad_order = ['channels', 'direction_y', 'direction_x']
                     expected_order = [ImageGeometry.CHANNEL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+
                 order = self.gm_domain.get_order_by_label(self.gm_domain.dimension_labels, expected_order)
                 self.ind = order[1:]
                 #self.ind = numpy.arange(1,self.gm_domain.length)
@@ -87,10 +147,12 @@ class Gradient(LinearOperator):
                 else:
                     # 2D
                     expected_order = [ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]    
+
                 self.ind = self.gm_domain.get_order_by_label(self.gm_domain.dimension_labels, expected_order)
                 # self.ind = numpy.arange(self.gm_domain.length)
-        elif self.correlation==Gradient.CORRELATION_SPACECHANNEL:
-            if self.gm_domain.channels>1:
+                
+        elif self.correlation==CORRELATION_SPACECHANNEL:
+            if self.gm_domain.channels > 1:
                 self.gm_range = BlockGeometry(*[self.gm_domain for _ in range(self.gm_domain.length)])
                 self.ind = range(self.gm_domain.length)
             else:
@@ -245,7 +307,7 @@ cilacc.fdiff2D.argtypes = [ctypes.POINTER(ctypes.c_float),
                        ctypes.c_int32]
 
 
-class GradientOperator(LinearOperator):
+class Gradient_C(LinearOperator):
     
     '''Finite Difference Operator:
             
@@ -255,7 +317,7 @@ class GradientOperator(LinearOperator):
 
     def __init__(self, gm_domain, gm_range=None, bnd_cond = NEUMANN):
 
-        super(GradientOperator, self).__init__() 
+        super(Gradient_C, self).__init__() 
 
         self.gm_domain = gm_domain
         self.gm_range = gm_range
@@ -287,14 +349,14 @@ class GradientOperator(LinearOperator):
         return ndx, ndx.ctypes.data_as(c_float_p)
         
     def direct(self, x, out=None):
-        ndx , x_p = GradientOperator.datacontainer_as_c_pointer(x)
+        ndx , x_p = Gradient_C.datacontainer_as_c_pointer(x)
         
         return_val = False
         if out is None:
             out = self.gm_range.allocate(None)
             return_val = True
 
-        arg1 = [GradientOperator.datacontainer_as_c_pointer(out.get_item(i))[1] for i in range(self.gm_range.shape[0])]
+        arg1 = [Gradient_C.datacontainer_as_c_pointer(out.get_item(i))[1] for i in range(self.gm_range.shape[0])]
         arg2 = [el for el in x.shape]
         args = arg1 + arg2 + [self.bnd_cond, 1]
         self.fd(x_p, *args)
@@ -310,9 +372,9 @@ class GradientOperator(LinearOperator):
             out = self.gm_domain.allocate(None)
             return_val = True
 
-        ndout , out_p = GradientOperator.datacontainer_as_c_pointer(out)
+        ndout, out_p = Gradient_C.datacontainer_as_c_pointer(out)
 
-        arg1 = [GradientOperator.datacontainer_as_c_pointer(x.get_item(i))[1] for i in range(self.gm_range.shape[0])]
+        arg1 = [Gradient_C.datacontainer_as_c_pointer(x.get_item(i))[1] for i in range(self.gm_range.shape[0])]
         arg2 = [el for el in out.shape]
         args = arg1 + arg2 + [self.bnd_cond, 0]
 
@@ -332,8 +394,6 @@ class GradientOperator(LinearOperator):
         '''Returns range_geometry of Gradient'''
         
         return self.gm_range
-
-            
 
        
 if __name__ == '__main__':
@@ -448,8 +508,5 @@ if __name__ == '__main__':
     G.direct(u, out = res)          
     G.adjoint(w, out = res1)
           
-    print( (res*w).sum(),  (u*res1).sum() )     
+    print( (res*w).sum(),  (u*res1).sum() )
     
-    
-    
-

@@ -25,8 +25,6 @@ from ccpi.framework import ImageData, ImageGeometry, BlockGeometry, BlockDataCon
 import numpy 
 from ccpi.optimisation.operators import FiniteDiff, SparseFiniteDiff
 
-#%%
-
 NEUMANN = 'Neumann'
 PERIODIC = 'Periodic'
 C = 'c'
@@ -374,7 +372,7 @@ class Gradient_C(LinearOperator):
             out = self.gm_domain.allocate(None)
             return_val = True
 
-        ndout , out_p = Gradient_C.datacontainer_as_c_pointer(out)
+        ndout, out_p = Gradient_C.datacontainer_as_c_pointer(out)
 
         arg1 = [Gradient_C.datacontainer_as_c_pointer(x.get_item(i))[1] for i in range(self.gm_range.shape[0])]
         arg2 = [el for el in out.shape]
@@ -396,8 +394,6 @@ class Gradient_C(LinearOperator):
         '''Returns range_geometry of Gradient'''
         
         return self.gm_range
-
-            
 
        
 if __name__ == '__main__':

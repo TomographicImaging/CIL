@@ -318,7 +318,7 @@ class GradientOperator(LinearOperator):
 
         self.fd(out_p, *args)
 
-        if return_val is True
+        if return_val is True:
             return out
 
     def domain_geometry(self):

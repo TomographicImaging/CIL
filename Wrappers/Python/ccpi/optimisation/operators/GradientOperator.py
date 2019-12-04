@@ -34,6 +34,23 @@ CORRELATION_SPACECHANNEL = "SpaceChannels"
 
 class Gradient(LinearOperator):
 
+    """This is a class to compute the first-order forward/backward differences on ImageData
+    
+    :param gm_domain: Set up the domain of the function
+    :type gm_domain: `ImageGeometry`
+    :param bnd_cond: Set the boundary conditions to use 'Neumann' or 'Periodic', defaults to 'Neumann'
+    :type bnd_cond: str, optional    
+    
+    :param \**kwargs:
+        See below
+
+    :Keyword Arguments:
+        * *correlation* (``str``) --
+          'Space' or 'SpaceChannels', defaults to 'Space'
+        * *backend* (``str``) --
+          'c' or 'numpy', defaults to 'c' if correlation is 'SpaceChannels' or channels = 1
+    """
+
     r'''Gradient Operator: .. math:: \nabla : X -> Y           
             
             Computes first-order forward/backward differences 
@@ -41,7 +58,8 @@ class Gradient(LinearOperator):
                      under Neumann/Periodic boundary conditions
                                                              
                 Example (2D): u\in X, \nabla(u) = [\partial_{y} u, \partial_{x} u]
-                              u^{*}\in Y, \nabla^{*}(u^{*}) = \partial_{y} v1 + \partial_{x} v2           
+                              u^{*}\in Y, \nabla^{*}(u^{*}) = \partial_{y} v1 + \partial_{x} v2
+        
     '''
 
     #kept here for backwards compatability
@@ -49,7 +67,8 @@ class Gradient(LinearOperator):
     CORRELATION_SPACECHANNEL = CORRELATION_SPACECHANNEL
 
     def __init__(self, gm_domain, bnd_cond = 'Neumann', **kwargs):
-        
+        """Constructor method
+        """        
         super(Gradient, self).__init__() 
 
         backend = kwargs.get('backend',C)
@@ -59,6 +78,7 @@ class Gradient(LinearOperator):
         if correlation == CORRELATION_SPACE and gm_domain.channels > 1:
             #numpy implementation only for now
             backend = NUMPY
+            "Warning: correlation='Space' on multi-channel dataset will use `numpy` backend"
 
         if backend == NUMPY:
             self.Operator = Gradient_numpy(gm_domain, bnd_cond=bnd_cond, **kwargs)
@@ -67,22 +87,29 @@ class Gradient(LinearOperator):
 
 
     def direct(self, x, out=None):
-        if out is None:
-            out = self.Operator.direct(x, out=out)
-            return out
-        else:
-            self.Operator.direct(x, out=out)
+        """Computes the first-order forward differences
+        :param x: Image data
+        :type x: `ImageData`
+        :param out: pre-allocated output memory to store result
+        :type out: `BlockDataContainer`, optional        
+        :return: result data if not passed as parameter
+        :rtype: `BlockDataContainer`
+        """        
+        return self.Operator.direct(x, out=out)
         
         
     def adjoint(self, x, out=None):
-        if out is None:
-            out = self.Operator.adjoint(x, out=out)
-            return out
-        else:
-            self.Operator.adjoint(x, out=out)
+        """Computes the first-order backward differences
+        :param x: Gradient images for each dimension in ImageGeometry domain
+        :type x: `BlockDataContainer`
+        :param out: pre-allocated output memory to store result
+        :type out: `ImageData`, optional      
+        :return: result data if not passed as parameter
+        :rtype: `ImageData`
+        """            
+        return self.Operator.adjoint(x, out=out)
 
     def domain_geometry(self):
-        
         '''Returns domain_geometry of Gradient'''
         
         return self.Operator.gm_domain
@@ -95,24 +122,6 @@ class Gradient(LinearOperator):
 
 class Gradient_numpy(LinearOperator):
     
-    
-    r'''Gradient Operator: .. math:: \nabla : X -> Y           
-            
-            Computes first-order forward/backward differences 
-                     on 2D, 3D, 4D ImageData
-                     under Neumann/Periodic boundary conditions
-                                                             
-                Example (2D): u\in X, \nabla(u) = [\partial_{y} u, \partial_{x} u]
-                              u^{*}\in Y, \nabla^{*}(u^{*}) = \partial_{y} v1 + \partial_{x} v2
-        
-                Grad_order = ['channels', 'direction_z', 'direction_y', 'direction_x']
-                Grad_order = ['channels', 'direction_y', 'direction_x']
-                Grad_order = ['direction_z', 'direction_y', 'direction_x']
-                Grad_order = ['channels', 'direction_z', 'direction_y', 'direction_x']
-                
-
-    '''
-
     def __init__(self, gm_domain, bnd_cond = 'Neumann', **kwargs):
         
         super(Gradient_numpy, self).__init__() 

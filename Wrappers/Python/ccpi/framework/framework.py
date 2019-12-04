@@ -211,6 +211,32 @@ class ImageGeometry(object):
 
 
 class AcquisitionGeometry(object):
+    """
+    General inputs for standard type projection geometries
+    detectorDomain or detectorpixelSize:
+        If 2D
+            If scalar: Width of detector or single detector pixel
+            If 2-vec: Error
+        If 3D
+            If scalar: Width in both dimensions
+            If 2-vec: Vertical then horizontal size
+    grid
+        If 2D
+            If scalar: number of detectors
+            If 2-vec: error
+        If 3D
+            If scalar: Square grid that size
+            If 2-vec vertical then horizontal size
+    cone or parallel
+    2D or 3D
+    parallel_parameters: ?
+    cone_parameters:
+        source_to_center_dist (if parallel: NaN)
+        center_to_detector_dist (if parallel: NaN)
+    standard or nonstandard (vec) geometry
+    angles is expected numpy array, dtype - float32
+    angles_format radians or degrees
+    """
 
     RANDOM = 'random'
     RANDOM_INT = 'random_int'
@@ -222,85 +248,89 @@ class AcquisitionGeometry(object):
     VERTICAL = 'vertical'
     HORIZONTAL = 'horizontal'
 
+    @property
+    def geom_type(self):
+        return self._geom_type
+
+    @geom_type.setter
+    def geom_type(self,val):
+        if val != 'cone' and val != 'parallel':
+            raise ValueError('geom_type = {} not recognised please specify \'cone\' or \'parallel\''.format(val))
+        else:
+            self._geom_type = val
+
+    @property
+    def dimension(self):
+        return self._dimension
+
+    @property
+    def num_pixels(self):
+        return self._num_pixels
+
+    @num_pixels.setter
+    def num_pixels(self, val):
+
+        if isinstance(val,int):
+            num_pixels_temp = (val, 1)
+        elif isinstance(val, (list, tuple)) and len(val) == 2 and isinstance(val[0], int) and isinstance(val[1], int):
+            num_pixels_temp = (val[0], val[1])
+        else:
+            raise ValueError('num_pixels expected int x or [int y, int x]. Got {}'.format(val))
+
+        if num_pixels_temp < (1,1):
+            raise ValueError('num_pixels (y,x) must be > (0,0). Got {}'.format(num_pixels))
+        else:
+            self._num_pixels = num_pixels_temp
+
+            if self.num_pixels[0] > 1:
+                self._dimension = '3D'
+            elif self.num_pixels[0] == 1:
+                self._dimension = '2D'
+ 
+    @property
+    def pixel_size(self):
+        return self._pixel_size
+
+    @pixel_size.setter
+    def pixel_size(self, val):
+
+        if isinstance(val,float):
+            pixel_size_temp = (val, 1)
+        elif isinstance(val, (list, tuple)) and len(val) == 2 and isinstance(val[0], float) and isinstance(val[1], float):
+            pixel_size_temp = (val[0], val[1])
+        else:
+            raise ValueError('pixel_size expected float xy or [float y, float x]. Got {}'.format(val))
+
+        if pixel_size_temp <= (0,0):
+            raise ValueError('pixel_size (y,x) at must be > (0.,0.). Got {}'.format(pixel_size))
+        else:
+            self._pixel_size = pixel_size_temp
+
     def __init__(self,
-                 geom_type: str,
-                 num_pixels: Tuple[int, int],
-                 pixel_size: Tuple[float, float],
-                 obj_to_src: List[Tuple[float, float, float]],
-                 obj_to_det: List[Tuple[float, float, float]],
-                 det_orientation: List[Tuple[float, float, float]],
-                 pixel_theta: float = 90.,
-                 num_channels: int = 1,
+                 geom_type, #'cone'/'parallel'
+                 num_pixels, # int x or [int y, int x]
+                 pixel_size, # float xy or [float y, float x]
+                 src_to_obj, # List[(float x, float y, float z)]
+                 obj_to_det, # List[(float x, float y, float z)]
+                 det_orientation, # List[(float Rx, float Ry, float Rz)]
+                 num_channels = 1, #int
                  ** kwargs):
 
-        """
-        General inputs for standard type projection geometries
-        detectorDomain or detectorpixelSize:
-            If 2D
-                If scalar: Width of detector or single detector pixel
-                If 2-vec: Error
-            If 3D
-                If scalar: Width in both dimensions
-                If 2-vec: Vertical then horizontal size
-        grid
-            If 2D
-                If scalar: number of detectors
-                If 2-vec: error
-            If 3D
-                If scalar: Square grid that size
-                If 2-vec vertical then horizontal size
-        cone or parallel
-        2D or 3D
-        parallel_parameters: ?
-        cone_parameters:
-            source_to_center_dist (if parallel: NaN)
-            center_to_detector_dist (if parallel: NaN)
-        standard or nonstandard (vec) geometry
-        angles is expected numpy array, dtype - float32
-        angles_format radians or degrees
-        """
-
-        @property
-        def num_pixels(self):
-            return self._num_pixels
-
-        @num_pixel.setter
-        def num_pixel(self, pixels):
-            self._num_pixels = tuple(pixels[1], pixels[0])
-
-        num_pixels.setter(num_pixels)
-
-        #check inputs all make sense
-        if geom_type != 'cone' and geom_type != 'parallel':
-            raise ValueError('geom_type = {} not recognised please specify \'cone\' or \'parallel\''.format(geom_type))
-
-        if num_pixels < (1,1):
-            raise ValueError('Number of pixels (y,x) must be > (0,0). Got {}'.format(num_pixels))
+        self.geom_type  = geom_type
+        self.num_pixels = num_pixels
+        self.pixel_size = pixel_size
         
-        if pixel_size <= (0,0):
-            raise ValueError('Pixel sixe (y,x) at must be > (0.,0.). Got {}'.format(pixel_size))
-        
-        if isinstance(obj_to_src, list) and  isinstance(obj_to_det, list) and  isinstance(det_orientation, list):
+        if isinstance(src_to_obj, list) and  isinstance(obj_to_det, list) and  isinstance(det_orientation, list):
             if len(obj_to_src) != len(obj_to_det) != len(det_orientation):
                 raise ValueError('obj_to_src[], obj_to_det[] and det_orientation[] must have the same length')
         else:
             raise ValueError('obj_to_src[], obj_to_det[] and det_orientation[] must be of type list')
 
-        if num_pixels[0] > 1:
-            dimension = '3D'
-        elif num_pixels[0] == 1:
-            dimension = '2D'
-
-        self.geom_type  = geom_type        
-        ##self.num_pixels = num_pixels
-        self.pixel_size = pixel_size
-        self.obj_to_src = obj_to_src
+        self.src_to_obj = src_to_obj
         self.obj_to_det = obj_to_det
         self.det_orientation = det_orientation
         self.pixel_theta = pixel_theta
         self.num_channels = num_channels
-        self.dimension = dimension 
-
         
         #and make it work with current projector style for
         num_of_angles = len (obj_to_src)

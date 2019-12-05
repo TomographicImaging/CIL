@@ -270,12 +270,19 @@ class AcquisitionGeometry(object):
     @num_pixels.setter
     def num_pixels(self, val):
 
-        if isinstance(val,int):
-            num_pixels_temp = (val, 1)
-        elif isinstance(val, (list, tuple)) and len(val) == 2 and isinstance(val[0], int) and isinstance(val[1], int):
-            num_pixels_temp = (val[0], val[1])
+        try:         
+            length = len(val)
+        except:
+            try:
+                num_pixels_temp = (1, int(val))
+            except:
+                raise TypeError('num_pixels expected int x or [int y, int x]. Got {}'.format(val))
         else:
-            raise ValueError('num_pixels expected int x or [int y, int x]. Got {}'.format(val))
+            if length == 2:
+                try:
+                    num_pixels_temp = (int(val[0]), int(val[1]))
+                except:
+                    raise TypeError('num_pixels expected int x or [int y, int x]. Got {}'.format(val))
 
         if num_pixels_temp < (1,1):
             raise ValueError('num_pixels (y,x) must be > (0,0). Got {}'.format(num_pixels))
@@ -294,58 +301,124 @@ class AcquisitionGeometry(object):
     @pixel_size.setter
     def pixel_size(self, val):
 
-        if isinstance(val,float):
-            pixel_size_temp = (val, 1)
-        elif isinstance(val, (list, tuple)) and len(val) == 2 and isinstance(val[0], float) and isinstance(val[1], float):
-            pixel_size_temp = (val[0], val[1])
+        try:         
+            length = len(val)
+        except:
+            try:
+                pixel_size_temp = (float(val), float(val))
+            except:
+                raise TypeError('pixel_size expected float xy or [float y, float x]. Got {}'.format(val))
         else:
-            raise ValueError('pixel_size expected float xy or [float y, float x]. Got {}'.format(val))
+            if length == 2:
+                try:
+                    pixel_size_temp = (float(val[0]), float(val[1]))
+                except:
+                    raise TypeError('pixel_size expected float xy or [float y, float x]. Got {}'.format(val))
+
 
         if pixel_size_temp <= (0,0):
             raise ValueError('pixel_size (y,x) at must be > (0.,0.). Got {}'.format(pixel_size))
         else:
             self._pixel_size = pixel_size_temp
 
+    @property
+    def num_positions(self):
+        return self._num_positions
+
+    @num_positions.setter
+    def num_positions(self, val):
+
+        try:
+            val = int(val)
+        except:
+            raise TypeError('num_positions expected a positive integer. Got {}'.format(val))
+
+        if val > 0:
+            self._num_positions = val
+        else:
+            raise ValueError('num_positions expected a positive integer. Got {}'.format(val))
+
+    @property
+    def num_channels(self):
+        return self._num_channels
+
+    @num_channels.setter
+    def num_channels(self, val):
+        
+        try:
+            val = int(val)
+        except:
+            raise TypeError('num_channels expected a positive integer. Got {}'.format(val))
+
+        if val > 0:
+            self._num_channels = val
+        else:
+            raise ValueError('num_channels expected a positive integer. Got {}'.format(val))
+
+    @property
+    def src_dof(self):
+        return self._src_dof
+
+    @src_dof.setter
+    def src_dof(self, val):
+        if self.dimension == '3D':
+            length = 3
+        else:
+            length = 2
+
+        try:
+            self._src_dof = numpy.asarray(val, dtype=float).reshape(self.num_positions,length)
+        except ValueError as ve:
+            raise ValueError('src_dof must be size num_positions x {0} for {1} dataset'.format(length, self.dimension))
+
+    @property
+    def det_dof(self):
+        return self._det_dof
+
+    @det_dof.setter
+    def det_dof(self, val):
+        if self.dimension == '3D':
+            length = 6
+        else:
+            length = 3
+
+        try:
+            self._det_dof = numpy.asarray(val, dtype=float).reshape(self.num_positions,length)
+        except ValueError as ve:
+            raise ValueError('det_dof must be size numproj x {0} for {1} dataset'.format(length, self.dimension))
+
     def __init__(self,
                  geom_type, #'cone'/'parallel'
                  num_pixels, # int x or [int y, int x]
                  pixel_size, # float xy or [float y, float x]
-                 src_to_obj, # List[(float x, float y, float z)]
-                 obj_to_det, # List[(float x, float y, float z)]
-                 det_orientation, # List[(float Rx, float Ry, float Rz)]
+                 num_positions, # int
+                 src_dof, # 3 dof (x,y,z) per projection as [num_positions, src vector]
+                 det_dof, # 6 dof (x,y,z,Rx,Ry,Rz) per projection as [num_positions, det vector]
                  num_channels = 1, #int
                  ** kwargs):
 
         self.geom_type  = geom_type
         self.num_pixels = num_pixels
         self.pixel_size = pixel_size
-        
-        if isinstance(src_to_obj, list) and  isinstance(obj_to_det, list) and  isinstance(det_orientation, list):
-            if len(obj_to_src) != len(obj_to_det) != len(det_orientation):
-                raise ValueError('obj_to_src[], obj_to_det[] and det_orientation[] must have the same length')
-        else:
-            raise ValueError('obj_to_src[], obj_to_det[] and det_orientation[] must be of type list')
-
-        self.src_to_obj = src_to_obj
-        self.obj_to_det = obj_to_det
-        self.det_orientation = det_orientation
-        self.pixel_theta = pixel_theta
+        self.num_positions = num_positions
         self.num_channels = num_channels
-        
-        #and make it work with current projector style for
-        num_of_angles = len (obj_to_src)
+        self.src_dof = src_dof
+        self.det_dof = det_dof
+
+        #and make it work with current 2D projector style for now
+        num_of_angles = self.num_positions
         angles = numpy.ndarray(num_of_angles)
         AcquisitionGeometry.ANGLE_UNIT = AcquisitionGeometry.RADIAN
 
         for i in range(num_of_angles):
-            angles[i] = numpy.arctan2(obj_to_src[i][0], -obj_to_src[i][1])
+            angles[i] = numpy.arctan2(src_dof[i][0], -src_dof[i][1])
 
-        self.dist_source_center = -self.obj_to_src[0][1]
-        self.dist_center_detector = self.obj_to_det[0][1]        
+        self.dist_source_center = -self.src_dof[0][1]
+        self.dist_center_detector = self.det_dof[0][1]        
         self.pixel_num_h = self.num_pixels[1]
-        self.pixel_size_h = self.pixel_size[0]
+        self.pixel_size_h = self.pixel_size[1]
         self.pixel_num_v = self.num_pixels[0]
-        self.pixel_size_v = self.pixel_size[1]    
+        self.pixel_size_v = self.pixel_size[0]    
         self.channels = self.num_channels
         self.angles = angles
 
@@ -406,22 +479,18 @@ class AcquisitionGeometry(object):
                     break
         return order
 
-
-
         
     def clone(self):
         '''returns a copy of the AcquisitionGeometry'''
         return AcquisitionGeometry(self.geom_type,
-                                   self.dimension, 
-                                   self.angles, 
-                                   self.pixel_num_h, 
-                                   self.pixel_size_h, 
-                                   self.pixel_num_v, 
-                                   self.pixel_size_v, 
-                                   self.dist_source_center, 
-                                   self.dist_center_detector, 
-                                   self.channels,
-                                   dimension_labels=self.dimension_labels)
+                                   self.num_pixels, 
+                                   self.pixel_size, 
+                                   self.num_positions, 
+                                   self.src_dof, 
+                                   self.det_dof, 
+                                   self.num_channels, 
+                                   dimension_labels=self.dimension_labels
+                 )
         
     def __str__ (self):
         repres = ""

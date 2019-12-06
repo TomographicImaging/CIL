@@ -20,8 +20,6 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from typing import Union, List, Tuple
-
 import numpy
 import sys
 from datetime import timedelta, datetime
@@ -247,7 +245,9 @@ class AcquisitionGeometry(object):
     ANGLE = 'angle'
     VERTICAL = 'vertical'
     HORIZONTAL = 'horizontal'
-
+    AQ3D = '3D'
+    AQ2D = '2D'
+    
     @property
     def geom_type(self):
         return self._geom_type
@@ -269,7 +269,6 @@ class AcquisitionGeometry(object):
 
     @num_pixels.setter
     def num_pixels(self, val):
-
         try:         
             length = len(val)
         except:
@@ -290,9 +289,9 @@ class AcquisitionGeometry(object):
             self._num_pixels = num_pixels_temp
 
             if self.num_pixels[0] > 1:
-                self._dimension = '3D'
+                self._dimension = AcquisitionGeometry.AQ3D
             elif self.num_pixels[0] == 1:
-                self._dimension = '2D'
+                self._dimension = AcquisitionGeometry.AQ2D
  
     @property
     def pixel_size(self):
@@ -300,7 +299,6 @@ class AcquisitionGeometry(object):
 
     @pixel_size.setter
     def pixel_size(self, val):
-
         try:         
             length = len(val)
         except:
@@ -361,7 +359,7 @@ class AcquisitionGeometry(object):
 
     @src_dof.setter
     def src_dof(self, val):
-        if self.dimension == '3D':
+        if self.dimension == AcquisitionGeometry.AQ3D:
             length = 3
         else:
             length = 2
@@ -377,7 +375,7 @@ class AcquisitionGeometry(object):
 
     @det_dof.setter
     def det_dof(self, val):
-        if self.dimension == '3D':
+        if self.dimension == AcquisitionGeometry.AQ3D:
             length = 6
         else:
             length = 3
@@ -405,7 +403,7 @@ class AcquisitionGeometry(object):
         self.src_dof = src_dof
         self.det_dof = det_dof
 
-        #and make it work with current 2D projector style for now
+        #and make it work with current 2D projector style to test
         num_of_angles = self.num_positions
         angles = numpy.ndarray(num_of_angles)
         AcquisitionGeometry.ANGLE_UNIT = AcquisitionGeometry.RADIAN
@@ -431,7 +429,7 @@ class AcquisitionGeometry(object):
 
         # default labels
         if channels > 1:
-            if pixel_num_v > 1:
+            if self.dimension == AcquisitionGeometry.AQ3D:
                 shape = (channels, num_of_angles , pixel_num_v, pixel_num_h)
                 dim_labels = [AcquisitionGeometry.CHANNEL ,
                  AcquisitionGeometry.ANGLE , AcquisitionGeometry.VERTICAL ,
@@ -441,7 +439,7 @@ class AcquisitionGeometry(object):
                 dim_labels = [AcquisitionGeometry.CHANNEL ,
                  AcquisitionGeometry.ANGLE, AcquisitionGeometry.HORIZONTAL]
         else:
-            if pixel_num_v > 1:
+            if self.dimension == AcquisitionGeometry.AQ3D:
                 shape = (num_of_angles, pixel_num_v, pixel_num_h)
                 dim_labels = [AcquisitionGeometry.ANGLE , AcquisitionGeometry.VERTICAL ,
                  AcquisitionGeometry.HORIZONTAL]
@@ -503,6 +501,7 @@ class AcquisitionGeometry(object):
         repres += "distance center-detector: {0}\n".format(self.dist_center_detector)
         repres += "number of channels: {0}\n".format(self.channels)
         return repres
+        
     def allocate(self, value=0, dimension_labels=None, **kwargs):
         '''allocates an AcquisitionData according to the size expressed in the instance'''
         if dimension_labels is None:

@@ -494,12 +494,13 @@ class TestBlockOperator(unittest.TestCase):
             print("Z1", Z1[0][1].as_array())
             print("RES1", RES1[0][1].as_array())
     def test_timedifference(self):
+
         print ("test_timedifference")
         M, N ,W = 100, 512, 512
         ig = ImageGeometry(M, N, W)
         arr = ig.allocate('random_int')  
         
-        G = Gradient(ig)
+        G = Gradient(ig, backend='numpy')
         Id = Identity(ig)
         
         B = BlockOperator(G, Id)

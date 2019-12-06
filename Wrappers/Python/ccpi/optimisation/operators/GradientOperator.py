@@ -21,9 +21,10 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 from ccpi.optimisation.operators import Operator, LinearOperator, ScaledOperator
+from ccpi.optimisation.operators import FiniteDiff, SparseFiniteDiff
 from ccpi.framework import ImageData, ImageGeometry, BlockGeometry, BlockDataContainer
 import numpy 
-from ccpi.optimisation.operators import FiniteDiff, SparseFiniteDiff
+import warnings
 
 NEUMANN = 'Neumann'
 PERIODIC = 'Periodic'
@@ -78,16 +79,17 @@ class Gradient(LinearOperator):
         if correlation == CORRELATION_SPACE and gm_domain.channels > 1:
             #numpy implementation only for now
             backend = NUMPY
-            "Warning: correlation='Space' on multi-channel dataset will use `numpy` backend"
+            warnings.warn("Warning: correlation='Space' on multi-channel dataset will use `numpy` backend")
 
         if backend == NUMPY:
-            self.Operator = Gradient_numpy(gm_domain, bnd_cond=bnd_cond, **kwargs)
+            self.operator = Gradient_numpy(gm_domain, bnd_cond=bnd_cond, **kwargs)
         else:
-            self.Operator = Gradient_C(gm_domain, bnd_cond=bnd_cond)
+            self.operator = Gradient_C(gm_domain, bnd_cond=bnd_cond)
 
 
     def direct(self, x, out=None):
         """Computes the first-order forward differences
+
         :param x: Image data
         :type x: `ImageData`
         :param out: pre-allocated output memory to store result
@@ -95,11 +97,12 @@ class Gradient(LinearOperator):
         :return: result data if not passed as parameter
         :rtype: `BlockDataContainer`
         """        
-        return self.Operator.direct(x, out=out)
+        return self.operator.direct(x, out=out)
         
         
     def adjoint(self, x, out=None):
         """Computes the first-order backward differences
+
         :param x: Gradient images for each dimension in ImageGeometry domain
         :type x: `BlockDataContainer`
         :param out: pre-allocated output memory to store result
@@ -107,18 +110,18 @@ class Gradient(LinearOperator):
         :return: result data if not passed as parameter
         :rtype: `ImageData`
         """            
-        return self.Operator.adjoint(x, out=out)
+        return self.operator.adjoint(x, out=out)
 
     def domain_geometry(self):
         '''Returns domain_geometry of Gradient'''
         
-        return self.Operator.gm_domain
+        return self.operator.gm_domain
     
     def range_geometry(self):
         
         '''Returns range_geometry of Gradient'''
         
-        return self.Operator.gm_range
+        return self.operator.gm_range
 
 class Gradient_numpy(LinearOperator):
     

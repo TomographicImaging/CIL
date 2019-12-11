@@ -8,9 +8,9 @@ Further, it provides a number of high-level generic implementations of optimisat
 
 The fundamental components are:
 
-+ Operator: A class specifying a (currently linear) operator
-+ Function: A class specifying mathematical functions such as a least squares data fidelity.
-+ Algorithm: Implementation of an iterative optimisation algorithm to solve a particular generic optimisation problem. Algorithms are iterable Python object which can be run in a for loop. Can be stopped and warm restarted.
++ :code:`Operator`: A class specifying a (currently linear) operator
++ :code:`Function`: A class specifying mathematical functions such as a least squares data fidelity.
++ :code:`Algorithm`: Implementation of an iterative optimisation algorithm to solve a particular generic optimisation problem. Algorithms are iterable Python object which can be run in a for loop. Can be stopped and warm restarted.
 
 Algorithm
 =========
@@ -22,12 +22,13 @@ Gradient (PDHG) and Fast Iterative Shrinkage Thresholding Algorithm (FISTA).
 
 An algorithm is designed for a 
 particular generic optimisation problem accepts and number of 
-Functions and/or Operators as input to define a specific instance of 
+:code:`Function`s and/or :code:`Operator`s as input to define a specific instance of 
 the generic optimisation problem to be solved.
 They are iterable objects which can be run in a for loop. 
 The user can provide a stopping criterion different than the default max_iteration.
 
-New algorithms can be easily created by extending the Algorithm class. The user is required to implement only 4 methods: set_up, __init__, update and update_objective.
+New algorithms can be easily created by extending the :code:`Algorithm` class. 
+The user is required to implement only 4 methods: set_up, __init__, update and update_objective.
 
 + :code:`set_up` and :code:`__init__` are used to configure the algorithm
 + :code:`update` is the actual iteration updating the solution
@@ -43,7 +44,9 @@ algorithm to minimise a Function will only be:
     def update_objective(self):
         self.loss.append(self.objective_function(self.x))
 
-The :code:`Algorithm` provides the infrastructure to continue iteration, to access the values of the objective function in subsequent iterations, the time for each iteration.
+The :code:`Algorithm` provides the infrastructure to continue iteration, to access the values of the 
+objective function in subsequent iterations, the time for each iteration, and to provide a nice 
+print to screen of the status of the optimisation.
 
 .. autoclass:: ccpi.optimisation.algorithms.Algorithm
    :members:
@@ -155,5 +158,69 @@ e.g. :code:`f(x)` for a :code:`Function f` and input point :code:`x`.
    :members:
    :special-members:
 
+
+Block Framework
+***************
+
+Block Operator
+==============
+
+A Block matrix with operators 
+
+.. math::
+  K = \begin{bmatrix}
+  A_{1} & A_{2} \\
+  A_{3} & A_{4} \\
+  A_{5} & A_{6}
+  \end{bmatrix}_{(3,2)} *  \quad \underbrace{\begin{bmatrix}
+  x_{1} \\
+  x_{2} 
+  \end{bmatrix}_{(2,1)}}_{\textbf{x}} =  \begin{bmatrix}
+  A_{1}x_{1}  + A_{2}x_{2}\\
+  A_{3}x_{1}  + A_{4}x_{2}\\
+  A_{5}x_{1}  + A_{6}x_{2}\\
+  \end{bmatrix}_{(3,1)} =  \begin{bmatrix}
+  y_{1}\\
+  y_{2}\\
+  y_{3}
+  \end{bmatrix}_{(3,1)} = \textbf{y}$$
+
+Column: Share the same domains :math:`X_{1}, X_{2}`
+Rows: Share the same ranges :math:`Y_{1}, Y_{2}, Y_{3}`.
+
+.. math::
+  
+  K : (X_{1}\times X_{2}) \rightarrow (Y_{1}\times Y_{2} \times Y_{3})
+
+  A_{1}, A_{3}, A_{5}: \text{share the same domain }  X_{1}
+
+  A_{2}, A_{4}, A_{6}: \text{share the same domain }  X_{2}
+
+  A_{1}: X_{1} \rightarrow Y_{1}, \quad A_{3}: X_{1} \rightarrow Y_{2}, \quad  A_{5}: X_{1} \rightarrow Y_{3}
+  
+  A_{2}: X_{2} \rightarrow Y_{1}, \quad A_{4}: X_{2} \rightarrow Y_{2}, \quad  A_{6}: X_{2} \rightarrow Y_{3}
+ 
+Block Function  
+---------------
+A Block vector of functions, Size of vector coincides with the rows of :math:`K`:
+
+.. math::
+  
+  Kx  = \begin{bmatrix}
+  y_{1}\\
+  y_{2}\\
+  y_{3}\\
+  \end{bmatrix}, \quad  f  = [ f_{1}, f_{2}, f_{3} ]
+
+  f(Kx) : = f_{1}(y_{1}) + f_{2}(y_{2}) + f_{3}(y_{3})
+
+Block DataContainer 
+----------------------
+
+.. math:: 
+
+  x = [x_{1}, x_{2} ]\in (X_{1}\times X_{2})
+
+  y = [y_{1}, y_{2}, y_{3} ]\in(Y_{1}\times Y_{2} \times Y_{3})
 
 :ref:`Return Home <mastertoc>`

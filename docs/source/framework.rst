@@ -1,6 +1,6 @@
 Framework 
 *********
-|The goal of the CCPi Framework is to allow the user to simply create iterative reconstruction methods which
+The goal of the CCPi Framework is to allow the user to simply create iterative reconstruction methods which
 go beyond the standard filter back projection technique and which better suit the data characteristics.
 The framework comprises: 
 
@@ -273,6 +273,11 @@ default :code:`ImageGeometry` parameters can be set up as follows:
    :members:
 
 
+=======
+
+``DataContainer`` and subclasses ``AcquisitionData`` and ``ImageData`` are 
+meant to contain data and meta-data in ``AcquisitionGeometry`` and 
+``ImageGeometry`` respectively.
 
 DataContainer and subclasses
 ============================
@@ -368,7 +373,8 @@ can be defined for multi-channel (spectral) CT data using :code:`channels` attri
 Block Framework 
 ===============
 
-Consider the typical `Tikhonov regularisation <https://en.wikipedia.org/wiki/Tikhonov_regularization>`_:
+The block framework allows writing more advanced `optimisation problems`_. Consider the typical 
+`Tikhonov regularisation <https://en.wikipedia.org/wiki/Tikhonov_regularization>`_:
 
 .. math:: 
 
@@ -413,6 +419,9 @@ represents a column vector of :code:`DataContainer`s.
 
   bdc = BlockDataContainer(DataContainer0, DataContainer1)
 
+. These 
+classes are required for it to work. They provide a base class that will 
+behave as normal ``DataContainer``.
 
 .. autoclass:: ccpi.framework.BlockDataContainer
    :members:
@@ -423,7 +432,6 @@ represents a column vector of :code:`DataContainer`s.
    :members:
    :private-members:
    :special-members:
-
 
 DataProcessor
 =============
@@ -458,7 +466,6 @@ perform these operations for both :code:`ImageData` and :code:`AcquisitionData`.
   # get new ImageGeometry
   ig_data_cropped = data_cropped.geometry
 
-
 .. autoclass:: ccpi.processors.Resizer
    :members:
    :private-members:
@@ -486,3 +493,5 @@ from theoretical. In the current release :code:`CenterOfRotationFinder` supports
 
 
 :ref:`Return Home <mastertoc>`
+
+.. _optimisation problems: optimisation.html

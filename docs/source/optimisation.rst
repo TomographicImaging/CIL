@@ -12,6 +12,109 @@ The fundamental components are:
 + :code:`Function`: A class specifying mathematical functions such as a least squares data fidelity.
 + :code:`Algorithm`: Implementation of an iterative optimisation algorithm to solve a particular generic optimisation problem. Algorithms are iterable Python object which can be run in a for loop. Can be stopped and warm restarted.
 
+To be able to express complex optimisation problems we developed the
+block framework, which provides a generic strategy to treat variational 
+problems in the following form:
+
+.. math::
+    \min \text{Regulariser} + \text{Fidelity} 
+
+The block framework consists of:
+
++ BlockDataContainer
++ BlockFunction
++ BlockOperator
+
+`BlockDataContainer`_ holds `DataContainer` as column vector. It is possible to 
+do basic algebra between ``BlockDataContainer`` s and with numbers, list or numpy arrays. 
+
+`BlockFunction`_ acts on ``BlockDataContainer`` as a separable sum function:
+    
+      .. math:: 
+
+          f = [f_1,...,f_n] \newline
+
+          f([x_1,...,x_n]) = f_1(x_1) +  .... + f_n(x_n)
+
+`BlockOperator`_ represent a block matrix with operators
+
+.. math:: 
+  K = \begin{bmatrix}
+      A_{1} & A_{2} \\
+      A_{3} & A_{4} \\
+      A_{5} & A_{6}
+ \end{bmatrix}_{(3,2)} *  \quad \underbrace{\begin{bmatrix}
+ x_{1} \\
+ x_{2}
+ \end{bmatrix}_{(2,1)}}_{\textbf{x}} =  \begin{bmatrix}
+ A_{1}x_{1}  + A_{2}x_{2}\\
+ A_{3}x_{1}  + A_{4}x_{2}\\
+ A_{5}x_{1}  + A_{6}x_{2}\\
+ \end{bmatrix}_{(3,1)} =  \begin{bmatrix}
+ y_{1}\\
+ y_{2}\\
+ y_{3}
+ \end{bmatrix}_{(3,1)} = \textbf{y}
+
+Column: Share the same domains :math:`X_{1}, X_{2}`
+
+Rows: Share the same ranges :math:`Y_{1}, Y_{2}, Y_{3}`
+
+.. math::
+ K : (X_{1}\times X_{2}) \rightarrow (Y_{1}\times Y_{2} \times Y_{3})
+
+:math:`A_{1}, A_{3}, A_{5}`: share the same domain :math:`X_{1}` and 
+:math:`A_{2}, A_{4}, A_{6}`: share the same domain :math:`X_{2}`
+
+.. math::
+
+ A_{1}: X_{1} \rightarrow Y_{1} \\
+ A_{3}: X_{1} \rightarrow Y_{2} \\
+ A_{5}: X_{1} \rightarrow Y_{3} \\
+ A_{2}: X_{2} \rightarrow Y_{1} \\ 
+ A_{4}: X_{2} \rightarrow Y_{2} \\
+ A_{6}: X_{2} \rightarrow Y_{3}
+
+For instance with these ingredients one may write the following objective 
+function,
+
+.. math::
+   \alpha ||\nabla u||_{2,1} + ||u - g||_2^2
+
+where :math:`g` represent the measured values, :math:`u` the solution
+:math:`\nabla` is the gradient operator, :math:`|| ~~ ||_{2,1}` is a norm for 
+the output of the gradient operator and :math:`|| x-g ||^2_2` is 
+least squares fidelity function as
+
+.. math::
+   K = \begin{bmatrix}
+           \nabla \\
+           \mathbb{1}
+         \end{bmatrix}
+
+ F(x) = \Big[ \alpha \lVert ~x~ \rVert_{2,1} ~~ , ~~ || x - g||_2^2 \Big]
+ 
+ w = [ u ]
+
+Then we have rewritten the problem as
+
+.. math::
+  F(Kw) =   \alpha \left\lVert \nabla u \right\rVert_{2,1} + ||u-g||^2_2
+
+Which in Python would be like
+
+.. code-block:: python
+
+   op1 = Gradient(ig, correlation=Gradient.CORRELATION_SPACE)
+   op2 = Identity(ig, ag)
+
+   # Create BlockOperator
+   K = BlockOperator(op1, op2, shape=(2,1) )
+
+   # Create functions      
+   F = BlockFunction(alpha * MixedL21Norm(), 0.5 * L2NormSquared(b=noisy_data))
+
+
 Algorithm
 =========
 
@@ -295,6 +398,9 @@ Rows: Share the same ranges :math:`Y_{1}, Y_{2}, Y_{3}`.
 .. autoclass:: ccpi.optimisation.operators.BlockScaledOperator
    :members:
    :special-members:
+.. autoclass:: ccpi.optimisation.functions.BlockFunction
+   :members:
+   :special-members:
 
 
 
@@ -332,3 +438,7 @@ Block DataContainer
    :special-members:
 
 :ref:`Return Home <mastertoc>`
+
+.. _BlockDataContainer: framework.html#ccpi.framework.BlockDataContainer
+.. _BlockFunction: optimisation.html#ccpi.optimisation.functions.BlockFunction
+.. _BlockOperator: optimisation.html#ccpi.optimisation.operators.BlockOperators

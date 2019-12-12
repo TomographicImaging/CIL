@@ -12,8 +12,8 @@ The fundamental components are:
 + :code:`Function`: A class specifying mathematical functions such as a least squares data fidelity.
 + :code:`Algorithm`: Implementation of an iterative optimisation algorithm to solve a particular generic optimisation problem. Algorithms are iterable Python object which can be run in a for loop. Can be stopped and warm restarted.
 
-To be able to express complex optimisation problems we developed the
-block framework, which provides a generic strategy to treat variational 
+To be able to express more advanced optimisation problems we developed the
+`Block Framework`_, which provides a generic strategy to treat variational 
 problems in the following form:
 
 .. math::
@@ -350,46 +350,8 @@ Mixed L21 norm
 Block Framework
 ***************
 
-The block framework allows to write 
-
 Block Operator
 ==============
-
-A Block matrix with operators 
-
-.. math::
-  K = \begin{bmatrix}
-  A_{1} & A_{2} \\
-  A_{3} & A_{4} \\
-  A_{5} & A_{6}
-  \end{bmatrix}_{(3,2)} *  \quad \underbrace{\begin{bmatrix}
-  x_{1} \\
-  x_{2} 
-  \end{bmatrix}_{(2,1)}}_{\textbf{x}} =  \begin{bmatrix}
-  A_{1}x_{1}  + A_{2}x_{2}\\
-  A_{3}x_{1}  + A_{4}x_{2}\\
-  A_{5}x_{1}  + A_{6}x_{2}\\
-  \end{bmatrix}_{(3,1)} =  \begin{bmatrix}
-  y_{1}\\
-  y_{2}\\
-  y_{3}
-  \end{bmatrix}_{(3,1)} = \textbf{y}$$
-
-Column: Share the same domains :math:`X_{1}, X_{2}`
-Rows: Share the same ranges :math:`Y_{1}, Y_{2}, Y_{3}`.
-
-.. math::
-  
-  K : (X_{1}\times X_{2}) \rightarrow (Y_{1}\times Y_{2} \times Y_{3})
-
-  A_{1}, A_{3}, A_{5}: \text{share the same domain }  X_{1}
-
-  A_{2}, A_{4}, A_{6}: \text{share the same domain }  X_{2}
-
-  A_{1}: X_{1} \rightarrow Y_{1}, \quad A_{3}: X_{1} \rightarrow Y_{2}, \quad  A_{5}: X_{1} \rightarrow Y_{3}
-  
-  A_{2}: X_{2} \rightarrow Y_{1}, \quad A_{4}: X_{2} \rightarrow Y_{2}, \quad  A_{6}: X_{2} \rightarrow Y_{3}
- 
 
 
 .. autoclass:: ccpi.optimisation.operators.BlockOperator
@@ -398,14 +360,10 @@ Rows: Share the same ranges :math:`Y_{1}, Y_{2}, Y_{3}`.
 .. autoclass:: ccpi.optimisation.operators.BlockScaledOperator
    :members:
    :special-members:
-.. autoclass:: ccpi.optimisation.functions.BlockFunction
-   :members:
-   :special-members:
-
 
 
 Block Function  
----------------
+==============
 A Block vector of functions, Size of vector coincides with the rows of :math:`K`:
 
 .. math::
@@ -418,13 +376,14 @@ A Block vector of functions, Size of vector coincides with the rows of :math:`K`
 
   f(Kx) : = f_{1}(y_{1}) + f_{2}(y_{2}) + f_{3}(y_{3})
 
-.. autoclass:: ccpi.optimisation.operators.BlockFunction
+
+.. autoclass:: ccpi.optimisation.functions.BlockFunction
    :members:
    :special-members:
 
 
 Block DataContainer 
-----------------------
+==============
 
 .. math:: 
 
@@ -433,7 +392,7 @@ Block DataContainer
   y = [y_{1}, y_{2}, y_{3} ]\in(Y_{1}\times Y_{2} \times Y_{3})
 
 
-.. autoclass:: ccpi.optimisation.operators.BlockDataContainer
+.. autoclass:: ccpi.framework.BlockDataContainer
    :members:
    :special-members:
 

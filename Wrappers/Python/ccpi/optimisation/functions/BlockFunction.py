@@ -52,7 +52,7 @@ class BlockFunction(Function):
         
             :param: x (BlockDataContainer): must have as many rows as self.length
 
-            returns ..math:: sum(f_i(x_i))
+            returns ..math:: \sum(f_i(x_i))
             
         '''
         
@@ -67,7 +67,7 @@ class BlockFunction(Function):
         
         r'''Convex conjugate of BlockFunction at x            
         
-            .. math:: returns sum(f_i^{*}(x_i))
+            .. math:: returns \sum(f_i^{*}(x_i))
         
         '''       
         t = 0                
@@ -80,7 +80,7 @@ class BlockFunction(Function):
         
         r'''Proximal operator of BlockFunction at x: 
                  
-                 .. math:: prox_{tau*f}(x) = sum_{i} prox_{tau*f_{i}}(x_{i}) 
+                 .. math:: prox_{tau*f}(x) = \sum_{i} prox_{tau*f_{i}}(x_{i}) 
         
         
         '''
@@ -110,7 +110,7 @@ class BlockFunction(Function):
         
         r'''Proximal operator of the convex conjugate of BlockFunction at x:
         
-            .. math:: prox_{tau*f^{*}}(x) = sum_{i} prox_{tau*f^{*}_{i}}(x_{i}) 
+            .. math:: prox_{tau*f^{*}}(x) = \sum_{i} prox_{tau*f^{*}_{i}}(x_{i}) 
         '''
         
         if out is None:

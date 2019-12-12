@@ -32,18 +32,22 @@ class Gradient(LinearOperator):
     
     r'''Gradient Operator: .. math:: \nabla : X -> Y           
             
-            Computes first-order forward/backward differences 
-                     on 2D, 3D, 4D ImageData
-                     under Neumann/Periodic boundary conditions
-                                                             
-                Example (2D): u\in X, \nabla(u) = [\partial_{y} u, \partial_{x} u]
-                              u^{*}\in Y, \nabla^{*}(u^{*}) = \partial_{y} v1 + \partial_{x} v2
+        Computes first-order forward/backward differences on 2D, 3D, 4D ImageData under Neumann/Periodic boundary conditions
+                                                            
+        Example (2D): 
         
-                Grad_order = ['channels', 'direction_z', 'direction_y', 'direction_x']
-                Grad_order = ['channels', 'direction_y', 'direction_x']
-                Grad_order = ['direction_z', 'direction_y', 'direction_x']
-                Grad_order = ['channels', 'direction_z', 'direction_y', 'direction_x']
-                
+        .. math::
+        
+            \nabla(u) = [\partial_{y} u, \partial_{x} u] \text{ for } u\in X, \\
+            \nabla^{*}(u^{*}) = \partial_{y} v1 + \partial_{x} v2  \text{ for } u^{*}\in Y
+
+        .. code:: python
+
+            Grad_order = ['channels', 'direction_z', 'direction_y', 'direction_x']
+            Grad_order = ['channels', 'direction_y', 'direction_x']
+            Grad_order = ['direction_z', 'direction_y', 'direction_x']
+            Grad_order = ['channels', 'direction_z', 'direction_y', 'direction_x']
+            
 
     '''
     
@@ -52,7 +56,15 @@ class Gradient(LinearOperator):
     CORRELATION_SPACECHANNEL = "SpaceChannels"
 
     def __init__(self, gm_domain, bnd_cond = 'Neumann', **kwargs):
+        '''creator
         
+        :param gm_domain: domain of the operator
+        :type gm_domain: :code:`AcquisitionGeometry` or :code:`ImageGeometry`
+        :param bnd_cond: boundary condition, either :code:`Neumann` or :code:`Periodic`.
+        :type bnd_cond: str, optional, default :code:`Neumann`
+        :param correlation: optional, :code:`SpaceChannel` or :code:`Space`
+        :type correlation: str, optional, default :code:`Space`
+        '''
         super(Gradient, self).__init__() 
                 
         self.gm_domain = gm_domain # Domain of Grad Operator

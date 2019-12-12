@@ -26,15 +26,24 @@ from ccpi.optimisation.functions import ScaledFunction
 
 class FunctionOperatorComposition(Function):
     
-    '''Function composition with Operator: (f o A)(x) = f(Ax)
+    r'''Function composition with Operator: :math:`(f \otimes A)(x) = f(Ax)`
     
-            : parameter A: operator
-            : parameter f: function
+    :param A: operator
+    :type A: :code:`Operator`
+    :param f: function
+    :type f: :code:`Function`
     
     '''
     
     def __init__(self, function, operator):
-        
+        '''creator
+
+    :param A: operator
+    :type A: :code:`Operator`
+    :param f: function
+    :type f: :code:`Function`
+    '''
+
         super(FunctionOperatorComposition, self).__init__()
         
         self.function = function     

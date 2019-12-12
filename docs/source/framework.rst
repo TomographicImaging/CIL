@@ -147,8 +147,9 @@ To have consistent :code:`AcquisitionData` and :code:`AcquisitionGeometry`, we r
   # allocate AcquisitionData
   ad_par = ag_par.allocate()
 
+
 ImageGeometry and ImageData
----------------------------
+===========================
 
 To store reconstruction results, we implemented two classes: :code:`ImageGeometry` and :code:`ImageData` classes.
 Similar to :code:`AcquisitionData` and :code:`AcquisitionGeometry`, we first define 2D :code:`ImageGeometry`
@@ -172,7 +173,7 @@ and then allocate :code:`ImageData`.
   im_data2 = ig_par.allocate('random', seed=5)
 
 3D parallel, fan-beam and cone-beam geometries
-==============================================
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Fan-beam, cone-beam and 3D (multi-slice) parallel geometry can be set-up similar to 2D parallel geometry.
 

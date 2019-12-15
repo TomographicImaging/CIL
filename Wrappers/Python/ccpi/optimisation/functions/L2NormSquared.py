@@ -27,24 +27,17 @@ from ccpi.optimisation.functions import Function
 
 class L2NormSquared(Function):
     
-    r"""
-    
-    |
-    
-    L2NormSquared function: :math:`F(x) = \| x\|^{2}_{2} = \underset{i}{\sum}x_{i}^{2}`
+    r""" L2NormSquared function: :math:`F(x) = \| x\|^{2}_{2} = \underset{i}{\sum}x_{i}^{2}`
           
     Following cases are considered:
                 
         a) :math:`F(x) = \|x\|^{2}_{2}`
         b) :math:`F(x) = \|x - b\|^{2}_{2}`
         
-    Notes
-    -----
-        In the b) case we can also use *TranslateFunction* with
-        :math:`F = L2NormSquared().centered\_at(b)`
+    .. note::  For case b) case we can use :code:`F = L2NormSquared().centered_at(b)`,
+               see *TranslateFunction*.
         
-    Example
-    -------
+    :Example:
         
         >>> F = L2NormSquared()
         >>> F = L2NormSquared(b=b) 
@@ -63,48 +56,18 @@ class L2NormSquared(Function):
         #    self.domain = self.b.geometry  
                             
     def __call__(self, x):
-                        
-        r"""   
+
+        r"""Returns the value of the L2NormSquared function at x.
         
-        Parameters
-        ----------
-            var1 : array_like
-                Array_like means all those objects -- lists, nested lists, etc. --
-                that can be converted to an array.  We can also refer to
-                variables like `var1`.
-            var2 : int
-                The type above can either refer to an actual Python type
-                (e.g. ``int``), or describe the type of the variable in more
-                detail, e.g. ``(N,) ndarray`` or ``array_like``.
-            long_var_name : {'hi', 'ho'}, optional
-                Choices in brackets, default first when optional.
-                                  
-        Returns
-        -------
-        type
-            Explanation of anonymous return value of type ``type``.
-        describe : type
-            Explanation of return value named `describe`.
-        out : type
-            Explanation of `out`.
-        type_without_description                
-        
-                                                
-        """
-        
-        
-        
-        
-        
-        
-#        r"""Returns the value of the L2NormSquared function at x.
-#        
-#        Consider the following cases:
-#                
-#                a) .. math:: F(x) = \|x\|^{2}_{2} 
-#                b) .. math:: F(x) = \|x - b\|^{2}_{2}
-#                
-#        """          
+        Following cases are considered:
+            
+            a) :math:`F(x) = \|x\|^{2}_{2}`
+            b) :math:`F(x) = \|x - b\|^{2}_{2}`
+    
+        :param: :math:`x`
+        :returns: :math:`\underset{i}{\sum}x_{i}^{2}`
+                
+        """          
             
         y = x
         if self.b is not None: 

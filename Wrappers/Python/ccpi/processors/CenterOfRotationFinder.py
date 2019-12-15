@@ -29,6 +29,17 @@ class CenterOfRotationFinder(DataProcessor):
     
     Input: AcquisitionDataSet
     Set_slice: Slice index or 'centre'
+    smin, smax : int, optional
+        Reference to the horizontal center of the sinogram.
+    srad : float, optional
+        Fine search radius.
+    step : float, optional
+        Step of fine searching.
+    ratio : float, optional
+        The ratio between the FOV of the camera and the size of object.
+        It's used to generate the mask.
+    drop : int, optional
+        Drop lines around vertical center of the mask.
     
     Output: float. center of rotation in pixel coordinate
     '''
@@ -36,16 +47,22 @@ class CenterOfRotationFinder(DataProcessor):
     def __init__(self):
 
         kwargs = {
-            'slice_number' : None
+            'slice_number' : None,
+            'smin' : None,
+            'smax' : None,
+            'srad' : None,
+            'step' : None,
+            'ratio' : None,
+            'drop' : None
                  }
         
         
         #DataProcessor.__init__(self, **kwargs)
         super(CenterOfRotationFinder, self).__init__(**kwargs)
         
-    def set_slice(self, slice):
+    def set_slice(self, slice_index='centre'):
         """
-        Set the slice to run over in a 3D data set.
+        Set the slice to run over in a 3D data set. The default will use the centre slice.
 
         Input is any valid slice index or 'centre'
         """
@@ -53,21 +70,21 @@ class CenterOfRotationFinder(DataProcessor):
 
         if dataset is None:
             raise ValueError('Please set input data before slice selection')    
+        
+        if dataset.number_of_dimensions == 2:
+            print('Slice number not a valid parameter of a 2D data set')
 
         #check slice number is valid
-        if dataset.number_of_dimensions == 3:
-            if slice == 'centre':
-                slice = dataset.get_dimension_size('vertical')//2 
-
-            elif slice >= dataset.get_dimension_size('vertical'):
+        elif dataset.number_of_dimensions == 3:
+            if slice_index == 'centre':
+                slice_index = dataset.get_dimension_size('vertical')//2 
+            elif not isinstance(slice_index, (int)):
+                raise TypeError("Invalid input. Expect integer slice index.")               
+            elif slice_index >= dataset.get_dimension_size('vertical'):
                 raise ValueError("Slice out of range must be less than {0}"\
                     .format(dataset.get_dimension_size('vertical')))
 
-        elif dataset.number_of_dimensions == 2:
-            if slice is not None:
-                raise ValueError('Slice number not a valid parameter of a 2D data set')
-
-        self.slice_number = slice
+            self.slice_number = slice_index
 
     def check_input(self, dataset):
         #check dataset
@@ -337,11 +354,40 @@ class CenterOfRotationFinder(DataProcessor):
         
         if projections.number_of_dimensions==3:
             projections = projections.subset(vertical=self.slice_number).subset(['angle','horizontal'])
-
         else:
             projections = projections.subset(['angle','horizontal'])   
+        
+        if self.smin is None:
+            self.smin = numpy.around(-0.1*projections.get_dimension_size('horizontal'))
+            if (self.smin > -10):
+                self.smin = -10
+                
+        if self.smax is None:
+            self.smax = numpy.around(0.1*projections.get_dimension_size('horizontal'))
+            if (self.smax < 10):
+                self.smax = 10
+        
+        if self.srad is None:        
+            self.srad = numpy.around(self.smax / 5)
+            if self.srad < 5:
+                self.srad = 5
+        
+        if self.step is None:
+            self.step = 0.5
+        
+        if self.ratio is None:
+            self.ratio = 2.
+        
+        if self.drop is None:
+            self.drop = 20
 
-        cor = CenterOfRotationFinder.find_center_vo(projections.as_array())
+        cor = CenterOfRotationFinder.find_center_vo(projections.as_array(),
+                                                    smin = self.smin,
+                                                    smax = self.smax,
+                                                    srad = self.srad,
+                                                    step = self.step,
+                                                    ratio = self.ratio,
+                                                    drop = self.drop)
 
         return cor
 

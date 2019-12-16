@@ -17,14 +17,17 @@
 
 import numpy as np
 
-from ccpi.framework import DataContainer, ImageData, ImageGeometry, VectorGeometry
-from ccpi.optimisation.operators import  Identity, LinearOperatorMatrix, BlockOperator
-from ccpi.framework import BlockDataContainer
+from ccpi.framework import DataContainer, ImageData, ImageGeometry, \
+    VectorGeometry, VectorData, BlockDataContainer
+from ccpi.optimisation.operators import Identity, LinearOperatorMatrix, BlockOperator
+from ccpi.optimisation.functions import Function, KullbackLeibler
 from numbers import Number
 from ccpi.optimisation.operators import Gradient
 
 from ccpi.optimisation.functions import Function, KullbackLeibler, L2NormSquared,\
-                                         L1Norm, MixedL21Norm, LeastSquares, ZeroFunction, FunctionOperatorComposition
+                                         L1Norm, MixedL21Norm, LeastSquares, \
+                                         ZeroFunction, FunctionOperatorComposition,\
+                                         Rosenbrock
 
 import unittest
 import numpy
@@ -430,5 +433,13 @@ class TestFunction(unittest.TestCase):
         tmp = scipy.special.kl_div(f1.b.as_array()[ind], tmp_sum[ind])                 
         self.assertNumpyArrayAlmostEqual(f1(u1), numpy.sum(tmp) )          
         
+        proxc = f.proximal_conjugate(x,1.2)
+        f.proximal_conjugate(x, 1.2, out=out)
+        numpy.testing.assert_array_equal(proxc.as_array(), out.as_array())
 
-            
+    def test_Rosenbrock(self):
+        f = Rosenbrock (alpha = 1, beta=100)
+        x = VectorData(numpy.asarray([1,1]))
+        assert f(x) == 0.
+        numpy.testing.assert_array_almost_equal( f.gradient(x).as_array(), numpy.zeros(shape=(2,), dtype=numpy.float32))
+

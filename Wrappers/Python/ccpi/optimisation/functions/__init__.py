@@ -26,3 +26,4 @@ from .smoothMixedL21Norm import smoothMixedL21Norm
 from .IndicatorBox import IndicatorBox
 from .KullbackLeibler import KullbackLeibler
 from .LeastSquares import LeastSquares
+from .Rosenbrock import Rosenbrock

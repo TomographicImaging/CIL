@@ -64,7 +64,7 @@ class TestDataProcessor(unittest.TestCase):
         print ("Center of rotation", cf.get_output())
         self.assertAlmostEqual(86.25, cf.get_output())
 
-    #def test_CenterOfRotation_slice(self):
+    #def test_CenterOfRotation_singleslice(self):
         #reader = NexusReader(self.filename)
         #data = reader.get_acquisition_data_whole()
         
@@ -87,6 +87,9 @@ class TestDataProcessor(unittest.TestCase):
         cf.set_slice(80)
         print ("Center of rotation", cf.get_output())
         self.assertAlmostEqual(86.25, cf.get_output())
+        cf.set_slice()
+        print ("Center of rotation", cf.get_output())
+        self.assertAlmostEqual(86.25, cf.get_output())       
         cf.set_slice('centre')
         print ("Center of rotation", cf.get_output())
         self.assertAlmostEqual(86.25, cf.get_output())

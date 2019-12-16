@@ -30,10 +30,10 @@ setup(
     name="ccpi-framework",
     version=cil_version,
     packages=['ccpi' , 'ccpi.io',
-              'ccpi.framework', 'ccpi.optimisation',
-              'ccpi.optimisation.functions',
-              'ccpi.optimisation.algorithms',
+              'ccpi.framework', 'ccpi.optimisation', 
               'ccpi.optimisation.operators',
+              'ccpi.optimisation.algorithms',
+              'ccpi.optimisation.functions',
               'ccpi.processors',
               'ccpi.utilities', 'ccpi.utilities.jupyter',
               'ccpi.contrib','ccpi.contrib.optimisation',
@@ -64,7 +64,7 @@ setup(
     description='CCPi Core Imaging Library - Python Framework Module',
     license="Apache v2.0",
     keywords="Python Framework",
-    url="http://www.ccpi.ac.uk",   # project home page, if any
+    url="http://www.ccpi.ac.uk/CIL",   # project home page, if any
 
     # could also include long_description, download_url, classifiers, etc.
 )

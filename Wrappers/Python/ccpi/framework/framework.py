@@ -25,6 +25,26 @@ from datetime import timedelta, datetime
 import warnings
 from functools import reduce
 from numbers import Number
+import ctypes, platform
+
+# dll = os.path.abspath(os.path.join( 
+#          os.path.abspath(os.path.dirname(__file__)),
+#          'libfdiff.dll')
+# )
+
+# check for the extension
+if platform.system() == 'Linux':
+    dll = 'libcilacc.so'
+elif platform.system() == 'Windows':
+    dll = 'cilacc.dll'
+elif platform.system() == 'Darwin':
+    dll = 'libcilacc.dylib'
+else:
+    raise ValueError('Not supported platform, ', platform.system())
+
+#print ("dll location", dll)
+cilacc = ctypes.cdll.LoadLibrary(dll)
+
 
 def find_key(dic, val):
     """return the key of dictionary dic given the value"""
@@ -801,7 +821,69 @@ class DataContainer(object):
     def minimum(self,x2, out=None, *args, **kwargs):
         return self.pixel_wise_binary(numpy.minimum, x2=x2, out=out, *args, **kwargs)
 
-    
+    @staticmethod
+    def axpby(a,x,b,y,out,dtype=numpy.float32):
+        '''performs axpby with cilacc C library
+        
+        Does the operation .. math:: a*x+b*y and stores the result in out
+
+        :param a: scalar
+        :param x: DataContainer
+        :param b: scalar
+        :param y: DataContainer
+        :param out: DataContainer to store the result
+        :param dtype: optional, data type of the DataContainers
+        '''
+
+        c_float_p = ctypes.POINTER(ctypes.c_float)
+        c_double_p = ctypes.POINTER(ctypes.c_double)
+        # get the reference to the data
+        ndx = x.as_array()
+        ndy = y.as_array()
+        ndout = out.as_array()
+
+        if ndx.dtype != dtype:
+            ndx = ndx.astype(dtype)
+        if ndy.dtype != dtype:
+            ndy = ndy.astype(dtype)
+        
+        if dtype == numpy.float32:
+            x_p = ndx.ctypes.data_as(c_float_p)
+            y_p = ndy.ctypes.data_as(c_float_p)
+            out_p = ndout.ctypes.data_as(c_float_p)
+            f = cilacc.saxpby
+
+        elif dtype == numpy.float64:
+            ndx = ndx.astype(numpy.float64)
+            b = b.astype(numpy.float64)
+            x_p = ndx.ctypes.data_as(c_double_p)
+            y_p = ndy.ctypes.data_as(c_double_p)
+            out_p = ndout.ctypes.data_as(c_double_p)
+            f = cilacc.daxpby
+        else:
+            raise TypeError('Unsupported type {}. Expecting numpy.float32 or numpy.float64'.format(dtype))
+
+        #out = numpy.empty_like(a)
+
+        
+        # int psaxpby(float * x, float * y, float * out, float a, float b, long size)
+        cilacc.saxpby.argtypes = [ctypes.POINTER(ctypes.c_float),  # pointer to the first array 
+                                  ctypes.POINTER(ctypes.c_float),  # pointer to the second array 
+                                  ctypes.POINTER(ctypes.c_float),  # pointer to the third array 
+                                  ctypes.c_float,                  # type of A (float)
+                                  ctypes.c_float,                  # type of B (float)
+                                  ctypes.c_long]                   # type of size of first array 
+        cilacc.daxpby.argtypes = [ctypes.POINTER(ctypes.c_double), # pointer to the first array 
+                                  ctypes.POINTER(ctypes.c_double), # pointer to the second array 
+                                  ctypes.POINTER(ctypes.c_double), # pointer to the third array 
+                                  ctypes.c_double,                 # type of A (c_double)
+                                  ctypes.c_double,                 # type of B (c_double)
+                                  ctypes.c_long]                   # type of size of first array 
+
+        if f(x_p, y_p, out_p, a, b, ndx.size) != 0:
+            raise RuntimeError('axpby execution failed')
+        
+
     ## unary operations
     def pixel_wise_unary(self, pwop, *args,  **kwargs):
         out = kwargs.get('out', None)

@@ -15,7 +15,8 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-from .Function import Function, ScaledFunction, SumFunction, SumFunctionScalar, ConstantFunction, ZeroFunction, TranslateFunction
+from .Function import Function, ScaledFunction, SumFunction, SumFunctionScalar, \
+    ConstantFunction, ZeroFunction, TranslateFunction
 from .L1Norm import L1Norm
 from .L2NormSquared import L2NormSquared
 from .BlockFunction import BlockFunction

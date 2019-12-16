@@ -20,7 +20,6 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from __future__ import unicode_literals
 
 from ccpi.optimisation.functions import Function       
 from ccpi.optimisation.operators import ShrinkageOperator 
@@ -29,7 +28,7 @@ import numpy as np
 
 class L1Norm(Function):
     
-    r"""L2NormSquared function: :math:`F(x) = \| x\|_{1} = \underset{i}{\sum}|x_{i}|`
+    r"""L1Norm function
             
         Consider the following cases:           
             a) .. math:: F(x) = ||x||_{1}

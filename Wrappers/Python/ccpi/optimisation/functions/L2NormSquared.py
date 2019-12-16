@@ -82,10 +82,10 @@ class L2NormSquared(Function):
         
         r"""Returns the value of the gradient of the L2NormSquared function at x.
         
-        Consider the following cases:
+        Following cases are considered:
                 
-                a) .. math:: F'(x) = 2x
-                b) .. math:: F'(x) = 2(x-b)
+            a) :math:`F'(x) = 2x`
+            b) :math:`F'(x) = 2(x-b)`
                 
         """
                 

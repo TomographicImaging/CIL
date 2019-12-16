@@ -44,16 +44,22 @@ class CenterOfRotationFinder(DataProcessor):
     Output: float. center of rotation in pixel coordinate
     '''
     
-    def __init__(self):
+    def __init__(self, 
+                 smin = None,
+                 smax = None,
+                 srad = None,
+                 step = None,
+                 ratio = None,
+                 drop = None):
 
         kwargs = {
             'slice_number' : None,
-            'smin' : None,
-            'smax' : None,
-            'srad' : None,
-            'step' : None,
-            'ratio' : None,
-            'drop' : None
+            'smin' : smin,
+            'smax' : smax,
+            'srad' : srad,
+            'step' : step,
+            'ratio' : ratio,
+            'drop' : drop
                  }
         
         
@@ -101,6 +107,31 @@ class CenterOfRotationFinder(DataProcessor):
             self.slice_number = dataset.get_dimension_size('vertical')//2
         else:
             self.slice_number = 0
+        
+        if self.smin is None:
+            self.smin = numpy.int_(numpy.around(-0.1*dataset.get_dimension_size('horizontal')))
+            if (self.smin > -10):
+                self.smin = numpy.int_(-10)
+                
+        if self.smax is None:
+            self.smax = numpy.int_(numpy.around(0.1*dataset.get_dimension_size('horizontal')))
+            if (self.smax < 10):
+                self.smax = numpy.int_(10)
+        
+        if self.srad is None:        
+            self.srad = numpy.around(self.smax / 5)
+            if self.srad < 5:
+                self.srad = 5
+        
+        if self.step is None:
+            self.step = 0.5
+        
+        if self.ratio is None:
+            self.ratio = 2.
+        
+        if self.drop is None:
+            self.drop = 20
+
 
         return True
 
@@ -357,31 +388,8 @@ class CenterOfRotationFinder(DataProcessor):
         else:
             projections = projections.subset(['angle','horizontal'])   
         
-        if self.smin is None:
-            self.smin = numpy.around(-0.1*projections.get_dimension_size('horizontal'))
-            if (self.smin > -10):
-                self.smin = -10
-                
-        if self.smax is None:
-            self.smax = numpy.around(0.1*projections.get_dimension_size('horizontal'))
-            if (self.smax < 10):
-                self.smax = 10
-        
-        if self.srad is None:        
-            self.srad = numpy.around(self.smax / 5)
-            if self.srad < 5:
-                self.srad = 5
-        
-        if self.step is None:
-            self.step = 0.5
-        
-        if self.ratio is None:
-            self.ratio = 2.
-        
-        if self.drop is None:
-            self.drop = 20
-
         cor = CenterOfRotationFinder.find_center_vo(projections.as_array(),
+                                                    ind = None,
                                                     smin = self.smin,
                                                     smax = self.smax,
                                                     srad = self.srad,

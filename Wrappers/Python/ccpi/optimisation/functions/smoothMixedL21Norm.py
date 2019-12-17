@@ -22,8 +22,8 @@ from __future__ import print_function
 
 from ccpi.optimisation.functions import Function
 from ccpi.framework import BlockDataContainer
-import numpy as np
-import functools
+#import numpy as np
+#import functools
 
 
 # promxial conjugate, proximal no closed-form solutions
@@ -32,7 +32,16 @@ import functools
 
 class smoothMixedL21Norm(Function):
     
-        
+    r""" smoothMixedL21Norm function: :math:`F(x) = \| x\|_{2,1} = \underset{i}{\sum}\sqrt{x_{i}^{2}+\epsilon^{2}}`
+    
+    It represents a smooth relaxation of the MixedL21Norm function making it differentiable.
+    
+    :param: :math:`\epsilon` is positive constant
+    
+    :note: Proximal method has no closed form solution
+    
+    """    
+            
     def __init__(self, epsilon):
 
         super(smoothMixedL21Norm, self).__init__(L=1)          
@@ -56,7 +65,10 @@ class smoothMixedL21Norm(Function):
         return tmp.sqrt().sum()
 
 
-    def gradient(self, x, out=None): 
+    def gradient(self, x, out=None):
+        
+        r"""Returns the value of the gradient of the smoothMixedL21Norm function at x.
+        """
         
         tmp = x.get_item(0) * 0.
         for el in x.containers:
@@ -103,8 +115,7 @@ class smoothMixedL21Norm(Function):
 #            return np.inf
 #        
 #    def proximal(self, x, tau, out=None):   
-#        
-#        
+#        #        
 #        return x - tau * self.proximal_conjugate(x/tau, 1/tau, out=None)
 #        
 #        # This has no closed form solution and need to be computed numerically

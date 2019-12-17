@@ -752,7 +752,7 @@ class DataContainer(object):
             return type(self)(out,
                    deep_copy=False, 
                    dimension_labels=self.dimension_labels,
-                   geometry=self.geometry, 
+                   geometry=self.geometry.copy(), 
                    suppress_warning=True)
             
         

@@ -181,14 +181,7 @@ class KullbackLeibler(Function):
             out += tmp
             out *= 0.5
 
-#    def __rmul__(self, scalar):
-#        
-#        '''Multiplication of KullbackLeibler with a scalar        
-#            
-#            Returns: ScaledFunction
-#        '''
-#        
-#        return ScaledFunction(self, scalar) 
+
 
 
 if __name__ == '__main__':
@@ -200,8 +193,8 @@ if __name__ == '__main__':
     ig = ImageGeometry(N, M, K)
     
     u1 = ig.allocate('random_int', seed = 500)    
-    g1 = ig.allocate('random_int', seed = 100)
-    b1 = ig.allocate('random_int', seed = 1000)
+    g1 = ig.allocate('random_int', seed = 1000)
+    b1 = ig.allocate('random', seed = 5000)
     
     # with no data
     try:
@@ -271,9 +264,15 @@ if __name__ == '__main__':
         proxc1 = f1.proximal_conjugate(u1,t1)
         proxc_out1 = ig.allocate()
         f1.proximal_conjugate(u1, t1, out = proxc_out1)
-        print('tau = {} is OK'.format(t1) )
         numpy.testing.assert_array_almost_equal(proxc1.as_array(), 
                                                 proxc_out1.as_array(),
-                                                decimal = 4)     
+                                                decimal = 4)  
+        
+        
+#        proxc2 = u1 - t1 * f1.proximal(u1/t1,1/t1)
+#        numpy.testing.assert_array_almost_equal(proxc1.as_array(), 
+#                                                proxc2.as_array(),
+#                                                decimal = 5)     
+        print('tau = {} is OK'.format(t1) )        
         
     

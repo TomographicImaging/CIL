@@ -1667,6 +1667,8 @@ class VectorGeometry(object):
                     numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
                 out.fill(numpy.random.randint(max_value,size=self.shape))
+            elif value is None:
+                pass
             else:
                 raise ValueError('Value {} unknown'.format(value))
         return out

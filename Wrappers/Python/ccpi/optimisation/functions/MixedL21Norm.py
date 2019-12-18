@@ -69,11 +69,11 @@ class MixedL21Norm(Function):
             y = x - self.b    
         return y.pnorm(p=2).sum()                                
             
-        tmp = x.get_item(0) * 0.
-        for el in x.containers:
-            tmp += el.power(2.)
-        #tmp.add(self.epsilon, out = tmp)    
-        return tmp.sqrt().sum()
+#        tmp = x.get_item(0) * 0.
+#        for el in x.containers:
+#            tmp += el.power(2.)
+#        #tmp.add(self.epsilon, out = tmp)    
+#        return tmp.sqrt().sum()
 
                             
     def convex_conjugate(self,x):

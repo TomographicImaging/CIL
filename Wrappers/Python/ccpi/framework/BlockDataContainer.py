@@ -62,8 +62,8 @@ class BlockDataContainer(object):
         self.containers = args
         self.index = 0        
         self.geometry = None
-        if len(set([i.shape for i in self.containers])):
-            self.geometry = self.containers[0].geometry
+        #if len(set([i.shape for i in self.containers])):
+        #    self.geometry = self.containers[0].geometry
                 
         shape = kwargs.get('shape', None)
         if shape is None:

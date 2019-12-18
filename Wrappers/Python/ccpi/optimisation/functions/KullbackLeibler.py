@@ -156,32 +156,31 @@ class KullbackLeibler(Function):
             out *= 0.5            
         
                             
-#    def proximal_conjugate(self, x, tau, out=None):
-#        
-#        r'''Proximal operator of the convex conjugate of KullbackLeibler at x:
-#           
-#           .. math::     prox_{\tau * f^{*}}(x)
-#        '''
-#
-#                
-#        if out is None:
-#            z = x + tau * self.background_term
-#            return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.data).sqrt())
-#        else:
-#            
-#            tmp = tau * self.background_term
-#            tmp += x
-#            tmp -= 1
-#            
-#            self.data.multiply(4*tau, out=out)    
-#            
-#            out.add((tmp)**2, out=out)
-#            out.sqrt(out=out)
-#            out *= -1
-#            tmp += 2
-#            out += tmp
-#            out *= 0.5
-##
+    def proximal_conjugate(self, x, tau, out=None):
+        
+        r'''Proximal operator of the convex conjugate of KullbackLeibler at x:
+           
+           .. math::     prox_{\tau * f^{*}}(x)
+        '''
+
+                
+        if out is None:
+            z = x + tau * self.eta
+            return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
+        else:            
+            tmp = tau * self.eta
+            tmp += x
+            tmp -= 1
+            
+            self.b.multiply(4*tau, out=out)    
+            
+            out.add((tmp)**2, out=out)
+            out.sqrt(out=out)
+            out *= -1
+            tmp += 2
+            out += tmp
+            out *= 0.5
+
 #    def __rmul__(self, scalar):
 #        
 #        '''Multiplication of KullbackLeibler with a scalar        
@@ -197,7 +196,7 @@ if __name__ == '__main__':
     from ccpi.framework import ImageGeometry
     import numpy as np
     
-    M, N, K =  20, 30, 40
+    M, N, K =  30, 30, 20
     ig = ImageGeometry(N, M, K)
     
     u1 = ig.allocate('random_int', seed = 500)    
@@ -245,15 +244,61 @@ if __name__ == '__main__':
     numpy.testing.assert_equal(0.0, f.convex_conjugate(u1))   
 
 
-    print('Check KullbackLeibler with background\n')      
-    eta = b1
-    
+    print('Check KullbackLeibler with background\n')       
     f1 = KullbackLeibler(b=g1, eta=b1) 
         
-    tmp_sum = (u1 + eta).as_array()
+    tmp_sum = (u1 + f1.eta).as_array()
     ind = tmp_sum >= 0
     tmp = scipy.special.kl_div(f1.b.as_array()[ind], tmp_sum[ind])                 
     numpy.testing.assert_equal(f1(u1), numpy.sum(tmp) )
+    
+    print('Check proximal KL without background\n')   
+    tau = [0.1, 1, 10, 100, 10000]
+    
+    for t1 in tau:
+        
+        proxc = f.proximal_conjugate(u1,t1)
+        proxc_out = ig.allocate()
+        f.proximal_conjugate(u1, t1, out = proxc_out)
+        print('tau = {} is OK'.format(t1) )
+        numpy.testing.assert_array_almost_equal(proxc.as_array(), 
+                                                proxc_out.as_array(),
+                                                decimal = 4)
+        
+    print('\nCheck proximal KL with background\n')          
+    for t1 in tau:
+        
+        proxc1 = f1.proximal_conjugate(u1,t1)
+        proxc_out1 = ig.allocate()
+        f1.proximal_conjugate(u1, t1, out = proxc_out1)
+        print('tau = {} is OK'.format(t1) )
+        numpy.testing.assert_array_almost_equal(proxc1.as_array(), 
+                                                proxc_out1.as_array(),
+                                                decimal = 4)     
+        
+    
+#    print('Check proximal conjugate KL with background\n')      
+#    z = u1 + tau * f1.eta
+#    proxc1 = 0.5*((z + 1) - ((z-1)**2 + 4 * tau * f1.b).sqrt())
+#    
+#    
+#    proxc2 = f1.proximal_conjugate()
+    
+    
+#    proxc1 = f1.proximal_conjugate(u1+tau*eta,tau)
+#    proxc_out1 = ig.allocate()
+#    f1.proximal_conjugate(u1+tau*eta, tau, out = proxc_out1)
+#    numpy.testing.assert_array_almost_equal(proxc1.as_array(), 
+#                                            proxc_out1.as_array(),
+#                                            decimal = 5)    
+    
+        
+#    prox_conj = f.proximal_conjugate(u1, tau)
+#    prox_conj1 =  u1 - tau * f.proximal(u1/tau, 1/tau)
+#    
+#    diff = (prox_conj - prox_conj1).abs()
+#    numpy.testing.assert_array_almost_equal(diff.as_array(), 
+#                                            ig.allocate().as_array(), decimal = 4)
     
 
     

@@ -94,7 +94,7 @@ class TestAlgorithms(unittest.TestCase):
         b = ig.allocate('random')
         identity = Identity(ig)
         
-        norm2sq = Norm2Sq(identity, b)
+        norm2sq = LeastSquares(identity, b)
         rate = None
         
         alg = GradientDescent(x_init=x_init, 
@@ -417,5 +417,7 @@ class TestAlgorithms(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    
+    d = TestAlgorithms()
+    d.test_GradientDescentArmijo2()
  

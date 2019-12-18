@@ -15,6 +15,8 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+from __future__ import absolute_import
+
 import numpy as np
 
 from ccpi.framework import DataContainer, ImageData, ImageGeometry, \
@@ -376,7 +378,7 @@ class TestFunction(unittest.TestCase):
     def test_KullbackLeibler(self):
         print ("test_KullbackLeibler")
         
-        M, N, K =  20, 30, 40
+        M, N, K =  2, 3, 4
         ig = ImageGeometry(N, M, K)
         
         u1 = ig.allocate('random_int', seed = 500)    
@@ -408,7 +410,7 @@ class TestFunction(unittest.TestCase):
                                                 res_gradient_out.as_array(),decimal = 4)  
         
         print('Check proximal ... is OK\n')        
-        tau = 0.4
+        tau = 400.4
         res_proximal = f.proximal(u1, tau)
         res_proximal_out = u1.geometry.allocate()   
         f.proximal(u1, tau, out = res_proximal_out)
@@ -433,9 +435,12 @@ class TestFunction(unittest.TestCase):
         tmp = scipy.special.kl_div(f1.b.as_array()[ind], tmp_sum[ind])                 
         self.assertNumpyArrayAlmostEqual(f1(u1), numpy.sum(tmp) )          
         
-        proxc = f.proximal_conjugate(x,1.2)
-        f.proximal_conjugate(x, 1.2, out=out)
-        numpy.testing.assert_array_equal(proxc.as_array(), out.as_array())
+        res_proximal_conj_out = u1.geometry.allocate()
+        proxc = f.proximal_conjugate(u1,tau)
+        f.proximal_conjugate(u1, tau, out=res_proximal_conj_out)
+        print(res_proximal_conj_out.as_array())
+        print(proxc.as_array())
+        numpy.testing.assert_array_almost_equal(proxc.as_array(), res_proximal_conj_out.as_array())
 
     def test_Rosenbrock(self):
         f = Rosenbrock (alpha = 1, beta=100)
@@ -443,3 +448,7 @@ class TestFunction(unittest.TestCase):
         assert f(x) == 0.
         numpy.testing.assert_array_almost_equal( f.gradient(x).as_array(), numpy.zeros(shape=(2,), dtype=numpy.float32))
 
+if __name__ == '__main__':
+    
+    d = TestFunction()
+    d.test_KullbackLeibler()

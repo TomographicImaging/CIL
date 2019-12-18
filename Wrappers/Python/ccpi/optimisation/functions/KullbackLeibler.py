@@ -277,32 +277,3 @@ if __name__ == '__main__':
                                                 decimal = 4)     
         
     
-#    print('Check proximal conjugate KL with background\n')      
-#    z = u1 + tau * f1.eta
-#    proxc1 = 0.5*((z + 1) - ((z-1)**2 + 4 * tau * f1.b).sqrt())
-#    
-#    
-#    proxc2 = f1.proximal_conjugate()
-    
-    
-#    proxc1 = f1.proximal_conjugate(u1+tau*eta,tau)
-#    proxc_out1 = ig.allocate()
-#    f1.proximal_conjugate(u1+tau*eta, tau, out = proxc_out1)
-#    numpy.testing.assert_array_almost_equal(proxc1.as_array(), 
-#                                            proxc_out1.as_array(),
-#                                            decimal = 5)    
-    
-        
-#    prox_conj = f.proximal_conjugate(u1, tau)
-#    prox_conj1 =  u1 - tau * f.proximal(u1/tau, 1/tau)
-#    
-#    diff = (prox_conj - prox_conj1).abs()
-#    numpy.testing.assert_array_almost_equal(diff.as_array(), 
-#                                            ig.allocate().as_array(), decimal = 4)
-    
-
-    
-    
-        
-        
-

@@ -148,9 +148,12 @@ class Function(object):
         """Returns a function multiplied by a scalar."""               
         return ScaledFunction(self, scalar)
     
-    def __mul__(self, scalar):
-        """ Returns a function multiplied by a scalar from the left."""                    
-        return scalar * ScaledFunction(self, 1)   
+    __mul__ = __rmul__
+    
+#    def __mul__(self, scalar):
+#        """ Returns a function multiplied by a scalar from the left."""                 
+#        return scalar * ScaledFunction(self, 1)   
+#        return ScaledFunction(self, scalar)
     
     def centered_at(self, center):
         """ Returns a translated function, namely if we have a function :math:`F(x)` the center is at the origin.         
@@ -205,8 +208,9 @@ class SumFunction(Function):
         if out is None:            
             return self.function1.gradient(x) +  self.function2.gradient(x)  
         else:
-            out_tmp = out.copy()
-            out_tmp *=0
+#            out_tmp = out.copy()
+#            out_tmp *=0
+            out_tmp = out*0.
             self.function1.gradient(x, out=out)
             self.function2.gradient(x, out=out_tmp)
             out_tmp.add(out, out=out)
@@ -296,9 +300,6 @@ class ScaledFunction(Function):
             self.function.proximal_conjugate(x/self.scalar, tau/self.scalar, out=out)
             out *= self.scalar
 
-    def function(self):
-        return self.function
-
 class SumFunctionScalar(SumFunction):
           
     """ SumFunctionScalar represents the sum a function with a scalar. 
@@ -339,8 +340,8 @@ class SumFunctionScalar(SumFunction):
         """                
         return self.function.proximal(x, tau, out=out)        
             
-    def function(self):       
-       return self.function    
+#    def function(self):       
+#       return self.function    
 
 class ConstantFunction(Function):
     
@@ -485,11 +486,8 @@ class TranslateFunction(Function):
         """        
         
         return self.function.convex_conjugate(x) + self.center.dot(x)
-                 
-    def function(self):       
-       return self.function             
-   
-    
+                           
+       
 ###############################################################################
 #### Do we want it????
 #class IndicatorSingleton(Function):

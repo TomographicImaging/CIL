@@ -106,3 +106,8 @@ class LeastSquares(Function):
             out.multiply (self.c * 2.0, out=out)
         else:
             return (2.0*self.c)*self.A.adjoint(self.A.direct(x) - self.b)
+        
+
+    
+    
+    

@@ -20,6 +20,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+
 from ccpi.optimisation.functions import Function
 from ccpi.framework import BlockDataContainer
 import numpy as np

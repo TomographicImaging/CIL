@@ -267,12 +267,7 @@ if __name__ == '__main__':
         numpy.testing.assert_array_almost_equal(proxc1.as_array(), 
                                                 proxc_out1.as_array(),
                                                 decimal = 4)  
-        
-        
-#        proxc2 = u1 - t1 * f1.proximal(u1/t1,1/t1)
-#        numpy.testing.assert_array_almost_equal(proxc1.as_array(), 
-#                                                proxc2.as_array(),
-#                                                decimal = 5)     
+    
         print('tau = {} is OK'.format(t1) )        
         
     

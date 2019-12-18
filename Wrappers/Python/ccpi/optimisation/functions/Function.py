@@ -150,7 +150,8 @@ class Function(object):
     
     def __mul__(self, scalar):
         """ Returns a function multiplied by a scalar from the left."""                    
-        return scalar * ScaledFunction(self, 1)   
+        #return scalar * ScaledFunction(self, 1)   
+        return ScaledFunction(self, scalar)
     
     def centered_at(self, center):
         """ Returns a translated function, namely if we have a function :math:`F(x)` the center is at the origin.         
@@ -485,11 +486,8 @@ class TranslateFunction(Function):
         """        
         
         return self.function.convex_conjugate(x) + self.center.dot(x)
-                 
-    def function(self):       
-       return self.function             
-   
-    
+                           
+       
 ###############################################################################
 #### Do we want it????
 #class IndicatorSingleton(Function):

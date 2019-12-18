@@ -148,10 +148,12 @@ class Function(object):
         """Returns a function multiplied by a scalar."""               
         return ScaledFunction(self, scalar)
     
-    def __mul__(self, scalar):
-        """ Returns a function multiplied by a scalar from the left."""                    
-        #return scalar * ScaledFunction(self, 1)   
-        return ScaledFunction(self, scalar)
+    __mul__ = __rmul__
+    
+#    def __mul__(self, scalar):
+#        """ Returns a function multiplied by a scalar from the left."""                 
+#        return scalar * ScaledFunction(self, 1)   
+#        return ScaledFunction(self, scalar)
     
     def centered_at(self, center):
         """ Returns a translated function, namely if we have a function :math:`F(x)` the center is at the origin.         
@@ -296,9 +298,6 @@ class ScaledFunction(Function):
         else:
             self.function.proximal_conjugate(x/self.scalar, tau/self.scalar, out=out)
             out *= self.scalar
-
-    def function(self):
-        return self.function
 
 class SumFunctionScalar(SumFunction):
           

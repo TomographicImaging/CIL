@@ -148,7 +148,10 @@ class Function(object):
         """Returns a function multiplied by a scalar."""               
         return ScaledFunction(self, scalar)
     
-    __mul__ = __rmul__
+    def __mul__(self, scalar):
+        return self.__rmul__(scalar)
+    
+#    __mul__ = __rmul__
     
 #    def __mul__(self, scalar):
 #        """ Returns a function multiplied by a scalar from the left."""                 
@@ -400,8 +403,11 @@ class ConstantFunction(Function):
         .. math:: \mathrm{prox}_{\tau F}(x) = x 
         
         """
-        
-        return Identity(x.geometry).direct(x, out=out)
+        if out is None:
+            return x.copy()
+        else:
+            out.fill(x)
+        #return Identity(x.geometry).direct(x, out=out)
 
 class ZeroFunction(ConstantFunction):
     
@@ -456,10 +462,9 @@ class TranslateFunction(Function):
         """        
         
         if out is None:
-            return self.function.gradient(Identity(x.geometry).direct(x) - self.center)
-        else:            
-            Identity(x.geometry).direct(x, out = out)
-            out.subtract(self.center, out = out)
+            return self.function.gradient(x - self.center)
+        else:                       
+            x.subtract(self.center, out = out)
             self.function.gradient(out, out = out)           
     
     def proximal(self, x, tau, out = None):

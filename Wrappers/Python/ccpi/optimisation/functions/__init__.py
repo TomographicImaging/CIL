@@ -15,15 +15,18 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-from .Function import Function, ScaledFunction, SumFunction, SumFunctionScalar, \
-    ConstantFunction, ZeroFunction, TranslateFunction
+
+from __future__ import absolute_import
+
+from .Function import Function, ConstantFunction, ZeroFunction, TranslateFunction, SumFunctionScalar
+from .Function import ScaledFunction
 from .L1Norm import L1Norm
 from .L2NormSquared import L2NormSquared
+from .LeastSquares import LeastSquares
 from .BlockFunction import BlockFunction
 from .FunctionOperatorComposition import FunctionOperatorComposition
 from .MixedL21Norm import MixedL21Norm
 from .smoothMixedL21Norm import smoothMixedL21Norm
 from .IndicatorBox import IndicatorBox
 from .KullbackLeibler import KullbackLeibler
-from .LeastSquares import LeastSquares
 from .Rosenbrock import Rosenbrock

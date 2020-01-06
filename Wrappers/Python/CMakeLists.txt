@@ -59,7 +59,7 @@ if (BUILD_PYTHON_WRAPPER)
                                                         PREFIX=${CMAKE_SOURCE_DIR}/src/
                                                         LIBRARY_INC=${CMAKE_SOURCE_DIR}/src/include
                                                         LIBRARY_LIB=${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}
-                                                        ${PYTHON_EXECUTABLE} ${SETUP_PY} build_ext --inplace
+                                                        ${PYTHON_EXECUTABLE} ${SETUP_PY} build_py
                         COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT}
                         DEPENDS cilacc)
         else()
@@ -68,7 +68,7 @@ if (BUILD_PYTHON_WRAPPER)
                         COMMAND ${CMAKE_COMMAND} -E env PREFIX=${CMAKE_SOURCE_DIR}/src/
                                                         LIBRARY_INC=${CMAKE_SOURCE_DIR}/src/include
                                                         LIBRARY_LIB=${CMAKE_BINARY_DIR}/
-                                                        ${PYTHON_EXECUTABLE} ${SETUP_PY} build_ext --inplace
+                                                        ${PYTHON_EXECUTABLE} ${SETUP_PY} build_py
                         COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT}
                         DEPENDS cilacc
                         )

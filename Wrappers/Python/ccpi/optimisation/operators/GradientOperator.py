@@ -20,11 +20,17 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+
 from ccpi.optimisation.operators import Operator, LinearOperator, ScaledOperator
 from ccpi.optimisation.operators import FiniteDiff, SparseFiniteDiff
 from ccpi.framework import ImageData, ImageGeometry, BlockGeometry, BlockDataContainer
 import numpy 
 import warnings
+
+#default nThreads
+import multiprocessing
+cpus = multiprocessing.cpu_count()
+NUM_THREADS = max(int(cpus/2),1)
 
 NEUMANN = 'Neumann'
 PERIODIC = 'Periodic'
@@ -50,6 +56,8 @@ class Gradient(LinearOperator):
           'Space' or 'SpaceChannels', defaults to 'Space'
         * *backend* (``str``) --
           'c' or 'numpy', defaults to 'c' if correlation is 'SpaceChannels' or channels = 1
+        * *num_threads* (``int``) --
+          If backend is 'c' specify the number of threads to use. Default is number of cpus/2          
     """
 
     r'''Gradient Operator: .. math:: \nabla : X -> Y           
@@ -84,7 +92,7 @@ class Gradient(LinearOperator):
         if backend == NUMPY:
             self.operator = Gradient_numpy(gm_domain, bnd_cond=bnd_cond, **kwargs)
         else:
-            self.operator = Gradient_C(gm_domain, bnd_cond=bnd_cond)
+            self.operator = Gradient_C(gm_domain, bnd_cond=bnd_cond, **kwargs)
 
 
     def direct(self, x, out=None):
@@ -174,7 +182,7 @@ class Gradient_numpy(LinearOperator):
         
         # Call FiniteDiff operator        
         self.FD = FiniteDiff(self.gm_domain, direction = 0, bnd_cond = self.bnd_cond)
-                                                         
+        print("Initialised GradientOperator with numpy backend")               
         
     def direct(self, x, out=None):
         
@@ -266,7 +274,9 @@ class Gradient_numpy(LinearOperator):
             spMat = SparseFiniteDiff(self.gm_domain, direction=self.ind[i], bnd_cond=self.bnd_cond)
             res.append(spMat.sum_abs_col())
         return BlockDataContainer(*res)
-   
+
+
+
 import ctypes, platform
 
 # check for the extension
@@ -298,6 +308,7 @@ cilacc.fdiff4D.argtypes = [ctypes.POINTER(ctypes.c_float),
                        ctypes.c_long,
                        ctypes.c_long,
                        ctypes.c_int32,
+                       ctypes.c_int32,
                        ctypes.c_int32]
 
 cilacc.fdiff3D.argtypes = [ctypes.POINTER(ctypes.c_float),
@@ -308,6 +319,7 @@ cilacc.fdiff3D.argtypes = [ctypes.POINTER(ctypes.c_float),
                        ctypes.c_long,
                        ctypes.c_long,
                        ctypes.c_int32,
+                       ctypes.c_int32,
                        ctypes.c_int32]
 
 cilacc.fdiff2D.argtypes = [ctypes.POINTER(ctypes.c_float),
@@ -315,6 +327,7 @@ cilacc.fdiff2D.argtypes = [ctypes.POINTER(ctypes.c_float),
                        ctypes.POINTER(ctypes.c_float),
                        ctypes.c_long,
                        ctypes.c_long,
+                       ctypes.c_int32,
                        ctypes.c_int32,
                        ctypes.c_int32]
 
@@ -327,9 +340,11 @@ class Gradient_C(LinearOperator):
                      on 2D, 3D, 4D ImageData
                      under Neumann/Periodic boundary conditions'''
 
-    def __init__(self, gm_domain, gm_range=None, bnd_cond = NEUMANN):
+    def __init__(self, gm_domain, gm_range=None, bnd_cond = NEUMANN, **kwargs):
 
         super(Gradient_C, self).__init__() 
+
+        self.num_threads = kwargs.get('num_threads',NUM_THREADS)
 
         self.gm_domain = gm_domain
         self.gm_range = gm_range
@@ -353,8 +368,9 @@ class Gradient_C(LinearOperator):
             self.fd = cilacc.fdiff2D
         else:
             raise ValueError('Number of dimensions not supported, expected 2, 3 or 4, got {}'.format(len(gm_domain.shape)))
-        
-                        
+      
+        print("Initialised GradientOperator with C backend running with ", self.num_threads," threads")               
+
     @staticmethod 
     def datacontainer_as_c_pointer(x):
         ndx = x.as_array()
@@ -368,9 +384,10 @@ class Gradient_C(LinearOperator):
             out = self.gm_range.allocate(None)
             return_val = True
 
+        #pass list of all arguments
         arg1 = [Gradient_C.datacontainer_as_c_pointer(out.get_item(i))[1] for i in range(self.gm_range.shape[0])]
         arg2 = [el for el in x.shape]
-        args = arg1 + arg2 + [self.bnd_cond, 1]
+        args = arg1 + arg2 + [self.bnd_cond, 1, self.num_threads]
         self.fd(x_p, *args)
         
         if return_val is True:
@@ -388,7 +405,7 @@ class Gradient_C(LinearOperator):
 
         arg1 = [Gradient_C.datacontainer_as_c_pointer(x.get_item(i))[1] for i in range(self.gm_range.shape[0])]
         arg2 = [el for el in out.shape]
-        args = arg1 + arg2 + [self.bnd_cond, 0]
+        args = arg1 + arg2 + [self.bnd_cond, 0, self.num_threads]
 
         self.fd(out_p, *args)
 

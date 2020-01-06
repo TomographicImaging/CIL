@@ -129,7 +129,6 @@ class Gradient_numpy(LinearOperator):
     def __init__(self, gm_domain, bnd_cond = 'Neumann', **kwargs):
         '''creator
         
-<<<<<<< .merge_file_yVAagr
         :param gm_domain: domain of the operator
         :type gm_domain: :code:`AcquisitionGeometry` or :code:`ImageGeometry`
         :param bnd_cond: boundary condition, either :code:`Neumann` or :code:`Periodic`.
@@ -137,10 +136,7 @@ class Gradient_numpy(LinearOperator):
         :param correlation: optional, :code:`SpaceChannel` or :code:`Space`
         :type correlation: str, optional, default :code:`Space`
         '''
-        super(Gradient, self).__init__() 
-=======
         super(Gradient_numpy, self).__init__() 
->>>>>>> .merge_file_SzQTv1
                 
         self.gm_domain = gm_domain # Domain of Grad Operator
         

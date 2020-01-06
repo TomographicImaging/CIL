@@ -22,7 +22,6 @@ Processors
 .. autoclass:: ccpi.astra.processors.AstraForwardProjectorMC
    :members:
    :special-members:
-|
 
 Operators
 =========
@@ -35,7 +34,5 @@ Operators
 .. autoclass:: ccpi.astra.operators.AstraProjectorMC
    :members:
    :special-members:
-|
-
 
 :ref:`Return Home <mastertoc>`

@@ -31,11 +31,14 @@ class MixedL21Norm(Function):
     
     
     '''
-        f(x) = ||x||_{2,1} = \sum |x|_{2}                   
+        .. math::
+          
+          f(x) = ||x||_{2,1} = \sum |x|_{2}
     '''      
     
     def __init__(self, **kwargs):
-
+        '''creator        
+        '''
         super(MixedL21Norm, self).__init__()                      
         self.SymTensor = kwargs.get('SymTensor',False)
         
@@ -43,7 +46,7 @@ class MixedL21Norm(Function):
         
         ''' Evaluates L2,1Norm at point x
             
-            :param: x is a BlockDataContainer
+            :param x: is a BlockDataContainer
                                 
         '''
         if not isinstance(x, BlockDataContainer):
@@ -60,8 +63,9 @@ class MixedL21Norm(Function):
                             
     def convex_conjugate(self,x):
         
-        ''' This is the Indicator function of ||\cdot||_{2, \infty}
-            which is either 0 if ||x||_{2, \infty} or \infty        
+        ''' This is the Indicator function of :math:`||\cdot||_{2, \infty}` which is either 0 if :math:`||x||_{2, \infty}` or :math:`\infty`
+
+        Notice this returns 0
         '''
         
         return 0.0

@@ -40,7 +40,15 @@ class LinearOperator(Operator):
     
     @staticmethod
     def PowerMethod(operator, iterations, x_init=None):
-        '''Power method to calculate iteratively the Lipschitz constant'''
+        '''Power method to calculate iteratively the Lipschitz constant
+        
+        :param operator: input operator
+        :type operator: :code:`LinearOperator`
+        :param iterations: number of iterations to run
+        :type iteration: int
+        :param x_init: starting point for the iteration in the operator domain
+        :returns: tuple with: L, list of L at each iteration, the data the iteration worked on.
+        '''
         
         # Initialise random
         if x_init is None:
@@ -73,11 +81,11 @@ class LinearOperator(Operator):
 
     @staticmethod
     def dot_test(operator, domain_init=None, range_init=None, verbose=False):
-        '''Does a dot linearity test on the operator
+        r'''Does a dot linearity test on the operator
         
         Evaluates if the following equivalence holds
         
-        :math: ..
+        .. math::
         
           Ax\times y = y \times A^Tx
         

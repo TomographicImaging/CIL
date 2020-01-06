@@ -392,6 +392,7 @@ class AcquisitionGeometry(object):
                  num_positions, # int
                  src_dof, # 3 dof (x,y,z) per projection as [num_positions, src vector]
                  det_dof, # 6 dof (x,y,z,Rx,Ry,Rz) per projection as [num_positions, det vector]
+                 angles, #temp for backward compatibility
                  num_channels = 1, #int
                  ** kwargs):
 
@@ -402,10 +403,11 @@ class AcquisitionGeometry(object):
         self.num_channels = num_channels
         self.src_dof = src_dof
         self.det_dof = det_dof
+        self.angles = angles
 
         #and make it work with current 2D projector style to test
         num_of_angles = self.num_positions
-        angles = numpy.ndarray(num_of_angles)
+        angles_test = numpy.ndarray(num_of_angles)
         AcquisitionGeometry.ANGLE_UNIT = AcquisitionGeometry.RADIAN
 
         for i in range(num_of_angles):
@@ -1046,6 +1048,7 @@ class ImageData(DataContainer):
             warnings.warn('Direct invocation is deprecated and will be removed in following version. Use allocate from ImageGeometry instead',
                    DeprecationWarning, stacklevel=4)
         self.geometry = kwargs.get('geometry', None)
+        
         if array is None:
             if self.geometry is not None:
                 shape, dimension_labels = self.get_shape_labels(self.geometry, dimension_labels)

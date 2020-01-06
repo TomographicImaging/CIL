@@ -86,7 +86,6 @@ class TestData(object):
             
         else:
             tmp = Image.open(os.path.join(self.data_dir, which))
-            print (tmp)
             bands = tmp.getbands()
             if len(bands) > 1:
                 ig = ImageGeometry(voxel_num_x=size[0], voxel_num_y=size[1], channels=len(bands), 

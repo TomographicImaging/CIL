@@ -64,7 +64,7 @@ setup(
     description='CCPi Core Imaging Library - Python Framework Module',
     license="Apache v2.0",
     keywords="Python Framework",
-    url="http://www.ccpi.ac.uk",   # project home page, if any
+    url="http://www.ccpi.ac.uk/CIL",   # project home page, if any
 
     # could also include long_description, download_url, classifiers, etc.
 )

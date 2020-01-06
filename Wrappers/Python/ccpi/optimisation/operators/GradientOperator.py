@@ -41,7 +41,9 @@ CORRELATION_SPACECHANNEL = "SpaceChannels"
 
 class Gradient(LinearOperator):
 
-    """This is a class to compute the first-order forward/backward differences on ImageData
+
+    r'''Gradient Operator: Computes first-order forward/backward differences on 
+        2D, 3D, 4D ImageData under Neumann/Periodic boundary conditions
     
     :param gm_domain: Set up the domain of the function
     :type gm_domain: `ImageGeometry`
@@ -58,17 +60,16 @@ class Gradient(LinearOperator):
           'c' or 'numpy', defaults to 'c' if correlation is 'SpaceChannels' or channels = 1
         * *num_threads* (``int``) --
           If backend is 'c' specify the number of threads to use. Default is number of cpus/2          
-    """
-
-    r'''Gradient Operator: .. math:: \nabla : X -> Y           
-            
-            Computes first-order forward/backward differences 
-                     on 2D, 3D, 4D ImageData
-                     under Neumann/Periodic boundary conditions
-                                                             
-                Example (2D): u\in X, \nabla(u) = [\partial_{y} u, \partial_{x} u]
-                              u^{*}\in Y, \nabla^{*}(u^{*}) = \partial_{y} v1 + \partial_{x} v2
+                 
+                 
+        Example (2D): 
+        .. math::
         
+          \nabla : X -> Y \\
+          u\in X, \nabla(u) = [\partial_{y} u, \partial_{x} u] \\
+          u^{*}\in Y, \nabla^{*}(u^{*}) = \partial_{y} v1 + \partial_{x} v2
+            
+
     '''
 
     #kept here for backwards compatability
@@ -134,7 +135,15 @@ class Gradient(LinearOperator):
 class Gradient_numpy(LinearOperator):
     
     def __init__(self, gm_domain, bnd_cond = 'Neumann', **kwargs):
+        '''creator
         
+        :param gm_domain: domain of the operator
+        :type gm_domain: :code:`AcquisitionGeometry` or :code:`ImageGeometry`
+        :param bnd_cond: boundary condition, either :code:`Neumann` or :code:`Periodic`.
+        :type bnd_cond: str, optional, default :code:`Neumann`
+        :param correlation: optional, :code:`SpaceChannel` or :code:`Space`
+        :type correlation: str, optional, default :code:`Space`
+        '''
         super(Gradient_numpy, self).__init__() 
                 
         self.gm_domain = gm_domain # Domain of Grad Operator

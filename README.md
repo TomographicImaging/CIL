@@ -11,11 +11,11 @@ This package provides a common framework, hence the name, for the analysis of da
 
 ## Installation
 
-Binary installation of the CCPi Framework can be done with `conda`. Install a new environment as in the following. Some packages are optional (cvxpy and ccpi-astra)
+Binary installation of the CCPi Framework can be done with `conda`. Install a new environment as in the following. Some packages are optional (`cvxpy`, `ccpi-plugins`, `ccpi-astra`) but very useful.
 
 ```bash
 
-conda create -y --name cil python=3.6.7 cvxpy=1.0.15 lapack numpy=1.14 ccpi-framework ccpi-astra tomophantom ccpi-plugins -c oxfordcontrol -c conda-forge -c astra-toolbox -c ccpi/label/dev
+conda create -y --name cil python=3 cvxpy ccpi-framework=19.10 ccpi-astra=19.10 tomophantom ccpi-plugins=19.10 -c oxfordcontrol -c conda-forge -c astra-toolbox -c ccpi
 ```
 
 ### Components

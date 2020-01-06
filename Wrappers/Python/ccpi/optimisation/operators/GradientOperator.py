@@ -35,6 +35,7 @@ CORRELATION_SPACECHANNEL = "SpaceChannels"
 
 class Gradient(LinearOperator):
 
+
     r'''Gradient Operator: Computes first-order forward/backward differences on 
         2D, 3D, 4D ImageData under Neumann/Periodic boundary conditions
     
@@ -51,7 +52,7 @@ class Gradient(LinearOperator):
           'Space' or 'SpaceChannels', defaults to 'Space'
         * *backend* (``str``) --
           'c' or 'numpy', defaults to 'c' if correlation is 'SpaceChannels' or channels = 1
-    
+   
                                                         
         Example (2D): 
 

@@ -8,6 +8,7 @@ and other contributing institutions.
 
 Main contributors in alphabetical order:
 Evelina Ametova (UoM)
+Gemma Fardell (STFC)
 Jakob Jorgensen (UoM)
 Daniil Kazantsev (Diamond Light Source)
 Srikanth Nagella (STFC)

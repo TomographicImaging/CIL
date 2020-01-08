@@ -2,17 +2,19 @@
 
 #include "FiniteDifferenceLibrary.h"
 
-DLL_EXPORT int openMPtest(void)
+DLL_EXPORT int openMPtest(int nThreads)
 {
-	int nThreads;
+ 	omp_set_num_threads(nThreads);
+
+ 	int nThreads_running;
 #pragma omp parallel
-	{
-		if (omp_get_thread_num() == 0)
-		{
-			nThreads = omp_get_num_threads();
-		}
-	}
-	return nThreads;
+ 	{
+ 		if (omp_get_thread_num() == 0)
+ 		{
+ 			nThreads_running = omp_get_num_threads();
+ 		}
+ 	}
+	return nThreads_running;
 }
 int fdiff_direct_neumann(const float *inimagefull, float *outimageXfull, float *outimageYfull, float *outimageZfull, float *outimageCfull, long nx, long ny, long nz, long nc)
 {
@@ -245,7 +247,7 @@ int fdiff_direct_neumann_L21(const float *inimagefull, float *outimageL21normful
 				outimageL21norm[ind] += outimageC[ind] * outimageC[ind];
 
 				//sqrt
-				outimageL21norm[ind] = (float)sqrt(outimageL21norm[ind]);
+				outimageL21norm[ind] = (float)sqrt((double)outimageL21norm[ind]);
 			}
 		}
 

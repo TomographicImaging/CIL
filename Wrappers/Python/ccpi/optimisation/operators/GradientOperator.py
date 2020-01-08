@@ -20,7 +20,6 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-
 from ccpi.optimisation.operators import Operator, LinearOperator, ScaledOperator
 from ccpi.optimisation.operators import FiniteDiff, SparseFiniteDiff
 from ccpi.framework import ImageData, ImageGeometry, BlockGeometry, BlockDataContainer
@@ -285,7 +284,6 @@ class Gradient_numpy(LinearOperator):
         return BlockDataContainer(*res)
 
 
-
 import ctypes, platform
 
 # check for the extension
@@ -298,14 +296,13 @@ elif platform.system() == 'Darwin':
 else:
     raise ValueError('Not supported platform, ', platform.system())
 
-#print ("dll location", dll)
-cilacc = ctypes.cdll.LoadLibrary(dll)
 
-#FD = ctypes.CDLL(dll)
+cilacc = ctypes.cdll.LoadLibrary(dll)
 
 c_float_p = ctypes.POINTER(ctypes.c_float)
 
 cilacc.openMPtest.restypes = ctypes.c_int32
+cilacc.openMPtest.argtypes = [ctypes.c_int32]
 
 cilacc.fdiff4D.argtypes = [ctypes.POINTER(ctypes.c_float),
                        ctypes.POINTER(ctypes.c_float),
@@ -377,8 +374,8 @@ class Gradient_C(LinearOperator):
             self.fd = cilacc.fdiff2D
         else:
             raise ValueError('Number of dimensions not supported, expected 2, 3 or 4, got {}'.format(len(gm_domain.shape)))
-      
-        print("Initialised GradientOperator with C backend running with ", self.num_threads," threads")               
+      #self.num_threads
+        print("Initialised GradientOperator with C backend running with ", cilacc.openMPtest(self.num_threads)," threads")               
 
     @staticmethod 
     def datacontainer_as_c_pointer(x):

@@ -5,9 +5,15 @@ if (BUILD_PYTHON_WRAPPER)
   
   set(PYTHON_DEST_DIR "" CACHE PATH "Directory of the Python wrappers")
   if (PYTHON_DEST_DIR)
-  set(PYTHON_DEST "${PYTHON_DEST_DIR}")
+    set(PYTHON_DEST "${PYTHON_DEST_DIR}")
   else() 
-  set(PYTHON_DEST "${CMAKE_INSTALL_PREFIX}/python")
+    message(STATUS "python version ${PYTHON_DEST}")
+    execute_process(COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/sp_dir.py 
+      OUTPUT_VARIABLE SP_DIR)
+    # remove trailing newline  
+    string(REGEX REPLACE "\n$" "" PYTHON_DEST ${SP_DIR})
+    # append default site-packages
+    set(PYTHON_DEST "${PYTHON_DEST}/site-packages")
   endif()
   message(STATUS "Python wrappers will be installed in " ${PYTHON_DEST})
 
@@ -35,16 +41,12 @@ if (BUILD_PYTHON_WRAPPER)
 
       #configure_file(${SETUP_PY_IN} ${SETUP_PY})
 
-      message("Core binary dir " ${CMAKE_BINARY_DIR}/Core/${CMAKE_BUILD_TYPE})
       
       if (CONDA_BUILD)
         add_custom_command(OUTPUT ${OUTPUT}
                         #COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
                         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
                         COMMAND ${CMAKE_COMMAND} -E env CIL_VERSION=${CIL_VERSION}
-                                                        #PREFIX=${CMAKE_SOURCE_DIR}/src/Core
-                                                        #LIBRARY_INC=${CMAKE_SOURCE_DIR}/src/Core
-                                                        #LIBRARY_LIB=${CMAKE_BINARY_DIR}/src/Core
                                                         ${PYTHON_EXECUTABLE} ${SETUP_PY} -vv install
                                                         #echo "EDO"
                         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
@@ -59,7 +61,7 @@ if (BUILD_PYTHON_WRAPPER)
                                                         PREFIX=${CMAKE_SOURCE_DIR}/src/
                                                         LIBRARY_INC=${CMAKE_SOURCE_DIR}/src/include
                                                         LIBRARY_LIB=${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}
-                                                        ${PYTHON_EXECUTABLE} ${SETUP_PY} build_ext --inplace
+                                                        ${PYTHON_EXECUTABLE} ${SETUP_PY} build_py
                         COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT}
                         DEPENDS cilacc)
         else()
@@ -68,21 +70,22 @@ if (BUILD_PYTHON_WRAPPER)
                         COMMAND ${CMAKE_COMMAND} -E env PREFIX=${CMAKE_SOURCE_DIR}/src/
                                                         LIBRARY_INC=${CMAKE_SOURCE_DIR}/src/include
                                                         LIBRARY_LIB=${CMAKE_BINARY_DIR}/
-                                                        ${PYTHON_EXECUTABLE} ${SETUP_PY} build_ext --inplace
+                                                        ${PYTHON_EXECUTABLE} ${SETUP_PY} build_py
                         COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT}
                         DEPENDS cilacc
                         )
         endif()
         #set (PYTHON_DEST ${CMAKE_INSTALL_PREFIX}/python/)
-        install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/
+        install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/ccpi
                 DESTINATION ${PYTHON_DEST})
+        install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/ DESTINATION ${CMAKE_INSTALL_PREFIX}/share/ccpi)
         #file(TOUCH ${PYTHON_DEST}/edo/__init__.py)
         
       endif()
       
       
       add_custom_target(PythonWrapper ALL DEPENDS ${OUTPUT})
-      #install(CODE "execute_process(COMMAND ${PYTHON} ${SETUP_PY} install)")
+      
   endif()
 
 endif()

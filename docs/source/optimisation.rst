@@ -271,6 +271,7 @@ Base classes
 .. autoclass:: ccpi.optimisation.functions.ScaledFunction
    :members:
    :special-members:
+<<<<<<< HEAD
    
 .. autoclass:: ccpi.optimisation.functions.SumFunction
    :members:
@@ -294,6 +295,8 @@ Constant Function
    :members:
    :special-members:            
 
+=======
+>>>>>>> origin
 
 Composition of operator and a function
 --------------------------------------
@@ -352,10 +355,16 @@ Squared L2 norm
    :members:
    :special-members:
 
+<<<<<<< HEAD
 Least Squares
 -------------
 
 .. autoclass:: ccpi.optimisation.functions.LeastSquares
+=======
+And a least squares function:
+
+.. autoclass:: ccpi.optimisation.functions.Norm2Sq
+>>>>>>> origin
    :members:
    :special-members:
 
@@ -365,6 +374,7 @@ Mixed L21 norm
 .. autoclass:: ccpi.optimisation.functions.MixedL21Norm
    :members:
    :special-members:
+<<<<<<< HEAD
    
 Smooth Mixed L21 norm
 ---------------------
@@ -387,6 +397,27 @@ Block Operator
 .. autoclass:: ccpi.optimisation.operators.BlockScaledOperator
    :members:
    :special-members:
+=======
+
+.. autoclass:: ccpi.optimisation.functions.ZeroFunction
+   :members:
+   :special-members:
+
+
+Block Framework
+***************
+
+Block Operator
+==============
+
+
+.. autoclass:: ccpi.optimisation.operators.BlockOperator
+   :members:
+   :special-members:
+.. autoclass:: ccpi.optimisation.operators.BlockScaledOperator
+   :members:
+   :special-members:
+>>>>>>> origin
 
 
 Block Function  

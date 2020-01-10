@@ -37,7 +37,15 @@ class L1Norm(Function):
     """   
            
     def __init__(self, **kwargs):
-        
+        '''creator
+
+        Cases considered (with/without data):            
+        a) :math:`f(x) = ||x||_{1}`
+        b) :math:`f(x) = ||x - b||_{1}`
+
+        :param b: translation of the function
+        :type b: :code:`DataContainer`, optional
+        '''
         super(L1Norm, self).__init__()
         self.b = kwargs.get('b',None)
         self.shinkage_operator = ShrinkageOperator()

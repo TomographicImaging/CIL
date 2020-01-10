@@ -33,6 +33,10 @@ class LinearOperatorMatrix(LinearOperator):
     """
     
     def __init__(self,A):
+        '''creator
+
+        :param A: numpy ndarray representing a matrix
+        '''
         self.A = A
         M_A, N_A = self.A.shape
         self.gm_domain = VectorGeometry(N_A)

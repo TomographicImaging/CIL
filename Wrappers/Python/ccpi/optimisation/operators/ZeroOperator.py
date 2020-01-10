@@ -25,19 +25,19 @@ from ccpi.optimisation.operators import LinearOperator
 
 class ZeroOperator(LinearOperator):
     
-    r'''ZeroOperator:  O: X -> Y,  maps any element of x\in X into the zero element in Y
-                       O(x) = O_{Y}
+    r'''ZeroOperator:  O: X -> Y,  maps any element of :math:`x\in X` into the zero element :math:`\in Y,  O(x) = O_{Y}`
                        
-                       X : gm_domain
-                       Y : gm_range ( Default: Y = X )
-                       
-                       
-                       Note: 
-                       .. math::
+        :param gm_domain: domain of the operator 
+        :param gm_range: range of the operator, default: same as domain
+        
+        
+        Note: 
+        
+        .. math::
 
-                              O^{*}: Y^{*} -> X^{*} (Adjoint)
-                       
-                              < O(x), y > = < x, O^{*}(y) >
+                O^{*}: Y^{*} -> X^{*} \text{(Adjoint)}
+        
+                < O(x), y > = < x, O^{*}(y) >
                        
      '''
     

@@ -220,7 +220,7 @@ class TestFunction(unittest.TestCase):
         scalar = 0.25
         f1 =  scalar * L2NormSquared(b=b)
         f2 = 5
-        
+           
         f = f1 + f2
         print(f)
         
@@ -228,6 +228,24 @@ class TestFunction(unittest.TestCase):
         print(g)
 
         tau = 0.03
+        
+        # check call method       
+        res1 = f(tmp)
+        res2 = f1(tmp) + f2
+        self.assertAlmostEqual(res1, res2)
+        
+        # check gradient
+        res1 = f.gradient(tmp)
+        res2 = f1.gradient(tmp)
+        self.assertNumpyArrayAlmostEqual(res1.as_array(), res2.as_array())
+        
+        # check gradient with out
+        out1 = tmp*0
+        out2 = tmp*0
+        f.gradient(tmp, out=out1)
+        f1.gradient(tmp, out=out2)
+        self.assertNumpyArrayAlmostEqual(out1.as_array(), out2.as_array())
+        
 
         res1 = f.proximal(tmp, tau)
         res2 = f1.proximal(tmp, tau)
@@ -255,6 +273,47 @@ class TestFunction(unittest.TestCase):
         f1.proximal_conjugate(tmp, tau, out = res2_out)             
         self.assertNumpyArrayAlmostEqual(res1_out.as_array(), res2_out.as_array())        
             
+        
+def test_ConstantFunction(self):      
+        
+        M, N, K = 3,4,5
+        ig = ImageGeometry(M, N, K)
+        
+        tmp = ig.allocate('random_int')
+        
+        constant = 10
+        f = ConstantFunction(constant)
+        
+        # check call
+        res1 = f(tmp)
+        self.assertAlmostEqual(res1, constant)
+        
+        # check gradient with and without out
+        res1 = f.gradient(tmp)
+        out = ig.allocate()
+        self.assertNumpyArrayAlmostEqual(res1.as_array(), out)
+        
+        out1 = ig.allocate()
+        f.gradient(tmp, out=out1)
+        self.assertNumpyArrayAlmostEqual(res1.as_array(), out1)
+        
+        # check convex conjugate        
+        res1 = f.convex_conjugate(tmp)
+        res2 = tmp.maximum(0).sum()
+        self.assertNumpyArrayAlmostEqual(res1.as_array(), res2.as_array())
+        
+        # check proximal 
+        tau = 0.4
+        res1 = f.proximal(tmp, tau)
+        self.assertNumpyArrayAlmostEqual(res1.as_array(), tmp.as_array()) 
+            
+        
+        
+        # check call
+        
+        
+        
+     
         
                 
 #if __name__ == '__main__':

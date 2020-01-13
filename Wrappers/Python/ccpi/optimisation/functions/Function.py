@@ -39,11 +39,10 @@ class Function(object):
     """
     
     
-    def __init__(self, domain = None, L = None):
+    def __init__(self, L = None):
         
         self.L = L
-        self.domain = domain
-
+        
     def __call__(self,x):
         
         r"""Returns the value of the function F at x: :math:`F(x)`
@@ -105,13 +104,7 @@ class Function(object):
         warnings.warn('''This method will disappear in following 
         versions of the CIL. Use proximal instead''', DeprecationWarning)
         return self.proximal(x, tau, out=None)
-    
-    def domain(self):
-        """  Returns the domain of the function :math:`F`. 
-        Although, it is mathematically correct to setup a function based on the domain, 
-        we do not use this information at the moment. """
-        return self.domain
-    
+        
     # Algebra for Function Class
     
         # Add functions
@@ -151,13 +144,7 @@ class Function(object):
     def __mul__(self, scalar):
         return self.__rmul__(scalar)
     
-#    __mul__ = __rmul__
-    
-#    def __mul__(self, scalar):
-#        """ Returns a function multiplied by a scalar from the left."""                 
-#        return scalar * ScaledFunction(self, 1)   
-#        return ScaledFunction(self, scalar)
-    
+   
     def centered_at(self, center):
         """ Returns a translated function, namely if we have a function :math:`F(x)` the center is at the origin.         
             TranslateFunction is :math:`F(x - b)` and the center is at point b."""
@@ -211,18 +198,10 @@ class SumFunction(Function):
         if out is None:            
             return self.function1.gradient(x) +  self.function2.gradient(x)  
         else:
-#            out_tmp = out.copy()
-#            out_tmp *=0
-            out_tmp = out*0.
+
             self.function1.gradient(x, out=out)
-            self.function2.gradient(x, out=out_tmp)
-            out_tmp.add(out, out=out)
-#            out.add(self.function2.gradient(x, out=out), out=out)
-#        except NotImplementedError:
-#            print("Either {} or {} is not differentiable".format(type(self.function1).__name__), type(self.function1).__name__)) 
-                            
+            out.add(self.function2.gradient(x), out=out)                
             
-        
 class ScaledFunction(Function):
     
     r""" ScaledFunction represents the scalar multiplication with a Function.
@@ -279,8 +258,6 @@ class ScaledFunction(Function):
         else:
             self.function.gradient(x, out=out)
             out *= self.scalar  
-#        except NotImplementedError:
-#            print("{} is not differentiable".format(type(self.function).__name__))                         
 
     def proximal(self, x, tau, out=None):
         
@@ -289,10 +266,9 @@ class ScaledFunction(Function):
         .. math:: \mathrm{prox}_{\tau G}(x) = \mathrm{prox}_{(\tau\alpha) F}(x)
         
         """        
-#        if out is None:
+
         return self.function.proximal(x, tau*self.scalar, out=out)     
-#        else:
-#            self.function.proximal(x, tau*self.scalar, out = out)
+
 
     def proximal_conjugate(self, x, tau, out = None):
         r"""This returns the proximal operator for the function at x, tau
@@ -370,8 +346,10 @@ class ConstantFunction(Function):
     def gradient(self, x, out=None):
         
         """ Returns the value of the gradient of the function, :math:`F'(x)=0`"""       
-        
-        return ZeroOperator(x.geometry).direct(x, out=out)
+        if out is None:
+            return x * 0.
+        else:
+            out.fill(0)
     
     def convex_conjugate(self, x):
                         
@@ -492,27 +470,5 @@ class TranslateFunction(Function):
         
         return self.function.convex_conjugate(x) + self.center.dot(x)
                            
-       
-###############################################################################
-#### Do we want it????
-#class IndicatorSingleton(Function):
-#    
-#    """ Indicator funtion for the singleton C = {0}
-#        
-#    """
-#    
-#    def __init__(self, constant = 0):
-#        
-#        super(IndicatorSingleton, self).__init__()
-#        
-#    def __call__(self):
-#        pass
-#                
-#    def convex_conjugate(self):
-#        pass
-#    
-#    def proximal_conjugate(self):
-#        pass
-       
-   
+    
     

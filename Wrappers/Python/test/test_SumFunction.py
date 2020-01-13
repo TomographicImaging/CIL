@@ -182,7 +182,7 @@ class TestFunction(unittest.TestCase):
         out_right1 = ig.allocate()
         out_right2 = ig.allocate()  
             
-        for func in list1:               
+        for i, func in enumerate(list1):               
                 
             if isinstance(func, ScaledFunction):
                 type_fun = ' scalar * ' + type(func.function).__name__
@@ -208,6 +208,21 @@ class TestFunction(unittest.TestCase):
                 self.assertNumpyArrayAlmostEqual(out_left.as_array(), out_right1.as_array() + tmp_fun_gradient_out)
             except NotImplementedError:
                 print("{} is not differentiable".format(type_fun))  
+    def test_ConstantFunction(self):
+
+        k = ConstantFunction(constant=1)
+        ig = ImageGeometry(1,2,3)
+        x = ig.allocate(2)
+
+        grad = k.gradient(x)
+        out = ig.allocate(-1)
+
+        k.gradient(x, out=out)
+        #out.fill(-3)
+        
+        self.assertNumpyArrayEqual(numpy.zeros(x.shape), grad.as_array())
+        
+        self.assertNumpyArrayEqual(out.as_array(), grad.as_array())
                 
     def test_SumFunctionScalar(self):      
         

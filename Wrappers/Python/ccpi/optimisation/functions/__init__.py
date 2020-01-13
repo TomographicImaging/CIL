@@ -26,7 +26,6 @@ from .LeastSquares import LeastSquares
 from .BlockFunction import BlockFunction
 from .FunctionOperatorComposition import FunctionOperatorComposition
 from .MixedL21Norm import MixedL21Norm
-from .smoothMixedL21Norm import smoothMixedL21Norm
 from .IndicatorBox import IndicatorBox
 from .KullbackLeibler import KullbackLeibler
 from .Rosenbrock import Rosenbrock

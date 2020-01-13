@@ -36,6 +36,7 @@ int fdiff_direct_neumann(const float *inimagefull, float *outimageXfull, float *
 			long ind, k, j, i;
 			float pix0;
 			//run over all and then fix boundaries
+			
 #pragma omp for nowait
 			for (ind = 0; ind < nx * ny * (nz - 1); ind++)
 			{

@@ -16,14 +16,13 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 import unittest
-from ccpi.framework import ImageGeometry, ImageData, BlockDataContainer, DataContainer
+from ccpi.framework import ImageGeometry, VectorGeometry, ImageData, BlockDataContainer, DataContainer
 from ccpi.optimisation.operators import BlockOperator, BlockScaledOperator,\
     FiniteDiff, SymmetrizedGradient
 import numpy
 from timeit import default_timer as timer
-from ccpi.framework import ImageGeometry
 from ccpi.optimisation.operators import Gradient, Identity, SparseFiniteDiff
-from ccpi.optimisation.operators import LinearOperator
+from ccpi.optimisation.operators import LinearOperator, LinearOperatorMatrix
 
 
 def dt(steps):
@@ -66,6 +65,39 @@ class CCPiTestClass(unittest.TestCase):
 
 
 class TestOperator(CCPiTestClass):
+    
+    def test_LinearOperatorMatrix(self):
+        
+        print('Check LinearOperatorMatrix')
+                
+        m = 30
+        n = 20
+        
+        vg = VectorGeometry(n)
+        
+        Amat = numpy.random.randn(m, n)
+        A = LinearOperatorMatrix(Amat)
+        
+        b = vg.allocate('random')
+        
+        out1 = A.range_geometry().allocate()
+        out2 = A.domain_geometry().allocate()
+        
+        res1 = A.direct(b)
+        res2 = numpy.dot(A.A, b.as_array())
+        self.assertNumpyArrayAlmostEqual(res1.as_array(), res2)
+            
+        A.direct(b, out = out1)
+        self.assertNumpyArrayAlmostEqual(res1.as_array(), out1.as_array(), decimal=4)
+        
+        res3 = A.adjoint(res1)
+        res4 = numpy.dot(A.A.transpose(),res1.as_array())
+        self.assertNumpyArrayAlmostEqual(res3.as_array(), res4, decimal=4)   
+        
+        A.adjoint(res1, out = out2)
+        self.assertNumpyArrayAlmostEqual(res3.as_array(), out2.as_array(), decimal=4)        
+    
+    
     def test_ScaledOperator(self):
         print ("test_ScaledOperator")
         ig = ImageGeometry(10,20,30)

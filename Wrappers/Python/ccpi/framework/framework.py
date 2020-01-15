@@ -560,7 +560,12 @@ class DataContainer(object):
                     return VectorData(cleaned)
     
     def fill(self, array, **dimension):
-        '''fills the internal numpy array with the one provided'''
+        '''fills the internal numpy array with the one provided
+        
+        :param array: numpy array to copy into the DataContainer
+        :type array: DataContainer, numpy array or number
+        :param dimension: dictionary, optional
+        '''
         if dimension == {}:
             if issubclass(type(array), DataContainer) or\
                issubclass(type(array), numpy.ndarray):
@@ -573,6 +578,8 @@ class DataContainer(object):
                 else:
                     #self.array[:] = array
                     numpy.copyto(self.array, array)
+            else:
+                self.array.fill(array)
         else:
             
             command = 'self.array['

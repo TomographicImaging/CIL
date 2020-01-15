@@ -36,6 +36,7 @@ A number of demos can be found on the `CIL-Demos`_ repository.
    plugins
    astra
    contrib
+   developer_guide
 
 .. Indices and tables
 .. ==================

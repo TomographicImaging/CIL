@@ -183,6 +183,53 @@ class MixedL21Norm(Function):
 #            x.divide(res1, out=out)
                               
 
+
+
+
+class SmoothMixedL21Norm(Function):
+    # promxial conjugate, proximal no closed-form solutions
+    # convex conjugate closed form solution, not implemented
+        
+    def __init__(self, epsilon):
+        r'''creator
+
+        :param epsilon: explain what it is
+        '''
+
+        super(SmoothMixedL21Norm, self).__init__(L=1)          
+        self.epsilon = epsilon        
+        
+        if self.epsilon==0:
+            raise ValueError('We need epsilon>0')
+                            
+    def __call__(self, x):
+        
+        r"""Returns the value of the SmoothMixedL21Norm function at x.                                            
+        """
+        if not isinstance(x, BlockDataContainer):
+            raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 
+         
+        tmp_cont = x.containers                        
+        tmp = x.get_item(0) * 0.
+        for el in tmp_cont:
+            tmp += el.power(2.)
+        tmp.add(self.epsilon**2, out = tmp)    
+        return tmp.sqrt().sum()
+
+
+    def gradient(self, x, out=None): 
+        
+        tmp = x.get_item(0) * 0.
+        for el in x.containers:
+            tmp += el.power(2.)
+        tmp+=self.epsilon**2
+                  
+        if out is None:
+            return x.divide(tmp.sqrt())
+        else:
+            x.divide(tmp.sqrt(), out=out)
+
+
 if __name__ == '__main__':
     
     M, N, K = 2,3,50

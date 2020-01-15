@@ -65,6 +65,7 @@ class BlockFunction(Function):
             
             x : BlockDataContainer and must have as many rows as self.length
 
+            returns ..math:: \sum(f_i(x_i))
             
         """
         

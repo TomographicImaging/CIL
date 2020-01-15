@@ -92,19 +92,7 @@ class Function(object):
             self.proximal(x/tau, 1/tau, out = out)
             out*=-tau
             out.add(x, out = out)                       
-
-    def grad(self, x):
-        """Alias of gradient(x,None)"""
-        warnings.warn('''This method will disappear in following 
-        versions of the CIL. Use gradient instead''', DeprecationWarning)
-        return self.gradient(x, out=None)
-
-    def prox(self, x, tau):
-        """ Alias of proximal(x, tau, None)"""
-        warnings.warn('''This method will disappear in following 
-        versions of the CIL. Use proximal instead''', DeprecationWarning)
-        return self.proximal(x, tau, out=None)
-        
+    
     # Algebra for Function Class
     
         # Add functions

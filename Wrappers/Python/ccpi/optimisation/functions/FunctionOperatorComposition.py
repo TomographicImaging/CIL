@@ -30,10 +30,10 @@ import warnings
 
 class FunctionOperatorComposition(Function):
     
-    """ Composition of a function with an operator as : :math:`(F o A)(x) = F(Ax)`
+    """ Composition of a function with an operator as : :math:`(F \otimes A)(x) = F(Ax)`
     
-            : parameter function : function F
-            : parameter operator : operator A
+            :parameter function: :code:`Function` F
+            :parameter operator: :code:`Operator` A
             
             
         For general operator, we have no explicit formulas for convex_conjugate,
@@ -42,7 +42,14 @@ class FunctionOperatorComposition(Function):
     """
     
     def __init__(self, function, operator):
-        
+        '''creator
+
+    :param A: operator
+    :type A: :code:`Operator`
+    :param f: function
+    :type f: :code:`Function`
+    '''
+
         super(FunctionOperatorComposition, self).__init__()
         
         self.function = function     

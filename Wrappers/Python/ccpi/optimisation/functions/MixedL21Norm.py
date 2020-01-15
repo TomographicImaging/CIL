@@ -36,7 +36,11 @@ class MixedL21Norm(Function):
     """      
     
     def __init__(self, **kwargs):
-
+        '''Creator
+        
+        :param b:  translation of the function
+        :type b: :code:`DataContainer`, optional
+        '''
         super(MixedL21Norm, self).__init__()  
         self.b = kwargs.get('b', None)  
 
@@ -52,7 +56,9 @@ class MixedL21Norm(Function):
         
     def __call__(self, x):
         
-        r"""Returns the value of the MixedL21Norm function at x.                                            
+        r"""Returns the value of the MixedL21Norm function at x. 
+
+        :param x: :code:`BlockDataContainer`                                           
         """
         if not isinstance(x, BlockDataContainer):
             raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 

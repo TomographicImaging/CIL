@@ -563,6 +563,7 @@ class DataContainer(object):
         '''fills the internal numpy array with the one provided
         
         :param array: numpy array to copy into the DataContainer
+        :type array: DataContainer, numpy array or number
         :param dimension: dictionary, optional
         '''
         if dimension == {}:

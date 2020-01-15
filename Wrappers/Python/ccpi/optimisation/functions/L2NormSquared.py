@@ -45,11 +45,17 @@ class L2NormSquared(Function):
     """    
     
     def __init__(self, **kwargs):
-        
-        
-                                
-        super(L2NormSquared, self).__init__(L = 2)        
-        self.b = kwargs.get('b', None)                             
+        '''creator
+
+        Cases considered (with/without data):            
+                a) .. math:: f(x) = \|x\|^{2}_{2} 
+                b) .. math:: f(x) = \|\|x - b\|\|^{2}_{2}
+
+        :param b:  translation of the function
+        :type b: :code:`DataContainer`, optional
+        '''                        
+        super(L2NormSquared, self).__init__(L = 2)
+        self.b = kwargs.get('b',None) 
         
         #if self.b is not None:
         #    self.domain = self.b.geometry  

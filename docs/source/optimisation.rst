@@ -378,15 +378,6 @@ Block Framework
 ***************
 
 Block Operator
-==============
-
-
-.. autoclass:: ccpi.optimisation.operators.BlockOperator
-   :members:
-   :special-members:
-.. autoclass:: ccpi.optimisation.operators.BlockScaledOperator
-   :members:
-   :special-members:
 
 
 Block Function  

@@ -187,13 +187,21 @@ class MixedL21Norm(Function):
 
 
 class SmoothMixedL21Norm(Function):
+    
+    """ SmoothMixedL21Norm function: :math:`F(x) = ||x||_{2,1} = \sum |x|_{2} = \sum \sqrt{ (x^{1})^{2} + (x^{2})^{2} + \epsilon^2 + \dots}`                  
+    
+        where x is a BlockDataContainer, i.e., :math:`x=(x^{1}, x^{2}, \dots)`
+    
+    """    
+    
     # promxial conjugate, proximal no closed-form solutions
     # convex conjugate closed form solution, not implemented
         
     def __init__(self, epsilon):
+                
         r'''creator
 
-        :param epsilon: explain what it is
+        :param epsilon: smoothing parameter making MixedL21Norm differentiable 
         '''
 
         super(SmoothMixedL21Norm, self).__init__(L=1)          

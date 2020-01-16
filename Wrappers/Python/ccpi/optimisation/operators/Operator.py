@@ -47,7 +47,7 @@ class Operator(object):
         :param iterations: number of iterations to run
         :type iterations: int, optional, default = 25
         :param x_init: starting point for the iteration in the operator domain
-        :type x_init: same type as domain, a subclass of :code:`DataContainer`, optional, default randomly filled :code:`DataContainer`
+        :type x_init: same type as domain, a subclass of :code:`DataContainer`, optional, default None
         :parameter force: forces the recalculation of the norm
         :type force: boolean, default :code:`False`
         '''

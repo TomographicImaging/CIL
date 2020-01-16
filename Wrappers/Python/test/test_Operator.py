@@ -212,7 +212,7 @@ class TestOperator(CCPiTestClass):
         norm4 = G.norm(iterations=50, force=True)
         t5 = timer()
         self.assertLess(t2-t1, t5-t4)
-        
+
         numpy.random.seed(1)
         t4 = timer()
         norm5 = G.norm(x_init=ig.allocate('random'), iterations=50, force=True)
@@ -320,9 +320,22 @@ class TestGradients(CCPiTestClass):
         lhs3 = E3.direct(u3).dot(w3)
         rhs3 = u3.dot(E3.adjoint(w3))
         numpy.testing.assert_almost_equal(lhs3, rhs3)  
+        self.assertAlmostEqual(lhs3, rhs3)
+        print (lhs3, rhs3, abs((rhs3-lhs3)/rhs3) , 1.5 * 10**(-4), abs((rhs3-lhs3)/rhs3) < 1.5 * 10**(-4))
+        self.assertTrue( LinearOperator.dot_test(E3, range_init = w3, domain_init=u3) )
+    def test_dot_test(self):
+        Grad3 = Gradient(self.ig3, correlation = 'Space', backend='numpy')
+             
         # self.assertAlmostEqual(lhs3, rhs3)
-        # self.assertTrue( LinearOperator.dot_test(E3) )
+        self.assertTrue( LinearOperator.dot_test(Grad3 , verbose=True))
+        self.assertTrue( LinearOperator.dot_test(Grad3 , decimal=6, verbose=True))
 
+    def test_dot_test2(self):
+        Grad3 = Gradient(self.ig3, correlation = 'SpaceChannel', backend='c')
+             
+        # self.assertAlmostEqual(lhs3, rhs3)
+        self.assertTrue( LinearOperator.dot_test(Grad3 , verbose=True))
+        self.assertTrue( LinearOperator.dot_test(Grad3 , decimal=6, verbose=True))
 
 
 

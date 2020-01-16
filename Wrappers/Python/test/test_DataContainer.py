@@ -744,7 +744,24 @@ class TestDataContainer(unittest.TestCase):
         res = numpy.ones_like(d1.as_array()) * 4.
         numpy.testing.assert_array_equal(res, out.as_array())
 
+    def test_min(self):
+        print ("test min")
+        ig = ImageGeometry(10,10)     
+        a = numpy.asarray(numpy.linspace(-10,10, num=100, endpoint=True), dtype=numpy.float32)
+        a = a.reshape((10,10))
+        d1 = ig.allocate(1)                                                     
+        d1.fill(a)                                                     
+        self.assertAlmostEqual(d1.min(), -10.)
 
+    def test_max(self):
+        print ("test max")
+        ig = ImageGeometry(10,10)     
+        a = numpy.asarray(numpy.linspace(-10,10, num=100, endpoint=True), dtype=numpy.float32)
+        a = a.reshape((10,10))
+        d1 = ig.allocate(1)                                                     
+        d1.fill(a)                                                     
+        self.assertAlmostEqual(d1.max(), 10.)
+        
         
 
 

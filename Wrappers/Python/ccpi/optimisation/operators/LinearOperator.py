@@ -26,11 +26,14 @@ import numpy
 
 class LinearOperator(Operator):
     '''A Linear Operator that maps from a space X <-> Y'''
-    def __init__(self):
-        super(LinearOperator, self).__init__()
+    
+    def __init__(self, domain_gm=None, range_gm=None):
+        super(LinearOperator, self).__init__(domain_gm, range_gm)
+        
     def is_linear(self):
         '''Returns if the operator is linear'''
         return True
+    
     def adjoint(self,x, out=None):
         '''returns the adjoint/inverse operation
         
@@ -39,7 +42,15 @@ class LinearOperator(Operator):
     
     @staticmethod
     def PowerMethod(operator, iterations, x_init=None):
-        '''Power method to calculate iteratively the Lipschitz constant'''
+        '''Power method to calculate iteratively the Lipschitz constant
+        
+        :param operator: input operator
+        :type operator: :code:`LinearOperator`
+        :param iterations: number of iterations to run
+        :type iteration: int
+        :param x_init: starting point for the iteration in the operator domain
+        :returns: tuple with: L, list of L at each iteration, the data the iteration worked on.
+        '''
         
         # Initialise random
         if x_init is None:
@@ -72,11 +83,11 @@ class LinearOperator(Operator):
 
     @staticmethod
     def dot_test(operator, domain_init=None, range_init=None, verbose=False):
-        '''Does a dot linearity test on the operator
+        r'''Does a dot linearity test on the operator
         
         Evaluates if the following equivalence holds
         
-        :math: ..
+        .. math::
         
           Ax\times y = y \times A^Tx
         

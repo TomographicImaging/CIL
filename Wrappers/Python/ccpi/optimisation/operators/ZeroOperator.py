@@ -19,8 +19,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import numpy as np
-from ccpi.framework import ImageData
 from ccpi.optimisation.operators import LinearOperator
 
 class ZeroOperator(LinearOperator):
@@ -41,50 +39,39 @@ class ZeroOperator(LinearOperator):
                        
      '''
     
-    def __init__(self, gm_domain, gm_range=None):
+    def __init__(self, domain_gm, range_gm=None):
         
-        super(ZeroOperator, self).__init__()             
-
-        self.gm_domain = gm_domain
-        self.gm_range = gm_range  
-        if self.gm_range is None:
-            self.gm_range = self.gm_domain
-                   
+        super(ZeroOperator, self).__init__()          
         
-    def direct(self,x,out=None):
+        self.domain_gm = domain_gm
+        self.range_gm = range_gm  
+        
+        if self.range_gm is None:
+            self.range_gm = self.domain_gm
+                                          
+        
+    def direct(self, x, out=None):
         
         '''Returns O(x)'''
         
         
         if out is None:
-            return self.gm_range.allocate()
+            return self.range_gm.allocate()
         else:
-            out.fill(self.gm_range.allocate())
+            out.fill(self.range_gm.allocate())
     
-    def adjoint(self,x, out=None):
+    def adjoint(self, x, out=None):
         
         '''Returns O^{*}(y)'''        
         
         if out is None:
-            return self.gm_domain.allocate()
+            return self.domain_gm.allocate()
         else:
-            out.fill(self.gm_domain.allocate())
+            out.fill(self.domain_gm.allocate())
         
     def calculate_norm(self, **kwargs):
         
         '''Evaluates operator norm of ZeroOperator'''
         
-        return 0
+        return 0.
     
-    def domain_geometry(self): 
-        
-        '''Returns domain_geometry of ZeroOperator'''
-        
-        
-        return self.gm_domain  
-        
-    def range_geometry(self):
-        
-        '''Returns domain_geometry of ZeroOperator'''
-        
-        return self.gm_range

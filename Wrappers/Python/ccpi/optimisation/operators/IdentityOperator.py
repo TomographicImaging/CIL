@@ -35,16 +35,20 @@ class Identity(LinearOperator):
     '''    
     
     
-    def __init__(self, gm_domain, gm_range=None):
-
-        self.gm_domain = gm_domain
-        self.gm_range = gm_range  
-        if self.gm_range is None:
-            self.gm_range = self.gm_domain
+    def __init__(self, domain_gm, range_gm=None):
         
-        super(Identity, self).__init__()
+        # this is only to get self.__norm = None????
+        super(Identity, self).__init__()         
         
-    def direct(self,x,out=None):
+        self.domain_gm = domain_gm
+        self.range_gm = range_gm          
+        
+        if self.range_gm is None:
+            self.range_gm = self.domain_gm
+                   
+                        
+        
+    def direct(self, x, out=None):
         
         '''Returns Id(x)'''
         
@@ -53,15 +57,12 @@ class Identity(LinearOperator):
         else:
             out.fill(x)
     
-    def adjoint(self,x, out=None):
+    def adjoint(self, x, out=None):
         
-        '''Returns Id(x)'''         
+        '''Returns Id(x)'''
         
-        
-        if out is None:
-            return x.copy()
-        else:
-            out.fill(x)
+        return self.direct(x, out = out)
+
         
     def calculate_norm(self, **kwargs):
         
@@ -69,52 +70,20 @@ class Identity(LinearOperator):
         
         return 1.0
         
-    def domain_geometry(self): 
         
-        '''Returns domain_geometry of Identity'''
-        
-        return self.gm_domain
-        
-    def range_geometry(self):
-        
-        '''Returns range_geometry of Identity'''         
-        
-        return self.gm_range
-    
-    
     ###########################################################################
     ###############  For preconditioning ######################################
     ###########################################################################                    
-    def matrix(self):
-        
-        return sp.eye(np.prod(self.gm_domain.shape))
-    
-    def sum_abs_row(self):
-        
-        return self.gm_range.allocate(1)
-    
-    def sum_abs_col(self):
-        
-        return self.gm_domain.allocate(1)
-    
-    
-if __name__ == '__main__':
-    
-    from ccpi.framework import ImageGeometry
-
-    M, N = 2, 3
-    ig = ImageGeometry(M, N)
-    arr = ig.allocate('random_int')
-    
-    Id = Identity(ig)
-    d = Id.matrix()
-    print(d.toarray())
-    
-    d1 = Id.sum_abs_col()
-    print(d1.as_array())
-    
-    
-
-            
+#    def matrix(self):
+#        
+#        return sp.eye(np.prod(self.gm_domain.shape))
+#    
+#    def sum_abs_row(self):
+#        
+#        return self.gm_range.allocate(1)
+#    
+#    def sum_abs_col(self):
+#        
+#        return self.gm_domain.allocate(1)
     
     

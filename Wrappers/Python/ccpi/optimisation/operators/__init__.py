@@ -16,9 +16,9 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from .Operator import Operator
+from .Operator import Operator, ScaledOperator
+
 from .LinearOperator import LinearOperator
-from .ScaledOperator import ScaledOperator
 from .BlockOperator import BlockOperator
 from .BlockScaledOperator import BlockScaledOperator
 

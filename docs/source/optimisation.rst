@@ -369,7 +369,7 @@ Mixed L21 norm
 Smooth Mixed L21 norm
 ---------------------
 
-.. autoclass:: ccpi.optimisation.functions.smoothMixedL21Norm
+.. autoclass:: ccpi.optimisation.functions.MixedL21Norm.smoothMixedL21Norm
    :members:
    :special-members:   
 

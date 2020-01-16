@@ -828,14 +828,12 @@ class DataContainer(object):
     def minimum(self,x2, out=None, *args, **kwargs):
         return self.pixel_wise_binary(numpy.minimum, x2=x2, out=out, *args, **kwargs)
 
-    @staticmethod
-    def axpby(a,x,b,y,out,dtype=numpy.float32):
+    def axpby(self, a, b, y, out, dtype=numpy.float32):
         '''performs axpby with cilacc C library
         
-        Does the operation .. math:: a*x+b*y and stores the result in out
+        Does the operation .. math:: a*x+b*y and stores the result in out, where x is self
 
         :param a: scalar
-        :param x: DataContainer
         :param b: scalar
         :param y: DataContainer
         :param out: DataContainer to store the result
@@ -845,7 +843,7 @@ class DataContainer(object):
         c_float_p = ctypes.POINTER(ctypes.c_float)
         c_double_p = ctypes.POINTER(ctypes.c_double)
         # get the reference to the data
-        ndx = x.as_array()
+        ndx = self.as_array()
         ndy = y.as_array()
         ndout = out.as_array()
 

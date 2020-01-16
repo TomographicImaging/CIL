@@ -485,4 +485,43 @@ class TestBlockDataContainer(unittest.TestCase):
             print(err)
         self.assertTrue(res)    
 
+    def test_axpby(self):
+        ig0 = ImageGeometry(2,3,4)
+        ig1 = ImageGeometry(2,3,5)
+        
+        data0 = ig0.allocate(-1)
+        data2 = ig0.allocate(1)
+
+        data1 = ig0.allocate(2)
+        data3 = ig0.allocate(3)
+        
+        cp0 = BlockDataContainer(data0,data2)
+        cp1 = BlockDataContainer(data1,data3)
+        
+        out = cp0 * 0. - 10
+
+        cp0.axpby(3,-2,cp1,out)
+
+        # operation should be [  3 * -1 + (-2) * 2 , 3 * 1 + (-2) * 3 ] 
+        # output should be [ -7 , -3 ]
+        res0 = ig0.allocate(-7)
+        res2 = ig0.allocate(-3)
+        res = BlockDataContainer(res0, res2)
+
+        print ("res0", res0.as_array())
+        print ("res2", res2.as_array())
+
+        print ("###############################")
+        
+        print ("out_0", out.get_item(0).as_array())
+        print ("out_1", out.get_item(1).as_array())
+        self.assertBlockDataContainerEqual(out, res)
+
+
+
+        # nested = BlockDataContainer(cp0, data2, data2)
+        # out = BlockDataContainer(BlockDataContainer(data0 , data0), data0, data0)
+        # nested.divide(data2,out=out)
+        # self.assertBlockDataContainerEqual(out, nested)
+
 

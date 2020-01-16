@@ -50,11 +50,12 @@ class BlockDataContainer(object):
     A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]
     
     '''
-    ADD = 'add'
+    ADD      = 'add'
     SUBTRACT = 'subtract'
     MULTIPLY = 'multiply'
-    DIVIDE = 'divide'
-    POWER = 'power'
+    DIVIDE   = 'divide'
+    POWER    = 'power'
+    AXPBY    = 'axpby'
     __array_priority__ = 1
     __container_priority__ = 2
     def __init__(self, *args, **kwargs):
@@ -173,7 +174,20 @@ class BlockDataContainer(object):
             self.binary_operations(BlockDataContainer.DIVIDE, other, *args, **kwargs)
         else:
             return self.binary_operations(BlockDataContainer.DIVIDE, other, *args, **kwargs)
-    
+    def axpby(self, a, b, y, out, dtype=numpy.float32):
+        r'''performs axpby element-wise on the BlockDataContainer containers
+        
+        Does the operation .. math:: a*x+b*y and stores the result in out, where x is self
+
+        :param a: scalar
+        :param b: scalar
+        :param y: compatible (Block)DataContainer
+        :param out: (Block)DataContainer to store the result
+        :param dtype: optional, data type of the DataContainers
+        '''
+        kwargs = {'a':a, 'b':b, 'out':out, 'dtype': dtype}
+        self.binary_operations(BlockDataContainer.AXPBY, y, **kwargs)
+
 
     def binary_operations(self, operation, other, *args, **kwargs):
         '''Algebra: generic method of algebric operation with BlockDataContainer with number/DataContainer or BlockDataContainer
@@ -234,11 +248,19 @@ class BlockDataContainer(object):
                     op = el.divide
                 elif operation == BlockDataContainer.POWER:
                     op = el.power
+                elif operation == BlockDataContainer.AXPBY:
+                    if not isinstance(other, BlockDataContainer):
+                        raise ValueError("{} cannot handle {}".format(operation, type(other)))
+                    op = el.axpby
                 else:
                     raise ValueError('Unsupported operation', operation)
                 if out is not None:
                     kw['out'] = out.get_item(i)
-                    op(ot, *args, **kw)
+                    kw['y'] = ot
+                    if operation == BlockDataContainer.AXPBY:
+                        el.axpby(kw['a'], kw['b'], kw['y'], kw['out'])
+                    else:
+                        op(ot, *args, **kw)
                 else:
                     res.append(op(ot, *args, **kw))
             if out is not None:
@@ -261,6 +283,12 @@ class BlockDataContainer(object):
                     op = el.divide
                 elif operation == BlockDataContainer.POWER:
                     op = el.power
+                elif operation == BlockDataContainer.AXPBY:
+                    # if not isinstance(other, BlockDataContainer):
+                    #     raise ValueError("{} cannot handle {}".format(operation, type(other)))
+                    # op = el.axpby
+                    print ("Checking here")
+                    return el.axpby(kw['a'], kw['b'], kw['y'], kw['out'])
                 else:
                     raise ValueError('Unsupported operation', operation)
                 if out is not None:

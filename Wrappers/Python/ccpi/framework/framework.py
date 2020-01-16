@@ -982,9 +982,11 @@ class DataContainer(object):
                 return sf
         else:
             raise ValueError('Shapes are not aligned: {} != {}'.format(self.shape, other.shape))
+    
     def min(self, *args, **kwargs):
         '''Returns the min pixel value in the DataContainer'''
         return numpy.min(self.as_array(), *args, **kwargs)
+    
     def max(self, *args, **kwargs):
         '''Returns the max pixel value in the DataContainer'''
         return numpy.max(self.as_array(), *args, **kwargs)

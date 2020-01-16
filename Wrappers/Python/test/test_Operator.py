@@ -191,6 +191,7 @@ class TestOperator(CCPiTestClass):
     def test_Norm(self):
         print ("test_BlockOperator")
         ##
+        numpy.random.seed(1)
         N, M = 200, 300
 
         ig = ImageGeometry(N, M)
@@ -200,8 +201,26 @@ class TestOperator(CCPiTestClass):
         t1 = timer()
         norm2 = G.norm()
         t2 = timer()
-        print ("Norm dT1 {} dT2 {}".format(t1-t0,t2-t1))
+        norm3 = G.norm(force=True)
+        t3 = timer()
+        print ("Norm dT1 {} dT2 {} dT3 {}".format(t1-t0,t2-t1, t3-t2))
         self.assertLess(t2-t1, t1-t0)
+        self.assertLess(t2-t1, t3-t2)
+
+        numpy.random.seed(1)
+        t4 = timer()
+        norm4 = G.norm(iterations=50, force=True)
+        t5 = timer()
+        self.assertLess(t2-t1, t5-t4)
+        
+        numpy.random.seed(1)
+        t4 = timer()
+        norm5 = G.norm(x_init=ig.allocate('random'), iterations=50, force=True)
+        t5 = timer()
+        self.assertLess(t2-t1, t5-t4)
+        for n in [norm, norm2, norm3, norm4, norm5]:
+            print ("norm {}", format(n))
+
 
 class TestGradients(CCPiTestClass): 
     def setUp(self):

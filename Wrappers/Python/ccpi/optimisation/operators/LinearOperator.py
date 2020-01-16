@@ -73,7 +73,7 @@ class LinearOperator(Operator):
 
     def calculate_norm(self, **kwargs):
         '''Returns the norm of the LinearOperator as calculated by the PowerMethod'''
-        x0 = kwargs.get('x0', None)
+        x0 = kwargs.get('x_init', None)
         iterations = kwargs.get('iterations', 25)
         s1, sall, svec = LinearOperator.PowerMethod(self, iterations, x_init=x0)
         return s1

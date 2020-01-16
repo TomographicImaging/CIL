@@ -191,11 +191,12 @@ class SmoothMixedL21Norm(Function):
     """ SmoothMixedL21Norm function: :math:`F(x) = ||x||_{2,1} = \sum |x|_{2} = \sum \sqrt{ (x^{1})^{2} + (x^{2})^{2} + \epsilon^2 + \dots}`                  
     
         where x is a BlockDataContainer, i.e., :math:`x=(x^{1}, x^{2}, \dots)`
+        
+        Conjugate, proximal and proximal conjugate methods no closed-form solution
+        
     
     """    
-    
-    # promxial conjugate, proximal no closed-form solutions
-    # convex conjugate closed form solution, not implemented
+
         
     def __init__(self, epsilon):
                 
@@ -226,6 +227,13 @@ class SmoothMixedL21Norm(Function):
 
 
     def gradient(self, x, out=None): 
+        
+        r"""Returns the value of the gradient of the SmoothMixedL21Norm function at x.
+        
+        \frac{x}{|x|}
+                
+                
+        """        
         
         tmp = x.get_item(0) * 0.
         for el in x.containers:

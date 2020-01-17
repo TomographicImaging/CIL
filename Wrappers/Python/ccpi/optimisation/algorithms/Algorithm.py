@@ -206,7 +206,7 @@ class Algorithm(object):
 
     def verbose_output(self, verbose=False):
         '''Creates a nice tabulated output'''
-        timing = self.timing[-self.update_objective_interval-1:-1]
+        timing = self.timing[-self.update_objective_interval:-1]
         self._iteration.append(self.iteration)
         if len (timing) == 0:
             t = 0

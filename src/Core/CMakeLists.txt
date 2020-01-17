@@ -78,6 +78,11 @@ if (WIN32)
 	set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /Ddll_EXPORTS")
 endif()
 
+if (UNIX)
+  set (FLAGS "-std=c11 -O3 -fPIC -Wall -m64 -finline-functions -funroll-all-loops -fstrict-aliasing -march=native")  
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${FLAGS}")
+  set (CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} ${FLAGS}")
+endif()
 
 message("CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS}")
 message("CMAKE_C_FLAGS ${CMAKE_C_FLAGS}")

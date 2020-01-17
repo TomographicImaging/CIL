@@ -94,7 +94,6 @@ class Gradient(LinearOperator):
         else:
             self.operator = Gradient_C(gm_domain, bnd_cond=bnd_cond, **kwargs)
 
-
     def direct(self, x, out=None):
         """Computes the first-order forward differences
 
@@ -107,6 +106,8 @@ class Gradient(LinearOperator):
         """        
         return self.operator.direct(x, out=out)
         
+    def direct_L21norm(self, x, out=None):   
+        return self.operator.direct_L21norm(x, out=out)        
         
     def adjoint(self, x, out=None):
         """Computes the first-order backward differences
@@ -328,6 +329,30 @@ cilacc.fdiff3D.argtypes = [ctypes.POINTER(ctypes.c_float),
                        ctypes.c_int32,
                        ctypes.c_int32]
 
+cilacc.fdiff3D_neu_f_L21sum.argtypes = [ctypes.POINTER(ctypes.c_float),
+                       ctypes.POINTER(ctypes.c_float),
+                       ctypes.POINTER(ctypes.c_float),
+                       ctypes.POINTER(ctypes.c_float),
+                       ctypes.c_long,
+                       ctypes.c_long,
+                       ctypes.c_long,
+                       ctypes.c_int32,
+                       ctypes.c_int32,
+                       ctypes.c_int32,
+                       ctypes.POINTER(ctypes.c_float)]
+
+cilacc.fdiff3D_neu_b_L21sum.argtypes = [ctypes.POINTER(ctypes.c_float),
+                       ctypes.POINTER(ctypes.c_float),
+                       ctypes.POINTER(ctypes.c_float),
+                       ctypes.POINTER(ctypes.c_float),
+                       ctypes.c_long,
+                       ctypes.c_long,
+                       ctypes.c_long,
+                       ctypes.c_int32,
+                       ctypes.c_int32,
+                       ctypes.c_int32,
+                       ctypes.POINTER(ctypes.c_float)]
+
 cilacc.fdiff2D.argtypes = [ctypes.POINTER(ctypes.c_float),
                        ctypes.POINTER(ctypes.c_float),
                        ctypes.POINTER(ctypes.c_float),
@@ -336,7 +361,6 @@ cilacc.fdiff2D.argtypes = [ctypes.POINTER(ctypes.c_float),
                        ctypes.c_int32,
                        ctypes.c_int32,
                        ctypes.c_int32]
-
 
 class Gradient_C(LinearOperator):
     
@@ -365,11 +389,13 @@ class Gradient_C(LinearOperator):
         if self.gm_range is None:
             self.gm_range = BlockGeometry(*[gm_domain for _ in range(len(gm_domain.shape))])
         
-
+ 
         if len(gm_domain.shape) == 4:
             self.fd = cilacc.fdiff4D
         elif len(gm_domain.shape) == 3:
             self.fd = cilacc.fdiff3D
+            self.fd_f_L2sum = cilacc.fdiff3D_neu_f_L21sum
+            self.fd_b_L2sum = cilacc.fdiff3D_neu_b_L21sum
         elif len(gm_domain.shape) == 2:
             self.fd = cilacc.fdiff2D
         else:
@@ -399,6 +425,25 @@ class Gradient_C(LinearOperator):
         if return_val is True:
             return out
 
+    def direct_L21norm(self, x, out=None):
+        ndx , x_p = Gradient_C.datacontainer_as_c_pointer(x)
+        
+        L2norm = ctypes.c_float(0.0)   
+        pL2norm = c_float_p(L2norm)
+
+        return_val = False
+        if out is None:
+            out = self.gm_range.allocate(None)
+            return_val = True
+
+        #pass list of all arguments
+        arg1 = [Gradient_C.datacontainer_as_c_pointer(out.get_item(i))[1] for i in range(self.gm_range.shape[0])]
+        arg2 = [el for el in x.shape]
+        args = arg1 + arg2 + [self.bnd_cond, 1, self.num_threads, pL2norm]
+        self.fd_f_L2sum(x_p, *args)
+        
+        if return_val is True:
+            return L2norm.value, out
 
     def adjoint(self, x, out=None):
 
@@ -417,6 +462,28 @@ class Gradient_C(LinearOperator):
 
         if return_val is True:
             return out
+
+    def adjoint_L21norm(self, x, out=None):
+
+        L2norm = ctypes.c_float(0.0)   
+        pL2norm = c_float_p(L2norm)
+
+        return_val = False
+        if out is None:
+            out = self.gm_domain.allocate(None)
+            return_val = True
+
+        ndout, out_p = Gradient_C.datacontainer_as_c_pointer(out)
+
+        arg1 = [Gradient_C.datacontainer_as_c_pointer(x.get_item(i))[1] for i in range(self.gm_range.shape[0])]
+        arg2 = [el for el in out.shape]
+        args = arg1 + arg2 + [self.bnd_cond, 0, self.num_threads, pL2norm]
+
+        self.fd_b_L2sum(out_p, *args)
+
+        if return_val is True:
+            return L2norm.value, out
+
 
     def domain_geometry(self):
         

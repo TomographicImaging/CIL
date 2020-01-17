@@ -78,7 +78,7 @@ class CGLS(Algorithm):
         self.r = data - self.operator.direct(self.x)
         self.s = self.operator.adjoint(self.r)
         
-        self.p = self.s
+        self.p = self.s.copy()
         self.norms0 = self.s.norm()
         
         self.norms = self.s.norm()
@@ -96,16 +96,29 @@ class CGLS(Algorithm):
     def update(self):
         '''single iteration'''
         
-        self.q = self.operator.direct(self.p)
+        temp, self.q = self.operator.direct(self.p)
         delta = self.q.squared_norm()
+
+        #if delta is None:
+        #    delta = self.q.squared_norm()
+
         alpha = self.gamma/delta
                         
         self.x += alpha * self.p
         self.r -= alpha * self.q
         
-        self.s = self.operator.adjoint(self.r)
-        
+        sumsq, self.s = self.operator.adjoint(self.r)
+
+        # if sumsq is None:          
+        #     self.norms = self.s.norm()
+        # else:
+        #     self.norms = numpy.sqrt(sumsq)
+
+        if sumsq is not None:
+            temp2 = numpy.sqrt(sumsq)
+
         self.norms = self.s.norm()
+
         self.gamma1 = self.gamma
         self.gamma = self.norms**2
         self.beta = self.gamma/self.gamma1

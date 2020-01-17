@@ -185,6 +185,8 @@ class BlockDataContainer(object):
         :param out: (Block)DataContainer to store the result
         :param dtype: optional, data type of the DataContainers
         '''
+        if out is None:
+            raise ValueError("out container cannot be None")
         kwargs = {'a':a, 'b':b, 'out':out, 'dtype': dtype}
         self.binary_operations(BlockDataContainer.AXPBY, y, **kwargs)
 
@@ -256,8 +258,8 @@ class BlockDataContainer(object):
                     raise ValueError('Unsupported operation', operation)
                 if out is not None:
                     kw['out'] = out.get_item(i)
-                    kw['y'] = ot
                     if operation == BlockDataContainer.AXPBY:
+                        kw['y'] = ot
                         el.axpby(kw['a'], kw['b'], kw['y'], kw['out'])
                     else:
                         op(ot, *args, **kw)
@@ -271,6 +273,12 @@ class BlockDataContainer(object):
         else:
             # try to do algebra with one DataContainer. Will raise error if not compatible
             kw = kwargs.copy()
+            if operation != BlockDataContainer.AXPBY:
+                # remove keyworded argument related to AXPBY
+                for k in ['a','b','y']:
+                    if k in kw.keys():
+                        kw.pop(k)
+                
             res = []
             for i,el in enumerate(self.containers):
                 if operation == BlockDataContainer.ADD:
@@ -284,11 +292,11 @@ class BlockDataContainer(object):
                 elif operation == BlockDataContainer.POWER:
                     op = el.power
                 elif operation == BlockDataContainer.AXPBY:
-                    # if not isinstance(other, BlockDataContainer):
-                    #     raise ValueError("{} cannot handle {}".format(operation, type(other)))
-                    # op = el.axpby
-                    print ("Checking here")
-                    return el.axpby(kw['a'], kw['b'], kw['y'], kw['out'])
+                    # As out cannot be None, it is safe to continue the 
+                    # for loop after the call to axpby
+                    kw['out'] = out.get_item(i)
+                    el.axpby(kw['a'], kw['b'], other, kw['out'])
+                    continue
                 else:
                     raise ValueError('Unsupported operation', operation)
                 if out is not None:

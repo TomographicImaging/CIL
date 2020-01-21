@@ -10,12 +10,18 @@ if(APPLE)
         message(FATAL_ERROR "Need to set OPENMP_INCLUDES and OPENMP_LIBRARIES on OSX.")
     endif()
     if(CMAKE_C_COMPILER_ID MATCHES "Clang")
-        set(OpenMP_C "${CMAKE_C_COMPILER}")
-        set(OpenMP_C_FLAGS "-fopenmp=libomp -Wno-unused-command-line-argument")
-        set(OpenMP_C_LIB_NAMES "libomp" "libgomp" "libiomp5")
+        #set(OpenMP_C "${CMAKE_C_COMPILER}")
+        set(OpenMP_C_FLAGS "-Xclang -fopenmp -Wno-unused-command-line-argument -L${OPENMP_LIBRARIES}" CACHE STRING "C FLAGS")
+        set(OpenMP_C_LIB_NAMES "omp" "libomp" "libgomp" "libiomp5")
+        set(OpenMP_omp_LIBRARY ${OpenMP_C_LIB_NAMES})
         set(OpenMP_libomp_LIBRARY ${OpenMP_C_LIB_NAMES})
-        set(OpenMP_libgomp_LIBRARY ${OpenMP_C_LIB_NAMES})
-        set(OpenMP_libiomp5_LIBRARY ${OpenMP_C_LIB_NAMES})
+        #set(OpenMP_libgomp_LIBRARY ${OpenMP_C_LIB_NAMES})
+        #set(OpenMP_libiomp5_LIBRARY ${OpenMP_C_LIB_NAMES})
+        set (OpenMP_C_LIBRARY "omp")
+        set (OpenMP_C_LIB_NAMES ${OpenMP_C_LIBRARY})
+        set (OpenMP_C_LIBRARY_PATH ${OPENMP_LIBRARIES})
+        set (OpenMP_LINKER_FLAGS "-L${OpenMP_C_LIBRARY_PATH}")
+        
     endif()
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         set(OpenMP_CXX "${CMAKE_CXX_COMPILER}")
@@ -27,11 +33,11 @@ if(APPLE)
     endif()
 endif()
 
-
+message ("OpenMP_C_FLAGS ${OpenMP_C_FLAGS}")
+add_definitions(${OpenMP_C_FLAGS})
+#add_definitions(${OpenMP_CXX_FLAGS})
 find_package(OpenMP REQUIRED)
 
-add_definitions(${OpenMP_CXX_FLAGS})
-add_definitions(${OpenMP_C_FLAGS})
   
   if (APPLE)
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
@@ -50,7 +56,7 @@ add_definitions(${OpenMP_C_FLAGS})
       # need to explicitly set this. Definitely for gcc, hopefully also for other systems.
       # See https://gitlab.kitware.com/cmake/cmake/issues/15392
       set (OpenMP_EXE_LINKER_FLAGS ${OpenMP_CXX_FLAGS})
-      set (OpenMP_EXE_LINKER_FLAGS ${OpenMP_C_FLAGS})
+      set (OpenMP_EXE_LINKER_FLAGS ${OpenMP_C_FLAGS} ${OpenMP_LINKER_FLAGS})
     endif()
   endif()
 
@@ -89,7 +95,7 @@ message("CMAKE_STATIC_LINKER_FLAGS ${CMAKE_STATIC_LINKER_FLAGS}")
 add_library(cilacc SHARED ${CMAKE_CURRENT_SOURCE_DIR}/axpby.c
                           ${CMAKE_CURRENT_SOURCE_DIR}/FiniteDifferenceLibrary.c )
 
-target_link_libraries(cilacc ${OpenMP_C_LIB_NAMES} )
+target_link_libraries(cilacc ${OpenMP_C_LIBRARY} )
 include_directories(cilacc PUBLIC 
 				  ${CMAKE_CURRENT_SOURCE_DIR}/include
 		          )

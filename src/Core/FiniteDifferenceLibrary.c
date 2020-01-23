@@ -16,17 +16,6 @@ DLL_EXPORT int openMPtest(int nThreads)
 	}
 	return nThreads_running;
 }
-void threads_setup(int nThreads_requested, int *nThreads_current)
-{
-#pragma omp parallel
-	{
-		if (omp_get_thread_num() == 0)
-		{
-			*nThreads_current = omp_get_num_threads();
-		}
-	}
-	omp_set_num_threads(nThreads_requested);
-}
 
 int fdiff_direct_neumann(const float *inimagefull, float *outimageXfull, float *outimageYfull, float *outimageZfull, float *outimageCfull, long nx, long ny, long nz, long nc)
 {

@@ -18,7 +18,6 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from __future__ import unicode_literals
 
 import numpy
 from numbers import Number
@@ -94,9 +93,6 @@ class BlockGeometry(object):
                 containers[6]=containers[9]
                 containers[7]=containers[10]
                 containers[11]=containers[15]
-                
-                
-                
-        
+
         return BlockDataContainer(*containers)
            

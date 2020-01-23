@@ -18,7 +18,6 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from __future__ import unicode_literals
 
 import numpy
 import sys
@@ -561,7 +560,12 @@ class DataContainer(object):
                     return VectorData(cleaned)
     
     def fill(self, array, **dimension):
-        '''fills the internal numpy array with the one provided'''
+        '''fills the internal numpy array with the one provided
+        
+        :param array: numpy array to copy into the DataContainer
+        :type array: DataContainer, numpy array or number
+        :param dimension: dictionary, optional
+        '''
         if dimension == {}:
             if issubclass(type(array), DataContainer) or\
                issubclass(type(array), numpy.ndarray):
@@ -574,6 +578,8 @@ class DataContainer(object):
                 else:
                     #self.array[:] = array
                     numpy.copyto(self.array, array)
+            else:
+                self.array.fill(array)
         else:
             
             command = 'self.array['
@@ -814,8 +820,8 @@ class DataContainer(object):
         return self.pixel_wise_binary(numpy.divide, other, *args, **kwargs)
     
     def power(self, other, *args, **kwargs):
-        return self.pixel_wise_binary(numpy.power, other, *args, **kwargs)
-    
+        return self.pixel_wise_binary(numpy.power, other, *args, **kwargs)    
+          
     def maximum(self, x2, *args, **kwargs):
         return self.pixel_wise_binary(numpy.maximum, x2, *args, **kwargs)
     
@@ -911,6 +917,12 @@ class DataContainer(object):
     def abs(self, *args,  **kwargs):
         return self.pixel_wise_unary(numpy.abs, *args,  **kwargs)
     
+#    def max(self, *args,  **kwargs):
+#        return self.pixel_wise_unary(numpy.max, *args,  **kwargs) 
+#    
+#    def min(self, *args,  **kwargs):
+#        return self.pixel_wise_unary(numpy.min, *args,  **kwargs)     
+    
     def sign(self, *args,  **kwargs):
         return self.pixel_wise_unary(numpy.sign, *args,  **kwargs)
     
@@ -927,6 +939,7 @@ class DataContainer(object):
     def log(self, *args, **kwargs):
         '''Applies log pixel-wise to the DataContainer'''
         return self.pixel_wise_unary(numpy.log, *args, **kwargs)
+    
     #def __abs__(self):
     #    operation = FM.OPERATION.ABS
     #    return self.callFieldMath(operation, None, self.mask, self.maskOnValue)
@@ -969,7 +982,14 @@ class DataContainer(object):
                 return sf
         else:
             raise ValueError('Shapes are not aligned: {} != {}'.format(self.shape, other.shape))
-   
+    
+    def min(self, *args, **kwargs):
+        '''Returns the min pixel value in the DataContainer'''
+        return numpy.min(self.as_array(), *args, **kwargs)
+    
+    def max(self, *args, **kwargs):
+        '''Returns the max pixel value in the DataContainer'''
+        return numpy.max(self.as_array(), *args, **kwargs)
 
     
     
@@ -1624,7 +1644,8 @@ class VectorData(DataContainer):
                 else:
                     raise ValueError('Incompatible size: expecting {} got {}'.format((self.length,), array.shape))
         deep_copy = True
-        super(VectorData, self).__init__(out, deep_copy, None)
+        # need to pass the geometry, othewise None
+        super(VectorData, self).__init__(out, deep_copy, None, geometry = self.geometry)
 
 class VectorGeometry(object):
     '''Geometry describing VectorData to contain 1D array'''
@@ -1661,30 +1682,36 @@ class VectorGeometry(object):
                     numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
                 out.fill(numpy.random.randint(max_value,size=self.shape))
+            elif value is None:
+                pass
             else:
                 raise ValueError('Value {} unknown'.format(value))
         return out
 
     
 if __name__ == "__main__":
+    
+    
+    vg = VectorGeometry(10)    
+    b = vg.allocate('random_int')
 
-    ig = ImageGeometry(voxel_num_x=100, 
-                    voxel_num_y=200, 
-                    voxel_num_z=300, 
-                    voxel_size_x=1, 
-                    voxel_size_y=1, 
-                    voxel_size_z=1, 
-                    center_x=0, 
-                    center_y=0, 
-                    center_z=0, 
-                    channels=50)
-
-    id = ig.allocate(2)
-
-    print(id.geometry)
-    print(id.dimension_labels)
-
-    sid = id.subset(channel = 20)
-
-    print(sid.dimension_labels)
-    print(sid.geometry)
+#    ig = ImageGeometry(voxel_num_x=100, 
+#                    voxel_num_y=200, 
+#                    voxel_num_z=300, 
+#                    voxel_size_x=1, 
+#                    voxel_size_y=1, 
+#                    voxel_size_z=1, 
+#                    center_x=0, 
+#                    center_y=0, 
+#                    center_z=0, 
+#                    channels=50)
+#
+#    id = ig.allocate(2)
+#
+#    print(id.geometry)
+#    print(id.dimension_labels)
+#
+#    sid = id.subset(channel = 20)
+#
+#    print(sid.dimension_labels)
+#    print(sid.geometry)

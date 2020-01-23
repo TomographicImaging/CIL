@@ -76,7 +76,9 @@ if (BUILD_PYTHON_WRAPPER)
                         )
         endif()
         #set (PYTHON_DEST ${CMAKE_INSTALL_PREFIX}/python/)
+
         install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/build/lib/ccpi
+
                 DESTINATION ${PYTHON_DEST})
         install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/ DESTINATION ${CMAKE_INSTALL_PREFIX}/share/ccpi)
         #file(TOUCH ${PYTHON_DEST}/edo/__init__.py)

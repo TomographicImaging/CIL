@@ -23,6 +23,7 @@ import numpy
 from numbers import Number
 import functools
 from ccpi.framework import DataContainer
+from ccpi.utilities import NUM_THREADS
 #from ccpi.framework import AcquisitionData, ImageData
 #from ccpi.optimisation.operators import Operator, LinearOperator
 
@@ -50,11 +51,12 @@ class BlockDataContainer(object):
     A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]
     
     '''
-    ADD = 'add'
+    ADD      = 'add'
     SUBTRACT = 'subtract'
     MULTIPLY = 'multiply'
-    DIVIDE = 'divide'
-    POWER = 'power'
+    DIVIDE   = 'divide'
+    POWER    = 'power'
+    AXPBY    = 'axpby'
     __array_priority__ = 1
     __container_priority__ = 2
     def __init__(self, *args, **kwargs):
@@ -173,7 +175,22 @@ class BlockDataContainer(object):
             self.binary_operations(BlockDataContainer.DIVIDE, other, *args, **kwargs)
         else:
             return self.binary_operations(BlockDataContainer.DIVIDE, other, *args, **kwargs)
-    
+    def axpby(self, a, b, y, out, dtype=numpy.float32, num_threads = NUM_THREADS):
+        r'''performs axpby element-wise on the BlockDataContainer containers
+        
+        Does the operation .. math:: a*x+b*y and stores the result in out, where x is self
+
+        :param a: scalar
+        :param b: scalar
+        :param y: compatible (Block)DataContainer
+        :param out: (Block)DataContainer to store the result
+        :param dtype: optional, data type of the DataContainers
+        '''
+        if out is None:
+            raise ValueError("out container cannot be None")
+        kwargs = {'a':a, 'b':b, 'out':out, 'dtype': dtype, 'num_threads': NUM_THREADS}
+        self.binary_operations(BlockDataContainer.AXPBY, y, **kwargs)
+
 
     def binary_operations(self, operation, other, *args, **kwargs):
         '''Algebra: generic method of algebric operation with BlockDataContainer with number/DataContainer or BlockDataContainer
@@ -234,11 +251,19 @@ class BlockDataContainer(object):
                     op = el.divide
                 elif operation == BlockDataContainer.POWER:
                     op = el.power
+                elif operation == BlockDataContainer.AXPBY:
+                    if not isinstance(other, BlockDataContainer):
+                        raise ValueError("{} cannot handle {}".format(operation, type(other)))
+                    op = el.axpby
                 else:
                     raise ValueError('Unsupported operation', operation)
                 if out is not None:
                     kw['out'] = out.get_item(i)
-                    op(ot, *args, **kw)
+                    if operation == BlockDataContainer.AXPBY:
+                        kw['y'] = ot
+                        el.axpby(kw['a'], kw['b'], kw['y'], kw['out'], kw['dtype'], kw['num_threads'])
+                    else:
+                        op(ot, *args, **kw)
                 else:
                     res.append(op(ot, *args, **kw))
             if out is not None:
@@ -249,6 +274,12 @@ class BlockDataContainer(object):
         else:
             # try to do algebra with one DataContainer. Will raise error if not compatible
             kw = kwargs.copy()
+            if operation != BlockDataContainer.AXPBY:
+                # remove keyworded argument related to AXPBY
+                for k in ['a','b','y', 'num_threads', 'dtype']:
+                    if k in kw.keys():
+                        kw.pop(k)
+                
             res = []
             for i,el in enumerate(self.containers):
                 if operation == BlockDataContainer.ADD:
@@ -261,6 +292,12 @@ class BlockDataContainer(object):
                     op = el.divide
                 elif operation == BlockDataContainer.POWER:
                     op = el.power
+                elif operation == BlockDataContainer.AXPBY:
+                    # As out cannot be None, it is safe to continue the 
+                    # for loop after the call to axpby
+                    kw['out'] = out.get_item(i)
+                    el.axpby(kw['a'], kw['b'], other, kw['out'], kw['dtype'], kw['num_threads'])
+                    continue
                 else:
                     raise ValueError('Unsupported operation', operation)
                 if out is not None:

@@ -130,24 +130,26 @@ class PDHG(Algorithm):
 
         # Gradient ascent for the dual variable
         self.operator.direct(self.xbar, out=self.y_tmp)
-        self.y_tmp *= self.sigma
-        self.y_tmp += self.y_old
+        # self.y_tmp *= self.sigma
+        # self.y_tmp += self.y_old
+        self.y_tmp.axpby(self.sigma, 1 , self.y_old, self.y_tmp)
 
         # self.y = self.f.proximal_conjugate(self.y_old, self.sigma)
         self.f.proximal_conjugate(self.y_tmp, self.sigma, out=self.y)
         
         # Gradient descent for the primal variable
         self.operator.adjoint(self.y, out=self.x_tmp)
-        self.x_tmp *= -1*self.tau
-        self.x_tmp += self.x_old
+        # self.x_tmp *= -1*self.tau
+        # self.x_tmp += self.x_old
+        self.x_tmp.axpby(-self.tau, 1. , self.x_old, self.x_tmp)
 
         self.g.proximal(self.x_tmp, self.tau, out=self.x)
 
         # Update
         self.x.subtract(self.x_old, out=self.xbar)
-        self.xbar *= self.theta
-        self.xbar += self.x
-
+        # self.xbar *= self.theta
+        # self.xbar += self.x
+        self.xbar.axpby(self.theta, 1 , self.x, self.xbar)
         
         
     def update_objective(self):

@@ -740,7 +740,20 @@ class TestDataContainer(unittest.TestCase):
         d2 = ig.allocate(2)                                                     
         out = ig.allocate(None)                                                 
         # equals to 2 * [1] + 1 * [2] = [4]
-        DataContainer.axpby(2,d1,1,d2,out)
+        d1.axpby(2,1,d2,out)
+        res = numpy.ones_like(d1.as_array()) * 4.
+        numpy.testing.assert_array_equal(res, out.as_array())
+    def test_axpby2(self):
+        print ("test axpby2")
+        N = 100
+        ig = ImageGeometry(N,2*N,N*10)                                               
+        d1 = ig.allocate(1)                                                     
+        d2 = ig.allocate(2)                                                     
+        out = ig.allocate(None)   
+        print ("allocated")                                              
+        # equals to 2 * [1] + 1 * [2] = [4]
+        d1.axpby(2,1,d2,out, num_threads=4)
+        print ("calculated") 
         res = numpy.ones_like(d1.as_array()) * 4.
         numpy.testing.assert_array_equal(res, out.as_array())
 

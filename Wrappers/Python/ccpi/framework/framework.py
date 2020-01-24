@@ -26,6 +26,7 @@ import warnings
 from functools import reduce
 from numbers import Number
 import ctypes, platform
+from ccpi.utilities import NUM_THREADS
 
 # dll = os.path.abspath(os.path.join( 
 #          os.path.abspath(os.path.dirname(__file__)),
@@ -44,6 +45,11 @@ else:
 
 #print ("dll location", dll)
 cilacc = ctypes.cdll.LoadLibrary(dll)
+
+#default nThreads
+# import multiprocessing
+# cpus = multiprocessing.cpu_count()
+# NUM_THREADS = max(int(cpus/2),1)
 
 
 def find_key(dic, val):
@@ -828,24 +834,27 @@ class DataContainer(object):
     def minimum(self,x2, out=None, *args, **kwargs):
         return self.pixel_wise_binary(numpy.minimum, x2=x2, out=out, *args, **kwargs)
 
-    @staticmethod
-    def axpby(a,x,b,y,out,dtype=numpy.float32):
+    def axpby(self, a, b, y, out, dtype=numpy.float32, num_threads=NUM_THREADS):
         '''performs axpby with cilacc C library
         
-        Does the operation .. math:: a*x+b*y and stores the result in out
+        Does the operation .. math:: a*x+b*y and stores the result in out, where x is self
 
         :param a: scalar
-        :param x: DataContainer
+        :type a: float
         :param b: scalar
+        :type b: float
         :param y: DataContainer
-        :param out: DataContainer to store the result
-        :param dtype: optional, data type of the DataContainers
+        :param out: DataContainer instance to store the result
+        :param dtype: data type of the DataContainers
+        :type dtype: numpy type, optional, default numpy.float32
+        :param num_threads: number of threads to run on
+        :type num_threads: int, optional, default 1/2 CPU of the system
         '''
 
         c_float_p = ctypes.POINTER(ctypes.c_float)
         c_double_p = ctypes.POINTER(ctypes.c_double)
         # get the reference to the data
-        ndx = x.as_array()
+        ndx = self.as_array()
         ndy = y.as_array()
         ndout = out.as_array()
 
@@ -879,15 +888,17 @@ class DataContainer(object):
                                   ctypes.POINTER(ctypes.c_float),  # pointer to the third array 
                                   ctypes.c_float,                  # type of A (float)
                                   ctypes.c_float,                  # type of B (float)
-                                  ctypes.c_long]                   # type of size of first array 
+                                  ctypes.c_long,                   # type of size of first array 
+                                  ctypes.c_int]                    # number of threads
         cilacc.daxpby.argtypes = [ctypes.POINTER(ctypes.c_double), # pointer to the first array 
                                   ctypes.POINTER(ctypes.c_double), # pointer to the second array 
                                   ctypes.POINTER(ctypes.c_double), # pointer to the third array 
                                   ctypes.c_double,                 # type of A (c_double)
                                   ctypes.c_double,                 # type of B (c_double)
-                                  ctypes.c_long]                   # type of size of first array 
+                                  ctypes.c_long,                   # type of size of first array 
+                                  ctypes.c_int]                    # number of threads
 
-        if f(x_p, y_p, out_p, a, b, ndx.size) != 0:
+        if f(x_p, y_p, out_p, a, b, ndx.size, num_threads) != 0:
             raise RuntimeError('axpby execution failed')
         
 

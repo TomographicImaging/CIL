@@ -501,7 +501,7 @@ class TestBlockDataContainer(unittest.TestCase):
         
         out = cp0 * 0. - 10
 
-        cp0.axpby(3,-2,cp1,out)
+        cp0.axpby(3,-2,cp1,out, num_threads=4)
 
         # operation should be [  3 * -1 + (-2) * 2 , 3 * 1 + (-2) * 3 ] 
         # output should be [ -7 , -3 ]
@@ -597,4 +597,47 @@ class TestBlockDataContainer(unittest.TestCase):
         # print ("out_1", out.get_item(1).as_array())
         self.assertBlockDataContainerEqual(out, res)
 
+    def test_axpby4(self):
+        # test axpby with nested BlockDataContainer
+        ig0 = ImageGeometry(2,3,4)
+        ig1 = ImageGeometry(2,3,5)
+        
+        data0 = ig0.allocate(-1)
+        data2 = ig0.allocate(1)
 
+        # data1 = ig0.allocate(2)
+        data3 = ig1.allocate(3)
+        
+        cp0 = BlockDataContainer(data0,data2)
+        cp1 = BlockDataContainer(cp0 *0. +  [2, -2], data3)
+        print (cp1.get_item(0).get_item(0).as_array())
+        print (cp1.get_item(0).get_item(1).as_array())
+        print (cp1.get_item(1).as_array())
+        print ("###############################")
+        
+
+
+        out = cp1 * 0. 
+        cp2 = out + [1,3]
+
+
+        print (cp2.get_item(0).get_item(0).as_array())
+        print (cp2.get_item(0).get_item(1).as_array())
+        print (cp2.get_item(1).as_array())
+
+        cp2.axpby(3,-2, cp1 ,out, num_threads=4)
+
+        # output should be [ [ -1 , 7 ] , 3]
+        res0 = ig0.allocate(-1)
+        res2 = ig0.allocate(7)
+        res3 = ig1.allocate(3)
+        res = BlockDataContainer(BlockDataContainer(res0, res2), res3)
+
+        # print ("res0", res0.as_array())
+        # print ("res2", res2.as_array())
+
+        print ("###############################")
+        
+        # print ("out_0", out.get_item(0).as_array())
+        # print ("out_1", out.get_item(1).as_array())
+        self.assertBlockDataContainerEqual(out, res)

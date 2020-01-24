@@ -30,6 +30,8 @@ class TestGradient(unittest.TestCase):
         N, M, K = 20, 30, 40
         channels = 10
         
+        numpy.random.seed(1)
+        
         # check range geometry, examples
         
         ig1 = ImageGeometry(voxel_num_x = M, voxel_num_y = N) 

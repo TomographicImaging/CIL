@@ -23,6 +23,7 @@ import numpy
 from numbers import Number
 import functools
 from ccpi.framework import DataContainer
+from ccpi.utilities import NUM_THREADS
 #from ccpi.framework import AcquisitionData, ImageData
 #from ccpi.optimisation.operators import Operator, LinearOperator
 
@@ -174,7 +175,7 @@ class BlockDataContainer(object):
             self.binary_operations(BlockDataContainer.DIVIDE, other, *args, **kwargs)
         else:
             return self.binary_operations(BlockDataContainer.DIVIDE, other, *args, **kwargs)
-    def axpby(self, a, b, y, out, dtype=numpy.float32):
+    def axpby(self, a, b, y, out, dtype=numpy.float32, num_threads = NUM_THREADS):
         r'''performs axpby element-wise on the BlockDataContainer containers
         
         Does the operation .. math:: a*x+b*y and stores the result in out, where x is self
@@ -187,7 +188,7 @@ class BlockDataContainer(object):
         '''
         if out is None:
             raise ValueError("out container cannot be None")
-        kwargs = {'a':a, 'b':b, 'out':out, 'dtype': dtype}
+        kwargs = {'a':a, 'b':b, 'out':out, 'dtype': dtype, 'num_threads': NUM_THREADS}
         self.binary_operations(BlockDataContainer.AXPBY, y, **kwargs)
 
 
@@ -260,7 +261,7 @@ class BlockDataContainer(object):
                     kw['out'] = out.get_item(i)
                     if operation == BlockDataContainer.AXPBY:
                         kw['y'] = ot
-                        el.axpby(kw['a'], kw['b'], kw['y'], kw['out'])
+                        el.axpby(kw['a'], kw['b'], kw['y'], kw['out'], kw['dtype'], kw['num_threads'])
                     else:
                         op(ot, *args, **kw)
                 else:
@@ -275,7 +276,7 @@ class BlockDataContainer(object):
             kw = kwargs.copy()
             if operation != BlockDataContainer.AXPBY:
                 # remove keyworded argument related to AXPBY
-                for k in ['a','b','y']:
+                for k in ['a','b','y', 'num_threads', 'dtype']:
                     if k in kw.keys():
                         kw.pop(k)
                 
@@ -295,7 +296,7 @@ class BlockDataContainer(object):
                     # As out cannot be None, it is safe to continue the 
                     # for loop after the call to axpby
                     kw['out'] = out.get_item(i)
-                    el.axpby(kw['a'], kw['b'], other, kw['out'])
+                    el.axpby(kw['a'], kw['b'], other, kw['out'], kw['dtype'], kw['num_threads'])
                     continue
                 else:
                     raise ValueError('Unsupported operation', operation)

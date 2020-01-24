@@ -22,13 +22,14 @@ from __future__ import print_function
 from ccpi.optimisation.operators import Operator, LinearOperator, ScaledOperator
 from ccpi.optimisation.operators import FiniteDiff, SparseFiniteDiff
 from ccpi.framework import ImageData, ImageGeometry, BlockGeometry, BlockDataContainer
+from ccpi.utilities import NUM_THREADS
 import numpy 
 import warnings
 
 #default nThreads
-import multiprocessing
-cpus = multiprocessing.cpu_count()
-NUM_THREADS = max(int(cpus/2),1)
+# import multiprocessing
+# cpus = multiprocessing.cpu_count()
+# NUM_THREADS = max(int(cpus/2),1)
 
 NEUMANN = 'Neumann'
 PERIODIC = 'Periodic'

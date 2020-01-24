@@ -26,6 +26,7 @@ import warnings
 from functools import reduce
 from numbers import Number
 import ctypes, platform
+from ccpi.utilities import NUM_THREADS
 
 # dll = os.path.abspath(os.path.join( 
 #          os.path.abspath(os.path.dirname(__file__)),
@@ -46,9 +47,9 @@ else:
 cilacc = ctypes.cdll.LoadLibrary(dll)
 
 #default nThreads
-import multiprocessing
-cpus = multiprocessing.cpu_count()
-NUM_THREADS = max(int(cpus/2),1)
+# import multiprocessing
+# cpus = multiprocessing.cpu_count()
+# NUM_THREADS = max(int(cpus/2),1)
 
 
 def find_key(dic, val):

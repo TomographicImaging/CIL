@@ -633,11 +633,11 @@ class SumOperator(Operator):
         self.operator1 = operator1
         self.operator2 = operator2
         
-#        if self.operator1.domain_geometry() != self.operator2.domain_geometry():
-#            raise ValueError('Domain geometry of {} is not equal with domain geometry of {}'.format(self.operator1.__class__.__name__,self.operator2.__class__.__name__))    
+        if self.operator1.domain_geometry() != self.operator2.domain_geometry():
+            raise ValueError('Domain geometry of {} is not equal with domain geometry of {}'.format(self.operator1.__class__.__name__,self.operator2.__class__.__name__))    
                 
-#        if self.operator1.range_geometry() != self.operator2.range_geometry():
-#            raise ValueError('Range geometry of {} is not equal with range geometry of {}'.format(self.operator1.__class__.__name__,self.operator2.__class__.__name__))    
+        if self.operator1.range_geometry() != self.operator2.range_geometry():
+            raise ValueError('Range geometry of {} is not equal with range geometry of {}'.format(self.operator1.__class__.__name__,self.operator2.__class__.__name__))    
             
         self.linear_flag = self.operator1.is_linear() and self.operator2.is_linear()            
         

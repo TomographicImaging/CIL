@@ -21,8 +21,9 @@ from __future__ import division
 from __future__ import print_function
 
 from ccpi.optimisation.operators import LinearOperator
-import scipy.sparse as sp
-import numpy as np
+#import scipy.sparse as sp
+#import numpy as np
+
 
 
 class Identity(LinearOperator):
@@ -61,7 +62,10 @@ class Identity(LinearOperator):
         
         '''Returns Id(x)'''
         
-        return self.direct(x, out = out)
+        if out is None:
+            return x.copy()
+        else:
+            out.fill(x)
 
         
     def calculate_norm(self, **kwargs):

@@ -106,11 +106,11 @@ class ImageGeometry(object):
                     raise ValueError('Requested axis are not possible. Expected {},\ngot {}'.format(
                                     allowed_labels,labels))
             order = self.get_order_by_label(labels, dim_labels)
-            if order != [i for i in range(len(dim_labels))]:
+#            if order != [i for i in range(len(dim_labels))]:
                 # resort
-                self.shape = tuple([shape[i] for i in order])
-            else:
-                self.shape = tuple(order)
+            self.shape = tuple([shape[i] for i in order])
+#            else:
+#                self.shape = tuple(order)
             self.dimension_labels = labels
                 
     def get_order_by_label(self, dimension_labels, default_dimension_labels):
@@ -195,6 +195,17 @@ class ImageGeometry(object):
                 raise ValueError('Value {} unknown'.format(value))
 
         return out
+    
+    def __eq__(self, other):
+        
+        dict1 = self.__dict__
+        dict2 = other.__dict__
+        for k1, k2 in zip(dict1.items(), dict2.items()): 
+            if k1!=k2:
+                raise ValueError('Geometries are not equal: {} is not equal with {}'.format(k1,k2))
+        return True   
+    
+    
     # The following methods return 2 members of the class, therefore I 
     # don't think we need to implement them. 
     # Additionally using __len__ is confusing as one would think this is 
@@ -318,11 +329,11 @@ class AcquisitionGeometry(object):
                     raise ValueError('Requested axis are not possible. Expected {},\ngot {}'.format(
                                     allowed_labels,labels))
             order = self.get_order_by_label(labels, dim_labels)
-            if order != [i for i in range(len(dim_labels))]:
+#            if order != [i for i in range(len(dim_labels))]:
                 # resort
-                self.shape = tuple([shape[i] for i in order])
-            else:
-                self.shape = tuple(order)
+            self.shape = tuple([shape[i] for i in order])
+#            else:
+#                self.shape = tuple(order)
             self.dimension_labels = labels
         
     def get_order_by_label(self, dimension_labels, default_dimension_labels):

@@ -16,11 +16,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from .Operator import Operator, ScaledOperator
-
-from .LinearOperator import LinearOperator
-from .BlockOperator import BlockOperator
-from .BlockScaledOperator import BlockScaledOperator
+from .Operator import Operator, ScaledOperator, LinearOperator, BlockOperator, CompositionOperator, SumOperator
 
 from .SparseFiniteDiff import SparseFiniteDiff
 from .ShrinkageOperator import ShrinkageOperator

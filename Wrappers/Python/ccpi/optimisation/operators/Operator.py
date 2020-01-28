@@ -413,7 +413,7 @@ class CompositionOperator(Operator):
         if out is None:
             #return self.operator1.direct(self.operator2.direct(x))
             return functools.reduce(lambda X,operator: operator.direct(X), 
-                                   self.operators[::-1],
+                                   self.operators[::-1][1:],
                                    self.operators[-1].direct(x))
         else:
             # tmp = self.operator2.range_geometry().allocate()
@@ -423,7 +423,7 @@ class CompositionOperator(Operator):
             # TODO this is a bit silly but will handle the pre allocation later
             out.fill (
                 functools.reduce(lambda X,operator: operator.direct(X), 
-                                   self.operators[::-1],
+                                   self.operators[::-1][1:],
                                    self.operators[-1].direct(x))
             )
             
@@ -434,12 +434,12 @@ class CompositionOperator(Operator):
             if out is None:
                 #return self.operator2.adjoint(self.operator1.adjoint(x))
                 return functools.reduce(lambda X,operator: operator.adjoint(X), 
-                                   self.operators,
+                                   self.operators[1:],
                                    self.operators[0].adjoint(x))
             else:
                 out.fill(
                     functools.reduce(lambda X,operator: operator.adjoint(X), 
-                                   self.operators,
+                                   self.operators[1:],
                                    self.operators[0].adjoint(x))
                 )
         else:

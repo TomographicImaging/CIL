@@ -48,33 +48,36 @@ class SymmetrizedGradient(LinearOperator):
     CORRELATION_SPACE = "Space"
     CORRELATION_SPACECHANNEL = "SpaceChannels"
     
-    def __init__(self, gm_domain, bnd_cond = 'Neumann', **kwargs):
+    def __init__(self, domain_geometry, bnd_cond = 'Neumann', **kwargs):
         '''creator
         
-        :param gm_domain: domain of the operator
+        :param domain_geometry: domain of the operator
         :param bnd_cond: boundary condition, either :code:`Neumann` or :code:`Periodic`.
         :type bnd_cond: str, optional, default :code:`Neumann`
         :param correlation: :code:`SpaceChannel` or :code:`Channel`
         :type correlation: str, optional, default :code:`Channel`
         '''
-        super(SymmetrizedGradient, self).__init__() 
+        # super(SymmetrizedGradient, self).__init__(domain_geometry=domain_geometry) 
                 
-        self.gm_domain = gm_domain
         self.bnd_cond = bnd_cond
         self.correlation = kwargs.get('correlation',SymmetrizedGradient.CORRELATION_SPACE)
                 
-        tmp_gm = len(self.gm_domain.geometries)*self.gm_domain.geometries
+        tmp_gm = len(domain_geometry.geometries)*domain_geometry.geometries
         
-        self.gm_range = BlockGeometry(*tmp_gm)
         
         # Define FD operator. We need one geometry from the BlockGeometry of the domain
-        self.FD = FiniteDiff(self.gm_domain.get_item(0), direction = 0, bnd_cond = self.bnd_cond)
+        self.FD = FiniteDiff(domain_geometry.get_item(0), direction = 0, 
+                             bnd_cond = self.bnd_cond)
         
-        if self.gm_domain.shape[0]==2:
+        if domain_geometry.shape[0]==2:
             self.order_ind = [0,2,1,3]
         else:
             self.order_ind = [0,3,6,1,4,7,2,5,8]            
-                
+        
+        super(SymmetrizedGradient, self).__init__(
+                                          domain_geometry=domain_geometry, 
+                                          range_geometry=BlockGeometry(*tmp_gm))
+        
         
     def direct(self, x, out=None):
         
@@ -83,7 +86,7 @@ class SymmetrizedGradient(LinearOperator):
         if out is None:
             
             tmp = []
-            for i in range(self.gm_domain.shape[0]):
+            for i in range(self.domain_geometry().shape[0]):
                 for j in range(x.shape[0]):
                     self.FD.direction = i
                     tmp.append(self.FD.adjoint(x.get_item(j)))
@@ -97,7 +100,7 @@ class SymmetrizedGradient(LinearOperator):
         else:
             
             ind = 0
-            for i in range(self.gm_domain.shape[0]):
+            for i in range(self.domain_geometry().shape[0]):
                 for j in range(x.shape[0]):
                     self.FD.direction = i
                     self.FD.adjoint(x.get_item(j), out=out[ind])
@@ -110,12 +113,12 @@ class SymmetrizedGradient(LinearOperator):
         
         if out is None:
             
-            tmp = [None]*self.gm_domain.shape[0]
+            tmp = [None]*self.domain_geometry().shape[0]
             i = 0
             
-            for k in range(self.gm_domain.shape[0]):
+            for k in range(self.domain_geometry().shape[0]):
                 tmp1 = 0
-                for j in range(self.gm_domain.shape[0]):
+                for j in range(self.domain_geometry().shape[0]):
                     self.FD.direction = j
                     tmp1 += self.FD.direct(x[i])                    
                     i+=1
@@ -125,23 +128,18 @@ class SymmetrizedGradient(LinearOperator):
 
         else:
             
-            tmp = self.gm_domain.allocate() 
+            tmp = self.domain_geometry().allocate() 
             i = 0
-            for k in range(self.gm_domain.shape[0]):
+            for k in range(self.domain_geometry().shape[0]):
                 tmp1 = 0
-                for j in range(self.gm_domain.shape[0]):
+                for j in range(self.domain_geometry().shape[0]):
                     self.FD.direction = j
                     self.FD.direct(x[i], out=tmp[j])
                     i+=1
                     tmp1+=tmp[j]
                 out[k].fill(tmp1)
                     
-                     
-    def domain_geometry(self):
-        return self.gm_domain
     
-    def range_geometry(self):
-        return self.gm_range
 
 if __name__ == '__main__':   
     

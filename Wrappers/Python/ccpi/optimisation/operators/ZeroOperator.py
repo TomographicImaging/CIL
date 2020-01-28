@@ -41,14 +41,11 @@ class ZeroOperator(LinearOperator):
                        
      '''
     
-    def __init__(self, gm_domain, gm_range=None):
+    def __init__(self, domain_geometry, range_geometry=None):
         
-        super(ZeroOperator, self).__init__()             
+        super(ZeroOperator, self).__init__(domain_geometry=domain_geometry, 
+                                           range_geometry=range_geometry)
 
-        self.gm_domain = gm_domain
-        self.gm_range = gm_range  
-        if self.gm_range is None:
-            self.gm_range = self.gm_domain
                    
         
     def direct(self,x,out=None):
@@ -76,15 +73,4 @@ class ZeroOperator(LinearOperator):
         
         return 0
     
-    def domain_geometry(self): 
-        
-        '''Returns domain_geometry of ZeroOperator'''
-        
-        
-        return self.gm_domain  
-        
-    def range_geometry(self):
-        
-        '''Returns domain_geometry of ZeroOperator'''
-        
-        return self.gm_range
+    

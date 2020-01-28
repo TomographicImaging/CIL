@@ -221,6 +221,18 @@ class TestOperator(CCPiTestClass):
         for n in [norm, norm2, norm3, norm4, norm5]:
             print ("norm {}", format(n))
 
+    def test_CompositionOperator(self):
+        N, M = 200, 300
+        
+        ig = ImageGeometry(N, M)
+        G = Gradient(ig)
+        Id = Identity(ig)
+
+        c = G.compose(Id)
+        x = c.domain_geometry().allocate()
+
+        
+
 
 class TestGradients(CCPiTestClass): 
     def setUp(self):

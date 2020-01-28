@@ -22,12 +22,19 @@ from numbers import Number
 import numpy
 import functools
 
-from ccpi.optimisation.operators.ScaledOperator import ScaledOperator
-
 class Operator(object):
     '''Operator that maps from a space X -> Y'''
-    def __init__(self, **kwargs):
-        self.__norm = None
+    def __init__(self, domain_geometry, **kwargs):
+        r'''
+        Creator
+
+        :param domain_geometry: domain of the operator
+        :param range_geometry: range of the operator
+        :type range_geometry: optional, default None
+        '''
+        self._norm = None
+        self._domain_geometry = domain_geometry
+        self._range_geometry = kwargs.get('range_geometry', None)
 
     def is_linear(self):
         '''Returns if the operator is linear'''
@@ -54,36 +61,36 @@ class Operator(object):
         :parameter force: forces the recalculation of the norm
         :type force: boolean, default :code:`False`
         '''
-        if self.__norm is None or kwargs.get('force', False):
-            self.__norm = self.calculate_norm(**kwargs)
-        return self.__norm
+        if self._norm is None or kwargs.get('force', False):
+            self._norm = self.calculate_norm(**kwargs)
+        return self._norm
     def calculate_norm(self, **kwargs):
         '''Calculates the norm of the Operator'''
         raise NotImplementedError
     def range_geometry(self):
         '''Returns the range of the Operator: Y space'''
-        raise NotImplementedError
+        return self._range_geometry
     def domain_geometry(self):
         '''Returns the domain of the Operator: X space'''
-        raise NotImplementedError
+        return self._domain_geometry
     def __rmul__(self, scalar):
         '''Defines the multiplication by a scalar on the left
 
         returns a ScaledOperator'''
         return ScaledOperator(self, scalar)
     
-    def compose(self, *other):
+    def compose(self, *other, **kwargs):
         # TODO: check equality of domain and range of operators        
         #if self.operator2.range_geometry != self.operator1.domain_geometry:
         #    raise ValueError('Cannot compose operators, check domain geometry of {} and range geometry of {}'.format(self.operato1,self.operator2))    
         
-        return CompositionOperator(self, other) 
+        return CompositionOperator(self, *other, **kwargs) 
 
 
 class LinearOperator(Operator):
     '''A Linear Operator that maps from a space X <-> Y'''
-    def __init__(self, **kwargs):
-        super(LinearOperator, self).__init__(**kwargs)
+    def __init__(self, domain_geometry, **kwargs):
+        super(LinearOperator, self).__init__(domain_geometry, **kwargs)
     def is_linear(self):
         '''Returns if the operator is linear'''
         return True
@@ -222,7 +229,9 @@ class ScaledOperator(Operator):
         :param operator: a Operator or LinearOperator
         :param scalar: a scalar multiplier
         :type scalar: float'''
-        super(ScaledOperator, self).__init__(**kwargs)
+
+        super(ScaledOperator, self).__init__(domain_geometry=operator.domain_geometry(), 
+                                             range_geometry=operator.range_geometry())
         if not isinstance (scalar, Number):
             raise TypeError('expected scalar: got {}'.format(type(scalar)))
         self.scalar = scalar
@@ -247,12 +256,12 @@ class ScaledOperator(Operator):
     def norm(self, **kwargs):
         '''norm of the operator'''
         return numpy.abs(self.scalar) * self.operator.norm(**kwargs)
-    def range_geometry(self):
-        '''range of the operator'''
-        return self.operator.range_geometry()
-    def domain_geometry(self):
-        '''domain of the operator'''
-        return self.operator.domain_geometry()
+    # def range_geometry(self):
+    #     '''range of the operator'''
+    #     return self.operator.range_geometry()
+    # def domain_geometry(self):
+    #     '''domain of the operator'''
+    #     return self.operator.domain_geometry()
     def is_linear(self):
         '''returns whether the operator is linear
         
@@ -272,16 +281,16 @@ class SumOperator(Operator):
         self.operator1 = operator1
         self.operator2 = operator2
         
-        if self.operator1.domain_geometry() != self.operator2.domain_geometry():
-            raise ValueError('Domain geometry of {} is not equal with domain geometry of {}'.format(self.operator1.__class__.__name__,self.operator2.__class__.__name__))    
+        # if self.operator1.domain_geometry() != self.operator2.domain_geometry():
+        #     raise ValueError('Domain geometry of {} is not equal with domain geometry of {}'.format(self.operator1.__class__.__name__,self.operator2.__class__.__name__))    
                 
-        if self.operator1.range_geometry() != self.operator2.range_geometry():
-            raise ValueError('Range geometry of {} is not equal with range geometry of {}'.format(self.operator1.__class__.__name__,self.operator2.__class__.__name__))    
+        # if self.operator1.range_geometry() != self.operator2.range_geometry():
+        #     raise ValueError('Range geometry of {} is not equal with range geometry of {}'.format(self.operator1.__class__.__name__,self.operator2.__class__.__name__))    
             
         self.linear_flag = self.operator1.is_linear() and self.operator2.is_linear()            
         
-        super(SumOperator, self).__init__(self.operator1.domain_geometry(),
-                                          self.operator1.range_geometry()) 
+        super(SumOperator, self).__init__(domain_geometry=self.operator1.domain_geometry(),
+                                          range_geometry=self.operator1.range_geometry()) 
                                   
     def direct(self, x, out=None):
         
@@ -377,21 +386,24 @@ class CompositionOperator(Operator):
     
     def __init__(self, *operators, **kwargs):
         
-        # get a copy of the operators
+        # get a reference to the operators
         self.operators = operators
-        
         
         self.linear_flag = functools.reduce(lambda x,y: x and y.is_linear(),
                                             self.operators, True)
-        
-        if kwargs.get('preallocate', False):
+        self.preallocate = kwargs.get('preallocate', False)
+        if self.preallocate:
+            # self.tmp_domain = [op.domain_geometry().allocate() for op in self.operators]
+            # self.tmp_range = [op.range_geometry().allocate() for op in self.operators]
             pass
+
         # TODO address the equality of geometries
         # if self.operator2.range_geometry() != self.operator1.domain_geometry():
         #     raise ValueError('Domain geometry of {} is not equal with range geometry of {}'.format(self.operator1.__class__.__name__,self.operator2.__class__.__name__))    
                 
-        super(CompositionOperator, self).__init__(self.operator[0].domain_geometry(),
-                                                  self.operator[-1].range_geometry()) 
+        super(CompositionOperator, self).__init__(
+            domain_geometry=self.operators[0].domain_geometry(),
+            range_geometry=self.operators[-1].range_geometry()) 
         
     def direct(self, x, out = None):
 
@@ -404,18 +416,29 @@ class CompositionOperator(Operator):
             # tmp = self.operator2.range_geometry().allocate()
             # self.operator2.direct(x, out = tmp)
             # self.operator1.direct(tmp, out = out)
+
+            # TODO this is a bit silly but will handle the pre allocation later
+            out.fill (
+                funtools.reduce(lambda x,y: y.direct(x), 
+                                   self.operators,
+                                   self.operator[0].direct(x))
+            )
             
     def adjoint(self, x, out = None):
         
         if self.linear_flag: 
             
             if out is None:
-                return self.operator2.adjoint(self.operator1.adjoint(x))
+                #return self.operator2.adjoint(self.operator1.adjoint(x))
+                return funtools.reduce(lambda x,y: y.direct(x), 
+                                   self.operators[::-1],
+                                   self.operator[-1].adjoint(x))
             else:
-                
-                tmp = self.operator1.domain_geometry().allocate()
-                self.operator1.adjoint(x, out=tmp)
-                self.operator2.adjoint(tmp, out=out)
+                out.fill(
+                    funtools.reduce(lambda x,y: y.direct(x), 
+                                   self.operators[::-1],
+                                   self.operator[-1].adjoint(x))
+                )
         else:
             raise ValueError('No adjoint operation with non-linear operators')
             

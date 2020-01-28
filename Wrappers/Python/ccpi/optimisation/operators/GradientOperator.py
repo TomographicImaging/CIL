@@ -75,24 +75,29 @@ class Gradient(LinearOperator):
     CORRELATION_SPACE = CORRELATION_SPACE
     CORRELATION_SPACECHANNEL = CORRELATION_SPACECHANNEL
 
-    def __init__(self, gm_domain, bnd_cond = 'Neumann', **kwargs):
+    def __init__(self, domain_geometry, bnd_cond = 'Neumann', **kwargs):
         """Constructor method
         """        
-        super(Gradient, self).__init__() 
-
+        
         backend = kwargs.get('backend',C)
 
         correlation = kwargs.get('correlation',CORRELATION_SPACE)
 
-        if correlation == CORRELATION_SPACE and gm_domain.channels > 1:
+        if correlation == CORRELATION_SPACE and domain_geometry.channels > 1:
             #numpy implementation only for now
             backend = NUMPY
             warnings.warn("Warning: correlation='Space' on multi-channel dataset will use `numpy` backend")
 
         if backend == NUMPY:
-            self.operator = Gradient_numpy(gm_domain, bnd_cond=bnd_cond, **kwargs)
+            self.operator = Gradient_numpy(domain_geometry, bnd_cond=bnd_cond, **kwargs)
         else:
-            self.operator = Gradient_C(gm_domain, bnd_cond=bnd_cond, **kwargs)
+            self.operator = Gradient_C(domain_geometry, bnd_cond=bnd_cond, **kwargs)
+        
+        super(Gradient, self).__init__(domain_geometry=domain_geometry, 
+                                       range_geometry=self.operator.range_geometry()) 
+
+        self.gm_range = self.range_geometry()
+        self.gm_domain = self.domain_geometry()
 
 
     def direct(self, x, out=None):
@@ -120,16 +125,16 @@ class Gradient(LinearOperator):
         """            
         return self.operator.adjoint(x, out=out)
 
-    def domain_geometry(self):
-        '''Returns domain_geometry of Gradient'''
+    # def domain_geometry(self):
+    #     '''Returns domain_geometry of Gradient'''
         
-        return self.operator.gm_domain
+    #     return self.operator.gm_domain
     
-    def range_geometry(self):
+    # def range_geometry(self):
         
-        '''Returns range_geometry of Gradient'''
+    #     '''Returns range_geometry of Gradient'''
         
-        return self.operator.gm_range
+    #     return self.operator.gm_range
 
 class Gradient_numpy(LinearOperator):
     
@@ -143,7 +148,6 @@ class Gradient_numpy(LinearOperator):
         :param correlation: optional, :code:`SpaceChannel` or :code:`Space`
         :type correlation: str, optional, default :code:`Space`
         '''
-        super(Gradient_numpy, self).__init__() 
                 
         self.gm_domain = gm_domain # Domain of Grad Operator
         
@@ -190,6 +194,10 @@ class Gradient_numpy(LinearOperator):
         
         # Call FiniteDiff operator        
         self.FD = FiniteDiff(self.gm_domain, direction = 0, bnd_cond = self.bnd_cond)
+
+        super(Gradient_numpy, self).__init__(domain_geometry=self.gm_domain, 
+                                             range_geometry=self.gm_range) 
+        
         print("Initialised GradientOperator with numpy backend")               
         
     def direct(self, x, out=None):
@@ -348,8 +356,6 @@ class Gradient_C(LinearOperator):
 
     def __init__(self, gm_domain, gm_range=None, bnd_cond = NEUMANN, **kwargs):
 
-        super(Gradient_C, self).__init__() 
-
         self.num_threads = kwargs.get('num_threads',NUM_THREADS)
 
         self.gm_domain = gm_domain
@@ -375,6 +381,9 @@ class Gradient_C(LinearOperator):
         else:
             raise ValueError('Number of dimensions not supported, expected 2, 3 or 4, got {}'.format(len(gm_domain.shape)))
       #self.num_threads
+        # super(Gradient_C, self).__init__() 
+        super(Gradient_C, self).__init__(domain_geometry=self.gm_domain, 
+                                             range_geometry=self.gm_range) 
         print("Initialised GradientOperator with C backend running with ", cilacc.openMPtest(self.num_threads)," threads")               
 
     @staticmethod 
@@ -418,17 +427,17 @@ class Gradient_C(LinearOperator):
         if return_val is True:
             return out
 
-    def domain_geometry(self):
+    # def domain_geometry(self):
         
-        '''Returns domain_geometry of Gradient'''
+    #     '''Returns domain_geometry of Gradient'''
         
-        return self.gm_domain
+    #     return self.gm_domain
     
-    def range_geometry(self):
+    # def range_geometry(self):
         
-        '''Returns range_geometry of Gradient'''
+    #     '''Returns range_geometry of Gradient'''
         
-        return self.gm_range
+    #     return self.gm_range
 
        
 if __name__ == '__main__':

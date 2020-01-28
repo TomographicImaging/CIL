@@ -21,7 +21,7 @@ from .Operator import Operator, LinearOperator, ScaledOperator, SumOperator,\
 #from .LinearOperator import LinearOperator
 #from .ScaledOperator import ScaledOperator
 from .BlockOperator import BlockOperator
-from .BlockScaledOperator import BlockScaledOperator
+# from .BlockScaledOperator import BlockScaledOperator
 
 from .SparseFiniteDiff import SparseFiniteDiff
 from .ShrinkageOperator import ShrinkageOperator

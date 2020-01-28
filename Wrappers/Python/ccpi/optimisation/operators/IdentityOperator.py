@@ -35,14 +35,14 @@ class Identity(LinearOperator):
     '''    
     
     
-    def __init__(self, gm_domain, gm_range=None):
+    def __init__(self, domain_geometry, range_geometry=None):
 
-        self.gm_domain = gm_domain
-        self.gm_range = gm_range  
-        if self.gm_range is None:
-            self.gm_range = self.gm_domain
         
-        super(Identity, self).__init__()
+        if range_geometry is None:
+            range_geometry = domain_geometry
+        
+        super(Identity, self).__init__(domain_geometry=domain_geometry,
+                                       range_geometry=range_geometry)
         
     def direct(self,x,out=None):
         
@@ -68,18 +68,6 @@ class Identity(LinearOperator):
         '''Evaluates operator norm of Identity'''        
         
         return 1.0
-        
-    def domain_geometry(self): 
-        
-        '''Returns domain_geometry of Identity'''
-        
-        return self.gm_domain
-        
-    def range_geometry(self):
-        
-        '''Returns range_geometry of Identity'''         
-        
-        return self.gm_range
     
     
     ###########################################################################

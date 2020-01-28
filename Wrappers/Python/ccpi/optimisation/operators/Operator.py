@@ -86,6 +86,9 @@ class Operator(object):
         
         return CompositionOperator(self, *other, **kwargs) 
 
+    def __add__(self, other):
+        return SumOperator(self, other)
+
 
 class LinearOperator(Operator):
     '''A Linear Operator that maps from a space X <-> Y'''
@@ -402,16 +405,16 @@ class CompositionOperator(Operator):
         #     raise ValueError('Domain geometry of {} is not equal with range geometry of {}'.format(self.operator1.__class__.__name__,self.operator2.__class__.__name__))    
                 
         super(CompositionOperator, self).__init__(
-            domain_geometry=self.operators[0].domain_geometry(),
-            range_geometry=self.operators[-1].range_geometry()) 
+            domain_geometry=self.operators[-1].domain_geometry(),
+            range_geometry=self.operators[0].range_geometry()) 
         
     def direct(self, x, out = None):
 
         if out is None:
             #return self.operator1.direct(self.operator2.direct(x))
-            return funtools.reduce(lambda x,y: y.direct(x), 
-                                   self.operators,
-                                   self.operator[0].direct(x))
+            return functools.reduce(lambda X,operator: operator.direct(X), 
+                                   self.operators[::-1],
+                                   self.operators[-1].direct(x))
         else:
             # tmp = self.operator2.range_geometry().allocate()
             # self.operator2.direct(x, out = tmp)
@@ -419,9 +422,9 @@ class CompositionOperator(Operator):
 
             # TODO this is a bit silly but will handle the pre allocation later
             out.fill (
-                funtools.reduce(lambda x,y: y.direct(x), 
-                                   self.operators,
-                                   self.operator[0].direct(x))
+                functools.reduce(lambda X,operator: operator.direct(X), 
+                                   self.operators[::-1],
+                                   self.operators[-1].direct(x))
             )
             
     def adjoint(self, x, out = None):
@@ -430,14 +433,14 @@ class CompositionOperator(Operator):
             
             if out is None:
                 #return self.operator2.adjoint(self.operator1.adjoint(x))
-                return funtools.reduce(lambda x,y: y.direct(x), 
-                                   self.operators[::-1],
-                                   self.operator[-1].adjoint(x))
+                return functools.reduce(lambda X,operator: operator.adjoint(X), 
+                                   self.operators,
+                                   self.operators[0].adjoint(x))
             else:
                 out.fill(
-                    funtools.reduce(lambda x,y: y.direct(x), 
-                                   self.operators[::-1],
-                                   self.operator[-1].adjoint(x))
+                    functools.reduce(lambda X,operator: operator.adjoint(X), 
+                                   self.operators,
+                                   self.operators[0].adjoint(x))
                 )
         else:
             raise ValueError('No adjoint operation with non-linear operators')

@@ -89,6 +89,17 @@ class Operator(object):
     def __add__(self, other):
         return SumOperator(self, other)
 
+    def __mul__(self, scalar):
+        return self.__rmul__(scalar)    
+    
+    def __neg__(self):
+        """ Return -self """
+        return -1 * self    
+        
+    def __sub__(self, other):
+        """ Returns the subtraction of the operators."""
+        return self + (-1) * other   
+
 
 class LinearOperator(Operator):
     '''A Linear Operator that maps from a space X <-> Y'''

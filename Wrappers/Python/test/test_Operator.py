@@ -23,7 +23,12 @@ import numpy
 from timeit import default_timer as timer
 from ccpi.optimisation.operators import Gradient, Identity, SparseFiniteDiff
 from ccpi.optimisation.operators import LinearOperator, LinearOperatorMatrix
+import numpy   
+from ccpi.optimisation.operators import SumOperator, Gradient,\
+            ZeroOperator, SymmetrizedGradient, CompositionOperator
 
+from ccpi.framework import TestData
+import os
 
 def dt(steps):
     return steps[-1] - steps[-2]
@@ -221,15 +226,7 @@ class TestOperator(CCPiTestClass):
         for n in [norm, norm2, norm3, norm4, norm5]:
             print ("norm {}", format(n))
 
-    def test_CompositionOperator(self):
-        N, M = 200, 300
-        
-        ig = ImageGeometry(N, M)
-        G = Gradient(ig)
-        Id = Identity(ig)
-
-        c = G.compose(Id)
-        x = c.domain_geometry().allocate()
+    
 
         
 
@@ -348,6 +345,7 @@ class TestGradients(CCPiTestClass):
         # self.assertAlmostEqual(lhs3, rhs3)
         self.assertTrue( LinearOperator.dot_test(Grad3 , verbose=True))
         self.assertTrue( LinearOperator.dot_test(Grad3 , decimal=6, verbose=True))
+
 
 
 
@@ -657,6 +655,194 @@ class TestBlockOperator(unittest.TestCase):
         u1 = B.adjoint(w)
         self.assertEqual((w * w1).sum() , (u1*u).sum())
 
-    
+class TestOperatorCompositionSum(unittest.TestCase):
+    def setUp(self):
+        
+        
 
+        # data_dir = os.path.abspath(
+        #     os.path.join(os.environ['SIRF_INSTALL_PATH'], 'share','ccpi')
+        # )
+
+        # self.data = TestData(data_dir=data_dir).load(TestData.BOAT, size=(128,128))
+        self.data = TestData().load(TestData.BOAT, size=(128,128))
+        self.ig = self.data.geometry
+
+    def test_SumOperator(self):
+
+        # numpy.random.seed(1)
+        ig = self.ig
+        data = self.data
+
+        Id1 = 2 * Identity(ig)
+        Id2 = Identity(ig)
+        # z = ZeroOperator(domain_geometry=ig)
+        # sym = SymmetrizedGradient(domain_geometry=ig)
+
+        c = SumOperator(Id1,Id2)
+        out = c.direct(data)
+
+        numpy.testing.assert_array_almost_equal(out.as_array(),3 * data.as_array())
+
+
+    def test_CompositionOperator_direct1(self):
+        ig = self.ig
+        data = self.data
+        G = Gradient(domain_geometry=ig)
+        
+
+        Id1 = 2 * Identity(ig)
+        Id2 = Identity(ig)
+        
+        d = CompositionOperator(G, Id2)
+
+        out1 = G.direct(data)
+        out2 = d.direct(data)
+
+
+        numpy.testing.assert_array_almost_equal(out2.get_item(0).as_array(),  out1.get_item(0).as_array())
+        numpy.testing.assert_array_almost_equal(out2.get_item(1).as_array(),  out1.get_item(1).as_array())
+
+    def test_CompositionOperator_direct2(self):
+        ig = self.ig
+        data = self.data
+        G = Gradient(domain_geometry=ig)
+        
+
+        Id1 = 2 * Identity(ig)
+        Id2 = Identity(ig)
+        
+        d = CompositionOperator(G, Id2)
+
+        out1 = G.direct(data)
+        
+        d_out = d.direct(data)
+
+        d1 = Id2.direct(data)
+        d2 = G.direct(d1)
+
+        numpy.testing.assert_array_almost_equal(d2.get_item(0).as_array(),
+                                                d_out.get_item(0).as_array())
+        numpy.testing.assert_array_almost_equal(d2.get_item(1).as_array(),
+                                                d_out.get_item(1).as_array())
+
+    def test_CompositionOperator_direct3(self):
+        ig = self.ig
+        data = self.data
+        G = Gradient(domain_geometry=ig)
+        
+
+        Id1 = 2 * Identity(ig)
+        Id2 = Identity(ig)
+        
+        d = CompositionOperator(G, Id2)
+
+        out1 = G.direct(data)
+        
+        d_out = d.direct(data)
+
+        d1 = Id2.direct(data)
+        d2 = G.direct(d1)
+
+        numpy.testing.assert_array_almost_equal(d2.get_item(0).as_array(),
+                                                d_out.get_item(0).as_array())
+        numpy.testing.assert_array_almost_equal(d2.get_item(1).as_array(),
+                                                d_out.get_item(1).as_array())
+
+        G2Id = G.compose(2*Id2)
+        d2g = G2Id.direct(data)
+
+        numpy.testing.assert_array_almost_equal(d2g.get_item(0).as_array(),
+                                                2 * d_out.get_item(0).as_array())
+        numpy.testing.assert_array_almost_equal(d2g.get_item(1).as_array(),
+                                                2 * d_out.get_item(1).as_array())
+
+
+
+    def test_CompositionOperator_adjoint1(self):
+        ig = self.ig
+        data = self.data
+        G = Gradient(domain_geometry=ig)
+        
+
+        Id1 = 2 * Identity(ig)
+        Id2 = Identity(ig)
+        
+        d = CompositionOperator(G, Id2)
+        da = d.direct(data)
+        
+        out1 = G.adjoint(da)
+        out2 = d.adjoint(da)
+
+        numpy.testing.assert_array_almost_equal(out2.as_array(),  out1.as_array())
+        
+    def test_CompositionOperator_adjoint2(self):
+        ig = self.ig
+        data = self.data
+        G = Gradient(domain_geometry=ig)
+        
+
+        Id1 = 2 * Identity(ig)
+        Id2 = Identity(ig)
+        
+        d = CompositionOperator(G, Id1)
+        da = d.direct(data)
+        
+        out1 = G.adjoint(da)
+        out2 = d.adjoint(da)
+
+        numpy.testing.assert_array_almost_equal(out2.as_array(),  2 * out1.as_array())
+    
+    def test_CompositionOperator_adjoint3(self):
+        ig = self.ig
+        data = self.data
+        G = Gradient(domain_geometry=ig)
+        
+
+        Id1 = 2 * Identity(ig)
+        Id2 = Identity(ig)
+        
+        d = G.compose(Id1)
+        da = d.direct(data)
+        
+        out1 = G.adjoint(da)
+        out2 = d.adjoint(da)
+
+        numpy.testing.assert_array_almost_equal(out2.as_array(),  2 * out1.as_array())
+
+
+    def test_CompositionOperator_adjoint4(self):
+        ig = self.ig
+        data = self.data
+        G = Gradient(domain_geometry=ig)
+        
+
+        Id1 = 2 * Identity(ig)
+        
+        d = G.compose(-Id1)
+        da = d.direct(data)
+        
+        out1 = G.adjoint(da)
+        out2 = d.adjoint(da)
+
+        numpy.testing.assert_array_almost_equal(out2.as_array(),  - 2 * out1.as_array())
+
+    def test_CompositionOperator_adjoint5(self):
+        ig = self.ig
+        data = self.data
+        G = Gradient(domain_geometry=ig)
+        
+
+        Id1 = 3 * Identity(ig)
+        Id = Id1 - Identity(ig)
+        d = G.compose(Id)
+        da = d.direct(data)
+        
+        out1 = G.adjoint(da)
+        out2 = d.adjoint(da)
+
+        numpy.testing.assert_array_almost_equal(out2.as_array(),  2 * out1.as_array())
+
+
+    
 

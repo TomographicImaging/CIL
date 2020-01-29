@@ -660,12 +660,12 @@ class TestOperatorCompositionSum(unittest.TestCase):
         
         
 
-        # data_dir = os.path.abspath(
-        #     os.path.join(os.environ['SIRF_INSTALL_PATH'], 'share','ccpi')
-        # )
+        data_dir = os.path.abspath(
+            os.path.join(os.environ['SIRF_INSTALL_PATH'], 'share','ccpi')
+        )
 
-        # self.data = TestData(data_dir=data_dir).load(TestData.BOAT, size=(128,128))
-        self.data = TestData().load(TestData.BOAT, size=(128,128))
+        self.data = TestData(data_dir=data_dir).load(TestData.BOAT, size=(128,128))
+        # self.data = TestData().load(TestData.BOAT, size=(128,128))
         self.ig = self.data.geometry
 
     def test_SumOperator(self):
@@ -842,6 +842,40 @@ class TestOperatorCompositionSum(unittest.TestCase):
         out2 = d.adjoint(da)
 
         numpy.testing.assert_array_almost_equal(out2.as_array(),  2 * out1.as_array())
+    
+    def test_CompositionOperator_adjoint6(self):
+        ig = self.ig
+        data = self.data
+        G = Gradient(domain_geometry=ig)
+        
+
+        Id1 = 3 * Identity(ig)
+        Id = ZeroOperator(ig)
+        d = G.compose(Id)
+        da = d.direct(data)
+        
+        out1 = G.adjoint(da)
+        out2 = d.adjoint(da)
+
+        numpy.testing.assert_array_almost_equal(out2.as_array(),  0 * out1.as_array())
+
+    def stest_CompositionOperator_direct4(self):
+        ig = self.ig
+        data = self.data
+        G = Gradient(domain_geometry=ig)
+        
+
+        sym = SymmetrizedGradient(domain_geometry=ig)
+        Id2 = Identity(ig)
+        
+        d = CompositionOperator(sym, Id2)
+
+        out1 = G.direct(data)
+        out2 = d.direct(data)
+
+
+        numpy.testing.assert_array_almost_equal(out2.get_item(0).as_array(),  out1.get_item(0).as_array())
+        numpy.testing.assert_array_almost_equal(out2.get_item(1).as_array(),  out1.get_item(1).as_array())
 
 
     

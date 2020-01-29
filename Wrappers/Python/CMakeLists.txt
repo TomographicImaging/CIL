@@ -39,9 +39,9 @@ if (BUILD_PYTHON_WRAPPER)
       set (DEPS       "${CMAKE_BINARY_DIR}/")
       set(OUTPUT      "${CMAKE_CURRENT_BINARY_DIR}/build/timestamp")
 
-      #configure_file(${SETUP_PY_IN} ${SETUP_PY})
-
-      
+      # add to add_custom_command DEPENDS the list of python files of the project.
+      # as a hack I remove ${OUTPUT}. This should trigger the new build.
+      file(REMOVE ${OUTPUT})
       if (CONDA_BUILD)
         add_custom_command(OUTPUT ${OUTPUT}
                         #COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}

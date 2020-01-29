@@ -399,7 +399,7 @@ class CompositionOperator(Operator):
             # self.tmp_domain = [op.domain_geometry().allocate() for op in self.operators]
             # self.tmp_range = [op.range_geometry().allocate() for op in self.operators]
             pass
-
+        
         # TODO address the equality of geometries
         # if self.operator2.range_geometry() != self.operator1.domain_geometry():
         #     raise ValueError('Domain geometry of {} is not equal with range geometry of {}'.format(self.operator1.__class__.__name__,self.operator2.__class__.__name__))    
@@ -412,36 +412,60 @@ class CompositionOperator(Operator):
 
         if out is None:
             #return self.operator1.direct(self.operator2.direct(x))
-            return functools.reduce(lambda X,operator: operator.direct(X), 
-                                   self.operators[::-1][1:],
-                                   self.operators[-1].direct(x))
+            # return functools.reduce(lambda X,operator: operator.direct(X), 
+            #                        self.operators[::-1][1:],
+            #                        self.operators[-1].direct(x))
+            for i,operator in enumerate(self.operators[::-1]):
+                if i == 0:
+                    step = operator.direct(x)
+                else:
+                    step = operator.direct(step)
+            return step
+
         else:
             # tmp = self.operator2.range_geometry().allocate()
             # self.operator2.direct(x, out = tmp)
             # self.operator1.direct(tmp, out = out)
-
+            
+            # out.fill (
+            #     functools.reduce(lambda X,operator: operator.direct(X), 
+            #                        self.operators[::-1][1:],
+            #                        self.operators[-1].direct(x))
+            # )
+            
             # TODO this is a bit silly but will handle the pre allocation later
-            out.fill (
-                functools.reduce(lambda X,operator: operator.direct(X), 
-                                   self.operators[::-1][1:],
-                                   self.operators[-1].direct(x))
-            )
+            for i,operator in enumerate(self.operators[::-1]):
+                if i == 0:
+                    step = operator.direct(x)
+                else:
+                    step = operator.direct(step)
+            out.fill( step )    
             
     def adjoint(self, x, out = None):
         
         if self.linear_flag: 
             
             if out is None:
-                #return self.operator2.adjoint(self.operator1.adjoint(x))
-                return functools.reduce(lambda X,operator: operator.adjoint(X), 
-                                   self.operators[1:],
-                                   self.operators[0].adjoint(x))
+                # return self.operator2.adjoint(self.operator1.adjoint(x))
+                # return functools.reduce(lambda X,operator: operator.adjoint(X), 
+                #                    self.operators[1:],
+                #                    self.operators[0].adjoint(x))
+
+                for i,operator in enumerate(self.operators):
+                    if i == 0:
+                        step = operator.adjoint(x)
+                    else:
+                        step = operator.adjoint(step)
+                return step
+
             else:
-                out.fill(
-                    functools.reduce(lambda X,operator: operator.adjoint(X), 
-                                   self.operators[1:],
-                                   self.operators[0].adjoint(x))
-                )
+                for i,operator in enumerate(self.operators):
+                    if i == 0:
+                        step = operator.adjoint(x)
+                    else:
+                        step = operator.adjoint(step)
+                
+                out.fill( step )
         else:
             raise ValueError('No adjoint operation with non-linear operators')
             

@@ -174,7 +174,7 @@ class KullbackLeibler(Function):
             
             self.b.multiply(4*tau, out=out)    
             
-            out.add((tmp)**2, out=out)
+            out.add(tmp.power(2), out=out)
             out.sqrt(out=out)
             out *= -1
             tmp += 2

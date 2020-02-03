@@ -411,7 +411,10 @@ class AcquisitionGeometry(object):
         AcquisitionGeometry.ANGLE_UNIT = AcquisitionGeometry.RADIAN
 
         for i in range(num_of_angles):
-            angles[i] = numpy.arctan2(src_dof[i][0], -src_dof[i][1])
+            angles_test[i] = numpy.arctan2(src_dof[i][0], -src_dof[i][1])                            
+
+        if angles is None:
+            angles = angles_test
 
         self.dist_source_center = -self.src_dof[0][1]
         self.dist_center_detector = self.det_dof[0][1]        

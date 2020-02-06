@@ -23,7 +23,12 @@ import numpy
 from timeit import default_timer as timer
 from ccpi.optimisation.operators import Gradient, Identity, SparseFiniteDiff
 from ccpi.optimisation.operators import LinearOperator, LinearOperatorMatrix
-
+try:
+    import cupy
+    has_cupy = True
+    from ccpi.optimisation.operators import FiniteDiffCupy
+except ImportError as ie:
+    has_cupy = False
 
 def dt(steps):
     return steps[-1] - steps[-2]
@@ -145,6 +150,47 @@ class TestOperator(CCPiTestClass):
         self.assertNumpyArrayEqual(u.as_array(), w.as_array())
 
         G = Gradient(ig)
+
+        u = G.range_geometry().allocate(ImageGeometry.RANDOM_INT)
+        res = G.domain_geometry().allocate()
+        G.adjoint(u, out=res)
+        w = G.adjoint(u)
+        self.assertNumpyArrayEqual(res.as_array(), w.as_array())
+        
+        u = G.domain_geometry().allocate(ImageGeometry.RANDOM_INT)
+        res = G.range_geometry().allocate()
+        G.direct(u, out=res)
+        w = G.direct(u)
+        self.assertBlockDataContainerEqual(res, w)
+    
+    def test_FiniteDifferenceCupy(self):
+        print ("test FiniteDifferenceCupy")
+        if not has_cupy:
+            return
+        ##
+        N, M = 2, 3
+
+        ig = ImageGeometry(N, M)
+        Id = Identity(ig)
+
+        FD = FiniteDiffCupy(ig, direction = 0, bnd_cond = 'Neumann')
+        u = FD.domain_geometry().allocate('random_int')
+        
+        
+        res = FD.domain_geometry().allocate(ImageGeometry.RANDOM_INT)
+        FD.adjoint(u, out=res)
+        w = FD.adjoint(u)
+
+        self.assertNumpyArrayEqual(res.as_array(), w.as_array())
+        
+        res = Id.domain_geometry().allocate(ImageGeometry.RANDOM_INT)
+        Id.adjoint(u, out=res)
+        w = Id.adjoint(u)
+
+        self.assertNumpyArrayEqual(res.as_array(), w.as_array())
+        self.assertNumpyArrayEqual(u.as_array(), w.as_array())
+
+        G = Gradient(ig, backend='cupy')
 
         u = G.range_geometry().allocate(ImageGeometry.RANDOM_INT)
         res = G.domain_geometry().allocate()

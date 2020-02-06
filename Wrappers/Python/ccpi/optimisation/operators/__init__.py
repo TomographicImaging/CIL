@@ -32,3 +32,9 @@ from .IdentityOperator import Identity
 from .ZeroOperator import ZeroOperator
 from .LinearOperatorMatrix import LinearOperatorMatrix
 
+try:
+    import cupy
+    has_cupy = True
+    from .FiniteDifferenceOperator import FiniteDiffCupy
+except ImportError as ie:
+    has_cupy = False

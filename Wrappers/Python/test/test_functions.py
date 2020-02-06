@@ -29,7 +29,7 @@ from ccpi.optimisation.operators import Gradient
 from ccpi.optimisation.functions import Function, KullbackLeibler, L2NormSquared,\
                                          L1Norm, MixedL21Norm, LeastSquares, \
                                          ZeroFunction, FunctionOperatorComposition,\
-                                         Rosenbrock
+                                         Rosenbrock, IndicatorBox
 
 import unittest
 import numpy
@@ -447,6 +447,18 @@ class TestFunction(unittest.TestCase):
         x = VectorData(numpy.asarray([1,1]))
         assert f(x) == 0.
         numpy.testing.assert_array_almost_equal( f.gradient(x).as_array(), numpy.zeros(shape=(2,), dtype=numpy.float32))
+    def test_IndicatorBox(self):
+        ig = ImageGeometry(10,10)
+        im = ig.allocate(-1)
+        ib = IndicatorBox(lower=0)
+        a = ib(im)
+        numpy.testing.assert_equal(a, numpy.inf)
+        ib = IndicatorBox(lower=-2)
+        a = ib(im)
+        numpy.testing.assert_array_equal(0, a)
+        ib = IndicatorBox(lower=-5, upper=-2)
+        a = ib(im)
+        numpy.testing.assert_equal(a, numpy.inf)
 
 if __name__ == '__main__':
     

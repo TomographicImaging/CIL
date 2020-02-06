@@ -44,10 +44,10 @@ class IndicatorBox(Function):
         :type lower: float, default = :code:`-numpy.inf`
         :param upper: upper bound
         :type upper: float, optional, default = :code:`numpy.inf`
+        '''
         super(IndicatorBox, self).__init__()
         self.lower = lower
         self.upper = upper
-        '''
 
     def __call__(self,x):
         

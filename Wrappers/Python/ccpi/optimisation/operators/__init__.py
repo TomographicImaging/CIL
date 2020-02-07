@@ -25,16 +25,9 @@ from .BlockScaledOperator import BlockScaledOperator
 from .SparseFiniteDiff import SparseFiniteDiff
 from .ShrinkageOperator import ShrinkageOperator
 
-from .FiniteDifferenceOperator import FiniteDiff
+from .FiniteDifferenceOperator import FiniteDiff, FiniteDiffCupy
 from .GradientOperator import Gradient
 from .SymmetrizedGradientOperator import SymmetrizedGradient
 from .IdentityOperator import Identity
 from .ZeroOperator import ZeroOperator
 from .LinearOperatorMatrix import LinearOperatorMatrix
-
-try:
-    import cupy
-    has_cupy = True
-    from .FiniteDifferenceOperator import FiniteDiffCupy
-except ImportError as ie:
-    has_cupy = False

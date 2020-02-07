@@ -20,7 +20,7 @@ from __future__ import division
 from __future__ import print_function
 
 from ccpi.optimisation.operators import Operator, LinearOperator, ScaledOperator
-from ccpi.optimisation.operators import FiniteDiff, SparseFiniteDiff
+from ccpi.optimisation.operators import FiniteDiff, SparseFiniteDiff, FiniteDiffCupy
 from ccpi.framework import ImageData, ImageGeometry, BlockGeometry, BlockDataContainer
 from ccpi.utilities import NUM_THREADS
 import numpy 
@@ -29,8 +29,9 @@ import warnings
 try:
     import cupy
     has_cupy = True
-    from ccpi.optimisation.operators import FiniteDiffCupy
+    
 except ImportError as ie:
+    print (ie)
     has_cupy = False
 
 
@@ -90,7 +91,7 @@ class Gradient(LinearOperator):
         super(Gradient, self).__init__() 
 
         backend = kwargs.get('backend',C)
-
+        print ("Asked backend CUPY, has_cupy", has_cupy)
         correlation = kwargs.get('correlation',CORRELATION_SPACE)
 
         if correlation == CORRELATION_SPACE and gm_domain.channels > 1:
@@ -501,7 +502,7 @@ if has_cupy:
             
             # Call FiniteDiff operator        
             self.FD = FiniteDiffCupy(self.gm_domain, direction = 0, bnd_cond = self.bnd_cond)
-            print("Initialised GradientOperator with numpy backend")               
+            print("Initialised GradientOperator with cupy backend")               
             
         def direct(self, x, out=None):
             

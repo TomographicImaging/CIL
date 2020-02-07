@@ -50,7 +50,7 @@ from ccpi.framework import AcquisitionGeometrySubsetGenerator
 
 
 model = 12 # select a model number from the library
-N = 256 # set dimension of the phantom
+N = 1024 # set dimension of the phantom
 device = 'gpu'
 path = os.path.dirname(tomophantom.__file__)
 path_library2D = os.path.join(path, "Phantom2DLibrary.dat")
@@ -220,7 +220,7 @@ sgd_u = StochasticGradientDescent(x_init=im_data*0.,
 #print (x.shape)
 
 tsgd0 = time.time()
-sgd_u.run(nsubs * 20)
+sgd_u.run(nsubs * 12)
 tsgd1 = time.time()
 
 
@@ -244,10 +244,10 @@ sgd_r = StochasticGradientDescent(x_init=im_data*0.,
 #print (x.shape)
 
 tsgd2 = time.time()
-sgd_r.run(nsubs * 10)
+sgd_r.run(nsubs * 12)
 tsgd3 = time.time()
 #%%
-%matplotlib qt5
+
 plotter2D([gd.get_output(), 
            im_data - gd.get_output(), 
            sgd_u.get_output() ,
@@ -275,5 +275,7 @@ print("Objective SGD perm",  l2(sgd_r.get_output()))
 
 print("Objective GD ", l2(gd.get_output()))
 
-    
+data.geometry.generate_subsets(10, 'uniform')
+b = data.copy()
+print (b.shape)
 

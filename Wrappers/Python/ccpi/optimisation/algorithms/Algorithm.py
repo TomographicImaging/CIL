@@ -255,6 +255,7 @@ class StochasticAlgorithm(Algorithm):
         self.number_of_subsets = kwargs.get('number_of_subsets', 1)
         self.current_subset_id = 0
         self.update_subset_interval = kwargs.get('update_subset_interval' , 1)
+        self.max_epoch = self.max_iteration
         
     def update_subset(self):
         if self.iteration % self.update_subset_interval == 0:
@@ -276,10 +277,15 @@ class StochasticAlgorithm(Algorithm):
     
     def max_epoch_stop_cryterion(self):
         '''default stop cryterion for iterative algorithm: max_iteration reached'''
-        return self.epoch >= self.max_iteration
+        return self.epoch >= self.max_epoch
     def notify_new_subset(self, subset_id, number_of_subsets):
         raise NotImplemented('This callback must be implemented by the concrete algorithm')
     
     def __next__(self):
         super(StochasticAlgorithm, self).__next__()
         self.update_subset()
+    def should_stop(self):
+        '''default stopping cryterion: number of iterations
+        
+        The user can change this in concrete implementatition of iterative algorithms.'''
+        return self.max_epoch_stop_cryterion()

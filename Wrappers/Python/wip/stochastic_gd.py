@@ -50,7 +50,7 @@ from ccpi.framework import AcquisitionGeometrySubsetGenerator
 
 
 model = 12 # select a model number from the library
-N = 1024 # set dimension of the phantom
+N = 256 # set dimension of the phantom
 device = 'gpu'
 path = os.path.dirname(tomophantom.__file__)
 path_library2D = os.path.join(path, "Phantom2DLibrary.dat")
@@ -198,15 +198,18 @@ class StochasticNorm2Sq(Norm2Sq):
         self.A.notify_new_subset(subset_id, number_of_subsets)
         
 
+
+#%%
 nsubs = 10
-data.generate_subsets(nsubs, 'uniform')
+data.geometry.generate_subsets(nsubs, 'uniform')
+data.geometry.subset_id = 0
 
 sl2 = StochasticNorm2Sq(A=OS_A, b=data)
-
-sgd = StochasticGradientDescent(x_init=im_data*0., 
+sgd_u = StochasticGradientDescent(x_init=im_data*0., 
                                 objective_function=sl2, 
                                 number_of_subsets=nsubs,
-                                update_objective_interval=10, max_iteration=100)
+                                update_objective_interval=10, max_iteration=100, 
+                                update_subset_interval=nsubs)
 
 #b = OS_A.direct(im_data)
 #
@@ -217,26 +220,60 @@ sgd = StochasticGradientDescent(x_init=im_data*0.,
 #print (x.shape)
 
 tsgd0 = time.time()
-sgd.run(100)
+sgd_u.run(nsubs * 20)
 tsgd1 = time.time()
+
+
+nsubs = 10
+data.geometry.generate_subsets(nsubs, 'random_permutation')
+data.geometry.subset_id = 0
+
+# sl22 = StochasticNorm2Sq(A=OS_A, b=data)
+sgd_r = StochasticGradientDescent(x_init=im_data*0., 
+                                objective_function=sl2, 
+                                number_of_subsets=nsubs,
+                                update_objective_interval=10, max_iteration=100, 
+                                update_subset_interval=nsubs)
+
+#b = OS_A.direct(im_data)
+#
+#print ('direct ->' , b.shape)
+#b.subtract(data, out=b)
+#
+#x = OS_A.adjoint(b)
+#print (x.shape)
+
+tsgd2 = time.time()
+sgd_r.run(nsubs * 10)
+tsgd3 = time.time()
 #%%
-plotter2D([im_data, 
-           gd.get_output(), 
-           gd.get_output()-sgd.get_output(), 
-           sgd.get_output() ,
+%matplotlib qt5
+plotter2D([gd.get_output(), 
+           im_data - gd.get_output(), 
+           sgd_u.get_output() ,
+           im_data - sgd_u.get_output(),
+           sgd_r.get_output() ,
+           im_data - sgd_r.get_output(),
+           
            #x
            ], titles=\
-          ['ground truth', 
+          [
            'GD {:.2f}s'.format(tgd1- tgd0), 
-           'GD - SGD',
-           'stochastic GD {:.2f}s'.format(tsgd1 - tsgd0),
+           'GD - ground truth',
+           'stochastic uniform GD {:.2f}s'.format(tsgd3 - tsgd2),
+           'SGD uniform - ground truth',
+           'stochastic GD perm {:.2f}s'.format(tsgd1 - tsgd0),
+           'SGD perm - ground truth',
            #'inline GD {}'.format(inline1-inline0)
            ],
           cmap='viridis')
 
+data.geometry.generate_subsets(1, 'uniform')
+data.geometry.subset_id = None
+print("Objective SGD unif",  l2(sgd_u.get_output())) 
+print("Objective SGD perm",  l2(sgd_r.get_output())) 
 
-
-
+print("Objective GD ", l2(gd.get_output()))
 
     
 

@@ -1,0 +1,47 @@
+package:
+  name: ccpi-framework
+  version: {{ environ['CIL_VERSION'] }}
+
+build:
+  preserve_egg_dir: False
+  script_env:
+    - CIL_VERSION   
+  #number: 0  
+  
+test:
+  requires:
+    - python-wget
+    - cvxpy # [ unix and py36 and np115 ]
+
+  source_files:
+    - ./Wrappers/Python/test # [win]
+    - ./ccpi/Wrappers/Python/test # [not win] 
+
+  commands:
+    - python -c "import os; print ('TESTING IN THIS DIRECTORY' , os.getcwd())"
+    - python -m unittest discover Wrappers/Python/test # [win]
+    - python -m unittest discover -s ccpi/Wrappers/Python/test # [not win]
+    
+requirements:
+  build:
+    - {{ pin_compatible('numpy', max_pin='x.x') }}
+    - python
+    - setuptools
+    - cmake
+    - openmp # [osx]
+
+  run:
+    - {{ pin_compatible('numpy', max_pin='x.x') }}
+    - python
+    - numpy
+    - scipy
+    - matplotlib
+    - h5py
+    - pillow
+    - libgcc-ng # [linux]
+    - openmp # [osx]
+  
+about:
+  home: http://www.ccpi.ac.uk
+  license:  Apache 2.0 License
+  summary: 'CCPi Framework'

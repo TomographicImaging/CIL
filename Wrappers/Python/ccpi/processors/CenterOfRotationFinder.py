@@ -15,6 +15,9 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 
 from ccpi.framework import DataProcessor, DataContainer, AcquisitionData,\
  AcquisitionGeometry, ImageGeometry, ImageData
@@ -43,9 +46,9 @@ class CenterOfRotationFinder(DataProcessor):
         #DataProcessor.__init__(self, **kwargs)
         super(CenterOfRotationFinder, self).__init__(**kwargs)
         
-    def set_slice(self, slice):
+    def set_slice(self, slice_index='centre'):
         """
-        Set the slice to run over in a 3D data set.
+        Set the slice to run over in a 3D data set. The default will use the centre slice.
 
         Input is any valid slice index or 'centre'
         """
@@ -53,21 +56,21 @@ class CenterOfRotationFinder(DataProcessor):
 
         if dataset is None:
             raise ValueError('Please set input data before slice selection')    
+        
+        if dataset.number_of_dimensions == 2:
+            print('Slice number not a valid parameter of a 2D data set')
 
         #check slice number is valid
-        if dataset.number_of_dimensions == 3:
-            if slice == 'centre':
-                slice = dataset.get_dimension_size('vertical')//2 
-
-            elif slice >= dataset.get_dimension_size('vertical'):
+        elif dataset.number_of_dimensions == 3:
+            if slice_index == 'centre':
+                slice_index = dataset.get_dimension_size('vertical')//2 
+            elif not isinstance(slice_index, (int)):
+                raise TypeError("Invalid input. Expect integer slice index.")               
+            elif slice_index >= dataset.get_dimension_size('vertical'):
                 raise ValueError("Slice out of range must be less than {0}"\
                     .format(dataset.get_dimension_size('vertical')))
 
-        elif dataset.number_of_dimensions == 2:
-            if slice is not None:
-                raise ValueError('Slice number not a valid parameter of a 2D data set')
-
-        self.slice_number = slice
+            self.slice_number = slice_index
 
     def check_input(self, dataset):
         #check dataset

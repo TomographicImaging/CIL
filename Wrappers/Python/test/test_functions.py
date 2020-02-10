@@ -7,7 +7,6 @@
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
 #   You may obtain a copy of the License at
-
 #   http://www.apache.org/licenses/LICENSE-2.0
 
 #   Unless required by applicable law or agreed to in writing, software
@@ -16,24 +15,25 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+from __future__ import absolute_import
+
 import numpy as np
+
+from ccpi.framework import DataContainer, ImageData, ImageGeometry, \
+    VectorGeometry, VectorData, BlockDataContainer
+from ccpi.optimisation.operators import Identity, LinearOperatorMatrix, BlockOperator
 from ccpi.optimisation.functions import Function, KullbackLeibler
-from ccpi.framework import DataContainer, ImageData, ImageGeometry 
-from ccpi.optimisation.operators import  Identity
-from ccpi.optimisation.operators import BlockOperator
-from ccpi.framework import BlockDataContainer
 from numbers import Number
 from ccpi.optimisation.operators import Gradient
 
-from ccpi.optimisation.functions import L2NormSquared
-from ccpi.optimisation.functions import L1Norm, MixedL21Norm
+from ccpi.optimisation.functions import Function, KullbackLeibler, L2NormSquared,\
+                                         L1Norm, MixedL21Norm, LeastSquares, \
+                                         ZeroFunction, FunctionOperatorComposition,\
+                                         Rosenbrock, IndicatorBox
 
-from ccpi.optimisation.functions import Norm2Sq
-from ccpi.optimisation.functions import ZeroFunction
-
-from ccpi.optimisation.functions import FunctionOperatorComposition
 import unittest
 import numpy
+import scipy.special
 
                     
 class TestFunction(unittest.TestCase):
@@ -298,23 +298,50 @@ class TestFunction(unittest.TestCase):
         #                                         ((u - tau * b)/(1 + tau/(2*scalar) )).as_array(), decimal=4)    
            
     def test_Norm2sq_as_FunctionOperatorComposition(self):
-        M, N, K = 2,3,5
-        ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N, voxel_num_z = K)
-        u = ig.allocate(ImageGeometry.RANDOM_INT)
-        b = ig.allocate(ImageGeometry.RANDOM_INT) 
         
-        A = 0.5 * Identity(ig)
-        old_chisq = Norm2Sq(A, b, 1.0)
-        new_chisq = FunctionOperatorComposition(L2NormSquared(b=b),A)
-
-        yold = old_chisq(u)
-        ynew = new_chisq(u)
-        self.assertEqual(yold, ynew)
-
-        yold = old_chisq.gradient(u)
-        ynew = new_chisq.gradient(u)
-        numpy.testing.assert_array_equal(yold.as_array(), ynew.as_array())
+        print('Test for FunctionOperatorComposition')         
+            
+        M, N = 50, 50
+        ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
+        b = ig.allocate('random_int')
         
+        print('Check call with Identity operator... OK\n')
+        operator = 3 * Identity(ig)
+            
+        u = ig.allocate('random_int', seed = 50)
+        
+        func1 = FunctionOperatorComposition(0.5 * L2NormSquared(b = b), operator)
+        func2 = LeastSquares(operator, b, 0.5)
+            
+        self.assertNumpyArrayAlmostEqual(func1(u), func2(u))
+        
+        
+        print('Check gradient with Identity operator... OK\n')
+        
+        tmp1 = ig.allocate()
+        tmp2 = ig.allocate()
+        res_gradient1 = func1.gradient(u)
+        res_gradient2 = func2.gradient(u)    
+        func1.gradient(u, out = tmp1)
+        func2.gradient(u, out = tmp2)
+            
+        self.assertNumpyArrayAlmostEqual(tmp1.as_array(), tmp2.as_array())
+        self.assertNumpyArrayAlmostEqual(res_gradient1.as_array(), res_gradient2.as_array())
+        
+        print('Check call with LinearOperatorMatrix... OK\n')  
+        mat = np.random.randn(M, N)
+        operator = LinearOperatorMatrix(mat)   
+        vg = VectorGeometry(N)
+        b = vg.allocate('random_int')    
+        u = vg.allocate('random_int')
+          
+        func1 = FunctionOperatorComposition(0.5 * L2NormSquared(b = b), operator)
+        func2 = LeastSquares(operator, b, 0.5)
+         
+        self.assertNumpyArrayAlmostEqual(func1(u), func2(u))   
+        
+        self.assertNumpyArrayAlmostEqual(func1.L, func2.L)
+            
     def test_mixedL12Norm(self):
         M, N, K = 2,3,5
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
@@ -350,24 +377,90 @@ class TestFunction(unittest.TestCase):
 
     def test_KullbackLeibler(self):
         print ("test_KullbackLeibler")
-        N, M = 2,3
-        ig  = ImageGeometry(N, M)
-        data = ig.allocate(ImageGeometry.RANDOM_INT)
-        x = ig.allocate(ImageGeometry.RANDOM_INT)
-        bnoise = ig.allocate(ImageGeometry.RANDOM_INT)
         
-        out = ig.allocate()
+        M, N, K =  2, 3, 4
+        ig = ImageGeometry(N, M, K)
         
-        f = KullbackLeibler(data, bnoise=bnoise)
+        u1 = ig.allocate('random_int', seed = 500)    
+        g1 = ig.allocate('random_int', seed = 100)
+        b1 = ig.allocate('random_int', seed = 1000)
         
-        grad = f.gradient(x)
-        f.gradient(x, out=out)
-        numpy.testing.assert_array_equal(grad.as_array(), out.as_array())
+        # with no data
+        try:
+            f = KullbackLeibler()   
+        except ValueError:
+            print('Give data b=...\n')
+            
+        print('With negative data, no background\n')   
+        try:        
+            f = KullbackLeibler(b=-1*g1)
+        except ValueError:
+            print('We have negative data\n') 
+            
+        f = KullbackLeibler(b=g1)        
+            
+        print('Check KullbackLeibler(x,x)=0\n') 
+        self.assertNumpyArrayAlmostEqual(0.0, f(g1))
+                
+        print('Check gradient .... is OK \n')
+        res_gradient = f.gradient(u1)
+        res_gradient_out = u1.geometry.allocate()
+        f.gradient(u1, out = res_gradient_out) 
+        self.assertNumpyArrayAlmostEqual(res_gradient.as_array(), \
+                                                res_gradient_out.as_array(),decimal = 4)  
         
-        prox = f.proximal(x,1.2)
-        f.proximal(x, 1.2, out=out)
-        numpy.testing.assert_array_equal(prox.as_array(), out.as_array())
+        print('Check proximal ... is OK\n')        
+        tau = 400.4
+        res_proximal = f.proximal(u1, tau)
+        res_proximal_out = u1.geometry.allocate()   
+        f.proximal(u1, tau, out = res_proximal_out)
+        self.assertNumpyArrayAlmostEqual(res_proximal.as_array(), \
+                                                res_proximal_out.as_array(), decimal =5)  
         
-        proxc = f.proximal_conjugate(x,1.2)
-        f.proximal_conjugate(x, 1.2, out=out)
-        numpy.testing.assert_array_equal(proxc.as_array(), out.as_array())
+        print('Check conjugate ... is OK\n')  
+        
+        if (1 - u1.as_array()).all():
+            print('If 1-x<=0, Convex conjugate returns 0.0')
+            
+        self.assertNumpyArrayAlmostEqual(0.0, f.convex_conjugate(u1))   
+
+
+        print('Check KullbackLeibler with background\n')      
+        eta = b1
+        
+        f1 = KullbackLeibler(b=g1, eta=b1) 
+            
+        tmp_sum = (u1 + eta).as_array()
+        ind = tmp_sum >= 0
+        tmp = scipy.special.kl_div(f1.b.as_array()[ind], tmp_sum[ind])                 
+        self.assertNumpyArrayAlmostEqual(f1(u1), numpy.sum(tmp) )          
+        
+        res_proximal_conj_out = u1.geometry.allocate()
+        proxc = f.proximal_conjugate(u1,tau)
+        f.proximal_conjugate(u1, tau, out=res_proximal_conj_out)
+        print(res_proximal_conj_out.as_array())
+        print(proxc.as_array())
+        numpy.testing.assert_array_almost_equal(proxc.as_array(), res_proximal_conj_out.as_array())
+
+    def test_Rosenbrock(self):
+        f = Rosenbrock (alpha = 1, beta=100)
+        x = VectorData(numpy.asarray([1,1]))
+        assert f(x) == 0.
+        numpy.testing.assert_array_almost_equal( f.gradient(x).as_array(), numpy.zeros(shape=(2,), dtype=numpy.float32))
+    def test_IndicatorBox(self):
+        ig = ImageGeometry(10,10)
+        im = ig.allocate(-1)
+        ib = IndicatorBox(lower=0)
+        a = ib(im)
+        numpy.testing.assert_equal(a, numpy.inf)
+        ib = IndicatorBox(lower=-2)
+        a = ib(im)
+        numpy.testing.assert_array_equal(0, a)
+        ib = IndicatorBox(lower=-5, upper=-2)
+        a = ib(im)
+        numpy.testing.assert_equal(a, numpy.inf)
+
+if __name__ == '__main__':
+    
+    d = TestFunction()
+    d.test_KullbackLeibler()

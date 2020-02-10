@@ -18,7 +18,6 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from __future__ import unicode_literals
 
 import numpy
 import sys
@@ -26,6 +25,32 @@ from datetime import timedelta, datetime
 import warnings
 from functools import reduce
 from numbers import Number
+import ctypes, platform
+from ccpi.utilities import NUM_THREADS
+
+# dll = os.path.abspath(os.path.join( 
+#          os.path.abspath(os.path.dirname(__file__)),
+#          'libfdiff.dll')
+# )
+
+# check for the extension
+if platform.system() == 'Linux':
+    dll = 'libcilacc.so'
+elif platform.system() == 'Windows':
+    dll = 'cilacc.dll'
+elif platform.system() == 'Darwin':
+    dll = 'libcilacc.dylib'
+else:
+    raise ValueError('Not supported platform, ', platform.system())
+
+#print ("dll location", dll)
+cilacc = ctypes.cdll.LoadLibrary(dll)
+
+#default nThreads
+# import multiprocessing
+# cpus = multiprocessing.cpu_count()
+# NUM_THREADS = max(int(cpus/2),1)
+
 
 def find_key(dic, val):
     """return the key of dictionary dic given the value"""
@@ -541,7 +566,12 @@ class DataContainer(object):
                     return VectorData(cleaned)
     
     def fill(self, array, **dimension):
-        '''fills the internal numpy array with the one provided'''
+        '''fills the internal numpy array with the one provided
+        
+        :param array: numpy array to copy into the DataContainer
+        :type array: DataContainer, numpy array or number
+        :param dimension: dictionary, optional
+        '''
         if dimension == {}:
             if issubclass(type(array), DataContainer) or\
                issubclass(type(array), numpy.ndarray):
@@ -554,6 +584,8 @@ class DataContainer(object):
                 else:
                     #self.array[:] = array
                     numpy.copyto(self.array, array)
+            else:
+                self.array.fill(array)
         else:
             
             command = 'self.array['
@@ -794,15 +826,82 @@ class DataContainer(object):
         return self.pixel_wise_binary(numpy.divide, other, *args, **kwargs)
     
     def power(self, other, *args, **kwargs):
-        return self.pixel_wise_binary(numpy.power, other, *args, **kwargs)
-    
+        return self.pixel_wise_binary(numpy.power, other, *args, **kwargs)    
+          
     def maximum(self, x2, *args, **kwargs):
         return self.pixel_wise_binary(numpy.maximum, x2, *args, **kwargs)
     
     def minimum(self,x2, out=None, *args, **kwargs):
         return self.pixel_wise_binary(numpy.minimum, x2=x2, out=out, *args, **kwargs)
 
-    
+    def axpby(self, a, b, y, out, dtype=numpy.float32, num_threads=NUM_THREADS):
+        '''performs axpby with cilacc C library
+        
+        Does the operation .. math:: a*x+b*y and stores the result in out, where x is self
+
+        :param a: scalar
+        :type a: float
+        :param b: scalar
+        :type b: float
+        :param y: DataContainer
+        :param out: DataContainer instance to store the result
+        :param dtype: data type of the DataContainers
+        :type dtype: numpy type, optional, default numpy.float32
+        :param num_threads: number of threads to run on
+        :type num_threads: int, optional, default 1/2 CPU of the system
+        '''
+
+        c_float_p = ctypes.POINTER(ctypes.c_float)
+        c_double_p = ctypes.POINTER(ctypes.c_double)
+        # get the reference to the data
+        ndx = self.as_array()
+        ndy = y.as_array()
+        ndout = out.as_array()
+
+        if ndx.dtype != dtype:
+            ndx = ndx.astype(dtype)
+        if ndy.dtype != dtype:
+            ndy = ndy.astype(dtype)
+        
+        if dtype == numpy.float32:
+            x_p = ndx.ctypes.data_as(c_float_p)
+            y_p = ndy.ctypes.data_as(c_float_p)
+            out_p = ndout.ctypes.data_as(c_float_p)
+            f = cilacc.saxpby
+
+        elif dtype == numpy.float64:
+            ndx = ndx.astype(numpy.float64)
+            b = b.astype(numpy.float64)
+            x_p = ndx.ctypes.data_as(c_double_p)
+            y_p = ndy.ctypes.data_as(c_double_p)
+            out_p = ndout.ctypes.data_as(c_double_p)
+            f = cilacc.daxpby
+        else:
+            raise TypeError('Unsupported type {}. Expecting numpy.float32 or numpy.float64'.format(dtype))
+
+        #out = numpy.empty_like(a)
+
+        
+        # int psaxpby(float * x, float * y, float * out, float a, float b, long size)
+        cilacc.saxpby.argtypes = [ctypes.POINTER(ctypes.c_float),  # pointer to the first array 
+                                  ctypes.POINTER(ctypes.c_float),  # pointer to the second array 
+                                  ctypes.POINTER(ctypes.c_float),  # pointer to the third array 
+                                  ctypes.c_float,                  # type of A (float)
+                                  ctypes.c_float,                  # type of B (float)
+                                  ctypes.c_long,                   # type of size of first array 
+                                  ctypes.c_int]                    # number of threads
+        cilacc.daxpby.argtypes = [ctypes.POINTER(ctypes.c_double), # pointer to the first array 
+                                  ctypes.POINTER(ctypes.c_double), # pointer to the second array 
+                                  ctypes.POINTER(ctypes.c_double), # pointer to the third array 
+                                  ctypes.c_double,                 # type of A (c_double)
+                                  ctypes.c_double,                 # type of B (c_double)
+                                  ctypes.c_long,                   # type of size of first array 
+                                  ctypes.c_int]                    # number of threads
+
+        if f(x_p, y_p, out_p, a, b, ndx.size, num_threads) != 0:
+            raise RuntimeError('axpby execution failed')
+        
+
     ## unary operations
     def pixel_wise_unary(self, pwop, *args,  **kwargs):
         out = kwargs.get('out', None)
@@ -829,6 +928,12 @@ class DataContainer(object):
     def abs(self, *args,  **kwargs):
         return self.pixel_wise_unary(numpy.abs, *args,  **kwargs)
     
+#    def max(self, *args,  **kwargs):
+#        return self.pixel_wise_unary(numpy.max, *args,  **kwargs) 
+#    
+#    def min(self, *args,  **kwargs):
+#        return self.pixel_wise_unary(numpy.min, *args,  **kwargs)     
+    
     def sign(self, *args,  **kwargs):
         return self.pixel_wise_unary(numpy.sign, *args,  **kwargs)
     
@@ -845,6 +950,7 @@ class DataContainer(object):
     def log(self, *args, **kwargs):
         '''Applies log pixel-wise to the DataContainer'''
         return self.pixel_wise_unary(numpy.log, *args, **kwargs)
+    
     #def __abs__(self):
     #    operation = FM.OPERATION.ABS
     #    return self.callFieldMath(operation, None, self.mask, self.maskOnValue)
@@ -887,7 +993,14 @@ class DataContainer(object):
                 return sf
         else:
             raise ValueError('Shapes are not aligned: {} != {}'.format(self.shape, other.shape))
-   
+    
+    def min(self, *args, **kwargs):
+        '''Returns the min pixel value in the DataContainer'''
+        return numpy.min(self.as_array(), *args, **kwargs)
+    
+    def max(self, *args, **kwargs):
+        '''Returns the max pixel value in the DataContainer'''
+        return numpy.max(self.as_array(), *args, **kwargs)
 
     
     
@@ -1542,7 +1655,8 @@ class VectorData(DataContainer):
                 else:
                     raise ValueError('Incompatible size: expecting {} got {}'.format((self.length,), array.shape))
         deep_copy = True
-        super(VectorData, self).__init__(out, deep_copy, None)
+        # need to pass the geometry, othewise None
+        super(VectorData, self).__init__(out, deep_copy, None, geometry = self.geometry)
 
 class VectorGeometry(object):
     '''Geometry describing VectorData to contain 1D array'''
@@ -1579,30 +1693,36 @@ class VectorGeometry(object):
                     numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
                 out.fill(numpy.random.randint(max_value,size=self.shape))
+            elif value is None:
+                pass
             else:
                 raise ValueError('Value {} unknown'.format(value))
         return out
 
     
 if __name__ == "__main__":
+    
+    
+    vg = VectorGeometry(10)    
+    b = vg.allocate('random_int')
 
-    ig = ImageGeometry(voxel_num_x=100, 
-                    voxel_num_y=200, 
-                    voxel_num_z=300, 
-                    voxel_size_x=1, 
-                    voxel_size_y=1, 
-                    voxel_size_z=1, 
-                    center_x=0, 
-                    center_y=0, 
-                    center_z=0, 
-                    channels=50)
-
-    id = ig.allocate(2)
-
-    print(id.geometry)
-    print(id.dimension_labels)
-
-    sid = id.subset(channel = 20)
-
-    print(sid.dimension_labels)
-    print(sid.geometry)
+#    ig = ImageGeometry(voxel_num_x=100, 
+#                    voxel_num_y=200, 
+#                    voxel_num_z=300, 
+#                    voxel_size_x=1, 
+#                    voxel_size_y=1, 
+#                    voxel_size_z=1, 
+#                    center_x=0, 
+#                    center_y=0, 
+#                    center_z=0, 
+#                    channels=50)
+#
+#    id = ig.allocate(2)
+#
+#    print(id.geometry)
+#    print(id.dimension_labels)
+#
+#    sid = id.subset(channel = 20)
+#
+#    print(sid.dimension_labels)
+#    print(sid.geometry)

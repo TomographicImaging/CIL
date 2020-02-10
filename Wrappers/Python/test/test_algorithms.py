@@ -24,7 +24,7 @@ from ccpi.framework import AcquisitionData
 from ccpi.framework import ImageGeometry
 from ccpi.framework import AcquisitionGeometry
 from ccpi.optimisation.operators import Identity
-from ccpi.optimisation.functions import Norm2Sq, ZeroFunction, \
+from ccpi.optimisation.functions import LeastSquares, ZeroFunction, \
    L2NormSquared, FunctionOperatorComposition
 from ccpi.optimisation.algorithms import GradientDescent
 from ccpi.optimisation.algorithms import CGLS
@@ -65,25 +65,74 @@ class TestAlgorithms(unittest.TestCase):
         b = ig.allocate('random')
         identity = Identity(ig)
         
-        norm2sq = Norm2Sq(identity, b)
-        rate = 0.3
+        norm2sq = LeastSquares(identity, b)
         rate = norm2sq.L / 3.
         
         alg = GradientDescent(x_init=x_init, 
                               objective_function=norm2sq, 
-                              rate=rate)
-        alg.max_iteration = 20
-        alg.run(20, verbose=True)
+                              rate=rate, atol=1e-9, rtol=1e-6)
+        alg.max_iteration = 1000
+        alg.run()
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
         alg = GradientDescent(x_init=x_init, 
                               objective_function=norm2sq, 
                               rate=rate, max_iteration=20,
-                              update_objective_interval=2)
+                              update_objective_interval=2,
+                              atol=1e-9, rtol=1e-6)
         alg.max_iteration = 20
         self.assertTrue(alg.max_iteration == 20)
         self.assertTrue(alg.update_objective_interval==2)
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+    def test_GradientDescentArmijo(self):
+        print ("Test GradientDescent")
+        ig = ImageGeometry(12,13,14)
+        x_init = ig.allocate()
+        # b = x_init.copy()
+        # fill with random numbers
+        # b.fill(numpy.random.random(x_init.shape))
+        b = ig.allocate('random')
+        identity = Identity(ig)
+        
+        norm2sq = LeastSquares(identity, b)
+        rate = None
+        
+        alg = GradientDescent(x_init=x_init, 
+                              objective_function=norm2sq, rate=rate)
+        alg.max_iteration = 100
+        alg.run()
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+        alg = GradientDescent(x_init=x_init, 
+                              objective_function=norm2sq, 
+                              max_iteration=20,
+                              update_objective_interval=2)
+        #alg.max_iteration = 20
+        self.assertTrue(alg.max_iteration == 20)
+        self.assertTrue(alg.update_objective_interval==2)
+        alg.run(20, verbose=True)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+    def test_GradientDescentArmijo2(self):
+        from ccpi.optimisation.functions import Rosenbrock
+        from ccpi.framework import VectorData, VectorGeometry
+
+        f = Rosenbrock (alpha = 1., beta=100.)
+        vg = VectorGeometry(2)
+        x = vg.allocate('random_int', seed=2)
+        # x = vg.allocate('random', seed=1) 
+        x.fill(numpy.asarray([10.,-3.]))
+        
+        max_iter = 1000000
+        update_interval = 100000
+
+        alg = GradientDescent(x, f, max_iteration=max_iter, update_objective_interval=update_interval, alpha=1e6)
+        
+        alg.run()
+        
+        print (alg.get_output().as_array(), alg.step_size, alg.kmax, alg.k)
+
+        numpy.testing.assert_array_almost_equal(alg.get_output().as_array(), [1,1], decimal = 1)
+        numpy.testing.assert_array_almost_equal(alg.get_output().as_array(), [0.982744, 0.965725], decimal = 6)
+
     def test_CGLS(self):
         print ("Test CGLS")
         #ig = ImageGeometry(124,153,154)
@@ -149,7 +198,7 @@ class TestAlgorithms(unittest.TestCase):
         identity = Identity(ig)
         
 	    #### it seems FISTA does not work with Nowm2Sq
-        norm2sq = Norm2Sq(identity, b)
+        norm2sq = LeastSquares(identity, b)
         #norm2sq.L = 2 * norm2sq.c * identity.norm()**2
         #norm2sq = FunctionOperatorComposition(L2NormSquared(b=b), identity)
         opt = {'tol': 1e-4, 'memopt':False}
@@ -178,7 +227,7 @@ class TestAlgorithms(unittest.TestCase):
         identity = Identity(ig)
         
 	    #### it seems FISTA does not work with Nowm2Sq
-        norm2sq = Norm2Sq(identity, b)
+        norm2sq = LeastSquares(identity, b)
         print ('Lipschitz', norm2sq.L)
         norm2sq.L = None
         #norm2sq.L = 2 * norm2sq.c * identity.norm()**2
@@ -232,7 +281,7 @@ class TestAlgorithms(unittest.TestCase):
             if noise == 's&p':
                 g = L1Norm(b=noisy_data)
             elif noise == 'poisson':
-                g = KullbackLeibler(noisy_data)
+                g = KullbackLeibler(b=noisy_data)
             elif noise == 'gaussian':
                 g = 0.5 * L2NormSquared(b=noisy_data)
             return noisy_data, alpha, g
@@ -333,36 +382,7 @@ class TestAlgorithms(unittest.TestCase):
 
         # Setup and run the FISTA algorithm
         operator = Gradient(ig)
-        fid = KullbackLeibler(noisy_data)
-
-        def KL_Prox_PosCone(x, tau, out=None):
-                
-            if out is None: 
-                tmp = 0.5 *( (x - fid.bnoise - tau) + ( (x + fid.bnoise - tau)**2 + 4*tau*fid.b   ) .sqrt() )
-                return tmp.maximum(0)
-            else:            
-                tmp =  0.5 *( (x - fid.bnoise - tau) + 
-                            ( (x + fid.bnoise - tau)**2 + 4*tau*fid.b   ) .sqrt()
-                            )
-                x.add(fid.bnoise, out=out)
-                out -= tau
-                out *= out
-                tmp = fid.b * (4 * tau)
-                out.add(tmp, out=out)
-                out.sqrt(out=out)
-                
-                x.subtract(fid.bnoise, out=tmp)
-                tmp -= tau
-                
-                out += tmp
-                
-                out *= 0.5
-                
-                # ADD the constraint here
-                out.maximum(0, out=out)
-                
-        fid.proximal = KL_Prox_PosCone
-
+        fid = KullbackLeibler(b=noisy_data)
         reg = FunctionOperatorComposition(alpha * L2NormSquared(), operator)
 
         x_init = ig.allocate()
@@ -397,5 +417,7 @@ class TestAlgorithms(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    
+    d = TestAlgorithms()
+    d.test_GradientDescentArmijo2()
  

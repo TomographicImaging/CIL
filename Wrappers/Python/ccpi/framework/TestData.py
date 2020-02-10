@@ -18,7 +18,6 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from __future__ import unicode_literals
 
 from ccpi.framework import ImageData, ImageGeometry, DataContainer
 import numpy
@@ -86,7 +85,6 @@ class TestData(object):
             
         else:
             tmp = Image.open(os.path.join(self.data_dir, which))
-            print (tmp)
             bands = tmp.getbands()
             if len(bands) > 1:
                 ig = ImageGeometry(voxel_num_x=size[0], voxel_num_y=size[1], channels=len(bands), 

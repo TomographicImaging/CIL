@@ -30,14 +30,15 @@ class Algorithm(object):
     '''Base class for iterative algorithms
 
       provides the minimal infrastructure.
+
       Algorithms are iterables so can be easily run in a for loop. They will
       stop as soon as the stop cryterion is met.
-      The user is required to implement the set_up, __init__, update and
-      and update_objective methods
+      The user is required to implement the :code:`set_up`, :code:`__init__`, :code:`update` and
+      and :code:`update_objective` methods
       
-      A courtesy method run is available to run n iterations. The method accepts
-      a callback function that receives the current iteration number and the actual objective
-      value and can be used to trigger print to screens and other user interactions. The run
+      A courtesy method :code:`run` is available to run :code:`n` iterations. The method accepts
+      a :code:`callback` function that receives the current iteration number and the actual objective
+      value and can be used to trigger print to screens and other user interactions. The :code:`run`
       method will stop when the stopping cryterion is met. 
    '''
 
@@ -45,14 +46,15 @@ class Algorithm(object):
         '''Constructor
         
         Set the minimal number of parameters:
-            iteration: current iteration number
-            max_iteration: maximum number of iterations
-            memopt: whether to use memory optimisation ()
-            timing: list to hold the times it took to run each iteration
-            update_objectice_interval: the interval every which we would save the current
-                                       objective. 1 means every iteration, 2 every 2 iteration
-                                       and so forth. This is by default 1 and should be increased
+        
+        
+        :param max_iteration: maximum number of iterations
+        :type max_iteration: int, optional, default 0
+        :param update_objectice_interval: the interval every which we would save the current\
+                                       objective. 1 means every iteration, 2 every 2 iteration\
+                                       and so forth. This is by default 1 and should be increased\
                                        when evaluating the objective is computationally expensive.
+        :type update_objective_interval: int, optional, default 1
         '''
         self.iteration = 0
         self.__max_iteration = kwargs.get('max_iteration', 0)
@@ -197,6 +199,10 @@ class Algorithm(object):
                     if verbose:
                         print (self.verbose_output(very_verbose))
                 break
+        if verbose:
+            if self.update_objective_interval != 1:
+                print (self.verbose_output(very_verbose))
+            print ("Stop criterion has been reached.")
 
     def verbose_output(self, verbose=False):
         '''Creates a nice tabulated output'''

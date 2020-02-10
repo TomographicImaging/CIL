@@ -20,7 +20,6 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from __future__ import unicode_literals
 
 from ccpi.optimisation.algorithms import Algorithm
 import numpy
@@ -64,9 +63,9 @@ class CGLS(Algorithm):
     def set_up(self, x_init, operator, data, tolerance=1e-6):
         '''initialisation of the algorithm
 
-        :param operator : Linear operator for the inverse problem
-        :param x_init : Initial guess ( Default x_init = 0)
-        :param data : Acquired data to reconstruct       
+        :param operator: Linear operator for the inverse problem
+        :param x_init: Initial guess ( Default x_init = 0)
+        :param data: Acquired data to reconstruct       
         :param tolerance: Tolerance/ Stopping Criterion to end CGLS algorithm
         '''
         print("{} setting up".format(self.__class__.__name__, ))
@@ -94,6 +93,7 @@ class CGLS(Algorithm):
 
         
     def update(self):
+        '''single iteration'''
         
         self.q = self.operator.direct(self.p)
         delta = self.q.squared_norm()
@@ -121,9 +121,11 @@ class CGLS(Algorithm):
         self.loss.append(a)
         
     def should_stop(self):
+        '''stopping criterion'''
         return self.flag() or self.max_iteration_stop_cryterion()
  
     def flag(self):
+        '''returns whether the tolerance has been reached'''
         flag  = (self.norms <= self.norms0 * self.tolerance) or (self.normx * self.tolerance >= 1)
 
         if flag:

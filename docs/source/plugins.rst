@@ -7,7 +7,6 @@ Operators
 .. autoclass:: ccpi.plugins.operators.CCPiProjectorSimple
    :members:
    :special-members:
-|
 
 Processors
 ==========
@@ -23,7 +22,6 @@ Processors
 .. autoclass:: ccpi.plugins.processors.setupCCPiGeometries
    :members:
    :special-members:
-|
 
 Regularisers
 ============

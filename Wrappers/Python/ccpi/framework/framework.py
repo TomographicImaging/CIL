@@ -398,10 +398,13 @@ class AcquisitionGeometry(object):
         return repres
 
     def generate_subsets(self, number_of_subsets, method):
-        self.number_of_subsets = number_of_subsets
+        
         subsets = AcquisitionGeometrySubsetGenerator.generate_subset(
                         self, 0, number_of_subsets, method) 
+        # store results
         self.subsets = subsets[:]
+        self.subset_id = 0
+        self.number_of_subsets = number_of_subsets
         
         
     def allocate(self, value=0, dimension_labels=None, **kwargs):
@@ -768,7 +771,11 @@ class DataContainer(object):
                             suppress_warning=True )
         else:
             out = self.geometry.allocate(None)
-            out.fill(self.array)
+            if hasattr(self.geometry, 'number_of_subsets') and \
+               self.geometry.number_of_subsets > 1:
+                out.fill(self.array[self.geometry.subsets[self.geometry.subset_id]])
+            else:
+                out.fill(self.array)
             return out
     
     def get_data_axes_order(self,new_order=None):

@@ -232,11 +232,14 @@ class Algorithm(object):
             out = "{:>9} {:>10} {:>13} {:>13} {:>13} {:>15}\n".format('Iter', 
                                                       'Max Iter',
                                                       'Time/Iter',
-                                                      'Primal' , 'Dual', 'Primal-Dual')
+                                                      'Primal' , 'Dual', 
+                                                      'Primal-Dual')
             out += "{:>9} {:>10} {:>13} {:>13} {:>13} {:>15}".format('', 
                                                       '',
                                                       '[s]',
-                                                      'Objective' , 'Objective', 'Gap')
+                                                      'Objective' , 
+                                                      'Objective', 
+                                                      'Gap')
         else:
             out = "{:>9} {:>10} {:>13} {:>20}\n".format('Iter', 
                                                       'Max Iter',
@@ -254,7 +257,8 @@ class StochasticAlgorithm(Algorithm):
         self.epoch = 0
         self.number_of_subsets = kwargs.get('number_of_subsets', 1)
         self.current_subset_id = 0
-        self.update_subset_interval = kwargs.get('update_subset_interval' , 1)
+        self.update_subset_interval = kwargs.get('update_subset_interval',
+                                                 self.number_of_subsets)
         self.max_epoch = self.max_iteration
         
     def update_subset(self):

@@ -84,7 +84,8 @@ nsubs = 10
 step_rate = 0.0002328
 
 data.geometry.generate_subsets(nsubs,'uniform')
-
+b = data.copy()
+print (b.shape)
 #OS_A = AstraSubsetProjectorSimple(ig, data.geometry, device = 'gpu')
 #### Check single steps
 #

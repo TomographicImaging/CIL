@@ -70,7 +70,7 @@ if (BUILD_PYTHON_WRAPPER)
                         COMMAND ${CMAKE_COMMAND} -E env PREFIX=${CMAKE_SOURCE_DIR}/src/
                                                         LIBRARY_INC=${CMAKE_SOURCE_DIR}/src/include
                                                         LIBRARY_LIB=${CMAKE_BINARY_DIR}/
-                                                        ${PYTHON_EXECUTABLE} ${SETUP_PY} build_py
+                                                        ${PYTHON_EXECUTABLE} ${SETUP_PY} build_py --build-lib ${CMAKE_CURRENT_BINARY_DIR}/build/lib/
                         COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT}
                         DEPENDS cilacc
                         )

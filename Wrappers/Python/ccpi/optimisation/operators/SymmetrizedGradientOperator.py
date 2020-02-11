@@ -18,8 +18,6 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from __future__ import unicode_literals
-
 
 from ccpi.optimisation.operators import LinearOperator
 from ccpi.framework import BlockGeometry, BlockDataContainer
@@ -30,27 +28,35 @@ class SymmetrizedGradient(LinearOperator):
     
     r'''Symmetrized Gradient Operator:  E: V -> W
         
-            V : range of the Gradient Operator
-            W : range of the Symmetrized Gradient          
+        V : range of the Gradient Operator
+        W : range of the Symmetrized Gradient          
+
+        Example (2D): 
         
-            Example (2D): 
-            .. math::
-               v = (v1, v2), 
+        .. math::
+            v = (v1, v2) \\
+        
+            Ev = 0.5 * ( \nabla\cdot v + (\nabla\cdot c)^{T} ) \\
             
-                           Ev = 0.5 * ( \nabla\cdot v + (\nabla\cdot c)^{T} )
-                           
-                           \begin{matrix} 
-                               \partial_{y} v1 & 0.5 * (\partial_{x} v1 + \partial_{y} v2) \\
-                               0.5 * (\partial_{x} v1 + \partial_{y} v2) & \partial_{x} v2 
-                           \end{matrix}
-              |                                                      
+            \begin{matrix} 
+                \partial_{y} v1 & 0.5 * (\partial_{x} v1 + \partial_{y} v2) \\
+                0.5 * (\partial_{x} v1 + \partial_{y} v2) & \partial_{x} v2 
+            \end{matrix}
+                                                                  
     '''
     
     CORRELATION_SPACE = "Space"
     CORRELATION_SPACECHANNEL = "SpaceChannels"
     
     def __init__(self, gm_domain, bnd_cond = 'Neumann', **kwargs):
+        '''creator
         
+        :param gm_domain: domain of the operator
+        :param bnd_cond: boundary condition, either :code:`Neumann` or :code:`Periodic`.
+        :type bnd_cond: str, optional, default :code:`Neumann`
+        :param correlation: :code:`SpaceChannel` or :code:`Channel`
+        :type correlation: str, optional, default :code:`Channel`
+        '''
         super(SymmetrizedGradient, self).__init__() 
                 
         self.gm_domain = gm_domain

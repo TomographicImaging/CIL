@@ -21,32 +21,58 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from __future__ import unicode_literals
 
 from ccpi.optimisation.functions import Function
-from ccpi.optimisation.functions.ScaledFunction import ScaledFunction
 
 class L2NormSquared(Function):
     
-    r'''L2NormSquared function: 
-            
-            Cases considered (with/without data):            
-                a) .. math:: f(x) = \|x\|^{2}_{2} 
-                b) .. math:: f(x) = \|\|x - b\|\|^{2}_{2}
-                                
-    '''    
+    r""" L2NormSquared function: :math:`F(x) = \| x\|^{2}_{2} = \underset{i}{\sum}x_{i}^{2}`
+          
+    Following cases are considered:
+                
+        a) :math:`F(x) = \|x\|^{2}_{2}`
+        b) :math:`F(x) = \|x - b\|^{2}_{2}`
+        
+    .. note::  For case b) case we can use :code:`F = L2NormSquared().centered_at(b)`,
+               see *TranslateFunction*.
+        
+    :Example:
+        
+        >>> F = L2NormSquared()
+        >>> F = L2NormSquared(b=b) 
+        >>> F = L2NormSquared().centered_at(b)
+                                                          
+    """    
     
     def __init__(self, **kwargs):
-                                
-        super(L2NormSquared, self).__init__()
+        '''creator
+
+        Cases considered (with/without data):            
+                a) .. math:: f(x) = \|x\|^{2}_{2} 
+                b) .. math:: f(x) = \|\|x - b\|\|^{2}_{2}
+
+        :param b:  translation of the function
+        :type b: :code:`DataContainer`, optional
+        '''                        
+        super(L2NormSquared, self).__init__(L = 2)
         self.b = kwargs.get('b',None) 
         
-        # Lipschitz constant
-        self.L = 2
-
+        #if self.b is not None:
+        #    self.domain = self.b.geometry  
+                            
     def __call__(self, x):
+
+        r"""Returns the value of the L2NormSquared function at x.
         
-        '''Evaluates L2NormSquared at x'''
+        Following cases are considered:
+            
+            a) :math:`F(x) = \|x\|^{2}_{2}`
+            b) :math:`F(x) = \|x - b\|^{2}_{2}`
+    
+        :param: :math:`x`
+        :returns: :math:`\underset{i}{\sum}x_{i}^{2}`
+                
+        """          
             
         y = x
         if self.b is not None: 
@@ -59,7 +85,14 @@ class L2NormSquared(Function):
                 
     def gradient(self, x, out=None):        
         
-        '''Evaluates gradient of L2NormSquared at x'''
+        r"""Returns the value of the gradient of the L2NormSquared function at x.
+        
+        Following cases are considered:
+                
+            a) :math:`F'(x) = 2x`
+            b) :math:`F'(x) = 2(x-b)`
+                
+        """
                 
         if out is not None:
             
@@ -78,23 +111,34 @@ class L2NormSquared(Function):
                                                        
     def convex_conjugate(self, x):
         
-        '''Convex conjugate of L2NormSquared at x'''
+        r"""Returns the value of the convex conjugate of the L2NormSquared function at x.
         
+        Consider the following cases:
+                
+                a) .. math:: F^{*}(x^{*}) = \frac{1}{4}\|x^{*}\|^{2}_{2} 
+                b) .. math:: F^{*}(x^{*}) = \frac{1}{4}\|x^{*}\|^{2}_{2} + <x^{*}, b>
+                
+        """                
         tmp = 0
         
         if self.b is not None:
-            tmp = x.dot(self.b) #(x * self.b).sum()
+            tmp = x.dot(self.b) 
             
         return (1./4.) * x.squared_norm() + tmp
 
 
     def proximal(self, x, tau, out = None):
-
-        r'''Proximal operator of L2NormSquared at x
-            
-            .. math:: prox_{\tau * f}(x)
-        '''          
         
+        r"""Returns the value of the proximal operator of the L2NormSquared function at x.
+        
+        
+        Consider the following cases:
+                
+                a) .. math:: \mathrm{prox}_{\tau F}(x) = \frac{x}{1+2\tau}
+                b) .. math:: \mathrm{prox}_{\tau F}(x) = \frac{x-b}{1+2\tau} + b      
+                        
+        """            
+
         if out is None:
             
             if self.b is None:
@@ -114,33 +158,23 @@ class L2NormSquared(Function):
                 x.divide((1+2*tau), out=out)
 
     
-    def proximal_conjugate(self, x, tau, out=None):
-        
-        r'''Proximal operator of the convex conjugate of L2NormSquared at x:
-           
-           .. math::  prox_{\tau * f^{*}}(x)'''
-        
-        if out is None:
-            if self.b is not None:
-                return (x - tau*self.b)/(1 + tau/2) 
-            else:
-                return x/(1 + tau/2)
-        else:
-            if self.b is not None:
-                x.subtract(tau*self.b, out=out)
-                out.divide(1+tau/2, out=out)
-            else:
-                x.divide(1 + tau/2, out=out)
-                                        
-    def __rmul__(self, scalar):
-        
-        '''Multiplication of L2NormSquared with a scalar        
-           
-           Returns: ScaledFunction'''
-        
-        return ScaledFunction(self, scalar)  
-
-
+#    def proximal_conjugate(self, x, tau, out=None):
+#        
+#        r'''Proximal operator of the convex conjugate of L2NormSquared at x:
+#           
+#           .. math::  prox_{\tau * f^{*}}(x)'''
+#        
+#        if out is None:
+#            if self.b is not None:
+#                return (x - tau*self.b)/(1 + tau/2) 
+#            else:
+#                return x/(1 + tau/2)
+#        else:
+#            if self.b is not None:
+#                x.subtract(tau*self.b, out=out)
+#                out.divide(1+tau/2, out=out)
+#            else:
+#                x.divide(1 + tau/2, out=out)                                        
 
 if __name__ == '__main__':
     
@@ -148,7 +182,7 @@ if __name__ == '__main__':
     import numpy
     # TESTS for L2 and scalar * L2
     
-    M, N, K = 20,30,50
+    M, N, K = 2,3,1
     ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N, voxel_num_z = K)
     u = ig.allocate('random_int')
     b = ig.allocate('random_int') 
@@ -161,12 +195,14 @@ if __name__ == '__main__':
     numpy.testing.assert_equal(f(u), u.squared_norm())
 
     # check grad/call with data
+    
+    igggg = ImageGeometry(4,4)
     f1 = L2NormSquared(b=b)
     b1 = f1.gradient(u)
     b2 = 2 * (u-b)
         
     numpy.testing.assert_array_almost_equal(b1.as_array(), b2.as_array(), decimal=4)
-    numpy.testing.assert_equal(f1(u), (u-b).squared_norm())
+    numpy.testing.assert_equal(f1(u), ((u-b)).squared_norm())
     
     #check convex conjuagate no data
     c1 = f.convex_conjugate(u)

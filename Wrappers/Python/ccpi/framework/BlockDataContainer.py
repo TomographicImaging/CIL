@@ -18,12 +18,12 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from __future__ import unicode_literals
 
 import numpy
 from numbers import Number
 import functools
 from ccpi.framework import DataContainer
+from ccpi.utilities import NUM_THREADS
 #from ccpi.framework import AcquisitionData, ImageData
 #from ccpi.optimisation.operators import Operator, LinearOperator
 
@@ -51,17 +51,22 @@ class BlockDataContainer(object):
     A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]
     
     '''
-    ADD = 'add'
+    ADD      = 'add'
     SUBTRACT = 'subtract'
     MULTIPLY = 'multiply'
-    DIVIDE = 'divide'
-    POWER = 'power'
+    DIVIDE   = 'divide'
+    POWER    = 'power'
+    AXPBY    = 'axpby'
     __array_priority__ = 1
     __container_priority__ = 2
     def __init__(self, *args, **kwargs):
         ''''''
         self.containers = args
-        self.index = 0
+        self.index = 0        
+        self.geometry = None
+        #if len(set([i.shape for i in self.containers])):
+        #    self.geometry = self.containers[0].geometry
+                
         shape = kwargs.get('shape', None)
         if shape is None:
            shape = (len(args),1)
@@ -170,7 +175,22 @@ class BlockDataContainer(object):
             self.binary_operations(BlockDataContainer.DIVIDE, other, *args, **kwargs)
         else:
             return self.binary_operations(BlockDataContainer.DIVIDE, other, *args, **kwargs)
-    
+    def axpby(self, a, b, y, out, dtype=numpy.float32, num_threads = NUM_THREADS):
+        r'''performs axpby element-wise on the BlockDataContainer containers
+        
+        Does the operation .. math:: a*x+b*y and stores the result in out, where x is self
+
+        :param a: scalar
+        :param b: scalar
+        :param y: compatible (Block)DataContainer
+        :param out: (Block)DataContainer to store the result
+        :param dtype: optional, data type of the DataContainers
+        '''
+        if out is None:
+            raise ValueError("out container cannot be None")
+        kwargs = {'a':a, 'b':b, 'out':out, 'dtype': dtype, 'num_threads': NUM_THREADS}
+        self.binary_operations(BlockDataContainer.AXPBY, y, **kwargs)
+
 
     def binary_operations(self, operation, other, *args, **kwargs):
         '''Algebra: generic method of algebric operation with BlockDataContainer with number/DataContainer or BlockDataContainer
@@ -231,11 +251,19 @@ class BlockDataContainer(object):
                     op = el.divide
                 elif operation == BlockDataContainer.POWER:
                     op = el.power
+                elif operation == BlockDataContainer.AXPBY:
+                    if not isinstance(other, BlockDataContainer):
+                        raise ValueError("{} cannot handle {}".format(operation, type(other)))
+                    op = el.axpby
                 else:
                     raise ValueError('Unsupported operation', operation)
                 if out is not None:
                     kw['out'] = out.get_item(i)
-                    op(ot, *args, **kw)
+                    if operation == BlockDataContainer.AXPBY:
+                        kw['y'] = ot
+                        el.axpby(kw['a'], kw['b'], kw['y'], kw['out'], kw['dtype'], kw['num_threads'])
+                    else:
+                        op(ot, *args, **kw)
                 else:
                     res.append(op(ot, *args, **kw))
             if out is not None:
@@ -246,6 +274,12 @@ class BlockDataContainer(object):
         else:
             # try to do algebra with one DataContainer. Will raise error if not compatible
             kw = kwargs.copy()
+            if operation != BlockDataContainer.AXPBY:
+                # remove keyworded argument related to AXPBY
+                for k in ['a','b','y', 'num_threads', 'dtype']:
+                    if k in kw.keys():
+                        kw.pop(k)
+                
             res = []
             for i,el in enumerate(self.containers):
                 if operation == BlockDataContainer.ADD:
@@ -258,6 +292,12 @@ class BlockDataContainer(object):
                     op = el.divide
                 elif operation == BlockDataContainer.POWER:
                     op = el.power
+                elif operation == BlockDataContainer.AXPBY:
+                    # As out cannot be None, it is safe to continue the 
+                    # for loop after the call to axpby
+                    kw['out'] = out.get_item(i)
+                    el.axpby(kw['a'], kw['b'], other, kw['out'], kw['dtype'], kw['num_threads'])
+                    continue
                 else:
                     raise ValueError('Unsupported operation', operation)
                 if out is not None:
@@ -330,8 +370,9 @@ class BlockDataContainer(object):
                         
         if p==1:            
             return sum(self.abs())        
-        elif p==2:                    
-            return sum([el*el for el in self.containers]).sqrt()
+        elif p==2:                 
+            tmp = functools.reduce(lambda a,b: a + b*b, self.containers, self.get_item(0) * 0 ).sqrt()            
+            return tmp      
         else:
             return ValueError('Not implemented')
                 
@@ -507,26 +548,32 @@ if __name__ == '__main__':
     import numpy
 
     N, M = 2, 3
-    ig = ImageGeometry(N, M)    
-    BG = BlockGeometry(ig, ig)
+    ig = ImageGeometry(N, M) 
+    
+    ig1 = ImageGeometry(2*N, 4*M) 
+    BG = BlockGeometry(ig, ig1)
     
     U = BG.allocate('random_int')
     V = BG.allocate('random_int')
     
+    print(U.geometry)
     
-    print ("test sum BDC " )
-    w = U[0].as_array() + U[1].as_array()    
-    w1 = sum(U).as_array()    
-    numpy.testing.assert_array_equal(w, w1)
+    print(len(set([i.shape for i in U.containers]))==1)
     
-    print ("test sum BDC " )
-    z = numpy.sqrt(U[0].as_array()**2 + U[1].as_array()**2)
-    z1 = sum(U**2).sqrt().as_array()    
-    numpy.testing.assert_array_equal(z, z1)   
     
-    z2 = U.pnorm(2)
-    
-    zzz = U.dot(V)
+#    print ("test sum BDC " )
+#    w = U[0].as_array() + U[1].as_array()    
+#    w1 = sum(U).as_array()    
+#    numpy.testing.assert_array_equal(w, w1)
+#    
+#    print ("test sum BDC " )
+#    z = numpy.sqrt(U[0].as_array()**2 + U[1].as_array()**2)
+#    z1 = sum(U**2).sqrt().as_array()    
+#    numpy.testing.assert_array_equal(z, z1)   
+#    
+#    z2 = U.pnorm(2)
+#    
+#    zzz = U.dot(V)
     
    
 

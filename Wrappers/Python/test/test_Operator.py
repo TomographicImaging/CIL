@@ -658,13 +658,6 @@ class TestBlockOperator(unittest.TestCase):
 class TestOperatorCompositionSum(unittest.TestCase):
     def setUp(self):
         
-        
-
-        # data_dir = os.path.abspath(
-        #     os.path.join(os.environ['SIRF_INSTALL_PATH'], 'share','ccpi')
-        # )
-
-        # self.data = TestData(data_dir=data_dir).load(TestData.BOAT, size=(128,128))
         self.data = TestData().load(TestData.BOAT, size=(128,128))
         self.ig = self.data.geometry
 

@@ -407,9 +407,9 @@ class CompositionOperator(Operator):
                                             self.operators, True)
         self.preallocate = kwargs.get('preallocate', False)
         if self.preallocate:
-            # self.tmp_domain = [op.domain_geometry().allocate() for op in self.operators]
-            # self.tmp_range = [op.range_geometry().allocate() for op in self.operators]
-            pass
+            self.tmp_domain = [op.domain_geometry().allocate() for op in self.operators[:-1]]
+            self.tmp_range = [op.range_geometry().allocate() for op in self.operators[1:]]
+            # pass
         
         # TODO address the equality of geometries
         # if self.operator2.range_geometry() != self.operator1.domain_geometry():
@@ -445,18 +445,21 @@ class CompositionOperator(Operator):
             # )
             
             # TODO this is a bit silly but will handle the pre allocation later
+            
             for i,operator in enumerate(self.operators[::-1]):
                 if i == 0:
-                    step = operator.direct(x)
+                    operator.direct(x, out=self.tmp_range[i])
+                elif i == len(self.operators) - 1:
+                    operator.direct(self.tmp_range[i-1], out=out)
                 else:
-                    step = operator.direct(step)
-            out.fill( step )    
+                    operator.direct(self.tmp_range[i-1], out=self.tmp_range[i])
+            
             
     def adjoint(self, x, out = None):
         
         if self.linear_flag: 
             
-            if out is None:
+            if out is not None:
                 # return self.operator2.adjoint(self.operator1.adjoint(x))
                 # return functools.reduce(lambda X,operator: operator.adjoint(X), 
                 #                    self.operators[1:],
@@ -464,10 +467,12 @@ class CompositionOperator(Operator):
 
                 for i,operator in enumerate(self.operators):
                     if i == 0:
-                        step = operator.adjoint(x)
+                        operator.adjoint(x, out=self.tmp_domain[i])
+                    elif i == len(self.operators) - 1:
+                        step = operator.adjoint(self.tmp_domain[i-1], out=out)
                     else:
-                        step = operator.adjoint(step)
-                return step
+                        operator.adjoint(self.tmp_domain[i-1], out=self.tmp_domain[i])
+                return
 
             else:
                 for i,operator in enumerate(self.operators):
@@ -476,7 +481,7 @@ class CompositionOperator(Operator):
                     else:
                         step = operator.adjoint(step)
                 
-                out.fill( step )
+                return step
         else:
             raise ValueError('No adjoint operation with non-linear operators')
             

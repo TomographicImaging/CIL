@@ -248,14 +248,6 @@ class Gradient_numpy(LinearOperator):
         
         return self.gm_range
     
-    def __rmul__(self, scalar):
-        
-        '''Multiplication of Gradient with a scalar        
-            
-            Returns: ScaledOperator
-        '''        
-        
-        return ScaledOperator(self, scalar) 
     
     ###########################################################################
     ###############  For preconditioning ######################################

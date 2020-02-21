@@ -750,7 +750,25 @@ class TestOperatorCompositionSum(unittest.TestCase):
         numpy.testing.assert_array_almost_equal(d2g.get_item(1).as_array(),
                                                 2 * d_out.get_item(1).as_array())
 
+    def test_CompositionOperator_direct4(self):
+        ig = self.ig
+        data = self.data
+        G = Gradient(domain_geometry=ig)
+        
 
+        Id1 = 2 * Identity(ig)
+        Id2 = Identity(ig)
+        
+        d = CompositionOperator(G, Id1, Id2)
+
+        out1 = G.direct(data)
+        
+        d_out = d.direct(data)
+
+        numpy.testing.assert_array_almost_equal(d_out.get_item(0).as_array(),
+                                                2 * out1.get_item(0).as_array())
+        numpy.testing.assert_array_almost_equal(d_out.get_item(1).as_array(),
+                                                2 * out1.get_item(1).as_array())
 
     def test_CompositionOperator_adjoint1(self):
         ig = self.ig
@@ -869,6 +887,27 @@ class TestOperatorCompositionSum(unittest.TestCase):
 
         numpy.testing.assert_array_almost_equal(out2.get_item(0).as_array(),  out1.get_item(0).as_array())
         numpy.testing.assert_array_almost_equal(out2.get_item(1).as_array(),  out1.get_item(1).as_array())
+    
+    def test_CompositionOperator_adjoint7(self):
+        ig = self.ig
+        data = self.data
+        G = Gradient(domain_geometry=ig)
+        
+
+        Id1 = 2 * Identity(ig)
+        Id2 = Identity(ig)
+        
+        d = CompositionOperator(G, Id1, Id2)
+
+        out1 = G.direct(data)
+        out2 = G.adjoint(out1)
+        
+        d_out = d.adjoint(out1)
+
+        numpy.testing.assert_array_almost_equal(d_out.as_array(),
+                                                2 * out2.as_array())
+        numpy.testing.assert_array_almost_equal(d_out.as_array(),
+                                                2 * out2.as_array())
 
 
     

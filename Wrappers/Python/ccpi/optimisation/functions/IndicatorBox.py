@@ -19,7 +19,6 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from __future__ import unicode_literals
 
 from ccpi.optimisation.functions import Function
 import numpy
@@ -30,20 +29,25 @@ class IndicatorBox(Function):
     r'''Indicator function for box constraint
             
       .. math:: 
-         f(x) = \mathbb{I}_{[a, b]} = \begin{cases}
-            
-                                            0, if x\in[a, b]
-                                            \infty, otherwise                            
-                                    \end{cases}
+         
+         f(x) = \mathbb{I}_{[a, b]} = \begin{cases}  
+                                            0, \text{ if } x \in [a, b] \\
+                                            \infty, \text{otherwise}
+                                     \end{cases}
     
     '''
     
     def __init__(self,lower=-numpy.inf,upper=numpy.inf):
+        '''creator
 
+        :param lower: lower bound
+        :type lower: float, default = :code:`-numpy.inf`
+        :param upper: upper bound
+        :type upper: float, optional, default = :code:`numpy.inf`
+        '''
         super(IndicatorBox, self).__init__()
         self.lower = lower
         self.upper = upper
-        
 
     def __call__(self,x):
         

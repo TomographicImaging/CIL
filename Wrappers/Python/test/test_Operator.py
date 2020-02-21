@@ -16,14 +16,13 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 import unittest
-from ccpi.framework import ImageGeometry, ImageData, BlockDataContainer, DataContainer
+from ccpi.framework import ImageGeometry, VectorGeometry, ImageData, BlockDataContainer, DataContainer
 from ccpi.optimisation.operators import BlockOperator, BlockScaledOperator,\
     FiniteDiff, SymmetrizedGradient
 import numpy
 from timeit import default_timer as timer
-from ccpi.framework import ImageGeometry
 from ccpi.optimisation.operators import Gradient, Identity, SparseFiniteDiff
-from ccpi.optimisation.operators import LinearOperator
+from ccpi.optimisation.operators import LinearOperator, LinearOperatorMatrix
 
 
 def dt(steps):
@@ -66,6 +65,39 @@ class CCPiTestClass(unittest.TestCase):
 
 
 class TestOperator(CCPiTestClass):
+    
+    def test_LinearOperatorMatrix(self):
+        
+        print('Check LinearOperatorMatrix')
+                
+        m = 30
+        n = 20
+        
+        vg = VectorGeometry(n)
+        
+        Amat = numpy.random.randn(m, n)
+        A = LinearOperatorMatrix(Amat)
+        
+        b = vg.allocate('random')
+        
+        out1 = A.range_geometry().allocate()
+        out2 = A.domain_geometry().allocate()
+        
+        res1 = A.direct(b)
+        res2 = numpy.dot(A.A, b.as_array())
+        self.assertNumpyArrayAlmostEqual(res1.as_array(), res2)
+            
+        A.direct(b, out = out1)
+        self.assertNumpyArrayAlmostEqual(res1.as_array(), out1.as_array(), decimal=4)
+        
+        res3 = A.adjoint(res1)
+        res4 = numpy.dot(A.A.transpose(),res1.as_array())
+        self.assertNumpyArrayAlmostEqual(res3.as_array(), res4, decimal=4)   
+        
+        A.adjoint(res1, out = out2)
+        self.assertNumpyArrayAlmostEqual(res3.as_array(), out2.as_array(), decimal=4)        
+    
+    
     def test_ScaledOperator(self):
         print ("test_ScaledOperator")
         ig = ImageGeometry(10,20,30)
@@ -159,6 +191,7 @@ class TestOperator(CCPiTestClass):
     def test_Norm(self):
         print ("test_BlockOperator")
         ##
+        numpy.random.seed(1)
         N, M = 200, 300
 
         ig = ImageGeometry(N, M)
@@ -168,8 +201,26 @@ class TestOperator(CCPiTestClass):
         t1 = timer()
         norm2 = G.norm()
         t2 = timer()
-        print ("Norm dT1 {} dT2 {}".format(t1-t0,t2-t1))
+        norm3 = G.norm(force=True)
+        t3 = timer()
+        print ("Norm dT1 {} dT2 {} dT3 {}".format(t1-t0,t2-t1, t3-t2))
         self.assertLess(t2-t1, t1-t0)
+        self.assertLess(t2-t1, t3-t2)
+
+        numpy.random.seed(1)
+        t4 = timer()
+        norm4 = G.norm(iterations=50, force=True)
+        t5 = timer()
+        self.assertLess(t2-t1, t5-t4)
+
+        numpy.random.seed(1)
+        t4 = timer()
+        norm5 = G.norm(x_init=ig.allocate('random'), iterations=50, force=True)
+        t5 = timer()
+        self.assertLess(t2-t1, t5-t4)
+        for n in [norm, norm2, norm3, norm4, norm5]:
+            print ("norm {}", format(n))
+
 
 class TestGradients(CCPiTestClass): 
     def setUp(self):
@@ -269,9 +320,22 @@ class TestGradients(CCPiTestClass):
         lhs3 = E3.direct(u3).dot(w3)
         rhs3 = u3.dot(E3.adjoint(w3))
         numpy.testing.assert_almost_equal(lhs3, rhs3)  
+        self.assertAlmostEqual(lhs3, rhs3)
+        print (lhs3, rhs3, abs((rhs3-lhs3)/rhs3) , 1.5 * 10**(-4), abs((rhs3-lhs3)/rhs3) < 1.5 * 10**(-4))
+        self.assertTrue( LinearOperator.dot_test(E3, range_init = w3, domain_init=u3) )
+    def test_dot_test(self):
+        Grad3 = Gradient(self.ig3, correlation = 'Space', backend='numpy')
+             
         # self.assertAlmostEqual(lhs3, rhs3)
-        # self.assertTrue( LinearOperator.dot_test(E3) )
+        self.assertTrue( LinearOperator.dot_test(Grad3 , verbose=True))
+        self.assertTrue( LinearOperator.dot_test(Grad3 , decimal=6, verbose=True))
 
+    def test_dot_test2(self):
+        Grad3 = Gradient(self.ig3, correlation = 'SpaceChannel', backend='c')
+             
+        # self.assertAlmostEqual(lhs3, rhs3)
+        self.assertTrue( LinearOperator.dot_test(Grad3 , verbose=True))
+        self.assertTrue( LinearOperator.dot_test(Grad3 , decimal=6, verbose=True))
 
 
 
@@ -494,12 +558,13 @@ class TestBlockOperator(unittest.TestCase):
             print("Z1", Z1[0][1].as_array())
             print("RES1", RES1[0][1].as_array())
     def test_timedifference(self):
+
         print ("test_timedifference")
         M, N ,W = 100, 512, 512
         ig = ImageGeometry(M, N, W)
         arr = ig.allocate('random_int')  
         
-        G = Gradient(ig)
+        G = Gradient(ig, backend='numpy')
         Id = Identity(ig)
         
         B = BlockOperator(G, Id)

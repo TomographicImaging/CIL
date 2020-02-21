@@ -20,59 +20,94 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from __future__ import unicode_literals
 
-from ccpi.optimisation.functions import Function
-from ccpi.optimisation.functions.ScaledFunction import ScaledFunction        
+from ccpi.optimisation.functions import Function       
 from ccpi.optimisation.operators import ShrinkageOperator 
+import numpy as np
  
 
 class L1Norm(Function):
     
-    r'''L1Norm function: 
+    r"""L1Norm function
             
-            Cases considered (with/without data):            
-                a) .. math:: f(x) = ||x||_{1}
-                b) .. math:: f(x) = ||x - b||_{1}
+        Consider the following cases:           
+            a) .. math:: F(x) = ||x||_{1}
+            b) .. math:: F(x) = ||x - b||_{1}
                                 
-    '''   
+    """   
            
     def __init__(self, **kwargs):
-        
+        '''creator
+
+        Cases considered (with/without data):            
+        a) :math:`f(x) = ||x||_{1}`
+        b) :math:`f(x) = ||x - b||_{1}`
+
+        :param b: translation of the function
+        :type b: :code:`DataContainer`, optional
+        '''
         super(L1Norm, self).__init__()
         self.b = kwargs.get('b',None)
         self.shinkage_operator = ShrinkageOperator()
         
     def __call__(self, x):
         
-        '''Evaluates L1Norm at x'''
+        r"""Returns the value of the L1Norm function at x.
+        
+        Consider the following cases:           
+            a) .. math:: F(x) = ||x||_{1}
+            b) .. math:: F(x) = ||x - b||_{1}        
+        
+        """
         
         y = x
         if self.b is not None: 
             y = x - self.b
         return y.abs().sum()  
-    
-    def gradient(self,x):
-        
-        return ValueError('Not Differentiable')   
-    
+          
     def convex_conjugate(self,x):
         
-        '''Convex conjugate of L1Norm at x'''
-
-        y = 0        
-        if self.b is not None:
-            y =  0 + self.b.dot(x)
-        return y  
+        r"""Returns the value of the convex conjugate of the L1Norm function at x.
+        Here, we need to use the convex conjugate of L1Norm, which is the Indicator of the unit 
+        :math:`L^{\infty}` norm
+        
+        Consider the following cases:
+                
+                a) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*}) 
+                b) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*}) + <x^{*},b>      
+        
     
+        .. math:: \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*}) 
+            = \begin{cases} 
+            0, \mbox{if } \|x^{*}\|_{\infty}\leq1\\
+            \infty, \mbox{otherwise}
+            \end{cases}
+    
+        """        
+        tmp = (np.abs(x.as_array()).max() - 1)
+        if tmp<=1e-5:            
+            if self.b is not None:
+                return self.b.dot(x)
+            else:
+                return 0.
+        return np.inf        
+                    
     def proximal(self, x, tau, out=None):
         
-        r'''Proximal operator of L1Norm at x
-           
-           ..math::     prox_{\tau * f}(x)
-                
-        ''' 
+        r"""Returns the value of the proximal operator of the L1Norm function at x.
         
+        
+        Consider the following cases:
+                
+                a) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x)
+                b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) + b   
+    
+        where,
+        
+        .. math :: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) = sgn(x) * \max\{ |x| - \tau, 0 \}
+                            
+        """  
+            
         if out is None:
             if self.b is not None:
                 return self.b + self.shinkage_operator(x - self.b, tau)
@@ -84,33 +119,33 @@ class L1Norm(Function):
             else:
                 out.fill(self.shinkage_operator(x, tau))
                                     
-    def proximal_conjugate(self, x, tau, out=None):
-        
-        r'''Proximal operator of the convex conjugate of L1Norm at x:
-                
-            .. math:: prox_{\tau * f^{*}}(x)
-                
-        '''          
-        
-        if out is None:
-            if self.b is not None:
-                return (x - tau*self.b).divide((x - tau*self.b).abs().maximum(1.0))
-            else:
-                return x.divide(x.abs().maximum(1.0))
-        else:
-            if self.b is not None:
-                out.fill((x - tau*self.b).divide((x - tau*self.b).abs().maximum(1.0)))
-            else:
-                out.fill(x.divide(x.abs().maximum(1.0)) )                
+#    def proximal_conjugate(self, x, tau, out=None):
+#        
+#        r'''Proximal operator of the convex conjugate of L1Norm at x:
+#                
+#            .. math:: prox_{\tau * f^{*}}(x)
+#                
+#        '''          
+#        
+#        if out is None:
+#            if self.b is not None:
+#                return (x - tau*self.b).divide((x - tau*self.b).abs().maximum(1.0))
+#            else:
+#                return x.divide(x.abs().maximum(1.0))
+#        else:
+#            if self.b is not None:
+#                out.fill((x - tau*self.b).divide((x - tau*self.b).abs().maximum(1.0)))
+#            else:
+#                out.fill(x.divide(x.abs().maximum(1.0)) )                
             
-    def __rmul__(self, scalar):
-        
-        '''Multiplication of L2NormSquared with a scalar        
-            
-            Returns: ScaledFunction
-        '''
-        
-        return ScaledFunction(self, scalar)
+#    def __rmul__(self, scalar):
+#        
+#        '''Multiplication of L2NormSquared with a scalar        
+#            
+#            Returns: ScaledFunction
+#        '''
+#        
+#        return ScaledFunction(self, scalar)
 
 
 if __name__ == '__main__':   

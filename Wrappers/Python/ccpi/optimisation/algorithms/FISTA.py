@@ -20,7 +20,7 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from __future__ import unicode_literals
+
 
 from ccpi.optimisation.algorithms import Algorithm
 from ccpi.optimisation.functions import ZeroFunction
@@ -40,9 +40,9 @@ class FISTA(Algorithm):
     
     Parameters :
         
-      :parameter x_init : Initial guess ( Default x_init = 0)
-      :parameter f : Differentiable function
-      :parameter g : Convex function with " simple " proximal operator
+      :param x_init: Initial guess ( Default x_init = 0)
+      :param f: Differentiable function
+      :param g: Convex function with " simple " proximal operator
 
 
     Reference:
@@ -60,9 +60,11 @@ class FISTA(Algorithm):
         initialisation can be done at creation time if all 
         proper variables are passed or later with set_up
         
-        :param x_init : Initial guess ( Default x_init = 0)
-        :param f : Differentiable function
-        :param g : Convex function with " simple " proximal operator'''
+        Optional parameters:
+
+        :param x_init: Initial guess ( Default x_init = 0)
+        :param f: Differentiable function
+        :param g: Convex function with " simple " proximal operator'''
         
         super(FISTA, self).__init__(**kwargs)
         
@@ -72,9 +74,9 @@ class FISTA(Algorithm):
     def set_up(self, x_init, f, g=ZeroFunction()):
         '''initialisation of the algorithm
 
-        :param x_init : Initial guess ( Default x_init = 0)
-        :param f : Differentiable function
-        :param g : Convex function with " simple " proximal operator'''
+        :param x_init: Initial guess ( Default x_init = 0)
+        :param f: Differentiable function
+        :param g: Convex function with " simple " proximal operator'''
 
         print("{} setting up".format(self.__class__.__name__, ))
         

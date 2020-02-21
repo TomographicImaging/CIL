@@ -67,7 +67,7 @@ if (BUILD_PYTHON_WRAPPER)
         else()
           add_custom_command(OUTPUT ${OUTPUT}
                         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
-                        COMMAND ${CMAKE_COMMAND} -E env CIL_VERSION=20.01
+                        COMMAND ${CMAKE_COMMAND} -E env CIL_VERSION=${CIL_VERSION}
                                                         PREFIX=${CMAKE_SOURCE_DIR}/src/
                                                         LIBRARY_INC=${CMAKE_SOURCE_DIR}/src/include
                                                         LIBRARY_LIB=${CMAKE_BINARY_DIR}/

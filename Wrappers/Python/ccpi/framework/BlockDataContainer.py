@@ -261,7 +261,7 @@ class BlockDataContainer(object):
                     kw['out'] = out.get_item(i)
                     if operation == BlockDataContainer.AXPBY:
                         kw['y'] = ot
-                        el.axpby(kw['a'], kw['b'], kw['y'], kw['out'], kw['dtype'], kw['num_threads'])
+                        el.axpby(kw['a'], kw['b'], kw['y'], kw['out'], dtype=kw['dtype'], num_threads=kw['num_threads'])
                     else:
                         op(ot, *args, **kw)
                 else:

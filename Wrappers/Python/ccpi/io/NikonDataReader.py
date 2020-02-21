@@ -17,15 +17,72 @@ try:
 except:
     pilAvailable = False
     
-        
+
+def CreateAcquisitionGeometry_old(geom_type, angles, pixel_num_v, pixel_num_h, pixel_size_v, pixel_size_h, dist_source_center=1, dist_center_detector=0, CofR=0, tilt=0):
+
+    if pixel_num_v == 1:
+        src_orig = numpy.array([[CofR], [-dist_source_center]])
+        det_orig = numpy.array([[CofR], [dist_center_detector]])
+
+        src_origin = []
+        det_origin_orientation = []
+
+        for i, theta in enumerate(angles):
+            cos_t = numpy.cos(-theta)
+            sin_t = numpy.sin(-theta)
+
+            rotation_matrix = numpy.array([[cos_t, -sin_t], [sin_t, cos_t]])
+
+            src = rotation_matrix.dot(src_orig)
+            det = rotation_matrix.dot(det_orig)
+
+            src_origin.append((src[0][0], src[1][0]))
+            det_origin_orientation.append((det[0][0], det[1][0], theta))
+
+    else:
+        src_orig = numpy.array([[CofR], [-dist_source_center], [0]])
+        det_orig = numpy.array([[CofR], [dist_center_detector], [0]])
+
+        src_origin = []
+        det_origin_orientation = []
+
+        for i, theta in enumerate(angles):
+            cos_Rz = numpy.cos(-theta)
+            sin_Rz = numpy.sin(-theta)
+            cos_Rx = numpy.cos(tilt)
+            sin_Rx = numpy.sin(tilt)
+
+            Rx = numpy.matrix([[1, 0, 0], [0, cos_Rx, -sin_Rx],  [0, sin_Rx, cos_Rx]])
+            Ry = numpy.matrix([[1, 0, 0], [0, 1, 0],  [0, 0, 1]])
+            Rz = numpy.matrix([[cos_Rz, -sin_Rz, 0], [sin_Rz, cos_Rz, 0],  [0, 0, 1]])
+
+            rotation_matrix = numpy.matmul(numpy.matmul(Rx, Ry), Rz)
+            rotation_matrix_T = numpy.matrix.transpose(rotation_matrix)
+
+            src = rotation_matrix_T.dot(src_orig)
+            det = rotation_matrix_T.dot(det_orig)
+
+            Rx_new = -numpy.arctan2(rotation_matrix_T[1, 2], rotation_matrix_T[2, 2])
+            Ry_new = numpy.arctan2(rotation_matrix_T[0, 2], numpy.sqrt(rotation_matrix_T[2, 2] * rotation_matrix_T[2, 2] + rotation_matrix_T[1, 2] * rotation_matrix_T[1, 2]))
+            Rz_new = -numpy.arctan2(rotation_matrix_T[0, 1], rotation_matrix_T[0, 0])
+
+            vec = [src[0][0], src[1][0], src[2][0], det[0][0], det[1][0], det[2][0], Rx_new, Ry_new, Rz_new]
+
+            src_origin.append((src[0][0], src[1][0], src[2][0]))
+            det_origin_orientation.append((det[0][0], det[1][0], det[2][0], Rx_new, Ry_new, Rz_new))
+
+    return AcquisitionGeometry(geom_type, (pixel_num_v, pixel_num_h), (pixel_size_v, pixel_size_h), len(angles), src_origin, det_origin_orientation, angles)
+
+
 class NikonDataReader(object):
+
     
     def __init__(self, 
                  **kwargs):
         '''
         Constructor
         
-        Input:
+        Inumpyut:
             
             xtek_file       full path to .xtexct file
             
@@ -63,6 +120,7 @@ class NikonDataReader(object):
                         normalize = self.normalize,
                         flip = self.flip)
             
+    
     def set_up(self, 
                xtek_file = None, 
                roi = -1, 
@@ -154,9 +212,9 @@ class NikonDataReader(object):
         Parse the angles file .ang or _ctdata.txt file and returns the angles
         as an numpy array. 
         '''
-        input_path = os.path.dirname(self.xtek_file)
-        angles_ctdata_file = os.path.join(input_path, '_ctdata.txt')
-        angles_named_file = os.path.join(input_path, self._experiment_name+'.ang')
+        inumpyut_path = os.path.dirname(self.xtek_file)
+        angles_ctdata_file = os.path.join(inumpyut_path, '_ctdata.txt')
+        angles_named_file = os.path.join(inumpyut_path, self._experiment_name+'.ang')
         angles = numpy.zeros(num_projections, dtype = 'float')
         
         # look for _ctdata.txt
@@ -185,20 +243,24 @@ class NikonDataReader(object):
             angles = numpy.flipud(angles + initial_angle) # angles are in the reverse order
             
         else:   # calculate angles based on xtek file
-            angles = initial_angle + angular_step * range(num_projections)
+            angles = []
+            for i in range(num_projections):
+                angles.append(initial_angle + angular_step * i)
         
         # fill in metadata
-        self._ag = AcquisitionGeometry(geom_type = 'cone', 
-                                       dimension = '3D', 
-                                       angles = angles, 
-                                       pixel_num_h = pixel_num_h, 
-                                       pixel_size_h = pixel_size_h, 
-                                       pixel_num_v = pixel_num_v, 
-                                       pixel_size_v = pixel_size_v, 
-                                       dist_source_center = source_x, 
-                                       dist_center_detector = detector_x - source_x, 
-                                       channels = 1,
-                                       angle_unit = 'degree')
+        self._ag = CreateAcquisitionGeometry_old(geom_type='cone', angles=angles, pixel_num_v=pixel_num_v, pixel_num_h=pixel_num_h, pixel_size_v=pixel_size_v, pixel_size_h=pixel_size_h, dist_source_center=source_x, dist_center_detector = detector_x - source_x, CofR=0, tilt = 0.0)
+
+        # self._ag = AcquisitionGeometry(geom_type = 'cone', 
+        #                                dimension = '3D', 
+        #                                angles = angles, 
+        #                                pixel_num_h = pixel_num_h, 
+        #                                pixel_size_h = pixel_size_h, 
+        #                                pixel_num_v = pixel_num_v, 
+        #                                pixel_size_v = pixel_size_v, 
+        #                                dist_source_center = source_x, 
+        #                                dist_center_detector = detector_x - source_x, 
+        #                                channels = 1,
+        #                                angle_unit = 'degree')
 
     def get_geometry(self):
         

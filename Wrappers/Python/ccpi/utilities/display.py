@@ -24,7 +24,7 @@ import numpy
 from ccpi.framework import ImageGeometry
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-def plotter2D(datacontainers, titles=None, fix_range=False, stretch_y=False, cmap='gray', axis_labels=None):
+def plotter2D(datacontainers, titles=None, fix_range=False, stretch_y=False, cmap='gray', axis_labels=None, custom_range=None):
     '''plotter2D(datacontainers=[], titles=[], fix_range=False, stretch_y=False, cmap='gray', axes_labels=['X','Y'])
     
     plots 1 or more 2D plots in an (n x 2) matix
@@ -61,6 +61,11 @@ def plotter2D(datacontainers, titles=None, fix_range=False, stretch_y=False, cma
             range_min = min(range_min, numpy.amin(dc))
             range_max = max(range_max, numpy.amax(dc))
         
+    if custom_range is not None:
+        if len(custom_range) is 2:
+            range_min = custom_range[0]
+            range_max = custom_range[1]
+
     for i in range(rows*2):
         axes[i].set_visible(False)
 
@@ -95,7 +100,7 @@ def plotter2D(datacontainers, titles=None, fix_range=False, stretch_y=False, cma
             
         plt.colorbar(sp, ax=axes[i],fraction=0.0467*im_ratio, pad=0.02)
         
-        if fix_range == True:
+        if fix_range == True or custom_range is not None:
             sp.set_clim(range_min,range_max)
     plt.show()
 

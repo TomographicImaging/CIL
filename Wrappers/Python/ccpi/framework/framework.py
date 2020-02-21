@@ -1342,6 +1342,7 @@ class AcquisitionData(DataContainer):
                     )
             shape = tuple(shape)
         return (shape, dimension_labels)
+
     def subset(self, dimensions=None, **kw):
         '''returns a subset of the AcquisitionData and regenerates the geometry'''
 
@@ -1398,19 +1399,17 @@ class AcquisitionData(DataContainer):
                 
             
             dim_lab = [ out.dimension_labels[k] for k in range(len(out.dimension_labels.items()))]
-            
+
             out.geometry = AcquisitionGeometry(geom_type=self.geometry.geom_type, 
-                                    dimension=dim,
-                                    angles=angles,
-                                    pixel_num_h=pixel_num_h,
-                                    pixel_size_h = pixel_size_h,
-                                    pixel_num_v = pixel_num_v,
-                                    pixel_size_v = pixel_size_v,
-                                    dist_source_center = dist_source_center,
-                                    dist_center_detector = dist_center_detector,
-                                    channels = channels,
-                                    dimension_labels = dim_lab
-                                    )
+                                                    num_pixels = self.geometry.num_pixels,
+                                                    pixel_size = self.geometry.pixel_size,
+                                                    num_positions = self.geometry.num_positions,
+                                                    src_dof = self.geometry.src_dof,
+                                                    det_dof = self.geometry.det_dof,
+                                                    angles = self.geometry.angles,
+                                                    num_channels = self.geometry.num_channels,
+                                                    dimension_labels = dim_lab)    
+                  
         return out
     
                 

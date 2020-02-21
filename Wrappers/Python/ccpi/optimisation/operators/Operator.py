@@ -331,14 +331,8 @@ class SumOperator(Operator):
         return self.linear_flag 
     
     def calculate_norm(self, **kwargs):
-        # TODO
-        # find a way to not repeat this code. This is a fallback in case the 
-        # operator is linear.
         if self.is_linear():
-            x0 = kwargs.get('x0', None)
-            iterations = kwargs.get('iterations', 25)
-            s1, sall, svec = LinearOperator.PowerMethod(self, iterations, x_init=x0)
-            return s1
+            return LinearOperator.calculate_norm(self, **kwargs)
 
 ###############################################################################
 ################   Composition  ###########################################
@@ -387,14 +381,8 @@ class Composition2Operator(Operator):
         return self.linear_flag             
             
     def calculate_norm(self, **kwargs):
-        # TODO
-        # find a way to not repeat this code. This is a fallback in case the 
-        # operator is linear.
         if self.is_linear():
-            x0 = kwargs.get('x0', None)
-            iterations = kwargs.get('iterations', 25)
-            s1, sall, svec = LinearOperator.PowerMethod(self, iterations, x_init=x0)
-            return s1
+            return LinearOperator.calculate_norm(self, **kwargs)
 
 class CompositionOperator(Operator):
     
@@ -490,14 +478,8 @@ class CompositionOperator(Operator):
         return self.linear_flag             
             
     def calculate_norm(self, **kwargs):
-        # TODO
-        # find a way to not repeat this code. This is a fallback in case the 
-        # operator is linear.
         if self.is_linear():
-            x0 = kwargs.get('x0', None)
-            iterations = kwargs.get('iterations', 25)
-            s1, sall, svec = LinearOperator.PowerMethod(self, iterations, x_init=x0)
-            return s1
+            return LinearOperator.calculate_norm(self, **kwargs)
 
 
 

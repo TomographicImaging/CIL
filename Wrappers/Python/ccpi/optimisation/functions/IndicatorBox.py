@@ -48,7 +48,6 @@ class IndicatorBox(Function):
         super(IndicatorBox, self).__init__()
         self.lower = lower
         self.upper = upper
-        
 
     def __call__(self,x):
         

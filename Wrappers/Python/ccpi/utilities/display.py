@@ -24,7 +24,7 @@ import numpy
 from ccpi.framework import ImageGeometry
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-def plotter2D(datacontainers, titles=None, fix_range=False, stretch_y=False, cmap='gray', axis_labels=None, custom_range=None):
+def plotter2D(datacontainers, titles=None, fix_range=False, stretch_y=False, cmap='gray', axis_labels=None, custom_range=None, origin='upper'):
     '''plotter2D(datacontainers=[], titles=[], fix_range=False, stretch_y=False, cmap='gray', axes_labels=['X','Y'])
     
     plots 1 or more 2D plots in an (n x 2) matix
@@ -89,7 +89,7 @@ def plotter2D(datacontainers, titles=None, fix_range=False, stretch_y=False, cma
                 axes[i].set_xlabel(datacontainers[i].dimension_labels[1])        
         
         
-        sp = axes[i].imshow(dc, cmap=cmap, origin='upper', extent=(0,dc.shape[1],dc.shape[0],0))
+        sp = axes[i].imshow(dc, cmap=cmap, origin=origin, extent=(0,dc.shape[1],dc.shape[0],0))
     
         
         im_ratio = dc.shape[0]/dc.shape[1]

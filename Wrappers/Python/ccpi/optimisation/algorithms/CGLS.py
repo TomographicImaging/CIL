@@ -76,15 +76,16 @@ class CGLS(Algorithm):
 
         self.r = data - self.operator.direct(self.x)
         self.s = self.operator.adjoint(self.r)
-        
-        self.p = self.s
-        self.norms0 = self.s.norm()
-        
-        self.norms = self.s.norm()
+        self.p = self.s.copy()
+
+        self.q = self.operator.range_geometry().allocate()
+
+        self.norms0 = self.s.norm()      
+        self.norms = self.norms0
 
         self.gamma = self.norms0**2
         self.normx = self.x.norm()
-        self.xmax = self.normx   
+        #self.xmax = self.normx   
         
         self.loss.append(self.r.squared_norm())
         self.configured = True
@@ -95,23 +96,28 @@ class CGLS(Algorithm):
     def update(self):
         '''single iteration'''
         
-        self.q = self.operator.direct(self.p)
+        self.operator.direct(self.p, out=self.q)
+
         delta = self.q.squared_norm()
         alpha = self.gamma/delta
                         
         self.x += alpha * self.p
         self.r -= alpha * self.q
         
-        self.s = self.operator.adjoint(self.r)
+        self.operator.adjoint(self.r, out=self.s)
         
         self.norms = self.s.norm()
+
         self.gamma1 = self.gamma
         self.gamma = self.norms**2
+
         self.beta = self.gamma/self.gamma1
-        self.p = self.s + self.beta * self.p   
+
+        self.p.axpby(self.beta, 1, self.s, out=self.p)
+        #self.p = self.s + self.beta * self.p   
         
         self.normx = self.x.norm()
-        self.xmax = numpy.maximum(self.xmax, self.normx)
+        #self.xmax = numpy.maximum(self.xmax, self.normx)
                     
 
     def update_objective(self):

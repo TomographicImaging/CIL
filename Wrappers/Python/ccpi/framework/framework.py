@@ -1537,7 +1537,7 @@ class AcquisitionData(DataContainer):
         horiz         = geometry.num_pixels[1]
         vert          = geometry.num_pixels[0]
         angles        = geometry.angles
-        num_of_angles = numpy.shape(angles)[0]
+        num_of_angles = geometry.num_positions
         
         if dimension_labels is None:
             if channels > 1:

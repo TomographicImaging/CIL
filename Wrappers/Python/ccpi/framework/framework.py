@@ -1002,8 +1002,6 @@ class DataContainer(object):
         return self.as_array().size
 
     
-    
-    
 class ImageData(DataContainer):
     '''DataContainer for holding 2D or 3D DataContainer'''
     __container_priority__ = 1

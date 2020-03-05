@@ -1001,6 +1001,10 @@ class DataContainer(object):
     def max(self, *args, **kwargs):
         '''Returns the max pixel value in the DataContainer'''
         return numpy.max(self.as_array(), *args, **kwargs)
+    
+    def size(self):
+        '''Returns the number of elements of the DataContainer'''
+        return self.as_array().size
 
     
     

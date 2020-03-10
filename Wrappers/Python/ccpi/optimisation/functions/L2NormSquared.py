@@ -176,6 +176,31 @@ class L2NormSquared(Function):
 #            else:
 #                x.divide(1 + tau/2, out=out)                                        
 
+
+class weighted_L2NormSquared(Function):
+    
+   def __init__(self, weight, **kwargs):
+
+                     
+    super(L2NormSquared, self).__init__(L = 2)
+    self.b = kwargs.get('b',None)  
+    self.weight = weight
+    
+    def __call__(self, x):
+        pass
+    
+    def gradient(self, x, out = None):
+        pass
+    
+    def convex_conjugate(self, x):
+        pass
+    
+    def proximal(self, x, tau, out = None):
+        pass    
+        
+     
+
+
 if __name__ == '__main__':
     
     from ccpi.framework import ImageGeometry

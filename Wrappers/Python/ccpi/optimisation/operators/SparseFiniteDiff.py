@@ -29,16 +29,16 @@ class SparseFiniteDiff(object):
     '''Create Sparse Matrices for the Finite Difference Operator'''
     
     
-    def __init__(self, gm_domain, gm_range=None, direction=0, bnd_cond = 'Neumann'):
+    def __init__(self, domain_geometry, range_geometry=None, 
+      direction=0, bnd_cond = 'Neumann'):
         
-        super(SparseFiniteDiff, self).__init__() 
-        self.gm_domain = gm_domain
-        self.gm_range = gm_range
+        super(SparseFiniteDiff, self).__init__(domain_geometry=domain_geometry,
+                                               range_geometry=range_geometry) 
         self.direction = direction
         self.bnd_cond = bnd_cond
         
-        if self.gm_range is None:
-            self.gm_range = self.gm_domain
+        if self.range_geometry is None:
+            self.range_geometry = self.domain_geometry
             
         self.get_dims = [i for i in gm_domain.shape]  
         

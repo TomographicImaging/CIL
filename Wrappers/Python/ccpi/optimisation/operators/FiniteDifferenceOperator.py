@@ -56,8 +56,7 @@ class FiniteDiff(LinearOperator):
         :type bnd_cond: str, default :code:`Neumann`
         
         '''
-        super(FiniteDiff, self).__init__() 
-
+        
         self.gm_domain = gm_domain
         self.gm_range = gm_range
         
@@ -75,6 +74,8 @@ class FiniteDiff(LinearOperator):
         #self.voxel_size = kwargs.get('voxel_size',1)
         # this wrongly assumes a homogeneous voxel size
 #        self.voxel_size = self.gm_domain.voxel_size_x
+        super(FiniteDiff, self).__init__(domain_geometry=gm_domain, 
+                                         range_geometry=self.gm_range) 
 
 
     def direct(self, x, out=None):
@@ -350,24 +351,24 @@ class FiniteDiff(LinearOperator):
         #else:
         #    out.fill(outa)
             
-    def range_geometry(self):
+    # def range_geometry(self):
         
-        '''
+    #     '''
         
-            Returns the range_geometry of FiniteDiff
+    #         Returns the range_geometry of FiniteDiff
         
-        '''
+    #     '''
         
-        return self.gm_range
+    #     return self.gm_range
     
-    def domain_geometry(self):
+    # def domain_geometry(self):
         
-        '''
+    #     '''
         
-            Returns the domain_geometry of FiniteDiff
+    #         Returns the domain_geometry of FiniteDiff
         
-        '''        
-        return self.gm_domain
+    #     '''        
+    #     return self.gm_domain
 
 
 if __name__ == '__main__':

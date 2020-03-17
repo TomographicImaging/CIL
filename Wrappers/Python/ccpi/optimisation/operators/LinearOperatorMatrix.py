@@ -39,15 +39,16 @@ class LinearOperatorMatrix(LinearOperator):
         '''
         self.A = A
         M_A, N_A = self.A.shape
-        self.gm_domain = VectorGeometry(N_A)
-        self.gm_range = VectorGeometry(M_A)
+        domain_geometry = VectorGeometry(N_A)
+        range_geometry = VectorGeometry(M_A)
         self.s1 = None   # Largest singular value, initially unknown
-        super(LinearOperatorMatrix, self).__init__()
+        super(LinearOperatorMatrix, self).__init__(domain_geometry=domain_geometry,
+                                                   range_geometry=range_geometry)
         
     def direct(self,x, out=None):        
                 
         if out is None:
-            tmp = self.gm_range.allocate()
+            tmp = self.range_geometry().allocate()
             tmp.fill(numpy.dot(self.A,x.as_array()))
             return tmp
         else:
@@ -58,7 +59,7 @@ class LinearOperatorMatrix(LinearOperator):
 
     def adjoint(self,x, out=None):
         if out is None:
-            tmp = self.gm_domain.allocate()
+            tmp = self.domain_geometry().allocate()
             tmp.fill(numpy.dot(self.A.transpose(),x.as_array()))
             return tmp
         else:            
@@ -70,8 +71,4 @@ class LinearOperatorMatrix(LinearOperator):
     def calculate_norm(self, **kwargs):
         # If unknown, compute and store. If known, simply return it.
         return svds(self.A,1,return_singular_vectors=False)[0]
-        
-    def domain_geometry(self):
-        return self.gm_domain
-    def range_geometry(self):
-        return self.gm_range
+    

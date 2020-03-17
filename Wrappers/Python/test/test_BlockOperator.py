@@ -81,8 +81,8 @@ class TestBlockOperator(unittest.TestCase):
                    ImageGeometry(10,22,31) , \
                    ImageGeometry(10,20,31) ]
             x = [ g.allocate() for g in ig ]
-            ops = [ Identity(g, gm_range=r) for g,r in zip(ig, rg0) ]
-            ops += [ Identity(g, gm_range=r) for g,r in zip(ig, rg1) ]
+            ops = [ Identity(g, range_geometry=r) for g,r in zip(ig, rg0) ]
+            ops += [ Identity(g, range_geometry=r) for g,r in zip(ig, rg1) ]
 
             K = BlockOperator(*ops, shape=(2,3))
             print ("K col comp? " , K.column_wise_compatible())

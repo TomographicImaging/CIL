@@ -13,10 +13,12 @@ from ccpi.framework import ImageData, TestData, ImageGeometry, AcquisitionGeomet
 
 from ccpi.optimisation.functions import L2NormSquared, ZeroFunction, L1Norm, BlockFunction, MixedL21Norm, IndicatorBox, FunctionOperatorComposition
 from ccpi.optimisation.operators import Gradient, BlockOperator
-from ccpi.optimisation.algorithms import PDHG, SIRT, CGLS
+from ccpi.optimisation.algorithms import PDHG, SIRT, CGLS, FISTA, SFISTA
 
 from ccpi.astra.operators import AstraProjectorSimple, AstraProjector3DSimple
 from ccpi.astra.processors import FBP, AstraForwardProjector, AstraBackProjector
+
+from ccpi.plugins import regularisers
 
 import tomophantom
 from tomophantom import TomoP2D
@@ -33,7 +35,7 @@ from ccpi.optimisation.algorithms import Algorithm, GradientDescent
 import numpy
 
 
-from ccpi.optimisation.functions import Norm2Sq
+from ccpi.optimisation.functions import LeastSquares
 from ccpi.utilities.display import plotter2D
 
 
@@ -168,14 +170,14 @@ for j in range(100):
         x+=tmp
 inline1 = time.time()
     
-plotter2D(x)
+#plotter2D(x)
 
 
 #%%
 
 # use the whole dataset -> reset to 1 subset.
 data.geometry.generate_subsets(1, 'random')
-l2 = Norm2Sq(A=A, b=data)
+l2 = LeastSquares(A=A, b=data)
 gd = GradientDescent(x_init=im_data*0., 
                      objective_function=l2, 
                      step_size=None, 
@@ -185,11 +187,11 @@ gd.run(100)
 tgd1 = time.time()
 print (gd.step_size)
 
-plotter2D([x, gd.get_output(), x - gd.get_output()], titles=['stochastic', 'GD', 'diff'], cmap='viridis')
+#plotter2D([x, gd.get_output(), x - gd.get_output()], titles=['stochastic', 'GD', 'diff'], cmap='viridis')
 #%%
 
 
-class StochasticNorm2Sq(Norm2Sq):
+class StochasticNorm2Sq(LeastSquares):
     def __init__(self, A, b, c=1.0):
         super(StochasticNorm2Sq, self).__init__(A, b, c)
         
@@ -246,7 +248,52 @@ sgd_r = StochasticGradientDescent(x_init=im_data*0.,
 tsgd2 = time.time()
 sgd_r.run(nsubs * 12)
 tsgd3 = time.time()
+
+data.geometry.subset_id = 0
+
+# sl22 = StochasticNorm2Sq(A=OS_A, b=data)
+# sgd_r = SFISTA(x_init=im_data*0., 
+#                                 objective_function=sl2, 
+#                                 number_of_subsets=nsubs,
+#                                 update_objective_interval=10, max_iteration=100, 
+#                                 update_subset_interval=nsubs)
 #%%
+
+# use the whole dataset -> reset to 1 subset.
+data.geometry.generate_subsets(1, 'random')
+# l2 = LeastSquares(A=A, b=data)
+lambdaReg = 0.5e2
+iterationsTV = 500
+tolerance = 1e-5
+methodTV=0
+nonnegativity = 1
+printing = 0
+device = 'gpu'
+TV = regularisers.FGP_TV(lambdaReg,iterationsTV,tolerance,methodTV,nonnegativity,printing,device)
+
+algos = []
+dts = []
+algos.append( FISTA(x_init=im_data*0., 
+                     f = l2, g = TV,
+                     update_objective_interval=10, max_iteration=100)
+)
+tt = time.time()
+algos[-1].run(40)
+dts.append( time.time() - tt )
+print (gd.step_size)
+
+
+nsubs = 10
+data.geometry.generate_subsets(nsubs, 'uniform')
+data.geometry.subset_id = 0
+algos.append( SFISTA(x_init=im_data*0., 
+                     f = sl2, g = TV,
+                     update_objective_interval=10, max_iteration=100)
+)
+tt = time.time()
+algos[-1].run(40)
+dts.append( time.time() - tt )
+
 
 plotter2D([gd.get_output(), 
            im_data - gd.get_output(), 
@@ -254,7 +301,8 @@ plotter2D([gd.get_output(),
            im_data - sgd_u.get_output(),
            sgd_r.get_output() ,
            im_data - sgd_r.get_output(),
-           
+           algos[0].get_output(), im_data-algos[0].get_output(),
+           algos[1].get_output(), im_data-algos[1].get_output(), 
            #x
            ], titles=\
           [
@@ -264,6 +312,8 @@ plotter2D([gd.get_output(),
            'SGD uniform - ground truth',
            'stochastic GD perm {:.2f}s'.format(tsgd1 - tsgd0),
            'SGD perm - ground truth',
+           'FISTA TV {:.2f}s'.format(dts[0]), 'FISTA TV- ground truth'
+           'SFISTA TV {:.2f}s'.format(dts[0]), 'SFISTA TV- ground truth'
            #'inline GD {}'.format(inline1-inline0)
            ],
           cmap='viridis')
@@ -274,6 +324,7 @@ print("Objective SGD unif",  l2(sgd_u.get_output()))
 print("Objective SGD perm",  l2(sgd_r.get_output())) 
 
 print("Objective GD ", l2(gd.get_output()))
+print("Objective FISTA TV ", l2(algos[0].get_output()))
 
 data.geometry.generate_subsets(10, 'uniform')
 b = data.copy()

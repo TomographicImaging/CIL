@@ -21,5 +21,6 @@ from .CGLS import CGLS
 from .SIRT import SIRT
 from .GradientDescent import GradientDescent, StochasticGradientDescent
 from .FISTA import FISTA
+from .FISTA import SFISTA
 from .PDHG import PDHG
 

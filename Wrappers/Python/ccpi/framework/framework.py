@@ -461,8 +461,6 @@ class AcquisitionGeometry(object):
         return out
 
 class AcquisitionGeometrySubsetGenerator(object):
-    RANDOM='random'
-    UNIFORM_SAMPLING='uniform'
     
     ### Changes in the Operator required to work as OS operator
     @staticmethod
@@ -482,6 +480,9 @@ class AcquisitionGeometrySubsetGenerator(object):
             rndidx = numpy.asarray(range(len(angles)))
             indices = AcquisitionGeometrySubsetGenerator.uniform_groups_indices(rndidx, number_of_subsets)
             
+        elif method == 'stagger':
+            idx = numpy.asarray(range(len(angles)))
+            indices = AcquisitionGeometrySubsetGenerator.staggered_indices(idx, number_of_subsets)
         else:
             raise ValueError('Can only do {}. got {}'.format(['random', 'random_permutation', 'uniform'], method))
         return indices
@@ -507,6 +508,30 @@ class AcquisitionGeometrySubsetGenerator(object):
         for i,el in enumerate(indices):
             ret[el] = True
         return ret
+    @staticmethod
+    def staggered_indices(idx, number_of_subsets):
+        indices = []
+        # groups = int(len(idx)/number_of_subsets)
+        for i in range(number_of_subsets):
+            ret = numpy.asarray(numpy.zeros_like(idx), dtype=numpy.bool)
+            indices.append(ret)
+        i = 0
+        while i < len(idx):    
+            for ret in indices:
+                ret[i] = True
+                i += 1
+                if i >= len(idx):
+                    break
+                
+        return indices
+    @staticmethod
+    def get_new_indices(index):
+        newidx = []
+        for idx in index:
+            ai = numpy.where(idx == True)[0]
+            for i in ai:
+                newidx.append(i)
+        return numpy.asarray(newidx)
 
 class DataContainer(object):
     '''Generic class to hold data

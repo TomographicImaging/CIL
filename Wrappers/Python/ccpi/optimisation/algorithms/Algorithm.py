@@ -65,6 +65,7 @@ class Algorithm(object):
         self._iteration = []
         self.update_objective_interval = kwargs.get('update_objective_interval', 1)
         self.x = None
+        self.counter = 0
     def set_up(self, *args, **kwargs):
         '''Set up the algorithm'''
         raise NotImplementedError()
@@ -103,7 +104,7 @@ class Algorithm(object):
             if self.iteration == 0:
                 self.update_objective()
                 self._iteration.append(self.iteration)
-                
+            self.counter += 1     
             self.update()
             self.timing.append( time.time() - time0 )
             if self.iteration % self.update_objective_interval == 0:
@@ -262,6 +263,7 @@ class StochasticAlgorithm(Algorithm):
         self.update_subset_interval = kwargs.get('update_subset_interval',
                                                  self.number_of_subsets)
         self.max_epoch = self.max_iteration
+        self.scounter = 0
         
     def update_subset(self):
         if self.iteration % self.update_subset_interval == 0:
@@ -288,8 +290,10 @@ class StochasticAlgorithm(Algorithm):
         raise NotImplemented('This callback must be implemented by the concrete algorithm')
     
     def __next__(self):
-        super(StochasticAlgorithm, self).__next__()
-        self.update_subset()
+        for _ in range(self.number_of_subsets):
+            super(StochasticAlgorithm, self).__next__()
+            self.update_subset()
+            self.scounter += 1
     def should_stop(self):
         '''default stopping cryterion: number of iterations
         

@@ -620,8 +620,7 @@ class DataContainer(object):
         return self.divide(other)
     def __pow__(self, other):
         return self.power(other)
-    
-    
+        
     
     # reverse operand
     def __radd__(self, other):
@@ -927,13 +926,7 @@ class DataContainer(object):
     
     def abs(self, *args,  **kwargs):
         return self.pixel_wise_unary(numpy.abs, *args,  **kwargs)
-    
-#    def max(self, *args,  **kwargs):
-#        return self.pixel_wise_unary(numpy.max, *args,  **kwargs) 
-#    
-#    def min(self, *args,  **kwargs):
-#        return self.pixel_wise_unary(numpy.min, *args,  **kwargs)     
-    
+             
     def sign(self, *args,  **kwargs):
         return self.pixel_wise_unary(numpy.sign, *args,  **kwargs)
     
@@ -1001,13 +994,41 @@ class DataContainer(object):
     def max(self, *args, **kwargs):
         '''Returns the max pixel value in the DataContainer'''
         return numpy.max(self.as_array(), *args, **kwargs)
-    
+        
     def size(self):
         '''Returns the number of elements of the DataContainer'''
         return self.as_array().size
+    
+    # Logic operators between DataContainers and floats    
+    def __le__(self, other):
+        if isinstance(other, DataContainer):
+            return self.as_array()<=other.as_array()
+        return self.as_array()<=other
+    
+    def __lt__(self, other):
+        if isinstance(other, DataContainer):
+            return self.as_array()<other.as_array()
+        return self.as_array()<other    
+    
+    def __ge__(self, other):
+        if isinstance(other, DataContainer):
+            return self.as_array()>=other.as_array()
+        return self.as_array()>=other  
+    
+    def __gt__(self, other):
+        if isinstance(other, DataContainer):
+            return self.as_array()>other.as_array()
+        return self.as_array()>other      
+    
+    def __eq__(self, other):
+        if isinstance(other, DataContainer):
+            return self.as_array()==other.as_array()
+        return self.as_array()==other  
 
-    
-    
+    def __ne__(self, other):
+        if isinstance(other, DataContainer):
+            return self.as_array()!=other.as_array()
+        return self.as_array()!=other      
     
 class ImageData(DataContainer):
     '''DataContainer for holding 2D or 3D DataContainer'''

@@ -23,7 +23,6 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from __future__ import unicode_literals
 
 from ccpi.optimisation.functions import Function
 from ccpi.framework import BlockDataContainer
@@ -31,14 +30,24 @@ from numbers import Number
 
 class BlockFunction(Function):
     
-    r'''BlockFunction acts as a separable sum function: f = [f_1,...,f_n]
+    r""" BlockFunction represents a *separable sum* function :math:`F` defined as
     
-      .. math::
-
-          f([x_1,...,x_n]) = f_1(x_1) +  .... + f_n(x_n)
-      |
-
-    '''
+    .. math:: F:X_{1}\times X_{2}\cdots\times X_{m} \rightarrow (-\infty, \infty]
+    
+    where :math:`F` is the separable sum of functions :math:`(f_{i})_{i=1}^{m}`,
+    
+    .. math:: F(x_{1}, x_{2}, \cdots, x_{m}) = \overset{m}{\underset{i=1}{\sum}}f_{i}(x_{i}), \mbox{ with } f_{i}: X_{i} \rightarrow (-\infty, \infty].
+    
+    A nice property (due to it's separability structure) is that the proximal operator 
+    can be decomposed along the proximal operators of each function :math:`f_{i}`.
+    
+    .. math:: \mathrm{prox}_{\tau F}(x) = ( \mathrm{prox}_{\tau f_{i}}(x_{i}) )_{i=1}^{m}
+    
+    In addition, if :math:`\tau := (\tau_{1},\dots,\tau_{m})`, then 
+    
+    .. math:: \mathrm{prox}_{\tau F}(x) = ( \mathrm{prox}_{\tau_{i} f_{i}}(x_{i}) )_{i=1}^{m}
+    
+    """
     
     def __init__(self, *functions):
                 
@@ -48,13 +57,17 @@ class BlockFunction(Function):
                                 
     def __call__(self, x):
         
-        r'''Evaluates the BlockFunction at a BlockDataContainer x
+        r""" Returns the value of the BlockFunction :math:`F`
         
-            :param: x (BlockDataContainer): must have as many rows as self.length
-
-            returns ..math:: sum(f_i(x_i))
+        .. math:: F(x) = \overset{m}{\underset{i=1}{\sum}}f_{i}(x_{i}), \mbox{ where } x = (x_{1}, x_{2}, \cdots, x_{m}), \quad i = 1,2,\dots,m
+                
+        Parameter:
             
-        '''
+            x : BlockDataContainer and must have as many rows as self.length
+
+            returns ..math:: \sum(f_i(x_i))
+            
+        """
         
         if self.length != x.shape[0]:
             raise ValueError('BlockFunction and BlockDataContainer have incompatible size')
@@ -65,53 +78,36 @@ class BlockFunction(Function):
     
     def convex_conjugate(self, x):
         
-        r'''Convex conjugate of BlockFunction at x            
+        r"""Returns the value of the convex conjugate of the BlockFunction at :math:`x^{*}`.       
         
-            .. math:: returns sum(f_i^{*}(x_i))
+            .. math:: F^{*}(x^{*}) = \overset{m}{\underset{i=1}{\sum}}f_{i}^{*}(x^{*}_{i})
+            
+            Parameter:
+            
+                x : BlockDataContainer and must have as many rows as self.length            
         
-        '''       
-        t = 0                
+        """     
+        
+        if self.length != x.shape[0]:
+            raise ValueError('BlockFunction and BlockDataContainer have incompatible size')
+        t = 0              
         for i in range(x.shape[0]):
             t += self.functions[i].convex_conjugate(x.get_item(i))
         return t  
     
-    
-    def proximal_conjugate(self, x, tau, out = None):
-        
-        r'''Proximal operator of BlockFunction at x: 
-                 
-                 .. math:: prox_{tau*f}(x) = sum_{i} prox_{tau*f_{i}}(x_{i}) 
-        
-        
-        '''
-
-        if out is not None:
-            if isinstance(tau, Number):
-                for i in range(self.length):
-                    self.functions[i].proximal_conjugate(x.get_item(i), tau, out=out.get_item(i))
-            else:
-                for i in range(self.length):
-                    self.functions[i].proximal_conjugate(x.get_item(i), tau.get_item(i),out=out.get_item(i))
-            
-        else:
-                
-            out = [None]*self.length
-            if isinstance(tau, Number):
-                for i in range(self.length):
-                    out[i] = self.functions[i].proximal_conjugate(x.get_item(i), tau)
-            else:
-                for i in range(self.length):
-                    out[i] = self.functions[i].proximal_conjugate(x.get_item(i), tau.get_item(i))
-            
-            return BlockDataContainer(*out) 
-
-    
     def proximal(self, x, tau, out = None):
         
-        r'''Proximal operator of the convex conjugate of BlockFunction at x:
+        r"""Proximal operator of the BlockFunction at x:
         
-            .. math:: prox_{tau*f^{*}}(x) = sum_{i} prox_{tau*f^{*}_{i}}(x_{i}) 
-        '''
+            .. math:: \mathrm{prox}_{\tau F}(x) =  (\mathrm{prox}_{\tau f_{i}}(x_{i}))_{i=1}^{m}
+            
+            Parameter:
+            
+                x : BlockDataContainer and must have as many rows as self.length            
+        """
+        
+        if self.length != x.shape[0]:
+            raise ValueError('BlockFunction and BlockDataContainer have incompatible size')        
         
         if out is None:
                 
@@ -135,27 +131,68 @@ class BlockFunction(Function):
             
             
     
-    def gradient(self,x, out=None):
+    def gradient(self, x, out=None):
         
-        r'''Evaluates gradient of BlockFunction at x
+        r"""Returns the value of the gradient of the BlockFunction function at x.
         
-            returns: BlockDataContainer .. math:: [f_{1}'(x_{1}), ... , f_{n}'(x_{n})]
+        .. math:: F'(x) = [f_{1}'(x_{1}), ... , f_{m}'(x_{m})]        
+        
+        Parameter:
+            
+            x : BlockDataContainer and must have as many rows as self.length
                 
-        '''
+        """        
+        
+        if self.length != x.shape[0]:
+            raise ValueError('BlockFunction and BlockDataContainer have incompatible size')        
         
         out = [None]*self.length
         for i in range(self.length):
             out[i] = self.functions[i].gradient(x.get_item(i))
             
-        return  BlockDataContainer(*out)           
+        return  BlockDataContainer(*out)     
+
+    def proximal_conjugate(self, x, tau, out = None):
+        
+        r"""Proximal operator of the convex conjugate of BlockFunction at x:
+        
+            .. math:: \mathrm{prox}_{\tau F^{*}}(x) = (\mathrm{prox}_{\tau f^{*}_{i}}(x^{*}_{i}))_{i=1}^{m}
+            
+            Parameter:
+            
+                x : BlockDataContainer and must have as many rows as self.length            
+        """
+
+        if self.length != x.shape[0]:
+            raise ValueError('BlockFunction and BlockDataContainer have incompatible size')
+
+        if out is not None:
+            if isinstance(tau, Number):
+                for i in range(self.length):
+                    self.functions[i].proximal_conjugate(x.get_item(i), tau, out=out.get_item(i))
+            else:
+                for i in range(self.length):
+                    self.functions[i].proximal_conjugate(x.get_item(i), tau.get_item(i),out=out.get_item(i))
+            
+        else:
+                
+            out = [None]*self.length
+            if isinstance(tau, Number):
+                for i in range(self.length):
+                    out[i] = self.functions[i].proximal_conjugate(x.get_item(i), tau)
+            else:
+                for i in range(self.length):
+                    out[i] = self.functions[i].proximal_conjugate(x.get_item(i), tau.get_item(i))
+            
+            return BlockDataContainer(*out)       
                             
     
     
 if __name__ == '__main__':
     
-    M, N, K = 2,3,5
+    M, N, K = 20,30,50
     
-    from ccpi.optimisation.functions import L2NormSquared, MixedL21Norm
+    from ccpi.optimisation.functions import L2NormSquared, MixedL21Norm, L1Norm
     from ccpi.framework import ImageGeometry, BlockGeometry
     from ccpi.optimisation.operators import Gradient, Identity, BlockOperator
     import numpy
@@ -191,7 +228,22 @@ if __name__ == '__main__':
     numpy.testing.assert_array_almost_equal(res_no_out[1].as_array(), \
                                             res_out[1].as_array(), decimal=4)     
     
-                    
+    
+
+    ig1 = ImageGeometry(M, N)               
+    ig2 = ImageGeometry(2*M, N)
+    ig3 = ImageGeometry(3*M, 4*N)
+    
+    bg = BlockGeometry(ig1,ig2,ig3)
+    
+    z = bg.allocate('random_int')
+    
+    f1 = L1Norm()
+    f2 = 5 * L2NormSquared()
+    
+    f = BlockFunction(f2, f2, f2 + 5, f1 - 4, f1)
+    
+    res = f.convex_conjugate(z)
     
     ##########################################################################
     

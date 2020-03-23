@@ -23,7 +23,6 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from __future__ import unicode_literals
 
 from ccpi.optimisation.algorithms import Algorithm
 
@@ -35,27 +34,26 @@ class SIRT(Algorithm):
     
     .. math::  
     
-    A x = b
-    |
-
-    Parameters:
-        
-      :parameter operator : Linear operator for the inverse problem
-      :parameter x_init : Initial guess
-      :parameter data : Acquired data to reconstruct       
-      :parameter constraint : Function proximal method
-                   e.g.  x\in[0, 1], IndicatorBox to enforce box constraints
-                         Default is None).
+      A x = b
+    
+    :param x_init: Initial guess
+    :param operator: Linear operator for the inverse problem
+    :param data: Acquired data to reconstruct       
+    :param constraint: Function proximal method
+                e.g.  :math:`x\in[0, 1]`, :code:`IndicatorBox` to enforce box constraints
+                        Default is :code:`None`).
     '''
     def __init__(self, x_init=None, operator=None, data=None, constraint=None, **kwargs):
         '''SIRT algorithm creator
 
-        :param x_init : Initial guess
-        :param operator : Linear operator for the inverse problem
-        :param data : Acquired data to reconstruct       
-        :param constraint : Function proximal method
-                   e.g.  x\in[0, 1], IndicatorBox to enforce box constraints
-                         Default is None).'''
+       Optional parameters:
+
+      :param x_init: Initial guess
+      :param operator: Linear operator for the inverse problem
+      :param data: Acquired data to reconstruct       
+      :param constraint: Function proximal method
+                   e.g.  :math:`x\in[0, 1]`, :code:`IndicatorBox` to enforce box constraints
+                         Default is :code:`None`).'''
         super(SIRT, self).__init__(**kwargs)
 
         if x_init is not None and operator is not None and data is not None:
@@ -64,12 +62,12 @@ class SIRT(Algorithm):
     def set_up(self, x_init, operator, data, constraint=None):
         '''initialisation of the algorithm
 
-        :param operator : Linear operator for the inverse problem
-        :param x_init : Initial guess
-        :param data : Acquired data to reconstruct       
-        :param constraint : Function proximal method
-                   e.g.  x\in[0, 1], IndicatorBox to enforce box constraints
-                         Default is None).'''
+        :param x_init: Initial guess
+        :param operator: Linear operator for the inverse problem
+        :param data: Acquired data to reconstruct       
+        :param constraint: Function proximal method
+                   e.g.  :math:`x\in[0, 1]`, :code:`IndicatorBox` to enforce box constraints
+                         Default is :code:`None`).'''
         print("{} setting up".format(self.__class__.__name__, ))
         
         self.x = x_init.copy()

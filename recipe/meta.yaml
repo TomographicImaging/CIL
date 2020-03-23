@@ -28,6 +28,7 @@ requirements:
     - python
     - setuptools
     - cmake
+    - openmp # [osx]
 
   run:
     - {{ pin_compatible('numpy', max_pin='x.x') }}
@@ -37,7 +38,8 @@ requirements:
     - matplotlib
     - h5py
     - pillow
-    - libgcc-ng # [not win]
+    - libgcc-ng # [linux]
+    - openmp # [osx]
   
 about:
   home: http://www.ccpi.ac.uk

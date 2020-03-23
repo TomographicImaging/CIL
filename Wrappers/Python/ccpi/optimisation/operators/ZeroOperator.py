@@ -18,8 +18,6 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from __future__ import unicode_literals
-
 
 import numpy as np
 from ccpi.framework import ImageData
@@ -27,30 +25,28 @@ from ccpi.optimisation.operators import LinearOperator
 
 class ZeroOperator(LinearOperator):
     
-    r'''ZeroOperator:  O: X -> Y,  maps any element of x\in X into the zero element in Y
-                       O(x) = O_{Y}
+    r'''ZeroOperator:  O: X -> Y,  maps any element of :math:`x\in X` into the zero element :math:`\in Y,  O(x) = O_{Y}`
                        
-                       X : gm_domain
-                       Y : gm_range ( Default: Y = X )
-                       
-                       
-                       Note: 
-                       .. math::
+        :param gm_domain: domain of the operator 
+        :param gm_range: range of the operator, default: same as domain
+        
+        
+        Note: 
+        
+        .. math::
 
-                              O^{*}: Y^{*} -> X^{*} (Adjoint)
-                       
-                              < O(x), y > = < x, O^{*}(y) >
+                O^{*}: Y^{*} -> X^{*} \text{(Adjoint)}
+        
+                < O(x), y > = < x, O^{*}(y) >
                        
      '''
     
-    def __init__(self, gm_domain, gm_range=None):
-        
-        super(ZeroOperator, self).__init__()             
+    def __init__(self, domain_geometry, range_geometry=None):
+        if range_geometry is None:
+            range_geometry = domain_geometry.clone()
+        super(ZeroOperator, self).__init__(domain_geometry=domain_geometry, 
+                                           range_geometry=range_geometry)
 
-        self.gm_domain = gm_domain
-        self.gm_range = gm_range  
-        if self.gm_range is None:
-            self.gm_range = self.gm_domain
                    
         
     def direct(self,x,out=None):
@@ -59,18 +55,18 @@ class ZeroOperator(LinearOperator):
         
         
         if out is None:
-            return self.gm_range.allocate()
+            return self.range_geometry().allocate()
         else:
-            out.fill(self.gm_range.allocate())
+            out.fill(self.range_geometry.allocate())
     
     def adjoint(self,x, out=None):
         
         '''Returns O^{*}(y)'''        
         
         if out is None:
-            return self.gm_domain.allocate()
+            return self.domain_geometry().allocate()
         else:
-            out.fill(self.gm_domain.allocate())
+            out.fill(self.domain_geometry().allocate())
         
     def calculate_norm(self, **kwargs):
         
@@ -78,15 +74,4 @@ class ZeroOperator(LinearOperator):
         
         return 0
     
-    def domain_geometry(self): 
-        
-        '''Returns domain_geometry of ZeroOperator'''
-        
-        
-        return self.gm_domain  
-        
-    def range_geometry(self):
-        
-        '''Returns domain_geometry of ZeroOperator'''
-        
-        return self.gm_range
+    

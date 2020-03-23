@@ -15,8 +15,10 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-
-import numpy
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+import numpy as np
 import os
 from ccpi.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
 import datetime
@@ -69,7 +71,7 @@ class NEXUSDataWriter(object):
             # give the file some important attributes
             f.attrs['file_name'] = self.file_name
             f.attrs['file_time'] = str(datetime.datetime.utcnow())
-            f.attrs['creator'] = 'NEXUSDataWriter.py'
+            f.attrs['creator'] = np.string_('NEXUSDataWriter.py')
             f.attrs['NeXus_version'] = '4.3.0'
             f.attrs['HDF5_Version'] = h5py.version.hdf5_version
             f.attrs['h5py_version'] = h5py.version.version

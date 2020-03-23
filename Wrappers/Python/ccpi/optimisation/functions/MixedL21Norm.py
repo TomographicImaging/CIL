@@ -19,105 +19,170 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from __future__ import unicode_literals
 
-from ccpi.optimisation.functions import Function, ScaledFunction
+
+from ccpi.optimisation.functions import Function
 from ccpi.framework import BlockDataContainer
 import numpy as np
 
-import functools
 
 class MixedL21Norm(Function):
     
     
-    '''
-        f(x) = ||x||_{2,1} = \sum |x|_{2}                   
-    '''      
+    """ MixedL21Norm function: :math:`F(x) = ||x||_{2,1} = \sum |x|_{2} = \sum \sqrt{ (x^{1})^{2} + (x^{2})^{2} + \dots}`                  
+    
+        where x is a BlockDataContainer, i.e., :math:`x=(x^{1}, x^{2}, \dots)`
+    
+    """      
     
     def __init__(self, **kwargs):
+        '''Creator
+        
+        :param b:  translation of the function
+        :type b: :code:`DataContainer`, optional
+        '''
+        super(MixedL21Norm, self).__init__()  
+        self.b = kwargs.get('b', None)  
 
-        super(MixedL21Norm, self).__init__()                      
+        # This is to handle tensor for Total Generalised Variation                    
         self.SymTensor = kwargs.get('SymTensor',False)
+        
+        # We use this parameter to make MixedL21Norm differentiable
+#        self.epsilon = epsilon
+        
+        if self.b is not None and not isinstance(self.b, BlockDataContainer):
+            raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(self.b)))
+            
         
     def __call__(self, x):
         
-        ''' Evaluates L2,1Norm at point x
-            
-            :param: x is a BlockDataContainer
-                                
-        '''
+        r"""Returns the value of the MixedL21Norm function at x. 
+
+        :param x: :code:`BlockDataContainer`                                           
+        """
         if not isinstance(x, BlockDataContainer):
             raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 
-                                         
-        tmp = x.get_item(0) * 0.
-        for el in x.containers:
-            tmp += el.power(2.)
-        return tmp.sqrt().sum()
+            
+#        tmp_cont = x.containers                        
+#        tmp = x.get_item(0) * 0.
+#        for el in tmp_cont:
+#            tmp += el.power(2.)
+#        tmp.add(self.epsilon**2, out = tmp)    
+#        return tmp.sqrt().sum()            
+         
+        y = x
+        if self.b is not None:
+            y = x - self.b    
+        return y.pnorm(p=2).sum()                                
+            
+#        tmp = x.get_item(0) * 0.
+#        for el in x.containers:
+#            tmp += el.power(2.)
+#        #tmp.add(self.epsilon, out = tmp)    
+#        return tmp.sqrt().sum()
 
-                            
-    def gradient(self, x, out=None):
-        return ValueError('Not Differentiable')
                             
     def convex_conjugate(self,x):
         
-        ''' This is the Indicator function of ||\cdot||_{2, \infty}
-            which is either 0 if ||x||_{2, \infty} or \infty        
-        '''
+        r"""Returns the value of the convex conjugate of the MixedL21Norm function at x.
         
-        return 0.0
+        This is the Indicator function of :math:`\mathbb{I}_{\{\|\cdot\|_{2,\infty}\leq1\}}(x^{*})`,
         
-    
+        i.e., 
+        
+        .. math:: \mathbb{I}_{\{\|\cdot\|_{2, \infty}\leq1\}}(x^{*}) 
+            = \begin{cases} 
+            0, \mbox{if } \|x\|_{2, \infty}\leq1\\
+            \infty, \mbox{otherwise}
+            \end{cases}
+        
+        where, 
+        
+        .. math:: \|x\|_{2,\infty} = \max\{ \|x\|_{2} \} = \max\{ \sqrt{ (x^{1})^{2} + (x^{2})^{2} + \dots}\}
+        
+        """
+        if not isinstance(x, BlockDataContainer):
+            raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 
+                
+#        tmp1 = x.get_item(0) * 0.
+#        for el in x.containers:
+#            tmp1 += el.power(2.)
+#        tmp1.add(self.epsilon**2, out = tmp1)
+#        tmp = tmp1.sqrt().as_array().max() - 1
+#                    
+#        if tmp<=1e-6:
+#            return 0
+#        else:
+#            return np.inf            
+                
+        tmp = (x.pnorm(2).as_array().max() - 1)
+        if tmp<=1e-5:
+            return 0
+        else:
+            return np.inf
+                    
     def proximal(self, x, tau, out=None):
+        
+        r"""Returns the value of the proximal operator of the MixedL21Norm function at x.
+        
+        .. math :: \mathrm{prox}_{\tau F}(x) = \frac{x}{\|x\|_{2}}\max\{ \|x\|_{2} - \tau, 0 \}
+        
+        where the convention 0 · (0/0) = 0 is used.
+        
+        """
         
         if out is None:
             
-            tmp = sum([ el*el for el in x.containers]).sqrt()
+            tmp = x.pnorm(2)
             res = (tmp - tau).maximum(0.0) * x/tmp
-            return res
+            
+            for el in res.containers:
+                el.as_array()[np.isnan(el.as_array())]=0            
+            
+            return res            
             
         else:
-                        
-            tmp = functools.reduce(lambda a,b: a + b*b, x.containers, x.get_item(0) * 0 ).sqrt()
+            
+            tmp = x.pnorm(2)
             res = (tmp - tau).maximum(0.0) * x/tmp
 
             for el in res.containers:
                 el.as_array()[np.isnan(el.as_array())]=0
 
-            out.fill(res)
+            out.fill(res)            
+            
+                        
+#            tmp = functools.reduce(lambda a,b: a + b*b, x.containers, x.get_item(0) * 0 ).sqrt()
+#            res = (tmp - tau).maximum(0.0) * x/tmp
+#
+#            for el in res.containers:
+#                el.as_array()[np.isnan(el.as_array())]=0
+#
+#            out.fill(res)
         
-    
-    def proximal_conjugate(self, x, tau, out=None): 
-
-        
-        if out is None:                                        
-            tmp = x.get_item(0) * 0	
-            for el in x.containers:	
-                tmp += el.power(2.)	
-            tmp.sqrt(out=tmp)	
-            tmp.maximum(1.0, out=tmp)	
-            frac = [ el.divide(tmp) for el in x.containers ]	
-            return BlockDataContainer(*frac)
-        
-    
-        else:
-                            
-            res1 = functools.reduce(lambda a,b: a + b*b, x.containers, x.get_item(0) * 0 )
-            res1.sqrt(out=res1)	
-            res1.maximum(1.0, out=res1)	
-            x.divide(res1, out=out)
+##############################################################################
+        ##############################################################################
+#    def proximal_conjugate(self, x, tau, out=None): 
+#
+#        
+#        if out is None:                                        
+#            tmp = x.get_item(0) * 0	
+#            for el in x.containers:	
+#                tmp += el.power(2.)	
+#            tmp.sqrt(out=tmp)	
+#            tmp.maximum(1.0, out=tmp)	
+#            frac = [ el.divide(tmp) for el in x.containers ]	
+#            return BlockDataContainer(*frac)
+#        
+#    
+#        else:
+#                            
+#            res1 = functools.reduce(lambda a,b: a + b*b, x.containers, x.get_item(0) * 0 )
+#            res1.sqrt(out=res1)	
+#            res1.maximum(1.0, out=res1)	
+#            x.divide(res1, out=out)
                               
 
-    def __rmul__(self, scalar):
-        
-        ''' Multiplication of MixedL21Norm with a scalar
-        
-        Returns: ScaledFunction
-             
-        '''         
-        return ScaledFunction(self, scalar) 
-
-
-#
 if __name__ == '__main__':
     
     M, N, K = 2,3,50
@@ -185,8 +250,24 @@ if __name__ == '__main__':
                                             d1.get_item(0).as_array(), decimal=4) 
 
     numpy.testing.assert_array_almost_equal(out1.get_item(1).as_array(), \
-                                            d1.get_item(1).as_array(), decimal=4)      
-#    
+                                            d1.get_item(1).as_array(), decimal=4)   
+    
+    f_scaled.proximal_conjugate(U, tau, out = out1)
+    x = U
+    tmp = x.get_item(0) * 0	
+    for el in x.containers:	
+        tmp += el.power(2.)	
+    tmp.sqrt(out=tmp)	
+    (tmp/f_scaled.scalar).maximum(1.0, out=tmp)	
+    frac = [ el.divide(tmp) for el in x.containers ]	
+    out2 = BlockDataContainer(*frac)   
+    
+    numpy.testing.assert_array_almost_equal(out1.get_item(0).as_array(), \
+                                            out2.get_item(0).as_array(), decimal=4)       
+    
+    
+
+      
     
     
     

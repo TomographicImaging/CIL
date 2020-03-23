@@ -20,7 +20,6 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from __future__ import unicode_literals
 
 from ccpi.optimisation.algorithms import Algorithm
 
@@ -34,22 +33,21 @@ class PDHG(Algorithm):
     .. math::
     
       \min_{x} f(Kx) + g(x)
-    |
-
-    Parameters : 
         
-        :parameter operator : Linear Operator = K
-        :parameter f : Convex function with "simple" proximal of its conjugate. 
-        :parameter g : Convex function with "simple" proximal 
-        :parameter sigma : Step size parameter for Primal problem
-        :parameter tau : Step size parameter for Dual problem
+    :param operator: Linear Operator = K
+    :param f: Convex function with "simple" proximal of its conjugate. 
+    :param g: Convex function with "simple" proximal 
+    :param sigma: Step size parameter for Primal problem
+    :param tau: Step size parameter for Dual problem
         
-        Remark: Convergence is guaranted provided that
+    Remark: Convergence is guaranted provided that
         
-        .. math:: \tau \sigma \|K\|^{2} <1
+    .. math:: 
+    
+      \tau \sigma \|K\|^{2} <1
         
             
-    Reference :
+    Reference:
         
         
         (a) A. Chambolle and T. Pock (2011), "A first-order primal–dual algorithm for convex
@@ -64,11 +62,14 @@ class PDHG(Algorithm):
     def __init__(self, f=None, g=None, operator=None, tau=None, sigma=1.,**kwargs):
         '''PDHG algorithm creator
 
-        :param operator : Linear Operator = K
-        :param f : Convex function with "simple" proximal of its conjugate. 
-        :param g : Convex function with "simple" proximal 
-        :param sigma : Step size parameter for Primal problem
-        :param tau : Step size parameter for Dual problem'''
+        Optional parameters
+
+        :param operator: a Linear Operator
+        :param f: Convex function with "simple" proximal of its conjugate. 
+        :param g: Convex function with "simple" proximal 
+        :param sigma: Step size parameter for Primal problem
+        :param tau: Step size parameter for Dual problem
+        '''
         super(PDHG, self).__init__(**kwargs)
         
 
@@ -78,11 +79,11 @@ class PDHG(Algorithm):
     def set_up(self, f, g, operator, tau=None, sigma=1.):
         '''initialisation of the algorithm
 
-        :param operator : Linear Operator = K
-        :param f : Convex function with "simple" proximal of its conjugate. 
-        :param g : Convex function with "simple" proximal 
-        :param sigma : Step size parameter for Primal problem
-        :param tau : Step size parameter for Dual problem'''
+        :param operator: a Linear Operator
+        :param f: Convex function with "simple" proximal of its conjugate. 
+        :param g: Convex function with "simple" proximal 
+        :param sigma: Step size parameter for Primal problem
+        :param tau: Step size parameter for Dual problem'''
 
         print("{} setting up".format(self.__class__.__name__, ))
         
@@ -129,24 +130,26 @@ class PDHG(Algorithm):
 
         # Gradient ascent for the dual variable
         self.operator.direct(self.xbar, out=self.y_tmp)
-        self.y_tmp *= self.sigma
-        self.y_tmp += self.y_old
+        # self.y_tmp *= self.sigma
+        # self.y_tmp += self.y_old
+        self.y_tmp.axpby(self.sigma, 1 , self.y_old, self.y_tmp)
 
         # self.y = self.f.proximal_conjugate(self.y_old, self.sigma)
         self.f.proximal_conjugate(self.y_tmp, self.sigma, out=self.y)
         
         # Gradient descent for the primal variable
         self.operator.adjoint(self.y, out=self.x_tmp)
-        self.x_tmp *= -1*self.tau
-        self.x_tmp += self.x_old
+        # self.x_tmp *= -1*self.tau
+        # self.x_tmp += self.x_old
+        self.x_tmp.axpby(-self.tau, 1. , self.x_old, self.x_tmp)
 
         self.g.proximal(self.x_tmp, self.tau, out=self.x)
 
         # Update
         self.x.subtract(self.x_old, out=self.xbar)
-        self.xbar *= self.theta
-        self.xbar += self.x
-
+        # self.xbar *= self.theta
+        # self.xbar += self.x
+        self.xbar.axpby(self.theta, 1 , self.x, self.xbar)
         
         
     def update_objective(self):

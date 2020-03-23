@@ -15,10 +15,12 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-import numpy
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+import numpy as np
 import os
 from ccpi.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
-
 
 h5pyAvailable = True
 try:
@@ -71,11 +73,11 @@ class NEXUSDataReader(object):
         try:
             with h5py.File(self.nexus_file,'r') as file:
                 
-                if (file.attrs['creator'] != 'NEXUSDataWriter.py'):
+                if np.string_(file.attrs['creator']) != np.string_('NEXUSDataWriter.py'):
                     raise Exception('We can parse only files created by NEXUSDataWriter.py')
                 
                 ds_data = file['entry1/tomo_entry/data/data']
-                data = numpy.array(ds_data, dtype = 'float32')
+                data = np.array(ds_data, dtype = 'float32')
                 
                 dimension_labels = []
                 
@@ -119,7 +121,7 @@ class NEXUSDataReader(object):
                                                          pixel_num_v = ds_data.attrs['pixel_num_v'],
                                                          pixel_size_v = ds_data.attrs['pixel_size_v'],
                                                          channels = ds_data.attrs['channels'],
-                                                         angles = numpy.array(file['entry1/tomo_entry/data/rotation_angle'], dtype = 'float32'))
+                                                         angles = np.array(file['entry1/tomo_entry/data/rotation_angle'], dtype = 'float32'))
                                                          #angle_unit = file['entry1/tomo_entry/data/rotation_angle'].attrs['units'])
                                              
                     return AcquisitionData(array = data,

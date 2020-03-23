@@ -24,7 +24,7 @@ from ccpi.framework import AcquisitionData
 from ccpi.framework import ImageGeometry
 from ccpi.framework import AcquisitionGeometry
 from ccpi.optimisation.operators import Identity
-from ccpi.optimisation.functions import Norm2Sq, ZeroFunction, \
+from ccpi.optimisation.functions import LeastSquares, ZeroFunction, \
    L2NormSquared, FunctionOperatorComposition
 from ccpi.optimisation.algorithms import GradientDescent
 from ccpi.optimisation.algorithms import CGLS
@@ -65,7 +65,7 @@ class TestAlgorithms(unittest.TestCase):
         b = ig.allocate('random')
         identity = Identity(ig)
         
-        norm2sq = Norm2Sq(identity, b)
+        norm2sq = LeastSquares(identity, b)
         rate = norm2sq.L / 3.
         
         alg = GradientDescent(x_init=x_init, 
@@ -94,7 +94,7 @@ class TestAlgorithms(unittest.TestCase):
         b = ig.allocate('random')
         identity = Identity(ig)
         
-        norm2sq = Norm2Sq(identity, b)
+        norm2sq = LeastSquares(identity, b)
         rate = None
         
         alg = GradientDescent(x_init=x_init, 
@@ -198,7 +198,7 @@ class TestAlgorithms(unittest.TestCase):
         identity = Identity(ig)
         
 	    #### it seems FISTA does not work with Nowm2Sq
-        norm2sq = Norm2Sq(identity, b)
+        norm2sq = LeastSquares(identity, b)
         #norm2sq.L = 2 * norm2sq.c * identity.norm()**2
         #norm2sq = FunctionOperatorComposition(L2NormSquared(b=b), identity)
         opt = {'tol': 1e-4, 'memopt':False}
@@ -227,7 +227,7 @@ class TestAlgorithms(unittest.TestCase):
         identity = Identity(ig)
         
 	    #### it seems FISTA does not work with Nowm2Sq
-        norm2sq = Norm2Sq(identity, b)
+        norm2sq = LeastSquares(identity, b)
         print ('Lipschitz', norm2sq.L)
         norm2sq.L = None
         #norm2sq.L = 2 * norm2sq.c * identity.norm()**2
@@ -281,7 +281,7 @@ class TestAlgorithms(unittest.TestCase):
             if noise == 's&p':
                 g = L1Norm(b=noisy_data)
             elif noise == 'poisson':
-                g = KullbackLeibler(noisy_data)
+                g = KullbackLeibler(b=noisy_data)
             elif noise == 'gaussian':
                 g = 0.5 * L2NormSquared(b=noisy_data)
             return noisy_data, alpha, g
@@ -382,36 +382,7 @@ class TestAlgorithms(unittest.TestCase):
 
         # Setup and run the FISTA algorithm
         operator = Gradient(ig)
-        fid = KullbackLeibler(noisy_data)
-
-        def KL_Prox_PosCone(x, tau, out=None):
-                
-            if out is None: 
-                tmp = 0.5 *( (x - fid.bnoise - tau) + ( (x + fid.bnoise - tau)**2 + 4*tau*fid.b   ) .sqrt() )
-                return tmp.maximum(0)
-            else:            
-                tmp =  0.5 *( (x - fid.bnoise - tau) + 
-                            ( (x + fid.bnoise - tau)**2 + 4*tau*fid.b   ) .sqrt()
-                            )
-                x.add(fid.bnoise, out=out)
-                out -= tau
-                out *= out
-                tmp = fid.b * (4 * tau)
-                out.add(tmp, out=out)
-                out.sqrt(out=out)
-                
-                x.subtract(fid.bnoise, out=tmp)
-                tmp -= tau
-                
-                out += tmp
-                
-                out *= 0.5
-                
-                # ADD the constraint here
-                out.maximum(0, out=out)
-                
-        fid.proximal = KL_Prox_PosCone
-
+        fid = KullbackLeibler(b=noisy_data)
         reg = FunctionOperatorComposition(alpha * L2NormSquared(), operator)
 
         x_init = ig.allocate()
@@ -446,5 +417,7 @@ class TestAlgorithms(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    
+    d = TestAlgorithms()
+    d.test_GradientDescentArmijo2()
  

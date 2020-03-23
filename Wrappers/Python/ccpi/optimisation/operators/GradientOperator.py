@@ -18,13 +18,18 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from __future__ import unicode_literals
 
 from ccpi.optimisation.operators import Operator, LinearOperator, ScaledOperator
 from ccpi.optimisation.operators import FiniteDiff, SparseFiniteDiff
 from ccpi.framework import ImageData, ImageGeometry, BlockGeometry, BlockDataContainer
+from ccpi.utilities import NUM_THREADS
 import numpy 
 import warnings
+
+#default nThreads
+# import multiprocessing
+# cpus = multiprocessing.cpu_count()
+# NUM_THREADS = max(int(cpus/2),1)
 
 NEUMANN = 'Neumann'
 PERIODIC = 'Periodic'
@@ -35,7 +40,9 @@ CORRELATION_SPACECHANNEL = "SpaceChannels"
 
 class Gradient(LinearOperator):
 
-    """This is a class to compute the first-order forward/backward differences on ImageData
+
+    r'''Gradient Operator: Computes first-order forward/backward differences on 
+        2D, 3D, 4D ImageData under Neumann/Periodic boundary conditions
     
     :param gm_domain: Set up the domain of the function
     :type gm_domain: `ImageGeometry`
@@ -50,41 +57,47 @@ class Gradient(LinearOperator):
           'Space' or 'SpaceChannels', defaults to 'Space'
         * *backend* (``str``) --
           'c' or 'numpy', defaults to 'c' if correlation is 'SpaceChannels' or channels = 1
-    """
-
-    r'''Gradient Operator: .. math:: \nabla : X -> Y           
-            
-            Computes first-order forward/backward differences 
-                     on 2D, 3D, 4D ImageData
-                     under Neumann/Periodic boundary conditions
-                                                             
-                Example (2D): u\in X, \nabla(u) = [\partial_{y} u, \partial_{x} u]
-                              u^{*}\in Y, \nabla^{*}(u^{*}) = \partial_{y} v1 + \partial_{x} v2
+        * *num_threads* (``int``) --
+          If backend is 'c' specify the number of threads to use. Default is number of cpus/2          
+                 
+                 
+        Example (2D): 
+        .. math::
         
+          \nabla : X -> Y \\
+          u\in X, \nabla(u) = [\partial_{y} u, \partial_{x} u] \\
+          u^{*}\in Y, \nabla^{*}(u^{*}) = \partial_{y} v1 + \partial_{x} v2
+            
+
     '''
 
     #kept here for backwards compatability
     CORRELATION_SPACE = CORRELATION_SPACE
     CORRELATION_SPACECHANNEL = CORRELATION_SPACECHANNEL
 
-    def __init__(self, gm_domain, bnd_cond = 'Neumann', **kwargs):
+    def __init__(self, domain_geometry, bnd_cond = 'Neumann', **kwargs):
         """Constructor method
         """        
-        super(Gradient, self).__init__() 
-
+        
         backend = kwargs.get('backend',C)
 
         correlation = kwargs.get('correlation',CORRELATION_SPACE)
 
-        if correlation == CORRELATION_SPACE and gm_domain.channels > 1:
+        if correlation == CORRELATION_SPACE and domain_geometry.channels > 1:
             #numpy implementation only for now
             backend = NUMPY
             warnings.warn("Warning: correlation='Space' on multi-channel dataset will use `numpy` backend")
 
         if backend == NUMPY:
-            self.operator = Gradient_numpy(gm_domain, bnd_cond=bnd_cond, **kwargs)
+            self.operator = Gradient_numpy(domain_geometry, bnd_cond=bnd_cond, **kwargs)
         else:
-            self.operator = Gradient_C(gm_domain, bnd_cond=bnd_cond)
+            self.operator = Gradient_C(domain_geometry, bnd_cond=bnd_cond, **kwargs)
+        
+        super(Gradient, self).__init__(domain_geometry=domain_geometry, 
+                                       range_geometry=self.operator.range_geometry()) 
+
+        self.gm_range = self.range_geometry()
+        self.gm_domain = self.domain_geometry()
 
 
     def direct(self, x, out=None):
@@ -112,22 +125,29 @@ class Gradient(LinearOperator):
         """            
         return self.operator.adjoint(x, out=out)
 
-    def domain_geometry(self):
-        '''Returns domain_geometry of Gradient'''
+    # def domain_geometry(self):
+    #     '''Returns domain_geometry of Gradient'''
         
-        return self.operator.gm_domain
+    #     return self.operator.gm_domain
     
-    def range_geometry(self):
+    # def range_geometry(self):
         
-        '''Returns range_geometry of Gradient'''
+    #     '''Returns range_geometry of Gradient'''
         
-        return self.operator.gm_range
+    #     return self.operator.gm_range
 
 class Gradient_numpy(LinearOperator):
     
     def __init__(self, gm_domain, bnd_cond = 'Neumann', **kwargs):
+        '''creator
         
-        super(Gradient_numpy, self).__init__() 
+        :param gm_domain: domain of the operator
+        :type gm_domain: :code:`AcquisitionGeometry` or :code:`ImageGeometry`
+        :param bnd_cond: boundary condition, either :code:`Neumann` or :code:`Periodic`.
+        :type bnd_cond: str, optional, default :code:`Neumann`
+        :param correlation: optional, :code:`SpaceChannel` or :code:`Space`
+        :type correlation: str, optional, default :code:`Space`
+        '''
                 
         self.gm_domain = gm_domain # Domain of Grad Operator
         
@@ -174,7 +194,11 @@ class Gradient_numpy(LinearOperator):
         
         # Call FiniteDiff operator        
         self.FD = FiniteDiff(self.gm_domain, direction = 0, bnd_cond = self.bnd_cond)
-                                                         
+
+        super(Gradient_numpy, self).__init__(domain_geometry=self.gm_domain, 
+                                             range_geometry=self.gm_range) 
+        
+        print("Initialised GradientOperator with numpy backend")               
         
     def direct(self, x, out=None):
         
@@ -224,14 +248,6 @@ class Gradient_numpy(LinearOperator):
         
         return self.gm_range
     
-    def __rmul__(self, scalar):
-        
-        '''Multiplication of Gradient with a scalar        
-            
-            Returns: ScaledOperator
-        '''        
-        
-        return ScaledOperator(self, scalar) 
     
     ###########################################################################
     ###############  For preconditioning ######################################
@@ -266,7 +282,8 @@ class Gradient_numpy(LinearOperator):
             spMat = SparseFiniteDiff(self.gm_domain, direction=self.ind[i], bnd_cond=self.bnd_cond)
             res.append(spMat.sum_abs_col())
         return BlockDataContainer(*res)
-   
+
+
 import ctypes, platform
 
 # check for the extension
@@ -279,14 +296,13 @@ elif platform.system() == 'Darwin':
 else:
     raise ValueError('Not supported platform, ', platform.system())
 
-#print ("dll location", dll)
-cilacc = ctypes.cdll.LoadLibrary(dll)
 
-#FD = ctypes.CDLL(dll)
+cilacc = ctypes.cdll.LoadLibrary(dll)
 
 c_float_p = ctypes.POINTER(ctypes.c_float)
 
 cilacc.openMPtest.restypes = ctypes.c_int32
+cilacc.openMPtest.argtypes = [ctypes.c_int32]
 
 cilacc.fdiff4D.argtypes = [ctypes.POINTER(ctypes.c_float),
                        ctypes.POINTER(ctypes.c_float),
@@ -298,6 +314,7 @@ cilacc.fdiff4D.argtypes = [ctypes.POINTER(ctypes.c_float),
                        ctypes.c_long,
                        ctypes.c_long,
                        ctypes.c_int32,
+                       ctypes.c_int32,
                        ctypes.c_int32]
 
 cilacc.fdiff3D.argtypes = [ctypes.POINTER(ctypes.c_float),
@@ -308,6 +325,7 @@ cilacc.fdiff3D.argtypes = [ctypes.POINTER(ctypes.c_float),
                        ctypes.c_long,
                        ctypes.c_long,
                        ctypes.c_int32,
+                       ctypes.c_int32,
                        ctypes.c_int32]
 
 cilacc.fdiff2D.argtypes = [ctypes.POINTER(ctypes.c_float),
@@ -315,6 +333,7 @@ cilacc.fdiff2D.argtypes = [ctypes.POINTER(ctypes.c_float),
                        ctypes.POINTER(ctypes.c_float),
                        ctypes.c_long,
                        ctypes.c_long,
+                       ctypes.c_int32,
                        ctypes.c_int32,
                        ctypes.c_int32]
 
@@ -327,9 +346,9 @@ class Gradient_C(LinearOperator):
                      on 2D, 3D, 4D ImageData
                      under Neumann/Periodic boundary conditions'''
 
-    def __init__(self, gm_domain, gm_range=None, bnd_cond = NEUMANN):
+    def __init__(self, gm_domain, gm_range=None, bnd_cond = NEUMANN, **kwargs):
 
-        super(Gradient_C, self).__init__() 
+        self.num_threads = kwargs.get('num_threads',NUM_THREADS)
 
         self.gm_domain = gm_domain
         self.gm_range = gm_range
@@ -353,8 +372,12 @@ class Gradient_C(LinearOperator):
             self.fd = cilacc.fdiff2D
         else:
             raise ValueError('Number of dimensions not supported, expected 2, 3 or 4, got {}'.format(len(gm_domain.shape)))
-        
-                        
+      #self.num_threads
+        # super(Gradient_C, self).__init__() 
+        super(Gradient_C, self).__init__(domain_geometry=self.gm_domain, 
+                                             range_geometry=self.gm_range) 
+        print("Initialised GradientOperator with C backend running with ", cilacc.openMPtest(self.num_threads)," threads")               
+
     @staticmethod 
     def datacontainer_as_c_pointer(x):
         ndx = x.as_array()
@@ -368,9 +391,10 @@ class Gradient_C(LinearOperator):
             out = self.gm_range.allocate(None)
             return_val = True
 
+        #pass list of all arguments
         arg1 = [Gradient_C.datacontainer_as_c_pointer(out.get_item(i))[1] for i in range(self.gm_range.shape[0])]
         arg2 = [el for el in x.shape]
-        args = arg1 + arg2 + [self.bnd_cond, 1]
+        args = arg1 + arg2 + [self.bnd_cond, 1, self.num_threads]
         self.fd(x_p, *args)
         
         if return_val is True:
@@ -388,24 +412,24 @@ class Gradient_C(LinearOperator):
 
         arg1 = [Gradient_C.datacontainer_as_c_pointer(x.get_item(i))[1] for i in range(self.gm_range.shape[0])]
         arg2 = [el for el in out.shape]
-        args = arg1 + arg2 + [self.bnd_cond, 0]
+        args = arg1 + arg2 + [self.bnd_cond, 0, self.num_threads]
 
         self.fd(out_p, *args)
 
         if return_val is True:
             return out
 
-    def domain_geometry(self):
+    # def domain_geometry(self):
         
-        '''Returns domain_geometry of Gradient'''
+    #     '''Returns domain_geometry of Gradient'''
         
-        return self.gm_domain
+    #     return self.gm_domain
     
-    def range_geometry(self):
+    # def range_geometry(self):
         
-        '''Returns range_geometry of Gradient'''
+    #     '''Returns range_geometry of Gradient'''
         
-        return self.gm_range
+    #     return self.gm_range
 
        
 if __name__ == '__main__':

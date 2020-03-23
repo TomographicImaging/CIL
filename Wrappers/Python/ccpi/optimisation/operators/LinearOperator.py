@@ -19,7 +19,6 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from __future__ import unicode_literals
 
 from ccpi.optimisation.operators import Operator
 import numpy
@@ -40,7 +39,15 @@ class LinearOperator(Operator):
     
     @staticmethod
     def PowerMethod(operator, iterations, x_init=None):
-        '''Power method to calculate iteratively the Lipschitz constant'''
+        '''Power method to calculate iteratively the Lipschitz constant
+        
+        :param operator: input operator
+        :type operator: :code:`LinearOperator`
+        :param iterations: number of iterations to run
+        :type iteration: int
+        :param x_init: starting point for the iteration in the operator domain
+        :returns: tuple with: L, list of L at each iteration, the data the iteration worked on.
+        '''
         
         # Initialise random
         if x_init is None:
@@ -65,26 +72,42 @@ class LinearOperator(Operator):
         return numpy.sqrt(s[-1]), numpy.sqrt(s), x0
 
     def calculate_norm(self, **kwargs):
-        '''Returns the norm of the LinearOperator as calculated by the PowerMethod'''
-        x0 = kwargs.get('x0', None)
+        '''Returns the norm of the LinearOperator as calculated by the PowerMethod
+        
+        :param iterations: number of iterations to run
+        :type iterations: int, optional, default = 25
+        :param x_init: starting point for the iteration in the operator domain
+        :type x_init: same type as domain, a subclass of :code:`DataContainer`, optional, None
+        :parameter force: forces the recalculation of the norm
+        :type force: boolean, default :code:`False`
+        '''
+        x0 = kwargs.get('x_init', None)
         iterations = kwargs.get('iterations', 25)
         s1, sall, svec = LinearOperator.PowerMethod(self, iterations, x_init=x0)
         return s1
 
     @staticmethod
-    def dot_test(operator, domain_init=None, range_init=None, verbose=False):
-        '''Does a dot linearity test on the operator
+    def dot_test(operator, domain_init=None, range_init=None, verbose=False, **kwargs):
+        r'''Does a dot linearity test on the operator
         
         Evaluates if the following equivalence holds
         
-        :math: ..
+        .. math::
         
           Ax\times y = y \times A^Tx
         
+        The equivalence is tested within a user specified precision
+
+        .. code::
+        
+          abs(desired-actual) < 1.5 * 10**(-decimal)
+
         :param operator: operator to test
         :param range_init: optional initialisation container in the operator range 
         :param domain_init: optional initialisation container in the operator domain 
         :returns: boolean, True if the test is passed.
+        :param decimal: desired precision
+        :type decimal: int, optional, default 4
         '''
         if range_init is None:
             y = operator.range_geometry().allocate('random_int')
@@ -101,8 +124,9 @@ class LinearOperator(Operator):
         b = by.dot(x)
         if verbose:
             print ('Left hand side  {}, \nRight hand side {}'.format(a, b))
+            print ("decimal ", kwargs.get('decimal', 4))
         try:
-            numpy.testing.assert_almost_equal(abs((a-b)/a), 0, decimal=4)
+            numpy.testing.assert_almost_equal(abs((a-b)/a), 0., decimal=kwargs.get('decimal',4))
             return True
         except AssertionError as ae:
             print (ae)

@@ -23,6 +23,7 @@ from __future__ import division
 from __future__ import print_function
 
 from ccpi.optimisation.functions import Function
+from ccpi.framework import DataContainer
 
 class L2NormSquared(Function):
     
@@ -157,7 +158,11 @@ class L2NormSquared(Function):
             else:
                 x.divide((1+2*tau), out=out)
 
-    
+# TODO
+# We do not need this, because it is computed directly by the method proximal_conjugate
+# of parent class "Function"
+# However, we should add the expression below to the docs    
+                
 #    def proximal_conjugate(self, x, tau, out=None):
 #        
 #        r'''Proximal operator of the convex conjugate of L2NormSquared at x:
@@ -176,169 +181,93 @@ class L2NormSquared(Function):
 #            else:
 #                x.divide(1 + tau/2, out=out)                                        
 
-
+# TODO
+# it's easier if we define a weighted space
+# otherwise we need to define for every function a weighted version
+# if we need it. However, for that we need to define a space for the functions __init__
+                
+from ccpi.optimisation.operators import LinearOperatorMatrix
+                
 class weighted_L2NormSquared(Function):
     
-   def __init__(self, weight, **kwargs):
-
-                     
-    super(L2NormSquared, self).__init__(L = 2)
-    self.b = kwargs.get('b',None)  
-    self.weight = weight
-    
-    def __call__(self, x):
-        pass
-    
-    def gradient(self, x, out = None):
-        pass
-    
-    def convex_conjugate(self, x):
-        pass
-    
-    def proximal(self, x, tau, out = None):
-        pass    
-        
-     
-
-
-if __name__ == '__main__':
-    
-    from ccpi.framework import ImageGeometry
-    import numpy
-    # TESTS for L2 and scalar * L2
-    
-    M, N, K = 2,3,1
-    ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N, voxel_num_z = K)
-    u = ig.allocate('random_int')
-    b = ig.allocate('random_int') 
-    
-    # check grad/call no data
-    f = L2NormSquared()
-    a1 = f.gradient(u)
-    a2 = 2 * u
-    numpy.testing.assert_array_almost_equal(a1.as_array(), a2.as_array(), decimal=4)
-    numpy.testing.assert_equal(f(u), u.squared_norm())
-
-    # check grad/call with data
-    
-    igggg = ImageGeometry(4,4)
-    f1 = L2NormSquared(b=b)
-    b1 = f1.gradient(u)
-    b2 = 2 * (u-b)
-        
-    numpy.testing.assert_array_almost_equal(b1.as_array(), b2.as_array(), decimal=4)
-    numpy.testing.assert_equal(f1(u), ((u-b)).squared_norm())
-    
-    #check convex conjuagate no data
-    c1 = f.convex_conjugate(u)
-    c2 = 1/4 * u.squared_norm()
-    numpy.testing.assert_equal(c1, c2)
-    
-    #check convex conjuagate with data
-    d1 = f1.convex_conjugate(u)
-    d2 = (1/4) * u.squared_norm() + u.dot(b)
-    numpy.testing.assert_equal(d1, d2)  
-    
-    # check proximal no data
-    tau = 5
-    e1 = f.proximal(u, tau)
-    e2 = u/(1+2*tau)
-    numpy.testing.assert_array_almost_equal(e1.as_array(), e2.as_array(), decimal=4)
-    
-    # check proximal with data
-    tau = 5
-    h1 = f1.proximal(u, tau)
-    h2 = (u-b)/(1+2*tau) + b
-    numpy.testing.assert_array_almost_equal(h1.as_array(), h2.as_array(), decimal=4)    
-    
-    # check proximal conjugate no data
-    tau = 0.2
-    k1 = f.proximal_conjugate(u, tau)
-    k2 = u/(1 + tau/2 )
-    numpy.testing.assert_array_almost_equal(k1.as_array(), k2.as_array(), decimal=4) 
-    
-    # check proximal conjugate with data
-    l1 = f1.proximal_conjugate(u, tau)
-    l2 = (u - tau * b)/(1 + tau/2 )
-    numpy.testing.assert_array_almost_equal(l1.as_array(), l2.as_array(), decimal=4)     
-    
-        
-    # check scaled function properties
-    
-    # scalar 
-    scalar = 100
-    f_scaled_no_data = scalar * L2NormSquared()
-    f_scaled_data = scalar * L2NormSquared(b=b)
-    
-    # call
-    numpy.testing.assert_equal(f_scaled_no_data(u), scalar*f(u))
-    numpy.testing.assert_equal(f_scaled_data(u), scalar*f1(u))
-    
-    # grad
-    numpy.testing.assert_array_almost_equal(f_scaled_no_data.gradient(u).as_array(), scalar*f.gradient(u).as_array(), decimal=4)
-    numpy.testing.assert_array_almost_equal(f_scaled_data.gradient(u).as_array(), scalar*f1.gradient(u).as_array(), decimal=4)
-    
-    # conj
-    numpy.testing.assert_almost_equal(f_scaled_no_data.convex_conjugate(u), \
-                               f.convex_conjugate(u/scalar) * scalar, decimal=4)
-    
-    numpy.testing.assert_almost_equal(f_scaled_data.convex_conjugate(u), \
-                               scalar * f1.convex_conjugate(u/scalar), decimal=4)
-    
-    # proximal
-    numpy.testing.assert_array_almost_equal(f_scaled_no_data.proximal(u, tau).as_array(), \
-                                            f.proximal(u, tau*scalar).as_array())
+   def __init__(self, **kwargs):
+                         
+    # Weight treated as Linear operator, 
+    # in order to compute the lispchitz constant L = 2 *||weight||
     
     
-    numpy.testing.assert_array_almost_equal(f_scaled_data.proximal(u, tau).as_array(), \
-                                            f1.proximal(u, tau*scalar).as_array())
-                               
+    self.weight = kwargs.get('weight', 1.0) 
+    self.b = kwargs.get('b', None) 
+    tmp_norm = 1.0  
     
-    # proximal conjugate
-    numpy.testing.assert_array_almost_equal(f_scaled_no_data.proximal_conjugate(u, tau).as_array(), \
-                                            (u/(1 + tau/(2*scalar) )).as_array(), decimal=4)
-    
-    numpy.testing.assert_array_almost_equal(f_scaled_data.proximal_conjugate(u, tau).as_array(), \
-                                            ((u - tau * b)/(1 + tau/(2*scalar) )).as_array(), decimal=4)   
-    
-    
-    
-    print( " ####### check without out ######### " )
+    # Need this to make it behave similarly as the L2NormSquared
+    self.weight_sqrt = 1.0
           
-          
-    u_out_no_out = ig.allocate('random_int')         
-    res_no_out = f_scaled_data.proximal_conjugate(u_out_no_out, 0.5)          
-    print(res_no_out.as_array())
+    if isinstance(self.weight, DataContainer):
+        op_weight = LinearOperatorMatrix(self.weight.as_array())  
+        tmp_norm = op_weight.norm() 
+        self.weight_sqrt = self.weight.sqrt()
+        if (self.weight<0).any():
+            raise ValueError('Weigth contains negative values')
+    super(weighted_L2NormSquared, self).__init__(L = 2 * tmp_norm  )        
     
-    print( " ####### check with out ######### " ) 
-          
-    res_out = ig.allocate()        
-    f_scaled_data.proximal_conjugate(u_out_no_out, 0.5, out = res_out)
     
-    print(res_out.as_array())   
+   def __call__(self, x):
+        
+        y = self.weight_sqrt * x
+        if self.b is not None: 
+            y = self.weight_sqrt * (x - self.b)
+        try:
+            return y.squared_norm()
+        except AttributeError as ae:
+            # added for compatibility with SIRF 
+            return (y.norm()**2)        
+                
+   def gradient(self, x, out=None):        
+        
+                
+        if out is not None:
+            
+            out.fill(x)        
+            if self.b is not None:
+                out -= self.b
+            out *= self.weight                
+            out *= 2
+            
+        else:
+            
+            y = x
+            if self.b is not None:
+                y = x - self.b
+            return 2*self.weight*y
+    
+   def convex_conjugate(self, x):
+                      
+        tmp = 0
+        
+        if self.b is not None:
+            tmp = x.dot(self.b) 
+            
+        return (1./4) * (x/self.weight_sqrt).squared_norm() + tmp
+    
+   def proximal(self, x, tau, out = None):
+                  
 
-    numpy.testing.assert_array_almost_equal(res_no_out.as_array(), \
-                                            res_out.as_array(), decimal=4)  
-    
-    
-    
-    ig1 = ImageGeometry(2,3)
-    
-    tau = 0.1
-    
-    u = ig1.allocate('random_int')
-    b = ig1.allocate('random_int')
-    
-    scalar = 0.5
-    f_scaled = scalar * L2NormSquared(b=b)
-    f_noscaled = L2NormSquared(b=b)
-    
-    
-    res1 = f_scaled.proximal(u, tau)
-    res2 = f_noscaled.proximal(u, tau*scalar)
-    
-#    res2 = (u + tau*b)/(1+tau)
-    
-    numpy.testing.assert_array_almost_equal(res1.as_array(), \
-                                            res2.as_array(), decimal=4)
-                                            
+        if out is None:
+            
+            if self.b is None:
+                return x/(1+2*tau*self.weight)
+            else:
+                tmp = x.subtract(self.b)
+                tmp /= (1+2*tau*self.weight)
+                tmp += self.b
+                return tmp
+
+        else:
+            if self.b is not None:
+                x.subtract(self.b, out=out)
+                out /= (1+2*tau*self.weight)
+                out += self.b
+            else:
+                x.divide((1+2*tau*self.weight), out=out)
+                                               

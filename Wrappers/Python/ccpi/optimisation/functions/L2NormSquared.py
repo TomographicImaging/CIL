@@ -270,4 +270,6 @@ class weighted_L2NormSquared(Function):
                 out += self.b
             else:
                 x.divide((1+2*tau*self.weight), out=out)
+                
+    #TODO add test for the proximal conjugate                
                                                

@@ -460,7 +460,4 @@ class TestFunction(unittest.TestCase):
         a = ib(im)
         numpy.testing.assert_equal(a, numpy.inf)
 
-if __name__ == '__main__':
-    
-    d = TestFunction()
-    d.test_KullbackLeibler()
+

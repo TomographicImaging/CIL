@@ -393,7 +393,8 @@ class CompositionOperator(Operator):
         
         self.linear_flag = functools.reduce(lambda x,y: x and y.is_linear(),
                                             self.operators, True)
-        self.preallocate = kwargs.get('preallocate', False)
+        # self.preallocate = kwargs.get('preallocate', False)
+        self.preallocate = False
         if self.preallocate:
             self.tmp_domain = [op.domain_geometry().allocate() for op in self.operators[:-1]]
             self.tmp_range = [op.range_geometry().allocate() for op in self.operators[1:]]
@@ -414,12 +415,15 @@ class CompositionOperator(Operator):
             # return functools.reduce(lambda X,operator: operator.direct(X), 
             #                        self.operators[::-1][1:],
             #                        self.operators[-1].direct(x))
-            for i,operator in enumerate(self.operators[::-1]):
-                if i == 0:
-                    step = operator.direct(x)
-                else:
-                    step = operator.direct(step)
-            return step
+            if self.preallocate:
+                pass
+            else:
+                for i,operator in enumerate(self.operators[::-1]):
+                    if i == 0:
+                        step = operator.direct(x)
+                    else:
+                        step = operator.direct(step)
+                return step
 
         else:
             # tmp = self.operator2.range_geometry().allocate()
@@ -433,15 +437,23 @@ class CompositionOperator(Operator):
             # )
             
             # TODO this is a bit silly but will handle the pre allocation later
-            
-            for i,operator in enumerate(self.operators[::-1]):
-                if i == 0:
-                    operator.direct(x, out=self.tmp_range[i])
-                elif i == len(self.operators) - 1:
-                    operator.direct(self.tmp_range[i-1], out=out)
-                else:
-                    operator.direct(self.tmp_range[i-1], out=self.tmp_range[i])
-            
+            if self.preallocate:
+
+                for i,operator in enumerate(self.operators[::-1]):
+                    if i == 0:
+                        operator.direct(x, out=self.tmp_range[i])
+                    elif i == len(self.operators) - 1:
+                        operator.direct(self.tmp_range[i-1], out=out)
+                    else:
+                        operator.direct(self.tmp_range[i-1], out=self.tmp_range[i])
+            else:
+                for i,operator in enumerate(self.operators[::-1]):
+                    if i == 0:
+                        step = operator.direct(x)
+                    else:
+                        step = operator.direct(step)
+                out.fill(step)
+
             
     def adjoint(self, x, out = None):
         
@@ -452,24 +464,34 @@ class CompositionOperator(Operator):
                 # return functools.reduce(lambda X,operator: operator.adjoint(X), 
                 #                    self.operators[1:],
                 #                    self.operators[0].adjoint(x))
-
-                for i,operator in enumerate(self.operators):
-                    if i == 0:
-                        operator.adjoint(x, out=self.tmp_domain[i])
-                    elif i == len(self.operators) - 1:
-                        step = operator.adjoint(self.tmp_domain[i-1], out=out)
-                    else:
-                        operator.adjoint(self.tmp_domain[i-1], out=self.tmp_domain[i])
-                return
-
-            else:
-                for i,operator in enumerate(self.operators):
-                    if i == 0:
-                        step = operator.adjoint(x)
-                    else:
-                        step = operator.adjoint(step)
+                if self.preallocate:
+                    for i,operator in enumerate(self.operators):
+                        if i == 0:
+                            operator.adjoint(x, out=self.tmp_domain[i])
+                        elif i == len(self.operators) - 1:
+                            step = operator.adjoint(self.tmp_domain[i-1], out=out)
+                        else:
+                            operator.adjoint(self.tmp_domain[i-1], out=self.tmp_domain[i])
+                    return
+                else:
+                    for i,operator in enumerate(self.operators):
+                        if i == 0:
+                            step = operator.adjoint(x)
+                        else:
+                            step = operator.adjoint(step)
+                    out.fill(step)
                 
-                return step
+            else:
+                if self.preallocate:
+                    pass
+                else:
+                    for i,operator in enumerate(self.operators):
+                        if i == 0:
+                            step = operator.adjoint(x)
+                        else:
+                            step = operator.adjoint(step)
+                    
+                    return step
         else:
             raise ValueError('No adjoint operation with non-linear operators')
             
@@ -479,7 +501,11 @@ class CompositionOperator(Operator):
             
     def calculate_norm(self, **kwargs):
         if self.is_linear():
-            return LinearOperator.calculate_norm(self, **kwargs)
+            #return LinearOperator.calculate_norm(self, **kwargs)
+            x0 = kwargs.get('x_init', None)
+            iterations = kwargs.get('iterations', 25)
+            s1, sall, svec = LinearOperator.PowerMethod(self, iterations, x_init=x0)
+            return s1
 
 
 

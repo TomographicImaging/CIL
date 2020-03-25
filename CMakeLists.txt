@@ -13,6 +13,8 @@ if (APPLE)
   endif(SHARED_LIBS_ABS_PATH)
 endif(APPLE)
 
+set(CMAKE_BUILD_TYPE "Release")
+
 set(CIL_VERSION $ENV{CIL_VERSION})
 add_subdirectory(src/Core)
 add_subdirectory(Wrappers/Python)

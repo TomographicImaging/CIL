@@ -82,11 +82,18 @@ class BlockOperator(Operator):
             raise ValueError(
                     'Dimension and size do not match: expected {} got {}'
                     .format(n_elements,len(args)))
-        # test if operators are compatible
-        if not self.column_wise_compatible():
-            raise ValueError('Operators in each column must have the same domain')
-        if not self.row_wise_compatible():
-            raise ValueError('Operators in each row must have the same range')
+        # TODO
+        # until a decent way to check equality of Acquisition/Image geometries
+        # required to fullfil "Operators in a Block are required to have the same 
+        # domain column-wise and the same range row-wise."
+        # let us just not check if column/row-wise compatible, which is actually 
+        # the same achieved by the column_wise_compatible and row_wise_compatible methods.
+        
+        # # test if operators are compatible
+        # if not self.column_wise_compatible():
+        #     raise ValueError('Operators in each column must have the same domain')
+        # if not self.row_wise_compatible():
+        #     raise ValueError('Operators in each row must have the same range')
     
     def column_wise_compatible(self):
         '''Operators in a Block should have the same domain per column'''

@@ -95,20 +95,23 @@ class CGLS(Algorithm):
     def update(self):
         '''single iteration'''
         
-        self.q = self.operator.direct(self.p)
+        self.operator.direct(self.p, out=self.q)
         delta = self.q.squared_norm()
         alpha = self.gamma/delta
-                        
-        self.x += alpha * self.p
-        self.r -= alpha * self.q
+         
+        self.x.axpby(1, alpha, self.py, out=self.x)
+        #self.x += alpha * self.p
+        self.r.axpby(1, -alpha, self.q, out=self.r)
+        #self.r -= alpha * self.q
         
-        self.s = self.operator.adjoint(self.r)
+        self.operator.adjoint(self.r, out=self.s)
         
         self.norms = self.s.norm()
         self.gamma1 = self.gamma
         self.gamma = self.norms**2
         self.beta = self.gamma/self.gamma1
-        self.p = self.s + self.beta * self.p   
+        #self.p = self.s + self.beta * self.p   
+        self.p.axpby(self.beta, 1, self.s, out=self.p)
         
         self.normx = self.x.norm()
         self.xmax = numpy.maximum(self.xmax, self.normx)

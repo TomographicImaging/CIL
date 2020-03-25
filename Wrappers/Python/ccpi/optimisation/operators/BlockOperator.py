@@ -97,7 +97,10 @@ class BlockOperator(Operator):
             for row in range(1,rows):
                 dg0 = self.get_item(row-1,col).domain_geometry()
                 dg1 = self.get_item(row,col).domain_geometry()
-                column_compatible = dg0.__dict__ == dg1.__dict__ and column_compatible
+                if hasattr(dg0,'handle') and hasattr(dg1,'handle'):
+                    column_compatible = True and column_compatible
+                else:
+                    column_compatible = dg0.__dict__ == dg1.__dict__ and column_compatible
             compatible = compatible and column_compatible
         return compatible
     
@@ -110,8 +113,13 @@ class BlockOperator(Operator):
             for col in range(1,cols):
                 dg0 = self.get_item(row,col-1).range_geometry()
                 dg1 = self.get_item(row,col).range_geometry()
-                row_compatible = dg0.__dict__ == dg1.__dict__ and row_compatible
+                if hasattr(dg0,'handle') and hasattr(dg1,'handle'):
+                    row_compatible = True and column_compatible
+                else:
+                    row_compatible = dg0.__dict__ == dg1.__dict__ and row_compatible
+                
             compatible = compatible and row_compatible
+            
         return compatible
 
     def get_item(self, row, col):

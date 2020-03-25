@@ -91,7 +91,7 @@ class TestBlockOperator(unittest.TestCase):
                 print ("range" , op.range_geometry().shape)
             for op in ops:
                 print ("domain" , op.domain_geometry().shape)
-            self.assertTrue(K.row_wise_compatible())
+            self.assertFalse(K.row_wise_compatible())
         except ValueError as ve:
             print (ve)
             self.assertTrue(True)

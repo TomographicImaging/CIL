@@ -201,7 +201,7 @@ class SmoothMixedL21Norm(Function):
         if out is None:
             return x.divide(denom)
         else:
-            x.divide(tmp, out=out)        
+            x.divide(denom, out=out)        
 
 if __name__ == '__main__':
     

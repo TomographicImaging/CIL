@@ -311,18 +311,20 @@ class BlockDataContainer(object):
                 return type(self)(*res, shape=self.shape)
         
 
-    def power(self, other, out = None, *args, **kwargs):
+    def power(self, other, *args, **kwargs):
         if not self.is_compatible(other):
             raise ValueError('Incompatible for power')
+        out = kwargs.get('out', None)
         if isinstance(other, Number):
             return type(self)(*[ el.power(other, *args, **kwargs) for el in self.containers], shape=self.shape)
         elif isinstance(other, list) or isinstance(other, numpy.ndarray):
-            return type(self)(*[ el.power(ot, out = out, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
-        return type(self)(*[ el.power(ot, out = out, *args, **kwargs) for el,ot in zip(self.containers,other.containers)], shape=self.shape)
+            return type(self)(*[ el.power(ot, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
+        return type(self)(*[ el.power(ot, *args, **kwargs) for el,ot in zip(self.containers,other.containers)], shape=self.shape)
     
-    def maximum(self, other, out = None, *args, **kwargs):
+    def maximum(self,other, *args, **kwargs):
         if not self.is_compatible(other):
             raise ValueError('Incompatible for maximum')
+        out = kwargs.get('out', None)
         if isinstance(other, Number):
             return type(self)(*[ el.maximum(other, *args, **kwargs) for el in self.containers], shape=self.shape)
         elif isinstance(other, list) or isinstance(other, numpy.ndarray):
@@ -330,9 +332,10 @@ class BlockDataContainer(object):
         return type(self)(*[ el.maximum(ot, *args, **kwargs) for el,ot in zip(self.containers,other.containers)], shape=self.shape)
 
 
-    def minimum(self, other, out = None, *args, **kwargs):
+    def minimum(self,other, *args, **kwargs):
         if not self.is_compatible(other):
-            raise ValueError('Incompatible for minimum')
+            raise ValueError('Incompatible for maximum')
+        out = kwargs.get('out', None)
         if isinstance(other, Number):
             return type(self)(*[ el.minimum(other, *args, **kwargs) for el in self.containers], shape=self.shape)
         elif isinstance(other, list) or isinstance(other, numpy.ndarray):
@@ -341,11 +344,11 @@ class BlockDataContainer(object):
 
     
     ## unary operations    
-    def abs(self, out = None, *args,  **kwargs):
+    def abs(self, *args,  **kwargs):
         return type(self)(*[ el.abs(*args, **kwargs) for el in self.containers], shape=self.shape)
-    def sign(self, out = None, *args,  **kwargs):
+    def sign(self, *args,  **kwargs):
         return type(self)(*[ el.sign(*args, **kwargs) for el in self.containers], shape=self.shape)
-    def sqrt(self, out = None, *args,  **kwargs):
+    def sqrt(self, *args,  **kwargs):
         return type(self)(*[ el.sqrt(*args, **kwargs) for el in self.containers], shape=self.shape)
     def conjugate(self, out=None):
         return type(self)(*[el.conjugate() for el in self.containers], shape=self.shape)

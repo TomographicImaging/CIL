@@ -842,7 +842,7 @@ class DataContainer(object):
         return self.pixel_wise_binary(numpy.maximum, x2, *args, **kwargs)
     
     def minimum(self,x2, *args, **kwargs):
-        return self.pixel_wise_binary(numpy.minimum, x2=x2, *args, **kwargs)
+        return self.pixel_wise_binary(numpy.minimum, x2, *args, **kwargs)
 
     def axpby(self, a, b, y, out, dtype=numpy.float32, num_threads=NUM_THREADS):
         '''performs axpby with cilacc C library

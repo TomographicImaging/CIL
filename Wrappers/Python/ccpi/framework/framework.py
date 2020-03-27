@@ -187,6 +187,10 @@ class ImageGeometry(object):
                             self.center_z, 
                             self.channels,
                             dimension_labels=self.dimension_labels)
+    def copy(self):
+        '''alias of clone'''
+        return self.clone()
+ 
     def __str__ (self):
         repres = ""
         repres += "Number of channels: {0}\n".format(self.channels)
@@ -376,7 +380,10 @@ class AcquisitionGeometry(object):
                                    self.dist_center_detector, 
                                    self.channels,
                                    dimension_labels=self.dimension_labels)
-        
+    def copy(self):
+        '''alias of clone'''
+        return self.clone()
+
     def __str__ (self):
         repres = ""
         repres += "Number of dimensions: {0}\n".format(self.dimension)
@@ -761,10 +768,13 @@ class DataContainer(object):
                 out = pwop(self.as_array() , x2 , *args, **kwargs )
             elif issubclass(type(x2) , DataContainer):
                 out = pwop(self.as_array() , x2.as_array() , *args, **kwargs )
+            geom = self.geometry
+            if geom is not None:
+                geom = self.geometry.copy()
             return type(self)(out,
                    deep_copy=False, 
                    dimension_labels=self.dimension_labels,
-                   geometry=self.geometry, 
+                   geometry= None if self.geometry is None else self.geometry.copy(), 
                    suppress_warning=True)
             
         
@@ -1661,6 +1671,7 @@ class VectorData(DataContainer):
         deep_copy = True
         # need to pass the geometry, othewise None
         super(VectorData, self).__init__(out, deep_copy, None, geometry = self.geometry)
+    
 
 class VectorGeometry(object):
     '''Geometry describing VectorData to contain 1D array'''
@@ -1677,6 +1688,9 @@ class VectorGeometry(object):
     def clone(self):
         '''returns a copy of VectorGeometry'''
         return VectorGeometry(self.length)
+    def copy(self):
+        '''alias of clone'''
+        return self.clone()
 
     def allocate(self, value=0, **kwargs):
         '''allocates an VectorData according to the size expressed in the instance'''

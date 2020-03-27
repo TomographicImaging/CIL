@@ -57,7 +57,7 @@ class ZeroOperator(LinearOperator):
         if out is None:
             return self.range_geometry().allocate()
         else:
-            out.fill(self.range_geometry.allocate())
+            out.fill(self.range_geometry().allocate())
     
     def adjoint(self,x, out=None):
         

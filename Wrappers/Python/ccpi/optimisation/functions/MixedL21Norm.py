@@ -74,7 +74,7 @@ class MixedL21Norm(Function):
         if not isinstance(x, BlockDataContainer):
             raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 
                                         
-        tmp = (x.pnorm(2).as_array().max() - 1)
+        tmp = (x.pnorm(2).max() - 1)
         if tmp<=1e-5:
             return 0
         else:
@@ -97,6 +97,8 @@ class MixedL21Norm(Function):
             
             # TODO avoid using numpy, add operation in the framework
             # This will be useful when we add cupy 
+                     
+            
             for el in res.containers:
                 el.as_array()[np.isnan(el.as_array())]=0            
             
@@ -286,6 +288,21 @@ if __name__ == '__main__':
     
     numpy.testing.assert_array_almost_equal(out1.get_item(0).as_array(), \
                                             out2.get_item(0).as_array(), decimal=4) 
+    
+    
+    # check convex conjugate
+    
+    f = MixedL21Norm()
+    x = BG.allocate('random_int')
+    
+    res1 = f.convex_conjugate(x)
+    tmp = (x.pnorm(2).max() - 1)
+    if tmp<=1e-5:
+        res2=0
+    else:
+        res2=np.inf
+    numpy.testing.assert_almost_equal(res1, res2) 
+    print("Convex conjugate is .... OK")
 
 
 

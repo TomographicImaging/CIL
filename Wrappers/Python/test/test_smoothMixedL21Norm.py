@@ -78,8 +78,7 @@ class TestFunction(unittest.TestCase):
         res2 = tmp.sqrt().sum()
         numpy.testing.assert_almost_equal(res1, res2) 
         
-        # check gradient
-        
+        # check gradient        
         res1 = f1.gradient(x)
         res2 = x.divide(tmp.sqrt())
         numpy.testing.assert_array_almost_equal(res1.get_item(0).as_array(), 

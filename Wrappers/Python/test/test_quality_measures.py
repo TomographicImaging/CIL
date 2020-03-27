@@ -26,56 +26,101 @@ import matplotlib.pyplot as plt
 from ccpi.framework import TestData
 import os
 import sys
-from skimage import data, io, filters
-from skimage.metrics import mean_squared_error, peak_signal_noise_ratio, structural_similarity
 import unittest
 import warnings
 from ccpi.utilities.quality_measures import mse, mae, psnr
+from packaging import version
+if version.parse(np.version.version) >= version.parse("1.13"):
+    try:
+        from skimage import data, io, filters
+        from skimage.metrics import mean_squared_error, peak_signal_noise_ratio, structural_similarity
+        has_skimage = True
+    except ImportError as ie:
+        has_skimage = False
+else:
+    has_skimage = False
 
-#%%
-im_coins = data.coins()
-im_coins = im_coins/np.max(im_coins)
+class CCPiTestClass(unittest.TestCase):
+        
+    def assertNumpyArrayEqual(self, first, second):
+        res = True
+        try:
+            numpy.testing.assert_array_equal(first, second)
+        except AssertionError as err:
+            res = False
+            print(err)
+        self.assertTrue(res)
 
-ig = ImageGeometry(voxel_num_x = im_coins.shape[1], voxel_num_y = im_coins.shape[0])
+    def assertNumpyArrayAlmostEqual(self, first, second, decimal=6):
+        res = True
+        try:
+            numpy.testing.assert_array_almost_equal(first, second, decimal)
+        except AssertionError as err:
+            res = False
+            print(err)
+            print("expected " , second)
+            print("actual " , first)
 
-dc1 = ig.allocate('random')
-dc2 = ig.allocate('random')
+        self.assertTrue(res)
 
-id_coins = ig.allocate()
-id_coins.fill(im_coins)
-
-id_coins_noisy = TestData.random_noise(id_coins, mode='gaussian', var = 0.05, seed=10)
-
-plt.imshow(id_coins.as_array(), cmap='gray')
-plt.show()
-
-plt.imshow(id_coins_noisy.as_array(), cmap='gray')
-plt.show()
-
-
-#%%  Check Mean Squared error for random image and images
-
-res1 = mse(dc1, dc2)
-res2 = mean_squared_error(dc1.as_array(), dc2.as_array())
-print('Check MSE for random ImageData')
-np.testing.assert_almost_equal(res1, res2, decimal=5)
-
-res1 = mse(id_coins, id_coins_noisy)
-res2 = mean_squared_error(id_coins.as_array(), id_coins_noisy.as_array())
-print('Check MSE for Coins image gaussian noise')
-np.testing.assert_almost_equal(res1, res2, decimal=5)
-
-#%% check PSNR 
+class TestQualityMeasures(CCPiTestClass):
     
-res1 = psnr(dc1, dc2, data_range = dc1.as_array().max())
-res2 = peak_signal_noise_ratio(dc1.as_array(), dc2.as_array())
-print('Check PSNR for random ImageData')
-np.testing.assert_almost_equal(res1, res2, decimal=3)
+    def setUp(self):
 
-res1 = psnr(id_coins, id_coins_noisy, data_range = dc1.as_array().max())
-res2 = peak_signal_noise_ratio(id_coins.as_array(), id_coins_noisy.as_array())
-print('Check PSNR for Coins image gaussian noise')
-np.testing.assert_almost_equal(res1, res2, decimal=3)
+        if has_skimage and version.parse(np.version.version) >= version.parse("1.13"):
+
+            im_coins = data.coins()
+            im_coins = im_coins/np.max(im_coins)
+
+            ig = ImageGeometry(voxel_num_x = im_coins.shape[1], voxel_num_y = im_coins.shape[0])
+
+            dc1 = ig.allocate('random')
+            dc2 = ig.allocate('random')
+
+            id_coins = ig.allocate()
+            id_coins.fill(im_coins)
+
+            id_coins_noisy = TestData.random_noise(id_coins, mode='gaussian', var = 0.05, seed=10)
+
+            self.im_coins = im_coins
+            self.ig = ig
+            self.dc1 = dc1
+            self.dc2 = dc2
+            self.id_coins = id_coins
+            self.id_coins_noisy = id_coins_noisy
+
+    @unittest.skipIf(version.parse(np.version.version) >= version.parse("1.13"), "Skip test with numpy < 1.13")
+    def test_mse(self):
+        if has_skimage:
+            #%%  Check Mean Squared error for random image and images
+
+            res1 = mse(self.dc1, self.dc2)
+            res2 = mean_squared_error(self.dc1.as_array(), self.dc2.as_array())
+            print('Check MSE for random ImageData')
+            np.testing.assert_almost_equal(res1, res2, decimal=5)
+
+            res1 = mse(self.id_coins, self.id_coins_noisy)
+            res2 = mean_squared_error(self.id_coins.as_array(), self.id_coins_noisy.as_array())
+            print('Check MSE for Coins image gaussian noise')
+            np.testing.assert_almost_equal(res1, res2, decimal=5)
+        else:
+            self.skipTest("scikit0-image not present ... skipping")
+    
+    @unittest.skipIf(version.parse(np.version.version) >= version.parse("1.13"), "Skip test with numpy < 1.13")
+    def test_psnr(self):
+        if has_skimage:
+
+            res1 = psnr(self.dc1, self.dc2, data_range = self.dc1.max())
+            res2 = peak_signal_noise_ratio(self.dc1.as_array(), self.dc2.as_array())
+            print('Check PSNR for random ImageData')
+            np.testing.assert_almost_equal(res1, res2, decimal=3)
+
+            res1 = psnr(self.id_coins, self.id_coins_noisy, data_range = self.dc1.max())
+            res2 = peak_signal_noise_ratio(self.id_coins.as_array(), self.id_coins_noisy.as_array())
+            print('Check PSNR for Coins image gaussian noise')
+            np.testing.assert_almost_equal(res1, res2, decimal=3)
+        else:
+            self.skipTest("scikit0-image not present ... skipping")
 
 
 ##%% SSIM

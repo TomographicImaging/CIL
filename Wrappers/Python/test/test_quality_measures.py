@@ -23,7 +23,6 @@ from ccpi.framework import ImageGeometry
 from ccpi.optimisation.functions import L2NormSquared, L1Norm
 import numpy as np
 import matplotlib.pyplot as plt
-from skimage import img_as_float
 from ccpi.framework import TestData
 import os
 import sys

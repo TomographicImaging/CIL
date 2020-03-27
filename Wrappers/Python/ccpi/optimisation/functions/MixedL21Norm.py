@@ -36,23 +36,9 @@ class MixedL21Norm(Function):
     """      
     
     def __init__(self, **kwargs):
-        '''Creator
-        
-        :param b:  translation of the function
-        :type b: :code:`DataContainer`, optional
-        '''
-        super(MixedL21Norm, self).__init__()  
-        self.b = kwargs.get('b', None)  
 
-        # This is to handle tensor for Total Generalised Variation                    
-        self.SymTensor = kwargs.get('SymTensor',False)
-        
-        # We use this parameter to make MixedL21Norm differentiable
-#        self.epsilon = epsilon
-        
-        if self.b is not None and not isinstance(self.b, BlockDataContainer):
-            raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(self.b)))
-            
+        super(MixedL21Norm, self).__init__()  
+                    
         
     def __call__(self, x):
         
@@ -62,25 +48,9 @@ class MixedL21Norm(Function):
         """
         if not isinstance(x, BlockDataContainer):
             raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 
+              
+        return x.pnorm(p=2).sum()                                
             
-#        tmp_cont = x.containers                        
-#        tmp = x.get_item(0) * 0.
-#        for el in tmp_cont:
-#            tmp += el.power(2.)
-#        tmp.add(self.epsilon**2, out = tmp)    
-#        return tmp.sqrt().sum()            
-         
-        y = x
-        if self.b is not None:
-            y = x - self.b    
-        return y.pnorm(p=2).sum()                                
-            
-#        tmp = x.get_item(0) * 0.
-#        for el in x.containers:
-#            tmp += el.power(2.)
-#        #tmp.add(self.epsilon, out = tmp)    
-#        return tmp.sqrt().sum()
-
                             
     def convex_conjugate(self,x):
         
@@ -103,18 +73,7 @@ class MixedL21Norm(Function):
         """
         if not isinstance(x, BlockDataContainer):
             raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 
-                
-#        tmp1 = x.get_item(0) * 0.
-#        for el in x.containers:
-#            tmp1 += el.power(2.)
-#        tmp1.add(self.epsilon**2, out = tmp1)
-#        tmp = tmp1.sqrt().as_array().max() - 1
-#                    
-#        if tmp<=1e-6:
-#            return 0
-#        else:
-#            return np.inf            
-                
+                                        
         tmp = (x.pnorm(2).as_array().max() - 1)
         if tmp<=1e-5:
             return 0
@@ -136,6 +95,8 @@ class MixedL21Norm(Function):
             tmp = x.pnorm(2)
             res = (tmp - tau).maximum(0.0) * x/tmp
             
+            # TODO avoid using numpy, add operation in the framework
+            # This will be useful when we add cupy 
             for el in res.containers:
                 el.as_array()[np.isnan(el.as_array())]=0            
             
@@ -160,8 +121,10 @@ class MixedL21Norm(Function):
 #
 #            out.fill(res)
         
+# TODO, add the prox conjugate in the documenataion and then delete the code below
+            
 ##############################################################################
-        ##############################################################################
+##############################################################################
 #    def proximal_conjugate(self, x, tau, out=None): 
 #
 #        
@@ -182,8 +145,67 @@ class MixedL21Norm(Function):
 #            res1.maximum(1.0, out=res1)	
 #            x.divide(res1, out=out)
                               
+                
+class SmoothMixedL21Norm(Function):
+    
+    """ SmoothMixedL21Norm function: :math:`F(x) = ||x||_{2,1} = \sum |x|_{2} = \sum \sqrt{ (x^{1})^{2} + (x^{2})^{2} + \epsilon^2 + \dots}`                  
+    
+        where x is a BlockDataContainer, i.e., :math:`x=(x^{1}, x^{2}, \dots)`
+        
+        Conjugate, proximal and proximal conjugate methods no closed-form solution
+        
+    
+    """    
+        
+    def __init__(self, epsilon):
+                
+        r'''
+        :param epsilon: smoothing parameter making MixedL21Norm differentiable 
+        '''
+
+        super(SmoothMixedL21Norm, self).__init__(L=1)          
+        self.epsilon = epsilon   
+                
+        if self.epsilon==0:
+            raise ValueError('We need epsilon>0. Otherwise, call "MixedL21Norm" ')
+                            
+    def __call__(self, x):
+        
+        r"""Returns the value of the SmoothMixedL21Norm function at x.                                            
+        """
+        if not isinstance(x, BlockDataContainer):
+            raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 
+            
+        tmp = x.copy()            
+        tmp.containers += (self.epsilon,)     
+        return tmp.pnorm(p=2).sum()             
+         
+
+    def gradient(self, x, out=None): 
+        
+        r"""Returns the value of the gradient of the SmoothMixedL21Norm function at x.
+        
+        \frac{x}{|x|}
+                
+                
+        """     
+        
+        if not isinstance(x, BlockDataContainer):
+            raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 
+                   
+        
+        tmp = x.copy()
+        tmp.containers += (self.epsilon,)          
+        denom = tmp.pnorm(p=2)
+                          
+        if out is None:
+            return x.divide(denom)
+        else:
+            x.divide(tmp, out=out)        
 
 if __name__ == '__main__':
+    
+# TODO delete test below    
     
     M, N, K = 2,3,50
     from ccpi.framework import BlockGeometry, ImageGeometry
@@ -263,7 +285,22 @@ if __name__ == '__main__':
     out2 = BlockDataContainer(*frac)   
     
     numpy.testing.assert_array_almost_equal(out1.get_item(0).as_array(), \
-                                            out2.get_item(0).as_array(), decimal=4)       
+                                            out2.get_item(0).as_array(), decimal=4) 
+
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+      
     
     
 

@@ -774,7 +774,20 @@ class TestDataContainer(unittest.TestCase):
         d1 = ig.allocate(1)                                                     
         d1.fill(a)                                                     
         self.assertAlmostEqual(d1.max(), 10.)
+
+    def test_size(self):
+        print ("test size")
+        ig = ImageGeometry(10,10)     
+        d1 = ig.allocate(1)                                                     
+                                                
+        self.assertEqual( d1.size, 100 )
         
+        sgeometry = AcquisitionGeometry(dimension=2, angles=numpy.linspace(0, 180, num=10),
+                                        geom_type='parallel', pixel_num_v=3,
+                                        pixel_num_h=5, channels=2)
+        ad = sgeometry.allocate()
+
+        self.assertEqual( ad.size, 3*5*10*2 )
         
 
 

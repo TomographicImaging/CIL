@@ -18,8 +18,10 @@
 
 from ccpi.optimisation.functions import Function, L1Norm, ScaledFunction, \
                                         LeastSquares, L2NormSquared, \
-                                        KullbackLeibler, ZeroFunction, ConstantFunction, TranslateFunction
-from ccpi.optimisation.operators import Identity                                        
+                                        KullbackLeibler, ZeroFunction, \
+                                        ConstantFunction, TranslateFunction, \
+                                        MixedL21Norm, FunctionOperatorComposition
+from ccpi.optimisation.operators import Identity, Gradient                              
 from ccpi.framework import ImageGeometry, BlockGeometry
 
 import unittest
@@ -131,142 +133,34 @@ class TestFunction(unittest.TestCase):
             func.proximal_conjugate(tmp, tau, out = out_proximal_conj1)
             func_shift.proximal_conjugate(tmp, tau, out = out_proximal_conj2)
             self.assertNumpyArrayAlmostEqual(out_proximal_conj1.as_array(), out_proximal_conj1.as_array())               
-                                
+            
+                
+    def test_TranslateFunction_MixedL21Norm(self):    
+        
+        ig = ImageGeometry(4,4)
+        
+        Grad = Gradient(ig)
+        
+        b = Grad.range_geometry().allocate('random_int')
+                
+        alpha = 0.4
+        fun = alpha * TranslateFunction(MixedL21Norm(), b)
+        
+        tmp_x = Grad.range_geometry().allocate('random_int')
+        
+        res1 = fun(tmp_x)        
+        res2 = alpha * (tmp_x - b).pnorm(2).sum()        
+        self.assertAlmostEqual(res1, res2)
+        print("Check call...OK")
+        
+        # TODO
+        print("Missing convex conj, prox, prox_conj")
+        
+                                     
             
 if __name__ == '__main__':
-#    
+ 
     t = TestFunction()
-    t.test_TranslateFunction()    
+    t.test_TranslateFunction() 
+    t.test_TranslateFunction_MixedL21Norm()
 
-
-#    ig = ImageGeometry(4,4)
-#    tmp = ig.allocate('random_int')
-#    b = ig.allocate('random_int')
-#    scalar = 0.4
-#            
-##    f = scalar * L2NormSquared().centered_at(b)
-##    print(f.function.function)
-#    list1 = [ L2NormSquared(), scalar * L2NormSquared(), scalar * L2NormSquared(b=b)]                            
-#        
-##        for func in list_functions:
-##            
-###            if isinstance(func, ScaledFunction):
-###                func_tmp = func.function
-###            else:
-###                func_tmp = func                
-###                                
-###            if func_tmp.b is None:
-###                tmp_data = ig.allocate()
-###            else:
-###                tmp_data = b 
-##            
-##            func_tmp = func
-##            tmp_data = ig.allocate()
-##                                        
-##            res1 = func_tmp(tmp)        
-##            res2 = func_tmp.centered_at(tmp_data)(tmp)
-##            
-##            self.assertNumpyArrayAlmostEqual(res1, res2)
-        
-        
-
-        
-        
-#        
-#        for i in list_functions:
-#            
-#            print('Test Translation for Function {} '.format(type(i).__name__))
-#            
-#            if isinstance(i, L2NormSquared):
-#                
-#                f = L2NormSquared(b = b)    
-#                g = TranslateFunction(L2NormSquared(), b)
-#                
-#            elif isinstance(i, L1Norm):
-#                
-#                f = L1Norm(b = b)    
-#                g = TranslateFunction(L1Norm(), b)
-#                
-#            elif isinstance(i, ScaledFunction):
-#    
-#                if isinstance(i.function, L2NormSquared):
-#                    f = scalar * L2NormSquared(b = b)    
-#                    g = scalar * TranslateFunction(L2NormSquared(), b)
-#                    
-#                if isinstance(i.function, L1Norm):
-#                    f = scalar * L1Norm(b = b)    
-#                    g = scalar * TranslateFunction(L1Norm(), b)                
-#                            
-#            # check call
-#            res1 = f(tmp)
-#            res2 = g(tmp)    
-#            numpy.testing.assert_equal(res1, res2)
-#            
-#            # check gradient
-#                
-#            if not isinstance(i, L1Norm):
-#            
-#                res1 = f.gradient(tmp)
-#                res2 = g.gradient(tmp) 
-#                numpy.testing.assert_equal(res1.as_array(), res2.as_array()) 
-#            
-#                # check gradient out
-#                res3 = ig.allocate()
-#                res4 = ig.allocate()
-#                f.gradient(tmp, out = res3)
-#                g.gradient(tmp, out = res4)
-#                numpy.testing.assert_equal(res3.as_array(), res4.as_array())
-#            
-#            # check convex conjugate
-#            res1 = f.convex_conjugate(tmp)
-#            res2 = g.convex_conjugate(tmp)
-#            numpy.testing.assert_equal(res1, res2) 
-#            
-#            # check proximal    
-#            tau = 0.5
-#            res1 = f.proximal(tmp, tau)
-#            res2 = g.proximal(tmp, tau)
-#            numpy.testing.assert_equal(res1.as_array(), res2.as_array()) 
-#            
-#            # check proximal out           
-#            res3 = ig.allocate()
-#            res4 = ig.allocate()
-#            f.proximal(tmp, tau, out = res3)
-#            g.proximal(tmp, tau, out = res4)
-#            numpy.testing.assert_array_almost_equal(res3.as_array(), res4.as_array(),decimal = decimal)     
-#            
-#            # check proximal conjugate  
-#            tau = 0.4
-#            res1 = f.proximal_conjugate(tmp, tau)
-#            res2 = g.proximal_conjugate(tmp, tau)
-#            numpy.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(),decimal = decimal)  
-#                                
-#            # check proximal out           
-#            res3 = ig.allocate()
-#            res4 = ig.allocate()
-#            f.proximal_conjugate(tmp, tau, out = res3)
-#            g.proximal_conjugate(tmp, tau, out = res4)
-#            numpy.testing.assert_array_almost_equal(res3.as_array(), res4.as_array(),decimal = decimal)          
-#            
-#            
-#            f = L2NormSquared() + 1
-#            print(f(tmp))
-#            
-#                
-       
-#            
-#        
-#    #    tau = 0.5    
-#    #    f = L2NormSquared(b=b) 
-#    #    g = TranslateFunction(f, b)
-#    #    res1 = f.proximal_conjugate(tmp, tau)    
-#    #    res2 = tmp - tau * f.proximal(tmp/tau, 1/tau)
-#    #    res3 = g.proximal_conjugate(tmp, tau)
-#        
-#    #    print(res1.as_array())
-#    #    print(res3.as_array())
-#    #    numpy.testing.assert_equal(res1.as_array(), res2.as_array()) 
-#    #    numpy.testing.assert_equal(res1.as_array(), res3.as_array()) 
-#    
-#                    
-#    

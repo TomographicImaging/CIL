@@ -70,28 +70,25 @@ class TestFunction(unittest.TestCase):
         x = bg.allocate('random_int')
         
         
-        print("Check call for MixedL21Norm")
+        print("Check call for smooth MixedL21Norm")
         
         # check call
-        res1 = f1(x)
-        tmp = x.get_item(0) * 0.
-        for el in x.containers:
-            tmp += el.power(2.)
-        tmp+=epsilon**2        
-        res2 = tmp.sqrt().sum()
+        res1 = f1(x)        
+        res2 = (x.pnorm(2)**2 + epsilon**2).sqrt().sum()
+
     
         # alternative        
         tmp1 = x.copy()
         tmp1.containers += (epsilon,)        
         res3 = tmp1.pnorm(2).sum()
                         
-        numpy.testing.assert_almost_equal(res1, res2) 
-        numpy.testing.assert_almost_equal(res1, res3) 
+        numpy.testing.assert_almost_equal(res1, res2, decimal=5) 
+        numpy.testing.assert_almost_equal(res1, res3, decimal=5) 
         
-        print("Check gradient for MixedL21Norm")        
+        print("Check gradient for smooth MixedL21Norm ... OK ")        
         
         res1 = f1.gradient(x)
-        res2 = x.divide(tmp.sqrt())
+        res2 = x.divide((x.pnorm(2)**2 + epsilon**2).sqrt())
         numpy.testing.assert_array_almost_equal(res1.get_item(0).as_array(), 
                                                 res2.get_item(0).as_array()) 
         
@@ -100,7 +97,7 @@ class TestFunction(unittest.TestCase):
         
         # check with MixedL21Norm, when epsilon close to 0
         
-        print("Check as epsilon goes to 0") 
+        print("Check as epsilon goes to 0 ... OK") 
         
         f1 = SmoothMixedL21Norm(1e-12)   
         f2 = MixedL21Norm()
@@ -109,7 +106,11 @@ class TestFunction(unittest.TestCase):
         res2 = f2(x)
         numpy.testing.assert_almost_equal(f1(x), f2(x)) 
         
-
+if __name__ == '__main__':
+    
+    t = TestFunction()
+    t.test_smoothL21Norm()
+         
 
 
         

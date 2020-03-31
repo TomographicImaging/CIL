@@ -92,15 +92,20 @@ class MixedL21Norm(Function):
         
         if out is None:
             
+        
             tmp = x.pnorm(2)
             res = (tmp - tau).maximum(0.0) * x/tmp
             
             # TODO avoid using numpy, add operation in the framework
             # This will be useful when we add cupy 
-                     
-            
+                                 
             for el in res.containers:
-                el.as_array()[np.isnan(el.as_array())]=0            
+                
+                elarray = el.as_array()
+                elarray[np.isnan(elarray)]=0
+                el.fill(elarray)                
+                
+#                el.as_array()[np.isnan(el.as_array())]=0            
             
             return res            
             
@@ -110,7 +115,10 @@ class MixedL21Norm(Function):
             res = (tmp - tau).maximum(0.0) * x/tmp
 
             for el in res.containers:
-                el.as_array()[np.isnan(el.as_array())]=0
+                
+                elarray = el.as_array()
+                elarray[np.isnan(elarray)]=0
+                el.fill(elarray)  
 
             out.fill(res)            
             
@@ -179,7 +187,7 @@ class SmoothMixedL21Norm(Function):
             raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 
             
             
-        return (x.pnorm(2)**2 + self.epsilon**2).sqrt().sum 
+        return (x.pnorm(2)**2 + self.epsilon**2).sqrt().sum()
          
 
     def gradient(self, x, out=None): 
@@ -198,7 +206,7 @@ class SmoothMixedL21Norm(Function):
 #        tmp = x.copy()
 #        tmp.containers += (self.epsilon,)          
 #        denom = tmp.pnorm(p=2)
-        denom = (x.pnorm(2)**2 + self.epsilon**2).sqrt().sum 
+        denom = (x.pnorm(2)**2 + self.epsilon**2).sqrt()
                           
         if out is None:
             return x.divide(denom)
@@ -303,6 +311,58 @@ if __name__ == '__main__':
         res2=np.inf
     numpy.testing.assert_almost_equal(res1, res2) 
     print("Convex conjugate is .... OK")
+    
+    
+    ig = ImageGeometry(4, 5)
+    bg = BlockGeometry(ig, ig)
+    
+    epsilon = 0.5
+    
+    f1 = SmoothMixedL21Norm(epsilon)    
+    x = bg.allocate('random_int')
+    
+    
+    print("Check call for smooth MixedL21Norm ...OK")
+    
+    # check call
+    res1 = f1(x)
+    
+    
+    res2 = (x.pnorm(2)**2 + epsilon**2).sqrt().sum()
+#    tmp = x.get_item(0) * 0.
+#    for el in x.containers:
+#        tmp += el.power(2.)
+#    tmp+=epsilon**2        
+#    res2 = tmp.sqrt().sum()
+
+    # alternative        
+    tmp1 = x.copy()
+    tmp1.containers += (epsilon,)        
+    res3 = tmp1.pnorm(2).sum()
+                    
+    numpy.testing.assert_almost_equal(res1, res2, decimal=4) 
+    numpy.testing.assert_almost_equal(res1, res3, decimal=4) 
+    
+    print("Check gradient for smooth MixedL21Norm ... OK ")        
+    
+    res1 = f1.gradient(x)
+    res2 = x.divide((x.pnorm(2)**2 + epsilon**2).sqrt())
+    numpy.testing.assert_array_almost_equal(res1.get_item(0).as_array(), 
+                                            res2.get_item(0).as_array()) 
+    
+    numpy.testing.assert_array_almost_equal(res1.get_item(1).as_array(), 
+                                            res2.get_item(1).as_array()) 
+    
+    # check with MixedL21Norm, when epsilon close to 0
+    
+    print("Check as epsilon goes to 0 ... OK") 
+    
+    f1 = SmoothMixedL21Norm(1e-12)   
+    f2 = MixedL21Norm()
+    
+    res1 = f1(x)
+    res2 = f2(x)
+    numpy.testing.assert_almost_equal(f1(x), f2(x))     
 
 
 

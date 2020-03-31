@@ -75,20 +75,21 @@ class CenterOfRotationFinder(DataProcessor):
         dataset = self.get_input()
 
         if dataset is None:
-            raise ValueError('Please set input data before slice selection')    
-        
+            raise ValueError('Please set input data before slice selection')
+
+        #check slice number is valid  
         if dataset.number_of_dimensions == 2:
             print('Slice number not a valid parameter of a 2D data set')
-
-        #check slice number is valid
         elif dataset.number_of_dimensions == 3:
             if slice_index == 'centre':
                 slice_index = dataset.get_dimension_size('vertical')//2 
-            elif not isinstance(slice_index, (int)):
-                raise TypeError("Invalid input. Expect integer slice index.")               
-            elif slice_index >= dataset.get_dimension_size('vertical'):
-                raise ValueError("Slice out of range must be less than {0}"\
-                    .format(dataset.get_dimension_size('vertical')))
+            try:
+                slice_index = int(slice_index)
+            except TypeError:
+                 raise TypeError('slice_index expected a positive integer. Got {}'.format(slice_index))
+                      
+            if slice_index >= dataset.get_dimension_size('vertical'):
+                raise ValueError('slice_index out of range must be less than {0}. Got {}'.format(slice_index))
 
             self.slice_number = slice_index
 
@@ -108,31 +109,30 @@ class CenterOfRotationFinder(DataProcessor):
         else:
             self.slice_number = 0
         
-        if self.smin is None:
-            self.smin = numpy.int_(numpy.around(-0.1*dataset.get_dimension_size('horizontal')))
-            if (self.smin > -10):
-                self.smin = numpy.int_(-10)
-                
-        if self.smax is None:
-            self.smax = numpy.int_(numpy.around(0.1*dataset.get_dimension_size('horizontal')))
-            if (self.smax < 10):
-                self.smax = numpy.int_(10)
-        
-        if self.srad is None:        
-            self.srad = numpy.around(self.smax / 5)
-            if self.srad < 5:
-                self.srad = 5
-        
-        if self.step is None:
-            self.step = 0.5
-        
+        #set defaults for find_center_vo()
+
         if self.ratio is None:
             self.ratio = 2.
         
         if self.drop is None:
             self.drop = 20
 
+        #coarse search set up
+        if self.smin is None:
+            self.smin = min(-10, -dataset.get_dimension_size('horizontal')//10 )
+            self.smin = numpy.int_(self.smin)
+                
+        if self.smax is None:
+            self.smax = max(10, dataset.get_dimension_size('horizontal')//10 )
+            self.smax = numpy.int_(self.smax)
 
+        #fine search set up
+        if self.srad is None:        
+            self.srad = 10
+        
+        if self.step is None:
+            self.step = 0.5
+     
         return True
 
 
@@ -255,27 +255,20 @@ class CenterOfRotationFinder(DataProcessor):
         
         _tomo = tomo#[:, ind, :]
      
-        
-    
         # Reduce noise by smooth filters. Use different filters for coarse and fine search 
         _tomo_cs = ndimage.filters.gaussian_filter(_tomo, (3, 1))
         _tomo_fs = ndimage.filters.median_filter(_tomo, (2, 2))
     
         # Coarse and fine searches for finding the rotation center.
-        if _tomo.shape[0] * _tomo.shape[1] > 4e6:  # If data is large (>2kx2k)
-            #_tomo_coarse = downsample(numpy.expand_dims(_tomo_cs,1), level=2)[:, 0, :]
-            #init_cen = _search_coarse(_tomo_coarse, smin, smax, ratio, drop)
-            #fine_cen = _search_fine(_tomo_fs, srad, step, init_cen*4, ratio, drop)
-            init_cen = CenterOfRotationFinder._search_coarse(_tomo_cs, smin, 
-                                                             smax, ratio, drop)
-            fine_cen = CenterOfRotationFinder._search_fine(_tomo_fs, srad, 
-                                                           step, init_cen, 
-                                                           ratio, drop)
-        else:
-            init_cen = CenterOfRotationFinder._search_coarse(_tomo_cs, 
+        # if _tomo.shape[0] * _tomo.shape[1] > 4e6:  # If data is large (>2kx2k)
+        #     _tomo_coarse = downsample(numpy.expand_dims(_tomo_cs,1), level=2)[:, 0, :]
+        #     init_cen = _search_coarse(_tomo_coarse, smin, smax, ratio, drop)
+        #     fine_cen = _search_fine(_tomo_fs, srad, step, init_cen*4, ratio, drop)
+        # else:
+        init_cen = CenterOfRotationFinder._search_coarse(_tomo_cs, 
                                                              smin, smax, 
                                                              ratio, drop)
-            fine_cen = CenterOfRotationFinder._search_fine(_tomo_fs, srad, 
+        fine_cen = CenterOfRotationFinder._search_fine(_tomo_fs, srad, 
                                                            step, init_cen, 
                                                            ratio, drop)
     

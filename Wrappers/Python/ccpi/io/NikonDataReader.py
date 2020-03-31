@@ -206,7 +206,7 @@ class NikonDataReader(object):
                 angles.append(initial_angle + angular_step * i)
         
         # fill in metadata
-        self._ag = AcquisitionGeometry(geom_type='cone', num_pixels=(pixel_num_v, pixel_num_h), pixel_size=(pixel_size_v, pixel_size_h), num_positions=num_projections, source_origin=-source_x, detector_origin=detector_x - source_x, angles=angles)
+        self._ag = AcquisitionGeometry(geom_type='cone', num_pixels=(pixel_num_v, pixel_num_h), pixel_size=(pixel_size_v, pixel_size_h), num_positions=num_projections, source_dof=-source_x, detector_origin=detector_x - source_x, angles=angles)
 
     def get_geometry(self):
         

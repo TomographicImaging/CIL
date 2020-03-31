@@ -29,7 +29,7 @@ def mse(dc1, dc2):
     '''
     
     diff = dc1 - dc2    
-    return L2NormSquared().__call__(diff)/dc1.size()
+    return L2NormSquared().__call__(diff)/dc1.size
 
 
 def mae(dc1, dc2):

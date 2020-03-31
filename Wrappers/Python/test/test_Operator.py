@@ -17,7 +17,7 @@
 #   limitations under the License.
 import unittest
 from ccpi.framework import ImageGeometry, VectorGeometry, ImageData, BlockDataContainer, DataContainer
-from ccpi.optimisation.operators import BlockOperator, BlockScaledOperator,\
+from ccpi.optimisation.operators import BlockOperator,\
     FiniteDiff, SymmetrizedGradient
 import numpy
 from timeit import default_timer as timer

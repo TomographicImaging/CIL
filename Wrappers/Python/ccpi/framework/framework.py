@@ -841,8 +841,8 @@ class DataContainer(object):
     def maximum(self, x2, *args, **kwargs):
         return self.pixel_wise_binary(numpy.maximum, x2, *args, **kwargs)
     
-    def minimum(self,x2, *args, **kwargs):
-        return self.pixel_wise_binary(numpy.minimum, x2, *args, **kwargs)
+    def minimum(self,x2, out=None, *args, **kwargs):
+        return self.pixel_wise_binary(numpy.minimum, x2=x2, out=out, *args, **kwargs)
 
     def axpby(self, a, b, y, out, dtype=numpy.float32, num_threads=NUM_THREADS):
         '''performs axpby with cilacc C library
@@ -938,11 +938,6 @@ class DataContainer(object):
     def abs(self, *args,  **kwargs):
         return self.pixel_wise_unary(numpy.abs, *args,  **kwargs)
     
-#    def max(self, *args,  **kwargs):
-#        return self.pixel_wise_unary(numpy.max, *args,  **kwargs) 
-#    
-#    def min(self, *args,  **kwargs):
-#        return self.pixel_wise_unary(numpy.min, *args,  **kwargs)     
     
     def sign(self, *args,  **kwargs):
         return self.pixel_wise_unary(numpy.sign, *args,  **kwargs)
@@ -1017,8 +1012,6 @@ class DataContainer(object):
         '''Returns the number of elements of the DataContainer'''
         return self.as_array().size
 
-    
-    
     
 class ImageData(DataContainer):
     '''DataContainer for holding 2D or 3D DataContainer'''

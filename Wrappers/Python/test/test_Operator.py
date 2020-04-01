@@ -266,14 +266,16 @@ class TestGradients(CCPiTestClass):
         Grad = Gradient(self.ig)
         
         E1 = SymmetrizedGradient(Grad.range_geometry())
-        u1 = E1.domain_geometry().allocate('random_int')
-        w1 = E1.range_geometry().allocate('random_int', symmetry = True)
+        numpy.random.seed(1)
+        u1 = E1.domain_geometry().allocate('random')
+        w1 = E1.range_geometry().allocate('random', symmetry = True)
         
         
         lhs = E1.direct(u1).dot(w1)
         rhs = u1.dot(E1.adjoint(w1))
+        print ("lhs {} rhs {}".format (lhs, rhs))
         # self.assertAlmostEqual(lhs, rhs)
-        numpy.testing.assert_almost_equal(lhs, rhs)
+        numpy.testing.assert_almost_equal(lhs, rhs, decimal=4)
             
     def test_SymmetrizedGradient2(self):        
         ###########################################################################
@@ -282,14 +284,14 @@ class TestGradients(CCPiTestClass):
         Grad2 = Gradient(self.ig2, correlation = 'Space')
         
         E2 = SymmetrizedGradient(Grad2.range_geometry())
-        
-        u2 = E2.domain_geometry().allocate('random_int')
-        w2 = E2.range_geometry().allocate('random_int', symmetry = True)
+        numpy.random.seed(1)
+        u2 = E2.domain_geometry().allocate('random')
+        w2 = E2.range_geometry().allocate('random', symmetry = True)
     #    
         lhs2 = E2.direct(u2).dot(w2)
         rhs2 = u2.dot(E2.adjoint(w2))
             
-        numpy.testing.assert_almost_equal(lhs2, rhs2)
+        numpy.testing.assert_almost_equal(lhs2, rhs2, decimal=4)
         
     def test_SymmetrizedGradient2a(self):        
         ###########################################################################
@@ -323,28 +325,28 @@ class TestGradients(CCPiTestClass):
         
         E3 = SymmetrizedGradient(Grad3.range_geometry())
         
-        u3 = E3.domain_geometry().allocate('random_int')
-        w3 = E3.range_geometry().allocate('random_int', symmetry = True)
+        u3 = E3.domain_geometry().allocate('random', seed=1)
+        w3 = E3.range_geometry().allocate('random', seed=2, symmetry = True)
     #    
         lhs3 = E3.direct(u3).dot(w3)
         rhs3 = u3.dot(E3.adjoint(w3))
-        numpy.testing.assert_almost_equal(lhs3, rhs3)  
-        self.assertAlmostEqual(lhs3, rhs3)
-        print (lhs3, rhs3, abs((rhs3-lhs3)/rhs3) , 1.5 * 10**(-4), abs((rhs3-lhs3)/rhs3) < 1.5 * 10**(-4))
-        self.assertTrue( LinearOperator.dot_test(E3, range_init = w3, domain_init=u3) )
+        numpy.testing.assert_almost_equal(lhs3, rhs3, decimal=4)  
+        # self.assertAlmostEqual(lhs3, rhs3,  )
+        print ("*******", lhs3, rhs3, abs((rhs3-lhs3)/rhs3) , 1.5 * 10**(-4), abs((rhs3-lhs3)/rhs3) < 1.5 * 10**(-4))
+        self.assertTrue( LinearOperator.dot_test(E3, range_init = w3, domain_init=u3, decimal=4) )
     def test_dot_test(self):
         Grad3 = Gradient(self.ig3, correlation = 'Space', backend='numpy')
              
         # self.assertAlmostEqual(lhs3, rhs3)
-        self.assertTrue( LinearOperator.dot_test(Grad3 , verbose=True))
-        self.assertTrue( LinearOperator.dot_test(Grad3 , decimal=6, verbose=True))
+        self.assertTrue( LinearOperator.dot_test(Grad3 , verbose=True, decimal=4))
+        self.assertTrue( LinearOperator.dot_test(Grad3 , decimal=5, verbose=True))
 
     def test_dot_test2(self):
         Grad3 = Gradient(self.ig3, correlation = 'SpaceChannel', backend='c')
              
         # self.assertAlmostEqual(lhs3, rhs3)
-        self.assertTrue( LinearOperator.dot_test(Grad3 , verbose=True))
-        self.assertTrue( LinearOperator.dot_test(Grad3 , decimal=6, verbose=True))
+        # self.assertTrue( LinearOperator.dot_test(Grad3 , verbose=True))
+        self.assertTrue( LinearOperator.dot_test(Grad3 , decimal=5, verbose=True))
 
 
 

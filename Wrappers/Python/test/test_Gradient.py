@@ -52,9 +52,8 @@ class TestGradient(unittest.TestCase):
         G7 = Gradient(ig4, correlation = 'SpaceChannels', backend='numpy')
         print(G7.range_geometry().shape, '3D with channels with corr')
         
-        
         u = ig1.allocate(ImageGeometry.RANDOM)
-        w = G1.range_geometry().allocate(ImageGeometry.RANDOM_INT)
+        w = G1.range_geometry().allocate(ImageGeometry.RANDOM)
         
         LHS = (G1.direct(u)*w).sum()
         RHS = (u * G1.adjoint(w)).sum()
@@ -227,6 +226,7 @@ class TestGradient(unittest.TestCase):
         ig = ImageGeometry(voxel_num_x=nx, voxel_num_y=ny, voxel_num_z=nz, channels=nc)
 
         grad = Gradient(ig, bnd_cond='Neumann', correlation='SpaceChannels', backend='c')
+        
         self.assertTrue(LinearOperator.dot_test(grad))
 
         grad = Gradient(ig, bnd_cond='Periodic', correlation='SpaceChannels', backend='c')

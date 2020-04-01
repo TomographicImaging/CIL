@@ -21,7 +21,7 @@ from __future__ import print_function
 
 import numpy as np
 from ccpi.framework import ImageData
-#from ccpi.optimisation.operators import DiagonalOperator
+from ccpi.optimisation.operators import DiagonalOperator
 
 class MaskOperator(DiagonalOperator):
     

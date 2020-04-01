@@ -724,7 +724,9 @@ class DataContainer(object):
         kw = {'out':self}
         return self.divide(other, **kw)
     
-
+    def __neg__(self):
+        '''negation operator'''
+        return -1 * self   
     
     def __str__ (self, representation=False):
         repres = ""

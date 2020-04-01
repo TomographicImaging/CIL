@@ -815,7 +815,14 @@ class TestDataContainer(unittest.TestCase):
         ad = sgeometry.allocate()
 
         self.assertEqual( ad.size, 3*5*10*2 )
+    
+    def test_negation(self):
+        X, Y, Z = 256, 512, 512
+        a = numpy.ones((X, Y, Z), dtype='int32')
         
+        ds = - DataContainer(a, False, ['X', 'Y', 'Z'])
+        
+        numpy.testing.assert_array_equal(ds.as_array(), -a)
 
 
 

@@ -28,6 +28,7 @@ requirements:
   build:
     - {{ pin_compatible('numpy', max_pin='x.x') }}
     - python
+    - numpy
     - setuptools
     - cmake
     - openmp # [osx]

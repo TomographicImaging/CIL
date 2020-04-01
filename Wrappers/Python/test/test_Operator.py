@@ -644,18 +644,18 @@ class TestBlockOperator(unittest.TestCase):
         
         M, N  = 3, 4
         ig = ImageGeometry(M, N)
-        arr = ig.allocate('random_int')  
+        arr = ig.allocate('random', seed=1)  
         
         G = Gradient(ig)
         Id = Identity(ig)
         
         B = BlockOperator(G, Id)
         # Nx1 case
-        u = ig.allocate('random_int')
-        w = B.range_geometry().allocate(ImageGeometry.RANDOM_INT)
+        u = ig.allocate('random', seed=2)
+        w = B.range_geometry().allocate(ImageGeometry.RANDOM, seed=3)
         w1 = B.direct(u)
         u1 = B.adjoint(w)
-        self.assertEqual((w * w1).sum() , (u1*u).sum())
+        self.assertAlmostEqual((w * w1).sum() , (u1*u).sum(), places=5)
 
 class TestOperatorCompositionSum(unittest.TestCase):
     def setUp(self):

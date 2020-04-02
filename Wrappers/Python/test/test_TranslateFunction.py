@@ -81,8 +81,8 @@ class TestFunction(unittest.TestCase):
         # Test TranslationFunction
     
         ig = ImageGeometry(4,4)
-        tmp = ig.allocate('random_int')
-        b = ig.allocate('random_int')
+        tmp = ig.allocate('random')
+        b = ig.allocate('random')
         scalar = 0.4
         tau = 0.05
                                 

@@ -20,61 +20,34 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
-from ccpi.framework import ImageData
+
 from ccpi.optimisation.operators import DiagonalOperator
 
 class MaskOperator(DiagonalOperator):
     
     r'''MaskOperator:  D: X -> X,  takes in a DataContainer or subclass 
-    thereof, mask, of datatype Boolean where a True represents a value to be
-    kept and False a value to be lost/set to zero. Maps an element of 
+    thereof, mask, with 1.0 representing a value to be
+    kept and 0.0 a value to be lost/set to zero. Maps an element of 
     :math:`x\in X` onto the element :math:`y \in X,  y = mask*x`, 
     where * denotes elementwise multiplication.
                        
-        :param mask: DataContainer with True/False elements
+        :param mask: DataContainer with 1/0 elements
                        
      '''
     
     def __init__(self, mask):
+        # Special case of DiagonalOperator which is the superclass of
+        # MaskOperator, so simply instanciate a DiagonalOperator with mask.
         super(MaskOperator, self).__init__(mask)
-
         
 
 if __name__ == '__main__':
-    
-    from ccpi.framework import ImageGeometry
-
-    M = 3
-    ig = ImageGeometry(M, M)
-    x = ig.allocate('random_int')
-    diag = ig.allocate('random_int')
-    
-    # Print what each ImageData is
-    print(x.as_array())
-    print(diag.as_array())
-    
-    
-    
-    # Set up example DiagonalOperator
-    D = DiagonalOperator(diag)
-    
-    # Apply direct and check whether result equals diag*x as expected.
-    z = D.direct(x)
-    print(z.as_array())
-    print((diag*x).as_array())
-    
-    # Apply adjoint and check whether results equals diag*(diag*x) as expected.
-    y = D.adjoint(z)
-    print(y.as_array())
-    print((diag*(diag*x)).as_array())
-    
-    import numpy as np 
-    import numpy                          
+                      
     import matplotlib.pyplot as plt
     
     from ccpi.optimisation.algorithms import PDHG
     
-    from ccpi.optimisation.operators import BlockOperator, Identity, Gradient
+    from ccpi.optimisation.operators import BlockOperator, Gradient
     from ccpi.optimisation.functions import ZeroFunction, L1Norm, \
                           MixedL21Norm, BlockFunction, L2NormSquared,\
                               KullbackLeibler
@@ -82,27 +55,17 @@ if __name__ == '__main__':
     import os
     import sys
     
-    # user supplied input
-    if len(sys.argv) > 1:
-        which_noise = int(sys.argv[1])
-    else:
-        which_noise = 2
-    print ("Applying {} noise")
+    # Specify which which type of noise to use.    
+    which_noise = 0
+    print ("which_noise ", which_noise)
     
-    if len(sys.argv) > 2:
-        method = sys.argv[2]
-    else:
-        method = '1'
-        
-    method = '0'
-    print ("method ", method)
-    
-    
+    # Load in test image
     loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
     data = loader.load(TestData.SHAPES)
     ig = data.geometry
     ag = ig
     
+    # Create mask with four rectangles to be masked, set up MaskOperator
     mask = ig.allocate()
     mask = mask + 1
     amask = mask.as_array()
@@ -113,7 +76,8 @@ if __name__ == '__main__':
     
     MO = MaskOperator(mask)
     
-    # Create noisy data. 
+    # Create noisy and masked data: First add noise, then mask the image with 
+    # MaskOperator.
     noises = ['gaussian', 'poisson', 's&p']
     noise = noises[which_noise]
     if noise == 's&p':
@@ -128,30 +92,17 @@ if __name__ == '__main__':
     noisy_data = ig.allocate()
     noisy_data.fill(n1)
     
-    noisy_data = MO.direct(noisy_data)
-    
-    # Show Ground Truth and Noisy Data
-    plt.figure(figsize=(10,5))
-    plt.subplot(1,2,1)
-    plt.imshow(data.as_array())
-    plt.title('Ground Truth')
-    plt.colorbar()
-    plt.subplot(1,2,2)
-    plt.imshow(noisy_data.as_array())
-    plt.title('Noisy Data')
-    plt.colorbar()
-    plt.show()
-    
+    noisy_data = MO.direct(noisy_data)    
     
     # Regularisation Parameter depending on the noise distribution
     if noise == 's&p':
         alpha = 0.8
     elif noise == 'poisson':
-        alpha = 1
+        alpha = 1.0
     elif noise == 'gaussian':
         alpha = .3
     
-    # fidelity
+    # Choose data fidelity dependent on noise type.
     if noise == 's&p':
         f2 = L1Norm(b=noisy_data)
     elif noise == 'poisson':
@@ -159,33 +110,23 @@ if __name__ == '__main__':
     elif noise == 'gaussian':
         f2 = 0.5 * L2NormSquared(b=noisy_data)
     
-    if method == '0':
-    
-        # Create operators
-        op1 = Gradient(ig, correlation=Gradient.CORRELATION_SPACE)
-        op2 = MO #Identity(ig, ag)
-    
-        # Create BlockOperator
-        operator = BlockOperator(op1, op2, shape=(2,1) ) 
-    
-        # Create functions      
-        f = BlockFunction(alpha * MixedL21Norm(), f2) 
-        g = ZeroFunction()
-        
-    else:
-        
-        operator = Gradient(ig)
-        f =  alpha * MixedL21Norm()
-        g = f2
+    # Create operators
+    op1 = Gradient(ig, correlation=Gradient.CORRELATION_SPACE)
+    op2 = MO
+
+    # Create BlockOperator
+    operator = BlockOperator(op1, op2, shape=(2,1) ) 
+
+    # Create functions      
+    f = BlockFunction(alpha * MixedL21Norm(), f2) 
+    g = ZeroFunction()
             
-        
     # Compute operator Norm
     normK = operator.norm()
     
     # Primal & dual stepsizes
     sigma = 1
     tau = 1/(sigma*normK**2)
-    
     
     # Setup and run the PDHG algorithm
     pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
@@ -196,23 +137,21 @@ if __name__ == '__main__':
     # Show results
     plt.figure(figsize=(20,5))
     plt.subplot(1,4,1)
-    plt.imshow(data.subset(channel=0).as_array())
+    plt.imshow(data.as_array())
     plt.title('Ground Truth')
     plt.colorbar()
     plt.subplot(1,4,2)
-    plt.imshow(noisy_data.subset(channel=0).as_array())
+    plt.imshow(noisy_data.as_array())
     plt.title('Noisy Data')
     plt.colorbar()
     plt.subplot(1,4,3)
-    plt.imshow(pdhg.get_output().subset(channel=0).as_array())
+    plt.imshow(pdhg.get_output().as_array())
     plt.title('TV Reconstruction')
     plt.colorbar()
     plt.subplot(1,4,4)
     plt.plot(np.linspace(0,ig.shape[1],ig.shape[1]), data.as_array()[int(ig.shape[0]/2),:], label = 'GTruth')
+    plt.plot(np.linspace(0,ig.shape[1],ig.shape[1]), noisy_data.as_array()[int(ig.shape[0]/2),:], label = 'Noisy and masked')
     plt.plot(np.linspace(0,ig.shape[1],ig.shape[1]), pdhg.get_output().as_array()[int(ig.shape[0]/2),:], label = 'TV reconstruction')
     plt.legend()
     plt.title('Middle Line Profiles')
     plt.show()
-    
-        
-        

@@ -31,4 +31,5 @@ from .ZeroOperator import ZeroOperator
 from .LinearOperatorMatrix import LinearOperatorMatrix
 
 from .DiagonalOperator import DiagonalOperator
+from .MaskOperator import MaskOperator
 

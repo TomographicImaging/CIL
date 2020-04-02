@@ -334,8 +334,10 @@ class TestGradients(CCPiTestClass):
         rhs3 = u3.dot(E3.adjoint(w3))
         # with numpy 1.11 and py 3.5 decimal = 3
         decimal = 4
-        if version.parse(numpy.version.version) == version.parse("1.11"):
-            decimal -= 2
+        npv = version.parse(numpy.version.version)
+        if npv.major == 1 and npv.minor == 11:
+            print ("########## SETTING decimal to 3 ###########")
+            decimal = 3
         numpy.testing.assert_almost_equal(lhs3, rhs3, decimal=decimal)  
         # self.assertAlmostEqual(lhs3, rhs3,  )
         print ("*******", lhs3, rhs3, abs((rhs3-lhs3)/rhs3) , 1.5 * 10**(-4), abs((rhs3-lhs3)/rhs3) < 1.5 * 10**(-4))

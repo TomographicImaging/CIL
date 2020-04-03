@@ -106,22 +106,47 @@ class ChannelwiseOperator(LinearOperator):
                                            range_geometry=r)
         
         self.op = op
+        self.channels = channels
+        self.channel_label = channel_label
 
         
     def direct(self,x,out=None):
         
         '''Returns D(x)'''
         
-        if out is None:
+        # Initialise output
+        output = self.range_geometry().allocate()
+        output_array = output.as_array()
+        cury = self.op.range_geometry().allocate()
+        
+        for k in range(self.channels):
+            curx = x.subset(channel=k)
+            self.op.direct(curx,cury)
+            output_array[k] = cury.as_array()
+        
+        return output
+        
+        
+        '''if out is None:
             return self.diagonal * x
         else:
-            self.diagonal.multiply(x,out=out)
+            self.diagonal.multiply(x,out=out)'''
     
     def adjoint(self,x, out=None):
         
-        '''Returns D^{*}(y), which is identical to direct, so use direct.'''        
+        '''Returns D^{*}(y)'''        
         
-        return self.direct(x, out=out)
+        # Initialise output
+        output = self.domain_geometry().allocate()
+        output_array = output.as_array()
+        cury = self.op.domain_geometry().allocate()
+        
+        for k in range(self.channels):
+            curx = x.subset(channel=k)
+            self.op.adjoint(curx,cury)
+            output_array[k] = cury.as_array()
+        
+        return output
         
     def calculate_norm(self, **kwargs):
         
@@ -131,12 +156,28 @@ class ChannelwiseOperator(LinearOperator):
 
 if __name__ == '__main__':
     
-    from ccpi.framework import ImageGeometry
+    from ccpi.optimisation.operators import DiagonalOperator
 
     M = 3
-    ig = ImageGeometry(M, M)
+    channels = 4
+    ig = ImageGeometry(M, M, channels=channels)
+    igs = ImageGeometry(M, M)
     x = ig.allocate('random',seed=100)
-    diag = ig.allocate('random',seed=101)
+    diag = igs.allocate('random',seed=101)
+    
+    D = DiagonalOperator(diag)
+    C = ChannelwiseOperator(D,channels)
+    
+    y = C.direct(x)
+    
+    print(y.subset(channel=2).as_array())
+    print((diag*x.subset(channel=2)).as_array())
+    
+    
+    z = C.adjoint(y)
+    
+    print(z.subset(channel=2).as_array())
+    print((diag*(diag*x.subset(channel=2))).as_array())
     
     
     

@@ -87,7 +87,7 @@ class TestQualityMeasures(CCPiTestClass):
             self.id_coins = id_coins
             self.id_coins_noisy = id_coins_noisy
 
-    @unittest.skipIf(version.parse(np.version.version) <= version.parse("1.13"), "Skip test with numpy < 1.13")
+    @unittest.skipIf(version.parse(np.version.version) < version.parse("1.13"), "Skip test with numpy < 1.13")
     def test_mse(self):
         if has_skimage:
             #%%  Check Mean Squared error for random image and images
@@ -104,7 +104,7 @@ class TestQualityMeasures(CCPiTestClass):
         else:
             self.skipTest("scikit0-image not present ... skipping")
     
-    @unittest.skipIf(version.parse(np.version.version) <= version.parse("1.13"), "Skip test with numpy < 1.13")
+    @unittest.skipIf(version.parse(np.version.version) < version.parse("1.13"), "Skip test with numpy < 1.13")
     def test_psnr(self):
         if has_skimage:
 

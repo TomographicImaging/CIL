@@ -104,6 +104,8 @@ class ChannelwiseOperator(LinearOperator):
         
         super(ChannelwiseOperator, self).__init__(domain_geometry=d, 
                                            range_geometry=r)
+        
+        self.op = op
 
         
     def direct(self,x,out=None):
@@ -125,7 +127,7 @@ class ChannelwiseOperator(LinearOperator):
         
         '''Evaluates operator norm of DiagonalOperator'''
         
-        return self.diagonal.max()
+        return self.op.calculate_norm()
 
 if __name__ == '__main__':
     

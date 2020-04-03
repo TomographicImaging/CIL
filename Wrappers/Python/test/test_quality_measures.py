@@ -30,13 +30,15 @@ import unittest
 import warnings
 from ccpi.utilities.quality_measures import mse, mae, psnr
 from packaging import version
-
-try:
-    from skimage import data, io, filters
-    from skimage.metrics import mean_squared_error, peak_signal_noise_ratio, structural_similarity
-    has_skimage = True
-except ImportError as ie:
-        has_skimage = False
+if version.parse(np.version.version) >= version.parse("1.13"):
+    try:
+        from skimage import data, io, filters
+        from skimage.metrics import mean_squared_error, peak_signal_noise_ratio, structural_similarity
+        has_skimage = True
+    except ImportError as ie:
+            has_skimage = False
+else:
+    has_skimage = False
 
 class CCPiTestClass(unittest.TestCase):
         

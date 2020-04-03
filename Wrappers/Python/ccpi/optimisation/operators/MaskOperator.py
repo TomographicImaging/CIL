@@ -26,12 +26,12 @@ from ccpi.optimisation.operators import DiagonalOperator
 class MaskOperator(DiagonalOperator):
     
     r'''MaskOperator:  D: X -> X,  takes in a DataContainer or subclass 
-    thereof, mask, with 1.0 representing a value to be
-    kept and 0.0 a value to be lost/set to zero. Maps an element of 
+    thereof, mask, with True or 1.0 representing a value to be
+    kept and False or 0.0 a value to be lost/set to zero. Maps an element of 
     :math:`x\in X` onto the element :math:`y \in X,  y = mask*x`, 
     where * denotes elementwise multiplication.
                        
-        :param mask: DataContainer with 1/0 elements
+        :param mask: DataContainer of datatype bool or with 1/0 elements
                        
      '''
     

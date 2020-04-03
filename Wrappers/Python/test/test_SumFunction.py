@@ -80,8 +80,8 @@ class TestFunction(unittest.TestCase):
         M, N, K = 3,4,5
         ig = ImageGeometry(M, N, K)
         
-        tmp = ig.allocate('random_int')
-        b = ig.allocate('random_int')
+        tmp = ig.allocate('random_int', seed=1)
+        b   = ig.allocate('random_int', seed=2)
         
         operator = Identity(ig)
 
@@ -225,12 +225,12 @@ class TestFunction(unittest.TestCase):
         self.assertNumpyArrayEqual(out.as_array(), grad.as_array())
                 
     def test_SumFunctionScalar(self):      
-        
+        numpy.random.seed(1)
         M, N, K = 3,4,5
         ig = ImageGeometry(M, N, K)
         
-        tmp = ig.allocate('random_int')
-        b = ig.allocate('random_int')
+        tmp = ig.allocate('random')
+        b = ig.allocate('random')
         
         scalar = 0.25
         f1 =  scalar * L2NormSquared(b=b)

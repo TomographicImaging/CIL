@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 #  CCP in Tomographic Imaging (CCPi) Core Imaging Library (CIL).
 
-#   Copyright 2017 UKRI-STFC
-#   Copyright 2017 University of Manchester
+#   Copyright 2017-2020 UKRI-STFC
+#   Copyright 2017-2020 University of Manchester
 
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -39,6 +39,8 @@ class MaskOperator(DiagonalOperator):
         # Special case of DiagonalOperator which is the superclass of
         # MaskOperator, so simply instanciate a DiagonalOperator with mask.
         super(MaskOperator, self).__init__(mask)
+        self.mask = self.diagonal
+        
         
 
 if __name__ == '__main__':
@@ -65,14 +67,13 @@ if __name__ == '__main__':
     ig = data.geometry
     ag = ig
     
-    # Create mask with four rectangles to be masked, set up MaskOperator
-    mask = ig.allocate()
-    mask = mask + 1
+    # Create mask with four rectangles to be masked, set up MaskOperator    
+    mask = ig.allocate(True,dtype=np.bool)
     amask = mask.as_array()
-    amask[140:160,10:90] = 0.0
-    amask[70:130,140:160] = 0.0
-    amask[15:50,180:240] = 0.0
-    amask[95:105,180:295] = 0.0
+    amask[140:160,10:90] = False
+    amask[70:130,140:160] = False
+    amask[15:50,180:240] = False
+    amask[95:105,180:295] = False
     
     MO = MaskOperator(mask)
     

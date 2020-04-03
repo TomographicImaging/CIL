@@ -119,8 +119,8 @@ class TestOperator(CCPiTestClass):
         
         M = 3
         ig = ImageGeometry(M, M)
-        x = ig.allocate('random_int')
-        diag = ig.allocate('random_int')
+        x = ig.allocate('random',seed=100)
+        diag = ig.allocate('random',seed=101)
         
         # Set up example DiagonalOperator
         D = DiagonalOperator(diag)
@@ -138,13 +138,12 @@ class TestOperator(CCPiTestClass):
         
         M = 3
         ig = ImageGeometry(M, M)
-        x = ig.allocate('random_int')
+        x = ig.allocate('random',seed=100)
         
-        mask = ig.allocate()
-        mask = mask + 1
+        mask = ig.allocate(True,dtype=numpy.bool)
         amask = mask.as_array()
-        amask[2,1:3] = 0.0
-        amask[0,0] = 0.0
+        amask[2,1:3] = False
+        amask[0,0] = False
         
         MO = MaskOperator(mask)
         

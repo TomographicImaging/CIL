@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 #  CCP in Tomographic Imaging (CCPi) Core Imaging Library (CIL).
 
-#   Copyright 2017 UKRI-STFC
-#   Copyright 2017 University of Manchester
+#   Copyright 2017-2020 UKRI-STFC
+#   Copyright 2017-2020 University of Manchester
 
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -29,6 +29,9 @@ class DiagonalOperator(LinearOperator):
     thereof, diag, representing elements on the diagonal of a diagonal 
     operator. Maps an element of :math:`x\in X` onto the element 
     :math:`y \in X,  y = diag*x`, where * denotes elementwise multiplication.
+    In matrix-vector interpretation, if x is a vector of length N, then diag is 
+    also a vector of length N, and D will be an NxN diagonal matrix with diag 
+    on its diagonal and zeros everywhere else.
                        
         :param diagonal: DataContainer with diagonal elements
                        
@@ -47,22 +50,19 @@ class DiagonalOperator(LinearOperator):
         if out is None:
             return self.diagonal * x
         else:
-            out.fill(self.diagonal * x)
+            self.diagonal.multiply(x,out=out)
     
     def adjoint(self,x, out=None):
         
-        '''Returns D^{*}(y)'''        
+        '''Returns D^{*}(y), which is identical to direct, so use direct.'''        
         
-        if out is None:
-            return self.diagonal * x
-        else:
-            out.fill(self.diagonal * x)
+        return self.direct(x, out=out)
         
     def calculate_norm(self, **kwargs):
         
         '''Evaluates operator norm of DiagonalOperator'''
         
-        return self.diagonal.as_array().max()
+        return self.diagonal.max()
 
 if __name__ == '__main__':
     
@@ -70,8 +70,8 @@ if __name__ == '__main__':
 
     M = 3
     ig = ImageGeometry(M, M)
-    x = ig.allocate('random_int')
-    diag = ig.allocate('random_int')
+    x = ig.allocate('random',seed=100)
+    diag = ig.allocate('random',seed=101)
     
     # Print what each ImageData is
     print(x.as_array())

@@ -136,28 +136,40 @@ class TestFunction(unittest.TestCase):
             self.assertNumpyArrayAlmostEqual(out_proximal_conj1.as_array(), out_proximal_conj1.as_array())               
             
                 
-    def test_TranslateFunction_MixedL21Norm(self):    
+    def test_TranslateFunction_MixedL21Norm(self): 
+        
+        print("Test for TranslateFunction for MixedL21Norm")
         
         ig = ImageGeometry(4,4)
         
-        Grad = Gradient(ig)
-        
-        b = Grad.range_geometry().allocate('random_int')
-                
+        Grad = Gradient(ig)        
+        b = Grad.range_geometry().allocate('random')
+                        
         alpha = 0.4
-        fun = alpha * TranslateFunction(MixedL21Norm(), b)
+        f1 = alpha * MixedL21Norm()
+        fun = TranslateFunction(f1, b)
         
-        tmp_x = Grad.range_geometry().allocate('random_int')
+        tmp_x = Grad.range_geometry().allocate('random')
         
         res1 = fun(tmp_x)        
-        res2 = alpha * (tmp_x - b).pnorm(2).sum()        
+        res2 = f1(tmp_x - b)        
         self.assertAlmostEqual(res1, res2)
         print("Check call...OK")
+
+        res1 = f1.convex_conjugate(tmp_x) - b.dot(tmp_x)
+        res2 = fun.convex_conjugate(tmp_x)
+        self.assertAlmostEqual(res1, res2)
+        print("Check convex conjugate...OK (maybe inf=inf)")
         
-        # TODO
-        print("Missing convex conj, prox, prox_conj")
+        tau = 0.4
+        res1 = fun.proximal(tmp_x, tau)
+        res2 = f1.proximal(tmp_x - b, tau) + b
         
-                                     
+        self.assertNumpyArrayAlmostEqual(res1.get_item(0).as_array(), res2.get_item(0).as_array() )
+        self.assertNumpyArrayAlmostEqual(res1.get_item(1).as_array(), res2.get_item(1).as_array() )
+        print("Check prox...OK ")
+        
+                                         
             
 if __name__ == '__main__':
  

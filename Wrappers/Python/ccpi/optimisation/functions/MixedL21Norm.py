@@ -111,16 +111,32 @@ class MixedL21Norm(Function):
             
         else:
             
+#            tmp = x.pnorm(2)
+#            res = (tmp - tau).maximum(0.0) * x/tmp
+#
+#            for el in res.containers:
+#                
+#                elarray = el.as_array()
+#                elarray[np.isnan(elarray)]=0
+#                el.fill(elarray)  
+#
+#            out.fill(res)   
+            
+            
             tmp = x.pnorm(2)
-            res = (tmp - tau).maximum(0.0) * x/tmp
-
-            for el in res.containers:
+            tmp_ig = 0.0 * tmp
+            (tmp - tau).maximum(0.0, out = tmp_ig)
+            tmp_ig.multiply(x, out = out)
+            out.divide(tmp, out = out)
+            
+            for el in out.containers:
                 
                 elarray = el.as_array()
                 elarray[np.isnan(elarray)]=0
                 el.fill(elarray)  
 
-            out.fill(res)            
+            out.fill(out)              
+            
             
                         
 #            tmp = functools.reduce(lambda a,b: a + b*b, x.containers, x.get_item(0) * 0 ).sqrt()
@@ -202,10 +218,6 @@ class SmoothMixedL21Norm(Function):
         if not isinstance(x, BlockDataContainer):
             raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 
                    
-        
-#        tmp = x.copy()
-#        tmp.containers += (self.epsilon,)          
-#        denom = tmp.pnorm(p=2)
         denom = (x.pnorm(2)**2 + self.epsilon**2).sqrt()
                           
         if out is None:

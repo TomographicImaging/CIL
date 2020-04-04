@@ -69,28 +69,31 @@ class TestQualityMeasures(CCPiTestClass):
         print ("SETUP", np.version.version)
         if has_skimage:
 
-            im_coins = data.coins()
-            im_coins = im_coins/np.max(im_coins)
-
-            ig = ImageGeometry(voxel_num_x = im_coins.shape[1], voxel_num_y = im_coins.shape[0])
-
-            dc1 = ig.allocate('random')
-            dc2 = ig.allocate('random')
-
-            id_coins = ig.allocate()
-            id_coins.fill(im_coins)
+            id_coins = TestData().load(TestData.CAMERA)
 
             id_coins_noisy = TestData.random_noise(id_coins, mode='gaussian', var = 0.05, seed=10)
 
-            self.im_coins = im_coins
-            self.ig = ig
+            ig = id_coins.geometry.copy()
+            dc1 = ig.allocate('random')
+            dc2 = ig.allocate('random')
+
             self.dc1 = dc1
             self.dc2 = dc2
             self.id_coins = id_coins
             self.id_coins_noisy = id_coins_noisy
 
     @unittest.skipIf(version.parse(np.version.version) < version.parse("1.13"), "Skip test with numpy < 1.13")
-    def test_mse(self):
+    def test_mse1(self):
+        if has_skimage:
+            #%%  Check Mean Squared error for random image and images
+            res1 = mse(self.id_coins, self.id_coins_noisy)
+            res2 = mean_squared_error(self.id_coins.as_array(), self.id_coins_noisy.as_array())
+            print('Check MSE for CAMERA image gaussian noise')
+            np.testing.assert_almost_equal(res1, res2, decimal=5)
+        else:
+            self.skipTest("scikit0-image not present ... skipping")
+    @unittest.skipIf(version.parse(np.version.version) < version.parse("1.13"), "Skip test with numpy < 1.13")
+    def test_mse2(self):
         if has_skimage:
             #%%  Check Mean Squared error for random image and images
 
@@ -99,15 +102,20 @@ class TestQualityMeasures(CCPiTestClass):
             print('Check MSE for random ImageData')
             np.testing.assert_almost_equal(res1, res2, decimal=5)
 
-            res1 = mse(self.id_coins, self.id_coins_noisy)
-            res2 = mean_squared_error(self.id_coins.as_array(), self.id_coins_noisy.as_array())
-            print('Check MSE for Coins image gaussian noise')
-            np.testing.assert_almost_equal(res1, res2, decimal=5)
         else:
             self.skipTest("scikit0-image not present ... skipping")
-    
     @unittest.skipIf(version.parse(np.version.version) < version.parse("1.13"), "Skip test with numpy < 1.13")
-    def test_psnr(self):
+    def test_psnr1(self):
+        if has_skimage:
+
+            res1 = psnr(self.id_coins, self.id_coins_noisy, data_range = self.dc1.max())
+            res2 = peak_signal_noise_ratio(self.id_coins.as_array(), self.id_coins_noisy.as_array())
+            print('Check PSNR for CAMERA image gaussian noise')
+            np.testing.assert_almost_equal(res1, res2, decimal=3)
+        else:
+            self.skipTest("scikit0-image not present ... skipping")
+    @unittest.skipIf(version.parse(np.version.version) < version.parse("1.13"), "Skip test with numpy < 1.13")
+    def test_psnr2(self):
         if has_skimage:
 
             res1 = psnr(self.dc1, self.dc2, data_range = self.dc1.max())
@@ -115,10 +123,6 @@ class TestQualityMeasures(CCPiTestClass):
             print('Check PSNR for random ImageData')
             np.testing.assert_almost_equal(res1, res2, decimal=3)
 
-            res1 = psnr(self.id_coins, self.id_coins_noisy, data_range = self.dc1.max())
-            res2 = peak_signal_noise_ratio(self.id_coins.as_array(), self.id_coins_noisy.as_array())
-            print('Check PSNR for Coins image gaussian noise')
-            np.testing.assert_almost_equal(res1, res2, decimal=3)
         else:
             self.skipTest("scikit0-image not present ... skipping")
 

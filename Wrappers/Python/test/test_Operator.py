@@ -23,7 +23,8 @@ from ccpi.optimisation.operators import BlockOperator,\
     FiniteDiff, SymmetrizedGradient
 import numpy
 from timeit import default_timer as timer
-from ccpi.optimisation.operators import Gradient, Identity, SparseFiniteDiff
+from ccpi.optimisation.operators import Gradient, Identity, SparseFiniteDiff,\
+    DiagonalOperator, MaskOperator
 from ccpi.optimisation.operators import LinearOperator, LinearOperatorMatrix
 import numpy   
 from ccpi.optimisation.operators import SumOperator, Gradient,\
@@ -114,7 +115,47 @@ class TestOperator(CCPiTestClass):
         scalar = 0.5
         sid = scalar * Identity(ig)
         numpy.testing.assert_array_equal(scalar * img.as_array(), sid.direct(img).as_array())
+    
+    def test_DiagonalOperator(self):
+        print ("test_DiagonalOperator")
         
+        M = 3
+        ig = ImageGeometry(M, M)
+        x = ig.allocate('random',seed=100)
+        diag = ig.allocate('random',seed=101)
+        
+        # Set up example DiagonalOperator
+        D = DiagonalOperator(diag)
+    
+        # Apply direct and check whether result equals diag*x as expected.
+        z = D.direct(x)
+        numpy.testing.assert_array_equal(z.as_array(), (diag*x).as_array())
+    
+        # Apply adjoint and check whether results equals diag*(diag*x) as expected.
+        y = D.adjoint(z)
+        numpy.testing.assert_array_equal(y.as_array(), (diag*(diag*x)).as_array())
+        
+    def test_MaskOperator(self):
+        print ("test_MaskOperator")
+        
+        M = 3
+        ig = ImageGeometry(M, M)
+        x = ig.allocate('random',seed=100)
+        
+        mask = ig.allocate(True,dtype=numpy.bool)
+        amask = mask.as_array()
+        amask[2,1:3] = False
+        amask[0,0] = False
+        
+        MO = MaskOperator(mask)
+        
+        # Apply direct and check whether result equals diag*x as expected.
+        z = MO.direct(x)
+        numpy.testing.assert_array_equal(z.as_array(), (mask*x).as_array())
+    
+        # Apply adjoint and check whether results equals diag*(diag*x) as expected.
+        y = MO.adjoint(z)
+        numpy.testing.assert_array_equal(y.as_array(), (mask*(mask*x)).as_array())
 
     def test_Identity(self):
         print ("test_Identity")

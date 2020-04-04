@@ -138,14 +138,6 @@ class MixedL21Norm(Function):
             out.fill(out)              
             
             
-                        
-#            tmp = functools.reduce(lambda a,b: a + b*b, x.containers, x.get_item(0) * 0 ).sqrt()
-#            res = (tmp - tau).maximum(0.0) * x/tmp
-#
-#            for el in res.containers:
-#                el.as_array()[np.isnan(el.as_array())]=0
-#
-#            out.fill(res)
         
 # TODO, add the prox conjugate in the documenataion and then delete the code below
             

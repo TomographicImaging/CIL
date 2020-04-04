@@ -114,35 +114,35 @@ class ChannelwiseOperator(LinearOperator):
         
         '''Returns D(x)'''
         
-        # Initialise output
-        output = self.range_geometry().allocate()
-        cury = self.op.range_geometry().allocate()
-        
-        for k in range(self.channels):
-            self.op.direct(x.subset(channel=k),cury)
-            output.fill(cury.as_array(),channel=k)
-        
-        return output
-        
-        
-        '''if out is None:
-            return self.diagonal * x
+        if out is None:
+            output = self.range_geometry().allocate()
+            cury = self.op.range_geometry().allocate()
+            for k in range(self.channels):
+                self.op.direct(x.subset(channel=k),cury)
+                output.fill(cury.as_array(),channel=k)
+            return output
         else:
-            self.diagonal.multiply(x,out=out)'''
+            cury = self.op.range_geometry().allocate()
+            for k in range(self.channels):
+                self.op.direct(x.subset(channel=k),cury)
+                out.fill(cury.as_array(),channel=k)
     
     def adjoint(self,x, out=None):
         
         '''Returns D^{*}(y)'''        
         
-        # Initialise output
-        output = self.domain_geometry().allocate()
-        cury = self.op.domain_geometry().allocate()
-        
-        for k in range(self.channels):
-            self.op.adjoint(x.subset(channel=k),cury)
-            output.fill(cury.as_array(),channel=k)
-        
-        return output
+        if out is None:
+            output = self.domain_geometry().allocate()
+            cury = self.op.domain_geometry().allocate()
+            for k in range(self.channels):
+                self.op.adjoint(x.subset(channel=k),cury)
+                output.fill(cury.as_array(),channel=k)
+            return output
+        else:
+            cury = self.op.domain_geometry().allocate()
+            for k in range(self.channels):
+                self.op.adjoint(x.subset(channel=k),cury)
+                out.fill(cury.as_array(),channel=k)
         
     def calculate_norm(self, **kwargs):
         
@@ -166,14 +166,24 @@ if __name__ == '__main__':
     
     y = C.direct(x)
     
+    y2 = ig.allocate()
+    C.direct(x,y2)
+    
     print(y.subset(channel=2).as_array())
+    print(y2.subset(channel=2).as_array())
     print((diag*x.subset(channel=2)).as_array())
     
     
     z = C.adjoint(y)
     
+    z2 = ig.allocate()
+    C.adjoint(y,z2)
+    
     print(z.subset(channel=2).as_array())
+    print(z2.subset(channel=2).as_array())
     print((diag*(diag*x.subset(channel=2))).as_array())
+    
+
     
     
     

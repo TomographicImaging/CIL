@@ -80,7 +80,7 @@ class LeastSquares(Function):
         try:
 #            if self.c == 1:
 #                return y.squared_norm()
-            return y.squared_norm() * self.c
+            return y.dot(y) * self.c
         except AttributeError as ae:
             # added for compatibility with SIRF
             warnings.warn('squared_norm method not found! Proceeding with norm.')
@@ -106,6 +106,129 @@ class LeastSquares(Function):
             out.multiply (self.c * 2.0, out=out)
         else:
             return (2.0*self.c)*self.A.adjoint(self.A.direct(x) - self.b)
+        
+
+        
+        
+if __name__ == '__main__':
+
+#    from ccpi.framework import ImageGeometry, ImageData, \
+#        AcquisitionGeometry, BlockDataContainer, AcquisitionData
+#    
+#    import numpy as np 
+#    import numpy                          
+#    import matplotlib.pyplot as plt
+#    
+#    from ccpi.optimisation.algorithms import CGLS
+#    from ccpi.optimisation.operators import BlockOperator, Gradient, Identity
+#           
+#    import tomophantom
+#    from tomophantom import TomoP2D
+#    from ccpi.astra.operators import AstraProjectorSimple 
+#    import os
+#    
+#    
+#    # Load  Shepp-Logan phantom 
+#    model = 1 # select a model number from the library
+#    N = 64 # set dimension of the phantom
+#    path = os.path.dirname(tomophantom.__file__)
+#    path_library2D = os.path.join(path, "Phantom2DLibrary.dat")
+#    phantom_2D = TomoP2D.Model(model, N, path_library2D)
+#    
+#    ig = ImageGeometry(voxel_num_x = N, voxel_num_y = N)
+#    data = ImageData(phantom_2D)
+#    
+#    detectors =  N
+#    angles = np.linspace(0, np.pi, 80, dtype=np.float32)
+#    
+#    ag = AcquisitionGeometry('parallel','2D', angles, detectors)
+#    
+#    device = input('Available device: GPU==1 / CPU==0 ')
+#    
+#    if device =='1':
+#        dev = 'gpu'
+#    else:
+#        dev = 'cpu'
+#    
+#    Aop = AstraProjectorSimple(ig, ag, dev)    
+#    sin = Aop.direct(data)
+#    
+#    np.random.seed(10)
+#    noisy_data = AcquisitionData( sin.as_array() + np.random.normal(0,1,ag.shape))
+#    
+#    # Show Ground Truth and Noisy Data
+#    plt.figure(figsize=(10,10))
+#    plt.subplot(2,1,1)
+#    plt.imshow(data.as_array())
+#    plt.title('Ground Truth')
+#    plt.colorbar()
+#    plt.subplot(2,1,2)
+#    plt.imshow(noisy_data.as_array())
+#    plt.title('Noisy Data')
+#    plt.colorbar()
+#    plt.show()
+#    
+#    # Setup and run the simple CGLS algorithm  
+#    x_init = ig.allocate()  
+#    
+#    cgls1 = CGLS(x_init = x_init, operator = Aop, data = noisy_data)
+#    cgls1.max_iteration = 20
+#    cgls1.update_objective_interval = 5
+#    cgls1.run(20, verbose = True)
+#    
+#    plt.imshow(cgls1.get_output().as_array())
+#    plt.show()        
+    
+    
+    print("Check LeastSquares with FunctionOperatorComposition")
+    
+    from ccpi.framework import ImageGeometry
+    from ccpi.optimisation.functions import FunctionOperatorComposition, L2NormSquared
+    from ccpi.optimisation.operators import Identity, DiagonalOperator, CompositionOperator
+    import numpy
+    
+    ig = ImageGeometry(4,5)
+    Aop = 2 * Identity(ig)
+    data = ig.allocate('random_int')
+    
+    x = ig.allocate('random_int')
+    alpha = 5
+    tmp = alpha * L2NormSquared(b=data)
+    f1 = FunctionOperatorComposition(tmp, Aop)
+    f2 = LeastSquares(Aop, data, c = alpha)
+    res1 = f1(x)
+    res2 = f2(x)
+    
+    numpy.testing.assert_almost_equal(res1, res2)   
+    
+    res1 = f1.gradient(x)
+    res2 = f2.gradient(x)
+    numpy.testing.assert_array_almost_equal(res1.as_array(), res2.as_array())
+    
+    print("Check WeightLeastSquares")
+    
+    weight = ig.allocate('random_int', seed = 10)
+    
+    tmp1 = alpha * (weight * (Aop.direct(x) - data)**2).sum()
+    
+    D = DiagonalOperator(weight)
+    tmp2 = f2(D.direct(x))
+    
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
         
 
     

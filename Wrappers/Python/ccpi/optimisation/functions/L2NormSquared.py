@@ -188,7 +188,7 @@ class L2NormSquared(Function):
                 
 from ccpi.optimisation.operators import LinearOperatorMatrix
                 
-class weighted_L2NormSquared(Function):
+class WeightedL2NormSquared(Function):
     
    def __init__(self, **kwargs):
                          
@@ -209,7 +209,7 @@ class weighted_L2NormSquared(Function):
         self.weight_sqrt = self.weight.sqrt()
         if (self.weight<0).any():
             raise ValueError('Weigth contains negative values')
-    super(weighted_L2NormSquared, self).__init__(L = 2 * tmp_norm  )        
+    super(WeightedL2NormSquared, self).__init__(L = 2 * tmp_norm  )        
     
     
    def __call__(self, x):

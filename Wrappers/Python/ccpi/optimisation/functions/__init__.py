@@ -21,7 +21,7 @@ from __future__ import absolute_import
 from .Function import Function, ConstantFunction, ZeroFunction, TranslateFunction, SumFunctionScalar
 from .Function import ScaledFunction
 from .L1Norm import L1Norm
-from .L2NormSquared import L2NormSquared, weighted_L2NormSquared
+from .L2NormSquared import L2NormSquared, WeightedL2NormSquared
 from .LeastSquares import LeastSquares
 from .BlockFunction import BlockFunction
 from .FunctionOperatorComposition import FunctionOperatorComposition

@@ -15,7 +15,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division
 
 import numpy as np
 
@@ -49,6 +49,20 @@ class TestFunction(unittest.TestCase):
                     )
             else:
                 self.assertBlockDataContainerEqual(container1.get_item(col),container2.get_item(col))
+    def assertBlockDataContainerAlmostEqual(self, container1, container2, decimal=7):
+        print ("assert Block Data Container Equal")
+        self.assertTrue(issubclass(container1.__class__, container2.__class__))
+        for col in range(container1.shape[0]):
+            if issubclass(container1.get_item(col).__class__, DataContainer):
+                print ("Checking col ", col)
+                self.assertNumpyArrayAlmostEqual(
+                    container1.get_item(col).as_array(), 
+                    container2.get_item(col).as_array(), 
+                    decimal = decimal
+                    )
+            else:
+                self.assertBlockDataContainerEqual(container1.get_item(col),
+                container2.get_item(col), decimal=decimal)
     
     def assertNumpyArrayEqual(self, first, second):
         res = True
@@ -72,7 +86,7 @@ class TestFunction(unittest.TestCase):
         self.assertTrue(res)
     def test_Function(self):
     
-    
+        numpy.random.seed(1)
         N = 3
         ig = ImageGeometry(N,N)
         ag = ig       
@@ -83,9 +97,9 @@ class TestFunction(unittest.TestCase):
         operator = BlockOperator(op1, op2 , shape=(2,1) )
         
         # Create functions
-        noisy_data = ag.allocate(ImageGeometry.RANDOM_INT)
+        noisy_data = ag.allocate(ImageGeometry.RANDOM)
         
-        d = ag.allocate(ImageGeometry.RANDOM_INT)
+        d = ag.allocate(ImageGeometry.RANDOM)
         alpha = 0.5
         # scaled function
         g = alpha * L2NormSquared(b=noisy_data)
@@ -97,7 +111,7 @@ class TestFunction(unittest.TestCase):
         
         # Compare convex conjugate of g
         a3 = 0.5 * d.squared_norm() + d.dot(noisy_data)
-        self.assertEqual(a3, g.convex_conjugate(d))
+        self.assertAlmostEqual(a3, g.convex_conjugate(d), places=7)
         #print( a3, g.convex_conjugate(d))
 
         #test proximal conjugate
@@ -106,11 +120,11 @@ class TestFunction(unittest.TestCase):
     def test_L2NormSquared(self):
         # TESTS for L2 and scalar * L2
         print ("Test L2NormSquared")
-    
+        numpy.random.seed(1)
         M, N, K = 2,3,5
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N, voxel_num_z = K)
-        u = ig.allocate(ImageGeometry.RANDOM_INT)
-        b = ig.allocate(ImageGeometry.RANDOM_INT) 
+        u = ig.allocate(ImageGeometry.RANDOM)
+        b = ig.allocate(ImageGeometry.RANDOM) 
         
         # check grad/call no data
         f = L2NormSquared()
@@ -135,7 +149,7 @@ class TestFunction(unittest.TestCase):
         #check convex conjugate with data
         d1 = f1.convex_conjugate(u)
         d2 = (1./4.) * u.squared_norm() + (u*b).sum()
-        numpy.testing.assert_equal(d1, d2)  
+        numpy.testing.assert_almost_equal(d1, d2, decimal=6)  
         
         # check proximal no data
         tau = 5
@@ -203,8 +217,8 @@ class TestFunction(unittest.TestCase):
     
         M, N, K = 2,3,5
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N, voxel_num_z = K)
-        u = ig.allocate(ImageGeometry.RANDOM_INT)
-        b = ig.allocate(ImageGeometry.RANDOM_INT) 
+        u = ig.allocate(ImageGeometry.RANDOM, seed=1)
+        b = ig.allocate(ImageGeometry.RANDOM, seed=2) 
         
         # check grad/call no data
         f = L2NormSquared()
@@ -303,7 +317,7 @@ class TestFunction(unittest.TestCase):
             
         M, N = 50, 50
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
-        b = ig.allocate('random_int')
+        b = ig.allocate('random', seed=1)
         
         print('Check call with Identity operator... OK\n')
         operator = 3 * Identity(ig)
@@ -343,10 +357,11 @@ class TestFunction(unittest.TestCase):
         self.assertNumpyArrayAlmostEqual(func1.L, func2.L)
             
     def test_mixedL12Norm(self):
+        numpy.random.seed(1)
         M, N, K = 2,3,5
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
-        u1 = ig.allocate('random_int')
-        u2 = ig.allocate('random_int')
+        u1 = ig.allocate('random')
+        u2 = ig.allocate('random')
         
         U = BlockDataContainer(u1, u2, shape=(2,1))
         
@@ -366,24 +381,24 @@ class TestFunction(unittest.TestCase):
                                            U.power(2))
         
         z1 = f_no_scaled.proximal_conjugate(U, 1)
-        u3 = ig.allocate('random_int')
-        u4 = ig.allocate('random_int')
+        u3 = ig.allocate('random')
+        u4 = ig.allocate('random')
         
         z3 = BlockDataContainer(u3, u4, shape=(2,1))
         
         
         f_no_scaled.proximal_conjugate(U, 1, out=z3)
-        self.assertBlockDataContainerEqual(z3,z1)
+        self.assertBlockDataContainerAlmostEqual(z3,z1, decimal=5)
 
     def test_KullbackLeibler(self):
         print ("test_KullbackLeibler")
-        
+        #numpy.random.seed(1)
         M, N, K =  2, 3, 4
         ig = ImageGeometry(N, M, K)
         
-        u1 = ig.allocate('random_int', seed = 500)    
-        g1 = ig.allocate('random_int', seed = 100)
-        b1 = ig.allocate('random_int', seed = 1000)
+        u1 = ig.allocate('random', seed = 500)    
+        g1 = ig.allocate('random', seed = 100)
+        b1 = ig.allocate('random', seed = 1000)
         
         # with no data
         try:
@@ -421,8 +436,8 @@ class TestFunction(unittest.TestCase):
         
         if (1 - u1.as_array()).all():
             print('If 1-x<=0, Convex conjugate returns 0.0')
-            
-        self.assertNumpyArrayAlmostEqual(0.0, f.convex_conjugate(u1))   
+        u2 = u1 * 0 + 2.
+        self.assertNumpyArrayAlmostEqual(0.0, f.convex_conjugate(u2))   
 
 
         print('Check KullbackLeibler with background\n')      

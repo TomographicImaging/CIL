@@ -16,6 +16,8 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+from __future__ import division
+
 import unittest
 import numpy
 from ccpi.framework import ImageGeometry, AcquisitionGeometry
@@ -24,8 +26,47 @@ from ccpi.framework import BlockDataContainer, DataContainer
 import functools
 
 from ccpi.optimisation.operators import Gradient, Identity, BlockOperator
+class BDCUnittest(unittest.TestCase):
+    def assertBlockDataContainerEqual(self, container1, container2):
+        print ("assert Block Data Container Equal")
+        self.assertTrue(issubclass(container1.__class__, container2.__class__))
+        for col in range(container1.shape[0]):
+            if issubclass(container1.get_item(col).__class__, DataContainer):
+                print ("Checking col ", col)
+                self.assertNumpyArrayEqual(
+                    container1.get_item(col).as_array(), 
+                    container2.get_item(col).as_array()
+                    )
+            else:
+                self.assertBlockDataContainerEqual(container1.get_item(col),container2.get_item(col))
 
-class TestBlockDataContainer(unittest.TestCase):
+    def assertNumpyArrayEqual(self, first, second):
+        res = True
+        try:
+            numpy.testing.assert_array_equal(first, second)
+        except AssertionError as err:
+            res = False
+            print(err)
+        self.assertTrue(res)
+    
+    def assertBlockDataContainerAlmostEqual(self, container1, container2, decimal=7):
+        print ("assert Block Data Container Equal")
+        self.assertTrue(issubclass(container1.__class__, container2.__class__))
+        for col in range(container1.shape[0]):
+            if issubclass(container1.get_item(col).__class__, DataContainer):
+                print ("Checking col ", col)
+                self.assertNumpyArrayAlmostEqual(
+                    container1.get_item(col).as_array(), 
+                    container2.get_item(col).as_array(), 
+                    decimal=decimal
+                    )
+            else:
+                self.assertBlockDataContainerAlmostEqual(container1.get_item(col),container2.get_item(col), decimal=decimal)
+
+    def assertNumpyArrayAlmostEqual(self, first, second, decimal):
+        numpy.testing.assert_array_almost_equal(first, second, decimal)
+
+class TestBlockDataContainer(BDCUnittest):
     def skiptest_BlockDataContainerShape(self):
         print ("test block data container")
         ig0 = ImageGeometry(12,42,55,32)
@@ -463,27 +504,7 @@ class TestBlockDataContainer(unittest.TestCase):
         self.assertBlockDataContainerEqual(out, nested)
 
 
-    def assertBlockDataContainerEqual(self, container1, container2):
-        print ("assert Block Data Container Equal")
-        self.assertTrue(issubclass(container1.__class__, container2.__class__))
-        for col in range(container1.shape[0]):
-            if issubclass(container1.get_item(col).__class__, DataContainer):
-                print ("Checking col ", col)
-                self.assertNumpyArrayEqual(
-                    container1.get_item(col).as_array(), 
-                    container2.get_item(col).as_array()
-                    )
-            else:
-                self.assertBlockDataContainerEqual(container1.get_item(col),container2.get_item(col))
-
-    def assertNumpyArrayEqual(self, first, second):
-        res = True
-        try:
-            numpy.testing.assert_array_equal(first, second)
-        except AssertionError as err:
-            res = False
-            print(err)
-        self.assertTrue(res)    
+    
 
     def test_axpby(self):
         # test axpby between BlockDataContainers
@@ -641,3 +662,150 @@ class TestBlockDataContainer(unittest.TestCase):
         # print ("out_0", out.get_item(0).as_array())
         # print ("out_1", out.get_item(1).as_array())
         self.assertBlockDataContainerEqual(out, res)
+class TestOutParameter(BDCUnittest):
+    def setUp(self):
+        ig0 = ImageGeometry(2,3,4)
+        ig1 = ImageGeometry(2,3,5)
+        
+        data0 = ig0.allocate(-1)
+        data2 = ig1.allocate(1)
+
+        # data1 = ig0.allocate(2)
+        # data3 = ig1.allocate(3)
+        
+        cp0 = BlockDataContainer(data0,data2)
+        self.ig0 = ig0
+        self.ig1 = ig1
+        self.cp0 = cp0
+
+    def test_binary_add(self):
+        # test axpby with nested BlockDataContainer
+        cp0 = self.cp0
+        cp1 = cp0 * 0
+
+        cp0.add(1 , out = cp1)
+        res = BlockDataContainer(self.ig0.allocate(0), self.ig1.allocate(2))
+        self.assertBlockDataContainerEqual(cp1, res)
+    def test_binary_subtract(self):
+        # test axpby with nested BlockDataContainer
+        cp0 = self.cp0
+        cp1 = cp0 * 0
+
+        cp0.subtract(1 , out = cp1)
+        res = BlockDataContainer(self.ig0.allocate(-1-1), self.ig1.allocate(1-1))
+        self.assertBlockDataContainerEqual(cp1, res)
+    def test_binary_multiply(self):
+        # test axpby with nested BlockDataContainer
+        cp0 = self.cp0
+        cp1 = cp0 * 0
+
+        cp0.multiply(2 , out = cp1)
+        res = BlockDataContainer(self.ig0.allocate(-1*2), self.ig1.allocate(1*2))
+        self.assertBlockDataContainerAlmostEqual(cp1, res)
+    def test_binary_divide(self):
+        # test axpby with nested BlockDataContainer
+        cp0 = self.cp0
+        cp1 = cp0 * 0
+
+        cp0.divide(2 , out = cp1)
+        res = BlockDataContainer(self.ig0.allocate(-1/2), self.ig1.allocate(1/2))
+        self.assertBlockDataContainerAlmostEqual(cp1, res)
+    def test_binary_power(self):
+        # test axpby with nested BlockDataContainer
+        cp0 = self.cp0
+        cp1 = cp0 * 0
+
+        cp0.power(2 , out = cp1)
+        res = BlockDataContainer(self.ig0.allocate((-1)**2), self.ig1.allocate((1)**2))
+        self.assertBlockDataContainerAlmostEqual(cp1, res)
+    def test_binary_maximum(self):
+        # test axpby with nested BlockDataContainer
+        cp0 = self.cp0
+        cp1 = cp0 * 10
+
+        cp0.maximum(0 , out = cp1)
+        res = BlockDataContainer(self.ig0.allocate(0), self.ig1.allocate(1))
+        self.assertBlockDataContainerAlmostEqual(cp1, res)
+    def test_binary_minimum(self):
+        # test axpby with nested BlockDataContainer
+        cp0 = self.cp0
+        cp1 = cp0 * 10
+
+        cp0.minimum(0 , out = cp1)
+        res = BlockDataContainer(self.ig0.allocate(-1), self.ig1.allocate(0))
+        self.assertBlockDataContainerAlmostEqual(cp1, res)
+
+    def test_unary_abs(self):
+        # test axpby with nested BlockDataContainer
+        cp0 = self.cp0
+        cp0.abs(out = cp0)
+        res = BlockDataContainer(self.ig0.allocate(1), self.ig1.allocate(1))
+        self.assertBlockDataContainerAlmostEqual(res, cp0)
+    def test_unary_sign(self):
+        # test axpby with nested BlockDataContainer
+        cp0 = self.cp0
+        cp1 = cp0.sign()
+        res = BlockDataContainer(self.ig0.allocate(-1), self.ig1.allocate(1))
+        self.assertBlockDataContainerAlmostEqual(res, cp1)
+    def test_unary_sign2(self):
+        # test axpby with nested BlockDataContainer
+        cp0 = self.cp0
+        cp0.sign(out=cp0)
+        res = BlockDataContainer(self.ig0.allocate(-1), self.ig1.allocate(1))
+        self.assertBlockDataContainerAlmostEqual(res, cp0)
+    def test_unary_sqrt(self):
+        # test axpby with nested BlockDataContainer
+        data0 = self.ig0.allocate(4)
+        data2 = self.ig1.allocate(8)
+
+        # data1 = ig0.allocate(2)
+        # data3 = ig1.allocate(3)
+        
+        cp0 = BlockDataContainer(data0,data2)
+        cp1 = cp0.sqrt()
+        res = BlockDataContainer(self.ig0.allocate(numpy.sqrt(4)), self.ig1.allocate(numpy.sqrt(8)))
+        self.assertBlockDataContainerAlmostEqual(res, cp1)
+    def test_unary_sqrt2(self):
+        # test axpby with nested BlockDataContainer
+        data0 = self.ig0.allocate(4)
+        data2 = self.ig1.allocate(8)
+
+        # data1 = ig0.allocate(2)
+        # data3 = ig1.allocate(3)
+        
+        cp0 = BlockDataContainer(data0,data2)
+        cp0.sqrt(out=cp0)
+        res = BlockDataContainer(self.ig0.allocate(numpy.sqrt(4)), self.ig1.allocate(numpy.sqrt(8)))
+        self.assertBlockDataContainerAlmostEqual(res, cp0)
+
+    def test_unary_conjugate(self):
+        # test axpby with nested BlockDataContainer
+        data0 = self.ig0.allocate(4+3j, dtype=numpy.complex64)
+        data2 = self.ig1.allocate(1-1j, dtype=numpy.complex64)
+
+        # data1 = ig0.allocate(2)
+        # data3 = ig1.allocate(3)
+        
+        cp0 = BlockDataContainer(data0,data2)
+        cp1 = cp0.conjugate()
+        res = BlockDataContainer(self.ig0.allocate(4-3j, dtype=numpy.complex64), self.ig1.allocate(1+1j, dtype=numpy.complex64))
+        self.assertBlockDataContainerAlmostEqual(res, cp1)
+    def test_unary_conjugate2(self):
+        # test axpby with nested BlockDataContainer
+        data0 = self.ig0.allocate(4+3j, dtype=numpy.complex64)
+        data2 = self.ig1.allocate(1-1j, dtype=numpy.complex64)
+
+        # data1 = ig0.allocate(2)
+        # data3 = ig1.allocate(3)
+        
+        cp0 = BlockDataContainer(data0,data2)
+        cp0.conjugate(out=cp0)
+        res = BlockDataContainer(self.ig0.allocate(4-3j, dtype=numpy.complex64), self.ig1.allocate(1+1j, dtype=numpy.complex64))
+        self.assertBlockDataContainerAlmostEqual(res, cp0)
+
+    def test_unary_abs1(self):
+        # test axpby with nested BlockDataContainer
+        cp0 = self.cp0
+        cp1 = cp0.abs()
+        res = BlockDataContainer(self.ig0.allocate(1), self.ig1.allocate(1))
+        self.assertBlockDataContainerAlmostEqual(res, cp1)

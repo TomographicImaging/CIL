@@ -116,13 +116,11 @@ class ChannelwiseOperator(LinearOperator):
         
         # Initialise output
         output = self.range_geometry().allocate()
-        output_array = output.as_array()
         cury = self.op.range_geometry().allocate()
         
         for k in range(self.channels):
-            curx = x.subset(channel=k)
-            self.op.direct(curx,cury)
-            output_array[k] = cury.as_array()
+            self.op.direct(x.subset(channel=k),cury)
+            output.fill(cury.as_array(),channel=k)
         
         return output
         
@@ -138,13 +136,11 @@ class ChannelwiseOperator(LinearOperator):
         
         # Initialise output
         output = self.domain_geometry().allocate()
-        output_array = output.as_array()
         cury = self.op.domain_geometry().allocate()
         
         for k in range(self.channels):
-            curx = x.subset(channel=k)
-            self.op.adjoint(curx,cury)
-            output_array[k] = cury.as_array()
+            self.op.adjoint(x.subset(channel=k),cury)
+            output.fill(cury.as_array(),channel=k)
         
         return output
         

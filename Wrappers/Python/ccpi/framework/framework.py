@@ -187,6 +187,10 @@ class ImageGeometry(object):
                             self.center_z, 
                             self.channels,
                             dimension_labels=self.dimension_labels)
+    def copy(self):
+        '''alias of clone'''
+        return self.clone()
+ 
     def __str__ (self):
         repres = ""
         repres += "Number of channels: {0}\n".format(self.channels)
@@ -196,10 +200,20 @@ class ImageGeometry(object):
         return repres
     def allocate(self, value=0, dimension_labels=None, **kwargs):
         '''allocates an ImageData according to the size expressed in the instance'''
-        if dimension_labels is None:
-            out = ImageData(geometry=self, dimension_labels=self.dimension_labels, suppress_warning=True)
+        if value == 'random_int':
+            dtype = kwargs.get('dtype', numpy.int32)
+            if dtype not in [numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64]:
+                raise ValueError('Expecting int type, got {}'.format(dtype))
         else:
-            out = ImageData(geometry=self, dimension_labels=dimension_labels, suppress_warning=True)
+            dtype = kwargs.get('dtype', numpy.float32)
+        if dimension_labels is None:
+            out = ImageData(geometry=self, dimension_labels=self.dimension_labels, 
+                            dtype=dtype, 
+                            suppress_warning=True)
+        else:
+            out = ImageData(geometry=self, dimension_labels=dimension_labels,
+                            dtype=dtype, 
+                            suppress_warning=True)
         if isinstance(value, Number):
             # it's created empty, so we make it 0
             out.array.fill(value)
@@ -207,14 +221,18 @@ class ImageGeometry(object):
             if value == ImageGeometry.RANDOM:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
-                    numpy.random.seed(seed) 
-                out.fill(numpy.random.random_sample(self.shape))
+                    numpy.random.seed(seed)
+                if dtype in [ numpy.complex , numpy.complex64 , numpy.complex128 ] :
+                    r = numpy.random.random_sample(self.shape) + 1j * numpy.random.random_sample(self.shape)
+                    out.fill(r)
+                else: 
+                    out.fill(numpy.random.random_sample(self.shape))
             elif value == ImageGeometry.RANDOM_INT:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)
-                max_value = kwargs.get('max_value', 100)
-                out.fill(numpy.random.randint(max_value,size=self.shape))
+                    max_value = kwargs.get('max_value', 100)
+                    out.fill(numpy.random.randint(max_value,size=self.shape, dtype=dtype))
             elif value is None:
                 pass
             else:
@@ -289,7 +307,7 @@ class AcquisitionGeometry(object):
         elif pixel_num_v == 0:
             dimension = '2D'
         else:
-            raise ValueError('Number of pixels at detector on the vertical axis must be >= 0. Got {}'.format(vert))
+            raise ValueError('Number of pixels at detector on the vertical axis must be >= 0. Got {}'.format(pixel_num_v))
     
         self.dimension = dimension # 2D or 3D
         if isinstance(angles, numpy.ndarray):
@@ -376,7 +394,10 @@ class AcquisitionGeometry(object):
                                    self.dist_center_detector, 
                                    self.channels,
                                    dimension_labels=self.dimension_labels)
-        
+    def copy(self):
+        '''alias of clone'''
+        return self.clone()
+
     def __str__ (self):
         repres = ""
         repres += "Number of dimensions: {0}\n".format(self.dimension)
@@ -389,11 +410,29 @@ class AcquisitionGeometry(object):
         repres += "number of channels: {0}\n".format(self.channels)
         return repres
     def allocate(self, value=0, dimension_labels=None, **kwargs):
-        '''allocates an AcquisitionData according to the size expressed in the instance'''
-        if dimension_labels is None:
-            out = AcquisitionData(geometry=self, dimension_labels=self.dimension_labels, suppress_warning=True)
+        '''allocates an AcquisitionData according to the size expressed in the instance
+        
+        :param value: accepts numbers to allocate an uniform array, or a string as 'random' or 'random_int' to create a random array or None.
+        :type value: number or string, default None allocates empty memory block
+        :param dimension_labels: labels for the dimension axis
+        :type list: default None
+        :param dtype: numerical type to allocate
+        :type dtype: numpy type, default numpy.float32
+        '''
+        if value == 'random_int':
+            dtype = kwargs.get('dtype', numpy.int32)
+            if dtype not in [numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64]:
+                raise ValueError('Expecting int type, got {}'.format(dtype))
         else:
-            out = AcquisitionData(geometry=self, dimension_labels=dimension_labels, suppress_warning=True)
+            dtype = kwargs.get('dtype', numpy.float32)
+        if dimension_labels is None:
+            out = AcquisitionData(geometry=self, dimension_labels=self.dimension_labels, 
+                                  dtype=dtype,
+                                  suppress_warning=True)
+        else:
+            out = AcquisitionData(geometry=self, dimension_labels=dimension_labels, 
+                                  dtype=dtype, 
+                                  suppress_warning=True)
         if isinstance(value, Number):
             # it's created empty, so we make it 0
             out.array.fill(value)
@@ -401,14 +440,18 @@ class AcquisitionGeometry(object):
             if value == AcquisitionGeometry.RANDOM:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
-                    numpy.random.seed(seed) 
-                out.fill(numpy.random.random_sample(self.shape))
+                    numpy.random.seed(seed)
+                if dtype in [ numpy.complex , numpy.complex64 , numpy.complex128 ] :
+                    r = numpy.random.random_sample(self.shape) + 1j * numpy.random.random_sample(self.shape)
+                    out.fill(r)
+                else:
+                    out.fill(numpy.random.random_sample(self.shape))
             elif value == AcquisitionGeometry.RANDOM_INT:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
-                out.fill(numpy.random.randint(max_value,size=self.shape))
+                out.fill(numpy.random.randint(max_value,size=self.shape, dtype=dtype))
             elif value is None:
                 pass
             else:
@@ -463,7 +506,7 @@ class DataContainer(object):
                     acq_size = self.shape[k]
             return acq_size
         else:
-            raise ValueError('Unknown dimension {0}. Should be one of'.format(dimension_label,
+            raise ValueError('Unknown dimension {0}. Should be one of {1}'.format(dimension_label,
                              self.dimension_labels))
     def get_dimension_axis(self, dimension_label):
         if dimension_label in self.dimension_labels.values():
@@ -471,7 +514,7 @@ class DataContainer(object):
                 if v == dimension_label:
                     return k
         else:
-            raise ValueError('Unknown dimension {0}. Should be one of'.format(dimension_label,
+            raise ValueError('Unknown dimension {0}. Should be one of {1}'.format(dimension_label,
                              self.dimension_labels.values()))
                         
     def as_array(self, dimensions=None):
@@ -680,7 +723,9 @@ class DataContainer(object):
         kw = {'out':self}
         return self.divide(other, **kw)
     
-
+    def __neg__(self):
+        '''negation operator'''
+        return -1 * self   
     
     def __str__ (self, representation=False):
         repres = ""
@@ -760,10 +805,13 @@ class DataContainer(object):
                 out = pwop(self.as_array() , x2 , *args, **kwargs )
             elif issubclass(type(x2) , DataContainer):
                 out = pwop(self.as_array() , x2.as_array() , *args, **kwargs )
+            geom = self.geometry
+            if geom is not None:
+                geom = self.geometry.copy()
             return type(self)(out,
                    deep_copy=False, 
                    dimension_labels=self.dimension_labels,
-                   geometry=self.geometry, 
+                   geometry= None if self.geometry is None else self.geometry.copy(), 
                    suppress_warning=True)
             
         
@@ -926,7 +974,12 @@ class DataContainer(object):
     
     def abs(self, *args,  **kwargs):
         return self.pixel_wise_unary(numpy.abs, *args,  **kwargs)
+<<<<<<< HEAD
              
+=======
+    
+    
+>>>>>>> master
     def sign(self, *args,  **kwargs):
         return self.pixel_wise_unary(numpy.sign, *args,  **kwargs)
     
@@ -957,7 +1010,7 @@ class DataContainer(object):
         #shape = self.shape
         #size = reduce(lambda x,y:x*y, shape, 1)
         #y = numpy.reshape(self.as_array(), (size, ))
-        return self.dot(self.conjugate())
+        return self.dot(self)
         #return self.dot(self)
     def norm(self):
         '''return the euclidean norm of the DataContainer viewed as a vector'''
@@ -965,23 +1018,27 @@ class DataContainer(object):
     
     
     def dot(self, other, *args, **kwargs):
-        '''return the inner product of 2 DataContainers viewed as vectors'''
+        '''return the inner product of 2 DataContainers viewed as vectors
+        
+        applies to real and complex data. In such case the dot method returns
+
+        a.dot(b.conjugate())
+        '''
         method = kwargs.get('method', 'numpy')
         if method not in ['numpy','reduce']:
             raise ValueError('dot: specified method not valid. Expecting numpy or reduce got {} '.format(
                     method))
 
         if self.shape == other.shape:
-            # return (self*other).sum()
             if method == 'numpy':
-                return numpy.dot(self.as_array().ravel(), other.as_array().ravel())
+                return numpy.dot(self.as_array().ravel(), other.as_array().ravel().conjugate())
             elif method == 'reduce':
                 # see https://github.com/vais-ral/CCPi-Framework/pull/273
                 # notice that Python seems to be smart enough to use
                 # the appropriate type to hold the result of the reduction
                 sf = reduce(lambda x,y: x + y[0]*y[1],
                             zip(self.as_array().ravel(),
-                                other.as_array().ravel()),
+                                other.as_array().ravel().conjugate()),
                             0)
                 return sf
         else:
@@ -994,6 +1051,7 @@ class DataContainer(object):
     def max(self, *args, **kwargs):
         '''Returns the max pixel value in the DataContainer'''
         return numpy.max(self.as_array(), *args, **kwargs)
+<<<<<<< HEAD
         
     def size(self):
         '''Returns the number of elements of the DataContainer'''
@@ -1029,6 +1087,19 @@ class DataContainer(object):
         if isinstance(other, DataContainer):
             return self.as_array()!=other.as_array()
         return self.as_array()!=other      
+=======
+    
+    @property
+    def size(self):
+        '''Returns the number of elements of the DataContainer'''
+        return self.as_array().size
+
+    @property
+    def dtype(self):
+        '''Returns the type of the data array'''
+        return self.as_array().dtype
+
+>>>>>>> master
     
 class ImageData(DataContainer):
     '''DataContainer for holding 2D or 3D DataContainer'''
@@ -1045,12 +1116,13 @@ class ImageData(DataContainer):
             warnings.warn('Direct invocation is deprecated and will be removed in following version. Use allocate from ImageGeometry instead',
                    DeprecationWarning, stacklevel=4)
         self.geometry = kwargs.get('geometry', None)
+        dtype = kwargs.get('dtype', numpy.float32)
         if array is None:
             if self.geometry is not None:
                 shape, dimension_labels = self.get_shape_labels(self.geometry, dimension_labels)
                     
                 # array = numpy.zeros( shape, dtype=numpy.float32) 
-                array = numpy.empty( shape, dtype=numpy.float32)
+                array = numpy.empty( shape, dtype=dtype)
                 super(ImageData, self).__init__(array, deep_copy,
                                  dimension_labels, **kwargs)
                 
@@ -1225,7 +1297,7 @@ class AcquisitionData(DataContainer):
         if not kwargs.get('suppress_warning', False):
             warnings.warn('Direct invocation is deprecated and will be removed in following version. Use allocate from AcquisitionGeometry instead',
               DeprecationWarning)
-        
+        dtype = kwargs.get('dtype', numpy.float32)
         self.geometry = kwargs.get('geometry', None)
         if array is None:
             if 'geometry' in kwargs.keys():
@@ -1236,7 +1308,7 @@ class AcquisitionData(DataContainer):
                 
                     
                 # array = numpy.zeros( shape , dtype=numpy.float32) 
-                array = numpy.empty( shape, dtype=numpy.float32)
+                array = numpy.empty( shape, dtype=dtype)
                 super(AcquisitionData, self).__init__(array, deep_copy,
                                  dimension_labels, **kwargs)
         else:
@@ -1658,7 +1730,7 @@ class VectorData(DataContainer):
     '''DataContainer to contain 1D array'''
     def __init__(self, array=None, **kwargs):
         self.geometry = kwargs.get('geometry', None)
-        self.dtype = kwargs.get('dtype', numpy.float32)
+        dtype = kwargs.get('dtype', numpy.float32)
         
         if self.geometry is None:
             if array is None:
@@ -1673,7 +1745,7 @@ class VectorData(DataContainer):
             self.length = self.geometry.length
                 
             if array is None:
-                out = numpy.zeros((self.length,), dtype=self.dtype)
+                out = numpy.zeros((self.length,), dtype=dtype)
             else:
                 if self.length == array.shape[0]:
                     out = array
@@ -1682,6 +1754,7 @@ class VectorData(DataContainer):
         deep_copy = True
         # need to pass the geometry, othewise None
         super(VectorData, self).__init__(out, deep_copy, None, geometry = self.geometry)
+    
 
 class VectorGeometry(object):
     '''Geometry describing VectorData to contain 1D array'''
@@ -1698,6 +1771,9 @@ class VectorGeometry(object):
     def clone(self):
         '''returns a copy of VectorGeometry'''
         return VectorGeometry(self.length)
+    def copy(self):
+        '''alias of clone'''
+        return self.clone()
 
     def allocate(self, value=0, **kwargs):
         '''allocates an VectorData according to the size expressed in the instance'''

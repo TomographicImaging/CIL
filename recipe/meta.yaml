@@ -12,6 +12,8 @@ test:
   requires:
     - python-wget
     - cvxpy # [ unix and py36 and np115 ]
+    - scikit-image
+    - packaging
 
   source_files:
     - ./Wrappers/Python/test # [win]
@@ -26,6 +28,7 @@ requirements:
   build:
     - {{ pin_compatible('numpy', max_pin='x.x') }}
     - python
+    - numpy
     - setuptools
     - cmake
     - openmp # [osx]

@@ -348,27 +348,7 @@ class FiniteDiff(LinearOperator):
         if outnone:
             ret.fill(outa)
             return ret
-        #else:
-        #    out.fill(outa)
-            
-    # def range_geometry(self):
-        
-    #     '''
-        
-    #         Returns the range_geometry of FiniteDiff
-        
-    #     '''
-        
-    #     return self.gm_range
-    
-    # def domain_geometry(self):
-        
-    #     '''
-        
-    #         Returns the domain_geometry of FiniteDiff
-        
-    #     '''        
-    #     return self.gm_domain
+
 
 
 if __name__ == '__main__':

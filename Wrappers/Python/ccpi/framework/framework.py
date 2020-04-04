@@ -231,8 +231,8 @@ class ImageGeometry(object):
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)
-                    max_value = kwargs.get('max_value', 100)
-                    out.fill(numpy.random.randint(max_value,size=self.shape, dtype=dtype))
+                max_value = kwargs.get('max_value', 100)
+                out.fill(numpy.random.randint(max_value,size=self.shape, dtype=dtype))
             elif value is None:
                 pass
             else:

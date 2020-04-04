@@ -27,15 +27,13 @@ from ccpi.framework.framework import ImageGeometry, AcquisitionGeometry
 
 class ChannelwiseOperator(LinearOperator):
     
-    r'''DiagonalOperator:  D: X -> X,  takes in a DataContainer or subclass 
-    thereof, diag, representing elements on the diagonal of a diagonal 
-    operator. Maps an element of :math:`x\in X` onto the element 
-    :math:`y \in X,  y = diag*x`, where * denotes elementwise multiplication.
-    In matrix-vector interpretation, if x is a vector of length N, then diag is 
-    also a vector of length N, and D will be an NxN diagonal matrix with diag 
-    on its diagonal and zeros everywhere else.
+    r'''ChannelwiseOperator:  takes in a single-channel operator op and the 
+    number of channels to be used, and creates a new multi-channel 
+    ChannelwiseOperator, which will apply the operator op independently on 
+    each channel for the number of channels specified.
                        
-        :param diagonal: DataContainer with diagonal elements
+        :param op: Single-channel operator
+        :param channels: Number of channels
                        
      '''
     

@@ -225,7 +225,7 @@ if __name__ == '__main__':
     
     BG = BlockGeometry(ig, ig)
     
-    U = BG.allocate('random_int')
+    U = BG.allocate('random')
     
     # Define no scale and scaled
     alpha = 0.5
@@ -273,7 +273,7 @@ if __name__ == '__main__':
     numpy.testing.assert_array_almost_equal(d1.get_item(1).as_array(), \
                                             d2.get_item(1).as_array(), decimal=4)     
     
-    out1 = BG.allocate('random_int')
+    out1 = BG.allocate('random')
     
     
     f_scaled.proximal(U, tau, out = out1)
@@ -301,7 +301,7 @@ if __name__ == '__main__':
     # check convex conjugate
     
     f = MixedL21Norm()
-    x = BG.allocate('random_int')
+    x = BG.allocate('random')
     
     res1 = f.convex_conjugate(x)
     tmp = (x.pnorm(2).max() - 1)
@@ -319,7 +319,7 @@ if __name__ == '__main__':
     epsilon = 0.5
     
     f1 = SmoothMixedL21Norm(epsilon)    
-    x = bg.allocate('random_int')
+    x = bg.allocate('random')
     
     
     print("Check call for smooth MixedL21Norm ...OK")

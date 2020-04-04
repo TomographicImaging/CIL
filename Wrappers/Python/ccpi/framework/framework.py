@@ -1058,7 +1058,6 @@ class DataContainer(object):
     def dtype(self):
         '''Returns the type of the data array'''
         return self.as_array().dtype
-
     
 class ImageData(DataContainer):
     '''DataContainer for holding 2D or 3D DataContainer'''

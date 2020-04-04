@@ -51,12 +51,18 @@ class BlockDataContainer(object):
     A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]
     
     '''
-    ADD      = 'add'
-    SUBTRACT = 'subtract'
-    MULTIPLY = 'multiply'
-    DIVIDE   = 'divide'
-    POWER    = 'power'
-    AXPBY    = 'axpby'
+    ADD       = 'add'
+    SUBTRACT  = 'subtract'
+    MULTIPLY  = 'multiply'
+    DIVIDE    = 'divide'
+    POWER     = 'power'
+    AXPBY     = 'axpby'
+    MAXIMUM   = 'maximum'
+    MINIMUM   = 'minimum'
+    ABS       = 'abs'
+    SIGN      = 'sign'
+    SQRT      = 'sqrt'
+    CONJUGATE = 'conjugate'
     __array_priority__ = 1
     __container_priority__ = 2
     def __init__(self, *args, **kwargs):
@@ -175,6 +181,40 @@ class BlockDataContainer(object):
             self.binary_operations(BlockDataContainer.DIVIDE, other, *args, **kwargs)
         else:
             return self.binary_operations(BlockDataContainer.DIVIDE, other, *args, **kwargs)
+    def power(self, other, *args, **kwargs):
+        '''Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer
+        
+        :param: other (number, DataContainer or subclasses or BlockDataContainer
+        :param: out (optional): provides a placehold for the resul.
+        '''
+        out = kwargs.get('out', None)
+        if out is not None:
+            self.binary_operations(BlockDataContainer.POWER, other, *args, **kwargs)
+        else:
+            return self.binary_operations(BlockDataContainer.POWER, other, *args, **kwargs)
+    def maximum(self, other, *args, **kwargs):
+        '''Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer
+        
+        :param: other (number, DataContainer or subclasses or BlockDataContainer
+        :param: out (optional): provides a placehold for the resul.
+        '''
+        out = kwargs.get('out', None)
+        if out is not None:
+            self.binary_operations(BlockDataContainer.MAXIMUM, other, *args, **kwargs)
+        else:
+            return self.binary_operations(BlockDataContainer.MAXIMUM, other, *args, **kwargs)
+    def minimum(self, other, *args, **kwargs):
+        '''Algebra: power method of BlockDataContainer with number/DataContainer or BlockDataContainer
+        
+        :param: other (number, DataContainer or subclasses or BlockDataContainer
+        :param: out (optional): provides a placehold for the resul.
+        '''
+        out = kwargs.get('out', None)
+        if out is not None:
+            self.binary_operations(BlockDataContainer.MINIMUM, other, *args, **kwargs)
+        else:
+            return self.binary_operations(BlockDataContainer.MINIMUM, other, *args, **kwargs)
+
     def axpby(self, a, b, y, out, dtype=numpy.float32, num_threads = NUM_THREADS):
         r'''performs axpby element-wise on the BlockDataContainer containers
         
@@ -219,6 +259,10 @@ class BlockDataContainer(object):
                     op = el.divide
                 elif operation == BlockDataContainer.POWER:
                     op = el.power
+                elif operation == BlockDataContainer.MAXIMUM:
+                    op = el.maximum
+                elif operation == BlockDataContainer.MINIMUM:
+                    op = el.minimum
                 else:
                     raise ValueError('Unsupported operation', operation)
                 if out is not None:
@@ -251,6 +295,10 @@ class BlockDataContainer(object):
                     op = el.divide
                 elif operation == BlockDataContainer.POWER:
                     op = el.power
+                elif operation == BlockDataContainer.MAXIMUM:
+                    op = el.maximum
+                elif operation == BlockDataContainer.MINIMUM:
+                    op = el.minimum
                 elif operation == BlockDataContainer.AXPBY:
                     if not isinstance(other, BlockDataContainer):
                         raise ValueError("{} cannot handle {}".format(operation, type(other)))
@@ -292,6 +340,10 @@ class BlockDataContainer(object):
                     op = el.divide
                 elif operation == BlockDataContainer.POWER:
                     op = el.power
+                elif operation == BlockDataContainer.MAXIMUM:
+                    op = el.maximum
+                elif operation == BlockDataContainer.MINIMUM:
+                    op = el.minimum
                 elif operation == BlockDataContainer.AXPBY:
                     # As out cannot be None, it is safe to continue the 
                     # for loop after the call to axpby
@@ -309,49 +361,61 @@ class BlockDataContainer(object):
                 return
             else:
                 return type(self)(*res, shape=self.shape)
+
+    ## unary operations
+
+    def unary_operations(self, operation, *args, **kwargs ):
+        '''Unary operation on BlockDataContainer: 
         
-
-    def power(self, other, *args, **kwargs):
-        if not self.is_compatible(other):
-            raise ValueError('Incompatible for power')
+        generic method of unary operation with BlockDataContainer: abs, sign, sqrt and conjugate
+        
+        This method is not to be used directly
+        '''
         out = kwargs.get('out', None)
-        if isinstance(other, Number):
-            return type(self)(*[ el.power(other, *args, **kwargs) for el in self.containers], shape=self.shape)
-        elif isinstance(other, list) or isinstance(other, numpy.ndarray):
-            return type(self)(*[ el.power(ot, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
-        return type(self)(*[ el.power(ot, *args, **kwargs) for el,ot in zip(self.containers,other.containers)], shape=self.shape)
-    
-    def maximum(self,other, *args, **kwargs):
-        if not self.is_compatible(other):
-            raise ValueError('Incompatible for maximum')
-        out = kwargs.get('out', None)
-        if isinstance(other, Number):
-            return type(self)(*[ el.maximum(other, *args, **kwargs) for el in self.containers], shape=self.shape)
-        elif isinstance(other, list) or isinstance(other, numpy.ndarray):
-            return type(self)(*[ el.maximum(ot, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
-        return type(self)(*[ el.maximum(ot, *args, **kwargs) for el,ot in zip(self.containers,other.containers)], shape=self.shape)
+        kw = kwargs.copy()
+        if out is None:
+            res = []
+            for el in self.containers:
+                if operation == BlockDataContainer.ABS:
+                    op = el.abs
+                elif operation == BlockDataContainer.SIGN:
+                    op = el.sign
+                elif operation == BlockDataContainer.SQRT:
+                    op = el.sqrt
+                elif operation == BlockDataContainer.CONJUGATE:
+                    op = el.conjugate
+                res.append(op(*args, **kw))
+            return BlockDataContainer(*res)
+        else:
+            kw.pop('out')
+            for el,elout in zip(self.containers, out.containers):
+                if operation == BlockDataContainer.ABS:
+                    op = el.abs
+                elif operation == BlockDataContainer.SIGN:
+                    op = el.sign
+                elif operation == BlockDataContainer.SQRT:
+                    op = el.sqrt
+                elif operation == BlockDataContainer.CONJUGATE:
+                    op = el.conjugate
+                kw['out'] = elout
+                op(*args, **kw)
 
-
-    def minimum(self,other, *args, **kwargs):
-        if not self.is_compatible(other):
-            raise ValueError('Incompatible for maximum')
-        out = kwargs.get('out', None)
-        if isinstance(other, Number):
-            return type(self)(*[ el.minimum(other, *args, **kwargs) for el in self.containers], shape=self.shape)
-        elif isinstance(other, list) or isinstance(other, numpy.ndarray):
-            return type(self)(*[ el.minimum(ot, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
-        return type(self)(*[ el.minimum(ot, *args, **kwargs) for el,ot in zip(self.containers,other.containers)], shape=self.shape)
-
-    
-    ## unary operations    
-    def abs(self, *args,  **kwargs):
-        return type(self)(*[ el.abs(*args, **kwargs) for el in self.containers], shape=self.shape)
-    def sign(self, *args,  **kwargs):
-        return type(self)(*[ el.sign(*args, **kwargs) for el in self.containers], shape=self.shape)
-    def sqrt(self, *args,  **kwargs):
-        return type(self)(*[ el.sqrt(*args, **kwargs) for el in self.containers], shape=self.shape)
-    def conjugate(self, out=None):
-        return type(self)(*[el.conjugate() for el in self.containers], shape=self.shape)
+    def abs(self, *args, **kwargs):
+        return self.unary_operations(BlockDataContainer.ABS, *args, **kwargs)
+    def sign(self, *args, **kwargs):
+        return self.unary_operations(BlockDataContainer.SIGN, *args, **kwargs)
+    def sqrt(self, *args, **kwargs):
+        return self.unary_operations(BlockDataContainer.SQRT, *args, **kwargs)
+    def conjugate(self, *args, **kwargs):
+        return self.unary_operations(BlockDataContainer.CONJUGATE, *args, **kwargs)
+    # def abs(self, *args,  **kwargs):
+    #     return type(self)(*[ el.abs(*args, **kwargs) for el in self.containers], shape=self.shape)
+    # def sign(self, *args,  **kwargs):
+    #     return type(self)(*[ el.sign(*args, **kwargs) for el in self.containers], shape=self.shape)
+    # def sqrt(self, *args,  **kwargs):
+    #     return type(self)(*[ el.sqrt(*args, **kwargs) for el in self.containers], shape=self.shape)
+    # def conjugate(self, out=None):
+    #     return type(self)(*[el.conjugate() for el in self.containers], shape=self.shape)
     
     ## reductions
     

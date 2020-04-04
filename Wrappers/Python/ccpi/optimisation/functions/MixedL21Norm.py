@@ -242,7 +242,7 @@ if __name__ == '__main__':
     print( " ####### check without out ######### " )
           
           
-    u_out_no_out = BG.allocate('random_int')         
+    u_out_no_out = BG.allocate('random')         
     res_no_out = f_scaled.proximal_conjugate(u_out_no_out, 0.5)          
     print(res_no_out[0].as_array())
     

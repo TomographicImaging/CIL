@@ -105,8 +105,7 @@ class TestOperator(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(res3.as_array(), res4, decimal=4)   
         
         A.adjoint(res1, out = out2)
-        self.assertNumpyArrayAlmostEqual(res3.as_array(), out2.as_array(), decimal=4)        
-    
+        self.assertNumpyArrayAlmostEqual(res3.as_array(), out2.as_array(), decimal=4)
     
     def test_ScaledOperator(self):
         print ("test_ScaledOperator")

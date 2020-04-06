@@ -90,7 +90,6 @@ class ChannelwiseOperator(LinearOperator):
         
         self.op = op
         self.channels = channels
-
         
     def direct(self,x,out=None):
         
@@ -159,7 +158,6 @@ if __name__ == '__main__':
     print(y2.subset(channel=2).as_array())
     print((diag*x.subset(channel=2)).as_array())
     
-    
     z = C.adjoint(y)
     
     z2 = ig.allocate()
@@ -168,9 +166,4 @@ if __name__ == '__main__':
     print(z.subset(channel=2).as_array())
     print(z2.subset(channel=2).as_array())
     print((diag*(diag*x.subset(channel=2))).as_array())
-    
-
-    
-    
-    
     

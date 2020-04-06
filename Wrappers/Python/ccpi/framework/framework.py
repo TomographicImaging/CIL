@@ -974,12 +974,7 @@ class DataContainer(object):
     
     def abs(self, *args,  **kwargs):
         return self.pixel_wise_unary(numpy.abs, *args,  **kwargs)
-<<<<<<< HEAD
-             
-=======
-    
-    
->>>>>>> master
+
     def sign(self, *args,  **kwargs):
         return self.pixel_wise_unary(numpy.sign, *args,  **kwargs)
     
@@ -1051,7 +1046,6 @@ class DataContainer(object):
     def max(self, *args, **kwargs):
         '''Returns the max pixel value in the DataContainer'''
         return numpy.max(self.as_array(), *args, **kwargs)
-<<<<<<< HEAD
         
     def size(self):
         '''Returns the number of elements of the DataContainer'''
@@ -1087,7 +1081,6 @@ class DataContainer(object):
         if isinstance(other, DataContainer):
             return self.as_array()!=other.as_array()
         return self.as_array()!=other      
-=======
     
     @property
     def size(self):
@@ -1099,7 +1092,6 @@ class DataContainer(object):
         '''Returns the type of the data array'''
         return self.as_array().dtype
 
->>>>>>> master
     
 class ImageData(DataContainer):
     '''DataContainer for holding 2D or 3D DataContainer'''

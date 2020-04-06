@@ -42,66 +42,42 @@ class ChannelwiseOperator(LinearOperator):
         dom_op = op.domain_geometry()
         ran_op = op.range_geometry()
         
-        if isinstance(dom_op, ImageGeometry):
-            d = ImageGeometry(  
-                            dom_op.voxel_num_x, 
-                            dom_op.voxel_num_y, 
-                            dom_op.voxel_num_z, 
-                            dom_op.voxel_size_x, 
-                            dom_op.voxel_size_y, 
-                            dom_op.voxel_size_z, 
-                            dom_op.center_x, 
-                            dom_op.center_y, 
-                            dom_op.center_z, 
-                            channels,
-                            dimension_labels=[channel_label] + dom_op.dimension_labels)
-        elif isinstance(dom_op, AcquisitionGeometry):
-            d = AcquisitionGeometry(
-                                   dom_op.geom_type,
-                                   dom_op.dimension, 
-                                   dom_op.angles, 
-                                   dom_op.pixel_num_h, 
-                                   dom_op.pixel_size_h, 
-                                   dom_op.pixel_num_v, 
-                                   dom_op.pixel_size_v, 
-                                   dom_op.dist_source_center, 
-                                   dom_op.dist_center_detector, 
-                                   channels,
-                                   dimension_labels=[channel_label] + dom_op.dimension_labels)
-        else:
-            pass
+        geom_mc = []
         
-        if isinstance(ran_op, ImageGeometry):
-            r = ImageGeometry(  
-                            ran_op.voxel_num_x, 
-                            ran_op.voxel_num_y, 
-                            ran_op.voxel_num_z, 
-                            ran_op.voxel_size_x, 
-                            ran_op.voxel_size_y, 
-                            ran_op.voxel_size_z, 
-                            ran_op.center_x, 
-                            ran_op.center_y, 
-                            ran_op.center_z, 
-                            channels,
-                            dimension_labels=[channel_label] + ran_op.dimension_labels)
-        elif isinstance(ran_op, AcquisitionGeometry):
-            r = AcquisitionGeometry(
-                                   ran_op.geom_type,
-                                   ran_op.dimension, 
-                                   ran_op.angles, 
-                                   ran_op.pixel_num_h, 
-                                   ran_op.pixel_size_h, 
-                                   ran_op.pixel_num_v, 
-                                   ran_op.pixel_size_v, 
-                                   ran_op.dist_source_center, 
-                                   ran_op.dist_center_detector, 
-                                   channels,
-                                   dimension_labels=[channel_label] + ran_op.dimension_labels)
-        else:
-            pass
+        for geom in [dom_op,ran_op]:
+            if isinstance(geom, ImageGeometry):
+                geom_mc.append(
+                    ImageGeometry(  
+                    geom.voxel_num_x, 
+                    geom.voxel_num_y, 
+                    geom.voxel_num_z, 
+                    geom.voxel_size_x, 
+                    geom.voxel_size_y, 
+                    geom.voxel_size_z, 
+                    geom.center_x, 
+                    geom.center_y, 
+                    geom.center_z, 
+                    channels,
+                    dimension_labels=[channel_label] + dom_op.dimension_labels))
+            elif isinstance(geom, AcquisitionGeometry):
+                geom_mc.append(
+                    AcquisitionGeometry(
+                       geom.geom_type,
+                       geom.dimension, 
+                       geom.angles, 
+                       geom.pixel_num_h, 
+                       geom.pixel_size_h, 
+                       geom.pixel_num_v, 
+                       geom.pixel_size_v, 
+                       geom.dist_source_center, 
+                       geom.dist_center_detector, 
+                       channels,
+                       dimension_labels=[channel_label] + dom_op.dimension_labels))
+            else:
+                pass
         
-        super(ChannelwiseOperator, self).__init__(domain_geometry=d, 
-                                           range_geometry=r)
+        super(ChannelwiseOperator, self).__init__(domain_geometry=geom_mc[0], 
+                                           range_geometry=geom_mc[1])
         
         self.op = op
         self.channels = channels

@@ -37,13 +37,16 @@ class ChannelwiseOperator(LinearOperator):
                        
      '''
     
-    def __init__(self, op, channels, channel_label='channel'):
+    def __init__(self, op, channels):
         
         dom_op = op.domain_geometry()
         ran_op = op.range_geometry()
         
         geom_mc = []
         
+        # Create multi-channel domain and range geometries: Clones of the
+        # input single-channel geometries but with the specified number of
+        # channels and additional dimension_label 'channel'.
         for geom in [dom_op,ran_op]:
             if isinstance(geom, ImageGeometry):
                 geom_mc.append(
@@ -58,7 +61,7 @@ class ChannelwiseOperator(LinearOperator):
                     geom.center_y, 
                     geom.center_z, 
                     channels,
-                    dimension_labels=[channel_label] + dom_op.dimension_labels))
+                    dimension_labels=['channel'] + dom_op.dimension_labels))
             elif isinstance(geom, AcquisitionGeometry):
                 geom_mc.append(
                     AcquisitionGeometry(
@@ -72,7 +75,7 @@ class ChannelwiseOperator(LinearOperator):
                        geom.dist_source_center, 
                        geom.dist_center_detector, 
                        channels,
-                       dimension_labels=[channel_label] + dom_op.dimension_labels))
+                       dimension_labels=['channel'] + dom_op.dimension_labels))
             else:
                 pass
         
@@ -81,13 +84,14 @@ class ChannelwiseOperator(LinearOperator):
         
         self.op = op
         self.channels = channels
-        self.channel_label = channel_label
 
         
     def direct(self,x,out=None):
         
         '''Returns D(x)'''
         
+        # Loop over channels, extract single-channel data, apply single-channel
+        # operator's direct method and fill into multi-channel output data set.
         if out is None:
             output = self.range_geometry().allocate()
             cury = self.op.range_geometry().allocate()
@@ -105,6 +109,8 @@ class ChannelwiseOperator(LinearOperator):
         
         '''Returns D^{*}(y)'''        
         
+        # Loop over channels, extract single-channel data, apply single-channel
+        # operator's adjoint method and fill into multi-channel output data set.
         if out is None:
             output = self.domain_geometry().allocate()
             cury = self.op.domain_geometry().allocate()

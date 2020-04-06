@@ -24,7 +24,7 @@ from ccpi.optimisation.operators import BlockOperator,\
 import numpy
 from timeit import default_timer as timer
 from ccpi.optimisation.operators import Gradient, Identity, SparseFiniteDiff,\
-    DiagonalOperator, MaskOperator
+    DiagonalOperator, MaskOperator, ChannelwiseOperator
 from ccpi.optimisation.operators import LinearOperator, LinearOperatorMatrix
 import numpy   
 from ccpi.optimisation.operators import SumOperator, Gradient,\
@@ -105,8 +105,7 @@ class TestOperator(CCPiTestClass):
         self.assertNumpyArrayAlmostEqual(res3.as_array(), res4, decimal=4)   
         
         A.adjoint(res1, out = out2)
-        self.assertNumpyArrayAlmostEqual(res3.as_array(), out2.as_array(), decimal=4)        
-    
+        self.assertNumpyArrayAlmostEqual(res3.as_array(), out2.as_array(), decimal=4)
     
     def test_ScaledOperator(self):
         print ("test_ScaledOperator")
@@ -156,6 +155,46 @@ class TestOperator(CCPiTestClass):
         # Apply adjoint and check whether results equals diag*(diag*x) as expected.
         y = MO.adjoint(z)
         numpy.testing.assert_array_equal(y.as_array(), (mask*(mask*x)).as_array())
+        
+    def test_ChannelwiseOperator(self):
+        print("test_ChannelwiseOperator")
+        
+        M = 3
+        channels = 4
+        ig = ImageGeometry(M, M, channels=channels)
+        igs = ImageGeometry(M, M)
+        x = ig.allocate('random',seed=100)
+        diag = igs.allocate('random',seed=101)
+        
+        D = DiagonalOperator(diag)
+        C = ChannelwiseOperator(D,channels)
+        
+        y = C.direct(x)
+        
+        y2 = ig.allocate()
+        C.direct(x,y2)
+        
+        for c in range(channels):
+            numpy.testing.assert_array_equal(y.subset(channel=2).as_array(), \
+                                             (diag*x.subset(channel=2)).as_array())
+            numpy.testing.assert_array_equal(y2.subset(channel=2).as_array(), \
+                                             (diag*x.subset(channel=2)).as_array())
+        
+        
+        z = C.adjoint(y)
+        
+        z2 = ig.allocate()
+        C.adjoint(y,z2)
+        
+        for c in range(channels):
+            numpy.testing.assert_array_equal(z.subset(channel=2).as_array(), \
+                                             (diag*(diag*x.subset(channel=2))).as_array())
+            numpy.testing.assert_array_equal(z2.subset(channel=2).as_array(), \
+                                             (diag*(diag*x.subset(channel=2))).as_array())
+        
+        #print(z.subset(channel=2).as_array())
+        #print(z2.subset(channel=2).as_array())
+        #print((diag*(diag*x.subset(channel=2))).as_array())
 
     def test_Identity(self):
         print ("test_Identity")

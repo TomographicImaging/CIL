@@ -25,7 +25,7 @@ from ccpi.optimisation.operators import LinearOperator
 from ccpi.optimisation.functions import Function
 import warnings
 
-# Define a class for squared 2-norm
+
 class LeastSquares(Function):
     r"""Least Squares function
     
@@ -46,29 +46,30 @@ class LeastSquares(Function):
     
     """
     
-    def __init__(self, A, b, c=1.0):
+    def __init__(self, A, b, c=1.0, estimate_Lipschitz = False):
         super(LeastSquares, self).__init__()
     
         self.A = A  # Should be an operator, default identity
         self.b = b  # Default zero DataSet?
         self.c = c  # Default 1.
         self.range_tmp = A.range_geometry().allocate()
-
-        # Compute the Lipschitz parameter from the operator if possible
-        # Leave it initialised to None otherwise
-        try:
-            self.L = 2.0*self.c*(self.A.norm()**2)
-        except AttributeError as ae:
-            if self.A.is_linear():
-                Anorm = LinearOperator.PowerMethod(self.A, 10)[0]
-                self.L = 2.0 * self.c * (Anorm*Anorm)
-            else:
+        
+        if estimate_Lipschitz:
+            # Compute the Lipschitz parameter from the operator if possible
+            # Leave it initialised to None otherwise
+            try:
+                self.L = 2.0*self.c*(self.A.norm()**2)
+            except AttributeError as ae:
+                if self.A.is_linear():
+                    Anorm = LinearOperator.PowerMethod(self.A, 10)[0]
+                    self.L = 2.0 * self.c * (Anorm*Anorm)
+                else:
+                    warnings.warn('{} could not calculate Lipschitz Constant. {}'.format(
+                    self.__class__.__name__, ae))
+                
+            except NotImplementedError as noe:
                 warnings.warn('{} could not calculate Lipschitz Constant. {}'.format(
-                self.__class__.__name__, ae))
-            
-        except NotImplementedError as noe:
-            warnings.warn('{} could not calculate Lipschitz Constant. {}'.format(
-                self.__class__.__name__, noe))
+                    self.__class__.__name__, noe))
         
     def __call__(self, x):
         
@@ -78,9 +79,7 @@ class LeastSquares(Function):
         y = self.A.direct(x)
         y.subtract(self.b, out=y)
         try:
-#            if self.c == 1:
-#                return y.squared_norm()
-            return y.dot(y) * self.c
+            return y.squared_norm() * self.c
         except AttributeError as ae:
             # added for compatibility with SIRF
             warnings.warn('squared_norm method not found! Proceeding with norm.')
@@ -98,11 +97,9 @@ class LeastSquares(Function):
         """
         
         if out is not None:
-            #return 2.0*self.c*self.A.adjoint( self.A.direct(x) - self.b )
             self.A.direct(x, out=self.range_tmp)
             self.range_tmp.subtract(self.b , out=self.range_tmp)
             self.A.adjoint(self.range_tmp, out=out)
-            #self.direct_placehold.multiply(2.0*self.c, out=out)
             out.multiply (self.c * 2.0, out=out)
         else:
             return (2.0*self.c)*self.A.adjoint(self.A.direct(x) - self.b)
@@ -111,7 +108,43 @@ class LeastSquares(Function):
         
         
 if __name__ == '__main__':
+    
+    
+    
+    print("Check LeastSquares")
+    from ccpi.framework import ImageGeometry
+    from ccpi.optimisation.operators import Identity
+    import numpy
+    
+    ig = ImageGeometry(4,5)
+    Aop = 2*Identity(ig)
+    data = ig.allocate('random')
+    
+    alpha = 0.4
+    f = LeastSquares(Aop, data, c = alpha)
+    x = ig.allocate('random')
+    
+    res1 = f(x)
+    res2 = alpha * ((Aop.direct(x) - data)**2).sum()
+    numpy.testing.assert_almost_equal(res1, res2) 
+    print("Checking call .... OK ")
+    
+    res1 = f.gradient(x)
+    res2 = 2*alpha * Aop.adjoint(Aop.direct(x) - data)
+    numpy.testing.assert_almost_equal(res1.as_array(), res2.as_array(), decimal=4) 
+    print("Checking gradient .... OK ")
+    
+    
+    
+    
+    
+    
+    
 
+    
+    ####################################################
+    ############ CGLS ##################################
+    ###################################################
 #    from ccpi.framework import ImageGeometry, ImageData, \
 #        AcquisitionGeometry, BlockDataContainer, AcquisitionData
 #    
@@ -139,7 +172,7 @@ if __name__ == '__main__':
 #    data = ImageData(phantom_2D)
 #    
 #    detectors =  N
-#    angles = np.linspace(0, np.pi, 80, dtype=np.float32)
+#    angles = np.linspace(0, np.pi, 180, dtype=np.float32)
 #    
 #    ag = AcquisitionGeometry('parallel','2D', angles, detectors)
 #    
@@ -171,48 +204,65 @@ if __name__ == '__main__':
 #    # Setup and run the simple CGLS algorithm  
 #    x_init = ig.allocate()  
 #    
-#    cgls1 = CGLS(x_init = x_init, operator = Aop, data = noisy_data)
+#    cgls1 = CGLS(x_init = x_init, operator = Aop, data = sin)
 #    cgls1.max_iteration = 20
 #    cgls1.update_objective_interval = 5
 #    cgls1.run(20, verbose = True)
 #    
 #    plt.imshow(cgls1.get_output().as_array())
-#    plt.show()        
+#    plt.show()       
     
     
-    print("Check LeastSquares with FunctionOperatorComposition")
     
-    from ccpi.framework import ImageGeometry
-    from ccpi.optimisation.functions import FunctionOperatorComposition, L2NormSquared
-    from ccpi.optimisation.operators import Identity, DiagonalOperator, CompositionOperator
-    import numpy
     
-    ig = ImageGeometry(4,5)
-    Aop = 2 * Identity(ig)
-    data = ig.allocate('random_int')
+#    print("Check LeastSquares with FunctionOperatorComposition")
+#    
+#    from ccpi.framework import ImageGeometry
+#    from ccpi.optimisation.functions import FunctionOperatorComposition, L2NormSquared
+#    from ccpi.optimisation.operators import Identity, DiagonalOperator, CompositionOperator
+#    import numpy
+#    
+#    ig = ImageGeometry(4,5)
+#    Aop = 2 * Identity(ig)
+#    data = ig.allocate('random')
+#    
+#    x = ig.allocate('random')
+#    alpha = 5
+#    tmp = alpha * L2NormSquared(b=data)
+#    f1 = FunctionOperatorComposition(tmp, Aop)
+#    f2 = LeastSquares(Aop, data, c = alpha)
+#    res1 = f1(x)
+#    res2 = f2(x)
+#    
+#    numpy.testing.assert_almost_equal(res1, res2)   
+#    
+#    res1 = f1.gradient(x)
+#    res2 = f2.gradient(x)
+#    numpy.testing.assert_array_almost_equal(res1.as_array(), res2.as_array())
+#    
+#    print("Check WeightLeastSquares")
+#    
+#    weight = ig.allocate('random', seed = 10)
+#    tmp1 = weight.sqrt() * (Aop.direct(x) - data)
+#    res1 = alpha *  tmp1.dot(tmp1)    
+#    
+#    f = alpha * WeightedLeastSquares(Aop, data, c=alpha, weight = weight)    
+#    res2 = f(x)    
+#    numpy.testing.assert_almost_equal(res1, res2) 
+#    
+#    #### test
+#    D = DiagonalOperator(weight.sqrt())
+#    f = L2NormSquared()
+#    res1 = f(D.direct(x))
+#    
+#    
+##    from ccpi.framework 
+#    
     
-    x = ig.allocate('random_int')
-    alpha = 5
-    tmp = alpha * L2NormSquared(b=data)
-    f1 = FunctionOperatorComposition(tmp, Aop)
-    f2 = LeastSquares(Aop, data, c = alpha)
-    res1 = f1(x)
-    res2 = f2(x)
     
-    numpy.testing.assert_almost_equal(res1, res2)   
     
-    res1 = f1.gradient(x)
-    res2 = f2.gradient(x)
-    numpy.testing.assert_array_almost_equal(res1.as_array(), res2.as_array())
     
-    print("Check WeightLeastSquares")
-    
-    weight = ig.allocate('random_int', seed = 10)
-    
-    tmp1 = alpha * (weight * (Aop.direct(x) - data)**2).sum()
-    
-    D = DiagonalOperator(weight)
-    tmp2 = f2(D.direct(x))
+
     
 
 

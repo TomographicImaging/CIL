@@ -23,7 +23,7 @@ import numpy as np
 from ccpi.framework import ImageData
 from ccpi.optimisation.operators import LinearOperator
 
-from ccpi.framework.framework import ImageGeometry, AcquisitionGeometry
+from ccpi.framework import ImageGeometry, AcquisitionGeometry, BlockGeometry
 
 class ChannelwiseOperator(LinearOperator):
     
@@ -76,6 +76,8 @@ class ChannelwiseOperator(LinearOperator):
                        geom.dist_center_detector, 
                        channels,
                        dimension_labels=['channel'] + dom_op.dimension_labels))
+            elif isinstance(geom,BlockGeometry):
+                raise Exception("ChannelwiseOperator does not support BlockOperator as input. Consider making a BlockOperator of ChannelwiseOperators instead.")
             else:
                 pass
         

@@ -128,7 +128,7 @@ class ChannelwiseOperator(LinearOperator):
         
         '''Evaluates operator norm of DiagonalOperator'''
         
-        return self.op.calculate_norm()
+        return self.op.norm()
 
 if __name__ == '__main__':
     

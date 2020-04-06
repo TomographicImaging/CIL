@@ -31,6 +31,10 @@ class ChannelwiseOperator(LinearOperator):
     number of channels to be used, and creates a new multi-channel 
     ChannelwiseOperator, which will apply the operator op independently on 
     each channel for the number of channels specified.
+    
+    ChannelwiseOperator supports simple operators as input but not 
+    BlockOperators. Typically if such behaviour is desired, it can be achieved  
+    by creating instead a BlockOperator of ChannelwiseOperators.
                        
         :param op: Single-channel operator
         :param channels: Number of channels

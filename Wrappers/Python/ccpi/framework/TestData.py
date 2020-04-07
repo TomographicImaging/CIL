@@ -75,8 +75,8 @@ class TestData(object):
             data.fill(sdata)
             
         elif which == TestData.SHAPES:
-            
-            tmp = numpy.array(Image.open(os.path.join(self.data_dir, which)).convert('L'))
+            with Image.open(os.path.join(self.data_dir, which)) as f:
+                tmp = numpy.array(f.convert('L'))
             N = 200
             M = 300   
             ig = ImageGeometry(voxel_num_x = N, voxel_num_y = M, dimension_labels=[ImageGeometry.HORIZONTAL_X, ImageGeometry.HORIZONTAL_Y])
@@ -84,16 +84,16 @@ class TestData(object):
             data.fill(tmp/numpy.max(tmp))
             
         else:
-            tmp = Image.open(os.path.join(self.data_dir, which))
-            bands = tmp.getbands()
-            if len(bands) > 1:
-                ig = ImageGeometry(voxel_num_x=size[0], voxel_num_y=size[1], channels=len(bands), 
-                dimension_labels=[ImageGeometry.HORIZONTAL_X, ImageGeometry.HORIZONTAL_Y, ImageGeometry.CHANNEL])
-                data = ig.allocate()
-            else:
-                ig = ImageGeometry(voxel_num_x = size[0], voxel_num_y = size[1], dimension_labels=[ImageGeometry.HORIZONTAL_X, ImageGeometry.HORIZONTAL_Y])
-                data = ig.allocate()
-            data.fill(numpy.array(tmp.resize((size[1],size[0]))))
+            with Image.open(os.path.join(self.data_dir, which)) as tmp:
+                bands = tmp.getbands()
+                if len(bands) > 1:
+                    ig = ImageGeometry(voxel_num_x=size[0], voxel_num_y=size[1], channels=len(bands), 
+                    dimension_labels=[ImageGeometry.HORIZONTAL_X, ImageGeometry.HORIZONTAL_Y, ImageGeometry.CHANNEL])
+                    data = ig.allocate()
+                else:
+                    ig = ImageGeometry(voxel_num_x = size[0], voxel_num_y = size[1], dimension_labels=[ImageGeometry.HORIZONTAL_X, ImageGeometry.HORIZONTAL_Y])
+                    data = ig.allocate()
+                data.fill(numpy.array(tmp.resize((size[1],size[0]))))
             if scale is not None:
                 dmax = data.as_array().max()
                 dmin = data.as_array().min()

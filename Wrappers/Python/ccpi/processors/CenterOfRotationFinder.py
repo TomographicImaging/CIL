@@ -89,7 +89,7 @@ class CenterOfRotationFinder(DataProcessor):
                  raise TypeError('slice_index expected a positive integer. Got {}'.format(slice_index))
                       
             if slice_index >= dataset.get_dimension_size('vertical'):
-                raise ValueError('slice_index out of range must be less than {0}. Got {}'.format(slice_index))
+                raise ValueError('slice_index out of range must be less than {0}. Got {1}'.format(dataset.get_dimension_size('vertical'), slice_index))
 
             self.slice_number = slice_index
 
@@ -197,10 +197,7 @@ class CenterOfRotationFinder(DataProcessor):
     @staticmethod
     def as_float32(arr):
         arr = CenterOfRotationFinder.as_ndarray(arr, numpy.float32)
-        return CenterOfRotationFinder.as_dtype(arr, numpy.float32)
-    
-    
-    
+        return CenterOfRotationFinder.as_dtype(arr, numpy.float32)   
     
     @staticmethod
     def find_center_vo(tomo, ind=None, smin=-40, smax=40, srad=10, step=0.5,
@@ -268,6 +265,7 @@ class CenterOfRotationFinder(DataProcessor):
         init_cen = CenterOfRotationFinder._search_coarse(_tomo_cs, 
                                                              smin, smax, 
                                                              ratio, drop)
+                   
         fine_cen = CenterOfRotationFinder._search_fine(_tomo_fs, srad, 
                                                            step, init_cen, 
                                                            ratio, drop)
@@ -303,12 +301,21 @@ class CenterOfRotationFinder(DataProcessor):
                 _sino[:, 0:i] = temp_img[:, 0:i]
             else:
                 _sino[:, i:] = temp_img[:, i:]
+
             listmetric[i - smin] = numpy.sum(numpy.abs(numpy.fft.fftshift(
                 #pyfftw.interfaces.numpy_fft.fft2(
                 #    numpy.vstack((sino, _sino)))
                 numpy.fft.fft2(numpy.vstack((sino, _sino)))
                 )) * mask)
         minpos = numpy.argmin(listmetric)
+
+        if minpos == 0:
+            raise ValueError("CentreOfRotationFinder() hit search boundary smin")
+
+        if minpos == (len(listshift) - 1):
+            raise ValueError("CentreOfRotationFinder() hit search boundary smax")
+                                      
+
         return centerfliplr + listshift[minpos] / 2.0
     
     @staticmethod

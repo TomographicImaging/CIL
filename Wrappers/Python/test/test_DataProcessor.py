@@ -52,10 +52,6 @@ class TestDataProcessor(unittest.TestCase):
         print ("Center of rotation", cf.get_output())
         self.assertAlmostEqual(86.25, cf.get_output())
 
-    #def test_CenterOfRotation_transpose(self):
-        #reader = NexusReader(self.filename)
-        #data = reader.get_acquisition_data_whole()
-
         ad = data.clone()
         ad = ad.subset(['vertical','angle','horizontal'])
         print (ad)
@@ -64,10 +60,6 @@ class TestDataProcessor(unittest.TestCase):
         print ("Center of rotation", cf.get_output())
         self.assertAlmostEqual(86.25, cf.get_output())
 
-    #def test_CenterOfRotation_slice(self):
-        #reader = NexusReader(self.filename)
-        #data = reader.get_acquisition_data_whole()
-        
         ad = data.clone()
         ad = ad.subset(vertical=67)
         print (ad)
@@ -75,10 +67,6 @@ class TestDataProcessor(unittest.TestCase):
         cf.set_input(ad)
         print ("Center of rotation", cf.get_output())
         self.assertAlmostEqual(86.25, cf.get_output())
-
-    #def test_CenterOfRotation_slice(self):
-        #reader = NexusReader(self.filename)
-        #data = reader.get_acquisition_data_whole()
 
         ad = data.clone()
         print (ad)

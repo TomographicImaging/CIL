@@ -27,7 +27,7 @@ from numbers import Number
 from ccpi.optimisation.operators import Gradient
 
 from ccpi.optimisation.functions import Function, KullbackLeibler, L2NormSquared,\
-                                         L1Norm, MixedL21Norm, weighted_L2NormSquared,  LeastSquares, \
+                                         L1Norm, MixedL21Norm, WeightedL2NormSquared,  LeastSquares, \
                                          ZeroFunction, FunctionOperatorComposition,\
                                          Rosenbrock, IndicatorBox
 
@@ -208,11 +208,13 @@ class TestFunctionL2NormSq(unittest.TestCase):
                                                 res2.as_array(), decimal=4)
         
         
+        print("Checks for WeightedL2NormSquared")
+        
         # Tests for weighted L2NormSquared
         ig = ImageGeometry(voxel_num_x = 3, voxel_num_y = 3)
         weight = ig.allocate('random_int')
         
-        f = weighted_L2NormSquared(weight=weight)                                              
+        f = WeightedL2NormSquared(weight=weight)                                              
         x = ig.allocate(0.4)
         
         res1 = f(x)
@@ -243,6 +245,9 @@ class TestFunctionL2NormSq(unittest.TestCase):
         res2 = x/(1+2*tau*weight)
         numpy.testing.assert_array_almost_equal(res1.as_array(), \
                                                 res2.as_array(), decimal=4)  
+        
+        
+        
         
         
         

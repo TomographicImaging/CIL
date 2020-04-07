@@ -355,6 +355,50 @@ class TestFunction(unittest.TestCase):
         self.assertNumpyArrayAlmostEqual(func1(u), func2(u))   
         
         self.assertNumpyArrayAlmostEqual(func1.L, func2.L)
+        
+        
+    def LeastSquares_et_FunctionOperatorComposition(self):
+        
+        print("Check LeastSquares")    
+        ig = ImageGeometry(4,5)
+        Aop = 2*Identity(ig)
+        data = ig.allocate('random')
+        
+        alpha = 0.4
+        f = LeastSquares(Aop, data, c = alpha)
+        x = ig.allocate('random')
+        
+        res1 = f(x)
+        res2 = alpha * ((Aop.direct(x) - data)**2).sum()
+        numpy.testing.assert_almost_equal(res1, res2, decimal=5) 
+        print("Checking call .... OK ")
+        
+        res1 = f.gradient(x)
+        res2 = 2*alpha * Aop.adjoint(Aop.direct(x) - data)
+        numpy.testing.assert_almost_equal(res1.as_array(), res2.as_array(), decimal=4) 
+        print("Checking gradient .... OK ")
+                    
+        print("Check LeastSquares with FunctionOperatorComposition")        
+        ig = ImageGeometry(4,5)
+        Aop = 2 * Identity(ig)
+        data = ig.allocate('random')
+        
+        x = ig.allocate('random')
+        alpha = 5
+        tmp = alpha * L2NormSquared(b=data)
+        f1 = FunctionOperatorComposition(tmp, Aop)
+        f2 = LeastSquares(Aop, data, c = alpha)
+        res1 = f1(x)
+        res2 = f2(x)
+        
+        numpy.testing.assert_almost_equal(res1, res2)   
+        print("Checking call .... OK ")
+        
+        res1 = f1.gradient(x)
+        res2 = f2.gradient(x)
+        numpy.testing.assert_array_almost_equal(res1.as_array(), res2.as_array())
+        print("Checking gradient .... OK ")        
+
             
     def test_mixedL12Norm(self):
         numpy.random.seed(1)

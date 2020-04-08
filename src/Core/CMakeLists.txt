@@ -17,11 +17,18 @@ message("CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS}")
 message("CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS}")
 message("CMAKE_STATIC_LINKER_FLAGS ${CMAKE_STATIC_LINKER_FLAGS}")
 
+find_package(PythonInterp REQUIRED)
+find_package(PythonLibs REQUIRED)
+# NPY_INCLUDES is passed 
+# can be defined with 
+# python -c "import numpy; print (numpy.get_include())"
 
 
 add_library(cilacc SHARED ${CMAKE_CURRENT_SOURCE_DIR}/utilities.c
                           ${CMAKE_CURRENT_SOURCE_DIR}/FiniteDifferenceLibrary.c
-                          ${CMAKE_CURRENT_SOURCE_DIR}/axpby.c )
+						  ${CMAKE_CURRENT_SOURCE_DIR}/axpby.c 
+						  ${CMAKE_CURRENT_SOURCE_DIR}/divide.c 
+						  )
 
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.9.0") 
   set (OpenMP_EXE_LINKER_FLAGS OpenMP::OpenMP_C)
@@ -35,6 +42,8 @@ endif()
 target_link_libraries(cilacc ${OpenMP_EXE_LINKER_FLAGS} )
 include_directories(cilacc PUBLIC 
 				  ${CMAKE_CURRENT_SOURCE_DIR}/include
+				  ${NPY_INCLUDES}
+				  ${PYTHON_INCLUDE_DIRS}
 		          )
 
 ## Install

@@ -195,7 +195,7 @@ class SmoothMixedL21Norm(Function):
             raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 
             
             
-        return (x.pnorm(2)**2 + self.epsilon**2).sqrt().sum()
+        return (x.pnorm(2).power(2) + self.epsilon**2).sqrt().sum()
          
 
     def gradient(self, x, out=None): 
@@ -210,7 +210,7 @@ class SmoothMixedL21Norm(Function):
         if not isinstance(x, BlockDataContainer):
             raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 
                    
-        denom = (x.pnorm(2)**2 + self.epsilon**2).sqrt()
+        denom = (x.pnorm(2).power(2) + self.epsilon**2).sqrt()
                           
         if out is None:
             return x.divide(denom)

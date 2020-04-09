@@ -103,25 +103,11 @@ class MixedL21Norm(Function):
                 
                 elarray = el.as_array()
                 elarray[np.isnan(elarray)]=0
-                el.fill(elarray)                
-                
-#                el.as_array()[np.isnan(el.as_array())]=0            
+                el.fill(elarray)                                       
             
             return res            
             
         else:
-            
-#            tmp = x.pnorm(2)
-#            res = (tmp - tau).maximum(0.0) * x/tmp
-#
-#            for el in res.containers:
-#                
-#                elarray = el.as_array()
-#                elarray[np.isnan(elarray)]=0
-#                el.fill(elarray)  
-#
-#            out.fill(res)   
-            
             
             tmp = x.pnorm(2)
             tmp_ig = 0.0 * tmp
@@ -217,156 +203,6 @@ class SmoothMixedL21Norm(Function):
         else:
             x.divide(denom, out=out)        
 
-if __name__ == '__main__':
-    
-# TODO delete test below    
-    
-    M, N, K = 2,3,50
-    from ccpi.framework import BlockGeometry, ImageGeometry
-    import numpy
-    
-    ig = ImageGeometry(M, N)
-    
-    BG = BlockGeometry(ig, ig)
-    
-    U = BG.allocate('random')
-    
-    # Define no scale and scaled
-    alpha = 0.5
-    f_no_scaled = MixedL21Norm() 
-    f_scaled = alpha * MixedL21Norm()  
-    
-    # call
-    
-    a1 = f_no_scaled(U)
-    a2 = f_scaled(U)    
-    print(a1, 2*a2)
-        
-    
-    print( " ####### check without out ######### " )
-          
-          
-    u_out_no_out = BG.allocate('random')         
-    res_no_out = f_scaled.proximal_conjugate(u_out_no_out, 0.5)          
-    print(res_no_out[0].as_array())
-    
-    print( " ####### check with out ######### " ) 
-#          
-    res_out = BG.allocate()        
-    f_scaled.proximal_conjugate(u_out_no_out, 0.5, out = res_out)
-#    
-    print(res_out[0].as_array())   
-#
-    numpy.testing.assert_array_almost_equal(res_no_out[0].as_array(), \
-                                            res_out[0].as_array(), decimal=4)
-
-    numpy.testing.assert_array_almost_equal(res_no_out[1].as_array(), \
-                                            res_out[1].as_array(), decimal=4)     
-    
-    
-    tau = 0.4
-    d1 = f_scaled.proximal(U, tau)
-    
-    tmp = (U.get_item(0)**2 + U.get_item(1)**2).sqrt()
-    
-    d2 = (tmp - alpha*tau).maximum(0) * U/tmp
-    
-    numpy.testing.assert_array_almost_equal(d1.get_item(0).as_array(), \
-                                            d2.get_item(0).as_array(), decimal=4) 
-
-    numpy.testing.assert_array_almost_equal(d1.get_item(1).as_array(), \
-                                            d2.get_item(1).as_array(), decimal=4)     
-    
-    out1 = BG.allocate('random')
-    
-    
-    f_scaled.proximal(U, tau, out = out1)
-    
-    numpy.testing.assert_array_almost_equal(out1.get_item(0).as_array(), \
-                                            d1.get_item(0).as_array(), decimal=4) 
-
-    numpy.testing.assert_array_almost_equal(out1.get_item(1).as_array(), \
-                                            d1.get_item(1).as_array(), decimal=4)   
-    
-    f_scaled.proximal_conjugate(U, tau, out = out1)
-    x = U
-    tmp = x.get_item(0) * 0	
-    for el in x.containers:	
-        tmp += el.power(2.)	
-    tmp.sqrt(out=tmp)	
-    (tmp/f_scaled.scalar).maximum(1.0, out=tmp)	
-    frac = [ el.divide(tmp) for el in x.containers ]	
-    out2 = BlockDataContainer(*frac)   
-    
-    numpy.testing.assert_array_almost_equal(out1.get_item(0).as_array(), \
-                                            out2.get_item(0).as_array(), decimal=4) 
-    
-    
-    # check convex conjugate
-    
-    f = MixedL21Norm()
-    x = BG.allocate('random')
-    
-    res1 = f.convex_conjugate(x)
-    tmp = (x.pnorm(2).max() - 1)
-    if tmp<=1e-5:
-        res2=0
-    else:
-        res2=np.inf
-    numpy.testing.assert_almost_equal(res1, res2) 
-    print("Convex conjugate is .... OK")
-    
-    
-    ig = ImageGeometry(4, 5)
-    bg = BlockGeometry(ig, ig)
-    
-    epsilon = 0.5
-    
-    f1 = SmoothMixedL21Norm(epsilon)    
-    x = bg.allocate('random')
-    
-    
-    print("Check call for smooth MixedL21Norm ...OK")
-    
-    # check call
-    res1 = f1(x)
-    
-    
-    res2 = (x.pnorm(2)**2 + epsilon**2).sqrt().sum()
-#    tmp = x.get_item(0) * 0.
-#    for el in x.containers:
-#        tmp += el.power(2.)
-#    tmp+=epsilon**2        
-#    res2 = tmp.sqrt().sum()
-
-    # alternative        
-    tmp1 = x.copy()
-    tmp1.containers += (epsilon,)        
-    res3 = tmp1.pnorm(2).sum()
-                    
-    numpy.testing.assert_almost_equal(res1, res2, decimal=4) 
-    numpy.testing.assert_almost_equal(res1, res3, decimal=4) 
-    
-    print("Check gradient for smooth MixedL21Norm ... OK ")        
-    
-    res1 = f1.gradient(x)
-    res2 = x.divide((x.pnorm(2)**2 + epsilon**2).sqrt())
-    numpy.testing.assert_array_almost_equal(res1.get_item(0).as_array(), 
-                                            res2.get_item(0).as_array()) 
-    
-    numpy.testing.assert_array_almost_equal(res1.get_item(1).as_array(), 
-                                            res2.get_item(1).as_array()) 
-    
-    # check with MixedL21Norm, when epsilon close to 0
-    
-    print("Check as epsilon goes to 0 ... OK") 
-    
-    f1 = SmoothMixedL21Norm(1e-12)   
-    f2 = MixedL21Norm()
-    
-    res1 = f1(x)
-    res2 = f2(x)
-    numpy.testing.assert_almost_equal(f1(x), f2(x))     
 
 
 

@@ -74,8 +74,8 @@ class TestFunctionL2NormSq(unittest.TestCase):
 
         M, N, K = 2,3,1
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N, voxel_num_z = K)
-        u = ig.allocate('random_int')
-        b = ig.allocate('random_int') 
+        u = ig.allocate('random')
+        b = ig.allocate('random') 
         
         # check grad/call no data
         f = L2NormSquared()
@@ -86,7 +86,7 @@ class TestFunctionL2NormSq(unittest.TestCase):
     
         # check grad/call with data
         
-        igggg = ImageGeometry(4,4)
+#        igggg = ImageGeometry(4,4)
         f1 = L2NormSquared(b=b)
         b1 = f1.gradient(u)
         b2 = 2 * (u-b)
@@ -191,8 +191,8 @@ class TestFunctionL2NormSq(unittest.TestCase):
         
         tau = 0.1
         
-        u = ig1.allocate('random_int')
-        b = ig1.allocate('random_int')
+        u = ig1.allocate('random')
+        b = ig1.allocate('random')
         
         scalar = 0.5
         f_scaled = scalar * L2NormSquared(b=b)
@@ -207,44 +207,76 @@ class TestFunctionL2NormSq(unittest.TestCase):
         numpy.testing.assert_array_almost_equal(res1.as_array(), \
                                                 res2.as_array(), decimal=4)
         
-        
-        print("Checks for WeightedL2NormSquared")
-        
-        # Tests for weighted L2NormSquared
-        ig = ImageGeometry(voxel_num_x = 3, voxel_num_y = 3)
-        weight = ig.allocate('random_int')
-        
-        f = WeightedL2NormSquared(weight=weight)                                              
-        x = ig.allocate(0.4)
-        
-        res1 = f(x)
-        res2 = (weight * (x**2)).sum()
-        numpy.testing.assert_almost_equal(res1, res2, decimal=4)
-        
-        # gradient for weighted L2NormSquared    
-        res1 = f.gradient(x)
-        res2 = 2*weight*x
-        out = ig.allocate()
-        f.gradient(x, out = out)
-        numpy.testing.assert_array_almost_equal(res1.as_array(), \
-                                                out.as_array(), decimal=4)  
-        numpy.testing.assert_array_almost_equal(res2.as_array(), \
-                                                out.as_array(), decimal=4)  
-        
-        # convex conjugate for weighted L2NormSquared       
-        res1 = f.convex_conjugate(x)
-        res2 = 1/4 * (x/weight.sqrt()).squared_norm()
-        numpy.testing.assert_array_almost_equal(res1, \
-                                                res2, decimal=4)   
-        
-        # proximal for weighted L2NormSquared       
-        tau = 0.3
-        out = ig.allocate()
-        res1 = f.proximal(x, tau)
-        f.proximal(x, tau, out = out)
-        res2 = x/(1+2*tau*weight)
-        numpy.testing.assert_array_almost_equal(res1.as_array(), \
-                                                res2.as_array(), decimal=4)  
+                    
+    print("Checks for WeightedL2NormSquared")
+    
+    from ccpi.framework import ImageGeometry
+    from ccpi.optimisation.functions import TranslateFunction
+    import numpy
+    
+    # Tests for weighted L2NormSquared
+    ig = ImageGeometry(voxel_num_x = 3, voxel_num_y = 3)
+    weight = ig.allocate('random')
+    
+    f = WeightedL2NormSquared(weight=weight)                                              
+    x = ig.allocate(0.4)
+    
+    res1 = f(x)
+    res2 = (weight * (x**2)).sum()
+    numpy.testing.assert_almost_equal(res1, res2, decimal=4)
+    
+    print("Call of WeightedL2NormSquared is ... ok")
+    
+    # gradient for weighted L2NormSquared    
+    res1 = f.gradient(x)
+    res2 = 2*weight*x
+    out = ig.allocate()
+    f.gradient(x, out = out)
+    numpy.testing.assert_array_almost_equal(res1.as_array(), \
+                                            out.as_array(), decimal=4)  
+    numpy.testing.assert_array_almost_equal(res2.as_array(), \
+                                            out.as_array(), decimal=4)  
+    
+    print("Gradient of WeightedL2NormSquared is ... ok")    
+    
+    # convex conjugate for weighted L2NormSquared       
+    res1 = f.convex_conjugate(x)
+    res2 = 1/4 * (x/weight.sqrt()).squared_norm()
+    numpy.testing.assert_array_almost_equal(res1, \
+                                            res2, decimal=4)   
+    
+    print("Convex conjugate of WeightedL2NormSquared is ... ok")        
+    
+    # proximal for weighted L2NormSquared       
+    tau = 0.3
+    out = ig.allocate()
+    res1 = f.proximal(x, tau)
+    f.proximal(x, tau, out = out)
+    res2 = x/(1+2*tau*weight)
+    numpy.testing.assert_array_almost_equal(res1.as_array(), \
+                                            res2.as_array(), decimal=4)  
+    
+    print("Proximal of WeightedL2NormSquared is ... ok")  
+    
+    
+    tau = 0.3
+    out = ig.allocate()
+    res1 = f.proximal_conjugate(x, tau)   
+    res2 = x/(1 + tau/(2*weight))    
+    numpy.testing.assert_array_almost_equal(res1.as_array(), \
+                                            res2.as_array(), decimal=4)  
+    
+    print("Proximal conjugate of WeightedL2NormSquared is ... ok")  
+
+
+    b = ig.allocate('random')
+    f1 = TranslateFunction(WeightedL2NormSquared(weight=weight), b) 
+    f2 = WeightedL2NormSquared(weight = weight, b=b)
+    res1 = f1(x)
+    res2 = f2(x)
+    numpy.testing.assert_almost_equal(res1, res2, decimal=4)
+    
+    print("Call of WeightedL2NormSquared vs TranslateFunction is ... ok")   
         
         
         

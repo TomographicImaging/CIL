@@ -163,3 +163,16 @@ class PDHG(Algorithm):
         d1 = -(self.f.convex_conjugate(self.y) + self.g.convex_conjugate(-1*self.operator.adjoint(self.y)))
 
         self.loss.append([p1, d1, p1-d1])
+        
+    @property
+    def objective(self):
+        '''alias of loss'''
+        return list(map(lambda x: x[0], self.loss))
+
+    @property
+    def dual_objective(self):
+        return list(map(lambda x: x[1], self.loss))
+    
+    @property
+    def primal_dual_gap(self):
+        return list(map(lambda x: x[2], self.loss))

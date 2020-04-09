@@ -84,8 +84,8 @@ class TestFunction(unittest.TestCase):
         # Test TranslationFunction
     
         ig = ImageGeometry(4,4)
-        tmp = ig.allocate('random')
-        b = ig.allocate('random')
+        tmp = ig.allocate('random', seed=10)
+        b = ig.allocate('random', seed=10)
         scalar = 0.4
         tau = 0.05
                                 
@@ -143,13 +143,13 @@ class TestFunction(unittest.TestCase):
         ig = ImageGeometry(4,4)
         
         Grad = Gradient(ig)        
-        b = Grad.range_geometry().allocate('random')
+        b = Grad.range_geometry().allocate('random', seed=10)
                         
         alpha = 0.4
         f1 = alpha * MixedL21Norm()
         fun = TranslateFunction(f1, b)
         
-        tmp_x = Grad.range_geometry().allocate('random')
+        tmp_x = Grad.range_geometry().allocate('random', seed=10)
         
         res1 = fun(tmp_x)        
         res2 = f1(tmp_x - b)        

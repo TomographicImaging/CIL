@@ -66,8 +66,10 @@ class TestFunction(unittest.TestCase):
         
         epsilon = 0.5
         
+        
+        
         f1 = SmoothMixedL21Norm(epsilon)    
-        x = bg.allocate('random')
+        x = bg.allocate('random', seed=10)
         
         
         print("Check call for smooth MixedL21Norm")

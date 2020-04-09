@@ -19,7 +19,6 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from __future__ import unicode_literals
 
 import numpy
 from scipy.sparse.linalg import svds
@@ -27,27 +26,44 @@ from ccpi.framework import VectorGeometry
 from ccpi.optimisation.operators import LinearOperator
 
 class LinearOperatorMatrix(LinearOperator):
-    '''Matrix wrapped into a LinearOperator'''
+    """ Matrix wrapped into a LinearOperator
+    
+    :param: a numpy matrix 
+    
+    """
     
     def __init__(self,A):
+        '''creator
+
+        :param A: numpy ndarray representing a matrix
+        '''
         self.A = A
         M_A, N_A = self.A.shape
-        self.gm_domain = VectorGeometry(N_A)
-        self.gm_range = VectorGeometry(M_A)
+        domain_geometry = VectorGeometry(N_A)
+        range_geometry = VectorGeometry(M_A)
         self.s1 = None   # Largest singular value, initially unknown
-        super(LinearOperatorMatrix, self).__init__()
+        super(LinearOperatorMatrix, self).__init__(domain_geometry=domain_geometry,
+                                                   range_geometry=range_geometry)
         
-    def direct(self,x, out=None):
+    def direct(self,x, out=None):        
+                
         if out is None:
-            return type(x)(numpy.dot(self.A,x.as_array()))
+            tmp = self.range_geometry().allocate()
+            tmp.fill(numpy.dot(self.A,x.as_array()))
+            return tmp
         else:
-            numpy.dot(self.A, x.as_array(), out=out.as_array())
+            # Below use of out is not working, see
+            # https://docs.scipy.org/doc/numpy/reference/generated/numpy.dot.html            
+            # numpy.dot(self.A, x.as_array(), out = out.as_array())            
+            out.fill(numpy.dot(self.A, x.as_array()))
 
     def adjoint(self,x, out=None):
         if out is None:
-            return type(x)(numpy.dot(self.A.transpose(),x.as_array()))
-        else:
-            numpy.dot(self.A.transpose(),x.as_array(), out=out.as_array())
+            tmp = self.domain_geometry().allocate()
+            tmp.fill(numpy.dot(self.A.transpose(),x.as_array()))
+            return tmp
+        else:            
+            out.fill(numpy.dot(self.A.transpose(),x.as_array()))
 
     def size(self):
         return self.A.shape
@@ -55,8 +71,4 @@ class LinearOperatorMatrix(LinearOperator):
     def calculate_norm(self, **kwargs):
         # If unknown, compute and store. If known, simply return it.
         return svds(self.A,1,return_singular_vectors=False)[0]
-        
-    def domain_geometry(self):
-        return self.gm_domain
-    def range_geometry(self):
-        return self.gm_range
+    

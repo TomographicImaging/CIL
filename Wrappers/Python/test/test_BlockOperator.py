@@ -64,7 +64,7 @@ class TestBlockOperator(unittest.TestCase):
             ops = [ Identity(g) for g in ig ]
             
             K = BlockOperator(*ops)
-            self.assertTrue(False)
+            self.assertFalse(K.column_wise_compatible())
         except ValueError as ve:
             print (ve)
             self.assertTrue(True)
@@ -81,8 +81,8 @@ class TestBlockOperator(unittest.TestCase):
                    ImageGeometry(10,22,31) , \
                    ImageGeometry(10,20,31) ]
             x = [ g.allocate() for g in ig ]
-            ops = [ Identity(g, gm_range=r) for g,r in zip(ig, rg0) ]
-            ops += [ Identity(g, gm_range=r) for g,r in zip(ig, rg1) ]
+            ops = [ Identity(g, range_geometry=r) for g,r in zip(ig, rg0) ]
+            ops += [ Identity(g, range_geometry=r) for g,r in zip(ig, rg1) ]
 
             K = BlockOperator(*ops, shape=(2,3))
             print ("K col comp? " , K.column_wise_compatible())
@@ -91,7 +91,7 @@ class TestBlockOperator(unittest.TestCase):
                 print ("range" , op.range_geometry().shape)
             for op in ops:
                 print ("domain" , op.domain_geometry().shape)
-            self.assertTrue(False)
+            self.assertFalse(K.row_wise_compatible())
         except ValueError as ve:
             print (ve)
             self.assertTrue(True)

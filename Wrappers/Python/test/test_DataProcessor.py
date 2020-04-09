@@ -15,6 +15,8 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
+from __future__ import division
+
 import sys
 import unittest
 import numpy
@@ -75,6 +77,9 @@ class TestDataProcessor(unittest.TestCase):
         cf.set_slice(80)
         print ("Center of rotation", cf.get_output())
         self.assertAlmostEqual(86.25, cf.get_output())
+        cf.set_slice()
+        print ("Center of rotation", cf.get_output())
+        self.assertAlmostEqual(86.25, cf.get_output())       
         cf.set_slice('centre')
         print ("Center of rotation", cf.get_output())
         self.assertAlmostEqual(86.25, cf.get_output())

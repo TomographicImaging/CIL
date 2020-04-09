@@ -15,16 +15,24 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
+from __future__ import division
+
 import unittest
-from ccpi.framework import ImageGeometry, ImageData, BlockDataContainer, DataContainer
-from ccpi.optimisation.operators import BlockOperator, BlockScaledOperator,\
+from ccpi.framework import ImageGeometry, VectorGeometry, ImageData, BlockDataContainer, DataContainer
+from ccpi.optimisation.operators import BlockOperator,\
     FiniteDiff, SymmetrizedGradient
 import numpy
 from timeit import default_timer as timer
-from ccpi.framework import ImageGeometry
-from ccpi.optimisation.operators import Gradient, Identity, SparseFiniteDiff
-from ccpi.optimisation.operators import LinearOperator
+from ccpi.optimisation.operators import Gradient, Identity, SparseFiniteDiff,\
+    DiagonalOperator, MaskOperator, ChannelwiseOperator
+from ccpi.optimisation.operators import LinearOperator, LinearOperatorMatrix
+import numpy   
+from ccpi.optimisation.operators import SumOperator, Gradient,\
+            ZeroOperator, SymmetrizedGradient, CompositionOperator
 
+from ccpi.framework import TestData
+import os
+from packaging import version
 
 def dt(steps):
     return steps[-1] - steps[-2]
@@ -66,6 +74,39 @@ class CCPiTestClass(unittest.TestCase):
 
 
 class TestOperator(CCPiTestClass):
+    def setUp(self):
+        numpy.random.seed(1)
+    def test_LinearOperatorMatrix(self):
+        
+        print('Check LinearOperatorMatrix')
+                
+        m = 30
+        n = 20
+        
+        vg = VectorGeometry(n)
+        
+        Amat = numpy.random.randn(m, n)
+        A = LinearOperatorMatrix(Amat)
+        
+        b = vg.allocate('random')
+        
+        out1 = A.range_geometry().allocate()
+        out2 = A.domain_geometry().allocate()
+        
+        res1 = A.direct(b)
+        res2 = numpy.dot(A.A, b.as_array())
+        self.assertNumpyArrayAlmostEqual(res1.as_array(), res2)
+            
+        A.direct(b, out = out1)
+        self.assertNumpyArrayAlmostEqual(res1.as_array(), out1.as_array(), decimal=4)
+        
+        res3 = A.adjoint(res1)
+        res4 = numpy.dot(A.A.transpose(),res1.as_array())
+        self.assertNumpyArrayAlmostEqual(res3.as_array(), res4, decimal=4)   
+        
+        A.adjoint(res1, out = out2)
+        self.assertNumpyArrayAlmostEqual(res3.as_array(), out2.as_array(), decimal=4)
+    
     def test_ScaledOperator(self):
         print ("test_ScaledOperator")
         ig = ImageGeometry(10,20,30)
@@ -73,7 +114,87 @@ class TestOperator(CCPiTestClass):
         scalar = 0.5
         sid = scalar * Identity(ig)
         numpy.testing.assert_array_equal(scalar * img.as_array(), sid.direct(img).as_array())
+    
+    def test_DiagonalOperator(self):
+        print ("test_DiagonalOperator")
         
+        M = 3
+        ig = ImageGeometry(M, M)
+        x = ig.allocate('random',seed=100)
+        diag = ig.allocate('random',seed=101)
+        
+        # Set up example DiagonalOperator
+        D = DiagonalOperator(diag)
+    
+        # Apply direct and check whether result equals diag*x as expected.
+        z = D.direct(x)
+        numpy.testing.assert_array_equal(z.as_array(), (diag*x).as_array())
+    
+        # Apply adjoint and check whether results equals diag*(diag*x) as expected.
+        y = D.adjoint(z)
+        numpy.testing.assert_array_equal(y.as_array(), (diag*(diag*x)).as_array())
+        
+    def test_MaskOperator(self):
+        print ("test_MaskOperator")
+        
+        M = 3
+        ig = ImageGeometry(M, M)
+        x = ig.allocate('random',seed=100)
+        
+        mask = ig.allocate(True,dtype=numpy.bool)
+        amask = mask.as_array()
+        amask[2,1:3] = False
+        amask[0,0] = False
+        
+        MO = MaskOperator(mask)
+        
+        # Apply direct and check whether result equals diag*x as expected.
+        z = MO.direct(x)
+        numpy.testing.assert_array_equal(z.as_array(), (mask*x).as_array())
+    
+        # Apply adjoint and check whether results equals diag*(diag*x) as expected.
+        y = MO.adjoint(z)
+        numpy.testing.assert_array_equal(y.as_array(), (mask*(mask*x)).as_array())
+        
+    def test_ChannelwiseOperator(self):
+        print("test_ChannelwiseOperator")
+        
+        M = 3
+        channels = 4
+        ig = ImageGeometry(M, M, channels=channels)
+        igs = ImageGeometry(M, M)
+        x = ig.allocate('random',seed=100)
+        diag = igs.allocate('random',seed=101)
+        
+        D = DiagonalOperator(diag)
+        C = ChannelwiseOperator(D,channels)
+        
+        y = C.direct(x)
+        
+        y2 = ig.allocate()
+        C.direct(x,y2)
+        
+        for c in range(channels):
+            numpy.testing.assert_array_equal(y.subset(channel=2).as_array(), \
+                                             (diag*x.subset(channel=2)).as_array())
+            numpy.testing.assert_array_equal(y2.subset(channel=2).as_array(), \
+                                             (diag*x.subset(channel=2)).as_array())
+        
+        
+        z = C.adjoint(y)
+        
+        z2 = ig.allocate()
+        C.adjoint(y,z2)
+        
+        for c in range(channels):
+            numpy.testing.assert_array_equal(z.subset(channel=2).as_array(), \
+                                             (diag*(diag*x.subset(channel=2))).as_array())
+            numpy.testing.assert_array_equal(z2.subset(channel=2).as_array(), \
+                                             (diag*(diag*x.subset(channel=2))).as_array())
+        
+        #print(z.subset(channel=2).as_array())
+        #print(z2.subset(channel=2).as_array())
+        #print((diag*(diag*x.subset(channel=2))).as_array())
 
     def test_Identity(self):
         print ("test_Identity")
@@ -91,21 +212,21 @@ class TestOperator(CCPiTestClass):
         print ("test FiniteDifference")
         ##
         N, M = 2, 3
-
+        numpy.random.seed(1)
         ig = ImageGeometry(N, M)
         Id = Identity(ig)
 
         FD = FiniteDiff(ig, direction = 0, bnd_cond = 'Neumann')
-        u = FD.domain_geometry().allocate('random_int')
+        u = FD.domain_geometry().allocate('random')
         
         
-        res = FD.domain_geometry().allocate(ImageGeometry.RANDOM_INT)
+        res = FD.domain_geometry().allocate(ImageGeometry.RANDOM)
         FD.adjoint(u, out=res)
         w = FD.adjoint(u)
 
         self.assertNumpyArrayEqual(res.as_array(), w.as_array())
         
-        res = Id.domain_geometry().allocate(ImageGeometry.RANDOM_INT)
+        res = Id.domain_geometry().allocate(ImageGeometry.RANDOM)
         Id.adjoint(u, out=res)
         w = Id.adjoint(u)
 
@@ -114,13 +235,13 @@ class TestOperator(CCPiTestClass):
 
         G = Gradient(ig)
 
-        u = G.range_geometry().allocate(ImageGeometry.RANDOM_INT)
+        u = G.range_geometry().allocate(ImageGeometry.RANDOM)
         res = G.domain_geometry().allocate()
         G.adjoint(u, out=res)
         w = G.adjoint(u)
         self.assertNumpyArrayEqual(res.as_array(), w.as_array())
         
-        u = G.domain_geometry().allocate(ImageGeometry.RANDOM_INT)
+        u = G.domain_geometry().allocate(ImageGeometry.RANDOM)
         res = G.range_geometry().allocate()
         G.direct(u, out=res)
         w = G.direct(u)
@@ -136,7 +257,7 @@ class TestOperator(CCPiTestClass):
         
         G = Gradient(ig)
         
-        uid = Id.domain_geometry().allocate(ImageGeometry.RANDOM_INT, seed=1)
+        uid = Id.domain_geometry().allocate(ImageGeometry.RANDOM, seed=1)
         
         a = LinearOperator.PowerMethod(Id, niter, uid)
         #b = LinearOperator.PowerMethodNonsquare(Id, niter, uid)
@@ -159,6 +280,7 @@ class TestOperator(CCPiTestClass):
     def test_Norm(self):
         print ("test_BlockOperator")
         ##
+        numpy.random.seed(1)
         N, M = 200, 300
 
         ig = ImageGeometry(N, M)
@@ -168,8 +290,30 @@ class TestOperator(CCPiTestClass):
         t1 = timer()
         norm2 = G.norm()
         t2 = timer()
-        print ("Norm dT1 {} dT2 {}".format(t1-t0,t2-t1))
+        norm3 = G.norm(force=True)
+        t3 = timer()
+        print ("Norm dT1 {} dT2 {} dT3 {}".format(t1-t0,t2-t1, t3-t2))
         self.assertLess(t2-t1, t1-t0)
+        self.assertLess(t2-t1, t3-t2)
+
+        numpy.random.seed(1)
+        t4 = timer()
+        norm4 = G.norm(iterations=50, force=True)
+        t5 = timer()
+        self.assertLess(t2-t1, t5-t4)
+
+        numpy.random.seed(1)
+        t4 = timer()
+        norm5 = G.norm(x_init=ig.allocate('random'), iterations=50, force=True)
+        t5 = timer()
+        self.assertLess(t2-t1, t5-t4)
+        for n in [norm, norm2, norm3, norm4, norm5]:
+            print ("norm {}", format(n))
+
+    
+
+        
+
 
 class TestGradients(CCPiTestClass): 
     def setUp(self):
@@ -206,14 +350,16 @@ class TestGradients(CCPiTestClass):
         Grad = Gradient(self.ig)
         
         E1 = SymmetrizedGradient(Grad.range_geometry())
-        u1 = E1.domain_geometry().allocate('random_int')
-        w1 = E1.range_geometry().allocate('random_int', symmetry = True)
+        numpy.random.seed(1)
+        u1 = E1.domain_geometry().allocate('random')
+        w1 = E1.range_geometry().allocate('random', symmetry = True)
         
         
         lhs = E1.direct(u1).dot(w1)
         rhs = u1.dot(E1.adjoint(w1))
+        print ("lhs {} rhs {}".format (lhs, rhs))
         # self.assertAlmostEqual(lhs, rhs)
-        numpy.testing.assert_almost_equal(lhs, rhs)
+        numpy.testing.assert_almost_equal(lhs, rhs, decimal=4)
             
     def test_SymmetrizedGradient2(self):        
         ###########################################################################
@@ -222,14 +368,14 @@ class TestGradients(CCPiTestClass):
         Grad2 = Gradient(self.ig2, correlation = 'Space')
         
         E2 = SymmetrizedGradient(Grad2.range_geometry())
-        
-        u2 = E2.domain_geometry().allocate('random_int')
-        w2 = E2.range_geometry().allocate('random_int', symmetry = True)
+        numpy.random.seed(1)
+        u2 = E2.domain_geometry().allocate('random')
+        w2 = E2.range_geometry().allocate('random', symmetry = True)
     #    
         lhs2 = E2.direct(u2).dot(w2)
         rhs2 = u2.dot(E2.adjoint(w2))
             
-        numpy.testing.assert_almost_equal(lhs2, rhs2)
+        numpy.testing.assert_almost_equal(lhs2, rhs2, decimal=4)
         
     def test_SymmetrizedGradient2a(self):        
         ###########################################################################
@@ -262,20 +408,43 @@ class TestGradients(CCPiTestClass):
         Grad3 = Gradient(self.ig3, correlation = 'Space')
         
         E3 = SymmetrizedGradient(Grad3.range_geometry())
-        
-        u3 = E3.domain_geometry().allocate('random_int')
-        w3 = E3.range_geometry().allocate('random_int', symmetry = True)
+        numpy.random.seed(1)
+        u3 = E3.domain_geometry().allocate('random')
+        w3 = E3.range_geometry().allocate('random', symmetry = True)
     #    
         lhs3 = E3.direct(u3).dot(w3)
         rhs3 = u3.dot(E3.adjoint(w3))
-        numpy.testing.assert_almost_equal(lhs3, rhs3)  
+        # with numpy 1.11 and py 3.5 decimal = 3
+        decimal = 4
+        npv = version.parse(numpy.version.version)
+        if npv.major == 1 and npv.minor == 11:
+            print ("########## SETTING decimal to 3 ###########")
+            decimal = 3
+        numpy.testing.assert_almost_equal(lhs3, rhs3, decimal=decimal)  
+        # self.assertAlmostEqual(lhs3, rhs3,  )
+        print ("*******", lhs3, rhs3, abs((rhs3-lhs3)/rhs3) , 1.5 * 10**(-4), abs((rhs3-lhs3)/rhs3) < 1.5 * 10**(-4))
+        self.assertTrue( LinearOperator.dot_test(E3, range_init = w3, domain_init=u3, decimal=decimal) )
+    def test_dot_test(self):
+        Grad3 = Gradient(self.ig3, correlation = 'Space', backend='numpy')
+             
         # self.assertAlmostEqual(lhs3, rhs3)
-        # self.assertTrue( LinearOperator.dot_test(E3) )
+        self.assertTrue( LinearOperator.dot_test(Grad3 , verbose=True, decimal=4))
+        self.assertTrue( LinearOperator.dot_test(Grad3 , decimal=5, verbose=True))
+
+    def test_dot_test2(self):
+        Grad3 = Gradient(self.ig3, correlation = 'SpaceChannel', backend='c')
+             
+        # self.assertAlmostEqual(lhs3, rhs3)
+        # self.assertTrue( LinearOperator.dot_test(Grad3 , verbose=True))
+        self.assertTrue( LinearOperator.dot_test(Grad3 , decimal=5, verbose=True))
 
 
 
 
 class TestBlockOperator(unittest.TestCase):
+    def setUp(self):
+        numpy.random.seed(1)
+
     def assertBlockDataContainerEqual(self, container1, container2):
         print ("assert Block Data Container Equal")
         self.assertTrue(issubclass(container1.__class__, container2.__class__))
@@ -315,14 +484,14 @@ class TestBlockOperator(unittest.TestCase):
         
         M, N  = 3, 4
         ig = ImageGeometry(M, N)
-        arr = ig.allocate('random_int')  
+        arr = ig.allocate('random')  
         
         G = Gradient(ig)
         Id = Identity(ig)
         
         B = BlockOperator(G, Id)
         # Nx1 case
-        u = ig.allocate('random_int')
+        u = ig.allocate('random')
         z1 = B.direct(u)
         
         res = B.range_geometry().allocate()
@@ -349,7 +518,7 @@ class TestBlockOperator(unittest.TestCase):
         #             a.as_array(), 
         #             b.as_array()
         #             )
-        z1 = B.range_geometry().allocate(ImageGeometry.RANDOM_INT)
+        z1 = B.range_geometry().allocate(ImageGeometry.RANDOM)
 
         res1 = B.adjoint(z1)
         res2 = B.domain_geometry().allocate()
@@ -477,7 +646,7 @@ class TestBlockOperator(unittest.TestCase):
         if True:
             #B1 = BlockOperator(Id, Id, Id, Id, shape=(2,2))
             B1 = BlockOperator(G, Id)
-            U = ig.allocate(ImageGeometry.RANDOM_INT)
+            U = ig.allocate(ImageGeometry.RANDOM)
             #U = BlockDataContainer(u,u)
             RES1 = B1.range_geometry().allocate()
             
@@ -494,19 +663,20 @@ class TestBlockOperator(unittest.TestCase):
             print("Z1", Z1[0][1].as_array())
             print("RES1", RES1[0][1].as_array())
     def test_timedifference(self):
+
         print ("test_timedifference")
         M, N ,W = 100, 512, 512
         ig = ImageGeometry(M, N, W)
-        arr = ig.allocate('random_int')  
+        arr = ig.allocate('random')  
         
-        G = Gradient(ig)
+        G = Gradient(ig, backend='numpy')
         Id = Identity(ig)
         
         B = BlockOperator(G, Id)
         
     
         # Nx1 case
-        u = ig.allocate('random_int')
+        u = ig.allocate('random')
         steps = [timer()]
         i = 0
         n = 10.
@@ -567,19 +737,273 @@ class TestBlockOperator(unittest.TestCase):
         
         M, N  = 3, 4
         ig = ImageGeometry(M, N)
-        arr = ig.allocate('random_int')  
+        arr = ig.allocate('random', seed=1)  
         
         G = Gradient(ig)
         Id = Identity(ig)
         
         B = BlockOperator(G, Id)
         # Nx1 case
-        u = ig.allocate('random_int')
-        w = B.range_geometry().allocate(ImageGeometry.RANDOM_INT)
+        u = ig.allocate('random', seed=2)
+        w = B.range_geometry().allocate(ImageGeometry.RANDOM, seed=3)
         w1 = B.direct(u)
         u1 = B.adjoint(w)
-        self.assertEqual((w * w1).sum() , (u1*u).sum())
+        self.assertAlmostEqual((w * w1).sum() , (u1*u).sum(), places=5)
+
+class TestOperatorCompositionSum(unittest.TestCase):
+    def setUp(self):
+        
+        self.data = TestData().load(TestData.BOAT, size=(128,128))
+        self.ig = self.data.geometry
+
+    def test_SumOperator(self):
+
+        # numpy.random.seed(1)
+        ig = self.ig
+        data = self.data
+
+        Id1 = 2 * Identity(ig)
+        Id2 = Identity(ig)
+        # z = ZeroOperator(domain_geometry=ig)
+        # sym = SymmetrizedGradient(domain_geometry=ig)
+
+        c = SumOperator(Id1,Id2)
+        out = c.direct(data)
+
+        numpy.testing.assert_array_almost_equal(out.as_array(),3 * data.as_array())
+
+
+    def test_CompositionOperator_direct1(self):
+        ig = self.ig
+        data = self.data
+        G = Gradient(domain_geometry=ig)
+        
+
+        Id1 = 2 * Identity(ig)
+        Id2 = Identity(ig)
+        
+        d = CompositionOperator(G, Id2)
+
+        out1 = G.direct(data)
+        out2 = d.direct(data)
+
+
+        numpy.testing.assert_array_almost_equal(out2.get_item(0).as_array(),  out1.get_item(0).as_array())
+        numpy.testing.assert_array_almost_equal(out2.get_item(1).as_array(),  out1.get_item(1).as_array())
+
+    def test_CompositionOperator_direct2(self):
+        ig = self.ig
+        data = self.data
+        G = Gradient(domain_geometry=ig)
+        
+
+        Id1 = 2 * Identity(ig)
+        Id2 = Identity(ig)
+        
+        d = CompositionOperator(G, Id2)
+
+        out1 = G.direct(data)
+        
+        d_out = d.direct(data)
+
+        d1 = Id2.direct(data)
+        d2 = G.direct(d1)
+
+        numpy.testing.assert_array_almost_equal(d2.get_item(0).as_array(),
+                                                d_out.get_item(0).as_array())
+        numpy.testing.assert_array_almost_equal(d2.get_item(1).as_array(),
+                                                d_out.get_item(1).as_array())
+
+    def test_CompositionOperator_direct3(self):
+        ig = self.ig
+        data = self.data
+        G = Gradient(domain_geometry=ig)
+        
+
+        Id1 = 2 * Identity(ig)
+        Id2 = Identity(ig)
+        
+        d = CompositionOperator(G, Id2)
+
+        out1 = G.direct(data)
+        
+        d_out = d.direct(data)
+
+        d1 = Id2.direct(data)
+        d2 = G.direct(d1)
+
+        numpy.testing.assert_array_almost_equal(d2.get_item(0).as_array(),
+                                                d_out.get_item(0).as_array())
+        numpy.testing.assert_array_almost_equal(d2.get_item(1).as_array(),
+                                                d_out.get_item(1).as_array())
+
+        G2Id = G.compose(2*Id2)
+        d2g = G2Id.direct(data)
+
+        numpy.testing.assert_array_almost_equal(d2g.get_item(0).as_array(),
+                                                2 * d_out.get_item(0).as_array())
+        numpy.testing.assert_array_almost_equal(d2g.get_item(1).as_array(),
+                                                2 * d_out.get_item(1).as_array())
+
+    def test_CompositionOperator_direct4(self):
+        ig = self.ig
+        data = self.data
+        G = Gradient(domain_geometry=ig)
+        
+
+        Id1 = 2 * Identity(ig)
+        Id2 = Identity(ig)
+        
+        d = CompositionOperator(G, Id1, Id2)
+
+        out1 = G.direct(data)
+        
+        d_out = d.direct(data)
+
+        numpy.testing.assert_array_almost_equal(d_out.get_item(0).as_array(),
+                                                2 * out1.get_item(0).as_array())
+        numpy.testing.assert_array_almost_equal(d_out.get_item(1).as_array(),
+                                                2 * out1.get_item(1).as_array())
+
+    def test_CompositionOperator_adjoint1(self):
+        ig = self.ig
+        data = self.data
+        G = Gradient(domain_geometry=ig)
+        
+
+        Id1 = 2 * Identity(ig)
+        Id2 = Identity(ig)
+        
+        d = CompositionOperator(G, Id2)
+        da = d.direct(data)
+        
+        out1 = G.adjoint(da)
+        out2 = d.adjoint(da)
+
+        numpy.testing.assert_array_almost_equal(out2.as_array(),  out1.as_array())
+        
+    def test_CompositionOperator_adjoint2(self):
+        ig = self.ig
+        data = self.data
+        G = Gradient(domain_geometry=ig)
+        
+
+        Id1 = 2 * Identity(ig)
+        Id2 = Identity(ig)
+        
+        d = CompositionOperator(G, Id1)
+        da = d.direct(data)
+        
+        out1 = G.adjoint(da)
+        out2 = d.adjoint(da)
+
+        numpy.testing.assert_array_almost_equal(out2.as_array(),  2 * out1.as_array())
+    
+    def test_CompositionOperator_adjoint3(self):
+        ig = self.ig
+        data = self.data
+        G = Gradient(domain_geometry=ig)
+        
+
+        Id1 = 2 * Identity(ig)
+        Id2 = Identity(ig)
+        
+        d = G.compose(Id1)
+        da = d.direct(data)
+        
+        out1 = G.adjoint(da)
+        out2 = d.adjoint(da)
+
+        numpy.testing.assert_array_almost_equal(out2.as_array(),  2 * out1.as_array())
+
+
+    def test_CompositionOperator_adjoint4(self):
+        ig = self.ig
+        data = self.data
+        G = Gradient(domain_geometry=ig)
+        
+
+        Id1 = 2 * Identity(ig)
+        
+        d = G.compose(-Id1)
+        da = d.direct(data)
+        
+        out1 = G.adjoint(da)
+        out2 = d.adjoint(da)
+
+        numpy.testing.assert_array_almost_equal(out2.as_array(),  - 2 * out1.as_array())
+
+    def test_CompositionOperator_adjoint5(self):
+        ig = self.ig
+        data = self.data
+        G = Gradient(domain_geometry=ig)
+        
+
+        Id1 = 3 * Identity(ig)
+        Id = Id1 - Identity(ig)
+        d = G.compose(Id)
+        da = d.direct(data)
+        
+        out1 = G.adjoint(da)
+        out2 = d.adjoint(da)
+
+        numpy.testing.assert_array_almost_equal(out2.as_array(),  2 * out1.as_array())
+    
+    def test_CompositionOperator_adjoint6(self):
+        ig = self.ig
+        data = self.data
+        G = Gradient(domain_geometry=ig)
+        
+
+        Id1 = 3 * Identity(ig)
+        Id = ZeroOperator(ig)
+        d = G.compose(Id)
+        da = d.direct(data)
+        
+        out1 = G.adjoint(da)
+        out2 = d.adjoint(da)
+
+        numpy.testing.assert_array_almost_equal(out2.as_array(),  0 * out1.as_array())
+
+    def stest_CompositionOperator_direct4(self):
+        ig = self.ig
+        data = self.data
+        G = Gradient(domain_geometry=ig)
+        
+
+        sym = SymmetrizedGradient(domain_geometry=ig)
+        Id2 = Identity(ig)
+        
+        d = CompositionOperator(sym, Id2)
+
+        out1 = G.direct(data)
+        out2 = d.direct(data)
+
+
+        numpy.testing.assert_array_almost_equal(out2.get_item(0).as_array(),  out1.get_item(0).as_array())
+        numpy.testing.assert_array_almost_equal(out2.get_item(1).as_array(),  out1.get_item(1).as_array())
+    
+    def test_CompositionOperator_adjoint7(self):
+        ig = self.ig
+        data = self.data
+        G = Gradient(domain_geometry=ig)
+        
+
+        Id1 = 2 * Identity(ig)
+        Id2 = Identity(ig)
+        
+        d = CompositionOperator(G, Id1, Id2)
+
+        out1 = G.direct(data)
+        out2 = G.adjoint(out1)
+        
+        d_out = d.adjoint(out1)
+
+        numpy.testing.assert_array_almost_equal(d_out.as_array(),
+                                                2 * out2.as_array())
+        numpy.testing.assert_array_almost_equal(d_out.as_array(),
+                                                2 * out2.as_array())
+
 
     
-
 

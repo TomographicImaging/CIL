@@ -18,7 +18,6 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from __future__ import unicode_literals
 
 from ccpi.optimisation.operators import LinearOperator
 import numpy as np
@@ -27,12 +26,14 @@ class FiniteDiff(LinearOperator):
     
     '''Finite Difference Operator:
             
-            Computes first-order forward/backward differences 
-                     on 2D, 3D, 4D ImageData
-                     under Neumann/Periodic boundary conditions
+        Computes first-order forward/backward differences 
+                    on 2D, 3D, 4D ImageData
+                    under Neumann/Periodic boundary conditions
 
         Order of the Gradient ( ImageGeometry may contain channels ):
-                            
+
+        .. code:: python          
+
             Grad_order = ['channels', 'direction_z', 'direction_y', 'direction_x']
             Grad_order = ['channels', 'direction_y', 'direction_x']
             Grad_order = ['direction_z', 'direction_y', 'direction_x']
@@ -43,9 +44,19 @@ class FiniteDiff(LinearOperator):
 
         
     def __init__(self, gm_domain, gm_range=None, direction=0, bnd_cond = 'Neumann'):
+        '''creator
 
-        super(FiniteDiff, self).__init__() 
-
+        :param gm_domain: domain of the operator
+        :type gm_domain: :code:`AcquisitionGeometry` or :code:`ImageGeometry`
+        :param gm_range: optional range of the operator
+        :type gm_range: :code:`AcquisitionGeometry` or :code:`ImageGeometry`, optional
+        :param direction: optional axis in the input :code:`DataContainer` along which to calculate the finite differences, default 0
+        :type direction: int, optional, default 0
+        :param bnd_cond: boundary condition, either :code:`Neumann` or :code:`Periodic`.
+        :type bnd_cond: str, default :code:`Neumann`
+        
+        '''
+        
         self.gm_domain = gm_domain
         self.gm_range = gm_range
         
@@ -63,6 +74,8 @@ class FiniteDiff(LinearOperator):
         #self.voxel_size = kwargs.get('voxel_size',1)
         # this wrongly assumes a homogeneous voxel size
 #        self.voxel_size = self.gm_domain.voxel_size_x
+        super(FiniteDiff, self).__init__(domain_geometry=gm_domain, 
+                                         range_geometry=self.gm_range) 
 
 
     def direct(self, x, out=None):
@@ -338,24 +351,24 @@ class FiniteDiff(LinearOperator):
         #else:
         #    out.fill(outa)
             
-    def range_geometry(self):
+    # def range_geometry(self):
         
-        '''
+    #     '''
         
-            Returns the range_geometry of FiniteDiff
+    #         Returns the range_geometry of FiniteDiff
         
-        '''
+    #     '''
         
-        return self.gm_range
+    #     return self.gm_range
     
-    def domain_geometry(self):
+    # def domain_geometry(self):
         
-        '''
+    #     '''
         
-            Returns the domain_geometry of FiniteDiff
+    #         Returns the domain_geometry of FiniteDiff
         
-        '''        
-        return self.gm_domain
+    #     '''        
+    #     return self.gm_domain
 
 
 if __name__ == '__main__':

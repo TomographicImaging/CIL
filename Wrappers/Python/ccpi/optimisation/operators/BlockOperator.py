@@ -20,7 +20,6 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from __future__ import unicode_literals
 
 import numpy
 import functools
@@ -83,11 +82,18 @@ class BlockOperator(Operator):
             raise ValueError(
                     'Dimension and size do not match: expected {} got {}'
                     .format(n_elements,len(args)))
-        # test if operators are compatible
-        if not self.column_wise_compatible():
-            raise ValueError('Operators in each column must have the same domain')
-        if not self.row_wise_compatible():
-            raise ValueError('Operators in each row must have the same range')
+        # TODO
+        # until a decent way to check equality of Acquisition/Image geometries
+        # required to fullfil "Operators in a Block are required to have the same 
+        # domain column-wise and the same range row-wise."
+        # let us just not check if column/row-wise compatible, which is actually 
+        # the same achieved by the column_wise_compatible and row_wise_compatible methods.
+        
+        # # test if operators are compatible
+        # if not self.column_wise_compatible():
+        #     raise ValueError('Operators in each column must have the same domain')
+        # if not self.row_wise_compatible():
+        #     raise ValueError('Operators in each row must have the same range')
     
     def column_wise_compatible(self):
         '''Operators in a Block should have the same domain per column'''
@@ -98,7 +104,10 @@ class BlockOperator(Operator):
             for row in range(1,rows):
                 dg0 = self.get_item(row-1,col).domain_geometry()
                 dg1 = self.get_item(row,col).domain_geometry()
-                column_compatible = dg0.__dict__ == dg1.__dict__ and column_compatible
+                if hasattr(dg0,'handle') and hasattr(dg1,'handle'):
+                    column_compatible = True and column_compatible
+                else:
+                    column_compatible = dg0.__dict__ == dg1.__dict__ and column_compatible
             compatible = compatible and column_compatible
         return compatible
     
@@ -111,8 +120,13 @@ class BlockOperator(Operator):
             for col in range(1,cols):
                 dg0 = self.get_item(row,col-1).range_geometry()
                 dg1 = self.get_item(row,col).range_geometry()
-                row_compatible = dg0.__dict__ == dg1.__dict__ and row_compatible
+                if hasattr(dg0,'handle') and hasattr(dg1,'handle'):
+                    row_compatible = True and column_compatible
+                else:
+                    row_compatible = dg0.__dict__ == dg1.__dict__ and row_compatible
+                
             compatible = compatible and row_compatible
+            
         return compatible
 
     def get_item(self, row, col):

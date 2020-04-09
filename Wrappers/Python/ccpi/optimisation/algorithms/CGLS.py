@@ -20,7 +20,6 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from __future__ import unicode_literals
 
 from ccpi.optimisation.algorithms import Algorithm
 import numpy
@@ -57,16 +56,17 @@ class CGLS(Algorithm):
         '''
         super(CGLS, self).__init__(**kwargs)
         
-
+        if x_init is None and operator is not None:
+            x_init = operator.domain_geometry().allocate(0)
         if x_init is not None and operator is not None and data is not None:
             self.set_up(x_init=x_init, operator=operator, data=data, tolerance=tolerance)
 
     def set_up(self, x_init, operator, data, tolerance=1e-6):
         '''initialisation of the algorithm
 
-        :param operator : Linear operator for the inverse problem
-        :param x_init : Initial guess ( Default x_init = 0)
-        :param data : Acquired data to reconstruct       
+        :param operator: Linear operator for the inverse problem
+        :param x_init: Initial guess ( Default x_init = 0)
+        :param data: Acquired data to reconstruct       
         :param tolerance: Tolerance/ Stopping Criterion to end CGLS algorithm
         '''
         print("{} setting up".format(self.__class__.__name__, ))
@@ -78,7 +78,8 @@ class CGLS(Algorithm):
         self.r = data - self.operator.direct(self.x)
         self.s = self.operator.adjoint(self.r)
         
-        self.p = self.s
+        self.p = self.s.copy()
+        self.q = self.operator.range_geometry().allocate()
         self.norms0 = self.s.norm()
         
         self.norms = self.s.norm()
@@ -94,21 +95,25 @@ class CGLS(Algorithm):
 
         
     def update(self):
+        '''single iteration'''
         
-        self.q = self.operator.direct(self.p)
+        self.operator.direct(self.p, out=self.q)
         delta = self.q.squared_norm()
         alpha = self.gamma/delta
-                        
-        self.x += alpha * self.p
-        self.r -= alpha * self.q
+         
+        self.x.axpby(1, alpha, self.p, out=self.x)
+        #self.x += alpha * self.p
+        self.r.axpby(1, -alpha, self.q, out=self.r)
+        #self.r -= alpha * self.q
         
-        self.s = self.operator.adjoint(self.r)
+        self.operator.adjoint(self.r, out=self.s)
         
         self.norms = self.s.norm()
         self.gamma1 = self.gamma
         self.gamma = self.norms**2
         self.beta = self.gamma/self.gamma1
-        self.p = self.s + self.beta * self.p   
+        #self.p = self.s + self.beta * self.p   
+        self.p.axpby(self.beta, 1, self.s, out=self.p)
         
         self.normx = self.x.norm()
         self.xmax = numpy.maximum(self.xmax, self.normx)
@@ -121,9 +126,11 @@ class CGLS(Algorithm):
         self.loss.append(a)
         
     def should_stop(self):
+        '''stopping criterion'''
         return self.flag() or self.max_iteration_stop_cryterion()
  
     def flag(self):
+        '''returns whether the tolerance has been reached'''
         flag  = (self.norms <= self.norms0 * self.tolerance) or (self.normx * self.tolerance >= 1)
 
         if flag:

@@ -12,21 +12,26 @@ test:
   requires:
     - python-wget
     - cvxpy # [ unix and py36 and np115 ]
+    - scikit-image
+    - packaging
 
   source_files:
-    - ./test # [win]
+    - ./Wrappers/Python/test # [win]
     - ./ccpi/Wrappers/Python/test # [not win] 
 
   commands:
-    - python -c "import os; print (os.getcwd())"
-    - python -m unittest discover # [win]
+    - python -c "import os; print ('TESTING IN THIS DIRECTORY' , os.getcwd())"
+    - python -m unittest discover Wrappers/Python/test # [win]
     - python -m unittest discover -s ccpi/Wrappers/Python/test # [not win]
     
 requirements:
   build:
     - {{ pin_compatible('numpy', max_pin='x.x') }}
     - python
+    - numpy
     - setuptools
+    - cmake
+    - openmp # [osx]
 
   run:
     - {{ pin_compatible('numpy', max_pin='x.x') }}
@@ -36,6 +41,8 @@ requirements:
     - matplotlib
     - h5py
     - pillow
+    - libgcc-ng # [linux]
+    - openmp # [osx]
   
 about:
   home: http://www.ccpi.ac.uk

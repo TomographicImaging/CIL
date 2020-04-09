@@ -15,6 +15,8 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
+from __future__ import division
+
 import sys
 import unittest
 import numpy
@@ -585,11 +587,11 @@ class TestDataContainer(unittest.TestCase):
                             angles=numpy.linspace(0, 180, num=10),
                             geom_type='parallel', pixel_num_v=3,
                             pixel_num_h=5, channels=2)
-        sino = ageometry.allocate()
+        sino = ageometry.allocate(0)
         shape = sino.shape
         print ("shape", shape)
-        self.assertEqual(0,sino.as_array()[0][0][0][0])
-        self.assertEqual(0,sino.as_array()[shape[0]-1][shape[1]-1][shape[2]-1][shape[3]-1])
+        self.assertAlmostEqual(0.,sino.as_array()[0][0][0][0])
+        self.assertAlmostEqual(0.,sino.as_array()[shape[0]-1][shape[1]-1][shape[2]-1][shape[3]-1])
         
         sino = ageometry.allocate(1)
         self.assertEqual(1,sino.as_array()[0][0][0][0])
@@ -610,6 +612,7 @@ class TestDataContainer(unittest.TestCase):
         self.assertEqual(order[2], sino.dimension_labels[2])
         self.assertEqual(order[2], sino.dimension_labels[2])
         
+
         
         try:
             z = AcquisitionData(numpy.random.randint(10, size=(2,3)), geometry=ageometry)
@@ -617,6 +620,32 @@ class TestDataContainer(unittest.TestCase):
         except ValueError as ve:
             print (ve)
             self.assertTrue(True)
+    def test_ImageGeometry_allocate_complex(self):
+        ig = ImageGeometry(2,2)
+        data = ig.allocate(None, dtype=numpy.complex64)
+        shape = data.shape
+        print ("shape", shape)
+        print ("dtype", data.dtype)
+
+        r = (1 + 1j*1)* numpy.ones(data.shape, dtype=data.dtype)
+        data.fill(r)
+
+        # norm = (2*2) * ((1+i1) * (1-j1) = 4* (1+1) = 4*2=8
+        self.assertAlmostEqual(data.squared_norm(), data.size * 2)
+
+    def test_AcquisitionGeometry_allocate_complex(self):
+        ageometry = AcquisitionGeometry(dimension=2, 
+                            angles=numpy.linspace(0, 180, num=10),
+                            geom_type='parallel', pixel_num_v=3,
+                            pixel_num_h=5, channels=2)
+        sino = ageometry.allocate(0, dtype=numpy.complex64)
+        shape = sino.shape
+        print ("shape", shape)
+        print ("dtype", sino.dtype)
+        r = (1 + 1j*1)* numpy.ones(sino.shape, dtype=sino.dtype)
+        sino.fill(r)
+        self.assertAlmostEqual(sino.squared_norm(), sino.size*2)
+        
     def test_AcquisitionDataSubset(self):
         sgeometry = AcquisitionGeometry(dimension=2, angles=numpy.linspace(0, 180, num=10),
                                         geom_type='parallel', pixel_num_v=3,
@@ -732,7 +761,70 @@ class TestDataContainer(unittest.TestCase):
         u.multiply(2, out=u)
         c = b * 2
         numpy.testing.assert_array_equal(u.as_array(), c)
+
+    def test_axpby(self):
+        print ("test axpby")
+        ig = ImageGeometry(10,10)                                               
+        d1 = ig.allocate(1)                                                     
+        d2 = ig.allocate(2)                                                     
+        out = ig.allocate(None)                                                 
+        # equals to 2 * [1] + 1 * [2] = [4]
+        d1.axpby(2,1,d2,out)
+        res = numpy.ones_like(d1.as_array()) * 4.
+        numpy.testing.assert_array_equal(res, out.as_array())
+    def test_axpby2(self):
+        print ("test axpby2")
+        N = 100
+        ig = ImageGeometry(N,2*N,N*10)                                               
+        d1 = ig.allocate(1)                                                     
+        d2 = ig.allocate(2)                                                     
+        out = ig.allocate(None)   
+        print ("allocated")                                              
+        # equals to 2 * [1] + 1 * [2] = [4]
+        d1.axpby(2,1,d2,out, num_threads=4)
+        print ("calculated") 
+        res = numpy.ones_like(d1.as_array()) * 4.
+        numpy.testing.assert_array_equal(res, out.as_array())
+
+    def test_min(self):
+        print ("test min")
+        ig = ImageGeometry(10,10)     
+        a = numpy.asarray(numpy.linspace(-10,10, num=100, endpoint=True), dtype=numpy.float32)
+        a = a.reshape((10,10))
+        d1 = ig.allocate(1)                                                     
+        d1.fill(a)                                                     
+        self.assertAlmostEqual(d1.min(), -10.)
+
+    def test_max(self):
+        print ("test max")
+        ig = ImageGeometry(10,10)     
+        a = numpy.asarray(numpy.linspace(-10,10, num=100, endpoint=True), dtype=numpy.float32)
+        a = a.reshape((10,10))
+        d1 = ig.allocate(1)                                                     
+        d1.fill(a)                                                     
+        self.assertAlmostEqual(d1.max(), 10.)
+
+    def test_size(self):
+        print ("test size")
+        ig = ImageGeometry(10,10)     
+        d1 = ig.allocate(1)                                                     
+                                                
+        self.assertEqual( d1.size, 100 )
         
+        sgeometry = AcquisitionGeometry(dimension=2, angles=numpy.linspace(0, 180, num=10),
+                                        geom_type='parallel', pixel_num_v=3,
+                                        pixel_num_h=5, channels=2)
+        ad = sgeometry.allocate()
+
+        self.assertEqual( ad.size, 3*5*10*2 )
+    
+    def test_negation(self):
+        X, Y, Z = 256, 512, 512
+        a = numpy.ones((X, Y, Z), dtype='int32')
+        
+        ds = - DataContainer(a, False, ['X', 'Y', 'Z'])
+        
+        numpy.testing.assert_array_equal(ds.as_array(), -a)
 
 
 

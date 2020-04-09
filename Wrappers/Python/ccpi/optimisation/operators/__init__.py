@@ -18,10 +18,7 @@
 
 from .Operator import Operator, LinearOperator, ScaledOperator, SumOperator,\
  CompositionOperator, Composition2Operator
-#from .LinearOperator import LinearOperator
-#from .ScaledOperator import ScaledOperator
 from .BlockOperator import BlockOperator
-# from .BlockScaledOperator import BlockScaledOperator
 
 from .SparseFiniteDiff import SparseFiniteDiff
 from .ShrinkageOperator import ShrinkageOperator
@@ -32,4 +29,8 @@ from .SymmetrizedGradientOperator import SymmetrizedGradient
 from .IdentityOperator import Identity
 from .ZeroOperator import ZeroOperator
 from .LinearOperatorMatrix import LinearOperatorMatrix
+
+from .DiagonalOperator import DiagonalOperator
+from .MaskOperator import MaskOperator
+from .ChannelwiseOperator import ChannelwiseOperator
 

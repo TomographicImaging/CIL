@@ -56,7 +56,8 @@ class CGLS(Algorithm):
         '''
         super(CGLS, self).__init__(**kwargs)
         
-
+        if x_init is None and operator is not None:
+            x_init = operator.domain_geometry().allocate(0)
         if x_init is not None and operator is not None and data is not None:
             self.set_up(x_init=x_init, operator=operator, data=data, tolerance=tolerance)
 
@@ -76,12 +77,12 @@ class CGLS(Algorithm):
 
         self.r = data - self.operator.direct(self.x)
         self.s = self.operator.adjoint(self.r)
+        
         self.p = self.s.copy()
-
         self.q = self.operator.range_geometry().allocate()
-
-        self.norms0 = self.s.norm()      
-        self.norms = self.norms0
+        self.norms0 = self.s.norm()
+        
+        self.norms = self.s.norm()
 
         self.gamma = self.norms0**2
         self.normx = self.x.norm()
@@ -97,12 +98,13 @@ class CGLS(Algorithm):
         '''single iteration'''
         
         self.operator.direct(self.p, out=self.q)
-
         delta = self.q.squared_norm()
         alpha = self.gamma/delta
-                        
-        self.x += alpha * self.p
-        self.r -= alpha * self.q
+         
+        self.x.axpby(1, alpha, self.p, out=self.x)
+        #self.x += alpha * self.p
+        self.r.axpby(1, -alpha, self.q, out=self.r)
+        #self.r -= alpha * self.q
         
         self.operator.adjoint(self.r, out=self.s)
         
@@ -112,9 +114,8 @@ class CGLS(Algorithm):
         self.gamma = self.norms**2
 
         self.beta = self.gamma/self.gamma1
-
-        self.p.axpby(self.beta, 1, self.s, out=self.p)
         #self.p = self.s + self.beta * self.p   
+        self.p.axpby(self.beta, 1, self.s, out=self.p)
         
         self.normx = self.x.norm()
         #self.xmax = numpy.maximum(self.xmax, self.normx)

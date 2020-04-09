@@ -64,7 +64,7 @@ class TestBlockOperator(unittest.TestCase):
             ops = [ Identity(g) for g in ig ]
             
             K = BlockOperator(*ops)
-            self.assertTrue(False)
+            self.assertFalse(K.column_wise_compatible())
         except ValueError as ve:
             print (ve)
             self.assertTrue(True)
@@ -91,7 +91,7 @@ class TestBlockOperator(unittest.TestCase):
                 print ("range" , op.range_geometry().shape)
             for op in ops:
                 print ("domain" , op.domain_geometry().shape)
-            self.assertTrue(False)
+            self.assertFalse(K.row_wise_compatible())
         except ValueError as ve:
             print (ve)
             self.assertTrue(True)

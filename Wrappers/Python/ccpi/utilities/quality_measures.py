@@ -19,19 +19,37 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import numpy
-import sys
-from datetime import timedelta, datetime
-import warnings
-from functools import reduce
+from ccpi.optimisation.functions import L2NormSquared, L1Norm
+import numpy as np
 
-from .framework import DataContainer
-from .framework import ImageData, AcquisitionData
-from .framework import ImageGeometry, AcquisitionGeometry
-from .framework import VectorData, VectorGeometry
-from .framework import find_key, message
-from .framework import DataProcessor
-from .framework import AX, PixelByPixelDataProcessor, CastDataContainer
-from .BlockDataContainer import BlockDataContainer
-from .BlockGeometry import BlockGeometry
-from .TestData import TestData
+
+def mse(dc1, dc2):    
+    
+    ''' Returns the Mean Squared error of two DataContainers
+    '''
+    
+    diff = dc1 - dc2    
+    return L2NormSquared().__call__(diff)/dc1.size
+
+
+def mae(dc1, dc2):
+    
+    ''' Returns the Mean Absolute error of two DataContainers
+    '''    
+    
+    diff = dc1 - dc2  
+    return L1Norm().__call__(diff)/dc1.size()
+
+def psnr(ground_truth, corrupted, data_range = 255):
+
+    ''' Returns the Peak signal to noise ratio
+    '''   
+    
+    tmp_mse = mse(ground_truth, corrupted)
+    if tmp_mse == 0:
+        return 1e5
+    return 10 * np.log10((data_range ** 2) / tmp_mse)
+
+
+
+

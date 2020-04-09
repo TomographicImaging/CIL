@@ -59,7 +59,7 @@ class PDHG(Algorithm):
         SIAM J. Imaging Sci. 3, 1015–1046.
     '''
 
-    def __init__(self, f=None, g=None, operator=None, tau=None, sigma=1.,**kwargs):
+    def __init__(self, f=None, g=None, operator=None, tau=None, sigma=1.,x_init=None,**kwargs):
         '''PDHG algorithm creator
 
         Optional parameters
@@ -69,21 +69,23 @@ class PDHG(Algorithm):
         :param g: Convex function with "simple" proximal 
         :param sigma: Step size parameter for Primal problem
         :param tau: Step size parameter for Dual problem
+        :param x_init: Initial guess ( Default x_init = 0)
         '''
         super(PDHG, self).__init__(**kwargs)
         
 
         if f is not None and operator is not None and g is not None:
-            self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma)
+            self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, x_init=x_init)
 
-    def set_up(self, f, g, operator, tau=None, sigma=1.):
+    def set_up(self, f, g, operator, tau=None, sigma=1., x_init=None):
         '''initialisation of the algorithm
 
         :param operator: a Linear Operator
         :param f: Convex function with "simple" proximal of its conjugate. 
         :param g: Convex function with "simple" proximal 
         :param sigma: Step size parameter for Primal problem
-        :param tau: Step size parameter for Dual problem'''
+        :param tau: Step size parameter for Dual problem
+        :param x_init: Initial guess ( Default x_init = 0)'''
 
         print("{} setting up".format(self.__class__.__name__, ))
         
@@ -106,7 +108,10 @@ class PDHG(Algorithm):
             self.tau = 1 / (self.sigma * normK ** 2)
 
 
-        self.x_old = self.operator.domain_geometry().allocate()
+        if x_init is None:
+            self.x_old = self.operator.domain_geometry().allocate()
+        else:
+            self.x_old = x_init.copy()
         self.x_tmp = self.x_old.copy()
         self.x = self.x_old.copy()
     

@@ -46,30 +46,15 @@ class LeastSquares(Function):
     
     """
     
-    def __init__(self, A, b, c=1.0, estimate_Lipschitz = True):
+    def __init__(self, A, b, c=1.0):
         super(LeastSquares, self).__init__()
     
         self.A = A  # Should be an operator, default identity
         self.b = b  # Default zero DataSet?
         self.c = c  # Default 1.
         self.range_tmp = A.range_geometry().allocate()
-        
-        if estimate_Lipschitz:
-            # Compute the Lipschitz parameter from the operator if possible
-            # Leave it initialised to None otherwise
-            try:
-                self.L = 2.0*self.c*(self.A.norm()**2)
-            except AttributeError as ae:
-                if self.A.is_linear():
-                    Anorm = LinearOperator.PowerMethod(self.A, 10)[0]
-                    self.L = 2.0 * self.c * (Anorm*Anorm)
-                else:
-                    warnings.warn('{} could not calculate Lipschitz Constant. {}'.format(
-                    self.__class__.__name__, ae))
-                
-            except NotImplementedError as noe:
-                warnings.warn('{} could not calculate Lipschitz Constant. {}'.format(
-                    self.__class__.__name__, noe))
+        self._L = self.compute_Lipschitz
+            
         
     def __call__(self, x):
         
@@ -103,6 +88,30 @@ class LeastSquares(Function):
             out.multiply (self.c * 2.0, out=out)
         else:
             return (2.0*self.c)*self.A.adjoint(self.A.direct(x) - self.b)
+    
+    @property    
+    def compute_Lipschitz(self):
+        
+#        if estimate_Lipschitz:
+#                    # Compute the Lipschitz parameter from the operator if possible
+#                    # Leave it initialised to None otherwise
+            try:
+                self.L = 2.0*self.c*(self.A.norm()**2)
+            except AttributeError as ae:
+                if self.A.is_linear():
+                    Anorm = LinearOperator.PowerMethod(self.A, 10)[0]
+                    self.L = 2.0 * self.c * (Anorm*Anorm)
+                else:
+                    warnings.warn('{} could not calculate Lipschitz Constant. {}'.format(
+                    self.__class__.__name__, ae))
+                
+            except NotImplementedError as noe:
+                warnings.warn('{} could not calculate Lipschitz Constant. {}'.format(
+                    self.__class__.__name__, noe))
+                
+            return self.L                
+        
+        
             
         
 if __name__ == '__main__':
@@ -153,6 +162,43 @@ if __name__ == '__main__':
     res2 = f2.gradient(x)
     numpy.testing.assert_array_almost_equal(res1.as_array(), res2.as_array())
     print("Checking gradient .... OK ")
+    
+        
+    g2 = LeastSquares(Aop, data, c = alpha)
+    print(g2.L)
+    
+    
+#    res = x * Aop
+#
+#
+#
+#
+#    
+#    
+#    from ccpi.optimisation.operators import DiagonalOperator, CompositionOperator
+#    
+#    D = DiagonalOperator(x)
+#    C = CompositionOperator(D, Aop)
+#    
+#    tmp = ig.allocate('random')
+#    res1 = C.direct(tmp)
+#    
+#    res2 = x * Aop.direct(tmp)
+#    
+#    
+#    
+#    x 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
 
     

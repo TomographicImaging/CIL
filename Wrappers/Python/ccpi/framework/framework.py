@@ -233,6 +233,138 @@ class ImageGeometry(object):
     #    return self.shape
 
 
+class PositionOrientation(object):
+
+    @property
+    def orientation(self):
+        return self.__orientation
+
+    @orientation.setter
+    def orientation(self, val):
+
+        dof = 3 if self.dimension_temp == 3 else 1
+
+        if val is None:
+            self.__orientation = val
+        elif len(val) == dof and all(isinstance(i, numpy.float32) for i in val):
+            self.__orientation = val
+        else:
+            raise ValueError('orientation expects a container of floats of length {0}. Got {1}'.format(dof, val))
+   
+    @property
+    def origin(self):
+        return self.__origin
+
+    @origin.setter
+    def origin(self, val):
+        if val is None:
+            self.__origin = val
+        elif len(val) == self.dimension_temp and all(isinstance(i, numpy.float32) for i in val):
+            self.__origin = val
+        else:
+            raise ValueError('positions expects a container of floats of length {0}. Got {1}'.format(self.dimension_temp, val))
+   
+    def __init__ (self, origin, orientation, dimension=3, radians=True):
+        #if 2D position = [x,y], 3D position = [x,y,z]
+        #if 2D orientation = [rz], 3D position = [rx,ry,rz]
+        self.dimension_temp = dimension
+
+        if origin is None:
+            self.origin = None
+        else:
+            self.origin = numpy.asarray(origin,dtype=numpy.float32)
+        
+        if orientation is None:
+            self.orientation = None
+        else:
+            self.orientation = numpy.asarray(orientation,dtype=numpy.float32)
+            if radians is False:
+                self.orientation *= numpy.pi / 180.
+
+        del self.dimension_temp
+
+class SystemPlacement(object):
+    def __init__ (self, dimension, source_pos=None, source_orientation=None, detector_pos=None, detector_orientation=None, object_pos=None, object_orientation=None, radians=True):
+        self.source = PositionOrientation(source_pos, source_orientation, dimension, radians)
+        self.detector = PositionOrientation(detector_pos, detector_orientation, dimension, radians)
+        self.object = PositionOrientation(object_pos, object_orientation, dimension, radians)
+
+class Panel(object):
+    @property
+    def num_pixels(self):
+        return self.__num_pixels
+
+    @num_pixels.setter
+    def num_pixels(self, val):
+        if isinstance(val,int):
+            num_pixels_temp = (1, val)
+        elif len(val) == 2 and all(isinstance(i, int) for i in val):
+            num_pixels_temp = (val[0], val[1])
+        else:
+            raise ValueError('num_pixels expected int x or [int x, int y]. Got {}'.format(val))
+   
+        if num_pixels_temp < (1,1):
+            raise ValueError('num_pixels (x,y) must be >= (1,1). Got {}'.format(num_pixels_temp))
+        else:
+            self.__num_pixels = num_pixels_temp
+
+    @property
+    def pixel_size(self):
+        return self.__pixel_size
+
+    @pixel_size.setter
+    def pixel_size(self, val):
+        if isinstance(val,float):
+            pixel_size_temp = (1, val)
+        elif len(val) == 2 and all(isinstance(i, float) for i in val):
+            pixel_size_temp = (val[0], val[1])
+        else:
+            raise ValueError('pixel_size expected float xy or [float x, float y]. Got {}'.format(val))
+   
+        if pixel_size_temp <= (0,0):
+            raise ValueError('pixel_size (x,y) at must be > (0.,0.). Got {}'.format(pixel_size_temp))
+        else:
+            self.__pixel_size = pixel_size_temp
+
+    def __init__ (self, num_pixels, pixel_size):  
+        self.num_pixels = num_pixels
+        self.pixel_size = pixel_size
+
+class Channels(object):
+    @property
+    def num_channels(self):
+        return self.__num_channels
+
+    @num_channels.setter
+    def num_channels(self, val):      
+        if isinstance(val,int) and val > 0:
+            self.__num_channels = val
+        else:
+            raise ValueError('num_channels expected a positive integer. Got {}'.format(val))
+
+    @property
+    def labels(self):
+        return self.__labels
+
+    @labels.setter
+    def labels(self, val):      
+        if val is None or len(val) == self._num_channels:
+            self.__labels = val  
+        else:
+            raise ValueError('labels expected to have length {0}. Got {1}'.format(self._num_channels, len(val)))
+
+    def __init__ (self, num_channels, labels = None):
+        self.num_channels = num_channels
+        self.labels = labels
+
+    @property
+    def panel(self):
+        return self.__panel
+
+    @panel.setter
+    def panel(self, val):
+        self.__panel = val
+
 class AcquisitionGeometry(object):
     """
     General inputs for standard type projection geometries
@@ -260,343 +392,124 @@ class AcquisitionGeometry(object):
     angles is expected numpy array, dtype - float32
     angles_format radians or degrees
     """
-
+    #todo:keep these?
     RANDOM = 'random'
     RANDOM_INT = 'random_int'
     ANGLE_UNIT = 'angle_unit'
     DEGREE = 'degree'
     RADIAN = 'radian'
+    AQ3D = '3D'
+    AQ2D = '2D'
+    #keep these
     CHANNEL = 'channel'
     ANGLE = 'angle'
     VERTICAL = 'vertical'
     HORIZONTAL = 'horizontal'
-    AQ3D = '3D'
-    AQ2D = '2D'
     
     @property
     def geom_type(self):
-        return self._geom_type
+        return self.__geom_type
 
     @geom_type.setter
     def geom_type(self,val):
         if val != 'cone' and val != 'parallel':
             raise ValueError('geom_type = {} not recognised please specify \'cone\' or \'parallel\''.format(val))
         else:
-            self._geom_type = val
-
-    @property
-    def dimension(self):
-        return self._dimension
-
-    @property
-    def num_pixels(self):
-        return self._num_pixels
-
-    @num_pixels.setter
-    def num_pixels(self, val):
-        try:         
-            length = len(val)
-        except TypeError:
-            try:
-                num_pixels_temp = (1, int(val))
-            except:
-                raise ValueError('num_pixels expected int x or [int y, int x]. Got {}'.format(val))
-        else:
-            if length == 2:
-                try:
-                    num_pixels_temp = (int(val[0]), int(val[1]))
-                except:
-                    raise ValueError('num_pixels expected int x or [int y, int x]. Got {}'.format(val))
-
-        if num_pixels_temp < (1,1):
-            raise ValueError('num_pixels (y,x) must be > (0,0). Got {}'.format(num_pixels))
-        else:
-            self._num_pixels = num_pixels_temp
-
-            if self.num_pixels[0] > 1:
-                self._dimension = AcquisitionGeometry.AQ3D
-            elif self.num_pixels[0] == 1:
-                self._dimension = AcquisitionGeometry.AQ2D
- 
-    @property
-    def pixel_size(self):
-        return self._pixel_size
-
-    @pixel_size.setter
-    def pixel_size(self, val):
-        try:         
-            length = len(val)
-        except TypeError:
-            try:
-                pixel_size_temp = (float(val), float(val))
-            except ValueError:
-                raise ValueError('pixel_size expected float xy or [float y, float x]. Got {}'.format(val))
-        else:
-            if length == 2:
-                try:
-                    pixel_size_temp = (float(val[0]), float(val[1]))
-                except ValueError:
-                    raise ValueError('pixel_size expected float xy or [float y, float x]. Got {}'.format(val))
-
-
-        if pixel_size_temp <= (0,0):
-            raise ValueError('pixel_size (y,x) at must be > (0.,0.). Got {}'.format(pixel_size_temp))
-        else:
-            self._pixel_size = pixel_size_temp
+            self.__geom_type = val
 
     @property
     def num_positions(self):
-        return self._num_positions
+        return self.__num_positions
 
     @num_positions.setter
     def num_positions(self, val):
-
-        try:
-            val = int(val)
-        except ValueError:
-            raise ValueError('num_positions expected a positive integer. Got {}'.format(val))
-
-        if val > 0:
-            self._num_positions = val
+        if isinstance(val,int) and val > 0:
+            self.__num_positions = val
         else:
             raise ValueError('num_positions expected a positive integer. Got {}'.format(val))
 
     @property
-    def num_channels(self):
-        return self._num_channels
+    def dimension(self):
+        return self.__dimension
 
-    @num_channels.setter
-    def num_channels(self, val):
-        
-        try:
-            val = int(val)
-        except TypeError:
-            raise TypeError('num_channels expected a positive integer. Got {}'.format(val))
-
-        if val > 0:
-            self._num_channels = val
-        else:
-            raise ValueError('num_channels expected a positive integer. Got {}'.format(val))
+    def set_dimension(self):
+        self.__dimension = 3 if self.panel.num_pixels[1] > 1 else 2
 
     @property
-    def source_dof(self):
-        return self._source_dof
+    def angles(self):
+        return self.__angles
 
-    @source_dof.setter
-    def source_dof(self, val):
-        if self.dimension == AcquisitionGeometry.AQ3D:
-            dof = 3 #x, y, z
+    @angles.setter
+    def angles(self, val):
+        if val == None:
+            self.__angles = val
+        elif len(val) == self.num_positions and all(isinstance(i, float) for i in val):
+            self.__angles = val  
         else:
-            dof = 2 #x, y
-
-        positions=1
-
-        #input can be a single float (cone/parallel) or None (parallel)
-        try:         
-            length = len(val)
-        except TypeError:
-
-            if self.geom_type is 'parallel' and val is None:
-                val = 0.0
-
-            try:
-                y_position = float(val)
-            except ValueError:
-                raise ValueError('source_dof must contain floats. Got {}'.type(val))
-            else:
-                source_dof = [0.0] * dof
-                source_dof[1] = y_position  
-        else:
-            #input can be a container (length = dof) of floats
-            #input can be a container (length = dof*projection) of floats 
-
-            if length in (dof, self.num_positions * dof):
-                positions = length//dof
-
-                try:
-                    source_dof = []
-                    for el in val:
-                        source_dof.append(float(el))
-                except ValueError as ve:
-                    raise ValueError('source_dof must contain floats. Got {}'.type(el)) #hmmm is the element that broke it still in memory?
-            #input can be a container (length = projection) of containers (length = dof) of floats 
-            elif length in (1, self.num_positions):
-                positions = length
-
-                #check for container of containers
-                try:
-                    source_dof = []
-                    for values in val:
-                        for el in values:
-                            source_dof.append(float(el))
-                except ValueError as ve:
-                    raise ValueError('source_dof must contain floats. Got {}'.type(el)) #hmmm is the element that broke it still in memory?
-            else:
-                raise ValueError('source_dof must be a sensible size')
-
-        self._source_dof = numpy.asarray(source_dof, dtype=float).reshape(positions,dof)
-
-    @property
-    def detector_origin(self):
-        return self._detector_origin
-
-    @detector_origin.setter
-    def detector_origin(self, val):
-        if self.dimension == AcquisitionGeometry.AQ3D:
-            dof = 3 #x, y, z
-        else:
-            dof = 2 #x, y
-
-        positions=1
-        #input can be a single float
-        try:         
-            length = len(val)
-        except TypeError:
-
-            if self.geom_type is 'parallel' and val is None:
-                val = 0.0
-
-            try:
-                y_position = float(val)
-            except ValueError:
-                raise ValueError('detector_origin must contain floats. Got {}'.type(val))
-            else:
-                detector_origin = [0.0] * dof
-                detector_origin[1] = y_position  
-        else:
-            #input can be a container (length = dof) of floats
-            #input can be a container (length = dof*projection) of floats 
-
-            if length in (dof, self.num_positions * dof):
-                positions = length//dof
-
-                try:
-                    detector_origin = []
-                    for el in val:
-                        detector_origin.append(float(el))
-                except ValueError as ve:
-                    raise ValueError('detector_origin must contain floats. Got {}'.type(el)) #hmmm is the element that broke it still in memory?
-            #input can be a container (length = projection) of containers (length = dof) of floats 
-            elif length in (1, self.num_positions):
-                positions = length
-
-                #check for container of containers
-                try:
-                    detector_origin = []
-                    for values in val:
-                        for el in values:
-                            detector_origin.append(float(el))
-                except ValueError as ve:
-                    raise ValueError('detector_origin must contain floats. Got {}'.type(el)) #hmmm is the element that broke it still in memory?
-            else:
-                raise ValueError('detector_origin must be a sensible size source-to-object distance, dof of dof per projection')
-
-        self._detector_origin = numpy.asarray(detector_origin, dtype=float).reshape(positions,dof)
-
-    @property
-    def detector_orientation(self):
-        return self._detector_orientation
-
-    @detector_orientation.setter
-    def detector_orientation(self, val):
-        if self.dimension == AcquisitionGeometry.AQ3D:
-            dof = 3 #Rx Ry Rz
-        else:
-            dof = 1 #Rz
-
-        positions=1
-
-        #Can be None for any simple geometry
-        if val is None:
-            val = [0.0] * dof
-
-        #input can be a single float for 2D
-        try:         
-            length = len(val)
-        except TypeError:
-            if self.dimension == AcquisitionGeometry.AQ2D:
-                try:
-                    detector_orientation = [float(val)]
-                except ValueError:
-                    raise ValueError('detector_orientation must contain floats. Got {}'.type(val))
-
-            else:
-                raise ValueError('detector_orientation For 3D Geometries expect a container of length dof')
-        else:
-            #input can be a container (length = dof) of floats
-            #input can be a container (length = dof*projection) of floats 
-
-            if length in (dof, self.num_positions * dof):
-                positions = length//dof
-
-                try:
-                    detector_orientation = []
-                    for el in val:
-                        detector_orientation.append(float(el))
-                except ValueError as ve:
-                    raise ValueError('detector_orientation must contain floats. Got {}'.type(el)) #hmmm is the element that broke it still in memory?
-            #input can be a container (length = projection) of containers (length = dof) of floats 
-            elif length in (1, self.num_positions):
-                positions = length
-
-                #check for container of containers
-                try:
-                    detector_orientation = []
-                    for values in val:
-                        for el in values:
-                            detector_orientation.append(float(el))
-                except ValueError as ve:
-                    raise ValueError('detector_orientation must contain floats. Got {}'.type(el)) #hmmm is the element that broke it still in memory?
-            else:
-                raise ValueError('detector_orientation must be a sensible size either object-to-dector value, dof or dof per projection')
-
-        self._detector_orientation = numpy.asarray(detector_orientation, dtype=float).reshape(positions,dof)
+            raise ValueError('angles expected to be a list of floats length {0}. Got {1}'.format(self.num_channels, len(val)))
 
     def __init__(self,
                  geom_type, #'cone'/'parallel'
-                 num_pixels, # int x or [int y, int x]
-                 pixel_size, # float xy or [float y, float x]
                  num_positions, # int
-                 source_dof = None, # None, y, 3 dof (x,y,z), or 3 dof per projection as [num_positions, src vector]
-                 detector_origin = None,# y, 3 dof (x,y,z), or 3 dof per projection as [num_positions, det vector]
-                 detector_orientation = None, # 3 dof (rx,ry,rz), or 3 dof per projection as [num_positions, det vector]
-                 angles = None, #for simple geometry needs angles
+                 num_pixels, # int x or [int x, int y]
+                 pixel_size, # float xy or [float x, float y]
+                 source_position = None, 
+                 source_orientation = None,
+                 detector_position = None,
+                 detector_orientation = None,
+                 object_position = None,
+                 object_orientation = None,                 
+                 angles = None, 
                  num_channels = 1, #int
+                 channel_labels = None, 
                  ** kwargs):
 
-        self.geom_type  = geom_type
-        self.num_pixels = num_pixels
-        self.pixel_size = pixel_size
+        self.geom_type = geom_type
         self.num_positions = num_positions
-        self.num_channels = num_channels
-        self.source_dof = source_dof
-        self.detector_origin = detector_origin
-        self.detector_orientation = detector_orientation
+        self.panel = Panel(num_pixels, pixel_size)  
+        self.set_dimension()
+        self.channels = Channels(num_channels, channel_labels)
         self.angles = angles
 
-        self.angle_unit=kwargs.get(AcquisitionGeometry.ANGLE_UNIT, 
-                               AcquisitionGeometry.DEGREE)
+        if self.angles is not None:           
+            self.placement = SystemPlacement(self.dimension, source_position, source_orientation, detector_position, detector_orientation, detector_orientation, object_position, True)
+        else:
+            none_list = [None]*self.num_positions
+
+            if source_position is None:
+                source_position = none_list
+            if source_orientation is None:
+                source_orientation = none_list
+            if detector_position is None:
+                detector_position = none_list
+            if detector_orientation is None:
+                detector_orientation = none_list
+            if object_position is None:
+                object_position = none_list
+            if object_orientation is None:
+                object_orientation = none_list
+
+            #check length of lists are consistent with numberproj and dof?
+            self.placement = []
+            for pos in range(self.num_positions):
+                self.placement.append
+                (
+                    SystemPlacement(self.dimension, 
+                    source_position[pos], source_orientation[pos],
+                    detector_position[pos], detector_orientation[pos],
+                    object_position[pos], object_orientation[pos], 
+                    True)
+                )
 
 
         # default labels
-        if self.num_channels > 1:
-            if self.dimension == AcquisitionGeometry.AQ3D:
-                shape = (self.num_channels, self.num_positions , self.num_pixels[0], self.num_pixels[1])
-                dim_labels = [AcquisitionGeometry.CHANNEL ,
-                 AcquisitionGeometry.ANGLE , AcquisitionGeometry.VERTICAL ,
-                 AcquisitionGeometry.HORIZONTAL]
-            else:
-                shape = (self.num_channels , self.num_positions, self.num_pixels[1])
-                dim_labels = [AcquisitionGeometry.CHANNEL ,
-                 AcquisitionGeometry.ANGLE, AcquisitionGeometry.HORIZONTAL]
-        else:
-            if self.dimension == AcquisitionGeometry.AQ3D:
-                shape = (self.num_positions, self.num_pixels[0], self.num_pixels[1])
-                dim_labels = [AcquisitionGeometry.ANGLE , AcquisitionGeometry.VERTICAL ,
-                 AcquisitionGeometry.HORIZONTAL]
-            else:
-                shape = (self.num_positions, self.num_pixels[1])
-                dim_labels = [AcquisitionGeometry.ANGLE, AcquisitionGeometry.HORIZONTAL]
+        shape = [self.channels.num_channels, self.num_positions , self.panel.num_pixels[1], self.panel.num_pixels[0]]
+        dim_labels = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.ANGLE, AcquisitionGeometry.VERTICAL, AcquisitionGeometry.HORIZONTAL]
+        #if dimension has length 1 remove from list
+        for i,x in enumerate(shape):
+            if x == 1:
+                shape.pop(i)
+                dim_labels.pop(i)
         
         labels = kwargs.get('dimension_labels', None)
         if labels is None:
@@ -618,8 +531,7 @@ class AcquisitionGeometry(object):
             else:
                 self.shape = tuple(order)
             self.dimension_labels = labels
-        
-
+     
     def get_order_by_label(self, dimension_labels, default_dimension_labels):
         order = []
         for i, el in enumerate(dimension_labels):
@@ -629,32 +541,37 @@ class AcquisitionGeometry(object):
                     break
         return order
 
-        
     def clone(self):
         '''returns a copy of the AcquisitionGeometry'''
-        return AcquisitionGeometry(self.geom_type,
-                                   self.num_pixels, 
-                                   self.pixel_size, 
-                                   self.num_positions, 
-                                   self.source_dof, 
-                                   self.detector_origin, 
-                                   self.detector_orientation, 
-                                   self.num_channels, 
-                                   dimension_labels=self.dimension_labels
-                 )
-    #ToDo fix this    
+        #todo check for python2 compatability
+        return copy.deepcopy(self)
+
     def __str__ (self):
         repres = ""
-        repres += "Number of dimensions: {0}\n".format(self.dimension)
-        repres += "angles: {0}...\n".format(self.angles[0:10])
-        repres += "num_positions: {0}\n".format(self.num_positions)
-        repres += "voxel_num : h{0},v{1}\n".format(self.num_pixels[0], self.num_pixels[1])
-        repres += "voxel size: h{0},v{1}\n".format(self.pixel_size[0], self.pixel_size[1])
-        repres += "geometry type: {0}\n".format(self.geom_type)
-        repres += "distance source-detector: {0}\n".format(self.source_dof)
-        repres += "distance center-detector: {0}\n".format(self.detector_origin)
-        repres += "distance detector_orientation: {0}\n".format(self.detector_orientation)        
-        repres += "number of channels: {0}\n".format(self.num_channels)
+        repres += "Geometry type: {0}\n".format(self.geom_type)
+        repres += "number of channels: {0}\n".format(self.channels.num_channels)                
+        repres += "num_positions: {0}\n".format(self.num_positions)         
+        repres += "panel size: h{0},v{1}\n".format(self.panel.num_pixels[0], self.panel.num_pixels[1])
+        repres += "pixel size: h{0},v{1}\n".format(self.panel.pixel_size[0], self.panel.pixel_size[1])
+        repres += "System placement:\n"
+        if self.angles is not None:
+            if self.geom_type == 'cone': 
+                repres += "\tsource position: {0}\n".format(self.placement.source.origin)
+            if self.geom_type == 'parallel':
+                repres += "\tsource orientation: {0}\n".format(self.placement.source.orientation)
+
+            repres += "\tdetector position: {0}\n".format(self.placement.detector.origin)
+            repres += "\tdetector orientation: {0}\n".format(self.placement.detector.orientation)        
+            repres += "angles: {0}...\n".format(self.angles[0:10])
+        else:
+            for ind in placement:
+                if self.geom_type == 'cone': 
+                    repres += "\tsource position: {0}\n".format(self.placement[ind].source.origin)
+                if self.geom_type == 'parallel':
+                    repres += "\tsource orientation: {0}\n".format(self.placement[ind].source.orientation)
+
+                repres += "\tdetector position: {0}\n".format(self.placement[ind].detector.origin)
+                repres += "\tdetector orientation: {0}\n".format(self.placement[ind].detector.orientation)    
         return repres
         
     def allocate(self, value=0, dimension_labels=None, **kwargs):
@@ -1971,9 +1888,30 @@ class VectorGeometry(object):
     
 if __name__ == "__main__":
     
-    
-    vg = VectorGeometry(10)    
-    b = vg.allocate('random_int')
+    num_proj = 360
+    ang_step = 360./num_proj
+    angles = []
+    for i in range(num_proj):
+        angles.append(ang_step * i)
+
+    ag = AcquisitionGeometry('cone',360,(100,200),(0.1,0.2),[0.,-100.,0.],None,[0.,100.,0.],[0.1,0.2,0.3], None, None,angles,1)
+    ag1 = AcquisitionGeometry('parallel',360,(100,200),(0.1,0.2),None,None,None,None, None, None,angles,1)
+    print(ag)
+    print(ag1)
+
+    ag2 = ag.clone()
+
+    ag3 = AcquisitionGeometry('cone',2,(100,200),(0.1,0.2),[[0.,-100.,0.,],[0.,-200.,0.,]],None,[[0.,100.,0.],[0.,200.,0.]],[[0.1,0.2,0.3],[0.1,0.2,0.3]], None, None,None,1)
+
+    #todo test allocate
+    ad = ag.allocate()
+
+    ag.num_positions = 10
+    print(ag)
+    print("fin")
+
+#    vg = VectorGeometry(10)    
+#    b = vg.allocate('random_int')
 
 #    ig = ImageGeometry(voxel_num_x=100, 
 #                    voxel_num_y=200, 

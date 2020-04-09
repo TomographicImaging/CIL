@@ -208,7 +208,7 @@ class TestFunctionL2NormSq(unittest.TestCase):
                                                 res2.as_array(), decimal=4)
         
                     
-    print("Checks for WeightedL2NormSquared")
+        print("Checks for WeightedL2NormSquared")
     
     from ccpi.framework import ImageGeometry
     from ccpi.optimisation.functions import TranslateFunction
@@ -276,7 +276,16 @@ class TestFunctionL2NormSq(unittest.TestCase):
     res2 = f2(x)
     numpy.testing.assert_almost_equal(res1, res2, decimal=4)
     
-    print("Call of WeightedL2NormSquared vs TranslateFunction is ... ok")   
+    print("Call of WeightedL2NormSquared vs TranslateFunction is ... ok") 
+    
+    f1 = WeightedL2NormSquared(b=b)
+    f2 = L2NormSquared(b=b)
+    
+    numpy.testing.assert_almost_equal(f1.L, f2.L, decimal=4)
+    numpy.testing.assert_almost_equal(f1.L, 2, decimal=4)
+    numpy.testing.assert_almost_equal(f2.L, 2, decimal=4)
+    
+    print("Check Lip constants ... ok")       
         
         
         

@@ -185,36 +185,35 @@ class L2NormSquared(Function):
 # otherwise we need to define for every function a weighted version
 # if we need it. However, for that we need to define a space for the functions __init__
                 
-from ccpi.optimisation.operators import DiagonalOperator
+
                 
 class WeightedL2NormSquared(Function):
+    
+    r""" WeightedL2NormSquared function: :math:`F(x) = \| x\|_{w}^{2}_{2} = \underset{i}{\sum}w_{i}*x_{i}^{2} = <x, w*x> = x^{T}*w*x`
+                                                                    
+    """                 
               
-   def __init__(self, **kwargs):
-                         
-    # Weight can be either a scalar or a DataContainer
-    
-    
-    # in order to compute the lispchitz constant L = 2 *||weight||
+    def __init__(self, **kwargs):
+        
+       # Weight can be either a scalar or a DataContainer
+       # Lispchitz constant L = 2 *||weight||         
+                   
+       self.weight = kwargs.get('weight', 1.0) 
+       self.b = kwargs.get('b', None) 
+       tmp_norm = 1.0  
+       self.tmp_space = self.weight*0. 
+                            
+       if isinstance(self.weight, DataContainer):
+           self.operator_weight = DiagonalOperator(self.weight) 
+           tmp_norm = self.operator_weight.norm() 
+           self.tmp_space = self.operator_weight.domain_geometry().allocate()  
+           
+           if (self.weight<0).any():
+               raise ValueError('Weigth contains negative values')             
 
-    self.weight = kwargs.get('weight', 1.0) 
-    self.b = kwargs.get('b', None) 
-#    tmp_norm = 1.0  
+       super(WeightedL2NormSquared, self).__init__(L = 2 * tmp_norm  ) 
     
-    # Need this to make it behave similarly as the L2NormSquared
-#    self.weight_sqrt = 1.0
-          
-    if isinstance(self.weight, DataContainer):
-        self.operator_weight = DiagonalOperator(self.weight) 
-        tmp_norm = self.operator_weight.norm() 
-#        self.weight_sqrt = self.weight.sqrt()
-#        if (self.weight<0).any():
-#            raise ValueError('Weigth contains negative values')
-    super(WeightedL2NormSquared, self).__init__(L = 2 * tmp_norm  ) 
-
-    self.tmp_space = self.operator_weight.domain_geometry().allocate()       
-    
-    
-   def __call__(self, x):
+    def __call__(self, x):
        
        self.operator_weight.direct(x, out = self.tmp_space)
        y = x.dot(self.tmp_space)
@@ -222,20 +221,10 @@ class WeightedL2NormSquared(Function):
        if self.b is not None:
            self.operator_weight.direct(x - self.b, out = self.tmp_space)
            y = (x - self.b).dot(self.tmp_space)
-       return y           
-           
-        # TODO is there dot method in SIRF
-            
-#        y = self.weight_sqrt * x
-#        if self.b is not None: 
-#            y = self.weight_sqrt * (x - self.b)
-#        try:
-#            return y.squared_norm()
-#        except AttributeError as ae:
-#            # added for compatibility with SIRF 
-#            return (y.norm()**2)        
+       return y
+     
                 
-   def gradient(self, x, out=None):        
+    def gradient(self, x, out=None):        
         
                 
         if out is not None:
@@ -243,8 +232,7 @@ class WeightedL2NormSquared(Function):
             out.fill(x)        
             if self.b is not None:
                 out -= self.b
-            self.operator_weight.direct(out, out=out)                
-#            out *= self.weight                
+            self.operator_weight.direct(out, out=out)                            
             out *= 2
             
         else:
@@ -254,7 +242,7 @@ class WeightedL2NormSquared(Function):
                 y = x - self.b
             return 2*self.weight*y
     
-   def convex_conjugate(self, x):
+    def convex_conjugate(self, x):
                       
         tmp = 0
         
@@ -263,7 +251,7 @@ class WeightedL2NormSquared(Function):
             
         return (1./4) * (x/self.weight.sqrt()).squared_norm() + tmp
     
-   def proximal(self, x, tau, out = None):
+    def proximal(self, x, tau, out = None):
                   
 
         if out is None:
@@ -285,8 +273,6 @@ class WeightedL2NormSquared(Function):
             else:
                 x.divide((1+2*tau*self.weight), out=out)
                 
-    #TODO add test for the proximal conjugate    
-
 
 if __name__ == '__main__':
     
@@ -359,6 +345,17 @@ if __name__ == '__main__':
     numpy.testing.assert_almost_equal(res1, res2, decimal=4)
     
     print("Call of WeightedL2NormSquared vs TranslateFunction is ... ok") 
+    
+    f1 = WeightedL2NormSquared(b=b)
+    f2 = L2NormSquared(b=b)
+    
+    numpy.testing.assert_almost_equal(f1.L, f2.L, decimal=4)
+    numpy.testing.assert_almost_equal(f1.L, 2, decimal=4)
+    numpy.testing.assert_almost_equal(f2.L, 2, decimal=4)
+    
+    print("Check Lip constants ... ok")     
+    
+    
     
     
     

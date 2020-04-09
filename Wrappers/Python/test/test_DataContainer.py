@@ -20,6 +20,7 @@ from __future__ import division
 import sys
 import unittest
 import numpy
+import numpy as np
 from ccpi.framework import DataContainer
 from ccpi.framework import ImageData
 from ccpi.framework import AcquisitionData
@@ -825,6 +826,41 @@ class TestDataContainer(unittest.TestCase):
         ds = - DataContainer(a, False, ['X', 'Y', 'Z'])
         
         numpy.testing.assert_array_equal(ds.as_array(), -a)
+
+    def test_divide_handle(self):
+        dtypes = [np.float32, np.float64, np.int32]
+
+        for dtype in dtypes:
+            print ("TEST ", dtype)
+            
+            a = np.asarray([0,-2,3,0], dtype=dtype)
+            b = np.asarray([-4,0,3,0], dtype=dtype)
+            ig = ImageGeometry(2,2)
+            dca = ig.allocate( None , dtype=dtype)
+            dca.fill(numpy.reshape(a, dca.shape))
+            dcb = ig.allocate( None , dtype=dtype)
+            dcb.fill(numpy.reshape(b, dcb.shape))
+            
+            if dtype == numpy.int32:
+                inf = numpy.iinfo(dtype).max +1
+            else:
+                inf = numpy.inf
+            
+            if dtype != numpy.int32:
+                sol = np.reshape(np.asarray([0,-inf,1,numpy.nan],dtype=dtype), dca.shape)
+                res = dca.divide(dcb)
+                numpy.testing.assert_array_almost_equal(res.as_array(), sol)
+                print (">>>>>>>> divide", res.as_array())
+
+            res = dca.divide(dcb, default_div_by_0=-10)
+            sol = np.reshape(np.asarray([0,-10,1,-10],dtype=dtype), dca.shape)
+            print (">>>>>>>> a/0",res.as_array())
+            numpy.testing.assert_array_almost_equal(res.as_array(), sol)        
+
+            sol = np.reshape(np.asarray([0,-inf,1,-15],dtype=dtype), dca.shape)
+            res = dca.divide(dcb, default_div_0by0=-15)
+            print (">>>>>>> 0/0", res.as_array())
+            numpy.testing.assert_array_almost_equal(res.as_array(), sol)
 
 
 

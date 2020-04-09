@@ -746,7 +746,7 @@ class DataContainer(object):
             return type(self)(self.array, 
                             dimension_labels=self.dimension_labels,
                             deep_copy=True,
-                            geometry=self.geometry,
+                            geometry=self.geometry.copy(),
                             suppress_warning=True )
         else:
             out = self.geometry.allocate(None)
@@ -871,7 +871,25 @@ class DataContainer(object):
         if hasattr(other, '__container_priority__') and \
            self.__class__.__container_priority__ < other.__class__.__container_priority__:
             return other.divide(self, *args, **kwargs)
-        return self.pixel_wise_binary(numpy.divide, other, *args, **kwargs)
+        if 'default_div_by_0'in kwargs.keys() or 'default_div_0by0' in kwargs.keys():
+            out = kwargs.get('out', None)
+            if out is None:
+                out = self * 0
+                must_return = True
+            else:
+                must_return = False
+            if 'default_div_by_0' in kwargs.keys():
+                default_value = kwargs.get('default_div_by_0', 0)
+                is_zero_by_zero = False
+            else:
+                default_value = kwargs.get('default_div_0by0', 0)
+                is_zero_by_zero = True
+            self.divide_handled(other, out, default_value, is_zero_by_zero, 
+                dtype = self.dtype, num_threads=kwargs.get('NUM_THREADS', NUM_THREADS))
+            if must_return:
+                return out
+        else:
+            return self.pixel_wise_binary(numpy.divide, other, *args, **kwargs)
     
     def power(self, other, *args, **kwargs):
         return self.pixel_wise_binary(numpy.power, other, *args, **kwargs)    
@@ -949,6 +967,91 @@ class DataContainer(object):
         if f(x_p, y_p, out_p, a, b, ndx.size, num_threads) != 0:
             raise RuntimeError('axpby execution failed')
         
+    def divide_handled(self, y, out, default_value, is_0by0=False, dtype=numpy.float32, num_threads=NUM_THREADS):
+        '''performs division with cilacc C library
+        
+        Does the operation .. math:: a*x+b*y and stores the result in out, where x is self
+
+        :param a: scalar
+        :type a: float
+        :param b: scalar
+        :type b: floatx 
+        :param y: DataContainer
+        :param out: DataContainer instance to store the result
+        :param dtype: data type of the DataContainers
+        :type dtype: numpy type, optional, default numpy.float32
+        :param num_threads: number of threads to run on
+        :type num_threads: int, optional, default 1/2 CPU of the system
+        '''
+
+        c_float_p = ctypes.POINTER(ctypes.c_float)
+        c_double_p = ctypes.POINTER(ctypes.c_double)
+        c_int_p = ctypes.POINTER(ctypes.c_int)
+        # get the reference to the data
+        ndx = self.as_array()
+        ndy = y.as_array()
+        ndout = out.as_array()
+        
+        if is_0by0:
+            zero_by_zero = numpy.int(1)
+        else:
+            zero_by_zero = numpy.int(0)
+
+        if ndx.dtype != dtype:
+            ndx = ndx.astype(dtype)
+        if ndy.dtype != dtype:
+            ndy = ndy.astype(dtype)
+        
+        if dtype == numpy.float32:
+            x_p = ndx.ctypes.data_as(c_float_p)
+            y_p = ndy.ctypes.data_as(c_float_p)
+            out_p = ndout.ctypes.data_as(c_float_p)
+            default_value = numpy.float32(default_value)
+            f = cilacc.fdivide
+
+        elif dtype == numpy.float64:
+            default_value = numpy.float64(default_value)
+            x_p = ndx.ctypes.data_as(c_double_p)
+            y_p = ndy.ctypes.data_as(c_double_p)
+            out_p = ndout.ctypes.data_as(c_double_p)
+            f = cilacc.ddivide
+        elif dtype == numpy.int32:
+            default_value = numpy.int(default_value)
+            x_p = ndx.ctypes.data_as(c_int_p)
+            y_p = ndy.ctypes.data_as(c_int_p)
+            out_p = ndout.ctypes.data_as(c_int_p)
+            f = cilacc.idivide
+        else:
+            raise TypeError('Unsupported type {}. Expecting numpy.float32 or numpy.float64 or numpy.int32'.format(dtype))
+
+        #out = numpy.empty_like(a)
+
+        
+        # int psaxpby(float * x, float * y, float * out, float a, float b, long size)
+        cilacc.fdivide.argtypes = [ctypes.POINTER(ctypes.c_float),  # pointer to the first array 
+                                    ctypes.POINTER(ctypes.c_float),  # pointer to the second array 
+                                    ctypes.POINTER(ctypes.c_float),  # pointer to the third array 
+                                    ctypes.c_float,                  # type of default value
+                                    ctypes.c_int,                  # type of is_zero_by_zero (int)
+                                    ctypes.c_long,                   # type of size of first array 
+                                    ctypes.c_int]                    # number of threads
+        cilacc.ddivide.argtypes = [ctypes.POINTER(ctypes.c_double),  # pointer to the first array 
+                                    ctypes.POINTER(ctypes.c_double),  # pointer to the second array 
+                                    ctypes.POINTER(ctypes.c_double),  # pointer to the third array 
+                                    ctypes.c_double,                  # type of default value
+                                    ctypes.c_int,                  # type of is_zero_by_zero (int)
+                                    ctypes.c_long,                   # type of size of first array 
+                                    ctypes.c_int]                    # number of threads
+        cilacc.idivide.argtypes = [ctypes.POINTER(ctypes.c_int),  # pointer to the first array 
+                                    ctypes.POINTER(ctypes.c_int),  # pointer to the second array 
+                                    ctypes.POINTER(ctypes.c_int),  # pointer to the third array 
+                                    ctypes.c_int,                  # type of default value
+                                    ctypes.c_int,                  # type of is_zero_by_zero (int)
+                                    ctypes.c_long,                   # type of size of first array 
+                                    ctypes.c_int]                    # number of threads
+
+        if f(x_p, y_p, out_p, default_value, zero_by_zero, ndx.size, num_threads) != 0:
+            raise RuntimeError('axpby execution failed')
 
     ## unary operations
     def pixel_wise_unary(self, pwop, *args,  **kwargs):

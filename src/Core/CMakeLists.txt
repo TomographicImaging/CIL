@@ -20,9 +20,11 @@ message("CMAKE_STATIC_LINKER_FLAGS ${CMAKE_STATIC_LINKER_FLAGS}")
 find_package(PythonInterp REQUIRED)
 find_package(PythonLibs REQUIRED)
 # NPY_INCLUDES is passed 
-# can be defined with 
-# python -c "import numpy; print (numpy.get_include())"
-
+execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import numpy; import sys; sys.stdout.write(numpy.get_include())" OUTPUT_VARIABLE NPY_INCLUDE)
+message (STATUS "Numpy include directory: ${NPY_INCLUDE}")
+# set cached variable
+set (NPY_INCLUDES ${NPY_INCLUDE} CACHE PATH "Location of numpy includes" FORCE)
+message (STATUS "Numpy include directory: ${NPY_INCLUDES}")
 
 add_library(cilacc SHARED ${CMAKE_CURRENT_SOURCE_DIR}/utilities.c
                           ${CMAKE_CURRENT_SOURCE_DIR}/FiniteDifferenceLibrary.c

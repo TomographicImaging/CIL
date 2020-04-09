@@ -1,12 +1,9 @@
 #include "divide.h"
 
-
 DLL_EXPORT int fdivide(float * x, float * y, float * out, float default_value, int is_zero_by_zero, long size, int nThreads){
     long i = 0;
-
     int nThreads_initial;
 	threads_setup(nThreads, &nThreads_initial);
-
 #pragma omp parallel
 {
 #pragma omp for
@@ -20,7 +17,12 @@ DLL_EXPORT int fdivide(float * x, float * y, float * out, float default_value, i
                 if ( * ( x + i ) == 0. ) {
                     * (out + i) = default_value;
                 } else {
-                    * (out + i) = NPY_INFINITYF;
+                    if (*( x + i) < (float)0.0){
+                        * (out + i) = - NPY_INFINITYF ;
+                    } else {
+                        * (out + i) = NPY_INFINITYF ;
+                    }
+                    //* (out + i) = NPY_INFINITYF;
                 }
             }
         }
@@ -36,7 +38,6 @@ DLL_EXPORT int fdivide(float * x, float * y, float * out, float default_value, i
 
 DLL_EXPORT int ddivide(double * x, double * y, double * out, double default_value, int is_zero_by_zero, long size, int nThreads){
     long i = 0;
-
     int nThreads_initial;
 	threads_setup(nThreads, &nThreads_initial);
 
@@ -53,7 +54,11 @@ DLL_EXPORT int ddivide(double * x, double * y, double * out, double default_valu
                 if ( * ( x + i ) == 0. ) {
                     * (out + i) = default_value;
                 } else {
-                    * (out + i) = NPY_INFINITY ;
+                    if (*( x + i) < (double)0.0){
+                        * (out + i) = - NPY_INFINITY;
+                    } else {
+                        * (out + i) = NPY_INFINITY;
+                    }
                 }
             }
         }
@@ -70,7 +75,6 @@ DLL_EXPORT int ddivide(double * x, double * y, double * out, double default_valu
 
 DLL_EXPORT int idivide(int * x, int * y, int * out, int default_value, int is_zero_by_zero, long size, int nThreads){
     long i = 0;
-
     int nThreads_initial;
 	threads_setup(nThreads, &nThreads_initial);
 
@@ -87,7 +91,11 @@ DLL_EXPORT int idivide(int * x, int * y, int * out, int default_value, int is_ze
                 if ( * ( x + i ) == 0. ) {
                     * (out + i) = default_value;
                 } else {
-                    * (out + i) = NPY_INFINITYL ;
+                    if (*( x + i) < 0){
+                        * (out + i) = - NPY_INFINITYL ;
+                    } else {
+                        * (out + i) = NPY_INFINITYL ;
+                    }
                 }
             }
         }

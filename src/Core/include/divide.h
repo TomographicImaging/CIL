@@ -5,7 +5,7 @@
 #include "dll_export.h"
 #include "utilities.h"
 #include "Python.h"
-#include "npy_math.h"
+#include "numpy/npy_math.h"
 
 
 DLL_EXPORT int fdivide(float * x, float * y, float * out, float default_value, int is_zero_by_zero, long size, int nThreads);

@@ -122,11 +122,8 @@ class MixedL21Norm(Function):
                 el.fill(elarray)  
 
             out.fill(out)              
-            
-            
-        
-# TODO, add the prox conjugate in the documenataion and then delete the code below
-            
+                    
+# TODO, add the prox conjugate in the documenataion and then delete the code below            
 ##############################################################################
 ##############################################################################
 #    def proximal_conjugate(self, x, tau, out=None): 

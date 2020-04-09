@@ -167,12 +167,12 @@ class PDHG(Algorithm):
     @property
     def objective(self):
         '''alias of loss'''
-        return list(map(lambda x: x[0], self.loss))
+        return [x[0] for x in self.loss]
 
     @property
     def dual_objective(self):
-        return list(map(lambda x: x[1], self.loss))
+        return [x[1] for x in self.loss]
     
     @property
     def primal_dual_gap(self):
-        return list(map(lambda x: x[2], self.loss))
+        return [x[2] for x in self.loss]

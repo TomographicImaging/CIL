@@ -86,7 +86,7 @@ class TestFunction(unittest.TestCase):
         self.assertTrue(res)
     def test_Function(self):
     
-        numpy.random.seed(1)
+        numpy.random.seed(10)
         N = 3
         ig = ImageGeometry(N,N)
         ag = ig       
@@ -322,7 +322,7 @@ class TestFunction(unittest.TestCase):
         print('Check call with Identity operator... OK\n')
         operator = 3 * Identity(ig)
             
-        u = ig.allocate('random_int', seed = 50)
+        u = ig.allocate('random', seed = 50)
         
         func1 = FunctionOperatorComposition(0.5 * L2NormSquared(b = b), operator)
         func2 = LeastSquares(operator, b, 0.5)
@@ -346,15 +346,15 @@ class TestFunction(unittest.TestCase):
         mat = np.random.randn(M, N)
         operator = LinearOperatorMatrix(mat)   
         vg = VectorGeometry(N)
-        b = vg.allocate('random_int')    
-        u = vg.allocate('random_int')
+        b = vg.allocate('random')    
+        u = vg.allocate('random')
           
         func1 = FunctionOperatorComposition(0.5 * L2NormSquared(b = b), operator)
         func2 = LeastSquares(operator, b, 0.5)
          
-        self.assertNumpyArrayAlmostEqual(func1(u), func2(u))   
+        self.assertNumpyArrayAlmostEqual(func1(u), func2(u))       
+        numpy.testing.assert_almost_equal(func1.L, func2.L) 
         
-        self.assertNumpyArrayAlmostEqual(func1.L, func2.L)
             
     def test_mixedL12Norm(self):
         numpy.random.seed(1)
@@ -479,3 +479,4 @@ if __name__ == '__main__':
     
     d = TestFunction()
     d.test_KullbackLeibler()
+    d.test_Norm2sq_as_FunctionOperatorComposition()

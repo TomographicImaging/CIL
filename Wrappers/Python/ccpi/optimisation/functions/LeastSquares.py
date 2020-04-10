@@ -25,8 +25,9 @@ from ccpi.optimisation.operators import LinearOperator
 from ccpi.optimisation.functions import Function
 import warnings
 
-# Define a class for squared 2-norm
+
 class LeastSquares(Function):
+    
     r"""Least Squares function
     
     .. math:: F(x) = c\|Ax-b\|_2^2
@@ -46,29 +47,37 @@ class LeastSquares(Function):
     
     """
     
-    def __init__(self, A, b, c=1.0):
+    def __init__(self, A, b, c=1.0, **kwargs):
+        
         super(LeastSquares, self).__init__()
     
         self.A = A  # Should be an operator, default identity
         self.b = b  # Default zero DataSet?
         self.c = c  # Default 1.
         self.range_tmp = A.range_geometry().allocate()
-
-        # Compute the Lipschitz parameter from the operator if possible
-        # Leave it initialised to None otherwise
-        try:
-            self.L = 2.0*self.c*(self.A.norm()**2)
-        except AttributeError as ae:
-            if self.A.is_linear():
-                Anorm = LinearOperator.PowerMethod(self.A, 10)[0]
-                self.L = 2.0 * self.c * (Anorm*Anorm)
-            else:
-                warnings.warn('{} could not calculate Lipschitz Constant. {}'.format(
-                self.__class__.__name__, ae))
+        
+        # Lipschitz constant is set to None. This will allow the user to fix his 
+        # own value without computing A.norm in extreme cases        
+        self.L = kwargs.get('L', None)
+        
+        if self.L is None:
             
-        except NotImplementedError as noe:
-            warnings.warn('{} could not calculate Lipschitz Constant. {}'.format(
-                self.__class__.__name__, noe))
+            # Compute the Lipschitz parameter from the operator if possible
+            # Leave it initialised to None otherwise
+            try:
+                self.L = 2.0*self.c*(self.A.norm()**2)
+            except AttributeError as ae:
+                if self.A.is_linear():
+                    Anorm = LinearOperator.PowerMethod(self.A, 10)[0]
+                    self.L = 2.0 * self.c * (Anorm * Anorm)
+                else:
+                    warnings.warn('{} could not calculate Lipschitz Constant. {}'.format(
+                    self.__class__.__name__, ae))
+                
+            except NotImplementedError as noe:
+                warnings.warn('{} could not calculate Lipschitz Constant. {}'.format(
+                    self.__class__.__name__, noe))
+                
         
     def __call__(self, x):
         
@@ -78,8 +87,6 @@ class LeastSquares(Function):
         y = self.A.direct(x)
         y.subtract(self.b, out=y)
         try:
-#            if self.c == 1:
-#                return y.squared_norm()
             return y.squared_norm() * self.c
         except AttributeError as ae:
             # added for compatibility with SIRF
@@ -98,15 +105,28 @@ class LeastSquares(Function):
         """
         
         if out is not None:
-            #return 2.0*self.c*self.A.adjoint( self.A.direct(x) - self.b )
             self.A.direct(x, out=self.range_tmp)
             self.range_tmp.subtract(self.b , out=self.range_tmp)
             self.A.adjoint(self.range_tmp, out=out)
-            #self.direct_placehold.multiply(2.0*self.c, out=out)
             out.multiply (self.c * 2.0, out=out)
         else:
             return (2.0*self.c)*self.A.adjoint(self.A.direct(x) - self.b)
         
+        
+if __name__ == "__main__":
+
+    from ccpi.framework import ImageGeometry
+    from ccpi.optimisation.operators import Identity
+
+    ig = ImageGeometry(4,5)
+    x = ig.allocate('random')
+    print(x<0.5)
+    
+    Id = Identity(ig)
+    b = ig.allocate('random')
+    
+    f = LeastSquares(Id, b)
+    print(f.L)
 
     
     

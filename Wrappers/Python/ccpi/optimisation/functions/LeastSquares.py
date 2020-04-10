@@ -113,21 +113,6 @@ class LeastSquares(Function):
             return (2.0*self.c)*self.A.adjoint(self.A.direct(x) - self.b)
         
         
-if __name__ == "__main__":
 
-    from ccpi.framework import ImageGeometry
-    from ccpi.optimisation.operators import Identity
-
-    ig = ImageGeometry(4,5)
-    x = ig.allocate('random')
-    print(x<0.5)
-    
-    Id = Identity(ig)
-    b = ig.allocate('random')
-    
-    f = LeastSquares(Id, b)
-    print(f.L)
-
-    
     
     

@@ -25,7 +25,7 @@ from ccpi.optimisation.operators import Identity, LinearOperatorMatrix, BlockOpe
 from ccpi.optimisation.functions import Function, KullbackLeibler
 from ccpi.optimisation.operators import Gradient
 
-from ccpi.optimisation.functions import Function, KullbackLeibler, L2NormSquared,\
+from ccpi.optimisation.functions import Function, KullbackLeibler, WeightedL2NormSquared, L2NormSquared,\
                                          L1Norm, MixedL21Norm, LeastSquares, \
                                          ZeroFunction, FunctionOperatorComposition,\
                                          Rosenbrock, IndicatorBox

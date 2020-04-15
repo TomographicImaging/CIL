@@ -20,7 +20,6 @@ from __future__ import division
 from __future__ import print_function
 
 from ccpi.framework import AcquisitionData, AcquisitionGeometry
-import numpy as np
 import numpy
 import os
 
@@ -31,16 +30,15 @@ try:
 except:
     pilAvailable = False
     
-
+        
 class NikonDataReader(object):
-
     
     def __init__(self, 
                  **kwargs):
         '''
         Constructor
         
-        Inumpyut:
+        Input:
             
             xtek_file       full path to .xtexct file
             
@@ -78,7 +76,6 @@ class NikonDataReader(object):
                         normalize = self.normalize,
                         flip = self.flip)
             
-    
     def set_up(self, 
                xtek_file = None, 
                roi = -1, 
@@ -170,9 +167,9 @@ class NikonDataReader(object):
         Parse the angles file .ang or _ctdata.txt file and returns the angles
         as an numpy array. 
         '''
-        inumpyut_path = os.path.dirname(self.xtek_file)
-        angles_ctdata_file = os.path.join(inumpyut_path, '_ctdata.txt')
-        angles_named_file = os.path.join(inumpyut_path, self._experiment_name+'.ang')
+        input_path = os.path.dirname(self.xtek_file)
+        angles_ctdata_file = os.path.join(input_path, '_ctdata.txt')
+        angles_named_file = os.path.join(input_path, self._experiment_name+'.ang')
         angles = numpy.zeros(num_projections, dtype = 'float')
         
         # look for _ctdata.txt
@@ -206,7 +203,17 @@ class NikonDataReader(object):
                 angles.append(initial_angle + angular_step * i)
         
         # fill in metadata
-        self._ag = AcquisitionGeometry(geom_type='cone', num_pixels=(pixel_num_v, pixel_num_h), pixel_size=(pixel_size_v, pixel_size_h), num_positions=num_projections, source_dof=-source_x, detector_origin=detector_x - source_x, angles=angles)
+        self._ag = AcquisitionGeometry(geom_type = 'cone', 
+                                       dimension = '3D', 
+                                       angles = angles, 
+                                       pixel_num_h = pixel_num_h, 
+                                       pixel_size_h = pixel_size_h, 
+                                       pixel_num_v = pixel_num_v, 
+                                       pixel_size_v = pixel_size_v, 
+                                       dist_source_center = source_x, 
+                                       dist_center_detector = detector_x - source_x, 
+                                       channels = 1,
+                                       angle_unit = 'degree')
 
     def get_geometry(self):
         
@@ -229,7 +236,7 @@ class NikonDataReader(object):
         num_projections = numpy.shape(self._ag.angles)[0]
         
         # allocate array to store projections    
-        data = numpy.zeros((num_projections, self._ag.num_pixels[0], self._ag.num_pixels[1]), dtype = float)
+        data = numpy.zeros((num_projections, self._ag.pixel_num_v, self._ag.pixel_num_h), dtype = float)
         
         for i in range(num_projections):
             
@@ -244,8 +251,8 @@ class NikonDataReader(object):
             if (self.binning == [1, 1]):
                 data[i, :, :] = tmp[self._roi_par[0][0]:self._roi_par[0][1], self._roi_par[1][0]:self._roi_par[1][1]]
             else:
-                shape = (self._ag.num_pixels[0], self.binning[0], 
-                         self._ag.num_pixels[1], self.binning[1])
+                shape = (self._ag.pixel_num_v, self.binning[0], 
+                         self._ag.pixel_num_h, self.binning[1])
                 data[i, :, :] = tmp[self._roi_par[0][0]:(self._roi_par[0][0] + (((self._roi_par[0][1] - self._roi_par[0][0]) // self.binning[0]) * self.binning[0])), \
                                     self._roi_par[1][0]:(self._roi_par[1][0] + (((self._roi_par[1][1] - self._roi_par[1][0]) // self.binning[1]) * self.binning[1]))].reshape(shape).mean(-1).mean(1)
         

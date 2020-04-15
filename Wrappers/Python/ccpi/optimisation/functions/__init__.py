@@ -24,6 +24,7 @@ from .L1Norm import L1Norm
 from .L2NormSquared import L2NormSquared
 from .L2NormSquared import WeightedL2NormSquared
 from .LeastSquares import LeastSquares
+from .LeastSquares import WeightedLeastSquares
 from .BlockFunction import BlockFunction
 from .FunctionOperatorComposition import FunctionOperatorComposition
 from .MixedL21Norm import MixedL21Norm

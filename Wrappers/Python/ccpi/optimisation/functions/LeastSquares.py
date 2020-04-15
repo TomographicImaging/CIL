@@ -21,7 +21,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from ccpi.optimisation.operators import LinearOperator
+from ccpi.optimisation.operators import LinearOperator, DiagonalOperator
 from ccpi.optimisation.functions import Function
 from ccpi.framework import DataContainer
 import warnings

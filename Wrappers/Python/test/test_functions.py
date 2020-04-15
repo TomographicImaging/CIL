@@ -29,7 +29,8 @@ from ccpi.optimisation.functions import Function, KullbackLeibler, WeightedL2Nor
                                          L1Norm, MixedL21Norm, LeastSquares, \
                                          ZeroFunction, FunctionOperatorComposition,\
                                          Rosenbrock, IndicatorBox
-
+from ccpi.optimisation.functions import WeightedLeastSquares                                         
+from ccpi.optimisation.operators import DiagonalOperator
 import unittest
 import numpy
 import scipy.special
@@ -690,7 +691,61 @@ class TestFunction(unittest.TestCase):
         numpy.testing.assert_almost_equal(f1.L, 2, decimal=4)
         numpy.testing.assert_almost_equal(f2.L, 2, decimal=4)
         
-        print("Check Lip constants ... ok")           
+        print("Check Lip constants ... ok")          
+        
+
+
+    def tests_for_LS_weightedLS(self):
+                        
+        ig = ImageGeometry(40,30)
+        
+        A = Identity(ig)
+        b = ig.allocate('random')
+        x = ig.allocate('random')
+        c = 0.3
+        
+        weight = ig.allocate('random') 
+        
+        D = DiagonalOperator(weight)
+        norm_weight = D.norm()
+        
+        f1 = WeightedLeastSquares(A, b, c, weight) 
+        f2 = WeightedLeastSquares(A, b, c)
+        
+        print("Check LS vs wLS")        
+        
+        # check Lipshitz    
+        numpy.testing.assert_almost_equal(f2.L, 2 * c * A.norm()**2)   
+        numpy.testing.assert_almost_equal(f1.L, 2 * c * norm_weight * A.norm()**2) 
+        print("Lipschitz is ... OK")
+            
+        # check call with weight    
+               
+        res1 = c * (A.direct(x)-b).dot(weight * (A.direct(x) - b))
+        res2 = f1(x)    
+        numpy.testing.assert_almost_equal(res1, res2)
+        print("Call is ... OK")        
+        
+        # check call without weight   
+               
+        res1 = c * (A.direct(x)-b).dot((A.direct(x) - b))
+        res2 = f2(x)    
+        numpy.testing.assert_almost_equal(res1, res2) 
+        print("Call without weight is ... OK")        
+        
+        # check gradient with weight     
+        
+        res1 = f1.gradient(x)
+        res2 = 2 * c * weight * (A.direct(x)-b).power(2)
+        numpy.testing.assert_array_almost_equal(res1.as_array(), res2.as_array())
+        print("Gradient is ... OK")          
+        
+        # check gradient without weight     
+        
+        res1 = f2.gradient(x)
+        res2 = 2 * c * (A.direct(x)-b).power(2)
+        numpy.testing.assert_array_almost_equal(res1.as_array(), res2.as_array()) 
+        print("Gradient without weight is ... OK")            
 
 if __name__ == '__main__':
     
@@ -698,3 +753,4 @@ if __name__ == '__main__':
     d.test_KullbackLeibler()
     d.test_Norm2sq_as_FunctionOperatorComposition()
     d.tests_for_L2NormSq_and_weighted()
+    d.tests_for_LS_weightedLS()

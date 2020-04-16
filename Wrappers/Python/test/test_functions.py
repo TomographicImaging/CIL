@@ -21,16 +21,15 @@ import numpy as np
 
 from ccpi.framework import DataContainer, ImageGeometry, \
     VectorGeometry, VectorData, BlockDataContainer
-from ccpi.optimisation.operators import Identity, LinearOperatorMatrix, BlockOperator
+from ccpi.optimisation.operators import Identity, LinearOperatorMatrix, DiagonalOperator, BlockOperator
 from ccpi.optimisation.functions import Function, KullbackLeibler
 from ccpi.optimisation.operators import Gradient
 
 from ccpi.optimisation.functions import Function, KullbackLeibler, WeightedL2NormSquared, L2NormSquared,\
                                          L1Norm, MixedL21Norm, LeastSquares, \
                                          ZeroFunction, FunctionOperatorComposition,\
-                                         Rosenbrock, IndicatorBox
-from ccpi.optimisation.functions import WeightedLeastSquares                                         
-from ccpi.optimisation.operators import DiagonalOperator
+                                         Rosenbrock, IndicatorBox                                     
+
 import unittest
 import numpy
 import scipy.special
@@ -343,8 +342,9 @@ class TestFunction(unittest.TestCase):
         func1.gradient(u, out = tmp1)
         func2.gradient(u, out = tmp2)
             
-        self.assertNumpyArrayAlmostEqual(tmp1.as_array(), tmp2.as_array())
         self.assertNumpyArrayAlmostEqual(res_gradient1.as_array(), res_gradient2.as_array())
+        self.assertNumpyArrayAlmostEqual(tmp1.as_array(), tmp2.as_array())
+       
         
         print('Check call with LinearOperatorMatrix... OK\n')  
         mat = np.random.randn(M, N)
@@ -709,8 +709,8 @@ class TestFunction(unittest.TestCase):
         D = DiagonalOperator(weight)
         norm_weight = D.norm()
         
-        f1 = WeightedLeastSquares(A, b, c, weight) 
-        f2 = WeightedLeastSquares(A, b, c)
+        f1 = LeastSquares(A, b, c, weight) 
+        f2 = LeastSquares(A, b, c)
         
         print("Check LS vs wLS")        
         
@@ -719,38 +719,71 @@ class TestFunction(unittest.TestCase):
         numpy.testing.assert_almost_equal(f1.L, 2 * c * norm_weight * A.norm()**2) 
         print("Lipschitz is ... OK")
             
-        # check call with weight    
-               
+        # check call with weight                   
         res1 = c * (A.direct(x)-b).dot(weight * (A.direct(x) - b))
         res2 = f1(x)    
         numpy.testing.assert_almost_equal(res1, res2)
         print("Call is ... OK")        
         
-        # check call without weight   
-               
+        # check call without weight                  
         res1 = c * (A.direct(x)-b).dot((A.direct(x) - b))
         res2 = f2(x)    
         numpy.testing.assert_almost_equal(res1, res2) 
         print("Call without weight is ... OK")        
         
-        # check gradient with weight     
-        
+        # check gradient with weight             
+        out = ig.allocate()
         res1 = f1.gradient(x)
-        res2 = 2 * c * weight * (A.direct(x)-b).power(2)
+        f1.gradient(x, out = out)
+        res2 = 2 * c * A.adjoint(weight*(A.direct(x)-b))
         numpy.testing.assert_array_almost_equal(res1.as_array(), res2.as_array())
+        numpy.testing.assert_array_almost_equal(out.as_array(), res2.as_array())
         print("Gradient is ... OK")          
         
-        # check gradient without weight     
-        
+        # check gradient without weight             
+        out = ig.allocate()
         res1 = f2.gradient(x)
-        res2 = 2 * c * (A.direct(x)-b).power(2)
-        numpy.testing.assert_array_almost_equal(res1.as_array(), res2.as_array()) 
-        print("Gradient without weight is ... OK")            
+        f2.gradient(x, out = out)
+        res2 = 2*c*A.adjoint(A.direct(x)-b)
+        numpy.testing.assert_array_almost_equal(res1.as_array(), res2.as_array())
+        numpy.testing.assert_array_almost_equal(out.as_array(), res2.as_array())
+        
+        print("Gradient without weight is ... OK")   
+
+
+        print("Compare Least Squares with DiagonalOperator + CompositionOperator")
+        
+        ig2 = ImageGeometry(100,100,100)
+        A = Identity(ig2)
+        b = ig2.allocate('random')
+        x = ig2.allocate('random')
+        c = 0.3
+        
+        weight = ig2.allocate('random')     
+        
+        weight_operator = DiagonalOperator(weight.sqrt())
+        tmp_A = CompositionOperator(weight_operator, A)
+        tmp_b = weight_operator.direct(b)
+    
+        f1 = LeastSquares(tmp_A, tmp_b, c)    
+        f2 = LeastSquares(A, b, c, weight)
+        
+        t0 = timer()
+        res1 = f1(x)
+        t1 = timer()
+        print("Time with Composition+Diagonal is {}".format(t1-t0))
+        
+        t2 = timer()
+        res2 = f2(x)
+        t3 = timer()
+        print("Time with LS + weight is {}".format(t3-t2))
+        
+        numpy.testing.assert_almost_equal(res1, res2, decimal=2)          
 
 if __name__ == '__main__':
     
     d = TestFunction()
     d.test_KullbackLeibler()
-    d.test_Norm2sq_as_FunctionOperatorComposition()
     d.tests_for_L2NormSq_and_weighted()
     d.tests_for_LS_weightedLS()
+    d.test_Norm2sq_as_FunctionOperatorComposition()    

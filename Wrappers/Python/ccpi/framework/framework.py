@@ -798,14 +798,15 @@ class DataContainer(object):
         out = kwargs.get('out', None)
         
         if out is None:
-            if isinstance(x2, (int, float, complex)):
-                out = pwop(self.as_array() , x2 , *args, **kwargs )
-            elif isinstance(x2, (numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64,\
+            if isinstance(x2, (int, float, complex, \
+                                 numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64,\
                                  numpy.float, numpy.float16, numpy.float32, numpy.float64, \
                                  numpy.complex)):
                 out = pwop(self.as_array() , x2 , *args, **kwargs )
             elif issubclass(type(x2) , DataContainer):
                 out = pwop(self.as_array() , x2.as_array() , *args, **kwargs )
+            else:
+                raise TypeError('Expected x2 type as number of DataContainer, got {}'.format(type(x2)))
             geom = self.geometry
             if geom is not None:
                 geom = self.geometry.copy()

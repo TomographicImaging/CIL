@@ -809,3 +809,36 @@ class TestOutParameter(BDCUnittest):
         cp1 = cp0.abs()
         res = BlockDataContainer(self.ig0.allocate(1), self.ig1.allocate(1))
         self.assertBlockDataContainerAlmostEqual(res, cp1)
+
+    def test_BlockDataContainer_divide(self):
+        print ("test block data container")
+        ig0 = ImageGeometry(2,3,4)
+        ig1 = ImageGeometry(2,3,5)
+        
+        # data0 = ImageData(geometry=ig0)
+        # data1 = ImageData(geometry=ig1) + 1
+        data0 = ig0.allocate(0.)
+        data1 = ig1.allocate(1.)
+    
+        # data2 = ImageData(geometry=ig0) + 2
+        # data3 = ImageData(geometry=ig1) + 3
+        data2 = ig0.allocate(2.)
+        data3 = ig1.allocate(3.)
+
+        cp0 = BlockDataContainer(data0,data1)
+        cp1 = BlockDataContainer(data2,data3)
+
+        res = cp1.divide(cp0)
+        nump = numpy.empty_like(res.get_item(0))
+        #numpy.testing.assert_array_equal(res.get_item(0), , ))
+        numpy.testing.assert_equal(res.get_item(0).as_array()[0][0][0], numpy.inf)
+        numpy.testing.assert_almost_equal(res.get_item(1).as_array()[0][0][0], 3)
+
+        res = cp1.divide(cp0, default_div_by_0=-11)
+        numpy.testing.assert_equal(res.get_item(0).as_array()[0][0][0], -11)
+        numpy.testing.assert_almost_equal(res.get_item(1).as_array()[0][0][0], 3)
+        
+        res = cp0.divide(cp0, default_div_0by0=-12)
+        numpy.testing.assert_equal(res.get_item(0).as_array()[0][0][0], -12)
+        numpy.testing.assert_almost_equal(res.get_item(1).as_array()[0][0][0], 1)
+

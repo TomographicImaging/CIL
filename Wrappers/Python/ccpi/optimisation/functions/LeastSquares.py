@@ -29,6 +29,7 @@ import warnings
 
 class LeastSquares(Function):
     
+    
     r""" (Weighted) Least Squares function
     
     .. math:: F(x) = c\|Ax-b\|_2^2 

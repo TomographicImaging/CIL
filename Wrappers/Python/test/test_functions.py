@@ -21,7 +21,7 @@ import numpy as np
 
 from ccpi.framework import DataContainer, ImageGeometry, \
     VectorGeometry, VectorData, BlockDataContainer
-from ccpi.optimisation.operators import Identity, LinearOperatorMatrix, DiagonalOperator, BlockOperator
+from ccpi.optimisation.operators import Identity, LinearOperatorMatrix, CompositionOperator, DiagonalOperator, BlockOperator
 from ccpi.optimisation.functions import Function, KullbackLeibler
 from ccpi.optimisation.operators import Gradient
 
@@ -36,6 +36,7 @@ import scipy.special
 
 from ccpi.framework import ImageGeometry
 from ccpi.optimisation.functions import TranslateFunction
+from timeit import default_timer as timer
 
 
                     

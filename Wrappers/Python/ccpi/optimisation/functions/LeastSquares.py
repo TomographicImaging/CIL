@@ -29,9 +29,13 @@ import warnings
 
 class LeastSquares(Function):
     
-    r"""Least Squares function
+    r""" (Weighted) Least Squares function
     
-    .. math:: F(x) = c\|Ax-b\|_2^2
+    .. math:: F(x) = c\|Ax-b\|_2^2 
+    
+    or
+    
+    .. math:: F(x) = c\|Ax-b\|_{2,W}^{2}
     
     Parameters:
         
@@ -40,11 +44,17 @@ class LeastSquares(Function):
         c : Scaling Constant
         
         b : Data
+        
+        weight: 1.0 (Default) or DataContainer
+        
+    Members:        
             
-    L : Lipshitz Constant of the gradient of :math:`F` which is :math:`2c||A||_2^2 = 2s1(A)^2`,
+        L : Lipshitz Constant of the gradient of :math:`F` which is :math:`2 c ||A||_2^2 = 2 c s1(A)^2`, or
+        
+        L : Lipshitz Constant of the gradient of :math:`F` which is :math:`2 c ||weight|| ||A||_2^2 = 2s1(A)^2`,
     
     where s1(A) is the largest singular value of A.
-        
+       
     
     """
     
@@ -88,7 +98,8 @@ class LeastSquares(Function):
         
     def __call__(self, x):
         
-        r""" Returns the value of :math:`F(x) = c\|Ax-b\|_2^2`
+        r""" Returns the value of :math:`F(x) = c\|Ax-b\|_2^2` or c\|Ax-b\|_{2,weight}^2
+                        
         """
         
         self.A.direct(x, out = self.tmp_space)
@@ -118,6 +129,8 @@ class LeastSquares(Function):
         r""" Returns the value of the gradient of :math:`F(x) = c*\|A*x-b\|_2^2`
         
              .. math:: F'(x) = 2cA^T(Ax-b)
+             
+             .. math:: F'(x) = 2cA^T(weight(Ax-b))
 
         """
         

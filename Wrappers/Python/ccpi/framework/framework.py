@@ -259,9 +259,6 @@ class PositionOrientation(object):
 
     @orientation.setter
     def orientation(self, val):
-
-        dof = 3 if self.dimension_temp == 3 else 1
-
         if val is None:
             self.__orientation = val
         else:
@@ -270,52 +267,39 @@ class PositionOrientation(object):
             except:
                 raise ValueError("can't convert to numpy array")
    
-            if val.shape[0] == self.dimension_temp:
+            if val.shape[0] == 3:
                 self.__orientation = val
             else:
-                raise ValueError('orientation expects a container of floats of length {0}. Got {1}'.format(dof, val))
+                raise ValueError('orientation expects a container of floats of length 3 (rx, ry, rz). Got {1}'.format(dof, val))
    
     @property
-    def origin(self):
-        return self.__origin
+    def position(self):
+        return self.__position
 
-    @origin.setter
-    def origin(self, val):
+    @position.setter
+    def position(self, val):
         if val is None:
-            self.__origin = val
+            self.__position = val
         else:
             try:
                 val = numpy.asarray(val, dtype=numpy.float32)
             except:
                 raise ValueError("can't convert to numpy array")
    
-            if val.shape[0] == self.dimension_temp:
-                self.__origin = val
+            if val.shape[0] == 3:
+                self.__position = val
             else:
-                raise ValueError('positions expects a container of floats of length {0}. Got {1}'.format(self.dimension_temp, val))
+                raise ValueError('positions expects a container of floats of length 3 (x, y, z). Got {1}'.format(val))
    
-    def __init__ (self, origin, orientation, dimension=3):
-        #if 2D position = [x,y], 3D position = [x,y,z]
-        #if 2D orientation = [rz], 3D position = [rx,ry,rz]
-        self.dimension_temp = dimension
-
-        if origin is None:
-            self.origin = None
-        else:
-            self.origin = origin
-        
-        if orientation is None:
-            self.orientation = None
-        else:
-            self.orientation = numpy.asarray(orientation,dtype=numpy.float32)
-
-        del self.dimension_temp
+    def __init__ (self, position, orientation):
+        self.position = position
+        self.orientation = orientation
 
 class SystemPlacement(object):
-    def __init__ (self, dimension, source_pos=None, source_orientation=None, detector_pos=None, detector_orientation=None, object_pos=None, object_orientation=None):
-        self.source = PositionOrientation(source_pos, source_orientation, dimension)
-        self.detector = PositionOrientation(detector_pos, detector_orientation, dimension)
-        self.object = PositionOrientation(object_pos, object_orientation, dimension)
+    def __init__ (self, source_pos=None, source_orientation=None, detector_pos=None, detector_orientation=None, object_pos=None, object_orientation=None):
+        self.source = PositionOrientation(source_pos, source_orientation)
+        self.detector = PositionOrientation(detector_pos, detector_orientation)
+        self.object = PositionOrientation(object_pos, object_orientation)
 
 class Panel(object):
     @property
@@ -342,23 +326,28 @@ class Panel(object):
 
     @pixel_size.setter
     def pixel_size(self, val):
-        if isinstance(val,float):
-            pixel_size_temp = (val, 1)
-        elif len(val) == 2 and all(isinstance(i, float) for i in val):
-            pixel_size_temp = (val[0], val[1])
+        if val is None:
+            pixel_size_temp = None
         else:
-            raise ValueError('pixel_size expected float xy or [float x, float y]. Got {}'.format(val))
-   
-        if pixel_size_temp <= (0,0):
-            raise ValueError('pixel_size (x,y) at must be > (0.,0.). Got {}'.format(pixel_size_temp))
-        else:
-            self.__pixel_size = pixel_size_temp
+            try:
+                temp = float(val)
+                pixel_size_temp = (temp, temp)
+            except TypeError:
+                if len(val) == 2:
+                    try:
+                        temp0 = float(val[0]) 
+                        temp1 = float(val[1]) 
+                        pixel_size_temp = (temp0, temp1)
+                    except:
+                        raise ValueError('pixel_size expected float xy or [float x, float y]. Got {}'.format(val))
+                else:
+                    raise ValueError('pixel_size expected float xy or [float x, float y]. Got {}'.format(val))
+    
+            if pixel_size_temp <= (0,0):
+                raise ValueError('pixel_size (x,y) at must be > (0.,0.). Got {}'.format(pixel_size_temp)) 
 
-    def __init__ (self, num_pixels, pixel_size):  
-        self.num_pixels = num_pixels
-        self.pixel_size = pixel_size
+        self.__pixel_size = pixel_size_temp
 
-class Channels(object):
     @property
     def num_channels(self):
         return self.__num_channels
@@ -371,27 +360,22 @@ class Channels(object):
             raise ValueError('num_channels expected a positive integer. Got {}'.format(val))
 
     @property
-    def labels(self):
-        return self.__labels
+    def channel_labels(self):
+        return self.__channel_labels
 
-    @labels.setter
-    def labels(self, val):      
-        if val is None or len(val) == self._num_channels:
-            self.__labels = val  
+    @channel_labels.setter
+    def channel_labels(self, val):      
+        if val is None or len(val) == self.__num_channels:
+            self.__channel_labels = val  
         else:
-            raise ValueError('labels expected to have length {0}. Got {1}'.format(self._num_channels, len(val)))
+            raise ValueError('labels expected to have length {0}. Got {1}'.format(self.__num_channels, len(val)))
 
-    def __init__ (self, num_channels, labels = None):
+    def __init__ (self, num_pixels, pixel_size, num_channels, channel_labels):  
+
+        self.num_pixels = num_pixels
+        self.pixel_size = pixel_size
         self.num_channels = num_channels
-        self.labels = labels
-
-    @property
-    def panel(self):
-        return self.__panel
-
-    @panel.setter
-    def panel(self, val):
-        self.__panel = val
+        self.channel_labels = channel_labels
 
 class AcquisitionGeometry(object):
     """
@@ -426,14 +410,35 @@ class AcquisitionGeometry(object):
     ANGLE_UNIT = 'angle_unit'
     DEGREE = 'degree'
     RADIAN = 'radian'
-    AQ3D = '3D'
-    AQ2D = '2D'
     #keep these
     CHANNEL = 'channel'
     ANGLE = 'angle'
     VERTICAL = 'vertical'
     HORIZONTAL = 'horizontal'
     
+    #for backwards compatibility with old AG
+    @property
+    def pixel_num_h(self):
+        return self.panel.num_pixels[0]
+
+    @property
+    def pixel_num_v(self):
+        return self.panel.num_pixels[1]
+
+    @property
+    def pixel_size_h(self):
+        return self.panel.pixel_size[0]
+
+    @property
+    def pixel_size_v(self):
+        return self.panel.pixel_size[1]
+
+    @property
+    def channels(self):
+        return self.panel.num_channels
+
+
+    #new geom
     @property
     def geom_type(self):
         return self.__geom_type
@@ -457,13 +462,6 @@ class AcquisitionGeometry(object):
             raise ValueError('num_positions expected a positive integer. Got {}'.format(val))
 
     @property
-    def dimension(self):
-        return self.__dimension
-
-    def set_dimension(self):
-        self.__dimension = 3 if self.panel.num_pixels[1] > 1 else 2
-
-    @property
     def angles(self):
         return self.__angles
 
@@ -471,15 +469,23 @@ class AcquisitionGeometry(object):
     def angles(self, val):
         if val is None:
             self.__angles = val
-        elif len(val) == self.num_positions and all(isinstance(i, float) for i in val):
-            self.__angles = val  
         else:
-            raise ValueError('angles expected to be a list of floats length {0}. Got {1}'.format(self.num_channels, len(val)))
+            try:
+                self.num_positions = len(val)
+            except TypeError:
+                self.num_positions = 1
+
+            self.__angles = numpy.empty(self.num_positions, dtype=float, order='C')
+
+            try:
+                self.__angles.fill(val)
+            except:
+                ValueError('angles expected to be a list of floats') 
 
     def __init__(self,
                 geom_type, #'cone'/'parallel'
-                num_pixels = [1., 0], # int x or [int x, int y] #optional for backward compatibility
-                pixel_size = [1.,0.], # float xy or [float x, float y] #optional for backward compatibility
+                num_pixels = [0, 0], # int x or [int x, int y] #optional for backward compatibility
+                pixel_size = None, # float xy or [float x, float y] #optional for backward compatibility
                 num_channels = 1,    
                 angles = None,              
                 source_position = None, 
@@ -491,49 +497,57 @@ class AcquisitionGeometry(object):
                 channel_labels = None, 
                 ** kwargs):
 
-        #backward compatibility list    also store as self for now...   
-        self.pixel_num_h = kwargs.get('pixel_num_h', None)
-        self.pixel_num_v = kwargs.get('pixel_num_v', None)
-        self.pixel_size_h = kwargs.get('pixel_size_h', None)
-        self.pixel_size_v = kwargs.get('pixel_size_v', None)
+        #backward compatibility
+        pixel_num_h = kwargs.get('pixel_num_h', None)
+        pixel_num_v = kwargs.get('pixel_num_v', None)
+        pixel_size_h = kwargs.get('pixel_size_h', None)
+        pixel_size_v = kwargs.get('pixel_size_v', None)
+        chanels = kwargs.get('channels', None)
+
+        num_pixels_temp = [0,0]
+        pixel_size_temp = [1,1]
+
+        if pixel_num_h:
+            num_pixels_temp[0] = pixel_num_h
+            num_pixels = num_pixels_temp
+        if pixel_num_v:
+            num_pixels_temp[1] = pixel_num_v
+            num_pixels = num_pixels_temp
+        if pixel_size_h:
+            pixel_size_temp[0] = pixel_size_h
+            pixel_size = pixel_size_temp
+        if pixel_size_v:
+            pixel_size_temp[1] = pixel_size_v
+            pixel_size = pixel_size_temp
+        if chanels:
+            num_channels = chanels
+
         self.dist_source_center = kwargs.get('dist_source_center', None)
         self.dist_center_detector = kwargs.get('dist_center_detector', None)
-        self.chanels = kwargs.get('channels', None)
 
-        if self.pixel_num_h:
-            num_pixels = [self.pixel_num_h, 1]
-        if self.pixel_num_v:
-            num_pixels[1] = self.pixel_num_v
-        if self.pixel_size_h:
-            pixel_size = [self.pixel_size_h, self.pixel_size_h]
-        if self.pixel_size_v:
-            pixel_size[1] = self.pixel_size_v
         if self.dist_source_center:
             source_position = [0., -self.dist_source_center, 0.]
         if self.dist_center_detector:
             detector_position = [0., self.dist_center_detector, 0.]
-        if self.chanels:
-            num_channels = self.chanels
 
         #initilisation using new inputs
         self.geom_type = geom_type
-        self.panel = Panel(num_pixels, pixel_size)  
-        self.set_dimension()
-        self.channels = Channels(num_channels, channel_labels)
+        self.panel = Panel(num_pixels, pixel_size, num_channels, channel_labels)  
 
         #takes degrees as default
         self.angle_unit = kwargs.get(AcquisitionGeometry.ANGLE_UNIT, AcquisitionGeometry.DEGREE)
 
-        #perproj/or rigid if there is an agles list... should maybe be on det pos length
+        #perproj/or rigid if there is an agles list...
         if angles is not None:
-            self.num_positions = len(angles)     
-            self.angles = angles
-            self.placement = SystemPlacement(self.dimension, source_position, source_orientation, detector_position, detector_orientation, object_position, object_orientation)
+            self.per_projection = False
+            self.angles = angles         
+            self.placement = SystemPlacement(source_position, source_orientation, detector_position, detector_orientation, object_position, object_orientation)
         else:
+            self.per_projection = True
             self.num_positions = len(detector_position)
             self.angles = None
-            none_list = [None]*self.num_positions
 
+            none_list = [None]*self.num_positions
             if source_position is None:
                 source_position = none_list
             if source_orientation is None:
@@ -549,16 +563,17 @@ class AcquisitionGeometry(object):
             for pos in range(self.num_positions):
                 self.placement.append
                 (
-                    SystemPlacement(self.dimension, 
+                    SystemPlacement(
                     source_position[pos], source_orientation[pos],
                     detector_position[pos], detector_orientation[pos],
                     object_position[pos], object_orientation[pos], 
-                    True)
+                    )
                 )
 
         # default labels
-        shape = [self.channels.num_channels, self.num_positions , self.panel.num_pixels[1], self.panel.num_pixels[0]]
+        shape = [self.panel.num_channels, self.num_positions , self.panel.num_pixels[1], self.panel.num_pixels[0]]
         dim_labels = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.ANGLE, AcquisitionGeometry.VERTICAL, AcquisitionGeometry.HORIZONTAL]
+
         #if dimension has length 1 remove from list
         for i,x in enumerate(shape):
             if x == 1:
@@ -607,27 +622,36 @@ class AcquisitionGeometry(object):
     def __str__ (self):
         repres = ""
         repres += "Geometry type: {0}\n".format(self.geom_type)
-        repres += "number of channels: {0}\n".format(self.channels.num_channels)                
+        repres += "Panel description:\n"             
+        repres += "\tpanel size: h{0},v{1}\n".format(self.panel.num_pixels[0], self.panel.num_pixels[1])
+        
+        if self.panel.pixel_size is not None:
+            repres += "\tpixel size: h{0},v{1}\n".format(self.panel.pixel_size[0], self.panel.pixel_size[1])
+        
+        repres += "\tnumber of channels: {0}\n".format(self.panel.num_channels)
+        
+        if self.panel.channel_labels is not None:
+            repres += "\tchannel labels 0-10: {0}\n".format(self.panel.channel_labels[0:min(10,self.panel.num_channels)])              
+
         repres += "num_positions: {0}\n".format(self.num_positions)         
-        repres += "panel size: h{0},v{1}\n".format(self.panel.num_pixels[0], self.panel.num_pixels[1])
-        repres += "pixel size: h{0},v{1}\n".format(self.panel.pixel_size[0], self.panel.pixel_size[1])
+
         repres += "System placement:\n"
 
         if self.angles is not None:
-            if self.placement.source.origin is not None:
-                repres += "\tsource position: {0}\n".format(self.placement.source.origin)
+            if self.placement.source.position is not None:
+                repres += "\tsource position: {0}\n".format(self.placement.source.position)
             if self.placement.source.orientation is not None:        
                 repres += "\tsource orientation: {0}\n".format(self.placement.source.orientation)
-            if self.placement.detector.origin is not None:   
-                repres += "\tdetector position: {0}\n".format(self.placement.detector.origin)
+            if self.placement.detector.position is not None:   
+                repres += "\tdetector position: {0}\n".format(self.placement.detector.position)
             if self.placement.detector.orientation is not None:                   
                 repres += "\tdetector orientation: {0}\n".format(self.placement.detector.orientation)
-            if self.placement.object.origin is not None:
-                repres += "\tobject position: {0}\n".format(self.placement.object.origin)
+            if self.placement.object.position is not None:
+                repres += "\tobject position: {0}\n".format(self.placement.object.position)
             if self.placement.object.orientation is not None:
                 repres += "\tobject orientation: {0}\n".format(self.placement.object.orientation)
 
-            repres += "angles: {0}...\n".format(self.angles[0:min(10,self.num_positions)])                  
+            repres += "angles 0-10: {0}...\n".format(self.angles[0:min(10,self.num_positions)])                  
             repres += "all algular units: {0}".format(self.angle_unit)                  
 
         else:
@@ -1539,7 +1563,7 @@ class AcquisitionData(DataContainer):
                      dimension_labels, **kwargs)
                 
     def get_shape_labels(self, geometry, dimension_labels=None):
-        channels      = geometry.channels.num_channels
+        channels      = geometry.panel.num_channels
         horiz         = geometry.panel.num_pixels[0]
         vert          = geometry.panel.num_pixels[1]
         angles        = geometry.angles
@@ -1594,6 +1618,8 @@ class AcquisitionData(DataContainer):
             shape = tuple(shape)
         return (shape, dimension_labels)
 
+    #ToDo: insert transpose and slicde methods that return this
+
     def subset(self, dimensions=None, **kw):
         '''returns a subset of the AcquisitionData and regenerates the geometry'''
 
@@ -1620,45 +1646,61 @@ class AcquisitionData(DataContainer):
         if out.number_of_dimensions > 1:
             
             dim = str (len(out.shape)) + "D"
-            
+           
             channels = 1
-            pixel_num_h = 0
-            pixel_size_h = 1
-            pixel_num_v = 0
-            pixel_size_v = 1
+            pixel_num_h = 1
+            pixel_num_v = 1
 
-            # update the angles if necessary
+            #slice on angle or channel should return full AG
+            #slice on V?#
+                #returns full geometry but:
+                    #'detector origin' should change to slice pos if not None, and pix_size not none (need det origin, Rx, Ry, and pix_size)
+                    #'detector orientation' updated to Ry, Rz (rx = 0)
+                    #num pix_v = 1
+            # Slice on H? 
+                # (horixontal rotation axis)
+                    #'detector origin' should change to slice pos if not None and pix size not none (need det origin, Ry, Rz, and pix_size)
+                    #detector orientation updated to Rx, Ry (Rz = 0)
+                    #num pix_h = 1
+
+
+ 
+
+            # update the angles if necessary, will need to handle per projection geometry too
             sliceme = kw.get(AcquisitionGeometry.ANGLE, None)
             if sliceme is not None:
-                angles = numpy.asarray([ self.geometry.angles[sliceme] ] , numpy.float32)
+                angles = self.geometry.angles[sliceme]
+                placement = self.geometry.placement
             else:
                 angles = self.geometry.angles.copy()
-            
+                placement = self.geometry.placement
+
+            #ToDo udate this
             for key in out.dimension_labels.keys():
                 if out.dimension_labels[key] == AcquisitionGeometry.CHANNEL:
-                    channels = self.geometry.channels
+                    channels = self.geometry.panel.num_channels
                 elif out.dimension_labels[key] == AcquisitionGeometry.ANGLE:
                     pass
                 elif out.dimension_labels[key] == AcquisitionGeometry.VERTICAL:
-                    pixel_num_v = self.geometry.num_pixels[0]
-                    pixel_size_v = self.geometry.pixel_size[0]
+                    pixel_num_v = self.geometry.panel.num_pixels[1]
                 elif out.dimension_labels[key] == AcquisitionGeometry.HORIZONTAL:
-                    pixel_num_h = self.geometry.num_pixels[1]
-                    pixel_size_h = self.geometry.pixel_size[1]
+                    pixel_num_h = self.geometry.panel.num_pixels[0]
                 
             
             dim_lab = [ out.dimension_labels[k] for k in range(len(out.dimension_labels.items()))]
 
-            #This is broken! Gemma needs to fix it
+            #ToDo: misses any kwargs used in set up?
             out.geometry = AcquisitionGeometry( geom_type=self.geometry.geom_type, 
-                                                num_pixels = self.geometry.num_pixels,
-                                                pixel_size = self.geometry.pixel_size,
-                                                num_positions = self.geometry.num_positions,
-                                                source_dof = self.geometry.source_dof,
-                                                detector_origin = self.geometry.detector_origin,
-                                                detector_orientation = self.geometry.detector_orientation,
-                                                angles = self.geometry.angles,
-                                                num_channels = self.geometry.num_channels,
+                                                num_pixels = (pixel_num_h, pixel_num_v),
+                                                pixel_size = self.geometry.panel.pixel_size,
+                                                source_position = placement.source.position,
+                                                source_orientation = placement.source.orientation,
+                                                detector_position = placement.detector.position,
+                                                detector_orientation = placement.detector.orientation,
+                                                object_position = placement.object.position,
+                                                object_orientation = placement.object.orientation,                                           
+                                                angles = angles,
+                                                num_channels = channels,
                                                 dimension_labels = dim_lab)    
                   
         return out
@@ -1988,11 +2030,14 @@ class VectorGeometry(object):
     
 if __name__ == "__main__":
     
+    ag = AcquisitionGeometry(geom_type='cone',num_pixels=(10,20),angles=[0.1,0.2])
 
-   vg = VectorGeometry(10)    
-   b = vg.allocate('random_int')
+    vert = ag.pixel_num_v
 
-   ig = ImageGeometry(voxel_num_x=100, 
+    vg = VectorGeometry(10)    
+    b = vg.allocate('random_int')
+
+    ig = ImageGeometry(voxel_num_x=100, 
                    voxel_num_y=200, 
                    voxel_num_z=300, 
                    voxel_size_x=1, 
@@ -2003,12 +2048,12 @@ if __name__ == "__main__":
                    center_z=0, 
                    channels=50)
 
-   id = ig.allocate(2)
+    id = ig.allocate(2)
 
-   print(id.geometry)
-   print(id.dimension_labels)
+    print(id.geometry)
+    print(id.dimension_labels)
 
-   sid = id.subset(channel = 20)
+    sid = id.subset(channel = 20)
 
-   print(sid.dimension_labels)
-   print(sid.geometry)
+    print(sid.dimension_labels)
+    print(sid.geometry)

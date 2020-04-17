@@ -337,52 +337,6 @@ class SumOperator(Operator):
 ###############################################################################
 ################   Composition  ###########################################
 ###############################################################################             
-    
-class Composition2Operator(Operator):
-    
-    def __init__(self, operator1, operator2):
-        
-        self.operator1 = operator1
-        self.operator2 = operator2
-        
-        self.linear_flag = self.operator1.is_linear() and self.operator2.is_linear()        
-        
-        if self.operator2.range_geometry() != self.operator1.domain_geometry():
-            raise ValueError('Domain geometry of {} is not equal with range geometry of {}'.format(self.operator1.__class__.__name__,self.operator2.__class__.__name__))    
-                
-        super(Composition2Operator, self).__init__(self.operator1.domain_geometry(),
-                                          self.operator2.range_geometry()) 
-        
-    def direct(self, x, out = None):
-
-        if out is None:
-            return self.operator1.direct(self.operator2.direct(x))
-        else:
-            tmp = self.operator2.range_geometry().allocate()
-            self.operator2.direct(x, out = tmp)
-            self.operator1.direct(tmp, out = out)
-            
-    def adjoint(self, x, out = None):
-        
-        if self.linear_flag: 
-            
-            if out is None:
-                return self.operator2.adjoint(self.operator1.adjoint(x))
-            else:
-                
-                tmp = self.operator1.domain_geometry().allocate()
-                self.operator1.adjoint(x, out=tmp)
-                self.operator2.adjoint(tmp, out=out)
-        else:
-            raise ValueError('No adjoint operation with non-linear operators')
-            
-
-    def is_linear(self):
-        return self.linear_flag             
-            
-    def calculate_norm(self, **kwargs):
-        if self.is_linear():
-            return LinearOperator.calculate_norm(self, **kwargs)
 
 class CompositionOperator(Operator):
     

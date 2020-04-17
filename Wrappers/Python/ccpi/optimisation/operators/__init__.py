@@ -17,7 +17,7 @@
 #   limitations under the License.
 
 from .Operator import Operator, LinearOperator, ScaledOperator, SumOperator,\
- CompositionOperator, Composition2Operator
+ CompositionOperator
 from .BlockOperator import BlockOperator
 
 from .SparseFiniteDiff import SparseFiniteDiff

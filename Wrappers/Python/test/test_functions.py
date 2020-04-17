@@ -342,8 +342,12 @@ class TestFunction(unittest.TestCase):
         self.assertNumpyArrayAlmostEqual(tmp1.as_array(), tmp2.as_array())
         self.assertNumpyArrayAlmostEqual(res_gradient1.as_array(), res_gradient2.as_array())
         
-        print('Check call with LinearOperatorMatrix... OK\n')  
-        mat = np.random.randn(M, N)
+        print('Check call with LinearOperatorMatrix... OK\n') 
+        
+        ig = ImageGeometry(N, M)
+        mat = ig.allocate('random')
+        
+#        mat = np.random.randn(M, N)
         operator = LinearOperatorMatrix(mat)   
         vg = VectorGeometry(N)
         b = vg.allocate('random_int')    
@@ -479,3 +483,4 @@ if __name__ == '__main__':
     
     d = TestFunction()
     d.test_KullbackLeibler()
+    d.test_Norm2sq_as_FunctionOperatorComposition()

@@ -53,22 +53,6 @@ class LeastSquares(Function):
         self.b = b  # Default zero DataSet?
         self.c = c  # Default 1.
         self.range_tmp = A.range_geometry().allocate()
-
-        # Compute the Lipschitz parameter from the operator if possible
-        # Leave it initialised to None otherwise
-        try:
-            self.L = 2.0*self.c*(self.A.norm()**2)
-        except AttributeError as ae:
-            if self.A.is_linear():
-                Anorm = LinearOperator.PowerMethod(self.A, 10)[0]
-                self.L = 2.0 * self.c * (Anorm*Anorm)
-            else:
-                warnings.warn('{} could not calculate Lipschitz Constant. {}'.format(
-                self.__class__.__name__, ae))
-            
-        except NotImplementedError as noe:
-            warnings.warn('{} could not calculate Lipschitz Constant. {}'.format(
-                self.__class__.__name__, noe))
         
     def __call__(self, x):
         
@@ -107,7 +91,22 @@ class LeastSquares(Function):
         else:
             return (2.0*self.c)*self.A.adjoint(self.A.direct(x) - self.b)
         
-
+    def calculate_Lipschitz(self):
+        # Compute the Lipschitz parameter from the operator if possible
+        # Leave it initialised to None otherwise
+        try:
+            return  2.0*self.c*(self.A.norm()**2)
+        except AttributeError as ae:
+            if self.A.is_linear():
+                Anorm = LinearOperator.PowerMethod(self.A, 10)[0]
+                return 2.0 * self.c * (Anorm*Anorm)
+            else:
+                warnings.warn('{} could not calculate Lipschitz Constant. {}'.format(
+                self.__class__.__name__, ae))
+            
+        except NotImplementedError as noe:
+            warnings.warn('{} could not calculate Lipschitz Constant. {}'.format(
+                self.__class__.__name__, noe))
     
     
     

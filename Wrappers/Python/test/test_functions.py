@@ -323,11 +323,16 @@ class TestFunction(unittest.TestCase):
         operator = 3 * Identity(ig)
             
         u = ig.allocate('random_int', seed = 50)
-        
-        func1 = FunctionOperatorComposition(0.5 * L2NormSquared(b = b), operator)
+        f = 0.5 * L2NormSquared(b = b)
+        func1 = FunctionOperatorComposition(f, operator)
         func2 = LeastSquares(operator, b, 0.5)
-        print("func1.L {}, func2.L {}, operator norm {}".format(func1.L, func2.L, operator.norm()))
-            
+        print("f.L {}".format(f.L))
+        print("0.5*f.L {}".format((0.5*f).L))
+        print("type func1 {}".format(type(func1)))
+        print("func1.L {}".format(func1.L))
+        print("func2.L {}".format(func2.L))
+        print("operator.norm() {}".format(operator.norm()))
+  
         self.assertNumpyArrayAlmostEqual(func1(u), func2(u))
         
         

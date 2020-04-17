@@ -222,7 +222,7 @@ class TestAlgorithms(unittest.TestCase):
         x_init = ImageData(geometry=ig)
         x_init = ig.allocate()
         b = x_init.copy()
-        # fill with random numbers
+        # fill with random numbers  
         b.fill(numpy.random.random(x_init.shape))
         x_init = ig.allocate(ImageGeometry.RANDOM)
         identity = Identity(ig)
@@ -230,13 +230,13 @@ class TestAlgorithms(unittest.TestCase):
 	    #### it seems FISTA does not work with Nowm2Sq
         norm2sq = LeastSquares(identity, b)
         print ('Lipschitz', norm2sq.L)
-        norm2sq.L = None
+        # norm2sq.L = None
         #norm2sq.L = 2 * norm2sq.c * identity.norm()**2
         #norm2sq = FunctionOperatorComposition(L2NormSquared(b=b), identity)
         opt = {'tol': 1e-4, 'memopt':False}
         print ("initial objective", norm2sq(x_init))
         try:
-            alg = FISTA(x_init=x_init, f=norm2sq, g=ZeroFunction())
+            alg = FISTA(x_init=x_init, f=L1Norm(), g=ZeroFunction())
             self.assertTrue(False)
         except ValueError as ve:
             print (ve)

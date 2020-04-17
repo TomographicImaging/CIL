@@ -119,6 +119,10 @@ class L1Norm(Function):
             else:
                 out.fill(self.shinkage_operator(x, tau))
                                     
+    @property
+    def L(self):
+        '''Function not differentiable so doesn't have Lipschitz'''
+        raise ValueError('L1Norm does not have a Lipschitz constant')
 #    def proximal_conjugate(self, x, tau, out=None):
 #        
 #        r'''Proximal operator of the convex conjugate of L1Norm at x:

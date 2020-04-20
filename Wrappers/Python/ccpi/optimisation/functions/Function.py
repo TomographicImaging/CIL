@@ -34,7 +34,10 @@ class Function(object):
     """ Abstract class representing a function 
     
         :param L: Lipschitz constant of the gradient of the function F(x), when it is differentiable.
+        :type L: number, positive, default None
         :param domain: The domain of the function.
+
+        Lipschitz is positive real number, such that |f(x) - f(y)| <= L ||x-y||, assuming f: IG --> R
 
     """
     
@@ -144,22 +147,16 @@ class Function(object):
     
     @property
     def L(self):
-        if self._L is not None:
-            return self._L
-        else:
-            self.L = self.calculate_Lipschitz()
-            return self._L
+        '''Lipschitz is positive real number, such that |f(x) - f(y)| <= L ||x-y||, assuming f: IG --> R'''
+        return self._L
         # return self._L
     @L.setter
     def L(self, value):
         '''Setter for Lipschitz constant'''
-        if isinstance(value, (Number,)):
+        if isinstance(value, (Number,)) and value >= 0:
             self._L = value
         else:
-            raise TypeError('The Lipschitz constant is a real number')
-
-    def calculate_Lipschitz(self):
-        raise NotImplementedError('calculate_Lipschitz method not implemented')
+            raise TypeError('The Lipschitz constant is a real positive number')
     
 class SumFunction(Function):
     
@@ -233,8 +230,10 @@ class ScaledFunction(Function):
         self.function = function       
     @property
     def L(self):
-        #if function.L is not None:        
-        return abs(self.scalar) * self.function.L
+        if self.function.L is not None:
+            return abs(self.scalar) * self.function.L
+        else:
+            return None
 
     @property
     def scalar(self):
@@ -407,6 +406,9 @@ class ConstantFunction(Function):
         if not isinstance (value, Number):
             raise TypeError('expected scalar: got {}'.format(type(constant)))
         self._constant = value
+    @property
+    def L(self):
+        return 0.
 
 class ZeroFunction(ConstantFunction):
     

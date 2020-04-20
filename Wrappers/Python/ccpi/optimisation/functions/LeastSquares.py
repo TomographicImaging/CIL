@@ -24,6 +24,7 @@ from __future__ import print_function
 from ccpi.optimisation.operators import LinearOperator
 from ccpi.optimisation.functions import Function
 import warnings
+from numbers import Number
 
 # Define a class for squared 2-norm
 class LeastSquares(Function):
@@ -91,15 +92,28 @@ class LeastSquares(Function):
         else:
             return (2.0*self.c)*self.A.adjoint(self.A.direct(x) - self.b)
         
+    @property
+    def L(self):
+        if self._L is None:
+            self.calculate_Lipschitz()
+        return self._L
+    @L.setter
+    def L(self, value):
+        warnings.warn("You should set the Lipschitz constant with calculate_Lipschitz().")
+        if isinstance(value, (Number,)) and value >= 0:
+            self._L = value
+        else:
+            raise TypeError('The Lipschitz constant is a real positive number')
+
     def calculate_Lipschitz(self):
         # Compute the Lipschitz parameter from the operator if possible
         # Leave it initialised to None otherwise
         try:
-            return  2.0*self.c*(self.A.norm()**2)
+            self._L = 2.0*self.c*(self.A.norm()**2)
         except AttributeError as ae:
             if self.A.is_linear():
                 Anorm = LinearOperator.PowerMethod(self.A, 10)[0]
-                return 2.0 * self.c * (Anorm*Anorm)
+                self._L = 2.0 * self.c * (Anorm*Anorm)
             else:
                 warnings.warn('{} could not calculate Lipschitz Constant. {}'.format(
                 self.__class__.__name__, ae))

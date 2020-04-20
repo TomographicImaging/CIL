@@ -481,6 +481,26 @@ class TestFunction(unittest.TestCase):
         a = ib(im)
         numpy.testing.assert_equal(a, numpy.inf)
 
+    def test_Lipschitz(self):
+        print('Test for FunctionOperatorComposition')         
+            
+        M, N = 50, 50
+        ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
+        b = ig.allocate('random', seed=1)
+        
+        print('Check call with Identity operator... OK\n')
+        operator = 3 * Identity(ig)
+            
+        u = ig.allocate('random_int', seed = 50)
+        func2 = LeastSquares(operator, b, 0.5)
+        assert func2.L != 2
+        print (func2.L)
+        func2.L = 2
+        assert func2.L == 2
+
+
+
+
 if __name__ == '__main__':
     
     d = TestFunction()

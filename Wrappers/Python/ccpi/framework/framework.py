@@ -507,13 +507,24 @@ class AcquisitionGeometry(object):
     @property
     def dist_source_center(self):
         print("Warning: dist_source_center returns the y component of source position only")
-        return -self.configuration.source.position[1]
+        if self.configuration.source.position is  None:
+            return None
 
+        return -self.configuration.source.position[1]
+        
     @property
     def dist_center_detector(self):
         print("Warning: dist_center_detector returns the y component of detector poition only")
+        if self.configuration.detector.position is None:        
+            return None
         return self.configuration.detector.position[1]
 
+    @property
+    def dimension(self):
+        if self.panel.num_pixels[1] == 1:
+            return '2D'
+        else:
+            return '3D'    
 
     #new geom
     @property

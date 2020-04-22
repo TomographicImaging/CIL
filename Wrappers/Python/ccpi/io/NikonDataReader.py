@@ -198,9 +198,8 @@ class NikonDataReader(object):
             angles = numpy.flipud(angles + initial_angle) # angles are in the reverse order
             
         else:   # calculate angles based on xtek file
-            angles = []
             for i in range(num_projections):
-                angles.append(initial_angle + angular_step * i)
+                angles[i] = initial_angle + angular_step * i
         
         # fill in metadata
         self._ag = AcquisitionGeometry(geom_type = 'cone', 

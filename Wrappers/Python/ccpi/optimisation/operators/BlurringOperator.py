@@ -23,17 +23,16 @@ import numpy as np
 from ccpi.framework import ImageData
 from ccpi.optimisation.operators import LinearOperator
 
+from scipy.signal import convolve2d, correlate2d
+
 class BlurringOperator(LinearOperator):
     
-    r'''DiagonalOperator:  D: X -> X,  takes in a DataContainer or subclass 
-    thereof, diag, representing elements on the diagonal of a diagonal 
-    operator. Maps an element of :math:`x\in X` onto the element 
-    :math:`y \in X,  y = diag*x`, where * denotes elementwise multiplication.
-    In matrix-vector interpretation, if x is a vector of length N, then diag is 
-    also a vector of length N, and D will be an NxN diagonal matrix with diag 
-    on its diagonal and zeros everywhere else.
+    r'''BlurringOperator:  D: X -> X,  takes in a numpy array PSF representing 
+    a point spread function for blurring the image. The implementation is 
+    generic and naive simply using convolution.
                        
-        :param diagonal: DataContainer with diagonal elements
+        :param PSF: numpy array with point spread function of blur.
+        :param geometry: ImageGeometry of ImageData to work on.
                        
      '''
     
@@ -48,22 +47,29 @@ class BlurringOperator(LinearOperator):
         
         '''Returns D(x)'''
         
-        result = self.domain_geometry().allocate()
-        result.fill(convolve2d(x.as_array(),self.PSF,mode='same',boundary='symm'))
-        
-        return result
+        if out is None:
+            result = self.range_geometry().allocate()
+            result.fill(convolve2d(x.as_array(),self.PSF,mode='same',boundary='symm'))
+            return result
+        else:
+            out.fill(convolve2d(x.as_array(),self.PSF,mode='same',boundary='symm'))
+        #result.fill(convolve2d(x.as_array(),self.PSF,mode='same'))
     
     def adjoint(self,x, out=None):
         
         '''Returns D^{*}(y).'''
         
-        result = self.range_geometry().allocate()
-        result.fill(convolve2d(x.as_array(),self.PSF_adjoint,mode='same',boundary='symm'))
-        
-        return result
+        if out is None:
+            result = self.domain_geometry().allocate()
+            result.fill(correlate2d(x.as_array(),self.PSF,mode='same',boundary='symm'))
+            #result.fill(correlate2d(x.as_array(),self.PSF_adjoint,mode='same'))
+            return result
+        else:
+            out.fill(correlate2d(x.as_array(),self.PSF,mode='same',boundary='symm'))
+            
     
-    def norm(self):
-        return 100.0
+    #def norm(self):
+    #    return 100.0
 
 if __name__ == '__main__':
     
@@ -100,23 +106,31 @@ if __name__ == '__main__':
                 0.1140*data_rgb.subset(channel=2)
     ig_gray = data_gray.geometry
     
-    plt.figure(), plt.imshow(data_gray.as_array()), plt.gray(), plt.colorbar()
-    from scipy.signal import convolve2d
+    #plt.figure(), plt.imshow(data_gray.as_array()), plt.gray(), plt.colorbar()
      
     ks          = 11; 
     ksigma      = 5.0;
     
     
-    w           = np.exp(-np.arange(-(ks-1)/2,(ks-1)/2+1)**2/(2*ksigma**2))
-    w.shape     = (ks,1)
-    PSF         = w*np.transpose(w)
+    #w           = np.exp(-np.arange(-(ks-1)/2,(ks-1)/2+1)**2/(2*ksigma**2))
+    #w.shape     = (ks,1)
+    #PSF         = w*np.transpose(w)
     #PSF         = PSF/(PSF**2).sum()
-    PSF         = PSF/PSF.sum()
+    #PSF         = PSF/PSF.sum()
+    #PSF = np.ones((ks,ks))/ks**2
+    
+    PSF = np.random.rand(ks,ks)
+    PSF = PSF / PSF.sum()
+    
+    #Q,R = np.linalg.qr(PSF)
     
     
     BOP = BlurringOperator(PSF,ig_gray)
     
+    print(BOP.dot_test(BOP))
+    
     blurredimage = BOP.direct(data_gray)
+    
     
     
     plt.figure(), plt.imshow(blurredimage.as_array()), plt.gray(), plt.colorbar()
@@ -184,7 +198,7 @@ if __name__ == '__main__':
 #    elif noise == 'poisson':
 #        alpha = 1.0
 #    elif noise == 'gaussian':
-    alpha = .1
+    alpha = 0.02
     
     # Choose data fidelity dependent on noise type.
 #    if noise == 's&p':
@@ -214,9 +228,9 @@ if __name__ == '__main__':
     
     # Setup and run the PDHG algorithm
     pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
-    pdhg.max_iteration = 100
+    pdhg.max_iteration = 10000
     pdhg.update_objective_interval = 1
-    pdhg.run(100,very_verbose=True)
+    pdhg.run(200,very_verbose=True)
     
     # Show results
     plt.figure(figsize=(20,5))

@@ -157,7 +157,7 @@ class L2NormSquared(Function):
             else:
                 x.divide((1+2*tau), out=out)
 
-    
+#    TODO add to docs    
 #    def proximal_conjugate(self, x, tau, out=None):
 #        
 #        r'''Proximal operator of the convex conjugate of L2NormSquared at x:

@@ -138,14 +138,6 @@ class L1Norm(Function):
 #            else:
 #                out.fill(x.divide(x.abs().maximum(1.0)) )                
             
-#    def __rmul__(self, scalar):
-#        
-#        '''Multiplication of L2NormSquared with a scalar        
-#            
-#            Returns: ScaledFunction
-#        '''
-#        
-#        return ScaledFunction(self, scalar)
 
 
 if __name__ == '__main__':   

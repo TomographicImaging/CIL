@@ -663,8 +663,7 @@ class DataContainer(object):
         return self.divide(other)
     def __pow__(self, other):
         return self.power(other)
-    
-    
+        
     
     # reverse operand
     def __radd__(self, other):
@@ -976,8 +975,7 @@ class DataContainer(object):
     
     def abs(self, *args,  **kwargs):
         return self.pixel_wise_unary(numpy.abs, *args,  **kwargs)
-    
-    
+
     def sign(self, *args,  **kwargs):
         return self.pixel_wise_unary(numpy.sign, *args,  **kwargs)
     
@@ -1049,6 +1047,43 @@ class DataContainer(object):
     def max(self, *args, **kwargs):
         '''Returns the max pixel value in the DataContainer'''
         return numpy.max(self.as_array(), *args, **kwargs)
+    
+    # Logic operators between DataContainers and floats    
+    def __le__(self, other):
+        '''Returns boolean array of DataContainer less or equal than DataContainer/float'''
+        if isinstance(other, DataContainer):
+            return self.as_array()<=other.as_array()
+        return self.as_array()<=other
+    
+    def __lt__(self, other):
+        '''Returns boolean array of DataContainer less than DataContainer/float'''
+        if isinstance(other, DataContainer):
+            return self.as_array()<other.as_array()
+        return self.as_array()<other    
+    
+    def __ge__(self, other):
+        '''Returns boolean array of DataContainer greater or equal than DataContainer/float'''        
+        if isinstance(other, DataContainer):
+            return self.as_array()>=other.as_array()
+        return self.as_array()>=other  
+    
+    def __gt__(self, other):
+        '''Returns boolean array of DataContainer greater than DataContainer/float'''        
+        if isinstance(other, DataContainer):
+            return self.as_array()>other.as_array()
+        return self.as_array()>other      
+    
+    def __eq__(self, other):
+        '''Returns boolean array of DataContainer equal to DataContainer/float'''          
+        if isinstance(other, DataContainer):
+            return self.as_array()==other.as_array()
+        return self.as_array()==other  
+
+    def __ne__(self, other):
+        '''Returns boolean array of DataContainer negative to DataContainer/float'''           
+        if isinstance(other, DataContainer):
+            return self.as_array()!=other.as_array()
+        return self.as_array()!=other      
     
     @property
     def size(self):

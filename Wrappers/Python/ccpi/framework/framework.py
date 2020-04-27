@@ -251,28 +251,73 @@ class ImageGeometry(object):
     #    '''Returns the shape of the array of the ImageData it describes'''
     #    return self.shape
 
-
-class PositionOrientation(object):
+class Detector(object):
 
     @property
-    def orientation(self):
-        return self.__orientation
+    def position(self):
+        return self.__position
 
-    @orientation.setter
-    def orientation(self, val):
-        if val is None:
-            self.__orientation = val
-        else:
-            try:
-                val = numpy.asarray(val, dtype=numpy.float32)
-            except:
-                raise ValueError("can't convert to numpy array")
+    @position.setter
+    def position(self, val):
+        try:
+            temp_val = numpy.asarray(val, dtype=numpy.float32)
+        except:
+            raise ValueError("can't convert to numpy array")
    
-            if val.shape[0] == 3:
-                self.__orientation = val
-            else:
-                raise ValueError('orientation expects a container of floats of length 3 (rx, ry, rz). Got {0}'.format(val))
+        if temp_val.shape[0] != 3:
+            raise ValueError('orientation expects a container of floats of length 3 (rx, ry, rz). Got {0}'.format(val))
+        
+        self.__position = temp_val
+
+    @property
+    def direction_horizontal(self):
+        return self.__direction_horizontal
+
+    @direction_horizontal.setter
+    def direction_horizontal(self, val):
+        try:
+            temp_val = numpy.asarray(val, dtype=numpy.float32)
+            unit_vec = temp_val / numpy.sqrt(temp_val.dot(temp_val))
+        except:
+            raise ValueError("can't convert to normalised numpy array")
    
+        if unit_vec.shape[0] != 3:
+            raise ValueError('orientation expects a container of floats of length 3 (rx, ry, rz). Got {0}'.format(val))
+
+        self.__direction_horizontal = unit_vec
+
+    @property
+    def direction_vertical(self):
+        return self.__direction_vertical
+
+    @direction_vertical.setter
+    def direction_vertical(self, val):
+        try:
+            temp_val = numpy.asarray(val, dtype=numpy.float32)
+            unit_vec = temp_val / numpy.sqrt(temp_val.dot(temp_val))
+        except:
+            raise ValueError("can't convert to normalised numpy array")
+   
+        if unit_vec.shape[0] != 3:
+            raise ValueError('orientation expects a container of floats of length 3 (rx, ry, rz). Got {0}'.format(val))
+
+        self.__direction_vertical = unit_vec
+
+    def __init__(self, position, direction_horizontal, direction_vertical):     
+        if position is None:
+            position = [0,0,0]
+        if direction_horizontal is None:
+            direction_horizontal = [1,0,0]
+        if direction_vertical is None:
+            direction_vertical = [0,0,1]
+
+        self.position = position
+        #ToDo check these are orthogonal
+        self.direction_horizontal = direction_horizontal
+        self.direction_vertical = direction_vertical
+
+class Source(object):
+
     @property
     def position(self):
         return self.__position
@@ -280,60 +325,114 @@ class PositionOrientation(object):
     @position.setter
     def position(self, val):
         if val is None:
-            self.__position = val
-        else:
+            self.__position = None
+        else:  
             try:
-                val = numpy.asarray(val, dtype=numpy.float32)
+                temp_val = numpy.asarray(val, dtype=numpy.float32)
             except:
                 raise ValueError("can't convert to numpy array")
-   
-            if val.shape[0] == 3:
-                self.__position = val
-            else:
-                raise ValueError('positions expects a container of floats of length 3 (x, y, z). Got {1}'.format(val))
-   
-    def __init__ (self, position, orientation):
+    
+            if temp_val.shape[0] != 3:
+                raise ValueError('orientation expects a container of floats of length 3 (rx, ry, rz). Got {0}'.format(val))
+            
+            self.__position = temp_val
+
+    @property
+    def direction(self):
+        return self.__direction
+
+    @direction.setter
+    def direction(self, val):
+        if val is None:
+            self.__direction = None
+        else:
+            try:
+                temp_val = numpy.asarray(val, dtype=numpy.float32)
+                unit_vec = temp_val / numpy.sqrt(temp_val.dot(temp_val))
+            except:
+                raise ValueError("can't convert to normalised numpy array")
+    
+            if unit_vec.shape[0] != 3:
+                raise ValueError('orientation expects a container of floats of length 3 (rx, ry, rz). Got {0}'.format(val))
+
+            self.__direction = unit_vec
+
+    def __init__(self, geom_type, position, direction):
+        
+        if geom_type == 'parallel' and direction is None:
+            direction = [0,1,0]
+
         self.position = position
-        self.orientation = orientation
+        self.direction = direction
+
+class RoatationAxis(object):
+    @property
+    def position(self):
+        return self.__position
+
+    @position.setter
+    def position(self, val):    
+        try:
+            temp_val = numpy.asarray(val, dtype=numpy.float32)
+        except:
+            raise ValueError("can't convert to numpy array")
+   
+        if temp_val.shape[0] != 3:
+            raise ValueError('orientation expects a container of floats of length 3 (rx, ry, rz). Got {0}'.format(val))
+        
+        self.__position = temp_val
+
+    @property
+    def direction(self):
+        return self.__direction
+
+    @direction.setter
+    def direction(self, val):
+        try:
+            temp_val = numpy.asarray(val, dtype=numpy.float32)
+            unit_vec = temp_val / numpy.sqrt(temp_val.dot(temp_val))
+        except:
+            raise ValueError("can't convert to normalised numpy array")
+   
+        if unit_vec.shape[0] != 3:
+            raise ValueError('orientation expects a container of floats of length 3 (rx, ry, rz). Got {0}'.format(val))
+
+        self.__direction = unit_vec
+
+    @property
+    def initial_angle(self):
+        return self.__initial_angle
+
+    @initial_angle.setter
+    def initial_angle(self, val):
+        try:
+            val = float(val)
+        except:
+            raise ValueError('initial angle expects a float. Got {0}'.format(val))
+
+        self.__initial_angle = val
+
+
+    def __init__(self, position, direction, initial_angle):
+        if position is None:
+            position = [0,0,0]
+        if direction is None:
+            direction = [0,0,1]
+        if initial_angle is None:
+            initial_angle = 0.0
+
+        self.position = position
+        self.direction = direction
+        self.initial_angle = initial_angle
+
 
 class SystemConfiguration(object):
-    @property
-    def source(self):
-        return self.__source
 
-    @source.setter
-    def source(self, val):
-        if self.geom_type == 'cone':
-            if val.position is None:
-                raise ValueError('for cone beam ct need source position')
-            elif val.position[1] == 0.0:
-                raise ValueError('for cone beam ct need non zero source position')                
-        else:
-            if val.orientation is None:
-                val.orientation = [0.,0.,0.]
+    def __init__ (self, geom_type, source_pos, ray_direction, detector_pos, detector_direction_horizontal, detector_direction_vertical, rotation_axis_pos, rotation_axis_direction, rotation_axis_angle):
+        self.source = Source(geom_type, source_pos, ray_direction)
+        self.detector = Detector(detector_pos, detector_direction_horizontal, detector_direction_vertical)
+        self.rotation_axis = RoatationAxis(rotation_axis_pos, rotation_axis_direction, rotation_axis_angle)
 
-        self.__source = val 
-
-    @property
-    def detector(self):
-        return self.__detector
-
-    @detector.setter
-    def detector(self, val):
-        if self.geom_type == 'cone':
-            if val.position is None:
-                raise ValueError('for cone beam ct need detector position')
-            elif val.position[1] == 0.0:
-                raise ValueError('for cone beam ct need non zero detector position')
-
-        self.__detector = val
-
-    def __init__ (self, geom_type, source_pos=None, source_orientation=None, detector_pos=None, detector_orientation=[0.,0.,0.], object_pos=[0.,0.,0.], object_orientation=[0.,0.,0.]):
-        self.geom_type = geom_type
-        self.source = PositionOrientation(source_pos, source_orientation)
-        self.detector = PositionOrientation(detector_pos, detector_orientation)
-        self.object = PositionOrientation(object_pos, object_orientation)
-        del self.geom_type
 
 class Panel(object):
     @property
@@ -347,6 +446,7 @@ class Panel(object):
                 val = int(val)
             except:
                 TypeError('num_pixels expected int x or [int x, int y]. Got {}'.format(type(val)))
+                #ToDo Add deprecation warning
 
             num_pixels_temp = [val, 1]
 
@@ -373,7 +473,7 @@ class Panel(object):
     @pixel_size.setter
     def pixel_size(self, val):
         if val is None:
-            pixel_size_temp = None
+            pixel_size_temp = pixel_size = [1.0,1.0] 
         else:
             try:
                 temp = float(val)
@@ -455,13 +555,11 @@ class AcquisitionGeometry(object):
     angles is expected numpy array, dtype - float32
     angles_format radians or degrees
     """
-    #todo:keep these?
     RANDOM = 'random'
     RANDOM_INT = 'random_int'
     ANGLE_UNIT = 'angle_unit'
     DEGREE = 'degree'
     RADIAN = 'radian'
-    #keep these
     CHANNEL = 'channel'
     ANGLE = 'angle'
     VERTICAL = 'vertical'
@@ -506,17 +604,18 @@ class AcquisitionGeometry(object):
 
     @property
     def dist_source_center(self):
-        print("Warning: dist_source_center returns the y component of source position only")
-        if self.configuration.source.position is  None:
+        if self.configuration.source.position is None:
             return None
-
+            
+        print("Warning: dist_source_center returns the y component of source poition only")
         return -self.configuration.source.position[1]
-        
+
     @property
     def dist_center_detector(self):
-        print("Warning: dist_center_detector returns the y component of detector poition only")
-        if self.configuration.detector.position is None:        
+        if self.configuration.detector.position is None:
             return None
+
+        print("Warning: dist_center_detector returns the y component of detector poition only")
         return self.configuration.detector.position[1]
 
     @property
@@ -578,11 +677,13 @@ class AcquisitionGeometry(object):
                 num_channels = 1,    
                 angles = None,              
                 source_position = None, 
-                source_orientation = None,
+                ray_direction = None,
                 detector_position = None,
-                detector_orientation = None,
-                object_position = None,
-                object_orientation = None,
+                detector_direction_horizontal = None,
+                detector_direction_vertical = None,
+                rotation_axis_position = None,
+                rotation_axis_direction = None,
+                rotation_axis_rotation = None,
                 channel_labels = None, 
                 ** kwargs):
 
@@ -619,6 +720,8 @@ class AcquisitionGeometry(object):
 
         #initilisation using new inputs
         self.geom_type = geom_type
+
+        #set up panel
         self.panel = Panel(num_pixels, pixel_size, num_channels, channel_labels)  
 
         #takes degrees as default
@@ -628,16 +731,9 @@ class AcquisitionGeometry(object):
         if angles is not None:
             self.per_projection = False
             self.angles = angles
-
-            if detector_orientation is None:
-                detector_orientation = [0.,0.,0.]
-            if object_position is None:
-                object_position = [0.,0.,0.]
-            if object_orientation is None:
-                object_orientation = [0.,0.,0.]
-
-            self.configuration = SystemConfiguration(self.geom_type, source_position, source_orientation, detector_position, detector_orientation, object_position, object_orientation)
-        else:
+            #where to set defaults?
+            self.configuration = SystemConfiguration(self.geom_type, source_position, ray_direction, detector_position, detector_direction_horizontal, detector_direction_vertical, rotation_axis_position, rotation_axis_direction, rotation_axis_rotation)
+        else:           
             self.per_projection = True
             self.num_positions = len(detector_position)
             self.angles = None
@@ -645,27 +741,50 @@ class AcquisitionGeometry(object):
             none_list = [None]*self.num_positions
             zero_list = [[0.,0.,0.]]*self.num_positions
 
+            #need a complete list for these
+            if self.geom_type == 'parallel' and ray_direction is None:
+                print("nope")
+            if self.geom_type == 'cone' and source_position is None:
+                print("nope")    
+            if detector_position is None:
+                print("nope")
+            if detector_direction_horizontal is None:
+                print("nope")                
+            if detector_direction_vertical is None:
+                print("nope")
+
             if source_position is None:
                 source_position = none_list
-            if source_orientation is None:
-                source_orientation = none_list
-            if detector_orientation is None:
-                detector_orientation = zero_list
-            if object_position is None:
-                object_position = zero_list
-            if object_orientation is None:
-                object_orientation = zero_list
+            if ray_direction is None:
+                ray_direction = none_list
+            if rotation_axis_position is None:
+                rotation_axis_position = none_list
+            if rotation_axis_direction is None:
+                rotation_axis_position = none_list
 
             self.configuration = none_list
+            
             for pos in range(self.num_positions):
-                self.configuration[pos] = SystemConfiguration(
-                    source_position[pos], source_orientation[pos],
-                    detector_position[pos], detector_orientation[pos],
-                    object_position[pos], object_orientation[pos] )
+                self.configuration[pos] =  SystemConfiguration( self.geom_type,
+                                                                source_position[pos], 
+                                                                ray_direction[pos], 
+                                                                detector_position[pos], 
+                                                                detector_direction_horizontal[pos], 
+                                                                detector_direction_vertical[pos], 
+                                                                rotation_axis_position[pos], 
+                                                                rotation_axis_direction[pos]
+                                                            )
+    
+
 
         # default labels
         shape = [self.panel.num_channels, self.num_positions , self.panel.num_pixels[1], self.panel.num_pixels[0]]
-        dim_labels = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.ANGLE, AcquisitionGeometry.VERTICAL, AcquisitionGeometry.HORIZONTAL]
+        allowed_labels =    [AcquisitionGeometry.CHANNEL,
+                            AcquisitionGeometry.ANGLE,
+                            AcquisitionGeometry.VERTICAL,
+                            AcquisitionGeometry.HORIZONTAL]
+
+        dim_labels = allowed_labels.copy()
 
         #if dimension has length 1 remove from list
         for i,x in enumerate(shape):
@@ -674,24 +793,22 @@ class AcquisitionGeometry(object):
                 dim_labels.pop(i)
         
         labels = kwargs.get('dimension_labels', None)
+
         if labels is None:
             self.shape = shape
             self.dimension_labels = dim_labels
         else:
-            if labels is not None:
-                allowed_labels = [AcquisitionGeometry.CHANNEL,
-                                    AcquisitionGeometry.ANGLE,
-                                    AcquisitionGeometry.VERTICAL,
-                                    AcquisitionGeometry.HORIZONTAL]
-                if not reduce(lambda x,y: (y in allowed_labels) and x, labels , True):
-                    raise ValueError('Requested axis are not possible. Expected {},\ngot {}'.format(
-                                    allowed_labels,labels))
+            if not reduce(lambda x,y: (y in allowed_labels) and x, labels , True):
+                raise ValueError('Requested axis are not possible. Expected {},\ngot {}'.format(
+                                allowed_labels,labels))
+
             order = self.get_order_by_label(labels, dim_labels)
             if order != [i for i in range(len(dim_labels))]:
                 # resort
                 self.shape = tuple([shape[i] for i in order])
             else:
-                self.shape = tuple(order)
+                self.shape = shape
+
             self.dimension_labels = labels
     
     def get_order_by_label(self, dimension_labels, default_dimension_labels):
@@ -717,10 +834,7 @@ class AcquisitionGeometry(object):
         repres += "Geometry type: {0}\n".format(self.geom_type)
         repres += "Panel description:\n"             
         repres += "\tpanel size: h{0},v{1}\n".format(self.panel.num_pixels[0], self.panel.num_pixels[1])
-        
-        if self.panel.pixel_size is not None:
-            repres += "\tpixel size: h{0},v{1}\n".format(self.panel.pixel_size[0], self.panel.pixel_size[1])
-        
+        repres += "\tpixel size: h{0},v{1}\n".format(self.panel.pixel_size[0], self.panel.pixel_size[1])
         repres += "\tnumber of channels: {0}\n".format(self.panel.num_channels)
         
         if self.panel.channel_labels is not None:
@@ -729,24 +843,10 @@ class AcquisitionGeometry(object):
         repres += "num_positions: {0}\n".format(self.num_positions)         
 
         repres += "System configuration:\n"
-
         if self.angles is not None:
-            if self.configuration.source.position is not None:
-                repres += "\tsource position: {0}\n".format(self.configuration.source.position)
-            if self.configuration.source.orientation is not None:        
-                repres += "\tsource orientation: {0}\n".format(self.configuration.source.orientation)
-            if self.configuration.detector.position is not None:   
-                repres += "\tdetector position: {0}\n".format(self.configuration.detector.position)
-            if self.configuration.detector.orientation is not None:                   
-                repres += "\tdetector orientation: {0}\n".format(self.configuration.detector.orientation)
-            if self.configuration.object.position is not None:
-                repres += "\tobject position: {0}\n".format(self.configuration.object.position)
-            if self.configuration.object.orientation is not None:
-                repres += "\tobject orientation: {0}\n".format(self.configuration.object.orientation)
-
             repres += "angles 0-10: {0}...\n".format(self.angles[0:min(10,self.num_positions)])                  
             repres += "all algular units: {0}".format(self.angle_unit)                  
-
+            repres += "\tToDo ADD SYSTEM CONFIG\n" #ToDo
         else:
             repres += "\tgeometry stored per projection\n"
             #ToDo print arrays
@@ -1357,7 +1457,6 @@ class DataContainer(object):
         '''return the euclidean norm of the DataContainer viewed as a vector'''
         return numpy.sqrt(self.squared_norm(**kwargs))
     
-    
     def dot(self, other, *args, **kwargs):
         '''return the inner product of 2 DataContainers viewed as vectors
         
@@ -1736,69 +1835,46 @@ class AcquisitionData(DataContainer):
             raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
         out = super(AcquisitionData, self).subset(dimensions, **kw)
         
-        if out.number_of_dimensions > 1:
-            
-            dim = str (len(out.shape)) + "D"
            
-            channels = 1
-            pixel_num_h = 1
-            pixel_num_v = 1
+        #slice on angle or channel should return full AG
+        #slice on V?#
+            #returns full geometry but:
+                #'detector origin' should change to slice pos if not None, and pix_size not none (need det origin, Rx, Ry, and pix_size)
+                #'detector orientation' updated to Ry, Rz (rx = 0)
+                #num pix_v = 1
+        # Slice on H? 
+            # (horixontal rotation axis)
+                #'detector origin' should change to slice pos if not None and pix size not none (need det origin, Ry, Rz, and pix_size)
+                #detector orientation updated to Rx, Ry (Rz = 0)
+                #num pix_h = 1
 
-            #slice on angle or channel should return full AG
-            #slice on V?#
-                #returns full geometry but:
-                    #'detector origin' should change to slice pos if not None, and pix_size not none (need det origin, Rx, Ry, and pix_size)
-                    #'detector orientation' updated to Ry, Rz (rx = 0)
-                    #num pix_v = 1
-            # Slice on H? 
-                # (horixontal rotation axis)
-                    #'detector origin' should change to slice pos if not None and pix size not none (need det origin, Ry, Rz, and pix_size)
-                    #detector orientation updated to Rx, Ry (Rz = 0)
-                    #num pix_h = 1
+        dimension_labels = [ out.dimension_labels[k] for k in range(len(out.dimension_labels))]
+        shape = out.shape
 
-
- 
-
-            # update the angles if necessary, will need to handle per projection geometry too
-            sliceme = kw.get(AcquisitionGeometry.ANGLE, None)
-            if sliceme is not None:
-                angles = self.geometry.angles[sliceme]
-            else:
-                angles = self.geometry.angles.copy()
+        out.geometry = self.geometry.copy()
+        out.geometry.dimension_labels = dimension_labels
+        out.geometry.shape = shape
 
 
-            #ToDo udate this
-            for key in out.dimension_labels.keys():
-                if out.dimension_labels[key] == AcquisitionGeometry.CHANNEL:
-                    channels = self.geometry.panel.num_channels
-                elif out.dimension_labels[key] == AcquisitionGeometry.ANGLE:
-                    pass
-                elif out.dimension_labels[key] == AcquisitionGeometry.VERTICAL:
-                    pixel_num_v = self.geometry.panel.num_pixels[1]
-                elif out.dimension_labels[key] == AcquisitionGeometry.HORIZONTAL:
-                    pixel_num_h = self.geometry.panel.num_pixels[0]
-                
-            
-            dim_lab = [ out.dimension_labels[k] for k in range(len(out.dimension_labels.items()))]
 
-            #ToDo: misses any kwargs used in set up?
-            out.geometry = AcquisitionGeometry( geom_type =self.geometry.geom_type, 
-                                                num_pixels = (pixel_num_h, pixel_num_v),
-                                                pixel_size = self.geometry.panel.pixel_size,
-                                                source_position = self.geometry.configuration.source.position,
-                                                source_orientation = self.geometry.configuration.source.orientation,
-                                                detector_position = self.geometry.configuration.detector.position,
-                                                detector_orientation = self.geometry.configuration.detector.orientation,
-                                                object_position = self.geometry.configuration.object.position,
-                                                object_orientation = self.geometry.configuration.object.orientation,                                           
-                                                angles = angles,
-                                                angle_units = self.geometry.angle_unit,
-                                                num_channels = channels,
-                                                dimension_labels = dim_lab)    
-                  
-        return out
+        angle_slice = kw.get(AcquisitionGeometry.ANGLE, None)
+        channel_slice = kw.get(AcquisitionGeometry.CHANNEL, None)
+        vertical_slice = kw.get(AcquisitionGeometry.VERTICAL, None)
+        horizontal_slice = kw.get(AcquisitionGeometry.HORIZONTAL, None)
+
+        if angle_slice is not None:
+            out.geometry.angles = out.geometry.angles[angle_slice]
+        elif channel_slice is not None:
+            out.geometry.panel.num_channels = 1
+            if out.geometry.panel.channel_labels is not None:
+                out.geometry.panel.channel_labels = out.geometry.panel.channel_labels[channel_slice]
+        elif vertical_slice is not None:
+            out.geometry.panel.num_pixels[1] = 1
+        elif horizontal_slice is not None:
+            out.geometry.panel.num_pixels[0] = 1
     
-                
+        return out
+
             
 class DataProcessor(object):
     
@@ -2123,7 +2199,9 @@ class VectorGeometry(object):
     
 if __name__ == "__main__":
     
-    ag = AcquisitionGeometry(geom_type='cone',num_pixels=(10,20),angles=[0.1,0.2])
+    ag = AcquisitionGeometry(geom_type='parallel',num_pixels=(10,20),angles=[0.1,0.2])
+    ad = ag.allocate(0)
+    ad.subset(angle=1)
 
     vert = ag.pixel_num_v
 

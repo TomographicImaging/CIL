@@ -22,7 +22,7 @@ from __future__ import print_function
 from ccpi.optimisation.operators import LinearOperator
 import numpy as np
 
-class FiniteDiff(LinearOperator):
+class OldFiniteDiff(LinearOperator):
     
     '''Finite Difference Operator:
             
@@ -74,7 +74,7 @@ class FiniteDiff(LinearOperator):
         #self.voxel_size = kwargs.get('voxel_size',1)
         # this wrongly assumes a homogeneous voxel size
 #        self.voxel_size = self.gm_domain.voxel_size_x
-        super(FiniteDiff, self).__init__(domain_geometry=gm_domain, 
+        super(OldFiniteDiff, self).__init__(domain_geometry=gm_domain, 
                                          range_geometry=self.gm_range) 
 
 
@@ -348,55 +348,267 @@ class FiniteDiff(LinearOperator):
         if outnone:
             ret.fill(outa)
             return ret
+        
+        
+class FiniteDiff(LinearOperator):
+    
+    def __init__(self, domain_geometry, 
+                       range_geometry=None, 
+                       direction=0, 
+                       method = 'forward',
+                       voxel_size = 1.0,
+                       bnd_cond = 'Neumann'):
+        
+        self.direction = direction
+        self.voxel_size = voxel_size
+        self.boundary_condition = bnd_cond
+        self.method = method
+                
+        # Domain Geometry = Range Geometry if not stated
+        if range_geometry is None:
+            range_geometry = domain_geometry 
+            
+        super(FiniteDiff, self).__init__(domain_geometry = domain_geometry, 
+                                         range_geometry = range_geometry)              
+            
+        self.size_dom_gm = len(self.domain_geometry().shape) 
+        
+        # check direction and "length" of geometry
+        if self.direction + 1 > self.size_dom_gm:
+            raise ValueError('Finite differences direction {} larger than geometry shape length {}'.format(self.direction + 1, self.size_dom_gm))          
+                                                 
+    def get_slice(self, start, stop, end=None):
+        
+        tmp = [slice(None)]*self.size_dom_gm
+        tmp[self.direction] = slice(start, stop, end)
+        return tmp       
 
+    def direct(self, x, out = None):
+        
+        x_asarr = x.as_array()
+        
+        outnone = False
+        if out is None:
+            outnone = True
+            ret = self.domain_geometry().allocate()
+            outa = ret.as_array()
+        else:
+            outa = out.as_array()
+            outa[:]=0     
 
+        if self.method == 'forward':  
+            
+            np.subtract( x_asarr[tuple(self.get_slice(2, None))], \
+                             x_asarr[tuple(self.get_slice(1,-1))], \
+                             out = outa[tuple(self.get_slice(1, -1))])               
 
+            if self.boundary_condition == 'Neumann':
+                
+                np.subtract(x_asarr[tuple(self.get_slice(1,2))],\
+                            x_asarr[tuple(self.get_slice(0,1))],
+                            out = outa[tuple(self.get_slice(0,1))]) 
+                
+            elif self.boundary_condition == 'Periodic':
+                
+                np.subtract(x_asarr[tuple(self.get_slice(1,2))],\
+                            x_asarr[tuple(self.get_slice(0,1))],
+                            out = outa[tuple(self.get_slice(0,1))])  
+                
+                np.subtract(x_asarr[tuple(self.get_slice(0,1))],\
+                            x_asarr[tuple(self.get_slice(-1,None))],
+                            out = outa[tuple(self.get_slice(-1,None))])  
+                
+            else:
+                raise ValueError('Not implemented')                
+                
+
+        elif self.method == 'backward':   
+                                   
+            
+            np.subtract( x_asarr[tuple(self.get_slice(1, -1))], \
+                             x_asarr[tuple(self.get_slice(0,-2))], \
+                             out = outa[tuple(self.get_slice(1, -1))])              
+            
+            if self.boundary_condition == 'Neumann':
+                    
+                    np.subtract( x_asarr[tuple(self.get_slice(-1, None))], \
+                                 x_asarr[tuple(self.get_slice(-2,-1))], \
+                                 out = outa[tuple(self.get_slice(-1, None))]) 
+                    
+            elif self.boundary_condition == 'Periodic':
+                    
+                np.subtract(x_asarr[tuple(self.get_slice(0,1))],\
+                            x_asarr[tuple(self.get_slice(-1,None))],
+                            out = outa[tuple(self.get_slice(0,1))])  
+                
+                np.subtract(x_asarr[tuple(self.get_slice(-1,None))],\
+                            x_asarr[tuple(self.get_slice(-2,-1))],
+                            out = outa[tuple(self.get_slice(-1,None))])  
+                                                         
+            else:
+                raise ValueError('Not implemented')
+                
+        else:
+                raise ValueError('Not implemented')                
+
+  
+        if outnone:
+            outa /= self.voxel_size
+            ret.fill(outa)
+            return ret                
+                 
+        
+    def adjoint(self, x, out=None):
+        
+        # Adjoint operation defined as  
+                      
+        x_asarr = x.as_array()
+
+        outnone = False 
+        if out is None:
+            outnone = True
+            ret = self.range_geometry().allocate()
+            outa = ret.as_array()
+        else:
+            outa = out.as_array()        
+            outa[:]=0 
+            
+
+        if self.method == 'forward':    
+            
+            np.subtract( x_asarr[tuple(self.get_slice(1, -1))], \
+                             x_asarr[tuple(self.get_slice(0,-2))], \
+                             out = outa[tuple(self.get_slice(1, -1))])              
+            
+            if self.boundary_condition == 'Neumann':            
+
+                outa[tuple(self.get_slice(0,1))] = x_asarr[tuple(self.get_slice(0,1))]                
+                outa[tuple(self.get_slice(-1,None))] = - x_asarr[tuple(self.get_slice(-2,-1))]  
+                
+            elif self.boundary_condition == 'Periodic':            
+
+                np.subtract(x_asarr[tuple(self.get_slice(0,1))],\
+                            x_asarr[tuple(self.get_slice(-1,None))],
+                            out = outa[tuple(self.get_slice(0,1))])  
+                
+                np.subtract(x_asarr[tuple(self.get_slice(-1,None))],\
+                            x_asarr[tuple(self.get_slice(-2,-1))],
+                            out = outa[tuple(self.get_slice(-1,None))])                 
+                
+        elif self.method == 'backward': 
+            
+            np.subtract( x_asarr[tuple(self.get_slice(2, None))], \
+                             x_asarr[tuple(self.get_slice(1,-1))], \
+                             out = outa[tuple(self.get_slice(1, -1))])             
+            
+            if self.boundary_condition == 'Neumann':             
+                
+                outa[tuple(self.get_slice(0,1))] = x_asarr[tuple(self.get_slice(1,2))]                
+                outa[tuple(self.get_slice(-1,None))] = - x_asarr[tuple(self.get_slice(-1,None))] 
+                
+                
+            elif self.boundary_condition == 'Periodic':
+            
+                np.subtract(x_asarr[tuple(self.get_slice(1,2))],\
+                            x_asarr[tuple(self.get_slice(0,1))],
+                            out = outa[tuple(self.get_slice(0,1))])  
+                
+                np.subtract(x_asarr[tuple(self.get_slice(0,1))],\
+                            x_asarr[tuple(self.get_slice(-1,None))],
+                            out = outa[tuple(self.get_slice(-1,None))])              
+                            
+            else:
+                raise ValueError('Not implemented')
+                
+        else:
+                raise ValueError('Not implemented')                  
+                               
+        outa *= -1.
+            
+        if outnone:
+            outa /= self.voxel_size
+            ret.fill(outa)
+            return ret       
+        
 if __name__ == '__main__':
     
+    
     from ccpi.framework import ImageGeometry
-    import numpy
+    import numpy as np
+    from timeit import default_timer as timer
     
-    N, M = 2, 3
-
-    ig = ImageGeometry(N, M)
-
-
-    FD = FiniteDiff(ig, direction = 1, bnd_cond = 'Neumann')
-    u = FD.domain_geometry().allocate('random_int')
+    ig = ImageGeometry(3, 4)
+    x = ig.allocate('random_int', max_value = 10, seed = 10)
+    methods = ['forward', 'backward']
+                
+    for i in range(len(ig.shape)):
         
-    res = FD.domain_geometry().allocate()
-    res1 = FD.range_geometry().allocate()
-    FD.direct(u, out=res)
-
-    z = FD.direct(u)    
-#    print(z.as_array(), res.as_array())
-
-    for i in range(10):
-#        
-        z1 = FD.direct(u) 
-        FD.direct(u, out=res)
-        
-        u = ig.allocate('random_int')
-        res = u
-        z1  = u
-        numpy.testing.assert_array_almost_equal(z1.as_array(), \
-                                                res.as_array(), decimal=4)
-        
-#        print(z1.as_array(), res.as_array())
-        z2 = FD.adjoint(z1) 
-        FD.adjoint(z1, out=res1)  
-        numpy.testing.assert_array_almost_equal(z2.as_array(), \
-                                                res1.as_array(), decimal=4)        
-        
-        
-        
-
-        
-        
-        
+        FD_old = OldFiniteDiff(ig, direction=i, bnd_cond = 'Neumann')    
+        FD = FiniteDiff(ig, direction=i,  bnd_cond = 'Neumann')        
     
-#    w = G.range_geometry().allocate('random_int')
+        res1 = FD_old.direct(x)
+        res2 = FD.direct(x)
+        
+        np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array())
+        
+    for i in range(len(ig.shape)):
+        
+        FD_old = OldFiniteDiff(ig, direction=i, bnd_cond = 'Periodic')    
+        FD = FiniteDiff(ig, direction=i,  bnd_cond = 'Periodic') 
+        
+        res1 = FD_old.direct(x)
+        res2 = FD.direct(x)        
     
+        np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array()) 
+     
+            
+    FD = FiniteDiff(ig, direction=0, method = 'forward', bnd_cond = 'Neumann') 
+    print(FD.dot_test(FD))
+    
+    FD = FiniteDiff(ig, direction=0, method = 'backward', bnd_cond = 'Neumann') 
+    print(FD.dot_test(FD))    
+    
+    FD = FiniteDiff(ig, direction=0, method = 'forward', bnd_cond = 'Periodic') 
+    print(FD.dot_test(FD))    
+    
+    FD = FiniteDiff(ig, direction=0, method = 'backward', bnd_cond = 'Periodic') 
+    print(FD.dot_test(FD))     
+    
+    voxel_size = [0.3, 0.001, 0.04, 4.]
+    bnd_cond = ['Neumann', 'Periodic']
+    
+    x = ig.allocate('random', max_value = 10, seed = 10)
+    w = ig.allocate('random')
+    
+    for i in range(len(ig.shape)):
+            for j in range(len(methods)): 
+                for k in range(len(voxel_size)): 
+                    for l in range(len(bnd_cond)):
+                        FD = FiniteDiff(ig, direction = i, method = methods[j], voxel_size = voxel_size[k], bnd_cond = bnd_cond[l])
+                        
+                        
+                        print("FD: Direction = {}, Method = {}, VS = {}, BND = {} , DOT = {}"\
+                              .format(i, methods[j], voxel_size[k], bnd_cond[l], \
+                                      FD.dot_test(FD)))
+        
+    ig = ImageGeometry(300,200,400)                
+    FD_old = OldFiniteDiff(ig, direction=0, bnd_cond = 'Periodic')    
+    FD = FiniteDiff(ig, direction=1, method = 'backward',  bnd_cond = 'Periodic')    
+    
+    x = ig.allocate()
+    res1 = x*0.
+    t0 = timer()
+    for i in range(100):
+        FD_old.direct(x, out = res1)
+    t1 = timer()
+    print(t1-t0)
 
-    
-    
+    res2 = x*0.
+    t2 = timer()
+    for i in range(100):
+        FD.direct(x, out = res2)
+    t3 = timer()
+    print(t3-t2)    
+
+                   
+                        

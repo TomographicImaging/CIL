@@ -398,22 +398,26 @@ class FiniteDiff(LinearOperator):
 
         if self.method == 'forward':  
             
+            # interior nodes
             np.subtract( x_asarr[tuple(self.get_slice(2, None))], \
                              x_asarr[tuple(self.get_slice(1,-1))], \
                              out = outa[tuple(self.get_slice(1, -1))])               
 
             if self.boundary_condition == 'Neumann':
                 
+                # left boundary
                 np.subtract(x_asarr[tuple(self.get_slice(1,2))],\
                             x_asarr[tuple(self.get_slice(0,1))],
                             out = outa[tuple(self.get_slice(0,1))]) 
                 
             elif self.boundary_condition == 'Periodic':
                 
+                # left boundary
                 np.subtract(x_asarr[tuple(self.get_slice(1,2))],\
                             x_asarr[tuple(self.get_slice(0,1))],
                             out = outa[tuple(self.get_slice(0,1))])  
                 
+                # right boundary
                 np.subtract(x_asarr[tuple(self.get_slice(0,1))],\
                             x_asarr[tuple(self.get_slice(-1,None))],
                             out = outa[tuple(self.get_slice(-1,None))])  
@@ -424,23 +428,26 @@ class FiniteDiff(LinearOperator):
 
         elif self.method == 'backward':   
                                    
-            
+            # interior nodes
             np.subtract( x_asarr[tuple(self.get_slice(1, -1))], \
                              x_asarr[tuple(self.get_slice(0,-2))], \
                              out = outa[tuple(self.get_slice(1, -1))])              
             
             if self.boundary_condition == 'Neumann':
                     
+                    # right boundary
                     np.subtract( x_asarr[tuple(self.get_slice(-1, None))], \
                                  x_asarr[tuple(self.get_slice(-2,-1))], \
                                  out = outa[tuple(self.get_slice(-1, None))]) 
                     
             elif self.boundary_condition == 'Periodic':
-                    
+                  
+                # left boundary
                 np.subtract(x_asarr[tuple(self.get_slice(0,1))],\
                             x_asarr[tuple(self.get_slice(-1,None))],
                             out = outa[tuple(self.get_slice(0,1))])  
                 
+                # right boundary
                 np.subtract(x_asarr[tuple(self.get_slice(-1,None))],\
                             x_asarr[tuple(self.get_slice(-2,-1))],
                             out = outa[tuple(self.get_slice(-1,None))])  
@@ -476,43 +483,54 @@ class FiniteDiff(LinearOperator):
 
         if self.method == 'forward':    
             
+            # interior nodes
             np.subtract( x_asarr[tuple(self.get_slice(1, -1))], \
                              x_asarr[tuple(self.get_slice(0,-2))], \
                              out = outa[tuple(self.get_slice(1, -1))])              
             
             if self.boundary_condition == 'Neumann':            
 
+                # left boundary
                 outa[tuple(self.get_slice(0,1))] = x_asarr[tuple(self.get_slice(0,1))]                
+                
+                # right boundary
                 outa[tuple(self.get_slice(-1,None))] = - x_asarr[tuple(self.get_slice(-2,-1))]  
                 
             elif self.boundary_condition == 'Periodic':            
 
+                # left boundary
                 np.subtract(x_asarr[tuple(self.get_slice(0,1))],\
                             x_asarr[tuple(self.get_slice(-1,None))],
                             out = outa[tuple(self.get_slice(0,1))])  
-                
+                # right boundary
                 np.subtract(x_asarr[tuple(self.get_slice(-1,None))],\
                             x_asarr[tuple(self.get_slice(-2,-1))],
                             out = outa[tuple(self.get_slice(-1,None))])                 
                 
         elif self.method == 'backward': 
             
+            # interior nodes
             np.subtract( x_asarr[tuple(self.get_slice(2, None))], \
                              x_asarr[tuple(self.get_slice(1,-1))], \
                              out = outa[tuple(self.get_slice(1, -1))])             
             
             if self.boundary_condition == 'Neumann':             
                 
+                # left boundary
                 outa[tuple(self.get_slice(0,1))] = x_asarr[tuple(self.get_slice(1,2))]                
+                
+                # right boundary
                 outa[tuple(self.get_slice(-1,None))] = - x_asarr[tuple(self.get_slice(-1,None))] 
                 
                 
             elif self.boundary_condition == 'Periodic':
             
+                # left boundary
                 np.subtract(x_asarr[tuple(self.get_slice(1,2))],\
                             x_asarr[tuple(self.get_slice(0,1))],
                             out = outa[tuple(self.get_slice(0,1))])  
                 
+                # right boundary
                 np.subtract(x_asarr[tuple(self.get_slice(0,1))],\
                             x_asarr[tuple(self.get_slice(-1,None))],
                             out = outa[tuple(self.get_slice(-1,None))])              

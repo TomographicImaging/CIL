@@ -20,10 +20,9 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
-from ccpi.framework import ImageData
 from ccpi.optimisation.operators import LinearOperator
 
-from scipy.signal import convolve2d, correlate2d
+from scipy.ndimage import convolve, correlate
 
 class BlurringOperator(LinearOperator):
     
@@ -45,31 +44,29 @@ class BlurringOperator(LinearOperator):
         
     def direct(self,x,out=None):
         
-        '''Returns D(x)'''
+        '''Returns D(x). The forward mapping consists of convolution of the 
+        image with the specified PSF. Here reflective boundary conditions 
+        are selected.'''
         
         if out is None:
             result = self.range_geometry().allocate()
-            result.fill(convolve2d(x.as_array(),self.PSF,mode='same',boundary='symm'))
+            result.fill(convolve(x.as_array(),self.PSF, mode='reflect'))
             return result
         else:
-            out.fill(convolve2d(x.as_array(),self.PSF,mode='same',boundary='symm'))
-        #result.fill(convolve2d(x.as_array(),self.PSF,mode='same'))
+            convolve(x.as_array(),self.PSF, output=out.as_array(),mode='reflect')
     
     def adjoint(self,x, out=None):
         
-        '''Returns D^{*}(y).'''
+        '''Returns D^{*}(y). The adjoint of convolution is convolution with 
+        the PSF rotated by 180 degrees, or equivalently correlation by the PSF
+        itself.'''
         
         if out is None:
             result = self.domain_geometry().allocate()
-            result.fill(correlate2d(x.as_array(),self.PSF,mode='same',boundary='symm'))
-            #result.fill(correlate2d(x.as_array(),self.PSF_adjoint,mode='same'))
+            result.fill(correlate(x.as_array(),self.PSF, mode='reflect'))
             return result
         else:
-            out.fill(correlate2d(x.as_array(),self.PSF,mode='same',boundary='symm'))
-            
-    
-    #def norm(self):
-    #    return 100.0
+            correlate(x.as_array(),self.PSF, output=out.as_array(),mode='reflect')
 
 if __name__ == '__main__':
     
@@ -77,23 +74,12 @@ if __name__ == '__main__':
     
     from ccpi.optimisation.algorithms import PDHG
     
-    from ccpi.optimisation.operators import BlockOperator, Gradient, \
-                                            MaskOperator, ChannelwiseOperator
-    from ccpi.optimisation.functions import ZeroFunction, L1Norm, \
-                          MixedL21Norm, BlockFunction, L2NormSquared,\
-                              KullbackLeibler
+    from ccpi.optimisation.operators import BlockOperator, Gradient
+    from ccpi.optimisation.functions import ZeroFunction, MixedL21Norm, \
+                                            BlockFunction, L2NormSquared
     from ccpi.framework import TestData
     import os
     import sys
-    
-    import numpy as np
-    
-    # Specify which which type of noise to use.    
-    which_noise = 0
-    print ("which_noise ", which_noise)
-    
-    # Specify whether to do gray (0), colour using channelwise (1), colour mask (2)
-    colour_mode = 1
     
     # Load in test image
     loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
@@ -106,117 +92,54 @@ if __name__ == '__main__':
                 0.1140*data_rgb.subset(channel=2)
     ig_gray = data_gray.geometry
     
-    #plt.figure(), plt.imshow(data_gray.as_array()), plt.gray(), plt.colorbar()
-     
+    # Display clean original image
+    plt.figure(), plt.imshow(data_gray.as_array()), plt.gray(), plt.colorbar()
+    
+    # Parameters for point spread function PSF (size and std)
     ks          = 11; 
     ksigma      = 5.0;
     
+    # Create 1D PSF and 2D as outer product, then normalise.
+    w           = np.exp(-np.arange(-(ks-1)/2,(ks-1)/2+1)**2/(2*ksigma**2))
+    w.shape     = (ks,1)
+    PSF         = w*np.transpose(w)
+    PSF         = PSF/(PSF**2).sum()
+    PSF         = PSF/PSF.sum()
     
-    #w           = np.exp(-np.arange(-(ks-1)/2,(ks-1)/2+1)**2/(2*ksigma**2))
-    #w.shape     = (ks,1)
-    #PSF         = w*np.transpose(w)
-    #PSF         = PSF/(PSF**2).sum()
-    #PSF         = PSF/PSF.sum()
-    #PSF = np.ones((ks,ks))/ks**2
+    # Display PSF as image
+    plt.figure(), plt.imshow(PSF), plt.gray(), plt.colorbar()
     
-    PSF = np.random.rand(ks,ks)
-    PSF = PSF / PSF.sum()
-    
-    #Q,R = np.linalg.qr(PSF)
-    
-    
+    # Create blurring operator and apply to clean image to produce blurred,
+    # and display.
     BOP = BlurringOperator(PSF,ig_gray)
-    
-    print(BOP.dot_test(BOP))
-    
     blurredimage = BOP.direct(data_gray)
-    
-    
-    
     plt.figure(), plt.imshow(blurredimage.as_array()), plt.gray(), plt.colorbar()
     
+    # Further apply adjoint for illustration and display.    
     adjointimage = BOP.adjoint(blurredimage)
-    
     plt.figure(), plt.imshow(adjointimage.as_array()), plt.gray(), plt.colorbar()
     
-#    # Create mask with letters CIL
-#    if colour_mode < 2:
-#        mask = ig_gray.allocate(True,dtype=np.bool)
-#    else:
-#        mask = ig_rgb.allocate(True,dtype=np.bool)
-#    amask = mask.as_array()
-#    
-#    # Letter C
-#    amask[50:-50,56-10:56+10] = False
-#    amask[-70:-50,56-10:166] = False
-#    amask[50:70,56-10:166] = False
-#    
-#    # Letter I
-#    amask[50:-50,256-10:256+10] = False
-#    amask[50:70,256-50:256+50] = False
-#    amask[-70:-50,256-50:256+50] = False
-#    
-#    # Letter L
-#    amask[50:-50,356-10:356+10] = False
-#    amask[-70:-50,356-10:466] = False
-#    
-#    # If 0, use the gray version and do a single-channel mask and inpainting.
-#    # If 1, use ChannelwiseOperator to do colour inpainting.
-#    # If 2, use multi-channel mask in MaskOperator to do colour inpainting.
-#    if colour_mode==0:
-#        MO = MaskOperator(mask)
-#        data = data_gray
-#    elif colour_mode==1:
-#        MO = ChannelwiseOperator(MaskOperator(mask),3,'append')
-#        data = data_rgb
-#    else:
-#        MO = MaskOperator(mask)
-#        data = data_rgb
-#    ig = data.geometry
-#    
-#    # Create noisy and masked data: First add noise, then mask the image with 
-#    # MaskOperator.
-#    noises = ['gaussian', 'poisson', 's&p']
-#    noise = noises[which_noise]
-#    if noise == 's&p':
-#        n1 = TestData.random_noise(data.as_array(), mode = noise, salt_vs_pepper = 0.9, amount=0.2)
-#    elif noise == 'poisson':
-#        scale = 5
-#        n1 = TestData.random_noise( data.as_array()/scale, mode = noise, seed = 10)*scale
-#    elif noise == 'gaussian':
-#        n1 = TestData.random_noise(data.as_array(), mode = noise, seed = 10)
-#    else:
-#        raise ValueError('Unsupported Noise ', noise)
-#    noisy_data = ig.allocate()
-#    noisy_data.fill(n1)
+    # Run dot test to check validity of adjoint.
+    print(BOP.dot_test(BOP))
     
-    noisy_data = BOP.direct(data_gray)    
-    
-    # Regularisation Parameter depending on the noise distribution
-#    if noise == 's&p':
-#        alpha = 0.8
-#    elif noise == 'poisson':
-#        alpha = 1.0
-#    elif noise == 'gaussian':
-    alpha = 0.02
-    
-    # Choose data fidelity dependent on noise type.
-#    if noise == 's&p':
-#        f2 = L1Norm(b=noisy_data)
-#    elif noise == 'poisson':
-#        f2 = KullbackLeibler(noisy_data)
-#    elif noise == 'gaussian':
-    f2 = 0.5 * L2NormSquared(b=noisy_data)
+    # Specify total variation regularised least squares
     
     # Create operators
     op1 = Gradient(ig_gray, correlation=Gradient.CORRELATION_SPACE)
     op2 = BOP
     
+    # Set regularisation parameter.
+    alpha = 0.02
+    
+    # Create functions to be blocked with operators
+    f1 = alpha * MixedL21Norm()
+    f2 = 0.5 * L2NormSquared(b=blurredimage)
+    
     # Create BlockOperator
     operator = BlockOperator(op1, op2, shape=(2,1) ) 
     
     # Create functions      
-    f = BlockFunction(alpha * MixedL21Norm(), f2) 
+    f = BlockFunction(f1, f2) 
     g = ZeroFunction()
             
     # Compute operator Norm
@@ -240,7 +163,7 @@ if __name__ == '__main__':
     plt.gray()
     plt.colorbar()
     plt.subplot(1,3,2)
-    plt.imshow(noisy_data.as_array(),vmin=0.0,vmax=1.0)
+    plt.imshow(blurredimage.as_array(),vmin=0.0,vmax=1.0)
     plt.title('Noisy and Masked Data')
     plt.gray()
     plt.colorbar()

@@ -373,6 +373,9 @@ class FiniteDiff(LinearOperator):
             
         self.size_dom_gm = len(self.domain_geometry().shape) 
         
+        if self.voxel_size <= 0:
+            raise ValueError(' Need a positive voxel size ')                      
+                    
         # check direction and "length" of geometry
         if self.direction + 1 > self.size_dom_gm:
             raise ValueError('Finite differences direction {} larger than geometry shape length {}'.format(self.direction + 1, self.size_dom_gm))          
@@ -396,6 +399,10 @@ class FiniteDiff(LinearOperator):
             outa = out.as_array()
             outa[:]=0     
 
+        #######################################################################
+        ##################### Forward differences #############################
+        #######################################################################
+                
         if self.method == 'forward':  
             
             # interior nodes
@@ -409,6 +416,7 @@ class FiniteDiff(LinearOperator):
                 np.subtract(x_asarr[tuple(self.get_slice(1,2))],\
                             x_asarr[tuple(self.get_slice(0,1))],
                             out = outa[tuple(self.get_slice(0,1))]) 
+                
                 
             elif self.boundary_condition == 'Periodic':
                 
@@ -425,6 +433,9 @@ class FiniteDiff(LinearOperator):
             else:
                 raise ValueError('Not implemented')                
                 
+        #######################################################################
+        ##################### Backward differences ############################
+        #######################################################################                
 
         elif self.method == 'backward':   
                                    
@@ -450,10 +461,57 @@ class FiniteDiff(LinearOperator):
                 # right boundary
                 np.subtract(x_asarr[tuple(self.get_slice(-1,None))],\
                             x_asarr[tuple(self.get_slice(-2,-1))],
-                            out = outa[tuple(self.get_slice(-1,None))])  
-                                                         
+                            out = outa[tuple(self.get_slice(-1,None))]) 
+                
             else:
-                raise ValueError('Not implemented')
+                raise ValueError('Not implemented')                 
+        
+        #######################################################################
+        ##################### Centered differences ############################
+        #######################################################################
+        
+        
+        elif self.method == 'centered':
+            
+            # interior nodes
+            np.subtract( x_asarr[tuple(self.get_slice(2, None))], \
+                             x_asarr[tuple(self.get_slice(0,-2))], \
+                             out = outa[tuple(self.get_slice(1, -1))]) 
+            
+            outa[tuple(self.get_slice(1, -1))] /= 2.
+            
+            if self.boundary_condition == 'Neumann':
+            #                
+#                # left boundary
+                np.subtract( x_asarr[tuple(self.get_slice(1, 2))], \
+                                 x_asarr[tuple(self.get_slice(0,1))], \
+                                 out = outa[tuple(self.get_slice(0, 1))])  
+                outa[tuple(self.get_slice(0, 1))] /=2.
+#                
+#                # left boundary
+                np.subtract( x_asarr[tuple(self.get_slice(-1, None))], \
+                                 x_asarr[tuple(self.get_slice(-2,-1))], \
+                                 out = outa[tuple(self.get_slice(-1, None))])
+                outa[tuple(self.get_slice(-1, None))] /=2.                
+#                
+            elif self.boundary_condition == 'Periodic':
+                pass
+#                
+               # left boundary
+                np.subtract( x_asarr[tuple(self.get_slice(1, 2))], \
+                                 x_asarr[tuple(self.get_slice(-1,None))], \
+                                 out = outa[tuple(self.get_slice(0, 1))])                  
+                outa[tuple(self.get_slice(0, 1))] /= 2.
+                
+                
+                # left boundary
+                np.subtract( x_asarr[tuple(self.get_slice(0, 1))], \
+                                 x_asarr[tuple(self.get_slice(-2,-1))], \
+                                 out = outa[tuple(self.get_slice(-1, None))]) 
+                outa[tuple(self.get_slice(-1, None))] /= 2.
+
+            else:
+                raise ValueError('Not implemented')                 
                 
         else:
                 raise ValueError('Not implemented')                
@@ -480,6 +538,11 @@ class FiniteDiff(LinearOperator):
             outa = out.as_array()        
             outa[:]=0 
             
+            
+        #######################################################################
+        ##################### Forward differences #############################
+        #######################################################################            
+            
 
         if self.method == 'forward':    
             
@@ -505,7 +568,14 @@ class FiniteDiff(LinearOperator):
                 # right boundary
                 np.subtract(x_asarr[tuple(self.get_slice(-1,None))],\
                             x_asarr[tuple(self.get_slice(-2,-1))],
-                            out = outa[tuple(self.get_slice(-1,None))])                 
+                            out = outa[tuple(self.get_slice(-1,None))]) 
+                
+            else:
+                raise ValueError('Not implemented')                 
+
+        #######################################################################
+        ##################### Backward differences ############################
+        #######################################################################                
                 
         elif self.method == 'backward': 
             
@@ -538,6 +608,54 @@ class FiniteDiff(LinearOperator):
             else:
                 raise ValueError('Not implemented')
                 
+                
+        #######################################################################
+        ##################### Centered differences ############################
+        #######################################################################
+
+        elif self.method == 'centered':
+            
+            # interior nodes
+            np.subtract( x_asarr[tuple(self.get_slice(2, None))], \
+                             x_asarr[tuple(self.get_slice(0,-2))], \
+                             out = outa[tuple(self.get_slice(1, -1))]) 
+            outa[tuple(self.get_slice(1, -1))] /= 2.
+            
+
+            if self.boundary_condition == 'Neumann':
+                
+                # left boundary
+                np.add(x_asarr[tuple(self.get_slice(0,1))],\
+                            x_asarr[tuple(self.get_slice(1,2))],
+                            out = outa[tuple(self.get_slice(0,1))])
+                outa[tuple(self.get_slice(0,1))] /= 2.
+
+                # right boundary
+                np.add(x_asarr[tuple(self.get_slice(-1,None))],\
+                            x_asarr[tuple(self.get_slice(-2,-1))],
+                            out = outa[tuple(self.get_slice(-1,None))])  
+
+                outa[tuple(self.get_slice(-1,None))] /= -2.                
+                                                            
+                
+            elif self.boundary_condition == 'Periodic':
+                
+                # left boundary
+                np.subtract(x_asarr[tuple(self.get_slice(1,2))],\
+                            x_asarr[tuple(self.get_slice(-1,None))],
+                            out = outa[tuple(self.get_slice(0,1))])
+                outa[tuple(self.get_slice(0,1))] /= 2.0
+                
+                # right boundary
+                np.subtract(x_asarr[tuple(self.get_slice(0,1))],\
+                            x_asarr[tuple(self.get_slice(-2,-1))],
+                            out = outa[tuple(self.get_slice(-1,None))])
+                outa[tuple(self.get_slice(-1,None))] /= 2.
+                
+                                
+            else:
+                raise ValueError('Not implemented') 
+                                             
         else:
                 raise ValueError('Not implemented')                  
                                
@@ -552,68 +670,32 @@ if __name__ == '__main__':
     
     
     from ccpi.framework import ImageGeometry
-    import numpy as np
     from timeit import default_timer as timer
     
-    ig = ImageGeometry(3, 4)
+    ig = ImageGeometry(3, 4, 5)
     x = ig.allocate('random_int', max_value = 10, seed = 10)
-    methods = ['forward', 'backward']
-                
-    for i in range(len(ig.shape)):
-        
-        FD_old = OldFiniteDiff(ig, direction=i, bnd_cond = 'Neumann')    
-        FD = FiniteDiff(ig, direction=i,  bnd_cond = 'Neumann')        
-    
-        res1 = FD_old.direct(x)
-        res2 = FD.direct(x)
-        
-        np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array())
-        
-    for i in range(len(ig.shape)):
-        
-        FD_old = OldFiniteDiff(ig, direction=i, bnd_cond = 'Periodic')    
-        FD = FiniteDiff(ig, direction=i,  bnd_cond = 'Periodic') 
-        
-        res1 = FD_old.direct(x)
-        res2 = FD.direct(x)        
-    
-        np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array()) 
+
      
-            
-    FD = FiniteDiff(ig, direction=0, method = 'forward', bnd_cond = 'Neumann') 
-    print(FD.dot_test(FD))
-    
-    FD = FiniteDiff(ig, direction=0, method = 'backward', bnd_cond = 'Neumann') 
-    print(FD.dot_test(FD))    
-    
-    FD = FiniteDiff(ig, direction=0, method = 'forward', bnd_cond = 'Periodic') 
-    print(FD.dot_test(FD))    
-    
-    FD = FiniteDiff(ig, direction=0, method = 'backward', bnd_cond = 'Periodic') 
-    print(FD.dot_test(FD))     
-    
-    voxel_size = [0.3, 0.001, 0.04, 4.]
+    methods = ['forward', 'backward', 'centered']
     bnd_cond = ['Neumann', 'Periodic']
-    
-    x = ig.allocate('random', max_value = 10, seed = 10)
-    w = ig.allocate('random')
+    vsz = [0.3, 3., 0.01, 4.]
     
     for i in range(len(ig.shape)):
-            for j in range(len(methods)): 
-                for k in range(len(voxel_size)): 
-                    for l in range(len(bnd_cond)):
-                        FD = FiniteDiff(ig, direction = i, method = methods[j], voxel_size = voxel_size[k], bnd_cond = bnd_cond[l])
+        for j in range(len(methods)):
+            for k in range(len(bnd_cond)):
+                for l in range(len(vsz)):
+                        FD = FiniteDiff(ig, direction=i, method = methods[j], bnd_cond = bnd_cond[k], voxel_size = vsz[l]) 
+                        print("FD: Direction = {}, Method = {}, VS = {}, BND = {} , DOT = {}" \
+                              .format(i, methods[j], vsz[l], bnd_cond[k], \
+                                      FD.dot_test(FD)))                    
                         
-                        
-                        print("FD: Direction = {}, Method = {}, VS = {}, BND = {} , DOT = {}"\
-                              .format(i, methods[j], voxel_size[k], bnd_cond[l], \
-                                      FD.dot_test(FD)))
-        
-    ig = ImageGeometry(300,200,400)                
-    FD_old = OldFiniteDiff(ig, direction=0, bnd_cond = 'Periodic')    
-    FD = FiniteDiff(ig, direction=1, method = 'backward',  bnd_cond = 'Periodic')    
+    # Checking speed vs the FiniteDiff old, the new one is a bit faster                        
+    ig1 = ImageGeometry(300,40,50, 20, 30)                        
+    FD_old = OldFiniteDiff(ig1, direction=0, bnd_cond = 'Neumann')    
+    FD = FiniteDiff(ig1, direction=0,  bnd_cond = 'Neumann')
+                           
+    x = ig1.allocate('random_int')
     
-    x = ig.allocate()
     res1 = x*0.
     t0 = timer()
     for i in range(100):
@@ -626,7 +708,7 @@ if __name__ == '__main__':
     for i in range(100):
         FD.direct(x, out = res2)
     t3 = timer()
-    print(t3-t2)    
-
-                   
-                        
+    print(t3-t2)  
+    
+    print((t3-t2)/(t1-t0))
+    

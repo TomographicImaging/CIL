@@ -138,9 +138,14 @@ class Gradient_numpy(LinearOperator):
         :type correlation: str, optional, default :code:`Space`
         '''                
         
-        self.size_dom_gm = len(domain_geometry.shape) 
+        self.size_dom_gm = len(domain_geometry.shape)         
+        self.correlation = kwargs.get('correlation',CORRELATION_SPACE)        
+        self.bnd_cond = bnd_cond 
         
-        self.correlation = kwargs.get('correlation',CORRELATION_SPACE)
+        # Call FiniteDiff operator 
+        self.method = method
+        self.FD = FiniteDiff(domain_geometry, direction = 0, method = self.method, voxel_size = 1.0, bnd_cond = self.bnd_cond)
+                
         
         if self.correlation==CORRELATION_SPACE:
             
@@ -188,18 +193,14 @@ class Gradient_numpy(LinearOperator):
                 range_geometry = BlockGeometry(*[domain_geometry for _ in range(domain_geometry.length)])
                 self.ind = range(domain_geometry.length)                
                 if self.size_dom_gm == 4:
+                    # Voxel size wrt to channel direction == 1.0
                     self.voxel_size_order = [1.0, domain_geometry.voxel_size_z, domain_geometry.voxel_size_y, domain_geometry.voxel_size_x ]                 
                 elif self.size_dom_gm == 3:
+                    # Voxel size wrt to channel direction == 1.0
                     self.voxel_size_order = [1.0, domain_geometry.voxel_size_y, domain_geometry.voxel_size_x ]                     
             else:
                 raise ValueError('No channels to correlate')
          
-        self.bnd_cond = bnd_cond 
-        
-        # Call FiniteDiff operator 
-        self.method = method
-        self.FD = FiniteDiff(domain_geometry, direction = 0, method = self.method, voxel_size = 1.0, bnd_cond = self.bnd_cond)
-
         super(Gradient_numpy, self).__init__(domain_geometry = domain_geometry, 
                                              range_geometry = range_geometry) 
         
@@ -358,13 +359,16 @@ class Gradient_C(LinearOperator):
             self.gm_range = BlockGeometry(*[gm_domain for _ in range(len(gm_domain.shape))])
         
         if len(gm_domain.shape) == 4:
+            # Voxel size wrt to channel direction == 1.0
             self.fd = cilacc.fdiff4D
             self.voxel_size_order = [1.0, gm_domain.voxel_size_z, gm_domain.voxel_size_y, gm_domain.voxel_size_x ]            
         elif len(gm_domain.shape) == 3:
+            # Voxel size wrt to channel direction == 1.0
             self.fd = cilacc.fdiff3D
             self.voxel_size_order = [gm_domain.voxel_size_z, gm_domain.voxel_size_y, gm_domain.voxel_size_x ]            
         elif len(gm_domain.shape) == 2:
             self.fd = cilacc.fdiff2D
+            # Voxel size wrt to channel direction == 1.0
             self.voxel_size_order = [gm_domain.voxel_size_y, gm_domain.voxel_size_x ]            
         else:
             raise ValueError('Number of dimensions not supported, expected 2, 3 or 4, got {}'.format(len(gm_domain.shape)))
@@ -428,12 +432,19 @@ if __name__ == '__main__':
     
     G_numpy = Gradient(ig, method = 'backward', bnd_cond = 'Neumann', backend = 'numpy')    
     print(G_numpy.dot_test(G_numpy))   
+        
+    G_numpy = Gradient(ig, method = 'centered', bnd_cond = 'Neumann', backend = 'numpy')    
+    print(G_numpy.dot_test(G_numpy))    
     
     G_numpy = Gradient(ig, method = 'forward', bnd_cond = 'Periodic', backend = 'numpy')    
     print(G_numpy.dot_test(G_numpy))
     
     G_numpy = Gradient(ig, method = 'backward', bnd_cond = 'Periodic', backend = 'numpy')    
     print(G_numpy.dot_test(G_numpy))
+    
+    G_numpy = Gradient(ig, method = 'centered', bnd_cond = 'Periodic', backend = 'numpy')    
+    print(G_numpy.dot_test(G_numpy))    
+    
         
 #    ig = ImageGeometry(voxel_num_x = 3, voxel_num_y = 4, voxel_size_x = 15, voxel_size_y = 12, channels = 2)
 #    x = ig.allocate('random_int', max_value = 10, seed = 10)  
@@ -448,7 +459,7 @@ if __name__ == '__main__':
 #    
 #    res1a = G_np.direct(x)
 #    print(res1a.get_item(0).as_array())   
-#    
+#    r
 #    res2a = G_c.direct(x)
 #    print(res2a.get_item(0).as_array()) 
 #

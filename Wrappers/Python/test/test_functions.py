@@ -396,14 +396,13 @@ class TestFunction(unittest.TestCase):
         self.assertBlockDataContainerAlmostEqual(z3,z1, decimal=5)
 
     def test_KullbackLeibler(self):
-        print ("test_KullbackLeibler")
-        #numpy.random.seed(1)
-        M, N, K =  2, 3, 4
+    
+        M, N, K =  30, 30, 20
         ig = ImageGeometry(N, M, K)
         
         u1 = ig.allocate('random', seed = 500)    
         g1 = ig.allocate('random', seed = 100)
-        b1 = ig.allocate('random', seed = 1000)
+        b1 = ig.allocate('random', seed = 500)
         
         # with no data
         try:
@@ -420,47 +419,56 @@ class TestFunction(unittest.TestCase):
         f = KullbackLeibler(b=g1)        
             
         print('Check KullbackLeibler(x,x)=0\n') 
-        self.assertNumpyArrayAlmostEqual(0.0, f(g1))
+        numpy.testing.assert_equal(0.0, f(g1))
                 
         print('Check gradient .... is OK \n')
         res_gradient = f.gradient(u1)
         res_gradient_out = u1.geometry.allocate()
         f.gradient(u1, out = res_gradient_out) 
-        self.assertNumpyArrayAlmostEqual(res_gradient.as_array(), \
-                                                res_gradient_out.as_array(),decimal = 4)  
+        numpy.testing.assert_array_almost_equal(res_gradient.as_array(), \
+                                                res_gradient_out.as_array())  
         
         print('Check proximal ... is OK\n')        
-        tau = 400.4
+        tau = 0.4
         res_proximal = f.proximal(u1, tau)
         res_proximal_out = u1.geometry.allocate()   
         f.proximal(u1, tau, out = res_proximal_out)
-        self.assertNumpyArrayAlmostEqual(res_proximal.as_array(), \
-                                                res_proximal_out.as_array(), decimal =5)  
-        
-        print('Check conjugate ... is OK\n')  
-        
-        if (1 - u1.as_array()).all():
-            print('If 1-x<=0, Convex conjugate returns 0.0')
-        u2 = u1 * 0 + 2.
-        self.assertNumpyArrayAlmostEqual(0.0, f.convex_conjugate(u2))   
-
-
-        print('Check KullbackLeibler with background\n')      
-        eta = b1
-        
+        numpy.testing.assert_array_almost_equal(res_proximal.as_array(), \
+                                                res_proximal_out.as_array())  
+                        
+    
+        print('Check KullbackLeibler with background\n')       
         f1 = KullbackLeibler(b=g1, eta=b1) 
             
-        tmp_sum = (u1 + eta).as_array()
+        tmp_sum = (u1 + f1.eta).as_array()
         ind = tmp_sum >= 0
         tmp = scipy.special.kl_div(f1.b.as_array()[ind], tmp_sum[ind])                 
-        self.assertNumpyArrayAlmostEqual(f1(u1), numpy.sum(tmp) )          
+        numpy.testing.assert_almost_equal(f1(u1), numpy.sum(tmp), decimal=1)
         
-        res_proximal_conj_out = u1.geometry.allocate()
-        proxc = f.proximal_conjugate(u1,tau)
-        f.proximal_conjugate(u1, tau, out=res_proximal_conj_out)
-        print(res_proximal_conj_out.as_array())
-        print(proxc.as_array())
-        numpy.testing.assert_array_almost_equal(proxc.as_array(), res_proximal_conj_out.as_array())
+        print('Check proximal KL without background\n')   
+        tau = [0.1, 1, 10, 100, 10000]
+        
+        for t1 in tau:
+            
+            proxc = f.proximal_conjugate(u1,t1)
+            proxc_out = ig.allocate()
+            f.proximal_conjugate(u1, t1, out = proxc_out)
+            print('tau = {} is OK'.format(t1) )
+            numpy.testing.assert_array_almost_equal(proxc.as_array(), 
+                                                    proxc_out.as_array(),
+                                                    decimal = 4)
+            
+        print('\nCheck proximal KL with background\n')          
+        for t1 in tau:
+            
+            proxc1 = f1.proximal_conjugate(u1,t1)
+            proxc_out1 = ig.allocate()
+            f1.proximal_conjugate(u1, t1, out = proxc_out1)
+            numpy.testing.assert_array_almost_equal(proxc1.as_array(), 
+                                                    proxc_out1.as_array(),
+                                                    decimal = 4)  
+        
+            print('tau = {} is OK'.format(t1) ) 
 
     def test_Rosenbrock(self):
         f = Rosenbrock (alpha = 1, beta=100)

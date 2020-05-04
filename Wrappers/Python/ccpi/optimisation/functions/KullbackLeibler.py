@@ -35,11 +35,11 @@ try:
     def kl_proximal(x,b, tau, out, eta):
             for i in prange(x.size):
                 out.flat[i] = 0.5 *  ( 
-                    ( x.flat[i] + eta.flat[i] - tau ) +\
+                    ( x.flat[i] - eta.flat[i] - tau ) +\
                     numpy.sqrt( (x.flat[i] + eta.flat[i] - tau)**2. + \
                         (4. * tau * b.flat[i]) 
                     )
-                )
+                )                   
     @jit(nopython=True)
     def kl_proximal_conjugate(x, b, bnoise, tau, out):
         #z = x + tau * self.bnoise
@@ -346,6 +346,15 @@ if __name__ == '__main__':
                                                 proxc_out1.as_array(),
                                                 decimal = 4)  
     
-        print('tau = {} is OK'.format(t1) )        
+        print('tau = {} is OK'.format(t1) )    
+        
+    f = KullbackLeibler(b=g1, eta = b1)        
+    tau = 0.4
+    res_proximal = f.proximal(u1, tau)
+    res_proximal_out = u1.geometry.allocate()   
+    f.proximal(u1, tau, out = res_proximal_out)
+    numpy.testing.assert_array_almost_equal(res_proximal.as_array(), \
+                                            res_proximal_out.as_array())  
+    print('Check proximal with eta ... is OK\n')         
         
     

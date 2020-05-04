@@ -532,11 +532,21 @@ class AcquisitionGeometry(object):
 
     @property
     def shape(self):
-        return self.__shape
+
+        shape_dict = {AcquisitionGeometry.CHANNEL: self.panel.num_channels,
+                     AcquisitionGeometry.ANGLE: len(self.angles),
+                     AcquisitionGeometry.VERTICAL: self.panel.num_pixels[1],        
+                     AcquisitionGeometry.HORIZONTAL: self.panel.num_pixels[0]}
+
+        shape = []
+        for label in self.dimension_labels:
+            shape.append(shape_dict[label])
+
+        return tuple(shape)
 
     @shape.setter
     def shape(self, val):
-        #ToDo bettwre warnings
+        #ToDo better warnings
         print("Deprecated - shape will be set automatically")
         pass
 
@@ -546,34 +556,23 @@ class AcquisitionGeometry(object):
 
     @dimension_labels.setter
     def dimension_labels(self, val):
+        labels_default = [  AcquisitionGeometry.CHANNEL,
+                            AcquisitionGeometry.ANGLE,
+                            AcquisitionGeometry.VERTICAL,
+                            AcquisitionGeometry.HORIZONTAL]
+        if val is None:
+            self.__dimension_labels = labels_default
+            for i, x in enumerate(self.shape):
+                if x == 1:
+                    self.__dimension_labels.pop(i)
 
-        dim_labels =    [AcquisitionGeometry.CHANNEL,
-                        AcquisitionGeometry.ANGLE,
-                        AcquisitionGeometry.VERTICAL,
-                        AcquisitionGeometry.HORIZONTAL]
+        else:
+            for x in val:
+                if x not in labels_default:
+                    raise ValueError('Requested axis are not possible. Expected {},\ngot {}'.format(
+                                labels_default,val))  
 
-        shape = [self.panel.num_channels, len(self.angles),self.panel.num_pixels[1],self.panel.num_pixels[0]]
-                  
-        #if dimension has length 1 remove from list
-        for i,x in enumerate(shape):
-            if x == 1:
-                shape.pop(i)
-                dim_labels.pop(i)
-            
-        if val is not None:
-            if not reduce(lambda x,y: (y in dim_labels) and x, val , True):
-                raise ValueError('Requested axis are not possible. Expected {},\ngot {}'.format(
-                                dim_labels,val))  
-
-            order = self.get_order_by_label(val, dim_labels)
-            if order != [i for i in range(len(dim_labels))]:
-                # resort
-                shape = tuple([shape[i] for i in order])
-
-            dim_labels = val
-        
-        self.__shape = shape
-        self.__dimension_labels = dim_labels 
+            self.__dimension_labels = val
 
     #new geom
     @property
@@ -1614,7 +1613,6 @@ class AcquisitionData(DataContainer):
     '''DataContainer for holding 2D or 3D sinogram'''
     __container_priority__ = 1
     
-    
     def __init__(self, 
                  array = None, 
                  deep_copy=True, 
@@ -1679,98 +1677,34 @@ class AcquisitionData(DataContainer):
                      dimension_labels, **kwargs)
                 
     def get_shape_labels(self, geometry, dimension_labels=None):
-        channels      = geometry.panel.num_channels
-        horiz         = geometry.panel.num_pixels[0]
-        vert          = geometry.panel.num_pixels[1]
-        angles        = geometry.angles
-        num_of_angles = geometry.num_positions
 
         if dimension_labels is None:
-            if channels > 1:
-                if vert > 1:
-                    shape = (channels, num_of_angles , vert, horiz)
-                    dim_labels = [AcquisitionGeometry.CHANNEL,
-                                  AcquisitionGeometry.ANGLE,
-                                  AcquisitionGeometry.VERTICAL,
-                                  AcquisitionGeometry.HORIZONTAL]
-                else:
-                    shape = (channels , num_of_angles, horiz)
-                    dim_labels = [AcquisitionGeometry.CHANNEL,
-                                  AcquisitionGeometry.ANGLE,
-                                  AcquisitionGeometry.HORIZONTAL]
-            else:
-                if vert > 1:
-                    shape = (num_of_angles, vert, horiz)
-                    dim_labels = [AcquisitionGeometry.ANGLE,
-                                  AcquisitionGeometry.VERTICAL,
-                                  AcquisitionGeometry.HORIZONTAL
-                                  ]
-                else:
-                    shape = (num_of_angles, horiz)
-                    dim_labels = [AcquisitionGeometry.ANGLE,
-                                  AcquisitionGeometry.HORIZONTAL
-                                  ]
-            
-            dimension_labels = dim_labels
+            dimension_labels = geometry.dimension_labels
+
         else:
-            shape = []
-            for i in range(len(dimension_labels)):
-                dim = dimension_labels[i]
-                
-                if dim == AcquisitionGeometry.CHANNEL:
-                    shape.append(channels)
-                elif dim == AcquisitionGeometry.ANGLE:
-                    shape.append(num_of_angles)
-                elif dim == AcquisitionGeometry.VERTICAL:
-                    shape.append(vert)
-                elif dim == AcquisitionGeometry.HORIZONTAL:
-                    shape.append(horiz)
-            if len(shape) != len(dimension_labels):
-                raise ValueError('Missing {0} axes.\nExpected{1} got {2}'\
-                    .format(
-                        len(dimension_labels) - len(shape),
-                        dimension_labels, shape) 
-                    )
-            shape = tuple(shape)
-        return (shape, dimension_labels)
+            if isinstance(dimension_labels,dict):
+                dimension_labels_temp = []
+                for i in range(len(dimension_labels)):
+                    dimension_labels_temp.append(dimension_labels[i])
+            else:
+                try:
+                    dimension_labels_temp = list(dimension_labels)
+                except:
+                    raise TypeError('dimension_labels expected a list got {0}'.format(type(dimension_labels)))
+            
+            geometry.dimension_labels = dimension_labels_temp      
+
+        return (geometry.shape, dimension_labels)
 
     #ToDo: insert transpose and slicde methods that return this
 
     def subset(self, dimensions=None, **kw):
         '''returns a subset of the AcquisitionData and regenerates the geometry'''
-
-        # # Check that this is actually a resorting
-        # if dimensions is not None and \
-        #     (len(dimensions) != len(self.shape) ):
-        #     raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
-
-        # requested_labels = kw.get('dimension_labels', None)
-        # if requested_labels is not None:
-        #     allowed_labels = [AcquisitionGeometry.CHANNEL,
-        #                           AcquisitionGeometry.ANGLE,
-        #                           AcquisitionGeometry.VERTICAL,
-        #                           AcquisitionGeometry.HORIZONTAL]
-        #     if not reduce(lambda x,y: (y in allowed_labels) and x, requested_labels , True):
-        #         raise ValueError('Requested axis are not possible. Expected {},\ngot {}'.format(
-        #                         allowed_labels,requested_labels))
-        # Check that this is actually a resorting
+  
         if dimensions is not None and \
             (len(dimensions) != len(self.shape) ):
             raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
-        out = super(AcquisitionData, self).subset(dimensions, **kw)
-        
-           
-        #slice on angle or channel should return full AG
-        #slice on V?#
-            #returns full geometry but:
-                #'detector origin' should change to slice pos if not None, and pix_size not none (need det origin, Rx, Ry, and pix_size)
-                #'detector orientation' updated to Ry, Rz (rx = 0)
-                #num pix_v = 1
-        # Slice on H? 
-            # (horixontal rotation axis)
-                #'detector origin' should change to slice pos if not None and pix size not none (need det origin, Ry, Rz, and pix_size)
-                #detector orientation updated to Rx, Ry (Rz = 0)
-                #num pix_h = 1
+        out = super(AcquisitionData, self).subset(dimensions, **kw)          
 
         dimension_labels = [ out.dimension_labels[k] for k in range(len(out.dimension_labels))]
         out.geometry = self.geometry.copy()
@@ -1790,10 +1724,11 @@ class AcquisitionData(DataContainer):
         
         if vertical_slice is not None:
             out.geometry.panel.num_pixels[1] = 1
-            out.geometry.configuration = None
+            #out.geometry.configuration = None
         
         if horizontal_slice is not None:
             out.geometry.panel.num_pixels[0] = 1
+            #change to return a DC
             out.geometry.configuration = None
 
         out.geometry.dimension_labels = dimension_labels

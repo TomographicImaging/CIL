@@ -349,6 +349,14 @@ class OldFiniteDiff(LinearOperator):
             ret.fill(outa)
             return ret
         
+###############################################################################
+###############################################################################
+###############################################################################
+############################# New Finite Difference ###########################
+###############################################################################
+###############################################################################
+###############################################################################            
+            
         
 class FiniteDiff(LinearOperator):
     
@@ -690,11 +698,11 @@ if __name__ == '__main__':
                                       FD.dot_test(FD)))                    
                         
     # Checking speed vs the FiniteDiff old, the new one is a bit faster                        
-    ig1 = ImageGeometry(300,40,50, 20, 30)                        
+    ig1 = ImageGeometry(300, 300, 400)                        
     FD_old = OldFiniteDiff(ig1, direction=0, bnd_cond = 'Neumann')    
     FD = FiniteDiff(ig1, direction=0,  bnd_cond = 'Neumann')
                            
-    x = ig1.allocate('random_int')
+    x = ig1.allocate('random')
     
     res1 = x*0.
     t0 = timer()
@@ -710,5 +718,22 @@ if __name__ == '__main__':
     t3 = timer()
     print(t3-t2)  
     
-    print((t3-t2)/(t1-t0))
+    
+    from ccpi.optimisation.operators import Gradient
+    
+    G_numpy = Gradient(ig1, backend = 'numpy')
+    G_C = Gradient(ig1, backend = 'c')
+    
+    res3 = G_numpy.range_geometry().allocate()
+    t4 = timer()
+    G_numpy.direct(x, out = res3)
+    t5 = timer()
+    print(t5-t4) 
+
+    res4 = G_C.range_geometry().allocate()
+    t6 = timer()
+    G_C.direct(x, out = res4)
+    t7 = timer()
+    print(t7-t6)      
+    
     

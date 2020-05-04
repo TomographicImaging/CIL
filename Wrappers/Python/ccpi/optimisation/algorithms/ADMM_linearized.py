@@ -154,7 +154,7 @@ if __name__ == '__main__':
         if len(sys.argv) > 1:
             which_noise = int(sys.argv[1])
         else:
-            which_noise = 0
+            which_noise = 1
         print ("Applying {} noise")
         
         
@@ -212,9 +212,12 @@ if __name__ == '__main__':
             
         operator = Gradient(ig)       
         g = alpha * MixedL21Norm()
+        
+        sigma1 = 100
+        tau1 = sigma1/operator.norm()**2       
                         
         # Setup and run the PDHG algorithm
-        admm = ADMM_linearized(f = f2, g = g, operator = operator)
+        admm = ADMM_linearized(f = f2, g = g, operator = operator, sigma = sigma1, tau = tau1)
         admm.max_iteration = 3000
         admm.update_objective_interval = 500
         admm.run(3000, verbose=True)   
@@ -232,8 +235,7 @@ if __name__ == '__main__':
         # Create functions      
         f = BlockFunction(g, f2) 
         h = ZeroFunction()
-            
-        
+                    
         sigma = 1
         tau = 1/(sigma * operator.norm()**2 )
         

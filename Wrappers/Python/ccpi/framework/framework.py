@@ -136,7 +136,7 @@ class ImageGeometry(object):
                 # resort
                 self.shape = tuple([shape[i] for i in order])
             else:
-                self.shape = tuple(order)
+                self.shape = shape
             self.dimension_labels = labels
                 
     def get_order_by_label(self, dimension_labels, default_dimension_labels):
@@ -366,7 +366,7 @@ class AcquisitionGeometry(object):
                 # resort
                 self.shape = tuple([shape[i] for i in order])
             else:
-                self.shape = tuple(order)
+                self.shape = shape
             self.dimension_labels = labels
         
     def get_order_by_label(self, dimension_labels, default_dimension_labels):

@@ -182,17 +182,20 @@ class RCGLS(CGLS):
         self.x = x_init * 0.
         data = BlockDataContainer(data, operator.domain_geometry().allocate(0))
         gradient = Gradient(operator.domain_geometry(), backend='c')
-        # TODO remove this
-        # gradient.adjoint_L21norm = gradient.operator.adjoint_L21norm
-
+        # store the regularisation parameter into the gradient operator
+        gradient.scalar = alpha
         self.operator = BlockOperator(operator, gradient)
-        
         self.tolerance = tolerance
 
-        self.r = data - self.operator.direct(self.x)
-        self.s = self.operator.adjoint(self.r)
-        
+        # self.r = data - self.operator.direct(self.x)
+        self.r = data - BlockDataContainer(operator.direct(self.x), gradient.scalar * gradient.direct(self.x))
+        #self.s = self.operator.adjoint(self.r)
+        self.s = gradient.adjoint(self.r.get_item(1))
+        self.s.multiply(gradient.scalar, out=self.s)
+        self.s.add(operator.adjoint(self.r.get_item(0)), out=self.s)
+
         self.p = self.s.copy()
+        # don't need to preallocate as we reallocate at each iteration
         self.q = self.operator.range_geometry().allocate()
         self.norms0 = self.s.norm()
         
@@ -208,11 +211,17 @@ class RCGLS(CGLS):
      
     def update(self):
         '''single iteration'''
+        gradient = self.operator.get_item(0,1)
+
         term0 = self.operator.get_item(0,0).direct(self.p)
         delta0 = term0.squared_norm()
+        # self.operator.get_item(0,0).direct(self.p, out=self.q.get_item(0))
+        # delta0 = self.q.get_item(0).squared_norm()
         delta1, term1 = self.operator.get_item(0,1).direct_L21norm(self.p)
-        
+        #term1.multiply(gradient.scalar, out=self.q.get_item(1))
+        term1.multiply(gradient.scalar, out=term1)
         self.q = BlockDataContainer(term0, term1)
+
         delta = delta0 + delta1
         # print ("delta", delta, "delta0", delta0, "delta1", delta1)
         # delta = self.q.squared_norm()
@@ -231,11 +240,12 @@ class RCGLS(CGLS):
         # sumsq, self.s = self.operator.adjoint(self.r)
         term0 = self.operator.get_item(0,0).adjoint(self.r.get_item(0))
         delta0 = term0.norm()
-        delta1, term1 = self.operator.get_item(0,1).adjoint_L21norm(self.r.get_item(1))
+        delta1, term1 = gradient.adjoint_L21norm(self.r.get_item(1))
         self.norms = delta0 + numpy.sqrt(delta1)
         # self.norms = self.s.norm()
 
-        term0.add(term1, out=self.s)
+        #term0.add(term1, out=self.s)
+        term0.axpby(1,gradient.scalar, term1, out=self.s)
         # print ("self.norms {}".format(self.norms))
         
         self.gamma1 = self.gamma

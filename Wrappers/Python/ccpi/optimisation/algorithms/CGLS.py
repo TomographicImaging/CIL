@@ -24,6 +24,9 @@ from __future__ import print_function
 from ccpi.optimisation.algorithms import Algorithm
 import numpy
 
+from ccpi.optimisation.operators import Gradient, BlockOperator
+from ccpi.framework import BlockDataContainer
+
 class CGLS(Algorithm):
 
     r'''Conjugate Gradient Least Squares algorithm 
@@ -141,3 +144,104 @@ class CGLS(Algorithm):
 
         return flag
  
+class RCGLS(CGLS):
+    '''Regularised CGLS
+
+    Tikhonov regularisation
+    '''
+    def __init__(self, x_init=None, operator=None, data=None, tolerance=1e-6, **kwargs):
+        '''initialisation of the algorithm
+
+        :param operator : Linear operator for the inverse problem
+        :param x_init : Initial guess ( Default x_init = 0)
+        :param data : Acquired data to reconstruct       
+        :param tolerance: Tolerance/ Stopping Criterion to end CGLS algorithm
+        '''
+        super(CGLS, self).__init__(**kwargs)
+        
+        alpha = kwargs.get('alpha', None)
+        if alpha is None:
+            raise ValueError('Please specify alpha')
+
+        if x_init is None and operator is not None:
+            x_init = operator.domain_geometry().allocate(0)
+        if x_init is not None and operator is not None and data is not None:
+            self.set_up(x_init=x_init, operator=operator, data=data, tolerance=tolerance, alpha=alpha)
+
+    def set_up(self, x_init, operator, data, tolerance=1e-6, alpha=1e-2):
+        '''initialisation of the algorithm
+
+        :param operator: Linear operator for the inverse problem
+        :param x_init: Initial guess ( Default x_init = 0)
+        :param data: Acquired data to reconstruct       
+        :param tolerance: Tolerance/ Stopping Criterion to end CGLS algorithm
+        :param alpha: regularisation parameter
+        '''
+        print("{} setting up".format(self.__class__.__name__, ))
+        
+        self.x = x_init * 0.
+        data = BlockDataContainer(data, operator.domain_geometry().allocate(0))
+        gradient = Gradient(operator.domain_geometry(), backend='c')
+        # TODO remove this
+        # gradient.adjoint_L21norm = gradient.operator.adjoint_L21norm
+
+        self.operator = BlockOperator(operator, gradient)
+        
+        self.tolerance = tolerance
+
+        self.r = data - self.operator.direct(self.x)
+        self.s = self.operator.adjoint(self.r)
+        
+        self.p = self.s.copy()
+        self.q = self.operator.range_geometry().allocate()
+        self.norms0 = self.s.norm()
+        
+        self.norms = self.s.norm()
+
+        self.gamma = self.norms0**2
+        self.normx = self.x.norm()
+        self.xmax = self.normx   
+        
+        self.loss.append(self.r.squared_norm())
+        self.configured = True
+        print("{} configured".format(self.__class__.__name__, ))
+     
+    def update(self):
+        '''single iteration'''
+        term0 = self.operator.get_item(0,0).direct(self.p)
+        delta0 = term0.squared_norm()
+        delta1, term1 = self.operator.get_item(0,1).direct_L21norm(self.p)
+        
+        self.q = BlockDataContainer(term0, term1)
+        delta = delta0 + delta1
+        # print ("delta", delta, "delta0", delta0, "delta1", delta1)
+        # delta = self.q.squared_norm()
+
+        alpha = self.gamma/delta
+        # print ("alpha", alpha)                        
+        # self.x += alpha * self.p
+        # self.r -= alpha * self.q
+        
+        self.x.axpby(1, alpha, self.p, out=self.x)
+        #self.x += alpha * self.p
+        self.r.axpby(1, -alpha, self.q, out=self.r)
+        #self.r -= alpha * self.q
+
+        # adjoint of block operator is sum of adjoints
+        # sumsq, self.s = self.operator.adjoint(self.r)
+        term0 = self.operator.get_item(0,0).adjoint(self.r.get_item(0))
+        delta0 = term0.norm()
+        delta1, term1 = self.operator.get_item(0,1).adjoint_L21norm(self.r.get_item(1))
+        self.norms = delta0 + numpy.sqrt(delta1)
+        # self.norms = self.s.norm()
+
+        term0.add(term1, out=self.s)
+        # print ("self.norms {}".format(self.norms))
+        
+        self.gamma1 = self.gamma
+        self.gamma = self.norms**2
+        self.beta = self.gamma/self.gamma1
+        self.p.axpby(self.beta, 1., self.s , out=self.p)
+        
+        self.normx = self.x.norm()
+        self.xmax = numpy.maximum(self.xmax, self.normx)

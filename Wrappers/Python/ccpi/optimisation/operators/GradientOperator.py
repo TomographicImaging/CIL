@@ -125,7 +125,7 @@ class Gradient(LinearOperator):
         """            
         return self.operator.adjoint(x, out=out)
 
-    def direct_L21norm(self, x, out=None):   
+    def direct_L21norm(self, x, out=None):
         return self.operator.direct_L21norm(x, out=out)
     def adjoint_L21norm(self, x, out=None):   
         return self.operator.adjoint_L21norm(x, out=out)
@@ -449,6 +449,9 @@ class Gradient_C(LinearOperator):
         
         if return_val is True:
             return L2norm.value, out
+        else:
+            return L2norm.value, None
+
 
     def adjoint(self, x, out=None):
 
@@ -488,6 +491,8 @@ class Gradient_C(LinearOperator):
 
         if return_val is True:
             return L2norm.value, out
+        else:
+            return L2norm.value, None
 
 
     # def domain_geometry(self):

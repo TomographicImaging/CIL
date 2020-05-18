@@ -84,17 +84,17 @@ def islicer(data, direction, title="", slice_number=None, cmap='gray', minmax=No
         else:
             axis_labels = ['X', 'Y', 'Z']
 
-    
-    if hasattr(data, "as_array"):
+    if isinstance (data, numpy.ndarray):
+        container = data
+    elif hasattr(data, "__getitem__"):
+        container = data
+    elif hasattr(data, "as_array"):
         container = data.as_array()
         
-        if not isinstance (direction, int):
-            if direction in data.dimension_labels.values():
-                direction = data.get_dimension_axis(direction)                             
+    if not isinstance (direction, int):
+        if direction in data.dimension_labels.values():
+            direction = data.get_dimension_axis(direction)                             
 
-    elif isinstance (data, numpy.ndarray):
-        container = data
-        
     if slice_number is None:
         slice_number = int(data.shape[direction]/2)
         
@@ -123,7 +123,7 @@ def islicer(data, direction, title="", slice_number=None, cmap='gray', minmax=No
                                 continuous_update=False,
                                 orientation='horizontal',
                                 readout=True,
-                                readout_format='.1f',
+                                readout_format='.1e',
                             )
     interact(display_slice(container, 
                            direction, 

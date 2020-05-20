@@ -22,10 +22,9 @@ from __future__ import division
 from __future__ import print_function
 
 from ccpi.optimisation.algorithms import Algorithm
-import numpy
-
 from ccpi.optimisation.operators import Gradient, BlockOperator
 from ccpi.framework import BlockDataContainer
+import numpy, psutil, functools, time
 
 class CGLS(Algorithm):
 
@@ -160,13 +159,18 @@ class RCGLS(CGLS):
         super(CGLS, self).__init__(**kwargs)
         
         alpha = kwargs.get('alpha', None)
+        preallocate = kwargs.get('preallocate', False)
+
         if alpha is None:
             raise ValueError('Please specify alpha')
 
         if x_init is None and operator is not None:
             x_init = operator.domain_geometry().allocate(0)
-        if x_init is not None and operator is not None and data is not None:
+        if operator is not None and data is not None:
             self.set_up(x_init=x_init, operator=operator, data=data, tolerance=tolerance, alpha=alpha)
+            
+    
+
 
     def set_up(self, x_init, operator, data, tolerance=1e-6, alpha=1e-2):
         '''initialisation of the algorithm
@@ -177,75 +181,110 @@ class RCGLS(CGLS):
         :param tolerance: Tolerance/ Stopping Criterion to end CGLS algorithm
         :param alpha: regularisation parameter
         '''
-        print("{} setting up".format(self.__class__.__name__, ))
-        
-        self.x = x_init * 0.
-        data = BlockDataContainer(data, operator.domain_geometry().allocate(0))
-        gradient = Gradient(operator.domain_geometry(), backend='c')
-        # store the regularisation parameter into the gradient operator
-        gradient.scalar = alpha
-        self.operator = BlockOperator(operator, gradient)
-        self.tolerance = tolerance
+        try:
+            print("{} setting up".format(self.__class__.__name__, ))
+            gradient = Gradient(operator.domain_geometry(), backend='c')
+            gradient.scalar = alpha
+            # # required memory is 
+            # def prod(X):
+            #     return functools.reduce(lambda x,y:x*y, X, 1)
+            # # 3 in operator domain (x, p s)
+            # domain_size = 3 * x_init.size
+            # # 2 in operator range (q r)
+            # org = operator.range_geometry()
+            # or_size = 2 * functools.reduce(lambda x, y: x*y, org.shape, 1)
+            # # 3 in gradient range
+            # grg = gradient.range_geometry()
+            # gr_size = 3 * sum(prod(gradient.range_geometry().get_item(i).shape) for i in range(gradient.range_geometry().shape[0]))
 
-        # self.r = data - self.operator.direct(self.x)
-        self.r = data - BlockDataContainer(operator.direct(self.x), gradient.scalar * gradient.direct(self.x))
-        #self.s = self.operator.adjoint(self.r)
-        self.s = gradient.adjoint(self.r.get_item(1))
-        self.s.multiply(gradient.scalar, out=self.s)
-        self.s.add(operator.adjoint(self.r.get_item(0)), out=self.s)
+            # required_mem = (domain_size + or_size + gr_size) * 32 / 8 / 1024**3
+            # print ("Required memory: {:.3f} Gb".format(required_mem))
+            # print ("Available memory {:.3f} Gb".format(psutil.virtual_memory().available/1024**3))
+            # if required_mem > psutil.virtual_memory().available/1024**3:
+            #     raise MemoryError('Insufficient Memory for process')
+            # x_init.size + 
+            # don't create a copy
+            self.x = x_init
+            data = BlockDataContainer(data, operator.domain_geometry().allocate(0))
+            #data = BlockDataContainer(data, 0)
+            
+            self.operator = BlockOperator(operator, gradient)
+            self.tolerance = tolerance
 
-        self.p = self.s.copy()
-        # don't need to preallocate as we reallocate at each iteration
-        self.q = self.operator.range_geometry().allocate()
-        self.norms0 = self.s.norm()
-        
-        self.norms = self.s.norm()
+            print ("Allocating q")
+            self.q = self.operator.range_geometry().allocate(value=None)
 
-        self.gamma = self.norms0**2
-        self.normx = self.x.norm()
-        self.xmax = self.normx   
-        
-        self.loss.append(self.r.squared_norm())
-        self.configured = True
-        print("{} configured".format(self.__class__.__name__, ))
+            # self.r = data - self.operator.direct(self.x)
+            self.r = data - BlockDataContainer(operator.direct(self.x), gradient.scalar * gradient.direct(self.x))
+            # residuals
+            print ("Allocating and setting up r")
+            #self.r = BlockDataContainer(- operator.direct(self.x), - gradient.scalar * gradient.direct(self.x)) 
+            #self.r.add(data, out=self.r)
+            #self.s = self.operator.adjoint(self.r)
+            
+            print ("Allocating and setting up p")
+            self.p = gradient.adjoint(self.r.get_item(1))
+            self.p.multiply(gradient.scalar, out=self.p)
+            self.p.add(operator.adjoint(self.r.get_item(0)), out=self.p)
+
+            print ("Allocating s")
+            self.s = self.p.copy()
+            print ("Allocating s1")
+            self.s1 = gradient.domain_geometry().allocate(None)
+
+            self.norms = self.p.norm()
+            self.norms0 = self.norms
+            self.gamma = self.norms**2
+            self.normx = self.x.norm()
+            
+            
+            self.loss.append(self.r.squared_norm())
+            self.configured = True
+            print("{} configured".format(self.__class__.__name__, ))
+        except MemoryError as me:
+            print (me)
+            print ("Cannot allocate all this memory!")
      
     def update(self):
         '''single iteration'''
+        operator = self.operator.get_item(0,0)
         gradient = self.operator.get_item(0,1)
-
-        term0 = self.operator.get_item(0,0).direct(self.p)
-        delta0 = term0.squared_norm()
+        operator.direct(self.p, out=self.q.get_item(0))
+        delta0 = self.q.get_item(0).squared_norm()
         # self.operator.get_item(0,0).direct(self.p, out=self.q.get_item(0))
         # delta0 = self.q.get_item(0).squared_norm()
-        delta1, term1 = self.operator.get_item(0,1).direct_L21norm(self.p)
+        delta1, a = gradient.direct_L21norm(self.p, out=self.q.get_item(1))
         #term1.multiply(gradient.scalar, out=self.q.get_item(1))
-        term1.multiply(gradient.scalar, out=term1)
-        self.q = BlockDataContainer(term0, term1)
-
-        delta = delta0 + delta1
+        self.q.get_item(1).multiply(gradient.scalar, out=self.q.get_item(1))
+        
+        delta = delta0 + delta1 * numpy.abs(gradient.scalar)
         # print ("delta", delta, "delta0", delta0, "delta1", delta1)
         # delta = self.q.squared_norm()
 
         alpha = self.gamma/delta
+        self.r.axpby(1, -alpha, self.q, out=self.r)
+        
         # print ("alpha", alpha)                        
         # self.x += alpha * self.p
         # self.r -= alpha * self.q
         
         self.x.axpby(1, alpha, self.p, out=self.x)
         #self.x += alpha * self.p
-        self.r.axpby(1, -alpha, self.q, out=self.r)
         #self.r -= alpha * self.q
 
         # adjoint of block operator is sum of adjoints
         # sumsq, self.s = self.operator.adjoint(self.r)
-        term0 = self.operator.get_item(0,0).adjoint(self.r.get_item(0))
-        delta0 = term0.norm()
-        delta1, term1 = gradient.adjoint_L21norm(self.r.get_item(1))
-        self.norms = delta0 + numpy.sqrt(delta1)
+        
+        operator.adjoint(self.r.get_item(0), out=self.s)
+        delta0 = self.s.norm()
+
+        delta1, a = gradient.adjoint_L21norm(self.r.get_item(1), out=self.s1)
+        self.norms = delta0 + numpy.sqrt(delta1) * gradient.scalar
         # self.norms = self.s.norm()
 
         #term0.add(term1, out=self.s)
-        term0.axpby(1,gradient.scalar, term1, out=self.s)
+        self.s.axpby(1,gradient.scalar, self.s1, out=self.s)
+        
         # print ("self.norms {}".format(self.norms))
         
         self.gamma1 = self.gamma
@@ -254,4 +293,5 @@ class RCGLS(CGLS):
         self.p.axpby(self.beta, 1., self.s , out=self.p)
         
         self.normx = self.x.norm()
-        self.xmax = numpy.maximum(self.xmax, self.normx)
+        # self.xmax = numpy.maximum(self.xmax, self.normx)
+

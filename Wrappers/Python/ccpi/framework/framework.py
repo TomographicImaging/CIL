@@ -507,7 +507,7 @@ class AcquisitionGeometry(object):
         if val is None:
             return None
             
-        print("Warning: dist_source_center returns the y component of source poition only")
+        print("Warning: dist_source_center returns the y component of source position only")
         return -val[1]
 
     @property
@@ -520,7 +520,7 @@ class AcquisitionGeometry(object):
         if val is None:
             return None
 
-        print("Warning: dist_center_detector returns the y component of detector poition only")
+        print("Warning: dist_center_detector returns the y component of detector position only")
         return val[1]
 
     @property
@@ -552,27 +552,42 @@ class AcquisitionGeometry(object):
 
     @property
     def dimension_labels(self):
+        #check if AG has changed
         return self.__dimension_labels
 
     @dimension_labels.setter
     def dimension_labels(self, val):
+
         labels_default = [  AcquisitionGeometry.CHANNEL,
                             AcquisitionGeometry.ANGLE,
                             AcquisitionGeometry.VERTICAL,
                             AcquisitionGeometry.HORIZONTAL]
-        if val is None:
-            self.__dimension_labels = labels_default
-            for i, x in enumerate(self.shape):
-                if x == 1:
-                    self.__dimension_labels.pop(i)
 
-        else:
+        shape_default = [   self.panel.num_channels,
+                            len(self.angles),
+                            self.panel.num_pixels[1], 
+                            self.panel.num_pixels[0]
+                        ]
+
+        labels = labels_default.copy()
+
+        #remove from list labels where len == 1
+        for i, x in enumerate(shape_default):
+            if x == 1:
+                labels.remove(labels_default[i])
+              
+        #check input and reorder to match
+        if val is not None:
+            if len(val) != len(labels):    
+                raise ValueError('Requested axis are not possible. Expected {},\ngot {}'.format(labels,val))                
+
             for x in val:
-                if x not in labels_default:
-                    raise ValueError('Requested axis are not possible. Expected {},\ngot {}'.format(
-                                labels_default,val))  
+                if x not in labels:
+                    raise ValueError('Requested axis are not possible. Expected {},\ngot {}'.format(labels,val))
+                
+            labels = val
 
-            self.__dimension_labels = val
+        self.__dimension_labels = tuple(labels)
 
     #new geom
     @property
@@ -619,6 +634,7 @@ class AcquisitionGeometry(object):
                 except:
                     ValueError('angles expected to be a list of floats') 
 
+
     def __init__(self,
                 geom_type, #'cone'/'parallel'
                 num_pixels = [0, 0], # int x or [int x, int y] #optional for backward compatibility
@@ -648,34 +664,34 @@ class AcquisitionGeometry(object):
         num_pixels_temp = [1,1]
         pixel_size_temp = [1,1]
 
-        if pixel_num_h:
+        if pixel_num_h is not None:
             num_pixels_temp[0] = pixel_num_h
             num_pixels = num_pixels_temp
-        if pixel_num_v:
+        if pixel_num_v is not None:
             num_pixels_temp[1] = pixel_num_v
             num_pixels = num_pixels_temp
-        if pixel_size_h:
+        if pixel_size_h is not None:
             pixel_size_temp[0] = pixel_size_h
             pixel_size = pixel_size_temp
-        if pixel_size_v:
+        if pixel_size_v is not None:
             pixel_size_temp[1] = pixel_size_v
             pixel_size = pixel_size_temp
-        if chanels:
+        if chanels is not None:
             num_channels = chanels
 
         #initilisation using new inputs
         self.geom_type = geom_type
         self.panel = Panel(num_pixels, pixel_size, num_channels, channel_labels)  
 
-        #takes degrees as default
+        #takes degrees as default ToDo fix this for 2D geometry in 2Dspace
         dof = 3
-        if self.dimension == '2D':
-            dof = 2
+        #if self.dimension == '2D':
+        #    dof = 2
         
-        if dist_source_center:
+        if dist_source_center is not None:
             source_position = [0.0]*dof
             source_position[1] = -dist_source_center
-        if dist_center_detector:
+        if dist_center_detector is not None:
             detector_position = [0.0]*dof
             detector_position[1] = dist_center_detector
 

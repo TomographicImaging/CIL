@@ -126,7 +126,7 @@ int fdiff_direct_neumann(const float *inimagefull, float *outimageXfull, float *
 
 	return 0;
 }
-int fdiff_direct_neumann_L21sum(const float *inimagefull, float *outimageXfull, float *outimageYfull, float *outimageZfull, float *outimageCfull, long nx, long ny, long nz, long nc, float * L21_sum)
+int fdiff_direct_neumann_L21sum(const float *inimagefull, float *outimageXfull, float *outimageYfull, float *outimageZfull, float *outimageCfull, long nx, long ny, long nz, long nc, double * L21_sum)
 {
 	size_t volume = nx * ny * nz;
 
@@ -242,7 +242,7 @@ int fdiff_direct_neumann_L21sum(const float *inimagefull, float *outimageXfull, 
 	}
 	free(L21_arr);
 
-	*L21_sum = (float)L21_sum_temp;
+	*L21_sum = (double)L21_sum_temp;
 
 	//now the rest of the channels
 	if (nc > 1)
@@ -510,7 +510,7 @@ int fdiff_adjoint_neumann(float *outimagefull, const float *inimageXfull, const 
 
 	return 0;
 }
-int fdiff_adjoint_neumann_L21sum(float *outimagefull, const float *inimageXfull, const float *inimageYfull, const float *inimageZfull, const float *inimageCfull, long nx, long ny, long nz, long nc, float * L21_sum)
+int fdiff_adjoint_neumann_L21sum(float *outimagefull, const float *inimageXfull, const float *inimageYfull, const float *inimageZfull, const float *inimageCfull, long nx, long ny, long nz, long nc, double * L21_sum)
 {
 	//runs over full data in x, y, z. then corrects elements for bounday conditions and sums
 	size_t volume = nx * ny * nz;
@@ -632,7 +632,7 @@ int fdiff_adjoint_neumann_L21sum(float *outimagefull, const float *inimageXfull,
 	}
 	free(L21_arr);
 
-	*L21_sum = (float)L21_sum_temp;
+	*L21_sum = (double)L21_sum_temp;
 
 	//	//now the rest of the channels
 	if (nc > 1)
@@ -957,7 +957,7 @@ DLL_EXPORT int fdiff2D(float *imagefull, float *gradYfull, float *gradXfull, lon
 	omp_set_num_threads(nThreads_initial);
 	return 0;
 }
-DLL_EXPORT int fdiff3D_neu_f_L21sum(float *imagefull, float *gradZfull, float *gradYfull, float *gradXfull, long nz, long ny, long nx, int boundary, int direction, int nThreads, float * L21_sum)
+DLL_EXPORT int fdiff3D_neu_f_L21sum(float *imagefull, float *gradZfull, float *gradYfull, float *gradXfull, long nz, long ny, long nx, int boundary, int direction, int nThreads, double * L21_sum)
 {
 	int nThreads_initial;
 	threads_setup(nThreads, &nThreads_initial);
@@ -967,7 +967,7 @@ DLL_EXPORT int fdiff3D_neu_f_L21sum(float *imagefull, float *gradZfull, float *g
 	omp_set_num_threads(nThreads_initial);
 	return 0;
 }
-DLL_EXPORT int fdiff3D_neu_b_L21sum(float *imagefull, float *gradZfull, float *gradYfull, float *gradXfull, long nz, long ny, long nx, int boundary, int direction, int nThreads, float * L21_sum)
+DLL_EXPORT int fdiff3D_neu_b_L21sum(float *imagefull, float *gradZfull, float *gradYfull, float *gradXfull, long nz, long ny, long nx, int boundary, int direction, int nThreads, double * L21_sum)
 {
 	int nThreads_initial;
 	threads_setup(nThreads, &nThreads_initial);

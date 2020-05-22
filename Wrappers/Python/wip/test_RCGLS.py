@@ -7,6 +7,7 @@ from ccpi.astra.operators import AstraProjector3DSimple
 from ccpi.utilities.display import plotter2D
 import os
 import numpy as np
+import matplotlib.pyplot as plt
 
 # Set up image geometry
 num_vx = 128
@@ -25,7 +26,7 @@ path_library3D = os.path.join(path, "Phantom3DLibrary.dat")
 #tomophantom takes angular input in degrees
 phantom_3D = TomoP3D.Model(model, (num_vx, num_vy, num_vz), path_library3D)
 #set up acquisition geometry
-number_pixels_x = 128
+number_pixels_x = num_vx
 number_projections = 180
 angles = np.linspace(0, np.pi, number_projections, dtype=np.float32)
 ag = AcquisitionGeometry(geom_type='parallel', angles=angles, 
@@ -65,16 +66,19 @@ sinogram_noisy.fill(sino_out)
 device = "gpu"
 operator = AstraProjector3DSimple(ig, ag)
 
-
-
-print ("calculating norm of A")
-normA = operator.norm()
-print ("calculating norm of Gradient")
 L = Gradient(ig)
-normL = L.norm()
-ratio = normA/normL
-gamma = 0.3
-alpha = gamma * ratio
+    
+if False:
+    print ("calculating norm of A")
+    normA = operator.norm()
+    print ("calculating norm of Gradient")
+    normL = L.norm()
+    ratio = normA/normL
+    gamma = 0.3
+    alpha = gamma * ratio
+else:
+    alpha = 13.066
+    #alpha = 1/alpha
 
 print (alpha)
 
@@ -90,17 +94,39 @@ operator_block = BlockOperator( operator, alpha * L)
 zero_data = L.range_geometry().allocate(0)
 data_block = BlockDataContainer(sinogram_noisy, zero_data)
   
+
+bcgls_step = []
+rcgls_step = []
+
+N = 100
+
 cgls_regularised = CGLS(operator=operator_block, data=data_block, 
                         update_objective_interval = 10)
 cgls_regularised.max_iteration = 10000
-cgls_regularised.run(10)
+cgls_regularised.run(N, verbose=True)
 
 rcgls = RCGLS(operator=operator, data=sinogram_noisy, alpha=alpha, 
-              max_iteration = 1000, update_objective_interval=20, tolerance=1e-2)
-rcgls.run(10)
+              max_iteration = 1000, update_objective_interval=10)
 
+# for i in range(N):
 
+#     cgls_regularised.run(1, verbose=False)
+#     rcgls.run(1, verbose=False)
+#     #bcgls_step.append([cgls_regularised.q,cgls_regularised.p,cgls_regularised.r,cgls_regularised.s])
+#     #rcgls_step.append([rcgls.q,rcgls.p,rcgls.r,rcgls.s])
+#     #bcgls_step.append([cgls_regularised.delta, cgls_regularised.norms, cgls_regularised.get_output()])
+#     #rcgls.append([rcgls.delta, rcgls.norms, rcgls.get_output()])
 
-plotter2D([model.subset(vertical=64), cgls_simple.get_output().subset(vertical=64),
-           rcgls.get_output().subset(vertical=64),
-           cgls_regularised.get_output().subset(vertical=64)])
+#     print ("NORMS", cgls_regularised.norms, 'rcgls', rcgls.norms, rcgls.norms2, rcgls.norms3, rcgls.delta0, rcgls.delta1)
+#     print ("DELTA", cgls_regularised.delta, 'rcgls', rcgls.delta, rcgls.delta/cgls_regularised.delta)
+rcgls.run(N, verbose=True)
+
+sl = num_vx // 2 
+plotter2D([model.subset(vertical=sl), cgls_simple.get_output().subset(vertical=sl),
+           rcgls.get_output().subset(vertical=sl),
+           cgls_regularised.get_output().subset(vertical=sl)], titles=['model', 'CGLS', 'RCGLS', 'Block Reg CGLS'])
+# plotter2D([cgls_simple.get_output().subset(vertical=64),
+#            rcgls.get_output().subset(vertical=64),
+#            cgls_regularised.get_output().subset(vertical=64)])
+
+# plt.plot([i for i in range(N)], bcgls_step[0], rgcls_step[0])

@@ -305,6 +305,7 @@ else:
 cilacc = ctypes.cdll.LoadLibrary(dll)
 
 c_float_p = ctypes.POINTER(ctypes.c_float)
+c_double_p = ctypes.POINTER(ctypes.c_double)
 
 cilacc.openMPtest.restypes = ctypes.c_int32
 cilacc.openMPtest.argtypes = [ctypes.c_int32]
@@ -343,7 +344,7 @@ cilacc.fdiff3D_neu_f_L21sum.argtypes = [ctypes.POINTER(ctypes.c_float),
                        ctypes.c_int32,
                        ctypes.c_int32,
                        ctypes.c_int32,
-                       ctypes.POINTER(ctypes.c_float)]
+                       ctypes.POINTER(ctypes.c_double)]
 
 cilacc.fdiff3D_neu_b_L21sum.argtypes = [ctypes.POINTER(ctypes.c_float),
                        ctypes.POINTER(ctypes.c_float),
@@ -355,7 +356,7 @@ cilacc.fdiff3D_neu_b_L21sum.argtypes = [ctypes.POINTER(ctypes.c_float),
                        ctypes.c_int32,
                        ctypes.c_int32,
                        ctypes.c_int32,
-                       ctypes.POINTER(ctypes.c_float)]
+                       ctypes.POINTER(ctypes.c_double)]
 
 cilacc.fdiff2D.argtypes = [ctypes.POINTER(ctypes.c_float),
                        ctypes.POINTER(ctypes.c_float),
@@ -433,8 +434,8 @@ class Gradient_C(LinearOperator):
     def direct_L21norm(self, x, out=None):
         ndx , x_p = Gradient_C.datacontainer_as_c_pointer(x)
         
-        L2norm = ctypes.c_float(0.0)   
-        pL2norm = c_float_p(L2norm)
+        L2norm = ctypes.c_double(0.0)   
+        pL2norm = c_double_p(L2norm)
 
         return_val = False
         if out is None:
@@ -473,8 +474,8 @@ class Gradient_C(LinearOperator):
 
     def adjoint_L21norm(self, x, out=None):
 
-        L2norm = ctypes.c_float(0.0)   
-        pL2norm = c_float_p(L2norm)
+        L2norm = ctypes.c_double(0.0)   
+        pL2norm = c_double_p(L2norm)
 
         return_val = False
         if out is None:

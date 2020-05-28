@@ -21,6 +21,7 @@ from __future__ import print_function
 
 import numpy as np
 from ccpi.optimisation.operators import LinearOperator
+import ccpi
 
 from scipy.ndimage import convolve, correlate
 
@@ -38,8 +39,14 @@ class BlurringOperator(LinearOperator):
     def __init__(self, PSF, geometry):
         super(BlurringOperator, self).__init__(domain_geometry=geometry, 
                                            range_geometry=geometry)
-        self.PSF = PSF
-        self.PSF_adjoint = np.rot90(PSF,2)
+        if isinstance(PSF,np.ndarray):
+            self.PSF = PSF
+        else:
+            raise TypeError('PSF must be a number array with same number of dimensions as geometry.')
+        
+        if not (isinstance(geometry,ccpi.framework.framework.ImageGeometry) or \
+                isinstance(geometry,ccpi.framework.framework.AcquisitionGeometry)):
+            raise TypeError('geometry must be an ImageGeometry or AcquisitionGeometry.')
 
         
     def direct(self,x,out=None):

@@ -1653,7 +1653,7 @@ class AcquisitionData(DataContainer):
                                  dimension_labels, **kwargs)
         else:
             if self.geometry is not None:
-                shape, labels = self.get_shape_labels(self.geometry, dimension_labels)
+                shape, dimension_labels = self.get_shape_labels(self.geometry, dimension_labels)
                 if array.shape != shape:
                     raise ValueError('Shape mismatch {} {}'.format(shape, array.shape))
                     

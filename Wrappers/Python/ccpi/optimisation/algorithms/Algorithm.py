@@ -190,8 +190,8 @@ class Algorithm(object):
             if (self.iteration) % self.update_objective_interval == 0: 
                 if verbose:
                     print (self.verbose_output(very_verbose))
-                if callback is not None:
-                    callback(self.iteration, self.get_last_objective(return_all=very_verbose), self.x)
+            if callback is not None:
+                callback(self.iteration, self.get_last_objective(return_all=very_verbose), self.x)
             i += 1
             if i == iterations:
                 if self.iteration != self._iteration[-1]:

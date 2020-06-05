@@ -237,14 +237,16 @@ class ScaledFunction(Function):
         self.function = function       
     @property
     def L(self):
-        if self.function.L is not None:
-            return abs(self.scalar) * self.function.L
-        else:
-            return None
+        if self._L is None:
+            if self.function.L is not None:
+                self._L = abs(self.scalar) * self.function.L
+            else:
+                self._L = None
+        return self._L
     @L.setter
     def L(self, value):
         # call base class setter
-        super(SumFunction, self.__class__).L.fset(self, value )
+        super(ScaledFunction, self.__class__).L.fset(self, value )
 
     @property
     def scalar(self):
@@ -344,9 +346,19 @@ class SumFunctionScalar(SumFunction):
                         
         """                
         return self.function.proximal(x, tau, out=out)        
-            
-#    def function(self):       
-#       return self.function    
+    
+    @property
+    def L(self):
+        if self._L is None:
+            if self.function.L is not None:
+                self._L = self.function.L
+            else:
+                self._L = None
+        return self._L
+    @L.setter
+    def L(self, value):
+        # call base class setter
+        super(SumFunctionScalar, self.__class__).L.fset(self, value )
 
 class ConstantFunction(Function):
     

@@ -846,6 +846,46 @@ class TestFunction(unittest.TestCase):
         print (f3.L)
         f3.L = 2
         assert f3.L == 2
+    def test_Lipschitz4(self):
+        print('Test for test_Lipschitz4')         
+            
+        M, N = 50, 50
+        ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
+        b = ig.allocate('random', seed=1)
+        
+        print('Check call with Identity operator... OK\n')
+        operator = 3 * Identity(ig)
+            
+        u = ig.allocate('random_int', seed = 50)
+        # func2 = LeastSquares(operator, b, 0.5)
+        func1 = ConstantFunction(0.3)
+        f3 = func1 + 3
+        assert f3.L == 0
+        print ("OK")
+        print (f3.L)
+        f3.L = 2
+        assert f3.L == 2
+        print ("OK")
+        assert func1.L == 0
+        print ("OK")
+        try:
+            func1.L = 2
+            assert False
+        except AttributeError as ve:
+            assert True
+        print ("OK")
+        f2 = LeastSquares(operator, b, 0.5)
+        f4 = 2 * f2
+        assert f4.L == 2 * f2.L
+        
+        print ("OK")
+        f4.L = 10
+        assert f4.L != 2 * f2.L  
+        print ("OK")
+
+        f4 = -2 * f2
+        assert f4.L == 2 * f2.L
+        
 
 
 

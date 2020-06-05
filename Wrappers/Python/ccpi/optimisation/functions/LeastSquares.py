@@ -60,7 +60,7 @@ class LeastSquares(Function):
     
     """
     
-    def __init__(self, A, b, c=1.0, weight = 1.0):
+    def __init__(self, A, b, c=1.0, weight = None):
         super(LeastSquares, self).__init__()
     
         self.A = A  # Should be an operator, default identity
@@ -69,25 +69,24 @@ class LeastSquares(Function):
         
         # weight
         self.weight = weight      
-        self.weight_norm = 1.0
+        self._weight_norm = None
 
-        if isinstance(self.weight, DataContainer):
+        if weight is not None:
             if (self.weight<0).any():
                 raise ValueError('Weight contains negative values') 
-            D = DiagonalOperator(self.weight)
-            self.weight_norm = D.norm()
+            
         
     def __call__(self, x):
         
         r""" Returns the value of :math:`F(x) = c\|Ax-b\|_2^2` or c\|Ax-b\|_{2,weight}^2
                         
         """
-        
+        # c * (A.direct(x)-b).dot((A.direct(x) - b))
         y = self.A.direct(x)
         y.subtract(self.b, out = y) 
         
-        if isinstance(self.weight, Number):    
-            return self.c * (y.norm() ** 2)
+        if self.weight is None:    
+            return self.c * y.dot(y)
         else:
             wy = self.weight.multiply(y)
             return self.c * y.dot(wy) 
@@ -103,14 +102,17 @@ class LeastSquares(Function):
         """
         
         if out is not None:
-            self.A.direct(x, out = out)
-            out.subtract(self.b , out=out)
-            if not isinstance(self.weight, Number):
-                out *= self.weight           
-            self.A.adjoint(out, out = out)
+            tmp = self.A.direct(x)
+            tmp.subtract(self.b , out=tmp)
+            if self.weight is not None:
+                tmp.multiply(self.weight, out=tmp)
+            self.A.adjoint(tmp, out = out)
             out.multiply(self.c * 2.0, out=out)
         else:
-            return (2.0*self.c)*self.A.adjoint(self.A.direct(x) - self.b)
+            if self.weight is None:
+                return (2.0*self.c)*self.A.adjoint(self.A.direct(x) - self.b)
+            else:
+                return (2.0*self.c)*self.A.adjoint(self.weight * (self.A.direct(x) - self.b))
         
     @property
     def L(self):
@@ -137,10 +139,17 @@ class LeastSquares(Function):
             else:
                 warnings.warn('{} could not calculate Lipschitz Constant. {}'.format(
                 self.__class__.__name__, ae))
-            
         except NotImplementedError as noe:
             warnings.warn('{} could not calculate Lipschitz Constant. {}'.format(
                 self.__class__.__name__, noe))
-    
-    
-    
+        if self.weight is not None:
+                self._L *= self.weight_norm
+    @property
+    def weight_norm(self):
+        if self.weight is not None:
+            if self._weight_norm is None:
+                D = DiagonalOperator(self.weight)
+                self._weight_norm = D.norm()
+        else:
+            self._weight_norm = 1.0
+        return self._weight_norm

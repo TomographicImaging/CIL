@@ -338,8 +338,7 @@ class TestFunction(unittest.TestCase):
         print("func2.L {}".format(func2.L))
         print("operator.norm() {}".format(operator.norm()))
   
-        # self.assertNumpyArrayAlmostEqual(func1(u), func2(u))
-        numpy.testing.assert_array_almost_equal(func1(u).as_array(), func2(u).as_array())
+        numpy.testing.assert_almost_equal(func1(u), func2(u))
         
         
         print('Check gradient with Identity operator... OK\n')
@@ -488,7 +487,7 @@ class TestFunction(unittest.TestCase):
         numpy.testing.assert_equal(a, numpy.inf)
         
     def tests_for_L2NormSq_and_weighted(self):
-
+        numpy.random.seed(1)
         M, N, K = 2,3,1
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N, voxel_num_z = K)
         u = ig.allocate('random')
@@ -707,15 +706,18 @@ class TestFunction(unittest.TestCase):
                         
         ig = ImageGeometry(40,30)
         
+        numpy.random.seed(1)
+
         A = Identity(ig)
         b = ig.allocate('random')
         x = ig.allocate('random')
-        c = 0.3
+        c = numpy.float64(0.3)
         
         weight = ig.allocate('random') 
         
         D = DiagonalOperator(weight)
-        norm_weight = D.norm()
+        norm_weight = numpy.float64(D.norm())
+        print("norm_weight", norm_weight)
         
         f1 = LeastSquares(A, b, c, weight) 
         f2 = LeastSquares(A, b, c)
@@ -723,8 +725,10 @@ class TestFunction(unittest.TestCase):
         print("Check LS vs wLS")        
         
         # check Lipshitz    
-        numpy.testing.assert_almost_equal(f2.L, 2 * c * A.norm()**2)   
-        numpy.testing.assert_almost_equal(f1.L, 2 * c * norm_weight * A.norm()**2) 
+        numpy.testing.assert_almost_equal(f2.L, 2 * c * (A.norm()**2))   
+        print ("unwrapped", 2. * c * norm_weight * (A.norm()**2))
+        print ("f1.L", f1.L)
+        numpy.testing.assert_almost_equal(f1.L, numpy.float64(2.) * c * norm_weight * (A.norm()**2)) 
         print("Lipschitz is ... OK")
             
         # check call with weight                   
@@ -734,15 +738,17 @@ class TestFunction(unittest.TestCase):
         print("Call is ... OK")        
         
         # check call without weight                  
-        res1 = c * (A.direct(x)-b).dot((A.direct(x) - b))
+        #res1 = c * (A.direct(x)-b).dot((A.direct(x) - b))
+        res1 = c * (A.direct(x)-b).squared_norm()
         res2 = f2(x)    
         numpy.testing.assert_almost_equal(res1, res2) 
         print("Call without weight is ... OK")        
         
         # check gradient with weight             
-        out = ig.allocate()
+        out = ig.allocate(None)
         res1 = f1.gradient(x)
-        f1.gradient(x, out = out)
+        #out = f1.gradient(x)
+        f1.gradient(x, out=out)
         res2 = 2 * c * A.adjoint(weight*(A.direct(x)-b))
         numpy.testing.assert_array_almost_equal(res1.as_array(), res2.as_array())
         numpy.testing.assert_array_almost_equal(out.as_array(), res2.as_array())

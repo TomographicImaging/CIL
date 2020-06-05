@@ -10,6 +10,11 @@ if (WIN32)
 	set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /Ddll_EXPORTS")
 endif()
 
+if (${CMAKE_C_COMPILER_ID} STREQUAL "GNU")
+  # appends some flags
+  add_compile_options(-ftree-vectorize -fopt-info-vec-optimized -fopt-info-vec)
+  # add_compile_options(-march=native -mavx )
+endif()
 
 message("CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS}")
 message("CMAKE_C_FLAGS ${CMAKE_C_FLAGS}")

@@ -65,10 +65,10 @@ class FunctionOperatorComposition(Function):
     def L(self):
         if self._L is None:
             try:
-                return self.function.L * self.operator.norm()**2 
-            except ValueError as er:
+                self._L = self.function.L  * (self.operator.norm() ** 2)
+            except ValueError as ve:
                 self._L = None
-                warnings.warn("Lipschitz constant was not calculated")
+        return self._L
     
     def __call__(self, x):
         

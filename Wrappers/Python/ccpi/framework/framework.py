@@ -745,7 +745,7 @@ class DataContainer(object):
             return type(self)(self.array, 
                             dimension_labels=self.dimension_labels,
                             deep_copy=True,
-                            geometry=self.geometry,
+                            geometry=self.geometry.copy(),
                             suppress_warning=True )
         else:
             out = self.geometry.allocate(None)

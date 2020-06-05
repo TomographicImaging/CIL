@@ -10,10 +10,10 @@ from IPython.display import HTML
 import random
 
 
-def display_slice(container, direction, title, cmap, minmax, size, axis_labels):
+def display_slice(container, direction, title, cmap, size, axis_labels):
     
         
-    def get_slice_3D(x):
+    def get_slice_3D(x, minmax):
         
         if direction == 0:
             img = container[x]
@@ -84,41 +84,54 @@ def islicer(data, direction, title="", slice_number=None, cmap='gray', minmax=No
         else:
             axis_labels = ['X', 'Y', 'Z']
 
-    
-    if hasattr(data, "as_array"):
+    if isinstance (data, numpy.ndarray):
+        container = data
+    elif hasattr(data, "__getitem__"):
+        container = data
+    elif hasattr(data, "as_array"):
         container = data.as_array()
         
-        if not isinstance (direction, int):
-            if direction in data.dimension_labels.values():
-                direction = data.get_dimension_axis(direction)                             
+    if not isinstance (direction, int):
+        if direction in data.dimension_labels.values():
+            direction = data.get_dimension_axis(direction)                             
 
-    elif isinstance (data, numpy.ndarray):
-        container = data
-        
     if slice_number is None:
         slice_number = int(data.shape[direction]/2)
         
     slider = widgets.IntSlider(min=0, max=data.shape[direction]-1, step=1, 
                              value=slice_number, continuous_update=False, description=axis_labels[direction])
-
-    if minmax is None:
-        amax = container.max()
-        amin = container.min()
+    amax = container.max()
+    amin = container.min()
+    if minmax is None:    
+        cmax = amax
+        cmin = amin
     else:
-        amin = min(minmax)
-        amax = max(minmax)
+        cmin = min(minmax)
+        cmax = max(minmax)
     
     if isinstance (size, (int, float)):
         default_ratio = 6./8.
         size = ( size , size * default_ratio )
     
+    min_max = widgets.FloatRangeSlider(
+                                value=[cmin, cmax],
+                                min=amin,
+                                max=amax,
+                                step=(amax-amin)/100.,
+                                description='display window',
+                                disabled=False,
+                                continuous_update=False,
+                                orientation='horizontal',
+                                readout=True,
+                                readout_format='.1e',
+                            )
     interact(display_slice(container, 
                            direction, 
                            title=title, 
                            cmap=cmap, 
-                           minmax=(amin, amax),
+                           # minmax=(amin, amax),
                            size=size, axis_labels=axis_labels),
-             x=slider);
+             x=slider, minmax=min_max)
     
     return slider
     

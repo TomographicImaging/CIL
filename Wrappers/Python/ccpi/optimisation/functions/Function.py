@@ -173,15 +173,20 @@ class SumFunction(Function):
         super(SumFunction, self).__init__()        
 
         self.function1 = function1
-        self.function2 = function2               
+        self.function2 = function2
     @property
     def L(self):
         '''Lipschitz constant'''
-        # if function1.L is not None and function2.L is not None:
-        #     self.L = function1.L + function2.L
-        
-        return self.function1.L + self.function2.L
-        
+        if self.function1.L is not None and self.function2.L is not None:
+            self._L = self.function1.L + self.function2.L
+        else:
+            self._L = None
+        return self._L
+    @L.setter
+    def L(self, value):
+        # call base class setter
+        super(SumFunction, self.__class__).L.fset(self, value )
+
     def __call__(self,x):
         r"""Returns the value of the sum of functions :math:`F_{1}` and :math:`F_{2}` at x
         
@@ -236,6 +241,10 @@ class ScaledFunction(Function):
             return abs(self.scalar) * self.function.L
         else:
             return None
+    @L.setter
+    def L(self, value):
+        # call base class setter
+        super(SumFunction, self.__class__).L.fset(self, value )
 
     @property
     def scalar(self):

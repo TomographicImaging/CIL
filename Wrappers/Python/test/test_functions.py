@@ -22,7 +22,7 @@ import numpy as np
 from ccpi.framework import DataContainer, ImageGeometry, \
     VectorGeometry, VectorData, BlockDataContainer
 from ccpi.optimisation.operators import Identity, LinearOperatorMatrix, CompositionOperator, DiagonalOperator, BlockOperator
-from ccpi.optimisation.functions import Function, KullbackLeibler
+from ccpi.optimisation.functions import Function, KullbackLeibler, ConstantFunction, TranslateFunction
 from ccpi.optimisation.operators import Gradient
 
 from ccpi.optimisation.functions import Function, KullbackLeibler, WeightedL2NormSquared, L2NormSquared,\
@@ -810,6 +810,43 @@ class TestFunction(unittest.TestCase):
         print (func2.L)
         func2.L = 2
         assert func2.L == 2
+    def test_Lipschitz2(self):
+        print('Test for test_Lipschitz2')         
+            
+        M, N = 50, 50
+        ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
+        b = ig.allocate('random', seed=1)
+        
+        print('Check call with Identity operator... OK\n')
+        operator = 3 * Identity(ig)
+            
+        u = ig.allocate('random_int', seed = 50)
+        func2 = LeastSquares(operator, b, 0.5)
+        func1 = ConstantFunction(0.3)
+        f3 = func1 + func2
+        assert f3.L != 2
+        print (func2.L)
+        func2.L = 2
+        assert func2.L == 2
+    def test_Lipschitz3(self):
+        print('Test for test_Lipschitz3')         
+            
+        M, N = 50, 50
+        ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
+        b = ig.allocate('random', seed=1)
+        
+        print('Check call with Identity operator... OK\n')
+        operator = 3 * Identity(ig)
+            
+        u = ig.allocate('random_int', seed = 50)
+        # func2 = LeastSquares(operator, b, 0.5)
+        func1 = ConstantFunction(0.3)
+        f3 = TranslateFunction(func1, 3)
+        assert f3.L != 2
+        print (f3.L)
+        f3.L = 2
+        assert f3.L == 2
+
 
 
 

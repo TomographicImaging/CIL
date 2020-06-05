@@ -37,7 +37,7 @@ class Function(object):
         :type L: number, positive, default None
         :param domain: The domain of the function.
 
-        Lipschitz is positive real number, such that |f(x) - f(y)| <= L ||x-y||, assuming f: IG --> R
+        Lipschitz of the gradient of the function; it is a positive real number, such that |f'(x) - f'(y)| <= L ||x-y||, assuming f: IG --> R
 
     """
     
@@ -147,7 +147,9 @@ class Function(object):
     
     @property
     def L(self):
-        '''Lipschitz is positive real number, such that |f(x) - f(y)| <= L ||x-y||, assuming f: IG --> R'''
+        '''Lipschitz of the gradient of function f.
+        
+        L is positive real number, such that |f'(x) - f'(y)| <= L ||x-y||, assuming f: IG --> R'''
         return self._L
         # return self._L
     @L.setter

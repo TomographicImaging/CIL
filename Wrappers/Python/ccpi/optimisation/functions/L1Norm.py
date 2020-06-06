@@ -119,6 +119,7 @@ class L1Norm(Function):
             else:
                 out.fill(self.shinkage_operator(x, tau))
                                     
+    
 #    def proximal_conjugate(self, x, tau, out=None):
 #        
 #        r'''Proximal operator of the convex conjugate of L1Norm at x:

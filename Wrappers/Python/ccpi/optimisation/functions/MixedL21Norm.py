@@ -89,23 +89,21 @@ class MixedL21Norm(Function):
         where the convention 0 · (0/0) = 0 is used.
         
         """
-        
+
         if out is None:
-            
-        
             tmp = x.pnorm(2)
             res = (tmp - tau).maximum(0.0) * x/tmp
-            
+
             # TODO avoid using numpy, add operation in the framework
             # This will be useful when we add cupy 
                                  
             for el in res.containers:
-                
+
                 elarray = el.as_array()
                 elarray[np.isnan(elarray)]=0
-                el.fill(elarray)                                       
-            
-            return res            
+                el.fill(elarray)
+
+            return res
             
         else:
             
@@ -121,32 +119,8 @@ class MixedL21Norm(Function):
                 elarray[np.isnan(elarray)]=0
                 el.fill(elarray)  
 
-            out.fill(out)              
-                    
-# TODO, add the prox conjugate in the documenataion and then delete the code below            
-##############################################################################
-##############################################################################
-#    def proximal_conjugate(self, x, tau, out=None): 
-#
-#        
-#        if out is None:                                        
-#            tmp = x.get_item(0) * 0	
-#            for el in x.containers:	
-#                tmp += el.power(2.)	
-#            tmp.sqrt(out=tmp)	
-#            tmp.maximum(1.0, out=tmp)	
-#            frac = [ el.divide(tmp) for el in x.containers ]	
-#            return BlockDataContainer(*frac)
-#        
-#    
-#        else:
-#                            
-#            res1 = functools.reduce(lambda a,b: a + b*b, x.containers, x.get_item(0) * 0 )
-#            res1.sqrt(out=res1)	
-#            res1.maximum(1.0, out=res1)	
-#            x.divide(res1, out=out)
-                              
-                
+            out.fill(out)
+
 class SmoothMixedL21Norm(Function):
     
     """ SmoothMixedL21Norm function: :math:`F(x) = ||x||_{2,1} = \sum |x|_{2} = \sum \sqrt{ (x^{1})^{2} + (x^{2})^{2} + \epsilon^2 + \dots}`                  
@@ -164,7 +138,7 @@ class SmoothMixedL21Norm(Function):
         :param epsilon: smoothing parameter making MixedL21Norm differentiable 
         '''
 
-        super(SmoothMixedL21Norm, self).__init__(L=1)          
+        super(SmoothMixedL21Norm, self).__init__(L=1)
         self.epsilon = epsilon   
                 
         if self.epsilon==0:
@@ -172,7 +146,7 @@ class SmoothMixedL21Norm(Function):
                             
     def __call__(self, x):
         
-        r"""Returns the value of the SmoothMixedL21Norm function at x.                                            
+        r"""Returns the value of the SmoothMixedL21Norm function at x.
         """
         if not isinstance(x, BlockDataContainer):
             raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 
@@ -199,30 +173,3 @@ class SmoothMixedL21Norm(Function):
             return x.divide(denom)
         else:
             x.divide(denom, out=out)        
-
-
-
-
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-      
-    
-    
-
-      
-    
-    
-    
-
-    
-
-    

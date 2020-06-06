@@ -134,27 +134,29 @@ class TestFunction(unittest.TestCase):
             
         print('###################  Check Lispchitz constant ################## \n')
         
-        for func in list1:
+        for i,func in enumerate(list1):
             
             if isinstance(func, ScaledFunction):
                 type_fun = ' scalar * ' + type(func.function).__name__
             else:    
                 type_fun = type(func).__name__            
                
-            
-            # check Lispchitz sum of two functions  
-            
-            if isinstance(func, Number):
-                tmp_fun_L = 0
-            else:
-                tmp_fun_L = func.L           
-            
-            sumf = f1 + func   
-            
             try:
-                sumf.L==f1.L + tmp_fun_L
-            except TypeError:
-                print('Function {} has L = None'.format(type_fun))
+                # check Lispchitz sum of two functions  
+                print ("i", i,func.__class__.__name__)
+                if isinstance(func, Number):
+                    tmp_fun_L = 0
+                else:
+                    tmp_fun_L = func.L           
+                
+                sumf = f1 + func   
+                
+                try:
+                    sumf.L==f1.L + tmp_fun_L
+                except TypeError:
+                    print('Function {} has L = None'.format(type_fun))
+            except ValueError as nie:
+                print (func.__class__.__name__, nie)
                 
         print('\n###################  Check Gradient ################## \n')   
               

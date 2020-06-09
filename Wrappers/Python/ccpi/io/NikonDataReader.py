@@ -38,14 +38,14 @@ class NikonDataReader(object):
             xtek_file       full path to .xtexct file
             
             roi             region-of-interest to load. 
-                            If roi = {'horizontal_x': -1, 'vertical': -1} (default), 
+                            If roi = {'horizontal': -1, 'vertical': -1} (default), 
                             full projections will be loaded. Otherwise roi is 
-                            given by {'horizontal_x': (column0, column1), 'vertical': (row0, row1)}
+                            given by {'horizontal': (column0, column1), 'vertical': (row0, row1)}
                             where row0, column0 are coordinates of top left corner and 
                             row1, column1 are coordinates of bottom right corner.
                             
             binning         number of pixels to bin (combine) along corresponsing lables. 
-                            If binning = {'horizontal_x': 1, 'vertical': 1} (default),
+                            If binning = {'horizontal': 1, 'vertical': 1} (default),
                             projections in original resolution are loaded. Note, 
                             anisotropic pixels are currently not supported by Framework
             
@@ -59,8 +59,8 @@ class NikonDataReader(object):
         '''
         
         self.xtek_file = kwargs.get('xtek_file', None)
-        self.roi = kwargs.get('roi', {'horizontal_x': -1, 'vertical': -1})
-        self.binning = kwargs.get('binning', {'horizontal_x': 1, 'vertical': 1})
+        self.roi = kwargs.get('roi', {'horizontal': -1, 'vertical': -1})
+        self.binning = kwargs.get('binning', {'horizontal': 1, 'vertical': 1})
         self.normalize = kwargs.get('normalize', False)
         self.fliplr = kwargs.get('fliplr', False)
         
@@ -73,8 +73,8 @@ class NikonDataReader(object):
             
     def set_up(self, 
                xtek_file = None, 
-               roi = {'horizontal_x': -1, 'vertical': -1}, 
-               binning = {'horizontal_x': 1, 'vertical': 1},
+               roi = {'horizontal': -1, 'vertical': -1}, 
+               binning = {'horizontal': 1, 'vertical': 1},
                normalize = False,
                fliplr = False):
         
@@ -93,36 +93,36 @@ class NikonDataReader(object):
                 
         # check labels
         for key in self.binning.keys():
-            if key not in ['horizontal_x', 'vertical']:
-                raise Exception("Wrong label. horizontal_x and/or vertical are expected")
+            if key not in ['horizontal', 'vertical']:
+                raise Exception("Wrong label. horizontal and/or vertical are expected")
         
         for key in self.roi.keys():
-            if key not in ['horizontal_x', 'vertical']:
-                raise Exception("Wrong label. horizontal_x and/or vertical are expected")
+            if key not in ['horizontal', 'vertical']:
+                raise Exception("Wrong label. horizontal and/or vertical are expected")
         
         self._binning = self.binning.copy()
         self._roi = self.roi.copy()
         
-        if 'horizontal_x' not in self._binning.keys():
-            self._binning['horizontal_x'] = 1
+        if 'horizontal' not in self._binning.keys():
+            self._binning['horizontal'] = 1
         
         if 'vertical' not in self._binning.keys():
             self._binning['vertical'] = 1
         
-        if 'horizontal_x' not in self._roi.keys():
-            self._roi['horizontal_x'] = -1
+        if 'horizontal' not in self._roi.keys():
+            self._roi['horizontal'] = -1
         
         if 'vertical' not in self._roi.keys():
             self._roi['vertical'] = -1
         
         # check if inputs for roi and binning are integer
-        if not ((isinstance(self._binning['horizontal_x'], int)) and 
+        if not ((isinstance(self._binning['horizontal'], int)) and 
                 isinstance(self._binning['vertical'], int)):
             raise Exception("Integers are expected for binning")
         
-        if self._roi['horizontal_x'] != -1:
-            if not (isinstance(self._roi['horizontal_x'][0], int) and \
-                    isinstance(self._roi['horizontal_x'][1], int)):
+        if self._roi['horizontal'] != -1:
+            if not (isinstance(self._roi['horizontal'][0], int) and \
+                    isinstance(self._roi['horizontal'][1], int)):
                 raise Exception("Integers are expected for roi")
         
         if self._roi['vertical'] != -1:
@@ -176,22 +176,22 @@ class NikonDataReader(object):
             roi_par.append((0, pixel_num_v_0))
         else:
             roi_par.append(self._roi['vertical'])
-        if self._roi['horizontal_x'] == -1:
+        if self._roi['horizontal'] == -1:
             roi_par.append((0, pixel_num_h_0))
         else:
-            roi_par.append(self._roi['horizontal_x'])
+            roi_par.append(self._roi['horizontal'])
                 
         # calculate number of pixels and pixel size
-        if (self._binning['horizontal_x'] == 1 and self._binning['vertical'] == 1):
+        if (self._binning['horizontal'] == 1 and self._binning['vertical'] == 1):
             pixel_num_v = roi_par[0][1] - roi_par[0][0]
             pixel_num_h = roi_par[1][1] - roi_par[1][0]
             pixel_size_v = pixel_size_v_0
             pixel_size_h = pixel_size_h_0
         else:
             pixel_num_v = (roi_par[0][1] - roi_par[0][0]) // self._binning['vertical']
-            pixel_num_h = (roi_par[1][1] - roi_par[1][0]) // self._binning['horizontal_x']
+            pixel_num_h = (roi_par[1][1] - roi_par[1][0]) // self._binning['horizontal']
             pixel_size_v = pixel_size_v_0 * self._binning['vertical']
-            pixel_size_h = pixel_size_h_0 * self._binning['horizontal_x']
+            pixel_size_h = pixel_size_h_0 * self._binning['horizontal']
         
         '''
         Parse the angles file .ang or _ctdata.txt file and returns the angles
@@ -264,8 +264,8 @@ class NikonDataReader(object):
         reader = TIFFStackReader()
         reader.set_up(path = path_projection,
                       n_images = num_projections,
-                      binning = {'axis_0': self._binning['vertical'], 'axis_1': self._binning['horizontal_x']},
-                      roi = {'axis_0': self._roi['vertical'], 'axis_1': self._roi['horizontal_x']})
+                      binning = {'axis_0': self._binning['vertical'], 'axis_1': self._binning['horizontal']},
+                      roi = {'axis_0': self._roi['vertical'], 'axis_1': self._roi['horizontal']})
 
         data = reader.load_images()
         
@@ -304,8 +304,8 @@ import matplotlib.pyplot as plt
 xtek_file = '/media/newhd/shared/Data/SophiaBeads/SophiaBeads_256_averaged/SophiaBeads_256_averaged.xtekct'
 reader = NikonDataReader()
 reader.set_up(xtek_file = xtek_file,
-              binning = {'horizontal_x': 8, 'vertical': 1},
-              roi = {'horizontal_x': (500,1500), 'vertical': (100,900)},
+              binning = {'horizontal': 8, 'vertical': 1},
+              roi = {'horizontal': (500,1500), 'vertical': (100,900)},
               normalize = True,
               fliplr = True)
 

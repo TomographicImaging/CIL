@@ -198,7 +198,7 @@ class ImageGeometry(object):
         repres += "voxel_size : x{0},y{1},z{2}\n".format(self.voxel_size_x, self.voxel_size_y, self.voxel_size_z)
         repres += "center : x{0},y{1},z{2}\n".format(self.center_x, self.center_y, self.center_z)
         return repres
-    def allocate(self, value=0, dimension_labels=None, **kwargs):
+    def allocate(self, value=None, dimension_labels=None, **kwargs):
         '''allocates an ImageData according to the size expressed in the instance'''
         if value == 'random_int':
             dtype = kwargs.get('dtype', numpy.int32)
@@ -409,7 +409,7 @@ class AcquisitionGeometry(object):
         repres += "distance center-detector: {0}\n".format(self.dist_source_center)
         repres += "number of channels: {0}\n".format(self.channels)
         return repres
-    def allocate(self, value=0, dimension_labels=None, **kwargs):
+    def allocate(self, value=None, dimension_labels=None, **kwargs):
         '''allocates an AcquisitionData according to the size expressed in the instance
         
         :param value: accepts numbers to allocate an uniform array, or a string as 'random' or 'random_int' to create a random array or None.

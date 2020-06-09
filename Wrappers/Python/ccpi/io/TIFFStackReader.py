@@ -118,24 +118,39 @@ class TIFFStackReader(object):
         for key in self.binning.keys():
             if key not in ['axis_0', 'axis_1']:
                 raise Exception("Wrong label. axis_0 and axis_1 are expected")
-        # check labels
+        
         for key in self.roi.keys():
             if key not in ['axis_0', 'axis_1']:
                 raise Exception("Wrong label. axis_0 and axis_1 are expected")
+        
+        self._binning = self.binning.copy()
+        self._roi = self.roi.copy()
+        
+        if 'axis_1' not in self._binning.keys():
+            self._binning['axis_1'] = 1
+        
+        if 'axis_0' not in self._binning.keys():
+            self._binning['axis_0'] = 1
+        
+        if 'axis_1' not in self._roi.keys():
+            self._roi['axis_1'] = -1
+        
+        if 'axis_0' not in self._roi.keys():
+            self._roi['axis_0'] = -1
                 
         # check if inputs for roi and binning are integer
-        if not (isinstance(self.binning['axis_0'], int) and \
-                isinstance(self.binning['axis_1'], int)):
+        if not (isinstance(self._binning['axis_0'], int) and \
+                isinstance(self._binning['axis_1'], int)):
             raise Exception("Integers are expected for binning")
         
-        if self.roi['axis_0'] != -1:
-            if not (isinstance(self.roi['axis_0'][0], int) and \
-                    isinstance(self.roi['axis_0'][1], int)):
+        if self._roi['axis_0'] != -1:
+            if not (isinstance(self._roi['axis_0'][0], int) and \
+                    isinstance(self._roi['axis_0'][1], int)):
                 raise Exception("Integers are expected for roi")
         
-        if self.roi['axis_1'] != -1:
-            if not (isinstance(self.roi['axis_1'][0], int) and \
-                    isinstance(self.roi['axis_1'][1], int)):
+        if self._roi['axis_1'] != -1:
+            if not (isinstance(self._roi['axis_1'][0], int) and \
+                    isinstance(self._roi['axis_1'][1], int)):
                 raise Exception("Integers are expected for roi")
         
         self._tiff_files = [f for f in os.listdir(self.path) if (os.path.isfile(os.path.join(self.path, f)) and '.tif' in f.lower())]
@@ -166,22 +181,22 @@ class TIFFStackReader(object):
         n_rows_raw, n_cols_raw = tmp.shape
 
         roi_par = []
-        if self.roi['axis_0'] == -1:
+        if self._roi['axis_0'] == -1:
             roi_par.append((0, n_rows_raw))
         else:
-            roi_par.append(self.roi['axis_0'])
-        if self.roi['axis_1'] == -1:
+            roi_par.append(self._roi['axis_0'])
+        if self._roi['axis_1'] == -1:
             roi_par.append((0, n_cols_raw))
         else:
-            roi_par.append(self.roi['axis_1'])
+            roi_par.append(self._roi['axis_1'])
                 
-        # calculate number of pixels and pixel size
-        if (self.binning['axis_0'] == 1 and self.binning['axis_1'] == 1):
+        # calculate number of pixels
+        if (self._binning['axis_0'] == 1 and self._binning['axis_1'] == 1):
             n_rows = roi_par[0][1] - roi_par[0][0]
             n_cols = roi_par[1][1] - roi_par[1][0]
         else:
-            n_rows = (roi_par[0][1] - roi_par[0][0]) // self.binning['axis_0']
-            n_cols = (roi_par[1][1] - roi_par[1][0]) // self.binning['axis_1']
+            n_rows = (roi_par[0][1] - roi_par[0][0]) // self._binning['axis_0']
+            n_cols = (roi_par[1][1] - roi_par[1][0]) // self._binning['axis_1']
         
         if (self.n_images == -1 or self.n_images > (len(self._tiff_files) - self.skip)):
             num_to_read = len(self._tiff_files) - self.skip
@@ -203,13 +218,13 @@ class TIFFStackReader(object):
                 print('Error reading\n {}\n file.'.format(filename))
                 raise
                 
-            if (self.binning['axis_0'] == 1 and self.binning['axis_1'] == 1):
+            if (self._binning['axis_0'] == 1 and self._binning['axis_1'] == 1):
                 tmp = raw[roi_par[0][0]:roi_par[0][1], roi_par[1][0]:roi_par[1][1]]
             else:
-                shape = (n_rows, self.binning['axis_0'], 
-                         n_cols, self.binning['axis_1'])
-                tmp = raw[roi_par[0][0]:(roi_par[0][0] + (((roi_par[0][1] - roi_par[0][0]) // self.binning['axis_0']) * self.binning['axis_0'])), \
-                          roi_par[1][0]:(roi_par[1][0] + (((roi_par[1][1] - roi_par[1][0]) // self.binning['axis_1']) * self.binning['axis_1']))].reshape(shape).mean(-1).mean(1)
+                shape = (n_rows, self._binning['axis_0'], 
+                         n_cols, self._binning['axis_1'])
+                tmp = raw[roi_par[0][0]:(roi_par[0][0] + (((roi_par[0][1] - roi_par[0][0]) // self._binning['axis_0']) * self._binning['axis_0'])), \
+                          roi_par[1][0]:(roi_par[1][0] + (((roi_par[1][1] - roi_par[1][0]) // self._binning['axis_1']) * self._binning['axis_1']))].reshape(shape).mean(-1).mean(1)
             
             if self.transpose:
                 im[i, :, :] = numpy.transpose(tmp)

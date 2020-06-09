@@ -136,7 +136,7 @@ class ImageGeometry(object):
                 # resort
                 self.shape = tuple([shape[i] for i in order])
             else:
-                self.shape = tuple(order)
+                self.shape = shape
             self.dimension_labels = labels
                 
     def get_order_by_label(self, dimension_labels, default_dimension_labels):
@@ -365,7 +365,7 @@ class AcquisitionGeometry(object):
                 # resort
                 self.shape = tuple([shape[i] for i in order])
             else:
-                self.shape = tuple(order)
+                self.shape = shape
             self.dimension_labels = labels
 
 
@@ -462,11 +462,11 @@ class AcquisitionGeometry(object):
         else:
             dtype = kwargs.get('dtype', numpy.float32)
         if dimension_labels is None:
-            out = AcquisitionData(geometry=self, dimension_labels=self.dimension_labels, 
+            out = AcquisitionData(geometry=self.copy(), dimension_labels=self.dimension_labels, 
                                   dtype=dtype,
                                   suppress_warning=True)
         else:
-            out = AcquisitionData(geometry=self, dimension_labels=dimension_labels, 
+            out = AcquisitionData(geometry=self.copy(), dimension_labels=dimension_labels, 
                                   dtype=dtype, 
                                   suppress_warning=True)
         if isinstance(value, Number):
@@ -778,8 +778,7 @@ class DataContainer(object):
         return self.divide(other)
     def __pow__(self, other):
         return self.power(other)
-    
-    
+        
     
     # reverse operand
     def __radd__(self, other):
@@ -861,7 +860,7 @@ class DataContainer(object):
             return type(self)(self.array, 
                             dimension_labels=self.dimension_labels,
                             deep_copy=True,
-                            geometry=self.geometry.copy(),
+                            geometry=self.geometry.copy() if self.geometry is not None else None,
                             suppress_warning=True )
         else:
             out = self.geometry.allocate(None)
@@ -917,21 +916,22 @@ class DataContainer(object):
         out = kwargs.get('out', None)
         
         if out is None:
-            if isinstance(x2, (int, float, complex)):
-                out = pwop(self.as_array() , x2 , *args, **kwargs )
-            elif isinstance(x2, (numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64,\
+            if isinstance(x2, (int, float, complex, \
+                                 numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64,\
                                  numpy.float, numpy.float16, numpy.float32, numpy.float64, \
                                  numpy.complex)):
                 out = pwop(self.as_array() , x2 , *args, **kwargs )
             elif issubclass(type(x2) , DataContainer):
                 out = pwop(self.as_array() , x2.as_array() , *args, **kwargs )
-            geometry = None
-            if self.geometry is not None:
-                geometry = self.geometry.copy()
+            else:
+                raise TypeError('Expected x2 type as number of DataContainer, got {}'.format(type(x2)))
+            geom = self.geometry
+            if geom is not None:
+                geom = self.geometry.copy()
             return type(self)(out,
                    deep_copy=False, 
                    dimension_labels=self.dimension_labels,
-                   geometry=geometry, 
+                   geometry=geom, 
                    suppress_warning=True)
             
         
@@ -1097,8 +1097,7 @@ class DataContainer(object):
     
     def abs(self, *args,  **kwargs):
         return self.pixel_wise_unary(numpy.abs, *args,  **kwargs)
-    
-    
+
     def sign(self, *args,  **kwargs):
         return self.pixel_wise_unary(numpy.sign, *args,  **kwargs)
     
@@ -1171,6 +1170,43 @@ class DataContainer(object):
         '''Returns the max pixel value in the DataContainer'''
         return numpy.max(self.as_array(), *args, **kwargs)
     
+    # Logic operators between DataContainers and floats    
+    def __le__(self, other):
+        '''Returns boolean array of DataContainer less or equal than DataContainer/float'''
+        if isinstance(other, DataContainer):
+            return self.as_array()<=other.as_array()
+        return self.as_array()<=other
+    
+    def __lt__(self, other):
+        '''Returns boolean array of DataContainer less than DataContainer/float'''
+        if isinstance(other, DataContainer):
+            return self.as_array()<other.as_array()
+        return self.as_array()<other    
+    
+    def __ge__(self, other):
+        '''Returns boolean array of DataContainer greater or equal than DataContainer/float'''        
+        if isinstance(other, DataContainer):
+            return self.as_array()>=other.as_array()
+        return self.as_array()>=other  
+    
+    def __gt__(self, other):
+        '''Returns boolean array of DataContainer greater than DataContainer/float'''        
+        if isinstance(other, DataContainer):
+            return self.as_array()>other.as_array()
+        return self.as_array()>other      
+    
+    def __eq__(self, other):
+        '''Returns boolean array of DataContainer equal to DataContainer/float'''          
+        if isinstance(other, DataContainer):
+            return self.as_array()==other.as_array()
+        return self.as_array()==other  
+
+    def __ne__(self, other):
+        '''Returns boolean array of DataContainer negative to DataContainer/float'''           
+        if isinstance(other, DataContainer):
+            return self.as_array()!=other.as_array()
+        return self.as_array()!=other      
+    
     @property
     def size(self):
         '''Returns the number of elements of the DataContainer'''
@@ -1180,7 +1216,6 @@ class DataContainer(object):
     def dtype(self):
         '''Returns the type of the data array'''
         return self.as_array().dtype
-
     
 class ImageData(DataContainer):
     '''DataContainer for holding 2D or 3D DataContainer'''

@@ -32,14 +32,14 @@ try:
     has_numba = True
     '''Some parallelisation of KL calls'''
     @jit(nopython=True)
-    def kl_proximal(x,b, bnoise, tau, out, eta):
+    def kl_proximal(x,b, tau, out, eta):
             for i in prange(x.size):
                 out.flat[i] = 0.5 *  ( 
-                    ( x.flat[i] + eta.flat[i] - bnoise.flat[i] - tau ) +\
-                    numpy.sqrt( (x.flat[i] + eta.flat[i] + bnoise.flat[i] - tau)**2. + \
+                    ( x.flat[i] - eta.flat[i] - tau ) +\
+                    numpy.sqrt( (x.flat[i] + eta.flat[i] - tau)**2. + \
                         (4. * tau * b.flat[i]) 
                     )
-                )
+                )                   
     @jit(nopython=True)
     def kl_proximal_conjugate(x, b, bnoise, tau, out):
         #z = x + tau * self.bnoise
@@ -51,9 +51,9 @@ try:
                 (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * tau * b.flat[i])
                 )
     @jit(nopython=True)
-    def kl_gradient(x, b, bnoise, out, eta):
+    def kl_gradient(x, b, out, eta):
         for i in prange(x.size):
-            out.flat[i] = 1 - b.flat[i]/(x.flat[i] + bnoise.flat[i] + eta.flat[i])
+            out.flat[i] = 1 - b.flat[i]/(x.flat[i] + eta.flat[i])
 
     @jit(nopython=True)
     def kl_div(x, y, eta):
@@ -80,8 +80,8 @@ try:
     out = numpy.empty_like(x)
     tau = 1.
     kl_div(b,x,eta)
-    kl_gradient(x,b,bnoise,out, eta)
-    kl_proximal(x,b, bnoise, tau, out, eta)
+    kl_gradient(x,b,out, eta)
+    kl_proximal(x,b, tau, out, eta)
     kl_proximal_conjugate(x,b, bnoise, tau, out)
     
 except ImportError as ie:
@@ -173,12 +173,12 @@ class KullbackLeibler(Function):
             if out is None:
                 out = (x * 0.)
                 out_np = out.as_array()
-                kl_gradient(x.as_array(), self.b.as_array(), self.bnoise.as_array(), out_np, self.eta.as_array())
+                kl_gradient(x.as_array(), self.b.as_array(), out_np, self.eta.as_array())
                 # out.fill(out_np)
                 return out
             else:
                 out_np = out.as_array()
-                kl_gradient(x.as_array(), self.b.as_array(), self.bnoise.as_array(), out_np, self.eta.as_array())
+                kl_gradient(x.as_array(), self.b.as_array(), out_np, self.eta.as_array())
                 # out.fill(out_np)
         else:                           
             tmp_sum_array = (x + self.eta).as_array()
@@ -221,12 +221,12 @@ class KullbackLeibler(Function):
                 out = (x * 0.)
                 # out_np = numpy.empty_like(out.as_array(), dtype=numpy.float64)
                 out_np = out.as_array()
-                kl_proximal(x.as_array(), self.b.as_array(), self.bnoise.as_array(), tau, out_np, self.eta.as_array())
+                kl_proximal(x.as_array(), self.b.as_array(), tau, out_np, self.eta.as_array())
                 out.fill(out_np)
                 return out
             else:
                 out_np = out.as_array()
-                kl_proximal(x.as_array(), self.b.as_array(), self.bnoise.as_array(), tau, out_np, self.eta.as_array())
+                kl_proximal(x.as_array(), self.b.as_array(), tau, out_np, self.eta.as_array())
                 # out.fill(out_np)                    
         else:
             if out is None:        
@@ -278,9 +278,9 @@ if __name__ == '__main__':
     M, N, K =  30, 30, 20
     ig = ImageGeometry(N, M, K)
     
-    u1 = ig.allocate('random_int', seed = 500)    
-    g1 = ig.allocate('random_int', seed = 1000)
-    b1 = ig.allocate('random', seed = 5000)
+    u1 = ig.allocate('random', seed = 500)    
+    g1 = ig.allocate('random', seed = 100)
+    b1 = ig.allocate('random', seed = 500)
     
     # with no data
     try:
@@ -304,7 +304,7 @@ if __name__ == '__main__':
     res_gradient_out = u1.geometry.allocate()
     f.gradient(u1, out = res_gradient_out) 
     numpy.testing.assert_array_almost_equal(res_gradient.as_array(), \
-                                            res_gradient_out.as_array(),decimal = 4)  
+                                            res_gradient_out.as_array())  
     
     print('Check proximal ... is OK\n')        
     tau = 0.4
@@ -312,16 +312,8 @@ if __name__ == '__main__':
     res_proximal_out = u1.geometry.allocate()   
     f.proximal(u1, tau, out = res_proximal_out)
     numpy.testing.assert_array_almost_equal(res_proximal.as_array(), \
-                                            res_proximal_out.as_array(), decimal =5)  
-    
-    print('Check conjugate ... is OK\n')  
-    res_conj = f.convex_conjugate(u1) 
-    
-    if (1 - u1.as_array()).all():
-        print('If 1-x<=0, Convex conjugate returns 0.0')
-        
-    numpy.testing.assert_equal(0.0, f.convex_conjugate(u1))   
-
+                                            res_proximal_out.as_array())  
+                
 
     print('Check KullbackLeibler with background\n')       
     f1 = KullbackLeibler(b=g1, eta=b1) 
@@ -329,7 +321,7 @@ if __name__ == '__main__':
     tmp_sum = (u1 + f1.eta).as_array()
     ind = tmp_sum >= 0
     tmp = scipy.special.kl_div(f1.b.as_array()[ind], tmp_sum[ind])                 
-    numpy.testing.assert_equal(f1(u1), numpy.sum(tmp) )
+    numpy.testing.assert_almost_equal(f1(u1), numpy.sum(tmp), decimal=1)
     
     print('Check proximal KL without background\n')   
     tau = [0.1, 1, 10, 100, 10000]
@@ -354,6 +346,15 @@ if __name__ == '__main__':
                                                 proxc_out1.as_array(),
                                                 decimal = 4)  
     
-        print('tau = {} is OK'.format(t1) )        
+        print('tau = {} is OK'.format(t1) )    
+        
+    f = KullbackLeibler(b=g1, eta = b1)        
+    tau = 0.4
+    res_proximal = f.proximal(u1, tau)
+    res_proximal_out = u1.geometry.allocate()   
+    f.proximal(u1, tau, out = res_proximal_out)
+    numpy.testing.assert_array_almost_equal(res_proximal.as_array(), \
+                                            res_proximal_out.as_array())  
+    print('Check proximal with eta ... is OK\n')         
         
     

@@ -23,4 +23,5 @@ from .GradientDescent import GradientDescent, StochasticGradientDescent
 from .FISTA import FISTA
 from .FISTA import SFISTA
 from .PDHG import PDHG
+from .ADMM import LADMM
 

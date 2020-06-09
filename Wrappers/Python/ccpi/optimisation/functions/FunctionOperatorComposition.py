@@ -52,22 +52,24 @@ class FunctionOperatorComposition(Function):
 
         super(FunctionOperatorComposition, self).__init__()
         
-        self.function = function     
-        self.operator = operator
-        
-        if not isinstance(self.function, Function):
+        if not isinstance(function, Function):
             raise ValueError('{} is not function '.format(type(self.function)))
-          
-        # check also ScaledOperator because it's not a child atm of Operator            
-        if not isinstance(self.operator, (Operator, ScaledOperator)):
+
+        if not isinstance(operator, Operator):
             raise ValueError('{} is not function '.format(type(self.operator)))            
         
-        try:
-            self.L = function.L * operator.norm()**2 
-        except ValueError as er:
-            self.L = None
-            warnings.warn("Lipschitz constant was not calculated")
-        
+        self.function = function     
+        self.operator = operator
+
+    @property
+    def L(self):
+        if self._L is None:
+            try:
+                self._L = self.function.L  * (self.operator.norm() ** 2)
+            except ValueError as ve:
+                self._L = None
+        return self._L
+    
     def __call__(self, x):
         
         """ Returns :math:`F(Ax)`

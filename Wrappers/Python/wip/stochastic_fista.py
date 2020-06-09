@@ -135,16 +135,16 @@ class AstraSubsetProjectorSimple(AstraProjectorSimple):
 nsubs = 10
 step_rate = 0.0002328
 
-# data.geometry.generate_subsets(nsubs,'stagger')
-idx = numpy.asarray(range(len(data.geometry.angles)))
-indices = AcquisitionGeometrySubsetGenerator.staggered_indices(idx, nsubs)
-newidx = AcquisitionGeometrySubsetGenerator.get_new_indices(indices)
+# # data.geometry.generate_subsets(nsubs,'stagger')
+# idx = numpy.asarray(range(len(data.geometry.angles)))
+# indices = AcquisitionGeometrySubsetGenerator.staggered_indices(idx, nsubs)
+# newidx = AcquisitionGeometrySubsetGenerator.get_new_indices(indices)
 
-new_array = data.as_array()[newidx]
-data.fill(new_array)
-del new_array
-data.geometry.generate_subsets(nsubs,'uniform')
-data.geometry.angles = data.geometry.angles[newidx]
+# new_array = data.as_array()[newidx]
+# data.fill(new_array)
+# del new_array
+data.geometry.generate_subsets(nsubs,'stagger')
+# data.geometry.angles = data.geometry.angles[newidx]
 
 OS_A = AstraSubsetProjectorSimple(ig, data.geometry, device = 'gpu')
 
@@ -196,27 +196,19 @@ TV = regularisers.FGP_TV(lambdaReg,iterationsTV,tolerance,methodTV,nonnegativity
 algos.append( SFISTA(x_init=im_data*0., 
                      f = sl2, g = TV,
                      number_of_subsets=nsubs,
-                     update_objective_interval=10, max_iteration=100, 
-                     update_subset_interval=nsubs)
+                     update_objective_interval=1, max_iteration=100, 
+                     #update_subset_interval=nsubs
+                     )
 )
 tt = time.time()
 algos[-1].run(4)
 dts.append( time.time() - tt )
 
-data.geometry.generate_subsets(1, 'uniform')
-data.geometry.subset_id = None
+# Compare the output of FISTA and SoFISTA algorithm
 print("Objective FISTA TV ", l2(algos[0].get_output()))
 print("Objective SoFISTA TV ", l2(algos[1].get_output()))
 
-# to use the whole dataset -> reset to 1 subset.
-# data.geometry.generate_subsets(1, 'random')
-
-
-
 print ("###################################")
-print ("FISTA counter ", algos[0].counter)
-
-print ("SFISTA counter ", algos[1].counter, algos[1].scounter)
 
 plotter2D([
         

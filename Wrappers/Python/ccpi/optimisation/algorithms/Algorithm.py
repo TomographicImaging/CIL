@@ -65,7 +65,7 @@ class Algorithm(object):
         self._iteration = []
         self.update_objective_interval = kwargs.get('update_objective_interval', 1)
         self.x = None
-        self.counter = 0
+        self.iter_string = 'Iter'
     def set_up(self, *args, **kwargs):
         '''Set up the algorithm'''
         raise NotImplementedError()
@@ -104,7 +104,6 @@ class Algorithm(object):
             if self.iteration == 0:
                 self.update_objective()
                 self._iteration.append(self.iteration)
-            self.counter += 1     
             self.update()
             self.timing.append( time.time() - time0 )
             if self.iteration % self.update_objective_interval == 0:
@@ -191,8 +190,8 @@ class Algorithm(object):
             if (self.iteration) % self.update_objective_interval == 0: 
                 if verbose:
                     print (self.verbose_output(very_verbose))
-                if callback is not None:
-                    callback(self.iteration, self.get_last_objective(return_all=very_verbose), self.x)
+            if callback is not None:
+                callback(self.iteration, self.get_last_objective(return_all=very_verbose), self.x)
             i += 1
             if i == iterations:
                 if self.iteration != self._iteration[-1]:
@@ -202,6 +201,12 @@ class Algorithm(object):
                 break
         if verbose:
             if self.update_objective_interval != 1:
+                start = 3 # I don't understand why this
+                bars = ['-' for i in range(start+9+10+13+20)]
+                if (very_verbose):
+                    bars = ['-' for i in range(start+9+10+13+13+13+15)]
+                # print a nice ---- with proper length at the end
+                print (functools.reduce(lambda x,y: x+y, bars, ''))
                 print (self.verbose_output(very_verbose))
             print ("Stop criterion has been reached.")
 
@@ -232,9 +237,9 @@ class Algorithm(object):
     def verbose_header(self, verbose=False):
         el = self.get_last_objective(return_all=verbose)
         if type(el) == list:
-            out = "{:>9} {:>10} {:>13} {:>13} {:>13} {:>15}\n".format('Iter', 
-                                                      'Max Iter',
-                                                      'Time/Iter',
+            out = "{:>9} {:>10} {:>13} {:>13} {:>13} {:>15}\n".format(self.iter_string, 
+                                                      'Max {}'.format(self.iter_string),
+                                                      'Time/{}'.format(self.iter_string),
                                                       'Primal' , 'Dual', 
                                                       'Primal-Dual')
             out += "{:>9} {:>10} {:>13} {:>13} {:>13} {:>15}".format('', 
@@ -244,29 +249,30 @@ class Algorithm(object):
                                                       'Objective', 
                                                       'Gap')
         else:
-            out = "{:>9} {:>10} {:>13} {:>20}\n".format('Iter', 
-                                                      'Max Iter',
-                                                      'Time/Iter',
+            out = "{:>9} {:>10} {:>13} {:>20}\n".format(self.iter_string, 
+                                                      'Max {}'.format(self.iter_string),
+                                                      'Time/{}'.format(self.iter_string),
                                                       'Objective')
             out += "{:>9} {:>10} {:>13} {:>20}".format('', 
                                                       '',
                                                       '[s]',
                                                       '')
-        return out
+        return out  
 
 class StochasticAlgorithm(Algorithm):
     def __init__(self, **kwargs):
+        update_objective_interval = kwargs.get('update_objective_interval', 1)
+        self.number_of_subsets = kwargs.get('number_of_subsets', 1)
+        
+        kwargs['update_objective_interval'] = update_objective_interval * self.number_of_subsets
         super(StochasticAlgorithm, self).__init__(**kwargs)
         self.epoch = 0
-        self.number_of_subsets = kwargs.get('number_of_subsets', 1)
         self.current_subset_id = 0
-        self.update_subset_interval = kwargs.get('update_subset_interval',
-                                                 self.number_of_subsets)
         self.max_epoch = self.max_iteration
-        self.scounter = 0
+        self.iter_string = 'Epoch'
         
     def update_subset(self):
-        if self.iteration % self.update_subset_interval == 0:
+        if self.iteration % self.number_of_subsets == 0:
             # increment epoch
             self.epoch += 1
             
@@ -293,9 +299,24 @@ class StochasticAlgorithm(Algorithm):
         for _ in range(self.number_of_subsets):
             super(StochasticAlgorithm, self).__next__()
             self.update_subset()
-            self.scounter += 1
+            
     def should_stop(self):
         '''default stopping cryterion: number of iterations
         
         The user can change this in concrete implementatition of iterative algorithms.'''
         return self.max_epoch_stop_cryterion()
+    def verbose_output(self, verbose=False):
+        '''Creates a nice tabulated output'''
+        timing = self.timing[-self.update_objective_interval-1:-1]
+        self._iteration.append(self.iteration)
+        if len (timing) == 0:
+            t = 0
+        else:
+            t = sum(timing)/len(timing)
+        out = "{:>9} {:>10} {:>13} {}".format(
+                 self.epoch, 
+                 self.max_epoch,
+                 "{:.3f}".format(t), 
+                 self.objective_to_string(verbose)
+               )
+        return out

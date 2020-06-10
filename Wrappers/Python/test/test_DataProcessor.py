@@ -31,7 +31,7 @@ from timeit import default_timer as timer
 from ccpi.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 
 from ccpi.io.reader import NexusReader
-from ccpi.processors import CenterOfRotationFinder
+from ccpi.processors import CenterOfRotationFinder, Resizer
 import wget
 import os
 
@@ -83,7 +83,49 @@ class TestDataProcessor(unittest.TestCase):
         cf.set_slice('centre')
         print ("Center of rotation", cf.get_output())
         self.assertAlmostEqual(86.25, cf.get_output())
-
+    
+    def test_Resizer(self):
+        reader = NexusReader(self.filename)
+        data = reader.get_acquisition_data_whole()
+        ad = data.clone()
+        print(ad.geometry)
+        
+        resizer = Resizer(binning = {'horizontal': 2}, 
+                          roi = {'vertical': (10,124)})
+        resizer.input = data
+        data_resized = resizer.process()
+        
+        print(ad.geometry)
+        
+        self.assertAlmostEqual(80, data_resized.geometry.pixel_num_h)
+        self.assertAlmostEqual(114, data_resized.geometry.pixel_num_v)
+        self.assertAlmostEqual(1, data_resized.geometry.pixel_size_v)
+        self.assertAlmostEqual(2, data_resized.geometry.pixel_size_h)
+        
+        resizer = Resizer(binning = {'vertical': 5}, 
+                          roi = {'horizontal': (10,20)})
+        resizer.input = data
+        data_resized = resizer.process()
+        
+        print(ad.geometry)
+        
+        self.assertAlmostEqual(10, data_resized.geometry.pixel_num_h)
+        self.assertAlmostEqual(26, data_resized.geometry.pixel_num_v)
+        self.assertAlmostEqual(5, data_resized.geometry.pixel_size_v)
+        self.assertAlmostEqual(1, data_resized.geometry.pixel_size_h)
+        
+        resizer = Resizer(binning = {'horizontal': 4, 'vertical': 5}, 
+                  roi = {'vertical': (10,100), 'horizontal': (10,100)})
+        resizer.input = data
+        data_resized = resizer.process()
+        
+        print(ad.geometry)
+        
+        self.assertAlmostEqual(22, data_resized.geometry.pixel_num_h)
+        self.assertAlmostEqual(18, data_resized.geometry.pixel_num_v)
+        self.assertAlmostEqual(5, data_resized.geometry.pixel_size_v)
+        self.assertAlmostEqual(4, data_resized.geometry.pixel_size_h)
+        
     def test_Normalizer(self):
         pass         
         

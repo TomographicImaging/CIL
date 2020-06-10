@@ -60,7 +60,9 @@ class BlurringOperator(LinearOperator):
             result.fill(convolve(x.as_array(),self.PSF, mode='reflect'))
             return result
         else:
-            convolve(x.as_array(),self.PSF, output=out.as_array(),mode='reflect')
+            outarr = out.as_array()
+            convolve(x.as_array(),self.PSF, output=outarr, mode='reflect')
+            out.fill(outarr)
     
     def adjoint(self,x, out=None):
         
@@ -73,7 +75,9 @@ class BlurringOperator(LinearOperator):
             result.fill(correlate(x.as_array(),self.PSF, mode='reflect'))
             return result
         else:
-            correlate(x.as_array(),self.PSF, output=out.as_array(),mode='reflect')
+            outarr = out.as_array()
+            correlate(x.as_array(),self.PSF, output=outarr, mode='reflect')
+            out.fill(outarr)
 
 if __name__ == '__main__':
     

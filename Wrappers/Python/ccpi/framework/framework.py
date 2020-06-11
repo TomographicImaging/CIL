@@ -1602,9 +1602,18 @@ class AcquisitionData(DataContainer):
            self.geometry.number_of_subsets == 1:
             return DataContainer.as_array(self, **kwargs)
         else:
-
-            # this assumes that subsetting dimension is 0!
-            return DataContainer.as_array(self, **kwargs)[self.geometry.subsets[self.geometry.subset_id]]
+            
+            # this assumes that subsetting dimension is angles
+            # find where angle is in the dimension anc create the slice object
+            sliceobj = []
+            for k,v in self.dimension_labels.items():
+                if v == 'angle':
+                    sliceobj.append( self.geometry.subsets[self.geometry.subset_id] )
+                else:
+                    sliceobj.append(slice(None, None, 1))
+            # the slice object must be passed as immutable tuple.
+            return DataContainer.as_array(self, **kwargs)[tuple(sliceobj)]
+            # return DataContainer.as_array(self, **kwargs)[self.geometry.subsets[self.geometry.subset_id] ]
     @property
     def shape(self, **kwargs):
         if self.geometry is None or self.geometry.number_of_subsets is None or self.geometry.number_of_subsets == 1:

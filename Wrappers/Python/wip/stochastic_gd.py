@@ -245,7 +245,7 @@ sgd_r = StochasticGradientDescent(x_init=im_data*0.,
 #print (x.shape)
 
 tsgd2 = time.time()
-sgd_r.run(nsubs * 12)
+sgd_r.run(12)
 tsgd3 = time.time()
 
 data.geometry.subset_id = 0
@@ -283,14 +283,14 @@ print (gd.step_size)
 
 
 nsubs = 10
-data.geometry.generate_subsets(nsubs, 'uniform')
+data.geometry.generate_subsets(nsubs, 'stagger')
 data.geometry.subset_id = 0
 algos.append( SFISTA(x_init=im_data*0., 
                      f = sl2, g = TV,
-                     update_objective_interval=10, max_iteration=100)
+                     update_objective_interval=1, max_iteration=100)
 )
 tt = time.time()
-algos[-1].run(40)
+algos[-1].run(4)
 dts.append( time.time() - tt )
 
 

@@ -30,8 +30,8 @@ from ccpi.optimisation.functions import LeastSquares, ZeroFunction, \
 from ccpi.optimisation.algorithms import GradientDescent
 from ccpi.optimisation.algorithms import CGLS
 from ccpi.optimisation.algorithms import FISTA
-
 from ccpi.optimisation.algorithms import PDHG
+from ccpi.optimisation.algorithms import Algorithm
 
 from ccpi.optimisation.operators import Gradient, BlockOperator, FiniteDiff
 from ccpi.optimisation.functions import MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler                     
@@ -394,6 +394,32 @@ class TestAlgorithms(unittest.TestCase):
         rmse = (fista.get_output() - data).norm() / data.as_array().size
         print ("RMSE", rmse)
         self.assertLess(rmse, 4.2e-4)
+
+
+    def test_algo_out(self):
+        class TestAlgo(Algorithm):
+            def __init__(self, **kwargs):
+                super(TestAlgo, self).__init__(**kwargs)
+                self.counter = 0
+                self.set_up()
+
+            def set_up(self):
+                self.update_objective()
+                self.configured = True
+            def update(self):
+                self.counter += 1
+            def update_objective(self):
+                self.loss.append([self.iteration,1,2])
+        
+        algo = TestAlgo(max_iteration=100, update_objective_interval=1)
+        algo.update()
+        algo.run(10, very_verbose=True)
+        algo.run(23)
+        algo = TestAlgo(max_iteration=100, update_objective_interval=5)
+        algo.update()
+        algo.run(10)
+        algo.run(23)
+        assert True
 
     def assertNumpyArrayEqual(self, first, second):
         res = True

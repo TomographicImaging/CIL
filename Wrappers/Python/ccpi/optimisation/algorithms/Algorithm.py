@@ -106,7 +106,7 @@ class Algorithm(object):
                 self._iteration.append(self.iteration)
             self.update()
             self.timing.append( time.time() - time0 )
-            if self.iteration % self.update_objective_interval == 0:
+            if self.iteration > 0 and self.iteration % self.update_objective_interval == 0:
                 self.update_objective()
             self.iteration += 1
         
@@ -183,32 +183,44 @@ class Algorithm(object):
         i = 0
         if verbose:
             print (self.verbose_header(very_verbose))
-        if self.iteration == 0:
-            if verbose:
-                print(self.verbose_output(very_verbose))
+        
         for _ in self:
+            # __next__ is called
+
+            # the following code is just for displaying purposes of the status of the minimisation
+
+            # self.iteration is incremented in __next__, so now we have 
+            # self.iteration is one iteration larger than what we want to display
+            self.iteration -= 1
             if (self.iteration) % self.update_objective_interval == 0: 
                 if verbose:
                     print (self.verbose_output(very_verbose))
             if callback is not None:
                 callback(self.iteration, self.get_last_objective(return_all=very_verbose), self.x)
+            
+            # restore self.iteration value to what it should be
+            self.iteration += 1
+
+            # check if run has to stop
             i += 1
             if i == iterations:
-                if self.iteration != self._iteration[-1]:
-                    self.update_objective()
-                    if verbose:
-                        print (self.verbose_output(very_verbose))
                 break
+            
         if verbose:
-            if self.update_objective_interval != 1:
-                start = 3 # I don't understand why this
-                bars = ['-' for i in range(start+9+10+13+20)]
-                if (very_verbose):
-                    bars = ['-' for i in range(start+9+10+13+13+13+15)]
-                # print a nice ---- with proper length at the end
-                print (functools.reduce(lambda x,y: x+y, bars, ''))
-                print (self.verbose_output(very_verbose))
+            if self.iteration != self._iteration[-1]:
+                # if the objective hasn't already been calculated as not on 
+                # the right update_objective_interval 
+                self.update_objective()
+                
+            start = 3 # I don't understand why this
+            bars = ['-' for i in range(start+9+10+13+20)]
+            if (very_verbose):
+                bars = ['-' for i in range(start+9+10+13+13+13+15)]
+            # print a nice ---- with proper length at the end
+            print (functools.reduce(lambda x,y: x+y, bars, ''))
+            print (self.verbose_output(very_verbose))
             print ("Stop criterion has been reached.")
+        
 
     def verbose_output(self, verbose=False):
         '''Creates a nice tabulated output'''

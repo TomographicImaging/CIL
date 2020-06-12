@@ -86,6 +86,9 @@ class ImageGeometry(object):
                  center_z=0, 
                  channels=1, 
                  **kwargs):
+        '''AcquisitionGeometry describes the ImageData
+        
+        '''
         
         self.voxel_num_x = voxel_num_x
         self.voxel_num_y = voxel_num_y
@@ -273,30 +276,25 @@ class AcquisitionGeometry(object):
                  **kwargs
                  ):
         """
-        General inputs for standard type projection geometries
-        detectorDomain or detectorpixelSize:
-            If 2D
-                If scalar: Width of detector or single detector pixel
-                If 2-vec: Error
-            If 3D
-                If scalar: Width in both dimensions
-                If 2-vec: Vertical then horizontal size
-        grid
-            If 2D
-                If scalar: number of detectors
-                If 2-vec: error
-            If 3D
-                If scalar: Square grid that size
-                If 2-vec vertical then horizontal size
-        cone or parallel
-        2D or 3D
-        parallel_parameters: ?
-        cone_parameters:
-            source_to_center_dist (if parallel: NaN)
-            center_to_detector_dist (if parallel: NaN)
-        standard or nonstandard (vec) geometry
-        angles is expected numpy array, dtype - float32
-        angles_format radians or degrees
+        AcquisitionGeometry describes the experimental setup:
+        
+        :param geom_type: 'parallel', 'cone'
+        :type geom_type: string,
+        :param dimension: if 2D or 3D. This parameter can be safely set to any string as it will be reset internally.
+        :type dimension: string.
+        :param pixel_num_h: number of pixel in the acquisition panel on the horizontal axis
+        :type pixel_size_h: acquisition panel pixel spacing on the horizontal axis. 
+        :param pixel_num_v: number of pixel in the acquisition panel on the vertical axis
+        :type pixel_size_v: acquisition panel pixel spacing on the vertical axis. 
+        :param dist_source_center: distance of the source to the center of the object, valid only for cone geometry
+        :param dist_center_detector: distance of the object to the detector, valid only for cone geometry
+        :type dist_source_center: float, in same units as pixel_size
+        :type dist_center_detector: float, in same units as pixel_size 
+        :param channel: number of energy channels resolved by the acquisition panel.
+        :param angles: the rotation angles of the acquisition data
+        :type angles: numpy.ndarray, dtype - float32
+        :param angle_unit: unit measure of the acquisition angle
+        :type angle_unit: string, default 'degree', allowed 'radian', 'degree'
         """
         self.geom_type = geom_type   # 'parallel' or 'cone'
         # Override the parameter passed as dimension
@@ -436,6 +434,13 @@ class AcquisitionGeometry(object):
         return repres
 
     def generate_subsets(self, number_of_subsets, method):
+        '''generate subset indices with AcquisitionGeometrySubsetGenerator
+
+        :param number_of_subsets: number of subsets to generate
+        :type number_of_subsets: int, positive default=1
+        :param method: method used to generate subsets.
+        :type method: string, allowed values 'uniform', 'random', 'random_permutation', 'stagger'
+        '''
         
         subsets = AcquisitionGeometrySubsetGenerator.generate_subset(
                         self, 0, number_of_subsets, method) 
@@ -443,6 +448,7 @@ class AcquisitionGeometry(object):
         self.subsets = subsets[:]
         self.subset_id = 0
         self.number_of_subsets = number_of_subsets
+        self.subset_dimension = AcquisitionGeometry.ANGLE
         
         
     def allocate(self, value=0, dimension_labels=None, **kwargs):
@@ -496,6 +502,19 @@ class AcquisitionGeometry(object):
         return out
 
 class AcquisitionGeometrySubsetGenerator(object):
+    '''AcquisitionGeometrySubsetGenerator is a factory that helps generating subsets of AcquisitionData
+    
+    AcquisitionGeometrySubsetGenerator generates the indices to slice the data array in AcquisitionData along the 
+    angle dimension with 4 methods:
+
+    1. random: picks randomly between all the angles. Subset may contain same projection as other
+    2. random_permutation: generates a number of subset by a random permutation of the indices, thereby no subset contain the same data.
+    3. uniform: divides the angles in uniform subsets without permutation
+    4. stagger: generates number_of_subsets by interleaving them, e.g. generating 2 subsets from [0,1,2,3] would lead to [0,2] and [1,3]
+
+    The factory is not to be used directly rather from the AcquisitionGeometry class.
+
+    '''
     
     ### Changes in the Operator required to work as OS operator
     @staticmethod
@@ -1597,17 +1616,25 @@ class AcquisitionData(DataContainer):
         return out
     
     def as_array(self, **kwargs):
+        '''returns a reference to the internal numpy.ndarray
+        
+        If the geometry is not None and subsets have been generated it will return a view, or a copy if not possible,
+        of the subset selected by self.geometry.subset_id.
+
+        The subset will only be on the angle dimension. Any data order is allowed, i.e. angles does not have to be
+        the first dimension.
+        '''
         if self.geometry is None or \
            self.geometry.number_of_subsets is None or\
            self.geometry.number_of_subsets == 1:
             return DataContainer.as_array(self, **kwargs)
         else:
             
-            # this assumes that subsetting dimension is angles
-            # find where angle is in the dimension anc create the slice object
+            # find where the subsetting dimension is and create the slice object
+            # notice that currently only angle is used. But this method is generic
             sliceobj = []
             for k,v in self.dimension_labels.items():
-                if v == 'angle':
+                if v == self.geometry.subset_dimension:
                     sliceobj.append( self.geometry.subsets[self.geometry.subset_id] )
                 else:
                     sliceobj.append(slice(None, None, 1))

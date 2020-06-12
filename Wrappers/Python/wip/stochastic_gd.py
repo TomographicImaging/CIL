@@ -111,19 +111,18 @@ class AstraSubsetProjectorSimple(AstraProjectorSimple):
         #self.indices = self.sinogram_geometry.subsets[subset_id]
         device = self.fp.device
         # this will only copy the subset geometry
-        ag = self.sinogram_geometry.copy()
+        ag = self.range_geometry().copy()
         #print (ag.shape)
         
-        self.fp = AstraForwardProjector(volume_geometry=self.volume_geometry,
+        self.fp = AstraForwardProjector(volume_geometry=self.domain_geometry(),
                                         sinogram_geometry=ag,
                                         proj_id = None,
                                         device=device)
 
-        self.bp = AstraBackProjector(volume_geometry = self.volume_geometry,
+        self.bp = AstraBackProjector(volume_geometry = self.domain_geometry(),
                                         sinogram_geometry = ag,
                                         proj_id = None,
                                         device = device)
-    
 
     
 # In[ ]:
@@ -211,7 +210,7 @@ sgd_u = StochasticGradientDescent(x_init=im_data*0.,
                                 objective_function=sl2, 
                                 number_of_subsets=nsubs,
                                 update_objective_interval=10, max_iteration=100, 
-                                update_subset_interval=nsubs)
+                                )
 
 #b = OS_A.direct(im_data)
 #
@@ -235,7 +234,7 @@ sgd_r = StochasticGradientDescent(x_init=im_data*0.,
                                 objective_function=sl2, 
                                 number_of_subsets=nsubs,
                                 update_objective_interval=10, max_iteration=100, 
-                                update_subset_interval=nsubs)
+                                )
 
 #b = OS_A.direct(im_data)
 #
@@ -312,7 +311,7 @@ plotter2D([gd.get_output(),
            'SGD uniform - ground truth',
            'stochastic GD perm {:.2f}s'.format(tsgd1 - tsgd0),
            'SGD perm - ground truth',
-           'FISTA TV {:.2f}s'.format(dts[0]), 'FISTA TV- ground truth'
+           'FISTA TV {:.2f}s'.format(dts[0]), 'FISTA TV- ground truth',
            'SFISTA TV {:.2f}s'.format(dts[0]), 'SFISTA TV- ground truth'
            #'inline GD {}'.format(inline1-inline0)
            ],

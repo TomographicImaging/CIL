@@ -183,9 +183,7 @@ class Algorithm(object):
         i = 0
         if verbose:
             print (self.verbose_header(very_verbose))
-        if self.iteration == 1:
-            if verbose:
-                print(self.verbose_output(very_verbose))
+        
         for _ in self:
             # __next__ is called
 
@@ -206,21 +204,21 @@ class Algorithm(object):
             # check if run has to stop
             i += 1
             if i == iterations:
-                if self.iteration != self._iteration[-1]:
-                    self.update_objective()
-                    if verbose:
-                        print (self.verbose_output(very_verbose))
                 break
             
         if verbose:
-            if self.update_objective_interval != 1:
-                start = 3 # I don't understand why this
-                bars = ['-' for i in range(start+9+10+13+20)]
-                if (very_verbose):
-                    bars = ['-' for i in range(start+9+10+13+13+13+15)]
-                # print a nice ---- with proper length at the end
-                print (functools.reduce(lambda x,y: x+y, bars, ''))
-                print (self.verbose_output(very_verbose))
+            if self.iteration != self._iteration[-1]:
+                # if the objective hasn't already been calculated as not on 
+                # the right update_objective_interval 
+                self.update_objective()
+                
+            start = 3 # I don't understand why this
+            bars = ['-' for i in range(start+9+10+13+20)]
+            if (very_verbose):
+                bars = ['-' for i in range(start+9+10+13+13+13+15)]
+            # print a nice ---- with proper length at the end
+            print (functools.reduce(lambda x,y: x+y, bars, ''))
+            print (self.verbose_output(very_verbose))
             print ("Stop criterion has been reached.")
         
 
@@ -271,4 +269,4 @@ class Algorithm(object):
                                                       '',
                                                       '[s]',
                                                       '')
-        return out  
+        return out

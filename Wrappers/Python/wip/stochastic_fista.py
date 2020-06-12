@@ -135,14 +135,8 @@ class AstraSubsetProjectorSimple(AstraProjectorSimple):
 nsubs = 10
 step_rate = 0.0002328
 
-# # data.geometry.generate_subsets(nsubs,'stagger')
-# idx = numpy.asarray(range(len(data.geometry.angles)))
-# indices = AcquisitionGeometrySubsetGenerator.staggered_indices(idx, nsubs)
-# newidx = AcquisitionGeometrySubsetGenerator.get_new_indices(indices)
 
-# new_array = data.as_array()[newidx]
-# data.fill(new_array)
-# del new_array
+# data = data.subset(dimensions=['horizontal', 'angle'])
 data.geometry.generate_subsets(nsubs,'stagger')
 # data.geometry.angles = data.geometry.angles[newidx]
 
@@ -187,8 +181,14 @@ tt = time.time()
 algos[-1].run(40)
 dts.append( time.time() - tt )
 #print (gd.step_size)
-
-
+algos.append( FISTA(x_init=im_data*0., 
+                     f = l2, g = TV,
+                     update_objective_interval=5, max_iteration=100)
+)
+tt = time.time()
+algos[-1].run(40)
+dts.append( time.time() - tt )
+#%%
 lambdaReg = 0.5e1
 # iterationsTV = 50
 TV = regularisers.FGP_TV(lambdaReg,iterationsTV,tolerance,methodTV,nonnegativity,printing,device)
@@ -225,3 +225,6 @@ plotter2D([
 
 
 
+
+
+# %%

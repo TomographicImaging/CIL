@@ -220,9 +220,9 @@ class TXRMDataReader(object):
                                        dimension = '3D', 
                                        angles = numpy.degrees(metadata['thetas']), 
                                        pixel_num_h = metadata['image_width'], 
-                                       pixel_size_h = d_pixel_size, 
+                                       pixel_size_h = d_pixel_size/1000, 
                                        pixel_num_v = metadata['image_height'], 
-                                       pixel_size_v = d_pixel_size, 
+                                       pixel_size_v = d_pixel_size/1000, 
                                        dist_source_center =  StoCdist, 
                                        dist_center_detector = DtoCdist, 
                                        channels = 1,
@@ -244,7 +244,9 @@ if __name__ == '__main__':
     
     from ccpi.framework import ImageGeometry, ImageData
     from ccpi.astra.operators import AstraProjectorSimple
-    from ccpi.optimisation.algorithms import FISTA, CGLS
+    from ccpi.optimisation.algorithms import FISTA, CGLS, SIRT
+    from ccpi.astra.processors import FBP
+    import matplotlib.pyplot as plt
     
     filename = "/media/newhd/shared/Data/zeiss/walnut/valnut/valnut_2014-03-21_643_28/tomo-A/valnut_tomo-A.txrm"
     reader = TXRMDataReader()
@@ -252,10 +254,20 @@ if __name__ == '__main__':
     
     data = reader.load_projections()
     
+    print('done loading')
+    
+    plt.figure()
+    plt.imshow(data.subset(angle=0).as_array())
+    plt.colorbar()
+    
+    plt.figure()
+    plt.imshow(data.subset(angle=800).as_array())
+    plt.colorbar()
+    
     # Extract AcquisitionGeometry for central slice for 2D fanbeam reconstruction
     ag2d = AcquisitionGeometry('cone',
                           '2D',
-                          angles=data.geometry.angles,
+                          angles=-numpy.pi/180*data.geometry.angles,
                           pixel_num_h=data.geometry.pixel_num_h,
                           pixel_size_h=data.geometry.pixel_size_h,
                           dist_source_center=data.geometry.dist_source_center, 
@@ -263,6 +275,17 @@ if __name__ == '__main__':
     
     # Set up AcquisitionData object for central slice 2D fanbeam
     data2d = AcquisitionData(data.subset(vertical=512),geometry=ag2d)
+    
+    plt.figure()
+    plt.imshow(data2d.as_array())
+    plt.colorbar()
+    
+    data2d.log(out=data2d)
+    data2d *= -1
+    
+    plt.figure()
+    plt.imshow(data2d.as_array())
+    plt.colorbar()
     
     # Choose the number of voxels to reconstruct onto as number of detector pixels
     N = data.geometry.pixel_num_h
@@ -281,37 +304,30 @@ if __name__ == '__main__':
                          voxel_size_x=voxel_size_h, 
                          voxel_size_y=voxel_size_h)
     
+    print('done set up astra op')
+    
+    fbpalg = FBP(ig2d,ag2d)
+
+    fbpalg.set_input(data2d)
+    
+    recfbp = fbpalg.get_output()
+    
+    plt.figure()
+    plt.imshow(recfbp.as_array())
+
+    '''
     # Set up the Projector (AcquisitionModel) using ASTRA on GPU
-    Aop = AstraProjectorSimple(ig2d, ag2d,"gpu")
+    Aop = AstraProjectorSimple(ig2d, ag2d,"cpu")
     
     # Set initial guess for CGLS reconstruction
     x_init = ImageData(geometry=ig2d)
     
     # Set tolerance and number of iterations for reconstruction algorithms.
-    opt = {'tol': 1e-4, 'iter': 50}
+    opt = {'tol': 1e-4, 'iter': 2}
     
     # First a CGLS reconstruction can be done:
-    CGLS_alg = CGLS()
+    CGLS_alg = SIRT()
     CGLS_alg.set_up(x_init, Aop, data2d)
     CGLS_alg.max_iteration = 2000
     CGLS_alg.run(opt['iter'])
-
-
-'''
-# usage example
-xtek_file = '/home/evelina/nikon_data/SophiaBeads_256_averaged.xtekct'
-reader = NikonDataReader()
-reader.set_up(xtek_file = xtek_file,
-              binning = [1, 1],
-              roi = -1,
-              normalize = True,
-              flip = True)
-
-data = reader.load_projections()
-print(data)
-ag = reader.get_geometry()
-print(ag)
-
-plt.imshow(data.as_array()[1, :, :])
-plt.show()
-'''
+    '''

@@ -20,7 +20,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from ccpi.optimisation.functions import Function, MixedL21Norm
+from ccpi.optimisation.functions import Function, MixedL21Norm, IndicatorBox
 from ccpi.optimisation.operators import Gradient
 import numpy 
 import functools
@@ -37,50 +37,72 @@ class FGP_TV(Function):
       :param regularising_parameter: TV regularising parameter 
       :param inner_iterations: Iterations of FGP algorithm
       :param tolerance: Stopping criterion (Default=1e-4)
-      :param nonnegativity: 
+      :param lower: ( Default = - numpy.inf ) lower bound for the orthogonal projection onto the convex set C
+      :param upper: ( Default = + numpy.inf ) upper bound for the orthogonal projection onto the convex set C
       
     Reference:
       
-        Beck, A. and Teboulle, M., 2009. Fast Gradient-Based Algorithms for Constrained
-        Total Variation Image Denoising and Deblurring Problems 
-        IEEE TRANSACTIONS ON IMAGE PROCESSING, VOL. 18, NO. 11, NOVEMBER 2009.
+        A. Beck and M. Teboulle, "Fast Gradient-Based Algorithms for Constrained Total Variation 
+        Image Denoising and Deblurring Problems," in IEEE Transactions on Image Processing,
+        vol. 18, no. 11, pp. 2419-2434, Nov. 2009, 
+        doi: 10.1109/TIP.2009.2028250.
         
     '''    
     
     
-    def __init__(self, domain, regularising_parameter, inner_iterations, tolerance, nonnegativity):
+    def __init__(self, domain, regularising_parameter, 
+                 inner_iterations, 
+                 tolerance, 
+                 lower = -numpy.inf, 
+                 upper = numpy.inf,
+                 info = False):
         
+        # Regularising parameter = alpha
         self.regularising_parameter = regularising_parameter
+        
+        # Iterations for FGP_TV
         self.inner_iterations = inner_iterations
+        
+        # Tolerance for FGP_TV
         self.tolerance = tolerance
-        self.nonnegativity = nonnegativity                
+        
+        # Define (ISOTROPIC) Total variation penalty ( Note it is without the regularising paremeter)
+        # TODO add anisotropic???
+        self.TV = MixedL21Norm()  
+        
+        # Define orthogonal projection onto the convex set C
+        self.lower = lower
+        self.upper = upper
+        self.tmp_proj_C = IndicatorBox(lower, upper).proximal
+                        
+#         Setup Gradient as None. This is to avoid domain argument in the __init__     
+#         self.gradient = None
+
         self.gradient = Gradient(domain)
-        self.TV = regularising_parameter * MixedL21Norm()                 
-            
-    def __call__(self,x):
+        self.Lipschitz = (1./self.gradient.norm())**2   
+        
+        # Print stopping information (iterations and tolerance error) of FGP_TV  
+        self.info = info
+                    
+    def __call__(self, x):
+        
+        r''' Returns the value of the \alpha * TV(x)'''
+                        
+#         if self.gradient is None:
+#             self.gradient = Gradient(x.geometry)
         
         # evaluate objective function of TV gradient
-        return self.TV(self.gradient.direct(x))
+        return regularising_parameter * self.TV(self.gradient.direct(x))
     
     
     def projection_C(self, x, out=None):   
-
-        # This can be replaced by IndicatorBox(lower=0), but is less effient.
+                     
+        r''' Returns orthogonal projection onto the convex set C'''            
+        return self.tmp_proj_C(x, tau = None, out = out)
                         
-        if out is None:            
-            if self.nonnegativity:
-                return x.maximum(0.)
-            else:
-                return x
-        else:
-            if self.nonnegativity:            
-                x.maximum(0., out=out)                
-            else:
-                out.fill(x)
-
     def projection_P(self, x, out=None):
-
-        # This can be replaced by the proximal conjugate of MixedL21Norm, but is less effient.
+                       
+        r''' Returns the projection P onto \|\cdot\|_{\infty} '''  
         
         res1 = functools.reduce(lambda a,b: a + b*b, x.containers, x.get_item(0) * 0 )
         res1.sqrt(out=res1)	
@@ -92,28 +114,37 @@ class FGP_TV(Function):
             x.divide(res1, out=out)
     
     
-    def proximal(self, b, tau, out = None):
-                
+    def proximal(self, x, tau, out = None):
+        
+        ''' Returns the solution of the FGP_TV algorithm '''         
+                        
+#         if self.gradient is None:
+            
+#             # Define 1/Lipschitz of the Gradient
+#             self.gradient = Gradient(x.geometry)            
+#             self.Lipschitz = (1./self.gradient.norm())**2            
+                      
         # initialise
         t = 1        
         tmp_p = self.gradient.range_geometry().allocate()  
         tmp_q = tmp_p.copy()
-        x = self.gradient.domain_geometry().allocate()     
+        tmp_x = self.gradient.domain_geometry().allocate()     
         p1 = tmp_p.copy()
 
         for k in range(self.inner_iterations):
                                                                                    
             t0 = t
-            self.gradient.adjoint(tmp_q, out = x)
+            self.gradient.adjoint(tmp_q, out = tmp_x)
             
             # this can be replaced by axpby
-            x *= -self.regularising_parameter
-            x *= tau
-            x += b
-            self.projection_C(x, out = x)                       
+            tmp_x *= -self.regularising_parameter
+            tmp_x *= tau
+            tmp_x += x
+            self.projection_C(tmp_x, out = tmp_x)                       
 
-            self.gradient.direct(x, out=p1)
-            p1 *= 1./(8*self.regularising_parameter)
+            self.gradient.direct(tmp_x, out=p1)
+            p1 *= self.Lipschitz
+            p1 /= self.regularising_parameter
             p1 /= tau
             p1 += tmp_q
             self.projection_P(p1, out=p1)
@@ -128,16 +159,21 @@ class FGP_TV(Function):
             t = (1 + numpy.sqrt(1 + 4 * t0 ** 2)) / 2                                                                                                                                             
             tmp_q.fill(p1 + (t0 - 1) / t * (p1 - tmp_p))                                      
             tmp_p.fill(p1)             
-                                        
-        if out is None:            
-            print("Run for {} iterations".format(k))
-            return self.projection_C(b - self.regularising_parameter*tau*self.gradient.adjoint(tmp_q))
-        else:
-            print("Run for {} iterations".format(k))            
+        
+        # Print stopping information (iterations and tolerance error) of FGP_TV     
+        if self.info:
+            if self.tolerance is not None:
+                print("Stop at {} iterations with error {} .".format(k, error))
+            else:
+                print("Stop at {} iterations.".format(k))                
+            
+        if out is None:                        
+            return self.projection_C(x - self.regularising_parameter*tau*self.gradient.adjoint(tmp_q))
+        else:          
             self.gradient.adjoint(tmp_q, out = out)
             out*=tau
             out*=-self.regularising_parameter
-            out+=b
+            out+=x
             self.projection_C(out, out=out)
     
     def convex_conjugate(self,x):        
@@ -147,18 +183,23 @@ if __name__ == '__main__':
     
     import numpy as np                         
     import matplotlib.pyplot as plt
-
-#     from ccpi.optimisation.algorithms import PDHG
-
-#     from ccpi.optimisation.operators import BlockOperator, Identity, Gradient
-#     from ccpi.optimisation.functions import ZeroFunction, L1Norm, \
-#                           MixedL21Norm, BlockFunction, L2NormSquared,\
-#                               KullbackLeibler
     from ccpi.framework import TestData
     import os
     import sys
     from ccpi.plugins.regularisers import FGP_TV as CCPiReg_FGP_TV
     from ccpi.filters import regularisers    
+    from timeit import default_timer as timer       
+    import tomophantom
+    from tomophantom import TomoP3D
+    from ccpi.framework import ImageGeometry
+    from ccpi.utilities.quality_measures import mae
+    from ccpi.utilities.display import show
+        
+    ###################################################################
+    ###################################################################
+    ###################################################################
+    ###################################################################
+    print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV no tolerance (2D)")
     
     loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
     data = loader.load(TestData.SHAPES)
@@ -184,69 +225,15 @@ if __name__ == '__main__':
     
     alpha = 0.1
     iters = 1000
-    
-    print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV no tolerance")
+        
     # CIL_FGP_TV no tolerance
-    g_CIL = FGP_TV(ig, alpha, iters, tolerance=None, nonnegativity=True)
+    g_CIL = FGP_TV(ig, alpha, iters, tolerance=None, lower = 0, info = True)
+    t0 = timer()
     res1 = g_CIL.proximal(noisy_data, 1.)
-
-    plt.imshow(res1.as_array())
-    plt.colorbar()
-    plt.show()
+    t1 = timer()
+    print(t1-t0)
     
-    # CCPi Regularisation toolkit high tolerance
-    r_alpha = alpha
-    r_iterations = iters
-    r_tolerance = 1e-8
-    r_iso = 0
-    r_nonneg = 1
-    r_printing = 0
-    g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'gpu')
-
-    res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
-    plt.imshow(res2.as_array())
-    plt.colorbar()
-    plt.show()
-
-    plt.imshow(np.abs(res1.as_array()-res2.as_array()))
-    plt.colorbar()
-    plt.title("Difference CIL_FGP_TV vs CCPi_FGP_TV")
-    plt.show()
-    
-    print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV with tolerance. There is a problem with this line https://github.com/vais-ral/CCPi-Regularisation-Toolkit/blob/master/src/Core/regularisers_GPU/TV_FGP_GPU_core.cu#L456")
-    # CIL_FGP_TV no tolerance
-    g_CIL = FGP_TV(ig, alpha, iters, tolerance=1e-3, nonnegativity=True)
-    res1 = g_CIL.proximal(noisy_data, 1.)
-
-    plt.imshow(res1.as_array())
-    plt.colorbar()
-    plt.show()
-    
-    # CCPi Regularisation toolkit high tolerance
-    r_alpha = alpha
-    r_iterations = iters
-    r_tolerance = 1e-3
-    r_iso = 0
-    r_nonneg = 1
-    r_printing = 0
-    g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'gpu')
-
-    res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
-    plt.imshow(res2.as_array())
-    plt.colorbar()
-    plt.show()
-
-    plt.imshow(np.abs(res1.as_array()-res2.as_array()))
-    plt.colorbar()
-    plt.title("Difference CIL_FGP_TV vs CCPi_FGP_TV")
-    plt.show()    
-    
-    print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV with iterations.")
-    iters = 208
-    # CIL_FGP_TV no tolerance
-    g_CIL = FGP_TV(ig, alpha, iters, tolerance=1e-9, nonnegativity=True)
-    res1 = g_CIL.proximal(noisy_data, 1.)
-
+    plt.figure()
     plt.imshow(res1.as_array())
     plt.colorbar()
     plt.show()
@@ -261,15 +248,219 @@ if __name__ == '__main__':
     g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'gpu')
 
     res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
+    plt.figure()
+    plt.imshow(res2.as_array())
+    plt.colorbar()
+    plt.show()
+    
+    plt.figure()
+    plt.imshow(np.abs(res1.as_array()-res2.as_array()))
+    plt.colorbar()
+    plt.title("Difference CIL_FGP_TV vs CCPi_FGP_TV")
+    plt.show()
+
+    np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal = 4)
+    
+    ###################################################################
+    ###################################################################
+    ###################################################################
+    ###################################################################    
+    
+    print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV with iterations.")
+    iters = 408
+    # CIL_FGP_TV no tolerance
+    g_CIL = FGP_TV(ig, alpha, iters, tolerance=1e-9, lower = 0.)
+    res1 = g_CIL.proximal(noisy_data, 1.)
+    
+    # CCPi Regularisation toolkit high tolerance
+    r_alpha = alpha
+    r_iterations = iters
+    r_tolerance = 1e-9
+    r_iso = 0
+    r_nonneg = 1
+    r_printing = 0
+    g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'gpu')
+
+    res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
+
+    plt.figure()
+    plt.imshow(np.abs(res1.as_array()-res2.as_array()))
+    plt.colorbar()
+    plt.title("Difference CIL_FGP_TV vs CCPi_FGP_TV")
+    plt.show()          
+    
+    print(mae(res1, res2))
+    np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal=3)    
+    
+    ###################################################################
+    ###################################################################
+    ###################################################################
+    ###################################################################
+    print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV no tolerance (3D)") 
+        
+    print ("Building 3D phantom using TomoPhantom software")
+    model = 13 # select a model number from the library
+    N_size = 64 # Define phantom dimensions using a scalar value (cubic phantom)
+    path = os.path.dirname(tomophantom.__file__)
+    path_library3D = os.path.join(path, "Phantom3DLibrary.dat")
+    #This will generate a N_size x N_size x N_size phantom (3D)
+    phantom_tm = TomoP3D.Model(model, N_size, path_library3D)    
+    
+    ig = ImageGeometry(N_size, N_size, N_size)
+    data = ig.allocate()
+    data.fill(phantom_tm)
+        
+    n1 = TestData.random_noise(data.as_array(), mode = 'gaussian', seed = 10)
+
+    noisy_data = ig.allocate()
+    noisy_data.fill(n1)    
+    
+    # Show Ground Truth and Noisy Data
+    plt.figure(figsize=(10,5))
+    plt.subplot(1,2,1)
+    plt.imshow(data.as_array()[32])
+    plt.title('Ground Truth')
+    plt.colorbar()
+    plt.subplot(1,2,2)
+    plt.imshow(noisy_data.as_array()[32])
+    plt.title('Noisy Data')
+    plt.colorbar()
+    plt.show()
+    
+    alpha = 0.1
+    iters = 1000
+    
+    print("Use tau as an array of ones")
+    # CIL_FGP_TV no tolerance
+    g_CIL = FGP_TV(ig, alpha, iters, tolerance=None, info=True)
+    t0 = timer()   
+    res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
+    t1 = timer()
+    print(t1-t0)
+
+    show(res1, cmap='viridis')
+    
+    # CCPi Regularisation toolkit high tolerance
+    r_alpha = alpha
+    r_iterations = iters
+    r_tolerance = 1e-9
+    r_iso = 0
+    r_nonneg = 0
+    r_printing = 0
+    g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'gpu')
+
+    res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
+    show(res1, cmap='viridis')
+
+    show((res1-res2).abs(), title = "Difference CIL_FGP_TV vs CCPi_FGP_TV", cmap='viridis')     
+    np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal=3)
+
+    
+    
+    # CIL_FGP_TV no tolerance
+    g_CIL = FGP_TV(ig, alpha, iters, tolerance=None, info=True)
+    t0 = timer()
+    res1 = g_CIL.proximal(noisy_data, 1.)
+    t1 = timer()
+    print(t1-t0)
+
+    show(res1, cmap='viridis')    
+    
+    
+    ###################################################################
+    ###################################################################
+    ###################################################################
+    ###################################################################     
+#     print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV with tolerance. There is a problem with this line https://github.com/vais-ral/CCPi-Regularisation-Toolkit/blob/master/src/Core/regularisers_GPU/TV_FGP_GPU_core.cu#L456")
+    
+#     g_CIL = FGP_TV(ig, alpha, iters, tolerance=1e-3, lower = 0)
+#     res1 = g_CIL.proximal(noisy_data, 1.)
+
+#     plt.imshow(res1.as_array())
+#     plt.colorbar()
+#     plt.show()
+    
+#     r_alpha = alpha
+#     r_iterations = iters
+#     r_tolerance = 1e-3
+#     r_iso = 0
+#     r_nonneg = 1
+#     r_printing = 0
+#     g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'gpu')
+
+#     res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
+#     plt.imshow(res2.as_array())
+#     plt.colorbar()
+#     plt.show()
+
+#     plt.imshow(np.abs(res1.as_array()-res2.as_array()))
+#     plt.colorbar()
+#     plt.title("Difference CIL_FGP_TV vs CCPi_FGP_TV")
+#     plt.show() 
+    
+#     if mae(res1, res2)>1e-5:
+#         raise ValueError ("2 solutions are not the same")      
+            
+       
+    loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
+    data = loader.load(TestData.PEPPERS, size=(256,256))
+    ig = data.geometry
+    ag = ig
+
+    n1 = TestData.random_noise(data.as_array(), mode = 'gaussian', seed = 10)
+
+    noisy_data = ig.allocate()
+    noisy_data.fill(n1)    
+    
+    # Show Ground Truth and Noisy Data
+    plt.figure(figsize=(10,5))
+    plt.subplot(1,2,1)
+    plt.imshow(data.as_array())
+    plt.title('Ground Truth')
+    plt.colorbar()
+    plt.subplot(1,2,2)
+    plt.imshow(noisy_data.as_array())
+    plt.title('Noisy Data')
+    plt.colorbar()
+    plt.show()
+    
+    alpha = 0.1
+    iters = 1000
+    
+    # CIL_FGP_TV no tolerance
+    g_CIL = FGP_TV(ig, alpha, iters, tolerance=None)
+    t0 = timer()
+    res1 = g_CIL.proximal(noisy_data, 1.)
+    t1 = timer()
+    print(t1-t0)
+
+    plt.figure()
+    plt.imshow(res1.as_array())
+    plt.colorbar()
+    plt.show()
+    
+    # CCPi Regularisation toolkit high tolerance
+    r_alpha = alpha
+    r_iterations = iters
+    r_tolerance = 1e-8
+    r_iso = 0
+    r_nonneg = 0
+    r_printing = 0
+    g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'gpu')
+
+    res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
+    plt.figure()
     plt.imshow(res2.as_array())
     plt.colorbar()
     plt.show()
 
+    plt.figure()
     plt.imshow(np.abs(res1.as_array()-res2.as_array()))
     plt.colorbar()
     plt.title("Difference CIL_FGP_TV vs CCPi_FGP_TV")
-    plt.show()        
+    plt.show()    
     
     
     
-   
+    
+    

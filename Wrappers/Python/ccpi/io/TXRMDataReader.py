@@ -259,10 +259,15 @@ if __name__ == '__main__':
     plt.figure()
     plt.imshow(data.subset(angle=0).as_array())
     plt.colorbar()
+    plt.gray()
+    plt.savefig('walnut_proj0.png',dpi=300)
+    
     
     plt.figure()
     plt.imshow(data.subset(angle=800).as_array())
     plt.colorbar()
+    plt.gray()
+    plt.savefig('walnut_proj800.png',dpi=300)
     
     # Extract AcquisitionGeometry for central slice for 2D fanbeam reconstruction
     ag2d = AcquisitionGeometry('cone',
@@ -279,6 +284,8 @@ if __name__ == '__main__':
     plt.figure()
     plt.imshow(data2d.as_array())
     plt.colorbar()
+    plt.gray()
+    plt.savefig('walnut_sinotrans.png',dpi=300)
     
     data2d.log(out=data2d)
     data2d *= -1
@@ -286,6 +293,8 @@ if __name__ == '__main__':
     plt.figure()
     plt.imshow(data2d.as_array())
     plt.colorbar()
+    plt.gray()
+    plt.savefig('walnut_sinoabs.png',dpi=300)
     
     # Choose the number of voxels to reconstruct onto as number of detector pixels
     N = data.geometry.pixel_num_h
@@ -314,6 +323,9 @@ if __name__ == '__main__':
     
     plt.figure()
     plt.imshow(recfbp.as_array())
+    plt.gray()
+    plt.colorbar()
+    plt.savefig('walnut_2DFBP.png',dpi=300)
 
     '''
     # Set up the Projector (AcquisitionModel) using ASTRA on GPU

@@ -207,7 +207,31 @@ class Padder(DataProcessor):
                     elif key == 'vertical':
                         geometry.pixel_num_v += pad_param[idx][0]+pad_param[idx][1]
                     elif key == 'angle':
-                        geometry.angles = np.pad(geometry_0.angles, tuple(pad_param[idx]))
+                        if self.mode in ['maximum', 'minimum', 'median', 'mean'] and stat_length is not None:
+                            geometry.angles = np.pad(geometry_0.angles, 
+                                                      tuple(pad_param[idx]), 
+                                                      mode=self.mode,
+                                                      stat_length=stat_length[idx])
+                        elif self.mode == 'constant' and constant_values is not None:
+                            geometry.angles = np.pad(geometry_0.angles, 
+                                                     tuple(pad_param[idx]), 
+                                                     mode=self.mode,
+                                                     constant_values=constant_values[idx])
+                        elif self.mode == 'linear_ramp' and end_values is not None:
+                            geometry.angles = np.pad(geometry_0.angles, 
+                                                     tuple(pad_param[idx]), 
+                                                     mode=self.mode,
+                                                     end_values=end_values[idx])
+                        elif self.mode in ['reflect', 'symmetric']:
+                            geometry.angles = np.pad(geometry_0.angles, 
+                                                     pad_param, 
+                                                     mode=self.mode,
+                                                     reflect_type=self.reflect_type)
+                        else:
+                            geometry.angles = np.pad(geometry_0.angles, 
+                                                     pad_param, 
+                                                     mode=self.mode)
+
         pad_param = tuple(pad_param)
         
         if self.mode in ['maximum', 'minimum', 'median', 'mean'] and stat_length is not None:

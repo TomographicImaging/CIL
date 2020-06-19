@@ -614,7 +614,11 @@ class DataContainer(object):
         :param array: numpy array to copy into the DataContainer
         :type array: DataContainer, numpy array or number
         :param dimension: dictionary, optional
+        
+        if the passed numpy array is the same, it just returns
         '''
+        if id(array) == id(self.array):
+            return
         if dimension == {}:
             if issubclass(type(array), DataContainer) or\
                issubclass(type(array), numpy.ndarray):
@@ -745,7 +749,7 @@ class DataContainer(object):
             return type(self)(self.array, 
                             dimension_labels=self.dimension_labels,
                             deep_copy=True,
-                            geometry=self.geometry,
+                            geometry=self.geometry.copy() if self.geometry is not None else None,
                             suppress_warning=True )
         else:
             out = self.geometry.allocate(None)

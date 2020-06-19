@@ -22,7 +22,7 @@ import numpy as np
 from ccpi.framework import DataContainer, ImageGeometry, \
     VectorGeometry, VectorData, BlockDataContainer
 from ccpi.optimisation.operators import Identity, LinearOperatorMatrix, CompositionOperator, DiagonalOperator, BlockOperator
-from ccpi.optimisation.functions import Function, KullbackLeibler
+from ccpi.optimisation.functions import Function, KullbackLeibler, ConstantFunction, TranslateFunction
 from ccpi.optimisation.operators import Gradient
 
 from ccpi.optimisation.functions import Function, KullbackLeibler, WeightedL2NormSquared, L2NormSquared,\
@@ -321,18 +321,24 @@ class TestFunction(unittest.TestCase):
             
         M, N = 50, 50
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
+        #numpy.random.seed(1)
         b = ig.allocate('random', seed=1)
         
         print('Check call with Identity operator... OK\n')
         operator = 3 * Identity(ig)
             
         u = ig.allocate('random', seed = 50)
-        
-        func1 = FunctionOperatorComposition(0.5 * L2NormSquared(b = b), operator)
+        f = 0.5 * L2NormSquared(b = b)
+        func1 = FunctionOperatorComposition(f, operator)
         func2 = LeastSquares(operator, b, 0.5)
-        print("func1.L {}, func2.L {}, operator norm {}".format(func1.L, func2.L, operator.norm()))
-            
-        self.assertNumpyArrayAlmostEqual(func1(u), func2(u))
+        print("f.L {}".format(f.L))
+        print("0.5*f.L {}".format((0.5*f).L))
+        print("type func1 {}".format(type(func1)))
+        print("func1.L {}".format(func1.L))
+        print("func2.L {}".format(func2.L))
+        print("operator.norm() {}".format(operator.norm()))
+  
+        numpy.testing.assert_almost_equal(func1(u), func2(u))
         
         
         print('Check gradient with Identity operator... OK\n')
@@ -481,7 +487,7 @@ class TestFunction(unittest.TestCase):
         numpy.testing.assert_equal(a, numpy.inf)
         
     def tests_for_L2NormSq_and_weighted(self):
-
+        numpy.random.seed(1)
         M, N, K = 2,3,1
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N, voxel_num_z = K)
         u = ig.allocate('random')
@@ -700,15 +706,18 @@ class TestFunction(unittest.TestCase):
                         
         ig = ImageGeometry(40,30)
         
+        numpy.random.seed(1)
+
         A = Identity(ig)
         b = ig.allocate('random')
         x = ig.allocate('random')
-        c = 0.3
+        c = numpy.float64(0.3)
         
         weight = ig.allocate('random') 
         
         D = DiagonalOperator(weight)
-        norm_weight = D.norm()
+        norm_weight = numpy.float64(D.norm())
+        print("norm_weight", norm_weight)
         
         f1 = LeastSquares(A, b, c, weight) 
         f2 = LeastSquares(A, b, c)
@@ -716,8 +725,10 @@ class TestFunction(unittest.TestCase):
         print("Check LS vs wLS")        
         
         # check Lipshitz    
-        numpy.testing.assert_almost_equal(f2.L, 2 * c * A.norm()**2)   
-        numpy.testing.assert_almost_equal(f1.L, 2 * c * norm_weight * A.norm()**2) 
+        numpy.testing.assert_almost_equal(f2.L, 2 * c * (A.norm()**2))   
+        print ("unwrapped", 2. * c * norm_weight * (A.norm()**2))
+        print ("f1.L", f1.L)
+        numpy.testing.assert_almost_equal(f1.L, numpy.float64(2.) * c * norm_weight * (A.norm()**2)) 
         print("Lipschitz is ... OK")
             
         # check call with weight                   
@@ -727,15 +738,17 @@ class TestFunction(unittest.TestCase):
         print("Call is ... OK")        
         
         # check call without weight                  
-        res1 = c * (A.direct(x)-b).dot((A.direct(x) - b))
+        #res1 = c * (A.direct(x)-b).dot((A.direct(x) - b))
+        res1 = c * (A.direct(x)-b).squared_norm()
         res2 = f2(x)    
         numpy.testing.assert_almost_equal(res1, res2) 
         print("Call without weight is ... OK")        
         
         # check gradient with weight             
-        out = ig.allocate()
+        out = ig.allocate(None)
         res1 = f1.gradient(x)
-        f1.gradient(x, out = out)
+        #out = f1.gradient(x)
+        f1.gradient(x, out=out)
         res2 = 2 * c * A.adjoint(weight*(A.direct(x)-b))
         numpy.testing.assert_array_almost_equal(res1.as_array(), res2.as_array())
         numpy.testing.assert_array_almost_equal(out.as_array(), res2.as_array())
@@ -780,6 +793,103 @@ class TestFunction(unittest.TestCase):
         print("Time with LS + weight is {}".format(t3-t2))
         
         numpy.testing.assert_almost_equal(res1, res2, decimal=2)          
+
+    def test_Lipschitz(self):
+        print('Test for FunctionOperatorComposition')         
+            
+        M, N = 50, 50
+        ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
+        b = ig.allocate('random', seed=1)
+        
+        print('Check call with Identity operator... OK\n')
+        operator = 3 * Identity(ig)
+            
+        u = ig.allocate('random_int', seed = 50)
+        func2 = LeastSquares(operator, b, 0.5)
+        assert func2.L != 2
+        print (func2.L)
+        func2.L = 2
+        assert func2.L == 2
+    def test_Lipschitz2(self):
+        print('Test for test_Lipschitz2')         
+            
+        M, N = 50, 50
+        ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
+        b = ig.allocate('random', seed=1)
+        
+        print('Check call with Identity operator... OK\n')
+        operator = 3 * Identity(ig)
+            
+        u = ig.allocate('random_int', seed = 50)
+        func2 = LeastSquares(operator, b, 0.5)
+        func1 = ConstantFunction(0.3)
+        f3 = func1 + func2
+        assert f3.L != 2
+        print (func2.L)
+        func2.L = 2
+        assert func2.L == 2
+    def test_Lipschitz3(self):
+        print('Test for test_Lipschitz3')         
+            
+        M, N = 50, 50
+        ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
+        b = ig.allocate('random', seed=1)
+        
+        print('Check call with Identity operator... OK\n')
+        operator = 3 * Identity(ig)
+            
+        u = ig.allocate('random_int', seed = 50)
+        # func2 = LeastSquares(operator, b, 0.5)
+        func1 = ConstantFunction(0.3)
+        f3 = TranslateFunction(func1, 3)
+        assert f3.L != 2
+        print (f3.L)
+        f3.L = 2
+        assert f3.L == 2
+    def test_Lipschitz4(self):
+        print('Test for test_Lipschitz4')         
+            
+        M, N = 50, 50
+        ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
+        b = ig.allocate('random', seed=1)
+        
+        print('Check call with Identity operator... OK\n')
+        operator = 3 * Identity(ig)
+            
+        u = ig.allocate('random_int', seed = 50)
+        # func2 = LeastSquares(operator, b, 0.5)
+        func1 = ConstantFunction(0.3)
+        f3 = func1 + 3
+        assert f3.L == 0
+        print ("OK")
+        print (f3.L)
+        f3.L = 2
+        assert f3.L == 2
+        print ("OK")
+        assert func1.L == 0
+        print ("OK")
+        try:
+            func1.L = 2
+            assert False
+        except AttributeError as ve:
+            assert True
+        print ("OK")
+        f2 = LeastSquares(operator, b, 0.5)
+        f4 = 2 * f2
+        assert f4.L == 2 * f2.L
+        
+        print ("OK")
+        f4.L = 10
+        assert f4.L != 2 * f2.L  
+        print ("OK")
+
+        f4 = -2 * f2
+        assert f4.L == 2 * f2.L
+        
+
+
+
+
 
 if __name__ == '__main__':
     

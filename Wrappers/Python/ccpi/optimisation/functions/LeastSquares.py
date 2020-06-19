@@ -25,6 +25,7 @@ from ccpi.optimisation.operators import LinearOperator, DiagonalOperator
 from ccpi.optimisation.functions import Function
 from ccpi.framework import DataContainer
 import warnings
+from numbers import Number
 
 
 class LeastSquares(Function):
@@ -59,7 +60,7 @@ class LeastSquares(Function):
     
     """
     
-    def __init__(self, A, b, c=1.0, weight = 1.0):
+    def __init__(self, A, b, c=1.0, weight = None):
         super(LeastSquares, self).__init__()
     
         self.A = A  # Should be an operator, default identity
@@ -68,51 +69,28 @@ class LeastSquares(Function):
         
         # weight
         self.weight = weight      
-        self.weight_norm = 1.0
-        
-        # allocate default spaces
-        self.tmp_space = A.range_geometry().allocate()
-        self.tmp_space1 = self.tmp_space.copy()
-                                
-        if isinstance(self.weight, DataContainer):
+        self._weight_norm = None
+
+        if weight is not None:
             if (self.weight<0).any():
                 raise ValueError('Weight contains negative values') 
-            D = DiagonalOperator(self.weight)
-            self.weight_norm = D.norm()                    
-                
-        # Compute the Lipschitz parameter from the operator if possible
-        # Leave it initialised to None otherwise
-        try:
-            self.L = 2.0 * self.c * (self.weight_norm * self.A.norm()**2)
-        except AttributeError as ae:
-            if self.A.is_linear():
-                Anorm = LinearOperator.PowerMethod(self.A, 10)[0]
-                self.L = 2.0 * self.c * ( self.weight_norm * Anorm*Anorm)
-            else:
-                warnings.warn('{} could not calculate Lipschitz Constant. {}'.format(
-                self.__class__.__name__, ae))
             
-        except NotImplementedError as noe:
-            warnings.warn('{} could not calculate Lipschitz Constant. {}'.format(
-                self.__class__.__name__, noe))          
-                
         
     def __call__(self, x):
         
         r""" Returns the value of :math:`F(x) = c\|Ax-b\|_2^2` or c\|Ax-b\|_{2,weight}^2
                         
         """
+        # c * (A.direct(x)-b).dot((A.direct(x) - b))
+        y = self.A.direct(x)
+        y.subtract(self.b, out = y) 
         
-        self.A.direct(x, out = self.tmp_space)
-        self.tmp_space.subtract(self.b, out = self.tmp_space) 
-                
-        if isinstance(self.weight, DataContainer):    
-            self.weight.multiply(self.tmp_space, out=self.tmp_space1)
-            return self.c * self.tmp_space.dot(self.tmp_space1) 
+        if self.weight is None:    
+            return self.c * y.dot(y)
         else:
-            return self.c * self.tmp_space.dot(self.tmp_space)
-        
-    
+            wy = self.weight.multiply(y)
+            return self.c * y.dot(wy) 
+
     def gradient(self, x, out=None):
         
         r""" Returns the value of the gradient of :math:`F(x) = c*\|A*x-b\|_2^2`
@@ -124,11 +102,54 @@ class LeastSquares(Function):
         """
         
         if out is not None:
-            self.A.direct(x, out = out)
-            out.subtract(self.b , out=out)
-            if isinstance(self.weight, DataContainer):
-                out *= self.weight           
-            self.A.adjoint(out, out = out)
+            tmp = self.A.direct(x)
+            tmp.subtract(self.b , out=tmp)
+            if self.weight is not None:
+                tmp.multiply(self.weight, out=tmp)
+            self.A.adjoint(tmp, out = out)
             out.multiply(self.c * 2.0, out=out)
         else:
-            return (2.0*self.c)*self.A.adjoint(self.weight * (self.A.direct(x) - self.b))        
+            if self.weight is None:
+                return (2.0*self.c)*self.A.adjoint(self.A.direct(x) - self.b)
+            else:
+                return (2.0*self.c)*self.A.adjoint(self.weight * (self.A.direct(x) - self.b))
+        
+    @property
+    def L(self):
+        if self._L is None:
+            self.calculate_Lipschitz()
+        return self._L
+    @L.setter
+    def L(self, value):
+        warnings.warn("You should set the Lipschitz constant with calculate_Lipschitz().")
+        if isinstance(value, (Number,)) and value >= 0:
+            self._L = value
+        else:
+            raise TypeError('The Lipschitz constant is a real positive number')
+
+    def calculate_Lipschitz(self):
+        # Compute the Lipschitz parameter from the operator if possible
+        # Leave it initialised to None otherwise
+        try:
+            self._L = 2.0*self.c*(self.A.norm()**2)
+        except AttributeError as ae:
+            if self.A.is_linear():
+                Anorm = LinearOperator.PowerMethod(self.A, 10)[0]
+                self._L = 2.0 * self.c * (Anorm*Anorm)
+            else:
+                warnings.warn('{} could not calculate Lipschitz Constant. {}'.format(
+                self.__class__.__name__, ae))
+        except NotImplementedError as noe:
+            warnings.warn('{} could not calculate Lipschitz Constant. {}'.format(
+                self.__class__.__name__, noe))
+        if self.weight is not None:
+                self._L *= self.weight_norm
+    @property
+    def weight_norm(self):
+        if self.weight is not None:
+            if self._weight_norm is None:
+                D = DiagonalOperator(self.weight)
+                self._weight_norm = D.norm()
+        else:
+            self._weight_norm = 1.0
+        return self._weight_norm

@@ -24,7 +24,7 @@ from ccpi.optimisation.operators import BlockOperator,\
 import numpy
 from timeit import default_timer as timer
 from ccpi.optimisation.operators import Gradient, Identity, SparseFiniteDiff,\
-    DiagonalOperator, MaskOperator, ChannelwiseOperator
+    DiagonalOperator, MaskOperator, ChannelwiseOperator, BlurringOperator
 from ccpi.optimisation.operators import LinearOperator, LinearOperatorMatrix
 import numpy   
 from ccpi.optimisation.operators import SumOperator, Gradient,\
@@ -195,6 +195,28 @@ class TestOperator(CCPiTestClass):
         #print(z.subset(channel=2).as_array())
         #print(z2.subset(channel=2).as_array())
         #print((diag*(diag*x.subset(channel=2))).as_array())
+        
+    def test_BlurringOperator(self):
+        print("test_BlurringOperator")
+        
+        ig = ImageGeometry(100,100)
+        
+        # Parameters for point spread function PSF (size and std)
+        ks          = 11; 
+        ksigma      = 5.0;
+        
+        # Create 1D PSF and 2D as outer product, then normalise.
+        w           = numpy.exp(-numpy.arange(-(ks-1)/2,(ks-1)/2+1)**2/(2*ksigma**2))
+        w.shape     = (ks,1)
+        PSF         = w*numpy.transpose(w)
+        PSF         = PSF/(PSF**2).sum()
+        PSF         = PSF/PSF.sum()
+        
+        # Create blurring operator
+        BOP = BlurringOperator(PSF,ig)
+        
+        # Run dot test to check validity of adjoint.
+        self.assertTrue(BOP.dot_test(BOP))
 
     def test_Identity(self):
         print ("test_Identity")

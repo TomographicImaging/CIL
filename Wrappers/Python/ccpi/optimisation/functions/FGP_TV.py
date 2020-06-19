@@ -25,6 +25,8 @@ from ccpi.optimisation.operators import Gradient
 import numpy 
 import functools
 
+
+
 class FGP_TV(Function):
     
     r'''Fast Gradient Projection algorithm for Total Variation(TV) Denoising (ROF problem)
@@ -50,13 +52,15 @@ class FGP_TV(Function):
     '''    
     
     
-    def __init__(self, domain, regularising_parameter, 
+    def __init__(self, regularising_parameter, 
                  inner_iterations, 
                  tolerance, 
                  lower = -numpy.inf, 
                  upper = numpy.inf,
                  info = False):
         
+
+        super(FGP_TV, self).__init__(L = None)
         # Regularising parameter = alpha
         self.regularising_parameter = regularising_parameter
         
@@ -78,8 +82,10 @@ class FGP_TV(Function):
 #         Setup Gradient as None. This is to avoid domain argument in the __init__     
 #         self.gradient = None
 
-        self.gradient = Gradient(domain)
-        self.Lipschitz = (1./self.gradient.norm())**2   
+        # self.gradient = Gradient(domain)
+        # self.Lipschitz = (1./self.gradient.norm())**2   
+        self._gradient = None
+        self._domain = None
         
         # Print stopping information (iterations and tolerance error) of FGP_TV  
         self.info = info
@@ -87,7 +93,7 @@ class FGP_TV(Function):
     def __call__(self, x):
         
         r''' Returns the value of the \alpha * TV(x)'''
-                        
+        self._domain = x.geometry
 #         if self.gradient is None:
 #             self.gradient = Gradient(x.geometry)
         
@@ -97,12 +103,15 @@ class FGP_TV(Function):
     
     def projection_C(self, x, out=None):   
                      
-        r''' Returns orthogonal projection onto the convex set C'''            
+        r''' Returns orthogonal projection onto the convex set C'''
+
+        self._domain = x.geometry
         return self.tmp_proj_C(x, tau = None, out = out)
                         
     def projection_P(self, x, out=None):
                        
         r''' Returns the projection P onto \|\cdot\|_{\infty} '''  
+        self._domain = x.geometry
         
         res1 = functools.reduce(lambda a,b: a + b*b, x.containers, x.get_item(0) * 0 )
         res1.sqrt(out=res1)	
@@ -123,7 +132,8 @@ class FGP_TV(Function):
 #             # Define 1/Lipschitz of the Gradient
 #             self.gradient = Gradient(x.geometry)            
 #             self.Lipschitz = (1./self.gradient.norm())**2            
-                      
+        self._domain = x.geometry
+        
         # initialise
         t = 1        
         tmp_p = self.gradient.range_geometry().allocate()  
@@ -143,7 +153,7 @@ class FGP_TV(Function):
             self.projection_C(tmp_x, out = tmp_x)                       
 
             self.gradient.direct(tmp_x, out=p1)
-            p1 *= self.Lipschitz
+            p1 *= self.L
             p1 /= self.regularising_parameter
             p1 /= tau
             p1 += tmp_q
@@ -178,7 +188,35 @@ class FGP_TV(Function):
     
     def convex_conjugate(self,x):        
         return 0.0    
+    @property
+    def L(self):
+        if self._L is None:
+            self.calculate_Lipschitz()
+        return self._L
+    @L.setter
+    def L(self, value):
+        warnings.warn("You should set the Lipschitz constant with calculate_Lipschitz().")
+        if isinstance(value, (Number,)) and value >= 0:
+            self._L = value
+        else:
+            raise TypeError('The Lipschitz constant is a real positive number')
+
+    def calculate_Lipschitz(self):
+        # Compute the Lipschitz parameter from the operator if possible
+        # Leave it initialised to None otherwise
+        self._L = (1./self.gradient.norm())**2  
     
+    @property
+    def gradient(self):
+        '''creates a gradient operator if not instantiated yet
+
+        There is no check that the variable _domain is changed after instantiation (should not be the case)'''
+        if self._gradient is None:
+            if self._domain is not None:
+                self._gradient = Gradient(self._domain)
+        return self._gradient
+    
+
 if __name__ == '__main__':
     
     import numpy as np                         
@@ -194,6 +232,7 @@ if __name__ == '__main__':
     from ccpi.framework import ImageGeometry
     from ccpi.utilities.quality_measures import mae
     from ccpi.utilities.display import show
+    
         
     ###################################################################
     ###################################################################
@@ -227,7 +266,7 @@ if __name__ == '__main__':
     iters = 1000
         
     # CIL_FGP_TV no tolerance
-    g_CIL = FGP_TV(ig, alpha, iters, tolerance=None, lower = 0, info = True)
+    g_CIL = FGP_TV(alpha, iters, tolerance=None, lower = 0, info = True)
     t0 = timer()
     res1 = g_CIL.proximal(noisy_data, 1.)
     t1 = timer()
@@ -245,9 +284,13 @@ if __name__ == '__main__':
     r_iso = 0
     r_nonneg = 1
     r_printing = 0
-    g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'gpu')
-
+    g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'cpu')
+    
+    t2 = timer()
     res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
+    t3 = timer()
+    print(t3-t1)
+    
     plt.figure()
     plt.imshow(res2.as_array())
     plt.colorbar()
@@ -269,8 +312,11 @@ if __name__ == '__main__':
     print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV with iterations.")
     iters = 408
     # CIL_FGP_TV no tolerance
-    g_CIL = FGP_TV(ig, alpha, iters, tolerance=1e-9, lower = 0.)
+    g_CIL = FGP_TV(alpha, iters, tolerance=1e-9, lower = 0.)
+    t0 = timer()
     res1 = g_CIL.proximal(noisy_data, 1.)
+    t1 = timer()
+    print(t1-t0)
     
     # CCPi Regularisation toolkit high tolerance
     r_alpha = alpha
@@ -279,10 +325,13 @@ if __name__ == '__main__':
     r_iso = 0
     r_nonneg = 1
     r_printing = 0
-    g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'gpu')
+    g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'cpu')
 
+    t2 = timer()
     res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
-
+    t3 = timer()
+    print(t3-t2)
+    
     plt.figure()
     plt.imshow(np.abs(res1.as_array()-res2.as_array()))
     plt.colorbar()
@@ -332,7 +381,7 @@ if __name__ == '__main__':
     
     print("Use tau as an array of ones")
     # CIL_FGP_TV no tolerance
-    g_CIL = FGP_TV(ig, alpha, iters, tolerance=None, info=True)
+    g_CIL = FGP_TV(alpha, iters, tolerance=None, info=True)
     t0 = timer()   
     res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
     t1 = timer()
@@ -347,9 +396,12 @@ if __name__ == '__main__':
     r_iso = 0
     r_nonneg = 0
     r_printing = 0
-    g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'gpu')
+    g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'cpu')
 
+    t2 = timer()
     res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
+    t3 = timer()
+    print (t3-t2)
     show(res1, cmap='viridis')
 
     show((res1-res2).abs(), title = "Difference CIL_FGP_TV vs CCPi_FGP_TV", cmap='viridis')     
@@ -358,7 +410,8 @@ if __name__ == '__main__':
     
     
     # CIL_FGP_TV no tolerance
-    g_CIL = FGP_TV(ig, alpha, iters, tolerance=None, info=True)
+    #g_CIL = FGP_TV(ig, alpha, iters, tolerance=None, info=True)
+    g_CIL.tolerance = None
     t0 = timer()
     res1 = g_CIL.proximal(noisy_data, 1.)
     t1 = timer()
@@ -428,7 +481,7 @@ if __name__ == '__main__':
     iters = 1000
     
     # CIL_FGP_TV no tolerance
-    g_CIL = FGP_TV(ig, alpha, iters, tolerance=None)
+    g_CIL = FGP_TV(alpha, iters, tolerance=None)
     t0 = timer()
     res1 = g_CIL.proximal(noisy_data, 1.)
     t1 = timer()
@@ -446,9 +499,12 @@ if __name__ == '__main__':
     r_iso = 0
     r_nonneg = 0
     r_printing = 0
-    g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'gpu')
-
+    g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'cpu')
+    
+    t2 = timer()
     res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
+    t3 = timer()
+    print (t3-t2)
     plt.figure()
     plt.imshow(res2.as_array())
     plt.colorbar()

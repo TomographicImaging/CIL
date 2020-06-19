@@ -17,4 +17,5 @@
 #   limitations under the License.
 from .CenterOfRotationFinder import CenterOfRotationFinder
 from .Normalizer import Normalizer
-from .Resizer import Resizer
+from .Binner import Binner
+from .Slicer import Slicer

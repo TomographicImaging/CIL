@@ -100,35 +100,13 @@ class NikonDataReader(object):
             if key not in ['horizontal', 'vertical']:
                 raise Exception("Wrong label. horizontal and/or vertical are expected")
         
-        self._binning = self.binning.copy()
-        self._roi = self.roi.copy()
+        roi = self.roi.copy()
         
-        if 'horizontal' not in self._binning.keys():
-            self._binning['horizontal'] = 1
+        if 'horizontal' not in roi.keys():
+            roi['horizontal'] = -1
         
-        if 'vertical' not in self._binning.keys():
-            self._binning['vertical'] = 1
-        
-        if 'horizontal' not in self._roi.keys():
-            self._roi['horizontal'] = -1
-        
-        if 'vertical' not in self._roi.keys():
-            self._roi['vertical'] = -1
-        
-        # check if inputs for roi and binning are integer
-        if not ((isinstance(self._binning['horizontal'], int)) and 
-                isinstance(self._binning['vertical'], int)):
-            raise Exception("Integers are expected for binning")
-        
-        if self._roi['horizontal'] != -1:
-            if not (isinstance(self._roi['horizontal'][0], int) and \
-                    isinstance(self._roi['horizontal'][1], int)):
-                raise Exception("Integers are expected for roi")
-        
-        if self._roi['vertical'] != -1:
-            if not (isinstance(self._roi['vertical'][0], int) and \
-                    isinstance(self._roi['vertical'][1], int)):
-                raise Exception("Integers are expected for roi")
+        if 'vertical' not in roi.keys():
+            roi['vertical'] = -1
                 
         # parse xtek file
         with open(self.xtek_file, 'r') as f:
@@ -170,28 +148,35 @@ class NikonDataReader(object):
             # angular increment (in degrees)
             elif line.startswith("AngularStep"):
                 angular_step = float(line.split('=')[1])
-                
-        roi_par = []
-        if self._roi['vertical'] == -1:
-            roi_par.append((0, pixel_num_v_0))
-        else:
-            roi_par.append(self._roi['vertical'])
-        if self._roi['horizontal'] == -1:
-            roi_par.append((0, pixel_num_h_0))
-        else:
-            roi_par.append(self._roi['horizontal'])
+            
+        self._roi_par = [[0, num_projections, 1] ,[0, pixel_num_v_0, 1], [0, pixel_num_h_0, 1]]
+        
+        for key in roi.keys():
+            if key == 'angle':
+                idx = 0
+            elif key == 'vertical':
+                idx = 1
+            elif key == 'horizontal':
+                idx = 2
+            if roi[key] != -1:
+                for i in range(2):
+                    if roi[key][i] != None:
+                        if roi[key][i] >= 0:
+                            self._roi_par[idx][i] = roi[key][i]
+                        else:
+                            self._roi_par[idx][i] = self._roi_par[idx][1]+roi[key][i]
+                if len(roi[key]) > 2:
+                    if roi[key][2] != None:
+                        if roi[key][2] > 0:
+                            self._roi_par[idx][2] = roi[key][2] 
+                        else:
+                            raise Exception("Negative step is not allowed")
                 
         # calculate number of pixels and pixel size
-        if (self._binning['horizontal'] == 1 and self._binning['vertical'] == 1):
-            pixel_num_v = roi_par[0][1] - roi_par[0][0]
-            pixel_num_h = roi_par[1][1] - roi_par[1][0]
-            pixel_size_v = pixel_size_v_0
-            pixel_size_h = pixel_size_h_0
-        else:
-            pixel_num_v = (roi_par[0][1] - roi_par[0][0]) // self._binning['vertical']
-            pixel_num_h = (roi_par[1][1] - roi_par[1][0]) // self._binning['horizontal']
-            pixel_size_v = pixel_size_v_0 * self._binning['vertical']
-            pixel_size_h = pixel_size_h_0 * self._binning['horizontal']
+        pixel_num_v = (self._roi_par[1][1] - self._roi_par[1][0]) // self._roi_par[1][2]
+        pixel_num_h = (self._roi_par[2][1] - self._roi_par[2][0]) // self._roi_par[2][2]
+        pixel_size_v = pixel_size_v_0 * self._roi_par[1][2]
+        pixel_size_h = pixel_size_h_0 * self._roi_par[2][2]
         
         '''
         Parse the angles file .ang or _ctdata.txt file and returns the angles
@@ -230,6 +215,10 @@ class NikonDataReader(object):
         else:   # calculate angles based on xtek file
             angles = numpy.asarray( [ initial_angle + angular_step * proj for proj in range(num_projections) ] , dtype=numpy.float32)
         
+        n_pix_0 = (self._roi_par[0][1] - self._roi_par[0][0]) // self._roi_par[0][2]
+        shape = (n_pix_0, self._roi_par[0][2])
+        angles = angles[self._roi_par[0][0]:(self._roi_par[0][0] + n_pix_0 * self._roi_par[0][2])].reshape(shape).mean(1)
+        
         # fill in metadata
         self._ag = AcquisitionGeometry(geom_type = 'cone', 
                                        dimension = '3D', 
@@ -259,21 +248,21 @@ class NikonDataReader(object):
             
         # get path to projections
         path_projection = os.path.dirname(self.xtek_file)
-        num_projections = numpy.shape(self._ag.angles)[0]
+#        num_projections = numpy.shape(self._ag.angles)[0]
         
         reader = TIFFStackReader()
         reader.set_up(path = path_projection,
-                      n_images = num_projections,
-                      binning = {'axis_0': self._binning['vertical'], 'axis_1': self._binning['horizontal']},
-                      roi = {'axis_0': self._roi['vertical'], 'axis_1': self._roi['horizontal']})
+                      roi = {'axis_0': tuple(self._roi_par[0]), 
+                             'axis_1': tuple(self._roi_par[1]),
+                             'axis_2': tuple(self._roi_par[2])})
 
         data = reader.load_images()
-        
-        # sanity check
-        if (data.shape[0] != num_projections or\
-            data.shape[1] != self._ag.pixel_num_v or \
-            data.shape[2] != self._ag.pixel_num_h):
-            raise Exception("Something went wrong. Geometry and data dimensions do not match.")
+
+#        # sanity check
+#        if (data.shape[0] != num_projections or\
+#            data.shape[1] != self._ag.pixel_num_v or \
+#            data.shape[2] != self._ag.pixel_num_h):
+#            raise Exception("Something went wrong. Geometry and data dimensions do not match.")
               
         if (self.normalize):
             data /= self._white_level

@@ -31,7 +31,7 @@ from timeit import default_timer as timer
 from ccpi.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 
 from ccpi.io.reader import NexusReader
-from ccpi.processors import CenterOfRotationFinder, Resizer
+from ccpi.processors import CenterOfRotationFinder, Binner, Slicer
 import wget
 import os
 
@@ -84,47 +84,144 @@ class TestDataProcessor(unittest.TestCase):
         print ("Center of rotation", cf.get_output())
         self.assertAlmostEqual(86.25, cf.get_output())
     
-    def test_Resizer(self):
+    def test_Binner(self):
         reader = NexusReader(self.filename)
         data = reader.get_acquisition_data_whole()
         ad = data.clone()
         print(ad.geometry)
         
-        resizer = Resizer(binning = {'horizontal': 2}, 
-                          roi = {'vertical': (10,124)})
+        resizer = Binner(roi = {'vertical': (10,124),
+                                 'horizontal': (None,None,2)})
         resizer.input = data
         data_resized = resizer.process()
         
-        print(ad.geometry)
+        print(data_resized.geometry)
         
-        self.assertAlmostEqual(80, data_resized.geometry.pixel_num_h)
-        self.assertAlmostEqual(114, data_resized.geometry.pixel_num_v)
-        self.assertAlmostEqual(1, data_resized.geometry.pixel_size_v)
-        self.assertAlmostEqual(2, data_resized.geometry.pixel_size_h)
+        self.assertTrue(80 == data_resized.geometry.pixel_num_h)
+        self.assertTrue(114 == data_resized.geometry.pixel_num_v)
+        self.assertTrue(1 == data_resized.geometry.pixel_size_v)
+        self.assertTrue(2 == data_resized.geometry.pixel_size_h)
         
-        resizer = Resizer(binning = {'vertical': 5}, 
-                          roi = {'horizontal': (10,20)})
+        resizer = Binner(roi = {'horizontal': (10,20), 
+                                 'vertical': (None,None,5)})
         resizer.input = data
         data_resized = resizer.process()
         
-        print(ad.geometry)
+        print(data_resized.geometry)
         
-        self.assertAlmostEqual(10, data_resized.geometry.pixel_num_h)
-        self.assertAlmostEqual(26, data_resized.geometry.pixel_num_v)
-        self.assertAlmostEqual(5, data_resized.geometry.pixel_size_v)
-        self.assertAlmostEqual(1, data_resized.geometry.pixel_size_h)
+        self.assertTrue(10 == data_resized.geometry.pixel_num_h)
+        self.assertTrue(26 == data_resized.geometry.pixel_num_v)
+        self.assertTrue(5 == data_resized.geometry.pixel_size_v)
+        self.assertTrue(1 == data_resized.geometry.pixel_size_h)
         
-        resizer = Resizer(binning = {'horizontal': 4, 'vertical': 5}, 
-                  roi = {'vertical': (10,100), 'horizontal': (10,100)})
+        resizer = Binner(roi = {'horizontal': (10,100,4), 
+                                 'vertical': (10,100,5)})
         resizer.input = data
         data_resized = resizer.process()
         
+        print(data_resized.geometry)
+        
+        self.assertTrue(22 == data_resized.geometry.pixel_num_h)
+        self.assertTrue(18 == data_resized.geometry.pixel_num_v)
+        self.assertTrue(5 == data_resized.geometry.pixel_size_v)
+        self.assertTrue(4 == data_resized.geometry.pixel_size_h)
+        
+        ig = ImageGeometry(voxel_num_x=40,
+                           voxel_num_y=50,
+                           voxel_num_z=60,
+                           voxel_size_x=1, 
+                           voxel_size_y=2,
+                           voxel_size_z=3,
+                           channels=10)
+        
+        image = ig.allocate()
+        
+        resizer = Binner(roi = {'channel': (None, None, 2), 
+                                 'horizontal_x': (20, None),
+                                 'horizontal_y': (-40,-10),
+                                 'vertical': (None,None,4)})
+        resizer.input = image
+        image_resized = resizer.process()
+        
+        print(image_resized.geometry)
+        
+        self.assertTrue(5 == image_resized.geometry.channels)
+        self.assertTrue(20 == image_resized.geometry.voxel_num_x)
+        self.assertTrue(30 == image_resized.geometry.voxel_num_y)
+        self.assertTrue(15 == image_resized.geometry.voxel_num_z)
+        self.assertTrue(1 == image_resized.geometry.voxel_size_x)
+        self.assertTrue(2 == image_resized.geometry.voxel_size_y)
+        self.assertTrue(12 == image_resized.geometry.voxel_size_z)
+    
+    def test_Slicer(self):
+        
+        reader = NexusReader(self.filename)
+        data = reader.get_acquisition_data_whole()
+        ad = data.clone()
         print(ad.geometry)
         
-        self.assertAlmostEqual(22, data_resized.geometry.pixel_num_h)
-        self.assertAlmostEqual(18, data_resized.geometry.pixel_num_v)
-        self.assertAlmostEqual(5, data_resized.geometry.pixel_size_v)
-        self.assertAlmostEqual(4, data_resized.geometry.pixel_size_h)
+        resizer = Slicer(roi = {'vertical': (10,124),
+                                 'horizontal': (None,None,2)})
+        resizer.input = data
+        data_resized = resizer.process()
+        
+        print(data_resized.geometry)
+        
+        self.assertTrue(80 == data_resized.geometry.pixel_num_h)
+        self.assertTrue(114 == data_resized.geometry.pixel_num_v)
+        self.assertTrue(1 == data_resized.geometry.pixel_size_v)
+        self.assertTrue(1 == data_resized.geometry.pixel_size_h)
+        
+        resizer = Slicer(roi = {'horizontal': (10,20), 
+                                 'vertical': (None,None,5)})
+        resizer.input = data
+        data_resized = resizer.process()
+        
+        print(data_resized.geometry)
+        
+        self.assertTrue(10 == data_resized.geometry.pixel_num_h)
+        self.assertTrue(27 == data_resized.geometry.pixel_num_v)
+        self.assertTrue(1 == data_resized.geometry.pixel_size_v)
+        self.assertTrue(1 == data_resized.geometry.pixel_size_h)
+        
+        resizer = Slicer(roi = {'horizontal': (10,100,4), 
+                                 'vertical': (10,100,5)})
+        resizer.input = data
+        data_resized = resizer.process()
+        
+        self.assertTrue(data_resized.geometry)
+        
+        self.assertTrue(23 == data_resized.geometry.pixel_num_h)
+        self.assertTrue(18 == data_resized.geometry.pixel_num_v)
+        self.assertTrue(1 == data_resized.geometry.pixel_size_v)
+        self.assertTrue(1 == data_resized.geometry.pixel_size_h)
+        
+        ig = ImageGeometry(voxel_num_x=40,
+                           voxel_num_y=50,
+                           voxel_num_z=60,
+                           voxel_size_x=1, 
+                           voxel_size_y=2,
+                           voxel_size_z=3,
+                           channels=10)
+        
+        image = ig.allocate()
+        
+        resizer = Slicer(roi = {'channel': (None, None, 2), 
+                                 'horizontal_x': (20, None),
+                                 'horizontal_y': (-40,-10),
+                                 'vertical': (None,None,4)})
+        resizer.input = image
+        image_resized = resizer.process()
+        
+        print(image_resized.geometry)
+        
+        self.assertTrue(5 == image_resized.geometry.channels)
+        self.assertTrue(20 == image_resized.geometry.voxel_num_x)
+        self.assertTrue(30 == image_resized.geometry.voxel_num_y)
+        self.assertTrue(15 == image_resized.geometry.voxel_num_z)
+        self.assertTrue(1 == image_resized.geometry.voxel_size_x)
+        self.assertTrue(2 == image_resized.geometry.voxel_size_y)
+        self.assertTrue(3 == image_resized.geometry.voxel_size_z)
         
     def test_Normalizer(self):
         pass         

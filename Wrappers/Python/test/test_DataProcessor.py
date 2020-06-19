@@ -31,7 +31,7 @@ from timeit import default_timer as timer
 from ccpi.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 
 from ccpi.io.reader import NexusReader
-from ccpi.processors import CenterOfRotationFinder, Binner, Slicer
+from ccpi.processors import CenterOfRotationFinder, Binner, Slicer, Padder
 import wget
 import os
 
@@ -99,8 +99,8 @@ class TestDataProcessor(unittest.TestCase):
         
         self.assertTrue(80 == data_resized.geometry.pixel_num_h)
         self.assertTrue(114 == data_resized.geometry.pixel_num_v)
-        self.assertTrue(1 == data_resized.geometry.pixel_size_v)
-        self.assertTrue(2 == data_resized.geometry.pixel_size_h)
+        self.assertTrue(data.geometry.pixel_size_v == data_resized.geometry.pixel_size_v)
+        self.assertTrue(data.geometry.pixel_size_h * 2 == data_resized.geometry.pixel_size_h)
         
         resizer = Binner(roi = {'horizontal': (10,20), 
                                  'vertical': (None,None,5)})
@@ -111,8 +111,8 @@ class TestDataProcessor(unittest.TestCase):
         
         self.assertTrue(10 == data_resized.geometry.pixel_num_h)
         self.assertTrue(26 == data_resized.geometry.pixel_num_v)
-        self.assertTrue(5 == data_resized.geometry.pixel_size_v)
-        self.assertTrue(1 == data_resized.geometry.pixel_size_h)
+        self.assertTrue(data.geometry.pixel_size_v * 5 == data_resized.geometry.pixel_size_v)
+        self.assertTrue(data.geometry.pixel_size_h == data_resized.geometry.pixel_size_h)
         
         resizer = Binner(roi = {'horizontal': (10,100,4), 
                                  'vertical': (10,100,5)})
@@ -149,9 +149,9 @@ class TestDataProcessor(unittest.TestCase):
         self.assertTrue(20 == image_resized.geometry.voxel_num_x)
         self.assertTrue(30 == image_resized.geometry.voxel_num_y)
         self.assertTrue(15 == image_resized.geometry.voxel_num_z)
-        self.assertTrue(1 == image_resized.geometry.voxel_size_x)
-        self.assertTrue(2 == image_resized.geometry.voxel_size_y)
-        self.assertTrue(12 == image_resized.geometry.voxel_size_z)
+        self.assertTrue(image.geometry.voxel_size_x == image_resized.geometry.voxel_size_x)
+        self.assertTrue(image.geometry.voxel_size_y == image_resized.geometry.voxel_size_y)
+        self.assertTrue(image.geometry.voxel_size_z * 4 == image_resized.geometry.voxel_size_z)
     
     def test_Slicer(self):
         
@@ -169,8 +169,8 @@ class TestDataProcessor(unittest.TestCase):
         
         self.assertTrue(80 == data_resized.geometry.pixel_num_h)
         self.assertTrue(114 == data_resized.geometry.pixel_num_v)
-        self.assertTrue(1 == data_resized.geometry.pixel_size_v)
-        self.assertTrue(1 == data_resized.geometry.pixel_size_h)
+        self.assertTrue(data.geometry.pixel_size_v == data_resized.geometry.pixel_size_v)
+        self.assertTrue(data.geometry.pixel_size_h == data_resized.geometry.pixel_size_h)
         
         resizer = Slicer(roi = {'horizontal': (10,20), 
                                  'vertical': (None,None,5)})
@@ -181,8 +181,8 @@ class TestDataProcessor(unittest.TestCase):
         
         self.assertTrue(10 == data_resized.geometry.pixel_num_h)
         self.assertTrue(27 == data_resized.geometry.pixel_num_v)
-        self.assertTrue(1 == data_resized.geometry.pixel_size_v)
-        self.assertTrue(1 == data_resized.geometry.pixel_size_h)
+        self.assertTrue(data.geometry.pixel_size_v == data_resized.geometry.pixel_size_v)
+        self.assertTrue(data.geometry.pixel_size_h == data_resized.geometry.pixel_size_h)
         
         resizer = Slicer(roi = {'horizontal': (10,100,4), 
                                  'vertical': (10,100,5)})
@@ -193,8 +193,8 @@ class TestDataProcessor(unittest.TestCase):
         
         self.assertTrue(23 == data_resized.geometry.pixel_num_h)
         self.assertTrue(18 == data_resized.geometry.pixel_num_v)
-        self.assertTrue(1 == data_resized.geometry.pixel_size_v)
-        self.assertTrue(1 == data_resized.geometry.pixel_size_h)
+        self.assertTrue(data.geometry.pixel_size_v == data_resized.geometry.pixel_size_v)
+        self.assertTrue(data.geometry.pixel_size_h == data_resized.geometry.pixel_size_h)
         
         ig = ImageGeometry(voxel_num_x=40,
                            voxel_num_y=50,
@@ -219,9 +219,70 @@ class TestDataProcessor(unittest.TestCase):
         self.assertTrue(20 == image_resized.geometry.voxel_num_x)
         self.assertTrue(30 == image_resized.geometry.voxel_num_y)
         self.assertTrue(15 == image_resized.geometry.voxel_num_z)
-        self.assertTrue(1 == image_resized.geometry.voxel_size_x)
-        self.assertTrue(2 == image_resized.geometry.voxel_size_y)
-        self.assertTrue(3 == image_resized.geometry.voxel_size_z)
+        self.assertTrue(image.geometry.voxel_size_x == image_resized.geometry.voxel_size_x)
+        self.assertTrue(image.geometry.voxel_size_y == image_resized.geometry.voxel_size_y)
+        self.assertTrue(image.geometry.voxel_size_z == image_resized.geometry.voxel_size_z)
+    
+    def test_Padder(self):
+        
+        reader = NexusReader(self.filename)
+        data = reader.get_acquisition_data_whole()
+        ad = data.clone()
+        print(ad.geometry)
+        
+        padder = Padder(pad_width = 10,
+                        mode = 'constant',
+                        constant_values = {'vertical': (0,100), 'horizontal': 1000})
+        
+        padder.input = data
+        data_resized = padder.process()
+        
+        numpy.testing.assert_array_equal(data_resized.as_array(), numpy.pad(data.as_array(), 10, mode='constant', constant_values=((0,0), (0,100), (1000,1000))))
+        self.assertTrue(data.geometry.pixel_num_h+20 == data_resized.geometry.pixel_num_h)
+        self.assertTrue(data.geometry.pixel_num_v+20 == data_resized.geometry.pixel_num_v)
+        self.assertTrue(data.geometry.pixel_size_v == data_resized.geometry.pixel_size_v)
+        self.assertTrue(data.geometry.pixel_size_h == data_resized.geometry.pixel_size_h)
+        
+        padder = Padder(pad_width = {'vertical': 10, 'horizontal': 20, 'angle': 30},
+                        mode = 'reflect',
+                        reflect_type = 'odd')
+        
+        padder.input = data
+        data_resized = padder.process()
+        
+        numpy.testing.assert_array_equal(data_resized.as_array(), numpy.pad(data.as_array(), ((30,30), (10,10), (20,20)), mode ='reflect',reflect_type='odd'))
+        self.assertTrue(data.geometry.pixel_num_h+40 == data_resized.geometry.pixel_num_h)
+        self.assertTrue(data.geometry.pixel_num_v+20 == data_resized.geometry.pixel_num_v)
+        self.assertTrue(data.geometry.pixel_size_v == data_resized.geometry.pixel_size_v)
+        self.assertTrue(data.geometry.pixel_size_h == data_resized.geometry.pixel_size_h)
+        
+        ig = ImageGeometry(voxel_num_x=40,
+                           voxel_num_y=50,
+                           voxel_num_z=60,
+                           voxel_size_x=1, 
+                           voxel_size_y=2,
+                           voxel_size_z=3,
+                           channels=10)
+        
+        image = ig.allocate()
+        
+        resizer = Padder(pad_width = {'vertical': 1, 'horizontal_x': 2, 'channel': 3},
+                         mode='linear_ramp',
+                         end_values = {'vertical': 1, 'horizontal_x': 2, 'channel': 3})
+        resizer.input = image
+        image_resized = resizer.process()
+        
+        print(image_resized.geometry)
+        
+        numpy.testing.assert_array_equal(image_resized.as_array(), numpy.pad(image.as_array(), ((3,3),(1,1),(0,0),(2,2)), mode ='linear_ramp', end_values=((3,3),(1,1),(0,0),(2,2))))
+        self.assertTrue(image.geometry.channels+6 == image_resized.geometry.channels)
+        self.assertTrue(image.geometry.voxel_num_x+4 == image_resized.geometry.voxel_num_x)
+        self.assertTrue(image.geometry.voxel_num_y == image_resized.geometry.voxel_num_y)
+        self.assertTrue(image.geometry.voxel_num_z+2 == image_resized.geometry.voxel_num_z)
+        self.assertTrue(image.geometry.voxel_size_x == image_resized.geometry.voxel_size_x)
+        self.assertTrue(image.geometry.voxel_size_y == image_resized.geometry.voxel_size_y)
+        self.assertTrue(image.geometry.voxel_size_z == image_resized.geometry.voxel_size_z)
+    
         
     def test_Normalizer(self):
         pass         

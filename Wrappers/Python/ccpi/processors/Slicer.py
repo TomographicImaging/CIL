@@ -115,10 +115,8 @@ class Slicer(DataProcessor):
         
         data_resized = data.as_array()[tuple(sliceobj)]
         
-        out = type(data)(array = data_resized, 
-                         deep_copy = False,
-                         dimension_labels = data.dimension_labels,
-                         geometry = geometry)
+        out = geometry.allocate()
+        out.fill(data_resized)
         
         return out
 

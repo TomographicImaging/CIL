@@ -142,10 +142,8 @@ class Binner(DataProcessor):
                                            roi[2][0]:(roi[2][0] + n_pix_2 * roi[2][2]), 
                                            roi[3][0]:(roi[3][0] + n_pix_3 * roi[3][2])].reshape(shape).mean(-1).mean(1).mean(2).mean(3)
 
-        out = type(data)(array = data_resized, 
-                         deep_copy = False,
-                         dimension_labels = data.dimension_labels,
-                         geometry = geometry)
+        out = geometry.allocate()
+        out.fill(data_resized)
         
         return out
 

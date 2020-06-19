@@ -28,7 +28,7 @@ from ccpi.optimisation.operators import Gradient
 from ccpi.optimisation.functions import Function, KullbackLeibler, WeightedL2NormSquared, L2NormSquared,\
                                          L1Norm, MixedL21Norm, LeastSquares, \
                                          ZeroFunction, FunctionOperatorComposition,\
-                                         Rosenbrock, IndicatorBox, FGP_TV                                     
+                                         Rosenbrock, IndicatorBox, TotalVariation                                     
 
 import unittest
 import numpy
@@ -905,7 +905,7 @@ class TestFunction(unittest.TestCase):
         f4 = -2 * f2
         assert f4.L == 2 * f2.L
 
-    def test_FGP_TV(self):
+    def test_TotalVariation(self):
         if has_reg_toolkit:
             print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV no tolerance (2D)")
     
@@ -923,7 +923,7 @@ class TestFunction(unittest.TestCase):
             iters = 1000
                 
             # CIL_FGP_TV no tolerance
-            g_CIL = FGP_TV(alpha, iters, tolerance=None, lower = 0, info = True)
+            g_CIL = TotalVariation(alpha, iters, tolerance=None, lower = 0, info = True)
             t0 = timer()
             res1 = g_CIL.proximal(noisy_data, 1.)
             t1 = timer()
@@ -954,7 +954,7 @@ class TestFunction(unittest.TestCase):
             print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV with iterations.")
             iters = 408
             # CIL_FGP_TV no tolerance
-            g_CIL = FGP_TV(alpha, iters, tolerance=1e-9, lower = 0.)
+            g_CIL = TotalVariation(alpha, iters, tolerance=1e-9, lower = 0.)
             t0 = timer()
             res1 = g_CIL.proximal(noisy_data, 1.)
             t1 = timer()
@@ -1007,8 +1007,9 @@ class TestFunction(unittest.TestCase):
                 iters = 1000
                 
                 print("Use tau as an array of ones")
-                # CIL_FGP_TV no tolerance
-                g_CIL = FGP_TV(alpha, iters, tolerance=None, info=True)
+                # CIL_TotalVariation no tolerance
+                g_CIL = TotalVariation(alpha, iters, tolerance=None, info=True)
+                res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
                 t0 = timer()   
                 res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
                 t1 = timer()
@@ -1088,7 +1089,7 @@ class TestFunction(unittest.TestCase):
             iters = 1000
             
             # CIL_FGP_TV no tolerance
-            g_CIL = FGP_TV(alpha, iters, tolerance=None)
+            g_CIL = TotalVariation(alpha, iters, tolerance=None)
             t0 = timer()
             res1 = g_CIL.proximal(noisy_data, 1.)
             t1 = timer()

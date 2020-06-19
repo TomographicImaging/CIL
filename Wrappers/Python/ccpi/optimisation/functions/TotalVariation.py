@@ -24,10 +24,12 @@ from ccpi.optimisation.functions import Function, MixedL21Norm, IndicatorBox
 from ccpi.optimisation.operators import Gradient
 import numpy 
 import functools
+import numpy as np
+from numbers import Number
 
 
 
-class FGP_TV(Function):
+class TotalVariation(Function):
     
     r'''Fast Gradient Projection algorithm for Total Variation(TV) Denoising (ROF problem)
     
@@ -60,7 +62,7 @@ class FGP_TV(Function):
                  info = False):
         
 
-        super(FGP_TV, self).__init__(L = None)
+        super(TotalVariation, self).__init__(L = None)
         # Regularising parameter = alpha
         self.regularising_parameter = regularising_parameter
         
@@ -86,6 +88,9 @@ class FGP_TV(Function):
         # self.Lipschitz = (1./self.gradient.norm())**2   
         self._gradient = None
         self._domain = None
+
+        self.pptmp = None
+        self.pptmp1 = None
         
         # Print stopping information (iterations and tolerance error) of FGP_TV  
         self.info = info
@@ -113,14 +118,27 @@ class FGP_TV(Function):
         r''' Returns the projection P onto \|\cdot\|_{\infty} '''  
         self._domain = x.geometry
         
-        res1 = functools.reduce(lambda a,b: a + b*b, x.containers, x.get_item(0) * 0 )
-        res1.sqrt(out=res1)	
-        res1.maximum(1.0, out=res1)	    
+        # res1 = functools.reduce(lambda a,b: a + b*b, x.containers, x.get_item(0) * 0 )
+        # res1.sqrt(out=res1)	
+        # res1.maximum(1.0, out=res1)	    
+        # print (type(res1))
+        # tmp = x.get_item(0) * 0
+        # tmp1 = tmp.copy()
+        # preallocated in proximal
+        tmp = self.pptmp
+        tmp1 = self.pptmp1
+        tmp1 *= 0
+        
 
+        for i,el in enumerate(x.containers):
+            el.multiply(el, out=tmp)
+            tmp1.add(tmp, out=tmp1)
+        tmp1.sqrt(out=tmp1)
+        tmp1.maximum(1.0, out=tmp1)
         if out is None:
-            return x.divide(res1)
+            return x.divide(tmp1)
         else:
-            x.divide(res1, out=out)
+            x.divide(tmp1, out=out)
     
     
     def proximal(self, x, tau, out = None):
@@ -136,39 +154,70 @@ class FGP_TV(Function):
         
         # initialise
         t = 1        
-        tmp_p = self.gradient.range_geometry().allocate()  
+        tmp_p = self.gradient.range_geometry().allocate(0)  
         tmp_q = tmp_p.copy()
-        tmp_x = self.gradient.domain_geometry().allocate()     
-        p1 = tmp_p.copy()
+        tmp_x = self.gradient.domain_geometry().allocate(None)     
+        p1 = self.gradient.range_geometry().allocate(None)
+        
 
+        should_break = False
         for k in range(self.inner_iterations):
                                                                                    
             t0 = t
             self.gradient.adjoint(tmp_q, out = tmp_x)
             
             # this can be replaced by axpby
-            tmp_x *= -self.regularising_parameter
-            tmp_x *= tau
-            tmp_x += x
+            if isinstance (tau, (Number, np.float32, np.float64)):
+                tmp_x.axpby(-self.regularising_parameter, tau, x, out=tmp_x)
+            else:
+                tmp_x *= -self.regularising_parameter
+                tmp_x *= tau
+                tmp_x += x
             self.projection_C(tmp_x, out = tmp_x)                       
 
             self.gradient.direct(tmp_x, out=p1)
-            p1 *= self.L
-            p1 /= self.regularising_parameter
-            p1 /= tau
-            p1 += tmp_q
-            self.projection_P(p1, out=p1)
-            
+            if isinstance (tau, (Number, np.float32, np.float64)):
+                p1 *= self.L/(self.regularising_parameter * tau)
+            else:
+                p1 *= self.L/self.regularising_parameter
+                p1 /= tau
+
             if self.tolerance is not None:
                 
                 if k%5==0:
-                    error = (p1-tmp_q).norm()/p1.norm()            
+                    error = p1.norm()
+                    p1 += tmp_q
+                    error /= p1.norm()
                     if error<=self.tolerance:                           
-                        break
+                        should_break = True
+                else:
+                    p1 += tmp_q
+            else:
+                p1 += tmp_q
+            if k == 0:
+                # preallocate for projection_P
+                self.pptmp = p1.get_item(0) * 0
+                self.pptmp1 = self.pptmp.copy()
 
-            t = (1 + numpy.sqrt(1 + 4 * t0 ** 2)) / 2                                                                                                                                             
-            tmp_q.fill(p1 + (t0 - 1) / t * (p1 - tmp_p))                                      
-            tmp_p.fill(p1)             
+            self.projection_P(p1, out=p1)
+            
+            
+
+            t = (1 + numpy.sqrt(1 + 4 * t0 ** 2)) / 2
+            
+            #tmp_q.fill(p1 + (t0 - 1) / t * (p1 - tmp_p))
+            p1.subtract(tmp_p, out=tmp_q)
+            tmp_q *= (t0-1)/t
+            tmp_q += p1
+            
+            tmp_p.fill(p1)
+
+            if should_break:
+                break
+        
+        #clear preallocated projection_P arrays
+        self.pptmp = None
+        self.pptmp1 = None
         
         # Print stopping information (iterations and tolerance error) of FGP_TV     
         if self.info:
@@ -178,12 +227,18 @@ class FGP_TV(Function):
                 print("Stop at {} iterations.".format(k))                
             
         if out is None:                        
-            return self.projection_C(x - self.regularising_parameter*tau*self.gradient.adjoint(tmp_q))
+            #return self.projection_C(x - self.regularising_parameter*tau*self.gradient.adjoint(tmp_q))
+            self.gradient.adjoint(tmp_q, out=tmp_x)
+            tmp_x *= tau
+            tmp_x *= self.regularising_parameter 
+            x.subtract(tmp_x, out=tmp_x)
+            return self.projection_C(tmp_x)
         else:          
             self.gradient.adjoint(tmp_q, out = out)
             out*=tau
-            out*=-self.regularising_parameter
-            out+=x
+            out*=self.regularising_parameter
+            #out+=x
+            x.subtract(out, out=out)
             self.projection_C(out, out=out)
     
     def convex_conjugate(self,x):        
@@ -260,13 +315,13 @@ if __name__ == '__main__':
     plt.imshow(noisy_data.as_array())
     plt.title('Noisy Data')
     plt.colorbar()
-    plt.show()
+    #plt.show()
     
     alpha = 0.1
     iters = 1000
         
     # CIL_FGP_TV no tolerance
-    g_CIL = FGP_TV(alpha, iters, tolerance=None, lower = 0, info = True)
+    g_CIL = TotalVariation(alpha, iters, tolerance=None, lower = 0, info = True)
     t0 = timer()
     res1 = g_CIL.proximal(noisy_data, 1.)
     t1 = timer()
@@ -289,7 +344,7 @@ if __name__ == '__main__':
     t2 = timer()
     res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
     t3 = timer()
-    print(t3-t1)
+    print(t3-t2)
     
     plt.figure()
     plt.imshow(res2.as_array())
@@ -312,7 +367,7 @@ if __name__ == '__main__':
     print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV with iterations.")
     iters = 408
     # CIL_FGP_TV no tolerance
-    g_CIL = FGP_TV(alpha, iters, tolerance=1e-9, lower = 0.)
+    g_CIL = TotalVariation(alpha, iters, tolerance=1e-9, lower = 0.)
     t0 = timer()
     res1 = g_CIL.proximal(noisy_data, 1.)
     t1 = timer()
@@ -338,7 +393,7 @@ if __name__ == '__main__':
     plt.title("Difference CIL_FGP_TV vs CCPi_FGP_TV")
     plt.show()          
     
-    print(mae(res1, res2))
+    print("MAE" , mae(res1, res2))
     np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal=3)    
     
     ###################################################################
@@ -381,7 +436,7 @@ if __name__ == '__main__':
     
     print("Use tau as an array of ones")
     # CIL_FGP_TV no tolerance
-    g_CIL = FGP_TV(alpha, iters, tolerance=None, info=True)
+    g_CIL = TotalVariation(alpha, iters, tolerance=None, info=True)
     t0 = timer()   
     res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
     t1 = timer()
@@ -481,7 +536,7 @@ if __name__ == '__main__':
     iters = 1000
     
     # CIL_FGP_TV no tolerance
-    g_CIL = FGP_TV(alpha, iters, tolerance=None)
+    g_CIL = TotalVariation(alpha, iters, tolerance=None)
     t0 = timer()
     res1 = g_CIL.proximal(noisy_data, 1.)
     t1 = timer()

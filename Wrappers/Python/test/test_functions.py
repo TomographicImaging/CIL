@@ -28,7 +28,7 @@ from ccpi.optimisation.operators import Gradient
 from ccpi.optimisation.functions import Function, KullbackLeibler, WeightedL2NormSquared, L2NormSquared,\
                                          L1Norm, MixedL21Norm, LeastSquares, \
                                          ZeroFunction, FunctionOperatorComposition,\
-                                         Rosenbrock, IndicatorBox                                     
+                                         Rosenbrock, IndicatorBox, FGP_TV                                     
 
 import unittest
 import numpy
@@ -38,6 +38,25 @@ from ccpi.framework import ImageGeometry
 from ccpi.optimisation.functions import TranslateFunction
 from timeit import default_timer as timer
 
+import numpy as np                         
+from ccpi.framework import TestData
+import os
+import sys
+try:
+    from ccpi.plugins.regularisers import FGP_TV as CCPiReg_FGP_TV
+    from ccpi.filters import regularisers    
+    has_reg_toolkit = True
+except ImportError as ie:
+    has_reg_toolkit = False
+from timeit import default_timer as timer       
+try:
+    import tomophantom
+    from tomophantom import TomoP3D
+    has_tomophantom = True
+except ImportError as ie:
+    has_tomophantom = False
+
+from ccpi.utilities.quality_measures import mae
 
                     
 class TestFunction(unittest.TestCase):
@@ -885,7 +904,210 @@ class TestFunction(unittest.TestCase):
 
         f4 = -2 * f2
         assert f4.L == 2 * f2.L
-        
+
+    def test_FGP_TV(self):
+        if has_reg_toolkit:
+            print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV no tolerance (2D)")
+    
+            loader = TestData()
+            data = loader.load(TestData.SHAPES)
+            ig = data.geometry
+            ag = ig
+
+            # Create noisy data. 
+            n1 = np.random.normal(0, 0.1, size = ig.shape)
+            noisy_data = ig.allocate()
+            noisy_data.fill(n1+data.as_array())
+            
+            alpha = 0.1
+            iters = 1000
+                
+            # CIL_FGP_TV no tolerance
+            g_CIL = FGP_TV(alpha, iters, tolerance=None, lower = 0, info = True)
+            t0 = timer()
+            res1 = g_CIL.proximal(noisy_data, 1.)
+            t1 = timer()
+            print(t1-t0)
+            
+            # CCPi Regularisation toolkit high tolerance
+            r_alpha = alpha
+            r_iterations = iters
+            r_tolerance = 1e-9
+            r_iso = 0
+            r_nonneg = 1
+            r_printing = 0
+            g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'cpu')
+            
+            t2 = timer()
+            res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
+            t3 = timer()
+            print(t3-t1)
+            
+            
+            np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal = 4)
+            
+            ###################################################################
+            ###################################################################
+            ###################################################################
+            ###################################################################    
+            
+            print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV with iterations.")
+            iters = 408
+            # CIL_FGP_TV no tolerance
+            g_CIL = FGP_TV(alpha, iters, tolerance=1e-9, lower = 0.)
+            t0 = timer()
+            res1 = g_CIL.proximal(noisy_data, 1.)
+            t1 = timer()
+            print(t1-t0)
+            
+            # CCPi Regularisation toolkit high tolerance
+            r_alpha = alpha
+            r_iterations = iters
+            r_tolerance = 1e-9
+            r_iso = 0
+            r_nonneg = 1
+            r_printing = 0
+            g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'cpu')
+
+            t2 = timer()
+            res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
+            t3 = timer()
+            print(t3-t2)
+            
+            
+            print(mae(res1, res2))
+            np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal=3)    
+            
+            ###################################################################
+            ###################################################################
+            ###################################################################
+            ###################################################################
+            if has_tomophantom:
+                print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV no tolerance (3D)") 
+                    
+                print ("Building 3D phantom using TomoPhantom software")
+                model = 13 # select a model number from the library
+                N_size = 64 # Define phantom dimensions using a scalar value (cubic phantom)
+                path = os.path.dirname(tomophantom.__file__)
+                path_library3D = os.path.join(path, "Phantom3DLibrary.dat")
+                #This will generate a N_size x N_size x N_size phantom (3D)
+                phantom_tm = TomoP3D.Model(model, N_size, path_library3D)    
+                
+                ig = ImageGeometry(N_size, N_size, N_size)
+                data = ig.allocate()
+                data.fill(phantom_tm)
+                    
+                n1 = TestData.random_noise(data.as_array(), mode = 'gaussian', seed = 10)
+
+                noisy_data = ig.allocate()
+                noisy_data.fill(n1)    
+                
+                
+                alpha = 0.1
+                iters = 1000
+                
+                print("Use tau as an array of ones")
+                # CIL_FGP_TV no tolerance
+                g_CIL = FGP_TV(alpha, iters, tolerance=None, info=True)
+                t0 = timer()   
+                res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
+                t1 = timer()
+                print(t1-t0)
+
+                # CCPi Regularisation toolkit high tolerance
+                r_alpha = alpha
+                r_iterations = iters
+                r_tolerance = 1e-9
+                r_iso = 0
+                r_nonneg = 0
+                r_printing = 0
+                g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'cpu')
+
+                t2 = timer()
+                res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
+                t3 = timer()
+                print (t3-t2)
+                np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal=3)
+
+                
+                
+                # CIL_FGP_TV no tolerance
+                #g_CIL = FGP_TV(ig, alpha, iters, tolerance=None, info=True)
+                g_CIL.tolerance = None
+                t0 = timer()
+                res1 = g_CIL.proximal(noisy_data, 1.)
+                t1 = timer()
+                print(t1-t0)
+            
+            ###################################################################
+            ###################################################################
+            ###################################################################
+            ###################################################################     
+        #     print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV with tolerance. There is a problem with this line https://github.com/vais-ral/CCPi-Regularisation-Toolkit/blob/master/src/Core/regularisers_GPU/TV_FGP_GPU_core.cu#L456")
+            
+        #     g_CIL = FGP_TV(ig, alpha, iters, tolerance=1e-3, lower = 0)
+        #     res1 = g_CIL.proximal(noisy_data, 1.)
+
+        #     plt.imshow(res1.as_array())
+        #     plt.colorbar()
+        #     plt.show()
+            
+        #     r_alpha = alpha
+        #     r_iterations = iters
+        #     r_tolerance = 1e-3
+        #     r_iso = 0
+        #     r_nonneg = 1
+        #     r_printing = 0
+        #     g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'gpu')
+
+        #     res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
+        #     plt.imshow(res2.as_array())
+        #     plt.colorbar()
+        #     plt.show()
+
+        #     plt.imshow(np.abs(res1.as_array()-res2.as_array()))
+        #     plt.colorbar()
+        #     plt.title("Difference CIL_FGP_TV vs CCPi_FGP_TV")
+        #     plt.show() 
+            
+        #     if mae(res1, res2)>1e-5:
+        #         raise ValueError ("2 solutions are not the same")      
+                    
+            
+            loader = TestData()
+            data = loader.load(TestData.PEPPERS, size=(256,256))
+            ig = data.geometry
+            ag = ig
+
+            n1 = TestData.random_noise(data.as_array(), mode = 'gaussian', seed = 10)
+
+            noisy_data = ig.allocate()
+            noisy_data.fill(n1)    
+                        
+            alpha = 0.1
+            iters = 1000
+            
+            # CIL_FGP_TV no tolerance
+            g_CIL = FGP_TV(alpha, iters, tolerance=None)
+            t0 = timer()
+            res1 = g_CIL.proximal(noisy_data, 1.)
+            t1 = timer()
+            print(t1-t0)
+
+            # CCPi Regularisation toolkit high tolerance
+            r_alpha = alpha
+            r_iterations = iters
+            r_tolerance = 1e-8
+            r_iso = 0
+            r_nonneg = 0
+            r_printing = 0
+            g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'cpu')
+            
+            t2 = timer()
+            res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
+            t3 = timer()
+            print (t3-t2)
+
 
 
 

@@ -224,12 +224,12 @@ class Padder(DataProcessor):
                                                      end_values=end_values[idx])
                         elif self.mode in ['reflect', 'symmetric']:
                             geometry.angles = np.pad(geometry_0.angles, 
-                                                     pad_param, 
+                                                     tuple(pad_param[idx]), 
                                                      mode=self.mode,
                                                      reflect_type=self.reflect_type)
                         else:
                             geometry.angles = np.pad(geometry_0.angles, 
-                                                     pad_param, 
+                                                     tuple(pad_param[idx]), 
                                                      mode=self.mode)
 
         pad_param = tuple(pad_param)

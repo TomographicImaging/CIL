@@ -17,7 +17,7 @@
 #   limitations under the License.
 
 from .Algorithm import Algorithm
-from .CGLS import CGLS
+from .CGLS import CGLS, RCGLS
 from .SIRT import SIRT
 from .GradientDescent import GradientDescent
 from .FISTA import FISTA

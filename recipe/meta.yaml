@@ -43,6 +43,7 @@ requirements:
     - pillow
     - libgcc-ng # [linux]
     - openmp # [osx]
+    - psutil
   
 about:
   home: http://www.ccpi.ac.uk

@@ -48,7 +48,7 @@ class NEXUSDataWriter(object):
                file_name = None):
         
         self.data_container = data_container
-        self.file_name = file_name
+        self.file_name = os.path.abspath(file_name)
         
         if not ((isinstance(self.data_container, ImageData)) or 
                 (isinstance(self.data_container, AcquisitionData))):
@@ -82,8 +82,8 @@ class NEXUSDataWriter(object):
             
             # create dataset to store data
             ds_data = f.create_dataset('entry1/tomo_entry/data/data', 
-                                       (self.data_container.as_array().shape), 
-                                       dtype = 'float32', 
+                                       (self.data_container.shape), 
+                                       dtype = self.data_container.dtype, 
                                        data = self.data_container.as_array())
             
             # set up dataset attributes
@@ -112,7 +112,7 @@ class NEXUSDataWriter(object):
                 # create the dataset to store rotation angles
                 ds_angles = f.create_dataset('entry1/tomo_entry/data/rotation_angle', 
                                              (self.data_container.geometry.angles.shape), 
-                                             dtype = 'float32', 
+                                             dtype = self.data_container.geometry.angles.dtype, 
                                              data = self.data_container.geometry.angles)
                 
                 #ds_angles.attrs['units'] = self.data_container.geometry.angle_unit

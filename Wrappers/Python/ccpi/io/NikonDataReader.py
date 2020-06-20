@@ -37,17 +37,20 @@ class NikonDataReader(object):
             
             xtek_file       full path to .xtexct file
             
-            roi             region-of-interest to load. 
-                            If roi = {'horizontal': -1, 'vertical': -1} (default), 
-                            full projections will be loaded. Otherwise roi is 
-                            given by {'horizontal': (column0, column1), 'vertical': (row0, row1)}
-                            where row0, column0 are coordinates of top left corner and 
-                            row1, column1 are coordinates of bottom right corner.
-                            
-            binning         number of pixels to bin (combine) along corresponsing lables. 
-                            If binning = {'horizontal': 1, 'vertical': 1} (default),
-                            projections in original resolution are loaded. Note, 
-                            anisotropic pixels are currently not supported by Framework
+            roi             roi to load specified as a dictionary
+                            {'angle': (start, end, step), 
+                             'horizontal': (start, end, step), 
+                             'vertical': (start, end, step)}
+                            Files are stacked along axis_0. axis_1 and axis_2 correspond
+                            to row and column dimensions, respectively.
+                            Files are stacked in alphabetic order. 
+                            To skip files or to change number of files to load, 
+                            adjust 'angle'. For instance, 'angle': (100, 300)
+                            will skip first 100 files and will load 200 files.
+                            'angle': -1 is a shortcut to load all elements along axis.
+                            Start and end can be specified as None which is equivalent 
+                            to start = 0 and end = load everything to the end, respectively.
+                            Start and end also can be negative.
             
             normalize       normalize loaded projections by detector 
                             white level (I_0). Default value is False, 
@@ -55,33 +58,40 @@ class NikonDataReader(object):
                             
             fliplr          default = False, flip projections in the left-right direction
                             (about vertical axis)
+                            
+            mode            'bin' (default) or 'slice'. In bin mode, 'step' number
+                            of pixels is binned together, values of resulting binned
+                            pixels are calculated as average. 
+                            In 'slice' mode 'step' defines standard numpy slicing.
+                            Note: in general 
+                            output array size in bin mode != output array size in slice mode
                     
         '''
         
         self.xtek_file = kwargs.get('xtek_file', None)
-        self.roi = kwargs.get('roi', {'horizontal': -1, 'vertical': -1})
-        self.binning = kwargs.get('binning', {'horizontal': 1, 'vertical': 1})
+        self.roi = kwargs.get('roi', {'angle': -1, 'horizontal': -1, 'vertical': -1})
         self.normalize = kwargs.get('normalize', False)
+        self.mode = kwargs.get('mode', 'bin')
         self.fliplr = kwargs.get('fliplr', False)
         
         if self.xtek_file is not None:
             self.set_up(xtek_file = self.xtek_file,
                         roi = self.roi,
-                        binning = self.binning,
                         normalize = self.normalize,
+                        mode = self.mode,
                         fliplr = self.fliplr)
             
     def set_up(self, 
                xtek_file = None, 
-               roi = {'horizontal': -1, 'vertical': -1}, 
-               binning = {'horizontal': 1, 'vertical': 1},
+               roi = {'angle': -1, 'horizontal': -1, 'vertical': -1},
                normalize = False,
+               mode = 'bin',
                fliplr = False):
         
         self.xtek_file = xtek_file
         self.roi = roi
-        self.binning = binning
         self.normalize = normalize
+        self.mode = mode
         self.fliplr = fliplr
         
         if self.xtek_file == None:
@@ -91,17 +101,16 @@ class NikonDataReader(object):
         if not(os.path.isfile(self.xtek_file)):
             raise Exception('File\n {}\n does not exist.'.format(self.xtek_file))  
                 
-        # check labels
-        for key in self.binning.keys():
-            if key not in ['horizontal', 'vertical']:
-                raise Exception("Wrong label. horizontal and/or vertical are expected")
-        
+        # check labels     
         for key in self.roi.keys():
-            if key not in ['horizontal', 'vertical']:
-                raise Exception("Wrong label. horizontal and/or vertical are expected")
+            if key not in ['angle', 'horizontal', 'vertical']:
+                raise Exception("Wrong label. One of ollowing is expected: angle, horizontal, vertical")
         
         roi = self.roi.copy()
         
+        if 'angle' not in roi.keys():
+            roi['angle'] = -1
+            
         if 'horizontal' not in roi.keys():
             roi['horizontal'] = -1
         
@@ -171,12 +180,18 @@ class NikonDataReader(object):
                             self._roi_par[idx][2] = roi[key][2] 
                         else:
                             raise Exception("Negative step is not allowed")
-                
-        # calculate number of pixels and pixel size
-        pixel_num_v = (self._roi_par[1][1] - self._roi_par[1][0]) // self._roi_par[1][2]
-        pixel_num_h = (self._roi_par[2][1] - self._roi_par[2][0]) // self._roi_par[2][2]
-        pixel_size_v = pixel_size_v_0 * self._roi_par[1][2]
-        pixel_size_h = pixel_size_h_0 * self._roi_par[2][2]
+        
+        if self.mode == 'bin':
+            # calculate number of pixels and pixel size
+            pixel_num_v = (self._roi_par[1][1] - self._roi_par[1][0]) // self._roi_par[1][2]
+            pixel_num_h = (self._roi_par[2][1] - self._roi_par[2][0]) // self._roi_par[2][2]
+            pixel_size_v = pixel_size_v_0 * self._roi_par[1][2]
+            pixel_size_h = pixel_size_h_0 * self._roi_par[2][2]
+        else: # slice
+            pixel_num_v = numpy.int(numpy.ceil((self._roi_par[1][1] - self._roi_par[1][0]) / self._roi_par[1][2]))
+            pixel_num_h = numpy.int(numpy.ceil((self._roi_par[2][1] - self._roi_par[2][0]) / self._roi_par[2][2]))
+            pixel_size_v = pixel_size_v_0
+            pixel_size_h = pixel_size_h_0
         
         '''
         Parse the angles file .ang or _ctdata.txt file and returns the angles
@@ -215,9 +230,12 @@ class NikonDataReader(object):
         else:   # calculate angles based on xtek file
             angles = numpy.asarray( [ initial_angle + angular_step * proj for proj in range(num_projections) ] , dtype=numpy.float32)
         
-        n_pix_0 = (self._roi_par[0][1] - self._roi_par[0][0]) // self._roi_par[0][2]
-        shape = (n_pix_0, self._roi_par[0][2])
-        angles = angles[self._roi_par[0][0]:(self._roi_par[0][0] + n_pix_0 * self._roi_par[0][2])].reshape(shape).mean(1)
+        if self.mode == 'bin':
+            n_elem = (self._roi_par[0][1] - self._roi_par[0][0]) // self._roi_par[0][2]
+            shape = (n_elem, self._roi_par[0][2])
+            angles = angles[self._roi_par[0][0]:(self._roi_par[0][0] + n_elem * self._roi_par[0][2])].reshape(shape).mean(1)
+        else:
+            angles = angles[slice(self._roi_par[0][0], self._roi_par[0][1], self._roi_par[0][2])]
         
         # fill in metadata
         self._ag = AcquisitionGeometry(geom_type = 'cone', 
@@ -254,7 +272,8 @@ class NikonDataReader(object):
         reader.set_up(path = path_projection,
                       roi = {'axis_0': tuple(self._roi_par[0]), 
                              'axis_1': tuple(self._roi_par[1]),
-                             'axis_2': tuple(self._roi_par[2])})
+                             'axis_2': tuple(self._roi_par[2])},
+                      mode = self.mode)
 
         data = reader.load_images()
 

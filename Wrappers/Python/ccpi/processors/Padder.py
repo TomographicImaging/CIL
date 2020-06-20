@@ -75,6 +75,18 @@ class Padder(DataProcessor):
         geometry_0 = data.geometry
         geometry = geometry_0.clone()
         
+        if self.mode not in ['maximum', 'minimum', 'median', 'mean'] and self.stat_length != None:
+            warnings.warn('Parameter stat_length is used only in maximum, minimum, median, mean modes. Will be ignored.',
+              UserWarning)
+        
+        if self.mode != 'constant' and self.constant_values != None:
+            warnings.warn('Parameter constant_values is used only in constant mode. Will be ignored.',
+              UserWarning)
+        
+        if self.mode != 'linear_ramp' and self.cend_values != None:
+            warnings.warn('Parameter end values is used only in linear_ramp mode. Will be ignored.',
+              UserWarning)
+        
         if self.pad_width != None:
             if isinstance(self.pad_width, dict):
                 for key in self.pad_width.keys():
@@ -97,10 +109,10 @@ class Padder(DataProcessor):
             if isinstance(self.end_values, dict):
                 for key in self.end_values.keys():
                     if key not in data.dimension_labels.values():
-                        raise Exception('Wrong label is specified for end_values') 
+                        raise ValueError('Wrong label is specified for end_values') 
         
         if self.reflect_type not in ['even', 'odd']:
-            raise Exception('Wrong reflect_type, even or odd is expected')
+            raise ValueError('Wrong reflect_type, even or odd is expected')
         
         if self.constant_values != None and not(isinstance(self.constant_values, int) or isinstance(self.constant_values, tuple)):
             constant_values = []
@@ -117,7 +129,7 @@ class Padder(DataProcessor):
                             tmp[i] = self.constant_values[key][i]
                     constant_values[idx] = tuple(tmp)
                 else:
-                    raise Exception('Wrong constant_values parameter is specified. Excpected int or tuple(int,int)')
+                    raise ValueError('Wrong constant_values parameter is specified. Excpected int or tuple(int,int)')
             constant_values = tuple(constant_values)
         else:
             constant_values = self.constant_values
@@ -137,7 +149,7 @@ class Padder(DataProcessor):
                             tmp[i] = self.end_values[key][i]
                     end_values[idx] = tuple(tmp)
                 else:
-                    raise Exception('Wrong end_values parameter is specified. Excpected int or tuple(int,int)')
+                    raise ValueError('Wrong end_values parameter is specified. Excpected int or tuple(int,int)')
             end_values = tuple(end_values)
         else:
             end_values = self.end_values
@@ -157,7 +169,7 @@ class Padder(DataProcessor):
                             tmp[i] = self.stat_length[key][i]
                     stat_length[idx] = tuple(tmp)
                 else:
-                    raise Exception('Wrong pad_width parameter is specified. Excpected int or tuple(int,int)')
+                    raise ValueError('Wrong pad_width parameter is specified. Excpected int or tuple(int,int)')
             stat_length = tuple(stat_length)
         else:
             stat_length = self.stat_length
@@ -207,44 +219,44 @@ class Padder(DataProcessor):
                     elif key == 'vertical':
                         geometry.pixel_num_v += pad_param[idx][0]+pad_param[idx][1]
                     elif key == 'angle':
-                        if self.mode in ['maximum', 'minimum', 'median', 'mean'] and stat_length is not None:
+                        if self.mode in ['maximum', 'minimum', 'median', 'mean'] and stat_length != None:
                             geometry.angles = np.pad(geometry_0.angles, 
-                                                      tuple(pad_param[idx]), 
-                                                      mode=self.mode,
-                                                      stat_length=stat_length[idx])
-                        elif self.mode == 'constant' and constant_values is not None:
+                                                     pad_param[idx],
+                                                     mode=self.mode,
+                                                     stat_length=stat_length[idx])
+                        elif self.mode == 'constant' and constant_values != None:
                             geometry.angles = np.pad(geometry_0.angles, 
-                                                     tuple(pad_param[idx]), 
+                                                     pad_param[idx], 
                                                      mode=self.mode,
                                                      constant_values=constant_values[idx])
-                        elif self.mode == 'linear_ramp' and end_values is not None:
+                        elif self.mode == 'linear_ramp' and end_values != None:
                             geometry.angles = np.pad(geometry_0.angles, 
-                                                     tuple(pad_param[idx]), 
+                                                     pad_param[idx], 
                                                      mode=self.mode,
                                                      end_values=end_values[idx])
                         elif self.mode in ['reflect', 'symmetric']:
                             geometry.angles = np.pad(geometry_0.angles, 
-                                                     tuple(pad_param[idx]), 
+                                                     pad_param[idx], 
                                                      mode=self.mode,
                                                      reflect_type=self.reflect_type)
                         else:
                             geometry.angles = np.pad(geometry_0.angles, 
-                                                     tuple(pad_param[idx]), 
+                                                     pad_param[idx], 
                                                      mode=self.mode)
 
         pad_param = tuple(pad_param)
         
-        if self.mode in ['maximum', 'minimum', 'median', 'mean'] and stat_length is not None:
+        if self.mode in ['maximum', 'minimum', 'median', 'mean'] and stat_length != None:
             data_resized = np.pad(data.as_array(), 
                                   pad_param, 
                                   mode=self.mode,
                                   stat_length=stat_length)
-        elif self.mode == 'constant' and constant_values is not None:
+        elif self.mode == 'constant' and constant_values != None:
             data_resized = np.pad(data.as_array(), 
                                   pad_param, 
                                   mode=self.mode,
                                   constant_values=constant_values)
-        elif self.mode == 'linear_ramp' and end_values is not None:
+        elif self.mode == 'linear_ramp' and end_values != None:
             data_resized = np.pad(data.as_array(), 
                                   pad_param, 
                                   mode=self.mode,

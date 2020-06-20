@@ -46,10 +46,10 @@ class Slicer(DataProcessor):
         
         if not ((isinstance(data, ImageData)) or 
                 (isinstance(data, AcquisitionData))):
-            raise Exception('Processor supports only following data types:\n' +
+            raise ValueError('Processor supports only following data types:\n' +
                             ' - ImageData\n - AcquisitionData')
         elif (data.geometry == None):
-            raise Exception('Geometry is not defined.')
+            raise ValueError('Geometry is not defined.')
         else:
             return True 
     
@@ -64,13 +64,13 @@ class Slicer(DataProcessor):
         if self.roi != None:
             for key in self.roi.keys():
                 if key not in data.dimension_labels.values():
-                    raise Exception('Wrong label is specified for roi')
+                    raise ValueError('Wrong label is specified for roi')
         
         roi = []
+        sliceobj = []
         for i in range(ndim):
             roi.append([0, data.shape[i], 1])
-        
-        sliceobj = [slice(None, None, None)]*ndim
+            sliceobj.append(slice(None, None, None))
             
         if self.roi != None:
             for key in self.roi.keys():
@@ -87,7 +87,7 @@ class Slicer(DataProcessor):
                             if self.roi[key][2] > 0:
                                 roi[idx][2] = self.roi[key][2]
                             else:
-                                raise Exception("Negative step is not allowed")
+                                raise ValueError("Negative step is not allowed")
                     sliceobj[idx] = slice(roi[idx][0], roi[idx][1], roi[idx][2])
                 if (isinstance(data, ImageData)):
                     if key == 'channel':

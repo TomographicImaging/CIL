@@ -63,7 +63,7 @@ class Binner(DataProcessor):
         if self.roi != None:
             for key in self.roi.keys():
                 if key not in data.dimension_labels.values():
-                    raise Exception('Wrong label is specified for roi')
+                    raise ValueError('Wrong label is specified for roi')
         
         roi = []
         for i in range(ndim):
@@ -84,7 +84,7 @@ class Binner(DataProcessor):
                             if self.roi[key][2] > 0:
                                 roi[idx][2] = self.roi[key][2]
                             else:
-                                raise Exception("Negative step is not allowed")
+                                raise ValueError("Negative step is not allowed")
                 if (isinstance(data, ImageData)):
                     if key == 'channel':
                         geometry.channels = (roi[idx][1] - roi[idx][0]) // roi[idx][2]

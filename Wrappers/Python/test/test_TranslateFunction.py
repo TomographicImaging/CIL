@@ -92,8 +92,8 @@ class TestFunction(unittest.TestCase):
         list1 = [ L2NormSquared(), scalar * L2NormSquared(), scalar * L2NormSquared(b=b), 
                  L1Norm(), scalar * L1Norm(), scalar * L1Norm(b=b)]
         
-        list1_shift = [ L2NormSquared().centered_at(ig.allocate()), scalar * L2NormSquared().centered_at(ig.allocate()), scalar * L2NormSquared().centered_at(b),
-                        L1Norm().centered_at(ig.allocate()), scalar * L1Norm().centered_at(ig.allocate()), scalar * L1Norm().centered_at(b)]        
+        list1_shift = [ L2NormSquared().centered_at(ig.allocate(0)), scalar * L2NormSquared().centered_at(ig.allocate(0)), scalar * L2NormSquared().centered_at(b),
+                        L1Norm().centered_at(ig.allocate(0)), scalar * L1Norm().centered_at(ig.allocate(0)), scalar * L1Norm().centered_at(b)]        
         
         out_gradient1 = ig.allocate()
         out_gradient2 = ig.allocate()

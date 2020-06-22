@@ -498,7 +498,7 @@ class TestDataContainer(unittest.TestCase):
         # create ImageData from geometry
         vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)
         #vol = ImageData(geometry=vgeometry)
-        vol = vgeometry.allocate()
+        vol = vgeometry.allocate(0)
         self.assertEqual(vol.shape, (2, 3, 4))
 
         vol1 = vol + 1
@@ -559,7 +559,7 @@ class TestDataContainer(unittest.TestCase):
 
     def test_ImageGeometry_allocate(self):
         vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)
-        image = vgeometry.allocate()
+        image = vgeometry.allocate(0)
         self.assertEqual(0,image.as_array()[0][0][0])
         image = vgeometry.allocate(1)
         self.assertEqual(1,image.as_array()[0][0][0])
@@ -683,7 +683,7 @@ class TestDataContainer(unittest.TestCase):
         
         self.assertListEqual(new_order,
                               vgeometry.dimension_labels)
-        vol = vgeometry.allocate()
+        vol = vgeometry.allocate(0)
 
         # test reshape
         new_order = [ 'channel', 'horizontal_x','horizontal_y']

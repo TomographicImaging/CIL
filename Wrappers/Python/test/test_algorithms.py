@@ -59,7 +59,7 @@ class TestAlgorithms(unittest.TestCase):
     def test_GradientDescent(self):
         print ("Test GradientDescent")
         ig = ImageGeometry(12,13,14)
-        x_init = ig.allocate()
+        x_init = ig.allocate(0)
         # b = x_init.copy()
         # fill with random numbers
         # b.fill(numpy.random.random(x_init.shape))

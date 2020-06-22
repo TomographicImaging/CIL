@@ -34,7 +34,7 @@ class TestNexusReaderWriter(unittest.TestCase):
         im_size = 5
         ig = ImageGeometry(voxel_num_x = im_size,
         		           voxel_num_y = im_size)
-        im = ig.allocate()
+        im = ig.allocate(0)
         writer = NEXUSDataWriter()
         writer.set_up(file_name = os.path.join(os.getcwd(), 'test_nexus_im.nxs'),
                       data_container = im)
@@ -79,7 +79,7 @@ class TestNexusReaderWriter(unittest.TestCase):
         im_size = 5
         ig_test = ImageGeometry(voxel_num_x = im_size,
                                 voxel_num_y = im_size)
-        im_test = ig_test.allocate()
+        im_test = ig_test.allocate(0)
         
         reader = NEXUSDataReader()
         reader.set_up(nexus_file = os.path.join(os.getcwd(), 'test_nexus_im.nxs'))

@@ -614,7 +614,11 @@ class DataContainer(object):
         :param array: numpy array to copy into the DataContainer
         :type array: DataContainer, numpy array or number
         :param dimension: dictionary, optional
+        
+        if the passed numpy array is the same, it just returns
         '''
+        if id(array) == id(self.array):
+            return
         if dimension == {}:
             if issubclass(type(array), DataContainer) or\
                issubclass(type(array), numpy.ndarray):

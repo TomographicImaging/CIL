@@ -655,7 +655,7 @@ class TestDataContainer(unittest.TestCase):
         self.assertListEqual([AcquisitionGeometry.CHANNEL ,
                  AcquisitionGeometry.ANGLE , AcquisitionGeometry.VERTICAL ,
                  AcquisitionGeometry.HORIZONTAL],
-                              sgeometry.dimension_labels)
+                              list(sgeometry.dimension_labels))
         sino = sgeometry.allocate()
 
         # test reshape
@@ -664,15 +664,15 @@ class TestDataContainer(unittest.TestCase):
                  AcquisitionGeometry.ANGLE]
         ss = sino.subset(new_order)
 
-        self.assertListEqual(new_order, ss.geometry.dimension_labels)
+        self.assertListEqual(new_order, list(ss.geometry.dimension_labels))
 
         ss1 = ss.subset(vertical = 0)
         self.assertListEqual([AcquisitionGeometry.HORIZONTAL ,
                  AcquisitionGeometry.CHANNEL  ,
-                 AcquisitionGeometry.ANGLE], ss1.geometry.dimension_labels)
+                 AcquisitionGeometry.ANGLE], list(ss1.geometry.dimension_labels))
         ss2 = ss.subset(vertical = 0, channel=0)
         self.assertListEqual([AcquisitionGeometry.HORIZONTAL ,
-                 AcquisitionGeometry.ANGLE], ss2.geometry.dimension_labels)
+                 AcquisitionGeometry.ANGLE], list(ss2.geometry.dimension_labels))
 
     def test_ImageDataSubset(self):
         new_order = ['horizontal_x', 'channel', 'horizontal_y', ]

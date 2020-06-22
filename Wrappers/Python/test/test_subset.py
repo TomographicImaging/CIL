@@ -32,7 +32,7 @@ class TestSubset(unittest.TestCase):
         self.ig = ImageGeometry(1,2,3,channels=4)
         angles = numpy.asarray([90.,0.,-90.], dtype=numpy.float32)
 
-        self.ag = AcquisitionGeometry('cone', 'edo', pixel_num_h=20, pixel_num_v=2, angles=angles, 
+        self.ag = AcquisitionGeometry('parallel', 'edo', pixel_num_h=20, pixel_num_v=2, angles=angles, 
                          dist_source_center = 312.2, 
                          dist_center_detector = 123.,
                          channels=4 )

@@ -256,35 +256,117 @@ class ComponentDescription(object):
 
 class SystemConfiguration(object):
 
-    def __init__ (self, dof, geom_type, source_pos, ray_direction, detector_pos, detector_direction_row, detector_direction_col, rotation_axis_pos, rotation_axis_direction, rotation_axis_angle):
-        
-        zero_list = [0.] * dof
-        
-        if geom_type == 'parallel':
-            if ray_direction is None:
-                ray_direction = zero_list.copy()
-                ray_direction[1] = 1.0
+    def __init__(self):
+        self.source = ComponentDescription()
+        self.detector = ComponentDescription()
+        self.rotation_axis = ComponentDescription()
 
-            if detector_pos is None:
-                detector_pos = zero_list.copy()
-        else:
-            if source_pos is None:
-                raise ValueError("Cone beam CT requres a source position")
+    @staticmethod
+    def CreateVector(val):
+        if val is None:
+            return None
+        try:
+            temp_val = numpy.asarray(val, dtype=numpy.float32)
+        except:
+            raise ValueError("Can't convert to numpy array")
+   
+        return temp_val
 
-            if detector_pos is None:
-                raise ValueError("Cone beam CT requres a detector position")
+    @staticmethod
+    def CreateUnitVector(val):
+        if val is None:
+            return None
+
+        vec = SystemConfiguration.CreateVector(val)
+
+        return vec/numpy.sqrt(vec.dot(vec))
+
+class Parallel2D(SystemConfiguration):
+    def __init__ (self, ray_direction, detector_pos, detector_direction_row, rotation_axis_pos, rotation_axis_angle):
+        super(Parallel2D, self).__init__()
+
+        zero_list = [0.,0.]
+
+        if ray_direction is None:
+            ray_direction = zero_list.copy()
+            ray_direction[1] = 1.0
+
+        if detector_pos is None:
+            detector_pos = zero_list.copy()
+
+        if detector_direction_row is None:
+            detector_direction_row = zero_list.copy()
+            detector_direction_row[0] = 1.       
+
+        if rotation_axis_pos is None:
+            rotation_axis_pos = zero_list.copy()
+
+        if rotation_axis_angle is None:
+            rotation_axis_angle = 0.
+
+        self.source.direction = SystemConfiguration.CreateUnitVector(ray_direction)
+
+        self.detector.position = SystemConfiguration.CreateVector(detector_pos)
+        self.detector.direction_row = SystemConfiguration.CreateUnitVector(detector_direction_row)
+
+        self.rotation_axis.position = SystemConfiguration.CreateVector(rotation_axis_pos)
+        self.rotation_axis.initial_angle = rotation_axis_angle
+
+
+class Cone2D(SystemConfiguration):
+    def __init__ (self, source_pos, detector_pos, detector_direction_row, rotation_axis_pos, rotation_axis_angle):
+        super(Cone2D, self).__init__()
+
+        zero_list = [0.,0.]
+
+        if source_pos is None:
+            raise ValueError("Cone beam CT requres a source position") 
+        
+        if detector_pos is None:
+            raise ValueError("Cone beam CT requres a detector position")
+
+        if detector_direction_row is None:
+            detector_direction_row = zero_list.copy()
+            detector_direction_row[0] = 1.        
+
+        if rotation_axis_pos is None:
+            rotation_axis_pos = zero_list.copy()
+
+        if rotation_axis_angle is None:
+            rotation_axis_angle = 0.
+
+        self.source.position = SystemConfiguration.CreateVector(source_pos)
+
+        self.detector.position = SystemConfiguration.CreateVector(detector_pos)
+        self.detector.direction_row = SystemConfiguration.CreateUnitVector(detector_direction_row)
+
+        self.rotation_axis.position = SystemConfiguration.CreateVector(rotation_axis_pos)
+        self.rotation_axis.initial_angle = rotation_axis_angle
+
+class Parallel3D(SystemConfiguration):
+    def __init__ (self,  ray_direction, detector_pos, detector_direction_row, detector_direction_col, rotation_axis_pos, rotation_axis_direction, rotation_axis_angle):
+        super(Parallel3D, self).__init__()
+
+        zero_list = [0.,0.,0.]
+
+        if ray_direction is None:
+            ray_direction = zero_list.copy()
+            ray_direction[1] = 1.0
+
+        if detector_pos is None:
+            detector_pos = zero_list.copy()
 
         if detector_direction_row is None:
             detector_direction_row = zero_list.copy()
             detector_direction_row[0] = 1.
 
-        if dof == 3:
-            if detector_direction_col is None:
-                detector_direction_col = [0.,0.,1.]
+        if detector_direction_col is None:
+            detector_direction_col = zero_list.copy()
+            detector_direction_col[2] = 1.
 
-            if rotation_axis_direction is None:
-                rotation_axis_direction = zero_list.copy()
-                rotation_axis_direction[2] = 1.
+        if rotation_axis_direction is None:
+            rotation_axis_direction = zero_list.copy()
+            rotation_axis_direction[2] = 1.
 
         if rotation_axis_pos is None:
             rotation_axis_pos = zero_list.copy()
@@ -292,42 +374,101 @@ class SystemConfiguration(object):
         if rotation_axis_angle is None:
             rotation_axis_angle = 0.
                     
-        self.source = ComponentDescription()
-        self.source.position = SystemConfiguration.CreateVector(dof, source_pos)
-        self.source.direction = SystemConfiguration.CreateUnitVector(dof, ray_direction)
+        self.source.direction = SystemConfiguration.CreateUnitVector(ray_direction)
 
-        self.detector = ComponentDescription()
-        self.detector.position = SystemConfiguration.CreateVector(dof, detector_pos)
-        self.detector.direction_row = SystemConfiguration.CreateUnitVector(dof, detector_direction_row)
-        self.detector.direction_col = SystemConfiguration.CreateUnitVector(dof, detector_direction_col)
+        self.detector.position = SystemConfiguration.CreateVector(detector_pos)
+        self.detector.direction_row = SystemConfiguration.CreateUnitVector(detector_direction_row)
+        self.detector.direction_col = SystemConfiguration.CreateUnitVector(detector_direction_col)
 
-        self.rotation_axis = ComponentDescription()
-        self.rotation_axis.position = SystemConfiguration.CreateVector(dof, rotation_axis_pos)
-        self.rotation_axis.direction = SystemConfiguration.CreateUnitVector(dof, rotation_axis_direction)
+        self.rotation_axis.position = SystemConfiguration.CreateVector(rotation_axis_pos)
+        self.rotation_axis.direction = SystemConfiguration.CreateUnitVector(rotation_axis_direction)
+        self.rotation_axis.initial_angle = rotation_axis_angle
+        
+    def centre_sice(self):
+
+        #ToDo:
+        #if ray direction is perpencicular to rotate axis
+        #and if det row direction is perpencicular to rotate axis
+        #can slice
+        #to slice:
+            #convert to rotation axis reference frame
+            #det col direction should update pixel size v
+            #det col direction and det position to update det position
+            #drop rotate axis direction
+            #drop z component of ray_direction, rotation_axis_position, detector_direction_row
+
+        #else:
+            #return Error or none
+        
+
+        ray_direction = self.source.direction[0:2]
+        detector_position = self.detector.position[0:2]
+        detector_direction_row = self.detector.direction_row[0:2]
+        rotation_axis_position = self.rotation_axis.position[0:2]
+
+        return Parallel2D(ray_direction, detector_position, detector_direction_row, rotation_axis_position, self.rotation_axis.initial_angle)
+
+class Cone3D(SystemConfiguration):
+    def __init__ (self, source_pos, detector_pos, detector_direction_row, detector_direction_col, rotation_axis_pos, rotation_axis_direction, rotation_axis_angle):
+        super(Cone3D, self).__init__()
+
+        zero_list = [0.,0.,0.]
+        
+        if source_pos is None:
+            raise ValueError("Cone beam CT requres a source position")
+
+        if detector_pos is None:
+            raise ValueError("Cone beam CT requres a detector position")
+
+        if detector_direction_row is None:
+            detector_direction_row = zero_list.copy()
+            detector_direction_row[0] = 1.
+
+        if detector_direction_col is None:
+            detector_direction_col = zero_list.copy()
+            detector_direction_col[2] = 1.
+
+        if rotation_axis_direction is None:
+            rotation_axis_direction = zero_list.copy()
+            rotation_axis_direction[2] = 1.
+
+        if rotation_axis_pos is None:
+            rotation_axis_pos = zero_list.copy()
+
+        if rotation_axis_angle is None:
+            rotation_axis_angle = 0.
+                    
+        self.source.position = SystemConfiguration.CreateVector(source_pos)
+
+        self.detector.position = SystemConfiguration.CreateVector(detector_pos)
+        self.detector.direction_row = SystemConfiguration.CreateUnitVector(detector_direction_row)
+        self.detector.direction_col = SystemConfiguration.CreateUnitVector(detector_direction_col)
+
+        self.rotation_axis.position = SystemConfiguration.CreateVector(rotation_axis_pos)
+        self.rotation_axis.direction = SystemConfiguration.CreateUnitVector(rotation_axis_direction)
         self.rotation_axis.initial_angle = rotation_axis_angle
 
-    @staticmethod
-    def CreateVector(dof, val):
-        if val is None:
-            return None
+    def centre_sice(self):
+        #ToDo:
+        #if rotate axis is perpendicular to plane orthogonal to detector containing source
+        #and if det row direction is perpencicular to rotate axis
+        #can slice
+        #to slice:
+            #convert to rotation axis reference frame
+            #det col direction should update pixel size v
+            #det col direction and det position to update det position
+            #drop rotate axis direction
+            #drop z component of source position, rotation_axis_position, detector_direction_row
 
-        try:
-            temp_val = numpy.asarray(val, dtype=numpy.float32)
-        except:
-            raise ValueError("can't convert to numpy array")
-   
-        if temp_val.shape[0] != dof:
-            raise ValueError('CreateVector expects a container of floats of length {0}. Got {1}'.format(dof, val))
-        
-        return temp_val
+        #else:
+            #return Error or none
 
-    @staticmethod
-    def CreateUnitVector(dof, val):
-        if val is None:
-            return None
+        source_position = self.source.position[0:2]
+        detector_position = self.detector.position[0:2]
+        detector_direction_row = self.detector.direction_row[0:2]
+        rotation_axis_position = self.rotation_axis.position[0:2]
 
-        vec = SystemConfiguration.CreateVector(dof, val)
-        return vec/numpy.sqrt(vec.dot(vec))
+        return Cone2D(source_position, detector_position, detector_direction_row, rotation_axis_position, self.rotation_axis.initial_angle)
 
 class Panel(object):
     @property
@@ -421,7 +562,8 @@ class Panel(object):
         self.num_pixels = num_pixels
         self.pixel_size = pixel_size
         self.num_channels = num_channels
-        self.channel_labels = channel_labels
+        if channel_labels is not None:
+            self.channel_labels = channel_labels
 
 class AcquisitionGeometry(object):
     """
@@ -459,7 +601,11 @@ class AcquisitionGeometry(object):
     ANGLE = 'angle'
     VERTICAL = 'vertical'
     HORIZONTAL = 'horizontal'
-    
+    PARALLEL = 'parallel'
+    CONE = 'cone'
+    DIM2 = '2D'
+    DIM3 = '3D'
+
     #for backwards compatibility with old AG
     @property
     def pixel_num_h(self):
@@ -596,7 +742,7 @@ class AcquisitionGeometry(object):
 
     @geom_type.setter
     def geom_type(self,val):
-        if val != 'cone' and val != 'parallel':
+        if val != AcquisitionGeometry.CONE and val != AcquisitionGeometry.PARALLEL:
             raise ValueError('geom_type = {} not recognised please specify \'cone\' or \'parallel\''.format(val))
         else:
             self.__geom_type = val
@@ -683,15 +829,15 @@ class AcquisitionGeometry(object):
         self.geom_type = geom_type
         self.panel = Panel(num_pixels, pixel_size, num_channels, channel_labels)  
 
-        #takes degrees as default ToDo fix this for 2D geometry in 2Dspace
-        dof = 3
-        #if self.dimension == '2D':
-        #    dof = 2
-        
+        #Once panel is configured, self.dimension is set
+
+        #more backward compatability
         if dist_source_center is not None:
+            dof = 2 if self.dimension == AcquisitionGeometry.DIM2 else 3
             source_position = [0.0]*dof
             source_position[1] = -dist_source_center
         if dist_center_detector is not None:
+            dof = 2 if self.dimension == AcquisitionGeometry.DIM2 else 3
             detector_position = [0.0]*dof
             detector_position[1] = dist_center_detector
 
@@ -701,20 +847,29 @@ class AcquisitionGeometry(object):
         if angles is not None:
             self.per_projection = False
             self.angles = angles
-            #where to set defaults?
-            self.configuration = SystemConfiguration(dof, self.geom_type, source_position, ray_direction, detector_position, detector_direction_row, detector_direction_col, rotation_axis_position, rotation_axis_direction, rotation_axis_rotation)
-        else:           
+            if self.dimension == AcquisitionGeometry.DIM2:
+                if self.geom_type == AcquisitionGeometry.PARALLEL:
+                    self.configuration = Parallel2D(ray_direction, detector_position, detector_direction_row, rotation_axis_position, rotation_axis_rotation)
+                else:
+                    self.configuration = Cone2D(source_position, detector_position, detector_direction_row, rotation_axis_position, rotation_axis_rotation)
+            else:
+                if self.geom_type == AcquisitionGeometry.PARALLEL:
+                    self.configuration = Parallel3D(ray_direction, detector_position, detector_direction_row, detector_direction_col, rotation_axis_position, rotation_axis_direction, rotation_axis_rotation)
+                else:
+                    self.configuration = Cone3D(source_position, detector_position, detector_direction_row, detector_direction_col, rotation_axis_position, rotation_axis_direction, rotation_axis_rotation)
+ 
+        else:
+            raise NotImplementedError("Per projection geometry is not yet implemented")   
             self.per_projection = True
             self.num_positions = len(detector_position)
             self.angles = None
-
             none_list = [None]*self.num_positions
             zero_list = [[0.]*dof]*self.num_positions
 
             #need a complete list for these
-            if self.geom_type == 'parallel' and ray_direction is None:
+            if self.geom_type == AcquisitionGeometry.PARALLEL and ray_direction is None:
                 print("nope")
-            if self.geom_type == 'cone' and source_position is None:
+            if self.geom_type == AcquisitionGeometry.CONE and source_position is None:
                 print("nope")    
             if detector_position is None:
                 print("nope")
@@ -749,7 +904,6 @@ class AcquisitionGeometry(object):
         labels = kwargs.get('dimension_labels', None)
         self.dimension_labels = labels
 
-    
     def get_order_by_label(self, dimension_labels, default_dimension_labels):
         order = []
         for i, el in enumerate(dimension_labels):
@@ -768,24 +922,51 @@ class AcquisitionGeometry(object):
         '''alias of clone'''
         return self.clone()
 
+    def centre_slice(self):
+        AG_2D = copy.deepcopy(self)
+        AG_2D.panel.num_pixels[1] = 1
+        AG_2D.configuration = self.configuration.centre_sice()
+
+        return AG_2D
+
     def __str__ (self):
+        def csv(val):
+            return numpy.array2string(val, separator=', ')
+
         repres = ""
-        repres += "Geometry type: {0}\n".format(self.geom_type)
+        repres += "{0} {1}-beam tomography\n".format(self.dimension, self.geom_type)   
         repres += "Panel description:\n"             
         repres += "\tpanel size: h{0},v{1}\n".format(self.panel.num_pixels[0], self.panel.num_pixels[1])
         repres += "\tpixel size: h{0},v{1}\n".format(self.panel.pixel_size[0], self.panel.pixel_size[1])
         repres += "\tnumber of channels: {0}\n".format(self.panel.num_channels)
         
-        if self.panel.channel_labels is not None:
-            repres += "\tchannel labels 0-10: {0}\n".format(self.panel.channel_labels[0:min(10,self.panel.num_channels)])              
-
-        repres += "num_positions: {0}\n".format(self.num_positions)         
+        num_print=min(10,self.panel.num_channels)                     
+        if  hasattr(self.panel, 'channel_labels'):
+            repres += "\tchannel labels 0-{0}: {1}\n".format(num_print, self.panel.channel_labels[0:num_print])
 
         repres += "System configuration:\n"
-        if self.angles is not None:
-            repres += "angles 0-10: {0}...\n".format(self.angles[0:min(10,self.num_positions)])                  
-            repres += "all algular units: {0}".format(self.angle_unit)                  
-            repres += "\tToDo ADD SYSTEM CONFIG\n" #ToDo
+        if self.per_projection is not None:                             
+            if  hasattr(self.configuration.source, 'position'):
+                repres += "\tsource position: {0}\n".format(csv(self.configuration.source.position))
+            if  hasattr(self.configuration.source, 'direction'):
+                repres += "\tray direction: {0}\n".format(csv(self.configuration.source.direction))
+            if  hasattr(self.configuration.rotation_axis, 'position'):
+                repres += "\trotation axis position: {0}\n".format(csv(self.configuration.rotation_axis.position))
+            if  hasattr(self.configuration.rotation_axis, 'direction'):
+                repres += "\trotation axis direction: {0}\n".format(csv(self.configuration.rotation_axis.direction))
+            if  hasattr(self.configuration.rotation_axis, 'initial_angle'):
+                repres += "\trotation axis initial angle: {0} {1}s\n".format(self.configuration.rotation_axis.initial_angle, self.angle_unit)
+            if  hasattr(self.configuration.detector, 'position'):
+                repres += "\tdetector position: {0}\n".format(csv(self.configuration.detector.position))
+            if  hasattr(self.configuration.detector, 'direction_col'):
+                repres += "\tdetector column direction : {0}\n".format(csv(self.configuration.detector.direction_col))
+            if  hasattr(self.configuration.detector, 'direction_row'):
+                repres += "\tdetector row direction: {0}\n".format(self.configuration.detector.direction_row)
+
+            repres += "num_positions: {0}\n".format(self.num_positions)
+            num_print=min(10,self.num_positions)
+            repres += "angles 0-{0} in {1}s: {2}\n".format(num_print, self.angle_unit, csv(self.angles[0:num_print]))      
+                                                
         else:
             repres += "\tgeometry stored per projection\n"
             #ToDo print arrays
@@ -955,26 +1136,15 @@ class DataContainer(object):
                 #print ("left_dimensions {0}".format(left_dimensions))
                 #new_shape = [self.shape[ax] for ax in axis_order]
                 #print ("new_shape {0}".format(new_shape))
-                command = "self.array["
-                for i in range(self.number_of_dimensions):
+
+                #slices on each unwanted dimension in reverse order
+                #np.take returns a new array each time
+                cleaned = self.array.copy()
+                for i in reversed(range(self.number_of_dimensions)):
                     if self.dimension_labels[i] in unwanted_dimensions.values():
-                        value = 0
-                        for k,v in kw.items():
-                            if k == self.dimension_labels[i]:
-                                value = v
-                                
-                        command = command + str(value)
-                    else:
-                        command = command + ":"
-                    if i < self.number_of_dimensions -1:
-                        command = command + ','
-                command = command + ']'
-                
-                cleaned = eval(command)
-                # cleaned has collapsed dimensions in the same order of
-                # self.array, but we want it in the order stated in the 
-                # "dimensions". 
-                # create axes order for numpy.transpose
+                        value = kw.get(self.dimension_labels[i],0)                                
+                        cleaned = cleaned.take(indices=value, axis=i)
+    
                 axes = []
                 for key in dimensions:
                     #print ("key {0}".format( key))
@@ -1441,7 +1611,7 @@ class DataContainer(object):
         '''Returns the type of the data array'''
         return self.as_array().dtype
 
-    
+
 class ImageData(DataContainer):
     '''DataContainer for holding 2D or 3D DataContainer'''
     __container_priority__ = 1
@@ -1720,38 +1890,60 @@ class AcquisitionData(DataContainer):
         if dimensions is not None and \
             (len(dimensions) != len(self.shape) ):
             raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
-        out = super(AcquisitionData, self).subset(dimensions, **kw)          
 
-        dimension_labels = [ out.dimension_labels[k] for k in range(len(out.dimension_labels))]
-        out.geometry = self.geometry.copy()
-
+        #Update Geometry
         angle_slice = kw.get(AcquisitionGeometry.ANGLE, None)
         channel_slice = kw.get(AcquisitionGeometry.CHANNEL, None)
         vertical_slice = kw.get(AcquisitionGeometry.VERTICAL, None)
         horizontal_slice = kw.get(AcquisitionGeometry.HORIZONTAL, None)
 
-        if angle_slice is not None:
-            out.geometry.angles = out.geometry.angles[angle_slice]
-        
+        geometry_new = self.geometry.copy()
         if channel_slice is not None:
-            out.geometry.panel.num_channels = 1
-            if out.geometry.panel.channel_labels is not None:
-                out.geometry.panel.channel_labels = out.geometry.panel.channel_labels[channel_slice]
+            geometry_new.panel.num_channels = 1
+            if hasattr(geometry_new.panel,'channel_labels'):
+                geometry_new.panel.channel_labels = geometry_new.panel.channel_labels[channel_slice]
+
+        if angle_slice is not None:
+            geometry_new.angles = geometry_new.angles[angle_slice]
         
         if vertical_slice is not None:
-            out.geometry.panel.num_pixels[1] = 1
-            #out.geometry.configuration = None
+            if geometry_new.geom_type == AcquisitionGeometry.PARALLEL or vertical_slice == 'centre':
+                geometry_new = geometry_new.centre_slice()
+            else:
+                geometry_new = None
         
         if horizontal_slice is not None:
-            out.geometry.panel.num_pixels[0] = 1
-            #change to return a DC
-            out.geometry.configuration = None
+            geometry_new = None
 
-        out.geometry.dimension_labels = dimension_labels
+        #Update Data
 
-        return out
+        #if vertical = 'centre' slice convert to index and subset.
+        #if the index is non-integer then return rows either side and interpolate to get the center slice value
+        interpolate = False
+        if vertical_slice == 'centre':           
+            ind = self.geometry.dimension_labels.index('vertical')
+            centre_slice = (self.geometry.shape[ind]-1) / 2.
+            centre_slice_floor = int(numpy.floor(centre_slice))
+            kw['vertical'] = centre_slice_floor
+            w2 = centre_slice - centre_slice_floor
+            if w2  > 0.0001:
+                interpolate = True
 
-            
+ 
+        out = super(AcquisitionData, self).subset(dimensions, **kw)
+
+        if interpolate == True:
+            kw['vertical'] = centre_slice_floor + 1
+            out2 = super(AcquisitionData, self).subset(dimensions, **kw)
+            out = out * (1 - w2) + out2 * w2
+
+        dimension_labels = out.dimension_labels.copy()    
+
+        if geometry_new is None:                
+            return DataContainer(out.array, deep_copy=False, dimension_labels=dimension_labels)
+        else:
+            return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new, dimension_labels=dimension_labels)
+
 class DataProcessor(object):
     
     '''Defines a generic DataContainer processor
@@ -2075,7 +2267,7 @@ class VectorGeometry(object):
     
 if __name__ == "__main__":
     
-    ag = AcquisitionGeometry(geom_type='parallel',num_pixels=(10,20),angles=[0.1,0.2])
+    ag = AcquisitionGeometry(geom_type='parallel',num_pixels=(10,1),angles=[0.1,0.2])
     ad = ag.allocate(0)
     ad.subset(angle=1)
 

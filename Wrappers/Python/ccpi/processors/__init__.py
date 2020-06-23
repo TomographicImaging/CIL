@@ -20,3 +20,4 @@ from .Normalizer import Normalizer
 from .Binner import Binner
 from .Slicer import Slicer
 from .Padder import Padder
+from .MaskGenerator import MaskGenerator

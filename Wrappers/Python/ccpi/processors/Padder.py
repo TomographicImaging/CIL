@@ -83,7 +83,7 @@ class Padder(DataProcessor):
             warnings.warn('Parameter constant_values is used only in constant mode. Will be ignored.',
               UserWarning)
         
-        if self.mode != 'linear_ramp' and self.cend_values != None:
+        if self.mode != 'linear_ramp' and self.end_values != None:
             warnings.warn('Parameter end values is used only in linear_ramp mode. Will be ignored.',
               UserWarning)
         

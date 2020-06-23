@@ -26,6 +26,7 @@ import numpy
 import functools
 import numpy as np
 from numbers import Number
+import warnings
 
 
 
@@ -103,7 +104,7 @@ class TotalVariation(Function):
 #             self.gradient = Gradient(x.geometry)
         
         # evaluate objective function of TV gradient
-        return regularising_parameter * self.TV(self.gradient.direct(x))
+        return self.regularising_parameter * self.TV(self.gradient.direct(x))
     
     
     def projection_C(self, x, out=None):   

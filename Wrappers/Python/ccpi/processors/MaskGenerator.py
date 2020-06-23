@@ -40,8 +40,43 @@ class MaskGenerator(DataProcessor):
         
         Input:
             
-            method              special_values, nan, inf, threshold, quantile, mean, median, movmean, movmedian
-
+            method              
+                - special_values    test element-wise for both inf and nan
+                - nan               test element-wise for nan
+                - inf               test element-wise for nan
+                - threshold         test element-wise if array values are within boundaries
+                                    given by threshold_values = (float,float). 
+                                    You can secify only lower threshold value by setting another to None
+                                    such as threshold_values = (float,None), then
+                                    upper boundary will be amax(data). Similarly, to specify only upper 
+                                    boundary, use threshold_values = (None,float). If both threshold_values
+                                    are set to None, then original array will be returned.
+                - quantile          test element-wise if array values are within boundaries
+                                    given by quantiles = (q1,q2), q1,q2<=1. 
+                                    You can secify only lower quantile value by setting another to None
+                                    such as quantiles = (float,q2), then
+                                    upper boundary will be amax(data). Similarly, to specify only upper 
+                                    boundary, use quantiles = (None,q1). If both quantiles
+                                    are set to None, then original array will be returned.
+                - mean              test element-wise if 
+                                    abs(A - mean(A)) < threshold_factor * std(A).
+                                    Default value of threshold_factor is 3. If no axis is specified, 
+                                    then operates over flattened array. Alternatively operates along axis specified 
+                                    as dimension_label.
+                - median            test element-wise if 
+                                    abs(A - median(A)) < threshold_factor * scaled MAD(A),
+                                    scaled MAD is defined as c*median(abs(A-median(A))) where c=-1/(sqrt(2)*erfcinv(3/2))
+                                    Default value of threshold_factor is 3. If no axis is specified, 
+                                    then operates over flattened array. Alternatively operates along axis specified 
+                                    as dimension_label.
+                - movmean           the same as mean but uses rolling mean with a specified window,
+                                    default window value is 5
+                - movmedian         the same as mean but uses rolling median with a specified window,
+                                    default window value is 5
+        
+        Output:
+                numpy boolean array with 1 where condition was satisfied and 0 where not
+                
         '''
 
         kwargs = {'method': method,
@@ -71,45 +106,74 @@ class MaskGenerator(DataProcessor):
         mask = numpy.zeros_like(data.as_array())
         
         if self.method == 'special_values':
+            
             mask[numpy.logical_or(numpy.isnan(data.as_array()), numpy.isinf(data.as_array()))] = 1
         
         elif self.method == 'nan':
+            
             mask[numpy.isnan(data.as_array())] = 1
             
         elif self.method == 'inf':
+            
             mask[numpy.isinf(data.as_array())] = 1
             
         elif self.method == 'threshold':
             
+            if not(isinstance(self.threshold_value, tuple)):
+                raise Exception("Threshold value must be given as a tuple containing two values,\n use None if no threshold value is given")
+                
             threshold_value = []
             if self.threshold_value[0] is None:
                 threshold_value.append(numpy.amin(data.as_array()))
             else:
                 threshold_value.append(self.threshold_value[0])
+                tmp_min = numpy.amin(data.as_array())
+                if self.threshold_value[0] < tmp_min:
+                    warnings.warn("Given threshold_value {} is smaller than min value of data {}".format(self.threshold_value[0], tmp_min))
+            
             if self.threshold_value[1] is None:
                 threshold_value.append(numpy.amax(data.as_array()))
             else:
                 threshold_value.append(self.threshold_value[1])
-                
+                tmp_max = numpy.amax(data.as_array())
+                if self.threshold_value[1] > tmp_max:
+                    warnings.warn("Given threshold_value {} is larger than max value of data {}".format(self.threshold_value[1], tmp_max))
+            
+            if threshold_value[1] < threshold_value[0]:
+                raise Exception("Upper threshold value must be larger than lower treshold value or min of data")
+            
             mask[numpy.logical_or(data.as_array() < threshold_value[0], data.as_array() > threshold_value[1])] = 1
             
         elif self.method == 'quantile':
+            
+            if not(isinstance(self.quantiles, tuple)):
+                raise Exception("Quantiles must be given as a tuple containing two values,\n use None if no quantile value is given")
             
             quantile_values = []
             if self.quantiles[0] is None:
                 quantile_values.append(numpy.amin(data.as_array()))
             else:
+                if self.quantiles[0] < 0 or self.quantiles[0] > 1:
+                    raise Exception("quantile_values must be within 0 and 1")
                 quantile_values.append(numpy.quantile(data.as_array(), self.quantiles[0]))
             if self.quantiles[1] is None:
                 quantile_values.append(numpy.amax(data.as_array()))
             else:
                 quantile_values.append(numpy.quantile(data.as_array(), self.quantiles[1]))
+                if self.quantiles[1] < 0 or self.quantiles[1] > 1:
+                    raise Exception("quantile_values must be within 0 and 1")
+            
+            if quantile_values[1] <  quantile_values[0]:
+                raise Exception("Upper quantile must be larger than lower quantile.")
                 
             mask[numpy.logical_or(data.as_array() < quantile_values[0], data.as_array() > quantile_values[1])] = 1
         
         elif self.method == 'mean':
             
             if self.axis is not None:
+                
+                if self.axis not in data.dimension_labels.values():
+                    raise Exception("Wrong label is specified for axis")
                 
                 axis = data.get_dimension_axis(self.axis)
                 ndim = len(data.dimension_labels)
@@ -130,6 +194,7 @@ class MaskGenerator(DataProcessor):
                      self.threshold_factor * numpy.tile((numpy.std(data.as_array(), axis=axis))[slice_obj], tile_par)] = 1
                      
             else:
+                
                  mask[numpy.abs(data.as_array() - numpy.mean(data.as_array())) > 
                  self.threshold_factor * numpy.std(data.as_array())] = 1
         
@@ -139,6 +204,9 @@ class MaskGenerator(DataProcessor):
             
             if self.axis is not None:
                 
+                if self.axis not in data.dimension_labels.values():
+                    raise Exception("Wrong label is specified for axis")
+                    
                 axis = data.get_dimension_axis(self.axis)
                 ndim = len(data.dimension_labels)
                 
@@ -165,13 +233,14 @@ class MaskGenerator(DataProcessor):
         elif self.method == 'movmean':
             
             if self.window is None:
-                    window = numpy.int(numpy.round(data.get_dimension_size(self.axis) * 0.1))
-                    if window < 5:
-                        window = 5
+                window = 5
             else:
                 window = self.window
             
             if self.axis is not None:
+                
+                if self.axis not in data.dimension_labels.values():
+                    raise Exception("Wrong label is specified for axis")
                 
                 axis = data.get_dimension_axis(self.axis)
                 
@@ -200,13 +269,14 @@ class MaskGenerator(DataProcessor):
         elif self.method == 'movmedian':
             
             if self.window is None:
-                    window = numpy.int(numpy.round(data.get_dimension_size(self.axis) * 0.1))
-                    if window < 5:
-                        window = 5
+                window = 5
             else:
                 window = self.window
                     
             if self.axis is not None:
+                
+                if self.axis not in data.dimension_labels.values():
+                    raise Exception("Wrong label is specified for axis")
                 
                 axis = data.get_dimension_axis(self.axis)
                 ndim = len(data.dimension_labels)
@@ -234,4 +304,4 @@ class MaskGenerator(DataProcessor):
                 tmp = abs(data.as_array() - median_array)
                 mask[tmp > self.threshold_factor * c * scipy.ndimage.median_filter(tmp, size=window, mode='reflect')] = 1
                 
-        return mask        
+        return mask

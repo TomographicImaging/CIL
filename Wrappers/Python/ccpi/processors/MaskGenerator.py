@@ -28,11 +28,11 @@ import numpy, scipy
 class MaskGenerator(DataProcessor):
 
     def __init__(self,
-                 method = 'nan',
+                 mode = 'nan',
                  threshold_value = (None, None),
                  quantiles = (None, None),
                  threshold_factor = 3,
-                 window = None,
+                 window = 5,
                  axis = None):
         
         '''
@@ -40,7 +40,7 @@ class MaskGenerator(DataProcessor):
         
         Input:
             
-            method              
+            mode              
                 - special_values    test element-wise for both inf and nan
                 - nan               test element-wise for nan
                 - inf               test element-wise for nan
@@ -52,7 +52,7 @@ class MaskGenerator(DataProcessor):
                                     boundary, use threshold_values = (None,float). If both threshold_values
                                     are set to None, then original array will be returned.
                 - quantile          test element-wise if array values are within boundaries
-                                    given by quantiles = (q1,q2), q1,q2<=1. 
+                                    given by quantiles = (q1,q2), 0<=q1,q2<=1. 
                                     You can secify only lower quantile value by setting another to None
                                     such as quantiles = (float,q2), then
                                     upper boundary will be amax(data). Similarly, to specify only upper 
@@ -79,7 +79,7 @@ class MaskGenerator(DataProcessor):
                 
         '''
 
-        kwargs = {'method': method,
+        kwargs = {'mode': mode,
                   'threshold_value': threshold_value,
                   'threshold_factor': threshold_factor,
                   'quantiles': quantiles,
@@ -103,21 +103,21 @@ class MaskGenerator(DataProcessor):
 
         data = self.get_input()
         
-        mask = numpy.zeros_like(data.as_array())
+        mask = numpy.zeros(data.as_array().shape, dtype=bool)
         
-        if self.method == 'special_values':
+        if self.mode == 'special_values':
             
             mask[numpy.logical_or(numpy.isnan(data.as_array()), numpy.isinf(data.as_array()))] = 1
         
-        elif self.method == 'nan':
+        elif self.mode == 'nan':
             
             mask[numpy.isnan(data.as_array())] = 1
             
-        elif self.method == 'inf':
+        elif self.mode == 'inf':
             
             mask[numpy.isinf(data.as_array())] = 1
             
-        elif self.method == 'threshold':
+        elif self.mode == 'threshold':
             
             if not(isinstance(self.threshold_value, tuple)):
                 raise Exception("Threshold value must be given as a tuple containing two values,\n use None if no threshold value is given")
@@ -144,7 +144,7 @@ class MaskGenerator(DataProcessor):
             
             mask[numpy.logical_or(data.as_array() < threshold_value[0], data.as_array() > threshold_value[1])] = 1
             
-        elif self.method == 'quantile':
+        elif self.mode == 'quantile':
             
             if not(isinstance(self.quantiles, tuple)):
                 raise Exception("Quantiles must be given as a tuple containing two values,\n use None if no quantile value is given")
@@ -168,7 +168,7 @@ class MaskGenerator(DataProcessor):
                 
             mask[numpy.logical_or(data.as_array() < quantile_values[0], data.as_array() > quantile_values[1])] = 1
         
-        elif self.method == 'mean':
+        elif self.mode == 'mean':
             
             if self.axis is not None:
                 
@@ -186,7 +186,7 @@ class MaskGenerator(DataProcessor):
                         slice_obj.append(numpy.newaxis)
                     else:
                         tile_par.append(1)
-                        slice_obj.append(slice(None, None, None))
+                        slice_obj.append(slice(None, None, 1))
                 tile_par = tuple(tile_par)
                 slice_obj = tuple(slice_obj)
                 
@@ -198,7 +198,7 @@ class MaskGenerator(DataProcessor):
                  mask[numpy.abs(data.as_array() - numpy.mean(data.as_array())) > 
                  self.threshold_factor * numpy.std(data.as_array())] = 1
         
-        elif self.method == 'median':
+        elif self.mode == 'median':
             
             c = -1 / (numpy.sqrt(2) * scipy.special.erfcinv(3 / 2))
             
@@ -218,7 +218,7 @@ class MaskGenerator(DataProcessor):
                         slice_obj.append(numpy.newaxis)
                     else:
                         tile_par.append(1)
-                        slice_obj.append(slice(None, None, None))
+                        slice_obj.append(slice(None, None, 1))
                 tile_par = tuple(tile_par)
                 slice_obj = tuple(slice_obj)
             
@@ -230,13 +230,8 @@ class MaskGenerator(DataProcessor):
                 tmp = abs(data.as_array() - numpy.median(data.as_array()))
                 mask[tmp > self.threshold_factor * c * numpy.median(tmp)] = 1
             
-        elif self.method == 'movmean':
-            
-            if self.window is None:
-                window = 5
-            else:
-                window = self.window
-            
+        elif self.mode == 'movmean':
+                        
             if self.axis is not None:
                 
                 if self.axis not in data.dimension_labels.values():
@@ -245,11 +240,11 @@ class MaskGenerator(DataProcessor):
                 axis = data.get_dimension_axis(self.axis)
                 
                 # we compute rolling mean and rolling std through convolution                
-                kernel = numpy.ones(window, dtype=numpy.float32)
+                kernel = numpy.ones(self.window, dtype=numpy.float32)
                 mean_array = scipy.ndimage.convolve1d(data.as_array(), weights=kernel, axis=axis, mode='reflect')
                 q = mean_array ** 2
                 q = scipy.ndimage.convolve1d(q, weights=kernel, axis=axis, mode='reflect')
-                std_array = numpy.sqrt((q - (mean_array ** 2) / window) / (window-1))
+                std_array = numpy.sqrt((q - (mean_array ** 2) / self.window) / (self.window-1))
                 mask[numpy.abs(data.as_array()-mean_array) > self.threshold_factor * std_array] = 1
             
             else:
@@ -257,21 +252,15 @@ class MaskGenerator(DataProcessor):
                 ndim = len(data.dimension_labels)
                 
                 # we compute rolling mean and rolling std through convolution 
-                kernel = numpy.ones((window,)*ndim, dtype=numpy.float32)
+                kernel = numpy.ones((self.window,)*ndim, dtype=numpy.float32)
                 mean_array = scipy.ndimage.convolve(data.as_array(), weights=kernel, mode='reflect')
                 q = mean_array ** 2
                 q = scipy.ndimage.convolve(q, weights=kernel, mode='reflect')
-                std_array = numpy.sqrt((q - (mean_array ** 2) / window) / (window-1))
+                std_array = numpy.sqrt((q - (mean_array ** 2) / self.window) / (self.window-1))
                 
-                mask[numpy.abs(data.as_array()-mean_array) > self.threshold_factor * std_array] = 1
-                
+                mask[numpy.abs(data.as_array()-mean_array) > self.threshold_factor * std_array] = 1           
             
-        elif self.method == 'movmedian':
-            
-            if self.window is None:
-                window = 5
-            else:
-                window = self.window
+        elif self.mode == 'movmedian':
                     
             if self.axis is not None:
                 
@@ -284,7 +273,7 @@ class MaskGenerator(DataProcessor):
                 kernel_shape = []
                 for i in range(ndim):
                     if i == axis:
-                        kernel_shape.append(window)
+                        kernel_shape.append(self.window)
                     else:
                         kernel_shape.append(1)
                 
@@ -298,10 +287,10 @@ class MaskGenerator(DataProcessor):
                 
             else:
                 
-                median_array = scipy.ndimage.median_filter(data.as_array(), size=window, mode='reflect')
+                median_array = scipy.ndimage.median_filter(data.as_array(), size=self.window, mode='reflect')
                 
                 c = -1 / (numpy.sqrt(2) * scipy.special.erfcinv(3 / 2))
                 tmp = abs(data.as_array() - median_array)
-                mask[tmp > self.threshold_factor * c * scipy.ndimage.median_filter(tmp, size=window, mode='reflect')] = 1
+                mask[tmp > self.threshold_factor * c * scipy.ndimage.median_filter(tmp, size=self.window, mode='reflect')] = 1
                 
         return mask

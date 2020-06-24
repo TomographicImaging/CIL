@@ -22,7 +22,8 @@ from __future__ import print_function
 
 from ccpi.framework import DataProcessor, AcquisitionData, ImageData
 import warnings
-import numpy, scipy
+import numpy
+from scipy import interpolate
 
 
 class Masker(DataProcessor):
@@ -31,7 +32,8 @@ class Masker(DataProcessor):
                  mask = None,
                  mode = 'value',
                  value = 0,
-                 axis = None
+                 axis = None,
+                 interp_kind = 'linear'
                  ):
         
         '''
@@ -40,39 +42,10 @@ class Masker(DataProcessor):
         Input:
             
             mode              
-                - special_values    test element-wise for both inf and nan
-                - nan               test element-wise for nan
-                - inf               test element-wise for nan
-                - threshold         test element-wise if array values are within boundaries
-                                    given by threshold_values = (float,float). 
-                                    You can secify only lower threshold value by setting another to None
-                                    such as threshold_values = (float,None), then
-                                    upper boundary will be amax(data). Similarly, to specify only upper 
-                                    boundary, use threshold_values = (None,float). If both threshold_values
-                                    are set to None, then original array will be returned.
-                - quantile          test element-wise if array values are within boundaries
-                                    given by quantiles = (q1,q2), q1,q2<=1. 
-                                    You can secify only lower quantile value by setting another to None
-                                    such as quantiles = (float,q2), then
-                                    upper boundary will be amax(data). Similarly, to specify only upper 
-                                    boundary, use quantiles = (None,q1). If both quantiles
-                                    are set to None, then original array will be returned.
-                - mean              test element-wise if 
-                                    abs(A - mean(A)) < threshold_factor * std(A).
-                                    Default value of threshold_factor is 3. If no axis is specified, 
-                                    then operates over flattened array. Alternatively operates along axis specified 
-                                    as dimension_label.
-                - median            test element-wise if 
-                                    abs(A - median(A)) < threshold_factor * scaled MAD(A),
-                                    scaled MAD is defined as c*median(abs(A-median(A))) where c=-1/(sqrt(2)*erfcinv(3/2))
-                                    Default value of threshold_factor is 3. If no axis is specified, 
-                                    then operates over flattened array. Alternatively operates along axis specified 
-                                    as dimension_label.
-                - movmean           the same as mean but uses rolling mean with a specified window,
-                                    default window value is 5
-                - movmedian         the same as mean but uses rolling median with a specified window,
-                                    default window value is 5
-        
+                - value
+                - mean
+                - median
+                - interpolation
         Output:
                 numpy boolean array with 1 where condition was satisfied and 0 where not
                 
@@ -81,7 +54,8 @@ class Masker(DataProcessor):
         kwargs = {'mask': mask,
                   'mode': mode,
                   'value': value,
-                  'axis': axis}
+                  'axis': axis,
+                  'interp_kind': interp_kind}
 
         super(Masker, self).__init__(**kwargs)
     
@@ -97,6 +71,10 @@ class Masker(DataProcessor):
             return True 
 
     def process(self):
+        
+        if self.mode not in ['value', 'mean', 'median', 'interpolate']:
+            raise Exception("Wrong mode. One of the following is expected:\n value, mean, median, interpolate")
+        
 
         data_raw = self.get_input()
         data = data_raw.clone()
@@ -117,7 +95,7 @@ class Masker(DataProcessor):
                     
                 slice_obj = []
                 for i in range(ndim):
-                        slice_obj.append(slice(None, None, 1))
+                    slice_obj.append(slice(None, None, 1))
                             
                 for i in range(data_raw.get_dimension_size(self.axis)):
                     slice_tmp = slice_obj[:]
@@ -143,7 +121,7 @@ class Masker(DataProcessor):
                     
                 slice_obj = []
                 for i in range(ndim):
-                        slice_obj.append(slice(None, None, 1))
+                    slice_obj.append(slice(None, None, 1))
                             
                 for i in range(data_raw.get_dimension_size(self.axis)):
                     slice_tmp = slice_obj[:]
@@ -157,10 +135,14 @@ class Masker(DataProcessor):
                 
                 data.as_array()[self.mask] = numpy.median(data.as_array()[~self.mask])
         
-        elif self.mode == 'lookup':
+        elif self.mode == 'interpolate':
+            
+            if self.interp_kind not in ['linear', 'nearest', 'zeros', 'linear', \
+                                        'quadratic', 'cubic', 'previous', 'next']:
+                raise Exception("Wrong interpolation kind, one of the follwoing is expected:\n linear, nearest, zeros, linear, quadratic, cubic, previous, next")
             
             ndim = len(data.dimension_labels)
-            shape = numpy.array(data.shape)
+            shape = data.shape
             
             if self.axis is not None:
                 if self.axis not in data.dimension_labels.values():
@@ -173,28 +155,37 @@ class Masker(DataProcessor):
             for i in range(ndim):
                 if i != axis:
                     res_dim *= shape[i]
+                    
+            interp_axis = numpy.arange(shape[axis])
             
             for i in range(res_dim):
-                idx = []
-                rest_shape = numpy.unravel_index(i, tuple(shape[1:]))
+                
+                rest_shape = []
+                for j in range(ndim):
+                    if j != axis:
+                        rest_shape.append(shape[j])
+                rest_shape = tuple(rest_shape)
+                
+                rest_idx = numpy.unravel_index(i, rest_shape)
+                
                 k = 0
+                idx = []
                 for j in range(ndim):
                     if j == axis:
                         idx.append(slice(None,None,1))
                     else:
-                        idx.append(rest_shape[k])
+                        idx.append(rest_idx[k])
                         k += 1
                 idx = tuple(idx)
                 
                 if numpy.any(self.mask[idx]):
                     tmp = data.as_array()[idx]
-                    tmp[self.mask[idx]] = numpy.interp(numpy.where(self.mask[idx] == True)[0], 
-                                       numpy.arange(shape[0])[~self.mask[idx]],
-                                       tmp[~self.mask[idx]])
+                    f = interpolate.interp1d(interp_axis[~self.mask[idx]], tmp[~self.mask[idx]], 
+                                             fill_value='extrapolate',
+                                             assume_sorted=True,
+                                             kind=self.interp_kind)
+                    tmp[self.mask[idx]] = f(numpy.where(self.mask[idx] == True)[0])
                     data.as_array()[idx] = tmp
-                
-                
-        
         
         return data
         

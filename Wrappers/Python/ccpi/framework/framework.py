@@ -252,38 +252,198 @@ class ImageGeometry(object):
     #    return self.shape
 
 class ComponentDescription(object):
-    pass
+    r'''This class enables the creation of the position and direction vectors describing the components of a tomography system
+     '''
+    def __init__ (self, dof):
+        self.dof = dof
 
-class SystemConfiguration(object):
-
-    def __init__(self):
-        self.source = ComponentDescription()
-        self.detector = ComponentDescription()
-        self.rotation_axis = ComponentDescription()
-
-    @staticmethod
+    @staticmethod  
     def CreateVector(val):
-        if val is None:
-            return None
         try:
-            temp_val = numpy.asarray(val, dtype=numpy.float32)
+            vec = numpy.asarray(val, dtype=numpy.float32).reshape(len(val))
         except:
             raise ValueError("Can't convert to numpy array")
    
-        return temp_val
+        return vec
 
-    @staticmethod
+    @staticmethod   
     def CreateUnitVector(val):
-        if val is None:
-            return None
+        vec = ComponentDescription.CreateVector(val)
+        vec = (vec/numpy.sqrt(vec.dot(vec)))
+        return vec
 
-        vec = SystemConfiguration.CreateVector(val)
+    def length_check(self, val):
+        try:
+            val_length = len(val)
+        except:
+            raise ValueError("Vectors for {0}D geometries must have length = {0}. Got {1}".format(self.dof,val))
+        
+        if val_length != self.dof:
+            raise ValueError("Vectors for {0}D geometries must have length = {0}. Got {1}".format(self.dof,val))
 
-        return vec/numpy.sqrt(vec.dot(vec))
+    @property
+    def position(self):
+        try:
+            return self.__position
+        except:
+            raise AttributeError
+
+    @position.setter
+    def position(self, val):  
+        self.length_check(val)
+        self.__position = ComponentDescription.CreateVector(val)
+
+    @property
+    def direction(self):      
+        try:
+            return self.__direction
+        except:
+            raise AttributeError
+
+    @direction.setter
+    def direction(self, val):
+        self.length_check(val)    
+        self.__direction = ComponentDescription.CreateUnitVector(val)
+
+    @property
+    def direction_row(self):
+        try:
+            return self.__direction_row
+        except:
+            raise AttributeError
+
+    @direction_row.setter
+    def direction_row(self, val):
+        self.length_check(val)
+        row = ComponentDescription.CreateUnitVector(val)
+
+        try:
+            col = self.__direction_col
+        except:
+            col = None
+    
+        if col is not None:
+            dot_product = row.dot(col)
+            if not numpy.isclose(dot_product, 0):
+                raise ValueError("vectors detector.direction_row and detector.direction_col must be orthogonal")
+
+        self.__direction_row = ComponentDescription.CreateUnitVector(val)
+
+    @property
+    def direction_col(self):
+        try:
+            return self.__direction_col
+        except:
+            raise AttributeError
+
+    @direction_col.setter
+    def direction_col(self, val):
+
+        self.length_check(val)
+        col = ComponentDescription.CreateUnitVector(val)
+
+        try:
+            row = self.__direction_row
+        except:
+            row = None
+
+        if row is not None:
+            dot_product = row.dot(col)
+            if not numpy.isclose(dot_product, 0):
+                raise ValueError("vectors detector.direction_row and detector.direction_col must be orthogonal")
+
+        self.__direction_col = ComponentDescription.CreateUnitVector(val)
+
+    @property
+    def initial_angle(self):
+        try:
+            return self.__initial_angle
+        except:
+            return 0.0
+
+    @initial_angle.setter
+    def initial_angle(self, val):
+        try:
+            val = float(val)
+        except:
+            raise TypeError('initial_angle expected a float. Got {0}'.format(type(val)))
+
+        self.__initial_angle = val
+
+class SystemConfiguration(object):
+    r'''This is a generic class to hold the configuration of a tomography system
+     '''
+    def __init__(self, dof):
+        self.source = ComponentDescription(dof)
+        self.detector = ComponentDescription(dof)
+        self.rotation_axis = ComponentDescription(dof)
+
+    
+    def set_origin(self):
+        raise NotImplementedError
+
+    def centre_slice(self):
+        """Returns the 2D system configuration corersponding to the centre slice
+        """        
+        return self
+
+    def calculate_mag(self):
+        r'''Calculates the magnification of the system using the source to rotate axis,
+        and source to detector distance along the direction.
+
+        :return: returns [dist_source_center, dist_center_detector, magnification],  [0] distance from the source to the rotate axis, [1] distance from the rotate axis to the detector, [2] magnification of the system
+        :rtype: list
+        '''
+        # calculates the source to the rotate axis vector, 
+        # and the distance from the rotate axis to the detector along this direction
+
+        #if parallel beam data
+        if not hasattr(self.source, 'position'):
+            return [None, None, None]
+
+        ab = self.rotation_axis.position - self.source.position
+        ab_unit = ComponentDescription.CreateUnitVector(ab)
+
+        dist_source_center = numpy.sqrt(ab.dot(ab))
+
+        #col and row are perpindicular unit vectors so n is a unit vector
+        #unit vector orthogonal to the detector
+        
+        if len(self.detector.direction_row) == 2:
+            n = ComponentDescription.CreateVector([self.detector.direction_row[1], -self.detector.direction_row[0]])
+        else:
+            n = numpy.cross(self.detector.direction_row,self.detector.direction_col)
+
+        #perpendicular distance between source and detector centre
+        sd = (self.detector.position - self.source.position).dot(n)
+
+        ratio = ab_unit.dot(n)
+
+        source_to_detector = sd / ratio
+
+        dist_center_detector = source_to_detector - dist_source_center
+        magnification = (dist_center_detector + dist_source_center) / dist_source_center
+
+        return [dist_source_center, dist_center_detector, magnification]
 
 class Parallel2D(SystemConfiguration):
+    r'''This class creates the SystemConfiguration of a parallel beam 2D tomographic system
+                       
+    :param ray_direction: A 2D unit vector describing the x-ray direction (x,y), defaults to (0,1)
+    :type ray_direction: list, tuple, ndarray, optional
+    :param detector_pos: A 2D vector describing the position of the centre of the detector (x,y), defaults to (0,0)
+    :type detector_pos: list, tuple, ndarray, optional
+    :param detector_direction_row: A 2D unit vector describing the direction of the pixels of the detector (x,y), defaults to (1,0)
+    :type detector_direction_row: list, tuple, ndarray, optional
+    :param rotation_axis_pos: A 2D vector describing the position of the axis of rotation (x,y), defaults to (0,0)
+    :type rotation_axis_pos: list, tuple, ndarray, optional
+    :param rotation_axis_angle: the initial rotation of the system, defaults to 0.0
+    :type rotation_axis_angle: float, optional      
+     '''
     def __init__ (self, ray_direction, detector_pos, detector_direction_row, rotation_axis_pos, rotation_axis_angle):
-        super(Parallel2D, self).__init__()
+        """Constructor method
+        """
+        super(Parallel2D, self).__init__(dof=2)
 
         zero_list = [0.,0.]
 
@@ -296,7 +456,7 @@ class Parallel2D(SystemConfiguration):
 
         if detector_direction_row is None:
             detector_direction_row = zero_list.copy()
-            detector_direction_row[0] = 1.       
+            detector_direction_row[0] = 1.
 
         if rotation_axis_pos is None:
             rotation_axis_pos = zero_list.copy()
@@ -304,48 +464,46 @@ class Parallel2D(SystemConfiguration):
         if rotation_axis_angle is None:
             rotation_axis_angle = 0.
 
-        self.source.direction = SystemConfiguration.CreateUnitVector(ray_direction)
+        #source
+        self.source.direction = ray_direction
 
-        self.detector.position = SystemConfiguration.CreateVector(detector_pos)
-        self.detector.direction_row = SystemConfiguration.CreateUnitVector(detector_direction_row)
+        #detector
+        self.detector.position = detector_pos
+        self.detector.direction_row = detector_direction_row
 
-        self.rotation_axis.position = SystemConfiguration.CreateVector(rotation_axis_pos)
+        #rotate axis
+        self.rotation_axis.position = rotation_axis_pos
         self.rotation_axis.initial_angle = rotation_axis_angle
 
+    def set_origin(self):
+        r'''Transforms the system origin to the rotate axis
+        '''         
+        self.detector.position -= self.rotation_axis.position
+        self.rotation_axis.position = [0,0]
 
-class Cone2D(SystemConfiguration):
-    def __init__ (self, source_pos, detector_pos, detector_direction_row, rotation_axis_pos, rotation_axis_angle):
-        super(Cone2D, self).__init__()
-
-        zero_list = [0.,0.]
-
-        if source_pos is None:
-            raise ValueError("Cone beam CT requres a source position") 
-        
-        if detector_pos is None:
-            raise ValueError("Cone beam CT requres a detector position")
-
-        if detector_direction_row is None:
-            detector_direction_row = zero_list.copy()
-            detector_direction_row[0] = 1.        
-
-        if rotation_axis_pos is None:
-            rotation_axis_pos = zero_list.copy()
-
-        if rotation_axis_angle is None:
-            rotation_axis_angle = 0.
-
-        self.source.position = SystemConfiguration.CreateVector(source_pos)
-
-        self.detector.position = SystemConfiguration.CreateVector(detector_pos)
-        self.detector.direction_row = SystemConfiguration.CreateUnitVector(detector_direction_row)
-
-        self.rotation_axis.position = SystemConfiguration.CreateVector(rotation_axis_pos)
-        self.rotation_axis.initial_angle = rotation_axis_angle
 
 class Parallel3D(SystemConfiguration):
+    r'''This class creates the SystemConfiguration of a parallel beam 3D tomographic system
+                       
+    :param ray_direction: A 3D unit vector describing the x-ray direction (x,y,z), defaults to (0,1,0)
+    :type ray_direction: list, tuple, ndarray, optional
+    :param detector_pos: A 3D vector describing the position of the centre of the detector (x,y,z), defaults to (0,0,0)
+    :type detector_pos: list, tuple, ndarray, optional
+    :param detector_direction_row: A 3D unit vector describing the direction of the pixels in the rows of the detector (x,y,z), defaults to (1,0,0)
+    :type detector_direction_row: list, tuple, ndarray, optional
+    :param detector_direction_col: A 3D unit vector describing the direction of the pixels in the coloumns of the detector (x,y,z), defaults to (0,0,1)
+    :type detector_direction_col: list, tuple, ndarray, optional    
+    :param rotation_axis_pos: A 3D vector describing the position of the axis of rotation (x,y,z), defaults to (0,0,0)
+    :type rotation_axis_pos: list, tuple, ndarray, optional
+    :param rotation_axis_direction: A 3D unit vector describing the direction of the axis of rotation (x,y,z), defaults to (0,0,1)
+    :type rotation_axis_direction: list, tuple, ndarray, optional     
+    :param rotation_axis_angle: the initial rotation of the system, defaults to 0.0
+    :type rotation_axis_angle: float, optional      
+     '''
     def __init__ (self,  ray_direction, detector_pos, detector_direction_row, detector_direction_col, rotation_axis_pos, rotation_axis_direction, rotation_axis_angle):
-        super(Parallel3D, self).__init__()
+        """Constructor method
+        """
+        super(Parallel3D, self).__init__(dof=3)
 
         zero_list = [0.,0.,0.]
 
@@ -374,46 +532,146 @@ class Parallel3D(SystemConfiguration):
         if rotation_axis_angle is None:
             rotation_axis_angle = 0.
                     
-        self.source.direction = SystemConfiguration.CreateUnitVector(ray_direction)
+        #source
+        self.source.direction = ray_direction
 
-        self.detector.position = SystemConfiguration.CreateVector(detector_pos)
-        self.detector.direction_row = SystemConfiguration.CreateUnitVector(detector_direction_row)
-        self.detector.direction_col = SystemConfiguration.CreateUnitVector(detector_direction_col)
+        #detector
+        self.detector.position = detector_pos
+        self.detector.direction_row = detector_direction_row
+        self.detector.direction_col = detector_direction_col
 
-        self.rotation_axis.position = SystemConfiguration.CreateVector(rotation_axis_pos)
-        self.rotation_axis.direction = SystemConfiguration.CreateUnitVector(rotation_axis_direction)
+        #rotate axis
+        self.rotation_axis.position = rotation_axis_pos
+        self.rotation_axis.direction = rotation_axis_direction
         self.rotation_axis.initial_angle = rotation_axis_angle
-        
+
+    def set_origin(self):
+        r'''Transforms the system origin to the rotate axis with z direction aligned to the rotate axis direction
+        '''          
+        #shift detector
+        det_pos = (self.detector.position - self.rotation_axis.position)
+
+        #calculate rotation matrix to align rotation axis direction with z
+        a = self.rotation_axis.direction
+        vx = numpy.array([[0, 0, -a[0]], [0, 0, -a[1]], [a[0], a[1], 0]])
+        axis_rotation = numpy.eye(3) + vx + vx.dot(vx) *  1 / (1 + a[2])
+        rotation_matrix = numpy.matrix.transpose(axis_rotation)
+
+        #apply transform
+        self.rotation_axis.position = [0,0,0]
+        self.rotation_axis.direction = [0,0,1]
+        self.source.direction = rotation_matrix.dot(self.source.direction.reshape(3,1))
+        self.detector.position = rotation_matrix.dot(det_pos.reshape(3,1))
+        self.detector.direction_row = rotation_matrix.dot(self.detector.direction_row.reshape(3,1))
+        self.detector.direction_col = rotation_matrix.dot(self.detector.direction_col.reshape(3,1))
+
     def centre_sice(self):
+        """Returns the 2D system configuration corersponding to the centre slice
+        """  
+        dp1 = self.rotation_axis.direction.dot(self.source.direction)
+        dp2 = self.rotation_axis.direction.dot(self.detector.direction_row)
 
-        #ToDo:
-        #if ray direction is perpencicular to rotate axis
-        #and if det row direction is perpencicular to rotate axis
-        #can slice
-        #to slice:
+        if numpy.isclose(dp1, 0) and numpy.isclose(dp2, 0):
+
             #convert to rotation axis reference frame
-            #det col direction should update pixel size v
-            #det col direction and det position to update det position
-            #drop rotate axis direction
-            #drop z component of ray_direction, rotation_axis_position, detector_direction_row
+            self.set_origin()
 
-        #else:
-            #return Error or none
+            ray_direction = self.source.direction[0:2]
+            detector_position = self.detector.position[0:2]
+            detector_direction_row = self.detector.direction_row[0:2]
+            rotation_axis_position = self.rotation_axis.position[0:2]
+
+            return Parallel2D(ray_direction, detector_position, detector_direction_row, rotation_axis_position, self.rotation_axis.initial_angle)
+
+        else:
+            raise Warning("Cannot convert geometry to 2D")
+            pass
+
+
+class Cone2D(SystemConfiguration):
+    r'''This class creates the SystemConfiguration of a cone beam 2D tomographic system
+                       
+    :param source_pos: A 2D vector describing the position of the source (x,y)
+    :type source_pos: list, tuple, ndarray
+    :param detector_pos: A 2D vector describing the position of the centre of the detector (x,y)
+    :type detector_pos: list, tuple, ndarray
+    :param detector_direction_row: A 2D unit vector describing the direction of the pixels of the detector (x,y), defaults to (1,0)
+    :type detector_direction_row: list, tuple, ndarray, optional
+    :param rotation_axis_pos: A 2D vector describing the position of the axis of rotation (x,y), defaults to (0,0)
+    :type rotation_axis_pos: list, tuple, ndarray, optional
+    :param rotation_axis_angle: the initial rotation of the system, defaults to 0.0
+    :type rotation_axis_angle: float, optional      
+     '''
+
+    def __init__ (self, source_pos, detector_pos, detector_direction_row, rotation_axis_pos, rotation_axis_angle):
+        """Constructor method
+        """
+        super(Cone2D, self).__init__(dof=2)
+
+        zero_list = [0.,0.]
+
+        if source_pos is None:
+            raise ValueError("Cone beam CT requres a source position") 
         
+        if detector_pos is None:
+            raise ValueError("Cone beam CT requres a detector position")
 
-        ray_direction = self.source.direction[0:2]
-        detector_position = self.detector.position[0:2]
-        detector_direction_row = self.detector.direction_row[0:2]
-        rotation_axis_position = self.rotation_axis.position[0:2]
+        if detector_direction_row is None:
+            detector_direction_row = zero_list.copy()
+            detector_direction_row[0] = 1.        
 
-        return Parallel2D(ray_direction, detector_position, detector_direction_row, rotation_axis_position, self.rotation_axis.initial_angle)
+        if rotation_axis_pos is None:
+            rotation_axis_pos = zero_list.copy()
+
+        if rotation_axis_angle is None:
+            rotation_axis_angle = 0.
+
+        #source
+        self.source.position = source_pos
+
+        #detector
+        self.detector.position = detector_pos
+        self.detector.direction_row = detector_direction_row
+
+        #rotate axis
+        self.rotation_axis.position = rotation_axis_pos
+        self.rotation_axis.initial_angle = rotation_axis_angle
+
+    def set_origin(self):
+        r'''Transforms the system origin to the rotate axis
+        '''                  
+        self.source.position -= self.rotation_axis.position
+        self.detector.position -= self.rotation_axis.position
+        self.rotation_axis.position = [0,0]
+    
 
 class Cone3D(SystemConfiguration):
+    r'''This class creates the SystemConfiguration of a cone beam 3D tomographic system
+                       
+    :param source_pos: A 3D vector describing the position of the source (x,y,z)
+    :type source_pos: list, tuple, ndarray
+    :param detector_pos: A 3D vector describing the position of the centre of the detector (x,y,z)
+    :type detector_pos: list, tuple, ndarray
+    :param detector_direction_row: A 3D unit vector describing the direction of the pixels in the rows of the detector (x,y,z), defaults to (1,0,0)
+    :type detector_direction_row: list, tuple, ndarray, optional
+    :param detector_direction_col: A 3D unit vector describing the direction of the pixels in the coloumns of the detector (x,y,z), defaults to (0,0,1)
+    :type detector_direction_col: list, tuple, ndarray, optional    
+    :param rotation_axis_pos: A 3D vector describing the position of the axis of rotation (x,y,z), defaults to (0,0,0)
+    :type rotation_axis_pos: list, tuple, ndarray, optional
+    :param rotation_axis_direction: A 3D unit vector describing the direction of the axis of rotation (x,y,z), defaults to (0,0,1)
+    :type rotation_axis_direction: list, tuple, ndarray, optional   
+    :param rotation_axis_angle: the initial rotation of the system, defaults to 0.0
+    :type rotation_axis_angle: float, optional
+    '''
+
     def __init__ (self, source_pos, detector_pos, detector_direction_row, detector_direction_col, rotation_axis_pos, rotation_axis_direction, rotation_axis_angle):
-        super(Cone3D, self).__init__()
+        """Constructor method
+        """
+        super(Cone3D, self).__init__(dof=3)
 
         zero_list = [0.,0.,0.]
-        
+        self.recalculate = True
+
         if source_pos is None:
             raise ValueError("Cone beam CT requres a source position")
 
@@ -438,39 +696,76 @@ class Cone3D(SystemConfiguration):
         if rotation_axis_angle is None:
             rotation_axis_angle = 0.
                     
-        self.source.position = SystemConfiguration.CreateVector(source_pos)
+        #source
+        self.source.position = source_pos
 
-        self.detector.position = SystemConfiguration.CreateVector(detector_pos)
-        self.detector.direction_row = SystemConfiguration.CreateUnitVector(detector_direction_row)
-        self.detector.direction_col = SystemConfiguration.CreateUnitVector(detector_direction_col)
+        #detector
+        self.detector.position = detector_pos
+        self.detector.direction_row = detector_direction_row
+        self.detector.direction_col = detector_direction_col
 
-        self.rotation_axis.position = SystemConfiguration.CreateVector(rotation_axis_pos)
-        self.rotation_axis.direction = SystemConfiguration.CreateUnitVector(rotation_axis_direction)
+        #rotate axis
+        self.rotation_axis.position = rotation_axis_pos
+        self.rotation_axis.direction = rotation_axis_direction
         self.rotation_axis.initial_angle = rotation_axis_angle
 
+    def set_origin(self):
+        r'''Transforms the system origin to the rotate axis with z direction aligned to the rotate axis direction
+        '''                  
+        #shift 
+        det_pos = (self.detector.position - self.rotation_axis.position)
+        src_pos = (self.source.position - self.rotation_axis.position)
+
+        #calculate rotation matrix to align rotation axis direction with z
+        a = self.rotation_axis.direction
+        vx = numpy.array([[0, 0, -a[0]], [0, 0, -a[1]], [a[0], a[1], 0]])
+        axis_rotation = numpy.eye(3) + vx + vx.dot(vx) *  1 / (1 + a[2])
+        rotation_matrix = numpy.matrix.transpose(axis_rotation)
+
+        #apply transform
+        self.rotation_axis.position = [0,0,0]
+        self.rotation_axis.direction = [0,0,1]
+        self.source.position = rotation_matrix.dot(src_pos.reshape(3,1))
+        self.detector.position = rotation_matrix.dot(det_pos.reshape(3,1))
+        self.detector.direction_row = rotation_matrix.dot(self.detector.direction_row.reshape(3,1))
+        self.detector.direction_col = rotation_matrix.dot(self.detector.direction_col.reshape(3,1))
+
     def centre_sice(self):
-        #ToDo:
-        #if rotate axis is perpendicular to plane orthogonal to detector containing source
-        #and if det row direction is perpencicular to rotate axis
-        #can slice
-        #to slice:
-            #convert to rotation axis reference frame
-            #det col direction should update pixel size v
-            #det col direction and det position to update det position
-            #drop rotate axis direction
-            #drop z component of source position, rotation_axis_position, detector_direction_row
+        """Returns the 2D system configuration corersponding to the centre slice
+        """ 
+        vec1= self.detector.position - self.source.position  
+        dp1 = self.rotation_axis.direction.dot(vec1)
+        dp2 = self.rotation_axis.direction.dot(self.detector.direction_row)
 
-        #else:
-            #return Error or none
+        if numpy.isclose(dp1, 0) and numpy.isclose(dp2, 0):
 
-        source_position = self.source.position[0:2]
-        detector_position = self.detector.position[0:2]
-        detector_direction_row = self.detector.direction_row[0:2]
-        rotation_axis_position = self.rotation_axis.position[0:2]
+            self.set_origin()
 
-        return Cone2D(source_position, detector_position, detector_direction_row, rotation_axis_position, self.rotation_axis.initial_angle)
+            source_position = self.source.position[0:2]
+            detector_position = self.detector.position[0:2]
+            detector_direction_row = self.detector.direction_row[0:2]
+            rotation_axis_position = self.rotation_axis.position[0:2]
+
+            return Cone2D(source_position, detector_position, detector_direction_row, rotation_axis_position, self.rotation_axis.initial_angle)
+        else:
+            raise Warning("Cannot convert geometry to 2D")
+            return self
+
 
 class Panel(object):
+    r'''This is a class describing the panel of the system. 
+    This will be created on initialisation of AcquisitionGeometry.
+                       
+    :param num_pixels: A tuple (num_pixels_h, num_pixels_v) containing the number of pixels of the panel
+    :type num_pixels: tuple
+    :param pixel_size: A tuple (pixel_size_h, pixel_size_v) containing the size of the pixels of the panel
+    :type pixel_size: tuple
+    :param num_channels: The number of channels measured by each pixel
+    :type num_channels: int
+    :param channel_labels: A list of channel labels         
+    :type channel_labels: list, optional
+     '''
+
     @property
     def num_pixels(self):
         return self.__num_pixels
@@ -497,7 +792,7 @@ class Panel(object):
         else:
             raise ValueError('num_pixels expected int x or [int x, int y]. Got {}'.format(val))
    
-        if num_pixels_temp < [1,1]:
+        if num_pixels_temp[0] < 1 or num_pixels_temp[1] < 1:
             raise ValueError('num_pixels (x,y) must be >= (1,1). Got {}'.format(num_pixels_temp))
         else:
             self.__num_pixels = num_pixels_temp
@@ -558,7 +853,8 @@ class Panel(object):
             raise ValueError('labels expected to have length {0}. Got {1}'.format(self.__num_channels, len(val)))
 
     def __init__ (self, num_pixels, pixel_size, num_channels, channel_labels):  
-
+        """Constructor method
+        """
         self.num_pixels = num_pixels
         self.pixel_size = pixel_size
         self.num_channels = num_channels
@@ -566,32 +862,66 @@ class Panel(object):
             self.channel_labels = channel_labels
 
 class AcquisitionGeometry(object):
-    """
-    General inputs for standard type projection geometries
-    detectorDomain or detectorpixelSize:
-        If 2D
-            If scalar: Width of detector or single detector pixel
-            If 2-vec: Error
-        If 3D
-            If scalar: Width in both dimensions
-            If 2-vec: Vertical then horizontal size
-    grid
-        If 2D
-            If scalar: number of detectors
-            If 2-vec: error
-        If 3D
-            If scalar: Square grid that size
-            If 2-vec vertical then horizontal size
-    cone or parallel
-    2D or 3D
-    parallel_parameters: ?
-    cone_parameters:
-        source_to_center_dist (if parallel: NaN)
-        center_to_detector_dist (if parallel: NaN)
-    standard or nonstandard (vec) geometry
-    angles is expected numpy array, dtype - float32
-    angles_format radians or degrees
-    """
+    r'''This class holds the AcquisitionGeometry of the system.
+
+    Not all parameters are required for different data types so please refer to the :class:`SystemConfiguration` for a full description of required parameters and their default values
+
+    :param geom_type: A description of the system type 'cone' or 'parallel'
+    :type geom_type: string
+
+    Panel description:
+    :param num_pixels: A tuple (num_pixels_h, num_pixels_v) containing the number of pixels of the panel
+    :type num_pixels: tuple, list, int
+    :param pixel_size: A tuple (pixel_size_h, pixel_size_v) containing the size of the pixels of the panel
+    :type pixel_size: tuple, list, float
+    :param num_channels: The number of channels measured by each pixel, defaults to 1
+    :type num_channels: int
+    :param angles: A container of angular positions corresponding to each radiograph
+    :type angles: tuple, list, ndarray
+    :param channel_labels: A list of channel labels         
+    :type channel_labels: list, optional
+
+    System configuration 
+    Source description:
+    :param source_pos: Cone-beam CT specific. A vector describing the position of the source
+    :type source_pos: list, tuple, ndarray, optional
+    :param ray_direction: Parallel-beam CT specific. A vector describing the x-ray beam direction
+    :type ray_direction: list, tuple, ndarray, optional
+
+    Detector description:
+    :param detector_pos: A vector describing the position of the centre of the detector
+    :type detector_pos: list, tuple, ndarray, optional
+    :param detector_direction_row: A vector describing the direction of the pixels in the rows of the detector
+    :type detector_direction_row: list, tuple, ndarray, optional
+    :param detector_direction_col: A vector describing the direction of the pixels in the coloumns of the detector
+    :type detector_direction_col: list, tuple, ndarray, optional 
+
+    :param rotation_axis_pos: A vector describing the position of the axis of rotation, defaults to the origin
+    :type rotation_axis_pos: list, tuple, ndarray, optional
+    :param rotation_axis_direction: A vector describing the direction of the axis of rotation
+    :type rotation_axis_direction: list, tuple, ndarray, optional   
+    :param rotation_axis_angle: the initial rotation of the system
+    :type rotation_axis_angle: float, optional
+
+
+    These initialisation parameters will be deprecated in a future release
+    :param pixel_num_h: Number of pixels in the horizontal direction
+    :type pixel_num_h: int, optional
+    :param pixel_num_v: Number of pixels in the vertical direction
+    :type pixel_num_v: int, optional    
+    :param pixel_size_h: Size of pixels in the horizontal direction
+    :type pixel_size_h: float, optional    
+    :param pixel_size_v: Size of pixels in the vertical direction
+    :type pixel_size_v: float, optional       
+    :param chanels: Number of channels
+    :type chanels: int, optional       
+    :param dist_source_center: Distance from the source to the origin
+    :type dist_source_center: float, optional
+    :param dist_center_detector: Distance from the origin to the centre of the detector
+    :type dist_center_detector: float, optional
+
+    '''
+
     RANDOM = 'random'
     RANDOM_INT = 'random_int'
     ANGLE_UNIT = 'angle_unit'
@@ -606,7 +936,7 @@ class AcquisitionGeometry(object):
     DIM2 = '2D'
     DIM3 = '3D'
 
-    #for backwards compatibility with old AG
+    #for backwards compatibility
     @property
     def pixel_num_h(self):
         return self.panel.num_pixels[0]
@@ -645,29 +975,18 @@ class AcquisitionGeometry(object):
 
     @property
     def dist_source_center(self):
-        try:
-            val = self.configuration.source.position
-        except AttributeError:
-            return None
-
-        if val is None:
-            return None
-            
-        print("Warning: dist_source_center returns the y component of source position only")
-        return -val[1]
+        out = self.configuration.calculate_mag()
+        return out[0]
 
     @property
     def dist_center_detector(self):
-        try:
-            val = self.configuration.detector.position
-        except AttributeError:
-            return None
+        out = self.configuration.calculate_mag()
+        return out[1]
 
-        if val is None:
-            return None
-
-        print("Warning: dist_center_detector returns the y component of detector position only")
-        return val[1]
+    @property
+    def magnification(self):
+        out = self.configuration.calculate_mag()
+        return out[2]
 
     @property
     def dimension(self):
@@ -693,7 +1012,7 @@ class AcquisitionGeometry(object):
     @shape.setter
     def shape(self, val):
         #ToDo better warnings
-        print("Deprecated - shape will be set automatically")
+        raise Warning("Deprecated - shape will be set automatically")
         pass
 
     @property
@@ -797,6 +1116,9 @@ class AcquisitionGeometry(object):
                 rotation_axis_rotation = None,
                 channel_labels = None, 
                 ** kwargs):
+
+        """Constructor method
+        """
 
         #backward compatibility
         pixel_num_h = kwargs.get('pixel_num_h', None)
@@ -923,10 +1245,13 @@ class AcquisitionGeometry(object):
         return self.clone()
 
     def centre_slice(self):
+        '''returns a 2D AcquisitionGeometry that corresponds to the centre slice of the input'''
         AG_2D = copy.deepcopy(self)
-        AG_2D.panel.num_pixels[1] = 1
-        AG_2D.configuration = self.configuration.centre_sice()
 
+        if AG_2D.dimension == '3D':
+            AG_2D.configuration = self.configuration.centre_sice()
+            AG_2D.panel.num_pixels[1] = 1
+            AG_2D.panel.pixel_size[1] = abs(self.configuration.detector.direction_col[2]) * self.panel.pixel_size[1]
         return AG_2D
 
     def __str__ (self):

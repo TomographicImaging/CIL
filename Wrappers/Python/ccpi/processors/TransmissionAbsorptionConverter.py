@@ -29,11 +29,13 @@ class TransmissionAbsorptionConverter(DataProcessor):
 
     def __init__(self,
                  threshold = 1e-3,
-                 value = 0
+                 value = 0,
+                 white_level = 1
                  ):
 
         kwargs = {'threshold': threshold,
-                  'value': value}
+                  'value': value,
+                  'white_level': white_level}
 
         super(TransmissionAbsorptionConverter, self).__init__(**kwargs)
     
@@ -52,7 +54,7 @@ class TransmissionAbsorptionConverter(DataProcessor):
         
         data_raw = self.get_input()
         data = data_raw.geometry.allocate(self.value)
-        mask = data_raw.as_array() > self.threshold
-        data.as_array()[mask] = -1 * numpy.log(data_raw.as_array()[mask])
+        mask = (data_raw.as_array() / self.white_level) > self.threshold
+        data.as_array()[mask] = -1 * numpy.log(data_raw.as_array()[mask] / self.white_level)
         
         return data

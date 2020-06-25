@@ -169,7 +169,7 @@ class TotalVariation(Function):
             
             # this can be replaced by axpby
             if isinstance (tau, (Number, np.float32, np.float64)):
-                tmp_x.axpby(-self.regularising_parameter, tau, x, out=tmp_x)
+                tmp_x.axpby(-self.regularising_parameter*tau, 1.0, x, out=tmp_x)
             else:
                 tmp_x *= -self.regularising_parameter
                 tmp_x *= tau

@@ -22,3 +22,5 @@ from .Slicer import Slicer
 from .Padder import Padder
 from .MaskGenerator import MaskGenerator
 from .Masker import Masker
+from .TransmissionAbsorptionConverter import TransmissionAbsorptionConverter
+from .AbsorptionTransmissionConverter import AbsorptionTransmissionConverter

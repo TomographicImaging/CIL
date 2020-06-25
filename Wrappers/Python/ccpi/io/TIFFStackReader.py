@@ -22,6 +22,7 @@ from __future__ import print_function
 
 import numpy
 import os
+import re
 
 
 pilAvailable = True
@@ -131,7 +132,7 @@ class TIFFStackReader(object):
         if not self._tiff_files:
             raise Exception("No tiff files were found in the directory \n{}".format(self.path))
         
-        self._tiff_files.sort()
+        self._tiff_files.sort(key=self.__natural_keys)
                
                 
     def load_images(self):
@@ -235,7 +236,21 @@ class TIFFStackReader(object):
                 else:
                     im[(i - roi_par[0][0]) // roi_par[0][2], :, :] = tmp
         
-        return im
+        return numpy.squeeze(im)
+    
+    def __atoi(self, text):
+        return int(text) if text.isdigit() else text
+    
+    def __natural_keys(self, text):
+        '''
+        https://stackoverflow.com/questions/5967500/how-to-correctly-sort-a-string-with-a-number-inside
+        alist.sort(key=natural_keys) sorts in human order
+        http://nedbatchelder.com/blog/200712/human_sorting.html
+        (See Toothy's implementation in the comments)
+        '''
+        return [self.__atoi(c) for c in re.split(r'(\d+)', text) ]
+    
+    
 
 
 '''

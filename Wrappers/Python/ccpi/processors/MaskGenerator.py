@@ -100,7 +100,11 @@ class MaskGenerator(DataProcessor):
             return True 
 
     def process(self):
-
+        
+        if self.mode not in ['special_values', 'nan', 'inf', 'threshold', 'quantile',\
+                             'mean', 'median', 'movmean', 'movmedian']:
+            raise Exception("Wrong mode. One of the following is expected:\n special_values, nan, inf, threshold, quantile, mean, median, movmean, movmedian")
+        
         data = self.get_input()
         
         mask = numpy.zeros(data.as_array().shape, dtype=bool)

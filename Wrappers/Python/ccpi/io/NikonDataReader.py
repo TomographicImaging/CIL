@@ -237,18 +237,30 @@ class NikonDataReader(object):
         else:
             angles = angles[slice(self._roi_par[0][0], self._roi_par[0][1], self._roi_par[0][2])]
         
-        # fill in metadata
-        self._ag = AcquisitionGeometry(geom_type = 'cone', 
-                                       dimension = '3D', 
-                                       angles = angles, 
-                                       pixel_num_h = pixel_num_h, 
-                                       pixel_size_h = pixel_size_h, 
-                                       pixel_num_v = pixel_num_v, 
-                                       pixel_size_v = pixel_size_v, 
-                                       dist_source_center = source_x, 
-                                       dist_center_detector = detector_x - source_x, 
-                                       channels = 1,
-                                       angle_unit = 'degree')
+        if pixel_num_v > 1:
+            # fill in metadata
+            self._ag = AcquisitionGeometry(geom_type = 'cone', 
+                                           dimension = '3D', 
+                                           angles = angles, 
+                                           pixel_num_h = pixel_num_h, 
+                                           pixel_size_h = pixel_size_h, 
+                                           pixel_num_v = pixel_num_v, 
+                                           pixel_size_v = pixel_size_v, 
+                                           dist_source_center = source_x, 
+                                           dist_center_detector = detector_x - source_x, 
+                                           channels = 1,
+                                           angle_unit = 'degree')
+        else:
+            self._ag = AcquisitionGeometry(geom_type = 'cone', 
+                                           dimension = '2D', 
+                                           angles = angles, 
+                                           pixel_num_h = pixel_num_h, 
+                                           pixel_size_h = pixel_size_h,
+                                           dist_source_center = source_x, 
+                                           dist_center_detector = detector_x - source_x, 
+                                           channels = 1,
+                                           angle_unit = 'degree')
+                
 
     def get_geometry(self):
         
@@ -286,21 +298,35 @@ class NikonDataReader(object):
         if (self.normalize):
             data /= self._white_level
             data[data > 1] = 1
-        
-        if self.fliplr:
-            return AcquisitionData(array = data[:, :, ::-1], 
-                                   deep_copy = False,
-                                   geometry = self._ag,
-                                   dimension_labels = ['angle', \
-                                                       'vertical', \
-                                                       'horizontal'])
+
+        if self._ag.pixel_num_v == 0:
+            if self.fliplr:
+                return AcquisitionData(array = data[:, ::-1], 
+                                       deep_copy = False,
+                                       geometry = self._ag,
+                                       dimension_labels = ['angle', \
+                                                           'horizontal'])
+            else:
+                return AcquisitionData(array = data, 
+                                       deep_copy = False,
+                                       geometry = self._ag,
+                                       dimension_labels = ['angle', \
+                                                           'horizontal'])
         else:
-            return AcquisitionData(array = data, 
-                                   deep_copy = False,
-                                   geometry = self._ag,
-                                   dimension_labels = ['angle', \
-                                                       'vertical', \
-                                                       'horizontal'])
+            if self.fliplr:
+                return AcquisitionData(array = data[:, :, ::-1], 
+                                       deep_copy = False,
+                                       geometry = self._ag,
+                                       dimension_labels = ['angle', \
+                                                           'vertical', \
+                                                           'horizontal'])
+            else:
+                return AcquisitionData(array = data, 
+                                       deep_copy = False,
+                                       geometry = self._ag,
+                                       dimension_labels = ['angle', \
+                                                           'vertical', \
+                                                           'horizontal'])
 
 
 '''

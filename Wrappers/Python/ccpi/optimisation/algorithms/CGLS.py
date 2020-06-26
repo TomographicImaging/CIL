@@ -86,7 +86,7 @@ class CGLS(Algorithm):
 
         self.gamma = self.norms0**2
         self.normx = self.x.norm()
-        #self.xmax = self.normx   
+        self.xmax = self.normx   
         
         self.loss.append(self.r.squared_norm())
         self.configured = True
@@ -109,16 +109,14 @@ class CGLS(Algorithm):
         self.operator.adjoint(self.r, out=self.s)
         
         self.norms = self.s.norm()
-
         self.gamma1 = self.gamma
         self.gamma = self.norms**2
-
         self.beta = self.gamma/self.gamma1
         #self.p = self.s + self.beta * self.p   
         self.p.axpby(self.beta, 1, self.s, out=self.p)
         
         self.normx = self.x.norm()
-        #self.xmax = numpy.maximum(self.xmax, self.normx)
+        self.xmax = numpy.maximum(self.xmax, self.normx)
                     
 
     def update_objective(self):

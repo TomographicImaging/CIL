@@ -170,7 +170,7 @@ class NikonDataReader(object):
         input_path = os.path.dirname(self.xtek_file)
         angles_ctdata_file = os.path.join(input_path, '_ctdata.txt')
         angles_named_file = os.path.join(input_path, self._experiment_name+'.ang')
-        angles = numpy.empty(num_projections, dtype = numpy.float32)
+        angles = numpy.zeros(num_projections, dtype = 'float')
         
         # look for _ctdata.txt
         if os.path.exists(angles_ctdata_file):
@@ -198,8 +198,7 @@ class NikonDataReader(object):
             angles = numpy.flipud(angles + initial_angle) # angles are in the reverse order
             
         else:   # calculate angles based on xtek file
-            for i in range(num_projections):
-                angles[i] = initial_angle + angular_step * i
+            angles = initial_angle + angular_step * range(num_projections)
         
         # fill in metadata
         self._ag = AcquisitionGeometry(geom_type = 'cone', 
@@ -235,14 +234,14 @@ class NikonDataReader(object):
         num_projections = numpy.shape(self._ag.angles)[0]
         
         # allocate array to store projections    
-        data = numpy.empty((num_projections, self._ag.pixel_num_v, self._ag.pixel_num_h), dtype = numpy.float32)
+        data = numpy.zeros((num_projections, self._ag.pixel_num_v, self._ag.pixel_num_h), dtype = float)
         
         for i in range(num_projections):
             
             filename = (path_projection + '/' + self._experiment_name + '_{:04d}.tif').format(i + 1)
             
             try:
-                tmp = numpy.asarray(Image.open(filename), dtype = numpy.float32)
+                tmp = numpy.asarray(Image.open(filename), dtype = float)
             except:
                 print('Error reading\n {}\n file.'.format(filename))
                 raise

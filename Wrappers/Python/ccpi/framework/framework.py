@@ -1190,47 +1190,7 @@ class AcquisitionGeometry(object):
  
         else:
             raise NotImplementedError("Per projection geometry is not yet implemented")   
-            self.per_projection = True
-            self.num_positions = len(detector_position)
-            self.angles = None
-            none_list = [None]*self.num_positions
-            zero_list = [[0.]*dof]*self.num_positions
 
-            #need a complete list for these
-            if self.geom_type == AcquisitionGeometry.PARALLEL and ray_direction is None:
-                print("nope")
-            if self.geom_type == AcquisitionGeometry.CONE and source_position is None:
-                print("nope")    
-            if detector_position is None:
-                print("nope")
-            if detector_direction_row is None:
-                print("nope")                
-            if detector_direction_col is None:
-                print("nope")
-
-            if source_position is None:
-                source_position = none_list
-            if ray_direction is None:
-                ray_direction = none_list
-            if rotation_axis_position is None:
-                rotation_axis_position = none_list
-            if rotation_axis_direction is None:
-                rotation_axis_position = none_list
-
-            self.configuration = none_list
-            
-            for pos in range(self.num_positions):
-                self.configuration[pos] =  SystemConfiguration( dof,
-                                                                self.geom_type,
-                                                                source_position[pos], 
-                                                                ray_direction[pos], 
-                                                                detector_position[pos], 
-                                                                detector_direction_row[pos], 
-                                                                detector_direction_col[pos], 
-                                                                rotation_axis_position[pos], 
-                                                                rotation_axis_direction[pos]
-                                                            )  
-    
         labels = kwargs.get('dimension_labels', None)
         self.dimension_labels = labels
 

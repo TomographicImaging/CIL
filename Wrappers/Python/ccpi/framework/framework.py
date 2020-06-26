@@ -770,15 +770,17 @@ class Panel(object):
 
     @num_pixels.setter
     def num_pixels(self, val):
+
         if isinstance(val,int):
+            num_pixels_temp = [val, 1]
+        else:
             try:
-                val = int(val)
+                length_val = len(val)
             except:
                 TypeError('num_pixels expected int x or [int x, int y]. Got {}'.format(type(val)))
 
-            num_pixels_temp = [val, 1]
 
-        elif len(val) == 2:
+        if length_val == 2:
             try:
                 val0 = int(val[0])
                 val1 = int(val[1])
@@ -800,24 +802,33 @@ class Panel(object):
 
     @pixel_size.setter
     def pixel_size(self, val):
+
         if val is None:
-            pixel_size_temp = pixel_size = [1.0,1.0] 
+            pixel_size_temp = [1.0,1.0] 
         else:
+
             try:
-                temp = float(val)
-                pixel_size_temp = [temp, temp]
-            except TypeError:
-                if len(val) == 2:
-                    try:
-                        temp0 = float(val[0]) 
-                        temp1 = float(val[1]) 
-                        pixel_size_temp = [temp0, temp1]
-                    except:
-                        raise ValueError('pixel_size expected float xy or [float x, float y]. Got {}'.format(val))
-                else:
-                    raise ValueError('pixel_size expected float xy or [float x, float y]. Got {}'.format(val))
+                length_val = len(val)
+            except:
+                try:
+                    temp = float(val)
+                    pixel_size_temp = [temp, temp]
+
+                except:
+                    raise TypeError('pixel_size expected float xy or [float x, float y]. Got {}'.format(val))    
+
     
-            if pixel_size_temp <= [0,0]:
+            if length_val == 2:
+                try:
+                    temp0 = float(val[0]) 
+                    temp1 = float(val[1]) 
+                    pixel_size_temp = [temp0, temp1]
+                except:
+                    raise ValueError('pixel_size expected float xy or [float x, float y]. Got {}'.format(val))
+            else:
+                raise ValueError('pixel_size expected float xy or [float x, float y]. Got {}'.format(val))
+    
+            if pixel_size_temp[0] <= 0 or pixel_size_temp[1] <= 0:
                 raise ValueError('pixel_size (x,y) at must be > (0.,0.). Got {}'.format(pixel_size_temp)) 
 
         self.__pixel_size = pixel_size_temp

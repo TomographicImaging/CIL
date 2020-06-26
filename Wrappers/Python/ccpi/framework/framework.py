@@ -394,8 +394,6 @@ class SystemConfiguration(object):
         :return: returns [dist_source_center, dist_center_detector, magnification],  [0] distance from the source to the rotate axis, [1] distance from the rotate axis to the detector, [2] magnification of the system
         :rtype: list
         '''
-        # calculates the source to the rotate axis vector, 
-        # and the distance from the rotate axis to the detector along this direction
 
         #if parallel beam data
         if not hasattr(self.source, 'position'):
@@ -777,7 +775,6 @@ class Panel(object):
                 val = int(val)
             except:
                 TypeError('num_pixels expected int x or [int x, int y]. Got {}'.format(type(val)))
-                #ToDo Add deprecation warning
 
             num_pixels_temp = [val, 1]
 
@@ -888,7 +885,7 @@ class AcquisitionGeometry(object):
     :param ray_direction: Parallel-beam CT specific. A vector describing the x-ray beam direction
     :type ray_direction: list, tuple, ndarray, optional
 
-    Detector description:
+    Detector description
     :param detector_pos: A vector describing the position of the centre of the detector
     :type detector_pos: list, tuple, ndarray, optional
     :param detector_direction_row: A vector describing the direction of the pixels in the rows of the detector
@@ -896,6 +893,7 @@ class AcquisitionGeometry(object):
     :param detector_direction_col: A vector describing the direction of the pixels in the coloumns of the detector
     :type detector_direction_col: list, tuple, ndarray, optional 
 
+    Rotation axis description
     :param rotation_axis_pos: A vector describing the position of the axis of rotation, defaults to the origin
     :type rotation_axis_pos: list, tuple, ndarray, optional
     :param rotation_axis_direction: A vector describing the direction of the axis of rotation
@@ -1011,7 +1009,6 @@ class AcquisitionGeometry(object):
 
     @shape.setter
     def shape(self, val):
-        #ToDo better warnings
         raise Warning("Deprecated - shape will be set automatically")
         pass
 
@@ -1237,7 +1234,6 @@ class AcquisitionGeometry(object):
 
     def clone(self):
         '''returns a copy of the AcquisitionGeometry'''
-        #todo check for python2 compatability
         return copy.deepcopy(self)
 
     def copy(self):
@@ -1294,7 +1290,7 @@ class AcquisitionGeometry(object):
                                                 
         else:
             repres += "\tgeometry stored per projection\n"
-            #ToDo print arrays
+
       
         return repres
         
@@ -2206,8 +2202,6 @@ class AcquisitionData(DataContainer):
             geometry.dimension_labels = dimension_labels_temp      
 
         return (geometry.shape, dimension_labels)
-
-    #ToDo: insert transpose and slicde methods that return this
 
     def subset(self, dimensions=None, **kw):
         '''returns a subset of the AcquisitionData and regenerates the geometry'''

@@ -17,20 +17,17 @@
 #   limitations under the License.
 
 from .Operator import Operator, LinearOperator, ScaledOperator, SumOperator,\
- CompositionOperator, Composition2Operator
+ CompositionOperator
 from .BlockOperator import BlockOperator
-
 from .SparseFiniteDiff import SparseFiniteDiff
-from .ShrinkageOperator import ShrinkageOperator
-
 from .FiniteDifferenceOperator import FiniteDiff
 from .GradientOperator import Gradient
 from .SymmetrizedGradientOperator import SymmetrizedGradient
 from .IdentityOperator import Identity
 from .ZeroOperator import ZeroOperator
 from .LinearOperatorMatrix import LinearOperatorMatrix
-
 from .DiagonalOperator import DiagonalOperator
 from .MaskOperator import MaskOperator
 from .ChannelwiseOperator import ChannelwiseOperator
+from .BlurringOperator import BlurringOperator
 

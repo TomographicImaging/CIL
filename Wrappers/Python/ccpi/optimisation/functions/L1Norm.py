@@ -22,9 +22,22 @@ from __future__ import division
 from __future__ import print_function
 
 from ccpi.optimisation.functions import Function       
-from ccpi.optimisation.operators import ShrinkageOperator 
 import numpy as np
+
  
+def soft_shrinkage(x, tau, out=None):
+    
+    r"""Returns the value of the soft-shrinkage operator at x.
+    """
+    
+    if out is None:
+        return x.sign() * (x.abs() - tau).maximum(0) 
+    else:
+        x.abs(out = out)
+        out -= tau
+        out.maximum(0, out = out)
+        out *= x.sign()  
+        
 
 class L1Norm(Function):
     
@@ -48,7 +61,6 @@ class L1Norm(Function):
         '''
         super(L1Norm, self).__init__()
         self.b = kwargs.get('b',None)
-        self.shinkage_operator = ShrinkageOperator()
         
     def __call__(self, x):
         
@@ -84,13 +96,15 @@ class L1Norm(Function):
             \end{cases}
     
         """        
-        tmp = (np.abs(x.as_array()).max() - 1)
+        
+        tmp = x.abs().max() - 1
         if tmp<=1e-5:            
             if self.b is not None:
                 return self.b.dot(x)
             else:
                 return 0.
-        return np.inf        
+        return np.inf    
+
                     
     def proximal(self, x, tau, out=None):
         
@@ -107,18 +121,24 @@ class L1Norm(Function):
         .. math :: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) = sgn(x) * \max\{ |x| - \tau, 0 \}
                             
         """  
+
+                    
+        if out is None:                                                
+            if self.b is not None:                                
+                return self.b + soft_shrinkage(x - self.b, tau)
+            else:
+                return soft_shrinkage(x, tau)             
+        else: 
             
-        if out is None:
             if self.b is not None:
-                return self.b + self.shinkage_operator(x - self.b, tau)
+                soft_shrinkage(x - self.b, tau, out = out)
+                out += self.b
+#                out.fill(self.b + self.shinkage_operator(x - self.b, tau))
             else:
-                return self.shinkage_operator(x, tau)             
-        else:
-            if self.b is not None:
-                out.fill(self.b + self.shinkage_operator(x - self.b, tau))
-            else:
-                out.fill(self.shinkage_operator(x, tau))
-                                    
+                soft_shrinkage(x, tau, out = out)       
+#                out.fill(self.shinkage_operator(x, tau))
+                                                
+    
 #    def proximal_conjugate(self, x, tau, out=None):
 #        
 #        r'''Proximal operator of the convex conjugate of L1Norm at x:
@@ -138,78 +158,4 @@ class L1Norm(Function):
 #            else:
 #                out.fill(x.divide(x.abs().maximum(1.0)) )                
             
-#    def __rmul__(self, scalar):
-#        
-#        '''Multiplication of L2NormSquared with a scalar        
-#            
-#            Returns: ScaledFunction
-#        '''
-#        
-#        return ScaledFunction(self, scalar)
 
-
-if __name__ == '__main__':   
-    
-    from ccpi.framework import ImageGeometry
-    import numpy
-    N, M = 400,400
-    ig = ImageGeometry(N, M)
-    scalar = 10
-    b = ig.allocate('random')
-    u = ig.allocate('random') 
-    
-    f = L1Norm()
-    f_scaled = scalar * L1Norm()
-
-    f_b = L1Norm(b=b)
-    f_scaled_b = scalar * L1Norm(b=b)
-    
-    # call  
-        
-    a1 = f(u)
-    a2 = f_scaled(u)
-    numpy.testing.assert_equal(scalar * a1, a2)
-    
-    a3 = f_b(u)
-    a4 = f_scaled_b(u)
-    numpy.testing.assert_equal(scalar * a3, a4) 
-    
-    # proximal
-    tau = 0.4
-    b1 = f.proximal(u, tau*scalar)
-    b2 = f_scaled.proximal(u, tau)
-        
-    numpy.testing.assert_array_almost_equal(b1.as_array(), b2.as_array(), decimal=4)
-    
-    b3 = f_b.proximal(u, tau*scalar)
-    b4 = f_scaled_b.proximal(u, tau)
-    
-    z1 = b + (u-b).sign() * ((u-b).abs() - tau * scalar).maximum(0)
-        
-    numpy.testing.assert_array_almost_equal(b3.as_array(), b4.as_array(), decimal=4)    
-#        
-#    #proximal conjugate
-#    
-    c1 = f_scaled.proximal_conjugate(u, tau)
-    c2 = u.divide((u.abs()/scalar).maximum(1.0))
-    
-    numpy.testing.assert_array_almost_equal(c1.as_array(), c2.as_array(), decimal=4) 
-    
-    c3 = f_scaled_b.proximal_conjugate(u, tau)
-    c4 = (u - tau*b).divide( ((u-tau*b).abs()/scalar).maximum(1.0) )
-    
-    numpy.testing.assert_array_almost_equal(c3.as_array(), c4.as_array(), decimal=4)     
-    
-    
-    
-
-
-
-    
-            
-        
-
-        
-        
-        
-      

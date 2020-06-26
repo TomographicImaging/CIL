@@ -36,23 +36,9 @@ class MixedL21Norm(Function):
     """      
     
     def __init__(self, **kwargs):
-        '''Creator
-        
-        :param b:  translation of the function
-        :type b: :code:`DataContainer`, optional
-        '''
-        super(MixedL21Norm, self).__init__()  
-        self.b = kwargs.get('b', None)  
 
-        # This is to handle tensor for Total Generalised Variation                    
-        self.SymTensor = kwargs.get('SymTensor',False)
-        
-        # We use this parameter to make MixedL21Norm differentiable
-#        self.epsilon = epsilon
-        
-        if self.b is not None and not isinstance(self.b, BlockDataContainer):
-            raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(self.b)))
-            
+        super(MixedL21Norm, self).__init__()  
+                    
         
     def __call__(self, x):
         
@@ -62,25 +48,9 @@ class MixedL21Norm(Function):
         """
         if not isinstance(x, BlockDataContainer):
             raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 
+              
+        return x.pnorm(p=2).sum()                                
             
-#        tmp_cont = x.containers                        
-#        tmp = x.get_item(0) * 0.
-#        for el in tmp_cont:
-#            tmp += el.power(2.)
-#        tmp.add(self.epsilon**2, out = tmp)    
-#        return tmp.sqrt().sum()            
-         
-        y = x
-        if self.b is not None:
-            y = x - self.b    
-        return y.pnorm(p=2).sum()                                
-            
-#        tmp = x.get_item(0) * 0.
-#        for el in x.containers:
-#            tmp += el.power(2.)
-#        #tmp.add(self.epsilon, out = tmp)    
-#        return tmp.sqrt().sum()
-
                             
     def convex_conjugate(self,x):
         
@@ -103,19 +73,8 @@ class MixedL21Norm(Function):
         """
         if not isinstance(x, BlockDataContainer):
             raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 
-                
-#        tmp1 = x.get_item(0) * 0.
-#        for el in x.containers:
-#            tmp1 += el.power(2.)
-#        tmp1.add(self.epsilon**2, out = tmp1)
-#        tmp = tmp1.sqrt().as_array().max() - 1
-#                    
-#        if tmp<=1e-6:
-#            return 0
-#        else:
-#            return np.inf            
-                
-        tmp = (x.pnorm(2).as_array().max() - 1)
+                                        
+        tmp = (x.pnorm(2).max() - 1)
         if tmp<=1e-5:
             return 0
         else:
@@ -130,148 +89,87 @@ class MixedL21Norm(Function):
         where the convention 0 · (0/0) = 0 is used.
         
         """
-        
+
         if out is None:
-            
             tmp = x.pnorm(2)
             res = (tmp - tau).maximum(0.0) * x/tmp
-            
+
+            # TODO avoid using numpy, add operation in the framework
+            # This will be useful when we add cupy 
+                                 
             for el in res.containers:
-                el.as_array()[np.isnan(el.as_array())]=0            
-            
-            return res            
+
+                elarray = el.as_array()
+                elarray[np.isnan(elarray)]=0
+                el.fill(elarray)
+
+            return res
             
         else:
             
             tmp = x.pnorm(2)
-            res = (tmp - tau).maximum(0.0) * x/tmp
-
-            for el in res.containers:
-                el.as_array()[np.isnan(el.as_array())]=0
-
-            out.fill(res)            
+            tmp_ig = 0.0 * tmp
+            (tmp - tau).maximum(0.0, out = tmp_ig)
+            tmp_ig.multiply(x, out = out)
+            out.divide(tmp, out = out)
             
-                        
-#            tmp = functools.reduce(lambda a,b: a + b*b, x.containers, x.get_item(0) * 0 ).sqrt()
-#            res = (tmp - tau).maximum(0.0) * x/tmp
-#
-#            for el in res.containers:
-#                el.as_array()[np.isnan(el.as_array())]=0
-#
-#            out.fill(res)
-        
-##############################################################################
-        ##############################################################################
-#    def proximal_conjugate(self, x, tau, out=None): 
-#
-#        
-#        if out is None:                                        
-#            tmp = x.get_item(0) * 0	
-#            for el in x.containers:	
-#                tmp += el.power(2.)	
-#            tmp.sqrt(out=tmp)	
-#            tmp.maximum(1.0, out=tmp)	
-#            frac = [ el.divide(tmp) for el in x.containers ]	
-#            return BlockDataContainer(*frac)
-#        
-#    
-#        else:
-#                            
-#            res1 = functools.reduce(lambda a,b: a + b*b, x.containers, x.get_item(0) * 0 )
-#            res1.sqrt(out=res1)	
-#            res1.maximum(1.0, out=res1)	
-#            x.divide(res1, out=out)
-                              
+            for el in out.containers:
+                
+                elarray = el.as_array()
+                elarray[np.isnan(elarray)]=0
+                el.fill(elarray)  
 
-if __name__ == '__main__':
+            out.fill(out)
+
+class SmoothMixedL21Norm(Function):
     
-    M, N, K = 2,3,50
-    from ccpi.framework import BlockGeometry, ImageGeometry
-    import numpy
+    """ SmoothMixedL21Norm function: :math:`F(x) = ||x||_{2,1} = \sum |x|_{2} = \sum \sqrt{ (x^{1})^{2} + (x^{2})^{2} + \epsilon^2 + \dots}`                  
     
-    ig = ImageGeometry(M, N)
-    
-    BG = BlockGeometry(ig, ig)
-    
-    U = BG.allocate('random_int')
-    
-    # Define no scale and scaled
-    alpha = 0.5
-    f_no_scaled = MixedL21Norm() 
-    f_scaled = alpha * MixedL21Norm()  
-    
-    # call
-    
-    a1 = f_no_scaled(U)
-    a2 = f_scaled(U)    
-    print(a1, 2*a2)
+        where x is a BlockDataContainer, i.e., :math:`x=(x^{1}, x^{2}, \dots)`
+        
+        Conjugate, proximal and proximal conjugate methods no closed-form solution
         
     
-    print( " ####### check without out ######### " )
-          
-          
-    u_out_no_out = BG.allocate('random_int')         
-    res_no_out = f_scaled.proximal_conjugate(u_out_no_out, 0.5)          
-    print(res_no_out[0].as_array())
-    
-    print( " ####### check with out ######### " ) 
-#          
-    res_out = BG.allocate()        
-    f_scaled.proximal_conjugate(u_out_no_out, 0.5, out = res_out)
-#    
-    print(res_out[0].as_array())   
-#
-    numpy.testing.assert_array_almost_equal(res_no_out[0].as_array(), \
-                                            res_out[0].as_array(), decimal=4)
+    """    
+        
+    def __init__(self, epsilon):
+                
+        r'''
+        :param epsilon: smoothing parameter making MixedL21Norm differentiable 
+        '''
 
-    numpy.testing.assert_array_almost_equal(res_no_out[1].as_array(), \
-                                            res_out[1].as_array(), decimal=4)     
-    
-    
-    tau = 0.4
-    d1 = f_scaled.proximal(U, tau)
-    
-    tmp = (U.get_item(0)**2 + U.get_item(1)**2).sqrt()
-    
-    d2 = (tmp - alpha*tau).maximum(0) * U/tmp
-    
-    numpy.testing.assert_array_almost_equal(d1.get_item(0).as_array(), \
-                                            d2.get_item(0).as_array(), decimal=4) 
+        super(SmoothMixedL21Norm, self).__init__(L=1)
+        self.epsilon = epsilon   
+                
+        if self.epsilon==0:
+            raise ValueError('We need epsilon>0. Otherwise, call "MixedL21Norm" ')
+                            
+    def __call__(self, x):
+        
+        r"""Returns the value of the SmoothMixedL21Norm function at x.
+        """
+        if not isinstance(x, BlockDataContainer):
+            raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 
+            
+            
+        return (x.pnorm(2).power(2) + self.epsilon**2).sqrt().sum()
+         
 
-    numpy.testing.assert_array_almost_equal(d1.get_item(1).as_array(), \
-                                            d2.get_item(1).as_array(), decimal=4)     
-    
-    out1 = BG.allocate('random_int')
-    
-    
-    f_scaled.proximal(U, tau, out = out1)
-    
-    numpy.testing.assert_array_almost_equal(out1.get_item(0).as_array(), \
-                                            d1.get_item(0).as_array(), decimal=4) 
-
-    numpy.testing.assert_array_almost_equal(out1.get_item(1).as_array(), \
-                                            d1.get_item(1).as_array(), decimal=4)   
-    
-    f_scaled.proximal_conjugate(U, tau, out = out1)
-    x = U
-    tmp = x.get_item(0) * 0	
-    for el in x.containers:	
-        tmp += el.power(2.)	
-    tmp.sqrt(out=tmp)	
-    (tmp/f_scaled.scalar).maximum(1.0, out=tmp)	
-    frac = [ el.divide(tmp) for el in x.containers ]	
-    out2 = BlockDataContainer(*frac)   
-    
-    numpy.testing.assert_array_almost_equal(out1.get_item(0).as_array(), \
-                                            out2.get_item(0).as_array(), decimal=4)       
-    
-    
-
-      
-    
-    
-    
-
-    
-
-    
+    def gradient(self, x, out=None): 
+        
+        r"""Returns the value of the gradient of the SmoothMixedL21Norm function at x.
+        
+        \frac{x}{|x|}
+                
+                
+        """     
+        
+        if not isinstance(x, BlockDataContainer):
+            raise ValueError('__call__ expected BlockDataContainer, got {}'.format(type(x))) 
+                   
+        denom = (x.pnorm(2).power(2) + self.epsilon**2).sqrt()
+                          
+        if out is None:
+            return x.divide(denom)
+        else:
+            x.divide(denom, out=out)        

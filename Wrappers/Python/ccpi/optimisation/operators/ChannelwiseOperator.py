@@ -38,10 +38,11 @@ class ChannelwiseOperator(LinearOperator):
                        
         :param op: Single-channel operator
         :param channels: Number of channels
+        :param dimension: 'prepend' (default) or 'append' channel dimension onto existing dimensions
                        
      '''
     
-    def __init__(self, op, channels):
+    def __init__(self, op, channels, dimension='prepend'):
         
         dom_op = op.domain_geometry()
         ran_op = op.range_geometry()
@@ -52,6 +53,12 @@ class ChannelwiseOperator(LinearOperator):
         # input single-channel geometries but with the specified number of
         # channels and additional dimension_label 'channel'.
         for geom in [dom_op,ran_op]:
+            if dimension == 'prepend':
+                new_dimension_labels = ['channel']+geom.dimension_labels
+            elif dimension == 'append':
+                new_dimension_labels = geom.dimension_labels+['channel']
+            else:
+                raise Exception("dimension must be either 'prepend' or 'append'")
             if isinstance(geom, ImageGeometry):
                 geom_mc.append(
                     ImageGeometry(  
@@ -65,7 +72,7 @@ class ChannelwiseOperator(LinearOperator):
                     geom.center_y, 
                     geom.center_z, 
                     channels,
-                    dimension_labels=['channel'] + dom_op.dimension_labels))
+                    dimension_labels=new_dimension_labels))
             elif isinstance(geom, AcquisitionGeometry):
                 geom_mc.append(
                     AcquisitionGeometry(
@@ -79,7 +86,7 @@ class ChannelwiseOperator(LinearOperator):
                        geom.dist_source_center, 
                        geom.dist_center_detector, 
                        channels,
-                       dimension_labels=['channel'] + dom_op.dimension_labels))
+                       dimension_labels=new_dimension_labels ))
             elif isinstance(geom,BlockGeometry):
                 raise Exception("ChannelwiseOperator does not support BlockOperator as input. Consider making a BlockOperator of ChannelwiseOperators instead.")
             else:

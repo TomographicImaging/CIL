@@ -205,7 +205,7 @@ class NexusReader(object):
         data = self.load_projection(dimensions)
         dims = self.get_projection_dimensions()
         geometry = AcquisitionGeometry('parallel', '3D', 
-                                       self.get_projection_angles(),
+                                       angles = self.get_projection_angles(),
                                        pixel_num_h          = dims[2],
                                        pixel_size_h         = 1 ,
                                        pixel_num_v          = dims[1],
@@ -282,7 +282,7 @@ class NexusReader(object):
         if ymax-ymin > 1:        
             
             geometry = AcquisitionGeometry('parallel', '3D', 
-                                       angles,
+                                       angles = angles,
                                        pixel_num_h          = dims[2],
                                        pixel_size_h         = 1 ,
                                        pixel_num_v          = ymax-ymin,
@@ -296,7 +296,7 @@ class NexusReader(object):
             return out
         elif ymax-ymin == 1:
             geometry = AcquisitionGeometry('parallel', '2D', 
-                                       angles,
+                                       angles = angles,
                                        pixel_num_h          = dims[2],
                                        pixel_size_h         = 1 ,
                                        dist_source_center   = None, 
@@ -365,7 +365,7 @@ class NexusReader(object):
         if bmax-bmin > 1:        
             
             geometry = AcquisitionGeometry('parallel', '3D', 
-                                       angles,
+                                       angles = angles,
                                        pixel_num_h          = dims[2],
                                        pixel_size_h         = 1 ,
                                        pixel_num_v          = bmax-bmin,
@@ -380,7 +380,7 @@ class NexusReader(object):
             
         elif bmax-bmin == 1:
             geometry = AcquisitionGeometry('parallel', '2D', 
-                                       angles,
+                                       angles = angles,
                                        pixel_num_h          = dims[2],
                                        pixel_size_h         = 1 ,
                                        dist_source_center   = None, 
@@ -447,8 +447,8 @@ class XTEKReader(object):
                 
         #Read Angles
         angles = self.read_angles()    
-        self.geometry = AcquisitionGeometry('cone', '3D', angles, pixel_num_h, xpixel_size, pixel_num_v, ypixel_size, -1 * source_x, 
-                 detector_x - source_x, 
+        self.geometry = AcquisitionGeometry('cone', '3D', angles=angles, pixel_num_h=pixel_num_h, pixel_size_h=xpixel_size, pixel_num_v=pixel_num_v, pixel_size_v=ypixel_size, dist_source_center=-1 * source_x, 
+                 dist_center_detector=detector_x - source_x, 
                  )
         
     def read_angles(self):

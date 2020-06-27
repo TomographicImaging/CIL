@@ -209,7 +209,7 @@ class Gradient_numpy(LinearOperator):
                 self.FD.direction = self.ind[i]
                 self.FD.direct(x, out = out[i])
         else:
-            tmp = self.gm_range.allocate()        
+            tmp = self.gm_range.allocate(0)        
             for i in range(tmp.shape[0]):
                 self.FD.direction=self.ind[i]
                 tmp.get_item(i).fill(self.FD.direct(x))
@@ -219,7 +219,7 @@ class Gradient_numpy(LinearOperator):
         
         if out is not None:
 
-            tmp = self.gm_domain.allocate()            
+            tmp = self.gm_domain.allocate(0)            
             for i in range(x.shape[0]):
                 self.FD.direction=self.ind[i] 
                 self.FD.adjoint(x.get_item(i), out = tmp)
@@ -228,7 +228,7 @@ class Gradient_numpy(LinearOperator):
                 else:
                     out += tmp
         else:            
-            tmp = self.gm_domain.allocate()
+            tmp = self.gm_domain.allocate(0)
             for i in range(x.shape[0]):
                 self.FD.direction=self.ind[i]
 
@@ -254,7 +254,7 @@ class Gradient_numpy(LinearOperator):
     ###########################################################################
     def matrix(self):
         
-        tmp = self.gm_range.allocate()
+        tmp = self.gm_range.allocate(0)
         
         mat = []
         for i in range(tmp.shape[0]):
@@ -267,8 +267,8 @@ class Gradient_numpy(LinearOperator):
 
     def sum_abs_col(self):
         
-        tmp = self.gm_range.allocate()
-        res = self.gm_domain.allocate()
+        tmp = self.gm_range.allocate(0)
+        res = self.gm_domain.allocate(0)
         for i in range(tmp.shape[0]):
             spMat = SparseFiniteDiff(self.gm_domain, direction=self.ind[i], bnd_cond=self.bnd_cond)
             res += spMat.sum_abs_row()
@@ -276,7 +276,7 @@ class Gradient_numpy(LinearOperator):
     
     def sum_abs_row(self):
         
-        tmp = self.gm_range.allocate()
+        tmp = self.gm_range.allocate(0)
         res = []
         for i in range(tmp.shape[0]):
             spMat = SparseFiniteDiff(self.gm_domain, direction=self.ind[i], bnd_cond=self.bnd_cond)

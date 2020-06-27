@@ -54,8 +54,8 @@ class TestGradient(unittest.TestCase):
         G7 = Gradient(ig4, correlation = 'SpaceChannels', backend='numpy')
         print(G7.range_geometry().shape, '3D with channels with corr')
         
-        u = ig1.allocate(ImageGeometry.RANDOM)
-        w = G1.range_geometry().allocate(ImageGeometry.RANDOM)
+        u = ig1.allocate(value=ImageGeometry.RANDOM)
+        w = G1.range_geometry().allocate(value=ImageGeometry.RANDOM)
         
         LHS = (G1.direct(u)*w).sum()
         RHS = (u * G1.adjoint(w)).sum()
@@ -188,8 +188,8 @@ class TestGradient(unittest.TestCase):
         gold_adjoint = grad1.adjoint(gold_direct)
 
         grad2 = Gradient(ig, bnd_cond='Neumann', correlation='SpaceChannels', backend='numpy')
-        out_direct = grad2.range_geometry().allocate()
-        out_adjoint = grad2.domain_geometry().allocate()
+        out_direct = grad2.range_geometry().allocate(0)
+        out_adjoint = grad2.domain_geometry().allocate(0)
         grad2.direct(data, out=out_direct)
         grad2.adjoint(out_direct, out=out_adjoint)
 

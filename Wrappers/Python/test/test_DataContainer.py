@@ -847,6 +847,27 @@ class TestDataContainer(unittest.TestCase):
         d1.axpby(a,b,d2,out)
         res = numpy.zeros_like(d1.as_array())
         numpy.testing.assert_array_equal(res, out.as_array())
+    def test_axpby7(self):
+        print ("test axpby7")
+        #a vec, b vec
+        #daxpby
+        ig = ImageGeometry(10,10)                                               
+        d1 = ig.allocate()                                                     
+        d2 = ig.allocate()   
+        a = ig.allocate()                                                  
+        b = ig.allocate()         
+
+        d1.fill(numpy.arange(1,101).reshape(10,10))
+        d2.fill(numpy.arange(1,101).reshape(10,10))
+        a.fill(1.0/d1.as_array())                                                  
+        b.fill(-1.0/d2.as_array())   
+
+        out = ig.allocate(dtype=numpy.float64)                                                 
+        # equals to 1 + -1 = 0
+        d1.axpby(a,b,d2,out, dtype=numpy.float64)
+        res = numpy.zeros_like(d1.as_array())
+        numpy.testing.assert_array_equal(res, out.as_array())
+
     def test_min(self):
         print ("test min")
         ig = ImageGeometry(10,10)     

@@ -908,14 +908,14 @@ class DataContainer(object):
 
         #convert a and b to numpy arrays and get the reference to the data (length = 1 or ndx.size)
         nda = numpy.asarray(a)
-        ndb = numpy.asarray(a)
+        ndb = numpy.asarray(b)
 
         a_vec = 0
-        if len(nda) > 1:
+        if nda.size > 1:
             a_vec = 1
 
         b_vec = 0
-        if len(ndb) > 1:
+        if ndb.size > 1:
             b_vec = 1
 
         # get the reference to the data

@@ -907,8 +907,15 @@ class DataContainer(object):
         c_double_p = ctypes.POINTER(ctypes.c_double)
 
         #convert a and b to numpy arrays and get the reference to the data (length = 1 or ndx.size)
-        nda = numpy.asarray(a)
-        ndb = numpy.asarray(b)
+        try:
+            nda = a.as_array()
+        except:
+            nda = numpy.asarray(a)
+
+        try:
+            ndb = b.as_array()
+        except:
+            ndb = numpy.asarray(b)
 
         a_vec = 0
         if nda.size > 1:

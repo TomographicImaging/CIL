@@ -373,7 +373,11 @@ class BlockOperator(Operator):
                     prod += self.get_item(row, col).sum_abs_col()
             res.append(prod)
 
-        return BlockDataContainer(*res)        
+        return BlockDataContainer(*res)
+
+    def __len__(self):
+        
+        return len(self.operators)        
         
         
         

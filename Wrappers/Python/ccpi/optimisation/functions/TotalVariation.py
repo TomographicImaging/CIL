@@ -168,12 +168,14 @@ class TotalVariation(Function):
             self.gradient.adjoint(tmp_q, out = tmp_x)
             
             # this can be replaced by axpby
-            if isinstance (tau, (Number, np.float32, np.float64)):
-                tmp_x.axpby(-self.regularising_parameter*tau, 1.0, x, out=tmp_x)
-            else:
-                tmp_x *= -self.regularising_parameter
-                tmp_x *= tau
-                tmp_x += x
+#            if isinstance (tau, (Number, np.float32, np.float64)):
+#                tmp_x.axpby(-self.regularising_parameter*tau, 1.0, x, out=tmp_x)
+#            else:
+#                tmp_x *= -self.regularising_parameter
+#                tmp_x *= tau
+#                tmp_x += x
+            # axpby now works for matrices
+            tmp_x.axpby(-self.regularising_parameter*tau, 1.0, x, out=tmp_x)
             self.projection_C(tmp_x, out = tmp_x)                       
 
             self.gradient.direct(tmp_x, out=p1)

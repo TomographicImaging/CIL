@@ -268,7 +268,7 @@ plt.imshow(noisy_data.as_array())
 plt.title('Noisy Data')
 plt.colorbar()
 plt.show()
-#%%
+#%% 'explicit' SPDHG, scalar step-sizes
 subsets = 10
 size_of_subsets = int(len(angles)/subsets)
 # create Gradient operator
@@ -289,17 +289,28 @@ alpha = 0.5
 ## block function
 F = BlockFunction(*[*[KullbackLeibler(b=g[i]) for i in range(subsets)] + [alpha * MixedL21Norm()]]) 
 G = IndicatorBox(lower=0)
-#%%
+
 prob = [1/20]*(len(A)-1) + [1/2]
 spdhg = SPDHG(f=F,g=G,operator=A, 
               max_iteration = 1000,
               update_objective_interval=200, prob = prob)
-spdhg.run(1000, very_verbose = True)
+#spdhg.run(1000, very_verbose = True)
 plt.figure()
 plt.imshow(spdhg.get_output().as_array())
 plt.colorbar()
 plt.show()
-#%%
+
+#%% with different probability choice
+#prob = [1/len(A)]*(len(A))
+#spdhg = SPDHG(f=F,g=G,operator=A, 
+#              max_iteration = 1000,
+#              update_objective_interval=200, prob = prob)
+#spdhg.run(1000, very_verbose = True)
+#plt.figure()
+#plt.imshow(spdhg.get_output().as_array())
+#plt.colorbar()
+#plt.show()
+#%% 'explicit' PDHG, scalar step-sizes
 op1 = Gradient(ig)
 op2 = Aop
 # Create BlockOperator
@@ -316,7 +327,202 @@ f = BlockFunction(f1, f2)
 pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
 pdhg.max_iteration = 1000
 pdhg.update_objective_interval = 200
-pdhg.run(1000, very_verbose = True)
+#pdhg.run(200, very_verbose = True)
+
+#%% show diff between PDHG and SPDHG
+#plt.imshow(spdhg.get_output().as_array() -pdhg.get_output().as_array())
+#plt.colorbar()
+#plt.show()
+
+#%% 'implicit' PDHG, scalar step-sizes
+
+# Fast Gradient Projection algorithm for Total Variation(TV)
+from ccpi.optimisation.functions import TotalVariation
+
+# Create BlockOperator
+operator = Aop 
+f = KullbackLeibler(b=noisy_data)        
+g =  TotalVariation(alpha, 200, 1e-4, lower=0)   
+normK = operator.norm()
+sigma = 1/normK
+tau = 1/normK
+      
+# Setup and run the PDHG algorithm
+pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
+pdhg.max_iteration = 1000
+pdhg.update_objective_interval = 200
+#pdhg.run(200, very_verbose = True)
+
+#%% 'implicit' PDHG, preconditioned step-sizes
+
+# Fast Gradient Projection algorithm for Total Variation(TV)
+from ccpi.optimisation.functions import TotalVariation
+
+# Create BlockOperator
+operator = Aop 
+f = KullbackLeibler(b=noisy_data)        
+g =  TotalVariation(alpha, 200, 1e-4, lower=0)   
+#normK = operator.norm()
+tau_tmp = 1
+sigma_tmp = 1
+tau = sigma_tmp / operator.adjoint(tau_tmp * operator.range_geometry().allocate(1.))
+sigma = tau_tmp / operator.direct(sigma_tmp * operator.domain_geometry().allocate(1.))
+x_init = operator.domain_geometry().allocate()
+
+# for some reason these lines don't work, but pdhg does
+#g.proximal(noisy_data, 1.)
+#g.proximal(x_init, tau)
+   
+## Setup and run the PDHG algorithm
+#pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
+#pdhg.max_iteration = 400
+#pdhg.update_objective_interval = 200
+#pdhg.run(1000, very_verbose = True)
+#
+#
+#plt.imshow(pdhg.get_output().as_array())
+#plt.colorbar()
+#plt.show()
+
+# %% 'implicit' SPDHG, scalar step-sizes
+from ccpi.optimisation.functions import TotalVariation
+
+subsets = 10
+size_of_subsets = int(len(angles)/subsets)
+# take angles and create uniform subsets in uniform+sequential setting
+list_angles = [angles[i:i+size_of_subsets] for i in range(0, len(angles), size_of_subsets)]
+# create acquisitioin geometries for each the interval of splitting angles
+list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1) 
+                for i in range(len(list_angles))]
+# create with operators as many as the subsets
+A = BlockOperator(*[AstraProjectorSimple(ig, list_geoms[i], dev) for i in range(subsets)])
+## number of subsets
+#(sub2ind, ind2sub) = divide_1Darray_equally(range(len(A)), subsets)
+#
+## acquisisiton data
+g = BlockDataContainer(*[AcquisitionData(noisy_data.as_array()[i:i+size_of_subsets,:])
+                            for i in range(0, len(angles), size_of_subsets)])
+alpha = 0.5
+## block function
+F = BlockFunction(*[KullbackLeibler(b=g[i]) for i in range(subsets)]) 
+G = TotalVariation(alpha, 200, 1e-4, lower=0) 
+
+prob = [1/len(A)]*len(A)
+spdhg = SPDHG(f=F,g=G,operator=A, 
+              max_iteration = 1000,
+              update_objective_interval=200, prob = prob)
+#spdhg.run(1000, very_verbose = True)
+#plt.figure()
+#plt.imshow(spdhg.get_output().as_array())
+#plt.colorbar()
+#plt.show()
+
+
+# %% 'implicit' SPDHG,  preconditioned step-sizes
+from ccpi.optimisation.functions import TotalVariation
+
+subsets = 10
+size_of_subsets = int(len(angles)/subsets)
+# take angles and create uniform subsets in uniform+sequential setting
+list_angles = [angles[i:i+size_of_subsets] for i in range(0, len(angles), size_of_subsets)]
+# create acquisitioin geometries for each the interval of splitting angles
+list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1) 
+                for i in range(len(list_angles))]
+# create with operators as many as the subsets
+A = BlockOperator(*[AstraProjectorSimple(ig, list_geoms[i], dev) for i in range(subsets)])
+## number of subsets
+#(sub2ind, ind2sub) = divide_1Darray_equally(range(len(A)), subsets)
+#
+## acquisisiton data
+g = BlockDataContainer(*[AcquisitionData(noisy_data.as_array()[i:i+size_of_subsets,:])
+                            for i in range(0, len(angles), size_of_subsets)])
+alpha = 0.5
+## block function
+F = BlockFunction(*[KullbackLeibler(b=g[i]) for i in range(subsets)]) 
+G = TotalVariation(alpha, 50, 1e-4, lower=0) 
+
+prob = [1/len(A)]*len(A)
+
+tau_tmp = 1
+sigma_tmp = 1
+tau = sigma_tmp / A.adjoint(tau_tmp * A.range_geometry().allocate(1.))
+sigma_tmp = tau_tmp / A.direct(sigma_tmp * A.domain_geometry().allocate(1.))
+
+
+spdhg = SPDHG(f=F,g=G,operator=A, 
+              max_iteration = 1000,
+              update_objective_interval=200, prob = prob, 
+              tau = tau, sigma = sigma)
 
 
 
+# %%
+
+
+
+
+
+import numpy as np 
+import numpy                          
+import matplotlib.pyplot as plt
+from ccpi.optimisation.algorithms import PDHG
+
+def PDHG_new_update(self):
+     """Modify the PDHG update to allow preconditioning"""
+     # save previous iteration
+     self.x_old.fill(self.x)
+     self.y_old.fill(self.y)
+     # Gradient ascent for the dual variable
+     self.operator.direct(self.xbar, out=self.y_tmp)
+     self.y_tmp *= self.sigma
+     self.y_tmp += self.y_old
+     self.f.proximal_conjugate(self.y_tmp, self.sigma, out=self.y)
+     # Gradient descent for the primal variable
+     self.operator.adjoint(self.y, out=self.x_tmp)
+     self.x_tmp *= -1*self.tau
+     self.x_tmp += self.x_old
+     self.g.proximal(self.x_tmp, self.tau, out=self.x)
+     # Update
+     self.x.subtract(self.x_old, out=self.xbar)
+     self.xbar *= self.theta    
+     self.xbar += self.x
+    
+PDHG.update = PDHG_new_update
+
+
+#tau_tmp = 1
+#sigma_tmp = 1
+#tau = sigma_tmp/K.adjoint(tau_tmp*K.range_geometry().allocate(1.))
+#sigma = tau_tmp/ K.direct(sigma_tmp*K.domain_geometry().allocate(1.))
+
+
+
+# %% 'explicit' PDHG,  preconditioned step-sizes
+
+#from ccpi.optimisation.operators import  Gradient_numpy
+
+op1 = Gradient(ig)
+#op1.sum_abs_col()
+
+op2 = Aop
+# Create BlockOperator
+operator = BlockOperator(op1, op2, shape=(2,1) ) 
+f2 = KullbackLeibler(b=noisy_data)  
+g =  IndicatorBox(lower=0)    
+
+
+tau = 1. / (op2.adjoint(op2.range_geometry().allocate(1.)) + 4.)
+sigma2 = 1. / op2.direct(op2.domain_geometry().allocate(1.))
+
+sigma1 =  op1.range_geometry().allocate(2.)
+
+sigma = BlockDataContainer(sigma1, sigma2)
+
+    
+f1 = alpha * MixedL21Norm() 
+f = BlockFunction(f1, f2)   
+# Setup and run the PDHG algorithm
+pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
+pdhg.max_iteration = 1000
+pdhg.update_objective_interval = 200
+pdhg.run(200, very_verbose = True)

@@ -54,6 +54,9 @@ class BlockFunction(Function):
         super(BlockFunction, self).__init__()
         self.functions = functions      
         self.length = len(self.functions)
+        
+    def __getitem__(self, row):
+        return self.functions[row]
                                 
     def __call__(self, x):
         
@@ -184,7 +187,8 @@ class BlockFunction(Function):
                 for i in range(self.length):
                     out[i] = self.functions[i].proximal_conjugate(x.get_item(i), tau.get_item(i))
             
-            return BlockDataContainer(*out)       
+            return BlockDataContainer(*out)    
+        
                             
     
     
@@ -213,6 +217,8 @@ if __name__ == '__main__':
     
     f = BlockFunction(f1, f2)
     tau = 0.3
+    
+    print(f[0])
     
     print( " without out " )
     res_no_out = f.proximal_conjugate( U, tau)

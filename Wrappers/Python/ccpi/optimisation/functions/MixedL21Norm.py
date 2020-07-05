@@ -91,9 +91,13 @@ class MixedL21Norm(Function):
         
         """
 
+        # Note: we divide x/tau so the cases of both scalar and 
+        # datacontainers of tau to be able to run
+        
+        
         if out is None:
-            tmp = x.pnorm(2)
-            res = (tmp - tau).maximum(0.0) * x/tmp
+            tmp = (x/tau).pnorm(2)
+            res = (tmp - 1).maximum(0.0) * x/tmp
 
             # TODO avoid using numpy, add operation in the framework
             # This will be useful when we add cupy 
@@ -108,9 +112,9 @@ class MixedL21Norm(Function):
             
         else:
             
-            tmp = x.pnorm(2)
+            tmp = (x/tau).pnorm(2)
             tmp_ig = 0.0 * tmp
-            (tmp - tau).maximum(0.0, out = tmp_ig)
+            (tmp - 1).maximum(0.0, out = tmp_ig)
             tmp_ig.multiply(x, out = out)
             out.divide(tmp, out = out)
             
@@ -121,26 +125,7 @@ class MixedL21Norm(Function):
                 el.fill(elarray)  
 
             out.fill(out)
-
-    def proximal_conjugate(self, x, tau, out=None): 
-
-        
-        if out is None:                                        
-            tmp = x.get_item(0) * 0	
-            for el in x.containers:	
-                tmp += el.power(2.)	
-            tmp.sqrt(out=tmp)	
-            tmp.maximum(1.0, out=tmp)	
-            frac = [ el.divide(tmp) for el in x.containers ]	
-            return BlockDataContainer(*frac)
-            
-        else:
-                            
-            res1 = functools.reduce(lambda a,b: a + b*b, x.containers, x.get_item(0) * 0 )
-            res1.sqrt(out=res1)	
-            res1.maximum(1.0, out=res1)	
-            x.divide(res1, out=out)            
-
+       
 class SmoothMixedL21Norm(Function):
     
     """ SmoothMixedL21Norm function: :math:`F(x) = ||x||_{2,1} = \sum |x|_{2} = \sum \sqrt{ (x^{1})^{2} + (x^{2})^{2} + \epsilon^2 + \dots}`                  

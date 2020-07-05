@@ -72,9 +72,7 @@ class SparseFiniteDiff(Operator):
         
         x_asarr = x.as_array()
         res = np.reshape( self.matrix() * x_asarr.flatten('F'), self.domain_geometry().shape, 'F')
-        
-        
-        
+                        
         return type(x)(res)
     
     def adjoint(self, x, out = None):
@@ -95,18 +93,18 @@ class SparseFiniteDiff(Operator):
         #res[res==0]=0
         return ImageData(res)
 
-
-from ccpi.framework import ImageGeometry        
-M, N, Κ = 2, 3, 2
-ig = ImageGeometry(M, N, Κ)
-arr = ig.allocate('random_int')
-sFD_neum1 = SparseFiniteDiff(ig, direction=0, bnd_cond='Periodic')
-sFD_neum2 = SparseFiniteDiff(ig, direction=1, bnd_cond='Periodic')
-DY = sFD_neum1.matrix().toarray()
-DX = sFD_neum2.matrix().toarray()
-#  
 #
-rows = sFD_neum1.sum_abs_row()
+#from ccpi.framework import ImageGeometry        
+#M, N, Κ = 2, 3, 2
+#ig = ImageGeometry(M, N, Κ)
+#arr = ig.allocate('random_int')
+#sFD_neum1 = SparseFiniteDiff(ig, direction=0, bnd_cond='Periodic')
+#sFD_neum2 = SparseFiniteDiff(ig, direction=1, bnd_cond='Periodic')
+#DY = sFD_neum1.matrix().toarray()
+#DX = sFD_neum2.matrix().toarray()
+##  
+##
+#rows = sFD_neum1.sum_abs_row()
 #cols = sFD_neum1.sum_abs_col()  
 #
 #print(rows.as_array())

@@ -599,6 +599,10 @@ class BlockDataContainer(object):
         '''Inline truedivision'''
         return self.__idiv__(other)
     
+    def __neg__(self):
+        """ Return -self """
+        return -1 * self       
+    
     def dot(self, other):
 #        
         tmp = [ self.containers[i].dot(other.containers[i]) for i in range(self.shape[0])]

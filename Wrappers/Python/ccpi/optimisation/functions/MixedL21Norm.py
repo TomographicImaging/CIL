@@ -24,6 +24,7 @@ from __future__ import print_function
 from ccpi.optimisation.functions import Function
 from ccpi.framework import BlockDataContainer
 import numpy as np
+import functools
 
 
 class MixedL21Norm(Function):
@@ -120,6 +121,25 @@ class MixedL21Norm(Function):
                 el.fill(elarray)  
 
             out.fill(out)
+
+    def proximal_conjugate(self, x, tau, out=None): 
+
+        
+        if out is None:                                        
+            tmp = x.get_item(0) * 0	
+            for el in x.containers:	
+                tmp += el.power(2.)	
+            tmp.sqrt(out=tmp)	
+            tmp.maximum(1.0, out=tmp)	
+            frac = [ el.divide(tmp) for el in x.containers ]	
+            return BlockDataContainer(*frac)
+            
+        else:
+                            
+            res1 = functools.reduce(lambda a,b: a + b*b, x.containers, x.get_item(0) * 0 )
+            res1.sqrt(out=res1)	
+            res1.maximum(1.0, out=res1)	
+            x.divide(res1, out=out)            
 
 class SmoothMixedL21Norm(Function):
     

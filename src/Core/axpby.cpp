@@ -131,7 +131,3 @@ DLL_EXPORT int daxpby(const double * x, const double * y, double * out, const do
 
 	return 0;
 }
-__main__()
-{
-
-}

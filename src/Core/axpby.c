@@ -16,7 +16,7 @@ int saxpby_asbs(const float * x, const float * y, float * out, float a, float b,
     return 0;
 }
 
-int saxpby_avbv(const float * x, const float * y, float * out, float * a, float * b, int64_t size, int nThreads)
+int saxpby_avbv(const float * x, const float * y, float * out, const float * a, const float * b, int64_t size, int nThreads)
 {
     int64_t i = 0;
 
@@ -31,7 +31,7 @@ int saxpby_avbv(const float * x, const float * y, float * out, float * a, float 
     return 0;    
 }
 
-int saxpby_asbv(const float * x, const float * y, float * out, float a, float * b, int64_t size, int nThreads)
+int saxpby_asbv(const float * x, const float * y, float * out, float a, const float * b, int64_t size, int nThreads)
 {
     int64_t i = 0;
 
@@ -59,7 +59,7 @@ int daxpby_asbs(const double * x, const double * y, double * out, double a, doub
 	}
 	return 0;
 }
-int daxpby_avbv(const double * x, const double * y, double * out, double * a, double * b, int64_t size, int nThreads)
+int daxpby_avbv(const double * x, const double * y, double * out, const double * a, const double * b, int64_t size, int nThreads)
 {
 	int64_t i = 0;
 #pragma omp parallel
@@ -72,7 +72,7 @@ int daxpby_avbv(const double * x, const double * y, double * out, double * a, do
 	}
 	return 0;
 }
-int daxpby_asbv(const double * x, const double * y, double * out, double a, double * b, int64_t size, int nThreads)
+int daxpby_asbv(const double * x, const double * y, double * out, double a, const double * b, int64_t size, int nThreads)
 {
 	int64_t i = 0;
 #pragma omp parallel
@@ -85,7 +85,7 @@ int daxpby_asbv(const double * x, const double * y, double * out, double a, doub
 	}
 	return 0;
 }
-DLL_EXPORT int saxpby(float * x, float * y, float * out, float *a, int a_type, float* b, int b_type, int64_t size, int nThreads)
+DLL_EXPORT int saxpby(const float * x, const float * y, float * out, const float *a, int a_type, const float* b, int b_type, int64_t size, int nThreads)
 {
 	//type = 0 float
 	//type = 1 array of floats
@@ -108,7 +108,7 @@ DLL_EXPORT int saxpby(float * x, float * y, float * out, float *a, int a_type, f
 
 	return 0;
 }
-DLL_EXPORT int daxpby(double * x, double * y, double * out, double *a, int a_type, double* b, int b_type, int64_t size, int nThreads)
+DLL_EXPORT int daxpby(const double * x, const double * y, double * out, const double *a, int a_type, const double* b, int b_type, int64_t size, int nThreads)
 {
 	//type = 0 double
 	//type = 1 array of double

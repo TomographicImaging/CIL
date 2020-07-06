@@ -72,26 +72,37 @@ class SparseFiniteDiff(Operator):
         
         x_asarr = x.as_array()
         res = np.reshape( self.matrix() * x_asarr.flatten('F'), self.domain_geometry().shape, 'F')
+        
+        if out is None:
+            return res
+        else:
+            out.fill(res)
                         
-        return type(x)(res)
     
     def adjoint(self, x, out = None):
         
         x_asarr = x.as_array()
         res = np.reshape( self.matrix().T * x_asarr.flatten('F'), self.domain_geometry().shape, 'F')
-        return type(x)(res) 
+        
+        if out is None:
+            return res
+        else:
+            out.fill(res)
     
     def sum_abs_row(self):
         
+        tmp = self.domain_geometry().allocate()
         res = np.array(np.reshape(abs(self.matrix()).sum(axis=0), self.domain_geometry().shape, 'F'))
-        #res[res==0]=0
-        return ImageData(res)
+        tmp.fill(res)
+
+        return tmp
     
     def sum_abs_col(self):
         
+        tmp = self.domain_geometry().allocate()
         res = np.array(np.reshape(abs(self.matrix()).sum(axis=1), self.domain_geometry().shape, 'F') )
-        #res[res==0]=0
-        return ImageData(res)
+        tmp.fill(res)
+        return tmp
 
 #
 #from ccpi.framework import ImageGeometry        

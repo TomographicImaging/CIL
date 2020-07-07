@@ -125,7 +125,7 @@ class SPDHG(Algorithm):
         
         # initialize variable z corresponding to back-projected dual variable
         self.z = operator.domain_geometry().allocate()
-        self.zbar= A.domain_geometry().allocate()
+        self.zbar= operator.domain_geometry().allocate()
         # relaxation parameter
         self.theta = 1
         self.update_objective()

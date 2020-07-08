@@ -232,9 +232,17 @@ class Algorithm(object):
             if (very_verbose):
                 bars = ['-' for i in range(start+9+10+13+13+13+15)]
             # print a nice ---- with proper length at the end
-            print (functools.reduce(lambda x,y: x+y, bars, ''))
-            print (self.verbose_output(very_verbose))
-            print ("Stop criterion has been reached.")
+            # print (functools.reduce(lambda x,y: x+y, bars, ''))
+            out = "{}\n{}\n{}\n".format(functools.reduce(lambda x,y: x+y, bars, '') ,
+                                        self.verbose_output(very_verbose),
+                                        "Stop criterion has been reached.")
+            print (out)
+            # print (self.verbose_output(very_verbose))
+            # print ("Stop criterion has been reached.")
+            # Print to log file if desired
+            if self.logger:
+                self.logger.info(out)
+
         
 
     def verbose_output(self, verbose=False):

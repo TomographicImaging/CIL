@@ -92,19 +92,19 @@ class SparseFiniteDiff(Operator):
         #res[res==0]=0
         return ImageData(res)
 
+if __name__ == '__main__':
+    from ccpi.framework import ImageGeometry        
+    M, N= 2, 3
+    ig = ImageGeometry(M, N)
+    arr = ig.allocate('random_int')
+    sFD_neum1 = SparseFiniteDiff(ig, direction=0, bnd_cond='Neumann')
+    sFD_neum2 = SparseFiniteDiff(ig, direction=1, bnd_cond='Neumann')
+    DY = sFD_neum1.matrix().toarray()
+    DX = sFD_neum2.matrix().toarray()
+    
 
-from ccpi.framework import ImageGeometry        
-M, N= 2, 3
-ig = ImageGeometry(M, N)
-arr = ig.allocate('random_int')
-sFD_neum1 = SparseFiniteDiff(ig, direction=0, bnd_cond='Neumann')
-sFD_neum2 = SparseFiniteDiff(ig, direction=1, bnd_cond='Neumann')
-DY = sFD_neum1.matrix().toarray()
-DX = sFD_neum2.matrix().toarray()
-  
+    rows = sFD_neum1.sum_abs_row()
+    cols = sFD_neum1.sum_abs_col()  
 
-rows = sFD_neum1.sum_abs_row()
-cols = sFD_neum1.sum_abs_col()  
-
-print(rows.as_array())
-print(cols.as_array())
+    print(rows.as_array())
+    print(cols.as_array())

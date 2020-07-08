@@ -600,7 +600,7 @@ class TestAlgorithms(unittest.TestCase):
         F = BlockFunction(*[*[KullbackLeibler(b=g[i]) for i in range(subsets)] + [alpha * MixedL21Norm()]]) 
         G = IndicatorBox(lower=0)
         print ("here")
-        prob = [1/20]*(len(A)-1) + [1/2]
+        prob = [1/(2*subsets)]*(len(A)-1) + [1/2]
         spdhg = SPDHG(f=F,g=G,operator=A, 
                     max_iteration = 1000,
                     update_objective_interval=200, prob = prob)

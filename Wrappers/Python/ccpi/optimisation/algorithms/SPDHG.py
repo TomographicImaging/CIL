@@ -43,7 +43,7 @@ class SPDHG(Algorithm):
         
     .. math:: 
     
-      \|\sigma[i]^{1/2} * K[i] * tau^{1/2} \|  <1 for all i
+      \|\sigma[i]^{1/2} * K[i] * tau^{1/2} \|^2  < p_i for all i
       
     Remark: Notation for primal and dual step-sizes are reversed with comparison
             to PDGH.py
@@ -65,9 +65,10 @@ class SPDHG(Algorithm):
         
     '''
     def __init__(self, f=None, g=None, operator=None, tau=None, sigma=None,
-                 x_init=None, prob=None, **kwargs):
+                 x_init=None, prob=None, gamma=1., **kwargs):
         '''SPDHG algorithm creator
-        Optional parameters
+
+        Parameters
         :param operator: BlockOperator of Linear Operators
         :param f: BlockFunction, each function with "simple" proximal of its conjugate 
         :param g: Convex function with "simple" proximal 
@@ -75,14 +76,16 @@ class SPDHG(Algorithm):
         :param tau: Step size parameter for Primal problem
         :param x_init: Initial guess ( Default x_init = 0)
         :param prob: List of probabilities
+        :param gamma: parameter controlling the trade-off between the primal and dual step sizes
         '''
         super(SPDHG, self).__init__(**kwargs)
         
         if f is not None and operator is not None and g is not None:
             self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, 
-                        x_init=x_init, prob=prob)
-    def set_up(self, f, g, operator, tau=None, sigma=None, x_init=None, prob=None):
+                        x_init=x_init, prob=prob, gamma=gamma)
+    def set_up(self, f, g, operator, tau=None, sigma=None, x_init=None, prob=None, gamma=1.):
         '''initialisation of the algorithm
+
         :param operator: BlockOperator of Linear Operators
         :param f: BlockFunction, each function with "simple" proximal of its conjugate.
         :param g: Convex function with "simple" proximal 
@@ -100,16 +103,20 @@ class SPDHG(Algorithm):
         self.sigma = sigma
         self.prob = prob
         self.ndual_subsets = len(self.operator)
+        self.gamma = gamma
+        self.rho = .99
         
         # Compute norm of each sub-operator       
         norms = [operator.get_item(i,0).norm() for i in range(self.ndual_subsets)]
-        
-        if self.sigma is None and self.tau is None:
-            self.sigma = [1.] * self.ndual_subsets
-            self.tau = 1 / sum([si * ni**2 for si, ni in zip(self.sigma, norms)])
-            
+        self.norms = norms
         if self.prob is None:
             self.prob = [1/self.ndual_subsets] * self.ndual_subsets
+
+        if self.sigma is None and self.tau is None:
+            self.sigma = [self.gamma * self.rho / ni for ni in norms] 
+            self.tau = min( [ pi / ( si * ni**2 ) for pi, ni, si in zip(self.prob, norms, self.sigma)] ) 
+            self.tau *= (self.rho / self.gamma)
+
         
         # initialize primal variable 
         if x_init is None:
@@ -157,7 +164,7 @@ class SPDHG(Algorithm):
         # z = z + x_tmp
         self.z.add(self.x_tmp, out =self.z)
         # zbar = z + (1 + theta/p[i]) x_tmp
-        self.z.axpby(1., (1 + self.theta / self.prob[i]), self.x_tmp, out = self.zbar)
+        self.z.axpby(1., self.theta / self.prob[i], self.x_tmp, out = self.zbar)
         
         
     def update_objective(self):

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.4)
 
-project (cil LANGUAGES C)
+project (cil LANGUAGES CXX)
 
 # If APPLE don't use @rpath
 if (APPLE)

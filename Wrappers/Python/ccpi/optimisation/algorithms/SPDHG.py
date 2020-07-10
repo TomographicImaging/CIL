@@ -65,7 +65,7 @@ class SPDHG(Algorithm):
         
     '''
     def __init__(self, f=None, g=None, operator=None, tau=None, sigma=None,
-                 x_init=None, prob=None, gamma=1., **kwargs):
+                 x_init=None, prob=None, gamma=1., use_axpby=True, **kwargs):
         '''SPDHG algorithm creator
 
         Parameters
@@ -77,9 +77,10 @@ class SPDHG(Algorithm):
         :param x_init: Initial guess ( Default x_init = 0)
         :param prob: List of probabilities
         :param gamma: parameter controlling the trade-off between the primal and dual step sizes
+        :param use_axpby: whether to use axpby or not
         '''
         super(SPDHG, self).__init__(**kwargs)
-        
+        self._use_axpby = use_axpby
         if f is not None and operator is not None and g is not None:
             self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, 
                         x_init=x_init, prob=prob, gamma=gamma)
@@ -142,7 +143,11 @@ class SPDHG(Algorithm):
         
         # Gradient descent for the primal variable
         # x_tmp = x - tau * zbar
-        self.x.axpby(1., -self.tau, self.zbar, out=self.x_tmp)
+        if self._use_axpby:
+            self.x.axpby(1., -self.tau, self.zbar, out=self.x_tmp)
+        else:
+            self.zbar.multiply(self.tau, out=self.x_tmp)
+            self.x.subtract(self.x_tmp, out=self.x_tmp)
         self.g.proximal(self.x_tmp, self.tau, out=self.x)
         
         # Choose subset
@@ -154,17 +159,27 @@ class SPDHG(Algorithm):
         # Gradient ascent for the dual variable
         # y[i] = y_old[i] + sigma[i] * K[i] x
         self.operator.get_item(i,0).direct(self.x, out=self.y[i])
-        self.y[i].axpby(self.sigma[i], 1., self.y_old[i], out=self.y[i])
+        if self._use_axpby:
+            self.y[i].axpby(self.sigma[i], 1., self.y_old[i], out=self.y[i])
+        else:
+            self.y[i].multiply(self.sigma[i], out=self.y[i])
+            self.y[i].add(self.y_old[i], out=self.y[i])
         self.f[i].proximal_conjugate(self.y[i], self.sigma[i], out=self.y[i])
         
         # Back-project
         # x_tmp = K[i]^*(y[i] - y_old[i])
         self.operator.get_item(i,0).adjoint(self.y[i]-self.y_old[i], out = self.x_tmp)
         # Update backprojected dual variable and extrapolate
+        # zbar = z + (1 + theta/p[i]) x_tmp
+
         # z = z + x_tmp
         self.z.add(self.x_tmp, out =self.z)
-        # zbar = z + (1 + theta/p[i]) x_tmp
-        self.z.axpby(1., self.theta / self.prob[i], self.x_tmp, out = self.zbar)
+        # zbar = z +  (theta/p[i]) x_tmp
+        if self._use_axpby:
+            self.z.axpby(1., self.theta / self.prob[i], self.x_tmp, out = self.zbar)
+        else:
+            self.x_tmp.multiply(self.theta / self.prob[i], out=self.x_tmp)
+            self.z.add(self.x_tmp, out=self.zbar)
         
         
     def update_objective(self):

@@ -112,12 +112,12 @@ class SPDHG(Algorithm):
         if self.prob is None:
             self.prob = [1/self.ndual_subsets] * self.ndual_subsets
 
-        if self.sigma is None and self.tau is None:
+        if self.sigma is None:
             self.sigma = [self.gamma * self.rho / ni for ni in norms] 
+        if self.tau is None:
             self.tau = min( [ pi / ( si * ni**2 ) for pi, ni, si in zip(self.prob, norms, self.sigma)] ) 
             self.tau *= (self.rho / self.gamma)
 
-        
         # initialize primal variable 
         if x_init is None:
             self.x = self.operator.domain_geometry().allocate()

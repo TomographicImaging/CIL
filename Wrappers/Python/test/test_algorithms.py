@@ -793,11 +793,7 @@ class TestAlgorithms(unittest.TestCase):
         f1 = alpha * MixedL21Norm() 
         f = BlockFunction(f1, f2)   
         # Setup and run the PDHG algorithm
-        pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
-        pdhg.max_iteration = 1000
-        pdhg.update_objective_interval = 200
-        pdhg.run(1000, very_verbose = True)
-
+        
         algos = []
         algos.append( PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma,  
                     max_iteration = 1000,

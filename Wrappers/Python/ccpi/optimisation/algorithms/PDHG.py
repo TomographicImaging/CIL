@@ -59,7 +59,7 @@ class PDHG(Algorithm):
         SIAM J. Imaging Sci. 3, 1015–1046.
     '''
 
-    def __init__(self, f=None, g=None, operator=None, tau=None, sigma=1.,x_init=None,**kwargs):
+    def __init__(self, f=None, g=None, operator=None, tau=None, sigma=1.,x_init=None, use_axpby=True, **kwargs):
         '''PDHG algorithm creator
 
         Optional parameters
@@ -72,7 +72,7 @@ class PDHG(Algorithm):
         :param x_init: Initial guess ( Default x_init = 0)
         '''
         super(PDHG, self).__init__(**kwargs)
-        
+        self._use_axpby = use_axpby
 
         if f is not None and operator is not None and g is not None:
             self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, x_init=x_init)
@@ -135,9 +135,14 @@ class PDHG(Algorithm):
 
         # Gradient ascent for the dual variable
         self.operator.direct(self.xbar, out=self.y_tmp)
+        
         # self.y_tmp *= self.sigma
         # self.y_tmp += self.y_old
-        self.y_tmp.axpby(self.sigma, 1 , self.y_old, self.y_tmp)
+        if self._use_axpby:
+            self.y_tmp.axpby(self.sigma, 1 , self.y_old, self.y_tmp)
+        else:
+            self.y_tmp *= self.sigma
+            self.y_tmp += self.y_old
 
         # self.y = self.f.proximal_conjugate(self.y_old, self.sigma)
         self.f.proximal_conjugate(self.y_tmp, self.sigma, out=self.y)
@@ -146,7 +151,11 @@ class PDHG(Algorithm):
         self.operator.adjoint(self.y, out=self.x_tmp)
         # self.x_tmp *= -1*self.tau
         # self.x_tmp += self.x_old
-        self.x_tmp.axpby(-self.tau, 1. , self.x_old, self.x_tmp)
+        if self._use_axpby:
+            self.x_tmp.axpby(-self.tau, 1. , self.x_old, self.x_tmp)
+        else:
+            self.x_tmp *= -1*self.tau
+            self.x_tmp += self.x_old
 
         self.g.proximal(self.x_tmp, self.tau, out=self.x)
 
@@ -154,7 +163,12 @@ class PDHG(Algorithm):
         self.x.subtract(self.x_old, out=self.xbar)
         # self.xbar *= self.theta
         # self.xbar += self.x
-        self.xbar.axpby(self.theta, 1 , self.x, self.xbar)
+        if self._use_axpby:
+            self.xbar.axpby(self.theta, 1 , self.x, self.xbar)
+        else:
+            self.xbar *= self.theta
+            self.xbar += self.x
+        
         
         
     def update_objective(self):

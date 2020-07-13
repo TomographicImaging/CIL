@@ -20,7 +20,7 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from ccpi.optimisation.algorithms import Algorithm, DataContainerWithHistory
+from ccpi.optimisation.algorithms import Algorithm
 import numpy as np
 
 class SPDHG(Algorithm):
@@ -130,7 +130,6 @@ class SPDHG(Algorithm):
         self.x_tmp = self.operator.domain_geometry().allocate(0)
         
         # initialize dual variable to 0
-        # self._y = DataContainerWithHistory(self.operator.range_geometry(), 0)
         self.y_old = operator.range_geometry().allocate(0)
         self.y = operator.range_geometry().allocate(0)
         
@@ -143,7 +142,6 @@ class SPDHG(Algorithm):
         self.configured = True
         print("{} configured".format(self.__class__.__name__, ))
     def update(self):
-        
         # Gradient descent for the primal variable
         # x_tmp = x - tau * zbar
         if self._use_axpby:
@@ -173,7 +171,8 @@ class SPDHG(Algorithm):
         
         # Back-project
         # x_tmp = K[i]^*(y[i] - y_old[i])
-        self.operator.get_item(i,0).adjoint(self.y[i]-self.y_old[i], out = self.x_tmp)
+        self.y[i].subtract(self.y_old[i], out=self.y_old[i])
+        self.operator.get_item(i,0).adjoint(self.y_old[i], out = self.x_tmp)
         # Update backprojected dual variable and extrapolate
         # zbar = z + (1 + theta/p[i]) x_tmp
 
@@ -204,18 +203,3 @@ class SPDHG(Algorithm):
     def primal_dual_gap(self):
         return [x[2] for x in self.loss]
     
-    # @property
-    # def y(self):
-    #     return self._y.current
-    # @property
-    # def y_old(self):
-    #     return self._y.previous
-    # def update_indices(self):
-    #     self._y.update_indices()
-
-    # @y.setter
-    # def y(self, value):
-    #     self._y.current = value
-    # @y.setter
-    # def y_old(self, value):
-    #     self._y.previous = value

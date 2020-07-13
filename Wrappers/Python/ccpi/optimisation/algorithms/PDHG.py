@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-# Copyright 2019 Science Technology Facilities Council
-# Copyright 2019 University of Manchester
+# Copyright 2019-2020 Science Technology Facilities Council
+# Copyright 2019-2020 University of Manchester
 #
 # This work is part of the Core Imaging Library developed by Science Technology
 # Facilities Council and University of Manchester
@@ -21,7 +21,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from ccpi.optimisation.algorithms import Algorithm
+from ccpi.optimisation.algorithms import Algorithm, DataContainerWithHistory
 
 
 
@@ -59,7 +59,7 @@ class PDHG(Algorithm):
         SIAM J. Imaging Sci. 3, 1015–1046.
     '''
 
-    def __init__(self, f=None, g=None, operator=None, tau=None, sigma=1.,x_init=None,**kwargs):
+    def __init__(self, f=None, g=None, operator=None, tau=None, sigma=1.,x_init=None, use_axpby=True, **kwargs):
         '''PDHG algorithm creator
 
         Optional parameters
@@ -72,7 +72,7 @@ class PDHG(Algorithm):
         :param x_init: Initial guess ( Default x_init = 0)
         '''
         super(PDHG, self).__init__(**kwargs)
-        
+        self._use_axpby = use_axpby
 
         if f is not None and operator is not None and g is not None:
             self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, x_init=x_init)
@@ -92,7 +92,6 @@ class PDHG(Algorithm):
         # can't happen with default sigma
         if sigma is None and tau is None:
             raise ValueError('Need sigma*tau||K||^2<1')
-
         # algorithmic parameters
         self.f = f
         self.g = g
@@ -106,38 +105,52 @@ class PDHG(Algorithm):
             normK = self.operator.norm()
             # Primal & dual stepsizes
             self.tau = 1 / (self.sigma * normK ** 2)
-
-
-        if x_init is None:
-            self.x_old = self.operator.domain_geometry().allocate()
-        else:
-            self.x_old = x_init.copy()
+        
+        self._x = DataContainerWithHistory(self.operator.domain_geometry())
+        
+        self._y = DataContainerWithHistory(self.operator.range_geometry())
+        
         self.x_tmp = self.x_old.copy()
-        self.x = self.x_old.copy()
-    
-        self.y_old = self.operator.range_geometry().allocate()
+        
         self.y_tmp = self.y_old.copy()
-        self.y = self.y_old.copy()
-
+        
         self.xbar = self.x_old.copy()
-
+        
         # relaxation parameter
         self.theta = 1
         self.update_objective()
+        
         self.configured = True
         print("{} configured".format(self.__class__.__name__, ))
 
+    @property
+    def x(self):
+        return self._x.current
+    @property
+    def x_old(self): # change to previous
+        return self._x.previous
+    @property
+    def y(self):
+        return self._y.current
+    @property
+    def y_old(self): # change to previous
+        return self._y.previous
+    def update_indices(self):
+        self._x.update_indices()
+        self._y.update_indices()
 
     def update(self):
-        # save previous iteration
-        self.x_old.fill(self.x)
-        self.y_old.fill(self.y)
-
+        
         # Gradient ascent for the dual variable
         self.operator.direct(self.xbar, out=self.y_tmp)
+        
         # self.y_tmp *= self.sigma
         # self.y_tmp += self.y_old
-        self.y_tmp.axpby(self.sigma, 1 , self.y_old, self.y_tmp)
+        if self._use_axpby:
+            self.y_tmp.axpby(self.sigma, 1 , self.y_old, self.y_tmp)
+        else:
+            self.y_tmp *= self.sigma
+            self.y_tmp += self.y_old
 
         # self.y = self.f.proximal_conjugate(self.y_old, self.sigma)
         self.f.proximal_conjugate(self.y_tmp, self.sigma, out=self.y)
@@ -146,7 +159,11 @@ class PDHG(Algorithm):
         self.operator.adjoint(self.y, out=self.x_tmp)
         # self.x_tmp *= -1*self.tau
         # self.x_tmp += self.x_old
-        self.x_tmp.axpby(-self.tau, 1. , self.x_old, self.x_tmp)
+        if self._use_axpby:
+            self.x_tmp.axpby(-self.tau, 1. , self.x_old, self.x_tmp)
+        else:
+            self.x_tmp *= -1*self.tau
+            self.x_tmp += self.x_old
 
         self.g.proximal(self.x_tmp, self.tau, out=self.x)
 
@@ -154,9 +171,14 @@ class PDHG(Algorithm):
         self.x.subtract(self.x_old, out=self.xbar)
         # self.xbar *= self.theta
         # self.xbar += self.x
-        self.xbar.axpby(self.theta, 1 , self.x, self.xbar)
+        if self._use_axpby:
+            self.xbar.axpby(self.theta, 1 , self.x, self.xbar)
+        else:
+            self.xbar *= self.theta
+            self.xbar += self.x
         
         
+
     def update_objective(self):
 
         p1 = self.f(self.operator.direct(self.x)) + self.g(self.x)

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-# Copyright 2019 Science Technology Facilities Council
-# Copyright 2019 University of Manchester
+# Copyright 2020 Science Technology Facilities Council
+# Copyright 2020 University of Manchester
+# Copyright 2020 University of Bath
 #
 # This work is part of the Core Imaging Library developed by Science Technology
 # Facilities Council and University of Manchester
@@ -19,7 +20,7 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from ccpi.optimisation.algorithms import Algorithm
+from ccpi.optimisation.algorithms import Algorithm, DataContainerWithHistory
 import numpy as np
 
 class SPDHG(Algorithm):
@@ -84,6 +85,7 @@ class SPDHG(Algorithm):
         if f is not None and operator is not None and g is not None:
             self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, 
                         x_init=x_init, prob=prob, gamma=gamma)
+    
     def set_up(self, f, g, operator, tau=None, sigma=None, x_init=None, prob=None, gamma=1.):
         '''initialisation of the algorithm
 
@@ -121,19 +123,20 @@ class SPDHG(Algorithm):
 
         # initialize primal variable 
         if x_init is None:
-            self.x = self.operator.domain_geometry().allocate()
+            self.x = self.operator.domain_geometry().allocate(0)
         else:
             self.x = x_init.copy()
-            
-        self.x_tmp = self.operator.domain_geometry().allocate()
+        
+        self.x_tmp = self.operator.domain_geometry().allocate(0)
         
         # initialize dual variable to 0
-        self.y = operator.range_geometry().allocate()
-        self.y_old = operator.range_geometry().allocate()
+        # self._y = DataContainerWithHistory(self.operator.range_geometry(), 0)
+        self.y_old = operator.range_geometry().allocate(0)
+        self.y = operator.range_geometry().allocate(0)
         
         # initialize variable z corresponding to back-projected dual variable
-        self.z = operator.domain_geometry().allocate()
-        self.zbar= operator.domain_geometry().allocate()
+        self.z = operator.domain_geometry().allocate(0)
+        self.zbar= operator.domain_geometry().allocate(0)
         # relaxation parameter
         self.theta = 1
         self.update_objective()
@@ -148,6 +151,7 @@ class SPDHG(Algorithm):
         else:
             self.zbar.multiply(self.tau, out=self.x_tmp)
             self.x.subtract(self.x_tmp, out=self.x_tmp)
+            
         self.g.proximal(self.x_tmp, self.tau, out=self.x)
         
         # Choose subset
@@ -164,6 +168,7 @@ class SPDHG(Algorithm):
         else:
             self.y[i].multiply(self.sigma[i], out=self.y[i])
             self.y[i].add(self.y_old[i], out=self.y[i])
+            
         self.f[i].proximal_conjugate(self.y[i], self.sigma[i], out=self.y[i])
         
         # Back-project
@@ -174,13 +179,12 @@ class SPDHG(Algorithm):
 
         # z = z + x_tmp
         self.z.add(self.x_tmp, out =self.z)
-        # zbar = z +  (theta/p[i]) x_tmp
+        # zbar = z + (theta/p[i]) * x_tmp
         if self._use_axpby:
             self.z.axpby(1., self.theta / self.prob[i], self.x_tmp, out = self.zbar)
         else:
             self.x_tmp.multiply(self.theta / self.prob[i], out=self.x_tmp)
             self.z.add(self.x_tmp, out=self.zbar)
-        
         
     def update_objective(self):
          p1 = self.f(self.operator.direct(self.x)) + self.g(self.x)
@@ -199,3 +203,19 @@ class SPDHG(Algorithm):
     @property
     def primal_dual_gap(self):
         return [x[2] for x in self.loss]
+    
+    # @property
+    # def y(self):
+    #     return self._y.current
+    # @property
+    # def y_old(self):
+    #     return self._y.previous
+    # def update_indices(self):
+    #     self._y.update_indices()
+
+    # @y.setter
+    # def y(self, value):
+    #     self._y.current = value
+    # @y.setter
+    # def y_old(self, value):
+    #     self._y.previous = value

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-# Copyright 2019 Science Technology Facilities Council
-# Copyright 2019 University of Manchester
+# Copyright 2019-2020 Science Technology Facilities Council
+# Copyright 2019-2020 University of Manchester
 #
 # This work is part of the Core Imaging Library developed by Science Technology
 # Facilities Council and University of Manchester
@@ -21,7 +21,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from ccpi.optimisation.algorithms import Algorithm
+from ccpi.optimisation.algorithms import Algorithm, DataContainerWithHistory
 
 
 
@@ -92,7 +92,6 @@ class PDHG(Algorithm):
         # can't happen with default sigma
         if sigma is None and tau is None:
             raise ValueError('Need sigma*tau||K||^2<1')
-
         # algorithmic parameters
         self.f = f
         self.g = g
@@ -106,33 +105,42 @@ class PDHG(Algorithm):
             normK = self.operator.norm()
             # Primal & dual stepsizes
             self.tau = 1 / (self.sigma * normK ** 2)
-
-
-        if x_init is None:
-            self.x_old = self.operator.domain_geometry().allocate()
-        else:
-            self.x_old = x_init.copy()
+        
+        self._x = DataContainerWithHistory(self.operator.domain_geometry())
+        
+        self._y = DataContainerWithHistory(self.operator.range_geometry())
+        
         self.x_tmp = self.x_old.copy()
-        self.x = self.x_old.copy()
-    
-        self.y_old = self.operator.range_geometry().allocate()
+        
         self.y_tmp = self.y_old.copy()
-        self.y = self.y_old.copy()
-
+        
         self.xbar = self.x_old.copy()
-
+        
         # relaxation parameter
         self.theta = 1
         self.update_objective()
+        
         self.configured = True
         print("{} configured".format(self.__class__.__name__, ))
 
+    @property
+    def x(self):
+        return self._x.current
+    @property
+    def x_old(self): # change to previous
+        return self._x.previous
+    @property
+    def y(self):
+        return self._y.current
+    @property
+    def y_old(self): # change to previous
+        return self._y.previous
+    def update_indices(self):
+        self._x.update_indices()
+        self._y.update_indices()
 
     def update(self):
-        # save previous iteration
-        self.x_old.fill(self.x)
-        self.y_old.fill(self.y)
-
+        
         # Gradient ascent for the dual variable
         self.operator.direct(self.xbar, out=self.y_tmp)
         
@@ -170,7 +178,7 @@ class PDHG(Algorithm):
             self.xbar += self.x
         
         
-        
+
     def update_objective(self):
 
         p1 = self.f(self.operator.direct(self.x)) + self.g(self.x)

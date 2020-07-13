@@ -659,7 +659,7 @@ class TestAlgorithms(unittest.TestCase):
         from ccpi.optimisation.algorithms import SPDHG, PDHG
         loader = TestData()
         data = loader.load(TestData.SIMPLE_PHANTOM_2D, size=(128,128))
-        print ("here")
+        print ("test_SPDHG_vs_SPDHG_explicit_axpby here")
         ig = data.geometry
         ig.voxel_size_x = 0.1
         ig.voxel_size_y = 0.1
@@ -720,13 +720,13 @@ class TestAlgorithms(unittest.TestCase):
         algos = []
         algos.append( SPDHG(f=F,g=G,operator=A, 
                     max_iteration = 1000,
-                    update_objective_interval=200, prob = prob, use_axpby=True)
+                    update_objective_interval=200, prob = prob.copy(), use_axpby=True)
         )
         algos[0].run(1000, very_verbose = True)
 
         algos.append( SPDHG(f=F,g=G,operator=A, 
                     max_iteration = 1000,
-                    update_objective_interval=200, prob = prob, use_axpby=False)
+                    update_objective_interval=200, prob = prob.copy(), use_axpby=False)
         )
         algos[1].run(1000, very_verbose = True)
         
@@ -738,8 +738,10 @@ class TestAlgorithms(unittest.TestCase):
             psnr(algos[0].get_output(), algos[1].get_output())
             )
         print ("Quality measures", qm)
-        np.testing.assert_array_less( qm[0], 0.005 )
-        np.testing.assert_array_less( qm[1], 3.e-05)
+        assert qm[0] < 0.005
+        assert qm[1] < 3.e-05
+
+    
     
     @unittest.skipIf(astra_not_available, "ccpi-astra not available")
     def test_PDHG_vs_PDHG_explicit_axpby(self):
@@ -750,7 +752,7 @@ class TestAlgorithms(unittest.TestCase):
         from ccpi.optimisation.algorithms import PDHG
         loader = TestData()
         data = loader.load(TestData.SIMPLE_PHANTOM_2D, size=(128,128))
-        print ("here")
+        print ("test_PDHG_vs_PDHG_explicit_axpby here")
         ig = data.geometry
         ig.voxel_size_x = 0.1
         ig.voxel_size_y = 0.1

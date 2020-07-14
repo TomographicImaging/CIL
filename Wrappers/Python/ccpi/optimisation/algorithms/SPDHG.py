@@ -20,7 +20,7 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from ccpi.optimisation.algorithms import Algorithm
+from ccpi.optimisation.algorithms import Algorithm, DataContainerWithHistory
 import numpy as np
 
 class SPDHG(Algorithm):
@@ -130,8 +130,7 @@ class SPDHG(Algorithm):
         self.x_tmp = self.operator.domain_geometry().allocate(0)
         
         # initialize dual variable to 0
-        self.y_old = operator.range_geometry().allocate(0)
-        self.y = operator.range_geometry().allocate(0)
+        self._y = DataContainerWithHistory(operator.range_geometry(), 0)
         
         # initialize variable z corresponding to back-projected dual variable
         self.z = operator.domain_geometry().allocate(0)
@@ -156,7 +155,7 @@ class SPDHG(Algorithm):
         i = int(np.random.choice(len(self.sigma), 1, p=self.prob))
         
         # save previous iteration
-        self.y_old[i].fill(self.y[i])
+        self.save_previous_iteration(i)
         
         # Gradient ascent for the dual variable
         # y[i] = y_old[i] + sigma[i] * K[i] x
@@ -202,4 +201,36 @@ class SPDHG(Algorithm):
     @property
     def primal_dual_gap(self):
         return [x[2] for x in self.loss]
+    @property
+    def y(self):
+        return self._y.current
+    @property
+    def y_old(self): # change to previous
+        return self._y.previous
+    def save_previous_iteration(self, index):
+        # swaps the reference in the BlockDataContainers
+        ca,cb = swap_element_from_tuples(self._y.current.containers,self._y.previous.containers,index)
+        self._y.current.containers = ca
+        self._y.previous.containers = cb
+
+
+def swap_element_from_tuples(tuple1, tuple2, index):
+    a = tuple1[index]
+    b = tuple2[index]
+    ca = create_and_replace_element_in_tuple(tuple1, index, b)
+    cb = create_and_replace_element_in_tuple(tuple2, index, a)
+    return ca,cb
     
+def create_and_replace_element_in_tuple(dtuple, index, new_element):
+    '''inplace create and replace element in list'''
+    dlist = []
+    for i in range(len(dtuple)):
+        if i == index:
+            dlist.append(new_element)
+        else:
+            dlist.append(dtuple[i])
+    return tuple(dlist)
+    
+
+
+

@@ -1705,6 +1705,11 @@ class AcquisitionData(DataContainer):
         '''
         if self.geometry is not None and number_of_subsets > 1:
             self.geometry.generate_subsets(number_of_subsets, method)
+
+    def __getitem__(self, index):
+        self.geometry.subset_id = index
+        return self
+
         
                 
             

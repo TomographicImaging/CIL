@@ -110,7 +110,7 @@ class SPDHG(Algorithm):
         self.rho = .99
         
         # Compute norm of each sub-operator       
-        norms = [operator.get_item(i,0).norm() for i in range(self.ndual_subsets)]
+        norms = [operator[i].norm() for i in range(self.ndual_subsets)]
         self.norms = norms
         if self.prob is None:
             self.prob = [1/self.ndual_subsets] * self.ndual_subsets
@@ -159,7 +159,7 @@ class SPDHG(Algorithm):
         
         # Gradient ascent for the dual variable
         # y[i] = y_old[i] + sigma[i] * K[i] x
-        self.operator.get_item(i,0).direct(self.x, out=self.y[i])
+        self.operator[i].direct(self.x, out=self.y[i])
         if self._use_axpby:
             self.y[i].axpby(self.sigma[i], 1., self.y_old[i], out=self.y[i])
         else:
@@ -171,7 +171,7 @@ class SPDHG(Algorithm):
         # Back-project
         # x_tmp = K[i]^*(y[i] - y_old[i])
         self.y[i].subtract(self.y_old[i], out=self.y_old[i])
-        self.operator.get_item(i,0).adjoint(self.y_old[i], out = self.x_tmp)
+        self.operator[i].adjoint(self.y_old[i], out = self.x_tmp)
         # Update backprojected dual variable and extrapolate
         # zbar = z + (1 + theta/p[i]) x_tmp
 
@@ -209,8 +209,9 @@ class SPDHG(Algorithm):
         return self._y.previous
     def save_previous_iteration(self, index):
         # swaps the reference in the BlockDataContainers
-        self._y.current.containers , self._y.previous.containers = \
-            swap_element_from_tuples( self._y.current.containers, self._y.previous.containers, index )
+        # self._y.current.containers , self._y.previous.containers = \
+        #     swap_element_from_tuples( self._y.current.containers, self._y.previous.containers, index )
+        self._y.update_indices()
 
 
 def swap_element_from_tuples(tuple1, tuple2, index):
@@ -232,5 +233,10 @@ def create_and_replace_element_in_tuple(dtuple, index, new_element):
     return tuple(dlist)
     
 
-
-
+class SPDHGFactory(object):
+    def __init__(self,  f=None, g=None, operator=None, num_physical_subsets=1, tau=None, sigma=1.,
+                 x_init=None, use_axpby=True, *args, **kwargs):
+        pass
+    @staticmethod
+    def get_instance(self):
+        pass

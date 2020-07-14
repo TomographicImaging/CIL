@@ -342,4 +342,66 @@ class Algorithm(object):
         if self.logger:
             self.logger.info(out)
 
+        return out  
+
+class StochasticAlgorithm(Algorithm):
+    def __init__(self, **kwargs):
+        update_objective_interval = kwargs.get('update_objective_interval', 1)
+        self.number_of_subsets = kwargs.get('number_of_subsets', 1)
+        
+        kwargs['update_objective_interval'] = update_objective_interval * self.number_of_subsets
+        super(StochasticAlgorithm, self).__init__(**kwargs)
+        self.epoch = 0
+        self.current_subset_id = 0
+        self.max_epoch = self.max_iteration
+        self.iter_string = 'Epoch'
+        
+    def update_subset(self):
+        if self.iteration % self.number_of_subsets == 0:
+            # increment epoch
+            self.epoch += 1
+            
+        self.current_subset_id += 1
+        if self.current_subset_id == self.number_of_subsets:
+            self.current_subset_id = 0
+        # this callback must be defined by the concrete implementation of the 
+        # algorithm to link to the appropriate object dealing with subsets
+        self.notify_new_subset(self.current_subset_id, self.number_of_subsets)
+        
+    def should_stop(self):
+        '''default stopping cryterion: number of iterations
+        
+        The user can change this in concrete implementatition of iterative algorithms.'''
+        return self.max_epoch_stop_cryterion()
+    
+    def max_epoch_stop_cryterion(self):
+        '''default stop cryterion for iterative algorithm: max_iteration reached'''
+        return self.epoch >= self.max_epoch
+    def notify_new_subset(self, subset_id, number_of_subsets):
+        raise NotImplemented('This callback must be implemented by the concrete algorithm')
+    
+    def __next__(self):
+        for _ in range(self.number_of_subsets):
+            super(StochasticAlgorithm, self).__next__()
+            self.update_subset()
+            
+    def should_stop(self):
+        '''default stopping cryterion: number of iterations
+        
+        The user can change this in concrete implementatition of iterative algorithms.'''
+        return self.max_epoch_stop_cryterion()
+    def verbose_output(self, verbose=False):
+        '''Creates a nice tabulated output'''
+        timing = self.timing[-self.update_objective_interval-1:-1]
+        self._iteration.append(self.iteration)
+        if len (timing) == 0:
+            t = 0
+        else:
+            t = sum(timing)/len(timing)
+        out = "{:>9} {:>10} {:>13} {}".format(
+                 self.epoch, 
+                 self.max_epoch,
+                 "{:.3f}".format(t), 
+                 self.objective_to_string(verbose)
+               )
         return out

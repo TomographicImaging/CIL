@@ -908,6 +908,135 @@ class TestDataContainer(unittest.TestCase):
         
         numpy.testing.assert_array_equal(ds.as_array(), -a)
 
+class TestStochasticSubset(unittest.TestCase):
+
+    def setUp(self):
+        N = 128 # set dimension of the phantom
+        angles = numpy.linspace(0, numpy.pi, 180, dtype='float32')
+        n_subsets = 10
+        detectors = N
+        ag = AcquisitionGeometry('parallel','2D', angles, detectors,
+                                pixel_size_h = 0.1)
+
+        print ("Number of subsets", ag.number_of_subsets)
+        print ("Subset_id", ag.subset_id)
+        data = ag.allocate(1)
+        data_id = id(data.as_array())
+        data2 = ag.allocate(2)
+        data2_id = id(data2.as_array())
+        self.data = data
+        self.data2 = data2
+        self.n_subsets = n_subsets
+
+    def test_AcquisitionData_subsets_pointers(self):
+        data = self.data
+        data2 = self.data2
+        n_subsets = self.n_subsets
+
+        a1 = data.as_array()
+        a2 = data2.as_array()
+        self.assertFalse (id (a1) == id(a2))
+
+        self.assertTrue(data.shape == (180,128))
+        self.assertTrue(data2.shape == (180,128))
+        
+        numpy.random.seed(1)
+        data.geometry.generate_subsets(n_subsets, 'random')
+        data.geometry.subset_id = 0
+
+        numpy.random.seed(1)
+        data2.geometry.generate_subsets(n_subsets, 'random')
+        data2.geometry.subset_id = 0
+
+        s1 = data2.geometry.subsets[3]
+        s2 = data.geometry.subsets[3]
+
+        numpy.testing.assert_array_equal(s1,s2)
+        
+        numpy.random.seed(1)
+        data.geometry.generate_subsets(n_subsets, 'random_permutation')
+        data.geometry.subset_id = 0
+
+        numpy.random.seed(1)
+        data2.geometry.generate_subsets(n_subsets, 'random_permutation')
+        data2.geometry.subset_id = 0
+
+        s1 = data2.geometry.subsets[3]
+        s2 = data.geometry.subsets[3]
+
+        numpy.testing.assert_array_equal(s1,s2)
+        
+
+        data2.geometry.subset_id = 8
+        print (data.shape)
+        print (data2.shape)
+        self.assertTrue(data.shape == (18,128))
+        self.assertTrue(data2.shape == (18,128))
+
+        print ("data.as_array().shape", data.as_array().shape)
+        print ("data2.as_array().shape", data2.as_array().shape)
+        
+        a1 = data.as_array()
+        a2 = data2.as_array()
+        
+        self.assertFalse (id (data.array) == id(a1))
+        self.assertFalse (id (data2.array) == id(a2))
+        self.assertFalse (id (a1) == id(a2))
+        
+    def test_AcquisitionData_subsets_algebra(self):
+        data = self.data # [1]
+        data2 = self.data2 # [2]
+        n_subsets = self.n_subsets
+
+        orig_shape = (180,128)
+
+        shape = tuple(orig_shape)
+        out = data + data2
+        numpy.testing.assert_array_equal(out.as_array(), 3 * numpy.ones(shape))
+
+        data2.subtract(data, out=out)
+        numpy.testing.assert_array_equal(out.as_array(), numpy.ones(shape))
+        data2.add(data, out=out)
+        numpy.testing.assert_array_equal(out.as_array(), 3 *  numpy.ones(shape))
+        data2.multiply(data, out=out)
+        numpy.testing.assert_array_equal(out.as_array(), 2 *  numpy.ones(shape))
+        out = data2/data
+        numpy.testing.assert_array_equal(out.as_array(), 2 *  numpy.ones(shape))
+        out /= 2
+        numpy.testing.assert_array_equal(out.as_array(), numpy.ones(shape))
+
+
+
+        # DataContainer.axpby(2 , data2, -1 , data, out=out)
+        # numpy.testing.assert_array_equal(out.as_array(), 3 * numpy.ones((180,128)))
+
+        numpy.random.seed(1)
+        data.geometry.generate_subsets(n_subsets, 'uniform')
+        data.geometry.subset_id = 0
+
+        numpy.random.seed(1)
+        data2.geometry.generate_subsets(n_subsets, 'uniform')
+        data2.geometry.subset_id = 2
+
+        shape = (18,128)
+        out = data + data2
+        numpy.testing.assert_array_equal(out.as_array(), 3 * numpy.ones(shape))
+
+        data2.subtract(data, out=out)
+        numpy.testing.assert_array_equal(out.as_array(), numpy.ones(shape))
+        data2.add(data, out=out)
+        numpy.testing.assert_array_equal(out.as_array(), 3 *  numpy.ones(shape))
+        data2.multiply(data, out=out)
+        numpy.testing.assert_array_equal(out.as_array(), 2 *  numpy.ones(shape))
+        out = data2/data
+        numpy.testing.assert_array_equal(out.as_array(), 2 *  numpy.ones(shape))
+        out /= 2
+        numpy.testing.assert_array_equal(out.as_array(), numpy.ones(shape))
+
+        out = data.exp()
+        numpy.testing.assert_array_almost_equal(out.as_array(), numpy.ones(shape)* numpy.exp(1))
+
+
 
 
 if __name__ == '__main__':

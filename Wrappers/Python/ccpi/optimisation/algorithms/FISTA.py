@@ -22,7 +22,7 @@ from __future__ import division
 from __future__ import print_function
 
 
-from ccpi.optimisation.algorithms import Algorithm
+from ccpi.optimisation.algorithms import Algorithm, StochasticAlgorithm
 from ccpi.optimisation.functions import ZeroFunction
 import numpy
 
@@ -98,9 +98,12 @@ class FISTA(Algorithm):
             
     def update(self):
         self.t_old = self.t
+        self.x_old.fill(self.x)
+
         self.f.gradient(self.y, out=self.u)
-        self.u.__imul__( -self.invL )
-        self.u.__iadd__( self.y )
+        # self.u.__imul__( -self.invL )
+        # self.u.__iadd__( self.y )
+        self.u.axpby(-self.invL, 1, self.y, out=self.u)
 
         self.g.proximal(self.u, self.invL, out=self.x)
         
@@ -112,7 +115,16 @@ class FISTA(Algorithm):
         self.x_old.fill(self.x)
 
         
+        
     def update_objective(self):
         self.loss.append( self.f(self.x) + self.g(self.x) )    
     
 
+class SFISTA(StochasticAlgorithm, FISTA):
+    def __init__(self, **kwargs):
+        # if kwargs.get('rate', None) is None:
+        #     raise ValueError('Please specify a rate.')
+        super(SFISTA, self).__init__(**kwargs)
+        
+    def notify_new_subset(self, subset_id, number_of_subsets):
+        self.f.notify_new_subset(subset_id, number_of_subsets)

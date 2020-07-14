@@ -86,6 +86,9 @@ class ImageGeometry(object):
                  center_z=0, 
                  channels=1, 
                  **kwargs):
+        '''AcquisitionGeometry describes the ImageData
+        
+        '''
         
         self.voxel_num_x = voxel_num_x
         self.voxel_num_y = voxel_num_y
@@ -190,7 +193,6 @@ class ImageGeometry(object):
     def copy(self):
         '''alias of clone'''
         return self.clone()
- 
     def __str__ (self):
         repres = ""
         repres += "Number of channels: {0}\n".format(self.channels)
@@ -274,30 +276,25 @@ class AcquisitionGeometry(object):
                  **kwargs
                  ):
         """
-        General inputs for standard type projection geometries
-        detectorDomain or detectorpixelSize:
-            If 2D
-                If scalar: Width of detector or single detector pixel
-                If 2-vec: Error
-            If 3D
-                If scalar: Width in both dimensions
-                If 2-vec: Vertical then horizontal size
-        grid
-            If 2D
-                If scalar: number of detectors
-                If 2-vec: error
-            If 3D
-                If scalar: Square grid that size
-                If 2-vec vertical then horizontal size
-        cone or parallel
-        2D or 3D
-        parallel_parameters: ?
-        cone_parameters:
-            source_to_center_dist (if parallel: NaN)
-            center_to_detector_dist (if parallel: NaN)
-        standard or nonstandard (vec) geometry
-        angles is expected numpy array, dtype - float32
-        angles_format radians or degrees
+        AcquisitionGeometry describes the experimental setup:
+        
+        :param geom_type: 'parallel', 'cone'
+        :type geom_type: string,
+        :param dimension: if 2D or 3D. This parameter can be safely set to any string as it will be reset internally.
+        :type dimension: string.
+        :param pixel_num_h: number of pixel in the acquisition panel on the horizontal axis
+        :type pixel_size_h: acquisition panel pixel spacing on the horizontal axis. 
+        :param pixel_num_v: number of pixel in the acquisition panel on the vertical axis
+        :type pixel_size_v: acquisition panel pixel spacing on the vertical axis. 
+        :param dist_source_center: distance of the source to the center of the object, valid only for cone geometry
+        :param dist_center_detector: distance of the object to the detector, valid only for cone geometry
+        :type dist_source_center: float, in same units as pixel_size
+        :type dist_center_detector: float, in same units as pixel_size 
+        :param channel: number of energy channels resolved by the acquisition panel.
+        :param angles: the rotation angles of the acquisition data
+        :type angles: numpy.ndarray, dtype - float32
+        :param angle_unit: unit measure of the acquisition angle
+        :type angle_unit: string, default 'degree', allowed 'radian', 'degree'
         """
         self.geom_type = geom_type   # 'parallel' or 'cone'
         # Override the parameter passed as dimension
@@ -311,7 +308,7 @@ class AcquisitionGeometry(object):
     
         self.dimension = dimension # 2D or 3D
         if isinstance(angles, numpy.ndarray):
-            self.angles = angles
+            self.angles = angles.copy()
         else:
             raise ValueError('numpy array is expected')
         num_of_angles = len (angles)
@@ -368,6 +365,13 @@ class AcquisitionGeometry(object):
             else:
                 self.shape = shape
             self.dimension_labels = labels
+
+
+        self.number_of_subsets = kwargs.get('number_of_subsets', 1)
+        self.subset_id = kwargs.get('subset_id', 0)
+        self.generate_subset_method = kwargs.get('generate_subset_method', 'random')
+        if self.number_of_subsets > 1:
+            self.generate_subsets(self.number_of_subsets, self.generate_subset_method)
         
     def get_order_by_label(self, dimension_labels, default_dimension_labels):
         order = []
@@ -381,11 +385,27 @@ class AcquisitionGeometry(object):
 
 
         
-    def clone(self):
-        '''returns a copy of the AcquisitionGeometry'''
-        return AcquisitionGeometry(self.geom_type,
+    def clone(self, **kwargs):
+        '''returns a copy of the AcquisitionGeometry
+        
+        if the geometry represents a subset copy returns the geometry relative to the subset
+        '''
+        copy_whole = kwargs.get('whole', False)
+        
+        
+        if self.number_of_subsets > 1 and not copy_whole:
+            number_of_subsets = 1
+            subset = self.subsets[self.subset_id]
+            angles = self.angles[subset]
+        else:
+            number_of_subsets = self.number_of_subsets
+            angles = self.angles[:]
+            subset = numpy.asarray(numpy.ones_like(angles), dtype=numpy.bool)
+            
+
+        ag = AcquisitionGeometry(self.geom_type,
                                    self.dimension, 
-                                   self.angles, 
+                                   angles, 
                                    self.pixel_num_h, 
                                    self.pixel_size_h, 
                                    self.pixel_num_v, 
@@ -393,11 +413,14 @@ class AcquisitionGeometry(object):
                                    self.dist_source_center, 
                                    self.dist_center_detector, 
                                    self.channels,
-                                   dimension_labels=self.dimension_labels)
-    def copy(self):
+                                   dimension_labels=self.dimension_labels, 
+                                   number_of_subsets=number_of_subsets,
+                                   subset_id=0)
+        return ag
+    def copy(self, **kwargs):
         '''alias of clone'''
         return self.clone()
-
+        
     def __str__ (self):
         repres = ""
         repres += "Number of dimensions: {0}\n".format(self.dimension)
@@ -409,6 +432,25 @@ class AcquisitionGeometry(object):
         repres += "distance center-detector: {0}\n".format(self.dist_source_center)
         repres += "number of channels: {0}\n".format(self.channels)
         return repres
+
+    def generate_subsets(self, number_of_subsets, method):
+        '''generate subset indices with AcquisitionGeometrySubsetGenerator
+
+        :param number_of_subsets: number of subsets to generate
+        :type number_of_subsets: int, positive default=1
+        :param method: method used to generate subsets.
+        :type method: string, allowed values 'uniform', 'random', 'random_permutation', 'stagger'
+        '''
+        
+        subsets = AcquisitionGeometrySubsetGenerator.generate_subset(
+                        self, 0, number_of_subsets, method) 
+        # store results
+        self.subsets = subsets[:]
+        self.subset_id = 0
+        self.number_of_subsets = number_of_subsets
+        self.subset_dimension = AcquisitionGeometry.ANGLE
+        
+        
     def allocate(self, value=0, dimension_labels=None, **kwargs):
         '''allocates an AcquisitionData according to the size expressed in the instance
         
@@ -426,11 +468,11 @@ class AcquisitionGeometry(object):
         else:
             dtype = kwargs.get('dtype', numpy.float32)
         if dimension_labels is None:
-            out = AcquisitionData(geometry=self, dimension_labels=self.dimension_labels, 
+            out = AcquisitionData(geometry=self.copy(), dimension_labels=self.dimension_labels, 
                                   dtype=dtype,
                                   suppress_warning=True)
         else:
-            out = AcquisitionData(geometry=self, dimension_labels=dimension_labels, 
+            out = AcquisitionData(geometry=self.copy(), dimension_labels=dimension_labels, 
                                   dtype=dtype, 
                                   suppress_warning=True)
         if isinstance(value, Number):
@@ -458,7 +500,93 @@ class AcquisitionGeometry(object):
                 raise ValueError('Value {} unknown'.format(value))
         
         return out
+
+class AcquisitionGeometrySubsetGenerator(object):
+    '''AcquisitionGeometrySubsetGenerator is a factory that helps generating subsets of AcquisitionData
     
+    AcquisitionGeometrySubsetGenerator generates the indices to slice the data array in AcquisitionData along the 
+    angle dimension with 4 methods:
+
+    1. random: picks randomly between all the angles. Subset may contain same projection as other
+    2. random_permutation: generates a number of subset by a random permutation of the indices, thereby no subset contain the same data.
+    3. uniform: divides the angles in uniform subsets without permutation
+    4. stagger: generates number_of_subsets by interleaving them, e.g. generating 2 subsets from [0,1,2,3] would lead to [0,2] and [1,3]
+
+    The factory is not to be used directly rather from the AcquisitionGeometry class.
+
+    '''
+    
+    ### Changes in the Operator required to work as OS operator
+    @staticmethod
+    def generate_subset(ag, subset_id, number_of_subsets, method='random'):
+        
+        angles = ag.angles.copy()
+        if method == 'random':
+            indices = [ AcquisitionGeometrySubsetGenerator.random_indices(angles, subset_id, number_of_subsets) 
+              for _ in range(number_of_subsets) ] 
+            
+        elif method == 'random_permutation':
+            rndidx = numpy.asarray(range(len(angles)))
+            numpy.random.shuffle(rndidx)
+            indices = AcquisitionGeometrySubsetGenerator.uniform_groups_indices(rndidx, number_of_subsets)
+            
+        elif method == 'uniform':
+            rndidx = numpy.asarray(range(len(angles)))
+            indices = AcquisitionGeometrySubsetGenerator.uniform_groups_indices(rndidx, number_of_subsets)
+            
+        elif method == 'stagger':
+            idx = numpy.asarray(range(len(angles)))
+            indices = AcquisitionGeometrySubsetGenerator.staggered_indices(idx, number_of_subsets)
+        else:
+            raise ValueError('Can only do {}. got {}'.format(['random', 'random_permutation', 'uniform'], method))
+        return indices
+    
+    @staticmethod
+    def uniform_groups_indices(idx, number_of_subsets):
+        indices = []
+        groups = int(len(idx)/number_of_subsets)
+        for i in range(number_of_subsets):
+            ret = numpy.asarray(numpy.zeros_like(idx), dtype=numpy.bool)
+            for j,el in enumerate(idx[i*groups:(i+1)*groups]):
+                ret[el] = True
+                
+            indices.append(ret)
+        return indices
+    @staticmethod
+    def random_indices(angles, subset_id, number_of_subsets):
+        N = int(numpy.floor(float(len(angles))/float(number_of_subsets)))
+        indices = numpy.asarray(range(len(angles)))
+        numpy.random.shuffle(indices)
+        indices = indices[:N]
+        ret = numpy.asarray(numpy.zeros_like(angles), dtype=numpy.bool)
+        for i,el in enumerate(indices):
+            ret[el] = True
+        return ret
+    @staticmethod
+    def staggered_indices(idx, number_of_subsets):
+        indices = []
+        # groups = int(len(idx)/number_of_subsets)
+        for i in range(number_of_subsets):
+            ret = numpy.asarray(numpy.zeros_like(idx), dtype=numpy.bool)
+            indices.append(ret)
+        i = 0
+        while i < len(idx):    
+            for ret in indices:
+                ret[i] = True
+                i += 1
+                if i >= len(idx):
+                    break
+                
+        return indices
+    @staticmethod
+    def get_new_indices(index):
+        newidx = []
+        for idx in index:
+            ai = numpy.where(idx == True)[0]
+            for i in ai:
+                newidx.append(i)
+        return numpy.asarray(newidx)
+
 class DataContainer(object):
     '''Generic class to hold data
     
@@ -497,6 +625,12 @@ class DataContainer(object):
         else:
             # assume it is parallel beam
             pass
+    @property
+    def shape(self):
+        return self._shape
+    @shape.setter
+    def shape(self, shape):
+        self._shape = shape
         
     def get_dimension_size(self, dimension_label):
         if dimension_label in self.dimension_labels.values():
@@ -753,7 +887,11 @@ class DataContainer(object):
                             suppress_warning=True )
         else:
             out = self.geometry.allocate(None)
-            out.fill(self.array)
+            if hasattr(self.geometry, 'number_of_subsets') and \
+               self.geometry.number_of_subsets > 1:
+                out.fill(self.array[self.geometry.subsets[self.geometry.subset_id]])
+            else:
+                out.fill(self.array)
             return out
     
     def get_data_axes_order(self,new_order=None):
@@ -816,7 +954,7 @@ class DataContainer(object):
             return type(self)(out,
                    deep_copy=False, 
                    dimension_labels=self.dimension_labels,
-                   geometry= None if self.geometry is None else self.geometry.copy(), 
+                   geometry=geom, 
                    suppress_warning=True)
             
         
@@ -993,10 +1131,13 @@ class DataContainer(object):
         out = kwargs.get('out', None)
         if out is None:
             out = pwop(self.as_array() , *args, **kwargs )
+            geometry = None
+            if self.geometry is not None:
+                geometry = self.geometry.copy()
             return type(self)(out,
                        deep_copy=False, 
                        dimension_labels=self.dimension_labels,
-                       geometry=self.geometry, 
+                       geometry=geometry, 
                        suppress_warning=True)
         elif issubclass(type(out), DataContainer):
             if self.check_dimensions(out):
@@ -1348,6 +1489,7 @@ class AcquisitionData(DataContainer):
                 shape, labels = self.get_shape_labels(self.geometry, dimension_labels)
                 if array.shape != shape:
                     raise ValueError('Shape mismatch {} {}'.format(shape, array.shape))
+                self.shape = shape
                     
             if issubclass(type(array) ,DataContainer):
                 # if the array is a DataContainer get the info from there
@@ -1359,6 +1501,7 @@ class AcquisitionData(DataContainer):
                 
                 #DataContainer.__init__(self, array.as_array(), deep_copy,
                 #                 array.dimension_labels, **kwargs)
+                self.shape = array.shape
                 super(AcquisitionData, self).__init__(array.as_array(), deep_copy,
                                  array.dimension_labels, **kwargs)
             elif issubclass(type(array) ,numpy.ndarray):
@@ -1380,7 +1523,7 @@ class AcquisitionData(DataContainer):
                     else:
                         dimension_labels = [AcquisitionGeometry.ANGLE,
                                             AcquisitionGeometry.HORIZONTAL]
-
+                self.shape = array.shape
                 super(AcquisitionData, self).__init__(array, deep_copy, 
                      dimension_labels, **kwargs)
                 
@@ -1510,6 +1653,59 @@ class AcquisitionData(DataContainer):
                                     )
         return out
     
+    def as_array(self, **kwargs):
+        '''returns a reference to the internal numpy.ndarray
+        
+        If the geometry is not None and subsets have been generated it will return a view, or a copy if not possible,
+        of the subset selected by self.geometry.subset_id.
+
+        The subset will only be on the angle dimension. Any data order is allowed, i.e. angles does not have to be
+        the first dimension.
+        '''
+        if self.geometry is None or \
+           self.geometry.number_of_subsets is None or\
+           self.geometry.number_of_subsets == 1:
+            return DataContainer.as_array(self, **kwargs)
+        else:
+            
+            # find where the subsetting dimension is and create the slice object
+            # notice that currently only angle is used. But this method is generic
+            sliceobj = []
+            for k,v in self.dimension_labels.items():
+                if v == self.geometry.subset_dimension:
+                    sliceobj.append( self.geometry.subsets[self.geometry.subset_id] )
+                else:
+                    sliceobj.append(slice(None, None, 1))
+            # the slice object must be passed as immutable tuple.
+            return DataContainer.as_array(self, **kwargs)[tuple(sliceobj)]
+            # return DataContainer.as_array(self, **kwargs)[self.geometry.subsets[self.geometry.subset_id] ]
+    @property
+    def shape(self, **kwargs):
+        if self.geometry is None or self.geometry.number_of_subsets is None or self.geometry.number_of_subsets == 1:
+            return self._shape
+        else:
+            # number of angles in the subset
+            idx = self.geometry.subsets[self.geometry.subset_id].sum()
+            for i,el in enumerate(self.geometry.dimension_labels):
+                if el == 'angle':
+                    break
+            updated_shape = list(self._shape)
+            updated_shape[i] = idx
+            return tuple(updated_shape)
+            
+            
+    @shape.setter
+    def shape(self, shape):
+        self._shape = shape
+        
+    def generate_subsets(self, number_of_subsets, method='uniform'):
+        '''generates indices for the subset
+        
+        calls the geometry.generate_subsets method
+        '''
+        if self.geometry is not None and number_of_subsets > 1:
+            self.geometry.generate_subsets(number_of_subsets, method)
+        
                 
             
 class DataProcessor(object):

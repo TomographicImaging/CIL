@@ -17,10 +17,12 @@
 #   limitations under the License.
 
 from .Algorithm import Algorithm, DataContainerWithHistory
+from .Algorithm import StochasticAlgorithm
 from .CGLS import CGLS
 from .SIRT import SIRT
-from .GradientDescent import GradientDescent
+from .GradientDescent import GradientDescent, StochasticGradientDescent
 from .FISTA import FISTA
+from .FISTA import SFISTA
 from .PDHG import PDHG
 from .ADMM import LADMM
 from .SPDHG import SPDHG

@@ -27,7 +27,7 @@ from functools import reduce
 
 from .framework import DataContainer
 from .framework import ImageData, AcquisitionData
-from .framework import ImageGeometry, AcquisitionGeometry
+from .framework import ImageGeometry, AcquisitionGeometry, AcquisitionGeometrySubsetGenerator
 from .framework import VectorData, VectorGeometry
 from .framework import find_key, message
 from .framework import DataProcessor

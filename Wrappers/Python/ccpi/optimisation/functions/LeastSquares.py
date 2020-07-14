@@ -102,6 +102,7 @@ class LeastSquares(Function):
         """
         
         if out is not None:
+            #return 2.0*self.c*self.A.adjoint( self.A.direct(x) - self.b )
             tmp = self.A.direct(x)
             tmp.subtract(self.b , out=tmp)
             if self.weight is not None:
@@ -153,3 +154,11 @@ class LeastSquares(Function):
         else:
             self._weight_norm = 1.0
         return self._weight_norm
+
+
+class StochasticNorm2Sq(LeastSquares):
+    def __init__(self, A, b, c=1.0, number_of_subsets=1):
+        super(StochasticNorm2Sq, self).__init__(A, b, c)
+       
+    def notify_new_subset(self, subset_id, number_of_subsets):
+        self.A.notify_new_subset(subset_id, number_of_subsets)

@@ -24,8 +24,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from ccpi.optimisation.algorithms import Algorithm, StochasticAlgorithm
 import numpy
-from ccpi.optimisation.algorithms import Algorithm
 
 class GradientDescent(Algorithm):
     ''' 
@@ -175,3 +175,12 @@ class GradientDescent(Algorithm):
                 atol=self.atol, equal_nan=False)
 
 
+class StochasticGradientDescent(StochasticAlgorithm, GradientDescent):
+    def __init__(self, **kwargs):
+        # if kwargs.get('rate', None) is None:
+        #     raise ValueError('Please specify a rate.')
+        super(StochasticGradientDescent, self).__init__(**kwargs)
+        
+    def notify_new_subset(self, subset_id, number_of_subsets):
+        self.objective_function.notify_new_subset(subset_id, number_of_subsets)
+        

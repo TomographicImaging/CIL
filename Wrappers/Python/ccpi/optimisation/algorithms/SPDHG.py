@@ -209,12 +209,12 @@ class SPDHG(Algorithm):
         return self._y.previous
     def save_previous_iteration(self, index):
         # swaps the reference in the BlockDataContainers
-        ca,cb = swap_element_from_tuples(self._y.current.containers,self._y.previous.containers,index)
-        self._y.current.containers = ca
-        self._y.previous.containers = cb
+        self._y.current.containers , self._y.previous.containers = \
+            swap_element_from_tuples( self._y.current.containers, self._y.previous.containers, index )
 
 
 def swap_element_from_tuples(tuple1, tuple2, index):
+    '''swap element at index from tuple1 and tuple2, returns 2 new tuples'''
     a = tuple1[index]
     b = tuple2[index]
     ca = create_and_replace_element_in_tuple(tuple1, index, b)
@@ -222,7 +222,7 @@ def swap_element_from_tuples(tuple1, tuple2, index):
     return ca,cb
     
 def create_and_replace_element_in_tuple(dtuple, index, new_element):
-    '''inplace create and replace element in list'''
+    '''replace element at index in a tuple with new_element by creating a list and returning a new tuple'''
     dlist = []
     for i in range(len(dtuple)):
         if i == index:

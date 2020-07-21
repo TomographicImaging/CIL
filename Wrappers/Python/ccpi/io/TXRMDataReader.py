@@ -53,134 +53,17 @@ class TXRMDataReader(object):
         if self.txrm_file == None:
             raise Exception('Path to txrm file is required.')
         
-        # check if xtek file exists
+        # check if txrm file exists
         if not(os.path.isfile(self.txrm_file)):
             raise Exception('File\n {}\n does not exist.'.format(self.txrm_file))  
-                
-        '''        
-        # parse xtek file
-        with open(self.xtek_file, 'r') as f:
-            content = f.readlines()    
-                
-        content = [x.strip() for x in content]
-        
-        for line in content:
-            # filename of TIFF files
-            if line.startswith("Name"):
-                self._experiment_name = line.split('=')[1]
-            # number of projections
-            elif line.startswith("Projections"):
-                num_projections = int(line.split('=')[1])
-            # white level - used for normalization
-            elif line.startswith("WhiteLevel"):
-                self._white_level = float(line.split('=')[1])
-            # number of pixels along Y axis
-            elif line.startswith("DetectorPixelsY"):
-                pixel_num_v_0 = int(line.split('=')[1])
-            # number of pixels along X axis
-            elif line.startswith("DetectorPixelsX"):
-                pixel_num_h_0 = int(line.split('=')[1])
-            # pixel size along X axis
-            elif line.startswith("DetectorPixelSizeX"):
-                pixel_size_h_0 = float(line.split('=')[1])
-            # pixel size along Y axis
-            elif line.startswith("DetectorPixelSizeY"):
-                pixel_size_v_0 = float(line.split('=')[1])
-            # source to center of rotation distance
-            elif line.startswith("SrcToObject"):
-                source_x = float(line.split('=')[1])
-            # source to detector distance
-            elif line.startswith("SrcToDetector"):
-                detector_x = float(line.split('=')[1])
-            # initial angular position of a rotation stage
-            elif line.startswith("InitialAngle"):
-                initial_angle = float(line.split('=')[1])
-            # angular increment (in degrees)
-            elif line.startswith("AngularStep"):
-                angular_step = float(line.split('=')[1])
-                
-        if self.roi == -1:
-            self._roi_par = [(0, pixel_num_v_0), \
-                              (0, pixel_num_h_0)]
-        else:
-            self._roi_par = self.roi.copy()
-            if self._roi_par[0] == -1:
-                self._roi_par[0] = (0, pixel_num_v_0)
-            if self._roi_par[1] == -1:
-                self._roi_par[1] = (0, pixel_num_h_0)
-                
-        # calculate number of pixels and pixel size
-        if (self.binning == [1, 1]):
-            pixel_num_v = self._roi_par[0][1] - self._roi_par[0][0]
-            pixel_num_h = self._roi_par[1][1] - self._roi_par[1][0]
-            pixel_size_v = pixel_size_v_0
-            pixel_size_h = pixel_size_h_0
-        else:
-            pixel_num_v = (self._roi_par[0][1] - self._roi_par[0][0]) // self.binning[0]
-            pixel_num_h = (self._roi_par[1][1] - self._roi_par[1][0]) // self.binning[1]
-            pixel_size_v = pixel_size_v_0 * self.binning[0]
-            pixel_size_h = pixel_size_h_0 * self.binning[1]
-        '''
-        
-        '''
-        Parse the angles file .ang or _ctdata.txt file and returns the angles
-        as an numpy array. 
-        '''
-        '''
-        input_path = os.path.dirname(self.xtek_file)
-        angles_ctdata_file = os.path.join(input_path, '_ctdata.txt')
-        angles_named_file = os.path.join(input_path, self._experiment_name+'.ang')
-        angles = numpy.zeros(num_projections, dtype = 'float')
-        
-        # look for _ctdata.txt
-        if os.path.exists(angles_ctdata_file):
-            # read txt file with angles
-            with open(angles_ctdata_file) as f:
-                content = f.readlines()
-            # skip firt three lines
-            # read the middle value of 3 values in each line as angles in degrees
-            index = 0
-            for line in content[3:]:
-                angles[index] = float(line.split(' ')[1])
-                index += 1
-            angles = angles + initial_angle
-        
-        # look for ang file
-        elif os.path.exists(angles_named_file):
-            # read the angles file which is text with first line as header
-            with open(angles_named_file) as f:
-                content = f.readlines()
-            # skip first line
-            index = 0
-            for line in content[1:]:
-                angles[index] = float(line.split(':')[1])
-                index += 1
-            angles = numpy.flipud(angles + initial_angle) # angles are in the reverse order
-            
-        else:   # calculate angles based on xtek file
-            angles = initial_angle + angular_step * range(num_projections)
-        
-        # fill in metadata
-        self._ag = AcquisitionGeometry(geom_type = 'cone', 
-                                       dimension = '3D', 
-                                       angles = angles, 
-                                       pixel_num_h = pixel_num_h, 
-                                       pixel_size_h = pixel_size_h, 
-                                       pixel_num_v = pixel_num_v, 
-                                       pixel_size_v = pixel_size_v, 
-                                       dist_source_center = source_x, 
-                                       dist_center_detector = detector_x - source_x, 
-                                       channels = 1,
-                                       angle_unit = 'degree')
-        '''
 
-    #def get_geometry(self):
-    #    
-    #    '''
-    #    Return AcquisitionGeometry object
-    #    '''
-    #    
-    #    return self._ag
+    def get_geometry(self):
+        
+        '''
+        Return AcquisitionGeometry object
+        '''
+        
+        return self._ag
         
     def load_projections(self):
         
@@ -227,11 +110,6 @@ class TXRMDataReader(object):
                                        dist_center_detector = DtoCdist, 
                                        channels = 1,
                                        angle_unit = 'degree')
-        
-        
-        #if (self.normalize):
-        #    data /= self._white_level
-        #    data[data > 1] = 1
 
         return AcquisitionData(array = data, 
                                deep_copy = False,
@@ -242,9 +120,7 @@ class TXRMDataReader(object):
                 
 if __name__ == '__main__':
     
-    from ccpi.framework import ImageGeometry, ImageData
-    from ccpi.astra.operators import AstraProjectorSimple
-    from ccpi.optimisation.algorithms import FISTA, CGLS, SIRT
+    from ccpi.framework import ImageGeometry
     from ccpi.astra.processors import FBP
     import matplotlib.pyplot as plt
     
@@ -285,7 +161,6 @@ if __name__ == '__main__':
     plt.imshow(data2d.as_array())
     plt.colorbar()
     plt.gray()
-    plt.savefig('walnut_sinotrans.png',dpi=300)
     
     data2d.log(out=data2d)
     data2d *= -1
@@ -294,7 +169,6 @@ if __name__ == '__main__':
     plt.imshow(data2d.as_array())
     plt.colorbar()
     plt.gray()
-    plt.savefig('walnut_sinoabs.png',dpi=300)
     
     # Choose the number of voxels to reconstruct onto as number of detector pixels
     N = data.geometry.pixel_num_h
@@ -325,21 +199,5 @@ if __name__ == '__main__':
     plt.imshow(recfbp.as_array())
     plt.gray()
     plt.colorbar()
-    plt.savefig('walnut_2DFBP.png',dpi=300)
-
-    '''
-    # Set up the Projector (AcquisitionModel) using ASTRA on GPU
-    Aop = AstraProjectorSimple(ig2d, ag2d,"cpu")
     
-    # Set initial guess for CGLS reconstruction
-    x_init = ImageData(geometry=ig2d)
     
-    # Set tolerance and number of iterations for reconstruction algorithms.
-    opt = {'tol': 1e-4, 'iter': 2}
-    
-    # First a CGLS reconstruction can be done:
-    CGLS_alg = SIRT()
-    CGLS_alg.set_up(x_init, Aop, data2d)
-    CGLS_alg.max_iteration = 2000
-    CGLS_alg.run(opt['iter'])
-    '''

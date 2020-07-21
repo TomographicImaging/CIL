@@ -29,6 +29,7 @@ from ccpi.optimisation.functions import LeastSquares, ZeroFunction, \
    L2NormSquared, FunctionOperatorComposition
 from ccpi.optimisation.algorithms import GradientDescent
 from ccpi.optimisation.algorithms import CGLS
+from ccpi.optimisation.algorithms import SIRT
 from ccpi.optimisation.algorithms import FISTA
 
 from ccpi.optimisation.algorithms import PDHG
@@ -159,6 +160,31 @@ class TestAlgorithms(unittest.TestCase):
         self.assertTrue(alg.update_objective_interval==2)
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+    
+    def test_SIRT(self):
+        print ("Test CGLS")
+        #ig = ImageGeometry(124,153,154)
+        ig = ImageGeometry(10,2)
+        numpy.random.seed(2)
+        x_init = ig.allocate(0.)
+        b = ig.allocate('random')
+        # b = x_init.copy()
+        # fill with random numbers
+        # b.fill(numpy.random.random(x_init.shape))
+        # b = ig.allocate()
+        # bdata = numpy.reshape(numpy.asarray([i for i in range(20)]), (2,10))
+        # b.fill(bdata)
+        identity = Identity(ig)
+        
+        alg = SIRT(x_init=x_init, operator=identity, data=b)
+        alg.max_iteration = 200
+        alg.run(20, verbose=True)
+        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+        
+        alg2 = SIRT(x_init=x_init, operator=identity, data=b, upper=0.3)
+        alg2.max_iteration = 200
+        alg2.run(20, verbose=True)
+        self.assertTrue(alg2.get_output().max()==0.3)
         
     def test_FISTA(self):
         print ("Test FISTA")

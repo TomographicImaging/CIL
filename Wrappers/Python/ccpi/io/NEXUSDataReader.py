@@ -79,10 +79,10 @@ class NEXUSDataReader(object):
                 ds_data = file['entry1/tomo_entry/data/data']
                 data = np.array(ds_data, dtype = 'float32')
                 
-                dimension_labels = []
+                dimension_labels = [None] * data.ndim
                 
                 for i in range(data.ndim):
-                    dimension_labels.append(ds_data.attrs['dim{}'.format(i)])
+                    dimension_labels[i] = ds_data.attrs['dim{}'.format(i)]
                 
                 if ds_data.attrs['data_type'] == 'ImageData':
                     self._geometry = ImageGeometry(voxel_num_x = ds_data.attrs['voxel_num_x'],
@@ -94,12 +94,8 @@ class NEXUSDataReader(object):
                                                    center_x = ds_data.attrs['center_x'],
                                                    center_y = ds_data.attrs['center_y'],
                                                    center_z = ds_data.attrs['center_z'],
-                                                   channels = ds_data.attrs['channels'])
-                    
-                    return ImageData(array = data,
-                                     deep_copy = False,
-                                     geometry = self._geometry,
-                                     dimension_labels = dimension_labels)
+                                                   channels = ds_data.attrs['channels'],
+                                                   dimension_labels = dimension_labels)
                     
                 else:   # AcquisitionData
                     if ds_data.attrs.__contains__('dist_source_center'):
@@ -121,13 +117,13 @@ class NEXUSDataReader(object):
                                                          pixel_num_v = ds_data.attrs['pixel_num_v'],
                                                          pixel_size_v = ds_data.attrs['pixel_size_v'],
                                                          channels = ds_data.attrs['channels'],
-                                                         angles = np.array(file['entry1/tomo_entry/data/rotation_angle'], dtype = 'float32'))
-                                                         #angle_unit = file['entry1/tomo_entry/data/rotation_angle'].attrs['units'])
+                                                         angles = np.array(file['entry1/tomo_entry/data/rotation_angle'], dtype = 'float32'),
+                                                         dimension_labels = dimension_labels,
+                                                         angle_unit = ds_data.attrs['angle_unit'])
                                              
-                    return AcquisitionData(array = data,
-                                           deep_copy = False,
-                                           geometry = self._geometry,
-                                           dimension_labels = dimension_labels)
+                out_data = self._geometry.allocate(0)
+                out_data.fill(data)
+                return out_data
                     
         except:
             print("Error reading nexus file")

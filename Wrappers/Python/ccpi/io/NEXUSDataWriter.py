@@ -92,8 +92,12 @@ class NEXUSDataWriter(object):
             else:
                 ds_data.attrs['data_type'] = 'AcquisitionData'
             
-            for i in range(self.data_container.as_array().ndim):
-                ds_data.attrs['dim{}'.format(i)] = self.data_container.dimension_labels[i]
+#            for i in range(self.data_container.as_array().ndim):
+#                ds_data.attrs['dim{}'.format(i)] = self.data_container.dimension_labels[i]
+            
+            for key in self.data_container.dimension_labels.keys():
+                ds_data.attrs['dim{}'.format(key)] = self.data_container.dimension_labels[key]
+                
             
             if (isinstance(self.data_container, AcquisitionData)):      
                 ds_data.attrs['geom_type'] = self.data_container.geometry.geom_type
@@ -108,6 +112,7 @@ class NEXUSDataWriter(object):
                 ds_data.attrs['pixel_size_v'] = self.data_container.geometry.pixel_size_v
                 ds_data.attrs['channels'] = self.data_container.geometry.channels
                 ds_data.attrs['n_angles'] = self.data_container.geometry.angles.shape[0]
+                ds_data.attrs['angle_unit'] = self.data_container.geometry.angle_unit
                 
                 # create the dataset to store rotation angles
                 ds_angles = f.create_dataset('entry1/tomo_entry/data/rotation_angle', 

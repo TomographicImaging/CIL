@@ -184,7 +184,23 @@ class TestAlgorithms(unittest.TestCase):
         alg2 = SIRT(x_init=x_init, operator=identity, data=b, upper=0.3)
         alg2.max_iteration = 200
         alg2.run(20, verbose=True)
-        self.assertLessEqual(alg2.get_output().max(), 0.3)
+        # equal 
+        try:
+            numpy.testing.assert_equal(alg2.get_output().max(), 0.3)
+            print ("Equal OK, returning")
+            return
+        except AssertionError as ae:
+            print ("Not equal, trying almost equal")
+        # almost equal to 7 digits or less
+        try:
+            numpy.testing.assert_almost_equal(alg2.get_output().max(), 0.3)
+            print ("Almost Equal OK, returning")
+            return
+        except AssertionError as ae:
+            print ("Not almost equal, trying less")
+        numpy.testing.assert_array_less(alg2.get_output().max(), 0.3)
+
+        # self.assertLessEqual(alg2.get_output().max(), 0.3)
 	# maybe we could add a test to compare alg.get_output() when < upper bound is 
 	# the same as alg2.get_output() and otherwise 0.3
         

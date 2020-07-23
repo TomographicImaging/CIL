@@ -97,6 +97,11 @@ class NEXUSDataReader(object):
                                                    channels = ds_data.attrs['channels'],
                                                    dimension_labels = dimension_labels)
                     
+                    return ImageData(array = data, 
+                                     deep_copy = False,
+                                     geometry = self._geometry,
+                                     dimension_labels = dimension_labels)
+                    
                 else:   # AcquisitionData
                     if ds_data.attrs.__contains__('dist_source_center'):
                         dist_source_center = ds_data.attrs['dist_source_center']
@@ -120,10 +125,11 @@ class NEXUSDataReader(object):
                                                          angles = np.array(file['entry1/tomo_entry/data/rotation_angle'], dtype = 'float32'),
                                                          dimension_labels = dimension_labels,
                                                          angle_unit = ds_data.attrs['angle_unit'])
-                                             
-                out_data = self._geometry.allocate(0)
-                out_data.fill(data)
-                return out_data
+                    
+                    return AcquisitionData(array = data, 
+                                           deep_copy = False,
+                                           geometry = self._geometry,
+                                           dimension_labels = dimension_labels)
                     
         except:
             print("Error reading nexus file")

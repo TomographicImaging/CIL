@@ -45,6 +45,8 @@ requirements:
     - pillow
     - libgcc-ng # [linux]
     - openmp # [osx]
+    - dxchange
+    - olefile >=0.46
   
 about:
   home: http://www.ccpi.ac.uk

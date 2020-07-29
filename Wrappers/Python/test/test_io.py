@@ -53,31 +53,31 @@ class TestNexusReaderWriter(unittest.TestCase):
         print ("has_olefile",has_olefile)
         print ("has_dxchange",has_dxchange)
         print ("has_file",has_file)
-        
-        self.reader = TXRMDataReader()
-        angle_unit = AcquisitionGeometry.RADIAN
-
-        self.reader.set_up(txrm_file=filename, 
-                           angle_unit=angle_unit)
-        data = self.reader.load_projections()
-        # Choose the number of voxels to reconstruct onto as number of detector pixels
-        N = data.geometry.pixel_num_h
-        
-        # Geometric magnification
-        mag = (np.abs(data.geometry.dist_center_detector) + \
-               np.abs(data.geometry.dist_source_center)) / \
-               np.abs(data.geometry.dist_source_center)
+        if has_file:
+            self.reader = TXRMDataReader()
+            angle_unit = AcquisitionGeometry.RADIAN
             
-        # Voxel size is detector pixel size divided by mag
-        voxel_size_h = data.geometry.pixel_size_h / mag
-        voxel_size_v = data.geometry.pixel_size_v / mag
+            self.reader.set_up(txrm_file=filename, 
+                            angle_unit=angle_unit)
+            data = self.reader.load_projections()
+            # Choose the number of voxels to reconstruct onto as number of detector pixels
+            N = data.geometry.pixel_num_h
+            
+            # Geometric magnification
+            mag = (np.abs(data.geometry.dist_center_detector) + \
+                np.abs(data.geometry.dist_source_center)) / \
+                np.abs(data.geometry.dist_source_center)
+                
+            # Voxel size is detector pixel size divided by mag
+            voxel_size_h = data.geometry.pixel_size_h / mag
+            voxel_size_v = data.geometry.pixel_size_v / mag
 
-        self.mag = mag
-        self.N = N
-        self.voxel_size_h = voxel_size_h
-        self.voxel_size_v = voxel_size_v
+            self.mag = mag
+            self.N = N
+            self.voxel_size_h = voxel_size_h
+            self.voxel_size_v = voxel_size_v
 
-        self.data = data
+            self.data = data
 
 
     def tearDown(self):

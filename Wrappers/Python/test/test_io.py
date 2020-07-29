@@ -41,6 +41,10 @@ print ("has_wget",has_wget)
 print ("has_olefile",has_olefile)
 print ("has_dxchange",has_dxchange)
 print ("has_file",has_file)
+
+if not has_file:
+    print("This unittest requires the walnut Zeiss dataset saved in {}".format(data_dir))
+
 class TestNexusReaderWriter(unittest.TestCase):
     
     def setUp(self):
@@ -49,6 +53,7 @@ class TestNexusReaderWriter(unittest.TestCase):
         print ("has_olefile",has_olefile)
         print ("has_dxchange",has_dxchange)
         print ("has_file",has_file)
+        
         self.reader = TXRMDataReader()
         angle_unit = AcquisitionGeometry.RADIAN
 

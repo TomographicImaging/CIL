@@ -17,7 +17,7 @@
 #   limitations under the License.
 
 from ccpi.framework import AcquisitionData, AcquisitionGeometry
-import numpy
+import numpy as np
 import os
 import olefile
     
@@ -39,6 +39,7 @@ class TXRMDataReader(object):
         
         if self.txrm_file is not None:
             self.set_up(txrm_file = self.txrm_file)
+        self._metadata = None
             
     def set_up(self, 
                txrm_file = None,
@@ -47,11 +48,11 @@ class TXRMDataReader(object):
         self.txrm_file = txrm_file
         
         if self.txrm_file == None:
-            raise Exception('Path to txrm file is required.')
+            raise ValueError('Path to txrm file is required.')
         
         # check if txrm file exists
         if not(os.path.isfile(self.txrm_file)):
-            raise Exception('File\n {}\n does not exist.'.format(self.txrm_file))  
+            raise FileNotFoundError('{}'.format(self.txrm_file))  
         possible_units = [AcquisitionGeometry.DEGREE, AcquisitionGeometry.RADIAN]
         if angle_unit in possible_units:
             self.angle_unit = angle_unit
@@ -84,15 +85,15 @@ class TXRMDataReader(object):
             DtoRADistance = dxchange.reader._read_ole_arr(ole, \
                     'ImageInfo/DtoRADistance', "<{0}f".format(number_of_images))
             
-        dist_source_center   = numpy.abs( StoRADistance[0] )
-        dist_center_detector = numpy.abs( DtoRADistance[0] )
+        dist_source_center   = np.abs( StoRADistance[0] )
+        dist_center_detector = np.abs( DtoRADistance[0] )
         
         # normalise data by flatfield
         data = data / metadata['reference']
         
         # circularly shift data by rounded x and y shifts
         for k in range(number_of_images):
-            data[k,:,:] = numpy.roll(data[k,:,:], \
+            data[k,:,:] = np.roll(data[k,:,:], \
                 (int(metadata['x-shifts'][k]),int(metadata['y-shifts'][k])), \
                 axis=(1,0))
         
@@ -102,11 +103,12 @@ class TXRMDataReader(object):
         d_pixel_size = ((dist_source_center+dist_center_detector)/dist_source_center)*metadata['pixel_size']
         
         # convert angles to requested unit measure, Zeiss stores in radians
-        # AND convert direction of rotation from Zeiss to our convention
+        # AND 
+        # convert direction of rotation from Zeiss to our convention
         if self.angle_unit == AcquisitionGeometry.DEGREE:
-            angles = - numpy.degrees(metadata['thetas'])
+            angles = - np.degrees(metadata['thetas'])
         else:
-            angles = - numpy.asarray(metadata['thetas'])
+            angles = - np.asarray(metadata['thetas'])
 
         self._ag = AcquisitionGeometry(geom_type = 'cone', 
                                        dimension = '3D', 
@@ -124,18 +126,24 @@ class TXRMDataReader(object):
                                                            'horizontal'])
         acq_data = self._ag.allocate(None)
         acq_data.fill(data)
-
+        self._metadata = metadata
         return acq_data
-
+        
+    def get_metadata(self):
+        '''return the metadata of the loaded file'''
+        return self._metadata
 if __name__ == '__main__':
     
     from ccpi.framework import ImageGeometry
     from ccpi.astra.processors import FBP
+    from ccpi.io import NEXUSDataWriter
     import matplotlib.pyplot as plt
-    
+    from ccpi.framework.TestData import data_dir
+
     angle_unit = AcquisitionGeometry.RADIAN
+
     #filename = "/media/newhd/shared/Data/zeiss/walnut/valnut/valnut_2014-03-21_643_28/tomo-A/valnut_tomo-A.txrm"
-    filename = os.path.abspath("/home/edo/scratch/Dataset/CCPi/valnut_tomo-A.txrm")
+    filename = os.path.join(data_dir, "valnut_tomo-A.txrm")
     reader = TXRMDataReader()
     reader.set_up(txrm_file=filename, 
                   angle_unit=angle_unit)
@@ -144,61 +152,19 @@ if __name__ == '__main__':
     
     print('done loading')
     
-    plt.figure()
-    plt.imshow(data.subset(angle=0).as_array())
-    plt.colorbar()
-    plt.gray()
-    # plt.savefig('walnut_proj0.png',dpi=300)
-    
-    
-    plt.figure()
-    plt.imshow(data.subset(angle=800).as_array())
-    plt.colorbar()
-    plt.gray()
-    # plt.savefig('walnut_proj800.png',dpi=300)
-    
-    if angle_unit == AcquisitionGeometry.DEGREE:
-        dangles = numpy.pi/180*data.geometry.angles
-    else:
-        dangles = data.geometry.angles
-    # Extract AcquisitionGeometry for central slice for 2D fanbeam reconstruction
-    ag2d = AcquisitionGeometry('cone',
-                          '2D',
-                          angles=dangles,
-                          pixel_num_h=data.geometry.pixel_num_h,
-                          pixel_size_h=data.geometry.pixel_size_h,
-                          dist_source_center=data.geometry.dist_source_center, 
-                          dist_center_detector=data.geometry.dist_center_detector,
-                          angle_unit=angle_unit)
-    
-    # Set up AcquisitionData object for central slice 2D fanbeam
-    # data2d = AcquisitionData(data.subset(vertical=512),geometry=ag2d)
+    # get central slice
     data2d = data.subset(vertical=512)
-
-    print ("data2d.geometry",data2d.geometry)
-    print ("ag2d", ag2d)
-
-    # exit(0)
-    plt.figure()
-    plt.imshow(data2d.as_array())
-    plt.colorbar()
-    plt.gray()
-    
+    # neg log
     data2d.log(out=data2d)
     data2d *= -1
-    
-    plt.figure()
-    plt.imshow(data2d.as_array())
-    plt.colorbar()
-    plt.gray()
-    
+
     # Choose the number of voxels to reconstruct onto as number of detector pixels
     N = data.geometry.pixel_num_h
     
     # Geometric magnification
-    mag = (numpy.abs(data.geometry.dist_center_detector) + \
-           numpy.abs(data.geometry.dist_source_center)) / \
-           numpy.abs(data.geometry.dist_source_center)
+    mag = (np.abs(data.geometry.dist_center_detector) + \
+           np.abs(data.geometry.dist_source_center)) / \
+           np.abs(data.geometry.dist_source_center)
            
     # Voxel size is detector pixel size divided by mag
     voxel_size_h = data.geometry.pixel_size_h / mag
@@ -217,8 +183,7 @@ if __name__ == '__main__':
     
     print('done set up astra op')
     
-    fbpalg = FBP(ig2d,ag2d)
-    #fbpalg = FBP(ig2d, data2d.geometry)
+    fbpalg = FBP(ig2d,data2d.geometry)
     fbpalg.set_input(data2d)
     
     recfbp = fbpalg.get_output()
@@ -227,6 +192,12 @@ if __name__ == '__main__':
     plt.imshow(recfbp.as_array())
     plt.gray()
     plt.colorbar()
+
+    writer = NEXUSDataWriter()
+    cwd = os.getcwd()
+    writer.set_up(data_container = recfbp,
+                  file_name = os.path.join(cwd,'walnut_slice512.nxs'))
+    writer.write_file()
     
     shuffle = data.subset(dimensions=['vertical','angle','horizontal'])
     shuffle.log(out=shuffle)
@@ -241,6 +212,8 @@ if __name__ == '__main__':
     plt.gray()
     plt.colorbar()
     
-
+    writer.set_up(data_container = fbp3d.get_output(),
+                  file_name = os.path.join(cwd,'walnut_3D.nxs'))
+    writer.write_file()
     plt.show()
     

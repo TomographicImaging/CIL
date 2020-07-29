@@ -81,8 +81,16 @@ class TestNexusReaderWriter(unittest.TestCase):
 
 
     def tearDown(self):
-        fname = os.path.join(data_dir, 'walnut_slice512.nxs')
-        os.remove(fname)
+        pass
+
+    def test_run_test(self):
+        print("run test Zeiss Reader")
+        self.assertTrue(True)
+    
+    @unittest.skipIf(True, 'skip test by default')
+    def test_not_run_test(self):
+        print("run test Zeiss Reader")
+        self.assertTrue(True)
 
     @unittest.skipIf(not has_prerequisites, "Prerequisites not met")
     def test_load_and_reconstruct_2D(self):
@@ -115,4 +123,6 @@ class TestNexusReaderWriter(unittest.TestCase):
         print ("MSE" , qm )
 
         np.testing.assert_almost_equal(qm, 0)
+        fname = os.path.join(data_dir, 'walnut_slice512.nxs')
+        os.remove(fname)
 

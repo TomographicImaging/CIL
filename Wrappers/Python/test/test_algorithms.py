@@ -695,11 +695,14 @@ class TestAlgorithms(unittest.TestCase):
         f2 = KullbackLeibler(b=noisy_data)  
         g =  IndicatorBox(lower=0)    
         normK = operator.norm()
-        sigma = 1/normK
-        tau = 1/normK
-            
+        finfo = np.finfo(dtype = np.float32)
+        eps = finfo.eps / normK
+        eps = 0
+        sigma = 1/normK - 2*eps
+        tau = 1/normK - 2* eps
+        
         f1 = alpha * MixedL21Norm() 
-        f = BlockFunction(f1, f2)   
+        f = BlockFunction(f1, f2)
         # Setup and run the PDHG algorithm
         pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
         pdhg.max_iteration = 1000

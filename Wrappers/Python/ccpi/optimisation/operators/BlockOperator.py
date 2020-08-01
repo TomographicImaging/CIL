@@ -377,7 +377,11 @@ class BlockOperator(Operator):
 
     def __len__(self):
         
-        return len(self.operators)        
+        return len(self.operators)
+
+    def __getitem__(self, index):
+        '''returns the  index operator in the operators list'''
+        return self.operators[index]
         
         
         

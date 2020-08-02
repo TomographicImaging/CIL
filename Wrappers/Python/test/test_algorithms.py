@@ -531,8 +531,10 @@ class TestAlgorithms(unittest.TestCase):
             )
         print ("Quality measures", qm)
          
-        np.testing.assert_almost_equal( mae(spdhg.get_output(), pdhg.get_output()), 0.0028578834608197212, decimal=5)
-        np.testing.assert_almost_equal( mse(spdhg.get_output(), pdhg.get_output()), 3.885594196617603e-05, decimal=5)
+        np.testing.assert_almost_equal( mae(spdhg.get_output(), pdhg.get_output()), 
+                                            0.0028578834608197212, decimal=3)
+        np.testing.assert_almost_equal( mse(spdhg.get_output(), pdhg.get_output()), 
+                                            3.885594196617603e-05, decimal=3)
 
     @unittest.skipIf(astra_not_available, "ccpi-astra not available")
     def test_SPDHG_vs_PDHG_explicit(self):

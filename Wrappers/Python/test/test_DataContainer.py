@@ -767,9 +767,11 @@ class TestDataContainer(unittest.TestCase):
         ig = ImageGeometry(10,10)                                               
         d1 = ig.allocate(1)                                                     
         d2 = ig.allocate(2)                                                     
-        out = ig.allocate(None)                                                 
+        out = ig.allocate(None)
+        a = 2                                                 
+        b = 1                                            
         # equals to 2 * [1] + 1 * [2] = [4]
-        d1.axpby(2,1,d2,out)
+        d1.axpby(a,b,d2,out)
         res = numpy.ones_like(d1.as_array()) * 4.
         numpy.testing.assert_array_equal(res, out.as_array())
     def test_axpby2(self):
@@ -779,11 +781,91 @@ class TestDataContainer(unittest.TestCase):
         d1 = ig.allocate(1)                                                     
         d2 = ig.allocate(2)                                                     
         out = ig.allocate(None)   
+        a = 2                                                 
+        b = 1        
         print ("allocated")                                              
         # equals to 2 * [1] + 1 * [2] = [4]
-        d1.axpby(2,1,d2,out, num_threads=4)
+        d1.axpby(a,b,d2,out, num_threads=4)
         print ("calculated") 
         res = numpy.ones_like(d1.as_array()) * 4.
+        numpy.testing.assert_array_equal(res, out.as_array())
+    def test_axpby3(self):
+        print ("test axpby3")
+        #a vec, b float
+        ig = ImageGeometry(10,10)                                               
+        d1 = ig.allocate(1)                                                     
+        d2 = ig.allocate(2)     
+        a = ig.allocate(2)                                                  
+        b = 1                                               
+        out = ig.allocate(None)                                                 
+        # equals to 2 * [1] + 1 * [2] = [4]
+        d1.axpby(a,b,d2,out)
+        res = numpy.ones_like(d1.as_array()) * 4.
+        numpy.testing.assert_array_equal(res, out.as_array())
+    def test_axpby4(self):
+        print ("test axpby4")
+        #a float, b vec
+        ig = ImageGeometry(10,10)                                               
+        d1 = ig.allocate(1)                                                     
+        d2 = ig.allocate(2)     
+        a = 2                                                  
+        b = ig.allocate(1)                                                 
+        out = ig.allocate(None)                                                 
+        # equals to 2 * [1] + 1 * [2] = [4]
+        d1.axpby(a,b,d2,out)
+        res = numpy.ones_like(d1.as_array()) * 4.
+        numpy.testing.assert_array_equal(res, out.as_array())
+    def test_axpby5(self):
+        print ("test axpby5")
+        #a vec, b vec
+        ig = ImageGeometry(10,10)                                               
+        d1 = ig.allocate(1)                                                     
+        d2 = ig.allocate(2)   
+        a = ig.allocate(2)                                                  
+        b = ig.allocate(1)                                                  
+        out = ig.allocate(None)                                                 
+        # equals to 2 * [1] + 1 * [2] = [4]
+        d1.axpby(a,b,d2,out)
+        res = numpy.ones_like(d1.as_array()) * 4.
+        numpy.testing.assert_array_equal(res, out.as_array())
+    def test_axpby6(self):
+        print ("test axpby6")
+        #a vec, b vec
+        ig = ImageGeometry(10,10)                                               
+        d1 = ig.allocate()                                                     
+        d2 = ig.allocate()   
+        a = ig.allocate()                                                  
+        b = ig.allocate()         
+
+        d1.fill(numpy.arange(1,101).reshape(10,10))
+        d2.fill(numpy.arange(1,101).reshape(10,10))
+        a.fill(1.0/d1.as_array())                                                  
+        b.fill(-1.0/d2.as_array())   
+
+        out = ig.allocate(None)                                                 
+        # equals to 1 + -1 = 0
+        d1.axpby(a,b,d2,out)
+        res = numpy.zeros_like(d1.as_array())
+        numpy.testing.assert_array_equal(res, out.as_array())
+    def test_axpby7(self):
+        print ("test axpby7")
+        #a vec, b vec
+        #daxpby
+        ig = ImageGeometry(10,10)                                               
+        d1 = ig.allocate()                                                     
+        d2 = ig.allocate()   
+        a = ig.allocate()                                                  
+        b = ig.allocate()         
+
+        d1.fill(numpy.arange(1,101).reshape(10,10))
+        d2.fill(numpy.arange(1,101).reshape(10,10))
+        a.fill(1.0/d1.as_array())                                                  
+        b.fill(-1.0/d2.as_array())   
+
+        out = ig.allocate(dtype=numpy.float64)                                                 
+        # equals to 1 + -1 = 0
+        d1.axpby(a,b,d2,out, dtype=numpy.float64)
+        res = numpy.zeros_like(d1.as_array())
         numpy.testing.assert_array_equal(res, out.as_array())
 
     def test_min(self):

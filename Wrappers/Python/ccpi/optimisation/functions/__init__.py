@@ -31,3 +31,4 @@ from .IndicatorBox import IndicatorBox
 from .KullbackLeibler import KullbackLeibler
 from .LeastSquares import LeastSquares, StochasticNorm2Sq
 from .Rosenbrock import Rosenbrock
+from .TotalVariation import TotalVariation

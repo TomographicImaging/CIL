@@ -25,6 +25,7 @@ from __future__ import division
 from __future__ import print_function
 import time, functools
 from numbers import Integral
+import logging
 
 class Algorithm(object):
     '''Base class for iterative algorithms
@@ -55,6 +56,8 @@ class Algorithm(object):
                                        and so forth. This is by default 1 and should be increased\
                                        when evaluating the objective is computationally expensive.
         :type update_objective_interval: int, optional, default 1
+        :param log_file: log verbose output to file
+        :type log_file: str, optional, default None
         '''
         self.iteration = 0
         self.__max_iteration = kwargs.get('max_iteration', 0)
@@ -66,6 +69,9 @@ class Algorithm(object):
         self.update_objective_interval = kwargs.get('update_objective_interval', 1)
         self.x = None
         self.iter_string = 'Iter'
+        self.logger = None
+        self.__set_up_logger(kwargs.get('log_file', None))
+
     def set_up(self, *args, **kwargs):
         '''Set up the algorithm'''
         raise NotImplementedError()
@@ -78,6 +84,15 @@ class Algorithm(object):
         
         The user can change this in concrete implementatition of iterative algorithms.'''
         return self.max_iteration_stop_cryterion()
+    
+    def __set_up_logger(self, fname):
+        """Set up the logger if desired"""
+        if fname:
+            print("Will output results to: " +  fname)
+            handler = logging.FileHandler(fname)
+            self.logger = logging.getLogger("obj_fn")
+            self.logger.setLevel(logging.INFO)
+            self.logger.addHandler(handler)
     
     def max_iteration_stop_cryterion(self):
         '''default stop cryterion for iterative algorithm: max_iteration reached'''
@@ -236,6 +251,9 @@ class Algorithm(object):
                  "{:.3f}".format(t), 
                  self.objective_to_string(verbose)
                )
+        # Print to log file if desired
+        if self.logger:
+            self.logger.info(out)
         return out
 
     def objective_to_string(self, verbose=False):

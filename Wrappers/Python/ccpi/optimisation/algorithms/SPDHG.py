@@ -66,7 +66,8 @@ class SPDHG(Algorithm):
         
     '''
     def __init__(self, f=None, g=None, operator=None, tau=None, sigma=None,
-                 x_init=None, prob=None, gamma=1., use_axpby=True, **kwargs):
+                 x_init=None, prob=None, gamma=1., use_axpby=True, 
+                 norms=None, **kwargs):
         '''SPDHG algorithm creator
 
         Parameters
@@ -79,14 +80,17 @@ class SPDHG(Algorithm):
         :param prob: List of probabilities
         :param gamma: parameter controlling the trade-off between the primal and dual step sizes
         :param use_axpby: whether to use axpby or not
+        :param norms: norms of the operators in operator
+        :type norms: list, default None
         '''
         super(SPDHG, self).__init__(**kwargs)
         self._use_axpby = use_axpby
         if f is not None and operator is not None and g is not None:
             self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, 
-                        x_init=x_init, prob=prob, gamma=gamma)
+                        x_init=x_init, prob=prob, gamma=gamma, norms=norms)
     
-    def set_up(self, f, g, operator, tau=None, sigma=None, x_init=None, prob=None, gamma=1.):
+    def set_up(self, f, g, operator, tau=None, sigma=None, \
+               x_init=None, prob=None, gamma=1., norms=None):
         '''initialisation of the algorithm
 
         :param operator: BlockOperator of Linear Operators
@@ -109,13 +113,15 @@ class SPDHG(Algorithm):
         self.gamma = gamma
         self.rho = .99
         
-        # Compute norm of each sub-operator       
-        norms = [operator.get_item(i,0).norm() for i in range(self.ndual_subsets)]
-        self.norms = norms
         if self.prob is None:
             self.prob = [1/self.ndual_subsets] * self.ndual_subsets
 
+        
         if self.sigma is None:
+            if norms is None:
+                # Compute norm of each sub-operator       
+                norms = [operator.get_item(i,0).norm() for i in range(self.ndual_subsets)]
+            self.norms = norms
             self.sigma = [self.gamma * self.rho / ni for ni in norms] 
         if self.tau is None:
             self.tau = min( [ pi / ( si * ni**2 ) for pi, ni, si in zip(self.prob, norms, self.sigma)] ) 

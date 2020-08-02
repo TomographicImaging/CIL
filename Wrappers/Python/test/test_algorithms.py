@@ -30,6 +30,7 @@ from ccpi.optimisation.functions import LeastSquares, ZeroFunction, \
    L2NormSquared, FunctionOperatorComposition
 from ccpi.optimisation.algorithms import GradientDescent
 from ccpi.optimisation.algorithms import CGLS
+from ccpi.optimisation.algorithms import SIRT
 from ccpi.optimisation.algorithms import FISTA
 
 from ccpi.optimisation.algorithms import PDHG
@@ -168,6 +169,7 @@ class TestAlgorithms(unittest.TestCase):
         self.assertTrue(alg.update_objective_interval==2)
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+    
         
     def test_FISTA(self):
         print ("Test FISTA")
@@ -422,6 +424,52 @@ class TestAlgorithms(unittest.TestCase):
             print(err)
         self.assertTrue(res)
 
+class TestSIRT(unittest.TestCase):
+    def test_SIRT(self):
+        print ("Test CGLS")
+        #ig = ImageGeometry(124,153,154)
+        ig = ImageGeometry(10,2)
+        numpy.random.seed(2)
+        x_init = ig.allocate(0.)
+        b = ig.allocate('random')
+        # b = x_init.copy()
+        # fill with random numbers
+        # b.fill(numpy.random.random(x_init.shape))
+        # b = ig.allocate()
+        # bdata = numpy.reshape(numpy.asarray([i for i in range(20)]), (2,10))
+        # b.fill(bdata)
+        identity = Identity(ig)
+        
+        alg = SIRT(x_init=x_init, operator=identity, data=b)
+        alg.max_iteration = 200
+        alg.run(20, verbose=True)
+        np.testing.assert_array_almost_equal(alg.x.as_array(), b.as_array())
+        
+        alg2 = SIRT(x_init=x_init, operator=identity, data=b, upper=0.3)
+        alg2.max_iteration = 200
+        alg2.run(20, verbose=True)
+        # equal 
+        try:
+            numpy.testing.assert_equal(alg2.get_output().max(), 0.3)
+            print ("Equal OK, returning")
+            return
+        except AssertionError as ae:
+            print ("Not equal, trying almost equal")
+        # almost equal to 7 digits or less
+        try:
+            numpy.testing.assert_almost_equal(alg2.get_output().max(), 0.3)
+            print ("Almost Equal OK, returning")
+            return
+        except AssertionError as ae:
+            print ("Not almost equal, trying less")
+        numpy.testing.assert_array_less(alg2.get_output().max(), 0.3)
+
+        # self.assertLessEqual(alg2.get_output().max(), 0.3)
+	# maybe we could add a test to compare alg.get_output() when < upper bound is 
+	# the same as alg2.get_output() and otherwise 0.3
+    
+class TestSPDHG(unittest.TestCase):
+
     @unittest.skipIf(astra_not_available, "ccpi-astra not available")
     def test_SPDHG_vs_PDHG_implicit(self):
         from ccpi.astra.operators import AstraProjectorSimple
@@ -649,8 +697,10 @@ class TestAlgorithms(unittest.TestCase):
             psnr(spdhg.get_output(), pdhg.get_output())
             )
         print ("Quality measures", qm)
-        np.testing.assert_almost_equal( mae(spdhg.get_output(), pdhg.get_output()), 0.0015075773699209094 , decimal=5)
-        np.testing.assert_almost_equal( mse(spdhg.get_output(), pdhg.get_output()), 1.6859006791491993e-05, decimal=5)
+        np.testing.assert_almost_equal( mae(spdhg.get_output(), pdhg.get_output()),
+         0.0015075773699209094 , decimal=3)
+        np.testing.assert_almost_equal( mse(spdhg.get_output(), pdhg.get_output()), 
+        1.6859006791491993e-05, decimal=3)
     
     @unittest.skipIf(astra_not_available, "ccpi-astra not available")
     def test_SPDHG_vs_SPDHG_explicit_axpby(self):

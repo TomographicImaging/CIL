@@ -6,27 +6,41 @@ import pywt
 from ccpi.framework import DataProcessor, ImageData, AcquisitionData
 
 class RingRemoval(DataProcessor):
-    '''Normalization based on flat and dark
     
-    This processor read in a AcquisitionData and normalises it based on 
-    the instrument reading with and without incident photons or neutrons.
-    
-    Input: AcquisitionData
-    Parameter: 2D projection with flat field (or stack)
-               2D projection with dark field (or stack)
-    Output: AcquisitionDataSetn
     '''
-    
+        RingRemoval Processor: Removes vertical stripes from a DataContainer(ImageData/AcquisitionData) 
+        the algorithm in https://doi.org/10.1364/OE.17.008567
+
+    '''
+        
     def __init__(self, decNum, wname, sigma, info = True):
         
+        '''
+    
+        Parameters
+        ----------
+        decNum : number of wavelet decompositions
+        
+        wname : (str) name of wavelet filter from pywt 
+            Example: 'db1' -- 'db35', 'haar'
+    
+        sigma : Damping parameter in Fourier space.
+        
+        info : Prints ring removal end message 
+        
+        Returns
+        -------
+        ImageData/AcquisitionData
+            Corrected 2D, 3D, multi-spectral 2D, multi-spectral 3D    
+        '''             
         
         kwargs = {'decNum': decNum,
                   'wname': wname,
                   'sigma': sigma,
                   'info': info}
-
-        super(RingRemoval, self).__init__(**kwargs)        
-        
+    
+        super(RingRemoval, self).__init__(**kwargs)            
+                          
         
     def check_input(self, dataset):
         if not ((isinstance(dataset, ImageData)) or 
@@ -77,7 +91,6 @@ class RingRemoval(DataProcessor):
                 for i in range(channels):
                     for j in range(vertical):
                         J = self.xRemoveStripesVertical(data_array[i,j], decNum, wname, sigma)
-#                         tmp_data_array[i,j] = J
                         out.fill(J, channel=i, vertical = j)
                     if info:
                         print("Finish channel {}".format(i))                    
@@ -85,19 +98,19 @@ class RingRemoval(DataProcessor):
                 for i in range(channels):
                         J = self.xRemoveStripesVertical(data_array[i], decNum, wname, sigma)
                         out.fill(J, channel = i)
-#                         tmp_data_array[i] = J
                         if info:
                             print("Finish channel {}".format(i))
         if info:
             print("Finish Ring Removal") 
-            
-#         out.fill(tmp_data_array)
-        
+                    
         return out
           
     def xRemoveStripesVertical(self,ima, decNum, wname, sigma):
         
-        # code from https://www.zora.uzh.ch/id/eprint/27018/2/Muench.pdf    
+        ''' Code from https://doi.org/10.1364/OE.17.008567 
+            translated in Python
+                
+        '''
                 
         # allocate cH, cV, cD
         Ch = [None]*decNum
@@ -115,9 +128,11 @@ class RingRemoval(DataProcessor):
             fCv = fftshift(fft(Cv[i], axis=0))
             my,mx = fCv.shape
             
+            # damping of vertical stripe information
             damp = 1 - np.exp(-np.array([range(-int(np.floor(my/2)),-int(np.floor(my/2))+my)])**2/(2*sigma**2))
             fCv*=damp.T
-                                   
+             
+            # inverse FFT          
             Cv[i] = np.real(ifft(ifftshift(fCv), axis=0))
                                                                     
         # wavelet reconstruction

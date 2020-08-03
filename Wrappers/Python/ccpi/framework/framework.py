@@ -255,7 +255,7 @@ class ComponentDescription(object):
     r'''This class enables the creation of the position and direction vectors describing the components of a tomography system
      '''
     def __init__ (self, dof):
-        self.dof = dof
+        self.__dof = dof
 
     @staticmethod  
     def CreateVector(val):
@@ -276,10 +276,16 @@ class ComponentDescription(object):
         try:
             val_length = len(val)
         except:
-            raise ValueError("Vectors for {0}D geometries must have length = {0}. Got {1}".format(self.dof,val))
+            raise ValueError("Vectors for {0}D geometries must have length = {0}. Got {1}".format(self.__dof,val))
         
-        if val_length != self.dof:
-            raise ValueError("Vectors for {0}D geometries must have length = {0}. Got {1}".format(self.dof,val))
+        if val_length != self.__dof:
+            raise ValueError("Vectors for {0}D geometries must have length = {0}. Got {1}".format(self.__dof,val))
+
+
+    def __init__ (self, dof):
+        self.__dof = dof
+
+class PositionVector(ComponentDescription):
 
     @property
     def position(self):
@@ -293,6 +299,8 @@ class ComponentDescription(object):
         self.length_check(val)
         self.__position = ComponentDescription.CreateVector(val)
 
+class DirectionVector(ComponentDescription):
+
     @property
     def direction(self):      
         try:
@@ -304,6 +312,11 @@ class ComponentDescription(object):
     def direction(self, val):
         self.length_check(val)    
         self.__direction = ComponentDescription.CreateUnitVector(val)
+
+class PositionDirectionVector(PositionVector, DirectionVector):
+    pass
+
+class Detector1D(PositionVector):
 
     @property
     def direction_row(self):
@@ -328,6 +341,8 @@ class ComponentDescription(object):
                 raise ValueError("vectors detector.direction_row and detector.direction_col must be orthogonal")
 
         self.__direction_row = ComponentDescription.CreateUnitVector(val)
+
+class Detector2D(Detector1D):
 
     @property
     def direction_col(self):
@@ -354,31 +369,52 @@ class ComponentDescription(object):
 
         self.__direction_col = ComponentDescription.CreateUnitVector(val)
 
-    @property
-    def initial_angle(self):
-        try:
-            return self.__initial_angle
-        except:
-            return 0.0
-
-    @initial_angle.setter
-    def initial_angle(self, val):
-        try:
-            val = float(val)
-        except:
-            raise TypeError('initial_angle expected a float. Got {0}'.format(type(val)))
-
-        self.__initial_angle = val
 
 class SystemConfiguration(object):
     r'''This is a generic class to hold the configuration of a tomography system
      '''
-    def __init__(self, dof):
-        self.source = ComponentDescription(dof)
-        self.detector = ComponentDescription(dof)
-        self.rotation_axis = ComponentDescription(dof)
+    @property
+    def dimension(self):
+        if self.__dimension == 2:
+            return '2D'
+        else:
+            return '3D'    
 
-    
+    @dimension.setter
+    def dimension(self,val):
+        if val != 2 and val != 3:
+            raise ValueError('Can set up 2D and 3D systems only. got {0}D'.format(val))
+        else:
+            self.__dimension = val
+
+    @property
+    def geometry(self):
+        return self.__geometry
+
+    @geometry.setter
+    def geometry(self,val):
+        if val != AcquisitionGeometry.CONE and val != AcquisitionGeometry.PARALLEL:
+            raise ValueError('geom_type = {} not recognised please specify \'cone\' or \'parallel\''.format(val))
+        else:
+            self.__geometry = val
+
+    def __init__(self, dof, geometry):
+        
+        self.dimension = dof
+        self.geometry = geometry
+        
+        if geometry == AcquisitionGeometry.PARALLEL:
+            self.ray = DirectionVector(dof)
+        else:
+            self.source = PositionVector(dof)
+
+        if dof == 2:
+            self.detector = Detector1D(dof)
+            self.rotation_axis = PositionVector(dof)
+        else:
+            self.detector = Detector2D(dof)
+            self.rotation_axis = PositionDirectionVector(dof)
+                
     def set_origin(self):
         raise NotImplementedError
 
@@ -396,13 +432,13 @@ class SystemConfiguration(object):
         '''
 
         #if parallel beam data
-        if not hasattr(self.source, 'position'):
-            return [None, None, None]
+        if self.geometry == AcquisitionGeometry.PARALLEL:
+            return [None, None, 1.0]
 
         ab = self.rotation_axis.position - self.source.position
         ab_unit = ComponentDescription.CreateUnitVector(ab)
 
-        dist_source_center = numpy.sqrt(ab.dot(ab))
+        dist_source_center = float(numpy.sqrt(ab.dot(ab)))
 
         #col and row are perpindicular unit vectors so n is a unit vector
         #unit vector orthogonal to the detector
@@ -413,9 +449,9 @@ class SystemConfiguration(object):
             n = numpy.cross(self.detector.direction_row,self.detector.direction_col)
 
         #perpendicular distance between source and detector centre
-        sd = (self.detector.position - self.source.position).dot(n)
+        sd = float((self.detector.position - self.source.position).dot(n))
 
-        ratio = ab_unit.dot(n)
+        ratio = float(ab_unit.dot(n))
 
         source_to_detector = sd / ratio
 
@@ -427,51 +463,29 @@ class SystemConfiguration(object):
 class Parallel2D(SystemConfiguration):
     r'''This class creates the SystemConfiguration of a parallel beam 2D tomographic system
                        
-    :param ray_direction: A 2D unit vector describing the x-ray direction (x,y), defaults to (0,1)
-    :type ray_direction: list, tuple, ndarray, optional
-    :param detector_pos: A 2D vector describing the position of the centre of the detector (x,y), defaults to (0,0)
-    :type detector_pos: list, tuple, ndarray, optional
-    :param detector_direction_row: A 2D unit vector describing the direction of the pixels of the detector (x,y), defaults to (1,0)
-    :type detector_direction_row: list, tuple, ndarray, optional
-    :param rotation_axis_pos: A 2D vector describing the position of the axis of rotation (x,y), defaults to (0,0)
-    :type rotation_axis_pos: list, tuple, ndarray, optional
-    :param rotation_axis_angle: the initial rotation of the system, defaults to 0.0
-    :type rotation_axis_angle: float, optional      
+    :param ray_direction: A 2D unit vector describing the x-ray direction (x,y)
+    :type ray_direction: list, tuple, ndarray
+    :param detector_pos: A 2D vector describing the position of the centre of the detector (x,y)
+    :type detector_pos: list, tuple, ndarray
+    :param detector_direction_row: A 2D unit vector describing the direction of the pixels of the detector (x,y)
+    :type detector_direction_row: list, tuple, ndarray
+    :param rotation_axis_pos: A 2D vector describing the position of the axis of rotation (x,y)
+    :type rotation_axis_pos: list, tuple, ndarray 
      '''
-    def __init__ (self, ray_direction, detector_pos, detector_direction_row, rotation_axis_pos, rotation_axis_angle):
+    def __init__ (self, ray_direction, detector_pos, detector_direction_row, rotation_axis_pos):
         """Constructor method
         """
-        super(Parallel2D, self).__init__(dof=2)
-
-        zero_list = [0.,0.]
-
-        if ray_direction is None:
-            ray_direction = zero_list.copy()
-            ray_direction[1] = 1.0
-
-        if detector_pos is None:
-            detector_pos = zero_list.copy()
-
-        if detector_direction_row is None:
-            detector_direction_row = zero_list.copy()
-            detector_direction_row[0] = 1.
-
-        if rotation_axis_pos is None:
-            rotation_axis_pos = zero_list.copy()
-
-        if rotation_axis_angle is None:
-            rotation_axis_angle = 0.
+        super(Parallel2D, self).__init__(dof=2, geometry = 'parallel')
 
         #source
-        self.source.direction = ray_direction
+        self.ray.direction = ray_direction
 
         #detector
         self.detector.position = detector_pos
         self.detector.direction_row = detector_direction_row
-
+        
         #rotate axis
         self.rotation_axis.position = rotation_axis_pos
-        self.rotation_axis.initial_angle = rotation_axis_angle
 
     def set_origin(self):
         r'''Transforms the system origin to the rotate axis
@@ -483,55 +497,26 @@ class Parallel2D(SystemConfiguration):
 class Parallel3D(SystemConfiguration):
     r'''This class creates the SystemConfiguration of a parallel beam 3D tomographic system
                        
-    :param ray_direction: A 3D unit vector describing the x-ray direction (x,y,z), defaults to (0,1,0)
-    :type ray_direction: list, tuple, ndarray, optional
-    :param detector_pos: A 3D vector describing the position of the centre of the detector (x,y,z), defaults to (0,0,0)
-    :type detector_pos: list, tuple, ndarray, optional
-    :param detector_direction_row: A 3D unit vector describing the direction of the pixels in the rows of the detector (x,y,z), defaults to (1,0,0)
-    :type detector_direction_row: list, tuple, ndarray, optional
-    :param detector_direction_col: A 3D unit vector describing the direction of the pixels in the coloumns of the detector (x,y,z), defaults to (0,0,1)
-    :type detector_direction_col: list, tuple, ndarray, optional    
-    :param rotation_axis_pos: A 3D vector describing the position of the axis of rotation (x,y,z), defaults to (0,0,0)
-    :type rotation_axis_pos: list, tuple, ndarray, optional
-    :param rotation_axis_direction: A 3D unit vector describing the direction of the axis of rotation (x,y,z), defaults to (0,0,1)
-    :type rotation_axis_direction: list, tuple, ndarray, optional     
-    :param rotation_axis_angle: the initial rotation of the system, defaults to 0.0
-    :type rotation_axis_angle: float, optional      
+    :param ray_direction: A 3D unit vector describing the x-ray direction (x,y,z)
+    :type ray_direction: list, tuple, ndarray
+    :param detector_pos: A 3D vector describing the position of the centre of the detector (x,y,z)
+    :type detector_pos: list, tuple, ndarray
+    :param detector_direction_row: A 3D unit vector describing the direction of the pixels in the rows of the detector (x,y,z)
+    :type detector_direction_row: list, tuple, ndarray
+    :param detector_direction_col: A 3D unit vector describing the direction of the pixels in the coloumns of the detector (x,y,z)
+    :type detector_direction_col: list, tuple, ndarray    
+    :param rotation_axis_pos: A 3D vector describing the position of the axis of rotation (x,y,z)
+    :type rotation_axis_pos: list, tuple, ndarray
+    :param rotation_axis_direction: A 3D unit vector describing the direction of the axis of rotation (x,y,z)
+    :type rotation_axis_direction: list, tuple, ndarray       
      '''
-    def __init__ (self,  ray_direction, detector_pos, detector_direction_row, detector_direction_col, rotation_axis_pos, rotation_axis_direction, rotation_axis_angle):
+    def __init__ (self,  ray_direction, detector_pos, detector_direction_row, detector_direction_col, rotation_axis_pos, rotation_axis_direction):
         """Constructor method
         """
-        super(Parallel3D, self).__init__(dof=3)
-
-        zero_list = [0.,0.,0.]
-
-        if ray_direction is None:
-            ray_direction = zero_list.copy()
-            ray_direction[1] = 1.0
-
-        if detector_pos is None:
-            detector_pos = zero_list.copy()
-
-        if detector_direction_row is None:
-            detector_direction_row = zero_list.copy()
-            detector_direction_row[0] = 1.
-
-        if detector_direction_col is None:
-            detector_direction_col = zero_list.copy()
-            detector_direction_col[2] = 1.
-
-        if rotation_axis_direction is None:
-            rotation_axis_direction = zero_list.copy()
-            rotation_axis_direction[2] = 1.
-
-        if rotation_axis_pos is None:
-            rotation_axis_pos = zero_list.copy()
-
-        if rotation_axis_angle is None:
-            rotation_axis_angle = 0.
+        super(Parallel3D, self).__init__(dof=3, geometry = 'parallel')
                     
         #source
-        self.source.direction = ray_direction
+        self.ray.direction = ray_direction
 
         #detector
         self.detector.position = detector_pos
@@ -541,7 +526,6 @@ class Parallel3D(SystemConfiguration):
         #rotate axis
         self.rotation_axis.position = rotation_axis_pos
         self.rotation_axis.direction = rotation_axis_direction
-        self.rotation_axis.initial_angle = rotation_axis_angle
 
     def set_origin(self):
         r'''Transforms the system origin to the rotate axis with z direction aligned to the rotate axis direction
@@ -558,7 +542,7 @@ class Parallel3D(SystemConfiguration):
         #apply transform
         self.rotation_axis.position = [0,0,0]
         self.rotation_axis.direction = [0,0,1]
-        self.source.direction = rotation_matrix.dot(self.source.direction.reshape(3,1))
+        self.ray.direction = rotation_matrix.dot(self.ray.direction.reshape(3,1))
         self.detector.position = rotation_matrix.dot(det_pos.reshape(3,1))
         self.detector.direction_row = rotation_matrix.dot(self.detector.direction_row.reshape(3,1))
         self.detector.direction_col = rotation_matrix.dot(self.detector.direction_col.reshape(3,1))
@@ -566,7 +550,7 @@ class Parallel3D(SystemConfiguration):
     def centre_sice(self):
         """Returns the 2D system configuration corersponding to the centre slice
         """  
-        dp1 = self.rotation_axis.direction.dot(self.source.direction)
+        dp1 = self.rotation_axis.direction.dot(self.ray.direction)
         dp2 = self.rotation_axis.direction.dot(self.detector.direction_row)
 
         if numpy.isclose(dp1, 0) and numpy.isclose(dp2, 0):
@@ -574,12 +558,12 @@ class Parallel3D(SystemConfiguration):
             #convert to rotation axis reference frame
             self.set_origin()
 
-            ray_direction = self.source.direction[0:2]
+            ray_direction = self.ray.direction[0:2]
             detector_position = self.detector.position[0:2]
             detector_direction_row = self.detector.direction_row[0:2]
             rotation_axis_position = self.rotation_axis.position[0:2]
 
-            return Parallel2D(ray_direction, detector_position, detector_direction_row, rotation_axis_position, self.rotation_axis.initial_angle)
+            return Parallel2D(ray_direction, detector_position, detector_direction_row, rotation_axis_position)
 
         else:
             raise Warning("Cannot convert geometry to 2D")
@@ -593,36 +577,16 @@ class Cone2D(SystemConfiguration):
     :type source_pos: list, tuple, ndarray
     :param detector_pos: A 2D vector describing the position of the centre of the detector (x,y)
     :type detector_pos: list, tuple, ndarray
-    :param detector_direction_row: A 2D unit vector describing the direction of the pixels of the detector (x,y), defaults to (1,0)
-    :type detector_direction_row: list, tuple, ndarray, optional
-    :param rotation_axis_pos: A 2D vector describing the position of the axis of rotation (x,y), defaults to (0,0)
-    :type rotation_axis_pos: list, tuple, ndarray, optional
-    :param rotation_axis_angle: the initial rotation of the system, defaults to 0.0
-    :type rotation_axis_angle: float, optional      
+    :param detector_direction_row: A 2D unit vector describing the direction of the pixels of the detector (x,y)
+    :type detector_direction_row: list, tuple, ndarray
+    :param rotation_axis_pos: A 2D vector describing the position of the axis of rotation (x,y)
+    :type rotation_axis_pos: list, tuple, ndarray    
      '''
 
-    def __init__ (self, source_pos, detector_pos, detector_direction_row, rotation_axis_pos, rotation_axis_angle):
+    def __init__ (self, source_pos, detector_pos, detector_direction_row, rotation_axis_pos):
         """Constructor method
         """
-        super(Cone2D, self).__init__(dof=2)
-
-        zero_list = [0.,0.]
-
-        if source_pos is None:
-            raise ValueError("Cone beam CT requres a source position") 
-        
-        if detector_pos is None:
-            raise ValueError("Cone beam CT requres a detector position")
-
-        if detector_direction_row is None:
-            detector_direction_row = zero_list.copy()
-            detector_direction_row[0] = 1.        
-
-        if rotation_axis_pos is None:
-            rotation_axis_pos = zero_list.copy()
-
-        if rotation_axis_angle is None:
-            rotation_axis_angle = 0.
+        super(Cone2D, self).__init__(dof=2, geometry = 'cone')
 
         #source
         self.source.position = source_pos
@@ -633,7 +597,6 @@ class Cone2D(SystemConfiguration):
 
         #rotate axis
         self.rotation_axis.position = rotation_axis_pos
-        self.rotation_axis.initial_angle = rotation_axis_angle
 
     def set_origin(self):
         r'''Transforms the system origin to the rotate axis
@@ -650,50 +613,21 @@ class Cone3D(SystemConfiguration):
     :type source_pos: list, tuple, ndarray
     :param detector_pos: A 3D vector describing the position of the centre of the detector (x,y,z)
     :type detector_pos: list, tuple, ndarray
-    :param detector_direction_row: A 3D unit vector describing the direction of the pixels in the rows of the detector (x,y,z), defaults to (1,0,0)
-    :type detector_direction_row: list, tuple, ndarray, optional
-    :param detector_direction_col: A 3D unit vector describing the direction of the pixels in the coloumns of the detector (x,y,z), defaults to (0,0,1)
-    :type detector_direction_col: list, tuple, ndarray, optional    
-    :param rotation_axis_pos: A 3D vector describing the position of the axis of rotation (x,y,z), defaults to (0,0,0)
-    :type rotation_axis_pos: list, tuple, ndarray, optional
-    :param rotation_axis_direction: A 3D unit vector describing the direction of the axis of rotation (x,y,z), defaults to (0,0,1)
-    :type rotation_axis_direction: list, tuple, ndarray, optional   
-    :param rotation_axis_angle: the initial rotation of the system, defaults to 0.0
-    :type rotation_axis_angle: float, optional
+    :param detector_direction_row: A 3D unit vector describing the direction of the pixels in the rows of the detector (x,y,z)
+    :type detector_direction_row: list, tuple, ndarray
+    :param detector_direction_col: A 3D unit vector describing the direction of the pixels in the coloumns of the detector (x,y,z)
+    :type detector_direction_col: list, tuple, ndarray    
+    :param rotation_axis_pos: A 3D vector describing the position of the axis of rotation (x,y,z)
+    :type rotation_axis_pos: list, tuple, ndarray
+    :param rotation_axis_direction: A 3D unit vector describing the direction of the axis of rotation (x,y,z)
+    :type rotation_axis_direction: list, tuple, ndarray   
     '''
 
-    def __init__ (self, source_pos, detector_pos, detector_direction_row, detector_direction_col, rotation_axis_pos, rotation_axis_direction, rotation_axis_angle):
+    def __init__ (self, source_pos, detector_pos, detector_direction_row, detector_direction_col, rotation_axis_pos, rotation_axis_direction):
         """Constructor method
         """
-        super(Cone3D, self).__init__(dof=3)
+        super(Cone3D, self).__init__(dof=3, geometry = 'cone')
 
-        zero_list = [0.,0.,0.]
-        self.recalculate = True
-
-        if source_pos is None:
-            raise ValueError("Cone beam CT requres a source position")
-
-        if detector_pos is None:
-            raise ValueError("Cone beam CT requres a detector position")
-
-        if detector_direction_row is None:
-            detector_direction_row = zero_list.copy()
-            detector_direction_row[0] = 1.
-
-        if detector_direction_col is None:
-            detector_direction_col = zero_list.copy()
-            detector_direction_col[2] = 1.
-
-        if rotation_axis_direction is None:
-            rotation_axis_direction = zero_list.copy()
-            rotation_axis_direction[2] = 1.
-
-        if rotation_axis_pos is None:
-            rotation_axis_pos = zero_list.copy()
-
-        if rotation_axis_angle is None:
-            rotation_axis_angle = 0.
-                    
         #source
         self.source.position = source_pos
 
@@ -705,7 +639,6 @@ class Cone3D(SystemConfiguration):
         #rotate axis
         self.rotation_axis.position = rotation_axis_pos
         self.rotation_axis.direction = rotation_axis_direction
-        self.rotation_axis.initial_angle = rotation_axis_angle
 
     def set_origin(self):
         r'''Transforms the system origin to the rotate axis with z direction aligned to the rotate axis direction
@@ -744,7 +677,7 @@ class Cone3D(SystemConfiguration):
             detector_direction_row = self.detector.direction_row[0:2]
             rotation_axis_position = self.rotation_axis.position[0:2]
 
-            return Cone2D(source_position, detector_position, detector_direction_row, rotation_axis_position, self.rotation_axis.initial_angle)
+            return Cone2D(source_position, detector_position, detector_direction_row, rotation_axis_position)
         else:
             raise Warning("Cannot convert geometry to 2D")
             return self
@@ -758,10 +691,6 @@ class Panel(object):
     :type num_pixels: tuple
     :param pixel_size: A tuple (pixel_size_h, pixel_size_v) containing the size of the pixels of the panel
     :type pixel_size: tuple
-    :param num_channels: The number of channels measured by each pixel
-    :type num_channels: int
-    :param channel_labels: A list of channel labels         
-    :type channel_labels: list, optional
      '''
 
     @property
@@ -780,16 +709,16 @@ class Panel(object):
                 TypeError('num_pixels expected int x or [int x, int y]. Got {}'.format(type(val)))
 
 
-        if length_val == 2:
-            try:
-                val0 = int(val[0])
-                val1 = int(val[1])
-            except:
-                TypeError('num_pixels expected int x or [int x, int y]. Got {0},{1}'.format(type(val[0]), type(val[1])))
+            if length_val == 2:
+                try:
+                    val0 = int(val[0])
+                    val1 = int(val[1])
+                except:
+                    TypeError('num_pixels expected int x or [int x, int y]. Got {0},{1}'.format(type(val[0]), type(val[1])))
 
-            num_pixels_temp = [val0, val1]
-        else:
-            raise ValueError('num_pixels expected int x or [int x, int y]. Got {}'.format(val))
+                num_pixels_temp = [val0, val1]
+            else:
+                raise ValueError('num_pixels expected int x or [int x, int y]. Got {}'.format(val))
    
         if num_pixels_temp[0] < 1 or num_pixels_temp[1] < 1:
             raise ValueError('num_pixels (x,y) must be >= (1,1). Got {}'.format(num_pixels_temp))
@@ -833,6 +762,23 @@ class Panel(object):
 
         self.__pixel_size = pixel_size_temp
 
+    def __init__ (self, num_pixels, pixel_size):  
+        """Constructor method
+        """
+        self.num_pixels = num_pixels
+        self.pixel_size = pixel_size
+
+
+class Channels(object):
+    r'''This is a class describing the channels of the data. 
+    This will be created on initialisation of AcquisitionGeometry.
+                       
+    :param num_channels: The number of channels measured by each pixel
+    :type num_channels: int
+    :param channel_labels: A list of channel labels         
+    :type channel_labels: list, optional
+     '''
+
     @property
     def num_channels(self):
         return self.__num_channels
@@ -860,60 +806,110 @@ class Panel(object):
         else:
             raise ValueError('labels expected to have length {0}. Got {1}'.format(self.__num_channels, len(val)))
 
-    def __init__ (self, num_pixels, pixel_size, num_channels, channel_labels):  
+    def __init__ (self, num_channels, channel_labels):  
         """Constructor method
         """
-        self.num_pixels = num_pixels
-        self.pixel_size = pixel_size
         self.num_channels = num_channels
         if channel_labels is not None:
             self.channel_labels = channel_labels
 
+class Angles(object):
+    r'''This is a class describing the angles of the data. 
+     '''
+
+    @property
+    def angle_data(self):
+        return self.__angle_data
+
+    @angle_data.setter
+    def angle_data(self, val):
+        if val is None:
+            self.__angle_data = val
+        else:
+            try:
+                self.num_positions = len(val)
+
+            except TypeError:
+                self.num_positions = 1
+                val = [val]
+
+            finally:
+                try:
+                    self.__angle_data = numpy.asarray(val, dtype=numpy.float32)
+                except:
+                    ValueError('angle_data expected to be a list of floats') 
+
+    @property
+    def initial_angle(self):
+        return self.__initial_angle
+
+    @initial_angle.setter
+    def initial_angle(self, val):
+        try:
+            val = float(val)
+        except:
+            raise TypeError('initial_angle expected a float. Got {0}'.format(type(val)))
+
+        self.__initial_angle = val
+
+    @property
+    def angle_unit(self):
+        return self.__angle_unit
+
+    @angle_unit.setter
+    def angle_unit(self,val):
+        if val != AcquisitionGeometry.DEGREE and val != AcquisitionGeometry.RADIAN:
+            raise ValueError('angle_unit = {} not recognised please specify \'degree\' or \'radian\''.format(val))
+        else:
+            self.__angle_unit = val
+
+    def __init__ (self, angles, initial_angle, angle_unit):  
+        """Constructor method
+        """
+        self.angle_data = angles
+        self.initial_angle = initial_angle
+        self.angle_unit = angle_unit
+
+class Configuration(object):
+
+    def __init__(self):
+        self.system = None
+        self.angles = None
+        self.panel = None
+        self.channels = Channels(1, None)
+
+    def check_configuration(self):
+
+        if self.system is None:
+            print("AG requires setup_ system configuration")
+            return False
+        
+        if self.angles is None:
+            print("AG requires setup_angles() ")
+            return False
+
+        if self.panel is None:
+            print("AG requires setup_panel() ")
+            return False
+
+        print("AG is configured")
+        return True
+
+
+
 class AcquisitionGeometry(object):
     r'''This class holds the AcquisitionGeometry of the system.
+    
+    Please initialise using factory:
+    AcquisitionGeometry.Create_Parallel2D
+    AcquisitionGeometry.Create_Cone3D
+    AcquisitionGeometry.Create_Parallel2D
+    AcquisitionGeometry.Create_Cone3D
 
-    Not all parameters are required for different data types so please refer to the :class:`SystemConfiguration` for a full description of required parameters and their default values
 
+    These initialisation parameters will be deprecated in a future release.    
     :param geom_type: A description of the system type 'cone' or 'parallel'
     :type geom_type: string
-
-    Panel description:
-    :param num_pixels: A tuple (num_pixels_h, num_pixels_v) containing the number of pixels of the panel
-    :type num_pixels: tuple, list, int
-    :param pixel_size: A tuple (pixel_size_h, pixel_size_v) containing the size of the pixels of the panel
-    :type pixel_size: tuple, list, float
-    :param num_channels: The number of channels measured by each pixel, defaults to 1
-    :type num_channels: int
-    :param angles: A container of angular positions corresponding to each radiograph
-    :type angles: tuple, list, ndarray
-    :param channel_labels: A list of channel labels         
-    :type channel_labels: list, optional
-
-    System configuration 
-    Source description:
-    :param source_pos: Cone-beam CT specific. A vector describing the position of the source
-    :type source_pos: list, tuple, ndarray, optional
-    :param ray_direction: Parallel-beam CT specific. A vector describing the x-ray beam direction
-    :type ray_direction: list, tuple, ndarray, optional
-
-    Detector description
-    :param detector_pos: A vector describing the position of the centre of the detector
-    :type detector_pos: list, tuple, ndarray, optional
-    :param detector_direction_row: A vector describing the direction of the pixels in the rows of the detector
-    :type detector_direction_row: list, tuple, ndarray, optional
-    :param detector_direction_col: A vector describing the direction of the pixels in the coloumns of the detector
-    :type detector_direction_col: list, tuple, ndarray, optional 
-
-    Rotation axis description
-    :param rotation_axis_pos: A vector describing the position of the axis of rotation, defaults to the origin
-    :type rotation_axis_pos: list, tuple, ndarray, optional
-    :param rotation_axis_direction: A vector describing the direction of the axis of rotation
-    :type rotation_axis_direction: list, tuple, ndarray, optional   
-    :param rotation_axis_angle: the initial rotation of the system
-    :type rotation_axis_angle: float, optional
-
-
-    These initialisation parameters will be deprecated in a future release
     :param pixel_num_h: Number of pixels in the horizontal direction
     :type pixel_num_h: int, optional
     :param pixel_num_v: Number of pixels in the vertical direction
@@ -947,59 +943,67 @@ class AcquisitionGeometry(object):
 
     #for backwards compatibility
     @property
+    def geom_type(self):
+        return self.config.system.geometry
+
+    @property
     def pixel_num_h(self):
-        return self.panel.num_pixels[0]
+        return self.config.panel.num_pixels[0]
 
     @pixel_num_h.setter
     def pixel_num_h(self, val):
-        self.panel.num_pixels[0] = val
+        self.config.panel.num_pixels[0] = val
 
     @property
     def pixel_num_v(self):
-        return self.panel.num_pixels[1]
+        return self.config.panel.num_pixels[1]
 
     @pixel_num_v.setter
     def pixel_num_v(self, val):
-        self.panel.num_pixels[1] = val
+        self.config.panel.num_pixels[1] = val
 
     @property
     def pixel_size_h(self):
-        return self.panel.pixel_size[0]
+        return self.config.panel.pixel_size[0]
 
     @pixel_size_h.setter
     def pixel_size_h(self, val):
-        self.panel.pixel_size[0] = val
+        self.config.panel.pixel_size[0] = val
 
     @property
     def pixel_size_v(self):
-        return self.panel.pixel_size[1]
+        return self.config.panel.pixel_size[1]
 
     @pixel_size_v.setter
     def pixel_size_v(self, val):
-        self.panel.pixel_size[1] = val
+        self.config.panel.pixel_size[1] = val
 
     @property
     def channels(self):
-        return self.panel.num_channels
+        return self.config.channels.num_channels
+
+    @property
+    def angles(self):
+        return self.config.angles.angle_data
 
     @property
     def dist_source_center(self):
-        out = self.configuration.calculate_mag()
+        out = self.config.system.calculate_mag()
         return out[0]
 
     @property
     def dist_center_detector(self):
-        out = self.configuration.calculate_mag()
+        out = self.config.system.calculate_mag()
         return out[1]
 
     @property
     def magnification(self):
-        out = self.configuration.calculate_mag()
+        out = self.config.system.calculate_mag()
         return out[2]
 
     @property
     def dimension(self):
-        if self.panel.num_pixels[1] == 1:
+        if self.config.panel.num_pixels[1] == 1:
             return '2D'
         else:
             return '3D'    
@@ -1007,10 +1011,10 @@ class AcquisitionGeometry(object):
     @property
     def shape(self):
 
-        shape_dict = {AcquisitionGeometry.CHANNEL: self.panel.num_channels,
-                     AcquisitionGeometry.ANGLE: len(self.angles),
-                     AcquisitionGeometry.VERTICAL: self.panel.num_pixels[1],        
-                     AcquisitionGeometry.HORIZONTAL: self.panel.num_pixels[0]}
+        shape_dict = {AcquisitionGeometry.CHANNEL: self.config.channels.num_channels,
+                     AcquisitionGeometry.ANGLE: self.config.angles.num_positions,
+                     AcquisitionGeometry.VERTICAL: self.config.panel.num_pixels[1],        
+                     AcquisitionGeometry.HORIZONTAL: self.config.panel.num_pixels[0]}
 
         shape = []
         for label in self.dimension_labels:
@@ -1025,9 +1029,33 @@ class AcquisitionGeometry(object):
 
     @property
     def dimension_labels(self):
-        #check if AG has changed
-        return self.__dimension_labels
+        labels_default = [AcquisitionGeometry.CHANNEL,
+                            AcquisitionGeometry.ANGLE,
+                            AcquisitionGeometry.VERTICAL,
+                            AcquisitionGeometry.HORIZONTAL]
 
+        shape_default = [self.config.channels.num_channels,
+                            self.config.angles.num_positions,
+                            self.config.panel.num_pixels[1],
+                            self.config.panel.num_pixels[0]
+                            ]
+
+        try:
+            labels = list(self.__dimension_labels)
+        except AttributeError:
+            labels = labels_default.copy()
+
+        #remove from list labels where len == 1
+        #
+        for i, x in enumerate(shape_default):
+            if x == 1:
+                try:
+                    labels.remove(labels_default[i])
+                except ValueError:
+                    pass #if not in custom list carry on
+
+        return tuple(labels)
+      
     @dimension_labels.setter
     def dimension_labels(self, val):
 
@@ -1036,163 +1064,108 @@ class AcquisitionGeometry(object):
                             AcquisitionGeometry.VERTICAL,
                             AcquisitionGeometry.HORIZONTAL]
 
-        shape_default = [   self.panel.num_channels,
-                            len(self.angles),
-                            self.panel.num_pixels[1], 
-                            self.panel.num_pixels[0]
-                        ]
-
-        labels = labels_default.copy()
-
-        #remove from list labels where len == 1
-        for i, x in enumerate(shape_default):
-            if x == 1:
-                labels.remove(labels_default[i])
-              
-        #check input and reorder to match
+        #check input and store. This value is not used directly
         if val is not None:
-            if len(val) != len(labels):    
-                raise ValueError('Requested axis are not possible. Expected {},\ngot {}'.format(labels,val))                
-
             for x in val:
-                if x not in labels:
-                    raise ValueError('Requested axis are not possible. Expected {},\ngot {}'.format(labels,val))
-                
-            labels = val
-
-        self.__dimension_labels = tuple(labels)
-
-    #new geom
-    @property
-    def geom_type(self):
-        return self.__geom_type
-
-    @geom_type.setter
-    def geom_type(self,val):
-        if val != AcquisitionGeometry.CONE and val != AcquisitionGeometry.PARALLEL:
-            raise ValueError('geom_type = {} not recognised please specify \'cone\' or \'parallel\''.format(val))
-        else:
-            self.__geom_type = val
-
-    @property
-    def num_positions(self):
-        return self.__num_positions
-
-    @num_positions.setter
-    def num_positions(self, val):
-        if isinstance(val,int) and val > 0:
-            self.__num_positions = val
-        else:
-            raise ValueError('num_positions expected a positive integer. Got {}'.format(val))
-
-    @property
-    def angles(self):
-        return self.__angles
-
-    @angles.setter
-    def angles(self, val):
-        if val is None:
-            self.__angles = val
-        else:
-            try:
-                self.num_positions = len(val)
-
-            except TypeError:
-                self.num_positions = 1
-                val = [val]
-
-            finally:
-                try:
-                    self.__angles = numpy.asarray(val, dtype=numpy.float32)
-                except:
-                    ValueError('angles expected to be a list of floats') 
+                if x not in labels_default:
+                    raise ValueError('Requested axis are not possible. Accepted label names {},\ngot {}'.format(labels_default,val))
+                    
+            self.__dimension_labels = tuple(val)
 
 
-    def __init__(self,
-                geom_type, #'cone'/'parallel'
-                num_pixels = [0, 0], # int x or [int x, int y] #optional for backward compatibility
-                pixel_size = [1.,1.], # float xy or [float x, float y] #optional for backward compatibility
-                num_channels = 1,    
-                angles = None,              
-                source_position = None, 
-                ray_direction = None,
-                detector_position = None,
-                detector_direction_row = None,
-                detector_direction_col = None,
-                rotation_axis_position = None,
-                rotation_axis_direction = None,
-                rotation_axis_rotation = None,
-                channel_labels = None, 
-                ** kwargs):
+    def __init__(self, geom_type, dimension, ** kwargs):
 
         """Constructor method
         """
 
         #backward compatibility
-        pixel_num_h = kwargs.get('pixel_num_h', None)
-        pixel_num_v = kwargs.get('pixel_num_v', None)
-        pixel_size_h = kwargs.get('pixel_size_h', None)
-        pixel_size_v = kwargs.get('pixel_size_v', None)
-        chanels = kwargs.get('channels', None)
-        dist_source_center = kwargs.get('dist_source_center', None)
-        dist_center_detector = kwargs.get('dist_center_detector', None)
+        angles = kwargs.get('angles', None)
 
-        num_pixels_temp = [1,1]
-        pixel_size_temp = [1,1]
-
-        if pixel_num_h is not None:
-            num_pixels_temp[0] = pixel_num_h
-            num_pixels = num_pixels_temp
-        if pixel_num_v is not None:
-            num_pixels_temp[1] = pixel_num_v
-            num_pixels = num_pixels_temp
-        if pixel_size_h is not None:
-            pixel_size_temp[0] = pixel_size_h
-            pixel_size = pixel_size_temp
-        if pixel_size_v is not None:
-            pixel_size_temp[1] = pixel_size_v
-            pixel_size = pixel_size_temp
-        if chanels is not None:
-            num_channels = chanels
-
-        #initilisation using new inputs
-        self.geom_type = geom_type
-        self.panel = Panel(num_pixels, pixel_size, num_channels, channel_labels)  
-
-        #Once panel is configured, self.dimension is set
-
-        #more backward compatability
-        if dist_source_center is not None:
-            dof = 2 if self.dimension == AcquisitionGeometry.DIM2 else 3
-            source_position = [0.0]*dof
-            source_position[1] = -dist_source_center
-        if dist_center_detector is not None:
-            dof = 2 if self.dimension == AcquisitionGeometry.DIM2 else 3
-            detector_position = [0.0]*dof
-            detector_position[1] = dist_center_detector
-
-        self.angle_unit = kwargs.get(AcquisitionGeometry.ANGLE_UNIT, AcquisitionGeometry.DEGREE)
-
-        #perproj/or rigid if there is an agles list...
+        #set up old geometry        
         if angles is not None:
-            self.per_projection = False
-            self.angles = angles
-            if self.dimension == AcquisitionGeometry.DIM2:
-                if self.geom_type == AcquisitionGeometry.PARALLEL:
-                    self.configuration = Parallel2D(ray_direction, detector_position, detector_direction_row, rotation_axis_position, rotation_axis_rotation)
-                else:
-                    self.configuration = Cone2D(source_position, detector_position, detector_direction_row, rotation_axis_position, rotation_axis_rotation)
-            else:
-                if self.geom_type == AcquisitionGeometry.PARALLEL:
-                    self.configuration = Parallel3D(ray_direction, detector_position, detector_direction_row, detector_direction_col, rotation_axis_position, rotation_axis_direction, rotation_axis_rotation)
-                else:
-                    self.configuration = Cone3D(source_position, detector_position, detector_direction_row, detector_direction_col, rotation_axis_position, rotation_axis_direction, rotation_axis_rotation)
- 
-        else:
-            raise NotImplementedError("Per projection geometry is not yet implemented")   
+            print("AG configured using deprecated method")
 
-        labels = kwargs.get('dimension_labels', None)
+            angles = kwargs.get('angles', None)
+            pixel_num_h = kwargs.get('pixel_num_h', 1)
+            pixel_num_v = kwargs.get('pixel_num_v', 1)
+            pixel_size_h = kwargs.get('pixel_size_h', 1)
+            pixel_size_v = kwargs.get('pixel_size_v', 1)
+            chanels = kwargs.get('channels', 1)
+            dist_source_center = kwargs.get('dist_source_center', None)
+            dist_center_detector = kwargs.get('dist_center_detector', None)
+
+
+            num_pixels = [pixel_num_h, pixel_num_v]
+            pixel_size= [pixel_size_h, pixel_size_v]
+
+            self.config = Configuration()
+            self.config.panel = Panel(num_pixels, pixel_size)  
+            self.config.channels = Channels(chanels, channel_labels=None)  
+            self.config.angles = Angles(angles, 0, kwargs.get(AcquisitionGeometry.ANGLE_UNIT, AcquisitionGeometry.DEGREE))
+            
+            if self.dimension == AcquisitionGeometry.DIM2:
+                if geom_type == AcquisitionGeometry.PARALLEL:
+                    self.config.system = Parallel2D(ray_direction=[0,1], detector_pos=[0,0], detector_direction_row=[1,0], rotation_axis_pos=[0,0])
+                else:
+                    self.config.system = Cone2D(source_pos=[0,-dist_source_center], detector_pos=[0,dist_center_detector], detector_direction_row=[1,0], rotation_axis_pos=[0,0])
+            else:
+                if geom_type == AcquisitionGeometry.PARALLEL:
+                    self.config.system = Parallel3D(ray_direction=[0,1,0], detector_pos=[0,0,0], detector_direction_row=[1,0,0], detector_direction_col=[0,0,1], rotation_axis_pos=[0,0,0], rotation_axis_direction=[0,0,1])
+                else:
+                    self.config.system = Cone3D(source_pos=[0,-dist_source_center,0], detector_pos=[0,dist_center_detector,0], detector_direction_row=[1,0,0], detector_direction_col=[0,0,1], rotation_axis_pos=[0,0,0], rotation_axis_direction=[0,0,1])
+
+            self.config.check_configuration()
+
+    def setup_angles(self, angles, initial_angle=0, angle_unit='degree'):
+
+        self.config.angles = Angles(angles, initial_angle, angle_unit)
+
+        return self
+
+    def setup_panel(self, num_pixels, pixel_size=(1,1)):
+
+        self.config.panel = Panel(num_pixels, pixel_size)
+
+        return self
+
+    def setup_channels(self, num_channels=1, channel_labels=None):
+        
+        self.config.channels = Channels(num_channels, channel_labels)
+
+        return self
+
+    def setup_labels(self, labels=None):
         self.dimension_labels = labels
+        return self
+ 
+    @staticmethod
+    def create_Parallel2D(ray_direction=[0,1], detector_position=[0,0], detector_direction_row=[1,0], rotation_axis_position=[0,0]):
+        AG = AcquisitionGeometry('deprecated', 'parameters')
+        AG.config = Configuration()
+        AG.config.system = Parallel2D(ray_direction, detector_position, detector_direction_row, rotation_axis_position)
+        return AG    
+
+    @staticmethod
+    def create_Cone2D(source_position, detector_position, detector_direction_row=[1,0], rotation_axis_position=[0,0]):
+        AG = AcquisitionGeometry('deprecated', 'parameters')
+        AG.config = Configuration()
+        AG.config.system = Cone2D(source_position, detector_position, detector_direction_row, rotation_axis_position)
+        return AG   
+
+    @staticmethod
+    def create_Parallel3D(ray_direction=[0,1,0], detector_position=[0,0,0], detector_direction_row=[1,0,0], detector_direction_col=[0,0,1], rotation_axis_position=[0,0,0], rotation_axis_direction=[0,0,1]):
+        AG = AcquisitionGeometry('deprecated', 'parameters')
+        AG.config = Configuration()
+        AG.config.system = Parallel3D(ray_direction, detector_position, detector_direction_row, detector_direction_col, rotation_axis_position, rotation_axis_direction)
+        return AG            
+
+    @staticmethod
+    def setup_Cone3D(source_position, detector_position, detector_direction_row=[1,0,0], detector_direction_col=[0,0,1], rotation_axis_position=[0,0,0], rotation_axis_direction=[0,0,1]):
+        AG = AcquisitionGeometry('deprecated', 'parameters')
+        AG.config = Configuration()
+        AG.config.system = Cone3D(source_position, detector_position, detector_direction_row, detector_direction_col, rotation_axis_position, rotation_axis_direction)
+        return AG          
+
 
     def get_order_by_label(self, dimension_labels, default_dimension_labels):
         order = []
@@ -1216,9 +1189,9 @@ class AcquisitionGeometry(object):
         AG_2D = copy.deepcopy(self)
 
         if AG_2D.dimension == '3D':
-            AG_2D.configuration = self.configuration.centre_sice()
-            AG_2D.panel.num_pixels[1] = 1
-            AG_2D.panel.pixel_size[1] = abs(self.configuration.detector.direction_col[2]) * self.panel.pixel_size[1]
+            AG_2D.config.system = self.config.system.centre_sice()
+            AG_2D.config.panel.num_pixels[1] = 1
+            AG_2D.config.panel.pixel_size[1] = abs(self.config.system.detector.direction_col[2]) * self.config.panel.pixel_size[1]
         return AG_2D
 
     def __str__ (self):
@@ -1228,40 +1201,44 @@ class AcquisitionGeometry(object):
         repres = ""
         repres += "{0} {1}-beam tomography\n".format(self.dimension, self.geom_type)   
         repres += "Panel description:\n"             
-        repres += "\tpanel size: h{0},v{1}\n".format(self.panel.num_pixels[0], self.panel.num_pixels[1])
-        repres += "\tpixel size: h{0},v{1}\n".format(self.panel.pixel_size[0], self.panel.pixel_size[1])
-        repres += "\tnumber of channels: {0}\n".format(self.panel.num_channels)
+        repres += "\tpanel size: h{0},v{1}\n".format(self.config.panel.num_pixels[0], self.config.panel.num_pixels[1])
+        repres += "\tpixel size: h{0},v{1}\n".format(self.config.panel.pixel_size[0], self.config.panel.pixel_size[1])
+        repres += "\tnumber of channels: {0}\n".format(self.config.channels.num_channels)
         
-        num_print=min(10,self.panel.num_channels)                     
-        if  hasattr(self.panel, 'channel_labels'):
-            repres += "\tchannel labels 0-{0}: {1}\n".format(num_print, self.panel.channel_labels[0:num_print])
+        num_print=min(10,self.config.channels.num_channels)                     
+        if  hasattr(self.config.channels, 'channel_labels'):
+            repres += "\tchannel labels 0-{0}: {1}\n".format(num_print, self.config.channels.channel_labels[0:num_print])
 
         repres += "System configuration:\n"
-        if self.per_projection is not None:                             
-            if  hasattr(self.configuration.source, 'position'):
-                repres += "\tsource position: {0}\n".format(csv(self.configuration.source.position))
-            if  hasattr(self.configuration.source, 'direction'):
-                repres += "\tray direction: {0}\n".format(csv(self.configuration.source.direction))
-            if  hasattr(self.configuration.rotation_axis, 'position'):
-                repres += "\trotation axis position: {0}\n".format(csv(self.configuration.rotation_axis.position))
-            if  hasattr(self.configuration.rotation_axis, 'direction'):
-                repres += "\trotation axis direction: {0}\n".format(csv(self.configuration.rotation_axis.direction))
-            if  hasattr(self.configuration.rotation_axis, 'initial_angle'):
-                repres += "\trotation axis initial angle: {0} {1}s\n".format(self.configuration.rotation_axis.initial_angle, self.angle_unit)
-            if  hasattr(self.configuration.detector, 'position'):
-                repres += "\tdetector position: {0}\n".format(csv(self.configuration.detector.position))
-            if  hasattr(self.configuration.detector, 'direction_col'):
-                repres += "\tdetector column direction : {0}\n".format(csv(self.configuration.detector.direction_col))
-            if  hasattr(self.configuration.detector, 'direction_row'):
-                repres += "\tdetector row direction: {0}\n".format(self.configuration.detector.direction_row)
 
-            repres += "num_positions: {0}\n".format(self.num_positions)
-            num_print=min(10,self.num_positions)
-            repres += "angles 0-{0} in {1}s: {2}\n".format(num_print, self.angle_unit, csv(self.angles[0:num_print]))      
-                                                
-        else:
-            repres += "\tgeometry stored per projection\n"
+        if hasattr(self.config.system, 'source'):
+            repres += "\tsource position: {0}\n".format(
+                csv(self.config.system.source.position))
+        if hasattr(self.config.system, 'ray'):
+            repres += "\tray direction: {0}\n".format(
+                csv(self.config.system.ray.direction))
+        if hasattr(self.config.system.rotation_axis, 'position'):
+            repres += "\trotation axis position: {0}\n".format(
+                csv(self.config.system.rotation_axis.position))
+        if hasattr(self.config.system.rotation_axis, 'direction'):
+            repres += "\trotation axis direction: {0}\n".format(
+                csv(self.config.system.rotation_axis.direction))
+        if hasattr(self.config.system.rotation_axis, 'initial_angle'):
+            repres += "\trotation axis initial angle: {0} {1}s\n".format(
+                self.config.system.rotation_axis.initial_angle, self.angle_unit)
+        if hasattr(self.config.system.detector, 'position'):
+            repres += "\tdetector position: {0}\n".format(
+                csv(self.config.system.detector.position))
+        if hasattr(self.config.system.detector, 'direction_col'):
+            repres += "\tdetector column direction : {0}\n".format(
+                csv(self.config.system.detector.direction_col))
+        if hasattr(self.config.system.detector, 'direction_row'):
+            repres += "\tdetector row direction: {0}\n".format(
+                self.config.system.detector.direction_row)
 
+        repres += "num_positions: {0}\n".format(self.config.angles.num_positions)
+        num_print=min(10,self.config.angles.num_positions)
+        repres += "angles 0-{0} in {1}s: {2}\n".format(num_print, self.config.angles.angle_unit, csv(self.config.angles.angle_data[0:num_print]))      
       
         return repres
         
@@ -2228,12 +2205,12 @@ class AcquisitionData(DataContainer):
 
         geometry_new = self.geometry.copy()
         if channel_slice is not None:
-            geometry_new.panel.num_channels = 1
-            if hasattr(geometry_new.panel,'channel_labels'):
-                geometry_new.panel.channel_labels = geometry_new.panel.channel_labels[channel_slice]
+            geometry_new.config.channels.num_channels = 1
+            if hasattr(geometry_new.config.channels,'channel_labels'):
+                geometry_new.config.panel.channel_labels = geometry_new.config.panel.channel_labels[channel_slice]
 
         if angle_slice is not None:
-            geometry_new.angles = geometry_new.angles[angle_slice]
+            geometry_new.config.angles.angle_data = geometry_new.config.angles.angle_data[angle_slice]
         
         if vertical_slice is not None:
             if geometry_new.geom_type == AcquisitionGeometry.PARALLEL or vertical_slice == 'centre':
@@ -2596,7 +2573,9 @@ class VectorGeometry(object):
     
 if __name__ == "__main__":
     
-    ag = AcquisitionGeometry(geom_type='parallel',num_pixels=(10,1),angles=[0.1,0.2])
+    ag = AcquisitionGeometry(geom_type='parallel',dimension='2D',pixel_num_h=10,pixel_num_v=5,angles=[0.1,0.2,0.3])
+    print(ag)
+
     ad = ag.allocate(0)
     ad.subset(angle=1)
 

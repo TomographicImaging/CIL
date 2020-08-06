@@ -18,3 +18,7 @@
 #endif
 
 #endif
+//define int64_t
+#if defined(DLL_EXPORT)
+using int64_t = __int64;
+#endif

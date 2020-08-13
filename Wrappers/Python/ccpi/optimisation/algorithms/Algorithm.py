@@ -27,39 +27,6 @@ import time, functools
 from numbers import Integral, Number
 import logging
 
-class DataContainerWithHistory(object):
-    def __init__(self, geometry, initialisation=None):
-        if isinstance(initialisation, Number):
-            self.datacontainers = [
-                geometry.allocate(0),
-                geometry.allocate(initialisation),
-            ]
-        else:
-            self.datacontainers = [
-                geometry.allocate(0),
-                geometry.allocate(0)
-            ]
-            try:
-                self.datacontainers[1].fill(initialisation.as_array())
-            except:
-                pass
-
-    @property
-    def previous(self):
-        return self.datacontainers[1]
-    @property
-    def current(self):
-        return self.datacontainers[0]
-    def update_indices(self):
-        self.datacontainers.reverse()
-
-    @previous.setter
-    def previous(self, value):
-        self.datacontainers[1] = value.copy()
-    @current.setter
-    def current(self, value):
-        self.datacontainers[0] = value.copy()
-
 class Algorithm(object):
     '''Base class for iterative algorithms
 

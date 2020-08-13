@@ -136,7 +136,7 @@ class SPDHG(Algorithm):
         self.x_tmp = self.operator.domain_geometry().allocate(0)
         
         # initialize dual variable to 0
-        self._y = DataContainerWithHistory(operator.range_geometry(), 0)
+        self.y_old = operator.range_geometry().allocate(0)
         
         # initialize variable z corresponding to back-projected dual variable
         self.z = operator.domain_geometry().allocate(0)
@@ -160,24 +160,22 @@ class SPDHG(Algorithm):
         # Choose subset
         i = int(np.random.choice(len(self.sigma), 1, p=self.prob))
         
-        # save previous iteration
-        self.save_previous_iteration(i)
-        
         # Gradient ascent for the dual variable
-        # y[i] = y_old[i] + sigma[i] * K[i] x
-        self.operator.get_item(i,0).direct(self.x, out=self.y[i])
+        # y_k = y_old[i] + sigma[i] * K[i] x
+        y_k = self.operator[i].direct(self.x)
         if self._use_axpby:
-            self.y[i].axpby(self.sigma[i], 1., self.y_old[i], out=self.y[i])
+            y_k.axpby(self.sigma[i], 1., self.y_old[i], out=y_k)
         else:
-            self.y[i].multiply(self.sigma[i], out=self.y[i])
-            self.y[i].add(self.y_old[i], out=self.y[i])
+            y_k.multiply(self.sigma[i], out=y_k)
+            y_k.add(self.y_old[i], out=y_k)
             
-        self.f[i].proximal_conjugate(self.y[i], self.sigma[i], out=self.y[i])
+        self.f[i].proximal_conjugate(y_k, self.sigma[i], out=y_k)
         
         # Back-project
-        # x_tmp = K[i]^*(y[i] - y_old[i])
-        self.y[i].subtract(self.y_old[i], out=self.y_old[i])
-        self.operator.get_item(i,0).adjoint(self.y_old[i], out = self.x_tmp)
+        # x_tmp = K[i]^*(y_k - y_old[i])
+        y_k.subtract(self.y_old[i], out=self.y_old[i])
+
+        self.operator[i].adjoint(self.y_old[i], out = self.x_tmp)
         # Update backprojected dual variable and extrapolate
         # zbar = z + (1 + theta/p[i]) x_tmp
 
@@ -190,10 +188,15 @@ class SPDHG(Algorithm):
             self.x_tmp.multiply(self.theta / self.prob[i], out=self.x_tmp)
             self.z.add(self.x_tmp, out=self.zbar)
         
+        # save previous iteration
+        self.save_previous_iteration(i, y_k)
+        
     def update_objective(self):
          p1 = self.f(self.operator.direct(self.x)) + self.g(self.x)
-         d1 = -(self.f.convex_conjugate(self.y) + self.g.convex_conjugate(-1*self.operator.adjoint(self.y)))
-#
+         d1 = - self.f.convex_conjugate(self.y_old)
+         tmp = -1*self.operator.adjoint(self.y_old)
+         d1 += self.g.convex_conjugate(tmp)
+
          self.loss.append([p1, d1, p1-d1])
 
     @property
@@ -207,36 +210,5 @@ class SPDHG(Algorithm):
     @property
     def primal_dual_gap(self):
         return [x[2] for x in self.loss]
-    @property
-    def y(self):
-        return self._y.current
-    @property
-    def y_old(self): # change to previous
-        return self._y.previous
-    def save_previous_iteration(self, index):
-        # swaps the reference in the BlockDataContainers
-        self._y.current.containers , self._y.previous.containers = \
-            swap_element_from_tuples( self._y.current.containers, self._y.previous.containers, index )
-
-
-def swap_element_from_tuples(tuple1, tuple2, index):
-    '''swap element at index from tuple1 and tuple2, returns 2 new tuples'''
-    a = tuple1[index]
-    b = tuple2[index]
-    ca = create_and_replace_element_in_tuple(tuple1, index, b)
-    cb = create_and_replace_element_in_tuple(tuple2, index, a)
-    return ca,cb
-    
-def create_and_replace_element_in_tuple(dtuple, index, new_element):
-    '''replace element at index in a tuple with new_element by creating a list and returning a new tuple'''
-    dlist = []
-    for i in range(len(dtuple)):
-        if i == index:
-            dlist.append(new_element)
-        else:
-            dlist.append(dtuple[i])
-    return tuple(dlist)
-    
-
-
-
+    def save_previous_iteration(self, index, y_current):
+        self.y_old[index].fill(y_current)

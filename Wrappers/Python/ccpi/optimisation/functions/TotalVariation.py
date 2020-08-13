@@ -119,12 +119,6 @@ class TotalVariation(Function):
         r''' Returns the projection P onto \|\cdot\|_{\infty} '''  
         self._domain = x.geometry
         
-        # res1 = functools.reduce(lambda a,b: a + b*b, x.containers, x.get_item(0) * 0 )
-        # res1.sqrt(out=res1)	
-        # res1.maximum(1.0, out=res1)	    
-        # print (type(res1))
-        # tmp = x.get_item(0) * 0
-        # tmp1 = tmp.copy()
         # preallocated in proximal
         tmp = self.pptmp
         tmp1 = self.pptmp1
@@ -145,12 +139,6 @@ class TotalVariation(Function):
     def proximal(self, x, tau, out = None):
         
         ''' Returns the solution of the FGP_TV algorithm '''         
-                        
-#         if self.gradient is None:
-            
-#             # Define 1/Lipschitz of the Gradient
-#             self.gradient = Gradient(x.geometry)            
-#             self.Lipschitz = (1./self.gradient.norm())**2            
         self._domain = x.geometry
         
         # initialise
@@ -167,13 +155,6 @@ class TotalVariation(Function):
             t0 = t
             self.gradient.adjoint(tmp_q, out = tmp_x)
             
-            # this can be replaced by axpby
-#            if isinstance (tau, (Number, np.float32, np.float64)):
-#                tmp_x.axpby(-self.regularising_parameter*tau, 1.0, x, out=tmp_x)
-#            else:
-#                tmp_x *= -self.regularising_parameter
-#                tmp_x *= tau
-#                tmp_x += x
             # axpby now works for matrices
             tmp_x.axpby(-self.regularising_parameter*tau, 1.0, x, out=tmp_x)
             self.projection_C(tmp_x, out = tmp_x)                       
@@ -230,7 +211,6 @@ class TotalVariation(Function):
                 print("Stop at {} iterations.".format(k))                
             
         if out is None:                        
-            #return self.projection_C(x - self.regularising_parameter*tau*self.gradient.adjoint(tmp_q))
             self.gradient.adjoint(tmp_q, out=tmp_x)
             tmp_x *= tau
             tmp_x *= self.regularising_parameter 
@@ -240,7 +220,6 @@ class TotalVariation(Function):
             self.gradient.adjoint(tmp_q, out = out)
             out*=tau
             out*=self.regularising_parameter
-            #out+=x
             x.subtract(out, out=out)
             self.projection_C(out, out=out)
     

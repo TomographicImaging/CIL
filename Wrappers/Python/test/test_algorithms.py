@@ -490,11 +490,6 @@ class TestSPDHG(unittest.TestCase):
         angles = np.linspace(0, np.pi, 180)
         ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1)
         # Select device
-        # device = input('Available device: GPU==1 / CPU==0 ')
-        # if device=='1':
-        #     dev = 'gpu'
-        # else:
-        #     dev = 'cpu'
         dev = 'gpu'
 
         Aop = AstraProjectorSimple(ig, ag, dev)
@@ -529,12 +524,8 @@ class TestSPDHG(unittest.TestCase):
         pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
         pdhg.max_iteration = 1000
         pdhg.update_objective_interval = 200
-        #pdhg.run(200, very_verbose = True)
 
         #%% 'implicit' PDHG, preconditioned step-sizes
-
-
-        #normK = operator.norm()
         tau_tmp = 1
         sigma_tmp = 1
         tau = sigma_tmp / operator.adjoint(tau_tmp * operator.range_geometry().allocate(1.))
@@ -602,11 +593,6 @@ class TestSPDHG(unittest.TestCase):
         angles = np.linspace(0, np.pi, 180)
         ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1)
         # Select device
-        # device = input('Available device: GPU==1 / CPU==0 ')
-        # if device=='1':
-        #     dev = 'gpu'
-        # else:
-        #     dev = 'cpu'
         dev = 'gpu'
 
         Aop = AstraProjectorSimple(ig, ag, dev)
@@ -656,17 +642,6 @@ class TestSPDHG(unittest.TestCase):
                     update_objective_interval=200, prob = prob)
         spdhg.run(1000, very_verbose = True)
 
-
-        #%% with different probability choice
-        #prob = [1/len(A)]*(len(A))
-        #spdhg = SPDHG(f=F,g=G,operator=A, 
-        #              max_iteration = 1000,
-        #              update_objective_interval=200, prob = prob)
-        #spdhg.run(1000, very_verbose = True)
-        #plt.figure()
-        #plt.imshow(spdhg.get_output().as_array())
-        #plt.colorbar()
-        #plt.show()
         #%% 'explicit' PDHG, scalar step-sizes
         op1 = Gradient(ig)
         op2 = Aop

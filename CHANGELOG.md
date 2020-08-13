@@ -1,3 +1,10 @@
+* 20.x
+  - added SPDHG algorithm
+
+* 20.04
+
+* 19.10
+
 * 19.07
  - Introduction of BlockFramework
  - major revision and restructuring of the whole code

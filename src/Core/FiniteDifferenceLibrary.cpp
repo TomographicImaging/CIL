@@ -1,5 +1,3 @@
-#define dll_EXPORTS = 1
-
 #include "FiniteDifferenceLibrary.h"
 
 DLL_EXPORT int openMPtest(int nThreads)

@@ -20,7 +20,7 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from ccpi.optimisation.algorithms import Algorithm, DataContainerWithHistory
+from ccpi.optimisation.algorithms import Algorithm
 import numpy as np
 
 class SPDHG(Algorithm):

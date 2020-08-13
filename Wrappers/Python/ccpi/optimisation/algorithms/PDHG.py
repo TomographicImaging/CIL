@@ -21,7 +21,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from ccpi.optimisation.algorithms import Algorithm, DataContainerWithHistory
+from ccpi.optimisation.algorithms import Algorithm
 
 
 
@@ -106,9 +106,11 @@ class PDHG(Algorithm):
             # Primal & dual stepsizes
             self.tau = 1 / (self.sigma * normK ** 2)
         
-        self._x = DataContainerWithHistory(self.operator.domain_geometry())
+        self.x = operator.domain_geometry().allocate(0)
+        self.x_old = operator.domain_geometry().allocate(0)
         
-        self._y = DataContainerWithHistory(self.operator.range_geometry())
+        self.y = self.operator.range_geometry().allocate(0)
+        self.y_old = self.operator.range_geometry().allocate(0)
         
         self.x_tmp = self.x_old.copy()
         
@@ -123,22 +125,15 @@ class PDHG(Algorithm):
         self.configured = True
         print("{} configured".format(self.__class__.__name__, ))
 
-    @property
-    def x(self):
-        return self._x.current
-    @property
-    def x_old(self): # change to previous
-        return self._x.previous
-    @property
-    def y(self):
-        return self._y.current
-    @property
-    def y_old(self): # change to previous
-        return self._y.previous
-    def update_indices(self):
-        self._x.update_indices()
-        self._y.update_indices()
-
+    def update_previous_solution(self):
+        # swap the pointers to current and previous solution
+        tmp = self.x_old
+        self.x_old = self.x
+        self.x = tmp
+        tmp = self.y_old
+        self.y_old = self.y
+        self.y = tmp
+        
     def update(self):
         
         # Gradient ascent for the dual variable

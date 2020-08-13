@@ -157,15 +157,17 @@ class Algorithm(object):
             if self.iteration > 0 and self.iteration % self.update_objective_interval == 0:
                 self.update_objective()
             self.iteration += 1
-            self.update_indices()
+            self.update_previous_solution()
 
-    def update_indices(self):
-        '''Update the indices of DataContainerWithHistory
+    def update_previous_solution(self):
+        '''Update the previous solution with the current one
         
-        The concrete algorithm needs to call update_indices for the DataContainerWithHistory that exists:
-        if only one DataContainerWithHistory exists with name self._x, then you need to 
+        The concrete algorithm calls update_previous_solution. Normally this would 
+        entail the swapping of pointers:
 
-        self._x.update_indices()
+        tmp = self.x_old
+        self.x_old = self.x
+        self.x = tmp 
         '''
         pass
     def get_output(self):

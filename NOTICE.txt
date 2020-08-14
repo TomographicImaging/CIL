@@ -8,7 +8,7 @@ and other contributing institutions.
 
 Main contributors in alphabetical order:
 Evelina Ametova (UoM)
-Claire Delplanke (UoB)
+Claire Delplancke (UoB)
 Gemma Fardell (STFC)
 Jakob Jorgensen (DTU)
 Daniil Kazantsev (Diamond Light Source)

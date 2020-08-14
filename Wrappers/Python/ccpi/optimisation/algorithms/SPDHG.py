@@ -62,7 +62,8 @@ class SPDHG(Algorithm):
         [2]"Faster PET reconstruction with non-smooth priors by randomization and preconditioning",
         Matthias J Ehrhardt, Pawel Markiewicz and Carola-Bibiane Schönlieb,
         Physics in Medicine & Biology, Volume 64, Number 22, 2019.
-        
+    
+    Example of usage: See https://github.com/vais-ral/CIL-Demos/blob/master/Tomography/Simulated/Single%20Channel/PDHG_vs_SPDHG.py
         
     '''
     def __init__(self, f=None, g=None, operator=None, tau=None, sigma=None,

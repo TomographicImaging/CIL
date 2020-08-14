@@ -16,6 +16,7 @@ test:
     - packaging
     - tomophantom
     - ccpi-plugins
+    - ccpi-astra # [ unix ] 
 
   source_files:
     - ./Wrappers/Python/test # [win]

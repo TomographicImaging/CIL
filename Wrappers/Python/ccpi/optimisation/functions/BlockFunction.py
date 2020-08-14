@@ -184,7 +184,10 @@ class BlockFunction(Function):
                 for i in range(self.length):
                     out[i] = self.functions[i].proximal_conjugate(x.get_item(i), tau.get_item(i))
             
-            return BlockDataContainer(*out)       
+            return BlockDataContainer(*out)
+        
+    def __getitem__(self, row):
+        return self.functions[row]
                             
     
     

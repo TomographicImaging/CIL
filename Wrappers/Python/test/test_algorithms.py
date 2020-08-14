@@ -19,6 +19,7 @@ from __future__ import division
 
 import unittest
 import numpy
+import numpy as np
 from ccpi.framework import DataContainer
 from ccpi.framework import ImageData
 from ccpi.framework import AcquisitionData
@@ -38,6 +39,14 @@ from ccpi.optimisation.operators import Gradient, BlockOperator, FiniteDiff
 from ccpi.optimisation.functions import MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler                     
 from ccpi.framework import TestData
 import os ,sys
+
+
+try:
+    from ccpi.astra.operators import AstraProjectorSimple
+    astra_not_available = False    
+except ImportError as ie:
+    # skip test
+    astra_not_available = True
 
 class TestAlgorithms(unittest.TestCase):
     def setUp(self):
@@ -161,48 +170,6 @@ class TestAlgorithms(unittest.TestCase):
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
     
-    def test_SIRT(self):
-        print ("Test CGLS")
-        #ig = ImageGeometry(124,153,154)
-        ig = ImageGeometry(10,2)
-        numpy.random.seed(2)
-        x_init = ig.allocate(0.)
-        b = ig.allocate('random')
-        # b = x_init.copy()
-        # fill with random numbers
-        # b.fill(numpy.random.random(x_init.shape))
-        # b = ig.allocate()
-        # bdata = numpy.reshape(numpy.asarray([i for i in range(20)]), (2,10))
-        # b.fill(bdata)
-        identity = Identity(ig)
-        
-        alg = SIRT(x_init=x_init, operator=identity, data=b)
-        alg.max_iteration = 200
-        alg.run(20, verbose=True)
-        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-        
-        alg2 = SIRT(x_init=x_init, operator=identity, data=b, upper=0.3)
-        alg2.max_iteration = 200
-        alg2.run(20, verbose=True)
-        # equal 
-        try:
-            numpy.testing.assert_equal(alg2.get_output().max(), 0.3)
-            print ("Equal OK, returning")
-            return
-        except AssertionError as ae:
-            print ("Not equal, trying almost equal")
-        # almost equal to 7 digits or less
-        try:
-            numpy.testing.assert_almost_equal(alg2.get_output().max(), 0.3)
-            print ("Almost Equal OK, returning")
-            return
-        except AssertionError as ae:
-            print ("Not almost equal, trying less")
-        numpy.testing.assert_array_less(alg2.get_output().max(), 0.3)
-
-        # self.assertLessEqual(alg2.get_output().max(), 0.3)
-	# maybe we could add a test to compare alg.get_output() when < upper bound is 
-	# the same as alg2.get_output() and otherwise 0.3
         
     def test_FISTA(self):
         print ("Test FISTA")
@@ -456,8 +423,428 @@ class TestAlgorithms(unittest.TestCase):
             res = False
             print(err)
         self.assertTrue(res)
+
+class TestSIRT(unittest.TestCase):
+    def test_SIRT(self):
+        print ("Test CGLS")
+        #ig = ImageGeometry(124,153,154)
+        ig = ImageGeometry(10,2)
+        numpy.random.seed(2)
+        x_init = ig.allocate(0.)
+        b = ig.allocate('random')
+        # b = x_init.copy()
+        # fill with random numbers
+        # b.fill(numpy.random.random(x_init.shape))
+        # b = ig.allocate()
+        # bdata = numpy.reshape(numpy.asarray([i for i in range(20)]), (2,10))
+        # b.fill(bdata)
+        identity = Identity(ig)
         
+        alg = SIRT(x_init=x_init, operator=identity, data=b)
+        alg.max_iteration = 200
+        alg.run(20, verbose=True)
+        np.testing.assert_array_almost_equal(alg.x.as_array(), b.as_array())
+        
+        alg2 = SIRT(x_init=x_init, operator=identity, data=b, upper=0.3)
+        alg2.max_iteration = 200
+        alg2.run(20, verbose=True)
+        # equal 
+        try:
+            numpy.testing.assert_equal(alg2.get_output().max(), 0.3)
+            print ("Equal OK, returning")
+            return
+        except AssertionError as ae:
+            print ("Not equal, trying almost equal")
+        # almost equal to 7 digits or less
+        try:
+            numpy.testing.assert_almost_equal(alg2.get_output().max(), 0.3)
+            print ("Almost Equal OK, returning")
+            return
+        except AssertionError as ae:
+            print ("Not almost equal, trying less")
+        numpy.testing.assert_array_less(alg2.get_output().max(), 0.3)
+
+        # self.assertLessEqual(alg2.get_output().max(), 0.3)
+	# maybe we could add a test to compare alg.get_output() when < upper bound is 
+	# the same as alg2.get_output() and otherwise 0.3
     
+class TestSPDHG(unittest.TestCase):
+
+    @unittest.skipIf(astra_not_available, "ccpi-astra not available")
+    def test_SPDHG_vs_PDHG_implicit(self):
+        from ccpi.astra.operators import AstraProjectorSimple
+        from ccpi.framework import BlockDataContainer, AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
+        from ccpi.optimisation.operators import BlockOperator, Gradient
+        from ccpi.optimisation.functions import BlockFunction, KullbackLeibler, MixedL21Norm, IndicatorBox
+        from ccpi.optimisation.algorithms import SPDHG, PDHG
+        # Fast Gradient Projection algorithm for Total Variation(TV)
+        from ccpi.optimisation.functions import TotalVariation
+        loader = TestData()
+        data = loader.load(TestData.SIMPLE_PHANTOM_2D, size=(128,128))
+        print ("here")
+        ig = data.geometry
+        ig.voxel_size_x = 0.1
+        ig.voxel_size_y = 0.1
+            
+        detectors = ig.shape[0]
+        angles = np.linspace(0, np.pi, 180)
+        ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1)
+        # Select device
+        dev = 'gpu'
+
+        Aop = AstraProjectorSimple(ig, ag, dev)
+        
+        sin = Aop.direct(data)
+        # Create noisy data. Apply Gaussian noise
+        noises = ['gaussian', 'poisson']
+        noise = noises[1]
+        if noise == 'poisson':
+            np.random.seed(10)
+            scale = 5
+            eta = 0
+            noisy_data = AcquisitionData(np.random.poisson( scale * (eta + sin.as_array()))/scale, ag)
+        elif noise == 'gaussian':
+            np.random.seed(10)
+            n1 = np.random.normal(0, 0.1, size = ag.shape)
+            noisy_data = AcquisitionData(n1 + sin.as_array(), ag)
+            
+        else:
+            raise ValueError('Unsupported Noise ', noise)
+        
+        # Create BlockOperator
+        operator = Aop 
+        f = KullbackLeibler(b=noisy_data)        
+        alpha = 0.5
+        g =  TotalVariation(alpha, 50, 1e-4, lower=0)   
+        normK = operator.norm()
+        sigma = 1/normK
+        tau = 1/normK
+            
+        # Setup and run the PDHG algorithm
+        pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
+        pdhg.max_iteration = 1000
+        pdhg.update_objective_interval = 200
+
+        #%% 'implicit' PDHG, preconditioned step-sizes
+        tau_tmp = 1
+        sigma_tmp = 1
+        tau = sigma_tmp / operator.adjoint(tau_tmp * operator.range_geometry().allocate(1.))
+        sigma = tau_tmp / operator.direct(sigma_tmp * operator.domain_geometry().allocate(1.))
+        x_init = operator.domain_geometry().allocate()
+
+        # Setup and run the PDHG algorithm
+        pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
+        pdhg.max_iteration = 1000
+        pdhg.update_objective_interval = 200
+        pdhg.run(1000, very_verbose = True)
+
+        subsets = 10
+        size_of_subsets = int(len(angles)/subsets)
+        # take angles and create uniform subsets in uniform+sequential setting
+        list_angles = [angles[i:i+size_of_subsets] for i in range(0, len(angles), size_of_subsets)]
+        # create acquisitioin geometries for each the interval of splitting angles
+        list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1) 
+                        for i in range(len(list_angles))]
+        # create with operators as many as the subsets
+        A = BlockOperator(*[AstraProjectorSimple(ig, list_geoms[i], dev) for i in range(subsets)])
+        ## number of subsets
+        #(sub2ind, ind2sub) = divide_1Darray_equally(range(len(A)), subsets)
+        #
+        ## acquisisiton data
+        g = BlockDataContainer(*[AcquisitionData(noisy_data.as_array()[i:i+size_of_subsets,:])
+                                    for i in range(0, len(angles), size_of_subsets)])
+        alpha = 0.5
+        ## block function
+        F = BlockFunction(*[KullbackLeibler(b=g[i]) for i in range(subsets)]) 
+        G = TotalVariation(alpha, 50, 1e-4, lower=0) 
+
+        prob = [1/len(A)]*len(A)
+        spdhg = SPDHG(f=F,g=G,operator=A, 
+                    max_iteration = 1000,
+                    update_objective_interval=200, prob = prob)
+        spdhg.run(1000, very_verbose = True)
+        from ccpi.utilities.quality_measures import mae, mse, psnr
+        qm = (mae(spdhg.get_output(), pdhg.get_output()),
+            mse(spdhg.get_output(), pdhg.get_output()),
+            psnr(spdhg.get_output(), pdhg.get_output())
+            )
+        print ("Quality measures", qm)
+         
+        np.testing.assert_almost_equal( mae(spdhg.get_output(), pdhg.get_output()), 
+                                            0.0028578834608197212, decimal=3)
+        np.testing.assert_almost_equal( mse(spdhg.get_output(), pdhg.get_output()), 
+                                            3.885594196617603e-05, decimal=3)
+
+    @unittest.skipIf(astra_not_available, "ccpi-astra not available")
+    def test_SPDHG_vs_PDHG_explicit(self):
+        from ccpi.astra.operators import AstraProjectorSimple
+        from ccpi.framework import BlockDataContainer, AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
+        from ccpi.optimisation.operators import BlockOperator, Gradient
+        from ccpi.optimisation.functions import BlockFunction, KullbackLeibler, MixedL21Norm, IndicatorBox
+        from ccpi.optimisation.algorithms import SPDHG, PDHG
+        loader = TestData()
+        data = loader.load(TestData.SIMPLE_PHANTOM_2D, size=(128,128))
+        print ("here")
+        ig = data.geometry
+        ig.voxel_size_x = 0.1
+        ig.voxel_size_y = 0.1
+            
+        detectors = ig.shape[0]
+        angles = np.linspace(0, np.pi, 180)
+        ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1)
+        # Select device
+        dev = 'gpu'
+
+        Aop = AstraProjectorSimple(ig, ag, dev)
+        
+        sin = Aop.direct(data)
+        # Create noisy data. Apply Gaussian noise
+        noises = ['gaussian', 'poisson']
+        noise = noises[1]
+        if noise == 'poisson':
+            np.random.seed(10)
+            scale = 5
+            eta = 0
+            noisy_data = AcquisitionData(np.random.poisson( scale * (eta + sin.as_array()))/scale, ag)
+        elif noise == 'gaussian':
+            np.random.seed(10)
+            n1 = np.random.normal(0, 0.1, size = ag.shape)
+            noisy_data = AcquisitionData(n1 + sin.as_array(), ag)
+            
+        else:
+            raise ValueError('Unsupported Noise ', noise)
+        
+        #%% 'explicit' SPDHG, scalar step-sizes
+        subsets = 10
+        size_of_subsets = int(len(angles)/subsets)
+        # create Gradient operator
+        op1 = Gradient(ig)
+        # take angles and create uniform subsets in uniform+sequential setting
+        list_angles = [angles[i:i+size_of_subsets] for i in range(0, len(angles), size_of_subsets)]
+        # create acquisitioin geometries for each the interval of splitting angles
+        list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1) 
+        for i in range(len(list_angles))]
+        # create with operators as many as the subsets
+        A = BlockOperator(*[AstraProjectorSimple(ig, list_geoms[i], dev) for i in range(subsets)] + [op1])
+        ## number of subsets
+        #(sub2ind, ind2sub) = divide_1Darray_equally(range(len(A)), subsets)
+        #
+        ## acquisisiton data
+        g = BlockDataContainer(*[AcquisitionData(noisy_data.as_array()[i:i+size_of_subsets,:]) for i in range(0, len(angles), size_of_subsets)])
+        alpha = 0.5
+        ## block function
+        F = BlockFunction(*[*[KullbackLeibler(b=g[i]) for i in range(subsets)] + [alpha * MixedL21Norm()]]) 
+        G = IndicatorBox(lower=0)
+        print ("here")
+        prob = [1/(2*subsets)]*(len(A)-1) + [1/2]
+        spdhg = SPDHG(f=F,g=G,operator=A, 
+                    max_iteration = 1000,
+                    update_objective_interval=200, prob = prob)
+        spdhg.run(1000, very_verbose = True)
+
+        #%% 'explicit' PDHG, scalar step-sizes
+        op1 = Gradient(ig)
+        op2 = Aop
+        # Create BlockOperator
+        operator = BlockOperator(op1, op2, shape=(2,1) ) 
+        f2 = KullbackLeibler(b=noisy_data)  
+        g =  IndicatorBox(lower=0)    
+        normK = operator.norm()
+        sigma = 1/normK
+        tau = 1/normK
+            
+        f1 = alpha * MixedL21Norm() 
+        f = BlockFunction(f1, f2)   
+        # Setup and run the PDHG algorithm
+        pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
+        pdhg.max_iteration = 1000
+        pdhg.update_objective_interval = 200
+        pdhg.run(1000, very_verbose = True)
+
+        #%% show diff between PDHG and SPDHG
+        # plt.imshow(spdhg.get_output().as_array() -pdhg.get_output().as_array())
+        # plt.colorbar()
+        # plt.show()
+
+        from ccpi.utilities.quality_measures import mae, mse, psnr
+        qm = (mae(spdhg.get_output(), pdhg.get_output()),
+            mse(spdhg.get_output(), pdhg.get_output()),
+            psnr(spdhg.get_output(), pdhg.get_output())
+            )
+        print ("Quality measures", qm)
+        np.testing.assert_almost_equal( mae(spdhg.get_output(), pdhg.get_output()),
+         0.0015075773699209094 , decimal=3)
+        np.testing.assert_almost_equal( mse(spdhg.get_output(), pdhg.get_output()), 
+        1.6859006791491993e-05, decimal=3)
+    
+    @unittest.skipIf(astra_not_available, "ccpi-astra not available")
+    def test_SPDHG_vs_SPDHG_explicit_axpby(self):
+        from ccpi.astra.operators import AstraProjectorSimple
+        from ccpi.framework import BlockDataContainer, AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
+        from ccpi.optimisation.operators import BlockOperator, Gradient
+        from ccpi.optimisation.functions import BlockFunction, KullbackLeibler, MixedL21Norm, IndicatorBox
+        from ccpi.optimisation.algorithms import SPDHG, PDHG
+        loader = TestData()
+        data = loader.load(TestData.SIMPLE_PHANTOM_2D, size=(128,128))
+        print ("test_SPDHG_vs_SPDHG_explicit_axpby here")
+        ig = data.geometry
+        ig.voxel_size_x = 0.1
+        ig.voxel_size_y = 0.1
+            
+        detectors = ig.shape[0]
+        angles = np.linspace(0, np.pi, 180)
+        ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1)
+        # Select device
+        # device = input('Available device: GPU==1 / CPU==0 ')
+        # if device=='1':
+        #     dev = 'gpu'
+        # else:
+        #     dev = 'cpu'
+        dev = 'gpu'
+
+        Aop = AstraProjectorSimple(ig, ag, dev)
+        
+        sin = Aop.direct(data)
+        # Create noisy data. Apply Gaussian noise
+        noises = ['gaussian', 'poisson']
+        noise = noises[1]
+        if noise == 'poisson':
+            np.random.seed(10)
+            scale = 5
+            eta = 0
+            noisy_data = AcquisitionData(np.random.poisson( scale * (eta + sin.as_array()))/scale, ag)
+        elif noise == 'gaussian':
+            np.random.seed(10)
+            n1 = np.random.normal(0, 0.1, size = ag.shape)
+            noisy_data = AcquisitionData(n1 + sin.as_array(), ag)
+            
+        else:
+            raise ValueError('Unsupported Noise ', noise)
+        
+        #%% 'explicit' SPDHG, scalar step-sizes
+        subsets = 10
+        size_of_subsets = int(len(angles)/subsets)
+        # create Gradient operator
+        op1 = Gradient(ig)
+        # take angles and create uniform subsets in uniform+sequential setting
+        list_angles = [angles[i:i+size_of_subsets] for i in range(0, len(angles), size_of_subsets)]
+        # create acquisitioin geometries for each the interval of splitting angles
+        list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1) 
+        for i in range(len(list_angles))]
+        # create with operators as many as the subsets
+        A = BlockOperator(*[AstraProjectorSimple(ig, list_geoms[i], dev) for i in range(subsets)] + [op1])
+        ## number of subsets
+        #(sub2ind, ind2sub) = divide_1Darray_equally(range(len(A)), subsets)
+        #
+        ## acquisisiton data
+        g = BlockDataContainer(*[AcquisitionData(noisy_data.as_array()[i:i+size_of_subsets,:]) for i in range(0, len(angles), size_of_subsets)])
+        alpha = 0.5
+        ## block function
+        F = BlockFunction(*[*[KullbackLeibler(b=g[i]) for i in range(subsets)] + [alpha * MixedL21Norm()]]) 
+        G = IndicatorBox(lower=0)
+        print ("here")
+        prob = [1/(2*subsets)]*(len(A)-1) + [1/2]
+        algos = []
+        algos.append( SPDHG(f=F,g=G,operator=A, 
+                    max_iteration = 1000,
+                    update_objective_interval=200, prob = prob.copy(), use_axpby=True)
+        )
+        algos[0].run(1000, very_verbose = True)
+
+        algos.append( SPDHG(f=F,g=G,operator=A, 
+                    max_iteration = 1000,
+                    update_objective_interval=200, prob = prob.copy(), use_axpby=False)
+        )
+        algos[1].run(1000, very_verbose = True)
+        
+
+        # np.testing.assert_array_almost_equal(algos[0].get_output().as_array(), algos[1].get_output().as_array())
+        from ccpi.utilities.quality_measures import mae, mse, psnr
+        qm = (mae(algos[0].get_output(), algos[1].get_output()),
+            mse(algos[0].get_output(), algos[1].get_output()),
+            psnr(algos[0].get_output(), algos[1].get_output())
+            )
+        print ("Quality measures", qm)
+        assert qm[0] < 0.005
+        assert qm[1] < 3.e-05
+
+    
+    
+    @unittest.skipIf(astra_not_available, "ccpi-astra not available")
+    def test_PDHG_vs_PDHG_explicit_axpby(self):
+        from ccpi.astra.operators import AstraProjectorSimple
+        from ccpi.framework import BlockDataContainer, AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
+        from ccpi.optimisation.operators import BlockOperator, Gradient
+        from ccpi.optimisation.functions import BlockFunction, KullbackLeibler, MixedL21Norm, IndicatorBox
+        from ccpi.optimisation.algorithms import PDHG
+        loader = TestData()
+        data = loader.load(TestData.SIMPLE_PHANTOM_2D, size=(128,128))
+        print ("test_PDHG_vs_PDHG_explicit_axpby here")
+        ig = data.geometry
+        ig.voxel_size_x = 0.1
+        ig.voxel_size_y = 0.1
+            
+        detectors = ig.shape[0]
+        angles = np.linspace(0, np.pi, 180)
+        ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1)
+        
+        dev = 'gpu'
+
+        Aop = AstraProjectorSimple(ig, ag, dev)
+        
+        sin = Aop.direct(data)
+        # Create noisy data. Apply Gaussian noise
+        noises = ['gaussian', 'poisson']
+        noise = noises[1]
+        if noise == 'poisson':
+            np.random.seed(10)
+            scale = 5
+            eta = 0
+            noisy_data = AcquisitionData(np.random.poisson( scale * (eta + sin.as_array()))/scale, ag)
+        elif noise == 'gaussian':
+            np.random.seed(10)
+            n1 = np.random.normal(0, 0.1, size = ag.shape)
+            noisy_data = AcquisitionData(n1 + sin.as_array(), ag)
+            
+        else:
+            raise ValueError('Unsupported Noise ', noise)
+        alpha = 0.5
+        op1 = Gradient(ig)
+        op2 = Aop
+        # Create BlockOperator
+        operator = BlockOperator(op1, op2, shape=(2,1) ) 
+        f2 = KullbackLeibler(b=noisy_data)  
+        g =  IndicatorBox(lower=0)    
+        normK = operator.norm()
+        sigma = 1/normK
+        tau = 1/normK
+            
+        f1 = alpha * MixedL21Norm() 
+        f = BlockFunction(f1, f2)   
+        # Setup and run the PDHG algorithm
+        
+        algos = []
+        algos.append( PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma,  
+                    max_iteration = 1000,
+                    update_objective_interval=200, use_axpby=True)
+        )
+        algos[0].run(1000, very_verbose = True)
+
+        algos.append( PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma,  
+                    max_iteration = 1000,
+                    update_objective_interval=200, use_axpby=False)
+        )
+        algos[1].run(1000, very_verbose = True)
+        
+
+        from ccpi.utilities.quality_measures import mae, mse, psnr
+        qm = (mae(algos[0].get_output(), algos[1].get_output()),
+            mse(algos[0].get_output(), algos[1].get_output()),
+            psnr(algos[0].get_output(), algos[1].get_output())
+            )
+        print ("Quality measures", qm)
+        np.testing.assert_array_less( qm[0], 0.005 )
+        np.testing.assert_array_less( qm[1], 3.e-05)
         
 
 

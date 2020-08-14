@@ -604,6 +604,10 @@ class BlockDataContainer(object):
         tmp = [ self.containers[i].dot(other.containers[i]) for i in range(self.shape[0])]
         return sum(tmp)
     
+    def __len__(self):
+        
+        return self.shape[0]
+    
        
     
 if __name__ == '__main__':

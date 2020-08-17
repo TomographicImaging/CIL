@@ -16,6 +16,7 @@ test:
     - packaging
     - tomophantom
     - ccpi-plugins
+    - ccpi-astra # [ unix ] 
 
   source_files:
     - ./Wrappers/Python/test # [win]
@@ -45,6 +46,8 @@ requirements:
     - pillow
     - libgcc-ng # [linux]
     - openmp # [osx]
+    - dxchange
+    - olefile >=0.46
   
 about:
   home: http://www.ccpi.ac.uk

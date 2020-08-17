@@ -19,3 +19,4 @@
 from .NEXUSDataReader import NEXUSDataReader
 from .NEXUSDataWriter import NEXUSDataWriter
 from .NikonDataReader import NikonDataReader
+from .TXRMDataReader import TXRMDataReader

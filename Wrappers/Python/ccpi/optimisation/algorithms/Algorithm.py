@@ -24,7 +24,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 import time, functools
-from numbers import Integral
+from numbers import Integral, Number
+import logging
 
 class Algorithm(object):
     '''Base class for iterative algorithms
@@ -55,6 +56,8 @@ class Algorithm(object):
                                        and so forth. This is by default 1 and should be increased\
                                        when evaluating the objective is computationally expensive.
         :type update_objective_interval: int, optional, default 1
+        :param log_file: log verbose output to file
+        :type log_file: str, optional, default None
         '''
         self.iteration = 0
         self.__max_iteration = kwargs.get('max_iteration', 0)
@@ -64,8 +67,11 @@ class Algorithm(object):
         self.timing = []
         self._iteration = []
         self.update_objective_interval = kwargs.get('update_objective_interval', 1)
-        self.x = None
+        # self.x = None
         self.iter_string = 'Iter'
+        self.logger = None
+        self.__set_up_logger(kwargs.get('log_file', None))
+
     def set_up(self, *args, **kwargs):
         '''Set up the algorithm'''
         raise NotImplementedError()
@@ -78,6 +84,15 @@ class Algorithm(object):
         
         The user can change this in concrete implementatition of iterative algorithms.'''
         return self.max_iteration_stop_cryterion()
+    
+    def __set_up_logger(self, fname):
+        """Set up the logger if desired"""
+        if fname:
+            print("Will output results to: " +  fname)
+            handler = logging.FileHandler(fname)
+            self.logger = logging.getLogger("obj_fn")
+            self.logger.setLevel(logging.INFO)
+            self.logger.addHandler(handler)
     
     def max_iteration_stop_cryterion(self):
         '''default stop cryterion for iterative algorithm: max_iteration reached'''
@@ -109,7 +124,19 @@ class Algorithm(object):
             if self.iteration > 0 and self.iteration % self.update_objective_interval == 0:
                 self.update_objective()
             self.iteration += 1
+            self.update_previous_solution()
+
+    def update_previous_solution(self):
+        '''Update the previous solution with the current one
         
+        The concrete algorithm calls update_previous_solution. Normally this would 
+        entail the swapping of pointers:
+
+        tmp = self.x_old
+        self.x_old = self.x
+        self.x = tmp 
+        '''
+        pass
     def get_output(self):
         '''Returns the solution found'''
         return self.x
@@ -217,9 +244,17 @@ class Algorithm(object):
             if (very_verbose):
                 bars = ['-' for i in range(start+9+10+13+13+13+15)]
             # print a nice ---- with proper length at the end
-            print (functools.reduce(lambda x,y: x+y, bars, ''))
-            print (self.verbose_output(very_verbose))
-            print ("Stop criterion has been reached.")
+            # print (functools.reduce(lambda x,y: x+y, bars, ''))
+            out = "{}\n{}\n{}\n".format(functools.reduce(lambda x,y: x+y, bars, '') ,
+                                        self.verbose_output(very_verbose),
+                                        "Stop criterion has been reached.")
+            print (out)
+            # print (self.verbose_output(very_verbose))
+            # print ("Stop criterion has been reached.")
+            # Print to log file if desired
+            if self.logger:
+                self.logger.info(out)
+
         
 
     def verbose_output(self, verbose=False):
@@ -236,6 +271,9 @@ class Algorithm(object):
                  "{:.3f}".format(t), 
                  self.objective_to_string(verbose)
                )
+        # Print to log file if desired
+        if self.logger:
+            self.logger.info(out)
         return out
 
     def objective_to_string(self, verbose=False):
@@ -269,4 +307,8 @@ class Algorithm(object):
                                                       '',
                                                       '[s]',
                                                       '')
+        # Print to log file if desired
+        if self.logger:
+            self.logger.info(out)
+
         return out

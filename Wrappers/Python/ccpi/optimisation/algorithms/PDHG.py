@@ -108,6 +108,10 @@ class PDHG(Algorithm):
         
         self.x = operator.domain_geometry().allocate(0)
         self.x_old = operator.domain_geometry().allocate(0)
+
+        if not x_init is None:
+            self.x.fill(x_init)
+            self.x_old.fill(x_init)
         
         self.y = self.operator.range_geometry().allocate(0)
         self.y_old = self.operator.range_geometry().allocate(0)

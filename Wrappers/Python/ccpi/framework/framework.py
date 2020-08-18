@@ -66,7 +66,6 @@ def message(cls, msg, *args):
     
     return msg.format(*args )
 
-
 class ImageGeometry(object):
     RANDOM = 'random'
     RANDOM_INT = 'random_int'
@@ -326,7 +325,13 @@ class Detector1D(PositionVector):
         self.length_check(val)
         self.__direction_row = ComponentDescription.CreateUnitVector(val)
 
-class Detector2D(Detector1D):
+class Detector2D(PositionVector):
+    @property
+    def direction_row(self):
+        try:
+            return self.__direction_row
+        except:
+            raise AttributeError
 
     @direction_row.setter
     def direction_row(self, val):
@@ -415,7 +420,10 @@ class SystemConfiguration(object):
         else:
             self.detector = Detector2D(dof)
             self.rotation_axis = PositionDirectionVector(dof)
-                
+    
+    def __str__(self):
+        raise NotImplementedError
+
     def set_origin(self):
         raise NotImplementedError
 
@@ -494,6 +502,17 @@ class Parallel2D(SystemConfiguration):
         self.detector.position -= self.rotation_axis.position
         self.rotation_axis.position = [0,0]
 
+    def __str__(self):
+        def csv(val):
+            return numpy.array2string(val, separator=', ')
+        
+        repres = "2D Parallel-beam tomography\n"
+        repres += "System configuration:\n"
+        repres += "\tRay direction: {0}\n".format(csv(self.ray.direction))
+        repres += "\tRotation axis position: {0}\n".format(csv(self.rotation_axis.position))
+        repres += "\tDetector position: {0}\n".format(csv(self.detector.position))
+        repres += "\tDetector row direction: {0}\n".format(csv(self.detector.direction_row))
+        return repres
 
 class Parallel3D(SystemConfiguration):
     r'''This class creates the SystemConfiguration of a parallel beam 3D tomographic system
@@ -547,6 +566,20 @@ class Parallel3D(SystemConfiguration):
         self.detector.position = rotation_matrix.dot(det_pos.reshape(3,1))
         self.detector.direction_row = rotation_matrix.dot(self.detector.direction_row.reshape(3,1))
         self.detector.direction_col = rotation_matrix.dot(self.detector.direction_col.reshape(3,1))
+
+    def __str__(self):
+        def csv(val):
+            return numpy.array2string(val, separator=', ')
+
+        repres = "3D Parallel-beam tomography\n"
+        repres += "System configuration:\n"
+        repres += "\tRay direction: {0}\n".format(csv(self.ray.direction))
+        repres += "\tRotation axis position: {0}\n".format(csv(self.rotation_axis.position))
+        repres += "\tRotation axis direction: {0}\n".format(csv(self.rotation_axis.direction))
+        repres += "\tDetector position: {0}\n".format(csv(self.detector.position))
+        repres += "\tDetector row direction: {0}\n".format(csv(self.detector.direction_row))
+        repres += "\tDetector column direction: {0}\n".format(csv(self.detector.direction_col))    
+        return repres
 
     def centre_sice(self):
         """Returns the 2D system configuration corersponding to the centre slice
@@ -603,7 +636,18 @@ class Cone2D(SystemConfiguration):
         self.source.position -= self.rotation_axis.position
         self.detector.position -= self.rotation_axis.position
         self.rotation_axis.position = [0,0]
-    
+
+    def __str__(self):
+        def csv(val):
+            return numpy.array2string(val, separator=', ')
+
+        repres = "2D Cone-beam tomography\n"
+        repres += "System configuration:\n"
+        repres += "\tSource position: {0}\n".format(csv(self.source.position))
+        repres += "\tRotation axis position: {0}\n".format(csv(self.rotation_axis.position))
+        repres += "\tDetector position: {0}\n".format(csv(self.detector.position))
+        repres += "\tDetector row direction: {0}\n".format(csv(self.detector.direction_row)) 
+        return repres    
 
 class Cone3D(SystemConfiguration):
     r'''This class creates the SystemConfiguration of a cone beam 3D tomographic system
@@ -679,6 +723,20 @@ class Cone3D(SystemConfiguration):
             return Cone2D(source_position, detector_position, detector_direction_row, rotation_axis_position)
         else:
             raise Warning("Cannot convert geometry to 2D")
+
+    def __str__(self):
+        def csv(val):
+            return numpy.array2string(val, separator=', ')
+
+        repres = "3D Cone-beam tomography\n"
+        repres += "System configuration:\n"
+        repres += "\tSource position: {0}\n".format(csv(self.source.position))
+        repres += "\tRotation axis position: {0}\n".format(csv(self.rotation_axis.position))
+        repres += "\tRotation axis direction: {0}\n".format(csv(self.rotation_axis.direction))
+        repres += "\tDetector position: {0}\n".format(csv(self.detector.position))
+        repres += "\tDetector row direction: {0}\n".format(csv(self.detector.direction_row))
+        repres += "\tDetector column direction: {0}\n".format(csv(self.detector.direction_col))
+        return repres   
 
 class Panel(object):
     r'''This is a class describing the panel of the system. 
@@ -760,6 +818,12 @@ class Panel(object):
 
         self.__pixel_size = pixel_size_temp
 
+    def __str__(self):
+        repres = "Panel configuration:\n"             
+        repres += "\tNumber of pixels: {0}\n".format(self.num_pixels)
+        repres += "\tPixel size: {0}\n".format(self.pixel_size)
+        return repres   
+
     def __init__ (self, num_pixels, pixel_size, dimension):  
         """Constructor method
         """
@@ -804,6 +868,16 @@ class Channels(object):
             self.__channel_labels = val  
         else:
             raise ValueError('labels expected to have length {0}. Got {1}'.format(self.__num_channels, len(val)))
+
+    def __str__(self):
+        repres = "Channel configuration:\n"             
+        repres += "\tNumber of channels: {0}\n".format(self.num_channels)
+        
+        num_print=min(10,self.num_channels)                     
+        if  hasattr(self, 'channel_labels'):
+            repres += "\tChannel labels 0-{0}: {1}\n".format(num_print, self.channel_labels[0:num_print])
+            
+        return repres
 
     def __init__ (self, num_channels, channel_labels):  
         """Constructor method
@@ -862,6 +936,12 @@ class Angles(object):
         else:
             self.__angle_unit = val
 
+    def __str__(self):
+        repres = "Acquisition description:\n"
+        repres += "\tNumber of positions: {0}\n".format(self.num_positions)
+        repres += "\tAngles in {0}s:\n{1}\n".format(self.angle_unit, numpy.array2string(self.angle_data, separator=', ', edgeitems=10, threshold=60))
+        return repres   
+
     def __init__ (self, angles, initial_angle, angle_unit):  
         """Constructor method
         """
@@ -878,23 +958,28 @@ class Configuration(object):
         self.channels = Channels(1, None)
 
     def check_configuration(self):
-
+        configured = True
         if self.system is None:
             print("AG requires setup_ system configuration")
-            return False
+            configured = False
         
         if self.angles is None:
             print("AG requires setup_angles() ")
-            return False
+            configured = False
 
         if self.panel is None:
             print("AG requires setup_panel() ")
-            return False
+            configured = False
 
-        print("AG is configured")
         return True
 
-
+    def __str__(self):
+        if self.check_configuration():
+            repres = str(self.system)
+            repres += str(self.panel)
+            repres += str(self.channels)
+            repres += str(self.angles)
+        return repres
 
 class AcquisitionGeometry(object):
     r'''This class holds the AcquisitionGeometry of the system.
@@ -1186,51 +1271,7 @@ class AcquisitionGeometry(object):
         return AG_2D
 
     def __str__ (self):
-        def csv(val):
-            return numpy.array2string(val, separator=', ')
-
-        repres = ""
-        repres += "{0} {1}-beam tomography\n".format(self.dimension, self.geom_type)   
-        repres += "Panel description:\n"             
-        repres += "\tpanel size: h{0},v{1}\n".format(self.config.panel.num_pixels[0], self.config.panel.num_pixels[1])
-        repres += "\tpixel size: h{0},v{1}\n".format(self.config.panel.pixel_size[0], self.config.panel.pixel_size[1])
-        repres += "\tnumber of channels: {0}\n".format(self.config.channels.num_channels)
-        
-        num_print=min(10,self.config.channels.num_channels)                     
-        if  hasattr(self.config.channels, 'channel_labels'):
-            repres += "\tchannel labels 0-{0}: {1}\n".format(num_print, self.config.channels.channel_labels[0:num_print])
-
-        repres += "System configuration:\n"
-
-        if hasattr(self.config.system, 'source'):
-            repres += "\tsource position: {0}\n".format(
-                csv(self.config.system.source.position))
-        if hasattr(self.config.system, 'ray'):
-            repres += "\tray direction: {0}\n".format(
-                csv(self.config.system.ray.direction))
-        if hasattr(self.config.system.rotation_axis, 'position'):
-            repres += "\trotation axis position: {0}\n".format(
-                csv(self.config.system.rotation_axis.position))
-        if hasattr(self.config.system.rotation_axis, 'direction'):
-            repres += "\trotation axis direction: {0}\n".format(
-                csv(self.config.system.rotation_axis.direction))
-        if hasattr(self.config.system.detector, 'position'):
-            repres += "\tdetector position: {0}\n".format(
-                csv(self.config.system.detector.position))
-        if hasattr(self.config.system.detector, 'direction_col'):
-            repres += "\tdetector column direction : {0}\n".format(
-                csv(self.config.system.detector.direction_col))
-        if hasattr(self.config.system.detector, 'direction_row'):
-            repres += "\tdetector row direction: {0}\n".format(
-                self.config.system.detector.direction_row)
-        if hasattr(self.config.angles, 'initial_angle'):
-            repres += "\trotation axis initial angle: {0} {1}s\n".format(
-                self.config.angles.initial_angle, self.config.angles.angle_unit)
-        repres += "num_positions: {0}\n".format(self.config.angles.num_positions)
-        num_print=min(10,self.config.angles.num_positions)
-        repres += "angles 0-{0} in {1}s: {2}\n".format(num_print, self.config.angles.angle_unit, csv(self.config.angles.angle_data[0:num_print]))      
-      
-        return repres
+        return str(self.config)
         
     def allocate(self, value=0, dimension_labels=None, **kwargs):
         '''allocates an AcquisitionData according to the size expressed in the instance

@@ -905,11 +905,11 @@ class Angles(object):
     r'''This is a class describing the angles of the data. 
 
     :param angles: The angular positions of the acquisition data
-    :type num_channels: list, ndarray
+    :type angles: list, ndarray
     :param initial_angle: The angular offset of the object from the reference frame
-    :type channel_labels: float, optional
+    :type initial_angle: float, optional
     :param angle_unit: The units of the stored angles 'degree' or 'radian'
-    :type geom_type: string
+    :type angle_unit: string
      '''
 
     @property
@@ -983,12 +983,22 @@ class Configuration(object):
 
     @property
     def configured(self):
-        if self.system is None \
-            or self.angles is None \
-            or self.panel is None:
-            
+        if self.system is None:
+            print("Please configure AcquisitionGeometry using one of the following methods:\
+                    \n\tAcquisitionGeometry.Create_Parallel2D()\
+                    \n\tAcquisitionGeometry.Create_Cone3D()\
+                    \n\tAcquisitionGeometry.Create_Parallel2D()\
+                    \n\tAcquisitionGeometry.Create_Cone3D()")
             return False
-        return True
+
+        configured = True
+        if self.angles is None:
+            print("Please configure angular data using the set_angles() method")
+            configured = False
+        if self.panel is None:
+            print("Please configure the panel using the set_panel() method")
+            configured = False
+        return configured
 
     def __str__(self):
         if self.configured:
@@ -1223,48 +1233,147 @@ class AcquisitionGeometry(object):
             self.config.angles = Angles(angles, 0, kwargs.get(AcquisitionGeometry.ANGLE_UNIT, AcquisitionGeometry.DEGREE))
 
             if self.config.configured:
-                print("AcquisitionGeometry configured using decrecated method")
+                print("AcquisitionGeometry configured using deprecated method")
+
 
     def set_angles(self, angles, initial_angle=0, angle_unit='degree'):
+        r'''This method configures the angular information of an AcquisitionGeometry object. 
+
+        :param angles: The angular positions of the acquisition data
+        :type angles: list, ndarray
+        :param initial_angle: The angular offset of the object from the reference frame
+        :type initial_angle: float, optional
+        :param angle_unit: The units of the stored angles 'degree' or 'radian'
+        :type angle_unit: string
+        :return: returns a configured AcquisitionGeometry object
+        :rtype: AcquisitionGeometry        
+        '''
         self.config.angles = Angles(angles, initial_angle, angle_unit)
         return self
 
     def set_panel(self, num_pixels, pixel_size=(1,1)):
+        r'''This method configures the panel information of an AcquisitionGeometry object. 
+                    
+        :param num_pixels: num_pixels_h or (num_pixels_h, num_pixels_v) containing the number of pixels of the panel
+        :type num_pixels: int, list, tuple
+        :param pixel_size: pixel_size_h or (pixel_size_h, pixel_size_v) containing the size of the pixels of the panel
+        :type pixel_size: int, lust, tuple, optional
+        :return: returns a configured AcquisitionGeometry object
+        :rtype: AcquisitionGeometry       
+        '''        
         self.config.panel = Panel(num_pixels, pixel_size, self.config.system._dimension)
         return self
 
     def set_channels(self, num_channels=1, channel_labels=None):
+        r'''This method configures the channel information of an AcquisitionGeometry object. 
+                        
+        :param num_channels: The number of channels of data
+        :type num_channels: int, optional
+        :param channel_labels: A list of channel labels
+        :type channel_labels: list, optional
+        :return: returns a configured AcquisitionGeometry object
+        :rtype: AcquisitionGeometry        
+        '''        
         self.config.channels = Channels(num_channels, channel_labels)
         return self
 
     def set_labels(self, labels=None):
+        r'''This method configures the dimension labels of an AcquisitionGeometry object. 
+                        
+        :param labels:  The order of the dimensions describing the data.\
+                        Expects a list containing at least one of the unique labels: 'channel' 'angle' 'vertical' 'horizontal'
+                        default = ['channel','angle','vertical','horizontal']
+        :type labels: list, optional
+        :return: returns a configured AcquisitionGeometry object
+        :rtype: AcquisitionGeometry        
+        '''           
         self.dimension_labels = labels
         return self
  
     @staticmethod
-    def create_Parallel2D(ray_direction=[0,1], detector_position=[0,0], detector_direction_row=[1,0], rotation_axis_position=[0,0]):
-        AG = AcquisitionGeometry('deprecated', new_setup=True)
+    def create_Parallel2D(ray_direction=[0, 1], detector_position=[0, 0], detector_direction_row=[1, 0], rotation_axis_position=[0, 0]):
+        r'''This creates the AcquisitionGeometry for a parallel beam 2D tomographic system
+
+        :param ray_direction: A 2D unit vector describing the x-ray direction (x,y)
+        :type ray_direction: list, tuple, ndarray, optional
+        :param detector_position: A 2D vector describing the position of the centre of the detector (x,y)
+        :type detector_position: list, tuple, ndarray, optional
+        :param detector_direction_row: A 2D unit vector describing the direction of the pixels of the detector (x,y)
+        :type detector_direction_row: list, tuple, ndarray, optional
+        :param rotation_axis_position: A 2D vector describing the position of the axis of rotation (x,y)
+        :type rotation_axis_position: list, tuple, ndarray, optional
+        :return: returns a configured AcquisitionGeometry object
+        :rtype: AcquisitionGeometry
+        '''
+        AG = AcquisitionGeometry('', new_setup=True)
         AG.config = Configuration()
         AG.config.system = Parallel2D(ray_direction, detector_position, detector_direction_row, rotation_axis_position)
         return AG    
 
     @staticmethod
     def create_Cone2D(source_position, detector_position, detector_direction_row=[1,0], rotation_axis_position=[0,0]):
-        AG = AcquisitionGeometry('deprecated', new_setup=True)
+        r'''This creates the AcquisitionGeometry for a cone beam 2D tomographic system          
+
+        :param source_position: A 2D vector describing the position of the source (x,y)
+        :type source_position: list, tuple, ndarray
+        :param detector_position: A 2D vector describing the position of the centre of the detector (x,y)
+        :type detector_position: list, tuple, ndarray
+        :param detector_direction_row: A 2D unit vector describing the direction of the pixels of the detector (x,y)
+        :type detector_direction_row: list, tuple, ndarray, optional
+        :param rotation_axis_position: A 2D vector describing the position of the axis of rotation (x,y)
+        :type rotation_axis_position: list, tuple, ndarray, optional
+        :return: returns a configured AcquisitionGeometry object
+        :rtype: AcquisitionGeometry        
+     '''    
+        AG = AcquisitionGeometry('', new_setup=True)
         AG.config = Configuration()
         AG.config.system = Cone2D(source_position, detector_position, detector_direction_row, rotation_axis_position)
         return AG   
 
     @staticmethod
     def create_Parallel3D(ray_direction=[0,1,0], detector_position=[0,0,0], detector_direction_row=[1,0,0], detector_direction_col=[0,0,1], rotation_axis_position=[0,0,0], rotation_axis_direction=[0,0,1]):
-        AG = AcquisitionGeometry('deprecated', new_setup=True)
+        r'''This creates the AcquisitionGeometry for a parallel beam 3D tomographic system
+                       
+        :param ray_direction: A 3D unit vector describing the x-ray direction (x,y,z)
+        :type ray_direction: list, tuple, ndarray, optional
+        :param detector_position: A 3D vector describing the position of the centre of the detector (x,y,z)
+        :type detector_position: list, tuple, ndarray, optional
+        :param detector_direction_row: A 3D unit vector describing the direction of the pixels in the rows of the detector (x,y,z)
+        :type detector_direction_row: list, tuple, ndarray, optional
+        :param detector_direction_col: A 3D unit vector describing the direction of the pixels in the coloumns of the detector (x,y,z)
+        :type detector_direction_col: list, tuple, ndarray, optional  
+        :param rotation_axis_position: A 3D vector describing the position of the axis of rotation (x,y,z)
+        :type rotation_axis_position: list, tuple, ndarray, optional
+        :param rotation_axis_direction: A 3D unit vector describing the direction of the axis of rotation (x,y,z)
+        :type rotation_axis_direction: list, tuple, ndarray, optional     
+        :return: returns a configured AcquisitionGeometry object
+        :rtype: AcquisitionGeometry       
+     '''
+        AG = AcquisitionGeometry('', new_setup=True)
         AG.config = Configuration()
         AG.config.system = Parallel3D(ray_direction, detector_position, detector_direction_row, detector_direction_col, rotation_axis_position, rotation_axis_direction)
         return AG            
 
     @staticmethod
     def create_Cone3D(source_position, detector_position, detector_direction_row=[1,0,0], detector_direction_col=[0,0,1], rotation_axis_position=[0,0,0], rotation_axis_direction=[0,0,1]):
-        AG = AcquisitionGeometry('deprecated',  new_setup=True)
+        r'''This creates the AcquisitionGeometry for a cone beam 3D tomographic system
+                        
+        :param source_position: A 3D vector describing the position of the source (x,y,z)
+        :type source_position: list, tuple, ndarray, optional
+        :param detector_position: A 3D vector describing the position of the centre of the detector (x,y,z)
+        :type detector_position: list, tuple, ndarray, optional
+        :param detector_direction_row: A 3D unit vector describing the direction of the pixels in the rows of the detector (x,y,z)
+        :type detector_direction_row: list, tuple, ndarray, optional
+        :param detector_direction_col: A 3D unit vector describing the direction of the pixels in the coloumns of the detector (x,y,z)
+        :type detector_direction_col: list, tuple, ndarray , optional  
+        :param rotation_axis_position: A 3D vector describing the position of the axis of rotation (x,y,z)
+        :type rotation_axis_position: list, tuple, ndarray, optional
+        :param rotation_axis_direction: A 3D unit vector describing the direction of the axis of rotation (x,y,z)
+        :type rotation_axis_direction: list, tuple, ndarray, optional
+        :return: returns a configured AcquisitionGeometry object
+        :rtype: AcquisitionGeometry           
+        '''
+        AG = AcquisitionGeometry('',  new_setup=True)
         AG.config = Configuration()
         AG.config.system = Cone3D(source_position, detector_position, detector_direction_row, detector_direction_col, rotation_axis_position, rotation_axis_direction)
         return AG          

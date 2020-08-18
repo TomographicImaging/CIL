@@ -251,7 +251,7 @@ class ImageGeometry(object):
     #    return self.shape
 
 class ComponentDescription(object):
-    r'''This class enables the creation of the position and direction vectors describing the components of a tomography system
+    r'''This class enables the creation of vectors and unit vectors used to describe the components of a tomography system
      '''
     def __init__ (self, dof):
         self.__dof = dof
@@ -281,7 +281,8 @@ class ComponentDescription(object):
             raise ValueError("Vectors for {0}D geometries must have length = {0}. Got {1}".format(self.__dof,val))
 
 class PositionVector(ComponentDescription):
-
+    r'''This class creates a component of a tomography system with a position attribute
+     '''
     @property
     def position(self):
         try:
@@ -294,8 +295,10 @@ class PositionVector(ComponentDescription):
         self.length_check(val)
         self.__position = ComponentDescription.CreateVector(val)
 
-class DirectionVector(ComponentDescription):
 
+class DirectionVector(ComponentDescription):
+    r'''This class creates a component of a tomography system with a direction attribute
+     '''
     @property
     def direction(self):      
         try:
@@ -308,11 +311,15 @@ class DirectionVector(ComponentDescription):
         self.length_check(val)    
         self.__direction = ComponentDescription.CreateUnitVector(val)
 
+ 
 class PositionDirectionVector(PositionVector, DirectionVector):
+    r'''This class creates a component of a tomography system with position and direction attributes
+     '''
     pass
 
 class Detector1D(PositionVector):
-
+    r'''This class creates a component of a tomography system with position and direction_row attributes used for 1D panels
+     '''
     @property
     def direction_row(self):
         try:
@@ -326,6 +333,8 @@ class Detector1D(PositionVector):
         self.__direction_row = ComponentDescription.CreateUnitVector(val)
 
 class Detector2D(PositionVector):
+    r'''This class creates a component of a tomography system with position, direction_row and direction_col attributes used for 2D panels
+     '''
     @property
     def direction_row(self):
         try:
@@ -377,7 +386,7 @@ class Detector2D(PositionVector):
 
 
 class SystemConfiguration(object):
-    r'''This is a generic class to hold the configuration of a tomography system
+    r'''This is a generic class to hold the description of a tomography system
      '''
     @property
     def dimension(self):
@@ -404,8 +413,9 @@ class SystemConfiguration(object):
         else:
             self.__geometry = val
 
-    def __init__(self, dof, geometry):
-        
+    def __init__(self, dof, geometry): 
+        """Initialises the system component attributes for the acquisition type
+        """                
         self.dimension = dof
         self.geometry = geometry
         
@@ -422,9 +432,13 @@ class SystemConfiguration(object):
             self.rotation_axis = PositionDirectionVector(dof)
     
     def __str__(self):
+        """Implements the string representation of the system configuration
+        """   
         raise NotImplementedError
 
     def set_origin(self):
+        """Returns the components of the system in the reference frame of the rotation axis at position 0
+        """      
         raise NotImplementedError
 
     def centre_slice(self):
@@ -513,6 +527,7 @@ class Parallel2D(SystemConfiguration):
         repres += "\tDetector position: {0}\n".format(csv(self.detector.position))
         repres += "\tDetector row direction: {0}\n".format(csv(self.detector.direction_row))
         return repres
+
 
 class Parallel3D(SystemConfiguration):
     r'''This class creates the SystemConfiguration of a parallel beam 3D tomographic system
@@ -741,10 +756,10 @@ class Cone3D(SystemConfiguration):
 class Panel(object):
     r'''This is a class describing the panel of the system. 
                  
-    :param num_pixels: A tuple (num_pixels_h, num_pixels_v) containing the number of pixels of the panel
-    :type num_pixels: tuple
-    :param pixel_size: A tuple (pixel_size_h, pixel_size_v) containing the size of the pixels of the panel
-    :type pixel_size: tuple
+    :param num_pixels: num_pixels_h or (num_pixels_h, num_pixels_v) containing the number of pixels of the panel
+    :type num_pixels: int, list, tuple
+    :param pixel_size: pixel_size_h or (pixel_size_h, pixel_size_v) containing the size of the pixels of the panel
+    :type pixel_size: int, lust, tuple
      '''
 
     @property
@@ -836,9 +851,9 @@ class Channels(object):
     r'''This is a class describing the channels of the data. 
     This will be created on initialisation of AcquisitionGeometry.
                        
-    :param num_channels: The number of channels measured by each pixel
+    :param num_channels: The number of channels of data
     :type num_channels: int
-    :param channel_labels: A list of channel labels         
+    :param channel_labels: A list of channel labels
     :type channel_labels: list, optional
      '''
 
@@ -876,7 +891,7 @@ class Channels(object):
         num_print=min(10,self.num_channels)                     
         if  hasattr(self, 'channel_labels'):
             repres += "\tChannel labels 0-{0}: {1}\n".format(num_print, self.channel_labels[0:num_print])
-            
+        
         return repres
 
     def __init__ (self, num_channels, channel_labels):  
@@ -888,6 +903,13 @@ class Channels(object):
 
 class Angles(object):
     r'''This is a class describing the angles of the data. 
+
+    :param angles: The angular positions of the acquisition data
+    :type num_channels: list, ndarray
+    :param initial_angle: The angular offset of the object from the reference frame
+    :type channel_labels: float, optional
+    :param angle_unit: The units of the stored angles 'degree' or 'radian'
+    :type geom_type: string
      '''
 
     @property
@@ -950,6 +972,8 @@ class Angles(object):
         self.angle_unit = angle_unit
 
 class Configuration(object):
+    r'''This is a class holds the description of the system components. 
+     '''
 
     def __init__(self):
         self.system = None
@@ -957,24 +981,17 @@ class Configuration(object):
         self.panel = None
         self.channels = Channels(1, None)
 
-    def check_configuration(self):
-        configured = True
-        if self.system is None:
-            print("AG requires setup_ system configuration")
-            configured = False
-        
-        if self.angles is None:
-            print("AG requires setup_angles() ")
-            configured = False
-
-        if self.panel is None:
-            print("AG requires setup_panel() ")
-            configured = False
-
+    @property
+    def configured(self):
+        if self.system is None \
+            or self.angles is None \
+            or self.panel is None:
+            
+            return False
         return True
 
     def __str__(self):
-        if self.check_configuration():
+        if self.configured:
             repres = str(self.system)
             repres += str(self.panel)
             repres += str(self.channels)
@@ -1153,26 +1170,34 @@ class AcquisitionGeometry(object):
             self.__dimension_labels = tuple(val)
 
 
-    def __init__(self, geom_type, dimension, ** kwargs):
+    def __init__(self,
+                geom_type, 
+                dimension=None,
+                angles=None, 
+                pixel_num_h=0, 	
+                pixel_size_h=1,
+                pixel_num_v=0,
+                pixel_size_v=1,
+                dist_source_center=None,
+                dist_center_detector=None,
+                channels=1,
+                ** kwargs):
 
         """Constructor method
         """
 
         #backward compatibility
-        angles = kwargs.get('angles', None)
+        new_setup = kwargs.get('new_setup', False)
 
         #set up old geometry        
-        if angles is not None:
-            print("AG configured using deprecated method")
-
-            pixel_num_h = kwargs.get('pixel_num_h', 1)
-            pixel_num_v = kwargs.get('pixel_num_v', 1)
-            pixel_size_h = kwargs.get('pixel_size_h', 1)
-            pixel_size_v = kwargs.get('pixel_size_v', 1)
-            chanels = kwargs.get('channels', 1)
-            dist_source_center = kwargs.get('dist_source_center', None)
-            dist_center_detector = kwargs.get('dist_center_detector', None)
-
+        if new_setup is False:
+            pixel_num_h = pixel_num_h
+            pixel_num_v = pixel_num_v
+            pixel_size_h = pixel_size_h
+            pixel_size_v = pixel_size_v
+            chanels = channels
+            dist_source_center = dist_source_center
+            dist_center_detector = dist_center_detector
 
             num_pixels = [pixel_num_h, pixel_num_v]
             pixel_size= [pixel_size_h, pixel_size_v]
@@ -1197,7 +1222,8 @@ class AcquisitionGeometry(object):
             self.config.channels = Channels(chanels, channel_labels=None)  
             self.config.angles = Angles(angles, 0, kwargs.get(AcquisitionGeometry.ANGLE_UNIT, AcquisitionGeometry.DEGREE))
 
-            self.config.check_configuration()
+            if self.config.configured:
+                print("AcquisitionGeometry configured using decrecated method")
 
     def set_angles(self, angles, initial_angle=0, angle_unit='degree'):
         self.config.angles = Angles(angles, initial_angle, angle_unit)
@@ -1217,28 +1243,28 @@ class AcquisitionGeometry(object):
  
     @staticmethod
     def create_Parallel2D(ray_direction=[0,1], detector_position=[0,0], detector_direction_row=[1,0], rotation_axis_position=[0,0]):
-        AG = AcquisitionGeometry('deprecated', 'parameters')
+        AG = AcquisitionGeometry('deprecated', new_setup=True)
         AG.config = Configuration()
         AG.config.system = Parallel2D(ray_direction, detector_position, detector_direction_row, rotation_axis_position)
         return AG    
 
     @staticmethod
     def create_Cone2D(source_position, detector_position, detector_direction_row=[1,0], rotation_axis_position=[0,0]):
-        AG = AcquisitionGeometry('deprecated', 'parameters')
+        AG = AcquisitionGeometry('deprecated', new_setup=True)
         AG.config = Configuration()
         AG.config.system = Cone2D(source_position, detector_position, detector_direction_row, rotation_axis_position)
         return AG   
 
     @staticmethod
     def create_Parallel3D(ray_direction=[0,1,0], detector_position=[0,0,0], detector_direction_row=[1,0,0], detector_direction_col=[0,0,1], rotation_axis_position=[0,0,0], rotation_axis_direction=[0,0,1]):
-        AG = AcquisitionGeometry('deprecated', 'parameters')
+        AG = AcquisitionGeometry('deprecated', new_setup=True)
         AG.config = Configuration()
         AG.config.system = Parallel3D(ray_direction, detector_position, detector_direction_row, detector_direction_col, rotation_axis_position, rotation_axis_direction)
         return AG            
 
     @staticmethod
     def create_Cone3D(source_position, detector_position, detector_direction_row=[1,0,0], detector_direction_col=[0,0,1], rotation_axis_position=[0,0,0], rotation_axis_direction=[0,0,1]):
-        AG = AcquisitionGeometry('deprecated', 'parameters')
+        AG = AcquisitionGeometry('deprecated',  new_setup=True)
         AG.config = Configuration()
         AG.config.system = Cone3D(source_position, detector_position, detector_direction_row, detector_direction_col, rotation_axis_position, rotation_axis_direction)
         return AG          

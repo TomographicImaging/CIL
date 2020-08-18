@@ -106,9 +106,12 @@ class PDHG(Algorithm):
             # Primal & dual stepsizes
             self.tau = 1 / (self.sigma * normK ** 2)
         
-        self.x = operator.domain_geometry().allocate(0)
-        self.x_old = operator.domain_geometry().allocate(0)
-        
+        if x_init is None:
+            self.x_old = self.operator.domain_geometry().allocate()
+        else:
+            self.x_old = x_init.copy()
+
+        self.x = operator.domain_geometry().allocate(0)        
         self.y = self.operator.range_geometry().allocate(0)
         self.y_old = self.operator.range_geometry().allocate(0)
         

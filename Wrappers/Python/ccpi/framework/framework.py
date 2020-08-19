@@ -436,6 +436,11 @@ class SystemConfiguration(object):
         """   
         raise NotImplementedError
 
+    def __eq__(self, other):
+        """Implements the equality check of the system configuration
+        """   
+        raise NotImplementedError
+
     def set_origin(self):
         """Returns the components of the system in the reference frame of the rotation axis at position 0
         """      
@@ -458,26 +463,32 @@ class SystemConfiguration(object):
         if self.geometry == AcquisitionGeometry.PARALLEL:
             return [None, None, 1.0]
 
-        ab = self.rotation_axis.position - self.source.position
-        ab_unit = ComponentDescription.CreateUnitVector(ab)
+        #64bit for maths
+        rotation_axis_position = self.rotation_axis.position.astype(numpy.float64)
+        source_position = self.source.position.astype(numpy.float64)
+        detector_position = self.detector.position.astype(numpy.float64)
+        direction_row = self.detector.direction_row.astype(numpy.float64)
+        direction_col = self.detector.direction_col.astype(numpy.float64)
 
+
+        ab = (rotation_axis_position - source_position)
         dist_source_center = float(numpy.sqrt(ab.dot(ab)))
+
+        ab_unit = ab / numpy.sqrt(ab.dot(ab))
 
         #col and row are perpindicular unit vectors so n is a unit vector
         #unit vector orthogonal to the detector
         
         if len(self.detector.direction_row) == 2:
-            n = ComponentDescription.CreateVector([self.detector.direction_row[1], -self.detector.direction_row[0]])
+            n = ComponentDescription.CreateVector([direction_row[1], -direction_row[0]])
         else:
-            n = numpy.cross(self.detector.direction_row,self.detector.direction_col)
+            n = numpy.cross(direction_row,direction_col)
 
         #perpendicular distance between source and detector centre
-        sd = float((self.detector.position - self.source.position).dot(n))
-
+        sd = float((detector_position - source_position).dot(n))
         ratio = float(ab_unit.dot(n))
 
         source_to_detector = sd / ratio
-
         dist_center_detector = source_to_detector - dist_source_center
         magnification = (dist_center_detector + dist_source_center) / dist_source_center
 
@@ -527,6 +538,19 @@ class Parallel2D(SystemConfiguration):
         repres += "\tDetector position: {0}\n".format(csv(self.detector.position))
         repres += "\tDetector row direction: {0}\n".format(csv(self.detector.direction_row))
         return repres
+
+    def __eq__(self, other):
+
+        if not isinstance(other, self.__class__):
+            return False
+        
+        if numpy.allclose(self.ray.direction, other.ray.direction) \
+        and numpy.allclose(self.detector.position, other.detector.position)\
+        and numpy.allclose(self.detector.direction_row, other.detector.direction_row)\
+        and numpy.allclose(self.rotation_axis.position, other.rotation_axis.position):
+            return True
+        
+        return False
 
 
 class Parallel3D(SystemConfiguration):
@@ -596,6 +620,22 @@ class Parallel3D(SystemConfiguration):
         repres += "\tDetector column direction: {0}\n".format(csv(self.detector.direction_col))    
         return repres
 
+    def __eq__(self, other):
+
+        if not isinstance(other, self.__class__):
+            return False
+        
+        if numpy.allclose(self.ray.direction, other.ray.direction) \
+        and numpy.allclose(self.detector.position, other.detector.position)\
+        and numpy.allclose(self.detector.direction_row, other.detector.direction_row)\
+        and numpy.allclose(self.detector.direction_col, other.detector.direction_col)\
+        and numpy.allclose(self.rotation_axis.position, other.rotation_axis.position)\
+        and numpy.allclose(self.rotation_axis.direction, other.rotation_axis.direction):
+            
+            return True
+        
+        return False
+
     def centre_sice(self):
         """Returns the 2D system configuration corersponding to the centre slice
         """  
@@ -663,6 +703,19 @@ class Cone2D(SystemConfiguration):
         repres += "\tDetector position: {0}\n".format(csv(self.detector.position))
         repres += "\tDetector row direction: {0}\n".format(csv(self.detector.direction_row)) 
         return repres    
+
+    def __eq__(self, other):
+
+        if not isinstance(other, self.__class__):
+            return False
+        
+        if numpy.allclose(self.source.position, other.source.position) \
+        and numpy.allclose(self.detector.position, other.detector.position)\
+        and numpy.allclose(self.detector.direction_row, other.detector.direction_row)\
+        and numpy.allclose(self.rotation_axis.position, other.rotation_axis.position):
+            return True
+        
+        return False
 
 class Cone3D(SystemConfiguration):
     r'''This class creates the SystemConfiguration of a cone beam 3D tomographic system
@@ -753,6 +806,22 @@ class Cone3D(SystemConfiguration):
         repres += "\tDetector column direction: {0}\n".format(csv(self.detector.direction_col))
         return repres   
 
+    def __eq__(self, other):
+
+        if not isinstance(other, self.__class__):
+            return False
+        
+        if numpy.allclose(self.source.position, other.source.position) \
+        and numpy.allclose(self.detector.position, other.detector.position)\
+        and numpy.allclose(self.detector.direction_row, other.detector.direction_row)\
+        and numpy.allclose(self.detector.direction_col, other.detector.direction_col)\
+        and numpy.allclose(self.rotation_axis.position, other.rotation_axis.position)\
+        and numpy.allclose(self.rotation_axis.direction, other.rotation_axis.direction):
+            
+            return True
+        
+        return False
+
 class Panel(object):
     r'''This is a class describing the panel of the system. 
                  
@@ -839,6 +908,16 @@ class Panel(object):
         repres += "\tPixel size: {0}\n".format(self.pixel_size)
         return repres   
 
+    def __eq__(self, other):
+
+        if not isinstance(other, self.__class__):
+            return False
+        
+        if self.num_pixels == other.num_pixels and numpy.allclose(self.pixel_size, other.pixel_size):   
+            return True
+        
+        return False
+
     def __init__ (self, num_pixels, pixel_size, dimension):  
         """Constructor method
         """
@@ -893,6 +972,21 @@ class Channels(object):
             repres += "\tChannel labels 0-{0}: {1}\n".format(num_print, self.channel_labels[0:num_print])
         
         return repres
+
+    def __eq__(self, other):
+
+        if not isinstance(other, self.__class__):
+            return False
+        
+        if self.num_channels != other.num_channels:
+            return False
+
+        if hasattr(self,'channel_labels'):
+            if self.channel_labels != other.channel_labels:
+                return False
+         
+        return True
+
 
     def __init__ (self, num_channels, channel_labels):  
         """Constructor method
@@ -964,6 +1058,22 @@ class Angles(object):
         repres += "\tAngles in {0}s:\n{1}\n".format(self.angle_unit, numpy.array2string(self.angle_data, separator=', ', edgeitems=10, threshold=60))
         return repres   
 
+    def __eq__(self, other):
+
+        if not isinstance(other, self.__class__):
+            return False
+        
+        if self.angle_unit != other.angle_unit:
+            return False
+
+        if self.initial_angle != other.initial_angle:
+            return False
+
+        if not numpy.allclose(self.angle_data, other.angle_data):
+            return False
+         
+        return True
+
     def __init__ (self, angles, initial_angle, angle_unit):  
         """Constructor method
         """
@@ -1007,6 +1117,19 @@ class Configuration(object):
             repres += str(self.channels)
             repres += str(self.angles)
         return repres
+
+    def __eq__(self, other):
+        
+        if not isinstance(other, self.__class__):
+            return False
+
+        if self.system == other.system\
+        and self.panel == other.panel\
+        and self.channels == other.channels\
+        and self.angles == other.angles:
+            return True
+
+        return False
 
 class AcquisitionGeometry(object):
     r'''This class holds the AcquisitionGeometry of the system.
@@ -1386,6 +1509,14 @@ class AcquisitionGeometry(object):
                     order.append(j)
                     break
         return order
+
+    def __eq__(self, other):
+
+        if isinstance(other, self.__class__) and self.config == other.config :
+            return True
+        return False
+
+
 
     def clone(self):
         '''returns a copy of the AcquisitionGeometry'''
@@ -2475,7 +2606,6 @@ class DataProcessor(object):
         for k,v in self.__dict__.items():
             if v is None and k != 'output':
                 raise ValueError('Key {0} is None'.format(k))
-
 
         #run if 1st time, if modified since last run, or if output not stored
         shouldRun = False

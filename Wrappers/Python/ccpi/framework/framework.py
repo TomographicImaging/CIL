@@ -342,23 +342,6 @@ class Detector2D(PositionVector):
         except:
             raise AttributeError
 
-    @direction_row.setter
-    def direction_row(self, val):
-        self.length_check(val)
-        row = ComponentDescription.CreateUnitVector(val)
-
-        try:
-            col = self.__direction_col
-        except:
-            col = None
-    
-        if col is not None:
-            dot_product = row.dot(col)
-            if not numpy.isclose(dot_product, 0):
-                raise ValueError("vectors detector.direction_row and detector.direction_col must be orthogonal")
-
-        self.__direction_row = row
-
     @property
     def direction_col(self):
         try:
@@ -366,24 +349,19 @@ class Detector2D(PositionVector):
         except:
             raise AttributeError
 
-    @direction_col.setter
-    def direction_col(self, val):
+    def set_direction(self, row, col):
+        self.length_check(row)
+        row = ComponentDescription.CreateUnitVector(row)
 
-        self.length_check(val)
-        col = ComponentDescription.CreateUnitVector(val)
+        self.length_check(col)
+        col = ComponentDescription.CreateUnitVector(col)
 
-        try:
-            row = self.__direction_row
-        except:
-            row = None
+        dot_product = row.dot(col)
+        if not numpy.isclose(dot_product, 0):
+            raise ValueError("vectors detector.direction_row and detector.direction_col must be orthogonal")
 
-        if row is not None:
-            dot_product = row.dot(col)
-            if not numpy.isclose(dot_product, 0):
-                raise ValueError("vectors detector.direction_row and detector.direction_col must be orthogonal")
-
-        self.__direction_col = col
-
+        self.__direction_col = col        
+        self.__direction_row = row
 
 class SystemConfiguration(object):
     r'''This is a generic class to hold the description of a tomography system
@@ -449,7 +427,7 @@ class SystemConfiguration(object):
     def centre_slice(self):
         """Returns the 2D system configuration corersponding to the centre slice
         """        
-        return self
+        raise NotImplementedError
 
     def calculate_mag(self):
         r'''Calculates the magnification of the system using the source to rotate axis,
@@ -458,41 +436,7 @@ class SystemConfiguration(object):
         :return: returns [dist_source_center, dist_center_detector, magnification],  [0] distance from the source to the rotate axis, [1] distance from the rotate axis to the detector, [2] magnification of the system
         :rtype: list
         '''
-
-        #if parallel beam data
-        if self.geometry == AcquisitionGeometry.PARALLEL:
-            return [None, None, 1.0]
-
-        #64bit for maths
-        rotation_axis_position = self.rotation_axis.position.astype(numpy.float64)
-        source_position = self.source.position.astype(numpy.float64)
-        detector_position = self.detector.position.astype(numpy.float64)
-        direction_row = self.detector.direction_row.astype(numpy.float64)
-        direction_col = self.detector.direction_col.astype(numpy.float64)
-
-
-        ab = (rotation_axis_position - source_position)
-        dist_source_center = float(numpy.sqrt(ab.dot(ab)))
-
-        ab_unit = ab / numpy.sqrt(ab.dot(ab))
-
-        #col and row are perpindicular unit vectors so n is a unit vector
-        #unit vector orthogonal to the detector
-        
-        if len(self.detector.direction_row) == 2:
-            n = ComponentDescription.CreateVector([direction_row[1], -direction_row[0]])
-        else:
-            n = numpy.cross(direction_row,direction_col)
-
-        #perpendicular distance between source and detector centre
-        sd = float((detector_position - source_position).dot(n))
-        ratio = float(ab_unit.dot(n))
-
-        source_to_detector = sd / ratio
-        dist_center_detector = source_to_detector - dist_source_center
-        magnification = (dist_center_detector + dist_source_center) / dist_source_center
-
-        return [dist_source_center, dist_center_detector, magnification]
+        raise NotImplementedError
 
 class Parallel2D(SystemConfiguration):
     r'''This class creates the SystemConfiguration of a parallel beam 2D tomographic system
@@ -552,6 +496,11 @@ class Parallel2D(SystemConfiguration):
         
         return False
 
+    def centre_slice(self):
+        return self
+
+    def calculate_mag(self):
+        return [None, None, 1.0]
 
 class Parallel3D(SystemConfiguration):
     r'''This class creates the SystemConfiguration of a parallel beam 3D tomographic system
@@ -579,8 +528,7 @@ class Parallel3D(SystemConfiguration):
 
         #detector
         self.detector.position = detector_pos
-        self.detector.direction_row = detector_direction_row
-        self.detector.direction_col = detector_direction_col
+        self.detector.set_direction(detector_direction_row, detector_direction_col)
 
         #rotate axis
         self.rotation_axis.position = rotation_axis_pos
@@ -603,8 +551,9 @@ class Parallel3D(SystemConfiguration):
         self.rotation_axis.direction = [0,0,1]
         self.ray.direction = rotation_matrix.dot(self.ray.direction.reshape(3,1))
         self.detector.position = rotation_matrix.dot(det_pos.reshape(3,1))
-        self.detector.direction_row = rotation_matrix.dot(self.detector.direction_row.reshape(3,1))
-        self.detector.direction_col = rotation_matrix.dot(self.detector.direction_col.reshape(3,1))
+        new_row = rotation_matrix.dot(self.detector.direction_row.reshape(3,1))
+        new_col = rotation_matrix.dot(self.detector.direction_col.reshape(3,1))
+        self.detector.set_direction(new_row, new_col)
 
     def __str__(self):
         def csv(val):
@@ -636,7 +585,10 @@ class Parallel3D(SystemConfiguration):
         
         return False
 
-    def centre_sice(self):
+    def calculate_mag(self):
+        return [None, None, 1.0]
+
+    def centre_slice(self):
         """Returns the 2D system configuration corersponding to the centre slice
         """  
         dp1 = self.rotation_axis.direction.dot(self.ray.direction)
@@ -655,7 +607,8 @@ class Parallel3D(SystemConfiguration):
             return Parallel2D(ray_direction, detector_position, detector_direction_row, rotation_axis_position)
 
         else:
-            raise Warning("Cannot convert geometry to 2D")
+            raise ValueError('Cannot convert geometry to 2D. Requires axis of rotation to be perpenidular to ray direction and the detector rows.')
+
 
 class Cone2D(SystemConfiguration):
     r'''This class creates the SystemConfiguration of a cone beam 2D tomographic system
@@ -717,6 +670,33 @@ class Cone2D(SystemConfiguration):
         
         return False
 
+    def centre_slice(self):
+        return self
+
+    def calculate_mag(self):
+        #64bit for maths
+        rotation_axis_position = self.rotation_axis.position.astype(numpy.float64)
+        source_position = self.source.position.astype(numpy.float64)
+        detector_position = self.detector.position.astype(numpy.float64)
+        direction_row = self.detector.direction_row.astype(numpy.float64)
+
+        ab = (rotation_axis_position - source_position)
+        dist_source_center = float(numpy.sqrt(ab.dot(ab)))
+
+        ab_unit = ab / numpy.sqrt(ab.dot(ab))
+
+        n = ComponentDescription.CreateVector([direction_row[1], -direction_row[0]]).astype(numpy.float64)
+
+        #perpendicular distance between source and detector centre
+        sd = float((detector_position - source_position).dot(n))
+        ratio = float(ab_unit.dot(n))
+
+        source_to_detector = sd / ratio
+        dist_center_detector = source_to_detector - dist_source_center
+        magnification = (dist_center_detector + dist_source_center) / dist_source_center
+
+        return [dist_source_center, dist_center_detector, magnification]
+
 class Cone3D(SystemConfiguration):
     r'''This class creates the SystemConfiguration of a cone beam 3D tomographic system
                        
@@ -744,8 +724,7 @@ class Cone3D(SystemConfiguration):
 
         #detector
         self.detector.position = detector_pos
-        self.detector.direction_row = detector_direction_row
-        self.detector.direction_col = detector_direction_col
+        self.detector.set_direction(detector_direction_row, detector_direction_col)
 
         #rotate axis
         self.rotation_axis.position = rotation_axis_pos
@@ -769,20 +748,20 @@ class Cone3D(SystemConfiguration):
         self.rotation_axis.direction = [0,0,1]
         self.source.position = rotation_matrix.dot(src_pos.reshape(3,1))
         self.detector.position = rotation_matrix.dot(det_pos.reshape(3,1))
-        self.detector.direction_row = rotation_matrix.dot(self.detector.direction_row.reshape(3,1))
-        self.detector.direction_col = rotation_matrix.dot(self.detector.direction_col.reshape(3,1))
+        new_row = rotation_matrix.dot(self.detector.direction_row.reshape(3,1)) 
+        new_col = rotation_matrix.dot(self.detector.direction_col.reshape(3,1))
+        self.detector.set_direction(new_row, new_col)
 
-    def centre_sice(self):
+    def centre_slice(self):
         """Returns the 2D system configuration corersponding to the centre slice
         """ 
-        vec1= self.detector.position - self.source.position  
+        #requires the rotate axis to be perpendicular to the detector, and parallel to coloumns
+        vec1= numpy.cross(self.detector.direction_row, self.detector.direction_col)  
         dp1 = self.rotation_axis.direction.dot(vec1)
         dp2 = self.rotation_axis.direction.dot(self.detector.direction_row)
-
+        
         if numpy.isclose(dp1, 0) and numpy.isclose(dp2, 0):
-
             self.set_origin()
-
             source_position = self.source.position[0:2]
             detector_position = self.detector.position[0:2]
             detector_direction_row = self.detector.direction_row[0:2]
@@ -790,8 +769,8 @@ class Cone3D(SystemConfiguration):
 
             return Cone2D(source_position, detector_position, detector_direction_row, rotation_axis_position)
         else:
-            raise Warning("Cannot convert geometry to 2D")
-
+            raise ValueError('Cannot convert geometry to 2D. Requires axis of rotation to be perpendicular to the detector.')
+        
     def __str__(self):
         def csv(val):
             return numpy.array2string(val, separator=', ')
@@ -821,6 +800,34 @@ class Cone3D(SystemConfiguration):
             return True
         
         return False
+
+    def calculate_mag(self):
+    
+        #64bit for maths
+        rotation_axis_position = self.rotation_axis.position.astype(numpy.float64)
+        source_position = self.source.position.astype(numpy.float64)
+        detector_position = self.detector.position.astype(numpy.float64)
+        direction_row = self.detector.direction_row.astype(numpy.float64)
+
+        ab = (rotation_axis_position - source_position)
+        dist_source_center = float(numpy.sqrt(ab.dot(ab)))
+
+        ab_unit = ab / numpy.sqrt(ab.dot(ab))
+
+        #col and row are perpindicular unit vectors so n is a unit vector
+        #unit vector orthogonal to the detector
+        direction_col = self.detector.direction_col.astype(numpy.float64)
+        n = numpy.cross(direction_row,direction_col)
+
+        #perpendicular distance between source and detector centre
+        sd = float((detector_position - source_position).dot(n))
+        ratio = float(ab_unit.dot(n))
+
+        source_to_detector = sd / ratio
+        dist_center_detector = source_to_detector - dist_source_center
+        magnification = (dist_center_detector + dist_source_center) / dist_source_center
+
+        return [dist_source_center, dist_center_detector, magnification]
 
 class Panel(object):
     r'''This is a class describing the panel of the system. 
@@ -1111,11 +1118,13 @@ class Configuration(object):
         return configured
 
     def __str__(self):
+        repres = ""
         if self.configured:
-            repres = str(self.system)
+            repres += str(self.system)
             repres += str(self.panel)
             repres += str(self.channels)
             repres += str(self.angles)
+        
         return repres
 
     def __eq__(self, other):
@@ -1255,7 +1264,7 @@ class AcquisitionGeometry(object):
 
     @shape.setter
     def shape(self, val):
-        raise Warning("Deprecated - shape will be set automatically")
+        DeprecationWarning("Deprecated - shape will be set automatically")
 
     @property
     def dimension_labels(self):
@@ -1528,12 +1537,14 @@ class AcquisitionGeometry(object):
 
     def centre_slice(self):
         '''returns a 2D AcquisitionGeometry that corresponds to the centre slice of the input'''
-        AG_2D = copy.deepcopy(self)
 
-        if AG_2D.dimension == '3D':
-            AG_2D.config.system = self.config.system.centre_sice()
-            AG_2D.config.panel.num_pixels[1] = 1
-            AG_2D.config.panel.pixel_size[1] = abs(self.config.system.detector.direction_col[2]) * self.config.panel.pixel_size[1]
+        if self.dimension == '2D':
+            return self
+              
+        AG_2D = copy.deepcopy(self)
+        AG_2D.config.system = self.config.system.centre_slice()
+        AG_2D.config.panel.num_pixels[1] = 1
+        AG_2D.config.panel.pixel_size[1] = abs(self.config.system.detector.direction_col[2]) * self.config.panel.pixel_size[1]
         return AG_2D
 
     def __str__ (self):

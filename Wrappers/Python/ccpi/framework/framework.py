@@ -1062,7 +1062,8 @@ class Angles(object):
     def __str__(self):
         repres = "Acquisition description:\n"
         repres += "\tNumber of positions: {0}\n".format(self.num_positions)
-        repres += "\tAngles in {0}s:\n{1}\n".format(self.angle_unit, numpy.array2string(self.angle_data, separator=', ', edgeitems=10, threshold=60))
+        num_print=min(20,self.num_positions)    
+        repres += "\tAngles 0-{0} in {1}s:\n{2}\n".format(num_print, self.angle_unit, numpy.array2string(self.angle_data[0:num_print], separator=', '))
         return repres   
 
     def __eq__(self, other):

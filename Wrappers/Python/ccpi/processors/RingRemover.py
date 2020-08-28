@@ -96,13 +96,13 @@ class RingRemover(DataProcessor):
             if vertical>0:
                 
                 for i in range(vertical):
-                    J = self.xRemoveStripesVertical(data.subset(vertical=i).as_array(), decNum, wname, sigma) 
-                    out.fill(J, vertical = i)  
+                    tmp_corrected = self.xRemoveStripesVertical(data.subset(vertical=i).as_array(), decNum, wname, sigma) 
+                    out.fill(tmp_corrected, vertical = i)  
             
             # for 2D data
             else:
-                J = self.xRemoveStripesVertical(data.as_array(), decNum, wname, sigma)
-                out.fill(J)        
+                tmp_corrected = self.xRemoveStripesVertical(data.as_array(), decNum, wname, sigma)
+                out.fill(tmp_corrected)        
         
         # for multichannel data        
         else:
@@ -112,8 +112,8 @@ class RingRemover(DataProcessor):
                 
                 for i in range(channels):
                     for j in range(vertical):
-                        J = self.xRemoveStripesVertical(data.subset(channel=i, vertical=j).as_array(), decNum, wname, sigma)
-                        out.fill(J, channel = i, vertical = j)
+                        tmp_corrected = self.xRemoveStripesVertical(data.subset(channel=i, vertical=j).as_array(), decNum, wname, sigma)
+                        out.fill(tmp_corrected, channel = i, vertical = j)
                     
                     # prints info for every channel
                     if info:
@@ -122,8 +122,8 @@ class RingRemover(DataProcessor):
             # for 2D data                        
             else:
                 for i in range(channels):
-                        J = self.xRemoveStripesVertical(data.subset(channel=i).as_array(), decNum, wname, sigma)
-                        out.fill(J, channel = i)
+                        tmp_corrected = self.xRemoveStripesVertical(data.subset(channel=i).as_array(), decNum, wname, sigma)
+                        out.fill(tmp_corrected, channel = i)
                         if info:
                             print("Finish channel {}".format(i))
         if info:

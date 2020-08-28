@@ -5,10 +5,10 @@ import numpy as np
 import pywt
 from ccpi.framework import DataProcessor, ImageData, AcquisitionData
 
-class RingRemoval(DataProcessor):
+class RingRemover(DataProcessor):
     
     '''
-        RingRemoval Processor: Removes vertical stripes from a DataContainer(ImageData/AcquisitionData) 
+        RingRemover Processor: Removes vertical stripes from a DataContainer(ImageData/AcquisitionData) 
         the algorithm in https://doi.org/10.1364/OE.17.008567
 
     '''
@@ -26,7 +26,7 @@ class RingRemoval(DataProcessor):
     
         sigma : Damping parameter in Fourier space.
         
-        info : Prints ring removal end message 
+        info : Prints ring remover end message 
         
         Returns
         -------
@@ -39,7 +39,7 @@ class RingRemoval(DataProcessor):
                   'sigma': sigma,
                   'info': info}
     
-        super(RingRemoval, self).__init__(**kwargs)            
+        super(RingRemover, self).__init__(**kwargs)            
                           
         
     def check_input(self, dataset):
@@ -101,7 +101,7 @@ class RingRemoval(DataProcessor):
                         if info:
                             print("Finish channel {}".format(i))
         if info:
-            print("Finish Ring Removal") 
+            print("Finish Ring Remover") 
                     
         return out
           

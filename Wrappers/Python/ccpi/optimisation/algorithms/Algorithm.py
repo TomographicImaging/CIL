@@ -24,7 +24,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 import time, functools
-from numbers import Integral
+from numbers import Integral, Number
 import logging
 
 class Algorithm(object):
@@ -67,7 +67,7 @@ class Algorithm(object):
         self.timing = []
         self._iteration = []
         self.update_objective_interval = kwargs.get('update_objective_interval', 1)
-        self.x = None
+        # self.x = None
         self.iter_string = 'Iter'
         self.logger = None
         self.__set_up_logger(kwargs.get('log_file', None))
@@ -124,7 +124,19 @@ class Algorithm(object):
             if self.iteration > 0 and self.iteration % self.update_objective_interval == 0:
                 self.update_objective()
             self.iteration += 1
+            self.update_previous_solution()
+
+    def update_previous_solution(self):
+        '''Update the previous solution with the current one
         
+        The concrete algorithm calls update_previous_solution. Normally this would 
+        entail the swapping of pointers:
+
+        tmp = self.x_old
+        self.x_old = self.x
+        self.x = tmp 
+        '''
+        pass
     def get_output(self):
         '''Returns the solution found'''
         return self.x
@@ -232,9 +244,17 @@ class Algorithm(object):
             if (very_verbose):
                 bars = ['-' for i in range(start+9+10+13+13+13+15)]
             # print a nice ---- with proper length at the end
-            print (functools.reduce(lambda x,y: x+y, bars, ''))
-            print (self.verbose_output(very_verbose))
-            print ("Stop criterion has been reached.")
+            # print (functools.reduce(lambda x,y: x+y, bars, ''))
+            out = "{}\n{}\n{}\n".format(functools.reduce(lambda x,y: x+y, bars, '') ,
+                                        self.verbose_output(very_verbose),
+                                        "Stop criterion has been reached.")
+            print (out)
+            # print (self.verbose_output(very_verbose))
+            # print ("Stop criterion has been reached.")
+            # Print to log file if desired
+            if self.logger:
+                self.logger.info(out)
+
         
 
     def verbose_output(self, verbose=False):

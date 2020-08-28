@@ -373,7 +373,15 @@ class BlockOperator(Operator):
                     prod += self.get_item(row, col).sum_abs_col()
             res.append(prod)
 
-        return BlockDataContainer(*res)        
+        return BlockDataContainer(*res)
+
+    def __len__(self):
+        
+        return len(self.operators)    
+    
+    def __getitem__(self, index):
+        '''returns the index-th operator in the block irrespectively of it's shape'''
+        return self.operators[index]
         
         
         

@@ -1,4 +1,22 @@
 # -*- coding: utf-8 -*-
+# Copyright 2020 Science Technology Facilities Council
+# Copyright 2020 University of Manchester
+# Copyright 2020 University of Bath
+#
+# This work is part of the Core Imaging Library developed by Science Technology
+# Facilities Council and University of Manchester
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from scipy.fftpack import fftshift, ifftshift, fft, ifft
 import numpy as np
@@ -30,8 +48,8 @@ class RingRemover(DataProcessor):
         
         Returns
         -------
-        ImageData/AcquisitionData
-            Corrected 2D, 3D, multi-spectral 2D, multi-spectral 3D    
+        Corrected ImageData/AcquisitionData 2D, 3D,
+                multi-spectral 2D, multi-spectral 3D    
         '''             
         
         kwargs = {'decNum': decNum,
@@ -69,34 +87,42 @@ class RingRemover(DataProcessor):
         vertical = geom.pixel_num_v
         
         # allocate datacontainer space
-        corrected_data = 0.*data 
-        out = corrected_data
+        out = 0.*data
         
-        # allocate numpy space
-        tmp_data_array = corrected_data.as_array()
-        
-        # sinogram numpy array
-        data_array = data.as_array()
-        
+        # for non multichannel data
         if channels == 1:        
+            
+            # for 3D data
             if vertical>0:
+                
                 for i in range(vertical):
-                    J = self.xRemoveStripesVertical(data_array[i], decNum, wname, sigma)
-                    tmp_data_array[i] = J                
+                    J = self.xRemoveStripesVertical(data.subset(vertical=i).as_array(), decNum, wname, sigma) 
+                    out.fill(J, vertical = i)  
+            
+            # for 2D data
             else:
-                J = self.xRemoveStripesVertical(data_array, decNum, wname, sigma)
+                J = self.xRemoveStripesVertical(data.as_array(), decNum, wname, sigma)
                 out.fill(J)        
+        
+        # for multichannel data        
         else:
+            
+            # for 3D data
             if vertical>0:
+                
                 for i in range(channels):
                     for j in range(vertical):
-                        J = self.xRemoveStripesVertical(data_array[i,j], decNum, wname, sigma)
+                        J = self.xRemoveStripesVertical(data.subset(vertical=i, channel=i).as_array(), decNum, wname, sigma)
                         out.fill(J, channel=i, vertical = j)
+                    
+                    # prints info for every channel
                     if info:
                         print("Finish channel {}".format(i))                    
+                        
+            # for 2D data                        
             else:
                 for i in range(channels):
-                        J = self.xRemoveStripesVertical(data_array[i], decNum, wname, sigma)
+                        J = self.xRemoveStripesVertical(data.subset(channel=i).as_array(), decNum, wname, sigma)
                         out.fill(J, channel = i)
                         if info:
                             print("Finish channel {}".format(i))
@@ -109,9 +135,13 @@ class RingRemover(DataProcessor):
         
         ''' Code from https://doi.org/10.1364/OE.17.008567 
             translated in Python
-                
-        '''
-                
+                            
+        Returns
+        -------
+        Corrected 2D sinogram data (Numpy Array)
+        
+        '''              
+                            
         # allocate cH, cV, cD
         Ch = [None]*decNum
         Cv = [None]*decNum
@@ -126,11 +156,11 @@ class RingRemover(DataProcessor):
             
             # use to axis=0, which correspond to the angles direction
             fCv = fftshift(fft(Cv[i], axis=0))
-            my,mx = fCv.shape
+            my, mx = fCv.shape
             
             # damping of vertical stripe information
             damp = 1 - np.exp(-np.array([range(-int(np.floor(my/2)),-int(np.floor(my/2))+my)])**2/(2*sigma**2))
-            fCv*=damp.T
+            fCv *= damp.T
              
             # inverse FFT          
             Cv[i] = np.real(ifft(ifftshift(fCv), axis=0))

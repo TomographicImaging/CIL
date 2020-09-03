@@ -438,6 +438,10 @@ class SystemConfiguration(object):
         '''
         raise NotImplementedError
 
+    def copy(self):
+        '''returns a copy of SystemConfiguration'''
+        return copy.deepcopy(self)
+
 class Parallel2D(SystemConfiguration):
     r'''This class creates the SystemConfiguration of a parallel beam 2D tomographic system
                        
@@ -595,14 +599,15 @@ class Parallel3D(SystemConfiguration):
         dp2 = self.rotation_axis.direction.dot(self.detector.direction_row)
 
         if numpy.isclose(dp1, 0) and numpy.isclose(dp2, 0):
+            temp = self.copy()
 
             #convert to rotation axis reference frame
-            self.set_origin()
+            temp.set_origin()
 
-            ray_direction = self.ray.direction[0:2]
-            detector_position = self.detector.position[0:2]
-            detector_direction_row = self.detector.direction_row[0:2]
-            rotation_axis_position = self.rotation_axis.position[0:2]
+            ray_direction = temp.ray.direction[0:2]
+            detector_position = temp.detector.position[0:2]
+            detector_direction_row = temp.detector.direction_row[0:2]
+            rotation_axis_position = temp.rotation_axis.position[0:2]
 
             return Parallel2D(ray_direction, detector_position, detector_direction_row, rotation_axis_position)
 
@@ -761,11 +766,12 @@ class Cone3D(SystemConfiguration):
         dp2 = self.rotation_axis.direction.dot(self.detector.direction_row)
         
         if numpy.isclose(dp1, 0) and numpy.isclose(dp2, 0):
-            self.set_origin()
-            source_position = self.source.position[0:2]
-            detector_position = self.detector.position[0:2]
-            detector_direction_row = self.detector.direction_row[0:2]
-            rotation_axis_position = self.rotation_axis.position[0:2]
+            temp = self.copy()
+            temp.set_origin()
+            source_position = temp.source.position[0:2]
+            detector_position = temp.detector.position[0:2]
+            detector_direction_row = temp.detector.direction_row[0:2]
+            rotation_axis_position = temp.rotation_axis.position[0:2]
 
             return Cone2D(source_position, detector_position, detector_direction_row, rotation_axis_position)
         else:

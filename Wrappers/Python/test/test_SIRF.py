@@ -88,14 +88,34 @@ class TestSIRFCILIntegration(unittest.TestCase):
         tmp = image2.subtract(1.)
         numpy.testing.assert_array_equal(image1.as_array(), tmp.as_array())
         
+        bdc = BlockDataContainer(image1, image2)
+        bdc1 = bdc.add(1.)
 
-        # image2.fill(0.)
-        # bdc = BlockDataContainer(image1, image2)
-        # bdc1 = bdc.add(1.)
+        image1.fill(1)
+        image2.fill(2)
 
+        bdc = BlockDataContainer(image1, image2)
 
+        self.assertBlockDataContainerEqual(bdc , bdc1)
+    
+    @unittest.skipUnless(has_sirf, "Has SIRF")
+    def test_BlockDataContainer_with_SIRF_DataContainer_subtract(self):
+        os.chdir(self.cwd)
+        image1 = pet.ImageData('emission.hv')
+        image2 = pet.ImageData('emission.hv')
+        image1.fill(2)
+        image2.fill(1)
+        print (image1.shape, image2.shape)
+        
+        bdc = BlockDataContainer(image1, image2)
+        bdc1 = bdc.subtract(1.)
 
-        # self.assertBlockDataContainerEqual(bdc , bdc1)
+        image1.fill(1)
+        image2.fill(0)
+
+        bdc = BlockDataContainer(image1, image2)
+
+        self.assertBlockDataContainerEqual(bdc , bdc1)
 
 
     def assertBlockDataContainerEqual(self, container1, container2):

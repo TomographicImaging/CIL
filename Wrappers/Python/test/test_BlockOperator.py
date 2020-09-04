@@ -21,7 +21,7 @@ from ccpi.framework import BlockDataContainer
 from ccpi.optimisation.operators import Identity
 from ccpi.framework import ImageGeometry, ImageData
 import numpy
-from ccpi.optimisation.operators import FiniteDiff
+from ccpi.optimisation.operators import FiniteDifferenceOperator
 
 
 class TestBlockOperator(unittest.TestCase):

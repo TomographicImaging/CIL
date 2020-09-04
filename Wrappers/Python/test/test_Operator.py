@@ -20,7 +20,7 @@ from __future__ import division
 import unittest
 from ccpi.framework import ImageGeometry, VectorGeometry, ImageData, BlockDataContainer, DataContainer
 from ccpi.optimisation.operators import BlockOperator,\
-    FiniteDiff, SymmetrizedGradient
+    FiniteDifferenceOperator, SymmetrizedGradient
 import numpy
 from timeit import default_timer as timer
 from ccpi.optimisation.operators import Gradient, Identity, SparseFiniteDiff,\
@@ -238,7 +238,7 @@ class TestOperator(CCPiTestClass):
         ig = ImageGeometry(N, M)
         Id = Identity(ig)
 
-        FD = FiniteDiff(ig, direction = 0, bnd_cond = 'Neumann')
+        FD = FiniteDifferenceOperator(ig, direction = 0, bnd_cond = 'Neumann')
         u = FD.domain_geometry().allocate('random')
         
         

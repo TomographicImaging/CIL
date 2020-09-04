@@ -359,7 +359,7 @@ class OldFiniteDiff(LinearOperator):
 ###############################################################################            
             
         
-class FiniteDiff(LinearOperator):
+class FiniteDifferenceOperator(LinearOperator):
     
     def __init__(self, domain_geometry, 
                        range_geometry=None, 
@@ -376,7 +376,7 @@ class FiniteDiff(LinearOperator):
         if range_geometry is None:
             range_geometry = domain_geometry 
             
-        super(FiniteDiff, self).__init__(domain_geometry = domain_geometry, 
+        super(FiniteDifferenceOperator, self).__init__(domain_geometry = domain_geometry, 
                                          range_geometry = range_geometry)              
             
         self.size_dom_gm = len(domain_geometry.shape) 

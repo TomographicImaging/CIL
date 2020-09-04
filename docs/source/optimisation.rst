@@ -221,7 +221,7 @@ In the following the required classes for the implementation of the :code:`Gradi
    :members:
    :special-members:
 
-.. autoclass:: ccpi.optimisation.operators.FiniteDiff
+.. autoclass:: ccpi.optimisation.operators.FiniteDifferenceOperator
    :members:
    :special-members:
 

@@ -20,7 +20,7 @@ from __future__ import division
 from __future__ import print_function
 
 from ccpi.optimisation.operators import LinearOperator
-from ccpi.optimisation.operators import FiniteDiff
+from ccpi.optimisation.operators import FiniteDifferenceOperator
 from ccpi.framework import ImageGeometry, BlockGeometry
 from ccpi.utilities import NUM_THREADS
 

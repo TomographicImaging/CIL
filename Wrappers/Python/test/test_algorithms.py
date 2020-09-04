@@ -35,7 +35,7 @@ from ccpi.optimisation.algorithms import FISTA
 
 from ccpi.optimisation.algorithms import PDHG
 
-from ccpi.optimisation.operators import Gradient, BlockOperator, FiniteDiff
+from ccpi.optimisation.operators import Gradient, BlockOperator, FiniteDifferenceOperator
 from ccpi.optimisation.functions import MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler                     
 from ccpi.framework import TestData
 import os ,sys

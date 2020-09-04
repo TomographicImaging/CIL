@@ -148,7 +148,7 @@ class Gradient_numpy(LinearOperator):
         
         # Call FiniteDiff operator 
         self.method = method
-        self.FD = FiniteDiff(domain_geometry, direction = 0, method = self.method, bnd_cond = self.bnd_cond)
+        self.FD = FiniteDifferenceOperator(domain_geometry, direction = 0, method = self.method, bnd_cond = self.bnd_cond)
                 
         
         if self.correlation==CORRELATION_SPACE:

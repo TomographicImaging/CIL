@@ -1371,6 +1371,7 @@ class AcquisitionGeometry(object):
             self.config.channels = Channels(chanels, channel_labels=None)  
             self.config.angles = Angles(angles, 0, kwargs.get(AcquisitionGeometry.ANGLE_UNIT, AcquisitionGeometry.DEGREE))
 
+            self.dimension_labels = kwargs.get('dimension_labels', None)
             if self.config.configured:
                 print("AcquisitionGeometry configured using deprecated method")
 

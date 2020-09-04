@@ -105,20 +105,24 @@ class ImageGeometry(object):
                 shape = (self.channels, self.voxel_num_z, self.voxel_num_y, self.voxel_num_x)
                 dim_labels = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL,
                 ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+                self.voxel_sizes = [1.0, self.voxel_size_z, self.voxel_size_y, self.voxel_size_x]
             else:
                 self.length = 3
                 shape = (self.channels, self.voxel_num_y, self.voxel_num_x)
                 dim_labels = [ImageGeometry.CHANNEL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+                self.voxel_sizes = [1.0, self.voxel_size_y, self.voxel_size_x]
         else:
             if self.voxel_num_z>1:
                 self.length = 3
                 shape = (self.voxel_num_z, self.voxel_num_y, self.voxel_num_x)
                 dim_labels = [ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y,
                  ImageGeometry.HORIZONTAL_X]
+                self.voxel_sizes = [self.voxel_size_z, self.voxel_size_y, self.voxel_size_x]
             else:
                 self.length = 2  
                 shape = (self.voxel_num_y, self.voxel_num_x)
                 dim_labels = [ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+                self.voxel_sizes = [self.voxel_size_y, self.voxel_size_x]
         
         labels = kwargs.get('dimension_labels', None)
         if labels is None:
@@ -249,6 +253,7 @@ class ImageGeometry(object):
     #def shape(self):
     #    '''Returns the shape of the array of the ImageData it describes'''
     #    return self.shape
+        
 
 class AcquisitionGeometry(object):
     RANDOM = 'random'
@@ -1839,16 +1844,18 @@ if __name__ == "__main__":
     vg = VectorGeometry(10)    
     b = vg.allocate('random_int')
 
-#    ig = ImageGeometry(voxel_num_x=100, 
-#                    voxel_num_y=200, 
-#                    voxel_num_z=300, 
-#                    voxel_size_x=1, 
-#                    voxel_size_y=1, 
-#                    voxel_size_z=1, 
-#                    center_x=0, 
-#                    center_y=0, 
-#                    center_z=0, 
-#                    channels=50)
+    ig = ImageGeometry(voxel_num_x=100, 
+                    voxel_num_y=200, 
+                    voxel_num_z=300, 
+                    voxel_size_x=0.1, 
+                    voxel_size_y=0.1, 
+                    voxel_size_z=2., 
+                    center_x=0, 
+                    center_y=0, 
+                    center_z=0, 
+                    channels=50)
+    
+    print(ig.voxel_sizes)
 #
 #    id = ig.allocate(2)
 #

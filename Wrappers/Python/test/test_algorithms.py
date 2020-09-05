@@ -593,7 +593,7 @@ class TestSPDHG(unittest.TestCase):
         angles = np.linspace(0, np.pi, 180)
         ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1)
         # Select device
-        dev = 'gpu'
+        dev = 'cpu'
 
         Aop = AstraProjectorSimple(ig, ag, dev)
         
@@ -850,6 +850,7 @@ class TestSPDHG(unittest.TestCase):
 
 if __name__ == '__main__':
     
-    d = TestAlgorithms()
-    d.test_GradientDescentArmijo2()
+    d = TestSPDHG()
+#    d.test_GradientDescentArmijo2()
+    d.test_SPDHG_vs_PDHG_explicit()
  

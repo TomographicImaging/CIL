@@ -700,7 +700,7 @@ class TestSPDHG(unittest.TestCase):
         #     dev = 'gpu'
         # else:
         #     dev = 'cpu'
-        dev = 'gpu'
+        dev = 'cpu'
 
         Aop = AstraProjectorSimple(ig, ag, dev)
         

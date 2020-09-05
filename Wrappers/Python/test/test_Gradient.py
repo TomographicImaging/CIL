@@ -390,4 +390,4 @@ class TestGradient(unittest.TestCase):
 if __name__ == '__main__':
     
     d = TestGradient()
-    d.test_Gradient_c_numpy_voxel()
+    d.test_GradientOperator_4D()

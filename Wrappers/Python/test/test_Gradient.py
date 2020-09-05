@@ -177,7 +177,8 @@ class TestGradient(unittest.TestCase):
         ig = ImageGeometry(voxel_num_x=nx, voxel_num_y=ny, voxel_num_z=nz, channels=nc)
 
 
-        arr = numpy.arange(size).reshape(dim).astype(numpy.float32)**2
+#        arr = numpy.arange(size).reshape(dim).astype(numpy.float32)**2
+        arr = ig.allocate('random')
 
         data = ig.allocate()
         data.fill(arr)
@@ -243,7 +244,7 @@ class TestGradient(unittest.TestCase):
     def test_Gradient_c_numpy_voxel(self):
         
         print("Test Gradient for 2D Geometry, ")
-        ig = ImageGeometry(400,500, voxel_size_x=0.1, voxel_size_y=0.5)  
+        ig = ImageGeometry(40,50, voxel_size_x=0.1, voxel_size_y=0.5)  
         
         GD_C = Gradient(ig, backend = 'c')
         GD_numpy = Gradient(ig, backend = 'numpy')
@@ -277,7 +278,7 @@ class TestGradient(unittest.TestCase):
         self.assertTrue(G_numpy1.dot_test(G_numpy1))         
         
         G_numpy1 = Gradient(ig, method = 'backward', bnd_cond = 'Periodic')    
-        self.assertTrue(G_numpy1.dot_test(G_numpy1))   
+        numpy.testing.assert_approx_equal(G_numpy1.dot_test(G_numpy1), True, significant = 1)
         
         G_numpy1 = Gradient(ig, method = 'centered', bnd_cond = 'Periodic')    
         numpy.testing.assert_approx_equal(G_numpy1.dot_test(G_numpy1), True, significant = 1)   
@@ -389,3 +390,4 @@ if __name__ == '__main__':
     d = TestGradient()
     d.test_GradientOperator_4D()
     d.test_Gradient_c_numpy_voxel()
+    d.test_Gradient_4D_allocate()

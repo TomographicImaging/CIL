@@ -381,6 +381,52 @@ class TestGradient(unittest.TestCase):
         print("Test passed\n")
         
         print("Test Gradient for 2D Geometry + channels passed\n")
+        
+        ###########################################################################
+        ###########################################################################
+        ###########################################################################
+        ###########################################################################
+        
+        print("Test Gradient for 3D Geometry + channels, ")
+        ig = ImageGeometry(10,10,10, voxel_size_x=0.1, voxel_size_y=0.5, voxel_size_z = 0.3, channels = 10)  
+        
+        GD_C = Gradient(ig, backend = 'c')
+        GD_numpy = Gradient(ig, backend = 'numpy')
+                   
+        print("Check Gradient_C, Gradient_numpy norms")
+        Gradient_C_norm = GD_C.norm()
+        Gradient_numpy_norm = GD_numpy.norm()    
+        numpy.testing.assert_approx_equal(Gradient_C_norm, Gradient_numpy_norm, significant = 1) 
+        print("Test passed\n")
+        
+        print("Check dot test")
+        self.assertTrue(GD_C.dot_test(GD_C))
+        self.assertTrue(GD_numpy.dot_test(GD_numpy))
+        print("Test passed\n")
+            
+        print("Check dot test for Gradient Numpy with different method/bdn_cond")
+            
+        G_numpy1 = Gradient(ig, method = 'forward', bnd_cond = 'Neumann')    
+        self.assertTrue(G_numpy1.dot_test(G_numpy1))
+        
+        G_numpy1 = Gradient(ig, method = 'backward', bnd_cond = 'Neumann')    
+        self.assertTrue(G_numpy1.dot_test(G_numpy1)) 
+        
+        G_numpy1 = Gradient(ig, method = 'centered', bnd_cond = 'Neumann') 
+        self.assertTrue(G_numpy1.dot_test(G_numpy1))  
+        
+        G_numpy1 = Gradient(ig, method = 'forward', bnd_cond = 'Periodic')    
+        self.assertTrue(G_numpy1.dot_test(G_numpy1))
+        
+        G_numpy1 = Gradient(ig, method = 'backward', bnd_cond = 'Periodic')    
+        self.assertTrue(G_numpy1.dot_test(G_numpy1))  
+        
+        G_numpy1 = Gradient(ig, method = 'centered', bnd_cond = 'Periodic')    
+        self.assertTrue(G_numpy1.dot_test(G_numpy1))  
+        
+        print("Test passed\n")
+        
+        print("Test Gradient for 3D Geometry + channels passed\n")        
 
      
 if __name__ == '__main__':

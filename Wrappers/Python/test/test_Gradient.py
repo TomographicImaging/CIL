@@ -177,8 +177,8 @@ class TestGradient(unittest.TestCase):
         ig = ImageGeometry(voxel_num_x=nx, voxel_num_y=ny, voxel_num_z=nz, channels=nc)
 
 
-#        arr = numpy.arange(size).reshape(dim).astype(numpy.float32)**2
-        arr = ig.allocate('random')
+        arr = numpy.arange(size).reshape(dim).astype(numpy.float32)**2
+#        arr = ig.allocate('random')
 
         data = ig.allocate()
         data.fill(arr)
@@ -228,8 +228,7 @@ class TestGradient(unittest.TestCase):
         nc, nz, ny, nx = 3, 4, 5, 6
         ig = ImageGeometry(voxel_num_x=nx, voxel_num_y=ny, voxel_num_z=nz, channels=nc)
 
-        grad = Gradient(ig, bnd_cond='Neumann', correlation='SpaceChannels', backend='c')
-        
+        grad = Gradient(ig, bnd_cond='Neumann', correlation='SpaceChannels', backend='c')   
         self.assertTrue(LinearOperator.dot_test(grad))
 
         grad = Gradient(ig, bnd_cond='Periodic', correlation='SpaceChannels', backend='c')
@@ -385,9 +384,10 @@ class TestGradient(unittest.TestCase):
         print("Test Gradient for 2D Geometry + channels passed\n")
 
      
-if __name__ == '__main__':
-    
-    d = TestGradient()
-    d.test_GradientOperator_4D()
-    d.test_Gradient_c_numpy_voxel()
-    d.test_Gradient_4D_allocate()
+#if __name__ == '__main__':
+#    
+#    d = TestGradient()
+##    d.test_GradientOperator_4D()
+##    d.test_Gradient_c_numpy_voxel()
+##    d.test_Gradient_4D_allocate()
+#    d.test_Gradient_linearity()

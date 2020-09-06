@@ -1027,5 +1027,3 @@ class TestOperatorCompositionSum(unittest.TestCase):
                                                 2 * out2.as_array())
 
 
-    
-

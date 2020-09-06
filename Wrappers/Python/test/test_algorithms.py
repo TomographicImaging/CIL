@@ -848,9 +848,5 @@ class TestSPDHG(unittest.TestCase):
         
 
 
-if __name__ == '__main__':
-    
-    d = TestSPDHG()
-#    d.test_GradientDescentArmijo2()
-    d.test_SPDHG_vs_PDHG_explicit()
+
  

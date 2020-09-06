@@ -808,6 +808,12 @@ class TestSPDHG(unittest.TestCase):
             
         else:
             raise ValueError('Unsupported Noise ', noise)
+         
+        import matplotlib.pyplot as plt    
+        plt.figure()
+        plt.imshow(noisy_data.as_array())            
+        plt.show()
+        
         alpha = 0.5
         op1 = Gradient(ig)
         op2 = Aop
@@ -847,6 +853,11 @@ class TestSPDHG(unittest.TestCase):
         np.testing.assert_array_less( qm[1], 3.e-05)
         
 
-
+if __name__ == '__main__':
+    
+    d = TestSPDHG()
+    d.test_PDHG_vs_PDHG_explicit_axpby()
+    
+    
 
  

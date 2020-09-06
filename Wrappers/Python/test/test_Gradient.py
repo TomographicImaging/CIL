@@ -247,8 +247,7 @@ class TestGradient(unittest.TestCase):
         
         GD_C = Gradient(ig, backend = 'c')
         GD_numpy = Gradient(ig, backend = 'numpy')
-        
-           
+                       
         print("Check Gradient_C, Gradient_numpy norms")
         Gradient_C_norm = GD_C.norm()
         Gradient_numpy_norm = GD_numpy.norm()    
@@ -384,10 +383,10 @@ class TestGradient(unittest.TestCase):
         print("Test Gradient for 2D Geometry + channels passed\n")
 
      
-#if __name__ == '__main__':
+if __name__ == '__main__':
 #    
-#    d = TestGradient()
+    d = TestGradient()
 ##    d.test_GradientOperator_4D()
-##    d.test_Gradient_c_numpy_voxel()
+    d.test_Gradient_c_numpy_voxel()
 ##    d.test_Gradient_4D_allocate()
 #    d.test_Gradient_linearity()

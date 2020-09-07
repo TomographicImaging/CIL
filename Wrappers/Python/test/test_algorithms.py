@@ -490,7 +490,7 @@ class TestSPDHG(unittest.TestCase):
         angles = np.linspace(0, np.pi, 180)
         ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1)
         # Select device
-        dev = 'gpu'
+        dev = 'cpu'
 
         Aop = AstraProjectorSimple(ig, ag, dev)
         
@@ -593,7 +593,7 @@ class TestSPDHG(unittest.TestCase):
         angles = np.linspace(0, np.pi, 180)
         ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1)
         # Select device
-        dev = 'gpu'
+        dev = 'cpu'
 
         Aop = AstraProjectorSimple(ig, ag, dev)
         
@@ -700,7 +700,7 @@ class TestSPDHG(unittest.TestCase):
         #     dev = 'gpu'
         # else:
         #     dev = 'cpu'
-        dev = 'gpu'
+        dev = 'cpu'
 
         Aop = AstraProjectorSimple(ig, ag, dev)
         
@@ -788,7 +788,7 @@ class TestSPDHG(unittest.TestCase):
         angles = np.linspace(0, np.pi, 180)
         ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1)
         
-        dev = 'gpu'
+        dev = 'cpu'
 
         Aop = AstraProjectorSimple(ig, ag, dev)
         

@@ -1626,10 +1626,12 @@ class DataProcessor(object):
         
     def process(self, out=None):
         raise NotImplementedError('process must be implemented')
+    
+    def __call__(self, x):
         
-    
-    
-
+        self.set_input(x)
+        return self.get_output()        
+                
 class DataProcessor23D(DataProcessor):
     '''Regularizers DataProcessor
     '''

@@ -380,8 +380,10 @@ class Gradient_C(LinearOperator):
             return_val = True
 
         ndout, out_p = Gradient_C.datacontainer_as_c_pointer(out)
+        
+        tmp = x/self.voxel_size_order
 
-        arg1 = [Gradient_C.datacontainer_as_c_pointer(x.get_item(i)/self.voxel_size_order[i])[1] for i in range(self.gm_range.shape[0])]
+        arg1 = [Gradient_C.datacontainer_as_c_pointer(tmp.get_item(i))[1] for i in range(self.gm_range.shape[0])]
         arg2 = [el for el in out.shape]
         args = arg1 + arg2 + [self.bnd_cond, 0, self.num_threads]
 

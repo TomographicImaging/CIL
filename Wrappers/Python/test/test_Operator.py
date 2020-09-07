@@ -18,20 +18,18 @@
 from __future__ import division
 
 import unittest
-from ccpi.framework import ImageGeometry, VectorGeometry, ImageData, BlockDataContainer, DataContainer
+from ccpi.framework import ImageGeometry, VectorGeometry, BlockDataContainer, DataContainer
 from ccpi.optimisation.operators import BlockOperator,\
     FiniteDiff, SymmetrizedGradient
 import numpy
 from timeit import default_timer as timer
-from ccpi.optimisation.operators import Gradient, Identity, SparseFiniteDiff,\
+from ccpi.optimisation.operators import Gradient, Identity,\
     DiagonalOperator, MaskOperator, ChannelwiseOperator, BlurringOperator
-from ccpi.optimisation.operators import LinearOperator, LinearOperatorMatrix
-import numpy   
-from ccpi.optimisation.operators import SumOperator, Gradient,\
-            ZeroOperator, SymmetrizedGradient, CompositionOperator
+from ccpi.optimisation.operators import LinearOperator, LinearOperatorMatrix  
+from ccpi.optimisation.operators import SumOperator,\
+            ZeroOperator, CompositionOperator
 
-from ccpi.framework import TestData
-import os
+from ccpi.utilities.DataGallery import TestData
 from packaging import version
 
 def dt(steps):

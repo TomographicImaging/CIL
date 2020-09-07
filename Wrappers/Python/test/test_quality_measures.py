@@ -19,16 +19,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from ccpi.framework import ImageGeometry
-from ccpi.optimisation.functions import L2NormSquared, L1Norm
 import numpy as np
-import matplotlib.pyplot as plt
-from ccpi.framework import TestData
-import os
-import sys
+from ccpi.utilities.DataGallery import TestData
 import unittest
-import warnings
-from ccpi.utilities.quality_measures import mse, mae, psnr
 from packaging import version
 if version.parse(np.version.version) >= version.parse("1.13"):
     try:

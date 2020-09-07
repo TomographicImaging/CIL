@@ -17,16 +17,10 @@
 #   limitations under the License.
 from __future__ import division
 
-import sys
 import unittest
 import numpy
-from ccpi.framework import DataProcessor
 from ccpi.framework import DataContainer
-from ccpi.framework import ImageData
-from ccpi.framework import AcquisitionData
-from ccpi.framework import ImageGeometry
-from ccpi.framework import AcquisitionGeometry
-from timeit import default_timer as timer
+
 
 from ccpi.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 

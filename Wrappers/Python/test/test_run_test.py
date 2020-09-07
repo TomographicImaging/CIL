@@ -22,9 +22,7 @@ import numpy
 import numpy as np
 from ccpi.framework import DataContainer
 from ccpi.framework import ImageData
-from ccpi.framework import AcquisitionData, VectorData
 from ccpi.framework import ImageGeometry,VectorGeometry
-from ccpi.framework import AcquisitionGeometry
 from ccpi.optimisation.algorithms import FISTA
 from ccpi.optimisation.functions import LeastSquares
 from ccpi.optimisation.functions import ZeroFunction

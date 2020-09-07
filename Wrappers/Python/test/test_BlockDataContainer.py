@@ -20,8 +20,8 @@ from __future__ import division
 
 import unittest
 import numpy
-from ccpi.framework import ImageGeometry, AcquisitionGeometry
-from ccpi.framework import ImageData, AcquisitionData
+from ccpi.framework import ImageGeometry
+from ccpi.framework import ImageData
 from ccpi.framework import BlockDataContainer, DataContainer
 import functools
 

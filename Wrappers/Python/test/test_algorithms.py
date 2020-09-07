@@ -20,11 +20,8 @@ from __future__ import division
 import unittest
 import numpy
 import numpy as np
-from ccpi.framework import DataContainer
 from ccpi.framework import ImageData
-from ccpi.framework import AcquisitionData
 from ccpi.framework import ImageGeometry
-from ccpi.framework import AcquisitionGeometry
 from ccpi.optimisation.operators import Identity
 from ccpi.optimisation.functions import LeastSquares, ZeroFunction, \
    L2NormSquared, FunctionOperatorComposition
@@ -35,10 +32,9 @@ from ccpi.optimisation.algorithms import FISTA
 
 from ccpi.optimisation.algorithms import PDHG
 
-from ccpi.optimisation.operators import Gradient, BlockOperator, FiniteDiff
-from ccpi.optimisation.functions import MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler                     
-from ccpi.framework import TestData
-import os ,sys
+from ccpi.optimisation.operators import Gradient
+from ccpi.optimisation.functions import MixedL21Norm, L1Norm, KullbackLeibler                     
+from ccpi.utilities.DataGallery import TestData
 
 
 try:

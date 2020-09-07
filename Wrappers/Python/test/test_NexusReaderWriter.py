@@ -21,7 +21,7 @@ import unittest
 import os
 from ccpi.io import NEXUSDataReader
 from ccpi.io import NEXUSDataWriter
-from ccpi.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
+from ccpi.framework import AcquisitionGeometry, ImageGeometry
 import numpy
     
 

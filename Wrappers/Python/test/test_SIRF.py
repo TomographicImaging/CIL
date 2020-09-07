@@ -1,7 +1,5 @@
 import numpy
-from numpy.linalg import norm
 import os
-import sys
 import shutil
 import unittest
 from ccpi.framework import BlockDataContainer

@@ -1,5 +1,5 @@
 import unittest
-from ccpi.framework import AcquisitionData, AcquisitionGeometry
+from ccpi.framework import AcquisitionGeometry
 import numpy as np
 import os
 import olefile
@@ -10,7 +10,7 @@ try:
     from ccpi.astra.processors import FBP
 except ImportError as ie:
     has_astra = False
-from ccpi.framework.TestData import data_dir
+from ccpi.utilities.DataGallery import data_dir
 filename = os.path.join(data_dir, "valnut_tomo-A.txrm")
 has_file = os.path.isfile(filename)
 

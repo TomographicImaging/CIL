@@ -18,7 +18,7 @@
 from __future__ import division
 
 import unittest
-from ccpi.framework import ImageGeometry, ImageData, BlockDataContainer, DataContainer
+from ccpi.framework import DataContainer
 import numpy
 
 def dt(steps):

@@ -22,6 +22,7 @@ from __future__ import print_function
 import numpy as np
 from ccpi.utilities.DataGallery import TestData
 import unittest
+from ccpi.utilities.quality_measures import mse, mae, psnr
 from packaging import version
 if version.parse(np.version.version) >= version.parse("1.13"):
     try:

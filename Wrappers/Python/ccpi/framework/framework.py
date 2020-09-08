@@ -128,6 +128,7 @@ class ImageGeometry(object):
         if labels is None:
             self.shape = shape
             self.dimension_labels = dim_labels
+            self.voxel_sizes = voxel_sizes
         else:
             if labels is not None:
                 allowed_labels = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL,

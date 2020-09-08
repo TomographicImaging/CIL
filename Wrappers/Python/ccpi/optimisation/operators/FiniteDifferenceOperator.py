@@ -524,7 +524,8 @@ class FiniteDifferenceOperator(LinearOperator):
         else:
                 raise ValueError('Not implemented')                
         
-        outa /= self.voxel_size  
+        if self.voxel_size != 1.0:
+            outa /= self.voxel_size  
 
         if outnone:                  
             ret.fill(outa)
@@ -668,7 +669,8 @@ class FiniteDifferenceOperator(LinearOperator):
                 raise ValueError('Not implemented')                  
                                
         outa *= -1.
-        outa /= self.voxel_size              
+        if self.voxel_size != 1.0:
+            outa /= self.voxel_size                      
             
         if outnone:                  
             ret.fill(outa)

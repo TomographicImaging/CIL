@@ -105,24 +105,24 @@ class ImageGeometry(object):
                 shape = (self.channels, self.voxel_num_z, self.voxel_num_y, self.voxel_num_x)
                 dim_labels = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL,
                 ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
-                self.voxel_sizes = [1.0, self.voxel_size_z, self.voxel_size_y, self.voxel_size_x]
+                voxel_sizes = [1.0, self.voxel_size_z, self.voxel_size_y, self.voxel_size_x]
             else:
                 self.length = 3
                 shape = (self.channels, self.voxel_num_y, self.voxel_num_x)
                 dim_labels = [ImageGeometry.CHANNEL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
-                self.voxel_sizes = [1.0, self.voxel_size_y, self.voxel_size_x]
+                voxel_sizes = [1.0, self.voxel_size_y, self.voxel_size_x]
         else:
             if self.voxel_num_z>1:
                 self.length = 3
                 shape = (self.voxel_num_z, self.voxel_num_y, self.voxel_num_x)
                 dim_labels = [ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y,
                  ImageGeometry.HORIZONTAL_X]
-                self.voxel_sizes = [self.voxel_size_z, self.voxel_size_y, self.voxel_size_x]
+                voxel_sizes = [self.voxel_size_z, self.voxel_size_y, self.voxel_size_x]
             else:
                 self.length = 2  
                 shape = (self.voxel_num_y, self.voxel_num_x)
                 dim_labels = [ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
-                self.voxel_sizes = [self.voxel_size_y, self.voxel_size_x]
+                voxel_sizes = [self.voxel_size_y, self.voxel_size_x]
         
         labels = kwargs.get('dimension_labels', None)
         if labels is None:
@@ -139,10 +139,13 @@ class ImageGeometry(object):
             if order != [i for i in range(len(dim_labels))]:
                 # resort
                 self.shape = tuple([shape[i] for i in order])
+                self.voxel_sizes = [voxel_sizes[i] for i in order]
             else:
                 self.shape = shape
+                self.voxel_sizes = voxel_sizes
             self.dimension_labels = labels
-                
+            
+                                
     def get_order_by_label(self, dimension_labels, default_dimension_labels):
         order = []
         for i, el in enumerate(dimension_labels):
@@ -1840,23 +1843,35 @@ class VectorGeometry(object):
     
 if __name__ == "__main__":
     
-    
-    vg = VectorGeometry(10)    
-    b = vg.allocate('random_int')
 
     ig = ImageGeometry(voxel_num_x=100, 
                     voxel_num_y=200, 
                     voxel_num_z=300, 
                     voxel_size_x=0.1, 
-                    voxel_size_y=0.1, 
-                    voxel_size_z=2., 
+                    voxel_size_y=0.2, 
+                    voxel_size_z=0.3, 
                     center_x=0, 
                     center_y=0, 
                     center_z=0, 
-                    channels=50)
+                    channels=50, dimension_labels = ['channel', 'vertical', 'horizontal_y', 'horizontal_x'])
     
     print(ig.voxel_sizes)
-#
+
+
+    ig = ImageGeometry(voxel_num_x=100, 
+                    voxel_num_y=200, 
+                    voxel_num_z=300, 
+                    voxel_size_x=0.1, 
+                    voxel_size_y=0.2, 
+                    voxel_size_z=0.3, 
+                    center_x=0, 
+                    center_y=0, 
+                    center_z=0, 
+                    channels=50, dimension_labels = ['vertical', 'horizontal_x', 'horizontal_x', 'channel'])
+    
+    print(ig.voxel_sizes)
+    
+    
 #    id = ig.allocate(2)
 #
 #    print(id.geometry)

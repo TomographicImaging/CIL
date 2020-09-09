@@ -90,9 +90,13 @@ class MixedL21Norm(Function):
         
         """
 
+        # Note: we divide x/tau so the cases of both scalar and 
+        # datacontainers of tau to be able to run
+        
+        
         if out is None:
-            tmp = x.pnorm(2)
-            res = (tmp - tau).maximum(0.0) * x/tmp
+            tmp = (x/tau).pnorm(2)
+            res = (tmp - 1).maximum(0.0) * x/tmp
 
             # TODO avoid using numpy, add operation in the framework
             # This will be useful when we add cupy 
@@ -107,9 +111,9 @@ class MixedL21Norm(Function):
             
         else:
             
-            tmp = x.pnorm(2)
+            tmp = (x/tau).pnorm(2)
             tmp_ig = 0.0 * tmp
-            (tmp - tau).maximum(0.0, out = tmp_ig)
+            (tmp - 1).maximum(0.0, out = tmp_ig)
             tmp_ig.multiply(x, out = out)
             out.divide(tmp, out = out)
             

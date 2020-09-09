@@ -428,7 +428,7 @@ class TestFunction(unittest.TestCase):
         
         u1 = ig.allocate('random', seed = 500)    
         g1 = ig.allocate('random', seed = 100)
-        b1 = ig.allocate('random', seed = 1000)
+        b1 = ig.allocate('random', seed = 500)
         
         # with no data
         try:

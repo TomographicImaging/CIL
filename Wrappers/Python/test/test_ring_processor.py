@@ -32,8 +32,13 @@ try:
     has_wget = True
 except ImportError as ie:
     has_wget = False
-
-
+#from ccpi.utilities.display import plotter2D
+from packaging import version
+skip_test = not has_wget
+print ("Numpy version ", np.version.version)
+if version.parse(np.version.version) < version.parse("1.14"):
+    print ("Numpy version ", np.version.version)
+    skip_test = True
 class TestRingProcessor(unittest.TestCase):
     
     def setUp(self):
@@ -56,6 +61,7 @@ class TestRingProcessor(unittest.TestCase):
                 os.remove(the_file)
                 print ("removed" , the_file)
 
+    @unittest.skipIf(skip_test, "Numpy <= 1.13")
     def test_2D_demo_ring(self):
         
         print("Start 2D ring removal in simulated sinogram")
@@ -66,8 +72,10 @@ class TestRingProcessor(unittest.TestCase):
         path_library2D = os.path.join(path, "Phantom2DLibrary.dat")
         
         phantom_2D = TomoP2D.Model(model, N, path_library2D)    
-        data = ImageData(phantom_2D)
+        # data = ImageData(phantom_2D)
         ig = ImageGeometry(voxel_num_x=N, voxel_num_y=N, voxel_size_x = 0.1, voxel_size_y = 0.1)
+        data = ig.allocate(None)
+        data.fill(phantom_2D)
         
         # Create acquisition data and geometry
         detectors = N
@@ -99,9 +107,11 @@ class TestRingProcessor(unittest.TestCase):
         
         print("Check ring remover sinogram 2D")
         np.testing.assert_array_almost_equal(tmp.as_array(), ring_recon.as_array()) 
+        # plotter2D([tmp, ring_recon], titles=['saved', 'recon'])
+        # np.testing.assert_allclose(tmp.as_array(), ring_recon.as_array(), rtol=1e4)
         print("Test passed\n")        
                     
-    @unittest.skipUnless(has_wget, "has wget")
+    @unittest.skipIf(skip_test, "has wget or Numpy < 1.14")
     def test_3D(self):
         
         print("Start 3D ring removal in real data")
@@ -133,7 +143,7 @@ class TestRingProcessor(unittest.TestCase):
         np.testing.assert_array_almost_equal(tmp.as_array(), ring_recon.as_array())          
         print("Test passed\n")
         
-    
+    @unittest.skipIf(skip_test, "has wget or Numpy < 1.14")
     def test_2D_channels(self):
         
         print("Start 2D+channels ring removal in real data")
@@ -166,7 +176,7 @@ class TestRingProcessor(unittest.TestCase):
         np.testing.assert_array_almost_equal(tmp.as_array(), ring_recon.as_array()) 
         print("Test passed\n")        
             
-    
+    @unittest.skipIf(skip_test, "has wget or Numpy < 1.14")
     def test_3D_channels(self):
         
         print("Start 3D+channels ring removal in real data")

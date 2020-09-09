@@ -46,6 +46,7 @@ class TestRingProcessor(unittest.TestCase):
         self.url = 'https://www.ccpi.ac.uk/sites/www.ccpi.ac.uk/files/'
         self.cwd = os.getcwd()
         np.random.seed(1)
+        self.decimal = 4
     # @property
     # def list_of_files(self):
     #     return self._list_of_files
@@ -106,7 +107,8 @@ class TestRingProcessor(unittest.TestCase):
         tmp = reader.load_data()      
         
         print("Check ring remover sinogram 2D")
-        np.testing.assert_array_almost_equal(tmp.as_array(), ring_recon.as_array()) 
+        np.testing.assert_array_almost_equal(tmp.as_array(), ring_recon.as_array(),
+            decimal=self.decimal) 
         # plotter2D([tmp, ring_recon], titles=['saved', 'recon'])
         # np.testing.assert_allclose(tmp.as_array(), ring_recon.as_array(), rtol=1e4)
         print("Test passed\n")        
@@ -140,7 +142,7 @@ class TestRingProcessor(unittest.TestCase):
         tmp = reader.load_data()      
         
         print("Check ring remover sinogram 3D")
-        np.testing.assert_array_almost_equal(tmp.as_array(), ring_recon.as_array())          
+        np.testing.assert_array_almost_equal(tmp.as_array(), ring_recon.as_array(),decimal=self.decimal)          
         print("Test passed\n")
         
     @unittest.skipIf(skip_test, "has wget or Numpy < 1.14")
@@ -173,7 +175,8 @@ class TestRingProcessor(unittest.TestCase):
         tmp = reader.load_data() 
 
         print("Check ring remover sinogram 2D_channels")
-        np.testing.assert_array_almost_equal(tmp.as_array(), ring_recon.as_array()) 
+        np.testing.assert_array_almost_equal(tmp.as_array(), ring_recon.as_array(),
+            decimal=self.decimal) 
         print("Test passed\n")        
             
     @unittest.skipIf(skip_test, "has wget or Numpy < 1.14")
@@ -207,7 +210,8 @@ class TestRingProcessor(unittest.TestCase):
         tmp = reader.load_data() 
 
         print("Check ring remover sinogram 3D_channels")
-        np.testing.assert_array_almost_equal(tmp.as_array(), ring_recon.as_array()) 
+        np.testing.assert_array_almost_equal(tmp.as_array(), 
+            ring_recon.as_array(), decimal=self.decimal) 
         print("Test passed\n")        
                 
                 

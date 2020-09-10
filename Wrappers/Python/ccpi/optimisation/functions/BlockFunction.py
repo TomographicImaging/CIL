@@ -50,19 +50,22 @@ class BlockFunction(Function):
     """
     
     def __init__(self, *functions):
-        
+                
+        super(BlockFunction, self).__init__()
+        self.functions = functions      
+        self.length = len(self.functions)
+       
+    @property        
+    def L(self):
         # compute Lipschitz constant if possible
         tmp_L = 0
-        for func in functions:
+        for func in self.functions:
             if func.L is not None:  
                 tmp_L += func.L                
             else:
                 tmp_L = None 
-                break
-        
-        super(BlockFunction, self).__init__(L = tmp_L)
-        self.functions = functions      
-        self.length = len(self.functions)
+                break 
+        return tmp_L     
                                 
     def __call__(self, x):
         

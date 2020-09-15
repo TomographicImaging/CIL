@@ -73,11 +73,93 @@ class ImageGeometry(object):
     VERTICAL = 'vertical'
     HORIZONTAL_X = 'horizontal_x'
     HORIZONTAL_Y = 'horizontal_y'
-    
+
+    @property
+    def shape(self):
+
+        shape_dict = {ImageGeometry.CHANNEL: self.channels,
+                     ImageGeometry.VERTICAL: self.voxel_num_z,
+                     ImageGeometry.HORIZONTAL_Y: self.voxel_num_y,        
+                     ImageGeometry.HORIZONTAL_X: self.voxel_num_x}
+
+        shape = []
+        for label in self.dimension_labels:
+            shape.append(shape_dict[label])
+
+        return tuple(shape)
+
+    @shape.setter
+    def shape(self, val):
+        DeprecationWarning("Deprecated - shape will be set automatically")
+
+    @property
+    def spacing(self):
+
+        spacing_dict = {ImageGeometry.CHANNEL: 1.0,
+                     ImageGeometry.VERTICAL: self.voxel_size_z,
+                     ImageGeometry.HORIZONTAL_Y: self.voxel_size_y,        
+                     ImageGeometry.HORIZONTAL_X: self.voxel_size_x}
+
+        spacing = []
+        for label in self.dimension_labels:
+            spacing.append(spacing_dict[label])
+
+        return tuple(spacing)
+
+    @property
+    def length(self):
+        return len(self.dimension_labels)
+
+    @property
+    def dimension_labels(self):
+        
+        labels_default = [  ImageGeometry.CHANNEL,
+                            ImageGeometry.VERTICAL,
+                            ImageGeometry.HORIZONTAL_Y,
+                            ImageGeometry.HORIZONTAL_X]
+
+        shape_default = [self.channels,
+                            self.voxel_num_z,
+                            self.voxel_num_y,
+                            self.voxel_num_x
+                            ]
+
+        try:
+            labels = list(self.__dimension_labels)
+        except AttributeError:
+            labels = labels_default.copy()
+
+        #remove from list labels where len == 1
+        #
+        for i, x in enumerate(shape_default):
+            if x == 1:
+                try:
+                    labels.remove(labels_default[i])
+                except ValueError:
+                    pass #if not in custom list carry on
+
+        return tuple(labels)
+      
+    @dimension_labels.setter
+    def dimension_labels(self, val):
+
+        labels_default = [  ImageGeometry.CHANNEL,
+                            ImageGeometry.VERTICAL,
+                            ImageGeometry.HORIZONTAL_Y,
+                            ImageGeometry.HORIZONTAL_X]
+
+        #check input and store. This value is not used directly
+        if val is not None:
+            for x in val:
+                if x not in labels_default:
+                    raise ValueError('Requested axis are not possible. Accepted label names {},\ngot {}'.format(labels_default,val))
+                    
+            self.__dimension_labels = tuple(val)
+
     def __init__(self, 
-                 voxel_num_x=0, 
-                 voxel_num_y=0, 
-                 voxel_num_z=0, 
+                 voxel_num_x=1, 
+                 voxel_num_y=1, 
+                 voxel_num_z=1, 
                  voxel_size_x=1, 
                  voxel_size_y=1, 
                  voxel_size_z=1, 
@@ -98,47 +180,38 @@ class ImageGeometry(object):
         self.center_z = center_z  
         self.channels = channels
         
-        # this is some code repetition
-        if self.channels > 1:            
-            if self.voxel_num_z>1:
-                self.length = 4
-                shape = (self.channels, self.voxel_num_z, self.voxel_num_y, self.voxel_num_x)
-                dim_labels = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL,
-                ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
-            else:
-                self.length = 3
-                shape = (self.channels, self.voxel_num_y, self.voxel_num_x)
-                dim_labels = [ImageGeometry.CHANNEL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
-        else:
-            if self.voxel_num_z>1:
-                self.length = 3
-                shape = (self.voxel_num_z, self.voxel_num_y, self.voxel_num_x)
-                dim_labels = [ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y,
-                 ImageGeometry.HORIZONTAL_X]
-            else:
-                self.length = 2  
-                shape = (self.voxel_num_y, self.voxel_num_x)
-                dim_labels = [ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
-        
-        labels = kwargs.get('dimension_labels', None)
-        if labels is None:
-            self.shape = shape
-            self.dimension_labels = dim_labels
-        else:
-            if labels is not None:
-                allowed_labels = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL,
-                                  ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
-                if not reduce(lambda x,y: (y in allowed_labels) and x, labels , True):
-                    raise ValueError('Requested axis are not possible. Expected {},\ngot {}'.format(
-                                    allowed_labels,labels))
-            order = self.get_order_by_label(labels, dim_labels)
-            if order != [i for i in range(len(dim_labels))]:
-                # resort
-                self.shape = tuple([shape[i] for i in order])
-            else:
-                self.shape = shape
-            self.dimension_labels = labels
+        self.dimension_labels = kwargs.get('dimension_labels', None)
+
+    def subset(self, dimensions=None, **kw):
+        '''Returns a new sliced and/or reshaped ImageGeometry'''
+  
+        if dimensions is not None and \
+            (len(dimensions) != len(self.shape) ):
+            raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
+
+        channel_slice = kw.get(ImageGeometry.CHANNEL, None)
+        vertical_slice = kw.get(ImageGeometry.VERTICAL, None)
+        horizontalx_slice = kw.get(ImageGeometry.HORIZONTAL_X, None)
+        horizontaly_slice = kw.get(ImageGeometry.HORIZONTAL_Y, None)
+
+        geometry_new = self.copy()
+        if channel_slice is not None:
+            geometry_new.channels = 1
+
+        if vertical_slice is not None:
+            geometry_new.voxel_num_z = 1
                 
+        if horizontaly_slice is not None:
+            geometry_new.voxel_num_y = 1
+
+        if horizontalx_slice is not None:
+            geometry_new.voxel_num_x = 1
+
+        if dimensions is not None:
+            geometry_new.dimension_labels = dimensions 
+
+        return geometry_new
+
     def get_order_by_label(self, dimension_labels, default_dimension_labels):
         order = []
         for i, el in enumerate(dimension_labels):
@@ -148,7 +221,6 @@ class ImageGeometry(object):
                     break
         return order
 
-        
     def get_min_x(self):
         return self.center_x - 0.5*self.voxel_num_x*self.voxel_size_x
         
@@ -174,22 +246,13 @@ class ImageGeometry(object):
             return 0
         
     def clone(self):
-        '''returns a copy of ImageGeometry'''
-        return ImageGeometry(
-                            self.voxel_num_x, 
-                            self.voxel_num_y, 
-                            self.voxel_num_z, 
-                            self.voxel_size_x, 
-                            self.voxel_size_y, 
-                            self.voxel_size_z, 
-                            self.center_x, 
-                            self.center_y, 
-                            self.center_z, 
-                            self.channels,
-                            dimension_labels=self.dimension_labels)
+        '''returns a copy of the ImageGeometry'''
+        return copy.deepcopy(self)
+
     def copy(self):
         '''alias of clone'''
         return self.clone()
+
  
     def __str__ (self):
         repres = ""
@@ -1000,7 +1063,6 @@ class Channels(object):
          
         return True
 
-
     def __init__ (self, num_channels, channel_labels):  
         """Constructor method
         """
@@ -1557,7 +1619,42 @@ class AcquisitionGeometry(object):
 
     def __str__ (self):
         return str(self.config)
+
+    def subset(self, dimensions=None, **kw):
+        '''returns a new sliced and/or reshaped AcquisitionGeometry'''
+  
+        if dimensions is not None and \
+            (len(dimensions) != len(self.shape) ):
+            raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
+
+        angle_slice = kw.get(AcquisitionGeometry.ANGLE, None)
+        channel_slice = kw.get(AcquisitionGeometry.CHANNEL, None)
+        vertical_slice = kw.get(AcquisitionGeometry.VERTICAL, None)
+        horizontal_slice = kw.get(AcquisitionGeometry.HORIZONTAL, None)
+
+        geometry_new = self.copy()
+        if channel_slice is not None:
+            geometry_new.config.channels.num_channels = 1
+            if hasattr(geometry_new.config.channels,'channel_labels'):
+                geometry_new.config.panel.channel_labels = geometry_new.config.panel.channel_labels[channel_slice]
+
+        if angle_slice is not None:
+            geometry_new.config.angles.angle_data = geometry_new.config.angles.angle_data[angle_slice]
         
+        if vertical_slice is not None:
+            if geometry_new.geom_type == AcquisitionGeometry.PARALLEL or vertical_slice == 'centre':
+                geometry_new = geometry_new.centre_slice()
+            else:
+                raise ValueError("Cannot calculate system geometry for the requested slice")
+        
+        if horizontal_slice is not None:
+            raise ValueError("Cannot calculate system geometry for the requested slice")
+
+        if dimensions is not None:
+            geometry_new.dimension_labels = dimensions 
+
+        return geometry_new
+
     def allocate(self, value=0, dimension_labels=None, **kwargs):
         '''allocates an AcquisitionData according to the size expressed in the instance
         
@@ -2355,53 +2452,20 @@ class ImageData(DataContainer):
         if dimensions is not None and \
             (len(dimensions) != len(self.shape) ):
             raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
-        #out = DataContainer.subset(self, dimensions, **kw)
-        out = super(ImageData, self).subset(dimensions, **kw)
         
-        if out.number_of_dimensions > 1:
-            channels = 1
-            
-            voxel_num_x = 0
-            voxel_num_y = 0
-            voxel_num_z = 0
-            
-            voxel_size_x = 1
-            voxel_size_y = 1
-            voxel_size_z = 1
-            
-            center_x = 0 
-            center_y = 0 
-            center_z = 0 
-            for key in out.dimension_labels.keys():
-                if out.dimension_labels[key] == 'channel':
-                    channels = self.geometry.channels
-                elif out.dimension_labels[key] == 'horizontal_y':
-                    voxel_size_y = self.geometry.voxel_size_y
-                    voxel_num_y = self.geometry.voxel_num_y
-                    center_y = self.geometry.center_y
-                elif out.dimension_labels[key] == 'vertical':
-                    voxel_size_z = self.geometry.voxel_size_z
-                    voxel_num_z = self.geometry.voxel_num_z
-                    center_z = self.geometry.center_z
-                elif out.dimension_labels[key] == 'horizontal_x':
-                    voxel_size_x = self.geometry.voxel_size_x
-                    voxel_num_x = self.geometry.voxel_num_x
-                    center_x = self.geometry.center_x
-            dim_lab = [ out.dimension_labels[k] for k in range(len(out.dimension_labels.items()))]
-            out.geometry = ImageGeometry(
-                                    voxel_num_x=voxel_num_x, 
-                                    voxel_num_y=voxel_num_y, 
-                                    voxel_num_z=voxel_num_z, 
-                                    voxel_size_x=voxel_size_x, 
-                                    voxel_size_y=voxel_size_y, 
-                                    voxel_size_z=voxel_size_z, 
-                                    center_x=center_x, 
-                                    center_y=center_y, 
-                                    center_z=center_z, 
-                                    channels = channels,
-                                    dimension_labels = dim_lab
-                                    )
-        return out
+        try:
+            geometry_new = self.geometry.subset(dimensions=dimensions, **kw)
+        except ValueError:
+            geometry_new = None
+
+        out = super(ImageData, self).subset(dimensions, **kw)
+        dimension_labels = out.dimension_labels.copy()    
+
+        if geometry_new is None:                
+            return DataContainer(out.array, deep_copy=False, dimension_labels=dimension_labels)
+        else:
+            return ImageData(out.array, deep_copy=False, geometry=geometry_new, dimension_labels=dimension_labels)
+
 
     def get_shape_labels(self, geometry, dimension_labels=None):
         channels  = geometry.channels
@@ -2548,34 +2612,15 @@ class AcquisitionData(DataContainer):
             raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
 
         #Update Geometry
-        angle_slice = kw.get(AcquisitionGeometry.ANGLE, None)
-        channel_slice = kw.get(AcquisitionGeometry.CHANNEL, None)
-        vertical_slice = kw.get(AcquisitionGeometry.VERTICAL, None)
-        horizontal_slice = kw.get(AcquisitionGeometry.HORIZONTAL, None)
-
-        geometry_new = self.geometry.copy()
-        if channel_slice is not None:
-            geometry_new.config.channels.num_channels = 1
-            if hasattr(geometry_new.config.channels,'channel_labels'):
-                geometry_new.config.panel.channel_labels = geometry_new.config.panel.channel_labels[channel_slice]
-
-        if angle_slice is not None:
-            geometry_new.config.angles.angle_data = geometry_new.config.angles.angle_data[angle_slice]
-        
-        if vertical_slice is not None:
-            if geometry_new.geom_type == AcquisitionGeometry.PARALLEL or vertical_slice == 'centre':
-                geometry_new = geometry_new.centre_slice()
-            else:
-                geometry_new = None
-        
-        if horizontal_slice is not None:
+        try:
+            geometry_new = self.geometry.subset(dimensions=dimensions, **kw)
+        except ValueError:
             geometry_new = None
-
-        #Update Data
 
         #if vertical = 'centre' slice convert to index and subset.
         #if the index is non-integer then return rows either side and interpolate to get the center slice value
         interpolate = False
+        vertical_slice = kw.get(AcquisitionGeometry.VERTICAL, None)
         if vertical_slice == 'centre':           
             ind = self.geometry.dimension_labels.index('vertical')
             centre_slice = (self.geometry.shape[ind]-1) / 2.
@@ -2585,7 +2630,6 @@ class AcquisitionData(DataContainer):
             if w2  > 0.0001:
                 interpolate = True
 
- 
         out = super(AcquisitionData, self).subset(dimensions, **kw)
 
         if interpolate == True:

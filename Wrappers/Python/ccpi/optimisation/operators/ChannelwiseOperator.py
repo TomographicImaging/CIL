@@ -54,9 +54,9 @@ class ChannelwiseOperator(LinearOperator):
         # channels and additional dimension_label 'channel'.
         for geom in [dom_op,ran_op]:
             if dimension == 'prepend':
-                new_dimension_labels = ['channel']+geom.dimension_labels
+                new_dimension_labels = ['channel']+list(geom.dimension_labels)
             elif dimension == 'append':
-                new_dimension_labels = geom.dimension_labels+['channel']
+                new_dimension_labels = list(geom.dimension_labels)+['channel']
             else:
                 raise Exception("dimension must be either 'prepend' or 'append'")
             if isinstance(geom, ImageGeometry):

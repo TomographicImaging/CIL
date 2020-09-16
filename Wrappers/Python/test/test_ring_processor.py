@@ -36,7 +36,7 @@ except ImportError as ie:
 from packaging import version
 skip_test = not has_wget
 print ("Numpy version ", np.version.version)
-if version.parse(np.version.version) < version.parse("1.14"):
+if version.parse(np.version.version) < version.parse("1.13.3"):
     print ("Numpy version ", np.version.version)
     skip_test = True
 class TestRingProcessor(unittest.TestCase):

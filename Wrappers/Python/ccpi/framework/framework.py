@@ -936,7 +936,7 @@ class Panel(object):
             try:
                 length_val = len(val)
             except:
-                TypeError('num_pixels expected int x or [int x, int y]. Got {}'.format(type(val)))
+                raise TypeError('num_pixels expected int x or [int x, int y]. Got {}'.format(type(val)))
 
 
             if length_val == 2:
@@ -944,7 +944,7 @@ class Panel(object):
                     val0 = int(val[0])
                     val1 = int(val[1])
                 except:
-                    TypeError('num_pixels expected int x or [int x, int y]. Got {0},{1}'.format(type(val[0]), type(val[1])))
+                    raise TypeError('num_pixels expected int x or [int x, int y]. Got {0},{1}'.format(type(val[0]), type(val[1])))
 
                 num_pixels_temp = [val0, val1]
             else:
@@ -1104,7 +1104,7 @@ class Angles(object):
     @angle_data.setter
     def angle_data(self, val):
         if val is None:
-            self.__angle_data = val
+            raise ValueError('angle_data expected to be a list of floats') 
         else:
             try:
                 self.num_positions = len(val)
@@ -1117,7 +1117,7 @@ class Angles(object):
                 try:
                     self.__angle_data = numpy.asarray(val, dtype=numpy.float32)
                 except:
-                    ValueError('angle_data expected to be a list of floats') 
+                    raise ValueError('angle_data expected to be a list of floats') 
 
     @property
     def initial_angle(self):
@@ -1452,6 +1452,10 @@ class AcquisitionGeometry(object):
             self.dimension_labels = kwargs.get('dimension_labels', None)
             if self.config.configured:
                 print("AcquisitionGeometry configured using deprecated method")
+            else:
+                raise ValueError("AcquisitionGeometry not configured")
+
+
 
 
     def set_angles(self, angles, initial_angle=0, angle_unit='degree'):

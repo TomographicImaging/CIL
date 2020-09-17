@@ -85,7 +85,7 @@ class ImageGeometry(object):
 
     @shape.setter
     def shape(self, val):
-        DeprecationWarning("Deprecated - shape will be set automatically")
+        print("Deprecated - shape will be set automatically")
 
     @property
     def spacing(self):
@@ -1349,7 +1349,7 @@ class AcquisitionGeometry(object):
 
     @shape.setter
     def shape(self, val):
-        DeprecationWarning("Deprecated - shape will be set automatically")
+        print("Deprecated - shape will be set automatically")
 
     @property
     def dimension_labels(self):

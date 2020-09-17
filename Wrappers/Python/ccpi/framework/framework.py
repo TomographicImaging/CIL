@@ -156,6 +156,27 @@ class ImageGeometry(object):
                     
             self.__dimension_labels = tuple(val)
 
+    def __eq__(self, other):
+
+        if not isinstance(other, self.__class__):
+            return False
+        
+        if self.voxel_num_x == other.voxel_num_x \
+            and self.voxel_num_y == other.voxel_num_y \
+            and self.voxel_num_z == other.voxel_num_z \
+            and self.voxel_size_x == other.voxel_size_x \
+            and self.voxel_size_y == other.voxel_size_y \
+            and self.voxel_size_z == other.voxel_size_z \
+            and self.center_x == other.center_x \
+            and self.center_y == other.center_y \
+            and self.center_z == other.center_z \
+            and self.channels == other.channels \
+            and self.dimension_labels == other.dimension_labels:
+
+            return True
+        
+        return False
+
     def __init__(self, 
                  voxel_num_x=1, 
                  voxel_num_y=1, 
@@ -1595,8 +1616,6 @@ class AcquisitionGeometry(object):
             return True
         return False
 
-
-
     def clone(self):
         '''returns a copy of the AcquisitionGeometry'''
         return copy.deepcopy(self)
@@ -1616,6 +1635,17 @@ class AcquisitionGeometry(object):
         AG_2D.config.panel.num_pixels[1] = 1
         AG_2D.config.panel.pixel_size[1] = abs(self.config.system.detector.direction_col[2]) * self.config.panel.pixel_size[1]
         return AG_2D
+
+    def get_ImageGeometry(self, resoultion=1.0):
+        '''returns a default configured ImageGeometry object based on the AcquisitionGeomerty'''
+
+        num_voxel_xy = numpy.ceil(self.config.panel.num_pixels[0] * resoultion)
+        num_voxel_z = numpy.ceil(self.config.panel.num_pixels[1] * resoultion)
+        voxel_size_xy = self.config.panel.pixel_size[0] * resoultion / self.magnification
+        voxel_size_z = self.config.panel.pixel_size[1] * resoultion/ self.magnification
+
+        return ImageGeometry(num_voxel_xy, num_voxel_xy, num_voxel_z, voxel_size_xy, voxel_size_xy, voxel_size_z, channels=self.channels)
+
 
     def __str__ (self):
         return str(self.config)

@@ -21,7 +21,7 @@ import sys
 import unittest
 import numpy
 import math
-from ccpi.framework import AcquisitionGeometry
+from ccpi.framework import AcquisitionGeometry, ImageGeometry
 
 class Test_AcquisitionGeometry(unittest.TestCase):
     def test_create_Parallel2D(self):
@@ -309,6 +309,38 @@ class Test_AcquisitionGeometry(unittest.TestCase):
         test2 = numpy.ndarray([2,5,3,4])
         self.assertEqual(test.shape, test2.shape)
 
+    def test_get_ImageGeometry(self):
+
+        AG = AcquisitionGeometry.create_Parallel2D()\
+            .set_panel(num_pixels=[512,1],pixel_size=[0.1,0.1])      
+        IG = AG.get_ImageGeometry()
+        IG_gold = ImageGeometry(512,512,1,0.1,0.1,0.1,0,0,0,1)
+        self.assertEqual(IG, IG_gold)
+
+        AG = AcquisitionGeometry.create_Parallel3D()\
+            .set_panel(num_pixels=[512,3],pixel_size=[0.1,0.2])
+        IG = AG.get_ImageGeometry()
+        IG_gold = ImageGeometry(512,512,3,0.1,0.1,0.2,0,0,0,1)
+        self.assertEqual(IG, IG_gold)
+
+        AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,500.])\
+            .set_panel(num_pixels=[512,1],pixel_size=[0.1,0.2])
+        IG = AG.get_ImageGeometry()
+        IG_gold = ImageGeometry(512,512,1,0.05,0.05,0.1,0,0,0,1)
+        self.assertEqual(IG, IG_gold)
+
+        AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,500.,0])\
+            .set_panel(num_pixels=[512,3],pixel_size=[0.1,0.2])
+        IG = AG.get_ImageGeometry()
+        IG_gold = ImageGeometry(512,512,3,0.05,0.05,0.1,0,0,0,1)
+        self.assertEqual(IG, IG_gold)
+
+        AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,500.,0])\
+            .set_panel(num_pixels=[512,3],pixel_size=[0.1,0.2])
+        IG = AG.get_ImageGeometry(resoultion=0.5)
+        IG_gold = ImageGeometry(256,256,2,0.025,0.025,0.05,0,0,0,1)
+        self.assertEqual(IG, IG_gold)
+
 class Test_Parallel2D(unittest.TestCase):
     
     def test_set_origin(self):
@@ -475,7 +507,7 @@ class Test_Cone3D(unittest.TestCase):
         with self.assertRaises(ValueError):
             cs = AG.config.system.centre_slice()
 
-    def test_calculate_mag(self):
+    def test_calculate_mag(self):        
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,1000.,0])
         out = AG.config.system.calculate_mag()
         self.assertEqual(out, [500, 1000, 3]) 
@@ -521,3 +553,5 @@ class Test_Cone3D(unittest.TestCase):
 
         source_to_detector = 1500 / (ab[1]  - ab[0])
         self.assertEqual(out, [source_to_object, source_to_detector - source_to_object, source_to_detector/source_to_object]) 
+
+

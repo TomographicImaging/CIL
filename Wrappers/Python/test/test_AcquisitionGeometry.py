@@ -288,10 +288,10 @@ class Test_AcquisitionGeometry(unittest.TestCase):
         AG2 = AG.copy()
         self.assertEqual(AG2, AG)
 
-    def test_centre_slice(self):
+    def test_get_centre_slice(self):
         AG = AcquisitionGeometry.create_Parallel3D(detector_direction_col=[0,1,1])
         AG.set_panel([1000,2000],[1,1])
-        AG_cs = AG.centre_slice()
+        AG_cs = AG.get_centre_slice()
 
         AG2 = AcquisitionGeometry.create_Parallel2D()
         AG2.set_panel([1000,1],[1,math.sqrt(0.5)])
@@ -337,39 +337,39 @@ class Test_AcquisitionGeometry(unittest.TestCase):
 
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,500.,0])\
             .set_panel(num_pixels=[512,3],pixel_size=[0.1,0.2])
-        IG = AG.get_ImageGeometry(resoultion=0.5)
+        IG = AG.get_ImageGeometry(resolution=0.5)
         IG_gold = ImageGeometry(256,256,2,0.025,0.025,0.05,0,0,0,1)
         self.assertEqual(IG, IG_gold)
 
 class Test_Parallel2D(unittest.TestCase):
     
-    def test_set_origin(self):
+    def test_update_reference_frame(self):
         AG = AcquisitionGeometry.create_Parallel2D(detector_position=[0.,1000.], rotation_axis_position=[5.,2.])
-        AG.config.system.set_origin()
+        AG.config.system.update_reference_frame()
 
         numpy.testing.assert_allclose(AG.config.system.ray.direction, [0,1], rtol=1E-6)
         numpy.testing.assert_allclose(AG.config.system.detector.position, [-5,998], rtol=1E-6)
         numpy.testing.assert_allclose(AG.config.system.detector.direction_row, [1,0], rtol=1E-6)
         numpy.testing.assert_allclose(AG.config.system.rotation_axis.position, [0,0], rtol=1E-6)
 
-    def test_centre_slice(self):
+    def test_get_centre_slice(self):
         AG = AcquisitionGeometry.create_Parallel2D()
         AG2 = AG.copy()
 
-        AG2.config.system.centre_slice()
+        AG2.config.system.get_centre_slice()
         self.assertEqual(AG.config.system, AG2.config.system)
 
-    def test_calculate_mag(self):
+    def test_calculate_magnification(self):
         AG = AcquisitionGeometry.create_Parallel2D()
-        out = AG.config.system.calculate_mag()
+        out = AG.config.system.calculate_magnification()
         self.assertEqual(out, [None, None, 1]) 
 
 class Test_Parallel3D(unittest.TestCase):
     
-    def test_set_origin(self):
+    def test_update_reference_frame(self):
         #translate origin
         AG = AcquisitionGeometry.create_Parallel3D(detector_position=[0.,1000.,0], rotation_axis_position=[5.,2.,4.])
-        AG.config.system.set_origin()
+        AG.config.system.update_reference_frame()
         numpy.testing.assert_allclose(AG.config.system.ray.direction, [0,1,0], rtol=1E-6)
         numpy.testing.assert_allclose(AG.config.system.detector.position, [-5,998,-4], rtol=1E-6)
         numpy.testing.assert_allclose(AG.config.system.detector.direction_row, [1,0,0], rtol=1E-6)
@@ -377,7 +377,7 @@ class Test_Parallel3D(unittest.TestCase):
 
         #align Z axis with rotate axis
         AG = AcquisitionGeometry.create_Parallel3D(detector_position=[0.,1000.,0], rotation_axis_position=[0.,0.,0.], rotation_axis_direction=[0,1,0])
-        AG.config.system.set_origin()
+        AG.config.system.update_reference_frame()
         numpy.testing.assert_allclose(AG.config.system.ray.direction, [0,0,-1], rtol=1E-6)
         numpy.testing.assert_allclose(AG.config.system.detector.position, [0,0,-1000], rtol=1E-6)
         numpy.testing.assert_allclose(AG.config.system.detector.direction_row, [1,0,0], rtol=1E-6)
@@ -386,69 +386,69 @@ class Test_Parallel3D(unittest.TestCase):
         numpy.testing.assert_allclose(AG.config.system.rotation_axis.direction, [0,0,1], rtol=1E-6)
 
 
-    def test_centre_slice(self):
+    def test_get_centre_slice(self):
         #returns the 2D version
         AG = AcquisitionGeometry.create_Parallel3D()
         AG2 = AcquisitionGeometry.create_Parallel2D()
-        cs = AG.config.system.centre_slice()
+        cs = AG.config.system.get_centre_slice()
         self.assertEqual(cs, AG2.config.system)
 
         #returns the 2D version
         AG = AcquisitionGeometry.create_Parallel3D(rotation_axis_direction=[-1,0,1],detector_direction_row=[1,0,1], detector_direction_col=[-1,0,1])
         AG2 = AcquisitionGeometry.create_Parallel2D()
-        cs = AG.config.system.centre_slice()
+        cs = AG.config.system.get_centre_slice()
         self.assertEqual(cs, AG2.config.system)
 
         #raise error if cannot extract a cnetre slice
         AG = AcquisitionGeometry.create_Parallel3D(ray_direction=[0,1,1])
         with self.assertRaises(ValueError):
-            cs = AG.config.system.centre_slice()
+            cs = AG.config.system.get_centre_slice()
 
         AG = AcquisitionGeometry.create_Parallel3D(detector_direction_row=[1,0,1], detector_direction_col=[-1,0,1])
         with self.assertRaises(ValueError):
-            cs = AG.config.system.centre_slice()
+            cs = AG.config.system.get_centre_slice()
 
-    def test_calculate_mag(self):
+    def test_calculate_magnification(self):
         AG = AcquisitionGeometry.create_Parallel3D()
-        out = AG.config.system.calculate_mag()
+        out = AG.config.system.calculate_magnification()
         self.assertEqual(out, [None, None, 1]) 
 
 class Test_Cone2D(unittest.TestCase):
     
-    def test_set_origin(self):
+    def test_update_reference_frame(self):
         AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,1000.], rotation_axis_position=[5.,2.])
-        AG.config.system.set_origin()
+        AG.config.system.update_reference_frame()
 
         numpy.testing.assert_allclose(AG.config.system.source.position, [-5,-502], rtol=1E-6)
         numpy.testing.assert_allclose(AG.config.system.detector.position, [-5,998], rtol=1E-6)
         numpy.testing.assert_allclose(AG.config.system.detector.direction_row, [1,0], rtol=1E-6)
         numpy.testing.assert_allclose(AG.config.system.rotation_axis.position, [0,0], rtol=1E-6)
 
-    def test_centre_slice(self):
+    def test_get_centre_slice(self):
         AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,1000.])
         AG2 = AG.copy()
 
-        AG2.config.system.centre_slice()
+        AG2.config.system.get_centre_slice()
         self.assertEqual(AG.config.system, AG2.config.system)
 
-    def test_calculate_mag(self):
+    def test_calculate_magnification(self):
         AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,1000.])
-        out = AG.config.system.calculate_mag()
+        out = AG.config.system.calculate_magnification()
         self.assertEqual(out, [500, 1000, 3]) 
 
         AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,1000.], rotation_axis_position=[0.,250.])
-        out = AG.config.system.calculate_mag()
+        out = AG.config.system.calculate_magnification()
         self.assertEqual(out, [750, 750, 2]) 
 
         AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,1000.], rotation_axis_position=[5.,0.])
-        out = AG.config.system.calculate_mag()
+        out = AG.config.system.calculate_magnification()
         source_to_object = numpy.sqrt(5.0**2 + 500.0**2)
         theta = math.atan2(5.0,500.0)
         source_to_detector = 1500.0/math.cos(theta)
         self.assertEqual(out, [source_to_object, source_to_detector - source_to_object, source_to_detector/source_to_object]) 
 
         AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,1000.], rotation_axis_position=[5.,0.],detector_direction_row=[math.sqrt(5),math.sqrt(5)])
-        out = AG.config.system.calculate_mag()
+        out = AG.config.system.calculate_magnification()
         source_to_object = numpy.sqrt(5.0**2 + 500.0**2)
 
         ab = (AG.config.system.rotation_axis.position - AG.config.system.source.position).astype(numpy.float64)/source_to_object
@@ -466,10 +466,10 @@ class Test_Cone2D(unittest.TestCase):
 
 class Test_Cone3D(unittest.TestCase):
     
-    def test_set_origin(self):
+    def test_update_reference_frame(self):
         #translate origin
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0],detector_position=[0.,1000.,0], rotation_axis_position=[5.,2.,4.])
-        AG.config.system.set_origin()
+        AG.config.system.update_reference_frame()
         numpy.testing.assert_allclose(AG.config.system.source.position, [-5,-502,-4], rtol=1E-6)
         numpy.testing.assert_allclose(AG.config.system.detector.position, [-5,998,-4], rtol=1E-6)
         numpy.testing.assert_allclose(AG.config.system.detector.direction_row, [1,0,0], rtol=1E-6)
@@ -477,7 +477,7 @@ class Test_Cone3D(unittest.TestCase):
 
         #align Z axis with rotate axis
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0],detector_position=[0.,1000.,0], rotation_axis_position=[0.,0.,0.], rotation_axis_direction=[0,1,0])
-        AG.config.system.set_origin()
+        AG.config.system.update_reference_frame()
         numpy.testing.assert_allclose(AG.config.system.source.position, [0,0,500], rtol=1E-6)
         numpy.testing.assert_allclose(AG.config.system.detector.position, [0,0,-1000], rtol=1E-6)
         numpy.testing.assert_allclose(AG.config.system.detector.direction_row, [1,0,0], rtol=1E-6)
@@ -485,61 +485,61 @@ class Test_Cone3D(unittest.TestCase):
         numpy.testing.assert_allclose(AG.config.system.rotation_axis.position, [0,0,0], rtol=1E-6)
         numpy.testing.assert_allclose(AG.config.system.rotation_axis.direction, [0,0,1], rtol=1E-6)
 
-    def test_centre_slice(self):
+    def test_get_centre_slice(self):
         #returns the 2D version
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0,1000,0])
         AG2 = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0,1000])
-        cs = AG.config.system.centre_slice()
+        cs = AG.config.system.get_centre_slice()
         self.assertEqual(cs, AG2.config.system)
 
         #returns the 2D version
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0,1000,0], rotation_axis_direction=[-1,0,1], detector_direction_row=[1,0,1], detector_direction_col=[-1,0,1])
         AG2 = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0,1000])
-        cs = AG.config.system.centre_slice()
+        cs = AG.config.system.get_centre_slice()
         self.assertEqual(cs, AG2.config.system)
 
         #raise error if cannot extract a cnetre slice
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0,1000,0], rotation_axis_direction=[1,0,1])
         with self.assertRaises(ValueError):
-            cs = AG.config.system.centre_slice()
+            cs = AG.config.system.get_centre_slice()
 
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0,1000,0],detector_direction_row=[1,0,1], detector_direction_col=[-1,0,1])
         with self.assertRaises(ValueError):
-            cs = AG.config.system.centre_slice()
+            cs = AG.config.system.get_centre_slice()
 
-    def test_calculate_mag(self):        
+    def test_calculate_magnification(self):        
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,1000.,0])
-        out = AG.config.system.calculate_mag()
+        out = AG.config.system.calculate_magnification()
         self.assertEqual(out, [500, 1000, 3]) 
 
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,1000.,0], rotation_axis_position=[0.,250.,0])
-        out = AG.config.system.calculate_mag()
+        out = AG.config.system.calculate_magnification()
         self.assertEqual(out, [750, 750, 2]) 
 
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,1000.,0], rotation_axis_position=[5.,0.,0])
-        out = AG.config.system.calculate_mag()
+        out = AG.config.system.calculate_magnification()
         source_to_object = numpy.sqrt(5.0**2 + 500.0**2)
         theta = math.atan2(5.0,500.0)
         source_to_detector = 1500.0/math.cos(theta)
         self.assertEqual(out, [source_to_object, source_to_detector - source_to_object, source_to_detector/source_to_object]) 
 
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,1000.,0], rotation_axis_position=[0.,0.,5.])
-        out = AG.config.system.calculate_mag()
+        out = AG.config.system.calculate_magnification()
         source_to_object = numpy.sqrt(5.0**2 + 500.0**2)
         theta = math.atan2(5.0,500.0)
         source_to_detector = 1500.0/math.cos(theta)
         self.assertEqual(out, [source_to_object, source_to_detector - source_to_object, source_to_detector/source_to_object]) 
 
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,1000.,0],detector_direction_col=[0,math.sqrt(5),math.sqrt(5)])
-        out = AG.config.system.calculate_mag()
+        out = AG.config.system.calculate_magnification()
         self.assertEqual(out, [500, 1000, 3]) 
 
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,1000.,0],detector_direction_row=[1,0.1,0.2],detector_direction_col=[-0.2,0,1])
-        out = AG.config.system.calculate_mag()
+        out = AG.config.system.calculate_magnification()
         self.assertEqual(out, [500, 1000, 3])         
         
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,1000.,0], rotation_axis_position=[5.,0.,0],detector_direction_row=[math.sqrt(5),math.sqrt(5),0])
-        out = AG.config.system.calculate_mag()
+        out = AG.config.system.calculate_magnification()
         source_to_object = numpy.sqrt(5.0**2 + 500.0**2)
 
         ab = (AG.config.system.rotation_axis.position - AG.config.system.source.position).astype(numpy.float64)/source_to_object

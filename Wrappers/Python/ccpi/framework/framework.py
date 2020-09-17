@@ -29,10 +29,6 @@ from numbers import Number
 import ctypes, platform
 from ccpi.utilities import NUM_THREADS
 import math
-# dll = os.path.abspath(os.path.join( 
-#          os.path.abspath(os.path.dirname(__file__)),
-#          'libfdiff.dll')
-# )
 
 # check for the extension
 if platform.system() == 'Linux':
@@ -44,7 +40,6 @@ elif platform.system() == 'Darwin':
 else:
     raise ValueError('Not supported platform, ', platform.system())
 
-#print ("dll location", dll)
 cilacc = ctypes.cdll.LoadLibrary(dll)
 
 #default nThreads
@@ -503,17 +498,17 @@ class SystemConfiguration(object):
         """   
         raise NotImplementedError
 
-    def set_origin(self):
+    def update_reference_frame(self):
         """Returns the components of the system in the reference frame of the rotation axis at position 0
         """      
         raise NotImplementedError
 
-    def centre_slice(self):
+    def get_centre_slice(self):
         """Returns the 2D system configuration corersponding to the centre slice
         """        
         raise NotImplementedError
 
-    def calculate_mag(self):
+    def calculate_magnification(self):
         r'''Calculates the magnification of the system using the source to rotate axis,
         and source to detector distance along the direction.
 
@@ -553,7 +548,7 @@ class Parallel2D(SystemConfiguration):
         #rotate axis
         self.rotation_axis.position = rotation_axis_pos
 
-    def set_origin(self):
+    def update_reference_frame(self):
         r'''Transforms the system origin to the rotate axis
         '''         
         self.detector.position -= self.rotation_axis.position
@@ -584,10 +579,10 @@ class Parallel2D(SystemConfiguration):
         
         return False
 
-    def centre_slice(self):
+    def get_centre_slice(self):
         return self
 
-    def calculate_mag(self):
+    def calculate_magnification(self):
         return [None, None, 1.0]
 
 class Parallel3D(SystemConfiguration):
@@ -622,7 +617,7 @@ class Parallel3D(SystemConfiguration):
         self.rotation_axis.position = rotation_axis_pos
         self.rotation_axis.direction = rotation_axis_direction
 
-    def set_origin(self):
+    def update_reference_frame(self):
         r'''Transforms the system origin to the rotate axis with z direction aligned to the rotate axis direction
         '''          
         #shift detector
@@ -673,10 +668,10 @@ class Parallel3D(SystemConfiguration):
         
         return False
 
-    def calculate_mag(self):
+    def calculate_magnification(self):
         return [None, None, 1.0]
 
-    def centre_slice(self):
+    def get_centre_slice(self):
         """Returns the 2D system configuration corersponding to the centre slice
         """  
         dp1 = self.rotation_axis.direction.dot(self.ray.direction)
@@ -686,7 +681,7 @@ class Parallel3D(SystemConfiguration):
             temp = self.copy()
 
             #convert to rotation axis reference frame
-            temp.set_origin()
+            temp.update_reference_frame()
 
             ray_direction = temp.ray.direction[0:2]
             detector_position = temp.detector.position[0:2]
@@ -727,7 +722,7 @@ class Cone2D(SystemConfiguration):
         #rotate axis
         self.rotation_axis.position = rotation_axis_pos
 
-    def set_origin(self):
+    def update_reference_frame(self):
         r'''Transforms the system origin to the rotate axis
         '''                  
         self.source.position -= self.rotation_axis.position
@@ -759,10 +754,10 @@ class Cone2D(SystemConfiguration):
         
         return False
 
-    def centre_slice(self):
+    def get_centre_slice(self):
         return self
 
-    def calculate_mag(self):
+    def calculate_magnification(self):
         #64bit for maths
         rotation_axis_position = self.rotation_axis.position.astype(numpy.float64)
         source_position = self.source.position.astype(numpy.float64)
@@ -819,7 +814,7 @@ class Cone3D(SystemConfiguration):
         self.rotation_axis.position = rotation_axis_pos
         self.rotation_axis.direction = rotation_axis_direction
 
-    def set_origin(self):
+    def update_reference_frame(self):
         r'''Transforms the system origin to the rotate axis with z direction aligned to the rotate axis direction
         '''                  
         #shift 
@@ -841,7 +836,7 @@ class Cone3D(SystemConfiguration):
         new_col = rotation_matrix.dot(self.detector.direction_col.reshape(3,1))
         self.detector.set_direction(new_row, new_col)
 
-    def centre_slice(self):
+    def get_centre_slice(self):
         """Returns the 2D system configuration corersponding to the centre slice
         """ 
         #requires the rotate axis to be perpendicular to the detector, and parallel to coloumns
@@ -851,7 +846,7 @@ class Cone3D(SystemConfiguration):
         
         if numpy.isclose(dp1, 0) and numpy.isclose(dp2, 0):
             temp = self.copy()
-            temp.set_origin()
+            temp.update_reference_frame()
             source_position = temp.source.position[0:2]
             detector_position = temp.detector.position[0:2]
             detector_direction_row = temp.detector.direction_row[0:2]
@@ -891,7 +886,7 @@ class Cone3D(SystemConfiguration):
         
         return False
 
-    def calculate_mag(self):
+    def calculate_magnification(self):
     
         #64bit for maths
         rotation_axis_position = self.rotation_axis.position.astype(numpy.float64)
@@ -1321,17 +1316,17 @@ class AcquisitionGeometry(object):
 
     @property
     def dist_source_center(self):
-        out = self.config.system.calculate_mag()
+        out = self.config.system.calculate_magnification()
         return out[0]
 
     @property
     def dist_center_detector(self):
-        out = self.config.system.calculate_mag()
+        out = self.config.system.calculate_magnification()
         return out[1]
 
     @property
     def magnification(self):
-        out = self.config.system.calculate_mag()
+        out = self.config.system.calculate_magnification()
         return out[2]
 
     @property
@@ -1624,25 +1619,25 @@ class AcquisitionGeometry(object):
         '''alias of clone'''
         return self.clone()
 
-    def centre_slice(self):
+    def get_centre_slice(self):
         '''returns a 2D AcquisitionGeometry that corresponds to the centre slice of the input'''
 
         if self.dimension == '2D':
             return self
               
         AG_2D = copy.deepcopy(self)
-        AG_2D.config.system = self.config.system.centre_slice()
+        AG_2D.config.system = self.config.system.get_centre_slice()
         AG_2D.config.panel.num_pixels[1] = 1
         AG_2D.config.panel.pixel_size[1] = abs(self.config.system.detector.direction_col[2]) * self.config.panel.pixel_size[1]
         return AG_2D
 
-    def get_ImageGeometry(self, resoultion=1.0):
+    def get_ImageGeometry(self, resolution=1.0):
         '''returns a default configured ImageGeometry object based on the AcquisitionGeomerty'''
 
-        num_voxel_xy = numpy.ceil(self.config.panel.num_pixels[0] * resoultion)
-        num_voxel_z = numpy.ceil(self.config.panel.num_pixels[1] * resoultion)
-        voxel_size_xy = self.config.panel.pixel_size[0] * resoultion / self.magnification
-        voxel_size_z = self.config.panel.pixel_size[1] * resoultion/ self.magnification
+        num_voxel_xy = numpy.ceil(self.config.panel.num_pixels[0] * resolution)
+        num_voxel_z = numpy.ceil(self.config.panel.num_pixels[1] * resolution)
+        voxel_size_xy = self.config.panel.pixel_size[0] * resolution / self.magnification
+        voxel_size_z = self.config.panel.pixel_size[1] * resolution/ self.magnification
 
         return ImageGeometry(num_voxel_xy, num_voxel_xy, num_voxel_z, voxel_size_xy, voxel_size_xy, voxel_size_z, channels=self.channels)
 
@@ -1673,7 +1668,7 @@ class AcquisitionGeometry(object):
         
         if vertical_slice is not None:
             if geometry_new.geom_type == AcquisitionGeometry.PARALLEL or vertical_slice == 'centre':
-                geometry_new = geometry_new.centre_slice()
+                geometry_new = geometry_new.get_centre_slice()
             else:
                 raise ValueError("Cannot calculate system geometry for the requested slice")
         
@@ -2881,10 +2876,6 @@ class CastDataContainer(DataProcessor):
                                 dimension_labels=dsi.dimension_labels )
         else:
             out.fill(numpy.asarray(dsi.as_array(), dtype=dtype))
-    
-        
-        
-    
     
 class PixelByPixelDataProcessor(DataProcessor):
     '''Example DataProcessor

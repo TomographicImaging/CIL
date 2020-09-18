@@ -90,10 +90,10 @@ class ImageGeometry(object):
     @property
     def spacing(self):
 
-        spacing_dict = {ImageGeometry.CHANNEL: 1.0,
-                     ImageGeometry.VERTICAL: self.voxel_size_z,
-                     ImageGeometry.HORIZONTAL_Y: self.voxel_size_y,        
-                     ImageGeometry.HORIZONTAL_X: self.voxel_size_x}
+        spacing_dict = {ImageGeometry.CHANNEL: self.channel_spacing,
+                        ImageGeometry.VERTICAL: self.voxel_size_z,
+                        ImageGeometry.HORIZONTAL_Y: self.voxel_size_y,        
+                        ImageGeometry.HORIZONTAL_X: self.voxel_size_x}
 
         spacing = []
         for label in self.dimension_labels:
@@ -113,26 +113,22 @@ class ImageGeometry(object):
                             ImageGeometry.HORIZONTAL_Y,
                             ImageGeometry.HORIZONTAL_X]
 
-        shape_default = [self.channels,
+        shape_default = [   self.channels - 1, #channels default is 1
                             self.voxel_num_z,
                             self.voxel_num_y,
-                            self.voxel_num_x
-                            ]
+                            self.voxel_num_x]
 
         try:
             labels = list(self.__dimension_labels)
         except AttributeError:
             labels = labels_default.copy()
 
-        #remove from list labels where len == 1
-        #
         for i, x in enumerate(shape_default):
-            if x == 1:
+            if x == 0:
                 try:
                     labels.remove(labels_default[i])
                 except ValueError:
                     pass #if not in custom list carry on
-
         return tuple(labels)
       
     @dimension_labels.setter
@@ -166,6 +162,7 @@ class ImageGeometry(object):
             and self.center_y == other.center_y \
             and self.center_z == other.center_z \
             and self.channels == other.channels \
+            and self.channel_spacing == other.channel_spacing \
             and self.dimension_labels == other.dimension_labels:
 
             return True
@@ -173,9 +170,9 @@ class ImageGeometry(object):
         return False
 
     def __init__(self, 
-                 voxel_num_x=1, 
-                 voxel_num_y=1, 
-                 voxel_num_z=1, 
+                 voxel_num_x=0, 
+                 voxel_num_y=0, 
+                 voxel_num_z=0, 
                  voxel_size_x=1, 
                  voxel_size_y=1, 
                  voxel_size_z=1, 
@@ -195,7 +192,7 @@ class ImageGeometry(object):
         self.center_y = center_y
         self.center_z = center_z  
         self.channels = channels
-        
+        self.channel_spacing = 1.0
         self.dimension_labels = kwargs.get('dimension_labels', None)
 
     def subset(self, dimensions=None, **kw):
@@ -215,13 +212,13 @@ class ImageGeometry(object):
             geometry_new.channels = 1
 
         if vertical_slice is not None:
-            geometry_new.voxel_num_z = 1
+            geometry_new.voxel_num_z = 0
                 
         if horizontaly_slice is not None:
-            geometry_new.voxel_num_y = 1
+            geometry_new.voxel_num_y = 0
 
         if horizontalx_slice is not None:
-            geometry_new.voxel_num_x = 1
+            geometry_new.voxel_num_x = 0
 
         if dimensions is not None:
             geometry_new.dimension_labels = dimensions 
@@ -268,14 +265,21 @@ class ImageGeometry(object):
     def copy(self):
         '''alias of clone'''
         return self.clone()
-
  
     def __str__ (self):
         repres = ""
         repres += "Number of channels: {0}\n".format(self.channels)
-        repres += "voxel_num : x{0},y{1},z{2}\n".format(self.voxel_num_x, self.voxel_num_y, self.voxel_num_z)
-        repres += "voxel_size : x{0},y{1},z{2}\n".format(self.voxel_size_x, self.voxel_size_y, self.voxel_size_z)
-        repres += "center : x{0},y{1},z{2}\n".format(self.center_x, self.center_y, self.center_z)
+        repres += "channel_spacing: {0}\n".format(self.channel_spacing)
+
+        if self.voxel_num_z > 0:
+            repres += "voxel_num : x{0},y{1},z{2}\n".format(self.voxel_num_x, self.voxel_num_y, self.voxel_num_z)
+            repres += "voxel_size : x{0},y{1},z{2}\n".format(self.voxel_size_x, self.voxel_size_y, self.voxel_size_z)
+            repres += "center : x{0},y{1},z{2}\n".format(self.center_x, self.center_y, self.center_z)
+        else:
+            repres += "voxel_num : x{0},y{1},z{2}\n".format(self.voxel_num_x, self.voxel_num_y)
+            repres += "voxel_size : x{0},y{1},z{2}\n".format(self.voxel_size_x, self.voxel_size_y)
+            repres += "center : x{0},y{1},z{2}\n".format(self.center_x, self.center_y)
+
         return repres
     def allocate(self, value=0, dimension_labels=None, **kwargs):
         '''allocates an ImageData according to the size expressed in the instance'''
@@ -967,7 +971,6 @@ class Panel(object):
         if val is None:
             pixel_size_temp = [1.0,1.0] 
         else:
-
             try:
                 length_val = len(val)
             except:
@@ -977,17 +980,16 @@ class Panel(object):
 
                 except:
                     raise TypeError('pixel_size expected float xy or [float x, float y]. Got {}'.format(val))    
-
-    
-            if length_val == 2:
-                try:
-                    temp0 = float(val[0]) 
-                    temp1 = float(val[1]) 
-                    pixel_size_temp = [temp0, temp1]
-                except:
-                    raise ValueError('pixel_size expected float xy or [float x, float y]. Got {}'.format(val))
             else:
-                raise ValueError('pixel_size expected float xy or [float x, float y]. Got {}'.format(val))
+                if length_val == 2:
+                    try:
+                        temp0 = float(val[0]) 
+                        temp1 = float(val[1]) 
+                        pixel_size_temp = [temp0, temp1]
+                    except:
+                        raise ValueError('pixel_size expected float xy or [float x, float y]. Got {}'.format(val))
+                else:
+                    raise ValueError('pixel_size expected float xy or [float x, float y]. Got {}'.format(val))
     
             if pixel_size_temp[0] <= 0 or pixel_size_temp[1] <= 0:
                 raise ValueError('pixel_size (x,y) at must be > (0.,0.). Got {}'.format(pixel_size_temp)) 
@@ -1418,35 +1420,37 @@ class AcquisitionGeometry(object):
 
         #set up old geometry        
         if new_setup is False:
-            pixel_num_h = pixel_num_h
-            pixel_num_v = pixel_num_v
-            pixel_size_h = pixel_size_h
-            pixel_size_v = pixel_size_v
-            chanels = channels
-            dist_source_center = dist_source_center
-            dist_center_detector = dist_center_detector
-
-            num_pixels = [pixel_num_h, pixel_num_v]
-            pixel_size= [pixel_size_h, pixel_size_v]
-
             self.config = Configuration()
             
+            if angles is None:
+                raise ValueError("AcquisitionGeometry not configured. Parameter 'angles' is required")
+
+            if geom_type == AcquisitionGeometry.CONE:
+                if dist_source_center is None:
+                    raise ValueError("AcquisitionGeometry not configured. Parameter 'dist_source_center' is required")
+                if dist_center_detector is None:
+                    raise ValueError("AcquisitionGeometry not configured. Parameter 'dist_center_detector' is required")
+
             if pixel_num_v > 1:
                 dimension = 3
-                if geom_type == AcquisitionGeometry.PARALLEL:
-                    self.config.system = Parallel3D(ray_direction=[0,1,0], detector_pos=[0,0,0], detector_direction_row=[1,0,0], detector_direction_col=[0,0,1], rotation_axis_pos=[0,0,0], rotation_axis_direction=[0,0,1])
-                else:
+                num_pixels = [pixel_num_h, pixel_num_v]
+                pixel_size = [pixel_size_h, pixel_size_v]
+                if geom_type == AcquisitionGeometry.CONE:
                     self.config.system = Cone3D(source_pos=[0,-dist_source_center,0], detector_pos=[0,dist_center_detector,0], detector_direction_row=[1,0,0], detector_direction_col=[0,0,1], rotation_axis_pos=[0,0,0], rotation_axis_direction=[0,0,1])
+                else:
+                    self.config.system = Parallel3D(ray_direction=[0,1,0], detector_pos=[0,0,0], detector_direction_row=[1,0,0], detector_direction_col=[0,0,1], rotation_axis_pos=[0,0,0], rotation_axis_direction=[0,0,1])
             else:
                 dimension = 2
-                if geom_type == AcquisitionGeometry.PARALLEL:
-                    self.config.system = Parallel2D(ray_direction=[0,1], detector_pos=[0,0], detector_direction_row=[1,0], rotation_axis_pos=[0,0])
-                else:
+                num_pixels = [pixel_num_h, 1]
+                pixel_size = [pixel_size_h, pixel_size_h]                
+                if geom_type == AcquisitionGeometry.CONE:
                     self.config.system = Cone2D(source_pos=[0,-dist_source_center], detector_pos=[0,dist_center_detector], detector_direction_row=[1,0], rotation_axis_pos=[0,0])
+                else:
+                    self.config.system = Parallel2D(ray_direction=[0,1], detector_pos=[0,0], detector_direction_row=[1,0], rotation_axis_pos=[0,0])
 
 
             self.config.panel = Panel(num_pixels, pixel_size, dimension)  
-            self.config.channels = Channels(chanels, channel_labels=None)  
+            self.config.channels = Channels(channels, channel_labels=None)  
             self.config.angles = Angles(angles, 0, kwargs.get(AcquisitionGeometry.ANGLE_UNIT, AcquisitionGeometry.DEGREE))
 
             self.dimension_labels = kwargs.get('dimension_labels', None)
@@ -1454,9 +1458,6 @@ class AcquisitionGeometry(object):
                 print("AcquisitionGeometry configured using deprecated method")
             else:
                 raise ValueError("AcquisitionGeometry not configured")
-
-
-
 
     def set_angles(self, angles, initial_angle=0, angle_unit='degree'):
         r'''This method configures the angular information of an AcquisitionGeometry object. 
@@ -1638,13 +1639,16 @@ class AcquisitionGeometry(object):
     def get_ImageGeometry(self, resolution=1.0):
         '''returns a default configured ImageGeometry object based on the AcquisitionGeomerty'''
 
-        num_voxel_xy = numpy.ceil(self.config.panel.num_pixels[0] * resolution)
-        num_voxel_z = numpy.ceil(self.config.panel.num_pixels[1] * resolution)
+        num_voxel_xy = int(numpy.ceil(self.config.panel.num_pixels[0] * resolution))
         voxel_size_xy = self.config.panel.pixel_size[0] * resolution / self.magnification
-        voxel_size_z = self.config.panel.pixel_size[1] * resolution/ self.magnification
 
+        if self.dimension == '3D':
+            num_voxel_z = int(numpy.ceil(self.config.panel.num_pixels[1] * resolution))
+            voxel_size_z = self.config.panel.pixel_size[1] * resolution/ self.magnification
+        else:
+            num_voxel_z = 0
+            voxel_size_z = 1
         return ImageGeometry(num_voxel_xy, num_voxel_xy, num_voxel_z, voxel_size_xy, voxel_size_xy, voxel_size_z, channels=self.channels)
-
 
     def __str__ (self):
         return str(self.config)

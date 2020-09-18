@@ -314,7 +314,7 @@ class Test_AcquisitionGeometry(unittest.TestCase):
         AG = AcquisitionGeometry.create_Parallel2D()\
             .set_panel(num_pixels=[512,1],pixel_size=[0.1,0.1])      
         IG = AG.get_ImageGeometry()
-        IG_gold = ImageGeometry(512,512,1,0.1,0.1,0.1,0,0,0,1)
+        IG_gold = ImageGeometry(512,512,0,0.1,0.1,1,0,0,0,1)
         self.assertEqual(IG, IG_gold)
 
         AG = AcquisitionGeometry.create_Parallel3D()\
@@ -326,7 +326,7 @@ class Test_AcquisitionGeometry(unittest.TestCase):
         AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,500.])\
             .set_panel(num_pixels=[512,1],pixel_size=[0.1,0.2])
         IG = AG.get_ImageGeometry()
-        IG_gold = ImageGeometry(512,512,1,0.05,0.05,0.1,0,0,0,1)
+        IG_gold = ImageGeometry(512,512,0,0.05,0.05,1,0,0,0,1)
         self.assertEqual(IG, IG_gold)
 
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0], detector_position=[0.,500.,0])\

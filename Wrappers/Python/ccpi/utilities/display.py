@@ -88,8 +88,12 @@ def plotter2D(datacontainers, titles=None, fix_range=False, stretch_y=False, cma
                 axes[i].set_ylabel(datacontainers[i].dimension_labels[0])
                 axes[i].set_xlabel(datacontainers[i].dimension_labels[1])        
         
-        
-        sp = axes[i].imshow(dc, cmap=cmap, origin=origin, extent=(0,dc.shape[1],dc.shape[0],0))
+        if origin == 'upper':
+            extent=(0,dc.shape[1],dc.shape[0],0)
+        else:
+            extent=(0,dc.shape[1],0,dc.shape[0])
+
+        sp = axes[i].imshow(dc, cmap=cmap, origin=origin, extent=extent)
     
         
         im_ratio = dc.shape[0]/dc.shape[1]

@@ -488,7 +488,7 @@ class TestSPDHG(unittest.TestCase):
             
         detectors = ig.shape[0]
         angles = np.linspace(0, np.pi, 180)
-        ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1)
+        ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1, angle_unit='radian')
         # Select device
         dev = 'cpu'
 
@@ -543,7 +543,7 @@ class TestSPDHG(unittest.TestCase):
         # take angles and create uniform subsets in uniform+sequential setting
         list_angles = [angles[i:i+size_of_subsets] for i in range(0, len(angles), size_of_subsets)]
         # create acquisitioin geometries for each the interval of splitting angles
-        list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1) 
+        list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1, angle_unit='radian') 
                         for i in range(len(list_angles))]
         # create with operators as many as the subsets
         A = BlockOperator(*[AstraProjectorSimple(ig, list_geoms[i], dev) for i in range(subsets)])
@@ -591,7 +591,7 @@ class TestSPDHG(unittest.TestCase):
             
         detectors = ig.shape[0]
         angles = np.linspace(0, np.pi, 180)
-        ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1)
+        ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1, angle_unit='radian')
         # Select device
         dev = 'cpu'
 
@@ -622,7 +622,7 @@ class TestSPDHG(unittest.TestCase):
         # take angles and create uniform subsets in uniform+sequential setting
         list_angles = [angles[i:i+size_of_subsets] for i in range(0, len(angles), size_of_subsets)]
         # create acquisitioin geometries for each the interval of splitting angles
-        list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1) 
+        list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1, angle_unit='radian') 
         for i in range(len(list_angles))]
         # create with operators as many as the subsets
         A = BlockOperator(*[AstraProjectorSimple(ig, list_geoms[i], dev) for i in range(subsets)] + [op1])
@@ -693,7 +693,7 @@ class TestSPDHG(unittest.TestCase):
             
         detectors = ig.shape[0]
         angles = np.linspace(0, np.pi, 180)
-        ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1)
+        ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1, angle_unit='radian')
         # Select device
         # device = input('Available device: GPU==1 / CPU==0 ')
         # if device=='1':
@@ -729,7 +729,7 @@ class TestSPDHG(unittest.TestCase):
         # take angles and create uniform subsets in uniform+sequential setting
         list_angles = [angles[i:i+size_of_subsets] for i in range(0, len(angles), size_of_subsets)]
         # create acquisitioin geometries for each the interval of splitting angles
-        list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1) 
+        list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1, angle_unit='radian') 
         for i in range(len(list_angles))]
         # create with operators as many as the subsets
         A = BlockOperator(*[AstraProjectorSimple(ig, list_geoms[i], dev) for i in range(subsets)] + [op1])
@@ -786,7 +786,7 @@ class TestSPDHG(unittest.TestCase):
             
         detectors = ig.shape[0]
         angles = np.linspace(0, np.pi, 180)
-        ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1)
+        ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1, angle_unit='radian')
         
         dev = 'cpu'
 

@@ -19,6 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import copy
 import numpy
 import sys
 from datetime import timedelta, datetime
@@ -27,11 +28,7 @@ from functools import reduce
 from numbers import Number
 import ctypes, platform
 from ccpi.utilities import NUM_THREADS
-
-# dll = os.path.abspath(os.path.join( 
-#          os.path.abspath(os.path.dirname(__file__)),
-#          'libfdiff.dll')
-# )
+import math
 
 # check for the extension
 if platform.system() == 'Linux':
@@ -43,7 +40,6 @@ elif platform.system() == 'Darwin':
 else:
     raise ValueError('Not supported platform, ', platform.system())
 
-#print ("dll location", dll)
 cilacc = ctypes.cdll.LoadLibrary(dll)
 
 #default nThreads
@@ -65,7 +61,6 @@ def message(cls, msg, *args):
     
     return msg.format(*args )
 
-
 class ImageGeometry(object):
     RANDOM = 'random'
     RANDOM_INT = 'random_int'
@@ -73,7 +68,107 @@ class ImageGeometry(object):
     VERTICAL = 'vertical'
     HORIZONTAL_X = 'horizontal_x'
     HORIZONTAL_Y = 'horizontal_y'
-    
+
+    @property
+    def shape(self):
+
+        shape_dict = {ImageGeometry.CHANNEL: self.channels,
+                     ImageGeometry.VERTICAL: self.voxel_num_z,
+                     ImageGeometry.HORIZONTAL_Y: self.voxel_num_y,        
+                     ImageGeometry.HORIZONTAL_X: self.voxel_num_x}
+
+        shape = []
+        for label in self.dimension_labels:
+            shape.append(shape_dict[label])
+
+        return tuple(shape)
+
+    @shape.setter
+    def shape(self, val):
+        print("Deprecated - shape will be set automatically")
+
+    @property
+    def spacing(self):
+
+        spacing_dict = {ImageGeometry.CHANNEL: self.channel_spacing,
+                        ImageGeometry.VERTICAL: self.voxel_size_z,
+                        ImageGeometry.HORIZONTAL_Y: self.voxel_size_y,        
+                        ImageGeometry.HORIZONTAL_X: self.voxel_size_x}
+
+        spacing = []
+        for label in self.dimension_labels:
+            spacing.append(spacing_dict[label])
+
+        return tuple(spacing)
+
+    @property
+    def length(self):
+        return len(self.dimension_labels)
+
+    @property
+    def dimension_labels(self):
+        
+        labels_default = [  ImageGeometry.CHANNEL,
+                            ImageGeometry.VERTICAL,
+                            ImageGeometry.HORIZONTAL_Y,
+                            ImageGeometry.HORIZONTAL_X]
+
+        shape_default = [   self.channels - 1, #channels default is 1
+                            self.voxel_num_z,
+                            self.voxel_num_y,
+                            self.voxel_num_x]
+
+        try:
+            labels = list(self.__dimension_labels)
+        except AttributeError:
+            labels = labels_default.copy()
+
+        for i, x in enumerate(shape_default):
+            if x == 0:
+                try:
+                    labels.remove(labels_default[i])
+                except ValueError:
+                    pass #if not in custom list carry on
+        return tuple(labels)
+      
+    @dimension_labels.setter
+    def dimension_labels(self, val):
+
+        labels_default = [  ImageGeometry.CHANNEL,
+                            ImageGeometry.VERTICAL,
+                            ImageGeometry.HORIZONTAL_Y,
+                            ImageGeometry.HORIZONTAL_X]
+
+        #check input and store. This value is not used directly
+        if val is not None:
+            for x in val:
+                if x not in labels_default:
+                    raise ValueError('Requested axis are not possible. Accepted label names {},\ngot {}'.format(labels_default,val))
+                    
+            self.__dimension_labels = tuple(val)
+
+    def __eq__(self, other):
+
+        if not isinstance(other, self.__class__):
+            return False
+        
+        if self.voxel_num_x == other.voxel_num_x \
+            and self.voxel_num_y == other.voxel_num_y \
+            and self.voxel_num_z == other.voxel_num_z \
+            and self.voxel_size_x == other.voxel_size_x \
+            and self.voxel_size_y == other.voxel_size_y \
+            and self.voxel_size_z == other.voxel_size_z \
+            and self.center_x == other.center_x \
+            and self.center_y == other.center_y \
+            and self.center_z == other.center_z \
+            and self.channels == other.channels \
+            and self.channel_spacing == other.channel_spacing \
+            and self.dimension_labels == other.dimension_labels:
+
+            return True
+        
+        return False
+
     def __init__(self, 
                  voxel_num_x=0, 
                  voxel_num_y=0, 
@@ -97,56 +192,39 @@ class ImageGeometry(object):
         self.center_y = center_y
         self.center_z = center_z  
         self.channels = channels
-        
-        # this is some code repetition
-        if self.channels > 1:            
-            if self.voxel_num_z>1:
-                self.length = 4
-                shape = (self.channels, self.voxel_num_z, self.voxel_num_y, self.voxel_num_x)
-                dim_labels = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL,
-                ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
-                voxel_sizes = [1.0, self.voxel_size_z, self.voxel_size_y, self.voxel_size_x]
-            else:
-                self.length = 3
-                shape = (self.channels, self.voxel_num_y, self.voxel_num_x)
-                dim_labels = [ImageGeometry.CHANNEL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
-                voxel_sizes = [1.0, self.voxel_size_y, self.voxel_size_x]
-        else:
-            if self.voxel_num_z>1:
-                self.length = 3
-                shape = (self.voxel_num_z, self.voxel_num_y, self.voxel_num_x)
-                dim_labels = [ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y,
-                 ImageGeometry.HORIZONTAL_X]
-                voxel_sizes = [self.voxel_size_z, self.voxel_size_y, self.voxel_size_x]
-            else:
-                self.length = 2  
-                shape = (self.voxel_num_y, self.voxel_num_x)
-                dim_labels = [ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
-                voxel_sizes = [self.voxel_size_y, self.voxel_size_x]
-        
-        labels = kwargs.get('dimension_labels', None)
-        if labels is None:
-            self.shape = shape
-            self.dimension_labels = dim_labels
-            self.voxel_sizes = voxel_sizes
-        else:
-            if labels is not None:
-                allowed_labels = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL,
-                                  ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
-                if not reduce(lambda x,y: (y in allowed_labels) and x, labels , True):
-                    raise ValueError('Requested axis are not possible. Expected {},\ngot {}'.format(
-                                    allowed_labels,labels))
-            order = self.get_order_by_label(labels, dim_labels)
-            if order != [i for i in range(len(dim_labels))]:
-                # resort
-                self.shape = tuple([shape[i] for i in order])
-                self.voxel_sizes = [voxel_sizes[i] for i in order]
-            else:
-                self.shape = shape
-                self.voxel_sizes = voxel_sizes
-            self.dimension_labels = labels
-            
-                                
+        self.channel_spacing = 1.0
+        self.dimension_labels = kwargs.get('dimension_labels', None)
+
+    def subset(self, dimensions=None, **kw):
+        '''Returns a new sliced and/or reshaped ImageGeometry'''
+  
+        if dimensions is not None and \
+            (len(dimensions) != len(self.shape) ):
+            raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
+
+        channel_slice = kw.get(ImageGeometry.CHANNEL, None)
+        vertical_slice = kw.get(ImageGeometry.VERTICAL, None)
+        horizontalx_slice = kw.get(ImageGeometry.HORIZONTAL_X, None)
+        horizontaly_slice = kw.get(ImageGeometry.HORIZONTAL_Y, None)
+
+        geometry_new = self.copy()
+        if channel_slice is not None:
+            geometry_new.channels = 1
+
+        if vertical_slice is not None:
+            geometry_new.voxel_num_z = 0
+                
+        if horizontaly_slice is not None:
+            geometry_new.voxel_num_y = 0
+
+        if horizontalx_slice is not None:
+            geometry_new.voxel_num_x = 0
+
+        if dimensions is not None:
+            geometry_new.dimension_labels = dimensions 
+
+        return geometry_new
+
     def get_order_by_label(self, dimension_labels, default_dimension_labels):
         order = []
         for i, el in enumerate(dimension_labels):
@@ -156,7 +234,6 @@ class ImageGeometry(object):
                     break
         return order
 
-        
     def get_min_x(self):
         return self.center_x - 0.5*self.voxel_num_x*self.voxel_size_x
         
@@ -182,19 +259,9 @@ class ImageGeometry(object):
             return 0
         
     def clone(self):
-        '''returns a copy of ImageGeometry'''
-        return ImageGeometry(
-                            self.voxel_num_x, 
-                            self.voxel_num_y, 
-                            self.voxel_num_z, 
-                            self.voxel_size_x, 
-                            self.voxel_size_y, 
-                            self.voxel_size_z, 
-                            self.center_x, 
-                            self.center_y, 
-                            self.center_z, 
-                            self.channels,
-                            dimension_labels=self.dimension_labels)
+        '''returns a copy of the ImageGeometry'''
+        return copy.deepcopy(self)
+
     def copy(self):
         '''alias of clone'''
         return self.clone()
@@ -202,9 +269,17 @@ class ImageGeometry(object):
     def __str__ (self):
         repres = ""
         repres += "Number of channels: {0}\n".format(self.channels)
-        repres += "voxel_num : x{0},y{1},z{2}\n".format(self.voxel_num_x, self.voxel_num_y, self.voxel_num_z)
-        repres += "voxel_size : x{0},y{1},z{2}\n".format(self.voxel_size_x, self.voxel_size_y, self.voxel_size_z)
-        repres += "center : x{0},y{1},z{2}\n".format(self.center_x, self.center_y, self.center_z)
+        repres += "channel_spacing: {0}\n".format(self.channel_spacing)
+
+        if self.voxel_num_z > 0:
+            repres += "voxel_num : x{0},y{1},z{2}\n".format(self.voxel_num_x, self.voxel_num_y, self.voxel_num_z)
+            repres += "voxel_size : x{0},y{1},z{2}\n".format(self.voxel_size_x, self.voxel_size_y, self.voxel_size_z)
+            repres += "center : x{0},y{1},z{2}\n".format(self.center_x, self.center_y, self.center_z)
+        else:
+            repres += "voxel_num : x{0},y{1}\n".format(self.voxel_num_x, self.voxel_num_y)
+            repres += "voxel_size : x{0},y{1}\n".format(self.voxel_size_x, self.voxel_size_y)
+            repres += "center : x{0},y{1}\n".format(self.center_x, self.center_y)
+
         return repres
     def allocate(self, value=0, dimension_labels=None, **kwargs):
         '''allocates an ImageData according to the size expressed in the instance'''
@@ -259,7 +334,930 @@ class ImageGeometry(object):
     #    return self.shape
         
 
+class ComponentDescription(object):
+    r'''This class enables the creation of vectors and unit vectors used to describe the components of a tomography system
+     '''
+    def __init__ (self, dof):
+        self.__dof = dof
+
+    @staticmethod  
+    def CreateVector(val):
+        try:
+            vec = numpy.asarray(val, dtype=numpy.float32).reshape(len(val))
+        except:
+            raise ValueError("Can't convert to numpy array")
+   
+        return vec
+
+    @staticmethod   
+    def CreateUnitVector(val):
+        vec = ComponentDescription.CreateVector(val)
+        vec = (vec/numpy.sqrt(vec.dot(vec)))
+        return vec
+
+    def length_check(self, val):
+        try:
+            val_length = len(val)
+        except:
+            raise ValueError("Vectors for {0}D geometries must have length = {0}. Got {1}".format(self.__dof,val))
+        
+        if val_length != self.__dof:
+            raise ValueError("Vectors for {0}D geometries must have length = {0}. Got {1}".format(self.__dof,val))
+
+class PositionVector(ComponentDescription):
+    r'''This class creates a component of a tomography system with a position attribute
+     '''
+    @property
+    def position(self):
+        try:
+            return self.__position
+        except:
+            raise AttributeError
+
+    @position.setter
+    def position(self, val):  
+        self.length_check(val)
+        self.__position = ComponentDescription.CreateVector(val)
+
+
+class DirectionVector(ComponentDescription):
+    r'''This class creates a component of a tomography system with a direction attribute
+     '''
+    @property
+    def direction(self):      
+        try:
+            return self.__direction
+        except:
+            raise AttributeError
+
+    @direction.setter
+    def direction(self, val):
+        self.length_check(val)    
+        self.__direction = ComponentDescription.CreateUnitVector(val)
+
+ 
+class PositionDirectionVector(PositionVector, DirectionVector):
+    r'''This class creates a component of a tomography system with position and direction attributes
+     '''
+    pass
+
+class Detector1D(PositionVector):
+    r'''This class creates a component of a tomography system with position and direction_row attributes used for 1D panels
+     '''
+    @property
+    def direction_row(self):
+        try:
+            return self.__direction_row
+        except:
+            raise AttributeError
+
+    @direction_row.setter
+    def direction_row(self, val):
+        self.length_check(val)
+        self.__direction_row = ComponentDescription.CreateUnitVector(val)
+
+class Detector2D(PositionVector):
+    r'''This class creates a component of a tomography system with position, direction_row and direction_col attributes used for 2D panels
+     '''
+    @property
+    def direction_row(self):
+        try:
+            return self.__direction_row
+        except:
+            raise AttributeError
+
+    @property
+    def direction_col(self):
+        try:
+            return self.__direction_col
+        except:
+            raise AttributeError
+
+    def set_direction(self, row, col):
+        self.length_check(row)
+        row = ComponentDescription.CreateUnitVector(row)
+
+        self.length_check(col)
+        col = ComponentDescription.CreateUnitVector(col)
+
+        dot_product = row.dot(col)
+        if not numpy.isclose(dot_product, 0):
+            raise ValueError("vectors detector.direction_row and detector.direction_col must be orthogonal")
+
+        self.__direction_col = col        
+        self.__direction_row = row
+
+class SystemConfiguration(object):
+    r'''This is a generic class to hold the description of a tomography system
+     '''
+    @property
+    def dimension(self):
+        if self._dimension == 2:
+            return '2D'
+        else:
+            return '3D'    
+
+    @dimension.setter
+    def dimension(self,val):
+        if val != 2 and val != 3:
+            raise ValueError('Can set up 2D and 3D systems only. got {0}D'.format(val))
+        else:
+            self._dimension = val
+
+    @property
+    def geometry(self):
+        return self.__geometry
+
+    @geometry.setter
+    def geometry(self,val):
+        if val != AcquisitionGeometry.CONE and val != AcquisitionGeometry.PARALLEL:
+            raise ValueError('geom_type = {} not recognised please specify \'cone\' or \'parallel\''.format(val))
+        else:
+            self.__geometry = val
+
+    def __init__(self, dof, geometry): 
+        """Initialises the system component attributes for the acquisition type
+        """                
+        self.dimension = dof
+        self.geometry = geometry
+        
+        if geometry == AcquisitionGeometry.PARALLEL:
+            self.ray = DirectionVector(dof)
+        else:
+            self.source = PositionVector(dof)
+
+        if dof == 2:
+            self.detector = Detector1D(dof)
+            self.rotation_axis = PositionVector(dof)
+        else:
+            self.detector = Detector2D(dof)
+            self.rotation_axis = PositionDirectionVector(dof)
+    
+    def __str__(self):
+        """Implements the string representation of the system configuration
+        """   
+        raise NotImplementedError
+
+    def __eq__(self, other):
+        """Implements the equality check of the system configuration
+        """   
+        raise NotImplementedError
+
+    def update_reference_frame(self):
+        """Returns the components of the system in the reference frame of the rotation axis at position 0
+        """      
+        raise NotImplementedError
+
+    def get_centre_slice(self):
+        """Returns the 2D system configuration corersponding to the centre slice
+        """        
+        raise NotImplementedError
+
+    def calculate_magnification(self):
+        r'''Calculates the magnification of the system using the source to rotate axis,
+        and source to detector distance along the direction.
+
+        :return: returns [dist_source_center, dist_center_detector, magnification],  [0] distance from the source to the rotate axis, [1] distance from the rotate axis to the detector, [2] magnification of the system
+        :rtype: list
+        '''
+        raise NotImplementedError
+
+    def copy(self):
+        '''returns a copy of SystemConfiguration'''
+        return copy.deepcopy(self)
+
+class Parallel2D(SystemConfiguration):
+    r'''This class creates the SystemConfiguration of a parallel beam 2D tomographic system
+                       
+    :param ray_direction: A 2D unit vector describing the x-ray direction (x,y)
+    :type ray_direction: list, tuple, ndarray
+    :param detector_pos: A 2D vector describing the position of the centre of the detector (x,y)
+    :type detector_pos: list, tuple, ndarray
+    :param detector_direction_row: A 2D unit vector describing the direction of the pixels of the detector (x,y)
+    :type detector_direction_row: list, tuple, ndarray
+    :param rotation_axis_pos: A 2D vector describing the position of the axis of rotation (x,y)
+    :type rotation_axis_pos: list, tuple, ndarray 
+     '''
+    def __init__ (self, ray_direction, detector_pos, detector_direction_row, rotation_axis_pos):
+        """Constructor method
+        """
+        super(Parallel2D, self).__init__(dof=2, geometry = 'parallel')
+
+        #source
+        self.ray.direction = ray_direction
+
+        #detector
+        self.detector.position = detector_pos
+        self.detector.direction_row = detector_direction_row
+        
+        #rotate axis
+        self.rotation_axis.position = rotation_axis_pos
+
+    def update_reference_frame(self):
+        r'''Transforms the system origin to the rotate axis
+        '''         
+        self.detector.position -= self.rotation_axis.position
+        self.rotation_axis.position = [0,0]
+
+    def __str__(self):
+        def csv(val):
+            return numpy.array2string(val, separator=', ')
+        
+        repres = "2D Parallel-beam tomography\n"
+        repres += "System configuration:\n"
+        repres += "\tRay direction: {0}\n".format(csv(self.ray.direction))
+        repres += "\tRotation axis position: {0}\n".format(csv(self.rotation_axis.position))
+        repres += "\tDetector position: {0}\n".format(csv(self.detector.position))
+        repres += "\tDetector row direction: {0}\n".format(csv(self.detector.direction_row))
+        return repres
+
+    def __eq__(self, other):
+
+        if not isinstance(other, self.__class__):
+            return False
+        
+        if numpy.allclose(self.ray.direction, other.ray.direction) \
+        and numpy.allclose(self.detector.position, other.detector.position)\
+        and numpy.allclose(self.detector.direction_row, other.detector.direction_row)\
+        and numpy.allclose(self.rotation_axis.position, other.rotation_axis.position):
+            return True
+        
+        return False
+
+    def get_centre_slice(self):
+        return self
+
+    def calculate_magnification(self):
+        return [None, None, 1.0]
+
+class Parallel3D(SystemConfiguration):
+    r'''This class creates the SystemConfiguration of a parallel beam 3D tomographic system
+                       
+    :param ray_direction: A 3D unit vector describing the x-ray direction (x,y,z)
+    :type ray_direction: list, tuple, ndarray
+    :param detector_pos: A 3D vector describing the position of the centre of the detector (x,y,z)
+    :type detector_pos: list, tuple, ndarray
+    :param detector_direction_row: A 3D unit vector describing the direction of the pixels in the rows of the detector (x,y,z)
+    :type detector_direction_row: list, tuple, ndarray
+    :param detector_direction_col: A 3D unit vector describing the direction of the pixels in the coloumns of the detector (x,y,z)
+    :type detector_direction_col: list, tuple, ndarray    
+    :param rotation_axis_pos: A 3D vector describing the position of the axis of rotation (x,y,z)
+    :type rotation_axis_pos: list, tuple, ndarray
+    :param rotation_axis_direction: A 3D unit vector describing the direction of the axis of rotation (x,y,z)
+    :type rotation_axis_direction: list, tuple, ndarray       
+     '''
+    def __init__ (self,  ray_direction, detector_pos, detector_direction_row, detector_direction_col, rotation_axis_pos, rotation_axis_direction):
+        """Constructor method
+        """
+        super(Parallel3D, self).__init__(dof=3, geometry = 'parallel')
+                    
+        #source
+        self.ray.direction = ray_direction
+
+        #detector
+        self.detector.position = detector_pos
+        self.detector.set_direction(detector_direction_row, detector_direction_col)
+
+        #rotate axis
+        self.rotation_axis.position = rotation_axis_pos
+        self.rotation_axis.direction = rotation_axis_direction
+
+    def update_reference_frame(self):
+        r'''Transforms the system origin to the rotate axis with z direction aligned to the rotate axis direction
+        '''          
+        #shift detector
+        det_pos = (self.detector.position - self.rotation_axis.position)
+
+        #calculate rotation matrix to align rotation axis direction with z
+        a = self.rotation_axis.direction
+        vx = numpy.array([[0, 0, -a[0]], [0, 0, -a[1]], [a[0], a[1], 0]])
+        axis_rotation = numpy.eye(3) + vx + vx.dot(vx) *  1 / (1 + a[2])
+        rotation_matrix = numpy.matrix.transpose(axis_rotation)
+
+        #apply transform
+        self.rotation_axis.position = [0,0,0]
+        self.rotation_axis.direction = [0,0,1]
+        self.ray.direction = rotation_matrix.dot(self.ray.direction.reshape(3,1))
+        self.detector.position = rotation_matrix.dot(det_pos.reshape(3,1))
+        new_row = rotation_matrix.dot(self.detector.direction_row.reshape(3,1))
+        new_col = rotation_matrix.dot(self.detector.direction_col.reshape(3,1))
+        self.detector.set_direction(new_row, new_col)
+
+    def __str__(self):
+        def csv(val):
+            return numpy.array2string(val, separator=', ')
+
+        repres = "3D Parallel-beam tomography\n"
+        repres += "System configuration:\n"
+        repres += "\tRay direction: {0}\n".format(csv(self.ray.direction))
+        repres += "\tRotation axis position: {0}\n".format(csv(self.rotation_axis.position))
+        repres += "\tRotation axis direction: {0}\n".format(csv(self.rotation_axis.direction))
+        repres += "\tDetector position: {0}\n".format(csv(self.detector.position))
+        repres += "\tDetector row direction: {0}\n".format(csv(self.detector.direction_row))
+        repres += "\tDetector column direction: {0}\n".format(csv(self.detector.direction_col))    
+        return repres
+
+    def __eq__(self, other):
+
+        if not isinstance(other, self.__class__):
+            return False
+        
+        if numpy.allclose(self.ray.direction, other.ray.direction) \
+        and numpy.allclose(self.detector.position, other.detector.position)\
+        and numpy.allclose(self.detector.direction_row, other.detector.direction_row)\
+        and numpy.allclose(self.detector.direction_col, other.detector.direction_col)\
+        and numpy.allclose(self.rotation_axis.position, other.rotation_axis.position)\
+        and numpy.allclose(self.rotation_axis.direction, other.rotation_axis.direction):
+            
+            return True
+        
+        return False
+
+    def calculate_magnification(self):
+        return [None, None, 1.0]
+
+    def get_centre_slice(self):
+        """Returns the 2D system configuration corersponding to the centre slice
+        """  
+        dp1 = self.rotation_axis.direction.dot(self.ray.direction)
+        dp2 = self.rotation_axis.direction.dot(self.detector.direction_row)
+
+        if numpy.isclose(dp1, 0) and numpy.isclose(dp2, 0):
+            temp = self.copy()
+
+            #convert to rotation axis reference frame
+            temp.update_reference_frame()
+
+            ray_direction = temp.ray.direction[0:2]
+            detector_position = temp.detector.position[0:2]
+            detector_direction_row = temp.detector.direction_row[0:2]
+            rotation_axis_position = temp.rotation_axis.position[0:2]
+
+            return Parallel2D(ray_direction, detector_position, detector_direction_row, rotation_axis_position)
+
+        else:
+            raise ValueError('Cannot convert geometry to 2D. Requires axis of rotation to be perpenidular to ray direction and the detector rows.')
+
+
+class Cone2D(SystemConfiguration):
+    r'''This class creates the SystemConfiguration of a cone beam 2D tomographic system
+                       
+    :param source_pos: A 2D vector describing the position of the source (x,y)
+    :type source_pos: list, tuple, ndarray
+    :param detector_pos: A 2D vector describing the position of the centre of the detector (x,y)
+    :type detector_pos: list, tuple, ndarray
+    :param detector_direction_row: A 2D unit vector describing the direction of the pixels of the detector (x,y)
+    :type detector_direction_row: list, tuple, ndarray
+    :param rotation_axis_pos: A 2D vector describing the position of the axis of rotation (x,y)
+    :type rotation_axis_pos: list, tuple, ndarray    
+     '''
+
+    def __init__ (self, source_pos, detector_pos, detector_direction_row, rotation_axis_pos):
+        """Constructor method
+        """
+        super(Cone2D, self).__init__(dof=2, geometry = 'cone')
+
+        #source
+        self.source.position = source_pos
+
+        #detector
+        self.detector.position = detector_pos
+        self.detector.direction_row = detector_direction_row
+
+        #rotate axis
+        self.rotation_axis.position = rotation_axis_pos
+
+    def update_reference_frame(self):
+        r'''Transforms the system origin to the rotate axis
+        '''                  
+        self.source.position -= self.rotation_axis.position
+        self.detector.position -= self.rotation_axis.position
+        self.rotation_axis.position = [0,0]
+
+    def __str__(self):
+        def csv(val):
+            return numpy.array2string(val, separator=', ')
+
+        repres = "2D Cone-beam tomography\n"
+        repres += "System configuration:\n"
+        repres += "\tSource position: {0}\n".format(csv(self.source.position))
+        repres += "\tRotation axis position: {0}\n".format(csv(self.rotation_axis.position))
+        repres += "\tDetector position: {0}\n".format(csv(self.detector.position))
+        repres += "\tDetector row direction: {0}\n".format(csv(self.detector.direction_row)) 
+        return repres    
+
+    def __eq__(self, other):
+
+        if not isinstance(other, self.__class__):
+            return False
+        
+        if numpy.allclose(self.source.position, other.source.position) \
+        and numpy.allclose(self.detector.position, other.detector.position)\
+        and numpy.allclose(self.detector.direction_row, other.detector.direction_row)\
+        and numpy.allclose(self.rotation_axis.position, other.rotation_axis.position):
+            return True
+        
+        return False
+
+    def get_centre_slice(self):
+        return self
+
+    def calculate_magnification(self):
+        #64bit for maths
+        rotation_axis_position = self.rotation_axis.position.astype(numpy.float64)
+        source_position = self.source.position.astype(numpy.float64)
+        detector_position = self.detector.position.astype(numpy.float64)
+        direction_row = self.detector.direction_row.astype(numpy.float64)
+
+        ab = (rotation_axis_position - source_position)
+        dist_source_center = float(numpy.sqrt(ab.dot(ab)))
+
+        ab_unit = ab / numpy.sqrt(ab.dot(ab))
+
+        n = ComponentDescription.CreateVector([direction_row[1], -direction_row[0]]).astype(numpy.float64)
+
+        #perpendicular distance between source and detector centre
+        sd = float((detector_position - source_position).dot(n))
+        ratio = float(ab_unit.dot(n))
+
+        source_to_detector = sd / ratio
+        dist_center_detector = source_to_detector - dist_source_center
+        magnification = (dist_center_detector + dist_source_center) / dist_source_center
+
+        return [dist_source_center, dist_center_detector, magnification]
+
+class Cone3D(SystemConfiguration):
+    r'''This class creates the SystemConfiguration of a cone beam 3D tomographic system
+                       
+    :param source_pos: A 3D vector describing the position of the source (x,y,z)
+    :type source_pos: list, tuple, ndarray
+    :param detector_pos: A 3D vector describing the position of the centre of the detector (x,y,z)
+    :type detector_pos: list, tuple, ndarray
+    :param detector_direction_row: A 3D unit vector describing the direction of the pixels in the rows of the detector (x,y,z)
+    :type detector_direction_row: list, tuple, ndarray
+    :param detector_direction_col: A 3D unit vector describing the direction of the pixels in the coloumns of the detector (x,y,z)
+    :type detector_direction_col: list, tuple, ndarray    
+    :param rotation_axis_pos: A 3D vector describing the position of the axis of rotation (x,y,z)
+    :type rotation_axis_pos: list, tuple, ndarray
+    :param rotation_axis_direction: A 3D unit vector describing the direction of the axis of rotation (x,y,z)
+    :type rotation_axis_direction: list, tuple, ndarray   
+    '''
+
+    def __init__ (self, source_pos, detector_pos, detector_direction_row, detector_direction_col, rotation_axis_pos, rotation_axis_direction):
+        """Constructor method
+        """
+        super(Cone3D, self).__init__(dof=3, geometry = 'cone')
+
+        #source
+        self.source.position = source_pos
+
+        #detector
+        self.detector.position = detector_pos
+        self.detector.set_direction(detector_direction_row, detector_direction_col)
+
+        #rotate axis
+        self.rotation_axis.position = rotation_axis_pos
+        self.rotation_axis.direction = rotation_axis_direction
+
+    def update_reference_frame(self):
+        r'''Transforms the system origin to the rotate axis with z direction aligned to the rotate axis direction
+        '''                  
+        #shift 
+        det_pos = (self.detector.position - self.rotation_axis.position)
+        src_pos = (self.source.position - self.rotation_axis.position)
+
+        #calculate rotation matrix to align rotation axis direction with z
+        a = self.rotation_axis.direction
+        vx = numpy.array([[0, 0, -a[0]], [0, 0, -a[1]], [a[0], a[1], 0]])
+        axis_rotation = numpy.eye(3) + vx + vx.dot(vx) *  1 / (1 + a[2])
+        rotation_matrix = numpy.matrix.transpose(axis_rotation)
+
+        #apply transform
+        self.rotation_axis.position = [0,0,0]
+        self.rotation_axis.direction = [0,0,1]
+        self.source.position = rotation_matrix.dot(src_pos.reshape(3,1))
+        self.detector.position = rotation_matrix.dot(det_pos.reshape(3,1))
+        new_row = rotation_matrix.dot(self.detector.direction_row.reshape(3,1)) 
+        new_col = rotation_matrix.dot(self.detector.direction_col.reshape(3,1))
+        self.detector.set_direction(new_row, new_col)
+
+    def get_centre_slice(self):
+        """Returns the 2D system configuration corersponding to the centre slice
+        """ 
+        #requires the rotate axis to be perpendicular to the detector, and parallel to coloumns
+        vec1= numpy.cross(self.detector.direction_row, self.detector.direction_col)  
+        dp1 = self.rotation_axis.direction.dot(vec1)
+        dp2 = self.rotation_axis.direction.dot(self.detector.direction_row)
+        
+        if numpy.isclose(dp1, 0) and numpy.isclose(dp2, 0):
+            temp = self.copy()
+            temp.update_reference_frame()
+            source_position = temp.source.position[0:2]
+            detector_position = temp.detector.position[0:2]
+            detector_direction_row = temp.detector.direction_row[0:2]
+            rotation_axis_position = temp.rotation_axis.position[0:2]
+
+            return Cone2D(source_position, detector_position, detector_direction_row, rotation_axis_position)
+        else:
+            raise ValueError('Cannot convert geometry to 2D. Requires axis of rotation to be perpendicular to the detector.')
+        
+    def __str__(self):
+        def csv(val):
+            return numpy.array2string(val, separator=', ')
+
+        repres = "3D Cone-beam tomography\n"
+        repres += "System configuration:\n"
+        repres += "\tSource position: {0}\n".format(csv(self.source.position))
+        repres += "\tRotation axis position: {0}\n".format(csv(self.rotation_axis.position))
+        repres += "\tRotation axis direction: {0}\n".format(csv(self.rotation_axis.direction))
+        repres += "\tDetector position: {0}\n".format(csv(self.detector.position))
+        repres += "\tDetector row direction: {0}\n".format(csv(self.detector.direction_row))
+        repres += "\tDetector column direction: {0}\n".format(csv(self.detector.direction_col))
+        return repres   
+
+    def __eq__(self, other):
+
+        if not isinstance(other, self.__class__):
+            return False
+        
+        if numpy.allclose(self.source.position, other.source.position) \
+        and numpy.allclose(self.detector.position, other.detector.position)\
+        and numpy.allclose(self.detector.direction_row, other.detector.direction_row)\
+        and numpy.allclose(self.detector.direction_col, other.detector.direction_col)\
+        and numpy.allclose(self.rotation_axis.position, other.rotation_axis.position)\
+        and numpy.allclose(self.rotation_axis.direction, other.rotation_axis.direction):
+            
+            return True
+        
+        return False
+
+    def calculate_magnification(self):
+    
+        #64bit for maths
+        rotation_axis_position = self.rotation_axis.position.astype(numpy.float64)
+        source_position = self.source.position.astype(numpy.float64)
+        detector_position = self.detector.position.astype(numpy.float64)
+        direction_row = self.detector.direction_row.astype(numpy.float64)
+
+        ab = (rotation_axis_position - source_position)
+        dist_source_center = float(numpy.sqrt(ab.dot(ab)))
+
+        ab_unit = ab / numpy.sqrt(ab.dot(ab))
+
+        #col and row are perpindicular unit vectors so n is a unit vector
+        #unit vector orthogonal to the detector
+        direction_col = self.detector.direction_col.astype(numpy.float64)
+        n = numpy.cross(direction_row,direction_col)
+
+        #perpendicular distance between source and detector centre
+        sd = float((detector_position - source_position).dot(n))
+        ratio = float(ab_unit.dot(n))
+
+        source_to_detector = sd / ratio
+        dist_center_detector = source_to_detector - dist_source_center
+        magnification = (dist_center_detector + dist_source_center) / dist_source_center
+
+        return [dist_source_center, dist_center_detector, magnification]
+
+class Panel(object):
+    r'''This is a class describing the panel of the system. 
+                 
+    :param num_pixels: num_pixels_h or (num_pixels_h, num_pixels_v) containing the number of pixels of the panel
+    :type num_pixels: int, list, tuple
+    :param pixel_size: pixel_size_h or (pixel_size_h, pixel_size_v) containing the size of the pixels of the panel
+    :type pixel_size: int, lust, tuple
+     '''
+
+    @property
+    def num_pixels(self):
+        return self.__num_pixels
+
+    @num_pixels.setter
+    def num_pixels(self, val):
+
+        if isinstance(val,int):
+            num_pixels_temp = [val, 1]
+        else:
+            try:
+                length_val = len(val)
+            except:
+                raise TypeError('num_pixels expected int x or [int x, int y]. Got {}'.format(type(val)))
+
+
+            if length_val == 2:
+                try:
+                    val0 = int(val[0])
+                    val1 = int(val[1])
+                except:
+                    raise TypeError('num_pixels expected int x or [int x, int y]. Got {0},{1}'.format(type(val[0]), type(val[1])))
+
+                num_pixels_temp = [val0, val1]
+            else:
+                raise ValueError('num_pixels expected int x or [int x, int y]. Got {}'.format(val))
+   
+        if num_pixels_temp[1] > 1 and self._dimension == 2:
+            raise ValueError('2D acquisitions expects a 1D panel. Expected num_pixels[1] = 1. Got {}'.format(num_pixels_temp[1]))
+        if num_pixels_temp[0] < 1 or num_pixels_temp[1] < 1:
+            raise ValueError('num_pixels (x,y) must be >= (1,1). Got {}'.format(num_pixels_temp))
+        else:
+            self.__num_pixels = num_pixels_temp
+
+    @property
+    def pixel_size(self):
+        return self.__pixel_size
+
+    @pixel_size.setter
+    def pixel_size(self, val):
+
+        if val is None:
+            pixel_size_temp = [1.0,1.0] 
+        else:
+            try:
+                length_val = len(val)
+            except:
+                try:
+                    temp = float(val)
+                    pixel_size_temp = [temp, temp]
+
+                except:
+                    raise TypeError('pixel_size expected float xy or [float x, float y]. Got {}'.format(val))    
+            else:
+                if length_val == 2:
+                    try:
+                        temp0 = float(val[0]) 
+                        temp1 = float(val[1]) 
+                        pixel_size_temp = [temp0, temp1]
+                    except:
+                        raise ValueError('pixel_size expected float xy or [float x, float y]. Got {}'.format(val))
+                else:
+                    raise ValueError('pixel_size expected float xy or [float x, float y]. Got {}'.format(val))
+    
+            if pixel_size_temp[0] <= 0 or pixel_size_temp[1] <= 0:
+                raise ValueError('pixel_size (x,y) at must be > (0.,0.). Got {}'.format(pixel_size_temp)) 
+
+        self.__pixel_size = pixel_size_temp
+
+    def __str__(self):
+        repres = "Panel configuration:\n"             
+        repres += "\tNumber of pixels: {0}\n".format(self.num_pixels)
+        repres += "\tPixel size: {0}\n".format(self.pixel_size)
+        return repres   
+
+    def __eq__(self, other):
+
+        if not isinstance(other, self.__class__):
+            return False
+        
+        if self.num_pixels == other.num_pixels and numpy.allclose(self.pixel_size, other.pixel_size):   
+            return True
+        
+        return False
+
+    def __init__ (self, num_pixels, pixel_size, dimension):  
+        """Constructor method
+        """
+        self._dimension = dimension
+        self.num_pixels = num_pixels
+        self.pixel_size = pixel_size
+
+
+class Channels(object):
+    r'''This is a class describing the channels of the data. 
+    This will be created on initialisation of AcquisitionGeometry.
+                       
+    :param num_channels: The number of channels of data
+    :type num_channels: int
+    :param channel_labels: A list of channel labels
+    :type channel_labels: list, optional
+     '''
+
+    @property
+    def num_channels(self):
+        return self.__num_channels
+
+    @num_channels.setter
+    def num_channels(self, val):      
+        try:
+            val = int(val)
+        except TypeError:
+            raise ValueError('num_channels expected a positive integer. Got {}'.format(type(val)))
+
+        if val > 0:
+            self.__num_channels = val
+        else:
+            raise ValueError('num_channels expected a positive integer. Got {}'.format(val))
+
+    @property
+    def channel_labels(self):
+        return self.__channel_labels
+
+    @channel_labels.setter
+    def channel_labels(self, val):      
+        if val is None or len(val) == self.__num_channels:
+            self.__channel_labels = val  
+        else:
+            raise ValueError('labels expected to have length {0}. Got {1}'.format(self.__num_channels, len(val)))
+
+    def __str__(self):
+        repres = "Channel configuration:\n"             
+        repres += "\tNumber of channels: {0}\n".format(self.num_channels)
+        
+        num_print=min(10,self.num_channels)                     
+        if  hasattr(self, 'channel_labels'):
+            repres += "\tChannel labels 0-{0}: {1}\n".format(num_print, self.channel_labels[0:num_print])
+        
+        return repres
+
+    def __eq__(self, other):
+
+        if not isinstance(other, self.__class__):
+            return False
+        
+        if self.num_channels != other.num_channels:
+            return False
+
+        if hasattr(self,'channel_labels'):
+            if self.channel_labels != other.channel_labels:
+                return False
+         
+        return True
+
+    def __init__ (self, num_channels, channel_labels):  
+        """Constructor method
+        """
+        self.num_channels = num_channels
+        if channel_labels is not None:
+            self.channel_labels = channel_labels
+
+class Angles(object):
+    r'''This is a class describing the angles of the data. 
+
+    :param angles: The angular positions of the acquisition data
+    :type angles: list, ndarray
+    :param initial_angle: The angular offset of the object from the reference frame
+    :type initial_angle: float, optional
+    :param angle_unit: The units of the stored angles 'degree' or 'radian'
+    :type angle_unit: string
+     '''
+
+    @property
+    def angle_data(self):
+        return self.__angle_data
+
+    @angle_data.setter
+    def angle_data(self, val):
+        if val is None:
+            raise ValueError('angle_data expected to be a list of floats') 
+        else:
+            try:
+                self.num_positions = len(val)
+
+            except TypeError:
+                self.num_positions = 1
+                val = [val]
+
+            finally:
+                try:
+                    self.__angle_data = numpy.asarray(val, dtype=numpy.float32)
+                except:
+                    raise ValueError('angle_data expected to be a list of floats') 
+
+    @property
+    def initial_angle(self):
+        return self.__initial_angle
+
+    @initial_angle.setter
+    def initial_angle(self, val):
+        try:
+            val = float(val)
+        except:
+            raise TypeError('initial_angle expected a float. Got {0}'.format(type(val)))
+
+        self.__initial_angle = val
+
+    @property
+    def angle_unit(self):
+        return self.__angle_unit
+
+    @angle_unit.setter
+    def angle_unit(self,val):
+        if val != AcquisitionGeometry.DEGREE and val != AcquisitionGeometry.RADIAN:
+            raise ValueError('angle_unit = {} not recognised please specify \'degree\' or \'radian\''.format(val))
+        else:
+            self.__angle_unit = val
+
+    def __str__(self):
+        repres = "Acquisition description:\n"
+        repres += "\tNumber of positions: {0}\n".format(self.num_positions)
+        num_print=min(20,self.num_positions)    
+        repres += "\tAngles 0-{0} in {1}s:\n{2}\n".format(num_print, self.angle_unit, numpy.array2string(self.angle_data[0:num_print], separator=', '))
+        return repres   
+
+    def __eq__(self, other):
+
+        if not isinstance(other, self.__class__):
+            return False
+        
+        if self.angle_unit != other.angle_unit:
+            return False
+
+        if self.initial_angle != other.initial_angle:
+            return False
+
+        if not numpy.allclose(self.angle_data, other.angle_data):
+            return False
+         
+        return True
+
+    def __init__ (self, angles, initial_angle, angle_unit):  
+        """Constructor method
+        """
+        self.angle_data = angles
+        self.initial_angle = initial_angle
+        self.angle_unit = angle_unit
+
+class Configuration(object):
+    r'''This is a class holds the description of the system components. 
+     '''
+
+    def __init__(self):
+        self.system = None
+        self.angles = None
+        self.panel = None
+        self.channels = Channels(1, None)
+
+    @property
+    def configured(self):
+        if self.system is None:
+            print("Please configure AcquisitionGeometry using one of the following methods:\
+                    \n\tAcquisitionGeometry.Create_Parallel2D()\
+                    \n\tAcquisitionGeometry.Create_Cone3D()\
+                    \n\tAcquisitionGeometry.Create_Parallel2D()\
+                    \n\tAcquisitionGeometry.Create_Cone3D()")
+            return False
+
+        configured = True
+        if self.angles is None:
+            print("Please configure angular data using the set_angles() method")
+            configured = False
+        if self.panel is None:
+            print("Please configure the panel using the set_panel() method")
+            configured = False
+        return configured
+
+    def __str__(self):
+        repres = ""
+        if self.configured:
+            repres += str(self.system)
+            repres += str(self.panel)
+            repres += str(self.channels)
+            repres += str(self.angles)
+        
+        return repres
+
+    def __eq__(self, other):
+        
+        if not isinstance(other, self.__class__):
+            return False
+
+        if self.system == other.system\
+        and self.panel == other.panel\
+        and self.channels == other.channels\
+        and self.angles == other.angles:
+            return True
+
+        return False
+
 class AcquisitionGeometry(object):
+    r'''This class holds the AcquisitionGeometry of the system.
+    
+    Please initialise using factory:
+    AcquisitionGeometry.Create_Parallel2D
+    AcquisitionGeometry.Create_Cone3D
+    AcquisitionGeometry.Create_Parallel2D
+    AcquisitionGeometry.Create_Cone3D
+
+
+    These initialisation parameters will be deprecated in a future release.    
+    :param geom_type: A description of the system type 'cone' or 'parallel'
+    :type geom_type: string
+    :param pixel_num_h: Number of pixels in the horizontal direction
+    :type pixel_num_h: int, optional
+    :param pixel_num_v: Number of pixels in the vertical direction
+    :type pixel_num_v: int, optional    
+    :param pixel_size_h: Size of pixels in the horizontal direction
+    :type pixel_size_h: float, optional    
+    :param pixel_size_v: Size of pixels in the vertical direction
+    :type pixel_size_v: float, optional       
+    :param chanels: Number of channels
+    :type chanels: int, optional       
+    :param dist_source_center: Distance from the source to the origin
+    :type dist_source_center: float, optional
+    :param dist_center_detector: Distance from the origin to the centre of the detector
+    :type dist_center_detector: float, optional
+
+    '''
+
     RANDOM = 'random'
     RANDOM_INT = 'random_int'
     ANGLE_UNIT = 'angle_unit'
@@ -269,115 +1267,341 @@ class AcquisitionGeometry(object):
     ANGLE = 'angle'
     VERTICAL = 'vertical'
     HORIZONTAL = 'horizontal'
-    def __init__(self, 
-                 geom_type, 
-                 dimension=None, 
-                 angles=None, 
-                 pixel_num_h=0, 
-                 pixel_size_h=1, 
-                 pixel_num_v=0, 
-                 pixel_size_v=1, 
-                 dist_source_center=None, 
-                 dist_center_detector=None, 
-                 channels=1,
-                 **kwargs
-                 ):
-        """
-        General inputs for standard type projection geometries
-        detectorDomain or detectorpixelSize:
-            If 2D
-                If scalar: Width of detector or single detector pixel
-                If 2-vec: Error
-            If 3D
-                If scalar: Width in both dimensions
-                If 2-vec: Vertical then horizontal size
-        grid
-            If 2D
-                If scalar: number of detectors
-                If 2-vec: error
-            If 3D
-                If scalar: Square grid that size
-                If 2-vec vertical then horizontal size
-        cone or parallel
-        2D or 3D
-        parallel_parameters: ?
-        cone_parameters:
-            source_to_center_dist (if parallel: NaN)
-            center_to_detector_dist (if parallel: NaN)
-        standard or nonstandard (vec) geometry
-        angles is expected numpy array, dtype - float32
-        angles_format radians or degrees
-        """
-        self.geom_type = geom_type   # 'parallel' or 'cone'
-        # Override the parameter passed as dimension
-        # determine if the geometry is 2D or 3D
-        if pixel_num_v >= 1:
-            dimension = '3D'
-        elif pixel_num_v == 0:
-            dimension = '2D'
-        else:
-            raise ValueError('Number of pixels at detector on the vertical axis must be >= 0. Got {}'.format(pixel_num_v))
-    
-        self.dimension = dimension # 2D or 3D
-        if isinstance(angles, numpy.ndarray):
-            self.angles = angles
-        else:
-            raise ValueError('numpy array is expected')
-        num_of_angles = len (angles)
-        
-        self.dist_source_center = dist_source_center
-        self.dist_center_detector = dist_center_detector
-        
-        self.pixel_num_h = pixel_num_h
-        self.pixel_size_h = pixel_size_h
-        self.pixel_num_v = pixel_num_v
-        self.pixel_size_v = pixel_size_v
-        
-        self.channels = channels
-        self.angle_unit=kwargs.get(AcquisitionGeometry.ANGLE_UNIT, 
-                               AcquisitionGeometry.DEGREE)
+    PARALLEL = 'parallel'
+    CONE = 'cone'
+    DIM2 = '2D'
+    DIM3 = '3D'
 
-        # default labels
-        if channels > 1:
+    #for backwards compatibility
+    @property
+    def geom_type(self):
+        return self.config.system.geometry
+
+    @property
+    def pixel_num_h(self):
+        return self.config.panel.num_pixels[0]
+
+    @pixel_num_h.setter
+    def pixel_num_h(self, val):
+        self.config.panel.num_pixels[0] = val
+
+    @property
+    def pixel_num_v(self):
+        return self.config.panel.num_pixels[1]
+
+    @pixel_num_v.setter
+    def pixel_num_v(self, val):
+        self.config.panel.num_pixels[1] = val
+
+    @property
+    def pixel_size_h(self):
+        return self.config.panel.pixel_size[0]
+
+    @pixel_size_h.setter
+    def pixel_size_h(self, val):
+        self.config.panel.pixel_size[0] = val
+
+    @property
+    def pixel_size_v(self):
+        return self.config.panel.pixel_size[1]
+
+    @pixel_size_v.setter
+    def pixel_size_v(self, val):
+        self.config.panel.pixel_size[1] = val
+
+    @property
+    def channels(self):
+        return self.config.channels.num_channels
+
+    @property
+    def angles(self):
+        return self.config.angles.angle_data
+
+    @property
+    def dist_source_center(self):
+        out = self.config.system.calculate_magnification()
+        return out[0]
+
+    @property
+    def dist_center_detector(self):
+        out = self.config.system.calculate_magnification()
+        return out[1]
+
+    @property
+    def magnification(self):
+        out = self.config.system.calculate_magnification()
+        return out[2]
+
+    @property
+    def dimension(self):
+        return self.config.system.dimension
+
+    @property
+    def shape(self):
+
+        shape_dict = {AcquisitionGeometry.CHANNEL: self.config.channels.num_channels,
+                     AcquisitionGeometry.ANGLE: self.config.angles.num_positions,
+                     AcquisitionGeometry.VERTICAL: self.config.panel.num_pixels[1],        
+                     AcquisitionGeometry.HORIZONTAL: self.config.panel.num_pixels[0]}
+
+        shape = []
+        for label in self.dimension_labels:
+            shape.append(shape_dict[label])
+
+        return tuple(shape)
+
+    @shape.setter
+    def shape(self, val):
+        print("Deprecated - shape will be set automatically")
+
+    @property
+    def dimension_labels(self):
+        labels_default = [AcquisitionGeometry.CHANNEL,
+                            AcquisitionGeometry.ANGLE,
+                            AcquisitionGeometry.VERTICAL,
+                            AcquisitionGeometry.HORIZONTAL]
+
+        shape_default = [self.config.channels.num_channels,
+                            self.config.angles.num_positions,
+                            self.config.panel.num_pixels[1],
+                            self.config.panel.num_pixels[0]
+                            ]
+
+        try:
+            labels = list(self.__dimension_labels)
+        except AttributeError:
+            labels = labels_default.copy()
+
+        #remove from list labels where len == 1
+        #
+        for i, x in enumerate(shape_default):
+            if x == 1:
+                try:
+                    labels.remove(labels_default[i])
+                except ValueError:
+                    pass #if not in custom list carry on
+
+        return tuple(labels)
+      
+    @dimension_labels.setter
+    def dimension_labels(self, val):
+
+        labels_default = [  AcquisitionGeometry.CHANNEL,
+                            AcquisitionGeometry.ANGLE,
+                            AcquisitionGeometry.VERTICAL,
+                            AcquisitionGeometry.HORIZONTAL]
+
+        #check input and store. This value is not used directly
+        if val is not None:
+            for x in val:
+                if x not in labels_default:
+                    raise ValueError('Requested axis are not possible. Accepted label names {},\ngot {}'.format(labels_default,val))
+                    
+            self.__dimension_labels = tuple(val)
+
+
+    def __init__(self,
+                geom_type, 
+                dimension=None,
+                angles=None, 
+                pixel_num_h=1, 	
+                pixel_size_h=1,
+                pixel_num_v=1,
+                pixel_size_v=1,
+                dist_source_center=None,
+                dist_center_detector=None,
+                channels=1,
+                ** kwargs):
+
+        """Constructor method
+        """
+
+        #backward compatibility
+        new_setup = kwargs.get('new_setup', False)
+
+        #set up old geometry        
+        if new_setup is False:
+            self.config = Configuration()
+            
+            if angles is None:
+                raise ValueError("AcquisitionGeometry not configured. Parameter 'angles' is required")
+
+            if geom_type == AcquisitionGeometry.CONE:
+                if dist_source_center is None:
+                    raise ValueError("AcquisitionGeometry not configured. Parameter 'dist_source_center' is required")
+                if dist_center_detector is None:
+                    raise ValueError("AcquisitionGeometry not configured. Parameter 'dist_center_detector' is required")
+
             if pixel_num_v > 1:
-                shape = (channels, num_of_angles , pixel_num_v, pixel_num_h)
-                dim_labels = [AcquisitionGeometry.CHANNEL ,
-                 AcquisitionGeometry.ANGLE , AcquisitionGeometry.VERTICAL ,
-                 AcquisitionGeometry.HORIZONTAL]
+                dimension = 3
+                num_pixels = [pixel_num_h, pixel_num_v]
+                pixel_size = [pixel_size_h, pixel_size_v]
+                if geom_type == AcquisitionGeometry.CONE:
+                    self.config.system = Cone3D(source_pos=[0,-dist_source_center,0], detector_pos=[0,dist_center_detector,0], detector_direction_row=[1,0,0], detector_direction_col=[0,0,1], rotation_axis_pos=[0,0,0], rotation_axis_direction=[0,0,1])
+                else:
+                    self.config.system = Parallel3D(ray_direction=[0,1,0], detector_pos=[0,0,0], detector_direction_row=[1,0,0], detector_direction_col=[0,0,1], rotation_axis_pos=[0,0,0], rotation_axis_direction=[0,0,1])
             else:
-                shape = (channels , num_of_angles, pixel_num_h)
-                dim_labels = [AcquisitionGeometry.CHANNEL ,
-                 AcquisitionGeometry.ANGLE, AcquisitionGeometry.HORIZONTAL]
-        else:
-            if pixel_num_v > 1:
-                shape = (num_of_angles, pixel_num_v, pixel_num_h)
-                dim_labels = [AcquisitionGeometry.ANGLE , AcquisitionGeometry.VERTICAL ,
-                 AcquisitionGeometry.HORIZONTAL]
+                dimension = 2
+                num_pixels = [pixel_num_h, 1]
+                pixel_size = [pixel_size_h, pixel_size_h]                
+                if geom_type == AcquisitionGeometry.CONE:
+                    self.config.system = Cone2D(source_pos=[0,-dist_source_center], detector_pos=[0,dist_center_detector], detector_direction_row=[1,0], rotation_axis_pos=[0,0])
+                else:
+                    self.config.system = Parallel2D(ray_direction=[0,1], detector_pos=[0,0], detector_direction_row=[1,0], rotation_axis_pos=[0,0])
+
+
+            self.config.panel = Panel(num_pixels, pixel_size, dimension)  
+            self.config.channels = Channels(channels, channel_labels=None)  
+            self.config.angles = Angles(angles, 0, kwargs.get(AcquisitionGeometry.ANGLE_UNIT, AcquisitionGeometry.DEGREE))
+
+            self.dimension_labels = kwargs.get('dimension_labels', None)
+            if self.config.configured:
+                print("AcquisitionGeometry configured using deprecated method")
             else:
-                shape = (num_of_angles, pixel_num_h)
-                dim_labels = [AcquisitionGeometry.ANGLE, AcquisitionGeometry.HORIZONTAL]
-        
-        labels = kwargs.get('dimension_labels', None)
-        if labels is None:
-            self.shape = shape
-            self.dimension_labels = dim_labels
-        else:
-            if labels is not None:
-                allowed_labels = [AcquisitionGeometry.CHANNEL,
-                                    AcquisitionGeometry.ANGLE,
-                                    AcquisitionGeometry.VERTICAL,
-                                    AcquisitionGeometry.HORIZONTAL]
-                if not reduce(lambda x,y: (y in allowed_labels) and x, labels , True):
-                    raise ValueError('Requested axis are not possible. Expected {},\ngot {}'.format(
-                                    allowed_labels,labels))
-            order = self.get_order_by_label(labels, dim_labels)
-            if order != [i for i in range(len(dim_labels))]:
-                # resort
-                self.shape = tuple([shape[i] for i in order])
-            else:
-                self.shape = shape
-            self.dimension_labels = labels
-        
+                raise ValueError("AcquisitionGeometry not configured")
+
+    def set_angles(self, angles, initial_angle=0, angle_unit='degree'):
+        r'''This method configures the angular information of an AcquisitionGeometry object. 
+
+        :param angles: The angular positions of the acquisition data
+        :type angles: list, ndarray
+        :param initial_angle: The angular offset of the object from the reference frame
+        :type initial_angle: float, optional
+        :param angle_unit: The units of the stored angles 'degree' or 'radian'
+        :type angle_unit: string
+        :return: returns a configured AcquisitionGeometry object
+        :rtype: AcquisitionGeometry        
+        '''
+        self.config.angles = Angles(angles, initial_angle, angle_unit)
+        return self
+
+    def set_panel(self, num_pixels, pixel_size=(1,1)):
+        r'''This method configures the panel information of an AcquisitionGeometry object. 
+                    
+        :param num_pixels: num_pixels_h or (num_pixels_h, num_pixels_v) containing the number of pixels of the panel
+        :type num_pixels: int, list, tuple
+        :param pixel_size: pixel_size_h or (pixel_size_h, pixel_size_v) containing the size of the pixels of the panel
+        :type pixel_size: int, lust, tuple, optional
+        :return: returns a configured AcquisitionGeometry object
+        :rtype: AcquisitionGeometry       
+        '''        
+        self.config.panel = Panel(num_pixels, pixel_size, self.config.system._dimension)
+        return self
+
+    def set_channels(self, num_channels=1, channel_labels=None):
+        r'''This method configures the channel information of an AcquisitionGeometry object. 
+                        
+        :param num_channels: The number of channels of data
+        :type num_channels: int, optional
+        :param channel_labels: A list of channel labels
+        :type channel_labels: list, optional
+        :return: returns a configured AcquisitionGeometry object
+        :rtype: AcquisitionGeometry        
+        '''        
+        self.config.channels = Channels(num_channels, channel_labels)
+        return self
+
+    def set_labels(self, labels=None):
+        r'''This method configures the dimension labels of an AcquisitionGeometry object. 
+                        
+        :param labels:  The order of the dimensions describing the data.\
+                        Expects a list containing at least one of the unique labels: 'channel' 'angle' 'vertical' 'horizontal'
+                        default = ['channel','angle','vertical','horizontal']
+        :type labels: list, optional
+        :return: returns a configured AcquisitionGeometry object
+        :rtype: AcquisitionGeometry        
+        '''           
+        self.dimension_labels = labels
+        return self
+ 
+    @staticmethod
+    def create_Parallel2D(ray_direction=[0, 1], detector_position=[0, 0], detector_direction_row=[1, 0], rotation_axis_position=[0, 0]):
+        r'''This creates the AcquisitionGeometry for a parallel beam 2D tomographic system
+
+        :param ray_direction: A 2D unit vector describing the x-ray direction (x,y)
+        :type ray_direction: list, tuple, ndarray, optional
+        :param detector_position: A 2D vector describing the position of the centre of the detector (x,y)
+        :type detector_position: list, tuple, ndarray, optional
+        :param detector_direction_row: A 2D unit vector describing the direction of the pixels of the detector (x,y)
+        :type detector_direction_row: list, tuple, ndarray, optional
+        :param rotation_axis_position: A 2D vector describing the position of the axis of rotation (x,y)
+        :type rotation_axis_position: list, tuple, ndarray, optional
+        :return: returns a configured AcquisitionGeometry object
+        :rtype: AcquisitionGeometry
+        '''
+        AG = AcquisitionGeometry('', new_setup=True)
+        AG.config = Configuration()
+        AG.config.system = Parallel2D(ray_direction, detector_position, detector_direction_row, rotation_axis_position)
+        return AG    
+
+    @staticmethod
+    def create_Cone2D(source_position, detector_position, detector_direction_row=[1,0], rotation_axis_position=[0,0]):
+        r'''This creates the AcquisitionGeometry for a cone beam 2D tomographic system          
+
+        :param source_position: A 2D vector describing the position of the source (x,y)
+        :type source_position: list, tuple, ndarray
+        :param detector_position: A 2D vector describing the position of the centre of the detector (x,y)
+        :type detector_position: list, tuple, ndarray
+        :param detector_direction_row: A 2D unit vector describing the direction of the pixels of the detector (x,y)
+        :type detector_direction_row: list, tuple, ndarray, optional
+        :param rotation_axis_position: A 2D vector describing the position of the axis of rotation (x,y)
+        :type rotation_axis_position: list, tuple, ndarray, optional
+        :return: returns a configured AcquisitionGeometry object
+        :rtype: AcquisitionGeometry        
+     '''    
+        AG = AcquisitionGeometry('', new_setup=True)
+        AG.config = Configuration()
+        AG.config.system = Cone2D(source_position, detector_position, detector_direction_row, rotation_axis_position)
+        return AG   
+
+    @staticmethod
+    def create_Parallel3D(ray_direction=[0,1,0], detector_position=[0,0,0], detector_direction_row=[1,0,0], detector_direction_col=[0,0,1], rotation_axis_position=[0,0,0], rotation_axis_direction=[0,0,1]):
+        r'''This creates the AcquisitionGeometry for a parallel beam 3D tomographic system
+                       
+        :param ray_direction: A 3D unit vector describing the x-ray direction (x,y,z)
+        :type ray_direction: list, tuple, ndarray, optional
+        :param detector_position: A 3D vector describing the position of the centre of the detector (x,y,z)
+        :type detector_position: list, tuple, ndarray, optional
+        :param detector_direction_row: A 3D unit vector describing the direction of the pixels in the rows of the detector (x,y,z)
+        :type detector_direction_row: list, tuple, ndarray, optional
+        :param detector_direction_col: A 3D unit vector describing the direction of the pixels in the coloumns of the detector (x,y,z)
+        :type detector_direction_col: list, tuple, ndarray, optional  
+        :param rotation_axis_position: A 3D vector describing the position of the axis of rotation (x,y,z)
+        :type rotation_axis_position: list, tuple, ndarray, optional
+        :param rotation_axis_direction: A 3D unit vector describing the direction of the axis of rotation (x,y,z)
+        :type rotation_axis_direction: list, tuple, ndarray, optional     
+        :return: returns a configured AcquisitionGeometry object
+        :rtype: AcquisitionGeometry       
+     '''
+        AG = AcquisitionGeometry('', new_setup=True)
+        AG.config = Configuration()
+        AG.config.system = Parallel3D(ray_direction, detector_position, detector_direction_row, detector_direction_col, rotation_axis_position, rotation_axis_direction)
+        return AG            
+
+    @staticmethod
+    def create_Cone3D(source_position, detector_position, detector_direction_row=[1,0,0], detector_direction_col=[0,0,1], rotation_axis_position=[0,0,0], rotation_axis_direction=[0,0,1]):
+        r'''This creates the AcquisitionGeometry for a cone beam 3D tomographic system
+                        
+        :param source_position: A 3D vector describing the position of the source (x,y,z)
+        :type source_position: list, tuple, ndarray, optional
+        :param detector_position: A 3D vector describing the position of the centre of the detector (x,y,z)
+        :type detector_position: list, tuple, ndarray, optional
+        :param detector_direction_row: A 3D unit vector describing the direction of the pixels in the rows of the detector (x,y,z)
+        :type detector_direction_row: list, tuple, ndarray, optional
+        :param detector_direction_col: A 3D unit vector describing the direction of the pixels in the coloumns of the detector (x,y,z)
+        :type detector_direction_col: list, tuple, ndarray , optional  
+        :param rotation_axis_position: A 3D vector describing the position of the axis of rotation (x,y,z)
+        :type rotation_axis_position: list, tuple, ndarray, optional
+        :param rotation_axis_direction: A 3D unit vector describing the direction of the axis of rotation (x,y,z)
+        :type rotation_axis_direction: list, tuple, ndarray, optional
+        :return: returns a configured AcquisitionGeometry object
+        :rtype: AcquisitionGeometry           
+        '''
+        AG = AcquisitionGeometry('',  new_setup=True)
+        AG.config = Configuration()
+        AG.config.system = Cone3D(source_position, detector_position, detector_direction_row, detector_direction_col, rotation_axis_position, rotation_axis_direction)
+        return AG          
+
     def get_order_by_label(self, dimension_labels, default_dimension_labels):
         order = []
         for i, el in enumerate(dimension_labels):
@@ -387,37 +1611,84 @@ class AcquisitionGeometry(object):
                     break
         return order
 
+    def __eq__(self, other):
 
+        if isinstance(other, self.__class__) and self.config == other.config :
+            return True
+        return False
 
-        
     def clone(self):
         '''returns a copy of the AcquisitionGeometry'''
-        return AcquisitionGeometry(self.geom_type,
-                                   self.dimension, 
-                                   self.angles, 
-                                   self.pixel_num_h, 
-                                   self.pixel_size_h, 
-                                   self.pixel_num_v, 
-                                   self.pixel_size_v, 
-                                   self.dist_source_center, 
-                                   self.dist_center_detector, 
-                                   self.channels,
-                                   dimension_labels=self.dimension_labels)
+        return copy.deepcopy(self)
+
     def copy(self):
         '''alias of clone'''
         return self.clone()
 
+    def get_centre_slice(self):
+        '''returns a 2D AcquisitionGeometry that corresponds to the centre slice of the input'''
+
+        if self.dimension == '2D':
+            return self
+              
+        AG_2D = copy.deepcopy(self)
+        AG_2D.config.system = self.config.system.get_centre_slice()
+        AG_2D.config.panel.num_pixels[1] = 1
+        AG_2D.config.panel.pixel_size[1] = abs(self.config.system.detector.direction_col[2]) * self.config.panel.pixel_size[1]
+        return AG_2D
+
+    def get_ImageGeometry(self, resolution=1.0):
+        '''returns a default configured ImageGeometry object based on the AcquisitionGeomerty'''
+
+        num_voxel_xy = int(numpy.ceil(self.config.panel.num_pixels[0] * resolution))
+        voxel_size_xy = self.config.panel.pixel_size[0] * resolution / self.magnification
+
+        if self.dimension == '3D':
+            num_voxel_z = int(numpy.ceil(self.config.panel.num_pixels[1] * resolution))
+            voxel_size_z = self.config.panel.pixel_size[1] * resolution/ self.magnification
+        else:
+            num_voxel_z = 0
+            voxel_size_z = 1
+        return ImageGeometry(num_voxel_xy, num_voxel_xy, num_voxel_z, voxel_size_xy, voxel_size_xy, voxel_size_z, channels=self.channels)
+
     def __str__ (self):
-        repres = ""
-        repres += "Number of dimensions: {0}\n".format(self.dimension)
-        repres += "angles: {0}\n".format(self.angles)
-        repres += "voxel_num : h{0},v{1}\n".format(self.pixel_num_h, self.pixel_num_v)
-        repres += "voxel size: h{0},v{1}\n".format(self.pixel_size_h, self.pixel_size_v)
-        repres += "geometry type: {0}\n".format(self.geom_type)
-        repres += "distance source-detector: {0}\n".format(self.dist_source_center)
-        repres += "distance center-detector: {0}\n".format(self.dist_source_center)
-        repres += "number of channels: {0}\n".format(self.channels)
-        return repres
+        return str(self.config)
+
+    def subset(self, dimensions=None, **kw):
+        '''returns a new sliced and/or reshaped AcquisitionGeometry'''
+  
+        if dimensions is not None and \
+            (len(dimensions) != len(self.shape) ):
+            raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
+
+        angle_slice = kw.get(AcquisitionGeometry.ANGLE, None)
+        channel_slice = kw.get(AcquisitionGeometry.CHANNEL, None)
+        vertical_slice = kw.get(AcquisitionGeometry.VERTICAL, None)
+        horizontal_slice = kw.get(AcquisitionGeometry.HORIZONTAL, None)
+
+        geometry_new = self.copy()
+        if channel_slice is not None:
+            geometry_new.config.channels.num_channels = 1
+            if hasattr(geometry_new.config.channels,'channel_labels'):
+                geometry_new.config.panel.channel_labels = geometry_new.config.panel.channel_labels[channel_slice]
+
+        if angle_slice is not None:
+            geometry_new.config.angles.angle_data = geometry_new.config.angles.angle_data[angle_slice]
+        
+        if vertical_slice is not None:
+            if geometry_new.geom_type == AcquisitionGeometry.PARALLEL or vertical_slice == 'centre':
+                geometry_new = geometry_new.get_centre_slice()
+            else:
+                raise ValueError("Cannot calculate system geometry for the requested slice")
+        
+        if horizontal_slice is not None:
+            raise ValueError("Cannot calculate system geometry for the requested slice")
+
+        if dimensions is not None:
+            geometry_new.dimension_labels = dimensions 
+
+        return geometry_new
+
     def allocate(self, value=0, dimension_labels=None, **kwargs):
         '''allocates an AcquisitionData according to the size expressed in the instance
         
@@ -581,26 +1852,15 @@ class DataContainer(object):
                 #print ("left_dimensions {0}".format(left_dimensions))
                 #new_shape = [self.shape[ax] for ax in axis_order]
                 #print ("new_shape {0}".format(new_shape))
-                command = "self.array["
-                for i in range(self.number_of_dimensions):
+
+                #slices on each unwanted dimension in reverse order
+                #np.take returns a new array each time
+                cleaned = self.array.copy()
+                for i in reversed(range(self.number_of_dimensions)):
                     if self.dimension_labels[i] in unwanted_dimensions.values():
-                        value = 0
-                        for k,v in kw.items():
-                            if k == self.dimension_labels[i]:
-                                value = v
-                                
-                        command = command + str(value)
-                    else:
-                        command = command + ":"
-                    if i < self.number_of_dimensions -1:
-                        command = command + ','
-                command = command + ']'
-                
-                cleaned = eval(command)
-                # cleaned has collapsed dimensions in the same order of
-                # self.array, but we want it in the order stated in the 
-                # "dimensions". 
-                # create axes order for numpy.transpose
+                        value = kw.get(self.dimension_labels[i],0)                                
+                        cleaned = cleaned.take(indices=value, axis=i)
+    
                 axes = []
                 for key in dimensions:
                     #print ("key {0}".format( key))
@@ -1048,17 +2308,16 @@ class DataContainer(object):
     ## reductions
     def sum(self, *args, **kwargs):
         return self.as_array().sum(*args, **kwargs)
-    def squared_norm(self):
+    def squared_norm(self, **kwargs):
         '''return the squared euclidean norm of the DataContainer viewed as a vector'''
         #shape = self.shape
         #size = reduce(lambda x,y:x*y, shape, 1)
         #y = numpy.reshape(self.as_array(), (size, ))
         return self.dot(self)
         #return self.dot(self)
-    def norm(self):
+    def norm(self, **kwargs):
         '''return the euclidean norm of the DataContainer viewed as a vector'''
-        return numpy.sqrt(self.squared_norm())
-    
+        return numpy.sqrt(self.squared_norm(**kwargs))
     
     def dot(self, other, *args, **kwargs):
         '''return the inner product of 2 DataContainers viewed as vectors
@@ -1227,53 +2486,20 @@ class ImageData(DataContainer):
         if dimensions is not None and \
             (len(dimensions) != len(self.shape) ):
             raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
-        #out = DataContainer.subset(self, dimensions, **kw)
-        out = super(ImageData, self).subset(dimensions, **kw)
         
-        if out.number_of_dimensions > 1:
-            channels = 1
-            
-            voxel_num_x = 0
-            voxel_num_y = 0
-            voxel_num_z = 0
-            
-            voxel_size_x = 1
-            voxel_size_y = 1
-            voxel_size_z = 1
-            
-            center_x = 0 
-            center_y = 0 
-            center_z = 0 
-            for key in out.dimension_labels.keys():
-                if out.dimension_labels[key] == 'channel':
-                    channels = self.geometry.channels
-                elif out.dimension_labels[key] == 'horizontal_y':
-                    voxel_size_y = self.geometry.voxel_size_y
-                    voxel_num_y = self.geometry.voxel_num_y
-                    center_y = self.geometry.center_y
-                elif out.dimension_labels[key] == 'vertical':
-                    voxel_size_z = self.geometry.voxel_size_z
-                    voxel_num_z = self.geometry.voxel_num_z
-                    center_z = self.geometry.center_z
-                elif out.dimension_labels[key] == 'horizontal_x':
-                    voxel_size_x = self.geometry.voxel_size_x
-                    voxel_num_x = self.geometry.voxel_num_x
-                    center_x = self.geometry.center_x
-            dim_lab = [ out.dimension_labels[k] for k in range(len(out.dimension_labels.items()))]
-            out.geometry = ImageGeometry(
-                                    voxel_num_x=voxel_num_x, 
-                                    voxel_num_y=voxel_num_y, 
-                                    voxel_num_z=voxel_num_z, 
-                                    voxel_size_x=voxel_size_x, 
-                                    voxel_size_y=voxel_size_y, 
-                                    voxel_size_z=voxel_size_z, 
-                                    center_x=center_x, 
-                                    center_y=center_y, 
-                                    center_z=center_z, 
-                                    channels = channels,
-                                    dimension_labels = dim_lab
-                                    )
-        return out
+        try:
+            geometry_new = self.geometry.subset(dimensions=dimensions, **kw)
+        except ValueError:
+            geometry_new = None
+
+        out = super(ImageData, self).subset(dimensions, **kw)
+        dimension_labels = out.dimension_labels.copy()    
+
+        if geometry_new is None:                
+            return DataContainer(out.array, deep_copy=False, dimension_labels=dimension_labels)
+        else:
+            return ImageData(out.array, deep_copy=False, geometry=geometry_new, dimension_labels=dimension_labels)
+
 
     def get_shape_labels(self, geometry, dimension_labels=None):
         channels  = geometry.channels
@@ -1329,7 +2555,6 @@ class AcquisitionData(DataContainer):
     '''DataContainer for holding 2D or 3D sinogram'''
     __container_priority__ = 1
     
-    
     def __init__(self, 
                  array = None, 
                  deep_copy=True, 
@@ -1354,7 +2579,7 @@ class AcquisitionData(DataContainer):
                                  dimension_labels, **kwargs)
         else:
             if self.geometry is not None:
-                shape, labels = self.get_shape_labels(self.geometry, dimension_labels)
+                shape, dimension_labels = self.get_shape_labels(self.geometry, dimension_labels)
                 if array.shape != shape:
                     raise ValueError('Shape mismatch {} {}'.format(shape, array.shape))
                     
@@ -1394,133 +2619,65 @@ class AcquisitionData(DataContainer):
                      dimension_labels, **kwargs)
                 
     def get_shape_labels(self, geometry, dimension_labels=None):
-        channels      = geometry.channels
-        horiz         = geometry.pixel_num_h
-        vert          = geometry.pixel_num_v
-        angles        = geometry.angles
-        num_of_angles = numpy.shape(angles)[0]
-        
+
         if dimension_labels is None:
-            if channels > 1:
-                if vert > 1:
-                    shape = (channels, num_of_angles , vert, horiz)
-                    dim_labels = [AcquisitionGeometry.CHANNEL,
-                                  AcquisitionGeometry.ANGLE,
-                                  AcquisitionGeometry.VERTICAL,
-                                  AcquisitionGeometry.HORIZONTAL]
-                else:
-                    shape = (channels , num_of_angles, horiz)
-                    dim_labels = [AcquisitionGeometry.CHANNEL,
-                                  AcquisitionGeometry.ANGLE,
-                                  AcquisitionGeometry.HORIZONTAL]
-            else:
-                if vert > 1:
-                    shape = (num_of_angles, vert, horiz)
-                    dim_labels = [AcquisitionGeometry.ANGLE,
-                                  AcquisitionGeometry.VERTICAL,
-                                  AcquisitionGeometry.HORIZONTAL
-                                  ]
-                else:
-                    shape = (num_of_angles, horiz)
-                    dim_labels = [AcquisitionGeometry.ANGLE,
-                                  AcquisitionGeometry.HORIZONTAL
-                                  ]
-            
-            dimension_labels = dim_labels
+            dimension_labels = geometry.dimension_labels
+
         else:
-            shape = []
-            for i in range(len(dimension_labels)):
-                dim = dimension_labels[i]
-                
-                if dim == AcquisitionGeometry.CHANNEL:
-                    shape.append(channels)
-                elif dim == AcquisitionGeometry.ANGLE:
-                    shape.append(num_of_angles)
-                elif dim == AcquisitionGeometry.VERTICAL:
-                    shape.append(vert)
-                elif dim == AcquisitionGeometry.HORIZONTAL:
-                    shape.append(horiz)
-            if len(shape) != len(dimension_labels):
-                raise ValueError('Missing {0} axes.\nExpected{1} got {2}'\
-                    .format(
-                        len(dimension_labels) - len(shape),
-                        dimension_labels, shape) 
-                    )
-            shape = tuple(shape)
-        return (shape, dimension_labels)
+            if isinstance(dimension_labels,dict):
+                dimension_labels_temp = []
+                for i in range(len(dimension_labels)):
+                    dimension_labels_temp.append(dimension_labels[i])
+            else:
+                try:
+                    dimension_labels_temp = list(dimension_labels)
+                except:
+                    raise TypeError('dimension_labels expected a list got {0}'.format(type(dimension_labels)))
+            
+            geometry.dimension_labels = dimension_labels_temp      
+
+        return (geometry.shape, dimension_labels)
+
     def subset(self, dimensions=None, **kw):
         '''returns a subset of the AcquisitionData and regenerates the geometry'''
-
-        # # Check that this is actually a resorting
-        # if dimensions is not None and \
-        #     (len(dimensions) != len(self.shape) ):
-        #     raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
-
-        # requested_labels = kw.get('dimension_labels', None)
-        # if requested_labels is not None:
-        #     allowed_labels = [AcquisitionGeometry.CHANNEL,
-        #                           AcquisitionGeometry.ANGLE,
-        #                           AcquisitionGeometry.VERTICAL,
-        #                           AcquisitionGeometry.HORIZONTAL]
-        #     if not reduce(lambda x,y: (y in allowed_labels) and x, requested_labels , True):
-        #         raise ValueError('Requested axis are not possible. Expected {},\ngot {}'.format(
-        #                         allowed_labels,requested_labels))
-        # Check that this is actually a resorting
+  
         if dimensions is not None and \
             (len(dimensions) != len(self.shape) ):
             raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
-        out = super(AcquisitionData, self).subset(dimensions, **kw)
-        
-        if out.number_of_dimensions > 1:
-            
-            dim = str (len(out.shape)) + "D"
-            
-            channels = 1
-            pixel_num_h = 0
-            pixel_size_h = 1
-            pixel_num_v = 0
-            pixel_size_v = 1
-            dist_source_center = self.geometry.dist_source_center
-            dist_center_detector = self.geometry.dist_center_detector
 
-            # update the angles if necessary
-            sliceme = kw.get(AcquisitionGeometry.ANGLE, None)
-            if sliceme is not None:
-                angles = numpy.asarray([ self.geometry.angles[sliceme] ] , numpy.float32)
-            else:
-                angles = self.geometry.angles.copy()
-            
-            for key in out.dimension_labels.keys():
-                if out.dimension_labels[key] == AcquisitionGeometry.CHANNEL:
-                    channels = self.geometry.channels
-                elif out.dimension_labels[key] == AcquisitionGeometry.ANGLE:
-                    pass
-                elif out.dimension_labels[key] == AcquisitionGeometry.VERTICAL:
-                    pixel_num_v = self.geometry.pixel_num_v
-                    pixel_size_v = self.geometry.pixel_size_v
-                elif out.dimension_labels[key] == AcquisitionGeometry.HORIZONTAL:
-                    pixel_num_h = self.geometry.pixel_num_h
-                    pixel_size_h = self.geometry.pixel_size_h
-                
-            
-            dim_lab = [ out.dimension_labels[k] for k in range(len(out.dimension_labels.items()))]
-            
-            out.geometry = AcquisitionGeometry(geom_type=self.geometry.geom_type, 
-                                    dimension=dim,
-                                    angles=angles,
-                                    pixel_num_h=pixel_num_h,
-                                    pixel_size_h = pixel_size_h,
-                                    pixel_num_v = pixel_num_v,
-                                    pixel_size_v = pixel_size_v,
-                                    dist_source_center = dist_source_center,
-                                    dist_center_detector = dist_center_detector,
-                                    channels = channels,
-                                    dimension_labels = dim_lab
-                                    )
-        return out
-    
-                
-            
+        #Update Geometry
+        try:
+            geometry_new = self.geometry.subset(dimensions=dimensions, **kw)
+        except ValueError:
+            geometry_new = None
+
+        #if vertical = 'centre' slice convert to index and subset.
+        #if the index is non-integer then return rows either side and interpolate to get the center slice value
+        interpolate = False
+        vertical_slice = kw.get(AcquisitionGeometry.VERTICAL, None)
+        if vertical_slice == 'centre':           
+            ind = self.geometry.dimension_labels.index('vertical')
+            centre_slice = (self.geometry.shape[ind]-1) / 2.
+            centre_slice_floor = int(numpy.floor(centre_slice))
+            kw['vertical'] = centre_slice_floor
+            w2 = centre_slice - centre_slice_floor
+            if w2  > 0.0001:
+                interpolate = True
+
+        out = super(AcquisitionData, self).subset(dimensions, **kw)
+
+        if interpolate == True:
+            kw['vertical'] = centre_slice_floor + 1
+            out2 = super(AcquisitionData, self).subset(dimensions, **kw)
+            out = out * (1 - w2) + out2 * w2
+
+        dimension_labels = out.dimension_labels.copy()    
+
+        if geometry_new is None:                
+            return DataContainer(out.array, deep_copy=False, dimension_labels=dimension_labels)
+        else:
+            return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new, dimension_labels=dimension_labels)
+
 class DataProcessor(object):
     
     '''Defines a generic DataContainer processor
@@ -1581,7 +2738,6 @@ class DataProcessor(object):
             if v is None and k != 'output':
                 raise ValueError('Key {0} is None'.format(k))
 
-
         #run if 1st time, if modified since last run, or if output not stored
         shouldRun = False
 
@@ -1635,10 +2791,12 @@ class DataProcessor(object):
         
     def process(self, out=None):
         raise NotImplementedError('process must be implemented')
+    
+    def __call__(self, x):
         
-    
-    
-
+        self.set_input(x)
+        return self.get_output()        
+                
 class DataProcessor23D(DataProcessor):
     '''Regularizers DataProcessor
     '''
@@ -1729,10 +2887,6 @@ class CastDataContainer(DataProcessor):
                                 dimension_labels=dsi.dimension_labels )
         else:
             out.fill(numpy.asarray(dsi.as_array(), dtype=dtype))
-    
-        
-        
-    
     
 class PixelByPixelDataProcessor(DataProcessor):
     '''Example DataProcessor
@@ -1842,43 +2996,3 @@ class VectorGeometry(object):
         return out
 
     
-if __name__ == "__main__":
-    
-
-    ig = ImageGeometry(voxel_num_x=100, 
-                    voxel_num_y=200, 
-                    voxel_num_z=300, 
-                    voxel_size_x=0.1, 
-                    voxel_size_y=0.2, 
-                    voxel_size_z=0.3, 
-                    center_x=0, 
-                    center_y=0, 
-                    center_z=0, 
-                    channels=50, dimension_labels = ['channel', 'vertical', 'horizontal_y', 'horizontal_x'])
-    
-    print(ig.voxel_sizes)
-
-
-    ig = ImageGeometry(voxel_num_x=100, 
-                    voxel_num_y=200, 
-                    voxel_num_z=300, 
-                    voxel_size_x=0.1, 
-                    voxel_size_y=0.2, 
-                    voxel_size_z=0.3, 
-                    center_x=0, 
-                    center_y=0, 
-                    center_z=0, 
-                    channels=50, dimension_labels = ['vertical', 'horizontal_x', 'horizontal_x', 'channel'])
-    
-    print(ig.voxel_sizes)
-    
-    
-#    id = ig.allocate(2)
-#
-#    print(id.geometry)
-#    print(id.dimension_labels)
-#
-#    sid = id.subset(channel = 20)
-#
-#    print(sid.dimension_labels)
-#    print(sid.geometry)

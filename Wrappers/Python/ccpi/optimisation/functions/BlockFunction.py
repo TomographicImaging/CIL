@@ -54,6 +54,18 @@ class BlockFunction(Function):
         super(BlockFunction, self).__init__()
         self.functions = functions      
         self.length = len(self.functions)
+       
+    @property        
+    def L(self):
+        # compute Lipschitz constant if possible
+        tmp_L = 0
+        for func in self.functions:
+            if func.L is not None:  
+                tmp_L += func.L                
+            else:
+                tmp_L = None 
+                break 
+        return tmp_L     
                                 
     def __call__(self, x):
         
@@ -212,84 +224,88 @@ if __name__ == '__main__':
     b = ig.allocate('random_int')
     
     f1 =  10 * MixedL21Norm()
-    f2 =  0.5 * L2NormSquared(b=b)    
+    f2 =  5 * L2NormSquared(b=b)    
     
     f = BlockFunction(f1, f2)
-    tau = 0.3
+    print(f.L)
     
-    print( " without out " )
-    res_no_out = f.proximal_conjugate( U, tau)
-    res_out = B.range_geometry().allocate()
-    f.proximal_conjugate( U, tau, out = res_out)
-    
-    numpy.testing.assert_array_almost_equal(res_no_out[0][0].as_array(), \
-                                            res_out[0][0].as_array(), decimal=4) 
-    
-    numpy.testing.assert_array_almost_equal(res_no_out[0][1].as_array(), \
-                                            res_out[0][1].as_array(), decimal=4) 
-
-    numpy.testing.assert_array_almost_equal(res_no_out[1].as_array(), \
-                                            res_out[1].as_array(), decimal=4)     
-    
-    
-
-    ig1 = ImageGeometry(M, N)               
-    ig2 = ImageGeometry(2*M, N)
-    ig3 = ImageGeometry(3*M, 4*N)
-    
-    bg = BlockGeometry(ig1,ig2,ig3)
-    
-    z = bg.allocate('random_int')
-    
-    f1 = L1Norm()
-    f2 = 5 * L2NormSquared()
-    
-    f = BlockFunction(f2, f2, f2 + 5, f1 - 4, f1)
-    
-    res = f.convex_conjugate(z)
-    
-    ##########################################################################
-    
-    
-    
-    
-    
-    
-    
-#    zzz = B.range_geometry().allocate('random_int')
-#    www = B.range_geometry().allocate()
-#    www.fill(zzz)
-    
-#    res[0].fill(z)
-    
-    
-    
-    
-#    f.proximal_conjugate(z, sigma, out = res)
-    
-#    print(z1[0][0].as_array())    
-#    print(res[0][0].as_array())
-    
-    
-    
-    
-#    U = BG.allocate('random_int')
-#    RES = BG.allocate()
-#    f = BlockFunction(f1, f2)
+    f = BlockFunction(f2, f2)
+    print(f.L)    
+#    tau = 0.3
 #    
-#    z = f.proximal_conjugate(U, 0.2)
-#    f.proximal_conjugate(U, 0.2, out = RES)
+#    print( " without out " )
+#    res_no_out = f.proximal_conjugate( U, tau)
+#    res_out = B.range_geometry().allocate()
+#    f.proximal_conjugate( U, tau, out = res_out)
 #    
-#    print(z[0].as_array())
-#    print(RES[0].as_array())
+#    numpy.testing.assert_array_almost_equal(res_no_out[0][0].as_array(), \
+#                                            res_out[0][0].as_array(), decimal=4) 
 #    
-#    print(z[1].as_array())
-#    print(RES[1].as_array())    
-    
-    
-    
-    
-    
-
-
-    
+#    numpy.testing.assert_array_almost_equal(res_no_out[0][1].as_array(), \
+#                                            res_out[0][1].as_array(), decimal=4) 
+#
+#    numpy.testing.assert_array_almost_equal(res_no_out[1].as_array(), \
+#                                            res_out[1].as_array(), decimal=4)     
+#    
+#    
+#
+#    ig1 = ImageGeometry(M, N)               
+#    ig2 = ImageGeometry(2*M, N)
+#    ig3 = ImageGeometry(3*M, 4*N)
+#    
+#    bg = BlockGeometry(ig1,ig2,ig3)
+#    
+#    z = bg.allocate('random_int')
+#    
+#    f1 = L1Norm()
+#    f2 = 5 * L2NormSquared()
+#    
+#    f = BlockFunction(f2, f2, f2 + 5, f1 - 4, f1)
+#    
+#    res = f.convex_conjugate(z)
+#    
+#    ##########################################################################
+#    
+#    
+#    
+#    
+#    
+#    
+#    
+##    zzz = B.range_geometry().allocate('random_int')
+##    www = B.range_geometry().allocate()
+##    www.fill(zzz)
+#    
+##    res[0].fill(z)
+#    
+#    
+#    
+#    
+##    f.proximal_conjugate(z, sigma, out = res)
+#    
+##    print(z1[0][0].as_array())    
+##    print(res[0][0].as_array())
+#    
+#    
+#    
+#    
+##    U = BG.allocate('random_int')
+##    RES = BG.allocate()
+##    f = BlockFunction(f1, f2)
+##    
+##    z = f.proximal_conjugate(U, 0.2)
+##    f.proximal_conjugate(U, 0.2, out = RES)
+##    
+##    print(z[0].as_array())
+##    print(RES[0].as_array())
+##    
+##    print(z[1].as_array())
+##    print(RES[1].as_array())    
+#    
+#    
+#    
+#    
+#    
+#
+#
+#    

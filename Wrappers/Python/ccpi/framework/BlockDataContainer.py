@@ -599,6 +599,10 @@ class BlockDataContainer(object):
         '''Inline truedivision'''
         return self.__idiv__(other)
     
+    def __neg__(self):
+        """ Return - self """
+        return -1 * self     
+    
     def dot(self, other):
 #        
         tmp = [ self.containers[i].dot(other.containers[i]) for i in range(self.shape[0])]
@@ -608,43 +612,3 @@ class BlockDataContainer(object):
         
         return self.shape[0]
     
-       
-    
-if __name__ == '__main__':
-    
-    from ccpi.framework import ImageGeometry, BlockGeometry
-    import numpy
-
-    N, M = 2, 3
-    ig = ImageGeometry(N, M) 
-    
-    ig1 = ImageGeometry(2*N, 4*M) 
-    BG = BlockGeometry(ig, ig1)
-    
-    U = BG.allocate('random_int')
-    V = BG.allocate('random_int')
-    
-    print(U.geometry)
-    
-    print(len(set([i.shape for i in U.containers]))==1)
-    
-    
-#    print ("test sum BDC " )
-#    w = U[0].as_array() + U[1].as_array()    
-#    w1 = sum(U).as_array()    
-#    numpy.testing.assert_array_equal(w, w1)
-#    
-#    print ("test sum BDC " )
-#    z = numpy.sqrt(U[0].as_array()**2 + U[1].as_array()**2)
-#    z1 = sum(U**2).sqrt().as_array()    
-#    numpy.testing.assert_array_equal(z, z1)   
-#    
-#    z2 = U.pnorm(2)
-#    
-#    zzz = U.dot(V)
-    
-   
-
-
-
-

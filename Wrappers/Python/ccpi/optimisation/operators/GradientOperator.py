@@ -206,7 +206,7 @@ class Gradient_numpy(LinearOperator):
             else:
                 raise ValueError('No channels to correlate')
                 
-        self.voxel_size_order = domain_geometry.voxel_sizes                
+        self.voxel_size_order = domain_geometry.spacing                
          
         super(Gradient_numpy, self).__init__(domain_geometry = domain_geometry, 
                                              range_geometry = range_geometry) 
@@ -344,7 +344,7 @@ class Gradient_C(LinearOperator):
         else:
             raise ValueError('Number of dimensions not supported, expected 2, 3 or 4, got {}'.format(len(gm_domain.shape)))
             
-        self.voxel_size_order = self.gm_domain.voxel_sizes
+        self.voxel_size_order = list(self.gm_domain.spacing)
         super(Gradient_C, self).__init__(domain_geometry=self.gm_domain, 
                                              range_geometry=self.gm_range) 
         print("Initialised GradientOperator with C backend running with ", cilacc.openMPtest(self.num_threads)," threads")               
@@ -393,19 +393,22 @@ class Gradient_C(LinearOperator):
             return out
 
        
-#if __name__ == '__main__':
-#
-#    from ccpi.framework import ImageGeometry
-#    from ccpi.optimisation.operators import FiniteDiff
-#    import numpy 
-#        
-#          
-#    print("Test Gradient for 2D Geometry, ")
-#    ig = ImageGeometry(400,500, voxel_size_x=0.1, voxel_size_y=0.5)  
-#    x = ig.allocate('random')
-#    
-#    GD_C = Gradient(ig, backend = 'c')
-#    GD_numpy = Gradient_numpy(ig, backend = 'numpy')
+if __name__ == '__main__':
+
+    from ccpi.framework import ImageGeometry
+    from ccpi.optimisation.operators import FiniteDifferenceOperator
+    import numpy 
+        
+          
+    print("Test Gradient for 2D Geometry, ")
+    ig = ImageGeometry(voxel_num_y = 400, voxel_num_x = 500, voxel_size_x=0.1, voxel_size_y=0.5)  
+    x = ig.allocate('random')
+    
+    GD_C = Gradient(ig, backend = 'c')
+    GD_numpy = Gradient_numpy(ig, backend = 'numpy')
+    
+    print(GD_C.norm(), GD_numpy.norm())
+    
 #    
 #    out1 = GD_C.range_geometry().allocate()
 #    out2 = GD_numpy.range_geometry().allocate()

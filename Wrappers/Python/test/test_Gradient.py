@@ -280,8 +280,7 @@ class TestGradient(unittest.TestCase):
         numpy.testing.assert_approx_equal(G_numpy1.dot_test(G_numpy1), True, significant = 1)
         
         G_numpy1 = Gradient(ig, method = 'centered', bnd_cond = 'Periodic')  
-        self.assertTrue(G_numpy1.dot_test(G_numpy1))
-#        numpy.testing.assert_approx_equal(G_numpy1.dot_test(G_numpy1), True, significant = 1)   
+        numpy.testing.assert_approx_equal(G_numpy1.dot_test(G_numpy1), True, significant = 1)   
         
         print("Test passed\n")
         

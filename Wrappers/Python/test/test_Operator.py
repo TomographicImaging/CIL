@@ -259,8 +259,10 @@ class TestOperator(CCPiTestClass):
 
         u = G.range_geometry().allocate(ImageGeometry.RANDOM)
         res = G.domain_geometry().allocate()
+        print(type(res))
         G.adjoint(u, out=res)
         w = G.adjoint(u)
+        print(type(w))
         self.assertNumpyArrayEqual(res.as_array(), w.as_array())
         
         u = G.domain_geometry().allocate(ImageGeometry.RANDOM)
@@ -1027,3 +1029,10 @@ class TestOperatorCompositionSum(unittest.TestCase):
                                                 2 * out2.as_array())
 
 
+if __name__ == '__main__':
+    
+    
+    d = TestOperator()
+    d.test_FiniteDifference()
+    
+    

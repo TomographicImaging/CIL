@@ -243,7 +243,9 @@ class TestGradient(unittest.TestCase):
     def test_Gradient_c_numpy_voxel(self):
         
         print("Test Gradient for 2D Geometry, ")
-        ig = ImageGeometry(40,50, voxel_size_x=0.1, voxel_size_y=0.5)  
+        ig = ImageGeometry(voxel_num_y = 40, voxel_num_x = 50, voxel_size_x=0.1, voxel_size_y=0.5)  
+        x = ig.allocate('random')
+    
         
         GD_C = Gradient(ig, backend = 'c')
         GD_numpy = Gradient(ig, backend = 'numpy')

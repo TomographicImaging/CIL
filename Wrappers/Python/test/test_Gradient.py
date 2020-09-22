@@ -271,16 +271,21 @@ class TestGradient(unittest.TestCase):
         self.assertTrue(G_numpy1.dot_test(G_numpy1))  
         
         G_numpy1 = Gradient(ig, method = 'centered', bnd_cond = 'Neumann')    
-        numpy.testing.assert_approx_equal(G_numpy1.dot_test(G_numpy1), True, significant = 1)
+        self.assertTrue(G_numpy1.dot_test(G_numpy1))
+#        numpy.testing.assert_approx_equal(G_numpy1.dot_test(G_numpy1), True, significant = 1)
 #        
         G_numpy1 = Gradient(ig, method = 'forward', bnd_cond = 'Periodic')    
         self.assertTrue(G_numpy1.dot_test(G_numpy1))         
         
         G_numpy1 = Gradient(ig, method = 'backward', bnd_cond = 'Periodic')    
-        numpy.testing.assert_approx_equal(G_numpy1.dot_test(G_numpy1), True, significant = 1)
+        self.assertTrue(G_numpy1.dot_test(G_numpy1))
+#        numpy.testing.assert_approx_equal(G_numpy1.dot_test(G_numpy1), True, significant = 1)
         
         G_numpy1 = Gradient(ig, method = 'centered', bnd_cond = 'Periodic')  
-        numpy.testing.assert_approx_equal(G_numpy1.dot_test(G_numpy1), True, significant = 1)   
+#        print("skata")
+#        print(G_numpy1.dot_test(G_numpy1))
+        self.assertTrue(G_numpy1.dot_test(G_numpy1))
+#        numpy.testing.assert_approx_equal(G_numpy1.dot_test(G_numpy1), True, significant = 1)   
         
         print("Test passed\n")
         
@@ -313,23 +318,28 @@ class TestGradient(unittest.TestCase):
             
         print("Check dot test for Gradient Numpy with different method/bdn_cond")
             
-        G_numpy1 = Gradient(ig, method = 'forward', bnd_cond = 'Neumann')    
-        numpy.testing.assert_approx_equal(G_numpy1.dot_test(G_numpy1), True, significant = 1)
+        G_numpy1 = Gradient(ig, method = 'forward', bnd_cond = 'Neumann')  
+        self.assertTrue(G_numpy1.dot_test(G_numpy1))
+#        numpy.testing.assert_approx_equal(G_numpy1.dot_test(G_numpy1), True, significant = 1)
 #        self.assertTrue(G_numpy1.dot_test(G_numpy1)) 
         
         G_numpy1 = Gradient(ig, method = 'backward', bnd_cond = 'Neumann')    
-        numpy.testing.assert_approx_equal(G_numpy1.dot_test(G_numpy1), True, significant = 1)        
+        self.assertTrue(G_numpy1.dot_test(G_numpy1))
+#        numpy.testing.assert_approx_equal(G_numpy1.dot_test(G_numpy1), True, significant = 1)        
 #        self.assertTrue(G_numpy1.dot_test(G_numpy1))   
         
         G_numpy1 = Gradient(ig, method = 'centered', bnd_cond = 'Neumann')
-        numpy.testing.assert_approx_equal(G_numpy1.dot_test(G_numpy1), True, significant = 1)  
+        self.assertTrue(G_numpy1.dot_test(G_numpy1))
+#        numpy.testing.assert_approx_equal(G_numpy1.dot_test(G_numpy1), True, significant = 1)  
         
         G_numpy1 = Gradient(ig, method = 'forward', bnd_cond = 'Periodic')    
-        numpy.testing.assert_approx_equal(G_numpy1.dot_test(G_numpy1), True, significant = 1)        
+        self.assertTrue(G_numpy1.dot_test(G_numpy1))
+#        numpy.testing.assert_approx_equal(G_numpy1.dot_test(G_numpy1), True, significant = 1)        
 #        self.assertTrue(G_numpy1.dot_test(G_numpy1)) 
         
         G_numpy1 = Gradient(ig, method = 'backward', bnd_cond = 'Periodic')    
-        numpy.testing.assert_approx_equal(G_numpy1.dot_test(G_numpy1), True, significant = 1)  
+        self.assertTrue(G_numpy1.dot_test(G_numpy1))
+#        numpy.testing.assert_approx_equal(G_numpy1.dot_test(G_numpy1), True, significant = 1)  
 #        self.assertTrue(G_numpy1.dot_test(G_numpy1)) 
         
         G_numpy1 = Gradient(ig, method = 'centered', bnd_cond = 'Periodic')    
@@ -399,7 +409,7 @@ class TestGradient(unittest.TestCase):
                    
         print("Check Gradient_C, Gradient_numpy norms")
         Gradient_C_norm = GD_C.norm()
-        Gradient_numpy_norm = GD_numpy.norm()    
+        Gradient_numpy_norm = GD_numpy.norm()  
         numpy.testing.assert_approx_equal(Gradient_C_norm, Gradient_numpy_norm, significant = 1) 
         print("Test passed\n")
         

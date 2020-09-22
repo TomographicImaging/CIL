@@ -243,8 +243,9 @@ class TestGradient(unittest.TestCase):
     def test_Gradient_c_numpy_voxel(self):
         
         print("Test Gradient for 2D Geometry, ")
-        ig = ImageGeometry(voxel_num_y = 10, voxel_num_x = 10, voxel_size_x=0.1, voxel_size_y=0.5)  
-        x = ig.allocate('random')
+        
+        ny, nx, nz = 3, 4, 5
+        ig = ImageGeometry(voxel_num_y = ny, voxel_num_x = nx, voxel_size_x=0.1, voxel_size_y=0.5)  
             
         GD_C = Gradient(ig, backend = 'c')
         GD_numpy = Gradient(ig, backend = 'numpy')
@@ -297,7 +298,7 @@ class TestGradient(unittest.TestCase):
         ###########################################################################
         
         print("Test Gradient for 3D Geometry, ")
-        ig = ImageGeometry(10,10,10, voxel_size_x=0.1, voxel_size_y=0.5, voxel_size_z = 0.4)  
+        ig = ImageGeometry(voxel_num_y = ny, voxel_num_x = nx, voxel_num_z = nz, voxel_size_x=0.1, voxel_size_y=0.5, voxel_size_z = 0.4)  
         
         GD_C = Gradient(ig, backend = 'c')
         GD_numpy = Gradient(ig, backend = 'numpy')
@@ -402,7 +403,7 @@ class TestGradient(unittest.TestCase):
         ###########################################################################
         
         print("Test Gradient for 3D Geometry + channels, ")
-        ig = ImageGeometry(5,4,11, voxel_size_x=0.1, voxel_size_y=0.5, voxel_size_z = 0.3, channels = 10)  
+        ig = ImageGeometry(voxel_num_x = nx, voxel_num_y = ny, voxel_num_z=nz, voxel_size_x=0.1, voxel_size_y=0.5, voxel_size_z = 0.3, channels = 10)  
         
         GD_C = Gradient(ig, backend = 'c')
         GD_numpy = Gradient(ig, backend = 'numpy')

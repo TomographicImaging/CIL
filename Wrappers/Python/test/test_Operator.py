@@ -1029,10 +1029,5 @@ class TestOperatorCompositionSum(unittest.TestCase):
                                                 2 * out2.as_array())
 
 
-if __name__ == '__main__':
-    
-    
-    d = TestOperator()
-    d.test_FiniteDifference()
     
     

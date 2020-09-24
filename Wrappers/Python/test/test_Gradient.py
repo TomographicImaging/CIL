@@ -247,11 +247,6 @@ class TestGradient(unittest.TestCase):
         
         ny, nx, nz = 3, 4, 5
         ig = ImageGeometry(voxel_num_y = ny, voxel_num_x = nx, voxel_size_x=0.1, voxel_size_y=0.5) 
-        
-        x=ig.allocate('random')
-        
-        print("skata")
-        print(x.as_array())
             
         GD_C = Gradient(ig, backend = 'c')
         GD_numpy = Gradient(ig, backend = 'numpy')

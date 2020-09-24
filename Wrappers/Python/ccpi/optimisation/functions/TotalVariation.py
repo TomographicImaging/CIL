@@ -280,8 +280,6 @@ if __name__ == '__main__':
     loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
     data = loader.load(TestData.SHAPES)
     ig = data.geometry
-    ig.voxel_size_x = 0.1
-    ig.voxel_size_y = 0.1
     ag = ig
 
     # Create noisy data. 

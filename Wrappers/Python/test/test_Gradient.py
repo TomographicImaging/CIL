@@ -241,10 +241,17 @@ class TestGradient(unittest.TestCase):
         
     def test_Gradient_c_numpy_voxel(self):
         
+        numpy.random.seed(10)
+        
         print("Test Gradient for 2D Geometry, ")
         
         ny, nx, nz = 3, 4, 5
-        ig = ImageGeometry(voxel_num_y = ny, voxel_num_x = nx, voxel_size_x=0.1, voxel_size_y=0.5)  
+        ig = ImageGeometry(voxel_num_y = ny, voxel_num_x = nx, voxel_size_x=0.1, voxel_size_y=0.5) 
+        
+        x=ig.allocate('random')
+        
+        print("skata")
+        print(x.as_array())
             
         GD_C = Gradient(ig, backend = 'c')
         GD_numpy = Gradient(ig, backend = 'numpy')
@@ -265,6 +272,7 @@ class TestGradient(unittest.TestCase):
         print("Check dot test for Gradient Numpy with different method/bdn_cond")
         
         G_numpy1 = Gradient(ig, method = 'forward', bnd_cond = 'Neumann')    
+
         self.assertTrue(G_numpy1.dot_test(G_numpy1))
                 
         G_numpy1 = Gradient(ig, method = 'backward', bnd_cond = 'Neumann')    

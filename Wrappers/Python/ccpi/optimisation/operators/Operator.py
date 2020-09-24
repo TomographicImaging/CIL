@@ -187,11 +187,11 @@ class LinearOperator(Operator):
         :type decimal: int, optional, default 4
         '''
         if range_init is None:
-            y = operator.range_geometry().allocate('random', seed = kwargs.get('seed',10))
+            y = operator.range_geometry().allocate('random')
         else:
             y = range_init
         if domain_init is None:
-            x = operator.domain_geometry().allocate('random', seed = kwargs.get('seed',10))
+            x = operator.domain_geometry().allocate('random')
         else:
             x = domain_init
             

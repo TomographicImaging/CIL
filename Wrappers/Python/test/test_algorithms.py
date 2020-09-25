@@ -355,9 +355,7 @@ class TestAlgorithms(unittest.TestCase):
         operator = Gradient(ig, correlation=Gradient.CORRELATION_SPACE)
 
         f1 =  alpha * MixedL21Norm()
-
-        
-                    
+   
         # Compute operator Norm
         normK = operator.norm()
 
@@ -564,9 +562,9 @@ class TestSPDHG(unittest.TestCase):
         print ("Quality measures", qm)
             
         np.testing.assert_almost_equal( mae(spdhg.get_output(), pdhg.get_output()), 
-                                            0.00033586719655431807, decimal=3)
+                                            0.000335, decimal=3)
         np.testing.assert_almost_equal( mse(spdhg.get_output(), pdhg.get_output()), 
-                                            5.511419658432715e-06, decimal=3) 
+                                            5.51141e-06, decimal=3) 
         
     @unittest.skipIf(astra_not_available, "ccpi-astra not available")
     def test_SPDHG_vs_PDHG_explicit(self):
@@ -666,9 +664,9 @@ class TestSPDHG(unittest.TestCase):
             )
         print ("Quality measures", qm)
         np.testing.assert_almost_equal( mae(spdhg.get_output(), pdhg.get_output()),
-         0.0015075773699209094 , decimal=3)
+         0.00150 , decimal=3)
         np.testing.assert_almost_equal( mse(spdhg.get_output(), pdhg.get_output()), 
-        1.6859006791491993e-05, decimal=3)
+        1.68590e-05, decimal=3)
     
     @unittest.skipIf(astra_not_available, "ccpi-astra not available")
     def test_SPDHG_vs_SPDHG_explicit_axpby(self):
@@ -839,6 +837,6 @@ class TestSPDHG(unittest.TestCase):
             )
         print ("Quality measures", qm)
         np.testing.assert_array_less( qm[0], 0.005 )
-        np.testing.assert_array_less( qm[1], 3.e-05)
+        np.testing.assert_array_less( qm[1], 3e-05)
         
 

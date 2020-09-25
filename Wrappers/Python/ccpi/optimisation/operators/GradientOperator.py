@@ -15,6 +15,7 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -25,11 +26,6 @@ from ccpi.framework import ImageGeometry, BlockGeometry
 from ccpi.utilities import NUM_THREADS
 
 import warnings
-
-#default nThreads
-# import multiprocessing
-# cpus = multiprocessing.cpu_count()
-# NUM_THREADS = max(int(cpus/2),1)
 
 NEUMANN = 'Neumann'
 PERIODIC = 'Periodic'
@@ -159,50 +155,35 @@ class Gradient_numpy(LinearOperator):
 
                 if self.size_dom_gm == 4:
                     # 3D + Channel
-                    # expected Grad_order = ['channels', 'direction_z', 'direction_y', 'direction_x']
                     expected_order = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
-#                    self.voxel_size_order = [domain_geometry.voxel_size_z, domain_geometry.voxel_size_y, domain_geometry.voxel_size_x ]
 
                 else:
                     # 2D + Channel
-                    # expected Grad_order = ['channels', 'direction_y', 'direction_x']
                     expected_order = [ImageGeometry.CHANNEL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
-#                    self.voxel_size_order = [domain_geometry.voxel_size_y, domain_geometry.voxel_size_x ]                    
 
                 order = domain_geometry.get_order_by_label(domain_geometry.dimension_labels, expected_order)
                 
                 self.ind = order[1:]
                 
-                #self.ind = numpy.arange(1,self.gm_domain.length)
             else:
                 # no channel info
                 range_geometry = BlockGeometry(*[domain_geometry for _ in range(domain_geometry.length) ] )
                 if self.size_dom_gm == 3:
                     # 3D
-                    # expected Grad_order = ['direction_z', 'direction_y', 'direction_x']
                     expected_order = [ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
 #                    self.voxel_size_order = [domain_geometry.voxel_size_z, domain_geometry.voxel_size_y, domain_geometry.voxel_size_x ]                    
                     
                 else:
                     # 2D
                     expected_order = [ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]    
-#                    self.voxel_size_order = [domain_geometry.voxel_size_y, domain_geometry.voxel_size_x ]                     
 
                 self.ind = domain_geometry.get_order_by_label(domain_geometry.dimension_labels, expected_order)
-                # self.ind = numpy.arange(self.gm_domain.length)
                 
         elif self.correlation==CORRELATION_SPACECHANNEL:
             
             if domain_geometry.channels > 1:
                 range_geometry = BlockGeometry(*[domain_geometry for _ in range(domain_geometry.length)])
                 self.ind = range(domain_geometry.length)                
-#                if self.size_dom_gm == 4:
-#                    # Voxel size wrt to channel direction == 1.0
-#                    self.voxel_size_order = [1.0, domain_geometry.voxel_size_z, domain_geometry.voxel_size_y, domain_geometry.voxel_size_x ]                 
-#                elif self.size_dom_gm == 3:
-#                    # Voxel size wrt to channel direction == 1.0
-#                    print("is correct")
-#                    self.voxel_size_order = [1.0, domain_geometry.voxel_size_y, domain_geometry.voxel_size_x ]                     
             else:
                 raise ValueError('No channels to correlate')
                 
@@ -332,15 +313,10 @@ class Gradient_C(LinearOperator):
         if len(gm_domain.shape) == 4:
             # Voxel size wrt to channel direction == 1.0
             self.fd = cilacc.fdiff4D
-#            self.voxel_size_order = [1.0, gm_domain.voxel_size_z, gm_domain.voxel_size_y, gm_domain.voxel_size_x ]            
         elif len(gm_domain.shape) == 3:
-            # Voxel size wrt to channel direction == 1.0
             self.fd = cilacc.fdiff3D
-#            self.voxel_size_order = [gm_domain.voxel_size_z, gm_domain.voxel_size_y, gm_domain.voxel_size_x ]            
         elif len(gm_domain.shape) == 2:
             self.fd = cilacc.fdiff2D
-            # Voxel size wrt to channel direction == 1.0
-#            self.voxel_size_order = [gm_domain.voxel_size_y, gm_domain.voxel_size_x ]            
         else:
             raise ValueError('Number of dimensions not supported, expected 2, 3 or 4, got {}'.format(len(gm_domain.shape)))
             
@@ -367,10 +343,13 @@ class Gradient_C(LinearOperator):
         arg2 = [el for el in x.shape]
         args = arg1 + arg2 + [self.bnd_cond, 1, self.num_threads]
         self.fd(x_p, *args)
-        out /= self.voxel_size_order
+        
+        if any(elem != 1.0 for elem in self.voxel_size_order):
+            out /= self.voxel_size_order
+#        out /= self.voxel_size_order
         
         if return_val is True:
-            return out
+            return out        
 
     def adjoint(self, x, out=None):
 
@@ -380,8 +359,12 @@ class Gradient_C(LinearOperator):
             return_val = True
 
         ndout, out_p = Gradient_C.datacontainer_as_c_pointer(out)
+               
         
-        tmp = x/self.voxel_size_order
+        if any(elem != 1.0 for elem in self.voxel_size_order):
+            tmp = x/self.voxel_size_order
+        else:
+            tmp = x
 
         arg1 = [Gradient_C.datacontainer_as_c_pointer(tmp.get_item(i))[1] for i in range(self.gm_range.shape[0])]
         arg2 = [el for el in out.shape]

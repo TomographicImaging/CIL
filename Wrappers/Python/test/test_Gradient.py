@@ -37,7 +37,6 @@ class TestGradient(unittest.TestCase):
         # check range geometry, examples
         
         ig1 = ImageGeometry(voxel_num_x = M, voxel_num_y = N) 
-        ig2 = ImageGeometry(voxel_num_x = M, voxel_num_y = N, voxel_num_z = K) 
         ig3 = ImageGeometry(voxel_num_x = M, voxel_num_y = N, channels = channels) 
         ig4 = ImageGeometry(voxel_num_x = M, voxel_num_y = N, channels = channels, voxel_num_z= K) 
         
@@ -105,7 +104,6 @@ class TestGradient(unittest.TestCase):
 
         M, N = 20, 30
         ig = ImageGeometry(M, N)
-        arr = ig.allocate('random_int' )
         
         # check direct of Gradient and sparse matrix
         G = Gradient(ig, backend='numpy')
@@ -175,9 +173,7 @@ class TestGradient(unittest.TestCase):
 
         ig = ImageGeometry(voxel_num_x=nx, voxel_num_y=ny, voxel_num_z=nz, channels=nc)
 
-
         arr = numpy.arange(size).reshape(dim).astype(numpy.float32)**2
-#        arr = ig.allocate('random')
 
         data = ig.allocate()
         data.fill(arr)
@@ -241,7 +237,7 @@ class TestGradient(unittest.TestCase):
         
     def test_Gradient_c_numpy_voxel(self):
         
-        numpy.random.seed(10)
+        numpy.random.seed(5)
         
         print("Test Gradient for 2D Geometry, ")
         
@@ -253,10 +249,11 @@ class TestGradient(unittest.TestCase):
                        
         print("Check Gradient_C, Gradient_numpy norms")
         Gradient_C_norm = GD_C.norm()
-        Gradient_numpy_norm = GD_numpy.norm()    
-        numpy.testing.assert_approx_equal(Gradient_C_norm, Gradient_numpy_norm, significant = 1) 
-        numpy.testing.assert_approx_equal(numpy.sqrt((2/ig.voxel_size_x)**2 + (2/ig.voxel_size_y)**2), Gradient_numpy_norm, significant = 1) 
-        numpy.testing.assert_approx_equal(numpy.sqrt((2/ig.voxel_size_x)**2 + (2/ig.voxel_size_y)**2), Gradient_C_norm, significant = 1) 
+        Gradient_numpy_norm = GD_numpy.norm()   
+        print(Gradient_C_norm, Gradient_numpy_norm)
+        numpy.testing.assert_allclose(Gradient_C_norm, Gradient_numpy_norm, rtol=0.1) 
+        numpy.testing.assert_allclose(numpy.sqrt((2/ig.voxel_size_x)**2 + (2/ig.voxel_size_y)**2), Gradient_numpy_norm, rtol=0.1) 
+        numpy.testing.assert_allclose(numpy.sqrt((2/ig.voxel_size_x)**2 + (2/ig.voxel_size_y)**2), Gradient_C_norm, rtol=0.1) 
         print("Test passed\n")
         
         print("Check dot test")
@@ -275,7 +272,7 @@ class TestGradient(unittest.TestCase):
         
         G_numpy1 = Gradient(ig, method = 'centered', bnd_cond = 'Neumann')    
         self.assertTrue(G_numpy1.dot_test(G_numpy1))
-#        
+ 
         G_numpy1 = Gradient(ig, method = 'forward', bnd_cond = 'Periodic')    
         self.assertTrue(G_numpy1.dot_test(G_numpy1))         
         
@@ -300,13 +297,14 @@ class TestGradient(unittest.TestCase):
         GD_C = Gradient(ig, backend = 'c')
         GD_numpy = Gradient(ig, backend = 'numpy')
         
+        numpy.random.seed(5)
            
         print("Check Gradient_C, Gradient_numpy norms")
         Gradient_C_norm = GD_C.norm()
         Gradient_numpy_norm = GD_numpy.norm()    
-        numpy.testing.assert_approx_equal(Gradient_C_norm, Gradient_numpy_norm, significant = 1) 
-        numpy.testing.assert_approx_equal(numpy.sqrt((2/ig.voxel_size_z)**2 + (2/ig.voxel_size_x)**2 + (2/ig.voxel_size_y)**2), Gradient_numpy_norm, significant = 1) 
-        numpy.testing.assert_approx_equal(numpy.sqrt((2/ig.voxel_size_z)**2 + (2/ig.voxel_size_x)**2 + (2/ig.voxel_size_y)**2), Gradient_C_norm, significant = 1) 
+        numpy.testing.assert_allclose(Gradient_C_norm, Gradient_numpy_norm, rtol=0.1) 
+        numpy.testing.assert_allclose(numpy.sqrt((2/ig.voxel_size_z)**2 + (2/ig.voxel_size_x)**2 + (2/ig.voxel_size_y)**2), Gradient_numpy_norm, rtol=0.1) 
+        numpy.testing.assert_allclose(numpy.sqrt((2/ig.voxel_size_z)**2 + (2/ig.voxel_size_x)**2 + (2/ig.voxel_size_y)**2), Gradient_C_norm, rtol=0.1) 
         print("Test passed\n")
         
         print("Check dot test")
@@ -352,7 +350,7 @@ class TestGradient(unittest.TestCase):
         print("Check Gradient_C, Gradient_numpy norms")
         Gradient_C_norm = GD_C.norm()
         Gradient_numpy_norm = GD_numpy.norm()    
-        numpy.testing.assert_approx_equal(Gradient_C_norm, Gradient_numpy_norm, significant = 1) 
+        numpy.testing.assert_allclose(Gradient_C_norm, Gradient_numpy_norm, rtol=0.1) 
         print("Test passed\n")
         
         print("Check dot test")
@@ -398,7 +396,7 @@ class TestGradient(unittest.TestCase):
         print("Check Gradient_C, Gradient_numpy norms")
         Gradient_C_norm = GD_C.norm()
         Gradient_numpy_norm = GD_numpy.norm()  
-        numpy.testing.assert_approx_equal(Gradient_C_norm, Gradient_numpy_norm, significant = 1) 
+        numpy.testing.assert_allclose(Gradient_C_norm, Gradient_numpy_norm, rtol=0.1) 
         print("Test passed\n")
         
         print("Check dot test")

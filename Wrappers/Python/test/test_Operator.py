@@ -259,10 +259,9 @@ class TestOperator(CCPiTestClass):
 
         u = G.range_geometry().allocate(ImageGeometry.RANDOM)
         res = G.domain_geometry().allocate()
-        print(type(res))
         G.adjoint(u, out=res)
         w = G.adjoint(u)
-        print(type(w))
+
         self.assertNumpyArrayEqual(res.as_array(), w.as_array())
         
         u = G.domain_geometry().allocate(ImageGeometry.RANDOM)
@@ -453,7 +452,7 @@ class TestGradients(CCPiTestClass):
              
         # self.assertAlmostEqual(lhs3, rhs3)
         self.assertTrue( LinearOperator.dot_test(Grad3 , verbose=True, decimal=4))
-        self.assertTrue( LinearOperator.dot_test(Grad3 , verbose=True, decimal=4, seed=6))
+        self.assertTrue( LinearOperator.dot_test(Grad3 , verbose=True, decimal=4))
 
     def test_dot_test2(self):
         Grad3 = Gradient(self.ig3, correlation = 'SpaceChannel', backend='c')

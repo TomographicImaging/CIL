@@ -21,7 +21,7 @@ from ccpi.framework import BlockDataContainer
 from ccpi.optimisation.operators import Identity
 from ccpi.framework import ImageGeometry, ImageData
 import numpy
-from ccpi.optimisation.operators import FiniteDiff
+from ccpi.optimisation.operators import FiniteDifferenceOperator
 
 
 class TestBlockOperator(unittest.TestCase):
@@ -360,7 +360,7 @@ class TestBlockOperator(unittest.TestCase):
         
         ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N)    
         u = ig.allocate('random_int')
-        G = FiniteDiff(ig, direction=0, bnd_cond = 'Neumann')
+        G = FiniteDifferenceOperator(ig, direction=0, bnd_cond = 'Neumann')
         print(type(u), u.as_array())    
         print(G.direct(u).as_array())
 
@@ -370,7 +370,7 @@ class TestBlockOperator(unittest.TestCase):
         M1, N1, K1 = 200, 300, 2
         ig1 = ImageGeometry(voxel_num_x = M1, voxel_num_y = N1, channels = K1)
         u1 = ig1.allocate('random_int')
-        G1 = FiniteDiff(ig1, direction=2, bnd_cond = 'Periodic')
+        G1 = FiniteDifferenceOperator(ig1, direction=2, bnd_cond = 'Periodic')
         print(ig1.shape==u1.shape)
         print (G1.norm())
         numpy.testing.assert_allclose(G1.norm(), numpy.sqrt(4), atol=0.1)

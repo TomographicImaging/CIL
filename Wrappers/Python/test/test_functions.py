@@ -1110,14 +1110,3 @@ class TestFunction(unittest.TestCase):
             print (t3-t2)
 
 
-
-
-
-
-if __name__ == '__main__':
-    
-    d = TestFunction()
-    d.test_KullbackLeibler()
-    d.tests_for_L2NormSq_and_weighted()
-    d.tests_for_LS_weightedLS()
-    d.test_Norm2sq_as_FunctionOperatorComposition()    

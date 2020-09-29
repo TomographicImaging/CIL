@@ -36,6 +36,7 @@ import wget
 import os
 
 class TestDataProcessor(unittest.TestCase):
+    
     def setUp(self):
         wget.download('https://github.com/DiamondLightSource/Savu/raw/master/test_data/data/24737_fd.nxs')
         self.filename = '24737_fd.nxs'
@@ -53,6 +54,9 @@ class TestDataProcessor(unittest.TestCase):
         cf.set_input(ad)
         print ("Center of rotation", cf.get_output())
         self.assertAlmostEqual(86.25, cf.get_output())
+        
+        print("check call method of DataProcessor")
+        self.assertAlmostEqual(86.25, cf(ad))
 
         ad = data.clone()
         ad = ad.subset(['vertical','angle','horizontal'])
@@ -61,6 +65,9 @@ class TestDataProcessor(unittest.TestCase):
         cf.set_input(ad)
         print ("Center of rotation", cf.get_output())
         self.assertAlmostEqual(86.25, cf.get_output())
+        
+        print("check call method of DataProcessor")
+        self.assertAlmostEqual(86.25, cf(ad))
 
         ad = data.clone()
         ad = ad.subset(vertical=67)
@@ -69,6 +76,8 @@ class TestDataProcessor(unittest.TestCase):
         cf.set_input(ad)
         print ("Center of rotation", cf.get_output())
         self.assertAlmostEqual(86.25, cf.get_output())
+        print("check call method of DataProcessor")
+        self.assertAlmostEqual(86.25, cf(ad))        
 
         ad = data.clone()
         print (ad)
@@ -100,6 +109,8 @@ class TestDataProcessor(unittest.TestCase):
         arr = c.as_array()
         #[ 0 60  1 61  2 62  3 63  4 64  5 65  6 66  7 67  8 68  9 69 10 70 11 71
         # 12 72 13 73 14 74 15 75 16 76 17 77 18 78 19 79]
+        
+        print(arr)
     
         ax = AX()
         ax.scalar = 2
@@ -107,7 +118,12 @@ class TestDataProcessor(unittest.TestCase):
         #ax.apply()
         print ("ax  in {0} out {1}".format(c.as_array().flatten(),
                ax.get_output().as_array().flatten()))
+        
         numpy.testing.assert_array_equal(ax.get_output().as_array(), arr*2)
+                
+        
+        print("check call method of DataProcessor")
+        numpy.testing.assert_array_equal(ax(c).as_array(), arr*2)
         
         cast = CastDataContainer(dtype=numpy.float32)
         cast.set_input(c)
@@ -119,6 +135,10 @@ class TestDataProcessor(unittest.TestCase):
         axm.set_input(c)
         axm.get_output(out)
         numpy.testing.assert_array_equal(out.as_array(), arr*0.5)
+        
+        print("check call method of DataProcessor")
+        numpy.testing.assert_array_equal(axm(c).as_array(), arr*0.5)        
+    
         
         # check out in DataSetProcessor
         #a = numpy.asarray([i for i in range( size )])
@@ -148,3 +168,13 @@ class TestDataProcessor(unittest.TestCase):
         chain.set_input_processor(ax)
         print ("chain in {0} out {1}".format(ax.get_output().as_array(), chain.get_output().as_array()))
         numpy.testing.assert_array_equal(chain.get_output().as_array(), arr)
+        
+        print("check call method of DataProcessor")
+        numpy.testing.assert_array_equal(ax(chain(c)).as_array(), arr)        
+
+        
+        
+if __name__ == "__main__":
+    
+    d = TestDataProcessor()
+    d.test_DataProcessorChaining()

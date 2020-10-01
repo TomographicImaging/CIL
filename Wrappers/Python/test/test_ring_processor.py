@@ -116,6 +116,8 @@ class TestRingProcessor(unittest.TestCase):
     @unittest.skipIf(skip_test, "has wget or Numpy < 1.14")
     def test_3D(self):
         
+        np.random.seed(10)
+        
         print("Start 3D ring removal in real data")
         wget.download(self.url + 'Sinogram_Rock_sample_3D.nxs', 
           out = self.cwd)
@@ -147,6 +149,8 @@ class TestRingProcessor(unittest.TestCase):
         
     @unittest.skipIf(skip_test, "has wget or Numpy < 1.14")
     def test_2D_channels(self):
+        
+        np.random.seed(10)
         
         print("Start 2D+channels ring removal in real data")
         self.list_of_files.append('Sinogram_Rock_sample_2D_channels.nxs')
@@ -181,6 +185,8 @@ class TestRingProcessor(unittest.TestCase):
             
     @unittest.skipIf(skip_test, "has wget or Numpy < 1.14")
     def test_3D_channels(self):
+        
+        np.random.seed(10)
         
         print("Start 3D+channels ring removal in real data")
         self.list_of_files.append('Sinogram_Rock_sample_3D_channels.nxs')
@@ -219,7 +225,6 @@ class TestRingProcessor(unittest.TestCase):
 if __name__ == '__main__':
     
     d = TestRingProcessor()
-    d.test_2D_demo_ring()
     d.test_3D()
     d.test_2D_channels()
     d.test_3D_channels()

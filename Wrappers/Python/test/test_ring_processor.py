@@ -62,57 +62,57 @@ class TestRingProcessor(unittest.TestCase):
                 os.remove(the_file)
                 print ("removed" , the_file)
 
-    @unittest.skipIf(skip_test, "Numpy <= 1.13")
-    def test_2D_demo_ring(self):
-        
-        print("Start 2D ring removal in simulated sinogram")
-        
-        model = 1 # select a model number from the library
-        N = 512 # set dimension of the phantom
-        path = os.path.dirname(tomophantom.__file__)
-        path_library2D = os.path.join(path, "Phantom2DLibrary.dat")
-        
-        phantom_2D = TomoP2D.Model(model, N, path_library2D)    
-        # data = ImageData(phantom_2D)
-        ig = ImageGeometry(voxel_num_x=N, voxel_num_y=N, voxel_size_x = 0.1, voxel_size_y = 0.1)
-        data = ig.allocate(None)
-        data.fill(phantom_2D)
-        
-        # Create acquisition data and geometry
-        detectors = N
-        angles = np.linspace(0, np.pi, 120)
-        ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1)
-            
-        Aop = AstraProjectorSimple(ig, ag, 'cpu')
-        sin = ag.allocate()
-        Aop.direct(data, out = sin)
-        
-        sin_stripe = 0*sin
-    #        sin_stripe = sin
-        tmp = sin.as_array()
-        tmp[:,::20]=0
-        sin_stripe.fill(tmp)
-                
-        ring_removal = RingRemover(4, "db25", 20, info = True)
-        ring_removal.set_input(sin_stripe)
-        ring_recon = ring_removal.get_output()
-        
-        # load ring processed result sinogram 2D 
-        wget.download(self.url + 'result_sinogram_2D_ring_remover.nxs', 
-          out = self.cwd)
-        self.list_of_files.append('result_sinogram_2D_ring_remover.nxs')
-        
-        reader = NEXUSDataReader()
-        reader.set_up(nexus_file = os.path.join(self.cwd, self.list_of_files[-1]))
-        tmp = reader.load_data()      
-        
-        print("Check ring remover sinogram 2D")
-        np.testing.assert_array_almost_equal(tmp.as_array(), ring_recon.as_array(),
-            decimal=self.decimal) 
-        # plotter2D([tmp, ring_recon], titles=['saved', 'recon'])
-        # np.testing.assert_allclose(tmp.as_array(), ring_recon.as_array(), rtol=1e4)
-        print("Test passed\n")        
-                    
+#    @unittest.skipIf(skip_test, "Numpy <= 1.13")
+#    def test_2D_demo_ring(self):
+#        
+#        print("Start 2D ring removal in simulated sinogram")
+#        
+#        model = 1 # select a model number from the library
+#        N = 512 # set dimension of the phantom
+#        path = os.path.dirname(tomophantom.__file__)
+#        path_library2D = os.path.join(path, "Phantom2DLibrary.dat")
+#        
+#        phantom_2D = TomoP2D.Model(model, N, path_library2D)    
+#        # data = ImageData(phantom_2D)
+#        ig = ImageGeometry(voxel_num_x=N, voxel_num_y=N, voxel_size_x = 0.1, voxel_size_y = 0.1)
+#        data = ig.allocate(None)
+#        data.fill(phantom_2D)
+#        
+#        # Create acquisition data and geometry
+#        detectors = N
+#        angles = np.linspace(0, np.pi, 120)
+#        ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1)
+#            
+#        Aop = AstraProjectorSimple(ig, ag, 'cpu')
+#        sin = ag.allocate()
+#        Aop.direct(data, out = sin)
+#        
+#        sin_stripe = 0*sin
+#    #        sin_stripe = sin
+#        tmp = sin.as_array()
+#        tmp[:,::20]=0
+#        sin_stripe.fill(tmp)
+#                
+#        ring_removal = RingRemover(4, "db25", 20, info = True)
+#        ring_removal.set_input(sin_stripe)
+#        ring_recon = ring_removal.get_output()
+#        
+#        # load ring processed result sinogram 2D 
+#        wget.download(self.url + 'result_sinogram_2D_ring_remover.nxs', 
+#          out = self.cwd)
+#        self.list_of_files.append('result_sinogram_2D_ring_remover.nxs')
+#        
+#        reader = NEXUSDataReader()
+#        reader.set_up(nexus_file = os.path.join(self.cwd, self.list_of_files[-1]))
+#        tmp = reader.load_data()      
+#        
+#        print("Check ring remover sinogram 2D")
+#        np.testing.assert_array_almost_equal(tmp.as_array(), ring_recon.as_array(),
+#            decimal=self.decimal) 
+#        # plotter2D([tmp, ring_recon], titles=['saved', 'recon'])
+#        # np.testing.assert_allclose(tmp.as_array(), ring_recon.as_array(), rtol=1e4)
+#        print("Test passed\n")        
+#                    
     @unittest.skipIf(skip_test, "has wget or Numpy < 1.14")
     def test_3D(self):
         

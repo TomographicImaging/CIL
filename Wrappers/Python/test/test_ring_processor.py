@@ -45,7 +45,7 @@ class TestRingProcessor(unittest.TestCase):
         self.list_of_files = []
         self.url = 'https://www.ccpi.ac.uk/sites/www.ccpi.ac.uk/files/'
         self.cwd = os.getcwd()
-        np.random.seed(1)
+        np.random.seed(10)
         self.decimal = 4
     # @property
     # def list_of_files(self):

@@ -112,7 +112,7 @@ class RingRemover(DataProcessor):
                 
                 for i in range(channels):
                     for j in range(vertical):
-                        tmp_corrected = self.xRemoveStripesVertical(data.subset(channel=i, vertical=j).as_array(), decNum, wname, sigma)
+                        tmp_corrected = self.xRemoveStripesVertical(data.subset(vertical=j, channel=i).as_array(), decNum, wname, sigma)
                         out.fill(tmp_corrected, channel = i, vertical = j)
                     
                     # prints info for every channel

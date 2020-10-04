@@ -48,6 +48,7 @@ requirements:
     - openmp # [osx]
     - dxchange
     - olefile >=0.46
+    - pywavelets
   
 about:
   home: http://www.ccpi.ac.uk

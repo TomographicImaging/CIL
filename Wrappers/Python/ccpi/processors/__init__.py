@@ -18,3 +18,4 @@
 from .CenterOfRotationFinder import CenterOfRotationFinder
 from .Normalizer import Normalizer
 from .Resizer import Resizer
+from .RingRemover import RingRemover

@@ -73,119 +73,135 @@ class RingRemover(DataProcessor):
         
     def process(self, out = None):
         
-        sinogram = self.get_input()                
-        decNum = self.decNum
-        wname = self.wname
-        sigma = self.sigma
-        info = self.info        
-        
-        # acquisition geometry from sinogram
-        geom = sinogram.geometry
-        
-        # channels, vertical 
-        channels =  geom.channels    
-        vertical = geom.pixel_num_v
-        
-        # allocate datacontainer space
-        corrected_sinogram = 0.*sinogram 
-        
-        # allocate numpy space
-        tmp_sinogram_array = corrected_sinogram.as_array()
-        
-        # sinogram numpy array
-        sinogram_array = sinogram.as_array()
-        
-        if channels == 1:        
-            if vertical>0:
-                for i in range(vertical):
-                    J = self.xRemoveStripesVertical(sinogram_array[i], decNum, wname, sigma)
-                    tmp_sinogram_array[i] = J                
-    #                 corrected_sinogram.fill(J, vertical = i)
-            else:
-                J = self.xRemoveStripesVertical(sinogram_array, decNum, wname, sigma)
-                tmp_sinogram_array = J
-    #             corrected_sinogram.fill(J)           
-        else:
-            if vertical>0:
-                for i in range(channels):
-                    for j in range(vertical):
-                        J = self.xRemoveStripesVertical(sinogram_array[i,j], decNum, wname, sigma)
-                        tmp_sinogram_array[i,j] = J
-    #                     corrected_sinogram.fill(J, channel=i, vertical = j)
-                    if info:
-                        print("Finish channel {}".format(i))                    
-            else:
-                for i in range(channels):
-                        J = self.xRemoveStripesVertical(sinogram_array[i], decNum, wname, sigma)
-                        tmp_sinogram_array[i] = J
-    #                     corrected_sinogram.fill(J, channel=i)
-                        if info:
-                            print("Finish channel {}".format(i))
-        if info:
-            print("Finish Removal vertical stripes") 
-            
-        corrected_sinogram.fill(tmp_sinogram_array)
-                  
-            
-    #     if vertical==0:
-    #         vertical = 1
-        
-    #     corrected_sinogram = 0*sinogram
-        
-    #     sinogram_array = sinogram.as_array() 
-        
-    #     if sinogram.shape ==2
-            
-    #     for i in range(channels):
-    #         for j in range(vertical):
-                      
-    # #             sinogram_array = sinogram.subset(channel=i, vertical=j).as_array()  
-    #             J = xRemoveStripesVertical(sinogram_array[, decNum, wname, sigma)            
-    #             corrected_sinogram.fill(J, channel = i, vertical = j)
-                
-    #         if info:
-    #             print("Finish channel {}".format(i))
-                
-        return corrected_sinogram  
-        
-        
-# This is the old approach with fill
-        
-#        data = self.get_input()                
+#        sinogram = self.get_input()                
 #        decNum = self.decNum
 #        wname = self.wname
 #        sigma = self.sigma
-#        info = self.info
+#        info = self.info        
 #        
 #        # acquisition geometry from sinogram
-#        geom = data.geometry
+#        geom = sinogram.geometry
 #        
-#        # get channels, vertical info
+#        # channels, vertical 
 #        channels =  geom.channels    
 #        vertical = geom.pixel_num_v
 #        
 #        # allocate datacontainer space
-#        out = 0.*data
+#        corrected_sinogram = 0.*sinogram 
 #        
-#        # for non multichannel data
+#        # allocate numpy space
+#        tmp_sinogram_array = corrected_sinogram.as_array()
+#        
+#        # sinogram numpy array
+#        sinogram_array = sinogram.as_array()
+#        
 #        if channels == 1:        
-#            
-#            # for 3D data
 #            if vertical>0:
-#                
 #                for i in range(vertical):
-#                    tmp_corrected = self.xRemoveStripesVertical(data.subset(vertical=i).as_array(), decNum, wname, sigma) 
-#                    out.fill(tmp_corrected, vertical = i)  
-#            
-#            # for 2D data
+#                    J = self.xRemoveStripesVertical(sinogram_array[i], decNum, wname, sigma)
+#                    tmp_sinogram_array[i] = J                
+#    #                 corrected_sinogram.fill(J, vertical = i)
 #            else:
-#                tmp_corrected = self.xRemoveStripesVertical(data.as_array(), decNum, wname, sigma)
-#                out.fill(tmp_corrected)        
-#        
-#        # for multichannel data        
+#                J = self.xRemoveStripesVertical(sinogram_array, decNum, wname, sigma)
+#                tmp_sinogram_array = J
+#    #             corrected_sinogram.fill(J)           
 #        else:
+#            if vertical>0:
+#                for i in range(channels):
+#                    for j in range(vertical):
+#                        J = self.xRemoveStripesVertical(sinogram_array[i,j], decNum, wname, sigma)
+#                        tmp_sinogram_array[i,j] = J
+#    #                     corrected_sinogram.fill(J, channel=i, vertical = j)
+#                    if info:
+#                        print("Finish channel {}".format(i))                    
+#            else:
+#                for i in range(channels):
+#                        J = self.xRemoveStripesVertical(sinogram_array[i], decNum, wname, sigma)
+#                        tmp_sinogram_array[i] = J
+#    #                     corrected_sinogram.fill(J, channel=i)
+#                        if info:
+#                            print("Finish channel {}".format(i))
+#        if info:
+#            print("Finish Removal vertical stripes") 
 #            
-#            # for 3D data
+#        corrected_sinogram.fill(tmp_sinogram_array)
+#                  
+#            
+#    #     if vertical==0:
+#    #         vertical = 1
+#        
+#    #     corrected_sinogram = 0*sinogram
+#        
+#    #     sinogram_array = sinogram.as_array() 
+#        
+#    #     if sinogram.shape ==2
+#            
+#    #     for i in range(channels):
+#    #         for j in range(vertical):
+#                      
+#    # #             sinogram_array = sinogram.subset(channel=i, vertical=j).as_array()  
+#    #             J = xRemoveStripesVertical(sinogram_array[, decNum, wname, sigma)            
+#    #             corrected_sinogram.fill(J, channel = i, vertical = j)
+#                
+#    #         if info:
+#    #             print("Finish channel {}".format(i))
+#                
+#        return corrected_sinogram  
+        
+        
+# This is the old approach with fill
+        
+        data = self.get_input()                
+        decNum = self.decNum
+        wname = self.wname
+        sigma = self.sigma
+        info = self.info
+        
+        # acquisition geometry from sinogram
+        geom = data.geometry
+        
+        # get channels, vertical info
+        channels =  geom.channels    
+        vertical = geom.pixel_num_v
+        
+        # allocate datacontainer space
+        out = 0.*data
+        
+        # for non multichannel data
+        if channels == 1:        
+            
+            # for 3D data
+            if vertical>0:
+                
+                for i in range(vertical):
+                    tmp_corrected = self.xRemoveStripesVertical(data.subset(vertical=i).as_array(), decNum, wname, sigma) 
+                    out.fill(tmp_corrected, vertical = i)  
+            
+            # for 2D data
+            else:
+                tmp_corrected = self.xRemoveStripesVertical(data.as_array(), decNum, wname, sigma)
+                out.fill(tmp_corrected)        
+        
+        # for multichannel data        
+        else:
+            
+           # for 3D data
+            if vertical>0:
+                for i in range(channels):
+                    
+                    out_ch_i = out.subset(channel=i)
+                    data_ch_i = data.subset(channel=i)
+                    
+                    for j in range(vertical):
+                        tmp_corrected = self.xRemoveStripesVertical(data_ch_i.subset(vertical=j).as_array(), decNum, wname, sigma)
+                        out_ch_i.fill(tmp_corrected, vertical = j)
+                        
+                    out.fill(out_ch_i.as_array(), channel=i) 
+                    
+                    if info:
+                        print("Finish channel {}".format(i))                    
+            
+            
 #            if vertical>0:
 #                
 #                for i in range(channels):
@@ -196,18 +212,18 @@ class RingRemover(DataProcessor):
 #                    # prints info for every channel
 #                    if info:
 #                        print("Finish channel {}".format(i))                    
-#                        
-#            # for 2D data                        
-#            else:
-#                for i in range(channels):
-#                        tmp_corrected = self.xRemoveStripesVertical(data.subset(channel=i).as_array(), decNum, wname, sigma)
-#                        out.fill(tmp_corrected, channel = i)
-#                        if info:
-#                            print("Finish channel {}".format(i))
-#        if info:
-#            print("Finish Ring Remover") 
-#                    
-#        return out
+                        
+            # for 2D data                        
+            else:
+                for i in range(channels):
+                        tmp_corrected = self.xRemoveStripesVertical(data.subset(channel=i).as_array(), decNum, wname, sigma)
+                        out.fill(tmp_corrected, channel = i)
+                        if info:
+                            print("Finish channel {}".format(i))
+        if info:
+            print("Finish Ring Remover") 
+                    
+        return out
           
     def xRemoveStripesVertical(self,ima, decNum, wname, sigma):
         

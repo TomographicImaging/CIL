@@ -261,6 +261,7 @@ class TestOperator(CCPiTestClass):
         res = G.domain_geometry().allocate()
         G.adjoint(u, out=res)
         w = G.adjoint(u)
+
         self.assertNumpyArrayEqual(res.as_array(), w.as_array())
         
         u = G.domain_geometry().allocate(ImageGeometry.RANDOM)
@@ -451,14 +452,14 @@ class TestGradients(CCPiTestClass):
              
         # self.assertAlmostEqual(lhs3, rhs3)
         self.assertTrue( LinearOperator.dot_test(Grad3 , verbose=True, decimal=4))
-        self.assertTrue( LinearOperator.dot_test(Grad3 , decimal=5, verbose=True))
+        self.assertTrue( LinearOperator.dot_test(Grad3 , verbose=True, decimal=4))
 
     def test_dot_test2(self):
         Grad3 = Gradient(self.ig3, correlation = 'SpaceChannel', backend='c')
              
         # self.assertAlmostEqual(lhs3, rhs3)
         # self.assertTrue( LinearOperator.dot_test(Grad3 , verbose=True))
-        self.assertTrue( LinearOperator.dot_test(Grad3 , decimal=5, verbose=True))
+        self.assertTrue( LinearOperator.dot_test(Grad3 , decimal=4, verbose=True))
 
 
 
@@ -1027,3 +1028,5 @@ class TestOperatorCompositionSum(unittest.TestCase):
                                                 2 * out2.as_array())
 
 
+    
+    

@@ -71,64 +71,69 @@ class RingRemover(DataProcessor):
             return True        
                                
     def process(self, out = None):
+        
+        data = self.get_input()                
+        decNum = self.decNum
+        wname = self.wname
+        sigma = self.sigma
+        info = self.info
+        
+        # acquisition geometry from sinogram
+        geom = data.geometry
+        
+        # get channels, vertical info
+        channels =  geom.channels    
+        vertical = geom.pixel_num_v
+        
+        # allocate datacontainer space
+        out = 0.*data
+        
+        # for non multichannel data
+        if channels == 1:        
+            
+            # for 3D data
+            if vertical>0:
+                
+                for i in range(vertical):
+                    tmp_corrected = self.xRemoveStripesVertical(data.subset(vertical=i).as_array(), decNum, wname, sigma) 
+                    out.fill(tmp_corrected, vertical = i)  
+            
+            # for 2D data
+            else:
+                tmp_corrected = self.xRemoveStripesVertical(data.as_array(), decNum, wname, sigma)
+                out.fill(tmp_corrected)        
+        
+        # for multichannel data        
+        else:
+            
+           # for 3D data
+            if vertical>0:
+                for i in range(channels):
+                    
+                    out_ch_i = out.subset(channel=i)
+                    data_ch_i = data.subset(channel=i)
+                    
+                    for j in range(vertical):
+                        tmp_corrected = self.xRemoveStripesVertical(data_ch_i.subset(vertical=j).as_array(), decNum, wname, sigma)
+                        out_ch_i.fill(tmp_corrected, vertical = j)
+                        
+                    out.fill(out_ch_i.as_array(), channel=i) 
+                    
+                    if info:
+                        print("Finish channel {}".format(i))                    
+                                       
+            # for 2D data                        
+            else:
+                for i in range(channels):
+                        tmp_corrected = self.xRemoveStripesVertical(data.subset(channel=i).as_array(), decNum, wname, sigma)
+                        out.fill(tmp_corrected, channel = i)
+                        if info:
+                            print("Finish channel {}".format(i))
+        if info:
+            print("Finish Ring Remover") 
+                    
+        return out
 
-           data = self.get_input()                
-           decNum = self.decNum
-           wname = self.wname
-           sigma = self.sigma
-           info = self.info
-
-           # acquisition geometry from sinogram
-           geom = data.geometry
-
-           # get channels, vertical info
-           channels =  geom.channels    
-           vertical = geom.pixel_num_v
-
-           # allocate datacontainer space                
-           out = 0.*data
-
-          # for non multichannel data
-           if channels == 1:        
-
-               # for 3D data
-               if vertical>0:
-
-                   for i in range(vertical):
-                       tmp_corrected = self.xRemoveStripesVertical(data.subset(vertical=i).as_array(), decNum, wname, sigma) 
-                       out.fill(tmp_corrected, vertical = i)  
-
-               # for 2D data
-               else:
-                   tmp_corrected = self.xRemoveStripesVertical(data.as_array(), decNum, wname, sigma)
-                   out.fill(tmp_corrected)        
-
-           # for multichannel data        
-           else:
-
-               # for 3D data
-               if vertical>0:
-
-                    for i in range(5):
-                        out_ch_i = out.subset(channel=i)
-                        data_ch_i = data.subset(channel=i)
-                        for j in range(vertical):
-                            tmp_corrected = self.xRemoveStripesVertical(data_ch_i.subset(vertical=j).as_array(), decNum, wname, sigma)
-                            out_ch_i.fill(tmp_corrected, vertical = j)
-                        out.fill(out_ch_i, channel=i)                
-
-               # for 2D data                        
-               else:
-                   for i in range(channels):
-                           tmp_corrected = self.xRemoveStripesVertical(data.subset(channel=i).as_array(), decNum, wname, sigma)
-                           out.fill(tmp_corrected, channel = i)
-                           if info:
-                               print("Finish channel {}".format(i))
-           if info:
-               print("Finish Ring Remover") 
-
-           return out
-    
           
     def xRemoveStripesVertical(self,ima, decNum, wname, sigma):
         

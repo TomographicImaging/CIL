@@ -1915,7 +1915,12 @@ class DataContainer(object):
                 if i < self.number_of_dimensions -1:
                     command = command + ','
                 i += 1
-            command = command + "] = array[:]" 
+                                
+            if issubclass(type(array), numpy.ndarray):
+                command = command + "] = array[:]" 
+            else:
+                print("Hello")
+                command = command + "] = array.as_array()[:]"
             exec(command)
             
         

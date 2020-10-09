@@ -1919,7 +1919,6 @@ class DataContainer(object):
             if issubclass(type(array), numpy.ndarray):
                 command = command + "] = array[:]" 
             else:
-                print("Hello")
                 command = command + "] = array.as_array()[:]"
             exec(command)            
             

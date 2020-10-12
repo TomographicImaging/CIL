@@ -20,7 +20,7 @@ from __future__ import division
 import unittest
 from ccpi.framework import ImageGeometry, VectorGeometry, ImageData, BlockDataContainer, DataContainer
 from ccpi.optimisation.operators import BlockOperator,\
-    FiniteDiff, SymmetrizedGradient
+    FiniteDifferenceOperator, SymmetrizedGradient
 import numpy
 from timeit import default_timer as timer
 from ccpi.optimisation.operators import Gradient, Identity, SparseFiniteDiff,\
@@ -238,7 +238,7 @@ class TestOperator(CCPiTestClass):
         ig = ImageGeometry(N, M)
         Id = Identity(ig)
 
-        FD = FiniteDiff(ig, direction = 0, bnd_cond = 'Neumann')
+        FD = FiniteDifferenceOperator(ig, direction = 0, bnd_cond = 'Neumann')
         u = FD.domain_geometry().allocate('random')
         
         
@@ -261,6 +261,7 @@ class TestOperator(CCPiTestClass):
         res = G.domain_geometry().allocate()
         G.adjoint(u, out=res)
         w = G.adjoint(u)
+
         self.assertNumpyArrayEqual(res.as_array(), w.as_array())
         
         u = G.domain_geometry().allocate(ImageGeometry.RANDOM)
@@ -451,14 +452,14 @@ class TestGradients(CCPiTestClass):
              
         # self.assertAlmostEqual(lhs3, rhs3)
         self.assertTrue( LinearOperator.dot_test(Grad3 , verbose=True, decimal=4))
-        self.assertTrue( LinearOperator.dot_test(Grad3 , decimal=5, verbose=True))
+        self.assertTrue( LinearOperator.dot_test(Grad3 , verbose=True, decimal=4))
 
     def test_dot_test2(self):
         Grad3 = Gradient(self.ig3, correlation = 'SpaceChannel', backend='c')
              
         # self.assertAlmostEqual(lhs3, rhs3)
         # self.assertTrue( LinearOperator.dot_test(Grad3 , verbose=True))
-        self.assertTrue( LinearOperator.dot_test(Grad3 , decimal=5, verbose=True))
+        self.assertTrue( LinearOperator.dot_test(Grad3 , decimal=4, verbose=True))
 
 
 
@@ -1028,4 +1029,4 @@ class TestOperatorCompositionSum(unittest.TestCase):
 
 
     
-
+    

@@ -21,7 +21,7 @@ from __future__ import print_function
 
 from ccpi.optimisation.operators import LinearOperator
 from ccpi.framework import BlockGeometry, BlockDataContainer
-from ccpi.optimisation.operators import FiniteDiff
+from ccpi.optimisation.operators import FiniteDifferenceOperator
 
 
 class SymmetrizedGradient(LinearOperator):
@@ -66,7 +66,7 @@ class SymmetrizedGradient(LinearOperator):
         
         
         # Define FD operator. We need one geometry from the BlockGeometry of the domain
-        self.FD = FiniteDiff(domain_geometry.get_item(0), direction = 0, 
+        self.FD = FiniteDifferenceOperator(domain_geometry.get_item(0), direction = 0, 
                              bnd_cond = self.bnd_cond)
         
         if domain_geometry.shape[0]==2:

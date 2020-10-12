@@ -105,7 +105,7 @@ class BlockDataContainer(object):
 
         if isinstance(other, Number):
             return True   
-        elif isinstance(other, (list, numpy.ndarray)) :
+        elif isinstance(other, (list, tuple, numpy.ndarray)) :
             for ot in other:
                 if not isinstance(ot, (Number,\
                                  numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64,\
@@ -274,7 +274,7 @@ class BlockDataContainer(object):
                 return
             else:
                 return type(self)(*res, shape=self.shape)
-        elif isinstance(other, (list, numpy.ndarray, BlockDataContainer)):
+        elif isinstance(other, (list, tuple, numpy.ndarray, BlockDataContainer)):
             # try to do algebra with one DataContainer. Will raise error if not compatible
             kw = kwargs.copy()
             res = []

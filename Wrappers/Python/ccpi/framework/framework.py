@@ -332,6 +332,7 @@ class ImageGeometry(object):
     #def shape(self):
     #    '''Returns the shape of the array of the ImageData it describes'''
     #    return self.shape
+        
 
 class ComponentDescription(object):
     r'''This class enables the creation of vectors and unit vectors used to describe the components of a tomography system
@@ -2995,36 +2996,3 @@ class VectorGeometry(object):
         return out
 
     
-if __name__ == "__main__":
-    
-    ag = AcquisitionGeometry(geom_type='parallel',dimension='2D',pixel_num_h=10,pixel_num_v=5,angles=[0.1,0.2,0.3])
-    print(ag)
-
-    ad = ag.allocate(0)
-    ad.subset(angle=1)
-
-    vert = ag.pixel_num_v
-
-    vg = VectorGeometry(10)    
-    b = vg.allocate('random_int')
-
-    ig = ImageGeometry(voxel_num_x=100, 
-                   voxel_num_y=200, 
-                   voxel_num_z=300, 
-                   voxel_size_x=1, 
-                   voxel_size_y=1, 
-                   voxel_size_z=1, 
-                   center_x=0, 
-                   center_y=0, 
-                   center_z=0, 
-                   channels=50)
-
-    id = ig.allocate(2)
-
-    print(id.geometry)
-    print(id.dimension_labels)
-
-    sid = id.subset(channel = 20)
-
-    print(sid.dimension_labels)
-    print(sid.geometry)

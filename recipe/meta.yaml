@@ -16,9 +16,9 @@ test:
     - cvxpy # [ unix and py36 and np115 ]
     - scikit-image
     - packaging
-#    - tomophantom
-#    - ccpi-plugins
-#    - ccpi-astra # [ unix ] 
+    - tomophantom
+    - ccpi-plugins
+    - ccpi-astra # [ unix ] 
 
   source_files:
     - ./Wrappers/Python/test # [win]

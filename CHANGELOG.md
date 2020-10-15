@@ -1,10 +1,17 @@
 * 20.x
   - added SPDHG algorithm
   - added TotalVariation function
+  - Redesign of the AcquisitionGeometry class allowing more general acquisition trajectories than currently possible.
+  - Added ZEISS reader
 
 * 20.04
+  - Significant upgrades to the operator and function classes to allow more flexible definition of optimisation problems
+  - Added multithreaded C library for calculation of finite difference and some data processing
+  - Added Gradient operator using C library and numpy backends
 
 * 19.10
+  - Improved usability with reader/writers and plotting utilities
+  - Substantially improved test coverage
 
 * 19.07
   - Introduction of BlockFramework

@@ -196,7 +196,7 @@ class SPDHG(Algorithm):
          p1 = self.f(self.operator.direct(self.x)) + self.g(self.x)
          d1 = - self.f.convex_conjugate(self.y_old)
          tmp = -1*self.operator.adjoint(self.y_old)
-         d1 += self.g.convex_conjugate(tmp)
+         d1 -= self.g.convex_conjugate(tmp)
 
          self.loss.append([p1, d1, p1-d1])
 

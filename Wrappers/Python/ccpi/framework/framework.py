@@ -1875,7 +1875,7 @@ class DataContainer(object):
                 if cleaned.ndim > 1:
                     return type(self)(cleaned , True, dimensions)
                 else:
-                    return VectorData(cleaned)
+                    return VectorData(cleaned, dimension_labels=dimensions)
     
     def fill(self, array, **dimension):
         '''fills the internal numpy array with the one provided
@@ -2495,12 +2495,15 @@ class ImageData(DataContainer):
         out = super(ImageData, self).subset(dimensions, **kw)
         dimension_labels = out.dimension_labels.copy()    
 
-        if geometry_new is None:                
-            return DataContainer(out.array, deep_copy=False, dimension_labels=dimension_labels)
+        if len(dimension_labels) == 1:
+            return out
         else:
-            return ImageData(out.array, deep_copy=False, geometry=geometry_new, dimension_labels=dimension_labels)
+            if geometry_new is None:                
+                return DataContainer(out.array, deep_copy=False, dimension_labels=dimension_labels)
+            else:
+                return ImageData(out.array, deep_copy=False, geometry=geometry_new, dimension_labels=dimension_labels)
 
-
+        
     def get_shape_labels(self, geometry, dimension_labels=None):
         channels  = geometry.channels
         horiz_x   = geometry.voxel_num_x
@@ -2934,7 +2937,7 @@ class VectorData(DataContainer):
                 if len(array.shape) > 1:
                     raise ValueError('Incompatible size: expected 1D got {}'.format(array.shape))
                 out = array
-                self.geometry = VectorGeometry(array.shape[0])
+                self.geometry = VectorGeometry(array.shape[0], **kwargs)
                 self.length = self.geometry.length
         else:
             self.length = self.geometry.length
@@ -2948,7 +2951,7 @@ class VectorData(DataContainer):
                     raise ValueError('Incompatible size: expecting {} got {}'.format((self.length,), array.shape))
         deep_copy = True
         # need to pass the geometry, othewise None
-        super(VectorData, self).__init__(out, deep_copy, None, geometry = self.geometry)
+        super(VectorData, self).__init__(out, deep_copy, self.geometry.dimension_labels, geometry = self.geometry)
     
 
 class VectorGeometry(object):
@@ -2957,15 +2960,16 @@ class VectorGeometry(object):
     RANDOM_INT = 'random_int'
         
     def __init__(self, 
-                 length):
+                 length, **kwargs):
         
         self.length = length
         self.shape = (length, )
-        
+
+        self.dimension_labels = kwargs.get('dimension_labels', None)
         
     def clone(self):
         '''returns a copy of VectorGeometry'''
-        return VectorGeometry(self.length)
+        return copy.deepcopy(self)
     def copy(self):
         '''alias of clone'''
         return self.clone()
@@ -2994,5 +2998,3 @@ class VectorGeometry(object):
             else:
                 raise ValueError('Value {} unknown'.format(value))
         return out
-
-    

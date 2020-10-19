@@ -172,6 +172,10 @@ class Algorithm(object):
         raise NotImplementedError()
 
     @property
+    def iterations(self):
+        '''returns the iterations at which the objective has been evaluated'''
+        return self._iteration
+    @property
     def loss(self):
         '''returns the list of the values of the objective during the iteration
         
@@ -210,7 +214,7 @@ class Algorithm(object):
         else:
             raise ValueError('Update objective interval must be an integer >= 0')
     
-    def run(self, iterations=None, verbose=0, callback=None, **kwargs):
+    def run(self, iterations=None, verbose=1, callback=None, **kwargs):
         '''run n iterations and update the user with the callback if specified
         
         :param iterations: number of iterations to run. If not set the algorithm will

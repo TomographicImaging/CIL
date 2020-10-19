@@ -210,17 +210,22 @@ class Algorithm(object):
         else:
             raise ValueError('Update objective interval must be an integer >= 0')
     
-    def run(self, iterations=None, verbose=0, callback=None, print_interval=1, **kwargs):
+    def run(self, iterations=None, verbose=0, callback=None, **kwargs):
         '''run n iterations and update the user with the callback if specified
         
         :param iterations: number of iterations to run. If not set the algorithm will
           run until max_iteration or until stop criterion is reached
         :param verbose: sets the verbosity output to screen, 0 no verbose, 1 medium, 2 highly verbose
         :param callback: is a function that receives: current iteration number, 
-          last objective function value and the current solution
+          last objective function value and the current solution and gets executed at each update_objective_interval
+        :param print_interval: integer, controls every how many iteration there's a print to 
+                               screen. Notice that printing will not evaluate the objective function
+                               and so the print might be out of sync wrt the calculation of the objective.
+                               In such cases nan will be printed.
         :param very_verbose: deprecated bool, useful for algorithms with primal and dual objectives (PDHG), 
                             prints to screen both primal and dual
         '''
+        print_interval = kwargs.get('print_interval', self.update_objective_interval)
         if isinstance(verbose, bool):
             very_verbose = kwargs.get('very_verbose', False)
         else:

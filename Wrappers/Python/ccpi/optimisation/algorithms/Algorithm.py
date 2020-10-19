@@ -317,10 +317,22 @@ class Algorithm(object):
         if self.iteration % self.update_objective_interval != 0:
             el = [ np.nan, np.nan, np.nan] if verbose else np.nan
         if isinstance (el, list):
-            string = functools.reduce(lambda x,y: x+' {:>13.5e}'.format(y), el[:-1],'')
-            string += '{:>15.5e}'.format(el[-1])
+            if np.isnan(el[0]):
+                string = functools.reduce(lambda x,y: x+' {:>13s}'.format('N/A'), el[:-1],'')
+            elif not np.isnan(el[0]) and np.isnan(el[1]):
+                string = ' {:>13.5e}'.format(el[0])
+                string += ' {:>13s}'.format('N/A')
+            else:    
+                string = functools.reduce(lambda x,y: x+' {:>13.5e}'.format(y), el[:-1],'')
+            if np.isnan(el[-1]):
+                string += '{:>15s}'.format('N/A')
+            else:
+                string += '{:>15.5e}'.format(el[-1])
         else:
-            string = "{:>20.5e}".format(el)
+            if np.isnan(el):
+                string = '{:>20s}'.format('N/A')
+            else:
+                string = "{:>20.5e}".format(el)
         return string
     def verbose_header(self, verbose=False):
         el = self.get_last_objective(return_all=verbose)

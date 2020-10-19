@@ -73,6 +73,12 @@ class Operator(object):
     def domain_geometry(self):
         '''Returns the domain of the Operator: X space'''
         return self._domain_geometry
+    @property
+    def domain(self):
+        return self.domain_geometry()
+    @property
+    def range(self):
+        return self.range_geometry()
     def __rmul__(self, scalar):
         '''Defines the multiplication by a scalar on the left
 

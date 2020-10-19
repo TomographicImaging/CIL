@@ -26,6 +26,7 @@ from __future__ import print_function
 import time, functools
 from numbers import Integral, Number
 import logging
+import numpy as np
 
 class Algorithm(object):
     '''Base class for iterative algorithms
@@ -116,12 +117,15 @@ class Algorithm(object):
             time0 = time.time()
             if not self.configured:
                 raise ValueError('Algorithm not configured correctly. Please run set_up.')
-            if self.iteration == 0:
-                self.update_objective()
-                self._iteration.append(self.iteration)
+            #if self.iteration == 0:
+                # self.update_objective()
+                #self._iteration.append(self.iteration)
             self.update()
             self.timing.append( time.time() - time0 )
-            if self.iteration > 0 and self.iteration % self.update_objective_interval == 0:
+            if self.iteration >= 0 and self.update_objective_interval > 0 and\
+                self.iteration % self.update_objective_interval == 0:
+                
+                self._iteration.append(self.iteration)
                 self.update_objective()
             self.iteration += 1
             self.update_previous_solution()
@@ -148,16 +152,24 @@ class Algorithm(object):
         iteration. If update_objective_interval > 1 it is the last stored value. 
         '''
         return_all =  kwargs.get('return_all', False)
-        objective = self.__loss[-1]
-        if return_all:
-            return list(objective)
-        if isinstance(objective, list):
-            return objective[0]
+        try:
+            objective = self.__loss[-1]
+        except IndexError as ie:
+            objective = [np.nan, np.nan, np.nan] if return_all else np.nan 
+        if isinstance (objective, list):
+            if return_all:
+                return objective
+            else:
+                return objective[0]
         else:
-            return objective
+            if return_all:
+                return [ objective, np.nan, np.nan]
+            else:
+                return objective
     def get_last_objective(self, **kwargs):
         '''alias to get_last_loss'''
         return self.get_last_loss(**kwargs)
+        
     def update_objective(self):
         '''calculates the objective with the current solution'''
         raise NotImplementedError()
@@ -188,23 +200,36 @@ class Algorithm(object):
     @update_objective_interval.setter
     def update_objective_interval(self, value):
         if isinstance(value, Integral):
-            if value >= 1:
+            if value >= 0:
                 self.__update_objective_interval = value
             else:
-                raise ValueError('Update objective interval must be an integer >= 1')
+                raise ValueError('Update objective interval must be an integer >= 0')
         else:
-            raise ValueError('Update objective interval must be an integer >= 1')
-    def run(self, iterations=None, verbose=True, callback=None, very_verbose=False):
+            raise ValueError('Update objective interval must be an integer >= 0')
+    def run(self, iterations=None, verbose=0, callback=None, very_verbose=False):
         '''run n iterations and update the user with the callback if specified
         
         :param iterations: number of iterations to run. If not set the algorithm will
           run until max_iteration or until stop criterion is reached
-        :param verbose: toggles verbose output to screen
+        :param verbose: sets the verbosity output to screen, 0 no verbose, 1 medium, 2 highly verbose
         :param callback: is a function that receives: current iteration number, 
           last objective function value and the current solution
         :param very_verbose: bool, useful for algorithms with primal and dual objectives (PDHG), 
                             prints to screen both primal and dual
         '''
+        if verbose == 0:
+            verbose = False
+            very_verbose = False
+        elif verbose == 1:
+            verbose = True
+            very_verbose = False
+        elif verbose == 2:
+            verbose = True
+            very_verbose = True
+        elif isinstance(verbose, bool) and isinstance(very_verbose, bool):
+            pass
+        else:
+            raise ValueError("verbose should be 0, 1 or 2. Got {}".format (verbose))
         if self.should_stop():
             print ("Stop cryterion has been reached.")
         i = 0
@@ -219,7 +244,8 @@ class Algorithm(object):
             # self.iteration is incremented in __next__, so now we have 
             # self.iteration is one iteration larger than what we want to display
             self.iteration -= 1
-            if (self.iteration) % self.update_objective_interval == 0: 
+            if self.update_objective_interval > 0 and\
+                self.iteration % self.update_objective_interval == 0: 
                 if verbose:
                     print (self.verbose_output(very_verbose))
             if callback is not None:
@@ -234,10 +260,10 @@ class Algorithm(object):
                 break
             
         if verbose:
-            if self.iteration != self._iteration[-1]:
-                # if the objective hasn't already been calculated as not on 
-                # the right update_objective_interval 
-                self.update_objective()
+            # if self.iteration != self._iteration[-1]:
+            #     # if the objective hasn't already been calculated as not on 
+            #     # the right update_objective_interval 
+            #     self.update_objective()
                 
             start = 3 # I don't understand why this
             bars = ['-' for i in range(start+9+10+13+20)]
@@ -260,7 +286,6 @@ class Algorithm(object):
     def verbose_output(self, verbose=False):
         '''Creates a nice tabulated output'''
         timing = self.timing[-self.update_objective_interval-1:-1]
-        self._iteration.append(self.iteration)
         if len (timing) == 0:
             t = 0
         else:
@@ -278,7 +303,9 @@ class Algorithm(object):
 
     def objective_to_string(self, verbose=False):
         el = self.get_last_objective(return_all=verbose)
-        if type(el) == list:
+        if self.iteration % self.update_objective_interval != 0:
+            el = [ np.nan, np.nan, np.nan] if verbose else np.nan
+        if isinstance (el, list):
             string = functools.reduce(lambda x,y: x+' {:>13.5e}'.format(y), el[:-1],'')
             string += '{:>15.5e}'.format(el[-1])
         else:
@@ -286,6 +313,7 @@ class Algorithm(object):
         return string
     def verbose_header(self, verbose=False):
         el = self.get_last_objective(return_all=verbose)
+        
         if type(el) == list:
             out = "{:>9} {:>10} {:>13} {:>13} {:>13} {:>15}\n".format(self.iter_string, 
                                                       'Max {}'.format(self.iter_string),

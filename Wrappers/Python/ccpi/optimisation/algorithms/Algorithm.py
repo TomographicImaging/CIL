@@ -117,9 +117,6 @@ class Algorithm(object):
             time0 = time.time()
             if not self.configured:
                 raise ValueError('Algorithm not configured correctly. Please run set_up.')
-            #if self.iteration == 0:
-                # self.update_objective()
-                #self._iteration.append(self.iteration)
             self.update()
             self.timing.append( time.time() - time0 )
             if self.iteration >= 0 and self.update_objective_interval > 0 and\
@@ -173,6 +170,7 @@ class Algorithm(object):
     def update_objective(self):
         '''calculates the objective with the current solution'''
         raise NotImplementedError()
+
     @property
     def loss(self):
         '''returns the list of the values of the objective during the iteration
@@ -181,22 +179,27 @@ class Algorithm(object):
         the update_objective_interval > 1
         '''
         return self.__loss
+
     @property
     def objective(self):
         '''alias of loss'''
         return self.loss
+
     @property
     def max_iteration(self):
         '''gets the maximum number of iterations'''
         return self.__max_iteration
+
     @max_iteration.setter
     def max_iteration(self, value):
         '''sets the maximum number of iterations'''
         assert isinstance(value, int)
         self.__max_iteration = value
+
     @property
     def update_objective_interval(self):
         return self.__update_objective_interval
+    
     @update_objective_interval.setter
     def update_objective_interval(self, value):
         if isinstance(value, Integral):
@@ -206,7 +209,8 @@ class Algorithm(object):
                 raise ValueError('Update objective interval must be an integer >= 0')
         else:
             raise ValueError('Update objective interval must be an integer >= 0')
-    def run(self, iterations=None, verbose=0, callback=None, very_verbose=False):
+    
+    def run(self, iterations=None, verbose=0, callback=None, print_interval=1, **kwargs):
         '''run n iterations and update the user with the callback if specified
         
         :param iterations: number of iterations to run. If not set the algorithm will
@@ -214,22 +218,23 @@ class Algorithm(object):
         :param verbose: sets the verbosity output to screen, 0 no verbose, 1 medium, 2 highly verbose
         :param callback: is a function that receives: current iteration number, 
           last objective function value and the current solution
-        :param very_verbose: bool, useful for algorithms with primal and dual objectives (PDHG), 
+        :param very_verbose: deprecated bool, useful for algorithms with primal and dual objectives (PDHG), 
                             prints to screen both primal and dual
         '''
-        if verbose == 0:
-            verbose = False
-            very_verbose = False
-        elif verbose == 1:
-            verbose = True
-            very_verbose = False
-        elif verbose == 2:
-            verbose = True
-            very_verbose = True
-        elif isinstance(verbose, bool) and isinstance(very_verbose, bool):
-            pass
+        if isinstance(verbose, bool):
+            very_verbose = kwargs.get('very_verbose', False)
         else:
-            raise ValueError("verbose should be 0, 1 or 2. Got {}".format (verbose))
+            if verbose == 0:
+                verbose = False
+                very_verbose = False
+            elif verbose == 1:
+                verbose = True
+                very_verbose = False
+            elif verbose == 2:
+                verbose = True
+                very_verbose = True
+            else:
+                raise ValueError("verbose should be 0, 1 or 2. Got {}".format (verbose))
         if self.should_stop():
             print ("Stop cryterion has been reached.")
         i = 0
@@ -246,10 +251,11 @@ class Algorithm(object):
             self.iteration -= 1
             if self.update_objective_interval > 0 and\
                 self.iteration % self.update_objective_interval == 0: 
-                if verbose:
-                    print (self.verbose_output(very_verbose))
-            if callback is not None:
-                callback(self.iteration, self.get_last_objective(return_all=very_verbose), self.x)
+                if callback is not None:
+                    callback(self.iteration, self.get_last_objective(return_all=very_verbose), self.x)
+            if verbose and i % print_interval == 0:
+                print (self.verbose_output(very_verbose))
+            
             
             # restore self.iteration value to what it should be
             self.iteration += 1

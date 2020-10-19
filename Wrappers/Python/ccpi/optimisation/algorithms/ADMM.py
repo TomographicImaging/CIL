@@ -94,7 +94,6 @@ class LADMM(Algorithm):
         self.z = self.operator.range_geometry().allocate() 
         self.u = self.operator.range_geometry().allocate() 
 
-        self.update_objective()
         self.configured = True  
         
         print("{} configured".format(self.__class__.__name__, ))

@@ -144,9 +144,9 @@ class SPDHG(Algorithm):
         self.zbar= operator.domain_geometry().allocate(0)
         # relaxation parameter
         self.theta = 1
-        self.update_objective()
         self.configured = True
         print("{} configured".format(self.__class__.__name__, ))
+        
     def update(self):
         # Gradient descent for the primal variable
         # x_tmp = x - tau * zbar

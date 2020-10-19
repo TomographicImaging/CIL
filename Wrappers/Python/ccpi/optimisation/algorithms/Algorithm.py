@@ -275,11 +275,6 @@ class Algorithm(object):
                 break
             
         if verbose:
-            # if self.iteration != self._iteration[-1]:
-            #     # if the objective hasn't already been calculated as not on 
-            #     # the right update_objective_interval 
-            #     self.update_objective()
-                
             start = 3 # I don't understand why this
             bars = ['-' for i in range(start+9+10+13+20)]
             if (very_verbose):
@@ -290,8 +285,6 @@ class Algorithm(object):
                                         self.verbose_output(very_verbose),
                                         "Stop criterion has been reached.")
             print (out)
-            # print (self.verbose_output(very_verbose))
-            # print ("Stop criterion has been reached.")
             # Print to log file if desired
             if self.logger:
                 self.logger.info(out)

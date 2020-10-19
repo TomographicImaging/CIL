@@ -114,17 +114,19 @@ class Algorithm(object):
         if self.should_stop():
             raise StopIteration()
         else:
-            time0 = time.time()
-            if not self.configured:
-                raise ValueError('Algorithm not configured correctly. Please run set_up.')
-            self.update()
-            self.timing.append( time.time() - time0 )
             if self.iteration >= 0 and self.update_objective_interval > 0 and\
                 self.iteration % self.update_objective_interval == 0:
                 
                 self._iteration.append(self.iteration)
                 self.update_objective()
+            time0 = time.time()
+            if not self.configured:
+                raise ValueError('Algorithm not configured correctly. Please run set_up.')
+            self.update()
+            self.timing.append( time.time() - time0 )
             self.iteration += 1
+            
+            
             self.update_previous_solution()
 
     def update_previous_solution(self):
@@ -273,7 +275,8 @@ class Algorithm(object):
             i += 1
             if i == iterations:
                 break
-            
+        
+        self.iteration -= 1
         if verbose:
             start = 3 # I don't understand why this
             bars = ['-' for i in range(start+9+10+13+20)]
@@ -288,7 +291,7 @@ class Algorithm(object):
             # Print to log file if desired
             if self.logger:
                 self.logger.info(out)
-
+        self.iteration += 1
         
 
     def verbose_output(self, verbose=False):
@@ -315,19 +318,19 @@ class Algorithm(object):
             el = [ np.nan, np.nan, np.nan] if verbose else np.nan
         if isinstance (el, list):
             if np.isnan(el[0]):
-                string = functools.reduce(lambda x,y: x+' {:>13s}'.format('N/A'), el[:-1],'')
+                string = functools.reduce(lambda x,y: x+' {:>13s}'.format(''), el[:-1],'')
             elif not np.isnan(el[0]) and np.isnan(el[1]):
                 string = ' {:>13.5e}'.format(el[0])
-                string += ' {:>13s}'.format('N/A')
+                string += ' {:>13s}'.format('')
             else:    
                 string = functools.reduce(lambda x,y: x+' {:>13.5e}'.format(y), el[:-1],'')
             if np.isnan(el[-1]):
-                string += '{:>15s}'.format('N/A')
+                string += '{:>15s}'.format('')
             else:
                 string += '{:>15.5e}'.format(el[-1])
         else:
             if np.isnan(el):
-                string = '{:>20s}'.format('N/A')
+                string = '{:>20s}'.format('')
             else:
                 string = "{:>20.5e}".format(el)
         return string

@@ -25,7 +25,7 @@ from .GradientOperator import Gradient
 from .SymmetrizedGradientOperator import SymmetrizedGradient
 from .IdentityOperator import Identity
 from .ZeroOperator import ZeroOperator
-from .LinearOperatorMatrix import LinearOperatorMatrix
+from .MatrixOperator import MatrixOperator
 from .DiagonalOperator import DiagonalOperator
 from .MaskOperator import MaskOperator
 from .ChannelwiseOperator import ChannelwiseOperator

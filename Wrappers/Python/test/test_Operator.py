@@ -25,7 +25,7 @@ import numpy
 from timeit import default_timer as timer
 from ccpi.optimisation.operators import Gradient, Identity, SparseFiniteDiff,\
     DiagonalOperator, MaskOperator, ChannelwiseOperator, BlurringOperator
-from ccpi.optimisation.operators import LinearOperator, LinearOperatorMatrix
+from ccpi.optimisation.operators import LinearOperator, MatrixOperator
 import numpy   
 from ccpi.optimisation.operators import SumOperator, Gradient,\
             ZeroOperator, SymmetrizedGradient, CompositionOperator
@@ -76,9 +76,9 @@ class CCPiTestClass(unittest.TestCase):
 class TestOperator(CCPiTestClass):
     def setUp(self):
         numpy.random.seed(1)
-    def test_LinearOperatorMatrix(self):
+    def test_MatrixOperator(self):
         
-        print('Check LinearOperatorMatrix')
+        print('Check MatrixOperator')
                 
         m = 30
         n = 20
@@ -86,7 +86,7 @@ class TestOperator(CCPiTestClass):
         vg = VectorGeometry(n)
         
         Amat = numpy.random.randn(m, n)
-        A = LinearOperatorMatrix(Amat)
+        A = MatrixOperator(Amat)
         
         b = vg.allocate('random')
         

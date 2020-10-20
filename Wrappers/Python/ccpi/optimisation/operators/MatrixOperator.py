@@ -25,7 +25,7 @@ from scipy.sparse.linalg import svds
 from ccpi.framework import VectorGeometry
 from ccpi.optimisation.operators import LinearOperator
 
-class LinearOperatorMatrix(LinearOperator):
+class MatrixOperator(LinearOperator):
     """ Matrix wrapped into a LinearOperator
     
     :param: a numpy matrix 
@@ -42,7 +42,7 @@ class LinearOperatorMatrix(LinearOperator):
         domain_geometry = VectorGeometry(N_A)
         range_geometry = VectorGeometry(M_A)
         self.s1 = None   # Largest singular value, initially unknown
-        super(LinearOperatorMatrix, self).__init__(domain_geometry=domain_geometry,
+        super(MatrixOperator, self).__init__(domain_geometry=domain_geometry,
                                                    range_geometry=range_geometry)
         
     def direct(self,x, out=None):        

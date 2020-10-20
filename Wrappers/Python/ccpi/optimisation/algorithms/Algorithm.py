@@ -97,7 +97,7 @@ class Algorithm(object):
     
     def max_iteration_stop_cryterion(self):
         '''default stop cryterion for iterative algorithm: max_iteration reached'''
-        return self.iteration >= self.max_iteration
+        return self.iteration > self.max_iteration
     def __iter__(self):
         '''Algorithm is an iterable'''
         return self
@@ -114,9 +114,7 @@ class Algorithm(object):
         if self.should_stop():
             raise StopIteration()
         else:
-            if self.iteration >= 0 and self.update_objective_interval > 0 and\
-                self.iteration % self.update_objective_interval == 0:
-                
+            if self.iteration == 0 and self.update_objective_interval > 0:
                 self._iteration.append(self.iteration)
                 self.update_objective()
             time0 = time.time()
@@ -126,8 +124,14 @@ class Algorithm(object):
             self.timing.append( time.time() - time0 )
             self.iteration += 1
             
-            
             self.update_previous_solution()
+            
+            if self.iteration >= 0 and self.update_objective_interval > 0 and\
+                self.iteration % self.update_objective_interval == 0:
+                
+                self._iteration.append(self.iteration)
+                self.update_objective()
+            
 
     def update_previous_solution(self):
         '''Update the previous solution with the current one
@@ -249,9 +253,11 @@ class Algorithm(object):
         if self.should_stop():
             print ("Stop cryterion has been reached.")
         i = 0
+        if self.iteration == 0:
+            iterations+=1
         if verbose:
             print (self.verbose_header(very_verbose))
-        
+            
         for _ in self:
             # __next__ is called
 
@@ -264,8 +270,9 @@ class Algorithm(object):
                 self.iteration % self.update_objective_interval == 0: 
                 if callback is not None:
                     callback(self.iteration, self.get_last_objective(return_all=very_verbose), self.x)
-            if verbose and i % print_interval == 0:
-                print (self.verbose_output(very_verbose))
+            if verbose:
+                if i % print_interval == 0:
+                    print (self.verbose_output(very_verbose))
             
             
             # restore self.iteration value to what it should be
@@ -276,6 +283,7 @@ class Algorithm(object):
             if i == iterations:
                 break
         
+        # see comment above regarding removing 1 from iteration
         self.iteration -= 1
         if verbose:
             start = 3 # I don't understand why this

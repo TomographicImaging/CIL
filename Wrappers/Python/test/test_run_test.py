@@ -30,7 +30,7 @@ from ccpi.optimisation.functions import LeastSquares
 from ccpi.optimisation.functions import ZeroFunction
 from ccpi.optimisation.functions import L1Norm
 
-from ccpi.optimisation.operators import LinearOperatorMatrix
+from ccpi.optimisation.operators import MatrixOperator
 from ccpi.optimisation.operators import Identity
 from ccpi.optimisation.operators import LinearOperator
 
@@ -84,7 +84,7 @@ class TestAlgorithms(unittest.TestCase):
                     n = 20
                     np.random.seed(1)
                     Amat = np.random.randn(m, n)
-                    A = LinearOperatorMatrix(Amat)
+                    A = MatrixOperator(Amat)
                     bmat = np.random.randn(m)
                     bmat.shape = (bmat.shape[0], 1)
     
@@ -151,7 +151,7 @@ class TestAlgorithms(unittest.TestCase):
                 n = 20
                 np.random.seed(1)
                 Amat = np.random.randn(m, n)
-                A = LinearOperatorMatrix(Amat)
+                A = MatrixOperator(Amat)
                 bmat = np.random.randn(m)
                 #bmat.shape = (bmat.shape[0], 1)
 
@@ -226,7 +226,7 @@ class TestAlgorithms(unittest.TestCase):
             n = 20
             np.random.seed(1)
             Amat = np.random.randn(m, n)
-            A = LinearOperatorMatrix(Amat)
+            A = MatrixOperator(Amat)
             bmat = np.random.randn(m)
             bmat.shape = (bmat.shape[0], 1)
 

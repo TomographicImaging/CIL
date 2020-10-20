@@ -32,13 +32,14 @@ from ccpi.optimisation.algorithms import GradientDescent
 from ccpi.optimisation.algorithms import CGLS
 from ccpi.optimisation.algorithms import SIRT
 from ccpi.optimisation.algorithms import FISTA
+from ccpi.optimisation.algorithms import Algorithm
 
 from ccpi.optimisation.algorithms import PDHG
 
 from ccpi.optimisation.operators import Gradient, BlockOperator, FiniteDifferenceOperator
 from ccpi.optimisation.functions import MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler                     
 from ccpi.framework import TestData
-import os ,sys
+import os, sys, time
 
 
 try:
@@ -840,3 +841,44 @@ class TestSPDHG(unittest.TestCase):
         np.testing.assert_array_less( qm[1], 3e-05)
         
 
+
+class PrintAlgo(Algorithm):
+    def __init__(self, **kwargs):
+
+        super(PrintAlgo, self).__init__(**kwargs)
+        # self.update_objective()
+        self.configured = True
+
+    def update(self):
+        self.x = - self.iteration
+        time.sleep(0.1)
+    
+    def update_objective(self):
+        self.loss.append(self.iteration * self.iteration)
+
+class TestPrint(unittest.TestCase):
+    def test_print(self):
+        def callback (iteration, objective, solution):
+            print("I am being called ", iteration)
+        algo = PrintAlgo(update_objective_interval = 10, max_iteration = 1000)
+
+        algo.run(20, verbose=2, print_interval = 2)
+        # it 0
+        # it 10 
+        # it 20
+        # --- stop
+        algo.run(3, verbose=1, print_interval = 2)
+        # it 20
+        # --- stop
+
+        algo.run(20, verbose = 1, print_interval = 7)
+        # it 20
+        # it 30
+        # -- stop
+
+        algo.run(20, verbose=True, very_verbose=False)
+        algo.run(20, verbose=True, very_verbose=True, print_interval=7, callback=callback)
+        print (algo._iteration)
+        print (algo.objective)
+        np.testing.assert_array_equal([0, 10, 20, 30, 40, 50, 60, 70, 80], algo.iterations)
+        np.testing.assert_array_equal([0, 100, 400, 900, 1600, 2500, 3600, 4900, 6400], algo.objective)

@@ -23,7 +23,7 @@ from ccpi.optimisation.operators import BlockOperator,\
     FiniteDifferenceOperator, SymmetrizedGradient
 import numpy
 from timeit import default_timer as timer
-from ccpi.optimisation.operators import Gradient, Identity, SparseFiniteDiff,\
+from ccpi.optimisation.operators import Gradient, Identity,\
     DiagonalOperator, MaskOperator, ChannelwiseOperator, BlurringOperator
 from ccpi.optimisation.operators import LinearOperator, MatrixOperator
 import numpy   

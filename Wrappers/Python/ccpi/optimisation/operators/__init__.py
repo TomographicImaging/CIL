@@ -19,7 +19,7 @@
 from .Operator import Operator, LinearOperator, ScaledOperator, SumOperator,\
  CompositionOperator
 from .BlockOperator import BlockOperator
-from .SparseFiniteDiff import SparseFiniteDiff
+from .SparseFiniteDifferenceOperator import SparseFiniteDifferenceOperator
 from .FiniteDifferenceOperator import FiniteDifferenceOperator
 from .GradientOperator import Gradient
 from .SymmetrizedGradientOperator import SymmetrizedGradient

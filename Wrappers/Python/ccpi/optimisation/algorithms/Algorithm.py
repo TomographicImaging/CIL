@@ -253,6 +253,8 @@ class Algorithm(object):
         if self.should_stop():
             print ("Stop cryterion has been reached.")
         i = 0
+        if iterations is None:
+            iterations = self.max_iteration
         if self.iteration == 0:
             iterations+=1
         if verbose:

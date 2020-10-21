@@ -937,8 +937,91 @@ class TestDataContainer(unittest.TestCase):
         
         numpy.testing.assert_array_equal(ds.as_array(), -a)
 
+    def test_fill_dimension_ImageData(self):
+        ig = ImageGeometry(2,3,4)
+        u = ig.allocate(0)
+        a = numpy.ones((4,2))
+        # default_labels = [ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+        
+        data = u.as_array()
+        axis_number = u.get_dimension_axis('horizontal_y')
+        
+        u.fill(a, horizontal_y=0)
+        numpy.testing.assert_array_equal(u.subset(horizontal_y=0).as_array(), a)
+
+        u.fill(2, horizontal_y=1)
+        numpy.testing.assert_array_equal(u.subset(horizontal_y=1).as_array(), 2 * a)
+
+        u.fill(2, horizontal_y=1)
+        numpy.testing.assert_array_equal(u.subset(horizontal_y=1).as_array(), 2 * a)
+        
+        b = u.subset(horizontal_y=2)
+        b.fill(3)
+        u.fill(b, horizontal_y=2)
+        numpy.testing.assert_array_equal(u.subset(horizontal_y=2).as_array(), 3 * a)
+
+    def test_fill_dimension_AcquisitionData(self):
+        ag = AcquisitionGeometry.create_Parallel3D()
+        ag.set_channels(4)
+        ag.set_panel([2,3])
+        ag.set_angles([0,1,2,3,5])
+        ag.set_labels(('horizontal','angle','vertical','channel'))
+        u = ag.allocate(0)
+        a = numpy.ones((4,2))
+        # default_labels = [ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+        
+        data = u.as_array()
+        axis_number = u.get_dimension_axis('horizontal_y')
+        
+        u.fill(a, horizontal_y=0)
+        numpy.testing.assert_array_equal(u.subset(horizontal_y=0).as_array(), a)
+
+        u.fill(2, horizontal_y=1)
+        numpy.testing.assert_array_equal(u.subset(horizontal_y=0).as_array(), 2 * a)
+
+        u.fill(2, horizontal_y=1)
+        numpy.testing.assert_array_equal(u.subset(horizontal_y=1).as_array(), 2 * a)
+        
+        b = u.subset(horizontal_y=2)
+        b.fill(3)
+        u.fill(b, horizontal_y=2)
+        numpy.testing.assert_array_equal(u.subset(horizontal_y=2).as_array(), 3 * a)
+
+        # slice with 2 axis
+        a = numpy.ones((2,))
+        u.fill(a, horizontal_y=1, vertical=0)
+        numpy.testing.assert_array_equal(u.subset(horizontal_y=1, vertical=0).as_array(), a)
 
 
+    def test_fill_dimension_AcquisitionData(self):
+        ag = AcquisitionGeometry.create_Parallel3D()
+        ag.set_channels(4)
+        ag.set_panel([2,3])
+        ag.set_angles([0,1,2,3,5])
+        ag.set_labels(('horizontal','angle','vertical','channel'))
+        u = ag.allocate(0)
+        print (u.shape)
+        # (2, 5, 3, 4)
+        a = numpy.ones((2,5))
+        # default_labels = [ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+        b = u.subset(channel=0, vertical=0)
+        print(b.shape)
+        data = u.as_array()
+        
+        u.fill(a, channel=0, vertical=0)
+        print(u.shape)
+        numpy.testing.assert_array_equal(u.subset(channel=0, vertical=0).as_array(), a)
+
+        u.fill(2, channel=0, vertical=0)
+        numpy.testing.assert_array_equal(u.subset(channel=0, vertical=0).as_array(), 2 * a)
+
+        u.fill(2, channel=0, vertical=0)
+        numpy.testing.assert_array_equal(u.subset(channel=0, vertical=0).as_array(), 2 * a)
+        
+        b = u.subset(channel=0, vertical=0)
+        b.fill(3)
+        u.fill(b, channel=1, vertical=1)
+        numpy.testing.assert_array_equal(u.subset(channel=1, vertical=1).as_array(), 3 * a)
 if __name__ == '__main__':
     unittest.main()
  

@@ -28,17 +28,18 @@ from ccpi.framework import AcquisitionGeometry
 from ccpi.optimisation.operators import Identity
 from ccpi.optimisation.functions import LeastSquares, ZeroFunction, \
    L2NormSquared, FunctionOperatorComposition
-from ccpi.optimisation.algorithms import GradientDescent
+from ccpi.optimisation.algorithms import GD
 from ccpi.optimisation.algorithms import CGLS
 from ccpi.optimisation.algorithms import SIRT
 from ccpi.optimisation.algorithms import FISTA
+from ccpi.optimisation.algorithms import Algorithm
 
 from ccpi.optimisation.algorithms import PDHG
 
 from ccpi.optimisation.operators import Gradient, BlockOperator, FiniteDifferenceOperator
 from ccpi.optimisation.functions import MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler                     
 from ccpi.framework import TestData
-import os ,sys
+import os, sys, time
 
 
 try:
@@ -66,8 +67,8 @@ class TestAlgorithms(unittest.TestCase):
         #os.remove(self.filename)
         pass
     
-    def test_GradientDescent(self):
-        print ("Test GradientDescent")
+    def test_GD(self):
+        print ("Test GD")
         ig = ImageGeometry(12,13,14)
         x_init = ig.allocate()
         # b = x_init.copy()
@@ -79,13 +80,13 @@ class TestAlgorithms(unittest.TestCase):
         norm2sq = LeastSquares(identity, b)
         rate = norm2sq.L / 3.
         
-        alg = GradientDescent(x_init=x_init, 
+        alg = GD(x_init=x_init, 
                               objective_function=norm2sq, 
                               rate=rate, atol=1e-9, rtol=1e-6)
         alg.max_iteration = 1000
         alg.run()
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-        alg = GradientDescent(x_init=x_init, 
+        alg = GD(x_init=x_init, 
                               objective_function=norm2sq, 
                               rate=rate, max_iteration=20,
                               update_objective_interval=2,
@@ -95,8 +96,8 @@ class TestAlgorithms(unittest.TestCase):
         self.assertTrue(alg.update_objective_interval==2)
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-    def test_GradientDescentArmijo(self):
-        print ("Test GradientDescent")
+    def test_GDArmijo(self):
+        print ("Test GD")
         ig = ImageGeometry(12,13,14)
         x_init = ig.allocate()
         # b = x_init.copy()
@@ -108,12 +109,12 @@ class TestAlgorithms(unittest.TestCase):
         norm2sq = LeastSquares(identity, b)
         rate = None
         
-        alg = GradientDescent(x_init=x_init, 
+        alg = GD(x_init=x_init, 
                               objective_function=norm2sq, rate=rate)
         alg.max_iteration = 100
         alg.run()
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-        alg = GradientDescent(x_init=x_init, 
+        alg = GD(x_init=x_init, 
                               objective_function=norm2sq, 
                               max_iteration=20,
                               update_objective_interval=2)
@@ -122,7 +123,7 @@ class TestAlgorithms(unittest.TestCase):
         self.assertTrue(alg.update_objective_interval==2)
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-    def test_GradientDescentArmijo2(self):
+    def test_GDArmijo2(self):
         from ccpi.optimisation.functions import Rosenbrock
         from ccpi.framework import VectorData, VectorGeometry
 
@@ -135,7 +136,7 @@ class TestAlgorithms(unittest.TestCase):
         max_iter = 1000000
         update_interval = 100000
 
-        alg = GradientDescent(x, f, max_iteration=max_iter, update_objective_interval=update_interval, alpha=1e6)
+        alg = GD(x, f, max_iteration=max_iter, update_objective_interval=update_interval, alpha=1e6)
         
         alg.run()
         
@@ -840,3 +841,47 @@ class TestSPDHG(unittest.TestCase):
         np.testing.assert_array_less( qm[1], 3e-05)
         
 
+<<<<<<< HEAD
+=======
+
+class PrintAlgo(Algorithm):
+    def __init__(self, **kwargs):
+
+        super(PrintAlgo, self).__init__(**kwargs)
+        # self.update_objective()
+        self.configured = True
+
+    def update(self):
+        self.x = - self.iteration
+        time.sleep(0.1)
+    
+    def update_objective(self):
+        self.loss.append(self.iteration * self.iteration)
+
+class TestPrint(unittest.TestCase):
+    def test_print(self):
+        def callback (iteration, objective, solution):
+            print("I am being called ", iteration)
+        algo = PrintAlgo(update_objective_interval = 10, max_iteration = 1000)
+
+        algo.run(20, verbose=2, print_interval = 2)
+        # it 0
+        # it 10 
+        # it 20
+        # --- stop
+        algo.run(3, verbose=1, print_interval = 2)
+        # it 20
+        # --- stop
+
+        algo.run(20, verbose = 1, print_interval = 7)
+        # it 20
+        # it 30
+        # -- stop
+
+        algo.run(20, verbose=True, very_verbose=False)
+        algo.run(20, verbose=True, very_verbose=True, print_interval=7, callback=callback)
+        print (algo._iteration)
+        print (algo.objective)
+        np.testing.assert_array_equal([0, 10, 20, 30, 40, 50, 60, 70, 80], algo.iterations)
+        np.testing.assert_array_equal([0, 100, 400, 900, 1600, 2500, 3600, 4900, 6400], algo.objective)
+>>>>>>> 4a6609df201e62fce9e9a2d3c20614a8364e5784

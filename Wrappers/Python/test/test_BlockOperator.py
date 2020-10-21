@@ -181,7 +181,7 @@ class TestBlockOperator(unittest.TestCase):
         from ccpi.optimisation.operators import Identity
         from ccpi.optimisation.funcs import Norm2sq, Norm1
         from ccpi.framework import ImageGeometry, AcquisitionGeometry
-        from ccpi.optimisation.Algorithms import GradientDescent
+        from ccpi.optimisation.Algorithms import GD
         #from ccpi.optimisation.Algorithms import CGLS
         import matplotlib.pyplot as plt
 
@@ -294,7 +294,7 @@ class TestBlockOperator(unittest.TestCase):
         simplef = Norm2sq(A, b)
         simplef.L = 0.00003
         
-        gd = GradientDescent( x_init=x_init, objective_function=simplef,
+        gd = GD( x_init=x_init, objective_function=simplef,
                             rate=simplef.L)
         gd.max_iteration = 10
         

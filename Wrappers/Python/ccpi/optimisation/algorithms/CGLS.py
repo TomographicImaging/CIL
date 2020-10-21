@@ -88,7 +88,6 @@ class CGLS(Algorithm):
         self.normx = self.x.norm()
         self.xmax = self.normx   
         
-        self.loss.append(self.r.squared_norm())
         self.configured = True
         print("{} configured".format(self.__class__.__name__, ))
      

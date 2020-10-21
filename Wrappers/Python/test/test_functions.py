@@ -21,7 +21,7 @@ import numpy as np
 
 from ccpi.framework import DataContainer, ImageGeometry, \
     VectorGeometry, VectorData, BlockDataContainer
-from ccpi.optimisation.operators import Identity, LinearOperatorMatrix, CompositionOperator, DiagonalOperator, BlockOperator
+from ccpi.optimisation.operators import Identity, MatrixOperator, CompositionOperator, DiagonalOperator, BlockOperator
 from ccpi.optimisation.functions import Function, KullbackLeibler, ConstantFunction, TranslateFunction
 from ccpi.optimisation.operators import Gradient
 
@@ -373,9 +373,9 @@ class TestFunction(unittest.TestCase):
         self.assertNumpyArrayAlmostEqual(tmp1.as_array(), tmp2.as_array())
        
         
-        print('Check call with LinearOperatorMatrix... OK\n')  
+        print('Check call with MatrixOperator... OK\n')  
         mat = np.random.randn(M, N)
-        operator = LinearOperatorMatrix(mat)   
+        operator = MatrixOperator(mat)   
         vg = VectorGeometry(N)
         b = vg.allocate('random')    
         u = vg.allocate('random')

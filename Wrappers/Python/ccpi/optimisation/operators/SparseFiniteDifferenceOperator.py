@@ -24,7 +24,7 @@ import numpy as np
 from ccpi.framework import ImageData
 from ccpi.optimisation.operators import Operator
 
-class SparseFiniteDiff(Operator):
+class SparseFiniteDifferenceOperator(Operator):
     
     
     '''Create Sparse Matrices for the Finite Difference Operator'''
@@ -33,7 +33,7 @@ class SparseFiniteDiff(Operator):
     def __init__(self, domain_geometry, range_geometry=None, 
       direction=0, bnd_cond = 'Neumann'):
         
-        super(SparseFiniteDiff, self).__init__(domain_geometry=domain_geometry,
+        super(SparseFiniteDifferenceOperator, self).__init__(domain_geometry=domain_geometry,
                                                range_geometry=range_geometry) 
         self.direction = direction
         self.bnd_cond = bnd_cond
@@ -97,8 +97,8 @@ if __name__ == '__main__':
     M, N= 2, 3
     ig = ImageGeometry(M, N)
     arr = ig.allocate('random_int')
-    sFD_neum1 = SparseFiniteDiff(ig, direction=0, bnd_cond='Neumann')
-    sFD_neum2 = SparseFiniteDiff(ig, direction=1, bnd_cond='Neumann')
+    sFD_neum1 = SparseFiniteDifferenceOperator(ig, direction=0, bnd_cond='Neumann')
+    sFD_neum2 = SparseFiniteDifferenceOperator(ig, direction=1, bnd_cond='Neumann')
     DY = sFD_neum1.matrix().toarray()
     DX = sFD_neum2.matrix().toarray()
     

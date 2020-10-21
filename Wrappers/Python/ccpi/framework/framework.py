@@ -1889,6 +1889,11 @@ class DataContainer(object):
 
         In case a DataContainer or subclass is passed, there will be a check of the geometry, 
         if present, and the array will be resorted if the data is not in the appropriate order.
+
+        User may pass a named parameter to specify in which axis the fill should happen:
+
+        dc.fill(some_data, vertical=1, horizontal_x=32)
+        will copy the data in some_data into the data container.
         '''
         if id(array) == id(self.array):
             return

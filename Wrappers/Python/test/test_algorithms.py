@@ -28,7 +28,7 @@ from ccpi.framework import AcquisitionGeometry
 from ccpi.optimisation.operators import Identity
 from ccpi.optimisation.functions import LeastSquares, ZeroFunction, \
    L2NormSquared, FunctionOperatorComposition
-from ccpi.optimisation.algorithms import GradientDescent
+from ccpi.optimisation.algorithms import GD
 from ccpi.optimisation.algorithms import CGLS
 from ccpi.optimisation.algorithms import SIRT
 from ccpi.optimisation.algorithms import FISTA
@@ -67,8 +67,8 @@ class TestAlgorithms(unittest.TestCase):
         #os.remove(self.filename)
         pass
     
-    def test_GradientDescent(self):
-        print ("Test GradientDescent")
+    def test_GD(self):
+        print ("Test GD")
         ig = ImageGeometry(12,13,14)
         x_init = ig.allocate()
         # b = x_init.copy()
@@ -80,13 +80,13 @@ class TestAlgorithms(unittest.TestCase):
         norm2sq = LeastSquares(identity, b)
         rate = norm2sq.L / 3.
         
-        alg = GradientDescent(x_init=x_init, 
+        alg = GD(x_init=x_init, 
                               objective_function=norm2sq, 
                               rate=rate, atol=1e-9, rtol=1e-6)
         alg.max_iteration = 1000
         alg.run()
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-        alg = GradientDescent(x_init=x_init, 
+        alg = GD(x_init=x_init, 
                               objective_function=norm2sq, 
                               rate=rate, max_iteration=20,
                               update_objective_interval=2,
@@ -96,8 +96,8 @@ class TestAlgorithms(unittest.TestCase):
         self.assertTrue(alg.update_objective_interval==2)
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-    def test_GradientDescentArmijo(self):
-        print ("Test GradientDescent")
+    def test_GDArmijo(self):
+        print ("Test GD")
         ig = ImageGeometry(12,13,14)
         x_init = ig.allocate()
         # b = x_init.copy()
@@ -109,12 +109,12 @@ class TestAlgorithms(unittest.TestCase):
         norm2sq = LeastSquares(identity, b)
         rate = None
         
-        alg = GradientDescent(x_init=x_init, 
+        alg = GD(x_init=x_init, 
                               objective_function=norm2sq, rate=rate)
         alg.max_iteration = 100
         alg.run()
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-        alg = GradientDescent(x_init=x_init, 
+        alg = GD(x_init=x_init, 
                               objective_function=norm2sq, 
                               max_iteration=20,
                               update_objective_interval=2)
@@ -123,7 +123,7 @@ class TestAlgorithms(unittest.TestCase):
         self.assertTrue(alg.update_objective_interval==2)
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-    def test_GradientDescentArmijo2(self):
+    def test_GDArmijo2(self):
         from ccpi.optimisation.functions import Rosenbrock
         from ccpi.framework import VectorData, VectorGeometry
 
@@ -136,7 +136,7 @@ class TestAlgorithms(unittest.TestCase):
         max_iter = 1000000
         update_interval = 100000
 
-        alg = GradientDescent(x, f, max_iteration=max_iter, update_objective_interval=update_interval, alpha=1e6)
+        alg = GD(x, f, max_iteration=max_iter, update_objective_interval=update_interval, alpha=1e6)
         
         alg.run()
         

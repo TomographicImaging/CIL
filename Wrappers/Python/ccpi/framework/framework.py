@@ -1873,49 +1873,65 @@ class DataContainer(object):
                 
                 cleaned = numpy.transpose(cleaned, axes).copy()
                 if cleaned.ndim > 1:
-                    return type(self)(cleaned , True, dimensions)
+                    return type(self)(cleaned , True, dimensions, suppress_warning=True)
                 else:
                     return VectorData(cleaned, dimension_labels=dimensions)
     
     def fill(self, array, **dimension):
-        '''fills the internal numpy array with the one provided
+        '''fills the internal data array with the DataContainer, numpy array or number provided
         
-        :param array: numpy array to copy into the DataContainer
-        :type array: DataContainer, numpy array or number
+        :param array: number, numpy array or DataContainer to copy into the DataContainer
+        :type array: DataContainer or subclasses, numpy array or number
         :param dimension: dictionary, optional
         
-        if the passed numpy array is the same, it just returns
+        if the passed numpy array points to the same array that is contained in the DataContainer,
+        it just returns
+
+        In case a DataContainer or subclass is passed, there will be a check of the geometry, 
+        if present, and the array will be resorted if the data is not in the appropriate order.
         '''
         if id(array) == id(self.array):
             return
         if dimension == {}:
-            if issubclass(type(array), DataContainer) or\
-               issubclass(type(array), numpy.ndarray):
+            if isinstance(array, numpy.ndarray):
                 if array.shape != self.shape:
                     raise ValueError('Cannot fill with the provided array.' + \
                                      'Expecting {0} got {1}'.format(
                                      self.shape,array.shape))
-                if issubclass(type(array), DataContainer):
-                    numpy.copyto(self.array, array.array)
-                else:
-                    #self.array[:] = array
-                    numpy.copyto(self.array, array)
+                numpy.copyto(self.array, array)
+            elif isinstance(array, Number):
+                self.array.fill(array) 
+            elif issubclass(array.__class__ , DataContainer):
+                if hasattr(self, 'geometry') and hasattr(array, 'geometry'):
+                    if self.geometry != array.geometry:
+                        numpy.copyto(self.array, array.subset(dimensions=array.dimension_labels).as_array())
+                        return
+                numpy.copyto(self.array, array.as_array())
             else:
-                self.array.fill(array)
+                raise TypeError('Can fill only with number, numpy array or DataContainer and subclasses. Got {}'.format(type(array)))
         else:
+            inv_labels = {v: k for k, v in self.dimension_labels.items()}
+
+            axis = [':' for _ in self.dimension_labels.items()]
+            for k,v in dimension.items():
+                axis[inv_labels[k]] = v
             
             command = 'self.array['
             i = 0
-            for k,v in self.dimension_labels.items():
-                for dim_label, dim_value in dimension.items():    
-                    if dim_label == v:
-                        command = command + str(dim_value)
-                    else:
-                        command = command + ":"
-                if i < self.number_of_dimensions -1:
-                    command = command + ','
-                i += 1
-            command = command + "] = array[:]" 
+            for el in axis:
+                if i > 0:
+                    command += ','
+                command += str(el)
+                i+=1
+            
+            if isinstance(array, numpy.ndarray):
+                command = command + "] = array[:]" 
+            elif issubclass(array.__class__, DataContainer):
+                command = command + "] = array.as_array()[:]" 
+            elif isinstance (array, Number):
+                command = command + "] = array"
+            else:
+                raise TypeError('Can fill only with number, numpy array or DataContainer and subclasses. Got {}'.format(type(array)))
             exec(command)
             
         
@@ -2415,6 +2431,7 @@ class ImageData(DataContainer):
         if not kwargs.get('suppress_warning', False):
             warnings.warn('Direct invocation is deprecated and will be removed in following version. Use allocate from ImageGeometry instead',
                    DeprecationWarning, stacklevel=4)
+
         self.geometry = kwargs.get('geometry', None)
         dtype = kwargs.get('dtype', numpy.float32)
         if array is None:
@@ -2491,17 +2508,20 @@ class ImageData(DataContainer):
             geometry_new = self.geometry.subset(dimensions=dimensions, **kw)
         except ValueError:
             geometry_new = None
-
-        out = super(ImageData, self).subset(dimensions, **kw)
+        
+        out = DataContainer.subset(self, dimensions, **kw)
         dimension_labels = out.dimension_labels.copy()    
 
         if len(dimension_labels) == 1:
             return out
         else:
             if geometry_new is None:                
-                return DataContainer(out.array, deep_copy=False, dimension_labels=dimension_labels)
+                return DataContainer(out.array, deep_copy=False, dimension_labels=dimension_labels,\
+                    suppress_warning=True)
             else:
-                return ImageData(out.array, deep_copy=False, geometry=geometry_new, dimension_labels=dimension_labels)
+                return ImageData(out.array, deep_copy=False, \
+                        geometry=geometry_new, dimension_labels=dimension_labels,\
+                        suppress_warning=True)
 
         
     def get_shape_labels(self, geometry, dimension_labels=None):
@@ -2667,7 +2687,8 @@ class AcquisitionData(DataContainer):
             if w2  > 0.0001:
                 interpolate = True
 
-        out = super(AcquisitionData, self).subset(dimensions, **kw)
+        # out = super(AcquisitionData, self).subset(dimensions, **kw)
+        out = DataContainer.subset(self, dimensions, **kw)
 
         if interpolate == True:
             kw['vertical'] = centre_slice_floor + 1
@@ -2677,9 +2698,11 @@ class AcquisitionData(DataContainer):
         dimension_labels = out.dimension_labels.copy()    
 
         if geometry_new is None:                
-            return DataContainer(out.array, deep_copy=False, dimension_labels=dimension_labels)
+            return DataContainer(out.array, deep_copy=False, dimension_labels=dimension_labels,\
+                suppress_warning=True)
         else:
-            return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new, dimension_labels=dimension_labels)
+            return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new,\
+                dimension_labels=dimension_labels, suppress_warning=True)
 
 class DataProcessor(object):
     

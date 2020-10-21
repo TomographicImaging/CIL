@@ -1952,24 +1952,19 @@ class DataContainer(object):
     # __rmul__
     
     def __rdiv__(self, other):
-        return pow(self / other, -1)
+        tmp = self.power(-1)
+        tmp *= other
+        return tmp
     # __rdiv__
     def __rtruediv__(self, other):
         return self.__rdiv__(other)
     
     def __rpow__(self, other):
-        if isinstance(other, (int, float)) :
+        if isinstance(other, Number) :
             fother = numpy.ones(numpy.shape(self.array)) * other
             return type(self)(fother ** self.array , 
                            dimension_labels=self.dimension_labels,
                            geometry=self.geometry)
-        elif issubclass(type(other), DataContainer):
-            if self.check_dimensions(other):
-                return type(self)(other.as_array() ** self.array , 
-                           dimension_labels=self.dimension_labels,
-                           geometry=self.geometry)
-            else:
-                raise ValueError('Dimensions do not match')
     # __rpow__
     
     # in-place arithmetic operators:

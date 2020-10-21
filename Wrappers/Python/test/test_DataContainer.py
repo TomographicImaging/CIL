@@ -373,6 +373,35 @@ class TestDataContainer(unittest.TestCase):
         self.assertEqual(.25, ds3.as_array()[0][0][0])
         self.assertEqual(.5, ds.as_array()[0][0][0])
 
+    def test_reverse_operand_algebra(self):
+        print ("Test reverse operand algebra")
+
+        number = 3/2
+        
+        X, Y, Z = 32, 64, 128
+        a = numpy.ones((X, Y, Z), dtype='float32')
+        ds = DataContainer(a * 3, False, ['X', 'Y', 'Z'])
+
+        # rdiv
+        b = number / ds
+        numpy.testing.assert_array_almost_equal(a * 0.5, b.as_array())
+        # radd
+        number = 1
+        b = number + ds
+        numpy.testing.assert_array_almost_equal(a * 4, b.as_array())
+        # rsub
+        number = 3
+        b = number - ds
+        numpy.testing.assert_array_almost_equal(numpy.zeros_like(a), b.as_array())
+        # rmul
+        number = 1/3
+        b = number * ds
+        numpy.testing.assert_array_almost_equal(a, b.as_array())
+        # rpow
+        number = 2
+        b = number ** ds
+        numpy.testing.assert_array_almost_equal(a * 8, b.as_array())
+
     def test_creation_copy(self):
         shape = (2, 3, 4, 5)
         size = shape[0]

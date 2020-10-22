@@ -30,7 +30,7 @@ import numpy
 from ccpi.optimisation.operators import SumOperator, Gradient,\
             ZeroOperator, SymmetrizedGradient, CompositionOperator
 
-from ccpi.framework import TestData
+from ccpi.utilities.TestData import TestData
 import os
 from packaging import version
 

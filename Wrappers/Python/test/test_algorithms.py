@@ -38,7 +38,7 @@ from ccpi.optimisation.algorithms import PDHG
 
 from ccpi.optimisation.operators import Gradient, BlockOperator, FiniteDifferenceOperator
 from ccpi.optimisation.functions import MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler                     
-from ccpi.framework import TestData
+from ccpi.utilities.TestData import TestData
 import os, sys, time
 
 

@@ -37,6 +37,42 @@ data_dir = os.path.abspath(
     os.path.join(sys.prefix, 'share','ccpi')
 )
 
+class DATA(object):
+    @classmethod
+    def dfile(cls):
+        return None
+    @classmethod
+    def get(cls, size=(512,512), scale=(0,1), **kwargs):
+        ddir = kwargs.get('data_dir', data_dir)
+        loader = TestData(data_dir=ddir)
+        return loader.load(cls.dfile(), size, scale, **kwargs)
+
+class BOAT(DATA):
+    @classmethod
+    def dfile(cls):
+        return TestData.BOAT
+class CAMERA(DATA):
+    @classmethod
+    def dfile(cls):
+        return TestData.CAMERA
+class PEPPERS(DATA):
+    @classmethod
+    def dfile(cls):
+        return TestData.PEPPERS
+class RESOLUTION_CHART(DATA):
+    @classmethod
+    def dfile(cls):
+        return TestData.RESOLUTION_CHART
+class SIMPLE_PHANTOM_2D(DATA):
+    @classmethod
+    def dfile(cls):
+        return TestData.SIMPLE_PHANTOM_2D
+class SHAPES(DATA):
+    @classmethod
+    def dfile(cls):
+        return TestData.SHAPES
+
+
 class TestData(object):
     '''Class to return test data
     
@@ -117,7 +153,7 @@ class TestData(object):
         See https://github.com/scikit-image/scikit-image/blob/master/skimage/util/noise.py
 
         '''
-        if issubclass(type(image), DataContainer):
+        if hasattr(image, 'as_array'):
             arr = TestData.scikit_random_noise(image.as_array(), mode=mode, seed=seed, clip=clip,
                   **kwargs)
             out = image.copy()
@@ -308,12 +344,12 @@ class TestData(object):
 
         elif mode == 'salt':
             # Re-call function with mode='s&p' and p=1 (all salt noise)
-            out = random_noise(image, mode='s&p', seed=seed,
+            out = TestData.random_noise(image, mode='s&p', seed=seed,
                             amount=kwargs['amount'], salt_vs_pepper=1.)
 
         elif mode == 'pepper':
             # Re-call function with mode='s&p' and p=1 (all pepper noise)
-            out = random_noise(image, mode='s&p', seed=seed,
+            out = TestData.random_noise(image, mode='s&p', seed=seed,
                             amount=kwargs['amount'], salt_vs_pepper=0.)
 
         elif mode == 's&p':

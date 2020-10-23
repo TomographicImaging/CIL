@@ -39,7 +39,8 @@ from ccpi.optimisation.functions import TranslateFunction
 from timeit import default_timer as timer
 
 import numpy as np                         
-from ccpi.framework import TestData
+from ccpi.utilities import dataexample
+from ccpi.utilities import noise
 import os
 import sys
 try:
@@ -909,8 +910,9 @@ class TestFunction(unittest.TestCase):
         if has_reg_toolkit:
             print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV no tolerance (2D)")
     
-            loader = TestData()
-            data = loader.load(TestData.SHAPES)
+            # loader = TestData()
+            # data = loader.load(TestData.SHAPES)
+            data = dataexample.SHAPES.get()
             ig = data.geometry
             ag = ig
 
@@ -997,10 +999,11 @@ class TestFunction(unittest.TestCase):
                 data = ig.allocate()
                 data.fill(phantom_tm)
                     
-                n1 = TestData.random_noise(data.as_array(), mode = 'gaussian', seed = 10)
+                # n1 = TestData.random_noise(data.as_array(), mode = 'gaussian', seed = 10)
 
-                noisy_data = ig.allocate()
-                noisy_data.fill(n1)    
+                # noisy_data = ig.allocate()
+                # noisy_data.fill(n1)    
+                noisy_data = noise.gaussian(data, seed=10)
                 
                 
                 alpha = 0.1
@@ -1075,15 +1078,17 @@ class TestFunction(unittest.TestCase):
         #         raise ValueError ("2 solutions are not the same")      
                     
             
-            loader = TestData()
-            data = loader.load(TestData.PEPPERS, size=(256,256))
+            # loader = TestData()
+            # data = loader.load(TestData.PEPPERS, size=(256,256))
+            data = dataexample.PEPPERS.get(size=(256, 256))
             ig = data.geometry
             ag = ig
 
-            n1 = TestData.random_noise(data.as_array(), mode = 'gaussian', seed = 10)
+            # n1 = TestData.random_noise(data.as_array(), mode = 'gaussian', seed = 10)
 
-            noisy_data = ig.allocate()
-            noisy_data.fill(n1)    
+            # noisy_data = ig.allocate()
+            # noisy_data.fill(n1)    
+            noisy_data = noise.gaussian(data, seed=10)
                         
             alpha = 0.1
             iters = 1000

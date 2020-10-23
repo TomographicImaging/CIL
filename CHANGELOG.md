@@ -1,4 +1,14 @@
-* 20.x
+* 20.*
+  - moved TestData to utilities and renamed as dataexample
+  - verbosity of Algorithms is indipendent of the update_objective_interval
+  - added unittests
+  - renamed
+    - GradientDescent to GD
+    - SparseFiniteDiff to SparseFiniteDifferenceOperator
+    - LinearOperatorMatrix to MatrixOperator
+  - bugfix update_objective of SPDHG 
+
+* 20.09
   - added SPDHG algorithm
   - added TotalVariation function
   - Redesign of the AcquisitionGeometry class allowing more general acquisition trajectories than currently possible.

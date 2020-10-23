@@ -23,7 +23,7 @@ from ccpi.framework import ImageGeometry
 from ccpi.optimisation.functions import L2NormSquared, L1Norm
 import numpy as np
 import matplotlib.pyplot as plt
-from ccpi.framework import TestData
+from ccpi.utilities import dataexample
 import os
 import sys
 import unittest
@@ -69,10 +69,11 @@ class TestQualityMeasures(CCPiTestClass):
         print ("SETUP", np.version.version)
         if has_skimage:
 
-            id_coins = TestData().load(TestData.CAMERA)
+            id_coins = dataexample.CAMERA.get()
 
-            id_coins_noisy = TestData.random_noise(id_coins, mode='gaussian', var = 0.05, seed=10)
-
+            #id_coins_noisy = TestData.random_noise(id_coins, mode='gaussian', var = 0.05, seed=10)
+            id_coins_noisy = noise.gaussian(id_coins, var=0.05, seed=10)
+            
             ig = id_coins.geometry.copy()
             dc1 = ig.allocate('random')
             dc2 = ig.allocate('random')

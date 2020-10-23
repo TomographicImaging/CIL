@@ -24,6 +24,7 @@ from ccpi.optimisation.functions import L2NormSquared, L1Norm
 import numpy as np
 import matplotlib.pyplot as plt
 from ccpi.utilities import dataexample
+from ccpi.utilities import noise
 import os
 import sys
 import unittest

@@ -390,7 +390,7 @@ class TestAlgorithms(unittest.TestCase):
         scale = 5
         # n1 = TestData.random_noise( data.as_array()/scale, mode = 'poisson', seed = 10)*scale
         # noisy_data = ImageData(n1)
-        noisy_data = noise.poisson(data/scale,seed=10) * scale
+        noisy_data = applynoise.poisson(data/scale,seed=10) * scale
 
         # Regularisation Parameter
         alpha = 10
@@ -600,7 +600,8 @@ class TestSPDHG(unittest.TestCase):
         noises = ['gaussian', 'poisson']
         noise = noises[1]
         if noise == 'poisson':
-            noisy_data = scale * noise.poisson(sin/scale, seed=10)
+            scale = 5
+            noisy_data = scale * applynoise.poisson(sin/scale, seed=10)
             # np.random.seed(10)
             # scale = 5
             # eta = 0

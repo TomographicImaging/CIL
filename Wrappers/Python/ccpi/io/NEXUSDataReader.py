@@ -127,7 +127,8 @@ class NEXUSDataReader(object):
                     return AcquisitionData(array = data,
                                            deep_copy = False,
                                            geometry = self._geometry,
-                                           dimension_labels = dimension_labels)
+                                           dimension_labels = dimension_labels, 
+                                           suppress_warning=True)
                     
         except:
             print("Error reading nexus file")

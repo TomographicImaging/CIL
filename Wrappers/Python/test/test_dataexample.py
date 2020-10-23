@@ -127,3 +127,20 @@ class TestTestData(CCPiTestClass):
             print("Failed to load file")
 
         self.assertTrue(res)
+
+    def test_load_SYNCHROTRON_PARALLEL_BEAM_DATA(self):
+        res = False
+        try:
+            image = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
+            if (image.shape[0] == 91) and (image.shape[1] == 135) and\
+                (image.shape[2] == 160):
+                res = True
+            else:
+                print("Image dimension mismatch")
+        except FileNotFoundError:
+            print("File not found")
+        except:
+            print("Failed to load file")
+
+        self.assertTrue(res)
+        

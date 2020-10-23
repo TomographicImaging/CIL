@@ -26,6 +26,7 @@ from PIL import Image
 import os
 import os.path 
 import sys
+from ccpi.io import NEXUSDataReader
 
 data_dir = os.path.abspath(os.path.join(
         os.path.dirname(__file__),
@@ -71,6 +72,13 @@ class SHAPES(DATA):
     @classmethod
     def dfile(cls):
         return TestData.SHAPES
+class SYNCHROTRON_PARALLEL_BEAM_DATA(DATA):
+    @classmethod
+    def get(cls, **kwargs):
+        ddir = kwargs.get('data_dir', data_dir)
+        loader = NEXUSDataReader()
+        loader.set_up(nexus_file=os.path.join(os.path.abspath(ddir), '24737_fd_normalised.nxs'))
+        return loader.load_data()
 
 
 class TestData(object):
@@ -91,6 +99,7 @@ class TestData(object):
     RESOLUTION_CHART = 'resolution_chart.tiff'
     SIMPLE_PHANTOM_2D = 'hotdog'
     SHAPES =  'shapes.png'
+
     
     def __init__(self, **kwargs):
         self.data_dir = kwargs.get('data_dir', data_dir)

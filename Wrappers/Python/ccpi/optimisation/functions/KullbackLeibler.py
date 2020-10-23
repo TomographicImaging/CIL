@@ -41,12 +41,12 @@ try:
                     )
                 )                   
     @jit(nopython=True)
-    def kl_proximal_conjugate(x, b, bnoise, tau, out):
+    def kl_proximal_conjugate(x, b, eta, tau, out):
         #z = x + tau * self.bnoise
         #return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
 
         for i in prange(x.size):
-            z = x.flat[i] + ( tau * bnoise.flat[i] )
+            z = x.flat[i] + ( tau * eta.flat[i] )
             out.flat[i] = 0.5 * ( 
                 (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * tau * b.flat[i])
                 )
@@ -73,16 +73,16 @@ try:
         return accumulator
     
     # force a jit
+    print ("forcing jit in KL")
     x = numpy.asarray(numpy.random.random((10,10)), dtype=numpy.float32)
     b = numpy.asarray(numpy.random.random((10,10)), dtype=numpy.float32)
-    bnoise = numpy.zeros_like(x)
     eta = numpy.zeros_like(x)
     out = numpy.empty_like(x)
     tau = 1.
     kl_div(b,x,eta)
     kl_gradient(x,b,out, eta)
     kl_proximal(x,b, tau, out, eta)
-    kl_proximal_conjugate(x,b, bnoise, tau, out)
+    kl_proximal_conjugate(x,b, eta, tau, out)
     
 except ImportError as ie:
     has_numba = False
@@ -136,6 +136,10 @@ class KullbackLeibler(Function):
             raise ValueError('Data should be larger or equal to 0')              
          
         self.eta = kwargs.get('eta',self.b * 0.0)
+        self.use_numba = kwargs.get('use_numba', True)
+        if self.use_numba and has_numba:
+            self.b_np = self.b.as_array()
+            self.eta_np = self.eta.as_array()
         
                                                     
     def __call__(self, x):
@@ -144,9 +148,9 @@ class KullbackLeibler(Function):
         r"""Returns the value of the KullbackLeibler function at :math:`(b, x + \eta)`.
         To avoid infinity values, we consider only pixels/voxels for :math:`x+\eta\geq0`.
         """
-        if has_numba:
+        if self.use_numba and has_numba:
             # tmp = numpy.empty_like(x.as_array())
-            return kl_div(self.b.as_array(), x.as_array(), self.eta.as_array())
+            return kl_div(self.b_np, x.as_array(), self.eta_np)
         else: 
             tmp_sum = (x + self.eta).as_array()
             ind = tmp_sum >= 0
@@ -169,7 +173,7 @@ class KullbackLeibler(Function):
         We require the :math:`x+\eta>0` otherwise we have inf values.
         
         """     
-        if has_numba:
+        if self.use_numba and has_numba:
             if out is None:
                 out = (x * 0.)
                 out_np = out.as_array()
@@ -216,28 +220,29 @@ class KullbackLeibler(Function):
         where :math:`z = x + \tau \eta`
                     
         """
-        if has_numba:
+        if self.use_numba and has_numba:
             if out is None:
                 out = (x * 0.)
                 # out_np = numpy.empty_like(out.as_array(), dtype=numpy.float64)
                 out_np = out.as_array()
-                kl_proximal(x.as_array(), self.b.as_array(), tau, out_np, self.eta.as_array())
+                kl_proximal(x.as_array(), self.b_np, tau, out_np, self.eta_np)
                 out.fill(out_np)
                 return out
             else:
                 out_np = out.as_array()
-                kl_proximal(x.as_array(), self.b.as_array(), tau, out_np, self.eta.as_array())
-                # out.fill(out_np)                    
+                kl_proximal(x.as_array(), self.b_np, tau, out_np, self.eta_np)
+                out.fill(out_np)                    
         else:
             if out is None:        
-                return 0.5 *( (x - self.eta - tau) + ( (x + self.eta - tau)**2 + 4*tau*self.b   ) .sqrt() )        
+                return 0.5 *( (x - self.eta - tau) + ( (x + self.eta - tau).power(2) + 4*tau*self.b   ) .sqrt() )        
             else:                      
                 x.add(self.eta, out=out)
                 out -= tau
                 out *= out
                 out.add(self.b * (4 * tau), out=out)
                 out.sqrt(out=out)  
-                out.subtract(tau, out = out)
+                out.subtract(tau, out=out)
+                out.subtract(self.eta, out=out)
                 out.add(x, out=out)         
                 out *= 0.5            
         
@@ -249,23 +254,35 @@ class KullbackLeibler(Function):
            .. math::     prox_{\tau * f^{*}}(x)
         '''
 
+        if self.use_numba and has_numba:
+            if out is None:
+                out = (x * 0.)
+                # out_np = numpy.empty(out.shape, dtype=numpy.float64)
+                out_np = out.as_array()
+                kl_proximal_conjugate(x.as_array(), self.b_np, self.eta_np, tau, out_np)
+                out.fill(out_np)
+                return out
+            else:
+                out_np = out.as_array()
+                kl_proximal_conjugate(x.as_array(), self.b_np, self.eta_np, tau, out_np)
+                out.fill(out_np)                    
+        else:
+            if out is None:
+                z = x + tau * self.eta
+                return 0.5*((z + 1) - ((z-1).power(2) + 4 * tau * self.b).sqrt())
+            else:            
+                tmp = tau * self.eta
+                tmp += x
+                tmp -= 1
                 
-        if out is None:
-            z = x + tau * self.eta
-            return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
-        else:            
-            tmp = tau * self.eta
-            tmp += x
-            tmp -= 1
-            
-            self.b.multiply(4*tau, out=out)    
-            
-            out.add(tmp.power(2), out=out)
-            out.sqrt(out=out)
-            out *= -1
-            tmp += 2
-            out += tmp
-            out *= 0.5
+                self.b.multiply(4*tau, out=out)    
+                
+                out.add(tmp.power(2), out=out)
+                out.sqrt(out=out)
+                out *= -1
+                tmp += 2
+                out += tmp
+                out *= 0.5
 
 
 

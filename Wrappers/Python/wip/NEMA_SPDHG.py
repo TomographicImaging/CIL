@@ -269,10 +269,12 @@ Gs = IndicatorBox(lower=0)
 Ks = BlockOperator(*ams)
 rho = 0.99
 # normK = PowerMethod(Ks, 6)[0]
-normK = 7978677.9511325015
+# normK = 7978677.9511325015
+normK = 1491.1303497291835
+print ("NORMK", normK)
+
 sigma = [rho/normK] * num_subsets
 tau = rho/normK
-
 
 # In[ ]:
 
@@ -331,7 +333,7 @@ print ("prox_conj", t1-t0)
 # In[ ]:
 
 
-pet.set_max_omp_threads(15)
+pet.set_max_omp_threads(25)
 
 def update_no_objective(algo, iteration, objective, solution):
     print(algo.verbose_output(verbose=False))
@@ -339,8 +341,8 @@ from functools import partial
 
 
 spdhg = SPDHG(f = Fs, g = Gs, operator=Ks, sigma=sigma, tau=tau,
-            max_iteration=1000, update_objective_interval = 50, use_axpby=True)
-spdhg.run(num_subsets,print_interval=1, verbose = 2)
+            max_iteration=1000, update_objective_interval = 10, use_axpby=True)
+spdhg.run(num_subsets*50,print_interval=1, verbose = 2)
 
 
 # In[ ]:
@@ -353,14 +355,15 @@ spdhg.run(num_subsets,print_interval=1, verbose = 2)
 
 
 pet.set_max_omp_threads(15)
-spdhg.update_objective_interval = 200
-# spdhg.run(3000,verbose = False, callback = lambda x,y,z: print (x))
-spdhg.run(999,very_verbose = True)
+# spdhg.update_objective_interval = 200
+# # spdhg.run(3000,verbose = False, callback = lambda x,y,z: print (x))
+# spdhg.run(1000, verbose = 2)
 
 
 # In[ ]:
 
-
+spdhg.get_output().write('spdhg_out.hs')
+print (spdhg.iterations, spdhg.objective)
 plt.figure()
 plt.imshow(spdhg.get_output().as_array()[75,:,:], cmap="inferno")
 plt.colorbar()

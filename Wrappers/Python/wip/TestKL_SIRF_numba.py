@@ -41,7 +41,7 @@ rand_arr = pet.AcquisitionData('NEMA_randoms_0-{}s.hs'.format(seconds))
 rand = acq_data * 0
 rand.fill(rand_arr)
 
-image = acq_data.create_uniform_image(0., (127, 220, 220))
+image = acq_data.create_uniform_image(1., (127, 220, 220))
 image.initialise(dim=(127, 220, 220), vsize=(2.03125, 1.7080754, 1.7080754))
 
 attns = pet.ImageData('mu_map.hv')
@@ -92,6 +92,7 @@ print ("call took", t1-t0)
 
 print ("numba {} {}s ".format(res_numba, dt_numba))
 print ("numpy {} {}s ".format(res_numpy, dt_numpy))
+# 
 tau = 1.
 
 print ("TEST proximal_conjugate")
@@ -185,7 +186,53 @@ np.testing.assert_allclose(out_np.as_array(), out_nb.as_array(), rtol=2e-5)
 
 
 diff = out_np - out_nb
-plotter2D([el.as_array()[0][80] for el in [out_nb, out_np, diff]], 
-           titles=['numba', 'numpy', 'diff'], cmap='viridis')
+# plotter2D([el.as_array()[0][80] for el in [out_nb, out_np, diff]], 
+#            titles=['numba', 'numpy', 'diff'], cmap='viridis')
 
 np.testing.assert_allclose(out_np.as_array(), out_nb.as_array(), rtol=2e-5)
+
+
+print ("TEST convex_conjugate")
+# convex_conjugate
+
+t0 = time.time()
+out_nb = f_numba.convex_conjugate(fake_data)
+t1 = time.time()
+dt_numba = t1-t0
+
+t0 = time.time()
+out_np = f_numpy.convex_conjugate(fake_data)
+t1 = time.time()
+dt_numpy = t1-t0
+
+print ("{} numba {} {}s ".format(out_nb, 'convex_conjugate', dt_numba))
+print ("{} numpy {} {}s ".format(out_np, 'convex_conjugate', dt_numpy))
+
+
+# call with mask
+
+am.num_subsets = 10
+am.subset_num = 1
+image.fill(1)
+
+fake_data = am.direct(image)
+mask = fake_data.as_array() > 0
+print ("has mask some values? {}/{}".format(np.sum(mask), mask.size))
+f_numba_mask = KullbackLeibler(b = acq_data, eta = rand , use_numba=True, mask=mask)
+
+t0 = time.time()
+res_numba = f_numba(fake_data)
+t1 = time.time()
+dt_numba = t1-t0
+
+t0 = time.time()
+res_numpy = f_numpy(fake_data)
+t1 = time.time()
+dt_numpy = t1-t0
+print ("call took", t1-t0)
+
+print ("numba {} {}s ".format(res_numba, dt_numba))
+print ("numpy {} {}s ".format(res_numpy, dt_numpy))
+
+
+

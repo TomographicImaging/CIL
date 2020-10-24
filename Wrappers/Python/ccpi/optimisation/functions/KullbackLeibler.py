@@ -71,6 +71,38 @@ try:
                 # out.flat[i] = numpy.inf
                 return numpy.inf
         return accumulator
+    @jit(nopython=True)
+    def kl_div_mask(x, y, eta, mask):
+        accumulator = 0.
+        for i in prange(x.size):
+            if mask.flat[i] > 0:
+                X = x.flat[i]
+                Y = y.flat[i] + eta.flat[i]
+                if X > 0 and Y > 0:
+                    # out.flat[i] = X * numpy.log(X/Y) - X + Y
+                    accumulator += X * numpy.log(X/Y) - X + Y
+                elif X == 0 and Y >= 0:
+                    # out.flat[i] = Y
+                    accumulator += Y
+                else:
+                    # out.flat[i] = numpy.inf
+                    return numpy.inf
+        return accumulator
+
+    @jit(nopython=True)
+    def kl_convex_conjugate(x, b, eta):
+        accumulator = 0.
+        for i in prange(x.size):
+            X = b.flat[i]
+            x_f = x.flat[i]
+            Y = 1 - x_f
+            if Y > 0:
+                if X > 0:
+                    # out.flat[i] = X * numpy.log(X/Y) - X + Y
+                    accumulator += X * numpy.log(Y)
+                # else xlogy is 0 so it doesn't add to the accumulator
+                accumulator += eta.flat[i] * x_f
+        return accumulator
     
     # force a jit
     print ("forcing jit in KL")
@@ -78,11 +110,14 @@ try:
     b = numpy.asarray(numpy.random.random((10,10)), dtype=numpy.float32)
     eta = numpy.zeros_like(x)
     out = numpy.empty_like(x)
+    mask = x > 0.3
     tau = 1.
-    kl_div(b,x,eta)
-    kl_gradient(x,b,out, eta)
-    kl_proximal(x,b, tau, out, eta)
-    kl_proximal_conjugate(x,b, eta, tau, out)
+    kl_div(b, x, eta)
+    kl_div_mask(b, x, eta, mask)
+    kl_gradient(x, b, out, eta)
+    kl_proximal(x, b, tau, out, eta)
+    kl_proximal_conjugate(x, b, eta, tau, out)
+    kl_convex_conjugate(x, b, eta)
     
 except ImportError as ie:
     has_numba = False
@@ -140,6 +175,14 @@ class KullbackLeibler(Function):
         if self.use_numba and has_numba:
             self.b_np = self.b.as_array()
             self.eta_np = self.eta.as_array()
+        mask = kwargs.get('mask', None)
+        if hasattr (mask, 'as_array'):
+            self.mask = mask.as_array()
+        else:
+            self.mask = mask
+
+        if self.mask is not None and not ( self.use_numba and has_numba) :
+            print ('Cannot make use of mask without numba')
         
                                                     
     def __call__(self, x):
@@ -150,6 +193,8 @@ class KullbackLeibler(Function):
         """
         if self.use_numba and has_numba:
             # tmp = numpy.empty_like(x.as_array())
+            if self.mask is not None:
+                return kl_div_mask(self.b_np, x.as_array(), self.eta_np, self.mask)
             return kl_div(self.b_np, x.as_array(), self.eta_np)
         else: 
             tmp_sum = (x + self.eta).as_array()
@@ -202,10 +247,13 @@ class KullbackLeibler(Function):
         .. math:: F^{*}(b, x + \eta) = - b \log(1-x^{*}) - <x^{*}, \eta> 
         
         """  
-        tmp = 1 - x.as_array()
-        ind = tmp>0
-        xlogy = - scipy.special.xlogy(self.b.as_array()[ind], tmp[ind])  
-        return numpy.sum(xlogy) - self.eta.dot(x)
+        if self.use_numba and has_numba:
+            return kl_convex_conjugate(x.as_array(), self.b_np, self.eta_np)
+        else:
+            tmp = 1 - x.as_array()
+            ind = tmp>0
+            xlogy = - scipy.special.xlogy(self.b.as_array()[ind], tmp[ind])  
+            return numpy.sum(xlogy) - self.eta.dot(x)
             
     def proximal(self, x, tau, out=None):
         

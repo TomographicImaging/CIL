@@ -21,6 +21,9 @@ from ccpi.optimisation.operators import     CompositionOperator, BlockOperator, 
 from ccpi.plugins.regularisers import FGP_TV
 from ccpi.filters import regularisers
 from ccpi.utilities import NUM_THREADS
+from ccpi.utilities.display import plotter2D
+
+from ccpi.optimisation.operators import Gradient
 
 pet.AcquisitionData.set_storage_scheme('memory')
 pet.set_verbosity(0)
@@ -58,6 +61,33 @@ vaggelis = True
 if vaggelis:
     image = acq_data.create_uniform_image(0., (127, 220, 220))
     image.initialise(dim=(127, 220, 220), vsize=(2.03125, 1.7080754, 1.7080754))
+    # create a shape
+    shape = pet.EllipticCylinder()
+    shape.set_length(400)
+    shape.set_radii((40, 100))
+    shape.set_origin((10, 60, 0))
+
+    # add the shape to the image
+    image.add_shape(shape, scale = 1)
+
+    # add another shape
+    shape.set_radii((30, 30))
+    shape.set_origin((10, -30, 60))
+    image.add_shape(shape, scale = 1.5)
+
+    # add another shape
+    shape.set_origin((10, -30, -60))
+    image.add_shape(shape, scale = 0.75)
+
+    G = Gradient(image, backend='c', correlation='SpaceChannel')
+    out = G.direct(image)
+
+    plotter2D([image.as_array()[70], out.get_item(1).as_array()[70], 
+               out.get_item(2).as_array()[70],
+               out.get_item(3).as_array()[70]], cmap='inferno', 
+               titles=['ImageData', 'grad_x', 'grad_y'. 'grad_z'])
+
+    raise RuntimeError('Stop it')
 else:
     nxny = 127
     image = acq_data.create_uniform_image(0.0, (nxny, nxny))

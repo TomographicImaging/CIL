@@ -306,7 +306,8 @@ class Algorithm(object):
 
     def verbose_output(self, verbose=False):
         '''Creates a nice tabulated output'''
-        timing = self.timing[-self.update_objective_interval-1:-1]
+        #timing = self.timing[-self.update_objective_interval-1:-1]
+        timing = self.timing
         if len (timing) == 0:
             t = 0
         else:
@@ -324,7 +325,8 @@ class Algorithm(object):
 
     def objective_to_string(self, verbose=False):
         el = self.get_last_objective(return_all=verbose)
-        if self.iteration % self.update_objective_interval != 0:
+        if self.update_objective_interval == 0 or \
+            self.iteration % self.update_objective_interval != 0:
             el = [ np.nan, np.nan, np.nan] if verbose else np.nan
         if isinstance (el, list):
             if np.isnan(el[0]):

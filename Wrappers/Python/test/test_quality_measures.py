@@ -72,7 +72,6 @@ class TestQualityMeasures(CCPiTestClass):
 
             id_coins = dataexample.CAMERA.get()
 
-            #id_coins_noisy = TestData.random_noise(id_coins, mode='gaussian', var = 0.05, seed=10)
             id_coins_noisy = noise.gaussian(id_coins, var=0.05, seed=10)
             
             ig = id_coins.geometry.copy()

@@ -1,6 +1,6 @@
 * 20.*
   - moved TestData to utilities and renamed as dataexample
-  - verbosity of Algorithms is indipendent of the update_objective_interval
+  - verbosity of Algorithms is independent of the update_objective_interval
   - added unittests
   - renamed
     - GradientDescent to GD

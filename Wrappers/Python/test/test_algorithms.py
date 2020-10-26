@@ -258,9 +258,6 @@ class TestAlgorithms(unittest.TestCase):
         print ("PDHG Denoising with 3 noises")
         # adapted from demo PDHG_TV_Color_Denoising.py in CIL-Demos repository
         
-        # loader = TestData(data_dir=os.path.join(os.environ['SIRF_INSTALL_PATH'], 'share','ccpi'))
-        # loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
-        
         data = dataexample.PEPPERS.get(size=(256,256))
         ig = data.geometry
         ag = ig
@@ -272,11 +269,9 @@ class TestAlgorithms(unittest.TestCase):
         
         def setup(data, dnoise):
             if dnoise == 's&p':
-                # n1 = TestData.random_noise(data.as_array(), mode = noise, salt_vs_pepper = 0.9, amount=0.2, seed=10)
                 n1 = applynoise.saltnpepper(data, salt_vs_pepper = 0.9, amount=0.2, seed=10)
             elif dnoise == 'poisson':
                 scale = 5
-                #n1 = TestData.random_noise( data.as_array()/scale, mode = noise, seed = 10)*scale
                 n1 = applynoise.poisson( data.as_array()/scale, seed = 10)*scale
             elif dnoise == 'gaussian':
                 n1 = applynoise.gaussian(data.as_array(), seed = 10)
@@ -379,17 +374,12 @@ class TestAlgorithms(unittest.TestCase):
     def test_FISTA_Denoising(self):
         print ("FISTA Denoising Poisson Noise Tikhonov")
         # adapted from demo FISTA_Tikhonov_Poisson_Denoising.py in CIL-Demos repository
-        #loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
-        # loader = TestData()
-        # data = loader.load(TestData.SHAPES)
         data = dataexample.SHAPES.get()
         ig = data.geometry
         ag = ig
         N=300
         # Create Noisy data with Poisson noise
         scale = 5
-        # n1 = TestData.random_noise( data.as_array()/scale, mode = 'poisson', seed = 10)*scale
-        # noisy_data = ImageData(n1)
         noisy_data = applynoise.poisson(data/scale,seed=10) * scale
 
         # Regularisation Parameter
@@ -482,8 +472,6 @@ class TestSPDHG(unittest.TestCase):
         from ccpi.optimisation.algorithms import SPDHG, PDHG
         # Fast Gradient Projection algorithm for Total Variation(TV)
         from ccpi.optimisation.functions import TotalVariation
-        # loader = TestData()
-        #data = loader.load(TestData.SIMPLE_PHANTOM_2D, size=(128,128))
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
         ig = data.geometry
         ig.voxel_size_x = 0.1
@@ -579,8 +567,6 @@ class TestSPDHG(unittest.TestCase):
         from ccpi.optimisation.operators import BlockOperator, Gradient
         from ccpi.optimisation.functions import BlockFunction, KullbackLeibler, MixedL21Norm, IndicatorBox
         from ccpi.optimisation.algorithms import SPDHG, PDHG
-        # loader = TestData()
-        # data = loader.load(TestData.SIMPLE_PHANTOM_2D, size=(128,128))
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
         print ("here")
         ig = data.geometry
@@ -685,8 +671,6 @@ class TestSPDHG(unittest.TestCase):
         from ccpi.optimisation.operators import BlockOperator, Gradient
         from ccpi.optimisation.functions import BlockFunction, KullbackLeibler, MixedL21Norm, IndicatorBox
         from ccpi.optimisation.algorithms import SPDHG, PDHG
-        # loader = TestData()
-        # data = loader.load(TestData.SIMPLE_PHANTOM_2D, size=(128,128))
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
         print ("test_SPDHG_vs_SPDHG_explicit_axpby here")
         ig = data.geometry
@@ -779,8 +763,6 @@ class TestSPDHG(unittest.TestCase):
         from ccpi.optimisation.operators import BlockOperator, Gradient
         from ccpi.optimisation.functions import BlockFunction, KullbackLeibler, MixedL21Norm, IndicatorBox
         from ccpi.optimisation.algorithms import PDHG
-        # loader = TestData()
-        # data = loader.load(TestData.SIMPLE_PHANTOM_2D, size=(128,128))
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
         print ("test_PDHG_vs_PDHG_explicit_axpby here")
         ig = data.geometry

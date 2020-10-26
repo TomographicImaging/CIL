@@ -39,7 +39,8 @@ from ccpi.optimisation.functions import TranslateFunction
 from timeit import default_timer as timer
 
 import numpy as np                         
-from ccpi.framework import TestData
+from ccpi.utilities import dataexample
+from ccpi.utilities import noise
 import os
 import sys
 try:
@@ -909,8 +910,7 @@ class TestFunction(unittest.TestCase):
         if has_reg_toolkit:
             print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV no tolerance (2D)")
     
-            loader = TestData()
-            data = loader.load(TestData.SHAPES)
+            data = dataexample.SHAPES.get()
             ig = data.geometry
             ag = ig
 
@@ -996,11 +996,8 @@ class TestFunction(unittest.TestCase):
                 ig = ImageGeometry(N_size, N_size, N_size)
                 data = ig.allocate()
                 data.fill(phantom_tm)
-                    
-                n1 = TestData.random_noise(data.as_array(), mode = 'gaussian', seed = 10)
-
-                noisy_data = ig.allocate()
-                noisy_data.fill(n1)    
+                
+                noisy_data = noise.gaussian(data, seed=10)
                 
                 
                 alpha = 0.1
@@ -1044,46 +1041,12 @@ class TestFunction(unittest.TestCase):
             ###################################################################
             ###################################################################
             ###################################################################     
-        #     print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV with tolerance. There is a problem with this line https://github.com/vais-ral/CCPi-Regularisation-Toolkit/blob/master/src/Core/regularisers_GPU/TV_FGP_GPU_core.cu#L456")
-            
-        #     g_CIL = FGP_TV(ig, alpha, iters, tolerance=1e-3, lower = 0)
-        #     res1 = g_CIL.proximal(noisy_data, 1.)
-
-        #     plt.imshow(res1.as_array())
-        #     plt.colorbar()
-        #     plt.show()
-            
-        #     r_alpha = alpha
-        #     r_iterations = iters
-        #     r_tolerance = 1e-3
-        #     r_iso = 0
-        #     r_nonneg = 1
-        #     r_printing = 0
-        #     g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'gpu')
-
-        #     res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
-        #     plt.imshow(res2.as_array())
-        #     plt.colorbar()
-        #     plt.show()
-
-        #     plt.imshow(np.abs(res1.as_array()-res2.as_array()))
-        #     plt.colorbar()
-        #     plt.title("Difference CIL_FGP_TV vs CCPi_FGP_TV")
-        #     plt.show() 
-            
-        #     if mae(res1, res2)>1e-5:
-        #         raise ValueError ("2 solutions are not the same")      
-                    
-            
-            loader = TestData()
-            data = loader.load(TestData.PEPPERS, size=(256,256))
+        
+            data = dataexample.PEPPERS.get(size=(256, 256))
             ig = data.geometry
             ag = ig
 
-            n1 = TestData.random_noise(data.as_array(), mode = 'gaussian', seed = 10)
-
-            noisy_data = ig.allocate()
-            noisy_data.fill(n1)    
+            noisy_data = noise.gaussian(data, seed=10)
                         
             alpha = 0.1
             iters = 1000

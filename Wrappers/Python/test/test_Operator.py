@@ -30,7 +30,7 @@ import numpy
 from ccpi.optimisation.operators import SumOperator, Gradient,\
             ZeroOperator, SymmetrizedGradient, CompositionOperator
 
-from ccpi.framework import TestData
+from ccpi.utilities import dataexample
 import os
 from packaging import version
 
@@ -776,7 +776,7 @@ class TestBlockOperator(unittest.TestCase):
 class TestOperatorCompositionSum(unittest.TestCase):
     def setUp(self):
         
-        self.data = TestData().load(TestData.BOAT, size=(128,128))
+        self.data = dataexample.BOAT.get(size=(128,128))
         self.ig = self.data.geometry
 
     def test_SumOperator(self):

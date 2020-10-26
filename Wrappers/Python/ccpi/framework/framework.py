@@ -27,9 +27,8 @@ import warnings
 from functools import reduce
 from numbers import Number
 import ctypes, platform
-from ccpi.utilities import NUM_THREADS
 import math
-
+from ccpi.utilities.multiprocessing import NUM_THREADS
 # check for the extension
 if platform.system() == 'Linux':
     dll = 'libcilacc.so'

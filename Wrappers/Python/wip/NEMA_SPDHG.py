@@ -82,10 +82,11 @@ if vaggelis:
     G = Gradient(image, backend='c', correlation='SpaceChannel')
     out = G.direct(image)
 
-    plotter2D([image.as_array()[70], out.get_item(1).as_array()[70], 
-               out.get_item(2).as_array()[70],
-               out.get_item(3).as_array()[70]], cmap='inferno', 
-               titles=['ImageData', 'grad_x', 'grad_y'. 'grad_z'])
+    plotter2D([image.as_array()[70], 
+               out.get_item(0).as_array()[70], 
+               out.get_item(1).as_array()[70],
+               out.get_item(2).as_array()[70]], cmap='inferno', 
+               titles=['ImageData', 'grad_x', 'grad_y', 'grad_z'])
 
     raise RuntimeError('Stop it')
 else:

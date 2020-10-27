@@ -33,23 +33,44 @@ try:
     '''Some parallelisation of KL calls'''
     @jit(nopython=True)
     def kl_proximal(x,b, tau, out, eta):
+        if isinstance(tau, numpy.ndarray):
             for i in prange(x.size):
+                t = tau.flat[i]
+                X = x.flat[i]
+                E = eta.flat[i]
                 out.flat[i] = 0.5 *  ( 
-                    ( x.flat[i] - eta.flat[i] - tau ) +\
-                    numpy.sqrt( (x.flat[i] + eta.flat[i] - tau)**2. + \
+                    ( X - E - t ) +\
+                    numpy.sqrt( (X + E - t)**2. + \
+                        (4. * t * b.flat[i]) 
+                    )
+                )
+        else:
+            for i in prange(x.size):
+                X = x.flat[i]
+                E = eta.flat[i]
+                out.flat[i] = 0.5 *  ( 
+                    ( X - E - tau ) +\
+                    numpy.sqrt( (X + E - tau)**2. + \
                         (4. * tau * b.flat[i]) 
                     )
-                )                   
+                )
     @jit(nopython=True)
     def kl_proximal_conjugate(x, b, eta, tau, out):
         #z = x + tau * self.bnoise
         #return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
-
-        for i in prange(x.size):
-            z = x.flat[i] + ( tau * eta.flat[i] )
-            out.flat[i] = 0.5 * ( 
-                (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * tau * b.flat[i])
-                )
+        if isinstance(tau, numpy.ndarray):
+            for i in prange(x.size):
+                t = tau.flat[i]
+                z = x.flat[i] + ( t * eta.flat[i] )
+                out.flat[i] = 0.5 * ( 
+                    (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * t * b.flat[i])
+                    )
+        else:
+            for i in prange(x.size):
+                z = x.flat[i] + ( tau * eta.flat[i] )
+                out.flat[i] = 0.5 * ( 
+                    (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * tau * b.flat[i])
+                    )
     @jit(nopython=True)
     def kl_gradient(x, b, out, eta):
         for i in prange(x.size):

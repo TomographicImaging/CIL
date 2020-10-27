@@ -33,44 +33,48 @@ try:
     '''Some parallelisation of KL calls'''
     @jit(nopython=True)
     def kl_proximal(x,b, tau, out, eta):
-        if isinstance(tau, numpy.ndarray):
-            for i in prange(x.size):
-                t = tau.flat[i]
-                X = x.flat[i]
-                E = eta.flat[i]
-                out.flat[i] = 0.5 *  ( 
-                    ( X - E - t ) +\
-                    numpy.sqrt( (X + E - t)**2. + \
-                        (4. * t * b.flat[i]) 
-                    )
+        for i in prange(x.size):
+            X = x.flat[i]
+            E = eta.flat[i]
+            out.flat[i] = 0.5 *  ( 
+                ( X - E - tau ) +\
+                numpy.sqrt( (X + E - tau)**2. + \
+                    (4. * tau * b.flat[i]) 
                 )
-        else:
-            for i in prange(x.size):
-                X = x.flat[i]
-                E = eta.flat[i]
-                out.flat[i] = 0.5 *  ( 
-                    ( X - E - tau ) +\
-                    numpy.sqrt( (X + E - tau)**2. + \
-                        (4. * tau * b.flat[i]) 
-                    )
+            )
+    @jit(nopython=True)
+    def kl_proximal_arr(x,b, tau, out, eta):
+        for i in prange(x.size):
+            t = tau.flat[i]
+            X = x.flat[i]
+            E = eta.flat[i]
+            out.flat[i] = 0.5 *  ( 
+                ( X - E - t ) +\
+                numpy.sqrt( (X + E - t)**2. + \
+                    (4. * t * b.flat[i]) 
                 )
+            )
+        
+    @jit(nopython=True)
+    def kl_proximal_conjugate_arr(x, b, eta, tau, out):
+        #z = x + tau * self.bnoise
+        #return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
+        for i in prange(x.size):
+            t = tau.flat[i]
+            z = x.flat[i] + ( t * eta.flat[i] )
+            out.flat[i] = 0.5 * ( 
+                (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * t * b.flat[i])
+                )
+        
     @jit(nopython=True)
     def kl_proximal_conjugate(x, b, eta, tau, out):
         #z = x + tau * self.bnoise
         #return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())
-        if isinstance(tau, numpy.ndarray):
-            for i in prange(x.size):
-                t = tau.flat[i]
-                z = x.flat[i] + ( t * eta.flat[i] )
-                out.flat[i] = 0.5 * ( 
-                    (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * t * b.flat[i])
-                    )
-        else:
-            for i in prange(x.size):
-                z = x.flat[i] + ( tau * eta.flat[i] )
-                out.flat[i] = 0.5 * ( 
-                    (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * tau * b.flat[i])
-                    )
+        for i in prange(x.size):
+            z = x.flat[i] + ( tau * eta.flat[i] )
+            out.flat[i] = 0.5 * ( 
+                (z + 1) - numpy.sqrt((z-1)*(z-1) + 4 * tau * b.flat[i])
+                )
     @jit(nopython=True)
     def kl_gradient(x, b, out, eta):
         for i in prange(x.size):
@@ -133,11 +137,14 @@ try:
     out = numpy.empty_like(x)
     mask = x > 0.3
     tau = 1.
+    tauarr = numpy.ones_like(x)
     kl_div(b, x, eta)
     kl_div_mask(b, x, eta, mask)
     kl_gradient(x, b, out, eta)
     kl_proximal(x, b, tau, out, eta)
+    kl_proximal_arr(x, b, tauarr, out, eta)
     kl_proximal_conjugate(x, b, eta, tau, out)
+    kl_proximal_conjugate_arr(x, b, eta, tauarr, out)
     kl_convex_conjugate(x, b, eta)
     
 except ImportError as ie:
@@ -298,7 +305,7 @@ class KullbackLeibler(Function):
                     kl_proximal(x.as_array(), self.b_np, tau, out_np, self.eta_np)
                 else:
                     # it should be a DataContainer
-                    kl_proximal(x.as_array(), self.b_np, tau.as_array(), out_np, self.eta_np)
+                    kl_proximal_arr(x.as_array(), self.b_np, tau.as_array(), out_np, self.eta_np)
                 out.fill(out_np)
                 return out
             else:
@@ -307,7 +314,7 @@ class KullbackLeibler(Function):
                     kl_proximal(x.as_array(), self.b_np, tau, out_np, self.eta_np)
                 else:
                     # it should be a DataContainer
-                    kl_proximal(x.as_array(), self.b_np, tau.as_array(), out_np, self.eta_np)
+                    kl_proximal_arr(x.as_array(), self.b_np, tau.as_array(), out_np, self.eta_np)
                 out.fill(out_np)                    
         else:
             if out is None:        
@@ -339,7 +346,7 @@ class KullbackLeibler(Function):
                 if isinstance(tau, Number):
                     kl_proximal_conjugate(x.as_array(), self.b_np, self.eta_np, tau, out_np)
                 else:
-                    kl_proximal_conjugate(x.as_array(), self.b_np, self.eta_np, tau.as_array(), out_np)
+                    kl_proximal_conjugate_arr(x.as_array(), self.b_np, self.eta_np, tau.as_array(), out_np)
                 out.fill(out_np)
                 return out
             else:
@@ -347,7 +354,7 @@ class KullbackLeibler(Function):
                 if isinstance(tau, Number):
                     kl_proximal_conjugate(x.as_array(), self.b_np, self.eta_np, tau, out_np)
                 else:
-                    kl_proximal_conjugate(x.as_array(), self.b_np, self.eta_np, tau.as_array(), out_np)
+                    kl_proximal_conjugate_arr(x.as_array(), self.b_np, self.eta_np, tau.as_array(), out_np)
                 out.fill(out_np)                    
         else:
             if out is None:

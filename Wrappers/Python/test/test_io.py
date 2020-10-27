@@ -1,16 +1,16 @@
 import unittest
-from ccpi.framework import AcquisitionData, AcquisitionGeometry
+from cil.framework import AcquisitionData, AcquisitionGeometry
 import numpy as np
 import os
 import olefile
-from ccpi.framework import ImageGeometry
-from ccpi.io import TXRMDataReader, NEXUSDataReader
+from cil.framework import ImageGeometry
+from cil.io import TXRMDataReader, NEXUSDataReader
 has_astra = True
 try:
-    from ccpi.astra.processors import FBP
+    from cil.astra.processors import FBP
 except ImportError as ie:
     has_astra = False
-from ccpi.utilities.dataexample import data_dir
+from cil.utilities.dataexample import data_dir
 filename = os.path.join(data_dir, "valnut_tomo-A.txrm")
 has_file = os.path.isfile(filename)
 
@@ -34,7 +34,7 @@ has_prerequisites = has_olefile and has_dxchange and has_astra and has_file \
 import wget
 
 
-from ccpi.utilities.quality_measures import mae, mse, psnr
+from cil.utilities.quality_measures import mae, mse, psnr
 
 print ("has_astra",has_astra)
 print ("has_wget",has_wget)

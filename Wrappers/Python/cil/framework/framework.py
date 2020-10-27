@@ -28,7 +28,7 @@ from functools import reduce
 from numbers import Number
 import ctypes, platform
 import math
-from ccpi.utilities.multiprocessing import NUM_THREADS
+from cil.utilities.multiprocessing import NUM_THREADS
 # check for the extension
 if platform.system() == 'Linux':
     dll = 'libcilacc.so'

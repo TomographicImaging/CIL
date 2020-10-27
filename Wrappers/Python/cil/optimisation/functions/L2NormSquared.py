@@ -22,9 +22,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from ccpi.optimisation.functions import Function
-from ccpi.framework import DataContainer
-from ccpi.optimisation.operators import DiagonalOperator
+from cil.optimisation.functions import Function
+from cil.framework import DataContainer
+from cil.optimisation.operators import DiagonalOperator
 
 class L2NormSquared(Function):
     

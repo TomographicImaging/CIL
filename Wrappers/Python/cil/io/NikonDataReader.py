@@ -19,7 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from ccpi.framework import AcquisitionData, AcquisitionGeometry
+from cil.framework import AcquisitionData, AcquisitionGeometry
 import numpy
 import os
 

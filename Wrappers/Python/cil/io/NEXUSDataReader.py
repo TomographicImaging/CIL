@@ -20,7 +20,7 @@ from __future__ import division
 from __future__ import print_function
 import numpy as np
 import os
-from ccpi.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
+from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
 
 h5pyAvailable = True
 try:

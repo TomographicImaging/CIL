@@ -27,7 +27,7 @@ from __future__ import print_function
 import warnings
 
 from numbers import Number
-from ccpi.optimisation.operators import ZeroOperator, Identity
+from cil.optimisation.operators import ZeroOperator, Identity
 
 class Function(object):
     

@@ -20,19 +20,19 @@ from __future__ import division
 import unittest
 import numpy
 import numpy as np
-from ccpi.framework import DataContainer
-from ccpi.framework import ImageData
-from ccpi.framework import AcquisitionData, VectorData
-from ccpi.framework import ImageGeometry,VectorGeometry
-from ccpi.framework import AcquisitionGeometry
-from ccpi.optimisation.algorithms import FISTA
-from ccpi.optimisation.functions import LeastSquares
-from ccpi.optimisation.functions import ZeroFunction
-from ccpi.optimisation.functions import L1Norm
+from cil.framework import DataContainer
+from cil.framework import ImageData
+from cil.framework import AcquisitionData, VectorData
+from cil.framework import ImageGeometry,VectorGeometry
+from cil.framework import AcquisitionGeometry
+from cil.optimisation.algorithms import FISTA
+from cil.optimisation.functions import LeastSquares
+from cil.optimisation.functions import ZeroFunction
+from cil.optimisation.functions import L1Norm
 
-from ccpi.optimisation.operators import MatrixOperator
-from ccpi.optimisation.operators import Identity
-from ccpi.optimisation.operators import LinearOperator
+from cil.optimisation.operators import MatrixOperator
+from cil.optimisation.operators import Identity
+from cil.optimisation.operators import LinearOperator
 
 import numpy.testing
 

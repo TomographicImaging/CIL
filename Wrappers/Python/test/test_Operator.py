@@ -18,19 +18,19 @@
 from __future__ import division
 
 import unittest
-from ccpi.framework import ImageGeometry, VectorGeometry, ImageData, BlockDataContainer, DataContainer
-from ccpi.optimisation.operators import BlockOperator,\
+from cil.framework import ImageGeometry, VectorGeometry, ImageData, BlockDataContainer, DataContainer
+from cil.optimisation.operators import BlockOperator,\
     FiniteDifferenceOperator, SymmetrizedGradient
 import numpy
 from timeit import default_timer as timer
-from ccpi.optimisation.operators import Gradient, Identity,\
+from cil.optimisation.operators import Gradient, Identity,\
     DiagonalOperator, MaskOperator, ChannelwiseOperator, BlurringOperator
-from ccpi.optimisation.operators import LinearOperator, MatrixOperator
+from cil.optimisation.operators import LinearOperator, MatrixOperator
 import numpy   
-from ccpi.optimisation.operators import SumOperator, Gradient,\
+from cil.optimisation.operators import SumOperator, Gradient,\
             ZeroOperator, SymmetrizedGradient, CompositionOperator
 
-from ccpi.utilities import dataexample
+from cil.utilities import dataexample
 import os
 from packaging import version
 

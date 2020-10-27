@@ -22,9 +22,8 @@ from __future__ import print_function
 import numpy
 from numbers import Number
 import functools
-from ccpi.framework import BlockDataContainer
-#from ccpi.optimisation.operators import Operator, LinearOperator
- 
+from cil.framework import BlockDataContainer
+
 class BlockGeometry(object):
     
     RANDOM = 'random'

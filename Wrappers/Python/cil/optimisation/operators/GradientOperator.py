@@ -20,11 +20,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from ccpi.optimisation.operators import LinearOperator
-from ccpi.optimisation.operators import FiniteDifferenceOperator
-from ccpi.framework import ImageGeometry, BlockGeometry
+from cil.optimisation.operators import LinearOperator
+from cil.optimisation.operators import FiniteDifferenceOperator
+from cil.framework import ImageGeometry, BlockGeometry
 import warnings
-from ccpi.utilities.multiprocessing import NUM_THREADS
+from cil.utilities.multiprocessing import NUM_THREADS
 
 NEUMANN = 'Neumann'
 PERIODIC = 'Periodic'

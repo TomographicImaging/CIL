@@ -19,9 +19,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from ccpi.optimisation.operators import LinearOperator
-from ccpi.framework import BlockGeometry, BlockDataContainer
-from ccpi.optimisation.operators import FiniteDifferenceOperator
+from cil.optimisation.operators import LinearOperator
+from cil.framework import BlockGeometry, BlockDataContainer
+from cil.optimisation.operators import FiniteDifferenceOperator
 
 
 class SymmetrizedGradient(LinearOperator):
@@ -145,8 +145,8 @@ if __name__ == '__main__':
     
     ###########################################################################  
     ## Symmetrized Gradient Tests
-    from ccpi.framework import ImageGeometry
-    from ccpi.optimisation.operators import Gradient
+    from cil.framework import ImageGeometry
+    from cil.optimisation.operators import Gradient
     import numpy as np
     
     N, M = 2, 3

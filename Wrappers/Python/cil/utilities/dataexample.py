@@ -19,14 +19,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from ccpi.framework import ImageData, ImageGeometry, DataContainer
+from cil.framework import ImageData, ImageGeometry, DataContainer
 import numpy
 import numpy as np
 from PIL import Image
 import os
 import os.path 
 import sys
-from ccpi.io import NEXUSDataReader
+from cil.io import NEXUSDataReader
 
 data_dir = os.path.abspath(os.path.join(
         os.path.dirname(__file__),
@@ -35,7 +35,7 @@ data_dir = os.path.abspath(os.path.join(
 
 # this is the default location after a conda install
 data_dir = os.path.abspath(
-    os.path.join(sys.prefix, 'share','ccpi')
+    os.path.join(sys.prefix, 'share','cil')
 )
 
 class DATA(object):

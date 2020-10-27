@@ -21,8 +21,8 @@ from __future__ import print_function
 
 import scipy.sparse as sp
 import numpy as np
-from ccpi.framework import ImageData
-from ccpi.optimisation.operators import Operator
+from cil.framework import ImageData
+from cil.optimisation.operators import Operator
 
 class SparseFiniteDifferenceOperator(Operator):
     
@@ -93,7 +93,7 @@ class SparseFiniteDifferenceOperator(Operator):
         return ImageData(res)
 
 if __name__ == '__main__':
-    from ccpi.framework import ImageGeometry        
+    from cil.framework import ImageGeometry        
     M, N= 2, 3
     ig = ImageGeometry(M, N)
     arr = ig.allocate('random_int')

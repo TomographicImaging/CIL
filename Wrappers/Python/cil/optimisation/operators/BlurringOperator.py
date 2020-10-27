@@ -20,8 +20,8 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
-from ccpi.optimisation.operators import LinearOperator
-import ccpi
+from cil.optimisation.operators import LinearOperator
+import cil
 
 from scipy.ndimage import convolve, correlate
 
@@ -44,8 +44,8 @@ class BlurringOperator(LinearOperator):
         else:
             raise TypeError('PSF must be a number array with same number of dimensions as geometry.')
         
-        if not (isinstance(geometry,ccpi.framework.framework.ImageGeometry) or \
-                isinstance(geometry,ccpi.framework.framework.AcquisitionGeometry)):
+        if not (isinstance(geometry,cil.framework.framework.ImageGeometry) or \
+                isinstance(geometry,cil.framework.framework.AcquisitionGeometry)):
             raise TypeError('geometry must be an ImageGeometry or AcquisitionGeometry.')
 
         
@@ -83,12 +83,12 @@ if __name__ == '__main__':
     
     import matplotlib.pyplot as plt
     
-    from ccpi.optimisation.algorithms import PDHG
+    from cil.optimisation.algorithms import PDHG
     
-    from ccpi.optimisation.operators import BlockOperator, Gradient
-    from ccpi.optimisation.functions import ZeroFunction, MixedL21Norm, \
+    from cil.optimisation.operators import BlockOperator, Gradient
+    from cil.optimisation.functions import ZeroFunction, MixedL21Norm, \
                                             BlockFunction, L2NormSquared
-    from ccpi.utilities import dataexample
+    from cil.utilities import dataexample
     import os
     import sys
     

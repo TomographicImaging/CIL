@@ -18,8 +18,8 @@
 from __future__ import division
 
 import numpy
-from ccpi.utilities import dataexample
-from ccpi.utilities import noise
+from cil.utilities import dataexample
+from cil.utilities import noise
 import os, sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from testclass import CCPiTestClass

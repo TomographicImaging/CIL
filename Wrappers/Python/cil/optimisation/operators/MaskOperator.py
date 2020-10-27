@@ -21,7 +21,7 @@ from __future__ import print_function
 
 import numpy as np
 
-from ccpi.optimisation.operators import DiagonalOperator
+from cil.optimisation.operators import DiagonalOperator
 
 class MaskOperator(DiagonalOperator):
     
@@ -47,13 +47,13 @@ if __name__ == '__main__':
                       
     import matplotlib.pyplot as plt
     
-    from ccpi.optimisation.algorithms import PDHG
+    from cil.optimisation.algorithms import PDHG
     
-    from ccpi.optimisation.operators import BlockOperator, Gradient
-    from ccpi.optimisation.functions import ZeroFunction, L1Norm, \
+    from cil.optimisation.operators import BlockOperator, Gradient
+    from cil.optimisation.functions import ZeroFunction, L1Norm, \
                           MixedL21Norm, BlockFunction, L2NormSquared,\
                               KullbackLeibler
-    from ccpi.framework import TestData
+    from cil.framework import TestData
     import os
     import sys
     
@@ -62,7 +62,7 @@ if __name__ == '__main__':
     print ("which_noise ", which_noise)
     
     # Load in test image
-    loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
+    loader = TestData(data_dir=os.path.join(sys.prefix, 'share','cil'))
     data = loader.load(TestData.SHAPES)
     ig = data.geometry
     ag = ig

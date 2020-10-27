@@ -19,13 +19,13 @@ from __future__ import absolute_import, division
 
 import numpy as np
 
-from ccpi.framework import DataContainer, ImageGeometry, \
+from cil.framework import DataContainer, ImageGeometry, \
     VectorGeometry, VectorData, BlockDataContainer
-from ccpi.optimisation.operators import Identity, MatrixOperator, CompositionOperator, DiagonalOperator, BlockOperator
-from ccpi.optimisation.functions import Function, KullbackLeibler, ConstantFunction, TranslateFunction
-from ccpi.optimisation.operators import Gradient
+from cil.optimisation.operators import Identity, MatrixOperator, CompositionOperator, DiagonalOperator, BlockOperator
+from cil.optimisation.functions import Function, KullbackLeibler, ConstantFunction, TranslateFunction
+from cil.optimisation.operators import Gradient
 
-from ccpi.optimisation.functions import Function, KullbackLeibler, WeightedL2NormSquared, L2NormSquared,\
+from cil.optimisation.functions import Function, KullbackLeibler, WeightedL2NormSquared, L2NormSquared,\
                                          L1Norm, MixedL21Norm, LeastSquares, \
                                          ZeroFunction, FunctionOperatorComposition,\
                                          Rosenbrock, IndicatorBox, TotalVariation                                     
@@ -34,18 +34,18 @@ import unittest
 import numpy
 import scipy.special
 
-from ccpi.framework import ImageGeometry
-from ccpi.optimisation.functions import TranslateFunction
+from cil.framework import ImageGeometry
+from cil.optimisation.functions import TranslateFunction
 from timeit import default_timer as timer
 
 import numpy as np                         
-from ccpi.utilities import dataexample
-from ccpi.utilities import noise
+from cil.utilities import dataexample
+from cil.utilities import noise
 import os
 import sys
 try:
-    from ccpi.plugins.regularisers import FGP_TV as CCPiReg_FGP_TV
-    from ccpi.filters import regularisers    
+    from cil.plugins.regularisers import FGP_TV as CCPiReg_FGP_TV
+    from cil.filters import regularisers    
     has_reg_toolkit = True
 except ImportError as ie:
     has_reg_toolkit = False
@@ -57,7 +57,7 @@ try:
 except ImportError as ie:
     has_tomophantom = False
 
-from ccpi.utilities.quality_measures import mae
+from cil.utilities.quality_measures import mae
 
                     
 class TestFunction(unittest.TestCase):

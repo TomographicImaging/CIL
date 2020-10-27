@@ -19,7 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from ccpi.framework import DataProcessor, DataContainer, AcquisitionData,\
+from cil.framework import DataProcessor, DataContainer, AcquisitionData,\
  AcquisitionGeometry, ImageGeometry, ImageData
 import numpy
 from scipy import ndimage

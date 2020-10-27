@@ -22,8 +22,8 @@ from __future__ import print_function
 
 import numpy
 from scipy.sparse.linalg import svds
-from ccpi.framework import VectorGeometry
-from ccpi.optimisation.operators import LinearOperator
+from cil.framework import VectorGeometry
+from cil.optimisation.operators import LinearOperator
 
 class MatrixOperator(LinearOperator):
     """ Matrix wrapped into a LinearOperator

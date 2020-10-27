@@ -19,13 +19,13 @@ from __future__ import division
 
 import unittest
 import numpy
-from ccpi.framework import ImageGeometry, AcquisitionGeometry
-from ccpi.framework import ImageData, AcquisitionData
-from ccpi.framework import BlockDataContainer
+from cil.framework import ImageGeometry, AcquisitionGeometry
+from cil.framework import ImageData, AcquisitionData
+from cil.framework import BlockDataContainer
 import functools
 
-from ccpi.optimisation.operators import Gradient, Identity, BlockOperator
-from ccpi.optimisation.operators import LinearOperator
+from cil.optimisation.operators import Gradient, Identity, BlockOperator
+from cil.optimisation.operators import LinearOperator
 
 class TestGradient(unittest.TestCase):
     def test_Gradient(self): 

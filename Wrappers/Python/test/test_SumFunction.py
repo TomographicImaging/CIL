@@ -17,11 +17,11 @@
 #   limitations under the License.
 from __future__ import division
 
-from ccpi.optimisation.functions import L1Norm, ScaledFunction, \
+from cil.optimisation.functions import L1Norm, ScaledFunction, \
                                         LeastSquares, L2NormSquared, \
                                         KullbackLeibler, ZeroFunction, ConstantFunction
-from ccpi.optimisation.operators import Identity                                        
-from ccpi.framework import ImageGeometry
+from cil.optimisation.operators import Identity                                        
+from cil.framework import ImageGeometry
 
 import unittest
 import numpy

@@ -16,7 +16,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from ccpi.utilities.dataexample import TestData
+from cil.utilities.dataexample import TestData
 
 def gaussian(image, seed=None, clip=True, **kwargs):
     '''Gaussian-distributed additive noise.

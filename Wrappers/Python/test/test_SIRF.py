@@ -4,7 +4,7 @@ import os
 import sys
 import shutil
 import unittest
-from ccpi.framework import BlockDataContainer
+from cil.framework import BlockDataContainer
 try:
     import sirf.STIR as pet
     from sirf.Utilities import  examples_data_path

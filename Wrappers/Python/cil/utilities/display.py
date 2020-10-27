@@ -21,7 +21,7 @@ from __future__ import print_function, division
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
 import numpy
-from ccpi.framework import ImageGeometry
+from cil.framework import ImageGeometry
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 def plotter2D(datacontainers, titles=None, fix_range=False, stretch_y=False, cmap='gray', axis_labels=None, custom_range=None, origin='upper'):
@@ -264,8 +264,8 @@ def show(x, title = None, show_channels = [1], **kwargs):
             
 if __name__ == '__main__':         
     
-    from ccpi.framework import ImageData
-    from ccpi.utilities import dataexample
+    from cil.framework import ImageData
+    from cil.utilities import dataexample
     import os
     import sys
     

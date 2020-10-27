@@ -16,7 +16,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from ccpi.framework import AcquisitionData, AcquisitionGeometry
+from cil.framework import AcquisitionData, AcquisitionGeometry
 import numpy as np
 import os
 import olefile
@@ -134,11 +134,11 @@ class TXRMDataReader(object):
         return self._metadata
 if __name__ == '__main__':
     
-    from ccpi.framework import ImageGeometry
-    from ccpi.astra.processors import FBP
-    from ccpi.io import NEXUSDataWriter
+    from cil.framework import ImageGeometry
+    from cil.astra.processors import FBP
+    from cil.io import NEXUSDataWriter
     import matplotlib.pyplot as plt
-    from ccpi.framework.dataexample import data_dir
+    from cil.framework.dataexample import data_dir
 
     angle_unit = AcquisitionGeometry.RADIAN
 

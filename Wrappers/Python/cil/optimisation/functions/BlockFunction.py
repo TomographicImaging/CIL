@@ -24,8 +24,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from ccpi.optimisation.functions import Function
-from ccpi.framework import BlockDataContainer
+from cil.optimisation.functions import Function
+from cil.framework import BlockDataContainer
 from numbers import Number
 
 class BlockFunction(Function):
@@ -207,9 +207,9 @@ if __name__ == '__main__':
     
     M, N, K = 20,30,50
     
-    from ccpi.optimisation.functions import L2NormSquared, MixedL21Norm, L1Norm
-    from ccpi.framework import ImageGeometry, BlockGeometry
-    from ccpi.optimisation.operators import Gradient, Identity, BlockOperator
+    from cil.optimisation.functions import L2NormSquared, MixedL21Norm, L1Norm
+    from cil.framework import ImageGeometry, BlockGeometry
+    from cil.optimisation.operators import Gradient, Identity, BlockOperator
     import numpy
     import numpy as np
     

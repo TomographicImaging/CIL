@@ -20,8 +20,8 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
-from ccpi.framework import ImageData
-from ccpi.optimisation.operators import LinearOperator
+from cil.framework import ImageData
+from cil.optimisation.operators import LinearOperator
 
 class ZeroOperator(LinearOperator):
     

@@ -20,7 +20,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from ccpi.optimisation.operators import LinearOperator
+from cil.optimisation.operators import LinearOperator
 import scipy.sparse as sp
 import numpy as np
 
@@ -88,7 +88,7 @@ class Identity(LinearOperator):
     
 if __name__ == '__main__':
     
-    from ccpi.framework import ImageGeometry
+    from cil.framework import ImageGeometry
 
     M, N = 2, 3
     ig = ImageGeometry(M, N)

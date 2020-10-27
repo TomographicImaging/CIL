@@ -22,8 +22,8 @@ from __future__ import division
 from __future__ import print_function
 
 
-from ccpi.optimisation.algorithms import Algorithm
-from ccpi.optimisation.functions import ZeroFunction
+from cil.optimisation.algorithms import Algorithm
+from cil.optimisation.functions import ZeroFunction
 import numpy
 
 class FISTA(Algorithm):

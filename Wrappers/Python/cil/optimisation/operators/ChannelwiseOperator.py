@@ -20,10 +20,10 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
-from ccpi.framework import ImageData
-from ccpi.optimisation.operators import LinearOperator
+from cil.framework import ImageData
+from cil.optimisation.operators import LinearOperator
 
-from ccpi.framework import ImageGeometry, AcquisitionGeometry, BlockGeometry
+from cil.framework import ImageGeometry, AcquisitionGeometry, BlockGeometry
 
 class ChannelwiseOperator(LinearOperator):
     
@@ -144,7 +144,7 @@ class ChannelwiseOperator(LinearOperator):
 
 if __name__ == '__main__':
     
-    from ccpi.optimisation.operators import DiagonalOperator
+    from cil.optimisation.operators import DiagonalOperator
 
     M = 3
     channels = 4

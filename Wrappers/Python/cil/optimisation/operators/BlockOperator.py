@@ -23,9 +23,9 @@ from __future__ import print_function
 
 import numpy
 import functools
-from ccpi.framework import ImageData, BlockDataContainer, DataContainer
-from ccpi.optimisation.operators import Operator, LinearOperator
-from ccpi.framework import BlockGeometry
+from cil.framework import ImageData, BlockDataContainer, DataContainer
+from cil.optimisation.operators import Operator, LinearOperator
+from cil.framework import BlockGeometry
 try:
     from sirf import SIRF
     from sirf.SIRF import DataContainer as SIRFDataContainer
@@ -387,8 +387,8 @@ class BlockOperator(Operator):
         
 if __name__ == '__main__':
     
-    from ccpi.framework import ImageGeometry
-    from ccpi.optimisation.operators import Gradient, Identity, \
+    from cil.framework import ImageGeometry
+    from cil.optimisation.operators import Gradient, Identity, \
                             SparseFiniteDifferenceOperator, SymmetrizedGradient, ZeroOperator
 
         

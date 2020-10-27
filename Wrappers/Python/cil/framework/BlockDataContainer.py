@@ -22,8 +22,8 @@ from __future__ import print_function
 import numpy
 from numbers import Number
 import functools
-from ccpi.framework import DataContainer
-from ccpi.utilities.multiprocessing import NUM_THREADS
+from cil.framework import DataContainer
+from cil.utilities.multiprocessing import NUM_THREADS
 
 class BlockDataContainer(object):
     '''Class to hold DataContainers as column vector

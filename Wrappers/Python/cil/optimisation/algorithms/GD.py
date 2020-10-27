@@ -25,7 +25,7 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy
-from ccpi.optimisation.algorithms import Algorithm
+from cil.optimisation.algorithms import Algorithm
 
 class GD(Algorithm):
     ''' 

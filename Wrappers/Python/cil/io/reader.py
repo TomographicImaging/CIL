@@ -20,8 +20,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from ccpi.framework import AcquisitionGeometry
-from ccpi.framework import AcquisitionData
+from cil.framework import AcquisitionGeometry
+from cil.framework import AcquisitionData
 import numpy as np
 import os
 

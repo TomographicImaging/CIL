@@ -22,7 +22,7 @@ from __future__ import print_function
 
 import numpy as np
 
-from ccpi.optimisation.operators import LinearOperator
+from cil.optimisation.operators import LinearOperator
 
 ###############################################################################
 ###############################################################################

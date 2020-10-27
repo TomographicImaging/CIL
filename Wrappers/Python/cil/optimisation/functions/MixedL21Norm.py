@@ -21,8 +21,8 @@ from __future__ import division
 from __future__ import print_function
 
 
-from ccpi.optimisation.functions import Function
-from ccpi.framework import BlockDataContainer
+from cil.optimisation.functions import Function
+from cil.framework import BlockDataContainer
 import numpy as np
 
 

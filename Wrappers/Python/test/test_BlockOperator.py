@@ -16,12 +16,12 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 import unittest
-from ccpi.optimisation.operators import BlockOperator
-from ccpi.framework import BlockDataContainer
-from ccpi.optimisation.operators import Identity
-from ccpi.framework import ImageGeometry, ImageData
+from cil.optimisation.operators import BlockOperator
+from cil.framework import BlockDataContainer
+from cil.optimisation.operators import Identity
+from cil.framework import ImageGeometry, ImageData
 import numpy
-from ccpi.optimisation.operators import FiniteDifferenceOperator
+from cil.optimisation.operators import FiniteDifferenceOperator
 
 
 class TestBlockOperator(unittest.TestCase):
@@ -174,14 +174,14 @@ class TestBlockOperator(unittest.TestCase):
         numpy.testing.assert_array_equal(y.as_array(), img.as_array())
 
     def skiptest_CGLS_tikhonov(self):
-        from ccpi.optimisation.algorithms import CGLS
+        from cil.optimisation.algorithms import CGLS
 
-        from ccpi.plugins.ops import CCPiProjectorSimple
-        from ccpi.optimisation.ops import PowerMethodNonsquare
-        from ccpi.optimisation.operators import Identity
-        from ccpi.optimisation.funcs import Norm2sq, Norm1
-        from ccpi.framework import ImageGeometry, AcquisitionGeometry
-        from ccpi.optimisation.Algorithms import GD
+        from cil.plugins.ops import CCPiProjectorSimple
+        from cil.optimisation.ops import PowerMethodNonsquare
+        from cil.optimisation.operators import Identity
+        from cil.optimisation.funcs import Norm2sq, Norm1
+        from cil.framework import ImageGeometry, AcquisitionGeometry
+        from cil.optimisation.Algorithms import GD
         #from ccpi.optimisation.Algorithms import CGLS
         import matplotlib.pyplot as plt
 

@@ -20,7 +20,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from ccpi.optimisation.functions import Function
+from cil.optimisation.functions import Function
 import numpy
 
 class IndicatorBox(Function):
@@ -103,7 +103,7 @@ class IndicatorBox(Function):
             
 if __name__ == '__main__':  
 
-    from ccpi.framework import ImageGeometry, BlockDataContainer
+    from cil.framework import ImageGeometry, BlockDataContainer
 
     N, M = 2,3
     ig = ImageGeometry(voxel_num_x = N, voxel_num_y = M)            

@@ -20,31 +20,31 @@ from __future__ import division
 import unittest
 import numpy
 import numpy as np
-from ccpi.framework import DataContainer
-from ccpi.framework import ImageData
-from ccpi.framework import AcquisitionData
-from ccpi.framework import ImageGeometry
-from ccpi.framework import AcquisitionGeometry
-from ccpi.optimisation.operators import Identity
-from ccpi.optimisation.functions import LeastSquares, ZeroFunction, \
+from cil.framework import DataContainer
+from cil.framework import ImageData
+from cil.framework import AcquisitionData
+from cil.framework import ImageGeometry
+from cil.framework import AcquisitionGeometry
+from cil.optimisation.operators import Identity
+from cil.optimisation.functions import LeastSquares, ZeroFunction, \
    L2NormSquared, FunctionOperatorComposition
-from ccpi.optimisation.algorithms import GD
-from ccpi.optimisation.algorithms import CGLS
-from ccpi.optimisation.algorithms import SIRT
-from ccpi.optimisation.algorithms import FISTA
-from ccpi.optimisation.algorithms import Algorithm
+from cil.optimisation.algorithms import GD
+from cil.optimisation.algorithms import CGLS
+from cil.optimisation.algorithms import SIRT
+from cil.optimisation.algorithms import FISTA
+from cil.optimisation.algorithms import Algorithm
 
-from ccpi.optimisation.algorithms import PDHG
+from cil.optimisation.algorithms import PDHG
 
-from ccpi.optimisation.operators import Gradient, BlockOperator, FiniteDifferenceOperator
-from ccpi.optimisation.functions import MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler                     
-from ccpi.utilities import dataexample
-from ccpi.utilities import noise as applynoise
+from cil.optimisation.operators import Gradient, BlockOperator, FiniteDifferenceOperator
+from cil.optimisation.functions import MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler                     
+from cil.utilities import dataexample
+from cil.utilities import noise as applynoise
 import os, sys, time
 
 
 try:
-    from ccpi.astra.operators import AstraProjectorSimple
+    from cil.astra.operators import AstraProjectorSimple
     astra_not_available = False    
 except ImportError as ie:
     # skip test
@@ -125,8 +125,8 @@ class TestAlgorithms(unittest.TestCase):
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
     def test_GDArmijo2(self):
-        from ccpi.optimisation.functions import Rosenbrock
-        from ccpi.framework import VectorData, VectorGeometry
+        from cil.optimisation.functions import Rosenbrock
+        from cil.framework import VectorData, VectorGeometry
 
         f = Rosenbrock (alpha = 1., beta=100.)
         vg = VectorGeometry(2)
@@ -463,15 +463,15 @@ class TestSIRT(unittest.TestCase):
     
 class TestSPDHG(unittest.TestCase):
 
-    @unittest.skipIf(astra_not_available, "ccpi-astra not available")
+    @unittest.skipIf(astra_not_available, "cil-astra not available")
     def test_SPDHG_vs_PDHG_implicit(self):
-        from ccpi.astra.operators import AstraProjectorSimple
-        from ccpi.framework import BlockDataContainer, AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
-        from ccpi.optimisation.operators import BlockOperator, Gradient
-        from ccpi.optimisation.functions import BlockFunction, KullbackLeibler, MixedL21Norm, IndicatorBox
-        from ccpi.optimisation.algorithms import SPDHG, PDHG
+        from cil.astra.operators import AstraProjectorSimple
+        from cil.framework import BlockDataContainer, AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
+        from cil.optimisation.operators import BlockOperator, Gradient
+        from cil.optimisation.functions import BlockFunction, KullbackLeibler, MixedL21Norm, IndicatorBox
+        from cil.optimisation.algorithms import SPDHG, PDHG
         # Fast Gradient Projection algorithm for Total Variation(TV)
-        from ccpi.optimisation.functions import TotalVariation
+        from cil.optimisation.functions import TotalVariation
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
         ig = data.geometry
         ig.voxel_size_x = 0.1
@@ -548,7 +548,7 @@ class TestSPDHG(unittest.TestCase):
                     max_iteration = 1000,
                     update_objective_interval=200, prob = prob)
         spdhg.run(1000, very_verbose = True)
-        from ccpi.utilities.quality_measures import mae, mse, psnr
+        from cil.utilities.quality_measures import mae, mse, psnr
         qm = (mae(spdhg.get_output(), pdhg.get_output()),
             mse(spdhg.get_output(), pdhg.get_output()),
             psnr(spdhg.get_output(), pdhg.get_output())
@@ -562,11 +562,11 @@ class TestSPDHG(unittest.TestCase):
         
     @unittest.skipIf(astra_not_available, "ccpi-astra not available")
     def test_SPDHG_vs_PDHG_explicit(self):
-        from ccpi.astra.operators import AstraProjectorSimple
-        from ccpi.framework import BlockDataContainer, AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
-        from ccpi.optimisation.operators import BlockOperator, Gradient
-        from ccpi.optimisation.functions import BlockFunction, KullbackLeibler, MixedL21Norm, IndicatorBox
-        from ccpi.optimisation.algorithms import SPDHG, PDHG
+        from cil.astra.operators import AstraProjectorSimple
+        from cil.framework import BlockDataContainer, AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
+        from cil.optimisation.operators import BlockOperator, Gradient
+        from cil.optimisation.functions import BlockFunction, KullbackLeibler, MixedL21Norm, IndicatorBox
+        from cil.optimisation.algorithms import SPDHG, PDHG
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
         print ("here")
         ig = data.geometry
@@ -653,7 +653,7 @@ class TestSPDHG(unittest.TestCase):
         # plt.colorbar()
         # plt.show()
 
-        from ccpi.utilities.quality_measures import mae, mse, psnr
+        from cil.utilities.quality_measures import mae, mse, psnr
         qm = (mae(spdhg.get_output(), pdhg.get_output()),
             mse(spdhg.get_output(), pdhg.get_output()),
             psnr(spdhg.get_output(), pdhg.get_output())
@@ -666,11 +666,11 @@ class TestSPDHG(unittest.TestCase):
     
     @unittest.skipIf(astra_not_available, "ccpi-astra not available")
     def test_SPDHG_vs_SPDHG_explicit_axpby(self):
-        from ccpi.astra.operators import AstraProjectorSimple
-        from ccpi.framework import BlockDataContainer, AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
-        from ccpi.optimisation.operators import BlockOperator, Gradient
-        from ccpi.optimisation.functions import BlockFunction, KullbackLeibler, MixedL21Norm, IndicatorBox
-        from ccpi.optimisation.algorithms import SPDHG, PDHG
+        from cil.astra.operators import AstraProjectorSimple
+        from cil.framework import BlockDataContainer, AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
+        from cil.optimisation.operators import BlockOperator, Gradient
+        from cil.optimisation.functions import BlockFunction, KullbackLeibler, MixedL21Norm, IndicatorBox
+        from cil.optimisation.algorithms import SPDHG, PDHG
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
         print ("test_SPDHG_vs_SPDHG_explicit_axpby here")
         ig = data.geometry
@@ -745,7 +745,7 @@ class TestSPDHG(unittest.TestCase):
         
 
         # np.testing.assert_array_almost_equal(algos[0].get_output().as_array(), algos[1].get_output().as_array())
-        from ccpi.utilities.quality_measures import mae, mse, psnr
+        from cil.utilities.quality_measures import mae, mse, psnr
         qm = (mae(algos[0].get_output(), algos[1].get_output()),
             mse(algos[0].get_output(), algos[1].get_output()),
             psnr(algos[0].get_output(), algos[1].get_output())
@@ -758,11 +758,11 @@ class TestSPDHG(unittest.TestCase):
     
     @unittest.skipIf(astra_not_available, "ccpi-astra not available")
     def test_PDHG_vs_PDHG_explicit_axpby(self):
-        from ccpi.astra.operators import AstraProjectorSimple
-        from ccpi.framework import BlockDataContainer, AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
-        from ccpi.optimisation.operators import BlockOperator, Gradient
-        from ccpi.optimisation.functions import BlockFunction, KullbackLeibler, MixedL21Norm, IndicatorBox
-        from ccpi.optimisation.algorithms import PDHG
+        from cil.astra.operators import AstraProjectorSimple
+        from cil.framework import BlockDataContainer, AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
+        from cil.optimisation.operators import BlockOperator, Gradient
+        from cil.optimisation.functions import BlockFunction, KullbackLeibler, MixedL21Norm, IndicatorBox
+        from cil.optimisation.algorithms import PDHG
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
         print ("test_PDHG_vs_PDHG_explicit_axpby here")
         ig = data.geometry
@@ -824,7 +824,7 @@ class TestSPDHG(unittest.TestCase):
         algos[1].run(1000, very_verbose = True)
         
 
-        from ccpi.utilities.quality_measures import mae, mse, psnr
+        from cil.utilities.quality_measures import mae, mse, psnr
         qm = (mae(algos[0].get_output(), algos[1].get_output()),
             mse(algos[0].get_output(), algos[1].get_output()),
             psnr(algos[0].get_output(), algos[1].get_output())

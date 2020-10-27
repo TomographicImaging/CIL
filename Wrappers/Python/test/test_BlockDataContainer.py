@@ -20,12 +20,12 @@ from __future__ import division
 
 import unittest
 import numpy
-from ccpi.framework import ImageGeometry, AcquisitionGeometry
-from ccpi.framework import ImageData, AcquisitionData
-from ccpi.framework import BlockDataContainer, DataContainer
+from cil.framework import ImageGeometry, AcquisitionGeometry
+from cil.framework import ImageData, AcquisitionData
+from cil.framework import BlockDataContainer, DataContainer
 import functools
 
-from ccpi.optimisation.operators import Gradient, Identity, BlockOperator
+from cil.optimisation.operators import Gradient, Identity, BlockOperator
 class BDCUnittest(unittest.TestCase):
     def assertBlockDataContainerEqual(self, container1, container2):
         print ("assert Block Data Container Equal")

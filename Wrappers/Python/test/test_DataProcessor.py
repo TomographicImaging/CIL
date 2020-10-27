@@ -20,18 +20,18 @@ from __future__ import division
 import sys
 import unittest
 import numpy
-from ccpi.framework import DataProcessor
-from ccpi.framework import DataContainer
-from ccpi.framework import ImageData
-from ccpi.framework import AcquisitionData
-from ccpi.framework import ImageGeometry
-from ccpi.framework import AcquisitionGeometry
+from cil.framework import DataProcessor
+from cil.framework import DataContainer
+from cil.framework import ImageData
+from cil.framework import AcquisitionData
+from cil.framework import ImageGeometry
+from cil.framework import AcquisitionGeometry
 from timeit import default_timer as timer
 
-from ccpi.framework import AX, CastDataContainer, PixelByPixelDataProcessor
+from cil.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 
-from ccpi.io.reader import NexusReader
-from ccpi.processors import CenterOfRotationFinder
+from cil.io.reader import NexusReader
+from cil.processors import CenterOfRotationFinder
 import wget
 import os
 

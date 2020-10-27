@@ -19,9 +19,9 @@ from __future__ import division
 
 import unittest
 import os
-from ccpi.io import NEXUSDataReader
-from ccpi.io import NEXUSDataWriter
-from ccpi.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
+from cil.io import NEXUSDataReader
+from cil.io import NEXUSDataWriter
+from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
 import numpy
     
 

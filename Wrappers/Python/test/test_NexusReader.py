@@ -24,7 +24,7 @@ try:
 except ImportError as ie:
     has_wget = False
 import os
-from ccpi.io.reader import NexusReader
+from cil.io.reader import NexusReader
 import numpy
 
 

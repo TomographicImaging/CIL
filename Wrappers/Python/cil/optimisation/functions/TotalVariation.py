@@ -20,8 +20,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from ccpi.optimisation.functions import Function, MixedL21Norm, IndicatorBox
-from ccpi.optimisation.operators import Gradient
+from cil.optimisation.functions import Function, MixedL21Norm, IndicatorBox
+from cil.optimisation.operators import Gradient
 import numpy 
 import functools
 import numpy as np
@@ -258,17 +258,17 @@ if __name__ == '__main__':
     
     import numpy as np                         
     import matplotlib.pyplot as plt
-    from ccpi.utilities import dataexample
+    from cil.utilities import dataexample
     import os
     import sys
-    from ccpi.plugins.regularisers import FGP_TV as CCPiReg_FGP_TV
-    from ccpi.filters import regularisers    
+    from cil.plugins.regularisers import FGP_TV as CCPiReg_FGP_TV
+    from cil.filters import regularisers    
     from timeit import default_timer as timer       
     import tomophantom
     from tomophantom import TomoP3D
-    from ccpi.framework import ImageGeometry
-    from ccpi.utilities.quality_measures import mae
-    from ccpi.utilities.display import show
+    from cil.framework import ImageGeometry
+    from cil.utilities.quality_measures import mae
+    from cil.utilities.display import show
     
         
     ###################################################################
@@ -492,7 +492,7 @@ if __name__ == '__main__':
 #         raise ValueError ("2 solutions are not the same")      
             
        
-    loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
+    loader = TestData(data_dir=os.path.join(sys.prefix, 'share','cil'))
     data = loader.load(TestData.PEPPERS, size=(256,256))
     ig = data.geometry
     ag = ig

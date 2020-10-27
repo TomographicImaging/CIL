@@ -22,7 +22,7 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy
-from ccpi.optimisation.functions import Function
+from cil.optimisation.functions import Function
 
 import functools
 import scipy.special
@@ -272,7 +272,7 @@ class KullbackLeibler(Function):
 
 if __name__ == '__main__':
     
-    from ccpi.framework import ImageGeometry
+    from cil.framework import ImageGeometry
     import numpy as np
     
     M, N, K =  30, 30, 20

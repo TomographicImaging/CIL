@@ -23,8 +23,8 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from ccpi.optimisation.functions import Function
-from ccpi.optimisation.operators import Operator, ScaledOperator
+from cil.optimisation.functions import Function
+from cil.optimisation.operators import Operator, ScaledOperator
 
 import warnings
 

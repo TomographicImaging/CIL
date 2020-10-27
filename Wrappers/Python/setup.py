@@ -27,33 +27,22 @@ if  cil_version == '':
     sys.exit(1)
 
 setup(
-    name="ccpi-framework",
+    name="cil",
     version=cil_version,
-    packages=['ccpi' , 'ccpi.io',
-              'ccpi.framework', 'ccpi.optimisation',
-              'ccpi.optimisation.functions',
-              'ccpi.optimisation.algorithms',
-              'ccpi.optimisation.operators',
-              'ccpi.processors',
-              'ccpi.utilities', 'ccpi.utilities.jupyter'],
-    data_files = [('share/ccpi', ['data/boat.tiff',
+    packages=['cil' , 'cil.io',
+              'cil.framework', 'cil.optimisation',
+              'cil.optimisation.functions',
+              'cil.optimisation.algorithms',
+              'cil.optimisation.operators',
+              'cil.processors',
+              'cil.utilities', 'cil.utilities.jupyter'],
+    data_files = [('share/cil', ['data/boat.tiff',
                                   'data/peppers.tiff',
                                   'data/camera.png',
                                   'data/resolution_chart.tiff',
                                   'data/shapes.png',
                                   'data/24737_fd_normalised.nxs'])],
 
-    # Project uses reStructuredText, so ensure that the docutils get
-    # installed or upgraded on the target machine
-    #install_requires=['docutils>=0.3'],
-
-#    package_data={
-#        # If any package contains *.txt or *.rst files, include them:
-#        '': ['*.txt', '*.rst'],
-#        # And include any *.msg files found in the 'hello' package, too:
-#        'hello': ['*.msg'],
-#    },
-    # zip_safe = False,
 
     # metadata for upload to PyPI
     author="CCPi developers",
@@ -62,7 +51,5 @@ setup(
     description='CCPi Core Imaging Library - Python Framework Module',
     license="Apache v2.0",
     keywords="Python Framework",
-    url="http://www.ccpi.ac.uk",   # project home page, if any
-
-    # could also include long_description, download_url, classifiers, etc.
+    url="http://www.ccpi.ac.uk/cil",
 )

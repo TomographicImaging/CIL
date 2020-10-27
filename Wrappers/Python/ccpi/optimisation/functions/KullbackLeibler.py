@@ -23,7 +23,7 @@ from __future__ import print_function
 
 import numpy
 from ccpi.optimisation.functions import Function
-
+from numbers import Number
 import functools
 import scipy.special
 try:
@@ -294,12 +294,20 @@ class KullbackLeibler(Function):
                 out = (x * 0.)
                 # out_np = numpy.empty_like(out.as_array(), dtype=numpy.float64)
                 out_np = out.as_array()
-                kl_proximal(x.as_array(), self.b_np, tau, out_np, self.eta_np)
+                if isinstance(tau, Number):
+                    kl_proximal(x.as_array(), self.b_np, tau, out_np, self.eta_np)
+                else:
+                    # it should be a DataContainer
+                    kl_proximal(x.as_array(), self.b_np, tau.as_array(), out_np, self.eta_np)
                 out.fill(out_np)
                 return out
             else:
                 out_np = out.as_array()
-                kl_proximal(x.as_array(), self.b_np, tau, out_np, self.eta_np)
+                if isinstance(tau, Number):
+                    kl_proximal(x.as_array(), self.b_np, tau, out_np, self.eta_np)
+                else:
+                    # it should be a DataContainer
+                    kl_proximal(x.as_array(), self.b_np, tau.as_array(), out_np, self.eta_np)
                 out.fill(out_np)                    
         else:
             if out is None:        
@@ -328,12 +336,18 @@ class KullbackLeibler(Function):
                 out = (x * 0.)
                 # out_np = numpy.empty(out.shape, dtype=numpy.float64)
                 out_np = out.as_array()
-                kl_proximal_conjugate(x.as_array(), self.b_np, self.eta_np, tau, out_np)
+                if isinstance(tau, Number):
+                    kl_proximal_conjugate(x.as_array(), self.b_np, self.eta_np, tau, out_np)
+                else:
+                    kl_proximal_conjugate(x.as_array(), self.b_np, self.eta_np, tau.as_array(), out_np)
                 out.fill(out_np)
                 return out
             else:
                 out_np = out.as_array()
-                kl_proximal_conjugate(x.as_array(), self.b_np, self.eta_np, tau, out_np)
+                if isinstance(tau, Number):
+                    kl_proximal_conjugate(x.as_array(), self.b_np, self.eta_np, tau, out_np)
+                else:
+                    kl_proximal_conjugate(x.as_array(), self.b_np, self.eta_np, tau.as_array(), out_np)
                 out.fill(out_np)                    
         else:
             if out is None:

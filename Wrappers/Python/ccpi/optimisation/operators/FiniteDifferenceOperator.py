@@ -39,9 +39,17 @@ class FiniteDifferenceOperator(LinearOperator):
                        range_geometry=None, 
                        direction=0, 
                        method = 'forward',
-                       bnd_cond = 'Neumann'):
+                       bnd_cond = 'Neumann', **kwargs):
+                        
+        self.label = kwargs.get("label", None)
         
-        self.direction = direction
+        if self.label is None:
+            self.direction = direction
+        else:       
+            if self.label not in domain_geometry.dimension_labels:
+                raise ValueError('Requested label is not possible. Accepted label names {}, \ngot {}'.format(domain_geometry.dimension_labels, self.label))                    
+            self.direction = domain_geometry.dimension_labels.index(self.label)
+                   
         self.voxel_size = domain_geometry.spacing[self.direction]
         self.boundary_condition = bnd_cond
         self.method = method
@@ -348,4 +356,5 @@ class FiniteDifferenceOperator(LinearOperator):
             
         if outnone:                  
             ret.fill(outa)
-            return ret       
+            return ret    
+        

@@ -270,6 +270,55 @@ class TestOperator(CCPiTestClass):
         w = G.direct(u)
         self.assertBlockDataContainerEqual(res, w)
         
+        # 2D       
+        M, N = 2, 3
+        ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N, voxel_size_x=0.1, voxel_size_y=0.4)
+        x = ig.allocate('random')
+                
+        for i in range(2):
+            FD1 = FiniteDifferenceOperator(ig, direction=i)    
+            res1 = FD1.direct(x)
+            res1b = FD1.adjoint(x)
+            
+            if i==0:
+                label="horizontal_y"
+            else: 
+                label="horizontal_x"
+                
+            FD2 = FiniteDifferenceOperator(ig, label=label)    
+            res2 = FD2.direct(x)
+            res2b = FD2.adjoint(x) 
+            
+            numpy.testing.assert_almost_equal(res1.as_array(), res2.as_array())
+            numpy.testing.assert_almost_equal(res1b.as_array(), res2b.as_array())
+            print("Check 2D FiniteDiff for label {}".format(label))
+        
+        # 2D  + chan     
+        M, N, K = 2,3,4
+        ig1 = ImageGeometry(voxel_num_x=M, voxel_num_y=N, channels=K, voxel_size_x=0.1, voxel_size_y=0.4)
+        print(ig1.dimension_labels)
+        x = ig1.allocate('random')
+        
+        for i in range(3):
+            FD1 = FiniteDifferenceOperator(ig1, direction=i)    
+            res1 = FD1.direct(x)
+            res1b = FD1.adjoint(x)
+            
+            if i==0:
+                label="channel"
+            elif i==1:
+                label="horizontal_y"
+            else: 
+                label="horizontal_x"
+                
+            FD2 = FiniteDifferenceOperator(ig1, label=label)    
+            res2 = FD2.direct(x)
+            res2b = FD2.adjoint(x) 
+            
+            numpy.testing.assert_almost_equal(res1.as_array(), res2.as_array())
+            numpy.testing.assert_almost_equal(res1b.as_array(), res2b.as_array()) 
+            print("Check for 2D chan for FiniteDiff label {}".format(label))        
+        
     def test_PowerMethod(self):
         print ("test_BlockOperator")
         

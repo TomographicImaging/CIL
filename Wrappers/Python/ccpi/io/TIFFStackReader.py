@@ -36,43 +36,45 @@ class TIFFStackReader(object):
     
     def __init__(self, 
                  **kwargs):
-        '''
-        Constructor
+        ''' 
+        Basic TIFF redaer which loops through all riff files in a specific 
+        folder and load them in alphabetic order
         
-        Input:
+        Parameters
+        ----------
             
-            path            path to tiff files
+        path: str containing path to folder with tiff files
             
-            roi             roi to load specified as a dictionary
-                            {'axis_0': (start, end, step), 
-                             'axis_1': (start, end, step), 
-                             'axis_2': (start, end, step)}
-                            Files are stacked along axis_0. axis_1 and axis_2 correspond
-                            to row and column dimensions, respectively.
-                            Files are stacked in alphabetic order. 
-                            To skip files or to change number of files to load, 
-                            adjust axis_0. For instance, 'axis_0': (100, 300)
-                            will skip first 100 files and will load 200 files.
-                            'axis_0': -1 is a shortcut to load all elements along axis.
-                            Start and end can be specified as None which is equivalent 
-                            to start = 0 and end = load everything to the end, respectively.
-                            Start and end also can be negative.
-                            Notes: roi is specified for axes before transpose.
+        roi: dictionary with roi to load 
+                {'axis_0': (start, end, step), 
+                 'axis_1': (start, end, step), 
+                 'axis_2': (start, end, step)}
+                Files are stacked along axis_0. axis_1 and axis_2 correspond
+                to row and column dimensions, respectively.
+                Files are stacked in alphabetic order. 
+                To skip files or to change number of files to load, 
+                adjust axis_0. For instance, 'axis_0': (100, 300)
+                will skip first 100 files and will load 200 files.
+                'axis_0': -1 is a shortcut to load all elements along axis.
+                Start and end can be specified as None which is equivalent 
+                to start = 0 and end = load everything to the end, respectively.
+                Start and end also can be negative.
+                Notes: roi is specified for axes before transpose.
             
-            transpose       Transpose loaded images, default False
+        transpose: bool, transpose loaded images, default False
             
-            mode            'bin' (default) or 'slice'. In bin mode, 'step' number
-                            of pixels is binned together, values of resulting binned
-                            pixels are calculated as average. 
-                            In 'slice' mode 'step' defines standard numpy slicing.
-                            Note: in general 
-                            output array size in bin mode != output array size in slice mode
+        mode: str, 'bin' (default) or 'slice'. In bin mode, 'step' number
+                of pixels is binned together, values of resulting binned
+                pixels are calculated as average. 
+                In 'slice' mode 'step' defines standard numpy slicing.
+                Note: in general 
+                output array size in bin mode != output array size in slice mode
         
-        Output:
+        Returns
+        -------
             
             numpy array with stack of images
             
-                    
         '''
         
         self.path = kwargs.get('path', None)

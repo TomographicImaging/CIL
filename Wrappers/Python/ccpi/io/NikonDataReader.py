@@ -30,41 +30,48 @@ class NikonDataReader(object):
     
     def __init__(self, 
                  **kwargs):
-        '''
-        Constructor
+        '''Basic reader for xtekct files
         
-        Input:
+        Parameters
+        ----------
+
             
-            xtek_file       full path to .xtexct file
+        xtek_file: str with full path to .xtexct file
             
-            roi             roi to load specified as a dictionary
-                            {'angle': (start, end, step), 
-                             'horizontal': (start, end, step), 
-                             'vertical': (start, end, step)}
-                            Files are stacked along axis_0. axis_1 and axis_2 correspond
-                            to row and column dimensions, respectively.
-                            Files are stacked in alphabetic order. 
-                            To skip files or to change number of files to load, 
-                            adjust 'angle'. For instance, 'angle': (100, 300)
-                            will skip first 100 files and will load 200 files.
-                            'angle': -1 is a shortcut to load all elements along axis.
-                            Start and end can be specified as None which is equivalent 
-                            to start = 0 and end = load everything to the end, respectively.
-                            Start and end also can be negative.
+        roi: dictionary with roi to load 
+                {'angle': (start, end, step), 
+                 'horizontal': (start, end, step), 
+                 'vertical': (start, end, step)}
+                Files are stacked along axis_0. axis_1 and axis_2 correspond
+                to row and column dimensions, respectively.
+                Files are stacked in alphabetic order. 
+                To skip projections or to change number of projections to load, 
+                adjust 'angle'. For instance, 'angle': (100, 300)
+                will skip first 100 projections and will load 200 projections.
+                'angle': -1 is a shortcut to load all elements along axis.
+                Start and end can be specified as None which is equivalent 
+                to start = 0 and end = load everything to the end, respectively.
+                Start and end also can be negative.
             
-            normalize       normalize loaded projections by detector 
-                            white level (I_0). Default value is False, 
-                            i.e. no normalization.
+        normalize: bool, norrmalize loaded projections by detector 
+                white level (I_0). Default value is False, i.e. no normalization.
                             
-            fliplr          default = False, flip projections in the left-right direction
-                            (about vertical axis)
+        fliplr: bool, default = False, flip projections in the left-right direction
+                (about vertical axis)
                             
-            mode            'bin' (default) or 'slice'. In bin mode, 'step' number
-                            of pixels is binned together, values of resulting binned
-                            pixels are calculated as average. 
-                            In 'slice' mode 'step' defines standard numpy slicing.
-                            Note: in general 
-                            output array size in bin mode != output array size in slice mode
+        mode: str, 'bin' (default) or 'slice'. In bin mode, 'step' number
+                of pixels is binned together, values of resulting binned
+                pixels are calculated as average. 
+                In 'slice' mode 'step' defines standard numpy slicing.
+                Note: in general 
+                output array size in bin mode != output array size in slice mode
+        
+        Output
+        ------
+        
+        Acquisition data with corresponding geomrtry, arranged as ['angle', horizontal'] 
+        if a single slice is loaded and ['vertical, 'angle', horizontal'] 
+        if more than 1 slices are loaded.
                     
         '''
         
@@ -213,7 +220,7 @@ class NikonDataReader(object):
             for line in content[3:]:
                 angles[index] = float(line.split(' ')[1])
                 index += 1
-            angles = angles + initial_angle
+            angles = angles
         
         # look for ang file
         elif os.path.exists(angles_named_file):
@@ -225,10 +232,10 @@ class NikonDataReader(object):
             for line in content[1:]:
                 angles[index] = float(line.split(':')[1])
                 index += 1
-            angles = numpy.flipud(angles + initial_angle) # angles are in the reverse order
+            angles = numpy.flipud(angles) # angles are in the reverse order
             
         else:   # calculate angles based on xtek file
-            angles = numpy.asarray( [ initial_angle + angular_step * proj for proj in range(num_projections) ] , dtype=numpy.float32)
+            angles = numpy.asarray( [ angular_step * proj for proj in range(num_projections) ] , dtype=numpy.float32)
         
         if self.mode == 'bin':
             n_elem = (self._roi_par[0][1] - self._roi_par[0][0]) // self._roi_par[0][2]
@@ -237,29 +244,17 @@ class NikonDataReader(object):
         else:
             angles = angles[slice(self._roi_par[0][0], self._roi_par[0][1], self._roi_par[0][2])]
         
-        if pixel_num_v > 1:
-            # fill in metadata
-            self._ag = AcquisitionGeometry(geom_type = 'cone', 
-                                           dimension = '3D', 
-                                           angles = angles, 
-                                           pixel_num_h = pixel_num_h, 
-                                           pixel_size_h = pixel_size_h, 
-                                           pixel_num_v = pixel_num_v, 
-                                           pixel_size_v = pixel_size_v, 
-                                           dist_source_center = source_x, 
-                                           dist_center_detector = detector_x - source_x, 
-                                           channels = 1,
-                                           angle_unit = 'degree')
-        else:
-            self._ag = AcquisitionGeometry(geom_type = 'cone', 
-                                           dimension = '2D', 
-                                           angles = angles, 
-                                           pixel_num_h = pixel_num_h, 
-                                           pixel_size_h = pixel_size_h,
-                                           dist_source_center = source_x, 
-                                           dist_center_detector = detector_x - source_x, 
-                                           channels = 1,
-                                           angle_unit = 'degree')
+
+        self._ag = AcquisitionGeometry.create_Cone3D(source_position=[0, 0, 0],
+                                                     rotation_axis_position=[0, detector_x - source_x, 0],
+                                                     detector_position=[0, detector_x, 0])
+        self._ag.set_angles(angles, 
+                            angle_unit='degree', 
+                            initial_angle=initial_angle)
+        
+        self._ag.set_panel((pixel_num_h, pixel_num_v),
+                           pixel_size=(pixel_size_h, pixel_size_v))
+
                 
 
     def get_geometry(self):
@@ -288,18 +283,12 @@ class NikonDataReader(object):
                       mode = self.mode)
 
         data = reader.load_images()
-
-#        # sanity check
-#        if (data.shape[0] != num_projections or\
-#            data.shape[1] != self._ag.pixel_num_v or \
-#            data.shape[2] != self._ag.pixel_num_h):
-#            raise Exception("Something went wrong. Geometry and data dimensions do not match.")
               
         if (self.normalize):
             data /= self._white_level
             data[data > 1] = 1
 
-        if self._ag.pixel_num_v == 0:
+        if self._ag.pixel_num_v == 1:
             if self.fliplr:
                 return AcquisitionData(array = data[:, ::-1], 
                                        deep_copy = False,
@@ -314,40 +303,33 @@ class NikonDataReader(object):
                                                            'horizontal'])
         else:
             if self.fliplr:
-                return AcquisitionData(array = data[:, :, ::-1], 
+                return AcquisitionData(array = numpy.transpose(data[:, :, ::-1], (1, 0, 2)), 
                                        deep_copy = False,
                                        geometry = self._ag,
-                                       dimension_labels = ['angle', \
-                                                           'vertical', \
+                                       dimension_labels = ['vertical', \
+                                                           'angle', \
                                                            'horizontal'])
             else:
-                return AcquisitionData(array = data, 
+                return AcquisitionData(array = numpy.transpose(data, (1, 0, 2)),
                                        deep_copy = False,
                                        geometry = self._ag,
-                                       dimension_labels = ['angle', \
-                                                           'vertical', \
+                                       dimension_labels = ['vertical', \
+                                                           'angle', \
                                                            'horizontal'])
 
 
 '''
 # usage example
 from ccpi.io import NikonDataReader
-import matplotlib.pyplot as plt
 
-# usage example
 xtek_file = '/media/newhd/shared/Data/SophiaBeads/SophiaBeads_256_averaged/SophiaBeads_256_averaged.xtekct'
 reader = NikonDataReader()
 reader.set_up(xtek_file = xtek_file,
-              binning = {'horizontal': 8, 'vertical': 1},
-              roi = {'horizontal': (500,1500), 'vertical': (100,900)},
-              normalize = True,
-              fliplr = True)
+              roi = {'angle': (None, None, 1), 'vertical': (None, None, 5)},
+              mode = 'slice',
+              normalize=True)
 
 data = reader.load_projections()
-print(data)
+#print(data)
 ag = reader.get_geometry()
-print(ag)
-
-plt.imshow(data.as_array()[1, :, :])
-plt.show()
 '''

@@ -472,12 +472,9 @@ class TestSPDHG(unittest.TestCase):
         from ccpi.optimisation.algorithms import SPDHG, PDHG
         # Fast Gradient Projection algorithm for Total Variation(TV)
         from ccpi.optimisation.functions import TotalVariation
-<<<<<<< HEAD
-        loader = TestData()
-        data = loader.load(TestData.SIMPLE_PHANTOM_2D, size=(128,128))
-=======
+
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
->>>>>>> 6db70e486f8e3e78a51d02df78915f0cdcb64bfc
+
         ig = data.geometry
         ig.voxel_size_x = 0.1
         ig.voxel_size_y = 0.1
@@ -839,8 +836,6 @@ class TestSPDHG(unittest.TestCase):
         np.testing.assert_array_less( qm[1], 3e-05)
         
 
-<<<<<<< HEAD
-=======
 
 class PrintAlgo(Algorithm):
     def __init__(self, **kwargs):
@@ -882,4 +877,4 @@ class TestPrint(unittest.TestCase):
         print (algo.objective)
         np.testing.assert_array_equal([0, 10, 20, 30, 40, 50, 60, 70, 80], algo.iterations)
         np.testing.assert_array_equal([0, 100, 400, 900, 1600, 2500, 3600, 4900, 6400], algo.objective)
->>>>>>> 6db70e486f8e3e78a51d02df78915f0cdcb64bfc
+

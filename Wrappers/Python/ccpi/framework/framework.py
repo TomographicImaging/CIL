@@ -27,9 +27,8 @@ import warnings
 from functools import reduce
 from numbers import Number
 import ctypes, platform
-from ccpi.utilities import NUM_THREADS
 import math
-
+from ccpi.utilities.multiprocessing import NUM_THREADS
 # check for the extension
 if platform.system() == 'Linux':
     dll = 'libcilacc.so'
@@ -1873,49 +1872,70 @@ class DataContainer(object):
                 
                 cleaned = numpy.transpose(cleaned, axes).copy()
                 if cleaned.ndim > 1:
-                    return type(self)(cleaned , True, dimensions)
+                    return type(self)(cleaned , True, dimensions, suppress_warning=True)
                 else:
-                    return VectorData(cleaned)
+                    return VectorData(cleaned, dimension_labels=dimensions)
     
     def fill(self, array, **dimension):
-        '''fills the internal numpy array with the one provided
+        '''fills the internal data array with the DataContainer, numpy array or number provided
         
-        :param array: numpy array to copy into the DataContainer
-        :type array: DataContainer, numpy array or number
+        :param array: number, numpy array or DataContainer to copy into the DataContainer
+        :type array: DataContainer or subclasses, numpy array or number
         :param dimension: dictionary, optional
         
-        if the passed numpy array is the same, it just returns
+        if the passed numpy array points to the same array that is contained in the DataContainer,
+        it just returns
+
+        In case a DataContainer or subclass is passed, there will be a check of the geometry, 
+        if present, and the array will be resorted if the data is not in the appropriate order.
+
+        User may pass a named parameter to specify in which axis the fill should happen:
+
+        dc.fill(some_data, vertical=1, horizontal_x=32)
+        will copy the data in some_data into the data container.
         '''
         if id(array) == id(self.array):
             return
         if dimension == {}:
-            if issubclass(type(array), DataContainer) or\
-               issubclass(type(array), numpy.ndarray):
+            if isinstance(array, numpy.ndarray):
                 if array.shape != self.shape:
                     raise ValueError('Cannot fill with the provided array.' + \
                                      'Expecting {0} got {1}'.format(
                                      self.shape,array.shape))
-                if issubclass(type(array), DataContainer):
-                    numpy.copyto(self.array, array.array)
-                else:
-                    #self.array[:] = array
-                    numpy.copyto(self.array, array)
+                numpy.copyto(self.array, array)
+            elif isinstance(array, Number):
+                self.array.fill(array) 
+            elif issubclass(array.__class__ , DataContainer):
+                if hasattr(self, 'geometry') and hasattr(array, 'geometry'):
+                    if self.geometry != array.geometry:
+                        numpy.copyto(self.array, array.subset(dimensions=array.dimension_labels).as_array())
+                        return
+                numpy.copyto(self.array, array.as_array())
             else:
-                self.array.fill(array)
+                raise TypeError('Can fill only with number, numpy array or DataContainer and subclasses. Got {}'.format(type(array)))
         else:
+            inv_labels = {v: k for k, v in self.dimension_labels.items()}
+
+            axis = [':' for _ in self.dimension_labels.items()]
+            for k,v in dimension.items():
+                axis[inv_labels[k]] = v
             
             command = 'self.array['
             i = 0
-            for k,v in self.dimension_labels.items():
-                for dim_label, dim_value in dimension.items():    
-                    if dim_label == v:
-                        command = command + str(dim_value)
-                    else:
-                        command = command + ":"
-                if i < self.number_of_dimensions -1:
-                    command = command + ','
-                i += 1
-            command = command + "] = array[:]" 
+            for el in axis:
+                if i > 0:
+                    command += ','
+                command += str(el)
+                i+=1
+            
+            if isinstance(array, numpy.ndarray):
+                command = command + "] = array[:]" 
+            elif issubclass(array.__class__, DataContainer):
+                command = command + "] = array.as_array()[:]" 
+            elif isinstance (array, Number):
+                command = command + "] = array"
+            else:
+                raise TypeError('Can fill only with number, numpy array or DataContainer and subclasses. Got {}'.format(type(array)))
             exec(command)
             
         
@@ -1952,24 +1972,19 @@ class DataContainer(object):
     # __rmul__
     
     def __rdiv__(self, other):
-        return pow(self / other, -1)
+        tmp = self.power(-1)
+        tmp *= other
+        return tmp
     # __rdiv__
     def __rtruediv__(self, other):
         return self.__rdiv__(other)
     
     def __rpow__(self, other):
-        if isinstance(other, (int, float)) :
+        if isinstance(other, Number) :
             fother = numpy.ones(numpy.shape(self.array)) * other
             return type(self)(fother ** self.array , 
                            dimension_labels=self.dimension_labels,
                            geometry=self.geometry)
-        elif issubclass(type(other), DataContainer):
-            if self.check_dimensions(other):
-                return type(self)(other.as_array() ** self.array , 
-                           dimension_labels=self.dimension_labels,
-                           geometry=self.geometry)
-            else:
-                raise ValueError('Dimensions do not match')
     # __rpow__
     
     # in-place arithmetic operators:
@@ -2415,6 +2430,7 @@ class ImageData(DataContainer):
         if not kwargs.get('suppress_warning', False):
             warnings.warn('Direct invocation is deprecated and will be removed in following version. Use allocate from ImageGeometry instead',
                    DeprecationWarning, stacklevel=4)
+
         self.geometry = kwargs.get('geometry', None)
         dtype = kwargs.get('dtype', numpy.float32)
         if array is None:
@@ -2491,16 +2507,22 @@ class ImageData(DataContainer):
             geometry_new = self.geometry.subset(dimensions=dimensions, **kw)
         except ValueError:
             geometry_new = None
-
-        out = super(ImageData, self).subset(dimensions, **kw)
+        
+        out = DataContainer.subset(self, dimensions, **kw)
         dimension_labels = out.dimension_labels.copy()    
 
-        if geometry_new is None:                
-            return DataContainer(out.array, deep_copy=False, dimension_labels=dimension_labels)
+        if len(dimension_labels) == 1:
+            return out
         else:
-            return ImageData(out.array, deep_copy=False, geometry=geometry_new, dimension_labels=dimension_labels)
+            if geometry_new is None:                
+                return DataContainer(out.array, deep_copy=False, dimension_labels=dimension_labels,\
+                    suppress_warning=True)
+            else:
+                return ImageData(out.array, deep_copy=False, \
+                        geometry=geometry_new, dimension_labels=dimension_labels,\
+                        suppress_warning=True)
 
-
+        
     def get_shape_labels(self, geometry, dimension_labels=None):
         channels  = geometry.channels
         horiz_x   = geometry.voxel_num_x
@@ -2664,7 +2686,8 @@ class AcquisitionData(DataContainer):
             if w2  > 0.0001:
                 interpolate = True
 
-        out = super(AcquisitionData, self).subset(dimensions, **kw)
+        # out = super(AcquisitionData, self).subset(dimensions, **kw)
+        out = DataContainer.subset(self, dimensions, **kw)
 
         if interpolate == True:
             kw['vertical'] = centre_slice_floor + 1
@@ -2674,9 +2697,11 @@ class AcquisitionData(DataContainer):
         dimension_labels = out.dimension_labels.copy()    
 
         if geometry_new is None:                
-            return DataContainer(out.array, deep_copy=False, dimension_labels=dimension_labels)
+            return DataContainer(out.array, deep_copy=False, dimension_labels=dimension_labels,\
+                suppress_warning=True)
         else:
-            return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new, dimension_labels=dimension_labels)
+            return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new,\
+                dimension_labels=dimension_labels, suppress_warning=True)
 
 class DataProcessor(object):
     
@@ -2934,7 +2959,7 @@ class VectorData(DataContainer):
                 if len(array.shape) > 1:
                     raise ValueError('Incompatible size: expected 1D got {}'.format(array.shape))
                 out = array
-                self.geometry = VectorGeometry(array.shape[0])
+                self.geometry = VectorGeometry(array.shape[0], **kwargs)
                 self.length = self.geometry.length
         else:
             self.length = self.geometry.length
@@ -2948,7 +2973,7 @@ class VectorData(DataContainer):
                     raise ValueError('Incompatible size: expecting {} got {}'.format((self.length,), array.shape))
         deep_copy = True
         # need to pass the geometry, othewise None
-        super(VectorData, self).__init__(out, deep_copy, None, geometry = self.geometry)
+        super(VectorData, self).__init__(out, deep_copy, self.geometry.dimension_labels, geometry = self.geometry)
     
 
 class VectorGeometry(object):
@@ -2957,15 +2982,16 @@ class VectorGeometry(object):
     RANDOM_INT = 'random_int'
         
     def __init__(self, 
-                 length):
+                 length, **kwargs):
         
         self.length = length
         self.shape = (length, )
-        
+
+        self.dimension_labels = kwargs.get('dimension_labels', None)
         
     def clone(self):
         '''returns a copy of VectorGeometry'''
-        return VectorGeometry(self.length)
+        return copy.deepcopy(self)
     def copy(self):
         '''alias of clone'''
         return self.clone()
@@ -2994,5 +3020,3 @@ class VectorGeometry(object):
             else:
                 raise ValueError('Value {} unknown'.format(value))
         return out
-
-    

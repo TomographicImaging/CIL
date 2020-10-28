@@ -3,13 +3,15 @@ package:
   version: {{ environ['CIL_VERSION'] }}
 
 build:
+  skip: True # [py==38 and np==115]
   preserve_egg_dir: False
   script_env:
     - CIL_VERSION   
   #number: 0  
-  
+
 test:
   requires:
+    - {{ pin_compatible('numpy', min_pin='x.x', max_pin='x.x') }}
     - python-wget
     - cvxpy # [ unix and py36 and np115 ]
     - scikit-image
@@ -29,17 +31,15 @@ test:
     
 requirements:
   build:
-    - {{ pin_compatible('numpy', max_pin='x.x') }}
     - python
-    - numpy
+    - numpy {{ numpy }}
     - setuptools
     - cmake
     - openmp # [osx]
 
   run:
-    - {{ pin_compatible('numpy', max_pin='x.x') }}
     - python
-    - numpy
+    - {{ pin_compatible('numpy', min_pin='x.x', max_pin='x.x') }}
     - scipy
     - matplotlib
     - h5py

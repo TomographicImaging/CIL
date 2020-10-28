@@ -389,7 +389,7 @@ if __name__ == '__main__':
     
     from ccpi.framework import ImageGeometry
     from ccpi.optimisation.operators import Gradient, Identity, \
-                            SparseFiniteDiff, SymmetrizedGradient, ZeroOperator
+                            SparseFiniteDifferenceOperator, SymmetrizedGradient, ZeroOperator
 
         
     M, N = 4, 3
@@ -403,8 +403,8 @@ if __name__ == '__main__':
     
     print(B.sum_abs_row())
 #    
-    Gx = SparseFiniteDiff(ig, direction=1, bnd_cond='Neumann')
-    Gy = SparseFiniteDiff(ig, direction=0, bnd_cond='Neumann')
+    Gx = SparseFiniteDifferenceOperator(ig, direction=1, bnd_cond='Neumann')
+    Gy = SparseFiniteDifferenceOperator(ig, direction=0, bnd_cond='Neumann')
     
     d1 = abs(Gx.matrix()).toarray().sum(axis=0)
     d2 = abs(Gy.matrix()).toarray().sum(axis=0)

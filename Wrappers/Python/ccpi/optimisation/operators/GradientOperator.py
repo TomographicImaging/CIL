@@ -23,9 +23,11 @@ from __future__ import print_function
 from ccpi.optimisation.operators import LinearOperator
 from ccpi.optimisation.operators import FiniteDifferenceOperator
 from ccpi.framework import ImageGeometry, BlockGeometry
-from ccpi.utilities import NUM_THREADS
-
 import warnings
+<<<<<<< HEAD
+=======
+from ccpi.utilities.multiprocessing import NUM_THREADS
+>>>>>>> 6db70e486f8e3e78a51d02df78915f0cdcb64bfc
 
 NEUMANN = 'Neumann'
 PERIODIC = 'Periodic'

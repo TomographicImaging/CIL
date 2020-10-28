@@ -154,10 +154,10 @@ class NikonDataReader(object):
                 pixel_size_v_0 = float(line.split('=')[1])
             # source to center of rotation distance
             elif line.startswith("SrcToObject"):
-                source_x = float(line.split('=')[1])
+                source_to_rot = float(line.split('=')[1])
             # source to detector distance
             elif line.startswith("SrcToDetector"):
-                detector_x = float(line.split('=')[1])
+                source_to_det = float(line.split('=')[1])
             # initial angular position of a rotation stage
             elif line.startswith("InitialAngle"):
                 initial_angle = float(line.split('=')[1])
@@ -199,6 +199,13 @@ class NikonDataReader(object):
             pixel_num_h = numpy.int(numpy.ceil((self._roi_par[2][1] - self._roi_par[2][0]) / self._roi_par[2][2]))
             pixel_size_v = pixel_size_v_0
             pixel_size_h = pixel_size_h_0
+        
+        det_pos_h = self._roi_par[2][0] * pixel_size_h_0 + \
+                    (pixel_num_h+1) / 2 * pixel_size_h - \
+                    (pixel_num_h_0+1) / 2 * pixel_size_h_0
+        det_pos_v = self._roi_par[1][0] * pixel_size_v_0 + \
+                    (pixel_num_v+1) / 2 * pixel_size_v - \
+                    (pixel_num_v_0+1) / 2 * pixel_size_v_0
         
         '''
         Parse the angles file .ang or _ctdata.txt file and returns the angles
@@ -244,16 +251,25 @@ class NikonDataReader(object):
         else:
             angles = angles[slice(self._roi_par[0][0], self._roi_par[0][1], self._roi_par[0][2])]
         
-
-        self._ag = AcquisitionGeometry.create_Cone3D(source_position=[0, 0, 0],
-                                                     rotation_axis_position=[0, detector_x - source_x, 0],
-                                                     detector_position=[0, detector_x, 0])
-        self._ag.set_angles(angles, 
-                            angle_unit='degree', 
-                            initial_angle=initial_angle)
-        
-        self._ag.set_panel((pixel_num_h, pixel_num_v),
-                           pixel_size=(pixel_size_h, pixel_size_v))
+        if pixel_num_v == 1 and (self._roi_par[1][0]+self._roi_par[1][1]) // 2 == pixel_num_v_0 // 2:
+            self._ag = AcquisitionGeometry.create_Cone2D(source_position=[0, 0],
+                                                     rotation_axis_position=[0, source_to_rot],
+                                                     detector_position=[det_pos_h, source_to_det])
+            self._ag.set_angles(angles, 
+                                angle_unit='degree', 
+                                initial_angle=initial_angle)
+            
+            self._ag.set_panel(pixel_num_h, pixel_size=pixel_size_h)
+        else:
+            self._ag = AcquisitionGeometry.create_Cone3D(source_position=[0, 0, 0],
+                                                         rotation_axis_position=[0, source_to_rot, 0],
+                                                         detector_position=[det_pos_h, source_to_det, det_pos_v])
+            self._ag.set_angles(angles, 
+                                angle_unit='degree', 
+                                initial_angle=initial_angle)
+            
+            self._ag.set_panel((pixel_num_h, pixel_num_v),
+                               pixel_size=(pixel_size_h, pixel_size_v))
 
                 
 

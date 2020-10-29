@@ -17,8 +17,8 @@ test:
     - scikit-image
     - packaging
     - tomophantom
-    - ccpi-plugins
-    - ccpi-astra # [ unix ] 
+    # - ccpi-plugins
+    # - ccpi-astra # [ unix ] 
 
   source_files:
     - ./Wrappers/Python/test # [win]

@@ -35,21 +35,34 @@ from ccpi.optimisation.operators import LinearOperator
         
 class FiniteDifferenceOperator(LinearOperator):
     
+    r'''                  
+        Computes forward/backward/centered finite differences of a DataContainer 
+        under Neumann/Periodic boundary conditions
+        
+        :param domain_geometry: Domain geometry for the FiniteDifferenceOperator
+        :param direction: Direction to evaluate finite differences
+        :type direction: Label from Domain geometry or Number
+        :param method: Method for finite differences
+        :type method: 'forward', 'backward', 'centered'
+        :param bnd_cond: 'Neumann', 'Periodic'
+        
+     '''        
+    
     def __init__(self, domain_geometry, 
                        range_geometry=None, 
-                       direction=0, 
+                       direction = None, 
                        method = 'forward',
-                       bnd_cond = 'Neumann', **kwargs):
-                        
-        self.label = kwargs.get("label", None)
+                       bnd_cond = 'Neumann'):
         
-        if self.label is None:
-            self.direction = direction
-        else:       
-            if self.label not in domain_geometry.dimension_labels:
-                raise ValueError('Requested label is not possible. Accepted label names {}, \ngot {}'.format(domain_geometry.dimension_labels, self.label))                    
-            self.direction = domain_geometry.dimension_labels.index(self.label)
-                   
+        # direction accepts number or label of domain_geometry
+        if direction not in domain_geometry.dimension_labels:
+            if direction > len(domain_geometry.shape) or direction<0:
+                raise ValueError('Requested direction is not possible. Accepted direction {}, \ngot {}'.format(range(len(domain_geometry.shape)), direction))
+            else:
+                self.direction = direction
+        else:
+            self.direction = domain_geometry.dimension_labels.index(direction)
+                                                                       
         self.voxel_size = domain_geometry.spacing[self.direction]
         self.boundary_condition = bnd_cond
         self.method = method
@@ -358,3 +371,4 @@ class FiniteDifferenceOperator(LinearOperator):
             ret.fill(outa)
             return ret    
         
+

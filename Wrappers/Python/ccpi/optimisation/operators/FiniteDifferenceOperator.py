@@ -21,9 +21,6 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
-from numbers import Integral
-
-
 from ccpi.optimisation.operators import LinearOperator
 
 ###############################################################################
@@ -56,17 +53,18 @@ class FiniteDifferenceOperator(LinearOperator):
                        method = 'forward',
                        bnd_cond = 'Neumann'):
         
-        # direction accepts number or label of domain_geometry
-        if direction not in domain_geometry.dimension_labels:
-            if not isinstance(direction, Integral):
-                raise TypeError('Integer is required, got {}'.format(type(direction)))            
+        if isinstance(direction, int):
             if direction > len(domain_geometry.shape) or direction<0:
-                raise ValueError('Requested direction is not possible. Accepted direction {}, \ngot {}'.format(range(len(domain_geometry.shape)), direction))
+                raise ValueError('Requested direction is not possible. Accepted direction {}, \ngot {}'.format(range(len(domain_geometry.shape)), direction))            
             else:
                 self.direction = direction
         else:
-            self.direction = domain_geometry.dimension_labels.index(direction)
-                                                                       
+           if direction in domain_geometry.dimension_labels:              
+                self.direction = domain_geometry.dimension_labels.index(direction)
+           else:
+               raise ValueError('Requested direction is not possible. Accepted direction {}, \ngot {}'.format(domain_geometry.dimension_labels, direction))
+                         
+                                                                                                           
         self.voxel_size = domain_geometry.spacing[self.direction]
         self.boundary_condition = bnd_cond
         self.method = method
@@ -188,22 +186,22 @@ class FiniteDifferenceOperator(LinearOperator):
             outa[tuple(self.get_slice(1, -1))] /= 2.
             
             if self.boundary_condition == 'Neumann':
-            #                
-#                # left boundary
+                            
+                # left boundary
                 np.subtract( x_asarr[tuple(self.get_slice(1, 2))], \
                                  x_asarr[tuple(self.get_slice(0,1))], \
                                  out = outa[tuple(self.get_slice(0, 1))])  
                 outa[tuple(self.get_slice(0, 1))] /=2.
-#                
-#                # left boundary
+                
+                # left boundary
                 np.subtract( x_asarr[tuple(self.get_slice(-1, None))], \
                                  x_asarr[tuple(self.get_slice(-2,-1))], \
                                  out = outa[tuple(self.get_slice(-1, None))])
                 outa[tuple(self.get_slice(-1, None))] /=2.                
-#                
+                
             elif self.boundary_condition == 'Periodic':
                 pass
-#                
+                
                # left boundary
                 np.subtract( x_asarr[tuple(self.get_slice(1, 2))], \
                                  x_asarr[tuple(self.get_slice(-1,None))], \
@@ -376,3 +374,31 @@ class FiniteDifferenceOperator(LinearOperator):
             return ret    
         
 
+if __name__ == '__main__':
+    
+#    from ccpi.optimisation.operators import FiniteDifferenceOperator
+    from ccpi.framework import ImageGeometry
+      
+    M, N = 2, 3
+    ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N, voxel_size_x=0.1, voxel_size_y=0.4)
+    x = ig.allocate('random')
+    
+    try:
+        FD1 = FiniteDifferenceOperator(ig, direction = "eraeR") 
+    except ValueError as err:
+        print("Error: {}".format(err))
+        
+    try:
+        FD1 = FiniteDifferenceOperator(ig, direction = -2) 
+    except ValueError as err:
+        print("Error: {}".format(err))   
+        
+#    try:
+#        FD1 = FiniteDifferenceOperator(ig, direction = np.array([1,2])) 
+#    except ValueError as err:
+#        print("Error: {}".format(err))      
+        
+    FD1 = FiniteDifferenceOperator(ig, direction = np.array([1,2]))         
+        
+    
+    

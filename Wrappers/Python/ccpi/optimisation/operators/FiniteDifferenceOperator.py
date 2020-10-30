@@ -21,6 +21,8 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
+from numbers import Integral
+
 
 from ccpi.optimisation.operators import LinearOperator
 
@@ -41,7 +43,7 @@ class FiniteDifferenceOperator(LinearOperator):
         
         :param domain_geometry: Domain geometry for the FiniteDifferenceOperator
         :param direction: Direction to evaluate finite differences
-        :type direction: Label from Domain geometry or Number
+        :type direction: string label from domain geometry or integer number
         :param method: Method for finite differences
         :type method: 'forward', 'backward', 'centered'
         :param bnd_cond: 'Neumann', 'Periodic'
@@ -56,6 +58,8 @@ class FiniteDifferenceOperator(LinearOperator):
         
         # direction accepts number or label of domain_geometry
         if direction not in domain_geometry.dimension_labels:
+            if not isinstance(direction, Integral):
+                raise TypeError('Integer is required, got {}'.format(type(direction)))            
             if direction > len(domain_geometry.shape) or direction<0:
                 raise ValueError('Requested direction is not possible. Accepted direction {}, \ngot {}'.format(range(len(domain_geometry.shape)), direction))
             else:

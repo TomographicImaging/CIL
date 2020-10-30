@@ -62,7 +62,7 @@ class FiniteDifferenceOperator(LinearOperator):
            if direction in domain_geometry.dimension_labels:              
                 self.direction = domain_geometry.dimension_labels.index(direction)
            else:
-               raise ValueError('Requested direction is not possible. Accepted direction {}, \ngot {}'.format(domain_geometry.dimension_labels, direction))
+               raise ValueError('Requested direction is not possible. Accepted direction is {} or {}, \ngot {}'.format(domain_geometry.dimension_labels, range(len(domain_geometry.shape)),  direction))
                          
                                                                                                            
         self.voxel_size = domain_geometry.spacing[self.direction]
@@ -372,33 +372,7 @@ class FiniteDifferenceOperator(LinearOperator):
         if outnone:                  
             ret.fill(outa)
             return ret    
-        
-
-if __name__ == '__main__':
-    
-#    from ccpi.optimisation.operators import FiniteDifferenceOperator
-    from ccpi.framework import ImageGeometry
-      
-    M, N = 2, 3
-    ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N, voxel_size_x=0.1, voxel_size_y=0.4)
-    x = ig.allocate('random')
-    
-    try:
-        FD1 = FiniteDifferenceOperator(ig, direction = "eraeR") 
-    except ValueError as err:
-        print("Error: {}".format(err))
-        
-    try:
-        FD1 = FiniteDifferenceOperator(ig, direction = -2) 
-    except ValueError as err:
-        print("Error: {}".format(err))   
-        
-#    try:
-#        FD1 = FiniteDifferenceOperator(ig, direction = np.array([1,2])) 
-#    except ValueError as err:
-#        print("Error: {}".format(err))      
-        
-    FD1 = FiniteDifferenceOperator(ig, direction = np.array([1,2]))         
+              
         
     
     

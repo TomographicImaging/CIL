@@ -1,1 +1,2 @@
 from .ProjectionOperator import ProjectionOperator
+from .ProjectionOperator import ProjectionOperatorFactory

@@ -17,8 +17,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from ccpi.filters import regularisers
-from ccpi.filters.cpu_regularisers import TV_ENERGY
+try:
+    from ccpi.filters import regularisers
+    from ccpi.filters.cpu_regularisers import TV_ENERGY
+except ImportError as ie:
+    raise ImportError(ie + "\n\n" + 
+                      "This plugin requires the additional package ccpi-regularisation\n" +
+                      "Please install it via conda as ccpi-regularisation from the ccpi channel\n"+
+                      "Minimal version is 20.04")
+
+
 from ccpi.framework import DataContainer
 from ccpi.optimisation.functions import Function
 import numpy as np

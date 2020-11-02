@@ -21,15 +21,21 @@ import numpy
 from cil.optimisation.operators import Operator, LinearOperator
 from cil.framework import ImageData, DataContainer , \
                            ImageGeometry, AcquisitionGeometry
-from cil.plugins.processors import CCPiBackwardProjector, \
+from cil.plugins.ccpi_reconstruction.processors import CCPiBackwardProjector, \
                                     CCPiForwardProjector , setupCCPiGeometries
         
 
+class ProjectionOperatorFactory(object):
+    @staticmethod
+    def get_operator(acquisition_geometry):
+        ig = setupCCPiGeometries(acquisition_geometry.get_ImageGeometry(), 
+                                 acquisition_geometry, 0)
+        return ProjectionOperator(ig, acquisition_geometry)
 
 class ProjectionOperator(Operator):
-    """ASTRA projector modified to use DataSet and geometry."""
+    """CCPi projector modified to use DataSet and geometry."""
     def __init__(self, geomv, geomp, default=False):
-        super(ProjectionOperator, self).__init__()
+        super(ProjectionOperator, self).__init__(geomv, range_geometry=geomp)
         
         # Store volume and sinogram geometries.
         self.acquisition_geometry = geomp
@@ -39,47 +45,45 @@ class ProjectionOperator(Operator):
             raise TypeError('Can only handle parallel beam')
         
         # set-up the geometries if compatible
-        geoms = setupCCPiGeometries(geomv, geomp, 0)
+        # geoms = setupCCPiGeometries(geomv, geomp, 0)
         
 
-        vg = ImageGeometry(voxel_num_x=geoms['output_volume_x'],
-                           voxel_num_y=geoms['output_volume_y'], 
-                           voxel_num_z=geoms['output_volume_z'])
+        # vg = ImageGeometry(voxel_num_x=geoms['output_volume_x'],
+        #                    voxel_num_y=geoms['output_volume_y'], 
+        #                    voxel_num_z=geoms['output_volume_z'])
 
-        pg = AcquisitionGeometry('parallel',
-                          '3D',
-                          geomp.angles,
-                          geoms['n_h'], geomp.pixel_size_h,
-                          geoms['n_v'], geomp.pixel_size_v #2D in 3D is a slice 1 pixel thick
-                          )
-        if not default:
-            # check if geometry is the same (on the voxels)
-            if not ( vg.voxel_num_x == geomv.voxel_num_x and \
-                     vg.voxel_num_y == geomv.voxel_num_y and \
-                     vg.voxel_num_z == geomv.voxel_num_z ):
-                msg = 'The required volume geometry will not work\nThe following would\n'
-                msg += vg.__str__()
-                raise ValueError(msg)
-            if not (pg.pixel_num_h == geomp.pixel_num_h and \
-                    pg.pixel_num_v == geomp.pixel_num_v and \
-                    len( pg.angles ) == len( geomp.angles ) ) :
-                msg = 'The required acquisition geometry will not work\nThe following would\n'
-                msg += pg.__str__()
-                raise ValueError(msg)
+        # pg = AcquisitionGeometry('parallel',
+        #                   '3D',
+        #                   geomp.angles,
+        #                   geoms['n_h'], geomp.pixel_size_h,
+        #                   geoms['n_v'], geomp.pixel_size_v #2D in 3D is a slice 1 pixel thick
+        #                   )
+        # if not default:
+        #     # check if geometry is the same (on the voxels)
+        #     if not ( vg.voxel_num_x == geomv.voxel_num_x and \
+        #              vg.voxel_num_y == geomv.voxel_num_y and \
+        #              vg.voxel_num_z == geomv.voxel_num_z ):
+        #         msg = 'The required volume geometry will not work\nThe following would\n'
+        #         msg += vg.__str__()
+        #         raise ValueError(msg)
+        #     if not (pg.pixel_num_h == geomp.pixel_num_h and \
+        #             pg.pixel_num_v == geomp.pixel_num_v and \
+        #             len( pg.angles ) == len( geomp.angles ) ) :
+        #         msg = 'The required acquisition geometry will not work\nThe following would\n'
+        #         msg += pg.__str__()
+        #         raise ValueError(msg)
         
-        self.fp = CCPiForwardProjector(image_geometry=vg,
-                                       acquisition_geometry=pg,
+        self.fp = CCPiForwardProjector(image_geometry=self.volume_geometry,
+                                       acquisition_geometry=self.acquisition_geometry,
                                        output_axes_order=['angle','vertical','horizontal'])
         
-        self.bp = CCPiBackwardProjector(image_geometry=vg,
-                                    acquisition_geometry=pg,
+        self.bp = CCPiBackwardProjector(image_geometry=self.volume_geometry,
+                                    acquisition_geometry=self.acquisition_geometry,
                                     output_axes_order=[ ImageGeometry.HORIZONTAL_X,
                  ImageGeometry.HORIZONTAL_Y, ImageGeometry.VERTICAL])
                 
-        # Initialise empty for singular value.
-        self.s1 = None
-        self.ag = pg
-        self.vg = vg
+        self.ag = self.acquisition_geometry
+        self.vg = self.volume_geometry
 
     def is_linear(self):
         return True

@@ -17,10 +17,17 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License
 
-from cil.framework import DataProcessor, AcquisitionData,\
-     AcquisitionGeometry, ImageGeometry, ImageData
-from ccpi.reconstruction.parallelbeam import alg as pbalg
 import numpy
+from cil.framework import DataProcessor, AcquisitionData
+from cil.framework import AcquisitionGeometry, ImageGeometry, ImageData
+
+try:
+    from ccpi.reconstruction.parallelbeam import alg as pbalg
+except ImportError as ie:
+    raise ImportError(ie + "\n\n" + 
+                      "This plugin requires the additional package ccpi-reconstruction\n" +
+                      "Please install it via conda as ccpi-reconstruction from ccpi channel\n"+
+                      "Minimal version is 20.04")
 
 def setupCCPiGeometries(ig, ag, counter):
         Phantom_ccpi = ig.allocate(dimension_labels=[ImageGeometry.HORIZONTAL_X, 
@@ -53,19 +60,23 @@ def setupCCPiGeometries(ig, ag, counter):
         counter+=1
         
         if counter < 4:
-            print (geoms, geoms_i)
+            print ("iteration {}, {} {}".format(counter, geoms, geoms_i))
             if (not ( geoms_i == geoms )):
                 print ("not equal and {} {} {}".format(counter, geoms['output_volume_z'], geoms_i['output_volume_z']))
                 X = max(geoms['output_volume_x'], geoms_i['output_volume_x'])
                 Y = max(geoms['output_volume_y'], geoms_i['output_volume_y'])
                 Z = max(geoms['output_volume_z'], geoms_i['output_volume_z'])
-                return setupCCPiGeometries(X,Y,Z,angles, counter)
+                ig.voxel_num_x = X
+                ig.voxel_num_y = Y
+                ig.voxel_num_z = Z
+                
+                return setupCCPiGeometries(ig, ag, counter)
             else:
                 print ("happy now {} {} {}".format(counter, geoms['output_volume_z'], geoms_i['output_volume_z']))
                 
-                return geoms
+                return ig
         else:
-            return geoms_i
+            return ig
 
 
 class CCPiForwardProjector(DataProcessor):

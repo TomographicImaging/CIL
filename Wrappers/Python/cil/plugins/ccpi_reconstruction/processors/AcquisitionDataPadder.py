@@ -4,10 +4,18 @@ Created on Tue Apr 30 13:43:52 2019
 
 @author: ofn77899
 """
+import numpy
 from cil.framework import DataProcessor, DataContainer, AcquisitionData,\
  AcquisitionGeometry, ImageGeometry, ImageData
-from ccpi.reconstruction.parallelbeam import alg as pbalg
-import numpy
+try:
+    from ccpi.reconstruction.parallelbeam import alg as pbalg
+except ImportError as ie:
+    raise ImportError(ie + "\n\n" + 
+                      "This plugin requires the additional package ccpi-reconstruction\n" +
+                      "Please install it via conda as ccpi-reconstruction from ccpi channel\n"+
+                      "Minimal version is 20.04")
+
+
 
 class AcquisitionDataPadder(DataProcessor):
     '''Normalization based on flat and dark

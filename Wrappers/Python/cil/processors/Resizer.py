@@ -108,10 +108,10 @@ class Resizer(DataProcessor):
                 for key in data.dimension_labels:
                     if data.dimension_labels[key] == 'channel':
                         if (roi_par[key] != -1):
-                            geometry.channels = (roi_par[key][1] - roi_par[key][0]) // binning[key]
+                            geometry.set_channels ( (roi_par[key][1] - roi_par[key][0]) // binning[key] )
                             roi_par[key] = (roi_par[key][0], roi_par[key][0] + ((roi_par[key][1] - roi_par[key][0]) // binning[key]) * binning[key])
                         else:
-                            geometry.channels = geometry_0.channels // binning[key]
+                            geometry.set_channels ( geometry_0.channels // binning[key] )
                             roi_par[key] = (0, geometry.channels * binning[key])
                     elif data.dimension_labels[key] == 'horizontal_y':
                         if (roi_par[key] != -1):
@@ -169,9 +169,9 @@ class Resizer(DataProcessor):
                             roi_par[key] = (0, geometry.channels * binning[key])
                     elif data.dimension_labels[key] == 'angle':
                         if (roi_par[key] != -1):
-                            geometry.angles = geometry_0.angles[roi_par[key][0]:roi_par[key][1]]
+                            geometry.set_angles( geometry_0.angles[roi_par[key][0]:roi_par[key][1]] )
                         else:
-                            geometry.angles = geometry_0.angles
+                            geometry.set_angles( geometry_0.angles )
                             roi_par[key] = (0, len(geometry.angles))
                         if (binning[key] != 1):
                             binning[key] = 1
@@ -229,7 +229,8 @@ class Resizer(DataProcessor):
         out = type(data)(array = data_resized, 
                          deep_copy = False,
                          dimension_labels = data.dimension_labels,
-                         geometry = geometry)
+                         geometry = geometry, 
+                         suppress_warning=False)
         
         return out
 

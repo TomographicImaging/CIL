@@ -37,9 +37,9 @@ class TestNexusReaderWriter(unittest.TestCase):
         im = ig.allocate()
         writer = NEXUSDataWriter()
         writer.set_up(file_name = os.path.join(os.getcwd(), 'test_nexus_im.nxs'),
-                      data_container = im)
-        writer.write_file()
-        self.stestreadImageData()
+                      data = im)
+        writer.write()
+        self.readImageDataAndTest()
         
     def testwriteAcquisitionData(self):
         im_size = 5
@@ -53,8 +53,8 @@ class TestNexusReaderWriter(unittest.TestCase):
         ad2d = ag2d.allocate()
         writer = NEXUSDataWriter()
         writer.set_up(file_name = os.path.join(os.getcwd(), 'test_nexus_ad2d.nxs'),
-                      data_container = ad2d)
-        writer.write_file()
+                      data = ad2d)
+        writer.write()
         
         ag3d = AcquisitionGeometry(geom_type = 'cone', 
                                    dimension = '3D', 
@@ -69,12 +69,12 @@ class TestNexusReaderWriter(unittest.TestCase):
         ad3d = ag3d.allocate()
         writer = NEXUSDataWriter()
         writer.set_up(file_name = os.path.join(os.getcwd(), 'test_nexus_ad3d.nxs'),
-                      data_container = ad3d)
-        writer.write_file()
+                      data = ad3d)
+        writer.write()
 
-        self.stestreadAcquisitionData()
+        self.readAcquisitionDataAndTest()
 	
-    def stestreadImageData(self):
+    def readImageDataAndTest(self):
         
         im_size = 5
         ig_test = ImageGeometry(voxel_num_x = im_size,
@@ -82,14 +82,14 @@ class TestNexusReaderWriter(unittest.TestCase):
         im_test = ig_test.allocate()
         
         reader = NEXUSDataReader()
-        reader.set_up(nexus_file = os.path.join(os.getcwd(), 'test_nexus_im.nxs'))
-        im = reader.load_data()
+        reader.set_up(file_name = os.path.join(os.getcwd(), 'test_nexus_im.nxs'))
+        im = reader.read()
         ig = reader.get_geometry()
         numpy.testing.assert_array_equal(im.as_array(), im_test.as_array(), 'Loaded image is not correct')
         self.assertEqual(ig.voxel_num_x, ig_test.voxel_num_x, 'ImageGeometry is not correct')
         self.assertEqual(ig.voxel_num_y, ig_test.voxel_num_y, 'ImageGeometry is not correct')
         
-    def stestreadAcquisitionData(self):
+    def readAcquisitionDataAndTest(self):
         im_size = 5
         ag2d_test = AcquisitionGeometry(geom_type = 'parallel', 
                                         dimension = '2D', 
@@ -101,8 +101,8 @@ class TestNexusReaderWriter(unittest.TestCase):
         ad2d_test = ag2d_test.allocate()
         
         reader2d = NEXUSDataReader()
-        reader2d.set_up(nexus_file = os.path.join(os.getcwd(), 'test_nexus_ad2d.nxs'))
-        ad2d = reader2d.load_data()
+        reader2d.set_up(file_name = os.path.join(os.getcwd(), 'test_nexus_ad2d.nxs'))
+        ad2d = reader2d.read()
         ag2d = reader2d.get_geometry()
         numpy.testing.assert_array_equal(ad2d.as_array(), ad2d_test.as_array(), 'Loaded image is not correct')
         self.assertEqual(ag2d.geom_type, ag2d_test.geom_type, 'ImageGeometry.geom_type is not correct')
@@ -125,8 +125,8 @@ class TestNexusReaderWriter(unittest.TestCase):
         ad3d_test = ag3d_test.allocate()
         
         reader3d = NEXUSDataReader()
-        reader3d.set_up(nexus_file = os.path.join(os.getcwd(), 'test_nexus_ad3d.nxs'))
-        ad3d = reader3d.load_data()
+        reader3d.set_up(file_name = os.path.join(os.getcwd(), 'test_nexus_ad3d.nxs'))
+        ad3d = reader3d.read()
         ag3d = reader3d.get_geometry()
         
         numpy.testing.assert_array_equal(ad3d.as_array(), ad3d_test.as_array(), 'Loaded image is not correct')

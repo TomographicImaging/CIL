@@ -36,6 +36,12 @@ class TestSubset(unittest.TestCase):
                          dist_source_center = 312.2, 
                          dist_center_detector = 123.,
                          channels=4 )
+        
+        self.ag_cone = AcquisitionGeometry.create_Cone3D([0,-500,0],[0,500,0])\
+                                     .set_panel((2,20))\
+                                     .set_angles(self.ag.angles)\
+                                     .set_channels(4)
+
 
     def test_ImageDataAllocate1a(self):
         data = self.ig.allocate()
@@ -174,7 +180,16 @@ class TestSubset(unittest.TestCase):
         sub = data.subset(angle = sliceme)
         self.assertTrue( sub.geometry.angles[0] == data.geometry.angles[sliceme])
         
+    def test_AcquisitionDataSubset1g(self):
         
-            
+        data = self.ag_cone.allocate()
+        sliceme = 1
+        sub = data.subset(angle = sliceme)
+        self.assertTrue( sub.geometry.angles[0] == data.geometry.angles[sliceme])       
 
+    def test_AcquisitionDataSubset1h(self):
         
+        data = self.ag_cone.allocate()
+        sliceme = 1
+        sub = data.subset(vertical = sliceme, force=True)
+        self.assertTrue( sub.shape == (4, 3, 2))

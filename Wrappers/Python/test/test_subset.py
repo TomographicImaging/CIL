@@ -152,7 +152,7 @@ class TestSubset(unittest.TestCase):
          AcquisitionGeometry.VERTICAL, AcquisitionGeometry.ANGLE]
         data = self.ag.allocate(dimension_labels=non_default_dimension_labels)
         #self.assertTrue( data.shape == (4,20,2,3))
-        sub = data.subset(horizontal = 0)
+        sub = data.subset(horizontal = 0, force=True)
         self.assertTrue( sub.shape == (4,2,3))
     def test_AcquisitionDataSubset1d(self):
         non_default_dimension_labels = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.HORIZONTAL,

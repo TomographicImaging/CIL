@@ -37,8 +37,6 @@ setup(
               'cil.processors',
               'cil.utilities', 'cil.utilities.jupyter',
               'cil.plugins', 
-              'cil.plugins.ccpi_reconstruction', 
-              'cil.plugins.ccpi_reconstruction.operators', 'cil.plugins.ccpi_reconstruction.processors',
               'cil.plugins.ccpi_regularisation', 
               'cil.plugins.ccpi_regularisation.functions'],
     data_files = [('share/cil', ['data/boat.tiff',

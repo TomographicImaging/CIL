@@ -138,7 +138,7 @@ if __name__ == '__main__':
     from ccpi.astra.processors import FBP
     from ccpi.io import NEXUSDataWriter
     import matplotlib.pyplot as plt
-    from ccpi.framework.TestData import data_dir
+    from ccpi.framework.dataexample import data_dir
 
     angle_unit = AcquisitionGeometry.RADIAN
 

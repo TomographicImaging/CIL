@@ -28,17 +28,19 @@ from ccpi.framework import AcquisitionGeometry
 from ccpi.optimisation.operators import Identity
 from ccpi.optimisation.functions import LeastSquares, ZeroFunction, \
    L2NormSquared, FunctionOperatorComposition
-from ccpi.optimisation.algorithms import GradientDescent
+from ccpi.optimisation.algorithms import GD
 from ccpi.optimisation.algorithms import CGLS
 from ccpi.optimisation.algorithms import SIRT
 from ccpi.optimisation.algorithms import FISTA
+from ccpi.optimisation.algorithms import Algorithm
 
 from ccpi.optimisation.algorithms import PDHG
 
 from ccpi.optimisation.operators import Gradient, BlockOperator, FiniteDifferenceOperator
 from ccpi.optimisation.functions import MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler                     
-from ccpi.framework import TestData
-import os ,sys
+from ccpi.utilities import dataexample
+from ccpi.utilities import noise as applynoise
+import os, sys, time
 
 
 try:
@@ -66,8 +68,8 @@ class TestAlgorithms(unittest.TestCase):
         #os.remove(self.filename)
         pass
     
-    def test_GradientDescent(self):
-        print ("Test GradientDescent")
+    def test_GD(self):
+        print ("Test GD")
         ig = ImageGeometry(12,13,14)
         x_init = ig.allocate()
         # b = x_init.copy()
@@ -79,13 +81,13 @@ class TestAlgorithms(unittest.TestCase):
         norm2sq = LeastSquares(identity, b)
         rate = norm2sq.L / 3.
         
-        alg = GradientDescent(x_init=x_init, 
+        alg = GD(x_init=x_init, 
                               objective_function=norm2sq, 
                               rate=rate, atol=1e-9, rtol=1e-6)
         alg.max_iteration = 1000
         alg.run()
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-        alg = GradientDescent(x_init=x_init, 
+        alg = GD(x_init=x_init, 
                               objective_function=norm2sq, 
                               rate=rate, max_iteration=20,
                               update_objective_interval=2,
@@ -95,8 +97,8 @@ class TestAlgorithms(unittest.TestCase):
         self.assertTrue(alg.update_objective_interval==2)
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-    def test_GradientDescentArmijo(self):
-        print ("Test GradientDescent")
+    def test_GDArmijo(self):
+        print ("Test GD")
         ig = ImageGeometry(12,13,14)
         x_init = ig.allocate()
         # b = x_init.copy()
@@ -108,12 +110,12 @@ class TestAlgorithms(unittest.TestCase):
         norm2sq = LeastSquares(identity, b)
         rate = None
         
-        alg = GradientDescent(x_init=x_init, 
+        alg = GD(x_init=x_init, 
                               objective_function=norm2sq, rate=rate)
         alg.max_iteration = 100
         alg.run()
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-        alg = GradientDescent(x_init=x_init, 
+        alg = GD(x_init=x_init, 
                               objective_function=norm2sq, 
                               max_iteration=20,
                               update_objective_interval=2)
@@ -122,7 +124,7 @@ class TestAlgorithms(unittest.TestCase):
         self.assertTrue(alg.update_objective_interval==2)
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-    def test_GradientDescentArmijo2(self):
+    def test_GDArmijo2(self):
         from ccpi.optimisation.functions import Rosenbrock
         from ccpi.framework import VectorData, VectorGeometry
 
@@ -135,7 +137,7 @@ class TestAlgorithms(unittest.TestCase):
         max_iter = 1000000
         update_interval = 100000
 
-        alg = GradientDescent(x, f, max_iteration=max_iter, update_objective_interval=update_interval, alpha=1e6)
+        alg = GD(x, f, max_iteration=max_iter, update_objective_interval=update_interval, alpha=1e6)
         
         alg.run()
         
@@ -256,49 +258,45 @@ class TestAlgorithms(unittest.TestCase):
         print ("PDHG Denoising with 3 noises")
         # adapted from demo PDHG_TV_Color_Denoising.py in CIL-Demos repository
         
-        # loader = TestData(data_dir=os.path.join(os.environ['SIRF_INSTALL_PATH'], 'share','ccpi'))
-        # loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
-        loader = TestData()
-        
-        data = loader.load(TestData.PEPPERS, size=(256,256))
+        data = dataexample.PEPPERS.get(size=(256,256))
         ig = data.geometry
         ag = ig
 
         which_noise = 0
         # Create noisy data. 
         noises = ['gaussian', 'poisson', 's&p']
-        noise = noises[which_noise]
+        dnoise = noises[which_noise]
         
-        def setup(data, noise):
-            if noise == 's&p':
-                n1 = TestData.random_noise(data.as_array(), mode = noise, salt_vs_pepper = 0.9, amount=0.2, seed=10)
-            elif noise == 'poisson':
+        def setup(data, dnoise):
+            if dnoise == 's&p':
+                n1 = applynoise.saltnpepper(data, salt_vs_pepper = 0.9, amount=0.2, seed=10)
+            elif dnoise == 'poisson':
                 scale = 5
-                n1 = TestData.random_noise( data.as_array()/scale, mode = noise, seed = 10)*scale
-            elif noise == 'gaussian':
-                n1 = TestData.random_noise(data.as_array(), mode = noise, seed = 10)
+                n1 = applynoise.poisson( data.as_array()/scale, seed = 10)*scale
+            elif dnoise == 'gaussian':
+                n1 = applynoise.gaussian(data.as_array(), seed = 10)
             else:
                 raise ValueError('Unsupported Noise ', noise)
             noisy_data = ig.allocate()
             noisy_data.fill(n1)
         
             # Regularisation Parameter depending on the noise distribution
-            if noise == 's&p':
+            if dnoise == 's&p':
                 alpha = 0.8
-            elif noise == 'poisson':
+            elif dnoise == 'poisson':
                 alpha = 1
-            elif noise == 'gaussian':
+            elif dnoise == 'gaussian':
                 alpha = .3
                 # fidelity
-            if noise == 's&p':
+            if dnoise == 's&p':
                 g = L1Norm(b=noisy_data)
-            elif noise == 'poisson':
+            elif dnoise == 'poisson':
                 g = KullbackLeibler(b=noisy_data)
-            elif noise == 'gaussian':
+            elif dnoise == 'gaussian':
                 g = 0.5 * L2NormSquared(b=noisy_data)
             return noisy_data, alpha, g
 
-        noisy_data, alpha, g = setup(data, noise)
+        noisy_data, alpha, g = setup(data, dnoise)
         operator = Gradient(ig, correlation=Gradient.CORRELATION_SPACE)
 
         f1 =  alpha * MixedL21Norm()
@@ -376,16 +374,13 @@ class TestAlgorithms(unittest.TestCase):
     def test_FISTA_Denoising(self):
         print ("FISTA Denoising Poisson Noise Tikhonov")
         # adapted from demo FISTA_Tikhonov_Poisson_Denoising.py in CIL-Demos repository
-        #loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
-        loader = TestData()
-        data = loader.load(TestData.SHAPES)
+        data = dataexample.SHAPES.get()
         ig = data.geometry
         ag = ig
         N=300
         # Create Noisy data with Poisson noise
         scale = 5
-        n1 = TestData.random_noise( data.as_array()/scale, mode = 'poisson', seed = 10)*scale
-        noisy_data = ImageData(n1)
+        noisy_data = applynoise.poisson(data/scale,seed=10) * scale
 
         # Regularisation Parameter
         alpha = 10
@@ -477,8 +472,7 @@ class TestSPDHG(unittest.TestCase):
         from ccpi.optimisation.algorithms import SPDHG, PDHG
         # Fast Gradient Projection algorithm for Total Variation(TV)
         from ccpi.optimisation.functions import TotalVariation
-        loader = TestData()
-        data = loader.load(TestData.SIMPLE_PHANTOM_2D, size=(128,128))
+        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
         ig = data.geometry
         ig.voxel_size_x = 0.1
         ig.voxel_size_y = 0.1
@@ -573,8 +567,7 @@ class TestSPDHG(unittest.TestCase):
         from ccpi.optimisation.operators import BlockOperator, Gradient
         from ccpi.optimisation.functions import BlockFunction, KullbackLeibler, MixedL21Norm, IndicatorBox
         from ccpi.optimisation.algorithms import SPDHG, PDHG
-        loader = TestData()
-        data = loader.load(TestData.SIMPLE_PHANTOM_2D, size=(128,128))
+        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
         print ("here")
         ig = data.geometry
         ig.voxel_size_x = 0.1
@@ -593,14 +586,17 @@ class TestSPDHG(unittest.TestCase):
         noises = ['gaussian', 'poisson']
         noise = noises[1]
         if noise == 'poisson':
-            np.random.seed(10)
             scale = 5
-            eta = 0
-            noisy_data = AcquisitionData(np.random.poisson( scale * (eta + sin.as_array()))/scale, ag)
+            noisy_data = scale * applynoise.poisson(sin/scale, seed=10)
+            # np.random.seed(10)
+            # scale = 5
+            # eta = 0
+            # noisy_data = AcquisitionData(np.random.poisson( scale * (eta + sin.as_array()))/scale, ag)
         elif noise == 'gaussian':
-            np.random.seed(10)
-            n1 = np.random.normal(0, 0.1, size = ag.shape)
-            noisy_data = AcquisitionData(n1 + sin.as_array(), ag)
+            noisy_data = noise.gaussian(sin, var=0.1, seed=10)
+            # np.random.seed(10)
+            # n1 = np.random.normal(0, 0.1, size = ag.shape)
+            # noisy_data = AcquisitionData(n1 + sin.as_array(), ag)
             
         else:
             raise ValueError('Unsupported Noise ', noise)
@@ -675,8 +671,7 @@ class TestSPDHG(unittest.TestCase):
         from ccpi.optimisation.operators import BlockOperator, Gradient
         from ccpi.optimisation.functions import BlockFunction, KullbackLeibler, MixedL21Norm, IndicatorBox
         from ccpi.optimisation.algorithms import SPDHG, PDHG
-        loader = TestData()
-        data = loader.load(TestData.SIMPLE_PHANTOM_2D, size=(128,128))
+        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
         print ("test_SPDHG_vs_SPDHG_explicit_axpby here")
         ig = data.geometry
         ig.voxel_size_x = 0.1
@@ -768,8 +763,7 @@ class TestSPDHG(unittest.TestCase):
         from ccpi.optimisation.operators import BlockOperator, Gradient
         from ccpi.optimisation.functions import BlockFunction, KullbackLeibler, MixedL21Norm, IndicatorBox
         from ccpi.optimisation.algorithms import PDHG
-        loader = TestData()
-        data = loader.load(TestData.SIMPLE_PHANTOM_2D, size=(128,128))
+        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
         print ("test_PDHG_vs_PDHG_explicit_axpby here")
         ig = data.geometry
         ig.voxel_size_x = 0.1
@@ -840,3 +834,44 @@ class TestSPDHG(unittest.TestCase):
         np.testing.assert_array_less( qm[1], 3e-05)
         
 
+
+class PrintAlgo(Algorithm):
+    def __init__(self, **kwargs):
+
+        super(PrintAlgo, self).__init__(**kwargs)
+        # self.update_objective()
+        self.configured = True
+
+    def update(self):
+        self.x = - self.iteration
+        time.sleep(0.1)
+    
+    def update_objective(self):
+        self.loss.append(self.iteration * self.iteration)
+
+class TestPrint(unittest.TestCase):
+    def test_print(self):
+        def callback (iteration, objective, solution):
+            print("I am being called ", iteration)
+        algo = PrintAlgo(update_objective_interval = 10, max_iteration = 1000)
+
+        algo.run(20, verbose=2, print_interval = 2)
+        # it 0
+        # it 10 
+        # it 20
+        # --- stop
+        algo.run(3, verbose=1, print_interval = 2)
+        # it 20
+        # --- stop
+
+        algo.run(20, verbose = 1, print_interval = 7)
+        # it 20
+        # it 30
+        # -- stop
+
+        algo.run(20, verbose=True, very_verbose=False)
+        algo.run(20, verbose=True, very_verbose=True, print_interval=7, callback=callback)
+        print (algo._iteration)
+        print (algo.objective)
+        np.testing.assert_array_equal([0, 10, 20, 30, 40, 50, 60, 70, 80], algo.iterations)
+        np.testing.assert_array_equal([0, 100, 400, 900, 1600, 2500, 3600, 4900, 6400], algo.objective)

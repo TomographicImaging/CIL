@@ -123,7 +123,6 @@ class PDHG(Algorithm):
         
         # relaxation parameter
         self.theta = 1
-        self.update_objective()
         
         self.configured = True
         print("{} configured".format(self.__class__.__name__, ))

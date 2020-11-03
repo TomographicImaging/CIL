@@ -44,8 +44,6 @@ class TestSubset(unittest.TestCase):
         self.assertTrue( default_dimension_labels == list(data.dimension_labels.values()) )
     def test_ImageDataAllocate1b(self):
         data = self.ig.allocate()
-        default_dimension_labels = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL,
-                ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
         self.assertTrue( data.shape == (5,4,3,2))
         
     def test_ImageDataAllocate2a(self):
@@ -60,6 +58,49 @@ class TestSubset(unittest.TestCase):
         data = self.ig.allocate(dimension_labels=non_default_dimension_labels)
         self.assertTrue( data.shape == (2,4,3,5))
 
+    def test_ImageDataSubset1a(self):
+        non_default_dimension_labels = [ImageGeometry.HORIZONTAL_X, ImageGeometry.CHANNEL, ImageGeometry.HORIZONTAL_Y,
+        ImageGeometry.VERTICAL]
+        data = self.ig.allocate(dimension_labels=non_default_dimension_labels)
+        sub = data.subset(horizontal_y = 1)
+        self.assertTrue( sub.shape == (2,5,4))
+
+    def test_ImageDataSubset2a(self):
+        non_default_dimension_labels = [ImageGeometry.HORIZONTAL_X, ImageGeometry.CHANNEL, ImageGeometry.HORIZONTAL_Y,
+        ImageGeometry.VERTICAL]
+        data = self.ig.allocate(dimension_labels=non_default_dimension_labels)
+        sub = data.subset(horizontal_x = 1)
+        self.assertTrue( sub.shape == (5,3,4))
+
+    def test_ImageDataSubset3a(self):
+        non_default_dimension_labels = [ImageGeometry.HORIZONTAL_X, ImageGeometry.CHANNEL, ImageGeometry.HORIZONTAL_Y,
+        ImageGeometry.VERTICAL]
+        data = self.ig.allocate(dimension_labels=non_default_dimension_labels)
+        sub = data.subset(channel = 1)
+        self.assertTrue( sub.shape == (2,3,4))
+
+    def test_ImageDataSubset4a(self):
+        non_default_dimension_labels = [ImageGeometry.HORIZONTAL_X, ImageGeometry.CHANNEL, ImageGeometry.HORIZONTAL_Y,
+        ImageGeometry.VERTICAL]
+        data = self.ig.allocate(dimension_labels=non_default_dimension_labels)
+        sub = data.subset(vertical = 1)
+        self.assertTrue( sub.shape == (2,5,3))
+
+    def test_ImageDataSubset5a(self):
+        non_default_dimension_labels = [ImageGeometry.HORIZONTAL_X, ImageGeometry.HORIZONTAL_Y]
+        data = self.ig.allocate(dimension_labels=non_default_dimension_labels)
+        sub = data.subset(horizontal_y = 1)
+        self.assertTrue( sub.shape == (2,))
+
+    def test_ImageDataSubset1b(self):
+        non_default_dimension_labels = [ImageGeometry.HORIZONTAL_X, ImageGeometry.CHANNEL, ImageGeometry.HORIZONTAL_Y,
+        ImageGeometry.VERTICAL]
+        data = self.ig.allocate(dimension_labels=non_default_dimension_labels)
+        new_dimension_labels = [ImageGeometry.HORIZONTAL_Y, ImageGeometry.CHANNEL, ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_X]
+        sub = data.subset(dimensions=new_dimension_labels)
+        self.assertTrue( sub.shape == (3,5,4,2))
+
+
     def test_AcquisitionDataAllocate1a(self):
         data = self.ag.allocate()
         default_dimension_labels = [AcquisitionGeometry.CHANNEL ,
@@ -69,10 +110,6 @@ class TestSubset(unittest.TestCase):
 
     def test_AcquisitionDataAllocate1b(self):
         data = self.ag.allocate()
-        default_dimension_labels = [AcquisitionGeometry.CHANNEL ,
-                 AcquisitionGeometry.ANGLE , AcquisitionGeometry.VERTICAL ,
-                 AcquisitionGeometry.HORIZONTAL]
-
         self.assertTrue( data.shape == (4,3,2,20))
 
     def test_AcquisitionDataAllocate2a(self):

@@ -88,13 +88,12 @@ if __name__ == '__main__':
     from ccpi.optimisation.operators import BlockOperator, Gradient
     from ccpi.optimisation.functions import ZeroFunction, MixedL21Norm, \
                                             BlockFunction, L2NormSquared
-    from ccpi.framework import TestData
+    from ccpi.utilities import dataexample
     import os
     import sys
     
     # Load in test image
-    loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
-    data_rgb = loader.load(TestData.PEPPERS)
+    data_rgb = dataexample.PEPPERS.get()
     ig_rgb = data_rgb.geometry
     
     # Create gray version of image
@@ -108,7 +107,7 @@ if __name__ == '__main__':
     
     # Parameters for point spread function PSF (size and std)
     ks          = 11; 
-    ksigma      = 5.0;
+    ksigma      = 5.0
     
     # Create 1D PSF and 2D as outer product, then normalise.
     w           = np.exp(-np.arange(-(ks-1)/2,(ks-1)/2+1)**2/(2*ksigma**2))

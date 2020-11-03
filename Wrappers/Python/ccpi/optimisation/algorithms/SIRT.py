@@ -102,7 +102,6 @@ class SIRT(Algorithm):
         # Set up scaling matrices D and M.
         self.M = 1/self.operator.direct(self.operator.domain_geometry().allocate(value=1.0))        
         self.D = 1/self.operator.adjoint(self.operator.range_geometry().allocate(value=1.0))
-        self.update_objective()
         self.configured = True
         print("{} configured".format(self.__class__.__name__, ))
 

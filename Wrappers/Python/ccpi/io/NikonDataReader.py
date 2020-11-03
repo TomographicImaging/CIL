@@ -270,8 +270,11 @@ class NikonDataReader(object):
             
             self._ag.set_panel((pixel_num_h, pixel_num_v),
                                pixel_size=(pixel_size_h, pixel_size_v))
-
-                
+        
+        if self._ag.dimension == '3D':
+            self._ag.dimension_labels = ['vertical', 'angle', 'horizontal']
+        else:
+            self._ag.dimension_labels = ['angle', 'horizontal']
 
     def get_geometry(self):
         
@@ -303,49 +306,21 @@ class NikonDataReader(object):
         if (self.normalize):
             data /= self._white_level
             data[data > 1] = 1
-
-        if self._ag.pixel_num_v == 1:
+        
+        output = self._ag.allocate(None)
+        
+        if self._ag.dimension == '2D':
+            
             if self.fliplr:
-                return AcquisitionData(array = data[:, ::-1], 
-                                       deep_copy = False,
-                                       geometry = self._ag,
-                                       dimension_labels = ['angle', \
-                                                           'horizontal'])
+                output.fill(data[:, ::-1])
             else:
-                return AcquisitionData(array = data, 
-                                       deep_copy = False,
-                                       geometry = self._ag,
-                                       dimension_labels = ['angle', \
-                                                           'horizontal'])
+                output.fill(data)
+                
         else:
+            
             if self.fliplr:
-                return AcquisitionData(array = numpy.transpose(data[:, :, ::-1], (1, 0, 2)), 
-                                       deep_copy = False,
-                                       geometry = self._ag,
-                                       dimension_labels = ['vertical', \
-                                                           'angle', \
-                                                           'horizontal'])
+                output.fill(numpy.transpose(data[:, :, ::-1], (1, 0, 2)))
             else:
-                return AcquisitionData(array = numpy.transpose(data, (1, 0, 2)),
-                                       deep_copy = False,
-                                       geometry = self._ag,
-                                       dimension_labels = ['vertical', \
-                                                           'angle', \
-                                                           'horizontal'])
-
-
-'''
-# usage example
-from ccpi.io import NikonDataReader
-
-xtek_file = '/media/newhd/shared/Data/SophiaBeads/SophiaBeads_256_averaged/SophiaBeads_256_averaged.xtekct'
-reader = NikonDataReader()
-reader.set_up(xtek_file = xtek_file,
-              roi = {'angle': (None, None, 1), 'vertical': (None, None, 5)},
-              mode = 'slice',
-              normalize=True)
-
-data = reader.load_projections()
-#print(data)
-ag = reader.get_geometry()
-'''
+                output.fill(numpy.transpose(data, (1, 0, 2)))
+        
+        return output

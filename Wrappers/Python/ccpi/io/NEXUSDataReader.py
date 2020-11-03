@@ -133,7 +133,6 @@ class NEXUSDataReader(object):
                             self._geometry = AcquisitionGeometry.create_Cone3D(source_position=[0, 0, 0],
                                                          rotation_axis_position=[0, ds_data.attrs['dist_source_center'], 0],
                                                          detector_position=[0, ds_data.attrs['dist_source_center'] + ds_data.attrs['dist_center_detector'], 0])
-                            self._geometry.set_angles(np.array(file['entry1/tomo_entry/data/rotation_angle'], dtype = 'float32'))
                             
                             self._geometry.set_panel((int(ds_data.attrs['pixel_num_h']), int(ds_data.attrs['pixel_num_v'])),
                                                      pixel_size=(ds_data.attrs['pixel_size_h'], ds_data.attrs['pixel_size_v']))
@@ -151,20 +150,26 @@ class NEXUSDataReader(object):
                         # if parallel 3D
                         elif ds_data.attrs.__contains__('dist_source_center') == False and ds_data.attrs['pixel_num_v'] > 1:
                             self._geometry = AcquisitionGeometry.create_Parallel3D()
-                            self._geometry.set_angles(np.array(file['entry1/tomo_entry/data/rotation_angle'], dtype = 'float32'))
                             
                             self._geometry.set_panel((int(ds_data.attrs['pixel_num_h']), int(ds_data.attrs['pixel_num_v'])),
                                                      pixel_size=(ds_data.attrs['pixel_size_h'], ds_data.attrs['pixel_size_v']))
                         # if parallel 2D
                         elif ds_data.attrs.__contains__('dist_source_center') == False and ds_data.attrs['pixel_num_v'] == 1:
                             self._geometry = AcquisitionGeometry.create_Parallel2D()
-                            self._geometry.set_angles(np.array(file['entry1/tomo_entry/data/rotation_angle'], dtype = 'float32'))
                             
                             self._geometry.set_panel(int(ds_data.attrs['pixel_num_h']),
                                                      pixel_size=ds_data.attrs['pixel_size_h'])
                         
                         # set channels
                         self._geometry.set_channels(num_channels = int(ds_data.attrs['channels']))
+                        
+                        # set angles
+                        ds_angles = file['entry1/tomo_entry/data/rotation_angle']
+                        if ds_angles.attrs.__contains__('units'):
+                            self._geometry.set_angles(np.array(ds_angles, dtype = 'float32'),
+                                                      angle_unit=ds_angles.attrs['units'])
+                        else:
+                            self._geometry.set_angles(np.array(ds_angles, dtype = 'float32'))
                         
                     # new file
                     else:
@@ -265,18 +270,10 @@ class NEXUSDataReader(object):
                 
             ds_data = file['entry1/tomo_entry/data/data']
             data = np.array(ds_data, dtype = 'float32')
-            
-            if ds_data.attrs['data_type'] == 'ImageData':
-    
-                return ImageData(array = data,
-                                 deep_copy = False,
-                                 geometry = self._geometry,
-                                 dimension_labels = self._geometry.dimension_labels)
-            
-            else:
                 
-                return AcquisitionData(array = data,
-                                       deep_copy = False,
-                                       geometry = self._geometry,
-                                       dimension_labels = self._geometry.dimension_labels)
+            output = self._geometry.allocate(None)
+            output.fill(data)
+            return output
+    
+          
                         

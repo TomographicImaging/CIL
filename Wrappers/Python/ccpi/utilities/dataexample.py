@@ -77,8 +77,8 @@ class SYNCHROTRON_PARALLEL_BEAM_DATA(DATA):
     def get(cls, **kwargs):
         ddir = kwargs.get('data_dir', data_dir)
         loader = NEXUSDataReader()
-        loader.set_up(nexus_file=os.path.join(os.path.abspath(ddir), '24737_fd_normalised.nxs'))
-        return loader.load_data()
+        loader.set_up(file_name=os.path.join(os.path.abspath(ddir), '24737_fd_normalised.nxs'))
+        return loader.read()
 
 
 class TestData(object):

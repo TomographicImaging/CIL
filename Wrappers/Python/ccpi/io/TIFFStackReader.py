@@ -137,10 +137,10 @@ class TIFFStackReader(object):
         self._tiff_files.sort(key=self.__natural_keys)
                
                 
-    def load(self):
+    def read(self):
         
         '''
-        Load images and return numpy array
+        Reads images and return numpy array
         '''
         # load first image to find out dimensions
         filename = os.path.join(self.path, self._tiff_files[0])

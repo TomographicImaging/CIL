@@ -50,7 +50,7 @@ class NEXUSDataReader(object):
     def set_up(self, 
                file_name = None):
         
-        self.file_name = file_name
+        self.file_name = os.path.abspath(file_name)
         
         # check that h5py library is installed
         if (h5pyAvailable == False):
@@ -261,15 +261,15 @@ class NEXUSDataReader(object):
         return self._geometry
     
     
-    def load(self):
+    def read(self):
         
         if self._geometry == None:
             self.get_geometry()
             
-        with h5py.File(self.file_name,'r') as file:
+        with h5py.File(self.file_name,'r') as dfile:
                 
-            ds_data = file['entry1/tomo_entry/data/data']
-            data = np.array(ds_data, dtype = 'float32')
+            ds_data = dfile['entry1/tomo_entry/data/data']
+            data = np.array(ds_data, dtype = np.float32)
                 
             output = self._geometry.allocate(None)
             output.fill(data)

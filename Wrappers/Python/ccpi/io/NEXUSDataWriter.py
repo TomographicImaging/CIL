@@ -59,7 +59,7 @@ class NEXUSDataWriter(object):
         if (h5pyAvailable == False):
             raise Exception('h5py is not available, cannot load NEXUS files.')
     
-    def write_file(self):
+    def write(self):
         
         # if the folder does not exist, create the folder
         if not os.path.isdir(os.path.dirname(self.file_name)):

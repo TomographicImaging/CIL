@@ -35,17 +35,17 @@ class TXRMDataReader(object):
                     
         '''
         
-        self.txrm_file = kwargs.get('txrm_file', None)
+        self.txrm_file = kwargs.get('file_name', None)
         
         if self.txrm_file is not None:
-            self.set_up(txrm_file = self.txrm_file)
+            self.set_up(file_name = self.txrm_file)
         self._metadata = None
             
     def set_up(self, 
-               txrm_file = None,
+               file_name = None,
                angle_unit = AcquisitionGeometry.DEGREE):
         
-        self.txrm_file = txrm_file
+        self.txrm_file = os.path.abspath(file_name)
         
         if self.txrm_file == None:
             raise ValueError('Path to txrm file is required.')
@@ -66,9 +66,9 @@ class TXRMDataReader(object):
         
         return self._ag
         
-    def load_projections(self):
+    def read(self):
         '''
-        Load projections and return AcquisitionData container
+        Reads projections and return AcquisitionData container
         '''
         # the import will raise an ImportError if dxchange is not installed
         import dxchange
@@ -138,7 +138,7 @@ if __name__ == '__main__':
     from ccpi.astra.processors import FBP
     from ccpi.io import NEXUSDataWriter
     import matplotlib.pyplot as plt
-    from ccpi.framework.TestData import data_dir
+    from ccpi.framework.dataexample import data_dir
 
     angle_unit = AcquisitionGeometry.RADIAN
 

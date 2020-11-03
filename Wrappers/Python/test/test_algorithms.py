@@ -38,7 +38,8 @@ from ccpi.optimisation.algorithms import PDHG
 
 from ccpi.optimisation.operators import Gradient, BlockOperator, FiniteDifferenceOperator
 from ccpi.optimisation.functions import MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler                     
-from ccpi.framework import TestData
+from ccpi.utilities import dataexample
+from ccpi.utilities import noise as applynoise
 import os, sys, time
 
 
@@ -257,49 +258,45 @@ class TestAlgorithms(unittest.TestCase):
         print ("PDHG Denoising with 3 noises")
         # adapted from demo PDHG_TV_Color_Denoising.py in CIL-Demos repository
         
-        # loader = TestData(data_dir=os.path.join(os.environ['SIRF_INSTALL_PATH'], 'share','ccpi'))
-        # loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
-        loader = TestData()
-        
-        data = loader.load(TestData.PEPPERS, size=(256,256))
+        data = dataexample.PEPPERS.get(size=(256,256))
         ig = data.geometry
         ag = ig
 
         which_noise = 0
         # Create noisy data. 
         noises = ['gaussian', 'poisson', 's&p']
-        noise = noises[which_noise]
+        dnoise = noises[which_noise]
         
-        def setup(data, noise):
-            if noise == 's&p':
-                n1 = TestData.random_noise(data.as_array(), mode = noise, salt_vs_pepper = 0.9, amount=0.2, seed=10)
-            elif noise == 'poisson':
+        def setup(data, dnoise):
+            if dnoise == 's&p':
+                n1 = applynoise.saltnpepper(data, salt_vs_pepper = 0.9, amount=0.2, seed=10)
+            elif dnoise == 'poisson':
                 scale = 5
-                n1 = TestData.random_noise( data.as_array()/scale, mode = noise, seed = 10)*scale
-            elif noise == 'gaussian':
-                n1 = TestData.random_noise(data.as_array(), mode = noise, seed = 10)
+                n1 = applynoise.poisson( data.as_array()/scale, seed = 10)*scale
+            elif dnoise == 'gaussian':
+                n1 = applynoise.gaussian(data.as_array(), seed = 10)
             else:
                 raise ValueError('Unsupported Noise ', noise)
             noisy_data = ig.allocate()
             noisy_data.fill(n1)
         
             # Regularisation Parameter depending on the noise distribution
-            if noise == 's&p':
+            if dnoise == 's&p':
                 alpha = 0.8
-            elif noise == 'poisson':
+            elif dnoise == 'poisson':
                 alpha = 1
-            elif noise == 'gaussian':
+            elif dnoise == 'gaussian':
                 alpha = .3
                 # fidelity
-            if noise == 's&p':
+            if dnoise == 's&p':
                 g = L1Norm(b=noisy_data)
-            elif noise == 'poisson':
+            elif dnoise == 'poisson':
                 g = KullbackLeibler(b=noisy_data)
-            elif noise == 'gaussian':
+            elif dnoise == 'gaussian':
                 g = 0.5 * L2NormSquared(b=noisy_data)
             return noisy_data, alpha, g
 
-        noisy_data, alpha, g = setup(data, noise)
+        noisy_data, alpha, g = setup(data, dnoise)
         operator = Gradient(ig, correlation=Gradient.CORRELATION_SPACE)
 
         f1 =  alpha * MixedL21Norm()
@@ -377,16 +374,13 @@ class TestAlgorithms(unittest.TestCase):
     def test_FISTA_Denoising(self):
         print ("FISTA Denoising Poisson Noise Tikhonov")
         # adapted from demo FISTA_Tikhonov_Poisson_Denoising.py in CIL-Demos repository
-        #loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
-        loader = TestData()
-        data = loader.load(TestData.SHAPES)
+        data = dataexample.SHAPES.get()
         ig = data.geometry
         ag = ig
         N=300
         # Create Noisy data with Poisson noise
         scale = 5
-        n1 = TestData.random_noise( data.as_array()/scale, mode = 'poisson', seed = 10)*scale
-        noisy_data = ImageData(n1)
+        noisy_data = applynoise.poisson(data/scale,seed=10) * scale
 
         # Regularisation Parameter
         alpha = 10
@@ -478,8 +472,7 @@ class TestSPDHG(unittest.TestCase):
         from ccpi.optimisation.algorithms import SPDHG, PDHG
         # Fast Gradient Projection algorithm for Total Variation(TV)
         from ccpi.optimisation.functions import TotalVariation
-        loader = TestData()
-        data = loader.load(TestData.SIMPLE_PHANTOM_2D, size=(128,128))
+        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
         ig = data.geometry
         ig.voxel_size_x = 0.1
         ig.voxel_size_y = 0.1
@@ -574,8 +567,7 @@ class TestSPDHG(unittest.TestCase):
         from ccpi.optimisation.operators import BlockOperator, Gradient
         from ccpi.optimisation.functions import BlockFunction, KullbackLeibler, MixedL21Norm, IndicatorBox
         from ccpi.optimisation.algorithms import SPDHG, PDHG
-        loader = TestData()
-        data = loader.load(TestData.SIMPLE_PHANTOM_2D, size=(128,128))
+        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
         print ("here")
         ig = data.geometry
         ig.voxel_size_x = 0.1
@@ -594,14 +586,17 @@ class TestSPDHG(unittest.TestCase):
         noises = ['gaussian', 'poisson']
         noise = noises[1]
         if noise == 'poisson':
-            np.random.seed(10)
             scale = 5
-            eta = 0
-            noisy_data = AcquisitionData(np.random.poisson( scale * (eta + sin.as_array()))/scale, ag)
+            noisy_data = scale * applynoise.poisson(sin/scale, seed=10)
+            # np.random.seed(10)
+            # scale = 5
+            # eta = 0
+            # noisy_data = AcquisitionData(np.random.poisson( scale * (eta + sin.as_array()))/scale, ag)
         elif noise == 'gaussian':
-            np.random.seed(10)
-            n1 = np.random.normal(0, 0.1, size = ag.shape)
-            noisy_data = AcquisitionData(n1 + sin.as_array(), ag)
+            noisy_data = noise.gaussian(sin, var=0.1, seed=10)
+            # np.random.seed(10)
+            # n1 = np.random.normal(0, 0.1, size = ag.shape)
+            # noisy_data = AcquisitionData(n1 + sin.as_array(), ag)
             
         else:
             raise ValueError('Unsupported Noise ', noise)
@@ -676,8 +671,7 @@ class TestSPDHG(unittest.TestCase):
         from ccpi.optimisation.operators import BlockOperator, Gradient
         from ccpi.optimisation.functions import BlockFunction, KullbackLeibler, MixedL21Norm, IndicatorBox
         from ccpi.optimisation.algorithms import SPDHG, PDHG
-        loader = TestData()
-        data = loader.load(TestData.SIMPLE_PHANTOM_2D, size=(128,128))
+        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
         print ("test_SPDHG_vs_SPDHG_explicit_axpby here")
         ig = data.geometry
         ig.voxel_size_x = 0.1
@@ -769,8 +763,7 @@ class TestSPDHG(unittest.TestCase):
         from ccpi.optimisation.operators import BlockOperator, Gradient
         from ccpi.optimisation.functions import BlockFunction, KullbackLeibler, MixedL21Norm, IndicatorBox
         from ccpi.optimisation.algorithms import PDHG
-        loader = TestData()
-        data = loader.load(TestData.SIMPLE_PHANTOM_2D, size=(128,128))
+        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
         print ("test_PDHG_vs_PDHG_explicit_axpby here")
         ig = data.geometry
         ig.voxel_size_x = 0.1

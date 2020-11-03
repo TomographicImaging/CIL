@@ -284,10 +284,10 @@ class NikonDataReader(object):
         
         return self._ag
         
-    def load(self):
+    def read(self):
         
         '''
-        Load projections and return AcquisitionData container
+        Reads projections and return AcquisitionData container
         '''
             
         # get path to projections

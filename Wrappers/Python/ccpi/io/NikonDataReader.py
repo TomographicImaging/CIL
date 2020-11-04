@@ -21,7 +21,7 @@ from __future__ import division
 from __future__ import print_function
 
 from ccpi.framework import AcquisitionData, AcquisitionGeometry
-from ccpi.io.TIFFStackReader import TIFFStackReader
+from ccpi.io import TIFFStackReader
 import numpy
 import os
     

@@ -33,7 +33,6 @@ from timeit import default_timer as timer
 from ccpi.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 
 from ccpi.io import NEXUSDataReader
-from ccpi.processors import CenterOfRotationFinder
 from ccpi.processors import CentreOfRotationCorrector, CofR_xcorr
 import wget
 import os

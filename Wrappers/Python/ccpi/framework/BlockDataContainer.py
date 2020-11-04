@@ -23,10 +23,7 @@ import numpy
 from numbers import Number
 import functools
 from ccpi.framework import DataContainer
-from ccpi.utilities import NUM_THREADS
-#from ccpi.framework import AcquisitionData, ImageData
-#from ccpi.optimisation.operators import Operator, LinearOperator
-
+from ccpi.utilities.multiprocessing import NUM_THREADS
 
 class BlockDataContainer(object):
     '''Class to hold DataContainers as column vector

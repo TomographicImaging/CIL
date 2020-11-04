@@ -258,7 +258,7 @@ if __name__ == '__main__':
     
     import numpy as np                         
     import matplotlib.pyplot as plt
-    from ccpi.framework import TestData
+    from ccpi.utilities import dataexample
     import os
     import sys
     from ccpi.plugins.regularisers import FGP_TV as CCPiReg_FGP_TV
@@ -277,8 +277,8 @@ if __name__ == '__main__':
     ###################################################################
     print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV no tolerance (2D)")
     
-    loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
-    data = loader.load(TestData.SHAPES)
+    
+    data = dataexample.SHAPES.get()
     ig = data.geometry
     ag = ig
 

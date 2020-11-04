@@ -91,7 +91,6 @@ class FISTA(Algorithm):
             raise ValueError('Error: Fidelity Function\'s Lipschitz constant is set to None')
         self.invL = 1/f.L
         self.t = 1
-        self.update_objective()
         self.configured = True
         print("{} configured".format(self.__class__.__name__, ))
 

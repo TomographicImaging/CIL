@@ -144,9 +144,9 @@ class SPDHG(Algorithm):
         self.zbar= operator.domain_geometry().allocate(0)
         # relaxation parameter
         self.theta = 1
-        self.update_objective()
         self.configured = True
         print("{} configured".format(self.__class__.__name__, ))
+        
     def update(self):
         # Gradient descent for the primal variable
         # x_tmp = x - tau * zbar
@@ -193,12 +193,18 @@ class SPDHG(Algorithm):
         self.save_previous_iteration(i, y_k)
         
     def update_objective(self):
-         p1 = self.f(self.operator.direct(self.x)) + self.g(self.x)
-         d1 = - self.f.convex_conjugate(self.y_old)
-         tmp = -1*self.operator.adjoint(self.y_old)
-         d1 += self.g.convex_conjugate(tmp)
+        # p1 = self.f(self.operator.direct(self.x)) + self.g(self.x)
+        p1 = 0.
+        for i,op in enumerate(self.operator.operators):
+            p1 += self.f[i](op.direct(self.x))
+        p1 += self.g(self.x)
 
-         self.loss.append([p1, d1, p1-d1])
+        d1 = - self.f.convex_conjugate(self.y_old)
+        tmp = self.operator.adjoint(self.y_old)
+        tmp *= -1
+        d1 -= self.g.convex_conjugate(tmp)
+
+        self.loss.append([p1, d1, p1-d1])
 
     @property
     def objective(self):

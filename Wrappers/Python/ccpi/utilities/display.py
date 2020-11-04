@@ -264,12 +264,12 @@ def show(x, title = None, show_channels = [1], **kwargs):
             
 if __name__ == '__main__':         
     
-    from ccpi.framework import TestData, ImageData
+    from ccpi.framework import ImageData
+    from ccpi.utilities import dataexample
     import os
     import sys
     
-    loader = TestData(data_dir=os.path.join(sys.prefix, 'share','ccpi'))
-    data = loader.load(TestData.PEPPERS, size=(256,256))
+    data = dataexample.PEPPERS.get(size=(256,256))
     ig = data.geometry
     
     show2D(data)

@@ -1922,23 +1922,6 @@ class DataContainer(object):
             
             command = 'self.array['
             i = 0
-
-            for k,v in self.dimension_labels.items():
-                for dim_label, dim_value in dimension.items():    
-                    if dim_label == v:
-                        command = command + str(dim_value)
-                    else:
-                        command = command + ":"
-                if i < self.number_of_dimensions -1:
-                    command = command + ','
-                i += 1
-            
-            if issubclass(type(array), numpy.ndarray):
-                command = command + "] = array[:]" 
-            else:
-                command = command + "] = array.as_array()[:]"
-            exec(command)            
-
             for el in axis:
                 if i > 0:
                     command += ','
@@ -1954,7 +1937,6 @@ class DataContainer(object):
             else:
                 raise TypeError('Can fill only with number, numpy array or DataContainer and subclasses. Got {}'.format(type(array)))
             exec(command)
-
             
         
     def check_dimensions(self, other):

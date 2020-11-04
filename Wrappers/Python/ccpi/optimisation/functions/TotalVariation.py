@@ -274,7 +274,7 @@ if __name__ == '__main__':
     from tomophantom import TomoP3D
     from ccpi.framework import ImageGeometry
     from ccpi.utilities.quality_measures import mae
-    from ccpi.utilities.display import show
+    from ccpi.utilities.display import show   
     
         
     ###################################################################

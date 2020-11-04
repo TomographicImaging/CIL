@@ -108,6 +108,17 @@ class TestDataProcessor(unittest.TestCase):
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)              
 
+    def test_CenterOfRotationCorrector(self):       
+        corr = CentreOfRotationCorrector.xcorr(slice_index='centre', projection_index=0, ang_tol=0.1)
+        corr.set_input(self.data_DLS.clone())
+        ad_out = corr.get_output()
+        self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
+        
+        corr = CentreOfRotationCorrector.xcorr(slice_index=67, projection_index=0, ang_tol=0.1)
+        corr.set_input(self.data_DLS.clone())
+        ad_out = corr.get_output()
+        self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)              
+
     def test_Normalizer(self):
         pass         
         

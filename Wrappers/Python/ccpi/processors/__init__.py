@@ -17,6 +17,7 @@
 #   limitations under the License.
 
 from .CenterOfRotationFinder import CenterOfRotationFinder
+from .CentreOfRotationCorrector import CentreOfRotationCorrector
 from .CofR_xcorr import CofR_xcorr
 from .Normalizer import Normalizer
 from .Resizer import Resizer

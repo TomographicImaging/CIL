@@ -49,53 +49,6 @@ class TestDataProcessor(unittest.TestCase):
         self.data_DLS = data_raw.log()
         self.data_DLS *= -1
 
-    def test_CenterOfRotation(self):
-
-        ad = self.data_DLS.clone()
-        print (ad)
-        cf = CenterOfRotationFinder()
-        cf.set_input(ad)
-        print ("Center of rotation", cf.get_output())
-        self.assertAlmostEqual(86.25, cf.get_output())
-        
-        print("check call method of DataProcessor")
-        self.assertAlmostEqual(86.25, cf(ad))
-
-        ad = self.data_DLS.clone()
-        ad = ad.subset(['vertical','angle','horizontal'])
-        print (ad)
-        cf = CenterOfRotationFinder()
-        cf.set_input(ad)
-        print ("Center of rotation", cf.get_output())
-        self.assertAlmostEqual(86.25, cf.get_output())
-        
-        print("check call method of DataProcessor")
-        self.assertAlmostEqual(86.25, cf(ad))
-
-        ad = self.data_DLS.clone()
-        ad = ad.subset(vertical=67)
-        print (ad)
-        cf = CenterOfRotationFinder()
-        cf.set_input(ad)
-        print ("Center of rotation", cf.get_output())
-        self.assertAlmostEqual(86.25, cf.get_output())
-        print("check call method of DataProcessor")
-        self.assertAlmostEqual(86.25, cf(ad))        
-
-        ad = self.data_DLS.clone()
-        print (ad)
-        cf = CenterOfRotationFinder()
-        cf.set_input(ad)
-        cf.set_slice(80)
-        print ("Center of rotation", cf.get_output())
-        self.assertAlmostEqual(86.25, cf.get_output())
-        cf.set_slice()
-        print ("Center of rotation", cf.get_output())
-        self.assertAlmostEqual(86.25, cf.get_output())       
-        cf.set_slice('centre')
-        print ("Center of rotation", cf.get_output())
-        self.assertAlmostEqual(86.25, cf.get_output())
-
     def test_CofR_xcorr(self):       
 
         corr = CofR_xcorr(slice_index='centre', projection_index=0, ang_tol=0.1)

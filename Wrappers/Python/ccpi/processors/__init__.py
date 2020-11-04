@@ -16,7 +16,6 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from .CenterOfRotationFinder import CenterOfRotationFinder
 from .CentreOfRotationCorrector import CentreOfRotationCorrector
 from .CofR_xcorr import CofR_xcorr
 from .Normalizer import Normalizer

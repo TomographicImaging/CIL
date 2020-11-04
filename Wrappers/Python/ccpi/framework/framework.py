@@ -1678,10 +1678,10 @@ class AcquisitionGeometry(object):
             if geometry_new.geom_type == AcquisitionGeometry.PARALLEL or vertical_slice == 'centre':
                 geometry_new = geometry_new.get_centre_slice()
             else:
-                raise ValueError("Cannot calculate system geometry for the requested slice")
+                raise ValueError("Can only subset centre slice geometry on cone-beam data. Expected vertical = 'centre'. Got vertical = {0}".format(vertical_slice))
         
         if horizontal_slice is not None:
-            raise ValueError("Cannot calculate system geometry for the requested slice")
+            raise ValueError("Cannot calculate system geometry for a horizontal slice")
 
         if dimensions is not None:
             geometry_new.dimension_labels = dimensions 
@@ -2667,16 +2667,24 @@ class AcquisitionData(DataContainer):
             (len(dimensions) != len(self.shape) ):
             raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
 
-        #Update Geometry
+        #Update Geometry if reasonable
         try:
             geometry_new = self.geometry.subset(dimensions=dimensions, **kw)
-        except ValueError:
-            geometry_new = None
+        except ValueError as ve:
+            if kw.get('force', False):
+                geometry_new = None
+            else:
+                print(ve)
+                raise ValueError ("Unable to subset requested geometry. Use 'force=True' to return DataContainer.")
 
         #if vertical = 'centre' slice convert to index and subset.
         #if the index is non-integer then return rows either side and interpolate to get the center slice value
         interpolate = False
-        vertical_slice = kw.get(AcquisitionGeometry.VERTICAL, None)
+
+        vertical_slice = None
+        if AcquisitionGeometry.VERTICAL in self.geometry.dimension_labels:
+            vertical_slice = kw.get(AcquisitionGeometry.VERTICAL, None)           
+
         if vertical_slice == 'centre':           
             ind = self.geometry.dimension_labels.index('vertical')
             centre_slice = (self.geometry.shape[ind]-1) / 2.
@@ -2696,12 +2704,14 @@ class AcquisitionData(DataContainer):
 
         dimension_labels = out.dimension_labels.copy()    
 
-        if geometry_new is None:                
-            return DataContainer(out.array, deep_copy=False, dimension_labels=dimension_labels,\
-                suppress_warning=True)
+        if len(dimension_labels) == 1:
+            return out
         else:
-            return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new,\
-                dimension_labels=dimension_labels, suppress_warning=True)
+            if geometry_new is None:
+                print("Returning DataContainer")
+                return DataContainer(out.array, deep_copy=False, dimension_labels=dimension_labels, suppress_warning=True)
+            else:
+                return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new, dimension_labels=dimension_labels, suppress_warning=True)
 
 class DataProcessor(object):
     

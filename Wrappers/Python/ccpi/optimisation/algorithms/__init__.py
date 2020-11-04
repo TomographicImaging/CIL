@@ -19,8 +19,8 @@
 from .Algorithm import Algorithm
 from .CGLS import CGLS
 from .SIRT import SIRT
-from .GradientDescent import GradientDescent
+from .GD import GD
 from .FISTA import FISTA
 from .PDHG import PDHG
 from .ADMM import LADMM
-
+from .SPDHG import SPDHG

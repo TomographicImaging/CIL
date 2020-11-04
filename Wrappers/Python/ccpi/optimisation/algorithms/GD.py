@@ -27,7 +27,7 @@ from __future__ import print_function
 import numpy
 from ccpi.optimisation.algorithms import Algorithm
 
-class GradientDescent(Algorithm):
+class GD(Algorithm):
     ''' 
     
         Gradient Descent algorithm
@@ -36,7 +36,7 @@ class GradientDescent(Algorithm):
     '''
 
     def __init__(self, x_init=None, objective_function=None, step_size =None, **kwargs):
-        '''GradientDescent algorithm creator
+        '''GD algorithm creator
         
         initialisation can be done at creation time if all 
         proper variables are passed or later with set_up
@@ -52,7 +52,7 @@ class GradientDescent(Algorithm):
         :param atol: optional parameter defining the absolute tolerance comparing the 
                      current objective function to 0, default 1e-8, see numpy.isclose
         '''
-        super(GradientDescent, self).__init__(**kwargs)
+        super(GD, self).__init__(**kwargs)
 
         self.alpha = kwargs.get('alpha' , 1e6)
         self.beta = kwargs.get('beta', 0.5)

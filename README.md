@@ -11,12 +11,25 @@ This package provides a common framework, hence the name, for the analysis of da
 
 ## Installation
 
-Binary installation of the CCPi Framework can be done with `conda`. Install a new environment as in the following. Some packages are optional (`cvxpy`, `ccpi-plugins`, `ccpi-astra`) but very useful.
+Binary installation of the CCPi Framework can be done with `conda`. Install a new environment using:
 
 ```bash
-
-conda create -y --name cil python=3 cvxpy ccpi-framework=19.10 ccpi-astra=19.10 tomophantom ccpi-plugins=19.10 -c oxfordcontrol -c conda-forge -c astra-toolbox -c ccpi
+conda create --name cil -c conda-forge -c ccpi ccpi-framework=20.09
 ```
+
+To install CIL and all optional packages needed to run the [CIL demos](https://github.com/vais-ral/CIL-Demos/releases/tag/v19.10.1) install the environment with:
+```bash
+
+conda create --name cil -c conda-forge -c astra-toolbox/label/dev -c ccpi ccpi-framework=20.09 ccpi-astra=20.09 ccpi-plugins=20.09 tomophantom
+```
+
+where,
+
+```ccpi-plugins``` will give you access to the [CCPi Regularisation Toolkit](https://github.com/vais-ral/CCPi-Regularisation-Toolkit) and CCPi-reconstruction plugins.
+
+```ccpi-astra``` will give you access to the CCPi wrappers to the ASTRA toolbox projectors (GPLv3 license).
+
+```tomophantom``` [Tomophantom](https://github.com/dkazanc/TomoPhantom) will allow you to generate phantoms to use as test data.
 
 ### Components
 

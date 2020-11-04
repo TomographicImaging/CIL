@@ -30,3 +30,4 @@ from .MixedL21Norm import MixedL21Norm, SmoothMixedL21Norm
 from .IndicatorBox import IndicatorBox
 from .KullbackLeibler import KullbackLeibler
 from .Rosenbrock import Rosenbrock
+from .TotalVariation import TotalVariation

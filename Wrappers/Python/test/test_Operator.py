@@ -20,17 +20,17 @@ from __future__ import division
 import unittest
 from ccpi.framework import ImageGeometry, VectorGeometry, ImageData, BlockDataContainer, DataContainer
 from ccpi.optimisation.operators import BlockOperator,\
-    FiniteDiff, SymmetrizedGradient
+    FiniteDifferenceOperator, SymmetrizedGradient
 import numpy
 from timeit import default_timer as timer
-from ccpi.optimisation.operators import Gradient, Identity, SparseFiniteDiff,\
-    DiagonalOperator, MaskOperator, ChannelwiseOperator
-from ccpi.optimisation.operators import LinearOperator, LinearOperatorMatrix
+from ccpi.optimisation.operators import Gradient, Identity,\
+    DiagonalOperator, MaskOperator, ChannelwiseOperator, BlurringOperator
+from ccpi.optimisation.operators import LinearOperator, MatrixOperator
 import numpy   
 from ccpi.optimisation.operators import SumOperator, Gradient,\
             ZeroOperator, SymmetrizedGradient, CompositionOperator
 
-from ccpi.framework import TestData
+from ccpi.utilities import dataexample
 import os
 from packaging import version
 
@@ -76,9 +76,9 @@ class CCPiTestClass(unittest.TestCase):
 class TestOperator(CCPiTestClass):
     def setUp(self):
         numpy.random.seed(1)
-    def test_LinearOperatorMatrix(self):
+    def test_MatrixOperator(self):
         
-        print('Check LinearOperatorMatrix')
+        print('Check MatrixOperator')
                 
         m = 30
         n = 20
@@ -86,7 +86,7 @@ class TestOperator(CCPiTestClass):
         vg = VectorGeometry(n)
         
         Amat = numpy.random.randn(m, n)
-        A = LinearOperatorMatrix(Amat)
+        A = MatrixOperator(Amat)
         
         b = vg.allocate('random')
         
@@ -195,6 +195,28 @@ class TestOperator(CCPiTestClass):
         #print(z.subset(channel=2).as_array())
         #print(z2.subset(channel=2).as_array())
         #print((diag*(diag*x.subset(channel=2))).as_array())
+        
+    def test_BlurringOperator(self):
+        print("test_BlurringOperator")
+        
+        ig = ImageGeometry(100,100)
+        
+        # Parameters for point spread function PSF (size and std)
+        ks          = 11; 
+        ksigma      = 5.0;
+        
+        # Create 1D PSF and 2D as outer product, then normalise.
+        w           = numpy.exp(-numpy.arange(-(ks-1)/2,(ks-1)/2+1)**2/(2*ksigma**2))
+        w.shape     = (ks,1)
+        PSF         = w*numpy.transpose(w)
+        PSF         = PSF/(PSF**2).sum()
+        PSF         = PSF/PSF.sum()
+        
+        # Create blurring operator
+        BOP = BlurringOperator(PSF,ig)
+        
+        # Run dot test to check validity of adjoint.
+        self.assertTrue(BOP.dot_test(BOP))
 
     def test_Identity(self):
         print ("test_Identity")
@@ -216,7 +238,7 @@ class TestOperator(CCPiTestClass):
         ig = ImageGeometry(N, M)
         Id = Identity(ig)
 
-        FD = FiniteDiff(ig, direction = 0, bnd_cond = 'Neumann')
+        FD = FiniteDifferenceOperator(ig, direction = 0, bnd_cond = 'Neumann')
         u = FD.domain_geometry().allocate('random')
         
         
@@ -239,6 +261,7 @@ class TestOperator(CCPiTestClass):
         res = G.domain_geometry().allocate()
         G.adjoint(u, out=res)
         w = G.adjoint(u)
+
         self.assertNumpyArrayEqual(res.as_array(), w.as_array())
         
         u = G.domain_geometry().allocate(ImageGeometry.RANDOM)
@@ -429,14 +452,14 @@ class TestGradients(CCPiTestClass):
              
         # self.assertAlmostEqual(lhs3, rhs3)
         self.assertTrue( LinearOperator.dot_test(Grad3 , verbose=True, decimal=4))
-        self.assertTrue( LinearOperator.dot_test(Grad3 , decimal=5, verbose=True))
+        self.assertTrue( LinearOperator.dot_test(Grad3 , verbose=True, decimal=4))
 
     def test_dot_test2(self):
         Grad3 = Gradient(self.ig3, correlation = 'SpaceChannel', backend='c')
              
         # self.assertAlmostEqual(lhs3, rhs3)
         # self.assertTrue( LinearOperator.dot_test(Grad3 , verbose=True))
-        self.assertTrue( LinearOperator.dot_test(Grad3 , decimal=5, verbose=True))
+        self.assertTrue( LinearOperator.dot_test(Grad3 , decimal=4, verbose=True))
 
 
 
@@ -753,7 +776,7 @@ class TestBlockOperator(unittest.TestCase):
 class TestOperatorCompositionSum(unittest.TestCase):
     def setUp(self):
         
-        self.data = TestData().load(TestData.BOAT, size=(128,128))
+        self.data = dataexample.BOAT.get(size=(128,128))
         self.ig = self.data.geometry
 
     def test_SumOperator(self):
@@ -1006,4 +1029,4 @@ class TestOperatorCompositionSum(unittest.TestCase):
 
 
     
-
+    

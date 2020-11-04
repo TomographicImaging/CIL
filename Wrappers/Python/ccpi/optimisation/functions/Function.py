@@ -34,14 +34,17 @@ class Function(object):
     """ Abstract class representing a function 
     
         :param L: Lipschitz constant of the gradient of the function F(x), when it is differentiable.
+        :type L: number, positive, default None
         :param domain: The domain of the function.
+
+        Lipschitz of the gradient of the function; it is a positive real number, such that |f'(x) - f'(y)| <= L ||x-y||, assuming f: IG --> R
 
     """
     
     
     def __init__(self, L = None):
-        
-        self.L = L
+        # overrides the type check to allow None as initial value
+        self._L = L
         
     def __call__(self,x):
         
@@ -140,7 +143,22 @@ class Function(object):
         if center is None:
             return self
         else:
-            return TranslateFunction(self, center)  
+            return TranslateFunction(self, center)
+    
+    @property
+    def L(self):
+        '''Lipschitz of the gradient of function f.
+        
+        L is positive real number, such that |f'(x) - f'(y)| <= L ||x-y||, assuming f: IG --> R'''
+        return self._L
+        # return self._L
+    @L.setter
+    def L(self, value):
+        '''Setter for Lipschitz constant'''
+        if isinstance(value, (Number,)) and value >= 0:
+            self._L = value
+        else:
+            raise TypeError('The Lipschitz constant is a real positive number')
     
 class SumFunction(Function):
     
@@ -154,17 +172,21 @@ class SumFunction(Function):
                 
         super(SumFunction, self).__init__()        
 
-        #if function1.domain != function2.domain:            
-        #    raise ValueError('{} is not the same as {}'.format(function1.domain, function2.domain)) 
-            
-        #self.domain = function1.domain
-                                
-        if function1.L is not None and function2.L is not None:
-            self.L = function1.L + function2.L
-            
         self.function1 = function1
-        self.function2 = function2               
-            
+        self.function2 = function2
+    @property
+    def L(self):
+        '''Lipschitz constant'''
+        if self.function1.L is not None and self.function2.L is not None:
+            self._L = self.function1.L + self.function2.L
+        else:
+            self._L = None
+        return self._L
+    @L.setter
+    def L(self, value):
+        # call base class setter
+        super(SumFunction, self.__class__).L.fset(self, value )
+
     def __call__(self,x):
         r"""Returns the value of the sum of functions :math:`F_{1}` and :math:`F_{2}` at x
         
@@ -211,12 +233,30 @@ class ScaledFunction(Function):
         if not isinstance (scalar, Number):
             raise TypeError('expected scalar: got {}'.format(type(scalar)))
         
-        if function.L is not None:        
-            self.L = abs(scalar) * function.L  
-            
         self.scalar = scalar
         self.function = function       
-              
+    @property
+    def L(self):
+        if self._L is None:
+            if self.function.L is not None:
+                self._L = abs(self.scalar) * self.function.L
+            else:
+                self._L = None
+        return self._L
+    @L.setter
+    def L(self, value):
+        # call base class setter
+        super(ScaledFunction, self.__class__).L.fset(self, value )
+
+    @property
+    def scalar(self):
+        return self._scalar
+    @scalar.setter
+    def scalar(self, value):
+        if isinstance(value, (Number, )):
+            self._scalar = value
+        else:
+            raise TypeError('Expecting scalar type as a number type. Got {}'.format(type(value)))
     def __call__(self,x, out=None):
         r"""Returns the value of the scaled function.
         
@@ -306,9 +346,19 @@ class SumFunctionScalar(SumFunction):
                         
         """                
         return self.function.proximal(x, tau, out=out)        
-            
-#    def function(self):       
-#       return self.function    
+    
+    @property
+    def L(self):
+        if self._L is None:
+            if self.function.L is not None:
+                self._L = self.function.L
+            else:
+                self._L = None
+        return self._L
+    @L.setter
+    def L(self, value):
+        # call base class setter
+        super(SumFunctionScalar, self.__class__).L.fset(self, value )
 
 class ConstantFunction(Function):
     
@@ -318,13 +368,10 @@ class ConstantFunction(Function):
     """
     
     def __init__(self, constant = 0):
-        
+        self.constant = constant
         super(ConstantFunction, self).__init__(L=0)
         
-        if not isinstance (constant, Number):
-            raise TypeError('expected scalar: got {}'.format(type(constant)))
-                
-        self.constant = constant
+        
               
     def __call__(self,x):
         
@@ -374,6 +421,17 @@ class ConstantFunction(Function):
         else:
             out.fill(x)
         #return Identity(x.geometry).direct(x, out=out)
+    @property
+    def constant(self):
+        return self._constant
+    @constant.setter
+    def constant(self, value):
+        if not isinstance (value, Number):
+            raise TypeError('expected scalar: got {}'.format(type(constant)))
+        self._constant = value
+    @property
+    def L(self):
+        return 0.
 
 class ZeroFunction(ConstantFunction):
     
@@ -401,8 +459,11 @@ class TranslateFunction(Function):
     """
     
     def __init__(self, function, center):
-        
-        super(TranslateFunction, self).__init__(L = function.L) 
+        try:
+            L = function.L
+        except NotImplementedError as nie:
+            L = None
+        super(TranslateFunction, self).__init__(L = L) 
                         
         self.function = function
         self.center = center

@@ -373,6 +373,35 @@ class TestDataContainer(unittest.TestCase):
         self.assertEqual(.25, ds3.as_array()[0][0][0])
         self.assertEqual(.5, ds.as_array()[0][0][0])
 
+    def test_reverse_operand_algebra(self):
+        print ("Test reverse operand algebra")
+
+        number = 3/2
+        
+        X, Y, Z = 32, 64, 128
+        a = numpy.ones((X, Y, Z), dtype='float32')
+        ds = DataContainer(a * 3, False, ['X', 'Y', 'Z'])
+
+        # rdiv
+        b = number / ds
+        numpy.testing.assert_array_almost_equal(a * 0.5, b.as_array())
+        # radd
+        number = 1
+        b = number + ds
+        numpy.testing.assert_array_almost_equal(a * 4, b.as_array())
+        # rsub
+        number = 3
+        b = number - ds
+        numpy.testing.assert_array_almost_equal(numpy.zeros_like(a), b.as_array())
+        # rmul
+        number = 1/3
+        b = number * ds
+        numpy.testing.assert_array_almost_equal(a, b.as_array())
+        # rpow
+        number = 2
+        b = number ** ds
+        numpy.testing.assert_array_almost_equal(a * 8, b.as_array())
+
     def test_creation_copy(self):
         shape = (2, 3, 4, 5)
         size = shape[0]
@@ -655,7 +684,7 @@ class TestDataContainer(unittest.TestCase):
         self.assertListEqual([AcquisitionGeometry.CHANNEL ,
                  AcquisitionGeometry.ANGLE , AcquisitionGeometry.VERTICAL ,
                  AcquisitionGeometry.HORIZONTAL],
-                              sgeometry.dimension_labels)
+                              list(sgeometry.dimension_labels))
         sino = sgeometry.allocate()
 
         # test reshape
@@ -664,43 +693,43 @@ class TestDataContainer(unittest.TestCase):
                  AcquisitionGeometry.ANGLE]
         ss = sino.subset(new_order)
 
-        self.assertListEqual(new_order, ss.geometry.dimension_labels)
+        self.assertListEqual(new_order, list(ss.geometry.dimension_labels))
 
         ss1 = ss.subset(vertical = 0)
         self.assertListEqual([AcquisitionGeometry.HORIZONTAL ,
                  AcquisitionGeometry.CHANNEL  ,
-                 AcquisitionGeometry.ANGLE], ss1.geometry.dimension_labels)
+                 AcquisitionGeometry.ANGLE], list(ss1.geometry.dimension_labels))
         ss2 = ss.subset(vertical = 0, channel=0)
         self.assertListEqual([AcquisitionGeometry.HORIZONTAL ,
-                 AcquisitionGeometry.ANGLE], ss2.geometry.dimension_labels)
+                 AcquisitionGeometry.ANGLE], list(ss2.geometry.dimension_labels))
 
     def test_ImageDataSubset(self):
-        new_order = ['horizontal_x', 'channel', 'horizontal_y', ]
+        new_order = ['horizontal_x', 'channel', 'horizontal_y']
 
 
         vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2, dimension_labels=new_order)
         # expected dimension_labels
         
         self.assertListEqual(new_order,
-                              vgeometry.dimension_labels)
+                              list(vgeometry.dimension_labels))
         vol = vgeometry.allocate()
 
         # test reshape
-        new_order = [ 'channel', 'horizontal_x','horizontal_y']
+        new_order = ['channel', 'horizontal_x','horizontal_y']
         ss = vol.subset(new_order)
 
-        self.assertListEqual(new_order, ss.geometry.dimension_labels)
+        self.assertListEqual(new_order, list(ss.geometry.dimension_labels))
 
         ss1 = ss.subset(horizontal_x = 0)
-        self.assertListEqual([ 'channel', 'horizontal_y'], ss1.geometry.dimension_labels)
+        self.assertListEqual(['channel', 'horizontal_y'], list(ss1.geometry.dimension_labels))
 
         vg = ImageGeometry(3,4,5,channels=2)
         self.assertListEqual([ImageGeometry.CHANNEL, ImageGeometry.VERTICAL,
                 ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X],
-                              vg.dimension_labels)
+                              list(vg.dimension_labels))
         ss2 = vg.allocate()
         ss3 = ss2.subset(vertical = 0, channel=0)
-        self.assertListEqual([ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X], ss3.geometry.dimension_labels)
+        self.assertListEqual([ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X], list(ss3.geometry.dimension_labels))
 
 
     def assertNumpyArrayEqual(self, first, second):
@@ -767,9 +796,11 @@ class TestDataContainer(unittest.TestCase):
         ig = ImageGeometry(10,10)                                               
         d1 = ig.allocate(1)                                                     
         d2 = ig.allocate(2)                                                     
-        out = ig.allocate(None)                                                 
+        out = ig.allocate(None)
+        a = 2                                                 
+        b = 1                                            
         # equals to 2 * [1] + 1 * [2] = [4]
-        d1.axpby(2,1,d2,out)
+        d1.axpby(a,b,d2,out)
         res = numpy.ones_like(d1.as_array()) * 4.
         numpy.testing.assert_array_equal(res, out.as_array())
     def test_axpby2(self):
@@ -779,11 +810,91 @@ class TestDataContainer(unittest.TestCase):
         d1 = ig.allocate(1)                                                     
         d2 = ig.allocate(2)                                                     
         out = ig.allocate(None)   
+        a = 2                                                 
+        b = 1        
         print ("allocated")                                              
         # equals to 2 * [1] + 1 * [2] = [4]
-        d1.axpby(2,1,d2,out, num_threads=4)
+        d1.axpby(a,b,d2,out, num_threads=4)
         print ("calculated") 
         res = numpy.ones_like(d1.as_array()) * 4.
+        numpy.testing.assert_array_equal(res, out.as_array())
+    def test_axpby3(self):
+        print ("test axpby3")
+        #a vec, b float
+        ig = ImageGeometry(10,10)                                               
+        d1 = ig.allocate(1)                                                     
+        d2 = ig.allocate(2)     
+        a = ig.allocate(2)                                                  
+        b = 1                                               
+        out = ig.allocate(None)                                                 
+        # equals to 2 * [1] + 1 * [2] = [4]
+        d1.axpby(a,b,d2,out)
+        res = numpy.ones_like(d1.as_array()) * 4.
+        numpy.testing.assert_array_equal(res, out.as_array())
+    def test_axpby4(self):
+        print ("test axpby4")
+        #a float, b vec
+        ig = ImageGeometry(10,10)                                               
+        d1 = ig.allocate(1)                                                     
+        d2 = ig.allocate(2)     
+        a = 2                                                  
+        b = ig.allocate(1)                                                 
+        out = ig.allocate(None)                                                 
+        # equals to 2 * [1] + 1 * [2] = [4]
+        d1.axpby(a,b,d2,out)
+        res = numpy.ones_like(d1.as_array()) * 4.
+        numpy.testing.assert_array_equal(res, out.as_array())
+    def test_axpby5(self):
+        print ("test axpby5")
+        #a vec, b vec
+        ig = ImageGeometry(10,10)                                               
+        d1 = ig.allocate(1)                                                     
+        d2 = ig.allocate(2)   
+        a = ig.allocate(2)                                                  
+        b = ig.allocate(1)                                                  
+        out = ig.allocate(None)                                                 
+        # equals to 2 * [1] + 1 * [2] = [4]
+        d1.axpby(a,b,d2,out)
+        res = numpy.ones_like(d1.as_array()) * 4.
+        numpy.testing.assert_array_equal(res, out.as_array())
+    def test_axpby6(self):
+        print ("test axpby6")
+        #a vec, b vec
+        ig = ImageGeometry(10,10)                                               
+        d1 = ig.allocate()                                                     
+        d2 = ig.allocate()   
+        a = ig.allocate()                                                  
+        b = ig.allocate()         
+
+        d1.fill(numpy.arange(1,101).reshape(10,10))
+        d2.fill(numpy.arange(1,101).reshape(10,10))
+        a.fill(1.0/d1.as_array())                                                  
+        b.fill(-1.0/d2.as_array())   
+
+        out = ig.allocate(None)                                                 
+        # equals to 1 + -1 = 0
+        d1.axpby(a,b,d2,out)
+        res = numpy.zeros_like(d1.as_array())
+        numpy.testing.assert_array_equal(res, out.as_array())
+    def test_axpby7(self):
+        print ("test axpby7")
+        #a vec, b vec
+        #daxpby
+        ig = ImageGeometry(10,10)                                               
+        d1 = ig.allocate()                                                     
+        d2 = ig.allocate()   
+        a = ig.allocate()                                                  
+        b = ig.allocate()         
+
+        d1.fill(numpy.arange(1,101).reshape(10,10))
+        d2.fill(numpy.arange(1,101).reshape(10,10))
+        a.fill(1.0/d1.as_array())                                                  
+        b.fill(-1.0/d2.as_array())   
+
+        out = ig.allocate(dtype=numpy.float64)                                                 
+        # equals to 1 + -1 = 0
+        d1.axpby(a,b,d2,out, dtype=numpy.float64)
+        res = numpy.zeros_like(d1.as_array())
         numpy.testing.assert_array_equal(res, out.as_array())
 
     def test_min(self):
@@ -826,8 +937,91 @@ class TestDataContainer(unittest.TestCase):
         
         numpy.testing.assert_array_equal(ds.as_array(), -a)
 
+    def test_fill_dimension_ImageData(self):
+        ig = ImageGeometry(2,3,4)
+        u = ig.allocate(0)
+        a = numpy.ones((4,2))
+        # default_labels = [ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+        
+        data = u.as_array()
+        axis_number = u.get_dimension_axis('horizontal_y')
+        
+        u.fill(a, horizontal_y=0)
+        numpy.testing.assert_array_equal(u.subset(horizontal_y=0).as_array(), a)
+
+        u.fill(2, horizontal_y=1)
+        numpy.testing.assert_array_equal(u.subset(horizontal_y=1).as_array(), 2 * a)
+
+        u.fill(2, horizontal_y=1)
+        numpy.testing.assert_array_equal(u.subset(horizontal_y=1).as_array(), 2 * a)
+        
+        b = u.subset(horizontal_y=2)
+        b.fill(3)
+        u.fill(b, horizontal_y=2)
+        numpy.testing.assert_array_equal(u.subset(horizontal_y=2).as_array(), 3 * a)
+
+    def test_fill_dimension_AcquisitionData(self):
+        ag = AcquisitionGeometry.create_Parallel3D()
+        ag.set_channels(4)
+        ag.set_panel([2,3])
+        ag.set_angles([0,1,2,3,5])
+        ag.set_labels(('horizontal','angle','vertical','channel'))
+        u = ag.allocate(0)
+        a = numpy.ones((4,2))
+        # default_labels = [ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+        
+        data = u.as_array()
+        axis_number = u.get_dimension_axis('horizontal_y')
+        
+        u.fill(a, horizontal_y=0)
+        numpy.testing.assert_array_equal(u.subset(horizontal_y=0).as_array(), a)
+
+        u.fill(2, horizontal_y=1)
+        numpy.testing.assert_array_equal(u.subset(horizontal_y=0).as_array(), 2 * a)
+
+        u.fill(2, horizontal_y=1)
+        numpy.testing.assert_array_equal(u.subset(horizontal_y=1).as_array(), 2 * a)
+        
+        b = u.subset(horizontal_y=2)
+        b.fill(3)
+        u.fill(b, horizontal_y=2)
+        numpy.testing.assert_array_equal(u.subset(horizontal_y=2).as_array(), 3 * a)
+
+        # slice with 2 axis
+        a = numpy.ones((2,))
+        u.fill(a, horizontal_y=1, vertical=0)
+        numpy.testing.assert_array_equal(u.subset(horizontal_y=1, vertical=0).as_array(), a)
 
 
+    def test_fill_dimension_AcquisitionData(self):
+        ag = AcquisitionGeometry.create_Parallel3D()
+        ag.set_channels(4)
+        ag.set_panel([2,3])
+        ag.set_angles([0,1,2,3,5])
+        ag.set_labels(('horizontal','angle','vertical','channel'))
+        u = ag.allocate(0)
+        print (u.shape)
+        # (2, 5, 3, 4)
+        a = numpy.ones((2,5))
+        # default_labels = [ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+        b = u.subset(channel=0, vertical=0)
+        print(b.shape)
+        data = u.as_array()
+        
+        u.fill(a, channel=0, vertical=0)
+        print(u.shape)
+        numpy.testing.assert_array_equal(u.subset(channel=0, vertical=0).as_array(), a)
+
+        u.fill(2, channel=0, vertical=0)
+        numpy.testing.assert_array_equal(u.subset(channel=0, vertical=0).as_array(), 2 * a)
+
+        u.fill(2, channel=0, vertical=0)
+        numpy.testing.assert_array_equal(u.subset(channel=0, vertical=0).as_array(), 2 * a)
+        
+        b = u.subset(channel=0, vertical=0)
+        b.fill(3)
+        u.fill(b, channel=1, vertical=1)
+        numpy.testing.assert_array_equal(u.subset(channel=1, vertical=1).as_array(), 3 * a)
 if __name__ == '__main__':
     unittest.main()
  

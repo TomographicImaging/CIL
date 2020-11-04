@@ -18,3 +18,15 @@
 #endif
 
 #endif
+//define int64_t
+#if defined(dll_EXPORTS)
+using int64_t = __int64;
+#endif
+
+#ifdef _MSC_VER
+//typedef __int64 int64; // 64-bit unsigned integer
+  using int64 = __int64;
+#else
+//typedef long long int64; //64-bit unsigned integer
+  using int64 = long long;
+#endif

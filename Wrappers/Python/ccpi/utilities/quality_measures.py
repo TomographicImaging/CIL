@@ -38,7 +38,7 @@ def mae(dc1, dc2):
     '''    
     
     diff = dc1 - dc2  
-    return L1Norm().__call__(diff)/dc1.size()
+    return L1Norm().__call__(diff)/dc1.size
 
 def psnr(ground_truth, corrupted, data_range = 255):
 

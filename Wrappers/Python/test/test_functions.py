@@ -21,14 +21,14 @@ import numpy as np
 
 from ccpi.framework import DataContainer, ImageGeometry, \
     VectorGeometry, VectorData, BlockDataContainer
-from ccpi.optimisation.operators import Identity, LinearOperatorMatrix, CompositionOperator, DiagonalOperator, BlockOperator
-from ccpi.optimisation.functions import Function, KullbackLeibler
+from ccpi.optimisation.operators import Identity, MatrixOperator, CompositionOperator, DiagonalOperator, BlockOperator
+from ccpi.optimisation.functions import Function, KullbackLeibler, ConstantFunction, TranslateFunction
 from ccpi.optimisation.operators import Gradient
 
 from ccpi.optimisation.functions import Function, KullbackLeibler, WeightedL2NormSquared, L2NormSquared,\
                                          L1Norm, MixedL21Norm, LeastSquares, \
                                          ZeroFunction, FunctionOperatorComposition,\
-                                         Rosenbrock, IndicatorBox                                     
+                                         Rosenbrock, IndicatorBox, TotalVariation                                     
 
 import unittest
 import numpy
@@ -38,6 +38,26 @@ from ccpi.framework import ImageGeometry
 from ccpi.optimisation.functions import TranslateFunction
 from timeit import default_timer as timer
 
+import numpy as np                         
+from ccpi.utilities import dataexample
+from ccpi.utilities import noise
+import os
+import sys
+try:
+    from ccpi.plugins.regularisers import FGP_TV as CCPiReg_FGP_TV
+    from ccpi.filters import regularisers    
+    has_reg_toolkit = True
+except ImportError as ie:
+    has_reg_toolkit = False
+from timeit import default_timer as timer       
+try:
+    import tomophantom
+    from tomophantom import TomoP3D
+    has_tomophantom = True
+except ImportError as ie:
+    has_tomophantom = False
+
+from ccpi.utilities.quality_measures import mae
 
                     
 class TestFunction(unittest.TestCase):
@@ -321,18 +341,24 @@ class TestFunction(unittest.TestCase):
             
         M, N = 50, 50
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
+        #numpy.random.seed(1)
         b = ig.allocate('random', seed=1)
         
         print('Check call with Identity operator... OK\n')
         operator = 3 * Identity(ig)
             
         u = ig.allocate('random', seed = 50)
-        
-        func1 = FunctionOperatorComposition(0.5 * L2NormSquared(b = b), operator)
+        f = 0.5 * L2NormSquared(b = b)
+        func1 = FunctionOperatorComposition(f, operator)
         func2 = LeastSquares(operator, b, 0.5)
-        print("func1.L {}, func2.L {}, operator norm {}".format(func1.L, func2.L, operator.norm()))
-            
-        self.assertNumpyArrayAlmostEqual(func1(u), func2(u))
+        print("f.L {}".format(f.L))
+        print("0.5*f.L {}".format((0.5*f).L))
+        print("type func1 {}".format(type(func1)))
+        print("func1.L {}".format(func1.L))
+        print("func2.L {}".format(func2.L))
+        print("operator.norm() {}".format(operator.norm()))
+  
+        numpy.testing.assert_almost_equal(func1(u), func2(u))
         
         
         print('Check gradient with Identity operator... OK\n')
@@ -348,9 +374,9 @@ class TestFunction(unittest.TestCase):
         self.assertNumpyArrayAlmostEqual(tmp1.as_array(), tmp2.as_array())
        
         
-        print('Check call with LinearOperatorMatrix... OK\n')  
+        print('Check call with MatrixOperator... OK\n')  
         mat = np.random.randn(M, N)
-        operator = LinearOperatorMatrix(mat)   
+        operator = MatrixOperator(mat)   
         vg = VectorGeometry(N)
         b = vg.allocate('random')    
         u = vg.allocate('random')
@@ -481,7 +507,7 @@ class TestFunction(unittest.TestCase):
         numpy.testing.assert_equal(a, numpy.inf)
         
     def tests_for_L2NormSq_and_weighted(self):
-
+        numpy.random.seed(1)
         M, N, K = 2,3,1
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N, voxel_num_z = K)
         u = ig.allocate('random')
@@ -700,15 +726,18 @@ class TestFunction(unittest.TestCase):
                         
         ig = ImageGeometry(40,30)
         
+        numpy.random.seed(1)
+
         A = Identity(ig)
         b = ig.allocate('random')
         x = ig.allocate('random')
-        c = 0.3
+        c = numpy.float64(0.3)
         
         weight = ig.allocate('random') 
         
         D = DiagonalOperator(weight)
-        norm_weight = D.norm()
+        norm_weight = numpy.float64(D.norm())
+        print("norm_weight", norm_weight)
         
         f1 = LeastSquares(A, b, c, weight) 
         f2 = LeastSquares(A, b, c)
@@ -716,8 +745,10 @@ class TestFunction(unittest.TestCase):
         print("Check LS vs wLS")        
         
         # check Lipshitz    
-        numpy.testing.assert_almost_equal(f2.L, 2 * c * A.norm()**2)   
-        numpy.testing.assert_almost_equal(f1.L, 2 * c * norm_weight * A.norm()**2) 
+        numpy.testing.assert_almost_equal(f2.L, 2 * c * (A.norm()**2))   
+        print ("unwrapped", 2. * c * norm_weight * (A.norm()**2))
+        print ("f1.L", f1.L)
+        numpy.testing.assert_almost_equal(f1.L, numpy.float64(2.) * c * norm_weight * (A.norm()**2)) 
         print("Lipschitz is ... OK")
             
         # check call with weight                   
@@ -727,15 +758,17 @@ class TestFunction(unittest.TestCase):
         print("Call is ... OK")        
         
         # check call without weight                  
-        res1 = c * (A.direct(x)-b).dot((A.direct(x) - b))
+        #res1 = c * (A.direct(x)-b).dot((A.direct(x) - b))
+        res1 = c * (A.direct(x)-b).squared_norm()
         res2 = f2(x)    
         numpy.testing.assert_almost_equal(res1, res2) 
         print("Call without weight is ... OK")        
         
         # check gradient with weight             
-        out = ig.allocate()
+        out = ig.allocate(None)
         res1 = f1.gradient(x)
-        f1.gradient(x, out = out)
+        #out = f1.gradient(x)
+        f1.gradient(x, out=out)
         res2 = 2 * c * A.adjoint(weight*(A.direct(x)-b))
         numpy.testing.assert_array_almost_equal(res1.as_array(), res2.as_array())
         numpy.testing.assert_array_almost_equal(out.as_array(), res2.as_array())
@@ -781,10 +814,262 @@ class TestFunction(unittest.TestCase):
         
         numpy.testing.assert_almost_equal(res1, res2, decimal=2)          
 
-if __name__ == '__main__':
+    def test_Lipschitz(self):
+        print('Test for FunctionOperatorComposition')         
+            
+        M, N = 50, 50
+        ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
+        b = ig.allocate('random', seed=1)
+        
+        print('Check call with Identity operator... OK\n')
+        operator = 3 * Identity(ig)
+            
+        u = ig.allocate('random_int', seed = 50)
+        func2 = LeastSquares(operator, b, 0.5)
+        assert func2.L != 2
+        print (func2.L)
+        func2.L = 2
+        assert func2.L == 2
+    def test_Lipschitz2(self):
+        print('Test for test_Lipschitz2')         
+            
+        M, N = 50, 50
+        ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
+        b = ig.allocate('random', seed=1)
+        
+        print('Check call with Identity operator... OK\n')
+        operator = 3 * Identity(ig)
+            
+        u = ig.allocate('random_int', seed = 50)
+        func2 = LeastSquares(operator, b, 0.5)
+        func1 = ConstantFunction(0.3)
+        f3 = func1 + func2
+        assert f3.L != 2
+        print (func2.L)
+        func2.L = 2
+        assert func2.L == 2
+    def test_Lipschitz3(self):
+        print('Test for test_Lipschitz3')         
+            
+        M, N = 50, 50
+        ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
+        b = ig.allocate('random', seed=1)
+        
+        print('Check call with Identity operator... OK\n')
+        operator = 3 * Identity(ig)
+            
+        u = ig.allocate('random_int', seed = 50)
+        # func2 = LeastSquares(operator, b, 0.5)
+        func1 = ConstantFunction(0.3)
+        f3 = TranslateFunction(func1, 3)
+        assert f3.L != 2
+        print (f3.L)
+        f3.L = 2
+        assert f3.L == 2
+    def test_Lipschitz4(self):
+        print('Test for test_Lipschitz4')         
+            
+        M, N = 50, 50
+        ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
+        b = ig.allocate('random', seed=1)
+        
+        print('Check call with Identity operator... OK\n')
+        operator = 3 * Identity(ig)
+            
+        u = ig.allocate('random_int', seed = 50)
+        # func2 = LeastSquares(operator, b, 0.5)
+        func1 = ConstantFunction(0.3)
+        f3 = func1 + 3
+        assert f3.L == 0
+        print ("OK")
+        print (f3.L)
+        f3.L = 2
+        assert f3.L == 2
+        print ("OK")
+        assert func1.L == 0
+        print ("OK")
+        try:
+            func1.L = 2
+            assert False
+        except AttributeError as ve:
+            assert True
+        print ("OK")
+        f2 = LeastSquares(operator, b, 0.5)
+        f4 = 2 * f2
+        assert f4.L == 2 * f2.L
+        
+        print ("OK")
+        f4.L = 10
+        assert f4.L != 2 * f2.L  
+        print ("OK")
+
+        f4 = -2 * f2
+        assert f4.L == 2 * f2.L
+
+    def test_TotalVariation(self):
+        if has_reg_toolkit:
+            print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV no tolerance (2D)")
     
-    d = TestFunction()
-    d.test_KullbackLeibler()
-    d.tests_for_L2NormSq_and_weighted()
-    d.tests_for_LS_weightedLS()
-    d.test_Norm2sq_as_FunctionOperatorComposition()    
+            data = dataexample.SHAPES.get()
+            ig = data.geometry
+            ag = ig
+
+            # Create noisy data. 
+            n1 = np.random.normal(0, 0.1, size = ig.shape)
+            noisy_data = ig.allocate()
+            noisy_data.fill(n1+data.as_array())
+            
+            alpha = 0.1
+            iters = 1000
+                
+            # CIL_FGP_TV no tolerance
+            g_CIL = TotalVariation(alpha, iters, tolerance=None, lower = 0, info = True)
+            t0 = timer()
+            res1 = g_CIL.proximal(noisy_data, 1.)
+            t1 = timer()
+            print(t1-t0)
+            
+            # CCPi Regularisation toolkit high tolerance
+            r_alpha = alpha
+            r_iterations = iters
+            r_tolerance = 1e-9
+            r_iso = 0
+            r_nonneg = 1
+            r_printing = 0
+            g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'cpu')
+            
+            t2 = timer()
+            res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
+            t3 = timer()
+            print(t3-t1)
+            
+            
+            np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal = 4)
+            
+            ###################################################################
+            ###################################################################
+            ###################################################################
+            ###################################################################    
+            
+            print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV with iterations.")
+            iters = 408
+            # CIL_FGP_TV no tolerance
+            g_CIL = TotalVariation(alpha, iters, tolerance=1e-9, lower = 0.)
+            t0 = timer()
+            res1 = g_CIL.proximal(noisy_data, 1.)
+            t1 = timer()
+            print(t1-t0)
+            
+            # CCPi Regularisation toolkit high tolerance
+            r_alpha = alpha
+            r_iterations = iters
+            r_tolerance = 1e-9
+            r_iso = 0
+            r_nonneg = 1
+            r_printing = 0
+            g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'cpu')
+
+            t2 = timer()
+            res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
+            t3 = timer()
+            print(t3-t2)
+            
+            
+            print(mae(res1, res2))
+            np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal=3)    
+            
+            ###################################################################
+            ###################################################################
+            ###################################################################
+            ###################################################################
+            if has_tomophantom:
+                print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV no tolerance (3D)") 
+                    
+                print ("Building 3D phantom using TomoPhantom software")
+                model = 13 # select a model number from the library
+                N_size = 64 # Define phantom dimensions using a scalar value (cubic phantom)
+                path = os.path.dirname(tomophantom.__file__)
+                path_library3D = os.path.join(path, "Phantom3DLibrary.dat")
+                #This will generate a N_size x N_size x N_size phantom (3D)
+                phantom_tm = TomoP3D.Model(model, N_size, path_library3D)    
+                
+                ig = ImageGeometry(N_size, N_size, N_size)
+                data = ig.allocate()
+                data.fill(phantom_tm)
+                
+                noisy_data = noise.gaussian(data, seed=10)
+                
+                
+                alpha = 0.1
+                iters = 1000
+                
+                print("Use tau as an array of ones")
+                # CIL_TotalVariation no tolerance
+                g_CIL = TotalVariation(alpha, iters, tolerance=None, info=True)
+                res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
+                t0 = timer()   
+                res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
+                t1 = timer()
+                print(t1-t0)
+
+                # CCPi Regularisation toolkit high tolerance
+                r_alpha = alpha
+                r_iterations = iters
+                r_tolerance = 1e-9
+                r_iso = 0
+                r_nonneg = 0
+                r_printing = 0
+                g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'cpu')
+
+                t2 = timer()
+                res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
+                t3 = timer()
+                print (t3-t2)
+                np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal=3)
+
+                
+                
+                # CIL_FGP_TV no tolerance
+                #g_CIL = FGP_TV(ig, alpha, iters, tolerance=None, info=True)
+                g_CIL.tolerance = None
+                t0 = timer()
+                res1 = g_CIL.proximal(noisy_data, 1.)
+                t1 = timer()
+                print(t1-t0)
+            
+            ###################################################################
+            ###################################################################
+            ###################################################################
+            ###################################################################     
+        
+            data = dataexample.PEPPERS.get(size=(256, 256))
+            ig = data.geometry
+            ag = ig
+
+            noisy_data = noise.gaussian(data, seed=10)
+                        
+            alpha = 0.1
+            iters = 1000
+            
+            # CIL_FGP_TV no tolerance
+            g_CIL = TotalVariation(alpha, iters, tolerance=None)
+            t0 = timer()
+            res1 = g_CIL.proximal(noisy_data, 1.)
+            t1 = timer()
+            print(t1-t0)
+
+            # CCPi Regularisation toolkit high tolerance
+            r_alpha = alpha
+            r_iterations = iters
+            r_tolerance = 1e-8
+            r_iso = 0
+            r_nonneg = 0
+            r_printing = 0
+            g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'cpu')
+            
+            t2 = timer()
+            res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
+            t3 = timer()
+            print (t3-t2)
+
+

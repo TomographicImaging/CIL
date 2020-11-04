@@ -60,33 +60,19 @@ class ChannelwiseOperator(LinearOperator):
             else:
                 raise Exception("dimension must be either 'prepend' or 'append'")
             if isinstance(geom, ImageGeometry):
-                geom_mc.append(
-                    ImageGeometry(  
-                    geom.voxel_num_x, 
-                    geom.voxel_num_y, 
-                    geom.voxel_num_z, 
-                    geom.voxel_size_x, 
-                    geom.voxel_size_y, 
-                    geom.voxel_size_z, 
-                    geom.center_x, 
-                    geom.center_y, 
-                    geom.center_z, 
-                    channels,
-                    dimension_labels=new_dimension_labels))
+                
+                geom_channels = geom.copy()
+                geom_channels.channels = channels
+                geom_channels.dimension_labels = new_dimension_labels
+
+                geom_mc.append(geom_channels)
             elif isinstance(geom, AcquisitionGeometry):
-                geom_mc.append(
-                    AcquisitionGeometry(
-                       geom.geom_type,
-                       geom.dimension, 
-                       geom.angles, 
-                       geom.pixel_num_h, 
-                       geom.pixel_size_h, 
-                       geom.pixel_num_v, 
-                       geom.pixel_size_v, 
-                       geom.dist_source_center, 
-                       geom.dist_center_detector, 
-                       channels,
-                       dimension_labels=new_dimension_labels ))
+                geom_channels = geom.copy()
+                geom_channels.config.channels.num_channels = channels
+                geom_channels.dimension_labels = new_dimension_labels
+
+                geom_mc.append(geom_channels)
+                    
             elif isinstance(geom,BlockGeometry):
                 raise Exception("ChannelwiseOperator does not support BlockOperator as input. Consider making a BlockOperator of ChannelwiseOperators instead.")
             else:

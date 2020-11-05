@@ -132,19 +132,22 @@ class ImageGeometry(object):
       
     @dimension_labels.setter
     def dimension_labels(self, val):
-
+        self.set_labels(val)
+    
+    def set_labels(self, labels):
         labels_default = [  ImageGeometry.CHANNEL,
                             ImageGeometry.VERTICAL,
                             ImageGeometry.HORIZONTAL_Y,
                             ImageGeometry.HORIZONTAL_X]
 
         #check input and store. This value is not used directly
-        if val is not None:
-            for x in val:
+        if labels is not None:
+            for x in labels:
                 if x not in labels_default:
-                    raise ValueError('Requested axis are not possible. Accepted label names {},\ngot {}'.format(labels_default,val))
+                    raise ValueError('Requested axis are not possible. Accepted label names {},\ngot {}'\
+                        .format(labels_default,labels))
                     
-            self.__dimension_labels = tuple(val)
+            self.__dimension_labels = tuple(labels)
 
     def __eq__(self, other):
 

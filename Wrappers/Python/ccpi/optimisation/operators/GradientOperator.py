@@ -25,6 +25,7 @@ from ccpi.optimisation.operators import FiniteDifferenceOperator
 from ccpi.framework import ImageGeometry, BlockGeometry
 import warnings
 from ccpi.utilities.multiprocessing import NUM_THREADS
+import numpy as np
 
 NEUMANN = 'Neumann'
 PERIODIC = 'Periodic'

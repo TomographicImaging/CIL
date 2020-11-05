@@ -473,6 +473,7 @@ class TestSPDHG(unittest.TestCase):
         # Fast Gradient Projection algorithm for Total Variation(TV)
         from cil.optimisation.functions import TotalVariation
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
+
         ig = data.geometry
         ig.voxel_size_x = 0.1
         ig.voxel_size_y = 0.1
@@ -875,3 +876,4 @@ class TestPrint(unittest.TestCase):
         print (algo.objective)
         np.testing.assert_array_equal([0, 10, 20, 30, 40, 50, 60, 70, 80], algo.iterations)
         np.testing.assert_array_equal([0, 100, 400, 900, 1600, 2500, 3600, 4900, 6400], algo.objective)
+

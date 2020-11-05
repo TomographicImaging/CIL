@@ -35,13 +35,37 @@ from cil.optimisation.operators import LinearOperator
         
 class FiniteDifferenceOperator(LinearOperator):
     
+    r'''                  
+        Computes forward/backward/centered finite differences of a DataContainer 
+        under Neumann/Periodic boundary conditions
+        
+        :param domain_geometry: Domain geometry for the FiniteDifferenceOperator
+        :param direction: Direction to evaluate finite differences
+        :type direction: string label from domain geometry or integer number
+        :param method: Method for finite differences
+        :type method: 'forward', 'backward', 'centered'
+        :param bnd_cond: 'Neumann', 'Periodic'
+        
+     '''        
+    
     def __init__(self, domain_geometry, 
                        range_geometry=None, 
-                       direction=0, 
+                       direction = None, 
                        method = 'forward',
                        bnd_cond = 'Neumann'):
         
-        self.direction = direction
+        if isinstance(direction, int):
+            if direction > len(domain_geometry.shape) or direction<0:
+                raise ValueError('Requested direction is not possible. Accepted direction {}, \ngot {}'.format(range(len(domain_geometry.shape)), direction))            
+            else:
+                self.direction = direction
+        else:
+           if direction in domain_geometry.dimension_labels:              
+                self.direction = domain_geometry.dimension_labels.index(direction)
+           else:
+               raise ValueError('Requested direction is not possible. Accepted direction is {} or {}, \ngot {}'.format(domain_geometry.dimension_labels, range(len(domain_geometry.shape)),  direction))
+                         
+                                                                                                           
         self.voxel_size = domain_geometry.spacing[self.direction]
         self.boundary_condition = bnd_cond
         self.method = method
@@ -163,22 +187,22 @@ class FiniteDifferenceOperator(LinearOperator):
             outa[tuple(self.get_slice(1, -1))] /= 2.
             
             if self.boundary_condition == 'Neumann':
-            #                
-#                # left boundary
+                            
+                # left boundary
                 np.subtract( x_asarr[tuple(self.get_slice(1, 2))], \
                                  x_asarr[tuple(self.get_slice(0,1))], \
                                  out = outa[tuple(self.get_slice(0, 1))])  
                 outa[tuple(self.get_slice(0, 1))] /=2.
-#                
-#                # left boundary
+                
+                # left boundary
                 np.subtract( x_asarr[tuple(self.get_slice(-1, None))], \
                                  x_asarr[tuple(self.get_slice(-2,-1))], \
                                  out = outa[tuple(self.get_slice(-1, None))])
                 outa[tuple(self.get_slice(-1, None))] /=2.                
-#                
+                
             elif self.boundary_condition == 'Periodic':
                 pass
-#                
+                
                # left boundary
                 np.subtract( x_asarr[tuple(self.get_slice(1, 2))], \
                                  x_asarr[tuple(self.get_slice(-1,None))], \
@@ -348,4 +372,8 @@ class FiniteDifferenceOperator(LinearOperator):
             
         if outnone:                  
             ret.fill(outa)
-            return ret       
+            return ret    
+              
+        
+    
+    

@@ -39,9 +39,11 @@ class TotalVariation(Function):
     Parameters:
       
       :param domain: Domain of the reconstruction
-      :param regularising_parameter: TV regularising parameter 
+      :param regularising_parameter: Regularising parameter for the TV regulariser
       :param inner_iterations: Iterations of FGP algorithm
-      :param tolerance: Stopping criterion (Default=1e-4)
+      :param tolerance: Stopping criterion (Default=1e-6)
+      :param correlation: Correlation between Space and/or SpaceChannels for the GradientOperator (Default='space')
+      :param backend: Backend to compute finite differences for the GradientOperator (Default='c')
       :param lower: ( Default = - numpy.inf ) lower bound for the orthogonal projection onto the convex set C
       :param upper: ( Default = + numpy.inf ) upper bound for the orthogonal projection onto the convex set C
       
@@ -57,7 +59,9 @@ class TotalVariation(Function):
     
     def __init__(self, regularising_parameter, 
                  inner_iterations, 
-                 tolerance, 
+                 tolerance = 1e-6, 
+                 correlation = "Space",
+                 backend = "c",
                  lower = -numpy.inf, 
                  upper = numpy.inf,
                  info = False):
@@ -75,7 +79,11 @@ class TotalVariation(Function):
         
         # Define (ISOTROPIC) Total variation penalty ( Note it is without the regularising paremeter)
         # TODO add anisotropic???
-        self.TV = MixedL21Norm()  
+        self.TV = MixedL21Norm() 
+        
+        # correlation space or spacechannels
+        self.correlation = correlation
+        self.backend = backend        
         
         # Define orthogonal projection onto the convex set C
         self.lower = lower
@@ -250,7 +258,7 @@ class TotalVariation(Function):
         There is no check that the variable _domain is changed after instantiation (should not be the case)'''
         if self._gradient is None:
             if self._domain is not None:
-                self._gradient = Gradient(self._domain)
+                self._gradient = Gradient(self._domain, correlation = self.correlation, backend = self.backend)
         return self._gradient
     
 

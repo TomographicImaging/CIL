@@ -277,7 +277,7 @@ class TestOperator(CCPiTestClass):
                 
         labels = ["horizontal_y", "horizontal_x"]
         
-        for i in range(len(labels)):
+        for i, dir in enumerate(labels):
             FD1 = FiniteDifferenceOperator(ig, direction=i)    
             res1 = FD1.direct(x)
             res1b = FD1.adjoint(x)
@@ -298,7 +298,7 @@ class TestOperator(CCPiTestClass):
         
         labels = ["channel","horizontal_y", "horizontal_x"]
         
-        for i in range(len(labels)):
+        for i, dir in enumerate(labels):
             FD1 = FiniteDifferenceOperator(ig1, direction=i)    
             res1 = FD1.direct(x)
             res1b = FD1.adjoint(x)

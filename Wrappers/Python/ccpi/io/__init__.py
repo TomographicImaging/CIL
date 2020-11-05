@@ -20,5 +20,6 @@ from .NEXUSDataReader import NEXUSDataReader
 from .NEXUSDataWriter import NEXUSDataWriter
 from .NikonDataReader import NikonDataReader
 from .TIFF import TIFFWriter
-from .TIFFStackReader import TIFFStackReader
+from .TIFF import TIFFStackReader
+# from .TIFFStackReader import TIFFStackReader
 from .TXRMDataReader import TXRMDataReader

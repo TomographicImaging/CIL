@@ -128,6 +128,9 @@ class TXRMDataReader(object):
         acq_data.fill(data)
         self._metadata = metadata
         return acq_data
+    def load_projections(self):
+        '''alias of read for backward compatibility'''
+        return self.read()
         
     def get_metadata(self):
         '''return the metadata of the loaded file'''

@@ -21,7 +21,7 @@ from __future__ import division
 from __future__ import print_function
 
 from ccpi.framework import AcquisitionData, AcquisitionGeometry
-from ccpi.io import TIFFStackReader
+from ccpi.io.TIFF import TIFFStackReader
 import numpy
 import os
     
@@ -324,3 +324,7 @@ class NikonDataReader(object):
                 output.fill(numpy.transpose(data, (1, 0, 2)))
         
         return output
+
+    def load_projections(self):
+        '''alias of read for backward compatibility'''
+        return self.read()

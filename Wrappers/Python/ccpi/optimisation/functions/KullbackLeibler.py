@@ -127,7 +127,7 @@ try:
                     accumulator += X * numpy.log(Y)
                 # else xlogy is 0 so it doesn't add to the accumulator
                 accumulator += eta.flat[i] * x_f
-        return accumulator
+        return - accumulator
     
     # force a jit
     print ("forcing jit in KL")

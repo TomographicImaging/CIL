@@ -1,7 +1,7 @@
-from ccpi.io import TIFFWriter
-from ccpi.io import TIFFStackReader
+from cil.io import TIFFWriter
+from cil.io import TIFFStackReader
 
-from ccpi.framework import ImageGeometry, AcquisitionGeometry
+from cil.framework import ImageGeometry, AcquisitionGeometry
 import os
 import numpy as np
 import unittest

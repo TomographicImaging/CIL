@@ -7,7 +7,7 @@ from ccpi.framework import ImageGeometry
 from ccpi.io import TXRMDataReader, NEXUSDataReader
 has_astra = True
 try:
-    from ccpi.astra.processors import FBP
+    from ccpi.astra.processors import FBP, FDK
 except ImportError as ie:
     has_astra = False
 from ccpi.utilities.dataexample import data_dir
@@ -45,7 +45,7 @@ print ("has_file",has_file)
 if not has_file:
     print("This unittest requires the walnut Zeiss dataset saved in {}".format(data_dir))
 
-class TestNexusReaderWriter(unittest.TestCase):
+class TestTXRMDataReader(unittest.TestCase):
     
     def setUp(self):
         print ("has_astra",has_astra)
@@ -57,9 +57,11 @@ class TestNexusReaderWriter(unittest.TestCase):
             self.reader = TXRMDataReader()
             angle_unit = AcquisitionGeometry.RADIAN
             
-            self.reader.set_up(txrm_file=filename, 
-                            angle_unit=angle_unit)
-            data = self.reader.load_projections()
+            self.reader.set_up(file_name=filename, 
+                               angle_unit=angle_unit)
+            data = self.reader.read()
+            if data.geometry is None:
+                raise AssertionError("WTF")
             # Choose the number of voxels to reconstruct onto as number of detector pixels
             N = data.geometry.pixel_num_h
             
@@ -93,21 +95,26 @@ class TestNexusReaderWriter(unittest.TestCase):
         self.assertTrue(True)
 
     @unittest.skipIf(not has_prerequisites, "Prerequisites not met")
-    def test_load_and_reconstruct_2D(self):
-        
+    def test_read_and_reconstruct_2D(self):
+        print (type(self.data))
+
         # get central slice
-        data2d = self.data.subset(vertical=512)
+        data2d = self.data.subset(vertical='centre')
+        # d512 = self.data.subset(vertical=512)
+        # data2d.fill(d512.as_array())
         # neg log
         data2d.log(out=data2d)
         data2d *= -1
 
-        
+        ig2d = data2d.geometry.get_ImageGeometry()
         # Construct the appropriate ImageGeometry
         ig2d = ImageGeometry(voxel_num_x=self.N,
                             voxel_num_y=self.N,
                             voxel_size_x=self.voxel_size_h, 
                             voxel_size_y=self.voxel_size_h)
-        fbpalg = FBP(ig2d,data2d.geometry)
+        if data2d.geometry is None:
+            raise AssertionError('What? None?')
+        fbpalg = FDK(ig2d,data2d.geometry)
         fbpalg.set_input(data2d)
         
         recfbp = fbpalg.get_output()
@@ -116,13 +123,13 @@ class TestNexusReaderWriter(unittest.TestCase):
                       out=data_dir)
         fname = os.path.join(data_dir, 'walnut_slice512.nxs')
         reader = NEXUSDataReader()
-        reader.set_up(nexus_file=fname)
-        gt = reader.load_data()
+        reader.set_up(file_name=fname)
+        gt = reader.read()
 
         qm = mse(gt, recfbp)
         print ("MSE" , qm )
 
-        np.testing.assert_almost_equal(qm, 0)
+        np.testing.assert_almost_equal(qm, 0, decimal=3)
         fname = os.path.join(data_dir, 'walnut_slice512.nxs')
         os.remove(fname)
 

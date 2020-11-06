@@ -27,7 +27,7 @@ from ccpi.framework import AcquisitionData
 from ccpi.framework import ImageGeometry
 from ccpi.framework import AcquisitionGeometry
 
-from ccpi.utilities.dataexample import data_dir
+from ccpi.utilities import dataexample
 from timeit import default_timer as timer
 
 from ccpi.framework import AX, CastDataContainer, PixelByPixelDataProcessor
@@ -41,9 +41,7 @@ class TestDataProcessor(unittest.TestCase):
     
     def setUp(self):
 
-        path = os.path.join(data_dir,'24737_fd_normalised.nxs')
-        myreader = NEXUSDataReader(nexus_file=path)
-        data_raw = myreader.load_data()
+        data_raw = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
 
         self.data_DLS = data_raw.log()
         self.data_DLS *= -1

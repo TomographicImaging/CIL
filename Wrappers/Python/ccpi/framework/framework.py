@@ -2670,7 +2670,7 @@ class AcquisitionData(DataContainer):
             (len(dimensions) != len(self.shape) ):
             raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
 
-        #Update Geometry if reasonable
+        #try to get a new geometry for the slice
         try:
             geometry_new = self.geometry.subset(dimensions=dimensions, **kw)
         except ValueError as ve:
@@ -2678,32 +2678,26 @@ class AcquisitionData(DataContainer):
                 geometry_new = None
             else:
                 print(ve)
-                raise ValueError ("Unable to subset requested geometry. Use 'force=True' to return DataContainer.")
+                raise ValueError ("Unable to subset requested geometry. Use 'force=True' to return DataContainer instead.")
 
-        #if vertical = 'centre' slice convert to index and subset.
-        #if the index is non-integer then return rows either side and interpolate to get the center slice value
-        interpolate = False
+        #if vertical = 'centre' slice convert to index and subset, this will interpolate 2 rows to get the center slice value
+        vertical_slice = kw.get(AcquisitionGeometry.VERTICAL, None)
 
-        vertical_slice = None
         if AcquisitionGeometry.VERTICAL in self.geometry.dimension_labels:
-            vertical_slice = kw.get(AcquisitionGeometry.VERTICAL, None)           
+            dim = self.geometry.dimension_labels.index('vertical')         
 
-        if vertical_slice == 'centre':           
-            ind = self.geometry.dimension_labels.index('vertical')
-            centre_slice = (self.geometry.shape[ind]-1) / 2.
-            centre_slice_floor = int(numpy.floor(centre_slice))
-            kw['vertical'] = centre_slice_floor
-            w2 = centre_slice - centre_slice_floor
-            if w2  > 0.0001:
-                interpolate = True
-
-        # out = super(AcquisitionData, self).subset(dimensions, **kw)
-        out = DataContainer.subset(self, dimensions, **kw)
-
-        if interpolate == True:
-            kw['vertical'] = centre_slice_floor + 1
-            out2 = super(AcquisitionData, self).subset(dimensions, **kw)
-            out = out * (1 - w2) + out2 * w2
+            if vertical_slice == 'centre':
+                centre_slice_pos = (self.geometry.shape[dim]-1) / 2.
+                ind0 = int(numpy.floor(centre_slice_pos))
+                w2 = centre_slice_pos - ind0
+                kw['vertical'] = ind0
+                out = super(AcquisitionData, self).subset(dimensions, **kw)
+                if w2 > 0:
+                    kw['vertical'] = ind0 + 1
+                    out2 = super(AcquisitionData, self).subset(dimensions, **kw)
+                    out = out * (1 - w2) + out2 * w2
+            else:
+                out = super(AcquisitionData, self).subset(dimensions, **kw)
 
         dimension_labels = out.dimension_labels.copy()    
 

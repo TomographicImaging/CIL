@@ -106,6 +106,11 @@ class TestSubset(unittest.TestCase):
         sub = data.subset(dimensions=new_dimension_labels)
         self.assertTrue( sub.shape == (3,5,4,2))
 
+    def test_ImageDataSubset1c(self):
+        data = self.ig.allocate()
+        sub = data.subset(channel=0,horizontal_x=0,horizontal_y=0)
+        self.assertTrue( sub.shape == (4,))
+
 
     def test_AcquisitionDataAllocate1a(self):
         data = self.ag.allocate()
@@ -193,3 +198,12 @@ class TestSubset(unittest.TestCase):
         sliceme = 1
         sub = data.subset(vertical = sliceme, force=True)
         self.assertTrue( sub.shape == (4, 3, 2))
+
+    def test_AcquisitionDataSubset1i(self):
+
+        data = self.ag.allocate()
+        sub = data.subset(angle = 0)
+        sub = sub.subset(vertical = 0)
+        sub = sub.subset(horizontal = 0, force=True)
+
+        self.assertTrue( sub.shape == (4,))

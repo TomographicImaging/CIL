@@ -19,6 +19,7 @@ test:
     - tomophantom
     - ccpi-plugins
     - ccpi-astra # [ unix ] 
+    - numba
 
   source_files:
     - ./Wrappers/Python/test # [win]

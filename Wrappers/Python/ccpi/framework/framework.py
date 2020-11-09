@@ -2680,16 +2680,13 @@ class AcquisitionData(DataContainer):
                 print(ve)
                 raise ValueError ("Unable to subset requested geometry. Use 'force=True' to return DataContainer instead.")
 
-
-        out = super(AcquisitionData, self).subset(dimensions, **kw)
-
         #if vertical = 'centre' slice convert to index and subset, this will interpolate 2 rows to get the center slice value
         vertical_slice = kw.get(AcquisitionGeometry.VERTICAL, None)
 
-        if AcquisitionGeometry.VERTICAL in self.geometry.dimension_labels:
-            dim = self.geometry.dimension_labels.index('vertical')         
+        if vertical_slice == 'centre':
+            dim = self.geometry.dimension_labels.index('vertical')
 
-            if vertical_slice == 'centre':
+            if self.geometry.shape[dim] > 1:   
                 centre_slice_pos = (self.geometry.shape[dim]-1) / 2.
                 ind0 = int(numpy.floor(centre_slice_pos))
                 w2 = centre_slice_pos - ind0
@@ -2699,6 +2696,8 @@ class AcquisitionData(DataContainer):
                     kw['vertical'] = ind0 + 1
                     out2 = super(AcquisitionData, self).subset(dimensions, **kw)
                     out = out * (1 - w2) + out2 * w2
+        else:
+            out = super(AcquisitionData, self).subset(dimensions, **kw)
 
         dimension_labels = out.dimension_labels.copy()    
 

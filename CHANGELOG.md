@@ -1,5 +1,11 @@
 * 20.*
   - python module renamed to cil
+  - renamed Identity->IdentityOperator, Gradient->GradientOperator, SymmetrizedGradient->SymmetrizedGradientOperator
+
+* 20.09.1
+  - FiniteDifferenceOperator takes into consideration voxel size
+  - Added CentreOfRotationCorrector
+  - Removed CenterOfRotationFinder
   - moved TestData to utilities and renamed as dataexample
   - verbosity of Algorithms is independent of the update_objective_interval
   - added unittests

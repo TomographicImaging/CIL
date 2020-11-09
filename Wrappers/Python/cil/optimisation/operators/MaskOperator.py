@@ -49,7 +49,7 @@ if __name__ == '__main__':
     
     from cil.optimisation.algorithms import PDHG
     
-    from cil.optimisation.operators import BlockOperator, Gradient
+    from cil.optimisation.operators import BlockOperator, GradientOperator
     from cil.optimisation.functions import ZeroFunction, L1Norm, \
                           MixedL21Norm, BlockFunction, L2NormSquared,\
                               KullbackLeibler
@@ -112,7 +112,7 @@ if __name__ == '__main__':
         f2 = 0.5 * L2NormSquared(b=noisy_data)
     
     # Create operators
-    op1 = Gradient(ig, correlation=Gradient.CORRELATION_SPACE)
+    op1 = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE)
     op2 = MO
 
     # Create BlockOperator

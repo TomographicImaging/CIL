@@ -85,7 +85,7 @@ if __name__ == '__main__':
     
     from cil.optimisation.algorithms import PDHG
     
-    from cil.optimisation.operators import BlockOperator, Gradient
+    from cil.optimisation.operators import BlockOperator, GradientOperator
     from cil.optimisation.functions import ZeroFunction, MixedL21Norm, \
                                             BlockFunction, L2NormSquared
     from cil.utilities import dataexample
@@ -135,7 +135,7 @@ if __name__ == '__main__':
     # Specify total variation regularised least squares
     
     # Create operators
-    op1 = Gradient(ig_gray, correlation=Gradient.CORRELATION_SPACE)
+    op1 = GradientOperator(ig_gray, correlation=GradientOperator.CORRELATION_SPACE)
     op2 = BOP
     
     # Set regularisation parameter.

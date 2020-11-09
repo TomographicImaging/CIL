@@ -21,7 +21,7 @@ from __future__ import division
 from __future__ import print_function
 
 from cil.optimisation.functions import Function, MixedL21Norm, IndicatorBox
-from cil.optimisation.operators import Gradient
+from cil.optimisation.operators import GradientOperator
 import numpy 
 import functools
 import numpy as np
@@ -90,11 +90,8 @@ class TotalVariation(Function):
         self.upper = upper
         self.tmp_proj_C = IndicatorBox(lower, upper).proximal
                         
-#         Setup Gradient as None. This is to avoid domain argument in the __init__     
-#         self.gradient = None
+#         Setup GradientOperator as None. This is to avoid domain argument in the __init__     
 
-        # self.gradient = Gradient(domain)
-        # self.Lipschitz = (1./self.gradient.norm())**2   
         self._gradient = None
         self._domain = None
 
@@ -108,9 +105,6 @@ class TotalVariation(Function):
         
         r''' Returns the value of the \alpha * TV(x)'''
         self._domain = x.geometry
-#         if self.gradient is None:
-#             self.gradient = Gradient(x.geometry)
-        
         # evaluate objective function of TV gradient
         return self.regularising_parameter * self.TV(self.gradient.direct(x))
     
@@ -258,7 +252,7 @@ class TotalVariation(Function):
         There is no check that the variable _domain is changed after instantiation (should not be the case)'''
         if self._gradient is None:
             if self._domain is not None:
-                self._gradient = Gradient(self._domain, correlation = self.correlation, backend = self.backend)
+                self._gradient = GradientOperator(self._domain, correlation = self.correlation, backend = self.backend)
         return self._gradient
     
 

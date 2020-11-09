@@ -21,9 +21,9 @@ from .Operator import Operator, LinearOperator, ScaledOperator, SumOperator,\
 from .BlockOperator import BlockOperator
 from .SparseFiniteDifferenceOperator import SparseFiniteDifferenceOperator
 from .FiniteDifferenceOperator import FiniteDifferenceOperator
-from .GradientOperator import Gradient
-from .SymmetrizedGradientOperator import SymmetrizedGradient
-from .IdentityOperator import Identity
+from .GradientOperator import GradientOperator
+from .SymmetrizedGradientOperator import SymmetrizedGradientOperator
+from .IdentityOperator import IdentityOperator
 from .ZeroOperator import ZeroOperator
 from .MatrixOperator import MatrixOperator
 from .DiagonalOperator import DiagonalOperator

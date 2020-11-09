@@ -25,30 +25,38 @@ from cil.framework import ImageData
 from cil.framework import AcquisitionData
 from cil.framework import ImageGeometry
 from cil.framework import AcquisitionGeometry
-from cil.optimisation.operators import Identity
+from cil.framework import BlockDataContainer
+
+from cil.optimisation.operators import IdentityOperator
+from cil.optimisation.operators import GradientOperator, BlockOperator, FiniteDifferenceOperator
+
 from cil.optimisation.functions import LeastSquares, ZeroFunction, \
    L2NormSquared, FunctionOperatorComposition
+from cil.optimisation.functions import MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler                     
+from cil.optimisation.functions import IndicatorBox
+
+from cil.optimisation.algorithms import Algorithm
 from cil.optimisation.algorithms import GD
 from cil.optimisation.algorithms import CGLS
 from cil.optimisation.algorithms import SIRT
 from cil.optimisation.algorithms import FISTA
-from cil.optimisation.algorithms import Algorithm
-
+from cil.optimisation.algorithms import SPDHG
 from cil.optimisation.algorithms import PDHG
 
-from cil.optimisation.operators import Gradient, BlockOperator, FiniteDifferenceOperator
-from cil.optimisation.functions import MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler                     
 from cil.utilities import dataexample
 from cil.utilities import noise as applynoise
 import os, sys, time
 
 
+# Fast Gradient Projection algorithm for Total Variation(TV)
+from cil.optimisation.functions import TotalVariation
+
 try:
-    from cil.astra.operators import AstraProjectorSimple
-    astra_not_available = False    
+    from cil.plugins.astra.operators import AstraProjectorSimple
+    has_astra = True    
 except ImportError as ie:
     # skip test
-    astra_not_available = True
+    has_astra = False
 
 class TestAlgorithms(unittest.TestCase):
     def setUp(self):
@@ -76,7 +84,7 @@ class TestAlgorithms(unittest.TestCase):
         # fill with random numbers
         # b.fill(numpy.random.random(x_init.shape))
         b = ig.allocate('random')
-        identity = Identity(ig)
+        identity = IdentityOperator(ig)
         
         norm2sq = LeastSquares(identity, b)
         rate = norm2sq.L / 3.
@@ -105,7 +113,7 @@ class TestAlgorithms(unittest.TestCase):
         # fill with random numbers
         # b.fill(numpy.random.random(x_init.shape))
         b = ig.allocate('random')
-        identity = Identity(ig)
+        identity = IdentityOperator(ig)
         
         norm2sq = LeastSquares(identity, b)
         rate = None
@@ -162,7 +170,7 @@ class TestAlgorithms(unittest.TestCase):
         # b = ig.allocate()
         # bdata = numpy.reshape(numpy.asarray([i for i in range(20)]), (2,10))
         # b.fill(bdata)
-        identity = Identity(ig)
+        identity = IdentityOperator(ig)
         
         alg = CGLS(x_init=x_init, operator=identity, data=b)
         alg.max_iteration = 200
@@ -184,7 +192,7 @@ class TestAlgorithms(unittest.TestCase):
         # fill with random numbers
         b.fill(numpy.random.random(x_init.shape))
         x_init = ig.allocate(ImageGeometry.RANDOM)
-        identity = Identity(ig)
+        identity = IdentityOperator(ig)
         
 	#### it seems FISTA does not work with Nowm2Sq
         # norm2sq = Norm2Sq(identity, b)
@@ -212,7 +220,7 @@ class TestAlgorithms(unittest.TestCase):
         b = ig.allocate(ImageGeometry.RANDOM)
         # fill with random numbers
         x_init = ig.allocate(ImageGeometry.RANDOM)
-        identity = Identity(ig)
+        identity = IdentityOperator(ig)
         
 	    #### it seems FISTA does not work with Nowm2Sq
         norm2sq = LeastSquares(identity, b)
@@ -241,7 +249,7 @@ class TestAlgorithms(unittest.TestCase):
         # fill with random numbers  
         b.fill(numpy.random.random(x_init.shape))
         x_init = ig.allocate(ImageGeometry.RANDOM)
-        identity = Identity(ig)
+        identity = IdentityOperator(ig)
         
 	    #### it seems FISTA does not work with Nowm2Sq
         norm2sq = LeastSquares(identity, b)
@@ -300,7 +308,7 @@ class TestAlgorithms(unittest.TestCase):
             return noisy_data, alpha, g
 
         noisy_data, alpha, g = setup(data, dnoise)
-        operator = Gradient(ig, correlation=Gradient.CORRELATION_SPACE)
+        operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE)
 
         f1 =  alpha * MixedL21Norm()
 
@@ -326,7 +334,7 @@ class TestAlgorithms(unittest.TestCase):
         which_noise = 1
         noise = noises[which_noise]
         noisy_data, alpha, g = setup(data, noise)
-        operator = Gradient(ig, correlation=Gradient.CORRELATION_SPACE)
+        operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE)
 
         f1 =  alpha * MixedL21Norm()
 
@@ -353,7 +361,7 @@ class TestAlgorithms(unittest.TestCase):
         which_noise = 2
         noise = noises[which_noise]
         noisy_data, alpha, g = setup(data, noise)
-        operator = Gradient(ig, correlation=Gradient.CORRELATION_SPACE)
+        operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE)
 
         f1 =  alpha * MixedL21Norm()
    
@@ -389,7 +397,7 @@ class TestAlgorithms(unittest.TestCase):
         alpha = 10
 
         # Setup and run the FISTA algorithm
-        operator = Gradient(ig)
+        operator = GradientOperator(ig)
         fid = KullbackLeibler(b=noisy_data)
         reg = FunctionOperatorComposition(alpha * L2NormSquared(), operator)
 
@@ -434,7 +442,7 @@ class TestSIRT(unittest.TestCase):
         # b = ig.allocate()
         # bdata = numpy.reshape(numpy.asarray([i for i in range(20)]), (2,10))
         # b.fill(bdata)
-        identity = Identity(ig)
+        identity = IdentityOperator(ig)
         
         alg = SIRT(x_init=x_init, operator=identity, data=b)
         alg.max_iteration = 200
@@ -466,15 +474,9 @@ class TestSIRT(unittest.TestCase):
     
 class TestSPDHG(unittest.TestCase):
 
-    @unittest.skipIf(astra_not_available, "cil-astra not available")
+    @unittest.skipUnless(has_astra, "cil-astra not available")
     def test_SPDHG_vs_PDHG_implicit(self):
-        from cil.astra.operators import AstraProjectorSimple
-        from cil.framework import BlockDataContainer, AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
-        from cil.optimisation.operators import BlockOperator, Gradient
-        from cil.optimisation.functions import BlockFunction, KullbackLeibler, MixedL21Norm, IndicatorBox
-        from cil.optimisation.algorithms import SPDHG, PDHG
-        # Fast Gradient Projection algorithm for Total Variation(TV)
-        from cil.optimisation.functions import TotalVariation
+        
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
 
         ig = data.geometry
@@ -564,13 +566,8 @@ class TestSPDHG(unittest.TestCase):
         np.testing.assert_almost_equal( mse(spdhg.get_output(), pdhg.get_output()), 
                                             5.51141e-06, decimal=3) 
         
-    @unittest.skipIf(astra_not_available, "ccpi-astra not available")
+    @unittest.skipUnless(has_astra, "ccpi-astra not available")
     def test_SPDHG_vs_PDHG_explicit(self):
-        from cil.astra.operators import AstraProjectorSimple
-        from cil.framework import BlockDataContainer, AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
-        from cil.optimisation.operators import BlockOperator, Gradient
-        from cil.optimisation.functions import BlockFunction, KullbackLeibler, MixedL21Norm, IndicatorBox
-        from cil.optimisation.algorithms import SPDHG, PDHG
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
         print ("here")
         ig = data.geometry
@@ -609,7 +606,7 @@ class TestSPDHG(unittest.TestCase):
         subsets = 10
         size_of_subsets = int(len(angles)/subsets)
         # create Gradient operator
-        op1 = Gradient(ig)
+        op1 = GradientOperator(ig)
         # take angles and create uniform subsets in uniform+sequential setting
         list_angles = [angles[i:i+size_of_subsets] for i in range(0, len(angles), size_of_subsets)]
         # create acquisitioin geometries for each the interval of splitting angles
@@ -634,7 +631,7 @@ class TestSPDHG(unittest.TestCase):
         spdhg.run(1000, very_verbose = True)
 
         #%% 'explicit' PDHG, scalar step-sizes
-        op1 = Gradient(ig)
+        op1 = GradientOperator(ig)
         op2 = Aop
         # Create BlockOperator
         operator = BlockOperator(op1, op2, shape=(2,1) ) 
@@ -668,13 +665,8 @@ class TestSPDHG(unittest.TestCase):
         np.testing.assert_almost_equal( mse(spdhg.get_output(), pdhg.get_output()), 
         1.68590e-05, decimal=3)
     
-    @unittest.skipIf(astra_not_available, "ccpi-astra not available")
+    @unittest.skipUnless(has_astra, "ccpi-astra not available")
     def test_SPDHG_vs_SPDHG_explicit_axpby(self):
-        from cil.astra.operators import AstraProjectorSimple
-        from cil.framework import BlockDataContainer, AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
-        from cil.optimisation.operators import BlockOperator, Gradient
-        from cil.optimisation.functions import BlockFunction, KullbackLeibler, MixedL21Norm, IndicatorBox
-        from cil.optimisation.algorithms import SPDHG, PDHG
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
         print ("test_SPDHG_vs_SPDHG_explicit_axpby here")
         ig = data.geometry
@@ -714,8 +706,8 @@ class TestSPDHG(unittest.TestCase):
         #%% 'explicit' SPDHG, scalar step-sizes
         subsets = 10
         size_of_subsets = int(len(angles)/subsets)
-        # create Gradient operator
-        op1 = Gradient(ig)
+        # create GradientOperator operator
+        op1 = GradientOperator(ig)
         # take angles and create uniform subsets in uniform+sequential setting
         list_angles = [angles[i:i+size_of_subsets] for i in range(0, len(angles), size_of_subsets)]
         # create acquisitioin geometries for each the interval of splitting angles
@@ -760,13 +752,8 @@ class TestSPDHG(unittest.TestCase):
 
     
     
-    @unittest.skipIf(astra_not_available, "ccpi-astra not available")
+    @unittest.skipUnless(has_astra, "ccpi-astra not available")
     def test_PDHG_vs_PDHG_explicit_axpby(self):
-        from cil.astra.operators import AstraProjectorSimple
-        from cil.framework import BlockDataContainer, AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
-        from cil.optimisation.operators import BlockOperator, Gradient
-        from cil.optimisation.functions import BlockFunction, KullbackLeibler, MixedL21Norm, IndicatorBox
-        from cil.optimisation.algorithms import PDHG
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
         print ("test_PDHG_vs_PDHG_explicit_axpby here")
         ig = data.geometry
@@ -800,7 +787,7 @@ class TestSPDHG(unittest.TestCase):
          
         
         alpha = 0.5
-        op1 = Gradient(ig)
+        op1 = GradientOperator(ig)
         op2 = Aop
         # Create BlockOperator
         operator = BlockOperator(op1, op2, shape=(2,1) ) 

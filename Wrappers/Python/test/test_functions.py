@@ -21,9 +21,9 @@ import numpy as np
 
 from cil.framework import DataContainer, ImageGeometry, \
     VectorGeometry, VectorData, BlockDataContainer
-from cil.optimisation.operators import Identity, MatrixOperator, CompositionOperator, DiagonalOperator, BlockOperator
+from cil.optimisation.operators import IdentityOperator, MatrixOperator, CompositionOperator, DiagonalOperator, BlockOperator
 from cil.optimisation.functions import Function, KullbackLeibler, ConstantFunction, TranslateFunction
-from cil.optimisation.operators import Gradient
+from cil.optimisation.operators import GradientOperator
 
 from cil.optimisation.functions import Function, KullbackLeibler, WeightedL2NormSquared, L2NormSquared,\
                                          L1Norm, MixedL21Norm, LeastSquares, \
@@ -124,8 +124,8 @@ class TestFunction(unittest.TestCase):
         N = 3
         ig = ImageGeometry(N,N)
         ag = ig       
-        op1 = Gradient(ig)
-        op2 = Identity(ig, ag)
+        op1 = GradientOperator(ig)
+        op2 = IdentityOperator(ig, ag)
 
         # Form Composite Operator
         operator = BlockOperator(op1, op2 , shape=(2,1) )
@@ -354,8 +354,8 @@ class TestFunction(unittest.TestCase):
         #numpy.random.seed(1)
         b = ig.allocate('random', seed=1)
         
-        print('Check call with Identity operator... OK\n')
-        operator = 3 * Identity(ig)
+        print('Check call with IdentityOperator operator... OK\n')
+        operator = 3 * IdentityOperator(ig)
             
         u = ig.allocate('random', seed = 50)
         f = 0.5 * L2NormSquared(b = b)
@@ -371,7 +371,7 @@ class TestFunction(unittest.TestCase):
         numpy.testing.assert_almost_equal(func1(u), func2(u))
         
         
-        print('Check gradient with Identity operator... OK\n')
+        print('Check gradient with IdentityOperator operator... OK\n')
         
         tmp1 = ig.allocate()
         tmp2 = ig.allocate()
@@ -682,7 +682,7 @@ class TestFunction(unittest.TestCase):
         numpy.testing.assert_array_almost_equal(res2.as_array(), \
                                                 out.as_array(), decimal=4)  
         
-        print("Gradient of WeightedL2NormSquared is ... ok")    
+        print("GradientOperator of WeightedL2NormSquared is ... ok")    
         
         # convex conjugate for weighted L2NormSquared       
         res1 = f.convex_conjugate(x)
@@ -740,7 +740,7 @@ class TestFunction(unittest.TestCase):
         
         numpy.random.seed(1)
 
-        A = Identity(ig)
+        A = IdentityOperator(ig)
         b = ig.allocate('random')
         x = ig.allocate('random')
         c = numpy.float64(0.3)
@@ -784,7 +784,7 @@ class TestFunction(unittest.TestCase):
         res2 = 2 * c * A.adjoint(weight*(A.direct(x)-b))
         numpy.testing.assert_array_almost_equal(res1.as_array(), res2.as_array())
         numpy.testing.assert_array_almost_equal(out.as_array(), res2.as_array())
-        print("Gradient is ... OK")          
+        print("GradientOperator is ... OK")          
         
         # check gradient without weight             
         out = ig.allocate()
@@ -794,13 +794,13 @@ class TestFunction(unittest.TestCase):
         numpy.testing.assert_array_almost_equal(res1.as_array(), res2.as_array())
         numpy.testing.assert_array_almost_equal(out.as_array(), res2.as_array())
         
-        print("Gradient without weight is ... OK")   
+        print("GradientOperator without weight is ... OK")   
 
 
         print("Compare Least Squares with DiagonalOperator + CompositionOperator")
         
         ig2 = ImageGeometry(100,100,100)
-        A = Identity(ig2)
+        A = IdentityOperator(ig2)
         b = ig2.allocate('random')
         x = ig2.allocate('random')
         c = 0.3
@@ -833,8 +833,8 @@ class TestFunction(unittest.TestCase):
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
         b = ig.allocate('random', seed=1)
         
-        print('Check call with Identity operator... OK\n')
-        operator = 3 * Identity(ig)
+        print('Check call with IdentityOperator operator... OK\n')
+        operator = 3 * IdentityOperator(ig)
             
         u = ig.allocate('random_int', seed = 50)
         func2 = LeastSquares(operator, b, 0.5)
@@ -849,8 +849,8 @@ class TestFunction(unittest.TestCase):
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
         b = ig.allocate('random', seed=1)
         
-        print('Check call with Identity operator... OK\n')
-        operator = 3 * Identity(ig)
+        print('Check call with IdentityOperator operator... OK\n')
+        operator = 3 * IdentityOperator(ig)
             
         u = ig.allocate('random_int', seed = 50)
         func2 = LeastSquares(operator, b, 0.5)
@@ -867,8 +867,8 @@ class TestFunction(unittest.TestCase):
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
         b = ig.allocate('random', seed=1)
         
-        print('Check call with Identity operator... OK\n')
-        operator = 3 * Identity(ig)
+        print('Check call with IdentityOperator operator... OK\n')
+        operator = 3 * IdentityOperator(ig)
             
         u = ig.allocate('random_int', seed = 50)
         # func2 = LeastSquares(operator, b, 0.5)
@@ -885,8 +885,8 @@ class TestFunction(unittest.TestCase):
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
         b = ig.allocate('random', seed=1)
         
-        print('Check call with Identity operator... OK\n')
-        operator = 3 * Identity(ig)
+        print('Check call with IdentityOperator operator... OK\n')
+        operator = 3 * IdentityOperator(ig)
             
         u = ig.allocate('random_int', seed = 50)
         # func2 = LeastSquares(operator, b, 0.5)

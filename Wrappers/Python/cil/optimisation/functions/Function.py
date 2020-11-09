@@ -27,7 +27,6 @@ from __future__ import print_function
 import warnings
 
 from numbers import Number
-from cil.optimisation.operators import ZeroOperator, Identity
 
 class Function(object):
     
@@ -420,7 +419,7 @@ class ConstantFunction(Function):
             return x.copy()
         else:
             out.fill(x)
-        #return Identity(x.geometry).direct(x, out=out)
+        
     @property
     def constant(self):
         return self._constant

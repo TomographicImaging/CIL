@@ -24,7 +24,7 @@ from cil.framework import BlockGeometry, BlockDataContainer
 from cil.optimisation.operators import FiniteDifferenceOperator
 
 
-class SymmetrizedGradient(LinearOperator):
+class SymmetrizedGradientOperator(LinearOperator):
     
     r'''Symmetrized Gradient Operator:  E: V -> W
         
@@ -57,10 +57,9 @@ class SymmetrizedGradient(LinearOperator):
         :param correlation: :code:`SpaceChannel` or :code:`Channel`
         :type correlation: str, optional, default :code:`Channel`
         '''
-        # super(SymmetrizedGradient, self).__init__(domain_geometry=domain_geometry) 
-                
+        
         self.bnd_cond = bnd_cond
-        self.correlation = kwargs.get('correlation',SymmetrizedGradient.CORRELATION_SPACE)
+        self.correlation = kwargs.get('correlation',SymmetrizedGradientOperator.CORRELATION_SPACE)
                 
         tmp_gm = len(domain_geometry.geometries)*domain_geometry.geometries
         
@@ -74,7 +73,7 @@ class SymmetrizedGradient(LinearOperator):
         else:
             self.order_ind = [0,3,6,1,4,7,2,5,8]            
         
-        super(SymmetrizedGradient, self).__init__(
+        super(SymmetrizedGradientOperator, self).__init__(
                                           domain_geometry=domain_geometry, 
                                           range_geometry=BlockGeometry(*tmp_gm))
         
@@ -144,9 +143,9 @@ class SymmetrizedGradient(LinearOperator):
 if __name__ == '__main__':   
     
     ###########################################################################  
-    ## Symmetrized Gradient Tests
+    ## Symmetrized GradientOperator Tests
     from cil.framework import ImageGeometry
-    from cil.optimisation.operators import Gradient
+    from cil.optimisation.operators import GradientOperator
     import numpy as np
     
     N, M = 2, 3
@@ -156,9 +155,9 @@ if __name__ == '__main__':
     ###########################################################################
     # 2D geometry no channels
     ig = ImageGeometry(N, M)
-    Grad = Gradient(ig)
+    Grad = GradientOperator(ig)
     
-    E1 = SymmetrizedGradient(Grad.range_geometry())
+    E1 = SymmetrizedGradientOperator(Grad.range_geometry())
     np.testing.assert_almost_equal(E1.norm(), np.sqrt(8), 1e-5)
     
     print(E1.domain_geometry().shape, E1.range_geometry().shape)
@@ -173,9 +172,9 @@ if __name__ == '__main__':
     ###########################################################################
     # 2D geometry with channels
     ig2 = ImageGeometry(N, M, channels = C)
-    Grad2 = Gradient(ig2, correlation = 'Space')
+    Grad2 = GradientOperator(ig2, correlation = 'Space')
     
-    E2 = SymmetrizedGradient(Grad2.range_geometry())
+    E2 = SymmetrizedGradientOperator(Grad2.range_geometry())
     np.testing.assert_almost_equal(E2.norm(), np.sqrt(12), 1e-6)
     
     print(E2.domain_geometry().shape, E2.range_geometry().shape)
@@ -189,9 +188,9 @@ if __name__ == '__main__':
     ###########################################################################
     # 3D geometry no channels
     ig3 = ImageGeometry(N, M, K)
-    Grad3 = Gradient(ig3, correlation = 'Space')
+    Grad3 = GradientOperator(ig3, correlation = 'Space')
     
-    E3 = SymmetrizedGradient(Grad3.range_geometry())
+    E3 = SymmetrizedGradientOperator(Grad3.range_geometry())
     np.testing.assert_almost_equal(E3.norm(), np.sqrt(12), 1e-6)
     
     print(E3.domain_geometry().shape, E3.range_geometry().shape)

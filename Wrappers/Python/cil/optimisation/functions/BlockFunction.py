@@ -209,7 +209,7 @@ if __name__ == '__main__':
     
     from cil.optimisation.functions import L2NormSquared, MixedL21Norm, L1Norm
     from cil.framework import ImageGeometry, BlockGeometry
-    from cil.optimisation.operators import Gradient, Identity, BlockOperator
+    from cil.optimisation.operators import GradientOperator, IdentityOperator, BlockOperator
     import numpy
     import numpy as np
     
@@ -218,7 +218,7 @@ if __name__ == '__main__':
     BG = BlockGeometry(ig, ig)
     
     u = ig.allocate('random_int')
-    B = BlockOperator( Gradient(ig), Identity(ig) )
+    B = BlockOperator( GradientOperator(ig), IdentityOperator(ig) )
     
     U = B.direct(u)
     b = ig.allocate('random_int')

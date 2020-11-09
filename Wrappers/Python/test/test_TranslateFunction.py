@@ -22,7 +22,7 @@ from cil.optimisation.functions import Function, L1Norm, ScaledFunction, \
                                         KullbackLeibler, ZeroFunction, \
                                         ConstantFunction, TranslateFunction, \
                                         MixedL21Norm, FunctionOperatorComposition
-from cil.optimisation.operators import Identity, Gradient                              
+from cil.optimisation.operators import GradientOperator
 from cil.framework import ImageGeometry, BlockGeometry
 
 import unittest
@@ -142,7 +142,7 @@ class TestFunction(unittest.TestCase):
         
         ig = ImageGeometry(4,4)
         
-        Grad = Gradient(ig)        
+        Grad = GradientOperator(ig)        
         b = Grad.range_geometry().allocate('random', seed=10)
                         
         alpha = 0.4

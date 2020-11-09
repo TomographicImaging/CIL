@@ -20,15 +20,14 @@ from __future__ import division
 import unittest
 from cil.framework import ImageGeometry, VectorGeometry, ImageData, BlockDataContainer, DataContainer
 from cil.optimisation.operators import BlockOperator,\
-    FiniteDifferenceOperator, SymmetrizedGradient
+    FiniteDifferenceOperator, SymmetrizedGradientOperator
 import numpy
 from timeit import default_timer as timer
-from cil.optimisation.operators import Gradient, Identity,\
+from cil.optimisation.operators import GradientOperator, IdentityOperator,\
     DiagonalOperator, MaskOperator, ChannelwiseOperator, BlurringOperator
 from cil.optimisation.operators import LinearOperator, MatrixOperator
 import numpy   
-from cil.optimisation.operators import SumOperator, Gradient,\
-            ZeroOperator, SymmetrizedGradient, CompositionOperator
+from cil.optimisation.operators import SumOperator,  ZeroOperator, CompositionOperator
 
 from cil.utilities import dataexample
 import os
@@ -112,7 +111,7 @@ class TestOperator(CCPiTestClass):
         ig = ImageGeometry(10,20,30)
         img = ig.allocate()
         scalar = 0.5
-        sid = scalar * Identity(ig)
+        sid = scalar * IdentityOperator(ig)
         numpy.testing.assert_array_equal(scalar * img.as_array(), sid.direct(img).as_array())
     
     def test_DiagonalOperator(self):
@@ -218,15 +217,15 @@ class TestOperator(CCPiTestClass):
         # Run dot test to check validity of adjoint.
         self.assertTrue(BOP.dot_test(BOP))
 
-    def test_Identity(self):
-        print ("test_Identity")
+    def test_IdentityOperator(self):
+        print ("test_IdentityOperator")
         ig = ImageGeometry(10,20,30)
         img = ig.allocate()
         # img.fill(numpy.ones((30,20,10)))
         self.assertTrue(img.shape == (30,20,10))
         #self.assertEqual(img.sum(), 2*float(10*20*30))
         self.assertEqual(img.sum(), 0.)
-        Id = Identity(ig)
+        Id = IdentityOperator(ig)
         y = Id.direct(img)
         numpy.testing.assert_array_equal(y.as_array(), img.as_array())
 
@@ -236,7 +235,7 @@ class TestOperator(CCPiTestClass):
         N, M = 2, 3
         numpy.random.seed(1)
         ig = ImageGeometry(N, M)
-        Id = Identity(ig)
+        Id = IdentityOperator(ig)
 
         FD = FiniteDifferenceOperator(ig, direction = 0, bnd_cond = 'Neumann')
         u = FD.domain_geometry().allocate('random')
@@ -255,7 +254,7 @@ class TestOperator(CCPiTestClass):
         self.assertNumpyArrayEqual(res.as_array(), w.as_array())
         self.assertNumpyArrayEqual(u.as_array(), w.as_array())
 
-        G = Gradient(ig)
+        G = GradientOperator(ig)
 
         u = G.range_geometry().allocate(ImageGeometry.RANDOM)
         res = G.domain_geometry().allocate()
@@ -318,9 +317,9 @@ class TestOperator(CCPiTestClass):
         N, M = 200, 300
         niter = 10
         ig = ImageGeometry(N, M)
-        Id = Identity(ig)
+        Id = IdentityOperator(ig)
         
-        G = Gradient(ig)
+        G = GradientOperator(ig)
         
         uid = Id.domain_geometry().allocate(ImageGeometry.RANDOM, seed=1)
         
@@ -349,7 +348,7 @@ class TestOperator(CCPiTestClass):
         N, M = 200, 300
 
         ig = ImageGeometry(N, M)
-        G = Gradient(ig)
+        G = GradientOperator(ig)
         t0 = timer()
         norm = G.norm()
         t1 = timer()
@@ -393,28 +392,28 @@ class TestGradients(CCPiTestClass):
         self.ig2 = ImageGeometry(N, M, channels = C)
         self.ig3 = ImageGeometry(N, M, K)
 
-    def test_SymmetrizedGradient1a(self):
+    def test_SymmetrizedGradientOperator1a(self):
         ###########################################################################  
         ## Symmetrized Gradient Tests
-        print ("Test SymmetrizedGradient")
+        print ("Test SymmetrizedGradientOperator")
         ###########################################################################
         # 2D geometry no channels
         # ig = ImageGeometry(N, M)
-        Grad = Gradient(self.ig)
+        Grad = GradientOperator(self.ig)
         
-        E1 = SymmetrizedGradient(Grad.range_geometry())
+        E1 = SymmetrizedGradientOperator(Grad.range_geometry())
         numpy.testing.assert_almost_equal(E1.norm(iterations=self.iterations), numpy.sqrt(8), decimal = self.decimal)
         
-    def test_SymmetrizedGradient1b(self):
+    def test_SymmetrizedGradientOperator1b(self):
         ###########################################################################  
-        ## Symmetrized Gradient Tests
-        print ("Test SymmetrizedGradient")
+        ## Symmetrized GradientOperator Tests
+        print ("Test SymmetrizedGradientOperator")
         ###########################################################################
         # 2D geometry no channels
         # ig = ImageGeometry(N, M)
-        Grad = Gradient(self.ig)
+        Grad = GradientOperator(self.ig)
         
-        E1 = SymmetrizedGradient(Grad.range_geometry())
+        E1 = SymmetrizedGradientOperator(Grad.range_geometry())
         numpy.random.seed(1)
         u1 = E1.domain_geometry().allocate('random')
         w1 = E1.range_geometry().allocate('random', symmetry = True)
@@ -426,13 +425,13 @@ class TestGradients(CCPiTestClass):
         # self.assertAlmostEqual(lhs, rhs)
         numpy.testing.assert_almost_equal(lhs, rhs, decimal=4)
             
-    def test_SymmetrizedGradient2(self):        
+    def test_SymmetrizedGradientOperator2(self):        
         ###########################################################################
         # 2D geometry with channels
         # ig2 = ImageGeometry(N, M, channels = C)
-        Grad2 = Gradient(self.ig2, correlation = 'Space')
+        Grad2 = GradientOperator(self.ig2, correlation = 'Space')
         
-        E2 = SymmetrizedGradient(Grad2.range_geometry())
+        E2 = SymmetrizedGradientOperator(Grad2.range_geometry())
         numpy.random.seed(1)
         u2 = E2.domain_geometry().allocate('random')
         w2 = E2.range_geometry().allocate('random', symmetry = True)
@@ -442,37 +441,37 @@ class TestGradients(CCPiTestClass):
             
         numpy.testing.assert_almost_equal(lhs2, rhs2, decimal=4)
         
-    def test_SymmetrizedGradient2a(self):        
+    def test_SymmetrizedGradientOperator2a(self):        
         ###########################################################################
         # 2D geometry with channels
         # ig2 = ImageGeometry(N, M, channels = C)
-        Grad2 = Gradient(self.ig2, correlation = 'Space')
+        Grad2 = GradientOperator(self.ig2, correlation = 'Space')
         
-        E2 = SymmetrizedGradient(Grad2.range_geometry())
+        E2 = SymmetrizedGradientOperator(Grad2.range_geometry())
         numpy.testing.assert_almost_equal(E2.norm(iterations=self.iterations), 
            numpy.sqrt(8), decimal = self.decimal)
         
     
-    def test_SymmetrizedGradient3a(self):
+    def test_SymmetrizedGradientOperator3a(self):
         ###########################################################################
         # 3D geometry no channels
         #ig3 = ImageGeometry(N, M, K)
-        Grad3 = Gradient(self.ig3, correlation = 'Space')
+        Grad3 = GradientOperator(self.ig3, correlation = 'Space')
         
-        E3 = SymmetrizedGradient(Grad3.range_geometry())
+        E3 = SymmetrizedGradientOperator(Grad3.range_geometry())
 
         norm1 = E3.norm()
         norm2 = E3.calculate_norm(iterations=100)
         print (norm1,norm2)
         numpy.testing.assert_almost_equal(norm2, numpy.sqrt(12), decimal = self.decimal)
         
-    def test_SymmetrizedGradient3b(self):
+    def test_SymmetrizedGradientOperator3b(self):
         ###########################################################################
         # 3D geometry no channels
         #ig3 = ImageGeometry(N, M, K)
-        Grad3 = Gradient(self.ig3, correlation = 'Space')
+        Grad3 = GradientOperator(self.ig3, correlation = 'Space')
         
-        E3 = SymmetrizedGradient(Grad3.range_geometry())
+        E3 = SymmetrizedGradientOperator(Grad3.range_geometry())
         numpy.random.seed(1)
         u3 = E3.domain_geometry().allocate('random')
         w3 = E3.range_geometry().allocate('random', symmetry = True)
@@ -490,14 +489,14 @@ class TestGradients(CCPiTestClass):
         print ("*******", lhs3, rhs3, abs((rhs3-lhs3)/rhs3) , 1.5 * 10**(-4), abs((rhs3-lhs3)/rhs3) < 1.5 * 10**(-4))
         self.assertTrue( LinearOperator.dot_test(E3, range_init = w3, domain_init=u3, decimal=decimal) )
     def test_dot_test(self):
-        Grad3 = Gradient(self.ig3, correlation = 'Space', backend='numpy')
+        Grad3 = GradientOperator(self.ig3, correlation = 'Space', backend='numpy')
              
         # self.assertAlmostEqual(lhs3, rhs3)
         self.assertTrue( LinearOperator.dot_test(Grad3 , verbose=True, decimal=4))
         self.assertTrue( LinearOperator.dot_test(Grad3 , verbose=True, decimal=4))
 
     def test_dot_test2(self):
-        Grad3 = Gradient(self.ig3, correlation = 'SpaceChannel', backend='c')
+        Grad3 = GradientOperator(self.ig3, correlation = 'SpaceChannel', backend='c')
              
         # self.assertAlmostEqual(lhs3, rhs3)
         # self.assertTrue( LinearOperator.dot_test(Grad3 , verbose=True))
@@ -551,8 +550,8 @@ class TestBlockOperator(unittest.TestCase):
         ig = ImageGeometry(M, N)
         arr = ig.allocate('random')  
         
-        G = Gradient(ig)
-        Id = Identity(ig)
+        G = GradientOperator(ig)
+        Id = IdentityOperator(ig)
         
         B = BlockOperator(G, Id)
         # Nx1 case
@@ -734,8 +733,8 @@ class TestBlockOperator(unittest.TestCase):
         ig = ImageGeometry(M, N, W)
         arr = ig.allocate('random')  
         
-        G = Gradient(ig, backend='numpy')
-        Id = Identity(ig)
+        G = GradientOperator(ig, backend='numpy')
+        Id = IdentityOperator(ig)
         
         B = BlockOperator(G, Id)
         
@@ -804,8 +803,8 @@ class TestBlockOperator(unittest.TestCase):
         ig = ImageGeometry(M, N)
         arr = ig.allocate('random', seed=1)  
         
-        G = Gradient(ig)
-        Id = Identity(ig)
+        G = GradientOperator(ig)
+        Id = IdentityOperator(ig)
         
         B = BlockOperator(G, Id)
         # Nx1 case
@@ -827,11 +826,9 @@ class TestOperatorCompositionSum(unittest.TestCase):
         ig = self.ig
         data = self.data
 
-        Id1 = 2 * Identity(ig)
-        Id2 = Identity(ig)
-        # z = ZeroOperator(domain_geometry=ig)
-        # sym = SymmetrizedGradient(domain_geometry=ig)
-
+        Id1 = 2 * IdentityOperator(ig)
+        Id2 = IdentityOperator(ig)
+        
         c = SumOperator(Id1,Id2)
         out = c.direct(data)
 
@@ -841,11 +838,11 @@ class TestOperatorCompositionSum(unittest.TestCase):
     def test_CompositionOperator_direct1(self):
         ig = self.ig
         data = self.data
-        G = Gradient(domain_geometry=ig)
+        G = GradientOperator(domain_geometry=ig)
         
 
-        Id1 = 2 * Identity(ig)
-        Id2 = Identity(ig)
+        Id1 = 2 * IdentityOperator(ig)
+        Id2 = IdentityOperator(ig)
         
         d = CompositionOperator(G, Id2)
 
@@ -859,11 +856,11 @@ class TestOperatorCompositionSum(unittest.TestCase):
     def test_CompositionOperator_direct2(self):
         ig = self.ig
         data = self.data
-        G = Gradient(domain_geometry=ig)
+        G = GradientOperator(domain_geometry=ig)
         
 
-        Id1 = 2 * Identity(ig)
-        Id2 = Identity(ig)
+        Id1 = 2 * IdentityOperator(ig)
+        Id2 = IdentityOperator(ig)
         
         d = CompositionOperator(G, Id2)
 
@@ -882,11 +879,11 @@ class TestOperatorCompositionSum(unittest.TestCase):
     def test_CompositionOperator_direct3(self):
         ig = self.ig
         data = self.data
-        G = Gradient(domain_geometry=ig)
+        G = GradientOperator(domain_geometry=ig)
         
 
-        Id1 = 2 * Identity(ig)
-        Id2 = Identity(ig)
+        Id1 = 2 * IdentityOperator(ig)
+        Id2 = IdentityOperator(ig)
         
         d = CompositionOperator(G, Id2)
 
@@ -913,11 +910,11 @@ class TestOperatorCompositionSum(unittest.TestCase):
     def test_CompositionOperator_direct4(self):
         ig = self.ig
         data = self.data
-        G = Gradient(domain_geometry=ig)
+        G = GradientOperator(domain_geometry=ig)
         
 
-        Id1 = 2 * Identity(ig)
-        Id2 = Identity(ig)
+        Id1 = 2 * IdentityOperator(ig)
+        Id2 = IdentityOperator(ig)
         
         d = CompositionOperator(G, Id1, Id2)
 
@@ -933,11 +930,11 @@ class TestOperatorCompositionSum(unittest.TestCase):
     def test_CompositionOperator_adjoint1(self):
         ig = self.ig
         data = self.data
-        G = Gradient(domain_geometry=ig)
+        G = GradientOperator(domain_geometry=ig)
         
 
-        Id1 = 2 * Identity(ig)
-        Id2 = Identity(ig)
+        Id1 = 2 * IdentityOperator(ig)
+        Id2 = IdentityOperator(ig)
         
         d = CompositionOperator(G, Id2)
         da = d.direct(data)
@@ -950,11 +947,11 @@ class TestOperatorCompositionSum(unittest.TestCase):
     def test_CompositionOperator_adjoint2(self):
         ig = self.ig
         data = self.data
-        G = Gradient(domain_geometry=ig)
+        G = GradientOperator(domain_geometry=ig)
         
 
-        Id1 = 2 * Identity(ig)
-        Id2 = Identity(ig)
+        Id1 = 2 * IdentityOperator(ig)
+        Id2 = IdentityOperator(ig)
         
         d = CompositionOperator(G, Id1)
         da = d.direct(data)
@@ -967,11 +964,11 @@ class TestOperatorCompositionSum(unittest.TestCase):
     def test_CompositionOperator_adjoint3(self):
         ig = self.ig
         data = self.data
-        G = Gradient(domain_geometry=ig)
+        G = GradientOperator(domain_geometry=ig)
         
 
-        Id1 = 2 * Identity(ig)
-        Id2 = Identity(ig)
+        Id1 = 2 * IdentityOperator(ig)
+        Id2 = IdentityOperator(ig)
         
         d = G.compose(Id1)
         da = d.direct(data)
@@ -985,10 +982,10 @@ class TestOperatorCompositionSum(unittest.TestCase):
     def test_CompositionOperator_adjoint4(self):
         ig = self.ig
         data = self.data
-        G = Gradient(domain_geometry=ig)
+        G = GradientOperator(domain_geometry=ig)
         
 
-        Id1 = 2 * Identity(ig)
+        Id1 = 2 * IdentityOperator(ig)
         
         d = G.compose(-Id1)
         da = d.direct(data)
@@ -1001,11 +998,11 @@ class TestOperatorCompositionSum(unittest.TestCase):
     def test_CompositionOperator_adjoint5(self):
         ig = self.ig
         data = self.data
-        G = Gradient(domain_geometry=ig)
+        G = GradientOperator(domain_geometry=ig)
         
 
-        Id1 = 3 * Identity(ig)
-        Id = Id1 - Identity(ig)
+        Id1 = 3 * IdentityOperator(ig)
+        Id = Id1 - IdentityOperator(ig)
         d = G.compose(Id)
         da = d.direct(data)
         
@@ -1017,10 +1014,10 @@ class TestOperatorCompositionSum(unittest.TestCase):
     def test_CompositionOperator_adjoint6(self):
         ig = self.ig
         data = self.data
-        G = Gradient(domain_geometry=ig)
+        G = GradientOperator(domain_geometry=ig)
         
 
-        Id1 = 3 * Identity(ig)
+        Id1 = 3 * IdentityOperator(ig)
         Id = ZeroOperator(ig)
         d = G.compose(Id)
         da = d.direct(data)
@@ -1033,11 +1030,11 @@ class TestOperatorCompositionSum(unittest.TestCase):
     def stest_CompositionOperator_direct4(self):
         ig = self.ig
         data = self.data
-        G = Gradient(domain_geometry=ig)
+        G = GradientOperator(domain_geometry=ig)
         
 
-        sym = SymmetrizedGradient(domain_geometry=ig)
-        Id2 = Identity(ig)
+        sym = SymmetrizedGradientOperator(domain_geometry=ig)
+        Id2 = IdentityOperator(ig)
         
         d = CompositionOperator(sym, Id2)
 
@@ -1051,11 +1048,11 @@ class TestOperatorCompositionSum(unittest.TestCase):
     def test_CompositionOperator_adjoint7(self):
         ig = self.ig
         data = self.data
-        G = Gradient(domain_geometry=ig)
+        G = GradientOperator(domain_geometry=ig)
         
 
-        Id1 = 2 * Identity(ig)
-        Id2 = Identity(ig)
+        Id1 = 2 * IdentityOperator(ig)
+        Id2 = IdentityOperator(ig)
         
         d = CompositionOperator(G, Id1, Id2)
 

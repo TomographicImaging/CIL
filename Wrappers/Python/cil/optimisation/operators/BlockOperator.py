@@ -388,16 +388,16 @@ class BlockOperator(Operator):
 if __name__ == '__main__':
     
     from cil.framework import ImageGeometry
-    from cil.optimisation.operators import Gradient, Identity, \
-                            SparseFiniteDifferenceOperator, SymmetrizedGradient, ZeroOperator
+    from cil.optimisation.operators import GradientOperator, IdentityOperator, \
+                            SparseFiniteDifferenceOperator, SymmetrizedGradientOperator, ZeroOperator
 
         
     M, N = 4, 3
     ig = ImageGeometry(M, N)
     arr = ig.allocate('random_int')  
     
-    G = Gradient(ig)
-    Id = Identity(ig)
+    G = GradientOperator(ig)
+    Id = IdentityOperator(ig)
     
     B = BlockOperator(G, Id)
     
@@ -447,15 +447,15 @@ if __name__ == '__main__':
     ig = ImageGeometry(M, N)
     ag = ig
     
-    op11 = Gradient(ig)
-    op12 = Identity(op11.range_geometry())
+    op11 = GradientOperator(ig)
+    op12 = IdentityOperator(op11.range_geometry())
     
-    op22 = SymmetrizedGradient(op11.domain_geometry())
+    op22 = SymmetrizedGradientOperator(op11.domain_geometry())
     
     op21 = ZeroOperator(ig, op22.range_geometry())
     
     
-    op31 = Identity(ig, ag)
+    op31 = IdentityOperator(ig, ag)
     op32 = ZeroOperator(op22.domain_geometry(), ag)
     
     operator = BlockOperator(op11, -1*op12, op21, op22, op31, op32, shape=(3,2) )    

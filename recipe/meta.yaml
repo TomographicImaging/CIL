@@ -17,8 +17,7 @@ test:
     - scikit-image
     - packaging
     - tomophantom
-    # - ccpi-plugins
-    # - ccpi-astra # [ unix ] 
+    # - cil-astra # [ unix ] 
     - numba
 
   source_files:

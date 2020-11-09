@@ -34,7 +34,7 @@ NUMPY = 'numpy'
 CORRELATION_SPACE = "Space"
 CORRELATION_SPACECHANNEL = "SpaceChannels"
 
-class Gradient(LinearOperator):
+class GradientOperator(LinearOperator):
 
 
     r'''Gradient Operator: Computes first-order forward/backward differences on 
@@ -93,7 +93,7 @@ class Gradient(LinearOperator):
         else:
             self.operator = Gradient_C(domain_geometry, bnd_cond=bnd_cond, **kwargs)
         
-        super(Gradient, self).__init__(domain_geometry=domain_geometry, 
+        super(GradientOperator, self).__init__(domain_geometry=domain_geometry, 
                                        range_geometry=self.operator.range_geometry()) 
 
         self.gm_range = self.range_geometry()

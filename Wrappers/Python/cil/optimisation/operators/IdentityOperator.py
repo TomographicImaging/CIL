@@ -25,9 +25,9 @@ import scipy.sparse as sp
 import numpy as np
 
 
-class Identity(LinearOperator):
+class IdentityOperator(LinearOperator):
     
-    '''Identity:  Id: X -> Y,  Id(x) = x\in Y
+    '''IdentityOperator:  Id: X -> Y,  Id(x) = x\in Y
                        
                    X : gm_domain
                    Y : gm_range ( Default: Y = X )
@@ -41,7 +41,7 @@ class Identity(LinearOperator):
         if range_geometry is None:
             range_geometry = domain_geometry
         
-        super(Identity, self).__init__(domain_geometry=domain_geometry,
+        super(IdentityOperator, self).__init__(domain_geometry=domain_geometry,
                                        range_geometry=range_geometry)
         
     def direct(self,x,out=None):
@@ -65,7 +65,7 @@ class Identity(LinearOperator):
         
     def calculate_norm(self, **kwargs):
         
-        '''Evaluates operator norm of Identity'''        
+        '''Evaluates operator norm of IdentityOperator'''        
         
         return 1.0
     
@@ -94,7 +94,7 @@ if __name__ == '__main__':
     ig = ImageGeometry(M, N)
     arr = ig.allocate('random_int')
     
-    Id = Identity(ig)
+    Id = IdentityOperator(ig)
     d = Id.matrix()
     print(d.toarray())
     

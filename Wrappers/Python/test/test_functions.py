@@ -58,6 +58,11 @@ except ImportError as ie:
     has_tomophantom = False
 
 from cil.utilities.quality_measures import mae
+has_numba = True
+try:
+    import numba
+except ImportError as ie:
+    has_numba = False
 
                     
 class TestFunction(unittest.TestCase):

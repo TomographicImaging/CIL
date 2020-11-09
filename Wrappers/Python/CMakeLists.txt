@@ -33,21 +33,13 @@ if (BUILD_PYTHON_WRAPPER)
 
   if (PYTHONINTERP_FOUND)
       message("Python found " ${PYTHON_EXECUTABLE})
-      set(SETUP_PY_IN "${CMAKE_CURRENT_SOURCE_DIR}/setup-cil.py.in")
       set(SETUP_PY    "${CMAKE_CURRENT_SOURCE_DIR}/setup.py")
-      #set(DEPS        "${CMAKE_CURRENT_SOURCE_DIR}/module/__init__.py")
-      # set (DEPS       "${CMAKE_CURRENT_SOURCE_DIR}/ccpi")
       set(OUTPUT      "${CMAKE_CURRENT_BINARY_DIR}/timestamp")
-      file(GLOB_RECURSE DEPS ${CMAKE_CURRENT_SOURCE_DIR}/ccpi/*.py )
+      file(GLOB_RECURSE DEPS ${CMAKE_CURRENT_SOURCE_DIR}/cil/*.py )
       
       # add to add_custom_command DEPENDS the list of python files of the project.
       # as a hack I remove ${OUTPUT}. This should trigger the new build.
       file( REMOVE ${OUTPUT} )
-      #file( REMOVE_RECURSE ${CMAKE_CURRENT_BINARY_DIR}/build/ )
-      #message(STATUS "We should have removed the build directory now")
-      #file( COPY ${CMAKE_CURRENT_SOURCE_DIR}/ccpi DESTINATION ${CMAKE_CURRENT_BINARY_DIR} )
-      #file( COPY ${CMAKE_CURRENT_SOURCE_DIR}/test DESTINATION ${CMAKE_CURRENT_BINARY_DIR} )
-      #file( COPY ${CMAKE_CURRENT_SOURCE_DIR}/setup.py DESTINATION ${CMAKE_CURRENT_BINARY_DIR} )
       
       
       if (CONDA_BUILD)
@@ -85,9 +77,9 @@ if (BUILD_PYTHON_WRAPPER)
         endif()
         #set (PYTHON_DEST ${CMAKE_INSTALL_PREFIX}/python/)
 
-        install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/build/lib/ccpi
+        install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/build/lib/cil
                 DESTINATION ${PYTHON_DEST} )
-        install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/ DESTINATION ${CMAKE_INSTALL_PREFIX}/share/ccpi)
+        install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/ DESTINATION ${CMAKE_INSTALL_PREFIX}/share/cil)
         #file(TOUCH ${PYTHON_DEST}/edo/__init__.py)
         
       endif()

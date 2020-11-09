@@ -21,7 +21,7 @@ import sys
 import unittest
 import numpy
 import math
-from ccpi.framework import AcquisitionGeometry, ImageGeometry
+from cil.framework import AcquisitionGeometry, ImageGeometry
 
 class Test_AcquisitionGeometry(unittest.TestCase):
     def test_create_Parallel2D(self):

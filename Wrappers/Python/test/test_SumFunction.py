@@ -17,11 +17,11 @@
 #   limitations under the License.
 from __future__ import division
 
-from ccpi.optimisation.functions import L1Norm, ScaledFunction, \
+from cil.optimisation.functions import L1Norm, ScaledFunction, \
                                         LeastSquares, L2NormSquared, \
                                         KullbackLeibler, ZeroFunction, ConstantFunction
-from ccpi.optimisation.operators import Identity                                        
-from ccpi.framework import ImageGeometry
+from cil.optimisation.operators import IdentityOperator                                        
+from cil.framework import ImageGeometry
 
 import unittest
 import numpy
@@ -85,7 +85,7 @@ class TestFunction(unittest.TestCase):
         b   = ig.allocate('random', seed=2)
         eta = ig.allocate(0.1)
         
-        operator = Identity(ig)
+        operator = IdentityOperator(ig)
 
         scalar = 0.25
         f1 = L2NormSquared()

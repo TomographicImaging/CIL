@@ -20,8 +20,8 @@ from __future__ import absolute_import
 import numpy 
 
 
-from ccpi.framework import ImageGeometry, BlockGeometry
-from ccpi.optimisation.functions import SmoothMixedL21Norm, MixedL21Norm
+from cil.framework import ImageGeometry, BlockGeometry
+from cil.optimisation.functions import SmoothMixedL21Norm, MixedL21Norm
 import unittest
                     
 class TestFunction(unittest.TestCase):

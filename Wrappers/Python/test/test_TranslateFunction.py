@@ -17,13 +17,13 @@
 #   limitations under the License.
 from __future__ import division
 
-from ccpi.optimisation.functions import Function, L1Norm, ScaledFunction, \
+from cil.optimisation.functions import Function, L1Norm, ScaledFunction, \
                                         LeastSquares, L2NormSquared, \
                                         KullbackLeibler, ZeroFunction, \
                                         ConstantFunction, TranslateFunction, \
                                         MixedL21Norm, FunctionOperatorComposition
-from ccpi.optimisation.operators import Identity, Gradient                              
-from ccpi.framework import ImageGeometry, BlockGeometry
+from cil.optimisation.operators import GradientOperator
+from cil.framework import ImageGeometry, BlockGeometry
 
 import unittest
 import numpy
@@ -142,7 +142,7 @@ class TestFunction(unittest.TestCase):
         
         ig = ImageGeometry(4,4)
         
-        Grad = Gradient(ig)        
+        Grad = GradientOperator(ig)        
         b = Grad.range_geometry().allocate('random', seed=10)
                         
         alpha = 0.4

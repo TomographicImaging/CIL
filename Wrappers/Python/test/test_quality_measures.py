@@ -19,17 +19,17 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from ccpi.framework import ImageGeometry
-from ccpi.optimisation.functions import L2NormSquared, L1Norm
+from cil.framework import ImageGeometry
+from cil.optimisation.functions import L2NormSquared, L1Norm
 import numpy as np
 import matplotlib.pyplot as plt
-from ccpi.utilities import dataexample
-from ccpi.utilities import noise
+from cil.utilities import dataexample
+from cil.utilities import noise
 import os
 import sys
 import unittest
 import warnings
-from ccpi.utilities.quality_measures import mse, mae, psnr
+from cil.utilities.quality_measures import mse, mae, psnr
 from packaging import version
 if version.parse(np.version.version) >= version.parse("1.13"):
     try:

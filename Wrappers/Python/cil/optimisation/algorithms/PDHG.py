@@ -1,0 +1,197 @@
+# -*- coding: utf-8 -*-
+# Copyright 2019-2020 Science Technology Facilities Council
+# Copyright 2019-2020 University of Manchester
+#
+# This work is part of the Core Imaging Library developed by Science Technology
+# Facilities Council and University of Manchester
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
+from cil.optimisation.algorithms import Algorithm
+
+
+
+class PDHG(Algorithm):
+    r'''Primal Dual Hybrid Gradient
+    
+    Problem: 
+    
+    .. math::
+    
+      \min_{x} f(Kx) + g(x)
+        
+    :param operator: Linear Operator = K
+    :param f: Convex function with "simple" proximal of its conjugate. 
+    :param g: Convex function with "simple" proximal 
+    :param sigma: Step size parameter for Primal problem
+    :param tau: Step size parameter for Dual problem
+        
+    Remark: Convergence is guaranted provided that
+        
+    .. math:: 
+    
+      \tau \sigma \|K\|^{2} <1
+        
+            
+    Reference:
+        
+        
+        (a) A. Chambolle and T. Pock (2011), "A first-order primal–dual algorithm for convex
+        problems with applications to imaging", J. Math. Imaging Vision 40, 120–145.        
+        
+        
+        (b) E. Esser, X. Zhang and T. F. Chan (2010), "A general framework for a class of first
+        order primal–dual algorithms for convex optimization in imaging science",
+        SIAM J. Imaging Sci. 3, 1015–1046.
+    '''
+
+    def __init__(self, f=None, g=None, operator=None, tau=None, sigma=1.,x_init=None, use_axpby=True, **kwargs):
+        '''PDHG algorithm creator
+
+        Optional parameters
+
+        :param operator: a Linear Operator
+        :param f: Convex function with "simple" proximal of its conjugate. 
+        :param g: Convex function with "simple" proximal 
+        :param sigma: Step size parameter for Primal problem
+        :param tau: Step size parameter for Dual problem
+        :param x_init: Initial guess ( Default x_init = 0)
+        '''
+        super(PDHG, self).__init__(**kwargs)
+        self._use_axpby = use_axpby
+
+        if f is not None and operator is not None and g is not None:
+            self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, x_init=x_init)
+
+    def set_up(self, f, g, operator, tau=None, sigma=1., x_init=None):
+        '''initialisation of the algorithm
+
+        :param operator: a Linear Operator
+        :param f: Convex function with "simple" proximal of its conjugate. 
+        :param g: Convex function with "simple" proximal 
+        :param sigma: Step size parameter for Primal problem
+        :param tau: Step size parameter for Dual problem
+        :param x_init: Initial guess ( Default x_init = 0)'''
+
+        print("{} setting up".format(self.__class__.__name__, ))
+        
+        # can't happen with default sigma
+        if sigma is None and tau is None:
+            raise ValueError('Need sigma*tau||K||^2<1')
+        # algorithmic parameters
+        self.f = f
+        self.g = g
+        self.operator = operator
+
+        self.tau = tau
+        self.sigma = sigma
+
+        if self.tau is None:
+            # Compute operator Norm
+            normK = self.operator.norm()
+            # Primal & dual stepsizes
+            self.tau = 1 / (self.sigma * normK ** 2)
+        
+        if x_init is None:
+            self.x_old = self.operator.domain_geometry().allocate()
+        else:
+            self.x_old = x_init.copy()
+
+        self.x = operator.domain_geometry().allocate(0)        
+        self.y = self.operator.range_geometry().allocate(0)
+        self.y_old = self.operator.range_geometry().allocate(0)
+        
+        self.x_tmp = self.x_old.copy()
+        
+        self.y_tmp = self.y_old.copy()
+        
+        self.xbar = self.x_old.copy()
+        
+        # relaxation parameter
+        self.theta = 1
+        
+        self.configured = True
+        print("{} configured".format(self.__class__.__name__, ))
+
+    def update_previous_solution(self):
+        # swap the pointers to current and previous solution
+        tmp = self.x_old
+        self.x_old = self.x
+        self.x = tmp
+        tmp = self.y_old
+        self.y_old = self.y
+        self.y = tmp
+        
+    def update(self):
+        
+        # Gradient ascent for the dual variable
+        self.operator.direct(self.xbar, out=self.y_tmp)
+        
+        # self.y_tmp *= self.sigma
+        # self.y_tmp += self.y_old
+        if self._use_axpby:
+            self.y_tmp.axpby(self.sigma, 1 , self.y_old, self.y_tmp)
+        else:
+            self.y_tmp *= self.sigma
+            self.y_tmp += self.y_old
+
+        # self.y = self.f.proximal_conjugate(self.y_old, self.sigma)
+        self.f.proximal_conjugate(self.y_tmp, self.sigma, out=self.y)
+        
+        # Gradient descent for the primal variable
+        self.operator.adjoint(self.y, out=self.x_tmp)
+        # self.x_tmp *= -1*self.tau
+        # self.x_tmp += self.x_old
+        if self._use_axpby:
+            self.x_tmp.axpby(-self.tau, 1. , self.x_old, self.x_tmp)
+        else:
+            self.x_tmp *= -1*self.tau
+            self.x_tmp += self.x_old
+
+        self.g.proximal(self.x_tmp, self.tau, out=self.x)
+
+        # Update
+        self.x.subtract(self.x_old, out=self.xbar)
+        # self.xbar *= self.theta
+        # self.xbar += self.x
+        if self._use_axpby:
+            self.xbar.axpby(self.theta, 1 , self.x, self.xbar)
+        else:
+            self.xbar *= self.theta
+            self.xbar += self.x
+        
+        
+
+    def update_objective(self):
+
+        p1 = self.f(self.operator.direct(self.x)) + self.g(self.x)
+        d1 = -(self.f.convex_conjugate(self.y) + self.g.convex_conjugate(-1*self.operator.adjoint(self.y)))
+
+        self.loss.append([p1, d1, p1-d1])
+        
+    @property
+    def objective(self):
+        '''alias of loss'''
+        return [x[0] for x in self.loss]
+
+    @property
+    def dual_objective(self):
+        return [x[1] for x in self.loss]
+    
+    @property
+    def primal_dual_gap(self):
+        return [x[2] for x in self.loss]

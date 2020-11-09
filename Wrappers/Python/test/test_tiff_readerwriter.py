@@ -1,7 +1,7 @@
-from ccpi.io import TIFFWriter
-from ccpi.io import TIFFStackReader
+from cil.io import TIFFWriter
+from cil.io import TIFFStackReader
 
-from ccpi.framework import ImageGeometry, AcquisitionGeometry
+from cil.framework import ImageGeometry, AcquisitionGeometry
 import os
 import numpy as np
 import unittest
@@ -21,7 +21,7 @@ class TIFFReadWrite(unittest.TestCase):
         data.fill(arr)
         self.cwd = os.getcwd()
         os.mkdir("test_tiff")
-        fname = os.path.join(self.cwd, 'test_tiff','puppa.tif')
+        fname = os.path.join(self.cwd, 'test_tiff','myfile.tif')
         self.data_dir = os.path.dirname(fname)
         writer = TIFFWriter(data=data, file_name=fname, counter_offset=0)
         writer.write()
@@ -132,7 +132,7 @@ if __name__ == '__main__':
     data.fill(arr)
     os.mkdir("test_tiff")
     cwd = os.getcwd()
-    fname = os.path.join(cwd, 'test_tiff','puppa.tif')
+    fname = os.path.join(cwd, 'test_tiff','myfile.tif')
     data_dir = os.path.dirname(fname)
     writer = TIFFWriter(data=data, file_name=fname, counter_offset=0)
     writer.write()

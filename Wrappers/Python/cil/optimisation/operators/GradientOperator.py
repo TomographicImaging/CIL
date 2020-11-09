@@ -25,6 +25,7 @@ from cil.optimisation.operators import FiniteDifferenceOperator
 from cil.framework import ImageGeometry, BlockGeometry
 import warnings
 from cil.utilities.multiprocessing import NUM_THREADS
+import numpy as np
 
 NEUMANN = 'Neumann'
 PERIODIC = 'Periodic'
@@ -328,21 +329,32 @@ class Gradient_C(LinearOperator):
     def datacontainer_as_c_pointer(x):
         ndx = x.as_array()
         return ndx, ndx.ctypes.data_as(c_float_p)
+
+    @staticmethod 
+    def ndarray_as_c_pointer(ndx):
+        return ndx.ctypes.data_as(c_float_p)
         
     def direct(self, x, out=None):
-        ndx , x_p = Gradient_C.datacontainer_as_c_pointer(x)
+        ndx = np.asarray(x.as_array(), dtype=np.float32)
+        #ndx , x_p = Gradient_C.datacontainer_as_c_pointer(x)
+        x_p = Gradient_C.ndarray_as_c_pointer(ndx)
         
         return_val = False
         if out is None:
             out = self.gm_range.allocate(None)
             return_val = True
+        ndout = [el.as_array() for el in out.containers]
 
         #pass list of all arguments
-        arg1 = [Gradient_C.datacontainer_as_c_pointer(out.get_item(i))[1] for i in range(self.gm_range.shape[0])]
+        #arg1 = [Gradient_C.datacontainer_as_c_pointer(out.get_item(i))[1] for i in range(self.gm_range.shape[0])]
+        arg1 = [Gradient_C.ndarray_as_c_pointer(ndout[i]) for i in range(self.gm_range.shape[0])]
         arg2 = [el for el in x.shape]
         args = arg1 + arg2 + [self.bnd_cond, 1, self.num_threads]
         self.fd(x_p, *args)
         
+        for i in range(len(ndout)):
+            out.get_item(i).fill(ndout[i])
+
         if any(elem != 1.0 for elem in self.voxel_size_order):
             out /= self.voxel_size_order
 #        out /= self.voxel_size_order
@@ -351,25 +363,32 @@ class Gradient_C(LinearOperator):
             return out        
 
     def adjoint(self, x, out=None):
-
+        
         return_val = False
         if out is None:
             out = self.gm_domain.allocate(None)
             return_val = True
+        ndout = out.as_array()
+        
 
-        ndout, out_p = Gradient_C.datacontainer_as_c_pointer(out)
+        # ndout, out_p = Gradient_C.datacontainer_as_c_pointer(out)
+        out_p = Gradient_C.ndarray_as_c_pointer(ndout)
+        
                
         
         if any(elem != 1.0 for elem in self.voxel_size_order):
             tmp = x/self.voxel_size_order
         else:
             tmp = x
-
-        arg1 = [Gradient_C.datacontainer_as_c_pointer(tmp.get_item(i))[1] for i in range(self.gm_range.shape[0])]
+        ndx = [el.as_array() for el in tmp.containers]
+        
+        #arg1 = [Gradient_C.datacontainer_as_c_pointer(tmp.get_item(i))[1] for i in range(self.gm_range.shape[0])]
+        arg1 = [Gradient_C.ndarray_as_c_pointer(ndx[i]) for i in range(self.gm_range.shape[0])]
         arg2 = [el for el in out.shape]
         args = arg1 + arg2 + [self.bnd_cond, 0, self.num_threads]
 
         self.fd(out_p, *args)
+        out.fill(ndout)
 
         if return_val is True:
             return out

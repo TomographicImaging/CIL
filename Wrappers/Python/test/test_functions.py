@@ -64,6 +64,11 @@ try:
 except ImportError as ie:
     has_numba = False
 
+has_numba = True
+try:
+    import numba
+except ImportError as ie:
+    has_numba = False
                     
 class TestFunction(unittest.TestCase):
     def assertBlockDataContainerEqual(self, container1, container2):
@@ -492,6 +497,8 @@ class TestFunction(unittest.TestCase):
         print(res_proximal_conj_out.as_array())
         print(proxc.as_array())
         numpy.testing.assert_array_almost_equal(proxc.as_array(), res_proximal_conj_out.as_array())
+
+
 
     def test_Rosenbrock(self):
         f = Rosenbrock (alpha = 1, beta=100)
@@ -1077,4 +1084,91 @@ class TestFunction(unittest.TestCase):
             t3 = timer()
             print (t3-t2)
 
+
+class TestKullbackLeiblerNumba(unittest.TestCase):
+    def setUp(self):
+        print ("test_KullbackLeibler numba")
+        #numpy.random.seed(1)
+        M, N, K =  2, 3, 4
+        ig = ImageGeometry(N, M, K)
+        
+        u1 = ig.allocate('random', seed = 500)
+        u1 = ig.allocate(0.2)  
+        g1 = ig.allocate('random', seed = 100)
+        b1 = ig.allocate('random', seed = 1000)
+                   
+        f = KullbackLeibler(b=g1, use_numba=True)
+        f_np = KullbackLeibler(b=g1, use_numba=False)
+
+        tau = 400.4
+        self.tau = tau
+        self.u1 = u1
+        self.g1 = g1
+        self.b1 = b1
+        self.f = f
+        self.f_np = f_np
+        
+    @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
+    def test_KullbackLeibler_numba_call(self):
+        f = self.f
+        f_np = self.f_np
+        tau = self.tau
+        u1 = self.u1
+
+        numpy.testing.assert_allclose(f(u1), f_np(u1),  rtol=1e-5)
+
+    @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
+    def test_KullbackLeibler_numba_proximal(self):
+        f = self.f
+        f_np = self.f_np
+        tau = self.tau
+        u1 = self.u1
+
+        numpy.testing.assert_allclose(f.proximal(u1,tau=tau).as_array(), 
+                                      f_np.proximal(u1,tau=tau).as_array(), rtol=2e-3)
+        numpy.testing.assert_array_almost_equal(f.proximal(u1,tau=tau).as_array(), 
+        f_np.proximal(u1,tau=tau).as_array(), decimal=5)
+        
+    @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
+    def test_KullbackLeibler_numba_proximal(self):
+        f = self.f
+        f_np = self.f_np
+        tau = self.tau
+        u1 = self.u1
+
+        numpy.testing.assert_allclose(f.proximal(u1,tau=tau).as_array(), 
+                                      f_np.proximal(u1,tau=tau).as_array(), rtol=2e-3)
+        numpy.testing.assert_array_almost_equal(f.proximal(u1,tau=tau).as_array(), 
+        f_np.proximal(u1,tau=tau).as_array(), decimal=5)
+        
+    @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
+    def test_KullbackLeibler_numba_gradient(self):
+        f = self.f
+        f_np = self.f_np
+        tau = self.tau
+        u1 = self.u1
+
+        numpy.testing.assert_allclose(f.gradient(u1).as_array(), f_np.gradient(u1).as_array(), rtol=1e-3)
+        
+    @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
+    def test_KullbackLeibler_numba_convex_conjugate(self):
+        f = self.f
+        f_np = self.f_np
+        tau = self.tau
+        u1 = self.u1
+
+        numpy.testing.assert_allclose(f.convex_conjugate(u1), f_np.convex_conjugate(u1), rtol=1e-3)
+        
+    @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
+    def test_KullbackLeibler_numba_proximal_conjugate(self):
+        f = self.f
+        f_np = self.f_np
+        tau = self.tau
+        u1 = self.u1
+
+        numpy.testing.assert_allclose(f.proximal_conjugate(u1,tau=tau).as_array(), 
+                        f_np.proximal_conjugate(u1,tau=tau).as_array(), rtol=1e-3)
+    
+    def tearDown(self):
+        pass
 

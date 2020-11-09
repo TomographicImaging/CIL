@@ -26,72 +26,47 @@ from cil.framework import ImageData
 from cil.framework import AcquisitionData
 from cil.framework import ImageGeometry
 from cil.framework import AcquisitionGeometry
+from cil.utilities import dataexample
 from timeit import default_timer as timer
 
 from cil.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 
-from cil.io.reader import NexusReader
-from cil.processors import CenterOfRotationFinder
+from cil.io import NEXUSDataReader
+from cil.processors import CentreOfRotationCorrector, CofR_xcorr
 import wget
 import os
 
 class TestDataProcessor(unittest.TestCase):
     
     def setUp(self):
-        wget.download('https://github.com/DiamondLightSource/Savu/raw/master/test_data/data/24737_fd.nxs')
-        self.filename = '24737_fd.nxs'
 
-    def tearDown(self):
-        os.remove(self.filename)
+        data_raw = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
 
-    def test_CenterOfRotation(self):
-        reader = NexusReader(self.filename)
-        data = reader.get_acquisition_data_whole()
+        self.data_DLS = data_raw.log()
+        self.data_DLS *= -1
 
-        ad = data.clone()
-        print (ad)
-        cf = CenterOfRotationFinder()
-        cf.set_input(ad)
-        print ("Center of rotation", cf.get_output())
-        self.assertAlmostEqual(86.25, cf.get_output())
+    def test_CofR_xcorr(self):       
+
+        corr = CofR_xcorr(slice_index='centre', projection_index=0, ang_tol=0.1)
+        corr.set_input(self.data_DLS.clone())
+        ad_out = corr.get_output()
+        self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
         
-        print("check call method of DataProcessor")
-        self.assertAlmostEqual(86.25, cf(ad))
+        corr = CofR_xcorr(slice_index=67, projection_index=0, ang_tol=0.1)
+        corr.set_input(self.data_DLS.clone())
+        ad_out = corr.get_output()
+        self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)              
 
-        ad = data.clone()
-        ad = ad.subset(['vertical','angle','horizontal'])
-        print (ad)
-        cf = CenterOfRotationFinder()
-        cf.set_input(ad)
-        print ("Center of rotation", cf.get_output())
-        self.assertAlmostEqual(86.25, cf.get_output())
+    def test_CenterOfRotationCorrector(self):       
+        corr = CentreOfRotationCorrector.xcorr(slice_index='centre', projection_index=0, ang_tol=0.1)
+        corr.set_input(self.data_DLS.clone())
+        ad_out = corr.get_output()
+        self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
         
-        print("check call method of DataProcessor")
-        self.assertAlmostEqual(86.25, cf(ad))
-
-        ad = data.clone()
-        ad = ad.subset(vertical=67)
-        print (ad)
-        cf = CenterOfRotationFinder()
-        cf.set_input(ad)
-        print ("Center of rotation", cf.get_output())
-        self.assertAlmostEqual(86.25, cf.get_output())
-        print("check call method of DataProcessor")
-        self.assertAlmostEqual(86.25, cf(ad))        
-
-        ad = data.clone()
-        print (ad)
-        cf = CenterOfRotationFinder()
-        cf.set_input(ad)
-        cf.set_slice(80)
-        print ("Center of rotation", cf.get_output())
-        self.assertAlmostEqual(86.25, cf.get_output())
-        cf.set_slice()
-        print ("Center of rotation", cf.get_output())
-        self.assertAlmostEqual(86.25, cf.get_output())       
-        cf.set_slice('centre')
-        print ("Center of rotation", cf.get_output())
-        self.assertAlmostEqual(86.25, cf.get_output())
+        corr = CentreOfRotationCorrector.xcorr(slice_index=67, projection_index=0, ang_tol=0.1)
+        corr.set_input(self.data_DLS.clone())
+        ad_out = corr.get_output()
+        self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)              
 
     def test_Normalizer(self):
         pass         

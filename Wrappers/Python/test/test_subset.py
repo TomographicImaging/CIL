@@ -195,11 +195,17 @@ class TestSubset(unittest.TestCase):
     def test_AcquisitionDataSubset1h(self):
         
         data = self.ag_cone.allocate()
+        sub = data.subset(vertical = 'centre')
+        self.assertTrue( sub.geometry.shape == (4,3,2))       
+
+    def test_AcquisitionDataSubset1i(self):
+        
+        data = self.ag_cone.allocate()
         sliceme = 1
         sub = data.subset(vertical = sliceme, force=True)
         self.assertTrue( sub.shape == (4, 3, 2))
 
-    def test_AcquisitionDataSubset1i(self):
+    def test_AcquisitionDataSubset1j(self):
 
         data = self.ag.allocate()
         sub = data.subset(angle = 0)

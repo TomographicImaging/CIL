@@ -19,7 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from ccpi.framework import DataProcessor, AcquisitionData
+from cil.framework import DataProcessor, AcquisitionData
 import numpy as np
 from scipy import signal
 

@@ -36,6 +36,12 @@ class TestSubset(unittest.TestCase):
                          dist_source_center = 312.2, 
                          dist_center_detector = 123.,
                          channels=4 )
+        
+        self.ag_cone = AcquisitionGeometry.create_Cone3D([0,-500,0],[0,500,0])\
+                                     .set_panel((2,20))\
+                                     .set_angles(self.ag.angles)\
+                                     .set_channels(4)
+
 
     def test_ImageDataAllocate1a(self):
         data = self.ig.allocate()
@@ -100,6 +106,11 @@ class TestSubset(unittest.TestCase):
         sub = data.subset(dimensions=new_dimension_labels)
         self.assertTrue( sub.shape == (3,5,4,2))
 
+    def test_ImageDataSubset1c(self):
+        data = self.ig.allocate()
+        sub = data.subset(channel=0,horizontal_x=0,horizontal_y=0)
+        self.assertTrue( sub.shape == (4,))
+
 
     def test_AcquisitionDataAllocate1a(self):
         data = self.ag.allocate()
@@ -146,7 +157,7 @@ class TestSubset(unittest.TestCase):
          AcquisitionGeometry.VERTICAL, AcquisitionGeometry.ANGLE]
         data = self.ag.allocate(dimension_labels=non_default_dimension_labels)
         #self.assertTrue( data.shape == (4,20,2,3))
-        sub = data.subset(horizontal = 0)
+        sub = data.subset(horizontal = 0, force=True)
         self.assertTrue( sub.shape == (4,2,3))
     def test_AcquisitionDataSubset1d(self):
         non_default_dimension_labels = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.HORIZONTAL,
@@ -174,7 +185,31 @@ class TestSubset(unittest.TestCase):
         sub = data.subset(angle = sliceme)
         self.assertTrue( sub.geometry.angles[0] == data.geometry.angles[sliceme])
         
+    def test_AcquisitionDataSubset1g(self):
         
-            
+        data = self.ag_cone.allocate()
+        sliceme = 1
+        sub = data.subset(angle = sliceme)
+        self.assertTrue( sub.geometry.angles[0] == data.geometry.angles[sliceme])       
 
+    def test_AcquisitionDataSubset1h(self):
         
+        data = self.ag_cone.allocate()
+        sub = data.subset(vertical = 'centre')
+        self.assertTrue( sub.geometry.shape == (4,3,2))       
+
+    def test_AcquisitionDataSubset1i(self):
+        
+        data = self.ag_cone.allocate()
+        sliceme = 1
+        sub = data.subset(vertical = sliceme, force=True)
+        self.assertTrue( sub.shape == (4, 3, 2))
+
+    def test_AcquisitionDataSubset1j(self):
+
+        data = self.ag.allocate()
+        sub = data.subset(angle = 0)
+        sub = sub.subset(vertical = 0)
+        sub = sub.subset(horizontal = 0, force=True)
+
+        self.assertTrue( sub.shape == (4,))

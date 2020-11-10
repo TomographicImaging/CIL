@@ -132,19 +132,22 @@ class ImageGeometry(object):
       
     @dimension_labels.setter
     def dimension_labels(self, val):
-
+        self.set_labels(val)
+    
+    def set_labels(self, labels):
         labels_default = [  ImageGeometry.CHANNEL,
                             ImageGeometry.VERTICAL,
                             ImageGeometry.HORIZONTAL_Y,
                             ImageGeometry.HORIZONTAL_X]
 
         #check input and store. This value is not used directly
-        if val is not None:
-            for x in val:
+        if labels is not None:
+            for x in labels:
                 if x not in labels_default:
-                    raise ValueError('Requested axis are not possible. Accepted label names {},\ngot {}'.format(labels_default,val))
+                    raise ValueError('Requested axis are not possible. Accepted label names {},\ngot {}'\
+                        .format(labels_default,labels))
                     
-            self.__dimension_labels = tuple(val)
+            self.__dimension_labels = tuple(labels)
 
     def __eq__(self, other):
 
@@ -1675,13 +1678,13 @@ class AcquisitionGeometry(object):
             geometry_new.config.angles.angle_data = geometry_new.config.angles.angle_data[angle_slice]
         
         if vertical_slice is not None:
-            if geometry_new.geom_type == AcquisitionGeometry.PARALLEL or vertical_slice == 'centre':
+            if geometry_new.geom_type == AcquisitionGeometry.PARALLEL or vertical_slice == 'centre' or vertical_slice == geometry_new.pixel_num_v//2:
                 geometry_new = geometry_new.get_centre_slice()
             else:
-                raise ValueError("Cannot calculate system geometry for the requested slice")
+                raise ValueError("Can only subset centre slice geometry on cone-beam data. Expected vertical = 'centre'. Got vertical = {0}".format(vertical_slice))
         
         if horizontal_slice is not None:
-            raise ValueError("Cannot calculate system geometry for the requested slice")
+            raise ValueError("Cannot calculate system geometry for a horizontal slice")
 
         if dimensions is not None:
             geometry_new.dimension_labels = dimensions 
@@ -2669,41 +2672,45 @@ class AcquisitionData(DataContainer):
             (len(dimensions) != len(self.shape) ):
             raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
 
-        #Update Geometry
+        #try to get a new geometry for the slice
         try:
             geometry_new = self.geometry.subset(dimensions=dimensions, **kw)
-        except ValueError:
-            geometry_new = None
+        except ValueError as ve:
+            if kw.get('force', False):
+                geometry_new = None
+            else:
+                print(ve)
+                raise ValueError ("Unable to subset requested geometry. Use 'force=True' to return DataContainer instead.")
 
-        #if vertical = 'centre' slice convert to index and subset.
-        #if the index is non-integer then return rows either side and interpolate to get the center slice value
-        interpolate = False
+        #if vertical = 'centre' slice convert to index and subset, this will interpolate 2 rows to get the center slice value
         vertical_slice = kw.get(AcquisitionGeometry.VERTICAL, None)
-        if vertical_slice == 'centre':           
-            ind = self.geometry.dimension_labels.index('vertical')
-            centre_slice = (self.geometry.shape[ind]-1) / 2.
-            centre_slice_floor = int(numpy.floor(centre_slice))
-            kw['vertical'] = centre_slice_floor
-            w2 = centre_slice - centre_slice_floor
-            if w2  > 0.0001:
-                interpolate = True
 
-        # out = super(AcquisitionData, self).subset(dimensions, **kw)
-        out = DataContainer.subset(self, dimensions, **kw)
+        if vertical_slice == 'centre':
+            dim = self.geometry.dimension_labels.index('vertical')
 
-        if interpolate == True:
-            kw['vertical'] = centre_slice_floor + 1
-            out2 = super(AcquisitionData, self).subset(dimensions, **kw)
-            out = out * (1 - w2) + out2 * w2
+            if self.geometry.shape[dim] > 1:   
+                centre_slice_pos = (self.geometry.shape[dim]-1) / 2.
+                ind0 = int(numpy.floor(centre_slice_pos))
+                w2 = centre_slice_pos - ind0
+                kw['vertical'] = ind0
+                out = super(AcquisitionData, self).subset(dimensions, **kw)
+                if w2 > 0:
+                    kw['vertical'] = ind0 + 1
+                    out2 = super(AcquisitionData, self).subset(dimensions, **kw)
+                    out = out * (1 - w2) + out2 * w2
+        else:
+            out = super(AcquisitionData, self).subset(dimensions, **kw)
 
         dimension_labels = out.dimension_labels.copy()    
 
-        if geometry_new is None:                
-            return DataContainer(out.array, deep_copy=False, dimension_labels=dimension_labels,\
-                suppress_warning=True)
+        if len(dimension_labels) == 1:
+            return out
         else:
-            return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new,\
-                dimension_labels=dimension_labels, suppress_warning=True)
+            if geometry_new is None:
+                print("Returning DataContainer")
+                return DataContainer(out.array, deep_copy=False, dimension_labels=dimension_labels, suppress_warning=True)
+            else:
+                return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new, dimension_labels=dimension_labels, suppress_warning=True)
 
 class DataProcessor(object):
     

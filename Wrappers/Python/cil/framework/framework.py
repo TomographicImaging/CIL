@@ -2093,10 +2093,12 @@ class DataContainer(object):
                                  numpy.float, numpy.float16, numpy.float32, numpy.float64, \
                                  numpy.complex)):
                 out = pwop(self.as_array() , x2 , *args, **kwargs )
-            elif issubclass(type(x2) , DataContainer):
+            elif issubclass(x2.__class__ , DataContainer):
                 out = pwop(self.as_array() , x2.as_array() , *args, **kwargs )
+            elif isinstance(x2, numpy.ndarray):
+                out = pwop(self.as_array() , x2 , *args, **kwargs )
             else:
-                raise TypeError('Expected x2 type as number of DataContainer, got {}'.format(type(x2)))
+                raise TypeError('Expected x2 type as number or DataContainer, got {}'.format(type(x2)))
             geom = self.geometry
             if geom is not None:
                 geom = self.geometry.copy()

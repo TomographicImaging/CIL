@@ -20,20 +20,19 @@ from __future__ import division
 import sys
 import unittest
 import numpy
-from ccpi.framework import DataProcessor
-from ccpi.framework import DataContainer
-from ccpi.framework import ImageData
-from ccpi.framework import AcquisitionData
-from ccpi.framework import ImageGeometry
-from ccpi.framework import AcquisitionGeometry
-
-from ccpi.utilities import dataexample
+from cil.framework import DataProcessor
+from cil.framework import DataContainer
+from cil.framework import ImageData
+from cil.framework import AcquisitionData
+from cil.framework import ImageGeometry
+from cil.framework import AcquisitionGeometry
+from cil.utilities import dataexample
 from timeit import default_timer as timer
 
-from ccpi.framework import AX, CastDataContainer, PixelByPixelDataProcessor
+from cil.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 
-from ccpi.io import NEXUSDataReader
-from ccpi.processors import CentreOfRotationCorrector, CofR_xcorr
+from cil.io import NEXUSDataReader
+from cil.processors import CentreOfRotationCorrector, CofR_xcorr
 import wget
 import os
 

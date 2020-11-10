@@ -20,12 +20,12 @@ from __future__ import division
 
 import unittest
 import numpy
-from ccpi.framework import ImageGeometry, AcquisitionGeometry
-from ccpi.framework import ImageData, AcquisitionData
-from ccpi.framework import BlockDataContainer, DataContainer
+from cil.framework import ImageGeometry, AcquisitionGeometry
+from cil.framework import ImageData, AcquisitionData
+from cil.framework import BlockDataContainer, DataContainer
 import functools
 
-from ccpi.optimisation.operators import Gradient, Identity, BlockOperator
+from cil.optimisation.operators import GradientOperator, IdentityOperator, BlockOperator
 class BDCUnittest(unittest.TestCase):
     def assertBlockDataContainerEqual(self, container1, container2):
         print ("assert Block Data Container Equal")
@@ -432,13 +432,14 @@ class TestBlockDataContainer(BDCUnittest):
         
 
         print ("test_Nested_BlockDataContainer OK")
-    def stest_NestedBlockDataContainer2(self):
+    
+    def test_NestedBlockDataContainer2(self):
         M, N = 2, 3
         ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N) 
         ag = ig
         u = ig.allocate(1)
-        op1 = Gradient(ig)
-        op2 = Identity(ig, ag)
+        op1 = GradientOperator(ig)
+        op2 = IdentityOperator(ig, ag)
 
         operator = BlockOperator(op1, op2, shape=(2,1)) 
 

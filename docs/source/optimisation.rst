@@ -105,8 +105,8 @@ Which in Python would be like
 
 .. code-block:: python
 
-   op1 = Gradient(ig, correlation=Gradient.CORRELATION_SPACE)
-   op2 = Identity(ig, ag)
+   op1 = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE)
+   op2 = IdentityOperator(ig, ag)
 
    # Create BlockOperator
    K = BlockOperator(op1, op2, shape=(2,1) )
@@ -155,7 +155,7 @@ print to screen of the status of the optimisation.
    :members:
    :private-members:
    :special-members:
-.. autoclass:: ccpi.optimisation.algorithms.GradientDescent
+.. autoclass:: ccpi.optimisation.algorithms.GD
    :members:
 .. autoclass:: ccpi.optimisation.algorithms.CGLS
    :members:
@@ -199,7 +199,7 @@ Trivial operators
 
 Trivial operators are the following.
 
-.. autoclass:: ccpi.optimisation.operators.Identity
+.. autoclass:: ccpi.optimisation.operators.IdentityOperator
    :members:
    :special-members:
 
@@ -212,12 +212,12 @@ Trivial operators are the following.
    :special-members:
 
 
-Gradient 
+GradientOperator 
 -----------------
 
-In the following the required classes for the implementation of the :code:`Gradient` operator.
+In the following the required classes for the implementation of the :code:`GradientOperator` operator.
 
-.. autoclass:: ccpi.optimisation.operators.Gradient
+.. autoclass:: ccpi.optimisation.operators.GradientOperator
    :members:
    :special-members:
 
@@ -229,7 +229,7 @@ In the following the required classes for the implementation of the :code:`Gradi
    :members:
    :special-members:
 
-.. autoclass:: ccpi.optimisation.operators.SymmetrizedGradient
+.. autoclass:: ccpi.optimisation.operators.SymmetrizedGradientOperator
    :members:
    :special-members:
 

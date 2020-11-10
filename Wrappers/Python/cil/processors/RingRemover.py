@@ -21,7 +21,7 @@
 from scipy.fftpack import fftshift, ifftshift, fft, ifft
 import numpy as np
 import pywt
-from ccpi.framework import DataProcessor, ImageData, AcquisitionData
+from cil.framework import DataProcessor, ImageData, AcquisitionData
 
 class RingRemover(DataProcessor):
     

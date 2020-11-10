@@ -18,6 +18,7 @@ test:
     - tomophantom
     - cil-astra # [ unix ] 
     - numba
+    - packaging
 
   source_files:
     - ./Wrappers/Python/test # [win]

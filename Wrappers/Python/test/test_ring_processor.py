@@ -17,8 +17,8 @@
 #   limitations under the License.
         
 
-from ccpi.processors import RingRemover
-from ccpi.framework import ImageData, ImageGeometry, AcquisitionGeometry
+from cil.processors import RingRemover
+from cil.framework import ImageData, ImageGeometry, AcquisitionGeometry
 # from ccpi.astra.operators import AstraProjectorSimple
 
 import tomophantom

@@ -89,14 +89,14 @@ class RingRemover(DataProcessor):
         out = 0.*data
         
         # for non multichannel data
-        if channels == 1:        
+        if 'channel' not in geom.dimension_labels:        
             
             # for 3D data
-            if vertical>1:
-                
+            if 'vertical' in geom.dimension_labels:
+                                
                 for i in range(vertical):
-                    tmp_corrected = self.xRemoveStripesVertical(data.subset(horizontal=i).as_array(), decNum, wname, sigma) 
-                    out.fill(tmp_corrected, horizontal = i)  
+                    tmp_corrected = self.xRemoveStripesVertical(data.subset(vertical=i).as_array(), decNum, wname, sigma) 
+                    out.fill(tmp_corrected, vertical = i)  
             
             # for 2D data
             else:
@@ -107,15 +107,16 @@ class RingRemover(DataProcessor):
         else:
             
            # for 3D data
-            if vertical>0:
+            if 'vertical' in geom.dimension_labels:
+                
                 for i in range(channels):
                     
                     out_ch_i = out.subset(channel=i)
                     data_ch_i = data.subset(channel=i)
                     
                     for j in range(vertical):
-                        tmp_corrected = self.xRemoveStripesVertical(data_ch_i.subset(horizontal=j).as_array(), decNum, wname, sigma)
-                        out_ch_i.fill(tmp_corrected, horizontal1= j)
+                        tmp_corrected = self.xRemoveStripesVertical(data_ch_i.subset(vertical=j).as_array(), decNum, wname, sigma)
+                        out_ch_i.fill(tmp_corrected, vertical = j)
                         
                     out.fill(out_ch_i.as_array(), channel=i) 
                     
@@ -176,4 +177,3 @@ class RingRemover(DataProcessor):
             nima = pywt.idwt2((nima,(Ch[i],Cv[i],Cd[i])),wname)
             
         return nima      
-

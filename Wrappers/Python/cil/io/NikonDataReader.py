@@ -200,49 +200,15 @@ class NikonDataReader(object):
             pixel_size_v = pixel_size_v_0
             pixel_size_h = pixel_size_h_0
         
-        det_pos_h = self._roi_par[2][0] * pixel_size_h_0 + \
+        det_pos_h = (self._roi_par[2][0] + 0.5) * pixel_size_h_0 + \
                     (pixel_num_h-1) / 2 * pixel_size_h - \
                     (pixel_num_h_0-1) / 2 * pixel_size_h_0
-        det_pos_v = self._roi_par[1][0] * pixel_size_v_0 + \
+        det_pos_v = (self._roi_par[1][0] + 0.5) * pixel_size_v_0 + \
                     (pixel_num_v-1) / 2 * pixel_size_v - \
                     (pixel_num_v_0-1) / 2 * pixel_size_v_0
         
-        '''
-        Parse the angles file .ang or _ctdata.txt file and returns the angles
-        as an numpy array. 
-        '''
-        input_path = os.path.dirname(self.file_name)
-        angles_ctdata_file = os.path.join(input_path, '_ctdata.txt')
-        angles_named_file = os.path.join(input_path, self._experiment_name+'.ang')
-        angles = numpy.zeros(num_projections, dtype = numpy.float32)
-        
-        # look for _ctdata.txt
-        if os.path.exists(angles_ctdata_file):
-            # read txt file with angles
-            with open(angles_ctdata_file) as f:
-                content = f.readlines()
-            # skip firt three lines
-            # read the middle value of 3 values in each line as angles in degrees
-            index = 0
-            for line in content[3:]:
-                angles[index] = float(line.split(' ')[1])
-                index += 1
-            angles = angles
-        
-        # look for ang file
-        elif os.path.exists(angles_named_file):
-            # read the angles file which is text with first line as header
-            with open(angles_named_file) as f:
-                content = f.readlines()
-            # skip first line
-            index = 0
-            for line in content[1:]:
-                angles[index] = float(line.split(':')[1])
-                index += 1
-            angles = numpy.flipud(angles) # angles are in the reverse order
-            
-        else:   # calculate angles based on xtek file
-            angles = numpy.asarray( [ angular_step * proj for proj in range(num_projections) ] , dtype=numpy.float32)
+        #angles from xtek.ct ignore *.ang and _ctdata.txt as not correct
+        angles = numpy.asarray( [ angular_step * proj for proj in range(num_projections) ] , dtype=numpy.float32)
         
         if self.mode == 'bin':
             n_elem = (self._roi_par[0][1] - self._roi_par[0][0]) // self._roi_par[0][2]
@@ -252,18 +218,20 @@ class NikonDataReader(object):
             angles = angles[slice(self._roi_par[0][0], self._roi_par[0][1], self._roi_par[0][2])]
         
         if pixel_num_v == 1 and (self._roi_par[1][0]+self._roi_par[1][1]) // 2 == pixel_num_v_0 // 2:
-            self._ag = AcquisitionGeometry.create_Cone2D(source_position=[0, 0],
-                                                     rotation_axis_position=[0, source_to_rot],
-                                                     detector_position=[det_pos_h, source_to_det])
+            self._ag = AcquisitionGeometry.create_Cone2D(source_position=[0, -source_to_rot],
+                                                     rotation_axis_position=[0, 0],
+                                                     detector_position=[det_pos_h, source_to_det-source_to_rot])
             self._ag.set_angles(angles, 
                                 angle_unit='degree', 
                                 initial_angle=initial_angle)
             
             self._ag.set_panel(pixel_num_h, pixel_size=pixel_size_h)
+
+            self._ag.set_labels(labels=['angle', 'horizontal'])
         else:
-            self._ag = AcquisitionGeometry.create_Cone3D(source_position=[0, 0, 0],
-                                                         rotation_axis_position=[0, source_to_rot, 0],
-                                                         detector_position=[det_pos_h, source_to_det, det_pos_v])
+            self._ag = AcquisitionGeometry.create_Cone3D(source_position=[0, -source_to_rot, 0],
+                                                         rotation_axis_position=[0, 0, 0],
+                                                         detector_position=[det_pos_h, source_to_det-source_to_rot, det_pos_v])
             self._ag.set_angles(angles, 
                                 angle_unit='degree', 
                                 initial_angle=initial_angle)
@@ -271,10 +239,7 @@ class NikonDataReader(object):
             self._ag.set_panel((pixel_num_h, pixel_num_v),
                                pixel_size=(pixel_size_h, pixel_size_v))
         
-        if self._ag.dimension == '3D':
-            self._ag.dimension_labels = ['vertical', 'angle', 'horizontal']
-        else:
-            self._ag.dimension_labels = ['angle', 'horizontal']
+            self._ag.set_labels(labels=['angle', 'vertical', 'horizontal'])
 
     def get_geometry(self):
         
@@ -289,11 +254,9 @@ class NikonDataReader(object):
         '''
         Reads projections and return AcquisitionData container
         '''
-            
-        # get path to projections
-        path_projection = os.path.dirname(self.file_name)
-#        num_projections = numpy.shape(self._ag.angles)[0]
         
+        path_projection = os.path.dirname(self.file_name)
+
         reader = TIFFStackReader()
         reader.set_up(path = path_projection,
                       roi = {'axis_0': tuple(self._roi_par[0]), 
@@ -301,29 +264,17 @@ class NikonDataReader(object):
                              'axis_2': tuple(self._roi_par[2])},
                       mode = self.mode)
 
-        data = reader.load()
+        ad = reader.read_as_AcquisitionData(self._ag)
               
         if (self.normalize):
-            data /= self._white_level
-            data[data > 1] = 1
+            ad /= self._white_level
+            ad.array[ad.array > 1] = 1
         
-        output = self._ag.allocate(None)
+        if self.fliplr:
+            dim = ad.get_dimension_axis('horizontal')
+            ad.array = numpy.flip(ad.array, dim)
         
-        if self._ag.dimension == '2D':
-            
-            if self.fliplr:
-                output.fill(data[:, ::-1])
-            else:
-                output.fill(data)
-                
-        else:
-            
-            if self.fliplr:
-                output.fill(numpy.transpose(data[:, :, ::-1], (1, 0, 2)))
-            else:
-                output.fill(numpy.transpose(data, (1, 0, 2)))
-        
-        return output
+        return ad
 
     def load_projections(self):
         '''alias of read for backward compatibility'''

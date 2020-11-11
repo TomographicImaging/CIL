@@ -18,7 +18,7 @@ conda create --name cil -c conda-forge -c ccpi cil
 To install CIL and the aditional packages and plugins needed to run the [CIL demos](https://github.com/vais-ral/CIL-Demos/releases/tag/v19.10.1) install the environment with:
 ```bash
 
-conda create --name cil -c conda-forge -c astra-toolbox/label/dev -c ccpi cil-astra ccpi-regulariser tomophantom cudatoolkit=9.0
+conda create --name cil -c conda-forge -c astra-toolbox/label/dev -c ccpi cil cil-astra ccpi-regulariser tomophantom cudatoolkit=9.0
 ```
 
 where,

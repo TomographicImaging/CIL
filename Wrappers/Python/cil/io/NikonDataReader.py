@@ -220,7 +220,7 @@ class NikonDataReader(object):
         if pixel_num_v == 1 and (self._roi_par[1][0]+self._roi_par[1][1]) // 2 == pixel_num_v_0 // 2:
             self._ag = AcquisitionGeometry.create_Cone2D(source_position=[0, -source_to_rot],
                                                      rotation_axis_position=[0, 0],
-                                                     detector_position=[det_pos_h, source_to_det])
+                                                     detector_position=[det_pos_h, source_to_det-source_to_rot])
             self._ag.set_angles(angles, 
                                 angle_unit='degree', 
                                 initial_angle=initial_angle)
@@ -231,7 +231,7 @@ class NikonDataReader(object):
         else:
             self._ag = AcquisitionGeometry.create_Cone3D(source_position=[0, -source_to_rot, 0],
                                                          rotation_axis_position=[0, 0, 0],
-                                                         detector_position=[det_pos_h, source_to_det, det_pos_v])
+                                                         detector_position=[det_pos_h, source_to_det-source_to_rot, det_pos_v])
             self._ag.set_angles(angles, 
                                 angle_unit='degree', 
                                 initial_angle=initial_angle)

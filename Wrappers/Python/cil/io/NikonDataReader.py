@@ -164,7 +164,7 @@ class NikonDataReader(object):
             # angular increment (in degrees)
             elif line.startswith("AngularStep"):
                 angular_step = float(line.split('=')[1])
-            
+
         self._roi_par = [[0, num_projections, 1] ,[0, pixel_num_v_0, 1], [0, pixel_num_h_0, 1]]
         
         for key in roi.keys():
@@ -200,13 +200,17 @@ class NikonDataReader(object):
             pixel_size_v = pixel_size_v_0
             pixel_size_h = pixel_size_h_0
         
-        det_pos_h = (self._roi_par[2][0] + 0.5) * pixel_size_h_0 + \
-                    (pixel_num_h-1) / 2 * pixel_size_h - \
-                    (pixel_num_h_0-1) / 2 * pixel_size_h_0
-        det_pos_v = (self._roi_par[1][0] + 0.5) * pixel_size_v_0 + \
-                    (pixel_num_v-1) / 2 * pixel_size_v - \
-                    (pixel_num_v_0-1) / 2 * pixel_size_v_0
+
+        det_start_0 = -(pixel_num_h_0 / 2)
+        det_start = det_start_0 + self._roi_par[2][0]
+        det_end = det_start + pixel_num_h * self._roi_par[2][2]
+        det_pos_h = (det_start + det_end) * 0.5 * pixel_size_h_0
         
+        det_start_0 = -(pixel_num_v_0 / 2)
+        det_start = det_start_0 + self._roi_par[1][0]
+        det_end = det_start + pixel_num_v * self._roi_par[1][2]
+        det_pos_v = (det_start + det_end) * 0.5 * pixel_size_v_0             
+
         #angles from xtek.ct ignore *.ang and _ctdata.txt as not correct
         angles = numpy.asarray( [ angular_step * proj for proj in range(num_projections) ] , dtype=numpy.float32)
         

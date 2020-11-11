@@ -18,7 +18,7 @@ conda create --name cil -c conda-forge -c ccpi cil
 To install CIL and the aditional packages and plugins needed to run the [CIL demos](https://github.com/vais-ral/CIL-Demos/releases/tag/v19.10.1) install the environment with:
 ```bash
 
-conda create --name cil -c conda-forge -c astra-toolbox/label/dev -c ccpi cil-astra ccpi-regulariser tomophantom
+conda create --name cil -c conda-forge -c astra-toolbox/label/dev -c ccpi cil-astra ccpi-regulariser tomophantom cudatoolkit=9.0
 ```
 
 where,
@@ -28,6 +28,8 @@ where,
 ```cil-astra``` will give you access to the CIL wrappers to the ASTRA toolbox projectors (GPLv3 license).
 
 ```tomophantom``` [Tomophantom](https://github.com/dkazanc/TomoPhantom) will allow you to generate phantoms to use as test data.
+
+```cudatoolkit``` If you have GPU drivers compatible with more recent CUDA versions you can modify this package selector.
 
 ### Components
 

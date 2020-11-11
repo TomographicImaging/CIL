@@ -3,31 +3,29 @@
 |--------|-------------|-------------------|
 | [![Build Status](https://anvil.softeng-support.ac.uk/jenkins/buildStatus/icon?job=CILsingle/CCPi-Framework)](https://anvil.softeng-support.ac.uk/jenkins/job/CILsingle/job/CCPi-Framework/) | [![Build Status](https://anvil.softeng-support.ac.uk/jenkins/buildStatus/icon?job=CILsingle/CCPi-Framework-dev)](https://anvil.softeng-support.ac.uk/jenkins/job/CILsingle/job/CCPi-Framework-dev/) |![conda version](https://anaconda.org/ccpi/ccpi-framework/badges/version.svg) ![conda last release](https://anaconda.org/ccpi/ccpi-framework/badges/latest_release_date.svg) [![conda platforms](https://anaconda.org/ccpi/ccpi-framework/badges/platforms.svg) ![conda dowloads](https://anaconda.org/ccpi/ccpi-framework/badges/downloads.svg)](https://anaconda.org/ccpi/ccpi-framework) |
 
-# CCPi-Framework
+# CIL - Core Imaging Library
 
-Basic Python Framework for CIL
-
-This package provides a common framework, hence the name, for the analysis of data in the CT pipeline and quick development of novel reconstruction algorithms.
+This package provides python modules for the analysis of data in the CT pipeline and quick development of novel reconstruction algorithms.
 
 ## Installation
 
-Binary installation of the CCPi Framework can be done with `conda`. Install a new environment using:
+Binary installation of CIL can be done with `conda`. Install a new environment using:
 
 ```bash
-conda create --name cil -c conda-forge -c ccpi ccpi-framework=20.09
+conda create --name cil -c conda-forge -c ccpi cil
 ```
 
-To install CIL and all optional packages needed to run the [CIL demos](https://github.com/vais-ral/CIL-Demos/releases/tag/v19.10.1) install the environment with:
+To install CIL and the aditional packages and plugins needed to run the [CIL demos](https://github.com/vais-ral/CIL-Demos/releases/tag/v19.10.1) install the environment with:
 ```bash
 
-conda create --name cil -c conda-forge -c astra-toolbox/label/dev -c ccpi ccpi-framework=20.09 ccpi-astra=20.09 ccpi-plugins=20.09 tomophantom
+conda create --name cil -c conda-forge -c astra-toolbox/label/dev -c ccpi cil-astra ccpi-regulariser tomophantom
 ```
 
 where,
 
-```ccpi-plugins``` will give you access to the [CCPi Regularisation Toolkit](https://github.com/vais-ral/CCPi-Regularisation-Toolkit) and CCPi-reconstruction plugins.
+```ccpi-regulariser``` will give you access to the [CCPi Regularisation Toolkit](https://github.com/vais-ral/CCPi-Regularisation-Toolkit).
 
-```ccpi-astra``` will give you access to the CCPi wrappers to the ASTRA toolbox projectors (GPLv3 license).
+```cil-astra``` will give you access to the CIL wrappers to the ASTRA toolbox projectors (GPLv3 license).
 
 ```tomophantom``` [Tomophantom](https://github.com/dkazanc/TomoPhantom) will allow you to generate phantoms to use as test data.
 
@@ -36,13 +34,16 @@ where,
 Some concepts are so much overlapping with the CCPPETMR [SIRF](https://github.com/CCPPETMR/SIRF) project that we have chosen to stick to their naming and conventions, in the hope that we may be able to complement each other (at least in Python).
 
 This package consists of the following Python modules:
-1. `ccpi.framework`
-2. `ccpi.optimisation`
-3. `ccpi.io`
+1. `cil.framework`
+2. `cil.optimisation`
+3. `cil.io`
+4. `cil.processors`
+5. `cil.utilities`
+6. `cil.plugins`
 
-### `ccpi.framework`
+### `cil.framework`
 
-In `ccpi.framework` we define a number of common classes normally used in tomography:
+In `cil.framework` we define a number of common classes normally used in tomography:
  
  * `DataContainer`
  * `DataSetProcessor`
@@ -69,7 +70,7 @@ In `ccpi.framework` we define a number of common classes normally used in tomogr
  
  A `DataProcessor` does calculate its output only when needed and can return a copy of its output (if available) when none of its inputs have changed. Normally it is important to overwrite the `process` method and the `__init__` to describe all the parameter that are specific to the processor.
  
- ### `ccpi.optimisation`
+ ### `cil.optimisation`
  
  This package allows rapid prototyping of optimisation-based reconstruction problems, 
  i.e. defining and solving different optimization problems to enforce different properties 

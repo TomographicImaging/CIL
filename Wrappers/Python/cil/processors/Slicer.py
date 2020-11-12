@@ -19,7 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from cil.framework import DataProcessor, AcquisitionData, ImageData, DataContainer, AcquisitionGeometry
+from ccpi.framework import DataProcessor, AcquisitionData, ImageData, DataContainer, AcquisitionGeometry
 import numpy as np
 import warnings
 
@@ -76,8 +76,30 @@ class Slicer(DataProcessor):
         for i in range(ndim):
             roi.append([0, data.shape[i], 1])
             sliceobj.append(slice(None, None, None))
-            
-        if self.roi != None:
+                        
+        if self.roi == None:
+            geometry = geometry_0.clone()
+        else:
+            if (isinstance(data, AcquisitionData)):
+                if geometry_0.config.system.geometry == 'parallel':
+                    ray_direction = geometry_0.config.system.ray.direction[:]
+                else:
+                    source_position = geometry_0.config.system.source.position[:]
+                detector_position = geometry_0.config.system.detector.position[:]
+                detector_direction_row = geometry_0.config.system.detector.direction_row[:]
+                if geometry_0.config.system.dimension == '3D':
+                    detector_direction_col = geometry_0.config.system.detector.direction_col[:]
+                    rotation_axis_direction = geometry_0.config.system.rotation_axis.direction[:]
+                rotation_axis_position = geometry_0.config.system.rotation_axis.position[:]
+                num_channels = geometry_0.config.channels.num_channels
+                pixel_size_x = geometry_0.config.panel.pixel_size[0]
+                pixel_size_y = geometry_0.config.panel.pixel_size[1]
+                num_pixels_x = geometry_0.config.panel.num_pixels[0]
+                num_pixels_y = geometry_0.config.panel.num_pixels[1]
+                angles = geometry_0.config.angles.angle_data[:]
+            else: #ImageData
+                geometry = geometry_0.clone()
+                
             for key in self.roi.keys():
                 idx = data.get_dimension_axis(key)
                 if (self.roi[key] != -1):
@@ -94,10 +116,10 @@ class Slicer(DataProcessor):
                             else:
                                 raise ValueError("Negative step is not allowed")
                     sliceobj[idx] = slice(roi[idx][0], roi[idx][1], roi[idx][2])
+                    
                 if (isinstance(data, ImageData)):
                     
                     flag_warn = False
-                    geometry = geometry_0.clone()
                     
                     if key == 'channel':
                         geometry.channels = int(np.ceil((roi[idx][1] - roi[idx][0]) / roi[idx][2]))
@@ -147,22 +169,6 @@ class Slicer(DataProcessor):
                     data_container_warn = False
                     geometry = None
                     
-                    if geometry_0.config.system.geometry == 'parallel':
-                        ray_direction = geometry_0.config.system.ray.direction
-                    else:
-                        source_position = geometry_0.config.system.source.position
-                    detector_position = geometry_0.config.system.detector.position
-                    detector_direction_row = geometry_0.config.system.detector.direction_row
-                    if geometry_0.config.system.dimension == '3D':
-                        detector_direction_col = geometry_0.config.system.detector.direction_col
-                    rotation_axis_position = geometry_0.config.system.rotation_axis.position
-                    num_channels = geometry_0.config.channels.num_channels
-                    pixel_size_x = geometry_0.config.panel.pixel_size[0]
-                    pixel_size_y = geometry_0.config.panel.pixel_size[1]
-                    num_pixels_x = geometry_0.config.panel.num_pixels[0]
-                    num_pixels_y = geometry_0.config.panel.num_pixels[1]
-                    angles = geometry_0.config.angles.angle_data
-                    
                     if key == 'channel':
                         num_channels = int(np.ceil((roi[idx][1] - roi[idx][0]) / roi[idx][2]))
                         
@@ -208,64 +214,65 @@ class Slicer(DataProcessor):
                         
                         if angles.shape[0] == 1:
                             dimension_labels.remove('angle')
-                    
-                    if data_container_warn == True:
-                        if self.force == True:
-                            geometry = None
-                        else:
-                            raise ValueError ("Unable to slice requested geometry. Use 'force=True' to return DataContainer instead.")
+
+            if (isinstance(data, AcquisitionData)):
+                if data_container_warn == True:
+                    if self.force == True:
+                        geometry = None
                     else:
-                        if geometry_0.config.system.geometry == 'cone':
-                            if num_pixels_y == 1:
-                                geometry = AcquisitionGeometry.create_Cone2D(source_position=source_position,
+                        raise ValueError ("Unable to slice requested geometry. Use 'force=True' to return DataContainer instead.")
+                else:
+                    if geometry_0.config.system.geometry == 'cone':
+                        if num_pixels_y == 1:
+                            geometry = AcquisitionGeometry.create_Cone2D(source_position=source_position,
+                                                                         rotation_axis_position=rotation_axis_position,
+                                                                         detector_position=detector_position,
+                                                                         detector_direction_row=detector_direction_row)
+                            
+                            geometry.set_panel(num_pixels_x, pixel_size=pixel_size_x)
+                            
+                        else:
+                            geometry = AcquisitionGeometry.create_Cone3D(source_position=source_position,
+                                                                         rotation_axis_position=rotation_axis_position,
+                                                                         rotation_axis_direction=rotation_axis_direction,
+                                                                         detector_position=detector_position,
+                                                                         detector_direction_row=detector_direction_row,
+                                                                         detector_direction_col=detector_direction_col)
+                            
+                            geometry.set_panel((num_pixels_x, num_pixels_y), 
+                                               pixel_size=(pixel_size_x, pixel_size_y))
+                    else:
+                        if num_pixels_y == 1:
+                            geometry = AcquisitionGeometry.create_Parallel2D(ray_direction=ray_direction,
                                                                              rotation_axis_position=rotation_axis_position,
                                                                              detector_position=detector_position,
                                                                              detector_direction_row=detector_direction_row)
-                                
-                                geometry.set_panel(num_pixels_x, pixel_size=pixel_size_x)
-                                
-                            else:
-                                
-                                geometry = AcquisitionGeometry.create_Cone3D(source_position=source_position,
+                            
+                            geometry.set_panel(num_pixels_x, pixel_size=pixel_size_x)
+                            
+                        else:
+                            geometry = AcquisitionGeometry.create_Parallel3D(ray_direction=ray_direction,
                                                                              rotation_axis_position=rotation_axis_position,
+                                                                             rotation_axis_direction=rotation_axis_direction,
                                                                              detector_position=detector_position,
                                                                              detector_direction_row=detector_direction_row,
                                                                              detector_direction_col=detector_direction_col)
-                                
-                                geometry.set_panel((num_pixels_x, num_pixels_y), 
-                                                   pixel_size=(pixel_size_x, pixel_size_y))
-                        else:
-                            if num_pixels_y == 1:
-                                geometry = AcquisitionGeometry.create_Parallel2D(ray_direction=ray_direction,
-                                                                                 rotation_axis_position=rotation_axis_position,
-                                                                                 detector_position=detector_position,
-                                                                                 detector_direction_row=detector_direction_row)
-                                
-                                geometry.set_panel(num_pixels_x, pixel_size=pixel_size_x)
-                                
-                            else:
-                                
-                                geometry = AcquisitionGeometry.create_Parallel3D(ray_direction=ray_direction,
-                                                                                 rotation_axis_position=rotation_axis_position,
-                                                                                 detector_position=detector_position,
-                                                                                 detector_direction_row=detector_direction_row,
-                                                                                 detector_direction_col=detector_direction_col)
-                                
-                                geometry.set_panel((num_pixels_x, num_pixels_y), 
-                                                   pixel_size=(pixel_size_x, pixel_size_y))
-                                
-                        geometry.set_angles(angles, 
-                                            angle_unit=geometry_0.config.angles.angle_unit, 
-                                            initial_angle=geometry_0.config.angles.initial_angle)
-
-                        geometry.set_channels(num_channels = num_channels)
-                                
-                        if detector_warn == True:
-                            warnings.warn('Geometrical center of the detector has been positioned at ({})'.format(geometry_0.config.system.detector.position))
-                        
-        data_resized = np.squeeze(data.as_array()[tuple(sliceobj)])
-        
-        if geometry == None:
-            return DataContainer(data_resized, deep_copy=False, dimension_labels=dimension_labels, suppress_warning=True)
-        else:
-            return type(data)(data_resized, deep_copy=False, geometry=geometry, dimension_labels=dimension_labels, suppress_warning=True)
+                            
+                            geometry.set_panel((num_pixels_x, num_pixels_y), 
+                                               pixel_size=(pixel_size_x, pixel_size_y))
+                            
+                    geometry.set_angles(angles, 
+                                        angle_unit=geometry_0.config.angles.angle_unit, 
+                                        initial_angle=geometry_0.config.angles.initial_angle)
+            
+                    geometry.set_channels(num_channels=num_channels)
+                            
+                    if detector_warn == True:
+                        warnings.warn('Geometrical center of the detector has been positioned at ({})'.format(geometry_0.config.system.detector.position))
+                                                        
+            data_resized = np.squeeze(data.as_array()[tuple(sliceobj)])
+            
+            if geometry == None:
+                return DataContainer(data_resized, deep_copy=False, dimension_labels=dimension_labels, suppress_warning=True)
+            else:
+                return type(data)(data_resized, deep_copy=False, geometry=geometry, dimension_labels=dimension_labels, suppress_warning=True)

@@ -23,8 +23,6 @@ from cil.framework import DataProcessor, AcquisitionData, ImageData, DataContain
 import numpy as np
 import warnings
 
-warnings.simplefilter('always', UserWarning)
-
 
 class Slicer(DataProcessor):
 

@@ -23,8 +23,6 @@ from ccpi.framework import DataProcessor, AcquisitionData, ImageData, DataContai
 import numpy as np
 import warnings
 
-warnings.simplefilter('always', UserWarning)
-
 
 class Slicer(DataProcessor):
 

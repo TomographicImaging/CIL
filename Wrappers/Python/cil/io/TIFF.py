@@ -11,7 +11,8 @@ try:
 except:
     pilAvailable = False
 import functools
-
+import glob
+import re
 
 class TIFFWriter(object):
     '''Write a DataSet to disk as a TIFF file or stack'''
@@ -123,14 +124,8 @@ class TIFFStackReader(object):
         Parameters
         ----------
             
-        :param path: path to folder with tiff files
-        :type path: str or abspath to folder
-        :param file_name: path to tiff file 
-        :type file_name: str, to be used if path is not specified
-        :param number: number of files to read after file_name. 
-           Set to -1 to select all files in alphabetical order that follow the specified file.
-        :type number: int, default -1 
-
+        :param file_name: path to folder with tiff files, list of paths of tiffs, or single tiff file
+        :type file_name: str, abspath to folder, list
             
         :param roi: dictionary with roi to load 
                 {'axis_0': (start, end, step), 
@@ -167,37 +162,30 @@ class TIFFStackReader(object):
             
         '''
         
-        self.path = kwargs.get('path', None)
+        self.file_name = kwargs.get('file_name', None)
         self.roi = kwargs.get('roi', {'axis_0': -1, 'axis_1': -1, 'axis_2': -1})
         self.transpose = kwargs.get('transpose', False)
         self.mode = kwargs.get('mode', 'bin')
         
-        if self.path is not None:
-            self.set_up(path = self.path,
+        if self.file_name is not None:
+            self.set_up(file_name = self.file_name,
                         roi = self.roi,
                         transpose = self.transpose,
                         mode = self.mode)
             
     def set_up(self, 
-               path = None,
-               file_name = None, 
-               number = -1, 
+               file_name = None,
                roi = {'axis_0': -1, 'axis_1': -1, 'axis_2': -1},
                transpose = False,
                mode = 'bin'):
         
-        self.path = path
         self.roi = roi
         self.transpose = transpose
         self.mode = mode
         
-        if self.path == None:
-            raise ValueError('Path to tiff files is required.')
+        if file_name == None:
+            raise ValueError('file_name to tiff files is required. Can be a tiff, a list of tiffs or a directory containing tiffs')
             
-        # check if path exists
-        if not(os.path.exists(self.path)):
-            raise Exception('Path \n {}\n does not exist.'.format(self.path))  
-                
         # check that PIL library is installed
         if (pilAvailable == False):
             raise Exception("PIL (pillow) is not available, cannot load TIFF files.")
@@ -221,10 +209,31 @@ class TIFFStackReader(object):
         if 'axis_2' not in self._roi.keys():
             self._roi['axis_2'] = -1
         
-        self._tiff_files = [f for f in os.listdir(self.path) if (os.path.isfile(os.path.join(self.path, f)) and '.tif' in f.lower())]
 
-        if not self._tiff_files:
-            raise Exception("No tiff files were found in the directory \n{}".format(self.path))
+        if isinstance(file_name, list):
+            self._tiff_files = file_name
+        elif os.path.isfile(file_name):
+            self._tiff_files = [file_name]
+        elif os.path.isdir(file_name): 
+            self._tiff_files = glob.glob(os.path.join(file_name,"*.tif"))
+            
+            if not self._tiff_files:
+                self._tiff_files = glob.glob(os.path.join(file_name,"*.tiff"))
+
+            if not self._tiff_files:
+                raise Exception("No tiff files were found in the directory \n{}".format(file_name))
+
+        else:
+            raise Exception("file_name expects a tiff file, a list of tiffs, or a directory containing tiffs.\n{}".format(file_name))
+
+        
+        for fn in self._tiff_files:
+            if '.tif' in fn:
+                if not(os.path.exists(fn)):
+                    raise Exception('File \n {}\n does not exist.'.format(fn))
+            else:
+                raise Exception("file_name expects a tiff file, a list of tiffs, or a directory containing tiffs.\n{}".format(file_name))
+
         
         self._tiff_files.sort(key=self.__natural_keys)
                
@@ -235,7 +244,7 @@ class TIFFStackReader(object):
         Reads images and return numpy array
         '''
         # load first image to find out dimensions
-        filename = os.path.join(self.path, self._tiff_files[0])
+        filename = os.path.abspath(self._tiff_files[0])
         
         tmp = np.asarray(Image.open(filename), dtype = np.float32)
         
@@ -280,7 +289,8 @@ class TIFFStackReader(object):
                 raw = np.zeros((array_shape_0[1], array_shape_0[2]), dtype=np.float32)
                 for j in range(roi_par[0][2]):
                 
-                    filename = os.path.join(self.path, self._tiff_files[roi_par[0][0] + i * roi_par[0][2] + j])
+                    index = int(roi_par[0][0] + i * roi_par[0][2] + j)
+                    filename = os.path.abspath(self._tiff_files[index])
 
                     try:
                         raw += np.asarray(Image.open(filename), dtype = np.float32)
@@ -311,7 +321,7 @@ class TIFFStackReader(object):
                         
             for i in range(roi_par[0][0], roi_par[0][1], roi_par[0][2]):
                 
-                filename = os.path.join(self.path, self._tiff_files[i])
+                filename = os.path.abspath(self._tiff_files[i])
                 #try:
                 raw = np.asarray(Image.open(filename), dtype = np.float32)
                 #except:

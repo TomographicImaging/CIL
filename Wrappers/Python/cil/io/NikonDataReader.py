@@ -164,6 +164,13 @@ class NikonDataReader(object):
             # angular increment (in degrees)
             elif line.startswith("AngularStep"):
                 angular_step = float(line.split('=')[1])
+            # detector offset x in units                
+            elif line.startswith("DetectorOffsetX"):
+                DetectorOffsetX = float(line.split('=')[1])
+            # detector offset y in units  
+            elif line.startswith("DetectorOffsetY"):
+                DetectorOffsetY = float(line.split('=')[1])
+
 
         self._roi_par = [[0, num_projections, 1] ,[0, pixel_num_v_0, 1], [0, pixel_num_h_0, 1]]
         
@@ -200,16 +207,15 @@ class NikonDataReader(object):
             pixel_size_v = pixel_size_v_0
             pixel_size_h = pixel_size_h_0
         
-
         det_start_0 = -(pixel_num_h_0 / 2)
         det_start = det_start_0 + self._roi_par[2][0]
         det_end = det_start + pixel_num_h * self._roi_par[2][2]
-        det_pos_h = (det_start + det_end) * 0.5 * pixel_size_h_0
+        det_pos_h = (det_start + det_end) * 0.5 * pixel_size_h_0 + DetectorOffsetX
         
         det_start_0 = -(pixel_num_v_0 / 2)
         det_start = det_start_0 + self._roi_par[1][0]
         det_end = det_start + pixel_num_v * self._roi_par[1][2]
-        det_pos_v = (det_start + det_end) * 0.5 * pixel_size_v_0             
+        det_pos_v = (det_start + det_end) * 0.5 * pixel_size_v_0 + DetectorOffsetY         
 
         #angles from xtek.ct ignore *.ang and _ctdata.txt as not correct
         angles = numpy.asarray( [ angular_step * proj for proj in range(num_projections) ] , dtype=numpy.float32)
@@ -221,13 +227,19 @@ class NikonDataReader(object):
         else:
             angles = angles[slice(self._roi_par[0][0], self._roi_par[0][1], self._roi_par[0][2])]
         
+        #convert NikonGeometry to CIL geometry
+        angles = angles + initial_angle + 180
+
+        if self.fliplr:
+            det_pos_h = -det_pos_h
+            angles = -angles           
+
         if pixel_num_v == 1 and (self._roi_par[1][0]+self._roi_par[1][1]) // 2 == pixel_num_v_0 // 2:
             self._ag = AcquisitionGeometry.create_Cone2D(source_position=[0, -source_to_rot],
                                                      rotation_axis_position=[0, 0],
                                                      detector_position=[det_pos_h, source_to_det-source_to_rot])
             self._ag.set_angles(angles, 
-                                angle_unit='degree', 
-                                initial_angle=initial_angle)
+                                angle_unit='degree')
             
             self._ag.set_panel(pixel_num_h, pixel_size=pixel_size_h)
 
@@ -237,8 +249,7 @@ class NikonDataReader(object):
                                                          rotation_axis_position=[0, 0, 0],
                                                          detector_position=[det_pos_h, source_to_det-source_to_rot, det_pos_v])
             self._ag.set_angles(angles, 
-                                angle_unit='degree', 
-                                initial_angle=initial_angle)
+                                angle_unit='degree')
             
             self._ag.set_panel((pixel_num_h, pixel_num_v),
                                pixel_size=(pixel_size_h, pixel_size_v))
@@ -262,7 +273,7 @@ class NikonDataReader(object):
         path_projection = os.path.dirname(self.file_name)
 
         reader = TIFFStackReader()
-        reader.set_up(path = path_projection,
+        reader.set_up(file_name = path_projection,
                       roi = {'axis_0': tuple(self._roi_par[0]), 
                              'axis_1': tuple(self._roi_par[1]),
                              'axis_2': tuple(self._roi_par[2])},
@@ -271,8 +282,7 @@ class NikonDataReader(object):
         ad = reader.read_as_AcquisitionData(self._ag)
               
         if (self.normalize):
-            ad /= self._white_level
-            ad.array[ad.array > 1] = 1
+            ad /= 65535 #unsinged char max
         
         if self.fliplr:
             dim = ad.get_dimension_axis('horizontal')

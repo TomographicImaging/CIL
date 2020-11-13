@@ -113,8 +113,8 @@ class Function(object):
         
         if isinstance(other, Function):
             return SumFunction(self, other)
-        elif isinstance(other, (SumFunctionScalar, ConstantFunction, Number)):
-            return SumFunctionScalar(self, other)
+        elif isinstance(other, (SumScalarFunction, ConstantFunction, Number)):
+            return SumScalarFunction(self, other)
         else:
             raise ValueError('Not implemented')   
             
@@ -306,9 +306,9 @@ class ScaledFunction(Function):
             self.function.proximal_conjugate(x/self.scalar, tau/self.scalar, out=out)
             out *= self.scalar
 
-class SumFunctionScalar(SumFunction):
+class SumScalarFunction(SumFunction):
           
-    """ SumFunctionScalar represents the sum a function with a scalar. 
+    """ SumScalarFunction represents the sum a function with a scalar. 
     
         .. math:: (F + scalar)(x)  = F(x) + scalar
     
@@ -324,7 +324,7 @@ class SumFunctionScalar(SumFunction):
     
     def __init__(self, function, constant):
         
-        super(SumFunctionScalar, self).__init__(function, ConstantFunction(constant))        
+        super(SumScalarFunction, self).__init__(function, ConstantFunction(constant))        
         self.constant = constant
         self.function = function
         
@@ -357,7 +357,7 @@ class SumFunctionScalar(SumFunction):
     @L.setter
     def L(self, value):
         # call base class setter
-        super(SumFunctionScalar, self.__class__).L.fset(self, value )
+        super(SumScalarFunction, self.__class__).L.fset(self, value )
 
 class ConstantFunction(Function):
     

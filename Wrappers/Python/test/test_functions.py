@@ -27,7 +27,7 @@ from cil.optimisation.operators import GradientOperator
 
 from cil.optimisation.functions import Function, KullbackLeibler, WeightedL2NormSquared, L2NormSquared,\
                                          L1Norm, MixedL21Norm, LeastSquares, \
-                                         ZeroFunction, FunctionOperatorComposition,\
+                                         ZeroFunction, OperatorCompositionFunction,\
                                          Rosenbrock, IndicatorBox, TotalVariation                                     
 
 import unittest
@@ -345,9 +345,9 @@ class TestFunction(unittest.TestCase):
         # numpy.testing.assert_array_almost_equal(f_scaled_data.proximal_conjugate(u, tau).as_array(), \
         #                                         ((u - tau * b)/(1 + tau/(2*scalar) )).as_array(), decimal=4)    
            
-    def test_Norm2sq_as_FunctionOperatorComposition(self):
+    def test_Norm2sq_as_OperatorCompositionFunction(self):
         
-        print('Test for FunctionOperatorComposition')         
+        print('Test for OperatorCompositionFunction')         
             
         M, N = 50, 50
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
@@ -359,7 +359,7 @@ class TestFunction(unittest.TestCase):
             
         u = ig.allocate('random', seed = 50)
         f = 0.5 * L2NormSquared(b = b)
-        func1 = FunctionOperatorComposition(f, operator)
+        func1 = OperatorCompositionFunction(f, operator)
         func2 = LeastSquares(operator, b, 0.5)
         print("f.L {}".format(f.L))
         print("0.5*f.L {}".format((0.5*f).L))
@@ -391,7 +391,7 @@ class TestFunction(unittest.TestCase):
         b = vg.allocate('random')    
         u = vg.allocate('random')
           
-        func1 = FunctionOperatorComposition(0.5 * L2NormSquared(b = b), operator)
+        func1 = OperatorCompositionFunction(0.5 * L2NormSquared(b = b), operator)
         func2 = LeastSquares(operator, b, 0.5)
          
         self.assertNumpyArrayAlmostEqual(func1(u), func2(u))       
@@ -827,7 +827,7 @@ class TestFunction(unittest.TestCase):
         numpy.testing.assert_almost_equal(res1, res2, decimal=2)          
 
     def test_Lipschitz(self):
-        print('Test for FunctionOperatorComposition')         
+        print('Test for OperatorCompositionFunction')         
             
         M, N = 50, 50
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)

@@ -28,7 +28,7 @@ from cil.optimisation.operators import Operator, ScaledOperator
 
 import warnings
 
-class FunctionOperatorComposition(Function):
+class OperatorCompositionFunction(Function):
     
     """ Composition of a function with an operator as : :math:`(F \otimes A)(x) = F(Ax)`
     
@@ -50,7 +50,7 @@ class FunctionOperatorComposition(Function):
     :type f: :code:`Function`
     '''
 
-        super(FunctionOperatorComposition, self).__init__()
+        super(OperatorCompositionFunction, self).__init__()
         
         if not isinstance(function, Function):
             raise ValueError('{} is not function '.format(type(self.function)))

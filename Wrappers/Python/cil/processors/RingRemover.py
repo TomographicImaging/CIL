@@ -95,7 +95,7 @@ class RingRemover(DataProcessor):
             if 'vertical' in geom.dimension_labels:
                                 
                 for i in range(vertical):
-                    tmp_corrected = self.xRemoveStripesVertical(data.subset(vertical=i).as_array(), decNum, wname, sigma) 
+                    tmp_corrected = self.xRemoveStripesVertical(data.subset(vertical=i, force=True).as_array(), decNum, wname, sigma) 
                     out.fill(tmp_corrected, vertical = i)  
             
             # for 2D data
@@ -115,7 +115,7 @@ class RingRemover(DataProcessor):
                     data_ch_i = data.subset(channel=i)
                     
                     for j in range(vertical):
-                        tmp_corrected = self.xRemoveStripesVertical(data_ch_i.subset(vertical=j).as_array(), decNum, wname, sigma)
+                        tmp_corrected = self.xRemoveStripesVertical(data_ch_i.subset(vertical=j, force=True).as_array(), decNum, wname, sigma)
                         out_ch_i.fill(tmp_corrected, vertical = j)
                         
                     out.fill(out_ch_i.as_array(), channel=i) 

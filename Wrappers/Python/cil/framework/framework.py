@@ -2707,7 +2707,6 @@ class AcquisitionData(DataContainer):
             return out
         else:
             if geometry_new is None:
-                print("Returning DataContainer")
                 return DataContainer(out.array, deep_copy=False, dimension_labels=dimension_labels, suppress_warning=True)
             else:
                 return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new, dimension_labels=dimension_labels, suppress_warning=True)

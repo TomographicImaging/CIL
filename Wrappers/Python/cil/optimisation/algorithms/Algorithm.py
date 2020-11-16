@@ -144,9 +144,14 @@ class Algorithm(object):
         self.x = tmp 
         '''
         pass
+        
     def get_output(self):
         '''Returns the solution found'''
         return self.x
+    
+    @property
+    def solution(self):
+        return self.get_output()
     
     def get_last_loss(self, **kwargs):
         '''Returns the last stored value of the loss function

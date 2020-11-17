@@ -2374,6 +2374,13 @@ class DataContainer(object):
         '''Returns the max pixel value in the DataContainer'''
         return numpy.max(self.as_array(), *args, **kwargs)
     
+    def mean(self, *args, **kwargs):
+        '''Returns the mean pixel value of the DataContainer'''
+        if kwargs.get('dtype', None) is None:
+            kwargs['dtype'] = numpy.float64
+        return numpy.mean(self.as_array(), *args, **kwargs)
+
+    
     # Logic operators between DataContainers and floats    
     def __le__(self, other):
         '''Returns boolean array of DataContainer less or equal than DataContainer/float'''

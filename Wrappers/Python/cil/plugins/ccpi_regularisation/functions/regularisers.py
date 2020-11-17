@@ -27,8 +27,8 @@ except ImportError as ie:
                       "Minimal version is 20.04")
 
 
-from ccpi.framework import DataContainer
-from ccpi.optimisation.functions import Function
+from cil.framework import DataContainer
+from cil.optimisation.functions import Function
 import numpy as np
 import warnings
 

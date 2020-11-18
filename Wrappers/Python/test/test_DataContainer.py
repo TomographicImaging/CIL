@@ -765,6 +765,22 @@ class TestDataContainer(unittest.TestCase):
         norm = dc.norm()
         self.assertEqual(sqnorm, 8.0)
         numpy.testing.assert_almost_equal(norm, numpy.sqrt(8.0), decimal=7)
+    
+    def test_reduction_mean(self):
+        print ("test reduction: mean")
+        ig = ImageGeometry(2,2)
+        data = ig.allocate(0)
+        np_arr = data.as_array()
+        np_arr[0][0] = 0
+        np_arr[0][1] = 1
+        np_arr[1][0] = 2
+        np_arr[1][1] = 3
+        data.fill(np_arr)
+
+        mean = data.mean()
+        expected = numpy.float64(0+1+2+3)/numpy.float64(4)
+        numpy.testing.assert_almost_equal(mean, expected)
+        
         
     def test_multiply_out(self):
         print ("test multiply_out")

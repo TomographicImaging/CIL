@@ -27,7 +27,7 @@ from cil.optimisation.operators import GradientOperator
 
 from cil.optimisation.functions import Function, KullbackLeibler, WeightedL2NormSquared, L2NormSquared,\
                                          L1Norm, MixedL21Norm, LeastSquares, \
-                                         ZeroFunction, FunctionOperatorComposition,\
+                                         ZeroFunction, OperatorCompositionFunction,\
                                          Rosenbrock, IndicatorBox, TotalVariation                                     
 
 import unittest
@@ -345,9 +345,9 @@ class TestFunction(unittest.TestCase):
         # numpy.testing.assert_array_almost_equal(f_scaled_data.proximal_conjugate(u, tau).as_array(), \
         #                                         ((u - tau * b)/(1 + tau/(2*scalar) )).as_array(), decimal=4)    
            
-    def test_Norm2sq_as_FunctionOperatorComposition(self):
+    def test_Norm2sq_as_OperatorCompositionFunction(self):
         
-        print('Test for FunctionOperatorComposition')         
+        print('Test for OperatorCompositionFunction')         
             
         M, N = 50, 50
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
@@ -359,7 +359,7 @@ class TestFunction(unittest.TestCase):
             
         u = ig.allocate('random', seed = 50)
         f = 0.5 * L2NormSquared(b = b)
-        func1 = FunctionOperatorComposition(f, operator)
+        func1 = OperatorCompositionFunction(f, operator)
         func2 = LeastSquares(operator, b, 0.5)
         print("f.L {}".format(f.L))
         print("0.5*f.L {}".format((0.5*f).L))
@@ -391,7 +391,7 @@ class TestFunction(unittest.TestCase):
         b = vg.allocate('random')    
         u = vg.allocate('random')
           
-        func1 = FunctionOperatorComposition(0.5 * L2NormSquared(b = b), operator)
+        func1 = OperatorCompositionFunction(0.5 * L2NormSquared(b = b), operator)
         func2 = LeastSquares(operator, b, 0.5)
          
         self.assertNumpyArrayAlmostEqual(func1(u), func2(u))       
@@ -827,7 +827,7 @@ class TestFunction(unittest.TestCase):
         numpy.testing.assert_almost_equal(res1, res2, decimal=2)          
 
     def test_Lipschitz(self):
-        print('Test for FunctionOperatorComposition')         
+        print('Test for OperatorCompositionFunction')         
             
         M, N = 50, 50
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
@@ -1090,23 +1090,52 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
         print ("test_KullbackLeibler numba")
         #numpy.random.seed(1)
         M, N, K =  2, 3, 4
-        ig = ImageGeometry(N, M, K)
+        ig = ImageGeometry(N, M)
         
         u1 = ig.allocate('random', seed = 500)
         u1 = ig.allocate(0.2)  
-        g1 = ig.allocate('random', seed = 100)
+        #g1 = ig.allocate('random', seed = 100)
+        g1 = ig.allocate(1)
+
         b1 = ig.allocate('random', seed = 1000)
-                   
-        f = KullbackLeibler(b=g1, use_numba=True)
-        f_np = KullbackLeibler(b=g1, use_numba=False)
+        eta = ig.allocate(1e-3)
+
+        mask = ig.allocate(1)
+
+        mask.fill(0, horizontal_x=0)
+
+        mask_c = ig.allocate(0)
+        mask_c.fill(1, horizontal_x=0)
+
+        # print ("mask\n", mask.as_array())
+        # print ("mask_c\n", mask_c.as_array())
+
+        f = KullbackLeibler(b=g1, use_numba=True, eta=eta)
+        f_np = KullbackLeibler(b=g1, use_numba=False, eta=eta)
+
+
+        # mask is on vartical=0
+        # separate the u1 vertical=0
+        f_mask = KullbackLeibler(b=g1.copy(), use_numba=True, mask=mask.copy(), eta=eta.copy())
+        f_mask_c = KullbackLeibler(b=g1.copy(), use_numba=True, mask=mask_c.copy(), eta=eta.copy())
+        f_on_mask = KullbackLeibler(b=g1.subset(horizontal_x=0), use_numba=True, eta=eta.subset(horizontal_x=0))
+        u1_on_mask = u1.subset(horizontal_x=0)
+
 
         tau = 400.4
         self.tau = tau
         self.u1 = u1
         self.g1 = g1
         self.b1 = b1
+        self.eta = eta
         self.f = f
         self.f_np = f_np
+        self.mask = mask
+        self.mask_c = mask_c
+        self.f_mask = f_mask
+        self.f_mask_c = f_mask_c
+        self.f_on_mask = f_on_mask
+        self.u1_on_mask = u1_on_mask
         
     @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
     def test_KullbackLeibler_numba_call(self):
@@ -1116,19 +1145,23 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
         u1 = self.u1
 
         numpy.testing.assert_allclose(f(u1), f_np(u1),  rtol=1e-5)
-
+    
     @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
-    def test_KullbackLeibler_numba_proximal(self):
+    def test_KullbackLeibler_numba_call_mask(self):
         f = self.f
         f_np = self.f_np
         tau = self.tau
         u1 = self.u1
+        g1 = self.g1
+        mask = self.mask
 
-        numpy.testing.assert_allclose(f.proximal(u1,tau=tau).as_array(), 
-                                      f_np.proximal(u1,tau=tau).as_array(), rtol=2e-3)
-        numpy.testing.assert_array_almost_equal(f.proximal(u1,tau=tau).as_array(), 
-        f_np.proximal(u1,tau=tau).as_array(), decimal=5)
+        u1_on_mask = self.u1_on_mask
+        f_on_mask = self.f_on_mask
+        f_mask = self.f_mask
+        f_mask_c = self.f_mask_c
         
+        numpy.testing.assert_allclose(f_mask(u1) + f_mask_c(u1), f(u1),  rtol=1e-5)
+
     @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
     def test_KullbackLeibler_numba_proximal(self):
         f = self.f
@@ -1137,9 +1170,24 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
         u1 = self.u1
 
         numpy.testing.assert_allclose(f.proximal(u1,tau=tau).as_array(), 
-                                      f_np.proximal(u1,tau=tau).as_array(), rtol=2e-3)
+                                      f_np.proximal(u1,tau=tau).as_array(), rtol=7e-3)
         numpy.testing.assert_array_almost_equal(f.proximal(u1,tau=tau).as_array(), 
-        f_np.proximal(u1,tau=tau).as_array(), decimal=5)
+        f_np.proximal(u1,tau=tau).as_array(), decimal=4)
+        
+    
+    @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
+    def test_KullbackLeibler_numba_proximal_arr(self):
+        f = self.f
+        f_np = self.f_np
+        tau = self.u1.copy()
+        tau.fill(self.tau)
+        u1 = self.u1
+        a = f.proximal(u1,tau=self.tau)
+        b = f.proximal(u1,tau=tau)
+        numpy.testing.assert_allclose(f.proximal(u1,tau=self.tau).as_array(), 
+                                      f.proximal(u1,tau=tau).as_array(), rtol=7e-3)
+        numpy.testing.assert_array_almost_equal(f.proximal(u1,tau=self.tau).as_array(), 
+                                                f.proximal(u1,tau=tau).as_array(), decimal=4)
         
     @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
     def test_KullbackLeibler_numba_gradient(self):
@@ -1160,7 +1208,7 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
         numpy.testing.assert_allclose(f.convex_conjugate(u1), f_np.convex_conjugate(u1), rtol=1e-3)
         
     @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
-    def test_KullbackLeibler_numba_proximal_conjugate(self):
+    def test_KullbackLeibler_numba_proximal_conjugate_arr(self):
         f = self.f
         f_np = self.f_np
         tau = self.tau
@@ -1169,6 +1217,52 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
         numpy.testing.assert_allclose(f.proximal_conjugate(u1,tau=tau).as_array(), 
                         f_np.proximal_conjugate(u1,tau=tau).as_array(), rtol=1e-3)
     
+    @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
+    def test_KullbackLeibler_numba_convex_conjugate_mask(self):
+        f = self.f
+        tau = self.tau
+        u1 = self.u1
+
+        mask = self.mask
+        f_mask = self.f_mask
+        f_mask_c = self.f_mask_c
+        f_on_mask = self.f_on_mask
+        u1_on_mask = self.u1_on_mask
+
+        print (f.convex_conjugate(u1))
+        print (f_mask.convex_conjugate(u1))
+        print (f_mask_c.convex_conjugate(u1))
+
+        numpy.testing.assert_allclose(
+            f.convex_conjugate(u1), 
+            f_mask.convex_conjugate(u1) + f_mask_c.convex_conjugate(u1) ,\
+                 rtol=1e-3)
+
+    @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
+    def test_KullbackLeibler_numba_proximal_conjugate_mask(self):
+        f = self.f
+        f_mask = self.f_mask
+        f_mask_c = self.f_mask_c
+        x = self.u1
+        m = self.mask
+        m_c = self.mask_c
+        tau = self.tau
+
+        out = x * 0
+        out_c = x * 0
+        f_mask_c.proximal_conjugate(x,tau=tau, out=out_c)
+        f_mask.proximal_conjugate(x,tau=tau, out=out)
+        numpy.testing.assert_allclose(f.proximal_conjugate(x,tau=tau).as_array(), 
+                                      (out + out_c).as_array(), rtol=7e-3)
+        # print ("f.prox_conj\n"       , f.proximal_conjugate(x,tau=tau).as_array())
+        # print ("f_mask.prox_conj\n"  , out.as_array())
+        # print ("f_mask_c.prox_conj\n", out_c.as_array())
+        b = f_mask_c.proximal_conjugate(x,tau=tau)
+        a = f_mask.proximal_conjugate(x,tau=tau)
+        numpy.testing.assert_allclose(f.proximal_conjugate(x,tau=tau).as_array(), 
+                                      (f_mask.proximal_conjugate(x,tau=tau) +\
+                                      f_mask_c.proximal_conjugate(x, tau=tau)) .as_array(), rtol=7e-3)
+        
     def tearDown(self):
         pass
 

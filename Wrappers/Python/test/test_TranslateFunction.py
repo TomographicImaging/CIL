@@ -21,7 +21,7 @@ from cil.optimisation.functions import Function, L1Norm, ScaledFunction, \
                                         LeastSquares, L2NormSquared, \
                                         KullbackLeibler, ZeroFunction, \
                                         ConstantFunction, TranslateFunction, \
-                                        MixedL21Norm, FunctionOperatorComposition
+                                        MixedL21Norm
 from cil.optimisation.operators import GradientOperator
 from cil.framework import ImageGeometry, BlockGeometry
 

@@ -1,6 +1,6 @@
 * 20.*
   - python module renamed to cil
-  - renamed Identity->IdentityOperator, Gradient->GradientOperator, SymmetrizedGradient->SymmetrizedGradientOperator
+  - renamed Identity->IdentityOperator, Gradient->GradientOperator, SymmetrisedGradient->SymmetrisedGradientOperator
 
 * 20.09.1
   - FiniteDifferenceOperator takes into consideration voxel size

@@ -68,7 +68,7 @@ class TestDataProcessor(unittest.TestCase):
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)              
 
-    def test_Normalizer(self):
+    def test_Normaliser(self):
         pass         
         
     def test_DataProcessorChaining(self):

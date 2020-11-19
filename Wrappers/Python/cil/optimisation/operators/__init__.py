@@ -22,7 +22,7 @@ from .BlockOperator import BlockOperator
 from .SparseFiniteDifferenceOperator import SparseFiniteDifferenceOperator
 from .FiniteDifferenceOperator import FiniteDifferenceOperator
 from .GradientOperator import GradientOperator
-from .SymmetrizedGradientOperator import SymmetrizedGradientOperator
+from .SymmetrisedGradientOperator import SymmetrisedGradientOperator
 from .IdentityOperator import IdentityOperator
 from .ZeroOperator import ZeroOperator
 from .MatrixOperator import MatrixOperator

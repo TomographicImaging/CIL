@@ -23,7 +23,7 @@ from cil.framework import DataProcessor, DataContainer, AcquisitionData,\
  AcquisitionGeometry, ImageGeometry, ImageData
 import numpy
 
-class Normalizer(DataProcessor):
+class Normaliser(DataProcessor):
     '''Normalization based on flat and dark
     
     This processor read in a AcquisitionData and normalises it based on 
@@ -44,7 +44,7 @@ class Normalizer(DataProcessor):
                   }
         
         #DataProcessor.__init__(self, **kwargs)
-        super(Normalizer, self).__init__(**kwargs)
+        super(Normaliser, self).__init__(**kwargs)
         if not flat_field is None:
             self.set_flat_field(flat_field)
         if not dark_field is None:

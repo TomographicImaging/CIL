@@ -425,7 +425,7 @@ class TestGradients(CCPiTestClass):
         # self.assertAlmostEqual(lhs, rhs)
         numpy.testing.assert_almost_equal(lhs, rhs, decimal=4)
             
-    def test_SymmetrizedGradientOperator2(self):        
+    def test_SymmetrisedGradientOperator2(self):        
         ###########################################################################
         # 2D geometry with channels
         # ig2 = ImageGeometry(N, M, channels = C)

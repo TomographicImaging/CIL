@@ -24,7 +24,7 @@ from cil.framework import BlockGeometry, BlockDataContainer
 from cil.optimisation.operators import FiniteDifferenceOperator
 
 
-class SymmetrizedGradientOperator(LinearOperator):
+class SymmetrisedGradientOperator(LinearOperator):
     
     r'''Symmetrized Gradient Operator:  E: V -> W
         
@@ -59,7 +59,7 @@ class SymmetrizedGradientOperator(LinearOperator):
         '''
         
         self.bnd_cond = bnd_cond
-        self.correlation = kwargs.get('correlation',SymmetrizedGradientOperator.CORRELATION_SPACE)
+        self.correlation = kwargs.get('correlation',SymmetrisedGradientOperator.CORRELATION_SPACE)
                 
         tmp_gm = len(domain_geometry.geometries)*domain_geometry.geometries
         
@@ -73,7 +73,7 @@ class SymmetrizedGradientOperator(LinearOperator):
         else:
             self.order_ind = [0,3,6,1,4,7,2,5,8]            
         
-        super(SymmetrizedGradientOperator, self).__init__(
+        super(SymmetrisedGradientOperator, self).__init__(
                                           domain_geometry=domain_geometry, 
                                           range_geometry=BlockGeometry(*tmp_gm))
         

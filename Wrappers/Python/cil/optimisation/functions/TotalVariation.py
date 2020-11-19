@@ -58,7 +58,7 @@ class TotalVariation(Function):
     
     
     def __init__(self, regularising_parameter, 
-                 inner_iterations, 
+                 iterations, 
                  tolerance = 1e-6, 
                  correlation = "Space",
                  backend = "c",

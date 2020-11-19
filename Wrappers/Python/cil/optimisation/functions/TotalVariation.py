@@ -39,8 +39,8 @@ class TotalVariation(Function):
     Parameters:
       
       :param domain: Domain of the reconstruction
-      :param regularising_parameter: Regularising parameter for the TV regulariser
-      :param inner_iterations: Iterations of FGP algorithm
+      :param regularising_parameter: Regularising parameter for the TV regulariser (Default = 1.)
+      :param inner_iterations: Iterations of FGP algorithm (Default = 100)
       :param tolerance: Stopping criterion (Default=1e-6)
       :param correlation: Correlation between Space and/or SpaceChannels for the GradientOperator (Default='space')
       :param backend: Backend to compute finite differences for the GradientOperator (Default='c')

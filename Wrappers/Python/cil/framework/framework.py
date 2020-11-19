@@ -628,19 +628,34 @@ class Parallel3D(SystemConfiguration):
         r'''Transforms the system origin to the rotate axis with z direction aligned to the rotate axis direction
         '''          
         #shift detector
-        det_pos = (self.detector.position - self.rotation_axis.position)
+        self.detector.position = (self.detector.position - self.rotation_axis.position)
+        self.rotation_axis.position = [0,0,0]
 
         #calculate rotation matrix to align rotation axis direction with z
         a = self.rotation_axis.direction
-        vx = numpy.array([[0, 0, -a[0]], [0, 0, -a[1]], [a[0], a[1], 0]])
-        axis_rotation = numpy.eye(3) + vx + vx.dot(vx) *  1 / (1 + a[2])
-        rotation_matrix = numpy.matrix.transpose(axis_rotation)
+
+        if numpy.allclose(a,[0,0,1]):
+            return
+        elif numpy.allclose(a,[0,0,-1]):
+            axis_rotation = numpy.eye(3)
+            axis_rotation[1][1] = -1
+            axis_rotation[2][2] = -1
+        else:
+            vx = numpy.array([[0, 0, -a[0]], [0, 0, -a[1]], [a[0], a[1], 0]])
+            axis_rotation = numpy.eye(3) + vx + vx.dot(vx) *  1 / (1 + a[2])
+        
+        rotation_matrix = numpy.matrix(axis_rotation)
+
+        #sanity check
+        new_rotation_axis_direction = rotation_matrix.dot(self.rotation_axis.direction.reshape(3,1))
+
+        if not numpy.allclose(new_rotation_axis_direction.flatten(), [0,0,1], atol=1e-7):
+            raise ValueError("Failed to align reference frame")
 
         #apply transform
-        self.rotation_axis.position = [0,0,0]
         self.rotation_axis.direction = [0,0,1]
         self.ray.direction = rotation_matrix.dot(self.ray.direction.reshape(3,1))
-        self.detector.position = rotation_matrix.dot(det_pos.reshape(3,1))
+        self.detector.position = rotation_matrix.dot(self.detector.position.reshape(3,1))
         new_row = rotation_matrix.dot(self.detector.direction_row.reshape(3,1))
         new_col = rotation_matrix.dot(self.detector.direction_col.reshape(3,1))
         self.detector.set_direction(new_row, new_col)
@@ -825,20 +840,34 @@ class Cone3D(SystemConfiguration):
         r'''Transforms the system origin to the rotate axis with z direction aligned to the rotate axis direction
         '''                  
         #shift 
-        det_pos = (self.detector.position - self.rotation_axis.position)
-        src_pos = (self.source.position - self.rotation_axis.position)
+        self.detector.position = (self.detector.position - self.rotation_axis.position)
+        self.source.position = (self.source.position - self.rotation_axis.position)
+        self.rotation_axis.position = [0,0,0]
 
         #calculate rotation matrix to align rotation axis direction with z
         a = self.rotation_axis.direction
-        vx = numpy.array([[0, 0, -a[0]], [0, 0, -a[1]], [a[0], a[1], 0]])
-        axis_rotation = numpy.eye(3) + vx + vx.dot(vx) *  1 / (1 + a[2])
-        rotation_matrix = numpy.matrix.transpose(axis_rotation)
+        if numpy.allclose(a,[0,0,1]):
+            return
+        elif numpy.allclose(a,[0,0,-1]):
+            axis_rotation = numpy.eye(3)
+            axis_rotation[1][1] = -1
+            axis_rotation[2][2] = -1
+        else:
+            vx = numpy.array([[0, 0, -a[0]], [0, 0, -a[1]], [a[0], a[1], 0]])
+            axis_rotation = numpy.eye(3) + vx + vx.dot(vx) *  1 / (1 + a[2])
+        
+        rotation_matrix = numpy.matrix(axis_rotation)
 
+        #sanity check
+        new_rotation_axis_direction = rotation_matrix.dot(self.rotation_axis.direction.reshape(3,1))
+
+        if not numpy.allclose(new_rotation_axis_direction.flatten(), [0,0,1], atol=1e-7):
+            raise ValueError("Failed to align reference frame")
+    
         #apply transform
-        self.rotation_axis.position = [0,0,0]
         self.rotation_axis.direction = [0,0,1]
-        self.source.position = rotation_matrix.dot(src_pos.reshape(3,1))
-        self.detector.position = rotation_matrix.dot(det_pos.reshape(3,1))
+        self.source.position = rotation_matrix.dot(self.source.position.reshape(3,1))
+        self.detector.position = rotation_matrix.dot(self.detector.position.reshape(3,1))
         new_row = rotation_matrix.dot(self.detector.direction_row.reshape(3,1)) 
         new_col = rotation_matrix.dot(self.detector.direction_col.reshape(3,1))
         self.detector.set_direction(new_row, new_col)
@@ -2380,7 +2409,7 @@ class DataContainer(object):
             kwargs['dtype'] = numpy.float64
         return numpy.mean(self.as_array(), *args, **kwargs)
 
-    
+
     # Logic operators between DataContainers and floats    
     def __le__(self, other):
         '''Returns boolean array of DataContainer less or equal than DataContainer/float'''

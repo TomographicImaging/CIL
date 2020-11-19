@@ -378,10 +378,10 @@ class Test_Parallel3D(unittest.TestCase):
         #align Z axis with rotate axis
         AG = AcquisitionGeometry.create_Parallel3D(detector_position=[0.,1000.,0], rotation_axis_position=[0.,0.,0.], rotation_axis_direction=[0,1,0])
         AG.config.system.update_reference_frame()
-        numpy.testing.assert_allclose(AG.config.system.ray.direction, [0,0,-1], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.position, [0,0,-1000], rtol=1E-6)
+        numpy.testing.assert_allclose(AG.config.system.ray.direction, [0,0,1], rtol=1E-6)
+        numpy.testing.assert_allclose(AG.config.system.detector.position, [0,0,1000], rtol=1E-6)
         numpy.testing.assert_allclose(AG.config.system.detector.direction_row, [1,0,0], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.direction_col, [0,1,0], rtol=1E-6)
+        numpy.testing.assert_allclose(AG.config.system.detector.direction_col, [0,-1,0], rtol=1E-6)
         numpy.testing.assert_allclose(AG.config.system.rotation_axis.position, [0,0,0], rtol=1E-6)
         numpy.testing.assert_allclose(AG.config.system.rotation_axis.direction, [0,0,1], rtol=1E-6)
 
@@ -478,10 +478,10 @@ class Test_Cone3D(unittest.TestCase):
         #align Z axis with rotate axis
         AG = AcquisitionGeometry.create_Cone3D(source_position=[0,-500,0],detector_position=[0.,1000.,0], rotation_axis_position=[0.,0.,0.], rotation_axis_direction=[0,1,0])
         AG.config.system.update_reference_frame()
-        numpy.testing.assert_allclose(AG.config.system.source.position, [0,0,500], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.position, [0,0,-1000], rtol=1E-6)
+        numpy.testing.assert_allclose(AG.config.system.source.position, [0,0,-500], rtol=1E-6)
+        numpy.testing.assert_allclose(AG.config.system.detector.position, [0,0,1000], rtol=1E-6)
         numpy.testing.assert_allclose(AG.config.system.detector.direction_row, [1,0,0], rtol=1E-6)
-        numpy.testing.assert_allclose(AG.config.system.detector.direction_col, [0,1,0], rtol=1E-6)
+        numpy.testing.assert_allclose(AG.config.system.detector.direction_col, [0,-1,0], rtol=1E-6)
         numpy.testing.assert_allclose(AG.config.system.rotation_axis.position, [0,0,0], rtol=1E-6)
         numpy.testing.assert_allclose(AG.config.system.rotation_axis.direction, [0,0,1], rtol=1E-6)
 

@@ -20,7 +20,7 @@ from __future__ import division
 import unittest
 from cil.framework import ImageGeometry, VectorGeometry, ImageData, BlockDataContainer, DataContainer
 from cil.optimisation.operators import BlockOperator,\
-    FiniteDifferenceOperator, SymmetrizedGradientOperator
+    FiniteDifferenceOperator, SymmetrisedGradientOperator
 import numpy
 from timeit import default_timer as timer
 from cil.optimisation.operators import GradientOperator, IdentityOperator,\
@@ -392,28 +392,28 @@ class TestGradients(CCPiTestClass):
         self.ig2 = ImageGeometry(N, M, channels = C)
         self.ig3 = ImageGeometry(N, M, K)
 
-    def test_SymmetrizedGradientOperator1a(self):
+    def test_SymmetrisedGradientOperator1a(self):
         ###########################################################################  
         ## Symmetrized Gradient Tests
-        print ("Test SymmetrizedGradientOperator")
+        print ("Test SymmetrisedGradientOperator")
         ###########################################################################
         # 2D geometry no channels
         # ig = ImageGeometry(N, M)
         Grad = GradientOperator(self.ig)
         
-        E1 = SymmetrizedGradientOperator(Grad.range_geometry())
+        E1 = SymmetrisedGradientOperator(Grad.range_geometry())
         numpy.testing.assert_almost_equal(E1.norm(iterations=self.iterations), numpy.sqrt(8), decimal = self.decimal)
         
-    def test_SymmetrizedGradientOperator1b(self):
+    def test_SymmetrisedGradientOperator1b(self):
         ###########################################################################  
         ## Symmetrized GradientOperator Tests
-        print ("Test SymmetrizedGradientOperator")
+        print ("Test SymmetrisedGradientOperator")
         ###########################################################################
         # 2D geometry no channels
         # ig = ImageGeometry(N, M)
         Grad = GradientOperator(self.ig)
         
-        E1 = SymmetrizedGradientOperator(Grad.range_geometry())
+        E1 = SymmetrisedGradientOperator(Grad.range_geometry())
         numpy.random.seed(1)
         u1 = E1.domain_geometry().allocate('random')
         w1 = E1.range_geometry().allocate('random', symmetry = True)
@@ -431,7 +431,7 @@ class TestGradients(CCPiTestClass):
         # ig2 = ImageGeometry(N, M, channels = C)
         Grad2 = GradientOperator(self.ig2, correlation = 'Space')
         
-        E2 = SymmetrizedGradientOperator(Grad2.range_geometry())
+        E2 = SymmetrisedGradientOperator(Grad2.range_geometry())
         numpy.random.seed(1)
         u2 = E2.domain_geometry().allocate('random')
         w2 = E2.range_geometry().allocate('random', symmetry = True)
@@ -441,37 +441,37 @@ class TestGradients(CCPiTestClass):
             
         numpy.testing.assert_almost_equal(lhs2, rhs2, decimal=4)
         
-    def test_SymmetrizedGradientOperator2a(self):        
+    def test_SymmetrisedGradientOperator2a(self):        
         ###########################################################################
         # 2D geometry with channels
         # ig2 = ImageGeometry(N, M, channels = C)
         Grad2 = GradientOperator(self.ig2, correlation = 'Space')
         
-        E2 = SymmetrizedGradientOperator(Grad2.range_geometry())
+        E2 = SymmetrisedGradientOperator(Grad2.range_geometry())
         numpy.testing.assert_almost_equal(E2.norm(iterations=self.iterations), 
            numpy.sqrt(8), decimal = self.decimal)
         
     
-    def test_SymmetrizedGradientOperator3a(self):
+    def test_SymmetrisedGradientOperator3a(self):
         ###########################################################################
         # 3D geometry no channels
         #ig3 = ImageGeometry(N, M, K)
         Grad3 = GradientOperator(self.ig3, correlation = 'Space')
         
-        E3 = SymmetrizedGradientOperator(Grad3.range_geometry())
+        E3 = SymmetrisedGradientOperator(Grad3.range_geometry())
 
         norm1 = E3.norm()
         norm2 = E3.calculate_norm(iterations=100)
         print (norm1,norm2)
         numpy.testing.assert_almost_equal(norm2, numpy.sqrt(12), decimal = self.decimal)
         
-    def test_SymmetrizedGradientOperator3b(self):
+    def test_SymmetrisedGradientOperator3b(self):
         ###########################################################################
         # 3D geometry no channels
         #ig3 = ImageGeometry(N, M, K)
         Grad3 = GradientOperator(self.ig3, correlation = 'Space')
         
-        E3 = SymmetrizedGradientOperator(Grad3.range_geometry())
+        E3 = SymmetrisedGradientOperator(Grad3.range_geometry())
         numpy.random.seed(1)
         u3 = E3.domain_geometry().allocate('random')
         w3 = E3.range_geometry().allocate('random', symmetry = True)
@@ -1033,7 +1033,7 @@ class TestOperatorCompositionSum(unittest.TestCase):
         G = GradientOperator(domain_geometry=ig)
         
 
-        sym = SymmetrizedGradientOperator(domain_geometry=ig)
+        sym = SymmetrisedGradientOperator(domain_geometry=ig)
         Id2 = IdentityOperator(ig)
         
         d = CompositionOperator(sym, Id2)

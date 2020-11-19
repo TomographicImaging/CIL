@@ -389,7 +389,7 @@ if __name__ == '__main__':
     
     from cil.framework import ImageGeometry
     from cil.optimisation.operators import GradientOperator, IdentityOperator, \
-                            SparseFiniteDifferenceOperator, SymmetrizedGradientOperator, ZeroOperator
+                            SparseFiniteDifferenceOperator, SymmetrisedGradientOperator, ZeroOperator
 
         
     M, N = 4, 3
@@ -450,7 +450,7 @@ if __name__ == '__main__':
     op11 = GradientOperator(ig)
     op12 = IdentityOperator(op11.range_geometry())
     
-    op22 = SymmetrizedGradientOperator(op11.domain_geometry())
+    op22 = SymmetrisedGradientOperator(op11.domain_geometry())
     
     op21 = ZeroOperator(ig, op22.range_geometry())
     

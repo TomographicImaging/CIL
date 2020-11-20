@@ -71,7 +71,7 @@ class TotalVariation(Function):
         self.regularising_parameter = 1.
         
         # Iterations for FGP_TV
-        self.iterations = iterations
+        self.iterations = max_iterations
         
         # Tolerance for FGP_TV
         self.tolerance = tolerance

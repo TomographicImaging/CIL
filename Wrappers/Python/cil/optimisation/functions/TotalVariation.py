@@ -283,7 +283,7 @@ if __name__ == '__main__':
     from cil.utilities import dataexample
     import os
     import sys
-    from cil.plugins.regularisers import FGP_TV as CCPiReg_FGP_TV
+    from cil.plugins.ccpi_regularisation.functions import FGP_TV as CCPiReg_FGP_TV
     from cil.filters import regularisers    
     from timeit import default_timer as timer       
     import tomophantom
@@ -325,7 +325,7 @@ if __name__ == '__main__':
     iters = 1000
         
     # CIL_FGP_TV no tolerance
-    g_CIL = TotalVariation(alpha, iters, tolerance=None, lower = 0, info = True)
+    g_CIL = alpha * TotalVariation(iters, tolerance=None, lower = 0, info = True)
     t0 = timer()
     res1 = g_CIL.proximal(noisy_data, 1.)
     t1 = timer()
@@ -371,7 +371,7 @@ if __name__ == '__main__':
     print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV with iterations.")
     iters = 408
     # CIL_FGP_TV no tolerance
-    g_CIL = TotalVariation(alpha, iters, tolerance=1e-9, lower = 0.)
+    g_CIL = alpha * TotalVariation(iters, tolerance=1e-9, lower = 0.)
     t0 = timer()
     res1 = g_CIL.proximal(noisy_data, 1.)
     t1 = timer()
@@ -440,7 +440,7 @@ if __name__ == '__main__':
     
     print("Use tau as an array of ones")
     # CIL_FGP_TV no tolerance
-    g_CIL = TotalVariation(alpha, iters, tolerance=None, info=True)
+    g_CIL = alpha * TotalVariation(iters, tolerance=None, info=True)
     t0 = timer()   
     res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
     t1 = timer()
@@ -540,7 +540,7 @@ if __name__ == '__main__':
     iters = 1000
     
     # CIL_FGP_TV no tolerance
-    g_CIL = TotalVariation(alpha, iters, tolerance=None)
+    g_CIL = alpha * TotalVariation(iters, tolerance=None)
     t0 = timer()
     res1 = g_CIL.proximal(noisy_data, 1.)
     t1 = timer()

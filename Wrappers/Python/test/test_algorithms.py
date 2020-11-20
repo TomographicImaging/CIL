@@ -514,7 +514,7 @@ class TestSPDHG(unittest.TestCase):
         operator = Aop 
         f = KullbackLeibler(b=noisy_data)        
         alpha = 0.005
-        g =  TotalVariation(alpha, 50, 1e-4, lower=0)   
+        g =  alpha * TotalVariation(50, 1e-4, lower=0)   
         normK = operator.norm()
             
         #% 'implicit' PDHG, preconditioned step-sizes
@@ -547,7 +547,7 @@ class TestSPDHG(unittest.TestCase):
                                     for i in range(0, len(angles), size_of_subsets)])
         ## block function
         F = BlockFunction(*[KullbackLeibler(b=g[i]) for i in range(subsets)]) 
-        G = TotalVariation(alpha, 50, 1e-4, lower=0) 
+        G = alpha * TotalVariation(50, 1e-4, lower=0) 
     
         prob = [1/len(A)]*len(A)
         spdhg = SPDHG(f=F,g=G,operator=A, 

@@ -39,7 +39,7 @@ class TotalVariation(Function):
     Parameters:
       
       :param domain: Domain of the reconstruction
-      :param iterations: Iterations of FGP algorithm (Default = 100)
+      :param max_iterations: Iterations of FGP algorithm (Default = 100)
       :param tolerance: Stopping criterion for the FGP algoritm (Default=None)
       :param correlation: Correlation between Space and/or SpaceChannels for the GradientOperator (Default='space')
       :param backend: Backend to compute finite differences for the GradientOperator (Default='c')

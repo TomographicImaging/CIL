@@ -39,9 +39,8 @@ class TotalVariation(Function):
     Parameters:
       
       :param domain: Domain of the reconstruction
-      :param regularising_parameter: Regularising parameter for the TV regulariser (Default = 1.)
       :param iterations: Iterations of FGP algorithm (Default = 100)
-      :param tolerance: Stopping criterion (Default=1e-6)
+      :param tolerance: Stopping criterion for the FGP algoritm (Default=None)
       :param correlation: Correlation between Space and/or SpaceChannels for the GradientOperator (Default='space')
       :param backend: Backend to compute finite differences for the GradientOperator (Default='c')
       :param lower: ( Default = - numpy.inf ) lower bound for the orthogonal projection onto the convex set C
@@ -57,9 +56,8 @@ class TotalVariation(Function):
     '''    
     
     
-    def __init__(self, regularising_parameter=1., 
-                 iterations=100, 
-                 tolerance = 1e-6, 
+    def __init__(self, max_iterations=100, 
+                 tolerance = None, 
                  correlation = "Space",
                  backend = "c",
                  lower = -numpy.inf, 
@@ -68,8 +66,9 @@ class TotalVariation(Function):
         
 
         super(TotalVariation, self).__init__(L = None)
-        # Regularising parameter = alpha
-        self.regularising_parameter = regularising_parameter
+
+        # set regularising parameter to 1.
+        self.regularising_parameter = 1.
         
         # Iterations for FGP_TV
         self.iterations = iterations

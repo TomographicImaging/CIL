@@ -232,7 +232,7 @@ try:
         kl_convex_conjugate(x, b, eta)
         kl_convex_conjugate_mask(x, b, eta, mask)
     
-    force_jit()
+    # force_jit()
 
 except ImportError as ie:
     has_numba = False

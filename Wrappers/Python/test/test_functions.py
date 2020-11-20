@@ -44,12 +44,15 @@ from cil.utilities import noise
 import os
 import sys
 try:
-    from cil.plugins.regularisers import FGP_TV as CCPiReg_FGP_TV
-    from cil.filters import regularisers    
+    from ccpi.filters import regularisers
     has_reg_toolkit = True
 except ImportError as ie:
     has_reg_toolkit = False
-from timeit import default_timer as timer       
+if has_reg_toolkit:
+    from cil.plugins.ccpi_regularisation.functions import FGP_TV as CCPiReg_FGP_TV
+
+print ("Has Reg Toolkit", has_reg_toolkit)
+from timeit import default_timer as timer
 try:
     import tomophantom
     from tomophantom import TomoP3D
@@ -69,7 +72,8 @@ try:
     import numba
 except ImportError as ie:
     has_numba = False
-                    
+
+
 class TestFunction(unittest.TestCase):
     def assertBlockDataContainerEqual(self, container1, container2):
         print ("assert Block Data Container Equal")
@@ -918,171 +922,209 @@ class TestFunction(unittest.TestCase):
         f4 = -2 * f2
         assert f4.L == 2 * f2.L
 
-    def test_TotalVariation(self):
-        if has_reg_toolkit:
-            print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV no tolerance (2D)")
+
+class TestTotalVariation(unittest.TestCase):
+
+    def test_regularisation_parameter(self):
+        tv = TotalVariation()
+        np.testing.assert_almost_equal(tv.regularisation_parameter, 1.)
+
+    def test_regularisation_parameter2(self):
+        alpha = 0.15
+        tv = alpha * TotalVariation()
+        np.testing.assert_almost_equal(tv.regularisation_parameter, alpha)
     
-            data = dataexample.SHAPES.get()
-            ig = data.geometry
-            ag = ig
+    def test_rmul(self):
+        alpha = 0.15
+        tv = alpha * TotalVariation()
+        assert isinstance(tv, TotalVariation)
+    
+    def test_regularisation_parameter3(self):
+        tv = TotalVariation()
+        try:
+            tv.regularisation_parameter = 'string'
+            assert False
+        except TypeError as te:
+            print (te)
+            assert True
+    def test_rmul2(self):
+        alpha = 'string'
+        try:
+            tv = alpha * TotalVariation()
+            assert False
+        except TypeError as te:
+            print (te)
+            assert True
+    
 
-            # Create noisy data. 
-            n1 = np.random.normal(0, 0.1, size = ig.shape)
-            noisy_data = ig.allocate()
-            noisy_data.fill(n1+data.as_array())
-            
-            alpha = 0.1
-            iters = 1000
-                
-            # CIL_FGP_TV no tolerance
-            g_CIL = TotalVariation(alpha, iters, tolerance=None, lower = 0, info = True)
-            t0 = timer()
-            res1 = g_CIL.proximal(noisy_data, 1.)
-            t1 = timer()
-            print(t1-t0)
-            
-            # CCPi Regularisation toolkit high tolerance
-            r_alpha = alpha
-            r_iterations = iters
-            r_tolerance = 1e-9
-            r_iso = 0
-            r_nonneg = 1
-            r_printing = 0
-            g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'cpu')
-            
-            t2 = timer()
-            res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
-            t3 = timer()
-            print(t3-t1)
-            
-            
-            np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal = 4)
-            
-            ###################################################################
-            ###################################################################
-            ###################################################################
-            ###################################################################    
-            
-            print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV with iterations.")
-            iters = 408
-            # CIL_FGP_TV no tolerance
-            g_CIL = TotalVariation(alpha, iters, tolerance=1e-9, lower = 0.)
-            t0 = timer()
-            res1 = g_CIL.proximal(noisy_data, 1.)
-            t1 = timer()
-            print(t1-t0)
-            
-            # CCPi Regularisation toolkit high tolerance
-            r_alpha = alpha
-            r_iterations = iters
-            r_tolerance = 1e-9
-            r_iso = 0
-            r_nonneg = 1
-            r_printing = 0
-            g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'cpu')
+    @unittest.skipUnless(has_reg_toolkit, "Regularisation Toolkit not present")
+    def test_compare_regularisation_toolkit(self):
+    
+        print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV no tolerance (2D)")
 
-            t2 = timer()
-            res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
-            t3 = timer()
-            print(t3-t2)
-            
-            
-            print(mae(res1, res2))
-            np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal=3)    
-            
-            ###################################################################
-            ###################################################################
-            ###################################################################
-            ###################################################################
-            if has_tomophantom:
-                print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV no tolerance (3D)") 
-                    
-                print ("Building 3D phantom using TomoPhantom software")
-                model = 13 # select a model number from the library
-                N_size = 64 # Define phantom dimensions using a scalar value (cubic phantom)
-                path = os.path.dirname(tomophantom.__file__)
-                path_library3D = os.path.join(path, "Phantom3DLibrary.dat")
-                #This will generate a N_size x N_size x N_size phantom (3D)
-                phantom_tm = TomoP3D.Model(model, N_size, path_library3D)    
-                
-                ig = ImageGeometry(N_size, N_size, N_size)
-                data = ig.allocate()
-                data.fill(phantom_tm)
-                
-                noisy_data = noise.gaussian(data, seed=10)
-                
-                
-                alpha = 0.1
-                iters = 1000
-                
-                print("Use tau as an array of ones")
-                # CIL_TotalVariation no tolerance
-                g_CIL = TotalVariation(alpha, iters, tolerance=None, info=True)
-                res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
-                t0 = timer()   
-                res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
-                t1 = timer()
-                print(t1-t0)
+        data = dataexample.SHAPES.get()
+        ig = data.geometry
+        ag = ig
 
-                # CCPi Regularisation toolkit high tolerance
-                r_alpha = alpha
-                r_iterations = iters
-                r_tolerance = 1e-9
-                r_iso = 0
-                r_nonneg = 0
-                r_printing = 0
-                g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'cpu')
-
-                t2 = timer()
-                res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
-                t3 = timer()
-                print (t3-t2)
-                np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal=3)
-
-                
-                
-                # CIL_FGP_TV no tolerance
-                #g_CIL = FGP_TV(ig, alpha, iters, tolerance=None, info=True)
-                g_CIL.tolerance = None
-                t0 = timer()
-                res1 = g_CIL.proximal(noisy_data, 1.)
-                t1 = timer()
-                print(t1-t0)
-            
-            ###################################################################
-            ###################################################################
-            ###################################################################
-            ###################################################################     
+        # Create noisy data. 
+        n1 = np.random.normal(0, 0.1, size = ig.shape)
+        noisy_data = ig.allocate()
+        noisy_data.fill(n1+data.as_array())
         
-            data = dataexample.PEPPERS.get(size=(256, 256))
-            ig = data.geometry
-            ag = ig
-
-            noisy_data = noise.gaussian(data, seed=10)
-                        
-            alpha = 0.1
-            iters = 1000
+        alpha = 0.1
+        iters = 1000
             
-            # CIL_FGP_TV no tolerance
-            g_CIL = TotalVariation(alpha, iters, tolerance=None)
-            t0 = timer()
-            res1 = g_CIL.proximal(noisy_data, 1.)
-            t1 = timer()
-            print(t1-t0)
+        # CIL_FGP_TV no tolerance
+        g_CIL = alpha * TotalVariation(iters, tolerance=None, lower = 0, info = True)
+        t0 = timer()
+        res1 = g_CIL.proximal(noisy_data, 1.)
+        t1 = timer()
+        print(t1-t0)
+        
+        # CCPi Regularisation toolkit high tolerance
+        r_alpha = alpha
+        r_iterations = iters
+        r_tolerance = 1e-9
+        r_iso = 0
+        r_nonneg = 1
+        r_printing = 0
+        g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'cpu')
+        
+        t2 = timer()
+        res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
+        t3 = timer()
+        print(t3-t1)
+        
+        
+        np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal = 4)
+        
+        ###################################################################
+        ###################################################################
+        ###################################################################
+        ###################################################################    
+        
+        print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV with iterations.")
+        iters = 408
+        # CIL_FGP_TV no tolerance
+        g_CIL = alpha * TotalVariation(iters, tolerance=1e-9, lower = 0.)
+        t0 = timer()
+        res1 = g_CIL.proximal(noisy_data, 1.)
+        t1 = timer()
+        print(t1-t0)
+        
+        # CCPi Regularisation toolkit high tolerance
+        r_alpha = alpha
+        r_iterations = iters
+        r_tolerance = 1e-9
+        r_iso = 0
+        r_nonneg = 1
+        r_printing = 0
+        g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'cpu')
 
-            # CCPi Regularisation toolkit high tolerance
-            r_alpha = alpha
-            r_iterations = iters
-            r_tolerance = 1e-8
-            r_iso = 0
-            r_nonneg = 0
-            r_printing = 0
-            g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'cpu')
+        t2 = timer()
+        res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
+        t3 = timer()
+        print(t3-t2)
+        
+        
+        print(mae(res1, res2))
+        np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal=3)    
+        
+        ###################################################################
+        ###################################################################
+        ###################################################################
+        ###################################################################
+    @unittest.skipUnless(has_tomophantom and has_reg_toolkit, "Missing Tomophantom or Regularisation-Toolkit")
+    def test_compare_regularisation_toolkit_tomophantom(self):
+    
+        print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV no tolerance (3D)") 
             
-            t2 = timer()
-            res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
-            t3 = timer()
-            print (t3-t2)
+        print ("Building 3D phantom using TomoPhantom software")
+        model = 13 # select a model number from the library
+        N_size = 64 # Define phantom dimensions using a scalar value (cubic phantom)
+        path = os.path.dirname(tomophantom.__file__)
+        path_library3D = os.path.join(path, "Phantom3DLibrary.dat")
+        #This will generate a N_size x N_size x N_size phantom (3D)
+        phantom_tm = TomoP3D.Model(model, N_size, path_library3D)    
+        
+        ig = ImageGeometry(N_size, N_size, N_size)
+        data = ig.allocate()
+        data.fill(phantom_tm)
+        
+        noisy_data = noise.gaussian(data, seed=10)
+        
+        
+        alpha = 0.1
+        iters = 1000
+        
+        print("Use tau as an array of ones")
+        # CIL_TotalVariation no tolerance
+        g_CIL = alpha * TotalVariation(iters, tolerance=None, info=True)
+        res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
+        t0 = timer()   
+        res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
+        t1 = timer()
+        print(t1-t0)
+
+        # CCPi Regularisation toolkit high tolerance
+        r_alpha = alpha
+        r_iterations = iters
+        r_tolerance = 1e-9
+        r_iso = 0
+        r_nonneg = 0
+        r_printing = 0
+        g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'cpu')
+
+        t2 = timer()
+        res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
+        t3 = timer()
+        print (t3-t2)
+        np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal=3)
+
+            
+            
+        # CIL_FGP_TV no tolerance
+        #g_CIL = FGP_TV(ig, alpha, iters, tolerance=None, info=True)
+        g_CIL.tolerance = None
+        t0 = timer()
+        res1 = g_CIL.proximal(noisy_data, 1.)
+        t1 = timer()
+        print(t1-t0)
+        
+        ###################################################################
+        ###################################################################
+        ###################################################################
+        ###################################################################     
+    
+        data = dataexample.PEPPERS.get(size=(256, 256))
+        ig = data.geometry
+        ag = ig
+
+        noisy_data = noise.gaussian(data, seed=10)
+                    
+        alpha = 0.1
+        iters = 1000
+        
+        # CIL_FGP_TV no tolerance
+        g_CIL = alpha * TotalVariation(iters, tolerance=None)
+        t0 = timer()
+        res1 = g_CIL.proximal(noisy_data, 1.)
+        t1 = timer()
+        print(t1-t0)
+
+        # CCPi Regularisation toolkit high tolerance
+        r_alpha = alpha
+        r_iterations = iters
+        r_tolerance = 1e-8
+        r_iso = 0
+        r_nonneg = 0
+        r_printing = 0
+        g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'cpu')
+        
+        t2 = timer()
+        res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
+        t3 = timer()
+        print (t3-t2)
 
 
 class TestKullbackLeiblerNumba(unittest.TestCase):

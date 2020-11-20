@@ -38,15 +38,20 @@ class TotalVariation(Function):
                 
     Parameters:
       
-      :param domain: Domain of the reconstruction
-      :param regularising_parameter: Regularising parameter for the TV regulariser (Default = 1.)
-      :param iterations: Iterations of FGP algorithm (Default = 100)
-      :param tolerance: Stopping criterion (Default=1e-6)
-      :param correlation: Correlation between Space and/or SpaceChannels for the GradientOperator (Default='space')
-      :param backend: Backend to compute finite differences for the GradientOperator (Default='c')
-      :param lower: ( Default = - numpy.inf ) lower bound for the orthogonal projection onto the convex set C
-      :param upper: ( Default = + numpy.inf ) upper bound for the orthogonal projection onto the convex set C
-      
+      :param max_iteration: max iterations of FGP algorithm
+      :type max_iteration: int, default 100
+      :param tolerance: Stopping criterion
+      :type tolerance: float, default `None` 
+      :param correlation: Correlation between `Space` and/or `SpaceChannels` for the GradientOperator
+      :type correlation: str, default 'Space'
+      :param backend: Backend to compute finite differences for the GradientOperator
+      :type backend: str, default 'c'
+      :param lower:lower bound for the orthogonal projection onto the convex set C
+      :type lower: Number, default `-numpy.inf`
+      :param upper: upper bound for the orthogonal projection onto the convex set C
+      :type upper: Number, default `+numpy.inf`
+      :param info: force a print to screen stating the stop
+      :type info: bool, default `False`
     Reference:
       
         A. Beck and M. Teboulle, "Fast Gradient-Based Algorithms for Constrained Total Variation 
@@ -57,9 +62,9 @@ class TotalVariation(Function):
     '''    
     
     
-    def __init__(self, regularising_parameter=1., 
-                 iterations=100, 
-                 tolerance = 1e-6, 
+    def __init__(self,
+                 max_iteration=100, 
+                 tolerance = None, 
                  correlation = "Space",
                  backend = "c",
                  lower = -numpy.inf, 
@@ -69,15 +74,15 @@ class TotalVariation(Function):
 
         super(TotalVariation, self).__init__(L = None)
         # Regularising parameter = alpha
-        self.regularising_parameter = regularising_parameter
+        self.regularisation_parameter = 1.
         
         # Iterations for FGP_TV
-        self.iterations = iterations
+        self.iterations = max_iteration
         
         # Tolerance for FGP_TV
         self.tolerance = tolerance
         
-        # Define (ISOTROPIC) Total variation penalty ( Note it is without the regularising paremeter)
+        # Define (ISOTROPIC) Total variation penalty ( Note it is without the regularisation paremeter)
         # TODO add anisotropic???
         self.TV = MixedL21Norm() 
         
@@ -100,13 +105,22 @@ class TotalVariation(Function):
         
         # Print stopping information (iterations and tolerance error) of FGP_TV  
         self.info = info
-                    
+    @property
+    def regularisation_parameter(self):
+        return self._regularisation_parameter
+
+    @regularisation_parameter.setter
+    def regularisation_parameter(self, value):
+        if not isinstance(value, Number):
+            raise TypeError("regularisation_parameter: expectec a number, got {}".format(type(value)))
+        self._regularisation_parameter = value
+
     def __call__(self, x):
         
         r''' Returns the value of the \alpha * TV(x)'''
         self._domain = x.geometry
         # evaluate objective function of TV gradient
-        return self.regularising_parameter * self.TV(self.gradient.direct(x))
+        return self.regularisation_parameter * self.TV(self.gradient.direct(x))
     
     
     def projection_C(self, x, out=None):   
@@ -158,14 +172,14 @@ class TotalVariation(Function):
             self.gradient.adjoint(tmp_q, out = tmp_x)
             
             # axpby now works for matrices
-            tmp_x.axpby(-self.regularising_parameter*tau, 1.0, x, out=tmp_x)
+            tmp_x.axpby(-self.regularisation_parameter*tau, 1.0, x, out=tmp_x)
             self.projection_C(tmp_x, out = tmp_x)                       
 
             self.gradient.direct(tmp_x, out=p1)
             if isinstance (tau, (Number, np.float32, np.float64)):
-                p1 *= self.L/(self.regularising_parameter * tau)
+                p1 *= self.L/(self.regularisation_parameter * tau)
             else:
-                p1 *= self.L/self.regularising_parameter
+                p1 *= self.L/self.regularisation_parameter
                 p1 /= tau
 
             if self.tolerance is not None:
@@ -208,20 +222,20 @@ class TotalVariation(Function):
         # Print stopping information (iterations and tolerance error) of FGP_TV     
         if self.info:
             if self.tolerance is not None:
-                print("Stop at {} iterations with error {} .".format(k, error))
+                print("Stop at {} iterations with tolerance {} .".format(k, error))
             else:
                 print("Stop at {} iterations.".format(k))                
             
         if out is None:                        
             self.gradient.adjoint(tmp_q, out=tmp_x)
             tmp_x *= tau
-            tmp_x *= self.regularising_parameter 
+            tmp_x *= self.regularisation_parameter 
             x.subtract(tmp_x, out=tmp_x)
             return self.projection_C(tmp_x)
         else:          
             self.gradient.adjoint(tmp_q, out = out)
             out*=tau
-            out*=self.regularising_parameter
+            out*=self.regularisation_parameter
             x.subtract(out, out=out)
             self.projection_C(out, out=out)
     
@@ -254,6 +268,12 @@ class TotalVariation(Function):
             if self._domain is not None:
                 self._gradient = GradientOperator(self._domain, correlation = self.correlation, backend = self.backend)
         return self._gradient
+    def __rmul__(self, scalar):
+        if not isinstance (scalar, Number):
+            raise TypeError("scalar: Expectec a number, got {}".format(type(scalar)))
+        self.regularisation_parameter = scalar
+        return self
+
     
 
 if __name__ == '__main__':
@@ -263,7 +283,7 @@ if __name__ == '__main__':
     from cil.utilities import dataexample
     import os
     import sys
-    from cil.plugins.regularisers import FGP_TV as CCPiReg_FGP_TV
+    from cil.plugins.ccpi_regularisation.functions import FGP_TV as CCPiReg_FGP_TV
     from cil.filters import regularisers    
     from timeit import default_timer as timer       
     import tomophantom
@@ -305,7 +325,7 @@ if __name__ == '__main__':
     iters = 1000
         
     # CIL_FGP_TV no tolerance
-    g_CIL = TotalVariation(alpha, iters, tolerance=None, lower = 0, info = True)
+    g_CIL = alpha * TotalVariation(iters, tolerance=None, lower = 0, info = True)
     t0 = timer()
     res1 = g_CIL.proximal(noisy_data, 1.)
     t1 = timer()
@@ -351,7 +371,7 @@ if __name__ == '__main__':
     print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV with iterations.")
     iters = 408
     # CIL_FGP_TV no tolerance
-    g_CIL = TotalVariation(alpha, iters, tolerance=1e-9, lower = 0.)
+    g_CIL = alpha * TotalVariation(iters, tolerance=1e-9, lower = 0.)
     t0 = timer()
     res1 = g_CIL.proximal(noisy_data, 1.)
     t1 = timer()
@@ -420,7 +440,7 @@ if __name__ == '__main__':
     
     print("Use tau as an array of ones")
     # CIL_FGP_TV no tolerance
-    g_CIL = TotalVariation(alpha, iters, tolerance=None, info=True)
+    g_CIL = alpha * TotalVariation(iters, tolerance=None, info=True)
     t0 = timer()   
     res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
     t1 = timer()
@@ -520,7 +540,7 @@ if __name__ == '__main__':
     iters = 1000
     
     # CIL_FGP_TV no tolerance
-    g_CIL = TotalVariation(alpha, iters, tolerance=None)
+    g_CIL = alpha * TotalVariation(iters, tolerance=None)
     t0 = timer()
     res1 = g_CIL.proximal(noisy_data, 1.)
     t1 = timer()

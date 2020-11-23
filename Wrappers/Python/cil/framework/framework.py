@@ -2093,10 +2093,12 @@ class DataContainer(object):
                                  numpy.float, numpy.float16, numpy.float32, numpy.float64, \
                                  numpy.complex)):
                 out = pwop(self.as_array() , x2 , *args, **kwargs )
-            elif issubclass(type(x2) , DataContainer):
+            elif issubclass(x2.__class__ , DataContainer):
                 out = pwop(self.as_array() , x2.as_array() , *args, **kwargs )
+            elif isinstance(x2, numpy.ndarray):
+                out = pwop(self.as_array() , x2 , *args, **kwargs )
             else:
-                raise TypeError('Expected x2 type as number of DataContainer, got {}'.format(type(x2)))
+                raise TypeError('Expected x2 type as number or DataContainer, got {}'.format(type(x2)))
             geom = self.geometry
             if geom is not None:
                 geom = self.geometry.copy()
@@ -2371,6 +2373,13 @@ class DataContainer(object):
     def max(self, *args, **kwargs):
         '''Returns the max pixel value in the DataContainer'''
         return numpy.max(self.as_array(), *args, **kwargs)
+    
+    def mean(self, *args, **kwargs):
+        '''Returns the mean pixel value of the DataContainer'''
+        if kwargs.get('dtype', None) is None:
+            kwargs['dtype'] = numpy.float64
+        return numpy.mean(self.as_array(), *args, **kwargs)
+
     
     # Logic operators between DataContainers and floats    
     def __le__(self, other):
@@ -2705,7 +2714,6 @@ class AcquisitionData(DataContainer):
             return out
         else:
             if geometry_new is None:
-                print("Returning DataContainer")
                 return DataContainer(out.array, deep_copy=False, dimension_labels=dimension_labels, suppress_warning=True)
             else:
                 return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new, dimension_labels=dimension_labels, suppress_warning=True)

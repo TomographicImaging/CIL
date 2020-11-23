@@ -7,7 +7,7 @@ import numpy as np
 import unittest
 import shutil, glob
 
-class TIFFReadWrite(unittest.TestCase):
+class TIFFReadWriter(unittest.TestCase):
     def setUp(self):
         ig = ImageGeometry(10,11,12, channels=3)
 
@@ -20,7 +20,6 @@ class TIFFReadWrite(unittest.TestCase):
                 k += 1
         data.fill(arr)
         self.cwd = os.getcwd()
-        os.mkdir("test_tiff")
         fname = os.path.join(self.cwd, 'test_tiff','myfile.tif')
         self.data_dir = os.path.dirname(fname)
         writer = TIFFWriter(data=data, file_name=fname, counter_offset=0)
@@ -41,12 +40,12 @@ class TIFFReadWrite(unittest.TestCase):
     
     def test_read1(self):
         data = self.data
-        reader = TIFFStackReader(path = self.data_dir)
+        reader = TIFFStackReader(file_name = self.data_dir)
         read = reader.read()
         np.testing.assert_array_equal(read.flatten(), data.as_array().flatten())
     
     def test_read_as_ImageData1(self):
-        reader = TIFFStackReader(path = self.data_dir)
+        reader = TIFFStackReader(file_name = self.data_dir)
         
         img = reader.read_as_ImageData(self.ig)
         np.testing.assert_array_equal(img.as_array(), self.data.as_array())
@@ -54,7 +53,7 @@ class TIFFReadWrite(unittest.TestCase):
     def test_read_as_ImageData_Exceptions(self):
         igs = [ ImageGeometry(10,11,12, channels=5) ]
         igs.append( ImageGeometry(12,32) )
-        reader = TIFFStackReader(path = self.data_dir)
+        reader = TIFFStackReader(file_name = self.data_dir)
         
         for geom in igs:
             try:
@@ -71,7 +70,7 @@ class TIFFReadWrite(unittest.TestCase):
         ag.set_channels(3)
         print (ag.shape)
         # print (glob.glob(os.path.join(self.data_dir, '*')))
-        reader = TIFFStackReader(path = self.data_dir)
+        reader = TIFFStackReader(file_name = self.data_dir)
         acq = reader.read_as_AcquisitionData(ag)
 
         np.testing.assert_array_equal(acq.as_array(), self.data.as_array())
@@ -83,7 +82,7 @@ class TIFFReadWrite(unittest.TestCase):
         ag.set_angles([i for i in range(12)])
         ag.set_channels(3)
 
-        reader = TIFFStackReader(path = self.data_dir)
+        reader = TIFFStackReader(file_name = self.data_dir)
         acq = reader.read_as_AcquisitionData(ag)
 
         np.testing.assert_array_equal(acq.as_array().flatten(), self.data.as_array().flatten())
@@ -93,7 +92,7 @@ class TIFFReadWrite(unittest.TestCase):
             ag.set_panel([11,12])
             ag.set_angles([i for i in range(12)])
             ag.set_channels(3)
-            reader = TIFFStackReader(path = self.data_dir)
+            reader = TIFFStackReader(file_name = self.data_dir)
             try:
                 acq = reader.read_as_AcquisitionData(ag)
                 assert False
@@ -106,7 +105,7 @@ class TIFFReadWrite(unittest.TestCase):
             ag.set_panel([11,12])
             ag.set_angles([i for i in range(12)])
             ag.set_channels(3)
-            reader = TIFFStackReader(path = self.data_dir)
+            reader = TIFFStackReader(file_name = self.data_dir)
 
             try:
                 class Fake(object):
@@ -143,7 +142,7 @@ if __name__ == '__main__':
     ag.set_channels(3)
     print (ag.shape)
     print (glob.glob(os.path.join(data_dir, '*')))
-    reader = TIFFStackReader(path = os.path.dirname(fname))
+    reader = TIFFStackReader(file_name = os.path.dirname(fname))
     acq = reader.read_as_AcquisitionData(ag)
 
     print (type(acq), type(data))

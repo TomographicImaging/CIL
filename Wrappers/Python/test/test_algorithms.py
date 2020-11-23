@@ -31,7 +31,7 @@ from cil.optimisation.operators import IdentityOperator
 from cil.optimisation.operators import GradientOperator, BlockOperator, FiniteDifferenceOperator
 
 from cil.optimisation.functions import LeastSquares, ZeroFunction, \
-   L2NormSquared, FunctionOperatorComposition
+   L2NormSquared, OperatorCompositionFunction
 from cil.optimisation.functions import MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler                     
 from cil.optimisation.functions import IndicatorBox
 
@@ -197,7 +197,7 @@ class TestAlgorithms(unittest.TestCase):
 	#### it seems FISTA does not work with Nowm2Sq
         # norm2sq = Norm2Sq(identity, b)
         # norm2sq.L = 2 * norm2sq.c * identity.norm()**2
-        norm2sq = FunctionOperatorComposition(L2NormSquared(b=b), identity)
+        norm2sq = OperatorCompositionFunction(L2NormSquared(b=b), identity)
         opt = {'tol': 1e-4, 'memopt':False}
         print ("initial objective", norm2sq(x_init))
         alg = FISTA(x_init=x_init, f=norm2sq, g=ZeroFunction())
@@ -225,7 +225,7 @@ class TestAlgorithms(unittest.TestCase):
 	    #### it seems FISTA does not work with Nowm2Sq
         norm2sq = LeastSquares(identity, b)
         #norm2sq.L = 2 * norm2sq.c * identity.norm()**2
-        #norm2sq = FunctionOperatorComposition(L2NormSquared(b=b), identity)
+        #norm2sq = OperatorCompositionFunction(L2NormSquared(b=b), identity)
         opt = {'tol': 1e-4, 'memopt':False}
         print ("initial objective", norm2sq(x_init))
         alg = FISTA(x_init=x_init, f=norm2sq, g=ZeroFunction())
@@ -256,7 +256,7 @@ class TestAlgorithms(unittest.TestCase):
         print ('Lipschitz', norm2sq.L)
         # norm2sq.L = None
         #norm2sq.L = 2 * norm2sq.c * identity.norm()**2
-        #norm2sq = FunctionOperatorComposition(L2NormSquared(b=b), identity)
+        #norm2sq = OperatorCompositionFunction(L2NormSquared(b=b), identity)
         opt = {'tol': 1e-4, 'memopt':False}
         print ("initial objective", norm2sq(x_init))
         try:
@@ -399,7 +399,7 @@ class TestAlgorithms(unittest.TestCase):
         # Setup and run the FISTA algorithm
         operator = GradientOperator(ig)
         fid = KullbackLeibler(b=noisy_data)
-        reg = FunctionOperatorComposition(alpha * L2NormSquared(), operator)
+        reg = OperatorCompositionFunction(alpha * L2NormSquared(), operator)
 
         x_init = ig.allocate()
         fista = FISTA(x_init=x_init , f=reg, g=fid)
@@ -514,7 +514,7 @@ class TestSPDHG(unittest.TestCase):
         operator = Aop 
         f = KullbackLeibler(b=noisy_data)        
         alpha = 0.005
-        g =  TotalVariation(alpha, 50, 1e-4, lower=0)   
+        g =  alpha * TotalVariation(50, 1e-4, lower=0)   
         normK = operator.norm()
             
         #% 'implicit' PDHG, preconditioned step-sizes
@@ -547,7 +547,7 @@ class TestSPDHG(unittest.TestCase):
                                     for i in range(0, len(angles), size_of_subsets)])
         ## block function
         F = BlockFunction(*[KullbackLeibler(b=g[i]) for i in range(subsets)]) 
-        G = TotalVariation(alpha, 50, 1e-4, lower=0) 
+        G = alpha * TotalVariation(50, 1e-4, lower=0) 
     
         prob = [1/len(A)]*len(A)
         spdhg = SPDHG(f=F,g=G,operator=A, 

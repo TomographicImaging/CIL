@@ -46,6 +46,7 @@ requirements:
     - pillow
     - libgcc-ng # [linux]
     - openmp # [osx]
+    - vc14 # [win]
     - dxchange
     - olefile >=0.46
   

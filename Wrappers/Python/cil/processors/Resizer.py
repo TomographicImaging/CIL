@@ -18,11 +18,11 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from cil.framework import DataProcessor, AcquisitionData, ImageData
+from cil.framework import Processor, AcquisitionData, ImageData
 import warnings
 
 
-class Resizer(DataProcessor):
+class Resizer(Processor):
 
     def __init__(self,
                  roi = -1,

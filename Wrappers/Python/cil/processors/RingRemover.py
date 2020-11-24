@@ -21,9 +21,9 @@
 from scipy.fftpack import fftshift, ifftshift, fft, ifft
 import numpy as np
 import pywt
-from cil.framework import DataProcessor, ImageData, AcquisitionData
+from cil.framework import Processor, ImageData, AcquisitionData
 
-class RingRemover(DataProcessor):
+class RingRemover(Processor):
     
     '''
         RingRemover Processor: Removes vertical stripes from a DataContainer(ImageData/AcquisitionData) 

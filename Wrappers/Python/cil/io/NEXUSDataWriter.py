@@ -107,10 +107,10 @@ class NEXUSDataWriter(object):
                 ds_data.attrs['dimension'] = self.data.geometry.config.system.dimension   
                 ds_data.attrs['num_channels'] = self.data.geometry.config.channels.num_channels
                 
-                f.create_dataset('entry1/tomo_entry/config/detector/direction_row', 
-                                 (self.data.geometry.config.system.detector.direction_row.shape), 
+                f.create_dataset('entry1/tomo_entry/config/detector/direction_x', 
+                                 (self.data.geometry.config.system.detector.direction_x.shape), 
                                  dtype = 'float32', 
-                                 data = self.data.geometry.config.system.detector.direction_row)
+                                 data = self.data.geometry.config.system.detector.direction_x)
                 
                 f.create_dataset('entry1/tomo_entry/config/detector/position', 
                                  (self.data.geometry.config.system.detector.position.shape), 
@@ -136,12 +136,13 @@ class NEXUSDataWriter(object):
                 
                 ds_data.attrs['num_pixels_h'] = self.data.geometry.config.panel.num_pixels[0]
                 ds_data.attrs['pixel_size_h'] = self.data.geometry.config.panel.pixel_size[0]
-                
+                ds_data.attrs['panel_origin'] = self.data.geometry.config.panel.origin
+
                 if self.data.geometry.config.system.dimension == '3D':
-                    f.create_dataset('entry1/tomo_entry/config/detector/direction_col', 
-                                     (self.data.geometry.config.system.detector.direction_col.shape), 
+                    f.create_dataset('entry1/tomo_entry/config/detector/direction_y', 
+                                     (self.data.geometry.config.system.detector.direction_y.shape), 
                                      dtype = 'float32', 
-                                     data = self.data.geometry.config.system.detector.direction_col)
+                                     data = self.data.geometry.config.system.detector.direction_y)
                     
                     f.create_dataset('entry1/tomo_entry/config/rotation_axis/direction', 
                                  (self.data.geometry.config.system.rotation_axis.direction.shape), 

@@ -170,12 +170,12 @@ class NEXUSDataReader(object):
                 else:
                     rotation_axis_position = np.array(dfile['entry1/tomo_entry/config/rotation_axis/position'], dtype = 'float32')
                     detector_position = np.array(dfile['entry1/tomo_entry/config/detector/position'], dtype = 'float32')
-                    detector_direction_row = np.array(dfile['entry1/tomo_entry/config/detector/direction_row'], dtype = 'float32')
+                    detector_direction_x = np.array(dfile['entry1/tomo_entry/config/detector/direction_x'], dtype = 'float32')
                     ds_angles = dfile['entry1/tomo_entry/config/angles']
                     angles = np.array(ds_angles, dtype = 'float32')
                     angle_unit = ds_angles.attrs['angle_unit']
                     initial_angle = ds_angles.attrs['initial_angle']
-                    
+                                        
                     # dimension_labels = []
                     
                     # # if 4D
@@ -195,52 +195,52 @@ class NEXUSDataReader(object):
                         source_position = np.array(dfile['entry1/tomo_entry/config/source/position'], dtype = 'float32')
                         # if Cone3D
                         if ds_data.attrs['dimension'] == '3D':
-                            detector_direction_col = np.array(dfile['entry1/tomo_entry/config/detector/direction_col'], dtype = 'float32')
+                            detector_direction_y = np.array(dfile['entry1/tomo_entry/config/detector/direction_y'], dtype = 'float32')
                             rotation_axis_direction = np.array(dfile['entry1/tomo_entry/config/rotation_axis/direction'], dtype = 'float32')
                             self._geometry = AcquisitionGeometry.create_Cone3D(source_position=source_position,
                                                                                 rotation_axis_position=rotation_axis_position,
                                                                                 rotation_axis_direction=rotation_axis_direction,
                                                                                 detector_position=detector_position,
-                                                                                detector_direction_row=detector_direction_row,
-                                                                                detector_direction_col=detector_direction_col)
+                                                                                detector_direction_x=detector_direction_x,
+                                                                                detector_direction_y=detector_direction_y)
                         
                             self._geometry.set_panel((int(ds_data.attrs['num_pixels_h']), int(ds_data.attrs['num_pixels_v'])),
-                                                        pixel_size=(ds_data.attrs['pixel_size_h'], ds_data.attrs['pixel_size_v']))
+                                                        pixel_size=(ds_data.attrs['pixel_size_h'], ds_data.attrs['pixel_size_v']),origin=ds_data.attrs['panel_origin'])
                         # if Cone2D
                         else:
                             self._geometry = AcquisitionGeometry.create_Cone2D(source_position=source_position,
                                                                                 rotation_axis_position=rotation_axis_position,
                                                                                 detector_position=detector_position,
-                                                                                detector_direction_row=detector_direction_row)
+                                                                                detector_direction_x=detector_direction_x)
                         
                             self._geometry.set_panel(int(ds_data.attrs['num_pixels_h']),
-                                                        pixel_size=ds_data.attrs['pixel_size_h'])
+                                                        pixel_size=ds_data.attrs['pixel_size_h'],origin=ds_data.attrs['panel_origin'])
                     
                     # if parallel beam geometry
                     else:
                         ray_direction = np.array(dfile['entry1/tomo_entry/config/ray/direction'], dtype = 'float32')
                         # if Parallel3D
                         if ds_data.attrs['dimension'] == '3D':
-                            detector_direction_col = np.array(dfile['entry1/tomo_entry/config/detector/direction_col'], dtype = 'float32')
+                            detector_direction_y = np.array(dfile['entry1/tomo_entry/config/detector/direction_y'], dtype = 'float32')
                             rotation_axis_direction = np.array(dfile['entry1/tomo_entry/config/rotation_axis/direction'], dtype = 'float32')
                             self._geometry = AcquisitionGeometry.create_Parallel3D(ray_direction=ray_direction,
                                                                                     rotation_axis_position=rotation_axis_position,
                                                                                     rotation_axis_direction=rotation_axis_direction,
                                                                                     detector_position=detector_position,
-                                                                                    detector_direction_row=detector_direction_row,
-                                                                                    detector_direction_col=detector_direction_col)
+                                                                                    detector_direction_x=detector_direction_x,
+                                                                                    detector_direction_y=detector_direction_y)
                         
                             self._geometry.set_panel((int(ds_data.attrs['num_pixels_h']), int(ds_data.attrs['num_pixels_v'])),
-                                                        pixel_size=(ds_data.attrs['pixel_size_h'], ds_data.attrs['pixel_size_v']))
+                                                        pixel_size=(ds_data.attrs['pixel_size_h'], ds_data.attrs['pixel_size_v']),origin=ds_data.attrs['panel_origin'])
                         # if Parallel2D
                         else:
                             self._geometry = AcquisitionGeometry.create_Parallel2D(ray_direction=ray_direction,
                                                                                     rotation_axis_position=rotation_axis_position,
                                                                                     detector_position=detector_position,
-                                                                                    detector_direction_row=detector_direction_row)
+                                                                                    detector_direction_x=detector_direction_x)
                         
                             self._geometry.set_panel(int(ds_data.attrs['num_pixels_h']),
-                                                        pixel_size=ds_data.attrs['pixel_size_h'])
+                                                        pixel_size=ds_data.attrs['pixel_size_h'],origin=ds_data.attrs['panel_origin'])
                             
                     self._geometry.set_angles(angles, 
                                                 angle_unit=angle_unit,

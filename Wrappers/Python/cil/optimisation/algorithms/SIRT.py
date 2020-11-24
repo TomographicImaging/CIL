@@ -26,8 +26,8 @@ from __future__ import print_function
 
 from cil.optimisation.algorithms import Algorithm
 from cil.optimisation.functions import IndicatorBox
-
 from numpy import inf
+import warnings
 
 class SIRT(Algorithm):
 
@@ -39,19 +39,19 @@ class SIRT(Algorithm):
     
       A x = b
     
-    :param x_init: Initial guess
+    :param initial: Initial guess
     :param operator: Linear operator for the inverse problem
     :param data: Acquired data to reconstruct       
     :param constraint: Function proximal method
                 e.g.  :math:`x\in[0, 1]`, :code:`IndicatorBox` to enforce box constraints
                         Default is :code:`None`).
     '''
-    def __init__(self, x_init=None, operator=None, data=None, lower=None, upper=None, constraint=None, **kwargs):
+    def __init__(self, initial=None, operator=None, data=None, lower=None, upper=None, constraint=None, **kwargs):
         '''SIRT algorithm creator
 
        Optional parameters:
 
-      :param x_init: Initial guess
+      :param initial: Initial guess
       :param operator: Linear operator for the inverse problem
       :param data: Acquired data to reconstruct 
       :param lower: Scalar specifying lower bound constraint on pixel values, default -inf
@@ -60,14 +60,21 @@ class SIRT(Algorithm):
                    e.g.  :math:`x\in[0, 1]`, :code:`IndicatorBox` to enforce box constraints
                          Default is :code:`None`). constraint takes priority over lower and upper.'''
         super(SIRT, self).__init__(**kwargs)
+        if kwargs.get('x_init', None) is not None:
+            if initial is None:
+                warnings.warn('The use of the x_init parameter is deprecated and will be removed in following version. Use initial instead',
+                   DeprecationWarning, stacklevel=4)
+                initial = kwargs.get('x_init', None)
+            else:
+                raise ValueError('{} received both initial and the deprecated x_init parameter. It is not clear which one we should use.'\
+                    .format(self.__class__.__name__))
+        if initial is not None and operator is not None and data is not None:
+            self.set_up(initial=initial, operator=operator, data=data, lower=lower, upper=upper, constraint=constraint)
 
-        if x_init is not None and operator is not None and data is not None:
-            self.set_up(x_init=x_init, operator=operator, data=data, lower=lower, upper=upper, constraint=constraint)
-
-    def set_up(self, x_init, operator, data, lower=None, upper=None, constraint=None):
+    def set_up(self, initial, operator, data, lower=None, upper=None, constraint=None):
         '''initialisation of the algorithm
 
-        :param x_init: Initial guess
+        :param initial: Initial guess
         :param operator: Linear operator for the inverse problem
         :param data: Acquired data to reconstruct
         :param lower: Scalar specifying lower bound constraint on pixel values, default -inf
@@ -77,7 +84,7 @@ class SIRT(Algorithm):
                          Default is :code:`None`). constraint takes priority over lower and upper.'''
         print("{} setting up".format(self.__class__.__name__, ))
         
-        self.x = x_init.copy()
+        self.x = initial.copy()
         self.operator = operator
         self.data = data
         

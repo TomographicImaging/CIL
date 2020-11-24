@@ -22,6 +22,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 from cil.optimisation.algorithms import Algorithm
+import warnings
 
 class LADMM(Algorithm):
         
@@ -47,9 +48,9 @@ class LADMM(Algorithm):
                 
     '''
 
-    def __init__(self, f, g, operator, \
+    def __init__(self, f=None, g=None, operator=None, \
                        tau = None, sigma = 1., 
-                       x_init = None):
+                       initial = None, **kwargs):
         
         '''Initialisation of the algorithm
 
@@ -58,13 +59,23 @@ class LADMM(Algorithm):
         :param g: Convex function with "simple" proximal 
         :param sigma: Positive step size parameter 
         :param tau: Positive step size parameter
-        :param x_init: Initial guess ( Default x_init = 0)'''        
+        :param initial: Initial guess ( Default initial_guess = 0)'''        
         
         super(LADMM, self).__init__()
-        
-        self.set_up(f = f, g = g, operator = operator, tau = tau, sigma = sigma, x_init = x_init)        
+        if kwargs.get('x_init', None) is not None:
+            if initial is None:
+                warnings.warn('The use of the x_init parameter is deprecated and will be removed in following version. Use initial instead',
+                   DeprecationWarning, stacklevel=4)
+                initial = kwargs.get('x_init', None)
+            else:
+                raise ValueError('{} received both initial and the deprecated x_init parameter. It is not clear which one we should use.'\
+                    .format(self.__class__.__name__))
+
+        self.set_up(f = f, g = g, operator = operator, tau = tau,\
+             sigma = sigma, initial=initial)        
                     
-    def set_up(self, f, g, operator, tau = None, sigma = 1., x_init = None):
+    def set_up(self, f, g, operator, tau = None, sigma=1., \
+        initial=None):
 
         print("{} setting up".format(self.__class__.__name__, ))
         
@@ -82,10 +93,10 @@ class LADMM(Algorithm):
             normK = self.operator.norm()
             self.tau = self.sigma / normK ** 2
             
-        if x_init is None:
+        if initial is None:
             self.x = self.operator.domain_geometry().allocate()
         else:
-            self.x = x_init.copy()
+            self.x = initial.copy()
          
         # allocate space for operator direct & adjoint    
         self.tmp_dir = self.operator.range_geometry().allocate()

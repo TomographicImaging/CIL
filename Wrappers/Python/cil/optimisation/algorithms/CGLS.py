@@ -23,6 +23,7 @@ from __future__ import print_function
 
 from cil.optimisation.algorithms import Algorithm
 import numpy
+import warnings
 
 class CGLS(Algorithm):
 
@@ -39,39 +40,46 @@ class CGLS(Algorithm):
     Parameters :
         
       :parameter operator : Linear operator for the inverse problem
-      :parameter x_init : Initial guess ( Default x_init = 0)
+      :parameter initial : Initial guess ( Default initial = 0)
       :parameter data : Acquired data to reconstruct       
       :parameter tolerance: Tolerance/ Stopping Criterion to end CGLS algorithm
       
     Reference:
         https://web.stanford.edu/group/SOL/software/cgls/
     '''
-    def __init__(self, x_init=None, operator=None, data=None, tolerance=1e-6, **kwargs):
+    def __init__(self, initial=None, operator=None, data=None, tolerance=1e-6, **kwargs):
         '''initialisation of the algorithm
 
         :param operator : Linear operator for the inverse problem
-        :param x_init : Initial guess ( Default x_init = 0)
+        :param initial : Initial guess ( Default initial = 0)
         :param data : Acquired data to reconstruct       
         :param tolerance: Tolerance/ Stopping Criterion to end CGLS algorithm
         '''
         super(CGLS, self).__init__(**kwargs)
-        
-        if x_init is None and operator is not None:
-            x_init = operator.domain_geometry().allocate(0)
-        if x_init is not None and operator is not None and data is not None:
-            self.set_up(x_init=x_init, operator=operator, data=data, tolerance=tolerance)
+        if kwargs.get('x_init', None) is not None:
+            if initial is None:
+                warnings.warn('The use of the x_init parameter is deprecated and will be removed in following version. Use initial instead',
+                   DeprecationWarning, stacklevel=4)
+                initial = kwargs.get('x_init', None)
+            else:
+                raise ValueError('{} received both initial and the deprecated x_init parameter. It is not clear which one we should use.'\
+                    .format(self.__class__.__name__))
+        if initial is None and operator is not None:
+            initial = operator.domain_geometry().allocate(0)
+        if initial is not None and operator is not None and data is not None:
+            self.set_up(initial=initial, operator=operator, data=data, tolerance=tolerance)
 
-    def set_up(self, x_init, operator, data, tolerance=1e-6):
+    def set_up(self, initial, operator, data, tolerance=1e-6):
         '''initialisation of the algorithm
 
         :param operator: Linear operator for the inverse problem
-        :param x_init: Initial guess ( Default x_init = 0)
+        :param initial: Initial guess ( Default initial = 0)
         :param data: Acquired data to reconstruct       
         :param tolerance: Tolerance/ Stopping Criterion to end CGLS algorithm
         '''
         print("{} setting up".format(self.__class__.__name__, ))
         
-        self.x = x_init * 0.
+        self.x = initial * 0.
         self.operator = operator
         self.tolerance = tolerance
 

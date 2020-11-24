@@ -26,6 +26,7 @@ from __future__ import print_function
 
 import numpy
 from cil.optimisation.algorithms import Algorithm
+import warnings
 
 class GD(Algorithm):
     ''' 
@@ -35,13 +36,13 @@ class GD(Algorithm):
         
     '''
 
-    def __init__(self, x_init=None, objective_function=None, step_size =None, **kwargs):
+    def __init__(self, initial=None, objective_function=None, step_size =None, **kwargs):
         '''GD algorithm creator
         
         initialisation can be done at creation time if all 
         proper variables are passed or later with set_up
         
-        :param x_init: initial guess
+        :param initial: initial guess
         :param objective_function: objective function to be minimised
         :param step_size: step size for gradient descent iteration
         :param alpha: optional parameter to start the backtracking algorithm, default 1e6
@@ -53,30 +54,38 @@ class GD(Algorithm):
                      current objective function to 0, default 1e-8, see numpy.isclose
         '''
         super(GD, self).__init__(**kwargs)
+        if kwargs.get('x_init', None) is not None:
+            if initial is None:
+                warnings.warn('The use of the x_init parameter is deprecated and will be removed in following version. Use initial instead',
+                   DeprecationWarning, stacklevel=4)
+                initial = kwargs.get('x_init', None)
+            else:
+                raise ValueError('{} received both initial and the deprecated x_init parameter. It is not clear which one we should use.'\
+                    .format(self.__class__.__name__))
 
         self.alpha = kwargs.get('alpha' , 1e6)
         self.beta = kwargs.get('beta', 0.5)
         self.rtol = kwargs.get('rtol', 1e-5)
         self.atol = kwargs.get('atol', 1e-8)
-        if x_init is not None and objective_function is not None :
-            self.set_up(x_init=x_init, objective_function=objective_function, step_size=step_size)
+        if initial is not None and objective_function is not None :
+            self.set_up(initial=initial, objective_function=objective_function, step_size=step_size)
     
-    def set_up(self, x_init, objective_function, step_size):
+    def set_up(self, initial, objective_function, step_size):
         '''initialisation of the algorithm
         
-        :param x_init: initial guess
+        :param initial: initial guess
         :param objective_function: objective function to be minimised
         :param step_size: step size'''
         print("{} setting up".format(self.__class__.__name__, ))
             
-        self.x = x_init.copy()
+        self.x = initial.copy()
         self.objective_function = objective_function
         
 
         if step_size is None:
             self.k = 0
             self.update_step_size = True
-            self.x_armijo = x_init.copy()
+            self.x_armijo = initial.copy()
             # self.rate = self.armijo_rule() * 2
             # print (self.rate)
         else:
@@ -87,7 +96,7 @@ class GD(Algorithm):
         self.update_objective()
         self.iteration = 0
 
-        self.x_update = x_init.copy()
+        self.x_update = initial.copy()
 
         self.configured = True
         print("{} configured".format(self.__class__.__name__, ))

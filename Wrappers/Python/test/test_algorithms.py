@@ -42,6 +42,7 @@ from cil.optimisation.algorithms import SIRT
 from cil.optimisation.algorithms import FISTA
 from cil.optimisation.algorithms import SPDHG
 from cil.optimisation.algorithms import PDHG
+from cil.optimisation.algorithms import LADMM
 
 from cil.utilities import dataexample
 from cil.utilities import noise as applynoise
@@ -79,23 +80,23 @@ class TestAlgorithms(unittest.TestCase):
     def test_GD(self):
         print ("Test GD")
         ig = ImageGeometry(12,13,14)
-        x_init = ig.allocate()
-        # b = x_init.copy()
+        initial = ig.allocate()
+        # b = initial.copy()
         # fill with random numbers
-        # b.fill(numpy.random.random(x_init.shape))
+        # b.fill(numpy.random.random(initial.shape))
         b = ig.allocate('random')
         identity = IdentityOperator(ig)
         
         norm2sq = LeastSquares(identity, b)
         rate = norm2sq.L / 3.
         
-        alg = GD(x_init=x_init, 
+        alg = GD(initial=initial, 
                               objective_function=norm2sq, 
                               rate=rate, atol=1e-9, rtol=1e-6)
         alg.max_iteration = 1000
         alg.run()
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-        alg = GD(x_init=x_init, 
+        alg = GD(initial=initial, 
                               objective_function=norm2sq, 
                               rate=rate, max_iteration=20,
                               update_objective_interval=2,
@@ -108,22 +109,22 @@ class TestAlgorithms(unittest.TestCase):
     def test_GDArmijo(self):
         print ("Test GD")
         ig = ImageGeometry(12,13,14)
-        x_init = ig.allocate()
-        # b = x_init.copy()
+        initial = ig.allocate()
+        # b = initial.copy()
         # fill with random numbers
-        # b.fill(numpy.random.random(x_init.shape))
+        # b.fill(numpy.random.random(initial.shape))
         b = ig.allocate('random')
         identity = IdentityOperator(ig)
         
         norm2sq = LeastSquares(identity, b)
         rate = None
         
-        alg = GD(x_init=x_init, 
+        alg = GD(initial=initial, 
                               objective_function=norm2sq, rate=rate)
         alg.max_iteration = 100
         alg.run()
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-        alg = GD(x_init=x_init, 
+        alg = GD(initial=initial, 
                               objective_function=norm2sq, 
                               max_iteration=20,
                               update_objective_interval=2)
@@ -162,22 +163,22 @@ class TestAlgorithms(unittest.TestCase):
         #ig = ImageGeometry(124,153,154)
         ig = ImageGeometry(10,2)
         numpy.random.seed(2)
-        x_init = ig.allocate(0.)
+        initial = ig.allocate(0.)
         b = ig.allocate('random')
-        # b = x_init.copy()
+        # b = initial.copy()
         # fill with random numbers
-        # b.fill(numpy.random.random(x_init.shape))
+        # b.fill(numpy.random.random(initial.shape))
         # b = ig.allocate()
         # bdata = numpy.reshape(numpy.asarray([i for i in range(20)]), (2,10))
         # b.fill(bdata)
         identity = IdentityOperator(ig)
         
-        alg = CGLS(x_init=x_init, operator=identity, data=b)
+        alg = CGLS(initial=initial, operator=identity, data=b)
         alg.max_iteration = 200
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
-        alg = CGLS(x_init=x_init, operator=identity, data=b, max_iteration=200, update_objective_interval=2)
+        alg = CGLS(initial=initial, operator=identity, data=b, max_iteration=200, update_objective_interval=2)
         self.assertTrue(alg.max_iteration == 200)
         self.assertTrue(alg.update_objective_interval==2)
         alg.run(20, verbose=True)
@@ -187,11 +188,11 @@ class TestAlgorithms(unittest.TestCase):
     def test_FISTA(self):
         print ("Test FISTA")
         ig = ImageGeometry(127,139,149)
-        x_init = ig.allocate()
-        b = x_init.copy()
+        initial = ig.allocate()
+        b = initial.copy()
         # fill with random numbers
-        b.fill(numpy.random.random(x_init.shape))
-        x_init = ig.allocate(ImageGeometry.RANDOM)
+        b.fill(numpy.random.random(initial.shape))
+        initial = ig.allocate(ImageGeometry.RANDOM)
         identity = IdentityOperator(ig)
         
 	#### it seems FISTA does not work with Nowm2Sq
@@ -199,13 +200,13 @@ class TestAlgorithms(unittest.TestCase):
         # norm2sq.L = 2 * norm2sq.c * identity.norm()**2
         norm2sq = OperatorCompositionFunction(L2NormSquared(b=b), identity)
         opt = {'tol': 1e-4, 'memopt':False}
-        print ("initial objective", norm2sq(x_init))
-        alg = FISTA(x_init=x_init, f=norm2sq, g=ZeroFunction())
+        print ("initial objective", norm2sq(initial))
+        alg = FISTA(initial=initial, f=norm2sq, g=ZeroFunction())
         alg.max_iteration = 2
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
-        alg = FISTA(x_init=x_init, f=norm2sq, g=ZeroFunction(), max_iteration=2, update_objective_interval=2)
+        alg = FISTA(initial=initial, f=norm2sq, g=ZeroFunction(), max_iteration=2, update_objective_interval=2)
         
         self.assertTrue(alg.max_iteration == 2)
         self.assertTrue(alg.update_objective_interval==2)
@@ -219,7 +220,7 @@ class TestAlgorithms(unittest.TestCase):
         ig = ImageGeometry(127,139,149)
         b = ig.allocate(ImageGeometry.RANDOM)
         # fill with random numbers
-        x_init = ig.allocate(ImageGeometry.RANDOM)
+        initial = ig.allocate(ImageGeometry.RANDOM)
         identity = IdentityOperator(ig)
         
 	    #### it seems FISTA does not work with Nowm2Sq
@@ -227,13 +228,13 @@ class TestAlgorithms(unittest.TestCase):
         #norm2sq.L = 2 * norm2sq.c * identity.norm()**2
         #norm2sq = OperatorCompositionFunction(L2NormSquared(b=b), identity)
         opt = {'tol': 1e-4, 'memopt':False}
-        print ("initial objective", norm2sq(x_init))
-        alg = FISTA(x_init=x_init, f=norm2sq, g=ZeroFunction())
+        print ("initial objective", norm2sq(initial))
+        alg = FISTA(initial=initial, f=norm2sq, g=ZeroFunction())
         alg.max_iteration = 2
         alg.run(20, verbose=True)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
-        alg = FISTA(x_init=x_init, f=norm2sq, g=ZeroFunction(), max_iteration=2, update_objective_interval=3)
+        alg = FISTA(initial=initial, f=norm2sq, g=ZeroFunction(), max_iteration=2, update_objective_interval=3)
         self.assertTrue(alg.max_iteration == 2)
         self.assertTrue(alg.update_objective_interval== 3)
 
@@ -243,12 +244,12 @@ class TestAlgorithms(unittest.TestCase):
     def test_FISTA_catch_Lipschitz(self):
         print ("Test FISTA catch Lipschitz")
         ig = ImageGeometry(127,139,149)
-        x_init = ImageData(geometry=ig)
-        x_init = ig.allocate()
-        b = x_init.copy()
+        initial = ImageData(geometry=ig)
+        initial = ig.allocate()
+        b = initial.copy()
         # fill with random numbers  
-        b.fill(numpy.random.random(x_init.shape))
-        x_init = ig.allocate(ImageGeometry.RANDOM)
+        b.fill(numpy.random.random(initial.shape))
+        initial = ig.allocate(ImageGeometry.RANDOM)
         identity = IdentityOperator(ig)
         
 	    #### it seems FISTA does not work with Nowm2Sq
@@ -258,9 +259,9 @@ class TestAlgorithms(unittest.TestCase):
         #norm2sq.L = 2 * norm2sq.c * identity.norm()**2
         #norm2sq = OperatorCompositionFunction(L2NormSquared(b=b), identity)
         opt = {'tol': 1e-4, 'memopt':False}
-        print ("initial objective", norm2sq(x_init))
+        print ("initial objective", norm2sq(initial))
         try:
-            alg = FISTA(x_init=x_init, f=L1Norm(), g=ZeroFunction())
+            alg = FISTA(initial=initial, f=L1Norm(), g=ZeroFunction())
             self.assertTrue(False)
         except ValueError as ve:
             print (ve)
@@ -401,8 +402,8 @@ class TestAlgorithms(unittest.TestCase):
         fid = KullbackLeibler(b=noisy_data)
         reg = OperatorCompositionFunction(alpha * L2NormSquared(), operator)
 
-        x_init = ig.allocate()
-        fista = FISTA(x_init=x_init , f=reg, g=fid)
+        initial = ig.allocate()
+        fista = FISTA(initial=initial , f=reg, g=fid)
         fista.max_iteration = 3000
         fista.update_objective_interval = 500
         fista.run(verbose=True)
@@ -428,28 +429,116 @@ class TestAlgorithms(unittest.TestCase):
             print(err)
         self.assertTrue(res)
 
+    def test_exception_initial_SIRT(self):
+        print ("Test CGLS")
+        ig = ImageGeometry(10,2)
+        numpy.random.seed(2)
+        initial = ig.allocate(0.)
+        b = ig.allocate('random')
+        identity = IdentityOperator(ig)
+        
+        try:
+            alg = SIRT(initial=initial, operator=identity, data=b, x_init=initial)
+            assert False
+        except ValueError as ve:
+            assert True
+    def test_exception_initial_CGLS(self):
+        print ("Test CGLS")
+        ig = ImageGeometry(10,2)
+        numpy.random.seed(2)
+        initial = ig.allocate(0.)
+        b = ig.allocate('random')
+        identity = IdentityOperator(ig)
+        
+        try:
+            alg = SIRT(initial=initial, operator=identity, data=b, x_init=initial)
+            assert False
+        except ValueError as ve:
+            assert True
+    def test_exception_initial_FISTA(self):
+        print ("Test FISTA")
+        ig = ImageGeometry(127,139,149)
+        initial = ig.allocate()
+        b = initial.copy()
+        # fill with random numbers
+        b.fill(numpy.random.random(initial.shape))
+        initial = ig.allocate(ImageGeometry.RANDOM)
+        identity = IdentityOperator(ig)
+        
+        norm2sq = OperatorCompositionFunction(L2NormSquared(b=b), identity)
+        opt = {'tol': 1e-4, 'memopt':False}
+        print ("initial objective", norm2sq(initial))
+        try:
+            alg = FISTA(initial=initial, f=norm2sq, g=ZeroFunction(), x_init=initial)
+            assert False
+        except ValueError as ve:
+            assert True
+    def test_exception_initial_GD(self):
+        print ("Test FISTA")
+        ig = ImageGeometry(127,139,149)
+        initial = ig.allocate()
+        b = initial.copy()
+        # fill with random numbers
+        b.fill(numpy.random.random(initial.shape))
+        initial = ig.allocate(ImageGeometry.RANDOM)
+        identity = IdentityOperator(ig)
+        
+        norm2sq = OperatorCompositionFunction(L2NormSquared(b=b), identity)
+        opt = {'tol': 1e-4, 'memopt':False}
+        print ("initial objective", norm2sq(initial))
+        try:
+            alg = GD(initial=initial, objective_function=norm2sq, x_init=initial)
+            assert False
+        except ValueError as ve:
+            assert True
+    def test_exception_initial_LADMM(self):
+        ig = ImageGeometry(10,10)
+        # K = Identity(ig)
+        # b = ig.allocate(0)
+        # f = LeastSquares(K, b)
+        # g = IndicatorBox(lower=0)
+        initial = ig.allocate(1)
+        try:
+            algo = LADMM(initial = initial, x_init=initial)
+            assert False
+        except ValueError as ve:
+            assert True
+    def test_exception_initial_PDHG(self):
+        initial = 1
+        try:
+            algo = PDHG(initial = initial, x_init=initial)
+            assert False
+        except ValueError as ve:
+            assert True
+    def test_exception_initial_SPDHG(self):
+        initial = 1
+        try:
+            algo = SPDHG(initial = initial, x_init=initial)
+            assert False
+        except ValueError as ve:
+            assert True
 class TestSIRT(unittest.TestCase):
     def test_SIRT(self):
         print ("Test CGLS")
         #ig = ImageGeometry(124,153,154)
         ig = ImageGeometry(10,2)
         numpy.random.seed(2)
-        x_init = ig.allocate(0.)
+        initial = ig.allocate(0.)
         b = ig.allocate('random')
-        # b = x_init.copy()
+        # b = initial.copy()
         # fill with random numbers
-        # b.fill(numpy.random.random(x_init.shape))
+        # b.fill(numpy.random.random(initial.shape))
         # b = ig.allocate()
         # bdata = numpy.reshape(numpy.asarray([i for i in range(20)]), (2,10))
         # b.fill(bdata)
         identity = IdentityOperator(ig)
         
-        alg = SIRT(x_init=x_init, operator=identity, data=b)
+        alg = SIRT(initial=initial, operator=identity, data=b)
         alg.max_iteration = 200
         alg.run(20, verbose=True)
         np.testing.assert_array_almost_equal(alg.x.as_array(), b.as_array())
         
-        alg2 = SIRT(x_init=x_init, operator=identity, data=b, upper=0.3)
+        alg2 = SIRT(initial=initial, operator=identity, data=b, upper=0.3)
         alg2.max_iteration = 200
         alg2.run(20, verbose=True)
         # equal 
@@ -522,7 +611,7 @@ class TestSPDHG(unittest.TestCase):
         sigma_tmp = 1.
         tau = sigma_tmp / operator.adjoint(tau_tmp * operator.range_geometry().allocate(1.))
         sigma = tau_tmp / operator.direct(sigma_tmp * operator.domain_geometry().allocate(1.))
-    #    x_init = operator.domain_geometry().allocate()
+    #    initial = operator.domain_geometry().allocate()
     
     #    # Setup and run the PDHG algorithm
         pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma,

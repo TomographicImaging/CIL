@@ -22,6 +22,7 @@ from __future__ import division
 from __future__ import print_function
 
 from cil.optimisation.algorithms import Algorithm
+import warnings
 
 
 
@@ -59,7 +60,7 @@ class PDHG(Algorithm):
         SIAM J. Imaging Sci. 3, 1015–1046.
     '''
 
-    def __init__(self, f=None, g=None, operator=None, tau=None, sigma=1.,x_init=None, use_axpby=True, **kwargs):
+    def __init__(self, f=None, g=None, operator=None, tau=None, sigma=1.,initial=None, use_axpby=True, **kwargs):
         '''PDHG algorithm creator
 
         Optional parameters
@@ -69,15 +70,23 @@ class PDHG(Algorithm):
         :param g: Convex function with "simple" proximal 
         :param sigma: Step size parameter for Primal problem
         :param tau: Step size parameter for Dual problem
-        :param x_init: Initial guess ( Default x_init = 0)
+        :param initial: Initial guess ( Default initial = 0)
         '''
         super(PDHG, self).__init__(**kwargs)
+        if kwargs.get('x_init', None) is not None:
+            if initial is None:
+                warnings.warn('The use of the x_init parameter is deprecated and will be removed in following version. Use initial instead',
+                   DeprecationWarning, stacklevel=4)
+                initial = kwargs.get('x_init', None)
+            else:
+                raise ValueError('{} received both initial and the deprecated x_init parameter. It is not clear which one we should use.'\
+                    .format(self.__class__.__name__))
         self._use_axpby = use_axpby
 
         if f is not None and operator is not None and g is not None:
-            self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, x_init=x_init)
+            self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, initial=initial)
 
-    def set_up(self, f, g, operator, tau=None, sigma=1., x_init=None):
+    def set_up(self, f, g, operator, tau=None, sigma=1., initial=None):
         '''initialisation of the algorithm
 
         :param operator: a Linear Operator
@@ -85,7 +94,7 @@ class PDHG(Algorithm):
         :param g: Convex function with "simple" proximal 
         :param sigma: Step size parameter for Primal problem
         :param tau: Step size parameter for Dual problem
-        :param x_init: Initial guess ( Default x_init = 0)'''
+        :param initial: Initial guess ( Default initial = 0)'''
 
         print("{} setting up".format(self.__class__.__name__, ))
         
@@ -106,10 +115,10 @@ class PDHG(Algorithm):
             # Primal & dual stepsizes
             self.tau = 1 / (self.sigma * normK ** 2)
         
-        if x_init is None:
+        if initial is None:
             self.x_old = self.operator.domain_geometry().allocate()
         else:
-            self.x_old = x_init.copy()
+            self.x_old = initial.copy()
 
         self.x = operator.domain_geometry().allocate(0)        
         self.y = self.operator.range_geometry().allocate(0)

@@ -25,6 +25,7 @@ from __future__ import print_function
 from cil.optimisation.algorithms import Algorithm
 from cil.optimisation.functions import ZeroFunction
 import numpy
+import warnings
 
 class FISTA(Algorithm):
     
@@ -40,7 +41,7 @@ class FISTA(Algorithm):
     
     Parameters :
         
-      :param x_init: Initial guess ( Default x_init = 0)
+      :param initial: Initial guess ( Default initial = 0)
       :param f: Differentiable function
       :param g: Convex function with " simple " proximal operator
 
@@ -53,7 +54,7 @@ class FISTA(Algorithm):
     '''
     
     
-    def __init__(self, x_init=None, f=None, g=ZeroFunction(), **kwargs):
+    def __init__(self, initial=None, f=None, g=ZeroFunction(), **kwargs):
         
         '''FISTA algorithm creator 
         
@@ -62,28 +63,36 @@ class FISTA(Algorithm):
         
         Optional parameters:
 
-        :param x_init: Initial guess ( Default x_init = 0)
+        :param initial: Initial guess ( Default initial = 0)
         :param f: Differentiable function
         :param g: Convex function with " simple " proximal operator'''
         
         super(FISTA, self).__init__(**kwargs)
+        if kwargs.get('x_init', None) is not None:
+            if initial is None:
+                warnings.warn('The use of the x_init parameter is deprecated and will be removed in following version. Use initial instead',
+                   DeprecationWarning, stacklevel=4)
+                initial = kwargs.get('x_init', None)
+            else:
+                raise ValueError('{} received both initial and the deprecated x_init parameter. It is not clear which one we should use.'\
+                    .format(self.__class__.__name__))
         
-        if x_init is not None and f is not None:
-            self.set_up(x_init=x_init, f=f, g=g)
+        if initial is not None and f is not None:
+            self.set_up(initial=initial, f=f, g=g)
 
-    def set_up(self, x_init, f, g=ZeroFunction()):
+    def set_up(self, initial, f, g=ZeroFunction()):
         '''initialisation of the algorithm
 
-        :param x_init: Initial guess ( Default x_init = 0)
+        :param initial: Initial guess ( Default initial = 0)
         :param f: Differentiable function
         :param g: Convex function with " simple " proximal operator'''
 
         print("{} setting up".format(self.__class__.__name__, ))
         
-        self.y = x_init.copy()
-        self.x_old = x_init.copy()
-        self.x = x_init.copy()
-        self.u = x_init.copy()
+        self.y = initial.copy()
+        self.x_old = initial.copy()
+        self.x = initial.copy()
+        self.u = initial.copy()
 
         self.f = f
         self.g = g

@@ -22,6 +22,7 @@ from __future__ import division
 from __future__ import print_function
 from cil.optimisation.algorithms import Algorithm
 import numpy as np
+import warnings
 
 class SPDHG(Algorithm):
     r'''Stochastic Primal Dual Hybrid Gradient
@@ -37,7 +38,7 @@ class SPDHG(Algorithm):
     :param g: Convex function with "simple" proximal 
     :param sigma=(sigma_i): List of Step size parameters for Dual problem
     :param tau: Step size parameter for Primal problem
-    :param x_init: Initial guess ( Default x_init = 0)
+    :param initial: Initial guess ( Default initial = 0)
     :param prob: List of probabilities
         
     Remark: Convergence is guaranted provided that [2, eq. (12)]:
@@ -67,7 +68,7 @@ class SPDHG(Algorithm):
         
     '''
     def __init__(self, f=None, g=None, operator=None, tau=None, sigma=None,
-                 x_init=None, prob=None, gamma=1., use_axpby=True, 
+                 initial=None, prob=None, gamma=1., use_axpby=True, 
                  norms=None, **kwargs):
         '''SPDHG algorithm creator
 
@@ -77,7 +78,7 @@ class SPDHG(Algorithm):
         :param g: Convex function with "simple" proximal 
         :param sigma=(sigma_i): List of Step size parameters for Dual problem
         :param tau: Step size parameter for Primal problem
-        :param x_init: Initial guess ( Default x_init = 0)
+        :param initial: Initial guess ( Default initial = 0)
         :param prob: List of probabilities
         :param gamma: parameter controlling the trade-off between the primal and dual step sizes
         :param use_axpby: whether to use axpby or not
@@ -85,13 +86,23 @@ class SPDHG(Algorithm):
         :type norms: list, default None
         '''
         super(SPDHG, self).__init__(**kwargs)
+
+        if kwargs.get('x_init', None) is not None:
+            if initial is None:
+                warnings.warn('The use of the x_init parameter is deprecated and will be removed in following version. Use initial instead',
+                   DeprecationWarning, stacklevel=4)
+                initial = kwargs.get('x_init', None)
+            else:
+                raise ValueError('{} received both initial and the deprecated x_init parameter. It is not clear which one we should use.'\
+                    .format(self.__class__.__name__))
+                    
         self._use_axpby = use_axpby
         if f is not None and operator is not None and g is not None:
             self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, 
-                        x_init=x_init, prob=prob, gamma=gamma, norms=norms)
+                        initial=initial, prob=prob, gamma=gamma, norms=norms)
     
     def set_up(self, f, g, operator, tau=None, sigma=None, \
-               x_init=None, prob=None, gamma=1., norms=None):
+               initial=None, prob=None, gamma=1., norms=None):
         '''initialisation of the algorithm
 
         :param operator: BlockOperator of Linear Operators
@@ -99,7 +110,7 @@ class SPDHG(Algorithm):
         :param g: Convex function with "simple" proximal 
         :param sigma: list of Step size parameters for dual problem
         :param tau: Step size parameter for primal problem
-        :param x_init: Initial guess ( Default x_init = 0)
+        :param initial: Initial guess ( Default initial = 0)
         :param prob: List of probabilities'''
         print("{} setting up".format(self.__class__.__name__, ))
                     
@@ -129,10 +140,10 @@ class SPDHG(Algorithm):
             self.tau *= (self.rho / self.gamma)
 
         # initialize primal variable 
-        if x_init is None:
+        if initial is None:
             self.x = self.operator.domain_geometry().allocate(0)
         else:
-            self.x = x_init.copy()
+            self.x = initial.copy()
         
         self.x_tmp = self.operator.domain_geometry().allocate(0)
         

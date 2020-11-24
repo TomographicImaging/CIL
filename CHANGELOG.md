@@ -1,4 +1,7 @@
-* 20.*
+* 20.11.x
+  - fixed windows build
+
+* 20.11
   - python module renamed to cil
   - renamed Identity->IdentityOperator, Gradient->GradientOperator, SymmetrisedGradient->SymmetrisedGradientOperator
 

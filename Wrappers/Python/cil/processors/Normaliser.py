@@ -19,11 +19,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from cil.framework import DataProcessor, DataContainer, AcquisitionData,\
+from cil.framework import Processor, DataContainer, AcquisitionData,\
  AcquisitionGeometry, ImageGeometry, ImageData
 import numpy
 
-class Normaliser(DataProcessor):
+class Normaliser(Processor):
     '''Normalization based on flat and dark
     
     This processor read in a AcquisitionData and normalises it based on 

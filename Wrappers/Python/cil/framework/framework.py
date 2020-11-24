@@ -2718,7 +2718,7 @@ class AcquisitionData(DataContainer):
             else:
                 return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new, dimension_labels=dimension_labels, suppress_warning=True)
 
-class DataProcessor(object):
+class Processor(object):
     
     '''Defines a generic DataContainer processor
     
@@ -2836,7 +2836,11 @@ class DataProcessor(object):
         
         self.set_input(x)
         return self.get_output()        
-                
+
+class DataProcessor(Processor):
+    '''Basically an alias of Processor Class'''
+    pass
+
 class DataProcessor23D(DataProcessor):
     '''Regularizers DataProcessor
     '''

@@ -19,11 +19,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from cil.framework import DataProcessor, AcquisitionData
+from cil.framework import Processor, AcquisitionData
 import numpy as np
 from scipy import signal
 
-class CofR_xcorr(DataProcessor):
+class CofR_xcorr(Processor):
 
     r'''CofR_xcorr processor uses the cross-correlation algorithm on a single slice between two projections at 180 degrees inteval.
 

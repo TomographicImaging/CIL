@@ -958,7 +958,7 @@ class Panel(object):
     :param pixel_size: pixel_size_h or (pixel_size_h, pixel_size_v) containing the size of the pixels of the panel
     :type pixel_size: int, lust, tuple
     :param origin: the position of pixel 0 (the data origin) of the panel `top-left`, `top-right`, `bottom-left`, `bottom-right`
-    :type origin: string   
+    :type origin: string 
      '''
 
     @property
@@ -1523,7 +1523,7 @@ class AcquisitionGeometry(object):
         self.config.angles = Angles(angles, initial_angle, angle_unit)
         return self
 
-    def set_panel(self, num_pixels, pixel_size=(1,1), origin='top-left'):
+    def set_panel(self, num_pixels, pixel_size=(1,1), origin='bottom-left'):
 
         r'''This method configures the panel information of an AcquisitionGeometry object. 
                     
@@ -1531,8 +1531,8 @@ class AcquisitionGeometry(object):
         :type num_pixels: int, list, tuple
         :param pixel_size: pixel_size_h or (pixel_size_h, pixel_size_v) containing the size of the pixels of the panel
         :type pixel_size: int, list, tuple, optional
-        :param origin: the position of pixel 0 (the data origin) of the panel `top-left`, `top-right`, `bottom-left`, `bottom-right`
-        :type origin: string , optional        
+        :param origin: the position of pixel 0 (the data origin) of the panel 'top-left', 'top-right', 'bottom-left', 'bottom-right'
+        :type origin: string, default 'bottom-left'
         :return: returns a configured AcquisitionGeometry object
         :rtype: AcquisitionGeometry       
         '''        

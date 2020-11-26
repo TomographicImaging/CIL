@@ -54,7 +54,7 @@ class NikonDataReader(object):
                 Start and end also can be negative.
             
         normalize: bool, norrmalize loaded projections by detector 
-                white level (I_0). Default value is False, i.e. no normalization.
+                white level (I_0). Default value is True
                             
         fliplr: bool, default = False, flip projections in the left-right direction
                 (about vertical axis)
@@ -77,7 +77,7 @@ class NikonDataReader(object):
         
         self.file_name = kwargs.get('file_name', None)
         self.roi = kwargs.get('roi', {'angle': -1, 'horizontal': -1, 'vertical': -1})
-        self.normalize = kwargs.get('normalize', False)
+        self.normalize = kwargs.get('normalize', True)
         self.mode = kwargs.get('mode', 'bin')
         self.fliplr = kwargs.get('fliplr', False)
         
@@ -130,6 +130,12 @@ class NikonDataReader(object):
                 
         content = [x.strip() for x in content]
         
+        #initialise parameters
+        detector_offset_h = 0
+        detector_offset_v = 0
+        object_offset_x = 0
+        object_roll_deg = 0
+
         for line in content:
             # filename of TIFF files
             if line.startswith("Name"):
@@ -154,7 +160,7 @@ class NikonDataReader(object):
                 pixel_size_v_0 = float(line.split('=')[1])
             # source to center of rotation distance
             elif line.startswith("SrcToObject"):
-                source_to_rot = float(line.split('=')[1])
+                source_to_origin = float(line.split('=')[1])
             # source to detector distance
             elif line.startswith("SrcToDetector"):
                 source_to_det = float(line.split('=')[1])
@@ -166,10 +172,16 @@ class NikonDataReader(object):
                 angular_step = float(line.split('=')[1])
             # detector offset x in units                
             elif line.startswith("DetectorOffsetX"):
-                DetectorOffsetX = float(line.split('=')[1])
+                detector_offset_h = float(line.split('=')[1])
             # detector offset y in units  
             elif line.startswith("DetectorOffsetY"):
-                DetectorOffsetY = float(line.split('=')[1])
+                detector_offset_v = float(line.split('=')[1])
+            # object offset x in units  
+            elif line.startswith("ObjectOffsetX"):
+                object_offset_x = float(line.split('=')[1])
+            # object roll in degrees  
+            elif line.startswith("ObjectRoll"):
+                object_roll_deg = float(line.split('=')[1])
 
 
         self._roi_par = [[0, num_projections, 1] ,[0, pixel_num_v_0, 1], [0, pixel_num_h_0, 1]]
@@ -210,12 +222,12 @@ class NikonDataReader(object):
         det_start_0 = -(pixel_num_h_0 / 2)
         det_start = det_start_0 + self._roi_par[2][0]
         det_end = det_start + pixel_num_h * self._roi_par[2][2]
-        det_pos_h = (det_start + det_end) * 0.5 * pixel_size_h_0 + DetectorOffsetX
+        det_pos_h = (det_start + det_end) * 0.5 * pixel_size_h_0 + detector_offset_h
         
         det_start_0 = -(pixel_num_v_0 / 2)
         det_start = det_start_0 + self._roi_par[1][0]
         det_end = det_start + pixel_num_v * self._roi_par[1][2]
-        det_pos_v = (det_start + det_end) * 0.5 * pixel_size_v_0 + DetectorOffsetY         
+        det_pos_v = (det_start + det_end) * 0.5 * pixel_size_v_0 + detector_offset_v         
 
         #angles from xtek.ct ignore *.ang and _ctdata.txt as not correct
         angles = numpy.asarray( [ angular_step * proj for proj in range(num_projections) ] , dtype=numpy.float32)
@@ -228,16 +240,21 @@ class NikonDataReader(object):
             angles = angles[slice(self._roi_par[0][0], self._roi_par[0][1], self._roi_par[0][2])]
         
         #convert NikonGeometry to CIL geometry
-        angles = angles + initial_angle + 180
+        angles = -angles - initial_angle + 180
+
+        object_roll_deg * numpy.pi /180.
+        rotate_axis_x = -numpy.tan(object_roll_deg * numpy.pi /180.)
 
         if self.fliplr:
-            det_pos_h = -det_pos_h
-            angles = -angles           
+            det_row_x = 1
+        else:
+            det_row_x = -1
 
         if pixel_num_v == 1 and (self._roi_par[1][0]+self._roi_par[1][1]) // 2 == pixel_num_v_0 // 2:
-            self._ag = AcquisitionGeometry.create_Cone2D(source_position=[0, -source_to_rot],
-                                                     rotation_axis_position=[0, 0],
-                                                     detector_position=[det_pos_h, source_to_det-source_to_rot])
+            self._ag = AcquisitionGeometry.create_Cone2D(source_position=[0, -source_to_origin],
+                                                     rotation_axis_position=[-object_offset_x, 0],
+                                                     detector_position=[-det_pos_h, source_to_det-source_to_origin],
+                                                     detector_direction_row=[det_row_x,0])
             self._ag.set_angles(angles, 
                                 angle_unit='degree')
             
@@ -245,9 +262,11 @@ class NikonDataReader(object):
 
             self._ag.set_labels(labels=['angle', 'horizontal'])
         else:
-            self._ag = AcquisitionGeometry.create_Cone3D(source_position=[0, -source_to_rot, 0],
-                                                         rotation_axis_position=[0, 0, 0],
-                                                         detector_position=[det_pos_h, source_to_det-source_to_rot, det_pos_v])
+            self._ag = AcquisitionGeometry.create_Cone3D(source_position=[0, -source_to_origin, 0],
+                                                         rotation_axis_position=[-object_offset_x, 0, 0],
+                                                         rotation_axis_direction=[-rotate_axis_x,0,1],
+                                                         detector_position=[-det_pos_h, source_to_det-source_to_origin, det_pos_v],
+                                                         detector_direction_row=[det_row_x,0,0])
             self._ag.set_angles(angles, 
                                 angle_unit='degree')
             
@@ -282,7 +301,8 @@ class NikonDataReader(object):
         ad = reader.read_as_AcquisitionData(self._ag)
               
         if (self.normalize):
-            ad /= 65535 #unsinged char max
+            ad.array[ad.array < 1] = 1
+            ad /= self._white_level
         
         if self.fliplr:
             dim = ad.get_dimension_axis('horizontal')

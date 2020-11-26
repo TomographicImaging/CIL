@@ -243,18 +243,17 @@ class NikonDataReader(object):
         angles = -angles - initial_angle + 180
 
         object_roll_deg * numpy.pi /180.
-        rotate_axis_x = -numpy.tan(object_roll_deg * numpy.pi /180.)
+        rotate_axis_x = numpy.tan(object_roll_deg * numpy.pi /180.)
 
         if self.fliplr:
-            det_row_x = 1
+            origin = 'top-left'
         else:
-            det_row_x = -1
+            origin = 'top-right'
 
         if pixel_num_v == 1 and (self._roi_par[1][0]+self._roi_par[1][1]) // 2 == pixel_num_v_0 // 2:
             self._ag = AcquisitionGeometry.create_Cone2D(source_position=[0, -source_to_origin],
                                                      rotation_axis_position=[-object_offset_x, 0],
-                                                     detector_position=[-det_pos_h, source_to_det-source_to_origin],
-                                                     detector_direction_row=[det_row_x,0])
+                                                     detector_position=[-det_pos_h, source_to_det-source_to_origin])
             self._ag.set_angles(angles, 
                                 angle_unit='degree')
             
@@ -264,14 +263,14 @@ class NikonDataReader(object):
         else:
             self._ag = AcquisitionGeometry.create_Cone3D(source_position=[0, -source_to_origin, 0],
                                                          rotation_axis_position=[-object_offset_x, 0, 0],
-                                                         rotation_axis_direction=[-rotate_axis_x,0,1],
-                                                         detector_position=[-det_pos_h, source_to_det-source_to_origin, det_pos_v],
-                                                         detector_direction_row=[det_row_x,0,0])
+                                                         rotation_axis_direction=[rotate_axis_x,0,1],
+                                                         detector_position=[-det_pos_h, source_to_det-source_to_origin, det_pos_v])
             self._ag.set_angles(angles, 
                                 angle_unit='degree')
             
             self._ag.set_panel((pixel_num_h, pixel_num_v),
-                               pixel_size=(pixel_size_h, pixel_size_v))
+                               pixel_size=(pixel_size_h, pixel_size_v),
+                               origin=origin)
         
             self._ag.set_labels(labels=['angle', 'vertical', 'horizontal'])
 

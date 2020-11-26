@@ -53,7 +53,7 @@ class NikonDataReader(object):
                 to start = 0 and end = load everything to the end, respectively.
                 Start and end also can be negative.
             
-        normalize: bool, norrmalize loaded projections by detector 
+        normalise: bool, normalises loaded projections by detector 
                 white level (I_0). Default value is True
                             
         fliplr: bool, default = False, flip projections in the left-right direction
@@ -77,30 +77,38 @@ class NikonDataReader(object):
         
         self.file_name = kwargs.get('file_name', None)
         self.roi = kwargs.get('roi', {'angle': -1, 'horizontal': -1, 'vertical': -1})
-        self.normalize = kwargs.get('normalize', True)
+        self.normalise = kwargs.get('normalise', True)
         self.mode = kwargs.get('mode', 'bin')
         self.fliplr = kwargs.get('fliplr', False)
         
+        if kwargs.get('normalize', None):
+            raise DeprecationWarning ("'normalize' has now been deprecated. Please use 'normalise' instead.")
+
         if self.file_name is not None:
             self.set_up(file_name = self.file_name,
                         roi = self.roi,
-                        normalize = self.normalize,
+                        normalise = self.normalise,
                         mode = self.mode,
                         fliplr = self.fliplr)
             
     def set_up(self, 
                file_name = None, 
                roi = {'angle': -1, 'horizontal': -1, 'vertical': -1},
-               normalize = False,
+               normalise = True,
                mode = 'bin',
-               fliplr = False):
+               fliplr = False,
+               **kwargs):
         
         self.file_name = file_name
         self.roi = roi
-        self.normalize = normalize
+        self.normalise = normalise
         self.mode = mode
         self.fliplr = fliplr
         
+        if kwargs.get('normalize', None):
+            raise DeprecationWarning ("'normalize' has now been deprecated. Please use 'normalise' instead.")
+
+
         if self.file_name == None:
             raise Exception('Path to xtek file is required.')
         
@@ -257,7 +265,7 @@ class NikonDataReader(object):
             self._ag.set_angles(angles, 
                                 angle_unit='degree')
             
-            self._ag.set_panel(pixel_num_h, pixel_size=pixel_size_h)
+            self._ag.set_panel(pixel_num_h, pixel_size=pixel_size_h, origin=origin)
 
             self._ag.set_labels(labels=['angle', 'horizontal'])
         else:
@@ -299,7 +307,7 @@ class NikonDataReader(object):
 
         ad = reader.read_as_AcquisitionData(self._ag)
               
-        if (self.normalize):
+        if (self.normalise):
             ad.array[ad.array < 1] = 1
             ad /= self._white_level
         

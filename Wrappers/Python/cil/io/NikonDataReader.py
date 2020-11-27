@@ -22,6 +22,7 @@ from __future__ import print_function
 
 from cil.framework import AcquisitionData, AcquisitionGeometry
 from cil.io.TIFF import TIFFStackReader
+import warnings
 import numpy
 import os
     
@@ -81,8 +82,9 @@ class NikonDataReader(object):
         self.mode = kwargs.get('mode', 'bin')
         self.fliplr = kwargs.get('fliplr', False)
         
-        if kwargs.get('normalize', None):
-            raise DeprecationWarning ("'normalize' has now been deprecated. Please use 'normalise' instead.")
+        if 'normalize' in kwargs.keys():
+            self.normalise = kwargs.get('normalize', True)
+            warnings.warn("'normalize' has now been deprecated. Please use 'normalise' instead.")
 
         if self.file_name is not None:
             self.set_up(file_name = self.file_name,
@@ -105,9 +107,9 @@ class NikonDataReader(object):
         self.mode = mode
         self.fliplr = fliplr
         
-        if kwargs.get('normalize', None):
-            raise DeprecationWarning ("'normalize' has now been deprecated. Please use 'normalise' instead.")
-
+        if 'normalize' in kwargs.keys():
+            self.normalise = kwargs.get('normalize', True)
+            warnings.warn("'normalize' has now been deprecated. Please use 'normalise' instead.")
 
         if self.file_name == None:
             raise Exception('Path to xtek file is required.')

@@ -21,10 +21,10 @@ from __future__ import print_function, division
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
 import numpy
-from cil.framework import ImageGeometry
+from cil.framework import ImageGeometry, AcquisitionData, ImageData
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-def plotter2D(datacontainers, titles=None, fix_range=False, stretch_y=False, cmap='gray', axis_labels=None, custom_range=None, origin='upper'):
+def plotter2D(datacontainers, titles=None, fix_range=False, stretch_y=False, cmap='gray', axis_labels=None, custom_range=None, origin='lower-left'):
     '''plotter2D(datacontainers=[], titles=[], fix_range=False, stretch_y=False, cmap='gray', axes_labels=['X','Y'])
     
     plots 1 or more 2D plots in an (n x 2) matix
@@ -86,24 +86,63 @@ def plotter2D(datacontainers, titles=None, fix_range=False, stretch_y=False, cma
             
             if axis_labels is None:
                 axes[i].set_ylabel(datacontainers[i].dimension_labels[0])
-                axes[i].set_xlabel(datacontainers[i].dimension_labels[1])        
-        
-        if origin == 'upper':
-            extent=(0,dc.shape[1],dc.shape[0],0)
-        else:
-            extent=(0,dc.shape[1],0,dc.shape[0])
+                axes[i].set_xlabel(datacontainers[i].dimension_labels[1])  
 
-        sp = axes[i].imshow(dc, cmap=cmap, origin=origin, extent=extent)
-    
+        
+        #set origin
+        shape_v = [0,dc.shape[0]]
+        shape_h = [0,dc.shape[1]]
+
+        data_origin='lower'
+        data_plot = dc
+
+        if 'upper' in origin:
+            shape_v.reverse()
+            data_origin='upper'
+
+        if 'right' in origin:
+            shape_h.reverse()
+            data_plot = numpy.flip(data_plot,1)
+
+        extent = (*shape_h,*shape_v)
+        
+        sp = axes[i].imshow(data_plot, cmap=cmap, origin=data_origin, extent=extent)
+
+
+
+        y_axes2 = False
+        if isinstance(datacontainers[i],(AcquisitionData)):
+            if axes[i].get_ylabel() == 'angle':
+                print('True')
+                locs = axes[i].get_yticks()
+                location_new = locs[0:-1].astype(int)
+
+                ang = datacontainers[i].geometry.config.angles
+
+                labels_new = [str(i) for i in numpy.take(ang.angle_data, location_new)]
+                axes[i].set_yticklabels(labels_new)
+                
+                axes[i].set_ylabel('angle / ' + str(ang.angle_unit))
+
+                y_axes2 = axes[i].axes.secondary_yaxis('right')
+                y_axes2.set_ylabel('angle / index')
+
         
         im_ratio = dc.shape[0]/dc.shape[1]
         
         if stretch_y ==True:   
             axes[i].set_aspect(1/im_ratio)
             im_ratio = 1
-            
-        plt.colorbar(sp, ax=axes[i],fraction=0.0467*im_ratio, pad=0.02)
-        
+
+        if y_axes2: 
+            scale = 0.041*im_ratio
+            pad = 0.12
+        else:
+            scale = 0.0467*im_ratio
+            pad = 0.02
+
+        plt.colorbar(sp, orientation='vertical', ax=axes[i],fraction=scale, pad=pad)
+
         if fix_range == True or custom_range is not None:
             sp.set_clim(range_min,range_max)
     plt.show()

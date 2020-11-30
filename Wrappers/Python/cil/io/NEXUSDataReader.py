@@ -69,16 +69,14 @@ class NEXUSDataReader(object):
         dimension_labels = [None] * 4
         for k,v in attrs.items():
             if k in ['dim0', 'dim1', 'dim2' , 'dim3']:
-                dimension_labels[int(k[3:])] = v
-        if all (map(lambda x: x is not None, dimension_labels)):
-            # remove Nones
-            if dimension_labels[3] is None:
-                dimension_labels.pop(3)
-            if dimension_labels[2] is None:
-                dimension_labels.pop(2)
-        else:
-            #assign default values => don't set dimension_labels
+                dimension_labels[int(k[3:])] = v   
+        
+        # remove Nones
+        dimension_labels = [i for i in dimension_labels if i] 
+
+        if len(dimension_labels) == 0:
             dimension_labels = None
+            
         return dimension_labels
 
     def get_geometry(self):
@@ -136,7 +134,7 @@ class NEXUSDataReader(object):
 
 
                 if self.is_old_file_version():
-                    num_pixels_h = ds_data.attrs.get('pixels_num_h', 1)
+                    num_pixels_h = ds_data.attrs.get('pixel_num_h', 1)
                     num_channels = ds_data.attrs['channels']
                     ds_angles = dfile['entry1/tomo_entry/data/rotation_angle']
 
@@ -206,7 +204,7 @@ class NEXUSDataReader(object):
                 self._geometry.set_angles(angles, initial_angle=initial_angle, angle_unit=angle_unit)
 
                 #set panel
-                pixel_size_v = ds_data.attrs.get('pixel_size_v', 1)
+                pixel_size_v = ds_data.attrs.get('pixel_size_v', ds_data.attrs['pixel_size_h'])
                 origin = ds_data.attrs.get('panel_origin','bottom-left')
                 self._geometry.set_panel((num_pixels_h, num_pixels_v),\
                                         pixel_size=(ds_data.attrs['pixel_size_h'], pixel_size_v),\
@@ -214,10 +212,11 @@ class NEXUSDataReader(object):
 
                 # set channels
                 self._geometry.set_channels(num_channels)
-                
+
+                dimension_labels = []
+                dimension_labels = self.read_dimension_labels(ds_data.attrs)
+            
         #set labels
-        dimension_labels = []
-        dimension_labels = self.read_dimension_labels(ds_data.attrs)
         self._geometry.set_labels(dimension_labels)
 
         return self._geometry

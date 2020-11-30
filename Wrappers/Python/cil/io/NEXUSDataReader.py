@@ -115,142 +115,112 @@ class NEXUSDataReader(object):
                 dimension_labels = self.read_dimension_labels(ds_data.attrs)
                 
             else:   # AcquisitionData
-                
-                # if old file 
+
+
+                if ds_data.attrs.__contains__('dist_source_center') or dfile['entry1/tomo_entry'].__contains__('config/source/position'):
+                    geom_type = 'cone'
+                else:
+                    geom_type = 'parallel'
+
+                if ds_data.attrs.__contains__('num_pixels_v'):
+                    num_pixels_v = ds_data.attrs.get('num_pixels_v')
+                elif ds_data.attrs.__contains__('pixel_num_v'):
+                    num_pixels_v = ds_data.attrs.get('pixel_num_v')
+                else:
+                    num_pixels_v = 1
+
+                if num_pixels_v > 1:
+                    dim = 3
+                else:
+                    dim = 2
+
+
                 if self.is_old_file_version():
-                    
-                    dimension_labels = []
-                    
-                    dimension_labels = self.read_dimension_labels(ds_data.attrs)
-                    
-                    # if cone 3D
-                    if ds_data.attrs.__contains__('dist_source_center') == True and ds_data.attrs['pixel_num_v'] > 1:
-                        self._geometry = AcquisitionGeometry.create_Cone3D(source_position=[0, 0, 0],
-                                                        rotation_axis_position=[0, ds_data.attrs['dist_source_center'], 0],
-                                                        detector_position=[0, ds_data.attrs['dist_source_center'] + ds_data.attrs['dist_center_detector'], 0])
-                        
-                        self._geometry.set_panel((int(ds_data.attrs['pixel_num_h']), int(ds_data.attrs['pixel_num_v'])),
-                                                    pixel_size=(ds_data.attrs['pixel_size_h'], ds_data.attrs['pixel_size_v']))
-                    
-                    # if cone 2D
-                    elif ds_data.attrs.__contains__('dist_source_center') == True and ds_data.attrs['pixel_num_v'] == 1:
-                        self._geometry = AcquisitionGeometry.create_Cone2D(source_position=[0, 0],
-                                                        rotation_axis_position=[0, ds_data.attrs['dist_source_center']],
-                                                        detector_position=[0, ds_data.attrs['dist_source_center'] + ds_data.attrs['dist_center_detector']])
-                        self._geometry.set_angles(np.array(dfile['entry1/tomo_entry/data/rotation_angle'], dtype = 'float32'))
-                        
-                        self._geometry.set_panel(int(ds_data.attrs['pixel_num_h']),
-                                                    pixel_size=ds_data.attrs['pixel_size_h'])
-                    
-                    # if parallel 3D
-                    elif ds_data.attrs.__contains__('dist_source_center') == False and ds_data.attrs['pixel_num_v'] > 1:
-                        self._geometry = AcquisitionGeometry.create_Parallel3D()
-                        
-                        self._geometry.set_panel((int(ds_data.attrs['pixel_num_h']), int(ds_data.attrs['pixel_num_v'])),
-                                                    pixel_size=(ds_data.attrs['pixel_size_h'], ds_data.attrs['pixel_size_v']))
-                    # if parallel 2D
-                    elif ds_data.attrs.__contains__('dist_source_center') == False and ds_data.attrs['pixel_num_v'] == 1:
-                        self._geometry = AcquisitionGeometry.create_Parallel2D()
-                        
-                        self._geometry.set_panel(int(ds_data.attrs['pixel_num_h']),
-                                                    pixel_size=ds_data.attrs['pixel_size_h'])
-                    
-                    # set channels
-                    self._geometry.set_channels(num_channels = int(ds_data.attrs['channels']))
-                    
-                    # set angles
+                    num_pixels_h = ds_data.attrs.get('pixels_num_h', 1)
+                    num_channels = ds_data.attrs['channels']
                     ds_angles = dfile['entry1/tomo_entry/data/rotation_angle']
-                    if ds_angles.attrs.__contains__('units'):
-                        self._geometry.set_angles(np.array(ds_angles, dtype = 'float32'),
-                                                    angle_unit=ds_angles.attrs['units'])
-                    else:
-                        self._geometry.set_angles(np.array(ds_angles, dtype = 'float32'))
-                    
+
+                    if geom_type == 'cone' and dim == 3:
+                        self._geometry = AcquisitionGeometry.create_Cone3D(source_position=[0, -ds_data.attrs['dist_source_center'], 0],
+                                                                               detector_position=[0, ds_data.attrs['dist_center_detector'],0])
+                    elif geom_type == 'cone' and dim == 2:
+                        self._geometry = AcquisitionGeometry.create_Cone2D(source_position=[0, -ds_data.attrs['dist_source_center']],
+                                                        detector_position=[0, ds_data.attrs['dist_center_detector']])
+                    elif geom_type == 'parallel' and dim == 3:
+                        self._geometry = AcquisitionGeometry.create_Parallel3D()
+                    elif geom_type == 'parallel' and dim == 2:
+                        self._geometry = AcquisitionGeometry.create_Parallel2D()
+
+                    #get angle path
+
                 # new file
                 else:
-                    rotation_axis_position = np.array(dfile['entry1/tomo_entry/config/rotation_axis/position'], dtype = 'float32')
-                    detector_position = np.array(dfile['entry1/tomo_entry/config/detector/position'], dtype = 'float32')
-                    detector_direction_x = np.array(dfile['entry1/tomo_entry/config/detector/direction_x'], dtype = 'float32')
+                    num_pixels_h = ds_data.attrs.get('num_pixels_h', 1)
+                    num_channels = ds_data.attrs['num_channels']
                     ds_angles = dfile['entry1/tomo_entry/config/angles']
-                    angles = np.array(ds_angles, dtype = 'float32')
-                    angle_unit = ds_angles.attrs['angle_unit']
-                    initial_angle = ds_angles.attrs['initial_angle']
-                                        
-                    # dimension_labels = []
-                    
-                    # # if 4D
-                    # if ds_data.attrs['dimension'] == '3D' and ds_data.attrs['num_channels'] > 1:
-                    #     ndim = 4
-                    # elif (ds_data.attrs['dimension'] == '3D' and ds_data.attrs['num_channels'] == 1) or (ds_data.attrs['dimension'] == '2D' and ds_data.attrs['num_channels'] > 1):
-                    #     ndim = 3
-                    # else:
-                    #     ndim = 2
-                        
-                    # for i in range(ndim):
-                    #         dimension_labels.append(ds_data.attrs['dim{}'.format(i)])
-                    dimension_labels = self.read_dimension_labels(ds_data.attrs)
-                    
-                    # if cone beam geometry
-                    if ds_data.attrs['geometry'] == 'cone':
-                        source_position = np.array(dfile['entry1/tomo_entry/config/source/position'], dtype = 'float32')
-                        # if Cone3D
-                        if ds_data.attrs['dimension'] == '3D':
-                            detector_direction_y = np.array(dfile['entry1/tomo_entry/config/detector/direction_y'], dtype = 'float32')
-                            rotation_axis_direction = np.array(dfile['entry1/tomo_entry/config/rotation_axis/direction'], dtype = 'float32')
-                            self._geometry = AcquisitionGeometry.create_Cone3D(source_position=source_position,
-                                                                                rotation_axis_position=rotation_axis_position,
-                                                                                rotation_axis_direction=rotation_axis_direction,
-                                                                                detector_position=detector_position,
-                                                                                detector_direction_x=detector_direction_x,
-                                                                                detector_direction_y=detector_direction_y)
-                        
-                            self._geometry.set_panel((int(ds_data.attrs['num_pixels_h']), int(ds_data.attrs['num_pixels_v'])),
-                                                        pixel_size=(ds_data.attrs['pixel_size_h'], ds_data.attrs['pixel_size_v']),origin=ds_data.attrs['panel_origin'])
-                        # if Cone2D
-                        else:
-                            self._geometry = AcquisitionGeometry.create_Cone2D(source_position=source_position,
-                                                                                rotation_axis_position=rotation_axis_position,
-                                                                                detector_position=detector_position,
-                                                                                detector_direction_x=detector_direction_x)
-                        
-                            self._geometry.set_panel(int(ds_data.attrs['num_pixels_h']),
-                                                        pixel_size=ds_data.attrs['pixel_size_h'],origin=ds_data.attrs['panel_origin'])
-                    
-                    # if parallel beam geometry
+
+                    rotation_axis_position = list(dfile['entry1/tomo_entry/config/rotation_axis/position'])
+                    detector_position = list(dfile['entry1/tomo_entry/config/detector/position'])
+
+                    ds_detector = dfile['entry1/tomo_entry/config/detector']
+                    if ds_detector.__contains__('direction_x'):
+                        detector_direction_x = list(dfile['entry1/tomo_entry/config/detector/direction_x'])
                     else:
-                        ray_direction = np.array(dfile['entry1/tomo_entry/config/ray/direction'], dtype = 'float32')
-                        # if Parallel3D
-                        if ds_data.attrs['dimension'] == '3D':
-                            detector_direction_y = np.array(dfile['entry1/tomo_entry/config/detector/direction_y'], dtype = 'float32')
-                            rotation_axis_direction = np.array(dfile['entry1/tomo_entry/config/rotation_axis/direction'], dtype = 'float32')
-                            self._geometry = AcquisitionGeometry.create_Parallel3D(ray_direction=ray_direction,
-                                                                                    rotation_axis_position=rotation_axis_position,
-                                                                                    rotation_axis_direction=rotation_axis_direction,
-                                                                                    detector_position=detector_position,
-                                                                                    detector_direction_x=detector_direction_x,
-                                                                                    detector_direction_y=detector_direction_y)
-                        
-                            self._geometry.set_panel((int(ds_data.attrs['num_pixels_h']), int(ds_data.attrs['num_pixels_v'])),
-                                                        pixel_size=(ds_data.attrs['pixel_size_h'], ds_data.attrs['pixel_size_v']),origin=ds_data.attrs['panel_origin'])
-                        # if Parallel2D
+                        detector_direction_x = list(dfile['entry1/tomo_entry/config/detector/direction_row'])
+ 
+                    if ds_detector.__contains__('direction_y'):
+                        detector_direction_y = list(dfile['entry1/tomo_entry/config/detector/direction_y'])
+                    elif ds_detector.__contains__('direction_cols'):
+                        detector_direction_y = list(dfile['entry1/tomo_entry/config/detector/direction_col'])
+
+                    ds_rotate = dfile['entry1/tomo_entry/config/rotation_axis']
+                    if ds_rotate.__contains__('direction'):
+                        rotation_axis_direction = list(dfile['entry1/tomo_entry/config/rotation_axis/direction'])
+
+
+                    if geom_type == 'cone':
+                        source_position = list(dfile['entry1/tomo_entry/config/source/position'])
+
+                        if dim == 2:
+                            self._geometry = AcquisitionGeometry.create_Cone2D(source_position, detector_position, detector_direction_x, rotation_axis_position)
                         else:
-                            self._geometry = AcquisitionGeometry.create_Parallel2D(ray_direction=ray_direction,
-                                                                                    rotation_axis_position=rotation_axis_position,
-                                                                                    detector_position=detector_position,
-                                                                                    detector_direction_x=detector_direction_x)
-                        
-                            self._geometry.set_panel(int(ds_data.attrs['num_pixels_h']),
-                                                        pixel_size=ds_data.attrs['pixel_size_h'],origin=ds_data.attrs['panel_origin'])
-                            
-                    self._geometry.set_angles(angles, 
-                                                angle_unit=angle_unit,
-                                                initial_angle=initial_angle)
-                        
-                    self._geometry.set_channels(num_channels = int(ds_data.attrs['num_channels']))
-        
+                            self._geometry = AcquisitionGeometry.create_Cone3D(source_position,\
+                                                detector_position, detector_direction_x, detector_direction_y,\
+                                                rotation_axis_position, rotation_axis_direction)
+                    else:
+                        ray_direction = list(dfile['entry1/tomo_entry/config/ray/direction'])
+
+                        if dim == 2:
+                            self._geometry = AcquisitionGeometry.create_Parallel2D(ray_direction, detector_position, detector_direction_x, rotation_axis_position)
+                        else:
+                            self._geometry = AcquisitionGeometry.create_Parallel3D(ray_direction,\
+                                                detector_position, detector_direction_x, detector_direction_y,\
+                                                rotation_axis_position, rotation_axis_direction)
+
+
+                # for all Aquisition data
+                #set angles
+                angles = list(ds_angles)
+                angle_unit = ds_angles.attrs.get('angle_unit','degree')
+                initial_angle = ds_angles.attrs.get('initial_angle',0)
+                self._geometry.set_angles(angles, initial_angle=initial_angle, angle_unit=angle_unit)
+
+                #set panel
+                pixel_size_v = ds_data.attrs.get('pixel_size_v', 1)
+                origin = ds_data.attrs.get('panel_origin','bottom-left')
+                self._geometry.set_panel((num_pixels_h, num_pixels_v),\
+                                        pixel_size=(ds_data.attrs['pixel_size_h'], pixel_size_v),\
+                                        origin=origin)
+
+                # set channels
+                self._geometry.set_channels(num_channels)
+                
+        #set labels
+        dimension_labels = []
+        dimension_labels = self.read_dimension_labels(ds_data.attrs)
         self._geometry.set_labels(dimension_labels)
+
         return self._geometry
-    
     
     def read(self):
         

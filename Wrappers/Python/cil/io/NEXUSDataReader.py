@@ -113,8 +113,6 @@ class NEXUSDataReader(object):
                 dimension_labels = self.read_dimension_labels(ds_data.attrs)
                 
             else:   # AcquisitionData
-
-
                 if ds_data.attrs.__contains__('dist_source_center') or dfile['entry1/tomo_entry'].__contains__('config/source/position'):
                     geom_type = 'cone'
                 else:
@@ -149,9 +147,7 @@ class NEXUSDataReader(object):
                     elif geom_type == 'parallel' and dim == 2:
                         self._geometry = AcquisitionGeometry.create_Parallel2D()
 
-                    #get angle path
-
-                # new file
+    
                 else:
                     num_pixels_h = ds_data.attrs.get('num_pixels_h', 1)
                     num_channels = ds_data.attrs['num_channels']
@@ -168,13 +164,12 @@ class NEXUSDataReader(object):
  
                     if ds_detector.__contains__('direction_y'):
                         detector_direction_y = list(dfile['entry1/tomo_entry/config/detector/direction_y'])
-                    elif ds_detector.__contains__('direction_cols'):
+                    elif ds_detector.__contains__('direction_col'):
                         detector_direction_y = list(dfile['entry1/tomo_entry/config/detector/direction_col'])
 
                     ds_rotate = dfile['entry1/tomo_entry/config/rotation_axis']
                     if ds_rotate.__contains__('direction'):
                         rotation_axis_direction = list(dfile['entry1/tomo_entry/config/rotation_axis/direction'])
-
 
                     if geom_type == 'cone':
                         source_position = list(dfile['entry1/tomo_entry/config/source/position'])
@@ -194,7 +189,6 @@ class NEXUSDataReader(object):
                             self._geometry = AcquisitionGeometry.create_Parallel3D(ray_direction,\
                                                 detector_position, detector_direction_x, detector_direction_y,\
                                                 rotation_axis_position, rotation_axis_direction)
-
 
                 # for all Aquisition data
                 #set angles

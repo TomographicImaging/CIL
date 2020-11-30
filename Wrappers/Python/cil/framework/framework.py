@@ -1498,7 +1498,7 @@ class AcquisitionGeometry(object):
                     self.config.system = Parallel2D(ray_direction=[0,1], detector_pos=[0,0], detector_direction_x=[1,0], rotation_axis_pos=[0,0])
 
 
-            self.config.panel = Panel(num_pixels, pixel_size, 'top-left', dimension)  
+            self.config.panel = Panel(num_pixels, pixel_size, 'bottom-left', dimension)  
             self.config.channels = Channels(channels, channel_labels=None)  
             self.config.angles = Angles(angles, 0, kwargs.get(AcquisitionGeometry.ANGLE_UNIT, AcquisitionGeometry.DEGREE))
 

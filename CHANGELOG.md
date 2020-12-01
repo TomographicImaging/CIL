@@ -1,5 +1,7 @@
 * 20.11.x
   - fixed windows build
+  - NikonDataReader converts Nikon geometry to CIL geometry from xtekct file including detector and centre-or-rotation offsets
+  - NexusdataReader supports files written with old versions of NexusDataWriter
 
 * 20.11
   - python module renamed to cil

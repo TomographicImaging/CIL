@@ -29,13 +29,28 @@ import shutil
 class TestNexusReaderWriter(unittest.TestCase):
     
     def setUp(self):
+
         self.data_dir = os.path.join(os.getcwd(), 'test_nxs')
-        os.mkdir(self.data_dir)
+        if not os.path.exists(self.data_dir):
+            os.mkdir(self.data_dir)
+
+        self.ag2d = AcquisitionGeometry.create_Parallel2D()\
+                                    .set_angles([0, 90, 180],-3.0, 'radian')\
+                                    .set_panel(5, 0.2, origin='top-right')\
+                                    .set_channels(6)\
+                                    .set_labels(['horizontal', 'angle'])
+
+        self.ad2d = self.ag2d.allocate('random_int')
+
+
+        self.ag3d = AcquisitionGeometry.create_Cone3D([0.1,-500,2], [3,600,-1], [0,1,0],[0,0,-1],[0.2,-0.1,0.5],[-0.1,0.2,0.9])\
+                                    .set_angles([0, 90, 180])\
+                                    .set_panel([5,10],[0.1,0.3])\
+
+        self.ad3d = self.ag3d.allocate('random_int')
+
     def tearDown(self):
         shutil.rmtree(self.data_dir)
-        # os.remove(os.path.join(os.getcwd(), 'test_nexus_im.nxs'))
-        # os.remove(os.path.join(os.getcwd(), 'test_nexus_ad2d.nxs'))
-        # os.remove(os.path.join(os.getcwd(), 'test_nexus_ad3d.nxs'))
     
     def test_writeImageData(self):
         im_size = 5
@@ -49,34 +64,14 @@ class TestNexusReaderWriter(unittest.TestCase):
         self.readImageDataAndTest()
         
     def test_writeAcquisitionData(self):
-        im_size = 5
-        ag2d = AcquisitionGeometry(geom_type = 'parallel', 
-                                   dimension = '2D', 
-                                   angles = numpy.array([0, 1]), 
-                                   pixel_num_h = im_size, 
-                                   pixel_size_h = 1, 
-                                   pixel_num_v = im_size, 
-                                   pixel_size_v = 1)
-        ad2d = ag2d.allocate()
         writer = NEXUSDataWriter()
         writer.set_up(file_name = os.path.join(self.data_dir, 'test_nexus_ad2d.nxs'),
-                      data = ad2d)
+                      data = self.ad2d)
         writer.write()
         
-        ag3d = AcquisitionGeometry(geom_type = 'cone', 
-                                   dimension = '3D', 
-                                   angles = numpy.array([0, 1]), 
-                                   pixel_num_h = im_size, 
-                                   pixel_size_h = 1, 
-                                   pixel_num_v = im_size, 
-                                   pixel_size_v = 1,
-                                   dist_source_center = 1,
-                                   dist_center_detector = 1, 
-                                   channels = im_size)
-        ad3d = ag3d.allocate()
         writer = NEXUSDataWriter()
         writer.set_up(file_name = os.path.join(self.data_dir, 'test_nexus_ad3d.nxs'),
-                      data = ad3d)
+                      data = self.ad3d)
         writer.write()
 
         self.readAcquisitionDataAndTest()
@@ -99,60 +94,40 @@ class TestNexusReaderWriter(unittest.TestCase):
         self.assertEqual(ig.voxel_num_y, ig_test.voxel_num_y, 'ImageGeometry is not correct')
         
     def readAcquisitionDataAndTest(self):
-        im_size = 5
-        ag2d_test = AcquisitionGeometry(geom_type = 'parallel', 
-                                        dimension = '2D', 
-                                        angles = numpy.array([0, 1]), 
-                                        pixel_num_h = im_size, 
-                                        pixel_size_h = 1, 
-                                        pixel_num_v = im_size, 
-                                        pixel_size_v = 1)
-        ad2d_test = ag2d_test.allocate()
         
         reader2d = NEXUSDataReader()
         reader2d.set_up(file_name = os.path.join(self.data_dir, 'test_nexus_ad2d.nxs'))
         ad2d = reader2d.read()
         ag2d = reader2d.get_geometry()
 
-        assert ag2d == ag2d_test
+        numpy.testing.assert_array_equal(ad2d.as_array(), self.ad2d.as_array(), 'Loaded image is not correct')
+        self.assertEqual(ag2d.geom_type, self.ag2d.geom_type, 'ImageGeometry.geom_type is not correct')
+        numpy.testing.assert_array_equal(ag2d.angles, self.ag2d.angles, 'ImageGeometry.angles is not correct')
+        self.assertEqual(ag2d.pixel_num_h, self.ag2d.pixel_num_h, 'ImageGeometry.pixel_num_h is not correct')
+        self.assertEqual(ag2d.pixel_size_h, self.ag2d.pixel_size_h, 'ImageGeometry.pixel_size_h is not correct')
+        self.assertEqual(ag2d.pixel_num_v, self.ag2d.pixel_num_v, 'ImageGeometry.pixel_num_v is not correct')
+        self.assertEqual(ag2d.pixel_size_v, self.ag2d.pixel_size_v, 'ImageGeometry.pixel_size_v is not correct')
 
-        numpy.testing.assert_array_equal(ad2d.as_array(), ad2d_test.as_array(), 'Loaded image is not correct')
-        self.assertEqual(ag2d.geom_type, ag2d_test.geom_type, 'ImageGeometry.geom_type is not correct')
-        numpy.testing.assert_array_equal(ag2d.angles, ag2d_test.angles, 'ImageGeometry.angles is not correct')
-        self.assertEqual(ag2d.pixel_num_h, ag2d_test.pixel_num_h, 'ImageGeometry.pixel_num_h is not correct')
-        self.assertEqual(ag2d.pixel_size_h, ag2d_test.pixel_size_h, 'ImageGeometry.pixel_size_h is not correct')
-        self.assertEqual(ag2d.pixel_num_v, ag2d_test.pixel_num_v, 'ImageGeometry.pixel_num_v is not correct')
-        self.assertEqual(ag2d.pixel_size_v, ag2d_test.pixel_size_v, 'ImageGeometry.pixel_size_v is not correct')
-        
-        ag3d_test = AcquisitionGeometry(geom_type = 'cone', 
-                                        dimension = '3D', 
-                                        angles = numpy.array([0, 1]), 
-                                        pixel_num_h = im_size, 
-                                        pixel_size_h = 1, 
-                                        pixel_num_v = im_size, 
-                                        pixel_size_v = 1,
-                                        dist_source_center = 1,
-                                        dist_center_detector = 1, 
-                                        channels = im_size)
-        ad3d_test = ag3d_test.allocate()
-        
+        assert ag2d == self.ag2d
+
         reader3d = NEXUSDataReader()
         reader3d.set_up(file_name = os.path.join(self.data_dir, 'test_nexus_ad3d.nxs'))
         ad3d = reader3d.read()
         ag3d = reader3d.get_geometry()
         
-        assert ag3d == ag3d_test
-        numpy.testing.assert_array_equal(ad3d.as_array(), ad3d_test.as_array(), 'Loaded image is not correct')
-        numpy.testing.assert_array_equal(ag3d.angles, ag3d_test.angles, 'AcquisitionGeometry.angles is not correct')
-        self.assertEqual(ag3d.geom_type, ag3d_test.geom_type, 'AcquisitionGeometry.geom_type is not correct')
-        self.assertEqual(ag3d.dimension, ag3d_test.dimension, 'AcquisitionGeometry.dimension is not correct')
-        self.assertEqual(ag3d.pixel_num_h, ag3d_test.pixel_num_h, 'AcquisitionGeometry.pixel_num_h is not correct')
-        self.assertEqual(ag3d.pixel_size_h, ag3d_test.pixel_size_h, 'AcquisitionGeometry.pixel_size_h is not correct')
-        self.assertEqual(ag3d.pixel_num_v, ag3d_test.pixel_num_v, 'AcquisitionGeometry.pixel_num_v is not correct')
-        self.assertEqual(ag3d.pixel_size_v, ag3d_test.pixel_size_v, 'AcquisitionGeometry.pixel_size_v is not correct')
-        self.assertEqual(ag3d.dist_source_center, ag3d_test.dist_source_center, 'AcquisitionGeometry.dist_source_center is not correct')
-        self.assertEqual(ag3d.dist_center_detector, ag3d_test.dist_center_detector, 'AcquisitionGeometry.dist_center_detector is not correct')
-        self.assertEqual(ag3d.channels, ag3d_test.channels, 'AcquisitionGeometry.channels is not correct')
+        numpy.testing.assert_array_equal(ad3d.as_array(), self.ad3d.as_array(), 'Loaded image is not correct')
+        numpy.testing.assert_array_equal(ag3d.angles, self.ag3d.angles, 'AcquisitionGeometry.angles is not correct')
+        self.assertEqual(ag3d.geom_type, self.ag3d.geom_type, 'AcquisitionGeometry.geom_type is not correct')
+        self.assertEqual(ag3d.dimension, self.ag3d.dimension, 'AcquisitionGeometry.dimension is not correct')
+        self.assertEqual(ag3d.pixel_num_h, self.ag3d.pixel_num_h, 'AcquisitionGeometry.pixel_num_h is not correct')
+        self.assertEqual(ag3d.pixel_size_h, self.ag3d.pixel_size_h, 'AcquisitionGeometry.pixel_size_h is not correct')
+        self.assertEqual(ag3d.pixel_num_v, self.ag3d.pixel_num_v, 'AcquisitionGeometry.pixel_num_v is not correct')
+        self.assertEqual(ag3d.pixel_size_v, self.ag3d.pixel_size_v, 'AcquisitionGeometry.pixel_size_v is not correct')
+        self.assertEqual(ag3d.dist_source_center, self.ag3d.dist_source_center, 'AcquisitionGeometry.dist_source_center is not correct')
+        self.assertEqual(ag3d.dist_center_detector, self.ag3d.dist_center_detector, 'AcquisitionGeometry.dist_center_detector is not correct')
+        self.assertEqual(ag3d.channels, self.ag3d.channels, 'AcquisitionGeometry.channels is not correct')
 
+        assert ag3d == self.ag3d
+        
 if __name__ == '__main__':
     unittest.main()

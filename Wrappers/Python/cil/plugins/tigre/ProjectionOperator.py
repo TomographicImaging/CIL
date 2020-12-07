@@ -65,7 +65,7 @@ class ProjectionOperator(LinearOperator):
 
     def __init__(self, domain_geometry, range_geometry, direct_method='interpolated',adjoint_method='matched'):
     
-        super(TIGREProjectionOperator,self).__init__(domain_geometry=domain_geometry,\
+        super(ProjectionOperator,self).__init__(domain_geometry=domain_geometry,\
              range_geometry=range_geometry)
         self.tigre_geom = CIL2TIGREGeometry.getTIGREGeometry(domain_geometry,range_geometry)
 

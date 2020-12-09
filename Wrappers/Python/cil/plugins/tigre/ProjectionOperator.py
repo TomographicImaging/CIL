@@ -17,11 +17,53 @@ class TIGREGeometry(Geometry):
     def __init__(self, ig, ag):
 
         Geometry.__init__(self)
-        
+
+        ag_in = ag.copy()
+        system = ag.config.system
+        system.update_reference_frame()
+
+        if ag_in.geom_type == 'cone':
+            if ag_in.dimension=='3D':    
+                z = system.source.position[2]
+                translate = np.asarray([0,0,-z])
+                system.source.position += translate
+                system.detector.position += translate
+                system.rotation_axis.position += translate
+
+                #align source along negative y
+                a = system.source.position
+                a = a / np.sqrt(a.dot(a))
+                b = np.array([0, -1, 0])
+
+                if np.allclose(a,b):
+                    axis_rotation = np.eye(3)
+                elif np.allclose(a,-b):
+                    axis_rotation = np.eye(3) #pi rotation around either axis
+                    axis_rotation[0][0] = -1
+                    axis_rotation[2][2] = -1
+                else:
+                    v = np.cross(a, b)
+                    s = np.linalg.norm(v)
+                    c = np.dot(a, b) 
+                    vx = np.array([[0, -v[2], v[1]], [v[2], 0, -v[0]], [-v[1], v[0], 0]]) 
+                    axis_rotation = np.eye(3) + vx + vx.dot(vx) * (1-c)/(s**2) 
+
+                r = np.matrix(axis_rotation)
+                system.source.position = r.dot(system.source.position.reshape(3,1))
+                system.detector.position = r.dot(system.detector.position.reshape(3,1))
+                system.rotation_axis.position = r.dot(system.rotation_axis.position.reshape(3,1))
+                new_x = r.dot(system.detector.direction_x.reshape(3,1)) 
+                new_y = r.dot(system.detector.direction_y.reshape(3,1))
+                system.detector.set_direction(new_x, new_y)
+
+            #distance source to origin
+            DSO = -system.source.position[1]
+            DSD = DSO + system.detector.position[1]
+
         # VARIABLE                                          DESCRIPTION                    UNITS
         # -------------------------------------------------------------------------------------
-        self.DSD = ag.dist_source_center + ag.dist_center_detector
-        self.DSO = ag.dist_source_center
+        self.DSD = DSD
+        self.DSO = DSO
        
         # Detector parameters
         # (V,U) number of pixels        (px)
@@ -47,12 +89,26 @@ class TIGREGeometry(Geometry):
         # total size of the image       (mm)
         self.sVoxel = self.nVoxel * self.dVoxel                                         
         
-        # Offsets
-        self.offOrigin = np.array( [0, 0, 0 ])
-        self.offDetector = np.array( [0 , 0, 0 ])                 # Offset of Detector            (mm)
-        self.rotDetector = np.array((0, 0, 0))
+        # Offsets Tigre (Z, Y, X) == CIL (Z, X, -Y)
+        ind = np.asarray([2, 0, 1])
+        flip = np.asarray([1, 1, -1])
+        self.offOrigin = np.array( system.rotation_axis.position[ind] * flip )
+
+        zero = np.asarray([1, 1, 0])
+        self.offDetector = np.array( system.detector.position[ind] * zero ) 
+        
+        #convert roll, pitch, yaw
+        U = system.detector.direction_x[ind] * flip
+        V = system.detector.direction_y[ind] * flip
+
+        roll = np.arctan2(-V[1], V[0])
+        pitch = np.arcsin(V[2])
+        yaw = np.arctan2(-U[2],U[1])
+
+        self.rotDetector = np.array((roll, pitch, yaw))  
+
         # Auxiliary
-        self.accuracy = 0.5                                 # Accuracy of FWD proj          (vx/sample)
+        self.accuracy = 0.5                        # Accuracy of FWD proj          (vx/sample)
         # Mode
         # parallel, cone
         self.mode = ag.config.system.geometry                                  
@@ -90,8 +146,10 @@ class ProjectionOperator(LinearOperator):
 
         if range_geometry.config.angles.angle_unit == AcquisitionGeometry.DEGREE:
             self.angles *= (np.pi/180.) 
+
+        self.angles *= -1
         self.angles -= np.pi/2
-        
+
         self.method = {'direct':direct_method,'adjoint':adjoint_method}
     
     def direct(self, x, out=None):
@@ -99,10 +157,10 @@ class ProjectionOperator(LinearOperator):
             out = self.range.allocate(None)
         if self.tigre_geom.is2D:
             data_temp = np.expand_dims(x.as_array(),axis=0)
-            arr_out = Ax.Ax(data_temp, self.tigre_geom, self.angles , krylov=self.method['direct'])
+            arr_out = Ax.Ax(data_temp, self.tigre_geom, self.angles, projection_type='Interpolated')
             arr_out = np.squeeze(arr_out, axis=1)
         else:
-            arr_out = Ax.Ax(x.as_array(), self.tigre_geom, self.angles , krylov=self.method['direct'])
+            arr_out = Ax.Ax(x.as_array(), self.tigre_geom, self.angles , projection_type='Siddon')
         out.fill ( arr_out )
         return out
     def adjoint(self, x, out=None):
@@ -110,15 +168,20 @@ class ProjectionOperator(LinearOperator):
             out = self.domain.allocate(None)
         if self.tigre_geom.is2D:
             data_temp = np.expand_dims(x.as_array(),axis=1)
-            arr_out = Atb.Atb(data_temp, self.tigre_geom, self.angles , krylov=self.method['adjoint'])
+            arr_out = Atb.Atb(data_temp, self.tigre_geom, self.angles , krylov='matched')
             arr_out = np.squeeze(arr_out, axis=0)
         else:
-            arr_out = Atb.Atb(x.as_array(), self.tigre_geom, self.angles , krylov=self.method['adjoint'])
+            arr_out = Atb.Atb(x.as_array(), self.tigre_geom, self.angles , krylov='matched')
         out.fill ( arr_out )
         return out
-    def fdk(self, x):
-        data_temp = np.expand_dims(x.as_array(),axis=1)
-        arr_out = fdk(data_temp, self.tigre_geom, self.angles)
-        arr_out = np.squeeze(arr_out, axis=0)
-        return arr_out
-        
+    def fdk(self, x, out=None):
+        if out is None:
+            out = self.domain.allocate(None)
+        if self.tigre_geom.is2D:
+            data_temp = np.expand_dims(x.as_array(),axis=1)
+            arr_out = fdk(data_temp, self.tigre_geom, self.angles)
+            arr_out = np.squeeze(arr_out, axis=0)
+        else:
+            arr_out = fdk(x.as_array(), self.tigre_geom, self.angles)
+        out.fill ( arr_out )
+        return out

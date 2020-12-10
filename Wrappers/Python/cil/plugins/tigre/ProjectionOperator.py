@@ -19,9 +19,10 @@ class TIGREGeometry(Geometry):
         Geometry.__init__(self)
 
         ag_in = ag.copy()
-        system = ag.config.system
+        system = ag_in.config.system
         system.update_reference_frame()
 
+        self.theta = 0
         if ag_in.geom_type == 'cone':
             if ag_in.dimension=='3D':    
                 z = system.source.position[2]
@@ -33,7 +34,7 @@ class TIGREGeometry(Geometry):
                 #align source along negative y
                 a = system.source.position
                 a = a / np.sqrt(a.dot(a))
-                b = np.array([0, -1, 0])
+                b = np.array([0.0, -1.0, 0.0])
 
                 if np.allclose(a,b):
                     axis_rotation = np.eye(3)
@@ -59,7 +60,7 @@ class TIGREGeometry(Geometry):
                 #align source along negative y
                 a = system.source.position
                 a = a / np.sqrt(a.dot(a))
-                b = np.array([0, -1])
+                b = np.array([0.0, -1.0])
 
                 if np.allclose(a,b):
                     axis_rotation = np.eye(2)
@@ -67,11 +68,12 @@ class TIGREGeometry(Geometry):
                     axis_rotation = np.eye(2)
                     axis_rotation[0][0] = -1
                 else:
-                    theta = np.arctan2(a[0], a[1])
+                    theta = np.arctan2(a[0], a[1]) + np.pi
                     axis_rotation = np.eye(2)
                     axis_rotation[0][0] = axis_rotation[1][1] = np.cos(theta)
                     axis_rotation[0][1] = -np.sin(theta)
                     axis_rotation[1][0] = np.sin(theta)
+                    self.theta = theta
 
                 r = np.matrix(axis_rotation)
                 system.source.position = r.dot(system.source.position.reshape(2,1))
@@ -90,13 +92,13 @@ class TIGREGeometry(Geometry):
        
         # Detector parameters
         # (V,U) number of pixels        (px)
-        self.nDetector = np.array(ag.config.panel.num_pixels[::-1])
+        self.nDetector = np.array(ag_in.config.panel.num_pixels[::-1])
         # size of each pixel            (mm)
-        self.dDetector = np.array(ag.config.panel.pixel_size[::-1])
+        self.dDetector = np.array(ag_in.config.panel.pixel_size[::-1])
         self.sDetector = self.dDetector * self.nDetector    # total size of the detector    (mm)
         
         # Image parameters
-        if ag.dimension == '2D':
+        if ag_in.dimension == '2D':
             # number of voxels              (vx)
             self.nVoxel = np.array( [1, ig.voxel_num_x, ig.voxel_num_y] )
             # size of each voxel            (mm)
@@ -152,7 +154,7 @@ class TIGREGeometry(Geometry):
         self.accuracy = 0.5                        # Accuracy of FWD proj          (vx/sample)
         # Mode
         # parallel, cone
-        self.mode = ag.config.system.geometry                                  
+        self.mode = ag_in.config.system.geometry                                  
 
 # def Ax(img, geo, angles,  krylov="ray-voxel"):
 class ProjectionOperator(LinearOperator):
@@ -188,8 +190,9 @@ class ProjectionOperator(LinearOperator):
         if range_geometry.config.angles.angle_unit == AcquisitionGeometry.DEGREE:
             self.angles *= (np.pi/180.) 
 
-        self.angles *= -1
-        self.angles -= np.pi/2
+        self.angles *= -1 #negate rotation
+        self.angles -= np.pi/2 #rotate imagegeometry 90deg
+        self.angles -= self.tigre_geom.theta #compensate for image geometry definitions
 
         self.method = {'direct':direct_method,'adjoint':adjoint_method}
     

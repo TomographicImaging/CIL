@@ -82,6 +82,7 @@ class TIGREGeometry(Geometry):
             DSO = -system.source.position[1]
             DSD = DSO + system.detector.position[1]
 
+
         # VARIABLE                                          DESCRIPTION                    UNITS
         # -------------------------------------------------------------------------------------
         self.DSD = DSD
@@ -111,7 +112,6 @@ class TIGREGeometry(Geometry):
             roll = 0
             pitch = 0
             yaw = np.arctan2(-U[2],U[1])
-            self.rotDetector = np.array((roll, pitch, yaw))  
 
         else:
             # number of voxels              (vx)
@@ -121,6 +121,7 @@ class TIGREGeometry(Geometry):
             self.is2D = False
         
             # Offsets Tigre (Z, Y, X) == CIL (Z, X, -Y)
+            
             ind = np.asarray([2, 0, 1])
             flip = np.asarray([1, 1, -1])
             self.offOrigin = np.array( system.rotation_axis.position[ind] * flip )
@@ -135,8 +136,15 @@ class TIGREGeometry(Geometry):
             roll = np.arctan2(-V[1], V[0])
             pitch = np.arcsin(V[2])
             yaw = np.arctan2(-U[2],U[1])
-            self.rotDetector = np.array((roll, pitch, yaw))  
-        
+ 
+        panel_origin = ag_in.config.panel.origin
+        if 'right' in panel_origin:
+            yaw += np.pi
+        if 'top' in panel_origin:
+            pitch += np.pi
+
+        self.rotDetector = np.array((roll, pitch, yaw)) 
+
         # total size of the image       (mm)
         self.sVoxel = self.nVoxel * self.dVoxel                                         
 
@@ -175,7 +183,7 @@ class ProjectionOperator(LinearOperator):
 
         # so we need to translate the angles by removing 90 degrees
         
-        self.angles = range_geometry.config.angles.angle_data.copy()
+        self.angles = range_geometry.config.angles.angle_data.copy() + range_geometry.config.angles.initial_angle
 
         if range_geometry.config.angles.angle_unit == AcquisitionGeometry.DEGREE:
             self.angles *= (np.pi/180.) 

@@ -55,7 +55,29 @@ class TIGREGeometry(Geometry):
                 new_x = r.dot(system.detector.direction_x.reshape(3,1)) 
                 new_y = r.dot(system.detector.direction_y.reshape(3,1))
                 system.detector.set_direction(new_x, new_y)
+            else:    
+                #align source along negative y
+                a = system.source.position
+                a = a / np.sqrt(a.dot(a))
+                b = np.array([0, -1])
 
+                if np.allclose(a,b):
+                    axis_rotation = np.eye(2)
+                elif np.allclose(a,-b):
+                    axis_rotation = np.eye(2)
+                    axis_rotation[0][0] = -1
+                else:
+                    theta = np.arctan2(a[0], a[1])
+                    axis_rotation = np.eye(2)
+                    axis_rotation[0][0] = axis_rotation[1][1] = np.cos(theta)
+                    axis_rotation[0][1] = -np.sin(theta)
+                    axis_rotation[1][0] = np.sin(theta)
+
+                r = np.matrix(axis_rotation)
+                system.source.position = r.dot(system.source.position.reshape(2,1))
+                system.detector.position = r.dot(system.detector.position.reshape(2,1))
+                system.rotation_axis.position = r.dot(system.rotation_axis.position.reshape(2,1))
+                system.detector.direction_x = r.dot(system.detector.direction_x.reshape(2,1)) 
             #distance source to origin
             DSO = -system.source.position[1]
             DSD = DSO + system.detector.position[1]
@@ -79,6 +101,18 @@ class TIGREGeometry(Geometry):
             # size of each voxel            (mm)
             self.dVoxel = np.array( [ig.voxel_size_x, ig.voxel_size_y, ig.voxel_size_x]  )
             self.is2D = True
+
+            # Offsets Tigre (Z, Y, X) == CIL (Z, X, -Y)
+            self.offOrigin = np.array( [0, system.rotation_axis.position[0], system.rotation_axis.position[1]])
+            self.offDetector = np.array( [0, system.detector.position[0] , 0 ]) 
+            
+            #convert roll, pitch, yaw
+            U = [0, system.detector.direction_x[0], -system.detector.direction_x[1]]
+            roll = 0
+            pitch = 0
+            yaw = np.arctan2(-U[2],U[1])
+            self.rotDetector = np.array((roll, pitch, yaw))  
+
         else:
             # number of voxels              (vx)
             self.nVoxel = np.array( [ig.voxel_num_z, ig.voxel_num_x, ig.voxel_num_y] )
@@ -86,26 +120,25 @@ class TIGREGeometry(Geometry):
             self.dVoxel = np.array( [ig.voxel_size_z, ig.voxel_size_y, ig.voxel_size_x]  )
             self.is2D = False
         
+            # Offsets Tigre (Z, Y, X) == CIL (Z, X, -Y)
+            ind = np.asarray([2, 0, 1])
+            flip = np.asarray([1, 1, -1])
+            self.offOrigin = np.array( system.rotation_axis.position[ind] * flip )
+
+            zero = np.asarray([1, 1, 0])
+            self.offDetector = np.array( system.detector.position[ind] * zero ) 
+            
+            #convert roll, pitch, yaw
+            U = system.detector.direction_x[ind] * flip
+            V = system.detector.direction_y[ind] * flip
+
+            roll = np.arctan2(-V[1], V[0])
+            pitch = np.arcsin(V[2])
+            yaw = np.arctan2(-U[2],U[1])
+            self.rotDetector = np.array((roll, pitch, yaw))  
+        
         # total size of the image       (mm)
         self.sVoxel = self.nVoxel * self.dVoxel                                         
-        
-        # Offsets Tigre (Z, Y, X) == CIL (Z, X, -Y)
-        ind = np.asarray([2, 0, 1])
-        flip = np.asarray([1, 1, -1])
-        self.offOrigin = np.array( system.rotation_axis.position[ind] * flip )
-
-        zero = np.asarray([1, 1, 0])
-        self.offDetector = np.array( system.detector.position[ind] * zero ) 
-        
-        #convert roll, pitch, yaw
-        U = system.detector.direction_x[ind] * flip
-        V = system.detector.direction_y[ind] * flip
-
-        roll = np.arctan2(-V[1], V[0])
-        pitch = np.arcsin(V[2])
-        yaw = np.arctan2(-U[2],U[1])
-
-        self.rotDetector = np.array((roll, pitch, yaw))  
 
         # Auxiliary
         self.accuracy = 0.5                        # Accuracy of FWD proj          (vx/sample)
@@ -157,7 +190,7 @@ class ProjectionOperator(LinearOperator):
             out = self.range.allocate(None)
         if self.tigre_geom.is2D:
             data_temp = np.expand_dims(x.as_array(),axis=0)
-            arr_out = Ax.Ax(data_temp, self.tigre_geom, self.angles, projection_type='Interpolated')
+            arr_out = Ax.Ax(data_temp, self.tigre_geom, self.angles, projection_type='interpolated')
             arr_out = np.squeeze(arr_out, axis=1)
         else:
             arr_out = Ax.Ax(x.as_array(), self.tigre_geom, self.angles , projection_type='Siddon')

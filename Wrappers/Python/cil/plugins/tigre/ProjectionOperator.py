@@ -22,7 +22,6 @@ class TIGREGeometry(Geometry):
         system = ag_in.config.system
         system.update_reference_frame()
 
-        self.theta = 0
         if ag_in.geom_type == 'cone':
             if ag_in.dimension=='3D':    
                 z = system.source.position[2]
@@ -72,8 +71,7 @@ class TIGREGeometry(Geometry):
                     axis_rotation = np.eye(2)
                     axis_rotation[0][0] = axis_rotation[1][1] = np.cos(theta)
                     axis_rotation[0][1] = -np.sin(theta)
-                    axis_rotation[1][0] = np.sin(theta)
-                    self.theta = theta
+                    axis_rotation[1][0] = np.sin(theta)   
 
                 r = np.matrix(axis_rotation)
                 system.source.position = r.dot(system.source.position.reshape(2,1))
@@ -139,6 +137,7 @@ class TIGREGeometry(Geometry):
             pitch = np.arcsin(V[2])
             yaw = np.arctan2(-U[2],U[1])
  
+        self.theta = yaw
         panel_origin = ag_in.config.panel.origin
         if 'right' in panel_origin:
             yaw += np.pi

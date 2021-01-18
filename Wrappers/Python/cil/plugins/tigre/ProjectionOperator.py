@@ -22,6 +22,7 @@ class TIGREGeometry(Geometry):
         system = ag_in.config.system
         system.update_reference_frame()
 
+        #rotate and translate system to match tigre definitions
         if ag_in.geom_type == 'cone':
             if ag_in.dimension=='3D':    
                 z = system.source.position[2]
@@ -78,13 +79,18 @@ class TIGREGeometry(Geometry):
                 system.detector.position = r.dot(system.detector.position.reshape(2,1))
                 system.rotation_axis.position = r.dot(system.rotation_axis.position.reshape(2,1))
                 system.detector.direction_x = r.dot(system.detector.direction_x.reshape(2,1)) 
+
+
             #distance source to origin
             DSO = -system.source.position[1]
             DSD = DSO + system.detector.position[1]
 
+        else:
+            #can reconstruct simple parallel geometry only
+            #Cofr?
+            raise NotImplementedError("Currently TIGRE only wrapped for cone-beam tomography")
 
-        # VARIABLE                                          DESCRIPTION                    UNITS
-        # -------------------------------------------------------------------------------------
+
         self.DSD = DSD
         self.DSO = DSO
        
@@ -94,18 +100,18 @@ class TIGREGeometry(Geometry):
         # size of each pixel            (mm)
         self.dDetector = np.array(ag_in.config.panel.pixel_size[::-1])
         self.sDetector = self.dDetector * self.nDetector    # total size of the detector    (mm)
-        
-        # Image parameters
-        if ag_in.dimension == '2D':
-            # number of voxels              (vx)
-            self.nVoxel = np.array( [1, ig.voxel_num_x, ig.voxel_num_y] )
-            # size of each voxel            (mm)
-            self.dVoxel = np.array( [ig.voxel_size_x, ig.voxel_size_y, ig.voxel_size_x]  )
-            self.is2D = True
 
-            # Offsets Tigre (Z, Y, X) == CIL (Z, X, -Y)
-            self.offOrigin = np.array( [0, system.rotation_axis.position[0], system.rotation_axis.position[1]])
-            self.offDetector = np.array( [0, system.detector.position[0] , 0 ]) 
+        # number of voxels              (vx)
+        self.nVoxel = np.array( [ig.voxel_num_z, ig.voxel_num_x, ig.voxel_num_y] )
+        self.nVoxel[self.nVoxel==0] = 1 #default is 1 not 0
+        # size of each voxel            (mm)
+        self.dVoxel = np.array( [ig.voxel_size_z, ig.voxel_size_x, ig.voxel_size_y]  )
+
+        if ag_in.dimension == '2D':
+            self.is2D = True
+            # Offsets Tigre (Z, Y, X) == CIL (X, -Y)
+            self.offOrigin = np.array( [0, system.rotation_axis.position[0], -system.rotation_axis.position[1]])
+            self.offDetector = np.array( [0, system.detector.position[0] , 0 ]) #y component in DSD
             
             #convert roll, pitch, yaw
             U = [0, system.detector.direction_x[0], -system.detector.direction_x[1]]
@@ -114,20 +120,13 @@ class TIGREGeometry(Geometry):
             yaw = np.arctan2(-U[2],U[1])
 
         else:
-            # number of voxels              (vx)
-            self.nVoxel = np.array( [ig.voxel_num_z, ig.voxel_num_x, ig.voxel_num_y] )
-            # size of each voxel            (mm)
-            self.dVoxel = np.array( [ig.voxel_size_z, ig.voxel_size_y, ig.voxel_size_x]  )
             self.is2D = False
-        
-            # Offsets Tigre (Z, Y, X) == CIL (Z, X, -Y)
-            
+            # Offsets Tigre (Z, Y, X) == CIL (Z, X, -Y)        
             ind = np.asarray([2, 0, 1])
             flip = np.asarray([1, 1, -1])
-            self.offOrigin = np.array( system.rotation_axis.position[ind] * flip )
 
-            zero = np.asarray([1, 1, 0])
-            self.offDetector = np.array( system.detector.position[ind] * zero ) 
+            self.offOrigin = np.array( system.rotation_axis.position[ind] * flip )
+            self.offDetector = np.array( [system.detector.position[2], system.detector.position[0], 0]) #y component in DSD
             
             #convert roll, pitch, yaw
             U = system.detector.direction_x[ind] * flip

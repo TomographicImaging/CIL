@@ -1692,14 +1692,15 @@ class AcquisitionGeometry(object):
         '''returns a default configured ImageGeometry object based on the AcquisitionGeomerty'''
 
         num_voxel_xy = int(numpy.ceil(self.config.panel.num_pixels[0] * resolution))
-        voxel_size_xy = self.config.panel.pixel_size[0] * resolution / self.magnification
+        voxel_size_xy = self.config.panel.pixel_size[0] / (resolution * self.magnification)
 
         if self.dimension == '3D':
             num_voxel_z = int(numpy.ceil(self.config.panel.num_pixels[1] * resolution))
-            voxel_size_z = self.config.panel.pixel_size[1] * resolution/ self.magnification
+            voxel_size_z = self.config.panel.pixel_size[1] / (resolution * self.magnification)
         else:
             num_voxel_z = 0
             voxel_size_z = 1
+            
         return ImageGeometry(num_voxel_xy, num_voxel_xy, num_voxel_z, voxel_size_xy, voxel_size_xy, voxel_size_z, channels=self.channels)
 
     def __str__ (self):

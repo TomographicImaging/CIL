@@ -6,7 +6,20 @@ class CIL2TIGREGeometry(object):
     @staticmethod
     def getTIGREGeometry(ig, ag):
         tg = TIGREGeometry(ig, ag)
-        tg.check_geo(angles=tg.angles)
+
+        #angles
+        angles = ag.config.angles.angle_data + ag.config.angles.initial_angle
+
+        if ag.config.angles.angle_unit == AcquisitionGeometry.DEGREE:
+            angles *= (np.pi/180.) 
+
+        angles *= -1 #negate rotation
+        angles -= np.pi/2 #rotate imagegeometry 90deg
+        angles -= tg.theta #compensate for image geometry definitions
+        angles = angles
+
+        #sets angles in tg
+        tg.check_geo(angles)
         return tg
 
 class TIGREGeometry(Geometry):
@@ -100,11 +113,15 @@ class TIGREGeometry(Geometry):
 
         # number of voxels              (vx)
         self.nVoxel = np.array( [ig.voxel_num_z, ig.voxel_num_x, ig.voxel_num_y] )
-        self.nVoxel[self.nVoxel==0] = 1 #default is 1 not 0
         # size of each voxel            (mm)
         self.dVoxel = np.array( [ig.voxel_size_z, ig.voxel_size_x, ig.voxel_size_y]  )
 
+
         if ag_in.dimension == '2D':
+            #fix IG
+            self.nVoxel[0]=1
+            self.dVoxel[0]= ag_in.config.panel.pixel_size[1] / ag_in.magnification
+
             self.is2D = True
             # Offsets Tigre (Z, Y, X) == CIL (X, -Y)
             self.offOrigin = np.array( [0, system.rotation_axis.position[0], -system.rotation_axis.position[1]])
@@ -150,15 +167,4 @@ class TIGREGeometry(Geometry):
         # Mode
         # parallel, cone
         self.mode = ag_in.config.system.geometry                 
-
-        #angles
-        angles = ag_in.config.angles.angle_data + ag.config.angles.initial_angle
-
-        if ag.config.angles.angle_unit == AcquisitionGeometry.DEGREE:
-            angles *= (np.pi/180.) 
-
-        angles *= -1 #negate rotation
-        angles -= np.pi/2 #rotate imagegeometry 90deg
-        angles -= self.theta #compensate for image geometry definitions
-        self.angles = angles
-                 
+        

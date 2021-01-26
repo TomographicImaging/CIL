@@ -1,4 +1,4 @@
-from cil.framework import DataProcessor
+from cil.framework import DataProcessor, ImageData
 from cil.plugins.tigre import CIL2TIGREGeometry
 from tigre.algorithms import fdk
 import numpy as np
@@ -24,12 +24,12 @@ class FBP(DataProcessor):
     
     def __init__(self, volume_geometry, sinogram_geometry): 
         
-        super(FBP, self).__init__( volume_geometry = volume_geometry, sinogram_geometry = sinogram_geometry)
 
+        tigre_geom = CIL2TIGREGeometry.getTIGREGeometry(volume_geometry,sinogram_geometry)
 
-        self.tigre_geom = CIL2TIGREGeometry.getTIGREGeometry(domain_geometry,range_geometry)
+        super(FBP, self).__init__(  volume_geometry = volume_geometry, sinogram_geometry = sinogram_geometry,\
+                                    tigre_geom=tigre_geom)
 
-        self.method = {'direct':direct_method,'adjoint':adjoint_method}
 
     def check_input(self, dataset):
         
@@ -40,7 +40,7 @@ class FBP(DataProcessor):
         return True
 
     def process(self, out=None):
-           
+        
         if self.tigre_geom.is2D:
             data_temp = np.expand_dims(self.get_input().as_array(), axis=1)
             arr_out = fdk(data_temp, self.tigre_geom, self.tigre_geom.angles)

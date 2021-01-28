@@ -42,27 +42,23 @@ class Test_convert_geometry(unittest.TestCase):
         ig.voxel_num_y = 50
         ig.voxel_size_y /= 2
 
-        angles_rad = np.zeros([3,3])
-        angles_rad[0,0] = -np.pi/2
-        angles_rad[1,0] = -np.pi
-        angles_rad[2,0] = -3 *np.pi/2
+        angles_rad = np.array([-np.pi/2, -np.pi, -3 *np.pi/2])
 
         #2D cone
-        geometry = CIL2TIGREGeometry.getTIGREGeometry(ig, ag)
-        np.testing.assert_allclose(geometry.DSD, ag.dist_center_detector + ag.dist_source_center)
-        np.testing.assert_allclose(geometry.DSO, ag.dist_source_center)
-        np.testing.assert_allclose(geometry.angles, angles_rad)
-        np.testing.assert_allclose(geometry.dDetector, ag.config.panel.pixel_size[::-1])
-        np.testing.assert_allclose(geometry.nDetector, ag.config.panel.num_pixels[::-1])
-        np.testing.assert_allclose(geometry.sDetector, geometry.dDetector * geometry.nDetector)
-        np.testing.assert_allclose(geometry.COR,0)
-        np.testing.assert_allclose(geometry.rotDetector,0)
-        np.testing.assert_allclose(geometry.offDetector,0)
-        np.testing.assert_allclose(geometry.offOrigin,0)
+        tg_geometry, tg_angles = CIL2TIGREGeometry.getTIGREGeometry(ig, ag)
+        np.testing.assert_allclose(tg_geometry.DSD, ag.dist_center_detector + ag.dist_source_center)
+        np.testing.assert_allclose(tg_geometry.DSO, ag.dist_source_center)
+        np.testing.assert_allclose(tg_angles, angles_rad)
+        np.testing.assert_allclose(tg_geometry.dDetector, ag.config.panel.pixel_size[::-1])
+        np.testing.assert_allclose(tg_geometry.nDetector, ag.config.panel.num_pixels[::-1])
+        np.testing.assert_allclose(tg_geometry.sDetector, tg_geometry.dDetector * tg_geometry.nDetector)
+        np.testing.assert_allclose(tg_geometry.rotDetector,0)
+        np.testing.assert_allclose(tg_geometry.offDetector,0)
+        np.testing.assert_allclose(tg_geometry.offOrigin,0)
 
         mag = ag.magnification
-        np.testing.assert_allclose(geometry.nVoxel, [1,128,50])
-        np.testing.assert_allclose(geometry.dVoxel, [0.1/mag,0.1/mag,0.05/mag])
+        np.testing.assert_allclose(tg_geometry.nVoxel, [1,128,50])
+        np.testing.assert_allclose(tg_geometry.dVoxel, [0.1/mag,0.1/mag,0.05/mag])
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_cone3D_simple(self):
@@ -75,27 +71,23 @@ class Test_convert_geometry(unittest.TestCase):
         ig.voxel_num_y = 50
         ig.voxel_size_y /= 2
 
-        angles_rad = np.zeros([3,3])
-        angles_rad[0,0] = -np.pi/2
-        angles_rad[1,0] = -np.pi
-        angles_rad[2,0] = -3 *np.pi/2
+        angles_rad = np.array([-np.pi/2, -np.pi, -3 *np.pi/2])
 
-        geometry = CIL2TIGREGeometry.getTIGREGeometry(ig, ag)
+        tg_geometry, tg_angles = CIL2TIGREGeometry.getTIGREGeometry(ig, ag)
 
-        np.testing.assert_allclose(geometry.DSD, ag.dist_center_detector + ag.dist_source_center)
-        np.testing.assert_allclose(geometry.DSO, ag.dist_source_center)
-        np.testing.assert_allclose(geometry.angles, angles_rad)
-        np.testing.assert_allclose(geometry.dDetector, ag.config.panel.pixel_size[::-1])
-        np.testing.assert_allclose(geometry.nDetector, ag.config.panel.num_pixels[::-1])
-        np.testing.assert_allclose(geometry.sDetector, geometry.dDetector * geometry.nDetector)
-        np.testing.assert_allclose(geometry.COR,0)
-        np.testing.assert_allclose(geometry.rotDetector,0)
-        np.testing.assert_allclose(geometry.offDetector,0)
-        np.testing.assert_allclose(geometry.offOrigin,0)
+        np.testing.assert_allclose(tg_geometry.DSD, ag.dist_center_detector + ag.dist_source_center)
+        np.testing.assert_allclose(tg_geometry.DSO, ag.dist_source_center)
+        np.testing.assert_allclose(tg_angles, angles_rad)
+        np.testing.assert_allclose(tg_geometry.dDetector, ag.config.panel.pixel_size[::-1])
+        np.testing.assert_allclose(tg_geometry.nDetector, ag.config.panel.num_pixels[::-1])
+        np.testing.assert_allclose(tg_geometry.sDetector, tg_geometry.dDetector * tg_geometry.nDetector)
+        np.testing.assert_allclose(tg_geometry.rotDetector,0)
+        np.testing.assert_allclose(tg_geometry.offDetector,0)
+        np.testing.assert_allclose(tg_geometry.offOrigin,0)
 
         mag = ag.magnification
-        np.testing.assert_allclose(geometry.nVoxel, [3,128,50])
-        np.testing.assert_allclose(geometry.dVoxel, [0.2/mag,0.1/mag,0.05/mag])
+        np.testing.assert_allclose(tg_geometry.nVoxel, [3,128,50])
+        np.testing.assert_allclose(tg_geometry.dVoxel, [0.2/mag,0.1/mag,0.05/mag])
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_cone3D_cofr(self):
@@ -111,56 +103,39 @@ class Test_convert_geometry(unittest.TestCase):
         ig.voxel_num_y = 50
         ig.voxel_size_y /= 2
 
-        geometry = CIL2TIGREGeometry.getTIGREGeometry(ig, ag)
+        tg_geometry, tg_angles= CIL2TIGREGeometry.getTIGREGeometry(ig, ag)
 
-        np.testing.assert_allclose(geometry.DSO, ag.dist_source_center)
+        np.testing.assert_allclose(tg_geometry.DSO, ag.dist_source_center)
 
         yaw = np.arcsin(3./5.)
-        det_rot = np.zeros((3,3))
-        det_rot[:,2] = yaw
-        np.testing.assert_allclose(geometry.rotDetector,det_rot)
+        det_rot = np.array([0,0,yaw])
+        np.testing.assert_allclose(tg_geometry.rotDetector,det_rot)
 
         offset = 4 * 6 /5
-        det_offset = np.zeros((3,3))
-        det_offset[:,1] = -offset
-        np.testing.assert_allclose(geometry.offDetector,det_offset)
+        det_offset = np.array([0,-offset,0])
+        np.testing.assert_allclose(tg_geometry.offDetector,det_offset)
     
         s2d = ag.dist_center_detector + ag.dist_source_center - 6 * 3 /5   
-        np.testing.assert_allclose(geometry.DSD, s2d)
+        np.testing.assert_allclose(tg_geometry.DSD, s2d)
 
-        angles_rad = np.zeros([3,3])
-        angles_rad[0,0] = -np.pi/2- yaw
-        angles_rad[1,0] = -np.pi- yaw
-        angles_rad[2,0] = -3 *np.pi/2- yaw
+        angles_rad = np.array([-np.pi/2, -np.pi, -3 *np.pi/2]) - yaw
 
-        np.testing.assert_allclose(geometry.angles, angles_rad)
-        np.testing.assert_allclose(geometry.dDetector, ag.config.panel.pixel_size[::-1])
-        np.testing.assert_allclose(geometry.nDetector, ag.config.panel.num_pixels[::-1])
-        np.testing.assert_allclose(geometry.sDetector, geometry.dDetector * geometry.nDetector)
-        np.testing.assert_allclose(geometry.COR,0)
-        np.testing.assert_allclose(geometry.offOrigin,0)
+
+        np.testing.assert_allclose(tg_angles, angles_rad)
+        np.testing.assert_allclose(tg_geometry.dDetector, ag.config.panel.pixel_size[::-1])
+        np.testing.assert_allclose(tg_geometry.nDetector, ag.config.panel.num_pixels[::-1])
+        np.testing.assert_allclose(tg_geometry.sDetector, tg_geometry.dDetector * tg_geometry.nDetector)
+        np.testing.assert_allclose(tg_geometry.offOrigin,0)
 
         mag = ag.magnification
-        np.testing.assert_allclose(geometry.nVoxel, [3,128,50])
-        np.testing.assert_allclose(geometry.dVoxel, [0.2/mag,0.1/mag,0.05/mag])
-
-    @unittest.skipUnless(has_tigre, "TIGRE not installed")
-    def test_cone3D_cofr2(self):
-        pass
-
-    @unittest.skipUnless(has_tigre, "TIGRE not installed")
-    def test_cone3D_lamino(self):
-        pass
-
-    @unittest.skipUnless(has_tigre, "TIGRE not installed")
-    def test_IG(self):
-        pass
+        np.testing.assert_allclose(tg_geometry.nVoxel, [3,128,50])
+        np.testing.assert_allclose(tg_geometry.dVoxel, [0.2/mag,0.1/mag,0.05/mag])
 
 class Test_ProjectionOperator(unittest.TestCase):
     def setUp(self): 
         
-        N = 128
-        angles = np.linspace(0, np.pi, 4, dtype='float32')
+        N = 3
+        angles = np.linspace(0, np.pi, 2, dtype='float32')
 
         self.ag = AcquisitionGeometry.create_Cone2D([0,-100],[0,200])\
                                 .set_angles(angles, angle_unit='radian')\
@@ -181,45 +156,47 @@ class Test_ProjectionOperator(unittest.TestCase):
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_norm(self):
         n = self.Op.norm()
-        self.assertAlmostEqual(n, 0.741749, places=3)
+        self.assertAlmostEqual(n, 0.08165, places=3)
 
         n3D = self.Op3D.norm()
-        self.assertAlmostEqual(n3D, 0.74150, places=3)
+        self.assertAlmostEqual(n3D, 0.08165, places=3)
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_bp(self):
-        ad = self.ag.allocate(0)
+        gold = np.zeros((3,3))
+        gold.fill(2/30)
+
+        ad = self.ag.allocate(1)
         res = self.Op.adjoint(ad)   
         self.assertEqual(res.shape, self.ig.shape)
+        np.testing.assert_allclose(res.as_array(),gold,atol=1e-6)
 
         res = self.ig.allocate(None)
         self.Op.adjoint(ad, out=res)   
         self.assertEqual(res.shape, self.ig.shape)
+        np.testing.assert_allclose(res.as_array(),gold,atol=1e-6)
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_fp(self):
-        data = self.ig.allocate(0)
+        gold = np.zeros((2,3))
+        gold.fill(0.1000017)
+
+        data = self.ig.allocate(1)
         res = self.Op.direct(data)
         self.assertEqual(res.shape, self.ag.shape)
+        np.testing.assert_allclose(res.as_array(),gold,atol=1e-6)
 
         res = self.ag.allocate(None)
         self.Op.direct(data, out=res)
         self.assertEqual(res.shape, self.ag.shape)
+        np.testing.assert_allclose(res.as_array(),gold,atol=1e-6)
 
-    @unittest.skipUnless(has_tigre, "TIGRE not installed")
-    def test_consistency(self):
-        pass   
-
-    @unittest.skipUnless(has_tigre and has_astra, "TIGRE or ASTRA not installed")
-    def test_with_astra(self):
-        pass   
-
-class Test_FBP(unittest.TestCase):
+class Test_results(unittest.TestCase):
     def setUp(self):
         #%% Setup Geometry
         voxel_num_xy = 255
         voxel_num_z = 15
-        self.cs_ind = (voxel_num_z-1)//2
+        cs_ind = (voxel_num_z-1)//2
 
         mag = 2
         src_to_obj = 50
@@ -229,7 +206,7 @@ class Test_FBP(unittest.TestCase):
         det_pix_x = voxel_num_xy
         det_pix_y = voxel_num_z
 
-        num_projections = 360
+        num_projections = 1000
         angles = np.linspace(0, 360, num=num_projections, endpoint=False)
 
         self.ag = AcquisitionGeometry.create_Cone2D([0,-src_to_obj],[0,src_to_det-src_to_obj])\
@@ -268,20 +245,73 @@ class Test_FBP(unittest.TestCase):
         for i in range(4):
             self.golden_data.fill(array=phantom, vertical=7+i)
 
-        self.golden_data_cs = self.golden_data.subset(vertical=self.cs_ind, force=True)
+        self.golden_data_cs = self.golden_data.subset(vertical=cs_ind, force=True)
+
+        self.Op = ProjectionOperator(self.ig3D, self.ag3D)
+        self.fp = self.Op.direct(self.golden_data)
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
-    def test_result_3D(self):
-        Op = ProjectionOperator(self.ig3D, self.ag3D)
-        fp = Op.direct(self.golden_data)
-
-        reco_out = FBP(self.ig, self.ag)(fp.subset(vertical='centre'))
+    def test_FBP(self):
+        reco_out = FBP(self.ig, self.ag)(self.fp.subset(vertical='centre'))
         mean_diff = (self.golden_data_cs-reco_out).abs().mean()
         self.assertLess(mean_diff, 0.01)
         np.testing.assert_allclose(self.golden_data_cs.as_array(),reco_out.as_array(),atol=1)
 
-        reco_out3D = FBP(self.ig3D, self.ag3D)(fp)
+        reco_out3D = FBP(self.ig3D, self.ag3D)(self.fp)
         diff = (self.golden_data-reco_out3D).abs()
         self.assertLess(diff.mean(), 0.01)
         np.testing.assert_allclose(self.golden_data.as_array(),reco_out3D.as_array(),atol=1)
 
+    @unittest.skipUnless(has_tigre and has_astra, "TIGRE or ASTRA not installed")
+    def test_fp_with_Astra(self):
+        AOp = AstraProjectionOperator(self.ig, self.ag)
+        fp_ASTRA = AOp.direct(self.golden_data_cs)
+
+        TOp = ProjectionOperator(self.ig, self.ag)
+        fp_TIGRE = TOp.direct(self.golden_data_cs)
+
+        mean_diff = (fp_ASTRA-fp_TIGRE).abs().mean()
+        self.assertLess(mean_diff, 1e-2)
+        np.testing.assert_allclose(fp_TIGRE.as_array(),fp_ASTRA.as_array(),atol=1)
+
+        astra_ag3D = self.ag3D.subset(['vertical','angle','horizontal'])
+        AOp = AstraProjectionOperator(self.ig3D, astra_ag3D)
+        fp_ASTRA = AOp.direct(self.golden_data)
+        fp_ASTRA = fp_ASTRA.subset(['angle','vertical','horizontal'])
+        mean_diff = (fp_ASTRA-self.fp).abs().mean()
+        self.assertLess(mean_diff, 1)
+        np.testing.assert_allclose(self.fp.as_array(),fp_ASTRA.as_array(),atol=5)
+
+    @unittest.skipUnless(has_tigre and has_astra, "TIGRE or ASTRA not installed")
+    def test_bp_with_Astra(self):
+
+        AOp = AstraProjectionOperator(self.ig, self.ag)
+        bp_ASTRA = AOp.adjoint(self.fp.subset(vertical='centre'))
+        TOp = ProjectionOperator(self.ig, self.ag)
+        bp_TIGRE = TOp.adjoint(self.fp.subset(vertical='centre'))
+        mean_diff = (bp_ASTRA-bp_TIGRE).abs().mean()
+        self.assertLess(mean_diff, 1)
+        np.testing.assert_allclose(bp_ASTRA.as_array(),bp_TIGRE.as_array(),atol=10)
+
+        astra_ag3D = self.ag3D.subset(['vertical','angle','horizontal'])
+        AOp = AstraProjectionOperator(self.ig3D, astra_ag3D)
+        bp_ASTRA = AOp.adjoint(self.fp.subset(['vertical','angle','horizontal']))
+        bp_TIGRE = self.Op.adjoint(self.fp)
+        mean_diff = (bp_ASTRA-bp_TIGRE).abs().mean()
+        self.assertLess(mean_diff, 1)
+        np.testing.assert_allclose(bp_ASTRA.as_array(),bp_TIGRE.as_array(),atol=5)
+
+    @unittest.skipUnless(has_tigre and has_astra, "TIGRE or ASTRA not installed")
+    def test_FBP_with_Astra(self):
+        reco_ASTRA = AstraFBP(self.ig, self.ag)(self.fp.subset(vertical='centre'))
+        reco_TIGRE = FBP(self.ig, self.ag)(self.fp.subset(vertical='centre'))
+        mean_diff = (reco_ASTRA-reco_TIGRE).abs().mean()
+        self.assertLess(mean_diff, 1e-4)
+        np.testing.assert_allclose(reco_ASTRA.as_array(),reco_TIGRE.as_array(),atol=1e-2)
+
+        astra_transpose = self.fp.subset(['vertical','angle','horizontal'])
+        reco_ASTRA3D = AstraFBP(self.ig3D, astra_transpose.geometry)(astra_transpose)
+        reco_TIGRE3D = FBP(self.ig3D, self.ag3D)(self.fp)
+        diff = (reco_ASTRA3D-reco_TIGRE3D).abs()
+        self.assertLess(diff.mean(), 1e-4)
+        np.testing.assert_allclose(reco_ASTRA3D.as_array(),reco_TIGRE3D.as_array(),atol=1e-2)

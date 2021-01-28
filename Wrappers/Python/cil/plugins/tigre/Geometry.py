@@ -1,6 +1,12 @@
 from cil.framework import AcquisitionGeometry, ImageGeometry
-from tigre.utilities.geometry import Geometry
 import numpy as np
+
+try:
+    from tigre.utilities.geometry import Geometry
+except ModuleNotFoundError:
+    print(  "This plugin requires the additional package TIGRE\n" +
+            "Please install it via conda as tigre from the ccpi channel\n"+
+            "Minimal version is 21.01")
 
 class CIL2TIGREGeometry(object):
     @staticmethod
@@ -16,11 +22,8 @@ class CIL2TIGREGeometry(object):
         angles *= -1 #negate rotation
         angles -= np.pi/2 #rotate imagegeometry 90deg
         angles -= tg.theta #compensate for image geometry definitions
-        angles = angles
 
-        #sets angles in tg
-        tg.check_geo(angles)
-        return tg
+        return tg, angles
 
 class TIGREGeometry(Geometry):
 

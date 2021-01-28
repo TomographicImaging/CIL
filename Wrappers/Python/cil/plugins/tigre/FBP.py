@@ -1,7 +1,13 @@
 from cil.framework import DataProcessor, ImageData
 from cil.plugins.tigre import CIL2TIGREGeometry
-from tigre.algorithms import fdk
 import numpy as np
+
+try:
+    from tigre.algorithms import fdk
+except ModuleNotFoundError:
+    print(  "This plugin requires the additional package TIGRE\n" +
+            "Please install it via conda as tigre from the ccpi channel\n"+
+            "Minimal version is 21.01")
 
 class FBP(DataProcessor):
 
@@ -25,10 +31,10 @@ class FBP(DataProcessor):
     def __init__(self, volume_geometry, sinogram_geometry): 
         
 
-        tigre_geom = CIL2TIGREGeometry.getTIGREGeometry(volume_geometry,sinogram_geometry)
+        tigre_geom, tigre_angles = CIL2TIGREGeometry.getTIGREGeometry(volume_geometry,sinogram_geometry)
 
         super(FBP, self).__init__(  volume_geometry = volume_geometry, sinogram_geometry = sinogram_geometry,\
-                                    tigre_geom=tigre_geom)
+                                    tigre_geom=tigre_geom, tigre_angles=tigre_angles)
 
 
     def check_input(self, dataset):
@@ -43,10 +49,10 @@ class FBP(DataProcessor):
         
         if self.tigre_geom.is2D:
             data_temp = np.expand_dims(self.get_input().as_array(), axis=1)
-            arr_out = fdk(data_temp, self.tigre_geom, self.tigre_geom.angles)
+            arr_out = fdk(data_temp, self.tigre_geom, self.tigre_angles)
             arr_out = np.squeeze(arr_out, axis=0)
         else:
-            arr_out = fdk(self.get_input().as_array(), self.tigre_geom, self.tigre_geom.angles)
+            arr_out = fdk(self.get_input().as_array(), self.tigre_geom, self.tigre_angles)
 
         if out is None:
             out = ImageData(arr_out, deep_copy=False, geometry=self.volume_geometry.copy(), suppress_warning=True)

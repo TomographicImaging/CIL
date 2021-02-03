@@ -60,7 +60,7 @@ install(TARGETS cilacc
 elseif(WIN32)
 message ("I'd install into ${CMAKE_INSTALL_PREFIX} lib bin")
   install(TARGETS cilacc 
-	RUNTIME DESTINATION bin
+	RUNTIME DESTINATION Library/bin
 	ARCHIVE DESTINATION lib
 	CONFIGURATIONS ${CMAKE_BUILD_TYPE} 
 	)

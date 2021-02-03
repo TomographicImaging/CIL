@@ -5,9 +5,8 @@ import numpy as np
 try:
     from tigre.algorithms import fdk
 except ModuleNotFoundError:
-    print(  "This plugin requires the additional package TIGRE\n" +
-            "Please install it via conda as tigre from the ccpi channel\n"+
-            "Minimal version is 21.01")
+    raise ModuleNotFoundError("This plugin requires the additional package TIGRE\n" +
+            "Please install it via conda as tigre from the ccpi channel")
 
 class FBP(DataProcessor):
 

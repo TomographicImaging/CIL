@@ -6,9 +6,8 @@ import numpy as np
 try:
     from tigre.utilities import Ax, Atb
 except ModuleNotFoundError:
-    print(  "This plugin requires the additional package TIGRE\n" +
-            "Please install it via conda as tigre from the ccpi channel\n"+
-            "Minimal version is 21.01")
+    raise ModuleNotFoundError("This plugin requires the additional package TIGRE\n" +
+            "Please install it via conda as tigre from the ccpi channel")
 
 class ProjectionOperator(LinearOperator):
     '''initial TIGRE Projection Operator

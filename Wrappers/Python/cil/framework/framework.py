@@ -23,6 +23,7 @@ import copy
 import numpy
 import sys
 from datetime import timedelta, datetime
+import time
 import warnings
 from functools import reduce
 from numbers import Number
@@ -2808,6 +2809,7 @@ class Processor(object):
     def set_input(self, dataset):
         if issubclass(type(dataset), DataContainer):
             if self.check_input(dataset):
+                time.sleep(1e-6)
                 self.__dict__['input'] = dataset
                 self.__dict__['mTime'] = datetime.now()
             else:
@@ -2938,13 +2940,12 @@ class AX(DataProcessor):
         
         dsi = self.get_input()
         a = self.scalar
+        tmp = a * dsi.as_array()
+
         if out is None:
-            y = DataContainer( a * dsi.as_array() , True, 
-                        dimension_labels=dsi.dimension_labels )
-            #self.setParameter(output_dataset=y)
-            return y
+            return DataContainer( tmp , False, dimension_labels=dsi.dimension_labels )
         else:
-            out.fill(a * dsi.as_array())
+            out.fill(tmp)
     
 
 ###### Example of DataProcessors

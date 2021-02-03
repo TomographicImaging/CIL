@@ -27,6 +27,7 @@ import warnings
 from functools import reduce
 from numbers import Number
 import ctypes, platform
+from ctypes import util
 import math
 from cil.utilities.multiprocessing import NUM_THREADS
 # check for the extension
@@ -39,7 +40,8 @@ elif platform.system() == 'Darwin':
 else:
     raise ValueError('Not supported platform, ', platform.system())
 
-cilacc = ctypes.cdll.LoadLibrary(dll)
+dll_path = util.find_library(dll)
+cilacc = ctypes.cdll.LoadLibrary(dll_path)
 
 #default nThreads
 # import multiprocessing

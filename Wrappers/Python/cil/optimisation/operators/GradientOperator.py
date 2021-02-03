@@ -232,7 +232,7 @@ class Gradient_numpy(LinearOperator):
             return tmp    
 
 import ctypes, platform
-
+from ctypes import util
 # check for the extension
 if platform.system() == 'Linux':
     dll = 'libcilacc.so'
@@ -243,8 +243,8 @@ elif platform.system() == 'Darwin':
 else:
     raise ValueError('Not supported platform, ', platform.system())
 
-
-cilacc = ctypes.cdll.LoadLibrary(dll)
+dll_path = util.find_library(dll)
+cilacc = ctypes.cdll.LoadLibrary(dll_path)
 
 c_float_p = ctypes.POINTER(ctypes.c_float)
 

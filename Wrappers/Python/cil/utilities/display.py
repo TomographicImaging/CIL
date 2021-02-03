@@ -62,7 +62,7 @@ def plotter2D(datacontainers, titles=None, fix_range=False, stretch_y=False, cma
             range_max = max(range_max, numpy.amax(dc))
         
     if custom_range is not None:
-        if len(custom_range) is 2:
+        if len(custom_range) == 2:
             range_min = custom_range[0]
             range_max = custom_range[1]
 
@@ -113,7 +113,6 @@ def plotter2D(datacontainers, titles=None, fix_range=False, stretch_y=False, cma
         y_axes2 = False
         if isinstance(datacontainers[i],(AcquisitionData)):
             if axes[i].get_ylabel() == 'angle':
-                print('True')
                 locs = axes[i].get_yticks()
                 location_new = locs[0:-1].astype(int)
 

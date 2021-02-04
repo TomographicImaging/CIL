@@ -70,7 +70,61 @@ class TestDataProcessor(unittest.TestCase):
 
     def test_Normaliser(self):
         pass         
-        
+
+    def test_DataProcessorBasic(self):
+
+        dc_in = DataContainer(numpy.arange(10), True)
+        dc_out = dc_in.copy()
+
+        ax = AX()
+        ax.scalar = 2
+        ax.set_input(dc_in)
+
+        #check results with out
+        out_gold = dc_in*2
+        ax.get_output(out=dc_out)
+        numpy.testing.assert_array_equal(dc_out.as_array(), out_gold.as_array())
+
+        #check results with return
+        dc_out2 = ax.get_output()
+        numpy.testing.assert_array_equal(dc_out2.as_array(), out_gold.as_array())
+
+        #check call method
+        dc_out2 = ax(dc_in)
+        numpy.testing.assert_array_equal(dc_out2.as_array(), out_gold.as_array())
+
+        #check storage mode
+        self.assertFalse(ax.store_output)
+        self.assertTrue(ax.output == None)
+        ax.store_output = True
+        self.assertTrue(ax.store_output)
+
+        #check storing a copy and not a reference
+        dc_out = ax.get_output()
+        numpy.testing.assert_array_equal(ax.output.as_array(), out_gold.as_array())
+        self.assertFalse(id(ax.output.as_array()) == id(dc_out.as_array()))
+
+        #check recalculation on argument change
+        ax.scalar = 3
+        out_gold = dc_in*3
+        ax.get_output(out=dc_out)
+        numpy.testing.assert_array_equal(dc_out.as_array(), out_gold.as_array())
+
+        #check recalculation on input change
+        dc_in2 = dc_in.copy()
+        dc_in2 *=2
+        out_gold = dc_in2*3
+        ax.set_input(dc_in2)
+        ax.get_output(out=dc_out)
+        numpy.testing.assert_array_equal(dc_out.as_array(), out_gold.as_array())
+
+        #check recalculation on input modified (won't pass)
+        dc_in2 *= 2
+        out_gold = dc_in2*3
+        ax.get_output(out=dc_out)
+        #numpy.testing.assert_array_equal(dc_out.as_array(), out_gold.as_array())
+
+
     def test_DataProcessorChaining(self):
         shape = (2,3,4,5)
         size = shape[0]

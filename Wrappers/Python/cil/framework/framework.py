@@ -21,8 +21,6 @@ from __future__ import print_function
 
 import copy
 import numpy
-import sys
-from datetime import timedelta, datetime
 import warnings
 from functools import reduce
 from numbers import Number

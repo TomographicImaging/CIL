@@ -2769,12 +2769,15 @@ class AcquisitionData(DataContainer):
                 return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new, dimension_labels=dimension_labels, suppress_warning=True)
 
 class Processor(object):
-    
-    '''Defines a generic DataContainer processor
-    
-    accepts DataContainer as inputs and 
-    outputs DataContainer
-    additional attributes can be defined with __setattr__
+
+    r'''Defines a generic DataContainer processor
+                       
+    accepts a DataContainer as input
+    returns a DataContainer
+    `__setattr__` allows additional attributes to be defined
+
+    `store_output` boolian defining whether a copy of the output is stored. Default is False.
+    If no attributes are modified get_output will return this stored copy bypassing `process`
     '''
     def __init__(self, **attributes):
         if not 'store_output' in attributes.keys():

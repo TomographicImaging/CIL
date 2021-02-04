@@ -2778,38 +2778,38 @@ class Processor(object):
     outputs DataContainer
     additional attributes can be defined with __setattr__
     '''
-    
     def __init__(self, **attributes):
         if not 'store_output' in attributes.keys():
-            attributes['store_output'] = True
-            attributes['output'] = False
-            attributes['runTime'] = -1
-            attributes['mTime'] = datetime.now()
-            attributes['input'] = None
+            attributes['store_output'] = False
+
+        attributes['output'] = None
+        attributes['shouldRun'] = True
+        attributes['input'] = None
+
         for key, value in attributes.items():
             self.__dict__[key] = value
         
-    
     def __setattr__(self, name, value):
         if name == 'input':
             self.set_input(value)
         elif name in self.__dict__.keys():
-            if name == 'runTime': #doesn't change mtime
-                self.__dict__[name] = value
-            elif name == 'output': #doesn't change mtime
-                self.__dict__[name] = value        
+
+            self.__dict__[name] = value
+
+            if name == 'shouldRun':
+                pass
+            elif name == 'output':
+                self.__dict__['shouldRun'] = False
             else:            
-                self.__dict__[name] = value
-                self.__dict__['mTime'] = datetime.now()
+                self.__dict__['shouldRun'] = True
         else:
             raise KeyError('Attribute {0} not found'.format(name))
-        #pass
     
     def set_input(self, dataset):
         if issubclass(type(dataset), DataContainer):
             if self.check_input(dataset):
                 self.__dict__['input'] = dataset
-                self.__dict__['mTime'] = datetime.now()
+                self.__dict__['shouldRun'] = True
             else:
                 raise ValueError('Input data not compatible')
         else:
@@ -2830,36 +2830,19 @@ class Processor(object):
             if v is None and k != 'output':
                 raise ValueError('Key {0} is None'.format(k))
 
-        #run if 1st time, if modified since last run, or if output not stored
-        shouldRun = False
-
-        if self.runTime == -1:
-            shouldRun = True
-        elif self.mTime > self.runTime:
-            shouldRun = True
-        elif not self.store_output:
-            shouldRun = True
-
-        if shouldRun:
-            self.runTime = datetime.now()
+        if self.output is None or self.shouldRun:
+            if out is None:
+                out = self.process()
+            else:
+                self.process(out=out)
 
             if self.store_output: 
-                try:
-                    self.output = self.process(out=out)
-                    return self.output
-
-                except TypeError as te:
-                    self.output = self.process()
-                    return self.output
-            else:            
-                try:
-                    return self.process(out=out)
-                
-                except TypeError as te:
-                    return self.process()
+                self.output = out.copy()
+            
+            return out
 
         else:
-            return self.output
+            return self.output.copy()
             
     
     def set_input_processor(self, processor):

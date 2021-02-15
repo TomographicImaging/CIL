@@ -21,17 +21,26 @@ from cil.processors import RingRemover
 from cil.framework import ImageData, ImageGeometry, AcquisitionGeometry
 # from ccpi.astra.operators import AstraProjectorSimple
 
-import tomophantom
-from tomophantom import TomoP2D
 import os
 import numpy as np
 import unittest
+
+try:
+    import tomophantom
+    from tomophantom import TomoP2D
+    has_tomophantom = True
+except ImportError as ie:
+    has_tomophantom = False
+print ("has_tomophantom", has_tomophantom)
+
 
 class TestL1NormRR(unittest.TestCase):
     def setUp(self):
         pass
     def tearDown(self):
         pass
+
+    @unittest.skipUnless(has_tomophantom, "Tomophantom not installed")
     def test_L1Norm_2D(self):
         model = 12 # select a model number from the library
         N = 400 # set dimension of the phantom

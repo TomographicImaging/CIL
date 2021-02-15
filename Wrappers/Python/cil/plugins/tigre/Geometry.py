@@ -98,9 +98,7 @@ class TIGREGeometry(Geometry):
             DSD = DSO + system.detector.position[1]
 
         else:
-            #can reconstruct simple parallel geometry only
-            #Cofr?
-            raise NotImplementedError("Currently TIGRE only wrapped for cone-beam tomography")
+            raise NotImplementedError("TIGRE only wrapped for cone-beam tomography in CIL")
 
 
         self.DSD = DSD
@@ -168,5 +166,6 @@ class TIGREGeometry(Geometry):
         self.accuracy = 0.5                        # Accuracy of FWD proj          (vx/sample)
         # Mode
         # parallel, cone
-        self.mode = ag_in.config.system.geometry                 
+        self.mode = ag_in.config.system.geometry
+
         

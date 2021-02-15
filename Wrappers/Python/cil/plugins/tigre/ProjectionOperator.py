@@ -57,4 +57,5 @@ class ProjectionOperator(LinearOperator):
         return self._domain_geometry
     
     def range_geometry(self):
-        return self._range_geometry 
+        return self._range_geometry
+        

@@ -31,6 +31,19 @@ where,
 
 ```cudatoolkit``` If you have GPU drivers compatible with more recent CUDA versions you can modify this package selector.
 
+## Building from source code 
+
+In case of development it is useful to be able to build the software directly. You should clone this repository as
+```bash
+
+git clone --recurse-submodule git@github.com:vais-ral/CCPi-Framework.git
+```
+The use of `--recurse-submodule` is necessary if the user wants the examples data to be fetched (they are needed by the unit tests). We have moved such data, previously hosted in this repo at `Wrappers/Python/data` to the [CIL-data](https://github.com/vais-ral/CIL-data) repository and linked it to this one as submodule. If the data is not available it can be fetched in an already cloned repository as
+```bash
+
+git submodule update --init
+```
+
 ### Components
 
 Some concepts are so much overlapping with the CCPPETMR [SIRF](https://github.com/CCPPETMR/SIRF) project that we have chosen to stick to their naming and conventions, in the hope that we may be able to complement each other (at least in Python).

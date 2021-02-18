@@ -50,13 +50,7 @@ class OperatorCompositionFunction(Function):
     :type f: :code:`Function`
     '''
 
-        super(OperatorCompositionFunction, self).__init__()
-        
-        if not isinstance(function, Function):
-            raise ValueError('{} is not function '.format(type(self.function)))
-
-        if not isinstance(operator, Operator):
-            raise ValueError('{} is not function '.format(type(self.operator)))            
+        super(OperatorCompositionFunction, self).__init__()    
         
         self.function = function     
         self.operator = operator

@@ -1308,3 +1308,132 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
     def tearDown(self):
         pass
 
+# tests for OperatorCompositionFunction
+class TestOperatorCompositionFunctionWithWrongInterfaceFunction(unittest.TestCase):
+    def setUp(self):
+        ig = ImageGeometry(2,2)
+        I = IdentityOperator(ig)
+        
+        x = ig.allocate(0)
+        class NotAFunction(object):
+            pass
+        ocf = OperatorCompositionFunction(NotAFunction(), I)
+        self.pars = (ig, I, x, ocf)
+    def tearDown(self):
+        pass
+
+    def test_call(self):
+        ig , I, x, ocf = self.pars
+        
+        try:
+            ocf(x)
+            self.assertFalse(True)
+        except TypeError as te:
+            self.assertFalse(False)
+    def test_L(self):
+        ig , I, x, ocf = self.pars
+        try:
+            ocf.L
+            self.assertTrue(False)
+        except AttributeError as ae:
+            self.assertTrue(True)
+    def test_gradient(self):
+        ig , I, x, ocf = self.pars
+        try:
+            ocf.gradient(x)
+            self.assertTrue(False)
+        except AttributeError as ae:
+            self.assertTrue(True)
+    def test_proximal(self):
+        ig , I, x, ocf = self.pars
+        try:
+            ocf.proximal(x, tau=1)
+            self.assertTrue(False)
+        except NotImplementedError as ae:
+            self.assertTrue(True)
+    def test_proximal_conjugate(self):
+        ig , I, x, ocf = self.pars
+        try:
+            ocf.proximal_conjugate(x, tau=1)
+            self.assertTrue(False)
+        except NotImplementedError as ae:
+            self.assertTrue(True)
+    def test_convex_conjugate(self):
+        ig , I, x, ocf = self.pars
+        try:
+            ocf.convex_conjugate(x)
+            self.assertTrue(False)
+        except NotImplementedError as ae:
+            self.assertTrue(True)
+    def test_proximal_conjugate(self):
+        ig , I, x, ocf = self.pars
+        try:
+            ocf.proximal_conjugate(x, tau=1)
+            self.assertTrue(False)
+        except NotImplementedError as ae:
+            self.assertTrue(True)
+    
+class TestOperatorCompositionFunctionWithWrongInterfaceFunctionAddScalar(TestOperatorCompositionFunctionWithWrongInterfaceFunction):
+    def setUp(self):
+        ig = ImageGeometry(2,2)
+        I = IdentityOperator(ig)
+        
+        x = ig.allocate(0)
+        class NotAFunction(object):
+            pass
+        ocf = OperatorCompositionFunction(NotAFunction(), I) + 1
+        self.pars = (ig, I, x, ocf)
+class TestOperatorCompositionFunctionWithWrongInterfaceFunctionMultiplyScalar(TestOperatorCompositionFunctionWithWrongInterfaceFunction):
+    def setUp(self):
+        ig = ImageGeometry(2,2)
+        I = IdentityOperator(ig)
+        
+        x = ig.allocate(0)
+        class NotAFunction(object):
+            pass
+        ocf = OperatorCompositionFunction(NotAFunction(), I) * 2.
+        self.pars = (ig, I, x, ocf)
+class TestOperatorCompositionFunctionWithWrongInterfaceFunctionAddFunction(TestOperatorCompositionFunctionWithWrongInterfaceFunction):
+    def setUp(self):
+        ig = ImageGeometry(2,2)
+        I = IdentityOperator(ig)
+        
+        x = ig.allocate(0)
+        class NotAFunction(object):
+            pass
+        ocf = OperatorCompositionFunction(NotAFunction(), I) + IndicatorBox()
+        self.pars = (ig, I, x, ocf)
+
+class TestOperatorCompositionFunctionWithWrongInterfaceOperator(TestOperatorCompositionFunctionWithWrongInterfaceFunction):
+    def setUp(self):
+        ig = ImageGeometry(2,2)
+        F = IndicatorBox()
+        
+        x = ig.allocate(0)
+        class NotAnOperator(object):
+            pass
+        nao = NotAnOperator()
+        ocf = OperatorCompositionFunction(F, nao)
+        self.pars = (ig, nao, x, ocf)
+    def tearDown(self):
+        pass
+    def test_call(self):
+        ig , I, x, ocf = self.pars
+        
+        try:
+            ocf(x)
+            self.assertFalse(True)
+        except AttributeError as te:
+            self.assertFalse(False)
+class TestOperatorCompositionFunctionWithWrongInterfaceOperatorScaled(TestOperatorCompositionFunctionWithWrongInterfaceOperator):
+    def setUp(self):
+        ig = ImageGeometry(2,2)
+        F = IndicatorBox()
+        
+        x = ig.allocate(0)
+        class NotAnOperator(object):
+            def __mul__(self, value):
+                return self
+        nao = NotAnOperator() * 2
+        ocf = OperatorCompositionFunction(F, nao)
+        self.pars = (ig, nao, x, ocf)

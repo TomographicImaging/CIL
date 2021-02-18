@@ -8,6 +8,11 @@ build:
   script_env:
     - CIL_VERSION   
   #number: 0  
+  missing_dso_whitelist:
+    - $RPATH/libc.so.6            # [linux]
+    - $RPATH/libm.so.6            # [linux]
+    - $RPATH/libpthread.so.0      # [linux]
+    - /lib64/ld-linux-x86-64.so.2 # [linux]
 
 test:
   requires:
@@ -20,14 +25,14 @@ test:
     - tigre
     - numba
     - packaging
-
+    
   source_files:
-    - ./Wrappers/Python/test # [win]
+    - ./Wrappers/Python/test     # [win]
     - ./cil/Wrappers/Python/test # [not win] 
 
   commands:
     - python -c "import os; print ('TESTING IN THIS DIRECTORY' , os.getcwd())"
-    - python -m unittest discover Wrappers/Python/test # [win]
+    - python -m unittest discover Wrappers/Python/test        # [win]
     - python -m unittest discover -s cil/Wrappers/Python/test # [not win]
     
 requirements:
@@ -36,7 +41,11 @@ requirements:
     - numpy {{ numpy }}
     - setuptools
     - cmake
-    - openmp # [osx]
+    - libgcc-ng     # [linux]
+    - libstdcxx-ng  # [linux]
+    - _openmp_mutex # [linux]
+    - openmp        # [osx]
+    - vc 14         # [win]
 
   run:
     - python
@@ -45,12 +54,15 @@ requirements:
     - matplotlib
     - h5py
     - pillow
-    - libgcc-ng # [linux]
-    - openmp # [osx]
-    - vc 14 # [win]
+    - libgcc-ng     # [linux]
+    - libstdcxx-ng  # [linux]
+    - _openmp_mutex # [linux]
+    - openmp        # [osx]
+    - vc 14         # [win]
     - dxchange
     - olefile >=0.46
     - pywavelets
+    
   
 about:
   home: http://www.ccpi.ac.uk/cil

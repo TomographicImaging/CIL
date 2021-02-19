@@ -9,9 +9,9 @@ build:
     - CIL_VERSION   
   #number: 0  
   missing_dso_whitelist:
-    - $RPATH/libc.so.6            # [linux]
-    - $RPATH/libm.so.6            # [linux]
-    - $RPATH/libpthread.so.0      # [linux]
+    - /lib64/libc.so.6            # [linux]
+    - /lib64/libm.so.6            # [linux]
+    - /lib64/libpthread.so.0      # [linux]
     - /lib64/ld-linux-x86-64.so.2 # [linux]
 
 test:

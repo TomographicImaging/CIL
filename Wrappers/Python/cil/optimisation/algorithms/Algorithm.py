@@ -265,6 +265,7 @@ class Algorithm(object):
         if verbose:
             print (self.verbose_header(very_verbose))
             
+            
         for _ in self:
             # __next__ is called
 
@@ -278,7 +279,7 @@ class Algorithm(object):
                 if callback is not None:
                     callback(self.iteration, self.get_last_objective(return_all=very_verbose), self.x)
             if verbose:
-                if i % print_interval == 0:
+                if i % print_interval == 0 or self.iteration % self.update_objective_interval == 0:
                     print (self.verbose_output(very_verbose))
             
             

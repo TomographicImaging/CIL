@@ -60,7 +60,7 @@ class Algorithm(object):
         :param log_file: log verbose output to file
         :type log_file: str, optional, default None
         '''
-        self.iteration = 0
+        self.iteration = -1
         self.__max_iteration = kwargs.get('max_iteration', 0)
         self.__loss = []
         self.memopt = False
@@ -72,7 +72,7 @@ class Algorithm(object):
         self.iter_string = 'Iter'
         self.logger = None
         self.__set_up_logger(kwargs.get('log_file', None))
-
+        
     def set_up(self, *args, **kwargs):
         '''Set up the algorithm'''
         raise NotImplementedError()
@@ -114,9 +114,11 @@ class Algorithm(object):
         if self.should_stop():
             raise StopIteration()
         else:
-            if self.iteration == 0 and self.update_objective_interval > 0:
+            if self.iteration == -1 and self.update_objective_interval > 0:
                 self._iteration.append(self.iteration)
                 self.update_objective()
+                self.iteration += 1
+                return
             time0 = time.time()
             if not self.configured:
                 raise ValueError('Algorithm not configured correctly. Please run set_up.')
@@ -258,22 +260,19 @@ class Algorithm(object):
         if self.should_stop():
             print ("Stop cryterion has been reached.")
         i = 0
-        if iterations is None:
+        if iterations is None :
             iterations = self.max_iteration
-        if self.iteration == 0:
-            iterations+=1
+
         if verbose:
             print (self.verbose_header(very_verbose))
-            
-            
-        for _ in self:
-            # __next__ is called
 
-            # the following code is just for displaying purposes of the status of the minimisation
+        if self.iteration == -1:
+            iterations+=1
+        else:
+            print (self.verbose_output(very_verbose))
 
-            # self.iteration is incremented in __next__, so now we have 
-            # self.iteration is one iteration larger than what we want to display
-            self.iteration -= 1
+        for i in range(iterations):
+            self.__next__()
             if self.update_objective_interval > 0 and\
                 self.iteration % self.update_objective_interval == 0: 
                 if callback is not None:
@@ -281,18 +280,7 @@ class Algorithm(object):
             if verbose:
                 if i % print_interval == 0 or self.iteration % self.update_objective_interval == 0:
                     print (self.verbose_output(very_verbose))
-            
-            
-            # restore self.iteration value to what it should be
-            self.iteration += 1
 
-            # check if run has to stop
-            i += 1
-            if i == iterations:
-                break
-        
-        # see comment above regarding removing 1 from iteration
-        self.iteration -= 1
         if verbose:
             start = 3 # I don't understand why this
             bars = ['-' for i in range(start+9+10+13+20)]
@@ -307,7 +295,6 @@ class Algorithm(object):
             # Print to log file if desired
             if self.logger:
                 self.logger.info(out)
-        self.iteration += 1
         
 
     def verbose_output(self, verbose=False):
@@ -318,7 +305,7 @@ class Algorithm(object):
         else:
             t = sum(timing)/len(timing)
         out = "{:>9} {:>10} {:>13} {}".format(
-                 self.iteration, 
+                 self.iteration if self.iteration != 0 else 'start', 
                  self.max_iteration,
                  "{:.3f}".format(t), 
                  self.objective_to_string(verbose)

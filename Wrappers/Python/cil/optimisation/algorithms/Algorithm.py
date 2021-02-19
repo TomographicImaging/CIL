@@ -309,7 +309,7 @@ class Algorithm(object):
         else:
             t = sum(timing)/len(timing)
         out = "{:>9} {:>10} {:>13} {}".format(
-                 self.iteration if self.iteration != 0 else 'start', 
+                 self.iteration, 
                  self.max_iteration,
                  "{:.3f}".format(t), 
                  self.objective_to_string(verbose)

@@ -94,7 +94,6 @@ class GD(Algorithm):
         
         
         self.update_objective()
-        self.iteration = 0
 
         self.x_update = initial.copy()
 

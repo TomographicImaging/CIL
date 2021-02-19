@@ -153,7 +153,7 @@ class TestAlgorithms(unittest.TestCase):
         print (alg.get_output().as_array(), alg.step_size, alg.kmax, alg.k)
 
         # this with 10k iterations
-        numpy.testing.assert_array_almost_equal(alg.get_output().as_array(), [0.13463363, 0.01604593], decimal = 6)
+        numpy.testing.assert_array_almost_equal(alg.get_output().as_array(), [0.13463363, 0.01604593], decimal = 5)
         # this with 1m iterations
         # numpy.testing.assert_array_almost_equal(alg.get_output().as_array(), [1,1], decimal = 1)
         # numpy.testing.assert_array_almost_equal(alg.get_output().as_array(), [0.982744, 0.965725], decimal = 6)
@@ -924,7 +924,7 @@ class PrintAlgo(Algorithm):
 
     def update(self):
         self.x = - self.iteration
-        time.sleep(0.1)
+        time.sleep(0.03)
     
     def update_objective(self):
         self.loss.append(self.iteration * self.iteration)
@@ -943,16 +943,32 @@ class TestPrint(unittest.TestCase):
         algo.run(3, verbose=1, print_interval = 2)
         # it 20
         # --- stop
-
+        
         algo.run(20, verbose = 1, print_interval = 7)
         # it 20
         # it 30
         # -- stop
-
+        
         algo.run(20, verbose=True, very_verbose=False)
         algo.run(20, verbose=True, very_verbose=True, print_interval=7, callback=callback)
+        
         print (algo._iteration)
         print (algo.objective)
-        np.testing.assert_array_equal([0, 10, 20, 30, 40, 50, 60, 70, 80], algo.iterations)
-        np.testing.assert_array_equal([0, 100, 400, 900, 1600, 2500, 3600, 4900, 6400], algo.objective)
+        np.testing.assert_array_equal([-1, 10, 20, 30, 40, 50, 60, 70, 80], algo.iterations)
+        np.testing.assert_array_equal([1, 100, 400, 900, 1600, 2500, 3600, 4900, 6400], algo.objective)
 
+    def test_print2(self):
+        def callback (iteration, objective, solution):
+            print("I am being called ", iteration)
+        algo = PrintAlgo(update_objective_interval = 4, max_iteration = 1000)
+
+        algo.run(10, verbose=2, print_interval=2)
+
+        print (algo.iteration)
+        algo.run(10, verbose=2, print_interval=2)
+        
+        print (algo._iteration, algo.objective)
+
+        algo = PrintAlgo(update_objective_interval = 4, max_iteration = 1000)
+
+        algo.run(20, verbose=2, print_interval=2)

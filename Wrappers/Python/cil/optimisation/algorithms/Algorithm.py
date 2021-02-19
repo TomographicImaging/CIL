@@ -243,6 +243,8 @@ class Algorithm(object):
                             prints to screen both primal and dual
         '''
         print_interval = kwargs.get('print_interval', self.update_objective_interval)
+        if print_interval > self.update_objective_interval:
+            print_interval = self.update_objective_interval
         if isinstance(verbose, bool):
             very_verbose = kwargs.get('very_verbose', False)
         else:
@@ -259,26 +261,28 @@ class Algorithm(object):
                 raise ValueError("verbose should be 0, 1 or 2. Got {}".format (verbose))
         if self.should_stop():
             print ("Stop cryterion has been reached.")
-        i = 0
         if iterations is None :
             iterations = self.max_iteration
 
         if verbose:
             print (self.verbose_header(very_verbose))
 
-        if self.iteration == -1:
+        if self.iteration == -1 and self.update_objective_interval>0:
             iterations+=1
         else:
             print (self.verbose_output(very_verbose))
 
         for i in range(iterations):
-            self.__next__()
+            try:
+                self.__next__()
+            except StopIteration:
+                break
             if self.update_objective_interval > 0 and\
                 self.iteration % self.update_objective_interval == 0: 
                 if callback is not None:
                     callback(self.iteration, self.get_last_objective(return_all=very_verbose), self.x)
             if verbose:
-                if i % print_interval == 0 or self.iteration % self.update_objective_interval == 0:
+                if (self.iteration % print_interval == 0) or self.iteration % self.update_objective_interval == 0:
                     print (self.verbose_output(very_verbose))
 
         if verbose:

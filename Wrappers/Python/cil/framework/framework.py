@@ -39,7 +39,10 @@ else:
     raise ValueError('Not supported platform, ', platform.system())
 
 dll_path = util.find_library(dll)
-cilacc = ctypes.cdll.LoadLibrary(dll_path)
+if dll_path is None:
+    cilacc = ctypes.cdll.LoadLibrary(dll)
+else:
+    cilacc = ctypes.cdll.LoadLibrary(dll_path)
 
 #default nThreads
 # import multiprocessing

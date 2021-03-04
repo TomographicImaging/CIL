@@ -112,9 +112,9 @@ class TIGREGeometry(Geometry):
         self.sDetector = self.dDetector * self.nDetector    # total size of the detector    (mm)
 
         # number of voxels              (vx)
-        self.nVoxel = np.array( [ig.voxel_num_z, ig.voxel_num_x, ig.voxel_num_y] )
+        self.nVoxel = np.array( [ig.voxel_num_z, ig.voxel_num_y, ig.voxel_num_x] )
         # size of each voxel            (mm)
-        self.dVoxel = np.array( [ig.voxel_size_z, ig.voxel_size_x, ig.voxel_size_y]  )
+        self.dVoxel = np.array( [ig.voxel_size_z, ig.voxel_size_y, ig.voxel_size_x]  )
 
 
         if ag_in.dimension == '2D':

@@ -57,8 +57,8 @@ class Test_convert_geometry(unittest.TestCase):
         np.testing.assert_allclose(tg_geometry.offOrigin,0)
 
         mag = ag.magnification
-        np.testing.assert_allclose(tg_geometry.nVoxel, [1,128,50])
-        np.testing.assert_allclose(tg_geometry.dVoxel, [0.1/mag,0.1/mag,0.05/mag])
+        np.testing.assert_allclose(tg_geometry.nVoxel, [1,50,128])
+        np.testing.assert_allclose(tg_geometry.dVoxel, [0.1/mag,0.05/mag,0.1/mag])
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_cone3D_simple(self):
@@ -86,8 +86,8 @@ class Test_convert_geometry(unittest.TestCase):
         np.testing.assert_allclose(tg_geometry.offOrigin,0)
 
         mag = ag.magnification
-        np.testing.assert_allclose(tg_geometry.nVoxel, [3,128,50])
-        np.testing.assert_allclose(tg_geometry.dVoxel, [0.2/mag,0.1/mag,0.05/mag])
+        np.testing.assert_allclose(tg_geometry.nVoxel, [3,50,128])
+        np.testing.assert_allclose(tg_geometry.dVoxel, [0.2/mag,0.05/mag,0.1/mag])
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_cone3D_cofr(self):
@@ -128,8 +128,8 @@ class Test_convert_geometry(unittest.TestCase):
         np.testing.assert_allclose(tg_geometry.offOrigin,0)
 
         mag = ag.magnification
-        np.testing.assert_allclose(tg_geometry.nVoxel, [3,128,50])
-        np.testing.assert_allclose(tg_geometry.dVoxel, [0.2/mag,0.1/mag,0.05/mag])
+        np.testing.assert_allclose(tg_geometry.nVoxel, [3,50,128])
+        np.testing.assert_allclose(tg_geometry.dVoxel, [0.2/mag,0.05/mag,0.1/mag])
 
 class Test_ProjectionOperator(unittest.TestCase):
     def setUp(self): 

@@ -24,83 +24,164 @@ import numpy
 from cil.framework import ImageGeometry, AcquisitionData, ImageData
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-def plotter2D(datacontainers, titles=None, fix_range=False, stretch_y=False, cmap='gray', axis_labels=None, custom_range=None, origin='lower-left'):
-    '''plotter2D(datacontainers=[], titles=[], fix_range=False, stretch_y=False, cmap='gray', axes_labels=['X','Y'])
+class PlotData(object):
+    def __init__(self, data, title, axis_labels, origin):
+        self.data = data
+        self.title = title
+        self.axis_labels = axis_labels
+        self.origin = origin
+        self.range = None
+
+def plotter2D(datacontainers, titles=None, slice_list=None, fix_range=False, origin='lower-left', cmap='gray', num_cols=2, sub_figsize=(15,15)):
+    r'''This function plots 2D slices from cil DataContainer types
+
+    Plots 1 or more 2D plots in an (n x num_cols) matix
+    Can plot multiple slices from one 3D dataset, or compare datasets
+
+    :param datacontainers: The DataContainers to be displayed
+    :type datacontainers: ImageData, AcquisitionData, list of  Image/AcquisitionData, BlockDataContainer
+    :param titles: The title for each figure
+    :type titles: string, list of strings
+    :param slice_list: The slices to show if the DataContainer is 3D either as: ('axis', index), index (of slowest dimension)  
+    :type slice_list: tuple, int, list of tuples, list of ints
+    :param fix_range: Sets the display range of the data. `True` sets all plots to the global (min, max). 
+    :type fix_range: boolian, tuple, list of tuples
+    :param origin: Sets the display origin. 'lower/upper-left/right'
+    :type origin: string, list of strings
+    :param cmap: Sets the colour map of the plot (see matplotlib.pyplot)
+    :param num_cols: Sets the number of columns of subplots to display
+    :type num_cols: int
+    :param sub_figsize: Sets the size of the subplots
+    :type sub_figsize: tuple of floats
+     '''
+
+    #get number of subplots
+    try:
+        num_plots = len(datacontainers)
+    except:
+        #single datacontainer, check number of slices
+        try:
+            if type(slice_list[0]) is str:
+                num_plots = 1
+            else:
+                num_plots = len(slice_list)
+        except:
+            num_plots = 1
     
-    plots 1 or more 2D plots in an (n x 2) matix
-    multiple datasets can be passed as a list
-    
-    Can take ImageData, AquistionData or numpy.ndarray as input
-    '''
-    if(isinstance(datacontainers, list)) is False:
-        datacontainers = [datacontainers]
+    subplots = []
 
-    if titles is not None:
-        if(isinstance(titles, list)) is False:
-            titles = [titles]
-            
+    #range needs subsetted data
+    range_min = float("inf")
+    range_max = -range_min
 
-    
-    nplots = len(datacontainers)
-    rows = int(round((nplots+0.5)/2.0))
+    #set up, all inputs can be 1 or num_plots
+    for i in range(num_plots):
+        #get slice list per subplot
 
-    fig, (ax) = plt.subplots(rows, 2,figsize=(15,15))
+        try:
+            slice_requested = int(slice_list)
+        except:
+            if slice_list is None or type(slice_list[0]) is str:
+                slice_requested = slice_list
+            else:
+                slice_requested = slice_list[i]
 
+        #get data per subplot, subset where required
+        try:
+            data = datacontainers[i]
+        except:
+            data = datacontainers
+
+        if len(data.shape) != 2:
+            try:
+                plot_slice = int(slice_requested)
+                axis = data.dimension_labels[0]
+            except:
+                plot_slice = slice_requested[1]
+                axis = slice_requested[0]
+
+            temp_dict = {axis:plot_slice}
+            plot_data = data.subset(**temp_dict, force=True)
+            subtitle = "{0} slice: {1}".format(axis,plot_slice)    
+        else:
+            plot_data = data
+            subtitle = None
+
+        #get min/max of subsetted data
+        range_min = min(range_min, data.min())
+        range_max = max(range_max, data.max())
+
+        #get title per subplot
+        if isinstance(titles, list):
+            if titles[i] is None:
+                plot_title = ''
+            else:
+                plot_title = titles[i]
+        else:
+            if titles is None:
+                plot_title = ''
+            else:
+                plot_title = titles
+
+        if subtitle is not None:
+            plot_title += '\n' + subtitle
+
+        #get axis labels per subplot
+        plot_axis_labels = (plot_data.dimension_labels[1],plot_data.dimension_labels[0])
+
+        #get origin per subplot
+        if isinstance(origin, list):
+            plot_origin = origin[i]
+        else:
+            plot_origin = origin
+
+        subplots.append(PlotData(plot_data,plot_title,plot_axis_labels, plot_origin))
+
+    #set range per subplot
+    for i, subplot in enumerate(subplots):
+        if fix_range == False:
+            pass  
+        elif fix_range == True:
+            subplot.range = (range_min,range_max)
+        else:
+            try:
+                float(fix_range[0])
+                subplot.range = (fix_range[0], fix_range[1])
+            except:
+                subplot.range = fix_range[i]
+        
+
+    #create plots
+    if num_plots < num_cols:
+        num_cols = num_plots
+        
+    num_rows = int(round((num_plots+0.5)/num_cols))
+    fig, (ax) = plt.subplots(num_rows, num_cols, figsize=sub_figsize)
     axes = ax.flatten() 
 
-    range_min = float("inf")
-    range_max = 0
-    
-    if fix_range == True:
-        for i in range(nplots):
-            if type(datacontainers[i]) is numpy.ndarray:
-                dc = datacontainers[i]
-            else:
-                dc = datacontainers[i].as_array()
-                
-            range_min = min(range_min, numpy.amin(dc))
-            range_max = max(range_max, numpy.amax(dc))
-        
-    if custom_range is not None:
-        if len(custom_range) == 2:
-            range_min = custom_range[0]
-            range_max = custom_range[1]
-
-    for i in range(rows*2):
+    #set up plots
+    for i in range(num_rows*num_cols):
         axes[i].set_visible(False)
 
-    for i in range(nplots):
+    for i, subplot in enumerate(subplots):
+
         axes[i].set_visible(True)
-        
-        if titles is not None:
-            axes[i].set_title(titles[i])
-       
-        if axis_labels is not None:
-            axes[i].set_ylabel(axis_labels[1])
-            axes[i].set_xlabel(axis_labels[0]) 
-            
-        if type(datacontainers[i]) is numpy.ndarray:
-            dc = datacontainers[i]          
-        else:
-            dc = datacontainers[i].as_array()
-            
-            if axis_labels is None:
-                axes[i].set_ylabel(datacontainers[i].dimension_labels[0])
-                axes[i].set_xlabel(datacontainers[i].dimension_labels[1])  
+        axes[i].set_title(subplot.title)
+        axes[i].set_ylabel(subplot.axis_labels[1])
+        axes[i].set_xlabel(subplot.axis_labels[0])  
 
-        
         #set origin
-        shape_v = [0,dc.shape[0]]
-        shape_h = [0,dc.shape[1]]
+        shape_v = [0,subplot.data.shape[0]]
+        shape_h = [0,subplot.data.shape[1]]
 
+        data_plot = subplot.data.as_array()
         data_origin='lower'
-        data_plot = dc
 
-        if 'upper' in origin:
+        if 'upper' in subplot.origin:
             shape_v.reverse()
             data_origin='upper'
 
-        if 'right' in origin:
+        if 'right' in subplot.origin:
             shape_h.reverse()
             data_plot = numpy.flip(data_plot,1)
 
@@ -108,15 +189,15 @@ def plotter2D(datacontainers, titles=None, fix_range=False, stretch_y=False, cma
         
         sp = axes[i].imshow(data_plot, cmap=cmap, origin=data_origin, extent=extent)
 
-
+        im_ratio = subplot.data.shape[0]/subplot.data.shape[1]
 
         y_axes2 = False
-        if isinstance(datacontainers[i],(AcquisitionData)):
+        if isinstance(subplot.data,(AcquisitionData)):
             if axes[i].get_ylabel() == 'angle':
                 locs = axes[i].get_yticks()
                 location_new = locs[0:-1].astype(int)
 
-                ang = datacontainers[i].geometry.config.angles
+                ang = subplot.data.geometry.config.angles
 
                 labels_new = [str(i) for i in numpy.take(ang.angle_data, location_new)]
                 axes[i].set_yticklabels(labels_new)
@@ -125,13 +206,10 @@ def plotter2D(datacontainers, titles=None, fix_range=False, stretch_y=False, cma
 
                 y_axes2 = axes[i].axes.secondary_yaxis('right')
                 y_axes2.set_ylabel('angle / index')
-
         
-        im_ratio = dc.shape[0]/dc.shape[1]
-        
-        if stretch_y ==True:   
-            axes[i].set_aspect(1/im_ratio)
-            im_ratio = 1
+                if subplot.data.shape[0] < subplot.data.shape[1]//2:
+                    axes[i].set_aspect(1/im_ratio)
+                    im_ratio = 1
 
         if y_axes2: 
             scale = 0.041*im_ratio
@@ -140,10 +218,11 @@ def plotter2D(datacontainers, titles=None, fix_range=False, stretch_y=False, cma
             scale = 0.0467*im_ratio
             pad = 0.02
 
+        plt.tight_layout()
         plt.colorbar(sp, orientation='vertical', ax=axes[i],fraction=scale, pad=pad)
 
-        if fix_range == True or custom_range is not None:
-            sp.set_clim(range_min,range_max)
+        if subplot.range is not None:
+            sp.set_clim(subplot.range[0],subplot.range[1])
     plt.show()
 
 
@@ -361,4 +440,4 @@ if __name__ == '__main__':
         
         ###############################################################################
                 
-          
+# %%

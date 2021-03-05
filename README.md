@@ -33,6 +33,8 @@ where,
 
 ## Building from source code 
 
+### Getting the code
+
 In case of development it is useful to be able to build the software directly. You should clone this repository as
 ```bash
 
@@ -43,6 +45,19 @@ The use of `--recurse-submodule` is necessary if the user wants the examples dat
 
 git submodule update --init
 ```
+
+### Build with CMake
+CMake and a C++ compiler are required to build the source code. Let's suppose that the user is in the source directory, then the following commands should work:
+
+```bash
+
+mkdir build
+cd build
+cmake .. -DCMAKE_INSTALL_PREFIX=<install_directory>
+cmake --build . --target install
+```
+
+The user then needs to add the path to `<install_directory>/lib` where the library is installed to the environment variable `PATH` or `LD_LIBRARY_PATH`, depending on system
 
 ### Components
 

@@ -67,7 +67,7 @@ class Slicer(DataProcessor):
         if self.roi != None:
             for key in self.roi.keys():
                 if key not in data.dimension_labels.values():
-                    raise ValueError('Wrong label is specified for roi')
+                    raise ValueError('Wrong label is specified for roi, expected {}.'.format(data.dimension_labels.values()))
         
         roi = []
         sliceobj = []

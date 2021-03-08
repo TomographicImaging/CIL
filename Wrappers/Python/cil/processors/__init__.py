@@ -20,4 +20,5 @@ from .CentreOfRotationCorrector import CentreOfRotationCorrector
 from .CofR_xcorr import CofR_xcorr
 from .Normalizer import Normalizer
 from .Resizer import Resizer
+from .Slicer import Slicer
 from .RingRemover import RingRemover

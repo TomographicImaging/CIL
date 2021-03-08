@@ -21,7 +21,7 @@ from __future__ import print_function, division
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
 import numpy
-from cil.framework import ImageGeometry, AcquisitionData, ImageData
+from cil.framework import ImageGeometry, AcquisitionData, ImageData, DataContainer, BlockDataContainer
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 class PlotData(object):
@@ -32,34 +32,36 @@ class PlotData(object):
         self.origin = origin
         self.range = None
 
-def plotter2D(datacontainers, titles=None, slice_list=None, fix_range=False, origin='lower-left', cmap='gray', num_cols=2, sub_figsize=(15,15)):
+def plotter2D(datacontainers, title=None, slice_list=None, fix_range=False, axis_labels=None, origin='lower-left', cmap='gray', num_cols=2, size=(15,15)):
     r'''This function plots 2D slices from cil DataContainer types
 
     Plots 1 or more 2D plots in an (n x num_cols) matix
-    Can plot multiple slices from one 3D dataset, or compare datasets
+    Can plot multiple slices from one 3D dataset, or compare multiple datasets
+    Inputs can be single arguments or list of arguments that will be sequentally applied to subplots
 
     :param datacontainers: The DataContainers to be displayed
     :type datacontainers: ImageData, AcquisitionData, list of  Image/AcquisitionData, BlockDataContainer
-    :param titles: The title for each figure
-    :type titles: string, list of strings
-    :param slice_list: The slices to show if the DataContainer is 3D either as: ('axis', index), index (of slowest dimension)  
+    :param title: The title for each figure
+    :type title: string, list of strings
+    :param slice_list: The slices to show if the DataContainer is 3D either as: ('axis name', index), (axis, index), index (of slowest dimension)  
     :type slice_list: tuple, int, list of tuples, list of ints
     :param fix_range: Sets the display range of the data. `True` sets all plots to the global (min, max). 
     :type fix_range: boolian, tuple, list of tuples
+    :param axis_labels: The axis labels for each figure e.g. ('x','y')
+    :type axis_labels: tuple, list of tuples
     :param origin: Sets the display origin. 'lower/upper-left/right'
     :type origin: string, list of strings
     :param cmap: Sets the colour map of the plot (see matplotlib.pyplot)
     :param num_cols: Sets the number of columns of subplots to display
     :type num_cols: int
-    :param sub_figsize: Sets the size of the subplots
-    :type sub_figsize: tuple of floats
+    :param size: Figure size in inches
+    :type size: tuple of floats
      '''
 
     #get number of subplots
-    try:
+    if isinstance(datacontainers, (list, BlockDataContainer)):
         num_plots = len(datacontainers)
-    except:
-        #single datacontainer, check number of slices
+    else:
         try:
             if type(slice_list[0]) is str:
                 num_plots = 1
@@ -76,58 +78,77 @@ def plotter2D(datacontainers, titles=None, slice_list=None, fix_range=False, ori
 
     #set up, all inputs can be 1 or num_plots
     for i in range(num_plots):
-        #get slice list per subplot
-
-        try:
-            slice_requested = int(slice_list)
-        except:
-            if slice_list is None or type(slice_list[0]) is str:
-                slice_requested = slice_list
-            else:
-                slice_requested = slice_list[i]
 
         #get data per subplot, subset where required
-        try:
+        if isinstance(datacontainers, (list, BlockDataContainer)):
             data = datacontainers[i]
-        except:
+        else:
             data = datacontainers
 
-        if len(data.shape) != 2:
-            try:
-                plot_slice = int(slice_requested)
-                axis = data.dimension_labels[0]
-            except:
-                plot_slice = slice_requested[1]
-                axis = slice_requested[0]
+        #get slice list per subplot
+        if type(slice_list) is list: 
+            slice_requested = slice_list[i]
+        else:
+            slice_requested = slice_list
 
-            temp_dict = {axis:plot_slice}
-            plot_data = data.subset(**temp_dict, force=True)
-            subtitle = "{0} slice: {1}".format(axis,plot_slice)    
+        if len(data.shape) == 3:
+
+            #default axis 0, centre slice
+            plot_slice = data.shape[0]//2
+            axis = 0
+                            
+            if slice_requested is not None:
+                try:
+                    plot_slice = slice_requested[1]
+                    axis = slice_requested[0]
+                except:
+                    plot_slice = slice_requested
+            try:
+                if hasattr(data, 'subset'):
+                    if type(axis) is int:
+                        axis = data.dimension_labels[axis]
+                    temp_dict = {axis:plot_slice}
+                    plot_data = data.subset(**temp_dict, force=True)
+                elif hasattr(data,'as_array'):
+                    plot_data = data.as_array().take(indices=plot_slice, axis=axis)
+                else:
+                    plot_data = data.take(indices=plot_slice, axis=axis)
+            except:
+                raise TypeError("Unable to slice input data. Could not obtain slice {0} from {1} with shape {2}.\n\
+                          Pass either correct slice information or a 2D array".format(slice_requested, type(data), data.shape))
+
+            subtitle = "direction: {0} slice: {1}".format(axis,plot_slice)  
         else:
             plot_data = data
             subtitle = None
+
+        #get axis labels per subplot
+        if type(axis_labels) is list: 
+            plot_axis_labels = axis_labels[i]
+        else:
+            plot_axis_labels = axis_labels
+
+        if plot_axis_labels is None and hasattr(plot_data,'dimension_labels'):
+                plot_axis_labels = (plot_data.dimension_labels[1],plot_data.dimension_labels[0])
 
         #get min/max of subsetted data
         range_min = min(range_min, data.min())
         range_max = max(range_max, data.max())
 
         #get title per subplot
-        if isinstance(titles, list):
-            if titles[i] is None:
+        if isinstance(title, list):
+            if title[i] is None:
                 plot_title = ''
             else:
-                plot_title = titles[i]
+                plot_title = title[i]
         else:
-            if titles is None:
+            if title is None:
                 plot_title = ''
             else:
-                plot_title = titles
+                plot_title = title
 
         if subtitle is not None:
             plot_title += '\n' + subtitle
-
-        #get axis labels per subplot
-        plot_axis_labels = (plot_data.dimension_labels[1],plot_data.dimension_labels[0])
 
         #get origin per subplot
         if isinstance(origin, list):
@@ -140,23 +161,20 @@ def plotter2D(datacontainers, titles=None, slice_list=None, fix_range=False, ori
     #set range per subplot
     for i, subplot in enumerate(subplots):
         if fix_range == False:
-            pass  
+            pass
         elif fix_range == True:
             subplot.range = (range_min,range_max)
+        elif type(fix_range) is list:
+            subplot.range = fix_range[i]
         else:
-            try:
-                float(fix_range[0])
-                subplot.range = (fix_range[0], fix_range[1])
-            except:
-                subplot.range = fix_range[i]
+            subplot.range = (fix_range[0], fix_range[1])                
         
-
     #create plots
     if num_plots < num_cols:
         num_cols = num_plots
         
     num_rows = int(round((num_plots+0.5)/num_cols))
-    fig, (ax) = plt.subplots(num_rows, num_cols, figsize=sub_figsize)
+    fig, (ax) = plt.subplots(num_rows, num_cols, figsize=size)
     axes = ax.flatten() 
 
     #set up plots
@@ -167,14 +185,18 @@ def plotter2D(datacontainers, titles=None, slice_list=None, fix_range=False, ori
 
         axes[i].set_visible(True)
         axes[i].set_title(subplot.title)
-        axes[i].set_ylabel(subplot.axis_labels[1])
-        axes[i].set_xlabel(subplot.axis_labels[0])  
+
+        if subplot.axis_labels is not None:
+            axes[i].set_ylabel(subplot.axis_labels[1])
+            axes[i].set_xlabel(subplot.axis_labels[0])  
 
         #set origin
         shape_v = [0,subplot.data.shape[0]]
         shape_h = [0,subplot.data.shape[1]]
 
-        data_plot = subplot.data.as_array()
+        if type(subplot.data) != numpy.ndarray:
+            data = subplot.data.as_array() 
+
         data_origin='lower'
 
         if 'upper' in subplot.origin:
@@ -183,11 +205,11 @@ def plotter2D(datacontainers, titles=None, slice_list=None, fix_range=False, ori
 
         if 'right' in subplot.origin:
             shape_h.reverse()
-            data_plot = numpy.flip(data_plot,1)
+            data = numpy.flip(data,1)
 
         extent = (*shape_h,*shape_v)
         
-        sp = axes[i].imshow(data_plot, cmap=cmap, origin=data_origin, extent=extent)
+        sp = axes[i].imshow(data, cmap=cmap, origin=data_origin, extent=extent)
 
         im_ratio = subplot.data.shape[0]/subplot.data.shape[1]
 

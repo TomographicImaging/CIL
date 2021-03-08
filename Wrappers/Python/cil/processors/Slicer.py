@@ -55,7 +55,7 @@ class Slicer(DataProcessor):
         elif (data.geometry == None):
             raise ValueError('Geometry is not defined.')
         elif (self.roi == None):
-            raise ValueError('Prease, specify roi')
+            raise ValueError('Please, specify roi')
         else:
             return True 
     
@@ -81,7 +81,7 @@ class Slicer(DataProcessor):
         
         for key in self.roi.keys():
             idx = data.get_dimension_axis(key)
-            n_elements = numpy.int32(numpy.ceil((slice_object[idx].stop - slice_object[idx].start) / np.abs(slice_object[idx].step)))
+            n_elements = numpy.int32(numpy.ceil((slice_object[idx].stop - slice_object[idx].start) / numpy.abs(slice_object[idx].step)))
             
             if (isinstance(data, ImageData)):
 
@@ -131,7 +131,7 @@ class Slicer(DataProcessor):
         
         if geometry is not None:
             data_sliced = geometry.allocate()
-            data_sliced.fill(np.squeeze(data.as_array()[tuple(slice_object)]))
+            data_sliced.fill(numpy.squeeze(data.as_array()[tuple(slice_object)]))
             if out == None:
                 return data_sliced
             else:
@@ -140,7 +140,7 @@ class Slicer(DataProcessor):
             if self.force == False:
                 raise ValueError("Cannot calculate system geometry. Use 'force=True' to return DataContainer instead.")
             else:
-                return DataContainer(np.squeeze(data.as_array()[tuple(slice_object)]), deep_copy=False, dimension_labels=dimension_labels, suppress_warning=True)
+                return DataContainer(numpy.squeeze(data.as_array()[tuple(slice_object)]), deep_copy=False, dimension_labels=dimension_labels, suppress_warning=True)
 
     def _construct_slice_object(self, roi, n_elements, dimension_labels):
         '''

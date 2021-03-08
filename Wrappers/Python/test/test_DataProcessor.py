@@ -47,21 +47,17 @@ class TestDataProcessor(unittest.TestCase):
     
     def test_Slicer(self):
         
+        #test parallel 2D case
+
         ray_direction = [0.1, 3.0]
         detector_position = [-1.3, 1000.0]
         detector_direction_row = [1.0, 0.2]
         rotation_axis_position = [0.1, 2.0]
         
         AG = AcquisitionGeometry.create_Parallel2D(ray_direction=ray_direction, 
-                                                   detector_position=detector_position, 
-                                                   detector_direction_row=detector_direction_row, 
-                                                   rotation_axis_position=rotation_axis_position)
-        
-        ray_direction = numpy.asarray(ray_direction)
-        detector_direction_row = numpy.asarray(detector_direction_row)
-        
-        ray_direction /= numpy.sqrt((ray_direction**2).sum())
-        detector_direction_row /= numpy.sqrt((detector_direction_row**2).sum())
+                                                    detector_position=detector_position, 
+                                                    detector_direction_row=detector_direction_row, 
+                                                    rotation_axis_position=rotation_axis_position)
         
         angles = numpy.linspace(0, 360, 10, dtype=numpy.float32)
         
@@ -77,22 +73,13 @@ class TestDataProcessor(unittest.TestCase):
         s.set_input(data)
         data_sliced = s.process()
         
-        self.assertEqual(data_sliced.geometry.config.channels.num_channels, numpy.arange(1, 10-2, 3).shape[0] )
-        self.assertEqual(data_sliced.geometry.config.panel.num_pixels, [numpy.arange(10, 100-11, 7).shape[0], 1])
-        self.assertEqual(data_sliced.geometry.config.panel.pixel_size, [0.1, 0.1])
-        self.assertEqual(data_sliced.geometry.config.angles.initial_angle, 10)
-        self.assertEqual(data_sliced.geometry.config.angles.angle_unit, 'radian')
-        self.assertEqual(data_sliced.geometry.config.angles.num_positions, numpy.arange(2, 9, 2).shape[0])
-        self.assertEqual(data_sliced.geometry.config.system.dimension, '2D')
-        self.assertEqual(data_sliced.geometry.config.system.geometry, 'parallel')
-        self.assertEqual(data_sliced.geometry.dimension_labels, data.geometry.dimension_labels)
+        AG_sliced = AG.clone()
+        AG_sliced.set_channels(num_channels=numpy.arange(1, 10-2, 3).shape[0])
+        AG_sliced.set_panel([numpy.arange(10, 100-11, 7).shape[0], 1], pixel_size=0.1)
+        AG_sliced.set_angles(angles[2:9:2], initial_angle=10, angle_unit='radian')
         
+        self.assertEqual(data_sliced.geometry == AG_sliced)
         numpy.testing.assert_allclose(data_sliced.as_array(), numpy.squeeze(data.as_array()[1:-2:3, 2:9:2, 10:-11:7]), rtol=1E-6)
-        numpy.testing.assert_allclose(data_sliced.geometry.config.angles.angle_data, angles[2:9:2], rtol=1E-6)
-        numpy.testing.assert_allclose(data_sliced.geometry.config.system.ray.direction, ray_direction, rtol=1E-6)
-        numpy.testing.assert_allclose(data_sliced.geometry.config.system.detector.position, detector_position, rtol=1E-6)
-        numpy.testing.assert_allclose(data_sliced.geometry.config.system.detector.direction_row, detector_direction_row, rtol=1E-6)
-        numpy.testing.assert_allclose(data_sliced.geometry.config.system.rotation_axis.position, rotation_axis_position, rtol=1E-6)
         
         #%%
         #test parallel 3D case
@@ -105,21 +92,11 @@ class TestDataProcessor(unittest.TestCase):
         rotation_axis_direction = [0.1, 2.0, 0.5]
         
         AG = AcquisitionGeometry.create_Parallel3D(ray_direction=ray_direction, 
-                                                   detector_position=detector_position, 
-                                                   detector_direction_row=detector_direction_row, 
-                                                   detector_direction_col=detector_direction_col,
-                                                   rotation_axis_position=rotation_axis_position,
-                                                   rotation_axis_direction=rotation_axis_direction)
-        
-        ray_direction = numpy.asarray(ray_direction)
-        rotation_axis_direction = numpy.asarray(ray_direction)
-        detector_direction_row = numpy.asarray(detector_direction_row)
-        detector_direction_col = numpy.asarray(detector_direction_col)
-        
-        ray_direction /= numpy.sqrt((ray_direction**2).sum())
-        rotation_axis_direction /= numpy.sqrt((rotation_axis_direction**2).sum())
-        detector_direction_row /= numpy.sqrt((detector_direction_row**2).sum())
-        detector_direction_col /= numpy.sqrt((detector_direction_col**2).sum())
+                                                    detector_position=detector_position, 
+                                                    detector_direction_row=detector_direction_row, 
+                                                    detector_direction_col=detector_direction_col,
+                                                    rotation_axis_position=rotation_axis_position,
+                                                    rotation_axis_direction=rotation_axis_direction)
         
         angles = numpy.linspace(0, 360, 10, dtype=numpy.float32)
         
@@ -127,16 +104,16 @@ class TestDataProcessor(unittest.TestCase):
         AG.set_angles(angles, initial_angle=10, angle_unit='radian')
         AG.set_panel((100, 50), pixel_size=(0.1, 0.2))
         AG.dimension_labels = ['vertical',\
-                               'horizontal',\
-                               'angle',\
-                               'channel']
+                                'horizontal',\
+                                'angle',\
+                                'channel']
         
         data = AG.allocate('random')
         
         s = Slicer(roi={'channel': (None, 1),
                         'angle': -1,
                         'horizontal': (10, None, 2),
-                        'vertical': (10, 12, 2)})
+                        'vertical': (10, 12, 1)})
         s.set_input(data)
         data_sliced = s.process()
         
@@ -144,31 +121,13 @@ class TestDataProcessor(unittest.TestCase):
         dimension_labels_sliced.remove('channel')
         dimension_labels_sliced.remove('vertical')
         
-        self.assertEqual(data_sliced.geometry.config.channels.num_channels, numpy.arange(0, 1, 1).shape[0])
-        self.assertEqual(data_sliced.geometry.config.panel.num_pixels, [numpy.arange(10, 100, 2).shape[0], numpy.arange(10, 12, 2).shape[0]])
-        self.assertEqual(data_sliced.geometry.config.panel.pixel_size, [0.1, 0.1])
-        self.assertEqual(data_sliced.geometry.config.angles.initial_angle, 10)
-        self.assertEqual(data_sliced.geometry.config.angles.angle_unit, 'radian')
-        self.assertEqual(data_sliced.geometry.config.angles.num_positions, angles.shape[0])
-        self.assertEqual(data_sliced.geometry.config.system.dimension, '2D')
-        self.assertEqual(data_sliced.geometry.config.system.geometry, 'parallel')
-        self.assertEqual(list(data_sliced.geometry.dimension_labels), dimension_labels_sliced)
+        AG_sliced = AG.clone()
+        AG_sliced.dimension_labels = dimension_labels_sliced
+        AG_sliced.set_channels(num_channels=1)
+        AG_sliced.set_panel([numpy.arange(10, 100, 2).shape[0], numpy.arange(10, 12, 1).shape[0]], pixel_size=(0.1, 0.2))
         
-        ray_direction = ray_direction[:2]
-        detector_direction_row = detector_direction_row[:2]
-        
-        ray_direction = numpy.asarray(ray_direction)
-        detector_direction_row = numpy.asarray(detector_direction_row)
-        
-        ray_direction /= numpy.sqrt((ray_direction**2).sum())
-        detector_direction_row /= numpy.sqrt((detector_direction_row**2).sum())
-        
-        numpy.testing.assert_allclose(data_sliced.as_array(), numpy.squeeze(data.as_array()[10:12:2, 10::2, :, :1]), rtol=1E-6)
-        numpy.testing.assert_allclose(data_sliced.geometry.config.angles.angle_data, angles, rtol=1E-6)
-        numpy.testing.assert_allclose(data_sliced.geometry.config.system.ray.direction, ray_direction, rtol=1E-6)
-        numpy.testing.assert_allclose(data_sliced.geometry.config.system.detector.position, detector_position[:2], rtol=1E-6)
-        numpy.testing.assert_allclose(data_sliced.geometry.config.system.detector.direction_row, detector_direction_row, rtol=1E-6)
-        numpy.testing.assert_allclose(data_sliced.geometry.config.system.rotation_axis.position, rotation_axis_position[:2], rtol=1E-6)
+        self.assertEqual(data_sliced.geometry == AG_sliced)
+        numpy.testing.assert_allclose(data_sliced.as_array(), numpy.squeeze(data.as_array()[10:12:1, 10::2, :, :1]), rtol=1E-6)
         
         #%%
         #test cone 2D case
@@ -179,15 +138,9 @@ class TestDataProcessor(unittest.TestCase):
         rotation_axis_position = [0.1, 2.0]
         
         AG = AcquisitionGeometry.create_Cone2D(source_position=source_position, 
-                                               detector_position=detector_position, 
-                                               detector_direction_row=detector_direction_row, 
-                                               rotation_axis_position=rotation_axis_position)
-        
-        ray_direction = numpy.asarray(ray_direction)
-        detector_direction_row = numpy.asarray(detector_direction_row)
-        
-        ray_direction /= numpy.sqrt((ray_direction**2).sum())
-        detector_direction_row /= numpy.sqrt((detector_direction_row**2).sum())
+                                                detector_position=detector_position, 
+                                                detector_direction_row=detector_direction_row, 
+                                                rotation_axis_position=rotation_axis_position)
         
         angles = numpy.linspace(0, 360, 10, dtype=numpy.float32)
         
@@ -203,49 +156,24 @@ class TestDataProcessor(unittest.TestCase):
         s.set_input(data)
         data_sliced = s.process()
         
-        self.assertEqual(data_sliced.geometry.config.channels.num_channels, numpy.arange(1, 10, 4).shape[0] )
-        self.assertEqual(data_sliced.geometry.config.panel.num_pixels, [numpy.arange(10, 100-10, 5).shape[0], 1])
-        self.assertEqual(data_sliced.geometry.config.panel.pixel_size, [0.1, 0.1])
-        self.assertEqual(data_sliced.geometry.config.angles.initial_angle, 10)
-        self.assertEqual(data_sliced.geometry.config.angles.angle_unit, 'degree')
-        self.assertEqual(data_sliced.geometry.config.angles.num_positions, numpy.arange(2, 9, 2).shape[0])
-        self.assertEqual(data_sliced.geometry.config.system.dimension, '2D')
-        self.assertEqual(data_sliced.geometry.config.system.geometry, 'cone')
-        self.assertEqual(data_sliced.geometry.dimension_labels, data.geometry.dimension_labels)
+        AG_sliced = AG.clone()
+        AG_sliced.set_channels(num_channels=np.arange(1,10,4).shape[0])
+        AG_sliced.set_angles(AG.config.angles.angle_data[2:9:2], angle_unit='degree', initial_angle=10)
+        AG_sliced.set_panel(np.arange(10,90,5).shape[0], pixel_size=0.1)
         
+        self.assertEqual(data_sliced.geometry == AG_sliced)
         numpy.testing.assert_allclose(data_sliced.as_array(), numpy.squeeze(data.as_array()[1::4, 2:9:2, 10:-10:5]), rtol=1E-6)
-        numpy.testing.assert_allclose(data_sliced.geometry.config.angles.angle_data, angles[2:9:2], rtol=1E-6)
-        numpy.testing.assert_allclose(data_sliced.geometry.config.system.source.position, source_position, rtol=1E-6)
-        numpy.testing.assert_allclose(data_sliced.geometry.config.system.detector.position, detector_position, rtol=1E-6)
-        numpy.testing.assert_allclose(data_sliced.geometry.config.system.detector.direction_row, detector_direction_row, rtol=1E-6)
-        numpy.testing.assert_allclose(data_sliced.geometry.config.system.rotation_axis.position, rotation_axis_position, rtol=1E-6)
         
         #%%
         #test cone 3D case
         
         source_position = [0.1, 3.0, 0.4]
         detector_position = [-1.3, 1000.0, 2]
-        detector_direction_row = [1.0, 0.2, 0.0]
-        detector_direction_col = [0.0 ,0.0, 1.0]
         rotation_axis_position = [0.1, 2.0, 0.5]
-        rotation_axis_direction = [0.1, 2.0, 0.5]
         
         AG = AcquisitionGeometry.create_Cone3D(source_position=source_position, 
-                                               detector_position=detector_position, 
-                                               detector_direction_row=detector_direction_row, 
-                                               detector_direction_col=detector_direction_col,
-                                               rotation_axis_position=rotation_axis_position,
-                                               rotation_axis_direction=rotation_axis_direction)
-        
-        ray_direction = numpy.asarray(ray_direction)
-        rotation_axis_direction = numpy.asarray(rotation_axis_direction)
-        detector_direction_row = numpy.asarray(detector_direction_row)
-        detector_direction_col = numpy.asarray(detector_direction_col)
-        
-        ray_direction /= numpy.sqrt((ray_direction**2).sum())
-        rotation_axis_direction /= numpy.sqrt((rotation_axis_direction**2).sum())
-        detector_direction_row /= numpy.sqrt((detector_direction_row**2).sum())
-        detector_direction_col /= numpy.sqrt((detector_direction_col**2).sum())
+                                                detector_position=detector_position,
+                                                rotation_axis_position=rotation_axis_position)
         
         angles = numpy.linspace(0, 360, 10, dtype=numpy.float32)
         
@@ -253,9 +181,9 @@ class TestDataProcessor(unittest.TestCase):
         AG.set_angles(angles, initial_angle=10, angle_unit='radian')
         AG.set_panel((100, 50), pixel_size=(0.1, 0.2))
         AG.dimension_labels = ['vertical',\
-                               'horizontal',\
-                               'angle',\
-                               'channel']
+                                'horizontal',\
+                                'angle',\
+                                'channel']
         
         data = AG.allocate('random')
         
@@ -269,26 +197,15 @@ class TestDataProcessor(unittest.TestCase):
         dimension_labels_sliced = list(data.geometry.dimension_labels)
         dimension_labels_sliced.remove('channel')
         
-        self.assertEqual(data_sliced.geometry.config.channels.num_channels, numpy.arange(0, 1, 1).shape[0])
-        self.assertEqual(data_sliced.geometry.config.panel.num_pixels, [numpy.arange(10, 100, 2).shape[0], numpy.arange(10, 50-10, 2).shape[0]])
-        self.assertEqual(data_sliced.geometry.config.panel.pixel_size, [0.1, 0.2])
-        self.assertEqual(data_sliced.geometry.config.angles.initial_angle, 10)
-        self.assertEqual(data_sliced.geometry.config.angles.angle_unit, 'radian')
-        self.assertEqual(data_sliced.geometry.config.angles.num_positions, angles.shape[0])
-        self.assertEqual(data_sliced.geometry.config.system.dimension, '3D')
-        self.assertEqual(data_sliced.geometry.config.system.geometry, 'cone')
-        self.assertEqual(list(data_sliced.geometry.dimension_labels), dimension_labels_sliced)
+        AG_sliced = AG.clone()
+        AG_sliced.dimension_labels = dimension_labels_sliced
+        AG_sliced.set_channels(num_channels=1)
+        AG_sliced.set_panel([numpy.arange(10, 100, 2).shape[0], numpy.arange(10, 50-10, 2).shape[0]], pixel_size=(0.1, 0.2))
+        self.assertEqual(data_sliced.geometry == AG_sliced)
         
         numpy.testing.assert_allclose(data_sliced.as_array(), numpy.squeeze(data.as_array()[10:-10:2, 10::2, :, :1]), rtol=1E-6)
-        numpy.testing.assert_allclose(data_sliced.geometry.config.angles.angle_data, angles, rtol=1E-6)
-        numpy.testing.assert_allclose(data_sliced.geometry.config.system.source.position, source_position, rtol=1E-6)
-        numpy.testing.assert_allclose(data_sliced.geometry.config.system.detector.position, detector_position, rtol=1E-6)
-        numpy.testing.assert_allclose(data_sliced.geometry.config.system.rotation_axis.position, rotation_axis_position, rtol=1E-6)
-        numpy.testing.assert_allclose(data_sliced.geometry.config.system.rotation_axis.direction, rotation_axis_direction, rtol=1E-6)
-        numpy.testing.assert_allclose(data_sliced.geometry.config.system.detector.direction_row, detector_direction_row, rtol=1E-6)
-        numpy.testing.assert_allclose(data_sliced.geometry.config.system.detector.direction_col, detector_direction_col, rtol=1E-6)
         
-        #%% test cone 3D - centre slice
+        #%% test cone 3D - central slice
         s = Slicer(roi={'channel': (None, 1),
                         'angle': -1,
                         'horizontal': (10, None, 2),
@@ -300,57 +217,29 @@ class TestDataProcessor(unittest.TestCase):
         dimension_labels_sliced.remove('channel')
         dimension_labels_sliced.remove('vertical')
         
-        self.assertEqual(data_sliced.geometry.config.channels.num_channels, numpy.arange(0, 1, 1).shape[0])
-        self.assertEqual(data_sliced.geometry.config.panel.num_pixels, [numpy.arange(10, 100, 2).shape[0], numpy.arange(25,26).shape[0]])
-        self.assertEqual(data_sliced.geometry.config.panel.pixel_size, [0.1, 0.1])
-        self.assertEqual(data_sliced.geometry.config.angles.initial_angle, 10)
-        self.assertEqual(data_sliced.geometry.config.angles.angle_unit, 'radian')
-        self.assertEqual(data_sliced.geometry.config.angles.num_positions, angles.shape[0])
-        self.assertEqual(data_sliced.geometry.config.system.dimension, '2D')
-        self.assertEqual(data_sliced.geometry.config.system.geometry, 'cone')
-        self.assertEqual(list(data_sliced.geometry.dimension_labels), dimension_labels_sliced)
+        AG_sliced = AG.subset(vertical='centre')
+        AG_sliced = AG_sliced.subset(channel=1)
+        AG_sliced.config.panel.num_pixels[0] = np.arange(10,100,2).shape[0]
         
-        detector_direction_row = detector_direction_row[:2]
-        detector_direction_row = numpy.asarray(detector_direction_row)
-        detector_direction_row /= numpy.sqrt((detector_direction_row**2).sum())
-        
+        self.assertEqual(data_sliced.geometry == AG_sliced)
         numpy.testing.assert_allclose(data_sliced.as_array(), numpy.squeeze(data.as_array()[25:26, 10::2, :, :1]), rtol=1E-6)
-        numpy.testing.assert_allclose(data_sliced.geometry.config.angles.angle_data, angles, rtol=1E-6)
-        numpy.testing.assert_allclose(data_sliced.geometry.config.system.source.position, source_position[:2], rtol=1E-6)
-        numpy.testing.assert_allclose(data_sliced.geometry.config.system.detector.position, detector_position[:2], rtol=1E-6)
-        numpy.testing.assert_allclose(data_sliced.geometry.config.system.detector.direction_row, detector_direction_row, rtol=1E-6)
-        numpy.testing.assert_allclose(data_sliced.geometry.config.system.rotation_axis.position, rotation_axis_position[:2], rtol=1E-6)
         
-        #%% test cone 3D single slice, not central
-        s = Slicer(roi={'channel': (None, 1),
-                        'angle': -1,
-                        'horizontal': (10, None, 2),
-                        'vertical': (1, 2)},
-                    force=True)
-        s.set_input(data)
-        data_sliced = s.process()
-        
-        dimension_labels_sliced = {i:data.dimension_labels[i] for i in data.dimension_labels if data.dimension_labels[i]!='channel' or data.dimension_labels[i]!='vertical'}
-        
-        self.assertEqual(data_sliced.geometry, None)
-        self.assertEqual(data_sliced.dimension_labels, {0: 'horizontal', 1: 'angle'})
-        numpy.testing.assert_allclose(data_sliced.as_array(), numpy.squeeze(data.as_array()[1:2, 10::2, :, :1]), rtol=1E-6)
         
         #%% test ImageData
         IG = ImageGeometry(voxel_num_x=20,
-                           voxel_num_y=30,
-                           voxel_num_z=12,
-                           voxel_size_x=0.1,
-                           voxel_size_y=0.2,
-                           voxel_size_z=0.3,
-                           channels=10,
-                           center_x=0.2,
-                           center_y=0.4,
-                           center_z=0.6,
-                           dimension_labels = ['vertical',\
-                                               'channel',\
-                                               'horizontal_y',\
-                                               'horizontal_x'])
+                            voxel_num_y=30,
+                            voxel_num_z=12,
+                            voxel_size_x=0.1,
+                            voxel_size_y=0.2,
+                            voxel_size_z=0.3,
+                            channels=10,
+                            center_x=0.2,
+                            center_y=0.4,
+                            center_z=0.6,
+                            dimension_labels = ['vertical',\
+                                                'channel',\
+                                                'horizontal_y',\
+                                                'horizontal_x'])
         
         data = IG.allocate('random')
         
@@ -361,18 +250,12 @@ class TestDataProcessor(unittest.TestCase):
         s.set_input(data)
         data_sliced = s.process()
         
-        self.assertEqual(data_sliced.geometry.voxel_num_x, IG.voxel_num_x)
-        self.assertEqual(data_sliced.geometry.voxel_num_y, numpy.arange(10, 30, 2).shape[0])
-        self.assertEqual(data_sliced.geometry.voxel_num_z, numpy.arange(5, 12, 3).shape[0])
-        self.assertEqual(data_sliced.geometry.channels, numpy.arange(0, 10, 2).shape[0])
-        self.assertEqual(data_sliced.geometry.voxel_size_x, IG.voxel_size_x)
-        self.assertEqual(data_sliced.geometry.voxel_size_y, IG.voxel_size_y)
-        self.assertEqual(data_sliced.geometry.voxel_size_z, IG.voxel_size_z)
-        self.assertEqual(data_sliced.geometry.center_x, IG.center_x)
-        self.assertEqual(data_sliced.geometry.center_y, IG.center_y)
-        self.assertEqual(data_sliced.geometry.center_z, IG.center_z)
-        self.assertEqual(data_sliced.dimension_labels, data.dimension_labels)
+        IG_sliced = IG.copy()
+        IG_sliced.voxel_num_y = numpy.arange(10, 30, 2).shape[0]
+        IG_sliced.voxel_num_z = numpy.arange(5, 12, 3).shape[0]
+        IG_sliced.channels = numpy.arange(0, 10, 2).shape[0]
         
+        self.assertEqual(data_sliced.geometry == IG_sliced)
         numpy.testing.assert_allclose(data_sliced.as_array(), numpy.squeeze(data.as_array()[5:12:3, ::2, 10:30:2, :]), rtol=1E-6)
 
 

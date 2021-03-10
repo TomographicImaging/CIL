@@ -78,7 +78,7 @@ class TestDataProcessor(unittest.TestCase):
         AG_sliced.set_panel([numpy.arange(10, 100-11, 7).shape[0], 1], pixel_size=0.1)
         AG_sliced.set_angles(angles[2:9:2], initial_angle=10, angle_unit='radian')
         
-        self.assertEqual(data_sliced.geometry == AG_sliced)
+        self.assertTrue(data_sliced.geometry == AG_sliced)
         numpy.testing.assert_allclose(data_sliced.as_array(), numpy.squeeze(data.as_array()[1:-2:3, 2:9:2, 10:-11:7]), rtol=1E-6)
         
         #%%
@@ -126,7 +126,7 @@ class TestDataProcessor(unittest.TestCase):
         AG_sliced.set_channels(num_channels=1)
         AG_sliced.set_panel([numpy.arange(10, 100, 2).shape[0], numpy.arange(10, 12, 1).shape[0]], pixel_size=(0.1, 0.2))
         
-        self.assertEqual(data_sliced.geometry == AG_sliced)
+        self.assertTrue(data_sliced.geometry == AG_sliced)
         numpy.testing.assert_allclose(data_sliced.as_array(), numpy.squeeze(data.as_array()[10:12:1, 10::2, :, :1]), rtol=1E-6)
         
         #%%
@@ -161,7 +161,7 @@ class TestDataProcessor(unittest.TestCase):
         AG_sliced.set_angles(AG.config.angles.angle_data[2:9:2], angle_unit='degree', initial_angle=10)
         AG_sliced.set_panel(np.arange(10,90,5).shape[0], pixel_size=0.1)
         
-        self.assertEqual(data_sliced.geometry == AG_sliced)
+        self.assertTrue(data_sliced.geometry == AG_sliced)
         numpy.testing.assert_allclose(data_sliced.as_array(), numpy.squeeze(data.as_array()[1::4, 2:9:2, 10:-10:5]), rtol=1E-6)
         
         #%%
@@ -201,7 +201,7 @@ class TestDataProcessor(unittest.TestCase):
         AG_sliced.dimension_labels = dimension_labels_sliced
         AG_sliced.set_channels(num_channels=1)
         AG_sliced.set_panel([numpy.arange(10, 100, 2).shape[0], numpy.arange(10, 50-10, 2).shape[0]], pixel_size=(0.1, 0.2))
-        self.assertEqual(data_sliced.geometry == AG_sliced)
+        self.assertTrue(data_sliced.geometry == AG_sliced)
         
         numpy.testing.assert_allclose(data_sliced.as_array(), numpy.squeeze(data.as_array()[10:-10:2, 10::2, :, :1]), rtol=1E-6)
         
@@ -221,7 +221,7 @@ class TestDataProcessor(unittest.TestCase):
         AG_sliced = AG_sliced.subset(channel=1)
         AG_sliced.config.panel.num_pixels[0] = np.arange(10,100,2).shape[0]
         
-        self.assertEqual(data_sliced.geometry == AG_sliced)
+        self.assertTrue(data_sliced.geometry == AG_sliced)
         numpy.testing.assert_allclose(data_sliced.as_array(), numpy.squeeze(data.as_array()[25:26, 10::2, :, :1]), rtol=1E-6)
         
         
@@ -255,7 +255,7 @@ class TestDataProcessor(unittest.TestCase):
         IG_sliced.voxel_num_z = numpy.arange(5, 12, 3).shape[0]
         IG_sliced.channels = numpy.arange(0, 10, 2).shape[0]
         
-        self.assertEqual(data_sliced.geometry == IG_sliced)
+        self.assertTrue(data_sliced.geometry == IG_sliced)
         numpy.testing.assert_allclose(data_sliced.as_array(), numpy.squeeze(data.as_array()[5:12:3, ::2, 10:30:2, :]), rtol=1E-6)
 
 

@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+#%%
+>>>>>>> 7a1dfa4b56d4350bf24d61fef4acf855b231948d
 # -*- coding: utf-8 -*-
 #  CCP in Tomographic Imaging (CCPi) Core Imaging Library (CIL).
 
@@ -19,8 +23,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+<<<<<<< HEAD
 from cil.framework import DataProcessor, AcquisitionData, ImageData, DataContainer, AcquisitionGeometry
 import numpy as np
+=======
+from cil.framework import DataProcessor, AcquisitionData, ImageData, DataContainer, AcquisitionGeometry, ImageGeometry
+import numpy
+>>>>>>> 7a1dfa4b56d4350bf24d61fef4acf855b231948d
 import warnings
 
 
@@ -44,6 +53,10 @@ class Slicer(DataProcessor):
 
         super(Slicer, self).__init__(**kwargs)
     
+<<<<<<< HEAD
+=======
+
+>>>>>>> 7a1dfa4b56d4350bf24d61fef4acf855b231948d
     def check_input(self, data):
         
         if not ((isinstance(data, ImageData)) or 
@@ -52,6 +65,7 @@ class Slicer(DataProcessor):
                             ' - ImageData\n - AcquisitionData')
         elif (data.geometry == None):
             raise ValueError('Geometry is not defined.')
+<<<<<<< HEAD
         else:
             return True 
     
@@ -62,6 +76,23 @@ class Slicer(DataProcessor):
         
         geometry_0 = data.geometry
         
+=======
+        elif (self.roi == None):
+            raise ValueError('Please, specify roi')
+        else:
+            return True 
+    
+
+    def process(self, out=None):
+
+        data = self.get_input()
+        ndim = len(data.dimension_labels)
+        dimension_labels = data.dimension_labels
+        
+        geometry_0 = data.geometry
+        geometry = geometry_0.copy()
+
+>>>>>>> 7a1dfa4b56d4350bf24d61fef4acf855b231948d
         dimension_labels = list(geometry_0.dimension_labels)
         
         if self.roi != None:
@@ -69,6 +100,7 @@ class Slicer(DataProcessor):
                 if key not in data.dimension_labels.values():
                     raise ValueError('Wrong label is specified for roi, expected {}.'.format(data.dimension_labels.values()))
         
+<<<<<<< HEAD
         roi = []
         sliceobj = []
         for i in range(ndim):
@@ -267,3 +299,131 @@ class Slicer(DataProcessor):
             return DataContainer(data_resized, deep_copy=False, dimension_labels=dimension_labels, suppress_warning=True)
         else:
             return type(data)(data_resized, deep_copy=False, geometry=geometry, dimension_labels=dimension_labels, suppress_warning=True)
+=======
+        slice_object = self._construct_slice_object(self.roi, data.shape, dimension_labels)
+
+        
+        for key in self.roi.keys():
+            idx = data.get_dimension_axis(key)
+            n_elements = numpy.int32(numpy.ceil((slice_object[idx].stop - slice_object[idx].start) / numpy.abs(slice_object[idx].step)))
+            
+            if (isinstance(data, ImageData)):
+
+                if key == 'channel':
+                    if  n_elements > 1:
+                        geometry.channels = n_elements
+                    else:
+                        geometry = geometry.subset(channel=slice_object[idx].start, force=self.force)
+                elif key == 'vertical':
+                    if n_elements > 1:
+                        geometry.voxel_num_z = n_elements
+                    else:
+                        geometry = geometry.subset(vertical=slice_object[idx].start, force=self.force)
+                elif key == 'horizontal_x':
+                    if n_elements > 1:
+                        geometry.voxel_num_x = n_elements
+                    else:
+                        geometry = geometry.subset(horizontal_x=slice_object[idx].start, force=self.force)
+                elif key == 'horizontal_y':
+                    if n_elements > 1:
+                        geometry.voxel_num_y = n_elements
+                    else:
+                        geometry = geometry.subset(horizontal_y=slice_object[idx].start, force=self.force)
+            
+            # if AcquisitionData
+            else:
+                if key == 'channel':
+                    if n_elements > 1:
+                        geometry.set_channels(num_channels=n_elements)
+                    else:
+                        geometry = geometry.subset(channel=slice_object[idx].start, force=self.force)
+                elif key == 'angle':
+                    if n_elements > 1:
+                        geometry.config.angles.angle_data = geometry_0.config.angles.angle_data[slice_object[idx]]
+                    else:
+                        geometry = geometry.subset(angle=slice_object[idx].start, force=self.force)
+                elif key == 'vertical':
+                    if n_elements > 1:
+                        geometry.config.panel.num_pixels[1] = n_elements
+                    else:
+                        geometry = geometry.subset(vertical=slice_object[idx].start, force=self.force)
+                elif key == 'horizontal':
+                    if n_elements > 1:
+                        geometry.config.panel.num_pixels[0] = n_elements
+                    else:
+                        geometry = geometry.subset(horizontal=slice_object[idx].start, force=self.force)
+        
+        if geometry is not None:
+            data_sliced = geometry.allocate()
+            data_sliced.fill(numpy.squeeze(data.as_array()[tuple(slice_object)]))
+            if out == None:
+                return data_sliced
+            else:
+                out = data_sliced
+        else:
+            if self.force == False:
+                raise ValueError("Cannot calculate system geometry. Use 'force=True' to return DataContainer instead.")
+            else:
+                return DataContainer(numpy.squeeze(data.as_array()[tuple(slice_object)]), deep_copy=False, dimension_labels=dimension_labels, suppress_warning=True)
+
+    def _construct_slice_object(self, roi, n_elements, dimension_labels):
+        '''
+        parse roi input
+        here we construct slice() object to slice the actual array
+        '''
+        ndim = len(n_elements)
+        slice_object = []
+        # loop through dimensions
+        for i in range(ndim):
+            # given dimension number, get corresponding label
+            label = dimension_labels[i]
+            # '-1' shortcut = include all elements
+            if (label in roi.keys()) and (roi[label] != -1):
+                # start and step are optional
+                if len(roi[label]) == 1:
+                    start = 0
+                    step = 1
+                    if roi[label][0] != None:
+                        if roi[label][0] < 0:
+                            stop =  n_elements[i]+roi[label][0]
+                        else:
+                            stop = roi[label][0]
+                    else:
+                        stop =  n_elements[i]
+
+                elif len(roi[label]) == 2 or len(roi[label]) == 3:
+                    
+                    if roi[label][0] != None:
+                        if roi[label][0] < 0:
+                            start = n_elements[i]+roi[label][0]
+                        else:
+                            start = roi[label][0]
+                    else:
+                        start = 0
+
+                    if roi[label][1] != None:
+                        if roi[label][1] < 0:
+                            stop = n_elements[i]+roi[label][1]
+                        else:
+                            stop = roi[label][1]
+                    else: 
+                        stop = n_elements[i]
+                    
+                    if len(roi[label]) == 2:
+                        step = 1
+
+                    if len(roi[label]) == 3:
+                        if roi[label][2] != None:
+                            step = roi[label][2]
+                        else:
+                            step = 1
+                else:
+                    raise ValueError('roi is exected to have 1, 2 or 3 elements')
+            else:
+                step = 1
+                start = 0
+                stop = n_elements[i]
+            slice_object.append(slice(start, stop, step))
+        return slice_object
+
+>>>>>>> 7a1dfa4b56d4350bf24d61fef4acf855b231948d

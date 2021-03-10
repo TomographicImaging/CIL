@@ -31,16 +31,16 @@ class TestSubset(unittest.TestCase):
     def setUp(self):
         self.ig = ImageGeometry(2,3,4,channels=5)
         angles = numpy.asarray([90.,0.,-90.], dtype=numpy.float32)
-
-        self.ag = AcquisitionGeometry('parallel', 'edo', pixel_num_h=20, pixel_num_v=2, angles=angles, 
-                         dist_source_center = 312.2, 
-                         dist_center_detector = 123.,
-                         channels=4 )
         
         self.ag_cone = AcquisitionGeometry.create_Cone3D([0,-500,0],[0,500,0])\
-                                     .set_panel((2,20))\
-                                     .set_angles(self.ag.angles)\
-                                     .set_channels(4)
+                                    .set_panel((20,2))\
+                                    .set_angles(angles)\
+                                    .set_channels(4)
+
+        self.ag = AcquisitionGeometry.create_Parallel3D()\
+                                    .set_angles(angles)\
+                                    .set_channels(4)\
+                                    .set_panel((20,2))
 
 
     def test_ImageDataAllocate1a(self):
@@ -196,14 +196,14 @@ class TestSubset(unittest.TestCase):
         
         data = self.ag_cone.allocate()
         sub = data.subset(vertical = 'centre')
-        self.assertTrue( sub.geometry.shape == (4,3,2))       
+        self.assertTrue( sub.geometry.shape == (4,3,20))       
 
     def test_AcquisitionDataSubset1i(self):
         
         data = self.ag_cone.allocate()
         sliceme = 1
         sub = data.subset(vertical = sliceme, force=True)
-        self.assertTrue( sub.shape == (4, 3, 2))
+        self.assertTrue( sub.shape == (4, 3, 20))
 
     def test_AcquisitionDataSubset1j(self):
 
@@ -213,3 +213,43 @@ class TestSubset(unittest.TestCase):
         sub = sub.subset(horizontal = 0, force=True)
 
         self.assertTrue( sub.shape == (4,))
+
+    def test_AcquisitionDataSubset_forastra(self):
+
+        self.ag.set_labels(['horizontal','vertical', 'angle', 'channel'])
+        new_ag = self.ag.subset('astra')
+        self.assertTrue(  list(new_ag.dimension_labels) == ['channel','vertical', 'angle', 'horizontal'] )
+
+        ad = self.ag.allocate()
+        new_ad = self.ag.subset('astra')
+        self.assertTrue(new_ad.shape == (4, 2, 3, 20) )
+
+    def test_AcquisitionDataSubset_fortigre(self):
+
+        self.ag.set_labels(['horizontal','vertical', 'angle', 'channel'])
+        new_ag = self.ag.subset('tigre')
+        self.assertTrue(  list(new_ag.dimension_labels) == ['channel','angle', 'vertical', 'horizontal'] )
+
+        ad = self.ag.allocate()
+        new_ad = self.ag.subset('tigre')
+        self.assertTrue(new_ad.shape == (4, 3, 2, 20) )
+
+    def test_ImageDataSubset_forastra(self):
+
+        self.ig.set_labels(['horizontal_x','horizontal_y', 'vertical', 'channel'])
+        new_ig = self.ig.subset('astra')
+        self.assertTrue(list(new_ig.dimension_labels) == ['channel','vertical', 'horizontal_y', 'horizontal_x'] )
+
+        id = self.ig.allocate()
+        new_id = self.ig.subset('astra')
+        self.assertTrue(new_id.shape == (5,4,3,2) )
+
+    def test_ImageDataSubset_fortigre(self):
+
+        self.ig.set_labels(['horizontal_x','horizontal_y', 'vertical', 'channel'])
+        new_ig = self.ig.subset('tigre')
+        self.assertTrue(list(new_ig.dimension_labels) == ['channel','vertical', 'horizontal_y', 'horizontal_x'] )
+
+        id = self.ig.allocate()
+        new_id = self.ig.subset('tigre')
+        self.assertTrue(new_id.shape == (5,4,3,2) )

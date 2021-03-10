@@ -199,7 +199,9 @@ class ImageGeometry(object):
 
     def subset(self, dimensions=None, **kw):
         '''Returns a new sliced and/or reshaped ImageGeometry'''
-  
+        if dimensions == 'astra' or dimensions == 'tigre':
+            dimensions = DataOrder.get_order_for_engine(dimensions, self)
+
         if dimensions is not None and \
             (len(dimensions) != len(self.shape) ):
             raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
@@ -1708,7 +1710,9 @@ class AcquisitionGeometry(object):
 
     def subset(self, dimensions=None, **kw):
         '''returns a new sliced and/or reshaped AcquisitionGeometry'''
-  
+        if dimensions == 'astra' or dimensions == 'tigre':
+            dimensions = DataOrder.get_order_for_engine(dimensions, self)
+ 
         if dimensions is not None and \
             (len(dimensions) != len(self.shape) ):
             raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
@@ -1900,10 +1904,6 @@ class DataContainer(object):
                 for ax in sorted(axis_order):
                     this_dimension = unwanted_dimensions.pop(ax)
                     left_dimensions.append(this_dimension)
-                #print ("unwanted_dimensions {0}".format(unwanted_dimensions))
-                #print ("left_dimensions {0}".format(left_dimensions))
-                #new_shape = [self.shape[ax] for ax in axis_order]
-                #print ("new_shape {0}".format(new_shape))
 
                 #slices on each unwanted dimension in reverse order
                 #np.take returns a new array each time
@@ -2477,7 +2477,7 @@ class DataContainer(object):
     def dtype(self):
         '''Returns the type of the data array'''
         return self.as_array().dtype
-    
+  
 class ImageData(DataContainer):
     '''DataContainer for holding 2D or 3D DataContainer'''
     __container_priority__ = 1
@@ -2560,7 +2560,9 @@ class ImageData(DataContainer):
                         
     def subset(self, dimensions=None, **kw):
         '''returns a subset of ImageData and regenerates the geometry'''
-        # Check that this is actually a resorting
+        if dimensions == 'astra' or dimensions == 'tigre':
+            dimensions = DataOrder.get_order_for_engine(dimensions, self)
+
         if dimensions is not None and \
             (len(dimensions) != len(self.shape) ):
             raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
@@ -2725,6 +2727,9 @@ class AcquisitionData(DataContainer):
     def subset(self, dimensions=None, **kw):
         '''returns a subset of the AcquisitionData and regenerates the geometry'''
   
+        if dimensions == 'astra' or dimensions == 'tigre':
+            dimensions = DataOrder.get_order_for_engine(dimensions, self)
+
         if dimensions is not None and \
             (len(dimensions) != len(self.shape) ):
             raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
@@ -3075,3 +3080,41 @@ class VectorGeometry(object):
             else:
                 raise ValueError('Value {} unknown'.format(value))
         return out
+
+class DataOrder():
+    ASTRA_IG_LABELS = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+    TIGRE_IG_LABELS = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+    ASTRA_AG_LABELS = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.VERTICAL, AcquisitionGeometry.ANGLE, AcquisitionGeometry.HORIZONTAL]
+    TIGRE_AG_LABELS = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.ANGLE, AcquisitionGeometry.VERTICAL, AcquisitionGeometry.HORIZONTAL]
+
+    @staticmethod
+    def get_order_for_engine(engine, geometry):
+        if engine == 'astra':
+            if isinstance(geometry, AcquisitionGeometry):
+                dim_order = DataOrder.ASTRA_AG_LABELS
+            else:
+                dim_order = DataOrder.ASTRA_IG_LABELS
+        elif engine == 'tigre':
+            if isinstance(geometry, AcquisitionGeometry):
+                dim_order = DataOrder.TIGRE_AG_LABELS
+            else:
+                dim_order = DataOrder.TIGRE_IG_LABELS   
+        else:
+            raise ValueError("Unknown engine expected 'tigre' or 'astra' got {}".format(engine))
+        
+        dimensions = []
+        for label in dim_order:
+            if label in geometry.dimension_labels:
+                dimensions.append(label)
+
+        return dimensions
+
+    @staticmethod
+    def check_order_for_engine(engine, geometry):
+        order_requested = get_order_for_engine(engine, geometry)
+
+        if order_requested == list(geometry.dimension_labels):
+            return True
+        else:
+            return False
+            

@@ -33,6 +33,7 @@ where,
 
 ## Building from source code 
 
+### Getting the source code
 In case of development it is useful to be able to build the software directly. You should clone this repository as
 ```bash
 
@@ -44,6 +45,23 @@ The use of `--recurse-submodule` is necessary if the user wants the examples dat
 git submodule update --init
 ```
 
+### Building locally
+You need `CMake` and a C++ compiler.
+
+We suggest to use virtualenv or conda to keep your system python separated from where you will install CIL. Let's assume that you have created a new conda environment with the appropriate dependencies, see for instance [this](https://github.com/vais-ral/CCPi-Framework/blob/master/scripts/create_local_env_for_cil_development.sh) script or `meta.yaml`.
+
+Once you've cloned the repository in the directory `CCPi-Framework` you can use:
+
+```bash
+mkdir build
+cd build
+cmake ../CCPi-Framework -DCMAKE_INSTALL_PREFIX=${CONDA_PREFIX}
+cmake --build . --target install
+cd ../CCPi-FrameworkWrappers/Python/tests/
+python -m unittest discover -s ../CCPi-FrameworkWrappers/Python/tests/
+```
+
+If you have set the `-DCMAKE_INSTALL_PREFIX` to something that is not on the system search path, you need to add it to it, e.g. add the directory to the environment variables `LD_LIBRARY_PATH` or `PATH`, otherwise the system will not be able to find the `cil` library.
 ### Components
 
 Some concepts are so much overlapping with the CCPPETMR [SIRF](https://github.com/CCPPETMR/SIRF) project that we have chosen to stick to their naming and conventions, in the hope that we may be able to complement each other (at least in Python).

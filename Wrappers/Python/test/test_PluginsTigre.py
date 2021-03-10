@@ -3,22 +3,26 @@ import unittest
 import numpy as np
 
 try:
-    from cil.plugins.tigre import CIL2TIGREGeometry
-    from cil.plugins.tigre import ProjectionOperator
-    from cil.plugins.tigre import FBP
+    import tigre
     has_tigre = True
 except ModuleNotFoundError:
     print(  "This plugin requires the additional package TIGRE\n" +
             "Please install it via conda as tigre from the ccpi channel\n"+
             "Minimal version is 21.01")
     has_tigre = False
+else:
+    from cil.plugins.tigre import CIL2TIGREGeometry
+    from cil.plugins.tigre import ProjectionOperator
+    from cil.plugins.tigre import FBP
 
 try:
-    from cil.plugins.astra.operators import ProjectionOperator as AstraProjectionOperator
-    from cil.plugins.astra.processors import FBP as AstraFBP
+    import astra
     has_astra = True
 except ModuleNotFoundError:
     has_astra = False
+else:
+    from cil.plugins.astra.operators import ProjectionOperator as AstraProjectionOperator
+    from cil.plugins.astra.processors import FBP as AstraFBP
 
 class Test_convert_geometry(unittest.TestCase):
     def setUp(self): 
@@ -261,6 +265,7 @@ class Test_results(unittest.TestCase):
         diff = (self.golden_data-reco_out3D).abs()
         self.assertLess(diff.mean(), 0.01)
         np.testing.assert_allclose(self.golden_data.as_array(),reco_out3D.as_array(),atol=1)
+
 
     @unittest.skipUnless(has_tigre and has_astra, "TIGRE or ASTRA not installed")
     def test_fp_with_Astra(self):

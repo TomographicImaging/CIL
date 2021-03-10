@@ -1,5 +1,7 @@
 from cil.framework import DataProcessor, ImageData
+from cil.framework import DataOrder
 from cil.plugins.tigre import CIL2TIGREGeometry
+
 import numpy as np
 
 try:
@@ -29,6 +31,8 @@ class FBP(DataProcessor):
     
     def __init__(self, volume_geometry, sinogram_geometry): 
         
+        DataOrder.check_order_for_engine('tigre', volume_geometry)
+        DataOrder.check_order_for_engine('tigre', sinogram_geometry) 
 
         tigre_geom, tigre_angles = CIL2TIGREGeometry.getTIGREGeometry(volume_geometry,sinogram_geometry)
 
@@ -42,6 +46,7 @@ class FBP(DataProcessor):
             raise ValueError("Expected input data to be single channel, got {0}"\
                  .format(self.sinogram_geometry.channels))  
 
+        DataOrder.check_order_for_engine('tigre', dataset.geometry)
         return True
 
     def process(self, out=None):

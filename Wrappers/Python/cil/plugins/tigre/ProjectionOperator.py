@@ -1,4 +1,5 @@
 from cil.framework import ImageData, AcquisitionData
+from cil.framework import DataOrder
 from cil.optimisation.operators import LinearOperator
 from cil.plugins.tigre import CIL2TIGREGeometry
 import numpy as np
@@ -10,12 +11,13 @@ except ModuleNotFoundError:
             "Please install it via conda as tigre from the ccpi channel")
 
 class ProjectionOperator(LinearOperator):
-    '''initial TIGRE Projection Operator
-
-    will only work with perfectly aligned data'''
+    '''TIGRE Projection Operator'''
 
     def __init__(self, image_geometry, aquisition_geometry, direct_method='Siddon',adjoint_method='matched'):
     
+        DataOrder.check_order_for_engine('tigre', image_geometry)
+        DataOrder.check_order_for_engine('tigre', aquisition_geometry) 
+
         super(ProjectionOperator,self).__init__(domain_geometry=image_geometry,\
              range_geometry=aquisition_geometry)
              

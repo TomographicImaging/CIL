@@ -38,6 +38,21 @@ class Slicer(DataProcessor):
             
             roi             region-of-interest to crop, specified as a dictionary
                             containing tuple (Start, Stop, Step)
+                            
+                            Start inclusive, Stop exclusive
+                            
+                            -1 is ashortcut to include all elemnts along the specified axis
+                            
+                            Input is used to contruct Python slice object using slice() function
+                            
+                            Start: Starting index where the slicing of object starts
+                            Stop: Ending index where the slicing of object stops.
+                            Step: Determines the increment between each index for slicing
+                            
+                            Both Start and Step are optional
+                            
+                            Supports negative indexing
+                            
         '''
 
         kwargs = {'roi': roi,

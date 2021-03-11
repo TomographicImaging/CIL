@@ -65,7 +65,7 @@ class Slicer(DataProcessor):
         
         if not ((isinstance(data, ImageData)) or 
                 (isinstance(data, AcquisitionData))):
-            raise ValueError('Processor supports only following data types:\n' +
+            raise TypeError('Processor supports only following data types:\n' +
                             ' - ImageData\n - AcquisitionData')
         elif (data.geometry == None):
             raise ValueError('Geometry is not defined.')

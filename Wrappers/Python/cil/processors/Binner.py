@@ -67,7 +67,7 @@ class Binner(DataProcessor):
         
         if not ((isinstance(data, ImageData)) or 
                 (isinstance(data, AcquisitionData))):
-            raise ValueError('Processor supports only following data types:\n' +
+            raise TypeError('Processor supports only following data types:\n' +
                             ' - ImageData\n - AcquisitionData')
         elif (data.geometry == None):
             raise ValueError('Geometry is not defined.')
@@ -105,23 +105,35 @@ class Binner(DataProcessor):
                 if key == 'channel':
                     geometry.channels = n_elements
                     geometry.channel_spacing *= roi_object[idx][2]
+                    if n_elements <= 1:
+                        dimension_labels.remove('channel')
                 elif key == 'vertical':
                     geometry.voxel_num_z = n_elements
                     geometry.voxel_size_z *= roi_object[idx][2]
+                    if n_elements <= 1:
+                        dimension_labels.remove('vertical')
                 elif key == 'horizontal_x':
                     geometry.voxel_num_x = n_elements
                     geometry.voxel_size_x *= roi_object[idx][2]
+                    if n_elements <= 1:
+                       dimension_labels.remove('horizontal_x')
                 elif key == 'horizontal_y':
                     geometry.voxel_num_y = n_elements
                     geometry.voxel_size_y *= roi_object[idx][2]
+                    if n_elements <= 1:
+                        dimension_labels.remove('horizontal_y')
             
             # if AcquisitionData
             else:
                 if key == 'channel':
                     geometry.set_channels(num_channels=n_elements)
+                    if n_elements <= 1:
+                        dimension_labels.remove('channel')
                 elif key == 'angle':
                     shape = (n_elements, roi_object[idx][2])
                     geometry.config.angles.angle_data = geometry_0.config.angles.angle_data[roi_object[idx][0]:(roi_object[idx][0] + n_elements * roi_object[idx][2])].reshape(shape).mean(1)
+                    if n_elements <= 1:
+                        dimension_labels.remove('angle')
                 elif key == 'vertical':
                     if n_elements > 1:
                         geometry.config.panel.num_pixels[1] = n_elements
@@ -131,6 +143,10 @@ class Binner(DataProcessor):
                 elif key == 'horizontal':
                     geometry.config.panel.num_pixels[0] = n_elements
                     geometry.config.panel.pixel_size[0] *= roi_object[idx][2]
+                    if n_elements <= 1:
+                        dimension_labels.remove('horizontal')
+        
+        geometry.dimension_labels = dimension_labels
         
         shape_object = []
         slice_object = []

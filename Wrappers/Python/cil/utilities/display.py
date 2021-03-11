@@ -38,12 +38,13 @@ def plotter2D(datacontainers, title=None, slice_list=None, fix_range=False, axis
     Plots 1 or more 2D plots in an (n x num_cols) matix
     Can plot multiple slices from one 3D dataset, or compare multiple datasets
     Inputs can be single arguments or list of arguments that will be sequentally applied to subplots
+    If no slice_list is passed a 3D dataset will display the centre slice of the outer dimension, a 4D dataset will show the centre slices of the two outer dimension.
 
-    :param datacontainers: The DataContainers to be displayed
+    :param datacontainers: The DataContainers to be displayed.
     :type datacontainers: ImageData, AcquisitionData, list of  Image/AcquisitionData, BlockDataContainer
     :param title: The title for each figure
     :type title: string, list of strings
-    :param slice_list: The slices to show if the DataContainer is 3D either as: ('axis name', index), (axis, index), index (of slowest dimension)  
+    :param slice_list: The slices to show. A list of intergers will show slices for the outer dimension. For 3D datacontainers single slice: (direction, index). For 4D datacontainers two slices: [(direction0, index),(direction1, index)].
     :type slice_list: tuple, int, list of tuples, list of ints
     :param fix_range: Sets the display range of the data. `True` sets all plots to the global (min, max). 
     :type fix_range: boolian, tuple, list of tuples
@@ -58,18 +59,21 @@ def plotter2D(datacontainers, title=None, slice_list=None, fix_range=False, axis
     :type size: tuple of floats
      '''
 
-    #get number of subplots
+    #get number of subplots, number of input datasets, or number of slices requested
     if isinstance(datacontainers, (list, BlockDataContainer)):
         num_plots = len(datacontainers)
     else:
-        try:
-            if type(slice_list[0]) is str:
-                num_plots = 1
-            else:
-                num_plots = len(slice_list)
-        except:
+        dim = len(datacontainers.shape)
+
+        if slice_list is None or dim == 2:
             num_plots = 1
-    
+        elif type(slice_list) is tuple:
+            num_plots = 1
+        elif dim == 4 and type(slice_list[0]) is tuple:
+            num_plots = 1  
+        else:
+            num_plots = len(slice_list)       
+
     subplots = []
 
     #range needs subsetted data
@@ -85,43 +89,113 @@ def plotter2D(datacontainers, title=None, slice_list=None, fix_range=False, axis
         else:
             data = datacontainers
 
-        #get slice list per subplot
-        if type(slice_list) is list: 
-            slice_requested = slice_list[i]
-        else:
-            slice_requested = slice_list
+        if len(data.shape) ==4:
 
-        if len(data.shape) == 3:
+            if slice_list is None or type(slice_list) is tuple or type(slice_list[0]) is tuple: #none, (direction, ind) or [(direction0, ind), (direction1, ind)] apply to all datasets
+                slice_requested = slice_list
+            elif type(slice_list[i]) == int or len(slice_list[i]) > 1: # [ind0, ind1, ind2] of direction0, or [[(direction0, ind), (direction1, ind)],[(direction0, ind), (direction1, ind)]]
+                slice_requested = slice_list[i]
+            else:
+                slice_requested = slice_list[i][0] # [[(direction0, ind)],[(direction0, ind)]]
 
-            #default axis 0, centre slice
-            plot_slice = data.shape[0]//2
-            axis = 0
-                            
-            if slice_requested is not None:
-                try:
-                    plot_slice = slice_requested[1]
-                    axis = slice_requested[0]
-                except:
-                    plot_slice = slice_requested
+            cut_axis = [0,1]
+            cut_slices = [data.shape[0]//2, data.shape[1]//2]
+
+            if type(slice_requested) is int:
+                #use axis 0, slice val
+                cut_slices[0] = slice_requested
+            elif type(slice_requested) is tuple:
+                #get axis ind,
+                # if 0 default 1
+                # if 1 default 0
+                axis = slice_requested[0]
+                if slice_requested[0] is str:
+                    axis = data.dimension_labels.index(axis)
+
+                if axis == 0:
+                    cut_axis[0] = slice_requested[0]
+                    cut_slices[0] = slice_requested[1]
+                else:
+                    cut_axis[1] = slice_requested[0]
+                    cut_slices[1] = slice_requested[1]
+
+            elif type(slice_requested) is list:
+                #use full input
+                cut_axis[0] = slice_requested[0][0]
+                cut_axis[1] = slice_requested[1][0]
+                cut_slices[0] = slice_requested[0][1]
+                cut_slices[1] = slice_requested[1][1]
+
+                if cut_axis[0] > cut_axis[1]:
+                    cut_axis.reverse()
+                    cut_slices.reverse()
+
             try:
                 if hasattr(data, 'subset'):
-                    if type(axis) is int:
-                        axis = data.dimension_labels[axis]
-                    temp_dict = {axis:plot_slice}
+                    if type(cut_axis[0]) is int:
+                        cut_axis[0] = data.dimension_labels[cut_axis[0]]
+                    if type(cut_axis[1]) is int:
+                        cut_axis[1] = data.dimension_labels[cut_axis[1]]
+
+                    temp_dict = {cut_axis[0]:cut_slices[0], cut_axis[1]:cut_slices[1]}
                     plot_data = data.subset(**temp_dict, force=True)
                 elif hasattr(data,'as_array'):
-                    plot_data = data.as_array().take(indices=plot_slice, axis=axis)
+                    plot_data = data.as_array().take(indices=cut_slices[1], axis=cut_axis[1])
+                    plot_data = plot_data.take(indices=cut_slices[0], axis=cut_axis[0])
                 else:
-                    plot_data = data.take(indices=plot_slice, axis=axis)
+                    plot_data = data.take(indices=cut_slices[1], axis=cut_axis[1])
+                    plot_data = plot_data.take(indices=cut_slices[0], axis=cut_axis[0])
+
             except:
-                raise TypeError("Unable to slice input data. Could not obtain slice {0} from {1} with shape {2}.\n\
+                raise TypeError("Unable to slice input data. Could not obtain 2D slice {0} from {1} with shape {2}.\n\
                           Pass either correct slice information or a 2D array".format(slice_requested, type(data), data.shape))
 
-            subtitle = "direction: {0} slice: {1}".format(axis,plot_slice)  
+            subtitle = "direction: ({0},{1}), slice: ({2},{3})".format(*cut_axis, * cut_slices)
+
+                
+        elif len(data.shape) == 3:
+            #get slice list per subplot
+            if type(slice_list) is list:            #[(direction, ind), (direction, ind)],  [ind0, ind1, ind2] of direction0
+                slice_requested = slice_list[i]
+            else:                                   #(direction, ind) single tuple apply to all datasets
+                slice_requested = slice_list
+
+            #default axis 0, centre slice
+            cut_slice = data.shape[0]//2
+            cut_axis = 0
+             
+            if type(slice_requested) is int:
+                #use axis 0, slice val
+                cut_slice = slice_requested             
+            if type(slice_requested) is tuple:
+                cut_slice = slice_requested[1]
+                cut_axis = slice_requested[0]
+
+            try:
+                if hasattr(data, 'subset'):
+                    if type(cut_axis) is int:
+                        cut_axis = data.dimension_labels[cut_axis]
+                    temp_dict = {cut_axis:cut_slice}
+                    plot_data = data.subset(**temp_dict, force=True)
+                elif hasattr(data,'as_array'):
+                    plot_data = data.as_array().take(indices=cut_slice, axis=cut_axis)
+                else:
+                    plot_data = data.take(indices=cut_slice, axis=cut_axis)
+            except:
+                raise TypeError("Unable to slice input data. Could not obtain 2D slice {0} from {1} with shape {2}.\n\
+                          Pass either correct slice information or a 2D array".format(slice_requested, type(data), data.shape))
+
+            subtitle = "direction: {0}, slice: {1}".format(cut_axis,cut_slice)  
         else:
             plot_data = data
             subtitle = None
 
+
+        #check dataset is now 2D
+        if len(plot_data.shape) != 2:
+            raise TypeError("Unable to slice input data. Could not obtain 2D slice {0} from {1} with shape {2}.\n\
+                             Pass either correct slice information or a 2D array".format(slice_requested, type(data), data.shape))
+       
         #get axis labels per subplot
         if type(axis_labels) is list: 
             plot_axis_labels = axis_labels[i]
@@ -132,8 +206,8 @@ def plotter2D(datacontainers, title=None, slice_list=None, fix_range=False, axis
                 plot_axis_labels = (plot_data.dimension_labels[1],plot_data.dimension_labels[0])
 
         #get min/max of subsetted data
-        range_min = min(range_min, data.min())
-        range_max = max(range_max, data.max())
+        range_min = min(range_min, plot_data.min())
+        range_max = max(range_max, plot_data.max())
 
         #get title per subplot
         if isinstance(title, list):
@@ -196,7 +270,9 @@ def plotter2D(datacontainers, title=None, slice_list=None, fix_range=False, axis
 
         if type(subplot.data) != numpy.ndarray:
             data = subplot.data.as_array() 
-
+        else:
+            data = subplot.data
+            
         data_origin='lower'
 
         if 'upper' in subplot.origin:

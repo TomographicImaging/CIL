@@ -131,41 +131,7 @@ class Binner(DataProcessor):
 
         for i in range(ndim):
             data_resized = data_resized.mean(mean_order[i])
-
-        
-        '''
-        if ndim == 2:
-            n_pix_0 = (roi_object[0][1] - roi_object[0][0]) // roi_object[0][2]
-            n_pix_1 = (roi_object[1][1] - roi_object[1][0]) // roi_object[1][2]
-            shape = (n_pix_0, roi_object[0][2], 
-                     n_pix_1, roi_object[1][2])
-            data_resized = data.as_array()[roi_object[0][0]:(roi_object[0][0] + n_pix_0 * roi_object[0][2]), 
-                                           roi_object[1][0]:(roi_object[1][0] + n_pix_1 * roi_object[1][2])].reshape(shape).mean(-1).mean(1)
-        if ndim == 3:
-            n_pix_0 = (roi_object[0][1] - roi_object[0][0]) // roi_object[0][2]
-            n_pix_1 = (roi_object[1][1] - roi_object[1][0]) // roi_object[1][2]
-            n_pix_2 = (roi_object[2][1] - roi_object[2][0]) // roi_object[2][2]
-            shape = (n_pix_0, roi_object[0][2], 
-                     n_pix_1, roi_object[1][2],
-                     n_pix_2, roi_object[2][2])
-            data_resized = data.as_array()[roi_object[0][0]:(roi_object[0][0] + n_pix_0 * roi_object[0][2]), 
-                                           roi_object[1][0]:(roi_object[1][0] + n_pix_1 * roi_object[1][2]), 
-                                           roi_object[2][0]:(roi_object[2][0] + n_pix_2 * roi_object[2][2])].reshape(shape).mean(-1).mean(1).mean(2)
-        if ndim == 4:
-            n_pix_0 = (roi_object[0][1] - roi_object[0][0]) // roi_object[0][2]
-            n_pix_1 = (roi_object[1][1] - roi_object[1][0]) // roi_object[1][2]
-            n_pix_2 = (roi_object[2][1] - roi_object[2][0]) // roi_object[2][2]
-            n_pix_3 = (roi_object[3][1] - roi_object[3][0]) // roi_object[3][2]
-            shape = (n_pix_0, roi_object[0][2], 
-                     n_pix_1, roi_object[1][2],
-                     n_pix_2, roi_object[2][2],
-                     n_pix_3, roi_object[3][2])
-            data_resized = data.as_array()[roi_object[0][0]:(roi_object[0][0] + n_pix_0 * roi_object[0][2]), 
-                                           roi_object[1][0]:(roi_object[1][0] + n_pix_1 * roi_object[1][2]), 
-                                           roi_object[2][0]:(roi_object[2][0] + n_pix_2 * roi_object[2][2]), 
-                                           roi_object[3][0]:(roi_object[3][0] + n_pix_3 * roi_object[3][2])].reshape(shape).mean(-1).mean(1).mean(2).mean(3)
-        '''
-
+            
         data_binned = geometry.allocate()
         data_binned.fill(numpy.squeeze(data_resized))
         if out == None:

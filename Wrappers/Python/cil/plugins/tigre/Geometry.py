@@ -61,7 +61,7 @@ class TIGREGeometry(Geometry):
                     vx = np.array([[0, -v[2], v[1]], [v[2], 0, -v[0]], [-v[1], v[0], 0]]) 
                     axis_rotation = np.eye(3) + vx + vx.dot(vx) * (1-c)/(s**2) 
 
-                r = np.matrix(axis_rotation)
+                r = np.ndarray(axis_rotation)
                 system.source.position = r.dot(system.source.position.reshape(3,1))
                 system.detector.position = r.dot(system.detector.position.reshape(3,1))
                 system.rotation_axis.position = r.dot(system.rotation_axis.position.reshape(3,1))
@@ -86,7 +86,7 @@ class TIGREGeometry(Geometry):
                     axis_rotation[0][1] = -np.sin(theta)
                     axis_rotation[1][0] = np.sin(theta)   
 
-                r = np.matrix(axis_rotation)
+                r = np.ndarray(axis_rotation)
                 system.source.position = r.dot(system.source.position.reshape(2,1))
                 system.detector.position = r.dot(system.detector.position.reshape(2,1))
                 system.rotation_axis.position = r.dot(system.rotation_axis.position.reshape(2,1))

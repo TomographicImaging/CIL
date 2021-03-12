@@ -28,7 +28,9 @@ import numpy
 class AbsorptionTransmissionConverter(DataProcessor):
 
     '''
-    Multiply by -1, calculate negative exponent and scae by white_level
+    Processor to convert from absorption measurements to transmission
+    Processor first multiplies data by -1, then calculates exponent 
+    and scales result by white_level (default=1)
     '''
 
     def __init__(self,

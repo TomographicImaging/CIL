@@ -28,8 +28,11 @@ import numpy
 class TransmissionAbsorptionConverter(DataProcessor):
 
     '''
-    Divide by white level and take negative logarithm. 
-    Elements below threshold (after division) are set to value.
+    Processor to convert from transmission measurements to absorption
+    based on the Beer-Lambert law
+    
+    Processor first divides by white_level (default=1) and then take negative logarithm. 
+    Elements below threshold (after division by white_level) are set to value.
     '''
 
     def __init__(self,

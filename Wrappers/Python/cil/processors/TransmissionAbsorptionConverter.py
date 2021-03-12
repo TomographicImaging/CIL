@@ -34,7 +34,7 @@ class TransmissionAbsorptionConverter(DataProcessor):
 
     def __init__(self,
                  threshold = 1e-3,
-                 value = 0,
+                 value = 1e-3,
                  white_level = 1
                  ):
 

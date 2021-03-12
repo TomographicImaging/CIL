@@ -27,6 +27,76 @@ from cil.framework import ImageGeometry
 from cil.framework import AcquisitionGeometry
 from timeit import default_timer as timer
 
+class Test_reorder(unittest.TestCase):
+    def test_DataContainer(self):
+        arr = numpy.arange(0,120).reshape(2,3,4,5)
+        data = DataContainer(arr, True,dimension_labels=['c','z','y','x'])
+        data_new = data.reorder(['x','y','z','c'])
+        self.assertEquals(data_new.shape,(5,4,3,2))
+        numpy.testing.assert_array_equal(data_new.array, arr.transpose(3,2,1,0))
+
+    def test_ImageData(self):
+        ig = ImageGeometry(voxel_num_x=5, voxel_num_y=4, voxel_num_z=3, channels=2,  dimension_labels=['channel','vertical','horizontal_y','horizontal_x'])
+        data = ig.allocate(None)
+        new_order = ['horizontal_x', 'horizontal_y','vertical', 'channel']
+        data_new = data.reorder(new_order)
+        self.assertEquals(data_new.shape,(5,4,3,2))
+        self.assertEquals(data_new.geometry.dimension_labels,tuple(new_order))
+
+    def test_AcquisitionData(self):
+        ag = AcquisitionGeometry.create_Parallel3D().set_panel([5,4]).set_angles([0,1,2]).set_channels(2).set_labels(['channel','angle','vertical','horizontal'])
+        data = ag.allocate(None)
+        new_order = ['horizontal', 'vertical','angle', 'channel']
+        data_new = data.reorder(new_order)
+        self.assertEquals(data_new.shape,(5,4,3,2))
+        self.assertEquals(data_new.geometry.dimension_labels,tuple(new_order))
+
+class Test_get_slice(unittest.TestCase):
+    def test_DataContainer(self):
+        arr = numpy.arange(0,120).reshape(2,3,4,5)
+        data = DataContainer(arr, True,dimension_labels=['c','z','y','x'])
+
+        data_new = data.get_slice(axis='c', index=1)
+        self.assertEquals(data_new.shape,(3,4,5))
+        numpy.testing.assert_array_equal(data_new.array, arr[1])
+
+        data_new = data.get_slice(axis=['c','y'], index=[1,3])
+        self.assertEquals(data_new.shape,(3,5))
+        numpy.testing.assert_array_equal(data_new.array, arr[1,:,3,:])
+
+        data_new = data.get_slice(axis=['c','y','z'], index=[1,3,1])
+        self.assertEquals(data_new.shape,(5,))
+        numpy.testing.assert_array_equal(data_new.array, arr[1,1,3,:])
+
+    def test_ImageData(self):
+        ig = ImageGeometry(voxel_num_x=5, voxel_num_y=4, voxel_num_z=3, channels=2,  dimension_labels=['channel','vertical','horizontal_y','horizontal_x'])
+        data = ig.allocate(None)
+        data_new = data.get_slice('vertical', 1)
+        self.assertEquals(data_new.shape,(2,4,5))
+        self.assertEquals(data_new.geometry.dimension_labels,('channel','horizontal_y','horizontal_x'))
+
+    def test_AcquisitionData(self):
+        ag = AcquisitionGeometry.create_Parallel3D().set_panel([5,4]).set_angles([0,1,2]).set_channels(2).set_labels(['channel','angle','vertical','horizontal'])
+        data = ag.allocate(None)
+        data_new = data.get_slice('angle',2)
+        self.assertEquals(data_new.shape,(2,4,5))
+        self.assertEquals(data_new.geometry.dimension_labels,('channel','vertical','horizontal'))
+
+        #won't return a geometry for un-reconstructable slice
+        ag = AcquisitionGeometry.create_Cone3D([0,-200,0],[0,200,0]).set_panel([5,4]).set_angles([0,1,2]).set_channels(2).set_labels(['channel','angle','vertical','horizontal'])
+        data = ag.allocate('random')
+        data_new = data.get_slice('vertical',1,force=True)
+        self.assertEquals(data_new.shape,(2,3,5))
+        self.assertTrue(isinstance(data_new,(DataContainer)))
+        self.assertIsNone(data_new.geometry)
+        self.assertDictEqual(data_new.dimension_labels,{0:'channel',1:'angle',2:'horizontal'})
+
+        #if 'centre' is between pixels interpolates
+        data_new = data.get_slice('vertical','centre')
+        self.assertEquals(data_new.shape,(2,3,5))
+        self.assertEquals(data_new.geometry.dimension_labels,('channel','angle','horizontal'))
+        numpy.testing.assert_allclose(data_new.array, (data.array[:,:,1,:] +data.array[:,:,2,:])/2 )
+
 class TestSubset(unittest.TestCase):
     def setUp(self):
         self.ig = ImageGeometry(2,3,4,channels=5)

@@ -227,6 +227,19 @@ class ImageGeometry(object):
 
         return geometry_new
 
+    def get_slice(self,axis,index,**kw):
+        slices_req = {}
+        if type(axis)== list:
+            for i, a in enumerate(axis):
+                slices_req[a]=index[i]
+        else:
+            slices_req[axis]=index
+
+        return self.subset(**slices_req, **kw)
+
+    def reorder(self,axis_order):
+        return self.subset(dimensions = axis_order)
+
     def get_order_by_label(self, dimension_labels, default_dimension_labels):
         order = []
         for i, el in enumerate(dimension_labels):
@@ -855,7 +868,7 @@ class Cone3D(SystemConfiguration):
         else:
             vx = numpy.array([[0, 0, -a[0]], [0, 0, -a[1]], [a[0], a[1], 0]])
             axis_rotation = numpy.eye(3) + vx + vx.dot(vx) *  1 / (1 + a[2])
-        
+    
         rotation_matrix = numpy.matrix(axis_rotation)
 
         #sanity check
@@ -1741,6 +1754,19 @@ class AcquisitionGeometry(object):
 
         return geometry_new
 
+    def get_slice(self,axis,index,**kw):
+        slices_req = {}
+        if type(axis)== list:
+            for i, a in enumerate(axis):
+                slices_req[a]=index[i]
+        else:
+            slices_req[axis]=index
+
+        return self.subset(**slices_req, **kw)
+
+    def reorder(self,axis_order):
+        return self.subset(dimensions = axis_order)
+
     def allocate(self, value=0, dimension_labels=None, **kwargs):
         '''allocates an AcquisitionData according to the size expressed in the instance
         
@@ -1858,8 +1884,7 @@ class DataContainer(object):
         if dimensions is not None:
             return self.subset(dimensions).as_array()
         return self.array
-    
-    
+
     def subset(self, dimensions=None, **kw):
         '''Creates a DataContainer containing a subset of self according to the 
         labels in dimensions'''
@@ -1929,6 +1954,19 @@ class DataContainer(object):
                 else:
                     return VectorData(cleaned, dimension_labels=dimensions)
     
+    def get_slice(self,axis,index,**kw):
+        slices_req = {}
+        if type(axis)== list:
+            for i, a in enumerate(axis):
+                slices_req[a]=index[i]
+        else:
+            slices_req[axis]=index
+
+        return self.subset(**slices_req, **kw)
+
+    def reorder(self,axis_order):
+        return self.subset(dimensions = axis_order)
+
     def fill(self, array, **dimension):
         '''fills the internal data array with the DataContainer, numpy array or number provided
         
@@ -2583,7 +2621,6 @@ class ImageData(DataContainer):
                 return ImageData(out.array, deep_copy=False, \
                         geometry=geometry_new, dimension_labels=dimension_labels,\
                         suppress_warning=True)
-
         
     def get_shape_labels(self, geometry, dimension_labels=None):
         channels  = geometry.channels

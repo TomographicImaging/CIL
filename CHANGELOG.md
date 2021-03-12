@@ -1,3 +1,7 @@
+* 21.01
+  - Plotter2D now takes 4D datasets and slice infomation as input
+  - TIGRE reconstruction package wrapped for cone-beam tomography
+
 * 20.11.2
   - fixed windows build
   - NikonDataReader converts Nikon geometry to CIL geometry from xtekct file including detector and centre-or-rotation offsets

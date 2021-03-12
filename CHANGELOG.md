@@ -1,4 +1,4 @@
-* 21.01
+* 21.0_rc
   - Plotter2D now takes 4D datasets and slice infomation as input
   - TIGRE reconstruction package wrapped for cone-beam tomography
 

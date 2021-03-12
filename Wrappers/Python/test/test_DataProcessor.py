@@ -32,7 +32,7 @@ from timeit import default_timer as timer
 from cil.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 
 from cil.io import NEXUSDataReader
-from cil.processors import CentreOfRotationCorrector, CofR_xcorr
+from cil.processors import CentreOfRotationCorrector, CofR_xcorr, TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
 import wget
 import os
 

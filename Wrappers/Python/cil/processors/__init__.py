@@ -21,3 +21,5 @@ from .CofR_xcorr import CofR_xcorr
 from .Normaliser import Normaliser
 from .Resizer import Resizer
 from .RingRemover import RingRemover
+from .AbsorptionTransmissionConverter import AbsorptionTransmissionConverter
+from .TransmissionAbsorptionConverter import TransmissionAbsorptionConverter

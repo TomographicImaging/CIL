@@ -415,76 +415,7 @@ class TestDataContainer(unittest.TestCase):
         ds = DataContainer(a, True, ['X', 'Y', 'Z', 'W'])
         #print("a refcount " , sys.getrefcount(a))
         self.assertEqual(sys.getrefcount(a), 2)
-
-    def test_subset(self):
-        shape = (4, 3, 2)
-        a = [i for i in range(2*3*4)]
-        a = numpy.asarray(a)
-        a = numpy.reshape(a, shape)
-        ds = DataContainer(a, True, ['X', 'Y', 'Z'])
-        sub = ds.subset(['X'])
-        res = True
-        try:
-            numpy.testing.assert_array_equal(sub.as_array(),
-                                             numpy.asarray([0, 6, 12, 18]))
-        except AssertionError as err:
-            res = False
-            print(err)
-        self.assertTrue(res)
-
-        sub = ds.subset(['X'], Y=2, Z=0)
-        res = True
-        try:
-            numpy.testing.assert_array_equal(sub.as_array(),
-                                             numpy.asarray([4, 10, 16, 22]))
-        except AssertionError as err:
-            res = False
-            print(err)
-        self.assertTrue(res)
-
-        sub = ds.subset(['Y'])
-        try:
-            numpy.testing.assert_array_equal(
-                sub.as_array(), numpy.asarray([0, 2, 4]))
-            res = True
-        except AssertionError as err:
-            res = False
-            print(err)
-        self.assertTrue(res)
-
-        sub = ds.subset(['Z'])
-        try:
-            numpy.testing.assert_array_equal(
-                sub.as_array(), numpy.asarray([0, 1]))
-            res = True
-        except AssertionError as err:
-            res = False
-            print(err)
-        self.assertTrue(res)
-        sub = ds.subset(['Z'], X=1, Y=2)
-        try:
-            numpy.testing.assert_array_equal(
-                sub.as_array(), numpy.asarray([10, 11]))
-            res = True
-        except AssertionError as err:
-            res = False
-            print(err)
-        self.assertTrue(res)
-
-        print(a)
-        sub = ds.subset(['X', 'Y'], Z=1)
-        res = True
-        try:
-            numpy.testing.assert_array_equal(sub.as_array(),
-                                             numpy.asarray([[1,  3,  5],
-                                                            [7,  9, 11],
-                                                            [13, 15, 17],
-                                                            [19, 21, 23]]))
-        except AssertionError as err:
-            res = False
-            print(err)
-        self.assertTrue(res)
-        
+       
     def test_dot(self):
         a0 = numpy.asarray([i for i in range(2*3*4)])
         a1 = numpy.asarray([2*i for i in range(2*3*4)])

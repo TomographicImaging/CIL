@@ -1889,10 +1889,12 @@ class DataContainer(object):
         '''
         new_array = self.array.copy()
 
+        #get ordered list of current dimensions
         dimension_labels_list = [0]*len(self.shape)
         for k,v in self.dimension_labels.items():
             dimension_labels_list[k] = v
 
+        #remove axes from array and labels
         for key, value in kw.items():
             if value is not None:
                 axis = dimension_labels_list.index(key)
@@ -2480,8 +2482,8 @@ class DataContainer(object):
 class ImageData(DataContainer):
     '''DataContainer for holding 2D or 3D DataContainer'''
     __container_priority__ = 1
-    
-    
+     
+
     def __init__(self, 
                  array = None, 
                  deep_copy=False, 

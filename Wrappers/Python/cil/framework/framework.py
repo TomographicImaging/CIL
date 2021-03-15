@@ -199,46 +199,40 @@ class ImageGeometry(object):
 
     def subset(self, dimensions=None, **kw):
         '''Returns a new sliced and/or reshaped ImageGeometry'''
-  
-        if dimensions is not None and \
-            (len(dimensions) != len(self.shape) ):
-            raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
+        if dimensions is not None:
+            return self.reorder(dimensions)
+        else:
+            return self.get_slice(**kw)
 
-        channel_slice = kw.get(ImageGeometry.CHANNEL, None)
-        vertical_slice = kw.get(ImageGeometry.VERTICAL, None)
-        horizontalx_slice = kw.get(ImageGeometry.HORIZONTAL_X, None)
-        horizontaly_slice = kw.get(ImageGeometry.HORIZONTAL_Y, None)
-
+    def get_slice(self,channel=None, vertical=None, horizontal_x=None, horizontal_y=None):
+        '''
+        Returns a new ImageGeometry of a single slice of in the requested direction.
+        '''
         geometry_new = self.copy()
-        if channel_slice is not None:
+        if channel is not None:
             geometry_new.channels = 1
 
-        if vertical_slice is not None:
+        if vertical is not None:
             geometry_new.voxel_num_z = 0
                 
-        if horizontaly_slice is not None:
+        if horizontal_y is not None:
             geometry_new.voxel_num_y = 0
 
-        if horizontalx_slice is not None:
+        if horizontal_x is not None:
             geometry_new.voxel_num_x = 0
-
-        if dimensions is not None:
-            geometry_new.dimension_labels = dimensions 
 
         return geometry_new
 
-    def get_slice(self,axis,index,**kw):
-        slices_req = {}
-        if type(axis)== list:
-            for i, a in enumerate(axis):
-                slices_req[a]=index[i]
-        else:
-            slices_req[axis]=index
-
-        return self.subset(**slices_req, **kw)
-
     def reorder(self,axis_order):
-        return self.subset(dimensions = axis_order)
+        '''
+        returns a new ImageGeometry with the dimension_labels set as requested.
+        '''
+        if len(axis_order) != len(self.shape):
+            raise ValueError('The axes list for resorting must contain the dimenension_labels {0} got {1}'.format(self.dimension_labels, axis_order))
+
+        geometry_new = self.copy()
+        geometry_new.dimension_labels = axis_order
+        return geometry_new
 
     def get_order_by_label(self, dimension_labels, default_dimension_labels):
         order = []
@@ -1720,52 +1714,47 @@ class AcquisitionGeometry(object):
         return str(self.config)
 
     def subset(self, dimensions=None, **kw):
-        '''returns a new sliced and/or reshaped AcquisitionGeometry'''
-  
-        if dimensions is not None and \
-            (len(dimensions) != len(self.shape) ):
-            raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
+        '''Returns a new sliced and/or reshaped AcquisitionGeometry'''
+        if dimensions is not None:
+            return self.reorder(dimensions)
+        else:
+            return self.get_slice(**kw)
 
-        angle_slice = kw.get(AcquisitionGeometry.ANGLE, None)
-        channel_slice = kw.get(AcquisitionGeometry.CHANNEL, None)
-        vertical_slice = kw.get(AcquisitionGeometry.VERTICAL, None)
-        horizontal_slice = kw.get(AcquisitionGeometry.HORIZONTAL, None)
-
+    def get_slice(self, channel=None, angle=None, vertical=None, horizontal=None):
+        '''
+        Returns a new AcquisitionGeometry of a single slice of in the requested direction. Will only return reconstructable geometries.
+        '''
         geometry_new = self.copy()
-        if channel_slice is not None:
+
+        if channel is not None:
             geometry_new.config.channels.num_channels = 1
             if hasattr(geometry_new.config.channels,'channel_labels'):
-                geometry_new.config.panel.channel_labels = geometry_new.config.panel.channel_labels[channel_slice]
+                geometry_new.config.panel.channel_labels = geometry_new.config.panel.channel_labels[channel]
 
-        if angle_slice is not None:
-            geometry_new.config.angles.angle_data = geometry_new.config.angles.angle_data[angle_slice]
+        if angle is not None:
+            geometry_new.config.angles.angle_data = geometry_new.config.angles.angle_data[angle]
         
-        if vertical_slice is not None:
-            if geometry_new.geom_type == AcquisitionGeometry.PARALLEL or vertical_slice == 'centre' or vertical_slice == geometry_new.pixel_num_v//2:
+        if vertical is not None:
+            if geometry_new.geom_type == AcquisitionGeometry.PARALLEL or vertical == 'centre' or vertical == geometry_new.pixel_num_v//2:
                 geometry_new = geometry_new.get_centre_slice()
             else:
-                raise ValueError("Can only subset centre slice geometry on cone-beam data. Expected vertical = 'centre'. Got vertical = {0}".format(vertical_slice))
+                raise ValueError("Can only subset centre slice geometry on cone-beam data. Expected vertical = 'centre'. Got vertical = {0}".format(vertical))
         
-        if horizontal_slice is not None:
+        if horizontal is not None:
             raise ValueError("Cannot calculate system geometry for a horizontal slice")
-
-        if dimensions is not None:
-            geometry_new.dimension_labels = dimensions 
 
         return geometry_new
 
-    def get_slice(self,axis,index,**kw):
-        slices_req = {}
-        if type(axis)== list:
-            for i, a in enumerate(axis):
-                slices_req[a]=index[i]
-        else:
-            slices_req[axis]=index
-
-        return self.subset(**slices_req, **kw)
-
     def reorder(self,axis_order):
-        return self.subset(dimensions = axis_order)
+        '''
+        returns a new AcquisitionGeometry with the dimension_labels set as requested.
+        '''
+        if len(axis_order) != len(self.shape):
+            raise ValueError('The axes list for resorting must contain the dimenension_labels {0} got {1}'.format(self.dimension_labels, axis_order))
+
+        geometry_new = self.copy()
+        geometry_new.dimension_labels = axis_order
+        return geometry_new
 
     def allocate(self, value=0, dimension_labels=None, **kwargs):
         '''allocates an AcquisitionData according to the size expressed in the instance
@@ -1888,85 +1877,57 @@ class DataContainer(object):
     def subset(self, dimensions=None, **kw):
         '''Creates a DataContainer containing a subset of self according to the 
         labels in dimensions'''
-        if dimensions is None:
-            if kw == {}:
-                return self.array.copy()
-            else:
-                reduced_dims = [v for k,v in self.dimension_labels.items()]
-                for dim_l, dim_v in kw.items():
-                    #for k,v in self.dimension_labels.items():
-                    for k,v in enumerate(reduced_dims):
-                        if v == dim_l:
-                            reduced_dims.pop(k)
-                            break
-                #return self.subset(dimensions=reduced_dims, **kw)
-                return DataContainer.subset(self, dimensions=reduced_dims, **kw)
+        if dimensions is None: 
+            return self.get_slice(**kw)
         else:
-            # check that all the requested dimensions are in the array
-            # this is done by checking the dimension_labels
-            proceed = True
-            # axis_order contains the order of the axis that the user wants
-            # in the output DataContainer
-            axis_order = []
-            if type(dimensions) == list:
-                for dl in dimensions:
-                    if dl not in self.dimension_labels.values():
-                        proceed = False
-                        unknown_key = dl
-                        break
-                    else:
-                        axis_order.append(find_key(self.dimension_labels, dl))
-                if not proceed:
-                    raise KeyError('Subset error: Unknown key specified {0}'.format(dl))
+            return self.reorder(dimensions)
+    
+    def get_slice(self,**kw):
+        '''
+        Returns a new DataContainer containing a single slice of in the requested direction. \
+        Pass keyword arguments <dimension label>=index
+        '''
+        new_array = self.array.copy()
+
+        dimension_labels_list = [0]*len(self.shape)
+        for k,v in self.dimension_labels.items():
+            dimension_labels_list[k] = v
+
+        for key, value in kw.items():
+            if value is not None:
+                axis = dimension_labels_list.index(key)
+                dimension_labels_list.remove(key)
+                new_array = new_array.take(indices=value, axis=axis)
+
+        if new_array.ndim > 1:
+            return DataContainer(new_array, False, dimension_labels_list, suppress_warning=True)
+        else:
+            return VectorData(new_array, dimension_labels=dimension_labels_list)
                     
-                # slice away the unwanted data from the array
-                unwanted_dimensions = self.dimension_labels.copy()
-                left_dimensions = []
-                for ax in sorted(axis_order):
-                    this_dimension = unwanted_dimensions.pop(ax)
-                    left_dimensions.append(this_dimension)
-                #print ("unwanted_dimensions {0}".format(unwanted_dimensions))
-                #print ("left_dimensions {0}".format(left_dimensions))
-                #new_shape = [self.shape[ax] for ax in axis_order]
-                #print ("new_shape {0}".format(new_shape))
-
-                #slices on each unwanted dimension in reverse order
-                #np.take returns a new array each time
-                cleaned = self.array.copy()
-                for i in reversed(range(self.number_of_dimensions)):
-                    if self.dimension_labels[i] in unwanted_dimensions.values():
-                        value = kw.get(self.dimension_labels[i],0)                                
-                        cleaned = cleaned.take(indices=value, axis=i)
-    
-                axes = []
-                for key in dimensions:
-                    #print ("key {0}".format( key))
-                    for i in range(len( left_dimensions )):
-                        ld = left_dimensions[i]
-                        #print ("ld {0}".format( ld))
-                        if ld == key:
-                            axes.append(i)
-                #print ("axes {0}".format(axes))
-                
-                cleaned = numpy.transpose(cleaned, axes).copy()
-                if cleaned.ndim > 1:
-                    return type(self)(cleaned , True, dimensions, suppress_warning=True)
-                else:
-                    return VectorData(cleaned, dimension_labels=dimensions)
-    
-    def get_slice(self,axis,index,**kw):
-        slices_req = {}
-        if type(axis)== list:
-            for i, a in enumerate(axis):
-                slices_req[a]=index[i]
-        else:
-            slices_req[axis]=index
-
-        return self.subset(**slices_req, **kw)
-
     def reorder(self,axis_order):
-        return self.subset(dimensions = axis_order)
+        '''
+        returns a new DataContainer with the data reordered in memory as requested.
 
+        :param axis_order: ordered list of labels from self.dimension_labels
+        :type axis_order: list
+        '''
+        if len(axis_order) != len(self.shape):
+            raise ValueError('The axes list for resorting must contain the dimenension_labels {0} got {1}'.format(self.dimension_labels, axis_order))
+
+        #get ordered list of current dimensions
+        dimension_labels_list = [0]*len(self.shape)
+        for k,v in self.dimension_labels.items():
+            dimension_labels_list[k] = v
+
+        #create a list containing the axes order requested
+        new_order = [0]*len(self.shape)
+        for i, axis in enumerate(axis_order):
+            new_order[i] = dimension_labels_list.index(axis)
+
+        new_array = numpy.transpose(self.array, new_order)
+
+        return DataContainer(new_array, False, axis_order, suppress_warning=True)
+                    
     def fill(self, array, **dimension):
         '''fills the internal data array with the DataContainer, numpy array or number provided
         
@@ -2598,30 +2559,42 @@ class ImageData(DataContainer):
                         
     def subset(self, dimensions=None, **kw):
         '''returns a subset of ImageData and regenerates the geometry'''
-        # Check that this is actually a resorting
-        if dimensions is not None and \
-            (len(dimensions) != len(self.shape) ):
-            raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
-        
-        try:
-            geometry_new = self.geometry.subset(dimensions=dimensions, **kw)
-        except ValueError:
-            geometry_new = None
-        
-        out = DataContainer.subset(self, dimensions, **kw)
-        dimension_labels = out.dimension_labels.copy()    
+        if dimensions is None: 
+            return self.get_slice(**kw)
+        else:
+            return self.reorder(dimensions)
 
-        if len(dimension_labels) == 1:
+    def get_slice(self,channel=None, vertical=None, horizontal_x=None, horizontal_y=None, force=False):
+        '''
+        Returns a new ImageData of a single slice of in the requested direction.
+        '''
+        try:
+            geometry_new = self.geometry.get_slice(channel=channel, vertical=vertical, horizontal_x=horizontal_x, horizontal_y=horizontal_y)
+        except ValueError:
+            if kw_force:
+                geometry_new = None
+            else:
+                print(ve)
+                raise ValueError ("Unable to return slice of requested ImageData. Use 'force=True' to return DataContainer instead.")
+
+        out = DataContainer.get_slice(self, channel=channel, vertical=vertical, horizontal_x=horizontal_x, horizontal_y=horizontal_y)
+
+        if len(out.shape) == 1 or geometry_new is None:
             return out
         else:
-            if geometry_new is None:                
-                return DataContainer(out.array, deep_copy=False, dimension_labels=dimension_labels,\
-                    suppress_warning=True)
-            else:
-                return ImageData(out.array, deep_copy=False, \
-                        geometry=geometry_new, dimension_labels=dimension_labels,\
-                        suppress_warning=True)
-        
+            return ImageData(out.array, deep_copy=False, geometry=geometry_new, dimension_labels=out.dimension_labels, suppress_warning=True)
+
+    def reorder(self,axis_order):
+        '''
+        returns a new ImageData with the data reordered in memory as requested.
+
+        :param axis_order: ordered list of labels from self.dimension_labels
+        :type axis_order: list
+        '''   
+        geometry_new = self.geometry.reorder(axis_order)
+        out = DataContainer.reorder(self,axis_order)
+        return ImageData(out.array, deep_copy=False, geometry=geometry_new, dimension_labels=out.dimension_labels, suppress_warning=True)
+
     def get_shape_labels(self, geometry, dimension_labels=None):
         channels  = geometry.channels
         horiz_x   = geometry.voxel_num_x
@@ -2761,49 +2734,54 @@ class AcquisitionData(DataContainer):
 
     def subset(self, dimensions=None, **kw):
         '''returns a subset of the AcquisitionData and regenerates the geometry'''
-  
-        if dimensions is not None and \
-            (len(dimensions) != len(self.shape) ):
-            raise ValueError('Please specify the slice on the axis/axes you want to cut away, or the same amount of axes for resorting')
+        if dimensions is None: 
+            return self.get_slice(**kw)
+        else:
+            return self.reorder(dimensions)
 
-        #try to get a new geometry for the slice
+    def get_slice(self,channel=None, angle=None, vertical=None, horizontal=None, force=False):
+        '''
+        Returns a new dataset of a single slice of in the requested direction. \
+        '''
         try:
-            geometry_new = self.geometry.subset(dimensions=dimensions, **kw)
-        except ValueError as ve:
-            if kw.get('force', False):
+            geometry_new = self.geometry.get_slice(channel=channel, angle=angle, vertical=vertical, horizontal=horizontal)
+        except ValueError:
+            if force:
                 geometry_new = None
             else:
                 print(ve)
-                raise ValueError ("Unable to subset requested geometry. Use 'force=True' to return DataContainer instead.")
+                raise ValueError ("Unable to return slice of requested AcquisitionData. Use 'force=True' to return DataContainer instead.")
 
+        #get new data
         #if vertical = 'centre' slice convert to index and subset, this will interpolate 2 rows to get the center slice value
-        vertical_slice = kw.get(AcquisitionGeometry.VERTICAL, None)
-
-        if vertical_slice == 'centre':
+        if vertical == 'centre':
             dim = self.geometry.dimension_labels.index('vertical')
-
             if self.geometry.shape[dim] > 1:   
                 centre_slice_pos = (self.geometry.shape[dim]-1) / 2.
                 ind0 = int(numpy.floor(centre_slice_pos))
                 w2 = centre_slice_pos - ind0
-                kw['vertical'] = ind0
-                out = super(AcquisitionData, self).subset(dimensions, **kw)
+                out = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=ind0, horizontal=horizontal)
                 if w2 > 0:
-                    kw['vertical'] = ind0 + 1
-                    out2 = super(AcquisitionData, self).subset(dimensions, **kw)
+                    out2 = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=ind0 + 1, horizontal=horizontal)
                     out = out * (1 - w2) + out2 * w2
         else:
-            out = super(AcquisitionData, self).subset(dimensions, **kw)
+            out = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=vertical, horizontal=horizontal)
 
-        dimension_labels = out.dimension_labels.copy()    
-
-        if len(dimension_labels) == 1:
+        if len(out.shape) == 1 or geometry_new is None:
             return out
         else:
-            if geometry_new is None:
-                return DataContainer(out.array, deep_copy=False, dimension_labels=dimension_labels, suppress_warning=True)
-            else:
-                return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new, dimension_labels=dimension_labels, suppress_warning=True)
+            return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new, dimension_labels=out.dimension_labels, suppress_warning=True)
+
+    def reorder(self,axis_order):
+        '''
+        returns a new dataset with the data reordered in memory as requested.
+
+        :param axis_order: ordered list of labels from self.dimension_labels
+        :type axis_order: list
+        '''
+        geometry_new = self.geometry.reorder(axis_order)
+        out = DataContainer.reorder(self,axis_order)
+        return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new, dimension_labels=out.dimension_labels, suppress_warning=True)
 
 class Processor(object):
 

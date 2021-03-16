@@ -73,8 +73,8 @@ class TestDataContainer(unittest.TestCase):
         #print("a refcount " , sys.getrefcount(a))
         ds = DataContainer(a, False, ['X', 'Y', 'Z', 'W'])
         #print("a refcount " , sys.getrefcount(a))
-        self.assertEqual(sys.getrefcount(a), 3)
-        self.assertEqual(ds.dimension_labels, {0: 'X', 1: 'Y', 2: 'Z', 3: 'W'})
+        self.assertEqual(id(a), id(ds.array))
+        self.assertEqual(ds.dimension_labels, ('X', 'Y', 'Z', 'W'))
 
     def testGb_creation_nocopy(self):
         X, Y, Z = 512, 512, 512

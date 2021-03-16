@@ -89,7 +89,7 @@ class Test_get_slice(unittest.TestCase):
         self.assertEquals(data_new.shape,(2,3,5))
         self.assertTrue(isinstance(data_new,(DataContainer)))
         self.assertIsNone(data_new.geometry)
-        self.assertDictEqual(data_new.dimension_labels,{0:'channel',1:'angle',2:'horizontal'})
+        self.assertEquals(data_new.dimension_labels,('channel','angle','horizontal'))
 
         #if 'centre' is between pixels interpolates
         data_new = data.get_slice(vertical='centre')
@@ -117,7 +117,7 @@ class TestSubset(unittest.TestCase):
         data = self.ig.allocate()
         default_dimension_labels = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL,
                 ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
-        self.assertTrue( default_dimension_labels == list(data.dimension_labels.values()) )
+        self.assertTrue( default_dimension_labels == list(data.dimension_labels) )
 
     def test_ImageDataAllocate1b(self):
         data = self.ig.allocate()
@@ -128,7 +128,7 @@ class TestSubset(unittest.TestCase):
                 ImageGeometry.HORIZONTAL_Y, ImageGeometry.CHANNEL]
         self.ig.set_labels(non_default_dimension_labels)
         data = self.ig.allocate()
-        self.assertTrue( non_default_dimension_labels == list(data.dimension_labels.values()) )
+        self.assertTrue( non_default_dimension_labels == list(data.dimension_labels) )
         
     def test_ImageDataAllocate2b(self):
         non_default_dimension_labels = [ ImageGeometry.HORIZONTAL_X, ImageGeometry.VERTICAL,
@@ -196,7 +196,7 @@ class TestSubset(unittest.TestCase):
         default_dimension_labels = [AcquisitionGeometry.CHANNEL ,
                  AcquisitionGeometry.ANGLE , AcquisitionGeometry.VERTICAL ,
                  AcquisitionGeometry.HORIZONTAL]
-        self.assertTrue(  default_dimension_labels == list(data.dimension_labels.values()) )
+        self.assertTrue(  default_dimension_labels == list(data.dimension_labels) )
 
     def test_AcquisitionDataAllocate1b(self):
         data = self.ag.allocate()
@@ -209,7 +209,7 @@ class TestSubset(unittest.TestCase):
         data = self.ag.allocate()
 
 
-        self.assertTrue(  non_default_dimension_labels == list(data.dimension_labels.values()) )
+        self.assertTrue(  non_default_dimension_labels == list(data.dimension_labels) )
         
     def test_AcquisitionDataAllocate2b(self):
         non_default_dimension_labels = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.HORIZONTAL,

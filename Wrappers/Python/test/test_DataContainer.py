@@ -528,7 +528,8 @@ class TestDataContainer(unittest.TestCase):
         self.assertEqual(default_order[1], image.dimension_labels[1])
         self.assertEqual(default_order[2], image.dimension_labels[2])
         order = [ 'horizontal_x' , 'horizontal_y', 'channel' ]
-        image = vgeometry.allocate(0,dimension_labels=order)
+        vgeometry.set_labels(order)
+        image = vgeometry.allocate(0)
         self.assertEqual(order[0], image.dimension_labels[0])
         self.assertEqual(order[1], image.dimension_labels[1])
         self.assertEqual(order[2], image.dimension_labels[2])
@@ -565,7 +566,8 @@ class TestDataContainer(unittest.TestCase):
         self.assertEqual(default_order[2], sino.dimension_labels[2])
         self.assertEqual(default_order[3], sino.dimension_labels[3])
         order = ['vertical' , 'horizontal', 'channel' , 'angle' ]
-        sino = ageometry.allocate(0,dimension_labels=order)
+        ageometry.set_labels(order)
+        sino = ageometry.allocate(0)
         print (sino.dimension_labels, sino.shape, ageometry)
         self.assertEqual(order[0], sino.dimension_labels[0])
         self.assertEqual(order[1], sino.dimension_labels[1])

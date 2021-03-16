@@ -199,10 +199,15 @@ class ImageGeometry(object):
 
     def subset(self, dimensions=None, **kw):
         '''Returns a new sliced and/or reshaped ImageGeometry'''
-        if dimensions is not None:
-            return self.reorder(dimensions)
-        else:
+        if dimensions is None:
             return self.get_slice(**kw)
+        else:
+            if len(dimensions) != len(self.dimension_labels):
+                raise ValueError('The axes list for subset must contain the dimension_labels {0} got {1}'.format(self.dimension_labels, axis_order))
+            
+            temp = self.copy()
+            temp.set_labels(dimensions)
+            return temp      
 
     def get_slice(self,channel=None, vertical=None, horizontal_x=None, horizontal_y=None):
         '''
@@ -221,17 +226,6 @@ class ImageGeometry(object):
         if horizontal_x is not None:
             geometry_new.voxel_num_x = 0
 
-        return geometry_new
-
-    def reorder(self,axis_order):
-        '''
-        returns a new ImageGeometry with the dimension_labels set as requested.
-        '''
-        if len(axis_order) != len(self.shape):
-            raise ValueError('The axes list for resorting must contain the dimenension_labels {0} got {1}'.format(self.dimension_labels, axis_order))
-
-        geometry_new = self.copy()
-        geometry_new.dimension_labels = axis_order
         return geometry_new
 
     def get_order_by_label(self, dimension_labels, default_dimension_labels):
@@ -290,7 +284,7 @@ class ImageGeometry(object):
             repres += "center : x{0},y{1}\n".format(self.center_x, self.center_y)
 
         return repres
-    def allocate(self, value=0, dimension_labels=None, **kwargs):
+    def allocate(self, value=0, **kwargs):
         '''allocates an ImageData according to the size expressed in the instance'''
         if value == 'random_int':
             dtype = kwargs.get('dtype', numpy.int32)
@@ -298,14 +292,14 @@ class ImageGeometry(object):
                 raise ValueError('Expecting int type, got {}'.format(dtype))
         else:
             dtype = kwargs.get('dtype', numpy.float32)
-        if dimension_labels is None:
-            out = ImageData(geometry=self, dimension_labels=self.dimension_labels, 
+
+        if kwargs.get('dimension_labels', False):
+            raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
+
+        out = ImageData(geometry=self, dimension_labels=self.dimension_labels, 
                             dtype=dtype, 
                             suppress_warning=True)
-        else:
-            out = ImageData(geometry=self, dimension_labels=dimension_labels,
-                            dtype=dtype, 
-                            suppress_warning=True)
+
         if isinstance(value, Number):
             # it's created empty, so we make it 0
             out.array.fill(value)
@@ -1715,10 +1709,15 @@ class AcquisitionGeometry(object):
 
     def subset(self, dimensions=None, **kw):
         '''Returns a new sliced and/or reshaped AcquisitionGeometry'''
-        if dimensions is not None:
-            return self.reorder(dimensions)
-        else:
+        if dimensions is None:
             return self.get_slice(**kw)
+        else:
+            if len(dimensions) != len(self.dimension_labels):
+                raise ValueError('The axes list for subset must contain the dimension_labels {0} got {1}'.format(self.dimension_labels, axis_order))
+
+            temp = self.copy()
+            temp.set_labels(dimensions)
+            return temp        
 
     def get_slice(self, channel=None, angle=None, vertical=None, horizontal=None):
         '''
@@ -1745,18 +1744,7 @@ class AcquisitionGeometry(object):
 
         return geometry_new
 
-    def reorder(self,axis_order):
-        '''
-        returns a new AcquisitionGeometry with the dimension_labels set as requested.
-        '''
-        if len(axis_order) != len(self.shape):
-            raise ValueError('The axes list for resorting must contain the dimenension_labels {0} got {1}'.format(self.dimension_labels, axis_order))
-
-        geometry_new = self.copy()
-        geometry_new.dimension_labels = axis_order
-        return geometry_new
-
-    def allocate(self, value=0, dimension_labels=None, **kwargs):
+    def allocate(self, value=0, **kwargs):
         '''allocates an AcquisitionData according to the size expressed in the instance
         
         :param value: accepts numbers to allocate an uniform array, or a string as 'random' or 'random_int' to create a random array or None.
@@ -1772,14 +1760,14 @@ class AcquisitionGeometry(object):
                 raise ValueError('Expecting int type, got {}'.format(dtype))
         else:
             dtype = kwargs.get('dtype', numpy.float32)
-        if dimension_labels is None:
-            out = AcquisitionData(geometry=self, dimension_labels=self.dimension_labels, 
-                                  dtype=dtype,
-                                  suppress_warning=True)
-        else:
-            out = AcquisitionData(geometry=self, dimension_labels=dimension_labels, 
-                                  dtype=dtype, 
-                                  suppress_warning=True)
+
+        if kwargs.get('dimension_labels', False):
+            raise ValueError("Deprecated: 'dimension_labels' cannot be set. Update geometry labels before using allocate.")
+
+        out = AcquisitionData(geometry=self, dimension_labels=self.dimension_labels, 
+                                dtype=dtype,
+                                suppress_warning=True)
+
         if isinstance(value, Number):
             # it's created empty, so we make it 0
             out.array.fill(value)
@@ -1810,25 +1798,52 @@ class DataContainer(object):
     '''Generic class to hold data
     
     Data is currently held in a numpy arrays'''
-    
+
+    @property
+    def geometry(self):
+        return None
+
+    @geometry.setter
+    def geometry(self, val):
+        raise TypeError("DataContainers cannot hold a geometry, use ImageData or AcquisitionData instead")
+
+    @property
+    def shape(self):
+        '''Returns the shape of the  of the DataContainer'''
+        return self.as_array().shape
+
+    @shape.setter
+    def shape(self, val):
+        print("Deprecated - shape will be set automatically")
+
+    @property
+    def number_of_dimensions(self):
+        '''Returns the shape of the  of the DataContainer'''
+        return len(self.as_array().shape)
+
+    @property
+    def dtype(self):
+        '''Returns the type of the data array'''
+        return self.as_array().dtype
+
+    @property
+    def size(self):
+        '''Returns the number of elements of the DataContainer'''
+        return self.as_array().size
+
+    @property
+    def dtype(self):
+        '''Returns the type of the data array'''
+        return self.as_array().dtype
+
     __container_priority__ = 1
     def __init__ (self, array, deep_copy=True, dimension_labels=None, 
                   **kwargs):
         '''Holds the data'''
         
-        self.shape = numpy.shape(array)
-        self.number_of_dimensions = len (self.shape)
         self.dimension_labels = {}
-        self.geometry = None # Only relevant for AcquisitionData and ImageData
-        
-        if dimension_labels is not None and \
-           len (dimension_labels) == self.number_of_dimensions:
-            for i in range(self.number_of_dimensions):
-                self.dimension_labels[i] = dimension_labels[i]
-        else:
-            for i in range(self.number_of_dimensions):
-                self.dimension_labels[i] = 'dimension_{0:02}'.format(i)
-        
+        self.__geometry = None # Only relevant for AcquisitionData and ImageData
+              
         if type(array) == numpy.ndarray:
             if deep_copy:
                 self.array = array.copy()
@@ -1837,13 +1852,18 @@ class DataContainer(object):
         else:
             raise TypeError('Array must be NumpyArray, passed {0}'\
                             .format(type(array)))
-        
+
+        if dimension_labels is not None and \
+           len (dimension_labels) == self.number_of_dimensions:
+            for i in range(self.number_of_dimensions):
+                self.dimension_labels[i] = dimension_labels[i]
+        else:
+            for i in range(self.number_of_dimensions):
+                self.dimension_labels[i] = 'dimension_{0:02}'.format(i)
+
         # finally copy the geometry
         if 'geometry' in kwargs.keys():
             self.geometry = kwargs['geometry']
-        else:
-            # assume it is parallel beam
-            pass
         
     def get_dimension_size(self, dimension_label):
         if dimension_label in self.dimension_labels.values():
@@ -1877,11 +1897,13 @@ class DataContainer(object):
     def subset(self, dimensions=None, **kw):
         '''Creates a DataContainer containing a subset of self according to the 
         labels in dimensions'''
-        if dimensions is None: 
+        if dimensions is None:
             return self.get_slice(**kw)
         else:
-            return self.reorder(dimensions)
-    
+            temp = self.copy()
+            temp.reorder(dimensions)
+            return temp
+
     def get_slice(self,**kw):
         '''
         Returns a new DataContainer containing a single slice of in the requested direction. \
@@ -1914,7 +1936,7 @@ class DataContainer(object):
         :type axis_order: list
         '''
         if len(axis_order) != len(self.shape):
-            raise ValueError('The axes list for resorting must contain the dimenension_labels {0} got {1}'.format(self.dimension_labels, axis_order))
+            raise ValueError('The axes list for resorting must contain the dimension_labels {0} got {1}'.format(self.dimension_labels, axis_order))
 
         #get ordered list of current dimensions
         dimension_labels_list = [0]*len(self.shape)
@@ -1925,10 +1947,12 @@ class DataContainer(object):
         new_order = [0]*len(self.shape)
         for i, axis in enumerate(axis_order):
             new_order[i] = dimension_labels_list.index(axis)
+            self.dimension_labels[i] = axis
 
-        new_array = numpy.transpose(self.array, new_order)
+        self.array = numpy.transpose(self.array, new_order)
 
-        return DataContainer(new_array, False, axis_order, suppress_warning=True)
+        if self.geometry is not None:
+            self.geometry.set_labels(axis_order)
                     
     def fill(self, array, **dimension):
         '''fills the internal data array with the DataContainer, numpy array or number provided
@@ -2468,21 +2492,18 @@ class DataContainer(object):
         if isinstance(other, DataContainer):
             return self.as_array()!=other.as_array()
         return self.as_array()!=other      
-    
-    @property
-    def size(self):
-        '''Returns the number of elements of the DataContainer'''
-        return self.as_array().size
-
-    @property
-    def dtype(self):
-        '''Returns the type of the data array'''
-        return self.as_array().dtype
-    
+        
 class ImageData(DataContainer):
     '''DataContainer for holding 2D or 3D DataContainer'''
     __container_priority__ = 1
-     
+
+    @property
+    def geometry(self):
+        return self.__geometry
+
+    @geometry.setter
+    def geometry(self, val):
+        self.__geometry = val
 
     def __init__(self, 
                  array = None, 
@@ -2561,10 +2582,12 @@ class ImageData(DataContainer):
                         
     def subset(self, dimensions=None, **kw):
         '''returns a subset of ImageData and regenerates the geometry'''
-        if dimensions is None: 
+        if dimensions is None:
             return self.get_slice(**kw)
         else:
-            return self.reorder(dimensions)
+            temp = self.copy()
+            temp.reorder(dimensions)
+            return temp
 
     def get_slice(self,channel=None, vertical=None, horizontal_x=None, horizontal_y=None, force=False):
         '''
@@ -2585,17 +2608,6 @@ class ImageData(DataContainer):
             return out
         else:
             return ImageData(out.array, deep_copy=False, geometry=geometry_new, dimension_labels=out.dimension_labels, suppress_warning=True)
-
-    def reorder(self,axis_order):
-        '''
-        returns a new ImageData with the data reordered in memory as requested.
-
-        :param axis_order: ordered list of labels from self.dimension_labels
-        :type axis_order: list
-        '''   
-        geometry_new = self.geometry.reorder(axis_order)
-        out = DataContainer.reorder(self,axis_order)
-        return ImageData(out.array, deep_copy=False, geometry=geometry_new, dimension_labels=out.dimension_labels, suppress_warning=True)
 
     def get_shape_labels(self, geometry, dimension_labels=None):
         channels  = geometry.channels
@@ -2650,7 +2662,15 @@ class ImageData(DataContainer):
 class AcquisitionData(DataContainer):
     '''DataContainer for holding 2D or 3D sinogram'''
     __container_priority__ = 1
-    
+
+    @property
+    def geometry(self):
+        return self.__geometry
+
+    @geometry.setter
+    def geometry(self, val):
+        self.__geometry = val
+
     def __init__(self, 
                  array = None, 
                  deep_copy=True, 
@@ -2736,10 +2756,12 @@ class AcquisitionData(DataContainer):
 
     def subset(self, dimensions=None, **kw):
         '''returns a subset of the AcquisitionData and regenerates the geometry'''
-        if dimensions is None: 
+        if dimensions is None:
             return self.get_slice(**kw)
         else:
-            return self.reorder(dimensions)
+            temp = self.copy()
+            temp.reorder(dimensions)
+            return temp
 
     def get_slice(self,channel=None, angle=None, vertical=None, horizontal=None, force=False):
         '''
@@ -2773,17 +2795,6 @@ class AcquisitionData(DataContainer):
             return out
         else:
             return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new, dimension_labels=out.dimension_labels, suppress_warning=True)
-
-    def reorder(self,axis_order):
-        '''
-        returns a new dataset with the data reordered in memory as requested.
-
-        :param axis_order: ordered list of labels from self.dimension_labels
-        :type axis_order: list
-        '''
-        geometry_new = self.geometry.reorder(axis_order)
-        out = DataContainer.reorder(self,axis_order)
-        return AcquisitionData(out.array, deep_copy=False, geometry=geometry_new, dimension_labels=out.dimension_labels, suppress_warning=True)
 
 class Processor(object):
 

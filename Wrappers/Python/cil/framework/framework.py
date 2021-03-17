@@ -199,6 +199,11 @@ class ImageGeometry(object):
 
     def subset(self, dimensions=None, **kw):
         '''Returns a new sliced and/or reshaped ImageGeometry'''
+
+        if not kw.get('suppress_warning', False):
+            warnings.warn('Subset has been deprecated and will be removed in following version. Use reorder() and get_slice() instead',
+              DeprecationWarning)
+
         if dimensions is None:
             return self.get_slice(**kw)
         else:
@@ -1709,6 +1714,11 @@ class AcquisitionGeometry(object):
 
     def subset(self, dimensions=None, **kw):
         '''Returns a new sliced and/or reshaped AcquisitionGeometry'''
+        
+        if not kw.get('suppress_warning', False):
+            warnings.warn('Subset has been deprecated and will be removed in following version. Use reorder() and get_slice() instead',
+              DeprecationWarning)
+
         if dimensions is None:
             return self.get_slice(**kw)
         else:
@@ -1908,6 +1918,11 @@ class DataContainer(object):
     def subset(self, dimensions=None, **kw):
         '''Creates a DataContainer containing a subset of self according to the 
         labels in dimensions'''
+        
+        if not kw.get('suppress_warning', False):
+            warnings.warn('Subset has been deprecated and will be removed in following version. Use reorder() and get_slice() instead',
+              DeprecationWarning)
+
         if dimensions is None:
             return self.get_slice(**kw)
         else:
@@ -2548,6 +2563,11 @@ class ImageData(DataContainer):
                                
     def subset(self, dimensions=None, **kw):
         '''returns a subset of ImageData and regenerates the geometry'''
+        
+        if not kw.get('suppress_warning', False):
+            warnings.warn('Subset has been deprecated and will be removed in following version. Use reorder() and get_slice() instead',
+              DeprecationWarning)
+
         if dimensions is None:
             return self.get_slice(**kw)
         else:
@@ -2632,6 +2652,11 @@ class AcquisitionData(DataContainer):
   
     def subset(self, dimensions=None, **kw):
         '''returns a subset of the AcquisitionData and regenerates the geometry'''
+        
+        if not kw.get('suppress_warning', False):
+            warnings.warn('Subset has been deprecated and will be removed in following version. Use reorder() and get_slice() instead',
+              DeprecationWarning)
+
         if dimensions is None:
             return self.get_slice(**kw)
         else:

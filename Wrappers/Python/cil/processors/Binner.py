@@ -28,34 +28,34 @@ import warnings
 class Binner(DataProcessor):
 
     def __init__(self,
-                 roi = None,
-                 force = False):
+                 roi = None):
+        
+        r'''Binner processor rebin (downsample) array and returns new geometry.
+        
+        :param roi: region-of-interest to bin, specified as a dictionary containing tuple (Start, Stop, Step)
+        :type roi: dict
+        :return: returns an AcquisitionData or ImageData object with an updated AcquisitionGeometry or ImageGeometry
+        :rtype: AcquisitionData or ImageData
+        '''
         
         '''
-        Constructor
+        Start inclusive, Stop exclusive
         
-        Input:
-            
-            roi             region-of-interest to crop, specified as a dictionary
-                            containing tuple (Start, Stop, Step)
-                            
-                            Start inclusive, Stop exclusive
-                            
-                            -1 is a shortcut to include all elements along the specified dimension
-                            
-                            if only one number is provided, then it is interpreted as Stop
-                            
-                            if two numbers are provided, then they are interpreted as Start and Stop
-                            
-                            Start = None is equivalent to Start = 0
-                            Stop = None is equivalent to Stop = number of elements
-                            Step = None is equivalent to Step = 1
-                            
-                            You can specify negative Start and Stop.
-                            
-                            If Stop - Start is not multiple of Step, then 
-                            the resulted dimension will have (Stop - Start) // Step 
-                            elements, i.e. (Stop - Start) % Step elements will be ignored
+        -1 is a shortcut to include all elements along the specified dimension
+        
+        if only one number is provided, then it is interpreted as Stop
+        
+        if two numbers are provided, then they are interpreted as Start and Stop
+        
+        Start = None is equivalent to Start = 0
+        Stop = None is equivalent to Stop = number of elements
+        Step = None is equivalent to Step = 1
+        
+        You can specify negative Start and Stop.
+        
+        If Stop - Start is not multiple of Step, then 
+        the resulted dimension will have (Stop - Start) // Step 
+        elements, i.e. (Stop - Start) % Step elements will be ignored
         '''
 
         kwargs = {'roi': roi}

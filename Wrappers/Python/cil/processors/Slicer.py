@@ -31,27 +31,30 @@ class Slicer(DataProcessor):
                  roi = None,
                  force = False):
         
-        '''
-        Constructor
+        r'''Slicer processor slice array and returns new geometry.
         
-        Input:
-            
-            roi             region-of-interest to crop, specified as a dictionary
-                            containing tuple (Start, Stop, Step)
-                            
-                            Start inclusive, Stop exclusive
-                            
-                            -1 is ashortcut to include all elemnts along the specified axis
-                            
-                            Input is used to contruct Python slice object using slice() function
-                            
-                            Start: Starting index where the slicing of object starts
-                            Stop: Ending index where the slicing of object stops.
-                            Step: Determines the increment between each index for slicing
-                            
-                            Both Start and Step are optional
-                            
-                            Supports negative indexing
+        :param roi: region-of-interest to slice, specified as a dictionary containing tuple (Start, Stop, Step)
+        :type roi: dict
+        :param force: enforce slicing even if the returned geometry is not meaningful
+        :type force: bool, default=False
+        :return: returns a DataContainer (AcquisitionData or ImageData) object with an updated AcquisitionGeometry or ImageGeometry where applicable
+        :rtype: DataContainer (AcquisitionData or ImageData)
+        '''
+        
+        '''                 
+        Start inclusive, Stop exclusive
+        
+        -1 is ashortcut to include all elemnts along the specified axis
+        
+        Input is used to contruct Python slice object using slice() function
+        
+        Start: Starting index where the slicing of object starts
+        Stop: Ending index where the slicing of object stops.
+        Step: Determines the increment between each index for slicing
+        
+        Both Start and Step are optional
+        
+        Supports negative indexing
                             
         '''
 

@@ -1,3 +1,6 @@
+* 21.0
+  - Added Binner and Slicer processors
+  
 * 20.11.2
   - fixed windows build
   - NikonDataReader converts Nikon geometry to CIL geometry from xtekct file including detector and centre-or-rotation offsets

@@ -134,7 +134,8 @@ class TestDataProcessor(unittest.TestCase):
         a = numpy.asarray([i for i in range( size )])
         a = numpy.reshape(a, shape)
         ds = DataContainer(a, False, ['X', 'Y','Z' ,'W'])
-        c = ds.subset(['Z','W','X'])
+        c = ds.subset(Y=0)
+        c = c.subset(['Z','W','X'])
         arr = c.as_array()
         #[ 0 60  1 61  2 62  3 63  4 64  5 65  6 66  7 67  8 68  9 69 10 70 11 71
         # 12 72 13 73 14 74 15 75 16 76 17 77 18 78 19 79]

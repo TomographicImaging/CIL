@@ -1,3 +1,11 @@
+* 21.0.0
+  - Plotter2D now takes 4D datasets and slice infomation as input
+  - TIGRE reconstruction package wrapped for cone-beam tomography
+  - Datacontainers have get_slice method which returns a dataset with a single slice of the data
+  - Datacontainers have reorder method which reorders the data in memory
+  - Subset method has been deprecated
+  - AcquisitionData and ImageData enforce requirement for a geometry on creation
+
 * 20.11.2
   - fixed windows build
   - NikonDataReader converts Nikon geometry to CIL geometry from xtekct file including detector and centre-or-rotation offsets

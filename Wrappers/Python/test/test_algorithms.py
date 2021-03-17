@@ -664,7 +664,7 @@ class TestSPDHG(unittest.TestCase):
     @unittest.skipUnless(has_astra, "ccpi-astra not available")
     def test_SPDHG_vs_PDHG_explicit(self):
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
-        print ("here")
+
         ig = data.geometry
         ig.voxel_size_x = 0.1
         ig.voxel_size_y = 0.1
@@ -725,7 +725,7 @@ class TestSPDHG(unittest.TestCase):
         ## block function
         F = BlockFunction(*[*[KullbackLeibler(b=g[i]) for i in range(subsets)] + [alpha * MixedL21Norm()]]) 
         G = IndicatorBox(lower=0)
-        print ("here")
+
         prob = [1/(2*subsets)]*(len(A)-1) + [1/2]
         spdhg = SPDHG(f=F,g=G,operator=A, 
                     max_iteration = 1000,
@@ -834,7 +834,7 @@ class TestSPDHG(unittest.TestCase):
         ## block function
         F = BlockFunction(*[*[KullbackLeibler(b=g[i]) for i in range(subsets)] + [alpha * MixedL21Norm()]]) 
         G = IndicatorBox(lower=0)
-        print ("here")
+
         prob = [1/(2*subsets)]*(len(A)-1) + [1/2]
         algos = []
         algos.append( SPDHG(f=F,g=G,operator=A, 

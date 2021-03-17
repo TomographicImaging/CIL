@@ -1871,7 +1871,9 @@ class DataContainer(object):
             raise TypeError('Array must be NumpyArray, passed {0}'\
                             .format(type(array)))
 
-        self.dimension_labels = dimension_labels
+        #Don't set for derived classes
+        if type(self) is DataContainer:
+            self.dimension_labels = dimension_labels
 
         # finally copy the geometry
         if 'geometry' in kwargs.keys():
@@ -2587,8 +2589,7 @@ class AcquisitionData(DataContainer):
 
     @property
     def dimension_labels(self):
-        if hasattr(self, 'geometry'):
-            return self.geometry.dimension_labels
+        return self.geometry.dimension_labels
 
     @dimension_labels.setter
     def dimension_labels(self, val):

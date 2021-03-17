@@ -51,6 +51,38 @@ class Test_reorder(unittest.TestCase):
         self.assertEquals(data.shape,(5,4,3,2))
         self.assertEquals(data.geometry.dimension_labels,tuple(new_order))
 
+    def test_AcquisitionData_forastra(self):
+        ag = AcquisitionGeometry.create_Parallel3D().set_panel([5,4]).set_angles([0,1,2]).set_channels(2).set_labels(['horizontal','vertical', 'angle', 'channel'])
+        data = ag.allocate(None)
+
+        data.reorder(for_engine='astra')
+        self.assertTrue(  list(data.dimension_labels) == ['channel','vertical', 'angle', 'horizontal'] )
+        self.assertTrue(data.shape == (2,4,3,5) )
+
+    def test_AcquisitionData_fortigre(self):
+        ag = AcquisitionGeometry.create_Parallel3D().set_panel([5,4]).set_angles([0,1,2]).set_channels(2).set_labels(['horizontal','vertical', 'angle', 'channel'])
+        data = ag.allocate(None)
+
+        data.reorder(for_engine='tigre')
+        self.assertTrue(  list(data.dimension_labels) == ['channel', 'angle','vertical', 'horizontal'] )
+        self.assertTrue(data.shape == (2,3,4,5))
+
+    def test_ImageData_forastra(self):
+        ig = ImageGeometry(voxel_num_x=5, voxel_num_y=4, voxel_num_z=3, channels=2,  dimension_labels=['horizontal_x','horizontal_y', 'vertical', 'channel'])
+        data = ig.allocate(None)
+
+        data.reorder(for_engine='astra')
+        self.assertTrue(list(data.dimension_labels) == ['channel','vertical', 'horizontal_y', 'horizontal_x'] )
+        self.assertTrue(data.shape == (2,3,4,5))
+
+    def test_ImageData_fortigre(self):
+        ig = ImageGeometry(voxel_num_x=5, voxel_num_y=4, voxel_num_z=3, channels=2,  dimension_labels=['horizontal_x','horizontal_y', 'vertical', 'channel'])
+        data = ig.allocate(None)
+
+        data.reorder(for_engine='tigre')
+        self.assertTrue(list(data.dimension_labels) == ['channel','vertical', 'horizontal_y', 'horizontal_x'] )
+        self.assertTrue(data.shape == (2,3,4,5))
+
 class Test_get_slice(unittest.TestCase):
     def test_DataContainer(self):
         arr = numpy.arange(0,120).reshape(2,3,4,5)
@@ -300,42 +332,3 @@ class TestSubset(unittest.TestCase):
 
         self.assertTrue( sub.shape == (4,))
 
-    def test_AcquisitionDataSubset_forastra(self):
-
-        self.ag.set_labels(['horizontal','vertical', 'angle', 'channel'])
-        new_ag = self.ag.subset('astra')
-        self.assertTrue(  list(new_ag.dimension_labels) == ['channel','vertical', 'angle', 'horizontal'] )
-
-        ad = self.ag.allocate()
-        new_ad = self.ag.subset('astra')
-        self.assertTrue(new_ad.shape == (4, 2, 3, 20) )
-
-    def test_AcquisitionDataSubset_fortigre(self):
-
-        self.ag.set_labels(['horizontal','vertical', 'angle', 'channel'])
-        new_ag = self.ag.subset('tigre')
-        self.assertTrue(  list(new_ag.dimension_labels) == ['channel','angle', 'vertical', 'horizontal'] )
-
-        ad = self.ag.allocate()
-        new_ad = self.ag.subset('tigre')
-        self.assertTrue(new_ad.shape == (4, 3, 2, 20) )
-
-    def test_ImageDataSubset_forastra(self):
-
-        self.ig.set_labels(['horizontal_x','horizontal_y', 'vertical', 'channel'])
-        new_ig = self.ig.subset('astra')
-        self.assertTrue(list(new_ig.dimension_labels) == ['channel','vertical', 'horizontal_y', 'horizontal_x'] )
-
-        id = self.ig.allocate()
-        new_id = self.ig.subset('astra')
-        self.assertTrue(new_id.shape == (5,4,3,2) )
-
-    def test_ImageDataSubset_fortigre(self):
-
-        self.ig.set_labels(['horizontal_x','horizontal_y', 'vertical', 'channel'])
-        new_ig = self.ig.subset('tigre')
-        self.assertTrue(list(new_ig.dimension_labels) == ['channel','vertical', 'horizontal_y', 'horizontal_x'] )
-
-        id = self.ig.allocate()
-        new_id = self.ig.subset('tigre')
-        self.assertTrue(new_id.shape == (5,4,3,2) )

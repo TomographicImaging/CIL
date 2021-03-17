@@ -1944,15 +1944,26 @@ class DataContainer(object):
         else:
             return VectorData(new_array, dimension_labels=dimension_labels_list)
                     
-    def reorder(self,axis_order):
+    def reorder(self,axis_order=None, for_engine=None):
         '''
         reorders the data in memory as requested.
 
         :param axis_order: ordered list of labels from self.dimension_labels
         :type axis_order: list
+        :param for_engine: 'astra' or 'tigre' will order the data for use with requested engine
+        :type for_engine: string        
         '''
-        if len(axis_order) != len(self.shape):
-            raise ValueError('The axes list for resorting must contain the dimension_labels {0} got {1}'.format(self.dimension_labels, axis_order))
+
+        if axis_order == None:
+            if for_engine == 'astra' or for_engine == 'tigre':
+                axis_order = DataOrder.get_order_for_engine(for_engine, self.geometry)
+            else:
+                raise ValueError("Can reorder for_engine 'astra' or 'tigre'. got {}".format(for_engine))               
+        else:
+            if for_engine is not None:
+                raise ValueError("Please supply axis_order or for_engine input, not both.")
+            if type(axis_order) != list or len(axis_order) != len(self.shape):
+                raise ValueError('The axes list for resorting must contain the dimension_labels {0} got {1}'.format(self.dimension_labels, axis_order))
 
         new_order = [0]*len(self.shape)
         dimension_labels_new = [0]*len(self.shape)
@@ -2117,23 +2128,7 @@ class DataContainer(object):
         if representation:
             repres += "Representation: \n{0}\n".format(self.array)
         return repres
-    
-    def clone(self):
-        '''returns a copy of itself'''
         
-        if self.geometry is None:
-            if not isinstance(self, DataContainer):
-                warnings.warn("Geometry is None in {}".format( self.__class__.__name__) )
-            return type(self)(self.array, 
-                            dimension_labels=self.dimension_labels,
-                            deep_copy=True,
-                            geometry=self.geometry.copy() if self.geometry is not None else None,
-                            suppress_warning=True )
-        else:
-            out = self.geometry.allocate(None)
-            out.fill(self.array)
-            return out
-    
     def get_data_axes_order(self,new_order=None):
         '''returns the axes label of self as a list
         
@@ -2158,8 +2153,12 @@ class DataContainer(object):
                 raise ValueError('Expecting {0} axes, got {2}'\
                                  .format(len(self.shape),len(new_order)))
         
+    def clone(self):
+        '''returns a copy of DataContainer'''
+        return copy.deepcopy(self)
+
     def copy(self):
-        '''alias of clone'''    
+        '''alias of clone'''
         return self.clone()
     
     ## binary operations
@@ -2992,6 +2991,7 @@ class VectorGeometry(object):
     def clone(self):
         '''returns a copy of VectorGeometry'''
         return copy.deepcopy(self)
+
     def copy(self):
         '''alias of clone'''
         return self.clone()
@@ -3058,4 +3058,3 @@ class DataOrder():
         else:
             raise ValueError("Expected dimension_label order {0}, got {1}.\nTry using `data.subset('{2}')` to permute for {2}"
                  .format(order_requested, list(geometry.dimension_labels), engine))
-

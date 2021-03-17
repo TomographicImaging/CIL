@@ -45,7 +45,7 @@ class TransmissionAbsorptionConverter(DataProcessor):
     '''
 
     def __init__(self,
-                 threshold = None,
+                 threshold = 0,
                  white_level = 1
                  ):
 
@@ -68,9 +68,7 @@ class TransmissionAbsorptionConverter(DataProcessor):
         
             data = self.get_input().clone()
             data.__idiv__(self.white_level)
-            
-            if self.threshold is not None:
-                data.as_array()[data.as_array() < self.threshold] = self.threshold
+            data.as_array()[data.as_array() < self.threshold] = self.threshold
             
             try:
                 data.log(out=data)
@@ -84,9 +82,7 @@ class TransmissionAbsorptionConverter(DataProcessor):
         else:
 
             out.__idiv__(self.white_level)
-            
-            if self.threshold is not None:
-                out.as_array()[out.as_array() < self.threshold] = self.threshold
+            out.as_array()[out.as_array() < self.threshold] = self.threshold
             
             try:
                 out.log(out=out)

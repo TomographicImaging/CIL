@@ -73,13 +73,13 @@ class TestDataProcessor(unittest.TestCase):
         
         ad = AG.allocate('random')
         
-        s = TransmissionAbsorptionConverter(white_level=10, threshold=0.1, value=0.5)
+        s = TransmissionAbsorptionConverter(white_level=10, threshold=0.1)
         s.set_input(ad)
         data_exp = s.get_output()
         
         data_new = ad.as_array().copy()
         data_new /= 10
-        data_new[data_new < 0.1] = 0.5
+        data_new[data_new < 0.1] = 0.1
         data_new = -1 * numpy.log(data_new)
         
         self.assertTrue(data_exp.geometry == AG)

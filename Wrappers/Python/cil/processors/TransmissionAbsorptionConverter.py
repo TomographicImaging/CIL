@@ -27,22 +27,29 @@ import numpy
 
 class TransmissionAbsorptionConverter(DataProcessor):
 
-    '''
-    Processor to convert from transmission measurements to absorption
+    r'''Processor to convert from transmission measurements to absorption
     based on the Beer-Lambert law
     
+    :param white_level: A float defining incidence intensity in the Beer-Lambert law.
+    :type white_level: float, optional
+    :param threshold: A float defining some threshold to avoid 0 in log
+    :type threshold: float, optional
+    :return: returns AcquisitionData, ImageData or DataContainer depending on input data type
+    :rtype: AcquisitionData, ImageData or DataContainer
+    
+    '''
+    
+    '''
     Processor first divides by white_level (default=1) and then take negative logarithm. 
-    Elements below threshold (after division by white_level) are set to value.
+    Elements below threshold (after division by white_level) are set to threshold.
     '''
 
     def __init__(self,
-                 threshold = 1e-3,
-                 value = 1e-3,
+                 threshold = None,
                  white_level = 1
                  ):
 
         kwargs = {'threshold': threshold,
-                  'value': value,
                   'white_level': white_level}
 
         super(TransmissionAbsorptionConverter, self).__init__(**kwargs)
@@ -61,8 +68,15 @@ class TransmissionAbsorptionConverter(DataProcessor):
         
             data = self.get_input().clone()
             data.__idiv__(self.white_level)
-            data.as_array()[data.as_array() < self.threshold] = self.value
-            data.log(out=data)
+            
+            if self.threshold is not None:
+                data.as_array()[data.as_array() < self.threshold] = self.threshold
+            
+            try:
+                data.log(out=data)
+            except RuntimeWarning:
+                raise ValueError('Zero encountered in log. Please set threshold to some value to avoid this.')
+                
             data.__imul__(-1)
 
             return data
@@ -70,6 +84,13 @@ class TransmissionAbsorptionConverter(DataProcessor):
         else:
 
             out.__idiv__(self.white_level)
-            out.as_array()[out.as_array() < self.threshold] = self.value
-            out.log(out=out)
+            
+            if self.threshold is not None:
+                out.as_array()[out.as_array() < self.threshold] = self.threshold
+            
+            try:
+                out.log(out=out)
+            except RuntimeWarning:
+                raise ValueError('Zero encountered in log. Please set threshold to some value to avoid this.')
+                
             out.__imul__(-1)

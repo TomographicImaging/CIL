@@ -1,3 +1,6 @@
+* 21.0
+  - added processors AbsorptionTransmissionConverter and TransmissionAbsorptionConverter to convert from Absorption to Transmission and back
+
 * 20.11.2
   - fixed windows build
   - NikonDataReader converts Nikon geometry to CIL geometry from xtekct file including detector and centre-or-rotation offsets

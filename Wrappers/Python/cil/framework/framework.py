@@ -1823,8 +1823,8 @@ class DataContainer(object):
 
         if self.__dimension_labels is None:
             default_labels = [0]*self.number_of_dimensions
-                for i in range(self.number_of_dimensions):
-                    default_labels[i] = 'dimension_{0:02}'.format(i)
+            for i in range(self.number_of_dimensions):
+                default_labels[i] = 'dimension_{0:02}'.format(i)
             return tuple(default_labels)
         else:
             return self.__dimension_labels

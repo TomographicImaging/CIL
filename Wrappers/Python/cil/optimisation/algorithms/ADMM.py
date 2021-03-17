@@ -61,7 +61,7 @@ class LADMM(Algorithm):
         :param tau: Positive step size parameter
         :param initial: Initial guess ( Default initial_guess = 0)'''        
         
-        super(LADMM, self).__init__(**kwargs)
+        super(LADMM, self).__init__(**kwars)
         if kwargs.get('x_init', None) is not None:
             if initial is None:
                 warnings.warn('The use of the x_init parameter is deprecated and will be removed in following version. Use initial instead',

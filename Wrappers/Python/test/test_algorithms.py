@@ -632,8 +632,14 @@ class TestSPDHG(unittest.TestCase):
         #(sub2ind, ind2sub) = divide_1Darray_equally(range(len(A)), subsets)
         #
         ## acquisisiton data
-        g = BlockDataContainer(*[AcquisitionData(noisy_data.as_array()[i:i+size_of_subsets,:])
-                                    for i in range(0, len(angles), size_of_subsets)])
+        AD_list = []
+        for sub_num in range(subsets):
+            for i in range(0, len(angles), size_of_subsets):
+                arr = noisy_data.as_array()[i:i+size_of_subsets,:]
+                AD_list.append(AcquisitionData(arr, geometry=list_geoms[sub_num]))
+
+        g = BlockDataContainer(*AD_list)
+
         ## block function
         F = BlockFunction(*[KullbackLeibler(b=g[i]) for i in range(subsets)]) 
         G = alpha * TotalVariation(50, 1e-4, lower=0) 
@@ -658,7 +664,7 @@ class TestSPDHG(unittest.TestCase):
     @unittest.skipUnless(has_astra, "ccpi-astra not available")
     def test_SPDHG_vs_PDHG_explicit(self):
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
-        print ("here")
+
         ig = data.geometry
         ig.voxel_size_x = 0.1
         ig.voxel_size_y = 0.1
@@ -707,12 +713,19 @@ class TestSPDHG(unittest.TestCase):
         #(sub2ind, ind2sub) = divide_1Darray_equally(range(len(A)), subsets)
         #
         ## acquisisiton data
-        g = BlockDataContainer(*[AcquisitionData(noisy_data.as_array()[i:i+size_of_subsets,:]) for i in range(0, len(angles), size_of_subsets)])
+        ## acquisisiton data
+        AD_list = []
+        for sub_num in range(subsets):
+            for i in range(0, len(angles), size_of_subsets):
+                arr = noisy_data.as_array()[i:i+size_of_subsets,:]
+                AD_list.append(AcquisitionData(arr, geometry=list_geoms[sub_num]))
+
+        g = BlockDataContainer(*AD_list)
         alpha = 0.5
         ## block function
         F = BlockFunction(*[*[KullbackLeibler(b=g[i]) for i in range(subsets)] + [alpha * MixedL21Norm()]]) 
         G = IndicatorBox(lower=0)
-        print ("here")
+
         prob = [1/(2*subsets)]*(len(A)-1) + [1/2]
         spdhg = SPDHG(f=F,g=G,operator=A, 
                     max_iteration = 1000,
@@ -783,11 +796,11 @@ class TestSPDHG(unittest.TestCase):
             np.random.seed(10)
             scale = 5
             eta = 0
-            noisy_data = AcquisitionData(np.random.poisson( scale * (eta + sin.as_array()))/scale, ag)
+            noisy_data = AcquisitionData(np.random.poisson( scale * (eta + sin.as_array()))/scale, geometry=ag)
         elif noise == 'gaussian':
             np.random.seed(10)
             n1 = np.random.normal(0, 0.1, size = ag.shape)
-            noisy_data = AcquisitionData(n1 + sin.as_array(), ag)
+            noisy_data = AcquisitionData(n1 + sin.as_array(), geometry=ag)
             
         else:
             raise ValueError('Unsupported Noise ', noise)
@@ -808,12 +821,20 @@ class TestSPDHG(unittest.TestCase):
         #(sub2ind, ind2sub) = divide_1Darray_equally(range(len(A)), subsets)
         #
         ## acquisisiton data
-        g = BlockDataContainer(*[AcquisitionData(noisy_data.as_array()[i:i+size_of_subsets,:]) for i in range(0, len(angles), size_of_subsets)])
+        ## acquisisiton data
+        AD_list = []
+        for sub_num in range(subsets):
+            for i in range(0, len(angles), size_of_subsets):
+                arr = noisy_data.as_array()[i:i+size_of_subsets,:]
+                AD_list.append(AcquisitionData(arr, geometry=list_geoms[sub_num]))
+
+        g = BlockDataContainer(*AD_list)        
+
         alpha = 0.5
         ## block function
         F = BlockFunction(*[*[KullbackLeibler(b=g[i]) for i in range(subsets)] + [alpha * MixedL21Norm()]]) 
         G = IndicatorBox(lower=0)
-        print ("here")
+
         prob = [1/(2*subsets)]*(len(A)-1) + [1/2]
         algos = []
         algos.append( SPDHG(f=F,g=G,operator=A, 
@@ -865,11 +886,11 @@ class TestSPDHG(unittest.TestCase):
             np.random.seed(10)
             scale = 5
             eta = 0
-            noisy_data = AcquisitionData(np.random.poisson( scale * (eta + sin.as_array()))/scale, ag)
+            noisy_data = AcquisitionData(np.random.poisson( scale * (eta + sin.as_array()))/scale, geometry=ag)
         elif noise == 'gaussian':
             np.random.seed(10)
             n1 = np.random.normal(0, 0.1, size = ag.shape)
-            noisy_data = AcquisitionData(n1 + sin.as_array(), ag)
+            noisy_data = AcquisitionData(n1 + sin.as_array(), geometry=ag)
             
         else:
             raise ValueError('Unsupported Noise ', noise)

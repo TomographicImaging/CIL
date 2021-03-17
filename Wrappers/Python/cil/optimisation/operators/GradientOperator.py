@@ -237,14 +237,14 @@ from ctypes import util
 if platform.system() == 'Linux':
     dll = 'libcilacc.so'
 elif platform.system() == 'Windows':
-    dll = 'cilacc.dll'
+    dll_file = 'cilacc.dll'
+    dll = util.find_library(dll_file)
 elif platform.system() == 'Darwin':
     dll = 'libcilacc.dylib'
 else:
     raise ValueError('Not supported platform, ', platform.system())
 
-dll_path = util.find_library(dll)
-cilacc = ctypes.cdll.LoadLibrary(dll_path)
+cilacc = ctypes.cdll.LoadLibrary(dll)
 
 c_float_p = ctypes.POINTER(ctypes.c_float)
 

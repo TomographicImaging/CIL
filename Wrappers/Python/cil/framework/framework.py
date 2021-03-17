@@ -2994,6 +2994,17 @@ class VectorGeometry(object):
         '''alias of clone'''
         return self.clone()
 
+    def __eq__(self, other):
+
+        if not isinstance(other, self.__class__):
+            return False
+        
+        if self.length == other.length \
+            and self.shape == other.shape \
+            and self.dimension_labels == other.dimension_labels:
+            return True
+        return False
+
     def allocate(self, value=0, **kwargs):
         '''allocates an VectorData according to the size expressed in the instance'''
         self.dtype = kwargs.get('dtype', numpy.float32)

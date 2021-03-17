@@ -1820,11 +1820,11 @@ class DataContainer(object):
 
     @property
     def dimension_labels(self):
-        default_labels = [0]*self.number_of_dimensions
-        for i in range(self.number_of_dimensions):
-            default_labels[i] = 'dimension_{0:02}'.format(i)
 
         if self.__dimension_labels is None:
+            default_labels = [0]*self.number_of_dimensions
+                for i in range(self.number_of_dimensions):
+                    default_labels[i] = 'dimension_{0:02}'.format(i)
             return tuple(default_labels)
         else:
             return self.__dimension_labels
@@ -1841,7 +1841,7 @@ class DataContainer(object):
     @property
     def shape(self):
         '''Returns the shape of the  of the DataContainer'''
-        return self.as_array().shape
+        return self.array.shape
 
     @shape.setter
     def shape(self, val):
@@ -1850,22 +1850,17 @@ class DataContainer(object):
     @property
     def number_of_dimensions(self):
         '''Returns the shape of the  of the DataContainer'''
-        return len(self.as_array().shape)
+        return len(self.array.shape)
 
     @property
     def dtype(self):
         '''Returns the type of the data array'''
-        return self.as_array().dtype
+        return self.array.dtype
 
     @property
     def size(self):
         '''Returns the number of elements of the DataContainer'''
-        return self.as_array().size
-
-    @property
-    def dtype(self):
-        '''Returns the type of the data array'''
-        return self.as_array().dtype
+        return self.array.size
 
     __container_priority__ = 1
     def __init__ (self, array, deep_copy=True, dimension_labels=None, 
@@ -1905,14 +1900,9 @@ class DataContainer(object):
             raise ValueError('Unknown dimension {0}. Should be one of {1}'.format(dimension_label,
                              self.dimension_labels))
                         
-    def as_array(self, dimensions=None):
-        '''Returns the DataContainer as Numpy Array
-        
-        Returns the pointer to the array if dimensions is not set.
-        If dimensions is set, it first creates a new DataContainer with the subset
-        and then it returns the pointer to the array'''
-        if dimensions is not None:
-            return self.subset(dimensions).as_array()
+    def as_array(self):
+        '''Returns the pointer to the array.
+        '''
         return self.array
 
     def subset(self, dimensions=None, **kw):
@@ -1954,7 +1944,7 @@ class DataContainer(object):
                     
     def reorder(self,axis_order):
         '''
-        returns a new DataContainer with the data reordered in memory as requested.
+        reorders the data in memory as requested.
 
         :param axis_order: ordered list of labels from self.dimension_labels
         :type axis_order: list
@@ -2524,7 +2514,7 @@ class ImageData(DataContainer):
     @dimension_labels.setter
     def dimension_labels(self, val):
         if val is not None:
-            print("use geometry.set_labels() to set the dimension_labels")
+            raise ValueError("Unable to set the dimension_labels directly. Use geometry.set_labels() instead")
 
     def __init__(self, 
                  array = None, 
@@ -2533,12 +2523,12 @@ class ImageData(DataContainer):
                  **kwargs):
 
         if not kwargs.get('suppress_warning', False):
-            warnings.warn('Direct invocation is deprecated and will be removed in following version. Use allocate from AcquisitionGeometry instead',
+            warnings.warn('Direct invocation is deprecated and will be removed in following version. Use allocate from ImageGeometry instead',
               DeprecationWarning)
         dtype = kwargs.get('dtype', numpy.float32)
 
         if geometry is None:
-            raise AttributeError("AcquisitionData requires a geometry")
+            raise AttributeError("ImageGeometry requires a geometry")
 
         labels = kwargs.get('dimension_labels', None)
         if labels is not None and labels != geometry.dimension_labels:
@@ -2614,7 +2604,7 @@ class AcquisitionData(DataContainer):
     @dimension_labels.setter
     def dimension_labels(self, val):
         if val is not None:
-            print("use geometry.set_labels() to set the dimension_labels")
+            raise ValueError("Unable to set the dimension_labels directly. Use geometry.set_labels() instead")
 
     def __init__(self, 
                  array = None, 

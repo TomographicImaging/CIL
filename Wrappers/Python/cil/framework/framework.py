@@ -1718,8 +1718,6 @@ class AcquisitionGeometry(object):
         if not kw.get('suppress_warning', False):
             warnings.warn('Subset has been deprecated and will be removed in following version. Use reorder() and get_slice() instead',
               DeprecationWarning)
-        if dimensions == 'astra' or dimensions == 'tigre':
-            dimensions = DataOrder.get_order_for_engine(dimensions, self)
  
         if dimensions is None:
             return self.get_slice(**kw)

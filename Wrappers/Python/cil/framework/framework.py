@@ -1960,9 +1960,10 @@ class DataContainer(object):
             dimension_labels_new[i] = axis
 
         self.array = numpy.transpose(self.array, new_order)
-        self.dimension_labels = dimension_labels_new
 
-        if self.geometry is not None:
+        if self.geometry is None:
+            self.dimension_labels = dimension_labels_new
+        else:
             self.geometry.set_labels(dimension_labels_new)
     
                     
@@ -2930,6 +2931,20 @@ class VectorData(DataContainer):
     @geometry.setter
     def geometry(self, val):
         self.__geometry = val
+
+    @property
+    def dimension_labels(self):
+        if hasattr(self,'geometry'):
+            return self.geometry.dimension_labels
+        else:
+            return self.__dimension_labels
+
+    @dimension_labels.setter
+    def dimension_labels(self, val):
+        if hasattr(self,'geometry'):
+            self.geometry.dimension_labels = val
+        
+        self.__dimension_labels = val
 
     def __init__(self, array=None, **kwargs):
         self.geometry = kwargs.get('geometry', None)

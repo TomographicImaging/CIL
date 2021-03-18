@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-#  CCP in Tomographic Imaging (CCPi) Core Imaging Library (CIL).
-
-#   Copyright 2017 UKRI-STFC
-#   Copyright 2017 University of Manchester
+#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
+#   (Collaborative Computational Project in Tomographic Imaging), with 
+#   substantial contributions by UKRI-STFC and University of Manchester.
 
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -15,6 +14,7 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
+
 import unittest
 from cil.optimisation.operators import BlockOperator
 from cil.framework import BlockDataContainer

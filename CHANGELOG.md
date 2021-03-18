@@ -2,7 +2,7 @@
   - Plotter2D now takes 4D datasets and slice infomation as input
   - TIGRE reconstruction package wrapped for cone-beam tomography
   - Datacontainers have get_slice method which returns a dataset with a single slice of the data
-  - Datacontainers have reorder method which reorders the data in memory
+  - Datacontainers have reorder method which reorders the data in memory as requested, or for use with 'astra' or 'tigre'
   - Subset method has been deprecated
   - AcquisitionData and ImageData enforce requirement for a geometry on creation
   - Implemented Binner and Slicer processors

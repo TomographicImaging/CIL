@@ -208,7 +208,7 @@ class ImageGeometry(object):
             return self.get_slice(**kw)
         else:
             if len(dimensions) != len(self.dimension_labels):
-                raise ValueError('The axes list for subset must contain the dimension_labels {0} got {1}'.format(self.dimension_labels, axis_order))
+                raise ValueError('The axes list for subset must contain the dimension_labels {0} got {1}'.format(self.dimension_labels, dimensions))
             
             temp = self.copy()
             temp.set_labels(dimensions)
@@ -1718,12 +1718,12 @@ class AcquisitionGeometry(object):
         if not kw.get('suppress_warning', False):
             warnings.warn('Subset has been deprecated and will be removed in following version. Use reorder() and get_slice() instead',
               DeprecationWarning)
-
+ 
         if dimensions is None:
             return self.get_slice(**kw)
         else:
             if len(dimensions) != len(self.dimension_labels):
-                raise ValueError('The axes list for subset must contain the dimension_labels {0} got {1}'.format(self.dimension_labels, axis_order))
+                raise ValueError('The axes list for subset must contain the dimension_labels {0} got {1}'.format(self.dimension_labels, dimensions))
 
             temp = self.copy()
             temp.set_labels(dimensions)
@@ -1942,20 +1942,24 @@ class DataContainer(object):
         else:
             return VectorData(new_array, dimension_labels=dimension_labels_list)
                     
-    def reorder(self,axis_order):
+    def reorder(self, order=None):
         '''
         reorders the data in memory as requested.
 
-        :param axis_order: ordered list of labels from self.dimension_labels
-        :type axis_order: list
+        :param order: ordered list of labels from self.dimension_labels, or order for engine 'astra' or 'tigre'
+        :type order: list, sting     
         '''
-        if len(axis_order) != len(self.shape):
-            raise ValueError('The axes list for resorting must contain the dimension_labels {0} got {1}'.format(self.dimension_labels, axis_order))
+
+        if order == 'astra' or order == 'tigre':
+            order = DataOrder.get_order_for_engine(order, self.geometry)  
+
+        if type(order) != list or len(order) != len(self.shape):
+            raise ValueError('The axes list for resorting must contain the dimension_labels {0} got {1}'.format(self.dimension_labels, order))
 
         new_order = [0]*len(self.shape)
         dimension_labels_new = [0]*len(self.shape)
 
-        for i, axis in enumerate(axis_order):
+        for i, axis in enumerate(order):
             new_order[i] = self.dimension_labels.index(axis)
             dimension_labels_new[i] = axis
 
@@ -1966,7 +1970,6 @@ class DataContainer(object):
         else:
             self.geometry.set_labels(dimension_labels_new)
     
-                    
     def fill(self, array, **dimension):
         '''fills the internal data array with the DataContainer, numpy array or number provided
         
@@ -2115,23 +2118,7 @@ class DataContainer(object):
         if representation:
             repres += "Representation: \n{0}\n".format(self.array)
         return repres
-    
-    def clone(self):
-        '''returns a copy of itself'''
         
-        if self.geometry is None:
-            if not isinstance(self, DataContainer):
-                warnings.warn("Geometry is None in {}".format( self.__class__.__name__) )
-            return type(self)(self.array, 
-                            dimension_labels=self.dimension_labels,
-                            deep_copy=True,
-                            geometry=self.geometry.copy() if self.geometry is not None else None,
-                            suppress_warning=True )
-        else:
-            out = self.geometry.allocate(None)
-            out.fill(self.array)
-            return out
-    
     def get_data_axes_order(self,new_order=None):
         '''returns the axes label of self as a list
         
@@ -2156,8 +2143,12 @@ class DataContainer(object):
                 raise ValueError('Expecting {0} axes, got {2}'\
                                  .format(len(self.shape),len(new_order)))
         
+    def clone(self):
+        '''returns a copy of DataContainer'''
+        return copy.deepcopy(self)
+
     def copy(self):
-        '''alias of clone'''    
+        '''alias of clone'''
         return self.clone()
     
     ## binary operations
@@ -2990,9 +2981,21 @@ class VectorGeometry(object):
     def clone(self):
         '''returns a copy of VectorGeometry'''
         return copy.deepcopy(self)
+
     def copy(self):
         '''alias of clone'''
         return self.clone()
+
+    def __eq__(self, other):
+
+        if not isinstance(other, self.__class__):
+            return False
+        
+        if self.length == other.length \
+            and self.shape == other.shape \
+            and self.dimension_labels == other.dimension_labels:
+            return True
+        return False
 
     def allocate(self, value=0, **kwargs):
         '''allocates an VectorData according to the size expressed in the instance'''
@@ -3018,3 +3021,41 @@ class VectorGeometry(object):
             else:
                 raise ValueError('Value {} unknown'.format(value))
         return out
+
+class DataOrder():
+    ASTRA_IG_LABELS = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+    TIGRE_IG_LABELS = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+    ASTRA_AG_LABELS = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.VERTICAL, AcquisitionGeometry.ANGLE, AcquisitionGeometry.HORIZONTAL]
+    TIGRE_AG_LABELS = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.ANGLE, AcquisitionGeometry.VERTICAL, AcquisitionGeometry.HORIZONTAL]
+
+    @staticmethod
+    def get_order_for_engine(engine, geometry):
+        if engine == 'astra':
+            if isinstance(geometry, AcquisitionGeometry):
+                dim_order = DataOrder.ASTRA_AG_LABELS
+            else:
+                dim_order = DataOrder.ASTRA_IG_LABELS
+        elif engine == 'tigre':
+            if isinstance(geometry, AcquisitionGeometry):
+                dim_order = DataOrder.TIGRE_AG_LABELS
+            else:
+                dim_order = DataOrder.TIGRE_IG_LABELS   
+        else:
+            raise ValueError("Unknown engine expected 'tigre' or 'astra' got {}".format(engine))
+        
+        dimensions = []
+        for label in dim_order:
+            if label in geometry.dimension_labels:
+                dimensions.append(label)
+
+        return dimensions
+
+    @staticmethod
+    def check_order_for_engine(engine, geometry):
+        order_requested = DataOrder.get_order_for_engine(engine, geometry)
+
+        if order_requested == list(geometry.dimension_labels):
+            return True
+        else:
+            raise ValueError("Expected dimension_label order {0}, got {1}.\nTry using `data.reorder('{2}')` to permute for {2}"
+                 .format(order_requested, list(geometry.dimension_labels), engine))

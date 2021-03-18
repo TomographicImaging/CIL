@@ -81,9 +81,8 @@ class Slicer(DataProcessor):
     def process(self, out=None):
 
         data = self.get_input()
-        ndim = len(data.dimension_labels)
-        dimension_labels = data.dimension_labels
-        
+        ndim = data.number_of_dimensions
+
         geometry_0 = data.geometry
         geometry = geometry_0.copy()
 
@@ -91,14 +90,14 @@ class Slicer(DataProcessor):
         
         if self.roi != None:
             for key in self.roi.keys():
-                if key not in data.dimension_labels.values():
-                    raise ValueError('Wrong label is specified for roi, expected {}.'.format(data.dimension_labels.values()))
+                if key not in data.dimension_labels:
+                    raise ValueError('Wrong label is specified for roi, expected {}.'.format(data.dimension_labels))
         
         slice_object = self._construct_slice_object(self.roi, data.shape, dimension_labels)
 
         
         for key in self.roi.keys():
-            idx = data.get_dimension_axis(key)
+            idx = data.dimension_labels.index(key)
             n_elements = numpy.int32(numpy.ceil((slice_object[idx].stop - slice_object[idx].start) / numpy.abs(slice_object[idx].step)))
             
             if (isinstance(data, ImageData)):
@@ -107,22 +106,22 @@ class Slicer(DataProcessor):
                     if  n_elements > 1:
                         geometry.channels = n_elements
                     else:
-                        geometry = geometry.subset(channel=slice_object[idx].start, force=self.force)
+                        geometry = geometry.get_slice(channel=slice_object[idx].start)
                 elif key == 'vertical':
                     if n_elements > 1:
                         geometry.voxel_num_z = n_elements
                     else:
-                        geometry = geometry.subset(vertical=slice_object[idx].start, force=self.force)
+                        geometry = geometry.get_slice(vertical=slice_object[idx].start)
                 elif key == 'horizontal_x':
                     if n_elements > 1:
                         geometry.voxel_num_x = n_elements
                     else:
-                        geometry = geometry.subset(horizontal_x=slice_object[idx].start, force=self.force)
+                        geometry = geometry.get_slice(horizontal_x=slice_object[idx].start)
                 elif key == 'horizontal_y':
                     if n_elements > 1:
                         geometry.voxel_num_y = n_elements
                     else:
-                        geometry = geometry.subset(horizontal_y=slice_object[idx].start, force=self.force)
+                        geometry = geometry.get_slice(horizontal_y=slice_object[idx].start)
             
             # if AcquisitionData
             else:
@@ -130,22 +129,22 @@ class Slicer(DataProcessor):
                     if n_elements > 1:
                         geometry.set_channels(num_channels=n_elements)
                     else:
-                        geometry = geometry.subset(channel=slice_object[idx].start, force=self.force)
+                        geometry = geometry.get_slice(channel=slice_object[idx].start)
                 elif key == 'angle':
                     if n_elements > 1:
                         geometry.config.angles.angle_data = geometry_0.config.angles.angle_data[slice_object[idx]]
                     else:
-                        geometry = geometry.subset(angle=slice_object[idx].start, force=self.force)
+                        geometry = geometry.get_slice(angle=slice_object[idx].start)
                 elif key == 'vertical':
                     if n_elements > 1:
                         geometry.config.panel.num_pixels[1] = n_elements
                     else:
-                        geometry = geometry.subset(vertical=slice_object[idx].start, force=self.force)
+                        geometry = geometry.get_slice(vertical=slice_object[idx].start)
                 elif key == 'horizontal':
                     if n_elements > 1:
                         geometry.config.panel.num_pixels[0] = n_elements
                     else:
-                        geometry = geometry.subset(horizontal=slice_object[idx].start, force=self.force)
+                        geometry = geometry.get_slice(horizontal=slice_object[idx].start)
         
         if geometry is not None:
             data_sliced = geometry.allocate()

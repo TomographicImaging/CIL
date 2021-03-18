@@ -79,9 +79,8 @@ class Binner(DataProcessor):
     def process(self, out=None):
 
         data = self.get_input()
-        ndim = len(data.dimension_labels)
-        dimension_labels = data.dimension_labels
-        
+        ndim = data.number_of_dimensions
+
         geometry_0 = data.geometry
         geometry = geometry_0.copy()
 
@@ -89,14 +88,14 @@ class Binner(DataProcessor):
         
         if self.roi != None:
             for key in self.roi.keys():
-                if key not in data.dimension_labels.values():
-                    raise ValueError('Wrong label is specified for roi, expected {}.'.format(data.dimension_labels.values()))
+                if key not in data.dimension_labels:
+                    raise ValueError('Wrong label is specified for roi, expected {}.'.format(data.dimension_labels))
         
         roi_object = self._construct_roi_object(self.roi, data.shape, dimension_labels)
 
         
         for key in self.roi.keys():
-            idx = data.get_dimension_axis(key)
+            idx = data.dimension_labels.index(key)
             n_elements = (roi_object[idx][1] - roi_object[idx][0]) // roi_object[idx][2]
             
             if (isinstance(data, ImageData)):

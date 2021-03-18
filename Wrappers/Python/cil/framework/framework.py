@@ -208,7 +208,7 @@ class ImageGeometry(object):
             return self.get_slice(**kw)
         else:
             if len(dimensions) != len(self.dimension_labels):
-                raise ValueError('The axes list for subset must contain the dimension_labels {0} got {1}'.format(self.dimension_labels, axis_order))
+                raise ValueError('The axes list for subset must contain the dimension_labels {0} got {1}'.format(self.dimension_labels, dimensions))
             
             temp = self.copy()
             temp.set_labels(dimensions)
@@ -1723,7 +1723,7 @@ class AcquisitionGeometry(object):
             return self.get_slice(**kw)
         else:
             if len(dimensions) != len(self.dimension_labels):
-                raise ValueError('The axes list for subset must contain the dimension_labels {0} got {1}'.format(self.dimension_labels, axis_order))
+                raise ValueError('The axes list for subset must contain the dimension_labels {0} got {1}'.format(self.dimension_labels, dimensions))
 
             temp = self.copy()
             temp.set_labels(dimensions)
@@ -1942,31 +1942,24 @@ class DataContainer(object):
         else:
             return VectorData(new_array, dimension_labels=dimension_labels_list)
                     
-    def reorder(self,axis_order=None, for_engine=None):
+    def reorder(self, order=None):
         '''
         reorders the data in memory as requested.
 
-        :param axis_order: ordered list of labels from self.dimension_labels
-        :type axis_order: list
-        :param for_engine: 'astra' or 'tigre' will order the data for use with requested engine
-        :type for_engine: string        
+        :param order: ordered list of labels from self.dimension_labels, or order for engine 'astra' or 'tigre'
+        :type order: list, sting     
         '''
 
-        if axis_order == None:
-            if for_engine == 'astra' or for_engine == 'tigre':
-                axis_order = DataOrder.get_order_for_engine(for_engine, self.geometry)
-            else:
-                raise ValueError("Can reorder for_engine 'astra' or 'tigre'. got {}".format(for_engine))               
-        else:
-            if for_engine is not None:
-                raise ValueError("Please supply axis_order or for_engine input, not both.")
-            if type(axis_order) != list or len(axis_order) != len(self.shape):
-                raise ValueError('The axes list for resorting must contain the dimension_labels {0} got {1}'.format(self.dimension_labels, axis_order))
+        if order == 'astra' or order == 'tigre':
+            order = DataOrder.get_order_for_engine(order, self.geometry)  
+
+        if type(order) != list or len(order) != len(self.shape):
+            raise ValueError('The axes list for resorting must contain the dimension_labels {0} got {1}'.format(self.dimension_labels, order))
 
         new_order = [0]*len(self.shape)
         dimension_labels_new = [0]*len(self.shape)
 
-        for i, axis in enumerate(axis_order):
+        for i, axis in enumerate(order):
             new_order[i] = self.dimension_labels.index(axis)
             dimension_labels_new[i] = axis
 
@@ -1977,7 +1970,6 @@ class DataContainer(object):
         else:
             self.geometry.set_labels(dimension_labels_new)
     
-                    
     def fill(self, array, **dimension):
         '''fills the internal data array with the DataContainer, numpy array or number provided
         
@@ -3065,5 +3057,5 @@ class DataOrder():
         if order_requested == list(geometry.dimension_labels):
             return True
         else:
-            raise ValueError("Expected dimension_label order {0}, got {1}.\nTry using `data.subset('{2}')` to permute for {2}"
+            raise ValueError("Expected dimension_label order {0}, got {1}.\nTry using `data.reorder('{2}')` to permute for {2}"
                  .format(order_requested, list(geometry.dimension_labels), engine))

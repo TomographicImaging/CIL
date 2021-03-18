@@ -55,7 +55,7 @@ class Test_reorder(unittest.TestCase):
         ag = AcquisitionGeometry.create_Parallel3D().set_panel([5,4]).set_angles([0,1,2]).set_channels(2).set_labels(['horizontal','vertical', 'angle', 'channel'])
         data = ag.allocate(None)
 
-        data.reorder(for_engine='astra')
+        data.reorder('astra')
         self.assertTrue(  list(data.dimension_labels) == ['channel','vertical', 'angle', 'horizontal'] )
         self.assertTrue(data.shape == (2,4,3,5) )
 
@@ -63,7 +63,7 @@ class Test_reorder(unittest.TestCase):
         ag = AcquisitionGeometry.create_Parallel3D().set_panel([5,4]).set_angles([0,1,2]).set_channels(2).set_labels(['horizontal','vertical', 'angle', 'channel'])
         data = ag.allocate(None)
 
-        data.reorder(for_engine='tigre')
+        data.reorder('tigre')
         self.assertTrue(  list(data.dimension_labels) == ['channel', 'angle','vertical', 'horizontal'] )
         self.assertTrue(data.shape == (2,3,4,5))
 
@@ -71,7 +71,7 @@ class Test_reorder(unittest.TestCase):
         ig = ImageGeometry(voxel_num_x=5, voxel_num_y=4, voxel_num_z=3, channels=2,  dimension_labels=['horizontal_x','horizontal_y', 'vertical', 'channel'])
         data = ig.allocate(None)
 
-        data.reorder(for_engine='astra')
+        data.reorder('astra')
         self.assertTrue(list(data.dimension_labels) == ['channel','vertical', 'horizontal_y', 'horizontal_x'] )
         self.assertTrue(data.shape == (2,3,4,5))
 
@@ -79,7 +79,7 @@ class Test_reorder(unittest.TestCase):
         ig = ImageGeometry(voxel_num_x=5, voxel_num_y=4, voxel_num_z=3, channels=2,  dimension_labels=['horizontal_x','horizontal_y', 'vertical', 'channel'])
         data = ig.allocate(None)
 
-        data.reorder(for_engine='tigre')
+        data.reorder('tigre')
         self.assertTrue(list(data.dimension_labels) == ['channel','vertical', 'horizontal_y', 'horizontal_x'] )
         self.assertTrue(data.shape == (2,3,4,5))
 

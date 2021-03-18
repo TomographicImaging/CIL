@@ -1,6 +1,6 @@
 CCPi Core Imaging Library (CIL).
-Copyright 2017-2020 Rutherford Appleton Laboratory STFC
-Copyright 2017-2020 University of Manchester
+Copyright 2017-2021 Rutherford Appleton Laboratory STFC
+Copyright 2017-2021 University of Manchester
 
 This software product is developed for the Collaborative Computational 
 Project in Tomographic Imaging CCPi (http://www.ccpi.ac.uk/) at RAL STFC (http://www.stfc.ac.uk), University of Manchester

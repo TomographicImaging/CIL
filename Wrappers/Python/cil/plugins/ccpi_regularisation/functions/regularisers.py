@@ -23,7 +23,7 @@ try:
 except ImportError as ie:
     raise ImportError(ie + "\n\n" + 
                       "This plugin requires the additional package ccpi-regularisation\n" +
-                      "Please install it via conda as ccpi-regularisation from the ccpi channel\n"+
+                      "Please install it via conda as ccpi-regulariser from the ccpi channel\n"+
                       "Minimal version is 20.04")
 
 

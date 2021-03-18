@@ -28,6 +28,7 @@ except:
 import functools
 import glob
 import re
+import numpy as np
 
 class TIFFWriter(object):
     '''Write a DataSet to disk as a TIFF file or stack'''

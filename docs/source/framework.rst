@@ -446,33 +446,6 @@ processing pipelines.
    :special-members:
 
 
-Resizer
--------
-
-Quite often we need either crop or downsample data; the :code:`Resizer` provides a convenient way to 
-perform these operations for both :code:`ImageData` and :code:`AcquisitionData`. 
-
-
-.. code:: python
-  
-  # imports
-  from ccpi.processors import Resizer
-  # crop ImageData along 1st dimension
-  # initialise Resizer
-  resizer_crop = Resizer(binning = [1, 1], roi = [-1, (20,180)])
-  # pass DataContainer
-  resizer_crop.input = data
-  data_cropped = resizer_crop.process()
-  # get new ImageGeometry
-  ig_data_cropped = data_cropped.geometry
-
-.. autoclass:: ccpi.processors.Resizer
-   :members:
-   :private-members:
-   :special-members:
-
-
-
 Calculation of Center of Rotation
 ---------------------------------
 

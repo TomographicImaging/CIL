@@ -1,24 +1,45 @@
+# -*- coding: utf-8 -*-
+#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
+#   (Collaborative Computational Project in Tomographic Imaging), with 
+#   substantial contributions by UKRI-STFC and University of Manchester.
+
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+
+#   http://www.apache.org/licenses/LICENSE-2.0
+
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
 from cil.framework import AcquisitionGeometry, ImageGeometry
 import unittest
 import numpy as np
 
 try:
-    from cil.plugins.tigre import CIL2TIGREGeometry
-    from cil.plugins.tigre import ProjectionOperator
-    from cil.plugins.tigre import FBP
+    import tigre
     has_tigre = True
 except ModuleNotFoundError:
     print(  "This plugin requires the additional package TIGRE\n" +
             "Please install it via conda as tigre from the ccpi channel\n"+
             "Minimal version is 21.01")
     has_tigre = False
+else:
+    from cil.plugins.tigre import CIL2TIGREGeometry
+    from cil.plugins.tigre import ProjectionOperator
+    from cil.plugins.tigre import FBP
 
 try:
-    from cil.plugins.astra.operators import ProjectionOperator as AstraProjectionOperator
-    from cil.plugins.astra.processors import FBP as AstraFBP
+    import astra
     has_astra = True
 except ModuleNotFoundError:
     has_astra = False
+else:
+    from cil.plugins.astra.operators import ProjectionOperator as AstraProjectionOperator
+    from cil.plugins.astra.processors import FBP as AstraFBP
 
 class Test_convert_geometry(unittest.TestCase):
     def setUp(self): 
@@ -261,6 +282,7 @@ class Test_results(unittest.TestCase):
         diff = (self.golden_data-reco_out3D).abs()
         self.assertLess(diff.mean(), 0.01)
         np.testing.assert_allclose(self.golden_data.as_array(),reco_out3D.as_array(),atol=1)
+
 
     @unittest.skipUnless(has_tigre and has_astra, "TIGRE or ASTRA not installed")
     def test_fp_with_Astra(self):

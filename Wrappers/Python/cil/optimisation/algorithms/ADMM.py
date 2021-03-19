@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-#  CCP in Tomographic Imaging (CCPi) Core Imaging Library (CIL).
-
-#   Copyright 2017-2020 UKRI-STFC
-#   Copyright 2017-2020 University of Manchester
+#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
+#   (Collaborative Computational Project in Tomographic Imaging), with 
+#   substantial contributions by UKRI-STFC and University of Manchester.
 
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -15,11 +14,6 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
 
 from cil.optimisation.algorithms import Algorithm
 import warnings
@@ -61,7 +55,7 @@ class LADMM(Algorithm):
         :param tau: Positive step size parameter
         :param initial: Initial guess ( Default initial_guess = 0)'''        
         
-        super(LADMM, self).__init__()
+        super(LADMM, self).__init__(**kwargs)
         if kwargs.get('x_init', None) is not None:
             if initial is None:
                 warnings.warn('The use of the x_init parameter is deprecated and will be removed in following version. Use initial instead',

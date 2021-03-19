@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-#  CCP in Tomographic Imaging (CCPi) Core Imaging Library (CIL).
-
-#   Copyright 2017 UKRI-STFC
-#   Copyright 2017 University of Manchester
+#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
+#   (Collaborative Computational Project in Tomographic Imaging), with 
+#   substantial contributions by UKRI-STFC and University of Manchester.
 
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -15,7 +14,6 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-from __future__ import division
 
 import sys
 import unittest
@@ -50,6 +48,38 @@ class Test_reorder(unittest.TestCase):
         data.reorder(new_order)
         self.assertEquals(data.shape,(5,4,3,2))
         self.assertEquals(data.geometry.dimension_labels,tuple(new_order))
+
+    def test_AcquisitionData_forastra(self):
+        ag = AcquisitionGeometry.create_Parallel3D().set_panel([5,4]).set_angles([0,1,2]).set_channels(2).set_labels(['horizontal','vertical', 'angle', 'channel'])
+        data = ag.allocate(None)
+
+        data.reorder('astra')
+        self.assertTrue(  list(data.dimension_labels) == ['channel','vertical', 'angle', 'horizontal'] )
+        self.assertTrue(data.shape == (2,4,3,5) )
+
+    def test_AcquisitionData_fortigre(self):
+        ag = AcquisitionGeometry.create_Parallel3D().set_panel([5,4]).set_angles([0,1,2]).set_channels(2).set_labels(['horizontal','vertical', 'angle', 'channel'])
+        data = ag.allocate(None)
+
+        data.reorder('tigre')
+        self.assertTrue(  list(data.dimension_labels) == ['channel', 'angle','vertical', 'horizontal'] )
+        self.assertTrue(data.shape == (2,3,4,5))
+
+    def test_ImageData_forastra(self):
+        ig = ImageGeometry(voxel_num_x=5, voxel_num_y=4, voxel_num_z=3, channels=2,  dimension_labels=['horizontal_x','horizontal_y', 'vertical', 'channel'])
+        data = ig.allocate(None)
+
+        data.reorder('astra')
+        self.assertTrue(list(data.dimension_labels) == ['channel','vertical', 'horizontal_y', 'horizontal_x'] )
+        self.assertTrue(data.shape == (2,3,4,5))
+
+    def test_ImageData_fortigre(self):
+        ig = ImageGeometry(voxel_num_x=5, voxel_num_y=4, voxel_num_z=3, channels=2,  dimension_labels=['horizontal_x','horizontal_y', 'vertical', 'channel'])
+        data = ig.allocate(None)
+
+        data.reorder('tigre')
+        self.assertTrue(list(data.dimension_labels) == ['channel','vertical', 'horizontal_y', 'horizontal_x'] )
+        self.assertTrue(data.shape == (2,3,4,5))
 
 class Test_get_slice(unittest.TestCase):
     def test_DataContainer(self):
@@ -101,16 +131,16 @@ class TestSubset(unittest.TestCase):
     def setUp(self):
         self.ig = ImageGeometry(2,3,4,channels=5)
         angles = numpy.asarray([90.,0.,-90.], dtype=numpy.float32)
-
-        self.ag = AcquisitionGeometry('parallel', 'edo', pixel_num_h=20, pixel_num_v=2, angles=angles, 
-                         dist_source_center = 312.2, 
-                         dist_center_detector = 123.,
-                         channels=4 )
         
         self.ag_cone = AcquisitionGeometry.create_Cone3D([0,-500,0],[0,500,0])\
-                                     .set_panel((2,20))\
-                                     .set_angles(self.ag.angles)\
-                                     .set_channels(4)
+                                    .set_panel((20,2))\
+                                    .set_angles(angles)\
+                                    .set_channels(4)
+
+        self.ag = AcquisitionGeometry.create_Parallel3D()\
+                                    .set_angles(angles)\
+                                    .set_channels(4)\
+                                    .set_panel((20,2))
 
 
     def test_ImageDataAllocate1a(self):
@@ -282,14 +312,14 @@ class TestSubset(unittest.TestCase):
         
         data = self.ag_cone.allocate()
         sub = data.subset(vertical = 'centre')
-        self.assertTrue( sub.geometry.shape == (4,3,2))       
+        self.assertTrue( sub.geometry.shape == (4,3,20))       
 
     def test_AcquisitionDataSubset1i(self):
         
         data = self.ag_cone.allocate()
         sliceme = 1
         sub = data.subset(vertical = sliceme, force=True)
-        self.assertTrue( sub.shape == (4, 3, 2))
+        self.assertTrue( sub.shape == (4, 3, 20))
 
     def test_AcquisitionDataSubset1j(self):
 
@@ -299,3 +329,4 @@ class TestSubset(unittest.TestCase):
         sub = sub.subset(horizontal = 0, force=True)
 
         self.assertTrue( sub.shape == (4,))
+

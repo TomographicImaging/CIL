@@ -44,94 +44,6 @@ class TestDataProcessor(unittest.TestCase):
 
         self.data_DLS = data_raw.log()
         self.data_DLS *= -1
-    
-    def test_TransmissionAbsorptionConverter(self):
-        
-        ray_direction = [0.1, 3.0, 0.4]
-        detector_position = [-1.3, 1000.0, 2]
-        detector_direction_row = [1.0, 0.2, 0.0]
-        detector_direction_col = [0.0 ,0.0, 1.0]
-        rotation_axis_position = [0.1, 2.0, 0.5]
-        rotation_axis_direction = [0.1, 2.0, 0.5]
-        
-        AG = AcquisitionGeometry.create_Parallel3D(ray_direction=ray_direction, 
-                                                    detector_position=detector_position, 
-                                                    detector_direction_x=detector_direction_row, 
-                                                    detector_direction_y=detector_direction_col,
-                                                    rotation_axis_position=rotation_axis_position,
-                                                    rotation_axis_direction=rotation_axis_direction)
-        
-        angles = numpy.linspace(0, 360, 10, dtype=numpy.float32)
-        
-        AG.set_channels(num_channels=10)
-        AG.set_angles(angles, initial_angle=10, angle_unit='radian')
-        AG.set_panel((10, 5), pixel_size=(0.1, 0.2))
-        AG.dimension_labels = ['vertical',\
-                                'horizontal',\
-                                'angle',\
-                                'channel']
-        
-        ad = AG.allocate('random')
-        
-        s = TransmissionAbsorptionConverter(white_level=10, min_intensity=0.1)
-        s.set_input(ad)
-        data_exp = s.get_output()
-        
-        data_new = ad.as_array().copy()
-        data_new /= 10
-        data_new[data_new < 0.1] = 0.1
-        data_new = -1 * numpy.log(data_new)
-        
-        self.assertTrue(data_exp.geometry == AG)
-        numpy.testing.assert_allclose(data_exp.as_array(), data_new, rtol=1E-6)
-        
-        s.process(out=ad)
-        
-        self.assertTrue(ad.geometry == AG)
-        numpy.testing.assert_allclose(data_exp.as_array(), ad.as_array(), rtol=1E-6)
-        
-    
-    def test_AbsorptionTransmissionConverter(self):
-    
-        ray_direction = [0.1, 3.0, 0.4]
-        detector_position = [-1.3, 1000.0, 2]
-        detector_direction_row = [1.0, 0.2, 0.0]
-        detector_direction_col = [0.0 ,0.0, 1.0]
-        rotation_axis_position = [0.1, 2.0, 0.5]
-        rotation_axis_direction = [0.1, 2.0, 0.5]
-        
-        AG = AcquisitionGeometry.create_Parallel3D(ray_direction=ray_direction, 
-                                                    detector_position=detector_position, 
-                                                    detector_direction_x=detector_direction_row, 
-                                                    detector_direction_y=detector_direction_col,
-                                                    rotation_axis_position=rotation_axis_position,
-                                                    rotation_axis_direction=rotation_axis_direction)
-        
-        angles = numpy.linspace(0, 360, 10, dtype=numpy.float32)
-        
-        AG.set_channels(num_channels=10)
-        AG.set_angles(angles, initial_angle=10, angle_unit='radian')
-        AG.set_panel((10, 5), pixel_size=(0.1, 0.2))
-        AG.dimension_labels = ['vertical',\
-                                'horizontal',\
-                                'angle',\
-                                'channel']
-        
-        ad = AG.allocate('random')
-        
-        s = AbsorptionTransmissionConverter(white_level=10)
-        s.set_input(ad)
-        data_exp = s.get_output()
-        
-        self.assertTrue(data_exp.geometry == AG)
-        numpy.testing.assert_allclose(data_exp.as_array(), numpy.exp(-ad.as_array())*10, rtol=1E-6)
-        
-        s.process(out=ad)
-        
-        self.assertTrue(ad.geometry == AG)
-        numpy.testing.assert_allclose(data_exp.as_array(), ad.as_array(), rtol=1E-6)
-
-
 
     def test_CofR_xcorr(self):       
 
@@ -290,7 +202,96 @@ class TestDataProcessor(unittest.TestCase):
         print("check call method of DataProcessor")
         numpy.testing.assert_array_equal(ax(chain(c)).as_array(), arr)        
 
+
+class TestTransmissionAbsorptionConverter(unittest.TestCase):
+
+    def test_TransmissionAbsorptionConverter(self):
+            
+        ray_direction = [0.1, 3.0, 0.4]
+        detector_position = [-1.3, 1000.0, 2]
+        detector_direction_row = [1.0, 0.2, 0.0]
+        detector_direction_col = [0.0 ,0.0, 1.0]
+        rotation_axis_position = [0.1, 2.0, 0.5]
+        rotation_axis_direction = [0.1, 2.0, 0.5]
         
+        AG = AcquisitionGeometry.create_Parallel3D(ray_direction=ray_direction, 
+                                                    detector_position=detector_position, 
+                                                    detector_direction_x=detector_direction_row, 
+                                                    detector_direction_y=detector_direction_col,
+                                                    rotation_axis_position=rotation_axis_position,
+                                                    rotation_axis_direction=rotation_axis_direction)
+        
+        angles = numpy.linspace(0, 360, 10, dtype=numpy.float32)
+        
+        AG.set_channels(num_channels=10)
+        AG.set_angles(angles, initial_angle=10, angle_unit='radian')
+        AG.set_panel((10, 5), pixel_size=(0.1, 0.2))
+        AG.dimension_labels = ['vertical',\
+                                'horizontal',\
+                                'angle',\
+                                'channel']
+        
+        ad = AG.allocate('random')
+        
+        s = TransmissionAbsorptionConverter(white_level=10, min_intensity=0.1)
+        s.set_input(ad)
+        data_exp = s.get_output()
+        
+        data_new = ad.as_array().copy()
+        data_new /= 10
+        data_new[data_new < 0.1] = 0.1
+        data_new = -1 * numpy.log(data_new)
+        
+        self.assertTrue(data_exp.geometry == AG)
+        numpy.testing.assert_allclose(data_exp.as_array(), data_new, rtol=1E-6)
+        
+        s.process(out=ad)
+        
+        self.assertTrue(ad.geometry == AG)
+        numpy.testing.assert_allclose(data_exp.as_array(), ad.as_array(), rtol=1E-6)
+    
+
+class TestAbsorptionTransmissionConverter(unittest.TestCase):
+
+    def test_AbsorptionTransmissionConverter(self):
+
+        ray_direction = [0.1, 3.0, 0.4]
+        detector_position = [-1.3, 1000.0, 2]
+        detector_direction_row = [1.0, 0.2, 0.0]
+        detector_direction_col = [0.0 ,0.0, 1.0]
+        rotation_axis_position = [0.1, 2.0, 0.5]
+        rotation_axis_direction = [0.1, 2.0, 0.5]
+        
+        AG = AcquisitionGeometry.create_Parallel3D(ray_direction=ray_direction, 
+                                                    detector_position=detector_position, 
+                                                    detector_direction_x=detector_direction_row, 
+                                                    detector_direction_y=detector_direction_col,
+                                                    rotation_axis_position=rotation_axis_position,
+                                                    rotation_axis_direction=rotation_axis_direction)
+        
+        angles = numpy.linspace(0, 360, 10, dtype=numpy.float32)
+        
+        AG.set_channels(num_channels=10)
+        AG.set_angles(angles, initial_angle=10, angle_unit='radian')
+        AG.set_panel((10, 5), pixel_size=(0.1, 0.2))
+        AG.dimension_labels = ['vertical',\
+                                'horizontal',\
+                                'angle',\
+                                'channel']
+        
+        ad = AG.allocate('random')
+        
+        s = AbsorptionTransmissionConverter(white_level=10)
+        s.set_input(ad)
+        data_exp = s.get_output()
+        
+        self.assertTrue(data_exp.geometry == AG)
+        numpy.testing.assert_allclose(data_exp.as_array(), numpy.exp(-ad.as_array())*10, rtol=1E-6)
+        
+        s.process(out=ad)
+        
+        self.assertTrue(ad.geometry == AG)
+        numpy.testing.assert_allclose(data_exp.as_array(), ad.as_array(), rtol=1E-6)       
         
 if __name__ == "__main__":
     

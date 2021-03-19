@@ -6,6 +6,7 @@
   - Subset method has been deprecated
   - AcquisitionData and ImageData enforce requirement for a geometry on creation
   - Implemented Binner and Slicer processors
+  - Implemented MaskGenerator and Masker processors
 
 * 20.11.2
   - fixed windows build

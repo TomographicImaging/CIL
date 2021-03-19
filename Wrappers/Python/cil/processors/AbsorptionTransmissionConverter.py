@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-#  CCP in Tomographic Imaging (CCPi) Core Imaging Library (CIL).
-
-#   Copyright 2017 UKRI-STFC
-#   Copyright 2017 University of Manchester
+#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
+#   (Collaborative Computational Project in Tomographic Imaging), with 
+#   substantial contributions by UKRI-STFC and University of Manchester.
 
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -16,9 +15,6 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 from cil.framework import DataProcessor, AcquisitionData, ImageData, DataContainer, AcquisitionGeometry, ImageGeometry
 import warnings
@@ -58,15 +54,15 @@ class AbsorptionTransmissionConverter(DataProcessor):
 
         if out is None:
         
-            data = self.get_input().clone()
-            data.__imul__(-1)
+            data = self.get_input().copy()
+            data *= -1
             data.exp(out=data)
-            data.__imul__(self.white_level)
+            data *= self.white_level
         
             return data
 
         else:
 
-            out.__imul__(-1)
+            out *= -1
             out.exp(out=out)
-            out.__imul__(self.white_level)
+            out *= self.white_level

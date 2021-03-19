@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-#  CCP in Tomographic Imaging (CCPi) Core Imaging Library (CIL).
-
-#   Copyright 2017 UKRI-STFC
-#   Copyright 2017 University of Manchester
+#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
+#   (Collaborative Computational Project in Tomographic Imaging), with 
+#   substantial contributions by UKRI-STFC and University of Manchester.
 
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -15,10 +14,6 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 from cil.framework import DataProcessor, AcquisitionData, ImageData, DataContainer
 import warnings
@@ -66,8 +61,8 @@ class TransmissionAbsorptionConverter(DataProcessor):
 
         if out is None:
         
-            data = self.get_input().clone()
-            data.__idiv__(self.white_level)
+            data = self.get_input().copy()
+            data /= self.white_level
             data.as_array()[data.as_array() < self.threshold] = self.threshold
             
             try:
@@ -75,13 +70,13 @@ class TransmissionAbsorptionConverter(DataProcessor):
             except RuntimeWarning:
                 raise ValueError('Zero encountered in log. Please set threshold to some value to avoid this.')
                 
-            data.__imul__(-1)
+            data *= -1
 
             return data
         
         else:
 
-            out.__idiv__(self.white_level)
+            out /= self.white_level
             out.as_array()[out.as_array() < self.threshold] = self.threshold
             
             try:
@@ -89,4 +84,4 @@ class TransmissionAbsorptionConverter(DataProcessor):
             except RuntimeWarning:
                 raise ValueError('Zero encountered in log. Please set threshold to some value to avoid this.')
                 
-            out.__imul__(-1)
+            out *= -1

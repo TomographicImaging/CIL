@@ -73,7 +73,7 @@ class TestDataProcessor(unittest.TestCase):
         
         ad = AG.allocate('random')
         
-        s = TransmissionAbsorptionConverter(white_level=10, threshold=0.1)
+        s = TransmissionAbsorptionConverter(white_level=10, min_intensity=0.1)
         s.set_input(ad)
         data_exp = s.get_output()
         

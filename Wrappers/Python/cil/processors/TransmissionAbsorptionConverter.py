@@ -27,8 +27,8 @@ class TransmissionAbsorptionConverter(DataProcessor):
     
     :param white_level: A float defining incidence intensity in the Beer-Lambert law.
     :type white_level: float, optional
-    :param threshold: A float defining some threshold to avoid 0 in log
-    :type threshold: float, optional
+    :param min_intensity: A float defining some threshold to avoid 0 in log, is applied after normalisation by white_level
+    :type min_intensity: float, optional
     :return: returns AcquisitionData, ImageData or DataContainer depending on input data type
     :rtype: AcquisitionData, ImageData or DataContainer
     
@@ -40,11 +40,11 @@ class TransmissionAbsorptionConverter(DataProcessor):
     '''
 
     def __init__(self,
-                 threshold = 0,
+                 min_intensity = 0,
                  white_level = 1
                  ):
 
-        kwargs = {'threshold': threshold,
+        kwargs = {'min_intensity': min_intensity,
                   'white_level': white_level}
 
         super(TransmissionAbsorptionConverter, self).__init__(**kwargs)
@@ -63,7 +63,7 @@ class TransmissionAbsorptionConverter(DataProcessor):
         
             data = self.get_input().copy()
             data /= self.white_level
-            data.as_array()[data.as_array() < self.threshold] = self.threshold
+            data.as_array()[data.as_array() < self.min_intensity] = self.min_intensity
             
             try:
                 data.log(out=data)
@@ -77,7 +77,7 @@ class TransmissionAbsorptionConverter(DataProcessor):
         else:
 
             out /= self.white_level
-            out.as_array()[out.as_array() < self.threshold] = self.threshold
+            out.as_array()[out.as_array() < self.min_intensity] = self.min_intensity
             
             try:
                 out.log(out=out)

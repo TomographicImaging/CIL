@@ -322,7 +322,7 @@ def show2D(datacontainers, title=None, slice_list=None, fix_range=False, axis_la
     
 def plotter2D(datacontainers, title=None, slice_list=None, fix_range=False, axis_labels=None, origin='lower-left', cmap='gray', num_cols=2, size=(15,15)):
     '''Alias of show2D'''
-    show2D(datacontainers, title=None, slice_list=None, fix_range=False, axis_labels=None, origin='lower-left', cmap='gray', num_cols=2, size=(15,15))
+    show2D(datacontainers, title=title, slice_list=slice_list, fix_range=fix_range, axis_labels=axis_labels, origin=origin, cmap=cmap, num_cols=num_cols, size=size)
             
 if __name__ == '__main__':         
     

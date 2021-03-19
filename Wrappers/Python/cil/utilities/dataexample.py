@@ -111,30 +111,34 @@ class TestData(object):
             sdata = numpy.zeros((N, M))
             sdata[int(round(N/4)):int(round(3*N/4)), int(round(N/4)):int(round(3*N/4))] = 0.5
             sdata[int(round(M/8)):int(round(7*M/8)), int(round(3*M/8)):int(round(5*M/8))] = 1
-            ig = ImageGeometry(voxel_num_x = N, voxel_num_y = M, dimension_labels=[ImageGeometry.HORIZONTAL_X, ImageGeometry.HORIZONTAL_Y])
+            ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
             data = ig.allocate()
             data.fill(sdata)
-            
+
         elif which == TestData.SHAPES:
             with Image.open(os.path.join(self.data_dir, which)) as f:
                 tmp = numpy.array(f.convert('L'))
             N = 200
             M = 300   
-            ig = ImageGeometry(voxel_num_x = N, voxel_num_y = M, dimension_labels=[ImageGeometry.HORIZONTAL_X, ImageGeometry.HORIZONTAL_Y])
+            ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
             data = ig.allocate()
             data.fill(tmp/numpy.max(tmp))
-            
+
         else:
             with Image.open(os.path.join(self.data_dir, which)) as tmp:
                 bands = tmp.getbands()
                 if len(bands) > 1:
-                    ig = ImageGeometry(voxel_num_x=size[0], voxel_num_y=size[1], channels=len(bands), 
-                    dimension_labels=[ImageGeometry.HORIZONTAL_X, ImageGeometry.HORIZONTAL_Y, ImageGeometry.CHANNEL])
+                    ig = ImageGeometry(voxel_num_x=size[1], voxel_num_y=size[0], channels=len(bands), 
+                    dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X,ImageGeometry.CHANNEL])
                     data = ig.allocate()
+                    data.fill(numpy.array(tmp.resize((size[1],size[0]))))
+                    data.reorder([ImageGeometry.CHANNEL,ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
                 else:
-                    ig = ImageGeometry(voxel_num_x = size[0], voxel_num_y = size[1], dimension_labels=[ImageGeometry.HORIZONTAL_X, ImageGeometry.HORIZONTAL_Y])
+                    ig = ImageGeometry(voxel_num_x = size[1], voxel_num_y = size[0], dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
                     data = ig.allocate()
-                data.fill(numpy.array(tmp.resize((size[1],size[0]))))
+                    data.fill(numpy.array(tmp.resize((size[1],size[0]))))
+
+
             if scale is not None:
                 dmax = data.as_array().max()
                 dmin = data.as_array().min()

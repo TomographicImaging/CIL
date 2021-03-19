@@ -107,7 +107,7 @@ def islicer(data, direction, title="", slice_number=None, cmap='gray', minmax=No
         container = data.as_array()
         
     if not isinstance (direction, int):
-        if direction in data.dimension_labels.values():
+        if direction in data.dimension_labels:
             direction = data.get_dimension_axis(direction)                             
 
     if slice_number is None:

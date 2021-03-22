@@ -69,7 +69,7 @@ class TestTestData(CCPiTestClass):
         res = False
         try:
             image = dataexample.PEPPERS.get()
-            if (image.shape[0] == 512) and (image.shape[1] == 512) and (image.shape[2] == 3):
+            if (image.shape[0] == 3) and (image.shape[1] == 512) and (image.shape[2] == 512):
                 res = True
             else:
                 print("Image dimension mismatch")

@@ -131,11 +131,12 @@ class TestData(object):
                     ig = ImageGeometry(voxel_num_x=size[1], voxel_num_y=size[0], channels=len(bands), 
                     dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X,ImageGeometry.CHANNEL])
                     data = ig.allocate()
+                    data.fill(numpy.array(tmp.resize((size[1],size[0]))))
+                    data.reorder([ImageGeometry.CHANNEL,ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
                 else:
                     ig = ImageGeometry(voxel_num_x = size[1], voxel_num_y = size[0], dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
                     data = ig.allocate()
-
-                data.fill(numpy.array(tmp.resize((size[1],size[0]))))
+                    data.fill(numpy.array(tmp.resize((size[1],size[0]))))
 
 
             if scale is not None:

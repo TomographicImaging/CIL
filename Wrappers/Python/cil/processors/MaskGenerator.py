@@ -108,7 +108,7 @@ class MaskGenerator(DataProcessor):
         
         if self.axis is not None:
                 
-            if self.axis not in data.dimension_labels.values():
+            if self.axis not in data.dimension_labels:
                 raise Exception("Wrong label is specified for axis. " + \
                     "Expected dimensions are {}.".format(data.dimension_labels))
 

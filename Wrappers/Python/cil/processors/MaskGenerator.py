@@ -15,15 +15,66 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-#%%
 from cil.framework import DataProcessor, AcquisitionData, ImageData, DataContainer, ImageGeometry
 import warnings
 import numpy
 from scipy import special, ndimage
 
-#%%
 
 class MaskGenerator(DataProcessor):
+
+    r'''Processor to detect outliers and return mask with 0 where outliers were detected.
+        
+    :param mode: a method for detecting outliers: special_values, nan, inf, threshold, quantile, mean, median, movmean, movmedian
+    :type mode: string, default=special_values
+    :param threshold_value: specify lower and upper boundaries if 'threshold' mode is selected
+    :type threshold_value: tuple
+    :param quantiles: specify lower and upper quantiles if 'quantile' mode is selected
+    :type quantiles: tuple
+    :param window: specify running window if 'movmean' or 'movmedian' mode is selected
+    :type window: int, default=5
+    :param axis: specify axis to alculate statistics for 'mean', 'median', 'movmean', 'movmean' modes
+    :type axis: string
+    :return: returns a DataContainer with boolean mask with 0 where outliers were detected
+    :rtype: DataContainer
+    '''
+    
+
+    '''             
+      - special_values    test element-wise for both inf and nan
+      - nan               test element-wise for nan
+      - inf               test element-wise for nan
+      - threshold         test element-wise if array values are within boundaries
+                          given by threshold_values = (float,float). 
+                          You can secify only lower threshold value by setting another to None
+                          such as threshold_values = (float,None), then
+                          upper boundary will be amax(data). Similarly, to specify only upper 
+                          boundary, use threshold_values = (None,float). If both threshold_values
+                          are set to None, then original array will be returned.
+      - quantile          test element-wise if array values are within boundaries
+                          given by quantiles = (q1,q2), 0<=q1,q2<=1. 
+                          You can secify only lower quantile value by setting another to None
+                          such as quantiles = (float,q2), then
+                          upper boundary will be amax(data). Similarly, to specify only upper 
+                          boundary, use quantiles = (None,q1). If both quantiles
+                          are set to None, then original array will be returned.
+      - mean              test element-wise if 
+                          abs(A - mean(A)) < threshold_factor * std(A).
+                          Default value of threshold_factor is 3. If no axis is specified, 
+                          then operates over flattened array. Alternatively operates along axis specified 
+                          as dimension_label.
+      - median            test element-wise if 
+                          abs(A - median(A)) < threshold_factor * scaled MAD(A),
+                          scaled MAD is defined as c*median(abs(A-median(A))) where c=-1/(sqrt(2)*erfcinv(3/2))
+                          Default value of threshold_factor is 3. If no axis is specified, 
+                          then operates over flattened array. Alternatively operates along axis specified 
+                          as dimension_label.
+      - movmean           the same as mean but uses rolling mean with a specified window,
+                          default window value is 5
+      - movmedian         the same as mean but uses rolling median with a specified window,
+                          default window value is 5
+
+      '''
 
     def __init__(self,
                  mode = 'special_values',
@@ -32,50 +83,6 @@ class MaskGenerator(DataProcessor):
                  threshold_factor = 3,
                  window = 5,
                  axis = None):
-        
-        '''
-        Constructor
-        
-        Input:
-            
-            mode              
-                - special_values    test element-wise for both inf and nan
-                - nan               test element-wise for nan
-                - inf               test element-wise for nan
-                - threshold         test element-wise if array values are within boundaries
-                                    given by threshold_values = (float,float). 
-                                    You can secify only lower threshold value by setting another to None
-                                    such as threshold_values = (float,None), then
-                                    upper boundary will be amax(data). Similarly, to specify only upper 
-                                    boundary, use threshold_values = (None,float). If both threshold_values
-                                    are set to None, then original array will be returned.
-                - quantile          test element-wise if array values are within boundaries
-                                    given by quantiles = (q1,q2), 0<=q1,q2<=1. 
-                                    You can secify only lower quantile value by setting another to None
-                                    such as quantiles = (float,q2), then
-                                    upper boundary will be amax(data). Similarly, to specify only upper 
-                                    boundary, use quantiles = (None,q1). If both quantiles
-                                    are set to None, then original array will be returned.
-                - mean              test element-wise if 
-                                    abs(A - mean(A)) < threshold_factor * std(A).
-                                    Default value of threshold_factor is 3. If no axis is specified, 
-                                    then operates over flattened array. Alternatively operates along axis specified 
-                                    as dimension_label.
-                - median            test element-wise if 
-                                    abs(A - median(A)) < threshold_factor * scaled MAD(A),
-                                    scaled MAD is defined as c*median(abs(A-median(A))) where c=-1/(sqrt(2)*erfcinv(3/2))
-                                    Default value of threshold_factor is 3. If no axis is specified, 
-                                    then operates over flattened array. Alternatively operates along axis specified 
-                                    as dimension_label.
-                - movmean           the same as mean but uses rolling mean with a specified window,
-                                    default window value is 5
-                - movmedian         the same as mean but uses rolling median with a specified window,
-                                    default window value is 5
-        
-        Output:
-                numpy boolean array with 0 where outliers were detected
-                
-        '''
 
         kwargs = {'mode': mode,
                   'threshold_value': threshold_value,

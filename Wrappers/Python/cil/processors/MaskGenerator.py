@@ -25,12 +25,14 @@ class MaskGenerator(DataProcessor):
 
     r'''Processor to detect outliers and return mask with 0 where outliers were detected.
         
-    :param mode: a method for detecting outliers: special_values, nan, inf, threshold, quantile, mean, median, movmean, movmedian
+    :param mode: a method for detecting outliers (special_values, nan, inf, threshold, quantile, mean, median, movmean, movmedian)
     :type mode: string, default=special_values
     :param threshold_value: specify lower and upper boundaries if 'threshold' mode is selected
     :type threshold_value: tuple
     :param quantiles: specify lower and upper quantiles if 'quantile' mode is selected
     :type quantiles: tuple
+    :param threshold_factor: scales detction threshold (standard deviation in case of 'mean', 'movmean' and median absolute deviation in case of 'median', movmedian')
+    :type threshold_factor: float, default=3
     :param window: specify running window if 'movmean' or 'movmedian' mode is selected
     :type window: int, default=5
     :param axis: specify axis to alculate statistics for 'mean', 'median', 'movmean', 'movmean' modes

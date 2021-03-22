@@ -68,6 +68,10 @@ class SHAPES(DATA):
     @classmethod
     def dfile(cls):
         return TestData.SHAPES
+class RAINBOW(DATA):
+    @classmethod
+    def dfile(cls):
+        return TestData.RAINBOW
 class SYNCHROTRON_PARALLEL_BEAM_DATA(DATA):
     @classmethod
     def get(cls, **kwargs):
@@ -87,7 +91,7 @@ class TestData(object):
     RESOLUTION_CHART = 'resolution_chart.tiff'
     SIMPLE_PHANTOM_2D = 'hotdog'
     SHAPES =  'shapes.png'
-    
+    RAINBOW = 'rainbow.png'
     '''
     BOAT = 'boat.tiff'
     CAMERA = 'camera.png'
@@ -95,7 +99,7 @@ class TestData(object):
     RESOLUTION_CHART = 'resolution_chart.tiff'
     SIMPLE_PHANTOM_2D = 'hotdog'
     SHAPES =  'shapes.png'
-
+    RAINBOW =  'rainbow.png'
     
     def __init__(self, **kwargs):
         self.data_dir = kwargs.get('data_dir', data_dir)
@@ -103,7 +107,8 @@ class TestData(object):
     def load(self, which, size=(512,512), scale=(0,1), **kwargs):
         if which not in [TestData.BOAT, TestData.CAMERA, 
                          TestData.PEPPERS, TestData.RESOLUTION_CHART,
-                         TestData.SIMPLE_PHANTOM_2D, TestData.SHAPES]:
+                         TestData.SIMPLE_PHANTOM_2D, TestData.SHAPES,
+                         TestData.RAINBOW]:
             raise ValueError('Unknown TestData {}.'.format(which))
         if which == TestData.SIMPLE_PHANTOM_2D:
             N = size[0]
@@ -123,7 +128,7 @@ class TestData(object):
             ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
             data = ig.allocate()
             data.fill(tmp/numpy.max(tmp))
-
+            
         else:
             with Image.open(os.path.join(self.data_dir, which)) as tmp:
                 bands = tmp.getbands()
@@ -133,6 +138,7 @@ class TestData(object):
                     data = ig.allocate()
                     data.fill(numpy.array(tmp.resize((size[1],size[0]))))
                     data.reorder([ImageGeometry.CHANNEL,ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
+                    data.geometry.channel_labels = bands
                 else:
                     ig = ImageGeometry(voxel_num_x = size[1], voxel_num_y = size[0], dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
                     data = ig.allocate()

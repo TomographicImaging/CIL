@@ -189,6 +189,7 @@ class ImageGeometry(object):
         self.center_y = center_y
         self.center_z = center_z  
         self.channels = channels
+        self.channel_labels = None
         self.channel_spacing = 1.0
         self.dimension_labels = kwargs.get('dimension_labels', None)
 
@@ -216,6 +217,9 @@ class ImageGeometry(object):
         geometry_new = self.copy()
         if channel is not None:
             geometry_new.channels = 1
+            
+            if geometry_new.channel_labels is not None:
+                geometry_new.channel_labels = self.channel_labels[channel]
 
         if vertical is not None:
             geometry_new.voxel_num_z = 0

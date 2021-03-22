@@ -113,7 +113,9 @@ class LADMM(Algorithm):
         self.tmp_adj *= -(self.tau/self.sigma)
         self.x += self.tmp_adj     
         # apply proximal of f        
-        self.f.proximal(self.x, self.tau, out = self.x)
+        tmp = self.f.proximal(self.x, self.tau)
+        self.x.fill(tmp)
+        del tmp
         
         self.operator.direct(self.x, out = self.tmp_dir)  
         self.u += self.tmp_dir

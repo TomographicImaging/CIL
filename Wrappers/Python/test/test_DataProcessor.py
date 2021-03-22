@@ -30,7 +30,7 @@ from timeit import default_timer as timer
 from cil.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 
 from cil.io import NEXUSDataReader
-from cil.processors import CentreOfRotationCorrector, CofR_xcorr, Slicer, Binner
+from cil.processors import CentreOfRotationCorrector, CofR_xcorr, Slicer, Binner, MaskGenerator
 import wget
 import os
 
@@ -594,7 +594,185 @@ class TestDataProcessor(unittest.TestCase):
         print("check call method of DataProcessor")
         numpy.testing.assert_array_equal(ax(chain(c)).as_array(), arr)        
 
+
+class TestMaskGenerator(unittest.TestCase):       
+
+    def test_MaskGenerator(self): 
+    
+        IG = ImageGeometry(voxel_num_x=10,
+                        voxel_num_y=10)
         
+        data = IG.allocate('random')
+        
+        data.as_array()[2,3] = float('inf')
+        data.as_array()[4,5] = float('nan')
+        
+        # check special values - default
+        m = MaskGenerator()
+        m.set_input(data)
+        mask = m.process()
+        
+        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual[2,3] = 0
+        mask_manual[4,5] = 0
+        
+        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
+        
+        # check nan
+        m = MaskGenerator(mode='nan')
+        m.set_input(data)
+        mask = m.process()
+        
+        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual[4,5] = 0
+        
+        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
+        
+        # check inf
+        m = MaskGenerator(mode='inf')
+        m.set_input(data)
+        mask = m.process()
+        
+        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual[2,3] = 0
+        
+        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
+        
+        # check threshold
+        data = IG.allocate('random')
+        data.as_array()[6,8] = 100
+        data.as_array()[1,3] = 80
+        
+        m = MaskGenerator(mode='threshold', threshold_value=(None, 70))
+        m.set_input(data)
+        mask = m.process()
+        
+        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual[6,8] = 0
+        mask_manual[1,3] = 0
+        
+        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
+        
+        m = MaskGenerator(mode='threshold', threshold_value=(None, 80))
+        m.set_input(data)
+        mask = m.process()
+        
+        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual[6,8] = 0
+        
+        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
+        
+        # check quantile
+        data = IG.allocate('random')
+        data.as_array()[6,8] = 100
+        data.as_array()[1,3] = 80
+        
+        m = MaskGenerator(mode='quantile', quantiles=(None, 0.98))
+        m.set_input(data)
+        mask = m.process()
+        
+        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual[6,8] = 0
+        mask_manual[1,3] = 0
+        
+        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
+        
+        m = MaskGenerator(mode='quantile', quantiles=(None, 0.99))
+        m.set_input(data)
+        mask = m.process()
+        
+        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual[6,8] = 0
+        
+        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
+        
+        # check mean
+        IG = ImageGeometry(voxel_num_x=200,
+                            voxel_num_y=200)
+        #data = IG.allocate('random', seed=10)
+        data = IG.allocate()
+        numpy.random.seed(10)
+        data.fill(numpy.random.rand(200,200))
+        data.as_array()[7,4] += 10 * numpy.std(data.as_array()[7,:])
+        
+        m = MaskGenerator(mode='mean', axis='horizontal_x')
+        m.set_input(data)
+        mask = m.process()
+        
+        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual[7,4] = 0
+        
+        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
+        
+        m = MaskGenerator(mode='mean')
+        m.set_input(data)
+        mask = m.process()
+        
+        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual[7,4] = 0
+        
+        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
+        
+        # check median
+        m = MaskGenerator(mode='median', axis='horizontal_x')
+        m.set_input(data)
+        mask = m.process()
+        
+        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual[7,4] = 0
+        
+        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
+        
+        m = MaskGenerator(mode='median')
+        m.set_input(data)
+        mask = m.process()
+        
+        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual[7,4] = 0
+        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
+        
+        # check movmean
+        m = MaskGenerator(mode='movmean', window=10)
+        m.set_input(data)
+        mask = m.process()
+        
+        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual[7,4] = 0
+        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
+        
+        #
+        m = MaskGenerator(mode='movmean', window=20, axis='horizontal_y')
+        m.set_input(data)
+        mask = m.process()
+        
+        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual[7,4] = 0
+        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
+        
+        m = MaskGenerator(mode='movmean', window=10, threshold_factor=10)
+        m.set_input(data)
+        mask = m.process()
+        
+        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
+        
+        # check movmedian
+        m = MaskGenerator(mode='movmedian', window=20)
+        m.set_input(data)
+        mask = m.process()
+        
+        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual[7,4] = 0
+        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
+        
+        # check movmedian
+        m = MaskGenerator(mode='movmedian', window=40)
+        m.set_input(data)
+        mask = m.process()
+        
+        mask_manual = numpy.ones((200,200), dtype=numpy.bool)
+        mask_manual[7,4] = 0
+        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
         
 if __name__ == "__main__":
     

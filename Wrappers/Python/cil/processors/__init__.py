@@ -21,3 +21,5 @@ from .Normaliser import Normaliser
 from .Slicer import Slicer
 from .Binner import Binner
 from .RingRemover import RingRemover
+from .AbsorptionTransmissionConverter import AbsorptionTransmissionConverter
+from .TransmissionAbsorptionConverter import TransmissionAbsorptionConverter

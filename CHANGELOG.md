@@ -5,6 +5,7 @@
   - Datacontainers have reorder method which reorders the data in memory as requested, or for use with 'astra' or 'tigre'
   - Subset method has been deprecated
   - AcquisitionData and ImageData enforce requirement for a geometry on creation
+  - New processors AbsorptionTransmissionConverter and TransmissionAbsorptionConverter to convert between Absorption and Transmission
   - Implemented Binner and Slicer processors
 
 * 20.11.2

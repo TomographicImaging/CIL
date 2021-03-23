@@ -617,7 +617,7 @@ class TestMaskGenerator(unittest.TestCase):
         mask_manual[2,3] = 0
         mask_manual[4,5] = 0
         
-        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
+        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
         
         # check nan
         m = MaskGenerator.special_values(inf=False)
@@ -627,7 +627,7 @@ class TestMaskGenerator(unittest.TestCase):
         mask_manual = numpy.ones((10,10), dtype=numpy.bool)
         mask_manual[4,5] = 0
         
-        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
+        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
         
         # check inf
         m = MaskGenerator.special_values(nan=False)
@@ -637,7 +637,7 @@ class TestMaskGenerator(unittest.TestCase):
         mask_manual = numpy.ones((10,10), dtype=numpy.bool)
         mask_manual[2,3] = 0
         
-        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
+        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
         
         # check threshold
         data = IG.allocate('random')
@@ -652,7 +652,7 @@ class TestMaskGenerator(unittest.TestCase):
         mask_manual[6,8] = 0
         mask_manual[1,3] = 0
         
-        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
+        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
         
         m = MaskGenerator.threshold(None, 80)
         m.set_input(data)
@@ -661,7 +661,7 @@ class TestMaskGenerator(unittest.TestCase):
         mask_manual = numpy.ones((10,10), dtype=numpy.bool)
         mask_manual[6,8] = 0
         
-        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
+        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
         
         # check quantile
         data = IG.allocate('random')
@@ -676,7 +676,7 @@ class TestMaskGenerator(unittest.TestCase):
         mask_manual[6,8] = 0
         mask_manual[1,3] = 0
         
-        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
+        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
         
         m = MaskGenerator.quantile(None, 0.99)
         m.set_input(data)
@@ -685,7 +685,7 @@ class TestMaskGenerator(unittest.TestCase):
         mask_manual = numpy.ones((10,10), dtype=numpy.bool)
         mask_manual[6,8] = 0
         
-        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
+        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
         
         # check mean
         IG = ImageGeometry(voxel_num_x=200,
@@ -703,7 +703,7 @@ class TestMaskGenerator(unittest.TestCase):
         mask_manual = numpy.ones((200,200), dtype=numpy.bool)
         mask_manual[7,4] = 0
         
-        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
+        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
         
         m = MaskGenerator.mean(window=5)
         m.set_input(data)
@@ -712,7 +712,7 @@ class TestMaskGenerator(unittest.TestCase):
         mask_manual = numpy.ones((200,200), dtype=numpy.bool)
         mask_manual[7,4] = 0
         
-        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
+        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
         
         # check median
         m = MaskGenerator.median(axis='horizontal_x')
@@ -722,7 +722,7 @@ class TestMaskGenerator(unittest.TestCase):
         mask_manual = numpy.ones((200,200), dtype=numpy.bool)
         mask_manual[7,4] = 0
         
-        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
+        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
         
         m = MaskGenerator.median()
         m.set_input(data)
@@ -730,7 +730,7 @@ class TestMaskGenerator(unittest.TestCase):
         
         mask_manual = numpy.ones((200,200), dtype=numpy.bool)
         mask_manual[7,4] = 0
-        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
+        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
         
         # check movmean
         m = MaskGenerator.mean(window=10)
@@ -739,7 +739,7 @@ class TestMaskGenerator(unittest.TestCase):
         
         mask_manual = numpy.ones((200,200), dtype=numpy.bool)
         mask_manual[7,4] = 0
-        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
+        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
         
         #
         m = MaskGenerator.mean(window=20, axis='horizontal_y')
@@ -748,14 +748,14 @@ class TestMaskGenerator(unittest.TestCase):
         
         mask_manual = numpy.ones((200,200), dtype=numpy.bool)
         mask_manual[7,4] = 0
-        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
+        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
         
         m = MaskGenerator.mean(window=10, threshold_factor=10)
         m.set_input(data)
         mask = m.process()
         
         mask_manual = numpy.ones((200,200), dtype=numpy.bool)
-        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
+        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
         
         # check movmedian
         m = MaskGenerator.median(window=20)
@@ -764,7 +764,7 @@ class TestMaskGenerator(unittest.TestCase):
         
         mask_manual = numpy.ones((200,200), dtype=numpy.bool)
         mask_manual[7,4] = 0
-        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
+        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
         
         # check movmedian
         m = MaskGenerator.median(window=40)
@@ -773,7 +773,7 @@ class TestMaskGenerator(unittest.TestCase):
         
         mask_manual = numpy.ones((200,200), dtype=numpy.bool)
         mask_manual[7,4] = 0
-        numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
+        numpy.testing.assert_array_equal(mask.as_array(), mask_manual)
 
 class TestTransmissionAbsorptionConverter(unittest.TestCase):
 

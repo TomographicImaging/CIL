@@ -22,7 +22,7 @@ from scipy import special, ndimage
 
 class MaskGenerator(DataProcessor):
     r'''
-    Processor to detect outliers and return mask with 0 where outliers were detected. Please use the desiried method to configure a processor for your needs.
+    Processor to detect outliers and return a mask with 0 where outliers were detected, and 1 for other pixels. Please use the desiried method to configure a processor for your needs.
     '''
 
     @staticmethod
@@ -80,8 +80,8 @@ class MaskGenerator(DataProcessor):
         
         :param threshold_factor: scale factor of standard-deviations to use as threshold
         :type threshold_factor: float, default=3
-        :param axis: specify axis from 'dimension_labels' to calculate mean. If no axis is specified then operates over flattened array.
-        :type axis: string
+        :param axis: specify axis as int or from 'dimension_labels' to calculate mean. If no axis is specified then operates over flattened array.
+        :type axis: int, string
         :param window: specify number of pixels to use in calculation of a rolling mean
         :type window: int, default=None
         '''
@@ -101,8 +101,8 @@ class MaskGenerator(DataProcessor):
 
         :param threshold_factor: scale factor of MAD to use as threshold
         :type threshold_factor: float, default=3        
-        :param axis: specify axis from 'dimension_labels' to calculate median. If no axis is specified then operates over flattened array.
-        :type axis: string
+        :param axis: specify axis as int or from 'dimension_labels' to calculate mean. If no axis is specified then operates over flattened array.
+        :type axis: int, string
         :param window: specify number of pixels to use in calculation of a rolling median
         :type window: int, default=None
         '''
@@ -121,26 +121,26 @@ class MaskGenerator(DataProcessor):
                  threshold_factor=3,
                  window=5,
                  axis=None):
-        r'''Processor to detect outliers and return mask with 0 where outliers were detected.
+        r'''Processor to detect outliers and return mask with 0 where outliers were detected and 1 for other pixels.
                 
             :param mode: a method for detecting outliers (special_values, nan, inf, threshold, quantile, mean, median, movmean, movmedian)
-            :type mode: string, default=special_values
+            :type mode: string, default='special_values'
             :param threshold_value: specify lower and upper boundaries if 'threshold' mode is selected
             :type threshold_value: tuple
             :param quantiles: specify lower and upper quantiles if 'quantile' mode is selected
             :type quantiles: tuple
-            :param threshold_factor: scales detction threshold (standard deviation in case of 'mean', 'movmean' and median absolute deviation in case of 'median', movmedian')
+            :param threshold_factor: scales detection threshold (standard deviation in case of 'mean', 'movmean' and median absolute deviation in case of 'median', movmedian')
             :type threshold_factor: float, default=3
             :param window: specify running window if 'movmean' or 'movmedian' mode is selected
             :type window: int, default=5
             :param axis: specify axis to alculate statistics for 'mean', 'median', 'movmean', 'movmean' modes
-            :type axis: string
+            :type axis: int, string
             :return: returns a DataContainer with boolean mask with 0 where outliers were detected
             :rtype: DataContainer
             
         - special_values    test element-wise for both inf and nan
         - nan               test element-wise for nan
-        - inf               test element-wise for nan
+        - inf               test element-wise for inf
         - threshold         test element-wise if array values are within boundaries
                             given by threshold_values = (float,float). 
                             You can secify only lower threshold value by setting another to None
@@ -185,29 +185,38 @@ class MaskGenerator(DataProcessor):
 
     def check_input(self, data):
 
-        if not (issubclass(type(data), DataContainer)):
-            raise TypeError('Processor supports only following data types:\n' +
-                            ' - ImageData\n - AcquisitionData\n' +
-                            ' - DataContainer')
         if self.mode not in ['special_values', 'nan', 'inf', 'threshold', 'quantile',
                              'mean', 'median', 'movmean', 'movmedian']:
             raise Exception("Wrong mode. One of the following is expected:\n" +
                             "special_values, nan, inf, threshold, \n quantile, mean, median, movmean, movmedian")
 
-        if self.axis is not None:
-
+        if self.axis is not None and type(self.axis) is not int:
             if self.axis not in data.dimension_labels:
                 raise Exception("Wrong label is specified for axis. " +
                                 "Expected {}, got {}.".format(data.dimension_labels, self.axis))
 
         return True
 
-    def process(self):
+    def process(self, out=None):
 
         # get input DataContainer
         data = self.get_input()
-        arr = data.as_array()
-        
+
+        try:
+            arr = data.as_array()
+        except:
+            arr = data
+
+        ndim = arr.ndim
+
+        try:
+            axis_index = data.dimension_labels.index(self.axis)               
+        except:
+            if type(self.axis) == int:
+                axis_index = self.axis
+            else:
+                axis_index = None
+
         # intialise mask with all ones
         mask = numpy.ones(arr.shape, dtype=numpy.bool)
         
@@ -247,16 +256,12 @@ class MaskGenerator(DataProcessor):
         elif self.mode == 'mean':
             
             # if mean along specific axis
-            if self.axis is not None:
-                
-                axis = data.dimension_labels.index(self.axis)
-                ndim = data.number_of_dimensions
-                
+            if axis_index is not None:               
                 tile_par = []
                 slice_obj = []
                 for i in range(ndim):
-                    if i == axis:
-                        tile_par.append(data.dimension_labels.index(self.axis))
+                    if i == axis_index:
+                        tile_par.append(axis_index)
                         slice_obj.append(numpy.newaxis)
                     else:
                         tile_par.append(1)
@@ -264,8 +269,8 @@ class MaskGenerator(DataProcessor):
                 tile_par = tuple(tile_par)
                 slice_obj = tuple(slice_obj)
                 
-                tmp_mean = numpy.tile((numpy.mean(arr, axis=axis))[slice_obj], tile_par)
-                tmp_std = numpy.tile((numpy.std(arr, axis=axis))[slice_obj], tile_par)
+                tmp_mean = numpy.tile((numpy.mean(arr, axis=axis_index))[slice_obj], tile_par)
+                tmp_std = numpy.tile((numpy.std(arr, axis=axis_index))[slice_obj], tile_par)
                 mask[numpy.abs(arr - tmp_mean) > self.threshold_factor * tmp_std] = 0
 
             # if global mean    
@@ -278,16 +283,12 @@ class MaskGenerator(DataProcessor):
             c = -1 / (numpy.sqrt(2) * special.erfcinv(3 / 2))
             
             # if median along specific axis
-            if self.axis is not None:
-
-                axis = data.dimension_labels.index(self.axis)
-                ndim = data.number_of_dimensions
-                
+            if axis_index is not None:
                 tile_par = []
                 slice_obj = []
                 for i in range(ndim):
-                    if i == axis:
-                        tile_par.append(data.dimension_labels.index(self.axis))
+                    if i == axis_index:
+                        tile_par.append(axis_index)
                         slice_obj.append(numpy.newaxis)
                     else:
                         tile_par.append(1)
@@ -295,8 +296,8 @@ class MaskGenerator(DataProcessor):
                 tile_par = tuple(tile_par)
                 slice_obj = tuple(slice_obj)
 
-                tmp = numpy.abs(arr - numpy.tile((numpy.median(arr, axis=axis))[slice_obj], tile_par))
-                median_absolute_dev = numpy.tile((numpy.median(tmp, axis=axis))[slice_obj], tile_par)
+                tmp = numpy.abs(arr - numpy.tile((numpy.median(arr, axis=axis_index))[slice_obj], tile_par))
+                median_absolute_dev = numpy.tile((numpy.median(tmp, axis=axis_index))[slice_obj], tile_par)
                 mask[tmp > self.threshold_factor * c * median_absolute_dev] = 0
             
             # if global median
@@ -308,13 +309,9 @@ class MaskGenerator(DataProcessor):
         elif self.mode == 'movmean':
 
             # if movmean along specific axis     
-            if self.axis is not None:
-                
-                axis = data.dimension_labels.index(self.axis)
-                ndim = data.number_of_dimensions
-                
+            if axis_index is not None:               
                 kernel = [1] * ndim
-                kernel[axis] = self.window
+                kernel[axis_index] = self.window
                 kernel = tuple(kernel)
 
                 mean_array = ndimage.generic_filter(arr, numpy.mean, size=kernel, mode='reflect')
@@ -324,9 +321,6 @@ class MaskGenerator(DataProcessor):
             
             # if global movmean
             else:
-                
-                ndim = data.number_of_dimensions
-
                 mean_array = ndimage.generic_filter(arr, numpy.mean, size=(self.window,)*ndim, mode='reflect')
                 std_array = ndimage.generic_filter(arr, numpy.std, size=(self.window,)*ndim, mode='reflect')
                 
@@ -337,15 +331,12 @@ class MaskGenerator(DataProcessor):
             c = -1 / (numpy.sqrt(2) * special.erfcinv(3 / 2))
             
             # if movmedian along specific axis
-            if self.axis is not None:
-                
-                axis = data.dimension_labels.index(self.axis)
-                ndim = data.number_of_dimensions
-                
+            if axis_index is not None:
+                                
                 # construct filter kernel
                 kernel_shape = []
                 for i in range(ndim):
-                    if i == axis:
+                    if i == axis_index:
                         kernel_shape.append(self.window)
                     else:
                         kernel_shape.append(1)
@@ -358,10 +349,8 @@ class MaskGenerator(DataProcessor):
                 mask[tmp > self.threshold_factor * c * ndimage.median_filter(tmp, footprint=kernel_shape, mode='reflect')] = 0
             
             # if global movmedian
-            else:
-                
+            else:      
                 # construct filter kernel
-                ndim = data.number_of_dimensions
                 kernel_shape = tuple([self.window]*ndim)
                 median_array = ndimage.median_filter(arr, size=kernel_shape, mode='reflect')
                 
@@ -372,10 +361,13 @@ class MaskGenerator(DataProcessor):
             raise ValueError('Mode not recognised. One of the following is expected: ' + \
                               'special_values, nan, inf, threshold, quantile, mean, median, movmean, movmedian')
         
-        data.fill(arr)     
-        return DataContainer(mask, deepcopy=True, dimension_labels=data.dimension_labels)
-        
-
+        if out is None:
+            out = data.copy()
+            out.fill(mask)
+            return out
+        else:
+            out.fill(mask)
+    
     def _parse_threshold_value(self, arr):
 
         threshold = []

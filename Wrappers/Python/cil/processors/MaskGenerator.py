@@ -239,7 +239,7 @@ class MaskGenerator(DataProcessor):
                 raise Exception("Threshold value must be given as a tuple containing two values,\n" +\
                     "use None if no threshold value is given")
                 
-            threshold = self._parse_threshold_value(arr)
+            threshold = self._parse_threshold_value(arr, quantile=False)
             
             mask[numpy.logical_or(arr < threshold[0], arr > threshold[1])] = 0
             
@@ -249,7 +249,7 @@ class MaskGenerator(DataProcessor):
                 raise Exception("Quantiles must be given as a tuple containing two values,\n " + \
                     "use None if no quantile value is given")
             
-            quantile = self._parse_quantile_value(arr)
+            quantile = self._parse_threshold_value(arr, quantile=True)
                 
             mask[numpy.logical_or(arr < quantile[0], arr > quantile[1])] = 0
         
@@ -368,50 +368,30 @@ class MaskGenerator(DataProcessor):
         else:
             out.fill(mask)
     
-    def _parse_threshold_value(self, arr):
+    def _parse_threshold_value(self, arr, quantile=False):
 
-        threshold = []
-        if self.threshold_value[0] is None:
-            threshold.append(numpy.amin(arr))
+        lower_val = None
+        upper_val = None
+
+        if quantile == True:
+            if self.quantiles[0] is not None:
+                lower_val = numpy.quantile(arr, self.quantiles[0])
+            if self.quantiles[1] is not None:
+                upper_val = numpy.quantile(arr, self.quantiles[1])
         else:
-            threshold.append(self.threshold_value[0])
-            tmp_min = numpy.amin(arr)
-            if self.threshold_value[0] < tmp_min:
-                warnings.warn("Given threshold_value {} is smaller than min" + \
-                    "value of data {}".format(input_threshold[0], tmp_min))
-        
-        if self.threshold_value[1] is None:
-            threshold.append(numpy.amax(arr))
-        else:
-            threshold.append(self.threshold_value[1])
-            tmp_max = numpy.amax(arr)
-            if self.threshold_value[1] > tmp_max:
-                warnings.warn("Given threshold_value {} is larger than max " + \
-                    "value of data {}".format(self.threshold_value[1], tmp_max))
-        
-        if threshold[1] < threshold[0]:
+            if self.threshold_value[0] is not None:
+                lower_val = self.threshold_value[0]
+            if self.threshold_value[1] is not None:
+                upper_val = self.threshold_value[1]
+
+        if lower_val is None:
+            lower_val = numpy.amin(arr)
+
+        if upper_val is None:
+            upper_val = numpy.amax(arr)
+
+        if upper_val <= lower_val:
             raise Exception("Upper threshold value must be larger than " + \
                 "lower treshold value or min of data")
-        
-        return threshold
-    
 
-    def _parse_quantile_value(self, arr):
-
-        quantile_values = []
-        if self.quantiles[0] is None:
-            quantile_values.append(numpy.amin(arr))
-        else:
-            quantile_values.append(numpy.quantile(arr, self.quantiles[0]))
-        if self.quantiles[1] is None:
-            quantile_values.append(numpy.amax(arr))
-        else:
-            quantile_values.append(numpy.quantile(arr, self.quantiles[1]))
-        if self.quantiles[1] < 0 or self.quantiles[1] > 1:
-            raise Exception("Quantile_values must be within 0 and 1. Got {}".format(self.quantiles))
-        
-        if quantile_values[1] <  quantile_values[0]:
-            raise Exception("Upper quantile must be larger than lower quantile. Got ({}, {})".format(self.quantiles))
-
-        return quantile_values
-  
+        return (lower_val, upper_val)

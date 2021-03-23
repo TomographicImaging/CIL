@@ -20,10 +20,11 @@ import warnings
 import numpy
 from scipy import special, ndimage
 
-class MaskGenerator(object):
-    """
-    This class contains factory methods to create a MaskGenerator object using the desired algorithm.
-    """
+class MaskGenerator(DataProcessor):
+    r'''
+    Processor to detect outliers and return mask with 0 where outliers were detected. Please use the desiried method to configure a processor for your needs.
+    '''
+
     @staticmethod
     def special_values(nan=True, inf=True):
         r'''This creates a MaskGenerator processor which generates a mask for inf and/or nan values.
@@ -36,16 +37,16 @@ class MaskGenerator(object):
         '''
         if nan is True:
             if inf is True:
-                proccessor = MaskGenerator_backend(mode='special_values')
+                processor = MaskGenerator(mode='special_values')
             else:
-                proccessor = MaskGenerator_backend(mode='nan')
+                processor = MaskGenerator(mode='nan')
         else:
             if inf is True:
-                proccessor = MaskGenerator_backend(mode='inf')
+                processor = MaskGenerator(mode='inf')
             else:
                 raise ValueError("Please specify at least one type of value to threshold on")
 
-        return proccessor
+        return processor
 
     @staticmethod
     def threshold(min_val=None, max_val=None):
@@ -56,8 +57,8 @@ class MaskGenerator(object):
         :param max_val: upper boundary
         :type max_val: float, default=None
         '''
-        proccessor = MaskGenerator_backend(mode='threshold', threshold_value=(min_val,max_val))
-        return proccessor
+        processor = MaskGenerator(mode='threshold', threshold_value=(min_val,max_val))
+        return processor
 
     @staticmethod
     def quantile(min_quantile=None, max_quantile=None):
@@ -68,8 +69,8 @@ class MaskGenerator(object):
         :param max_quantile: upper quantile, 0-1
         :type max_quantile: float, default=None
         '''
-        proccessor = MaskGenerator_backend(mode='quantile', quantiles=(min_quantile,max_quantile))
-        return proccessor
+        processor = MaskGenerator(mode='quantile', quantiles=(min_quantile,max_quantile))
+        return processor
 
     @staticmethod
     def mean(axis=None, threshold_factor=3, window=None):
@@ -85,11 +86,11 @@ class MaskGenerator(object):
         :type window: int, default=None
         '''
         if window == None:
-            proccessor = MaskGenerator_backend(mode='mean', threshold_factor=threshold_factor, axis=axis)
+            processor = MaskGenerator(mode='mean', threshold_factor=threshold_factor, axis=axis)
         else:
-            proccessor = MaskGenerator_backend(mode='movmean', threshold_factor=threshold_factor, axis=axis, window=window)
+            processor = MaskGenerator(mode='movmean', threshold_factor=threshold_factor, axis=axis, window=window)
 
-        return proccessor
+        return processor
 
     @staticmethod
     def median(axis=None, threshold_factor=3, window=None):
@@ -107,104 +108,99 @@ class MaskGenerator(object):
         '''
 
         if window == None:
-            proccessor = MaskGenerator_backend(mode='median', threshold_factor=threshold_factor, axis=axis)
+            processor = MaskGenerator(mode='median', threshold_factor=threshold_factor, axis=axis)
         else:
-            proccessor = MaskGenerator_backend(mode='movmedian', threshold_factor=threshold_factor, axis=axis, window=window)
+            processor = MaskGenerator(mode='movmedian', threshold_factor=threshold_factor, axis=axis, window=window)
 
-        return proccessor
-
-class MaskGenerator_backend(DataProcessor):
-
-    r'''Processor to detect outliers and return mask with 0 where outliers were detected.
-        
-    :param mode: a method for detecting outliers (special_values, nan, inf, threshold, quantile, mean, median, movmean, movmedian)
-    :type mode: string, default=special_values
-    :param threshold_value: specify lower and upper boundaries if 'threshold' mode is selected
-    :type threshold_value: tuple
-    :param quantiles: specify lower and upper quantiles if 'quantile' mode is selected
-    :type quantiles: tuple
-    :param threshold_factor: scales detction threshold (standard deviation in case of 'mean', 'movmean' and median absolute deviation in case of 'median', movmedian')
-    :type threshold_factor: float, default=3
-    :param window: specify running window if 'movmean' or 'movmedian' mode is selected
-    :type window: int, default=5
-    :param axis: specify axis to alculate statistics for 'mean', 'median', 'movmean', 'movmean' modes
-    :type axis: string
-    :return: returns a DataContainer with boolean mask with 0 where outliers were detected
-    :rtype: DataContainer
-    '''
-    
-    '''             
-      - special_values    test element-wise for both inf and nan
-      - nan               test element-wise for nan
-      - inf               test element-wise for nan
-      - threshold         test element-wise if array values are within boundaries
-                          given by threshold_values = (float,float). 
-                          You can secify only lower threshold value by setting another to None
-                          such as threshold_values = (float,None), then
-                          upper boundary will be amax(data). Similarly, to specify only upper 
-                          boundary, use threshold_values = (None,float). If both threshold_values
-                          are set to None, then original array will be returned.
-      - quantile          test element-wise if array values are within boundaries
-                          given by quantiles = (q1,q2), 0<=q1,q2<=1. 
-                          You can secify only lower quantile value by setting another to None
-                          such as quantiles = (float,q2), then
-                          upper boundary will be amax(data). Similarly, to specify only upper 
-                          boundary, use quantiles = (None,q1). If both quantiles
-                          are set to None, then original array will be returned.
-      - mean              test element-wise if 
-                          abs(A - mean(A)) < threshold_factor * std(A).
-                          Default value of threshold_factor is 3. If no axis is specified, 
-                          then operates over flattened array. Alternatively operates along axis specified 
-                          as dimension_label.
-      - median            test element-wise if 
-                          abs(A - median(A)) < threshold_factor * scaled MAD(A),
-                          scaled median absolute deviation (MAD) is defined as 
-                          c*median(abs(A-median(A))) where c=-1/(sqrt(2)*erfcinv(3/2))
-                          Default value of threshold_factor is 3. If no axis is specified, 
-                          then operates over flattened array. Alternatively operates along axis specified 
-                          as dimension_label.
-      - movmean           the same as mean but uses rolling mean with a specified window,
-                          default window value is 5
-      - movmedian         the same as mean but uses rolling median with a specified window,
-                          default window value is 5
-
-      '''
+        return processor
 
     def __init__(self,
-                 mode = 'special_values',
-                 threshold_value = (None, None),
-                 quantiles = (None, None),
-                 threshold_factor = 3,
-                 window = 5,
-                 axis = None):
+                 mode='special_values',
+                 threshold_value=(None, None),
+                 quantiles=(None, None),
+                 threshold_factor=3,
+                 window=5,
+                 axis=None):
+        r'''Processor to detect outliers and return mask with 0 where outliers were detected.
+                
+            :param mode: a method for detecting outliers (special_values, nan, inf, threshold, quantile, mean, median, movmean, movmedian)
+            :type mode: string, default=special_values
+            :param threshold_value: specify lower and upper boundaries if 'threshold' mode is selected
+            :type threshold_value: tuple
+            :param quantiles: specify lower and upper quantiles if 'quantile' mode is selected
+            :type quantiles: tuple
+            :param threshold_factor: scales detction threshold (standard deviation in case of 'mean', 'movmean' and median absolute deviation in case of 'median', movmedian')
+            :type threshold_factor: float, default=3
+            :param window: specify running window if 'movmean' or 'movmedian' mode is selected
+            :type window: int, default=5
+            :param axis: specify axis to alculate statistics for 'mean', 'median', 'movmean', 'movmean' modes
+            :type axis: string
+            :return: returns a DataContainer with boolean mask with 0 where outliers were detected
+            :rtype: DataContainer
+            
+        - special_values    test element-wise for both inf and nan
+        - nan               test element-wise for nan
+        - inf               test element-wise for nan
+        - threshold         test element-wise if array values are within boundaries
+                            given by threshold_values = (float,float). 
+                            You can secify only lower threshold value by setting another to None
+                            such as threshold_values = (float,None), then
+                            upper boundary will be amax(data). Similarly, to specify only upper 
+                            boundary, use threshold_values = (None,float). If both threshold_values
+                            are set to None, then original array will be returned.
+        - quantile          test element-wise if array values are within boundaries
+                            given by quantiles = (q1,q2), 0<=q1,q2<=1. 
+                            You can secify only lower quantile value by setting another to None
+                            such as quantiles = (float,q2), then
+                            upper boundary will be amax(data). Similarly, to specify only upper 
+                            boundary, use quantiles = (None,q1). If both quantiles
+                            are set to None, then original array will be returned.
+        - mean              test element-wise if 
+                            abs(A - mean(A)) < threshold_factor * std(A).
+                            Default value of threshold_factor is 3. If no axis is specified, 
+                            then operates over flattened array. Alternatively operates along axis specified 
+                            as dimension_label.
+        - median            test element-wise if 
+                            abs(A - median(A)) < threshold_factor * scaled MAD(A),
+                            scaled median absolute deviation (MAD) is defined as 
+                            c*median(abs(A-median(A))) where c=-1/(sqrt(2)*erfcinv(3/2))
+                            Default value of threshold_factor is 3. If no axis is specified, 
+                            then operates over flattened array. Alternatively operates along axis specified 
+                            as dimension_label.
+        - movmean           the same as mean but uses rolling mean with a specified window,
+                            default window value is 5
+        - movmedian         the same as mean but uses rolling median with a specified window,
+                            default window value is 5
+
+        '''
 
         kwargs = {'mode': mode,
-                  'threshold_value': threshold_value,
-                  'threshold_factor': threshold_factor,
-                  'quantiles': quantiles,
-                  'window': window,
-                  'axis': axis}
+                'threshold_value': threshold_value,
+                'threshold_factor': threshold_factor,
+                'quantiles': quantiles,
+                'window': window,
+                'axis': axis}
 
-        super(MaskGenerator_backend, self).__init__(**kwargs)
-    
+        super(MaskGenerator, self).__init__(**kwargs)
+
     def check_input(self, data):
-        
+
         if not (issubclass(type(data), DataContainer)):
             raise TypeError('Processor supports only following data types:\n' +
                             ' - ImageData\n - AcquisitionData\n' +
                             ' - DataContainer')
-        if self.mode not in ['special_values', 'nan', 'inf', 'threshold', 'quantile',\
+        if self.mode not in ['special_values', 'nan', 'inf', 'threshold', 'quantile',
                              'mean', 'median', 'movmean', 'movmedian']:
-            raise Exception("Wrong mode. One of the following is expected:\n" + \
+            raise Exception("Wrong mode. One of the following is expected:\n" +
                             "special_values, nan, inf, threshold, \n quantile, mean, median, movmean, movmedian")
-        
-        if self.axis is not None:
-                
-            if self.axis not in data.dimension_labels:
-                raise Exception("Wrong label is specified for axis. " + \
-                    "Expected {}, got {}.".format(data.dimension_labels, self.axis))
 
-        return True 
+        if self.axis is not None:
+
+            if self.axis not in data.dimension_labels:
+                raise Exception("Wrong label is specified for axis. " +
+                                "Expected {}, got {}.".format(data.dimension_labels, self.axis))
+
+        return True
 
     def process(self):
 

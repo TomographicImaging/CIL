@@ -44,6 +44,7 @@ setup(
                                   'data/camera.png',
                                   'data/resolution_chart.tiff',
                                   'data/shapes.png',
+                                  'data/rainbow.png',
                                   'data/24737_fd_normalised.nxs'])],
 
 

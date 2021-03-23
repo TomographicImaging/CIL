@@ -66,6 +66,7 @@ class ROF_TV(Function):
             out = x.copy()
             out.fill(res)
         return out
+
 class FGP_TV(Function):
     def __init__(self,lambdaReg,iterationsTV,tolerance,methodTV,nonnegativity,printing,device):
         # set parameters
@@ -105,13 +106,11 @@ class FGP_TV(Function):
         return out
     
     def convex_conjugate(self,x):        
-        return 0.0
-    
+        return 0.0    
     
 class TGV(Function):
 
     def __init__(self, regularisation_parameter, alpha1, alpha2, iter_TGV, LipshitzConstant, torelance, device ):
-        
         self.regularisation_parameter = regularisation_parameter
         self.alpha1 = alpha1
         self.alpha2 = alpha2
@@ -120,12 +119,9 @@ class TGV(Function):
         self.torelance = torelance
         self.device = device
         
-    
     def __call__(self,x):
-        warnings.warn("{}: the __call__ method is not currently implemented. Returning 0.".format(self.__class__.__name__))
-        
-        # TODO this is not correct, need a TGV energy same as TV
-        return 0.0
+        warnings.warn("{}: the __call__ method is not implemented. Returning NaN.".format(self.__class__.__name__))
+        return float('NaN')
     
     def proximal(self, x, tau, out=None):
         
@@ -163,10 +159,7 @@ class TGV(Function):
         # TODO this is not correct
         return 0.0
 
-        
 class LLT_ROF(Function):
-    
-
     
     def __init__(self, regularisation_parameterROF, 
                        regularisation_parameterLLT,
@@ -180,10 +173,8 @@ class LLT_ROF(Function):
         self.device = device 
         
     def __call__(self,x):
-        warnings.warn("{}: the __call__ method is not currently implemented. Returning 0.".format(self.__class__.__name__))
-        
-        # TODO this is not correct, need a TGV energy same as TV
-        return 0.0        
+        warnings.warn("{}: the __call__ method is not implemented. Returning NaN.".format(self.__class__.__name__))
+        return float('NaN')
     
     def proximal(self, x, tau, out=None):
         
@@ -194,9 +185,7 @@ class LLT_ROF(Function):
                 'number_of_iterations' :self.iter_LLT_ROF ,\
                 'time_marching_parameter': self.time_marching_parameter,\
                 'tolerance_constant':self.torelance}
-        
-        
-        
+
         res , info = regularisers.LLT_ROF(pars['input'], 
               pars['regularisation_parameterROF'],
               pars['regularisation_parameterLLT'],
@@ -210,7 +199,6 @@ class LLT_ROF(Function):
   
         self.info = info
         
-
 class FGP_dTV(Function):
     def __init__(self, refdata, regularisation_parameter, iterations,
                  tolerance, eta_const, methodTV, nonneg, device='cpu'):
@@ -225,9 +213,9 @@ class FGP_dTV(Function):
         self.eta = eta_const
         
     def __call__(self,x):
-        # evaluate objective function of TV gradient
-        EnergyValTV = TV_ENERGY(np.asarray(x.as_array(), dtype=np.float32), np.asarray(x.as_array(), dtype=np.float32), self.lambdaReg, 2)
-        return 0.5*EnergyValTV[0]
+        warnings.warn("{}: the __call__ method is not implemented. Returning NaN.".format(self.__class__.__name__))
+        return float('NaN')
+
     def proximal(self,x,tau, out=None):
         pars = {'algorithm' : FGP_dTV, \
                'input' : np.asarray(x.as_array(), dtype=np.float32),\
@@ -260,8 +248,6 @@ class FGP_dTV(Function):
         # TODO this is not correct
         return 0.0    
     
-       
-    
 class SB_TV(Function):
     def __init__(self,lambdaReg,iterationsTV,tolerance,methodTV,printing,device):
         # set parameters
@@ -272,8 +258,7 @@ class SB_TV(Function):
         self.printing = printing
         self.device = device # string for 'cpu' or 'gpu'
         
-    def __call__(self,x):
-        
+    def __call__(self,x):     
         # evaluate objective function of TV gradient
         EnergyValTV = TV_ENERGY(np.asarray(x.as_array(), dtype=np.float32), np.asarray(x.as_array(), dtype=np.float32), self.lambdaReg, 2)
         return 0.5*EnergyValTV[0]
@@ -301,8 +286,6 @@ class SB_TV(Function):
             out.fill(res)
             return out
 
-
-
 class TNV(Function):
     
     def __init__(self,regularisation_parameter,iterationsTNV,tolerance):
@@ -311,12 +294,10 @@ class TNV(Function):
         self.regularisation_parameter = regularisation_parameter
         self.iterationsTNV = iterationsTNV
         self.tolerance = tolerance
-
         
     def __call__(self,x):
-        warnings.warn("{}: the __call__ method is not currently implemented. Returning 0.".format(self.__class__.__name__))
-        # evaluate objective function of TV gradient
-        return 0.0
+        warnings.warn("{}: the __call__ method is not implemented. Returning NaN.".format(self.__class__.__name__))
+        return float('NaN')
     
     def proximal(self,x,tau, out=None):
         pars = {'algorithm' : TNV, \
@@ -338,4 +319,3 @@ class TNV(Function):
             out = x.copy()
             out.fill(res)
             return out
-

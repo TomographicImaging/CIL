@@ -609,7 +609,7 @@ class TestMaskGenerator(unittest.TestCase):
         data.as_array()[4,5] = float('nan')
         
         # check special values - default
-        m = MaskGenerator()
+        m = MaskGenerator.special_values()
         m.set_input(data)
         mask = m.process()
         
@@ -620,7 +620,7 @@ class TestMaskGenerator(unittest.TestCase):
         numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
         
         # check nan
-        m = MaskGenerator(mode='nan')
+        m = MaskGenerator.special_values(inf=False)
         m.set_input(data)
         mask = m.process()
         
@@ -630,7 +630,7 @@ class TestMaskGenerator(unittest.TestCase):
         numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
         
         # check inf
-        m = MaskGenerator(mode='inf')
+        m = MaskGenerator.special_values(nan=False)
         m.set_input(data)
         mask = m.process()
         
@@ -644,7 +644,7 @@ class TestMaskGenerator(unittest.TestCase):
         data.as_array()[6,8] = 100
         data.as_array()[1,3] = 80
         
-        m = MaskGenerator(mode='threshold', threshold_value=(None, 70))
+        m = MaskGenerator.threshold(None, 70)
         m.set_input(data)
         mask = m.process()
         
@@ -654,7 +654,7 @@ class TestMaskGenerator(unittest.TestCase):
         
         numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
         
-        m = MaskGenerator(mode='threshold', threshold_value=(None, 80))
+        m = MaskGenerator.threshold(None, 80)
         m.set_input(data)
         mask = m.process()
         
@@ -668,7 +668,7 @@ class TestMaskGenerator(unittest.TestCase):
         data.as_array()[6,8] = 100
         data.as_array()[1,3] = 80
         
-        m = MaskGenerator(mode='quantile', quantiles=(None, 0.98))
+        m = MaskGenerator.quantile(None, 0.98)
         m.set_input(data)
         mask = m.process()
         
@@ -678,7 +678,7 @@ class TestMaskGenerator(unittest.TestCase):
         
         numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
         
-        m = MaskGenerator(mode='quantile', quantiles=(None, 0.99))
+        m = MaskGenerator.quantile(None, 0.99)
         m.set_input(data)
         mask = m.process()
         
@@ -696,7 +696,7 @@ class TestMaskGenerator(unittest.TestCase):
         data.fill(numpy.random.rand(200,200))
         data.as_array()[7,4] += 10 * numpy.std(data.as_array()[7,:])
         
-        m = MaskGenerator(mode='mean', axis='horizontal_x')
+        m = MaskGenerator.mean(axis='horizontal_x')
         m.set_input(data)
         mask = m.process()
         
@@ -705,7 +705,7 @@ class TestMaskGenerator(unittest.TestCase):
         
         numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
         
-        m = MaskGenerator(mode='mean')
+        m = MaskGenerator.mean(window=5)
         m.set_input(data)
         mask = m.process()
         
@@ -715,7 +715,7 @@ class TestMaskGenerator(unittest.TestCase):
         numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
         
         # check median
-        m = MaskGenerator(mode='median', axis='horizontal_x')
+        m = MaskGenerator.median(axis='horizontal_x')
         m.set_input(data)
         mask = m.process()
         
@@ -724,7 +724,7 @@ class TestMaskGenerator(unittest.TestCase):
         
         numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
         
-        m = MaskGenerator(mode='median')
+        m = MaskGenerator.median()
         m.set_input(data)
         mask = m.process()
         
@@ -733,7 +733,7 @@ class TestMaskGenerator(unittest.TestCase):
         numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
         
         # check movmean
-        m = MaskGenerator(mode='movmean', window=10)
+        m = MaskGenerator.mean(window=10)
         m.set_input(data)
         mask = m.process()
         
@@ -742,7 +742,7 @@ class TestMaskGenerator(unittest.TestCase):
         numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
         
         #
-        m = MaskGenerator(mode='movmean', window=20, axis='horizontal_y')
+        m = MaskGenerator.mean(window=20, axis='horizontal_y')
         m.set_input(data)
         mask = m.process()
         
@@ -750,7 +750,7 @@ class TestMaskGenerator(unittest.TestCase):
         mask_manual[7,4] = 0
         numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
         
-        m = MaskGenerator(mode='movmean', window=10, threshold_factor=10)
+        m = MaskGenerator.mean(window=10, threshold_factor=10)
         m.set_input(data)
         mask = m.process()
         
@@ -758,7 +758,7 @@ class TestMaskGenerator(unittest.TestCase):
         numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
         
         # check movmedian
-        m = MaskGenerator(mode='movmedian', window=20)
+        m = MaskGenerator.median(window=20)
         m.set_input(data)
         mask = m.process()
         
@@ -767,7 +767,7 @@ class TestMaskGenerator(unittest.TestCase):
         numpy.testing.assert_allclose(mask.as_array(), mask_manual, rtol=1E-6)
         
         # check movmedian
-        m = MaskGenerator(mode='movmedian', window=40)
+        m = MaskGenerator.median(window=40)
         m.set_input(data)
         mask = m.process()
         

@@ -387,5 +387,37 @@ class Gradient_C(LinearOperator):
 
         if return_val is True:
             return out
-
-       
+        
+class DecomposeGradientOperator(LinearOperator):
+    
+    def __init__(self, domain, method = 'forward', bnd_cond = 'Neumann', **kwargs):
+              
+        self.operator = GradientOperator(domain, method = method, bnd_cond = bnd_cond, **kwargs)
+        new_range = BlockGeometry(domain, BlockGeometry(domain, domain, domain))    
+        
+        super(DecomposeGradientOperator, self).__init__(domain_geometry=self.operator.domain_geometry(), 
+                                       range_geometry=new_range)
+                                
+    def direct(self, x, out=None): 
+                    
+        if out is None:
+            tmp_out = self.operator.direct(x)
+        else:
+            tmp_out = BlockDataContainer(out[0], out[1][0], out[1][1], out[1][2])
+            self.operator.direct(x, out = tmp_out)
+                
+        tmp1 = tmp_out.containers[0]
+        tmp2 = BlockDataContainer(*tmp_out.containers[1:])
+        tmp_block = BlockDataContainer(tmp1, BlockDataContainer(*tmp2))
+        
+        return tmp_block
+    
+    def adjoint(self, x, out = None):
+        
+        tmp_x = BlockDataContainer(x[0], x[1][0], x[1][1], x[1][2])
+        
+        if out is None:
+            out = self.operator.adjoint(tmp_x)
+            return out 
+        else:
+            self.operator.adjoint(tmp_x, out=out)               

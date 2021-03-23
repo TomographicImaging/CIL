@@ -20,8 +20,100 @@ import warnings
 import numpy
 from scipy import special, ndimage
 
+class MaskGenerator(object):
+    """
+    This class contains factory methods to create a MaskGenerator object using the desired algorithm.
+    """
+    @staticmethod
+    def special_values(nan=True, inf=True):
+        r'''This creates a MaskGenerator processor which generates a mask for inf and/or nan values.
 
-class MaskGenerator(DataProcessor):
+        :param nan: mask NaN values
+        :type nan: bool, default=True
+        :param inf: mask INF values
+        :type inf: bool, default=True
+
+        '''
+        if nan is True:
+            if inf is True:
+                proccessor = MaskGenerator_backend(mode='special_values')
+            else:
+                proccessor = MaskGenerator_backend(mode='nan')
+        else:
+            if inf is True:
+                proccessor = MaskGenerator_backend(mode='inf')
+            else:
+                raise ValueError("Please specify at least one type of value to threshold on")
+
+        return proccessor
+
+    @staticmethod
+    def threshold(min_val=None, max_val=None):
+        r'''This creates a MaskGenerator processor which generates a mask for values outside boundaries
+
+        :param min_val: lower boundary
+        :type min_val: float, default=None
+        :param max_val: upper boundary
+        :type max_val: float, default=None
+        '''
+        proccessor = MaskGenerator_backend(mode='threshold', threshold_value=(min_val,max_val))
+        return proccessor
+
+    @staticmethod
+    def quantile(min_quantile=None, max_quantile=None):
+        r'''This creates a MaskGenerator processor which generates a mask for values outside boundaries
+
+        :param min_quantile: lower quantile, 0-1
+        :type min_quantile: float, default=None
+        :param max_quantile: upper quantile, 0-1
+        :type max_quantile: float, default=None
+        '''
+        proccessor = MaskGenerator_backend(mode='quantile', quantiles=(min_quantile,max_quantile))
+        return proccessor
+
+    @staticmethod
+    def mean(axis=None, threshold_factor=3, window=None):
+        r'''This creates a MaskGenerator processor which generates a mask for values outside a multiple of standard-devaiations from the mean.
+
+        abs(A - mean(A)) < threshold_factor * std(A).
+        
+        :param threshold_factor: scale factor of standard-deviations to use as threshold
+        :type threshold_factor: float, default=3
+        :param axis: specify axis from 'dimension_labels' to calculate mean. If no axis is specified then operates over flattened array.
+        :type axis: string
+        :param window: specify number of pixels to use in calculation of a rolling mean
+        :type window: int, default=None
+        '''
+        if window == None:
+            proccessor = MaskGenerator_backend(mode='mean', threshold_factor=threshold_factor, axis=axis)
+        else:
+            proccessor = MaskGenerator_backend(mode='movmean', threshold_factor=threshold_factor, axis=axis, window=window)
+
+        return proccessor
+
+    @staticmethod
+    def median(axis=None, threshold_factor=3, window=None):
+        r'''This creates a MaskGenerator processor which generates a mask for values outside a multiple of median absolute deviation (MAD) from the mean.
+
+        abs(A - median(A)) < threshold_factor * MAD(A),
+        MAD = c*median(abs(A-median(A))) where c=-1/(sqrt(2)*erfcinv(3/2))
+
+        :param threshold_factor: scale factor of MAD to use as threshold
+        :type threshold_factor: float, default=3        
+        :param axis: specify axis from 'dimension_labels' to calculate median. If no axis is specified then operates over flattened array.
+        :type axis: string
+        :param window: specify number of pixels to use in calculation of a rolling median
+        :type window: int, default=None
+        '''
+
+        if window == None:
+            proccessor = MaskGenerator_backend(mode='median', threshold_factor=threshold_factor, axis=axis)
+        else:
+            proccessor = MaskGenerator_backend(mode='movmedian', threshold_factor=threshold_factor, axis=axis, window=window)
+
+        return proccessor
+
+class MaskGenerator_backend(DataProcessor):
 
     r'''Processor to detect outliers and return mask with 0 where outliers were detected.
         
@@ -41,7 +133,6 @@ class MaskGenerator(DataProcessor):
     :rtype: DataContainer
     '''
     
-
     '''             
       - special_values    test element-wise for both inf and nan
       - nan               test element-wise for nan
@@ -94,7 +185,7 @@ class MaskGenerator(DataProcessor):
                   'window': window,
                   'axis': axis}
 
-        super(MaskGenerator, self).__init__(**kwargs)
+        super(MaskGenerator_backend, self).__init__(**kwargs)
     
     def check_input(self, data):
         

@@ -1962,7 +1962,7 @@ class DataContainer(object):
             new_order[i] = self.dimension_labels.index(axis)
             dimension_labels_new[i] = axis
 
-        self.array = numpy.transpose(self.array, new_order)
+        self.array = numpy.ascontiguousarray(numpy.transpose(self.array, new_order))
 
         if self.geometry is None:
             self.dimension_labels = dimension_labels_new

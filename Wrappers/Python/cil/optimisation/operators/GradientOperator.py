@@ -355,9 +355,9 @@ class Gradient_C(LinearOperator):
         args = arg1 + arg2 + [self.bnd_cond, 1, self.num_threads]
         self.fd(x_p, *args)
 
-        for el in self.voxel_size_order:
+        for i, el in enumerate(self.voxel_size_order):
             if el != 1:
-                ndout[i]/el
+                ndout[i]/=el
 
         #fill back out in corerct (non-traivial) order
         if self.split is False:
@@ -382,8 +382,8 @@ class Gradient_C(LinearOperator):
         if out is None:
             out = self.gm_domain.allocate(None)
             return_val = True
-        ndout = out.as_array()
-        
+
+        ndout = np.asarray(out.as_array(), dtype=np.float32, order='C')          
         out_p = Gradient_C.ndarray_as_c_pointer(ndout)
         
         if self.split is False:
@@ -393,9 +393,9 @@ class Gradient_C(LinearOperator):
             ndx = [el.as_array() for el in x.get_item(1).containers]
             ndx.insert(ind, x.get_item(0).as_array()) 
 
-        for el in self.voxel_size_order:
+        for i, el in enumerate(self.voxel_size_order):
             if el != 1:
-                ndx[i]/el
+                ndx[i]/=el
 
         arg1 = [Gradient_C.ndarray_as_c_pointer(ndx[i]) for i in range(self.ndim)]
         arg2 = [el for el in out.shape]

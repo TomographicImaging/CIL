@@ -404,5 +404,10 @@ class Gradient_C(LinearOperator):
         self.fd(out_p, *args)
         out.fill(ndout)
 
+        #reset input data
+        for i, el in enumerate(self.voxel_size_order):
+            if el != 1:
+                ndx[i]*= el
+                
         if return_val is True:
             return out

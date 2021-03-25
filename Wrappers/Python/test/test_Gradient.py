@@ -242,9 +242,37 @@ class TestGradientOperator(unittest.TestCase):
         ny, nx, nz = 3, 4, 5
         ig = ImageGeometry(voxel_num_y = ny, voxel_num_x = nx, voxel_size_x=0.1, voxel_size_y=0.5) 
             
+
         GD_C = GradientOperator(ig, backend = 'c')
         GD_numpy = GradientOperator(ig, backend = 'numpy')
-                       
+
+        id = ig.allocate('random')
+        direct_c = GD_C.direct(id)
+        direct_numpy = GD_numpy.direct(id)
+        numpy.testing.assert_allclose(direct_c[0].array, direct_numpy[0].array, atol=0.1) 
+        numpy.testing.assert_allclose(direct_c[1].array, direct_numpy[1].array, atol=0.1) 
+
+        direct_c *=0
+        direct_numpy *=0
+        GD_C.direct(id, out=direct_c)
+        GD_numpy.direct(id, out=direct_numpy)
+        numpy.testing.assert_allclose(direct_c[0].array, direct_numpy[0].array, atol=0.1) 
+        numpy.testing.assert_allclose(direct_c[1].array, direct_numpy[1].array, atol=0.1) 
+
+        adjoint_c = GD_C.adjoint(direct_c)
+        adjoint_numpy = GD_numpy.adjoint(direct_numpy)
+        numpy.testing.assert_allclose(adjoint_c.array, adjoint_numpy.array, atol=0.1) 
+        numpy.testing.assert_allclose(adjoint_c.array, adjoint_numpy.array, atol=0.1) 
+
+        adjoint_c *=0
+        adjoint_numpy *=0
+        GD_C.adjoint(direct_c, out=adjoint_c)
+        GD_numpy.adjoint(direct_numpy, out=adjoint_numpy)
+        numpy.testing.assert_allclose(adjoint_c.array, adjoint_numpy.array, atol=0.1) 
+        numpy.testing.assert_allclose(adjoint_c.array, adjoint_numpy.array, atol=0.1) 
+
+
+        
         print("Check Gradient_C, Gradient_numpy norms")
         Gradient_C_norm = GD_C.norm()
         Gradient_numpy_norm = GD_numpy.norm()   

@@ -50,8 +50,8 @@ class GradientOperator(LinearOperator):
           'c' or 'numpy', defaults to 'c' if correlation is 'SpaceChannels' or channels = 1
         * *num_threads* (``int``) --
           If backend is 'c' specify the number of threads to use. Default is number of cpus/2          
-        * *split* (``boolian``) --
-          If 'True' will return a BlockDataContainer with grouped spatial domains. i.e. [Channel, [Z, Y, X]], otherwise [Channel, Z, Y, X]
+        * *split* (``boolean``) --
+          If 'True', and backend 'C' will return a BlockDataContainer with grouped spatial domains. i.e. [Channel, [Z, Y, X]], otherwise [Channel, Z, Y, X]
                                
         Example (2D): 
         .. math::

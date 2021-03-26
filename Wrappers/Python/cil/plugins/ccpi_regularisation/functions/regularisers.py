@@ -66,36 +66,40 @@ class ROF_TV(Function):
             out = x.copy()
             out.fill(res)
         return out
+
 class FGP_TV(Function):
-    def __init__(self,lambdaReg,iterationsTV,tolerance,methodTV,nonnegativity,printing,device):
-        # set parameters
-        self.lambdaReg = lambdaReg
-        self.iterationsTV = iterationsTV
+    def __init__(self, alpha=1, max_iteration=100, tolerance=1e-6, isotropic=True, nonnegativity=True, printing=False, device='cpu'):
+
+        if isotropic == True:
+            self.methodTV = 0
+        else:
+            self.methodTV = 1
+
+        if nonnegativity == True:
+            self.nonnegativity = 1
+        else:
+            self.nonnegativity = 0
+
+        self.alpha = alpha
+        self.max_iteration = max_iteration
         self.tolerance = tolerance
-        self.methodTV = methodTV
         self.nonnegativity = nonnegativity
-        self.printing = printing
         self.device = device # string for 'cpu' or 'gpu'
+
     def __call__(self,x):
         # evaluate objective function of TV gradient
-        EnergyValTV = TV_ENERGY(np.asarray(x.as_array(), dtype=np.float32), np.asarray(x.as_array(), dtype=np.float32), self.lambdaReg, 2)
+        EnergyValTV = TV_ENERGY(np.asarray(x.as_array(), dtype=np.float32), np.asarray(x.as_array(), dtype=np.float32), self.alpha, 2)
         return 0.5*EnergyValTV[0]
+
     def proximal(self,x,tau, out=None):
-        pars = {'algorithm' : FGP_TV, \
-               'input' : np.asarray(x.as_array(), dtype=np.float32),\
-                'regularization_parameter':self.lambdaReg*tau, \
-                'number_of_iterations' :self.iterationsTV ,\
-                'tolerance_constant':self.tolerance,\
-                'methodTV': self.methodTV ,\
-                'nonneg': self.nonnegativity ,\
-                'printingOut': self.printing}
-        
-        res , info = regularisers.FGP_TV(pars['input'], 
-              pars['regularization_parameter'],
-              pars['number_of_iterations'],
-              pars['tolerance_constant'], 
-              pars['methodTV'],
-              pars['nonneg'],
+      
+        res , info = regularisers.FGP_TV(\
+              np.asarray(x.as_array(), dtype=np.float32),\
+              self.alpha*tau,\
+              self.max_iteration,\
+              self.tolerance,\
+              self.methodTV,\
+              self.nonnegativity,\
               self.device)
         if out is not None:
             out.fill(res)
@@ -210,45 +214,43 @@ class LLT_ROF(Function):
   
         self.info = info
         
-
 class FGP_dTV(Function):
-    def __init__(self, refdata, regularisation_parameter, iterations,
-                 tolerance, eta_const, methodTV, nonneg, device='cpu'):
-        # set parameters
-        self.lambdaReg = regularisation_parameter
-        self.iterationsTV = iterations
+    def __init__(self, reference, alpha=1, max_iteration=100,
+                 tolerance=1e-6, eta=0.01, isotropic=True, nonnegativity=True, device='cpu'):
+
+        if isotropic == True:
+            self.methodTV = 0
+        else:
+            self.methodTV = 1
+
+        if nonnegativity == True:
+            self.nonnegativity = 1
+        else:
+            self.nonnegativity = 0
+
+        self.alpha = alpha
+        self.max_iteration = max_iteration
         self.tolerance = tolerance
-        self.methodTV = methodTV
-        self.nonnegativity = nonneg
         self.device = device # string for 'cpu' or 'gpu'
-        self.refData = np.asarray(refdata.as_array(), dtype=np.float32)
-        self.eta = eta_const
+        self.reference = np.asarray(reference.as_array(), dtype=np.float32)
+        self.eta = eta
         
     def __call__(self,x):
         # evaluate objective function of TV gradient
-        EnergyValTV = TV_ENERGY(np.asarray(x.as_array(), dtype=np.float32), np.asarray(x.as_array(), dtype=np.float32), self.lambdaReg, 2)
+        EnergyValTV = TV_ENERGY(np.asarray(x.as_array(), dtype=np.float32), np.asarray(x.as_array(), dtype=np.float32), self.alpha, 2)
         return 0.5*EnergyValTV[0]
+
     def proximal(self,x,tau, out=None):
-        pars = {'algorithm' : FGP_dTV, \
-               'input' : np.asarray(x.as_array(), dtype=np.float32),\
-                'regularization_parameter':self.lambdaReg*tau, \
-                'number_of_iterations' :self.iterationsTV ,\
-                'tolerance_constant':self.tolerance,\
-                'methodTV': self.methodTV ,\
-                'nonneg': self.nonnegativity ,\
-                'eta_const' : self.eta,\
-                'refdata':self.refData}
-       #inputData, refdata, regularisation_parameter, iterations,
-       #              tolerance_param, eta_const, methodTV, nonneg, device='cpu' 
-        res , info = regularisers.FGP_dTV(pars['input'],
-              pars['refdata'], 
-              pars['regularization_parameter'],
-              pars['number_of_iterations'],
-              pars['tolerance_constant'],
-              pars['eta_const'], 
-              pars['methodTV'],
-              pars['nonneg'],
-              self.device)
+        res , info = regularisers.FGP_dTV(\
+                np.asarray(x.as_array(), dtype=np.float32),\
+                self.reference,\
+                self.alpha*tau,\
+                self.max_iteration,\
+                self.tolerance,\
+                self.eta,\
+                self.methodTV,\
+                self.nonnegativity,\
+                self.device)
         if out is not None:
             out.fill(res)
         else:

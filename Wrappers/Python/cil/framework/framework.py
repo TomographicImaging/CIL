@@ -234,8 +234,8 @@ class ImageGeometry(object):
 
     def get_order_by_label(self, dimension_labels, default_dimension_labels):
         order = []
-        for i, el in enumerate(dimension_labels):
-            for j, ek in enumerate(default_dimension_labels):
+        for i, el in enumerate(default_dimension_labels):
+            for j, ek in enumerate(dimension_labels):
                 if el == ek:
                     order.append(j)
                     break
@@ -1660,8 +1660,8 @@ class AcquisitionGeometry(object):
 
     def get_order_by_label(self, dimension_labels, default_dimension_labels):
         order = []
-        for i, el in enumerate(dimension_labels):
-            for j, ek in enumerate(default_dimension_labels):
+        for i, el in enumerate(default_dimension_labels):
+            for j, ek in enumerate(dimension_labels):
                 if el == ek:
                     order.append(j)
                     break

@@ -31,7 +31,7 @@ from cil.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 
 from cil.io import NEXUSDataReader
 from cil.processors import CentreOfRotationCorrector, CofR_xcorr, TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
-from cil.processors import Slicer, Binner, MaskGenerator
+from cil.processors import Slicer, Binner, MaskGenerator, Masker
 
 import wget
 import os
@@ -864,6 +864,83 @@ class TestAbsorptionTransmissionConverter(unittest.TestCase):
         
         self.assertTrue(ad.geometry == AG)
         numpy.testing.assert_allclose(data_exp.as_array(), ad.as_array(), rtol=1E-6)       
+
+
+class TestMasker(unittest.TestCase):       
+
+    def test_Masker(self): 
+        IG = ImageGeometry(voxel_num_x=10,
+                        voxel_num_y=10)
+        
+        data_init = IG.allocate('random')
+        
+        data = data_init.copy()
+        
+        data.as_array()[2,3] = float('inf')
+        data.as_array()[4,5] = float('nan')
+        
+        mask_manual = numpy.ones((10,10), dtype=numpy.bool)
+        mask_manual[2,3] = 0
+        mask_manual[4,5] = 0
+        
+        mask = DataContainer(mask_manual, dimension_labels=data.dimension_labels) 
+        
+        m = Masker.value(mask=mask, value=10)
+        m.set_input(data)
+        res = m.process()
+        
+        data_test = data.copy().as_array()
+        data_test[2,3] = 10
+        data_test[4,5] = 10
+        
+        numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)     
+        
+        m = Masker.mean(mask=mask)
+        m.set_input(data)
+        res = m.process()
+        
+        data_test = data.copy().as_array()
+        tmp = numpy.sum(data_init.as_array())-(data_init.as_array()[2,3]+data_init.as_array()[4,5])
+        tmp /= 98
+        data_test[2,3] = tmp
+        data_test[4,5] = tmp
+        
+        numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)  
+        
+        m = Masker.median(mask=mask)
+        m.set_input(data)
+        res = m.process()
+        
+        data_test = data.copy().as_array()
+        tmp = data.as_array()[numpy.isfinite(data.as_array())]
+        data_test[2,3] = numpy.median(tmp)
+        data_test[4,5] = numpy.median(tmp)
+        
+        numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)
+        
+        m = Masker.median(mask=mask, axis=0)
+        m.set_input(data)
+        res = m.process()
+        
+        data_test = data.copy().as_array()
+        tmp1 = data.as_array()[2,:][numpy.isfinite(data.as_array()[2,:])]
+        tmp2 = data.as_array()[4,:][numpy.isfinite(data.as_array()[4,:])]
+        data_test[2,3] = numpy.median(tmp1)
+        data_test[4,5] = numpy.median(tmp2)
+        
+        numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6) 
+        
+        m = Masker.mean(mask=mask, axis=data.dimension_labels[1])
+        m.set_input(data)
+        res = m.process()
+        
+        data_test = data.copy().as_array()
+        tmp1 = data.as_array()[:,3][numpy.isfinite(data.as_array()[:,3])]
+        tmp2 = data.as_array()[:,5][numpy.isfinite(data.as_array()[:,5])]
+        data_test[2,3] = numpy.sum(tmp1) / 9
+        data_test[4,5] = numpy.sum(tmp2) / 9
+        
+        numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6) 
 
         
 if __name__ == "__main__":

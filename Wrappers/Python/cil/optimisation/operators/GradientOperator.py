@@ -39,6 +39,9 @@ class GradientOperator(LinearOperator):
     :type gm_domain: `ImageGeometry`
     :param bnd_cond: Set the boundary conditions to use 'Neumann' or 'Periodic', defaults to 'Neumann'
     :type bnd_cond: str, optional    
+    :return: returns a BlockDataContainer containing images of the derivatives order given by `dimension_labels`\
+        i.e. ['horizontal_y','horizontal_x'] will return [d('horizontal_y'), d('horizontal_x')]
+    :rtype: BlockDataContainer
     
     :param \**kwargs:
         See below
@@ -95,6 +98,7 @@ class GradientOperator(LinearOperator):
         self.gm_range = self.range_geometry()
         self.gm_domain = self.domain_geometry()
 
+
     def direct(self, x, out=None):
         """Computes the first-order forward differences
 
@@ -140,78 +144,48 @@ class Gradient_numpy(LinearOperator):
         # Call FiniteDiff operator 
         self.method = method
         self.FD = FiniteDifferenceOperator(domain_geometry, direction = 0, method = self.method, bnd_cond = self.bnd_cond)
-                
-        if self.correlation==CORRELATION_SPACE:
-            
-            if domain_geometry.channels > 1:
-                
-                range_geometry = BlockGeometry(*[domain_geometry for _ in range(domain_geometry.length-1)] )
+        
+        self.ndim = len(domain_geometry.shape)
+        self.ind = list(range(self.ndim))
 
-                if self.size_dom_gm == 4:
-                    # 3D + Channel
-                    expected_order = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+        if self.correlation==CORRELATION_SPACE and 'channel' in domain_geometry.dimension_labels:
+            self.ndim -= 1
+            self.ind.remove(domain_geometry.dimension_labels.index('channel'))
 
-                else:
-                    # 2D + Channel
-                    expected_order = [ImageGeometry.CHANNEL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+        range_geometry = BlockGeometry(*[domain_geometry for _ in range(self.ndim) ] )
 
-                order = domain_geometry.get_order_by_label(domain_geometry.dimension_labels, expected_order)
-                
-                self.ind = order[1:]
-                
-            else:
-                # no channel info
-                range_geometry = BlockGeometry(*[domain_geometry for _ in range(domain_geometry.length) ] )
-                if self.size_dom_gm == 3:
-                    # 3D
-                    expected_order = [ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
-#                    self.voxel_size_order = [domain_geometry.voxel_size_z, domain_geometry.voxel_size_y, domain_geometry.voxel_size_x ]                    
-                    
-                else:
-                    # 2D
-                    expected_order = [ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]    
+        #get voxel spacing, if not use 1s
+        try:
+            self.voxel_size_order = list(domain_geometry.spacing)
+        except:
+            self.voxel_size_order = [1]*len(domain_geometry.shape)
 
-                self.ind = domain_geometry.get_order_by_label(domain_geometry.dimension_labels, expected_order)
-                
-        elif self.correlation==CORRELATION_SPACECHANNEL:
-            
-            if domain_geometry.channels > 1:
-                range_geometry = BlockGeometry(*[domain_geometry for _ in range(domain_geometry.length)])
-                self.ind = range(domain_geometry.length)                
-            else:
-                raise ValueError('No channels to correlate')
-                
-        self.voxel_size_order = domain_geometry.spacing                
-         
         super(Gradient_numpy, self).__init__(domain_geometry = domain_geometry, 
                                              range_geometry = range_geometry) 
         
         print("Initialised GradientOperator with numpy backend")               
         
-    def direct(self, x, out=None):        
-                
-         if out is not None:
-            
-             for i in range(self.range_geometry().shape[0]):
-                 self.FD.direction = self.ind[i]
-                 self.FD.voxel_size = self.voxel_size_order[i]
+    def direct(self, x, out=None):              
+         if out is not None:  
+             for i, axis_index in enumerate(self.ind):
+                 self.FD.direction = axis_index
+                 self.FD.voxel_size = self.voxel_size_order[axis_index]
                  self.FD.direct(x, out = out[i])
          else:
              tmp = self.range_geometry().allocate()        
-             for i in range(tmp.shape[0]):
-                 self.FD.direction = self.ind[i]
-                 self.FD.voxel_size = self.voxel_size_order[i]
+             for i, axis_index in enumerate(self.ind):
+                 self.FD.direction = axis_index
+                 self.FD.voxel_size = self.voxel_size_order[axis_index]
                  tmp.get_item(i).fill(self.FD.direct(x))
              return tmp    
         
     def adjoint(self, x, out=None):
 
         if out is not None:
-
             tmp = self.domain_geometry().allocate()            
-            for i in range(x.shape[0]):
-                self.FD.direction=self.ind[i] 
-                self.FD.voxel_size = self.voxel_size_order[i]
+            for i, axis_index in enumerate(self.ind):
+                self.FD.direction = axis_index
+                self.FD.voxel_size = self.voxel_size_order[axis_index]
                 self.FD.adjoint(x.get_item(i), out = tmp)
                 if i == 0:
                     out.fill(tmp)
@@ -219,9 +193,9 @@ class Gradient_numpy(LinearOperator):
                     out += tmp
         else:            
             tmp = self.domain_geometry().allocate()
-            for i in range(x.shape[0]):
-                self.FD.direction=self.ind[i]
-                self.FD.voxel_size = self.voxel_size_order[i]
+            for i, axis_index in enumerate(self.ind):
+                self.FD.direction = axis_index
+                self.FD.voxel_size = self.voxel_size_order[axis_index]
                 tmp += self.FD.adjoint(x.get_item(i))
             return tmp    
 

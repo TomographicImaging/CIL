@@ -163,6 +163,27 @@ class TestGradientOperator(unittest.TestCase):
         #print("GradientOperator, 4D, bnd_cond='Periodic', adjoint")
         numpy.testing.assert_array_equal(out_adjoint.as_array(), gold_adjoint.as_array())
 
+
+        #reordered
+        data.reorder(['vertical','horizontal_x','channel','horizontal_y'])
+        grad_py = GradientOperator(data.geometry, bnd_cond='Neumann', correlation='SpaceChannels', backend='numpy')
+        gold_direct = grad_py.direct(data)
+        gold_adjoint = grad_py.adjoint(gold_direct)
+
+        grad_c = GradientOperator(data.geometry, bnd_cond='Neumann', correlation='SpaceChannels', backend='c')
+        out_direct = grad_c.direct(data)
+        out_adjoint = grad_c.adjoint(out_direct)
+
+        #print("GradientOperator, 4D, bnd_cond='Neumann', direct")
+        numpy.testing.assert_array_equal(out_direct.get_item(0).as_array(), gold_direct.get_item(0).as_array())
+        numpy.testing.assert_array_equal(out_direct.get_item(1).as_array(), gold_direct.get_item(1).as_array())
+        numpy.testing.assert_array_equal(out_direct.get_item(2).as_array(), gold_direct.get_item(2).as_array())
+        numpy.testing.assert_array_equal(out_direct.get_item(3).as_array(), gold_direct.get_item(3).as_array())
+
+        #print("GradientOperator, 4D, bnd_cond='Neumann', adjoint")
+        numpy.testing.assert_array_equal(out_adjoint.as_array(), gold_adjoint.as_array())
+
+
     def test_GradientOperator_4D_allocate(self):
 
         nc, nz, ny, nx = 3, 4, 5, 6

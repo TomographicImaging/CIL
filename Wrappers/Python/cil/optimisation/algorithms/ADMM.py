@@ -109,7 +109,6 @@ class LADMM(Algorithm):
         self.tmp_dir -= self.z          
         self.operator.adjoint(self.tmp_dir, out = self.tmp_adj)          
         
-        # TODO replace with axpby (doesn'twork)
         self.tmp_adj *= -(self.tau/self.sigma)
         self.x += self.tmp_adj     
         # apply proximal of f        

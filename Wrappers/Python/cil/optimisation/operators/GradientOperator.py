@@ -50,8 +50,9 @@ class GradientOperator(LinearOperator):
           'c' or 'numpy', defaults to 'c' if correlation is 'SpaceChannels' or channels = 1
         * *num_threads* (``int``) --
           If backend is 'c' specify the number of threads to use. Default is number of cpus/2          
-                 
-                 
+        * *split* (``boolean``) --
+          If 'True', and backend 'C' will return a BlockDataContainer with grouped spatial domains. i.e. [Channel, [Z, Y, X]], otherwise [Channel, Z, Y, X]
+                               
         Example (2D): 
         .. math::
         
@@ -93,7 +94,6 @@ class GradientOperator(LinearOperator):
 
         self.gm_range = self.range_geometry()
         self.gm_domain = self.domain_geometry()
-
 
     def direct(self, x, out=None):
         """Computes the first-order forward differences
@@ -141,7 +141,6 @@ class Gradient_numpy(LinearOperator):
         self.method = method
         self.FD = FiniteDifferenceOperator(domain_geometry, direction = 0, method = self.method, bnd_cond = self.bnd_cond)
                 
-        
         if self.correlation==CORRELATION_SPACE:
             
             if domain_geometry.channels > 1:
@@ -291,10 +290,11 @@ class Gradient_C(LinearOperator):
     def __init__(self, gm_domain, gm_range=None, bnd_cond = NEUMANN, **kwargs):
 
         self.num_threads = kwargs.get('num_threads',NUM_THREADS)
-
+        self.split = kwargs.get('split',False)
         self.gm_domain = gm_domain
         self.gm_range = gm_range
-        
+        self.ndim = self.gm_domain.length
+                
         #default is 'Neumann'
         self.bnd_cond = 0
         
@@ -303,8 +303,12 @@ class Gradient_C(LinearOperator):
         
         # Domain Geometry = Range Geometry if not stated
         if self.gm_range is None:
-            self.gm_range = BlockGeometry(*[gm_domain for _ in range(len(gm_domain.shape))])
-        
+            if self.split is True and 'channel' in self.gm_domain.dimension_labels:
+                self.gm_range = BlockGeometry(gm_domain, BlockGeometry(*[gm_domain for _ in range(len(gm_domain.shape)-1)]))
+            else:
+                self.gm_range = BlockGeometry(*[gm_domain for _ in range(len(gm_domain.shape))])
+                self.split = False
+
         if len(gm_domain.shape) == 4:
             # Voxel size wrt to channel direction == 1.0
             self.fd = cilacc.fdiff4D
@@ -329,31 +333,46 @@ class Gradient_C(LinearOperator):
     def ndarray_as_c_pointer(ndx):
         return ndx.ctypes.data_as(c_float_p)
         
-    def direct(self, x, out=None):
-        ndx = np.asarray(x.as_array(), dtype=np.float32)
-        #ndx , x_p = Gradient_C.datacontainer_as_c_pointer(x)
+    def direct(self, x, out=None):    
+        ndx = np.asarray(x.as_array(), dtype=np.float32, order='C')
         x_p = Gradient_C.ndarray_as_c_pointer(ndx)
         
         return_val = False
         if out is None:
             out = self.gm_range.allocate(None)
             return_val = True
-        ndout = [el.as_array() for el in out.containers]
 
+        if self.split is False:
+            ndout = [el.as_array() for el in out.containers]
+        else:
+            ind = self.gm_domain.dimension_labels.index('channel')
+            ndout = [el.as_array() for el in out.get_item(1).containers]
+            ndout.insert(ind, out.get_item(0).as_array()) #insert channels dc at correct point for channel data
+                
         #pass list of all arguments
-        #arg1 = [Gradient_C.datacontainer_as_c_pointer(out.get_item(i))[1] for i in range(self.gm_range.shape[0])]
-        arg1 = [Gradient_C.ndarray_as_c_pointer(ndout[i]) for i in range(self.gm_range.shape[0])]
+        arg1 = [Gradient_C.ndarray_as_c_pointer(ndout[i]) for i in range(len(ndout))]
         arg2 = [el for el in x.shape]
         args = arg1 + arg2 + [self.bnd_cond, 1, self.num_threads]
         self.fd(x_p, *args)
-        
-        for i in range(len(ndout)):
-            out.get_item(i).fill(ndout[i])
 
-        if any(elem != 1.0 for elem in self.voxel_size_order):
-            out /= self.voxel_size_order
-#        out /= self.voxel_size_order
-        
+        for i, el in enumerate(self.voxel_size_order):
+            if el != 1:
+                ndout[i]/=el
+
+        #fill back out in corerct (non-traivial) order
+        if self.split is False:
+            for i in range(self.ndim):
+                out.get_item(i).fill(ndout[i])
+        else:
+            ind = self.gm_domain.dimension_labels.index('channel')
+            out.get_item(0).fill(ndout[ind])
+
+            j = 0
+            for i in range(self.ndim):
+                if i != ind:
+                    out.get_item(1).get_item(j).fill(ndout[i])
+                    j +=1
+
         if return_val is True:
             return out        
 
@@ -363,29 +382,32 @@ class Gradient_C(LinearOperator):
         if out is None:
             out = self.gm_domain.allocate(None)
             return_val = True
-        ndout = out.as_array()
-        
 
-        # ndout, out_p = Gradient_C.datacontainer_as_c_pointer(out)
+        ndout = np.asarray(out.as_array(), dtype=np.float32, order='C')          
         out_p = Gradient_C.ndarray_as_c_pointer(ndout)
         
-               
-        
-        if any(elem != 1.0 for elem in self.voxel_size_order):
-            tmp = x/self.voxel_size_order
+        if self.split is False:
+            ndx = [el.as_array() for el in x.containers]
         else:
-            tmp = x
-        ndx = [el.as_array() for el in tmp.containers]
-        
-        #arg1 = [Gradient_C.datacontainer_as_c_pointer(tmp.get_item(i))[1] for i in range(self.gm_range.shape[0])]
-        arg1 = [Gradient_C.ndarray_as_c_pointer(ndx[i]) for i in range(self.gm_range.shape[0])]
+            ind = self.gm_domain.dimension_labels.index('channel')
+            ndx = [el.as_array() for el in x.get_item(1).containers]
+            ndx.insert(ind, x.get_item(0).as_array()) 
+
+        for i, el in enumerate(self.voxel_size_order):
+            if el != 1:
+                ndx[i]/=el
+
+        arg1 = [Gradient_C.ndarray_as_c_pointer(ndx[i]) for i in range(self.ndim)]
         arg2 = [el for el in out.shape]
         args = arg1 + arg2 + [self.bnd_cond, 0, self.num_threads]
 
         self.fd(out_p, *args)
         out.fill(ndout)
 
+        #reset input data
+        for i, el in enumerate(self.voxel_size_order):
+            if el != 1:
+                ndx[i]*= el
+                
         if return_val is True:
             return out
-
-       

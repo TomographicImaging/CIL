@@ -300,7 +300,7 @@ class ImageGeometry(object):
         if kwargs.get('dimension_labels', None) is not None:
             raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
 
-        out = ImageData(geometry=self, 
+        out = ImageData(geometry=self.copy(), 
                             dtype=dtype, 
                             suppress_warning=True)
 
@@ -1773,7 +1773,7 @@ class AcquisitionGeometry(object):
         if kwargs.get('dimension_labels', None) is not None:
             raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
 
-        out = AcquisitionData(geometry=self, 
+        out = AcquisitionData(geometry=self.copy(), 
                                 dtype=dtype,
                                 suppress_warning=True)
 
@@ -2999,7 +2999,7 @@ class VectorGeometry(object):
     def allocate(self, value=0, **kwargs):
         '''allocates an VectorData according to the size expressed in the instance'''
         self.dtype = kwargs.get('dtype', numpy.float32)
-        out = VectorData(geometry=self, dtype=self.dtype)
+        out = VectorData(geometry=self.copy(), dtype=self.dtype)
         if isinstance(value, Number):
             if value != 0:
                 out += value

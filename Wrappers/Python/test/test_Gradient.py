@@ -557,7 +557,7 @@ class TestGradientOperator(unittest.TestCase):
         out4 = G4.direct(data4)
         ad4 = G4.adjoint(out4)
 
-        G4_gold = GradientOperator(ig4, split=False, correlation='SpaceChannels')
+        G4_gold = GradientOperator(data4.geometry, split=False, correlation='SpaceChannels')
         out4_gold = G4_gold.direct(data4)
         ad4_gold = G4_gold.adjoint(out4_gold)
 

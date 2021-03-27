@@ -218,8 +218,10 @@ class ImageGeometry(object):
         if channel is not None:
             geometry_new.channels = 1
             
-            if geometry_new.channel_labels is not None:
-                geometry_new.channel_labels = self.channel_labels[channel]
+            try:
+                geometry_new.channel_labels = [self.channel_labels[channel]]
+            except:
+                geometry_new.channel_labels = None
 
         if vertical is not None:
             geometry_new.voxel_num_z = 0

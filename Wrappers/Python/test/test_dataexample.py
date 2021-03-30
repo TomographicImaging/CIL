@@ -69,7 +69,7 @@ class TestTestData(CCPiTestClass):
         res = False
         try:
             image = dataexample.PEPPERS.get()
-            if (image.shape[0] == 512) and (image.shape[1] == 512) and (image.shape[2] == 3):
+            if (image.shape[0] == 3) and (image.shape[1] == 512) and (image.shape[2] == 512):
                 res = True
             else:
                 print("Image dimension mismatch")
@@ -80,12 +80,27 @@ class TestTestData(CCPiTestClass):
 
         self.assertTrue(res)
 
+    def test_load_RAINBOW(self):
+        
+        res = False
+        try:
+            image = dataexample.RAINBOW.get()
+            if (image.shape[0] == 3) and (image.shape[1] == 1353) and (image.shape[2] == 1194):
+                res = True
+            else:
+                print("Image dimension mismatch")
+        except FileNotFoundError:
+            print("File not found")
+        except:
+            print("Failed to load file")
+
+        self.assertTrue(res)
     def test_load_RESOLUTION_CHART(self):
         
         res = False
         try:
             image = dataexample.RESOLUTION_CHART.get()
-            if (image.shape[0] == 512) and (image.shape[1] == 512):
+            if (image.shape[0] == 256) and (image.shape[1] == 256):
                 res = True
             else:
                 print("Image dimension mismatch")

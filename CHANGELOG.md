@@ -7,6 +7,7 @@
   - AcquisitionData and ImageData enforce requirement for a geometry on creation
   - New processors AbsorptionTransmissionConverter and TransmissionAbsorptionConverter to convert between Absorption and Transmission
   - Implemented Binner and Slicer processors
+  - Implemented MaskGenerator and Masker processors
 
 * 20.11.2
   - fixed windows build

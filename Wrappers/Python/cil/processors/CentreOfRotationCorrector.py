@@ -37,5 +37,5 @@ class CentreOfRotationCorrector(object):
         :return: returns an AcquisitionData object with an updated AcquisitionGeometry
         :rtype: AcquisitionData
         '''
-        proccessor = CofR_xcorr(slice_index, projection_index, ang_tol)
-        return proccessor
+        processor = CofR_xcorr(slice_index, projection_index, ang_tol)
+        return processor

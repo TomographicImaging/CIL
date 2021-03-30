@@ -39,7 +39,7 @@ class DATA(object):
     def dfile(cls):
         return None
     @classmethod
-    def get(cls, size=(512,512), scale=(0,1), **kwargs):
+    def get(cls, size=None, scale=(0,1), **kwargs):
         ddir = kwargs.get('data_dir', data_dir)
         loader = TestData(data_dir=ddir)
         return loader.load(cls.dfile(), size, scale, **kwargs)
@@ -68,6 +68,10 @@ class SHAPES(DATA):
     @classmethod
     def dfile(cls):
         return TestData.SHAPES
+class RAINBOW(DATA):
+    @classmethod
+    def dfile(cls):
+        return TestData.RAINBOW
 class SYNCHROTRON_PARALLEL_BEAM_DATA(DATA):
     @classmethod
     def get(cls, **kwargs):
@@ -87,7 +91,7 @@ class TestData(object):
     RESOLUTION_CHART = 'resolution_chart.tiff'
     SIMPLE_PHANTOM_2D = 'hotdog'
     SHAPES =  'shapes.png'
-    
+    RAINBOW = 'rainbow.png'
     '''
     BOAT = 'boat.tiff'
     CAMERA = 'camera.png'
@@ -95,46 +99,76 @@ class TestData(object):
     RESOLUTION_CHART = 'resolution_chart.tiff'
     SIMPLE_PHANTOM_2D = 'hotdog'
     SHAPES =  'shapes.png'
-
+    RAINBOW =  'rainbow.png'
     
     def __init__(self, **kwargs):
         self.data_dir = kwargs.get('data_dir', data_dir)
         
-    def load(self, which, size=(512,512), scale=(0,1), **kwargs):
+    def load(self, which, size=None, scale=(0,1), **kwargs):
         if which not in [TestData.BOAT, TestData.CAMERA, 
                          TestData.PEPPERS, TestData.RESOLUTION_CHART,
-                         TestData.SIMPLE_PHANTOM_2D, TestData.SHAPES]:
+                         TestData.SIMPLE_PHANTOM_2D, TestData.SHAPES,
+                         TestData.RAINBOW]:
             raise ValueError('Unknown TestData {}.'.format(which))
         if which == TestData.SIMPLE_PHANTOM_2D:
-            N = size[0]
-            M = size[1]
+            if size is None:
+                N = 512
+                M = 512
+            else:
+                N = size[0]
+                M = size[1]
+
             sdata = numpy.zeros((N, M))
-            sdata[int(round(N/4)):int(round(3*N/4)), int(round(N/4)):int(round(3*N/4))] = 0.5
-            sdata[int(round(M/8)):int(round(7*M/8)), int(round(3*M/8)):int(round(5*M/8))] = 1
-            ig = ImageGeometry(voxel_num_x = N, voxel_num_y = M, dimension_labels=[ImageGeometry.HORIZONTAL_X, ImageGeometry.HORIZONTAL_Y])
+            sdata[int(round(N/4)):int(round(3*N/4)), int(round(M/4)):int(round(3*M/4))] = 0.5
+            sdata[int(round(N/8)):int(round(7*N/8)), int(round(3*M/8)):int(round(5*M/8))] = 1
+            ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
             data = ig.allocate()
             data.fill(sdata)
-            
+
         elif which == TestData.SHAPES:
+
             with Image.open(os.path.join(self.data_dir, which)) as f:
-                tmp = numpy.array(f.convert('L'))
-            N = 200
-            M = 300   
-            ig = ImageGeometry(voxel_num_x = N, voxel_num_y = M, dimension_labels=[ImageGeometry.HORIZONTAL_X, ImageGeometry.HORIZONTAL_Y])
-            data = ig.allocate()
-            data.fill(tmp/numpy.max(tmp))
+
+                if size is None:
+                    N = 200
+                    M = 300
+                else:
+                    N = size[0]
+                    M = size[1]
+                
+                ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
+                data = ig.allocate()
+                tmp = numpy.array(f.convert('L').resize((M,N)))
+                data.fill(tmp/numpy.max(tmp))
             
         else:
             with Image.open(os.path.join(self.data_dir, which)) as tmp:
+
+                if size is None:
+                    N = tmp.size[1]
+                    M = tmp.size[0]
+                else:
+                    N = size[0]
+                    M = size[1]
+
                 bands = tmp.getbands()
                 if len(bands) > 1:
-                    ig = ImageGeometry(voxel_num_x=size[0], voxel_num_y=size[1], channels=len(bands), 
-                    dimension_labels=[ImageGeometry.HORIZONTAL_X, ImageGeometry.HORIZONTAL_Y, ImageGeometry.CHANNEL])
+                    if len(bands) == 4:
+                        tmp = tmp.convert('RGB')
+                        bands = tmp.getbands()
+
+                    ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N, channels=len(bands), 
+                    dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X,ImageGeometry.CHANNEL])
                     data = ig.allocate()
+                    data.fill(numpy.array(tmp.resize((M,N))))
+                    data.reorder([ImageGeometry.CHANNEL,ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
+                    data.geometry.channel_labels = bands
                 else:
-                    ig = ImageGeometry(voxel_num_x = size[0], voxel_num_y = size[1], dimension_labels=[ImageGeometry.HORIZONTAL_X, ImageGeometry.HORIZONTAL_Y])
+                    ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
                     data = ig.allocate()
-                data.fill(numpy.array(tmp.resize((size[1],size[0]))))
+                    data.fill(numpy.array(tmp.resize((M,N))))
+
+
             if scale is not None:
                 dmax = data.as_array().max()
                 dmin = data.as_array().min()

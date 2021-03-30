@@ -189,6 +189,7 @@ class ImageGeometry(object):
         self.center_y = center_y
         self.center_z = center_z  
         self.channels = channels
+        self.channel_labels = None
         self.channel_spacing = 1.0
         self.dimension_labels = kwargs.get('dimension_labels', None)
 
@@ -216,6 +217,11 @@ class ImageGeometry(object):
         geometry_new = self.copy()
         if channel is not None:
             geometry_new.channels = 1
+            
+            try:
+                geometry_new.channel_labels = [self.channel_labels[channel]]
+            except:
+                geometry_new.channel_labels = None
 
         if vertical is not None:
             geometry_new.voxel_num_z = 0
@@ -230,8 +236,8 @@ class ImageGeometry(object):
 
     def get_order_by_label(self, dimension_labels, default_dimension_labels):
         order = []
-        for i, el in enumerate(dimension_labels):
-            for j, ek in enumerate(default_dimension_labels):
+        for i, el in enumerate(default_dimension_labels):
+            for j, ek in enumerate(dimension_labels):
                 if el == ek:
                     order.append(j)
                     break
@@ -296,7 +302,7 @@ class ImageGeometry(object):
         if kwargs.get('dimension_labels', None) is not None:
             raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
 
-        out = ImageData(geometry=self, 
+        out = ImageData(geometry=self.copy(), 
                             dtype=dtype, 
                             suppress_warning=True)
 
@@ -1656,8 +1662,8 @@ class AcquisitionGeometry(object):
 
     def get_order_by_label(self, dimension_labels, default_dimension_labels):
         order = []
-        for i, el in enumerate(dimension_labels):
-            for j, ek in enumerate(default_dimension_labels):
+        for i, el in enumerate(default_dimension_labels):
+            for j, ek in enumerate(dimension_labels):
                 if el == ek:
                     order.append(j)
                     break
@@ -1769,7 +1775,7 @@ class AcquisitionGeometry(object):
         if kwargs.get('dimension_labels', None) is not None:
             raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
 
-        out = AcquisitionData(geometry=self, 
+        out = AcquisitionData(geometry=self.copy(), 
                                 dtype=dtype,
                                 suppress_warning=True)
 
@@ -1958,7 +1964,7 @@ class DataContainer(object):
             new_order[i] = self.dimension_labels.index(axis)
             dimension_labels_new[i] = axis
 
-        self.array = numpy.transpose(self.array, new_order)
+        self.array = numpy.ascontiguousarray(numpy.transpose(self.array, new_order))
 
         if self.geometry is None:
             self.dimension_labels = dimension_labels_new
@@ -2995,7 +3001,7 @@ class VectorGeometry(object):
     def allocate(self, value=0, **kwargs):
         '''allocates an VectorData according to the size expressed in the instance'''
         self.dtype = kwargs.get('dtype', numpy.float32)
-        out = VectorData(geometry=self, dtype=self.dtype)
+        out = VectorData(geometry=self.copy(), dtype=self.dtype)
         if isinstance(value, Number):
             if value != 0:
                 out += value

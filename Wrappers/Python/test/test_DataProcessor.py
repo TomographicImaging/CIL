@@ -885,6 +885,7 @@ class TestMasker(unittest.TestCase):
         
         mask = DataContainer(mask_manual, dimension_labels=data.dimension_labels) 
         
+        # test vaue mode
         m = Masker.value(mask=mask, value=10)
         m.set_input(data)
         res = m.process()
@@ -895,6 +896,7 @@ class TestMasker(unittest.TestCase):
         
         numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)     
         
+        # test mean mode
         m = Masker.mean(mask=mask)
         m.set_input(data)
         res = m.process()
@@ -907,6 +909,7 @@ class TestMasker(unittest.TestCase):
         
         numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)  
         
+        # test median mode
         m = Masker.median(mask=mask)
         m.set_input(data)
         res = m.process()
@@ -918,6 +921,7 @@ class TestMasker(unittest.TestCase):
         
         numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)
         
+        # test axis int
         m = Masker.median(mask=mask, axis=0)
         m.set_input(data)
         res = m.process()
@@ -930,6 +934,7 @@ class TestMasker(unittest.TestCase):
         
         numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6) 
         
+        # test axis str
         m = Masker.mean(mask=mask, axis=data.dimension_labels[1])
         m.set_input(data)
         res = m.process()
@@ -940,7 +945,44 @@ class TestMasker(unittest.TestCase):
         data_test[2,3] = numpy.sum(tmp1) / 9
         data_test[4,5] = numpy.sum(tmp2) / 9
         
-        numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6) 
+        numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)
+        
+        # test inline
+        data = data_init.copy()
+        m = Masker.value(mask=mask, value=10)
+        m.set_input(data)
+        m.process(out=data)
+        
+        data_test = data_init.copy().as_array()
+        data_test[2,3] = 10
+        data_test[4,5] = 10
+        
+        numpy.testing.assert_allclose(data.as_array(), data_test, rtol=1E-6) 
+        
+        # test mask numpy 
+        data = data_init.copy()
+        m = Masker.value(mask=mask.as_array(), value=10)
+        m.set_input(data)
+        res = m.process()
+        
+        data_test = data.copy().as_array()
+        data_test[2,3] = 10
+        data_test[4,5] = 10
+        
+        numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)  
+        
+        # test interpolate
+        data = data_init.copy()
+        m = Masker.interpolate(mask=mask, method='linear', axis='horizontal_y')
+        m.set_input(data)
+        res = m.process()
+        
+        data_test = data.copy().as_array()
+        data_test[2,3] = (data_test[1,3] + data_test[3,3]) / 2
+        data_test[4,5] = (data_test[3,5] + data_test[5,5]) / 2
+        
+        numpy.testing.assert_allclose(res.as_array(), data_test, rtol=1E-6)  
+        
 
         
 if __name__ == "__main__":

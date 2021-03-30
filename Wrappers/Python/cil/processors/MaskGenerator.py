@@ -361,9 +361,10 @@ class MaskGenerator(DataProcessor):
             raise ValueError('Mode not recognised. One of the following is expected: ' + \
                               'special_values, nan, inf, threshold, quantile, mean, median, movmean, movmedian')
         
+
         if out is None:
-            out = data.copy()
-            out.fill(mask)
+            mask = numpy.asarray(mask, dtype=numpy.bool)
+            out = type(data)(mask, deep_copy=False, dtype=mask.dtype, geometry=data.geometry, suppress_warning=True, dimension_labels=data.dimension_labels)
             return out
         else:
             out.fill(mask)

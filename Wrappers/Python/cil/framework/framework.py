@@ -2739,10 +2739,6 @@ class Processor(object):
         
     def get_output(self, out=None):
         
-        for k,v in self.__dict__.items():
-            if v is None and k != 'output':
-                raise ValueError('Key {0} is None'.format(k))
-
         if self.output is None or self.shouldRun:
             if out is None:
                 out = self.process()

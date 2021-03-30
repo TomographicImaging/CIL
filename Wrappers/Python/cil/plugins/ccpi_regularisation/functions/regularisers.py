@@ -43,10 +43,10 @@ class TV_Base(Function):
             return 0
 
 class ROF_TV(TV_Base):
-    def __init__(self,alpha,max_iteration,tolerance,time_marchstep,device):
+    def __init__(self,lambdaReg,iterationsTV,tolerance,time_marchstep,device):
         # set parameters
-        self.alpha = alpha
-        self.max_iteration = max_iteration
+        self.alpha = lambdaReg
+        self.max_iteration = iterationsTV
         self.time_marchstep = time_marchstep
         self.device = device # string for 'cpu' or 'gpu'
         self.tolerance = tolerance

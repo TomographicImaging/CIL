@@ -184,14 +184,14 @@ class Masker(DataProcessor):
         elif self.mode == 'interpolate':
             if self.method not in ['linear', 'nearest', 'zeros', 'linear', \
                                         'quadratic', 'cubic', 'previous', 'next']:
-                raise Exception("Wrong interpolation method, one of the follwoing is expected:\n" + 
+                raise TypeError("Wrong interpolation method, one of the follwoing is expected:\n" + 
                                 "linear, nearest, zeros, linear, quadratic, cubic, previous, next")
             
             ndim = data.number_of_dimensions
             shape = arr.shape
             
             if axis_index is None:
-                raise NotImplementedError
+                raise NotImplementedError ('Currently Only 1D interpolation is available. Please specify an axis to interpolate over.')
             
             res_dim = 1
             for i in range(ndim):

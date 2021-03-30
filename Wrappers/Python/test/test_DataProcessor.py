@@ -868,23 +868,32 @@ class TestAbsorptionTransmissionConverter(unittest.TestCase):
 
 class TestMasker(unittest.TestCase):       
 
-    def test_Masker(self): 
+    def setUp(self):
         IG = ImageGeometry(voxel_num_x=10,
                         voxel_num_y=10)
         
-        data_init = IG.allocate('random')
+        self.data_init = IG.allocate('random')
         
-        data = data_init.copy()
+        self.data = self.data_init.copy()
         
-        data.as_array()[2,3] = float('inf')
-        data.as_array()[4,5] = float('nan')
+        self.data.as_array()[2,3] = float('inf')
+        self.data.as_array()[4,5] = float('nan')
         
         mask_manual = numpy.ones((10,10), dtype=numpy.bool)
         mask_manual[2,3] = 0
         mask_manual[4,5] = 0
         
-        mask = DataContainer(mask_manual, dimension_labels=data.dimension_labels) 
-        
+        self.mask_manual = DataContainer(mask_manual, dimension_labels=self.data.dimension_labels) 
+        self.mask_generated = MaskGenerator.special_values()(self.data)
+
+    def test_Masker_Manual(self):
+        self.Masker_check(self.mask_manual, self.data, self.data_init)
+
+    def test_Masker_generated(self):
+        self.Masker_check(self.mask_generated, self.data, self.data_init)
+
+    def Masker_check(self, mask, data, data_init): 
+
         # test vaue mode
         m = Masker.value(mask=mask, value=10)
         m.set_input(data)

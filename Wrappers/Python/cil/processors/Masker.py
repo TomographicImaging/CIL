@@ -27,9 +27,10 @@ class Masker(DataProcessor):
 
     @staticmethod
     def value(mask=None, value=0):
-        r'''This imputes value where mask == 0.
+        r'''This sets the masked values of the input data to the requested value.
+
         :param mask: A boolean array with the same dimensions as input, where 'False' represents masked values. Mask can be generated using 'MaskGenerator' processor to identify outliers. 
-        :type mask: DataContainer, ImageData, AcquisitionData numpy.ndarray
+        :type mask: DataContainer, ImageData, AcquisitionData, numpy.ndarray
         :param value: values to be assigned to missing elements
         :type value: float, default=0
         '''
@@ -41,6 +42,7 @@ class Masker(DataProcessor):
     @staticmethod
     def mean(mask=None, axis=None):
         r'''This sets the masked values of the input data to the mean of the unmasked values across the array or axis.
+
         :param mask: A boolean array with the same dimensions as input, where 'False' represents masked values. Mask can be generated using 'MaskGenerator' processor to identify outliers.  
         :type mask: DataContainer, ImageData, AcquisitionData, numpy.ndarray
         :param axis: specify axis as int or from 'dimension_labels' to calculate mean. 
@@ -54,6 +56,7 @@ class Masker(DataProcessor):
     @staticmethod
     def median(mask=None, axis=None):
         r'''This sets the masked values of the input data to the median of the unmasked values across the array or axis.
+
         :param mask: A boolean array with the same dimensions as input, where 'False' represents masked values. Mask can be generated using 'MaskGenerator' processor to identify outliers.  
         :type mask: DataContainer, ImageData, AcquisitionData, numpy.ndarray
         :param axis: specify axis as int or from 'dimension_labels' to calculate median. 
@@ -66,7 +69,8 @@ class Masker(DataProcessor):
     
     @staticmethod
     def interpolate(mask=None, axis=None, method='linear'):
-        r'''This operates over the specified axis and uses 1D interpolation over remaining flattened array to fill in missing vaues. .
+        r'''This operates over the specified axis and uses 1D interpolation over remaining flattened array to fill in missing vaues.
+
         :param mask: A boolean array with the same dimensions as input, where 'False' represents masked values. Mask can be generated using 'MaskGenerator' processor to identify outliers.  
         :type mask: DataContainer, ImageData, AcquisitionData, numpy.ndarray
         :param axis: specify axis as int or from 'dimension_labels' to loop over and perform 1D interpolation. 
@@ -87,6 +91,7 @@ class Masker(DataProcessor):
                  method = 'linear'):
         
         r'''Processor to fill missing values provided by mask.
+
         :param mask: A boolean array with the same dimensions as input, where 'False' represents masked values. Mask can be generated using 'MaskGenerator' processor to identify outliers. 
         :type mask: DataContainer, ImageData, AcquisitionData, numpy.ndarray
         :param mode: a method to fill in missing values (value, mean, median, interpolate)
@@ -132,8 +137,11 @@ class Masker(DataProcessor):
         
         data = self.get_input()
         
+        return_arr = False
         if out is None:
-            arr = data.copy().as_array()
+            out = data.copy()
+            arr = out.as_array()
+            return_arr = True
         else:
             arr = out.as_array()
         
@@ -235,9 +243,7 @@ class Masker(DataProcessor):
             raise ValueError('Mode is not recognised. One of the following is expected: ' + 
                               'value, mean, median, interpolate')
         
-        if out is None:
-            out = data.copy()
-            out.fill(arr)
+        out.fill(arr)
+
+        if return_arr is True:
             return out
-        else:
-            out.fill(arr)

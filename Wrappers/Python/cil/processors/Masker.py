@@ -150,7 +150,12 @@ class Masker(DataProcessor):
             mask_arr = self.mask.as_array()
         except:
             mask_arr = self.mask
-            
+
+        try:
+            mask_invert = ~mask_arr
+        except TypeError:
+            raise TypeError("Mask expected to be a boolean array got {}".format(mask_arr.dtype))
+
         try:
             axis_index = data.dimension_labels.index(self.axis)             
         except:
@@ -161,7 +166,7 @@ class Masker(DataProcessor):
         
         if self.mode == 'value':
             
-            arr[~mask_arr] = self.value
+            arr[mask_invert] = self.value
         
         elif self.mode == 'mean' or self.mode == 'median':
             
@@ -177,17 +182,17 @@ class Masker(DataProcessor):
                     current_slice_obj = tuple(current_slice_obj)
                     slice_data = arr[current_slice_obj]
                     if self.mode == 'mean':
-                        slice_data[~mask_arr[current_slice_obj]] = numpy.mean(slice_data[mask_arr[current_slice_obj]])
+                        slice_data[mask_invert[current_slice_obj]] = numpy.mean(slice_data[mask_arr[current_slice_obj]])
                     else:
-                        slice_data[~mask_arr[current_slice_obj]] = numpy.median(slice_data[mask_arr[current_slice_obj]])
+                        slice_data[mask_invert[current_slice_obj]] = numpy.median(slice_data[mask_arr[current_slice_obj]])
                     arr[current_slice_obj] = slice_data
                 
             else:
 
                 if self.mode == 'mean':
-                    arr[~mask_arr] = numpy.mean(arr[mask_arr]) 
+                    arr[mask_invert] = numpy.mean(arr[mask_arr]) 
                 else:
-                    arr[~mask_arr] = numpy.median(arr[mask_arr]) 
+                    arr[mask_invert] = numpy.median(arr[mask_arr]) 
         
         elif self.mode == 'interpolate':
             if self.method not in ['linear', 'nearest', 'zeros', 'linear', \
@@ -230,13 +235,13 @@ class Masker(DataProcessor):
                         k += 1
                 idx = tuple(idx)
                 
-                if numpy.any(~mask_arr[idx]):
+                if numpy.any(mask_invert[idx]):
                     tmp = arr[idx]
                     f = interpolate.interp1d(interp_axis[mask_arr[idx]], tmp[mask_arr[idx]], 
                                             fill_value='extrapolate',
                                             assume_sorted=True,
                                             kind=self.method)
-                    tmp[~mask_arr[idx]] = f(numpy.where(mask_arr[idx] == False)[0])
+                    tmp[mask_invert[idx]] = f(numpy.where(mask_arr[idx] == False)[0])
                     arr[idx] = tmp
         
         else:

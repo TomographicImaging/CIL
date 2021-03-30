@@ -36,8 +36,8 @@ class TV_Base(Function):
         EnergyValTV = TV_ENERGY(np.asarray(x.as_array(), dtype=np.float32), np.asarray(x.as_array(), dtype=np.float32), self.alpha, 2)
         return 0.5*EnergyValTV[0]
 
-    def convex_conjugate(self,x):        
-        if __call__(self,x) > 1:
+    def convex_conjugate(self,x):     
+        if self.__call__(self,x) > 1:
             return np.inf
         else:
             return 0

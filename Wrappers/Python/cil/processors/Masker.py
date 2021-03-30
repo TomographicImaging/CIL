@@ -27,8 +27,8 @@ class Masker(DataProcessor):
     @staticmethod
     def value(mask=None, value=0):
         r'''This imputes value where mask == 0.
-        :param mask: mask 
-        :type mask: DataContainer
+        :param mask: A boolean array with the same dimensions as input, where 'False' represents masked values. Mask can be generated using 'MaskGenerator' processor to identify outliers. 
+        :type mask: DataContainer, ImageData, AcquisitionData numpy.ndarray
         :param value: values to be assigned to missing elements
         :type value: float, default=0
         '''
@@ -39,9 +39,9 @@ class Masker(DataProcessor):
     
     @staticmethod
     def mean(mask=None, axis=None):
-        r'''This imputes mean where mask == 0. If no axis is specified then operates over flattened array.
-        :param mask: mask 
-        :type mask: DataContainer
+        r'''This sets the masked values of the input data to the mean of the unmasked values across the array or axis.
+        :param mask: A boolean array with the same dimensions as input, where 'False' represents masked values. Mask can be generated using 'MaskGenerator' processor to identify outliers.  
+        :type mask: DataContainer, ImageData, AcquisitionData, numpy.ndarray
         :param axis: specify axis as int or from 'dimension_labels' to calculate mean. 
         :type axis: str, int
         '''
@@ -52,9 +52,22 @@ class Masker(DataProcessor):
     
     @staticmethod
     def median(mask=None, axis=None):
-        r'''This imputes median where mask == 0. If no axis is specified then operates over flattened array.
-        :param mask: mask 
-        :type mask: DataContainer
+        r'''This sets the masked values of the input data to the median of the unmasked values across the array or axis.
+        :param mask: A boolean array with the same dimensions as input, where 'False' represents masked values. Mask can be generated using 'MaskGenerator' processor to identify outliers.  
+        :type mask: DataContainer, ImageData, AcquisitionData, numpy.ndarray
+        :param axis: specify axis as int or from 'dimension_labels' to calculate median. 
+        :type axis: str, int
+        '''
+
+        processor = Masker(mode='median', mask=mask, axis=axis)
+
+        return processor
+    
+    @staticmethod
+    def interpolate(mask=None, axis=None, method='linear'):
+        r'''This sets the masked values of the input data to the median of the unmasked values across the array or axis.
+        :param mask: A boolean array with the same dimensions as input, where 'False' represents masked values. Mask can be generated using 'MaskGenerator' processor to identify outliers.  
+        :type mask: DataContainer, ImageData, AcquisitionData, numpy.ndarray
         :param axis: specify axis as int or from 'dimension_labels' to calculate median. 
         :type axis: str, int
         '''
@@ -70,8 +83,8 @@ class Masker(DataProcessor):
                  axis = None ):
         
         r'''Processor to fill missing values provided by mask.
-        :param mask: DataContainer containing a boolean array with zeros where outliers are detected
-        :type mask: DataContainer
+        :param mask: A boolean array with the same dimensions as input, where 'False' represents masked values. Mask can be generated using 'MaskGenerator' processor to identify outliers. 
+        :type mask: DataContainer, ImageData, AcquisitionData, numpy.ndarray
         :param mode: a method to fill in missing values (value, mean, median)
         :type mode: str, default=value
         :param value: substitute all outliers with a specific value
@@ -94,17 +107,13 @@ class Masker(DataProcessor):
         if self.mask is None:
             raise ValueError('Please, provide a mask.')
 
-        if not (isinstance(self.mask, DataContainer)):
-            raise TypeError('Mask must be a DataContainer')
+        if not (data.shape == self.mask.shape):
+            raise Exception("Mask and Data must have the same shape." + 
+                            "{} != {}".format(self.mask.mask, data.shape))
         
-        if not (issubclass(type(data), DataContainer)):
-            raise TypeError('Processor supports only following data types:\n' +
-                            ' - ImageData\n - AcquisitionData\n' +
-                            ' - DataContainer')
-
-        if not (data.shape == self.mask.shape and data.dimension_labels == self.mask.dimension_labels):
-            raise Exception("Mask and Data has to have the same shape and dimension labels." + 
-                            "{} != {} or {} != {}".format(data.shape, self.mask.shape, data.dimension_labels, self.mask.dimension_labels))
+        if hasattr(self.mask, 'dimension_labels') and data.dimension_labels == self.mask.dimension_labels:
+            raise Exception("Mask and Data must have the same dimension labels." + 
+                            "{} != {}".format(self.mask.dimension_labels, data.dimension_labels))
 
         if self.mode not in ['value', 'mean', 'median']:
             raise Exception("Wrong mode. One of the following is expected:\n" + \
@@ -115,9 +124,18 @@ class Masker(DataProcessor):
     def process(self, out=None):
         
         data = self.get_input()
-        arr = data.copy().as_array()
-        mask_arr = self.mask.as_array()
-
+        
+        if out is None:
+            arr = data.copy().as_array()
+        else:
+            arr = out.as_array()
+        
+        #assumes mask has 'as_array' method, i.e. is a DataContainer or is a numpy array
+        try:
+            mask_arr = self.mask.as_array()
+        except:
+            mask_arr = self.mask
+            
         try:
             axis_index = data.dimension_labels.index(self.axis)             
         except:
@@ -156,9 +174,57 @@ class Masker(DataProcessor):
                 else:
                     arr[~mask_arr] = numpy.median(arr[mask_arr]) 
         
+        elif self.mode == 'interpolate':
+            if self.method not in ['linear', 'nearest', 'zeros', 'linear', \
+                                        'quadratic', 'cubic', 'previous', 'next']:
+                raise Exception("Wrong interpolation method, one of the follwoing is expected:\n" + \ 
+                                "linear, nearest, zeros, linear, quadratic, cubic, previous, next")
+            
+            ndim = data.number_of_dimensions
+            shape = data.shape
+            
+            if axis_index is None:
+                raise NotImplementedError
+            
+            res_dim = 1
+            for i in range(ndim):
+                if i != axis:
+                    res_dim *= shape[i]
+                    
+            interp_axis = numpy.arange(shape[axis])
+            
+            for i in range(res_dim):
+                
+                rest_shape = []
+                for j in range(ndim):
+                    if j != axis:
+                        rest_shape.append(shape[j])
+                rest_shape = tuple(rest_shape)
+                
+                rest_idx = numpy.unravel_index(i, rest_shape)
+                
+                k = 0
+                idx = []
+                for j in range(ndim):
+                    if j == axis:
+                        idx.append(slice(None,None,1))
+                    else:
+                        idx.append(rest_idx[k])
+                        k += 1
+                idx = tuple(idx)
+                
+                if numpy.any(~self.mask[idx]):
+                    tmp = data.as_array()[idx]
+                    f = interpolate.interp1d(interp_axis[self.mask[idx]], tmp[self.mask[idx]], 
+                                            fill_value='extrapolate',
+                                            assume_sorted=True,
+                                            kind=self.method)
+                    tmp[self.mask[idx]] = f(numpy.where(self.mask[idx] == False)[0])
+                    data.as_array()[idx] = tmp
+        
         else:
             raise ValueError('Mode is not recognised. One of the following is expected: ' + \
-                              'value, mean, median')
+                              'value, mean, median, interpolate')
         
         if out is None:
             out = data.copy()

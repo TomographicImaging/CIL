@@ -34,7 +34,7 @@ import warnings
 class TV_Base(Function):
     def __call__(self,x):
         in_arr = np.asarray(x.as_array(), dtype=np.float32, order='C')
-        EnergyValTV = TV_ENERGY(np.asarray(in_arr, in_arr, self.alpha, 2)
+        EnergyValTV = TV_ENERGY(in_arr, in_arr, self.alpha, 2)
         return 0.5*EnergyValTV[0]
 
     def convex_conjugate(self,x):     

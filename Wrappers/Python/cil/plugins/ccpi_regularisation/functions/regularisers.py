@@ -37,10 +37,7 @@ class TV_Base(Function):
         return 0.5*EnergyValTV[0]
 
     def convex_conjugate(self,x):     
-        if self.__call__(self,x) > 1:
-            return np.inf
-        else:
-            return 0
+        return 0.0
 
 class ROF_TV(TV_Base):
     def __init__(self,lambdaReg,iterationsTV,tolerance,time_marchstep,device):

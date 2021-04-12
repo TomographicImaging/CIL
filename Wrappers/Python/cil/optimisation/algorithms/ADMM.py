@@ -93,7 +93,7 @@ class LADMM(Algorithm):
             self.x = initial.copy()
          
         # allocate space for operator direct & adjoint    
-        self.tmp_dir = self.operator.direct(self.x)
+        self.tmp_dir = self.operator.range_geometry().allocate()
         self.tmp_adj = self.operator.domain_geometry().allocate()            
             
         self.z = self.operator.range_geometry().allocate() 
@@ -111,18 +111,21 @@ class LADMM(Algorithm):
         
         self.tmp_adj *= -(self.tau/self.sigma)
         self.x += self.tmp_adj     
-      
         # apply proximal of f        
-        self.f.proximal(self.x, self.tau, out=self.x)
-        self.operator.direct(self.x, out = self.tmp_dir)
+        tmp = self.f.proximal(self.x, self.tau)
+        self.x.fill(tmp)
+        del tmp
+        
+        self.operator.direct(self.x, out = self.tmp_dir)  
+        self.u += self.tmp_dir
         
         # apply proximal of g   
-        self.g.proximal(self.tmp_dir + self.u, self.sigma, out = self.z)
+        self.g.proximal(self.u, self.sigma, out = self.z)
 
         # update 
         self.u += self.tmp_dir
         self.u -= self.z
-                
+
     def update_objective(self):
         
         self.loss.append(self.f(self.x) +  self.g(self.operator.direct(self.x)) )                 

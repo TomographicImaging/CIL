@@ -110,8 +110,8 @@ class LADMM(Algorithm):
         self.operator.adjoint(self.tmp_dir, out = self.tmp_adj)          
         
         self.tmp_adj *= -(self.tau/self.sigma)
-        self.x += self.tmp_adj     
-        # apply proximal of f        
+        self.x += self.tmp_adj
+        # apply proximal of f
         tmp = self.f.proximal(self.x, self.tau)
         self.x.fill(tmp)
         del tmp
@@ -123,7 +123,6 @@ class LADMM(Algorithm):
         self.g.proximal(self.u, self.sigma, out = self.z)
 
         # update 
-        self.u += self.tmp_dir
         self.u -= self.z
 
     def update_objective(self):

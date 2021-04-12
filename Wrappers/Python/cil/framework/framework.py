@@ -2246,7 +2246,7 @@ class DataContainer(object):
         return self.pixel_wise_binary(numpy.minimum, x2=x2, out=out, *args, **kwargs)
 
     def axpby(self, a, b, y, out, dtype=numpy.float32, num_threads=NUM_THREADS):
-        '''performs axpby with cilacc C library
+        '''performs axpby with cilacc C library, can be done in-place.
         
         Does the operation .. math:: a*x+b*y and stores the result in out, where x is self
 

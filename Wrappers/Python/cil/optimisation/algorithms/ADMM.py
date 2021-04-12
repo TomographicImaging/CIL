@@ -106,17 +106,19 @@ class LADMM(Algorithm):
     def update(self):
 
         self.tmp_dir += self.u
-        self.tmp_dir -= self.z          
-        self.operator.adjoint(self.tmp_dir, out = self.tmp_adj)          
+        self.tmp_dir -= self.z
+        self.operator.adjoint(self.tmp_dir, out = self.tmp_adj)
         
-        self.tmp_adj *= -(self.tau/self.sigma)
-        self.x += self.tmp_adj
+        # self.tmp_adj *= -(self.tau/self.sigma)
+        # self.x += self.tmp_adj
+        self.x.axpby(1,-(self.tau/self.sigma), self.tmp_adj, out=self.x)
         # apply proximal of f
         tmp = self.f.proximal(self.x, self.tau)
+        self.operator.direct(tmp, out=self.tmp_dir)
+        # store the result in x
         self.x.fill(tmp)
         del tmp
-        
-        self.operator.direct(self.x, out = self.tmp_dir)  
+
         self.u += self.tmp_dir
         
         # apply proximal of g   
@@ -124,7 +126,7 @@ class LADMM(Algorithm):
 
         # update 
         self.u -= self.z
-
+        
     def update_objective(self):
         
         self.loss.append(self.f(self.x) +  self.g(self.operator.direct(self.x)) )                 

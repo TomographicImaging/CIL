@@ -72,8 +72,6 @@ class TXRMDataReader(object):
         import dxchange
         # Load projections and most metadata
         data, metadata = dxchange.read_txrm(self.txrm_file)
-        for k,v in metadata.items():
-            print (k,v)
         number_of_images = data.shape[0]
         
         # Read source to center and detector to center distances
@@ -101,12 +99,10 @@ class TXRMDataReader(object):
         d_pixel_size = ((dist_source_center+dist_center_detector)/dist_source_center)*metadata['pixel_size']
         
         # convert angles to requested unit measure, Zeiss stores in radians
-        # AND 
-        # convert direction of rotation from Zeiss to our convention
         if self.angle_unit == AcquisitionGeometry.DEGREE:
-            angles = - np.degrees(metadata['thetas'])
+            angles = np.degrees(metadata['thetas'])
         else:
-            angles = - np.asarray(metadata['thetas'])
+            angles = np.asarray(metadata['thetas'])
 
         self._ag = AcquisitionGeometry(geom_type = 'cone', 
                                        dimension = '3D', 

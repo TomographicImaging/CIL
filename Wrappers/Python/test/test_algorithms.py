@@ -1035,16 +1035,16 @@ class TestADMM(unittest.TestCase):
         self.fidelities = [ 0.5 * L2NormSquared(b=noisy_data), L1Norm(b=noisy_data), 
             KullbackLeibler(b=noisy_data, use_numba=False)]
 
-        # Setup and run the PDHG algorithm
-        G = ZeroFunction()
-        K = BlockOperator(GradientOperator(ig), IdentityOperator(ig))
+        F = self.alpha * MixedL21Norm()
+        K = GradientOperator(ig)
+        
         # Compute operator Norm
         normK = K.norm()
 
         # Primal & dual stepsizes
         self.sigma = 1./normK
         self.tau = 1./normK
-        self.G = G
+        self.F = F
         self.K = K
 
     def test_ADMM_L2(self):
@@ -1055,9 +1055,11 @@ class TestADMM(unittest.TestCase):
         self.do_test_with_fidelity(self.fidelities[2])
     def do_test_with_fidelity(self, fidelity):
         alpha = self.alpha
-        F = BlockFunction(alpha * MixedL21Norm(),fidelity)
+        # F = BlockFunction(alpha * MixedL21Norm(),fidelity)
+        
+        G = fidelity
         K = self.K
-        G = self.G 
+        F = self.F
 
         admm = LADMM(f=G, g=F, operator=K, tau=self.tau, sigma=self.sigma,
                     max_iteration = 100, update_objective_interval = 10)

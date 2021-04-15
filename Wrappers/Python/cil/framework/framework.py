@@ -62,12 +62,7 @@ class ImageGeometry(object):
     VERTICAL = 'vertical'
     HORIZONTAL_X = 'horizontal_x'
     HORIZONTAL_Y = 'horizontal_y'
-    @property
-    def labels_default(self):
-        return [  ImageGeometry.CHANNEL,
-                  ImageGeometry.VERTICAL,
-                  ImageGeometry.HORIZONTAL_Y,
-                  ImageGeometry.HORIZONTAL_X]
+    
     @property
     def shape(self):
 
@@ -107,7 +102,7 @@ class ImageGeometry(object):
     @property
     def dimension_labels(self):
         
-        labels_default = self.labels_default
+        labels_default = DataOrder.CIL_IG_LABELS
 
         shape_default = [   self.channels - 1, #channels default is 1
                             self.voxel_num_z,
@@ -132,7 +127,7 @@ class ImageGeometry(object):
         self.set_labels(val)
     
     def set_labels(self, labels):
-        labels_default = self.labels_default
+        labels_default = DataOrder.CIL_IG_LABELS
 
         #check input and store. This value is not used directly
         if labels is not None:
@@ -1326,13 +1321,6 @@ class AcquisitionGeometry(object):
     DIM2 = '2D'
     DIM3 = '3D'
 
-    @property
-    def labels_default(self):
-        return [AcquisitionGeometry.CHANNEL,
-                            AcquisitionGeometry.ANGLE,
-                            AcquisitionGeometry.VERTICAL,
-                            AcquisitionGeometry.HORIZONTAL]
-
     #for backwards compatibility
     @property
     def geom_type(self):
@@ -1417,7 +1405,7 @@ class AcquisitionGeometry(object):
 
     @property
     def dimension_labels(self):
-        labels_default = self.labels_default
+        labels_default = DataOrder.CIL_AG_LABELS
 
         shape_default = [self.config.channels.num_channels,
                             self.config.angles.num_positions,
@@ -1444,7 +1432,7 @@ class AcquisitionGeometry(object):
     @dimension_labels.setter
     def dimension_labels(self, val):
 
-        labels_default = self.labels_default
+        labels_default = DataOrder.CIL_AG_LABELS
 
         #check input and store. This value is not used directly
         if val is not None:
@@ -3024,6 +3012,8 @@ class DataOrder():
     TIGRE_IG_LABELS = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
     ASTRA_AG_LABELS = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.VERTICAL, AcquisitionGeometry.ANGLE, AcquisitionGeometry.HORIZONTAL]
     TIGRE_AG_LABELS = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.ANGLE, AcquisitionGeometry.VERTICAL, AcquisitionGeometry.HORIZONTAL]
+    CIL_IG_LABELS = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+    CIL_AG_LABELS = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.ANGLE, AcquisitionGeometry.VERTICAL, AcquisitionGeometry.HORIZONTAL] 
 
     @staticmethod
     def get_order_for_engine(engine, geometry):

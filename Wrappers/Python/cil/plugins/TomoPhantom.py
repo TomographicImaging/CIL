@@ -93,7 +93,36 @@ def check_model_params(model, dims=2):
         raise ValueError('Unsupported dimensionality. Expected 2 or 3, got {}'.format(dims))
 
 def get_ImageData(model, geometry):
-    '''Returns an ImageData relative to geometry with the model model from tomophantom'''
+    '''Returns an ImageData relative to geometry with the model model from tomophantom
+    
+    Example usage:
+    
+    .. code-block:: python
+      
+      ndim = 2
+      N=128
+      angles = np.linspace(0, 360, 50, True, dtype=np.float32)
+      offset = 0.4
+      channels = 3
+        
+      if ndim == 2:
+          ag = AcquisitionGeometry.create_Cone2D((offset,-100), (offset,100))
+          ag.set_panel(N)
+            
+      else:
+          ag = AcquisitionGeometry.create_Cone3D((offset,-100, 0), (offset,100,0))
+          ag.set_panel((N,N-2))
+        
+      ag.set_channels(channels)
+      ag.set_angles(angles, angle_unit=AcquisitionGeometry.DEGREE)
+        
+        
+      ig = ag.get_ImageGeometry()
+      model = 1
+      phantom = TomoPhantom.get_ImageData(model=model, geometry=ig)
+
+    
+    '''
     ig = geometry.copy()
     ig.set_labels(DataOrder.TOMOPHANTOM_IG_LABELS)
     num_dims = len(ig.dimension_labels)

@@ -2614,7 +2614,7 @@ class AcquisitionData(DataContainer):
             raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.formar(type(array)))
             
         if array.shape != geometry.shape:
-            raise ValueError('Shape mismatch {} {}'.format(array.shape, geometry.shape))
+            raise ValueError('Shape mismatch got {} expected {}'.format(array.shape, geometry.shape))
 
         if array.ndim not in [2,3,4]:
             raise ValueError('Number of dimensions are not 2 or 3 or 4 : {0}'.format(array.ndim))

@@ -62,7 +62,7 @@ class ImageGeometry(object):
     VERTICAL = 'vertical'
     HORIZONTAL_X = 'horizontal_x'
     HORIZONTAL_Y = 'horizontal_y'
-
+    
     @property
     def shape(self):
 
@@ -102,10 +102,7 @@ class ImageGeometry(object):
     @property
     def dimension_labels(self):
         
-        labels_default = [  ImageGeometry.CHANNEL,
-                            ImageGeometry.VERTICAL,
-                            ImageGeometry.HORIZONTAL_Y,
-                            ImageGeometry.HORIZONTAL_X]
+        labels_default = DataOrder.CIL_IG_LABELS
 
         shape_default = [   self.channels - 1, #channels default is 1
                             self.voxel_num_z,
@@ -130,10 +127,7 @@ class ImageGeometry(object):
         self.set_labels(val)
     
     def set_labels(self, labels):
-        labels_default = [  ImageGeometry.CHANNEL,
-                            ImageGeometry.VERTICAL,
-                            ImageGeometry.HORIZONTAL_Y,
-                            ImageGeometry.HORIZONTAL_X]
+        labels_default = DataOrder.CIL_IG_LABELS
 
         #check input and store. This value is not used directly
         if labels is not None:
@@ -1411,10 +1405,7 @@ class AcquisitionGeometry(object):
 
     @property
     def dimension_labels(self):
-        labels_default = [AcquisitionGeometry.CHANNEL,
-                            AcquisitionGeometry.ANGLE,
-                            AcquisitionGeometry.VERTICAL,
-                            AcquisitionGeometry.HORIZONTAL]
+        labels_default = DataOrder.CIL_AG_LABELS
 
         shape_default = [self.config.channels.num_channels,
                             self.config.angles.num_positions,
@@ -1441,10 +1432,7 @@ class AcquisitionGeometry(object):
     @dimension_labels.setter
     def dimension_labels(self, val):
 
-        labels_default = [  AcquisitionGeometry.CHANNEL,
-                            AcquisitionGeometry.ANGLE,
-                            AcquisitionGeometry.VERTICAL,
-                            AcquisitionGeometry.HORIZONTAL]
+        labels_default = DataOrder.CIL_AG_LABELS
 
         #check input and store. This value is not used directly
         if val is not None:
@@ -2626,7 +2614,7 @@ class AcquisitionData(DataContainer):
             raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.formar(type(array)))
             
         if array.shape != geometry.shape:
-            raise ValueError('Shape mismatch {} {}'.format(array.shape, geometry.shape))
+            raise ValueError('Shape mismatch got {} expected {}'.format(array.shape, geometry.shape))
 
         if array.ndim not in [2,3,4]:
             raise ValueError('Number of dimensions are not 2 or 3 or 4 : {0}'.format(array.ndim))
@@ -3024,7 +3012,10 @@ class DataOrder():
     TIGRE_IG_LABELS = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
     ASTRA_AG_LABELS = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.VERTICAL, AcquisitionGeometry.ANGLE, AcquisitionGeometry.HORIZONTAL]
     TIGRE_AG_LABELS = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.ANGLE, AcquisitionGeometry.VERTICAL, AcquisitionGeometry.HORIZONTAL]
-
+    CIL_IG_LABELS = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+    CIL_AG_LABELS = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.ANGLE, AcquisitionGeometry.VERTICAL, AcquisitionGeometry.HORIZONTAL] 
+    TOMOPHANTOM_IG_LABELS = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
+    
     @staticmethod
     def get_order_for_engine(engine, geometry):
         if engine == 'astra':

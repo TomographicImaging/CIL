@@ -85,7 +85,15 @@ class TestTomoPhantom2D(unittest.TestCase):
         phantom = TomoPhantom.get_ImageData(model, self.ig)
         assert phantom.geometry.channels == self.ig.channels
         assert phantom.shape == self.ig.shape
-
+    @unittest.skipUnless(has_tomophantom, 'Please install TomoPhantom')
+    def test_is_model_temporal(self):
+        model = 100
+        assert TomoPhantom.is_model_temporal(model, num_dims=2)
+    @unittest.skipUnless(has_tomophantom, 'Please install TomoPhantom')
+    def test_get_model_num_channels(self):
+        model = 100
+        N = TomoPhantom.is_model_temporal(model, num_dims=2)
+        assert N >= 1
 
 class TestTomoPhantom3D(unittest.TestCase):
     def setUp(self):
@@ -144,3 +152,12 @@ class TestTomoPhantom3D(unittest.TestCase):
         
         assert phantom.geometry.channels == ig.channels
         assert phantom.shape == ig.shape
+    @unittest.skipUnless(has_tomophantom, 'Please install TomoPhantom')
+    def test_is_model_temporal(self):
+        model = 100
+        assert TomoPhantom.is_model_temporal(model, num_dims=3)
+    @unittest.skipUnless(has_tomophantom, 'Please install TomoPhantom')
+    def test_get_model_num_channels(self):
+        model = 100
+        N = TomoPhantom.is_model_temporal(model, num_dims=3)
+        assert N >= 1

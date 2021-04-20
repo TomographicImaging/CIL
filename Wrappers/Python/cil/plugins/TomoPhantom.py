@@ -43,58 +43,82 @@ path = os.path.dirname(tomophantom.__file__)
 path_library2D = os.path.join(path, "Phantom2DLibrary.dat")
 path_library3D = os.path.join(path, "Phantom3DLibrary.dat")
 
-DataOrder.TOMOPHANTOM_AG_LABELS = [AcquisitionGeometry.CHANNEL, 
-                                   AcquisitionGeometry.ANGLE, 
-                                   AcquisitionGeometry.VERTICAL, 
-                                   AcquisitionGeometry.HORIZONTAL] 
-DataOrder.TOMOPHANTOM_IG_LABELS = [ImageGeometry.CHANNEL, 
-                                   ImageGeometry.VERTICAL, 
-                                   ImageGeometry.HORIZONTAL_Y, 
-                                   ImageGeometry.HORIZONTAL_X]
+def is_model_temporal(num_model, num_dims=2):
+    '''Returns whether a model in the TomoPhantom library is temporal
+    
+    This will go to check the installed library files from TomoPhantom
+    https://github.com/dkazanc/TomoPhantom/tree/master/PhantomLibrary/models
 
-def name_to_model_number(model, dims=2):
-    if model == 'shepp-logan':
-        if dims == 2:
-            return 1
-        else:
-            return 13
-    else:
-        return model
+    :param num_model: model number
+    :type num_model: int
+    :param num_dims: dimensionality of the phantom, 2D or 3D
+    :type num_dims: int, default 2
+    '''
+    return get_model_num_channels(num_model, num_dims) > 1
 
-def is_model_temporal(model, dims=2):
-    # https://github.com/dkazanc/TomoPhantom/blob/v1.4.9/Core/utils.c#L27
-    # https://github.com/dkazanc/TomoPhantom/blob/v1.4.9/Core/utils.c#L269
-    return check_model_params(model, dims=dims)[3] > 1
+def get_model_num_channels(num_model, num_dims=2):
+    '''Returns number of temporal steps (channels) the model has
+    
+    This will go to check the installed library files from TomoPhantom
+    https://github.com/dkazanc/TomoPhantom/tree/master/PhantomLibrary/models
 
-def check_model_params(model, dims=2):
-    if dims == 2:
+    https://github.com/dkazanc/TomoPhantom/blob/v1.4.9/Core/utils.c#L27
+    https://github.com/dkazanc/TomoPhantom/blob/v1.4.9/Core/utils.c#L269
+
+    :param num_model: model number
+    :type num_model: int
+    :param num_dims: dimensionality of the phantom, 2D or 3D
+    :type num_dims: int, default 2
+    '''
+    
+    return check_model_params(num_model, num_dims=num_dims)[3]
+
+def check_model_params(num_model, num_dims=2):
+    '''Returns params_switch array from the C TomoPhantom library in function checkParams2D or checkParams3D
+    
+    This will go to check the installed library files from TomoPhantom
+    https://github.com/dkazanc/TomoPhantom/tree/master/PhantomLibrary/models
+
+    https://github.com/dkazanc/TomoPhantom/blob/v1.4.9/Core/utils.c#L27
+    https://github.com/dkazanc/TomoPhantom/blob/v1.4.9/Core/utils.c#L269
+
+    :param num_model: model number
+    :type num_model: int
+    :param num_dims: dimensionality of the phantom, 2D or 3D
+    :type num_dims: int, default 2
+    '''
+    if num_dims == 2:
         libtomophantom.checkParams2D.argtypes = [ctypes.POINTER(ctypes.c_int),  # pointer to the params array 
                                   ctypes.c_int,                                   # model number selector (int)
                                   ctypes.c_char_p]                  # string to the library file
         params = np.zeros([10], dtype=np.int32)
         params_p = params.ctypes.data_as(ctypes.POINTER(ctypes.c_int))
         lib2d_p = str(path_library2D).encode('utf-8')
-        libtomophantom.checkParams2D(params_p, model, lib2d_p)
+        libtomophantom.checkParams2D(params_p, num_model, lib2d_p)
 
         return params
         
-    elif dims == 3:
+    elif num_dims == 3:
         libtomophantom.checkParams3D.argtypes = [ctypes.POINTER(ctypes.c_int),  # pointer to the params array 
                                   ctypes.c_int,                                   # model number selector (int)
                                   ctypes.c_char_p]                  # string to the library file
         params = np.zeros([11], dtype=np.int32)
         params_p = params.ctypes.data_as(ctypes.POINTER(ctypes.c_int))
         lib2d_p = str(path_library3D).encode('utf-8')
-        libtomophantom.checkParams3D(params_p, model, lib2d_p)
+        libtomophantom.checkParams3D(params_p, num_model, lib2d_p)
         
         return params
 
     else:
         raise ValueError('Unsupported dimensionality. Expected 2 or 3, got {}'.format(dims))
 
-def get_ImageData(model, geometry):
-    '''Returns an ImageData relative to geometry with the model model from tomophantom
+def get_ImageData(num_model, geometry):
+    '''Returns an ImageData relative to geometry with the model num_model from tomophantom
     
+    :param num_model: model number
+    :type num_model: int
+    :param geometry: geometrical info that describes the phantom
+    :type geometry: ImageGeometry
     Example usage:
     
     .. code-block:: python
@@ -118,8 +142,8 @@ def get_ImageData(model, geometry):
         
         
       ig = ag.get_ImageGeometry()
-      model = 1
-      phantom = TomoPhantom.get_ImageData(model=model, geometry=ig)
+      num_model = 1
+      phantom = TomoPhantom.get_ImageData(num_model=num_model, geometry=ig)
 
     
     '''
@@ -128,13 +152,13 @@ def get_ImageData(model, geometry):
     num_dims = len(ig.dimension_labels)
     
     if ImageGeometry.CHANNEL in ig.dimension_labels:
-        if not is_model_temporal(model):
-            raise ValueError('Selected model {} is not a temporal model, please change your selection'.format(model))
+        if not is_model_temporal(num_model):
+            raise ValueError('Selected model {} is not a temporal model, please change your selection'.format(num_model))
         if num_dims == 4:
             # 3D+time for tomophantom
             # output dimensions channel and then spatial, 
             # e.g. [ 'channel', 'vertical', 'horizontal_y', 'horizontal_x' ]
-            num_model = name_to_model_number(model)
+            num_model = num_model
             shape = tuple(ig.shape[1:])
             phantom_arr = TomoP3D.ModelTemporal(num_model, shape, path_library3D)
         elif num_dims == 3:
@@ -142,24 +166,24 @@ def get_ImageData(model, geometry):
             # output dimensions channel and then spatial, 
             # e.g. [ 'channel', 'horizontal_y', 'horizontal_x' ]
             N = ig.shape[1]
-            num_model = name_to_model_number(model)
+            num_model = num_model
             phantom_arr = TomoP2D.ModelTemporal(num_model, ig.shape[1], path_library2D)
         else:
             raise ValueError('Wrong ImageGeometry')
         if ig.channels != phantom_arr.shape[0]:
             raise ValueError('The required model {} has {} channels. The ImageGeometry you passed has {}. Please update your ImageGeometry.'\
-                .format(model, ig.channels, phantom_arr.shape[0]))
+                .format(num_model, ig.channels, phantom_arr.shape[0]))
     else:
         if num_dims == 3:
             # 3D
-            num_model = name_to_model_number(model)
+            num_model = num_model
             phantom_arr = TomoP3D.Model(num_model, ig.shape, path_library3D)
         elif num_dims == 2:
             # 2D
             if ig.shape[0] != ig.shape[1]:
                 raise ValueError('Can only handle square ImageData, got shape'.format(ig.shape))
             N = ig.shape[0]
-            num_model = name_to_model_number(model)
+            num_model = num_model
             phantom_arr = TomoP2D.Model(num_model, N, path_library2D)
         else:
             raise ValueError('Wrong ImageGeometry')
@@ -168,25 +192,3 @@ def get_ImageData(model, geometry):
     im_data = ImageData(phantom_arr, geometry=ig, suppress_warning=True)
     im_data.reorder(list(geometry.dimension_labels))
     return im_data
-    
-
-
-
-if __name__ == '__main__':
-    # ig = ImageGeometry(512,512,512)
-
-    # phantom = tomophantom.get_ImageData(model=12, ig)
-    # shepp_logan = tomophantom.get_ImageData(model='shepp-logan', ig)
-
-    # # only for simple parallel beam
-    # ag = AcquisitionGeometry.createParallel2D()
-    # # finish set up geometry
-    # ag.set_panel((80,80))
-    # ag.set_angles(angles, angle_unit='degree')
-
-    # ad = tomophantom.get_AcquisitionData(model='shepp-logan', ag)
-    
-    if is_model_temporal(1, dims=2):
-        print ("True")
-    else:
-        print ("False")

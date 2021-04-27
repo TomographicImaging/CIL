@@ -1,6 +1,7 @@
 * 21.1.0
   - Added TomoPhantom plugin to create 2D/3D + channel ImageData phantoms based on the TomoPhantom model library
-
+  - Fixed bug in Zeiss reader geometry direction of rotation
+  
 * 21.0.0
   - Show2D now takes 4D datasets and slice infomation as input
   - TIGRE reconstruction package wrapped for cone-beam tomography

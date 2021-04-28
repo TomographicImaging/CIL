@@ -47,10 +47,10 @@ try:
 except ImportError as ie:
     has_reg_toolkit = False
 if has_reg_toolkit:
-    from cil.plugins.ccpi_regularisation.functions import FGP_TV as CCPiReg_FGP_TV
+    from cil.plugins.ccpi_regularisation.functions import FGP_TV
 
 print ("Has Reg Toolkit", has_reg_toolkit)
-from timeit import default_timer as timer
+
 try:
     import tomophantom
     from tomophantom import TomoP3D
@@ -958,74 +958,78 @@ class TestTotalVariation(unittest.TestCase):
     @unittest.skipUnless(has_reg_toolkit, "Regularisation Toolkit not present")
     def test_compare_regularisation_toolkit(self):
     
-        print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV no tolerance (2D)")
+        # print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV no tolerance (2D)")
 
         data = dataexample.SHAPES.get()
         ig = data.geometry
         ag = ig
 
+        np.random.seed(0)
         # Create noisy data. 
         n1 = np.random.normal(0, 0.1, size = ig.shape)
         noisy_data = ig.allocate()
         noisy_data.fill(n1+data.as_array())
         
         alpha = 0.1
-        iters = 1000
+        iters = 100
             
         # CIL_FGP_TV no tolerance
         g_CIL = alpha * TotalVariation(iters, tolerance=None, lower = 0, info = True)
         t0 = timer()
         res1 = g_CIL.proximal(noisy_data, 1.)
         t1 = timer()
-        print(t1-t0)
+        # print(t1-t0)
         
-        # CCPi Regularisation toolkit high tolerance
         r_alpha = alpha
         r_iterations = iters
         r_tolerance = 1e-9
-        r_iso = 0
-        r_nonneg = 1
+        r_iso = True
+        r_nonneg = True
         r_printing = 0
-        g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'cpu')
+        # g_CCPI_reg_toolkit = alpha * FGP_TV(1., r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'cpu')
+        g_CCPI_reg_toolkit = alpha * FGP_TV(max_iteration=r_iterations, tolerance=r_tolerance, 
+             isotropic=r_iso, nonnegativity=r_nonneg, printing=r_printing, device='cpu')
         
         t2 = timer()
         res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
         t3 = timer()
-        print(t3-t1)
+        # print(t3-t1)
         
         
-        np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal = 4)
-        
+        # np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal = 4)
+        np.testing.assert_allclose(res1.as_array(), res2.as_array(), atol=2.5e-3)
+
         ###################################################################
         ###################################################################
         ###################################################################
         ###################################################################    
         
-        print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV with iterations.")
+        # print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV with iterations.")
         iters = 408
         # CIL_FGP_TV no tolerance
         g_CIL = alpha * TotalVariation(iters, tolerance=1e-9, lower = 0.)
         t0 = timer()
         res1 = g_CIL.proximal(noisy_data, 1.)
         t1 = timer()
-        print(t1-t0)
+        # print(t1-t0)
         
-        # CCPi Regularisation toolkit high tolerance
         r_alpha = alpha
         r_iterations = iters
         r_tolerance = 1e-9
-        r_iso = 0
-        r_nonneg = 1
+        r_iso = True
+        r_nonneg = True
         r_printing = 0
-        g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'cpu')
+        # g_CCPI_reg_toolkit = alpha * FGP_TV(1., r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'cpu')
+        g_CCPI_reg_toolkit = alpha * FGP_TV(max_iteration=r_iterations, tolerance=r_tolerance, 
+             isotropic=r_iso, nonnegativity=r_nonneg, printing=r_printing, device='cpu')
 
         t2 = timer()
         res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
         t3 = timer()
-        print(t3-t2)
+        # print(t3-t2)
         
         
-        print(mae(res1, res2))
+        # print(mae(res1, res2))
         np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal=3)    
         
         ###################################################################

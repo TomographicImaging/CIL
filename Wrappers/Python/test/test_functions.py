@@ -55,6 +55,7 @@ try:
     import tomophantom
     from tomophantom import TomoP3D
     has_tomophantom = True
+    from cil.plugins import TomoPhantom
 except ImportError as ie:
     has_tomophantom = False
 
@@ -1039,59 +1040,56 @@ class TestTotalVariation(unittest.TestCase):
     @unittest.skipUnless(has_tomophantom and has_reg_toolkit, "Missing Tomophantom or Regularisation-Toolkit")
     def test_compare_regularisation_toolkit_tomophantom(self):
     
-        print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV no tolerance (3D)") 
+        # print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV no tolerance (3D)") 
             
-        print ("Building 3D phantom using TomoPhantom software")
+        # print ("Building 3D phantom using TomoPhantom software")
         model = 13 # select a model number from the library
         N_size = 64 # Define phantom dimensions using a scalar value (cubic phantom)
-        path = os.path.dirname(tomophantom.__file__)
-        path_library3D = os.path.join(path, "Phantom3DLibrary.dat")
         #This will generate a N_size x N_size x N_size phantom (3D)
-        phantom_tm = TomoP3D.Model(model, N_size, path_library3D)    
         
         ig = ImageGeometry(N_size, N_size, N_size)
-        data = ig.allocate()
-        data.fill(phantom_tm)
-        
+        data = TomoPhantom.get_ImageData(num_model=model, geometry=ig)
+
         noisy_data = noise.gaussian(data, seed=10)
-        
         
         alpha = 0.1
         iters = 1000
         
-        print("Use tau as an array of ones")
+        # print("Use tau as an array of ones")
         # CIL_TotalVariation no tolerance
         g_CIL = alpha * TotalVariation(iters, tolerance=None, info=True)
         res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
         t0 = timer()   
         res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
         t1 = timer()
-        print(t1-t0)
+        # print(t1-t0)
 
         # CCPi Regularisation toolkit high tolerance
+        
         r_alpha = alpha
         r_iterations = iters
         r_tolerance = 1e-9
-        r_iso = 0
-        r_nonneg = 0
+        r_iso = True
+        r_nonneg = True
         r_printing = 0
-        g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'cpu')
+        g_CCPI_reg_toolkit = alpha * FGP_TV(max_iteration=r_iterations, tolerance=r_tolerance, 
+             isotropic=r_iso, nonnegativity=r_nonneg, printing=r_printing, device='cpu')
+
 
         t2 = timer()
         res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
         t3 = timer()
-        print (t3-t2)
+        # print (t3-t2)
         np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal=3)
 
             
             
         # CIL_FGP_TV no tolerance
-        #g_CIL = FGP_TV(ig, alpha, iters, tolerance=None, info=True)
         g_CIL.tolerance = None
         t0 = timer()
         res1 = g_CIL.proximal(noisy_data, 1.)
         t1 = timer()
-        print(t1-t0)
+        # print(t1-t0)
         
         ###################################################################
         ###################################################################
@@ -1112,21 +1110,24 @@ class TestTotalVariation(unittest.TestCase):
         t0 = timer()
         res1 = g_CIL.proximal(noisy_data, 1.)
         t1 = timer()
-        print(t1-t0)
+        # print(t1-t0)
 
         # CCPi Regularisation toolkit high tolerance
+        
         r_alpha = alpha
         r_iterations = iters
-        r_tolerance = 1e-8
-        r_iso = 0
-        r_nonneg = 0
+        r_tolerance = 1e-9
+        r_iso = True
+        r_nonneg = True
         r_printing = 0
-        g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'cpu')
-        
+        g_CCPI_reg_toolkit = alpha * FGP_TV(max_iteration=r_iterations, tolerance=r_tolerance, 
+             isotropic=r_iso, nonnegativity=r_nonneg, printing=r_printing, device='cpu')
+
+
         t2 = timer()
         res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
         t3 = timer()
-        print (t3-t2)
+        # print (t3-t2)
 
 
 class TestKullbackLeiblerNumba(unittest.TestCase):

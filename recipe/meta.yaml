@@ -25,6 +25,7 @@ test:
     - tigre
     - numba
     - packaging
+    - ccpi-regulariser
     
   source_files:
     - ./Wrappers/Python/test     # [win]

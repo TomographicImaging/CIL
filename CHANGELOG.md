@@ -1,3 +1,6 @@
+* 21.x.x
+  - add CCPi-Regularisation toolkit in unittests
+
 * 21.1.0
   - Added TomoPhantom plugin to create 2D/3D + channel ImageData phantoms based on the TomoPhantom model library
   - Fixed bug in Zeiss reader geometry direction of rotation

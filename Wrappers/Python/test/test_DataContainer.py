@@ -619,13 +619,15 @@ class TestDataContainer(unittest.TestCase):
         data.reorder(new_order)
         self.assertListEqual(list(new_order), list(data.geometry.dimension_labels))
         self.assertListEqual(list(new_order), list(data.dimension_labels))
+
     def test_reorder_with_list(self):
         vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)
         data = vgeometry.allocate(0)
-        new_order = ('horizontal_y','horizontal_x', 'channel')
+        new_order = ['horizontal_y','horizontal_x', 'channel']
         data.reorder(new_order)
         self.assertListEqual(list(new_order), list(data.geometry.dimension_labels))
         self.assertListEqual(list(new_order), list(data.dimension_labels))
+
     def test_reorder_with_tuple_wrong_len(self):
         vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)
         data = vgeometry.allocate(0)
@@ -635,6 +637,7 @@ class TestDataContainer(unittest.TestCase):
             assert False
         except ValueError:
             assert True
+
     def test_reorder_with_tuple_wrong_label(self):
         vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)
         data = vgeometry.allocate(0)
@@ -656,7 +659,6 @@ class TestDataContainer(unittest.TestCase):
             def __iter__(self):
                 return self
         new_order = Label(['horizontal_y','channel','horizontal_x'])
-        # print (len(new_order))
         try:
             data.reorder(new_order)
             assert False, "Unit test should have failed! Expecting len to be implemented"

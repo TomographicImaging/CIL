@@ -17,7 +17,7 @@
 
 
 #%%
-from cil.framework import ImageGeometry, AcquisitionData, ImageData, DataContainer, BlockDataContainer
+from cil.framework import AcquisitionGeometry, ImageGeometry, AcquisitionData, ImageData, DataContainer, BlockDataContainer
 import numpy as np
 from itertools import product, combinations
 
@@ -29,7 +29,7 @@ from mpl_toolkits.mplot3d import proj3d
 from matplotlib import gridspec
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-class __PlotData(object):
+class _PlotData(object):
     def __init__(self, data, title, axis_labels, origin):
         self.data = data
         self.title = title
@@ -235,7 +235,7 @@ def show2D(datacontainers, title=None, slice_list=None, fix_range=False, axis_la
         else:
             plot_origin = origin
 
-        subplots.append(__PlotData(plot_data,plot_title,plot_axis_labels, plot_origin))
+        subplots.append(_PlotData(plot_data,plot_title,plot_axis_labels, plot_origin))
 
     #set range per subplot
     for i, subplot in enumerate(subplots):
@@ -335,7 +335,7 @@ def plotter2D(datacontainers, title=None, slice_list=None, fix_range=False, axis
 
 
 
-class __Arrow3D(FancyArrowPatch):
+class _Arrow3D(FancyArrowPatch):
 
     def __init__(self, xs, ys, zs, *args, **kwargs):
         FancyArrowPatch.__init__(self, (0, 0), (0, 0), *args, **kwargs)
@@ -347,7 +347,7 @@ class __Arrow3D(FancyArrowPatch):
         self.set_positions((xs[0], ys[0]), (xs[1], ys[1]))
         FancyArrowPatch.draw(self, renderer)
 
-class __ShowGeometry(object):
+class _ShowGeometry(object):
 
     def __init__(self, ag, ig=None):
 
@@ -399,7 +399,7 @@ class __ShowGeometry(object):
         self.display_detector()
         self.display_object()
 
-        if ag.geom_type == 'cone':
+        if self.ag.geom_type == 'cone':
             self.display_source()
         else:
             self.display_ray()
@@ -440,7 +440,7 @@ class __ShowGeometry(object):
             axis = np.zeros(3)
             axis[i] = 1 * self.scale
 
-            a = __Arrow3D(*zip(Oo,axis*2), mutation_scale=20,lw=1, arrowstyle="->", color="k")
+            a = _Arrow3D(*zip(Oo,axis*2), mutation_scale=20,lw=1, arrowstyle="->", color="k")
             self.ax.add_artist(a)
         
             self.ax.text(*(axis*2.2),labels[i], **self.text_options)
@@ -490,13 +490,13 @@ class __ShowGeometry(object):
 
         det_rows_dir = self.ag.config.system.detector.direction_x
 
-        x = __Arrow3D(*zip(do, self.scale * det_rows_dir + do), mutation_scale=20,lw=1, arrowstyle="-|>", color="b")
+        x = _Arrow3D(*zip(do, self.scale * det_rows_dir + do), mutation_scale=20,lw=1, arrowstyle="-|>", color="b")
         self.ax.add_artist(x)
         self.ax.text(*(1.2 * self.scale * det_rows_dir + do),r'$D_x$', **self.text_options)
 
         if self.ndim == 3:
             det_col_dir = self.ag.config.system.detector.direction_y
-            y = __Arrow3D(*zip(do, self.scale * det_col_dir + do), mutation_scale=20,lw=1, arrowstyle="-|>", color="b")
+            y = _Arrow3D(*zip(do, self.scale * det_col_dir + do), mutation_scale=20,lw=1, arrowstyle="-|>", color="b")
             self.ax.add_artist(y)
             self.ax.text(*(1.2 * self.scale * det_col_dir + do),r'$D_y$', **self.text_options)
 
@@ -521,7 +521,7 @@ class __ShowGeometry(object):
         if self.ndim == 3:
             # rotate axis arrow
             r1 = ro +  self.ag.config.system.rotation_axis.direction * self.scale * 2
-            arrow3 = __Arrow3D(*zip(ro,r1), mutation_scale=20,lw=1, arrowstyle="-|>", color="r")
+            arrow3 = _Arrow3D(*zip(ro,r1), mutation_scale=20,lw=1, arrowstyle="-|>", color="r")
             self.ax.add_artist(arrow3)
 
         #reconstruction volume
@@ -581,7 +581,7 @@ class __ShowGeometry(object):
             z[i] = float(point_rot[2] + ro[2])
 
         self.ax.plot3D(x,y,z, color='r',ls="dashed",alpha=1)
-        arrow4 = __Arrow3D(x[-2:],y[-2:],z[-2:],mutation_scale=20,lw=1, arrowstyle="-|>", color="r")
+        arrow4 = _Arrow3D(x[-2:],y[-2:],z[-2:],mutation_scale=20,lw=1, arrowstyle="-|>", color="r")
         self.ax.add_artist(arrow4)
 
         handles = [ 
@@ -626,7 +626,7 @@ class __ShowGeometry(object):
         
         for i in range(len(rays)):
             h0 = self.ax.plot3D(*zip(rays[i],det[i]), color='#D4BD72',ls="dashed",alpha=0.4, label='ray direction')[0]
-            arrow = __Arrow3D(*zip(rays[i],rays[i]+self.ag.config.system.ray.direction*self.scale ),mutation_scale=20,lw=1, arrowstyle="-|>", color="#D4BD72")
+            arrow = _Arrow3D(*zip(rays[i],rays[i]+self.ag.config.system.ray.direction*self.scale ),mutation_scale=20,lw=1, arrowstyle="-|>", color="#D4BD72")
             self.ax.add_artist(arrow)
 
         self.handles.append(h0)
@@ -651,9 +651,9 @@ def show_geometry(acquisition_geom, image_geom=None, elevation=20, azimuthal=-35
     :grid: Show figire axis
     :type grid: boolean, default=False     
     '''
-    if ag.dimension == '2D':
+    if acquisition_geom.dimension == '2D':
         elevation = 90
         azimuthal = 0
 
-    display = __ShowGeometry(acquisition_geom, image_geom)
+    display = _ShowGeometry(acquisition_geom, image_geom)
     display.draw(elev=elevation, azim=azimuthal, view_distance=view_distance, grid=grid)

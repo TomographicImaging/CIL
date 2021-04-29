@@ -20,6 +20,7 @@
 from cil.framework import AcquisitionGeometry, ImageGeometry, AcquisitionData, ImageData, DataContainer, BlockDataContainer
 import numpy as np
 from itertools import product, combinations
+import warnings
 
 from mpl_toolkits import mplot3d
 import matplotlib.lines as mlines
@@ -343,7 +344,7 @@ class _Arrow3D(FancyArrowPatch):
 
     def draw(self, renderer):
         xs3d, ys3d, zs3d = self._verts3d
-        xs, ys, zs = proj3d.proj_transform(xs3d, ys3d, zs3d, renderer.M)
+        xs, ys, zs = proj3d.proj_transform(xs3d, ys3d, zs3d, self.axes.M)
         self.set_positions((xs[0], ys[0]), (xs[1], ys[1]))
         FancyArrowPatch.draw(self, renderer)
 
@@ -414,8 +415,10 @@ class _ShowGeometry(object):
         world_limits = self.ax.get_w_lims()
         self.ax.set_box_aspect((world_limits[1]-world_limits[0],world_limits[3]-world_limits[2],world_limits[5]-world_limits[4]))
 
-        self.ax.legend(self.handles, self.labels, loc='upper left', bbox_to_anchor= (0, 1), ncol=1,
-                borderaxespad=0, frameon=False,fontsize=self.text_options.get('fontsize'))
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            self.ax.legend(self.handles, self.labels, loc='upper left', bbox_to_anchor= (0, 1), ncol=1,
+                        borderaxespad=0, frameon=False,fontsize=self.text_options.get('fontsize'))
 
         plt.tight_layout()
 

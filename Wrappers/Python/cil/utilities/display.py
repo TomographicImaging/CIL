@@ -419,7 +419,7 @@ class _ShowGeometry(object):
 
         plt.tight_layout()
 
-        plt.draw()
+        plt.show()
 
     def display_world(self):
 

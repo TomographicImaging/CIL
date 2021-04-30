@@ -612,69 +612,6 @@ class TestDataContainer(unittest.TestCase):
         image2 = vgeometry.allocate('random', seed=0)
         numpy.testing.assert_array_equal(image1.as_array(), image2.as_array())
 
-    def test_reorder_with_tuple(self):
-        vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)
-        data = vgeometry.allocate(0)
-        new_order = ('horizontal_y','horizontal_x', 'channel')
-        data.reorder(new_order)
-        self.assertListEqual(list(new_order), list(data.geometry.dimension_labels))
-        self.assertListEqual(list(new_order), list(data.dimension_labels))
-
-    def test_reorder_with_list(self):
-        vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)
-        data = vgeometry.allocate(0)
-        new_order = ['horizontal_y','horizontal_x', 'channel']
-        data.reorder(new_order)
-        self.assertListEqual(list(new_order), list(data.geometry.dimension_labels))
-        self.assertListEqual(list(new_order), list(data.dimension_labels))
-
-    def test_reorder_with_tuple_wrong_len(self):
-        vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)
-        data = vgeometry.allocate(0)
-        new_order = ('horizontal_y','channel')
-        try:
-            data.reorder(new_order)
-            assert False
-        except ValueError:
-            assert True
-
-    def test_reorder_with_tuple_wrong_label(self):
-        vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)
-        data = vgeometry.allocate(0)
-        new_order = ('horizontal_y','channel','temperature')
-        try:
-            data.reorder(new_order)
-            assert False, "Unit test should have failed! Expecting labels in {}, got {}".format(vgeometry.dimension_labels, new_order)
-        except ValueError:
-            assert True
-
-    def test_reorder_with_iterable_no_len(self):
-        vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)
-        data = vgeometry.allocate(0)
-        class Label(object):
-            def __init__(self, labels):
-                self.labels = labels[:]
-            def __next__(self):
-                return self.labels.__next__()
-            def __iter__(self):
-                return self
-        new_order = Label(['horizontal_y','channel','horizontal_x'])
-        try:
-            data.reorder(new_order)
-            assert False, "Unit test should have failed! Expecting len to be implemented"
-        except ValueError as ve:
-            assert True, ve
-        
-    def test_reorder_with_repeated_label(self):
-        vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)
-        data = vgeometry.allocate(0)
-        new_order = ['horizontal_y','channel','horizontal_y']
-        # print (len(new_order))
-        try:
-            data.reorder(new_order)
-            assert False, "should have found a repeated label"
-        except ValueError as ve:
-            assert True, ve
         
     def test_AcquisitionDataSubset(self):
         sgeometry = AcquisitionGeometry(dimension=2, angles=numpy.linspace(0, 180, num=10),

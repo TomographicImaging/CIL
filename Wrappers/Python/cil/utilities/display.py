@@ -388,7 +388,7 @@ class _ShowGeometry(object):
         self.handles = []
         self.labels = []
 
-    def draw(self, elev=35, azim=35, view_distance=10, grid=False, figsize=(15,15), fontsize=10):
+    def draw(self, elev=35, azim=35, view_distance=10, grid=False, figsize=(10,10), fontsize=10):
 
         self.fig = plt.figure(figsize=figsize)
         self.ax = self.fig.add_subplot(111, projection='3d')
@@ -399,13 +399,16 @@ class _ShowGeometry(object):
 
 
         self.display_world()
-        self.display_detector()
-        self.display_object()
 
         if self.acquisition_geometry.geom_type == 'cone':
             self.display_source()
         else:
             self.display_ray()
+
+        self.display_object()
+
+        self.display_detector()
+
 
         if grid is False: 
             self.ax.set_axis_off()
@@ -417,10 +420,17 @@ class _ShowGeometry(object):
         world_limits = self.ax.get_w_lims()
         self.ax.set_box_aspect((world_limits[1]-world_limits[0],world_limits[3]-world_limits[2],world_limits[5]-world_limits[4]))
 
+        l = self.ax.plot(np.NaN, np.NaN, '-', color='none', label='')[0]
+
+        for i in range(3):
+            self.handles.insert(2,l)
+            self.labels.insert(2,'')   
+    
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            self.ax.legend(self.handles, self.labels, loc='upper left', bbox_to_anchor= (0, 1), ncol=1,
+            self.ax.legend(self.handles, self.labels, loc='upper left', bbox_to_anchor= (0, 1), ncol=3,
                         borderaxespad=0, frameon=False,fontsize=self.text_options.get('fontsize'))
+
 
         plt.tight_layout()
 
@@ -626,14 +636,12 @@ class _ShowGeometry(object):
         for i in range(len(det)):
             self.ax.plot3D(*zip(so,det[i]), color='#D4BD72',ls="dashed",alpha=0.4)
         
-        handles = [
-            self.ax.plot3D(*zip(so,self.acquisition_geometry.config.system.detector.position), color='#D4BD72',ls="solid",alpha=1)[0],
-            self.ax.scatter3D(*so, marker='*', alpha=1,color='#D4BD72',lw=1, label='source position', s=100)
-        ]
+        self.ax.plot3D(*zip(so,self.acquisition_geometry.config.system.detector.position), color='#D4BD72',ls="solid",alpha=1)[0],
 
-        for x in handles:
-            self.handles.append(x)
-            self.labels.append(x.get_label())
+        h0 = self.ax.scatter3D(*so, marker='*', alpha=1,color='#D4BD72',lw=1, label='source position', s=100)
+
+        self.handles.append(h0)
+        self.labels.append(h0.get_label())
 
     def display_ray(self):
 
@@ -656,7 +664,7 @@ class _ShowGeometry(object):
         self.labels.append(h0.get_label())
 
 #%%
-def show_geometry(acquisition_geometry, image_geometry=None, elevation=20, azimuthal=-35, view_distance=10, grid=False):
+def show_geometry(acquisition_geometry, image_geometry=None, elevation=20, azimuthal=-35, view_distance=10, grid=False, figsize=(10,10), fontsize=10):
     '''
     Displays a schematic of the acquisition geometry
     for 2D geometries elevation and azimuthal cannot be changed
@@ -671,12 +679,17 @@ def show_geometry(acquisition_geometry, image_geometry=None, elevation=20, azimu
     :type azimuthal: float, default=-35  
     :view_distance: Camera view distance
     :type view_distance: float, default=10  
-    :grid: Show figire axis
-    :type grid: boolean, default=False     
+    :grid: Show figure axis
+    :type grid: boolean, default=False
+    :figsize: Set figure size (inches)
+    :type figsize: tuple (x, y), default (10,10)    
+    :type grid: boolean, default=False
+    :fontsize: Set fontsize
+    :type fontsize: int 
     '''
     if acquisition_geometry.dimension == '2D':
         elevation = 90
         azimuthal = 0
 
     display = _ShowGeometry(acquisition_geometry, image_geometry)
-    display.draw(elev=elevation, azim=azimuthal, view_distance=view_distance, grid=grid)
+    display.draw(elev=elevation, azim=azimuthal, view_distance=view_distance, grid=grid, figsize=(10,10), fontsize=10)

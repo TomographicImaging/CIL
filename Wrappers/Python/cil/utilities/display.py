@@ -384,18 +384,20 @@ class _ShowGeometry(object):
         len2 = self.acquisition_geometry.config.panel.num_pixels[1] * self.acquisition_geometry.config.panel.pixel_size[1]
         self.scale = max(len1,len2)/5
 
-        self.text_options = {   'horizontalalignment': 'center',
-                                'verticalalignment': 'center',
-                                'fontsize': 15 }
 
         self.handles = []
         self.labels = []
 
-    def draw(self, elev=35, azim=35, view_distance=10, grid=False):
+    def draw(self, elev=35, azim=35, view_distance=10, grid=False, figsize=(15,15), fontsize=10):
 
-        self.fig = plt.figure(figsize=(15,15))
+        self.fig = plt.figure(figsize=figsize)
         self.ax = self.fig.add_subplot(111, projection='3d')
-        
+
+        self.text_options = {   'horizontalalignment': 'center',
+                                'verticalalignment': 'center',
+                                'fontsize': fontsize }
+
+
         self.display_world()
         self.display_detector()
         self.display_object()

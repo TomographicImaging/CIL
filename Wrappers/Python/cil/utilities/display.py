@@ -608,7 +608,7 @@ class _ShowGeometry(object):
         handles = [ 
             mlines.Line2D([], [], color='r',linestyle='solid', markersize=12, label='rotation axis direction'),
             mlines.Line2D([], [], color='r',linestyle='dashed', markersize=12, label=r'rotation direction $\theta$'),
-            mlines.Line2D([], [], color='r',linestyle='dotted', markersize=15, label='Imacquisition_geometrye geometry'),
+            mlines.Line2D([], [], color='r',linestyle='dotted', markersize=15, label='image geometry'),
             self.ax.scatter3D(*vox0, marker='x', alpha=1,color='r',lw=1,s=50, label='data origin (voxel 0)')
         ]
 

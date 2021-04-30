@@ -1942,9 +1942,18 @@ class DataContainer(object):
         if order == 'astra' or order == 'tigre':
             order = DataOrder.get_order_for_engine(order, self.geometry)  
 
-        if type(order) != list or len(order) != len(self.shape):
+        try:
+            if len(order) != len(self.shape):
+                raise ValueError('The axes list for resorting must have {0} dimensions. Got {1}'.format(len(self.shape), len(order)))
+        except TypeError as ae:
+            raise ValueError('The order must be an iterable with __len__ implemented, like a list or a tuple. Got {}'.format(type(order)))
+        
+        correct = True
+        for el in order:
+            correct = correct and el in self.dimension_labels
+        if not correct:
             raise ValueError('The axes list for resorting must contain the dimension_labels {0} got {1}'.format(self.dimension_labels, order))
-
+            
         new_order = [0]*len(self.shape)
         dimension_labels_new = [0]*len(self.shape)
 

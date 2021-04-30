@@ -606,6 +606,13 @@ class TestDataContainer(unittest.TestCase):
         sino.fill(r)
         self.assertAlmostEqual(sino.squared_norm(), sino.size*2)
         
+    def test_ImageGeometry_allocate_random_same_seed(self):
+        vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)
+        image1 = vgeometry.allocate('random', seed=0)
+        image2 = vgeometry.allocate('random', seed=0)
+        numpy.testing.assert_array_equal(image1.as_array(), image2.as_array())
+
+        
     def test_AcquisitionDataSubset(self):
         sgeometry = AcquisitionGeometry(dimension=2, angles=numpy.linspace(0, 180, num=10),
                                         geom_type='parallel', pixel_num_v=3,
@@ -622,15 +629,15 @@ class TestDataContainer(unittest.TestCase):
         new_order = [AcquisitionGeometry.HORIZONTAL ,
                  AcquisitionGeometry.CHANNEL , AcquisitionGeometry.VERTICAL ,
                  AcquisitionGeometry.ANGLE]
-        ss = sino.subset(new_order)
+        sino.reorder(new_order)
 
-        self.assertListEqual(new_order, list(ss.geometry.dimension_labels))
+        self.assertListEqual(new_order, list(sino.geometry.dimension_labels))
 
-        ss1 = ss.subset(vertical = 0)
+        ss1 = sino.get_slice(vertical = 0)
         self.assertListEqual([AcquisitionGeometry.HORIZONTAL ,
                  AcquisitionGeometry.CHANNEL  ,
                  AcquisitionGeometry.ANGLE], list(ss1.geometry.dimension_labels))
-        ss2 = ss.subset(vertical = 0, channel=0)
+        ss2 = sino.get_slice(vertical = 0, channel=0)
         self.assertListEqual([AcquisitionGeometry.HORIZONTAL ,
                  AcquisitionGeometry.ANGLE], list(ss2.geometry.dimension_labels))
 
@@ -646,12 +653,12 @@ class TestDataContainer(unittest.TestCase):
         vol = vgeometry.allocate()
 
         # test reshape
-        new_order = ['channel', 'horizontal_x','horizontal_y']
-        ss = vol.subset(new_order)
+        new_order = ['channel', 'horizontal_y','horizontal_x']
+        vol.reorder(new_order)
 
-        self.assertListEqual(new_order, list(ss.geometry.dimension_labels))
+        self.assertListEqual(new_order, list(vol.geometry.dimension_labels))
 
-        ss1 = ss.subset(horizontal_x = 0)
+        ss1 = vol.get_slice(horizontal_x = 0)
         self.assertListEqual(['channel', 'horizontal_y'], list(ss1.geometry.dimension_labels))
 
         vg = ImageGeometry(3,4,5,channels=2)
@@ -659,7 +666,7 @@ class TestDataContainer(unittest.TestCase):
                 ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X],
                               list(vg.dimension_labels))
         ss2 = vg.allocate()
-        ss3 = ss2.subset(vertical = 0, channel=0)
+        ss3 = vol.get_slice(channel=0)
         self.assertListEqual([ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X], list(ss3.geometry.dimension_labels))
 
 

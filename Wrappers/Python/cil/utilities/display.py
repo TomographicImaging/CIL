@@ -519,7 +519,7 @@ class _ShowGeometry(object):
         handles=[
             self.ax.scatter3D(*do, marker='o', alpha=1,color='b',lw=1, label='detector position'),
             mlines.Line2D([], [], color='b',linestyle='solid', markersize=12, label='detector direction'),      
-            self.ax.plot3D(*zip(*det, det[0]), color='b',ls='dashed',alpha=1, label='detector')[0],
+            self.ax.plot3D(*zip(*det, det[0]), color='b',ls='dotted',alpha=1, label='detector')[0],
             self.ax.scatter3D(*pix0, marker='x', alpha=1,color='b',lw=1,s=50, label='data origin (pixel 0)'),            
         ]
 
@@ -584,7 +584,7 @@ class _ShowGeometry(object):
                 y_data = float(s[1]) + ro[1], float(e[1]) + ro[1]
                 z_data = float(s[2]) + ro[2], float(e[2]) + ro[2]
 
-                self.ax.plot3D(x_data,y_data,z_data, color="r",ls='dashed',alpha=0.8)
+                self.ax.plot3D(x_data,y_data,z_data, color="r",ls='dotted',alpha=1)
 
                 if count == 0:
                     vox0=(x_data[0],y_data[0],z_data[0])
@@ -594,7 +594,7 @@ class _ShowGeometry(object):
             x = [self.image_geometry.get_min_x(), self.image_geometry.get_max_x()]
             y = [self.image_geometry.get_min_y(), self.image_geometry.get_max_y()]
             vertex = np.array([(x[0],y[0],0),(x[0],y[1],0),(x[1],y[1],0),(x[1],y[0],0)]) + ro
-            self.ax.plot3D(*zip(*vertex, vertex[0]), color='r',ls='dashed',alpha=1)
+            self.ax.plot3D(*zip(*vertex, vertex[0]), color='r',ls='dotted',alpha=1)
             vox0=vertex[0]
             rotation_matrix = np.eye(3)
 
@@ -613,15 +613,15 @@ class _ShowGeometry(object):
             y[i] = float(point_rot[1] + ro[1])
             z[i] = float(point_rot[2] + ro[2])
 
-        self.ax.plot3D(x,y,z, color='r',ls="dotted",alpha=1)
+        self.ax.plot3D(x,y,z, color='r',ls="dashed",alpha=1)
         arrow4 = _Arrow3D(x[-2:],y[-2:],z[-2:],mutation_scale=20,lw=1, arrowstyle="-|>", color="r")
         self.ax.add_artist(arrow4)
 
         handles = [ 
             mlines.Line2D([], [], color='r',linestyle='solid', markersize=12, label='rotation axis direction'),
-            mlines.Line2D([], [], color='r',linestyle='dotted', markersize=12, label=r'rotation direction $\theta$'),
-            mlines.Line2D([], [], color='r',linestyle='dashed', markersize=15, label='image geometry'),
-            self.ax.scatter3D(*vox0, marker='x', alpha=1,color='r',lw=1,s=50, label='data origin (voxel 0)')
+            mlines.Line2D([], [], color='r',linestyle='dotted', markersize=15, label='image geometry'),
+            self.ax.scatter3D(*vox0, marker='x', alpha=1,color='r',lw=1,s=50, label='data origin (voxel 0)'),
+            mlines.Line2D([], [], color='r',linestyle='dashed', markersize=12, label=r'rotation direction $\theta$')
         ]
 
         for x in handles:

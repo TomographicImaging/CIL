@@ -355,7 +355,11 @@ class ComponentDescription(object):
     @staticmethod   
     def CreateUnitVector(val):
         vec = ComponentDescription.CreateVector(val)
-        vec = (vec/numpy.sqrt(vec.dot(vec)))
+        dot_product = vec.dot(vec)
+        if abs(dot_product)>1e-8:
+            vec = (vec/numpy.sqrt(dot_product))
+        else:
+            raise ValueError("Can't return a unit vector of a zero magnitude vector")
         return vec
 
     def length_check(self, val):
@@ -562,6 +566,46 @@ class Parallel2D(SystemConfiguration):
         self.detector.position -= self.rotation_axis.position
         self.rotation_axis.position = [0,0]
 
+    def align_reference_frame(self):
+        r'''Transforms the system origin to the rotate axis and aligns the ray along the positive Y direction
+        '''          
+        self.update_reference_frame()
+
+        ray_vec = -self.ray.direction
+        axis_rotation = numpy.eye(2)
+        if numpy.allclose(ray_vec,[0,-1]):
+            pass
+        elif numpy.allclose(ray_vec,[0,1]):
+            axis_rotation[0][0] = -1
+            axis_rotation[1][1] = -1
+        else:
+            theta = math.atan(ray_vec[0]/ray_vec[1])
+            axis_rotation[0][0] = axis_rotation[1][1] = math.cos(theta)
+            axis_rotation[0][1] = -math.sin(theta)
+            axis_rotation[1][0] = math.sin(theta)
+
+        rotation_matrix = numpy.matrix(axis_rotation)
+        
+        self.ray.direction = rotation_matrix.dot(self.ray.direction.reshape(2,1))
+        self.detector.position = rotation_matrix.dot(self.detector.position.reshape(2,1))
+        self.detector.direction_x = rotation_matrix.dot(self.detector.direction_x.reshape(2,1))
+
+
+    def is_simple(self):
+        r'''Returns `True` if there are no geometry offsets or rotations
+        '''  
+        new = self.copy()
+        new.align_reference_frame()
+
+        try:
+            det_unit = ComponentDescription.CreateUnitVector(new.detector.position)
+        except ValueError: #pass test if detector is on origin
+            det_unit = [0,1]
+
+        if numpy.allclose(new.ray.direction,[0,1]) and numpy.allclose(det_unit,[0,1]) and numpy.allclose(new.detector.direction_x,[1,0]):
+            return True
+        return False
+
     def __str__(self):
         def csv(val):
             return numpy.array2string(val, separator=', ')
@@ -661,6 +705,51 @@ class Parallel3D(SystemConfiguration):
         new_y = rotation_matrix.dot(self.detector.direction_y.reshape(3,1))
         self.detector.set_direction(new_x, new_y)
 
+    def align_reference_frame(self):
+        r'''Transforms the system origin to the rotate axis with z direction aligned to the rotate axis direction, and aligns the ray direction along the postive Y direction
+        '''          
+        self.update_reference_frame()
+
+        ray_vec = -self.ray.direction
+        axis_rotation = numpy.eye(3)
+
+        if numpy.allclose(ray_vec,[0,-1,0]):
+            pass
+        elif numpy.allclose(ray_vec,[0,1,0]):
+            axis_rotation[0][0] = -1
+            axis_rotation[1][1] = -1
+        else:
+            theta = math.atan(ray_vec[0]/ray_vec[1])
+            axis_rotation[0][0] = axis_rotation[1][1] = math.cos(theta)
+            axis_rotation[0][1] = -math.sin(theta)
+            axis_rotation[1][0] = math.sin(theta)
+
+        rotation_matrix = numpy.matrix(axis_rotation)
+        
+        self.ray.direction = rotation_matrix.dot(self.ray.direction.reshape(3,1))
+        self.detector.position = rotation_matrix.dot(self.detector.position.reshape(3,1))
+
+        new_direction_x = rotation_matrix.dot(self.detector.direction_x.reshape(3,1))
+        new_direction_y = rotation_matrix.dot(self.detector.direction_y.reshape(3,1))
+
+        self.detector.set_direction(new_direction_x, new_direction_y)
+
+    def is_simple(self):
+        r'''Returns `True` if there are no geometry offsets or rotations
+        '''          
+        new = self.copy()
+        new.align_reference_frame()
+
+        try:
+            det_unit = ComponentDescription.CreateUnitVector(new.detector.position)
+        except ValueError: #pass test if detector is on origin
+            det_unit = [0,1,0]
+
+        if numpy.allclose(new.ray.direction,[0,1,0]) and numpy.allclose(det_unit,[0,1,0]) and numpy.allclose(new.detector.direction_x,[1,0,0]) and numpy.allclose(new.detector.direction_y,[0,0,1]):
+            return True
+        return False
+
+
     def __str__(self):
         def csv(val):
             return numpy.array2string(val, separator=', ')
@@ -751,6 +840,49 @@ class Cone2D(SystemConfiguration):
         self.source.position -= self.rotation_axis.position
         self.detector.position -= self.rotation_axis.position
         self.rotation_axis.position = [0,0]
+
+    def align_reference_frame(self):
+        r'''Transforms the system origin to the rotate axis and aligns the source position along the negative Y direction
+        '''          
+        self.update_reference_frame()
+
+        src_dir = ComponentDescription.CreateUnitVector(self.source.position)
+
+        axis_rotation = numpy.eye(2)
+        if numpy.allclose(src_dir,[0,-1]):
+            pass
+        elif numpy.allclose(src_dir,[0,1]):
+            axis_rotation[0][0] = -1
+            axis_rotation[1][1] = -1
+        else:
+            theta = math.atan(src_dir[0]/src_dir[1])
+            axis_rotation[0][0] = axis_rotation[1][1] = math.cos(theta)
+            axis_rotation[0][1] = -math.sin(theta)
+            axis_rotation[1][0] = math.sin(theta)
+
+        rotation_matrix = numpy.matrix(axis_rotation)
+        
+        self.source.position = rotation_matrix.dot(self.source.position.reshape(2,1))
+        self.detector.position = rotation_matrix.dot(self.detector.position.reshape(2,1))
+        self.detector.direction_x = rotation_matrix.dot(self.detector.direction_x.reshape(2,1))
+
+
+    def is_simple(self):
+        r'''Returns `True` if there are no geometry offsets or rotations
+        '''          
+        new = self.copy()
+        new.align_reference_frame()
+
+        src_unit = ComponentDescription.CreateUnitVector(new.source.position)
+
+        try:
+            det_unit = ComponentDescription.CreateUnitVector(new.detector.position)
+        except ValueError: #pass test if detector is on origin
+            det_unit = [0,1]
+
+        if numpy.allclose(src_unit,[0,-1]) and numpy.allclose(det_unit,[0,1]) and numpy.allclose(new.detector.direction_x,[1,0]):
+            return True
+        return False
 
     def __str__(self):
         def csv(val):
@@ -872,6 +1004,52 @@ class Cone3D(SystemConfiguration):
         new_x = rotation_matrix.dot(self.detector.direction_x.reshape(3,1)) 
         new_y = rotation_matrix.dot(self.detector.direction_y.reshape(3,1))
         self.detector.set_direction(new_x, new_y)
+
+    def align_reference_frame(self):
+        r'''Transforms the system origin to the rotate axis with z direction aligned to the rotate axis direction, and aligns the source direction along the negative Y direction
+        '''          
+        self.update_reference_frame()
+
+        src_dir = ComponentDescription.CreateUnitVector(self.source.position)
+
+        axis_rotation = numpy.eye(3)
+        if numpy.allclose(src_dir,[0,-1,0]):
+            pass
+        elif numpy.allclose(src_dir,[0,1,0]):
+            axis_rotation[0][0] = -1
+            axis_rotation[1][1] = -1
+        else:
+            theta = math.atan(src_dir[0]/src_dir[1])
+            axis_rotation[0][0] = axis_rotation[1][1] = math.cos(theta)
+            axis_rotation[0][1] = -math.sin(theta)
+            axis_rotation[1][0] = math.sin(theta)
+
+        rotation_matrix = numpy.matrix(axis_rotation)
+        
+        self.source.position = rotation_matrix.dot(self.source.position.reshape(3,1))
+        self.detector.position = rotation_matrix.dot(self.detector.position.reshape(3,1))
+
+        new_direction_x = rotation_matrix.dot(self.detector.direction_x.reshape(3,1))
+        new_direction_y = rotation_matrix.dot(self.detector.direction_y.reshape(3,1))
+
+        self.detector.set_direction(new_direction_x, new_direction_y)
+
+    def is_simple(self):
+        r'''Returns `True` if there are no geometry offsets or rotations
+        '''          
+        new = self.copy()
+        new.align_reference_frame()
+
+        src_unit = ComponentDescription.CreateUnitVector(new.source.position)
+
+        try:
+            det_unit = ComponentDescription.CreateUnitVector(new.detector.position)
+        except ValueError: #pass test if detector is on origin
+            det_unit = [0,1,0]
+
+        if numpy.allclose(src_unit,[0,-1,0]) and numpy.allclose(det_unit,[0,1,0]) and numpy.allclose(new.detector.direction_x,[1,0,0]) and numpy.allclose(new.detector.direction_y,[0,0,1]):
+            return True
+        return False
 
     def get_centre_slice(self):
         """Returns the 2D system configuration corersponding to the centre slice

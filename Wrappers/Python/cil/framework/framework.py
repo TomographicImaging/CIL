@@ -528,6 +528,11 @@ class SystemConfiguration(object):
         :rtype: list
         '''
         raise NotImplementedError
+  
+    def is_simple(self):
+        r'''Returns `True` if the the geometry matches the default definitions with no offsets or rotations
+        '''         
+        raise NotImplementedError
 
     def copy(self):
         '''returns a copy of SystemConfiguration'''

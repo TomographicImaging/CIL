@@ -566,12 +566,14 @@ class Parallel2D(SystemConfiguration):
         self.detector.position -= self.rotation_axis.position
         self.rotation_axis.position = [0,0]
 
+
     def align_reference_frame(self):
         r'''Transforms the system origin to the rotate axis and aligns the ray along the positive Y direction
         '''          
         self.update_reference_frame()
 
         ray_vec = -self.ray.direction
+
         axis_rotation = numpy.eye(2)
         if numpy.allclose(ray_vec,[0,-1]):
             pass
@@ -579,10 +581,10 @@ class Parallel2D(SystemConfiguration):
             axis_rotation[0][0] = -1
             axis_rotation[1][1] = -1
         else:
-            theta = math.atan(ray_vec[0]/ray_vec[1])
+            theta = math.atan2(ray_vec[0],-ray_vec[1])
             axis_rotation[0][0] = axis_rotation[1][1] = math.cos(theta)
-            axis_rotation[0][1] = -math.sin(theta)
-            axis_rotation[1][0] = math.sin(theta)
+            axis_rotation[0][1] = math.sin(theta)
+            axis_rotation[1][0] = -math.sin(theta)
 
         rotation_matrix = numpy.matrix(axis_rotation)
         
@@ -590,9 +592,8 @@ class Parallel2D(SystemConfiguration):
         self.detector.position = rotation_matrix.dot(self.detector.position.reshape(2,1))
         self.detector.direction_x = rotation_matrix.dot(self.detector.direction_x.reshape(2,1))
 
-
     def is_simple(self):
-        r'''Returns `True` if there are no geometry offsets or rotations
+        r'''Returns `True` if the the geometry matches the default definitions with no offsets or rotations
         '''  
         new = self.copy()
         new.align_reference_frame()
@@ -719,7 +720,7 @@ class Parallel3D(SystemConfiguration):
             axis_rotation[0][0] = -1
             axis_rotation[1][1] = -1
         else:
-            theta = math.atan(ray_vec[0]/ray_vec[1])
+            theta = math.atan2(ray_vec[0],ray_vec[1])
             axis_rotation[0][0] = axis_rotation[1][1] = math.cos(theta)
             axis_rotation[0][1] = -math.sin(theta)
             axis_rotation[1][0] = math.sin(theta)
@@ -735,7 +736,7 @@ class Parallel3D(SystemConfiguration):
         self.detector.set_direction(new_direction_x, new_direction_y)
 
     def is_simple(self):
-        r'''Returns `True` if there are no geometry offsets or rotations
+        r'''Returns `True` if the the geometry matches the default definitions with no offsets or rotations
         '''          
         new = self.copy()
         new.align_reference_frame()
@@ -855,7 +856,7 @@ class Cone2D(SystemConfiguration):
             axis_rotation[0][0] = -1
             axis_rotation[1][1] = -1
         else:
-            theta = math.atan(src_dir[0]/src_dir[1])
+            theta = math.atan2(src_dir[0],src_dir[1])
             axis_rotation[0][0] = axis_rotation[1][1] = math.cos(theta)
             axis_rotation[0][1] = -math.sin(theta)
             axis_rotation[1][0] = math.sin(theta)
@@ -868,7 +869,7 @@ class Cone2D(SystemConfiguration):
 
 
     def is_simple(self):
-        r'''Returns `True` if there are no geometry offsets or rotations
+        r'''Returns `True` if the the geometry matches the default definitions with no offsets or rotations
         '''          
         new = self.copy()
         new.align_reference_frame()
@@ -1019,10 +1020,10 @@ class Cone3D(SystemConfiguration):
             axis_rotation[0][0] = -1
             axis_rotation[1][1] = -1
         else:
-            theta = math.atan(src_dir[0]/src_dir[1])
+            theta = math.atan2(src_dir[0],-src_dir[1])
             axis_rotation[0][0] = axis_rotation[1][1] = math.cos(theta)
-            axis_rotation[0][1] = -math.sin(theta)
-            axis_rotation[1][0] = math.sin(theta)
+            axis_rotation[0][1] = math.sin(theta)
+            axis_rotation[1][0] = -math.sin(theta)
 
         rotation_matrix = numpy.matrix(axis_rotation)
         
@@ -1035,7 +1036,7 @@ class Cone3D(SystemConfiguration):
         self.detector.set_direction(new_direction_x, new_direction_y)
 
     def is_simple(self):
-        r'''Returns `True` if there are no geometry offsets or rotations
+        r'''Returns `True` if the the geometry matches the default definitions with no offsets or rotations
         '''          
         new = self.copy()
         new.align_reference_frame()
@@ -1553,6 +1554,10 @@ class AcquisitionGeometry(object):
     def dist_center_detector(self):
         out = self.config.system.calculate_magnification()
         return out[1]
+
+    @property
+    def simple_geometry(self):
+        return self.config.system.is_simple()
 
     @property
     def magnification(self):

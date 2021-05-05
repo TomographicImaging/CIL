@@ -1239,10 +1239,10 @@ class Configuration(object):
     def configured(self):
         if self.system is None:
             print("Please configure AcquisitionGeometry using one of the following methods:\
-                    \n\tAcquisitionGeometry.Create_Parallel2D()\
-                    \n\tAcquisitionGeometry.Create_Cone3D()\
-                    \n\tAcquisitionGeometry.Create_Parallel2D()\
-                    \n\tAcquisitionGeometry.Create_Cone3D()")
+                    \n\tAcquisitionGeometry.create_Parallel2D()\
+                    \n\tAcquisitionGeometry.create_Cone3D()\
+                    \n\tAcquisitionGeometry.create_Parallel2D()\
+                    \n\tAcquisitionGeometry.create_Cone3D()")
             return False
 
         configured = True
@@ -1281,10 +1281,10 @@ class AcquisitionGeometry(object):
     r'''This class holds the AcquisitionGeometry of the system.
     
     Please initialise using factory:
-    AcquisitionGeometry.Create_Parallel2D
-    AcquisitionGeometry.Create_Cone3D
-    AcquisitionGeometry.Create_Parallel2D
-    AcquisitionGeometry.Create_Cone3D
+    AcquisitionGeometry.create_Parallel2D
+    AcquisitionGeometry.create_Cone3D
+    AcquisitionGeometry.create_Parallel2D
+    AcquisitionGeometry.create_Cone3D
 
 
     These initialisation parameters will be deprecated in a future release.    

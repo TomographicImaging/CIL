@@ -15,13 +15,22 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+
+#%%
+from cil.framework import AcquisitionGeometry, ImageGeometry, AcquisitionData, ImageData, DataContainer, BlockDataContainer
+import numpy as np
+from itertools import product, combinations
+import warnings
+
+from mpl_toolkits import mplot3d
+import matplotlib.lines as mlines
 import matplotlib.pyplot as plt
+from matplotlib.patches import FancyArrowPatch
+from mpl_toolkits.mplot3d import proj3d
 from matplotlib import gridspec
-import numpy
-from cil.framework import ImageGeometry, AcquisitionData, ImageData, DataContainer, BlockDataContainer
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-class PlotData(object):
+class _PlotData(object):
     def __init__(self, data, title, axis_labels, origin):
         self.data = data
         self.title = title
@@ -227,13 +236,13 @@ def show2D(datacontainers, title=None, slice_list=None, fix_range=False, axis_la
         else:
             plot_origin = origin
 
-        subplots.append(PlotData(plot_data,plot_title,plot_axis_labels, plot_origin))
+        subplots.append(_PlotData(plot_data,plot_title,plot_axis_labels, plot_origin))
 
     #set range per subplot
     for i, subplot in enumerate(subplots):
-        if fix_range == False:
+        if fix_range is False:
             pass
-        elif fix_range == True:
+        elif fix_range is True:
             subplot.range = (range_min,range_max)
         elif type(fix_range) is list:
             subplot.range = fix_range[i]
@@ -265,7 +274,7 @@ def show2D(datacontainers, title=None, slice_list=None, fix_range=False, axis_la
         shape_v = [0,subplot.data.shape[0]]
         shape_h = [0,subplot.data.shape[1]]
 
-        if type(subplot.data) != numpy.ndarray:
+        if type(subplot.data) != np.ndarray:
             data = subplot.data.as_array() 
         else:
             data = subplot.data
@@ -278,7 +287,7 @@ def show2D(datacontainers, title=None, slice_list=None, fix_range=False, axis_la
 
         if 'right' in subplot.origin:
             shape_h.reverse()
-            data = numpy.flip(data,1)
+            data = np.flip(data,1)
 
         extent = (*shape_h,*shape_v)
         
@@ -294,7 +303,7 @@ def show2D(datacontainers, title=None, slice_list=None, fix_range=False, axis_la
 
                 ang = subplot.data.geometry.config.angles
 
-                labels_new = [str(i) for i in numpy.take(ang.angle_data, location_new)]
+                labels_new = [str(i) for i in np.take(ang.angle_data, location_new)]
                 axes[i].set_yticklabels(labels_new)
                 
                 axes[i].set_ylabel('angle / ' + str(ang.angle_unit))
@@ -323,66 +332,364 @@ def show2D(datacontainers, title=None, slice_list=None, fix_range=False, axis_la
 def plotter2D(datacontainers, title=None, slice_list=None, fix_range=False, axis_labels=None, origin='lower-left', cmap='gray', num_cols=2, size=(15,15)):
     '''Alias of show2D'''
     show2D(datacontainers, title=title, slice_list=slice_list, fix_range=fix_range, axis_labels=axis_labels, origin=origin, cmap=cmap, num_cols=num_cols, size=size)
-            
-if __name__ == '__main__':         
+
+
+
+
+class _Arrow3D(FancyArrowPatch):
+
+    def __init__(self, xs, ys, zs, *args, **kwargs):
+        FancyArrowPatch.__init__(self, (0, 0), (0, 0), *args, **kwargs)
+        self._verts3d = xs, ys, zs
+
+    def draw(self, renderer):
+        xs3d, ys3d, zs3d = self._verts3d
+        xs, ys, zs = proj3d.proj_transform(xs3d, ys3d, zs3d, self.axes.M)
+        self.set_positions((xs[0], ys[0]), (xs[1], ys[1]))
+        FancyArrowPatch.draw(self, renderer)
+
+class _ShowGeometry(object):
+
+    def __init__(self, acquisition_geometry, image_geometry=None):
+
+        if acquisition_geometry.dimension == "2D":
+            self.ndim = 2
+            sys = acquisition_geometry.config.system
+            if acquisition_geometry.geom_type == 'cone':    
+                ag_temp = AcquisitionGeometry.create_Cone3D([*sys.source.position,0], [*sys.detector.position,0], [*sys.detector.direction_x,0],[0,0,1],[*sys.rotation_axis.position,0],[0,0,1])
+            else:
+                ag_temp = AcquisitionGeometry.create_Parallel3D([*sys.ray.direction,0], [*sys.detector.position,0], [*sys.detector.direction_x,0],[0,0,1],[*sys.rotation_axis.position,0],[0,0,1])
+
+
+            ag_temp.config.panel = acquisition_geometry.config.panel
+            ag_temp.set_angles(acquisition_geometry.angles)
+            ag_temp.set_labels(['vertical', *acquisition_geometry.dimension_labels])
+
+            self.acquisition_geometry = ag_temp
+
+        elif acquisition_geometry.channels > 1:
+            self.ndim = 3
+            self.acquisition_geometry = acquisition_geometry.get_slice(channel=0)
+        else:
+            self.acquisition_geometry = acquisition_geometry
+            self.ndim = 3
+
+        if image_geometry is None:
+            self.image_geometry=self.acquisition_geometry.get_ImageGeometry()
+        else:
+            self.image_geometry = image_geometry
+
+
+        len1 = self.acquisition_geometry.config.panel.num_pixels[0] * self.acquisition_geometry.config.panel.pixel_size[0]
+        len2 = self.acquisition_geometry.config.panel.num_pixels[1] * self.acquisition_geometry.config.panel.pixel_size[1]
+        self.scale = max(len1,len2)/5
+
+
+        self.handles = []
+        self.labels = []
+
+    def draw(self, elev=35, azim=35, view_distance=10, grid=False, figsize=(10,10), fontsize=10):
+
+        self.fig = plt.figure(figsize=figsize)
+        self.ax = self.fig.add_subplot(111, projection='3d')
+
+        self.text_options = {   'horizontalalignment': 'center',
+                                'verticalalignment': 'center',
+                                'fontsize': fontsize }
+
+
+        self.display_world()
+
+        if self.acquisition_geometry.geom_type == 'cone':
+            self.display_source()
+        else:
+            self.display_ray()
+
+        self.display_object()
+
+        self.display_detector()
+
+
+        if grid is False: 
+            self.ax.set_axis_off()
+
+        self.ax.view_init(elev=elev, azim=azim)
+        self.ax.dist = view_distance
+
+        #to force aspect ratio 1:1:1
+        world_limits = self.ax.get_w_lims()
+        self.ax.set_box_aspect((world_limits[1]-world_limits[0],world_limits[3]-world_limits[2],world_limits[5]-world_limits[4]))
+
+        l = self.ax.plot(np.NaN, np.NaN, '-', color='none', label='')[0]
+
+        for i in range(3):
+            self.handles.insert(2,l)
+            self.labels.insert(2,'')   
     
-    from cil.framework import ImageData
-    from cil.utilities import dataexample
-    import os
-    import sys
-    
-    data = dataexample.PEPPERS.get(size=(256,256))
-    ig = data.geometry
-    
-    show2D(data)
-       
-    if False:
-    
-        N = 100
-        ig2D = ImageGeometry(voxel_num_x=N, voxel_num_y=N)
-        ig3D = ImageGeometry(voxel_num_x=N, voxel_num_y=N, voxel_num_z=N)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            self.ax.legend(self.handles, self.labels, loc='upper left', bbox_to_anchor= (0, 1), ncol=3,
+                        borderaxespad=0, frameon=False,fontsize=self.text_options.get('fontsize'))
+
+
+        plt.tight_layout()
+
+        plt.show()
+
+    def display_world(self):
+
+        self.ax.set_xlabel('X axis')
+        self.ax.set_ylabel('Y axis')
+
+        if self.ndim == 3:
+            self.ax.set_zlabel('Z axis')
+        else:
+            self.ax.set_zticks([])
+
+        #origin and coordinate frame
+        Oo = np.zeros(3)
+        self.ax.scatter3D(*Oo, marker='o', alpha=1,color='k',lw=1)
+        h = mlines.Line2D([], [], color='k',linestyle='solid', markersize=12, label='world coordinate system')
+
+        labels = ['$x$','$y$','$z$']
+        for i in range(self.ndim):
+            axis = np.zeros(3)
+            axis[i] = 1 * self.scale
+
+            a = _Arrow3D(*zip(Oo,axis*2), mutation_scale=20,lw=1, arrowstyle="->", color="k")
+            self.ax.add_artist(a)
         
-        ch_number = 10
-        ig2D_ch = ImageGeometry(voxel_num_x=N, voxel_num_y=N, channels = ch_number)
-        ig3D_ch = ImageGeometry(voxel_num_x=N, voxel_num_y=N, voxel_num_z=N, channels = ch_number)
+            self.ax.text(*(axis*2.2),labels[i], **self.text_options)
+
+        self.handles.append(h)
+        self.labels.append(h.get_label())
+
+    def detector_vertex(self):
+        # detector corners
+        det_size  = (np.array(self.acquisition_geometry.config.panel.num_pixels) * np.array(self.acquisition_geometry.config.panel.pixel_size))/2
+        det_rows_dir = self.acquisition_geometry.config.system.detector.direction_x
+
+        if self.ndim == 3:
+            det_v = self.acquisition_geometry.config.system.detector.direction_y * det_size[1]
+            det_h = det_rows_dir * det_size[0]
+
+            rt = det_h + det_v + self.acquisition_geometry.config.system.detector.position
+            lt = -det_h + det_v + self.acquisition_geometry.config.system.detector.position  
+            lb = -det_h - det_v + self.acquisition_geometry.config.system.detector.position              
+            rb = det_h - det_v + self.acquisition_geometry.config.system.detector.position
+
+            return [rb, lb, lt, rt]
+
+        else:
+            det_h = det_rows_dir * det_size[0]
+            r = det_h  + self.acquisition_geometry.config.system.detector.position
+            l = -det_h  + self.acquisition_geometry.config.system.detector.position
+            return [r, l]
         
-        x2D = ig2D.allocate('random_int')
-        x2D_ch = ig2D_ch.allocate('random_int')
-        x3D = ig3D.allocate('random_int')
-        x3D_ch = ig3D_ch.allocate('random_int')         
-         
-        #%%
-        ###############################################################################           
-        # test 2D cases
-        show(x2D)
-        show(x2D, title = '2D no font')
-        show(x2D, title = '2D with font', font_size = (50, 30))
-        show(x2D, title = '2D with font/fig_size', font_size = (20, 10), figure_size = (10,10))
-        show(x2D, title = '2D with font/fig_size', 
-                  font_size = (20, 10), 
-                  figure_size = (10,10),
-                  labels = ['xxx','yyy'])
-        ###############################################################################
+
+    def display_detector(self):
+
+        do = self.acquisition_geometry.config.system.detector.position 
+        det = self.detector_vertex()
+
+        #mark data origin
+        if 'right' in self.acquisition_geometry.config.panel.origin:
+            if 'bottom' in self.acquisition_geometry.config.panel.origin:
+                pix0 = det[0]
+            else:
+                pix0 = det[3]
+        else:
+            if 'bottom' in self.acquisition_geometry.config.panel.origin:
+                pix0 = det[1]
+            else:
+                pix0 = det[2]
+
+        det_rows_dir = self.acquisition_geometry.config.system.detector.direction_x
+
+        x = _Arrow3D(*zip(do, self.scale * det_rows_dir + do), mutation_scale=20,lw=1, arrowstyle="-|>", color="b")
+        self.ax.add_artist(x)
+        self.ax.text(*(1.2 * self.scale * det_rows_dir + do),r'$D_x$', **self.text_options)
+
+        if self.ndim == 3:
+            det_col_dir = self.acquisition_geometry.config.system.detector.direction_y
+            y = _Arrow3D(*zip(do, self.scale * det_col_dir + do), mutation_scale=20,lw=1, arrowstyle="-|>", color="b")
+            self.ax.add_artist(y)
+            self.ax.text(*(1.2 * self.scale * det_col_dir + do),r'$D_y$', **self.text_options)
+
+        handles=[
+            self.ax.scatter3D(*do, marker='o', alpha=1,color='b',lw=1, label='detector position'),
+            mlines.Line2D([], [], color='b',linestyle='solid', markersize=12, label='detector direction'),      
+            self.ax.plot3D(*zip(*det, det[0]), color='b',ls='dotted',alpha=1, label='detector')[0],
+            self.ax.scatter3D(*pix0, marker='x', alpha=1,color='b',lw=1,s=50, label='data origin (pixel 0)'),            
+        ]
+
+        for x in handles:
+            self.handles.append(x)
+            self.labels.append(x.get_label())
+
+    def display_object(self):
         
+        ro = self.acquisition_geometry.config.system.rotation_axis.position
+        h0 = self.ax.scatter3D(*ro, marker='o', alpha=1,color='r',lw=1,label='rotation axis position')
+        self.handles.append(h0)
+        self.labels.append(h0.get_label())
+
+        if self.ndim == 3:
+            # rotate axis arrow
+            r1 = ro +  self.acquisition_geometry.config.system.rotation_axis.direction * self.scale * 2
+            arrow3 = _Arrow3D(*zip(ro,r1), mutation_scale=20,lw=1, arrowstyle="-|>", color="r")
+            self.ax.add_artist(arrow3)
+
+            a = self.acquisition_geometry.config.system.rotation_axis.direction
+
+
+            # draw reco
+            x = np.array([self.image_geometry.get_min_x(), self.image_geometry.get_max_x()])
+            y = np.array([self.image_geometry.get_min_y(), self.image_geometry.get_max_y()])
+            z = np.array([self.image_geometry.get_min_z(), self.image_geometry.get_max_z()])
+
+            combos = [
+                ((x[0],y[0],z[0]),(x[0],y[1],z[0])),
+                ((x[0],y[1],z[0]),(x[1],y[1],z[0])),
+                ((x[1],y[1],z[0]),(x[1],y[0],z[0])),
+                ((x[1],y[0],z[0]),(x[0],y[0],z[0])),
+                ((x[0],y[0],z[1]),(x[0],y[1],z[1])),
+                ((x[0],y[1],z[1]),(x[1],y[1],z[1])),
+                ((x[1],y[1],z[1]),(x[1],y[0],z[1])),
+                ((x[1],y[0],z[1]),(x[0],y[0],z[1])),
+                ((x[0],y[0],z[0]),(x[0],y[0],z[1])),
+                ((x[0],y[1],z[0]),(x[0],y[1],z[1])),  
+                ((x[1],y[1],z[0]),(x[1],y[1],z[1])),  
+                ((x[1],y[0],z[0]),(x[1],y[0],z[1])),                                                              
+            ]
+
+            if np.allclose(a,[0,0,1]):
+                axis_rotation = np.eye(3)
+            elif np.allclose(a,[0,0,-1]):
+                axis_rotation = np.eye(3)
+                axis_rotation[1][1] = -1
+                axis_rotation[2][2] = -1
+            else:
+                vx = np.array([[0, 0, -a[0]], [0, 0, -a[1]], [a[0], a[1], 0]])
+                axis_rotation = np.eye(3) + vx + vx.dot(vx) *  1 / (1 + a[2])
+
+            rotation_matrix = np.matrix.transpose(axis_rotation)
+
+            count = 0
+            for x in combos:
+                s = rotation_matrix.dot(np.asarray(x[0]).reshape(3,1))
+                e = rotation_matrix.dot(np.asarray(x[1]).reshape(3,1))
+
+                x_data = float(s[0]) + ro[0], float(e[0]) + ro[0]
+                y_data = float(s[1]) + ro[1], float(e[1]) + ro[1]
+                z_data = float(s[2]) + ro[2], float(e[2]) + ro[2]
+
+                self.ax.plot3D(x_data,y_data,z_data, color="r",ls='dotted',alpha=1)
+
+                if count == 0:
+                    vox0=(x_data[0],y_data[0],z_data[0])
+                count+=1
+        else:
+            # draw square
+            x = [self.image_geometry.get_min_x(), self.image_geometry.get_max_x()]
+            y = [self.image_geometry.get_min_y(), self.image_geometry.get_max_y()]
+            vertex = np.array([(x[0],y[0],0),(x[0],y[1],0),(x[1],y[1],0),(x[1],y[0],0)]) + ro
+            self.ax.plot3D(*zip(*vertex, vertex[0]), color='r',ls='dotted',alpha=1)
+            vox0=vertex[0]
+            rotation_matrix = np.eye(3)
+
+        #rotation direction
+        points = 36
+        x = [None]*points
+        y = [None]*points
+        z = [None]*points
+
+        for i in range(points):
+            theta = i * (np.pi * 1.8) /36
+            point_i = np.array([np.sin(theta),-np.cos(theta),0]).reshape(3,1)
+            point_rot = -self.scale*0.5*rotation_matrix.dot(point_i)
+
+            x[i] = float(point_rot[0] + ro[0])
+            y[i] = float(point_rot[1] + ro[1])
+            z[i] = float(point_rot[2] + ro[2])
+
+        self.ax.plot3D(x,y,z, color='r',ls="dashed",alpha=1)
+        arrow4 = _Arrow3D(x[-2:],y[-2:],z[-2:],mutation_scale=20,lw=1, arrowstyle="-|>", color="r")
+        self.ax.add_artist(arrow4)
+
+        handles = [ 
+            mlines.Line2D([], [], color='r',linestyle='solid', markersize=12, label='rotation axis direction'),
+            mlines.Line2D([], [], color='r',linestyle='dotted', markersize=15, label='image geometry'),
+            self.ax.scatter3D(*vox0, marker='x', alpha=1,color='r',lw=1,s=50, label='data origin (voxel 0)'),
+            mlines.Line2D([], [], color='r',linestyle='dashed', markersize=12, label=r'rotation direction $\theta$')
+        ]
+
+        for x in handles:
+            self.handles.append(x)
+            self.labels.append(x.get_label())
+
+    def display_source(self):
+
+        so = self.acquisition_geometry.config.system.source.position
+        det = self.detector_vertex()
+
+        for i in range(len(det)):
+            self.ax.plot3D(*zip(so,det[i]), color='#D4BD72',ls="dashed",alpha=0.4)
         
-        #%%
-        ###############################################################################
-        # test 3D cases
-        show(x3D)
-        show(x3D, title = '2D no font')
-        show(x3D, title = '2D with font', font_size = (50, 30))
-        show(x3D, title = '2D with font/fig_size', font_size = (20, 20), figure_size = (10,4))
-        show(x3D, title = '2D with font/fig_size', 
-                  font_size = (20, 10), 
-                  figure_size = (10,4),
-                  labels = ['xxx','yyy','zzz'])
-        ###############################################################################
-        #%%
+        self.ax.plot3D(*zip(so,self.acquisition_geometry.config.system.detector.position), color='#D4BD72',ls="solid",alpha=1)[0],
+
+        h0 = self.ax.scatter3D(*so, marker='*', alpha=1,color='#D4BD72',lw=1, label='source position', s=100)
+
+        self.handles.append(h0)
+        self.labels.append(h0.get_label())
+
+    def display_ray(self):
+
+        det = self.detector_vertex()
+        det.append(self.acquisition_geometry.config.system.detector.position)
+
+        dist = np.sqrt(np.sum(self.acquisition_geometry.config.system.detector.position**2))*2
+
+        if dist < 0.01:
+            dist = self.acquisition_geometry.config.panel.num_pixels[0] * self.acquisition_geometry.config.panel.pixel_size[0]
+
+        rays = det - self.acquisition_geometry.config.system.ray.direction*dist
         
-        ###############################################################################
-        # test 2D case + channel
-        show(x2D_ch, show_channels = [1, 2, 5])
-        
-        ###############################################################################
-                
-# %%
+        for i in range(len(rays)):
+            h0 = self.ax.plot3D(*zip(rays[i],det[i]), color='#D4BD72',ls="dashed",alpha=0.4, label='ray direction')[0]
+            arrow = _Arrow3D(*zip(rays[i],rays[i]+self.acquisition_geometry.config.system.ray.direction*self.scale ),mutation_scale=20,lw=1, arrowstyle="-|>", color="#D4BD72")
+            self.ax.add_artist(arrow)
+
+        self.handles.append(h0)
+        self.labels.append(h0.get_label())
+
+#%%
+def show_geometry(acquisition_geometry, image_geometry=None, elevation=20, azimuthal=-35, view_distance=10, grid=False, figsize=(10,10), fontsize=10):
+    '''
+    Displays a schematic of the acquisition geometry
+    for 2D geometries elevation and azimuthal cannot be changed
+
+    :acquisition_geometry: CIL acquisition geometry
+    :type acquisition_geometry: AcquisitionGeometry     
+    :image_geometry: CIL image geometry
+    :type image_geometry: ImageGeometry, optional 
+    :elevation: Camera elevation in degrees, 3D geometries only
+    :type elevation: float, default=20  
+    :azimuthal: Camera azimuthal in degrees, 3D geometries only
+    :type azimuthal: float, default=-35  
+    :view_distance: Camera view distance
+    :type view_distance: float, default=10  
+    :grid: Show figure axis
+    :type grid: boolean, default=False
+    :figsize: Set figure size (inches)
+    :type figsize: tuple (x, y), default (10,10)    
+    :type grid: boolean, default=False
+    :fontsize: Set fontsize
+    :type fontsize: int 
+    '''
+    if acquisition_geometry.dimension == '2D':
+        elevation = 90
+        azimuthal = 0
+
+    display = _ShowGeometry(acquisition_geometry, image_geometry)
+    display.draw(elev=elevation, azim=azimuthal, view_distance=view_distance, grid=grid, figsize=(10,10), fontsize=10)

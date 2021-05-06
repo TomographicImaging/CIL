@@ -608,9 +608,14 @@ class Parallel2D(SystemConfiguration):
         except ValueError: #pass test if detector is on origin
             det_unit = [0,1]
 
-        if numpy.allclose(new.ray.direction,[0,1]) and numpy.allclose(det_unit,[0,1]) and numpy.allclose(new.detector.direction_x,[1,0]):
-            return True
-        return False
+        if not numpy.allclose(new.ray.direction,[0,1]) or\
+            not numpy.allclose(new.detector.direction_x,[1,0]):
+            return 'complex'
+        elif not numpy.allclose(det_unit,[0,1]):
+            return 'offset' 
+        else:
+            return 'simple'
+
 
     def __str__(self):
         def csv(val):
@@ -751,8 +756,15 @@ class Parallel3D(SystemConfiguration):
         except ValueError: #pass test if detector is on origin
             det_unit = [0,1,0]
 
-        if numpy.allclose(new.ray.direction,[0,1,0]) and numpy.allclose(det_unit,[0,1,0]) and numpy.allclose(new.detector.direction_x,[1,0,0]) and numpy.allclose(new.detector.direction_y,[0,0,1]):
-            return True
+        if not numpy.allclose(new.ray.direction,[0,1,0]) or\
+            not numpy.allclose(new.detector.direction_x,[1,0,0]) or\
+            not numpy.allclose(new.detector.direction_y,[0,0,1]):
+            return 'complex'
+        elif not numpy.allclose(det_unit,[0,1,0]):
+            return 'offset' 
+        else:
+            return 'simple'
+        
         return False
 
 
@@ -886,9 +898,14 @@ class Cone2D(SystemConfiguration):
         except ValueError: #pass test if detector is on origin
             det_unit = [0,1]
 
-        if numpy.allclose(src_unit,[0,-1]) and numpy.allclose(det_unit,[0,1]) and numpy.allclose(new.detector.direction_x,[1,0]):
-            return True
-        return False
+        if  not numpy.allclose(det_unit-src_unit,[0,0]) or\
+            not numpy.allclose(new.detector.direction_x,[1,0]):
+            return 'complex'
+        elif not numpy.allclose(src_unit,[0,-1]) or\
+           not numpy.allclose(det_unit,[0,1]):
+            return 'offset' 
+        else:
+            return 'simple'
 
     def __str__(self):
         def csv(val):
@@ -1053,9 +1070,15 @@ class Cone3D(SystemConfiguration):
         except ValueError: #pass test if detector is on origin
             det_unit = [0,1,0]
 
-        if numpy.allclose(src_unit,[0,-1,0]) and numpy.allclose(det_unit,[0,1,0]) and numpy.allclose(new.detector.direction_x,[1,0,0]) and numpy.allclose(new.detector.direction_y,[0,0,1]):
-            return True
-        return False
+        if  not numpy.allclose(det_unit-src_unit,[0,0,0]) or\
+            not numpy.allclose(new.detector.direction_x,[1,0,0]) or\
+            not numpy.allclose(new.detector.direction_y,[0,0,1]):
+            return 'complex'
+        elif not numpy.allclose(src_unit,[0,-1,0]) or\
+           not numpy.allclose(det_unit,[0,1,0]):
+            return 'offset' 
+        else:
+            return 'simple'
 
     def get_centre_slice(self):
         """Returns the 2D system configuration corersponding to the centre slice
@@ -1461,6 +1484,7 @@ class Configuration(object):
 
         return False
 
+
 class AcquisitionGeometry(object):
     r'''This class holds the AcquisitionGeometry of the system.
     
@@ -1559,10 +1583,6 @@ class AcquisitionGeometry(object):
     def dist_center_detector(self):
         out = self.config.system.calculate_magnification()
         return out[1]
-
-    @property
-    def simple_geometry(self):
-        return self.config.system.is_simple()
 
     @property
     def magnification(self):

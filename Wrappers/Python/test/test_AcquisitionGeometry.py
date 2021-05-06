@@ -368,16 +368,16 @@ class Test_Parallel2D(unittest.TestCase):
 
     def test_is_simple(self):
         AG = AcquisitionGeometry.create_Parallel2D()
-        self.assertTrue(AG.config.system.is_simple())
+        self.assertTrue(AG.config.system.is_simple()=='simple')
 
         AG = AcquisitionGeometry.create_Parallel2D(detector_position=[5,0], rotation_axis_position=[5,0])
-        self.assertTrue(AG.config.system.is_simple())
+        self.assertTrue(AG.config.system.is_simple()=='simple')
 
         AG = AcquisitionGeometry.create_Parallel2D(ray_direction=[1,1])
-        self.assertFalse(AG.config.system.is_simple())
+        self.assertTrue(AG.config.system.is_simple()=='complex')
 
         AG = AcquisitionGeometry.create_Parallel2D(rotation_axis_position=[5,0])
-        self.assertFalse(AG.config.system.is_simple())
+        self.assertTrue(AG.config.system.is_simple()=='offset')
 
     def test_get_centre_slice(self):
         AG = AcquisitionGeometry.create_Parallel2D()
@@ -425,16 +425,16 @@ class Test_Parallel3D(unittest.TestCase):
 
     def test_is_simple(self):
         AG = AcquisitionGeometry.create_Parallel3D()
-        self.assertTrue(AG.config.system.is_simple())
+        self.assertTrue(AG.config.system.is_simple()=='simple')
 
         AG = AcquisitionGeometry.create_Parallel3D(detector_position=[5,0,0], rotation_axis_position=[5,0,0])
-        self.assertTrue(AG.config.system.is_simple())
+        self.assertTrue(AG.config.system.is_simple()=='simple')
 
         AG = AcquisitionGeometry.create_Parallel3D(rotation_axis_position=[5,0,0])
-        self.assertFalse(AG.config.system.is_simple())
+        self.assertTrue(AG.config.system.is_simple()=='offset')
 
         AG = AcquisitionGeometry.create_Parallel3D(ray_direction = [1,1,0])
-        self.assertFalse(AG.config.system.is_simple())
+        self.assertTrue(AG.config.system.is_simple()=='complex')
 
 
     def test_get_centre_slice(self):
@@ -486,16 +486,16 @@ class Test_Cone2D(unittest.TestCase):
 
     def test_is_simple(self):
         AG = AcquisitionGeometry.create_Cone2D(source_position = [0,-50],detector_position=[0,100])
-        self.assertTrue(AG.config.system.is_simple())
+        self.assertTrue(AG.config.system.is_simple()=='simple')
 
         AG = AcquisitionGeometry.create_Cone2D(source_position = [5,-50],detector_position=[5,100], rotation_axis_position=[5,0])
-        self.assertTrue(AG.config.system.is_simple())
+        self.assertTrue(AG.config.system.is_simple()=='simple')
 
         AG = AcquisitionGeometry.create_Cone2D(source_position = [5,-50],detector_position=[0,100])
-        self.assertFalse(AG.config.system.is_simple())
+        self.assertTrue(AG.config.system.is_simple()=='complex')
 
         AG = AcquisitionGeometry.create_Cone2D(source_position = [0,-50],detector_position=[0,100], rotation_axis_position=[5,0])
-        self.assertFalse(AG.config.system.is_simple())
+        self.assertTrue(AG.config.system.is_simple()=='offset')
 
     def test_get_centre_slice(self):
         AG = AcquisitionGeometry.create_Cone2D(source_position=[0,-500], detector_position=[0.,1000.])
@@ -571,19 +571,19 @@ class Test_Cone3D(unittest.TestCase):
 
     def test_is_simple(self):
         AG = AcquisitionGeometry.create_Cone3D(source_position = [0,-50,0],detector_position=[0,100,0])
-        self.assertTrue(AG.config.system.is_simple())
+        self.assertTrue(AG.config.system.is_simple()=='simple')
 
         AG = AcquisitionGeometry.create_Cone3D(source_position = [-50,0,0],detector_position=[100,0,0], detector_direction_x=[0,-1,0])
-        self.assertTrue(AG.config.system.is_simple())
+        self.assertTrue(AG.config.system.is_simple()=='simple')
 
         AG = AcquisitionGeometry.create_Cone3D(source_position = [5,-50,0],detector_position=[5,100,0], rotation_axis_position=[5,0,0])
-        self.assertTrue(AG.config.system.is_simple())
+        self.assertTrue(AG.config.system.is_simple()=='simple')
 
         AG = AcquisitionGeometry.create_Cone3D(source_position = [5,-50,0],detector_position=[0,100,0])
-        self.assertFalse(AG.config.system.is_simple())
+        self.assertTrue(AG.config.system.is_simple()=='complex')
 
         AG = AcquisitionGeometry.create_Cone3D(source_position = [0,-50,0],detector_position=[0,100,0], rotation_axis_position=[5,0,0])
-        self.assertFalse(AG.config.system.is_simple())
+        self.assertTrue(AG.config.system.is_simple()=='offset')
 
     def test_get_centre_slice(self):
         #returns the 2D version

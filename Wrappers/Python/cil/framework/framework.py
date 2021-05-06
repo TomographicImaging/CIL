@@ -890,19 +890,12 @@ class Cone2D(SystemConfiguration):
         '''          
         new = self.copy()
         new.align_reference_frame()
+        dot_prod = (new.detector.position - new.source.position).dot(new.detector.direction_x)
 
-        src_unit = ComponentDescription.CreateUnitVector(new.source.position)
-
-        try:
-            det_unit = ComponentDescription.CreateUnitVector(new.detector.position)
-        except ValueError: #pass test if detector is on origin
-            det_unit = [0,1]
-
-        if  not numpy.allclose(det_unit-src_unit,[0,0]) or\
-            not numpy.allclose(new.detector.direction_x,[1,0]):
+        if abs(dot_prod)>1e-6:
             return 'complex'
-        elif not numpy.allclose(src_unit,[0,-1]) or\
-           not numpy.allclose(det_unit,[0,1]):
+        elif abs(new.source.position[0])>1e-6 or\
+            abs(new.detector.position[0])>1e-6:
             return 'offset' 
         else:
             return 'simple'
@@ -1063,27 +1056,27 @@ class Cone3D(SystemConfiguration):
         new = self.copy()
         new.align_reference_frame()
 
-        src_unit = ComponentDescription.CreateUnitVector(new.source.position)
+        dot_prod_a = (new.detector.position - new.source.position).dot(new.detector.direction_x)
+        dot_prod_b = (new.detector.position - new.source.position).dot(new.detector.direction_y)
+        dot_prod_c = (new.detector.direction_x).dot(new.rotation_axis.direction)
 
-        try:
-            det_unit = ComponentDescription.CreateUnitVector(new.detector.position)
-        except ValueError: #pass test if detector is on origin
-            det_unit = [0,1,0]
-
-        if  not numpy.allclose(det_unit-src_unit,[0,0,0]) or\
-            not numpy.allclose(new.detector.direction_x,[1,0,0]) or\
-            not numpy.allclose(new.detector.direction_y,[0,0,1]):
+        if abs(dot_prod_a)>1e-6 or\
+            abs(dot_prod_b)>1e-6 or\
+            abs(dot_prod_c)>1e-6:
             return 'complex'
-        elif not numpy.allclose(src_unit,[0,-1,0]) or\
-           not numpy.allclose(det_unit,[0,1,0]):
+        elif abs(new.source.position[0])>1e-6 or\
+            abs(new.source.position[2])>1e-6 or\
+            abs(new.detector.position[0])>1e-6 or\
+            abs(new.detector.position[2])>1e-6:
             return 'offset' 
         else:
             return 'simple'
 
+
     def get_centre_slice(self):
         """Returns the 2D system configuration corersponding to the centre slice
         """ 
-        #requires the rotate axis to be perpendicular to the detector, and parallel to detector_direction_y
+        #requires the rotate axis to be perpendicular to the normal of the detector, and perpendicular to detector_direction_x
         vec1= numpy.cross(self.detector.direction_x, self.detector.direction_y)  
         dp1 = self.rotation_axis.direction.dot(vec1)
         dp2 = self.rotation_axis.direction.dot(self.detector.direction_x)

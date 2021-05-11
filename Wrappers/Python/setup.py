@@ -39,13 +39,6 @@ setup(
               'cil.plugins.ccpi_regularisation', 
               'cil.plugins.ccpi_regularisation.functions',
               'cil.plugins.tigre'],
-    data_files = [('share/cil', ['data/boat.tiff',
-                                  'data/peppers.tiff',
-                                  'data/camera.png',
-                                  'data/resolution_chart.tiff',
-                                  'data/shapes.png',
-                                  'data/rainbow.png',
-                                  'data/24737_fd_normalised.nxs'])],
 
 
     # metadata for upload to PyPI

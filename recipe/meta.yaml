@@ -20,9 +20,9 @@ test:
     - python-wget
     - cvxpy # [ unix and py36 and np115 ]
     - scikit-image  
-    - tomophantom # [ unix ]
-    - cil-astra # [ unix ] 
-    - tigre
+    - tomophantom # [ linux ]
+    - cil-astra # [ linux ] 
+    - tigre # [ linux ] 
     - numba
     - packaging
     - ccpi-regulariser
@@ -47,6 +47,7 @@ requirements:
     - _openmp_mutex # [linux]
     - openmp        # [osx]
     - vc 14         # [win]
+    - cil-data
 
   run:
     - python
@@ -63,6 +64,7 @@ requirements:
     - dxchange
     - olefile >=0.46
     - pywavelets
+    - cil-data
     
   
 about:

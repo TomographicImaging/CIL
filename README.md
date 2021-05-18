@@ -4,6 +4,7 @@
 | [![Build Status](https://anvil.softeng-support.ac.uk/jenkins/buildStatus/icon?job=CILsingle/CCPi-Framework)](https://anvil.softeng-support.ac.uk/jenkins/job/CILsingle/job/CCPi-Framework/) | [![Build Status](https://anvil.softeng-support.ac.uk/jenkins/buildStatus/icon?job=CILsingle/CCPi-Framework-dev)](https://anvil.softeng-support.ac.uk/jenkins/job/CILsingle/job/CCPi-Framework-dev/) |![conda version](https://anaconda.org/ccpi/cil/badges/version.svg) ![conda last release](https://anaconda.org/ccpi/cil/badges/latest_release_date.svg) [![conda platforms](https://anaconda.org/ccpi/cil/badges/platforms.svg) ![conda dowloads](https://anaconda.org/ccpi/cil/badges/downloads.svg)](https://anaconda.org/ccpi/cil) |
 
 # CIL - Core Imaging Library
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TomographicImaging/CIL-Demos/HEAD?urlpath=lab/tree/binder%2Findex.ipynb)
 
 The Core Imaging Library (CIL) is an open-source Python framework for tomographic imaging with particular emphasis on reconstruction of challenging datasets. Conventional filtered backprojection reconstruction tends to be insufficient for highly noisy, incomplete, non-standard or multichannel data arising for example in dynamic, spectral and in situ tomography. CIL provides an extensive modular optimization framework for prototyping reconstruction methods including sparsity and total variation regularization, as well as tools for loading, preprocessing and visualizing tomographic data.
 
@@ -58,4 +59,10 @@ cmake --build . --target install
 ```
 
 The user then needs to add the path to `<install_directory>/lib` where the library is installed to the environment variable `PATH` or `LD_LIBRARY_PATH`, depending on system
+
+
+## CIL on binder
+
+Jupyter Notebooks usage examples without any local installation are provided in [Binder](https://mybinder.org/). Please click the Binder link above. For more information, go to [CIL-Demos](https://github.com/TomographicImaging/CIL-Demos).
+
 

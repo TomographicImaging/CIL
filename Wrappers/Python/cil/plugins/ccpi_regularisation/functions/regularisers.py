@@ -80,7 +80,6 @@ class ROF_TV(TV_Base):
         self.tolerance = tolerance
         
     def proximal_numpy(self, in_arr, tau, out = None):
-        in_arr = np.asarray(in_arr, dtype=np.float32, order='C')
         res , info = regularisers.ROF_TV(in_arr,
               self.alpha,
               self.max_iteration,

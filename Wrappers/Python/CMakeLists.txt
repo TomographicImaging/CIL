@@ -57,7 +57,7 @@ if (BUILD_PYTHON_WRAPPER)
       
       if (CONDA_BUILD)
         add_custom_target(pythonsetup ALL
-                        COMMAND ${CMAKE_COMMAND} -E ${PYTHON_EXECUTABLE} ${SETUP_PY} -vv install
+                        COMMAND ${CMAKE_COMMAND} -E env ${PYTHON_EXECUTABLE} ${SETUP_PY} -vv install
                         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                         COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT}
                         DEPENDS cilacc)

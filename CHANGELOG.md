@@ -1,4 +1,5 @@
 * 21.x.x
+  - add version string from git describe
   - add CCPi-Regularisation toolkit in unittests
   - show_geometry implemented to display AcquisitionGeometry objects, can be imported from utilities.display
 

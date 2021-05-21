@@ -29,4 +29,5 @@ else
                         -DCMAKE_INSTALL_PREFIX=$PREFIX
 
 fi
-make install VERBOSE=1
+
+cmake --build . --target install

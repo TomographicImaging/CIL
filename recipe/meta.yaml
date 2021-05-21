@@ -1,12 +1,10 @@
 package:
   name: cil
-  version: {{ environ['CIL_VERSION'] }}
+  version: {{ GIT_DESCRIBE_TAG }}
 
 build:
   skip: True # [py==38 and np==115]
   preserve_egg_dir: False
-  script_env:
-    - CIL_VERSION   
   #number: 0  
   missing_dso_whitelist:
     - /lib64/libc.so.6            # [linux]
@@ -18,11 +16,11 @@ test:
   requires:
     - {{ pin_compatible('numpy', min_pin='x.x', max_pin='x.x') }}
     - python-wget
-    - cvxpy # [ unix and py36 and np115 ]
-    - scikit-image  
-    - tomophantom # [ linux ]
-    - cil-astra # [ linux ] 
-    - tigre # [ linux ] 
+    - cvxpy              # [ unix and py36 and np115 ]
+    - scikit-image
+    - tomophantom        # [ linux ]
+    - cil-astra          # [ linux ] 
+    - tigre              # [ linux ] 
     - numba
     - packaging
     - ccpi-regulariser

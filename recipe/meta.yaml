@@ -2,6 +2,9 @@ package:
   name: cil
   version: {{ GIT_DESCRIBE_TAG }}
 
+source:
+  path: ..
+
 build:
   skip: True # [py==38 and np==115]
   preserve_egg_dir: False

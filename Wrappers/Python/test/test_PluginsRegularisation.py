@@ -18,17 +18,20 @@
 import sys
 import unittest
 import numpy
+import numpy as np
 from cil.framework import DataContainer
 from cil.framework import ImageData
 from cil.framework import AcquisitionData
 from cil.framework import ImageGeometry
 from cil.framework import AcquisitionGeometry
+from cil.utilities import dataexample
 from timeit import default_timer as timer
 
 
 try:
     from ccpi.filters import regularisers
     from ccpi.filters.cpu_regularisers import TV_ENERGY
+    from cil.plugins.ccpi_regularisation.functions import FGP_TV
     has_regularisation_toolkit = True
 except ImportError as ie:
     # raise ImportError(ie + "\n\n" + 
@@ -94,3 +97,16 @@ class TestPlugin(unittest.TestCase):
             assert True
         except ModuleNotFoundError as ie:
             assert False
+    @unittest.skipUnless(has_regularisation_toolkit, "Skipping as CCPi Regularisation Toolkit is not installed")
+    def test_FGP_TV_complex(self):
+        data = dataexample.CAMERA.get(size=(256,256))
+        datarr = data.as_array()
+        cmpx = np.zeros(data.shape, dtype=np.complex)
+        cmpx.real = datarr[:]
+        cmpx.imag = datarr[:]
+        data.array = cmpx
+        reg = FGP_TV()
+        out = reg.proximal(data, 1)
+        outarr = out.as_array()
+        np.testing.assert_almost_equal(outarr.imag, outarr.real)
+

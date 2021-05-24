@@ -23,11 +23,10 @@ test:
     - scikit-image
     - tomophantom        # [ linux ]
     - cil-astra          # [ linux ] 
-    - tigre              # [ linux ] 
+    - tigre              # [ linux or win ] 
     - numba
     - packaging
     - ccpi-regulariser
-    - cudatoolkit =10.1 # [linux]
     
   source_files:
     - ./Wrappers/Python/test     # [win]

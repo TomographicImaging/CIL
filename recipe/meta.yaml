@@ -1,6 +1,6 @@
 package:
   name: cil
-  version: {{ GIT_DESCRIBE_TAG }}
+  version: {{ environ.get('GIT_DESCRIBE_TAG','v')[1:] }}
 
 source:
   path: ..
@@ -8,7 +8,7 @@ source:
 build:
   skip: True # [py==38 and np==115]
   preserve_egg_dir: False
-  #number: 0  
+  number: {{ GIT_DESCRIBE_NUMBER }}
   missing_dso_whitelist:
     - /lib64/libc.so.6            # [linux]
     - /lib64/libm.so.6            # [linux]
@@ -27,6 +27,7 @@ test:
     - numba
     - packaging
     - ccpi-regulariser
+    - cudatoolkit =10.1 # [linux]
     
   source_files:
     - ./Wrappers/Python/test     # [win]

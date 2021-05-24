@@ -22,7 +22,7 @@ set(CMAKE_BUILD_TYPE "Release")
 # https://stackoverflow.com/questions/38919840/get-package-version-for-conda-meta-yaml-from-source-file
 
 
-execute_process(COMMAND git describe 
+execute_process(COMMAND git describe --abbrev=0
                 RESULT_VARIABLE worked 
                 OUTPUT_VARIABLE CIL_VERSION
                 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}

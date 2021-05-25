@@ -4,13 +4,14 @@
 | [![Build Status](https://anvil.softeng-support.ac.uk/jenkins/buildStatus/icon?job=CILsingle/CCPi-Framework)](https://anvil.softeng-support.ac.uk/jenkins/job/CILsingle/job/CCPi-Framework/) | [![Build Status](https://anvil.softeng-support.ac.uk/jenkins/buildStatus/icon?job=CILsingle/CCPi-Framework-dev)](https://anvil.softeng-support.ac.uk/jenkins/job/CILsingle/job/CCPi-Framework-dev/) |![conda version](https://anaconda.org/ccpi/cil/badges/version.svg) ![conda last release](https://anaconda.org/ccpi/cil/badges/latest_release_date.svg) [![conda platforms](https://anaconda.org/ccpi/cil/badges/platforms.svg) ![conda dowloads](https://anaconda.org/ccpi/cil/badges/downloads.svg)](https://anaconda.org/ccpi/cil) |
 
 # CIL - Core Imaging Library
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TomographicImaging/CIL-Demos/HEAD?urlpath=lab/tree/binder%2Findex.ipynb)
 
 The Core Imaging Library (CIL) is an open-source Python framework for tomographic imaging with particular emphasis on reconstruction of challenging datasets. Conventional filtered backprojection reconstruction tends to be insufficient for highly noisy, incomplete, non-standard or multichannel data arising for example in dynamic, spectral and in situ tomography. CIL provides an extensive modular optimization framework for prototyping reconstruction methods including sparsity and total variation regularization, as well as tools for loading, preprocessing and visualizing tomographic data.
 
 ## CIL on binder
 
-Jupyter Notebooks usage examples without any local installation are provided in [Binder](https://mybinder.org/). Please click the Binder link above. For more information, go to [CIL-Demos](https://github.com/TomographicImaging/CIL-Demos).
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TomographicImaging/CIL-Demos/HEAD?urlpath=lab/tree/binder%2Findex.ipynb)
+
+Jupyter Notebooks usage examples without any local installation are provided in [Binder](https://mybinder.org/v2/gh/TomographicImaging/CIL-Demos/HEAD?urlpath=lab/tree/binder%2Findex.ipynb). Please click the launch binder icon above. For more information, go to [CIL-Demos](https://github.com/TomographicImaging/CIL-Demos) and [https://mybinder.org](https://mybinder.org).
 
 ## Installation
 

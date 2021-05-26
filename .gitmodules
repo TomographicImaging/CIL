@@ -1,4 +1,4 @@
 [submodule "Wrappers/Python/data"]
 	path = Wrappers/Python/data
-	url = https://github.com/vais-ral/CIL-data.git
+	url = https://github.com/TomographicImaging/CIL-Data.git
 	branch = main

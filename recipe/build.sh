@@ -1,8 +1,3 @@
-if [ -z "$CIL_VERSION" ]; then
-    echo "Need to set CIL_VERSION"
-    exit 1
-fi
-
 mkdir -p ${SRC_DIR}/cil/Wrappers/Python
 cp -r "${RECIPE_DIR}/../Wrappers/Python/test" ${SRC_DIR}/cil/Wrappers/Python
 
@@ -29,4 +24,5 @@ else
                         -DCMAKE_INSTALL_PREFIX=$PREFIX
 
 fi
-make install VERBOSE=1
+
+cmake --build . --target install

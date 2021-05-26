@@ -30,8 +30,38 @@ from cil.optimisation.functions import Function
 import numpy as np
 import warnings
 
+class RegulariserFunction(Function):
+    def proximal(self, x, tau, out=None):
+        arr = x.as_array()
+        if arr.dtype in [np.complex, np.complex64]:
+            # do real and imag part indep
+            in_arr = np.asarray(arr.real, dtype=np.float32, order='C')
+            res, info = self.proximal_numpy(in_arr, tau, out)
+            arr.real = res[:]
+            in_arr = np.asarray(arr.imag, dtype=np.float32, order='C')
+            res, info = self.proximal_numpy(in_arr, tau, out)
+            arr.imag = res[:]
+            self.info = info
+            if out is not None:
+                out.fill(arr)
+            else:
+                out = x.copy()
+                out.fill(arr)
+                return out
+        else:
+            arr = np.asarray(x.as_array(), dtype=np.float32, order='C')
+            res, info = self.proximal_numpy(arr, tau, out)
+            self.info = info
+            if out is not None:
+                out.fill(res)
+            else:
+                out = x.copy()
+                out.fill(res)
+                return out
+    def proximal_numpy(self, xarr, tau, out=None):
+        raise NotImplementedError('Please implement proximal_numpy')
 
-class TV_Base(Function):
+class TV_Base(RegulariserFunction):
     def __call__(self,x):
         in_arr = np.asarray(x.as_array(), dtype=np.float32, order='C')
         EnergyValTV = TV_ENERGY(in_arr, in_arr, self.alpha, 2)
@@ -49,8 +79,7 @@ class ROF_TV(TV_Base):
         self.device = device # string for 'cpu' or 'gpu'
         self.tolerance = tolerance
         
-    def proximal(self,x,tau, out = None):
-        in_arr = np.asarray(x.as_array(), dtype=np.float32, order='C')
+    def proximal_numpy(self, in_arr, tau, out = None):
         res , info = regularisers.ROF_TV(in_arr,
               self.alpha,
               self.max_iteration,
@@ -58,14 +87,7 @@ class ROF_TV(TV_Base):
               self.tolerance,
               self.device)
         
-        self.info = info
-        
-        if out is not None:
-            out.fill(res)
-        else:
-            out = x.copy()
-            out.fill(res)
-        return out
+        return res, info
 
 class FGP_TV(TV_Base):
     def __init__(self, alpha=1, max_iteration=100, tolerance=1e-6, isotropic=True, nonnegativity=True, printing=False, device='cpu'):
@@ -86,8 +108,7 @@ class FGP_TV(TV_Base):
         self.nonnegativity = nonnegativity
         self.device = device # string for 'cpu' or 'gpu'
 
-    def proximal(self,x,tau, out=None):
-        in_arr = np.asarray(x.as_array(), dtype=np.float32, order='C')      
+    def proximal_numpy(self, in_arr, tau, out = None):
         res , info = regularisers.FGP_TV(\
               in_arr,\
               self.alpha*tau,\
@@ -96,12 +117,7 @@ class FGP_TV(TV_Base):
               self.methodTV,\
               self.nonnegativity,\
               self.device)
-        if out is not None:
-            out.fill(res)
-        else:
-            out = x.copy()
-            out.fill(res)
-        return out
+        return res, info
         
 class TGV(Function):
 
@@ -118,8 +134,7 @@ class TGV(Function):
         warnings.warn("{}: the __call__ method is not implemented. Returning NaN.".format(self.__class__.__name__))
         return np.nan
     
-    def proximal(self, x, tau, out=None):           
-        in_arr = np.asarray(x.as_array(), dtype=np.float32, order='C')
+    def proximal_numpy(self, in_arr, tau, out = None):
         res , info = regularisers.TGV(in_arr,
               self.regularisation_parameter,
               self.alpha1,
@@ -132,15 +147,7 @@ class TGV(Function):
         # info: return number of iteration and reached tolerance
         # https://github.com/vais-ral/CCPi-Regularisation-Toolkit/blob/master/src/Core/regularisers_CPU/TGV_core.c#L168
         # Stopping Criteria  || u^k - u^(k-1) ||_{2} / || u^{k} ||_{2}    
-  
-        self.info = info
-        
-        if out is not None:
-            out.fill(res)
-        else:
-            out = x.copy()
-            out.fill(res)
-            return out        
+        return res, info
     
     def convex_conjugate(self, x):
         warnings.warn("{}: the convex_conjugate method is not implemented. Returning NaN.".format(self.__class__.__name__))
@@ -163,8 +170,7 @@ class LLT_ROF(Function):
         warnings.warn("{}: the __call__ method is not implemented. Returning NaN.".format(self.__class__.__name__))
         return np.nan
     
-    def proximal(self, x, tau, out=None):
-        in_arr = np.asarray(x.as_array(), dtype=np.float32, order='C')
+    def proximal_numpy(self, in_arr, tau, out = None):
         res , info = regularisers.LLT_ROF(in_arr, 
               self.regularisation_parameterROF,
               self.regularisation_parameterLLT,
@@ -177,7 +183,7 @@ class LLT_ROF(Function):
         # https://github.com/vais-ral/CCPi-Regularisation-Toolkit/blob/master/src/Core/regularisers_CPU/TGV_core.c#L168
         # Stopping Criteria  || u^k - u^(k-1) ||_{2} / || u^{k} ||_{2}    
   
-        self.info = info
+        return res, info
 
     def convex_conjugate(self, x):
         warnings.warn("{}: the convex_conjugate method is not implemented. Returning NaN.".format(self.__class__.__name__))
@@ -208,8 +214,7 @@ class FGP_dTV(Function):
         warnings.warn("{}: the __call__ method is not implemented. Returning NaN.".format(self.__class__.__name__))
         return np.nan
 
-    def proximal(self,x,tau, out=None):
-        in_arr = np.asarray(x.as_array(), dtype=np.float32, order='C')        
+    def proximal_numpy(self, in_arr, tau, out = None):
         res , info = regularisers.FGP_dTV(\
                 in_arr,\
                 self.reference,\
@@ -220,13 +225,8 @@ class FGP_dTV(Function):
                 self.methodTV,\
                 self.nonnegativity,\
                 self.device)
-        if out is not None:
-            out.fill(res)
-        else:
-            out = x.copy()
-            out.fill(res)
-            return out        
-    
+        return res, info
+
     def convex_conjugate(self, x):
         warnings.warn("{}: the convex_conjugate method is not implemented. Returning NaN.".format(self.__class__.__name__))
         return np.nan
@@ -241,8 +241,7 @@ class SB_TV(TV_Base):
         self.printing = printing
         self.device = device # string for 'cpu' or 'gpu'
                 
-    def proximal(self,x,tau, out=None):
-        in_arr = np.asarray(x.as_array(), dtype=np.float32, order='C')          
+    def proximal_numpy(self, in_arr, tau, out = None):
         res , info = regularisers.SB_TV(in_arr, 
               self.alpha*tau,
               self.max_iteration,
@@ -250,14 +249,7 @@ class SB_TV(TV_Base):
               self.methodTV,
               self.device)
         
-        self.info = info
-    
-        if out is not None:
-            out.fill(res)
-        else:
-            out = x.copy()
-            out.fill(res)
-            return out
+        return res, info
 
 class TNV(Function):
     
@@ -272,19 +264,13 @@ class TNV(Function):
         warnings.warn("{}: the __call__ method is not implemented. Returning NaN.".format(self.__class__.__name__))
         return np.nan
     
-    def proximal(self,x,tau, out=None):
-        in_arr = np.asarray(x.as_array(), dtype=np.float32, order='C')        
-        res   = regularisers.TNV(in_arr, 
+    def proximal_numpy(self, in_arr, tau, out = None):
+        res = regularisers.TNV(in_arr, 
               self.regularisation_parameter,
               self.iterationsTNV,
               self.tolerance)
 
-        if out is not None:
-            out.fill(res)
-        else:
-            out = x.copy()
-            out.fill(res)
-            return out
+        return res, []
 
     def convex_conjugate(self, x):
         warnings.warn("{}: the convex_conjugate method is not implemented. Returning NaN.".format(self.__class__.__name__))

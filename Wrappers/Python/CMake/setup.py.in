@@ -20,10 +20,7 @@ import os
 import sys
 
 
-cil_version=os.environ['CIL_VERSION']
-if  cil_version == '':
-    print("Please set the environmental variable CIL_VERSION")
-    sys.exit(1)
+cil_version='@CIL_VERSION@'
 
 setup(
     name="cil",
@@ -39,20 +36,13 @@ setup(
               'cil.plugins.ccpi_regularisation', 
               'cil.plugins.ccpi_regularisation.functions',
               'cil.plugins.tigre'],
-    data_files = [('share/cil', ['data/boat.tiff',
-                                  'data/peppers.tiff',
-                                  'data/camera.png',
-                                  'data/resolution_chart.tiff',
-                                  'data/shapes.png',
-                                  'data/rainbow.png',
-                                  'data/24737_fd_normalised.nxs'])],
 
 
     # metadata for upload to PyPI
     author="CCPi developers",
     maintainer="Edoardo Pasca",
     maintainer_email="edoardo.pasca@stfc.ac.uk",
-    description='CCPi Core Imaging Library - Python Framework Module',
+    description='CCPi Core Imaging Library',
     license="Apache v2.0",
     keywords="Python Framework",
     url="http://www.ccpi.ac.uk/cil",

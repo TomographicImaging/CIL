@@ -16,6 +16,8 @@
 #   limitations under the License.
 
 from cil.processors.CofR_xcorr import CofR_xcorr
+from cil.processors.CofR_sobel import CofR_sobel
+
 
 class CentreOfRotationCorrector(object):
     """
@@ -38,4 +40,24 @@ class CentreOfRotationCorrector(object):
         :rtype: AcquisitionData
         '''
         processor = CofR_xcorr(slice_index, projection_index, ang_tol)
+        return processor
+
+    @staticmethod
+    def sobel(slice_index='centre', backend='astra', search_range=None, binning=None):
+        r'''This creates a CentreOfRotationCorrector processor which will find the centre by maximising the sharpness of a reconstructed slice.
+
+        Can be used on single slice parallel-beam, and centre slice cone beam geometry. For use only with datasets that can be reconstructed with FBP.
+
+        :param slice_index: An integer defining the vertical slice to run the algorithm on.
+        :type slice_index: int, str='centre', optional
+        :param backend: The CIL FBP backend to use. Currently can be set to 'astra'/'tigre' 
+        :type backend: string, default 'astra'
+        :param search_range: The range in pixels to search accross. If `None` the width of the panel/2 is used. 
+        :type search_range: int
+        :param binning: The size of the bins for the initial grid. If `None` will bin the image to a step corresponding to <256 pixels.
+        :type binning: int
+        :return: returns an AcquisitionData object with an updated AcquisitionGeometry
+        :rtype: AcquisitionDataData
+        '''
+        processor = CofR_sobel(slice_index='centre', backend='astra', search_range=None, binning=None)
         return processor

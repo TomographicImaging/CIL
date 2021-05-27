@@ -30,21 +30,13 @@ from timeit import default_timer as timer
 from cil.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 
 from cil.io import NEXUSDataReader
-from cil.processors import CentreOfRotationCorrector, CofR_xcorr, TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
+from cil.processors import CentreOfRotationCorrector, CofR_xcorr, CofR_sobel
+from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
 from cil.processors import Slicer, Binner, MaskGenerator, Masker
-
 import wget
 import os
 
-class TestDataProcessor(unittest.TestCase):
-    
-    def setUp(self):
-
-        data_raw = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
-
-        self.data_DLS = data_raw.log()
-        self.data_DLS *= -1
-        
+class TestBinner(unittest.TestCase):
     def test_Binner(self):
         #%%
         #test parallel 2D case
@@ -225,7 +217,7 @@ class TestDataProcessor(unittest.TestCase):
         self.assertTrue(data_binned.geometry == IG_binned)
         numpy.testing.assert_allclose(data_binned.as_array(), data_new, rtol=1E-6)
 
-        
+class TestSlicer(unittest.TestCase):      
     def test_Slicer(self):
         
         #test parallel 2D case
@@ -439,6 +431,16 @@ class TestDataProcessor(unittest.TestCase):
         self.assertTrue(data_sliced.geometry == IG_sliced)
         numpy.testing.assert_allclose(data_sliced.as_array(), numpy.squeeze(data.as_array()[5:12:3, ::2, 10:30:2, :]), rtol=1E-6)
 
+
+class TestCentreOfRotation(unittest.TestCase):
+    
+    def setUp(self):
+
+        data_raw = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
+
+        self.data_DLS = data_raw.log()
+        self.data_DLS *= -1
+        
     def test_CofR_xcorr(self):       
 
         corr = CofR_xcorr(slice_index='centre', projection_index=0, ang_tol=0.1)
@@ -451,6 +453,12 @@ class TestDataProcessor(unittest.TestCase):
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)              
 
+    def test_CofR_sobel(self):       
+        corr = CofR_sobel()
+        corr.set_input(self.data_DLS.clone())
+        ad_out = corr.get_output()
+        self.assertAlmostEqual(6.3, ad_out.geometry.config.system.rotation_axis.position[0],places=1)     
+
     def test_CenterOfRotationCorrector(self):       
         corr = CentreOfRotationCorrector.xcorr(slice_index='centre', projection_index=0, ang_tol=0.1)
         corr.set_input(self.data_DLS.clone())
@@ -462,9 +470,9 @@ class TestDataProcessor(unittest.TestCase):
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)              
 
-    def test_Normaliser(self):
-        pass         
 
+class TestDataProcessor(unittest.TestCase):
+   
     def test_DataProcessorBasic(self):
 
         dc_in = DataContainer(numpy.arange(10), True)
@@ -534,19 +542,19 @@ class TestDataProcessor(unittest.TestCase):
         #[ 0 60  1 61  2 62  3 63  4 64  5 65  6 66  7 67  8 68  9 69 10 70 11 71
         # 12 72 13 73 14 74 15 75 16 76 17 77 18 78 19 79]
         
-        print(arr)
+        #print(arr)
     
         ax = AX()
         ax.scalar = 2
         ax.set_input(c)
         #ax.apply()
-        print ("ax  in {0} out {1}".format(c.as_array().flatten(),
-               ax.get_output().as_array().flatten()))
+        #print ("ax  in {0} out {1}".format(c.as_array().flatten(),
+        #       ax.get_output().as_array().flatten()))
         
         numpy.testing.assert_array_equal(ax.get_output().as_array(), arr*2)
                 
         
-        print("check call method of DataProcessor")
+        #print("check call method of DataProcessor")
         numpy.testing.assert_array_equal(ax(c).as_array(), arr*2)
         
         cast = CastDataContainer(dtype=numpy.float32)
@@ -560,7 +568,7 @@ class TestDataProcessor(unittest.TestCase):
         axm.get_output(out)
         numpy.testing.assert_array_equal(out.as_array(), arr*0.5)
         
-        print("check call method of DataProcessor")
+        #print("check call method of DataProcessor")
         numpy.testing.assert_array_equal(axm(c).as_array(), arr*0.5)        
     
         
@@ -580,7 +588,7 @@ class TestDataProcessor(unittest.TestCase):
         self.assertTrue(v.max() == 19)
         self.assertTrue(v.min() == -79)
         
-        print ("clip in {0} out {1}".format(c.as_array(), clip.get_output().as_array()))
+        #print ("clip in {0} out {1}".format(c.as_array(), clip.get_output().as_array()))
         
         #dsp = DataProcessor()
         #dsp.set_input(ds)
@@ -590,10 +598,10 @@ class TestDataProcessor(unittest.TestCase):
         chain = AX()
         chain.scalar = 0.5
         chain.set_input_processor(ax)
-        print ("chain in {0} out {1}".format(ax.get_output().as_array(), chain.get_output().as_array()))
+        #print ("chain in {0} out {1}".format(ax.get_output().as_array(), chain.get_output().as_array()))
         numpy.testing.assert_array_equal(chain.get_output().as_array(), arr)
         
-        print("check call method of DataProcessor")
+        #print("check call method of DataProcessor")
         numpy.testing.assert_array_equal(ax(chain(c)).as_array(), arr)        
 
 class TestMaskGenerator(unittest.TestCase):       

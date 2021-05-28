@@ -16,12 +16,15 @@
 #   limitations under the License.
 
 from cil.framework import Processor, AcquisitionData
-from cil.processors import Binner
+from cil.processors.Binner import Binner
 import matplotlib.pyplot as plt
 import scipy
 import numpy as np
 import inspect
+import logging
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 class CofR_sobel(Processor):
 
     r'''CofR_sobel processor maximises the sharpness of a reconstructed slice.
@@ -40,26 +43,16 @@ class CofR_sobel(Processor):
     :rtype: AcquisitionData
     '''
 
-    def __init__(self, slice_index='centre', FBP=None, search_range=None, binning=None, debug=False):
+    def __init__(self, slice_index='centre', FBP=None, search_range=None, binning=None):
         
-
         if not inspect.isclass(FBP):
             ValueError("Please pass a CIL FBP class from cil.plugins.tigre or cil.plugins.astra")
-
-        if 'astra' in FBP.__module__:
-            backend = 'astra'
-        elif 'tigre' in FBP.__module__:
-            backend = 'tigre'
-        else:
-            raise ValueError("Please pass a CIL FBP class from cil.plugins.tigre or cil.plugins.astra")
 
         kwargs = {
                     'slice_index': slice_index,
                     'FBP': FBP,
-                    'backend':backend,
                     'search_range': search_range,
-                    'binning': binning,
-                    'debug': debug
+                    'binning': binning
                  }
 
         super(CofR_sobel, self).__init__(**kwargs)
@@ -93,8 +86,6 @@ class CofR_sobel(Processor):
         #%% get slice
         data_full = self.get_input()
         data = data_full.get_slice(vertical=self.slice_index)
-
-        data.reorder(self.backend)
 
         data.geometry.config.system.update_reference_frame()
         centre = data.geometry.config.system.rotation_axis.position[0]
@@ -171,10 +162,9 @@ class CofR_sobel(Processor):
             else:
                 raise ValueError ("Unable to minimise function within set search_range")
 
-            if self.debug == True:
-                print("iteration :", count)
-                print("binning :", binning)
-                print("cor at : ", centre)
+            logger.debug("iteration: {}\nbinning: {}\ncor at: {}",count, binning, centre)
+
+            if logger.isEnabledFor(logging.DEBUG):
                 plt.figure()
                 plt.scatter(binning *offsets/ig.voxel_size_x, obj_vals)
                 plt.show()
@@ -182,10 +172,10 @@ class CofR_sobel(Processor):
         new_geometry = data_full.geometry.copy()
         new_geometry.config.system.rotation_axis.position[0] = centre
         
-        print("Centre of rotation correction using sobel filtering with FBP backend from ", self.backend)
-        print("\tCalculated from slice: ", self.slice_index)
-        print("\tApplied centre of rotation shift = ", centre/ig.voxel_size_x, "pixels")
-        print("\tApplied centre of rotation shift = ", centre, "units at the object.")
+        logger.info("Centre of rotation correction using sobel filtering with FBP")
+        logger.info("Calculated from slice: {}", self.slice_index)
+        logger.info("Applied centre of rotation shift = {} pixels", centre/ig.voxel_size_x)
+        logger.info("Applied centre of rotation shift = {} units at the object.", centre)
 
         if out is None:
             return AcquisitionData(array=data_full, deep_copy=True, geometry=new_geometry, supress_warning=True)

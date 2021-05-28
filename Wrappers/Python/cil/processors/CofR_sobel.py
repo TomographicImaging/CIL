@@ -16,11 +16,11 @@
 #   limitations under the License.
 
 from cil.framework import Processor, AcquisitionData
-from cil.plugins.astra import FBP
 from cil.processors import Binner
 import matplotlib.pyplot as plt
 import scipy
 import numpy as np
+import inspect
 
 class CofR_sobel(Processor):
 
@@ -30,8 +30,8 @@ class CofR_sobel(Processor):
 
     :param slice_index: An integer defining the vertical slice to run the algorithm on.
     :type slice_index: int, str='centre', optional
-    :param backend: The CIL FBP backend to use. Currently can be set to 'astra'/'tigre' 
-    :type backend: string, default 'astra'
+    :param FBP: A CIL FBP class imported from cil.plugins.tigre or cil.plugins.astra  
+    :type FBP: class
     :param search_range: The range in pixels to search accross. If `None` the width of the panel/2 is used. 
     :type search_range: int
     :param binning: The size of the bins for the initial grid. If `None` will bin the image to a step corresponding to <256 pixels.
@@ -40,11 +40,23 @@ class CofR_sobel(Processor):
     :rtype: AcquisitionData
     '''
 
-    def __init__(self, slice_index='centre', backend='astra', search_range=None, binning=None, debug=False):
+    def __init__(self, slice_index='centre', FBP=None, search_range=None, binning=None, debug=False):
         
+
+        if not inspect.isclass(FBP):
+            ValueError("Please pass a CIL FBP class from cil.plugins.tigre or cil.plugins.astra")
+
+        if 'astra' in FBP.__module__:
+            backend = 'astra'
+        elif 'tigre' in FBP.__module__:
+            backend = 'tigre'
+        else:
+            raise ValueError("Please pass a CIL FBP class from cil.plugins.tigre or cil.plugins.astra")
+
         kwargs = {
                     'slice_index': slice_index,
-                    'backend': backend,
+                    'FBP': FBP,
+                    'backend':backend,
                     'search_range': search_range,
                     'binning': binning,
                     'debug': debug
@@ -81,6 +93,7 @@ class CofR_sobel(Processor):
         #%% get slice
         data_full = self.get_input()
         data = data_full.get_slice(vertical=self.slice_index)
+
         data.reorder(self.backend)
 
         data.geometry.config.system.update_reference_frame()
@@ -136,14 +149,8 @@ class CofR_sobel(Processor):
                 ag_shift = data_filtered.geometry.copy()
                 ag_shift.config.system.rotation_axis.position = [offset, 0]
 
-                reco = FBP(ig, ag_shift, device='gpu')(data_filtered)
-
-                #variance
-                mean = reco.mean()
-                obj_val = (reco - mean).power(2).sum()
-
-                #auto correlation
-                #obj_val = (reco*reco).sum()
+                reco = self.FBP(ig, ag_shift)(data_filtered)
+                obj_val = (reco*reco).sum()
                 obj_vals.append(obj_val)
 
             output_cor = zip(offsets, obj_vals)
@@ -175,13 +182,12 @@ class CofR_sobel(Processor):
         new_geometry = data_full.geometry.copy()
         new_geometry.config.system.rotation_axis.position[0] = centre
         
-        print("Centre of rotation correction using sobel FBP")
+        print("Centre of rotation correction using sobel filtering with FBP backend from ", self.backend)
         print("\tCalculated from slice: ", self.slice_index)
         print("\tApplied centre of rotation shift = ", centre/ig.voxel_size_x, "pixels")
         print("\tApplied centre of rotation shift = ", centre, "units at the object.")
 
         if out is None:
-            return AcquisitionData(array = data_full, deep_copy = True, geometry = new_geometry, supress_warning=True)
+            return AcquisitionData(array=data_full, deep_copy=True, geometry=new_geometry, supress_warning=True)
         else:
             out.geometry = new_geometry
-    # %%

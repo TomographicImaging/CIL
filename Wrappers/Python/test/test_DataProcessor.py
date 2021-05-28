@@ -36,6 +36,27 @@ from cil.processors import Slicer, Binner, MaskGenerator, Masker
 import wget
 import os
 
+
+try:
+    import tigre
+    has_tigre = True
+except ModuleNotFoundError:
+    print(  "This plugin requires the additional package TIGRE\n" +
+            "Please install it via conda as tigre from the ccpi channel\n"+
+            "Minimal version is 21.01")
+    has_tigre = False
+else:
+    from cil.plugins.tigre import FBP as TigreFBP
+
+try:
+    import astra
+    has_astra = True
+except ModuleNotFoundError:
+    has_astra = False
+else:
+    from cil.plugins.astra.processors import FBP as AstraFBP
+
+
 class TestBinner(unittest.TestCase):
     def test_Binner(self):
         #%%
@@ -440,7 +461,7 @@ class TestCentreOfRotation(unittest.TestCase):
 
         self.data_DLS = data_raw.log()
         self.data_DLS *= -1
-        
+
     def test_CofR_xcorr(self):       
 
         corr = CofR_xcorr(slice_index='centre', projection_index=0, ang_tol=0.1)
@@ -453,8 +474,16 @@ class TestCentreOfRotation(unittest.TestCase):
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)              
 
-    def test_CofR_sobel(self):       
-        corr = CofR_sobel()
+    @unittest.skipUnless(has_astra, "ASTRA not installed")
+    def test_CofR_sobel_astra(self):
+        corr = CofR_sobel(FBP=AstraFBP)
+        corr.set_input(self.data_DLS.clone())
+        ad_out = corr.get_output()
+        self.assertAlmostEqual(6.3, ad_out.geometry.config.system.rotation_axis.position[0],places=1)     
+
+    @unittest.skipUnless(False, "TIGRE not installed")
+    def skiptest_test_CofR_sobel_tigre(self): #currently not avaliable for parallel beam
+        corr = CofR_sobel(FBP=TigreFBP)
         corr.set_input(self.data_DLS.clone())
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.3, ad_out.geometry.config.system.rotation_axis.position[0],places=1)     

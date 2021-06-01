@@ -23,6 +23,7 @@ import numpy
 
 from IPython.display import HTML
 import random
+from cil.utilities.display import set_origin
 
 
 def display_slice(container, direction, title, cmap, size, axis_labels, origin):
@@ -67,8 +68,9 @@ def display_slice(container, direction, title, cmap, size, axis_labels, origin):
       
         ax.set_xlabel(x_label)     
         ax.set_ylabel(y_label)
- 
-        aximg = ax.imshow(img, cmap=cmap, origin=origin, extent=(0,x_lim,y_lim,0))
+
+        img, data_origin, extent = set_origin(img, origin)
+        aximg = ax.imshow(img, cmap=cmap, origin=data_origin, extent=extent)
         aximg.set_clim(minmax)
         ax.set_title(dtitle + " {}".format(x))
         # colorbar
@@ -147,7 +149,7 @@ def islicer(data, direction, title="", slice_number=None, cmap='gray', minmax=No
                            # minmax=(amin, amax),
                            size=size, axis_labels=axis_labels,
                            origin=origin),
-             x=slider, minmax=min_max)
+                           x=slider, minmax=min_max)
     
     return slider
     

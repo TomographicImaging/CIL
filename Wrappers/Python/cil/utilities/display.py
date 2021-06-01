@@ -38,6 +38,26 @@ class _PlotData(object):
         self.origin = origin
         self.range = None
 
+def set_origin(data, origin):
+    shape_v = [0, data.shape[0]]
+    shape_h = [0, data.shape[1]]
+
+    if type(data) != np.ndarray:
+        data = data.as_array() 
+            
+    data_origin='lower'
+
+    if 'upper' in origin:
+        shape_v.reverse()
+        data_origin='upper'
+
+    if 'right' in origin:
+        shape_h.reverse()
+        data = np.flip(data,1)
+
+    extent = (*shape_h,*shape_v)
+    return data, data_origin, extent
+
 def show2D(datacontainers, title=None, slice_list=None, fix_range=False, axis_labels=None, origin='lower-left', cmap='gray', num_cols=2, size=(15,15)):
     r'''This function plots 2D slices from cil DataContainer types
 
@@ -271,25 +291,7 @@ def show2D(datacontainers, title=None, slice_list=None, fix_range=False, axis_la
             axes[i].set_xlabel(subplot.axis_labels[0])  
 
         #set origin
-        shape_v = [0,subplot.data.shape[0]]
-        shape_h = [0,subplot.data.shape[1]]
-
-        if type(subplot.data) != np.ndarray:
-            data = subplot.data.as_array() 
-        else:
-            data = subplot.data
-            
-        data_origin='lower'
-
-        if 'upper' in subplot.origin:
-            shape_v.reverse()
-            data_origin='upper'
-
-        if 'right' in subplot.origin:
-            shape_h.reverse()
-            data = np.flip(data,1)
-
-        extent = (*shape_h,*shape_v)
+        data, data_origin, extent = set_origin(subplot.data, subplot.origin)
         
         sp = axes[i].imshow(data, cmap=cmap, origin=data_origin, extent=extent)
 

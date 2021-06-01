@@ -25,7 +25,7 @@ from IPython.display import HTML
 import random
 
 
-def display_slice(container, direction, title, cmap, size, axis_labels):
+def display_slice(container, direction, title, cmap, size, axis_labels, origin):
     
         
     def get_slice_3D(x, minmax):
@@ -68,7 +68,7 @@ def display_slice(container, direction, title, cmap, size, axis_labels):
         ax.set_xlabel(x_label)     
         ax.set_ylabel(y_label)
  
-        aximg = ax.imshow(img, cmap=cmap, origin='upper', extent=(0,x_lim,y_lim,0))
+        aximg = ax.imshow(img, cmap=cmap, origin=origin, extent=(0,x_lim,y_lim,0))
         aximg.set_clim(minmax)
         ax.set_title(dtitle + " {}".format(x))
         # colorbar
@@ -80,7 +80,7 @@ def display_slice(container, direction, title, cmap, size, axis_labels):
     return get_slice_3D
 
     
-def islicer(data, direction, title="", slice_number=None, cmap='gray', minmax=None, size=None, axis_labels=None):
+def islicer(data, direction, title="", slice_number=None, cmap='gray', minmax=None, size=None, axis_labels=None, origin='lower'):
 
     '''Creates an interactive integer slider that slices a 3D volume along direction
     
@@ -145,7 +145,8 @@ def islicer(data, direction, title="", slice_number=None, cmap='gray', minmax=No
                            title=title, 
                            cmap=cmap, 
                            # minmax=(amin, amax),
-                           size=size, axis_labels=axis_labels),
+                           size=size, axis_labels=axis_labels,
+                           origin=origin),
              x=slider, minmax=min_max)
     
     return slider

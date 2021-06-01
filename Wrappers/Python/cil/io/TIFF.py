@@ -29,6 +29,10 @@ import functools
 import glob
 import re
 import numpy as np
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class TIFFWriter(object):
     '''Write a DataSet to disk as a TIFF file or stack'''
@@ -67,9 +71,9 @@ class TIFFWriter(object):
                 file_name
                 )
             )[0]
-        print ("file_name", self.file_name)
+        logger.info("saving to file_name", self.file_name)
         self.dir_name = os.path.dirname(file_name)
-        print ("dir_name" , self.dir_name, self.dir_name is None)
+        logger.info("dir_name" , self.dir_name, self.dir_name is None)
         self.counter_offset = counter_offset
         
         if not ((isinstance(self.data_container, ImageData)) or 
@@ -79,12 +83,13 @@ class TIFFWriter(object):
     
     def write(self):
         if not os.path.isdir(self.dir_name):
+            logger.info('creating directory', self.dir_name)
             os.mkdir(self.dir_name)
 
         ndim = len(self.data_container.shape)
         if ndim == 2:
             # save single slice
-            
+            logger.info('2D dataset')
             if self.counter_offset >= 0:
                 fname = "{}_idx_{:04d}.tiff".format(os.path.join(self.dir_name, self.file_name), self.counter_offset)
             else:
@@ -92,6 +97,7 @@ class TIFFWriter(object):
             with open(fname, 'wb') as f:
                 Image.fromarray(self.data_container.as_array()).save(f, 'tiff')
         elif ndim == 3:
+            logger.info('3D dataset')
             for sliceno in range(self.data_container.shape[0]):
                 # save single slice
                 # pattern = self.file_name.split('.')
@@ -102,6 +108,7 @@ class TIFFWriter(object):
                 with open(fname, 'wb') as f:
                     Image.fromarray(self.data_container.as_array()[sliceno]).save(f, 'tiff')
         elif ndim == 4:
+            logger.info('4D dataset')
             # find how many decimal places self.data_container.shape[0] and shape[1] have
             zero_padding = self._zero_padding(self.data_container.shape[0])
             zero_padding += '_' + self._zero_padding(self.data_container.shape[1])
@@ -128,13 +135,56 @@ class TIFFWriter(object):
         zero_padding_string = '{:0'+str(i)+'d}'
         return zero_padding_string
 
+class TiffReader(object):
+    def __init__(self, path, dtype=np.float32):
+        '''Basic TIFF reader which loops through all tiff files in a specific 
+        folder and load them in alphabetic order
+        
+        Parameters
+        ----------
+            
+        :param path: path to folder with tiff files, list of paths of tiffs, or single tiff file
+        :type path: str, abspath to folder, list'''
+        self.path_to_tiffs = path
+        if isinstance(path, list):
+            self._tiff_files = path[:]
+        elif os.path.isfile(path):
+            self._tiff_files = [path]
+        elif os.path.isdir(path): 
+            self._tiff_files = glob.glob(os.path.join(path,"*.tif"))
+            if not self._tiff_files:
+                    self._tiff_files = glob.glob(os.path.join(path,"*.tiff"))
+
+        if not self._tiff_files:
+            raise Exception("No tiff files were found in the directory \n{}".format(file_name))
+        self.dtype = dtype
+    
+    def read(self):
+        # read one and figure out how much memory we need to read this dataset
+        num_tiff = len(self._tiff_files)
+        with Image.open(self._tiff_files[0]) as im:
+            data = np.asarray(im, dtype=self.dtype)
+        # if only one tiff return immediately after cast
+        if num_tiff ==  1:
+            return data
+        shape = data.shape
+        # allocate the memory
+        data = np.empty((num_tiff, *shape), dtype=self.dtype)
+        # copy the content of each file in data
+        for i, el in self._tiff_files:
+            with Image.open(el) as im:
+                data[i] = np.asarray(im, dtype=self.dtype)[:]
+        return data
+
+
+
 
 class TIFFStackReader(object):
     
     def __init__(self, 
                  **kwargs):
         ''' 
-        Basic TIFF redaer which loops through all riff files in a specific 
+        Basic TIFF reader which loops through all tiff files in a specific 
         folder and load them in alphabetic order
         
         Parameters
@@ -396,9 +446,9 @@ class TIFFStackReader(object):
     
     def _return_appropriate_data(self, data, geometry):
         if isinstance (geometry, ImageGeometry):
-            return ImageData(data, deep=True, geometry=geometry.copy(), suppress_warning=True)
+            return ImageData(data, deep=False, geometry=geometry.copy(), suppress_warning=True)
         elif isinstance (geometry, AcquisitionGeometry):
-            return AcquisitionData(data, deep=True, geometry=geometry.copy(), suppress_warning=True)
+            return AcquisitionData(data, deep=False, geometry=geometry.copy(), suppress_warning=True)
         else:
             raise TypeError("Unsupported Geometry type. Expected ImageGeometry or AcquisitionGeometry, got {}"\
                 .format(type(geometry)))
@@ -424,21 +474,16 @@ class TIFFStackReader(object):
     
 
 
-'''
-import matplotlib.pyplot as plt
-from ccpi.io import TIFFStackReader
+class EdoAndGemmaTIFFStackReader(TIFFStackReader):
+    def read(self):
+        reader = TiffReader(path = self._tiff_files)
+        return reader.read()
 
-path = '/media/newhd/shared/Data/SophiaBeads/SophiaBeads_256_averaged/'
+class BinTIFFStackReader(TIFFStackReader):
 
-reader = TIFFStackReader()
-reader.set_up(path = path,
-              n_images = 100,
-              binning = {'axis_0': 5, 'axis_1': 6},
-              roi = {'axis_0': (100,900), 'axis_1': (200,700)},
-              skip = 100)
-
-data = reader.load_images()
-
-plt.imshow(data[1, :, :])
-plt.show()
-'''
+    def set_Binner(self, binner):
+        self.binner = binner
+    def set_geometry(self, geometry):
+        pass
+    def read(self):
+        pass

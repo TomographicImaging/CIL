@@ -25,6 +25,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+
 class CofR_sobel(Processor):
 
     r'''CofR_sobel processor maximises the sharpness of a reconstructed slice.
@@ -85,7 +86,11 @@ class CofR_sobel(Processor):
 
         #%% get slice
         data_full = self.get_input()
-        data = data_full.get_slice(vertical=self.slice_index)
+
+        if data_full.geometry.dimension == '3D':
+            data = data_full.get_slice(vertical=self.slice_index)
+        else:
+            data = data_full
 
         data.geometry.config.system.update_reference_frame()
         centre = data.geometry.config.system.rotation_axis.position[0]
@@ -162,20 +167,19 @@ class CofR_sobel(Processor):
             else:
                 raise ValueError ("Unable to minimise function within set search_range")
 
-            logger.debug("iteration: {}\nbinning: {}\ncor at: {}",count, binning, centre)
+            logger.debug("iteration: %f\nbinning: %f\ncor at: %f",count, binning, centre)
 
             if logger.isEnabledFor(logging.DEBUG):
                 plt.figure()
                 plt.scatter(binning *offsets/ig.voxel_size_x, obj_vals)
                 plt.show()
-
         new_geometry = data_full.geometry.copy()
         new_geometry.config.system.rotation_axis.position[0] = centre
         
         logger.info("Centre of rotation correction using sobel filtering with FBP")
-        logger.info("Calculated from slice: {}", self.slice_index)
-        logger.info("Applied centre of rotation shift = {} pixels", centre/ig.voxel_size_x)
-        logger.info("Applied centre of rotation shift = {} units at the object.", centre)
+        logger.info("Calculated from slice: %s", str(self.slice_index))
+        logger.info("Applied centre of rotation shift = %f pixels", centre/ig.voxel_size_x)
+        logger.info("Applied centre of rotation shift = %f units at the object.", centre)
 
         if out is None:
             return AcquisitionData(array=data_full, deep_copy=True, geometry=new_geometry, supress_warning=True)

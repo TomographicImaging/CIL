@@ -21,10 +21,9 @@ Binary installation of CIL can be done with `conda`. Install a new environment u
 conda create --name cil -c conda-forge -c ccpi cil
 ```
 
-To install CIL and the aditional packages and plugins needed to run the [CIL demos](https://github.com/vais-ral/CIL-Demos/releases/tag/v19.10.1) install the environment with:
 ```bash
 
-conda create --name cil -c conda-forge -c astra-toolbox/label/dev -c ccpi cil cil-astra ccpi-regulariser tomophantom cudatoolkit=9.0
+conda create --name cil -c conda-forge -c astra-toolbox/label/dev -c ccpi cil cil-astra ccpi-regulariser tigre tomophantom cudatoolkit=9.2
 ```
 
 where,
@@ -35,6 +34,8 @@ where,
 
 ```tomophantom``` [Tomophantom](https://github.com/dkazanc/TomoPhantom) will allow you to generate phantoms to use as test data.
 
+```tigre``` [TIGRE](https://github.com/CERN/TIGRE) will allow you to use CIL wrappers to the TIGRE toolbox projectors (BSD license).
+
 ```cudatoolkit``` If you have GPU drivers compatible with more recent CUDA versions you can modify this package selector.
 
 ## Building from source code 
@@ -44,9 +45,9 @@ where,
 In case of development it is useful to be able to build the software directly. You should clone this repository as
 ```bash
 
-git clone --recurse-submodule git@github.com:vais-ral/CCPi-Framework.git
+git clone --recurse-submodule git@github.com:TomographicImaging/CIL.git
 ```
-The use of `--recurse-submodule` is necessary if the user wants the examples data to be fetched (they are needed by the unit tests). We have moved such data, previously hosted in this repo at `Wrappers/Python/data` to the [CIL-data](https://github.com/vais-ral/CIL-data) repository and linked it to this one as submodule. If the data is not available it can be fetched in an already cloned repository as
+The use of `--recurse-submodule` is necessary if the user wants the examples data to be fetched (they are needed by the unit tests). We have moved such data, previously hosted in this repo at `Wrappers/Python/data` to the [CIL-data](https://github.com/TomographicImaging/CIL-Data) repository and linked it to this one as submodule. If the data is not available it can be fetched in an already cloned repository as
 ```bash
 
 git submodule update --init

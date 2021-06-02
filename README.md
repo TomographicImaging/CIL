@@ -21,6 +21,8 @@ Binary installation of CIL can be done with `conda`. Install a new environment u
 conda create --name cil -c conda-forge -c ccpi cil
 ```
 
+To install CIL and the aditional packages and plugins needed to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) install the environment with:
+
 ```bash
 
 conda create --name cil -c conda-forge -c astra-toolbox/label/dev -c ccpi cil cil-astra ccpi-regulariser tigre tomophantom cudatoolkit=9.2

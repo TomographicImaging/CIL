@@ -82,7 +82,7 @@ def display_slice(container, direction, title, cmap, size, axis_labels, origin):
     return get_slice_3D
 
     
-def islicer(data, direction, title="", slice_number=None, cmap='gray', minmax=None, size=None, axis_labels=None, origin='lower'):
+def islicer(data, direction, title="", slice_number=None, cmap='gray', minmax=None, size=None, axis_labels=None, origin='lower-left'):
 
     '''Creates an interactive integer slider that slices a 3D volume along direction
     
@@ -92,7 +92,9 @@ def islicer(data, direction, title="", slice_number=None, cmap='gray', minmax=No
     :slice_number: int start slice number, optional. If None defaults to center slice
     :param cmap: matplotlib color map
     :param minmax: colorbar min and max values, defaults to min max of container
-    :param size: int or tuple specifying the figure size in inch. If int it specifies the width and scales the height keeping the standard matplotlib aspect ratio 
+    :param size: int or tuple specifying the figure size in inch. If int it specifies the width and scales the height keeping the standard matplotlib aspect ratio
+    :param origin: Sets the display origin. 'lower/upper-left/right' 
+    :type origin: string, default 'lower-left' 
     '''
     
     if axis_labels is None:

@@ -23,9 +23,10 @@ import numpy
 
 from IPython.display import HTML
 import random
+from cil.utilities.display import set_origin
 
 
-def display_slice(container, direction, title, cmap, size, axis_labels):
+def display_slice(container, direction, title, cmap, size, axis_labels, origin):
     
         
     def get_slice_3D(x, minmax):
@@ -67,8 +68,9 @@ def display_slice(container, direction, title, cmap, size, axis_labels):
       
         ax.set_xlabel(x_label)     
         ax.set_ylabel(y_label)
- 
-        aximg = ax.imshow(img, cmap=cmap, origin='upper', extent=(0,x_lim,y_lim,0))
+
+        img, data_origin, extent = set_origin(img, origin)
+        aximg = ax.imshow(img, cmap=cmap, origin=data_origin, extent=extent)
         aximg.set_clim(minmax)
         ax.set_title(dtitle + " {}".format(x))
         # colorbar
@@ -80,7 +82,7 @@ def display_slice(container, direction, title, cmap, size, axis_labels):
     return get_slice_3D
 
     
-def islicer(data, direction, title="", slice_number=None, cmap='gray', minmax=None, size=None, axis_labels=None):
+def islicer(data, direction, title="", slice_number=None, cmap='gray', minmax=None, size=None, axis_labels=None, origin='lower-left'):
 
     '''Creates an interactive integer slider that slices a 3D volume along direction
     
@@ -90,7 +92,9 @@ def islicer(data, direction, title="", slice_number=None, cmap='gray', minmax=No
     :slice_number: int start slice number, optional. If None defaults to center slice
     :param cmap: matplotlib color map
     :param minmax: colorbar min and max values, defaults to min max of container
-    :param size: int or tuple specifying the figure size in inch. If int it specifies the width and scales the height keeping the standard matplotlib aspect ratio 
+    :param size: int or tuple specifying the figure size in inch. If int it specifies the width and scales the height keeping the standard matplotlib aspect ratio
+    :param origin: Sets the display origin. 'lower/upper-left/right' 
+    :type origin: string, default 'lower-left' 
     '''
     
     if axis_labels is None:
@@ -145,8 +149,9 @@ def islicer(data, direction, title="", slice_number=None, cmap='gray', minmax=No
                            title=title, 
                            cmap=cmap, 
                            # minmax=(amin, amax),
-                           size=size, axis_labels=axis_labels),
-             x=slider, minmax=min_max)
+                           size=size, axis_labels=axis_labels,
+                           origin=origin),
+                           x=slider, minmax=min_max)
     
     return slider
     

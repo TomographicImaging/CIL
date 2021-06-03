@@ -43,7 +43,7 @@ class CentreOfRotationCorrector(object):
         return processor
 
     @staticmethod
-    def sobel(slice_index='centre', FBP=None, search_range=None, binning=None):
+    def sobel(slice_index='centre', FBP=None, tolerance=0.001, search_range=None, initial_binning=None):
         r'''This creates a CentreOfRotationCorrector processor which will find the centre by maximising the sharpness of a reconstructed slice.
 
         Can be used on single slice parallel-beam, and centre slice cone beam geometry. For use only with datasets that can be reconstructed with FBP.
@@ -52,12 +52,14 @@ class CentreOfRotationCorrector(object):
         :type slice_index: int, str='centre', optional
         :param FBP: A CIL FBP class imported from cil.plugins.tigre or cil.plugins.astra  
         :type FBP: class
-        :param search_range: The range in pixels to search accross. If `None` the width of the panel/2 is used. 
+        :param tolerance: The tolerance of the fit in pixels, the default is 1/1000 of a pixel. Note this is a stopping critera, not a statement of accuracy of the algorithm.
+        :type tolerance: float, default = 0.001    
+        :param search_range: The range in pixels to search across. If `None` the width of the panel/2 is used. 
         :type search_range: int
-        :param binning: The size of the bins for the initial grid. If `None` will bin the image to a step corresponding to <256 pixels.
-        :type binning: int
+        :param initial_binning: The size of the bins for the initial grid. If `None` will bin the image to a step corresponding to <128 pixels. Note the fine search will be on unbinned data.
+        :type initial_binning: int
         :return: returns an AcquisitionData object with an updated AcquisitionGeometry
-        :rtype: AcquisitionDataData
+        :rtype: AcquisitionData
         '''
-        processor = CofR_sobel(slice_index=slice_index, FBP=FBP, search_range=search_range, binning=binning)
+        processor = CofR_sobel(slice_index=slice_index, FBP=FBP, tolerance=tolerance, search_range=search_range, initial_binning=initial_binning)
         return processor

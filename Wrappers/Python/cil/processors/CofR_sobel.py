@@ -22,6 +22,7 @@ import scipy
 import numpy as np
 import inspect
 import logging
+import math
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -36,15 +37,17 @@ class CofR_sobel(Processor):
     :type slice_index: int, str='centre', optional
     :param FBP: A CIL FBP class imported from cil.plugins.tigre or cil.plugins.astra  
     :type FBP: class
-    :param search_range: The range in pixels to search accross. If `None` the width of the panel/2 is used. 
+    :param tolerance: The tolerance of the fit in pixels, the default is 1/1000 of a pixel. Note this is a stopping critera, not a statement of accuracy of the algorithm.
+    :type tolerance: float, default = 0.001    
+    :param search_range: The range in pixels to search across. If `None` the width of the panel/2 is used. 
     :type search_range: int
-    :param binning: The size of the bins for the initial grid. If `None` will bin the image to a step corresponding to <256 pixels.
-    :type binning: int
+    :param initial_binning: The size of the bins for the initial grid. If `None` will bin the image to a step corresponding to <128 pixels. Note the fine search will be on unbinned data.
+    :type initial_binning: int
     :return: returns an AcquisitionData object with an updated AcquisitionGeometry
     :rtype: AcquisitionData
     '''
 
-    def __init__(self, slice_index='centre', FBP=None, search_range=None, binning=None):
+    def __init__(self, slice_index='centre', FBP=None, tolerance=0.001, search_range=None, initial_binning=None):
         
         if not inspect.isclass(FBP):
             ValueError("Please pass a CIL FBP class from cil.plugins.tigre or cil.plugins.astra")
@@ -52,8 +55,9 @@ class CofR_sobel(Processor):
         kwargs = {
                     'slice_index': slice_index,
                     'FBP': FBP,
+                    'tolerance': tolerance,
                     'search_range': search_range,
-                    'binning': binning
+                    'initial_binning': initial_binning
                  }
 
         super(CofR_sobel, self).__init__(**kwargs)
@@ -81,10 +85,99 @@ class CofR_sobel(Processor):
                 raise ValueError('slice_index is out of range. Must be less than {0}. Got {1}'.format(data.get_dimension_size('vertical'), self.slice_index))
 
         return True
-    
+
+    def gss(self, data, ig, search_range, tolerance):
+        '''Golden section search'''
+        # intervals c:cr:c where r = φ − 1=0.619... and c = 1 − r = 0.381..., φ
+
+        phi = (1 + math.sqrt(5))*0.5
+        r = phi - 1
+        #1/(r+2)
+        r2inv = 1/ (r+2)
+        #c = 1 - r
+
+        all_data = {}
+        #set up
+        sample_points = [np.nan]*4
+        evaluation = [np.nan]*4
+
+        sample_points[0] = search_range[0]
+        sample_points[3] = search_range[1]
+
+        interval = sample_points[-1] - sample_points[0]
+        step_c = interval *r2inv
+        sample_points[1] = search_range[0] + step_c
+        sample_points[2] = search_range[1] - step_c
+
+        for i in range(4):
+            evaluation[i] = self.calculate(data, ig, sample_points[i])
+            all_data[sample_points[i]] = evaluation[i]
+
+        count = 0
+        while(count < 30):
+            ind = np.argmin(evaluation)
+            if ind == 1:
+                del sample_points[-1]
+                del evaluation[-1]
+
+                interval = sample_points[-1] - sample_points[0]
+                step_c = interval *r2inv
+                new_point = sample_points[0] + step_c
+
+            elif ind == 2:
+                del sample_points[0]
+                del evaluation[0]
+
+                interval = sample_points[-1] - sample_points[0]
+                step_c = interval *r2inv
+                new_point = sample_points[-1]- step_c
+
+            if interval < tolerance:
+                break
+
+            sample_points.insert(ind, new_point)      
+            obj = self.calculate(data, ig, new_point)
+            evaluation.insert(ind, obj)
+            all_data[new_point] = obj
+
+            count +=1
+
+        if logger.isEnabledFor(logging.DEBUG):
+            print("evaluated {} points".format(len(all_data)))
+            keys, values = zip(*all_data.items())
+            self.plot(keys, values, ig.voxel_size_x)
+
+        ind = np.argmin(evaluation)
+        return sample_points[ind]
+                
+    def calculate(self, data, ig, offset):
+        ag_shift = data.geometry.copy()
+        ag_shift.config.system.rotation_axis.position = [offset, 0]
+
+        reco = self.FBP(ig, ag_shift)(data)
+        return (reco*reco).sum()
+
+    def plot(self, offsets,values, vox_size):
+        x=[x / vox_size for x in offsets] 
+        y=values
+                 
+        plt.figure()
+        plt.scatter(x,y)
+        plt.show()
+
+    def get_min(self, offsets, values, ind):
+        #calculate quadratic from 3 points around ind  (-1,0,1)
+        a = (values[ind+1] + values[ind-1] - 2*values[ind]) * 0.5
+        b = a + values[ind] - values[ind-1]
+        ind_centre = -b / (2*a)+ind
+
+        ind0 = int(ind_centre)
+        w1 = ind_centre - ind0
+        return (1.0 - w1) * offsets[ind0] + w1 * offsets[ind0+1]
+
     def process(self, out=None):
 
-        #%% get slice
+        #get slice
         data_full = self.get_input()
 
         if data_full.geometry.dimension == '3D':
@@ -92,94 +185,69 @@ class CofR_sobel(Processor):
         else:
             data = data_full
 
+        #prepare data
         data.geometry.config.system.update_reference_frame()
-        centre = data.geometry.config.system.rotation_axis.position[0]
-           
+        data_filtered = data.copy()
+        data_filtered.fill(scipy.ndimage.sobel(data.as_array(), axis=1, mode='reflect', cval=0.0)) 
+
+        #initial grid search
         width = data.geometry.config.panel.num_pixels[0]
         if self.search_range is None:
             self.search_range = width //4
 
-        if self.binning is None:
-            binning = int(np.ceil(width / 256))
-        else:
-            binning = self.binning
+        if self.initial_binning is None:
+            self.initial_binning = min(int(np.ceil(width / 128)),8)
 
-        count = 0
-        while count < 3:
-
-            if count == 0:
-                #start with pre-calculated binning
-                start = -self.search_range //binning
-                stop = self.search_range //binning
-                total = stop - start + 1
-
-            if count == 1:
-                binning = 1
-                start = -5
-                stop =  +5 
-                total = (stop - start)*2 + 1
-
-            if count == 2:
-                binning = 1
-                start = -0.5
-                stop =  +0.5
-                total = (stop - start)*10 + 1
-
-            data_processed = data.copy()
-            if binning > 1:
-                data_temp = data_processed.copy()
-                data_processed.fill(scipy.ndimage.gaussian_filter(data_temp.as_array(), [0,binning//2]))
-                data_processed = Binner({'horizontal':(None,None,binning)})(data_processed) #check behaviour
+        if self.initial_binning > 1:
+            data_temp = data.copy()
+            data_temp.fill(scipy.ndimage.gaussian_filter(data.as_array(), [0,self.initial_binning//2]))
+            data_temp = Binner({'horizontal':(None,None,self.initial_binning)})(data_temp)
                 
             #%% sobel filter 
-            data_filtered = data_processed.copy()
-            data_filtered.fill(scipy.ndimage.sobel(data_processed.as_array(), axis=1, mode='reflect', cval=0.0))  
+            data_binned_filtered = data_temp.copy()
+            data_binned_filtered.fill(scipy.ndimage.sobel(data_temp.as_array(), axis=1, mode='reflect', cval=0.0))
+            data_processed = data_binned_filtered
+            ig = data_processed.geometry.get_ImageGeometry()
+        else:
+            data_processed = data_filtered
+            ig = data_processed.geometry.get_ImageGeometry()
 
-            ag = data_filtered.geometry
-            ig = ag.get_ImageGeometry()
+        vox_rad = self.search_range //self.initial_binning
+        offsets = np.linspace(-vox_rad, vox_rad, int(2*vox_rad + 1)) * ig.voxel_size_x
+        obj_vals = []
 
-            #search
-            obj_vals = []
-            offsets = np.linspace(start, stop, total) * ig.voxel_size_x + centre
-            for offset in offsets:
-                ag_shift = data_filtered.geometry.copy()
-                ag_shift.config.system.rotation_axis.position = [offset, 0]
+        for offset in offsets:
+            obj_vals.append(self.calculate(data_processed, ig, offset))
 
-                reco = self.FBP(ig, ag_shift)(data_filtered)
-                obj_val = (reco*reco).sum()
-                obj_vals.append(obj_val)
+        ind = np.argmin(obj_vals)
+        if ind == 0 or ind == len(obj_vals)-1:
+            raise ValueError ("Unable to minimise function within set search_range")
+        else:
+            centre = self.get_min(offsets, obj_vals, ind)
 
-            output_cor = zip(offsets, obj_vals)
+        if logger.isEnabledFor(logging.DEBUG):
+            self.plot(offsets,obj_vals,ig.voxel_size_x / self.initial_binning)
 
-            ind = np.argmin(obj_vals)
-            centre = offsets[ind]
+        #fine search
+        data_processed = data_filtered
+        ig = data.geometry.get_ImageGeometry()  
 
-            if ind != 0 and ind != len(offsets)-1:
-                #fit quadratic to 3 centre points (-1,0,1)
-                a = (obj_vals[ind+1] + obj_vals[ind-1] - 2*obj_vals[ind]) * 0.5
-                b = a + obj_vals[ind] - obj_vals[ind-1]
-                ind_centre = -b / (2*a)+ind
+        a = -self.initial_binning/2 * ig.voxel_size_x  + centre
+        b = self.initial_binning/2 * ig.voxel_size_x  + centre
 
-                ind0 = int(ind_centre)
-                w1 = ind_centre - ind0
-                centre = (1.0 - w1) * offsets[ind0] + w1 * offsets[ind0+1]
-                count += 1
-            else:
-                raise ValueError ("Unable to minimise function within set search_range")
+        centre = self.gss(data_processed,ig, (a, b), self.tolerance *ig.voxel_size_x )
 
-            logger.debug("iteration: %f\nbinning: %f\ncor at: %f",count, binning, centre)
-
-            if logger.isEnabledFor(logging.DEBUG):
-                plt.figure()
-                plt.scatter(binning *offsets/ig.voxel_size_x, obj_vals)
-                plt.show()
         new_geometry = data_full.geometry.copy()
         new_geometry.config.system.rotation_axis.position[0] = centre
         
+        voxel_offset = centre/ig.voxel_size_x
+        #voxel_offset = np.floor(voxel_offset *100 +0.5)/100
+        centre = voxel_offset * ig.voxel_size_x
+
         logger.info("Centre of rotation correction using sobel filtering with FBP")
         logger.info("Calculated from slice: %s", str(self.slice_index))
-        logger.info("Applied centre of rotation shift = %f pixels", centre/ig.voxel_size_x)
-        logger.info("Applied centre of rotation shift = %f units at the object.", centre)
+        logger.info("Applied centre of rotation shift = %f +/- %f pixels ", centre/ig.voxel_size_x, self.tolerance)
+        logger.info("Applied centre of rotation shift = %f +/- %f units at the object.", centre, ig.voxel_size_x * self.tolerance)
 
         if out is None:
             return AcquisitionData(array=data_full, deep_copy=True, geometry=new_geometry, supress_warning=True)

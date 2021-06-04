@@ -50,7 +50,7 @@ class CofR_sobel(Processor):
     def __init__(self, slice_index='centre', FBP=None, tolerance=0.001, search_range=None, initial_binning=None):
         
         if not inspect.isclass(FBP):
-            ValueError("Please pass a CIL FBP class from cil.plugins.tigre or cil.plugins.astra")
+            raise ValueError("Please pass a CIL FBP class from cil.plugins.tigre or cil.plugins.astra")
 
         kwargs = {
                     'slice_index': slice_index,
@@ -241,13 +241,12 @@ class CofR_sobel(Processor):
         new_geometry.config.system.rotation_axis.position[0] = centre
         
         voxel_offset = centre/ig.voxel_size_x
-        #voxel_offset = np.floor(voxel_offset *100 +0.5)/100
         centre = voxel_offset * ig.voxel_size_x
 
         logger.info("Centre of rotation correction using sobel filtering with FBP")
         logger.info("Calculated from slice: %s", str(self.slice_index))
-        logger.info("Applied centre of rotation shift = %f +/- %f pixels ", centre/ig.voxel_size_x, self.tolerance)
-        logger.info("Applied centre of rotation shift = %f +/- %f units at the object.", centre, ig.voxel_size_x * self.tolerance)
+        logger.info("Applied centre of rotation shift = %f", centre/ig.voxel_size_x)
+        logger.info("Applied centre of rotation shift = %f", centre)
 
         if out is None:
             return AcquisitionData(array=data_full, deep_copy=True, geometry=new_geometry, supress_warning=True)

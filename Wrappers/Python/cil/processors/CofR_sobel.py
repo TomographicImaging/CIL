@@ -37,9 +37,9 @@ class CofR_sobel(Processor):
     :type slice_index: int, str='centre', optional
     :param FBP: A CIL FBP class imported from cil.plugins.tigre or cil.plugins.astra  
     :type FBP: class
-    :param tolerance: The tolerance of the fit in pixels, the default is 1/1000 of a pixel. Note this is a stopping critera, not a statement of accuracy of the algorithm.
+    :param tolerance: The tolerance of the fit in pixels, the default is 1/200 of a pixel. Note this is a stopping critera, not a statement of accuracy of the algorithm.
     :type tolerance: float, default = 0.001    
-    :param search_range: The range in pixels to search across. If `None` the width of the panel/2 is used. 
+    :param search_range: The range in pixels to search either side of the panel centre. If `None` the width of the panel/4 is used. 
     :type search_range: int
     :param initial_binning: The size of the bins for the initial grid. If `None` will bin the image to a step corresponding to <128 pixels. Note the fine search will be on unbinned data.
     :type initial_binning: int
@@ -47,7 +47,7 @@ class CofR_sobel(Processor):
     :rtype: AcquisitionData
     '''
 
-    def __init__(self, slice_index='centre', FBP=None, tolerance=0.001, search_range=None, initial_binning=None):
+    def __init__(self, slice_index='centre', FBP=None, tolerance=0.005, search_range=None, initial_binning=None):
         
         if not inspect.isclass(FBP):
             raise ValueError("Please pass a CIL FBP class from cil.plugins.tigre or cil.plugins.astra")
@@ -147,9 +147,15 @@ class CofR_sobel(Processor):
             keys, values = zip(*all_data.items())
             self.plot(keys, values, ig.voxel_size_x)
 
-        ind = np.argmin(evaluation)
-        return sample_points[ind]
-                
+        z = np.polyfit(sample_points, evaluation, 2)
+        min_point = -z[1] / (2*z[0])
+
+        if np.sign(z[0]) == 1 and min_point < sample_points[2] and min_point > sample_points[0]:
+            return min_point
+        else:
+            ind = np.argmin(evaluation)
+            return sample_points[ind]
+
     def calculate(self, data, ig, offset):
         ag_shift = data.geometry.copy()
         ag_shift.config.system.rotation_axis.position = [offset, 0]
@@ -174,6 +180,7 @@ class CofR_sobel(Processor):
         ind0 = int(ind_centre)
         w1 = ind_centre - ind0
         return (1.0 - w1) * offsets[ind0] + w1 * offsets[ind0+1]
+
 
     def process(self, out=None):
 
@@ -219,21 +226,21 @@ class CofR_sobel(Processor):
         for offset in offsets:
             obj_vals.append(self.calculate(data_processed, ig, offset))
 
+        if logger.isEnabledFor(logging.DEBUG):
+            self.plot(offsets,obj_vals,ig.voxel_size_x / self.initial_binning)
+
         ind = np.argmin(obj_vals)
         if ind == 0 or ind == len(obj_vals)-1:
             raise ValueError ("Unable to minimise function within set search_range")
         else:
             centre = self.get_min(offsets, obj_vals, ind)
 
-        if logger.isEnabledFor(logging.DEBUG):
-            self.plot(offsets,obj_vals,ig.voxel_size_x / self.initial_binning)
-
         #fine search
         data_processed = data_filtered
         ig = data.geometry.get_ImageGeometry()  
 
-        a = -self.initial_binning/2 * ig.voxel_size_x  + centre
-        b = self.initial_binning/2 * ig.voxel_size_x  + centre
+        a = centre - ig.voxel_size_x * self.initial_binning
+        b = centre + ig.voxel_size_x * self.initial_binning
 
         centre = self.gss(data_processed,ig, (a, b), self.tolerance *ig.voxel_size_x )
 
@@ -241,12 +248,11 @@ class CofR_sobel(Processor):
         new_geometry.config.system.rotation_axis.position[0] = centre
         
         voxel_offset = centre/ig.voxel_size_x
-        centre = voxel_offset * ig.voxel_size_x
 
         logger.info("Centre of rotation correction using sobel filtering with FBP")
         logger.info("Calculated from slice: %s", str(self.slice_index))
-        logger.info("Applied centre of rotation shift = %f", centre/ig.voxel_size_x)
-        logger.info("Applied centre of rotation shift = %f", centre)
+        logger.info("Applied centre of rotation shift = %f pixels", centre/ig.voxel_size_x)
+        logger.info("Applied centre of rotation shift = %f units at the object", centre)
 
         if out is None:
             return AcquisitionData(array=data_full, deep_copy=True, geometry=new_geometry, supress_warning=True)

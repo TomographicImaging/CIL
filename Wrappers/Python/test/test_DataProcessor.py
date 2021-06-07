@@ -36,7 +36,6 @@ from cil.processors import Slicer, Binner, MaskGenerator, Masker
 import wget
 import os
 
-
 try:
     import tigre
     has_tigre = True
@@ -476,17 +475,17 @@ class TestCentreOfRotation(unittest.TestCase):
 
     @unittest.skipUnless(has_astra, "ASTRA not installed")
     def test_CofR_sobel_astra(self):
-        corr = CofR_sobel(FBP=AstraFBP)
+        corr = CofR_sobel(search_range=20, FBP=AstraFBP)
         corr.set_input(self.data_DLS.clone())
         ad_out = corr.get_output()
-        self.assertAlmostEqual(6.3, ad_out.geometry.config.system.rotation_axis.position[0],places=1)     
+        self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
 
     @unittest.skipUnless(False, "TIGRE not installed")
     def skiptest_test_CofR_sobel_tigre(self): #currently not avaliable for parallel beam
-        corr = CofR_sobel(FBP=TigreFBP)
+        corr = CofR_sobel(search_range=20, FBP=TigreFBP)
         corr.set_input(self.data_DLS.clone())
         ad_out = corr.get_output()
-        self.assertAlmostEqual(6.3, ad_out.geometry.config.system.rotation_axis.position[0],places=1)     
+        self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
 
     def test_CenterOfRotationCorrector(self):       
         corr = CentreOfRotationCorrector.xcorr(slice_index='centre', projection_index=0, ang_tol=0.1)

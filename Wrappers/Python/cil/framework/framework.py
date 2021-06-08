@@ -1825,7 +1825,7 @@ class DataContainer(object):
         elif len(val)==self.number_of_dimensions:
             self.__dimension_labels = tuple(val)
         else:
-            raise ValueError("dimension_labels expected a list containing {0} strings got {1}".format(self.number_of_dimensions, labels))
+            raise ValueError("dimension_labels expected a list containing {0} strings got {1}".format(self.number_of_dimensions, val))
 
     @property
     def shape(self):
@@ -1914,17 +1914,26 @@ class DataContainer(object):
         Returns a new DataContainer containing a single slice of in the requested direction. \
         Pass keyword arguments <dimension label>=index
         '''
-        new_array = self.array.copy()
 
         #get ordered list of current dimensions
         dimension_labels_list = list(self.dimension_labels)
 
+        slice_list = len(self.dimension_labels)*[slice(None,None,None)]
+
         #remove axes from array and labels
         for key, value in kw.items():
             if value is not None:
-                axis = dimension_labels_list.index(key)
+                axis = self.dimension_labels.index(key)                
                 dimension_labels_list.remove(key)
-                new_array = new_array.take(indices=value, axis=axis)
+                slice_list[axis] = slice(value, value+1, None)                      
+        
+        shape_list = []
+        for label in dimension_labels_list:
+            ind = self.dimension_labels.index(label)
+            shape_list.append(self.shape[ind])
+        
+        new_array = self.as_array()[tuple(slice_list)].reshape(shape_list)
+
 
         if new_array.ndim > 1:
             return DataContainer(new_array, False, dimension_labels_list, suppress_warning=True)

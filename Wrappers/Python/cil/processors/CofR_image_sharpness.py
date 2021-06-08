@@ -27,9 +27,9 @@ import math
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-class CofR_FBP(Processor):
+class CofR_image_sharpness(Processor):
 
-    r'''CofR_FBP processor maximises the sharpness of a reconstructed slice.
+    r'''CofR_image_sharpness processor maximises the sharpness of a reconstructed slice.
 
     For use on data-sets that can be reconstructed with FBP.
 
@@ -60,7 +60,7 @@ class CofR_FBP(Processor):
                     'initial_binning': initial_binning
                  }
 
-        super(CofR_FBP, self).__init__(**kwargs)
+        super(CofR_image_sharpness, self).__init__(**kwargs)
 
     def check_input(self, data):
         if not isinstance(data, AcquisitionData):

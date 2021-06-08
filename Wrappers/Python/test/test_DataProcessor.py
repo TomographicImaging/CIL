@@ -30,7 +30,7 @@ from timeit import default_timer as timer
 from cil.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 
 from cil.io import NEXUSDataReader
-from cil.processors import CentreOfRotationCorrector, CofR_xcorr, CofR_sobel
+from cil.processors import CentreOfRotationCorrector, CofR_xcorrelation, CofR_image_sharpness
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
 from cil.processors import Slicer, Binner, MaskGenerator, Masker
 import wget
@@ -471,39 +471,39 @@ class TestCentreOfRotation_parallel(unittest.TestCase):
         self.data_DLS = data_raw.log()
         self.data_DLS *= -1
 
-    def test_CofR_xcorr(self):       
+    def test_CofR_xcorrelation(self):       
 
-        corr = CofR_xcorr(slice_index='centre', projection_index=0, ang_tol=0.1)
+        corr = CofR_xcorrelation(slice_index='centre', projection_index=0, ang_tol=0.1)
         corr.set_input(self.data_DLS.clone())
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
         
-        corr = CofR_xcorr(slice_index=67, projection_index=0, ang_tol=0.1)
+        corr = CofR_xcorrelation(slice_index=67, projection_index=0, ang_tol=0.1)
         corr.set_input(self.data_DLS.clone())
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)              
 
     @unittest.skipUnless(has_astra, "ASTRA not installed")
-    def test_CofR_sobel_astra(self):
-        corr = CofR_sobel(search_range=20, FBP=AstraFBP)
+    def test_CofR_image_sharpness_astra(self):
+        corr = CofR_image_sharpness(search_range=20, FBP=AstraFBP)
         corr.set_input(self.data_DLS.clone())
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
 
     @unittest.skipUnless(False, "TIGRE not installed")
-    def skiptest_test_CofR_sobel_tigre(self): #currently not avaliable for parallel beam
-        corr = CofR_sobel(search_range=20, FBP=TigreFBP)
+    def skiptest_test_CofR_image_sharpness_tigre(self): #currently not avaliable for parallel beam
+        corr = CofR_image_sharpness(search_range=20, FBP=TigreFBP)
         corr.set_input(self.data_DLS.clone())
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
 
     def test_CenterOfRotationCorrector(self):       
-        corr = CentreOfRotationCorrector.xcorr(slice_index='centre', projection_index=0, ang_tol=0.1)
+        corr = CentreOfRotationCorrector.xcorrelation(slice_index='centre', projection_index=0, ang_tol=0.1)
         corr.set_input(self.data_DLS.clone())
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
         
-        corr = CentreOfRotationCorrector.xcorr(slice_index=67, projection_index=0, ang_tol=0.1)
+        corr = CentreOfRotationCorrector.xcorrelation(slice_index=67, projection_index=0, ang_tol=0.1)
         corr.set_input(self.data_DLS.clone())
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)              
@@ -535,22 +535,22 @@ class TestCentreOfRotation_conebeam(unittest.TestCase):
         self.data_offset.geometry = ag_orig
 
     @unittest.skipUnless(has_tomophantom and has_astra, "Tomophantom or ASTRA not installed")
-    def test_CofR_sobel_astra(self):
-        corr = CofR_sobel(FBP=AstraFBP)
+    def test_CofR_image_sharpness_astra(self):
+        corr = CofR_image_sharpness(FBP=AstraFBP)
         ad_out = corr(self.data_0)
         self.assertAlmostEqual(0.000, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
 
-        corr = CofR_sobel(FBP=AstraFBP)
+        corr = CofR_image_sharpness(FBP=AstraFBP)
         ad_out = corr(self.data_offset)
         self.assertAlmostEqual(-0.150, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
 
     @unittest.skipUnless(has_tomophantom and has_tigre, "Tomophantom or TIGRE not installed")
-    def test_CofR_sobel_tigre(self): #currently not avaliable for parallel beam
-        corr = CofR_sobel(FBP=TigreFBP)
+    def test_CofR_image_sharpness_tigre(self): #currently not avaliable for parallel beam
+        corr = CofR_image_sharpness(FBP=TigreFBP)
         ad_out = corr(self.data_0)
         self.assertAlmostEqual(0.000, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
 
-        corr = CofR_sobel(FBP=TigreFBP)
+        corr = CofR_image_sharpness(FBP=TigreFBP)
         ad_out = corr(self.data_offset)
         self.assertAlmostEqual(-0.150, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
 

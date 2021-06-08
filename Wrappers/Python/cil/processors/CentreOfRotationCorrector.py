@@ -15,8 +15,8 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from cil.processors.CofR_xcorr import CofR_xcorr
-from cil.processors.CofR_FBP import CofR_FBP
+from cil.processors.CofR_xcorrelation import CofR_xcorrelation
+from cil.processors.CofR_image_sharpness import CofR_image_sharpness
 
 
 class CentreOfRotationCorrector(object):
@@ -25,7 +25,7 @@ class CentreOfRotationCorrector(object):
     """
 
     @staticmethod
-    def xcorr(slice_index='centre', projection_index=0, ang_tol=0.1):
+    def xcorrelation(slice_index='centre', projection_index=0, ang_tol=0.1):
         r'''This creates a CentreOfRotationCorrector processor using the cross-correlation algorithm.
 
         For use on parallel-beam geometry it requires two projections 180 degree apart.
@@ -39,11 +39,11 @@ class CentreOfRotationCorrector(object):
         :return: returns an AcquisitionData object with an updated AcquisitionGeometry
         :rtype: AcquisitionData
         '''
-        processor = CofR_xcorr(slice_index, projection_index, ang_tol)
+        processor = CofR_xcorrelation(slice_index, projection_index, ang_tol)
         return processor
 
     @staticmethod
-    def FBP(slice_index='centre', FBP=None, tolerance=0.005, search_range=None, initial_binning=None):
+    def image_sharpness(slice_index='centre', FBP=None, tolerance=0.005, search_range=None, initial_binning=None):
         r'''This creates a CentreOfRotationCorrector processor which will find the centre by maximising the sharpness of a reconstructed slice.
 
         Can be used on single slice parallel-beam, and centre slice cone beam geometry. For use only with datasets that can be reconstructed with FBP.
@@ -61,5 +61,5 @@ class CentreOfRotationCorrector(object):
         :return: returns an AcquisitionData object with an updated AcquisitionGeometry
         :rtype: AcquisitionDataS
         '''
-        processor = CofR_FBP(slice_index=slice_index, FBP=FBP, tolerance=tolerance, search_range=search_range, initial_binning=initial_binning)
+        processor = CofR_image_sharpness(slice_index=slice_index, FBP=FBP, tolerance=tolerance, search_range=search_range, initial_binning=initial_binning)
         return processor

@@ -22,7 +22,7 @@ jobs:
     - uses: actions/upload-artifact@v1
       with:
         name: DocumentationHTML
-        path: docs/build/html/
+        path: docs/docs/build/html/
   
   publish:
     runs-on: ubuntu-latest
@@ -33,7 +33,7 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: DocumentationHTML
-        path: docs/build/html/
+        path: docs/docs/build/html/
     - name: Commit documentation changes
       run: |
         git clone https://github.com/TomographicImaging/CIL.git --branch gh-pages --single-branch gh-pages

@@ -48,12 +48,24 @@ else:
     from cil.plugins.tigre import FBP as TigreFBP
 
 try:
+    import tomophantom
+    has_tomophantom = True
+except ModuleNotFoundError:
+    print(  "This plugin requires the additional package tomophantom\n" +
+            "Please install it via conda as tomophantom from the ccpi channel\n")
+    has_tomophantom = False
+else:
+    from cil.plugins import TomoPhantom
+
+try:
     import astra
     has_astra = True
 except ModuleNotFoundError:
     has_astra = False
 else:
-    from cil.plugins.astra.processors import FBP as AstraFBP
+    from cil.plugins.astra import FBP as AstraFBP
+    from cil.plugins.astra import ProjectionOperator
+
 
 
 class TestBinner(unittest.TestCase):
@@ -452,12 +464,10 @@ class TestSlicer(unittest.TestCase):
         numpy.testing.assert_allclose(data_sliced.as_array(), numpy.squeeze(data.as_array()[5:12:3, ::2, 10:30:2, :]), rtol=1E-6)
 
 
-class TestCentreOfRotation(unittest.TestCase):
+class TestCentreOfRotation_parallel(unittest.TestCase):
     
     def setUp(self):
-
         data_raw = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
-
         self.data_DLS = data_raw.log()
         self.data_DLS *= -1
 
@@ -498,6 +508,49 @@ class TestCentreOfRotation(unittest.TestCase):
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)              
 
+
+class TestCentreOfRotation_conebeam(unittest.TestCase):
+
+    def setUp(self):
+        ag_orig = AcquisitionGeometry.create_Cone2D([0,-100],[0,100])\
+            .set_panel(512,0.2)\
+            .set_angles(numpy.arange(0,360))\
+            .set_labels(['angle', 'horizontal'])
+
+        ig = ag_orig.get_ImageGeometry()
+        phantom = TomoPhantom.get_ImageData(12, ig)
+
+        Op = ProjectionOperator(ig, ag_orig, device='gpu')
+        self.data_0 = Op.direct(phantom)
+
+        ag_offset = AcquisitionGeometry.create_Cone2D([0,-100],[0,100],rotation_axis_position=(-0.124,0))\
+            .set_panel(512,0.2)\
+            .set_angles(numpy.arange(0,360))\
+            .set_labels(['angle', 'horizontal'])
+
+        Op = ProjectionOperator(ig, ag_offset, device='gpu')
+        self.data_offset = Op.direct(phantom)
+        self.data_offset.geometry = ag_orig
+
+    @unittest.skipUnless(has_tomophantom and has_astra, "Tomophantom or ASTRA not installed")
+    def test_CofR_sobel_astra(self):
+        corr = CofR_sobel(FBP=AstraFBP)
+        ad_out = corr(self.data_0)
+        self.assertAlmostEqual(0.000, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
+
+        corr = CofR_sobel(FBP=AstraFBP)
+        ad_out = corr(self.data_offset)
+        self.assertAlmostEqual(-0.124, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
+
+    @unittest.skipUnless(has_tomophantom and has_tigre, "Tomophantom or TIGRE not installed")
+    def test_CofR_sobel_tigre(self): #currently not avaliable for parallel beam
+        corr = CofR_sobel(FBP=TigreFBP)
+        ad_out = corr(self.data_0)
+        self.assertAlmostEqual(0.000, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
+
+        corr = CofR_sobel(FBP=TigreFBP)
+        ad_out = corr(self.data_offset)
+        self.assertAlmostEqual(-0.124, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
 
 class TestDataProcessor(unittest.TestCase):
    

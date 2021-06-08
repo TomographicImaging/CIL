@@ -31,6 +31,8 @@ class CofR_image_sharpness(Processor):
 
     r'''CofR_image_sharpness processor maximises the sharpness of a reconstructed slice.
 
+    The centre-of-rotation offset is fitted using a reconstruction of edge-enhanced data. Auto-correlation is used to assess sharpness of the reconstructed slice. 
+
     For use on data-sets that can be reconstructed with FBP.
 
     :param slice_index: An integer defining the vertical slice to run the algorithm on.
@@ -81,8 +83,8 @@ class CofR_image_sharpness(Processor):
             except:
                 raise ValueError("slice_index expected to be a positive integer or the string 'centre'. Got {0}".format(self.slice_index))
 
-            if self.slice_index >= data.get_dimension_size('vertical'):
-                raise ValueError('slice_index is out of range. Must be less than {0}. Got {1}'.format(data.get_dimension_size('vertical'), self.slice_index))
+            if self.slice_index < 0 or self.slice_index >= data.get_dimension_size('vertical'):
+                raise ValueError('slice_index is out of range. Must be in range 0-{0}. Got {1}'.format(data.get_dimension_size('vertical'), self.slice_index))
 
         return True
 
@@ -142,8 +144,8 @@ class CofR_image_sharpness(Processor):
 
             count +=1
 
+        logger.info("evaluated %d points",len(all_data))
         if logger.isEnabledFor(logging.DEBUG):
-            print("evaluated {} points".format(len(all_data)))
             keys, values = zip(*all_data.items())
             self.plot(keys, values, ig.voxel_size_x)
 

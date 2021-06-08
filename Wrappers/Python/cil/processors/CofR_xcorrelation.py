@@ -19,9 +19,9 @@ from cil.framework import Processor, AcquisitionData
 import numpy as np
 from scipy import signal
 
-class CofR_xcorr(Processor):
+class CofR_xcorrelation(Processor):
 
-    r'''CofR_xcorr processor uses the cross-correlation algorithm on a single slice between two projections at 180 degrees inteval.
+    r'''CofR_xcorrelation processor uses the cross-correlation algorithm on a single slice between two projections at 180 degrees inteval.
 
     For use on parallel-beam geometry it requires two projections 180 degree apart.
 
@@ -43,7 +43,7 @@ class CofR_xcorr(Processor):
                     'projection_index': 0
                  }
 
-        super(CofR_xcorr, self).__init__(**kwargs)
+        super(CofR_xcorrelation, self).__init__(**kwargs)
 
     def check_input(self, data):
         if not isinstance(data, AcquisitionData):
@@ -64,8 +64,8 @@ class CofR_xcorr(Processor):
             except:
                 raise ValueError("slice_index expected to be a positive integer or the string 'centre'. Got {0}".format(self.slice_index))
 
-            if self.slice_index >= data.get_dimension_size('vertical'):
-                raise ValueError('slice_index is out of range. Must be less than {0}. Got {1}'.format(data.get_dimension_size('vertical'), self.slice_index))
+            if self.slice_index < 0 or self.slice_index >= data.get_dimension_size('vertical'):
+                raise ValueError('slice_index is out of range. Must be in range 0-{0}. Got {1}'.format(data.get_dimension_size('vertical'), self.slice_index))
 
         if self.projection_index >= data.geometry.config.angles.num_positions:
                 raise ValueError('projection_index is out of range. Must be less than {0}. Got {1}'.format(data.geometry.config.angles.num_positions, self.projection_index))

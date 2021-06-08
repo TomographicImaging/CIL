@@ -512,9 +512,11 @@ class TestCentreOfRotation_parallel(unittest.TestCase):
 class TestCentreOfRotation_conebeam(unittest.TestCase):
 
     def setUp(self):
+        angles = numpy.linspace(0, 360, 36, endpoint=False)
+
         ag_orig = AcquisitionGeometry.create_Cone2D([0,-100],[0,100])\
-            .set_panel(512,0.2)\
-            .set_angles(numpy.arange(0,360))\
+            .set_panel(64,0.2)\
+            .set_angles(angles)\
             .set_labels(['angle', 'horizontal'])
 
         ig = ag_orig.get_ImageGeometry()
@@ -523,9 +525,9 @@ class TestCentreOfRotation_conebeam(unittest.TestCase):
         Op = ProjectionOperator(ig, ag_orig, device='gpu')
         self.data_0 = Op.direct(phantom)
 
-        ag_offset = AcquisitionGeometry.create_Cone2D([0,-100],[0,100],rotation_axis_position=(-0.124,0))\
-            .set_panel(512,0.2)\
-            .set_angles(numpy.arange(0,360))\
+        ag_offset = AcquisitionGeometry.create_Cone2D([0,-100],[0,100],rotation_axis_position=(-0.150,0))\
+            .set_panel(64,0.2)\
+            .set_angles(angles)\
             .set_labels(['angle', 'horizontal'])
 
         Op = ProjectionOperator(ig, ag_offset, device='gpu')
@@ -540,7 +542,7 @@ class TestCentreOfRotation_conebeam(unittest.TestCase):
 
         corr = CofR_sobel(FBP=AstraFBP)
         ad_out = corr(self.data_offset)
-        self.assertAlmostEqual(-0.124, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
+        self.assertAlmostEqual(-0.150, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
 
     @unittest.skipUnless(has_tomophantom and has_tigre, "Tomophantom or TIGRE not installed")
     def test_CofR_sobel_tigre(self): #currently not avaliable for parallel beam
@@ -550,7 +552,7 @@ class TestCentreOfRotation_conebeam(unittest.TestCase):
 
         corr = CofR_sobel(FBP=TigreFBP)
         ad_out = corr(self.data_offset)
-        self.assertAlmostEqual(-0.124, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
+        self.assertAlmostEqual(-0.150, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
 
 class TestDataProcessor(unittest.TestCase):
    

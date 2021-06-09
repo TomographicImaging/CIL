@@ -14,6 +14,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+    
+    - name: Checkout cil-astra repo
+      uses: actions/checkout@v2
+      with:
+        repository: TomographicImaging/CIL-ASTRA
+        path: CIL-ASTRA
     - uses: ammaraskar/sphinx-action@master
       with:
         docs-folder: "docs/"

@@ -13,16 +13,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
+      with:
+        path: CIL
+    
+    - name: Checkout cil-astra repo
+      uses: actions/checkout@v2
+      with:
+        repository: TomographicImaging/CIL-ASTRA
+        path: CIL-ASTRA
     - uses: ammaraskar/sphinx-action@master
       with:
-        docs-folder: "docs/"
-        pre-build-command: python -m pip install --upgrade pip; pip install sphinx_rtd_theme; pip install numpy
+        docs-folder: "CIL/docs/"
+        pre-build-command: python -m pip install --upgrade pip; pip install sphinx_rtd_theme; pip install numpy; cp -r CIL-ASTRA/Wrappers/Python/cil/plugins/astra CIL/Wrappers/Python/cil/plugins/astra
     # Create an artifact of the html output.
     - uses: actions/upload-artifact@v1
       with:
         name: DocumentationHTML
-        path: docs/docs/build/html/
+        path: CIL/docs/docs/build/html/
   
   publish:
     runs-on: ubuntu-latest

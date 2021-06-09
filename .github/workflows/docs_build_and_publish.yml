@@ -17,11 +17,11 @@ jobs:
       with:
         path: CIL
     - uses: conda-incubator/setup-miniconda@v2
-        with:
-          auto-update-conda: true
-          python-version: 3.7
-      - name: Conda install cil
-        run: conda install cil -c conda-forge -c ccpi cil
+      with:
+        auto-update-conda: true
+        python-version: 3.7
+    - name: Conda install cil
+      run: conda install cil -c conda-forge -c ccpi cil
     
     - name: Checkout cil-astra repo
       uses: actions/checkout@v2

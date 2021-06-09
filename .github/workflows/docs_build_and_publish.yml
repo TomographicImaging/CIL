@@ -23,7 +23,7 @@ jobs:
         cd CIL
         mkdir build
         cd build
-        cmake .. -DCMAKE_INSTALL_PREFIX=<install_directory>
+        cmake .. -DCMAKE_INSTALL_PREFIX=install
         cmake --build . --target install
         cd install
         export PATH=$PATH:$(pwd)

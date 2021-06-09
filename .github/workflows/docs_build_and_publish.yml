@@ -16,13 +16,18 @@ jobs:
     - uses: actions/checkout@v2
       with:
         path: CIL
-    - uses: conda-incubator/setup-miniconda@v2
-      with:
-        auto-update-conda: true
-        python-version: 3.7
-    - name: Conda install cil
-      run: conda install -c conda-forge -c ccpi cil
-    
+    - name: install cil
+      run: |
+        apt-get update
+        apt-get install -y build-essential --fix-missing
+        cd CIL
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_INSTALL_PREFIX=<install_directory>
+        cmake --build . --target install
+        cd install
+        export PATH=$PATH:$(pwd)
+        cd ../..   
     - name: Checkout cil-astra repo
       uses: actions/checkout@v2
       with:
@@ -31,7 +36,7 @@ jobs:
     - uses: ammaraskar/sphinx-action@master
       with:
         docs-folder: "CIL/docs/"
-        pre-build-command: conda activate test; cp -r CIL-ASTRA/Wrappers/Python/cil/plugins/astra CIL/Wrappers/Python/cil/plugins/astra
+        pre-build-command: cp -r CIL-ASTRA/Wrappers/Python/cil/plugins/astra CIL/Wrappers/Python/cil/plugins/astra
     # Create an artifact of the html output.
     - uses: actions/upload-artifact@v1
       with:

@@ -512,7 +512,7 @@ class TestCentreOfRotation_parallel(unittest.TestCase):
 class TestCentreOfRotation_conebeam(unittest.TestCase):
 
     def setUp(self):
-        angles = numpy.linspace(0, 360, 36, endpoint=False)
+        angles = numpy.linspace(0, 360, 180, endpoint=False)
 
         ag_orig = AcquisitionGeometry.create_Cone2D([0,-100],[0,100])\
             .set_panel(64,0.2)\

@@ -401,7 +401,7 @@ A Block vector of functions, Size of vector coincides with the rows of :math:`K`
 
 
 Block DataContainer 
-==============
+===================
 
 .. math:: 
 

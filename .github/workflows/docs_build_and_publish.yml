@@ -25,7 +25,7 @@ jobs:
     - uses: ammaraskar/sphinx-action@master
       with:
         docs-folder: "CIL/docs/"
-        pre-build-command: python -m pip install --upgrade pip; pip install sphinx_rtd_theme; pip install numpy; cp CIL-ASTRA/Wrappers/Python/cil/plugins/astra CIL/Wrappers/Python/cil/plugins/astra
+        pre-build-command: python -m pip install --upgrade pip; pip install sphinx_rtd_theme; pip install numpy; cp -r CIL-ASTRA/Wrappers/Python/cil/plugins/astra CIL/Wrappers/Python/cil/plugins/astra
     # Create an artifact of the html output.
     - uses: actions/upload-artifact@v1
       with:

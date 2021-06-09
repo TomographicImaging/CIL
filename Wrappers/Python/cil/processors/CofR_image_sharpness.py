@@ -163,10 +163,7 @@ class CofR_image_sharpness(Processor):
         ag_shift.config.system.rotation_axis.position = [offset, 0]
 
         reco = self.FBP(ig, ag_shift)(data)
-        x = ig.voxel_num_x//4
-        y = ig.voxel_num_y//4
-        roi = reco.as_array()[y:-y,x:-x]
-        return (roi*roi).sum()
+        return (reco*reco).sum()
 
     def plot(self, offsets,values, vox_size):
         x=[x / vox_size for x in offsets] 

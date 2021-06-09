@@ -488,14 +488,14 @@ class TestCentreOfRotation_parallel(unittest.TestCase):
         corr = CofR_image_sharpness(search_range=20, FBP=AstraFBP)
         corr.set_input(self.data_DLS.clone())
         ad_out = corr.get_output()
-        self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
+        self.assertAlmostEqual(6.24, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
 
     @unittest.skipUnless(False, "TIGRE not installed")
     def skiptest_test_CofR_image_sharpness_tigre(self): #currently not avaliable for parallel beam
         corr = CofR_image_sharpness(search_range=20, FBP=TigreFBP)
         corr.set_input(self.data_DLS.clone())
         ad_out = corr.get_output()
-        self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
+        self.assertAlmostEqual(6.24, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
 
     def test_CenterOfRotationCorrector(self):       
         corr = CentreOfRotationCorrector.xcorrelation(slice_index='centre', projection_index=0, ang_tol=0.1)

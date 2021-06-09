@@ -24,13 +24,13 @@ jobs:
         path: CIL-ASTRA
     - uses: ammaraskar/sphinx-action@master
       with:
-        docs-folder: "docs/"
+        docs-folder: "CIL/docs/"
         pre-build-command: python -m pip install --upgrade pip; pip install sphinx_rtd_theme; pip install numpy
     # Create an artifact of the html output.
     - uses: actions/upload-artifact@v1
       with:
         name: DocumentationHTML
-        path: docs/docs/build/html/
+        path: CIL/docs/docs/build/html/
   
   publish:
     runs-on: ubuntu-latest

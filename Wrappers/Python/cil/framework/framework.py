@@ -1914,7 +1914,7 @@ class DataContainer(object):
         Returns a new DataContainer containing a single slice of in the requested direction. \
         Pass keyword arguments <dimension label>=index
         '''
-        new_array = self.array.copy()
+        new_array = None
 
         #get ordered list of current dimensions
         dimension_labels_list = list(self.dimension_labels)
@@ -1924,7 +1924,10 @@ class DataContainer(object):
             if value is not None:
                 axis = dimension_labels_list.index(key)
                 dimension_labels_list.remove(key)
-                new_array = new_array.take(indices=value, axis=axis)
+                if new_array is None:
+                    new_array = self.as_array().take(indices=value, axis=axis)
+                else:
+                    new_array = new_array.take(indices=value, axis=axis)
 
         if new_array.ndim > 1:
             return DataContainer(new_array, False, dimension_labels_list, suppress_warning=True)

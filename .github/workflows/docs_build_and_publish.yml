@@ -27,7 +27,8 @@ jobs:
         cmake .. -DCMAKE_INSTALL_PREFIX=install
         sudo cmake --build . --target install
         cd install/lib
-        sudo export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)
+        export PATH=$PATH:$(pwd)
         cd ../../..   
     - name: Checkout cil-astra repo
       uses: actions/checkout@v2
@@ -37,7 +38,7 @@ jobs:
     - uses: ammaraskar/sphinx-action@master
       with:
         docs-folder: "CIL/docs/"
-        pre-build-command: cp -r CIL-ASTRA/Wrappers/Python/cil/plugins/astra CIL/Wrappers/Python/cil/plugins/astra
+        pre-build-command: cp -r CIL-ASTRA/Wrappers/Python/cil/plugins/astra CIL/Wrappers/Python/cil/plugins/astra; echo $LD_LIBRARY_PATH
     # Create an artifact of the html output.
     - uses: actions/upload-artifact@v1
       with:

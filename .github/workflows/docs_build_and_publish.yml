@@ -18,8 +18,8 @@ jobs:
         path: CIL
     - name: install cil
       run: |
-        apt-get update
-        apt-get install -y build-essential --fix-missing
+        sudo apt-get update
+        sudo apt-get install -y build-essential --fix-missing
         cd CIL
         mkdir build
         cd build

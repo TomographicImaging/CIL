@@ -370,14 +370,8 @@ Block Function
    :members:
    :special-members:
 
-<<<<<<< HEAD
-
-Block DataContainer 
-===================
-=======
 Block Operator
 ==============
->>>>>>> 6c782e9f4f496069e68ae588d541b06162b20980
 
 `BlockOperator`_ represent a block matrix with operators
 

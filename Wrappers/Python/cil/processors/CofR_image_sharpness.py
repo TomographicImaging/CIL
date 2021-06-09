@@ -195,6 +195,7 @@ class CofR_image_sharpness(Processor):
             data = data_full
 
         #prepare data
+
         width = data.geometry.config.panel.num_pixels[0]
         pad = width //2
         new_geom = data.geometry.copy()
@@ -202,6 +203,7 @@ class CofR_image_sharpness(Processor):
         data_padded = new_geom.allocate()
         data_padded.fill(np.pad(data.array,((0,0),(pad,pad)),'edge'))
         data = data_padded
+
 
         data.geometry.config.system.update_reference_frame()
         data_filtered = data.copy()

@@ -18,6 +18,7 @@
 from cil.framework import Processor, AcquisitionData
 import numpy as np
 from scipy import signal
+
 import logging
 import math
 
@@ -79,6 +80,7 @@ class CofR_xcorrelation(Processor):
     
     def process(self, out=None):
 
+
         data_full = self.get_input()
 
         if data_full.geometry.dimension == '3D':
@@ -105,6 +107,7 @@ class CofR_xcorrelation(Processor):
         if target <= -180:
             target += 360
         elif target > 180:
+
             target -= 360     
 
         ind = np.abs(angles_deg - target).argmin()
@@ -116,6 +119,7 @@ class CofR_xcorrelation(Processor):
         #cross correlate single slice with the 180deg one reveresed
         data1 = data.subset(angle=0).as_array()
         data2 = np.flip(data.subset(angle=ind).as_array())
+
     
         border = int(data1.size * 0.05)
         lag = np.correlate(data1[border:-border],data2[border:-border],"full")
@@ -129,6 +133,7 @@ class CofR_xcorrelation(Processor):
 
         shift = (quad_max - (lag.size-1)/2)/2
         shift = np.floor(shift *100 +0.5)/100
+
 
         new_geometry = data_full.geometry.copy()
 

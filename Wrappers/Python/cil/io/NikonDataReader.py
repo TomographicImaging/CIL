@@ -110,7 +110,10 @@ class NikonDataReader(object):
         
         # check if xtek file exists
         if not(os.path.isfile(self.file_name)):
-            raise Exception('File\n {}\n does not exist.'.format(self.file_name))  
+            raise Exception('File\n {}\n does not exist.'.format(self.file_name))
+        
+        if os.path.basename(self.file_name).split('.')[-1].lower() != 'xtekct':
+            raise TypeError('This reader can only process xtekct files. Got {}'.format(os.path.basename(self.file_name)))
                 
         # check labels     
         for key in self.roi.keys():
@@ -186,6 +189,15 @@ class NikonDataReader(object):
             # object roll in degrees  
             elif line.startswith("ObjectRoll"):
                 object_roll_deg = float(line.split('=')[1])
+            # directory where data is stored
+            elif line.startswith("InputFolderName"):
+                input_folder_name = line.split('=')[1]
+                if input_folder_name == '':
+                    self.tiff_directory_path = os.path.dirname(self.file_name)
+                else:
+                    self.tiff_directory_path = os.path.join(os.path.dirname(self.file_name), input_folder_name)
+
+
 
 
         self._roi_par = [[0, num_projections, 1] ,[0, pixel_num_v_0, 1], [0, pixel_num_h_0, 1]]
@@ -285,27 +297,38 @@ class NikonDataReader(object):
         '''
         
         return self._ag
-        
+    def get_roi(self):
+        '''returns the roi'''
+        roi = self._roi_par[:]
+        if self._ag.dimension == '2D':
+            roi.pop(1)
+
+        roidict = {}
+        for i,el in enumerate(roi):
+            # print (i, el)
+            roidict['axis_{}'.format(i)] = tuple(el)
+        return roidict
+
     def read(self):
         
         '''
         Reads projections and return AcquisitionData container
         '''
         
-        path_projection = os.path.dirname(self.file_name)
-
         reader = TIFFStackReader()
-        reader.set_up(file_name = path_projection,
-                      roi = {'axis_0': tuple(self._roi_par[0]), 
-                             'axis_1': tuple(self._roi_par[1]),
-                             'axis_2': tuple(self._roi_par[2])},
-                      mode = self.mode)
+
+        roi = self.get_roi()
+
+        reader.set_up(file_name = self.tiff_directory_path,
+                      roi=roi, mode=self.mode)
 
         ad = reader.read_as_AcquisitionData(self._ag)
               
         if (self.normalise):
             ad.array[ad.array < 1] = 1
-            ad /= self._white_level
+            # cast the data read to float32
+            ad = ad / numpy.float32(self._white_level)
+            
         
         if self.fliplr:
             dim = ad.get_dimension_axis('horizontal')

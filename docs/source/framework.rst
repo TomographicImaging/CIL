@@ -454,12 +454,12 @@ detector has to coincide with a vertical midline of the detector. This is barely
 due to misalignment and/or kinematic errors in positioning of CT instrument components. 
 A slight offset of the center of rotation with respect to the theoretical position will contribute 
 to the loss of resolution; in more severe cases, it will cause severe artifacts in the reconstructed 
-volume (double-borders). :code:`CenterOfRotationFinder` allows to estimate offset of center of rotation 
-from theoretical. In the current release :code:`CenterOfRotationFinder` supports only parallel geometry. 
+volume (double-borders). :code:`CenterOfRotationCorrector` allows to estimate offset of center of rotation 
+from theoretical. In the current release :code:`CenterOfRotationCorrector` supports only parallel geometry. 
 
-:code:`CenterOfRotationFinder` is based on Nghia Vo's `method <https://doi.org/10.1364/OE.22.019078>`_.
+:code:`CenterOfRotationCorrector` is based on Nghia Vo's `method <https://doi.org/10.1364/OE.22.019078>`_.
 
-.. autoclass:: cil.processors.CenterOfRotationFinder
+.. autoclass:: cil.processors.CenterOfRotationCorrector
    :members:
    :private-members:
    :special-members:

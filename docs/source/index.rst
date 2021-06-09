@@ -35,8 +35,9 @@ A number of demos can be found on the `CIL-Demos`_ repository.
    optimisation
    plugins
    astra
-   contrib
    developer_guide
+   processors
+   utilities
 
 .. Indices and tables
 .. ==================

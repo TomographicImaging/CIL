@@ -151,20 +151,20 @@ The :code:`Algorithm` provides the infrastructure to continue iteration, to acce
 objective function in subsequent iterations, the time for each iteration, and to provide a nice 
 print to screen of the status of the optimisation.
 
-.. autoclass:: ccpi.optimisation.algorithms.Algorithm
+.. autoclass:: cil.optimisation.algorithms.Algorithm
    :members:
    :private-members:
    :special-members:
-.. autoclass:: ccpi.optimisation.algorithms.GD
+.. autoclass:: cil.optimisation.algorithms.GD
    :members:
-.. autoclass:: ccpi.optimisation.algorithms.CGLS
+.. autoclass:: cil.optimisation.algorithms.CGLS
    :members:
-.. autoclass:: ccpi.optimisation.algorithms.FISTA
+.. autoclass:: cil.optimisation.algorithms.FISTA
    :members:
    :special-members:
-.. autoclass:: ccpi.optimisation.algorithms.PDHG
+.. autoclass:: cil.optimisation.algorithms.PDHG
    :members:
-.. autoclass:: ccpi.optimisation.algorithms.SIRT
+.. autoclass:: cil.optimisation.algorithms.SIRT
    :members:
 
 Operator
@@ -184,13 +184,13 @@ All operators extend the :code:`Operator` class. A special class is the :code:`L
 which represents an operator for which the :code:`adjoint` operation is defined.
 A :code:`ScaledOperator` represents the multiplication of any operator with a scalar.
 
-.. autoclass:: ccpi.optimisation.operators.Operator
+.. autoclass:: cil.optimisation.operators.Operator
    :members:
    :special-members:
-.. autoclass:: ccpi.optimisation.operators.LinearOperator
+.. autoclass:: cil.optimisation.operators.LinearOperator
    :members:
    :special-members:
-.. autoclass:: ccpi.optimisation.operators.ScaledOperator
+.. autoclass:: cil.optimisation.operators.ScaledOperator
    :members:
    :special-members:
 
@@ -199,15 +199,15 @@ Trivial operators
 
 Trivial operators are the following.
 
-.. autoclass:: ccpi.optimisation.operators.IdentityOperator
+.. autoclass:: cil.optimisation.operators.IdentityOperator
    :members:
    :special-members:
 
-.. autoclass:: ccpi.optimisation.operators.ZeroOperator
+.. autoclass:: cil.optimisation.operators.ZeroOperator
    :members:
    :special-members:
 
-.. autoclass:: ccpi.optimisation.operators.LinearOperatorMatrix
+.. autoclass:: cil.optimisation.operators.LinearOperatorMatrix
    :members:
    :special-members:
 
@@ -217,19 +217,19 @@ GradientOperator
 
 In the following the required classes for the implementation of the :code:`GradientOperator` operator.
 
-.. autoclass:: ccpi.optimisation.operators.GradientOperator
+.. autoclass:: cil.optimisation.operators.GradientOperator
    :members:
    :special-members:
 
-.. autoclass:: ccpi.optimisation.operators.FiniteDifferenceOperator
+.. autoclass:: cil.optimisation.operators.FiniteDifferenceOperator
    :members:
    :special-members:
 
-.. autoclass:: ccpi.optimisation.operators.SparseFiniteDiff
+.. autoclass:: cil.optimisation.operators.SparseFiniteDiff
    :members:
    :special-members:
 
-.. autoclass:: ccpi.optimisation.operators.SymmetrizedGradientOperator
+.. autoclass:: cil.optimisation.operators.SymmetrizedGradientOperator
    :members:
    :special-members:
 
@@ -237,7 +237,7 @@ In the following the required classes for the implementation of the :code:`Gradi
 Shrinkage operator
 ------------------
 
-.. autoclass:: ccpi.optimisation.operators.ShrinkageOperator
+.. autoclass:: cil.optimisation.operators.ShrinkageOperator
    :members:
    :special-members:
 
@@ -264,33 +264,33 @@ e.g. :code:`f(x)` for a :code:`Function f` and input point :code:`x`.
 Base classes
 ------------
 
-.. autoclass:: ccpi.optimisation.functions.Function
+.. autoclass:: cil.optimisation.functions.Function
    :members:
    :special-members:
 
-.. autoclass:: ccpi.optimisation.functions.ScaledFunction
+.. autoclass:: cil.optimisation.functions.ScaledFunction
    :members:
    :special-members:
    
-.. autoclass:: ccpi.optimisation.functions.SumFunction
+.. autoclass:: cil.optimisation.functions.SumFunction
    :members:
    :special-members: 
    
 Zero Function
 -------------    
    
-.. autoclass:: ccpi.optimisation.functions.ZeroFunction
+.. autoclass:: cil.optimisation.functions.ZeroFunction
    :members:
    :special-members: 
    
-.. autoclass:: ccpi.optimisation.functions.SumFunctionScalar
+.. autoclass:: cil.optimisation.functions.SumFunctionScalar
    :members:
    :special-members: 
    
 Constant Function
 -----------------   
    
-.. autoclass:: ccpi.optimisation.functions.ConstantFunction
+.. autoclass:: cil.optimisation.functions.ConstantFunction
    :members:
    :special-members:            
 
@@ -318,14 +318,14 @@ be expressed as
   F2 = FunctionOperatorComposition(L2NormSquared(b=b), A)
 
 
-.. autoclass:: ccpi.optimisation.functions.FunctionOperatorComposition
+.. autoclass:: cil.optimisation.functions.FunctionOperatorComposition
    :members:
    :special-members:
 
 Indicator box
 -------------
 
-.. autoclass:: ccpi.optimisation.functions.IndicatorBox
+.. autoclass:: cil.optimisation.functions.IndicatorBox
    :members:
    :special-members:
 
@@ -333,14 +333,14 @@ Indicator box
 KullbackLeibler 
 ---------------
 
-.. autoclass:: ccpi.optimisation.functions.KullbackLeibler
+.. autoclass:: cil.optimisation.functions.KullbackLeibler
    :members:
    :special-members:
 
 L1 Norm
 -------
 
-.. autoclass:: ccpi.optimisation.functions.L1Norm
+.. autoclass:: cil.optimisation.functions.L1Norm
    :members:
    :special-members:
 
@@ -348,28 +348,28 @@ Squared L2 norm
 ---------------
 .. l2norm:
 
-.. autoclass:: ccpi.optimisation.functions.L2NormSquared
+.. autoclass:: cil.optimisation.functions.L2NormSquared
    :members:
    :special-members:
 
 Least Squares
 -------------
 
-.. autoclass:: ccpi.optimisation.functions.LeastSquares
+.. autoclass:: cil.optimisation.functions.LeastSquares
    :members:
    :special-members:
 
 Mixed L21 norm
 --------------
 
-.. autoclass:: ccpi.optimisation.functions.MixedL21Norm
+.. autoclass:: cil.optimisation.functions.MixedL21Norm
    :members:
    :special-members:
    
 Smooth Mixed L21 norm
 ---------------------
 
-.. autoclass:: ccpi.optimisation.functions.smoothMixedL21Norm
+.. autoclass:: cil.optimisation.functions.smoothMixedL21Norm
    :members:
    :special-members:   
 
@@ -395,7 +395,7 @@ A Block vector of functions, Size of vector coincides with the rows of :math:`K`
   f(Kx) : = f_{1}(y_{1}) + f_{2}(y_{2}) + f_{3}(y_{3})
 
 
-.. autoclass:: ccpi.optimisation.functions.BlockFunction
+.. autoclass:: cil.optimisation.functions.BlockFunction
    :members:
    :special-members:
 
@@ -417,5 +417,5 @@ Block DataContainer
 :ref:`Return Home <mastertoc>`
 
 .. _BlockDataContainer: framework.html#cil.framework.BlockDataContainer
-.. _BlockFunction: optimisation.html#ccpi.optimisation.functions.BlockFunction
-.. _BlockOperator: optimisation.html#ccpi.optimisation.operators.BlockOperators
+.. _BlockFunction: optimisation.html#cil.optimisation.functions.BlockFunction
+.. _BlockOperator: optimisation.html#cil.optimisation.operators.BlockOperators

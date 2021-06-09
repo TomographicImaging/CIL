@@ -150,7 +150,7 @@ In the following the required classes for the implementation of the :code:`Gradi
    :members:
    :special-members:
 
-.. autoclass:: cil.optimisation.operators.SymmetrizedGradientOperator
+.. autoclass:: cil.optimisation.operators.SymmetrisedGradientOperator
    :members:
    :special-members:
 
@@ -210,7 +210,7 @@ Simple functions
    :members:
    :special-members: 
 
-.. autoclass:: cil.optimisation.functions.Rosenbrok
+.. autoclass:: cil.optimisation.functions.Rosenbrock
    :members:
    :special-members: 
 

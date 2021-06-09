@@ -13,30 +13,30 @@ other image processing tasks.
 Total variation
 ---------------
  
-.. autoclass:: cil.plugins.ccpi_regulariser.functions.FGP_TV
+.. autoclass:: cil.plugins.ccpi_regularisation.functions.FGP_TV
    :members:
    :special-members:
-.. autoclass:: cil.plugins.ccpi_regulariser.functions.ROF_TV
+.. autoclass:: cil.plugins.ccpi_regularisation.functions.ROF_TV
    :members:
    :special-members:
-.. autoclass:: cil.plugins.ccpi_regulariser.functions.SB_TV
+.. autoclass:: cil.plugins.ccpi_regularisation.functions.SB_TV
    :members:
    :special-members:
 
 Other regularisation functions
 ------------------------------
 
-.. autoclass:: cil.plugins.ccpi_regulariser.functions.TGV
+.. autoclass:: cil.plugins.ccpi_regularisation.functions.TGV
    :members:
    :special-members:
-.. autoclass:: cil.plugins.ccpi_regulariser.functions.LLT_ROF
+.. autoclass:: cil.plugins.ccpi_regularisation.functions.LLT_ROF
    :members:
    :special-members:
 
-.. autoclass:: cil.plugins.ccpi_regulariser.functions.FGP_dTV
+.. autoclass:: cil.plugins.ccpi_regularisation.functions.FGP_dTV
    :members:
    :special-members:
-.. autoclass:: cil.plugins.ccpi_regulariser.functions.TNV
+.. autoclass:: cil.plugins.ccpi_regularisation.functions.TNV
    :members:
    :special-members:
 
@@ -75,11 +75,11 @@ This plugin allows the use of `ASTRA-toolbox
 (`10.1364/OE.24.025129 <http://dx.doi.org/10.1364/OE.24.025129>`_ 
 for forward and back projections and filter back projection reconstruction. 
 
-.. autoclass:: cil.plugins.astra.FBP
+.. autoclass:: cil.plugins.astra.processors.FBP
    :members:
    :special-members:
 
-.. autoclass:: cil.plugins.astra.ProjectionOperator
+.. autoclass:: cil.plugins.astra.operators.ProjectionOperator
    :members:
    :special-members:
 

@@ -4,34 +4,34 @@ Astra plugin
 Processors
 =====
 
-.. autoclass:: ccpi.astra.processors.AstraBackProjector
+.. autoclass:: cil.plugins.astra.processors.AstraBackProjector
    :members:
    :special-members:
-.. autoclass:: ccpi.astra.processors.AstraBackProjector3D
+.. autoclass:: cil.plugins.astra.processors.AstraBackProjector3D
    :members:
    :special-members:
-.. autoclass:: ccpi.astra.processors.AstraBackProjectorMC
+.. autoclass:: cil.plugins.astra.processors.AstraBackProjectorMC
    :members:
    :special-members:
-.. autoclass:: ccpi.astra.processors.AstraForwardProjector
+.. autoclass:: cil.plugins.astra.processors.AstraForwardProjector
    :members:
    :special-members:
-.. autoclass:: ccpi.astra.processors.AstraForwardProjector3D
+.. autoclass:: cil.plugins.astra.processors.AstraForwardProjector3D
    :members:
    :special-members:
-.. autoclass:: ccpi.astra.processors.AstraForwardProjectorMC
+.. autoclass:: cil.plugins.astra.processors.AstraForwardProjectorMC
    :members:
    :special-members:
 
 Operators
 =========
-.. autoclass:: ccpi.astra.operators.AstraProjectorSimple
+.. autoclass:: cil.plugins.astra.operators.AstraProjectorSimple
    :members:
    :special-members:
-.. autoclass:: ccpi.astra.operators.AstraProjector3DSimple
+.. autoclass:: cil.plugins.astra.operators.AstraProjector3DSimple
    :members:
    :special-members:
-.. autoclass:: ccpi.astra.operators.AstraProjectorMC
+.. autoclass:: cil.plugins.astra.operators.AstraProjectorMC
    :members:
    :special-members:
 

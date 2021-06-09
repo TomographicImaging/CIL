@@ -426,7 +426,7 @@ class TIFFStackReader(object):
 
 '''
 import matplotlib.pyplot as plt
-from ccpi.io import TIFFStackReader
+from cil.io import TIFFStackReader
 
 path = '/media/newhd/shared/Data/SophiaBeads/SophiaBeads_256_averaged/'
 

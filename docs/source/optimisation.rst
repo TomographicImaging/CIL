@@ -410,12 +410,12 @@ Block DataContainer
   y = [y_{1}, y_{2}, y_{3} ]\in(Y_{1}\times Y_{2} \times Y_{3})
 
 
-.. autoclass:: ccpi.framework.BlockDataContainer
+.. autoclass:: cil.framework.BlockDataContainer
    :members:
    :special-members:
 
 :ref:`Return Home <mastertoc>`
 
-.. _BlockDataContainer: framework.html#ccpi.framework.BlockDataContainer
+.. _BlockDataContainer: framework.html#cil.framework.BlockDataContainer
 .. _BlockFunction: optimisation.html#ccpi.optimisation.functions.BlockFunction
 .. _BlockOperator: optimisation.html#ccpi.optimisation.operators.BlockOperators

@@ -11,7 +11,7 @@ as NeXuS files.
 .. code:: python
 
   # imports
-  from ccpi.io import NEXUSDataWriter, NEXUSDataReader
+  from cil.io import NEXUSDataWriter, NEXUSDataReader
 
   # initialise NEXUS Writer
   writer = NEXUSDataWriter()
@@ -29,17 +29,17 @@ as NeXuS files.
   # get AcquisiionGeometry
   ag1 = reader.get_geometry()
 
-.. autoclass:: ccpi.io.NEXUSDataReader
+.. autoclass:: cil.io.NEXUSDataReader
    :members:
    :special-members:
-.. autoclass:: ccpi.io.NEXUSDataWriter
+.. autoclass:: cil.io.NEXUSDataWriter
    :members:
    :special-members:
 |
 
 Nikon
 =====
-.. autoclass:: ccpi.io.NikonDataReader
+.. autoclass:: cil.io.NikonDataReader
    :members:
    :special-members:
 |

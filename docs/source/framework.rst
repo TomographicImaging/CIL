@@ -4,9 +4,9 @@ The goal of the CCPi Framework is to allow the user to simply create iterative r
 go beyond the standard filter back projection technique and which better suit the data characteristics.
 The framework comprises: 
 
-* :code:`ccpi.framework` module which allows to simply translate real world CT systems into software. 
-* :code:`ccpi.optimisation` module allows the user to quickly create iterative methods to reconstruct acquisition data applying different types of regularisation, which better suit the data characteristics.
-* :code:`ccpi.io` module which provides a number of loaders for real CT machines, e.g. Nikon. It also provides reader and writer to save to NeXuS file format.
+* :code:`cil.framework` module which allows to simply translate real world CT systems into software. 
+* :code:`cil.optimisation` module allows the user to quickly create iterative methods to reconstruct acquisition data applying different types of regularisation, which better suit the data characteristics.
+* :code:`cil.io` module which provides a number of loaders for real CT machines, e.g. Nikon. It also provides reader and writer to save to NeXuS file format.
 
 CT Geometry
 ===========
@@ -103,7 +103,7 @@ In the Framework, we define :code:`AcquisitionGeometry` as follows.
 .. code:: python
 
   # imports
-  from ccpi.framework import AcquisitionGeometry
+  from cil.framework import AcquisitionGeometry
   import numpy as np
 
   # acquisition angles
@@ -158,7 +158,7 @@ and then allocate :code:`ImageData`.
 .. code:: python
 
   # imports
-  from ccpi.framework import ImageData, ImageGeometry
+  from cil.framework import ImageData, ImageGeometry
 
   # define 2D ImageGeometry
   # given AcquisitionGeometry ag_par, default parameters for corresponding ImageData
@@ -265,11 +265,11 @@ default :code:`ImageGeometry` parameters can be set up as follows:
 
 
 
-.. autoclass:: ccpi.framework.ImageGeometry
+.. autoclass:: cil.framework.ImageGeometry
    :members:
-.. autoclass:: ccpi.framework.AcquisitionGeometry
+.. autoclass:: cil.framework.AcquisitionGeometry
    :members:
-.. autoclass:: ccpi.framework.VectorGeometry
+.. autoclass:: cil.framework.VectorGeometry
    :members:
 
 
@@ -334,15 +334,15 @@ wants and not bother with knowing the actual layout of the data in the memory.
 
 
 
-.. autoclass:: ccpi.framework.DataContainer
+.. autoclass:: cil.framework.DataContainer
    :members:
    :private-members:
    :special-members:
-.. autoclass:: ccpi.framework.ImageData
+.. autoclass:: cil.framework.ImageData
    :members:
-.. autoclass:: ccpi.framework.AcquisitionData
+.. autoclass:: cil.framework.AcquisitionData
    :members:
-.. autoclass:: ccpi.framework.VectorData
+.. autoclass:: cil.framework.VectorData
    :members:
 
 
@@ -401,7 +401,7 @@ With the definitions:
 * :math:`\tilde{A} = \binom{A}{\alpha L}`
 * :math:`\tilde{b} = \binom{b}{0}`
 
-this can now be recognised as a least squares problem which can be solved by any algorithm in the :code:`ccpi.optimisation`
+this can now be recognised as a least squares problem which can be solved by any algorithm in the :code:`cil.optimisation`
 which can solve least squares problem, e.g. CGLS.
 
 .. math:: 
@@ -423,12 +423,12 @@ represents a column vector of :code:`DataContainer`s.
 classes are required for it to work. They provide a base class that will 
 behave as normal ``DataContainer``.
 
-.. autoclass:: ccpi.framework.BlockDataContainer
+.. autoclass:: cil.framework.BlockDataContainer
    :members:
    :private-members:
    :special-members:
 
-.. autoclass:: ccpi.framework.BlockGeometry
+.. autoclass:: cil.framework.BlockGeometry
    :members:
    :private-members:
    :special-members:
@@ -440,7 +440,7 @@ A :code:`DataProcessor` takes as an input a :code:`DataContainer` or subclass an
 another :code:`DataContainer` or some number. The aim of this class is to simplify the writing of 
 processing pipelines.
 
-.. autoclass:: ccpi.framework.DataProcessor
+.. autoclass:: cil.framework.DataProcessor
    :members:
    :private-members:
    :special-members:
@@ -459,7 +459,7 @@ from theoretical. In the current release :code:`CenterOfRotationFinder` supports
 
 :code:`CenterOfRotationFinder` is based on Nghia Vo's `method <https://doi.org/10.1364/OE.22.019078>`_.
 
-.. autoclass:: ccpi.processors.CenterOfRotationFinder
+.. autoclass:: cil.processors.CenterOfRotationFinder
    :members:
    :private-members:
    :special-members:

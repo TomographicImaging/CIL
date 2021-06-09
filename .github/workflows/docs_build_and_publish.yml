@@ -29,6 +29,8 @@ jobs:
         cd install/lib
         export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)
         export PATH=$PATH:$(pwd)
+        echo $PATH
+        echo $LD_LIBRARY_PATH
         cd ../../..   
     - name: Checkout cil-astra repo
       uses: actions/checkout@v2

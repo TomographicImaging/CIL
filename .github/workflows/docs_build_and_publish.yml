@@ -21,7 +21,7 @@ jobs:
         auto-update-conda: true
         python-version: 3.7
     - name: Conda install cil
-      run: conda install cil -c conda-forge -c ccpi cil
+      run: conda install -c conda-forge -c ccpi cil
     
     - name: Checkout cil-astra repo
       uses: actions/checkout@v2

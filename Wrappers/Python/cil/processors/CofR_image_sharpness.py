@@ -195,12 +195,21 @@ class CofR_image_sharpness(Processor):
             data = data_full
 
         #prepare data
+
+        width = data.geometry.config.panel.num_pixels[0]
+        pad = width //2
+        new_geom = data.geometry.copy()
+        new_geom.config.panel.num_pixels[0] +=2*pad
+        data_padded = new_geom.allocate()
+        data_padded.fill(np.pad(data.array,((0,0),(pad,pad)),'edge'))
+        data = data_padded
+
+
         data.geometry.config.system.update_reference_frame()
         data_filtered = data.copy()
         data_filtered.fill(scipy.ndimage.sobel(data.as_array(), axis=1, mode='reflect', cval=0.0)) 
 
         #initial grid search
-        width = data.geometry.config.panel.num_pixels[0]
         if self.search_range is None:
             self.search_range = width //4
 
@@ -251,11 +260,12 @@ class CofR_image_sharpness(Processor):
         
         voxel_offset = centre/ig.voxel_size_x
 
-        logger.info("Centre of rotation correction using sobel filtering with FBP")
+        logger.info("Centre of rotation correction found using image_sharpness")
         logger.info("Calculated from slice: %s", str(self.slice_index))
-        logger.info("Applied centre of rotation shift = %f pixels", centre/ig.voxel_size_x)
-        logger.info("Applied centre of rotation shift = %f units at the object", centre)
-
+        logger.info("Centre of rotation shift = %f pixels", centre/ig.voxel_size_x)
+        logger.info("Centre of rotation shift = %f units at the object", centre)
+        logger.info("Return new dataset with centred geometry")
+        
         if out is None:
             return AcquisitionData(array=data_full, deep_copy=True, geometry=new_geometry, supress_warning=True)
         else:

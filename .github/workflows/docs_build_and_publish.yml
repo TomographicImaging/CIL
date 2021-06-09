@@ -25,7 +25,7 @@ jobs:
         mkdir build
         cd build
         cmake .. -DCMAKE_INSTALL_PREFIX=install
-        cmake --build . --target install
+        sudo cmake --build . --target install
         cd install
         export PATH=$PATH:$(pwd)
         cd ../..   

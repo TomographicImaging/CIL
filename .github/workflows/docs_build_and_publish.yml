@@ -27,7 +27,7 @@ jobs:
         cmake .. -DCMAKE_INSTALL_PREFIX=install
         sudo cmake --build . --target install
         cd install/lib
-        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)
+        sudo export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)
         cd ../../..   
     - name: Checkout cil-astra repo
       uses: actions/checkout@v2

@@ -29,7 +29,9 @@ jobs:
         cd install/lib
         echo "$(pwd)" >> $GITHUB_PATH
         export LD_LIBRARY_PATH=$(pwd)
-        cd ../../..   
+        cd ../../..
+    - name: check variables
+      run: echo "Path variables $GITHUB_PATH and $LD_LIBRARY_PATH"
     - name: Checkout cil-astra repo
       uses: actions/checkout@v2
       with:

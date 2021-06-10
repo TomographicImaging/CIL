@@ -58,7 +58,7 @@ print to screen of the status of the optimisation.
    :members:
 .. autoclass:: cil.optimisation.algorithms.CGLS
    :members:
-   .. autoclass:: cil.optimisation.algorithms.SIRT
+.. autoclass:: cil.optimisation.algorithms.SIRT
    :members:
 .. autoclass:: cil.optimisation.algorithms.FISTA
    :members:

@@ -309,7 +309,6 @@ class Test_results(unittest.TestCase):
 
     @unittest.skipUnless(has_tigre and has_astra, "TIGRE or ASTRA not installed")
     def test_bp_with_Astra(self):
-
         AOp = AstraProjectionOperator(self.ig, self.ag)
         bp_ASTRA = AOp.adjoint(self.fp.get_slice(vertical='centre'))
         TOp = ProjectionOperator(self.ig, self.ag)

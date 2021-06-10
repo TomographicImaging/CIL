@@ -13,6 +13,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Checkout cil-astra repo
+      uses: actions/checkout@v2
+      with:
+        repository: TomographicImaging/CIL-ASTRA
+        path: CIL-ASTRA
+    - name: install CIL-ASTRA
+      run: |
+        cd CIL-ASTRA/Wrappers/Python
+        python setup.py install --prefix=/usr
     - uses: actions/checkout@v2
       with:
         path: CIL
@@ -31,15 +40,9 @@ jobs:
         cd ../../..
     - name: check variables
       run: echo "LD_LIBRARY_PATH var is ${{env.LD_LIBRARY_PATH}}"
-    - name: Checkout cil-astra repo
-      uses: actions/checkout@v2
-      with:
-        repository: TomographicImaging/CIL-ASTRA
-        path: CIL-ASTRA
     - uses: ammaraskar/sphinx-action@master
       with:
         docs-folder: "CIL/docs/"
-        pre-build-command: cd CIL-ASTRA/Wrappers/Python; python setup.py install --prefix=/usr; cd ../../../
     # Create an artifact of the html output.
     - uses: actions/upload-artifact@v1
       with:

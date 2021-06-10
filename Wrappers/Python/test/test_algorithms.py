@@ -51,7 +51,7 @@ import os, sys, time
 from cil.optimisation.functions import TotalVariation
 
 try:
-    from cil.plugins.astra.operators import AstraProjectorSimple
+    from cil.plugins.astra import ProjectionOperator
     has_astra = True    
 except ImportError as ie:
     # skip test
@@ -599,7 +599,7 @@ class TestSPDHG(unittest.TestCase):
         # Select device
         dev = 'cpu'
     
-        Aop = AstraProjectorSimple(ig, ag, dev)
+        Aop = ProjectionOperator(ig, ag, dev)
         
         sin = Aop.direct(data)
         # Create noisy data. Apply Gaussian noise
@@ -648,7 +648,7 @@ class TestSPDHG(unittest.TestCase):
         list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1, angle_unit='radian') 
                         for i in range(len(list_angles))]
         # create with operators as many as the subsets
-        A = BlockOperator(*[AstraProjectorSimple(ig, list_geoms[i], dev) for i in range(subsets)])
+        A = BlockOperator(*[ProjectionOperator(ig, list_geoms[i], dev) for i in range(subsets)])
         ## number of subsets
         #(sub2ind, ind2sub) = divide_1Darray_equally(range(len(A)), subsets)
         #
@@ -697,7 +697,7 @@ class TestSPDHG(unittest.TestCase):
         # Select device
         dev = 'cpu'
 
-        Aop = AstraProjectorSimple(ig, ag, dev)
+        Aop = ProjectionOperator(ig, ag, dev)
         
         sin = Aop.direct(data)
         # Create noisy data. Apply Gaussian noise
@@ -730,7 +730,7 @@ class TestSPDHG(unittest.TestCase):
         list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1, angle_unit='radian') 
         for i in range(len(list_angles))]
         # create with operators as many as the subsets
-        A = BlockOperator(*[AstraProjectorSimple(ig, list_geoms[i], dev) for i in range(subsets)] + [op1])
+        A = BlockOperator(*[ProjectionOperator(ig, list_geoms[i], dev) for i in range(subsets)] + [op1])
         ## number of subsets
         #(sub2ind, ind2sub) = divide_1Darray_equally(range(len(A)), subsets)
         #
@@ -810,7 +810,7 @@ class TestSPDHG(unittest.TestCase):
         #     dev = 'cpu'
         dev = 'cpu'
 
-        Aop = AstraProjectorSimple(ig, ag, dev)
+        Aop = ProjectionOperator(ig, ag, dev)
         
         sin = Aop.direct(data)
         # Create noisy data. Apply Gaussian noise
@@ -840,7 +840,7 @@ class TestSPDHG(unittest.TestCase):
         list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1, angle_unit='radian') 
         for i in range(len(list_angles))]
         # create with operators as many as the subsets
-        A = BlockOperator(*[AstraProjectorSimple(ig, list_geoms[i], dev) for i in range(subsets)] + [op1])
+        A = BlockOperator(*[ProjectionOperator(ig, list_geoms[i], dev) for i in range(subsets)] + [op1])
         ## number of subsets
         #(sub2ind, ind2sub) = divide_1Darray_equally(range(len(A)), subsets)
         #
@@ -902,7 +902,7 @@ class TestSPDHG(unittest.TestCase):
         
         dev = 'cpu'
 
-        Aop = AstraProjectorSimple(ig, ag, dev)
+        Aop = ProjectionOperator(ig, ag, dev)
         
         sin = Aop.direct(data)
         # Create noisy data. Apply Gaussian noise

@@ -28,7 +28,7 @@ jobs:
         sudo cmake --build . --target install
         cd install/lib
         echo "$(pwd)" >> $GITHUB_PATH
-        echo "$(pwd)" >> $LD_LIBRARY_PATH
+        export LD_LIBRARY_PATH=$(pwd)
         cd ../../..   
     - name: Checkout cil-astra repo
       uses: actions/checkout@v2

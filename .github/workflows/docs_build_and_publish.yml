@@ -40,17 +40,16 @@ jobs:
       run: |
         cd CIL-ASTRA/Wrappers/Python
         sudo python setup.py install --prefix=/usr
-    - uses: ammaraskar/sphinx-action@master
-      with:
-        docs-folder: "CIL/docs/"
-
     - name: make dummy ccpi module
       run: |
+        sudo mkdir /usr/lib/python3.8/site-packages/ccpi
         sudo mkdir /usr/lib/python3.8/site-packages/ccpi/filters
         sudo touch /usr/lib/python3.8/site-packages/ccpi/__init__.py
         sudo touch /usr/lib/python3.8/site-packages/ccpi/filters/__init__.py
         sudo touch /usr/lib/python3.8/site-packages/ccpi/filters/regularisers.py
-
+    - uses: ammaraskar/sphinx-action@master
+      with:
+        docs-folder: "CIL/docs/"
     # Create an artifact of the html output.
     - uses: actions/upload-artifact@v1
       with:

@@ -29,8 +29,6 @@ jobs:
         cd install/lib
         echo "$(pwd)" >> $GITHUB_PATH
         echo "$(pwd)" >> $LD_LIBRARY_PATH
-        echo $GITHUB_PATH
-        echo $LD_LIBRARY_PATH
         cd ../../..   
     - name: Checkout cil-astra repo
       uses: actions/checkout@v2

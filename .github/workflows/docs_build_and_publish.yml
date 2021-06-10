@@ -43,6 +43,14 @@ jobs:
     - uses: ammaraskar/sphinx-action@master
       with:
         docs-folder: "CIL/docs/"
+
+    - name: make dummy ccpi module
+      run: |
+      sudo mkdir /usr/lib/python3.8/site-packages/ccpi/filters
+      sudo touch /usr/lib/python3.8/site-packages/ccpi/__init__.py
+      sudo touch /usr/lib/python3.8/site-packages/ccpi/filters/__init__.py
+      sudo touch /usr/lib/python3.8/site-packages/ccpi/filters/regularisers.py
+
     # Create an artifact of the html output.
     - uses: actions/upload-artifact@v1
       with:

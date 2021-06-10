@@ -39,7 +39,7 @@ jobs:
     - uses: ammaraskar/sphinx-action@master
       with:
         docs-folder: "CIL/docs/"
-        pre-build-command: cd CIL-ASTRA/Wrappers/Python; python setup.py install --user; cd ../../../
+        pre-build-command: cd CIL-ASTRA/Wrappers/Python; python setup.py install --prefix=/usr; cd ../../../
     # Create an artifact of the html output.
     - uses: actions/upload-artifact@v1
       with:

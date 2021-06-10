@@ -39,7 +39,7 @@ jobs:
     - name: install CIL-ASTRA
       run: |
         cd CIL-ASTRA/Wrappers/Python
-        python setup.py install --prefix=/usr
+        python setup.py install --user --prefix=/usr
     - uses: ammaraskar/sphinx-action@master
       with:
         docs-folder: "CIL/docs/"

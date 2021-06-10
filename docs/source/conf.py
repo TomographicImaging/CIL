@@ -14,20 +14,27 @@
 #
 import os
 import sys
+import re
 sys.path.insert(0, os.path.abspath('../../Wrappers/Python/'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'CCPi-Framework'
+project = 'CIL'
 copyright = '2019, Edoardo Pasca'
 author = 'Edoardo Pasca'
 
 # The short X.Y version
-version = '19.10'
+# version = re.sub('^v', '', os.popen('git describe').read().strip())
+# version = version.split('-')[0]
 # The full version, including alpha/beta/rc tags
-release = '19.10'
+# release = '19.10'
 
 
+# sphinx-multiversion-config
+
+smv_released_pattern = r'^tags/.*$' # Tags only
+smv_outputdir_format = '{ref.name}'  # Use the branch/tag name
+smv_git_branch_whitelist = 'master'
 # -- General configuration ---------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -47,7 +54,7 @@ extensions = [
 ]
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['docstemplates']
+templates_path = ['_templates']
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:

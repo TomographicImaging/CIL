@@ -27,8 +27,8 @@ jobs:
         cmake .. -DCMAKE_INSTALL_PREFIX=install
         sudo cmake --build . --target install
         cd install/lib
-        echo $(pwd) >> $LD_LIBRARY_PATH
-        echo $(pwd) >> $GITHUB_PATH
+        echo "$(pwd)" >> $GITHUB_PATH
+        echo "$(pwd)" >> $LD_LIBRARY_PATH
         echo $GITHUB_PATH
         echo $LD_LIBRARY_PATH
         cd ../../..   

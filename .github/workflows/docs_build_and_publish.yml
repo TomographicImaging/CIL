@@ -27,7 +27,7 @@ jobs:
         cmake .. -DCMAKE_INSTALL_PREFIX=install
         sudo cmake --build . --target install
         cd install/lib
-        echo "{LD_LIBRARY_PATH}={$(pwd)}" >> $GITHUB_ENV
+        echo "LD_LIBRARY_PATH=$(pwd)" >> $GITHUB_ENV
         echo "$(pwd)" >> $GITHUB_PATH
         cd ../../..
     - name: check variables

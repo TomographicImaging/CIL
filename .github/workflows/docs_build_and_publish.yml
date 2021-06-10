@@ -16,6 +16,7 @@ jobs:
     - uses: actions/checkout@v2
       with:
         path: CIL
+        fetch-depth: 0
     - name: install cil
       run: |
         sudo apt-get update
@@ -24,10 +25,13 @@ jobs:
         mkdir build
         cd build
         cmake .. -DCMAKE_INSTALL_PREFIX=install
-        cmake --build . --target install
-        cd install
-        export PATH=$PATH:$(pwd)
-        cd ../..   
+        sudo cmake --build . --target install
+        cd install/lib
+        echo "LD_LIBRARY_PATH=$(pwd)" >> $GITHUB_ENV
+        echo "$(pwd)" >> $GITHUB_PATH
+        cd ../../..
+    - name: check variables
+      run: echo "Path variables $GITHUB_PATH and ${{env.LD_LIBRARY_PATH}}"
     - name: Checkout cil-astra repo
       uses: actions/checkout@v2
       with:
@@ -36,7 +40,7 @@ jobs:
     - uses: ammaraskar/sphinx-action@master
       with:
         docs-folder: "CIL/docs/"
-        pre-build-command: cp -r CIL-ASTRA/Wrappers/Python/cil/plugins/astra CIL/Wrappers/Python/cil/plugins/astra
+        pre-build-command: cp -r CIL-ASTRA/Wrappers/Python/cil/plugins/astra CIL/Wrappers/Python/cil/plugins/astra; echo $LD_LIBRARY_PATH
     # Create an artifact of the html output.
     - uses: actions/upload-artifact@v1
       with:

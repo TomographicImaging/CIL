@@ -30,11 +30,12 @@ author = 'Edoardo Pasca'
 # release = '19.10'
 
 
-# sphinx-multiversion-config
-
+# sphinx-multiversion-config --------------------------------------------------
 smv_released_pattern = r'^tags/.*$' # Tags only
 smv_outputdir_format = '{ref.name}'  # Use the branch/tag name
-smv_git_branch_whitelist = 'master'
+smv_branch_whitelist = 'master' # only master branch
+
+
 # -- General configuration ---------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.

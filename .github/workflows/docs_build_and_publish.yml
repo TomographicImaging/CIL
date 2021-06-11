@@ -32,11 +32,13 @@ jobs:
     - uses: ammaraskar/sphinx-action@master
       with:
         docs-folder: "CIL/docs/"
+        build-command: "sphinx-multiversion source build"
+        pre-build-command: "pip install sphinx-multiversion"
     # Create an artifact of the html output.
     - uses: actions/upload-artifact@v1
       with:
         name: DocumentationHTML
-        path: CIL/docs/docs/build/html/
+        path: CIL/docs/build/
   publish:
     runs-on: ubuntu-latest
     needs: build
@@ -46,7 +48,7 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: DocumentationHTML
-        path: docs/docs/build/html/
+        path: docs/build/
     - name: Commit documentation changes
       run: |
         git clone https://github.com/TomographicImaging/CIL.git --branch gh-pages --single-branch gh-pages

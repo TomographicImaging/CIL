@@ -47,6 +47,7 @@ jobs:
         sudo touch /usr/lib/python3.8/site-packages/ccpi/__init__.py
         sudo touch /usr/lib/python3.8/site-packages/ccpi/filters/__init__.py
         sudo touch /usr/lib/python3.8/site-packages/ccpi/filters/regularisers.py
+        sudo chmod -R ugo+rX /usr/lib/python3.8/site-packages/
         ls /usr/lib/python3.8/site-packages/
         ls /usr/lib/python3.8/site-packages/cil/plugins
     - uses: ammaraskar/sphinx-action@master

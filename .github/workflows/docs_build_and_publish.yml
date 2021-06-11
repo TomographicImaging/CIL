@@ -42,11 +42,14 @@ jobs:
         sudo python setup.py install --prefix=/usr
     - name: make dummy ccpi module
       run: |
-        sudo mkdir /usr/lib/python3.8/site-packages/ccpi
-        sudo mkdir /usr/lib/python3.8/site-packages/ccpi/filters
-        sudo touch /usr/lib/python3.8/site-packages/ccpi/__init__.py
-        sudo touch /usr/lib/python3.8/site-packages/ccpi/filters/__init__.py
-        sudo touch /usr/lib/python3.8/site-packages/ccpi/filters/regularisers.py
+        sudo mkdir /usr/local/lib/python3.8/site-packages/ccpi
+        sudo mkdir /usr/local/lib/python3.8/site-packages/ccpi/filters
+        sudo touch /usr/local/lib/python3.8/site-packages/ccpi/__init__.py
+        sudo touch /usr/local/lib/python3.8/site-packages/ccpi/filters/__init__.py
+        sudo touch /usr/local/lib/python3.8/site-packages/ccpi/filters/regularisers.py
+        ls /usr/local/lib/python3.8/site-packages/
+        echo "usr/lib/:"
+        ls /usr/lib/python3.8/site-packages/
     - uses: ammaraskar/sphinx-action@master
       with:
         docs-folder: "CIL/docs/"

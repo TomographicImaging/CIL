@@ -12,10 +12,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.8'
     - uses: actions/checkout@v2
       with:
         path: CIL
@@ -32,13 +28,10 @@ jobs:
         cd install/lib
         echo "LD_LIBRARY_PATH=$(pwd)" >> $GITHUB_ENV
         cd ../../..
-    - name: run multiversion-sphinx
-      run: |
-        python -m pip install --upgrade pip
-        pip install -U sphinx
-        pip install sphinx-multiversion
-        pip install -r CIL/docs/requirements.txt
-        sphinx-multiversion CIL/docs/source CIL/docs/build
+    - uses: ammaraskar/sphinx-action@master
+      with:
+        docs-folder: "CIL/docs/"
+        build-command: sphinx-build source build/nightly
     # Create an artifact of the html output.
     - uses: actions/upload-artifact@v1
       with:
@@ -53,11 +46,11 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: DocumentationHTML
-        path: docs/build/
+        path: CIL/docs/build/
     - name: Commit documentation changes
       run: |
         git clone https://github.com/TomographicImaging/CIL.git --branch gh-pages --single-branch gh-pages
-        cp -r docs/build/html/* gh-pages/
+        cp -r docs/build/* gh-pages/
         cd gh-pages
         touch .nojekyll
         git config --local user.email "action@github.com"

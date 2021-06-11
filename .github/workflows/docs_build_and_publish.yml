@@ -50,7 +50,7 @@ jobs:
         sudo chmod -R ugo+rX /usr/lib/python3.8/site-packages/
         ls /usr/lib/python3.8/site-packages/
         ls /usr/lib/python3.8/site-packages/cil/plugins
-        python -c 'import sys; print([i for i in sys.path])'
+        python -c 'import sys; print([i for i in sys.path]); sys.path.insert(0, os.path.abspath('/usr/lib/python3.8/site-packages'))
     - uses: ammaraskar/sphinx-action@master
       with:
         docs-folder: "CIL/docs/"

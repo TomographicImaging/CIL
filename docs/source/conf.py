@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.abspath('../../Wrappers/Python/'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'CCPi-Framework'
+project = 'CIL'
 copyright = '2019, Edoardo Pasca'
 author = 'Edoardo Pasca'
 

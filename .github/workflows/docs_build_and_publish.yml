@@ -29,28 +29,6 @@ jobs:
         cd install/lib
         echo "LD_LIBRARY_PATH=$(pwd)" >> $GITHUB_ENV
         cd ../../..
-    - name: check variables
-      run: echo "LD_LIBRARY_PATH var is ${{env.LD_LIBRARY_PATH}}"
-    - name: Checkout cil-astra repo
-      uses: actions/checkout@v2
-      with:
-        repository: TomographicImaging/CIL-ASTRA
-        path: CIL-ASTRA
-    - name: install CIL-ASTRA
-      run: |
-        cd CIL-ASTRA/Wrappers/Python
-        sudo python setup.py install --prefix=/usr
-    - name: make dummy ccpi module
-      run: |
-        sudo mkdir /usr/lib/python3.8/site-packages/ccpi
-        sudo mkdir /usr/lib/python3.8/site-packages/ccpi/filters
-        sudo touch /usr/lib/python3.8/site-packages/ccpi/__init__.py
-        sudo touch /usr/lib/python3.8/site-packages/ccpi/filters/__init__.py
-        sudo touch /usr/lib/python3.8/site-packages/ccpi/filters/regularisers.py
-        sudo chmod -R ugo+rX /usr/lib/python3.8/site-packages/
-        ls /usr/lib/python3.8/site-packages/
-        ls /usr/lib/python3.8/site-packages/cil/plugins
-        python -c "import sys; print([i for i in sys.path]); sys.path.insert(0, '/usr/lib/python3.8/site-packages')"
     - uses: ammaraskar/sphinx-action@master
       with:
         docs-folder: "CIL/docs/"
@@ -59,7 +37,6 @@ jobs:
       with:
         name: DocumentationHTML
         path: CIL/docs/docs/build/html/
-  
   publish:
     runs-on: ubuntu-latest
     needs: build

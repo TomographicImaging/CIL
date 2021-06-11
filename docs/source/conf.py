@@ -16,27 +16,16 @@ import os
 import sys
 import re
 sys.path.insert(0, os.path.abspath('../../Wrappers/Python/'))
-sys.path.insert(0, os.path.abspath('../../CIL-ASTRA/Wrappers/Python/'))
 
 # -- Project information -----------------------------------------------------
 
 project = 'CIL'
-copyright = '2019, Edoardo Pasca'
+copyright = '2021'
 author = 'Edoardo Pasca'
 
 # The short X.Y version
-# version = re.sub('^v', '', os.popen('git describe').read().strip())
-# version = version.split('-')[0]
-# The full version, including alpha/beta/rc tags
-# release = '19.10'
-
-
-# sphinx-multiversion-config --------------------------------------------------
-#smv_released_pattern = r'^tags/.*$' # Tags only - we can use this later
-smv_tag_whitelist = None
-smv_outputdir_format = '{ref.name}'  # Use the branch/tag name
-smv_branch_whitelist = 'master' # only master branch
-
+version = re.sub('^v', '', os.popen('git describe').read().strip())
+version = version.split('-')[0]
 
 # -- General configuration ---------------------------------------------------
 

@@ -32,7 +32,8 @@ author = 'Edoardo Pasca'
 
 
 # sphinx-multiversion-config --------------------------------------------------
-smv_released_pattern = r'^tags/.*$' # Tags only
+#smv_released_pattern = r'^tags/.*$' # Tags only - we can use this later
+smv_tag_whitelist = None
 smv_outputdir_format = '{ref.name}'  # Use the branch/tag name
 smv_branch_whitelist = 'master' # only master branch
 

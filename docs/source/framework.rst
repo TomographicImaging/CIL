@@ -1,6 +1,6 @@
 Framework 
 *********
-The goal of the CCPi Framework is to allow the user to simply create iterative reconstruction methods which
+The goal of the Core Imaging Library is to allow the user to simply create iterative reconstruction methods which
 go beyond the standard filter back projection technique and which better suit the data characteristics.
 The framework comprises: 
 

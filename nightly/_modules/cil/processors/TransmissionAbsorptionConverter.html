@@ -1,0 +1,294 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>cil.processors.TransmissionAbsorptionConverter &mdash; CIL  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> CIL
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../framework.html">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../io.html">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../optimisation.html">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../optimisation.html#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developer_guide.html">Developer’s guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../processors.html">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../utilities.html">Utilities</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">CIL</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>cil.processors.TransmissionAbsorptionConverter</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for cil.processors.TransmissionAbsorptionConverter</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#   This work is part of the Core Imaging Library (CIL) developed by CCPi </span>
+<span class="c1">#   (Collaborative Computational Project in Tomographic Imaging), with </span>
+<span class="c1">#   substantial contributions by UKRI-STFC and University of Manchester.</span>
+
+<span class="c1">#   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#   you may not use this file except in compliance with the License.</span>
+<span class="c1">#   You may obtain a copy of the License at</span>
+
+<span class="c1">#   http://www.apache.org/licenses/LICENSE-2.0</span>
+
+<span class="c1">#   Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1">#   distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1">#   See the License for the specific language governing permissions and</span>
+<span class="c1">#   limitations under the License.</span>
+
+<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">DataProcessor</span><span class="p">,</span> <span class="n">AcquisitionData</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">,</span> <span class="n">DataContainer</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+
+
+<div class="viewcode-block" id="TransmissionAbsorptionConverter"><a class="viewcode-back" href="../../../processors.html#cil.processors.TransmissionAbsorptionConverter">[docs]</a><span class="k">class</span> <span class="nc">TransmissionAbsorptionConverter</span><span class="p">(</span><span class="n">DataProcessor</span><span class="p">):</span>
+
+    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Processor to convert from transmission measurements to absorption</span>
+<span class="sd">    based on the Beer-Lambert law</span>
+<span class="sd">    </span>
+<span class="sd">    :param white_level: A float defining incidence intensity in the Beer-Lambert law.</span>
+<span class="sd">    :type white_level: float, optional</span>
+<span class="sd">    :param min_intensity: A float defining some threshold to avoid 0 in log, is applied after normalisation by white_level</span>
+<span class="sd">    :type min_intensity: float, optional</span>
+<span class="sd">    :return: returns AcquisitionData, ImageData or DataContainer depending on input data type</span>
+<span class="sd">    :rtype: AcquisitionData, ImageData or DataContainer</span>
+<span class="sd">    </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Processor first divides by white_level (default=1) and then take negative logarithm. </span>
+<span class="sd">    Elements below threshold (after division by white_level) are set to threshold.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+<div class="viewcode-block" id="TransmissionAbsorptionConverter.__init__"><a class="viewcode-back" href="../../../processors.html#cil.processors.TransmissionAbsorptionConverter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">min_intensity</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                 <span class="n">white_level</span> <span class="o">=</span> <span class="mi">1</span>
+                 <span class="p">):</span>
+
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;min_intensity&#39;</span><span class="p">:</span> <span class="n">min_intensity</span><span class="p">,</span>
+                  <span class="s1">&#39;white_level&#39;</span><span class="p">:</span> <span class="n">white_level</span><span class="p">}</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">TransmissionAbsorptionConverter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="TransmissionAbsorptionConverter.check_input"><a class="viewcode-back" href="../../../processors.html#cil.processors.TransmissionAbsorptionConverter.check_input">[docs]</a>    <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">DataContainer</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Processor supports only following data types:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
+                            <span class="s1">&#39; - ImageData</span><span class="se">\n</span><span class="s1"> - AcquisitionData</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
+                            <span class="s1">&#39; - DataContainer&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span> </div>
+
+    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_input</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">data</span> <span class="o">/=</span> <span class="bp">self</span><span class="o">.</span><span class="n">white_level</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">as_array</span><span class="p">()[</span><span class="n">data</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_intensity</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_intensity</span>
+            
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">out</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">RuntimeWarning</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Zero encountered in log. Please set threshold to some value to avoid this.&#39;</span><span class="p">)</span>
+                
+            <span class="n">data</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
+
+            <span class="k">return</span> <span class="n">data</span>
+        
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="n">out</span> <span class="o">/=</span> <span class="bp">self</span><span class="o">.</span><span class="n">white_level</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">as_array</span><span class="p">()[</span><span class="n">out</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_intensity</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_intensity</span>
+            
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">RuntimeWarning</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Zero encountered in log. Please set threshold to some value to avoid this.&#39;</span><span class="p">)</span>
+                
+            <span class="n">out</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

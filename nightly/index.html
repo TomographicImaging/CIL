@@ -1,0 +1,269 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Welcome to CIL’s documentation! &mdash; CIL  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Framework" href="framework.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="#" class="icon icon-home"> CIL
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="framework.html">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io.html">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimisation.html">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimisation.html#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer’s guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="processors.html">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utilities.html">Utilities</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">CIL</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Welcome to CIL’s documentation!</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="welcome-to-cil-s-documentation">
+<h1>Welcome to CIL’s documentation!<a class="headerlink" href="#welcome-to-cil-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>The aim of this package is to enable rapid prototyping of optimisation-based
+reconstruction problems, i.e. defining and solving different optimization problems to enforce different properties on the reconstructed image, while being
+powerful enough to be employed on real scale problems.</p>
+<p>Firstly, it provides a framework to handle acquisition and reconstruction
+data and metadata; it also provides a basic input/output package to read data
+from different sources, e.g. Nikon X-Radia, NeXus.</p>
+<p>Secondly, it provides an object-oriented framework for defining mathematical
+operators and functions as well a collection of useful example operators and
+functions. Both smooth and non-smooth functions can be used.</p>
+<p>Further, it provides a number of high-level generic implementations of
+optimisation algorithms to solve genericlly formulated optimisation problems
+constructed from operator and function objects.</p>
+<p>A number of demos can be found on the <a class="reference external" href="https://github.com/vais-ral/CIL-Demos">CIL-Demos</a> repository.</p>
+<div class="toctree-wrapper compound" id="mastertoc">
+<p class="caption"><span class="caption-text">Contents:</span><a class="headerlink" href="#mastertoc" title="Permalink to this toctree">¶</a></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="framework.html">Framework</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#ct-geometry">CT Geometry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#acquisitongeometry-and-acquisitiondata">AcquisitonGeometry and AcquisitionData</a></li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#imagegeometry-and-imagedata">ImageGeometry and ImageData</a></li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#datacontainer-and-subclasses">DataContainer and subclasses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#block-framework">Block Framework</a></li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#dataprocessor">DataProcessor</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="io.html">Read/ write AcquisitionData and ImageData</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="io.html#nexus">NeXuS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#nikon">Nikon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#zeiss">ZEISS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#tiff-reader-writer">TIFF Reader/Writer</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="optimisation.html">Optimisation framework</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="optimisation.html#algorithm">Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimisation.html#operator">Operator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimisation.html#function">Function</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="optimisation.html#block-framework">Block Framework</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="optimisation.html#blockdatacontainer">BlockDataContainer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimisation.html#block-function">Block Function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimisation.html#block-operator">Block Operator</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer’s guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="processors.html">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utilities.html">Utilities</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="contacts">
+<h1>Contacts<a class="headerlink" href="#contacts" title="Permalink to this headline">¶</a></h1>
+<p>Please refer to the main <a class="reference external" href="https://www.ccpi.ac.uk">CCPi website</a> for up-to-date information.</p>
+<p>The CCPi developers may be contacted joining the <a class="reference external" href="https://www.jiscmail.ac.uk/cgi-bin/webadmin?A0=CCPI-DEVEL">devel mailing list</a></p>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="framework.html" class="btn btn-neutral float-right" title="Framework" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

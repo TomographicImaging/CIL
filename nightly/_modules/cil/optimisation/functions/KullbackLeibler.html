@@ -1,0 +1,801 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>cil.optimisation.functions.KullbackLeibler &mdash; CIL  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> CIL
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../framework.html">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../io.html">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../optimisation.html">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../optimisation.html#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../developer_guide.html">Developer’s guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../processors.html">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../utilities.html">Utilities</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">CIL</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>cil.optimisation.functions.KullbackLeibler</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for cil.optimisation.functions.KullbackLeibler</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#   This work is part of the Core Imaging Library (CIL) developed by CCPi </span>
+<span class="c1">#   (Collaborative Computational Project in Tomographic Imaging), with </span>
+<span class="c1">#   substantial contributions by UKRI-STFC and University of Manchester.</span>
+
+<span class="c1">#   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#   you may not use this file except in compliance with the License.</span>
+<span class="c1">#   You may obtain a copy of the License at</span>
+
+<span class="c1">#   http://www.apache.org/licenses/LICENSE-2.0</span>
+
+<span class="c1">#   Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1">#   distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1">#   See the License for the specific language governing permissions and</span>
+<span class="c1">#   limitations under the License.</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">cil.optimisation.functions</span> <span class="kn">import</span> <span class="n">Function</span>
+<span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Number</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">scipy.special</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">numba</span>
+    <span class="kn">from</span> <span class="nn">numba</span> <span class="kn">import</span> <span class="n">jit</span><span class="p">,</span> <span class="n">prange</span>
+    <span class="n">has_numba</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="sd">&#39;&#39;&#39;Some parallelisation of KL calls&#39;&#39;&#39;</span>
+
+    <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">kl_proximal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">b</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">eta</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">E</span> <span class="o">=</span> <span class="n">eta</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span>  <span class="p">(</span> 
+                <span class="p">(</span> <span class="n">X</span> <span class="o">-</span> <span class="n">E</span> <span class="o">-</span> <span class="n">tau</span> <span class="p">)</span> <span class="o">+</span>\
+                <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="p">(</span><span class="n">X</span> <span class="o">+</span> <span class="n">E</span> <span class="o">-</span> <span class="n">tau</span><span class="p">)</span><span class="o">**</span><span class="mf">2.</span> <span class="o">+</span> \
+                    <span class="p">(</span><span class="mf">4.</span> <span class="o">*</span> <span class="n">tau</span> <span class="o">*</span> <span class="n">b</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> 
+                <span class="p">)</span>
+            <span class="p">)</span>
+    <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">kl_proximal_arr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">b</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">eta</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">tau</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">E</span> <span class="o">=</span> <span class="n">eta</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span>  <span class="p">(</span> 
+                <span class="p">(</span> <span class="n">X</span> <span class="o">-</span> <span class="n">E</span> <span class="o">-</span> <span class="n">t</span> <span class="p">)</span> <span class="o">+</span>\
+                <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="p">(</span><span class="n">X</span> <span class="o">+</span> <span class="n">E</span> <span class="o">-</span> <span class="n">t</span><span class="p">)</span><span class="o">**</span><span class="mf">2.</span> <span class="o">+</span> \
+                    <span class="p">(</span><span class="mf">4.</span> <span class="o">*</span> <span class="n">t</span> <span class="o">*</span> <span class="n">b</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> 
+                <span class="p">)</span>
+            <span class="p">)</span>
+    <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">kl_proximal_mask</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">b</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">X</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">E</span> <span class="o">=</span> <span class="n">eta</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span>  <span class="p">(</span> 
+                    <span class="p">(</span> <span class="n">X</span> <span class="o">-</span> <span class="n">E</span> <span class="o">-</span> <span class="n">tau</span> <span class="p">)</span> <span class="o">+</span>\
+                    <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="p">(</span><span class="n">X</span> <span class="o">+</span> <span class="n">E</span> <span class="o">-</span> <span class="n">tau</span><span class="p">)</span><span class="o">**</span><span class="mf">2.</span> <span class="o">+</span> \
+                        <span class="p">(</span><span class="mf">4.</span> <span class="o">*</span> <span class="n">tau</span> <span class="o">*</span> <span class="n">b</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> 
+                    <span class="p">)</span>
+                <span class="p">)</span>
+    <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">kl_proximal_arr_mask</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">b</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="n">tau</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">X</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">E</span> <span class="o">=</span> <span class="n">eta</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span>  <span class="p">(</span> 
+                    <span class="p">(</span> <span class="n">X</span> <span class="o">-</span> <span class="n">E</span> <span class="o">-</span> <span class="n">t</span> <span class="p">)</span> <span class="o">+</span>\
+                    <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="p">(</span><span class="n">X</span> <span class="o">+</span> <span class="n">E</span> <span class="o">-</span> <span class="n">t</span><span class="p">)</span><span class="o">**</span><span class="mf">2.</span> <span class="o">+</span> \
+                        <span class="p">(</span><span class="mf">4.</span> <span class="o">*</span> <span class="n">t</span> <span class="o">*</span> <span class="n">b</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> 
+                    <span class="p">)</span>
+                <span class="p">)</span>
+    <span class="c1"># proximal conjugate</span>
+    <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">kl_proximal_conjugate_arr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
+        <span class="c1">#z = x + tau * self.bnoise</span>
+        <span class="c1">#return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">tau</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span> <span class="n">t</span> <span class="o">*</span> <span class="n">eta</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">)</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span> 
+                <span class="p">(</span><span class="n">z</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">z</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">z</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">t</span> <span class="o">*</span> <span class="n">b</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="p">)</span>
+        
+    <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">kl_proximal_conjugate</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
+        <span class="c1">#z = x + tau * self.bnoise</span>
+        <span class="c1">#return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span> <span class="n">tau</span> <span class="o">*</span> <span class="n">eta</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">)</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span> 
+                <span class="p">(</span><span class="n">z</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">z</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">z</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">tau</span> <span class="o">*</span> <span class="n">b</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="p">)</span>
+
+    <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">kl_proximal_conjugate_arr_mask</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
+        <span class="c1">#z = x + tau * self.bnoise</span>
+        <span class="c1">#return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="n">tau</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span> <span class="n">t</span> <span class="o">*</span> <span class="n">eta</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">)</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span> 
+                    <span class="p">(</span><span class="n">z</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">z</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">z</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">t</span> <span class="o">*</span> <span class="n">b</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="p">)</span>
+        
+    <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">kl_proximal_conjugate_mask</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
+        <span class="c1">#z = x + tau * self.bnoise</span>
+        <span class="c1">#return 0.5*((z + 1) - ((z-1)**2 + 4 * tau * self.b).sqrt())</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span> <span class="n">tau</span> <span class="o">*</span> <span class="n">eta</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">)</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span> 
+                    <span class="p">(</span><span class="n">z</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">z</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">z</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">tau</span> <span class="o">*</span> <span class="n">b</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="p">)</span>
+    <span class="c1"># gradient</span>
+    <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">kl_gradient</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">eta</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">b</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">eta</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">kl_gradient_mask</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">b</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">eta</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    
+    <span class="c1"># KL divergence</span>
+    <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">kl_div</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">eta</span><span class="p">):</span>
+        <span class="n">accumulator</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">Y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">eta</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">X</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">Y</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># out.flat[i] = X * numpy.log(X/Y) - X + Y</span>
+                <span class="n">accumulator</span> <span class="o">+=</span> <span class="n">X</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">X</span><span class="o">/</span><span class="n">Y</span><span class="p">)</span> <span class="o">-</span> <span class="n">X</span> <span class="o">+</span> <span class="n">Y</span>
+            <span class="k">elif</span> <span class="n">X</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">Y</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># out.flat[i] = Y</span>
+                <span class="n">accumulator</span> <span class="o">+=</span> <span class="n">Y</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># out.flat[i] = numpy.inf</span>
+                <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">inf</span>
+        <span class="k">return</span> <span class="n">accumulator</span>
+    <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">kl_div_mask</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
+        <span class="n">accumulator</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">X</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">Y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">eta</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">X</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">Y</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="c1"># out.flat[i] = X * numpy.log(X/Y) - X + Y</span>
+                    <span class="n">accumulator</span> <span class="o">+=</span> <span class="n">X</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">X</span><span class="o">/</span><span class="n">Y</span><span class="p">)</span> <span class="o">-</span> <span class="n">X</span> <span class="o">+</span> <span class="n">Y</span>
+                <span class="k">elif</span> <span class="n">X</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">Y</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="c1"># out.flat[i] = Y</span>
+                    <span class="n">accumulator</span> <span class="o">+=</span> <span class="n">Y</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># out.flat[i] = numpy.inf</span>
+                    <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">inf</span>
+        <span class="k">return</span> <span class="n">accumulator</span>
+
+    <span class="c1"># convex conjugate</span>
+    <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">kl_convex_conjugate</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">eta</span><span class="p">):</span>
+        <span class="n">accumulator</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">x_f</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">Y</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">x_f</span>
+            <span class="k">if</span> <span class="n">Y</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">X</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="c1"># out.flat[i] = X * numpy.log(X/Y) - X + Y</span>
+                    <span class="n">accumulator</span> <span class="o">+=</span> <span class="n">X</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span>
+                <span class="c1"># else xlogy is 0 so it doesn&#39;t add to the accumulator</span>
+                <span class="n">accumulator</span> <span class="o">+=</span> <span class="n">eta</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">x_f</span>
+        <span class="k">return</span> <span class="o">-</span> <span class="n">accumulator</span>
+    <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">kl_convex_conjugate_mask</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
+        <span class="n">accumulator</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">j</span><span class="o">+=</span><span class="mi">1</span>
+                <span class="n">X</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">x_f</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">Y</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">x_f</span>
+                <span class="k">if</span> <span class="n">Y</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">X</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="c1"># out.flat[i] = X * numpy.log(X/Y) - X + Y</span>
+                        <span class="n">accumulator</span> <span class="o">+=</span> <span class="n">X</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span>
+                    <span class="c1"># else xlogy is 0 so it doesn&#39;t add to the accumulator</span>
+                    <span class="n">accumulator</span> <span class="o">+=</span> <span class="n">eta</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">x_f</span>
+        <span class="k">return</span> <span class="o">-</span> <span class="n">accumulator</span>
+    
+    <span class="c1"># force a jit</span>
+    <span class="k">def</span> <span class="nf">force_jit</span><span class="p">():</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;forcing jit in KL&quot;</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">eta</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mf">0.3</span>
+        <span class="n">tau</span> <span class="o">=</span> <span class="mf">1.</span>
+        <span class="n">tauarr</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">kl_div</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">eta</span><span class="p">)</span>
+        <span class="n">kl_div_mask</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
+
+        <span class="n">kl_gradient</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">eta</span><span class="p">)</span>
+        <span class="n">kl_gradient_mask</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
+        
+        <span class="n">kl_proximal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">eta</span><span class="p">)</span>
+        <span class="n">kl_proximal_arr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">tauarr</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">eta</span><span class="p">)</span>
+        <span class="n">kl_proximal_mask</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
+        <span class="n">kl_proximal_arr_mask</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">tauarr</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
+        
+        <span class="n">kl_proximal_conjugate</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
+        <span class="n">kl_proximal_conjugate_arr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">tauarr</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
+        <span class="n">kl_proximal_conjugate_mask</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
+        <span class="n">kl_proximal_conjugate_arr_mask</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">tauarr</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
+        
+        <span class="n">kl_convex_conjugate</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">eta</span><span class="p">)</span>
+        <span class="n">kl_convex_conjugate_mask</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
+    
+    <span class="c1"># force_jit()</span>
+
+<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">ie</span><span class="p">:</span>
+    <span class="n">has_numba</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="KullbackLeibler"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.KullbackLeibler">[docs]</a><span class="k">class</span> <span class="nc">KullbackLeibler</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
+    
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Kullback Leibler divergence function is defined as:</span>
+<span class="sd">            </span>
+<span class="sd">    .. math:: F(u, v)</span>
+<span class="sd">            = \begin{cases} </span>
+<span class="sd">            u \log(\frac{u}{v}) - u + v &amp; \mbox{ if } u &gt; 0, v &gt; 0\\</span>
+<span class="sd">            v &amp; \mbox{ if } u = 0, v \ge 0 \\</span>
+<span class="sd">            \infty, &amp; \mbox{otherwise}</span>
+<span class="sd">            \end{cases}  </span>
+<span class="sd">            </span>
+<span class="sd">    where we use the :math:`0\log0 := 0` convention. </span>
+
+<span class="sd">    At the moment, we use build-in implemention of scipy, see</span>
+<span class="sd">    https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.kl_div.html</span>
+<span class="sd">    </span>
+<span class="sd">    The Kullback-Leibler function is used as a fidelity term in minimisation problems where the</span>
+<span class="sd">    acquired data follow Poisson distribution. If we denote the acquired data with :math:`b`</span>
+<span class="sd">    then, we write</span>
+<span class="sd">    </span>
+<span class="sd">     .. math:: \underset{i}{\sum} F(b_{i}, (v + \eta)_{i})</span>
+<span class="sd">     </span>
+<span class="sd">     where, :math:`\eta` is an additional noise. </span>
+<span class="sd">     </span>
+<span class="sd">     Example: In the case of Positron Emission Tomography reconstruction :math:`\eta` represents </span>
+<span class="sd">     scatter and random events contribution during the PET acquisition. Hence, in that case the KullbackLeibler</span>
+<span class="sd">     fidelity measures the distance between :math:`\mathcal{A}v + \eta` and acquisition data :math:`b`, where</span>
+<span class="sd">     :math:`\mathcal{A}` is the projection operator.</span>
+<span class="sd">     </span>
+<span class="sd">     This is related to PoissonLogLikelihoodWithLinearModelForMean definition that is used in PET reconstruction</span>
+<span class="sd">     in the PET-MR software , see https://github.com/CCPPETMR and for more details in</span>
+<span class="sd">    </span>
+<span class="sd">    http://stir.sourceforge.net/documentation/doxy/html/classstir_1_1PoissonLogLikelihoodWithLinearModelForMean.html</span>
+<span class="sd">                        </span>
+<span class="sd">    &quot;&quot;&quot;</span>            
+    
+    
+<div class="viewcode-block" id="KullbackLeibler.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.KullbackLeibler.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        
+        <span class="nb">super</span><span class="p">(</span><span class="n">KullbackLeibler</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">L</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>          
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Please define data, as b = ...&#39;</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>            
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Data should be larger or equal to 0&#39;</span><span class="p">)</span>              
+         
+        <span class="bp">self</span><span class="o">.</span><span class="n">eta</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;eta&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">*</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_numba</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;use_numba&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_numba</span> <span class="ow">and</span> <span class="n">has_numba</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">b_np</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">eta_np</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span> <span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="s1">&#39;as_array&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_numba</span> <span class="ow">and</span> <span class="n">has_numba</span><span class="p">)</span> <span class="p">:</span>
+            <span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Cannot make use of mask without numba&#39;</span><span class="p">)</span></div>
+        
+                                                    
+<div class="viewcode-block" id="KullbackLeibler.__call__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.KullbackLeibler.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        
+
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the KullbackLeibler function at :math:`(b, x + \eta)`.</span>
+<span class="sd">        To avoid infinity values, we consider only pixels/voxels for :math:`x+\eta\geq0`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_numba</span> <span class="ow">and</span> <span class="n">has_numba</span><span class="p">:</span>
+            <span class="c1"># tmp = numpy.empty_like(x.as_array())</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">kl_div_mask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b_np</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">kl_div</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b_np</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta_np</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span> 
+            <span class="n">tmp_sum</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+            <span class="n">ind</span> <span class="o">=</span> <span class="n">tmp_sum</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">kl_div</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">as_array</span><span class="p">()[</span><span class="n">ind</span><span class="p">],</span> <span class="n">tmp_sum</span><span class="p">[</span><span class="n">ind</span><span class="p">])</span>             
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>         </div>
+        
+<div class="viewcode-block" id="KullbackLeibler.log"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.KullbackLeibler.log">[docs]</a>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datacontainer</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;calculates the in-place log of the datacontainer&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="ow">and</span> <span class="n">y</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">,</span> <span class="n">datacontainer</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="kc">True</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;KullbackLeibler. Cannot calculate log of negative number&#39;</span><span class="p">)</span>
+        <span class="n">datacontainer</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">datacontainer</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span> <span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="KullbackLeibler.gradient"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.KullbackLeibler.gradient">[docs]</a>    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the gradient of the KullbackLeibler function at :math:`(b, x + \eta)`.                </span>
+<span class="sd">        </span>
+<span class="sd">        .. math:: F&#39;(b, x + \eta) = 1 - \frac{b}{x+\eta}</span>
+<span class="sd">        </span>
+<span class="sd">        We require the :math:`x+\eta&gt;0` otherwise we have inf values.</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>     
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_numba</span> <span class="ow">and</span> <span class="n">has_numba</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="mf">0.</span><span class="p">)</span>
+                <span class="n">out_np</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">kl_gradient_mask</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">out_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
+                <span class="n">kl_gradient</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">out_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
+                <span class="c1"># out.fill(out_np)</span>
+                <span class="k">return</span> <span class="n">out</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out_np</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+                <span class="n">kl_gradient</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">out_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
+                <span class="c1"># out.fill(out_np)</span>
+        <span class="k">else</span><span class="p">:</span>                           
+            <span class="n">tmp_sum_array</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>   
+                <span class="n">tmp_out</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span> 
+                <span class="n">tmp_out</span><span class="o">.</span><span class="n">as_array</span><span class="p">()[</span><span class="n">tmp_sum_array</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> \
+                    <span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">as_array</span><span class="p">()[</span><span class="n">tmp_sum_array</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">tmp_sum_array</span><span class="p">[</span><span class="n">tmp_sum_array</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">return</span> <span class="n">tmp_out</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">x</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">as_array</span><span class="p">()[</span><span class="n">tmp_sum_array</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> \
+                    <span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">as_array</span><span class="p">()[</span><span class="n">tmp_sum_array</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">tmp_sum_array</span><span class="p">[</span><span class="n">tmp_sum_array</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]</span></div>
+
+            
+<div class="viewcode-block" id="KullbackLeibler.convex_conjugate"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.KullbackLeibler.convex_conjugate">[docs]</a>    <span class="k">def</span> <span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the convex conjugate of the KullbackLeibler function at :math:`(b, x + \eta)`.                </span>
+<span class="sd">        </span>
+<span class="sd">        .. math:: F^{*}(b, x + \eta) = - b \log(1-x^{*}) - &lt;x^{*}, \eta&gt; </span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>  
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_numba</span> <span class="ow">and</span> <span class="n">has_numba</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">kl_convex_conjugate_mask</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">kl_convex_conjugate</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta_np</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+            <span class="n">ind</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">&gt;</span><span class="mi">0</span>
+            <span class="n">xlogy</span> <span class="o">=</span> <span class="o">-</span> <span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">xlogy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">as_array</span><span class="p">()[</span><span class="n">ind</span><span class="p">],</span> <span class="n">tmp</span><span class="p">[</span><span class="n">ind</span><span class="p">])</span>  
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">xlogy</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
+            
+<div class="viewcode-block" id="KullbackLeibler.proximal"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.KullbackLeibler.proximal">[docs]</a>    <span class="k">def</span> <span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the proximal operator of the KullbackLeibler function at :math:`(b, x + \eta)`.</span>
+<span class="sd">        </span>
+<span class="sd">        .. math:: \mathrm{prox}_{\tau F}(x) = \frac{1}{2}\bigg( (x - \eta - \tau) + \sqrt{ (x + \eta - \tau)^2 + 4\tau b} \bigg)</span>
+<span class="sd">        </span>
+<span class="sd">        The proximal for the convex conjugate of :math:`F` is </span>
+<span class="sd">        </span>
+<span class="sd">        .. math:: \mathrm{prox}_{\tau F^{*}}(x) = 0.5*((z + 1) - \sqrt{(z-1)^2 + 4 * \tau b})</span>
+<span class="sd">        </span>
+<span class="sd">        where :math:`z = x + \tau \eta`</span>
+<span class="sd">                    </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_numba</span> <span class="ow">and</span> <span class="n">has_numba</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="mf">0.</span><span class="p">)</span>
+                <span class="c1"># out_np = numpy.empty_like(out.as_array(), dtype=numpy.float64)</span>
+                <span class="n">out_np</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">kl_proximal_mask</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_np</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out_np</span><span class="p">,</span> \
+                            <span class="bp">self</span><span class="o">.</span><span class="n">eta_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">kl_proximal</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_np</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta_np</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># it should be a DataContainer</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">kl_proximal_arr_mask</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_np</span><span class="p">,</span> <span class="n">tau</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> \
+                            <span class="n">out_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta_np</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">kl_proximal_arr</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_np</span><span class="p">,</span> <span class="n">tau</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> \
+                            <span class="n">out_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta_np</span><span class="p">)</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">out_np</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">out</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out_np</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">kl_proximal_mask</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_np</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out_np</span><span class="p">,</span> \
+                            <span class="bp">self</span><span class="o">.</span><span class="n">eta_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">kl_proximal</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_np</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta_np</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># it should be a DataContainer</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">kl_proximal_arr_mask</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_np</span><span class="p">,</span> <span class="n">tau</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> \
+                            <span class="n">out_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">kl_proximal_arr</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_np</span><span class="p">,</span> <span class="n">tau</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">out_np</span><span class="p">,</span> \
+                            <span class="bp">self</span><span class="o">.</span><span class="n">eta_np</span><span class="p">)</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">out_np</span><span class="p">)</span>                    
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>        
+                <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span><span class="p">(</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta</span> <span class="o">-</span> <span class="n">tau</span><span class="p">)</span> <span class="o">+</span> \
+                    <span class="p">(</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta</span> <span class="o">-</span> <span class="n">tau</span><span class="p">)</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="n">tau</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span>   <span class="p">)</span> <span class="o">.</span><span class="n">sqrt</span><span class="p">()</span> \
+                        <span class="p">)</span>        
+            <span class="k">else</span><span class="p">:</span>                      
+                <span class="n">x</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+                <span class="n">out</span> <span class="o">-=</span> <span class="n">tau</span>
+                <span class="n">out</span> <span class="o">*=</span> <span class="n">out</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">*</span> <span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">tau</span><span class="p">),</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>  
+                <span class="n">out</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>         
+                <span class="n">out</span> <span class="o">*=</span> <span class="mf">0.5</span>            </div>
+        
+                            
+<div class="viewcode-block" id="KullbackLeibler.proximal_conjugate"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.KullbackLeibler.proximal_conjugate">[docs]</a>    <span class="k">def</span> <span class="nf">proximal_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        
+        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Proximal operator of the convex conjugate of KullbackLeibler at x:</span>
+<span class="sd">           </span>
+<span class="sd">           .. math::     prox_{\tau * f^{*}}(x)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_numba</span> <span class="ow">and</span> <span class="n">has_numba</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="mf">0.</span><span class="p">)</span>
+                <span class="c1"># out_np = numpy.empty(out.shape, dtype=numpy.float64)</span>
+                <span class="n">out_np</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">kl_proximal_conjugate_mask</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta_np</span><span class="p">,</span> \
+                            <span class="n">tau</span><span class="p">,</span> <span class="n">out_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">kl_proximal_conjugate</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta_np</span><span class="p">,</span> \
+                            <span class="n">tau</span><span class="p">,</span> <span class="n">out_np</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">kl_proximal_conjugate_arr_mask</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta_np</span><span class="p">,</span> \
+                            <span class="n">tau</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">out_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">kl_proximal_conjugate_arr</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta_np</span><span class="p">,</span> \
+                            <span class="n">tau</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">out_np</span><span class="p">)</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">out_np</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">out</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out_np</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">kl_proximal_conjugate_mask</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta_np</span><span class="p">,</span> \
+                            <span class="n">tau</span><span class="p">,</span> <span class="n">out_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">kl_proximal_conjugate</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta_np</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> \
+                            <span class="n">out_np</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">kl_proximal_conjugate_arr_mask</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta_np</span><span class="p">,</span> \
+                            <span class="n">tau</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">out_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">kl_proximal_conjugate_arr</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta_np</span><span class="p">,</span> \
+                            <span class="n">tau</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">out_np</span><span class="p">)</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">out_np</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">tau</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta</span>
+                <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">((</span><span class="n">z</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="p">((</span><span class="n">z</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">tau</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">)</span><span class="o">.</span><span class="n">sqrt</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>            
+                <span class="n">tmp</span> <span class="o">=</span> <span class="n">tau</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta</span>
+                <span class="n">tmp</span> <span class="o">+=</span> <span class="n">x</span>
+                <span class="n">tmp</span> <span class="o">-=</span> <span class="mi">1</span>
+                
+                <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>    
+                
+                <span class="n">out</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+                <span class="n">out</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
+                <span class="n">tmp</span> <span class="o">+=</span> <span class="mi">2</span>
+                <span class="n">out</span> <span class="o">+=</span> <span class="n">tmp</span>
+                <span class="n">out</span> <span class="o">*=</span> <span class="mf">0.5</span></div></div>
+
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    
+    <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">ImageGeometry</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+    
+    <span class="n">M</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">K</span> <span class="o">=</span>  <span class="mi">30</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">20</span>
+    <span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">K</span><span class="p">)</span>
+    
+    <span class="n">u1</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="s1">&#39;random&#39;</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="mi">500</span><span class="p">)</span>    
+    <span class="n">g1</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="s1">&#39;random&#39;</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="mi">100</span><span class="p">)</span>
+    <span class="n">b1</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="s1">&#39;random&#39;</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="mi">500</span><span class="p">)</span>
+    
+    <span class="c1"># with no data</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">KullbackLeibler</span><span class="p">()</span>   
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Give data b=...</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;With negative data, no background</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>   
+    <span class="k">try</span><span class="p">:</span>        
+        <span class="n">f</span> <span class="o">=</span> <span class="n">KullbackLeibler</span><span class="p">(</span><span class="n">b</span><span class="o">=-</span><span class="mi">1</span><span class="o">*</span><span class="n">g1</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;We have negative data</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> 
+        
+    <span class="n">f</span> <span class="o">=</span> <span class="n">KullbackLeibler</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="n">g1</span><span class="p">)</span>        
+        
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Check KullbackLeibler(x,x)=0</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> 
+    <span class="n">numpy</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">f</span><span class="p">(</span><span class="n">g1</span><span class="p">))</span>
+            
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Check gradient .... is OK </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">res_gradient</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">u1</span><span class="p">)</span>
+    <span class="n">res_gradient_out</span> <span class="o">=</span> <span class="n">u1</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">u1</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">res_gradient_out</span><span class="p">)</span> 
+    <span class="n">numpy</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_almost_equal</span><span class="p">(</span><span class="n">res_gradient</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> \
+                                            <span class="n">res_gradient_out</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>  
+    
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Check proximal ... is OK</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>        
+    <span class="n">tau</span> <span class="o">=</span> <span class="mf">0.4</span>
+    <span class="n">res_proximal</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">u1</span><span class="p">,</span> <span class="n">tau</span><span class="p">)</span>
+    <span class="n">res_proximal_out</span> <span class="o">=</span> <span class="n">u1</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>   
+    <span class="n">f</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">u1</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">res_proximal_out</span><span class="p">)</span>
+    <span class="n">numpy</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_almost_equal</span><span class="p">(</span><span class="n">res_proximal</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> \
+                                            <span class="n">res_proximal_out</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>  
+                
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Check KullbackLeibler with background</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>       
+    <span class="n">f1</span> <span class="o">=</span> <span class="n">KullbackLeibler</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="n">g1</span><span class="p">,</span> <span class="n">eta</span><span class="o">=</span><span class="n">b1</span><span class="p">)</span> 
+        
+    <span class="n">tmp_sum</span> <span class="o">=</span> <span class="p">(</span><span class="n">u1</span> <span class="o">+</span> <span class="n">f1</span><span class="o">.</span><span class="n">eta</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+    <span class="n">ind</span> <span class="o">=</span> <span class="n">tmp_sum</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">kl_div</span><span class="p">(</span><span class="n">f1</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">as_array</span><span class="p">()[</span><span class="n">ind</span><span class="p">],</span> <span class="n">tmp_sum</span><span class="p">[</span><span class="n">ind</span><span class="p">])</span>                 
+    <span class="n">numpy</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_almost_equal</span><span class="p">(</span><span class="n">f1</span><span class="p">(</span><span class="n">u1</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">tmp</span><span class="p">),</span> <span class="n">decimal</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Check proximal KL without background</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>   
+    <span class="n">tau</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">10000</span><span class="p">]</span>
+    
+    <span class="k">for</span> <span class="n">t1</span> <span class="ow">in</span> <span class="n">tau</span><span class="p">:</span>
+        
+        <span class="n">proxc</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">proximal_conjugate</span><span class="p">(</span><span class="n">u1</span><span class="p">,</span><span class="n">t1</span><span class="p">)</span>
+        <span class="n">proxc_out</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">proximal_conjugate</span><span class="p">(</span><span class="n">u1</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">proxc_out</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;tau = </span><span class="si">{}</span><span class="s1"> is OK&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">t1</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">numpy</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_almost_equal</span><span class="p">(</span><span class="n">proxc</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> 
+                                                <span class="n">proxc_out</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span>
+                                                <span class="n">decimal</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span>
+        
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Check proximal KL with background</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>          
+    <span class="k">for</span> <span class="n">t1</span> <span class="ow">in</span> <span class="n">tau</span><span class="p">:</span>
+        
+        <span class="n">proxc1</span> <span class="o">=</span> <span class="n">f1</span><span class="o">.</span><span class="n">proximal_conjugate</span><span class="p">(</span><span class="n">u1</span><span class="p">,</span><span class="n">t1</span><span class="p">)</span>
+        <span class="n">proxc_out1</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+        <span class="n">f1</span><span class="o">.</span><span class="n">proximal_conjugate</span><span class="p">(</span><span class="n">u1</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">proxc_out1</span><span class="p">)</span>
+        <span class="n">numpy</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_almost_equal</span><span class="p">(</span><span class="n">proxc1</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> 
+                                                <span class="n">proxc_out1</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span>
+                                                <span class="n">decimal</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span>  
+    
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;tau = </span><span class="si">{}</span><span class="s1"> is OK&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">t1</span><span class="p">)</span> <span class="p">)</span>    
+        
+    <span class="n">f</span> <span class="o">=</span> <span class="n">KullbackLeibler</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="n">g1</span><span class="p">,</span> <span class="n">eta</span> <span class="o">=</span> <span class="n">b1</span><span class="p">)</span>        
+    <span class="n">tau</span> <span class="o">=</span> <span class="mf">0.4</span>
+    <span class="n">res_proximal</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">u1</span><span class="p">,</span> <span class="n">tau</span><span class="p">)</span>
+    <span class="n">res_proximal_out</span> <span class="o">=</span> <span class="n">u1</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>   
+    <span class="n">f</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">u1</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">res_proximal_out</span><span class="p">)</span>
+    <span class="n">numpy</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_almost_equal</span><span class="p">(</span><span class="n">res_proximal</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> \
+                                            <span class="n">res_proximal_out</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>  
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Check proximal with eta ... is OK</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>         
+        
+    
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

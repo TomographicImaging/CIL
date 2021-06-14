@@ -1,0 +1,783 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>cil.optimisation.functions.TotalVariation &mdash; CIL  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> CIL
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../framework.html">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../io.html">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../optimisation.html">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../optimisation.html#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../developer_guide.html">Developer’s guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../processors.html">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../utilities.html">Utilities</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">CIL</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>cil.optimisation.functions.TotalVariation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for cil.optimisation.functions.TotalVariation</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#   This work is part of the Core Imaging Library (CIL) developed by CCPi </span>
+<span class="c1">#   (Collaborative Computational Project in Tomographic Imaging), with </span>
+<span class="c1">#   substantial contributions by UKRI-STFC and University of Manchester.</span>
+
+<span class="c1">#   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#   you may not use this file except in compliance with the License.</span>
+<span class="c1">#   You may obtain a copy of the License at</span>
+
+<span class="c1">#   http://www.apache.org/licenses/LICENSE-2.0</span>
+
+<span class="c1">#   Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1">#   distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1">#   See the License for the specific language governing permissions and</span>
+<span class="c1">#   limitations under the License.</span>
+
+<span class="kn">from</span> <span class="nn">cil.optimisation.functions</span> <span class="kn">import</span> <span class="n">Function</span><span class="p">,</span> <span class="n">MixedL21Norm</span><span class="p">,</span> <span class="n">IndicatorBox</span>
+<span class="kn">from</span> <span class="nn">cil.optimisation.operators</span> <span class="kn">import</span> <span class="n">GradientOperator</span>
+<span class="kn">import</span> <span class="nn">numpy</span> 
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Number</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+
+
+<div class="viewcode-block" id="TotalVariation"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.TotalVariation">[docs]</a><span class="k">class</span> <span class="nc">TotalVariation</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
+    
+    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Fast Gradient Projection algorithm for Total Variation(TV) Denoising (ROF problem)</span>
+<span class="sd">    </span>
+<span class="sd">    .. math::  \min_{x} \alpha TV(x) + \frac{1}{2}||x-b||^{2}_{2}</span>
+<span class="sd">                </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">      </span>
+<span class="sd">      :param max_iteration: max iterations of FGP algorithm</span>
+<span class="sd">      :type max_iteration: int, default 100</span>
+<span class="sd">      :param tolerance: Stopping criterion</span>
+<span class="sd">      :type tolerance: float, default `None` </span>
+<span class="sd">      :param correlation: Correlation between `Space` and/or `SpaceChannels` for the GradientOperator</span>
+<span class="sd">      :type correlation: str, default &#39;Space&#39;</span>
+<span class="sd">      :param backend: Backend to compute finite differences for the GradientOperator</span>
+<span class="sd">      :type backend: str, default &#39;c&#39;</span>
+<span class="sd">      :param lower:lower bound for the orthogonal projection onto the convex set C</span>
+<span class="sd">      :type lower: Number, default `-numpy.inf`</span>
+<span class="sd">      :param upper: upper bound for the orthogonal projection onto the convex set C</span>
+<span class="sd">      :type upper: Number, default `+numpy.inf`</span>
+<span class="sd">      :param info: force a print to screen stating the stop</span>
+<span class="sd">      :type info: bool, default `False`</span>
+<span class="sd">    Reference:</span>
+<span class="sd">      </span>
+<span class="sd">        A. Beck and M. Teboulle, &quot;Fast Gradient-Based Algorithms for Constrained Total Variation </span>
+<span class="sd">        Image Denoising and Deblurring Problems,&quot; in IEEE Transactions on Image Processing,</span>
+<span class="sd">        vol. 18, no. 11, pp. 2419-2434, Nov. 2009, </span>
+<span class="sd">        doi: 10.1109/TIP.2009.2028250.</span>
+<span class="sd">        </span>
+<span class="sd">    &#39;&#39;&#39;</span>    
+    
+    
+<div class="viewcode-block" id="TotalVariation.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.TotalVariation.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">max_iteration</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> 
+                 <span class="n">tolerance</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+                 <span class="n">correlation</span> <span class="o">=</span> <span class="s2">&quot;Space&quot;</span><span class="p">,</span>
+                 <span class="n">backend</span> <span class="o">=</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span>
+                 <span class="n">lower</span> <span class="o">=</span> <span class="o">-</span><span class="n">numpy</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> 
+                 <span class="n">upper</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
+                 <span class="n">info</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">TotalVariation</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">L</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="c1"># Regularising parameter = alpha</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">regularisation_parameter</span> <span class="o">=</span> <span class="mf">1.</span>
+        
+        <span class="c1"># Iterations for FGP_TV</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iterations</span> <span class="o">=</span> <span class="n">max_iteration</span>
+        
+        <span class="c1"># Tolerance for FGP_TV</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="o">=</span> <span class="n">tolerance</span>
+        
+        <span class="c1"># Define (ISOTROPIC) Total variation penalty ( Note it is without the regularisation paremeter)</span>
+        <span class="c1"># TODO add anisotropic???</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">TV</span> <span class="o">=</span> <span class="n">MixedL21Norm</span><span class="p">()</span> 
+        
+        <span class="c1"># correlation space or spacechannels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">correlation</span> <span class="o">=</span> <span class="n">correlation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span>        
+        
+        <span class="c1"># Define orthogonal projection onto the convex set C</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lower</span> <span class="o">=</span> <span class="n">lower</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">upper</span> <span class="o">=</span> <span class="n">upper</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tmp_proj_C</span> <span class="o">=</span> <span class="n">IndicatorBox</span><span class="p">(</span><span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span><span class="o">.</span><span class="n">proximal</span>
+                        
+<span class="c1">#         Setup GradientOperator as None. This is to avoid domain argument in the __init__     </span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_gradient</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pptmp</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pptmp1</span> <span class="o">=</span> <span class="kc">None</span>
+        
+        <span class="c1"># Print stopping information (iterations and tolerance error) of FGP_TV  </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">info</span></div>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">regularisation_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regularisation_parameter</span>
+
+    <span class="nd">@regularisation_parameter</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">regularisation_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;regularisation_parameter: expectec a number, got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_regularisation_parameter</span> <span class="o">=</span> <span class="n">value</span>
+
+<div class="viewcode-block" id="TotalVariation.__call__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.TotalVariation.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        
+        <span class="sa">r</span><span class="sd">&#39;&#39;&#39; Returns the value of the \alpha * TV(x)&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">geometry</span>
+        <span class="c1"># evaluate objective function of TV gradient</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">regularisation_parameter</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">TV</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x</span><span class="p">))</span></div>
+    
+    
+<div class="viewcode-block" id="TotalVariation.projection_C"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.TotalVariation.projection_C">[docs]</a>    <span class="k">def</span> <span class="nf">projection_C</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>   
+                     
+        <span class="sa">r</span><span class="sd">&#39;&#39;&#39; Returns orthogonal projection onto the convex set C&#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">geometry</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_proj_C</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tau</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">)</span></div>
+                        
+<div class="viewcode-block" id="TotalVariation.projection_P"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.TotalVariation.projection_P">[docs]</a>    <span class="k">def</span> <span class="nf">projection_P</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                       
+        <span class="sa">r</span><span class="sd">&#39;&#39;&#39; Returns the projection P onto \|\cdot\|_{\infty} &#39;&#39;&#39;</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">geometry</span>
+        
+        <span class="c1"># preallocated in proximal</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pptmp</span>
+        <span class="n">tmp1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pptmp1</span>
+        <span class="n">tmp1</span> <span class="o">*=</span> <span class="mi">0</span>
+        
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">el</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">containers</span><span class="p">):</span>
+            <span class="n">el</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">el</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">tmp</span><span class="p">)</span>
+            <span class="n">tmp1</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">tmp1</span><span class="p">)</span>
+        <span class="n">tmp1</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">out</span><span class="o">=</span><span class="n">tmp1</span><span class="p">)</span>
+        <span class="n">tmp1</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">tmp1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">tmp1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">tmp1</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span></div>
+    
+    
+<div class="viewcode-block" id="TotalVariation.proximal"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.TotalVariation.proximal">[docs]</a>    <span class="k">def</span> <span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        
+        <span class="sd">&#39;&#39;&#39; Returns the solution of the FGP_TV algorithm &#39;&#39;&#39;</span>         
+        <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">geometry</span>
+        
+        <span class="c1"># initialise</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="mi">1</span>        
+        <span class="n">tmp_p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  
+        <span class="n">tmp_q</span> <span class="o">=</span> <span class="n">tmp_p</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">tmp_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>     
+        <span class="n">p1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        
+
+        <span class="n">should_break</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iterations</span><span class="p">):</span>
+                                                                                   
+            <span class="n">t0</span> <span class="o">=</span> <span class="n">t</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">tmp_q</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">tmp_x</span><span class="p">)</span>
+            
+            <span class="c1"># axpby now works for matrices</span>
+            <span class="n">tmp_x</span><span class="o">.</span><span class="n">axpby</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">regularisation_parameter</span><span class="o">*</span><span class="n">tau</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">tmp_x</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">projection_C</span><span class="p">(</span><span class="n">tmp_x</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">tmp_x</span><span class="p">)</span>                       
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">tmp_x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">p1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="p">(</span><span class="n">Number</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)):</span>
+                <span class="n">p1</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regularisation_parameter</span> <span class="o">*</span> <span class="n">tau</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">p1</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">regularisation_parameter</span>
+                <span class="n">p1</span> <span class="o">/=</span> <span class="n">tau</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                
+                <span class="k">if</span> <span class="n">k</span><span class="o">%</span><span class="mi">5</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                    <span class="n">error</span> <span class="o">=</span> <span class="n">p1</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
+                    <span class="n">p1</span> <span class="o">+=</span> <span class="n">tmp_q</span>
+                    <span class="n">error</span> <span class="o">/=</span> <span class="n">p1</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">error</span><span class="o">&lt;=</span><span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span><span class="p">:</span>                           
+                        <span class="n">should_break</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">p1</span> <span class="o">+=</span> <span class="n">tmp_q</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">p1</span> <span class="o">+=</span> <span class="n">tmp_q</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># preallocate for projection_P</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pptmp</span> <span class="o">=</span> <span class="n">p1</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">0</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pptmp1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pptmp</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">projection_P</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">p1</span><span class="p">)</span>
+            
+            
+
+            <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">t0</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="mi">2</span>
+            
+            <span class="c1">#tmp_q.fill(p1 + (t0 - 1) / t * (p1 - tmp_p))</span>
+            <span class="n">p1</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">tmp_p</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">tmp_q</span><span class="p">)</span>
+            <span class="n">tmp_q</span> <span class="o">*=</span> <span class="p">(</span><span class="n">t0</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">t</span>
+            <span class="n">tmp_q</span> <span class="o">+=</span> <span class="n">p1</span>
+            
+            <span class="n">tmp_p</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">should_break</span><span class="p">:</span>
+                <span class="k">break</span>
+        
+        <span class="c1">#clear preallocated projection_P arrays</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pptmp</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pptmp1</span> <span class="o">=</span> <span class="kc">None</span>
+        
+        <span class="c1"># Print stopping information (iterations and tolerance error) of FGP_TV     </span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Stop at </span><span class="si">{}</span><span class="s2"> iterations with tolerance </span><span class="si">{}</span><span class="s2"> .&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">error</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Stop at </span><span class="si">{}</span><span class="s2"> iterations.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>                
+            
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>                        
+            <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">tmp_q</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">tmp_x</span><span class="p">)</span>
+            <span class="n">tmp_x</span> <span class="o">*=</span> <span class="n">tau</span>
+            <span class="n">tmp_x</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">regularisation_parameter</span> 
+            <span class="n">x</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">tmp_x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">tmp_x</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">projection_C</span><span class="p">(</span><span class="n">tmp_x</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>          
+            <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">tmp_q</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">)</span>
+            <span class="n">out</span><span class="o">*=</span><span class="n">tau</span>
+            <span class="n">out</span><span class="o">*=</span><span class="bp">self</span><span class="o">.</span><span class="n">regularisation_parameter</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">projection_C</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="TotalVariation.convex_conjugate"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.TotalVariation.convex_conjugate">[docs]</a>    <span class="k">def</span> <span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>        
+        <span class="k">return</span> <span class="mf">0.0</span>    </div>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">L</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_L</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calculate_Lipschitz</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_L</span>
+    <span class="nd">@L</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">L</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;You should set the Lipschitz constant with calculate_Lipschitz().&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="n">Number</span><span class="p">,))</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_L</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;The Lipschitz constant is a real positive number&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">calculate_Lipschitz</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Compute the Lipschitz parameter from the operator if possible</span>
+        <span class="c1"># Leave it initialised to None otherwise</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_L</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">norm</span><span class="p">())</span><span class="o">**</span><span class="mi">2</span>  
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;creates a gradient operator if not instantiated yet</span>
+
+<span class="sd">        There is no check that the variable _domain is changed after instantiation (should not be the case)&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gradient</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_gradient</span> <span class="o">=</span> <span class="n">GradientOperator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_domain</span><span class="p">,</span> <span class="n">correlation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">correlation</span><span class="p">,</span> <span class="n">backend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gradient</span>
+<div class="viewcode-block" id="TotalVariation.__rmul__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.TotalVariation.__rmul__">[docs]</a>    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">scalar</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;scalar: Expectec a number, got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">scalar</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">regularisation_parameter</span> <span class="o">=</span> <span class="n">scalar</span>
+        <span class="k">return</span> <span class="bp">self</span></div></div>
+
+    
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>                         
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="kn">from</span> <span class="nn">cil.utilities</span> <span class="kn">import</span> <span class="n">dataexample</span>
+    <span class="kn">import</span> <span class="nn">os</span>
+    <span class="kn">import</span> <span class="nn">sys</span>
+    <span class="kn">from</span> <span class="nn">cil.plugins.ccpi_regularisation.functions</span> <span class="kn">import</span> <span class="n">FGP_TV</span> <span class="k">as</span> <span class="n">CCPiReg_FGP_TV</span>
+    <span class="kn">from</span> <span class="nn">cil.filters</span> <span class="kn">import</span> <span class="n">regularisers</span>    
+    <span class="kn">from</span> <span class="nn">timeit</span> <span class="kn">import</span> <span class="n">default_timer</span> <span class="k">as</span> <span class="n">timer</span>       
+    <span class="kn">import</span> <span class="nn">tomophantom</span>
+    <span class="kn">from</span> <span class="nn">tomophantom</span> <span class="kn">import</span> <span class="n">TomoP3D</span>
+    <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">ImageGeometry</span>
+    <span class="kn">from</span> <span class="nn">cil.utilities.quality_measures</span> <span class="kn">import</span> <span class="n">mae</span>
+    <span class="kn">from</span> <span class="nn">cil.utilities.display</span> <span class="kn">import</span> <span class="n">show</span>
+    
+        
+    <span class="c1">###################################################################</span>
+    <span class="c1">###################################################################</span>
+    <span class="c1">###################################################################</span>
+    <span class="c1">###################################################################</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Compare CIL_FGP_TV vs CCPiReg_FGP_TV no tolerance (2D)&quot;</span><span class="p">)</span>
+    
+    
+    <span class="n">data</span> <span class="o">=</span> <span class="n">dataexample</span><span class="o">.</span><span class="n">SHAPES</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+    <span class="n">ig</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span>
+    <span class="n">ag</span> <span class="o">=</span> <span class="n">ig</span>
+
+    <span class="c1"># Create noisy data. </span>
+    <span class="n">n1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">noisy_data</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+    <span class="n">noisy_data</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">n1</span><span class="o">+</span><span class="n">data</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
+
+    <span class="c1"># Show Ground Truth and Noisy Data</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Ground Truth&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">noisy_data</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Noisy Data&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+    <span class="c1">#plt.show()</span>
+    
+    <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">iters</span> <span class="o">=</span> <span class="mi">1000</span>
+        
+    <span class="c1"># CIL_FGP_TV no tolerance</span>
+    <span class="n">g_CIL</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">iters</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lower</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
+    <span class="n">res1</span> <span class="o">=</span> <span class="n">g_CIL</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">noisy_data</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span>
+    <span class="n">t1</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">t1</span><span class="o">-</span><span class="n">t0</span><span class="p">)</span>
+    
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">res1</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    
+    <span class="c1"># CCPi Regularisation toolkit high tolerance</span>
+    <span class="n">r_alpha</span> <span class="o">=</span> <span class="n">alpha</span>
+    <span class="n">r_iterations</span> <span class="o">=</span> <span class="n">iters</span>
+    <span class="n">r_tolerance</span> <span class="o">=</span> <span class="mf">1e-9</span>
+    <span class="n">r_iso</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">r_nonneg</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">r_printing</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">g_CCPI_reg_toolkit</span> <span class="o">=</span> <span class="n">CCPiReg_FGP_TV</span><span class="p">(</span><span class="n">r_alpha</span><span class="p">,</span> <span class="n">r_iterations</span><span class="p">,</span> <span class="n">r_tolerance</span><span class="p">,</span> <span class="n">r_iso</span><span class="p">,</span> <span class="n">r_nonneg</span><span class="p">,</span> <span class="n">r_printing</span><span class="p">,</span> <span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
+    
+    <span class="n">t2</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
+    <span class="n">res2</span> <span class="o">=</span> <span class="n">g_CCPI_reg_toolkit</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">noisy_data</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span>
+    <span class="n">t3</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">t3</span><span class="o">-</span><span class="n">t2</span><span class="p">)</span>
+    
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">res2</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">res1</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span><span class="o">-</span><span class="n">res2</span><span class="o">.</span><span class="n">as_array</span><span class="p">()))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Difference CIL_FGP_TV vs CCPi_FGP_TV&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_almost_equal</span><span class="p">(</span><span class="n">res1</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">res2</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">decimal</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span>
+    
+    <span class="c1">###################################################################</span>
+    <span class="c1">###################################################################</span>
+    <span class="c1">###################################################################</span>
+    <span class="c1">###################################################################    </span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Compare CIL_FGP_TV vs CCPiReg_FGP_TV with iterations.&quot;</span><span class="p">)</span>
+    <span class="n">iters</span> <span class="o">=</span> <span class="mi">408</span>
+    <span class="c1"># CIL_FGP_TV no tolerance</span>
+    <span class="n">g_CIL</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">iters</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">1e-9</span><span class="p">,</span> <span class="n">lower</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">)</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
+    <span class="n">res1</span> <span class="o">=</span> <span class="n">g_CIL</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">noisy_data</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span>
+    <span class="n">t1</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">t1</span><span class="o">-</span><span class="n">t0</span><span class="p">)</span>
+    
+    <span class="c1"># CCPi Regularisation toolkit high tolerance</span>
+    <span class="n">r_alpha</span> <span class="o">=</span> <span class="n">alpha</span>
+    <span class="n">r_iterations</span> <span class="o">=</span> <span class="n">iters</span>
+    <span class="n">r_tolerance</span> <span class="o">=</span> <span class="mf">1e-9</span>
+    <span class="n">r_iso</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">r_nonneg</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">r_printing</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">g_CCPI_reg_toolkit</span> <span class="o">=</span> <span class="n">CCPiReg_FGP_TV</span><span class="p">(</span><span class="n">r_alpha</span><span class="p">,</span> <span class="n">r_iterations</span><span class="p">,</span> <span class="n">r_tolerance</span><span class="p">,</span> <span class="n">r_iso</span><span class="p">,</span> <span class="n">r_nonneg</span><span class="p">,</span> <span class="n">r_printing</span><span class="p">,</span> <span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
+
+    <span class="n">t2</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
+    <span class="n">res2</span> <span class="o">=</span> <span class="n">g_CCPI_reg_toolkit</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">noisy_data</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span>
+    <span class="n">t3</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">t3</span><span class="o">-</span><span class="n">t2</span><span class="p">)</span>
+    
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">res1</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span><span class="o">-</span><span class="n">res2</span><span class="o">.</span><span class="n">as_array</span><span class="p">()))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Difference CIL_FGP_TV vs CCPi_FGP_TV&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>          
+    
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MAE&quot;</span> <span class="p">,</span> <span class="n">mae</span><span class="p">(</span><span class="n">res1</span><span class="p">,</span> <span class="n">res2</span><span class="p">))</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_almost_equal</span><span class="p">(</span><span class="n">res1</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">res2</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">decimal</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>    
+    
+    <span class="c1">###################################################################</span>
+    <span class="c1">###################################################################</span>
+    <span class="c1">###################################################################</span>
+    <span class="c1">###################################################################</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Compare CIL_FGP_TV vs CCPiReg_FGP_TV no tolerance (3D)&quot;</span><span class="p">)</span> 
+        
+    <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;Building 3D phantom using TomoPhantom software&quot;</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="mi">13</span> <span class="c1"># select a model number from the library</span>
+    <span class="n">N_size</span> <span class="o">=</span> <span class="mi">64</span> <span class="c1"># Define phantom dimensions using a scalar value (cubic phantom)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">tomophantom</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span>
+    <span class="n">path_library3D</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;Phantom3DLibrary.dat&quot;</span><span class="p">)</span>
+    <span class="c1">#This will generate a N_size x N_size x N_size phantom (3D)</span>
+    <span class="n">phantom_tm</span> <span class="o">=</span> <span class="n">TomoP3D</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">N_size</span><span class="p">,</span> <span class="n">path_library3D</span><span class="p">)</span>    
+    
+    <span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="n">N_size</span><span class="p">,</span> <span class="n">N_size</span><span class="p">,</span> <span class="n">N_size</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">phantom_tm</span><span class="p">)</span>
+        
+    <span class="n">n1</span> <span class="o">=</span> <span class="n">TestData</span><span class="o">.</span><span class="n">random_noise</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;gaussian&#39;</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span>
+
+    <span class="n">noisy_data</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+    <span class="n">noisy_data</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">n1</span><span class="p">)</span>    
+    
+    <span class="c1"># Show Ground Truth and Noisy Data</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">as_array</span><span class="p">()[</span><span class="mi">32</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Ground Truth&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">noisy_data</span><span class="o">.</span><span class="n">as_array</span><span class="p">()[</span><span class="mi">32</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Noisy Data&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    
+    <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">iters</span> <span class="o">=</span> <span class="mi">1000</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Use tau as an array of ones&quot;</span><span class="p">)</span>
+    <span class="c1"># CIL_FGP_TV no tolerance</span>
+    <span class="n">g_CIL</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">iters</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>   
+    <span class="n">res1</span> <span class="o">=</span> <span class="n">g_CIL</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">noisy_data</span><span class="p">,</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mf">1.</span><span class="p">))</span>
+    <span class="n">t1</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">t1</span><span class="o">-</span><span class="n">t0</span><span class="p">)</span>
+
+    <span class="n">show</span><span class="p">(</span><span class="n">res1</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">)</span>
+    
+    <span class="c1"># CCPi Regularisation toolkit high tolerance</span>
+    <span class="n">r_alpha</span> <span class="o">=</span> <span class="n">alpha</span>
+    <span class="n">r_iterations</span> <span class="o">=</span> <span class="n">iters</span>
+    <span class="n">r_tolerance</span> <span class="o">=</span> <span class="mf">1e-9</span>
+    <span class="n">r_iso</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">r_nonneg</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">r_printing</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">g_CCPI_reg_toolkit</span> <span class="o">=</span> <span class="n">CCPiReg_FGP_TV</span><span class="p">(</span><span class="n">r_alpha</span><span class="p">,</span> <span class="n">r_iterations</span><span class="p">,</span> <span class="n">r_tolerance</span><span class="p">,</span> <span class="n">r_iso</span><span class="p">,</span> <span class="n">r_nonneg</span><span class="p">,</span> <span class="n">r_printing</span><span class="p">,</span> <span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
+
+    <span class="n">t2</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
+    <span class="n">res2</span> <span class="o">=</span> <span class="n">g_CCPI_reg_toolkit</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">noisy_data</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span>
+    <span class="n">t3</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="p">(</span><span class="n">t3</span><span class="o">-</span><span class="n">t2</span><span class="p">)</span>
+    <span class="n">show</span><span class="p">(</span><span class="n">res1</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">)</span>
+
+    <span class="n">show</span><span class="p">((</span><span class="n">res1</span><span class="o">-</span><span class="n">res2</span><span class="p">)</span><span class="o">.</span><span class="n">abs</span><span class="p">(),</span> <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Difference CIL_FGP_TV vs CCPi_FGP_TV&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">)</span>     
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_almost_equal</span><span class="p">(</span><span class="n">res1</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">res2</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">decimal</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+    
+    
+    <span class="c1"># CIL_FGP_TV no tolerance</span>
+    <span class="c1">#g_CIL = FGP_TV(ig, alpha, iters, tolerance=None, info=True)</span>
+    <span class="n">g_CIL</span><span class="o">.</span><span class="n">tolerance</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
+    <span class="n">res1</span> <span class="o">=</span> <span class="n">g_CIL</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">noisy_data</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span>
+    <span class="n">t1</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">t1</span><span class="o">-</span><span class="n">t0</span><span class="p">)</span>
+
+    <span class="n">show</span><span class="p">(</span><span class="n">res1</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">)</span>    
+    
+    
+    <span class="c1">###################################################################</span>
+    <span class="c1">###################################################################</span>
+    <span class="c1">###################################################################</span>
+    <span class="c1">###################################################################     </span>
+<span class="c1">#     print(&quot;Compare CIL_FGP_TV vs CCPiReg_FGP_TV with tolerance. There is a problem with this line https://github.com/vais-ral/CCPi-Regularisation-Toolkit/blob/master/src/Core/regularisers_GPU/TV_FGP_GPU_core.cu#L456&quot;)</span>
+    
+<span class="c1">#     g_CIL = FGP_TV(ig, alpha, iters, tolerance=1e-3, lower = 0)</span>
+<span class="c1">#     res1 = g_CIL.proximal(noisy_data, 1.)</span>
+
+<span class="c1">#     plt.imshow(res1.as_array())</span>
+<span class="c1">#     plt.colorbar()</span>
+<span class="c1">#     plt.show()</span>
+    
+<span class="c1">#     r_alpha = alpha</span>
+<span class="c1">#     r_iterations = iters</span>
+<span class="c1">#     r_tolerance = 1e-3</span>
+<span class="c1">#     r_iso = 0</span>
+<span class="c1">#     r_nonneg = 1</span>
+<span class="c1">#     r_printing = 0</span>
+<span class="c1">#     g_CCPI_reg_toolkit = CCPiReg_FGP_TV(r_alpha, r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, &#39;gpu&#39;)</span>
+
+<span class="c1">#     res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)</span>
+<span class="c1">#     plt.imshow(res2.as_array())</span>
+<span class="c1">#     plt.colorbar()</span>
+<span class="c1">#     plt.show()</span>
+
+<span class="c1">#     plt.imshow(np.abs(res1.as_array()-res2.as_array()))</span>
+<span class="c1">#     plt.colorbar()</span>
+<span class="c1">#     plt.title(&quot;Difference CIL_FGP_TV vs CCPi_FGP_TV&quot;)</span>
+<span class="c1">#     plt.show() </span>
+    
+<span class="c1">#     if mae(res1, res2)&gt;1e-5:</span>
+<span class="c1">#         raise ValueError (&quot;2 solutions are not the same&quot;)      </span>
+            
+       
+    <span class="n">loader</span> <span class="o">=</span> <span class="n">TestData</span><span class="p">(</span><span class="n">data_dir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;share&#39;</span><span class="p">,</span><span class="s1">&#39;cil&#39;</span><span class="p">))</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">TestData</span><span class="o">.</span><span class="n">PEPPERS</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span><span class="mi">256</span><span class="p">))</span>
+    <span class="n">ig</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span>
+    <span class="n">ag</span> <span class="o">=</span> <span class="n">ig</span>
+
+    <span class="n">n1</span> <span class="o">=</span> <span class="n">TestData</span><span class="o">.</span><span class="n">random_noise</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;gaussian&#39;</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span>
+
+    <span class="n">noisy_data</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+    <span class="n">noisy_data</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">n1</span><span class="p">)</span>    
+    
+    <span class="c1"># Show Ground Truth and Noisy Data</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Ground Truth&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">noisy_data</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Noisy Data&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    
+    <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">iters</span> <span class="o">=</span> <span class="mi">1000</span>
+    
+    <span class="c1"># CIL_FGP_TV no tolerance</span>
+    <span class="n">g_CIL</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">TotalVariation</span><span class="p">(</span><span class="n">iters</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
+    <span class="n">res1</span> <span class="o">=</span> <span class="n">g_CIL</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">noisy_data</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span>
+    <span class="n">t1</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">t1</span><span class="o">-</span><span class="n">t0</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">res1</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    
+    <span class="c1"># CCPi Regularisation toolkit high tolerance</span>
+    <span class="n">r_alpha</span> <span class="o">=</span> <span class="n">alpha</span>
+    <span class="n">r_iterations</span> <span class="o">=</span> <span class="n">iters</span>
+    <span class="n">r_tolerance</span> <span class="o">=</span> <span class="mf">1e-8</span>
+    <span class="n">r_iso</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">r_nonneg</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">r_printing</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">g_CCPI_reg_toolkit</span> <span class="o">=</span> <span class="n">CCPiReg_FGP_TV</span><span class="p">(</span><span class="n">r_alpha</span><span class="p">,</span> <span class="n">r_iterations</span><span class="p">,</span> <span class="n">r_tolerance</span><span class="p">,</span> <span class="n">r_iso</span><span class="p">,</span> <span class="n">r_nonneg</span><span class="p">,</span> <span class="n">r_printing</span><span class="p">,</span> <span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
+    
+    <span class="n">t2</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
+    <span class="n">res2</span> <span class="o">=</span> <span class="n">g_CCPI_reg_toolkit</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">noisy_data</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span>
+    <span class="n">t3</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="p">(</span><span class="n">t3</span><span class="o">-</span><span class="n">t2</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">res2</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">res1</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span><span class="o">-</span><span class="n">res2</span><span class="o">.</span><span class="n">as_array</span><span class="p">()))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Difference CIL_FGP_TV vs CCPi_FGP_TV&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>    
+    
+    
+    
+    
+    
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

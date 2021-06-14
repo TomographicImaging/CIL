@@ -1,0 +1,244 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>CIL Plugins &mdash; CIL  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> CIL
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="framework.html">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io.html">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimisation.html">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimisation.html#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer’s guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="processors.html">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utilities.html">Utilities</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">CIL</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>CIL Plugins</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/plugins.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="cil-plugins">
+<h1>CIL Plugins<a class="headerlink" href="#cil-plugins" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="ccpi-regularisation">
+<h2>CCPi Regularisation<a class="headerlink" href="#ccpi-regularisation" title="Permalink to this headline">¶</a></h2>
+<p>This plugin allows the use of regularisation functions from the <a class="reference external" href="https://github.com/vais-ral/CCPi-Regularisation-Toolkit">CCPi Regularisation toolkit</a>
+(<a class="reference external" href="https://www.sciencedirect.com/science/article/pii/S2352711018301912">10.1016/j.softx.2019.04.003</a>,
+a set of CPU/GPU optimised regularisation modules for iterative image reconstruction and
+other image processing tasks.</p>
+<div class="section" id="total-variation">
+<h3>Total variation<a class="headerlink" href="#total-variation" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="other-regularisation-functions">
+<h3>Other regularisation functions<a class="headerlink" href="#other-regularisation-functions" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="tomophantom">
+<h2>TomoPhantom<a class="headerlink" href="#tomophantom" title="Permalink to this headline">¶</a></h2>
+<p>This plugin allows the use of part of <a class="reference external" href="https://github.com/dkazanc/TomoPhantom">TomoPhantom</a>
+(<a class="reference external" href="https://doi.org/10.1016/j.softx.2018.05.003">10.1016/j.softx.2018.05.003</a>,
+a toolbox written in C language to generate customisable 2D-4D phantoms (with a
+temporal capability).</p>
+</div>
+<div class="section" id="tigre">
+<h2>TIGRE<a class="headerlink" href="#tigre" title="Permalink to this headline">¶</a></h2>
+<p>This plugin allows the use of <a class="reference external" href="https://github.com/CERN/TIGRE">TIGRE</a>
+(<a class="reference external" href="http://iopscience.iop.org/article/10.1088/2057-1976/2/5/055010">10.1088/2057-1976/2/5/055010</a>
+for forward and back projections and filter back projection reconstruction.</p>
+</div>
+<div class="section" id="astra">
+<h2>ASTRA<a class="headerlink" href="#astra" title="Permalink to this headline">¶</a></h2>
+<p>This plugin allows the use of <a class="reference external" href="https://github.com/astra-toolbox/astra-toolbox">ASTRA-toolbox</a>
+(<a class="reference external" href="http://dx.doi.org/10.1364/OE.24.025129">10.1364/OE.24.025129</a>
+for forward and back projections and filter back projection reconstruction.</p>
+<p><a class="reference internal" href="index.html#mastertoc"><span class="std std-ref">Return Home</span></a></p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

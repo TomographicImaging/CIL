@@ -1,0 +1,383 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>cil.processors.RingRemover &mdash; CIL  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> CIL
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../framework.html">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../io.html">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../optimisation.html">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../optimisation.html#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developer_guide.html">Developer’s guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../processors.html">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../utilities.html">Utilities</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">CIL</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>cil.processors.RingRemover</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for cil.processors.RingRemover</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#   This work is part of the Core Imaging Library (CIL) developed by CCPi </span>
+<span class="c1">#   (Collaborative Computational Project in Tomographic Imaging), with </span>
+<span class="c1">#   substantial contributions by UKRI-STFC and University of Manchester.</span>
+
+<span class="c1">#   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1">#   you may not use this file except in compliance with the License.</span>
+<span class="c1">#   You may obtain a copy of the License at</span>
+
+<span class="c1">#   http://www.apache.org/licenses/LICENSE-2.0</span>
+
+<span class="c1">#   Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1">#   distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1">#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1">#   See the License for the specific language governing permissions and</span>
+<span class="c1">#   limitations under the License.</span>
+
+<span class="kn">from</span> <span class="nn">scipy.fftpack</span> <span class="kn">import</span> <span class="n">fftshift</span><span class="p">,</span> <span class="n">ifftshift</span><span class="p">,</span> <span class="n">fft</span><span class="p">,</span> <span class="n">ifft</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pywt</span>
+<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">Processor</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">,</span> <span class="n">AcquisitionData</span>
+
+<div class="viewcode-block" id="RingRemover"><a class="viewcode-back" href="../../../processors.html#cil.processors.RingRemover">[docs]</a><span class="k">class</span> <span class="nc">RingRemover</span><span class="p">(</span><span class="n">Processor</span><span class="p">):</span>
+    
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        RingRemover Processor: Removes vertical stripes from a DataContainer(ImageData/AcquisitionData) </span>
+<span class="sd">        the algorithm in https://doi.org/10.1364/OE.17.008567</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+        
+<div class="viewcode-block" id="RingRemover.__init__"><a class="viewcode-back" href="../../../processors.html#cil.processors.RingRemover.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">decNum</span><span class="p">,</span> <span class="n">wname</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+        
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        decNum : number of wavelet decompositions</span>
+<span class="sd">        </span>
+<span class="sd">        wname : (str) name of wavelet filter from pywt </span>
+<span class="sd">            Example: &#39;db1&#39; -- &#39;db35&#39;, &#39;haar&#39;</span>
+<span class="sd">    </span>
+<span class="sd">        sigma : Damping parameter in Fourier space.</span>
+<span class="sd">        </span>
+<span class="sd">        info : Prints ring remover end message </span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Corrected ImageData/AcquisitionData 2D, 3D,</span>
+<span class="sd">                multi-spectral 2D, multi-spectral 3D    </span>
+<span class="sd">        &#39;&#39;&#39;</span>             
+        
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;decNum&#39;</span><span class="p">:</span> <span class="n">decNum</span><span class="p">,</span>
+                  <span class="s1">&#39;wname&#39;</span><span class="p">:</span> <span class="n">wname</span><span class="p">,</span>
+                  <span class="s1">&#39;sigma&#39;</span><span class="p">:</span> <span class="n">sigma</span><span class="p">,</span>
+                  <span class="s1">&#39;info&#39;</span><span class="p">:</span> <span class="n">info</span><span class="p">}</span>
+    
+        <span class="nb">super</span><span class="p">(</span><span class="n">RingRemover</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>            </div>
+                          
+        
+<div class="viewcode-block" id="RingRemover.check_input"><a class="viewcode-back" href="../../../processors.html#cil.processors.RingRemover.check_input">[docs]</a>    <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">))</span> <span class="ow">or</span> 
+                <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">AcquisitionData</span><span class="p">))):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Processor supports only following data types:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
+                            <span class="s1">&#39; - ImageData</span><span class="se">\n</span><span class="s1"> - AcquisitionData&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">geometry</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Geometry is not defined.&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>        </div>
+                               
+    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_input</span><span class="p">()</span>                
+        <span class="n">decNum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decNum</span>
+        <span class="n">wname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wname</span>
+        <span class="n">sigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span>
+        
+        <span class="c1"># acquisition geometry from sinogram</span>
+        <span class="n">geom</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span>
+        
+        <span class="c1"># get channels, vertical info</span>
+        <span class="n">channels</span> <span class="o">=</span>  <span class="n">geom</span><span class="o">.</span><span class="n">channels</span>    
+        <span class="n">vertical</span> <span class="o">=</span> <span class="n">geom</span><span class="o">.</span><span class="n">pixel_num_v</span>
+        
+        <span class="c1"># allocate datacontainer space</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="mf">0.</span><span class="o">*</span><span class="n">data</span>
+        
+        <span class="c1"># for non multichannel data</span>
+        <span class="k">if</span> <span class="s1">&#39;channel&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">geom</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>        
+            
+            <span class="c1"># for 3D data</span>
+            <span class="k">if</span> <span class="s1">&#39;vertical&#39;</span> <span class="ow">in</span> <span class="n">geom</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
+                                
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">vertical</span><span class="p">):</span>
+                    <span class="n">tmp_corrected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xRemoveStripesVertical</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">subset</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">decNum</span><span class="p">,</span> <span class="n">wname</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span> 
+                    <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">tmp_corrected</span><span class="p">,</span> <span class="n">vertical</span> <span class="o">=</span> <span class="n">i</span><span class="p">)</span>  
+            
+            <span class="c1"># for 2D data</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tmp_corrected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xRemoveStripesVertical</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">decNum</span><span class="p">,</span> <span class="n">wname</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">tmp_corrected</span><span class="p">)</span>        
+        
+        <span class="c1"># for multichannel data        </span>
+        <span class="k">else</span><span class="p">:</span>
+            
+           <span class="c1"># for 3D data</span>
+            <span class="k">if</span> <span class="s1">&#39;vertical&#39;</span> <span class="ow">in</span> <span class="n">geom</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
+                
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">channels</span><span class="p">):</span>
+                    
+                    <span class="n">out_ch_i</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">subset</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
+                    <span class="n">data_ch_i</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">subset</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
+                    
+                    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">vertical</span><span class="p">):</span>
+                        <span class="n">tmp_corrected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xRemoveStripesVertical</span><span class="p">(</span><span class="n">data_ch_i</span><span class="o">.</span><span class="n">subset</span><span class="p">(</span><span class="n">vertical</span><span class="o">=</span><span class="n">j</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">decNum</span><span class="p">,</span> <span class="n">wname</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
+                        <span class="n">out_ch_i</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">tmp_corrected</span><span class="p">,</span> <span class="n">vertical</span> <span class="o">=</span> <span class="n">j</span><span class="p">)</span>
+                        
+                    <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">out_ch_i</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">channel</span><span class="o">=</span><span class="n">i</span><span class="p">)</span> 
+                    
+                    <span class="k">if</span> <span class="n">info</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finish channel </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>                    
+                                       
+            <span class="c1"># for 2D data                        </span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">channels</span><span class="p">):</span>
+                        <span class="n">tmp_corrected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xRemoveStripesVertical</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">subset</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">decNum</span><span class="p">,</span> <span class="n">wname</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
+                        <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">tmp_corrected</span><span class="p">,</span> <span class="n">channel</span> <span class="o">=</span> <span class="n">i</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">info</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finish channel </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">info</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finish Ring Remover&quot;</span><span class="p">)</span> 
+                    
+        <span class="k">return</span> <span class="n">out</span>
+
+          
+<div class="viewcode-block" id="RingRemover.xRemoveStripesVertical"><a class="viewcode-back" href="../../../processors.html#cil.processors.RingRemover.xRemoveStripesVertical">[docs]</a>    <span class="k">def</span> <span class="nf">xRemoveStripesVertical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ima</span><span class="p">,</span> <span class="n">decNum</span><span class="p">,</span> <span class="n">wname</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
+        
+        <span class="sd">&#39;&#39;&#39; Code from https://doi.org/10.1364/OE.17.008567 </span>
+<span class="sd">            translated in Python</span>
+<span class="sd">                            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Corrected 2D sinogram data (Numpy Array)</span>
+<span class="sd">        </span>
+<span class="sd">        &#39;&#39;&#39;</span>              
+                            
+        <span class="c1"># allocate cH, cV, cD</span>
+        <span class="n">Ch</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="n">decNum</span>
+        <span class="n">Cv</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="n">decNum</span>
+        <span class="n">Cd</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="n">decNum</span>
+            
+        <span class="c1"># wavelets decomposition</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">decNum</span><span class="p">):</span>
+            <span class="n">ima</span><span class="p">,</span> <span class="p">(</span><span class="n">Ch</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">Cv</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">Cd</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">=</span> <span class="n">pywt</span><span class="o">.</span><span class="n">dwt2</span><span class="p">(</span><span class="n">ima</span><span class="p">,</span><span class="n">wname</span><span class="p">)</span> 
+    
+        <span class="c1"># FFT transform of horizontal frequency bands</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">decNum</span><span class="p">):</span>
+            
+            <span class="c1"># use to axis=0, which correspond to the angles direction</span>
+            <span class="n">fCv</span> <span class="o">=</span> <span class="n">fftshift</span><span class="p">(</span><span class="n">fft</span><span class="p">(</span><span class="n">Cv</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+            <span class="n">my</span><span class="p">,</span> <span class="n">mx</span> <span class="o">=</span> <span class="n">fCv</span><span class="o">.</span><span class="n">shape</span>
+            
+            <span class="c1"># damping of vertical stripe information</span>
+            <span class="n">damp</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">my</span><span class="o">/</span><span class="mi">2</span><span class="p">)),</span><span class="o">-</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">my</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span><span class="o">+</span><span class="n">my</span><span class="p">)])</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+            <span class="n">fCv</span> <span class="o">*=</span> <span class="n">damp</span><span class="o">.</span><span class="n">T</span>
+             
+            <span class="c1"># inverse FFT          </span>
+            <span class="n">Cv</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">ifft</span><span class="p">(</span><span class="n">ifftshift</span><span class="p">(</span><span class="n">fCv</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+                                                                    
+        <span class="c1"># wavelet reconstruction</span>
+        <span class="n">nima</span> <span class="o">=</span> <span class="n">ima</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">decNum</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">nima</span> <span class="o">=</span> <span class="n">nima</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">Ch</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">0</span><span class="p">:</span><span class="n">Ch</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+            <span class="n">nima</span> <span class="o">=</span> <span class="n">pywt</span><span class="o">.</span><span class="n">idwt2</span><span class="p">((</span><span class="n">nima</span><span class="p">,(</span><span class="n">Ch</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">Cv</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">Cd</span><span class="p">[</span><span class="n">i</span><span class="p">])),</span><span class="n">wname</span><span class="p">)</span>
+            
+        <span class="k">return</span> <span class="n">nima</span>      </div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -33,8 +33,6 @@ A number of demos can be found on the `CIL-Demos`_ repository.
    framework
    io
    optimisation
-   plugins
-   astra
    developer_guide
    processors
    utilities

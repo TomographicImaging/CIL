@@ -16,7 +16,8 @@
 #   limitations under the License.
 
 from .CentreOfRotationCorrector import CentreOfRotationCorrector
-from .CofR_xcorr import CofR_xcorr
+from .CofR_xcorrelation import CofR_xcorrelation
+from .CofR_image_sharpness import CofR_image_sharpness
 from .Normaliser import Normaliser
 from .Slicer import Slicer
 from .Binner import Binner

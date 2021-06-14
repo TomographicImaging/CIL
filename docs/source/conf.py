@@ -12,22 +12,20 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
-
+import os
+import sys
+import re
+sys.path.insert(0, os.path.abspath('../../Wrappers/Python/'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'CCPi-Framework'
-copyright = '2019, Edoardo Pasca'
+project = 'CIL'
+copyright = '2021'
 author = 'Edoardo Pasca'
 
 # The short X.Y version
-version = '19.10'
-# The full version, including alpha/beta/rc tags
-release = '19.10'
-
+version = re.sub('^v', '', os.popen('git describe').read().strip())
+version = version.split('-')[0]
 
 # -- General configuration ---------------------------------------------------
 
@@ -48,7 +46,7 @@ extensions = [
 ]
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['docstemplates']
+templates_path = ['_templates']
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
@@ -107,7 +105,7 @@ html_static_path = ['docsstatic']
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'CCPi-Frameworkdoc'
+htmlhelp_basename = 'CILdoc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -134,7 +132,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'CCPi-Framework.tex', 'CCPi-Framework Documentation',
+    (master_doc, 'CIL.tex', 'CIL Documentation',
      'Edoardo Pasca', 'manual'),
 ]
 
@@ -144,7 +142,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'ccpi-framework', 'CCPi-Framework Documentation',
+    (master_doc, 'cil', 'CIL Documentation',
      [author], 1)
 ]
 
@@ -155,8 +153,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'CCPi-Framework', 'CCPi-Framework Documentation',
-     author, 'CCPi-Framework', 'One line description of project.',
+    (master_doc, 'CIL', 'CIL Documentation',
+     author, 'CIL', 'One line description of project.',
      'Miscellaneous'),
 ]
 

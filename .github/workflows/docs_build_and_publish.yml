@@ -49,7 +49,7 @@ jobs:
     - name: Commit documentation changes
       run: |
         git clone https://github.com/TomographicImaging/CIL.git --branch gh-pages --single-branch gh-pages
-        cp -r docs/build/* gh-pages/
+        cp -r CIL/docs/build/* gh-pages/
         cd gh-pages
         touch .nojekyll
         git config --local user.email "action@github.com"

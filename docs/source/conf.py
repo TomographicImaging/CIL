@@ -20,7 +20,9 @@ sys.path.insert(0, os.path.abspath('../../Wrappers/Python/'))
 # -- Project information -----------------------------------------------------
 
 project = 'CIL'
-copyright = '2021'
+
+copyright = '2017-2021 UKRI-STFC, University of Manchester'
+
 author = 'Edoardo Pasca'
 
 # The short X.Y version

@@ -292,8 +292,12 @@ class Gradient_C(LinearOperator):
             self.fd = cilacc.fdiff2D
         else:
             raise ValueError('Number of dimensions not supported, expected 2, 3 or 4, got {}'.format(len(gm_domain.shape)))
-            
-        self.voxel_size_order = list(self.gm_domain.spacing)
+        #get voxel spacing, if not use 1s
+        try:
+            self.voxel_size_order = list(self.gm_domain.spacing)
+        except:
+            self.voxel_size_order = [1]*len(self.gm_domain.shape)
+        
         super(Gradient_C, self).__init__(domain_geometry=self.gm_domain, 
                                              range_geometry=self.gm_range) 
         print("Initialised GradientOperator with C backend running with ", cilacc.openMPtest(self.num_threads)," threads")               

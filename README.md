@@ -13,6 +13,10 @@ The Core Imaging Library (CIL) is an open-source Python framework for tomographi
 
 Jupyter Notebooks usage examples without any local installation are provided in [Binder](https://mybinder.org/v2/gh/TomographicImaging/CIL-Demos/HEAD?urlpath=lab/tree/binder%2Findex.ipynb). Please click the launch binder icon above. For more information, go to [CIL-Demos](https://github.com/TomographicImaging/CIL-Demos) and [https://mybinder.org](https://mybinder.org).
 
+## Documentation
+
+The documentation for CIL can be accessed [here](https://tomographicimaging.github.io/CIL).
+
 ## Installation
 
 Binary installation of CIL can be done with `conda`. Install a new environment using:

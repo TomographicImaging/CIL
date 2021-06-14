@@ -455,9 +455,12 @@ due to misalignment and/or kinematic errors in positioning of CT instrument comp
 A slight offset of the center of rotation with respect to the theoretical position will contribute 
 to the loss of resolution; in more severe cases, it will cause severe artifacts in the reconstructed 
 volume (double-borders). :code:`CentreOfRotationCorrector` allows to estimate offset of center of rotation 
-from theoretical. In the current release :code:`CentreOfRotationCorrector` supports only parallel geometry. 
+from theoretical. In the current release :code:`CentreOfRotationCorrector` supports both parallel
+and cone-beam geometry with 2 different algorithms:
 
-:code:`CentreOfRotationCorrector` is based on Nghia Vo's `method <https://doi.org/10.1364/OE.22.019078>`_.
+* Cross correlation, suitable for single slice parallel-beam geometry. It requires two projections 180 degree apart.
+* Image sharpness method, which consists in maximising the sharpness of a reconstructed slice. It can be used on single 
+slice parallel-beam, and centre slice cone beam geometry. For use only with datasets that can be reconstructed with FBP.
 
 .. autoclass:: cil.processors.CentreOfRotationCorrector
    :members:

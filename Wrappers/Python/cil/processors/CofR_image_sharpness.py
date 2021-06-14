@@ -88,10 +88,10 @@ class CofR_image_sharpness(Processor):
 
         return True
 
-    def gss(self, data, ig, search_range, tolerance):
+    def gss(self, data, ig, search_range, tolerance, binning):
         '''Golden section search'''
         # intervals c:cr:c where r = φ − 1=0.619... and c = 1 − r = 0.381..., φ
-
+        logger.debug("GSS between %f and %f", *search_range)
         phi = (1 + math.sqrt(5))*0.5
         r = phi - 1
         #1/(r+2)
@@ -134,6 +134,9 @@ class CofR_image_sharpness(Processor):
                 step_c = interval *r2inv
                 new_point = sample_points[-1]- step_c
 
+            else:
+                raise ValueError("The centre of rotation could not be located to the requested tolerance. Try increasing the search tolerance.")
+
             if interval < tolerance:
                 break
 
@@ -147,7 +150,7 @@ class CofR_image_sharpness(Processor):
         logger.info("evaluated %d points",len(all_data))
         if logger.isEnabledFor(logging.DEBUG):
             keys, values = zip(*all_data.items())
-            self.plot(keys, values, ig.voxel_size_x)
+            self.plot(keys, values, ig.voxel_size_x/binning)
 
         z = np.polyfit(sample_points, evaluation, 2)
         min_point = -z[1] / (2*z[0])
@@ -194,42 +197,51 @@ class CofR_image_sharpness(Processor):
         else:
             data = data_full
 
-        #prepare data
+        data.geometry.config.system.update_reference_frame()
 
         width = data.geometry.config.panel.num_pixels[0]
-        pad = width //2
-        new_geom = data.geometry.copy()
-        new_geom.config.panel.num_pixels[0] +=2*pad
-        data_padded = new_geom.allocate()
-        data_padded.fill(np.pad(data.array,((0,0),(pad,pad)),'edge'))
-        data = data_padded
-
-
-        data.geometry.config.system.update_reference_frame()
-        data_filtered = data.copy()
-        data_filtered.fill(scipy.ndimage.sobel(data.as_array(), axis=1, mode='reflect', cval=0.0)) 
 
         #initial grid search
         if self.search_range is None:
             self.search_range = width //4
 
         if self.initial_binning is None:
-            self.initial_binning = min(int(np.ceil(width / 128)),8)
+            self.initial_binning = int(np.ceil(width / 128))
+
+        logger.debug("Initial search:")
+        logger.debug("search range is %d", self.search_range)
+        logger.debug("initial binning is %d", self.initial_binning)
+
+        #filter full projections
+        data_filtered = data.copy()
+        data_filtered.fill(scipy.ndimage.sobel(data.as_array(), axis=1, mode='reflect', cval=0.0))
 
         if self.initial_binning > 1:
-            data_temp = data.copy()
-            data_temp.fill(scipy.ndimage.gaussian_filter(data.as_array(), [0,self.initial_binning//2]))
+            #padding to keep centre when binning
+            temp = (width)/self.initial_binning
+            pad = int((np.ceil(temp) * self.initial_binning - width)/2)
+            logger.debug("padding by %d", pad)
+
+            new_geom = data.geometry.copy()
+            new_geom.config.panel.num_pixels[0] +=2*pad
+            data_padded = new_geom.allocate()
+            data_padded.fill(np.pad(data.array,((0,0),(pad,pad)),'edge'))
+            
+            #bin
+            data_temp = data_padded.copy()
+            data_temp.fill(scipy.ndimage.gaussian_filter(data_padded.as_array(), [0,self.initial_binning//2]))
             data_temp = Binner({'horizontal':(None,None,self.initial_binning)})(data_temp)
                 
-            #%% sobel filter 
+            #filter 
             data_binned_filtered = data_temp.copy()
             data_binned_filtered.fill(scipy.ndimage.sobel(data_temp.as_array(), axis=1, mode='reflect', cval=0.0))
             data_processed = data_binned_filtered
-            ig = data_processed.geometry.get_ImageGeometry()
         else:
             data_processed = data_filtered
-            ig = data_processed.geometry.get_ImageGeometry()
 
+        ig = data_processed.geometry.get_ImageGeometry()
+
+        #binned grid search
         vox_rad = self.search_range //self.initial_binning
         offsets = np.linspace(-vox_rad, vox_rad, int(2*vox_rad + 1)) * ig.voxel_size_x
         obj_vals = []
@@ -246,14 +258,20 @@ class CofR_image_sharpness(Processor):
         else:
             centre = self.get_min(offsets, obj_vals, ind)
 
+        if self.initial_binning > 8:
+            #binned search continued
+            logger.debug("binned search starting at %f", centre)
+            a = centre - ig.voxel_size_x *2
+            b = centre + ig.voxel_size_x *2
+            centre = self.gss(data_processed,ig, (a, b), self.tolerance *ig.voxel_size_x, self.initial_binning )
+
         #fine search
+        logger.debug("fine search starting at %f", centre)
         data_processed = data_filtered
-        ig = data.geometry.get_ImageGeometry()  
-
-        a = centre - ig.voxel_size_x * self.initial_binning
-        b = centre + ig.voxel_size_x * self.initial_binning
-
-        centre = self.gss(data_processed,ig, (a, b), self.tolerance *ig.voxel_size_x )
+        ig = data_processed.geometry.get_ImageGeometry()
+        a = centre - ig.voxel_size_x *2
+        b = centre + ig.voxel_size_x *2
+        centre = self.gss(data_processed,ig, (a, b), self.tolerance *ig.voxel_size_x, 1 )
 
         new_geometry = data_full.geometry.copy()
         new_geometry.config.system.rotation_axis.position[0] = centre

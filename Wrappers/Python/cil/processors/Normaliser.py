@@ -20,7 +20,7 @@ from cil.framework import Processor, DataContainer, AcquisitionData,\
 import numpy
 
 class Normaliser(Processor):
-    '''Normalization based on flat and dark
+    '''Normalisation based on flat and dark
     
     This processor read in a AcquisitionData and normalises it based on 
     the instrument reading with and without incident photons or neutrons.
@@ -73,7 +73,7 @@ class Normaliser(Processor):
             self.flat_field = self.set_flat_field(df.as_array())
     
     @staticmethod
-    def normalize_projection(projection, flat, dark, tolerance):
+    def Normalise_projection(projection, flat, dark, tolerance):
         a = (projection - dark)
         b = (flat-dark)
         with numpy.errstate(divide='ignore', invalid='ignore'):
@@ -108,12 +108,12 @@ class Normaliser(Processor):
                 
                    
             a = numpy.asarray(
-                    [ Normalizer.normalize_projection(
+                    [ Normaliser.Normalise_projection(
                             projection, flat, dark, self.tolerance) \
                      for projection in projections.as_array() ]
                     )
         elif projections.number_of_dimensions == 2:
-            a = Normalizer.normalize_projection(projections.as_array(), 
+            a = Normaliser.Normalise_projection(projections.as_array(), 
                                                 flat, dark, self.tolerance)
         y = type(projections)( a , True, 
                     dimension_labels=projections.dimension_labels,

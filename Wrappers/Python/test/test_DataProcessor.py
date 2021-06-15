@@ -909,11 +909,11 @@ class TestTransmissionAbsorptionConverter(unittest.TestCase):
         self.assertTrue(data_exp.geometry == AG)
         numpy.testing.assert_allclose(data_exp.as_array(), data_new, rtol=1E-6)
         
-        s.process(out=ad)
+        data_exp.fill(0)
+        s.process(out=data_exp)
         
-        self.assertTrue(ad.geometry == AG)
-        numpy.testing.assert_allclose(data_exp.as_array(), ad.as_array(), rtol=1E-6)
-    
+        self.assertTrue(data_exp.geometry == AG)
+        numpy.testing.assert_allclose(data_exp.as_array(), data_new, rtol=1E-6)
 
 class TestAbsorptionTransmissionConverter(unittest.TestCase):
 
@@ -952,10 +952,11 @@ class TestAbsorptionTransmissionConverter(unittest.TestCase):
         self.assertTrue(data_exp.geometry == AG)
         numpy.testing.assert_allclose(data_exp.as_array(), numpy.exp(-ad.as_array())*10, rtol=1E-6)
         
-        s.process(out=ad)
+        data_exp.fill(0)
+        s.process(out=data_exp)
         
-        self.assertTrue(ad.geometry == AG)
-        numpy.testing.assert_allclose(data_exp.as_array(), ad.as_array(), rtol=1E-6)       
+        self.assertTrue(data_exp.geometry == AG)
+        numpy.testing.assert_allclose(data_exp.as_array(), numpy.exp(-ad.as_array())*10, rtol=1E-6)  
 
 
 class TestMasker(unittest.TestCase):       

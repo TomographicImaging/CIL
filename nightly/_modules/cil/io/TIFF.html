@@ -228,9 +228,10 @@
                 <span class="n">file_name</span>
                 <span class="p">)</span>
             <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;file_name&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">)</span>
+        
         <span class="bp">self</span><span class="o">.</span><span class="n">dir_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
-        <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;dir_name&quot;</span> <span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;dir_name&quot;</span> <span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_name</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;file_name&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">counter_offset</span> <span class="o">=</span> <span class="n">counter_offset</span>
         
         <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_container</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">))</span> <span class="ow">or</span> 

@@ -181,7 +181,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span>
 
 <div class="viewcode-block" id="Normaliser"><a class="viewcode-back" href="../../../processors.html#cil.processors.Normaliser">[docs]</a><span class="k">class</span> <span class="nc">Normaliser</span><span class="p">(</span><span class="n">Processor</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Normalization based on flat and dark</span>
+    <span class="sd">&#39;&#39;&#39;Normalisation based on flat and dark</span>
 <span class="sd">    </span>
 <span class="sd">    This processor read in a AcquisitionData and normalises it based on </span>
 <span class="sd">    the instrument reading with and without incident photons or neutrons.</span>
@@ -234,7 +234,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">flat_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_flat_field</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
     
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">normalize_projection</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">Normalise_projection</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">):</span>
         <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">projection</span> <span class="o">-</span> <span class="n">dark</span><span class="p">)</span>
         <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="n">flat</span><span class="o">-</span><span class="n">dark</span><span class="p">)</span>
         <span class="k">with</span> <span class="n">numpy</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
@@ -269,12 +269,12 @@
                 
                    
             <span class="n">a</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
-                    <span class="p">[</span> <span class="n">Normalizer</span><span class="o">.</span><span class="n">normalize_projection</span><span class="p">(</span>
+                    <span class="p">[</span> <span class="n">Normaliser</span><span class="o">.</span><span class="n">Normalise_projection</span><span class="p">(</span>
                             <span class="n">projection</span><span class="p">,</span> <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span><span class="p">)</span> \
                      <span class="k">for</span> <span class="n">projection</span> <span class="ow">in</span> <span class="n">projections</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span> <span class="p">]</span>
                     <span class="p">)</span>
         <span class="k">elif</span> <span class="n">projections</span><span class="o">.</span><span class="n">number_of_dimensions</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="n">a</span> <span class="o">=</span> <span class="n">Normalizer</span><span class="o">.</span><span class="n">normalize_projection</span><span class="p">(</span><span class="n">projections</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> 
+            <span class="n">a</span> <span class="o">=</span> <span class="n">Normaliser</span><span class="o">.</span><span class="n">Normalise_projection</span><span class="p">(</span><span class="n">projections</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> 
                                                 <span class="n">flat</span><span class="p">,</span> <span class="n">dark</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span><span class="p">)</span>
         <span class="n">y</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">projections</span><span class="p">)(</span> <span class="n">a</span> <span class="p">,</span> <span class="kc">True</span><span class="p">,</span> 
                     <span class="n">dimension_labels</span><span class="o">=</span><span class="n">projections</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">,</span>

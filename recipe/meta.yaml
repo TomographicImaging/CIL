@@ -54,7 +54,7 @@ requirements:
     - python
     - {{ pin_compatible('numpy', min_pin='x.x', max_pin='x.x') }}
     - scipy
-    - matplotlib > 3.3.0
+    - matplotlib >=3.3.0
     - h5py
     - pillow
     - libgcc-ng     # [linux]

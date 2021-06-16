@@ -119,7 +119,7 @@ class FGP_TV(TV_Base):
               self.device)
         return res, info
         
-class TGV(Function):
+class TGV(RegulariserFunction):
 
     def __init__(self, regularisation_parameter, alpha1, alpha2, iter_TGV, LipshitzConstant, torelance, device ):
         self.regularisation_parameter = regularisation_parameter
@@ -153,7 +153,7 @@ class TGV(Function):
         warnings.warn("{}: the convex_conjugate method is not implemented. Returning NaN.".format(self.__class__.__name__))
         return np.nan
 
-class LLT_ROF(Function):
+class LLT_ROF(RegulariserFunction):
     
     def __init__(self, regularisation_parameterROF, 
                        regularisation_parameterLLT,
@@ -189,7 +189,7 @@ class LLT_ROF(Function):
         warnings.warn("{}: the convex_conjugate method is not implemented. Returning NaN.".format(self.__class__.__name__))
         return np.nan
 
-class FGP_dTV(Function):
+class FGP_dTV(RegulariserFunction):
     def __init__(self, reference, alpha=1, max_iteration=100,
                  tolerance=1e-6, eta=0.01, isotropic=True, nonnegativity=True, device='cpu'):
 
@@ -251,7 +251,7 @@ class SB_TV(TV_Base):
         
         return res, info
 
-class TNV(Function):
+class TNV(RegulariserFunction):
     
     def __init__(self,regularisation_parameter,iterationsTNV,tolerance):
         

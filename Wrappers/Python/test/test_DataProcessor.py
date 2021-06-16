@@ -488,7 +488,7 @@ class TestCentreOfRotation_parallel(unittest.TestCase):
         corr = CofR_image_sharpness(search_range=20, FBP=AstraFBP)
         corr.set_input(self.data_DLS.clone())
         ad_out = corr.get_output()
-        self.assertAlmostEqual(6.24, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
+        self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=1)     
 
 
     @unittest.skipUnless(False, "TIGRE not installed")
@@ -496,7 +496,7 @@ class TestCentreOfRotation_parallel(unittest.TestCase):
         corr = CofR_image_sharpness(search_range=20, FBP=TigreFBP)
         corr.set_input(self.data_DLS.clone())
         ad_out = corr.get_output()
-        self.assertAlmostEqual(6.24, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
+        self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
 
     def test_CenterOfRotationCorrector(self):       
         corr = CentreOfRotationCorrector.xcorrelation(slice_index='centre', projection_index=0, ang_tol=0.1)
@@ -909,11 +909,11 @@ class TestTransmissionAbsorptionConverter(unittest.TestCase):
         self.assertTrue(data_exp.geometry == AG)
         numpy.testing.assert_allclose(data_exp.as_array(), data_new, rtol=1E-6)
         
-        s.process(out=ad)
+        data_exp.fill(0)
+        s.process(out=data_exp)
         
-        self.assertTrue(ad.geometry == AG)
-        numpy.testing.assert_allclose(data_exp.as_array(), ad.as_array(), rtol=1E-6)
-    
+        self.assertTrue(data_exp.geometry == AG)
+        numpy.testing.assert_allclose(data_exp.as_array(), data_new, rtol=1E-6)
 
 class TestAbsorptionTransmissionConverter(unittest.TestCase):
 
@@ -952,10 +952,11 @@ class TestAbsorptionTransmissionConverter(unittest.TestCase):
         self.assertTrue(data_exp.geometry == AG)
         numpy.testing.assert_allclose(data_exp.as_array(), numpy.exp(-ad.as_array())*10, rtol=1E-6)
         
-        s.process(out=ad)
+        data_exp.fill(0)
+        s.process(out=data_exp)
         
-        self.assertTrue(ad.geometry == AG)
-        numpy.testing.assert_allclose(data_exp.as_array(), ad.as_array(), rtol=1E-6)       
+        self.assertTrue(data_exp.geometry == AG)
+        numpy.testing.assert_allclose(data_exp.as_array(), numpy.exp(-ad.as_array())*10, rtol=1E-6)  
 
 
 class TestMasker(unittest.TestCase):       

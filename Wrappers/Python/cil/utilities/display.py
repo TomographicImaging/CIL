@@ -694,4 +694,4 @@ def show_geometry(acquisition_geometry, image_geometry=None, elevation=20, azimu
         azimuthal = 0
 
     display = _ShowGeometry(acquisition_geometry, image_geometry)
-    display.draw(elev=elevation, azim=azimuthal, view_distance=view_distance, grid=grid, figsize=(10,10), fontsize=10)
+    display.draw(elev=elevation, azim=azimuthal, view_distance=view_distance, grid=grid, figsize=figsize, fontsize=fontsize)

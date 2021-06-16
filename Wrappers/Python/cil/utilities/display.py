@@ -666,7 +666,7 @@ class _ShowGeometry(object):
         self.labels.append(h0.get_label())
 
 #%%
-def show_geometry(acquisition_geometry, image_geometry=None, elevation=20, azimuthal=-35, view_distance=10, grid=False, figsize=(10,10), fontsize=10):
+def show_geometry(acquisition_geometry, image_geometry=None, elevation=20, azimuthal=-35, view_distance=10, grid=False, figsize=(6,6), fontsize=7):
     '''
     Displays a schematic of the acquisition geometry
     for 2D geometries elevation and azimuthal cannot be changed
@@ -684,9 +684,9 @@ def show_geometry(acquisition_geometry, image_geometry=None, elevation=20, azimu
     :grid: Show figure axis
     :type grid: boolean, default=False
     :figsize: Set figure size (inches)
-    :type figsize: tuple (x, y), default (10,10)    
+    :type figsize: tuple (x, y), default (6,6)    
     :type grid: boolean, default=False
-    :fontsize: Set fontsize
+    :fontsize: Set fontsize, default 7
     :type fontsize: int 
     '''
     if acquisition_geometry.dimension == '2D':
@@ -694,4 +694,4 @@ def show_geometry(acquisition_geometry, image_geometry=None, elevation=20, azimu
         azimuthal = 0
 
     display = _ShowGeometry(acquisition_geometry, image_geometry)
-    display.draw(elev=elevation, azim=azimuthal, view_distance=view_distance, grid=grid, figsize=(10,10), fontsize=10)
+    display.draw(elev=elevation, azim=azimuthal, view_distance=view_distance, grid=grid, figsize=figsize, fontsize=fontsize)

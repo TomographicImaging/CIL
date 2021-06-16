@@ -46,6 +46,6 @@ def has_gpu_astra():
     has_gpu = True
     try:
         astra.test_CUDA()
-    except RuntimeError:
+    except:
         has_gpu = False
     return has_gpu

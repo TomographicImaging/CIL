@@ -15,8 +15,13 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from .Function import Function, ConstantFunction, ZeroFunction, TranslateFunction, SumScalarFunction
+from .Function import Function
+from .Function import SumFunction
 from .Function import ScaledFunction
+from .Function import SumScalarFunction
+from .Function import ConstantFunction
+from .Function import ZeroFunction
+from .Function import TranslateFunction
 from .L1Norm import L1Norm
 from .L2NormSquared import L2NormSquared
 from .L2NormSquared import WeightedL2NormSquared

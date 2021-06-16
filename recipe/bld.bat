@@ -1,9 +1,4 @@
 
-IF NOT DEFINED CIL_VERSION (
-ECHO CIL_VERSION Not Defined.
-exit 1
-)
-
 ROBOCOPY /E "%RECIPE_DIR%\.." "%SRC_DIR%" /XD .git /XD Wrappers\Python\build
 
 mkdir "%SRC_DIR%\build_framework"

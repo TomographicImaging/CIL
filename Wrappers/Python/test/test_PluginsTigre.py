@@ -266,14 +266,14 @@ class Test_results(unittest.TestCase):
         for i in range(4):
             self.golden_data.fill(array=phantom, vertical=7+i)
 
-        self.golden_data_cs = self.golden_data.subset(vertical=cs_ind, force=True)
+        self.golden_data_cs = self.golden_data.get_slice(vertical=cs_ind, force=True)
 
         self.Op = ProjectionOperator(self.ig3D, self.ag3D)
         self.fp = self.Op.direct(self.golden_data)
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_FBP(self):
-        reco_out = FBP(self.ig, self.ag)(self.fp.subset(vertical='centre'))
+        reco_out = FBP(self.ig, self.ag)(self.fp.get_slice(vertical='centre'))
         mean_diff = (self.golden_data_cs-reco_out).abs().mean()
         self.assertLess(mean_diff, 0.01)
         np.testing.assert_allclose(self.golden_data_cs.as_array(),reco_out.as_array(),atol=1)
@@ -296,28 +296,34 @@ class Test_results(unittest.TestCase):
         self.assertLess(mean_diff, 1e-2)
         np.testing.assert_allclose(fp_TIGRE.as_array(),fp_ASTRA.as_array(),atol=1)
 
-        astra_ag3D = self.ag3D.subset(['vertical','angle','horizontal'])
+        astra_ag3D = self.ag3D.copy()
+        astra_ag3D.set_labels(['vertical','angle','horizontal'])
+
         AOp = AstraProjectionOperator(self.ig3D, astra_ag3D)
         fp_ASTRA = AOp.direct(self.golden_data)
-        fp_ASTRA = fp_ASTRA.subset(['angle','vertical','horizontal'])
+
+        fp_ASTRA.reorder(['angle','vertical','horizontal'])
         mean_diff = (fp_ASTRA-self.fp).abs().mean()
         self.assertLess(mean_diff, 1)
         np.testing.assert_allclose(self.fp.as_array(),fp_ASTRA.as_array(),atol=5)
 
     @unittest.skipUnless(has_tigre and has_astra, "TIGRE or ASTRA not installed")
     def test_bp_with_Astra(self):
-
         AOp = AstraProjectionOperator(self.ig, self.ag)
-        bp_ASTRA = AOp.adjoint(self.fp.subset(vertical='centre'))
+        bp_ASTRA = AOp.adjoint(data2d)
         TOp = ProjectionOperator(self.ig, self.ag)
-        bp_TIGRE = TOp.adjoint(self.fp.subset(vertical='centre'))
+        bp_TIGRE = TOp.adjoint(self.fp.get_slice(vertical='centre'))
         mean_diff = (bp_ASTRA-bp_TIGRE).abs().mean()
         self.assertLess(mean_diff, 1)
         np.testing.assert_allclose(bp_ASTRA.as_array(),bp_TIGRE.as_array(),atol=10)
 
-        astra_ag3D = self.ag3D.subset(['vertical','angle','horizontal'])
-        AOp = AstraProjectionOperator(self.ig3D, astra_ag3D)
-        bp_ASTRA = AOp.adjoint(self.fp.subset(['vertical','angle','horizontal']))
+
+        astra_fp = self.fp.copy()
+        astra_fp.reorder(['vertical','angle','horizontal'])
+
+        AOp = AstraProjectionOperator(self.ig3D, astra_fp.geometry)
+        bp_ASTRA = AOp.adjoint(astra_fp)
+        
         bp_TIGRE = self.Op.adjoint(self.fp)
         mean_diff = (bp_ASTRA-bp_TIGRE).abs().mean()
         self.assertLess(mean_diff, 1)
@@ -325,14 +331,15 @@ class Test_results(unittest.TestCase):
 
     @unittest.skipUnless(has_tigre and has_astra, "TIGRE or ASTRA not installed")
     def test_FBP_with_Astra(self):
-        reco_ASTRA = AstraFBP(self.ig, self.ag)(self.fp.subset(vertical='centre'))
-        reco_TIGRE = FBP(self.ig, self.ag)(self.fp.subset(vertical='centre'))
+        reco_ASTRA = AstraFBP(self.ig, self.ag)(self.fp.get_slice(vertical='centre'))
+        reco_TIGRE = FBP(self.ig, self.ag)(self.fp.get_slice(vertical='centre'))
         mean_diff = (reco_ASTRA-reco_TIGRE).abs().mean()
         self.assertLess(mean_diff, 1e-4)
         np.testing.assert_allclose(reco_ASTRA.as_array(),reco_TIGRE.as_array(),atol=1e-2)
 
-        astra_transpose = self.fp.subset(['vertical','angle','horizontal'])
-        reco_ASTRA3D = AstraFBP(self.ig3D, astra_transpose.geometry)(astra_transpose)
+        astra_fp = self.fp.copy()
+        astra_fp.reorder(['vertical','angle','horizontal'])
+        reco_ASTRA3D = AstraFBP(self.ig3D, astra_fp.geometry)(astra_fp)
         reco_TIGRE3D = FBP(self.ig3D, self.ag3D)(self.fp)
         diff = (reco_ASTRA3D-reco_TIGRE3D).abs()
         self.assertLess(diff.mean(), 1e-4)

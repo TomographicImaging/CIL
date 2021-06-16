@@ -18,6 +18,7 @@ from cil.framework import AcquisitionData, AcquisitionGeometry
 import numpy as np
 import os
 import olefile
+import logging
     
         
 class TXRMDataReader(object):
@@ -27,21 +28,39 @@ class TXRMDataReader(object):
         '''
         Constructor
         
-        Input:
-            
-            txrm_file       full path to .txrm file
+        :param file_name: file name to read
+        :type file_name: os.path or string, default None
+        :param angle_unit: describe what the unit is, angle or degree
+        :type angle_unit: string, default degree
+        :param logging_level: Logging messages which are less severe than level will be ignored.
+        :type logging_level: int, default 40 i.e. ERROR, possible values are 0 10 20 30 40 50 https://docs.python.org/3/library/logging.html#levels
                     
         '''
         
         self.txrm_file = kwargs.get('file_name', None)
-        
+        angle_unit = kwargs.get('angle_unit', AcquisitionGeometry.DEGREE)
+        level = kwargs.get('logging_level', 40)
         if self.txrm_file is not None:
-            self.set_up(file_name = self.txrm_file)
+            self.set_up(file_name = self.txrm_file, angle_unit=angle_unit, logging_level=level)
         self._metadata = None
             
     def set_up(self, 
                file_name = None,
-               angle_unit = AcquisitionGeometry.DEGREE):
+               angle_unit = AcquisitionGeometry.DEGREE,
+               logging_level=40):
+        '''Set up the reader
+        
+        :param file_name: file name to read
+        :type file_name: os.path or string, default None
+        :param angle_unit: describe what the unit is, angle or degree
+        :type angle_unit: string, default degree
+        :param logging_level: Logging messages which are less severe than level will be ignored.
+        :type logging_level: int, default 40 i.e. ERROR, possible values are 0 10 20 30 40 50 https://docs.python.org/3/library/logging.html#levels'''
+        self.logging_level = logging_level
+        # set logging level for dxchange reader.py
+        logger = logging.getLogger(name='dxchange.reader')
+        if logger is not None:
+            logger.setLevel(self.logging_level)
         
         self.txrm_file = os.path.abspath(file_name)
         
@@ -104,22 +123,17 @@ class TXRMDataReader(object):
         else:
             angles = np.asarray(metadata['thetas'])
 
-        self._ag = AcquisitionGeometry(geom_type = 'cone', 
-                                       dimension = '3D', 
-                                       angles = angles, 
-                                       pixel_num_h = metadata['image_width'], 
-                                       pixel_size_h = d_pixel_size/1000, 
-                                       pixel_num_v = metadata['image_height'], 
-                                       pixel_size_v = d_pixel_size/1000, 
-                                       dist_source_center =  dist_source_center, 
-                                       dist_center_detector = dist_center_detector, 
-                                       channels = 1,
-                                       angle_unit = self.angle_unit,
-                                       dimension_labels = ['angle', \
-                                                           'vertical', \
-                                                           'horizontal'])
-        acq_data = self._ag.allocate(None)
-        acq_data.fill(data)
+        self._ag = AcquisitionGeometry.create_Cone3D(
+            [0,-dist_source_center, 0] , [ 0, dist_center_detector, 0] \
+            ) \
+                .set_panel([metadata['image_width'], metadata['image_height']],\
+                    pixel_size=[d_pixel_size/1000,d_pixel_size/1000])\
+                .set_angles(angles, angle_unit=self.angle_unit)
+        self._ag.dimension_labels =  ['angle', 'vertical', 'horizontal']
+                
+
+        acq_data = AcquisitionData(array=data, deep_copy=False, geometry=self._ag.copy(),\
+            suppress_warning=True)
         self._metadata = metadata
         return acq_data
     def load_projections(self):

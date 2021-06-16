@@ -67,9 +67,10 @@ class TIFFWriter(object):
                 file_name
                 )
             )[0]
-        print ("file_name", self.file_name)
+        
         self.dir_name = os.path.dirname(file_name)
-        print ("dir_name" , self.dir_name, self.dir_name is None)
+        print ("dir_name" , self.dir_name)
+        print ("file_name", self.file_name)
         self.counter_offset = counter_offset
         
         if not ((isinstance(self.data_container, ImageData)) or 
@@ -426,7 +427,7 @@ class TIFFStackReader(object):
 
 '''
 import matplotlib.pyplot as plt
-from ccpi.io import TIFFStackReader
+from cil.io import TIFFStackReader
 
 path = '/media/newhd/shared/Data/SophiaBeads/SophiaBeads_256_averaged/'
 

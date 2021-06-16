@@ -60,8 +60,12 @@ class FiniteDifferenceOperator(LinearOperator):
            else:
                raise ValueError('Requested direction is not possible. Accepted direction is {} or {}, \ngot {}'.format(domain_geometry.dimension_labels, range(len(domain_geometry.shape)),  direction))
                          
-                                                                                                           
-        self.voxel_size = domain_geometry.spacing[self.direction]
+        #get voxel spacing, if not use 1s
+        try:
+            self.voxel_size = domain_geometry.spacing[self.direction]
+        except:
+            self.voxel_size = 1
+        
         self.boundary_condition = bnd_cond
         self.method = method
                 

@@ -15,15 +15,23 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from cil.processors.CofR_xcorr import CofR_xcorr
+from cil.processors.CofR_xcorrelation import CofR_xcorrelation
+from cil.processors.CofR_image_sharpness import CofR_image_sharpness
+
 
 class CentreOfRotationCorrector(object):
     """
     This class contains factory methods to create a CentreOfRotationCorrector object using the desired algorithm.
     """
-
     @staticmethod
     def xcorr(slice_index='centre', projection_index=0, ang_tol=0.1):
+        r'''Alias of xcorrelation. This method has been deprecated. Please use xcorrelation'''
+
+        processor = CofR_xcorrelation(slice_index, projection_index, ang_tol)
+        return processor
+        
+    @staticmethod
+    def xcorrelation(slice_index='centre', projection_index=0, ang_tol=0.1):
         r'''This creates a CentreOfRotationCorrector processor using the cross-correlation algorithm.
 
         For use on parallel-beam geometry it requires two projections 180 degree apart.
@@ -37,5 +45,27 @@ class CentreOfRotationCorrector(object):
         :return: returns an AcquisitionData object with an updated AcquisitionGeometry
         :rtype: AcquisitionData
         '''
-        processor = CofR_xcorr(slice_index, projection_index, ang_tol)
+        processor = CofR_xcorrelation(slice_index, projection_index, ang_tol)
+        return processor
+
+    @staticmethod
+    def image_sharpness(slice_index='centre', FBP=None, tolerance=0.005, search_range=None, initial_binning=None):
+        r'''This creates a CentreOfRotationCorrector processor which will find the centre by maximising the sharpness of a reconstructed slice.
+
+        Can be used on single slice parallel-beam, and centre slice cone beam geometry. For use only with datasets that can be reconstructed with FBP.
+
+        :param slice_index: An integer defining the vertical slice to run the algorithm on.
+        :type slice_index: int, str='centre', optional
+        :param FBP: A CIL FBP class imported from cil.plugins.tigre or cil.plugins.astra  
+        :type FBP: class
+        :param tolerance: The tolerance of the fit in pixels, the default is 1/200 of a pixel. Note this is a stopping critera, not a statement of accuracy of the algorithm.
+        :type tolerance: float, default = 0.001    
+        :param search_range: The range in pixels to search either side of the panel centre. If `None` the width of the panel/4 is used. 
+        :type search_range: int
+        :param initial_binning: The size of the bins for the initial grid. If `None` will bin the image to a step corresponding to <128 pixels. Note the fine search will be on unbinned data.
+        :type initial_binning: int
+        :return: returns an AcquisitionData object with an updated AcquisitionGeometry
+        :rtype: AcquisitionDataS
+        '''
+        processor = CofR_image_sharpness(slice_index=slice_index, FBP=FBP, tolerance=tolerance, search_range=search_range, initial_binning=initial_binning)
         return processor

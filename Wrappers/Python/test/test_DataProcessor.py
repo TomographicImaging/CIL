@@ -30,21 +30,45 @@ from timeit import default_timer as timer
 from cil.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 
 from cil.io import NEXUSDataReader
-from cil.processors import CentreOfRotationCorrector, CofR_xcorr, TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
+from cil.processors import CentreOfRotationCorrector, CofR_xcorrelation, CofR_image_sharpness
+from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
 from cil.processors import Slicer, Binner, MaskGenerator, Masker
-
 import wget
 import os
 
-class TestDataProcessor(unittest.TestCase):
-    
-    def setUp(self):
+try:
+    import tigre
+    has_tigre = True
+except ModuleNotFoundError:
+    print(  "This plugin requires the additional package TIGRE\n" +
+            "Please install it via conda as tigre from the ccpi channel\n"+
+            "Minimal version is 21.01")
+    has_tigre = False
+else:
+    from cil.plugins.tigre import FBP as TigreFBP
 
-        data_raw = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
+try:
+    import tomophantom
+    has_tomophantom = True
+except ModuleNotFoundError:
+    print(  "This plugin requires the additional package tomophantom\n" +
+            "Please install it via conda as tomophantom from the ccpi channel\n")
+    has_tomophantom = False
+else:
+    from cil.plugins import TomoPhantom
 
-        self.data_DLS = data_raw.log()
-        self.data_DLS *= -1
-        
+try:
+    import astra
+    has_astra = True
+except ModuleNotFoundError:
+    has_astra = False
+else:
+    from cil.plugins.astra import FBP as AstraFBP
+    from cil.plugins.astra import ProjectionOperator
+
+
+
+class TestBinner(unittest.TestCase):
     def test_Binner(self):
         #%%
         #test parallel 2D case
@@ -225,7 +249,7 @@ class TestDataProcessor(unittest.TestCase):
         self.assertTrue(data_binned.geometry == IG_binned)
         numpy.testing.assert_allclose(data_binned.as_array(), data_new, rtol=1E-6)
 
-        
+class TestSlicer(unittest.TestCase):      
     def test_Slicer(self):
         
         #test parallel 2D case
@@ -439,32 +463,100 @@ class TestDataProcessor(unittest.TestCase):
         self.assertTrue(data_sliced.geometry == IG_sliced)
         numpy.testing.assert_allclose(data_sliced.as_array(), numpy.squeeze(data.as_array()[5:12:3, ::2, 10:30:2, :]), rtol=1E-6)
 
-    def test_CofR_xcorr(self):       
 
-        corr = CofR_xcorr(slice_index='centre', projection_index=0, ang_tol=0.1)
+class TestCentreOfRotation_parallel(unittest.TestCase):
+    
+    def setUp(self):
+        data_raw = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
+        self.data_DLS = data_raw.log()
+        self.data_DLS *= -1
+
+    def test_CofR_xcorrelation(self):       
+
+        corr = CofR_xcorrelation(slice_index='centre', projection_index=0, ang_tol=0.1)
         corr.set_input(self.data_DLS.clone())
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
         
-        corr = CofR_xcorr(slice_index=67, projection_index=0, ang_tol=0.1)
+        corr = CofR_xcorrelation(slice_index=67, projection_index=0, ang_tol=0.1)
         corr.set_input(self.data_DLS.clone())
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)              
+
+    @unittest.skipUnless(has_astra, "ASTRA not installed")
+    def test_CofR_image_sharpness_astra(self):
+        corr = CofR_image_sharpness(search_range=20, FBP=AstraFBP)
+        corr.set_input(self.data_DLS.clone())
+        ad_out = corr.get_output()
+        self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=1)     
+
+
+    @unittest.skipUnless(False, "TIGRE not installed")
+    def skiptest_test_CofR_image_sharpness_tigre(self): #currently not avaliable for parallel beam
+        corr = CofR_image_sharpness(search_range=20, FBP=TigreFBP)
+        corr.set_input(self.data_DLS.clone())
+        ad_out = corr.get_output()
+        self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
 
     def test_CenterOfRotationCorrector(self):       
-        corr = CentreOfRotationCorrector.xcorr(slice_index='centre', projection_index=0, ang_tol=0.1)
+        corr = CentreOfRotationCorrector.xcorrelation(slice_index='centre', projection_index=0, ang_tol=0.1)
         corr.set_input(self.data_DLS.clone())
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
         
-        corr = CentreOfRotationCorrector.xcorr(slice_index=67, projection_index=0, ang_tol=0.1)
+        corr = CentreOfRotationCorrector.xcorrelation(slice_index=67, projection_index=0, ang_tol=0.1)
         corr.set_input(self.data_DLS.clone())
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)              
 
-    def test_Normaliser(self):
-        pass         
 
+class TestCentreOfRotation_conebeam(unittest.TestCase):
+
+    def setUp(self):
+        angles = numpy.linspace(0, 360, 180, endpoint=False)
+
+        ag_orig = AcquisitionGeometry.create_Cone2D([0,-100],[0,100])\
+            .set_panel(64,0.2)\
+            .set_angles(angles)\
+            .set_labels(['angle', 'horizontal'])
+
+        ig = ag_orig.get_ImageGeometry()
+        phantom = TomoPhantom.get_ImageData(12, ig)
+
+        Op = ProjectionOperator(ig, ag_orig, device='gpu')
+        self.data_0 = Op.direct(phantom)
+
+        ag_offset = AcquisitionGeometry.create_Cone2D([0,-100],[0,100],rotation_axis_position=(-0.150,0))\
+            .set_panel(64,0.2)\
+            .set_angles(angles)\
+            .set_labels(['angle', 'horizontal'])
+
+        Op = ProjectionOperator(ig, ag_offset, device='gpu')
+        self.data_offset = Op.direct(phantom)
+        self.data_offset.geometry = ag_orig
+
+    @unittest.skipUnless(has_tomophantom and has_astra, "Tomophantom or ASTRA not installed")
+    def test_CofR_image_sharpness_astra(self):
+        corr = CofR_image_sharpness(FBP=AstraFBP)
+        ad_out = corr(self.data_0)
+        self.assertAlmostEqual(0.000, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
+
+        corr = CofR_image_sharpness(FBP=AstraFBP)
+        ad_out = corr(self.data_offset)
+        self.assertAlmostEqual(-0.150, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
+
+    @unittest.skipUnless(has_tomophantom and has_tigre, "Tomophantom or TIGRE not installed")
+    def test_CofR_image_sharpness_tigre(self): #currently not avaliable for parallel beam
+        corr = CofR_image_sharpness(FBP=TigreFBP)
+        ad_out = corr(self.data_0)
+        self.assertAlmostEqual(0.000, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
+
+        corr = CofR_image_sharpness(FBP=TigreFBP)
+        ad_out = corr(self.data_offset)
+        self.assertAlmostEqual(-0.150, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
+
+class TestDataProcessor(unittest.TestCase):
+   
     def test_DataProcessorBasic(self):
 
         dc_in = DataContainer(numpy.arange(10), True)
@@ -534,19 +626,19 @@ class TestDataProcessor(unittest.TestCase):
         #[ 0 60  1 61  2 62  3 63  4 64  5 65  6 66  7 67  8 68  9 69 10 70 11 71
         # 12 72 13 73 14 74 15 75 16 76 17 77 18 78 19 79]
         
-        print(arr)
+        #print(arr)
     
         ax = AX()
         ax.scalar = 2
         ax.set_input(c)
         #ax.apply()
-        print ("ax  in {0} out {1}".format(c.as_array().flatten(),
-               ax.get_output().as_array().flatten()))
+        #print ("ax  in {0} out {1}".format(c.as_array().flatten(),
+        #       ax.get_output().as_array().flatten()))
         
         numpy.testing.assert_array_equal(ax.get_output().as_array(), arr*2)
                 
         
-        print("check call method of DataProcessor")
+        #print("check call method of DataProcessor")
         numpy.testing.assert_array_equal(ax(c).as_array(), arr*2)
         
         cast = CastDataContainer(dtype=numpy.float32)
@@ -560,7 +652,7 @@ class TestDataProcessor(unittest.TestCase):
         axm.get_output(out)
         numpy.testing.assert_array_equal(out.as_array(), arr*0.5)
         
-        print("check call method of DataProcessor")
+        #print("check call method of DataProcessor")
         numpy.testing.assert_array_equal(axm(c).as_array(), arr*0.5)        
     
         
@@ -580,7 +672,7 @@ class TestDataProcessor(unittest.TestCase):
         self.assertTrue(v.max() == 19)
         self.assertTrue(v.min() == -79)
         
-        print ("clip in {0} out {1}".format(c.as_array(), clip.get_output().as_array()))
+        #print ("clip in {0} out {1}".format(c.as_array(), clip.get_output().as_array()))
         
         #dsp = DataProcessor()
         #dsp.set_input(ds)
@@ -590,10 +682,10 @@ class TestDataProcessor(unittest.TestCase):
         chain = AX()
         chain.scalar = 0.5
         chain.set_input_processor(ax)
-        print ("chain in {0} out {1}".format(ax.get_output().as_array(), chain.get_output().as_array()))
+        #print ("chain in {0} out {1}".format(ax.get_output().as_array(), chain.get_output().as_array()))
         numpy.testing.assert_array_equal(chain.get_output().as_array(), arr)
         
-        print("check call method of DataProcessor")
+        #print("check call method of DataProcessor")
         numpy.testing.assert_array_equal(ax(chain(c)).as_array(), arr)        
 
 class TestMaskGenerator(unittest.TestCase):       
@@ -817,11 +909,11 @@ class TestTransmissionAbsorptionConverter(unittest.TestCase):
         self.assertTrue(data_exp.geometry == AG)
         numpy.testing.assert_allclose(data_exp.as_array(), data_new, rtol=1E-6)
         
-        s.process(out=ad)
+        data_exp.fill(0)
+        s.process(out=data_exp)
         
-        self.assertTrue(ad.geometry == AG)
-        numpy.testing.assert_allclose(data_exp.as_array(), ad.as_array(), rtol=1E-6)
-    
+        self.assertTrue(data_exp.geometry == AG)
+        numpy.testing.assert_allclose(data_exp.as_array(), data_new, rtol=1E-6)
 
 class TestAbsorptionTransmissionConverter(unittest.TestCase):
 
@@ -860,10 +952,11 @@ class TestAbsorptionTransmissionConverter(unittest.TestCase):
         self.assertTrue(data_exp.geometry == AG)
         numpy.testing.assert_allclose(data_exp.as_array(), numpy.exp(-ad.as_array())*10, rtol=1E-6)
         
-        s.process(out=ad)
+        data_exp.fill(0)
+        s.process(out=data_exp)
         
-        self.assertTrue(ad.geometry == AG)
-        numpy.testing.assert_allclose(data_exp.as_array(), ad.as_array(), rtol=1E-6)       
+        self.assertTrue(data_exp.geometry == AG)
+        numpy.testing.assert_allclose(data_exp.as_array(), numpy.exp(-ad.as_array())*10, rtol=1E-6)  
 
 
 class TestMasker(unittest.TestCase):       

@@ -50,12 +50,16 @@ import os, sys, time
 # Fast Gradient Projection algorithm for Total Variation(TV)
 from cil.optimisation.functions import TotalVariation
 
+from utils import has_gpu_tigre, has_gpu_astra
+
 try:
     from cil.plugins.astra import ProjectionOperator
     has_astra = True    
 except ImportError as ie:
     # skip test
     has_astra = False
+
+has_astra = has_astra and has_gpu_astra()
 
 debug_print = False
 

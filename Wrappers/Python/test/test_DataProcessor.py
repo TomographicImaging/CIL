@@ -36,6 +36,9 @@ from cil.processors import Slicer, Binner, MaskGenerator, Masker
 import wget
 import os
 
+from utils import has_gpu_tigre, has_gpu_astra
+
+
 try:
     import tigre
     has_tigre = True
@@ -59,13 +62,16 @@ else:
 
 try:
     import astra
+    from cil.plugins.astra import FBP as AstraFBP
+    from cil.plugins.astra import ProjectionOperator
     has_astra = True
 except ModuleNotFoundError:
     has_astra = False
-else:
-    from cil.plugins.astra import FBP as AstraFBP
-    from cil.plugins.astra import ProjectionOperator
 
+
+
+has_astra = has_astra and has_gpu_astra()
+has_tigre = has_tigre and has_gpu_tigre()
 
 
 class TestBinner(unittest.TestCase):

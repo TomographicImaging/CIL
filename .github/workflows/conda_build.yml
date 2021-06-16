@@ -26,3 +26,4 @@ jobs:
         subDir: 'recipe'
         channels: 'conda-forge -c astra-toolbox/label/dev -c cvxgrp -c ccpi'
         convert_win: false
+        convert_osx: false

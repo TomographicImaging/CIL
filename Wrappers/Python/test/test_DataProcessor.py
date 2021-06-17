@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 #   This work is part of the Core Imaging Library (CIL) developed by CCPi 
 #   (Collaborative Computational Project in Tomographic Imaging), with 
@@ -32,7 +33,7 @@ from cil.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 from cil.io import NEXUSDataReader
 from cil.processors import CentreOfRotationCorrector, CofR_xcorrelation, CofR_image_sharpness
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
-from cil.processors import Slicer, Binner, MaskGenerator, Masker
+from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder
 import wget
 import os
 
@@ -67,10 +68,184 @@ else:
     from cil.plugins.astra import ProjectionOperator
 
 
+class TestPadder(unittest.TestCase):
+    def test_Padder(self):
+        ray_direction = [0.1, 3.0]
+        detector_position = [-1.3, 1000.0]
+        detector_direction_row = [1.0, 0.2]
+        rotation_axis_position = [0.1, 2.0]
+
+        AG = AcquisitionGeometry.create_Parallel2D(ray_direction=ray_direction, 
+                                                    detector_position=detector_position, 
+                                                    detector_direction_x=detector_direction_row, 
+                                                    rotation_axis_position=rotation_axis_position)
+
+        # test int shortcut
+        angles = numpy.linspace(0, 360, 10, dtype=numpy.float32)
+
+        AG.set_channels(num_channels=10)
+        AG.set_angles(angles, initial_angle=10, angle_unit='radian')
+        AG.set_panel(5, pixel_size=0.1)
+
+        data = AG.allocate('random')
+
+        b = Padder.constant(pad_width=5)
+        b.set_input(data)
+        data_padded = b.process()
+
+        data_new = numpy.zeros((20,20,15), dtype=numpy.float32)
+        data_new[5:15,5:15,5:10] = data.as_array()
+        new_angles = numpy.zeros((20,), dtype=numpy.float32)
+        new_angles[5:15] = angles
+
+        geometry_padded = AG.copy()
+        geometry_padded.set_channels(num_channels=20)
+        geometry_padded.set_panel(15, pixel_size=0.1)
+        geometry_padded.set_angles(new_angles, initial_angle=10, angle_unit='radian')
+                
+        self.assertTrue(data_padded.geometry == geometry_padded)
+        numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
+
+        # test tuple
+        b = Padder.constant(pad_width=(5,2))
+        b.set_input(data)
+        data_padded = b.process()
+
+        data_new = numpy.zeros((17,17,12), dtype=numpy.float32)
+        data_new[5:15,5:15,5:10] = data.as_array()
+        new_angles = numpy.zeros((17,), dtype=numpy.float32)
+        new_angles[5:15] = angles
+
+        geometry_padded = AG.copy()
+        geometry_padded.set_channels(num_channels=17)
+        geometry_padded.set_panel(12, pixel_size=0.1)
+        geometry_padded.set_angles(new_angles, initial_angle=10, angle_unit='radian')
+                
+        self.assertTrue(data_padded.geometry == geometry_padded)
+        numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
+
+        # test dictionary + constant values
+        b = Padder.constant(pad_width={'channel':(5,2)}, constant_values=5)
+        b.set_input(data)
+        data_padded = b.process()
+
+        data_new = 5*numpy.ones((17,10,5), dtype=numpy.float32)
+        data_new[5:15,:,:] = data.as_array()
+
+        geometry_padded = AG.copy()
+        geometry_padded.set_channels(num_channels=17)
+
+        self.assertTrue(data_padded.geometry == geometry_padded)
+        numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
+
+        # test edge
+        b = Padder.edge(pad_width={'horizontal':(1,2)})
+        b.set_input(data)
+        data_padded = b.process()
+
+        data_new = numpy.ones((10,10,8), dtype=numpy.float32)
+        data_new[:,:,1:-2] = data.as_array()
+        data_new[:,:,0] = data.as_array()[:,:,0]
+        data_new[:,:,-1] = data.as_array()[:,:,-1]
+        data_new[:,:,-2] = data.as_array()[:,:,-1]
+
+        geometry_padded = AG.copy()
+        geometry_padded.set_panel(8, pixel_size=0.1)
+
+        self.assertTrue(data_padded.geometry == geometry_padded)
+        numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
+
+        #test linear_ramp
+        b = Padder.linear_ramp(pad_width={'channel':(0,2)}, end_values=5)
+        b.set_input(data)
+        data_padded = b.process()
+
+        data_new = numpy.ones((12,10,5), dtype=numpy.float32)
+        data_new[:10,:,:] = data.as_array()
+        data_new[10,:,:] = (data.as_array()[-1,:,:]+5) / 2
+        data_new[11,:,:] = 5
+
+        geometry_padded = AG.copy()
+        geometry_padded.set_channels(num_channels=12)
+
+        self.assertTrue(data_padded.geometry == geometry_padded)
+        numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
+
+        #test ImageData
+        IG = ImageGeometry(voxel_num_x=2,
+                            voxel_num_y=3,
+                            voxel_num_z=12,
+                            voxel_size_x=0.1,
+                            voxel_size_y=0.2,
+                            voxel_size_z=0.3,
+                            channels=10,
+                            center_x=0.2,
+                            center_y=0.4,
+                            center_z=0.6,
+                            dimension_labels = ['vertical',\
+                                                'channel',\
+                                                'horizontal_y',\
+                                                'horizontal_x'])
+                
+        data = IG.allocate('random')
+
+        b = Padder.constant(pad_width={'channel':(0,2), 'vertical':(4,5)}, constant_values=10)
+        b.set_input(data)
+        data_padded = b.process()
+
+        data_new = 10*numpy.ones((21,12,3,2), dtype=numpy.float32)
+        data_new[4:-5,:-2,:,:] = data.as_array()
+
+        geometry_padded = ImageGeometry(voxel_num_x=2,
+                            voxel_num_y=3,
+                            voxel_num_z=21,
+                            voxel_size_x=0.1,
+                            voxel_size_y=0.2,
+                            voxel_size_z=0.3,
+                            channels=12,
+                            center_x=0.2,
+                            center_y=0.4,
+                            center_z=0.6,
+                            dimension_labels = ['vertical',\
+                                                'channel',\
+                                                'horizontal_y',\
+                                                'horizontal_x'])
+
+        self.assertTrue(data_padded.geometry == geometry_padded)
+        numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
+
+        # test padding with diffrent values
+        b = Padder.constant(pad_width={'channel':(2,2)}, constant_values=(4,5))
+        b.set_input(data)
+        data_padded = b.process()
+
+        data_new = numpy.ones((12,14,3,2), dtype=numpy.float32)
+        data_new[:,:2,:,:] = 4
+        data_new[:,-2:,:,:] = 5
+        data_new[:,2:-2,:,:] = data.as_array()
+
+        geometry_padded = ImageGeometry(voxel_num_x=2,
+                            voxel_num_y=3,
+                            voxel_num_z=12,
+                            voxel_size_x=0.1,
+                            voxel_size_y=0.2,
+                            voxel_size_z=0.3,
+                            channels=14,
+                            center_x=0.2,
+                            center_y=0.4,
+                            center_z=0.6,
+                            dimension_labels = ['vertical',\
+                                                'channel',\
+                                                'horizontal_y',\
+                                                'horizontal_x'])
+
+        self.assertTrue(data_padded.geometry == geometry_padded)
+        numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
+
+
 
 class TestBinner(unittest.TestCase):
     def test_Binner(self):
-        #%%
         #test parallel 2D case
         
         ray_direction = [0.1, 3.0]

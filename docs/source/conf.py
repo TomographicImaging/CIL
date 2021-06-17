@@ -15,6 +15,7 @@
 import os
 import sys
 import re
+from cil import version
 sys.path.insert(0, os.path.abspath('../../Wrappers/Python/'))
 
 # -- Project information -----------------------------------------------------
@@ -26,8 +27,9 @@ copyright = '2017-2021 UKRI-STFC, University of Manchester'
 author = 'Edoardo Pasca'
 
 # The short X.Y version
-version = re.sub('^v', '', os.popen('git describe').read().strip())
+version = version.version
 version = version.split('-')[0]
+release = version
 
 # -- General configuration ---------------------------------------------------
 

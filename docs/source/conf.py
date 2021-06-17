@@ -15,8 +15,10 @@
 import os
 import sys
 import re
-from cil import version
+
 sys.path.insert(0, os.path.abspath('../../Wrappers/Python/'))
+
+from cil import version
 
 # -- Project information -----------------------------------------------------
 

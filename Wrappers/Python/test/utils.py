@@ -13,14 +13,19 @@ try:
 except ModuleNotFoundError:
     has_astra = False
 
-    
-
+import os
 from cil.framework import AcquisitionGeometry, ImageGeometry
 import numpy as np
 
 
-def has_gpu_tigre():
+def has_nvidia_smi():
+    return os.system('nvidia-smi') == 0
 
+
+def has_gpu_tigre():
+    print ("has_gpu_tigre")
+    if not has_nvidia_smi():
+        return False
     N = 3
     angles = np.linspace(0, np.pi, 2, dtype='float32')
 
@@ -43,6 +48,9 @@ def has_gpu_tigre():
     return has_gpu
 
 def has_gpu_astra():
+    print ("has_gpu_astra")
+    if not has_nvidia_smi():
+        return False
     has_gpu = True
     try:
         astra.test_CUDA()

@@ -69,7 +69,7 @@ else:
 
 
 class TestPadder(unittest.TestCase):
-    def test_Padder(self):
+    def setUp(self):
         ray_direction = [0.1, 3.0]
         detector_position = [-1.3, 1000.0]
         detector_direction_row = [1.0, 0.2]
@@ -81,63 +81,159 @@ class TestPadder(unittest.TestCase):
                                                     rotation_axis_position=rotation_axis_position)
 
         # test int shortcut
-        angles = numpy.linspace(0, 360, 10, dtype=numpy.float32)
+        self.num_angles = 10
+        angles = numpy.linspace(0, 360, self.num_angles, dtype=numpy.float32)
 
-        AG.set_channels(num_channels=10)
+        self.num_channels = 10
+        self.num_pixels = 5
+        AG.set_channels(num_channels=self.num_channels)
         AG.set_angles(angles, initial_angle=10, angle_unit='radian')
-        AG.set_panel(5, pixel_size=0.1)
+        AG.set_panel(self.num_pixels, pixel_size=0.1)
 
         data = AG.allocate('random')
+        
+        self.data = data
+        self.AG = AG
 
-        b = Padder.constant(pad_width=5)
+    def test_constant_with_int(self):
+        data = self.data
+        AG = self.AG
+        num_pad = 5
+        b = Padder.constant(pad_width=num_pad)
         b.set_input(data)
         data_padded = b.process()
 
-        data_new = numpy.zeros((20,20,15), dtype=numpy.float32)
-        data_new[5:15,5:15,5:10] = data.as_array()
-        new_angles = numpy.zeros((20,), dtype=numpy.float32)
-        new_angles[5:15] = angles
+        data_new = numpy.zeros((self.num_channels + 2*num_pad, self.num_angles, self.num_pixels + 2*num_pad), dtype=numpy.float32)
+        data_new[5:15,:,5:10] = data.as_array()
+        # new_angles = numpy.zeros((20,), dtype=numpy.float32)
+        # new_angles[5:15] = angles
 
         geometry_padded = AG.copy()
         geometry_padded.set_channels(num_channels=20)
         geometry_padded.set_panel(15, pixel_size=0.1)
-        geometry_padded.set_angles(new_angles, initial_angle=10, angle_unit='radian')
+        # geometry_padded.set_angles(new_angles, initial_angle=10, angle_unit='radian')
                 
         self.assertTrue(data_padded.geometry == geometry_padded)
         numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
-
+    
+    def test_constant_with_tuple(self):
+        data = self.data
+        AG = self.AG
         # test tuple
-        b = Padder.constant(pad_width=(5,2))
+        pad_tuple = (5,2)
+        b = Padder.constant(pad_width=pad_tuple)
         b.set_input(data)
         data_padded = b.process()
 
-        data_new = numpy.zeros((17,17,12), dtype=numpy.float32)
-        data_new[5:15,5:15,5:10] = data.as_array()
-        new_angles = numpy.zeros((17,), dtype=numpy.float32)
-        new_angles[5:15] = angles
+        data_new = numpy.zeros((self.num_channels + sum(pad_tuple), self.num_angles, self.num_pixels + sum(pad_tuple)),\
+                     dtype=numpy.float32)
+        data_new[pad_tuple[0]:-pad_tuple[1],\
+            :,\
+                pad_tuple[0]:-pad_tuple[1]] = data.as_array()
+        # new_angles = numpy.zeros((17,), dtype=numpy.float32)
+        # new_angles[5:15] = angles
 
         geometry_padded = AG.copy()
-        geometry_padded.set_channels(num_channels=17)
-        geometry_padded.set_panel(12, pixel_size=0.1)
-        geometry_padded.set_angles(new_angles, initial_angle=10, angle_unit='radian')
+        geometry_padded.set_channels(num_channels=self.num_channels+sum(pad_tuple))
+        geometry_padded.set_panel(self.num_pixels+sum(pad_tuple), pixel_size=0.1)
+        # geometry_padded.set_angles(new_angles, initial_angle=10, angle_unit='radian')
                 
         self.assertTrue(data_padded.geometry == geometry_padded)
         numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
 
+    def test_constant_with_dictionary(self):
+        data = self.data
+        AG = self.AG
         # test dictionary + constant values
-        b = Padder.constant(pad_width={'channel':(5,2)}, constant_values=5)
+        pad_tuple = (5,2)
+        const = 5.0
+        b = Padder.constant(pad_width={'channel':pad_tuple}, constant_values=const)
         b.set_input(data)
         data_padded = b.process()
 
-        data_new = 5*numpy.ones((17,10,5), dtype=numpy.float32)
-        data_new[5:15,:,:] = data.as_array()
+        data_new = const * numpy.ones((self.num_channels + sum(pad_tuple), self.num_angles, self.num_pixels),\
+                     dtype=numpy.float32)
 
+        # data_new = 5*numpy.ones((10,10,5), dtype=numpy.float32)
+        data_new[pad_tuple[0]:-pad_tuple[1],:,:] = data.as_array()
+        geometry_padded = AG.copy()
+        geometry_padded.set_channels(num_channels=17)
+
+        self.assertTrue(data_padded.geometry == geometry_padded)
+        numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
+    
+    def test_edge_with_int(self):
+        AG = self.AG
+        value = -11.
+        data = self.AG.allocate(value)
+        
+        num_pad = 5
+        b = Padder.edge(pad_width=num_pad)
+        b.set_input(data)
+        data_padded = b.process()
+
+        data_new = value * numpy.ones((self.num_channels + 2*num_pad, self.num_angles, self.num_pixels + 2*num_pad), dtype=numpy.float32)
+        data_new[5:15,:,5:10] = data.as_array()
+
+        # new_angles = numpy.zeros((20,), dtype=numpy.float32)
+        # new_angles[5:15] = angles
+
+        geometry_padded = AG.copy()
+        geometry_padded.set_channels(num_channels=20)
+        geometry_padded.set_panel(15, pixel_size=0.1)
+        # geometry_padded.set_angles(new_angles, initial_angle=10, angle_unit='radian')
+                
+        self.assertTrue(data_padded.geometry == geometry_padded)
+        numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
+    
+    def test_edge_with_tuple(self):
+        AG = self.AG
+        value = -11.
+        data = self.AG.allocate(value)
+        # test tuple
+        pad_tuple = (5,2)
+        b = Padder.edge(pad_width=pad_tuple)
+        b.set_input(data)
+        data_padded = b.process()
+
+        data_new = value * numpy.ones((self.num_channels + sum(pad_tuple), self.num_angles, self.num_pixels + sum(pad_tuple)),\
+                     dtype=numpy.float32)
+        data_new[pad_tuple[0]:-pad_tuple[1],\
+            :,\
+                pad_tuple[0]:-pad_tuple[1]] = data.as_array()
+        # new_angles = numpy.zeros((17,), dtype=numpy.float32)
+        # new_angles[5:15] = angles
+
+        geometry_padded = AG.copy()
+        geometry_padded.set_channels(num_channels=self.num_channels+sum(pad_tuple))
+        geometry_padded.set_panel(self.num_pixels+sum(pad_tuple), pixel_size=0.1)
+        # geometry_padded.set_angles(new_angles, initial_angle=10, angle_unit='radian')
+                
+        self.assertTrue(data_padded.geometry == geometry_padded)
+        numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
+
+    def test_edge_with_dictionary(self):
+        AG = self.AG
+        value = -11.
+        data = self.AG.allocate(value)
+        # test dictionary + constant values
+        pad_tuple = (5,2)
+        b = Padder.edge(pad_width={'channel':pad_tuple})
+        b.set_input(data)
+        data_padded = b.process()
+
+        data_new = value * numpy.ones((self.num_channels + sum(pad_tuple), self.num_angles, self.num_pixels),\
+                     dtype=numpy.float32)
+
+        # data_new = 5*numpy.ones((10,10,5), dtype=numpy.float32)
+        data_new[pad_tuple[0]:-pad_tuple[1],:,:] = data.as_array()
         geometry_padded = AG.copy()
         geometry_padded.set_channels(num_channels=17)
 
         self.assertTrue(data_padded.geometry == geometry_padded)
         numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
 
+    def skip_test(self):
         # test edge
         b = Padder.edge(pad_width={'horizontal':(1,2)})
         b.set_input(data)

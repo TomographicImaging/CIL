@@ -141,7 +141,7 @@ class TestPadder(unittest.TestCase):
         self.assertTrue(data_padded.geometry == geometry_padded)
         numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
 
-    def test_constant_with_dictionary(self):
+    def test_constant_with_dictionary1(self):
         data = self.data
         AG = self.AG
         # test dictionary + constant values
@@ -159,6 +159,30 @@ class TestPadder(unittest.TestCase):
         geometry_padded = AG.copy()
         geometry_padded.set_channels(num_channels=17)
 
+        self.assertTrue(data_padded.geometry == geometry_padded)
+        numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
+    
+    def test_constant_with_dictionary2(self):
+        data = self.data
+        AG = self.AG
+        # test dictionary + constant values
+        pad_tuple1 = (5,2)
+        pad_tuple2 = (2,5)
+        const = 5.0
+        b = Padder.constant(pad_width={'channel':pad_tuple1, 'horizontal':pad_tuple2}, constant_values=const)
+        b.set_input(data)
+        data_padded = b.process()
+
+        data_new = const * numpy.ones((self.num_channels + sum(pad_tuple1), self.num_angles, \
+            self.num_pixels + sum(pad_tuple2)),\
+                     dtype=numpy.float32)
+
+        # data_new = 5*numpy.ones((10,10,5), dtype=numpy.float32)
+        data_new[pad_tuple1[0]:-pad_tuple1[1],:,pad_tuple2[0]:-pad_tuple2[1]] = data.as_array()
+        geometry_padded = AG.copy()
+        geometry_padded.set_channels(num_channels=17)
+        geometry_padded.set_panel(self.num_pixels + sum(pad_tuple2),pixel_size=0.1)
+        
         self.assertTrue(data_padded.geometry == geometry_padded)
         numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
     
@@ -233,111 +257,80 @@ class TestPadder(unittest.TestCase):
         self.assertTrue(data_padded.geometry == geometry_padded)
         numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
 
-    def skip_test(self):
-        # test edge
-        b = Padder.edge(pad_width={'horizontal':(1,2)})
+    def test_linear_ramp_with_int(self):
+        AG = self.AG
+        value = -11.
+        data = self.AG.allocate(value)
+        
+        num_pad = 5
+        b = Padder.linear_ramp(pad_width=num_pad)
         b.set_input(data)
         data_padded = b.process()
 
-        data_new = numpy.ones((10,10,8), dtype=numpy.float32)
-        data_new[:,:,1:-2] = data.as_array()
-        data_new[:,:,0] = data.as_array()[:,:,0]
-        data_new[:,:,-1] = data.as_array()[:,:,-1]
-        data_new[:,:,-2] = data.as_array()[:,:,-1]
+        data_new = 0 * numpy.ones((self.num_channels + 2*num_pad, self.num_angles, self.num_pixels + 2*num_pad), dtype=numpy.float32)
+        data_new[5:15,:,5:10] = data.as_array()
+
+        # new_angles = numpy.zeros((20,), dtype=numpy.float32)
+        # new_angles[5:15] = angles
 
         geometry_padded = AG.copy()
-        geometry_padded.set_panel(8, pixel_size=0.1)
-
-        self.assertTrue(data_padded.geometry == geometry_padded)
-        numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
-
-        #test linear_ramp
-        b = Padder.linear_ramp(pad_width={'channel':(0,2)}, end_values=5)
-        b.set_input(data)
-        data_padded = b.process()
-
-        data_new = numpy.ones((12,10,5), dtype=numpy.float32)
-        data_new[:10,:,:] = data.as_array()
-        data_new[10,:,:] = (data.as_array()[-1,:,:]+5) / 2
-        data_new[11,:,:] = 5
-
-        geometry_padded = AG.copy()
-        geometry_padded.set_channels(num_channels=12)
-
-        self.assertTrue(data_padded.geometry == geometry_padded)
-        numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
-
-        #test ImageData
-        IG = ImageGeometry(voxel_num_x=2,
-                            voxel_num_y=3,
-                            voxel_num_z=12,
-                            voxel_size_x=0.1,
-                            voxel_size_y=0.2,
-                            voxel_size_z=0.3,
-                            channels=10,
-                            center_x=0.2,
-                            center_y=0.4,
-                            center_z=0.6,
-                            dimension_labels = ['vertical',\
-                                                'channel',\
-                                                'horizontal_y',\
-                                                'horizontal_x'])
+        geometry_padded.set_channels(num_channels=20)
+        geometry_padded.set_panel(15, pixel_size=0.1)
+        # geometry_padded.set_angles(new_angles, initial_angle=10, angle_unit='radian')
                 
-        data = IG.allocate('random')
-
-        b = Padder.constant(pad_width={'channel':(0,2), 'vertical':(4,5)}, constant_values=10)
+        self.assertTrue(data_padded.geometry == geometry_padded)
+        # numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
+        self.assertAlmostEqual(data_padded.as_array().ravel()[0] , 0.)
+        self.assertAlmostEqual(data_padded.as_array().ravel()[-1] , 0.)
+    
+    def test_linear_ramp_with_tuple(self):
+        AG = self.AG
+        value = -11.
+        data = self.AG.allocate(value)
+        # test tuple
+        pad_tuple = (5,2)
+        b = Padder.edge(pad_width=pad_tuple)
         b.set_input(data)
         data_padded = b.process()
 
-        data_new = 10*numpy.ones((21,12,3,2), dtype=numpy.float32)
-        data_new[4:-5,:-2,:,:] = data.as_array()
+        data_new = value * numpy.ones((self.num_channels + sum(pad_tuple), self.num_angles, self.num_pixels + sum(pad_tuple)),\
+                     dtype=numpy.float32)
+        data_new[pad_tuple[0]:-pad_tuple[1],\
+            :,\
+                pad_tuple[0]:-pad_tuple[1]] = data.as_array()
+        # new_angles = numpy.zeros((17,), dtype=numpy.float32)
+        # new_angles[5:15] = angles
 
-        geometry_padded = ImageGeometry(voxel_num_x=2,
-                            voxel_num_y=3,
-                            voxel_num_z=21,
-                            voxel_size_x=0.1,
-                            voxel_size_y=0.2,
-                            voxel_size_z=0.3,
-                            channels=12,
-                            center_x=0.2,
-                            center_y=0.4,
-                            center_z=0.6,
-                            dimension_labels = ['vertical',\
-                                                'channel',\
-                                                'horizontal_y',\
-                                                'horizontal_x'])
-
+        geometry_padded = AG.copy()
+        geometry_padded.set_channels(num_channels=self.num_channels+sum(pad_tuple))
+        geometry_padded.set_panel(self.num_pixels+sum(pad_tuple), pixel_size=0.1)
+        # geometry_padded.set_angles(new_angles, initial_angle=10, angle_unit='radian')
+                
         self.assertTrue(data_padded.geometry == geometry_padded)
         numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
 
-        # test padding with diffrent values
-        b = Padder.constant(pad_width={'channel':(2,2)}, constant_values=(4,5))
+    def test_linear_ramp_with_dictionary(self):
+        AG = self.AG
+        value = -11.
+        data = self.AG.allocate(value)
+        # test dictionary + constant values
+        pad_tuple = (5,2)
+        b = Padder.edge(pad_width={'channel':pad_tuple})
         b.set_input(data)
         data_padded = b.process()
 
-        data_new = numpy.ones((12,14,3,2), dtype=numpy.float32)
-        data_new[:,:2,:,:] = 4
-        data_new[:,-2:,:,:] = 5
-        data_new[:,2:-2,:,:] = data.as_array()
+        data_new = value * numpy.ones((self.num_channels + sum(pad_tuple), self.num_angles, self.num_pixels),\
+                     dtype=numpy.float32)
 
-        geometry_padded = ImageGeometry(voxel_num_x=2,
-                            voxel_num_y=3,
-                            voxel_num_z=12,
-                            voxel_size_x=0.1,
-                            voxel_size_y=0.2,
-                            voxel_size_z=0.3,
-                            channels=14,
-                            center_x=0.2,
-                            center_y=0.4,
-                            center_z=0.6,
-                            dimension_labels = ['vertical',\
-                                                'channel',\
-                                                'horizontal_y',\
-                                                'horizontal_x'])
+        # data_new = 5*numpy.ones((10,10,5), dtype=numpy.float32)
+        data_new[pad_tuple[0]:-pad_tuple[1],:,:] = data.as_array()
+        geometry_padded = AG.copy()
+        geometry_padded.set_channels(num_channels=17)
 
         self.assertTrue(data_padded.geometry == geometry_padded)
         numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
-
+    
+    
 
 
 class TestBinner(unittest.TestCase):

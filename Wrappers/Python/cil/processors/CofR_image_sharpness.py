@@ -206,7 +206,7 @@ class CofR_image_sharpness(Processor):
             self.search_range = width //4
 
         if self.initial_binning is None:
-            self.initial_binning = int(np.ceil(width / 128))
+            self.initial_binning = min(int(np.ceil(width / 128)),16)
 
         logger.debug("Initial search:")
         logger.debug("search range is %d", self.search_range)
@@ -242,8 +242,9 @@ class CofR_image_sharpness(Processor):
         ig = data_processed.geometry.get_ImageGeometry()
 
         #binned grid search
-        vox_rad = self.search_range //self.initial_binning
-        offsets = np.linspace(-vox_rad, vox_rad, int(2*vox_rad + 1)) * ig.voxel_size_x
+        vox_rad = np.ceil(self.search_range /self.initial_binning)
+        steps = int(4*vox_rad + 1)
+        offsets = np.linspace(-vox_rad, vox_rad, steps) * ig.voxel_size_x
         obj_vals = []
 
         for offset in offsets:

@@ -4,6 +4,7 @@
   - show_geometry implemented to display AcquisitionGeometry objects, can be imported from utilities.display
   - CentreOfRotationCorrector.image_sharpness implemented which finds the rotation axis offset by maximising sharpness of a single slice reconstruction
   - CentreOfRotationCorrector.xcorr renamed to CentreOfRotationCorrector.xcorrelation
+  - Implemented Padder processor
 
 * 21.1.0
   - Added TomoPhantom plugin to create 2D/3D + channel ImageData phantoms based on the TomoPhantom model library

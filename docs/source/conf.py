@@ -28,9 +28,7 @@ copyright = '2017-2021 UKRI-STFC, University of Manchester'
 
 author = 'Edoardo Pasca'
 
-# The short X.Y version
 version = version.version
-version = version.split('-')[0]
 release = version
 
 # -- General configuration ---------------------------------------------------

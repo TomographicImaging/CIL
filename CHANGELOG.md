@@ -1,9 +1,9 @@
-* 21.x.x
+* 21.2.0
   - add version string from git describe
   - add CCPi-Regularisation toolkit in unittests
   - show_geometry implemented to display AcquisitionGeometry objects, can be imported from utilities.display
   - CentreOfRotationCorrector.image_sharpness implemented which finds the rotation axis offset by maximising sharpness of a single slice reconstruction
-  - CentreOfRotationCorrector.xcorr renamed to CentreOfRotationCorrector.xcorrelation
+  - Renamed CentreOfRotationCorrector.xcorr to CentreOfRotationCorrector.xcorrelation
   - Implemented Padder processor
 
 * 21.1.0

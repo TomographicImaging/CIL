@@ -288,14 +288,14 @@ class ScaledFunction(Function):
         return self.function.proximal(x, tau*self.scalar, out=out)     
 
 
-    def proximal_conjugate(self, x, tau, out = None):
-        r"""This returns the proximal operator for the function at x, tau
-        """
-        if out is None:
-            return self.scalar * self.function.proximal_conjugate(x/self.scalar, tau/self.scalar)
-        else:
-            self.function.proximal_conjugate(x/self.scalar, tau/self.scalar, out=out)
-            out *= self.scalar
+    # def proximal_conjugate(self, x, tau, out = None):
+    #     r"""This returns the proximal operator for the function at x, tau
+    #     """
+    #     if out is None:
+    #         return self.scalar * self.function.proximal_conjugate(x/self.scalar, tau/self.scalar)
+    #     else:
+    #         self.function.proximal_conjugate(x/self.scalar, tau/self.scalar, out=out)
+    #         out *= self.scalar
 
 class SumScalarFunction(SumFunction):
           

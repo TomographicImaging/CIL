@@ -502,93 +502,163 @@ class KullbackLeibler(Function):
                 out *= 0.5
 
 
+# -*- coding: utf-8 -*-
+# Copyright 2019 Science Technology Facilities Council
+# Copyright 2019 University of Manchester
+#
+# This work is part of the Core Imaging Library developed by Science Technology
+# Facilities Council and University of Manchester
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 
-if __name__ == '__main__':
-    
-    from cil.framework import ImageGeometry
-    import numpy as np
-    
-    M, N, K =  30, 30, 20
-    ig = ImageGeometry(N, M, K)
-    
-    u1 = ig.allocate('random', seed = 500)    
-    g1 = ig.allocate('random', seed = 100)
-    b1 = ig.allocate('random', seed = 500)
-    
-    # with no data
-    try:
-        f = KullbackLeibler()   
-    except ValueError:
-        print('Give data b=...\n')
+class SmoothKullbackLeibler(Function):
         
-    print('With negative data, no background\n')   
-    try:        
-        f = KullbackLeibler(b=-1*g1)
-    except ValueError:
-        print('We have negative data\n') 
+    """The smooth version of the Kullback-Leibler divergence functional.
+
+    References
+    ----------
+    [CERS2017] A. Chambolle, M. J. Ehrhardt, P. Richtarik and C.-B. Schoenlieb,
+    *Stochastic Primal-Dual Hybrid Gradient Algorithm with Arbitrary Sampling
+    and Imaging Applications*. ArXiv: http://arxiv.org/abs/1706.04957 (2017).
+    """    
+    
+    #################################################################
+    # For every variable, we need to go to the numpy level
+    # in order to be able to run this function in a CIL+SIRF environment
+    ##################################################################      
+    
+    
+    def __init__(self, **kwargs):
+              
+        self.b = kwargs.get('b', None)
+        self.eta = kwargs.get('eta',None)    
         
-    f = KullbackLeibler(b=g1)        
+        self.b_np = self.b.as_array()
+        self.eta_np = self.eta.as_array()
         
-    print('Check KullbackLeibler(x,x)=0\n') 
-    numpy.testing.assert_equal(0.0, f(g1))
+        if self.b is None :
+            raise ValueError('Please define data, as b = ...')
+
+        if (self.b_np < 0).any():            
+            raise ValueError('Data should be positive')             
             
-    print('Check gradient .... is OK \n')
-    res_gradient = f.gradient(u1)
-    res_gradient_out = u1.geometry.allocate()
-    f.gradient(u1, out = res_gradient_out) 
-    numpy.testing.assert_array_almost_equal(res_gradient.as_array(), \
-                                            res_gradient_out.as_array())  
-    
-    print('Check proximal ... is OK\n')        
-    tau = 0.4
-    res_proximal = f.proximal(u1, tau)
-    res_proximal_out = u1.geometry.allocate()   
-    f.proximal(u1, tau, out = res_proximal_out)
-    numpy.testing.assert_array_almost_equal(res_proximal.as_array(), \
-                                            res_proximal_out.as_array())  
+        if self.eta is None:
+            raise ValueError('Please define data, as eta = ...')
+                        
+        if (self.eta_np <= 0).any():            
+            raise ValueError('Background should be positive')                          
                 
+        super(SmoothKullbackLeibler, self).__init__(L = numpy.max(self.b_np / self.eta_np ** 2))
+                          
+    
+    def __call__(self, x):
+                
+        r"""Returns the value of the smooth KullbackLeibler functional at :math:`x`.
+        """
+                                        
+        out = numpy.zeros(shape=self.b.shape, dtype=numpy.float32)
+        x_np = x.as_array()
+    
+        i = x_np>=0 
+        out[i] = x_np[i] + self.eta_np[i] - self.b_np[i]
+        
+        j = self.b_np>0
+        k = numpy.logical_and(i, j) 
+        out[k] += self.b_np[k] * numpy.log((self.b_np[k] / (x_np[k] + self.eta_np[k]))) 
+                
+        i = numpy.logical_not(i)
+        out[i] += (self.b_np[i] / (2 * self.eta_np[i]**2) * x_np[i]**2 + (1 - self.b_np[i] / self.eta_np[i]) * x_np[i] +
+                   self.eta_np[i] - self.b_np[i])
 
-    print('Check KullbackLeibler with background\n')       
-    f1 = KullbackLeibler(b=g1, eta=b1) 
+        k = numpy.logical_and(i,j)
+        out[k] += self.b_np[k] * numpy.log(self.b_np[k] / self.eta_np[k])
         
-    tmp_sum = (u1 + f1.eta).as_array()
-    ind = tmp_sum >= 0
-    tmp = scipy.special.kl_div(f1.b.as_array()[ind], tmp_sum[ind])                 
-    numpy.testing.assert_almost_equal(f1(u1), numpy.sum(tmp), decimal=1)
+        return out.sum()         
     
-    print('Check proximal KL without background\n')   
-    tau = [0.1, 1, 10, 100, 10000]
-    
-    for t1 in tau:
+    def gradient(self, x, out=None):
         
-        proxc = f.proximal_conjugate(u1,t1)
-        proxc_out = ig.allocate()
-        f.proximal_conjugate(u1, t1, out = proxc_out)
-        print('tau = {} is OK'.format(t1) )
-        numpy.testing.assert_array_almost_equal(proxc.as_array(), 
-                                                proxc_out.as_array(),
-                                                decimal = 4)
+        r"""Returns the value of the gradient of the smooth KullbackLeibler functional at :math:`x`.
+        """        
+                    
+        x_np = x.as_array()
         
-    print('\nCheck proximal KL with background\n')          
-    for t1 in tau:
+        i = x_np>=0
+        j = x_np<0
+                
+        tmp_np = numpy.zeros(shape=x.shape, dtype=numpy.float32)
+                    
+        tmp_np[i] = 1. - self.b_np[i]/(x_np[i] + self.eta_np[i])
+        tmp_np[j] = self.b_np[j]*x_np[j]/self.eta_np[j]**2 + 1. - self.b_np[j]/(self.eta_np[j])
         
-        proxc1 = f1.proximal_conjugate(u1,t1)
-        proxc_out1 = ig.allocate()
-        f1.proximal_conjugate(u1, t1, out = proxc_out1)
-        numpy.testing.assert_array_almost_equal(proxc1.as_array(), 
-                                                proxc_out1.as_array(),
-                                                decimal = 4)  
-    
-        print('tau = {} is OK'.format(t1) )    
+        if out is None:
+            out = x*0
+            return out.fill(tmp_np)
+        else:
+            out.fill(tmp_np)
+            
+    def convex_conjugate(self, x):
         
-    f = KullbackLeibler(b=g1, eta = b1)        
-    tau = 0.4
-    res_proximal = f.proximal(u1, tau)
-    res_proximal_out = u1.geometry.allocate()   
-    f.proximal(u1, tau, out = res_proximal_out)
-    numpy.testing.assert_array_almost_equal(res_proximal.as_array(), \
-                                            res_proximal_out.as_array())  
-    print('Check proximal with eta ... is OK\n')         
+        r"""Returns the value of the convex conjugate of the smooth KullbackLeibler functional at :math:`x`.
+        """      
         
-    
+        tmp_np = numpy.zeros(shape=x.shape, dtype=numpy.float32)
+        x_np = x.as_array()
+        
+        i = x_np<(1 - self.b_np/self.eta_np)
+        ry = self.eta_np[i]**2 / self.b_np[i]
+                
+        tmp_np[i] += (ry/2 * x_np[i]**2 + (self.eta_np[i] - ry) * x_np[i] + ry/2 + 3/2 * self.b_np[i] - 2 * self.eta_np[i]) 
+        
+        j = self.b_np>0
+        k = numpy.logical_and(i,j)
+        tmp_np[k] -= self.b_np[k]*numpy.log(self.b_np[k]/self.eta_np[k])
+                
+        i = numpy.logical_not(i)
+        tmp_np[i] -= self.eta_np[i]*x_np[i]
+        
+        k = numpy.logical_and(i, j)
+        tmp_np[k] -= self.b_np[k]*numpy.log(1 - x_np[k])
+                        
+        return tmp_np.sum()
+
+                                                                            
+    def proximal_conjugate(self, x, tau, out = None):
+        
+        r"""Returns the value of the proximal conjugate of the smooth KullbackLeibler functional at :math:`x`.
+        """        
+        
+        tmp_np = numpy.zeros(shape=x.shape, dtype=numpy.float32)
+        x_np = x.as_array()
+        
+        i = x_np<(1-self.b_np/self.eta_np)
+        
+        tmp_np[i] += (self.b_np[i]*x_np[i] - tau*self.eta_np[i]*self.b_np[i] + tau*self.eta_np[i]**2)/(self.b_np[i]+tau*self.eta_np[i]**2)
+        
+        i = numpy.logical_not(i)
+        
+        tmp_np[i] = x_np[i] + tau*self.eta_np[i] + 1 \
+                - numpy.sqrt( (x_np[i] + tau*self.eta_np[i] - 1)**2 + 4*tau*self.b_np[i])
+        tmp_np[i] *= 0.5
+        
+        if out is None:
+            out = x*0
+            return out.fill(tmp_np)
+        else:
+            out.fill(tmp_np)
+                              
+                    
+    def proximal(self, x, tau, out=None):
+                
+        raise NotImplementedError('Not Implemented')
+                                

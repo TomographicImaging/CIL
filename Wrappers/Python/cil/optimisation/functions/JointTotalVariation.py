@@ -48,7 +48,6 @@ class SmoothJointTV(Function):
     def __call__(self, x):
         
         r""" x is BlockDataContainer that contains 2 DataContainers, i.e., (u,v).
-
         """
 
         # We need a domain in order to define our GradientOperator. We extract the geometry from one of 
@@ -67,21 +66,20 @@ class SmoothJointTV(Function):
                                      
     def gradient(self, x, out=None):
         
-        denom = (self.lambda_par*self.gradient_operator.direct(x.get_item(0)).pnorm(2).power(2) +\
-             (1-self.lambda_par)*self.gradient_operator.direct(x.get_item(1)).pnorm(2).power(2)+\
+        denom = (self.lambda_par*self.grad.direct(x[0]).pnorm(2).power(2) + (1-self.lambda_par)*self.grad.direct(x[1]).pnorm(2).power(2)+\
               self.eta**2).sqrt()         
         
         if self.axis==0:            
-            num = self.lambda_par*self.gradient_operator.direct(x.get_item(0))                        
+            num = self.lambda_par*self.grad.direct(x[0])                        
         else:            
-            num = (1-self.lambda_par)*self.gradient_operator.direct(x.get_item(1))            
+            num = (1-self.lambda_par)*self.grad.direct(x[1])            
 
         if out is None:    
-            tmp = self.gradient_operator.range.allocate()
-            tmp[self.axis].fill(self.gradient_operator.adjoint(num.divide(denom)))
+            tmp = self.grad.range.allocate()
+            tmp[self.axis].fill(self.grad.adjoint(num.divide(denom)))
             return tmp
         else:                                
-            self.gradient_operator.adjoint(num.divide(denom), out=out[self.axis])
+            self.grad.adjoint(num.divide(denom), out=out[self.axis])
 
     @property
     def gradient_operator(self):

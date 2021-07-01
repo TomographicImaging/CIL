@@ -127,29 +127,6 @@ class L1Norm(Function):
             if self.b is not None:
                 soft_shrinkage(x - self.b, tau, out = out)
                 out += self.b
-#                out.fill(self.b + self.shinkage_operator(x - self.b, tau))
             else:
                 soft_shrinkage(x, tau, out = out)       
-#                out.fill(self.shinkage_operator(x, tau))
-                                                
-    
-#    def proximal_conjugate(self, x, tau, out=None):
-#        
-#        r'''Proximal operator of the convex conjugate of L1Norm at x:
-#                
-#            .. math:: prox_{\tau * f^{*}}(x)
-#                
-#        '''          
-#        
-#        if out is None:
-#            if self.b is not None:
-#                return (x - tau*self.b).divide((x - tau*self.b).abs().maximum(1.0))
-#            else:
-#                return x.divide(x.abs().maximum(1.0))
-#        else:
-#            if self.b is not None:
-#                out.fill((x - tau*self.b).divide((x - tau*self.b).abs().maximum(1.0)))
-#            else:
-#                out.fill(x.divide(x.abs().maximum(1.0)) )                
-            
 

@@ -17,6 +17,7 @@
 
 from cil.optimisation.algorithms import Algorithm
 import warnings
+import numpy
 
 
 
@@ -78,9 +79,9 @@ class PDHG(Algorithm):
         self._use_axpby = use_axpby
 
         if f is not None and operator is not None and g is not None:
-            self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, initial=initial)
+            self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, initial=initial, **kwargs)
 
-    def set_up(self, f, g, operator, tau=None, sigma=1., initial=None):
+    def set_up(self, f, g, operator, tau=None, sigma=1., initial=None, **kwargs):
         '''initialisation of the algorithm
 
         :param operator: a Linear Operator
@@ -95,6 +96,7 @@ class PDHG(Algorithm):
         # can't happen with default sigma
         if sigma is None and tau is None:
             raise ValueError('Need sigma*tau||K||^2<1')
+
         # algorithmic parameters
         self.f = f
         self.g = g
@@ -123,9 +125,12 @@ class PDHG(Algorithm):
         self.y_tmp = self.y_old.copy()
         
         self.xbar = self.x_old.copy()
-        
-        # relaxation parameter
-        self.theta = 1
+                
+        # relaxation parameter, default value is 1.0
+        self.theta = kwargs.get('theta',1.0)
+
+        # Strongly convex case either F or G or both
+        self.gamma = kwargs.get('gamma', None)
         
         self.configured = True
         print("{} configured".format(self.__class__.__name__, ))
@@ -176,8 +181,12 @@ class PDHG(Algorithm):
         else:
             self.xbar *= self.theta
             self.xbar += self.x
-        
-        
+  
+        if self.gamma is not None:
+            self.theta = float(1 / numpy.sqrt(1 + 2 * self.gamma * self.tau))
+            self.tau *= self.theta
+            self.sigma /= self.theta            
+                
 
     def update_objective(self):
 
@@ -198,3 +207,89 @@ class PDHG(Algorithm):
     @property
     def primal_dual_gap(self):
         return [x[2] for x in self.loss]
+
+
+if __name__ == "__main__":
+
+    # Import libraries
+    from cil.utilities import dataexample, noise
+    from cil.optimisation.operators import GradientOperator
+    from cil.optimisation.functions import MixedL21Norm, L2NormSquared
+    from cil.utilities.display import show2D
+    from cil.io import NEXUSDataWriter, NEXUSDataReader
+    import pickle
+    import matplotlib.pyplot as plt
+    import os
+
+    # Load data
+    data = dataexample.SHAPES.get()
+
+    # Add gaussian noise
+    noisy_data = noise.gaussian(data, seed = 10, var = 0.02)     
+
+    ig = noisy_data.geometry
+
+    alpha = 0.2
+    K = GradientOperator(ig)
+    F = alpha * MixedL21Norm()
+    G = 0.5 * L2NormSquared(b=noisy_data)
+
+    normK = K.norm()
+    sigma = 1./normK
+    tau = 1./normK
+
+    pdhg_noaccel = PDHG(f = F, g = G, operator = K, 
+                   update_objective_interval=1, 
+                   max_iteration=1000, sigma=sigma, tau=tau)
+    pdhg_noaccel.run(verbose=0)
+
+    name_recon = "pdhg_noaccel"
+    writer = NEXUSDataWriter(file_name = os.getcwd() + name_recon + ".nxs",
+                         data = pdhg_noaccel.solution)
+    writer.write() 
+
+    pdhg_noaccel_info = {}
+    pdhg_noaccel_info['primal'] = pdhg_noaccel.objective
+    pdhg_noaccel_info['dual'] = pdhg_noaccel.dual_objective
+    pdhg_noaccel_info['pdgap'] = pdhg_noaccel.primal_dual_gap
+
+    with open(os.getcwd() + 'pdhg_noaccel_info.pkl','wb') as f:
+        pickle.dump(pdhg_noaccel_info, f) 
+
+    pdhg_accel = PDHG(f = F, g = G, operator = K, 
+                    update_objective_interval=1, max_iteration=1000, 
+                      gamma = 0.2, sigma=sigma, tau=tau)
+    pdhg_accel.run(verbose=0)  
+
+    # Load pdhg_noaccel_info
+    pdhg_noaccel_info = pickle.load( open( os.getcwd() + 'pdhg_noaccel_info.pkl', "rb" ) )         
+
+    plt.figure()
+    plt.loglog(pdhg_accel.objective, label="Accelerate")
+    plt.loglog(pdhg_noaccel_info['primal'], label="No accelerate")
+    plt.legend()
+    plt.title("Primal")
+    plt.show()
+
+    plt.figure()
+    plt.loglog(pdhg_accel.primal_dual_gap, label="Accelerate")
+    plt.loglog(pdhg_noaccel_info['pdgap'], label="No accelerate")
+    plt.legend()
+    plt.title("PD - GAP")
+    plt.show() 
+
+    plt.figure()
+    plt.loglog(pdhg_accel.dual_objective, label="Accelerate")
+    plt.loglog(pdhg_noaccel_info['dual'], label="No accelerate")
+    plt.legend()
+    plt.title("Dual")
+    plt.show()        
+
+    reader_pdhg = NEXUSDataReader(file_name = os.getcwd() + "pdhg_noaccel" + ".nxs")
+    pdhg_accel_solution = reader_pdhg.load_data()
+        
+    show2D([pdhg_noaccel.solution,
+            pdhg_accel_solution, (pdhg_noaccel.solution - pdhg_accel_solution).abs()], num_cols=1, origin="upper")
+
+
+

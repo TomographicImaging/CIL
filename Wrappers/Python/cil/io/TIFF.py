@@ -171,6 +171,9 @@ class TIFFStackReader(object):
                 Note: in general output array size in bin mode != output array size
                 in slice mode
         :type mode: str, default 'bin'
+        :param dtype: Requested type of the read image. If set to None it defaults to
+                      the type of the saved file.
+        :type dtype: numpy type, string, default np.float32
         
         Returns
         -------
@@ -183,7 +186,7 @@ class TIFFStackReader(object):
         self.roi = kwargs.get('roi', {'axis_0': -1, 'axis_1': -1, 'axis_2': -1})
         self.transpose = kwargs.get('transpose', False)
         self.mode = kwargs.get('mode', 'bin')
-        self.dtype = kwargs.get('dtype', None)
+        self.dtype = kwargs.get('dtype', np.float32)
         
         if self.file_name is not None:
             self.set_up(file_name = self.file_name,
@@ -196,7 +199,7 @@ class TIFFStackReader(object):
                roi = {'axis_0': -1, 'axis_1': -1, 'axis_2': -1},
                transpose = False,
                mode = 'bin', 
-               dtype = None):
+               dtype = np.float32):
         '''
         :param file_name: path to folder with tiff files, list of paths of tiffs, or single tiff file
         :type file_name: str, abspath to folder, list
@@ -228,6 +231,9 @@ class TIFFStackReader(object):
                 Note: in general output array size in bin mode != output array size
                 in slice mode
         :type mode: str, default 'bin'
+        :param dtype: Requested type of the read image. If set to None it defaults to
+                      the type of the saved file.
+        :type dtype: numpy type, string, default np.float32
         '''
         self.roi = roi
         self.transpose = transpose
@@ -312,7 +318,7 @@ class TIFFStackReader(object):
         with Image.open(filename) as img:
             if self.dtype is None:
                 self.dtype = self._get_file_type(img)
-                tmp = np.asarray(img, dtype = self.dtype)
+            tmp = np.asarray(img, dtype = self.dtype)
         
         array_shape_0 = (len(self._tiff_files), tmp.shape[0], tmp.shape[1])
 

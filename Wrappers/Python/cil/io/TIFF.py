@@ -183,19 +183,52 @@ class TIFFStackReader(object):
         self.roi = kwargs.get('roi', {'axis_0': -1, 'axis_1': -1, 'axis_2': -1})
         self.transpose = kwargs.get('transpose', False)
         self.mode = kwargs.get('mode', 'bin')
+        self.dtype = kwargs.get('dtype', None)
         
         if self.file_name is not None:
             self.set_up(file_name = self.file_name,
                         roi = self.roi,
                         transpose = self.transpose,
-                        mode = self.mode)
+                        mode = self.mode, dtype=self.dtype)
             
     def set_up(self, 
                file_name = None,
                roi = {'axis_0': -1, 'axis_1': -1, 'axis_2': -1},
                transpose = False,
-               mode = 'bin'):
-        
+               mode = 'bin', 
+               dtype = None):
+        '''
+        :param file_name: path to folder with tiff files, list of paths of tiffs, or single tiff file
+        :type file_name: str, abspath to folder, list
+            
+        :param roi: dictionary with roi to load 
+                {'axis_0': (start, end, step), 
+                 'axis_1': (start, end, step), 
+                 'axis_2': (start, end, step)}
+                Files are stacked along axis_0. axis_1 and axis_2 correspond
+                to row and column dimensions, respectively.
+                Files are stacked in alphabetic order. 
+                To skip files or to change number of files to load, 
+                adjust axis_0. For instance, 'axis_0': (100, 300)
+                will skip first 100 files and will load 200 files.
+                'axis_0': -1 is a shortcut to load all elements along axis.
+                Start and end can be specified as None which is equivalent 
+                to start = 0 and end = load everything to the end, respectively.
+                Start and end also can be negative.
+                Notes: roi is specified for axes before transpose.
+        :type roi: dictionary, default None
+            
+        :param transpose: transpose loaded images
+        :type transpose: bool, default False
+            
+        :param mode: str, 'bin' (default) or 'slice'. In bin mode, 'step' number
+                of pixels is binned together, values of resulting binned
+                pixels are calculated as average. 
+                In 'slice' mode 'step' defines standard numpy slicing.
+                Note: in general output array size in bin mode != output array size
+                in slice mode
+        :type mode: str, default 'bin'
+        '''
         self.roi = roi
         self.transpose = transpose
         self.mode = mode
@@ -254,16 +287,32 @@ class TIFFStackReader(object):
         
         self._tiff_files.sort(key=self.__natural_keys)
                
-                
+    def _get_file_type(self, img): 
+        mode = img.mode
+        if mode == '1':
+            dtype = np.bool
+        elif mode == 'L':
+            dtype = np.uint8
+        elif mode == 'F':
+            dtype = np.float32
+        elif mode == 'I':
+            dtype = np.int32
+        else:
+            raise ValueError("Unsupported type {}. Expected 1 L I or F.".format(mode))
+        return dtype
+
     def read(self):
         
         '''
         Reads images and return numpy array
         '''
-        # load first image to find out dimensions
+        # load first image to find out dimensions and type
         filename = os.path.abspath(self._tiff_files[0])
         
-        tmp = np.asarray(Image.open(filename), dtype = np.float32)
+        with Image.open(filename) as img:
+            if self.dtype is None:
+                self.dtype = self._get_file_type(img)
+                tmp = np.asarray(img, dtype = self.dtype)
         
         array_shape_0 = (len(self._tiff_files), tmp.shape[0], tmp.shape[1])
 
@@ -297,20 +346,20 @@ class TIFFStackReader(object):
             num_to_read = (roi_par[0][1] - roi_par[0][0]) // roi_par[0][2]
             
             if not self.transpose:
-                im = np.zeros((num_to_read, n_rows, n_cols), dtype=np.float32)
+                im = np.zeros((num_to_read, n_rows, n_cols), dtype=self.dtype)
             else:
-                im = np.zeros((num_to_read, n_cols, n_rows), dtype=np.float32)
+                im = np.zeros((num_to_read, n_cols, n_rows), dtype=self.dtype)
             
             for i in range(0,num_to_read):
 
-                raw = np.zeros((array_shape_0[1], array_shape_0[2]), dtype=np.float32)
+                raw = np.zeros((array_shape_0[1], array_shape_0[2]), dtype=self.dtype)
                 for j in range(roi_par[0][2]):
                 
                     index = int(roi_par[0][0] + i * roi_par[0][2] + j)
                     filename = os.path.abspath(self._tiff_files[index])
 
                     try:
-                        raw += np.asarray(Image.open(filename), dtype = np.float32)
+                        raw += np.asarray(Image.open(filename), dtype = self.dtype)
                     except:
                         print('Error reading\n {}\n file.'.format(filename))
                         raise
@@ -332,15 +381,15 @@ class TIFFStackReader(object):
             num_to_read = np.int(np.ceil((roi_par[0][1] - roi_par[0][0]) / roi_par[0][2]))
             
             if not self.transpose:
-                im = np.zeros((num_to_read, n_rows, n_cols), dtype=np.float32)
+                im = np.zeros((num_to_read, n_rows, n_cols), dtype=self.dtype)
             else:
-                im = np.zeros((num_to_read, n_cols, n_rows), dtype=np.float32)
+                im = np.zeros((num_to_read, n_cols, n_rows), dtype=self.dtype)
                         
             for i in range(roi_par[0][0], roi_par[0][1], roi_par[0][2]):
                 
                 filename = os.path.abspath(self._tiff_files[i])
                 #try:
-                raw = np.asarray(Image.open(filename), dtype = np.float32)
+                raw = np.asarray(Image.open(filename), dtype = self.dtype)
                 #except:
                 #    print('Error reading\n {}\n file.'.format(filename))
                 #    raise

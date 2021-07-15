@@ -21,20 +21,20 @@
 Unit tests for Readers
 @author: Mr. Srikanth Nagella
 '''
+import os
 import unittest
 
 import numpy.testing
 import wget
-import os
+from cil.framework import AcquisitionGeometry
 from cil.io import NXTomoReader
-from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, AcquisitionGeometry
 
 
 class TestNXTomoReader(unittest.TestCase):
 
     def setUp(self):
-        # wget.download(
-        #     'https://github.com/DiamondLightSource/Savu/raw/master/test_data/data/24737_fd.nxs')
+        wget.download(
+            'https://github.com/DiamondLightSource/Savu/raw/master/test_data/data/24737_fd.nxs')
         self.filename = '24737_fd.nxs'
         # self.data_dir = os.path.join(os.getcwd(), 'test_nxtomo')
         # if not os.path.exists(self.data_dir):
@@ -54,8 +54,8 @@ class TestNXTomoReader(unittest.TestCase):
         # self.image_key_ids[0] = 1
         # self.image_key_ids[1] = 2
 
-    # def tearDown(self):
-    #     os.remove(self.filename)
+    def tearDown(self):
+        os.remove(self.filename)
 
     def test_get_dimensions(self):
         nr = NXTomoReader(self.filename)
@@ -187,7 +187,8 @@ class TestNXTomoReader(unittest.TestCase):
     def test_get_acquisition_data_batch(self):
         nr = NXTomoReader(self.filename)
         projections_full = nr.load_projection()
-        projections_part = nr.get_acquisition_data_batch(bmin=5, bmax=7).as_array()
+        projections_part = nr.get_acquisition_data_batch(
+            bmin=5, bmax=7).as_array()
         numpy.testing.assert_array_equal(
             projections_part, projections_full[5:7, :, :])
 

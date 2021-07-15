@@ -16,8 +16,9 @@
 #   limitations under the License.
 from .NEXUSDataReader import NEXUSDataReader
 from .NEXUSDataWriter import NEXUSDataWriter
+from .NXTomoReader import NXTomoReader
+from .NXTomoWriter import NXTomoWriter
 from .NikonDataReader import NikonDataReader
 from .TIFF import TIFFWriter
 from .TIFF import TIFFStackReader
-# from .TIFFStackReader import TIFFStackReader
 from .TXRMDataReader import TXRMDataReader

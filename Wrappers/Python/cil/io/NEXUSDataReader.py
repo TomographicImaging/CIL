@@ -219,7 +219,17 @@ class NEXUSDataReader(object):
         with h5py.File(self.file_name,'r') as dfile:
                 
             ds_data = dfile['entry1/tomo_entry/data/data']
-            data = np.array(ds_data, dtype = np.float32)
+            # If AcquisitionData, data may contain dark and flat fields:
+            if ds_data.attrs['data_type'] == 'AcquisitionData' and 'entry1/tomo_entry/data/image_key' in dfile:
+                all_data = np.array(ds_data, dtype = np.float32)
+                image_keys = np.array(dfile['entry1/tomo_entry/data/image_key'])
+                if 0 not in image_keys:
+                    raise ValueError("Projections are not in the data. Data Path ",
+                                    self.file_name)
+                else:
+                    data = all_data[image_keys == 0]
+            else:
+                data = np.array(ds_data, dtype = np.float32)
             
             # handle old files?
             if self.is_old_file_version():
@@ -250,3 +260,46 @@ class NEXUSDataReader(object):
 
             return 'geom_type' in ds_data.attrs.keys()
             # return True
+
+    def load_dark(self):
+        '''
+        Loads the dark field data from the nexus file, if
+        present.
+        returns: numpy array with flat field data
+        '''
+        return self._load_with_image_id(2)
+
+    def load_flat(self):
+        '''
+        Loads the flat field data from the nexus file, if
+        present.
+        returns: numpy array with flat field data
+        '''
+        return self._load_with_image_id(1)
+
+    def _load_with_image_id(self, image_key_id):
+        '''
+        This is generic loading function for loading flat field, dark field and
+        projection data, if an image_key array is saved in the data file.
+        Loads data with image key id of image_key_id
+        '''
+        with h5py.File(self.file_name,'r') as dfile:  
+            ds_data = dfile['entry1/tomo_entry/data/data']
+            # If AcquisitionData, data may contain dark and flat fields:
+            if ds_data.attrs['data_type'] == 'AcquisitionData' and 'entry1/tomo_entry/data/image_key' in dfile:
+                all_data = np.array(ds_data, dtype = np.float32)
+                image_keys = np.array(dfile['entry1/tomo_entry/data/image_key'])
+                if image_key_id not in image_keys:
+                    raise ValueError("Data with image key: ", image_key_id, "is not in the data. Data Path ",
+                                    self.file_name)
+                else:
+                    print("Image keys: ", image_keys)
+                    data = all_data[image_keys == image_key_id]
+                    if len(data==1):
+                        data = data[0]
+                    print(data)
+            else:
+                raise ValueError("Dark and Flat fields are not saved in the data. Data Path ",
+                                    self.file_name)
+
+            return data

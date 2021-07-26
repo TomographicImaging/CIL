@@ -28,20 +28,21 @@ except ImportError:
 
 class NXTomoWriter(object):
 
-    def __init__(self, data=None, filename=None, flats=[], darks=[]):
+    def __init__(self, data=None, filename=None, flat_field=[], dark_field=[]):
 
         self.data = data
         self.file_name = filename
-        self.flats = flats
-        self.darks = darks
+        self.flat_field = flat_field
+        self.dark_field = dark_field
 
         if ((self.data is not None) and (self.file_name is not None)):
             self.set_up(data=self.data,
-                        file_name=self.file_name, flats=flats, darks=darks)
+                        file_name=self.file_name, flat_field=flat_field,
+                        dark_field=dark_field)
 
     def set_up(self,
                data=None,
-               file_name=None, flats=None, darks=None):
+               file_name=None, flat_field=None, dark_field=None):
 
         self.data = data
         self.file_name = file_name
@@ -57,7 +58,7 @@ class NXTomoWriter(object):
 
     def initialise_nexus_file(self, f):
         data_len = self.data.as_array(
-        ).shape[0] + self.flats.shape[0] + self.darks.shape[0]
+        ).shape[0] + self.flat_field.shape[0] + self.dark_field.shape[0]
         height = self.data.as_array().shape[1]
         width = self.data.as_array().shape[2]  # TODO: check ordering
 
@@ -123,35 +124,37 @@ class NXTomoWriter(object):
             # set up dataset attributes
             if (isinstance(self.data, ImageData)):
                 print("Can't write ImageData to NXTomo file")
-            
+
             # set up dataset attributes
             data_len = self.data.as_array(
-            ).shape[0] + self.flats.shape[0] + self.darks.shape[0]
+            ).shape[0] + self.flat_field.shape[0] + self.dark_field.shape[0]
             height = self.data.as_array().shape[1]
             width = self.data.as_array().shape[2]
             data_to_write = self.data.as_array()
 
             data_to_write = np.empty((data_len, height, width))
             for i in range(data_len):
-                if i < self.flats.shape[0]:
-                    data_to_write[i] = self.flats[i]
-                elif i < (self.flats.shape[0] + self.darks.shape[0]):
-                    data_to_write[i] = self.darks[i-self.flats.shape[0]]
+                if i < self.flat_field.shape[0]:
+                    data_to_write[i] = self.flat_field[i]
+                elif i < (self.flat_field.shape[0] + self.dark_field.shape[0]):
+                    data_to_write[i] = self.dark_field[
+                        i - self.flat_field.shape[0]]
                 else:
                     data_to_write[i] = self.data.as_array(
-                    )[i-self.darks.shape[0]-self.flats.shape[0]]
+                    )[i-self.dark_field.shape[0]-self.flat_field.shape[0]]
 
             dataset[...] = data_to_write
 
             # image key:
             data_len = self.data.as_array().shape[0]
-            flats_len = self.flats.shape[0]
-            darks_len = self.darks.shape[0]
-            imagekey = [1] * flats_len + [2] * darks_len + [0] * data_len
+            flat_field_len = self.flat_field.shape[0]
+            dark_field_len = self.dark_field.shape[0]
+            imagekey = [1] * flat_field_len + [2] * \
+                dark_field_len + [0] * data_len
             imagekeyset[...] = imagekey
 
             # next is angles:
             rotation = self.data.geometry.config.angles.angle_data
             rotation = np.insert(
-                rotation, 0, [rotation[0]] * (flats_len + darks_len))
+                rotation, 0, [rotation[0]] * (flat_field_len + dark_field_len))
             rotationset[...] = rotation

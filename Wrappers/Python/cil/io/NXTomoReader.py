@@ -40,11 +40,11 @@ class NXTomoReader(object):
         '''
         This takes in input as filename and loads the data dataset.
         '''
-        self.flat = None
-        self.dark = None
+        self.filename = nexus_filename
+        self.flat_field = None
+        self.dark_field = None
         self.angles = None
         self.geometry = None
-        self.filename = nexus_filename
         self.key_path = 'entry1/tomo_entry/instrument/detector/image_key'
         self.data_path = 'entry1/tomo_entry/data/data'
         self.angle_path = 'entry1/tomo_entry/data/rotation_angle'

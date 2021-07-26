@@ -2534,7 +2534,7 @@ class ImageData(DataContainer):
         elif issubclass(type(array) , numpy.ndarray):
             pass
         else:
-            raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.formar(type(array)))
+            raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(array)))
             
         if array.shape != geometry.shape:
             raise ValueError('Shape mismatch {} {}'.format(array.shape, geometry.shape))
@@ -2622,7 +2622,7 @@ class AcquisitionData(DataContainer):
         elif issubclass(type(array) , numpy.ndarray):
             pass
         else:
-            raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.formar(type(array)))
+            raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(array)))
             
         if array.shape != geometry.shape:
             raise ValueError('Shape mismatch got {} expected {}'.format(array.shape, geometry.shape))

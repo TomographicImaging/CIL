@@ -102,15 +102,18 @@ class NEXUSDataWriter(object):
                 if self.flat_field is not None:
                     if len(self.flat_field.shape) == len(self.data.as_array().shape)-1:
                         flat_fields_len = 1
-                    else:
-                        flat_fields_len = self.flat_field.shape[angles_id]
+                        shape = list(self.flat_field.shape)
+                        shape.insert(angles_id,1)
+                        self.flat_field = self.flat_field.reshape(shape)
+                    flat_fields_len = self.flat_field.shape[angles_id]
                 else:
                     flat_fields_len = 0
                 if self.dark_field is not None:
                     if len(self.dark_field.shape) == len(self.data.as_array().shape)-1:
-                        dark_fields_len = 1
-                    else:
-                        dark_fields_len = self.dark_field.shape[angles_id]
+                        shape = list(self.dark_field.shape)
+                        shape.insert(angles_id,1)
+                        self.dark_field = self.dark_field.reshape(shape)
+                    dark_fields_len = self.dark_field.shape[angles_id]
                 else:
                     dark_fields_len = 0
 
@@ -131,6 +134,7 @@ class NEXUSDataWriter(object):
                         for i in range(0, dark_fields_len):
                             dark_field = np.take(self.dark_field, i, axis=angles_id)
                             data_to_write = np.insert(data_to_write, 0, dark_field, axis=angles_id)
+
                 if self.flat_field is not None:
                     if flat_fields_len ==0:
                         data_to_write = np.insert(data_to_write, 0, self.flat_field, axis=angles_id)

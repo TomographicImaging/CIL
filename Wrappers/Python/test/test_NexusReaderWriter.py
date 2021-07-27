@@ -36,7 +36,8 @@ class TestNexusReaderWriter(unittest.TestCase):
                                     .set_angles([0, 90, 180],-3.0, 'radian')\
                                     .set_panel(5, 0.2, origin='top-right')\
                                     .set_channels(6)\
-                                    .set_labels(['horizontal', 'angle'])
+                                    .set_labels(['angle', 'horizontal'])
+                                    #.set_labels(['horizontal', 'angle'])
 
         self.ad2d = self.ag2d.allocate('random_int')
 
@@ -114,14 +115,13 @@ class TestNexusReaderWriter(unittest.TestCase):
         
         if self.dark_field_2d is not None:
             dark_field_2d = reader2d.load_dark()
-            numpy.testing.assert_array_equal(dark_field_2d, self.dark_field_2d, 'Dark Field Data is not correct')
+            numpy.testing.assert_array_equal(dark_field_2d, self.dark_field_2d.reshape(1,5), 'Dark Field Data is not correct')
         
         if self.flat_field_2d is not None:
             flat_field_2d = reader2d.load_flat()
-            numpy.testing.assert_array_equal(flat_field_2d, self.flat_field_2d, 'Flat Field Data is not correct')
+            numpy.testing.assert_array_equal(flat_field_2d, self.flat_field_2d.reshape(1,5), 'Flat Field Data is not correct')
 
         assert ag2d == self.ag2d
-
         reader3d = NEXUSDataReader()
         reader3d.set_up(file_name = os.path.join(self.data_dir, 'test_nexus_ad3d.nxs'))
         ad3d = reader3d.read()
@@ -150,8 +150,9 @@ class TestNexusReaderWriter(unittest.TestCase):
         assert ag3d == self.ag3d
 
     def test_writeAcquisitionData_with_dark_and_flat_fields(self):
-        self.flat_field_2d = numpy.ones((5,1))
-        self.dark_field_2d = numpy.zeros((5,1))
+        print("write 2d")
+        self.flat_field_2d = numpy.ones(5)
+        self.dark_field_2d = numpy.zeros(5)
 
         writer = NEXUSDataWriter()
         writer.set_up(file_name=os.path.join(self.data_dir, 'test_nexus_ad2d.nxs'),
@@ -161,7 +162,7 @@ class TestNexusReaderWriter(unittest.TestCase):
         self.flat_field_3d = numpy.ones((1, 10, 5))
         self.dark_field_3d = numpy.zeros((1, 10, 5))
 
-
+        print("write 3d")
         writer = NEXUSDataWriter()
         writer.set_up(file_name=os.path.join(self.data_dir, 'test_nexus_ad3d.nxs'),
                       data=self.ad3d, flat_field=self.flat_field_3d, dark_field=self.dark_field_3d)

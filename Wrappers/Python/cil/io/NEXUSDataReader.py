@@ -299,7 +299,6 @@ class NEXUSDataReader(object):
                     raise ValueError("Data with image key: ", image_key_id, "is not in the data. Data Path ",
                                     self.file_name)
                 else:
-                    print("Image keys: ", image_keys)
                     angle_index = self._geometry.dimension_labels.index('angle')
                     if angle_index == 0:
                         data = all_data[image_keys == image_key_id]
@@ -307,7 +306,6 @@ class NEXUSDataReader(object):
                         data = all_data[:, image_keys == image_key_id]
                     elif angle_index == 2:
                         data = all_data[:,:,image_keys == image_key_id]
-
             else:
                 raise ValueError("Dark and Flat fields are not saved in the data. Data Path ",
                                     self.file_name)

@@ -40,12 +40,18 @@ class TestNexusReaderWriter(unittest.TestCase):
 
         self.ad2d = self.ag2d.allocate('random_int')
 
+        self.flat_field_2d = None
+        self.dark_field_2d = None
+
 
         self.ag3d = AcquisitionGeometry.create_Cone3D([0.1,-500,2], [3,600,-1], [0,1,0],[0,0,-1],[0.2,-0.1,0.5],[-0.1,0.2,0.9])\
                                     .set_angles([0, 90, 180])\
                                     .set_panel([5,10],[0.1,0.3])\
 
         self.ad3d = self.ag3d.allocate('random_int')
+
+        self.flat_field_3d = None
+        self.dark_field_3d = None
 
     def tearDown(self):
         shutil.rmtree(self.data_dir)
@@ -92,7 +98,7 @@ class TestNexusReaderWriter(unittest.TestCase):
         self.assertEqual(ig.voxel_num_y, ig_test.voxel_num_y, 'ImageGeometry is not correct')
         
     def readAcquisitionDataAndTest(self):
-        
+        print("read 2d")
         reader2d = NEXUSDataReader()
         reader2d.set_up(file_name = os.path.join(self.data_dir, 'test_nexus_ad2d.nxs'))
         ad2d = reader2d.read()
@@ -105,6 +111,14 @@ class TestNexusReaderWriter(unittest.TestCase):
         self.assertEqual(ag2d.pixel_size_h, self.ag2d.pixel_size_h, 'ImageGeometry.pixel_size_h is not correct')
         self.assertEqual(ag2d.pixel_num_v, self.ag2d.pixel_num_v, 'ImageGeometry.pixel_num_v is not correct')
         self.assertEqual(ag2d.pixel_size_v, self.ag2d.pixel_size_v, 'ImageGeometry.pixel_size_v is not correct')
+        
+        if self.dark_field_2d is not None:
+            dark_field_2d = reader2d.load_dark()
+            numpy.testing.assert_array_equal(dark_field_2d, self.dark_field_2d, 'Dark Field Data is not correct')
+        
+        if self.flat_field_2d is not None:
+            flat_field_2d = reader2d.load_flat()
+            numpy.testing.assert_array_equal(flat_field_2d, self.flat_field_2d, 'Flat Field Data is not correct')
 
         assert ag2d == self.ag2d
 
@@ -125,7 +139,36 @@ class TestNexusReaderWriter(unittest.TestCase):
         self.assertEqual(ag3d.dist_center_detector, self.ag3d.dist_center_detector, 'AcquisitionGeometry.dist_center_detector is not correct')
         self.assertEqual(ag3d.channels, self.ag3d.channels, 'AcquisitionGeometry.channels is not correct')
 
+        if self.dark_field_3d is not None:
+            dark_field_3d = reader3d.load_dark()
+            numpy.testing.assert_array_equal(dark_field_3d, self.dark_field_3d)
+
+        if self.flat_field_3d is not None:
+            flat_field_3d = reader3d.load_flat()
+            numpy.testing.assert_array_equal(flat_field_3d, self.flat_field_3d)
+
         assert ag3d == self.ag3d
+
+    def test_writeAcquisitionData_with_dark_and_flat_fields(self):
+        self.flat_field_2d = numpy.ones((5,1))
+        self.dark_field_2d = numpy.zeros((5,1))
+
+        writer = NEXUSDataWriter()
+        writer.set_up(file_name=os.path.join(self.data_dir, 'test_nexus_ad2d.nxs'),
+                      data=self.ad2d, flat_field=self.flat_field_2d, dark_field=self.dark_field_2d)
+        writer.write()
+
+        self.flat_field_3d = numpy.ones((1, 10, 5))
+        self.dark_field_3d = numpy.zeros((1, 10, 5))
+
+
+        writer = NEXUSDataWriter()
+        writer.set_up(file_name=os.path.join(self.data_dir, 'test_nexus_ad3d.nxs'),
+                      data=self.ad3d, flat_field=self.flat_field_3d, dark_field=self.dark_field_3d)
+        writer.write()
+
+        self.readAcquisitionDataAndTest()
+    
         
 if __name__ == '__main__':
     unittest.main()

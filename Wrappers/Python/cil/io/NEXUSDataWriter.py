@@ -93,6 +93,9 @@ class NEXUSDataWriter(object):
                 f.create_group('entry1/tomo_entry/config/source')
                 f.create_group('entry1/tomo_entry/config/detector')
                 f.create_group('entry1/tomo_entry/config/rotation_axis')
+
+                angles_id = list(self.data.dimension_labels).index('angle')
+                horizontal_id = list(self.data.dimension_labels).index('horizontal')
                 
 
                 # create full dataset to write, including flat and dark fields
@@ -100,39 +103,44 @@ class NEXUSDataWriter(object):
                     if len(self.flat_field.shape) == len(self.data.as_array().shape)-1:
                         flat_fields_len = 1
                     else:
-                        flat_fields_len = self.flat_field.shape[0]
+                        flat_fields_len = self.flat_field.shape[angles_id]
                 else:
                     flat_fields_len = 0
                 if self.dark_field is not None:
                     if len(self.dark_field.shape) == len(self.data.as_array().shape)-1:
                         dark_fields_len = 1
                     else:
-                        dark_fields_len = self.dark_field.shape[0]
+                        dark_fields_len = self.dark_field.shape[angles_id]
                 else:
                     dark_fields_len = 0
 
-                print("flat field len: ", flat_fields_len)
-
-                data_len = self.data.as_array().shape[0] + flat_fields_len + dark_fields_len
-                horizontal = self.data.as_array().shape[1]
+                data_len = self.data.as_array().shape[angles_id] + flat_fields_len + dark_fields_len
+                horizontal = self.data.as_array().shape[horizontal_id]
                 if len(self.data.as_array().shape) == 3:
                     vertical = self.data.as_array().shape[2]
                     data_to_write = np.empty((data_len, horizontal, vertical))
                 else:
                     data_to_write = np.empty((data_len, horizontal))
 
-                for i in range(data_len):
-                    if i < flat_fields_len:
-                        data_to_write[i] = self.flat_field[i]
-                    elif i < (flat_fields_len + dark_fields_len):
-                        data_to_write[i] = self.dark_field[i-flat_fields_len]
+                data_to_write = self.data.as_array().copy()
+
+                if self.dark_field is not None:
+                    if dark_fields_len ==0:
+                        data_to_write = np.insert(data_to_write, 0, self.dark_field, axis=angles_id)
                     else:
-                        data_to_write[i] = self.data.as_array(
-                        )[i-dark_fields_len-flat_fields_len]
+                        for i in range(0, dark_fields_len):
+                            dark_field = np.take(self.dark_field, i, axis=angles_id)
+                            data_to_write = np.insert(data_to_write, 0, dark_field, axis=angles_id)
+                if self.flat_field is not None:
+                    if flat_fields_len ==0:
+                        data_to_write = np.insert(data_to_write, 0, self.flat_field, axis=angles_id)
+                    else:
+                        for i in range(0, flat_fields_len):
+                            flat_field = np.take(self.flat_field, i, axis=angles_id)
+                            data_to_write = np.insert(data_to_write, 0, flat_field, axis=angles_id)
 
                 # create image key array to identify positioning of flat and dark fields:
-                data_len = self.data.as_array().shape[0]
-                print("Data shape: ", self.data.as_array().shape)
+                data_len = self.data.as_array().shape[angles_id]
                 image_key_array = np.array([1] * flat_fields_len + [2] * dark_fields_len + [0] * data_len)
                 # create dataset to store data
                 ds_data = f.create_dataset('entry1/tomo_entry/data/data',

@@ -227,7 +227,13 @@ class NEXUSDataReader(object):
                     raise ValueError("Projections are not in the data. Data Path ",
                                     self.file_name)
                 else:
-                    data = all_data[image_keys == 0]
+                    angle_index = self._geometry.dimension_labels.index('angle')
+                    if angle_index ==0:
+                        data = all_data[image_keys == 0]
+                    elif angle_index ==1:
+                        data = all_data[:, image_keys == 0]
+                    elif angle_index ==2:
+                        data = all_data[:,:,image_keys == 0]
             else:
                 data = np.array(ds_data, dtype = np.float32)
             
@@ -294,10 +300,14 @@ class NEXUSDataReader(object):
                                     self.file_name)
                 else:
                     print("Image keys: ", image_keys)
-                    data = all_data[image_keys == image_key_id]
-                    if len(data==1):
-                        data = data[0]
-                    print(data)
+                    angle_index = self._geometry.dimension_labels.index('angle')
+                    if angle_index == 0:
+                        data = all_data[image_keys == image_key_id]
+                    elif angle_index == 1:
+                        data = all_data[:, image_keys == image_key_id]
+                    elif angle_index == 2:
+                        data = all_data[:,:,image_keys == image_key_id]
+
             else:
                 raise ValueError("Dark and Flat fields are not saved in the data. Data Path ",
                                     self.file_name)

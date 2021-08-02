@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library developed by
-#   Visual Analytics and Imaging System Group of the Science Technology
-#   Facilities Council, STFC
-
-#   Copyright 2018 Jakob Jorgensen, Daniil Kazantsev, Edoardo Pasca and Srikanth Nagella
+#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
+#   (Collaborative Computational Project in Tomographic Imaging), with 
+#   substantial contributions by UKRI-STFC and University of Manchester.
 
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
 #   You may obtain a copy of the License at
 
-#       http://www.apache.org/licenses/LICENSE-2.0
+#   http://www.apache.org/licenses/LICENSE-2.0
 
 #   Unless required by applicable law or agreed to in writing, software
 #   distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,84 +15,90 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-'''
-Unit tests for Readers
-@author: Mr. Srikanth Nagella
-'''
 import os
 import unittest
 
 import numpy.testing
 import wget
 from cil.framework import AcquisitionGeometry
-from cil.io import NXTomoReader
+from cil.io import NXTomoReader, NXTomoWriter
+import shutil
 
 
-class TestNXTomoReader(unittest.TestCase):
+class TestNXTomoReaderWriter(unittest.TestCase):
 
     def setUp(self):
-        wget.download(
-            'https://github.com/DiamondLightSource/Savu/raw/master/test_data/data/24737_fd.nxs')
-        self.filename = '24737_fd.nxs'
-        # self.data_dir = os.path.join(os.getcwd(), 'test_nxtomo')
-        # if not os.path.exists(self.data_dir):
-        #     os.mkdir(self.data_dir)
 
-        # self.ag3d = AcquisitionGeometry.create_Parallel3D()\
-        #     .set_angles([i for i in range(0, 181, 2)])\
-        #     .set_panel([135, 160])\
-        #     .set_channels(1)\
-        #     .set_labels(['horizontal', 'vertical', 'angle'])
+        self.data_dir = os.path.join(os.getcwd(), 'test_nxtomo')
+        if not os.path.exists(self.data_dir):
+            os.mkdir(self.data_dir)
 
-        # self.ad3d = self.ag3d.allocate('random_int')
+        angles = [i for i in range(0,91)]
+        num_pixels = [135, 160] # horizontal, vertical
+        
 
-        # self.flats = numpy.ones(shape=(1, 135, 160))
-        # self.darks = numpy.zeros(shape=(1, 135, 160))
-        # self.image_key_ids = numpy.zeros(shape=(93,135,160))
-        # self.image_key_ids[0] = 1
-        # self.image_key_ids[1] = 2
+        self.ag3d = AcquisitionGeometry.create_Parallel3D()\
+                                    .set_angles(angles)\
+                                    .set_panel(num_pixels, origin='top-right')\
+                                    .set_labels(['angle', 'horizontal',   'vertical'])
+
+        self.ad3d = self.ag3d.allocate('random_int')
+
+        self.flat_field_3d = numpy.random.randint(0, 100, size=num_pixels)
+        self.dark_field_3d = numpy.random.randint(0, 100, size=num_pixels)
+
+        self.filename = os.path.join(self.data_dir, 'test_nxtomo_ad3d.nxs')
+        writer = NXTomoWriter(data=self.ad3d, filename=self.filename,
+            dark_fields=self.dark_field_3d, flat_fields=self.flat_field_3d)
+        writer.write()
+
+        self.sinogram_dims = (num_pixels[0], len(angles), num_pixels[1])
+        self.projection_dims = (len(angles), num_pixels[0],  num_pixels[1])
 
     def tearDown(self):
-        os.remove(self.filename)
+        shutil.rmtree(self.data_dir)
 
     def test_get_dimensions(self):
         nr = NXTomoReader(self.filename)
         self.assertEqual(nr.get_sinogram_dimensions(),
-                         (135, 91, 160), "Sinogram dimensions are not correct")
+                         self.sinogram_dims, "Sinogram dimensions are not correct")
 
     def test_get_projection_dimensions(self):
         nr = NXTomoReader(self.filename)
         self.assertEqual(nr.get_projection_dimensions(
-        ), (91, 135, 160), "Projection dimensions are not correct")
+        ), self.projection_dims, "Projection dimensions are not correct")
 
     def test_load_projection_without_dimensions(self):
         nr = NXTomoReader(self.filename)
         projections = nr.load_projection()
-        self.assertEqual(projections.shape, (91, 135, 160),
+        self.assertEqual(projections.shape, self.projection_dims,
                          "Loaded projection data dimensions are not correct")
 
     def test_load_projection_with_dimensions(self):
         nr = NXTomoReader(self.filename)
+        slice_extent = [1, self.projection_dims[1], self.projection_dims[2]]
         projections = nr.load_projection(
-            (slice(0, 1), slice(0, 135), slice(0, 160)))
-        self.assertEqual(projections.shape, (1, 135, 160),
+            (slice(0, slice_extent[0]), slice(0, slice_extent[1]), slice(0, slice_extent[2])))
+        self.assertEqual(projections.shape, (1, slice_extent[1], slice_extent[2]),
                          "Loaded projection data dimensions are not correct")
 
     def test_load_projection_compare_single(self):
         nr = NXTomoReader(self.filename)
         projections_full = nr.load_projection()
+        slice_extent = [1, self.projection_dims[1], self.projection_dims[2]]
         projections_part = nr.load_projection(
-            (slice(0, 1), slice(0, 135), slice(0, 160)))
+            (slice(0, slice_extent[0]), slice(0, slice_extent[1]), slice(0, slice_extent[2])))
         numpy.testing.assert_array_equal(
             projections_part, projections_full[0:1, :, :])
 
     def test_load_projection_compare_multi(self):
         nr = NXTomoReader(self.filename)
         projections_full = nr.load_projection()
+        slice_extent = [3, self.projection_dims[1], self.projection_dims[2]]
         projections_part = nr.load_projection(
-            (slice(0, 3), slice(0, 135), slice(0, 160)))
+            (slice(0, slice_extent[0]), slice(0, slice_extent[1]), slice(0, slice_extent[2])))
         numpy.testing.assert_array_equal(
-            projections_part, projections_full[0:3, :, :])
+            projections_part, projections_full[0:slice_extent[0], :, :])
 
     def test_load_projection_compare_random(self):
         nr = NXTomoReader(self.filename)
@@ -132,11 +136,11 @@ class TestNXTomoReader(unittest.TestCase):
         self.assertEqual(angles.shape, (91,),
                          "Loaded projection number of angles are not correct")
 
-    def test_get_acquition_data(self):
+    def test_get_acquisition_data(self):
         nr = NXTomoReader(self.filename)
         acq_data = nr.get_acquisition_data()
         self.assertEqual(acq_data.geometry.geom_type, 'parallel')
-        self.assertEqual(acq_data.geometry.angles.shape, (91,),
+        self.assertEqual(acq_data.geometry.angles.shape, (self.projection_dims[0],),
                          'AcquisitionGeometry.angles is not correct')
         self.assertEqual(acq_data.geometry.pixel_num_h, 160,
                          'AcquisitionGeometry.pixel_num_h is not correct')

@@ -28,21 +28,20 @@ except ImportError:
 
 class NXTomoWriter(object):
 
-    def __init__(self, data=None, filename=None, flat_field=[], dark_field=[]):
+    def __init__(self, data=None, file_name=None, flat_fields=None, dark_fields=None):
 
         self.data = data
-        self.file_name = filename
-        self.flat_field = flat_field
-        self.dark_field = dark_field
+        self.file_name = file_name
+        self.flat_fields = flat_fields
+        self.dark_fields = dark_fields
 
         if ((self.data is not None) and (self.file_name is not None)):
             self.set_up(data=self.data,
-                        file_name=self.file_name, flat_field=flat_field,
-                        dark_field=dark_field)
+                        file_name=self.file_name, flat_fields=flat_fields, dark_fields=dark_fields)
 
     def set_up(self,
                data=None,
-               file_name=None, flat_field=None, dark_field=None):
+               file_name=None, flat_fields=None, dark_fields=None):
 
         self.data = data
         self.file_name = file_name
@@ -56,11 +55,9 @@ class NXTomoWriter(object):
         if h5pyAvailable is False:
             raise Exception('h5py is not available, cannot write NEXUS files.')
 
-    def initialise_nexus_file(self, f):
-        data_len = self.data.as_array(
-        ).shape[0] + self.flat_field.shape[0] + self.dark_field.shape[0]
+    def _initialise_nexus_file(self, f, data_len):
         height = self.data.as_array().shape[1]
-        width = self.data.as_array().shape[2]  # TODO: check ordering
+        width = self.data.as_array().shape[2]
 
         # Create empty data-structure for NXTomo file:
         entry = f.create_group('entry1')
@@ -85,6 +82,7 @@ class NXTomoWriter(object):
 
         dataset = detector.create_dataset(
             'data', (data_len, height, width), np.float32)  # was dtype=np.uint16)
+        # TODO: figure out what type we should write
         dataset.attrs['long_name'] = 'X-ray counts'
 
         imagekeyset = detector.create_dataset(
@@ -113,48 +111,63 @@ class NXTomoWriter(object):
         return dataset, rotationset, imagekeyset
 
     def write(self):
+        if (isinstance(self.data, ImageData)):
+            raise Exception(
+                "Can't write ImageData to NXTomo file, \
+                only AcquisitionData is supported.")
+
         # if the folder does not exist, create the folder
-        if not os.path.isdir(os.path.dirname(self.file_name)):
+        if not os.path.isdir(os.path.dirname(self.file_name)) and \
+                os.path.dirname(self.file_name) != '':
             os.mkdir(os.path.dirname(self.file_name))
+
+        if self.flat_fields is not None:
+            if len(self.flat_fields.shape) == 2:
+                flat_fields_len = 1
+            else:
+                flat_fields_len = self.flat_fields.shape[0]
+        else:
+            flat_fields_len = 0
+        if self.dark_fields is not None:
+            if len(self.dark_fields.shape) == 2:
+                dark_fields_len = 1
+            else:
+                dark_fields_len = self.dark_fields.shape[0]
+        else:
+            dark_fields_len = 0
+
+        data_len = self.data.as_array(
+        ).shape[0] + flat_fields_len + dark_fields_len
 
         # create the file
         with h5py.File(self.file_name, 'w') as f:
-            dataset, rotationset, imagekeyset = self.initialise_nexus_file(f)
-            print(type(dataset), type(rotationset), type(imagekeyset))
-            # set up dataset attributes
-            if (isinstance(self.data, ImageData)):
-                print("Can't write ImageData to NXTomo file")
+            dataset, rotationset, imagekeyset = self._initialise_nexus_file(
+                f, data_len)
 
-            # set up dataset attributes
-            data_len = self.data.as_array(
-            ).shape[0] + self.flat_field.shape[0] + self.dark_field.shape[0]
             height = self.data.as_array().shape[1]
             width = self.data.as_array().shape[2]
-            data_to_write = self.data.as_array()
 
             data_to_write = np.empty((data_len, height, width))
             for i in range(data_len):
-                if i < self.flat_field.shape[0]:
-                    data_to_write[i] = self.flat_field[i]
-                elif i < (self.flat_field.shape[0] + self.dark_field.shape[0]):
-                    data_to_write[i] = self.dark_field[
-                        i - self.flat_field.shape[0]]
+                if i < flat_fields_len:
+                    data_to_write[i] = self.flat_fields[i]
+                elif i < (flat_fields_len + dark_fields_len):
+                    data_to_write[i] = self.dark_fields[i-flat_fields_len]
                 else:
                     data_to_write[i] = self.data.as_array(
-                    )[i-self.dark_field.shape[0]-self.flat_field.shape[0]]
+                    )[i-dark_fields_len-flat_fields_len]
 
             dataset[...] = data_to_write
 
             # image key:
             data_len = self.data.as_array().shape[0]
-            flat_field_len = self.flat_field.shape[0]
-            dark_field_len = self.dark_field.shape[0]
-            imagekey = [1] * flat_field_len + [2] * \
-                dark_field_len + [0] * data_len
+            imagekey = [1] * flat_fields_len + [2] * \
+                dark_fields_len + [0] * data_len
             imagekeyset[...] = imagekey
 
             # next is angles:
             rotation = self.data.geometry.config.angles.angle_data
             rotation = np.insert(
-                rotation, 0, [rotation[0]] * (flat_field_len + dark_field_len))
+                rotation, 0, [rotation[0]] * (
+                    flat_fields_len + dark_fields_len))
             rotationset[...] = rotation

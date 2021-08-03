@@ -40,11 +40,11 @@ class NXTomoReader(object):
         '''
         This takes in input as filename and loads the data dataset.
         '''
-        self.filename = nexus_filename
-        self.flat_field = None
-        self.dark_field = None
+        self.flat = None
+        self.dark = None
         self.angles = None
         self.geometry = None
+        self.filename = nexus_filename
         self.key_path = 'entry1/tomo_entry/instrument/detector/image_key'
         self.data_path = 'entry1/tomo_entry/data/data'
         self.angle_path = 'entry1/tomo_entry/data/rotation_angle'
@@ -312,7 +312,7 @@ class NXTomoReader(object):
         return self.get_acquisition_data_subset(ymin=y_slice, ymax=y_slice+1)
 
     def get_acquisition_data_whole(self):
-        # Is this necessary?
+        # TODO: Is this necessary?
         '''
         Loads the acquisition data and returns an AcquisitionData Object
         Same behaviour as get_acquisition_data when dimensions is set to None

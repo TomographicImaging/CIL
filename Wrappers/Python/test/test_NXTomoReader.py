@@ -34,13 +34,13 @@ class TestNXTomoReaderWriter(unittest.TestCase):
             os.mkdir(self.data_dir)
 
         angles = [i for i in range(0,91)]
-        num_pixels = [135, 160] # horizontal, vertical
+        num_pixels = [160, 135] # horizontal, vertical
         
 
         self.ag3d = AcquisitionGeometry.create_Parallel3D()\
                                     .set_angles(angles)\
                                     .set_panel(num_pixels, origin='top-right')\
-                                    .set_labels(['angle', 'horizontal',   'vertical'])
+                                    .set_labels(['angle', 'horizontal',  'vertical'])
 
         self.ad3d = self.ag3d.allocate('random_int')
 
@@ -179,14 +179,14 @@ class TestNXTomoReaderWriter(unittest.TestCase):
         projections_part = nr.get_acquisition_data_subset(
             ymin=5, ymax=10).as_array()
         numpy.testing.assert_array_equal(
-            projections_part, projections_full[:, 5:10, :])
+            projections_part, projections_full[:, :,  5:10])
 
     def test_get_acquisition_data_slice(self):
         nr = NXTomoReader(self.file_name)
         projections_full = nr.load_projection()
         projections_part = nr.get_acquisition_data_slice(y_slice=5).as_array()
         numpy.testing.assert_array_equal(
-            projections_part, projections_full[:, 5, :])
+            projections_part, projections_full[:, :, 5])
 
     def test_get_acquisition_data_batch(self):
         nr = NXTomoReader(self.file_name)

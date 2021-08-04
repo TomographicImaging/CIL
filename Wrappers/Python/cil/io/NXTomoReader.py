@@ -219,9 +219,9 @@ class NXTomoReader(object):
         data = self.load_projection(dimensions)
         dims = self.get_projection_dimensions()
         geometry = AcquisitionGeometry.create_Parallel3D().set_panel(
-            num_pixels=(dims[1], dims[2]), pixel_size=(1, 1)).set_angles(
+            num_pixels=(dims[2], dims[1]), pixel_size=(1, 1)).set_angles(
             angles=self.get_projection_angles()).set_labels(
-            ['angle', 'horizontal',  'vertical']).set_channels(1)
+            ['angle', 'vertical', 'horizontal']).set_channels(1)
         out = geometry.allocate()
         out.fill(data)
         return out
@@ -258,24 +258,23 @@ class NXTomoReader(object):
                     image_keys = self.get_image_keys()
                     projections = np.array(file[self.data_path])[
                         image_keys == 0]
-
                     if ymin is None:
                         ymin = 0
-                        if ymax > dims[2]:
+                        if ymax > dims[1]:
                             raise ValueError('ymax out of range')
                         data = projections[:, :ymax, :]
                     elif ymax is None:
-                        ymax = dims[2]
+                        ymax = dims[1]
                         if ymin < 0:
                             raise ValueError('ymin out of range')
                         data = projections[:, ymin:, :]
                     else:
-                        if ymax > dims[2]:
+                        if ymax > dims[1]:
                             raise ValueError('ymax out of range')
                         if ymin < 0:
                             raise ValueError('ymin out of range')
 
-                        data = projections[:, :, ymin:ymax]
+                        data = projections[:, ymin:ymax, :]
 
         except Exception:
             print("Error reading nexus file")
@@ -289,15 +288,15 @@ class NXTomoReader(object):
 
         if ymax-ymin > 1:
             geometry = AcquisitionGeometry.create_Parallel3D().set_panel(
-                num_pixels=(dims[1], ymax-ymin), pixel_size=(1, 1)).set_angles(
+                num_pixels=(dims[2], ymax-ymin), pixel_size=(1, 1)).set_angles(
                 angles=angles).set_labels(
-                    ['angle', 'horizontal', 'vertical']).set_channels(1)
+                    ['angle', 'vertical', 'horizontal']).set_channels(1)
             out = geometry.allocate()
             out.fill(data)
             return out
         elif ymax-ymin == 1:
             geometry = AcquisitionGeometry.create_Parallel2D().set_panel(
-                num_pixels=(dims[1]), pixel_size=(1, 1)).set_angles(
+                num_pixels=(dims[2]), pixel_size=(1, 1)).set_angles(
                 angles=angles).set_labels(
                     ['angle', 'horizontal']).set_channels(1)
             out = geometry.allocate()
@@ -323,7 +322,7 @@ class NXTomoReader(object):
                 dims = file[self.data_path].shape
 
             ymin = 0
-            ymax = dims[2]
+            ymax = dims[1]
 
             return self.get_acquisition_data_subset(ymin=ymin, ymax=ymax)
 

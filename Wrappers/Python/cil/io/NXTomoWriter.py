@@ -32,7 +32,7 @@ class NXTomoWriter(object):
             self, data=None, file_name=None, flat_fields=None,
             dark_fields=None):
         '''
-        data: Acqusistion Data ordered: (angle, horizontal, vertical)
+        data: Acqusistion Data ordered: (angle, vertical, horizontal)
         file_name: name of nexus file to write to
         flat_fields: numpy array of flat field data
         dark_fields: numpy array of dark field data

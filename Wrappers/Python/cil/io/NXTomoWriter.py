@@ -28,7 +28,15 @@ except ImportError:
 
 class NXTomoWriter(object):
 
-    def __init__(self, data=None, file_name=None, flat_fields=None, dark_fields=None):
+    def __init__(
+            self, data=None, file_name=None, flat_fields=None,
+            dark_fields=None):
+        '''
+        data: Acqusistion Data ordered: (angle, horizontal, vertical)
+        file_name: name of nexus file to write to
+        flat_fields: numpy array of flat field data
+        dark_fields: numpy array of dark field data
+        '''
 
         self.data = data
         self.file_name = file_name
@@ -37,14 +45,16 @@ class NXTomoWriter(object):
 
         if ((self.data is not None) and (self.file_name is not None)):
             self.set_up(data=self.data,
-                        file_name=self.file_name, flat_fields=flat_fields, dark_fields=dark_fields)
+                        file_name=self.file_name, flat_fields=flat_fields,
+                        dark_fields=dark_fields)
 
-    def set_up(self,
-               data=None,
-               file_name=None, flat_fields=None, dark_fields=None):
+    def set_up(self, data=None, file_name=None,
+               flat_fields=None, dark_fields=None):
 
         self.data = data
         self.file_name = file_name
+        self.flat_fields = flat_fields
+        self.dark_fields = dark_fields
 
         if not ((isinstance(self.data, ImageData)) or
                 (isinstance(self.data, AcquisitionData))):
@@ -56,10 +66,10 @@ class NXTomoWriter(object):
             raise Exception('h5py is not available, cannot write NEXUS files.')
 
     def _initialise_nexus_file(self, f, data_len):
+        ''' Creates empty data-structure for NXTomo file:'''
         height = self.data.as_array().shape[1]
         width = self.data.as_array().shape[2]
 
-        # Create empty data-structure for NXTomo file:
         entry = f.create_group('entry1')
         entry.attrs['NX_class'] = 'NXentry'
 
@@ -81,7 +91,8 @@ class NXTomoWriter(object):
         data.attrs['NX_class'] = 'NXdata'
 
         dataset = detector.create_dataset(
-            'data', (data_len, height, width), np.float32)  # was dtype=np.uint16)
+            'data', (data_len, height, width), np.uint32)
+        # was dtype=np.uint16 in EPAC code, is float32 in NEXUSDataWriter
         # TODO: figure out what type we should write
         dataset.attrs['long_name'] = 'X-ray counts'
 

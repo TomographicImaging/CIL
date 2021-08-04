@@ -36,7 +36,7 @@ class NXTomoReader(object):
     https://manual.nexusformat.org/classes/applications/NXtomo.html
     '''
 
-    def __init__(self, nexus_filename=None):
+    def __init__(self, file_name=None):
         '''
         This takes in input as filename and loads the data dataset.
         '''
@@ -44,7 +44,7 @@ class NXTomoReader(object):
         self.dark = None
         self.angles = None
         self.geometry = None
-        self.filename = nexus_filename
+        self.filename = file_name
         self.key_path = 'entry1/tomo_entry/instrument/detector/image_key'
         self.data_path = 'entry1/tomo_entry/data/data'
         self.angle_path = 'entry1/tomo_entry/data/rotation_angle'
@@ -288,9 +288,6 @@ class NXTomoReader(object):
             angles = np.linspace(0, n, n+1, dtype=np.float32)
 
         if ymax-ymin > 1:
-            # Used to set: - do we need?
-            # dist_source_center=None,
-            # dist_center_detector=None
             geometry = AcquisitionGeometry.create_Parallel3D().set_panel(
                 num_pixels=(dims[1], ymax-ymin), pixel_size=(1, 1)).set_angles(
                 angles=angles).set_labels(
@@ -392,7 +389,9 @@ class NXTomoReader(object):
                                            dist_source_center=None,
                                            dist_center_detector=None,
                                            channels=1,
-                                           dimension_labels=['angle', 'vertical', 'horizontal'])
+                                           dimension_labels=[
+                                               'angle', 'vertical',
+                                               'horizontal'])
             out = geometry.allocate()
             if bmax-bmin == 1:
                 out.fill(data.squeeze())

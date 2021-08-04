@@ -35,20 +35,27 @@ class NEXUSDataWriter(object):
         self.data = kwargs.get('data', None)
         self.file_name = kwargs.get('file_name', None)
         self.flat_field = kwargs.get('flat_field', None)
+        self.flat_field_key = kwargs.get('flat_field_key', None)
         self.dark_field = kwargs.get('dark_field', None)
+        self.dark_field_key = kwargs.get('dark_field_key', None)
         
         if ((self.data is not None) and (self.file_name is not None)):
             self.set_up(data=self.data,
                         file_name=self.file_name,
                         flat_field=self.flat_field,
-                        dark_field=self.dark_field)
+                        flat_field_key=self.flat_field_key,
+                        dark_field=self.dark_field,
+                        dark_field_key=self.dark_field_key)
         
     def set_up(self, data=None, file_name=None,
-               flat_field=None, dark_field=None):
+               flat_field=None, flat_field_key=None,
+               dark_field=None, dark_field_key=None):
         self.data = data
         self.file_name = file_name
         self.flat_field = flat_field
+        self.flat_field_key = flat_field_key
         self.dark_field = dark_field
+        self.dark_field_key = dark_field_key
         
         if not ((isinstance(self.data, ImageData)) or 
                 (isinstance(self.data, AcquisitionData))):
@@ -87,81 +94,42 @@ class NEXUSDataWriter(object):
             nxentry = f.create_group('entry1/tomo_entry')
             nxentry.attrs['NX_class'] = 'NXentry'
 
+            ds_data = f.create_dataset('entry1/tomo_entry/data/data',
+                            (self.data.as_array().shape),
+                            dtype='float32',
+                            data=self.data.as_array())
+
             if (isinstance(self.data, AcquisitionData)):
                 # create group to store configuration
                 f.create_group('entry1/tomo_entry/config')
                 f.create_group('entry1/tomo_entry/config/source')
                 f.create_group('entry1/tomo_entry/config/detector')
                 f.create_group('entry1/tomo_entry/config/rotation_axis')
-
-                angles_id = list(self.data.dimension_labels).index('angle')
-                horizontal_id = list(self.data.dimension_labels).index('horizontal')
-                
-
-                # create full dataset to write, including flat and dark fields
-                if self.flat_field is not None:
-                    if len(self.flat_field.shape) == len(self.data.as_array().shape)-1:
-                        flat_fields_len = 1
-                        shape = list(self.flat_field.shape)
-                        shape.insert(angles_id,1)
-                        self.flat_field = self.flat_field.reshape(shape)
-                    flat_fields_len = self.flat_field.shape[angles_id]
-                else:
-                    flat_fields_len = 0
-                if self.dark_field is not None:
-                    if len(self.dark_field.shape) == len(self.data.as_array().shape)-1:
-                        shape = list(self.dark_field.shape)
-                        shape.insert(angles_id,1)
-                        self.dark_field = self.dark_field.reshape(shape)
-                    dark_fields_len = self.dark_field.shape[angles_id]
-                else:
-                    dark_fields_len = 0
-
-                data_len = self.data.as_array().shape[angles_id] + flat_fields_len + dark_fields_len
-                horizontal = self.data.as_array().shape[horizontal_id]
-                if len(self.data.as_array().shape) == 3:
-                    vertical = self.data.as_array().shape[2]
-                    data_to_write = np.empty((data_len, horizontal, vertical))
-                else:
-                    data_to_write = np.empty((data_len, horizontal))
-
-                data_to_write = self.data.as_array().copy()
-
-                if self.dark_field is not None:
-                    if dark_fields_len ==0:
-                        data_to_write = np.insert(data_to_write, 0, self.dark_field, axis=angles_id)
-                    else:
-                        for i in range(0, dark_fields_len):
-                            dark_field = np.take(self.dark_field, i, axis=angles_id)
-                            data_to_write = np.insert(data_to_write, 0, dark_field, axis=angles_id)
-
-                if self.flat_field is not None:
-                    if flat_fields_len ==0:
-                        data_to_write = np.insert(data_to_write, 0, self.flat_field, axis=angles_id)
-                    else:
-                        for i in range(0, flat_fields_len):
-                            flat_field = np.take(self.flat_field, i, axis=angles_id)
-                            data_to_write = np.insert(data_to_write, 0, flat_field, axis=angles_id)
-
-                # create image key array to identify positioning of flat and dark fields:
-                data_len = self.data.as_array().shape[angles_id]
-                image_key_array = np.array([1] * flat_fields_len + [2] * dark_fields_len + [0] * data_len)
-                # create dataset to store data
-                ds_data = f.create_dataset('entry1/tomo_entry/data/data',
-                                           (data_to_write.shape),
-                                           dtype='float32',
-                                           data=data_to_write)
-
-                f.create_dataset('entry1/tomo_entry/data/image_key',
-                                 (image_key_array.shape),
-                                 dtype='float32',
-                                 data=image_key_array)
             
                 ds_data.attrs['data_type'] = 'AcquisitionData'
                 ds_data.attrs['geometry'] = self.data.geometry.config.system.geometry
                 ds_data.attrs['dimension'] = self.data.geometry.config.system.dimension   
                 ds_data.attrs['num_channels'] = self.data.geometry.config.channels.num_channels
 
+                # TODO: add check that flat and dark fields are same shape as dataset
+                if self.flat_field is not None:
+                    f.create_dataset('entry1/tomo_entry/data/flat_field/data',
+                                    (self.flat_field.shape),
+                                    dtype='float32',
+                                    data=self.flat_field)
+                    f.create_dataset('entry1/tomo_entry/data/flat_field/position_key',
+                                    (self.flat_field_key.shape),
+                                    dtype='int32',
+                                    data=self.flat_field_key)
+                if self.dark_field is not None:
+                    f.create_dataset('entry1/tomo_entry/data/dark_field/data',
+                                    (self.dark_field.shape),
+                                    dtype='float32',
+                                    data=self.dark_field)
+                    f.create_dataset('entry1/tomo_entry/data/dark_field/position_key',
+                                    (self.dark_field_key.shape),
+                                    dtype='int32',
+                                    data=self.dark_field_key)
 
                 f.create_dataset('entry1/tomo_entry/config/detector/direction_x',
                                  (self.data.geometry.config.system.detector.direction_x.shape), 
@@ -209,9 +177,6 @@ class NEXUSDataWriter(object):
                     ds_data.attrs['pixel_size_v'] = self.data.geometry.config.panel.pixel_size[1]
 
                 angle_data = self.data.geometry.config.angles.angle_data
-                # If we wanted to add angle data for flat/dark fields:
-                # angle_data = np.insert(
-                #     angle_data, 0, [angle_data[0]] * (flat_fields_len + dark_fields_len))
                     
                 angles = f.create_dataset('entry1/tomo_entry/config/angles', 
                                                  (angle_data.shape), 
@@ -221,11 +186,6 @@ class NEXUSDataWriter(object):
                 angles.attrs['initial_angle'] = self.data.geometry.config.angles.initial_angle
             
             else:   # ImageData
-                data_to_write = self.data.as_array()
-                ds_data = f.create_dataset('entry1/tomo_entry/data/data',
-                                           (data_to_write.shape),
-                                           dtype='float32',
-                                           data=data_to_write)
                 ds_data.attrs['data_type'] = 'ImageData'
                 ds_data.attrs['voxel_num_x'] = self.data.geometry.voxel_num_x
                 ds_data.attrs['voxel_num_y'] = self.data.geometry.voxel_num_y

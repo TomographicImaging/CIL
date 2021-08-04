@@ -99,7 +99,6 @@ class TestNexusReaderWriter(unittest.TestCase):
         self.assertEqual(ig.voxel_num_y, ig_test.voxel_num_y, 'ImageGeometry is not correct')
         
     def readAcquisitionDataAndTest(self):
-        print("read 2d")
         reader2d = NEXUSDataReader()
         reader2d.set_up(file_name = os.path.join(self.data_dir, 'test_nexus_ad2d.nxs'))
         ad2d = reader2d.read()
@@ -115,11 +114,11 @@ class TestNexusReaderWriter(unittest.TestCase):
         
         if self.dark_field_2d is not None:
             dark_field_2d = reader2d.load_dark()
-            numpy.testing.assert_array_equal(dark_field_2d, self.dark_field_2d.reshape(1,5), 'Dark Field Data is not correct')
+            numpy.testing.assert_array_equal(dark_field_2d, self.dark_field_2d, 'Dark Field Data is not correct')
         
         if self.flat_field_2d is not None:
             flat_field_2d = reader2d.load_flat()
-            numpy.testing.assert_array_equal(flat_field_2d, self.flat_field_2d.reshape(1,5), 'Flat Field Data is not correct')
+            numpy.testing.assert_array_equal(flat_field_2d, self.flat_field_2d, 'Flat Field Data is not correct')
 
         assert ag2d == self.ag2d
         reader3d = NEXUSDataReader()
@@ -150,22 +149,30 @@ class TestNexusReaderWriter(unittest.TestCase):
         assert ag3d == self.ag3d
 
     def test_writeAcquisitionData_with_dark_and_flat_fields(self):
-        print("write 2d")
-        self.flat_field_2d = numpy.ones(5)
-        self.dark_field_2d = numpy.zeros(5)
+        im_size = 5
+        self.flat_field_2d = numpy.ones(im_size)
+        self.dark_field_2d = numpy.zeros(im_size)
+        self.dark_field_position_key = numpy.random.randint(0, 2, im_size)
+        self.flat_field_position_key = numpy.random.randint(0, 2, im_size)
 
         writer = NEXUSDataWriter()
         writer.set_up(file_name=os.path.join(self.data_dir, 'test_nexus_ad2d.nxs'),
-                      data=self.ad2d, flat_field=self.flat_field_2d, dark_field=self.dark_field_2d)
+                      data=self.ad2d, flat_field=self.flat_field_2d, flat_field_key = self.flat_field_position_key,
+                      dark_field=self.dark_field_2d, dark_field_key=self.dark_field_position_key)
         writer.write()
 
         self.flat_field_3d = numpy.ones((1, 10, 5))
         self.dark_field_3d = numpy.zeros((1, 10, 5))
 
-        print("write 3d")
+        self.dark_field_position_key = numpy.random.randint(0, 2, 1)
+        self.flat_field_position_key = numpy.random.randint(0, 2, 1)
+
         writer = NEXUSDataWriter()
         writer.set_up(file_name=os.path.join(self.data_dir, 'test_nexus_ad3d.nxs'),
-                      data=self.ad3d, flat_field=self.flat_field_3d, dark_field=self.dark_field_3d)
+                      data=self.ad3d, flat_field=self.flat_field_3d,
+                      flat_field_key=self.flat_field_position_key,
+                      dark_field=self.dark_field_3d,
+                      dark_field_key=self.dark_field_position_key)
         writer.write()
 
         self.readAcquisitionDataAndTest()

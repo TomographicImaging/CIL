@@ -219,23 +219,7 @@ class NEXUSDataReader(object):
         with h5py.File(self.file_name,'r') as dfile:
                 
             ds_data = dfile['entry1/tomo_entry/data/data']
-            # If AcquisitionData, data may contain dark and flat fields:
-            if ds_data.attrs['data_type'] == 'AcquisitionData' and 'entry1/tomo_entry/data/image_key' in dfile:
-                all_data = np.array(ds_data, dtype = np.float32)
-                image_keys = np.array(dfile['entry1/tomo_entry/data/image_key'])
-                if 0 not in image_keys:
-                    raise ValueError("Projections are not in the data. Data Path ",
-                                    self.file_name)
-                else:
-                    angle_index = self._geometry.dimension_labels.index('angle')
-                    if angle_index ==0:
-                        data = all_data[image_keys == 0]
-                    elif angle_index ==1:
-                        data = all_data[:, image_keys == 0]
-                    elif angle_index ==2:
-                        data = all_data[:,:,image_keys == 0]
-            else:
-                data = np.array(ds_data, dtype = np.float32)
+            data = np.array(ds_data, dtype = np.float32)
             
             # handle old files?
             if self.is_old_file_version():
@@ -270,10 +254,10 @@ class NEXUSDataReader(object):
     def load_dark(self):
         '''
         Loads the dark field data from the nexus file, if
-        present.
+        present
         returns: numpy array with flat field data
         '''
-        return self._load_with_image_id(2)
+        return self._load_field('dark')
 
     def load_flat(self):
         '''
@@ -281,33 +265,32 @@ class NEXUSDataReader(object):
         present.
         returns: numpy array with flat field data
         '''
-        return self._load_with_image_id(1)
+        return self._load_field('flat')
 
-    def _load_with_image_id(self, image_key_id):
+    def _load_field(self, field_type):
         '''
-        This is generic loading function for loading flat field, dark field and
-        projection data, if an image_key array is saved in the data file.
-        Loads data with image key id of image_key_id
+        This is generic loading function for loading flat field or dark field
+        data, if saved in the data file.
         '''
-        with h5py.File(self.file_name,'r') as dfile:  
-            ds_data = dfile['entry1/tomo_entry/data/data']
-            # If AcquisitionData, data may contain dark and flat fields:
-            if ds_data.attrs['data_type'] == 'AcquisitionData' and 'entry1/tomo_entry/data/image_key' in dfile:
-                all_data = np.array(ds_data, dtype = np.float32)
-                image_keys = np.array(dfile['entry1/tomo_entry/data/image_key'])
-                if image_key_id not in image_keys:
-                    raise ValueError("Data with image key: ", image_key_id, "is not in the data. Data Path ",
-                                    self.file_name)
-                else:
-                    angle_index = self._geometry.dimension_labels.index('angle')
-                    if angle_index == 0:
-                        data = all_data[image_keys == image_key_id]
-                    elif angle_index == 1:
-                        data = all_data[:, image_keys == image_key_id]
-                    elif angle_index == 2:
-                        data = all_data[:,:,image_keys == image_key_id]
+        with h5py.File(self.file_name,'r') as dfile:
+            data_path = 'entry1/tomo_entry/data/{}_field/data'.format(field_type)
+            if data_path in dfile:
+                data = np.array(dfile[data_path])
             else:
-                raise ValueError("Dark and Flat fields are not saved in the data. Data Path ",
+                raise ValueError("{} fields are not saved in the data. Data Path ".format(field_type),
                                     self.file_name)
+            return data
 
+    def _load_field_key(self, field_type):
+        '''
+        This is generic loading function for loading flat field or dark field position key
+        data, if saved in the data file.
+        '''
+        with h5py.File(self.file_name,'r') as dfile:
+            data_path = 'entry1/tomo_entry/data/{}_field/position_key'.format(field_type)
+            if data_path in dfile:
+                data = np.array(dfile[data_path])
+            else:
+                raise ValueError("{} field keys are not saved in the data. Data Path ".format(field_type),
+                                    self.file_name)
             return data

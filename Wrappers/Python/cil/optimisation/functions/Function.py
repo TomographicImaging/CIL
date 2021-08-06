@@ -18,6 +18,7 @@
 import warnings
 
 from numbers import Number
+import numpy as np
 
 class Function(object):
     
@@ -79,13 +80,28 @@ class Function(object):
         .. math:: \mathrm{prox}_{\tau F^{*}}(x) = x - \tau\mathrm{prox}_{\tau^{-1} F}(\tau^{-1}x)
                 
         """
+        try:
+            tmp = x
+            x.divide(tau, out = tmp)
+        except TypeError:
+            tmp = x.divide(tau)
+
         if out is None:
-            return x - tau * self.proximal(x/tau, 1/tau)
+            val = self.proximal(tmp, 1.0/tau)
         else:            
-            self.proximal(x/tau, 1/tau, out = out)
-            out*=-tau
-            out.add(x, out = out)                       
-    
+            self.proximal(tmp, 1.0/tau, out = out)
+            val = out
+                   
+        if id(tmp) == id(x):
+            x.multiply(tau, out = x)
+
+        val.axpby(-tau, 1.0, x, out=val)
+
+        if out is None:
+            return val
+
+
+
     # Algebra for Function Class
     
         # Add functions
@@ -261,7 +277,19 @@ class ScaledFunction(Function):
         .. math:: G^{*}(x^{*}) = \alpha  F^{*}(\frac{x^{*}}{\alpha})
         
         """
-        return self.scalar * self.function.convex_conjugate(x/self.scalar)
+        try:
+            x.divide(self.scalar, out = x)
+            tmp = x
+        except TypeError:
+            tmp = x.divide(self.scalar)
+
+        val = self.function.convex_conjugate(tmp)
+
+        if id(tmp) == id(x):
+            x.multiply(self.scalar, out = x)
+
+        return  self.scalar * val
+
     
     def gradient(self, x, out=None):
         r"""Returns the gradient of the scaled function.
@@ -269,8 +297,6 @@ class ScaledFunction(Function):
         .. math:: G'(x) = \alpha  F'(x)
         
         """
-        
-#        try:
         if out is None:            
             return self.scalar * self.function.gradient(x)
         else:
@@ -291,11 +317,27 @@ class ScaledFunction(Function):
     def proximal_conjugate(self, x, tau, out = None):
         r"""This returns the proximal operator for the function at x, tau
         """
+
+        try:
+            x.divide(self.scalar, out = x)
+            tmp = x
+        except TypeError:
+            tmp = x.divide(self.scalar, dtype=np.float32)
+
         if out is None:
-            return self.scalar * self.function.proximal_conjugate(x/self.scalar, tau/self.scalar)
+            val = self.function.proximal_conjugate(tmp, tau/self.scalar)
+            val *= self.scalar
+
+            if id(tmp) == id(x):
+                x.multiply(self.scalar, out = x)
+            return val
+
         else:
-            self.function.proximal_conjugate(x/self.scalar, tau/self.scalar, out=out)
+            self.function.proximal_conjugate(tmp, tau/self.scalar, out=out)
             out *= self.scalar
+        
+            if id(tmp) == id(x):
+                x.multiply(self.scalar, out = x)       
 
 class SumScalarFunction(SumFunction):
           
@@ -508,6 +550,3 @@ class TranslateFunction(Function):
         """        
         
         return self.function.convex_conjugate(x) + self.center.dot(x)
-                           
-    
-    

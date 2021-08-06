@@ -2728,6 +2728,9 @@ class Processor(object):
             raise TypeError("Input type mismatch: got {0} expecting {1}"\
                             .format(type(dataset), DataContainer))
     
+    def clear_input(self):
+        self.__dict__['input']= None
+
     def check_input(self, dataset):
         '''Checks parameters of the input DataContainer
         

@@ -105,7 +105,14 @@ class MixedL21Norm(Function):
             
         else:
             
-            tmp = (x/tau).pnorm(2)
+            try:
+                x.divide(tau,out=x)
+                tmp = x.pnorm(2)
+                x.multiply(tau,out=x)
+            except TypeError:
+                x_scaled = x.divide(tau)
+                tmp = x_scaled.pnorm(2)
+ 
             tmp_ig = 0.0 * tmp
             (tmp - 1).maximum(0.0, out = tmp_ig)
             tmp_ig.multiply(x, out = out)

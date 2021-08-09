@@ -318,6 +318,8 @@ class ScaledFunction(Function):
         r"""This returns the proximal operator for the function at x, tau
         """
 
+
+
         try:
             x.divide(self.scalar, out = x)
             tmp = x
@@ -500,8 +502,6 @@ class TranslateFunction(Function):
         self.function = function
         self.center = center
         
-        
-                
     def __call__(self, x):
         
         r"""Returns the value of the translated function.
@@ -509,8 +509,19 @@ class TranslateFunction(Function):
         .. math:: G(x) = F(x - b)
         
         """        
-        
-        return self.function(x - self.center)
+        try:
+            x.subtract(self.center, out = x)
+            tmp = x
+        except TypeError:
+            tmp = x.subtract(self.center, dtype=np.float32)
+
+        val = self.function(tmp)
+
+        if id(tmp) == id(x):
+            x.add(self.center, out = x)
+
+        return val
+
     
     def gradient(self, x, out = None):
         
@@ -519,12 +530,23 @@ class TranslateFunction(Function):
         .. math:: G'(x) =  F'(x - b)
         
         """        
-        
+        try:
+            x.subtract(self.center, out = x)
+            tmp = x
+        except TypeError:
+            tmp = x.subtract(self.center, dtype=np.float32)
+
         if out is None:
-            return self.function.gradient(x - self.center)
+            val = self.function.gradient(tmp)
         else:                       
-            x.subtract(self.center, out = out)
-            self.function.gradient(out, out = out)           
+            self.function.gradient(tmp, out = out)   
+
+        if id(tmp) == id(x):
+            x.add(self.center, out = x)
+
+        if out is None:
+            return val
+
     
     def proximal(self, x, tau, out = None):
         
@@ -533,14 +555,25 @@ class TranslateFunction(Function):
         .. math:: \mathrm{prox}_{\tau G}(x) = \mathrm{prox}_{\tau F}(x-b) + b
         
         """        
-        
+        try:
+            x.subtract(self.center, out = x)
+            tmp = x
+        except TypeError:
+            tmp = x.subtract(self.center, dtype=np.float32)
+
         if out is None:
-            return self.function.proximal(x - self.center, tau) + self.center
+            val = self.function.proximal(tmp, tau)
+            val.add(self.center, out = val)
         else:                    
-            x.subtract(self.center, out = out)
-            self.function.proximal(out, tau, out = out)
+            self.function.proximal(tmp, tau, out = out)   
             out.add(self.center, out = out)
-                    
+
+        if id(tmp) == id(x):
+            x.add(self.center, out = x)
+
+        if out is None:
+            return val
+
     def convex_conjugate(self, x):
         
         r"""Returns the convex conjugate of the translated function.

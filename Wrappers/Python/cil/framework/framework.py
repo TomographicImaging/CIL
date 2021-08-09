@@ -2778,10 +2778,19 @@ class Processor(object):
     def process(self, out=None):
         raise NotImplementedError('process must be implemented')
     
-    def __call__(self, x):
+    def __call__(self, x, out=None):
         
-        self.set_input(x)
-        return self.get_output()        
+        self.set_input(x)    
+
+        if out is None:
+            out = self.get_output()      
+        else:
+            self.get_output(out=out)
+
+        self.clear_input()
+        
+        return out
+
 
 class DataProcessor(Processor):
     '''Basically an alias of Processor Class'''

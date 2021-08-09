@@ -116,8 +116,8 @@ class PDHG(Algorithm):
 
         self.x = self.x_old.copy()
         self.x_tmp = self.operator.domain_geometry().allocate(0)
-        self.y0 = self.operator.range_geometry().allocate(0)
-        self.y1 = self.operator.range_geometry().allocate(0)    
+        self.y = self.operator.range_geometry().allocate(0)
+        self.y_tmp = self.operator.range_geometry().allocate(0)    
         # relaxation parameter
         self.theta = 1
         
@@ -131,7 +131,7 @@ class PDHG(Algorithm):
         self.x = tmp
     def update(self):
 
-        #calculate x-bar (x currently holds )
+        #calculate x-bar and store in self.x_tmp
         if self._use_axpby:
             self.x_old.axpby((self.theta + 1.0), -self.theta , self.x, out=self.x_tmp) 
         else:
@@ -140,18 +140,18 @@ class PDHG(Algorithm):
             self.x_tmp += self.x_old
 
         # Gradient ascent for the dual variable
-        self.operator.direct(self.x_tmp, out=self.y1)
+        self.operator.direct(self.x_tmp, out=self.y_tmp)
         
         if self._use_axpby:
-            self.y1.axpby(self.sigma, 1.0 , self.y0, out=self.y1)
+            self.y_tmp.axpby(self.sigma, 1.0 , self.y, out=self.y_tmp)
         else:
-            self.y1 *= self.sigma
-            self.y1 += self.y0
+            self.y_tmp *= self.sigma
+            self.y_tmp += self.y
 
-        self.f.proximal_conjugate(self.y1, self.sigma, out=self.y0)
+        self.f.proximal_conjugate(self.y_tmp, self.sigma, out=self.y)
 
         # Gradient descent for the primal variable
-        self.operator.adjoint(self.y0, out=self.x_tmp)
+        self.operator.adjoint(self.y, out=self.x_tmp)
 
         if self._use_axpby:
             self.x_tmp.axpby(-self.tau, 1.0 , self.x_old, self.x_tmp)
@@ -163,20 +163,19 @@ class PDHG(Algorithm):
         
     def update_objective(self):
 
-        #use y1 as temp holder
-        self.operator.direct(self.x, out=self.y1)
-        p1 = self.f(self.y1)
-        p1 += self.g(self.x)
+        self.operator.direct(self.x, out=self.y_tmp)
+        f_eval_p = self.f(self.y_tmp)
+        g_eval_p = self.g(self.x)
+        p1 = f_eval_p + g_eval_p
 
-        #use x_tmp as temp holder
-        self.operator.adjoint(self.y0, out=self.x_tmp)
+        self.operator.adjoint(self.y, out=self.x_tmp)
         self.x_tmp.multiply(-1.0, out=self.x_tmp)
 
-        d1 = self.f.convex_conjugate(self.y0)
-        d1 += self.g.convex_conjugate(self.x_tmp)
-        d1 *= -1
+        f_eval_d = self.f.convex_conjugate(self.y)
+        g_eval_d = self.g.convex_conjugate(self.x_tmp)
+        d1 = f_eval_d + g_eval_d
 
-        self.loss.append([p1, d1, p1-d1])
+        self.loss.append([p1, -d1, p1+d1])
         
     @property
     def objective(self):

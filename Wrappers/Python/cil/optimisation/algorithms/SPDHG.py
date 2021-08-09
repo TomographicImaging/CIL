@@ -175,8 +175,8 @@ class SPDHG(Algorithm):
             y_k.multiply(self.sigma[i], out=y_k)
             y_k.add(self.y_old[i], out=y_k)
             
-        tmp = self.f[i].proximal_conjugate(y_k, self.sigma[i])
-        y_k = tmp
+        y_k = self.f[i].proximal_conjugate(y_k, self.sigma[i])
+        
         # Back-project
         # x_tmp = K[i]^*(y_k - y_old[i])
         y_k.subtract(self.y_old[i], out=self.y_old[i])

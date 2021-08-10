@@ -32,9 +32,9 @@ class PDHG(Algorithm):
     :param operator: Linear Operator = K
     :param f: Convex function with "simple" proximal of its conjugate. 
     :param g: Convex function with "simple" proximal 
-    :param sigma: Step size parameter for Primal problem
-    :param tau: Step size parameter for Dual problem
-        
+    :param tau: Step size parameter for Primal problem
+    :param sigma: Step size parameter for Dual problem
+ 
     Remark: Convergence is guaranted provided that
         
     .. math:: 
@@ -62,8 +62,8 @@ class PDHG(Algorithm):
         :param operator: a Linear Operator
         :param f: Convex function with "simple" proximal of its conjugate. 
         :param g: Convex function with "simple" proximal 
-        :param sigma: Step size parameter for Primal problem
-        :param tau: Step size parameter for Dual problem
+        :param tau: Step size parameter for Primal problem
+        :param sigma: Step size parameter for Dual problem
         :param initial: Initial guess ( Default initial = 0)
         '''
         super(PDHG, self).__init__(**kwargs)
@@ -86,8 +86,8 @@ class PDHG(Algorithm):
         :param operator: a Linear Operator
         :param f: Convex function with "simple" proximal of its conjugate. 
         :param g: Convex function with "simple" proximal 
-        :param sigma: Step size parameter for Primal problem
-        :param tau: Step size parameter for Dual problem
+        :param tau: Step size parameter for Primal problem
+        :param sigma: Step size parameter for Dual problem
         :param initial: Initial guess ( Default initial = 0)'''
 
         print("{} setting up".format(self.__class__.__name__, ))

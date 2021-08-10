@@ -1,7 +1,7 @@
 # GitHub Actions
 
 ## Building the Conda Package: [conda_build](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/conda_build.yml)
-This github action builds and tests the conda package.
+This github action builds and tests the conda package, by using the [conda-package-publish-action](https://github.com/paskino/conda-package-publish-action)
 
 If pushing to master or tagging, *all* variants are built and tested.
 

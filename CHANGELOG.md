@@ -1,3 +1,7 @@
+* 21.2.1
+  - PDHG memory optimisation
+  - ScaledFunction memory Optimisation
+
 * 21.2.0
   - add version string from git describe
   - add CCPi-Regularisation toolkit in unittests

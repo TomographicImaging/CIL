@@ -32,9 +32,9 @@ class PDHG(Algorithm):
     :param operator: Linear Operator = K
     :param f: Convex function with "simple" proximal of its conjugate. 
     :param g: Convex function with "simple" proximal 
-    :param sigma: Step size parameter for Primal problem
-    :param tau: Step size parameter for Dual problem
-        
+    :param tau: Step size parameter for Primal problem
+    :param sigma: Step size parameter for Dual problem
+ 
     Remark: Convergence is guaranted provided that
         
     .. math:: 
@@ -62,8 +62,8 @@ class PDHG(Algorithm):
         :param operator: a Linear Operator
         :param f: Convex function with "simple" proximal of its conjugate. 
         :param g: Convex function with "simple" proximal 
-        :param sigma: Step size parameter for Primal problem
-        :param tau: Step size parameter for Dual problem
+        :param tau: Step size parameter for Primal problem
+        :param sigma: Step size parameter for Dual problem
         :param initial: Initial guess ( Default initial = 0)
         '''
         super(PDHG, self).__init__(**kwargs)
@@ -86,8 +86,8 @@ class PDHG(Algorithm):
         :param operator: a Linear Operator
         :param f: Convex function with "simple" proximal of its conjugate. 
         :param g: Convex function with "simple" proximal 
-        :param sigma: Step size parameter for Primal problem
-        :param tau: Step size parameter for Dual problem
+        :param tau: Step size parameter for Primal problem
+        :param sigma: Step size parameter for Dual problem
         :param initial: Initial guess ( Default initial = 0)'''
 
         print("{} setting up".format(self.__class__.__name__, ))
@@ -110,20 +110,14 @@ class PDHG(Algorithm):
             self.tau = 1 / (self.sigma * normK ** 2)
         
         if initial is None:
-            self.x_old = self.operator.domain_geometry().allocate()
+            self.x_old = self.operator.domain_geometry().allocate(0)
         else:
             self.x_old = initial.copy()
 
-        self.x = operator.domain_geometry().allocate(0)        
+        self.x = self.x_old.copy()
+        self.x_tmp = self.operator.domain_geometry().allocate(0)
         self.y = self.operator.range_geometry().allocate(0)
-        self.y_old = self.operator.range_geometry().allocate(0)
-        
-        self.x_tmp = self.x_old.copy()
-        
-        self.y_tmp = self.y_old.copy()
-        
-        self.xbar = self.x_old.copy()
-        
+        self.y_tmp = self.operator.range_geometry().allocate(0)    
         # relaxation parameter
         self.theta = 1
         
@@ -135,56 +129,53 @@ class PDHG(Algorithm):
         tmp = self.x_old
         self.x_old = self.x
         self.x = tmp
-        tmp = self.y_old
-        self.y_old = self.y
-        self.y = tmp
-        
     def update(self):
-        
-        # Gradient ascent for the dual variable
-        self.operator.direct(self.xbar, out=self.y_tmp)
-        
-        # self.y_tmp *= self.sigma
-        # self.y_tmp += self.y_old
+
+        #calculate x-bar and store in self.x_tmp
         if self._use_axpby:
-            self.y_tmp.axpby(self.sigma, 1 , self.y_old, self.y_tmp)
+            self.x_old.axpby((self.theta + 1.0), -self.theta , self.x, out=self.x_tmp) 
+        else:
+            self.x_old.subtract(self.x, out=self.x_tmp)
+            self.x_tmp *= self.theta
+            self.x_tmp += self.x_old
+
+        # Gradient ascent for the dual variable
+        self.operator.direct(self.x_tmp, out=self.y_tmp)
+        
+        if self._use_axpby:
+            self.y_tmp.axpby(self.sigma, 1.0 , self.y, out=self.y_tmp)
         else:
             self.y_tmp *= self.sigma
-            self.y_tmp += self.y_old
+            self.y_tmp += self.y
 
-        # self.y = self.f.proximal_conjugate(self.y_old, self.sigma)
         self.f.proximal_conjugate(self.y_tmp, self.sigma, out=self.y)
-        
+
         # Gradient descent for the primal variable
         self.operator.adjoint(self.y, out=self.x_tmp)
-        # self.x_tmp *= -1*self.tau
-        # self.x_tmp += self.x_old
+
         if self._use_axpby:
-            self.x_tmp.axpby(-self.tau, 1. , self.x_old, self.x_tmp)
+            self.x_tmp.axpby(-self.tau, 1.0 , self.x_old, self.x_tmp)
         else:
-            self.x_tmp *= -1*self.tau
+            self.x_tmp *= -1.0*self.tau
             self.x_tmp += self.x_old
 
         self.g.proximal(self.x_tmp, self.tau, out=self.x)
-
-        # Update
-        self.x.subtract(self.x_old, out=self.xbar)
-        # self.xbar *= self.theta
-        # self.xbar += self.x
-        if self._use_axpby:
-            self.xbar.axpby(self.theta, 1 , self.x, self.xbar)
-        else:
-            self.xbar *= self.theta
-            self.xbar += self.x
         
-        
-
     def update_objective(self):
 
-        p1 = self.f(self.operator.direct(self.x)) + self.g(self.x)
-        d1 = -(self.f.convex_conjugate(self.y) + self.g.convex_conjugate(-1*self.operator.adjoint(self.y)))
+        self.operator.direct(self.x, out=self.y_tmp)
+        f_eval_p = self.f(self.y_tmp)
+        g_eval_p = self.g(self.x)
+        p1 = f_eval_p + g_eval_p
 
-        self.loss.append([p1, d1, p1-d1])
+        self.operator.adjoint(self.y, out=self.x_tmp)
+        self.x_tmp.multiply(-1.0, out=self.x_tmp)
+
+        f_eval_d = self.f.convex_conjugate(self.y)
+        g_eval_d = self.g.convex_conjugate(self.x_tmp)
+        d1 = f_eval_d + g_eval_d
+
+        self.loss.append([p1, -d1, p1+d1])
         
     @property
     def objective(self):

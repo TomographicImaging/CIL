@@ -14,8 +14,13 @@ The action does not publish to conda, instead this is done by jenkins. This is b
 This github action builds and optionally publishes the documentation located in [docs/source](https://github.com/TomographicImaging/CIL/tree/master/docs/source). 
 
 The github action has two jobs:
-[build](https://github.com/TomographicImaging/CIL/blob/39b6f7a722afb6d5f0e2d47a99ce8266378c2a65/.github/workflows/docs_build_and_publish.yml#L12)
-and [publish](https://github.com/TomographicImaging/CIL/blob/39b6f7a722afb6d5f0e2d47a99ce8266378c2a65/.github/workflows/docs_build_and_publish.yml#L40).
+1. [build](https://github.com/TomographicImaging/CIL/blob/39b6f7a722afb6d5f0e2d47a99ce8266378c2a65/.github/workflows/docs_build_and_publish.yml#L12): 
+-  builds the documentation with sphinx
+-  uses upload-artifact to upload the html files which may then be used by **publish**
+
+2. [publish](https://github.com/TomographicImaging/CIL/blob/39b6f7a722afb6d5f0e2d47a99ce8266378c2a65/.github/workflows/docs_build_and_publish.yml#L40):
+-  uses download-artifact to retrieve the built html files
+-  pushes the html files to the `nightly` folder on the gh-pages branch
 
 If opening or modifying a pull request to master, `build` is run, but not `publish`.
 If pushing to master or tagging, the documentation is built *and* published (both the `build` and `publish` jobs are run).
@@ -37,4 +42,11 @@ If you are an admin of the CIL repository you are able to see the settings for t
 To publish the documentation, the publish job of the gh-action pushes the documentation changes to the `gh-pages` branch.
 Any push to this branch automatically updates the github site.
 
+
+### Initial Setup of the Docs Site & Action
+To get the action to work I first had to:
+1. Create a gh-pages branch: https://gist.github.com/ramnathv/2227408 - note this only worked in bash, not windows command line.
+2. [Set the source](https://github.com/TomographicImaging/CIL/settings/pages) for our github pages to be the gh-pages branch.
+
+I followed the examples on the [sphinx build action page](https://github.com/marketplace/actions/sphinx-build), specifically this [example workflow](https://github.com/ammaraskar/sphinx-action-test/blob/master/.github/workflows/default.yml)
 

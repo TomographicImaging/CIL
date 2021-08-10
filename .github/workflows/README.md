@@ -45,7 +45,7 @@ Any push to this branch automatically updates the github site.
 
 ### Initial Setup of the Docs Site & Action
 To get the action to work I first had to:
-1. Create a gh-pages branch: https://gist.github.com/ramnathv/2227408 - note this only worked in bash, not windows command line.
+1. [Create a gh-pages branch](https://gist.github.com/ramnathv/2227408) - note this only worked in bash, not windows command line.
 2. [Set the source](https://github.com/TomographicImaging/CIL/settings/pages) for our github pages to be the gh-pages branch.
 
 I followed the examples on the [sphinx build action page](https://github.com/marketplace/actions/sphinx-build), specifically this [example workflow](https://github.com/ammaraskar/sphinx-action-test/blob/master/.github/workflows/default.yml)

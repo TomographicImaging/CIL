@@ -84,7 +84,7 @@ class Function(object):
             tmp = x
             x.divide(tau, out = tmp)
         except TypeError:
-            tmp = x.divide(tau)
+            tmp = x.divide(tau, dtype=np.float32)
 
         if out is None:
             val = self.proximal(tmp, 1.0/tau)
@@ -281,7 +281,7 @@ class ScaledFunction(Function):
             x.divide(self.scalar, out = x)
             tmp = x
         except TypeError:
-            tmp = x.divide(self.scalar)
+            tmp = x.divide(self.scalar, dtype=np.float32)
 
         val = self.function.convex_conjugate(tmp)
 
@@ -317,29 +317,25 @@ class ScaledFunction(Function):
     def proximal_conjugate(self, x, tau, out = None):
         r"""This returns the proximal operator for the function at x, tau
         """
-
-
-
         try:
-            x.divide(self.scalar, out = x)
             tmp = x
+            x.divide(tau, out = tmp)
         except TypeError:
-            tmp = x.divide(self.scalar, dtype=np.float32)
+            tmp = x.divide(tau, dtype=np.float32)
 
         if out is None:
-            val = self.function.proximal_conjugate(tmp, tau/self.scalar)
-            val *= self.scalar
-
-            if id(tmp) == id(x):
-                x.multiply(self.scalar, out = x)
-            return val
-
+            val = self.function.proximal(tmp, self.scalar/tau )
         else:
-            self.function.proximal_conjugate(tmp, tau/self.scalar, out=out)
-            out *= self.scalar
-        
-            if id(tmp) == id(x):
-                x.multiply(self.scalar, out = x)       
+            self.function.proximal(tmp, self.scalar/tau, out = out)
+            val = out     
+
+        if id(tmp) == id(x):
+            x.multiply(tau, out = x)
+
+        val.axpby(-tau, 1.0, x, out=val)
+
+        if out is None:
+            return val
 
 class SumScalarFunction(SumFunction):
           

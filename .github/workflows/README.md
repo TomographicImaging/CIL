@@ -26,7 +26,7 @@ in a folder named `DocumentationHTML`.
 This can be found by going to the ‘Actions’ tab, and selecting the appropriate run of `.github/workflows/docs_build_and_publish.yml`.
 
 When viewing the summary for the run of the action, there is an `Artifact` section at the bottom of the page.
-Clicking on `DocumentationHTML` allows you to download a zip folder containing the built html files. This allows you to preview
+Clicking on `DocumentationHTML` allows you to download a zip folder containing the built html files. This allows you to preview the documentation site before it is published.
 
 ### Publication of the Documentation
 The documentation is hosted on the [github site](https://tomographicimaging.github.io/CIL/) associated with the repository.

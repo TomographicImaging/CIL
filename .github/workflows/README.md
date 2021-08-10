@@ -3,9 +3,9 @@
 ## Building the Conda Package: [conda_build](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/conda_build.yml)
 This github action builds and tests the conda package, by using the [conda-package-publish-action](https://github.com/paskino/conda-package-publish-action)
 
-If pushing to master or tagging, *all* variants are built and tested.
+When pushing to master or creating an [annotated tag](https://git-scm.com/book/en/v2/Git-Basics-Tagging), *all* variants are built and tested.
 
-If opening or modifying a pull request to master, a single variant is built and tested.
+When opening or modifying a pull request to master, a single variant is built and tested. This variant is `python=3.7` and `numpy=1.18`.
 
 The action does not publish to conda, instead this is done by jenkins. This is because github-actions do not have a GPU.
 

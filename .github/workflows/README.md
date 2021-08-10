@@ -22,11 +22,11 @@ If pushing to master or tagging, the documentation is built *and* published (bot
 
 ### Viewing Built Documentation
 The `build` job builds the documentation and uploads it as an [artifact](https://github.com/TomographicImaging/CIL/blob/39b6f7a722afb6d5f0e2d47a99ce8266378c2a65/.github/workflows/docs_build_and_publish.yml#L36),
-in a folder named DocumentationHTML.
+in a folder named `DocumentationHTML`.
 This can be found by going to the ‘Actions’ tab, and selecting the appropriate run of `.github/workflows/docs_build_and_publish.yml`.
 
 When viewing the summary for the run of the action, there is an `Artifact` section at the bottom of the page.
-Clicking on ‘DocumentationHTML’ allows you to download a zip folder containing the built html files. This allows you to preview
+Clicking on `DocumentationHTML` allows you to download a zip folder containing the built html files. This allows you to preview
 
 ### Publication of the Documentation
 The documentation is hosted on the [github site](https://tomographicimaging.github.io/CIL/) associated with the repository.

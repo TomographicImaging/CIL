@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>cil.optimisation.algorithms.PDHG &mdash; CIL v21.1.0-43-g39b6f7a documentation</title>
+  <title>cil.optimisation.algorithms.PDHG &mdash; CIL v21.2.0-1-g01df8da documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v21.1.0-43-g39b6f7a
+                v21.2.0-1-g01df8da
               </div>
             
           
@@ -197,9 +197,9 @@
 <span class="sd">    :param operator: Linear Operator = K</span>
 <span class="sd">    :param f: Convex function with &quot;simple&quot; proximal of its conjugate. </span>
 <span class="sd">    :param g: Convex function with &quot;simple&quot; proximal </span>
-<span class="sd">    :param sigma: Step size parameter for Primal problem</span>
-<span class="sd">    :param tau: Step size parameter for Dual problem</span>
-<span class="sd">        </span>
+<span class="sd">    :param tau: Step size parameter for Primal problem</span>
+<span class="sd">    :param sigma: Step size parameter for Dual problem</span>
+<span class="sd"> </span>
 <span class="sd">    Remark: Convergence is guaranted provided that</span>
 <span class="sd">        </span>
 <span class="sd">    .. math:: </span>
@@ -227,8 +227,8 @@
 <span class="sd">        :param operator: a Linear Operator</span>
 <span class="sd">        :param f: Convex function with &quot;simple&quot; proximal of its conjugate. </span>
 <span class="sd">        :param g: Convex function with &quot;simple&quot; proximal </span>
-<span class="sd">        :param sigma: Step size parameter for Primal problem</span>
-<span class="sd">        :param tau: Step size parameter for Dual problem</span>
+<span class="sd">        :param tau: Step size parameter for Primal problem</span>
+<span class="sd">        :param sigma: Step size parameter for Dual problem</span>
 <span class="sd">        :param initial: Initial guess ( Default initial = 0)</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">PDHG</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -251,8 +251,8 @@
 <span class="sd">        :param operator: a Linear Operator</span>
 <span class="sd">        :param f: Convex function with &quot;simple&quot; proximal of its conjugate. </span>
 <span class="sd">        :param g: Convex function with &quot;simple&quot; proximal </span>
-<span class="sd">        :param sigma: Step size parameter for Primal problem</span>
-<span class="sd">        :param tau: Step size parameter for Dual problem</span>
+<span class="sd">        :param tau: Step size parameter for Primal problem</span>
+<span class="sd">        :param sigma: Step size parameter for Dual problem</span>
 <span class="sd">        :param initial: Initial guess ( Default initial = 0)&#39;&#39;&#39;</span>
 
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> setting up&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="p">))</span>
@@ -275,20 +275,14 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">tau</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span> <span class="o">*</span> <span class="n">normK</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
         
         <span class="k">if</span> <span class="n">initial</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">x_old</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_old</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">x_old</span> <span class="o">=</span> <span class="n">initial</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_old</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">y_old</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        
-        <span class="bp">self</span><span class="o">.</span><span class="n">x_tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_old</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        
-        <span class="bp">self</span><span class="o">.</span><span class="n">y_tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_old</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        
-        <span class="bp">self</span><span class="o">.</span><span class="n">xbar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_old</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>    
         <span class="c1"># relaxation parameter</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="mi">1</span>
         
@@ -299,57 +293,54 @@
         <span class="c1"># swap the pointers to current and previous solution</span>
         <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_old</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x_old</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">tmp</span>
-        <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_old</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">y_old</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">tmp</span></div>
-        
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">tmp</span></div>
 <div class="viewcode-block" id="PDHG.update"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.PDHG.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        
-        <span class="c1"># Gradient ascent for the dual variable</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xbar</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y_tmp</span><span class="p">)</span>
-        
-        <span class="c1"># self.y_tmp *= self.sigma</span>
-        <span class="c1"># self.y_tmp += self.y_old</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_axpby</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">y_tmp</span><span class="o">.</span><span class="n">axpby</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">,</span> <span class="mi">1</span> <span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_old</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_tmp</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">y_tmp</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">y_tmp</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_old</span>
 
-        <span class="c1"># self.y = self.f.proximal_conjugate(self.y_old, self.sigma)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">proximal_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_tmp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
-        
-        <span class="c1"># Gradient descent for the primal variable</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x_tmp</span><span class="p">)</span>
-        <span class="c1"># self.x_tmp *= -1*self.tau</span>
-        <span class="c1"># self.x_tmp += self.x_old</span>
+        <span class="c1">#calculate x-bar and store in self.x_tmp</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_axpby</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">x_tmp</span><span class="o">.</span><span class="n">axpby</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="p">,</span> <span class="mf">1.</span> <span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_old</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_tmp</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_old</span><span class="o">.</span><span class="n">axpby</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">),</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x_tmp</span><span class="p">)</span> 
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">x_tmp</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">tau</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_old</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x_tmp</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_tmp</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">x_tmp</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_old</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_tmp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
-
-        <span class="c1"># Update</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_old</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">xbar</span><span class="p">)</span>
-        <span class="c1"># self.xbar *= self.theta</span>
-        <span class="c1"># self.xbar += self.x</span>
+        <span class="c1"># Gradient ascent for the dual variable</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_tmp</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y_tmp</span><span class="p">)</span>
+        
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_axpby</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">xbar</span><span class="o">.</span><span class="n">axpby</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">,</span> <span class="mi">1</span> <span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xbar</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">y_tmp</span><span class="o">.</span><span class="n">axpby</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">,</span> <span class="mf">1.0</span> <span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y_tmp</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">xbar</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">xbar</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span></div>
-        
-        
+            <span class="bp">self</span><span class="o">.</span><span class="n">y_tmp</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">y_tmp</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">proximal_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_tmp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+
+        <span class="c1"># Gradient descent for the primal variable</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x_tmp</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_axpby</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_tmp</span><span class="o">.</span><span class="n">axpby</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="p">,</span> <span class="mf">1.0</span> <span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_old</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_tmp</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_tmp</span> <span class="o">*=</span> <span class="o">-</span><span class="mf">1.0</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">tau</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_tmp</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_old</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_tmp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span></div>
+        
 <div class="viewcode-block" id="PDHG.update_objective"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.algorithms.PDHG.update_objective">[docs]</a>    <span class="k">def</span> <span class="nf">update_objective</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
-        <span class="n">p1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">))</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">d1</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">convex_conjugate</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y_tmp</span><span class="p">)</span>
+        <span class="n">f_eval_p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_tmp</span><span class="p">)</span>
+        <span class="n">g_eval_p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">p1</span> <span class="o">=</span> <span class="n">f_eval_p</span> <span class="o">+</span> <span class="n">g_eval_p</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">p1</span><span class="p">,</span> <span class="n">d1</span><span class="p">,</span> <span class="n">p1</span><span class="o">-</span><span class="n">d1</span><span class="p">])</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x_tmp</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_tmp</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x_tmp</span><span class="p">)</span>
+
+        <span class="n">f_eval_d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">g_eval_d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_tmp</span><span class="p">)</span>
+        <span class="n">d1</span> <span class="o">=</span> <span class="n">f_eval_d</span> <span class="o">+</span> <span class="n">g_eval_d</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">p1</span><span class="p">,</span> <span class="o">-</span><span class="n">d1</span><span class="p">,</span> <span class="n">p1</span><span class="o">+</span><span class="n">d1</span><span class="p">])</span></div>
         
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">objective</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

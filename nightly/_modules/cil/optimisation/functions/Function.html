@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>cil.optimisation.functions.Function &mdash; CIL v21.1.0-43-g39b6f7a documentation</title>
+  <title>cil.optimisation.functions.Function &mdash; CIL v21.2.0-1-g01df8da documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v21.1.0-43-g39b6f7a
+                v21.2.0-1-g01df8da
               </div>
             
           
@@ -183,6 +183,7 @@
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Number</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <div class="viewcode-block" id="Function"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.Function">[docs]</a><span class="k">class</span> <span class="nc">Function</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     
@@ -244,13 +245,28 @@
 <span class="sd">        .. math:: \mathrm{prox}_{\tau F^{*}}(x) = x - \tau\mathrm{prox}_{\tau^{-1} F}(\tau^{-1}x)</span>
 <span class="sd">                </span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">x</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">x</span> <span class="o">-</span> <span class="n">tau</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="n">tau</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="n">tau</span><span class="p">)</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">tau</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>            
-            <span class="bp">self</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="n">tau</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">)</span>
-            <span class="n">out</span><span class="o">*=-</span><span class="n">tau</span>
-            <span class="n">out</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">)</span>                       </div>
-    
+            <span class="bp">self</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">)</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">out</span>
+                   
+        <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">==</span> <span class="nb">id</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">x</span><span class="p">)</span>
+
+        <span class="n">val</span><span class="o">.</span><span class="n">axpby</span><span class="p">(</span><span class="o">-</span><span class="n">tau</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">val</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">val</span></div>
+
+
+
     <span class="c1"># Algebra for Function Class</span>
     
         <span class="c1"># Add functions</span>
@@ -426,7 +442,19 @@
 <span class="sd">        .. math:: G^{*}(x^{*}) = \alpha  F^{*}(\frac{x^{*}}{\alpha})</span>
 <span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">convex_conjugate</span><span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">scalar</span><span class="p">)</span></div>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scalar</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">x</span><span class="p">)</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scalar</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+        <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">convex_conjugate</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">==</span> <span class="nb">id</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scalar</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">x</span><span class="p">)</span>
+
+        <span class="k">return</span>  <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span> <span class="o">*</span> <span class="n">val</span></div>
+
     
 <div class="viewcode-block" id="ScaledFunction.gradient"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.ScaledFunction.gradient">[docs]</a>    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the gradient of the scaled function.</span>
@@ -434,8 +462,6 @@
 <span class="sd">        .. math:: G&#39;(x) = \alpha  F&#39;(x)</span>
 <span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        
-<span class="c1">#        try:</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>            
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -456,11 +482,25 @@
 <div class="viewcode-block" id="ScaledFunction.proximal_conjugate"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.ScaledFunction.proximal_conjugate">[docs]</a>    <span class="k">def</span> <span class="nf">proximal_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;This returns the proximal operator for the function at x, tau</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">x</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">proximal_conjugate</span><span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">scalar</span><span class="p">,</span> <span class="n">tau</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">scalar</span><span class="p">)</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span><span class="o">/</span><span class="n">tau</span> <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">proximal_conjugate</span><span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">scalar</span><span class="p">,</span> <span class="n">tau</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">scalar</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
-            <span class="n">out</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span></div></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span><span class="o">/</span><span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">)</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">out</span>     
+
+        <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">==</span> <span class="nb">id</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">x</span><span class="p">)</span>
+
+        <span class="n">val</span><span class="o">.</span><span class="n">axpby</span><span class="p">(</span><span class="o">-</span><span class="n">tau</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">val</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">val</span></div></div>
 
 <div class="viewcode-block" id="SumScalarFunction"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.SumScalarFunction">[docs]</a><span class="k">class</span> <span class="nc">SumScalarFunction</span><span class="p">(</span><span class="n">SumFunction</span><span class="p">):</span>
           
@@ -623,8 +663,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">function</span> <span class="o">=</span> <span class="n">function</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="n">center</span></div>
         
-        
-                
 <div class="viewcode-block" id="TranslateFunction.__call__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.TranslateFunction.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the value of the translated function.</span>
@@ -632,8 +670,19 @@
 <span class="sd">        .. math:: G(x) = F(x - b)</span>
 <span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>        
-        
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">)</span></div>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">x</span><span class="p">)</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+        <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">==</span> <span class="nb">id</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">x</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">val</span></div>
+
     
 <div class="viewcode-block" id="TranslateFunction.gradient"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.TranslateFunction.gradient">[docs]</a>    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         
@@ -642,12 +691,23 @@
 <span class="sd">        .. math:: G&#39;(x) =  F&#39;(x - b)</span>
 <span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>        
-        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">x</span><span class="p">)</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">)</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>                       
-            <span class="n">x</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">)</span>           </div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">)</span>   
+
+        <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">==</span> <span class="nb">id</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">x</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">val</span></div>
+
     
 <div class="viewcode-block" id="TranslateFunction.proximal"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.TranslateFunction.proximal">[docs]</a>    <span class="k">def</span> <span class="nf">proximal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         
@@ -656,14 +716,25 @@
 <span class="sd">        .. math:: \mathrm{prox}_{\tau G}(x) = \mathrm{prox}_{\tau F}(x-b) + b</span>
 <span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>        
-        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">x</span><span class="p">)</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">,</span> <span class="n">tau</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">center</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">tau</span><span class="p">)</span>
+            <span class="n">val</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">val</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>                    
-            <span class="n">x</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">)</span>
-            <span class="n">out</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">)</span></div>
-                    
+            <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">proximal</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">)</span>   
+            <span class="n">out</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">==</span> <span class="nb">id</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">x</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">val</span></div>
+
 <div class="viewcode-block" id="TranslateFunction.convex_conjugate"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.TranslateFunction.convex_conjugate">[docs]</a>    <span class="k">def</span> <span class="nf">convex_conjugate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the convex conjugate of the translated function.</span>
@@ -673,9 +744,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>        
         
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">convex_conjugate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div></div>
-                           
-    
-    
 </pre></div>
 
            </div>

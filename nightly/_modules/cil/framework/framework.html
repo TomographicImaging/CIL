@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>cil.framework.framework &mdash; CIL v21.1.0-43-g39b6f7a documentation</title>
+  <title>cil.framework.framework &mdash; CIL v21.2.0-1-g01df8da documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v21.1.0-43-g39b6f7a
+                v21.2.0-1-g01df8da
               </div>
             
           
@@ -2893,6 +2893,9 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Input type mismatch: got </span><span class="si">{0}</span><span class="s2"> expecting </span><span class="si">{1}</span><span class="s2">&quot;</span>\
                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span> <span class="n">DataContainer</span><span class="p">))</span>
     
+    <span class="k">def</span> <span class="nf">clear_input</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]</span><span class="o">=</span> <span class="kc">None</span>
+
     <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Checks parameters of the input DataContainer</span>
 <span class="sd">        </span>
@@ -2940,10 +2943,19 @@
     <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;process must be implemented&#39;</span><span class="p">)</span>
     
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>    
+
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>      
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear_input</span><span class="p">()</span>
+        
+        <span class="k">return</span> <span class="n">out</span>
+
 
 <div class="viewcode-block" id="DataProcessor"><a class="viewcode-back" href="../../../framework.html#cil.framework.DataProcessor">[docs]</a><span class="k">class</span> <span class="nc">DataProcessor</span><span class="p">(</span><span class="n">Processor</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Basically an alias of Processor Class&#39;&#39;&#39;</span>

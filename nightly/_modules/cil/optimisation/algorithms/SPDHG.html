@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>cil.optimisation.algorithms.SPDHG &mdash; CIL v21.1.0-43-g39b6f7a documentation</title>
+  <title>cil.optimisation.algorithms.SPDHG &mdash; CIL v21.2.0-1-g01df8da documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v21.1.0-43-g39b6f7a
+                v21.2.0-1-g01df8da
               </div>
             
           
@@ -340,7 +340,7 @@
             <span class="n">y_k</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">out</span><span class="o">=</span><span class="n">y_k</span><span class="p">)</span>
             <span class="n">y_k</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_old</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">out</span><span class="o">=</span><span class="n">y_k</span><span class="p">)</span>
             
-        <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">proximal_conjugate</span><span class="p">(</span><span class="n">y_k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">out</span><span class="o">=</span><span class="n">y_k</span><span class="p">)</span>
+        <span class="n">y_k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">proximal_conjugate</span><span class="p">(</span><span class="n">y_k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
         
         <span class="c1"># Back-project</span>
         <span class="c1"># x_tmp = K[i]^*(y_k - y_old[i])</span>

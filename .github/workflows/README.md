@@ -14,11 +14,11 @@ The action does not publish to conda, instead this is done by jenkins. This is b
 This github action builds and optionally publishes the documentation located in [docs/source](https://github.com/TomographicImaging/CIL/tree/master/docs/source). 
 
 The github action has two jobs:
-1. [build](https://github.com/TomographicImaging/CIL/blob/39b6f7a722afb6d5f0e2d47a99ce8266378c2a65/.github/workflows/docs_build_and_publish.yml#L12): 
+1. [build](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/docs_build_and_publish.yml#L12): 
 -  builds the documentation with sphinx
 -  uses upload-artifact to upload the html files which may then be used by **publish**
 
-2. [publish](https://github.com/TomographicImaging/CIL/blob/39b6f7a722afb6d5f0e2d47a99ce8266378c2a65/.github/workflows/docs_build_and_publish.yml#L40):
+2. [publish](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/docs_build_and_publish.yml#L40):
 -  uses download-artifact to retrieve the built html files
 -  pushes the html files to the `nightly` folder on the gh-pages branch
 
@@ -26,7 +26,7 @@ If opening or modifying a pull request to master, `build` is run, but not `publi
 If pushing to master or tagging, the documentation is built *and* published (both the `build` and `publish` jobs are run).
 
 ### Viewing Built Documentation
-The `build` job builds the documentation and uploads it as an [artifact](https://github.com/TomographicImaging/CIL/blob/39b6f7a722afb6d5f0e2d47a99ce8266378c2a65/.github/workflows/docs_build_and_publish.yml#L36),
+The `build` job builds the documentation and uploads it as an [artifact](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/docs_build_and_publish.yml#L36),
 in a folder named `DocumentationHTML`.
 This can be found by going to the ‘Actions’ tab, and selecting the appropriate run of `.github/workflows/docs_build_and_publish.yml`.
 

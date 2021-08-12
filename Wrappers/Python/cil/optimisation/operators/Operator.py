@@ -245,7 +245,7 @@ class ScaledOperator(Operator):
 
         :param operator: a Operator or LinearOperator
         :param scalar: a scalar multiplier
-        :type scalar: float'''
+        :type scalar: Number'''
 
         super(ScaledOperator, self).__init__(domain_geometry=operator.domain_geometry(), 
                                              range_geometry=operator.range_geometry())
@@ -256,7 +256,9 @@ class ScaledOperator(Operator):
     def direct(self, x, out=None):
         '''direct method'''
         if out is None:
-            return self.scalar * self.operator.direct(x, out=out)
+            tmp = self.operator.direct(x)
+            tmp *= self.scalar
+            return tmp
         else:
             self.operator.direct(x, out=out)
             out *= self.scalar
@@ -264,7 +266,9 @@ class ScaledOperator(Operator):
         '''adjoint method'''
         if self.operator.is_linear():
             if out is None:
-                return self.scalar * self.operator.adjoint(x, out=out)
+                tmp = self.operator.adjoint(x)
+                tmp *= self.scalar
+                return tmp
             else:
                 self.operator.adjoint(x, out=out)
                 out *= self.scalar
@@ -273,12 +277,7 @@ class ScaledOperator(Operator):
     def norm(self, **kwargs):
         '''norm of the operator'''
         return numpy.abs(self.scalar) * self.operator.norm(**kwargs)
-    # def range_geometry(self):
-    #     '''range of the operator'''
-    #     return self.operator.range_geometry()
-    # def domain_geometry(self):
-    #     '''domain of the operator'''
-    #     return self.operator.domain_geometry()
+
     def is_linear(self):
         '''returns whether the operator is linear
         

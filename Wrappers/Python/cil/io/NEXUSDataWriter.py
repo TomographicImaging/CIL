@@ -16,7 +16,7 @@
 #   limitations under the License.
 import numpy as np
 import os
-from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
+from cil.framework import AcquisitionData, ImageData
 import datetime
 
 
@@ -31,6 +31,26 @@ class NEXUSDataWriter(object):
     
     def __init__(self,
                  **kwargs):
+        '''
+        Constructor
+
+        input:
+
+        data: Acquistion or Image Data
+
+        file_name: name of nexus file to write to (string)
+
+        flat_field: flat field projections (Acquisition Data or numpy array)
+
+        flat_field_key: numpy array of 0s and 1s, with same shape as flat_field.
+        0 indicates flat field was imaged before the projections, 1 after. 
+
+        dark_field: dark field projections (Acquisition Data or numpy array)
+
+        dark_field_key:numpy array of 0s and 1s, with same shape as dark_field.
+        0 indicates dark field was imaged before the projections, 1 after. 
+        
+        '''
         
         self.data = kwargs.get('data', None)
         self.file_name = kwargs.get('file_name', None)
@@ -50,12 +70,30 @@ class NEXUSDataWriter(object):
     def set_up(self, data=None, file_name=None,
                flat_field=None, flat_field_key=None,
                dark_field=None, dark_field_key=None):
+        '''
+        data: Acquistion or Image Data
+
+        file_name: name of nexus file to write to (string)
+
+        flat_field: flat field projections (Acquisition Data or numpy array)
+
+        flat_field_key: numpy array of 0s and 1s, with same shape as flat_field.
+        0 indicates flat field was imaged before the projections, 1 after. 
+
+        dark_field: dark field projections (Acquisition Data or numpy array)
+
+        dark_field_key:numpy array of 0s and 1s, with same shape as dark_field.
+        0 indicates dark field was imaged before the projections, 1 after. 
+        
+        '''
         self.data = data
         self.file_name = file_name
-        self.flat_field = flat_field
-        self.flat_field_key = flat_field_key
-        self.dark_field = dark_field
-        self.dark_field_key = dark_field_key
+        if flat_field is not None:
+            self.set_flat_field(flat_field)
+            self.set_flat_field_key(flat_field_key)
+        if dark_field is not None:
+            self.set_dark_field(dark_field)
+            self.set_dark_field_key(dark_field_key)
         
         if not ((isinstance(self.data, ImageData)) or 
                 (isinstance(self.data, AcquisitionData))):
@@ -71,8 +109,109 @@ class NEXUSDataWriter(object):
                     or isinstance(data, np.ndarray)):
                 raise Exception('Flat and dark fields must be one of the following data types:\n' +
                             ' - np.ndarray\n - AcquisitionData')
-        
-    
+
+    def set_flat_field(self, flat_field):
+        '''
+        Sets the flat field projections.
+        flat_field: flat field projections (Acquisition Data or numpy array)
+        '''
+        if isinstance(flat_field, AcquisitionData):
+            flat_field = flat_field.as_array()
+        elif type(flat_field) is not np.ndarray:
+            raise TypeError('Flat fields must be one of the following data types:\n' +
+                            ' - np.ndarray\n - AcquisitionData')
+        if self.data is not None:
+            self._validate_field_shape(flat_field)
+        self.flat_field = flat_field
+
+    def set_dark_field(self, dark_field):
+        '''
+        Sets the dark field projections
+        dark_field: dark field projections (Acquisition Data or numpy array)
+        '''
+        if isinstance(dark_field, AcquisitionData):
+            dark_field = dark_field.as_array()
+        elif type(dark_field) is not np.ndarray:
+            raise TypeError('Dark fields must be one of the following data types:\n' +
+                            ' - np.ndarray\n - AcquisitionData')
+        if self.data is not None:
+            self._validate_field_shape(dark_field)
+        self.dark_field = dark_field
+
+    def set_flat_field_key(self, key):
+        '''
+        Sets a key to identify the ordering of the flat fields relative to the
+        projections.
+
+        key: numpy array of 0s and 1s, with same shape as flat_field.
+        0 indicates flat field was imaged before the projections, 1 after.
+        '''
+        if self.flat_field is None:
+            raise ValueError('Flat field must be set before flat field key')
+        if key is None:
+            shape = self.flat_field.shape
+            key = np.zeros(shape)
+        key = self._validate_key_shape(key, self.flat_field)
+        self.flat_field_key = key
+
+    def set_dark_field_key(self, key):
+        '''
+        Sets a key to identify the ordering of the dark fields relative to the
+        projections.
+
+        key: numpy array of 0s and 1s, with same shape as dark_field.
+        0 indicates dark field was imaged before the projections, 1 after.
+        '''
+        if self.dark_field is None:
+            raise ValueError('Dark field must be set before dark field key')
+        key = self._validate_key_shape(key, self.dark_field)
+        self.dark_field_key = key
+
+    def _validate_field_shape(self, field_data):
+        ''' Checks that the shape of the projection data is the same
+        as that of the dark/flat field data, in the horizontal and 
+        vertical dimensions'''
+
+        angles_id = list(self.data.dimension_labels).index('angle')
+        try:
+            channels_id = list(self.data.dimension_labels).index('channel')
+        except ValueError:
+            channels_id = None
+        projection_shape = list(self.data.as_array().shape)
+        field_shape = list(field_data.shape)
+        projection_shape.pop(angles_id)
+        field_shape.pop(angles_id)
+        if channels_id is not None:
+            projection_shape.pop(channels_id)
+            field_shape.pop(channels_id)
+        if not (projection_shape == field_shape):
+            raise ValueError('Flats/Dark and projections size do not match: {},{}'.format(field_shape, projection_shape))
+
+    def _validate_key_shape(self, key, field_data):
+        ''' Checks that there are the same number of entries in the key,
+         as there are projections in the field data.
+        If key is set to None, it is assumed that the fields were taken
+        before the projections, and the key is set to a numpy array of 0s,
+        with the same number of entries as there are projections in the field data.'''
+        field_shape = list(field_data.shape)
+        horizontal_id = list(self.data.dimension_labels).index('horizontal')
+        field_shape.pop(horizontal_id)
+        try:
+            vertical_id = list(self.data.dimension_labels).index('vertical')
+            field_shape.pop(vertical_id)
+        except ValueError:
+            pass
+
+        if key is None:
+            key = np.zeros(field_shape)
+
+        num_field_projections = field_shape
+        num_key_entries = list(key.shape)
+        if not (num_field_projections == num_key_entries):
+            raise ValueError('Number of Flats/Dark and key entries do not match: {},{}'.format(num_field_projections, num_key_entries))
+
+        return key
+
     def write(self):
         
         # if the folder does not exist, create the folder
@@ -111,8 +250,8 @@ class NEXUSDataWriter(object):
                 ds_data.attrs['dimension'] = self.data.geometry.config.system.dimension   
                 ds_data.attrs['num_channels'] = self.data.geometry.config.channels.num_channels
 
-                # TODO: add check that flat and dark fields are same shape as dataset
                 if self.flat_field is not None:
+                    self._validate_field_shape(self.flat_field)
                     f.create_dataset('entry1/tomo_entry/data/flat_field/data',
                                     (self.flat_field.shape),
                                     dtype='float32',
@@ -122,6 +261,7 @@ class NEXUSDataWriter(object):
                                     dtype='int32',
                                     data=self.flat_field_key)
                 if self.dark_field is not None:
+                    self._validate_field_shape(self.dark_field)
                     f.create_dataset('entry1/tomo_entry/data/dark_field/data',
                                     (self.dark_field.shape),
                                     dtype='float32',

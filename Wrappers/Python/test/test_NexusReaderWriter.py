@@ -38,6 +38,7 @@ class TestNexusReaderWriter(unittest.TestCase):
                                     .set_channels(6)\
                                     .set_labels(['angle', 'horizontal'])
                                     #.set_labels(['horizontal', 'angle'])
+                                    #TODO: revert to og ordering
 
         self.ad2d = self.ag2d.allocate('random_int')
 
@@ -150,10 +151,11 @@ class TestNexusReaderWriter(unittest.TestCase):
 
     def test_writeAcquisitionData_with_dark_and_flat_fields(self):
         im_size = 5
-        self.flat_field_2d = numpy.ones(im_size)
-        self.dark_field_2d = numpy.zeros(im_size)
-        self.dark_field_position_key = numpy.random.randint(0, 2, im_size)
-        self.flat_field_position_key = numpy.random.randint(0, 2, im_size)
+        angles = 2
+        self.flat_field_2d = numpy.ones((angles, im_size))
+        self.dark_field_2d = numpy.zeros((angles, im_size))
+        self.dark_field_position_key = numpy.random.randint(0, 2, angles)
+        self.flat_field_position_key = numpy.random.randint(0, 2, angles)
 
         writer = NEXUSDataWriter()
         writer.set_up(file_name=os.path.join(self.data_dir, 'test_nexus_ad2d.nxs'),
@@ -164,15 +166,18 @@ class TestNexusReaderWriter(unittest.TestCase):
         self.flat_field_3d = numpy.ones((1, 10, 5))
         self.dark_field_3d = numpy.zeros((1, 10, 5))
 
-        self.dark_field_position_key = numpy.random.randint(0, 2, 1)
+        
         self.flat_field_position_key = numpy.random.randint(0, 2, 1)
+        # below, we will not set the dark field position key.
+        # in this case, it should automatically be set to an
+        # array of zeros with the same shape as the dark_field array
+        self.dark_field_position_key = numpy.zeros((1))
 
         writer = NEXUSDataWriter()
         writer.set_up(file_name=os.path.join(self.data_dir, 'test_nexus_ad3d.nxs'),
                       data=self.ad3d, flat_field=self.flat_field_3d,
                       flat_field_key=self.flat_field_position_key,
-                      dark_field=self.dark_field_3d,
-                      dark_field_key=self.dark_field_position_key)
+                      dark_field=self.dark_field_3d)
         writer.write()
 
         self.readAcquisitionDataAndTest()

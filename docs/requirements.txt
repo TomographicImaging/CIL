@@ -1,6 +1,6 @@
 sphinx_rtd_theme
 numpy
 scipy
-matplotlib
+matplotlib >=3.3.0,<=3.4.2
 olefile
 pywavelets

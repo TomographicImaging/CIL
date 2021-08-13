@@ -193,6 +193,10 @@ class NEXUSDataWriter(object):
         If key is set to None, it is assumed that the fields were taken
         before the projections, and the key is set to a numpy array of 0s,
         with the same number of entries as there are projections in the field data.'''
+        if key is not None:
+            if type(key) not in [np.ndarray, list]:
+                raise TypeError('Dark/flat field key must be one of the following data types:\n' +
+                                ' - np.ndarray\n - list')
         field_shape = list(field_data.shape)
         horizontal_id = list(self.data.dimension_labels).index('horizontal')
         field_shape.pop(horizontal_id)

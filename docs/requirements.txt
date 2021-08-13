@@ -1,6 +1,5 @@
 sphinx_rtd_theme
 numpy
 scipy
-matplotlib
 olefile
 pywavelets

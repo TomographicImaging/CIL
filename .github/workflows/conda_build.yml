@@ -20,8 +20,6 @@ jobs:
     - uses: actions/checkout@v1
     - name: publish-to-conda
       uses: paskino/conda-package-publish-action@v1.4.0
-      env:
-        CIL_VERSION: 21.0.0
       with:
         subDir: 'recipe'
         channels: 'conda-forge -c astra-toolbox/label/dev -c cvxgrp -c ccpi'

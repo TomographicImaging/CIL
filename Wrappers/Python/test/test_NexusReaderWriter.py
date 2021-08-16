@@ -36,9 +36,7 @@ class TestNexusReaderWriter(unittest.TestCase):
                                     .set_angles([0, 90, 180],-3.0, 'radian')\
                                     .set_panel(5, 0.2, origin='top-right')\
                                     .set_channels(6)\
-                                    .set_labels(['angle', 'horizontal'])
-                                    #.set_labels(['horizontal', 'angle'])
-                                    #TODO: revert to og ordering
+                                    .set_labels(['horizontal', 'angle'])
 
         self.ad2d = self.ag2d.allocate('random_int')
 
@@ -152,8 +150,8 @@ class TestNexusReaderWriter(unittest.TestCase):
     def test_writeAcquisitionData_with_dark_and_flat_fields(self):
         im_size = 5
         angles = 2
-        self.flat_field_2d = numpy.ones((angles, im_size))
-        self.dark_field_2d = numpy.zeros((angles, im_size))
+        self.flat_field_2d = numpy.ones((im_size, angles))
+        self.dark_field_2d = numpy.zeros((im_size, angles))
         self.dark_field_position_key = numpy.random.randint(0, 2, angles)
         self.flat_field_position_key = numpy.random.randint(0, 2, angles)
 
@@ -166,7 +164,6 @@ class TestNexusReaderWriter(unittest.TestCase):
         self.flat_field_3d = numpy.ones((1, 10, 5))
         self.dark_field_3d = numpy.zeros((1, 10, 5))
 
-        
         self.flat_field_position_key = numpy.random.randint(0, 2, 1)
         # below, we will not set the dark field position key.
         # in this case, it should automatically be set to an

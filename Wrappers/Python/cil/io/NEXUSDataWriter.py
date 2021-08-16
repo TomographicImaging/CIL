@@ -217,6 +217,8 @@ class NEXUSDataWriter(object):
         return key
 
     def write(self):
+        ''' writes the data and flat and dark field information
+        (if present) to self.file_name'''
         
         # if the folder does not exist, create the folder
         if not os.path.isdir(os.path.dirname(self.file_name)):

@@ -856,6 +856,7 @@ class TestDataProcessor(unittest.TestCase):
         self.assertTrue(ax.store_output)
 
         #check storing a copy and not a reference
+        ax.set_input(dc_in)
         dc_out = ax.get_output()
         numpy.testing.assert_array_equal(ax.output.as_array(), out_gold.as_array())
         self.assertFalse(id(ax.output.as_array()) == id(dc_out.as_array()))
@@ -900,17 +901,12 @@ class TestDataProcessor(unittest.TestCase):
     
         ax = AX()
         ax.scalar = 2
-        ax.set_input(c)
-        #ax.apply()
-        #print ("ax  in {0} out {1}".format(c.as_array().flatten(),
-        #       ax.get_output().as_array().flatten()))
-        
-        numpy.testing.assert_array_equal(ax.get_output().as_array(), arr*2)
-                
-        
-        #print("check call method of DataProcessor")
+
         numpy.testing.assert_array_equal(ax(c).as_array(), arr*2)
-        
+
+        ax.set_input(c)
+        numpy.testing.assert_array_equal(ax.get_output().as_array(), arr*2)
+
         cast = CastDataContainer(dtype=numpy.float32)
         cast.set_input(c)
         out = cast.get_output()

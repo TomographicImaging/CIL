@@ -1115,8 +1115,7 @@ class TestADMM(unittest.TestCase):
         from cil.utilities.quality_measures import psnr
         if debug_print:
             print ("PSNR" , psnr(admm.solution, pdhg.solution))
-        np.testing.assert_almost_equal(psnr(admm.solution, pdhg.solution), 84.46678222768597, decimal=4)
-        # 84.46678222768597
+        np.testing.assert_almost_equal(psnr(admm.solution, pdhg.solution), 84.55162459062069, decimal=4)
 
     def tearDown(self):
         pass

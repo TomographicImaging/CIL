@@ -129,6 +129,11 @@ class PDHG(Algorithm):
         tmp = self.x_old
         self.x_old = self.x
         self.x = tmp
+
+    def get_output(self):
+        # returns the current solution
+        return self.x_old
+
     def update(self):
 
         #calculate x-bar and store in self.x_tmp
@@ -160,12 +165,15 @@ class PDHG(Algorithm):
             self.x_tmp += self.x_old
 
         self.g.proximal(self.x_tmp, self.tau, out=self.x)
+
+        #update_previous_solution() called after update by base class
+        #i.e current solution is now in x_old, previous solution is now in x
         
     def update_objective(self):
 
-        self.operator.direct(self.x, out=self.y_tmp)
+        self.operator.direct(self.x_old, out=self.y_tmp)
         f_eval_p = self.f(self.y_tmp)
-        g_eval_p = self.g(self.x)
+        g_eval_p = self.g(self.x_old)
         p1 = f_eval_p + g_eval_p
 
         self.operator.adjoint(self.y, out=self.x_tmp)

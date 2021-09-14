@@ -1,74 +1,34 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>cil.optimisation.functions.BlockFunction &mdash; CIL v21.2.0-8-g66ac207 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>cil.optimisation.functions.BlockFunction &mdash; CIL v21.2.0-9-g2dfae92 documentation</title><link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+  <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/doctools.js"></script>
         <script src="../../../../_static/language_data.js"></script>
         <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
-
-    
+    <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../../../../index.html" class="icon icon-home"> CIL
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v21.2.0-8-g66ac207
+                v21.2.0-9-g2dfae92
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -76,18 +36,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../framework.html">Framework</a></li>
@@ -99,69 +48,30 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../utilities.html">Utilities</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../../index.html">CIL</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
-        
       <li>cil.optimisation.functions.BlockFunction</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for cil.optimisation.functions.BlockFunction</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1">#   This work is part of the Core Imaging Library (CIL) developed by CCPi </span>
@@ -359,155 +269,33 @@
                             
     
     
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    
-    <span class="n">M</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">K</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span><span class="mi">30</span><span class="p">,</span><span class="mi">50</span>
-    
-    <span class="kn">from</span> <span class="nn">cil.optimisation.functions</span> <span class="kn">import</span> <span class="n">L2NormSquared</span><span class="p">,</span> <span class="n">MixedL21Norm</span><span class="p">,</span> <span class="n">L1Norm</span>
-    <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">ImageGeometry</span><span class="p">,</span> <span class="n">BlockGeometry</span>
-    <span class="kn">from</span> <span class="nn">cil.optimisation.operators</span> <span class="kn">import</span> <span class="n">GradientOperator</span><span class="p">,</span> <span class="n">IdentityOperator</span><span class="p">,</span> <span class="n">BlockOperator</span>
-    <span class="kn">import</span> <span class="nn">numpy</span>
-    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-    
-    
-    <span class="n">ig</span> <span class="o">=</span> <span class="n">ImageGeometry</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
-    <span class="n">BG</span> <span class="o">=</span> <span class="n">BlockGeometry</span><span class="p">(</span><span class="n">ig</span><span class="p">,</span> <span class="n">ig</span><span class="p">)</span>
-    
-    <span class="n">u</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="s1">&#39;random_int&#39;</span><span class="p">)</span>
-    <span class="n">B</span> <span class="o">=</span> <span class="n">BlockOperator</span><span class="p">(</span> <span class="n">GradientOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">),</span> <span class="n">IdentityOperator</span><span class="p">(</span><span class="n">ig</span><span class="p">)</span> <span class="p">)</span>
-    
-    <span class="n">U</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
-    <span class="n">b</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="s1">&#39;random_int&#39;</span><span class="p">)</span>
-    
-    <span class="n">f1</span> <span class="o">=</span>  <span class="mi">10</span> <span class="o">*</span> <span class="n">MixedL21Norm</span><span class="p">()</span>
-    <span class="n">f2</span> <span class="o">=</span>  <span class="mi">5</span> <span class="o">*</span> <span class="n">L2NormSquared</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">)</span>    
-    
-    <span class="n">f</span> <span class="o">=</span> <span class="n">BlockFunction</span><span class="p">(</span><span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">L</span><span class="p">)</span>
-    
-    <span class="n">f</span> <span class="o">=</span> <span class="n">BlockFunction</span><span class="p">(</span><span class="n">f2</span><span class="p">,</span> <span class="n">f2</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">L</span><span class="p">)</span>    
-<span class="c1">#    tau = 0.3</span>
-<span class="c1">#    </span>
-<span class="c1">#    print( &quot; without out &quot; )</span>
-<span class="c1">#    res_no_out = f.proximal_conjugate( U, tau)</span>
-<span class="c1">#    res_out = B.range_geometry().allocate()</span>
-<span class="c1">#    f.proximal_conjugate( U, tau, out = res_out)</span>
-<span class="c1">#    </span>
-<span class="c1">#    numpy.testing.assert_array_almost_equal(res_no_out[0][0].as_array(), \</span>
-<span class="c1">#                                            res_out[0][0].as_array(), decimal=4) </span>
-<span class="c1">#    </span>
-<span class="c1">#    numpy.testing.assert_array_almost_equal(res_no_out[0][1].as_array(), \</span>
-<span class="c1">#                                            res_out[0][1].as_array(), decimal=4) </span>
-<span class="c1">#</span>
-<span class="c1">#    numpy.testing.assert_array_almost_equal(res_no_out[1].as_array(), \</span>
-<span class="c1">#                                            res_out[1].as_array(), decimal=4)     </span>
-<span class="c1">#    </span>
-<span class="c1">#    </span>
-<span class="c1">#</span>
-<span class="c1">#    ig1 = ImageGeometry(M, N)               </span>
-<span class="c1">#    ig2 = ImageGeometry(2*M, N)</span>
-<span class="c1">#    ig3 = ImageGeometry(3*M, 4*N)</span>
-<span class="c1">#    </span>
-<span class="c1">#    bg = BlockGeometry(ig1,ig2,ig3)</span>
-<span class="c1">#    </span>
-<span class="c1">#    z = bg.allocate(&#39;random_int&#39;)</span>
-<span class="c1">#    </span>
-<span class="c1">#    f1 = L1Norm()</span>
-<span class="c1">#    f2 = 5 * L2NormSquared()</span>
-<span class="c1">#    </span>
-<span class="c1">#    f = BlockFunction(f2, f2, f2 + 5, f1 - 4, f1)</span>
-<span class="c1">#    </span>
-<span class="c1">#    res = f.convex_conjugate(z)</span>
-<span class="c1">#    </span>
-<span class="c1">#    ##########################################################################</span>
-<span class="c1">#    </span>
-<span class="c1">#    </span>
-<span class="c1">#    </span>
-<span class="c1">#    </span>
-<span class="c1">#    </span>
-<span class="c1">#    </span>
-<span class="c1">#    </span>
-<span class="c1">##    zzz = B.range_geometry().allocate(&#39;random_int&#39;)</span>
-<span class="c1">##    www = B.range_geometry().allocate()</span>
-<span class="c1">##    www.fill(zzz)</span>
-<span class="c1">#    </span>
-<span class="c1">##    res[0].fill(z)</span>
-<span class="c1">#    </span>
-<span class="c1">#    </span>
-<span class="c1">#    </span>
-<span class="c1">#    </span>
-<span class="c1">##    f.proximal_conjugate(z, sigma, out = res)</span>
-<span class="c1">#    </span>
-<span class="c1">##    print(z1[0][0].as_array())    </span>
-<span class="c1">##    print(res[0][0].as_array())</span>
-<span class="c1">#    </span>
-<span class="c1">#    </span>
-<span class="c1">#    </span>
-<span class="c1">#    </span>
-<span class="c1">##    U = BG.allocate(&#39;random_int&#39;)</span>
-<span class="c1">##    RES = BG.allocate()</span>
-<span class="c1">##    f = BlockFunction(f1, f2)</span>
-<span class="c1">##    </span>
-<span class="c1">##    z = f.proximal_conjugate(U, 0.2)</span>
-<span class="c1">##    f.proximal_conjugate(U, 0.2, out = RES)</span>
-<span class="c1">##    </span>
-<span class="c1">##    print(z[0].as_array())</span>
-<span class="c1">##    print(RES[0].as_array())</span>
-<span class="c1">##    </span>
-<span class="c1">##    print(z[1].as_array())</span>
-<span class="c1">##    print(RES[1].as_array())    </span>
-<span class="c1">#    </span>
-<span class="c1">#    </span>
-<span class="c1">#    </span>
-<span class="c1">#    </span>
-<span class="c1">#    </span>
-<span class="c1">#</span>
-<span class="c1">#</span>
-<span class="c1">#    </span>
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017-2021 UKRI-STFC, University of Manchester.
-
-    </p>
+    <p>&#169; Copyright 2017-2021 UKRI-STFC, University of Manchester.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

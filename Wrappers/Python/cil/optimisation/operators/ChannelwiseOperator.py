@@ -124,35 +124,3 @@ class ChannelwiseOperator(LinearOperator):
         
         return self.op.norm()
 
-if __name__ == '__main__':
-    
-    from cil.optimisation.operators import DiagonalOperator
-
-    M = 3
-    channels = 4
-    ig = ImageGeometry(M, M, channels=channels)
-    igs = ImageGeometry(M, M)
-    x = ig.allocate('random',seed=100)
-    diag = igs.allocate('random',seed=101)
-    
-    D = DiagonalOperator(diag)
-    C = ChannelwiseOperator(D,channels)
-    
-    y = C.direct(x)
-    
-    y2 = ig.allocate()
-    C.direct(x,y2)
-    
-    print(y.subset(channel=2).as_array())
-    print(y2.subset(channel=2).as_array())
-    print((diag*x.subset(channel=2)).as_array())
-    
-    z = C.adjoint(y)
-    
-    z2 = ig.allocate()
-    C.adjoint(y,z2)
-    
-    print(z.subset(channel=2).as_array())
-    print(z2.subset(channel=2).as_array())
-    print((diag*(diag*x.subset(channel=2))).as_array())
-    

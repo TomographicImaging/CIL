@@ -26,7 +26,7 @@ test:
     - tigre              # [ linux or win ] 
     - numba
     - packaging
-    - ccpi-regulariser
+    - ccpi-regulariser   # [ not osx ]
     
   source_files:
     - ./Wrappers/Python/test     # [win]
@@ -49,6 +49,7 @@ requirements:
     - openmp        # [osx]
     - vc 14         # [win]
     - cil-data
+    - ripgrep
 
   run:
     - python

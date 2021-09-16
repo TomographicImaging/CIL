@@ -467,7 +467,7 @@ class TestAlgorithms(unittest.TestCase):
         identity = IdentityOperator(ig)
         
         try:
-            alg = SIRT(initial=initial, operator=identity, data=b, x_init=initial)
+            alg = CGLS(initial=initial, operator=identity, data=b, x_init=initial)
             assert False
         except ValueError as ve:
             assert True

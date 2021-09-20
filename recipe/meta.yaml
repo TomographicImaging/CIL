@@ -42,7 +42,8 @@ requirements:
     - python
     - numpy {{ numpy }}
     - setuptools
-    - cmake
+    - cmake         # [not osx]
+    - cmake >=3.16 # [osx]
     - libgcc-ng     # [linux]
     - libstdcxx-ng  # [linux]
     - _openmp_mutex # [linux]

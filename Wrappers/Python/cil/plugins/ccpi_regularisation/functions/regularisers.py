@@ -81,7 +81,7 @@ class ROF_TV(TV_Base):
         
     def proximal_numpy(self, in_arr, tau, out = None):
         res , info = regularisers.ROF_TV(in_arr,
-              self.alpha,
+              self.alpha * tau,
               self.max_iteration,
               self.time_marchstep,
               self.tolerance,
@@ -111,7 +111,7 @@ class FGP_TV(TV_Base):
     def proximal_numpy(self, in_arr, tau, out = None):
         res , info = regularisers.FGP_TV(\
               in_arr,\
-              self.alpha*tau,\
+              self.alpha * tau,\
               self.max_iteration,\
               self.tolerance,\
               self.methodTV,\
@@ -136,7 +136,7 @@ class TGV(RegulariserFunction):
     
     def proximal_numpy(self, in_arr, tau, out = None):
         res , info = regularisers.TGV(in_arr,
-              self.regularisation_parameter,
+              self.regularisation_parameter * tau,
               self.alpha1,
               self.alpha2,
               self.iter_TGV,
@@ -172,8 +172,8 @@ class LLT_ROF(RegulariserFunction):
     
     def proximal_numpy(self, in_arr, tau, out = None):
         res , info = regularisers.LLT_ROF(in_arr, 
-              self.regularisation_parameterROF,
-              self.regularisation_parameterLLT,
+              self.regularisation_parameterROF * tau,
+              self.regularisation_parameterLLT * tau,
               self.iter_LLT_ROF,
               self.time_marching_parameter,
               self.torelance,
@@ -218,7 +218,7 @@ class FGP_dTV(RegulariserFunction):
         res , info = regularisers.FGP_dTV(\
                 in_arr,\
                 self.reference,\
-                self.alpha*tau,\
+                self.alpha * tau,\
                 self.max_iteration,\
                 self.tolerance,\
                 self.eta,\
@@ -243,7 +243,7 @@ class SB_TV(TV_Base):
                 
     def proximal_numpy(self, in_arr, tau, out = None):
         res , info = regularisers.SB_TV(in_arr, 
-              self.alpha*tau,
+              self.alpha * tau,
               self.max_iteration,
               self.tolerance, 
               self.methodTV,
@@ -266,7 +266,7 @@ class TNV(RegulariserFunction):
     
     def proximal_numpy(self, in_arr, tau, out = None):
         res = regularisers.TNV(in_arr, 
-              self.regularisation_parameter,
+              self.regularisation_parameter * tau,
               self.iterationsTNV,
               self.tolerance)
 

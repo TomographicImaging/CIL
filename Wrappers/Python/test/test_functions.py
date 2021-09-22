@@ -26,7 +26,8 @@ from cil.optimisation.operators import GradientOperator
 from cil.optimisation.functions import Function, KullbackLeibler, WeightedL2NormSquared, L2NormSquared,\
                                          L1Norm, MixedL21Norm, LeastSquares, \
                                          ZeroFunction, OperatorCompositionFunction,\
-                                         Rosenbrock, IndicatorBox, TotalVariation                                     
+                                         Rosenbrock, IndicatorBox, TotalVariation       
+from cil.optimisation.functions import BlockFunction                              
 
 import unittest
 import numpy
@@ -1440,3 +1441,40 @@ class TestOperatorCompositionFunctionWithWrongInterfaceOperatorScaled(TestOperat
         nao = NotAnOperator() * 2
         ocf = OperatorCompositionFunction(F, nao)
         self.pars = (ig, nao, x, ocf)
+
+class TestBlockFunction(unittest.TestCase):
+    def setUp(self):
+        # M, N = 50, 50
+        # ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
+        # b = ig.allocate('random', seed=1)
+        
+        # print('Check call with IdentityOperator operator... OK\n')
+        # operator = 3 * IdentityOperator(ig)
+            
+        # u = ig.allocate('random_int', seed = 50)
+        # func2 = LeastSquares(operator, b, 0.5)
+        func1 = ConstantFunction(0.3)
+        func2 = ConstantFunction(-1.0)
+        self.funcs = [ func1 , func2 ]
+        # self.ig = ig
+
+    def tearDown(self) -> None:
+        return super().tearDown()
+
+    def test_iterator(self):
+        bf = BlockFunction(*self.funcs)
+        for el in bf:
+            assert isinstance(el, ConstantFunction)
+
+    def test_rmul_with_scalar_return(self):
+        bf = BlockFunction(*self.funcs)
+        bf2 = 2*bf
+        assert isinstance(bf2, BlockFunction)
+
+    def test_rmul_with_scalar(self):
+        bf = BlockFunction(*self.funcs)
+        bf2 = 2*bf
+        
+        for f1,f2 in zip(bf, bf2):
+            assert f2.constant == 2*f1.constant
+        

@@ -191,6 +191,24 @@ class BlockFunction(Function):
         
     def __getitem__(self, row):
         return self.functions[row]
+        
+    def __iter__(self):
+        self.iter = iter(self.functions)
+        return self.iter
+    def __next__(self):
+        return self.iter.__next__()
+
+
+    def __rmul__(self, other):
+        '''Define multiplication with a scalar
+        
+        :param other: number
+        Returns a new `BlockFunction`_ containing the product of the scalar with all the functions in the block
+        '''
+        if not isinstance(other, Number):
+            raise NotImplemented
+        return BlockFunction( [ other * el for el in self.functions] )
+
                             
     
     

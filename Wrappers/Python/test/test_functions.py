@@ -15,6 +15,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+from cil.optimisation.functions.Function import ScaledFunction
 import numpy as np
 
 from cil.framework import DataContainer, ImageGeometry, \
@@ -1478,9 +1479,12 @@ class TestBlockFunction(unittest.TestCase):
         
         
 
-    def test_rmul_with_scalar(self):
+    def test_rmul_with_scalar1(self):
         bf0 = BlockFunction(*self.funcs)
         bf = 2*bf0
         for i in range(2):
             assert bf[i].constant == 2*bf0[i].constant
-        
+    def test_rmul_with_scalar2(self):
+        bf0 = BlockFunction(L1Norm())
+        bf = 2*bf0
+        assert isinstance(bf[0], ScaledFunction)

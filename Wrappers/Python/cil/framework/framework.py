@@ -1832,6 +1832,29 @@ class DataContainer(object):
         '''Returns the shape of the  of the DataContainer'''
         return self.array.shape
 
+    @property
+    def ndim(self):
+        '''Returns the ndim of the  of the DataContainer'''
+        return self.array.ndim
+
+    def __getitem__(self, ind):
+
+        '''Allows python indexing for CIL DataContainer/ImageData/AcquisitionData'''
+
+        tmp = self.array[ind]
+
+        if len(tmp.shape) > 1:
+            if isinstance(self, ImageData):
+                return ImageData(tmp, geometry=ImageGeometry(*tmp.shape[::-1]))
+            elif isinstance(self, AcquisitionData):
+                return AcquisitionData(tmp, geometry=AcquisitionGeometry(*tmp.shape[::-1]))
+
+        else:
+            if isinstance(tmp, numpy.float32):
+                return tmp
+            else:
+                return VectorData(tmp, geometry=VectorGeometry(*tmp.shape))           
+
     @shape.setter
     def shape(self, val):
         print("Deprecated - shape will be set automatically")
@@ -2116,8 +2139,8 @@ class DataContainer(object):
         repres += "Number of dimensions: {0}\n".format(self.number_of_dimensions)
         repres += "Shape: {0}\n".format(self.shape)
         repres += "Axis labels: {0}\n".format(self.dimension_labels)
-        if representation:
-            repres += "Representation: \n{0}\n".format(self.array)
+        repres += "Representation: \n{0}\n".format(self.array[:5])
+
         return repres
         
     def get_data_axes_order(self,new_order=None):
@@ -2503,7 +2526,13 @@ class ImageData(DataContainer):
     @property
     def dimension_labels(self):
         return self.geometry.dimension_labels
-      
+
+    
+    # def __getitem__(self, val):
+    #     tmp = self.array[val]
+    #     return ImageData(tmp)       
+  
+          
     @dimension_labels.setter
     def dimension_labels(self, val):
         if val is not None:
@@ -2656,7 +2685,6 @@ class AcquisitionData(DataContainer):
             if force:
                 geometry_new = None
             else:
-                print(ve)
                 raise ValueError ("Unable to return slice of requested AcquisitionData. Use 'force=True' to return DataContainer instead.")
 
         #get new data
@@ -3070,3 +3098,6 @@ class DataOrder():
         else:
             raise ValueError("Expected dimension_label order {0}, got {1}.\nTry using `data.reorder('{2}')` to permute for {2}"
                  .format(order_requested, list(geometry.dimension_labels), engine))
+
+
+

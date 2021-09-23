@@ -466,7 +466,8 @@ class ConstantFunction(Function):
         '''defines the right multiplication with a number'''
         if not isinstance (other, Number):
             raise NotImplemented
-        self.constant = self.constant * other
+        constant = self.constant * other
+        return ConstantFunction(constant)
 
 class ZeroFunction(ConstantFunction):
     

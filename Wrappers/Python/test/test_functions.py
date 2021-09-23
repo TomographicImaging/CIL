@@ -1471,10 +1471,16 @@ class TestBlockFunction(unittest.TestCase):
         bf2 = 2*bf
         assert isinstance(bf2, BlockFunction)
 
-    def test_rmul_with_scalar(self):
+    def test_getitem(self):
         bf = BlockFunction(*self.funcs)
-        bf2 = 2*bf
+        assert isinstance(bf[0], ConstantFunction)
+        assert isinstance(bf[1], ConstantFunction)
         
-        for f1,f2 in zip(bf, bf2):
-            assert f2.constant == 2*f1.constant
+        
+
+    def test_rmul_with_scalar(self):
+        bf0 = BlockFunction(*self.funcs)
+        bf = 2*bf0
+        for i in range(2):
+            assert bf[i].constant == 2*bf0[i].constant
         

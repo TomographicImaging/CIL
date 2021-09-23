@@ -567,5 +567,68 @@ class TestGradientOperator(unittest.TestCase):
         numpy.testing.assert_allclose(out4[0].array, out4_gold[2].array, atol = 0.4)
         numpy.testing.assert_allclose(out4[1][0].array, out4_gold[0].array, atol = 0.4)  
         numpy.testing.assert_allclose(out4[1][1].array, out4_gold[1].array, atol = 0.4)        
-        numpy.testing.assert_allclose(out4[1][2].array, out4_gold[3].array, atol = 0.4)        
+        numpy.testing.assert_allclose(out4[1][2].array, out4_gold[3].array, atol = 0.4) 
+
+    def test_GradientOperator_for_pseudo_3D_geometries(self):   
+
+        numpy.random.seed(10)
+        ig = ImageGeometry(voxel_num_x = 10, voxel_num_y = 10, voxel_num_z=1,
+                            voxel_size_x = 0.4, voxel_size_y = 0.2, voxel_size_z=0.6)
+
+        data = ig.allocate('random')                            
+
+        ########################################
+        ##### Test Gradient numpy backend  #####
+        ########################################
+        Grad_numpy = GradientOperator(ig, backend='numpy')
+
+        res1 = Grad_numpy.direct(data) 
+        res2 = Grad_numpy.range_geometry().allocate()
+        Grad_numpy.direct(data, out=res2)
+
+        # test direct with and without out
+        numpy.testing.assert_array_almost_equal(res1[0].as_array(), res2[0].as_array()) 
+        numpy.testing.assert_array_almost_equal(res1[1].as_array(), res2[1].as_array()) 
+
+        # test adjoint with and without out
+        res3 = Grad_numpy.adjoint(res1)
+        res4 = Grad_numpy.domain_geometry().allocate()
+        Grad_numpy.adjoint(res2, out=res4)
+        numpy.testing.assert_array_almost_equal(res3.as_array(), res4.as_array()) 
+
+        # test dot_test
+        self.assertTrue(LinearOperator.dot_test(Grad_numpy))
+
+        # test shape of output of direct
+        self.assertEqual(res1[0].shape, ig.shape)
+        self.assertEqual(res1.shape, (2,1))
+
+        ########################################
+        ##### Test Gradient c backend  #####
+        ########################################
+        Grad_c = GradientOperator(ig, backend='c')
+
+        # test direct with and without out
+        res5 = Grad_c.direct(data) 
+        res6 = Grad_c.range_geometry().allocate()*0.
+        Grad_c.direct(data, out=res6)
+
+        numpy.testing.assert_array_almost_equal(res5[0].as_array(), res6[0].as_array()) 
+        numpy.testing.assert_array_almost_equal(res5[1].as_array(), res6[1].as_array())
+
+        # test direct numpy vs direct c backends (with and without out)
+        numpy.testing.assert_array_almost_equal(res5[0].as_array(), res1[0].as_array()) 
+        numpy.testing.assert_array_almost_equal(res6[1].as_array(), res2[1].as_array())
+
+        # test dot_test
+        self.assertTrue(LinearOperator.dot_test(Grad_c))
+
+        # test adjoint
+        res7 = Grad_c.adjoint(res5) 
+        res8 = Grad_c.domain_geometry().allocate()*0.
+        Grad_c.adjoint(res5, out=res8)
+        numpy.testing.assert_array_almost_equal(res7.as_array(), res8.as_array()) 
+
+
+            
 

@@ -1832,11 +1832,6 @@ class DataContainer(object):
         '''Returns the shape of the  of the DataContainer'''
         return self.array.shape
 
-    @property
-    def ndim(self):
-        '''Returns the ndim of the  of the DataContainer'''
-        return self.array.ndim
-
     def __getitem__(self, ind):
 
         '''Allows python indexing for CIL DataContainer/ImageData/AcquisitionData with no metadata'''
@@ -1884,6 +1879,9 @@ class DataContainer(object):
         # finally copy the geometry
         if 'geometry' in kwargs.keys():
             self.geometry = kwargs['geometry']
+
+        # ndim for DataContainer
+        self.ndim = self.array.ndim    
         
     def get_dimension_size(self, dimension_label):
 
@@ -3082,3 +3080,8 @@ class DataOrder():
         else:
             raise ValueError("Expected dimension_label order {0}, got {1}.\nTry using `data.reorder('{2}')` to permute for {2}"
                  .format(order_requested, list(geometry.dimension_labels), engine))
+
+
+
+
+    

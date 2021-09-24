@@ -1327,6 +1327,10 @@ class AcquisitionGeometry(object):
         return self.config.system.geometry
 
     @property
+    def num_projections(self):
+        self.config.angles.num_positions        
+
+    @property
     def pixel_num_h(self):
         return self.config.panel.num_pixels[0]
 

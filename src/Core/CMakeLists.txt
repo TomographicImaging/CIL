@@ -6,7 +6,8 @@ set (CMAKE_BUILD_TYPE Release)
 message ("OpenMP_CXX_FLAGS ${OpenMP_CXX_FLAGS}")
 find_package(OpenMP REQUIRED)
 add_definitions(${OpenMP_CXX_FLAGS})
-  
+
+
 if (WIN32)
 	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Ddll_EXPORTS")
 endif()
@@ -22,11 +23,24 @@ message("CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS}")
 message("CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS}")
 message("CMAKE_STATIC_LINKER_FLAGS ${CMAKE_STATIC_LINKER_FLAGS}")
 
+if(NOT DEFINED IPP_LIBRARY)
+  set(IPP_LIBRARY ${CMAKE_INSTALL_PREFIX}/Library/lib)
+endif()
 
+if(NOT DEFINED IPP_INCLUDE)
+  set(IPP_INCLUDE ${CMAKE_INSTALL_PREFIX}/include)
+endif()
+
+find_library(IPP_CORE ippcore PATHS ${IPP_LIBRARY} REQUIRED)
+find_library(IPP_S ipps PATHS ${IPP_LIBRARY} REQUIRED)
+
+message(IPP_CORE ${IPP_CORE})
+message(IPP_S ${IPP_S})
 
 add_library(cilacc SHARED ${CMAKE_CURRENT_SOURCE_DIR}/utilities.cpp
                           ${CMAKE_CURRENT_SOURCE_DIR}/FiniteDifferenceLibrary.cpp
-                          ${CMAKE_CURRENT_SOURCE_DIR}/axpby.cpp )
+                          ${CMAKE_CURRENT_SOURCE_DIR}/axpby.cpp
+                          ${CMAKE_CURRENT_SOURCE_DIR}/FBP_filtering.cpp )
 
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.9.0") 
   set (OpenMP_EXE_LINKER_FLAGS OpenMP::OpenMP_CXX)
@@ -37,9 +51,9 @@ else()
   set (OpenMP_EXE_LINKER_FLAGS ${OpenMP_C_FLAGS})
 endif()
 
-target_link_libraries(cilacc ${OpenMP_EXE_LINKER_FLAGS} )
+target_link_libraries(cilacc ${OpenMP_EXE_LINKER_FLAGS} ${IPP_CORE} ${IPP_S})
 include_directories(cilacc PUBLIC 
-				  ${CMAKE_CURRENT_SOURCE_DIR}/include
+				  ${IPP_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR}/include
 		          )
 
 ## Install

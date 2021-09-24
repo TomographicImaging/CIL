@@ -51,6 +51,8 @@ requirements:
     - vc 14         # [win]
     - cil-data
     - ripgrep
+    - ipp-include
+    - ipp-devel
 
   run:
     - python

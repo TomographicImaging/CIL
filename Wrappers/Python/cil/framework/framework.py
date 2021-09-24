@@ -1856,14 +1856,13 @@ class DataContainer(object):
                   **kwargs):
         '''Holds the data'''
         
-        if type(array) == numpy.ndarray:
+        try:
             if deep_copy:
                 self.array = array.copy()
             else:
                 self.array = array    
-        else:
-            raise TypeError('Array must be NumpyArray, passed {0}'\
-                            .format(type(array)))
+        except:
+            raise AttributeError("ImageData requires an Array type with shape, ndim and dtype, {} is passed".format(type(array)))  
 
         #Don't set for derived classes
         if type(self) is DataContainer:
@@ -2521,7 +2520,7 @@ class ImageData(DataContainer):
         dtype = kwargs.get('dtype', numpy.float32)
 
         if geometry is None:
-            raise AttributeError("ImageGeometry requires a geometry")
+            raise AttributeError("ImageData requires a geometry, {} is passed ".format(type(geometry)))
 
         labels = kwargs.get('dimension_labels', None)
         if labels is not None and labels != geometry.dimension_labels:
@@ -2530,11 +2529,9 @@ class ImageData(DataContainer):
         if array is None:                                   
             array = numpy.empty(geometry.shape, dtype=dtype)
         elif issubclass(type(array) , DataContainer):
-            array = array.as_array()
-        elif issubclass(type(array) , numpy.ndarray):
-            pass
-        else:
-            raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(array)))
+            array = array.as_array()        
+        elif not all(getattr(array, attrib) for attrib in ["shape", "ndim","dtype"]):
+            raise AttributeError("ImageData requires an Array type with shape, ndim and dtype, {} is passed".format(type(array)))  
             
         if array.shape != geometry.shape:
             raise ValueError('Shape mismatch {} {}'.format(array.shape, geometry.shape))
@@ -2618,12 +2615,10 @@ class AcquisitionData(DataContainer):
         if array is None:                                   
             array = numpy.empty(geometry.shape, dtype=dtype)
         elif issubclass(type(array) , DataContainer):
-            array = array.as_array()
-        elif issubclass(type(array) , numpy.ndarray):
-            pass
-        else:
-            raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(array)))
-            
+            array = array.as_array()        
+        elif not all(getattr(array, attrib) for attrib in ["shape", "ndim","dtype"]):
+            raise AttributeError("ImageData requires an Array type with shape, ndim and dtype, {} is passed".format(type(array)))  
+                       
         if array.shape != geometry.shape:
             raise ValueError('Shape mismatch got {} expected {}'.format(array.shape, geometry.shape))
 
@@ -3070,3 +3065,5 @@ class DataOrder():
         else:
             raise ValueError("Expected dimension_label order {0}, got {1}.\nTry using `data.reorder('{2}')` to permute for {2}"
                  .format(order_requested, list(geometry.dimension_labels), engine))
+
+

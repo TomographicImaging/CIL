@@ -147,3 +147,11 @@ class LeastSquares(Function):
         else:
             self._weight_norm = 1.0
         return self._weight_norm
+        
+    def __rmul__(self, other):
+        '''defines the right multiplication with a number'''
+        if not isinstance (other, Number):
+            raise NotImplemented
+        constant = self.c * other
+        
+        return LeastSquares(A=self.A, b=self.b, c=constant, weight=self.weight)

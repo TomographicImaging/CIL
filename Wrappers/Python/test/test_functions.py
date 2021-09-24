@@ -1313,6 +1313,70 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
     def tearDown(self):
         pass
 
+
+class TestLeastSquares(unittest.TestCase):
+    def setUp(self) -> None:
+        ig = ImageGeometry(10,2)
+        A = IdentityOperator(ig)
+        self.A = A
+        self.ig = ig
+        return super().setUp()
+
+
+    def test_rmul(self):
+        ig = self.ig
+        A = self.A
+        b = ig.allocate(1)
+        x = ig.allocate(3)
+        c = 1.
+        constant = 2.
+        ls = LeastSquares(A, b, c=c)
+        twicels = constant * ls
+
+        assert constant * ls.c == twicels.c
+
+    def test_rmul_with_call(self):
+        ig = self.ig
+        A = self.A
+        b = ig.allocate(1)
+        x = ig.allocate(3)
+        c = 1.
+        constant = 2.
+        ls = LeastSquares(A, b, c=c)
+        twicels = constant * ls
+
+        np.testing.assert_almost_equal( constant * ls(x) , twicels(x))
+    def test_rmul_with_Lipschitz(self):
+        ig = self.ig
+        A = self.A
+        b = ig.allocate(1)
+        x = ig.allocate(3)
+        c = 1.
+        constant = 2.
+        ls = LeastSquares(A, b, c=c)
+        twicels = constant * ls
+
+        np.testing.assert_almost_equal( constant * ls.L , twicels.L)
+
+    def test_rmul_with_gradient(self):
+        ig = self.ig
+        A = self.A
+        b = ig.allocate(1)
+        x = ig.allocate(3)
+        c = 1.
+        constant = 2.
+        ls = LeastSquares(A, b, c=c)
+        twicels = constant * ls
+
+        y1 = ls.gradient(x)
+        y2 = twicels.gradient(x)
+        np.testing.assert_array_almost_equal( constant * y1.as_array(), y2.as_array())
+
+        ls.gradient(x, out=y2)
+        twicels.gradient(x, out=y1)
+        np.testing.assert_array_almost_equal( constant * y2.as_array(), y1.as_array())
+        
+        
 # tests for OperatorCompositionFunction
 class TestOperatorCompositionFunctionWithWrongInterfaceFunction(unittest.TestCase):
     def setUp(self):
@@ -1482,6 +1546,10 @@ class TestBlockFunction(unittest.TestCase):
     def test_rmul_with_scalar1(self):
         bf0 = BlockFunction(*self.funcs)
         bf = 2*bf0
+
+        print (bf[0].constant, bf0[0].constant)
+        print (bf[1].constant, bf0[1].constant)
+
         for i in range(2):
             assert bf[i].constant == 2*bf0[i].constant
     def test_rmul_with_scalar2(self):

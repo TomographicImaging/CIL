@@ -374,18 +374,17 @@ class TestOperator(CCPiTestClass):
 
     def test_ProjectionMap(self):
 
-        print("Check if direct is correct")
+        # Check if direct is correct
         ig1 = ImageGeometry(3,4)
         ig2 = ImageGeometry(5,6)
         ig3 = ImageGeometry(5,6,4)
 
+        # Create BlockGeometry
         bg = BlockGeometry(ig1,ig2, ig3)
-
         x = bg.allocate('random')
-        x0 = x[0]
-        x1 = x[1]
-        x2 = x[2]
 
+        # Extract containers
+        x0, x1, x2 = x[0], x[1], x[2]
 
         for i in range(3):
 
@@ -398,11 +397,10 @@ class TestOperator(CCPiTestClass):
             res2 = bg.geometries[i].allocate(0)
             proj_map.direct(x, out=res2)
 
-            # Assert with and withou out
+            # Check with and without out
             numpy.testing.assert_array_almost_equal(res1.array, res2.array)
 
             # Depending on which index is used, check if x0, x1, x2 are the same with res2
-
             if i==0:            
                 numpy.testing.assert_array_almost_equal(x0.array, res2.array)
             elif i==1: 
@@ -412,12 +410,9 @@ class TestOperator(CCPiTestClass):
             else:
                 pass      
 
-        print("Test passed \n")    
-
-        print("Check if adjoint is correct")
+        # Check if adjoint is correct
 
         bg = BlockGeometry(ig1, ig2, ig3, ig1, ig2, ig3)
-
         x = ig1.allocate('random')
 
         index=3
@@ -431,11 +426,9 @@ class TestOperator(CCPiTestClass):
         for i in range(len(bg.geometries)):
 
             if i!=index:
-                numpy.testing.assert_array_almost_equal(res1[i].array, bg.geometries[i].allocate().array)
+                numpy.testing.assert_array_almost_equal(res1[i].array, bg.geometries[i].allocate().array)   
 
-        print("Test passed \n")       
-
-        print("Check error messages")
+        # Check error messages
         # Check if index is correct wrt length of Cartesian Product
         try:
             ig = ImageGeometry(3,4)
@@ -449,9 +442,7 @@ class TestOperator(CCPiTestClass):
         try:
             proj_map = ProjectionMap(ig, index)               
         except ValueError as err:
-            print(err)   
-        print("Test passed \n")           
-
+            print(err)           
     
 class TestGradients(CCPiTestClass): 
     def setUp(self):

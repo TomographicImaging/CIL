@@ -1839,21 +1839,10 @@ class DataContainer(object):
 
     def __getitem__(self, ind):
 
-        '''Allows python indexing for CIL DataContainer/ImageData/AcquisitionData'''
+        '''Allows python indexing for CIL DataContainer/ImageData/AcquisitionData with no metadata'''
 
         tmp = self.array[ind]
-
-        if len(tmp.shape) > 1:
-            if isinstance(self, ImageData):
-                return ImageData(tmp, geometry=ImageGeometry(*tmp.shape[::-1]))
-            elif isinstance(self, AcquisitionData):
-                return AcquisitionData(tmp, geometry=AcquisitionGeometry(*tmp.shape[::-1]))
-
-        else:
-            if isinstance(tmp, numpy.float32):
-                return tmp
-            else:
-                return VectorData(tmp, geometry=VectorGeometry(*tmp.shape))           
+        return DataContainer(tmp)         
 
     @shape.setter
     def shape(self, val):
@@ -2526,12 +2515,7 @@ class ImageData(DataContainer):
     @property
     def dimension_labels(self):
         return self.geometry.dimension_labels
-
-    
-    # def __getitem__(self, val):
-    #     tmp = self.array[val]
-    #     return ImageData(tmp)       
-  
+   
           
     @dimension_labels.setter
     def dimension_labels(self, val):
@@ -3098,6 +3082,3 @@ class DataOrder():
         else:
             raise ValueError("Expected dimension_label order {0}, got {1}.\nTry using `data.reorder('{2}')` to permute for {2}"
                  .format(order_requested, list(geometry.dimension_labels), engine))
-
-
-

@@ -457,7 +457,7 @@ class ConstantFunction(Function):
     @constant.setter
     def constant(self, value):
         if not isinstance (value, Number):
-            raise TypeError('expected scalar: got {}'.format(type(constant)))
+            raise TypeError('expected scalar: got {}'.format(type(value)))
         self._constant = value
     @property
     def L(self):

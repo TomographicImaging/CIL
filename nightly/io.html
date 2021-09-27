@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Read/ write AcquisitionData and ImageData &mdash; CIL v21.2.0-13-gdf66a84 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <title>Read/ write AcquisitionData and ImageData &mdash; CIL v21.2.0-14-g7bd3487 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
@@ -29,7 +29,7 @@
             <a href="index.html" class="icon icon-home"> CIL
           </a>
               <div class="version">
-                v21.2.0-13-gdf66a84
+                v21.2.0-14-g7bd3487
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -344,6 +344,8 @@ pixels are calculated as average.
 In ‘slice’ mode ‘step’ defines standard numpy slicing.
 Note: in general output array size in bin mode != output array size
 in slice mode</p></li>
+<li><p><strong>dtype</strong> (<em>numpy type</em><em>, </em><em>string</em><em>, </em><em>default np.float32</em>) – Requested type of the read image. If set to None it defaults to
+the type of the saved file.</p></li>
 </ul>
 </dd>
 </dl>
@@ -382,6 +384,45 @@ leads to sensible data.</p>
 no warranty that the data will be read in the right order! 
 In facts you can reshape a (2,3,4) array as (3,4,2), however we do not check if the reshape
 leads to sensible data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cil.io.TIFFStackReader.set_up">
+<code class="sig-name descname">set_up</code><span class="sig-paren">(</span><em class="sig-param">file_name=None</em>, <em class="sig-param">roi={'axis_0': -1</em>, <em class="sig-param">'axis_1': -1</em>, <em class="sig-param">'axis_2': -1}</em>, <em class="sig-param">transpose=False</em>, <em class="sig-param">mode='bin'</em>, <em class="sig-param">dtype=&lt;class 'numpy.float32'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TIFF.html#TIFFStackReader.set_up"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.io.TIFFStackReader.set_up" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_name</strong> (<em>str</em><em>, </em><em>abspath to folder</em><em>, </em><em>list</em>) – path to folder with tiff files, list of paths of tiffs, or single tiff file</p></li>
+<li><p><strong>roi</strong> (<em>dictionary</em><em>, </em><em>default None</em>) – <p>dictionary with roi to load 
+{‘axis_0’: (start, end, step),</p>
+<blockquote>
+<div><p>’axis_1’: (start, end, step), 
+‘axis_2’: (start, end, step)}</p>
+</div></blockquote>
+<p>Files are stacked along axis_0. axis_1 and axis_2 correspond
+to row and column dimensions, respectively.
+Files are stacked in alphabetic order. 
+To skip files or to change number of files to load, 
+adjust axis_0. For instance, ‘axis_0’: (100, 300)
+will skip first 100 files and will load 200 files.
+‘axis_0’: -1 is a shortcut to load all elements along axis.
+Start and end can be specified as None which is equivalent 
+to start = 0 and end = load everything to the end, respectively.
+Start and end also can be negative.
+Notes: roi is specified for axes before transpose.</p>
+</p></li>
+<li><p><strong>transpose</strong> (<em>bool</em><em>, </em><em>default False</em>) – transpose loaded images</p></li>
+<li><p><strong>mode</strong> (<em>str</em><em>, </em><em>default 'bin'</em>) – str, ‘bin’ (default) or ‘slice’. In bin mode, ‘step’ number
+of pixels is binned together, values of resulting binned
+pixels are calculated as average. 
+In ‘slice’ mode ‘step’ defines standard numpy slicing.
+Note: in general output array size in bin mode != output array size
+in slice mode</p></li>
+<li><p><strong>dtype</strong> (<em>numpy type</em><em>, </em><em>string</em><em>, </em><em>default np.float32</em>) – Requested type of the read image. If set to None it defaults to
+the type of the saved file.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

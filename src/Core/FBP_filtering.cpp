@@ -210,5 +210,3 @@ int filter_projections_reorder(float* data, const float* filter, const float* we
 
 	return 0;
 }
-void main()
-{}

@@ -77,9 +77,10 @@ if (BUILD_PYTHON_WRAPPER)
                         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                         COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT}
                         DEPENDS cilacc)
-                        install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/build/lib/cil
-                DESTINATION ${PYTHON_DEST} )
 
+          install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/build/lib/cil
+                DESTINATION ${PYTHON_DEST} )
+                
         else()
           add_custom_target(pythonsetup ALL  
                         COMMAND ${CMAKE_COMMAND} -E env PREFIX=${CMAKE_SOURCE_DIR}/src/
@@ -96,7 +97,8 @@ if (BUILD_PYTHON_WRAPPER)
 
         if (NOT WIN32)
           install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/build/lib/cil
-                  DESTINATION ${PYTHON_DEST} )
+                DESTINATION ${PYTHON_DEST} )
+
         endif()
         install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/ DESTINATION ${CMAKE_INSTALL_PREFIX}/share/cil)
         #file(TOUCH ${PYTHON_DEST}/edo/__init__.py)

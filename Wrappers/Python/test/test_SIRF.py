@@ -22,6 +22,7 @@ import sys
 import shutil
 import unittest
 from cil.framework import BlockDataContainer
+from cil.optimisation.operators import LinearOperator, GradientOperator
 try:
     import sirf.STIR as pet
     from sirf.Utilities import  examples_data_path
@@ -33,6 +34,7 @@ except ImportError as ie:
 class TestSIRFCILIntegration(unittest.TestCase):
     
     def setUp(self):
+
         if has_sirf:
             os.chdir(examples_data_path('PET'))
             # Copy files to a working folder and change directory to where these files are.
@@ -114,7 +116,69 @@ class TestSIRFCILIntegration(unittest.TestCase):
         bdc = BlockDataContainer(image1, image2)
 
         self.assertBlockDataContainerEqual(bdc , bdc1)
-    
+
+    @unittest.skipUnless(has_sirf, "Has SIRF")
+    def test_GradientSIRF_3D_pseudo_geometries(self):
+
+        shutil.rmtree('working_folder/thorax_single_slice',True)
+        shutil.copytree('thorax_single_slice','working_folder/thorax_single_slice')
+        os.chdir('working_folder/thorax_single_slice')
+
+        image1 = pet.ImageData('emission.hv')
+
+        ########################################
+        ##### Test Gradient numpy backend  #####
+        ########################################
+        Grad_numpy = GradientOperator(image1, backend='numpy')
+
+        res1 = Grad_numpy.direct(image1) 
+        res2 = Grad_numpy.range_geometry().allocate()
+        Grad_numpy.direct(image1, out=res2)
+
+        # test direct with and without out
+        numpy.testing.assert_array_almost_equal(res1[0].as_array(), res2[0].as_array()) 
+        numpy.testing.assert_array_almost_equal(res1[1].as_array(), res2[1].as_array()) 
+
+        # test adjoint with and without out
+        res3 = Grad_numpy.adjoint(res1)
+        res4 = Grad_numpy.domain_geometry().allocate()
+        Grad_numpy.adjoint(res2, out=res4)
+        numpy.testing.assert_array_almost_equal(res3.as_array(), res4.as_array()) 
+
+        # test dot_test
+        self.assertTrue(LinearOperator.dot_test(Grad_numpy))
+
+        # test shape of output of direct
+        self.assertEqual(res1[0].shape, image1.shape)
+        self.assertEqual(res1.shape, (2,1))
+
+        ########################################
+        ##### Test Gradient c backend  #####
+        ########################################
+        Grad_c = GradientOperator(image1, backend='c')
+
+        # test direct with and without out
+        res5 = Grad_c.direct(image1) 
+        res6 = Grad_c.range_geometry().allocate()*0.
+        Grad_c.direct(image1, out=res6)
+
+        numpy.testing.assert_array_almost_equal(res5[0].as_array(), res6[0].as_array()) 
+        numpy.testing.assert_array_almost_equal(res5[1].as_array(), res6[1].as_array())
+
+        # test direct numpy vs direct c backends (with and without out)
+        numpy.testing.assert_array_almost_equal(res5[0].as_array(), res1[0].as_array()) 
+        numpy.testing.assert_array_almost_equal(res6[1].as_array(), res2[1].as_array())
+
+        # test dot_test
+        self.assertTrue(LinearOperator.dot_test(Grad_c))
+
+        # test adjoint
+        res7 = Grad_c.adjoint(res5) 
+        res8 = Grad_c.domain_geometry().allocate()*0.
+        Grad_c.adjoint(res5, out=res8)
+        numpy.testing.assert_array_almost_equal(res7.as_array(), res8.as_array()) 
+
+
     @unittest.skipUnless(has_sirf, "Has SIRF")
     def test_BlockDataContainer_with_SIRF_DataContainer_subtract(self):
         os.chdir(self.cwd)

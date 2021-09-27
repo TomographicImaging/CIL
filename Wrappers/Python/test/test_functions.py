@@ -15,6 +15,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+from cil.optimisation.functions.Function import ScaledFunction
 import numpy as np
 
 from cil.framework import DataContainer, ImageGeometry, \
@@ -26,7 +27,8 @@ from cil.optimisation.operators import GradientOperator
 from cil.optimisation.functions import Function, KullbackLeibler, WeightedL2NormSquared, L2NormSquared,\
                                          L1Norm, MixedL21Norm, LeastSquares, \
                                          ZeroFunction, OperatorCompositionFunction,\
-                                         Rosenbrock, IndicatorBox, TotalVariation                                     
+                                         Rosenbrock, IndicatorBox, TotalVariation       
+from cil.optimisation.functions import BlockFunction                              
 
 import unittest
 import numpy
@@ -1311,6 +1313,70 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
     def tearDown(self):
         pass
 
+
+class TestLeastSquares(unittest.TestCase):
+    def setUp(self) -> None:
+        ig = ImageGeometry(10,2)
+        A = IdentityOperator(ig)
+        self.A = A
+        self.ig = ig
+        return super().setUp()
+
+
+    def test_rmul(self):
+        ig = self.ig
+        A = self.A
+        b = ig.allocate(1)
+        x = ig.allocate(3)
+        c = 1.
+        constant = 2.
+        ls = LeastSquares(A, b, c=c)
+        twicels = constant * ls
+
+        assert constant * ls.c == twicels.c
+
+    def test_rmul_with_call(self):
+        ig = self.ig
+        A = self.A
+        b = ig.allocate(1)
+        x = ig.allocate(3)
+        c = 1.
+        constant = 2.
+        ls = LeastSquares(A, b, c=c)
+        twicels = constant * ls
+
+        np.testing.assert_almost_equal( constant * ls(x) , twicels(x))
+    def test_rmul_with_Lipschitz(self):
+        ig = self.ig
+        A = self.A
+        b = ig.allocate(1)
+        x = ig.allocate(3)
+        c = 1.
+        constant = 2.
+        ls = LeastSquares(A, b, c=c)
+        twicels = constant * ls
+
+        np.testing.assert_almost_equal( constant * ls.L , twicels.L)
+
+    def test_rmul_with_gradient(self):
+        ig = self.ig
+        A = self.A
+        b = ig.allocate(1)
+        x = ig.allocate(3)
+        c = 1.
+        constant = 2.
+        ls = LeastSquares(A, b, c=c)
+        twicels = constant * ls
+
+        y1 = ls.gradient(x)
+        y2 = twicels.gradient(x)
+        np.testing.assert_array_almost_equal( constant * y1.as_array(), y2.as_array())
+
+        ls.gradient(x, out=y2)
+        twicels.gradient(x, out=y1)
+        np.testing.assert_array_almost_equal( constant * y2.as_array(), y1.as_array())
+        
+        
 # tests for OperatorCompositionFunction
 class TestOperatorCompositionFunctionWithWrongInterfaceFunction(unittest.TestCase):
     def setUp(self):
@@ -1440,3 +1506,53 @@ class TestOperatorCompositionFunctionWithWrongInterfaceOperatorScaled(TestOperat
         nao = NotAnOperator() * 2
         ocf = OperatorCompositionFunction(F, nao)
         self.pars = (ig, nao, x, ocf)
+
+class TestBlockFunction(unittest.TestCase):
+    def setUp(self):
+        # M, N = 50, 50
+        # ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
+        # b = ig.allocate('random', seed=1)
+        
+        # print('Check call with IdentityOperator operator... OK\n')
+        # operator = 3 * IdentityOperator(ig)
+            
+        # u = ig.allocate('random_int', seed = 50)
+        # func2 = LeastSquares(operator, b, 0.5)
+        func1 = ConstantFunction(0.3)
+        func2 = ConstantFunction(-1.0)
+        self.funcs = [ func1 , func2 ]
+        # self.ig = ig
+
+    def tearDown(self) -> None:
+        return super().tearDown()
+
+    def test_iterator(self):
+        bf = BlockFunction(*self.funcs)
+        for el in bf:
+            assert isinstance(el, ConstantFunction)
+
+    def test_rmul_with_scalar_return(self):
+        bf = BlockFunction(*self.funcs)
+        bf2 = 2*bf
+        assert isinstance(bf2, BlockFunction)
+
+    def test_getitem(self):
+        bf = BlockFunction(*self.funcs)
+        assert isinstance(bf[0], ConstantFunction)
+        assert isinstance(bf[1], ConstantFunction)
+        
+        
+
+    def test_rmul_with_scalar1(self):
+        bf0 = BlockFunction(*self.funcs)
+        bf = 2*bf0
+
+        print (bf[0].constant, bf0[0].constant)
+        print (bf[1].constant, bf0[1].constant)
+
+        for i in range(2):
+            assert bf[i].constant == 2*bf0[i].constant
+    def test_rmul_with_scalar2(self):
+        bf0 = BlockFunction(L1Norm())
+        bf = 2*bf0
+        assert isinstance(bf[0], ScaledFunction)

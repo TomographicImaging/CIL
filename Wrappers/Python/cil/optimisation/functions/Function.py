@@ -462,6 +462,12 @@ class ConstantFunction(Function):
     @property
     def L(self):
         return 0.
+    def __rmul__(self, other):
+        '''defines the right multiplication with a number'''
+        if not isinstance (other, Number):
+            raise NotImplemented
+        constant = self.constant * other
+        return ConstantFunction(constant)
 
 class ZeroFunction(ConstantFunction):
     

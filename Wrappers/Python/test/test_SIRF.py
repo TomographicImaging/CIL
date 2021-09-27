@@ -25,7 +25,7 @@ from cil.framework import BlockDataContainer
 from cil.optimisation.operators import LinearOperator, GradientOperator
 try:
     import sirf.STIR as pet
-    from sirf.Utilities import  examples_data_path
+    from sirf.Utilities import examples_data_path
     has_sirf = True
 except ImportError as ie:
     has_sirf = False
@@ -120,6 +120,7 @@ class TestSIRFCILIntegration(unittest.TestCase):
     @unittest.skipUnless(has_sirf, "Has SIRF")
     def test_GradientSIRF_3D_pseudo_geometries(self):
 
+        os.chdir(examples_data_path('PET'))
         shutil.rmtree('working_folder/thorax_single_slice',True)
         shutil.copytree('thorax_single_slice','working_folder/thorax_single_slice')
         os.chdir('working_folder/thorax_single_slice')

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cil.optimisation.functions.LeastSquares &mdash; CIL v21.2.0-14-g7bd3487 documentation</title><link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <title>cil.optimisation.functions.LeastSquares &mdash; CIL v21.2.0-15-ge7398e1 documentation</title><link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
@@ -27,7 +27,7 @@
             <a href="../../../../index.html" class="icon icon-home"> CIL
           </a>
               <div class="version">
-                v21.2.0-14-g7bd3487
+                v21.2.0-15-ge7398e1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -95,6 +95,7 @@
 <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">DataContainer</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Number</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 
 <div class="viewcode-block" id="LeastSquares"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.LeastSquares">[docs]</a><span class="k">class</span> <span class="nc">LeastSquares</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
@@ -200,11 +201,11 @@
         <span class="c1"># Compute the Lipschitz parameter from the operator if possible</span>
         <span class="c1"># Leave it initialised to None otherwise</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_L</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_L</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">ae</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">is_linear</span><span class="p">():</span>
                 <span class="n">Anorm</span> <span class="o">=</span> <span class="n">LinearOperator</span><span class="o">.</span><span class="n">PowerMethod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="mi">10</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_L</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">*</span> <span class="p">(</span><span class="n">Anorm</span><span class="o">*</span><span class="n">Anorm</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_L</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">Anorm</span><span class="o">*</span><span class="n">Anorm</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> could not calculate Lipschitz Constant. </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">ae</span><span class="p">))</span>
@@ -221,7 +222,15 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_weight_norm</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_weight_norm</span> <span class="o">=</span> <span class="mf">1.0</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_norm</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_norm</span>
+
+<div class="viewcode-block" id="LeastSquares.__rmul__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.LeastSquares.__rmul__">[docs]</a>    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;defines the right multiplication with a number&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="bp">NotImplemented</span>
+        <span class="n">constant</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">*</span> <span class="n">other</span>
+        
+        <span class="k">return</span> <span class="n">LeastSquares</span><span class="p">(</span><span class="n">A</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">constant</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

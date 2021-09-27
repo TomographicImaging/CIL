@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Optimisation framework &mdash; CIL v21.2.0-14-g7bd3487 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <title>Optimisation framework &mdash; CIL v21.2.0-15-ge7398e1 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
@@ -29,7 +29,7 @@
             <a href="index.html" class="icon icon-home"> CIL
           </a>
               <div class="version">
-                v21.2.0-14-g7bd3487
+                v21.2.0-15-ge7398e1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -1938,6 +1938,12 @@ if both of them are differentiable</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="cil.optimisation.functions.ConstantFunction.__rmul__">
+<code class="sig-name descname">__rmul__</code><span class="sig-paren">(</span><em class="sig-param">other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#ConstantFunction.__rmul__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.optimisation.functions.ConstantFunction.__rmul__" title="Permalink to this definition">¶</a></dt>
+<dd><p>defines the right multiplication with a number</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="cil.optimisation.functions.ConstantFunction.convex_conjugate">
 <code class="sig-name descname">convex_conjugate</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#ConstantFunction.convex_conjugate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.optimisation.functions.ConstantFunction.convex_conjugate" title="Permalink to this definition">¶</a></dt>
 <dd><p>The convex conjugate of constant function <span class="math notranslate nohighlight">\(F(x) = c\in\mathbb{R}\)</span> is</p>
@@ -2532,6 +2538,12 @@ see <em>TranslateFunction</em>.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="cil.optimisation.functions.LeastSquares.__rmul__">
+<code class="sig-name descname">__rmul__</code><span class="sig-paren">(</span><em class="sig-param">other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/LeastSquares.html#LeastSquares.__rmul__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.optimisation.functions.LeastSquares.__rmul__" title="Permalink to this definition">¶</a></dt>
+<dd><p>defines the right multiplication with a number</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="cil.optimisation.functions.LeastSquares.gradient">
 <code class="sig-name descname">gradient</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">out=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/LeastSquares.html#LeastSquares.gradient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.optimisation.functions.LeastSquares.gradient" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the value of the gradient of <span class="math notranslate nohighlight">\(F(x) = c*\|A*x-b\|_2^2\)</span></p>
@@ -3095,6 +3107,18 @@ can be decomposed along the proximal operators of each function <span class="mat
 <dt id="cil.optimisation.functions.BlockFunction.__init__">
 <code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">*functions</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/BlockFunction.html#BlockFunction.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.optimisation.functions.BlockFunction.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cil.optimisation.functions.BlockFunction.__rmul__">
+<code class="sig-name descname">__rmul__</code><span class="sig-paren">(</span><em class="sig-param">other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/BlockFunction.html#BlockFunction.__rmul__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.optimisation.functions.BlockFunction.__rmul__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define multiplication with a scalar</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>other</strong> – number</p>
+</dd>
+</dl>
+<p>Returns a new <a class="reference external" href="optimisation.html#cil.optimisation.functions.BlockFunction">BlockFunction</a> containing the product of the scalar with all the functions in the block</p>
 </dd></dl>
 
 <dl class="method">

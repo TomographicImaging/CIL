@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cil.optimisation.functions.Function &mdash; CIL v21.2.0-14-g7bd3487 documentation</title><link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <title>cil.optimisation.functions.Function &mdash; CIL v21.2.0-15-ge7398e1 documentation</title><link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
@@ -27,7 +27,7 @@
             <a href="../../../../index.html" class="icon icon-home"> CIL
           </a>
               <div class="version">
-                v21.2.0-14-g7bd3487
+                v21.2.0-15-ge7398e1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -536,7 +536,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_constant</span> <span class="o">=</span> <span class="n">value</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">L</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="mf">0.</span></div>
+        <span class="k">return</span> <span class="mf">0.</span>
+<div class="viewcode-block" id="ConstantFunction.__rmul__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.ConstantFunction.__rmul__">[docs]</a>    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;defines the right multiplication with a number&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span> <span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Number</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="bp">NotImplemented</span>
+        <span class="n">constant</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">constant</span> <span class="o">*</span> <span class="n">other</span>
+        <span class="k">return</span> <span class="n">ConstantFunction</span><span class="p">(</span><span class="n">constant</span><span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="ZeroFunction"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.functions.ZeroFunction">[docs]</a><span class="k">class</span> <span class="nc">ZeroFunction</span><span class="p">(</span><span class="n">ConstantFunction</span><span class="p">):</span>
     

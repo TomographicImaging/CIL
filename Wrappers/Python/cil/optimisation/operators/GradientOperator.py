@@ -285,23 +285,17 @@ class Gradient_C(LinearOperator):
         self.is2D = False
         self.tmp_dom_shape = []
         self.ind = []
-        tmp_domain_spacing = []
+        self.voxel_size_order = []
         for i, size in enumerate(list(domain_geometry.shape) ):
             if size!=1:
                 self.tmp_dom_shape.append(size)
                 self.ind.append(i)
-                tmp_domain_spacing.append(domain_geometry.spacing[i])
+                self.voxel_size_order.append(domain_geometry.spacing[i])
                 self.is2D = True
         
         # Dimension of domain geometry
         self.ndim = len(self.tmp_dom_shape)
-        
-        #get voxel spacing, if not use 1s
-        try:
-            self.voxel_size_order = tmp_domain_spacing
-        except:
-            self.voxel_size_order = [1]*self.ndim       
-                        
+                                    
         #default is 'Neumann'
         self.bnd_cond = 0
         
@@ -368,7 +362,7 @@ class Gradient_C(LinearOperator):
             if el != 1:
                 ndout[i]/=el
 
-        #fill back out in corerct (non-traivial) order
+        #fill back out in corerct (non-trivial) order
         if self.split is False:
             for i in range(self.ndim):
                 out.get_item(i).fill(ndout[i])
@@ -399,7 +393,7 @@ class Gradient_C(LinearOperator):
             if self.is2D:
                 ndx = [np.squeeze(el.as_array()) for el in x.containers]
             else:
-                ndx = [el.as_array() for el in x.containers]
+                ndx = [el for el in x.containers]
         else:
             ind = self.domain_geometry().dimension_labels.index('channel')
             ndx = [el.as_array() for el in x.get_item(1).containers]

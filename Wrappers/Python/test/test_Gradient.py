@@ -15,14 +15,13 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+from cil.framework import DataContainer
 import unittest
 import numpy
-from cil.framework import ImageGeometry, AcquisitionGeometry
-from cil.framework import ImageData, AcquisitionData
-from cil.framework import BlockDataContainer
+from cil.framework import ImageGeometry
 import functools
 
-from cil.optimisation.operators import GradientOperator, BlockOperator
+from cil.optimisation.operators import GradientOperator
 from cil.optimisation.operators import LinearOperator
 
 class TestGradientOperator(unittest.TestCase):
@@ -571,11 +570,12 @@ class TestGradientOperator(unittest.TestCase):
 
     def test_GradientOperator_for_pseudo_3D_geometries(self):   
 
-        numpy.random.seed(10)
+        numpy.random.seed(1)
         ig = ImageGeometry(voxel_num_x = 10, voxel_num_y = 10, voxel_num_z=1,
                             voxel_size_x = 0.4, voxel_size_y = 0.2, voxel_size_z=0.6)
 
-        data = ig.allocate('random')                            
+
+        data = ig.allocate('random')                                  
 
         ########################################
         ##### Test Gradient numpy backend  #####

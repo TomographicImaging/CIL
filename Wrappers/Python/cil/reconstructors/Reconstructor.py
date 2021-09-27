@@ -46,10 +46,7 @@ class Reconstructor(object):
 
     @backend.setter
     def backend(self, val):
-        supported_backends = ['tigre']
-        if val not in supported_backends:
-            raise ValueError("Backend unsupported. Supported backends: {}", supported_backends)
-        self.__backend = val
+        self.set_backend(val)
 
     def __init__(self, input):
         self.__backend = 'tigre'
@@ -65,17 +62,39 @@ class Reconstructor(object):
         self.__image_geometry = input.geometry.get_ImageGeometry()
 
     def set_input(self, input):
+        """
+        Update the data to run the reconstructor on. The new data must
+        have the same geometry as the initial data used to configure the reconstructor.
+
+        :param input: A dataset with the same geometry
+        :type input: AcquisitionData
+        """
         if input.geometry != self.input.geometry:
             raise ValueError ("Input not compatible with configured reconstructor. Initialise a new reconstructor fro this geometry")
         else:
             self.__input = input
 
     def set_image_geometry(self, image_geometry):
+        """
+        :param image_geometry: Set the ImageGeometry of the reconstructor
+        :type image_geometry: ImageGeometry
+        """
+
         if not issubclass(type(image_geometry), ImageGeometry):
             raise TypeError("ImageGeometry type mismatch: got {0} expecting {1}"\
                             .format(type(input), ImageGeometry))   
 
         self.__image_geometry = image_geometry.copy()
+
+    def set_backend(self, backend):
+        """
+        :param backend: Set the backend used for the foward/backward projectors
+        :type backend: string, 'tigre'
+        """
+        supported_backends = ['tigre']
+        if backend not in supported_backends:
+            raise ValueError("Backend unsupported. Supported backends: {}", supported_backends)
+        self.__backend = backend
 
     def run(self):
         raise NotImplementedError('Implement run for reconstructor')

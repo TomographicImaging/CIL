@@ -8,15 +8,8 @@ void ipp_status(IppStatus st)
 	}
 }
 
-int filter_projections(float * data, const float * filter, const float* weights, int order, long num_proj, long pix_y, long pix_x)
+int filter_projections_avh(float * data, const float * filter, const float* weights, int order, long num_proj, long pix_y, long pix_x)
 {
-	std::cout << "here7" << std::endl;
-
-	auto start_all = std::chrono::system_clock::now();
-	std::cout << "num_proj: " << num_proj << "\npix_y: " << pix_y << "\npix_x: " << pix_x <<  std::endl;
-	std::cout << "order: " << order << std::endl;
-
-	omp_set_num_threads(8);
 #pragma omp parallel
 	{
 #pragma omp single
@@ -27,10 +20,7 @@ int filter_projections(float * data, const float * filter, const float* weights,
 
 	//set up
 	int width = 1 << order;
-
-	std::cout << "width: " << width << std::endl;
 	int offset = int(floor((width - pix_x) / 2));
-
 
 	IppsFFTSpec_C_32fc* pSpec = 0;
 	Ipp8u* pMemSpec = 0;
@@ -95,27 +85,17 @@ int filter_projections(float * data, const float * filter, const float* weights,
 					ippsReal_32fc(src + offset, out_ptr, pix_x);
 				}
 			}
-
 			ippFree(src);
 			ippFree(dst);
 			ippFree(pMemBuffer);
-
 		}
 	}
 
 	ippFree(pMemSpec);
-	std::chrono::duration<double, std::milli> elapsed_milliseconds = std::chrono::system_clock::now() - start_all;
-	std::cout << "\ttime c : " << elapsed_milliseconds.count() / 1000 << "s" << std::endl;
-
 	return 0;
 }
-int filter_projections_reorder(float* data, const float* filter, const float* weights, int order, long pix_y, long num_proj, long pix_x)
+int filter_projections_vah(float* data, const float* filter, const float* weights, int order, long pix_y, long num_proj, long pix_x)
 {
-	auto start_all = std::chrono::system_clock::now();
-	std::cout << "num_proj: " << num_proj << "\npix_y: " << pix_y << "\npix_x: " << pix_x << std::endl;
-	std::cout << "order: " << order << std::endl;
-
-	omp_set_num_threads(7);
 #pragma omp parallel
 	{
 #pragma omp single
@@ -126,10 +106,7 @@ int filter_projections_reorder(float* data, const float* filter, const float* we
 
 	//set up
 	int width = 1 << order;
-
-	std::cout << "width: " << width << std::endl;
 	int offset = int(floor((width - pix_x) / 2));
-
 
 	IppsFFTSpec_C_32fc* pSpec = 0;
 	Ipp8u* pMemSpec = 0;
@@ -196,17 +173,12 @@ int filter_projections_reorder(float* data, const float* filter, const float* we
 					ippsReal_32fc(src + offset, out_ptr, pix_x);
 				}
 			}
-
 			ippFree(src);
 			ippFree(dst);
 			ippFree(pMemBuffer);
-
 		}
 	}
 
 	ippFree(pMemSpec);
-	std::chrono::duration<double, std::milli> elapsed_milliseconds = std::chrono::system_clock::now() - start_all;
-	std::cout << "\ttime c : " << elapsed_milliseconds.count() / 1000 << "s" << std::endl;
-
 	return 0;
 }

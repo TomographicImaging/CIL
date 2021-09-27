@@ -46,7 +46,7 @@ cilacc.filter_projections_avh.argtypes = [ctypes.POINTER(ctypes.c_float),  # poi
                                   ctypes.c_long, #pix_v
                                   ctypes.c_long] #pix_x
 
-cilacc.filter_projections_reorder.argtypes = [ctypes.POINTER(ctypes.c_float),  # pointer to the data array 
+cilacc.filter_projections_vah.argtypes = [ctypes.POINTER(ctypes.c_float),  # pointer to the data array 
                                   ctypes.POINTER(ctypes.c_float),  # pointer to the filter array
                                   ctypes.POINTER(ctypes.c_float),  # pointer to the weights array
                                   ctypes.c_int16, #order of the fft
@@ -102,7 +102,7 @@ class FBP(Reconstructor):
 
         #define defaults
         self.__filter = 'ram-lak' 
-        self.set_fft_order(0)
+        self.__fft_order =self.__min_fft_order()
         self.__filter_inplace = False
 
     def set_filter_inplace(self, inplace):
@@ -118,6 +118,13 @@ class FBP(Reconstructor):
         else:
             raise TypeError("set_filter_inplace expected a boolian. Got {}".format(type(inplace)))
         
+    def __min_fft_order(self):
+        min_order = 0
+        while 2**min_order < self.input.geometry.pixel_num_h * 2:
+            min_order+=1
+
+        min_order = max(8, min_order)
+        return min_order
 
     def set_fft_order(self, order):
         """
@@ -128,16 +135,20 @@ class FBP(Reconstructor):
         :param set_fft_order: The width of the fft N=2^order 
         :type set_fft_order: int
         """
-        min_order = 0
-        while 2**min_order < self.input.geometry.pixel_num_h * 2:
-            min_order+=1
+        try:
+            fft_order = int(order)
 
-        min_order = max(8, min_order)
-        fft_order = max(int(order), int(min_order))
+        except TypeError:
+            raise TypeError("fft order expected type `int`. Got{}".format(type(order)))
+        
+        min_order = self.__min_fft_order()
+        if fft_order < min_order:
+            raise ValueError("Minimum fft width 2^order is order = {0}. Got{1}".format(min_order,order))
 
-        if type(self.filter)==np.ndarray and fft_order != self.fft_order:
+        if self.filter=='custom' and fft_order != self.fft_order:
             print("Filter length changed - resetting filter array to ram-lak")
-            self.__filter=='ram-lak'
+            self.__filter='ram-lak'
+            del self.__filter_array
         
         self.__fft_order =fft_order
 
@@ -158,11 +169,11 @@ class FBP(Reconstructor):
 
         if filter in ['ram-lak']:
             self.__filter == filter
-        elif type(self.filter)==np.ndarray:
+        elif type(filter)==np.ndarray:
             try:
-                filter_array = np.asarray(filter,dtype=np.float32).reshape(2**self.order) 
+                filter_array = np.asarray(filter,dtype=np.float32).reshape(2**self.fft_order) 
+                self.__filter_array = filter_array.copy()
                 self.__filter = 'custom'
-                self.__filter_array = filter_array
             except ValueError:
                 raise ValueError("Custom filter not compatible with input.")
         else:

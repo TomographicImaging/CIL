@@ -53,6 +53,7 @@ requirements:
     - ripgrep
     - ipp-include
     - ipp-devel
+    - ipp
 
   run:
     - python
@@ -70,7 +71,9 @@ requirements:
     - olefile >=0.46
     - pywavelets
     - cil-data
-    
+    - ipp-include
+    - ipp-devel
+    - ipp
   
 about:
   home: http://www.ccpi.ac.uk/cil

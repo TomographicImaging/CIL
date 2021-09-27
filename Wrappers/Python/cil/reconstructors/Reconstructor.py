@@ -70,7 +70,7 @@ class Reconstructor(object):
         :type input: AcquisitionData
         """
         if input.geometry != self.input.geometry:
-            raise ValueError ("Input not compatible with configured reconstructor. Initialise a new reconstructor fro this geometry")
+            raise ValueError ("Input not compatible with configured reconstructor. Initialise a new reconstructor with this geometry")
         else:
             self.__input = input
 

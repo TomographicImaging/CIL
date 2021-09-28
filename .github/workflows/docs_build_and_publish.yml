@@ -21,6 +21,8 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y build-essential --fix-missing
         pip install ipp
+        pip install ipp-devel
+        pip install ipp-include
         cd CIL
         mkdir build
         cd build

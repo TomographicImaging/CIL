@@ -71,17 +71,18 @@ class TV_Base(RegulariserFunction):
         return 0.0
 
 class ROF_TV(TV_Base):
-    def __init__(self,lambdaReg,iterationsTV,tolerance,time_marchstep,device):
+    def __init__(self,alpha = 1.0, max_iteration=100, tolerance=1e-6, time_marchstep=1e-6, device='cpu'):
+
         # set parameters
-        self.alpha = lambdaReg
-        self.max_iteration = iterationsTV
+        self.alpha = alpha
+        self.max_iteration = max_iteration
         self.time_marchstep = time_marchstep
-        self.device = device # string for 'cpu' or 'gpu'
+        self.device = device 
         self.tolerance = tolerance
         
     def proximal_numpy(self, in_arr, tau, out = None):
         res , info = regularisers.ROF_TV(in_arr,
-              self.alpha,
+              self.alpha*tau,
               self.max_iteration,
               self.time_marchstep,
               self.tolerance,
@@ -232,12 +233,15 @@ class FGP_dTV(RegulariserFunction):
         return np.nan
     
 class SB_TV(TV_Base):
-    def __init__(self,lambdaReg,iterationsTV,tolerance,methodTV,printing,device):
+    def __init__(self, alpha=1.0, max_iteration=100, tolerance=1e-6, isotropic=True, printing=False, device='cpu'):
         # set parameters
-        self.alpha = lambdaReg
-        self.max_iteration = iterationsTV
+        self.alpha = alpha
+        self.max_iteration = max_iteration
         self.tolerance = tolerance
-        self.methodTV = methodTV
+        if isotropic == True:
+            self.methodTV = 0
+        else:
+            self.methodTV = 1
         self.printing = printing
         self.device = device # string for 'cpu' or 'gpu'
                 

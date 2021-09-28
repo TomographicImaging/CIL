@@ -333,11 +333,7 @@ class Gradient_C(LinearOperator):
         
     def direct(self, x, out=None): 
         
-        # Case for psedo 3D data with only one slice
-        if self.is2D:            
-            ndx = np.squeeze(np.asarray(x.as_array(), dtype=np.float32, order='C'))
-        else:
-            ndx = np.asarray(x.as_array(), dtype=np.float32, order='C')
+        ndx = np.asarray(x.as_array(), dtype=np.float32, order='C')
         x_p = Gradient_C.ndarray_as_c_pointer(ndx)
         
         return_val = False
@@ -354,7 +350,7 @@ class Gradient_C(LinearOperator):
                 
         #pass list of all arguments
         arg1 = [Gradient_C.ndarray_as_c_pointer(ndout[i]) for i in range(len(ndout))]
-        arg2 = [el for el in ndx.shape]
+        arg2 = [el for el in self.tmp_dom_shape]
         args = arg1 + arg2 + [self.bnd_cond, 1, self.num_threads]
         self.fd(x_p, *args)
 
@@ -390,10 +386,7 @@ class Gradient_C(LinearOperator):
         out_p = Gradient_C.ndarray_as_c_pointer(ndout)
         
         if self.split is False: 
-            if self.is2D:
-                ndx = [np.squeeze(el.as_array()) for el in x.containers]
-            else:
-                ndx = [el for el in x.containers]
+            ndx = [el.as_array() for el in x.containers]
         else:
             ind = self.domain_geometry().dimension_labels.index('channel')
             ndx = [el.as_array() for el in x.get_item(1).containers]
@@ -404,7 +397,7 @@ class Gradient_C(LinearOperator):
                 ndx[i]/=el
 
         arg1 = [Gradient_C.ndarray_as_c_pointer(ndx[i]) for i in range(self.ndim)]
-        arg2 = [el for el in ndx[0].shape]
+        arg2 = [el for el in self.tmp_dom_shape]
         args = arg1 + arg2 + [self.bnd_cond, 0, self.num_threads]
 
         self.fd(out_p, *args)

@@ -16,10 +16,10 @@
 #   limitations under the License.
 
 from cil.framework import AcquisitionGeometry
-from cil.reconstructors import FBP
+from cil.reconstructors import FBP, Reconstructor
 import unittest
 import numpy as np
-from utils import has_gpu_tigre
+from utils import has_gpu_tigre, has_ipp
 
 try:
     from cil.plugins.tigre import ProjectionOperator as ProjectionOperator
@@ -33,6 +33,9 @@ except ModuleNotFoundError:
     has_tigre = False
 
 has_tigre = has_tigre and has_gpu_tigre()
+
+has_ipp = has_ipp()
+
 
 class Test_Reconstructor(unittest.TestCase):
 
@@ -68,39 +71,42 @@ class Test_Reconstructor(unittest.TestCase):
     def test_setup(self):
         ad3D = self.ag3D.allocate('random')
         ig3D = self.ag3D.get_ImageGeometry()
-        fbp = FBP(ad3D)
+
+
+        reconstructor = Reconstructor(ad3D)
 
         #test defaults
-        self.assertEqual(id(fbp.input),id(ad3D))
-        self.assertEqual(fbp.image_geometry,ig3D)
-        self.assertEqual(fbp.backend, 'tigre')
+        self.assertEqual(id(reconstructor.input),id(ad3D))
+        self.assertEqual(reconstructor.image_geometry,ig3D)
+        self.assertEqual(reconstructor.backend, 'tigre')
 
         #test customisation
         ag3D_new = ad3D.copy()
-        fbp.set_input(ag3D_new)
-        self.assertEqual(id(fbp.input),id(ag3D_new))
+        reconstructor.set_input(ag3D_new)
+        self.assertEqual(id(reconstructor.input),id(ag3D_new))
 
         ag3D_new = ad3D.get_slice(vertical='centre')
         with self.assertRaises(ValueError):
-            fbp.set_input(ag3D_new)
+            reconstructor.set_input(ag3D_new)
         
         ig3D.voxel_num_z = 1
-        fbp.set_image_geometry(ig3D)
-        self.assertEqual(fbp.image_geometry,ig3D)
+        reconstructor.set_image_geometry(ig3D)
+        self.assertEqual(reconstructor.image_geometry,ig3D)
 
         with self.assertRaises(ValueError):
-            fbp.set_backend('gemma')
+            reconstructor.set_backend('gemma')
 
         #wrong input on initialisation
         ad3D.reorder('astra')
         with self.assertRaises(ValueError):
-            fbp = FBP(ad3D)
+            reconstructor = Reconstructor(ad3D)
 
         with self.assertRaises(TypeError):
-            fbp = FBP(self.ag3D)
+            reconstructor = Reconstructor(self.ag3D)
 
 class Test_FBP(Test_Reconstructor, unittest.TestCase):
-    
+
+    @unittest.skipUnless(has_ipp, "IPP not installed")
     def test_setup(self):
         ad3D = self.ag3D.allocate('random')
         ig3D = self.ag3D.get_ImageGeometry()
@@ -146,7 +152,7 @@ class Test_FBP(Test_Reconstructor, unittest.TestCase):
         with self.assertRaises(ValueError):
             fbp.set_fft_order(2)
 
-    @unittest.skipUnless(has_tigre, "TIGRE not installed")
+    @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
     def test_results(self):
         #create phantom
         kernel_size = self.ag3D.pixel_num_h

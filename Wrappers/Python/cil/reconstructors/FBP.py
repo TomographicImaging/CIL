@@ -38,21 +38,28 @@ cilacc = ctypes.cdll.LoadLibrary(dll)
 c_float_p = ctypes.POINTER(ctypes.c_float)
 c_double_p = ctypes.POINTER(ctypes.c_double)
 
-cilacc.filter_projections_avh.argtypes = [ctypes.POINTER(ctypes.c_float),  # pointer to the data array 
-                                  ctypes.POINTER(ctypes.c_float),  # pointer to the filter array
-                                  ctypes.POINTER(ctypes.c_float),  # pointer to the weights array
-                                  ctypes.c_int16, #order of the fft
-                                  ctypes.c_long, #num_proj
-                                  ctypes.c_long, #pix_v
-                                  ctypes.c_long] #pix_x
+try:
+    cilacc.filter_projections_avh
+    has_ipp = True
+except:
+    has_ipp = False
 
-cilacc.filter_projections_vah.argtypes = [ctypes.POINTER(ctypes.c_float),  # pointer to the data array 
-                                  ctypes.POINTER(ctypes.c_float),  # pointer to the filter array
-                                  ctypes.POINTER(ctypes.c_float),  # pointer to the weights array
-                                  ctypes.c_int16, #order of the fft
-                                  ctypes.c_long, #pix_v
-                                  ctypes.c_long, #num_proj
-                                  ctypes.c_long] #pix_x
+if has_ipp:
+    cilacc.filter_projections_avh.argtypes = [ctypes.POINTER(ctypes.c_float),  # pointer to the data array 
+                                    ctypes.POINTER(ctypes.c_float),  # pointer to the filter array
+                                    ctypes.POINTER(ctypes.c_float),  # pointer to the weights array
+                                    ctypes.c_int16, #order of the fft
+                                    ctypes.c_long, #num_proj
+                                    ctypes.c_long, #pix_v
+                                    ctypes.c_long] #pix_x
+
+    cilacc.filter_projections_vah.argtypes = [ctypes.POINTER(ctypes.c_float),  # pointer to the data array 
+                                    ctypes.POINTER(ctypes.c_float),  # pointer to the filter array
+                                    ctypes.POINTER(ctypes.c_float),  # pointer to the weights array
+                                    ctypes.c_int16, #order of the fft
+                                    ctypes.c_long, #pix_v
+                                    ctypes.c_long, #num_proj
+                                    ctypes.c_long] #pix_x
 
 class FBP(Reconstructor):
 
@@ -93,6 +100,9 @@ class FBP(Reconstructor):
         self.set_fft_order()
         self.set_filter_inplace()
         """
+        if has_ipp == False:
+            raise ImportError("IPP libraries not found. Cannot use CIL FBP")
+
         #call parent initialiser
         super(FBP, self).__init__(input)
         

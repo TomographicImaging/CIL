@@ -51,7 +51,7 @@ class BlockGeometry(object):
         
         max_value = kwargs.get('max_value', 100)
         symmetry = kwargs.get('symmetry',False)        
-        containers = [geom.allocate(value, max_value = max_value) for geom in self.geometries]
+        containers = [geom.allocate(value, max_value = max_value, **kwargs) for geom in self.geometries]
         
         if symmetry == True:
                         

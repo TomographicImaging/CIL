@@ -1,23 +1,8 @@
 #include "FBP_filtering.h"
 
-void ipp_status(IppStatus st)
-{
-	if (st)
-	{
-		std::cout << "Ipp Status " << st << ": " << ippGetStatusString(st) << std::endl;
-	}
-}
 
 int filter_projections_avh(float * data, const float * filter, const float* weights, int order, long num_proj, long pix_y, long pix_x)
 {
-#pragma omp parallel
-	{
-#pragma omp single
-		{
-			std::cout << "Spawned " << omp_get_num_threads() << " threads" << std::endl;
-		}
-	}
-
 	//set up
 	int width = 1 << order;
 	int offset = int(floor((width - pix_x) / 2));
@@ -96,14 +81,6 @@ int filter_projections_avh(float * data, const float * filter, const float* weig
 }
 int filter_projections_vah(float* data, const float* filter, const float* weights, int order, long pix_y, long num_proj, long pix_x)
 {
-#pragma omp parallel
-	{
-#pragma omp single
-		{
-			std::cout << "Spawned " << omp_get_num_threads() << " threads" << std::endl;
-		}
-	}
-
 	//set up
 	int width = 1 << order;
 	int offset = int(floor((width - pix_x) / 2));

@@ -118,7 +118,7 @@ class TestSIRFCILIntegration(unittest.TestCase):
         self.assertBlockDataContainerEqual(bdc , bdc1)
 
     @unittest.skipUnless(has_sirf, "Has SIRF")
-    def test_GradientSIRF_3D_pseudo_geometries(self):
+    def test_GradientSIRF_2D_pseudo_geometries(self):
 
         os.chdir(examples_data_path('PET'))
         shutil.rmtree('working_folder/thorax_single_slice',True)
@@ -126,15 +126,25 @@ class TestSIRFCILIntegration(unittest.TestCase):
         os.chdir('working_folder/thorax_single_slice')
 
         image1 = pet.ImageData('emission.hv')
+        isinstance(image1, pet.ImageData)        
 
         ########################################
         ##### Test Gradient numpy backend  #####
         ########################################
+
         Grad_numpy = GradientOperator(image1, backend='numpy')
 
-        res1 = Grad_numpy.direct(image1) 
+        res1 = Grad_numpy.direct(image1)         
         res2 = Grad_numpy.range_geometry().allocate()
         Grad_numpy.direct(image1, out=res2)
+
+        isinstance(res1,BlockDataContainer)
+        isinstance(res1[0], pet.ImageData)
+        isinstance(res1[1], pet.ImageData) 
+
+        isinstance(res2,BlockDataContainer)
+        isinstance(res2[0], pet.ImageData)
+        isinstance(res2[1], pet.ImageData)                
 
         # test direct with and without out
         numpy.testing.assert_array_almost_equal(res1[0].as_array(), res2[0].as_array()) 

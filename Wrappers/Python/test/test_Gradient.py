@@ -15,16 +15,27 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from cil.framework import DataContainer
 import unittest
 import numpy
 from cil.framework import ImageGeometry
-import functools
+
 
 from cil.optimisation.operators import GradientOperator
 from cil.optimisation.operators import LinearOperator
 
 class TestGradientOperator(unittest.TestCase):
+
+    def __init__(self, *args, **kwargs):
+
+        # setup geometries for different tests
+        numpy.random.seed(1)
+        N, M, K, channels = 2, 3, 5, 3
+        self.ig_2D = ImageGeometry(voxel_num_x = M, voxel_num_y = N) 
+        self.ig_2D_channels = ImageGeometry(voxel_num_x = M, voxel_num_y = N, channels = channels) 
+        self.ig_3D = ImageGeometry(voxel_num_x = M, voxel_num_y = N, voxel_num_z= K) 
+        self.ig_3D_channels = ImageGeometry(voxel_num_x = M, voxel_num_y = N, channels = channels)         
+
+        super(TestGradientOperator, self).__init__(*args, **kwargs)
 
     def test_GradientOperator(self): 
         N, M, K = 20, 30, 40
@@ -581,9 +592,6 @@ class TestGradientOperator(unittest.TestCase):
         # ImageGeometry shape (5,1,5)                              
         ig3 = ImageGeometry(voxel_num_x = 5, voxel_num_y = 1, voxel_num_z=5,
                             voxel_size_x = 0.6, voxel_size_y = 0.4, voxel_size_z=0.3)                                                      
-
-        def test_GradientOperator_for_pseudo_2D_geometries_in_place(self): 
-            print("Kalos")
 
         data1 = ig1.allocate('random')   
         data2 = ig2.allocate('random') 

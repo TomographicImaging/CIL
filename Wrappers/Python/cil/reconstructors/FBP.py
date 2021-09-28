@@ -97,6 +97,9 @@ class FBP(Reconstructor):
         if 'channel' in input.dimension_labels:
             raise ValueError("Input data cannot be multi-channel")
 
+        if  input.geometry.geom_type == AcquisitionGeometry.PARALLEL:
+            raise NotImplementedError("Currently not implemented for parallel beam data")
+
         #call parent initialiser
         super(FBP, self).__init__(input)
 
@@ -283,7 +286,7 @@ class FBP(Reconstructor):
             
         operator = ProjectionOperator(self.image_geometry,self.input.geometry,adjoint_method='FDK')
         
-        if out == None:
+        if out is None:
             return operator.adjoint(proj_filtered)
         else:
             operator.adjoint(proj_filtered, out = out)

@@ -19,11 +19,12 @@ from cil.framework import AcquisitionGeometry
 from cil.reconstructors import FBP
 import unittest
 import numpy as np
-from utils import has_gpu_tigre, has_gpu_astra
+from utils import has_gpu_tigre
 
 try:
     from cil.plugins.tigre import ProjectionOperator as ProjectionOperator
     from cil.plugins.tigre import FBP as FBP_tigre
+    from tigre.utilities.filtering import ramp_flat, filter
     has_tigre = True
 except ModuleNotFoundError:
     print(  "These reconstructors require the additional package TIGRE\n" +
@@ -31,9 +32,7 @@ except ModuleNotFoundError:
             "Minimal version is 21.01")
     has_tigre = False
 
-
 has_tigre = has_tigre and has_gpu_tigre()
-
 
 class Test_Reconstructor(unittest.TestCase):
 
@@ -41,7 +40,6 @@ class Test_Reconstructor(unittest.TestCase):
         #%% Setup Geometry
         voxel_num_xy = 255
         voxel_num_z = 15
-        cs_ind = (voxel_num_z-1)//2
 
         mag = 2
         src_to_obj = 50
@@ -120,7 +118,6 @@ class Test_FBP(Test_Reconstructor, unittest.TestCase):
         self.assertEqual(filter[256],1.0)
         self.assertEqual(filter[1],filter[511])
 
-
         #test customisation
         filter_new =filter *0.5
         fbp.set_filter(filter_new)
@@ -148,3 +145,78 @@ class Test_FBP(Test_Reconstructor, unittest.TestCase):
 
         with self.assertRaises(ValueError):
             fbp.set_fft_order(2)
+
+    @unittest.skipUnless(has_tigre, "TIGRE not installed")
+    def test_results(self):
+        #create phantom
+        kernel_size = self.ag3D.pixel_num_h
+        kernel_radius = (kernel_size - 1) // 2
+        y, x = np.ogrid[-kernel_radius:kernel_radius+1, -kernel_radius:kernel_radius+1]
+
+        circle1 = [5,0,0] #r,x,y
+        dist1 = ((x - circle1[1])**2 + (y - circle1[2])**2)**0.5
+
+        circle2 = [5,80,0] #r,x,y
+        dist2 = ((x - circle2[1])**2 + (y - circle2[2])**2)**0.5
+
+        circle3 = [25,0,80] #r,x,y
+        dist3 = ((x - circle3[1])**2 + (y - circle3[2])**2)**0.5
+
+        mask1 =(dist1 - circle1[0]).clip(0,1) 
+        mask2 =(dist2 - circle2[0]).clip(0,1) 
+        mask3 =(dist3 - circle3[0]).clip(0,1) 
+        phantom = 1 - np.logical_and(np.logical_and(mask1, mask2),mask3)
+
+        golden_data = self.ig3D.allocate(0)
+        for i in range(4):
+            golden_data.fill(array=phantom, vertical=7+i)
+
+        Op = ProjectionOperator(self.ig3D, self.ag3D, direct_method='interpolated')
+        data = Op.direct(golden_data)
+        data2D = data.get_slice(vertical='centre')
+
+        fbp_tigre = FBP_tigre(self.ig3D, self.ag3D)
+        reco_tigre = fbp_tigre(data)
+
+        fbp_cil = FBP(data)
+        reco_cil = fbp_cil.run()
+
+        #construct TIGRE's filter
+        n = 2**fbp_cil.fft_order
+        ramp = ramp_flat(n)
+        filt = filter('ram_lak',ramp[0],n,1,False)
+        fbp_cil.set_filter(filt)
+        reco_cil_filter = fbp_cil.run()
+        #check close to sim (aliasing makes the difference lareg at edges)
+        diff = (golden_data-reco_cil).abs().max()
+        self.assertLess(diff, 0.6)
+
+        #check close to tigre
+        diff = (reco_tigre-reco_cil).abs().max()
+        self.assertLess(diff, 0.006)
+
+        #very small difference expected with the same filter
+        diff = (reco_cil_filter-reco_tigre).abs().max()
+        self.assertLess(diff, 5e-6)
+
+        #2D
+        fbp_cil_2D = FBP(data2D)
+        reco_cil_2D = fbp_cil_2D.run()
+        diff = (reco_cil_2D - phantom).abs().max()
+        self.assertLess(diff, 1)
+
+        #test inplace run
+        reco_cil_2D_b = reco_cil_2D.copy()
+        reco_cil_2D_b.fill(0)
+        fbp_cil_2D.run(out=reco_cil_2D_b)
+        diff = (reco_cil_2D - reco_cil_2D_b).abs().max()
+        self.assertLess(diff,1e-8)
+
+        #test inplace filter
+        data_filtered= data2D.copy()
+        fbp_cil_filter_inplace = FBP(data_filtered)
+        fbp_cil_filter_inplace.set_filter_inplace(True)
+        fbp_cil_filter_inplace.run(out=reco_cil_2D)
+
+        diff = (data_filtered - data2D).abs().mean()
+        self.assertGreater(diff,0.5)

@@ -93,15 +93,15 @@ class FBP(Reconstructor):
         self.set_fft_order()
         self.set_filter_inplace()
         """
+        #call parent initialiser
+        super(FBP, self).__init__(input)
+        
         #additional check
         if 'channel' in input.dimension_labels:
             raise ValueError("Input data cannot be multi-channel")
 
         if  input.geometry.geom_type == AcquisitionGeometry.PARALLEL:
             raise NotImplementedError("Currently not implemented for parallel beam data")
-
-        #call parent initialiser
-        super(FBP, self).__init__(input)
 
         #define defaults
         self.__filter = 'ram-lak' 
@@ -290,5 +290,3 @@ class FBP(Reconstructor):
             return operator.adjoint(proj_filtered)
         else:
             operator.adjoint(proj_filtered, out = out)
-
-

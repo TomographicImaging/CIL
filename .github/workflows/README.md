@@ -9,6 +9,8 @@ When opening or modifying a pull request to master, a single variant is built an
 
 The action does not publish to conda, instead this is done by jenkins. This is because github-actions do not have a GPU.
 
+It looks for conda-build dependencies in the channels listed [here](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/conda_build.yml#L25). If you add any new dependencies, the appropriate channels need to be added to this line.
+
 ## Building/Publishing Documentation: [docs_build_and_publish](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/docs_build_and_publish.yml)
 
 This github action builds and optionally publishes the documentation located in [docs/source](https://github.com/TomographicImaging/CIL/tree/master/docs/source). 

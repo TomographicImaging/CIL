@@ -1,6 +1,5 @@
 #include "FBP_filtering.h"
 
-
 int filter_projections_avh(float * data, const float * filter, const float* weights, int order, long num_proj, long pix_y, long pix_x)
 {
 	//set up

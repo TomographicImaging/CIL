@@ -126,7 +126,7 @@ class TestSIRFCILIntegration(unittest.TestCase):
         os.chdir('working_folder/thorax_single_slice')
 
         image1 = pet.ImageData('emission.hv')
-        isinstance(image1, pet.ImageData)        
+        self.assertTrue(isinstance(image1, pet.ImageData))
 
         ########################################
         ##### Test Gradient numpy backend  #####
@@ -138,13 +138,13 @@ class TestSIRFCILIntegration(unittest.TestCase):
         res2 = Grad_numpy.range_geometry().allocate()
         Grad_numpy.direct(image1, out=res2)
 
-        isinstance(res1,BlockDataContainer)
-        isinstance(res1[0], pet.ImageData)
-        isinstance(res1[1], pet.ImageData) 
+        self.assertTrue(isinstance(res1,BlockDataContainer))
+        self.assertTrue(isinstance(res1[0], pet.ImageData))
+        self.assertTrue(isinstance(res1[1], pet.ImageData))
 
-        isinstance(res2,BlockDataContainer)
-        isinstance(res2[0], pet.ImageData)
-        isinstance(res2[1], pet.ImageData)                
+        self.assertTrue(isinstance(res2,BlockDataContainer))
+        self.assertTrue(isinstance(res2[0], pet.ImageData))
+        self.assertTrue(isinstance(res2[1], pet.ImageData))               
 
         # test direct with and without out
         numpy.testing.assert_array_almost_equal(res1[0].as_array(), res2[0].as_array()) 

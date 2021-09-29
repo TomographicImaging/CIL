@@ -63,8 +63,7 @@ def has_ipp():
     from cil.reconstructors import FBP
     try:
         fbp = FBP('fail')
-        return True
     except ImportError:
         return False
-    except:
-        pass
+    except TypeError:
+        return True

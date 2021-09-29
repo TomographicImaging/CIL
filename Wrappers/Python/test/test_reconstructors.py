@@ -18,6 +18,7 @@
 from cil.framework import AcquisitionGeometry
 from cil.reconstructors import FBP, Reconstructor
 import unittest
+from scipy.fftpack  import fft, ifft
 import numpy as np
 from utils import has_gpu_tigre, has_ipp
 
@@ -152,8 +153,65 @@ class Test_FBP(Test_Reconstructor, unittest.TestCase):
         with self.assertRaises(ValueError):
             fbp.set_fft_order(2)
 
+    @unittest.skipUnless(has_ipp, "IPP not installed")
+    def test_filtering(self):
+        ag = AcquisitionGeometry.create_Cone3D([0,-1,0],[0,2,0])\
+            .set_panel([64,3],[0.1,0.1])\
+            .set_angles([0,90])
+
+        ad = ag.allocate('random',seed=0)
+
+        fbp = FBP(ad)
+        out1 = ad.copy()
+        fbp._FBP__pre_filtering(out1)
+
+        #by hand
+        filter = fbp.get_filter_array()
+        weights = fbp._FBP__calculate_weights_fdk()
+        pad0 = (len(filter)-ag.pixel_num_h)//2
+        pad1 = len(filter)-ag.pixel_num_h-pad0
+
+        out2 = ad.array.copy()
+        out2*=weights
+        for i in range(2):
+            proj_padded = np.zeros((ag.pixel_num_v,len(filter)))
+            proj_padded[:,pad0:-pad1] = out2[i]
+            filtered_proj=fft(proj_padded,axis=-1)
+            filtered_proj*=filter
+            filtered_proj=ifft(filtered_proj,axis=-1)
+            out2[i]=np.real(filtered_proj)[:,pad0:-pad1]
+
+        diff = (out1-out2).abs().max()
+        self.assertLess(diff, 1e-5)
+
+    def test_weights(self):
+        ag = AcquisitionGeometry.create_Cone3D([0,-1,0],[0,2,0])\
+            .set_panel([3,4],[0.1,0.2])\
+            .set_angles([0,90])
+        ad = ag.allocate(0)
+
+        fbp = FBP(ad)
+        weights = fbp._FBP__calculate_weights_fdk()
+
+        scaling =  7.5 * np.pi
+        weights_new = np.ones_like(weights)
+
+        det_size_x = ag.pixel_size_h*ag.pixel_num_h
+        det_size_y = ag.pixel_size_v*ag.pixel_num_v
+
+        ray_length_z = 3
+        for j in range(4):
+            ray_length_y = -det_size_y/2 +  ag.pixel_size_v * (j+0.5)
+            for i in range(3):
+                ray_length_x = -det_size_x/2 +  ag.pixel_size_h * (i+0.5)
+                ray_length = (ray_length_x**2+ray_length_y**2+ray_length_z**2)**0.5
+                weights_new[j,i] = scaling*ray_length_z/ray_length
+
+        diff = np.max(np.abs(weights - weights_new))
+        self.assertLess(diff, 1e-5)
+  
     @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
-    def test_results(self):
+    def test_run_results(self):
         #create phantom
         kernel_size = self.ag3D.pixel_num_h
         kernel_radius = (kernel_size - 1) // 2

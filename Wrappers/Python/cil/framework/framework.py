@@ -1882,7 +1882,10 @@ class DataContainer(object):
         # finally copy the geometry
         if 'geometry' in kwargs.keys():
             self.geometry = kwargs['geometry']
-            self.geometry.dtype = self.dtype            
+            try:
+                self.geometry.dtype = self.dtype            
+            except:
+                pass    
         
     def get_dimension_size(self, dimension_label):
 
@@ -3141,6 +3144,7 @@ if __name__ == "__main__":
     data.array = x_np
     print(data.dtype)
     print(data.geometry.dtype)
+
 
 
 

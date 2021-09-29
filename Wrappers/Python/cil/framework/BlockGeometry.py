@@ -34,12 +34,6 @@ class BlockGeometry(object):
         ''''''
         self.geometries = args
         self.index = 0
-        # self.dtype = dtype
-        # self.dtype = tuple(i.dtype for i in self.geometries)
-        
-        # if all(self.geometries.dtype) is None:
-        #     self.dtype = numpy.float32
-
         shape = (len(args),1)
         self.shape = shape
 
@@ -48,19 +42,15 @@ class BlockGeometry(object):
             raise ValueError(
                     'Dimension and size do not match: expected {} got {}'
                     .format(n_elements, len(args)))
-
-                    
-                      
             
     def get_item(self, index):
         '''returns the Geometry in the BlockGeometry located at position index'''
         return self.geometries[index]            
 
-    def allocate(self, value=0, dimension_labels=None, **kwargs):
+    def allocate(self, value=0, **kwargs):
         
-        max_value = kwargs.get('max_value', 100)
         symmetry = kwargs.get('symmetry',False)        
-        containers = [geom.allocate(value, max_value = max_value) for geom in self.geometries]
+        containers = [geom.allocate(value, **kwargs) for geom in self.geometries]
         
         if symmetry == True:
                         

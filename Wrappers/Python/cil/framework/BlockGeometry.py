@@ -14,8 +14,7 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-import numpy
-from numbers import Number
+
 import functools
 from cil.framework import BlockDataContainer
 
@@ -75,7 +74,7 @@ class BlockGeometry(object):
             
             # for 4x4  
             # [ ig11, ig12, ig13, ig14\
-            #   ig21, ig22, ig23, ig24\
+            #   ig21, ig22, ig23, ig24\ c
             #   ig31, ig32, ig33, ig34
             #   ig41, ig42, ig43, ig44]   
             

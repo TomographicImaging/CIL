@@ -331,18 +331,7 @@ class ImageGeometry(object):
                 raise ValueError('Value {} unknown'.format(value))
 
         return out
-    # The following methods return 2 members of the class, therefore I 
-    # don't think we need to implement them. 
-    # Additionally using __len__ is confusing as one would think this is 
-    # an iterable. 
-    #def __len__(self):
-    #    '''returns the length of the geometry'''
-    #    return self.length
-    #def shape(self):
-    #    '''Returns the shape of the array of the ImageData it describes'''
-    #    return self.shape
-        
-
+    
 class ComponentDescription(object):
     r'''This class enables the creation of vectors and unit vectors used to describe the components of a tomography system
      '''
@@ -1449,6 +1438,14 @@ class AcquisitionGeometry(object):
             self.__dimension_labels = tuple(val)
 
 
+    @property
+    def dtype(self):
+        return self.__dtype
+
+    @dtype.setter
+    def dtype(self, val):
+        self.__dtype = val       
+
     def __init__(self,
                 geom_type, 
                 dimension=None,
@@ -1464,6 +1461,9 @@ class AcquisitionGeometry(object):
 
         """Constructor method
         """
+
+        # default dtype for the acquisition geometry
+        self.dtype = kwargs.get('dtype', numpy.float32)
 
         #backward compatibility
         new_setup = kwargs.get('new_setup', False)
@@ -1759,12 +1759,14 @@ class AcquisitionGeometry(object):
         :param dtype: numerical type to allocate
         :type dtype: numpy type, default numpy.float32
         '''
-        if value == 'random_int':
-            dtype = kwargs.get('dtype', numpy.int32)
-            if dtype not in [numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64]:
-                raise ValueError('Expecting int type, got {}'.format(dtype))
-        else:
-            dtype = kwargs.get('dtype', numpy.float32)
+        # if value == 'random_int':
+        #     dtype = kwargs.get('dtype', numpy.int32)
+        #     if dtype not in [numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64]:
+        #         raise ValueError('Expecting int type, got {}'.format(dtype))
+        # else:
+        #     dtype = kwargs.get('dtype', numpy.float32)
+
+        dtype = kwargs.get('dtype', self.dtype)
 
         if kwargs.get('dimension_labels', None) is not None:
             raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
@@ -1791,7 +1793,8 @@ class AcquisitionGeometry(object):
                 if seed is not None:
                     numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
-                out.fill(numpy.random.randint(max_value,size=self.shape, dtype=dtype))
+                r = numpy.random.randint(max_value,size=self.shape, dtype=dtype)
+                out.fill(numpy.asarray(r, dtype=self.dtype))
             elif value is None:
                 pass
             else:
@@ -1849,11 +1852,9 @@ class DataContainer(object):
 
     @property
     def dtype(self):
-        '''Returns the type of the data array'''
-        try:                              
-            self.geometry.dtype = self.array.dtype
-        except:
-            pass            
+        '''Returns the dtype of the data array. 
+           If geometry exists, the dtype of the geometry = dtype of the array'''                          
+        self.geometry.dtype = self.array.dtype       
         return self.array.dtype
 
     @property
@@ -1879,7 +1880,7 @@ class DataContainer(object):
         if type(self) is DataContainer:
             self.dimension_labels = dimension_labels
 
-        # finally copy the geometry
+        # finally copy the geometry, and force dtype of the geometry of the data = the dype of the data
         if 'geometry' in kwargs.keys():
             self.geometry = kwargs['geometry']
             try:
@@ -2623,6 +2624,7 @@ class AcquisitionData(DataContainer):
         if not kwargs.get('suppress_warning', False):
             warnings.warn('Direct invocation is deprecated and will be removed in following version. Use allocate from AcquisitionGeometry instead',
               DeprecationWarning)
+
         dtype = kwargs.get('dtype', numpy.float32)
 
         if geometry is None:
@@ -3093,7 +3095,10 @@ if __name__ == "__main__":
 
     from cil.framework import ImageData, ImageGeometry, BlockGeometry
     from cil.optimisation.operators import GradientOperator
+    from cil.plugins import TomoPhantom
 
+
+    print("TESTS FOR IMAGEGEOMETRIES\n")
     ig = ImageGeometry(3,3)
     print("The default dtype of the ImageGeometry is {}".format(ig.dtype))
 
@@ -3145,12 +3150,49 @@ if __name__ == "__main__":
     print(data.dtype)
     print(data.geometry.dtype)
 
+    print("END TESTS FOR IMAGEGEOMETRIES\n")
+
+    print("TESTS FOR AcquisitionGEOMETRIES\n")
+    # Detectors
+    N = 256
+    detectors =  N
+
+    # Angles
+    angles = numpy.linspace(0,180,180, dtype='float32')
+
+    # Setup acquisition geometry
+    ag = AcquisitionGeometry.create_Parallel2D()\
+                            .set_angles(angles)\
+                            .set_panel(detectors, pixel_size=0.1)
+    print("The default dtype of the AcquisitionGeometry is {}".format(ag.dtype))
 
 
+    ad = ag.allocate('random', dtype=numpy.complex)
+    # print("The default dtype of the AcquisitionData is {}".format(ad.dtype))  
 
+    print("Change dtype of Acquisition Geometry")
+    ag.dtype = numpy.complex  
+    print(ag.dtype)
+    # >>> np.complex
+    print(ad.geometry.dtype)
+    # >>> np.complex
 
+    ad = ig.allocate('random', dtype=numpy.complex)
+    print(ad.dtype)
+    # >>> np.complex
+    print(ad.geometry.dtype)
+    # >>> np.complex
 
+    tmp_ag = ad.geometry.copy()
+    print(id(tmp_ag.dtype), tmp_ag.dtype)
+    # print(id(ig.dtype), ig.dtype)
+    print(id(ad.geometry.dtype), ad.geometry.dtype)
+    # print(tmp_ig.dtype)    
 
+    y_np = numpy.ones(ag.shape, dtype=numpy.int16)
+    ad.array = y_np
+    print(ad.dtype)
+    print(ad.geometry.dtype)    
 
-
-
+    print("END TESTS FOR AcquisitionGEOMETRIES\n")
+    

@@ -43,7 +43,7 @@ elseif(WIN32)
   find_library(IPP_S ipps PATHS ${IPP_LIBRARY})
 endif()
 
-if(IPP_CORE AND IPPS)
+if(IPP_CORE AND IPP_S)
   set(USE_IPP TRUE)
   message("IPP libraries found")
 else()

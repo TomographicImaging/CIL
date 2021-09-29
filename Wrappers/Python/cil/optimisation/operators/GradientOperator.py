@@ -82,6 +82,10 @@ class GradientOperator(LinearOperator):
             #numpy implementation only for now
             backend = NUMPY
             warnings.warn("Warning: correlation='Space' on multi-channel dataset will use `numpy` backend")
+
+        if issubclass(domain_geometry.dtype, complex):
+           backend = NUMPY
+           warnings.warn("Warning: Complex data will use `numpy` backend")            
            
         if method != 'forward':
             backend = NUMPY

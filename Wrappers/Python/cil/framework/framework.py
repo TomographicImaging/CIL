@@ -2576,7 +2576,7 @@ class ImageData(DataContainer):
         try:
             geometry_new = self.geometry.get_slice(channel=channel, vertical=vertical, horizontal_x=horizontal_x, horizontal_y=horizontal_y)
         except ValueError:
-            if kw_force:
+            if force:
                 geometry_new = None
             else:
                 raise ValueError ("Unable to return slice of requested ImageData. Use 'force=True' to return DataContainer instead.")

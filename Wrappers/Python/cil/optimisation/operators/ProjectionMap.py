@@ -18,9 +18,9 @@ class ProjectionMap(LinearOperator):
 
     .. math:: \pi_{i}^{*}(x_{i}) = (0, \cdots, x_{i}, \cdots, 0)
 
-    :param domain_geometry: The domain of the Projection Map. A BlockGeometry is expected
+    :param domain_geometry: The domain of the Projection Map. A BlockGeometry is expected.
     :type domain_geometry: `BlockGeometry`
-    :param index: Index to project to the corresponding ImageGeometry X_{index}
+    :param index: Index to project to the corresponding ImageGeometry X_{index}.
     :type index: int   
     :return: returns a DataContainer 
     :rtype: DataContainer    
@@ -47,7 +47,7 @@ class ProjectionMap(LinearOperator):
     def direct(self,x,out=None):
                         
         if out is None:
-            return x[self.index]
+            return x[self.index].copy()
         else:
             out.fill(x[self.index])
     

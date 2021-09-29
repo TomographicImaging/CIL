@@ -1759,13 +1759,6 @@ class AcquisitionGeometry(object):
         :param dtype: numerical type to allocate
         :type dtype: numpy type, default numpy.float32
         '''
-        # if value == 'random_int':
-        #     dtype = kwargs.get('dtype', numpy.int32)
-        #     if dtype not in [numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64]:
-        #         raise ValueError('Expecting int type, got {}'.format(dtype))
-        # else:
-        #     dtype = kwargs.get('dtype', numpy.float32)
-
         dtype = kwargs.get('dtype', self.dtype)
 
         if kwargs.get('dimension_labels', None) is not None:
@@ -2966,6 +2959,7 @@ class VectorData(DataContainer):
 
     def __init__(self, array=None, **kwargs):
         self.geometry = kwargs.get('geometry', None)
+
         dtype = kwargs.get('dtype', numpy.float32)
         
         if self.geometry is None:
@@ -2996,13 +2990,21 @@ class VectorGeometry(object):
     '''Geometry describing VectorData to contain 1D array'''
     RANDOM = 'random'
     RANDOM_INT = 'random_int'
+
+    @property
+    def dtype(self):
+        return self.__dtype
+
+    @dtype.setter
+    def dtype(self, val):
+        self.__dtype = val      
         
     def __init__(self, 
                  length, **kwargs):
         
         self.length = length
         self.shape = (length, )
-
+        self.dtype = kwargs.get('dtype', numpy.float32)
         self.dimension_labels = kwargs.get('dimension_labels', None)
         
     def clone(self):
@@ -3026,8 +3028,10 @@ class VectorGeometry(object):
 
     def allocate(self, value=0, **kwargs):
         '''allocates an VectorData according to the size expressed in the instance'''
-        self.dtype = kwargs.get('dtype', numpy.float32)
-        out = VectorData(geometry=self.copy(), dtype=self.dtype)
+
+        dtype = kwargs.get('dtype', self.dtype)
+        # self.dtype = kwargs.get('dtype', numpy.float32)
+        out = VectorData(geometry=self.copy(), dtype=dtype)
         if isinstance(value, Number):
             if value != 0:
                 out += value
@@ -3042,7 +3046,8 @@ class VectorGeometry(object):
                 if seed is not None:
                     numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
-                out.fill(numpy.random.randint(max_value,size=self.shape))
+                r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
+                out.fill(r.as_array(dtype=dtype))               
             elif value is None:
                 pass
             else:
@@ -3093,9 +3098,9 @@ class DataOrder():
 
 if __name__ == "__main__":
 
-    from cil.framework import ImageData, ImageGeometry, BlockGeometry
+    from cil.framework import ImageData, ImageGeometry, BlockGeometry, VectorGeometry
     from cil.optimisation.operators import GradientOperator
-    from cil.plugins import TomoPhantom
+
 
 
     print("TESTS FOR IMAGEGEOMETRIES\n")
@@ -3114,7 +3119,7 @@ if __name__ == "__main__":
 
     data = ig.allocate('random', dtype=numpy.complex)
 
-    Grad = GradientOperator(ig, backend='numpy')
+    Grad = GradientOperator(ig)
 
     print("Domain of Grad has dtype {}".format(Grad.domain.dtype))
     print("Range of Grad has dtype {}".format(Grad.range.dtype))
@@ -3195,4 +3200,25 @@ if __name__ == "__main__":
     print(ad.geometry.dtype)    
 
     print("END TESTS FOR AcquisitionGEOMETRIES\n")
-    
+
+    print("TESTS FOR VectorGEOMETRIES\n")
+    vg = VectorGeometry(3)
+    print("The default dtype of the VectorGeometry is {}".format(vg.dtype))
+
+    vg.dtype = numpy.complex
+    vd = vg.allocate()
+    print(vd.dtype)
+    # >>> np.complex
+    print(vd.geometry.dtype)
+    # >>> np.complex    
+
+    tmp_vg = vd.geometry.copy()
+    print(id(tmp_vg.dtype), tmp_vg.dtype)
+    # print(id(ig.dtype), ig.dtype)
+    print(id(vd.geometry.dtype), vd.geometry.dtype)
+    # print(tmp_ig.dtype)    
+
+    z_np = numpy.ones(vg.shape, dtype=numpy.int32)
+    vd.array = z_np
+    print(vd.dtype)
+    print(vd.geometry.dtype)      

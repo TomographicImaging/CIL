@@ -27,22 +27,6 @@ class BlockGeometry(object):
     @property
     def dtype(self):
         return tuple(i.dtype for i in self.geometries)
-
-    # @dtype.setter
-    # def dtype(self, val):  
-
-        # if isinstance(val, tuple):
-        # self.__dtype = val 
-        # else:
-            # self.__dtype[index] = val
-
-
-        # self.geometries
-
-        # if not isinstance(val, tuple):
-            # raise ValueError()
-        # self.__dtype = val        
-    
     
     '''Class to hold Geometry as column vector'''
     #__array_priority__ = 1

@@ -24,6 +24,24 @@ class BlockGeometry(object):
     RANDOM = 'random'
     RANDOM_INT = 'random_int'
     
+    @property
+    def dtype(self):
+        return tuple(i.dtype for i in self.geometries)
+
+    # @dtype.setter
+    # def dtype(self, val):  
+
+        # if isinstance(val, tuple):
+        # self.__dtype = val 
+        # else:
+            # self.__dtype[index] = val
+
+
+        # self.geometries
+
+        # if not isinstance(val, tuple):
+            # raise ValueError()
+        # self.__dtype = val        
     
     
     '''Class to hold Geometry as column vector'''
@@ -32,6 +50,11 @@ class BlockGeometry(object):
         ''''''
         self.geometries = args
         self.index = 0
+        # self.dtype = dtype
+        # self.dtype = tuple(i.dtype for i in self.geometries)
+        
+        # if all(self.geometries.dtype) is None:
+        #     self.dtype = numpy.float32
 
         shape = (len(args),1)
         self.shape = shape
@@ -41,6 +64,8 @@ class BlockGeometry(object):
             raise ValueError(
                     'Dimension and size do not match: expected {} got {}'
                     .format(n_elements, len(args)))
+
+                    
                       
             
     def get_item(self, index):

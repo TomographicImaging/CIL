@@ -137,7 +137,7 @@ class ImageGeometry(object):
                         .format(labels_default,labels))
                     
             self.__dimension_labels = tuple(labels)
-
+        
     def __eq__(self, other):
 
         if not isinstance(other, self.__class__):
@@ -159,6 +159,14 @@ class ImageGeometry(object):
             return True
         
         return False
+
+    @property
+    def dtype(self):
+        return self.__dtype
+
+    @dtype.setter
+    def dtype(self, val):
+        self.__dtype = val           
 
     def __init__(self, 
                  voxel_num_x=0, 
@@ -186,6 +194,7 @@ class ImageGeometry(object):
         self.channel_labels = None
         self.channel_spacing = 1.0
         self.dimension_labels = kwargs.get('dimension_labels', None)
+        self.dtype = kwargs.get('dtype', numpy.float32)
 
     def subset(self, dimensions=None, **kw):
         '''Returns a new sliced and/or reshaped ImageGeometry'''
@@ -286,12 +295,8 @@ class ImageGeometry(object):
         return repres
     def allocate(self, value=0, **kwargs):
         '''allocates an ImageData according to the size expressed in the instance'''
-        if value == 'random_int':
-            dtype = kwargs.get('dtype', numpy.int32)
-            if dtype not in [numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64]:
-                raise ValueError('Expecting int type, got {}'.format(dtype))
-        else:
-            dtype = kwargs.get('dtype', numpy.float32)
+
+        dtype = kwargs.get('dtype', self.dtype)
 
         if kwargs.get('dimension_labels', None) is not None:
             raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
@@ -318,7 +323,8 @@ class ImageGeometry(object):
                 if seed is not None:
                     numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
-                out.fill(numpy.random.randint(max_value,size=self.shape, dtype=dtype))
+                r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
+                out.fill(numpy.asarray(r, dtype=self.dtype))
             elif value is None:
                 pass
             else:
@@ -1844,6 +1850,10 @@ class DataContainer(object):
     @property
     def dtype(self):
         '''Returns the type of the data array'''
+        try:                              
+            self.geometry.dtype = self.array.dtype
+        except:
+            pass            
         return self.array.dtype
 
     @property
@@ -1872,6 +1882,7 @@ class DataContainer(object):
         # finally copy the geometry
         if 'geometry' in kwargs.keys():
             self.geometry = kwargs['geometry']
+            self.geometry.dtype = self.dtype            
         
     def get_dimension_size(self, dimension_label):
 
@@ -2518,10 +2529,13 @@ class ImageData(DataContainer):
         if not kwargs.get('suppress_warning', False):
             warnings.warn('Direct invocation is deprecated and will be removed in following version. Use allocate from ImageGeometry instead',
               DeprecationWarning)
+
         dtype = kwargs.get('dtype', numpy.float32)
+    
 
         if geometry is None:
-            raise AttributeError("ImageGeometry requires a geometry")
+            raise AttributeError("ImageData requires a geometry")
+            
 
         labels = kwargs.get('dimension_labels', None)
         if labels is not None and labels != geometry.dimension_labels:
@@ -2542,7 +2556,7 @@ class ImageData(DataContainer):
         if array.ndim not in [2,3,4]:
             raise ValueError('Number of dimensions are not 2 or 3 or 4 : {0}'.format(array.ndim))
     
-        super(ImageData, self).__init__(array, deep_copy, geometry=geometry,**kwargs)
+        super(ImageData, self).__init__(array, deep_copy, geometry=geometry, **kwargs)
                                
     def subset(self, dimensions=None, **kw):
         '''returns a subset of ImageData and regenerates the geometry'''
@@ -3070,3 +3084,69 @@ class DataOrder():
         else:
             raise ValueError("Expected dimension_label order {0}, got {1}.\nTry using `data.reorder('{2}')` to permute for {2}"
                  .format(order_requested, list(geometry.dimension_labels), engine))
+
+
+if __name__ == "__main__":
+
+    from cil.framework import ImageData, ImageGeometry, BlockGeometry
+    from cil.optimisation.operators import GradientOperator
+
+    ig = ImageGeometry(3,3)
+    print("The default dtype of the ImageGeometry is {}".format(ig.dtype))
+
+    bg = BlockGeometry(ig,ig)
+    print("The default dtype of the BlockImageGeometry is {}".format(bg.dtype))    
+
+    print("Change it to complex")
+    ig.dtype = numpy.complex
+    print("The ImageGeometry dtype is now {} ".format(ig.dtype)) 
+
+    # bg.dtype = (numpy.complex64 , numpy.int32)
+    print("The BlockImageGeometry dtype is now {} ".format(bg.dtype)) 
+
+    data = ig.allocate('random', dtype=numpy.complex)
+
+    Grad = GradientOperator(ig, backend='numpy')
+
+    print("Domain of Grad has dtype {}".format(Grad.domain.dtype))
+    print("Range of Grad has dtype {}".format(Grad.range.dtype))
+    res2 = Grad.direct(data)  
+    print(res2[0].array)
+    print(res2[1].array)    
+    print(res2[0].dtype)
+    print(res2[1].dtype)    
+
+    ig.dtype = numpy.complex
+    data = ig.allocate()
+    print(data.dtype)
+    # >>> np.complex
+    print(data.geometry.dtype)
+    # >>> np.complex
+
+    data = ig.allocate(dtype=numpy.float64)
+    print(data.dtype)
+    # >>> np.float32
+    print(data.geometry.dtype)
+    # >>> np.float32
+    # print(ig.dtype)
+    # >>> np.complex
+
+    tmp_ig = data.geometry.copy()
+    print(id(tmp_ig.dtype), tmp_ig.dtype)
+    # print(id(ig.dtype), ig.dtype)
+    print(id(data.geometry.dtype), data.geometry.dtype)
+    # print(tmp_ig.dtype)
+
+    x_np = numpy.ones((2,2), dtype=numpy.int16)
+    data.array = x_np
+    print(data.dtype)
+    print(data.geometry.dtype)
+
+
+
+
+
+
+
+
+

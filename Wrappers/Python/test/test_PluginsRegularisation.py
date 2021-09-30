@@ -15,23 +15,17 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import sys
 import unittest
-import numpy
-import numpy as np
-from cil.framework import DataContainer
-from cil.framework import ImageData
-from cil.framework import AcquisitionData
-from cil.framework import ImageGeometry
-from cil.framework import AcquisitionGeometry
+import numpy 
 from cil.utilities import dataexample
-from timeit import default_timer as timer
-
+from cil.framework import ImageGeometry
+import matplotlib.pyplot as plt
 
 try:
     from ccpi.filters import regularisers
+    # from ccpi.filters.regularisers import SB_TV as SB_TV_ccpi_reg
     from ccpi.filters.cpu_regularisers import TV_ENERGY
-    from cil.plugins.ccpi_regularisation.functions import FGP_TV
+    from cil.plugins.ccpi_regularisation.functions import FGP_TV, ROF_TV, SB_TV
     has_regularisation_toolkit = True
 except ImportError as ie:
     # raise ImportError(ie + "\n\n" + 
@@ -101,12 +95,20 @@ class TestPlugin(unittest.TestCase):
     def test_FGP_TV_complex(self):
         data = dataexample.CAMERA.get(size=(256,256))
         datarr = data.as_array()
-        cmpx = np.zeros(data.shape, dtype=np.complex)
+        cmpx = numpy.zeros(data.shape, dtype=numpy.complex)
         cmpx.real = datarr[:]
         cmpx.imag = datarr[:]
         data.array = cmpx
         reg = FGP_TV()
         out = reg.proximal(data, 1)
         outarr = out.as_array()
-        np.testing.assert_almost_equal(outarr.imag, outarr.real)
+        numpy.testing.assert_almost_equal(outarr.imag, outarr.real)
+
+
+
+
+
+
+
+
 

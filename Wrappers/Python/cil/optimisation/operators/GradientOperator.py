@@ -151,6 +151,7 @@ class Gradient_numpy(LinearOperator):
      
         # Dimension of domain geometry        
         self.ndim = len(tmp_dom_shape) 
+
         
         # Default correlation for the gradient coupling
         self.correlation = kwargs.get('correlation',CORRELATION_SPACE)        

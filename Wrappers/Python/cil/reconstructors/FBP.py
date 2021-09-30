@@ -96,7 +96,7 @@ class FBP(Reconstructor):
         self.set_image_geometry()
         self.set_backend()
         self.set_filter()
-        self.get_filter()
+        self.get_filter_array()
         self.set_fft_order()
         self.set_filter_inplace()
         """
@@ -272,8 +272,10 @@ class FBP(Reconstructor):
             cilacc.filter_projections_avh(data_ptr, filter_ptr, weights_ptr, self.fft_order, *self.input.shape)
         elif ag.dimension_labels == ('angle','horizontal'): 
             cilacc.filter_projections_vah(data_ptr, filter_ptr, weights_ptr, self.fft_order, 1, *self.input.shape) 
+        elif ag.dimension_labels == ('vertical','horizontal'): 
+            cilacc.filter_projections_avh(data_ptr, filter_ptr, weights_ptr, self.fft_order, 1, *self.input.shape) 
         else:
-            raise ValueError ("Gemma says no")
+            raise ValueError ("The data is not in a compatible order. Try reordering the data with data.reorder({})".format(self.backend))
 
         acquistion_data.fill(nda)
 

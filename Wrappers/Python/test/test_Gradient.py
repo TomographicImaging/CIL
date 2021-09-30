@@ -27,7 +27,7 @@ class TestGradientOperator(unittest.TestCase):
     def __init__(self, *args, **kwargs):
 
         N, M, K = 10, 11, 12
-        channels = 12
+        channels = 13
 
         self.voxel_size_x, self.voxel_size_y, self.voxel_size_z = 0.1, 0.3, 0.6
 

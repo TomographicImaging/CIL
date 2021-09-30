@@ -189,13 +189,13 @@ class LinearOperator(Operator):
         :param decimal: desired precision
         :type decimal: int, optional, default 4
         '''
-        seed = kwargs.get('seed',10)
+        seed = kwargs.get('seed',None)
         if range_init is None:
-            y = operator.range_geometry().allocate('random', numpy.random.seed(seed))
+            y = operator.range_geometry().allocate('random', seed=seed)
         else:
             y = range_init
         if domain_init is None:
-            x = operator.domain_geometry().allocate('random',numpy.random.seed(seed))
+            x = operator.domain_geometry().allocate('random',seed=seed)
         else:
             x = domain_init
             

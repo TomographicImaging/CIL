@@ -17,555 +17,308 @@
 
 import unittest
 import numpy
-from cil.framework import ImageGeometry, AcquisitionGeometry
-from cil.framework import ImageData, AcquisitionData
-from cil.framework import BlockDataContainer
-import functools
+from cil.framework import ImageGeometry
 
-from cil.optimisation.operators import GradientOperator, BlockOperator
+from cil.optimisation.operators import GradientOperator
 from cil.optimisation.operators import LinearOperator
 
 class TestGradientOperator(unittest.TestCase):
-    def test_GradientOperator(self): 
-        N, M, K = 20, 30, 40
-        channels = 10
-        
-        numpy.random.seed(1)
-        
-        # check range geometry, examples
-        
-        ig1 = ImageGeometry(voxel_num_x = M, voxel_num_y = N) 
-        ig3 = ImageGeometry(voxel_num_x = M, voxel_num_y = N, channels = channels) 
-        ig4 = ImageGeometry(voxel_num_x = M, voxel_num_y = N, channels = channels, voxel_num_z= K) 
-        
-        G1 = GradientOperator(ig1, correlation = 'Space', backend='numpy') 
-        print(G1.range_geometry().shape, '2D no channels')
+
+    def __init__(self, *args, **kwargs):
+
+        N, M, K = 10, 11, 12
+        channels = 12
+
+        self.voxel_size_x, self.voxel_size_y, self.voxel_size_z = 0.1, 0.3, 0.6
+
+        self.ig_2D = ImageGeometry(voxel_num_x = M, voxel_num_y = N) 
+        self.ig_2D_chan = ImageGeometry(voxel_num_x = M, voxel_num_y = N, channels = channels) 
+        self.ig_3D = ImageGeometry(voxel_num_x = M, voxel_num_y = N, voxel_num_z= K) 
+        self.ig_3D_chan = ImageGeometry(voxel_num_x = M, voxel_num_y = N, channels = channels, voxel_num_z= K) 
+
+        self.ig_2D_voxel = ImageGeometry(voxel_num_x = M, voxel_num_y = N, voxel_size_x=self.voxel_size_x, voxel_size_y=self.voxel_size_y) 
+        self.ig_2D_chan_voxel = ImageGeometry(voxel_num_x = M, voxel_num_y = N, channels = channels, voxel_size_x=self.voxel_size_x, voxel_size_y=self.voxel_size_y) 
+        self.ig_3D_voxel = ImageGeometry(voxel_num_x = M, voxel_num_y = N, voxel_num_z= K, voxel_size_x=self.voxel_size_x, voxel_size_y=self.voxel_size_y, voxel_size_z=self.voxel_size_z) 
+        self.ig_3D_chan_voxel = ImageGeometry(voxel_num_x = M, voxel_num_y = N, channels = channels, voxel_num_z= K, voxel_size_y=self.voxel_size_y, voxel_size_x=self.voxel_size_x, voxel_size_z=self.voxel_size_z)         
+
+        self.list_geometries = [self.ig_2D, self.ig_2D_chan, self.ig_3D, self.ig_3D_chan,
+                                self.ig_2D_voxel, self.ig_2D_chan_voxel, self.ig_3D_voxel, self.ig_3D_chan_voxel]
+        self.bconditions = ['Neumann', 'Periodic']                                
+        self.backend = ['numpy','c']
+        self.correlation = ['Space','SpaceChannels']
+        self.method = ['forward', 'backward', 'centered']
+
+        super(TestGradientOperator, self).__init__(*args, **kwargs)
+
+    def print_assertion_info(self, geom = None, bnd = None, backend = None, method = None, corr = None, split = None):
+
+        print( " Test Failed ")
+        print( " ImageGeometry {} \n".format(geom))
+        print( " Bnd Cond {} ".format(bnd))                                
+        print( " Backend {} ".format(backend))
+        print( " Method {} ".format(method))
+        print( " Correlation {} ".format(corr)) 
+        if split is not None:
+            print( " Split {} ".format(split))        
             
-        G4 = GradientOperator(ig3, correlation = 'SpaceChannels', backend='numpy')
-        print(G4.range_geometry().shape, '2D with channels corr')  
-        G5 = GradientOperator(ig3, correlation = 'Space', backend='numpy')
-        print(G5.range_geometry().shape, '2D with channels no corr')
-        
-        G6 = GradientOperator(ig4, correlation = 'Space', backend='numpy')
-        print(G6.range_geometry().shape, '3D with channels no corr')
-        G7 = GradientOperator(ig4, correlation = 'SpaceChannels', backend='numpy')
-        print(G7.range_geometry().shape, '3D with channels with corr')
-        
-        u = ig1.allocate(ImageGeometry.RANDOM)
-        w = G1.range_geometry().allocate(ImageGeometry.RANDOM)
-        
-        LHS = (G1.direct(u)*w).sum()
-        RHS = (u * G1.adjoint(w)).sum()
-        numpy.testing.assert_approx_equal(LHS, RHS, significant = 1)
-        numpy.testing.assert_approx_equal(G1.norm(), numpy.sqrt(2*4), significant = 1)
-                    
-        u1 = ig3.allocate('random')
-        w1 = G4.range_geometry().allocate('random')
-        LHS1 = (G4.direct(u1) * w1).sum()
-        RHS1 = (u1 * G4.adjoint(w1)).sum() 
-        numpy.testing.assert_approx_equal(LHS1, RHS1, significant=1)
-        numpy.testing.assert_almost_equal(G4.norm(), numpy.sqrt(3*4), decimal = 0)
-        
-        u2 = ig4.allocate('random')
-        w2 = G7.range_geometry().allocate('random')
-        LHS2 = (G7.direct(u2) * w2).sum()
-        RHS2 = (u2 * G7.adjoint(w2)).sum() 
-        numpy.testing.assert_approx_equal(LHS2, RHS2, significant = 3)
-        numpy.testing.assert_approx_equal(G7.norm(), numpy.sqrt(3*4), significant = 1)
-        
-        
-        #check direct/adjoint for space/channels correlation
-        
-        ig_channel = ImageGeometry(voxel_num_x = 2, voxel_num_y = 3, channels = 2)
-        G_no_channel = GradientOperator(ig_channel, correlation = 'Space', backend='numpy')
-        G_channel = GradientOperator(ig_channel, correlation = 'SpaceChannels', backend='numpy')
-        
-        u3 = ig_channel.allocate('random_int')
-        res_no_channel = G_no_channel.direct(u3)
-        res_channel = G_channel.direct(u3)
-        
-        print(" Derivative for 3 directions, first is wrt Channel direction\n")
-        print(res_channel[0].as_array())
-        print(res_channel[1].as_array())
-        print(res_channel[2].as_array())
-        
-        print(" Derivative for 2 directions, no Channel direction\n")
-        print(res_no_channel[0].as_array())
-        print(res_no_channel[1].as_array())  
-        
-        ig2D = ImageGeometry(voxel_num_x = 2, voxel_num_y = 3)
-        u4 = ig2D.allocate('random_int')
-        G2D = GradientOperator(ig2D, backend='numpy')
-        res = G2D.direct(u4)  
-        print(res[0].as_array())
-        print(res[1].as_array())
-
-        M, N = 20, 30
-        ig = ImageGeometry(M, N)
-        
-        # check direct of GradientOperator and sparse matrix
-        G = GradientOperator(ig, backend='numpy')
-        norm1 = G.norm(iterations=300)
-        print ("should be sqrt(8) {} {}".format(numpy.sqrt(8), norm1))
-        numpy.testing.assert_almost_equal(norm1, numpy.sqrt(8), decimal=1)
-        ig4 = ImageGeometry(M,N, channels=3)
-        G4 = GradientOperator(ig4, correlation="SpaceChannels", backend='numpy')
-        norm4 = G4.norm(iterations=300)
-        print("should be sqrt(12) {} {}".format(numpy.sqrt(12), norm4))
-        self.assertTrue((norm4 - numpy.sqrt(12))/norm4 < 0.2)
-
-    def test_GradientOperator_4D(self):
-
-        nc, nz, ny, nx = 3, 4, 5, 6
-        size = nc * nz * ny * nx
-        dim = [nc, nz, ny, nx]
-
-        ig = ImageGeometry(voxel_num_x=nx, voxel_num_y=ny, voxel_num_z=nz, channels=nc)
-
-        arr = numpy.arange(size).reshape(dim).astype(numpy.float32)**2
-
-        data = ig.allocate()
-        data.fill(arr)
-
-        #neumann
-        grad_py = GradientOperator(ig, bnd_cond='Neumann', correlation='SpaceChannels', backend='numpy')
-        gold_direct = grad_py.direct(data)
-        gold_adjoint = grad_py.adjoint(gold_direct)
-
-        grad_c = GradientOperator(ig, bnd_cond='Neumann', correlation='SpaceChannels', backend='c')
-        out_direct = grad_c.direct(data)
-        out_adjoint = grad_c.adjoint(out_direct)
-
-        #print("GradientOperator, 4D, bnd_cond='Neumann', direct")
-        numpy.testing.assert_array_equal(out_direct.get_item(0).as_array(), gold_direct.get_item(0).as_array())
-        numpy.testing.assert_array_equal(out_direct.get_item(1).as_array(), gold_direct.get_item(1).as_array())
-        numpy.testing.assert_array_equal(out_direct.get_item(2).as_array(), gold_direct.get_item(2).as_array())
-        numpy.testing.assert_array_equal(out_direct.get_item(3).as_array(), gold_direct.get_item(3).as_array())
-
-        #print("GradientOperator, 4D, bnd_cond='Neumann', adjoint")
-        numpy.testing.assert_array_equal(out_adjoint.as_array(), gold_adjoint.as_array())
-
-        #periodic
-        grad_py = GradientOperator(ig, bnd_cond='Periodic', correlation='SpaceChannels', backend='numpy')
-        gold_direct = grad_py.direct(data)
-        gold_adjoint = grad_py.adjoint(gold_direct)
-
-        grad_c = GradientOperator(ig, bnd_cond='Periodic', correlation='SpaceChannels', backend='c')
-        out_direct = grad_c.direct(data)
-        out_adjoint = grad_c.adjoint(out_direct)
-
-        #print("GradientOperator, 4D, bnd_cond='Periodic', direct")
-        numpy.testing.assert_array_equal(out_direct.get_item(0).as_array(), gold_direct.get_item(0).as_array())
-        numpy.testing.assert_array_equal(out_direct.get_item(1).as_array(), gold_direct.get_item(1).as_array())
-        numpy.testing.assert_array_equal(out_direct.get_item(2).as_array(), gold_direct.get_item(2).as_array())
-        numpy.testing.assert_array_equal(out_direct.get_item(3).as_array(), gold_direct.get_item(3).as_array())
-
-        #print("GradientOperator, 4D, bnd_cond='Periodic', adjoint")
-        numpy.testing.assert_array_equal(out_adjoint.as_array(), gold_adjoint.as_array())
-
-
-        #reordered
-        data.reorder(['vertical','horizontal_x','channel','horizontal_y'])
-        grad_py = GradientOperator(data.geometry, bnd_cond='Neumann', correlation='SpaceChannels', backend='numpy')
-        gold_direct = grad_py.direct(data)
-        gold_adjoint = grad_py.adjoint(gold_direct)
-
-        grad_c = GradientOperator(data.geometry, bnd_cond='Neumann', correlation='SpaceChannels', backend='c')
-        out_direct = grad_c.direct(data)
-        out_adjoint = grad_c.adjoint(out_direct)
-
-        #print("GradientOperator, 4D, bnd_cond='Neumann', direct")
-        numpy.testing.assert_array_equal(out_direct.get_item(0).as_array(), gold_direct.get_item(0).as_array())
-        numpy.testing.assert_array_equal(out_direct.get_item(1).as_array(), gold_direct.get_item(1).as_array())
-        numpy.testing.assert_array_equal(out_direct.get_item(2).as_array(), gold_direct.get_item(2).as_array())
-        numpy.testing.assert_array_equal(out_direct.get_item(3).as_array(), gold_direct.get_item(3).as_array())
-
-        #print("GradientOperator, 4D, bnd_cond='Neumann', adjoint")
-        numpy.testing.assert_array_equal(out_adjoint.as_array(), gold_adjoint.as_array())
-
-
-    def test_GradientOperator_4D_allocate(self):
-
-        nc, nz, ny, nx = 3, 4, 5, 6
-        size = nc * nz * ny * nx
-        dim = [nc, nz, ny, nx]
-
-        ig = ImageGeometry(voxel_num_x=nx, voxel_num_y=ny, voxel_num_z=nz, channels=nc)
-
-        arr = numpy.arange(size).reshape(dim).astype(numpy.float32)**2
-
-        data = ig.allocate()
-        data.fill(arr)
-
-        #numpy
-        grad1 = GradientOperator(ig, bnd_cond='Neumann', correlation='SpaceChannels', backend='numpy')
-        gold_direct = grad1.direct(data)
-        gold_adjoint = grad1.adjoint(gold_direct)
-
-        grad2 = GradientOperator(ig, bnd_cond='Neumann', correlation='SpaceChannels', backend='numpy')
-        out_direct = grad2.range_geometry().allocate()
-        out_adjoint = grad2.domain_geometry().allocate()
-        grad2.direct(data, out=out_direct)
-        grad2.adjoint(out_direct, out=out_adjoint)
-
-        #print("GradientOperatorOperator, 4D, bnd_cond='Neumann', direct")
-        numpy.testing.assert_array_equal(out_direct.get_item(0).as_array(), gold_direct.get_item(0).as_array())
-        numpy.testing.assert_array_equal(out_direct.get_item(1).as_array(), gold_direct.get_item(1).as_array())
-        numpy.testing.assert_array_equal(out_direct.get_item(2).as_array(), gold_direct.get_item(2).as_array())
-        numpy.testing.assert_array_equal(out_direct.get_item(3).as_array(), gold_direct.get_item(3).as_array())
-
-        #print("GradientOperator, 4D, bnd_cond='Neumann', adjoint")
-        numpy.testing.assert_array_equal(out_adjoint.as_array(), gold_adjoint.as_array())
-
-        #c
-        grad1 = GradientOperator(ig, bnd_cond='Neumann', correlation='SpaceChannels', backend='c')
-        gold_direct = grad1.direct(data)
-        gold_adjoint = grad1.adjoint(gold_direct)
-
-        grad2 = GradientOperator(ig, bnd_cond='Neumann', correlation='SpaceChannels', backend='c')
-        out_direct = grad2.range_geometry().allocate()
-        out_adjoint = grad2.domain_geometry().allocate()
-        grad2.direct(data, out=out_direct)
-        grad2.adjoint(out_direct, out=out_adjoint)
-
-        #print("GradientOperator, 4D, bnd_cond='Neumann', direct")
-        numpy.testing.assert_array_equal(out_direct.get_item(0).as_array(), gold_direct.get_item(0).as_array())
-        numpy.testing.assert_array_equal(out_direct.get_item(1).as_array(), gold_direct.get_item(1).as_array())
-        numpy.testing.assert_array_equal(out_direct.get_item(2).as_array(), gold_direct.get_item(2).as_array())
-        numpy.testing.assert_array_equal(out_direct.get_item(3).as_array(), gold_direct.get_item(3).as_array())
-
-        #print("GradientOperator, 4D, bnd_cond='Neumann', adjoint")
-        numpy.testing.assert_array_equal(out_adjoint.as_array(), gold_adjoint.as_array())
 
     def test_GradientOperator_linearity(self):
 
-        nc, nz, ny, nx = 3, 4, 5, 6
-        ig = ImageGeometry(voxel_num_x=nx, voxel_num_y=ny, voxel_num_z=nz, channels=nc)
+        for geom in self.list_geometries:            
+            for bnd in self.bconditions:
+                for backend in self.backend:
+                    for corr in self.correlation:
+                        for method in self.method:                       
+                                                                                          
+                            Grad = GradientOperator(geom, 
+                                                    bnd_cond = bnd,
+                                                    backend = backend, 
+                                                    correlation = corr, method = method)
+                            try:                                                    
+                                self.assertTrue(LinearOperator.dot_test(Grad))
+                            except AssertionError:    
+                                self.print_assertion_info(geom,bnd,backend,corr,method)
+                                raise
+                                                            
+                            
 
-        grad = GradientOperator(ig, bnd_cond='Neumann', correlation='SpaceChannels', backend='c')   
-        self.assertTrue(LinearOperator.dot_test(grad))
+    def test_GradientOperator_norm(self):
 
-        grad = GradientOperator(ig, bnd_cond='Periodic', correlation='SpaceChannels', backend='c')
-        self.assertTrue(LinearOperator.dot_test(grad))
+        for i in self.list_geometries:            
+            for j in self.bconditions:
+                for k in self.backend:
+                    for z in self.correlation:
+                        for l in self.method:
 
-        grad = GradientOperator(ig, bnd_cond='Neumann', correlation='SpaceChannels', backend='numpy')
-        self.assertTrue(LinearOperator.dot_test(grad))
+                            if i.channels == 1:
+                            
+                                if i.length==2:                                                             
+                                    norm = numpy.sqrt((2/i.voxel_size_y)**2 + (2/i.voxel_size_x)**2)
+                                elif i.length==3:  
+                                    norm = numpy.sqrt((2/i.voxel_size_z)**2 + (2/i.voxel_size_y)**2 + (2/i.voxel_size_x)**2)  
 
-        grad = GradientOperator(ig, bnd_cond='Periodic', correlation='SpaceChannels', backend='numpy')
-        self.assertTrue(LinearOperator.dot_test(grad))
+                            else:
+
+                                if z == 'Space':     
+                                    if i.length==3:
+                                        norm = numpy.sqrt((2/i.voxel_size_y)**2 + (2/i.voxel_size_x)**2)
+                                    else:
+                                        norm = numpy.sqrt(4 + (2/i.voxel_size_z)**2 + (2/i.voxel_size_y)**2 + (2/i.voxel_size_x)**2)                                        
+
+                                else:
+
+                                    if i.length==3:
+                                        norm = numpy.sqrt(4 + (2/i.voxel_size_y)**2 + (2/i.voxel_size_x)**2)
+                                    else:
+                                        norm = numpy.sqrt(4 + (2/i.voxel_size_z)**2 + (2/i.voxel_size_y)**2 + (2/i.voxel_size_x)**2)                                      
+
+                                                
+                            Grad = GradientOperator(i, 
+                                                    bnd_cond = j,
+                                                    backend = k, 
+                                                    correlation = z, method=l)
+                            try:                                                    
+                                numpy.testing.assert_approx_equal(Grad.norm(), norm, significant = 1) 
+                            except AssertionError:    
+                                self.print_assertion_info(i,j,k,z,l)
+                                raise
+
+    def test_GradientOperator_in_place_vs_allocate_direct(self):
+
+        for geom in self.list_geometries:            
+            for bnd in self.bconditions:
+                for backend in self.backend:
+                    for corr in self.correlation:
+                        for method in self.method:   
+                            Grad = GradientOperator(geom, 
+                                                    bnd_cond = bnd,
+                                                    backend = backend, 
+                                                    correlation = corr, method=method)
+                            tmp_x = Grad.domain.allocate('random')
+                            res_in_place = Grad.direct(tmp_x)
+                            res_allocate = Grad.range.allocate()
+                            Grad.direct(tmp_x, out = res_allocate)
+
+                            for m in range(len(Grad.range.geometries)):
+
+                                try:
+                                    numpy.testing.assert_array_almost_equal(res_in_place[m].array, 
+                                                                    res_allocate[m].array)                            
+                                except:
+                                    self.print_assertion_info(geom,bnd,backend,corr,method) 
+                                    raise   
+
+    def test_GradientOperator_in_place_vs_allocate_adjoint(self):
+
+        for geom in self.list_geometries:            
+            for bnd in self.bconditions:
+                for backend in self.backend:
+                    for corr in self.correlation:
+                        for method in self.method:  
+                            Grad = GradientOperator(geom, 
+                                                    bnd_cond = bnd,
+                                                    backend = backend, 
+                                                    correlation = corr, method=method)
+                            tmp_x = Grad.range.allocate('random')
+                            res_in_place = Grad.adjoint(tmp_x)
+                            res_allocate = Grad.domain.allocate()
+                            Grad.adjoint(tmp_x, out = res_allocate)
+
+                            try:
+                                numpy.testing.assert_array_almost_equal(res_in_place.array, 
+                                                                res_allocate.array)                            
+                            except:
+                                self.print_assertion_info(geom,bnd,backend,corr,method, split) 
+                                raise  
+
+    def test_GradientOperator_range_shape(self):
+
+        Grad2D = GradientOperator(self.ig_2D)
+        numpy.testing.assert_equal(Grad2D.range.shape, (2,1)) 
+
+        Grad2D = GradientOperator(self.ig_2D_chan, correlation="Space")
+        numpy.testing.assert_equal(Grad2D.range.shape, (2,1))             
+
+        Grad2D_chan = GradientOperator(self.ig_2D_chan, correlation="SpaceChannels")
+        numpy.testing.assert_equal(Grad2D_chan.range.shape, (3,1))    
+
+        Grad3D = GradientOperator(self.ig_3D)
+        numpy.testing.assert_equal(Grad3D.range.shape, (3,1))   
+
+        Grad3D_chan = GradientOperator(self.ig_3D_chan, correlation="Space")
+        numpy.testing.assert_equal(Grad3D_chan.range.shape, (3,1))  
+
+        Grad3D_chan = GradientOperator(self.ig_3D_chan, correlation="SpaceChannels")
+        numpy.testing.assert_equal(Grad3D_chan.range.shape, (4,1))  
+
+    def test_GradientOperator_split_shape(self):
+
+        for geom in [self.ig_2D, self.ig_2D_chan, self.ig_3D, self.ig_3D_chan]:
+
+            for split in [True, False]:
+
+                Grad = GradientOperator(geom, split = split, correlation="SpaceChannels")
+
+                if geom == self.ig_2D:
+                    shape = (2,1)
+                elif geom == self.ig_3D:
+                    shape = (3,1)
+                elif geom == self.ig_2D_chan:
+                    if split:
+                        shape = (2,1)
+                    else:
+                        shape = (3,1)    
+                elif geom == self.ig_3D_chan:  
+                    if split:
+                        shape = (2,1)
+                    else:
+                        shape = (4,1)                                           
+
+                try:
+                    numpy.testing.assert_equal(Grad.range.shape, shape)  
+                except:
+                    self.print_assertion_info(geom, None, None, None, split=split)
+                    raise
+
+    def test_GradientOperator_split_direct_adjoint(self):
         
-    def test_Gradient_c_numpy_voxel(self):
-        
-        numpy.random.seed(5)
-        
-        print("Test GradientOperator for 2D Geometry, ")
-        
-        ny, nx, nz = 3, 4, 5
-        ig = ImageGeometry(voxel_num_y = ny, voxel_num_x = nx, voxel_size_x=0.1, voxel_size_y=0.5) 
+        # Test split for direct and adjoint in 2D + channels geometry
+        geom = self.ig_2D_chan
+        Grad2D_split_false = GradientOperator(geom, split = False, correlation="SpaceChannels")
+        Grad2D_split_true = GradientOperator(geom, split = True, correlation="SpaceChannels")
+
+        tmp_x = geom.allocate('random')
+        res1 = Grad2D_split_false.direct(tmp_x)
+        res2 = Grad2D_split_true.direct(tmp_x)
+        res1_adj = Grad2D_split_false.adjoint(res1)
+        res2_adj = Grad2D_split_true.adjoint(res2)
+
+        numpy.testing.assert_array_almost_equal(res1[0].array, res2[0].array)
+        numpy.testing.assert_array_almost_equal(res1[1].array, res2[1][0].array)  
+        numpy.testing.assert_array_almost_equal(res1[2].array, res2[1][1].array) 
+        numpy.testing.assert_array_almost_equal(res1_adj.array, res2_adj.array)     
+
+        # Test split for direct and adjoint in 3D + channels geometry
+        geom = self.ig_3D_chan
+        Grad3D_split_false = GradientOperator(geom, split = False, correlation="SpaceChannels")
+        Grad3D_split_true = GradientOperator(geom, split = True, correlation="SpaceChannels")
+
+        tmp_x = geom.allocate('random')
+        res1 = Grad3D_split_false.direct(tmp_x)
+        res2 = Grad3D_split_true.direct(tmp_x)
+        res1_adj = Grad3D_split_false.adjoint(res1)
+        res2_adj = Grad3D_split_true.adjoint(res2)
+
+        numpy.testing.assert_array_almost_equal(res1[0].array, res2[0].array)
+        numpy.testing.assert_array_almost_equal(res1[1].array, res2[1][0].array)  
+        numpy.testing.assert_array_almost_equal(res1[2].array, res2[1][1].array) 
+        numpy.testing.assert_array_almost_equal(res1[3].array, res2[1][2].array) 
+        numpy.testing.assert_array_almost_equal(res1_adj.array, res2_adj.array)                  
             
+    def test_Gradient_operator_numpy_vs_c(self):
 
-        GD_C = GradientOperator(ig, backend = 'c')
-        GD_numpy = GradientOperator(ig, backend = 'numpy')
+        for geom in self.list_geometries:
+            for bnd in self.bconditions:
+                for corr in self.correlation:
 
-        id = ig.allocate('random')
-        direct_c = GD_C.direct(id)
-        direct_numpy = GD_numpy.direct(id)
-        numpy.testing.assert_allclose(direct_c[0].array, direct_numpy[0].array, atol=0.1) 
-        numpy.testing.assert_allclose(direct_c[1].array, direct_numpy[1].array, atol=0.1) 
+                    Grad_c = GradientOperator(geom, bnd_cond = bnd, correlation= corr, backend = 'c')  
+                    Grad_numpy =  GradientOperator(geom, bnd_cond = bnd, correlation= corr, backend = 'numpy')
 
-        direct_c *=0
-        direct_numpy *=0
-        GD_C.direct(id, out=direct_c)
-        GD_numpy.direct(id, out=direct_numpy)
-        numpy.testing.assert_allclose(direct_c[0].array, direct_numpy[0].array, atol=0.1) 
-        numpy.testing.assert_allclose(direct_c[1].array, direct_numpy[1].array, atol=0.1) 
+                    tmp_x = geom.allocate('random')
+                    res1_c = Grad_c.direct(tmp_x)
+                    res1_np = Grad_numpy.direct(tmp_x)
+                    
+                    # Check direct of numpy vs c in place
+                    for m in range(len(Grad_c.range.geometries)):
+                        try:
+                            numpy.testing.assert_array_almost_equal(res1_c[m].array, 
+                                                            res1_np[m].array)                            
+                        except:
+                            print("Check direct of numpy vs c in place")
+                            self.print_assertion_info(geom, bnd, None, None, corr) 
+                            raise   
 
-        adjoint_c = GD_C.adjoint(direct_c)
-        adjoint_numpy = GD_numpy.adjoint(direct_numpy)
-        numpy.testing.assert_allclose(adjoint_c.array, adjoint_numpy.array, atol=0.1) 
-        numpy.testing.assert_allclose(adjoint_c.array, adjoint_numpy.array, atol=0.1) 
+                    res1_c_out = Grad_c.range.allocate()                    
+                    Grad_c.direct(tmp_x, out = res1_c_out)
 
-        adjoint_c *=0
-        adjoint_numpy *=0
-        GD_C.adjoint(direct_c, out=adjoint_c)
-        GD_numpy.adjoint(direct_numpy, out=adjoint_numpy)
-        numpy.testing.assert_allclose(adjoint_c.array, adjoint_numpy.array, atol=0.1) 
-        numpy.testing.assert_allclose(adjoint_c.array, adjoint_numpy.array, atol=0.1) 
+                    res1_np_out = Grad_numpy.range.allocate()                    
+                    Grad_numpy.direct(tmp_x, out = res1_np_out)     
+                    
+                    # Check direct of numpy vs c allocate
+                    for m in range(len(Grad_c.range.geometries)):
+                        try:
+                            numpy.testing.assert_array_almost_equal(res1_c_out[m].array, 
+                                                            res1_np_out[m].array)                            
+                        except:
+                            print("Check direct of numpy vs c allocate")
+                            self.print_assertion_info(geom, bnd, None, None, corr) 
+                            raise  
 
-
-        
-        print("Check Gradient_C, Gradient_numpy norms")
-        Gradient_C_norm = GD_C.norm()
-        Gradient_numpy_norm = GD_numpy.norm()   
-        print(Gradient_C_norm, Gradient_numpy_norm)
-        numpy.testing.assert_allclose(Gradient_C_norm, Gradient_numpy_norm, rtol=0.1) 
-        numpy.testing.assert_allclose(numpy.sqrt((2/ig.voxel_size_x)**2 + (2/ig.voxel_size_y)**2), Gradient_numpy_norm, rtol=0.1) 
-        numpy.testing.assert_allclose(numpy.sqrt((2/ig.voxel_size_x)**2 + (2/ig.voxel_size_y)**2), Gradient_C_norm, rtol=0.1) 
-        print("Test passed\n")
-        
-        print("Check dot test")
-        self.assertTrue(GD_C.dot_test(GD_C))
-        self.assertTrue(GD_numpy.dot_test(GD_numpy))
-        print("Test passed\n")
-            
-        print("Check dot test for Gradient Numpy with different method/bdn_cond")
-        
-        G_numpy1 = GradientOperator(ig, method = 'forward', bnd_cond = 'Neumann')    
-
-        self.assertTrue(G_numpy1.dot_test(G_numpy1))
-                
-        G_numpy1 = GradientOperator(ig, method = 'backward', bnd_cond = 'Neumann')    
-        self.assertTrue(G_numpy1.dot_test(G_numpy1))  
-        
-        G_numpy1 = GradientOperator(ig, method = 'centered', bnd_cond = 'Neumann')    
-        self.assertTrue(G_numpy1.dot_test(G_numpy1))
+                    tmp_x = Grad_c.range.allocate('random')
+                    res1_c = Grad_c.adjoint(tmp_x)
+                    res1_np = Grad_numpy.adjoint(tmp_x)
  
-        G_numpy1 = GradientOperator(ig, method = 'forward', bnd_cond = 'Periodic')    
-        self.assertTrue(G_numpy1.dot_test(G_numpy1))         
-        
-        G_numpy1 = GradientOperator(ig, method = 'backward', bnd_cond = 'Periodic')    
-        self.assertTrue(G_numpy1.dot_test(G_numpy1))
-        
-        G_numpy1 = GradientOperator(ig, method = 'centered', bnd_cond = 'Periodic')  
-        self.assertTrue(G_numpy1.dot_test(G_numpy1))
-        
-        print("Test passed\n")
-        
-        print("Test GradientOperator for 2D Geometry passed\n")
-        
-        ###########################################################################
-        ###########################################################################
-        ###########################################################################
-        ###########################################################################
-        
-        print("Test GradientOperator for 3D Geometry, ")
-        ig = ImageGeometry(voxel_num_y = ny, voxel_num_x = nx, voxel_num_z = nz, voxel_size_x=0.1, voxel_size_y=0.5, voxel_size_z = 0.4)  
-        
-        GD_C = GradientOperator(ig, backend = 'c')
-        GD_numpy = GradientOperator(ig, backend = 'numpy')
-        
-        numpy.random.seed(5)
-           
-        print("Check Gradient_C, Gradient_numpy norms")
-        Gradient_C_norm = GD_C.norm()
-        Gradient_numpy_norm = GD_numpy.norm()    
-        numpy.testing.assert_allclose(Gradient_C_norm, Gradient_numpy_norm, rtol=0.1) 
-        numpy.testing.assert_allclose(numpy.sqrt((2/ig.voxel_size_z)**2 + (2/ig.voxel_size_x)**2 + (2/ig.voxel_size_y)**2), Gradient_numpy_norm, rtol=0.1) 
-        numpy.testing.assert_allclose(numpy.sqrt((2/ig.voxel_size_z)**2 + (2/ig.voxel_size_x)**2 + (2/ig.voxel_size_y)**2), Gradient_C_norm, rtol=0.1) 
-        print("Test passed\n")
-        
-        print("Check dot test")
-        self.assertTrue(GD_C.dot_test(GD_C))
-        self.assertTrue(GD_numpy.dot_test(GD_numpy))
-        print("Test passed\n")
-            
-        print("Check dot test for GradientOperator Numpy with different method/bdn_cond")
-            
-        G_numpy1 = GradientOperator(ig, method = 'forward', bnd_cond = 'Neumann')  
-        self.assertTrue(G_numpy1.dot_test(G_numpy1))
-        
-        G_numpy1 = GradientOperator(ig, method = 'backward', bnd_cond = 'Neumann')    
-        self.assertTrue(G_numpy1.dot_test(G_numpy1))
-        
-        G_numpy1 = GradientOperator(ig, method = 'centered', bnd_cond = 'Neumann')
-        self.assertTrue(G_numpy1.dot_test(G_numpy1)) 
-        
-        G_numpy1 = GradientOperator(ig, method = 'forward', bnd_cond = 'Periodic')    
-        self.assertTrue(G_numpy1.dot_test(G_numpy1))
-       
-        G_numpy1 = GradientOperator(ig, method = 'backward', bnd_cond = 'Periodic')    
-        self.assertTrue(G_numpy1.dot_test(G_numpy1))
-      
-        G_numpy1 = GradientOperator(ig, method = 'centered', bnd_cond = 'Periodic')       
-        self.assertTrue(G_numpy1.dot_test(G_numpy1)) 
-        
-        print("Test passed\n")
-        
-        print("Test GradientOperator for 3D Geometry passed\n")
-    
-        ###########################################################################
-        ###########################################################################
-        ###########################################################################
-        ###########################################################################
-        
-        print("Test GradientOperator for 2D Geometry + channels, ")
-        ig = ImageGeometry(5,10, voxel_size_x=0.1, voxel_size_y=0.5, channels = 10)  
-        
-        GD_C = GradientOperator(ig, backend = 'c')
-        GD_numpy = GradientOperator(ig, backend = 'numpy')
-                   
-        print("Check Gradient_C, Gradient_numpy norms")
-        Gradient_C_norm = GD_C.norm()
-        Gradient_numpy_norm = GD_numpy.norm()    
-        numpy.testing.assert_allclose(Gradient_C_norm, Gradient_numpy_norm, rtol=0.1) 
-        print("Test passed\n")
-        
-        print("Check dot test")
-        self.assertTrue(GD_C.dot_test(GD_C))
-        self.assertTrue(GD_numpy.dot_test(GD_numpy))
-        print("Test passed\n")
-            
-        print("Check dot test for GradientOperator Numpy with different method/bdn_cond")
-            
-        G_numpy1 = GradientOperator(ig, method = 'forward', bnd_cond = 'Neumann')    
-        self.assertTrue(G_numpy1.dot_test(G_numpy1))
-        
-        G_numpy1 = GradientOperator(ig, method = 'backward', bnd_cond = 'Neumann')    
-        self.assertTrue(G_numpy1.dot_test(G_numpy1)) 
-        
-        G_numpy1 = GradientOperator(ig, method = 'centered', bnd_cond = 'Neumann') 
-        self.assertTrue(G_numpy1.dot_test(G_numpy1))  
-        
-        G_numpy1 = GradientOperator(ig, method = 'forward', bnd_cond = 'Periodic')    
-        self.assertTrue(G_numpy1.dot_test(G_numpy1))
-        
-        G_numpy1 = GradientOperator(ig, method = 'backward', bnd_cond = 'Periodic')    
-        self.assertTrue(G_numpy1.dot_test(G_numpy1))  
-        
-        G_numpy1 = GradientOperator(ig, method = 'centered', bnd_cond = 'Periodic')    
-        self.assertTrue(G_numpy1.dot_test(G_numpy1))  
-        
-        print("Test passed\n")
-        
-        print("Test GradientOperator for 2D Geometry + channels passed\n")
-        
-        ###########################################################################
-        ###########################################################################
-        ###########################################################################
-        ###########################################################################
-        
-        print("Test GradientOperator for 3D Geometry + channels, ")
-        ig = ImageGeometry(voxel_num_x = nx, voxel_num_y = ny, voxel_num_z=nz, voxel_size_x=0.1, voxel_size_y=0.5, voxel_size_z = 0.3, channels = 10)  
-        
-        GD_C = GradientOperator(ig, backend = 'c')
-        GD_numpy = GradientOperator(ig, backend = 'numpy')
-                   
-        print("Check Gradient_C, Gradient_numpy norms")
-        Gradient_C_norm = GD_C.norm()
-        Gradient_numpy_norm = GD_numpy.norm()  
-        numpy.testing.assert_allclose(Gradient_C_norm, Gradient_numpy_norm, rtol=0.1) 
-        print("Test passed\n")
-        
-        print("Check dot test")
-        self.assertTrue(GD_C.dot_test(GD_C))
-        self.assertTrue(GD_numpy.dot_test(GD_numpy))
-        print("Test passed\n")
-            
-        print("Check dot test for Gradient Numpy with different method/bdn_cond")
-            
-        G_numpy1 = GradientOperator(ig, method = 'forward', bnd_cond = 'Neumann')    
-        self.assertTrue(G_numpy1.dot_test(G_numpy1))
-        
-        G_numpy1 = GradientOperator(ig, method = 'backward', bnd_cond = 'Neumann')    
-        self.assertTrue(G_numpy1.dot_test(G_numpy1)) 
-        
-        G_numpy1 = GradientOperator(ig, method = 'centered', bnd_cond = 'Neumann') 
-        self.assertTrue(G_numpy1.dot_test(G_numpy1))  
-        
-        G_numpy1 = GradientOperator(ig, method = 'forward', bnd_cond = 'Periodic')    
-        self.assertTrue(G_numpy1.dot_test(G_numpy1))
-        
-        G_numpy1 = GradientOperator(ig, method = 'backward', bnd_cond = 'Periodic')    
-        self.assertTrue(G_numpy1.dot_test(G_numpy1))  
-        
-        G_numpy1 = GradientOperator(ig, method = 'centered', bnd_cond = 'Periodic')    
-        self.assertTrue(G_numpy1.dot_test(G_numpy1))  
-        
-        print("Test passed\n")
-        
-        print("Test GradientOperator for 3D Geometry + channels passed\n")        
+                    # Check adjoint of numpy vs c in place
+                    try:
+                        numpy.testing.assert_array_almost_equal(res1_c.array, 
+                                                        res1_np.array, decimal=5)                            
+                    except:
+                        print("Check adjoint of numpy vs c in place")
+                        self.print_assertion_info(geom, bnd, None, None, corr) 
+                        raise   
 
-    def test_GradientOperator_split(self): 
-        N, M, K = 2, 3, 4
-        channels = 10
-        
-        numpy.random.seed(1)
-        ig1 = ImageGeometry(voxel_num_x = M, voxel_num_y = N) 
-        ig2 = ImageGeometry(voxel_num_x = M, channels = channels)
-        ig3 = ImageGeometry(voxel_num_x = M, voxel_num_y = N, channels = channels) 
-        ig4 = ImageGeometry(voxel_num_x = M, voxel_num_y = N, channels = channels, voxel_num_z= K)
+                    res1_c_out = Grad_c.domain.allocate()                    
+                    Grad_c.adjoint(tmp_x, out = res1_c_out)
 
-        data1 = ig1.allocate('random')
-        data2 = ig2.allocate('random')
-        data3 = ig3.allocate('random')
-        data4 = ig4.allocate('random')
+                    res1_np_out = Grad_numpy.domain.allocate()                    
+                    Grad_numpy.adjoint(tmp_x, out = res1_np_out)     
 
-
-        G1 = GradientOperator(ig1, split=True, correlation='SpaceChannels')
-        out1 = G1.direct(data1)
-        ad1 = G1.adjoint(out1)
-
-        G1_gold = GradientOperator(ig1, split=False, correlation='SpaceChannels')
-        out1_gold = G1.direct(data1)
-        ad1_gold = G1.adjoint(out1_gold)
-
-        self.assertEquals(out1.shape, (2,1))
-        self.assertEquals(out1_gold.shape, (2,1))
-        numpy.testing.assert_allclose(ad1.array, ad1_gold.array, atol = 0.4)
-
-
-        G2 = GradientOperator(ig2, split=True, correlation='SpaceChannels')
-        out2 = G2.direct(data2)
-        ad2 = G2.adjoint(out2)
-
-        G2_gold = GradientOperator(ig2, split=False, correlation='SpaceChannels')
-        out2_gold = G2_gold.direct(data2)
-        ad2_gold = G2_gold.adjoint(out2_gold)
-
-        self.assertEquals(out2.shape, (2,1))
-        self.assertEquals(out2_gold.shape, (2,1))
-        numpy.testing.assert_allclose(ad2.array, ad2_gold.array, atol = 0.4)
-        numpy.testing.assert_allclose(out2[0].array, out2_gold[0].array, atol = 0.4)
-        numpy.testing.assert_allclose(out2[1][0].array, out2_gold[1].array, atol = 0.4)
-
-
-        G3 = GradientOperator(ig3, split=True, correlation='SpaceChannels')
-        out3 = G3.direct(data3)
-        ad3 = G3.adjoint(out3)
-
-        G3_gold = GradientOperator(ig3, split=False, correlation='SpaceChannels')
-        out3_gold = G3_gold.direct(data3)
-        ad3_gold = G3_gold.adjoint(out3_gold)
-
-        self.assertEquals(out3.shape, (2,1))
-        self.assertEquals(out3_gold.shape, (3,1))
-        numpy.testing.assert_allclose(ad3.array, ad3_gold.array, atol = 0.4)
-        numpy.testing.assert_allclose(out3[0].array, out3_gold[0].array, atol = 0.4)
-        numpy.testing.assert_allclose(out3[1][0].array, out3_gold[1].array, atol = 0.4)  
-        numpy.testing.assert_allclose(out3[1][1].array, out3_gold[2].array, atol = 0.4)
-
-
-        G4 = GradientOperator(ig4, split=True, correlation='SpaceChannels')
-        out4 = G4.direct(data4)
-        ad4 = G4.adjoint(out4)
-
-        G4_gold = GradientOperator(ig4, split=False, correlation='SpaceChannels')
-        out4_gold = G4_gold.direct(data4)
-        ad4_gold = G4_gold.adjoint(out4_gold)
-
-        self.assertEquals(out4.shape, (2,1))
-        self.assertEquals(out4_gold.shape, (4,1))
-        numpy.testing.assert_allclose(ad4.array, ad4_gold.array, atol = 0.4)
-        numpy.testing.assert_allclose(out4[0].array, out4_gold[0].array, atol = 0.4)
-        numpy.testing.assert_allclose(out4[1][0].array, out4_gold[1].array, atol = 0.4)  
-        numpy.testing.assert_allclose(out4[1][1].array, out4_gold[2].array, atol = 0.4)        
-        numpy.testing.assert_allclose(out4[1][2].array, out4_gold[3].array, atol = 0.4)        
-
-        #non default order
-        data4.reorder(['vertical','horizontal_x','channel','horizontal_y'])
-        G4 = GradientOperator(data4.geometry, split=True, correlation='SpaceChannels')
-        out4 = G4.direct(data4)
-        ad4 = G4.adjoint(out4)
-
-        G4_gold = GradientOperator(data4.geometry, split=False, correlation='SpaceChannels')
-        out4_gold = G4_gold.direct(data4)
-        ad4_gold = G4_gold.adjoint(out4_gold)
-
-        self.assertEquals(out4.shape, (2,1))
-        self.assertEquals(out4_gold.shape, (4,1))
-        numpy.testing.assert_allclose(ad4.array, ad4_gold.array, atol = 0.4)
-        numpy.testing.assert_allclose(out4[0].array, out4_gold[2].array, atol = 0.4)
-        numpy.testing.assert_allclose(out4[1][0].array, out4_gold[0].array, atol = 0.4)  
-        numpy.testing.assert_allclose(out4[1][1].array, out4_gold[1].array, atol = 0.4)        
-        numpy.testing.assert_allclose(out4[1][2].array, out4_gold[3].array, atol = 0.4)        
+                    # Check adjoint of numpy vs c allocate
+                    try:
+                        numpy.testing.assert_array_almost_equal(res1_c_out.array, 
+                                                        res1_np_out.array, decimal=5)                            
+                    except:
+                        print("Check adjoint of numpy vs c allocate")
+                        self.print_assertion_info(geom, bnd, None, None, corr) 
+                        raise    
 

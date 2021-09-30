@@ -75,52 +75,52 @@ class TestGradientOperator(unittest.TestCase):
                                                     backend = backend, 
                                                     correlation = corr, method = method)
                             try:                                                    
-                                self.assertTrue(LinearOperator.dot_test(Grad))
-                            except AssertionError:    
-                                self.print_assertion_info(geom,bnd,backend,corr,method)
+                                self.assertTrue(LinearOperator.dot_test(Grad, seed=10))
+                            except:    
+                                self.print_assertion_info(geom,bnd,backend,corr,method,None)
                                 raise
                                                             
                             
 
     def test_GradientOperator_norm(self):
 
-        for i in self.list_geometries:            
-            for j in self.bconditions:
-                for k in self.backend:
-                    for z in self.correlation:
-                        for l in self.method:
+        for geom in self.list_geometries:            
+            for bnd in self.bconditions:
+                for backend in self.backend:
+                    for corr in self.correlation:
+                        for method in self.method:
 
-                            if i.channels == 1:
+                            if geom.channels == 1:
                             
-                                if i.length==2:                                                             
-                                    norm = numpy.sqrt((2/i.voxel_size_y)**2 + (2/i.voxel_size_x)**2)
-                                elif i.length==3:  
-                                    norm = numpy.sqrt((2/i.voxel_size_z)**2 + (2/i.voxel_size_y)**2 + (2/i.voxel_size_x)**2)  
+                                if geom.length==2:                                                             
+                                    norm = numpy.sqrt((2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
+                                elif geom.length==3:  
+                                    norm = numpy.sqrt((2/geom.voxel_size_z)**2 + (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)  
 
                             else:
 
-                                if z == 'Space':     
-                                    if i.length==3:
-                                        norm = numpy.sqrt((2/i.voxel_size_y)**2 + (2/i.voxel_size_x)**2)
+                                if corr == 'Space':     
+                                    if geom.length==3:
+                                        norm = numpy.sqrt((2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
                                     else:
-                                        norm = numpy.sqrt(4 + (2/i.voxel_size_z)**2 + (2/i.voxel_size_y)**2 + (2/i.voxel_size_x)**2)                                        
+                                        norm = numpy.sqrt(4 + (2/geom.voxel_size_z)**2 + (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)                                        
 
                                 else:
 
-                                    if i.length==3:
-                                        norm = numpy.sqrt(4 + (2/i.voxel_size_y)**2 + (2/i.voxel_size_x)**2)
+                                    if geom.length==3:
+                                        norm = numpy.sqrt(4 + (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)
                                     else:
-                                        norm = numpy.sqrt(4 + (2/i.voxel_size_z)**2 + (2/i.voxel_size_y)**2 + (2/i.voxel_size_x)**2)                                      
+                                        norm = numpy.sqrt(4 + (2/geom.voxel_size_z)**2 + (2/geom.voxel_size_y)**2 + (2/geom.voxel_size_x)**2)                                      
 
                                                 
-                            Grad = GradientOperator(i, 
-                                                    bnd_cond = j,
-                                                    backend = k, 
-                                                    correlation = z, method=l)
+                            Grad = GradientOperator(geom, 
+                                                    bnd_cond = bnd,
+                                                    backend = backend, 
+                                                    correlation = corr, method=method)
                             try:                                                    
                                 numpy.testing.assert_approx_equal(Grad.norm(), norm, significant = 1) 
                             except AssertionError:    
-                                self.print_assertion_info(i,j,k,z,l)
+                                self.print_assertion_info(geom,bnd,backend,corr,method,None) 
                                 raise
 
     def test_GradientOperator_in_place_vs_allocate_direct(self):
@@ -145,7 +145,7 @@ class TestGradientOperator(unittest.TestCase):
                                     numpy.testing.assert_array_almost_equal(res_in_place[m].array, 
                                                                     res_allocate[m].array)                            
                                 except:
-                                    self.print_assertion_info(geom,bnd,backend,corr,method) 
+                                    self.print_assertion_info(geom,bnd,backend,corr,method,None) 
                                     raise   
 
     def test_GradientOperator_in_place_vs_allocate_adjoint(self):
@@ -168,7 +168,7 @@ class TestGradientOperator(unittest.TestCase):
                                 numpy.testing.assert_array_almost_equal(res_in_place.array, 
                                                                 res_allocate.array)                            
                             except:
-                                self.print_assertion_info(geom,bnd,backend,corr,method, split) 
+                                self.print_assertion_info(geom,bnd,backend,corr,method, None) 
                                 raise  
 
     def test_GradientOperator_range_shape(self):
@@ -275,7 +275,7 @@ class TestGradientOperator(unittest.TestCase):
                                                             res1_np[m].array)                            
                         except:
                             print("Check direct of numpy vs c in place")
-                            self.print_assertion_info(geom, bnd, None, None, corr) 
+                            self.print_assertion_info(geom, bnd, None, None, corr, None) 
                             raise   
 
                     res1_c_out = Grad_c.range.allocate()                    
@@ -291,7 +291,7 @@ class TestGradientOperator(unittest.TestCase):
                                                             res1_np_out[m].array)                            
                         except:
                             print("Check direct of numpy vs c allocate")
-                            self.print_assertion_info(geom, bnd, None, None, corr) 
+                            self.print_assertion_info(geom, bnd, None, None, corr, None) 
                             raise  
 
                     tmp_x = Grad_c.range.allocate('random')
@@ -304,7 +304,7 @@ class TestGradientOperator(unittest.TestCase):
                                                         res1_np.array, decimal=5)                            
                     except:
                         print("Check adjoint of numpy vs c in place")
-                        self.print_assertion_info(geom, bnd, None, None, corr) 
+                        self.print_assertion_info(geom, bnd, None, None, corr, None) 
                         raise   
 
                     res1_c_out = Grad_c.domain.allocate()                    
@@ -319,80 +319,80 @@ class TestGradientOperator(unittest.TestCase):
                                                         res1_np_out.array, decimal=5)                            
                     except:
                         print("Check adjoint of numpy vs c allocate")
-                        self.print_assertion_info(geom, bnd, None, None, corr) 
+                        self.print_assertion_info(geom, bnd, None, None, corr, None) 
                         raise    
 
-def test_GradientOperator_for_pseudo_2D_geometries(self):   
+    def test_GradientOperator_for_pseudo_2D_geometries(self):   
 
-        numpy.random.seed(1)
-        # ImageGeometry shape (5,5,1)
-        ig1 = ImageGeometry(voxel_num_x = 1, voxel_num_y = 5, voxel_num_z=5,
-                            voxel_size_x = 0.4, voxel_size_y = 0.2, voxel_size_z=0.6)
-        # ImageGeometry shape (1,5,5)                            
-        ig2 = ImageGeometry(voxel_num_x = 5, voxel_num_y = 5, voxel_num_z=1,
-                            voxel_size_x = 0.1, voxel_size_y = 0.2, voxel_size_z=0.4) 
-        # ImageGeometry shape (5,1,5)                              
-        ig3 = ImageGeometry(voxel_num_x = 5, voxel_num_y = 1, voxel_num_z=5,
-                            voxel_size_x = 0.6, voxel_size_y = 0.4, voxel_size_z=0.3)                                                      
+            numpy.random.seed(1)
+            # ImageGeometry shape (5,5,1)
+            ig1 = ImageGeometry(voxel_num_x = 1, voxel_num_y = 5, voxel_num_z=5,
+                                voxel_size_x = 0.4, voxel_size_y = 0.2, voxel_size_z=0.6)
+            # ImageGeometry shape (1,5,5)                            
+            ig2 = ImageGeometry(voxel_num_x = 5, voxel_num_y = 5, voxel_num_z=1,
+                                voxel_size_x = 0.1, voxel_size_y = 0.2, voxel_size_z=0.4) 
+            # ImageGeometry shape (5,1,5)                              
+            ig3 = ImageGeometry(voxel_num_x = 5, voxel_num_y = 1, voxel_num_z=5,
+                                voxel_size_x = 0.6, voxel_size_y = 0.4, voxel_size_z=0.3)                                                      
 
-        data1 = ig1.allocate('random')   
-        data2 = ig2.allocate('random') 
-        data3 = ig3.allocate('random')  
+            data1 = ig1.allocate('random')   
+            data2 = ig2.allocate('random') 
+            data3 = ig3.allocate('random')  
 
-        data = [data1, data2, data3]  
-        ig = [ig1, ig2, ig3]           
+            data = [data1, data2, data3]  
+            ig = [ig1, ig2, ig3]           
 
-        for i in range(3):
+            for i in range(3):
 
-            ########################################
-            ##### Test Gradient numpy backend  #####
-            ########################################
-            Grad_numpy = GradientOperator(ig[i], backend='numpy')
-            res1 = Grad_numpy.direct(data[i]) 
-            res2 = Grad_numpy.range_geometry().allocate()
-            Grad_numpy.direct(data[i], out=res2)
+                ########################################
+                ##### Test Gradient numpy backend  #####
+                ########################################
+                Grad_numpy = GradientOperator(ig[i], backend='numpy')
+                res1 = Grad_numpy.direct(data[i]) 
+                res2 = Grad_numpy.range_geometry().allocate()
+                Grad_numpy.direct(data[i], out=res2)
 
-            # test direct with and without out
-            numpy.testing.assert_array_almost_equal(res1[0].as_array(), res2[0].as_array()) 
-            numpy.testing.assert_array_almost_equal(res1[1].as_array(), res2[1].as_array()) 
+                # test direct with and without out
+                numpy.testing.assert_array_almost_equal(res1[0].as_array(), res2[0].as_array()) 
+                numpy.testing.assert_array_almost_equal(res1[1].as_array(), res2[1].as_array()) 
 
-            # test adjoint with and without out
-            res3 = Grad_numpy.adjoint(res1)
-            res4 = Grad_numpy.domain_geometry().allocate()
-            Grad_numpy.adjoint(res2, out=res4)
-            numpy.testing.assert_array_almost_equal(res3.as_array(), res4.as_array()) 
+                # test adjoint with and without out
+                res3 = Grad_numpy.adjoint(res1)
+                res4 = Grad_numpy.domain_geometry().allocate()
+                Grad_numpy.adjoint(res2, out=res4)
+                numpy.testing.assert_array_almost_equal(res3.as_array(), res4.as_array()) 
 
-            # test dot_test
-            self.assertTrue(LinearOperator.dot_test(Grad_numpy))
+                # test dot_test
+                self.assertTrue(LinearOperator.dot_test(Grad_numpy))
 
-            # test shape of output of direct
-            self.assertEqual(res1[0].shape, ig[i].shape)
-            self.assertEqual(res1.shape, (2,1))
+                # test shape of output of direct
+                self.assertEqual(res1[0].shape, ig[i].shape)
+                self.assertEqual(res1.shape, (2,1))
 
-            ########################################
-            ##### Test Gradient c backend  #####
-            ########################################
-            Grad_c = GradientOperator(ig[i], backend='c')
+                ########################################
+                ##### Test Gradient c backend  #####
+                ########################################
+                Grad_c = GradientOperator(ig[i], backend='c')
 
-            # test direct with and without out
-            res5 = Grad_c.direct(data[i]) 
-            res6 = Grad_c.range_geometry().allocate()*0.
-            Grad_c.direct(data[i], out=res6)
+                # test direct with and without out
+                res5 = Grad_c.direct(data[i]) 
+                res6 = Grad_c.range_geometry().allocate()*0.
+                Grad_c.direct(data[i], out=res6)
 
-            numpy.testing.assert_array_almost_equal(res5[0].as_array(), res6[0].as_array()) 
-            numpy.testing.assert_array_almost_equal(res5[1].as_array(), res6[1].as_array())
+                numpy.testing.assert_array_almost_equal(res5[0].as_array(), res6[0].as_array()) 
+                numpy.testing.assert_array_almost_equal(res5[1].as_array(), res6[1].as_array())
 
-            # test adjoint
-            res7 = Grad_c.adjoint(res5) 
-            res8 = Grad_c.domain_geometry().allocate()*0.
-            Grad_c.adjoint(res5, out=res8)
-            numpy.testing.assert_array_almost_equal(res7.as_array(), res8.as_array()) 
+                # test adjoint
+                res7 = Grad_c.adjoint(res5) 
+                res8 = Grad_c.domain_geometry().allocate()*0.
+                Grad_c.adjoint(res5, out=res8)
+                numpy.testing.assert_array_almost_equal(res7.as_array(), res8.as_array()) 
 
-            # test dot_test
-            self.assertTrue(LinearOperator.dot_test(Grad_c))        
+                # test dot_test
+                self.assertTrue(LinearOperator.dot_test(Grad_c))        
 
-            # test direct numpy vs direct c backends (with and without out)
-            numpy.testing.assert_array_almost_equal(res5[0].as_array(), res1[0].as_array()) 
-            numpy.testing.assert_array_almost_equal(res6[1].as_array(), res2[1].as_array())
+                # test direct numpy vs direct c backends (with and without out)
+                numpy.testing.assert_array_almost_equal(res5[0].as_array(), res1[0].as_array()) 
+                numpy.testing.assert_array_almost_equal(res6[1].as_array(), res2[1].as_array())
 
 

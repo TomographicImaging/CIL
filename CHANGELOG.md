@@ -1,4 +1,7 @@
 * 21.2.1
+  - Created Reconstructor base class for simpler use of CIL methods
+  - Added Intel IPP based library for filtering step of FBP
+  - Created FBP Reconstructor class using IPP
   - PDHG memory optimisation
   - ScaledFunction memory Optimisation
 

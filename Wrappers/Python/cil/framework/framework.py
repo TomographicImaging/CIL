@@ -24,6 +24,7 @@ from ctypes import util
 import math
 from cil.utilities.multiprocessing import NUM_THREADS
 # check for the extension
+
 if platform.system() == 'Linux':
     dll = 'libcilacc.so'
 elif platform.system() == 'Windows':
@@ -35,12 +36,6 @@ else:
     raise ValueError('Not supported platform, ', platform.system())
 
 cilacc = ctypes.cdll.LoadLibrary(dll)
-
-#default nThreads
-# import multiprocessing
-# cpus = multiprocessing.cpu_count()
-# NUM_THREADS = max(int(cpus/2),1)
-
 
 def find_key(dic, val):
     """return the key of dictionary dic given the value"""
@@ -1328,7 +1323,7 @@ class AcquisitionGeometry(object):
 
     @property
     def num_projections(self):
-        self.config.angles.num_positions        
+        return len(self.angles)       
 
     @property
     def pixel_num_h(self):

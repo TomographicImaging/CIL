@@ -14,6 +14,7 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
+from cil.framework import cilacc
 from cil.framework import AcquisitionGeometry
 from cil.reconstructors import Reconstructor
 from scipy.fft import fftfreq
@@ -23,17 +24,6 @@ import numpy as np
 import ctypes, platform
 from ctypes import util
 
-if platform.system() == 'Linux':
-    dll = 'libcilacc.so'
-elif platform.system() == 'Windows':
-    dll_file = 'cilacc.dll'
-    dll = util.find_library(dll_file)
-elif platform.system() == 'Darwin':
-    dll = 'libcilacc.dylib'
-else:
-    raise ValueError('Not supported platform, ', platform.system())
-
-cilacc = ctypes.cdll.LoadLibrary(dll)
 
 c_float_p = ctypes.POINTER(ctypes.c_float)
 c_double_p = ctypes.POINTER(ctypes.c_double)
@@ -89,7 +79,7 @@ class FBP(Reconstructor):
 
     def __init__ (self,input):
         """
-        Creates an FBP/FDK reconstructor with a 'ram-lak' filter.
+        Creates an FBP/FDK reconstructor based on your acquisition data with a 'ram-lak' filter.
 
         The reconstructor can be customised using:
         self.set_input()
@@ -99,6 +89,9 @@ class FBP(Reconstructor):
         self.get_filter_array()
         self.set_fft_order()
         self.set_filter_inplace()
+
+        :param input: The input data to reconstruct. The reconstructor is set-up based on the geometry of the data. 
+        :type input: AcquisitionData
         """
         if has_ipp == False:
             raise ImportError("IPP libraries not found. Cannot use CIL FBP")
@@ -227,19 +220,8 @@ class FBP(Reconstructor):
         (yy, xx) = np.meshgrid(xv, yv)
 
         principal_ray_length = ag.dist_source_center + ag.dist_center_detector
-        scaling =  ag.magnification * (2 * np.pi/ len(ag.angles)) / ( 4 * ag.pixel_size_h ) 
+        scaling =  ag.magnification * (2 * np.pi/ ag.num_projections) / ( 4 * ag.pixel_size_h ) 
         weights = scaling * principal_ray_length / np.sqrt((principal_ray_length ** 2 + xx ** 2 + yy ** 2))
-        return weights
-
-    def __calculate_weights_fbp(self):
-        """
-        Calculates the pre-weighting used for FBP reconstruction.
-
-        :return weights: A single image containing the weights perpixel
-        :rtype weights: numpy.ndarray
-        """
-        ag = self.input.geometry
-        weights = np.ones(ag.pixel_num_h,ag.pixel_num_v)
         return weights
 
     def __pre_filtering(self,acquistion_data):

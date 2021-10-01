@@ -23,6 +23,15 @@ message("CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS}")
 message("CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS}")
 message("CMAKE_STATIC_LINKER_FLAGS ${CMAKE_STATIC_LINKER_FLAGS}")
 
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.9.0") 
+  set (OpenMP_EXE_LINKER_FLAGS OpenMP::OpenMP_CXX)
+else()
+  message(WARNING "Your CMake version is old. OpenMP linking flags  might be incorrect.")
+  # need to explicitly set this. Definitely for gcc, hopefully also for other systems.
+  # See https://gitlab.kitware.com/cmake/cmake/issues/15392
+  set (OpenMP_EXE_LINKER_FLAGS ${OpenMP_C_FLAGS})
+endif()
+
 if(NOT DEFINED IPP_LIBRARY)
   if (UNIX)
     set(IPP_LIBRARY ${CMAKE_INSTALL_PREFIX}/lib)
@@ -56,26 +65,14 @@ if(USE_IPP)
                             ${CMAKE_CURRENT_SOURCE_DIR}/axpby.cpp
                             ${CMAKE_CURRENT_SOURCE_DIR}/FiniteDifferenceLibrary.cpp
                             ${CMAKE_CURRENT_SOURCE_DIR}/FBP_filtering.cpp)
+
+  target_link_libraries(cilacc ${OpenMP_EXE_LINKER_FLAGS} ${IPP_CORE} ${IPP_S})
+  include_directories(cilacc PUBLIC ${IPP_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR}/include)
 else()
   add_library(cilacc SHARED ${CMAKE_CURRENT_SOURCE_DIR}/utilities.cpp
                             ${CMAKE_CURRENT_SOURCE_DIR}/axpby.cpp
                             ${CMAKE_CURRENT_SOURCE_DIR}/FiniteDifferenceLibrary.cpp )
-endif()
 
-if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.9.0") 
-  set (OpenMP_EXE_LINKER_FLAGS OpenMP::OpenMP_CXX)
-else()
-  message(WARNING "Your CMake version is old. OpenMP linking flags  might be incorrect.")
-  # need to explicitly set this. Definitely for gcc, hopefully also for other systems.
-  # See https://gitlab.kitware.com/cmake/cmake/issues/15392
-  set (OpenMP_EXE_LINKER_FLAGS ${OpenMP_C_FLAGS})
-endif()
-
-
-if(USE_IPP)
-  target_link_libraries(cilacc ${OpenMP_EXE_LINKER_FLAGS} ${IPP_CORE} ${IPP_S})
-  include_directories(cilacc PUBLIC ${IPP_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR}/include)
-else()
   target_link_libraries(cilacc ${OpenMP_EXE_LINKER_FLAGS})
   include_directories(cilacc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 endif()

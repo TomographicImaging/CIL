@@ -35,7 +35,8 @@ setup(
               'cil.plugins', 
               'cil.plugins.ccpi_regularisation', 
               'cil.plugins.ccpi_regularisation.functions',
-              'cil.plugins.tigre'],
+              'cil.plugins.tigre',
+              'cil.reconstructors'],
 
 
     # metadata for upload to PyPI

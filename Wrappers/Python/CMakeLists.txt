@@ -15,9 +15,11 @@ if (BUILD_PYTHON_WRAPPER)
     # append default site-packages
     set(PYTHON_DEST "${PYTHON_DEST}/site-packages")
   endif()
+
   file(TO_CMAKE_PATH ${PYTHON_DEST} TMP)
   set (PYTHON_DEST ${TMP})
   unset (TMP)
+
   message(STATUS "Python wrappers will be installed in " ${PYTHON_DEST})
 
   message("CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS}")
@@ -75,8 +77,10 @@ if (BUILD_PYTHON_WRAPPER)
                         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                         COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT}
                         DEPENDS cilacc)
+
           install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/build/lib/cil
                 DESTINATION ${PYTHON_DEST} )
+                
         else()
           add_custom_target(pythonsetup ALL  
                         COMMAND ${CMAKE_COMMAND} -E env PREFIX=${CMAKE_SOURCE_DIR}/src/
@@ -90,9 +94,11 @@ if (BUILD_PYTHON_WRAPPER)
                         )
         endif()
         #set (PYTHON_DEST ${CMAKE_INSTALL_PREFIX}/python/)
+
         if (NOT WIN32)
           install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/build/lib/cil
                 DESTINATION ${PYTHON_DEST} )
+
         endif()
         install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/ DESTINATION ${CMAKE_INSTALL_PREFIX}/share/cil)
         #file(TOUCH ${PYTHON_DEST}/edo/__init__.py)

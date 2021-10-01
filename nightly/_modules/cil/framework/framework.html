@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cil.framework.framework &mdash; CIL v21.2.0-15-ge7398e1 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <title>cil.framework.framework &mdash; CIL v21.2.0-16-gde11b5a3 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> CIL
           </a>
               <div class="version">
-                v21.2.0-15-ge7398e1
+                v21.2.0-16-gde11b5a3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -99,6 +99,7 @@
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">from</span> <span class="nn">cil.utilities.multiprocessing</span> <span class="kn">import</span> <span class="n">NUM_THREADS</span>
 <span class="c1"># check for the extension</span>
+
 <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;Linux&#39;</span><span class="p">:</span>
     <span class="n">dll</span> <span class="o">=</span> <span class="s1">&#39;libcilacc.so&#39;</span>
 <span class="k">elif</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;Windows&#39;</span><span class="p">:</span>
@@ -110,12 +111,6 @@
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not supported platform, &#39;</span><span class="p">,</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">())</span>
 
 <span class="n">cilacc</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">cdll</span><span class="o">.</span><span class="n">LoadLibrary</span><span class="p">(</span><span class="n">dll</span><span class="p">)</span>
-
-<span class="c1">#default nThreads</span>
-<span class="c1"># import multiprocessing</span>
-<span class="c1"># cpus = multiprocessing.cpu_count()</span>
-<span class="c1"># NUM_THREADS = max(int(cpus/2),1)</span>
-
 
 <span class="k">def</span> <span class="nf">find_key</span><span class="p">(</span><span class="n">dic</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;return the key of dictionary dic given the value&quot;&quot;&quot;</span>
@@ -1400,6 +1395,10 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">geom_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">geometry</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">num_projections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">angles</span><span class="p">)</span>       
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">pixel_num_h</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

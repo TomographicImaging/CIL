@@ -75,7 +75,7 @@ class TestGradientOperator(unittest.TestCase):
                                                     backend = backend, 
                                                     correlation = corr, method = method)
                             try:                                                    
-                                self.assertTrue(LinearOperator.dot_test(Grad, seed=10))
+                                self.assertTrue(LinearOperator.dot_test(Grad, seed=5))
                             except:    
                                 self.print_assertion_info(geom,bnd,backend,corr,method,None)
                                 raise

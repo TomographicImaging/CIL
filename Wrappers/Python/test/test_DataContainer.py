@@ -21,7 +21,7 @@ import numpy
 from cil.framework import DataContainer
 from cil.framework import ImageData
 from cil.framework import AcquisitionData
-from cil.framework import ImageGeometry
+from cil.framework import ImageGeometry, BlockGeometry, VectorGeometry
 from cil.framework import AcquisitionGeometry
 from timeit import default_timer as timer
 
@@ -571,40 +571,159 @@ class TestDataContainer(unittest.TestCase):
         self.assertEqual(order[1], sino.dimension_labels[1])
         self.assertEqual(order[2], sino.dimension_labels[2])
         self.assertEqual(order[2], sino.dimension_labels[2])
-        
-
-        
+                
         try:
             z = AcquisitionData(numpy.random.randint(10, size=(2,3)), geometry=ageometry)
             self.assertTrue(False)
         except ValueError as ve:
             print (ve)
             self.assertTrue(True)
-    def test_ImageGeometry_allocate_complex(self):
-        ig = ImageGeometry(2,2)
-        data = ig.allocate(None, dtype=numpy.complex64)
-        shape = data.shape
-        print ("shape", shape)
-        print ("dtype", data.dtype)
 
+    def test_ImageGeometry_allocate_dtype(self):
+        
+        print("Test ImageGeometry dtype\n")
+        ig = ImageGeometry(3,3)
+        print("The default dtype of the ImageGeometry is {}".format(ig.dtype))
+        self.assertEqual(ig.dtype, numpy.float32)
+        
+        bg = BlockGeometry(ig,ig)
+        print("The default dtype of the BlockImageGeometry is {}".format(bg.dtype))   
+        self.assertEqual(bg.dtype, tuple([numpy.float32]*len(ig.shape)))
+         
+        print("Change it to complex")
+        ig.dtype = numpy.complex
+        print("The ImageGeometry dtype is now {} ".format(ig.dtype))         
+        self.assertEqual(ig.dtype, numpy.complex)
+
+        print("Test ImageGeometry allocate")
+        data = ig.allocate()
+        print("Data dtype is now {} ".format(ig.dtype))  
+        self.assertEqual(data.dtype, ig.dtype)
+        print("Data geometry dtype is now")
+        print(data.geometry.dtype)
+        self.assertEqual(data.geometry.dtype, ig.dtype) 
+
+        print("Allocate data with different dtype, e.g: numpy.int64 from the same ImageGeometry")
+        data = ig.allocate(dtype=numpy.int64)
+        self.assertEqual(data.dtype, numpy.int64) 
+        print("Data dtype is now {}".format(data.dtype))
+        print("Data geometry dtype is now {}".format(data.geometry.dtype))
+        self.assertEqual(data.geometry.dtype, numpy.int64)
+        self.assertEqual(data.dtype, numpy.int64)
+
+        print("The dtype of the ImageGeometry remain unchanged ig.dtype =  {}".format(ig.dtype))
+        self.assertEqual(ig.dtype, numpy.complex)  
+
+    def test_AcquisitionGeometry_allocate_dtype(self):
+
+        print("Test AcquisitionGeometry dtype\n")
+        # Detectors
+        detectors =  10
+
+        # Angles
+        angles = numpy.linspace(0,180,180, dtype='float32')
+
+        # Setup acquisition geometry
+        ag = AcquisitionGeometry.create_Parallel2D()\
+                                .set_angles(angles)\
+                                .set_panel(detectors, pixel_size=0.1)                                
+        print("The default dtype of the AcquisitionGeometry is {}".format(ag.dtype))  
+        self.assertEqual(ag.dtype, numpy.float32)      
+                 
+        print("Change it to complex")
+        ag.dtype = numpy.complex
+        print("The AcquisitionGeometry dtype is now {} ".format(ag.dtype))         
+        self.assertEqual(ag.dtype, numpy.complex)
+
+        print("Test AcquisitionGeometry allocate")
+        data = ag.allocate()
+        print("Data dtype is now {} ".format(ag.dtype))  
+        self.assertEqual(data.dtype, ag.dtype)
+        print("Data geometry dtype is now")
+        print(data.geometry.dtype)
+        self.assertEqual(data.geometry.dtype, ag.dtype) 
+
+        print("The dtype of the AcquisitionGeometry remain unchanged ag.dtype =  {}".format(ag.dtype))
+        self.assertEqual(ag.dtype, numpy.complex)         
+
+    def test_VectorGeometry_allocate_dtype(self):
+
+        print("Test VectorGeometry dtype\n")
+
+        vg = VectorGeometry(3)
+        print("The default dtype of the VectorGeometry is {}".format(vg.dtype))  
+        self.assertEqual(vg.dtype, numpy.float32)      
+                 
+        print("Change it to complex")
+        vg.dtype = numpy.complex
+        print("The VectorGeometry dtype is now {} ".format(vg.dtype))         
+        self.assertEqual(vg.dtype, numpy.complex)
+
+        print("Test VectorGeometry allocate")
+        data = vg.allocate()
+        print("Data dtype is now {} ".format(vg.dtype))  
+        self.assertEqual(data.dtype, vg.dtype)
+        print("Data geometry dtype is now")
+        print(data.geometry.dtype)
+        self.assertEqual(data.geometry.dtype, vg.dtype) 
+
+        print("The dtype of the VectorGeometry remain unchanged ag.dtype =  {}".format(vg.dtype))
+        self.assertEqual(vg.dtype, numpy.complex)  
+
+    def test_ImageGeometry_allocate_complex(self):
+
+        ig = ImageGeometry(2,2)
+        data = ig.allocate(dtype=numpy.complex)
+        print("Allocate complex array to a complex geometry")
         r = (1 + 1j*1)* numpy.ones(data.shape, dtype=data.dtype)
         data.fill(r)
+        self.assertAlmostEqual(data.squared_norm(), data.size * 2)  
+        numpy.testing.assert_almost_equal(data.abs().array, numpy.abs(r))              
 
-        # norm = (2*2) * ((1+i1) * (1-j1) = 4* (1+1) = 4*2=8
-        self.assertAlmostEqual(data.squared_norm(), data.size * 2)
+        data1 = ig.allocate(dtype=numpy.float32)
+        try:
+            data1.fill(r)
+        except TypeError as err:
+            print(err)    
 
     def test_AcquisitionGeometry_allocate_complex(self):
-        ageometry = AcquisitionGeometry(dimension=2, 
-                            angles=numpy.linspace(0, 180, num=10),
-                            geom_type='parallel', pixel_num_v=3,
-                            pixel_num_h=5, channels=2)
-        sino = ageometry.allocate(0, dtype=numpy.complex64)
-        shape = sino.shape
-        print ("shape", shape)
-        print ("dtype", sino.dtype)
-        r = (1 + 1j*1)* numpy.ones(sino.shape, dtype=sino.dtype)
-        sino.fill(r)
-        self.assertAlmostEqual(sino.squared_norm(), sino.size*2)
+
+        # Detectors
+        detectors =  10
+
+        # Angles
+        angles = numpy.linspace(0,10,10, dtype='float32')
+
+        # Setup acquisition geometry
+        ag = AcquisitionGeometry.create_Parallel2D()\
+                                .set_angles(angles)\
+                                .set_panel(detectors, pixel_size=0.1)   
+
+        data = ag.allocate(dtype=numpy.complex64)
+        r = (1 + 1j)* numpy.ones(data.shape, dtype=data.dtype)
+        data.fill(r)
+        numpy.testing.assert_almost_equal(data.abs().array, numpy.abs(r))      
+
+        data1 = ag.allocate(dtype=numpy.float32)
+        try:
+            data1.fill(r)
+        except TypeError as err:
+            print(err) 
+
+    def test_VectorGeometry_allocate_complex(self):
+
+        vg = VectorGeometry(3)
+        data = vg.allocate(dtype=numpy.complex)
+        print("Allocate complex array to a complex geometry")
+        r = (1 + 1j*1)* numpy.ones(data.shape, dtype=data.dtype)
+        data.fill(r)
+        numpy.testing.assert_almost_equal(data.abs().array, numpy.abs(r))          
+
+        data1 = vg.allocate(dtype=numpy.float32)
+        try:
+            data1.fill(r)
+        except TypeError as err:
+            print(err)                         
         
     def test_ImageGeometry_allocate_random_same_seed(self):
         vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)
@@ -612,7 +731,6 @@ class TestDataContainer(unittest.TestCase):
         image2 = vgeometry.allocate('random', seed=0)
         numpy.testing.assert_array_equal(image1.as_array(), image2.as_array())
 
-        
     def test_AcquisitionDataSubset(self):
         sgeometry = AcquisitionGeometry(dimension=2, angles=numpy.linspace(0, 180, num=10),
                                         geom_type='parallel', pixel_num_v=3,

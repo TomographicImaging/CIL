@@ -17,7 +17,7 @@
 
 from cil.optimisation.operators import LinearOperator
 from cil.optimisation.operators import FiniteDifferenceOperator
-from cil.framework import ImageGeometry, BlockGeometry
+from cil.framework import BlockGeometry
 import warnings
 from cil.utilities.multiprocessing import NUM_THREADS
 import numpy as np
@@ -147,7 +147,6 @@ class Gradient_numpy(LinearOperator):
         # Dimension of domain geometry        
         self.ndim = len(tmp_dom_shape) 
 
-        
         # Default correlation for the gradient coupling
         self.correlation = kwargs.get('correlation',CORRELATION_SPACE)        
         self.bnd_cond = bnd_cond 

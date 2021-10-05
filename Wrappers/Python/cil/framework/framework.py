@@ -289,7 +289,13 @@ class ImageGeometry(object):
 
         return repres
     def allocate(self, value=0, **kwargs):
-        '''allocates an ImageData according to the size expressed in the instance'''
+        '''allocates an ImageData according to the size expressed in the instance
+        
+        :param value: accepts numbers to allocate an uniform array, or a string as 'random' or 'random_int' to create a random array or None.
+        :type value: number or string, default None allocates empty memory block, default 0
+        :param dtype: numerical type to allocate
+        :type dtype: numpy type, default numpy.float32
+        '''
 
         dtype = kwargs.get('dtype', self.dtype)
 
@@ -1753,8 +1759,6 @@ class AcquisitionGeometry(object):
         
         :param value: accepts numbers to allocate an uniform array, or a string as 'random' or 'random_int' to create a random array or None.
         :type value: number or string, default None allocates empty memory block
-        :param dimension_labels: labels for the dimension axis
-        :type list: default None
         :param dtype: numerical type to allocate
         :type dtype: numpy type, default numpy.float32
         '''
@@ -3025,7 +3029,16 @@ class VectorGeometry(object):
         return False
 
     def allocate(self, value=0, **kwargs):
-        '''allocates an VectorData according to the size expressed in the instance'''
+        '''allocates an VectorData according to the size expressed in the instance
+        
+        :param value: accepts numbers to allocate an uniform array, or a string as 'random' or 'random_int' to create a random array or None.
+        :type value: number or string, default None allocates empty memory block
+        :param dtype: numerical type to allocate
+        :type dtype: numpy type, default numpy.float32
+        :param seed: seed for the random number generator
+        :type seed: int, default None
+        :param max_value: max value of the random int array
+        :type max_value: int, default 100'''
 
         dtype = kwargs.get('dtype', self.dtype)
         # self.dtype = kwargs.get('dtype', numpy.float32)

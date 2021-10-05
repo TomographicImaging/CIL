@@ -1785,7 +1785,7 @@ class AcquisitionGeometry(object):
                 if seed is not None:
                     numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
-                r = numpy.random.randint(max_value,size=self.shape, dtype=dtype)
+                r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
                 out.fill(numpy.asarray(r, dtype=self.dtype))
             elif value is None:
                 pass
@@ -3045,7 +3045,7 @@ class VectorGeometry(object):
                     numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
                 r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
-                out.fill(r.as_array(dtype=dtype))               
+                out.fill(numpy.asarray(r, dtype=self.dtype))             
             elif value is None:
                 pass
             else:
@@ -3092,3 +3092,48 @@ class DataOrder():
         else:
             raise ValueError("Expected dimension_label order {0}, got {1}.\nTry using `data.reorder('{2}')` to permute for {2}"
                  .format(order_requested, list(geometry.dimension_labels), engine))
+
+
+if __name__ == "__main__":
+
+    from cil.framework import ImageGeometry, BlockGeometry
+    from cil.plugins.astra import ProjectionOperator
+    ig = ImageGeometry(3,3)
+
+    x = ig.allocate()
+    bg = BlockGeometry(ig, ig)
+
+    print(bg.dtype)
+
+    x = bg.allocate()
+    print(x.dtype)
+
+    print("Test AcquisitionGeometry dtype\n")
+    # Detectors
+    detectors =  10
+
+    # Angles
+    angles = numpy.linspace(0,180,180, dtype='float32')
+
+    # Setup acquisition geometry
+    ag = AcquisitionGeometry.create_Parallel2D()\
+                            .set_angles(angles)\
+                            .set_panel(detectors, pixel_size=0.1)   
+
+    x = ag.allocate()
+    print(x.dtype)   
+
+    Aop = ProjectionOperator(ig, ag, 'cpu')
+    
+    sin = Aop.direct(data)
+    # Create noisy data. Apply Gaussian noise
+    noises = ['gaussian', 'poisson']
+    noise = noises[1]
+    if noise == 'poisson':
+        np.random.seed(10)
+        scale = 5
+        eta = 0
+        noisy_data = AcquisitionData(np.random.poisson( scale * (eta + sin.as_array()))/scale, geometry=ag)    
+    x.fill(numpy.random.poisson(x.array))                            
+
+

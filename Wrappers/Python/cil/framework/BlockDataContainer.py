@@ -57,6 +57,11 @@ class BlockDataContainer(object):
     CONJUGATE = 'conjugate'
     __array_priority__ = 1
     __container_priority__ = 2
+
+    @property
+    def dtype(self):
+        return tuple(i.dtype for i in self.containers)    
+
     def __init__(self, *args, **kwargs):
         ''''''
         self.containers = args

@@ -1785,7 +1785,7 @@ class AcquisitionGeometry(object):
                 if seed is not None:
                     numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
-                r = numpy.random.randint(max_value,size=self.shape, dtype=dtype)
+                r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
                 out.fill(numpy.asarray(r, dtype=self.dtype))
             elif value is None:
                 pass
@@ -3045,7 +3045,7 @@ class VectorGeometry(object):
                     numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
                 r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
-                out.fill(r.as_array(dtype=dtype))               
+                out.fill(numpy.asarray(r, dtype=self.dtype))             
             elif value is None:
                 pass
             else:
@@ -3092,3 +3092,5 @@ class DataOrder():
         else:
             raise ValueError("Expected dimension_label order {0}, got {1}.\nTry using `data.reorder('{2}')` to permute for {2}"
                  .format(order_requested, list(geometry.dimension_labels), engine))
+
+

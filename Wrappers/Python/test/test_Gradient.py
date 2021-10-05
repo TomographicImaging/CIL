@@ -24,7 +24,7 @@ from cil.optimisation.operators import LinearOperator
 
 class TestGradientOperator(unittest.TestCase):
 
-    def __init__(self, *args, **kwargs):
+    def setUp(self, *args, **kwargs):
 
         N, M, K = 10, 11, 12
         channels = 13
@@ -75,7 +75,7 @@ class TestGradientOperator(unittest.TestCase):
                                                     backend = backend, 
                                                     correlation = corr, method = method)
                             try:                                                    
-                                self.assertTrue(LinearOperator.dot_test(Grad, seed=10))
+                                self.assertTrue(LinearOperator.dot_test(Grad, seed=5))
                             except:    
                                 self.print_assertion_info(geom,bnd,backend,corr,method,None)
                                 raise

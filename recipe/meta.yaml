@@ -51,6 +51,9 @@ requirements:
     - vc 14         # [win]
     - cil-data
     - ripgrep
+    - ipp-include
+    - ipp-devel
+    - ipp
 
   run:
     - python
@@ -68,7 +71,7 @@ requirements:
     - olefile >=0.46
     - pywavelets
     - cil-data
-    
+    - ipp
   
 about:
   home: http://www.ccpi.ac.uk/cil

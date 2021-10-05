@@ -17,7 +17,7 @@
 
 from cil.optimisation.operators import LinearOperator
 from cil.optimisation.operators import FiniteDifferenceOperator
-from cil.framework import ImageGeometry, BlockGeometry
+from cil.framework import BlockGeometry
 import warnings
 from cil.utilities.multiprocessing import NUM_THREADS
 import numpy as np
@@ -79,12 +79,7 @@ class GradientOperator(LinearOperator):
 
         # Default correlation for the gradient coupling
         correlation = kwargs.get('correlation',CORRELATION_SPACE)
-        
-        # Add attributes for pseudo CIL geometries, e.g., SIRF data
-        if not isinstance(domain_geometry, ImageGeometry):
-            domain_geometry.channels = 1
-            domain_geometry.dimension_labels = [None]*len(domain_geometry.shape)
-        
+                       
         # Space correlation on multichannel data call numpy backend
         if correlation == CORRELATION_SPACE and domain_geometry.channels > 1:
             #numpy implementation only for now
@@ -141,7 +136,7 @@ class Gradient_numpy(LinearOperator):
         :type correlation: str, optional, default :code:`Space`
         '''             
         
-        # Consider pseudo 3D geometries with one slice, e.g., (1,155,155) used in SIRF
+        # Consider pseudo 2D geometries with one slice, e.g., (1,voxel_num_y,voxel_num_x)
         tmp_dom_shape = []
         self.ind = []
         for i, size in enumerate(list(domain_geometry.shape) ):
@@ -151,7 +146,6 @@ class Gradient_numpy(LinearOperator):
      
         # Dimension of domain geometry        
         self.ndim = len(tmp_dom_shape) 
-
         
         # Default correlation for the gradient coupling
         self.correlation = kwargs.get('correlation',CORRELATION_SPACE)        
@@ -282,7 +276,7 @@ class Gradient_C(LinearOperator):
         # Split gradients, e.g., space and channels
         self.split = kwargs.get('split',False)
         
-        # Consider pseudo 3D geometries with one slice, e.g., (1,155,155) for SIRF data
+        # Consider pseudo 2D geometries with one slice, e.g., (1,voxel_num_y,voxel_num_x)
         self.is2D = False
         self.tmp_dom_shape = []
         self.ind = []
@@ -414,4 +408,5 @@ class Gradient_C(LinearOperator):
 
 
 
+   
    

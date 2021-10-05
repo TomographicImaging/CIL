@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cil.optimisation.operators.GradientOperator &mdash; CIL v21.2.0-17-g9f757e9a documentation</title><link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <title>cil.optimisation.operators.GradientOperator &mdash; CIL v21.2.0-18-g034b3a71 documentation</title><link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
@@ -27,7 +27,7 @@
             <a href="../../../../index.html" class="icon icon-home"> CIL
           </a>
               <div class="version">
-                v21.2.0-17-g9f757e9a
+                v21.2.0-18-g034b3a71
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -92,7 +92,7 @@
 
 <span class="kn">from</span> <span class="nn">cil.optimisation.operators</span> <span class="kn">import</span> <span class="n">LinearOperator</span>
 <span class="kn">from</span> <span class="nn">cil.optimisation.operators</span> <span class="kn">import</span> <span class="n">FiniteDifferenceOperator</span>
-<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">BlockGeometry</span>
+<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">ImageGeometry</span><span class="p">,</span> <span class="n">BlockGeometry</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">cil.utilities.multiprocessing</span> <span class="kn">import</span> <span class="n">NUM_THREADS</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -149,18 +149,15 @@
         <span class="sd">&quot;&quot;&quot;Constructor method</span>
 <span class="sd">        &quot;&quot;&quot;</span>        
         
-        <span class="c1"># Default backend = C</span>
         <span class="n">backend</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;backend&#39;</span><span class="p">,</span><span class="n">C</span><span class="p">)</span>
 
-        <span class="c1"># Default correlation for the gradient coupling</span>
         <span class="n">correlation</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;correlation&#39;</span><span class="p">,</span><span class="n">CORRELATION_SPACE</span><span class="p">)</span>
-                
-        <span class="c1"># Space correlation on multichannel data call numpy backend</span>
+
         <span class="k">if</span> <span class="n">correlation</span> <span class="o">==</span> <span class="n">CORRELATION_SPACE</span> <span class="ow">and</span> <span class="n">domain_geometry</span><span class="o">.</span><span class="n">channels</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="c1">#numpy implementation only for now</span>
             <span class="n">backend</span> <span class="o">=</span> <span class="n">NUMPY</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Warning: correlation=&#39;Space&#39; on multi-channel dataset will use `numpy` backend&quot;</span><span class="p">)</span>
-        
+           
         <span class="k">if</span> <span class="n">method</span> <span class="o">!=</span> <span class="s1">&#39;forward&#39;</span><span class="p">:</span>
             <span class="n">backend</span> <span class="o">=</span> <span class="n">NUMPY</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Warning: method = </span><span class="si">{}</span><span class="s2"> implemented on `numpy` backend. Other methods are backward/centered.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">method</span><span class="p">))</span>            
@@ -171,7 +168,11 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">operator</span> <span class="o">=</span> <span class="n">Gradient_C</span><span class="p">(</span><span class="n">domain_geometry</span><span class="p">,</span> <span class="n">bnd_cond</span><span class="o">=</span><span class="n">bnd_cond</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         
         <span class="nb">super</span><span class="p">(</span><span class="n">GradientOperator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">domain_geometry</span><span class="p">,</span> 
-                                       <span class="n">range_geometry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">())</span> </div>
+                                       <span class="n">range_geometry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">())</span> 
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">gm_range</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gm_domain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span></div>
+
 
 <div class="viewcode-block" id="GradientOperator.direct"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.GradientOperator.direct">[docs]</a>    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Computes the first-order forward differences</span>
@@ -209,27 +210,19 @@
 <span class="sd">        :type bnd_cond: str, optional, default :code:`Neumann`</span>
 <span class="sd">        :param correlation: optional, :code:`SpaceChannel` or :code:`Space`</span>
 <span class="sd">        :type correlation: str, optional, default :code:`Space`</span>
-<span class="sd">        &#39;&#39;&#39;</span>             
+<span class="sd">        &#39;&#39;&#39;</span>                
         
-        <span class="c1"># Consider pseudo 2D geometries with one slice, e.g., (1,voxel_num_y,voxel_num_x)</span>
-        <span class="n">tmp_dom_shape</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ind</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">size</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="p">):</span>
-            <span class="k">if</span> <span class="n">size</span><span class="o">!=</span><span class="mi">1</span><span class="p">:</span>
-                <span class="n">tmp_dom_shape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">ind</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-     
-        <span class="c1"># Dimension of domain geometry        </span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">tmp_dom_shape</span><span class="p">)</span> 
-
-        <span class="c1"># Default correlation for the gradient coupling</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">size_dom_gm</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>         
         <span class="bp">self</span><span class="o">.</span><span class="n">correlation</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;correlation&#39;</span><span class="p">,</span><span class="n">CORRELATION_SPACE</span><span class="p">)</span>        
         <span class="bp">self</span><span class="o">.</span><span class="n">bnd_cond</span> <span class="o">=</span> <span class="n">bnd_cond</span> 
         
-        <span class="c1"># Call FiniteDifference operator </span>
+        <span class="c1"># Call FiniteDiff operator </span>
         <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">method</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">FD</span> <span class="o">=</span> <span class="n">FiniteDifferenceOperator</span><span class="p">(</span><span class="n">domain_geometry</span><span class="p">,</span> <span class="n">direction</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="n">bnd_cond</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bnd_cond</span><span class="p">)</span>
-    
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ind</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndim</span><span class="p">))</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">correlation</span><span class="o">==</span><span class="n">CORRELATION_SPACE</span> <span class="ow">and</span> <span class="s1">&#39;channel&#39;</span> <span class="ow">in</span> <span class="n">domain_geometry</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-=</span> <span class="mi">1</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ind</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">.</span><span class="n">dimension_labels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;channel&#39;</span><span class="p">))</span>
@@ -247,7 +240,7 @@
         
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Initialised GradientOperator with numpy backend&quot;</span><span class="p">)</span>               
         
-    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span> 
+    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>              
          <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  
              <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">axis_index</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ind</span><span class="p">):</span>
                  <span class="bp">self</span><span class="o">.</span><span class="n">FD</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">axis_index</span>
@@ -279,7 +272,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">FD</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">axis_index</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">FD</span><span class="o">.</span><span class="n">voxel_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">voxel_size_order</span><span class="p">[</span><span class="n">axis_index</span><span class="p">]</span>
                 <span class="n">tmp</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">FD</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
-            <span class="k">return</span> <span class="n">tmp</span> 
+            <span class="k">return</span> <span class="n">tmp</span>    
 
 <span class="kn">import</span> <span class="nn">ctypes</span><span class="o">,</span> <span class="nn">platform</span>
 <span class="kn">from</span> <span class="nn">ctypes</span> <span class="kn">import</span> <span class="n">util</span>
@@ -343,53 +336,45 @@
 <span class="sd">                     on 2D, 3D, 4D ImageData</span>
 <span class="sd">                     under Neumann/Periodic boundary conditions&#39;&#39;&#39;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_geometry</span><span class="p">,</span>  <span class="n">bnd_cond</span> <span class="o">=</span> <span class="n">NEUMANN</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gm_domain</span><span class="p">,</span> <span class="n">gm_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bnd_cond</span> <span class="o">=</span> <span class="n">NEUMANN</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
-        <span class="c1"># Number of threads</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_threads</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;num_threads&#39;</span><span class="p">,</span><span class="n">NUM_THREADS</span><span class="p">)</span>
-        
-        <span class="c1"># Split gradients, e.g., space and channels</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">split</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;split&#39;</span><span class="p">,</span><span class="kc">False</span><span class="p">)</span>
-        
-        <span class="c1"># Consider pseudo 2D geometries with one slice, e.g., (1,voxel_num_y,voxel_num_x)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">is2D</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dom_shape</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ind</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">voxel_size_order</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">size</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="p">):</span>
-            <span class="k">if</span> <span class="n">size</span><span class="o">!=</span><span class="mi">1</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dom_shape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">ind</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">voxel_size_order</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">.</span><span class="n">spacing</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">is2D</span> <span class="o">=</span> <span class="kc">True</span>
-        
-        <span class="c1"># Dimension of domain geometry</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_dom_shape</span><span class="p">)</span>
-                                    
+        <span class="bp">self</span><span class="o">.</span><span class="n">gm_domain</span> <span class="o">=</span> <span class="n">gm_domain</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gm_range</span> <span class="o">=</span> <span class="n">gm_range</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gm_domain</span><span class="o">.</span><span class="n">length</span>
+                
         <span class="c1">#default is &#39;Neumann&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bnd_cond</span> <span class="o">=</span> <span class="mi">0</span>
         
         <span class="k">if</span> <span class="n">bnd_cond</span> <span class="o">==</span> <span class="n">PERIODIC</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">bnd_cond</span> <span class="o">=</span> <span class="mi">1</span>
         
-        <span class="c1"># Define range geometry</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">split</span> <span class="ow">is</span> <span class="kc">True</span> <span class="ow">and</span> <span class="s1">&#39;channel&#39;</span> <span class="ow">in</span> <span class="n">domain_geometry</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
-            <span class="n">range_geometry</span> <span class="o">=</span> <span class="n">BlockGeometry</span><span class="p">(</span><span class="n">domain_geometry</span><span class="p">,</span> <span class="n">BlockGeometry</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">domain_geometry</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndim</span><span class="o">-</span><span class="mi">1</span><span class="p">)]))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">range_geometry</span> <span class="o">=</span> <span class="n">BlockGeometry</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">domain_geometry</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndim</span><span class="p">)])</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">split</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># Domain Geometry = Range Geometry if not stated</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gm_range</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">split</span> <span class="ow">is</span> <span class="kc">True</span> <span class="ow">and</span> <span class="s1">&#39;channel&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gm_domain</span><span class="o">.</span><span class="n">dimension_labels</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">gm_range</span> <span class="o">=</span> <span class="n">BlockGeometry</span><span class="p">(</span><span class="n">gm_domain</span><span class="p">,</span> <span class="n">BlockGeometry</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">gm_domain</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">gm_domain</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)]))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">gm_range</span> <span class="o">=</span> <span class="n">BlockGeometry</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">gm_domain</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">gm_domain</span><span class="o">.</span><span class="n">shape</span><span class="p">))])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">split</span> <span class="o">=</span> <span class="kc">False</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">gm_domain</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="c1"># Voxel size wrt to channel direction == 1.0</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="o">=</span> <span class="n">cilacc</span><span class="o">.</span><span class="n">fdiff4D</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">gm_domain</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="o">=</span> <span class="n">cilacc</span><span class="o">.</span><span class="n">fdiff3D</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">gm_domain</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="o">=</span> <span class="n">cilacc</span><span class="o">.</span><span class="n">fdiff2D</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Number of dimensions not supported, expected 2, 3 or 4, got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">)))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Number of dimensions not supported, expected 2, 3 or 4, got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">gm_domain</span><span class="o">.</span><span class="n">shape</span><span class="p">)))</span>
+        <span class="c1">#get voxel spacing, if not use 1s</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">voxel_size_order</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gm_domain</span><span class="o">.</span><span class="n">spacing</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">voxel_size_order</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gm_domain</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
         
-        <span class="nb">super</span><span class="p">(</span><span class="n">Gradient_C</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">domain_geometry</span><span class="p">,</span> 
-                                         <span class="n">range_geometry</span><span class="o">=</span><span class="n">range_geometry</span><span class="p">)</span> 
+        <span class="nb">super</span><span class="p">(</span><span class="n">Gradient_C</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gm_domain</span><span class="p">,</span> 
+                                             <span class="n">range_geometry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gm_range</span><span class="p">)</span> 
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Initialised GradientOperator with C backend running with &quot;</span><span class="p">,</span> <span class="n">cilacc</span><span class="o">.</span><span class="n">openMPtest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_threads</span><span class="p">),</span><span class="s2">&quot; threads&quot;</span><span class="p">)</span>               
 
     <span class="nd">@staticmethod</span> 
@@ -401,26 +386,25 @@
     <span class="k">def</span> <span class="nf">ndarray_as_c_pointer</span><span class="p">(</span><span class="n">ndx</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">ndx</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">c_float_p</span><span class="p">)</span>
         
-    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span> 
-        
+    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>    
         <span class="n">ndx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
         <span class="n">x_p</span> <span class="o">=</span> <span class="n">Gradient_C</span><span class="o">.</span><span class="n">ndarray_as_c_pointer</span><span class="p">(</span><span class="n">ndx</span><span class="p">)</span>
         
         <span class="n">return_val</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">range_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gm_range</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
             <span class="n">return_val</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">split</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
             <span class="n">ndout</span> <span class="o">=</span> <span class="p">[</span><span class="n">el</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">out</span><span class="o">.</span><span class="n">containers</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">dimension_labels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;channel&#39;</span><span class="p">)</span>
+            <span class="n">ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gm_domain</span><span class="o">.</span><span class="n">dimension_labels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;channel&#39;</span><span class="p">)</span>
             <span class="n">ndout</span> <span class="o">=</span> <span class="p">[</span><span class="n">el</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">containers</span><span class="p">]</span>
             <span class="n">ndout</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span> <span class="c1">#insert channels dc at correct point for channel data</span>
                 
         <span class="c1">#pass list of all arguments</span>
         <span class="n">arg1</span> <span class="o">=</span> <span class="p">[</span><span class="n">Gradient_C</span><span class="o">.</span><span class="n">ndarray_as_c_pointer</span><span class="p">(</span><span class="n">ndout</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ndout</span><span class="p">))]</span>
-        <span class="n">arg2</span> <span class="o">=</span> <span class="p">[</span><span class="n">el</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dom_shape</span><span class="p">]</span>
+        <span class="n">arg2</span> <span class="o">=</span> <span class="p">[</span><span class="n">el</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">]</span>
         <span class="n">args</span> <span class="o">=</span> <span class="n">arg1</span> <span class="o">+</span> <span class="n">arg2</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">bnd_cond</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_threads</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="p">(</span><span class="n">x_p</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
 
@@ -428,12 +412,12 @@
             <span class="k">if</span> <span class="n">el</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">ndout</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/=</span><span class="n">el</span>
 
-        <span class="c1">#fill back out in corerct (non-trivial) order</span>
+        <span class="c1">#fill back out in corerct (non-traivial) order</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">split</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndim</span><span class="p">):</span>
                 <span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">ndout</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">dimension_labels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;channel&#39;</span><span class="p">)</span>
+            <span class="n">ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gm_domain</span><span class="o">.</span><span class="n">dimension_labels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;channel&#39;</span><span class="p">)</span>
             <span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">ndout</span><span class="p">[</span><span class="n">ind</span><span class="p">])</span>
 
             <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
@@ -449,16 +433,16 @@
         
         <span class="n">return_val</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gm_domain</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
             <span class="n">return_val</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="n">ndout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>          
         <span class="n">out_p</span> <span class="o">=</span> <span class="n">Gradient_C</span><span class="o">.</span><span class="n">ndarray_as_c_pointer</span><span class="p">(</span><span class="n">ndout</span><span class="p">)</span>
         
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">split</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span> 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">split</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
             <span class="n">ndx</span> <span class="o">=</span> <span class="p">[</span><span class="n">el</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">containers</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_geometry</span><span class="p">()</span><span class="o">.</span><span class="n">dimension_labels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;channel&#39;</span><span class="p">)</span>
+            <span class="n">ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gm_domain</span><span class="o">.</span><span class="n">dimension_labels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;channel&#39;</span><span class="p">)</span>
             <span class="n">ndx</span> <span class="o">=</span> <span class="p">[</span><span class="n">el</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">containers</span><span class="p">]</span>
             <span class="n">ndx</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span> 
 
@@ -467,7 +451,7 @@
                 <span class="n">ndx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/=</span><span class="n">el</span>
 
         <span class="n">arg1</span> <span class="o">=</span> <span class="p">[</span><span class="n">Gradient_C</span><span class="o">.</span><span class="n">ndarray_as_c_pointer</span><span class="p">(</span><span class="n">ndx</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndim</span><span class="p">)]</span>
-        <span class="n">arg2</span> <span class="o">=</span> <span class="p">[</span><span class="n">el</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dom_shape</span><span class="p">]</span>
+        <span class="n">arg2</span> <span class="o">=</span> <span class="p">[</span><span class="n">el</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">out</span><span class="o">.</span><span class="n">shape</span><span class="p">]</span>
         <span class="n">args</span> <span class="o">=</span> <span class="n">arg1</span> <span class="o">+</span> <span class="n">arg2</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">bnd_cond</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_threads</span><span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="p">(</span><span class="n">out_p</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
@@ -479,11 +463,7 @@
                 <span class="n">ndx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*=</span> <span class="n">el</span>
                 
         <span class="k">if</span> <span class="n">return_val</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">out</span>        
-
-
-
-   
+            <span class="k">return</span> <span class="n">out</span>
 </pre></div>
 
            </div>

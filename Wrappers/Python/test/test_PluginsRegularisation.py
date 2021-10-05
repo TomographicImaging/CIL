@@ -109,4 +109,3 @@ class TestPlugin(unittest.TestCase):
         out = reg.proximal(data, 1)
         outarr = out.as_array()
         np.testing.assert_almost_equal(outarr.imag, outarr.real)
-

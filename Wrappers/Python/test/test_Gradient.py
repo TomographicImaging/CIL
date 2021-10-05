@@ -48,8 +48,6 @@ class TestGradientOperator(unittest.TestCase):
         self.correlation = ['Space','SpaceChannels']
         self.method = ['forward', 'backward', 'centered']
 
-        super(TestGradientOperator, self).__init__(*args, **kwargs)
-
     def print_assertion_info(self, geom = None, bnd = None, backend = None, method = None, corr = None, split = None):
 
         print( " Test Failed ")
@@ -394,4 +392,5 @@ class TestGradientOperator(unittest.TestCase):
                 # test direct numpy vs direct c backends (with and without out)
                 numpy.testing.assert_array_almost_equal(res5[0].as_array(), res1[0].as_array()) 
                 numpy.testing.assert_array_almost_equal(res6[1].as_array(), res2[1].as_array())
+
 

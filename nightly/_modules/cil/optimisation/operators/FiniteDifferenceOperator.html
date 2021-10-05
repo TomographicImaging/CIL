@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cil.optimisation.operators.FiniteDifferenceOperator &mdash; CIL v21.2.0-18-g034b3a71 documentation</title><link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <title>cil.optimisation.operators.FiniteDifferenceOperator &mdash; CIL v21.2.0-19-g4841db97 documentation</title><link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
@@ -27,7 +27,7 @@
             <a href="../../../../index.html" class="icon icon-home"> CIL
           </a>
               <div class="version">
-                v21.2.0-18-g034b3a71
+                v21.2.0-19-g4841db97
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -301,7 +301,9 @@
 
         <span class="k">if</span> <span class="n">outnone</span><span class="p">:</span>                  
             <span class="n">ret</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">outa</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">ret</span>                </div>
+            <span class="k">return</span> <span class="n">ret</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">outa</span><span class="p">)</span>                             </div>
                  
         
 <div class="viewcode-block" id="FiniteDifferenceOperator.adjoint"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.FiniteDifferenceOperator.adjoint">[docs]</a>    <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -446,7 +448,9 @@
             
         <span class="k">if</span> <span class="n">outnone</span><span class="p">:</span>                  
             <span class="n">ret</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">outa</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">ret</span>    </div></div>
+            <span class="k">return</span> <span class="n">ret</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">outa</span><span class="p">)</span>        </div></div>
               
         
     

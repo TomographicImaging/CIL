@@ -48,8 +48,6 @@ class TestGradientOperator(unittest.TestCase):
         self.correlation = ['Space','SpaceChannels']
         self.method = ['forward', 'backward', 'centered']
 
-        super(TestGradientOperator, self).__init__(*args, **kwargs)
-
     def print_assertion_info(self, geom = None, bnd = None, backend = None, method = None, corr = None, split = None):
 
         print( " Test Failed ")

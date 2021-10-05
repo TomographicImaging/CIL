@@ -578,6 +578,15 @@ class TestDataContainer(unittest.TestCase):
         except ValueError as ve:
             print (ve)
             self.assertTrue(True)
+
+    def test_BlockGeometry_allocate_dtype(self):
+        ig1 = ImageGeometry(3,3)
+        ig2 = ImageGeometry(3,3, dtype=numpy.int16)
+        bg = BlockGeometry(ig1,ig2)
+
+        # print("The default dtype of the BlockImageGeometry is {}".format(bg.dtype))   
+        self.assertEqual(bg.dtype, (numpy.float32, numpy.int16))
+
     def dtype_allocate_test(self, geometry):
         classname = geometry.__class__.__name__
         # print("The default dtype of the {} is {}".format(classname , geometry.dtype))
@@ -605,18 +614,16 @@ class TestDataContainer(unittest.TestCase):
         self.assertEqual(data.dtype, numpy.int64)
 
         #print("The dtype of the {} remain unchanged ig.dtype =  {}".format(classname, geometry.dtype))
-        self.assertEqual(geometry.dtype, numpy.complex)  
+        self.assertEqual(geometry.dtype, numpy.complex)
+
+        self.assertNotEqual(id(geometry), id(data.geometry))
+
     def test_ImageGeometry_allocate_dtype(self):
         
         #print("Test ImageGeometry dtype\n")
         ig = ImageGeometry(3,3)
         self.dtype_allocate_test(ig)
-        
-        # bg = BlockGeometry(ig,ig)
-        # print("The default dtype of the BlockImageGeometry is {}".format(bg.dtype))   
-        # self.assertEqual(bg.dtype, tuple([numpy.float32]*len(ig.shape)))
-         
-
+    
     def test_AcquisitionGeometry_allocate_dtype(self):
 
         # print("Test AcquisitionGeometry dtype\n")

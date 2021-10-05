@@ -578,45 +578,48 @@ class TestDataContainer(unittest.TestCase):
         except ValueError as ve:
             print (ve)
             self.assertTrue(True)
+    def dtype_allocate_test(self, geometry):
+        classname = geometry.__class__.__name__
+        # print("The default dtype of the {} is {}".format(classname , geometry.dtype))
+        self.assertEqual(geometry.dtype, numpy.float32)
 
-    def test_ImageGeometry_allocate_dtype(self):
-        
-        print("Test ImageGeometry dtype\n")
-        ig = ImageGeometry(3,3)
-        print("The default dtype of the ImageGeometry is {}".format(ig.dtype))
-        self.assertEqual(ig.dtype, numpy.float32)
-        
-        bg = BlockGeometry(ig,ig)
-        print("The default dtype of the BlockImageGeometry is {}".format(bg.dtype))   
-        self.assertEqual(bg.dtype, tuple([numpy.float32]*len(ig.shape)))
-         
-        print("Change it to complex")
-        ig.dtype = numpy.complex
-        print("The ImageGeometry dtype is now {} ".format(ig.dtype))         
-        self.assertEqual(ig.dtype, numpy.complex)
+        #print("Change it to complex")
+        geometry.dtype = numpy.complex
+        #print("The {} dtype is now {} ".format(classname , geometry.dtype))         
+        self.assertEqual(geometry.dtype, numpy.complex)
 
-        print("Test ImageGeometry allocate")
-        data = ig.allocate()
-        print("Data dtype is now {} ".format(ig.dtype))  
-        self.assertEqual(data.dtype, ig.dtype)
-        print("Data geometry dtype is now")
-        print(data.geometry.dtype)
-        self.assertEqual(data.geometry.dtype, ig.dtype) 
+        #print("Test {} allocate".format(classname ))
+        data = geometry.allocate()
+        #print("Data dtype is now {} ".format(geometry.dtype))  
+        self.assertEqual(data.dtype, geometry.dtype)
+        #print("Data geometry dtype is now")
+        #print(data.geometry.dtype)
+        self.assertEqual(data.geometry.dtype, geometry.dtype) 
 
-        print("Allocate data with different dtype, e.g: numpy.int64 from the same ImageGeometry")
-        data = ig.allocate(dtype=numpy.int64)
+        #print("Allocate data with different dtype, e.g: numpy.int64 from the same {}".format(classname ))
+        data = geometry.allocate(dtype=numpy.int64)
         self.assertEqual(data.dtype, numpy.int64) 
-        print("Data dtype is now {}".format(data.dtype))
-        print("Data geometry dtype is now {}".format(data.geometry.dtype))
+        #print("Data dtype is now {}".format(data.dtype))
+        #print("Data geometry dtype is now {}".format(data.geometry.dtype))
         self.assertEqual(data.geometry.dtype, numpy.int64)
         self.assertEqual(data.dtype, numpy.int64)
 
-        print("The dtype of the ImageGeometry remain unchanged ig.dtype =  {}".format(ig.dtype))
-        self.assertEqual(ig.dtype, numpy.complex)  
+        #print("The dtype of the {} remain unchanged ig.dtype =  {}".format(classname, geometry.dtype))
+        self.assertEqual(geometry.dtype, numpy.complex)  
+    def test_ImageGeometry_allocate_dtype(self):
+        
+        #print("Test ImageGeometry dtype\n")
+        ig = ImageGeometry(3,3)
+        self.dtype_allocate_test(ig)
+        
+        # bg = BlockGeometry(ig,ig)
+        # print("The default dtype of the BlockImageGeometry is {}".format(bg.dtype))   
+        # self.assertEqual(bg.dtype, tuple([numpy.float32]*len(ig.shape)))
+         
 
     def test_AcquisitionGeometry_allocate_dtype(self):
 
-        print("Test AcquisitionGeometry dtype\n")
+        # print("Test AcquisitionGeometry dtype\n")
         # Detectors
         detectors =  10
 
@@ -627,64 +630,35 @@ class TestDataContainer(unittest.TestCase):
         ag = AcquisitionGeometry.create_Parallel2D()\
                                 .set_angles(angles)\
                                 .set_panel(detectors, pixel_size=0.1)                                
-        print("The default dtype of the AcquisitionGeometry is {}".format(ag.dtype))  
-        self.assertEqual(ag.dtype, numpy.float32)      
-                 
-        print("Change it to complex")
-        ag.dtype = numpy.complex
-        print("The AcquisitionGeometry dtype is now {} ".format(ag.dtype))         
-        self.assertEqual(ag.dtype, numpy.complex)
-
-        print("Test AcquisitionGeometry allocate")
-        data = ag.allocate()
-        print("Data dtype is now {} ".format(ag.dtype))  
-        self.assertEqual(data.dtype, ag.dtype)
-        print("Data geometry dtype is now")
-        print(data.geometry.dtype)
-        self.assertEqual(data.geometry.dtype, ag.dtype) 
-
-        print("The dtype of the AcquisitionGeometry remain unchanged ag.dtype =  {}".format(ag.dtype))
-        self.assertEqual(ag.dtype, numpy.complex)         
+        self.dtype_allocate_test(ag)         
 
     def test_VectorGeometry_allocate_dtype(self):
 
-        print("Test VectorGeometry dtype\n")
+        # print("Test VectorGeometry dtype\n")
 
         vg = VectorGeometry(3)
-        print("The default dtype of the VectorGeometry is {}".format(vg.dtype))  
-        self.assertEqual(vg.dtype, numpy.float32)      
-                 
-        print("Change it to complex")
-        vg.dtype = numpy.complex
-        print("The VectorGeometry dtype is now {} ".format(vg.dtype))         
-        self.assertEqual(vg.dtype, numpy.complex)
+        self.dtype_allocate_test(vg)
 
-        print("Test VectorGeometry allocate")
-        data = vg.allocate()
-        print("Data dtype is now {} ".format(vg.dtype))  
-        self.assertEqual(data.dtype, vg.dtype)
-        print("Data geometry dtype is now")
-        print(data.geometry.dtype)
-        self.assertEqual(data.geometry.dtype, vg.dtype) 
-
-        print("The dtype of the VectorGeometry remain unchanged ag.dtype =  {}".format(vg.dtype))
-        self.assertEqual(vg.dtype, numpy.complex)  
-
-    def test_ImageGeometry_allocate_complex(self):
-
-        ig = ImageGeometry(2,2)
-        data = ig.allocate(dtype=numpy.complex)
+    def complex_allocate_geometry_test(self, geometry):
+        data = geometry.allocate(dtype=numpy.complex)
         print("Allocate complex array to a complex geometry")
         r = (1 + 1j*1)* numpy.ones(data.shape, dtype=data.dtype)
         data.fill(r)
         self.assertAlmostEqual(data.squared_norm(), data.size * 2)  
         numpy.testing.assert_almost_equal(data.abs().array, numpy.abs(r))              
 
-        data1 = ig.allocate(dtype=numpy.float32)
+        data1 = geometry.allocate(dtype=numpy.float32)
         try:
             data1.fill(r)
+            self.assertTrue(False)
         except TypeError as err:
             print(err)    
+            self.assertTrue(True)
+
+    def test_ImageGeometry_allocate_complex(self):
+
+        ig = ImageGeometry(2,2)
+        self.complex_allocate_geometry_test(ig)
 
     def test_AcquisitionGeometry_allocate_complex(self):
 
@@ -699,31 +673,12 @@ class TestDataContainer(unittest.TestCase):
                                 .set_angles(angles)\
                                 .set_panel(detectors, pixel_size=0.1)   
 
-        data = ag.allocate(dtype=numpy.complex64)
-        r = (1 + 1j)* numpy.ones(data.shape, dtype=data.dtype)
-        data.fill(r)
-        numpy.testing.assert_almost_equal(data.abs().array, numpy.abs(r))      
-
-        data1 = ag.allocate(dtype=numpy.float32)
-        try:
-            data1.fill(r)
-        except TypeError as err:
-            print(err) 
+        self.complex_allocate_geometry_test(ag)
 
     def test_VectorGeometry_allocate_complex(self):
 
         vg = VectorGeometry(3)
-        data = vg.allocate(dtype=numpy.complex)
-        print("Allocate complex array to a complex geometry")
-        r = (1 + 1j*1)* numpy.ones(data.shape, dtype=data.dtype)
-        data.fill(r)
-        numpy.testing.assert_almost_equal(data.abs().array, numpy.abs(r))          
-
-        data1 = vg.allocate(dtype=numpy.float32)
-        try:
-            data1.fill(r)
-        except TypeError as err:
-            print(err)                         
+        self.complex_allocate_geometry_test(vg)
         
     def test_ImageGeometry_allocate_random_same_seed(self):
         vgeometry = ImageGeometry(voxel_num_x=4, voxel_num_y=3, channels=2)

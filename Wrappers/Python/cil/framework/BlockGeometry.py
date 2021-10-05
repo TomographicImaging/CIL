@@ -14,7 +14,8 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-
+import numpy
+from numbers import Number
 import functools
 from cil.framework import BlockDataContainer
 
@@ -22,7 +23,9 @@ class BlockGeometry(object):
     
     RANDOM = 'random'
     RANDOM_INT = 'random_int'
-        
+    
+    
+    
     '''Class to hold Geometry as column vector'''
     #__array_priority__ = 1
     def __init__(self, *args, **kwargs):
@@ -44,12 +47,11 @@ class BlockGeometry(object):
         '''returns the Geometry in the BlockGeometry located at position index'''
         return self.geometries[index]            
 
-    def allocate(self, value=0, **kwargs):
-
-        '''Allocates a BlockDataContainer according to geometries contained in the BlockGeometry'''
+    def allocate(self, value=0, dimension_labels=None, **kwargs):
         
+        max_value = kwargs.get('max_value', 100)
         symmetry = kwargs.get('symmetry',False)        
-        containers = [geom.allocate(value) for geom in self.geometries]
+        containers = [geom.allocate(value, max_value = max_value) for geom in self.geometries]
         
         if symmetry == True:
                         

@@ -226,9 +226,7 @@ class FiniteDifferenceOperator(LinearOperator):
 
         if outnone:                  
             ret.fill(outa)
-            return ret
-        else:
-            out.fill(outa)               
+            return ret                
                  
         
     def adjoint(self, x, out=None):
@@ -373,9 +371,7 @@ class FiniteDifferenceOperator(LinearOperator):
             
         if outnone:                  
             ret.fill(outa)
-            return ret
-        else:
-            out.fill(outa)      
+            return ret    
               
         
     

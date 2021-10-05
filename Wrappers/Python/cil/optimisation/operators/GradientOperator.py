@@ -17,7 +17,7 @@
 
 from cil.optimisation.operators import LinearOperator
 from cil.optimisation.operators import FiniteDifferenceOperator
-from cil.framework import BlockGeometry
+from cil.framework import ImageGeometry, BlockGeometry
 import warnings
 from cil.utilities.multiprocessing import NUM_THREADS
 import numpy as np
@@ -74,18 +74,15 @@ class GradientOperator(LinearOperator):
         """Constructor method
         """        
         
-        # Default backend = C
         backend = kwargs.get('backend',C)
 
-        # Default correlation for the gradient coupling
         correlation = kwargs.get('correlation',CORRELATION_SPACE)
-                
-        # Space correlation on multichannel data call numpy backend
+
         if correlation == CORRELATION_SPACE and domain_geometry.channels > 1:
             #numpy implementation only for now
             backend = NUMPY
             warnings.warn("Warning: correlation='Space' on multi-channel dataset will use `numpy` backend")
-        
+           
         if method != 'forward':
             backend = NUMPY
             warnings.warn("Warning: method = {} implemented on `numpy` backend. Other methods are backward/centered.".format(method))            
@@ -97,6 +94,10 @@ class GradientOperator(LinearOperator):
         
         super(GradientOperator, self).__init__(domain_geometry=domain_geometry, 
                                        range_geometry=self.operator.range_geometry()) 
+
+        self.gm_range = self.range_geometry()
+        self.gm_domain = self.domain_geometry()
+
 
     def direct(self, x, out=None):
         """Computes the first-order forward differences
@@ -134,27 +135,19 @@ class Gradient_numpy(LinearOperator):
         :type bnd_cond: str, optional, default :code:`Neumann`
         :param correlation: optional, :code:`SpaceChannel` or :code:`Space`
         :type correlation: str, optional, default :code:`Space`
-        '''             
+        '''                
         
-        # Consider pseudo 2D geometries with one slice, e.g., (1,voxel_num_y,voxel_num_x)
-        tmp_dom_shape = []
-        self.ind = []
-        for i, size in enumerate(list(domain_geometry.shape) ):
-            if size!=1:
-                tmp_dom_shape.append(size)
-                self.ind.append(i)
-     
-        # Dimension of domain geometry        
-        self.ndim = len(tmp_dom_shape) 
-
-        # Default correlation for the gradient coupling
+        self.size_dom_gm = len(domain_geometry.shape)         
         self.correlation = kwargs.get('correlation',CORRELATION_SPACE)        
         self.bnd_cond = bnd_cond 
         
-        # Call FiniteDifference operator 
+        # Call FiniteDiff operator 
         self.method = method
         self.FD = FiniteDifferenceOperator(domain_geometry, direction = 0, method = self.method, bnd_cond = self.bnd_cond)
-    
+        
+        self.ndim = len(domain_geometry.shape)
+        self.ind = list(range(self.ndim))
+
         if self.correlation==CORRELATION_SPACE and 'channel' in domain_geometry.dimension_labels:
             self.ndim -= 1
             self.ind.remove(domain_geometry.dimension_labels.index('channel'))
@@ -172,7 +165,7 @@ class Gradient_numpy(LinearOperator):
         
         print("Initialised GradientOperator with numpy backend")               
         
-    def direct(self, x, out=None): 
+    def direct(self, x, out=None):              
          if out is not None:  
              for i, axis_index in enumerate(self.ind):
                  self.FD.direction = axis_index
@@ -204,7 +197,7 @@ class Gradient_numpy(LinearOperator):
                 self.FD.direction = axis_index
                 self.FD.voxel_size = self.voxel_size_order[axis_index]
                 tmp += self.FD.adjoint(x.get_item(i))
-            return tmp 
+            return tmp    
 
 import ctypes, platform
 from ctypes import util
@@ -268,53 +261,45 @@ class Gradient_C(LinearOperator):
                      on 2D, 3D, 4D ImageData
                      under Neumann/Periodic boundary conditions'''
 
-    def __init__(self, domain_geometry,  bnd_cond = NEUMANN, **kwargs):
+    def __init__(self, gm_domain, gm_range=None, bnd_cond = NEUMANN, **kwargs):
 
-        # Number of threads
         self.num_threads = kwargs.get('num_threads',NUM_THREADS)
-        
-        # Split gradients, e.g., space and channels
         self.split = kwargs.get('split',False)
-        
-        # Consider pseudo 2D geometries with one slice, e.g., (1,voxel_num_y,voxel_num_x)
-        self.is2D = False
-        self.tmp_dom_shape = []
-        self.ind = []
-        self.voxel_size_order = []
-        for i, size in enumerate(list(domain_geometry.shape) ):
-            if size!=1:
-                self.tmp_dom_shape.append(size)
-                self.ind.append(i)
-                self.voxel_size_order.append(domain_geometry.spacing[i])
-                self.is2D = True
-        
-        # Dimension of domain geometry
-        self.ndim = len(self.tmp_dom_shape)
-                                    
+        self.gm_domain = gm_domain
+        self.gm_range = gm_range
+        self.ndim = self.gm_domain.length
+                
         #default is 'Neumann'
         self.bnd_cond = 0
         
         if bnd_cond == PERIODIC:
             self.bnd_cond = 1
         
-        # Define range geometry
-        if self.split is True and 'channel' in domain_geometry.dimension_labels:
-            range_geometry = BlockGeometry(domain_geometry, BlockGeometry(*[domain_geometry for _ in range(self.ndim-1)]))
-        else:
-            range_geometry = BlockGeometry(*[domain_geometry for _ in range(self.ndim)])
-            self.split = False
+        # Domain Geometry = Range Geometry if not stated
+        if self.gm_range is None:
+            if self.split is True and 'channel' in self.gm_domain.dimension_labels:
+                self.gm_range = BlockGeometry(gm_domain, BlockGeometry(*[gm_domain for _ in range(len(gm_domain.shape)-1)]))
+            else:
+                self.gm_range = BlockGeometry(*[gm_domain for _ in range(len(gm_domain.shape))])
+                self.split = False
 
-        if self.ndim == 4:
+        if len(gm_domain.shape) == 4:
+            # Voxel size wrt to channel direction == 1.0
             self.fd = cilacc.fdiff4D
-        elif self.ndim == 3:
+        elif len(gm_domain.shape) == 3:
             self.fd = cilacc.fdiff3D
-        elif self.ndim == 2:
+        elif len(gm_domain.shape) == 2:
             self.fd = cilacc.fdiff2D
         else:
-            raise ValueError('Number of dimensions not supported, expected 2, 3 or 4, got {}'.format(len(domain_geometry.shape)))
+            raise ValueError('Number of dimensions not supported, expected 2, 3 or 4, got {}'.format(len(gm_domain.shape)))
+        #get voxel spacing, if not use 1s
+        try:
+            self.voxel_size_order = list(self.gm_domain.spacing)
+        except:
+            self.voxel_size_order = [1]*len(self.gm_domain.shape)
         
-        super(Gradient_C, self).__init__(domain_geometry=domain_geometry, 
-                                         range_geometry=range_geometry) 
+        super(Gradient_C, self).__init__(domain_geometry=self.gm_domain, 
+                                             range_geometry=self.gm_range) 
         print("Initialised GradientOperator with C backend running with ", cilacc.openMPtest(self.num_threads)," threads")               
 
     @staticmethod 
@@ -326,26 +311,25 @@ class Gradient_C(LinearOperator):
     def ndarray_as_c_pointer(ndx):
         return ndx.ctypes.data_as(c_float_p)
         
-    def direct(self, x, out=None): 
-        
+    def direct(self, x, out=None):    
         ndx = np.asarray(x.as_array(), dtype=np.float32, order='C')
         x_p = Gradient_C.ndarray_as_c_pointer(ndx)
         
         return_val = False
         if out is None:
-            out = self.range_geometry().allocate(None)
+            out = self.gm_range.allocate(None)
             return_val = True
 
         if self.split is False:
             ndout = [el.as_array() for el in out.containers]
         else:
-            ind = self.domain_geometry().dimension_labels.index('channel')
+            ind = self.gm_domain.dimension_labels.index('channel')
             ndout = [el.as_array() for el in out.get_item(1).containers]
             ndout.insert(ind, out.get_item(0).as_array()) #insert channels dc at correct point for channel data
                 
         #pass list of all arguments
         arg1 = [Gradient_C.ndarray_as_c_pointer(ndout[i]) for i in range(len(ndout))]
-        arg2 = [el for el in self.tmp_dom_shape]
+        arg2 = [el for el in x.shape]
         args = arg1 + arg2 + [self.bnd_cond, 1, self.num_threads]
         self.fd(x_p, *args)
 
@@ -353,12 +337,12 @@ class Gradient_C(LinearOperator):
             if el != 1:
                 ndout[i]/=el
 
-        #fill back out in corerct (non-trivial) order
+        #fill back out in corerct (non-traivial) order
         if self.split is False:
             for i in range(self.ndim):
                 out.get_item(i).fill(ndout[i])
         else:
-            ind = self.domain_geometry().dimension_labels.index('channel')
+            ind = self.gm_domain.dimension_labels.index('channel')
             out.get_item(0).fill(ndout[ind])
 
             j = 0
@@ -374,16 +358,16 @@ class Gradient_C(LinearOperator):
         
         return_val = False
         if out is None:
-            out = self.domain_geometry().allocate(None)
+            out = self.gm_domain.allocate(None)
             return_val = True
 
         ndout = np.asarray(out.as_array(), dtype=np.float32, order='C')          
         out_p = Gradient_C.ndarray_as_c_pointer(ndout)
         
-        if self.split is False: 
+        if self.split is False:
             ndx = [el.as_array() for el in x.containers]
         else:
-            ind = self.domain_geometry().dimension_labels.index('channel')
+            ind = self.gm_domain.dimension_labels.index('channel')
             ndx = [el.as_array() for el in x.get_item(1).containers]
             ndx.insert(ind, x.get_item(0).as_array()) 
 
@@ -392,7 +376,7 @@ class Gradient_C(LinearOperator):
                 ndx[i]/=el
 
         arg1 = [Gradient_C.ndarray_as_c_pointer(ndx[i]) for i in range(self.ndim)]
-        arg2 = [el for el in self.tmp_dom_shape]
+        arg2 = [el for el in out.shape]
         args = arg1 + arg2 + [self.bnd_cond, 0, self.num_threads]
 
         self.fd(out_p, *args)
@@ -404,8 +388,4 @@ class Gradient_C(LinearOperator):
                 ndx[i]*= el
                 
         if return_val is True:
-            return out        
-
-
-
-   
+            return out

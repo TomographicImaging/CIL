@@ -26,7 +26,7 @@ class BlockGeometry(object):
     @property
     def dtype(self):
         return tuple(i.dtype for i in self.geometries)
-    
+          
     '''Class to hold Geometry as column vector'''
     #__array_priority__ = 1
     def __init__(self, *args, **kwargs):
@@ -50,6 +50,11 @@ class BlockGeometry(object):
         
         symmetry = kwargs.get('symmetry',False)        
         containers = [geom.allocate(value, **kwargs) for geom in self.geometries]
+
+        '''Allocates a BlockDataContainer according to geometries contained in the BlockGeometry'''
+        
+        symmetry = kwargs.get('symmetry',False)        
+        containers = [geom.allocate(value) for geom in self.geometries]
         
         if symmetry == True:
                         

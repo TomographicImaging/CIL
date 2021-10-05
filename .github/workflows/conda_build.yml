@@ -22,6 +22,6 @@ jobs:
       uses: paskino/conda-package-publish-action@v1.4.1
       with:
         subDir: 'recipe'
-        channels: 'conda-forge -c astra-toolbox/label/dev -c cvxgrp -c ccpi'
+        channels: 'conda-forge -c intel -c astra-toolbox/label/dev -c cvxgrp -c ccpi'
         convert_win: false
         convert_osx: false

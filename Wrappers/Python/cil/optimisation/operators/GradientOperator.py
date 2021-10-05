@@ -345,7 +345,7 @@ class Gradient_C(LinearOperator):
                 
         #pass list of all arguments
         arg1 = [Gradient_C.ndarray_as_c_pointer(ndout[i]) for i in range(len(ndout))]
-        arg2 = [el for el in self.domai_shape]
+        arg2 = [el for el in self.domain_shape]
         args = arg1 + arg2 + [self.bnd_cond, 1, self.num_threads]
         self.fd(x_p, *args)
 

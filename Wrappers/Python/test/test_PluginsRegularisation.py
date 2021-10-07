@@ -132,27 +132,28 @@ class TestPlugin(unittest.TestCase):
         # Anisotropic FGP_TV CCPiReg toolkit (cpu)
         TV_regtoolkit_cpu_aniso = alpha * FGP_TV(max_iteration=iterations, device = 'cpu', isotropic=False)
 
-        # Isotropic FGP_TV CCPiReg toolkit (gpu)
-        TV_regtoolkit_gpu_iso = alpha * FGP_TV(max_iteration=iterations, device = 'gpu') 
-
-        # Anisotropic FGP_TV CCPiReg toolkit (gpu)
-        TV_regtoolkit_gpu_aniso = alpha * FGP_TV(max_iteration=iterations, device = 'gpu', isotropic=False)  
-
         res_TV_cil_iso = TV_cil_iso.proximal(self.data, tau=1.0)
         res_TV_cil_aniso = TV_cil_aniso.proximal(self.data, tau=1.0)
         res_TV_regtoolkit_cpu_iso = TV_regtoolkit_cpu_iso.proximal(self.data, tau=1.0)
-        res_TV_regtoolkit_cpu_aniso = TV_regtoolkit_cpu_aniso.proximal(self.data, tau=1.0)
-        res_TV_regtoolkit_gpu_iso = TV_regtoolkit_gpu_iso.proximal(self.data, tau=1.0)
-        res_TV_regtoolkit_gpu_aniso = TV_regtoolkit_gpu_aniso.proximal(self.data, tau=1.0)    
+        res_TV_regtoolkit_cpu_aniso = TV_regtoolkit_cpu_aniso.proximal(self.data, tau=1.0)  
 
-        # compare TV vs FGP_TV (isotropic, cpu, gpu)
-        numpy.testing.assert_array_almost_equal(res_TV_cil_iso.array, res_TV_regtoolkit_cpu_iso.array, decimal=3)
+        # compare TV vs FGP_TV (anisotropic, isotropic, cpu)
+        numpy.testing.assert_array_almost_equal(res_TV_cil_iso.array, res_TV_regtoolkit_cpu_iso.array, decimal=3)              
+        numpy.testing.assert_array_almost_equal(res_TV_cil_aniso.array, res_TV_regtoolkit_cpu_aniso.array, decimal=3)
+       
         if has_nvidia:
+
+            # Isotropic FGP_TV CCPiReg toolkit (gpu)
+            TV_regtoolkit_gpu_iso = alpha * FGP_TV(max_iteration=iterations, device = 'gpu') 
+
+            # Anisotropic FGP_TV CCPiReg toolkit (gpu)
+            TV_regtoolkit_gpu_aniso = alpha * FGP_TV(max_iteration=iterations, device = 'gpu', isotropic=False)  
+
+            res_TV_regtoolkit_gpu_iso = TV_regtoolkit_gpu_iso.proximal(self.data, tau=1.0)
+            res_TV_regtoolkit_gpu_aniso = TV_regtoolkit_gpu_aniso.proximal(self.data, tau=1.0)   
+
             numpy.testing.assert_array_almost_equal(res_TV_cil_iso.array, res_TV_regtoolkit_gpu_iso.array, decimal=3)
             numpy.testing.assert_array_almost_equal(res_TV_regtoolkit_cpu_iso.array, res_TV_regtoolkit_gpu_iso.array, decimal=3)
 
-        # compare TV vs FGP_TV (anisotropic, cpu, gpu)
-        numpy.testing.assert_array_almost_equal(res_TV_cil_aniso.array, res_TV_regtoolkit_cpu_aniso.array, decimal=3)
-        if has_nvidia:
             numpy.testing.assert_array_almost_equal(res_TV_cil_aniso.array, res_TV_regtoolkit_gpu_aniso.array, decimal=3)
-            numpy.testing.assert_array_almost_equal(res_TV_regtoolkit_cpu_aniso.array, res_TV_regtoolkit_gpu_aniso.array, decimal=3)        
+            numpy.testing.assert_array_almost_equal(res_TV_regtoolkit_cpu_aniso.array, res_TV_regtoolkit_gpu_aniso.array, decimal=3)    

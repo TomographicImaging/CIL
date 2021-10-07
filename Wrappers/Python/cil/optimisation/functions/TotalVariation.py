@@ -15,11 +15,9 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from cil.optimisation.functions import Function, MixedL21Norm, IndicatorBox
+from cil.optimisation.functions import Function, IndicatorBox
 from cil.optimisation.operators import GradientOperator
 import numpy 
-import functools
-import numpy as np
 from numbers import Number
 import warnings
 
@@ -64,6 +62,7 @@ class TotalVariation(Function):
                  backend = "c",
                  lower = -numpy.inf, 
                  upper = numpy.inf,
+                 isotropic = True,
                  info = False):
         
 
@@ -77,9 +76,8 @@ class TotalVariation(Function):
         # Tolerance for FGP_TV
         self.tolerance = tolerance
         
-        # Define (ISOTROPIC) Total variation penalty ( Note it is without the regularisation paremeter)
-        # TODO add anisotropic???
-        self.TV = MixedL21Norm() 
+        # Total variation correlation (isotropic=Default)
+        self.isotropic = isotropic
         
         # correlation space or spacechannels
         self.correlation = correlation
@@ -90,7 +88,7 @@ class TotalVariation(Function):
         self.upper = upper
         self.tmp_proj_C = IndicatorBox(lower, upper).proximal
                         
-#         Setup GradientOperator as None. This is to avoid domain argument in the __init__     
+        # Setup GradientOperator as None. This is to avoid domain argument in the __init__     
 
         self._gradient = None
         self._domain = None
@@ -115,7 +113,10 @@ class TotalVariation(Function):
         r''' Returns the value of the \alpha * TV(x)'''
         self._domain = x.geometry
         # evaluate objective function of TV gradient
-        return self.regularisation_parameter * self.TV(self.gradient.direct(x))
+        if self.isotropic:
+            self.regularisation_parameter * self.gradient.direct(x).pnorm(2)
+        else:
+            self.regularisation_parameter * self.gradient.direct(x).pnorm(1)   
     
     
     def projection_C(self, x, out=None):   
@@ -135,16 +136,23 @@ class TotalVariation(Function):
         tmp1 = self.pptmp1
         tmp1 *= 0
         
-
-        for i,el in enumerate(x.containers):
-            el.multiply(el, out=tmp)
-            tmp1.add(tmp, out=tmp1)
-        tmp1.sqrt(out=tmp1)
-        tmp1.maximum(1.0, out=tmp1)
-        if out is None:
-            return x.divide(tmp1)
+        if self.isotropic:
+            for el in x.containers:
+                el.multiply(el, out=tmp)
+                tmp1.add(tmp, out=tmp1)
+            tmp1.sqrt(out=tmp1)
+            tmp1.maximum(1.0, out=tmp1)
+            if out is None:
+                return x.divide(tmp1)
+            else:
+                x.divide(tmp1, out=out)
         else:
-            x.divide(tmp1, out=out)
+            tmp1 = x.abs()
+            tmp1.maximum(1.0, out=tmp1) 
+            if out is None:
+                return x.divide(tmp1)
+            else:
+                x.divide(tmp1, out=out)                   
     
     
     def proximal(self, x, tau, out = None):
@@ -171,7 +179,7 @@ class TotalVariation(Function):
             self.projection_C(tmp_x, out = tmp_x)                       
 
             self.gradient.direct(tmp_x, out=p1)
-            if isinstance (tau, (Number, np.float32, np.float64)):
+            if isinstance (tau, (Number, numpy.float32, numpy.float64)):
                 p1 *= self.L/(self.regularisation_parameter * tau)
             else:
                 p1 *= self.L/self.regularisation_parameter
@@ -195,7 +203,6 @@ class TotalVariation(Function):
                 self.pptmp1 = self.pptmp.copy()
 
             self.projection_P(p1, out=p1)
-            
             
 
             t = (1 + numpy.sqrt(1 + 4 * t0 ** 2)) / 2
@@ -225,7 +232,7 @@ class TotalVariation(Function):
             self.gradient.adjoint(tmp_q, out=tmp_x)
             tmp_x *= tau
             tmp_x *= self.regularisation_parameter 
-            x.subtract(tmp_x, out=tmp_x)
+            x.subtract(tmp_x, out=tmp_x)            
             return self.projection_C(tmp_x)
         else:          
             self.gradient.adjoint(tmp_q, out = out)

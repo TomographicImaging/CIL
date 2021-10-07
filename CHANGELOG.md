@@ -1,4 +1,5 @@
 * 21.2.1
+  - Add anisotropy in TotalVariation function
   - Fix GradientOperator to handle pseudo 2D CIL geometries
   - Created Reconstructor base class for simpler use of CIL methods
   - Added Intel IPP based library for filtering step of FBP

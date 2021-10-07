@@ -18,9 +18,7 @@
 import unittest
 import numpy
 from cil.utilities import dataexample
-from timeit import default_timer as timer
 from cil.optimisation.functions import TotalVariation
-
 
 try:
     from ccpi.filters import regularisers
@@ -30,6 +28,22 @@ try:
 except ImportError as ie:
     has_regularisation_toolkit = False
 print ("has_regularisation_toolkit", has_regularisation_toolkit)
+
+import subprocess
+
+def has_nvidia():
+    
+    try:
+        subprocess.check_output('nvidia-smi')
+        has_gpu=True
+    except:
+        print("No nvidia available")
+        has_gpu = False
+    return has_gpu    
+
+
+
+
 
 class TestPlugin(unittest.TestCase):
     def setUp(self):
@@ -133,10 +147,12 @@ class TestPlugin(unittest.TestCase):
 
         # compare TV vs FGP_TV (isotropic, cpu, gpu)
         numpy.testing.assert_array_almost_equal(res_TV_cil_iso.array, res_TV_regtoolkit_cpu_iso.array, decimal=3)
-        numpy.testing.assert_array_almost_equal(res_TV_cil_iso.array, res_TV_regtoolkit_gpu_iso.array, decimal=3)
-        numpy.testing.assert_array_almost_equal(res_TV_regtoolkit_cpu_iso.array, res_TV_regtoolkit_gpu_iso.array, decimal=3)
+        if has_nvidia:
+            numpy.testing.assert_array_almost_equal(res_TV_cil_iso.array, res_TV_regtoolkit_gpu_iso.array, decimal=3)
+            numpy.testing.assert_array_almost_equal(res_TV_regtoolkit_cpu_iso.array, res_TV_regtoolkit_gpu_iso.array, decimal=3)
 
         # compare TV vs FGP_TV (anisotropic, cpu, gpu)
         numpy.testing.assert_array_almost_equal(res_TV_cil_aniso.array, res_TV_regtoolkit_cpu_aniso.array, decimal=3)
-        numpy.testing.assert_array_almost_equal(res_TV_cil_aniso.array, res_TV_regtoolkit_gpu_aniso.array, decimal=3)
-        numpy.testing.assert_array_almost_equal(res_TV_regtoolkit_cpu_aniso.array, res_TV_regtoolkit_gpu_aniso.array, decimal=3)        
+        if has_nvidia:
+            numpy.testing.assert_array_almost_equal(res_TV_cil_aniso.array, res_TV_regtoolkit_gpu_aniso.array, decimal=3)
+            numpy.testing.assert_array_almost_equal(res_TV_regtoolkit_cpu_aniso.array, res_TV_regtoolkit_gpu_aniso.array, decimal=3)        

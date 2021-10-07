@@ -15,17 +15,11 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import sys
 import unittest
 import numpy
-import numpy as np
-from cil.framework import DataContainer
-from cil.framework import ImageData
-from cil.framework import AcquisitionData
-from cil.framework import ImageGeometry
-from cil.framework import AcquisitionGeometry
 from cil.utilities import dataexample
 from timeit import default_timer as timer
+from cil.optimisation.functions import TotalVariation
 
 
 try:
@@ -43,8 +37,10 @@ print ("has_regularisation_toolkit", has_regularisation_toolkit)
 
 class TestPlugin(unittest.TestCase):
     def setUp(self):
-        print ("test plugins")
-        pass
+
+        #Default test image
+        self.data = dataexample.SIMPLE_PHANTOM_2D.get(size=(64,64))
+
     def tearDown(self):
         pass
     @unittest.skipUnless(has_regularisation_toolkit, "Skipping as CCPi Regularisation Toolkit is not installed")
@@ -99,13 +95,53 @@ class TestPlugin(unittest.TestCase):
             assert False
     @unittest.skipUnless(has_regularisation_toolkit, "Skipping as CCPi Regularisation Toolkit is not installed")
     def test_FGP_TV_complex(self):
-        data = dataexample.CAMERA.get(size=(256,256))
-        datarr = data.as_array()
-        cmpx = np.zeros(data.shape, dtype=np.complex)
+        # data = dataexample.CAMERA.get(size=(256,256))
+        datarr = self.data.as_array()
+        cmpx = numpy.zeros(self.data.shape, dtype=numpy.complex)
         cmpx.real = datarr[:]
         cmpx.imag = datarr[:]
-        data.array = cmpx
+        self.data.array = cmpx
         reg = FGP_TV()
-        out = reg.proximal(data, 1)
+        out = reg.proximal(self.data, 1)
         outarr = out.as_array()
-        np.testing.assert_almost_equal(outarr.imag, outarr.real)
+        numpy.testing.assert_almost_equal(outarr.imag, outarr.real)
+
+    def test_TotalVariation_vs_FGP_TV(self):
+
+        alpha = 2.0
+        iterations = 500
+
+        # Isotropic TV cil
+        TV_cil_iso = alpha * TotalVariation(max_iteration=iterations)
+
+        # Anisotropic TV cil
+        TV_cil_aniso = alpha * TotalVariation(max_iteration=iterations, isotropic=False)
+
+        # Isotropic FGP_TV CCPiReg toolkit (cpu)
+        TV_regtoolkit_cpu_iso = alpha * FGP_TV(max_iteration=iterations, device = 'cpu')
+
+        # Anisotropic FGP_TV CCPiReg toolkit (cpu)
+        TV_regtoolkit_cpu_aniso = alpha * FGP_TV(max_iteration=iterations, device = 'cpu', isotropic=False)
+
+        # Isotropic FGP_TV CCPiReg toolkit (gpu)
+        TV_regtoolkit_gpu_iso = alpha * FGP_TV(max_iteration=iterations, device = 'gpu') 
+
+        # Anisotropic FGP_TV CCPiReg toolkit (gpu)
+        TV_regtoolkit_gpu_aniso = alpha * FGP_TV(max_iteration=iterations, device = 'gpu', isotropic=False)  
+
+        res_TV_cil_iso = TV_cil_iso.proximal(self.data, tau=1.0)
+        res_TV_cil_aniso = TV_cil_aniso.proximal(self.data, tau=1.0)
+        res_TV_regtoolkit_cpu_iso = TV_regtoolkit_cpu_iso.proximal(self.data, tau=1.0)
+        res_TV_regtoolkit_cpu_aniso = TV_regtoolkit_cpu_aniso.proximal(self.data, tau=1.0)
+        res_TV_regtoolkit_gpu_iso = TV_regtoolkit_gpu_iso.proximal(self.data, tau=1.0)
+        res_TV_regtoolkit_gpu_aniso = TV_regtoolkit_gpu_aniso.proximal(self.data, tau=1.0)    
+
+        # compare TV vs FGP_TV (isotropic, cpu, gpu)
+        numpy.testing.assert_array_almost_equal(res_TV_cil_iso.array, res_TV_regtoolkit_cpu_iso.array, decimal=3)
+        numpy.testing.assert_array_almost_equal(res_TV_cil_iso.array, res_TV_regtoolkit_gpu_iso.array, decimal=3)
+        numpy.testing.assert_array_almost_equal(res_TV_regtoolkit_cpu_iso.array, res_TV_regtoolkit_gpu_iso.array, decimal=3)
+
+        # compare TV vs FGP_TV (anisotropic, cpu, gpu)
+        numpy.testing.assert_array_almost_equal(res_TV_cil_aniso.array, res_TV_regtoolkit_cpu_aniso.array, decimal=3)
+        numpy.testing.assert_array_almost_equal(res_TV_cil_aniso.array, res_TV_regtoolkit_gpu_aniso.array, decimal=3)
+        numpy.testing.assert_array_almost_equal(res_TV_regtoolkit_cpu_aniso.array, res_TV_regtoolkit_gpu_aniso.array, decimal=3)        

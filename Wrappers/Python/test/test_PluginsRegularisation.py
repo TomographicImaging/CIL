@@ -28,10 +28,6 @@ try:
     from cil.plugins.ccpi_regularisation.functions import FGP_TV
     has_regularisation_toolkit = True
 except ImportError as ie:
-    # raise ImportError(ie + "\n\n" + 
-    #                   "This plugin requires the additional package ccpi-regularisation\n" +
-    #                   "Please install it via conda as ccpi-regularisation from the ccpi channel\n"+
-    #                   "Minimal version is 20.04")
     has_regularisation_toolkit = False
 print ("has_regularisation_toolkit", has_regularisation_toolkit)
 
@@ -95,7 +91,6 @@ class TestPlugin(unittest.TestCase):
             assert False
     @unittest.skipUnless(has_regularisation_toolkit, "Skipping as CCPi Regularisation Toolkit is not installed")
     def test_FGP_TV_complex(self):
-        # data = dataexample.CAMERA.get(size=(256,256))
         datarr = self.data.as_array()
         cmpx = numpy.zeros(self.data.shape, dtype=numpy.complex)
         cmpx.real = datarr[:]

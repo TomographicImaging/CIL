@@ -30,24 +30,8 @@ except ImportError as ie:
     has_regularisation_toolkit = False
 print ("has_regularisation_toolkit", has_regularisation_toolkit)
 
-
 def has_nvidia_smi():
     return os.system('nvidia-smi') == 0
-
-# import subprocess
-
-# def has_nvidia():
-    
-#     try:
-#         subprocess.check_output('nvidia-smi')
-#         has_gpu=True
-#     except:
-#         print("No nvidia available")
-#         has_gpu = False
-#     return has_gpu    
-
-
-
 
 
 class TestPlugin(unittest.TestCase):

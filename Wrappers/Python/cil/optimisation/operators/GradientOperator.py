@@ -93,7 +93,7 @@ class GradientOperator(LinearOperator):
             domain_geometry.dimension_labels = [None]*len(domain_geometry.shape)
 
         # Complex data will use numpy backend
-        if issubclass(domain_geometry.dtype, complex):
+        if domain_geometry.dtype in [numpy.complex, numpy.complex64]:
             backend = NUMPY
             warnings.warn("Warning: Complex geometries will use `numpy` backend")
         

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Framework &mdash; CIL v21.2.0-19-g4841db97 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <title>Framework &mdash; CIL v21.2.0-20-g3596e303 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
@@ -29,7 +29,7 @@
             <a href="index.html" class="icon icon-home"> CIL
           </a>
               <div class="version">
-                v21.2.0-19-g4841db97
+                v21.2.0-20-g3596e303
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -306,6 +306,14 @@ default <code class="code docutils literal notranslate"><span class="pre">ImageG
 <dt id="cil.framework.ImageGeometry.allocate">
 <code class="sig-name descname">allocate</code><span class="sig-paren">(</span><em class="sig-param">value=0</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/framework/framework.html#ImageGeometry.allocate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.framework.ImageGeometry.allocate" title="Permalink to this definition">¶</a></dt>
 <dd><p>allocates an ImageData according to the size expressed in the instance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> (<em>number</em><em> or </em><em>string</em><em>, </em><em>default None allocates empty memory block</em><em>, </em><em>default 0</em>) – accepts numbers to allocate an uniform array, or a string as ‘random’ or ‘random_int’ to create a random array or None.</p></li>
+<li><p><strong>dtype</strong> (<em>numpy type</em><em>, </em><em>default numpy.float32</em>) – numerical type to allocate</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -368,7 +376,6 @@ AcquisitionGeometry.create_Cone3D</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>value</strong> (<em>number</em><em> or </em><em>string</em><em>, </em><em>default None allocates empty memory block</em>) – accepts numbers to allocate an uniform array, or a string as ‘random’ or ‘random_int’ to create a random array or None.</p></li>
-<li><p><strong>dimension_labels</strong> – labels for the dimension axis</p></li>
 <li><p><strong>dtype</strong> (<em>numpy type</em><em>, </em><em>default numpy.float32</em>) – numerical type to allocate</p></li>
 </ul>
 </dd>
@@ -593,6 +600,16 @@ default = [‘channel’,’angle’,’vertical’,’horizontal’]</p>
 <dt id="cil.framework.VectorGeometry.allocate">
 <code class="sig-name descname">allocate</code><span class="sig-paren">(</span><em class="sig-param">value=0</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/framework/framework.html#VectorGeometry.allocate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.framework.VectorGeometry.allocate" title="Permalink to this definition">¶</a></dt>
 <dd><p>allocates an VectorData according to the size expressed in the instance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> (<em>number</em><em> or </em><em>string</em><em>, </em><em>default None allocates empty memory block</em>) – accepts numbers to allocate an uniform array, or a string as ‘random’ or ‘random_int’ to create a random array or None.</p></li>
+<li><p><strong>dtype</strong> (<em>numpy type</em><em>, </em><em>default numpy.float32</em>) – numerical type to allocate</p></li>
+<li><p><strong>seed</strong> (<em>int</em><em>, </em><em>default None</em>) – seed for the random number generator</p></li>
+<li><p><strong>max_value</strong> (<em>int</em><em>, </em><em>default 100</em>) – max value of the random int array</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -781,7 +798,8 @@ wants and not bother with knowing the actual layout of the data in the memory.</
 <dl class="method">
 <dt id="cil.framework.DataContainer.dtype">
 <em class="property">property </em><code class="sig-name descname">dtype</code><a class="headerlink" href="#cil.framework.DataContainer.dtype" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the type of the data array</p>
+<dd><p>Returns the dtype of the data array. 
+If geometry exists, the dtype of the geometry = dtype of the array</p>
 </dd></dl>
 
 <dl class="method">
@@ -1291,12 +1309,6 @@ methods of DataContainer and subclasses.</p>
 <dt id="cil.framework.BlockGeometry">
 <em class="property">class </em><code class="sig-prename descclassname">cil.framework.</code><code class="sig-name descname">BlockGeometry</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/framework/BlockGeometry.html#BlockGeometry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.framework.BlockGeometry" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="attribute">
-<dt id="cil.framework.BlockGeometry.RANDOM_INT">
-<code class="sig-name descname">RANDOM_INT</code><em class="property"> = 'random_int'</em><a class="headerlink" href="#cil.framework.BlockGeometry.RANDOM_INT" title="Permalink to this definition">¶</a></dt>
-<dd><p>Class to hold Geometry as column vector</p>
-</dd></dl>
-
-<dl class="attribute">
 <dt id="cil.framework.BlockGeometry.__weakref__">
 <code class="sig-name descname">__weakref__</code><a class="headerlink" href="#cil.framework.BlockGeometry.__weakref__" title="Permalink to this definition">¶</a></dt>
 <dd><p>list of weak references to the object (if defined)</p>

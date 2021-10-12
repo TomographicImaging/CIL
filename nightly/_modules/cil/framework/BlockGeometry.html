@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cil.framework.BlockGeometry &mdash; CIL v21.2.0-19-g4841db97 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <title>cil.framework.BlockGeometry &mdash; CIL v21.2.0-20-g3596e303 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> CIL
           </a>
               <div class="version">
-                v21.2.0-19-g4841db97
+                v21.2.0-20-g3596e303
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -97,14 +97,17 @@
     
     <span class="n">RANDOM</span> <span class="o">=</span> <span class="s1">&#39;random&#39;</span>
     <span class="n">RANDOM_INT</span> <span class="o">=</span> <span class="s1">&#39;random_int&#39;</span>
-        
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">dtype</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometries</span><span class="p">)</span>
+          
     <span class="sd">&#39;&#39;&#39;Class to hold Geometry as column vector&#39;&#39;&#39;</span>
     <span class="c1">#__array_priority__ = 1</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;&#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">geometries</span> <span class="o">=</span> <span class="n">args</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
-
         <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">),</span><span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="n">shape</span>
 
@@ -113,14 +116,13 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="s1">&#39;Dimension and size do not match: expected </span><span class="si">{}</span><span class="s1"> got </span><span class="si">{}</span><span class="s1">&#39;</span>
                     <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_elements</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)))</span>
-                      
             
 <div class="viewcode-block" id="BlockGeometry.get_item"><a class="viewcode-back" href="../../../framework.html#cil.framework.BlockGeometry.get_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;returns the Geometry in the BlockGeometry located at position index&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometries</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>            </div>
 
 <div class="viewcode-block" id="BlockGeometry.allocate"><a class="viewcode-back" href="../../../framework.html#cil.framework.BlockGeometry.allocate">[docs]</a>    <span class="k">def</span> <span class="nf">allocate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-
+        
         <span class="sd">&#39;&#39;&#39;Allocates a BlockDataContainer according to geometries contained in the BlockGeometry&#39;&#39;&#39;</span>
         
         <span class="n">symmetry</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;symmetry&#39;</span><span class="p">,</span><span class="kc">False</span><span class="p">)</span>        
@@ -149,7 +151,7 @@
             
             <span class="c1"># for 4x4  </span>
             <span class="c1"># [ ig11, ig12, ig13, ig14\</span>
-            <span class="c1">#   ig21, ig22, ig23, ig24\</span>
+            <span class="c1">#   ig21, ig22, ig23, ig24\ c</span>
             <span class="c1">#   ig31, ig32, ig33, ig34</span>
             <span class="c1">#   ig41, ig42, ig43, ig44]   </span>
             

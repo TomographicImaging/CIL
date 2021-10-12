@@ -73,7 +73,7 @@ class show_base(object):
         format = kwargs.get('format',None)
 
         if format is None:
-            if extension is '': 
+            if extension == '': 
                 extension = 'png'
         else:
             extension = format
@@ -124,7 +124,6 @@ class show2D(show_base):
         :rtype: matplotlib.figure.Figure
         '''
         self.figure = self.__show2D(datacontainers, title=title, slice_list=slice_list, fix_range=fix_range, axis_labels=axis_labels, origin=origin, cmap=cmap, num_cols=num_cols, size=size)
-    
 
     def __show2D(self,datacontainers, title=None, slice_list=None, fix_range=False, axis_labels=None, origin='lower-left', cmap='gray', num_cols=2, size=(15,15)):
         r'''This function plots 2D slices from cil DataContainer types. It returns a matplotlib figure that can be saved with the pyplot 'savefig()' method.
@@ -399,9 +398,14 @@ class show2D(show_base):
             if subplot.range is not None:
                 sp.set_clim(subplot.range[0],subplot.range[1])
         
+        fig.set_tight_layout(True)
+        fig.set_facecolor('w')
 
-        return fig
-    
+        #plt.show() creates a new figure so we save a copy to return
+        fig2 = plt.gcf()
+        plt.show()
+        return fig2
+
 def plotter2D(datacontainers, title=None, slice_list=None, fix_range=False, axis_labels=None, origin='lower-left', cmap='gray', num_cols=2, size=(15,15)):
     '''Alias of show2D'''
     return show2D(datacontainers, title=title, slice_list=slice_list, fix_range=fix_range, axis_labels=axis_labels, origin=origin, cmap=cmap, num_cols=num_cols, size=size)
@@ -504,7 +508,11 @@ class _ShowGeometry(object):
 
         self.fig.set_tight_layout(True)
         self.fig.set_facecolor('w')
-        return self.fig
+
+        #plt.show() creates a new figure so we save a copy to return
+        fig2 = plt.gcf()
+        plt.show()
+        return fig2
 
     def display_world(self):
 

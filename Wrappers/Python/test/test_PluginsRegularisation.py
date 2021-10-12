@@ -18,8 +18,6 @@
 import unittest
 import numpy 
 from cil.utilities import dataexample
-from cil.framework import ImageGeometry
-import matplotlib.pyplot as plt
 
 try:
     from ccpi.filters import regularisers
@@ -103,12 +101,3 @@ class TestPlugin(unittest.TestCase):
         out = reg.proximal(data, 1)
         outarr = out.as_array()
         numpy.testing.assert_almost_equal(outarr.imag, outarr.real)
-
-
-
-
-
-
-
-
-

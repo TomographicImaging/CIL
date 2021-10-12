@@ -14,8 +14,7 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-import numpy
-from numbers import Number
+
 import functools
 from cil.framework import BlockDataContainer
 
@@ -24,15 +23,16 @@ class BlockGeometry(object):
     RANDOM = 'random'
     RANDOM_INT = 'random_int'
     
-    
-    
+    @property
+    def dtype(self):
+        return tuple(i.dtype for i in self.geometries)
+          
     '''Class to hold Geometry as column vector'''
     #__array_priority__ = 1
     def __init__(self, *args, **kwargs):
         ''''''
         self.geometries = args
         self.index = 0
-
         shape = (len(args),1)
         self.shape = shape
 
@@ -41,13 +41,14 @@ class BlockGeometry(object):
             raise ValueError(
                     'Dimension and size do not match: expected {} got {}'
                     .format(n_elements, len(args)))
-                      
             
     def get_item(self, index):
         '''returns the Geometry in the BlockGeometry located at position index'''
         return self.geometries[index]            
 
-    def allocate(self, value=0, dimension_labels=None, **kwargs):
+    def allocate(self, value=0, **kwargs):
+        
+        '''Allocates a BlockDataContainer according to geometries contained in the BlockGeometry'''
         
         symmetry = kwargs.get('symmetry',False)        
         containers = [geom.allocate(value, **kwargs) for geom in self.geometries]
@@ -75,7 +76,7 @@ class BlockGeometry(object):
             
             # for 4x4  
             # [ ig11, ig12, ig13, ig14\
-            #   ig21, ig22, ig23, ig24\
+            #   ig21, ig22, ig23, ig24\ c
             #   ig31, ig32, ig33, ig34
             #   ig41, ig42, ig43, ig44]   
             

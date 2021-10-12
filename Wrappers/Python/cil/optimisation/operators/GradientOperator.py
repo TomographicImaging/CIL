@@ -17,7 +17,7 @@
 
 from cil.optimisation.operators import LinearOperator
 from cil.optimisation.operators import FiniteDifferenceOperator
-from cil.framework import ImageGeometry, BlockGeometry
+from cil.framework import BlockGeometry
 import warnings
 from cil.utilities.multiprocessing import NUM_THREADS
 import numpy as np
@@ -79,17 +79,13 @@ class GradientOperator(LinearOperator):
 
         # Default correlation for the gradient coupling
         correlation = kwargs.get('correlation',CORRELATION_SPACE)
-        
-        # Add attributes for pseudo CIL geometries, e.g., SIRF data
-        if not isinstance(domain_geometry, ImageGeometry):
-            domain_geometry.channels = 1
-            domain_geometry.dimension_labels = [None]*len(domain_geometry.shape)
-        
+                       
         # Space correlation on multichannel data call numpy backend
         if correlation == CORRELATION_SPACE and domain_geometry.channels > 1:
             #numpy implementation only for now
             backend = NUMPY
             warnings.warn("Warning: correlation='Space' on multi-channel dataset will use `numpy` backend")
+                     
         
         if method != 'forward':
             backend = NUMPY
@@ -141,17 +137,16 @@ class Gradient_numpy(LinearOperator):
         :type correlation: str, optional, default :code:`Space`
         '''             
         
-        # Consider pseudo 3D geometries with one slice, e.g., (1,155,155) used in SIRF
-        tmp_dom_shape = []
+        # Consider pseudo 2D geometries with one slice, e.g., (1,voxel_num_y,voxel_num_x)
+        domain_shape = []
         self.ind = []
         for i, size in enumerate(list(domain_geometry.shape) ):
             if size!=1:
-                tmp_dom_shape.append(size)
+                domain_shape.append(size)
                 self.ind.append(i)
      
         # Dimension of domain geometry        
-        self.ndim = len(tmp_dom_shape) 
-
+        self.ndim = len(domain_shape) 
         
         # Default correlation for the gradient coupling
         self.correlation = kwargs.get('correlation',CORRELATION_SPACE)        
@@ -282,20 +277,20 @@ class Gradient_C(LinearOperator):
         # Split gradients, e.g., space and channels
         self.split = kwargs.get('split',False)
         
-        # Consider pseudo 3D geometries with one slice, e.g., (1,155,155) for SIRF data
+        # Consider pseudo 2D geometries with one slice, e.g., (1,voxel_num_y,voxel_num_x)
         self.is2D = False
-        self.tmp_dom_shape = []
+        self.domain_shape = []
         self.ind = []
         self.voxel_size_order = []
         for i, size in enumerate(list(domain_geometry.shape) ):
             if size!=1:
-                self.tmp_dom_shape.append(size)
+                self.domain_shape.append(size)
                 self.ind.append(i)
                 self.voxel_size_order.append(domain_geometry.spacing[i])
                 self.is2D = True
         
         # Dimension of domain geometry
-        self.ndim = len(self.tmp_dom_shape)
+        self.ndim = len(self.domain_shape)
                                     
         #default is 'Neumann'
         self.bnd_cond = 0
@@ -351,7 +346,7 @@ class Gradient_C(LinearOperator):
                 
         #pass list of all arguments
         arg1 = [Gradient_C.ndarray_as_c_pointer(ndout[i]) for i in range(len(ndout))]
-        arg2 = [el for el in self.tmp_dom_shape]
+        arg2 = [el for el in self.domain_shape]
         args = arg1 + arg2 + [self.bnd_cond, 1, self.num_threads]
         self.fd(x_p, *args)
 
@@ -398,7 +393,7 @@ class Gradient_C(LinearOperator):
                 ndx[i]/=el
 
         arg1 = [Gradient_C.ndarray_as_c_pointer(ndx[i]) for i in range(self.ndim)]
-        arg2 = [el for el in self.tmp_dom_shape]
+        arg2 = [el for el in self.domain_shape]
         args = arg1 + arg2 + [self.bnd_cond, 0, self.num_threads]
 
         self.fd(out_p, *args)
@@ -411,7 +406,3 @@ class Gradient_C(LinearOperator):
                 
         if return_val is True:
             return out        
-
-
-
-   

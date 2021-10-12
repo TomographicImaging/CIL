@@ -20,7 +20,8 @@ from cil.optimisation.operators import FiniteDifferenceOperator
 from cil.framework import BlockGeometry
 import warnings
 from cil.utilities.multiprocessing import NUM_THREADS
-import numpy as np
+from cil.framework import ImageGeometry
+import numpy
 
 NEUMANN = 'Neumann'
 PERIODIC = 'Periodic'
@@ -85,7 +86,16 @@ class GradientOperator(LinearOperator):
             #numpy implementation only for now
             backend = NUMPY
             warnings.warn("Warning: correlation='Space' on multi-channel dataset will use `numpy` backend")
-                     
+
+        # Add attributes for SIRF data where there is no CIL geometry
+        if not isinstance(domain_geometry, ImageGeometry):
+            domain_geometry.channels = 1
+            domain_geometry.dimension_labels = [None]*len(domain_geometry.shape)
+
+        # Complex data will use numpy backend
+        if issubclass(domain_geometry.dtype, complex):
+            backend = NUMPY
+            warnings.warn("Warning: Complex geometries will use `numpy` backend")
         
         if method != 'forward':
             backend = NUMPY
@@ -329,7 +339,7 @@ class Gradient_C(LinearOperator):
         
     def direct(self, x, out=None): 
         
-        ndx = np.asarray(x.as_array(), dtype=np.float32, order='C')
+        ndx = numpy.asarray(x.as_array(), dtype=numpy.float32, order='C')
         x_p = Gradient_C.ndarray_as_c_pointer(ndx)
         
         return_val = False
@@ -378,7 +388,7 @@ class Gradient_C(LinearOperator):
             out = self.domain_geometry().allocate(None)
             return_val = True
 
-        ndout = np.asarray(out.as_array(), dtype=np.float32, order='C')          
+        ndout = numpy.asarray(out.as_array(), dtype=numpy.float32, order='C')          
         out_p = Gradient_C.ndarray_as_c_pointer(ndout)
         
         if self.split is False: 
@@ -406,3 +416,4 @@ class Gradient_C(LinearOperator):
                 
         if return_val is True:
             return out        
+

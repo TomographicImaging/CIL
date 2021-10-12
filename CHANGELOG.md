@@ -1,4 +1,5 @@
 * 21.2.1
+  - Add dtype for ImageGeometry, AcquisitionGeometry, VectorGeometry, BlockGeometry
   - Fix GradientOperator to handle pseudo 2D CIL geometries
   - Created Reconstructor base class for simpler use of CIL methods
   - Added Intel IPP based library for filtering step of FBP

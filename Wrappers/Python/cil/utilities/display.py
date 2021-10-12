@@ -56,7 +56,43 @@ def set_origin(data, origin):
     extent = (*shape_h,*shape_v)
     return data, data_origin, extent
 
-class show2D(object):
+class show_base(object):
+    def save(self,filename, **kwargs):
+        '''
+        Saves the image as a `.png` using matplotlib.figure.savefig()
+
+        matplotlib kwargs can be passed, refer to documentation
+        https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html
+        '''
+        file,extension = os.path.splitext(os.path.abspath(filename))
+        extension = extension.strip('.')
+
+        extensions = plt.gcf().canvas.get_supported_filetypes()
+        extensions = [i for i in extensions.keys()]
+
+        format = kwargs.get('format',None)
+
+        if format is None:
+            if extension is '': 
+                extension = 'png'
+        else:
+            extension = format
+
+        if extension not in extensions:
+            raise ValueError("Extension not valid. Got {0}, backend supports {1}".format(extension,extensions))
+
+        try:
+            path_full = file+'.'+extension
+            self.figure.set_tight_layout(True)
+            self.figure.set_facecolor('w')
+            self.figure.savefig(path_full, bbox_inches='tight',**kwargs)
+            print("Saved image as {}".format(path_full))
+        except PermissionError:
+            print("Unable to save image. Permissions denied: {}".format(path_full))
+        except:
+            print("Unable to save image")
+
+class show2D(show_base):
     r'''This class plots and saves 2D slices from cil DataContainer types.
      '''
     def __init__(self,datacontainers, title=None, slice_list=None, fix_range=False, axis_labels=None, origin='lower-left', cmap='gray', num_cols=2, size=(15,15)):
@@ -89,13 +125,6 @@ class show2D(object):
         '''
         self.figure = self.__show2D(datacontainers, title=title, slice_list=slice_list, fix_range=fix_range, axis_labels=axis_labels, origin=origin, cmap=cmap, num_cols=num_cols, size=size)
     
-    def save(self,filename):
-        try:
-            self.figure.set_tight_layout(True)
-            self.figure.set_facecolor('w')
-            self.figure.savefig(filename,bbox_inches='tight')
-        except:
-            "Unable to save"
 
     def __show2D(self,datacontainers, title=None, slice_list=None, fix_range=False, axis_labels=None, origin='lower-left', cmap='gray', num_cols=2, size=(15,15)):
         r'''This function plots 2D slices from cil DataContainer types. It returns a matplotlib figure that can be saved with the pyplot 'savefig()' method.
@@ -704,7 +733,7 @@ class _ShowGeometry(object):
         self.handles.append(h0)
         self.labels.append(h0.get_label())
 
-class show_geometry(object):
+class show_geometry(show_base):
     r'''This class plots and saves a schematic of the acquisition geometry.
      '''
     def __init__(self,acquisition_geometry, image_geometry=None, elevation=20, azimuthal=-35, view_distance=10, grid=False, figsize=(10,10), fontsize=10):
@@ -737,18 +766,3 @@ class show_geometry(object):
 
         self.display = _ShowGeometry(acquisition_geometry, image_geometry)
         self.figure = self.display.draw(elev=elevation, azim=azimuthal, view_distance=view_distance, grid=grid, figsize=figsize, fontsize=fontsize)
-
-    def save(self,filename, kwargs):
-        '''
-        Saves the geometry image using matplotlib.figure.savefig()
-
-        matplotlib kwargs can be passed.
-        '''
-        path_full = os.path.abspath(filename)
-        try:
-            self.figure.set_tight_layout(True)
-            self.figure.set_facecolor('w')
-            self.figure.savefig(filename,bbox_inches='tight',**kwargs)
-            print("Saved image as ",path_full)
-        except:
-            "Unable to save"

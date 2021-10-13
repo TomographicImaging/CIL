@@ -1,4 +1,5 @@
 * 21.2.1
+  - Fix GradientOperator for SIRF data: PET (pseudo 2D, 3D), MR
   - Add dtype for ImageGeometry, AcquisitionGeometry, VectorGeometry, BlockGeometry
   - Fix GradientOperator to handle pseudo 2D CIL geometries
   - Created Reconstructor base class for simpler use of CIL methods

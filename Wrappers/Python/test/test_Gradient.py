@@ -396,8 +396,7 @@ class TestGradientOperator(unittest.TestCase):
 
     def test_GradientOperator_complex_data(self):
  
-        # make complex dtype
-        
+        # make complex dtype        
         self.ig_2D.dtype = numpy.complex
         x = self.ig_2D.allocate('random')
         
@@ -408,7 +407,10 @@ class TestGradientOperator(unittest.TestCase):
         Grad.direct(x, out=res2)
 
         numpy.testing.assert_array_almost_equal(res1[0].as_array(), res2[0].as_array())
-        numpy.testing.assert_array_almost_equal(res1[1].as_array(), res2[1].as_array())     
+        numpy.testing.assert_array_almost_equal(res1[1].as_array(), res2[1].as_array())  
+
+        # check dot_test
+        self.assertTrue(LinearOperator.dot_test(Grad))              
 
 
 

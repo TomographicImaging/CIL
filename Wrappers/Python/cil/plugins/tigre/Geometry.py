@@ -69,7 +69,7 @@ class TIGREGeometry(Geometry):
             mag = ag_in.magnification
         else:
             geom = system.is_simple()
-            if geom is 'complex':
+            if geom is 'advanced':
                 raise NotImplementedError ("CIL cannot use TIGRE to process parallel geometries with tilted axes")
 
             self.DSO = 100000
@@ -127,4 +127,3 @@ class TIGREGeometry(Geometry):
         # Mode: parallel, cone
         self.mode = ag_in.config.system.geometry
 
-        

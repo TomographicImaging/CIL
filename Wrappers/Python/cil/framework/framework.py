@@ -765,7 +765,8 @@ class Parallel3D(SystemConfiguration):
 
         if not numpy.allclose(new.ray.direction,[0,1,0]) or\
             not numpy.allclose(new.detector.direction_x,[1,0,0]) or\
-            not numpy.allclose(new.detector.direction_y,[0,0,1]):
+            not numpy.allclose(new.detector.direction_y,[0,0,1]) or\
+            not numpy.allclose(new.rotation_axis.direction,[0,0,1]):
             return SystemConfiguration.SYSTEM_ADVANCED
         elif not numpy.allclose(det_unit,[0,1,0]):
             return SystemConfiguration.SYSTEM_OFFSET
@@ -1070,11 +1071,14 @@ class Cone3D(SystemConfiguration):
         dot_prod_a = (new.detector.position - new.source.position).dot(new.detector.direction_x)
         dot_prod_b = (new.detector.position - new.source.position).dot(new.detector.direction_y)
         dot_prod_c = (new.detector.direction_x).dot(new.rotation_axis.direction)
+        dot_prod_d = (new.detector.position - new.source.position).dot(new.rotation_axis.direction)
 
         if abs(dot_prod_a)>1e-6 or\
             abs(dot_prod_b)>1e-6 or\
-            abs(dot_prod_c)>1e-6:
+            abs(dot_prod_c)>1e-6 or\
+            abs(dot_prod_d)>1e-6: 
             return SystemConfiguration.SYSTEM_ADVANCED
+
         elif abs(new.source.position[0])>1e-6 or\
             abs(new.source.position[2])>1e-6 or\
             abs(new.detector.position[0])>1e-6 or\
@@ -1660,10 +1664,10 @@ class AcquisitionGeometry(object):
 
 
     @property
-
     def system_description(self):
         return self.config.system.system_description()
 
+    @property
     def dtype(self):
         return self.__dtype
 
@@ -2048,10 +2052,10 @@ class DataContainer(object):
     def dimension_labels(self, val):
         if val is None:
             self.__dimension_labels = None
-        elif len(val)==self.number_of_dimensions:
+        elif len(list(val))==self.number_of_dimensions:
             self.__dimension_labels = tuple(val)
         else:
-            raise ValueError("dimension_labels expected a list containing {0} strings got {1}".format(self.number_of_dimensions, labels))
+            raise ValueError("dimension_labels expected a list containing {0} strings got {1}".format(self.number_of_dimensions, val))
 
     @property
     def shape(self):
@@ -3326,5 +3330,3 @@ class DataOrder():
         else:
             raise ValueError("Expected dimension_label order {0}, got {1}.\nTry using `data.reorder('{2}')` to permute for {2}"
                  .format(order_requested, list(geometry.dimension_labels), engine))
-
-

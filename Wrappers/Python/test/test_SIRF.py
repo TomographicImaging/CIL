@@ -32,12 +32,15 @@ try:
 except ImportError as ie:
     has_sirf = False
 
+
 class TestGradientPET_2D(unittest.TestCase, GradientSIRF):  
 
     def setUp(self):
-        self.image1 = pet.ImageData(os.path.join(
-            examples_data_path('PET'),'thorax_single_slice','emission.hv')
-            )
+
+        if has_sirf:
+            self.image1 = pet.ImageData(os.path.join(
+                examples_data_path('PET'),'thorax_single_slice','emission.hv')
+                )
 
     def tearDown(self):
         pass    
@@ -45,9 +48,11 @@ class TestGradientPET_2D(unittest.TestCase, GradientSIRF):
 class TestGradientPET_3D(unittest.TestCase, GradientSIRF):  
 
     def setUp(self):
-        self.image1 = pet.ImageData(os.path.join(
-            examples_data_path('PET'),'brain','emission.hv')
-            )
+
+        if has_sirf:
+            self.image1 = pet.ImageData(os.path.join(
+                examples_data_path('PET'),'brain','emission.hv')
+                )
 
     def tearDown(self):
         pass  
@@ -55,14 +60,16 @@ class TestGradientPET_3D(unittest.TestCase, GradientSIRF):
 class TestGradientMR_2D(unittest.TestCase, GradientSIRF):  
 
     def setUp(self):
-        acq_data = mr.AcquisitionData(os.path.join
-            (examples_data_path('MR'),'simulated_MR_2D_cartesian.h5')
-        )
-        preprocessed_data = mr.preprocess_acquisition_data(acq_data)
-        recon = mr.FullySampledReconstructor()
-        recon.set_input(preprocessed_data)
-        recon.process()
-        self.image1 = recon.get_output()
+
+        if has_sirf:
+            acq_data = mr.AcquisitionData(os.path.join
+                (examples_data_path('MR'),'simulated_MR_2D_cartesian.h5')
+            )
+            preprocessed_data = mr.preprocess_acquisition_data(acq_data)
+            recon = mr.FullySampledReconstructor()
+            recon.set_input(preprocessed_data)
+            recon.process()
+            self.image1 = recon.get_output()
         
     def tearDown(self):
         pass      

@@ -80,17 +80,17 @@ class GradientOperator(LinearOperator):
 
         # Default correlation for the gradient coupling
         correlation = kwargs.get('correlation',CORRELATION_SPACE)
+
+        # Add attributes for SIRF data where there is no CIL geometry
+        if not isinstance(domain_geometry, ImageGeometry):
+            domain_geometry.channels = 1
+            domain_geometry.dimension_labels = [None]*len(domain_geometry.shape)        
                        
         # Space correlation on multichannel data call numpy backend
         if correlation == CORRELATION_SPACE and domain_geometry.channels > 1:
             #numpy implementation only for now
             backend = NUMPY
             warnings.warn("Warning: correlation='Space' on multi-channel dataset will use `numpy` backend")
-
-        # Add attributes for SIRF data where there is no CIL geometry
-        if not isinstance(domain_geometry, ImageGeometry):
-            domain_geometry.channels = 1
-            domain_geometry.dimension_labels = [None]*len(domain_geometry.shape)
 
         # Complex data will use numpy backend
         if domain_geometry.dtype in [numpy.complex, numpy.complex64]:

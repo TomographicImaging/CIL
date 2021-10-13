@@ -457,6 +457,11 @@ class Detector2D(PositionVector):
 class SystemConfiguration(object):
     r'''This is a generic class to hold the description of a tomography system
      '''
+
+    SYSTEM_SIMPLE = 'simple' 
+    SYSTEM_OFFSET = 'offset' 
+    SYSTEM_ADVANCED = 'advanced' 
+
     @property
     def dimension(self):
         if self._dimension == 2:
@@ -529,8 +534,10 @@ class SystemConfiguration(object):
         '''
         raise NotImplementedError
   
-    def is_simple(self):
-        r'''Returns `True` if the the geometry matches the default definitions with no offsets or rotations
+    def system_description(self):
+        r'''Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,
+            \nReturns `offset` if the the geometry matches the default definitions with centre-of-rotation or detector offsets
+            \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
         '''         
         raise NotImplementedError
 
@@ -597,9 +604,11 @@ class Parallel2D(SystemConfiguration):
         self.detector.position = rotation_matrix.dot(self.detector.position.reshape(2,1))
         self.detector.direction_x = rotation_matrix.dot(self.detector.direction_x.reshape(2,1))
 
-    def is_simple(self):
-        r'''Returns `True` if the the geometry matches the default definitions with no offsets or rotations
-        '''  
+    def system_description(self):
+        r'''Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,
+            \nReturns `offset` if the the geometry matches the default definitions with centre-of-rotation or detector offsets
+            \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
+        '''       
         new = self.copy()
         new.align_reference_frame()
 
@@ -610,11 +619,11 @@ class Parallel2D(SystemConfiguration):
 
         if not numpy.allclose(new.ray.direction,[0,1]) or\
             not numpy.allclose(new.detector.direction_x,[1,0]):
-            return 'complex'
+            return SystemConfiguration.SYSTEM_ADVANCED
         elif not numpy.allclose(det_unit,[0,1]):
-            return 'offset' 
+            return SystemConfiguration.SYSTEM_OFFSET
         else:
-            return 'simple'
+            return SystemConfiguration.SYSTEM_SIMPLE
 
 
     def __str__(self):
@@ -717,7 +726,7 @@ class Parallel3D(SystemConfiguration):
         self.detector.set_direction(new_x, new_y)
 
     def align_reference_frame(self):
-        r'''Transforms the system origin to the rotate axis with z direction aligned to the rotate axis direction, and aligns the ray direction along the postive Y direction
+        r'''Transforms the system origin to the rotate axis with z direction aligned to the rotate axis direction, and aligns the ray direction along the positive Y direction
         '''          
         self.update_reference_frame()
 
@@ -745,9 +754,11 @@ class Parallel3D(SystemConfiguration):
 
         self.detector.set_direction(new_direction_x, new_direction_y)
 
-    def is_simple(self):
-        r'''Returns `True` if the the geometry matches the default definitions with no offsets or rotations
-        '''          
+    def system_description(self):
+        r'''Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,
+            \nReturns `offset` if the the geometry matches the default definitions with centre-of-rotation or detector offsets
+            \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
+        '''              
         new = self.copy()
         new.align_reference_frame()
 
@@ -759,11 +770,11 @@ class Parallel3D(SystemConfiguration):
         if not numpy.allclose(new.ray.direction,[0,1,0]) or\
             not numpy.allclose(new.detector.direction_x,[1,0,0]) or\
             not numpy.allclose(new.detector.direction_y,[0,0,1]):
-            return 'complex'
+            return SystemConfiguration.SYSTEM_ADVANCED
         elif not numpy.allclose(det_unit,[0,1,0]):
-            return 'offset' 
+            return SystemConfiguration.SYSTEM_OFFSET
         else:
-            return 'simple'
+            return SystemConfiguration.SYSTEM_SIMPLE
         
         return False
 
@@ -885,20 +896,22 @@ class Cone2D(SystemConfiguration):
         self.detector.direction_x = rotation_matrix.dot(self.detector.direction_x.reshape(2,1))
 
 
-    def is_simple(self):
-        r'''Returns `True` if the the geometry matches the default definitions with no offsets or rotations
-        '''          
+    def system_description(self):
+        r'''Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,
+            \nReturns `offset` if the the geometry matches the default definitions with centre-of-rotation or detector offsets
+            \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
+        '''           
         new = self.copy()
         new.align_reference_frame()
         dot_prod = (new.detector.position - new.source.position).dot(new.detector.direction_x)
 
         if abs(dot_prod)>1e-6:
-            return 'complex'
+            return SystemConfiguration.SYSTEM_ADVANCED
         elif abs(new.source.position[0])>1e-6 or\
             abs(new.detector.position[0])>1e-6:
-            return 'offset' 
+            return SystemConfiguration.SYSTEM_OFFSET 
         else:
-            return 'simple'
+            return SystemConfiguration.SYSTEM_SIMPLE
 
     def __str__(self):
         def csv(val):
@@ -1050,9 +1063,11 @@ class Cone3D(SystemConfiguration):
 
         self.detector.set_direction(new_direction_x, new_direction_y)
 
-    def is_simple(self):
-        r'''Returns `True` if the the geometry matches the default definitions with no offsets or rotations
-        '''          
+    def system_description(self):
+        r'''Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,
+            \nReturns `offset` if the the geometry matches the default definitions with centre-of-rotation or detector offsets
+            \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
+        '''       
         new = self.copy()
         new.align_reference_frame()
 
@@ -1063,14 +1078,14 @@ class Cone3D(SystemConfiguration):
         if abs(dot_prod_a)>1e-6 or\
             abs(dot_prod_b)>1e-6 or\
             abs(dot_prod_c)>1e-6:
-            return 'complex'
+            return SystemConfiguration.SYSTEM_ADVANCED
         elif abs(new.source.position[0])>1e-6 or\
             abs(new.source.position[2])>1e-6 or\
             abs(new.detector.position[0])>1e-6 or\
             abs(new.detector.position[2])>1e-6:
-            return 'offset' 
+            return SystemConfiguration.SYSTEM_OFFSET
         else:
-            return 'simple'
+            return SystemConfiguration.SYSTEM_SIMPLE
 
 
     def get_centre_slice(self):
@@ -1643,6 +1658,10 @@ class AcquisitionGeometry(object):
                     
             self.__dimension_labels = tuple(val)
 
+
+    @property
+    def system_description(self):
+        return self.config.system.system_description()
 
     def __init__(self,
                 geom_type, 

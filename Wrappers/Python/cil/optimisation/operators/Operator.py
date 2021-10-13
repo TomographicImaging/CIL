@@ -191,18 +191,18 @@ class LinearOperator(Operator):
         '''
         seed = kwargs.get('seed',None)
         if range_init is None:
-            y = operator.range_geometry().allocate('random', seed=seed, dtype=operator.range.dtype)
+            y = operator.range_geometry().allocate('random', seed=seed)
         else:
             y = range_init
         if domain_init is None:
-            x = operator.domain_geometry().allocate('random',seed=seed, dtype=operator.range.dtype)
+            x = operator.domain_geometry().allocate('random',seed=seed)
         else:
             x = domain_init
             
         fx = operator.direct(x)
         by = operator.adjoint(y)
         a = fx.dot(y)
-        b = by.dot(x)
+        b = by.dot(x).conjugate()
         if verbose:
             print ('Left hand side  {}, \nRight hand side {}'.format(a, b))
             print ("decimal ", kwargs.get('decimal', 4))

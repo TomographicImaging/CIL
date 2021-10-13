@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 #   This work is part of the Core Imaging Library (CIL) developed by CCPi 
 #   (Collaborative Computational Project in Tomographic Imaging), with 
 #   substantial contributions by UKRI-STFC and University of Manchester.
@@ -22,13 +23,49 @@ import sys
 import shutil
 import unittest
 from cil.framework import BlockDataContainer
-from cil.optimisation.operators import LinearOperator, GradientOperator
+from utils import GradientSIRF
 try:
     import sirf.STIR as pet
+    import sirf.Gadgetron as mr
     from sirf.Utilities import examples_data_path
     has_sirf = True
 except ImportError as ie:
     has_sirf = False
+
+class TestGradientPET_2D(unittest.TestCase, GradientSIRF):  
+
+    def setUp(self):
+        self.image1 = pet.ImageData(os.path.join(
+            examples_data_path('PET'),'thorax_single_slice','emission.hv')
+            )
+
+    def tearDown(self):
+        pass    
+
+class TestGradientPET_3D(unittest.TestCase, GradientSIRF):  
+
+    def setUp(self):
+        self.image1 = pet.ImageData(os.path.join(
+            examples_data_path('PET'),'brain','emission.hv')
+            )
+
+    def tearDown(self):
+        pass  
+
+class TestGradientMR_2D(unittest.TestCase, GradientSIRF):  
+
+    def setUp(self):
+        acq_data = mr.AcquisitionData(os.path.join
+            (examples_data_path('MR'),'simulated_MR_2D_cartesian.h5')
+        )
+        preprocessed_data = mr.preprocess_acquisition_data(acq_data)
+        recon = mr.FullySampledReconstructor()
+        recon.set_input(preprocessed_data)
+        recon.process()
+        self.image1 = recon.get_output()
+        
+    def tearDown(self):
+        pass      
 
 
 class TestSIRFCILIntegration(unittest.TestCase):
@@ -58,12 +95,11 @@ class TestSIRFCILIntegration(unittest.TestCase):
         image2 = pet.ImageData('emission.hv')
         image1.fill(1.)
         image2.fill(2.)
-        print (image1.shape, image2.shape)
         
         tmp = image1.divide(1.)
-        # numpy.testing.assert_array_equal(image1.as_array(), tmp.as_array())
+        numpy.testing.assert_array_equal(image1.as_array(), tmp.as_array())
         tmp = image2.divide(1.)
-        # numpy.testing.assert_array_equal(image2.as_array(), tmp.as_array())
+        numpy.testing.assert_array_equal(image2.as_array(), tmp.as_array())
         
 
         # image.fill(1.)
@@ -79,7 +115,6 @@ class TestSIRFCILIntegration(unittest.TestCase):
         image2 = pet.ImageData('emission.hv')
         image1.fill(1.)
         image2.fill(2.)
-        print (image1.shape, image2.shape)
         
         tmp = image1.multiply(1.)
         numpy.testing.assert_array_equal(image1.as_array(), tmp.as_array())
@@ -100,7 +135,6 @@ class TestSIRFCILIntegration(unittest.TestCase):
         image2 = pet.ImageData('emission.hv')
         image1.fill(0)
         image2.fill(1)
-        print (image1.shape, image2.shape)
         
         tmp = image1.add(1.)
         numpy.testing.assert_array_equal(image2.as_array(), tmp.as_array())
@@ -118,86 +152,13 @@ class TestSIRFCILIntegration(unittest.TestCase):
         self.assertBlockDataContainerEqual(bdc , bdc1)
 
     @unittest.skipUnless(has_sirf, "Has SIRF")
-    def test_GradientSIRF_2D_pseudo_geometries(self):
-
-        os.chdir(examples_data_path('PET'))
-        shutil.rmtree('working_folder/thorax_single_slice',True)
-        shutil.copytree('thorax_single_slice','working_folder/thorax_single_slice')
-        os.chdir('working_folder/thorax_single_slice')
-
-        image1 = pet.ImageData('emission.hv')
-        self.assertTrue(isinstance(image1, pet.ImageData))
-
-        ########################################
-        ##### Test Gradient numpy backend  #####
-        ########################################
-
-        Grad_numpy = GradientOperator(image1, backend='numpy')
-
-        res1 = Grad_numpy.direct(image1)         
-        res2 = Grad_numpy.range_geometry().allocate()
-        Grad_numpy.direct(image1, out=res2)
-
-        self.assertTrue(isinstance(res1,BlockDataContainer))
-        self.assertTrue(isinstance(res1[0], pet.ImageData))
-        self.assertTrue(isinstance(res1[1], pet.ImageData))
-
-        self.assertTrue(isinstance(res2,BlockDataContainer))
-        self.assertTrue(isinstance(res2[0], pet.ImageData))
-        self.assertTrue(isinstance(res2[1], pet.ImageData))               
-
-        # test direct with and without out
-        numpy.testing.assert_array_almost_equal(res1[0].as_array(), res2[0].as_array()) 
-        numpy.testing.assert_array_almost_equal(res1[1].as_array(), res2[1].as_array()) 
-
-        # test adjoint with and without out
-        res3 = Grad_numpy.adjoint(res1)
-        res4 = Grad_numpy.domain_geometry().allocate()
-        Grad_numpy.adjoint(res2, out=res4)
-        numpy.testing.assert_array_almost_equal(res3.as_array(), res4.as_array()) 
-
-        # test dot_test
-        self.assertTrue(LinearOperator.dot_test(Grad_numpy))
-
-        # test shape of output of direct
-        self.assertEqual(res1[0].shape, image1.shape)
-        self.assertEqual(res1.shape, (2,1))
-
-        ########################################
-        ##### Test Gradient c backend  #####
-        ########################################
-        Grad_c = GradientOperator(image1, backend='c')
-
-        # test direct with and without out
-        res5 = Grad_c.direct(image1) 
-        res6 = Grad_c.range_geometry().allocate()*0.
-        Grad_c.direct(image1, out=res6)
-
-        numpy.testing.assert_array_almost_equal(res5[0].as_array(), res6[0].as_array()) 
-        numpy.testing.assert_array_almost_equal(res5[1].as_array(), res6[1].as_array())
-
-        # test direct numpy vs direct c backends (with and without out)
-        numpy.testing.assert_array_almost_equal(res5[0].as_array(), res1[0].as_array()) 
-        numpy.testing.assert_array_almost_equal(res6[1].as_array(), res2[1].as_array())
-
-        # test dot_test
-        self.assertTrue(LinearOperator.dot_test(Grad_c))
-
-        # test adjoint
-        res7 = Grad_c.adjoint(res5) 
-        res8 = Grad_c.domain_geometry().allocate()*0.
-        Grad_c.adjoint(res5, out=res8)
-        numpy.testing.assert_array_almost_equal(res7.as_array(), res8.as_array()) 
-
-
-    @unittest.skipUnless(has_sirf, "Has SIRF")
     def test_BlockDataContainer_with_SIRF_DataContainer_subtract(self):
         os.chdir(self.cwd)
         image1 = pet.ImageData('emission.hv')
         image2 = pet.ImageData('emission.hv')
         image1.fill(2)
         image2.fill(1)
-        print (image1.shape, image2.shape)
+
         
         bdc = BlockDataContainer(image1, image2)
         bdc1 = bdc.subtract(1.)
@@ -208,7 +169,6 @@ class TestSIRFCILIntegration(unittest.TestCase):
         bdc = BlockDataContainer(image1, image2)
 
         self.assertBlockDataContainerEqual(bdc , bdc1)
-
 
     def assertBlockDataContainerEqual(self, container1, container2):
         print ("assert Block Data Container Equal")
@@ -225,3 +185,4 @@ class TestSIRFCILIntegration(unittest.TestCase):
     
     def assertNumpyArrayEqual(self, first, second):
         numpy.testing.assert_array_equal(first, second)
+

@@ -59,32 +59,3 @@ class DiagonalOperator(LinearOperator):
         '''Evaluates operator norm of DiagonalOperator'''
         
         return self.diagonal.max()
-
-if __name__ == '__main__':
-    
-    from cil.framework import ImageGeometry
-
-    M = 3
-    ig = ImageGeometry(M, M)
-    x = ig.allocate('random',seed=100)
-    diag = ig.allocate('random',seed=101)
-    
-    # Print what each ImageData is
-    print(x.as_array())
-    print(diag.as_array())
-    
-    # Set up example DiagonalOperator
-    D = DiagonalOperator(diag)
-    
-    # Apply direct and check whether result equals diag*x as expected.
-    z = D.direct(x)
-    print(z.as_array())
-    print((diag*x).as_array())
-    
-    # Apply adjoint and check whether results equals diag*(diag*x) as expected.
-    y = D.adjoint(z)
-    print(y.as_array())
-    print((diag*(diag*x)).as_array())
-    
-    
-    

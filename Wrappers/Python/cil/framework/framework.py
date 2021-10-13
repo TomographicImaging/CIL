@@ -9,7 +9,7 @@
 
 #   http://www.apache.org/licenses/LICENSE-2.0
 
-#   Unless required by applicable law or agreed to in writing, software
+#   Unless required by applicable law or agreed to in writing, software 
 #   distributed under the License is distributed on an "AS IS" BASIS,
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
@@ -24,6 +24,7 @@ from ctypes import util
 import math
 from cil.utilities.multiprocessing import NUM_THREADS
 # check for the extension
+
 if platform.system() == 'Linux':
     dll = 'libcilacc.so'
 elif platform.system() == 'Windows':
@@ -35,12 +36,6 @@ else:
     raise ValueError('Not supported platform, ', platform.system())
 
 cilacc = ctypes.cdll.LoadLibrary(dll)
-
-#default nThreads
-# import multiprocessing
-# cpus = multiprocessing.cpu_count()
-# NUM_THREADS = max(int(cpus/2),1)
-
 
 def find_key(dic, val):
     """return the key of dictionary dic given the value"""
@@ -137,7 +132,7 @@ class ImageGeometry(object):
                         .format(labels_default,labels))
                     
             self.__dimension_labels = tuple(labels)
-
+        
     def __eq__(self, other):
 
         if not isinstance(other, self.__class__):
@@ -159,6 +154,14 @@ class ImageGeometry(object):
             return True
         
         return False
+
+    @property
+    def dtype(self):
+        return self.__dtype
+
+    @dtype.setter
+    def dtype(self, val):
+        self.__dtype = val           
 
     def __init__(self, 
                  voxel_num_x=0, 
@@ -186,6 +189,7 @@ class ImageGeometry(object):
         self.channel_labels = None
         self.channel_spacing = 1.0
         self.dimension_labels = kwargs.get('dimension_labels', None)
+        self.dtype = kwargs.get('dtype', numpy.float32)
 
     def subset(self, dimensions=None, **kw):
         '''Returns a new sliced and/or reshaped ImageGeometry'''
@@ -285,13 +289,15 @@ class ImageGeometry(object):
 
         return repres
     def allocate(self, value=0, **kwargs):
-        '''allocates an ImageData according to the size expressed in the instance'''
-        if value == 'random_int':
-            dtype = kwargs.get('dtype', numpy.int32)
-            if dtype not in [numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64]:
-                raise ValueError('Expecting int type, got {}'.format(dtype))
-        else:
-            dtype = kwargs.get('dtype', numpy.float32)
+        '''allocates an ImageData according to the size expressed in the instance
+        
+        :param value: accepts numbers to allocate an uniform array, or a string as 'random' or 'random_int' to create a random array or None.
+        :type value: number or string, default None allocates empty memory block, default 0
+        :param dtype: numerical type to allocate
+        :type dtype: numpy type, default numpy.float32
+        '''
+
+        dtype = kwargs.get('dtype', self.dtype)
 
         if kwargs.get('dimension_labels', None) is not None:
             raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
@@ -318,25 +324,15 @@ class ImageGeometry(object):
                 if seed is not None:
                     numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
-                out.fill(numpy.random.randint(max_value,size=self.shape, dtype=dtype))
+                r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
+                out.fill(numpy.asarray(r, dtype=self.dtype))
             elif value is None:
                 pass
             else:
                 raise ValueError('Value {} unknown'.format(value))
 
         return out
-    # The following methods return 2 members of the class, therefore I 
-    # don't think we need to implement them. 
-    # Additionally using __len__ is confusing as one would think this is 
-    # an iterable. 
-    #def __len__(self):
-    #    '''returns the length of the geometry'''
-    #    return self.length
-    #def shape(self):
-    #    '''Returns the shape of the array of the ImageData it describes'''
-    #    return self.shape
-        
-
+    
 class ComponentDescription(object):
     r'''This class enables the creation of vectors and unit vectors used to describe the components of a tomography system
      '''
@@ -1543,6 +1539,10 @@ class AcquisitionGeometry(object):
         return self.config.system.geometry
 
     @property
+    def num_projections(self):
+        return len(self.angles)       
+
+    @property
     def pixel_num_h(self):
         return self.config.panel.num_pixels[0]
 
@@ -1660,8 +1660,17 @@ class AcquisitionGeometry(object):
 
 
     @property
+
     def system_description(self):
         return self.config.system.system_description()
+
+    def dtype(self):
+        return self.__dtype
+
+    @dtype.setter
+    def dtype(self, val):
+        self.__dtype = val       
+
 
     def __init__(self,
                 geom_type, 
@@ -1678,6 +1687,9 @@ class AcquisitionGeometry(object):
 
         """Constructor method
         """
+
+        # default dtype for the acquisition geometry
+        self.dtype = kwargs.get('dtype', numpy.float32)
 
         #backward compatibility
         new_setup = kwargs.get('new_setup', False)
@@ -1968,17 +1980,10 @@ class AcquisitionGeometry(object):
         
         :param value: accepts numbers to allocate an uniform array, or a string as 'random' or 'random_int' to create a random array or None.
         :type value: number or string, default None allocates empty memory block
-        :param dimension_labels: labels for the dimension axis
-        :type list: default None
         :param dtype: numerical type to allocate
         :type dtype: numpy type, default numpy.float32
         '''
-        if value == 'random_int':
-            dtype = kwargs.get('dtype', numpy.int32)
-            if dtype not in [numpy.int, numpy.int8, numpy.int16, numpy.int32, numpy.int64]:
-                raise ValueError('Expecting int type, got {}'.format(dtype))
-        else:
-            dtype = kwargs.get('dtype', numpy.float32)
+        dtype = kwargs.get('dtype', self.dtype)
 
         if kwargs.get('dimension_labels', None) is not None:
             raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
@@ -2005,7 +2010,8 @@ class AcquisitionGeometry(object):
                 if seed is not None:
                     numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
-                out.fill(numpy.random.randint(max_value,size=self.shape, dtype=dtype))
+                r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
+                out.fill(numpy.asarray(r, dtype=self.dtype))
             elif value is None:
                 pass
             else:
@@ -2063,7 +2069,9 @@ class DataContainer(object):
 
     @property
     def dtype(self):
-        '''Returns the type of the data array'''
+        '''Returns the dtype of the data array. 
+           If geometry exists, the dtype of the geometry = dtype of the array'''                          
+        self.geometry.dtype = self.array.dtype       
         return self.array.dtype
 
     @property
@@ -2089,9 +2097,13 @@ class DataContainer(object):
         if type(self) is DataContainer:
             self.dimension_labels = dimension_labels
 
-        # finally copy the geometry
+        # finally copy the geometry, and force dtype of the geometry of the data = the dype of the data
         if 'geometry' in kwargs.keys():
             self.geometry = kwargs['geometry']
+            try:
+                self.geometry.dtype = self.dtype            
+            except:
+                pass    
         
     def get_dimension_size(self, dimension_label):
 
@@ -2134,7 +2146,7 @@ class DataContainer(object):
         Returns a new DataContainer containing a single slice of in the requested direction. \
         Pass keyword arguments <dimension label>=index
         '''
-        new_array = self.array.copy()
+        new_array = None
 
         #get ordered list of current dimensions
         dimension_labels_list = list(self.dimension_labels)
@@ -2144,7 +2156,10 @@ class DataContainer(object):
             if value is not None:
                 axis = dimension_labels_list.index(key)
                 dimension_labels_list.remove(key)
-                new_array = new_array.take(indices=value, axis=axis)
+                if new_array is None:
+                    new_array = self.as_array().take(indices=value, axis=axis)
+                else:
+                    new_array = new_array.take(indices=value, axis=axis)
 
         if new_array.ndim > 1:
             return DataContainer(new_array, False, dimension_labels_list, suppress_warning=True)
@@ -2735,10 +2750,13 @@ class ImageData(DataContainer):
         if not kwargs.get('suppress_warning', False):
             warnings.warn('Direct invocation is deprecated and will be removed in following version. Use allocate from ImageGeometry instead',
               DeprecationWarning)
+
         dtype = kwargs.get('dtype', numpy.float32)
+    
 
         if geometry is None:
-            raise AttributeError("ImageGeometry requires a geometry")
+            raise AttributeError("ImageData requires a geometry")
+            
 
         labels = kwargs.get('dimension_labels', None)
         if labels is not None and labels != geometry.dimension_labels:
@@ -2751,7 +2769,7 @@ class ImageData(DataContainer):
         elif issubclass(type(array) , numpy.ndarray):
             pass
         else:
-            raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.formar(type(array)))
+            raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(array)))
             
         if array.shape != geometry.shape:
             raise ValueError('Shape mismatch {} {}'.format(array.shape, geometry.shape))
@@ -2759,7 +2777,7 @@ class ImageData(DataContainer):
         if array.ndim not in [2,3,4]:
             raise ValueError('Number of dimensions are not 2 or 3 or 4 : {0}'.format(array.ndim))
     
-        super(ImageData, self).__init__(array, deep_copy, geometry=geometry,**kwargs)
+        super(ImageData, self).__init__(array, deep_copy, geometry=geometry, **kwargs)
                                
     def subset(self, dimensions=None, **kw):
         '''returns a subset of ImageData and regenerates the geometry'''
@@ -2782,10 +2800,9 @@ class ImageData(DataContainer):
         try:
             geometry_new = self.geometry.get_slice(channel=channel, vertical=vertical, horizontal_x=horizontal_x, horizontal_y=horizontal_y)
         except ValueError:
-            if kw_force:
+            if force:
                 geometry_new = None
             else:
-                print(ve)
                 raise ValueError ("Unable to return slice of requested ImageData. Use 'force=True' to return DataContainer instead.")
 
         out = DataContainer.get_slice(self, channel=channel, vertical=vertical, horizontal_x=horizontal_x, horizontal_y=horizontal_y)
@@ -2824,6 +2841,7 @@ class AcquisitionData(DataContainer):
         if not kwargs.get('suppress_warning', False):
             warnings.warn('Direct invocation is deprecated and will be removed in following version. Use allocate from AcquisitionGeometry instead',
               DeprecationWarning)
+
         dtype = kwargs.get('dtype', numpy.float32)
 
         if geometry is None:
@@ -2840,7 +2858,7 @@ class AcquisitionData(DataContainer):
         elif issubclass(type(array) , numpy.ndarray):
             pass
         else:
-            raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.formar(type(array)))
+            raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(array)))
             
         if array.shape != geometry.shape:
             raise ValueError('Shape mismatch got {} expected {}'.format(array.shape, geometry.shape))
@@ -2874,7 +2892,6 @@ class AcquisitionData(DataContainer):
             if force:
                 geometry_new = None
             else:
-                print(ve)
                 raise ValueError ("Unable to return slice of requested AcquisitionData. Use 'force=True' to return DataContainer instead.")
 
         #get new data
@@ -2946,6 +2963,9 @@ class Processor(object):
             raise TypeError("Input type mismatch: got {0} expecting {1}"\
                             .format(type(dataset), DataContainer))
     
+    def clear_input(self):
+        self.__dict__['input']= None
+
     def check_input(self, dataset):
         '''Checks parameters of the input DataContainer
         
@@ -2993,10 +3013,19 @@ class Processor(object):
     def process(self, out=None):
         raise NotImplementedError('process must be implemented')
     
-    def __call__(self, x):
+    def __call__(self, x, out=None):
         
-        self.set_input(x)
-        return self.get_output()        
+        self.set_input(x)    
+
+        if out is None:
+            out = self.get_output()      
+        else:
+            self.get_output(out=out)
+
+        self.clear_input()
+        
+        return out
+
 
 class DataProcessor(Processor):
     '''Basically an alias of Processor Class'''
@@ -3153,6 +3182,7 @@ class VectorData(DataContainer):
 
     def __init__(self, array=None, **kwargs):
         self.geometry = kwargs.get('geometry', None)
+
         dtype = kwargs.get('dtype', numpy.float32)
         
         if self.geometry is None:
@@ -3183,13 +3213,21 @@ class VectorGeometry(object):
     '''Geometry describing VectorData to contain 1D array'''
     RANDOM = 'random'
     RANDOM_INT = 'random_int'
+
+    @property
+    def dtype(self):
+        return self.__dtype
+
+    @dtype.setter
+    def dtype(self, val):
+        self.__dtype = val      
         
     def __init__(self, 
                  length, **kwargs):
         
         self.length = length
         self.shape = (length, )
-
+        self.dtype = kwargs.get('dtype', numpy.float32)
         self.dimension_labels = kwargs.get('dimension_labels', None)
         
     def clone(self):
@@ -3212,9 +3250,20 @@ class VectorGeometry(object):
         return False
 
     def allocate(self, value=0, **kwargs):
-        '''allocates an VectorData according to the size expressed in the instance'''
-        self.dtype = kwargs.get('dtype', numpy.float32)
-        out = VectorData(geometry=self.copy(), dtype=self.dtype)
+        '''allocates an VectorData according to the size expressed in the instance
+        
+        :param value: accepts numbers to allocate an uniform array, or a string as 'random' or 'random_int' to create a random array or None.
+        :type value: number or string, default None allocates empty memory block
+        :param dtype: numerical type to allocate
+        :type dtype: numpy type, default numpy.float32
+        :param seed: seed for the random number generator
+        :type seed: int, default None
+        :param max_value: max value of the random int array
+        :type max_value: int, default 100'''
+
+        dtype = kwargs.get('dtype', self.dtype)
+        # self.dtype = kwargs.get('dtype', numpy.float32)
+        out = VectorData(geometry=self.copy(), dtype=dtype)
         if isinstance(value, Number):
             if value != 0:
                 out += value
@@ -3229,7 +3278,8 @@ class VectorGeometry(object):
                 if seed is not None:
                     numpy.random.seed(seed)
                 max_value = kwargs.get('max_value', 100)
-                out.fill(numpy.random.randint(max_value,size=self.shape))
+                r = numpy.random.randint(max_value,size=self.shape, dtype=numpy.int32)
+                out.fill(numpy.asarray(r, dtype=self.dtype))             
             elif value is None:
                 pass
             else:
@@ -3276,3 +3326,5 @@ class DataOrder():
         else:
             raise ValueError("Expected dimension_label order {0}, got {1}.\nTry using `data.reorder('{2}')` to permute for {2}"
                  .format(order_requested, list(geometry.dimension_labels), engine))
+
+

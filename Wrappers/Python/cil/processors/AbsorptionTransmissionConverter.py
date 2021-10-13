@@ -52,17 +52,12 @@ class AbsorptionTransmissionConverter(DataProcessor):
 
     def process(self, out=None):
 
+        data = self.get_input()
         if out is None:
-        
-            data = self.get_input().copy()
-            data *= -1
-            data.exp(out=data)
-            data *= self.white_level
-        
-            return data
-
+            out = data.multiply(-1.0)          
         else:
+            data.multiply(-1.0, out=out)
 
-            out *= -1
-            out.exp(out=out)
-            out *= self.white_level
+        out.exp(out=out)
+        out.multiply(numpy.float32(self.white_level), out=out)
+        return out

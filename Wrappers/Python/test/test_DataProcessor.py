@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 #   This work is part of the Core Imaging Library (CIL) developed by CCPi 
 #   (Collaborative Computational Project in Tomographic Imaging), with 
@@ -30,23 +31,316 @@ from timeit import default_timer as timer
 from cil.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 
 from cil.io import NEXUSDataReader
-from cil.processors import CentreOfRotationCorrector, CofR_xcorr, TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
-from cil.processors import Slicer, Binner, MaskGenerator, Masker
-
+from cil.processors import CentreOfRotationCorrector, CofR_xcorrelation, CofR_image_sharpness
+from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
+from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder
 import wget
 import os
 
-class TestDataProcessor(unittest.TestCase):
-    
+from utils import has_gpu_tigre, has_gpu_astra
+
+
+try:
+    import tigre
+    has_tigre = True
+except ModuleNotFoundError:
+    print(  "This plugin requires the additional package TIGRE\n" +
+            "Please install it via conda as tigre from the ccpi channel\n"+
+            "Minimal version is 21.01")
+    has_tigre = False
+else:
+    from cil.plugins.tigre import FBP as TigreFBP
+
+try:
+    import tomophantom
+    has_tomophantom = True
+except ModuleNotFoundError:
+    print(  "This plugin requires the additional package tomophantom\n" +
+            "Please install it via conda as tomophantom from the ccpi channel\n")
+    has_tomophantom = False
+else:
+    from cil.plugins import TomoPhantom
+
+try:
+    import astra
+    from cil.plugins.astra import FBP as AstraFBP
+    from cil.plugins.astra import ProjectionOperator
+    has_astra = True
+except ModuleNotFoundError:
+    has_astra = False
+
+
+class TestPadder(unittest.TestCase):
     def setUp(self):
+        ray_direction = [0.1, 3.0]
+        detector_position = [-1.3, 1000.0]
+        detector_direction_row = [1.0, 0.2]
+        rotation_axis_position = [0.1, 2.0]
 
-        data_raw = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
+        AG = AcquisitionGeometry.create_Parallel2D(ray_direction=ray_direction, 
+                                                    detector_position=detector_position, 
+                                                    detector_direction_x=detector_direction_row, 
+                                                    rotation_axis_position=rotation_axis_position)
 
-        self.data_DLS = data_raw.log()
-        self.data_DLS *= -1
+        # test int shortcut
+        self.num_angles = 10
+        angles = numpy.linspace(0, 360, self.num_angles, dtype=numpy.float32)
+
+        self.num_channels = 10
+        self.num_pixels = 5
+        AG.set_channels(num_channels=self.num_channels)
+        AG.set_angles(angles, initial_angle=10, angle_unit='radian')
+        AG.set_panel(self.num_pixels, pixel_size=0.1)
+
+        data = AG.allocate('random')
         
+        self.data = data
+        self.AG = AG
+
+    def test_constant_with_int(self):
+        data = self.data
+        AG = self.AG
+        num_pad = 5
+        b = Padder.constant(pad_width=num_pad)
+        b.set_input(data)
+        data_padded = b.process()
+
+        data_new = numpy.zeros((self.num_channels + 2*num_pad, self.num_angles, self.num_pixels + 2*num_pad), dtype=numpy.float32)
+        data_new[5:15,:,5:10] = data.as_array()
+        # new_angles = numpy.zeros((20,), dtype=numpy.float32)
+        # new_angles[5:15] = angles
+
+        geometry_padded = AG.copy()
+        geometry_padded.set_channels(num_channels=20)
+        geometry_padded.set_panel(15, pixel_size=0.1)
+        # geometry_padded.set_angles(new_angles, initial_angle=10, angle_unit='radian')
+                
+        self.assertTrue(data_padded.geometry == geometry_padded)
+        numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
+    
+    def test_constant_with_tuple(self):
+        data = self.data
+        AG = self.AG
+        # test tuple
+        pad_tuple = (5,2)
+        b = Padder.constant(pad_width=pad_tuple)
+        b.set_input(data)
+        data_padded = b.process()
+
+        data_new = numpy.zeros((self.num_channels + sum(pad_tuple), self.num_angles, self.num_pixels + sum(pad_tuple)),\
+                     dtype=numpy.float32)
+        data_new[pad_tuple[0]:-pad_tuple[1],\
+            :,\
+                pad_tuple[0]:-pad_tuple[1]] = data.as_array()
+        # new_angles = numpy.zeros((17,), dtype=numpy.float32)
+        # new_angles[5:15] = angles
+
+        geometry_padded = AG.copy()
+        geometry_padded.set_channels(num_channels=self.num_channels+sum(pad_tuple))
+        geometry_padded.set_panel(self.num_pixels+sum(pad_tuple), pixel_size=0.1)
+        # geometry_padded.set_angles(new_angles, initial_angle=10, angle_unit='radian')
+                
+        self.assertTrue(data_padded.geometry == geometry_padded)
+        numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
+
+    def test_constant_with_dictionary1(self):
+        data = self.data
+        AG = self.AG
+        # test dictionary + constant values
+        pad_tuple = (5,2)
+        const = 5.0
+        b = Padder.constant(pad_width={'channel':pad_tuple}, constant_values=const)
+        b.set_input(data)
+        data_padded = b.process()
+
+        data_new = const * numpy.ones((self.num_channels + sum(pad_tuple), self.num_angles, self.num_pixels),\
+                     dtype=numpy.float32)
+
+        # data_new = 5*numpy.ones((10,10,5), dtype=numpy.float32)
+        data_new[pad_tuple[0]:-pad_tuple[1],:,:] = data.as_array()
+        geometry_padded = AG.copy()
+        geometry_padded.set_channels(num_channels=17)
+
+        self.assertTrue(data_padded.geometry == geometry_padded)
+        numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
+    
+    def test_constant_with_dictionary2(self):
+        data = self.data
+        AG = self.AG
+        # test dictionary + constant values
+        pad_tuple1 = (5,2)
+        pad_tuple2 = (2,5)
+        const = 5.0
+        b = Padder.constant(pad_width={'channel':pad_tuple1, 'horizontal':pad_tuple2}, constant_values=const)
+        b.set_input(data)
+        data_padded = b.process()
+
+        data_new = const * numpy.ones((self.num_channels + sum(pad_tuple1), self.num_angles, \
+            self.num_pixels + sum(pad_tuple2)),\
+                     dtype=numpy.float32)
+
+        # data_new = 5*numpy.ones((10,10,5), dtype=numpy.float32)
+        data_new[pad_tuple1[0]:-pad_tuple1[1],:,pad_tuple2[0]:-pad_tuple2[1]] = data.as_array()
+        geometry_padded = AG.copy()
+        geometry_padded.set_channels(num_channels=17)
+        geometry_padded.set_panel(self.num_pixels + sum(pad_tuple2),pixel_size=0.1)
+        
+        self.assertTrue(data_padded.geometry == geometry_padded)
+        numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
+    
+    def test_edge_with_int(self):
+        AG = self.AG
+        value = -11.
+        data = self.AG.allocate(value)
+        
+        num_pad = 5
+        b = Padder.edge(pad_width=num_pad)
+        b.set_input(data)
+        data_padded = b.process()
+
+        data_new = value * numpy.ones((self.num_channels + 2*num_pad, self.num_angles, self.num_pixels + 2*num_pad), dtype=numpy.float32)
+        data_new[5:15,:,5:10] = data.as_array()
+
+        # new_angles = numpy.zeros((20,), dtype=numpy.float32)
+        # new_angles[5:15] = angles
+
+        geometry_padded = AG.copy()
+        geometry_padded.set_channels(num_channels=20)
+        geometry_padded.set_panel(15, pixel_size=0.1)
+        # geometry_padded.set_angles(new_angles, initial_angle=10, angle_unit='radian')
+                
+        self.assertTrue(data_padded.geometry == geometry_padded)
+        numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
+    
+    def test_edge_with_tuple(self):
+        AG = self.AG
+        value = -11.
+        data = self.AG.allocate(value)
+        # test tuple
+        pad_tuple = (5,2)
+        b = Padder.edge(pad_width=pad_tuple)
+        b.set_input(data)
+        data_padded = b.process()
+
+        data_new = value * numpy.ones((self.num_channels + sum(pad_tuple), self.num_angles, self.num_pixels + sum(pad_tuple)),\
+                     dtype=numpy.float32)
+        data_new[pad_tuple[0]:-pad_tuple[1],\
+            :,\
+                pad_tuple[0]:-pad_tuple[1]] = data.as_array()
+        # new_angles = numpy.zeros((17,), dtype=numpy.float32)
+        # new_angles[5:15] = angles
+
+        geometry_padded = AG.copy()
+        geometry_padded.set_channels(num_channels=self.num_channels+sum(pad_tuple))
+        geometry_padded.set_panel(self.num_pixels+sum(pad_tuple), pixel_size=0.1)
+        # geometry_padded.set_angles(new_angles, initial_angle=10, angle_unit='radian')
+                
+        self.assertTrue(data_padded.geometry == geometry_padded)
+        numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
+
+    def test_edge_with_dictionary(self):
+        AG = self.AG
+        value = -11.
+        data = self.AG.allocate(value)
+        # test dictionary + constant values
+        pad_tuple = (5,2)
+        b = Padder.edge(pad_width={'channel':pad_tuple})
+        b.set_input(data)
+        data_padded = b.process()
+
+        data_new = value * numpy.ones((self.num_channels + sum(pad_tuple), self.num_angles, self.num_pixels),\
+                     dtype=numpy.float32)
+
+        # data_new = 5*numpy.ones((10,10,5), dtype=numpy.float32)
+        data_new[pad_tuple[0]:-pad_tuple[1],:,:] = data.as_array()
+        geometry_padded = AG.copy()
+        geometry_padded.set_channels(num_channels=17)
+
+        self.assertTrue(data_padded.geometry == geometry_padded)
+        numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
+
+    def test_linear_ramp_with_int(self):
+        AG = self.AG
+        value = -11.
+        data = self.AG.allocate(value)
+        
+        num_pad = 5
+        b = Padder.linear_ramp(pad_width=num_pad)
+        b.set_input(data)
+        data_padded = b.process()
+
+        data_new = 0 * numpy.ones((self.num_channels + 2*num_pad, self.num_angles, self.num_pixels + 2*num_pad), dtype=numpy.float32)
+        data_new[5:15,:,5:10] = data.as_array()
+
+        # new_angles = numpy.zeros((20,), dtype=numpy.float32)
+        # new_angles[5:15] = angles
+
+        geometry_padded = AG.copy()
+        geometry_padded.set_channels(num_channels=20)
+        geometry_padded.set_panel(15, pixel_size=0.1)
+        # geometry_padded.set_angles(new_angles, initial_angle=10, angle_unit='radian')
+                
+        self.assertTrue(data_padded.geometry == geometry_padded)
+        # numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
+        self.assertAlmostEqual(data_padded.as_array().ravel()[0] , 0.)
+        self.assertAlmostEqual(data_padded.as_array().ravel()[-1] , 0.)
+    
+    def test_linear_ramp_with_tuple(self):
+        AG = self.AG
+        value = -11.
+        data = self.AG.allocate(value)
+        # test tuple
+        pad_tuple = (5,2)
+        b = Padder.edge(pad_width=pad_tuple)
+        b.set_input(data)
+        data_padded = b.process()
+
+        data_new = value * numpy.ones((self.num_channels + sum(pad_tuple), self.num_angles, self.num_pixels + sum(pad_tuple)),\
+                     dtype=numpy.float32)
+        data_new[pad_tuple[0]:-pad_tuple[1],\
+            :,\
+                pad_tuple[0]:-pad_tuple[1]] = data.as_array()
+        # new_angles = numpy.zeros((17,), dtype=numpy.float32)
+        # new_angles[5:15] = angles
+
+        geometry_padded = AG.copy()
+        geometry_padded.set_channels(num_channels=self.num_channels+sum(pad_tuple))
+        geometry_padded.set_panel(self.num_pixels+sum(pad_tuple), pixel_size=0.1)
+        # geometry_padded.set_angles(new_angles, initial_angle=10, angle_unit='radian')
+                
+        self.assertTrue(data_padded.geometry == geometry_padded)
+        numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
+
+    def test_linear_ramp_with_dictionary(self):
+        AG = self.AG
+        value = -11.
+        data = self.AG.allocate(value)
+        # test dictionary + constant values
+        pad_tuple = (5,2)
+        b = Padder.edge(pad_width={'channel':pad_tuple})
+        b.set_input(data)
+        data_padded = b.process()
+
+        data_new = value * numpy.ones((self.num_channels + sum(pad_tuple), self.num_angles, self.num_pixels),\
+                     dtype=numpy.float32)
+
+        # data_new = 5*numpy.ones((10,10,5), dtype=numpy.float32)
+        data_new[pad_tuple[0]:-pad_tuple[1],:,:] = data.as_array()
+        geometry_padded = AG.copy()
+        geometry_padded.set_channels(num_channels=17)
+
+        self.assertTrue(data_padded.geometry == geometry_padded)
+        numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
+    
+    
+
+
+has_astra = has_astra and has_gpu_astra()
+has_tigre = has_tigre and has_gpu_tigre()
+
+
+class TestBinner(unittest.TestCase):
     def test_Binner(self):
-        #%%
         #test parallel 2D case
         
         ray_direction = [0.1, 3.0]
@@ -225,7 +519,7 @@ class TestDataProcessor(unittest.TestCase):
         self.assertTrue(data_binned.geometry == IG_binned)
         numpy.testing.assert_allclose(data_binned.as_array(), data_new, rtol=1E-6)
 
-        
+class TestSlicer(unittest.TestCase):      
     def test_Slicer(self):
         
         #test parallel 2D case
@@ -439,32 +733,100 @@ class TestDataProcessor(unittest.TestCase):
         self.assertTrue(data_sliced.geometry == IG_sliced)
         numpy.testing.assert_allclose(data_sliced.as_array(), numpy.squeeze(data.as_array()[5:12:3, ::2, 10:30:2, :]), rtol=1E-6)
 
-    def test_CofR_xcorr(self):       
 
-        corr = CofR_xcorr(slice_index='centre', projection_index=0, ang_tol=0.1)
+class TestCentreOfRotation_parallel(unittest.TestCase):
+    
+    def setUp(self):
+        data_raw = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
+        self.data_DLS = data_raw.log()
+        self.data_DLS *= -1
+
+    def test_CofR_xcorrelation(self):       
+
+        corr = CofR_xcorrelation(slice_index='centre', projection_index=0, ang_tol=0.1)
         corr.set_input(self.data_DLS.clone())
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
         
-        corr = CofR_xcorr(slice_index=67, projection_index=0, ang_tol=0.1)
+        corr = CofR_xcorrelation(slice_index=67, projection_index=0, ang_tol=0.1)
         corr.set_input(self.data_DLS.clone())
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)              
+
+    @unittest.skipUnless(has_astra, "ASTRA not installed")
+    def test_CofR_image_sharpness_astra(self):
+        corr = CofR_image_sharpness(search_range=20, FBP=AstraFBP)
+        corr.set_input(self.data_DLS.clone())
+        ad_out = corr.get_output()
+        self.assertAlmostEqual(6.48, ad_out.geometry.config.system.rotation_axis.position[0],places=1)     
+
+
+    @unittest.skipUnless(False, "TIGRE not installed")
+    def skiptest_test_CofR_image_sharpness_tigre(self): #currently not avaliable for parallel beam
+        corr = CofR_image_sharpness(search_range=20, FBP=TigreFBP)
+        corr.set_input(self.data_DLS.clone())
+        ad_out = corr.get_output()
+        self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
 
     def test_CenterOfRotationCorrector(self):       
-        corr = CentreOfRotationCorrector.xcorr(slice_index='centre', projection_index=0, ang_tol=0.1)
+        corr = CentreOfRotationCorrector.xcorrelation(slice_index='centre', projection_index=0, ang_tol=0.1)
         corr.set_input(self.data_DLS.clone())
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
         
-        corr = CentreOfRotationCorrector.xcorr(slice_index=67, projection_index=0, ang_tol=0.1)
+        corr = CentreOfRotationCorrector.xcorrelation(slice_index=67, projection_index=0, ang_tol=0.1)
         corr.set_input(self.data_DLS.clone())
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)              
 
-    def test_Normaliser(self):
-        pass         
 
+class TestCentreOfRotation_conebeam(unittest.TestCase):
+
+    def setUp(self):
+        angles = numpy.linspace(0, 360, 180, endpoint=False)
+
+        ag_orig = AcquisitionGeometry.create_Cone2D([0,-100],[0,100])\
+            .set_panel(64,0.2)\
+            .set_angles(angles)\
+            .set_labels(['angle', 'horizontal'])
+
+        ig = ag_orig.get_ImageGeometry()
+        phantom = TomoPhantom.get_ImageData(12, ig)
+
+        Op = ProjectionOperator(ig, ag_orig, device='gpu')
+        self.data_0 = Op.direct(phantom)
+
+        ag_offset = AcquisitionGeometry.create_Cone2D([0,-100],[0,100],rotation_axis_position=(-0.150,0))\
+            .set_panel(64,0.2)\
+            .set_angles(angles)\
+            .set_labels(['angle', 'horizontal'])
+
+        Op = ProjectionOperator(ig, ag_offset, device='gpu')
+        self.data_offset = Op.direct(phantom)
+        self.data_offset.geometry = ag_orig
+
+    @unittest.skipUnless(has_tomophantom and has_astra, "Tomophantom or ASTRA not installed")
+    def test_CofR_image_sharpness_astra(self):
+        corr = CofR_image_sharpness(FBP=AstraFBP)
+        ad_out = corr(self.data_0)
+        self.assertAlmostEqual(0.000, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
+
+        corr = CofR_image_sharpness(FBP=AstraFBP)
+        ad_out = corr(self.data_offset)
+        self.assertAlmostEqual(-0.150, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
+
+    @unittest.skipUnless(has_tomophantom and has_tigre, "Tomophantom or TIGRE not installed")
+    def test_CofR_image_sharpness_tigre(self): #currently not avaliable for parallel beam
+        corr = CofR_image_sharpness(FBP=TigreFBP)
+        ad_out = corr(self.data_0)
+        self.assertAlmostEqual(0.000, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
+
+        corr = CofR_image_sharpness(FBP=TigreFBP)
+        ad_out = corr(self.data_offset)
+        self.assertAlmostEqual(-0.150, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
+
+class TestDataProcessor(unittest.TestCase):
+   
     def test_DataProcessorBasic(self):
 
         dc_in = DataContainer(numpy.arange(10), True)
@@ -494,6 +856,7 @@ class TestDataProcessor(unittest.TestCase):
         self.assertTrue(ax.store_output)
 
         #check storing a copy and not a reference
+        ax.set_input(dc_in)
         dc_out = ax.get_output()
         numpy.testing.assert_array_equal(ax.output.as_array(), out_gold.as_array())
         self.assertFalse(id(ax.output.as_array()) == id(dc_out.as_array()))
@@ -534,21 +897,16 @@ class TestDataProcessor(unittest.TestCase):
         #[ 0 60  1 61  2 62  3 63  4 64  5 65  6 66  7 67  8 68  9 69 10 70 11 71
         # 12 72 13 73 14 74 15 75 16 76 17 77 18 78 19 79]
         
-        print(arr)
+        #print(arr)
     
         ax = AX()
         ax.scalar = 2
-        ax.set_input(c)
-        #ax.apply()
-        print ("ax  in {0} out {1}".format(c.as_array().flatten(),
-               ax.get_output().as_array().flatten()))
-        
-        numpy.testing.assert_array_equal(ax.get_output().as_array(), arr*2)
-                
-        
-        print("check call method of DataProcessor")
+
         numpy.testing.assert_array_equal(ax(c).as_array(), arr*2)
-        
+
+        ax.set_input(c)
+        numpy.testing.assert_array_equal(ax.get_output().as_array(), arr*2)
+
         cast = CastDataContainer(dtype=numpy.float32)
         cast.set_input(c)
         out = cast.get_output()
@@ -560,7 +918,7 @@ class TestDataProcessor(unittest.TestCase):
         axm.get_output(out)
         numpy.testing.assert_array_equal(out.as_array(), arr*0.5)
         
-        print("check call method of DataProcessor")
+        #print("check call method of DataProcessor")
         numpy.testing.assert_array_equal(axm(c).as_array(), arr*0.5)        
     
         
@@ -580,7 +938,7 @@ class TestDataProcessor(unittest.TestCase):
         self.assertTrue(v.max() == 19)
         self.assertTrue(v.min() == -79)
         
-        print ("clip in {0} out {1}".format(c.as_array(), clip.get_output().as_array()))
+        #print ("clip in {0} out {1}".format(c.as_array(), clip.get_output().as_array()))
         
         #dsp = DataProcessor()
         #dsp.set_input(ds)
@@ -590,10 +948,10 @@ class TestDataProcessor(unittest.TestCase):
         chain = AX()
         chain.scalar = 0.5
         chain.set_input_processor(ax)
-        print ("chain in {0} out {1}".format(ax.get_output().as_array(), chain.get_output().as_array()))
+        #print ("chain in {0} out {1}".format(ax.get_output().as_array(), chain.get_output().as_array()))
         numpy.testing.assert_array_equal(chain.get_output().as_array(), arr)
         
-        print("check call method of DataProcessor")
+        #print("check call method of DataProcessor")
         numpy.testing.assert_array_equal(ax(chain(c)).as_array(), arr)        
 
 class TestMaskGenerator(unittest.TestCase):       
@@ -817,11 +1175,11 @@ class TestTransmissionAbsorptionConverter(unittest.TestCase):
         self.assertTrue(data_exp.geometry == AG)
         numpy.testing.assert_allclose(data_exp.as_array(), data_new, rtol=1E-6)
         
-        s.process(out=ad)
+        data_exp.fill(0)
+        s.process(out=data_exp)
         
-        self.assertTrue(ad.geometry == AG)
-        numpy.testing.assert_allclose(data_exp.as_array(), ad.as_array(), rtol=1E-6)
-    
+        self.assertTrue(data_exp.geometry == AG)
+        numpy.testing.assert_allclose(data_exp.as_array(), data_new, rtol=1E-6)
 
 class TestAbsorptionTransmissionConverter(unittest.TestCase):
 
@@ -860,10 +1218,11 @@ class TestAbsorptionTransmissionConverter(unittest.TestCase):
         self.assertTrue(data_exp.geometry == AG)
         numpy.testing.assert_allclose(data_exp.as_array(), numpy.exp(-ad.as_array())*10, rtol=1E-6)
         
-        s.process(out=ad)
+        data_exp.fill(0)
+        s.process(out=data_exp)
         
-        self.assertTrue(ad.geometry == AG)
-        numpy.testing.assert_allclose(data_exp.as_array(), ad.as_array(), rtol=1E-6)       
+        self.assertTrue(data_exp.geometry == AG)
+        numpy.testing.assert_allclose(data_exp.as_array(), numpy.exp(-ad.as_array())*10, rtol=1E-6)  
 
 
 class TestMasker(unittest.TestCase):       

@@ -59,29 +59,25 @@ class TransmissionAbsorptionConverter(DataProcessor):
 
     def process(self, out=None):
 
+        data = self.get_input()
+
+        white_level = numpy.float32(self.white_level)
+
         if out is None:
-        
-            data = self.get_input().copy()
-            data /= self.white_level
-            data.as_array()[data.as_array() < self.min_intensity] = self.min_intensity
-            
-            try:
-                data.log(out=data)
-            except RuntimeWarning:
-                raise ValueError('Zero encountered in log. Please set threshold to some value to avoid this.')
-                
-            data *= -1
-
-            return data
-        
+            out = data.divide(white_level)
         else:
+            data.divide(white_level, out=out)
 
-            out /= self.white_level
-            out.as_array()[out.as_array() < self.min_intensity] = self.min_intensity
-            
-            try:
-                out.log(out=out)
-            except RuntimeWarning:
-                raise ValueError('Zero encountered in log. Please set threshold to some value to avoid this.')
+        arr = out.as_array()
+        threshold = numpy.float32(self.min_intensity)
+        threshold_indices = arr < threshold
+        arr[threshold_indices] = threshold
+        out.fill(arr)
+
+        try:
+            out.log(out=out)
+        except RuntimeWarning:
+            raise ValueError('Zero encountered in log. Please set threshold to some value to avoid this.')
                 
-            out *= -1
+        out.multiply(-1.0,out=out)
+        return out

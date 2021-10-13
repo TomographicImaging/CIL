@@ -81,23 +81,3 @@ class IdentityOperator(LinearOperator):
         return self.gm_domain.allocate(1)
     
     
-if __name__ == '__main__':
-    
-    from cil.framework import ImageGeometry
-
-    M, N = 2, 3
-    ig = ImageGeometry(M, N)
-    arr = ig.allocate('random_int')
-    
-    Id = IdentityOperator(ig)
-    d = Id.matrix()
-    print(d.toarray())
-    
-    d1 = Id.sum_abs_col()
-    print(d1.as_array())
-    
-    
-
-            
-    
-    

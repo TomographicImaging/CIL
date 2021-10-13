@@ -17,17 +17,15 @@
 
 
 #%%
-from cil.framework import AcquisitionGeometry, ImageGeometry, AcquisitionData, ImageData, DataContainer, BlockDataContainer
+from cil.framework import AcquisitionGeometry, AcquisitionData, BlockDataContainer
 import numpy as np
-from itertools import product, combinations
 import warnings
 
-from mpl_toolkits import mplot3d
+import os
 import matplotlib.lines as mlines
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyArrowPatch
 from mpl_toolkits.mplot3d import proj3d
-from matplotlib import gridspec
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 class _PlotData(object):
@@ -38,303 +36,379 @@ class _PlotData(object):
         self.origin = origin
         self.range = None
 
-def show2D(datacontainers, title=None, slice_list=None, fix_range=False, axis_labels=None, origin='lower-left', cmap='gray', num_cols=2, size=(15,15)):
-    r'''This function plots 2D slices from cil DataContainer types
+def set_origin(data, origin):
+    shape_v = [0, data.shape[0]]
+    shape_h = [0, data.shape[1]]
 
-    Plots 1 or more 2D plots in an (n x num_cols) matix
-    Can plot multiple slices from one 3D dataset, or compare multiple datasets
-    Inputs can be single arguments or list of arguments that will be sequentally applied to subplots
-    If no slice_list is passed a 3D dataset will display the centre slice of the outer dimension, a 4D dataset will show the centre slices of the two outer dimension.
-
-    :param datacontainers: The DataContainers to be displayed.
-    :type datacontainers: ImageData, AcquisitionData, list of  Image/AcquisitionData, BlockDataContainer
-    :param title: The title for each figure
-    :type title: string, list of strings
-    :param slice_list: The slices to show. A list of intergers will show slices for the outer dimension. For 3D datacontainers single slice: (direction, index). For 4D datacontainers two slices: [(direction0, index),(direction1, index)].
-    :type slice_list: tuple, int, list of tuples, list of ints
-    :param fix_range: Sets the display range of the data. `True` sets all plots to the global (min, max). 
-    :type fix_range: boolian, tuple, list of tuples
-    :param axis_labels: The axis labels for each figure e.g. ('x','y')
-    :type axis_labels: tuple, list of tuples
-    :param origin: Sets the display origin. 'lower/upper-left/right'
-    :type origin: string, list of strings
-    :param cmap: Sets the colour map of the plot (see matplotlib.pyplot)
-    :param num_cols: Sets the number of columns of subplots to display
-    :type num_cols: int
-    :param size: Figure size in inches
-    :type size: tuple of floats
-     '''
-
-    #get number of subplots, number of input datasets, or number of slices requested
-    if isinstance(datacontainers, (list, BlockDataContainer)):
-        num_plots = len(datacontainers)
-    else:
-        dim = len(datacontainers.shape)
-
-        if slice_list is None or dim == 2:
-            num_plots = 1
-        elif type(slice_list) is tuple:
-            num_plots = 1
-        elif dim == 4 and type(slice_list[0]) is tuple:
-            num_plots = 1  
-        else:
-            num_plots = len(slice_list)       
-
-    subplots = []
-
-    #range needs subsetted data
-    range_min = float("inf")
-    range_max = -range_min
-
-    #set up, all inputs can be 1 or num_plots
-    for i in range(num_plots):
-
-        #get data per subplot, subset where required
-        if isinstance(datacontainers, (list, BlockDataContainer)):
-            data = datacontainers[i]
-        else:
-            data = datacontainers
-
-        if len(data.shape) ==4:
-
-            if slice_list is None or type(slice_list) is tuple or type(slice_list[0]) is tuple: #none, (direction, ind) or [(direction0, ind), (direction1, ind)] apply to all datasets
-                slice_requested = slice_list
-            elif type(slice_list[i]) == int or len(slice_list[i]) > 1: # [ind0, ind1, ind2] of direction0, or [[(direction0, ind), (direction1, ind)],[(direction0, ind), (direction1, ind)]]
-                slice_requested = slice_list[i]
-            else:
-                slice_requested = slice_list[i][0] # [[(direction0, ind)],[(direction0, ind)]]
-
-            cut_axis = [0,1]
-            cut_slices = [data.shape[0]//2, data.shape[1]//2]
-
-            if type(slice_requested) is int:
-                #use axis 0, slice val
-                cut_slices[0] = slice_requested
-            elif type(slice_requested) is tuple:
-                #get axis ind,
-                # if 0 default 1
-                # if 1 default 0
-                axis = slice_requested[0]
-                if slice_requested[0] is str:
-                    axis = data.dimension_labels.index(axis)
-
-                if axis == 0:
-                    cut_axis[0] = slice_requested[0]
-                    cut_slices[0] = slice_requested[1]
-                else:
-                    cut_axis[1] = slice_requested[0]
-                    cut_slices[1] = slice_requested[1]
-
-            elif type(slice_requested) is list:
-                #use full input
-                cut_axis[0] = slice_requested[0][0]
-                cut_axis[1] = slice_requested[1][0]
-                cut_slices[0] = slice_requested[0][1]
-                cut_slices[1] = slice_requested[1][1]
-
-                if cut_axis[0] > cut_axis[1]:
-                    cut_axis.reverse()
-                    cut_slices.reverse()
-
-            try:
-                if hasattr(data, 'subset'):
-                    if type(cut_axis[0]) is int:
-                        cut_axis[0] = data.dimension_labels[cut_axis[0]]
-                    if type(cut_axis[1]) is int:
-                        cut_axis[1] = data.dimension_labels[cut_axis[1]]
-
-                    temp_dict = {cut_axis[0]:cut_slices[0], cut_axis[1]:cut_slices[1]}
-                    plot_data = data.subset(**temp_dict, force=True)
-                elif hasattr(data,'as_array'):
-                    plot_data = data.as_array().take(indices=cut_slices[1], axis=cut_axis[1])
-                    plot_data = plot_data.take(indices=cut_slices[0], axis=cut_axis[0])
-                else:
-                    plot_data = data.take(indices=cut_slices[1], axis=cut_axis[1])
-                    plot_data = plot_data.take(indices=cut_slices[0], axis=cut_axis[0])
-
-            except:
-                raise TypeError("Unable to slice input data. Could not obtain 2D slice {0} from {1} with shape {2}.\n\
-                          Pass either correct slice information or a 2D array".format(slice_requested, type(data), data.shape))
-
-            subtitle = "direction: ({0},{1}), slice: ({2},{3})".format(*cut_axis, * cut_slices)
-
-                
-        elif len(data.shape) == 3:
-            #get slice list per subplot
-            if type(slice_list) is list:            #[(direction, ind), (direction, ind)],  [ind0, ind1, ind2] of direction0
-                slice_requested = slice_list[i]
-            else:                                   #(direction, ind) single tuple apply to all datasets
-                slice_requested = slice_list
-
-            #default axis 0, centre slice
-            cut_slice = data.shape[0]//2
-            cut_axis = 0
-             
-            if type(slice_requested) is int:
-                #use axis 0, slice val
-                cut_slice = slice_requested             
-            if type(slice_requested) is tuple:
-                cut_slice = slice_requested[1]
-                cut_axis = slice_requested[0]
-
-            try:
-                if hasattr(data, 'subset'):
-                    if type(cut_axis) is int:
-                        cut_axis = data.dimension_labels[cut_axis]
-                    temp_dict = {cut_axis:cut_slice}
-                    plot_data = data.subset(**temp_dict, force=True)
-                elif hasattr(data,'as_array'):
-                    plot_data = data.as_array().take(indices=cut_slice, axis=cut_axis)
-                else:
-                    plot_data = data.take(indices=cut_slice, axis=cut_axis)
-            except:
-                raise TypeError("Unable to slice input data. Could not obtain 2D slice {0} from {1} with shape {2}.\n\
-                          Pass either correct slice information or a 2D array".format(slice_requested, type(data), data.shape))
-
-            subtitle = "direction: {0}, slice: {1}".format(cut_axis,cut_slice)  
-        else:
-            plot_data = data
-            subtitle = None
-
-
-        #check dataset is now 2D
-        if len(plot_data.shape) != 2:
-            raise TypeError("Unable to slice input data. Could not obtain 2D slice {0} from {1} with shape {2}.\n\
-                             Pass either correct slice information or a 2D array".format(slice_requested, type(data), data.shape))
-       
-        #get axis labels per subplot
-        if type(axis_labels) is list: 
-            plot_axis_labels = axis_labels[i]
-        else:
-            plot_axis_labels = axis_labels
-
-        if plot_axis_labels is None and hasattr(plot_data,'dimension_labels'):
-                plot_axis_labels = (plot_data.dimension_labels[1],plot_data.dimension_labels[0])
-
-        #get min/max of subsetted data
-        range_min = min(range_min, plot_data.min())
-        range_max = max(range_max, plot_data.max())
-
-        #get title per subplot
-        if isinstance(title, list):
-            if title[i] is None:
-                plot_title = ''
-            else:
-                plot_title = title[i]
-        else:
-            if title is None:
-                plot_title = ''
-            else:
-                plot_title = title
-
-        if subtitle is not None:
-            plot_title += '\n' + subtitle
-
-        #get origin per subplot
-        if isinstance(origin, list):
-            plot_origin = origin[i]
-        else:
-            plot_origin = origin
-
-        subplots.append(_PlotData(plot_data,plot_title,plot_axis_labels, plot_origin))
-
-    #set range per subplot
-    for i, subplot in enumerate(subplots):
-        if fix_range is False:
-            pass
-        elif fix_range is True:
-            subplot.range = (range_min,range_max)
-        elif type(fix_range) is list:
-            subplot.range = fix_range[i]
-        else:
-            subplot.range = (fix_range[0], fix_range[1])                
-        
-    #create plots
-    if num_plots < num_cols:
-        num_cols = num_plots
-        
-    num_rows = int(round((num_plots+0.5)/num_cols))
-    fig, (ax) = plt.subplots(num_rows, num_cols, figsize=size)
-    axes = ax.flatten() 
-
-    #set up plots
-    for i in range(num_rows*num_cols):
-        axes[i].set_visible(False)
-
-    for i, subplot in enumerate(subplots):
-
-        axes[i].set_visible(True)
-        axes[i].set_title(subplot.title)
-
-        if subplot.axis_labels is not None:
-            axes[i].set_ylabel(subplot.axis_labels[1])
-            axes[i].set_xlabel(subplot.axis_labels[0])  
-
-        #set origin
-        shape_v = [0,subplot.data.shape[0]]
-        shape_h = [0,subplot.data.shape[1]]
-
-        if type(subplot.data) != np.ndarray:
-            data = subplot.data.as_array() 
-        else:
-            data = subplot.data
+    if type(data) != np.ndarray:
+        data = data.as_array() 
             
-        data_origin='lower'
+    data_origin='lower'
 
-        if 'upper' in subplot.origin:
-            shape_v.reverse()
-            data_origin='upper'
+    if 'upper' in origin:
+        shape_v.reverse()
+        data_origin='upper'
 
-        if 'right' in subplot.origin:
-            shape_h.reverse()
-            data = np.flip(data,1)
+    if 'right' in origin:
+        shape_h.reverse()
+        data = np.flip(data,1)
 
-        extent = (*shape_h,*shape_v)
-        
-        sp = axes[i].imshow(data, cmap=cmap, origin=data_origin, extent=extent)
+    extent = (*shape_h,*shape_v)
+    return data, data_origin, extent
 
-        im_ratio = subplot.data.shape[0]/subplot.data.shape[1]
+class show_base(object):
+    def save(self,filename, **kwargs):
+        '''
+        Saves the image as a `.png` using matplotlib.figure.savefig()
 
-        y_axes2 = False
-        if isinstance(subplot.data,(AcquisitionData)):
-            if axes[i].get_ylabel() == 'angle':
-                locs = axes[i].get_yticks()
-                location_new = locs[0:-1].astype(int)
+        matplotlib kwargs can be passed, refer to documentation
+        https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html
+        '''
+        file,extension = os.path.splitext(os.path.abspath(filename))
+        extension = extension.strip('.')
 
-                ang = subplot.data.geometry.config.angles
+        extensions = plt.gcf().canvas.get_supported_filetypes()
+        extensions = [i for i in extensions.keys()]
 
-                labels_new = [str(i) for i in np.take(ang.angle_data, location_new)]
-                axes[i].set_yticklabels(labels_new)
-                
-                axes[i].set_ylabel('angle / ' + str(ang.angle_unit))
+        format = kwargs.get('format',None)
 
-                y_axes2 = axes[i].axes.secondary_yaxis('right')
-                y_axes2.set_ylabel('angle / index')
-        
-                if subplot.data.shape[0] < subplot.data.shape[1]//2:
-                    axes[i].set_aspect(1/im_ratio)
-                    im_ratio = 1
-
-        if y_axes2: 
-            scale = 0.041*im_ratio
-            pad = 0.12
+        if format is None:
+            if extension == '': 
+                extension = 'png'
         else:
-            scale = 0.0467*im_ratio
-            pad = 0.02
+            extension = format
 
-        plt.tight_layout()
-        plt.colorbar(sp, orientation='vertical', ax=axes[i],fraction=scale, pad=pad)
+        if extension not in extensions:
+            raise ValueError("Extension not valid. Got {0}, backend supports {1}".format(extension,extensions))
 
-        if subplot.range is not None:
-            sp.set_clim(subplot.range[0],subplot.range[1])
-    plt.show()
+        try:
+            path_full = file+'.'+extension
+            self.figure.set_tight_layout(True)
+            self.figure.set_facecolor('w')
+            self.figure.savefig(path_full, bbox_inches='tight',**kwargs)
+            print("Saved image as {}".format(path_full))
+        except PermissionError:
+            print("Unable to save image. Permissions denied: {}".format(path_full))
+        except:
+            print("Unable to save image")
+
+class show2D(show_base):
+    r'''This class plots and saves 2D slices from cil DataContainer types.
+     '''
+    def __init__(self,datacontainers, title=None, slice_list=None, fix_range=False, axis_labels=None, origin='lower-left', cmap='gray', num_cols=2, size=(15,15)):
+        r'''This plots 2D slices from cil DataContainer types.
+
+        Plots 1 or more 2D plots in an (n x num_cols) matix.
+        Can plot multiple slices from one 3D dataset, or compare multiple datasets
+        Inputs can be single arguments or list of arguments that will be sequentally applied to subplots
+        If no slice_list is passed a 3D dataset will display the centre slice of the outer dimension, a 4D dataset will show the centre slices of the two outer dimension.
+
+        :param datacontainers: The DataContainers to be displayed.
+        :type datacontainers: ImageData, AcquisitionData, list of  Image/AcquisitionData, BlockDataContainer
+        :param title: The title for each figure
+        :type title: string, list of strings
+        :param slice_list: The slices to show. A list of intergers will show slices for the outer dimension. For 3D datacontainers single slice: (direction, index). For 4D datacontainers two slices: [(direction0, index),(direction1, index)].
+        :type slice_list: tuple, int, list of tuples, list of ints
+        :param fix_range: Sets the display range of the data. `True` sets all plots to the global (min, max). 
+        :type fix_range: boolian, tuple, list of tuples
+        :param axis_labels: The axis labels for each figure e.g. ('x','y')
+        :type axis_labels: tuple, list of tuples
+        :param origin: Sets the display origin. 'lower/upper-left/right'
+        :type origin: string, list of strings
+        :param cmap: Sets the colour map of the plot (see matplotlib.pyplot)
+        :param num_cols: Sets the number of columns of subplots to display
+        :type num_cols: int
+        :param size: Figure size in inches
+        :type size: tuple of floats
+        :return: returns an matplotlib.pyplot figure object
+        :rtype: matplotlib.figure.Figure
+        '''
+        self.figure = self.__show2D(datacontainers, title=title, slice_list=slice_list, fix_range=fix_range, axis_labels=axis_labels, origin=origin, cmap=cmap, num_cols=num_cols, size=size)
+
+    def __show2D(self,datacontainers, title=None, slice_list=None, fix_range=False, axis_labels=None, origin='lower-left', cmap='gray', num_cols=2, size=(15,15)):
+        r'''This function plots 2D slices from cil DataContainer types. It returns a matplotlib figure that can be saved with the pyplot 'savefig()' method.
+
+        Plots 1 or more 2D plots in an (n x num_cols) matix.
+        Can plot multiple slices from one 3D dataset, or compare multiple datasets
+        Inputs can be single arguments or list of arguments that will be sequentally applied to subplots
+        If no slice_list is passed a 3D dataset will display the centre slice of the outer dimension, a 4D dataset will show the centre slices of the two outer dimension.
+
+        :param datacontainers: The DataContainers to be displayed.
+        :type datacontainers: ImageData, AcquisitionData, list of  Image/AcquisitionData, BlockDataContainer
+        :param title: The title for each figure
+        :type title: string, list of strings
+        :param slice_list: The slices to show. A list of intergers will show slices for the outer dimension. For 3D datacontainers single slice: (direction, index). For 4D datacontainers two slices: [(direction0, index),(direction1, index)].
+        :type slice_list: tuple, int, list of tuples, list of ints
+        :param fix_range: Sets the display range of the data. `True` sets all plots to the global (min, max). 
+        :type fix_range: boolian, tuple, list of tuples
+        :param axis_labels: The axis labels for each figure e.g. ('x','y')
+        :type axis_labels: tuple, list of tuples
+        :param origin: Sets the display origin. 'lower/upper-left/right'
+        :type origin: string, list of strings
+        :param cmap: Sets the colour map of the plot (see matplotlib.pyplot)
+        :param num_cols: Sets the number of columns of subplots to display
+        :type num_cols: int
+        :param size: Figure size in inches
+        :type size: tuple of floats
+        :return: returns an matplotlib.pyplot figure object
+        :rtype: matplotlib.figure.Figure
+        '''
+
+        #get number of subplots, number of input datasets, or number of slices requested
+        if isinstance(datacontainers, (list, BlockDataContainer)):
+            num_plots = len(datacontainers)
+        else:
+            dim = len(datacontainers.shape)
+
+            if slice_list is None or dim == 2:
+                num_plots = 1
+            elif type(slice_list) is tuple:
+                num_plots = 1
+            elif dim == 4 and type(slice_list[0]) is tuple:
+                num_plots = 1  
+            else:
+                num_plots = len(slice_list)       
+
+        subplots = []
+
+        #range needs subsetted data
+        range_min = float("inf")
+        range_max = -range_min
+
+        #set up, all inputs can be 1 or num_plots
+        for i in range(num_plots):
+
+            #get data per subplot, subset where required
+            if isinstance(datacontainers, (list, BlockDataContainer)):
+                data = datacontainers[i]
+            else:
+                data = datacontainers
+
+            if len(data.shape) ==4:
+
+                if slice_list is None or type(slice_list) is tuple or type(slice_list[0]) is tuple: #none, (direction, ind) or [(direction0, ind), (direction1, ind)] apply to all datasets
+                    slice_requested = slice_list
+                elif type(slice_list[i]) == int or len(slice_list[i]) > 1: # [ind0, ind1, ind2] of direction0, or [[(direction0, ind), (direction1, ind)],[(direction0, ind), (direction1, ind)]]
+                    slice_requested = slice_list[i]
+                else:
+                    slice_requested = slice_list[i][0] # [[(direction0, ind)],[(direction0, ind)]]
+
+                cut_axis = [0,1]
+                cut_slices = [data.shape[0]//2, data.shape[1]//2]
+
+                if type(slice_requested) is int:
+                    #use axis 0, slice val
+                    cut_slices[0] = slice_requested
+                elif type(slice_requested) is tuple:
+                    #get axis ind,
+                    # if 0 default 1
+                    # if 1 default 0
+                    axis = slice_requested[0]
+                    if slice_requested[0] is str:
+                        axis = data.dimension_labels.index(axis)
+
+                    if axis == 0:
+                        cut_axis[0] = slice_requested[0]
+                        cut_slices[0] = slice_requested[1]
+                    else:
+                        cut_axis[1] = slice_requested[0]
+                        cut_slices[1] = slice_requested[1]
+
+                elif type(slice_requested) is list:
+                    #use full input
+                    cut_axis[0] = slice_requested[0][0]
+                    cut_axis[1] = slice_requested[1][0]
+                    cut_slices[0] = slice_requested[0][1]
+                    cut_slices[1] = slice_requested[1][1]
+
+                    if cut_axis[0] > cut_axis[1]:
+                        cut_axis.reverse()
+                        cut_slices.reverse()
+
+                try:
+                    if hasattr(data, 'subset'):
+                        if type(cut_axis[0]) is int:
+                            cut_axis[0] = data.dimension_labels[cut_axis[0]]
+                        if type(cut_axis[1]) is int:
+                            cut_axis[1] = data.dimension_labels[cut_axis[1]]
+
+                        temp_dict = {cut_axis[0]:cut_slices[0], cut_axis[1]:cut_slices[1]}
+                        plot_data = data.subset(**temp_dict, force=True)
+                    elif hasattr(data,'as_array'):
+                        plot_data = data.as_array().take(indices=cut_slices[1], axis=cut_axis[1])
+                        plot_data = plot_data.take(indices=cut_slices[0], axis=cut_axis[0])
+                    else:
+                        plot_data = data.take(indices=cut_slices[1], axis=cut_axis[1])
+                        plot_data = plot_data.take(indices=cut_slices[0], axis=cut_axis[0])
+
+                except:
+                    raise TypeError("Unable to slice input data. Could not obtain 2D slice {0} from {1} with shape {2}.\n\
+                            Pass either correct slice information or a 2D array".format(slice_requested, type(data), data.shape))
+
+                subtitle = "direction: ({0},{1}), slice: ({2},{3})".format(*cut_axis, * cut_slices)
+
+                    
+            elif len(data.shape) == 3:
+                #get slice list per subplot
+                if type(slice_list) is list:            #[(direction, ind), (direction, ind)],  [ind0, ind1, ind2] of direction0
+                    slice_requested = slice_list[i]
+                else:                                   #(direction, ind) single tuple apply to all datasets
+                    slice_requested = slice_list
+
+                #default axis 0, centre slice
+                cut_slice = data.shape[0]//2
+                cut_axis = 0
+                
+                if type(slice_requested) is int:
+                    #use axis 0, slice val
+                    cut_slice = slice_requested             
+                if type(slice_requested) is tuple:
+                    cut_slice = slice_requested[1]
+                    cut_axis = slice_requested[0]
+
+                try:
+                    if hasattr(data, 'subset'):
+                        if type(cut_axis) is int:
+                            cut_axis = data.dimension_labels[cut_axis]
+                        temp_dict = {cut_axis:cut_slice}
+                        plot_data = data.subset(**temp_dict, force=True)
+                    elif hasattr(data,'as_array'):
+                        plot_data = data.as_array().take(indices=cut_slice, axis=cut_axis)
+                    else:
+                        plot_data = data.take(indices=cut_slice, axis=cut_axis)
+                except:
+                    raise TypeError("Unable to slice input data. Could not obtain 2D slice {0} from {1} with shape {2}.\n\
+                            Pass either correct slice information or a 2D array".format(slice_requested, type(data), data.shape))
+
+                subtitle = "direction: {0}, slice: {1}".format(cut_axis,cut_slice)  
+            else:
+                plot_data = data
+                subtitle = None
+
+
+            #check dataset is now 2D
+            if len(plot_data.shape) != 2:
+                raise TypeError("Unable to slice input data. Could not obtain 2D slice {0} from {1} with shape {2}.\n\
+                                Pass either correct slice information or a 2D array".format(slice_requested, type(data), data.shape))
+        
+            #get axis labels per subplot
+            if type(axis_labels) is list: 
+                plot_axis_labels = axis_labels[i]
+            else:
+                plot_axis_labels = axis_labels
+
+            if plot_axis_labels is None and hasattr(plot_data,'dimension_labels'):
+                    plot_axis_labels = (plot_data.dimension_labels[1],plot_data.dimension_labels[0])
+
+            #get min/max of subsetted data
+            range_min = min(range_min, plot_data.min())
+            range_max = max(range_max, plot_data.max())
+
+            #get title per subplot
+            if isinstance(title, list):
+                if title[i] is None:
+                    plot_title = ''
+                else:
+                    plot_title = title[i]
+            else:
+                if title is None:
+                    plot_title = ''
+                else:
+                    plot_title = title
+
+            if subtitle is not None:
+                plot_title += '\n' + subtitle
+
+            #get origin per subplot
+            if isinstance(origin, list):
+                plot_origin = origin[i]
+            else:
+                plot_origin = origin
+
+            subplots.append(_PlotData(plot_data,plot_title,plot_axis_labels, plot_origin))
+
+        #set range per subplot
+        for i, subplot in enumerate(subplots):
+            if fix_range is False:
+                pass
+            elif fix_range is True:
+                subplot.range = (range_min,range_max)
+            elif type(fix_range) is list:
+                subplot.range = fix_range[i]
+            else:
+                subplot.range = (fix_range[0], fix_range[1])                
+            
+        #create plots
+        if num_plots < num_cols:
+            num_cols = num_plots
+            
+        num_rows = int(round((num_plots+0.5)/num_cols))
+        fig, (ax) = plt.subplots(num_rows, num_cols, figsize=size)
+        axes = ax.flatten() 
+
+        #set up plots
+        for i in range(num_rows*num_cols):
+            axes[i].set_visible(False)
+
+        for i, subplot in enumerate(subplots):
+
+            axes[i].set_visible(True)
+            axes[i].set_title(subplot.title)
+
+            if subplot.axis_labels is not None:
+                axes[i].set_ylabel(subplot.axis_labels[1])
+                axes[i].set_xlabel(subplot.axis_labels[0])  
+
+            #set origin
+            data, data_origin, extent = set_origin(subplot.data, subplot.origin)
+            
+            sp = axes[i].imshow(data, cmap=cmap, origin=data_origin, extent=extent)
+
+            im_ratio = subplot.data.shape[0]/subplot.data.shape[1]
+
+            y_axes2 = False
+            if isinstance(subplot.data,(AcquisitionData)):
+                if axes[i].get_ylabel() == 'angle':
+                    locs = axes[i].get_yticks()
+                    location_new = locs[0:-1].astype(int)
+
+                    ang = subplot.data.geometry.config.angles
+
+                    labels_new = [str(i) for i in np.take(ang.angle_data, location_new)]
+                    axes[i].set_yticklabels(labels_new)
+                    
+                    axes[i].set_ylabel('angle / ' + str(ang.angle_unit))
+
+                    y_axes2 = axes[i].axes.secondary_yaxis('right')
+                    y_axes2.set_ylabel('angle / index')
+            
+                    if subplot.data.shape[0] < subplot.data.shape[1]//2:
+                        axes[i].set_aspect(1/im_ratio)
+                        im_ratio = 1
+
+            if y_axes2: 
+                scale = 0.041*im_ratio
+                pad = 0.12
+            else:
+                scale = 0.0467*im_ratio
+                pad = 0.02
+
+            plt.colorbar(sp, orientation='vertical', ax=axes[i],fraction=scale, pad=pad)
     
+            if subplot.range is not None:
+                sp.set_clim(subplot.range[0],subplot.range[1])
+        
+        fig.set_tight_layout(True)
+        fig.set_facecolor('w')
+
+        #plt.show() creates a new figure so we save a copy to return
+        fig2 = plt.gcf()
+        plt.show()
+        return fig2
+
 def plotter2D(datacontainers, title=None, slice_list=None, fix_range=False, axis_labels=None, origin='lower-left', cmap='gray', num_cols=2, size=(15,15)):
     '''Alias of show2D'''
-    show2D(datacontainers, title=title, slice_list=slice_list, fix_range=fix_range, axis_labels=axis_labels, origin=origin, cmap=cmap, num_cols=num_cols, size=size)
-
-
-
+    return show2D(datacontainers, title=title, slice_list=slice_list, fix_range=fix_range, axis_labels=axis_labels, origin=origin, cmap=cmap, num_cols=num_cols, size=size)
 
 class _Arrow3D(FancyArrowPatch):
 
@@ -432,9 +506,13 @@ class _ShowGeometry(object):
                         borderaxespad=0, frameon=False,fontsize=self.text_options.get('fontsize'))
 
 
-        plt.tight_layout()
+        self.fig.set_tight_layout(True)
+        self.fig.set_facecolor('w')
 
+        #plt.show() creates a new figure so we save a copy to return
+        fig2 = plt.gcf()
         plt.show()
+        return fig2
 
     def display_world(self):
 
@@ -663,33 +741,36 @@ class _ShowGeometry(object):
         self.handles.append(h0)
         self.labels.append(h0.get_label())
 
-#%%
-def show_geometry(acquisition_geometry, image_geometry=None, elevation=20, azimuthal=-35, view_distance=10, grid=False, figsize=(10,10), fontsize=10):
-    '''
-    Displays a schematic of the acquisition geometry
-    for 2D geometries elevation and azimuthal cannot be changed
+class show_geometry(show_base):
+    r'''This class plots and saves a schematic of the acquisition geometry.
+     '''
+    def __init__(self,acquisition_geometry, image_geometry=None, elevation=20, azimuthal=-35, view_distance=10, grid=False, figsize=(10,10), fontsize=10):
+        r'''Displays a schematic of the acquisition geometry
+        for 2D geometries elevation and azimuthal cannot be changed
 
-    :acquisition_geometry: CIL acquisition geometry
-    :type acquisition_geometry: AcquisitionGeometry     
-    :image_geometry: CIL image geometry
-    :type image_geometry: ImageGeometry, optional 
-    :elevation: Camera elevation in degrees, 3D geometries only
-    :type elevation: float, default=20  
-    :azimuthal: Camera azimuthal in degrees, 3D geometries only
-    :type azimuthal: float, default=-35  
-    :view_distance: Camera view distance
-    :type view_distance: float, default=10  
-    :grid: Show figure axis
-    :type grid: boolean, default=False
-    :figsize: Set figure size (inches)
-    :type figsize: tuple (x, y), default (10,10)    
-    :type grid: boolean, default=False
-    :fontsize: Set fontsize
-    :type fontsize: int 
-    '''
-    if acquisition_geometry.dimension == '2D':
-        elevation = 90
-        azimuthal = 0
+        :acquisition_geometry: CIL acquisition geometry
+        :type acquisition_geometry: AcquisitionGeometry     
+        :image_geometry: CIL image geometry
+        :type image_geometry: ImageGeometry, optional 
+        :elevation: Camera elevation in degrees, 3D geometries only
+        :type elevation: float, default=20  
+        :azimuthal: Camera azimuthal in degrees, 3D geometries only
+        :type azimuthal: float, default=-35  
+        :view_distance: Camera view distance
+        :type view_distance: float, default=10  
+        :grid: Show figure axis
+        :type grid: boolean, default=False
+        :figsize: Set figure size (inches)
+        :type figsize: tuple (x, y), default (6,6)    
+        :type grid: boolean, default=False
+        :fontsize: Set fontsize, default 7
+        :type fontsize: int 
+        :return: returns an matplotlib.pyplot figure object
+        :rtype: matplotlib.figure.Figure
+        '''
+        if acquisition_geometry.dimension == '2D':
+            elevation = 90
+            azimuthal = 0
 
-    display = _ShowGeometry(acquisition_geometry, image_geometry)
-    display.draw(elev=elevation, azim=azimuthal, view_distance=view_distance, grid=grid, figsize=(10,10), fontsize=10)
+        self.display = _ShowGeometry(acquisition_geometry, image_geometry)
+        self.figure = self.display.draw(elev=elevation, azim=azimuthal, view_distance=view_distance, grid=grid, figsize=figsize, fontsize=fontsize)

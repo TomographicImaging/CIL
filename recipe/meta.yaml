@@ -26,7 +26,7 @@ test:
     - tigre              # [ linux or win ] 
     - numba
     - packaging
-    - ccpi-regulariser
+    - ccpi-regulariser   # [ not osx ]
     
   source_files:
     - ./Wrappers/Python/test     # [win]
@@ -42,19 +42,24 @@ requirements:
     - python
     - numpy {{ numpy }}
     - setuptools
-    - cmake
+    - cmake         # [not osx]
+    - cmake >=3.16 # [osx]
     - libgcc-ng     # [linux]
     - libstdcxx-ng  # [linux]
     - _openmp_mutex # [linux]
     - openmp        # [osx]
     - vc 14         # [win]
     - cil-data
+    - ripgrep
+    - ipp-include
+    - ipp-devel
+    - ipp
 
   run:
     - python
     - {{ pin_compatible('numpy', min_pin='x.x', max_pin='x.x') }}
     - scipy
-    - matplotlib
+    - matplotlib >=3.3.0
     - h5py
     - pillow
     - libgcc-ng     # [linux]
@@ -66,7 +71,7 @@ requirements:
     - olefile >=0.46
     - pywavelets
     - cil-data
-    
+    - ipp
   
 about:
   home: http://www.ccpi.ac.uk/cil

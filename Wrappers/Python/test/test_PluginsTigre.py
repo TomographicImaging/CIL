@@ -18,28 +18,31 @@
 from cil.framework import AcquisitionGeometry, ImageGeometry
 import unittest
 import numpy as np
+from utils import has_gpu_tigre, has_gpu_astra
 
 try:
     import tigre
+    from cil.plugins.tigre import CIL2TIGREGeometry
+    from cil.plugins.tigre import ProjectionOperator
+    from cil.plugins.tigre import FBP
     has_tigre = True
 except ModuleNotFoundError:
     print(  "This plugin requires the additional package TIGRE\n" +
             "Please install it via conda as tigre from the ccpi channel\n"+
             "Minimal version is 21.01")
     has_tigre = False
-else:
-    from cil.plugins.tigre import CIL2TIGREGeometry
-    from cil.plugins.tigre import ProjectionOperator
-    from cil.plugins.tigre import FBP
 
 try:
     import astra
+    from cil.plugins.astra.operators import ProjectionOperator as AstraProjectionOperator
+    from cil.plugins.astra.processors import FBP as AstraFBP
     has_astra = True
 except ModuleNotFoundError:
     has_astra = False
-else:
-    from cil.plugins.astra.operators import ProjectionOperator as AstraProjectionOperator
-    from cil.plugins.astra.processors import FBP as AstraFBP
+
+has_astra = has_astra and has_gpu_astra()
+has_tigre = has_tigre and has_gpu_tigre()
+
 
 class Test_convert_geometry(unittest.TestCase):
     def setUp(self): 
@@ -309,7 +312,6 @@ class Test_results(unittest.TestCase):
 
     @unittest.skipUnless(has_tigre and has_astra, "TIGRE or ASTRA not installed")
     def test_bp_with_Astra(self):
-
         AOp = AstraProjectionOperator(self.ig, self.ag)
         bp_ASTRA = AOp.adjoint(self.fp.get_slice(vertical='centre'))
         TOp = ProjectionOperator(self.ig, self.ag)

@@ -1,7 +1,19 @@
-* 21.x.x
+* 21.2.1
+  - Add dtype for ImageGeometry, AcquisitionGeometry, VectorGeometry, BlockGeometry
+  - Fix GradientOperator to handle pseudo 2D CIL geometries
+  - Created Reconstructor base class for simpler use of CIL methods
+  - Added Intel IPP based library for filtering step of FBP
+  - Created FBP Reconstructor class using IPP
+  - PDHG memory optimisation
+  - ScaledFunction memory Optimisation
+
+* 21.2.0
   - add version string from git describe
   - add CCPi-Regularisation toolkit in unittests
   - show_geometry implemented to display AcquisitionGeometry objects, can be imported from utilities.display
+  - CentreOfRotationCorrector.image_sharpness implemented which finds the rotation axis offset by maximising sharpness of a single slice reconstruction
+  - Renamed CentreOfRotationCorrector.xcorr to CentreOfRotationCorrector.xcorrelation
+  - Implemented Padder processor
 
 * 21.1.0
   - Added TomoPhantom plugin to create 2D/3D + channel ImageData phantoms based on the TomoPhantom model library

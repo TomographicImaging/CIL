@@ -50,12 +50,16 @@ import os, sys, time
 # Fast Gradient Projection algorithm for Total Variation(TV)
 from cil.optimisation.functions import TotalVariation
 
+from utils import has_gpu_tigre, has_gpu_astra
+
 try:
-    from cil.plugins.astra.operators import AstraProjectorSimple
+    from cil.plugins.astra import ProjectionOperator
     has_astra = True    
 except ImportError as ie:
     # skip test
     has_astra = False
+
+has_astra = has_astra and has_gpu_astra()
 
 debug_print = False
 
@@ -463,7 +467,7 @@ class TestAlgorithms(unittest.TestCase):
         identity = IdentityOperator(ig)
         
         try:
-            alg = SIRT(initial=initial, operator=identity, data=b, x_init=initial)
+            alg = CGLS(initial=initial, operator=identity, data=b, x_init=initial)
             assert False
         except ValueError as ve:
             assert True
@@ -599,7 +603,7 @@ class TestSPDHG(unittest.TestCase):
         # Select device
         dev = 'cpu'
     
-        Aop = AstraProjectorSimple(ig, ag, dev)
+        Aop = ProjectionOperator(ig, ag, dev)
         
         sin = Aop.direct(data)
         # Create noisy data. Apply Gaussian noise
@@ -648,7 +652,7 @@ class TestSPDHG(unittest.TestCase):
         list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1, angle_unit='radian') 
                         for i in range(len(list_angles))]
         # create with operators as many as the subsets
-        A = BlockOperator(*[AstraProjectorSimple(ig, list_geoms[i], dev) for i in range(subsets)])
+        A = BlockOperator(*[ProjectionOperator(ig, list_geoms[i], dev) for i in range(subsets)])
         ## number of subsets
         #(sub2ind, ind2sub) = divide_1Darray_equally(range(len(A)), subsets)
         #
@@ -697,7 +701,7 @@ class TestSPDHG(unittest.TestCase):
         # Select device
         dev = 'cpu'
 
-        Aop = AstraProjectorSimple(ig, ag, dev)
+        Aop = ProjectionOperator(ig, ag, dev)
         
         sin = Aop.direct(data)
         # Create noisy data. Apply Gaussian noise
@@ -730,7 +734,7 @@ class TestSPDHG(unittest.TestCase):
         list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1, angle_unit='radian') 
         for i in range(len(list_angles))]
         # create with operators as many as the subsets
-        A = BlockOperator(*[AstraProjectorSimple(ig, list_geoms[i], dev) for i in range(subsets)] + [op1])
+        A = BlockOperator(*[ProjectionOperator(ig, list_geoms[i], dev) for i in range(subsets)] + [op1])
         ## number of subsets
         #(sub2ind, ind2sub) = divide_1Darray_equally(range(len(A)), subsets)
         #
@@ -810,7 +814,7 @@ class TestSPDHG(unittest.TestCase):
         #     dev = 'cpu'
         dev = 'cpu'
 
-        Aop = AstraProjectorSimple(ig, ag, dev)
+        Aop = ProjectionOperator(ig, ag, dev)
         
         sin = Aop.direct(data)
         # Create noisy data. Apply Gaussian noise
@@ -840,7 +844,7 @@ class TestSPDHG(unittest.TestCase):
         list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1, angle_unit='radian') 
         for i in range(len(list_angles))]
         # create with operators as many as the subsets
-        A = BlockOperator(*[AstraProjectorSimple(ig, list_geoms[i], dev) for i in range(subsets)] + [op1])
+        A = BlockOperator(*[ProjectionOperator(ig, list_geoms[i], dev) for i in range(subsets)] + [op1])
         ## number of subsets
         #(sub2ind, ind2sub) = divide_1Darray_equally(range(len(A)), subsets)
         #
@@ -890,6 +894,7 @@ class TestSPDHG(unittest.TestCase):
     @unittest.skipUnless(has_astra, "ccpi-astra not available")
     def test_PDHG_vs_PDHG_explicit_axpby(self):
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
+        
         if debug_print:
             print ("test_PDHG_vs_PDHG_explicit_axpby here")
         ig = data.geometry
@@ -902,9 +907,10 @@ class TestSPDHG(unittest.TestCase):
         
         dev = 'cpu'
 
-        Aop = AstraProjectorSimple(ig, ag, dev)
+        Aop = ProjectionOperator(ig, ag, dev)
         
         sin = Aop.direct(data)
+        
         # Create noisy data. Apply Gaussian noise
         noises = ['gaussian', 'poisson']
         noise = noises[1]
@@ -912,11 +918,12 @@ class TestSPDHG(unittest.TestCase):
             np.random.seed(10)
             scale = 5
             eta = 0
-            noisy_data = AcquisitionData(np.random.poisson( scale * (eta + sin.as_array()))/scale, geometry=ag)
+            noisy_data = AcquisitionData(numpy.asarray(np.random.poisson( scale * (eta + sin.as_array())),dtype=numpy.float32)/scale, geometry=ag)
+
         elif noise == 'gaussian':
             np.random.seed(10)
             n1 = np.random.normal(0, 0.1, size = ag.shape)
-            noisy_data = AcquisitionData(n1 + sin.as_array(), geometry=ag)
+            noisy_data = AcquisitionData(numpy.asarray(n1 + sin.as_array(), dtype=numpy.float32), geometry=ag)
             
         else:
             raise ValueError('Unsupported Noise ', noise)
@@ -1111,8 +1118,9 @@ class TestADMM(unittest.TestCase):
         from cil.utilities.quality_measures import psnr
         if debug_print:
             print ("PSNR" , psnr(admm.solution, pdhg.solution))
-        np.testing.assert_almost_equal(psnr(admm.solution, pdhg.solution), 84.46678222768597, decimal=4)
-        # 84.46678222768597
+        np.testing.assert_almost_equal(psnr(admm.solution, pdhg.solution), 84.55162459062069, decimal=4)
 
     def tearDown(self):
         pass
+
+    

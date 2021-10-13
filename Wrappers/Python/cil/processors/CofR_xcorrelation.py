@@ -19,9 +19,15 @@ from cil.framework import Processor, AcquisitionData
 import numpy as np
 from scipy import signal
 
-class CofR_xcorr(Processor):
+import logging
+import math
 
-    r'''CofR_xcorr processor uses the cross-correlation algorithm on a single slice between two projections at 180 degrees inteval.
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+class CofR_xcorrelation(Processor):
+
+    r'''CofR_xcorrelation processor uses the cross-correlation algorithm on a single slice between two projections at 180 degrees inteval.
 
     For use on parallel-beam geometry it requires two projections 180 degree apart.
 
@@ -43,7 +49,7 @@ class CofR_xcorr(Processor):
                     'projection_index': 0
                  }
 
-        super(CofR_xcorr, self).__init__(**kwargs)
+        super(CofR_xcorrelation, self).__init__(**kwargs)
 
     def check_input(self, data):
         if not isinstance(data, AcquisitionData):
@@ -64,8 +70,8 @@ class CofR_xcorr(Processor):
             except:
                 raise ValueError("slice_index expected to be a positive integer or the string 'centre'. Got {0}".format(self.slice_index))
 
-            if self.slice_index >= data.get_dimension_size('vertical'):
-                raise ValueError('slice_index is out of range. Must be less than {0}. Got {1}'.format(data.get_dimension_size('vertical'), self.slice_index))
+            if self.slice_index < 0 or self.slice_index >= data.get_dimension_size('vertical'):
+                raise ValueError('slice_index is out of range. Must be in range 0-{0}. Got {1}'.format(data.get_dimension_size('vertical'), self.slice_index))
 
         if self.projection_index >= data.geometry.config.angles.num_positions:
                 raise ValueError('projection_index is out of range. Must be less than {0}. Got {1}'.format(data.geometry.config.angles.num_positions, self.projection_index))
@@ -74,7 +80,14 @@ class CofR_xcorr(Processor):
     
     def process(self, out=None):
 
-        data = self.get_input()
+
+        data_full = self.get_input()
+
+        if data_full.geometry.dimension == '3D':
+            data = data_full.get_slice(vertical=self.slice_index)
+        else:
+            data = data_full
+
         geometry = data.geometry
 
         angles_deg = geometry.config.angles.angle_data.copy()
@@ -83,29 +96,30 @@ class CofR_xcorr(Processor):
             angles_deg *= 180/np.pi 
 
         #keep angles in range -180 to 180
-        while angles_deg.min() <-180:
-            angles_deg[angles_deg<-180] += 360
+        while angles_deg.min() <=-180:
+            angles_deg[angles_deg<=-180] += 360
 
-        while angles_deg.max() >= 180:
-            angles_deg[angles_deg>=180] -= 360
+        while angles_deg.max() > 180:
+            angles_deg[angles_deg>180] -= 360
 
         target = angles_deg[self.projection_index] + 180
         
-        if target <-180:
+        if target <= -180:
             target += 360
-        elif target >= 180:
+        elif target > 180:
+
             target -= 360     
 
         ind = np.abs(angles_deg - target).argmin()
         
-        if abs(angles_deg[ind] - angles_deg[0])-180 > self.ang_tol:
-            raise ValueError('Method requires projections at 180 degrees interval')
+        ang_diff = abs(angles_deg[ind] - angles_deg[0])
+        if abs(ang_diff-180) > self.ang_tol:
+            raise ValueError('Method requires projections at 180 +/- {0} degrees interval, got {1}.\nPick a different initial projection or increase the angular tolerance `ang_tol`.'.format(self.ang_tol, ang_diff))
 
         #cross correlate single slice with the 180deg one reveresed
-        data_slice = data.subset(vertical=self.slice_index)
+        data1 = data.subset(angle=0).as_array()
+        data2 = np.flip(data.subset(angle=ind).as_array())
 
-        data1 = data_slice.subset(angle=0).as_array()
-        data2 = np.flip(data_slice.subset(angle=ind).as_array())
     
         border = int(data1.size * 0.05)
         lag = np.correlate(data1[border:-border],data2[border:-border],"full")
@@ -120,16 +134,19 @@ class CofR_xcorr(Processor):
         shift = (quad_max - (lag.size-1)/2)/2
         shift = np.floor(shift *100 +0.5)/100
 
-        new_geometry = data.geometry.copy()
+
+        new_geometry = data_full.geometry.copy()
 
         #set up new geometry
         new_geometry.config.system.rotation_axis.position[0] = shift * geometry.config.panel.pixel_size[0]
         
-        print("Centre of rotation correction using cross-correlation")
-        print("\tCalculated from slice: ", self.slice_index)
-        print("\tApplied centre of rotation shift = ", shift, "pixels at the detector.")
+        logger.info("Centre of rotation correction found using cross-correlation")
+        logger.info("Calculated from slice: %s", str(self.slice_index))
+        logger.info("Centre of rotation shift = %f pixels", shift)
+        logger.info("Centre of rotation shift = %f units at the object", shift * geometry.config.panel.pixel_size[0])
+        logger.info("Return new dataset with centred geometry")
 
         if out is None:
-            return AcquisitionData(array = data, deep_copy = True, dimension_labels = new_geometry.dimension_labels, geometry = new_geometry, supress_warning=True)
+            return AcquisitionData(array = data_full, deep_copy = True, geometry = new_geometry, supress_warning=True)
         else:
             out.geometry = new_geometry

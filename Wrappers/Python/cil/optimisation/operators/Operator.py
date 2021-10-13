@@ -191,11 +191,11 @@ class LinearOperator(Operator):
         '''
         seed = kwargs.get('seed',None)
         if range_init is None:
-            y = operator.range_geometry().allocate('random', seed=seed)
+            y = operator.range_geometry().allocate('random', seed=seed, dtype=operator.range.dtype)
         else:
             y = range_init
         if domain_init is None:
-            x = operator.domain_geometry().allocate('random',seed=seed)
+            x = operator.domain_geometry().allocate('random',seed=seed, dtype=operator.range.dtype)
         else:
             x = domain_init
             

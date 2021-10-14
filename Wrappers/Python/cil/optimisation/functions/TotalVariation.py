@@ -18,8 +18,6 @@
 from cil.optimisation.functions import Function, MixedL21Norm, IndicatorBox
 from cil.optimisation.operators import GradientOperator
 import numpy 
-import functools
-import numpy as np
 from numbers import Number
 import warnings
 
@@ -166,12 +164,16 @@ class TotalVariation(Function):
             t0 = t
             self.gradient.adjoint(tmp_q, out = tmp_x)
             
-            # axpby now works for matrices
-            tmp_x.axpby(-self.regularisation_parameter*tau, 1.0, x, out=tmp_x)
+            if isinstance(tmp_x.dtype, numpy.float32):
+                tmp_x.axpby(-self.regularisation_parameter*tau, 1.0, x, out=tmp_x)
+            else:
+                tmp_x *= -self.regularisation_parameter*tau
+                tmp_x.add(1.0 * x, out = tmp_x)                 
+
             self.projection_C(tmp_x, out = tmp_x)                       
 
             self.gradient.direct(tmp_x, out=p1)
-            if isinstance (tau, (Number, np.float32, np.float64)):
+            if isinstance (tau, (Number, numpy.float32, numpy.float64)):
                 p1 *= self.L/(self.regularisation_parameter * tau)
             else:
                 p1 *= self.L/self.regularisation_parameter

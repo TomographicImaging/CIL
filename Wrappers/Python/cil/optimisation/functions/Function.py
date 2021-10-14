@@ -95,7 +95,12 @@ class Function(object):
         if id(tmp) == id(x):
             x.multiply(tau, out = x)
 
-        val.axpby(-tau, 1.0, x, out=val)
+        if issubclass(val.dtype, np.complex):
+            val *= -tau
+            val.add(1.0 * x, out = val)
+        else:                  
+            val.axpby(-tau, 1.0, x, out=val)
+  
 
         if out is None:
             return val

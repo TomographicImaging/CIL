@@ -2403,16 +2403,16 @@ class DataContainer(object):
 
 
     def isreal(self):
-        return numpy.isreal(self.array)
+        return numpy.isreal(self.as_array())
 
     def isrealobj(self):
-        return numpy.isrealobj(self.array)
+        return numpy.isrealobj(self.as_array())
 
     def iscomplex(self):
-        return numpy.iscomplex(self.array)
+        return numpy.iscomplex(self.as_array())
 
     def iscomplexobj(self):
-        return numpy.iscomplexobj(self)        
+        return numpy.iscomplexobj(self.as_array())        
 
     
     #def __abs__(self):

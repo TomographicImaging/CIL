@@ -129,15 +129,19 @@ class TotalVariation(Function):
         self._domain = x.geometry
         
         # preallocated in proximal
+        tmp = self.pptmp
         tmp1 = self.pptmp1
         tmp1 *= 0
         
-        tmp1 = x.pnorm(2)
+        for el in x.containers:
+            el.conjugate().multiply(el, out=tmp)
+            tmp1.add(tmp, out=tmp1)
+        tmp1.sqrt(out=tmp1)
         tmp1.maximum(1.0, out=tmp1)
         if out is None:
             return x.divide(tmp1)
         else:
-            x.divide(tmp1, out=out)
+            x.divide(tmp1, out=out)            
     
     
     def proximal(self, x, tau, out = None):

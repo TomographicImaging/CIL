@@ -101,8 +101,6 @@ class Function(object):
             val *= -tau
             val.add(1.0 * x, out = val)                             
 
-  
-
         if out is None:
             return val
 

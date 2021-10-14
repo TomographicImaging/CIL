@@ -275,6 +275,37 @@ class TestAlgorithms(unittest.TestCase):
         except ValueError as ve:
             print (ve)
             self.assertTrue(True)
+
+    def test_TotalVariation_denoising_complex(self):
+
+        test_data = dataexample.CAMERA.get(size=(32,32))
+
+        data_np_complex = numpy.zeros(test_data.shape, dtype=complex)
+        data_np_complex.real = test_data.array
+        data_np_complex.imag = test_data.array
+
+        ig = test_data.geometry
+        ig.dtype = numpy.complex        
+
+        data_complex = ig.allocate(dtype=numpy.complex)
+        data_complex.fill(data_np_complex)
+
+        alpha = 0.5
+        Grad = GradientOperator(ig)
+        f = alpha * MixedL21Norm()
+        g = 0.5 * L2NormSquared(b=data_complex)
+
+        # Total Variation ROF denoising for complex data using PDHG
+        pdhg = PDHG(f=f, g=g, operator=Grad, max_iteration=2000, update_objective_interval=1000, use_axpby=False)
+        pdhg.run(verbose=0)
+        res1 = pdhg.solution
+
+        TV = alpha * TotalVariation(max_iteration=2000)
+        res2 = TV.proximal(data_complex, tau=1.0)  
+
+        numpy.testing.assert_array_almost_equal(res1.array, res2.array, decimal=3)      
+
+
     def test_PDHG_Denoising(self):
         print ("PDHG Denoising with 3 noises")
         # adapted from demo PDHG_TV_Color_Denoising.py in CIL-Demos repository

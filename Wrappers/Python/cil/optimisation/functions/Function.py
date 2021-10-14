@@ -95,11 +95,11 @@ class Function(object):
         if id(tmp) == id(x):
             x.multiply(tau, out = x)
 
-        if isinstance(val.dtype, np.float32):
+        if val.isrealobj():
             val.axpby(-tau, 1.0, x, out=val)
         else: 
             val *= -tau
-            val.add(1.0 * x, out = val)                             
+            val.add(1.0 * x, out = val)                           
 
         if out is None:
             return val
@@ -336,7 +336,11 @@ class ScaledFunction(Function):
         if id(tmp) == id(x):
             x.multiply(tau, out = x)
 
-        val.axpby(-tau, 1.0, x, out=val)
+        if val.isrealobj():
+            val.axpby(-tau, 1.0, x, out=val)
+        else: 
+            val *= -tau
+            val.add(1.0 * x, out = val)                              
 
         if out is None:
             return val

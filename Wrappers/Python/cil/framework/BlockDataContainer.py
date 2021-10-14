@@ -432,7 +432,7 @@ class BlockDataContainer(object):
         if p==1:            
             return sum(self.abs())        
         elif p==2:                 
-            tmp = functools.reduce(lambda a,b: a + (b*b).abs(), self.containers, self.get_item(0) * 0 ).sqrt()            
+            tmp = functools.reduce(lambda a,b: a + (b.conjugate()*b), self.containers, self.get_item(0) * 0 ).sqrt()            
             return tmp      
         else:
             return ValueError('Not implemented')
@@ -608,4 +608,18 @@ class BlockDataContainer(object):
     def __len__(self):
         
         return self.shape[0]
+
+
+    def isreal(self):
+        return [i.isreal() for i in self.containers]
+        
+    def isrealobj(self):
+        return  numpy.all([i.isrealobj() for i in self.containers]) 
+
+    def iscomplex(self):
+        return [i.iscomplex() for i in self.containers]
+
+    def iscomplexobj(self):
+        return numpy.all([i.iscomplexobj() for i in self.containers]) 
+            
     

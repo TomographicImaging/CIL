@@ -314,7 +314,7 @@ class ImageGeometry(object):
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)
-                if dtype in [ numpy.complex , numpy.complex64 , numpy.complex128 ] :
+                if dtype in numpy.sctypes['complex']:
                     r = numpy.random.random_sample(self.shape) + 1j * numpy.random.random_sample(self.shape)
                     out.fill(r)
                 else: 
@@ -1779,7 +1779,7 @@ class AcquisitionGeometry(object):
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)
-                if dtype in [ numpy.complex , numpy.complex64 , numpy.complex128 ] :
+                if dtype in numpy.sctypes['complex']:
                     r = numpy.random.random_sample(self.shape) + 1j * numpy.random.random_sample(self.shape)
                     out.fill(r)
                 else:
@@ -2400,6 +2400,20 @@ class DataContainer(object):
     def log(self, *args, **kwargs):
         '''Applies log pixel-wise to the DataContainer'''
         return self.pixel_wise_unary(numpy.log, *args, **kwargs)
+
+
+    def isreal(self):
+        return numpy.isreal(self.array)
+
+    def isrealobj(self):
+        return numpy.isrealobj(self.array)
+
+    def iscomplex(self):
+        return numpy.iscomplex(self.array)
+
+    def iscomplexobj(self):
+        return numpy.iscomplexobj(self)        
+
     
     #def __abs__(self):
     #    operation = FM.OPERATION.ABS

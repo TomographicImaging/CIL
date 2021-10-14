@@ -22,7 +22,7 @@ from cil.plugins.tigre import CIL2TIGREGeometry
 import numpy as np
 
 try:
-    from tigre.algorithms import fdk
+    from tigre.algorithms import fdk, fbp
 except ModuleNotFoundError:
     raise ModuleNotFoundError("This plugin requires the additional package TIGRE\n" +
             "Please install it via conda as tigre from the ccpi channel")
@@ -70,10 +70,17 @@ class FBP(DataProcessor):
         
         if self.tigre_geom.is2D:
             data_temp = np.expand_dims(self.get_input().as_array(), axis=1)
-            arr_out = fdk(data_temp, self.tigre_geom, self.tigre_angles)
+
+            if self.sinogram_geometry.geom_type == 'cone':
+                arr_out = fdk(data_temp, self.tigre_geom, self.tigre_angles)
+            else:
+                arr_out = fbp(data_temp, self.tigre_geom, self.tigre_angles)
             arr_out = np.squeeze(arr_out, axis=0)
         else:
-            arr_out = fdk(self.get_input().as_array(), self.tigre_geom, self.tigre_angles)
+            if self.sinogram_geometry.geom_type == 'cone':
+                arr_out = fdk(self.get_input().as_array(), self.tigre_geom, self.tigre_angles)
+            else:
+                arr_out = fbp(self.get_input().as_array(), self.tigre_geom, self.tigre_angles)
 
         if out is None:
             out = ImageData(arr_out, deep_copy=False, geometry=self.volume_geometry.copy(), suppress_warning=True)

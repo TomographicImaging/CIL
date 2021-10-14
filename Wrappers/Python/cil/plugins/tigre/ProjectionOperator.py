@@ -32,7 +32,7 @@ class ProjectionOperator(LinearOperator):
 
     def __init__(self, image_geometry, aquisition_geometry, direct_method='Siddon',adjoint_method='matched'):
         '''
-        This class creates a configued TIGRE ProjectionOperator
+        This class creates a configured TIGRE ProjectionOperator
         
         Please refer to the TIGRE documentation for futher descriptions
         https://github.com/CERN/TIGRE
@@ -42,9 +42,9 @@ class ProjectionOperator(LinearOperator):
         :type image_geometry: ImageGeometry
         :param aquisition_geometry: A description of the AcquisitionGeometry of your data
         :type aquisition_geometry: AcquisitionGeometry
-        :param direct_method: The method used by the foward projector, 'Siddon' for ray-driven intersection, 'Interploated' for interpolated projection, default 'Siddon'
+        :param direct_method: The method used by the foward projector, 'Siddon' for ray-driven intersection, 'interpolated' for interpolated projection, default 'Siddon'
         :type direct_method: str
-        :param adjoint_method: The weighting method used by the backward projector, 'matched' for weights to approximatly match the interpolated foward projector, 'FDK' for FDK weights, default 'matched'
+        :param adjoint_method: The weighting method used by the cone-beam backward projector, 'matched' for weights to approximatly match the interpolated foward projector, 'FDK' for FDK weights, default 'matched'
         :type adjoint_method: str    
         '''
 

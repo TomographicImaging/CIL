@@ -65,50 +65,91 @@ class TIGREGeometry(Geometry):
 
 
         if ag_in.geom_type == 'cone':  
+            self.mode = 'cone'
+
             self.DSO = -system.source.position[1]
             mag = ag_in.magnification
+        
+            self.DSD = self.DSO + system.detector.position[1]
+        
+            if ag_in.dimension == '2D':
+                self.is2D = True
+
+                #fix IG to single slice in z
+                self.nVoxel[0]=1
+                self.dVoxel[0]= ag_in.config.panel.pixel_size[1] / mag
+
+                # Offsets Tigre (Z, Y, X) == CIL (X, -Y)
+                self.offOrigin = np.array( [0, system.rotation_axis.position[0], -system.rotation_axis.position[1]])
+                self.offDetector = np.array( [0, system.detector.position[0]-system.source.position[0], 0 ]) 
+                
+                #convert roll, pitch, yaw
+                U = [0, system.detector.direction_x[0], -system.detector.direction_x[1]]
+                roll = 0
+                pitch = 0
+                yaw = np.arctan2(-U[2],U[1])
+
+            else:
+                self.is2D = False
+                # Offsets Tigre (Z, Y, X) == CIL (Z, X, -Y)        
+                ind = np.asarray([2, 0, 1])
+                flip = np.asarray([1, 1, -1])
+
+                self.offOrigin = np.array( system.rotation_axis.position[ind] * flip )
+                self.offDetector = np.array( [system.detector.position[2]-system.source.position[2], system.detector.position[0]-system.source.position[0], 0])
+                
+                #convert roll, pitch, yaw
+                U = system.detector.direction_x[ind] * flip
+                V = system.detector.direction_y[ind] * flip
+
+                roll = np.arctan2(-V[1], V[0])
+                pitch = np.arcsin(V[2])
+                yaw = np.arctan2(-U[2],U[1])
+ 
         else:
-            if ag_in.system_description is 'complex':
+            if ag_in.system_description == 'advanced':
                 raise NotImplementedError ("CIL cannot use TIGRE to process parallel geometries with tilted axes")
 
-            self.DSO = 100000
-            mag = 1
-        
-        self.DSD = self.DSO + system.detector.position[1]
-       
-        if ag_in.dimension == '2D':
-            #fix IG to single slice in z
-            self.nVoxel[0]=1
-            self.dVoxel[0]= ag_in.config.panel.pixel_size[1] / mag
+            self.mode = 'parallel'
+            self.DSO = ig.voxel_num_z * ig.voxel_size_z
+            self.DSD = self.DSO*2
 
-            self.is2D = True
-            # Offsets Tigre (Z, Y, X) == CIL (X, -Y)
-            self.offOrigin = np.array( [0, system.rotation_axis.position[0], -system.rotation_axis.position[1]])
-            self.offDetector = np.array( [0, system.detector.position[0] , 0 ]) #y component in DSD
-            
-            #convert roll, pitch, yaw
-            U = [0, system.detector.direction_x[0], -system.detector.direction_x[1]]
-            roll = 0
-            pitch = 0
-            yaw = np.arctan2(-U[2],U[1])
+            if ag_in.dimension == '2D':
+    
+                self.is2D = True
 
-        else:
-            self.is2D = False
-            # Offsets Tigre (Z, Y, X) == CIL (Z, X, -Y)        
-            ind = np.asarray([2, 0, 1])
-            flip = np.asarray([1, 1, -1])
+                #fix IG to single slice in z
+                self.nVoxel[0]=1
+                self.dVoxel[0]= ag_in.config.panel.pixel_size[1]
 
-            self.offOrigin = np.array( system.rotation_axis.position[ind] * flip )
-            self.offDetector = np.array( [system.detector.position[2], system.detector.position[0], 0]) #y component in DSD
-            
-            #convert roll, pitch, yaw
-            U = system.detector.direction_x[ind] * flip
-            V = system.detector.direction_y[ind] * flip
+                # Offsets Tigre (Z, Y, X) == CIL (X, -Y)
+                self.offOrigin = np.array( [0, system.rotation_axis.position[0], 0])
+                self.offDetector = np.array( [0, system.detector.position[0], 0 ]) 
+                
+                #convert roll, pitch, yaw
+                U = [0, system.detector.direction_x[0], -system.detector.direction_x[1]]
+                roll = 0
+                pitch = 0
+                yaw = np.arctan2(-U[2],U[1])
 
-            roll = np.arctan2(-V[1], V[0])
-            pitch = np.arcsin(V[2])
-            yaw = np.arctan2(-U[2],U[1])
- 
+            else:
+                self.is2D = False
+
+                # Offsets Tigre (Z, Y, X) == CIL (Z, X, -Y)        
+                ind = np.asarray([2, 0, 1])
+                flip = np.asarray([1, 1, -1])
+
+                self.offOrigin = np.array( system.rotation_axis.position[ind] * flip )
+                self.offDetector = np.array( [system.detector.position[2], system.detector.position[0], 0])
+                
+                #convert roll, pitch, yaw
+                U = system.detector.direction_x[ind] * flip
+                V = system.detector.direction_y[ind] * flip
+
+                roll = np.arctan2(-V[1], V[0])
+                pitch = np.arcsin(V[2])
+                yaw = np.arctan2(-U[2],U[1])
+
         self.theta = yaw
         panel_origin = ag_in.config.panel.origin
         if 'right' in panel_origin:
@@ -123,6 +164,3 @@ class TIGREGeometry(Geometry):
 
         # Auxiliary
         self.accuracy = 0.5                        # Accuracy of FWD proj          (vx/sample)
-        # Mode: parallel, cone
-        self.mode = ag_in.config.system.geometry
-

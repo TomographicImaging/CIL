@@ -313,30 +313,6 @@ class ScaledFunction(Function):
 
         return self.function.proximal(x, tau*self.scalar, out=out)     
 
-
-    def proximal_conjugate(self, x, tau, out = None):
-        r"""This returns the proximal operator for the function at x, tau
-        """
-        try:
-            tmp = x
-            x.divide(tau, out = tmp)
-        except TypeError:
-            tmp = x.divide(tau, dtype=np.float32)
-
-        if out is None:
-            val = self.function.proximal(tmp, self.scalar/tau )
-        else:
-            self.function.proximal(tmp, self.scalar/tau, out = out)
-            val = out     
-
-        if id(tmp) == id(x):
-            x.multiply(tau, out = x)
-
-        val.axpby(-tau, 1.0, x, out=val)
-
-        if out is None:
-            return val
-
 class SumScalarFunction(SumFunction):
           
     """ SumScalarFunction represents the sum a function with a scalar. 

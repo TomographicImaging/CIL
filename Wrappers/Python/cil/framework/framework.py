@@ -314,7 +314,7 @@ class ImageGeometry(object):
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)
-                if dtype in numpy.sctypes['complex']:
+                if dtype in [ numpy.complex , numpy.complex64 , numpy.complex128 ] :
                     r = numpy.random.random_sample(self.shape) + 1j * numpy.random.random_sample(self.shape)
                     out.fill(r)
                 else: 
@@ -1779,7 +1779,7 @@ class AcquisitionGeometry(object):
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed)
-                if dtype in numpy.sctypes['complex']:
+                if dtype in [ numpy.complex , numpy.complex64 , numpy.complex128 ] :
                     r = numpy.random.random_sample(self.shape) + 1j * numpy.random.random_sample(self.shape)
                     out.fill(r)
                 else:
@@ -2400,20 +2400,6 @@ class DataContainer(object):
     def log(self, *args, **kwargs):
         '''Applies log pixel-wise to the DataContainer'''
         return self.pixel_wise_unary(numpy.log, *args, **kwargs)
-
-
-    def isreal(self):
-        return numpy.isreal(self.as_array())
-
-    def isrealobj(self):
-        return numpy.isrealobj(self.as_array())
-
-    def iscomplex(self):
-        return numpy.iscomplex(self.as_array())
-
-    def iscomplexobj(self):
-        return numpy.iscomplexobj(self.as_array())        
-
     
     #def __abs__(self):
     #    operation = FM.OPERATION.ABS
@@ -3119,5 +3105,4 @@ class DataOrder():
         else:
             raise ValueError("Expected dimension_label order {0}, got {1}.\nTry using `data.reorder('{2}')` to permute for {2}"
                  .format(order_requested, list(geometry.dimension_labels), engine))
-
 

@@ -18,6 +18,8 @@
 from cil.optimisation.functions import Function, MixedL21Norm, IndicatorBox
 from cil.optimisation.operators import GradientOperator
 import numpy 
+import functools
+import numpy as np
 from numbers import Number
 import warnings
 
@@ -111,11 +113,7 @@ class TotalVariation(Function):
     def __call__(self, x):
         
         r''' Returns the value of the \alpha * TV(x)'''
-        try:
-            self._domain = x.geometry
-        except:
-            self._domain = x
-
+        self._domain = x.geometry
         # evaluate objective function of TV gradient
         return self.regularisation_parameter * self.TV(self.gradient.direct(x))
     
@@ -124,51 +122,42 @@ class TotalVariation(Function):
                      
         r''' Returns orthogonal projection onto the convex set C'''
 
-        try:
-            self._domain = x.geometry
-        except:
-            self._domain = x
-
+        self._domain = x.geometry
         return self.tmp_proj_C(x, tau = None, out = out)
                         
     def projection_P(self, x, out=None):
                        
         r''' Returns the projection P onto \|\cdot\|_{\infty} '''  
-        try:
-            self._domain = x.geometry
-        except:
-            self._domain = x
+        self._domain = x.geometry
         
         # preallocated in proximal
         tmp = self.pptmp
         tmp1 = self.pptmp1
         tmp1 *= 0
         
-        for el in x.containers:
-            el.conjugate().multiply(el, out=tmp)
+
+        for i,el in enumerate(x.containers):
+            el.multiply(el, out=tmp)
             tmp1.add(tmp, out=tmp1)
         tmp1.sqrt(out=tmp1)
         tmp1.maximum(1.0, out=tmp1)
         if out is None:
             return x.divide(tmp1)
         else:
-            x.divide(tmp1, out=out)            
+            x.divide(tmp1, out=out)
     
     
     def proximal(self, x, tau, out = None):
         
         ''' Returns the solution of the FGP_TV algorithm '''         
-        try:
-            self._domain = x.geometry
-        except:
-            self._domain = x
+        self._domain = x.geometry
         
         # initialise
         t = 1        
-        tmp_p = self.gradient.range_geometry().allocate()  
+        tmp_p = self.gradient.range_geometry().allocate(0)  
         tmp_q = tmp_p.copy()
-        tmp_x = self.gradient.domain_geometry().allocate()     
-        p1 = self.gradient.range_geometry().allocate()
+        tmp_x = self.gradient.domain_geometry().allocate(None)     
+        p1 = self.gradient.range_geometry().allocate(None)
         
 
         should_break = False
@@ -177,16 +166,12 @@ class TotalVariation(Function):
             t0 = t
             self.gradient.adjoint(tmp_q, out = tmp_x)
             
-            if isinstance(tmp_x.dtype, numpy.float32):
-                tmp_x.axpby(-self.regularisation_parameter*tau, 1.0, x, out=tmp_x)
-            else:
-                tmp_x *= -self.regularisation_parameter*tau
-                tmp_x.add(1.0 * x, out = tmp_x)                 
-
+            # axpby now works for matrices
+            tmp_x.axpby(-self.regularisation_parameter*tau, 1.0, x, out=tmp_x)
             self.projection_C(tmp_x, out = tmp_x)                       
 
             self.gradient.direct(tmp_x, out=p1)
-            if isinstance (tau, (Number, numpy.float32, numpy.float64)):
+            if isinstance (tau, (Number, np.float32, np.float64)):
                 p1 *= self.L/(self.regularisation_parameter * tau)
             else:
                 p1 *= self.L/self.regularisation_parameter
@@ -285,4 +270,3 @@ class TotalVariation(Function):
         return self
 
     
-

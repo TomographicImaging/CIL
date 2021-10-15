@@ -29,6 +29,7 @@ from cil.framework import DataContainer
 from cil.optimisation.functions import Function
 import numpy as np
 import warnings
+from numbers import Number
 
 class RegulariserFunction(Function):
     def proximal(self, x, tau, out=None):
@@ -70,24 +71,6 @@ class TV_Base(RegulariserFunction):
     def convex_conjugate(self,x):     
         return 0.0
 
-class ROF_TV(TV_Base):
-    def __init__(self,lambdaReg,iterationsTV,tolerance,time_marchstep,device):
-        # set parameters
-        self.alpha = lambdaReg
-        self.max_iteration = iterationsTV
-        self.time_marchstep = time_marchstep
-        self.device = device # string for 'cpu' or 'gpu'
-        self.tolerance = tolerance
-        
-    def proximal_numpy(self, in_arr, tau, out = None):
-        res , info = regularisers.ROF_TV(in_arr,
-              self.alpha * tau,
-              self.max_iteration,
-              self.time_marchstep,
-              self.tolerance,
-              self.device)
-        
-        return res, info
 
 class FGP_TV(TV_Base):
     def __init__(self, alpha=1, max_iteration=100, tolerance=1e-6, isotropic=True, nonnegativity=True, printing=False, device='cpu'):
@@ -118,16 +101,27 @@ class FGP_TV(TV_Base):
               self.nonnegativity,\
               self.device)
         return res, info
+    
+    def __rmul__(self, scalar):
+        '''Define the multiplication with a scalar
+        
+        this changes the regularisation parameter in the plugin'''
+        if not isinstance (scalar, Number):
+            raise NotImplemented
+        else:
+            self.alpha *= scalar
         
 class TGV(RegulariserFunction):
 
-    def __init__(self, regularisation_parameter, alpha1, alpha2, iter_TGV, LipshitzConstant, torelance, device ):
-        self.regularisation_parameter = regularisation_parameter
+    def __init__(self, alpha=1, alpha1=1, alpha2=1, iter_TGV=100, LipshitzConstant=12, tolerance=1e-6, device='cpu' ):
+        # Default values
+        # https://github.com/vais-ral/CCPi-Regularisation-Toolkit/blob/413c6001003c6f1272aeb43152654baaf0c8a423/src/Core/regularisers_CPU/TGV_core.c#L25-L32
+        self.alpha = alpha
         self.alpha1 = alpha1
         self.alpha2 = alpha2
         self.iter_TGV = iter_TGV
         self.LipshitzConstant = LipshitzConstant
-        self.torelance = torelance
+        self.torelance = tolerance
         self.device = device
         
     def __call__(self,x):
@@ -152,42 +146,16 @@ class TGV(RegulariserFunction):
     def convex_conjugate(self, x):
         warnings.warn("{}: the convex_conjugate method is not implemented. Returning NaN.".format(self.__class__.__name__))
         return np.nan
-
-class LLT_ROF(RegulariserFunction):
-    
-    def __init__(self, regularisation_parameterROF, 
-                       regularisation_parameterLLT,
-                       iter_LLT_ROF, time_marching_parameter, torelance, device ):
         
-        self.regularisation_parameterROF = regularisation_parameterROF
-        self.regularisation_parameterLLT = regularisation_parameterLLT
-        self.iter_LLT_ROF = iter_LLT_ROF
-        self.time_marching_parameter = time_marching_parameter
-        self.torelance = torelance
-        self.device = device 
+    def __rmul__(self, scalar):
+        '''Define the multiplication with a scalar
         
-    def __call__(self,x):
-        warnings.warn("{}: the __call__ method is not implemented. Returning NaN.".format(self.__class__.__name__))
-        return np.nan
-    
-    def proximal_numpy(self, in_arr, tau, out = None):
-        res , info = regularisers.LLT_ROF(in_arr, 
-              self.regularisation_parameterROF * tau,
-              self.regularisation_parameterLLT * tau,
-              self.iter_LLT_ROF,
-              self.time_marching_parameter,
-              self.torelance,
-              self.device)
-                 
-        # info: return number of iteration and reached tolerance
-        # https://github.com/vais-ral/CCPi-Regularisation-Toolkit/blob/master/src/Core/regularisers_CPU/TGV_core.c#L168
-        # Stopping Criteria  || u^k - u^(k-1) ||_{2} / || u^{k} ||_{2}    
-  
-        return res, info
+        this changes the regularisation parameter in the plugin'''
+        if not isinstance (scalar, Number):
+            raise NotImplemented
+        else:
+            self.alpha *= scalar
 
-    def convex_conjugate(self, x):
-        warnings.warn("{}: the convex_conjugate method is not implemented. Returning NaN.".format(self.__class__.__name__))
-        return np.nan
 
 class FGP_dTV(RegulariserFunction):
     def __init__(self, reference, alpha=1, max_iteration=100,
@@ -231,32 +199,21 @@ class FGP_dTV(RegulariserFunction):
         warnings.warn("{}: the convex_conjugate method is not implemented. Returning NaN.".format(self.__class__.__name__))
         return np.nan
     
-class SB_TV(TV_Base):
-    def __init__(self,lambdaReg,iterationsTV,tolerance,methodTV,printing,device):
-        # set parameters
-        self.alpha = lambdaReg
-        self.max_iteration = iterationsTV
-        self.tolerance = tolerance
-        self.methodTV = methodTV
-        self.printing = printing
-        self.device = device # string for 'cpu' or 'gpu'
-                
-    def proximal_numpy(self, in_arr, tau, out = None):
-        res , info = regularisers.SB_TV(in_arr, 
-              self.alpha * tau,
-              self.max_iteration,
-              self.tolerance, 
-              self.methodTV,
-              self.device)
+    def __rmul__(self, scalar):
+        '''Define the multiplication with a scalar
         
-        return res, info
+        this changes the regularisation parameter in the plugin'''
+        if not isinstance (scalar, Number):
+            raise NotImplemented
+        else:
+            self.alpha *= scalar
 
 class TNV(RegulariserFunction):
     
-    def __init__(self,regularisation_parameter,iterationsTNV,tolerance):
+    def __init__(self,alpha=1, iterationsTNV=100, tolerance=1e-6):
         
         # set parameters
-        self.regularisation_parameter = regularisation_parameter
+        self.alpha = alpha
         self.iterationsTNV = iterationsTNV
         self.tolerance = tolerance
         
@@ -266,7 +223,7 @@ class TNV(RegulariserFunction):
     
     def proximal_numpy(self, in_arr, tau, out = None):
         res = regularisers.TNV(in_arr, 
-              self.regularisation_parameter * tau,
+              self.alpha * tau,
               self.iterationsTNV,
               self.tolerance)
 
@@ -275,3 +232,12 @@ class TNV(RegulariserFunction):
     def convex_conjugate(self, x):
         warnings.warn("{}: the convex_conjugate method is not implemented. Returning NaN.".format(self.__class__.__name__))
         return np.nan
+
+    def __rmul__(self, scalar):
+        '''Define the multiplication with a scalar
+        
+        this changes the regularisation parameter in the plugin'''
+        if not isinstance (scalar, Number):
+            raise NotImplemented
+        else:
+            self.alpha *= scalar

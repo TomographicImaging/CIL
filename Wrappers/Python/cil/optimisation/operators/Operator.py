@@ -202,7 +202,7 @@ class LinearOperator(Operator):
         fx = operator.direct(x)
         by = operator.adjoint(y)
         a = fx.dot(y)
-        b = by.dot(x).conjugate()
+        b = by.dot(x)
         if verbose:
             print ('Left hand side  {}, \nRight hand side {}'.format(a, b))
             print ("decimal ", kwargs.get('decimal', 4))

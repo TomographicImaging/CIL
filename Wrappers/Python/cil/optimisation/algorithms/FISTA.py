@@ -47,7 +47,7 @@ class FISTA(Algorithm):
     '''
     
     
-    def __init__(self, initial=None, f=None, g=ZeroFunction(), **kwargs):
+    def __init__(self, initial=None, f=None, g=ZeroFunction(), use_axpby=True, **kwargs):
         
         '''FISTA algorithm creator 
         
@@ -69,7 +69,11 @@ class FISTA(Algorithm):
             else:
                 raise ValueError('{} received both initial and the deprecated x_init parameter. It is not clear which one we should use.'\
                     .format(self.__class__.__name__))
-        
+        self._use_axpby = use_axpby 
+        if use_axpby:
+            warnings.warn('use_axpby` cannot be use for complex data. Use `use_axpby=False` ')
+                     
+
         if initial is not None and f is not None:
             self.set_up(initial=initial, f=f, g=g)
 
@@ -100,16 +104,22 @@ class FISTA(Algorithm):
     def update(self):
         self.t_old = self.t
         self.f.gradient(self.y, out=self.u)
-        self.u.__imul__( -self.invL )
-        self.u.__iadd__( self.y )
+        self.u.multiply( -self.invL , out=self.u)
+        self.u.add( self.y , out=self.u)
 
         self.g.proximal(self.u, self.invL, out=self.x)
         
         self.t = 0.5*(1 + numpy.sqrt(1 + 4*(self.t_old**2)))
         
         self.x.subtract(self.x_old, out=self.y)
-        self.y.axpby(((self.t_old-1)/self.t), 1, self.x, out=self.y)
-        
+
+        if self._use_axpby:
+            self.y.axpby(((self.t_old-1)/self.t), 1, self.x, out=self.y)
+        else:
+            self.x.substract(self.x_old, out=self.y)
+            self.y.multiply((self.t_old-1)/self.t, out=self.y)
+            self.y.add(self.x, out=self.y)
+
         self.x_old.fill(self.x)
 
         

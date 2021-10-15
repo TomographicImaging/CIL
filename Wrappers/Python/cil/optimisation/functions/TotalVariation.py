@@ -111,7 +111,11 @@ class TotalVariation(Function):
     def __call__(self, x):
         
         r''' Returns the value of the \alpha * TV(x)'''
-        self._domain = x.geometry
+        try:
+            self._domain = x.geometry
+        except:
+            self._domain = x
+
         # evaluate objective function of TV gradient
         return self.regularisation_parameter * self.TV(self.gradient.direct(x))
     
@@ -120,13 +124,20 @@ class TotalVariation(Function):
                      
         r''' Returns orthogonal projection onto the convex set C'''
 
-        self._domain = x.geometry
+        try:
+            self._domain = x.geometry
+        except:
+            self._domain = x
+
         return self.tmp_proj_C(x, tau = None, out = out)
                         
     def projection_P(self, x, out=None):
                        
         r''' Returns the projection P onto \|\cdot\|_{\infty} '''  
-        self._domain = x.geometry
+        try:
+            self._domain = x.geometry
+        except:
+            self._domain = x
         
         # preallocated in proximal
         tmp = self.pptmp
@@ -147,14 +158,17 @@ class TotalVariation(Function):
     def proximal(self, x, tau, out = None):
         
         ''' Returns the solution of the FGP_TV algorithm '''         
-        self._domain = x.geometry
+        try:
+            self._domain = x.geometry
+        except:
+            self._domain = x
         
         # initialise
         t = 1        
-        tmp_p = self.gradient.range_geometry().allocate(0)  
+        tmp_p = self.gradient.range_geometry().allocate()  
         tmp_q = tmp_p.copy()
-        tmp_x = self.gradient.domain_geometry().allocate(None)     
-        p1 = self.gradient.range_geometry().allocate(None)
+        tmp_x = self.gradient.domain_geometry().allocate()     
+        p1 = self.gradient.range_geometry().allocate()
         
 
         should_break = False

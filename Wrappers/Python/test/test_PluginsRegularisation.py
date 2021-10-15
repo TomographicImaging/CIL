@@ -228,10 +228,11 @@ class TestPlugin(unittest.TestCase):
         outrgl, info = regularisers.FGP_dTV(datarr, ref.as_array(), fcil.alpha*tau, fcil.max_iteration, fcil.tolerance, 0.01, 0, 1, 'cpu' )
         np.testing.assert_almost_equal(outrgl, outcil.as_array())
 
-    @unittest.skipUnless(TNV_fixed, "Skipping as CCPi Regularisation Toolkit is not installed")
+    @unittest.skipUnless(has_regularisation_toolkit, "Skipping as CCPi Regularisation Toolkit is not installed")
     def test_functionality_TNV(self):
 
-        data = dataexample.CAMERA.get(size=(256,256))
+        data = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
+
         datarr = data.as_array()
         from cil.plugins.ccpi_regularisation.functions import TNV
         from ccpi.filters import regularisers
@@ -245,8 +246,24 @@ class TestPlugin(unittest.TestCase):
         #    self.tolerance
         # outrgl, info = regularisers.TGV(datarr, fcil.alpha*tau, fcil.iterationsTNV, fcil.tolerance )
         outrgl = regularisers.TNV(datarr, 1, 100, 1e-6 )
-        print ("test outrgl", type(outrgl))
         
         fcil = TNV()
         outcil = fcil.proximal(data, tau=tau)
         np.testing.assert_almost_equal(outrgl, outcil.as_array())
+
+    @unittest.skipUnless(has_regularisation_toolkit, "Skipping as CCPi Regularisation Toolkit is not installed")
+    def test_TNV_raise_on_2D(self):
+
+        # data = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
+        data = dataexample.CAMERA.get(size=(256,256))
+        datarr = data.as_array()
+        from cil.plugins.ccpi_regularisation.functions import TNV
+        
+        tau = 1.
+        
+        fcil = TNV()
+        try:
+            outcil = fcil.proximal(data, tau=tau)
+            assert False
+        except ValueError:
+            assert True

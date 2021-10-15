@@ -71,7 +71,7 @@ class FISTA(Algorithm):
                     .format(self.__class__.__name__))
         self._use_axpby = use_axpby 
         if use_axpby:
-            warnings.warn('use_axpby` cannot be use for complex data. Use `use_axpby=False` ')
+            warnings.warn(' `use_axpby` cannot be use for complex data. Use `use_axpby=False` ')
                      
 
         if initial is not None and f is not None:

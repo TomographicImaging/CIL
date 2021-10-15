@@ -457,11 +457,17 @@ class ConstantFunction(Function):
     @constant.setter
     def constant(self, value):
         if not isinstance (value, Number):
-            raise TypeError('expected scalar: got {}'.format(type(constant)))
+            raise TypeError('expected scalar: got {}'.format(type(value)))
         self._constant = value
     @property
     def L(self):
         return 0.
+    def __rmul__(self, other):
+        '''defines the right multiplication with a number'''
+        if not isinstance (other, Number):
+            raise NotImplemented
+        constant = self.constant * other
+        return ConstantFunction(constant)
 
 class ZeroFunction(ConstantFunction):
     

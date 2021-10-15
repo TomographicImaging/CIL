@@ -20,6 +20,7 @@ from cil.optimisation.functions import Function
 from cil.framework import DataContainer
 import warnings
 from numbers import Number
+import numpy as np
 
 
 class LeastSquares(Function):
@@ -125,11 +126,11 @@ class LeastSquares(Function):
         # Compute the Lipschitz parameter from the operator if possible
         # Leave it initialised to None otherwise
         try:
-            self._L = 2.0*self.c*(self.A.norm()**2)
+            self._L = 2.0 * np.abs(self.c) * (self.A.norm()**2)
         except AttributeError as ae:
             if self.A.is_linear():
                 Anorm = LinearOperator.PowerMethod(self.A, 10)[0]
-                self._L = 2.0 * self.c * (Anorm*Anorm)
+                self._L = 2.0 * np.abs(self.c) * (Anorm*Anorm)
             else:
                 warnings.warn('{} could not calculate Lipschitz Constant. {}'.format(
                 self.__class__.__name__, ae))
@@ -147,3 +148,11 @@ class LeastSquares(Function):
         else:
             self._weight_norm = 1.0
         return self._weight_norm
+
+    def __rmul__(self, other):
+        '''defines the right multiplication with a number'''
+        if not isinstance (other, Number):
+            raise NotImplemented
+        constant = self.c * other
+        
+        return LeastSquares(A=self.A, b=self.b, c=constant, weight=self.weight)

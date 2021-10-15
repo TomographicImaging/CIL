@@ -95,11 +95,8 @@ class Function(object):
         if id(tmp) == id(x):
             x.multiply(tau, out = x)
 
-        if val.isrealobj():
-            val.axpby(-tau, 1.0, x, out=val)
-        else: 
-            val *= -tau
-            val.add(1.0 * x, out = val)                           
+        val *= -tau
+        val.add(1.0 * x, out = val)                           
 
         if out is None:
             return val

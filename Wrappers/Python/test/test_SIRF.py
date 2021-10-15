@@ -23,6 +23,9 @@ import sys
 import shutil
 import unittest
 from cil.framework import BlockDataContainer
+from cil.optimisation.functions import MixedL21Norm, L2NormSquared, TotalVariation
+from cil.optimisation.algorithms import PDHG, FISTA
+from cil.optimisation.operators import GradientOperator
 from utils import GradientSIRF
 try:
     import sirf.STIR as pet
@@ -73,6 +76,34 @@ class TestGradientMR_2D(unittest.TestCase, GradientSIRF):
         
     def tearDown(self):
         pass      
+
+    @unittest.skipUnless(has_sirf, "Has SIRF")
+    def test_TVdenoisingMR(self):
+
+        alpha = 0.5
+        TV = alpha * TotalVariation(max_iteration=10)
+        res1 = TV.proximal(self.image1, tau=1.0)
+
+        f =  alpha * MixedL21Norm()
+        g = 0.5 * L2NormSquared(b=self.image1)
+        K = GradientOperator(self.image1)
+        normK = numpy.sqrt(8)
+        sigma = 1./normK
+        tau = 1./normK
+        pdhg = PDHG(f=f, g=g, operator=K, sigma=sigma, tau=tau, max_iteration=10, update_objective_interval=100, use_axpby=False) 
+        pdhg.run(verbose=0)
+        res2 = pdhg.solution
+
+        numpy.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal=3) 
+
+        # numpy.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal=3)  
+        # # 
+        # g = TV
+        # f =  0.5 * L2NormSquared(b=self.image1)
+        # fista = FISTA(initial=self.image1*0.0, f=f, g=g, max_iteration=100, update_objective_interval=100)
+        # fista.run()
+        # res2 = fista.solution
+        # numpy.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal=3)     
 
 
 class TestSIRFCILIntegration(unittest.TestCase):
@@ -193,3 +224,10 @@ class TestSIRFCILIntegration(unittest.TestCase):
     def assertNumpyArrayEqual(self, first, second):
         numpy.testing.assert_array_equal(first, second)
 
+
+
+if __name__ == "__main__":
+
+    d = TestGradientMR_2D()
+    d.setUp()
+    d.test_TVdenoisingMR()

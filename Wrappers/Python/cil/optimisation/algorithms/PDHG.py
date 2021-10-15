@@ -76,6 +76,9 @@ class PDHG(Algorithm):
                 raise ValueError('{} received both initial and the deprecated x_init parameter. It is not clear which one we should use.'\
                     .format(self.__class__.__name__))
         self._use_axpby = use_axpby
+        if use_axpby:
+            warnings.warn('use_axpby` cannot be use for complex data. Use `use_axpby=False')
+                             
 
         if f is not None and operator is not None and g is not None:
             self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, initial=initial)

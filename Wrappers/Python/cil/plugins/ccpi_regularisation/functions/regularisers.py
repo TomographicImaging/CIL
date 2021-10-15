@@ -110,6 +110,7 @@ class FGP_TV(TV_Base):
             raise NotImplemented
         else:
             self.alpha *= scalar
+            return self
         
 class TGV(RegulariserFunction):
 
@@ -121,7 +122,7 @@ class TGV(RegulariserFunction):
         self.alpha2 = alpha2
         self.iter_TGV = iter_TGV
         self.LipshitzConstant = LipshitzConstant
-        self.torelance = tolerance
+        self.tolerance = tolerance
         self.device = device
         
     def __call__(self,x):
@@ -130,12 +131,12 @@ class TGV(RegulariserFunction):
     
     def proximal_numpy(self, in_arr, tau, out = None):
         res , info = regularisers.TGV(in_arr,
-              self.regularisation_parameter * tau,
+              self.alpha * tau,
               self.alpha1,
               self.alpha2,
               self.iter_TGV,
               self.LipshitzConstant,
-              self.torelance,
+              self.tolerance,
               self.device)
                 
         # info: return number of iteration and reached tolerance
@@ -155,6 +156,7 @@ class TGV(RegulariserFunction):
             raise NotImplemented
         else:
             self.alpha *= scalar
+            return self
 
 
 class FGP_dTV(RegulariserFunction):
@@ -207,6 +209,7 @@ class FGP_dTV(RegulariserFunction):
             raise NotImplemented
         else:
             self.alpha *= scalar
+            return self
 
 class TNV(RegulariserFunction):
     
@@ -226,7 +229,6 @@ class TNV(RegulariserFunction):
               self.alpha * tau,
               self.iterationsTNV,
               self.tolerance)
-
         return res, []
 
     def convex_conjugate(self, x):
@@ -241,3 +243,4 @@ class TNV(RegulariserFunction):
             raise NotImplemented
         else:
             self.alpha *= scalar
+            return self

@@ -211,36 +211,36 @@ class FGP_dTV(RegulariserFunction):
             self.alpha *= scalar
             return self
 
-class TNV(RegulariserFunction):
+# class TNV(RegulariserFunction):
     
-    def __init__(self,alpha=1, iterationsTNV=100, tolerance=1e-6):
+#     def __init__(self,alpha=1, iterationsTNV=100, tolerance=1e-6):
         
-        # set parameters
-        self.alpha = alpha
-        self.iterationsTNV = iterationsTNV
-        self.tolerance = tolerance
+#         # set parameters
+#         self.alpha = alpha
+#         self.iterationsTNV = iterationsTNV
+#         self.tolerance = tolerance
         
-    def __call__(self,x):
-        warnings.warn("{}: the __call__ method is not implemented. Returning NaN.".format(self.__class__.__name__))
-        return np.nan
+#     def __call__(self,x):
+#         warnings.warn("{}: the __call__ method is not implemented. Returning NaN.".format(self.__class__.__name__))
+#         return np.nan
     
-    def proximal_numpy(self, in_arr, tau, out = None):
-        res = regularisers.TNV(in_arr, 
-              self.alpha * tau,
-              self.iterationsTNV,
-              self.tolerance)
-        return res, []
+#     def proximal_numpy(self, in_arr, tau, out = None):
+#         res = regularisers.TNV(in_arr, 
+#               self.alpha * tau,
+#               self.iterationsTNV,
+#               self.tolerance)
+#         return res, []
 
-    def convex_conjugate(self, x):
-        warnings.warn("{}: the convex_conjugate method is not implemented. Returning NaN.".format(self.__class__.__name__))
-        return np.nan
+#     def convex_conjugate(self, x):
+#         warnings.warn("{}: the convex_conjugate method is not implemented. Returning NaN.".format(self.__class__.__name__))
+#         return np.nan
 
-    def __rmul__(self, scalar):
-        '''Define the multiplication with a scalar
+#     def __rmul__(self, scalar):
+#         '''Define the multiplication with a scalar
         
-        this changes the regularisation parameter in the plugin'''
-        if not isinstance (scalar, Number):
-            raise NotImplemented
-        else:
-            self.alpha *= scalar
-            return self
+#         this changes the regularisation parameter in the plugin'''
+#         if not isinstance (scalar, Number):
+#             raise NotImplemented
+#         else:
+#             self.alpha *= scalar
+#             return self

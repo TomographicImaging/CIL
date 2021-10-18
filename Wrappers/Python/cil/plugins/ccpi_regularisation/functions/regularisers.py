@@ -47,10 +47,10 @@ class RegulariserFunction(Function):
         if arr.dtype in [np.complex, np.complex64]:
             # do real and imag part indep
             in_arr = np.asarray(arr.real, dtype=np.float32, order='C')
-            res, info = self.proximal_numpy(in_arr, tau, out)
+            res, info = self.proximal_numpy(in_arr, tau)
             arr.real = res[:]
             in_arr = np.asarray(arr.imag, dtype=np.float32, order='C')
-            res, info = self.proximal_numpy(in_arr, tau, out)
+            res, info = self.proximal_numpy(in_arr, tau)
             arr.imag = res[:]
             self.info = info
             if out is not None:
@@ -61,7 +61,7 @@ class RegulariserFunction(Function):
                 return out
         else:
             arr = np.asarray(x.as_array(), dtype=np.float32, order='C')
-            res, info = self.proximal_numpy(arr, tau, out)
+            res, info = self.proximal_numpy(arr, tau)
             self.info = info
             if out is not None:
                 out.fill(res)
@@ -69,7 +69,7 @@ class RegulariserFunction(Function):
                 out = x.copy()
                 out.fill(res)
                 return out
-    def proximal_numpy(self, xarr, tau, out=None):
+    def proximal_numpy(self, xarr, tau):
         raise NotImplementedError('Please implement proximal_numpy')
 
     def check_input(self, input):
@@ -119,7 +119,7 @@ class FGP_TV(TV_Base):
         self.nonnegativity = nonnegativity
         self.device = device # string for 'cpu' or 'gpu'
 
-    def proximal_numpy(self, in_arr, tau, out = None):
+    def proximal_numpy(self, in_arr, tau):
         res , info = regularisers.FGP_TV(\
               in_arr,\
               self.alpha * tau,\
@@ -188,7 +188,7 @@ class TGV(RegulariserFunction):
     def alpha1(self):
         return 1.
     
-    def proximal_numpy(self, in_arr, tau, out = None):
+    def proximal_numpy(self, in_arr, tau):
         res , info = regularisers.TGV(in_arr,
               self.alpha * tau,
               self.alpha1,
@@ -273,7 +273,7 @@ class FGP_dTV(RegulariserFunction):
         warnings.warn("{}: the __call__ method is not implemented. Returning NaN.".format(self.__class__.__name__))
         return np.nan
 
-    def proximal_numpy(self, in_arr, tau, out = None):
+    def proximal_numpy(self, in_arr, tau):
         res , info = regularisers.FGP_dTV(\
                 in_arr,\
                 self.reference,\
@@ -325,7 +325,7 @@ class TNV(RegulariserFunction):
         warnings.warn("{}: the __call__ method is not implemented. Returning NaN.".format(self.__class__.__name__))
         return np.nan
     
-    def proximal_numpy(self, in_arr, tau, out = None):
+    def proximal_numpy(self, in_arr, tau):
         if in_arr.ndim != 3:
             # https://github.com/vais-ral/CCPi-Regularisation-Toolkit/blob/413c6001003c6f1272aeb43152654baaf0c8a423/src/Python/src/cpu_regularisers.pyx#L584-L588
             raise ValueError('Only 3D data is supported. Passed data has {} dimensions'.format(in_arr.ndim))

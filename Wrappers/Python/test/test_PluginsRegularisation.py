@@ -44,7 +44,7 @@ TNV_fixed = False
 
 class TestPlugin(unittest.TestCase):
     def setUp(self):
-        print ("test plugins")
+        # print ("test plugins")
         pass
     def tearDown(self):
         pass
@@ -159,7 +159,7 @@ class TestPlugin(unittest.TestCase):
         fcil = TGV()
         outcil = fcil.proximal(data, tau=tau)
         # use CIL defaults
-        outrgl, info = regularisers.TGV(datarr, fcil.alpha*tau, 1,1, fcil.iter_TGV, 12, fcil.tolerance, 'cpu' )
+        outrgl, info = regularisers.TGV(datarr, fcil.alpha*tau, 1,1, fcil.max_iteration, 12, fcil.tolerance, 'cpu' )
 
         np.testing.assert_almost_equal(outrgl, outcil.as_array())
 
@@ -188,10 +188,7 @@ class TestPlugin(unittest.TestCase):
         data = ig.allocate(None)
         data.fill(d)
         del d
-
-            
-        print (data.dimension_labels, data.shape)
-
+    
         datarr = data.as_array()
         from cil.plugins.ccpi_regularisation.functions import TNV
         from ccpi.filters import regularisers

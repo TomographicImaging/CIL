@@ -25,7 +25,7 @@ except ImportError as ie:
                       "Minimal version is 20.04")
 
 
-from cil.framework import DataContainer
+from cil.framework import DataOrder
 from cil.optimisation.functions import Function
 import numpy as np
 import warnings
@@ -33,6 +33,16 @@ from numbers import Number
 
 class RegulariserFunction(Function):
     def proximal(self, x, tau, out=None):
+        '''Generic proximal method for a RegulariserFunction
+        
+        :param x: image to be regularised
+        :type x: an ImageData
+        :param tau: 
+        :type tau: Number
+        :param out: a placeholder for the result
+        :type out: same as x: ImageData'''
+
+        self.check_input(x)
         arr = x.as_array()
         if arr.dtype in [np.complex, np.complex64]:
             # do real and imag part indep
@@ -62,6 +72,9 @@ class RegulariserFunction(Function):
     def proximal_numpy(self, xarr, tau, out=None):
         raise NotImplementedError('Please implement proximal_numpy')
 
+    def check_input(self, input):
+        pass
+
 class TV_Base(RegulariserFunction):
     def __call__(self,x):
         in_arr = np.asarray(x.as_array(), dtype=np.float32, order='C')
@@ -73,8 +86,23 @@ class TV_Base(RegulariserFunction):
 
 
 class FGP_TV(TV_Base):
-    def __init__(self, alpha=1, max_iteration=100, tolerance=1e-6, isotropic=True, nonnegativity=True, printing=False, device='cpu'):
+    def __init__(self, alpha=1, max_iteration=100, tolerance=1e-6, isotropic=True, nonnegativity=True, device='cpu'):
+        '''Creator of FGP_TV Function
 
+
+        :param alpha: regularisation parameter
+        :type alpha: number, default 1
+        :param isotropic: Whether it uses L2 (isotropic) or L1 (unisotropic) norm
+        :type isotropic: boolean, default True, can range between 1 and 2
+        :param nonnegativity: Whether to add the non-negativity constraint
+        :type nonnegativity: boolean, default True
+        :param max_iteration: max number of sub iterations. The algorithm will iterate up to this number of iteration or up to when the tolerance has been reached
+        :type max_iteration: integer, default 100
+        :param tolerance: minimum difference between previous iteration of the algorithm that determines the stop of the iteration earlier than num_iter
+        :type tolerance: float, default 1e-6
+        :param device: determines if the code runs on CPU or GPU
+        :type device: string, default 'cpu', can be 'gpu' if GPU is installed
+        '''
         if isotropic == True:
             self.methodTV = 0
         else:
@@ -111,30 +139,61 @@ class FGP_TV(TV_Base):
         else:
             self.alpha *= scalar
             return self
+    def check_input(self, input):
+        if input.geometry.length > 3:
+            raise ValueError('{} cannot work on more than 3D. Got {}'.format(self.__class__.__name__, input.geometry.length))
         
 class TGV(RegulariserFunction):
 
-    def __init__(self, alpha=1, alpha1=1, alpha2=1, iter_TGV=100, LipshitzConstant=12, tolerance=1e-6, device='cpu' ):
-        # Default values
-        # https://github.com/vais-ral/CCPi-Regularisation-Toolkit/blob/413c6001003c6f1272aeb43152654baaf0c8a423/src/Core/regularisers_CPU/TGV_core.c#L25-L32
+    def __init__(self, alpha=1, gamma=1, max_iteration=100, tolerance=1e-6, device='cpu' , **kwargs):
+        '''Creator of Total Generalised Variation Function 
+
+        :param alpha: regularisation parameter
+        :type alpha: number, default 1
+        :param gamma: ratio of TGV terms
+        :type gamma: number, default 1, can range between 1 and 2
+        :param max_iteration: max number of sub iterations. The algorithm will iterate up to this number of iteration or up to when the tolerance has been reached
+        :type max_iteration: integer, default 100
+        :param tolerance: minimum difference between previous iteration of the algorithm that determines the stop of the iteration earlier than num_iter
+        :type tolerance: float, default 1e-6
+        :param device: determines if the code runs on CPU or GPU
+        :type device: string, default 'cpu', can be 'gpu' if GPU is installed
+        
+        '''
+        
         self.alpha = alpha
-        self.alpha1 = alpha1
-        self.alpha2 = alpha2
-        self.iter_TGV = iter_TGV
-        self.LipshitzConstant = LipshitzConstant
+        self.gamma = gamma
+        self.max_iteration = max_iteration
         self.tolerance = tolerance
         self.device = device
+
+        if kwargs.get('iter_TGV', None) is not None:
+            # raise ValueError('iter_TGV parameter has been superseded by num_iter. Use that instead.')
+            self.num_iter = kwargs.get('iter_TGV')
         
     def __call__(self,x):
         warnings.warn("{}: the __call__ method is not implemented. Returning NaN.".format(self.__class__.__name__))
         return np.nan
+    @property
+    def gamma(self):
+        return self.__gamma
+    @gamma.setter
+    def gamma(self, value):
+        if value <= 2 and value >= 1:
+            self.__gamma = value
+    @property
+    def alpha2(self):
+        return self.alpha1 * self.gamma
+    @property
+    def alpha1(self):
+        return 1.
     
     def proximal_numpy(self, in_arr, tau, out = None):
         res , info = regularisers.TGV(in_arr,
               self.alpha * tau,
               self.alpha1,
               self.alpha2,
-              self.iter_TGV,
+              self.max_iteration,
               self.LipshitzConstant,
               self.tolerance,
               self.device)
@@ -158,8 +217,38 @@ class TGV(RegulariserFunction):
             self.alpha *= scalar
             return self
 
+        # f = TGV()
+        # f = alpha * f
+
+    def check_input(self, input):
+        if len(input.dimension_labels) == 2:
+            self.LipshitzConstant = 12
+        elif len(input.dimension_labels) == 3:
+            self.LipshitzConstant = 16 # Vaggelis to confirm
+        else:
+            raise ValueError('{} cannot work on more than 3D. Got {}'.format(self.__class__.__name__, input.geometry.length))
+        
 
 class FGP_dTV(RegulariserFunction):
+    '''Creator of FGP_dTV Function
+
+        :param reference: reference image
+        :type reference: ImageData
+        :param alpha: regularisation parameter
+        :type alpha: number, default 1
+        :param max_iteration: max number of sub iterations. The algorithm will iterate up to this number of iteration or up to when the tolerance has been reached
+        :type max_iteration: integer, default 100
+        :param tolerance: minimum difference between previous iteration of the algorithm that determines the stop of the iteration earlier than num_iter
+        :type tolerance: float, default 1e-6
+        :param eta: smoothing constant to calculate gradient of the reference
+        :type eta: number, default 0.01
+        :param isotropic: Whether it uses L2 (isotropic) or L1 (unisotropic) norm
+        :type isotropic: boolean, default True, can range between 1 and 2
+        :param nonnegativity: Whether to add the non-negativity constraint
+        :type nonnegativity: boolean, default True
+        :param device: determines if the code runs on CPU or GPU
+        :type device: string, default 'cpu', can be 'gpu' if GPU is installed
+        '''
     def __init__(self, reference, alpha=1, max_iteration=100,
                  tolerance=1e-6, eta=0.01, isotropic=True, nonnegativity=True, device='cpu'):
 
@@ -211,13 +300,25 @@ class FGP_dTV(RegulariserFunction):
             self.alpha *= scalar
             return self
 
+    def check_input(self, input):
+        if input.geometry.length > 3:
+            raise ValueError('{} cannot work on more than 3D. Got {}'.format(self.__class__.__name__, input.geometry.length))
+
 class TNV(RegulariserFunction):
     
-    def __init__(self,alpha=1, iterationsTNV=100, tolerance=1e-6):
-        
+    def __init__(self,alpha=1, max_iteration=100, tolerance=1e-6):
+        '''Creator of TNV Function
+
+        :param alpha: regularisation parameter
+        :type alpha: number, default 1
+        :param max_iteration: max number of sub iterations. The algorithm will iterate up to this number of iteration or up to when the tolerance has been reached
+        :type max_iteration: integer, default 100
+        :param tolerance: minimum difference between previous iteration of the algorithm that determines the stop of the iteration earlier than num_iter
+        :type tolerance: float, default 1e-6
+        '''
         # set parameters
         self.alpha = alpha
-        self.iterationsTNV = iterationsTNV
+        self.max_iteration = max_iteration
         self.tolerance = tolerance
         
     def __call__(self,x):
@@ -230,7 +331,7 @@ class TNV(RegulariserFunction):
             raise ValueError('Only 3D data is supported. Passed data has {} dimensions'.format(in_arr.ndim))
         res = regularisers.TNV(in_arr, 
               self.alpha * tau,
-              self.iterationsTNV,
+              self.max_iteration,
               self.tolerance)
         return res, []
 
@@ -247,3 +348,10 @@ class TNV(RegulariserFunction):
         else:
             self.alpha *= scalar
             return self
+
+    def check_input(self, input):
+        '''TNV requires 2D+channel data with the first dimension as the channel dimension'''
+        DataOrder.check_order_for_engine('cil', input.geometry)
+        if ( input.geometry.channels == 1 ) or ( not input.geometry.length == 3) :
+            raise ValueError('TNV requires 2D+channel data. Got {}'.format(input.geometry.dimension_labels))
+        

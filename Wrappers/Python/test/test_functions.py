@@ -988,10 +988,8 @@ class TestTotalVariation(unittest.TestCase):
         r_tolerance = 1e-9
         r_iso = True
         r_nonneg = True
-        r_printing = 0
-        # g_CCPI_reg_toolkit = alpha * FGP_TV(1., r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'cpu')
         g_CCPI_reg_toolkit = alpha * FGP_TV(max_iteration=r_iterations, tolerance=r_tolerance, 
-             isotropic=r_iso, nonnegativity=r_nonneg, printing=r_printing, device='cpu')
+             isotropic=r_iso, nonnegativity=r_nonneg, device='cpu')
         
         t2 = timer()
         res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
@@ -1021,10 +1019,8 @@ class TestTotalVariation(unittest.TestCase):
         r_tolerance = 1e-9
         r_iso = True
         r_nonneg = True
-        r_printing = 0
-        # g_CCPI_reg_toolkit = alpha * FGP_TV(1., r_iterations, r_tolerance, r_iso, r_nonneg, r_printing, 'cpu')
         g_CCPI_reg_toolkit = alpha * FGP_TV(max_iteration=r_iterations, tolerance=r_tolerance, 
-             isotropic=r_iso, nonnegativity=r_nonneg, printing=r_printing, device='cpu')
+             isotropic=r_iso, nonnegativity=r_nonneg, device='cpu')
 
         t2 = timer()
         res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
@@ -1073,9 +1069,8 @@ class TestTotalVariation(unittest.TestCase):
         r_tolerance = 1e-9
         r_iso = True
         r_nonneg = True
-        r_printing = 0
         g_CCPI_reg_toolkit = alpha * FGP_TV(max_iteration=r_iterations, tolerance=r_tolerance, 
-             isotropic=r_iso, nonnegativity=r_nonneg, printing=r_printing, device='cpu')
+             isotropic=r_iso, nonnegativity=r_nonneg, device='cpu')
 
 
         t2 = timer()
@@ -1084,52 +1079,6 @@ class TestTotalVariation(unittest.TestCase):
         # print (t3-t2)
         
         np.testing.assert_allclose(res1.as_array(), res2.as_array(), atol=7.5e-2)
-
-        # the following were in the unit tests but didn't assert anything    
-        # # CIL_FGP_TV no tolerance
-        # g_CIL.tolerance = None
-        # t0 = timer()
-        # res1 = g_CIL.proximal(noisy_data, 1.)
-        # t1 = timer()
-        # # print(t1-t0)
-        
-        # ###################################################################
-        # ###################################################################
-        # ###################################################################
-        # ###################################################################     
-    
-        # data = dataexample.PEPPERS.get(size=(256, 256))
-        # ig = data.geometry
-        # ag = ig
-
-        # noisy_data = noise.gaussian(data, seed=10)
-                    
-        # alpha = 0.1
-        # iters = 1000
-        
-        # # CIL_FGP_TV no tolerance
-        # g_CIL = alpha * TotalVariation(iters, tolerance=None)
-        # t0 = timer()
-        # res1 = g_CIL.proximal(noisy_data, 1.)
-        # t1 = timer()
-        # # print(t1-t0)
-
-        # # CCPi Regularisation toolkit high tolerance
-        
-        # r_alpha = alpha
-        # r_iterations = iters
-        # r_tolerance = 1e-9
-        # r_iso = True
-        # r_nonneg = True
-        # r_printing = 0
-        # g_CCPI_reg_toolkit = alpha * FGP_TV(max_iteration=r_iterations, tolerance=r_tolerance, 
-        #      isotropic=r_iso, nonnegativity=r_nonneg, printing=r_printing, device='cpu')
-
-
-        # t2 = timer()
-        # res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
-        # t3 = timer()
-        # # print (t3-t2)
 
 
 class TestKullbackLeiblerNumba(unittest.TestCase):

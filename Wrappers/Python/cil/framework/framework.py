@@ -1832,12 +1832,13 @@ class DataContainer(object):
         '''Returns the shape of the  of the DataContainer'''
         return self.array.shape
 
-    def __getitem__(self, ind):
+    def __getitem__(self, ind):    
 
         '''Allows python indexing for CIL DataContainer/ImageData/AcquisitionData with no metadata'''
 
-        tmp = self.array[ind]
-        return DataContainer(tmp)         
+        return DataContainer(self.array[ind], False)
+
+
 
     @shape.setter
     def shape(self, val):
@@ -1863,13 +1864,13 @@ class DataContainer(object):
                   **kwargs):
         '''Holds the data'''
         
-        if type(array) == numpy.ndarray:
+        try:
             if deep_copy:
                 self.array = array.copy()
             else:
                 self.array = array    
-        else:
-            raise TypeError('Array must be NumpyArray, passed {0}'\
+        except:
+            raise TypeError('Array like must be passed {0}'\
                             .format(type(array)))
 
         #Don't set for derived classes

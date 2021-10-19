@@ -93,47 +93,51 @@ class FiniteDifferenceOperator(LinearOperator):
 
     def direct(self, x, out = None):
         
-        x_asarr = x.as_array()
-        
-        outnone = False
         if out is None:
-            outnone = True
-            ret = self.domain_geometry().allocate()
-            outa = ret.as_array()
-        else:
-            outa = out.as_array()
-            outa[:]=0     
+            out = self.domain_geometry().allocate()
+
+        # outnone = False
+        # if out is None:
+            # outnone = True
+            # ret = self.domain_geometry().allocate()
+        # else:
+            # pass
+            # outa = out.as_array()
+            # outa[:]=0     
 
         #######################################################################
         ##################### Forward differences #############################
         #######################################################################
                 
         if self.method == 'forward':  
-            
-            # interior nodes
-            np.subtract( x_asarr[tuple(self.get_slice(2, None))], \
-                             x_asarr[tuple(self.get_slice(1,-1))], \
-                             out = outa[tuple(self.get_slice(1, -1))])               
+
+            x[tuple(self.get_slice(2, None))].\
+                subtract(x[tuple(self.get_slice(1,-1))], \
+                    out = out[tuple(self.get_slice(1, -1))])             
 
             if self.boundary_condition == 'Neumann':
                 
                 # left boundary
-                np.subtract(x_asarr[tuple(self.get_slice(1,2))],\
-                            x_asarr[tuple(self.get_slice(0,1))],
-                            out = outa[tuple(self.get_slice(0,1))]) 
+
+                x[tuple(self.get_slice(1,2))].\
+                    subtract(x[tuple(self.get_slice(0,1))], \
+                        out = out[tuple(self.get_slice(0,1))]) 
                 
                 
             elif self.boundary_condition == 'Periodic':
                 
                 # left boundary
-                np.subtract(x_asarr[tuple(self.get_slice(1,2))],\
-                            x_asarr[tuple(self.get_slice(0,1))],
-                            out = outa[tuple(self.get_slice(0,1))])  
+
+                x[tuple(self.get_slice(1,2))].\
+                    subtract([tuple(self.get_slice(0,1))], \
+                        out = out[tuple(self.get_slice(0,1))]) 
                 
                 # right boundary
-                np.subtract(x_asarr[tuple(self.get_slice(0,1))],\
-                            x_asarr[tuple(self.get_slice(-1,None))],
-                            out = outa[tuple(self.get_slice(-1,None))])  
+
+                x[tuple(self.get_slice(0,1))].\
+                    subtract([tuple(self.get_slice(-1,None))], \
+                        out = out[tuple(self.get_slice(-1,None))])   
+
                 
             else:
                 raise ValueError('Not implemented')                
@@ -222,11 +226,12 @@ class FiniteDifferenceOperator(LinearOperator):
                 raise ValueError('Not implemented')                
         
         if self.voxel_size != 1.0:
-            outa /= self.voxel_size  
+            out /= self.voxel_size  
 
-        if outnone:                  
-            ret.fill(outa)
-            return ret                
+        # if outnone:                  
+        #     # ret.fill(outa)
+        #     return ret       
+        return out         
                  
         
     def adjoint(self, x, out=None):

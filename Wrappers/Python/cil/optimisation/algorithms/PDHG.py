@@ -17,7 +17,7 @@
 
 from cil.optimisation.algorithms import Algorithm
 import warnings
-
+import numpy
 
 
 class PDHG(Algorithm):
@@ -78,9 +78,9 @@ class PDHG(Algorithm):
         self._use_axpby = use_axpby
 
         if f is not None and operator is not None and g is not None:
-            self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, initial=initial)
+            self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, initial=initial, **kwargs)
 
-    def set_up(self, f, g, operator, tau=None, sigma=1., initial=None):
+    def set_up(self, f, g, operator, tau=None, sigma=1., initial=None, **kwargs):
         '''initialisation of the algorithm
 
         :param operator: a Linear Operator
@@ -117,9 +117,17 @@ class PDHG(Algorithm):
         self.x = self.x_old.copy()
         self.x_tmp = self.operator.domain_geometry().allocate(0)
         self.y = self.operator.range_geometry().allocate(0)
-        self.y_tmp = self.operator.range_geometry().allocate(0)    
-        # relaxation parameter
-        self.theta = 1
+        self.y_tmp = self.operator.range_geometry().allocate(0)   
+
+        # relaxation parameter, default value is 1.0
+        self.theta = kwargs.get('theta',1.0)
+
+        # Strongly convex case g
+        self.gamma_g = kwargs.get('gamma_g', None)
+
+        # Strongly convex case f
+        self.gamma_fconj = kwargs.get('gamma_fconj', None) 
+        
         
         self.configured = True
         print("{} configured".format(self.__class__.__name__, ))
@@ -168,6 +176,19 @@ class PDHG(Algorithm):
 
         #update_previous_solution() called after update by base class
         #i.e current solution is now in x_old, previous solution is now in x
+    
+        # Update sigma and tau based on the strong convexity of G
+        if self.gamma_g is not None:
+            self.theta = float(1 / numpy.sqrt(1 + 2 * self.gamma_g * self.tau))
+            self.tau *= self.theta
+            self.sigma /= self.theta  
+
+        # Update sigma and tau based on the strong convexity of F
+        # Following operations are reversed due to symmetry, sigma --> tau, tau -->sigma
+        if self.gamma_fconj is not None:            
+            self.theta = float(1 / numpy.sqrt(1 + 2 * self.gamma_f * self.sigma))
+            self.sigma *= self.theta
+            self.tau /= self.theta                       
         
     def update_objective(self):
 
@@ -197,3 +218,80 @@ class PDHG(Algorithm):
     @property
     def primal_dual_gap(self):
         return [x[2] for x in self.loss]
+
+
+if __name__ == "__main__":
+    
+    # Import libraries
+    from cil.utilities import dataexample, noise
+    from cil.optimisation.operators import GradientOperator
+    from cil.optimisation.functions import MixedL21Norm, L2NormSquared
+    from cil.utilities.display import show2D
+    from cil.io import NEXUSDataWriter, NEXUSDataReader
+    import pickle
+    import matplotlib.pyplot as plt
+    import os
+
+    print("Denoising Case : Default sigma/tau vs Strongly convex")
+    # Load data
+    data = dataexample.CAMERA.get(size=(256,256))
+
+    # Add gaussian noise
+    noisy_data = noise.gaussian(data, seed = 10, var = 0.02)     
+
+    ig = noisy_data.geometry
+
+    alpha = 1.
+    K = GradientOperator(ig)
+    F = alpha * MixedL21Norm()
+    G = L2NormSquared(b=noisy_data)
+
+    normK = K.norm()
+    sigma = 1./normK
+    tau = 1./normK
+
+    # standard pdhg
+    pdhg = PDHG(f = F, g = G, operator = K, 
+                update_objective_interval=1, 
+                max_iteration=2000, sigma=sigma, tau=tau)
+    pdhg.run(verbose=0)
+
+    # pdhg = {}
+    # pdhg['primal'] = pdhg.objective
+    # pdhg['dual'] = pdhg.dual_objective
+    # pdhg['pdgap'] = pdhg.primal_dual_gap
+
+    # with open(os.getcwd() + 'pdhg_noaccel_info.pkl','wb') as f:
+    #     pickle.dump(pdhg_noaccel_info, f) 
+
+    # PDHG with G strongly convex acceleration
+    pdhg_sc = PDHG(f = F, g = G, operator = K, 
+                    update_objective_interval=1, max_iteration=2000, 
+                    gamma_g = 1, sigma=sigma, tau=tau)
+    pdhg_sc.run(verbose=0)  
+
+    # Load pdhg_noaccel_info
+    # pdhg_noaccel_info = pickle.load( open( os.getcwd() + 'pdhg_noaccel_info.pkl', "rb" ) )         
+
+    plt.figure()
+    plt.loglog(pdhg_sc.objective, label="Strongly Convex (g)")
+    plt.loglog(pdhg.objective, label="No accelerate")
+    plt.legend()
+    plt.title("Primal")
+    plt.show()
+
+    plt.figure()
+    plt.loglog(pdhg_sc.primal_dual_gap, label="Strongly Convex (g)")
+    plt.loglog(pdhg.primal_dual_gap, label="No accelerate")
+    plt.legend()
+    plt.title("PrimalDual gap")
+    plt.show()    
+
+#     reader_pdhg = NEXUSDataReader(file_name = os.getcwd() + "pdhg_noaccel" + ".nxs")
+#     pdhg_accel_solution = reader_pdhg.load_data()
+
+    show2D([pdhg_sc.solution,
+            pdhg.solution, 
+            (pdhg_sc.solution - pdhg.solution).abs()], 
+           num_cols=1, origin="upper")
+    

@@ -98,8 +98,8 @@ class FGP_TV(TV_Base):
         :type nonnegativity: boolean, default True
         :param max_iteration: max number of sub iterations. The algorithm will iterate up to this number of iteration or up to when the tolerance has been reached
         :type max_iteration: integer, default 100
-        :param tolerance: minimum difference between previous iteration of the algorithm that determines the stop of the iteration earlier than num_iter
-        :type tolerance: float, default 1e-6
+        :param tolerance: minimum difference between previous iteration of the algorithm that determines the stop of the iteration earlier than max_iteration. If set to 0 only the max_iteration will be used as stop criterion.
+        :type tolerance: float, default 0
         :param device: determines if the code runs on CPU or GPU
         :type device: string, default 'cpu', can be 'gpu' if GPU is installed
         '''
@@ -154,8 +154,8 @@ class TGV(RegulariserFunction):
         :type gamma: number, default 1, can range between 1 and 2
         :param max_iteration: max number of sub iterations. The algorithm will iterate up to this number of iteration or up to when the tolerance has been reached
         :type max_iteration: integer, default 100
-        :param tolerance: minimum difference between previous iteration of the algorithm that determines the stop of the iteration earlier than num_iter
-        :type tolerance: float, default 1e-6
+        :param tolerance: minimum difference between previous iteration of the algorithm that determines the stop of the iteration earlier than max_iteration. If set to 0 only the max_iteration will be used as stop criterion.
+        :type tolerance: float, default 0
         :param device: determines if the code runs on CPU or GPU
         :type device: string, default 'cpu', can be 'gpu' if GPU is installed
         
@@ -238,11 +238,11 @@ class FGP_dTV(RegulariserFunction):
         :type alpha: number, default 1
         :param max_iteration: max number of sub iterations. The algorithm will iterate up to this number of iteration or up to when the tolerance has been reached
         :type max_iteration: integer, default 100
-        :param tolerance: minimum difference between previous iteration of the algorithm that determines the stop of the iteration earlier than num_iter
-        :type tolerance: float, default 1e-6
+        :param tolerance: minimum difference between previous iteration of the algorithm that determines the stop of the iteration earlier than max_iteration. If set to 0 only the max_iteration will be used as stop criterion.
+        :type tolerance: float, default 0
         :param eta: smoothing constant to calculate gradient of the reference
         :type eta: number, default 0.01
-        :param isotropic: Whether it uses L2 (isotropic) or L1 (unisotropic) norm
+        :param isotropic: Whether it uses L2 (isotropic) or L1 (anisotropic) norm
         :type isotropic: boolean, default True, can range between 1 and 2
         :param nonnegativity: Whether to add the non-negativity constraint
         :type nonnegativity: boolean, default True
@@ -313,8 +313,8 @@ class TNV(RegulariserFunction):
         :type alpha: number, default 1
         :param max_iteration: max number of sub iterations. The algorithm will iterate up to this number of iteration or up to when the tolerance has been reached
         :type max_iteration: integer, default 100
-        :param tolerance: minimum difference between previous iteration of the algorithm that determines the stop of the iteration earlier than num_iter
-        :type tolerance: float, default 1e-6
+        :param tolerance: minimum difference between previous iteration of the algorithm that determines the stop of the iteration earlier than max_iteration. If set to 0 only the max_iteration will be used as stop criterion.
+        :type tolerance: float, default 0
         '''
         # set parameters
         self.alpha = alpha

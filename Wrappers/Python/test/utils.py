@@ -25,6 +25,7 @@ import os
 from cil.framework import AcquisitionGeometry, BlockDataContainer
 from cil.optimisation.operators import GradientOperator, LinearOperator
 import numpy
+import unittest
 
 def has_nvidia_smi():
     return os.system('nvidia-smi') == 0
@@ -76,7 +77,7 @@ def has_ipp():
     except TypeError:
         return True
 
-
+@unittest.skipUnless(has_sirf, "Skipping as SIRF is not available")
 class GradientSIRF(object):
 
     if has_sirf:

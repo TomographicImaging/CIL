@@ -1,4 +1,5 @@
 * 21.2.1
+  - CCPi Regularisation plugin is refactored, only FGP_TV, FGP_dTV, TGV and TNV are exposed. Docstrings and functionality unit tests are added. Tests of the functions are meant to be in the CCPi-Regularisation toolkit itself.
   - Add dtype for ImageGeometry, AcquisitionGeometry, VectorGeometry, BlockGeometry
   - Fix GradientOperator to handle pseudo 2D CIL geometries
   - Created Reconstructor base class for simpler use of CIL methods

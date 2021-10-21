@@ -91,7 +91,6 @@ class SPDHG(Algorithm):
                     .format(self.__class__.__name__))
                     
         self._use_axpby = use_axpby
-
         if f is not None and operator is not None and g is not None:
             self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, 
                         initial=initial, prob=prob, gamma=gamma, norms=norms)

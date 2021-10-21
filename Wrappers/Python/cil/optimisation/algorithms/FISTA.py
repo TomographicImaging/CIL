@@ -116,3 +116,4 @@ class FISTA(Algorithm):
     def update_objective(self):
         self.loss.append( self.f(self.x) + self.g(self.x) )    
     
+

@@ -40,7 +40,11 @@ class RegulariserFunction(Function):
         :param tau: 
         :type tau: Number
         :param out: a placeholder for the result
-        :type out: same as x: ImageData'''
+        :type out: same as x: ImageData
+        
+        If the ImageData contains complex data, rather than the default float32, the regularisation
+        is run indipendently on the real and imaginary part.
+        '''
 
         self.check_input(x)
         arr = x.as_array()

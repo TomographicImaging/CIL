@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cil.framework.framework &mdash; CIL v21.2.0-21-gfc6d9638 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <title>cil.framework.framework &mdash; CIL v21.2.0-22-gcf87ba97 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> CIL
           </a>
               <div class="version">
-                v21.2.0-21-gfc6d9638
+                v21.2.0-22-gcf87ba97
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -2476,11 +2476,6 @@
         <span class="sd">&#39;&#39;&#39;Applies log pixel-wise to the DataContainer&#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pixel_wise_unary</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
     
-    <span class="c1">#def __abs__(self):</span>
-    <span class="c1">#    operation = FM.OPERATION.ABS</span>
-    <span class="c1">#    return self.callFieldMath(operation, None, self.mask, self.maskOnValue)</span>
-    <span class="c1"># __abs__</span>
-    
     <span class="c1">## reductions</span>
     <span class="k">def</span> <span class="nf">sum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -3160,7 +3155,12 @@
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">AcquisitionGeometry</span><span class="p">):</span>
                 <span class="n">dim_order</span> <span class="o">=</span> <span class="n">DataOrder</span><span class="o">.</span><span class="n">TIGRE_AG_LABELS</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">dim_order</span> <span class="o">=</span> <span class="n">DataOrder</span><span class="o">.</span><span class="n">TIGRE_IG_LABELS</span>   
+                <span class="n">dim_order</span> <span class="o">=</span> <span class="n">DataOrder</span><span class="o">.</span><span class="n">TIGRE_IG_LABELS</span>
+        <span class="k">elif</span> <span class="n">engine</span> <span class="o">==</span> <span class="s1">&#39;cil&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">AcquisitionGeometry</span><span class="p">):</span>
+                <span class="n">dim_order</span> <span class="o">=</span> <span class="n">DataOrder</span><span class="o">.</span><span class="n">CIL_AG_LABELS</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dim_order</span> <span class="o">=</span> <span class="n">DataOrder</span><span class="o">.</span><span class="n">CIL_IG_LABELS</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown engine expected &#39;tigre&#39; or &#39;astra&#39; got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">engine</span><span class="p">))</span>
         

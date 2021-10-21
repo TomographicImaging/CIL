@@ -23,7 +23,6 @@ import sys
 import shutil
 import unittest
 from cil.framework import BlockDataContainer
-from cil.optimisation.operators import GradientOperator
 from utils import GradientSIRF
 try:
     import sirf.STIR as pet

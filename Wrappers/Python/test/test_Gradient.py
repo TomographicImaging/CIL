@@ -410,20 +410,4 @@ class TestGradientOperator(unittest.TestCase):
         numpy.testing.assert_array_almost_equal(res1[1].as_array(), res2[1].as_array())  
 
         # check dot_test
-        self.assertTrue(LinearOperator.dot_test(Grad)) 
-
-
-
-
-        
-
-
-
-
-
-
-
-
-
-
-
+        self.assertTrue(LinearOperator.dot_test(Grad))

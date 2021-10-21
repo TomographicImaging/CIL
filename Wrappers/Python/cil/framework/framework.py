@@ -3099,8 +3099,11 @@ class DataOrder():
     @staticmethod
     def check_order_for_engine(engine, geometry):
         order_requested = DataOrder.get_order_for_engine(engine, geometry)
+
         if order_requested == list(geometry.dimension_labels):
             return True
         else:
             raise ValueError("Expected dimension_label order {0}, got {1}.\nTry using `data.reorder('{2}')` to permute for {2}"
                  .format(order_requested, list(geometry.dimension_labels), engine))
+
+

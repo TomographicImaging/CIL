@@ -111,7 +111,11 @@ class TIGREGeometry(Geometry):
                 raise NotImplementedError ("CIL cannot use TIGRE to process parallel geometries with tilted axes")
 
             self.mode = 'parallel'
-            self.DSO = ig.voxel_num_z * ig.voxel_size_z
+            
+            lenx = (ig.voxel_num_x * ig.voxel_size_x)
+            leny = (ig.voxel_num_y * ig.voxel_size_y)
+
+            self.DSO = max(lenx,leny)
             self.DSD = self.DSO*2
 
             if ag_in.dimension == '2D':

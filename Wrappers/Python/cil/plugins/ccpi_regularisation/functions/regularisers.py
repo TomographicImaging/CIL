@@ -86,7 +86,7 @@ class TV_Base(RegulariserFunction):
 
 
 class FGP_TV(TV_Base):
-    def __init__(self, alpha=1, max_iteration=100, tolerance=1e-6, isotropic=True, nonnegativity=True, device='cpu'):
+    def __init__(self, alpha=1, max_iteration=100, tolerance=0, isotropic=True, nonnegativity=True, device='cpu'):
         '''Creator of FGP_TV Function
 
 
@@ -145,7 +145,7 @@ class FGP_TV(TV_Base):
         
 class TGV(RegulariserFunction):
 
-    def __init__(self, alpha=1, gamma=1, max_iteration=100, tolerance=1e-6, device='cpu' , **kwargs):
+    def __init__(self, alpha=1, gamma=1, max_iteration=100, tolerance=0, device='cpu' , **kwargs):
         '''Creator of Total Generalised Variation Function 
 
         :param alpha: regularisation parameter
@@ -250,7 +250,7 @@ class FGP_dTV(RegulariserFunction):
         :type device: string, default 'cpu', can be 'gpu' if GPU is installed
         '''
     def __init__(self, reference, alpha=1, max_iteration=100,
-                 tolerance=1e-6, eta=0.01, isotropic=True, nonnegativity=True, device='cpu'):
+                 tolerance=0, eta=0.01, isotropic=True, nonnegativity=True, device='cpu'):
 
         if isotropic == True:
             self.methodTV = 0
@@ -306,7 +306,7 @@ class FGP_dTV(RegulariserFunction):
 
 class TNV(RegulariserFunction):
     
-    def __init__(self,alpha=1, max_iteration=100, tolerance=1e-6):
+    def __init__(self,alpha=1, max_iteration=100, tolerance=0):
         '''Creator of TNV Function
 
         :param alpha: regularisation parameter

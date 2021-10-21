@@ -294,4 +294,3 @@ if __name__ == "__main__":
             pdhg.solution, 
             (pdhg_sc.solution - pdhg.solution).abs()], 
            num_cols=1, origin="upper")
-    

@@ -21,13 +21,42 @@ import numpy
 
 
 class PDHG(Algorithm):
-    r'''Primal Dual Hybrid Gradient
+
+    r"""Primal Dual Hybrid Gradient Algorithm
     
-    Problem: 
-    
-    .. math::
-    
-      \min_{x} f(Kx) + g(x)
+        Solves the following problem: 
+
+            :math: $\omega$
+
+            .. math:: X(e^{j\omega } ) = x(n)e^{ - j\omega n}
+        
+            .. math:: \min_{x} f(Kx) + g(x)
+
+        
+        Parameters
+        ----------  
+
+        x : 
+        primal variable
+
+
+        f: convex function with a "simple" `proximal_conjugate` method
+
+
+        g: convex function with a "simple" `proximal` method
+
+
+        operator: Linear operator with `direct` and `adjoint` properties
+
+
+        tau:
+
+
+        sigma:
+
+
+
+
         
     :param operator: Linear Operator = K
     :param f: Convex function with "simple" proximal of its conjugate. 
@@ -52,7 +81,8 @@ class PDHG(Algorithm):
         (b) E. Esser, X. Zhang and T. F. Chan (2010), "A general framework for a class of first
         order primal–dual algorithms for convex optimization in imaging science",
         SIAM J. Imaging Sci. 3, 1015–1046.
-    '''
+
+    """
 
     def __init__(self, f=None, g=None, operator=None, tau=None, sigma=1.,initial=None, use_axpby=True, **kwargs):
         '''PDHG algorithm creator
@@ -218,79 +248,3 @@ class PDHG(Algorithm):
     @property
     def primal_dual_gap(self):
         return [x[2] for x in self.loss]
-
-
-if __name__ == "__main__":
-    
-    # Import libraries
-    from cil.utilities import dataexample, noise
-    from cil.optimisation.operators import GradientOperator
-    from cil.optimisation.functions import MixedL21Norm, L2NormSquared
-    from cil.utilities.display import show2D
-    from cil.io import NEXUSDataWriter, NEXUSDataReader
-    import pickle
-    import matplotlib.pyplot as plt
-    import os
-
-    print("Denoising Case : Default sigma/tau vs Strongly convex")
-    # Load data
-    data = dataexample.CAMERA.get(size=(256,256))
-
-    # Add gaussian noise
-    noisy_data = noise.gaussian(data, seed = 10, var = 0.02)     
-
-    ig = noisy_data.geometry
-
-    alpha = 1.
-    K = GradientOperator(ig)
-    F = alpha * MixedL21Norm()
-    G = L2NormSquared(b=noisy_data)
-
-    normK = K.norm()
-    sigma = 1./normK
-    tau = 1./normK
-
-    # standard pdhg
-    pdhg = PDHG(f = F, g = G, operator = K, 
-                update_objective_interval=1, 
-                max_iteration=2000, sigma=sigma, tau=tau)
-    pdhg.run(verbose=0)
-
-    # pdhg = {}
-    # pdhg['primal'] = pdhg.objective
-    # pdhg['dual'] = pdhg.dual_objective
-    # pdhg['pdgap'] = pdhg.primal_dual_gap
-
-    # with open(os.getcwd() + 'pdhg_noaccel_info.pkl','wb') as f:
-    #     pickle.dump(pdhg_noaccel_info, f) 
-
-    # PDHG with G strongly convex acceleration
-    pdhg_sc = PDHG(f = F, g = G, operator = K, 
-                    update_objective_interval=1, max_iteration=2000, 
-                    gamma_g = 1, sigma=sigma, tau=tau)
-    pdhg_sc.run(verbose=0)  
-
-    # Load pdhg_noaccel_info
-    # pdhg_noaccel_info = pickle.load( open( os.getcwd() + 'pdhg_noaccel_info.pkl', "rb" ) )         
-
-    plt.figure()
-    plt.loglog(pdhg_sc.objective, label="Strongly Convex (g)")
-    plt.loglog(pdhg.objective, label="No accelerate")
-    plt.legend()
-    plt.title("Primal")
-    plt.show()
-
-    plt.figure()
-    plt.loglog(pdhg_sc.primal_dual_gap, label="Strongly Convex (g)")
-    plt.loglog(pdhg.primal_dual_gap, label="No accelerate")
-    plt.legend()
-    plt.title("PrimalDual gap")
-    plt.show()    
-
-#     reader_pdhg = NEXUSDataReader(file_name = os.getcwd() + "pdhg_noaccel" + ".nxs")
-#     pdhg_accel_solution = reader_pdhg.load_data()
-
-    show2D([pdhg_sc.solution,
-            pdhg.solution, 
-            (pdhg_sc.solution - pdhg.solution).abs()], 
-           num_cols=1, origin="upper")

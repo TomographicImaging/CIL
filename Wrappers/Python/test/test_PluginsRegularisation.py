@@ -16,11 +16,12 @@
 #   limitations under the License.
 
 import unittest
-import numpy
+import numpy as np
 from cil.utilities import dataexample
 from cil.optimisation.functions import TotalVariation
 import os
 from utils import has_nvidia_smi
+from cil.framework import ImageGeometry
 
 try:
     from ccpi.filters import regularisers
@@ -312,8 +313,8 @@ class TestPlugin(unittest.TestCase):
         res_TV_regtoolkit_cpu_aniso = TV_regtoolkit_cpu_aniso.proximal(self.data, tau=1.0)  
 
         # compare TV vs FGP_TV (anisotropic, isotropic, cpu)
-        numpy.testing.assert_array_almost_equal(res_TV_cil_iso.array, res_TV_regtoolkit_cpu_iso.array, decimal=3)              
-        numpy.testing.assert_array_almost_equal(res_TV_cil_aniso.array, res_TV_regtoolkit_cpu_aniso.array, decimal=3)
+        np.testing.assert_array_almost_equal(res_TV_cil_iso.array, res_TV_regtoolkit_cpu_iso.array, decimal=3)              
+        np.testing.assert_array_almost_equal(res_TV_cil_aniso.array, res_TV_regtoolkit_cpu_aniso.array, decimal=3)
        
     @unittest.skipUnless(has_regularisation_toolkit, "Skipping as CCPi Regularisation Toolkit is not installed")  
     @unittest.skipUnless((has_nvidia_smi()), "Skipping as there is no GPU")        
@@ -343,8 +344,8 @@ class TestPlugin(unittest.TestCase):
         TV_regtoolkit_cpu_iso = self.alpha * FGP_TV(max_iteration=self.iterations, device = 'cpu')
         res_TV_regtoolkit_cpu_iso = TV_regtoolkit_cpu_iso.proximal(self.data, tau=1.0)        
 
-        numpy.testing.assert_array_almost_equal(res_TV_cil_iso.array, res_TV_regtoolkit_gpu_iso.array, decimal=3)
-        numpy.testing.assert_array_almost_equal(res_TV_regtoolkit_cpu_iso.array, res_TV_regtoolkit_gpu_iso.array, decimal=3)
+        np.testing.assert_array_almost_equal(res_TV_cil_iso.array, res_TV_regtoolkit_gpu_iso.array, decimal=3)
+        np.testing.assert_array_almost_equal(res_TV_regtoolkit_cpu_iso.array, res_TV_regtoolkit_gpu_iso.array, decimal=3)
 
-        numpy.testing.assert_array_almost_equal(res_TV_cil_aniso.array, res_TV_regtoolkit_gpu_aniso.array, decimal=3)
-        numpy.testing.assert_array_almost_equal(res_TV_regtoolkit_cpu_aniso.array, res_TV_regtoolkit_gpu_aniso.array, decimal=3)              
+        np.testing.assert_array_almost_equal(res_TV_cil_aniso.array, res_TV_regtoolkit_gpu_aniso.array, decimal=3)
+        np.testing.assert_array_almost_equal(res_TV_regtoolkit_cpu_aniso.array, res_TV_regtoolkit_gpu_aniso.array, decimal=3)              

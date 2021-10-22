@@ -21,7 +21,7 @@ from cil.framework import BlockGeometry
 import warnings
 from cil.utilities.multiprocessing import NUM_THREADS
 from cil.framework import ImageGeometry
-import numpy
+import numpy as np
 
 NEUMANN = 'Neumann'
 PERIODIC = 'Periodic'
@@ -93,7 +93,7 @@ class GradientOperator(LinearOperator):
             warnings.warn("Warning: correlation='Space' on multi-channel dataset will use `numpy` backend")
 
         # Complex data will use numpy backend
-        if domain_geometry.dtype in [numpy.complex, numpy.complex64]:
+        if domain_geometry.dtype in [np.complex, np.complex64]:
             backend = NUMPY
             warnings.warn("Warning: Complex geometries will use `numpy` backend")
         
@@ -339,7 +339,7 @@ class Gradient_C(LinearOperator):
         
     def direct(self, x, out=None): 
         
-        ndx = numpy.asarray(x.as_array(), dtype=numpy.float32, order='C')
+        ndx = np.asarray(x.as_array(), dtype=np.float32, order='C')
         x_p = Gradient_C.ndarray_as_c_pointer(ndx)
         
         return_val = False
@@ -388,7 +388,7 @@ class Gradient_C(LinearOperator):
             out = self.domain_geometry().allocate(None)
             return_val = True
 
-        ndout = numpy.asarray(out.as_array(), dtype=numpy.float32, order='C')          
+        ndout = np.asarray(out.as_array(), dtype=np.float32, order='C')          
         out_p = Gradient_C.ndarray_as_c_pointer(ndout)
         
         if self.split is False: 

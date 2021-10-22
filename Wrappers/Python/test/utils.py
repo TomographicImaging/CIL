@@ -77,9 +77,10 @@ def has_ipp():
     except TypeError:
         return True
 
-@unittest.skipUnless(has_sirf, "Skipping as SIRF is not available")
-class GradientSIRF(object):
 
+class GradientSIRF(object):
+    
+    @unittest.skipUnless(has_sirf, "Skipping as SIRF is not available")
     def test_Gradient(self):
 
         #######################################

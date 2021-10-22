@@ -316,8 +316,7 @@ class TestPlugin(unittest.TestCase):
         np.testing.assert_array_almost_equal(res_TV_cil_iso.array, res_TV_regtoolkit_cpu_iso.array, decimal=3)              
         np.testing.assert_array_almost_equal(res_TV_cil_aniso.array, res_TV_regtoolkit_cpu_aniso.array, decimal=3)
        
-    @unittest.skipUnless(has_regularisation_toolkit, "Skipping as CCPi Regularisation Toolkit is not installed")  
-    @unittest.skipUnless((has_nvidia_smi()), "Skipping as there is no GPU")        
+    @unittest.skipUnless(has_regularisation_toolkit and has_nvidia_smi(), "Skipping as CCPi Regularisation Toolkit is not installed")  
     def test_TotalVariation_vs_FGP_TV_gpu(self):   
 
         # Isotropic TV cil

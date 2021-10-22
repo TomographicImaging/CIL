@@ -20,6 +20,7 @@ import numpy
 from cil.utilities import dataexample
 from cil.optimisation.functions import TotalVariation
 import os
+from utils import has_nvidia_smi
 
 try:
     from ccpi.filters import regularisers
@@ -30,10 +31,6 @@ except ImportError as ie:
     has_regularisation_toolkit = False
 print ("has_regularisation_toolkit", has_regularisation_toolkit)
 TNV_fixed = False
-
-def has_nvidia_smi():
-    return os.system('nvidia-smi') == 0
-
 
 class TestPlugin(unittest.TestCase):
     def setUp(self):

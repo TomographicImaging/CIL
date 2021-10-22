@@ -39,13 +39,18 @@ class TotalVariation(Function):
       :type correlation: str, default 'Space'
       :param backend: Backend to compute finite differences for the GradientOperator
       :type backend: str, default 'c'
-      :param lower:lower bound for the orthogonal projection onto the convex set C
+      :param lower: lower bound for the orthogonal projection onto the convex set C
       :type lower: Number, default `-np.inf`
       :param upper: upper bound for the orthogonal projection onto the convex set C
       :type upper: Number, default `+np.inf`
-      :param isotropic: isotropic setup for Total variation
-      :type isotropic: bool, default `True`  
-      :param split: splits the Gradient into spacial Gradienta and spectral Gradient for multichannel data
+      :param isotropic: L2 norm is used for Gradient Operator (isotropic) 
+      :type isotropic: bool, default `True` 
+      
+                        .. math:: \sum \sqrt{(\partial_y u)^{2} + (\partial_x u)^2} \mbox{ (isotropic) }
+
+                        .. math:: \sum |\partial_y u| + |\partial_x u| \mbox{ (anisotropic) }
+       
+      :param split: splits the Gradient into spatial Gradient and spectral Gradient for multichannel data
       :type split: bool, default `False`           
       :param info: force a print to screen stating the stop
       :type info: bool, default `False`

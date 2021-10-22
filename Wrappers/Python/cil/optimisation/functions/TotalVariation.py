@@ -55,8 +55,7 @@ class TotalVariation(Function):
       TV = alpha * TotalVariation()
       sol = TV.proximal(data, tau = 1.0) 
 
-      .. note:: `tau` can be a number or an array. The latter case implies that preconditioning is applies, hence
-                stepsize is an array.
+      .. note:: `tau` can be a number or an array. The latter case implies that step-size preconditioning is applied.
 
     Reference:
       

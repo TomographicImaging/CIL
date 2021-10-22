@@ -37,6 +37,8 @@ class TestPlugin(unittest.TestCase):
 
         #Default test image
         self.data = dataexample.SIMPLE_PHANTOM_2D.get(size=(64,64))
+        self.alpha = 2.0
+        self.iterations = 500        
 
     def tearDown(self):
         pass
@@ -85,22 +87,20 @@ class TestPlugin(unittest.TestCase):
         outarr = out.as_array()
         numpy.testing.assert_almost_equal(outarr.imag, outarr.real)
 
-    def test_TotalVariation_vs_FGP_TV(self):
-
-        alpha = 2.0
-        iterations = 500
+    @unittest.skipUnless(has_regularisation_toolkit, "Skipping as CCPi Regularisation Toolkit is not installed")
+    def test_TotalVariation_vs_FGP_TV_cpu(self):
 
         # Isotropic TV cil
-        TV_cil_iso = alpha * TotalVariation(max_iteration=iterations)
+        TV_cil_iso = self.alpha * TotalVariation(max_iteration=self.iterations)
 
         # Anisotropic TV cil
-        TV_cil_aniso = alpha * TotalVariation(max_iteration=iterations, isotropic=False)
+        TV_cil_aniso = self.alpha * TotalVariation(max_iteration=self.iterations, isotropic=False)
 
         # Isotropic FGP_TV CCPiReg toolkit (cpu)
-        TV_regtoolkit_cpu_iso = alpha * FGP_TV(max_iteration=iterations, device = 'cpu')
+        TV_regtoolkit_cpu_iso = self.alpha * FGP_TV(max_iteration=self.iterations, device = 'cpu')
 
         # Anisotropic FGP_TV CCPiReg toolkit (cpu)
-        TV_regtoolkit_cpu_aniso = alpha * FGP_TV(max_iteration=iterations, device = 'cpu', isotropic=False)
+        TV_regtoolkit_cpu_aniso = self.alpha * FGP_TV(max_iteration=self.iterations, device = 'cpu', isotropic=False)
 
         res_TV_cil_iso = TV_cil_iso.proximal(self.data, tau=1.0)
         res_TV_cil_aniso = TV_cil_aniso.proximal(self.data, tau=1.0)
@@ -111,22 +111,36 @@ class TestPlugin(unittest.TestCase):
         numpy.testing.assert_array_almost_equal(res_TV_cil_iso.array, res_TV_regtoolkit_cpu_iso.array, decimal=3)              
         numpy.testing.assert_array_almost_equal(res_TV_cil_aniso.array, res_TV_regtoolkit_cpu_aniso.array, decimal=3)
        
-        if has_nvidia_smi:
+    @unittest.skipUnless(has_regularisation_toolkit and has_nvidia_smi, "Skipping as CCPi Regularisation Toolkit is not installed")   
+    def test_TotalVariation_vs_FGP_TV_gpu(self):   
 
-            try:
-                # Isotropic FGP_TV CCPiReg toolkit (gpu)
-                TV_regtoolkit_gpu_iso = alpha * FGP_TV(max_iteration=iterations, device = 'gpu') 
+        # Isotropic TV cil
+        TV_cil_iso = self.alpha * TotalVariation(max_iteration=self.iterations)
+        res_TV_cil_iso = TV_cil_iso.proximal(self.data, tau=1.0)        
 
-                # Anisotropic FGP_TV CCPiReg toolkit (gpu)
-                TV_regtoolkit_gpu_aniso = alpha * FGP_TV(max_iteration=iterations, device = 'gpu', isotropic=False)  
+        # Anisotropic TV cil
+        TV_cil_aniso = self.alpha * TotalVariation(max_iteration=self.iterations, isotropic=False) 
+        res_TV_cil_aniso = TV_cil_aniso.proximal(self.data, tau=1.0)               
+        
+        # Isotropic FGP_TV CCPiReg toolkit (gpu)
+        TV_regtoolkit_gpu_iso = self.alpha * FGP_TV(max_iteration=self.iterations, device = 'gpu') 
+        res_TV_regtoolkit_gpu_iso = TV_regtoolkit_gpu_iso.proximal(self.data, tau=1.0)
 
-                res_TV_regtoolkit_gpu_iso = TV_regtoolkit_gpu_iso.proximal(self.data, tau=1.0)
-                res_TV_regtoolkit_gpu_aniso = TV_regtoolkit_gpu_aniso.proximal(self.data, tau=1.0)   
+        # Anisotropic FGP_TV CCPiReg toolkit (gpu)
+        TV_regtoolkit_gpu_aniso = self.alpha * FGP_TV(max_iteration=self.iterations, device = 'gpu', isotropic=False)  
+        res_TV_regtoolkit_gpu_aniso = TV_regtoolkit_gpu_aniso.proximal(self.data, tau=1.0)  
 
-                numpy.testing.assert_array_almost_equal(res_TV_cil_iso.array, res_TV_regtoolkit_gpu_iso.array, decimal=3)
-                numpy.testing.assert_array_almost_equal(res_TV_regtoolkit_cpu_iso.array, res_TV_regtoolkit_gpu_iso.array, decimal=3)
+        # Anisotropic FGP_TV CCPiReg toolkit (cpu)
+        TV_regtoolkit_cpu_aniso = self.alpha * FGP_TV(max_iteration=self.iterations, device = 'cpu', isotropic=False)         
+        res_TV_regtoolkit_cpu_aniso = TV_regtoolkit_cpu_aniso.proximal(self.data, tau=1.0)          
 
-                numpy.testing.assert_array_almost_equal(res_TV_cil_aniso.array, res_TV_regtoolkit_gpu_aniso.array, decimal=3)
-                numpy.testing.assert_array_almost_equal(res_TV_regtoolkit_cpu_aniso.array, res_TV_regtoolkit_gpu_aniso.array, decimal=3)    
-            except:
-                print("No GPU available")    
+        # Isotropic FGP_TV CCPiReg toolkit (cpu)
+        TV_regtoolkit_cpu_iso = self.alpha * FGP_TV(max_iteration=self.iterations, device = 'cpu')
+        res_TV_regtoolkit_cpu_iso = TV_regtoolkit_cpu_iso.proximal(self.data, tau=1.0)        
+
+        numpy.testing.assert_array_almost_equal(res_TV_cil_iso.array, res_TV_regtoolkit_gpu_iso.array, decimal=3)
+        numpy.testing.assert_array_almost_equal(res_TV_regtoolkit_cpu_iso.array, res_TV_regtoolkit_gpu_iso.array, decimal=3)
+
+        numpy.testing.assert_array_almost_equal(res_TV_cil_aniso.array, res_TV_regtoolkit_gpu_aniso.array, decimal=3)
+        numpy.testing.assert_array_almost_equal(res_TV_regtoolkit_cpu_aniso.array, res_TV_regtoolkit_gpu_aniso.array, decimal=3)    
+ 

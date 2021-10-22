@@ -76,7 +76,7 @@ class TestPlugin(unittest.TestCase):
     @unittest.skipUnless(has_regularisation_toolkit, "Skipping as CCPi Regularisation Toolkit is not installed")
     def test_FGP_TV_complex(self):
         datarr = self.data.as_array()
-        cmpx = numpy.zeros(self.data.shape, dtype=numpy.complex)
+        cmpx = numpy.zeros(self.data.shape, dtype=numpy.complex64)
         cmpx.real = datarr[:]
         cmpx.imag = datarr[:]
         self.data.array = cmpx

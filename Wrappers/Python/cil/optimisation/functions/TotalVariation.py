@@ -250,7 +250,7 @@ class TotalVariation(Function):
             self.gradient.adjoint(tmp_q, out=tmp_x)
             tmp_x *= tau
             tmp_x *= self.regularisation_parameter 
-            x.subtract(tmp_x, out=tmp_x)            
+            x.subtract(tmp_x, out=tmp_x)
             return self.projection_C(tmp_x)
         else:          
             self.gradient.adjoint(tmp_q, out = out)

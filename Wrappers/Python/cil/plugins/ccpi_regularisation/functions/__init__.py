@@ -15,5 +15,4 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from .regularisers import FGP_TV, ROF_TV, TGV, LLT_ROF, FGP_dTV,\
-        SB_TV, TNV
+from .regularisers import FGP_TV, TGV, FGP_dTV, TNV

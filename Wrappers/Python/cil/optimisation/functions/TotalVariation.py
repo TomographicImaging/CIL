@@ -25,9 +25,9 @@ import warnings
 
 class TotalVariation(Function):
     
-    r'''Fast Gradient Projection algorithm for Total Variation(TV) Denoising (ROF problem)
+    r'''Fast Gradient Projection algorithm for Total Variation(TV) regularisation
     
-    .. math::  \min_{x} \alpha TV(x) + \frac{1}{2}||x-b||^{2}_{2}
+    .. math::  \min_{x} \frac{1}{2}||x-b||^{2}_{2} + \tau\alpha TV(x)
                 
     Parameters:
       
@@ -43,8 +43,21 @@ class TotalVariation(Function):
       :type lower: Number, default `-numpy.inf`
       :param upper: upper bound for the orthogonal projection onto the convex set C
       :type upper: Number, default `+numpy.inf`
+      :param isotropic: isotropic setup for Total variation
+      :type isotropic: bool, default `True`  
+      :param split: splits the Gradient into spacial Gradienta and spectral Gradient for multichannel data
+      :type split: bool, default `False`           
       :param info: force a print to screen stating the stop
       :type info: bool, default `False`
+
+      :Example:
+ 
+      TV = alpha * TotalVariation()
+      sol = TV.proximal(data, tau = 1.0) 
+
+      .. note:: `tau` can be a number or an array. The latter case implies that preconditioning is applies, hence
+                stepsize is an array.
+
     Reference:
       
         A. Beck and M. Teboulle, "Fast Gradient-Based Algorithms for Constrained Total Variation 
@@ -63,6 +76,7 @@ class TotalVariation(Function):
                  lower = -numpy.inf, 
                  upper = numpy.inf,
                  isotropic = True,
+                 split = False,
                  info = False):
         
 
@@ -98,6 +112,10 @@ class TotalVariation(Function):
         
         # Print stopping information (iterations and tolerance error) of FGP_TV  
         self.info = info
+
+        # splitting Gradient
+        self.split = split
+
     @property
     def regularisation_parameter(self):
         return self._regularisation_parameter

@@ -894,6 +894,7 @@ class TestSPDHG(unittest.TestCase):
     @unittest.skipUnless(has_astra, "ccpi-astra not available")
     def test_PDHG_vs_PDHG_explicit_axpby(self):
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
+        
         if debug_print:
             print ("test_PDHG_vs_PDHG_explicit_axpby here")
         ig = data.geometry
@@ -909,6 +910,7 @@ class TestSPDHG(unittest.TestCase):
         Aop = ProjectionOperator(ig, ag, dev)
         
         sin = Aop.direct(data)
+        
         # Create noisy data. Apply Gaussian noise
         noises = ['gaussian', 'poisson']
         noise = noises[1]
@@ -916,11 +918,12 @@ class TestSPDHG(unittest.TestCase):
             np.random.seed(10)
             scale = 5
             eta = 0
-            noisy_data = AcquisitionData(np.random.poisson( scale * (eta + sin.as_array()))/scale, geometry=ag)
+            noisy_data = AcquisitionData(numpy.asarray(np.random.poisson( scale * (eta + sin.as_array())),dtype=numpy.float32)/scale, geometry=ag)
+
         elif noise == 'gaussian':
             np.random.seed(10)
             n1 = np.random.normal(0, 0.1, size = ag.shape)
-            noisy_data = AcquisitionData(n1 + sin.as_array(), geometry=ag)
+            noisy_data = AcquisitionData(numpy.asarray(n1 + sin.as_array(), dtype=numpy.float32), geometry=ag)
             
         else:
             raise ValueError('Unsupported Noise ', noise)
@@ -1119,3 +1122,5 @@ class TestADMM(unittest.TestCase):
 
     def tearDown(self):
         pass
+
+    

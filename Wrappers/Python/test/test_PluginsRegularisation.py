@@ -29,6 +29,7 @@ try:
 except ImportError as ie:
     has_regularisation_toolkit = False
 print ("has_regularisation_toolkit", has_regularisation_toolkit)
+TNV_fixed = False
 
 def has_nvidia_smi():
     return os.system('nvidia-smi') == 0
@@ -50,13 +51,7 @@ class TestPlugin(unittest.TestCase):
         except ModuleNotFoundError as ie:
             print (ie)
             assert False
-    @unittest.skipUnless(has_regularisation_toolkit, "Skipping as CCPi Regularisation Toolkit is not installed")
-    def test_import_ROF_TV(self):
-        try:
-            from cil.plugins.ccpi_regularisation.functions import ROF_TV
-            assert True
-        except ModuleNotFoundError as ie:
-            assert False
+    
     @unittest.skipUnless(has_regularisation_toolkit, "Skipping as CCPi Regularisation Toolkit is not installed")
     def test_import_TGV(self):
         try:
@@ -64,13 +59,7 @@ class TestPlugin(unittest.TestCase):
             assert True
         except ModuleNotFoundError as ie:
             assert False
-    @unittest.skipUnless(has_regularisation_toolkit, "Skipping as CCPi Regularisation Toolkit is not installed")
-    def test_import_LLT_ROF(self):
-        try:
-            from cil.plugins.ccpi_regularisation.functions import LLT_ROF
-            assert True
-        except ModuleNotFoundError as ie:
-            assert False
+    
     @unittest.skipUnless(has_regularisation_toolkit, "Skipping as CCPi Regularisation Toolkit is not installed")
     def test_import_FGP_dTV(self):
         try:
@@ -78,13 +67,7 @@ class TestPlugin(unittest.TestCase):
             assert True
         except ModuleNotFoundError as ie:
             assert False
-    @unittest.skipUnless(has_regularisation_toolkit, "Skipping as CCPi Regularisation Toolkit is not installed")
-    def test_import_SB_TV(self):
-        try:
-            from cil.plugins.ccpi_regularisation.functions import SB_TV
-            assert True
-        except ModuleNotFoundError as ie:
-            assert False
+    
     @unittest.skipUnless(has_regularisation_toolkit, "Skipping as CCPi Regularisation Toolkit is not installed")
     def test_import_TNV(self):
         try:
@@ -92,6 +75,7 @@ class TestPlugin(unittest.TestCase):
             assert True
         except ModuleNotFoundError as ie:
             assert False
+
     @unittest.skipUnless(has_regularisation_toolkit, "Skipping as CCPi Regularisation Toolkit is not installed")
     def test_FGP_TV_complex(self):
         datarr = self.data.as_array()

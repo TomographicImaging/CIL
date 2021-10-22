@@ -85,6 +85,7 @@ class GradientOperator(LinearOperator):
             #numpy implementation only for now
             backend = NUMPY
             warnings.warn("Warning: correlation='Space' on multi-channel dataset will use `numpy` backend")
+                     
         
         if method != 'forward':
             backend = NUMPY
@@ -405,8 +406,3 @@ class Gradient_C(LinearOperator):
                 
         if return_val is True:
             return out        
-
-
-
-   
-   

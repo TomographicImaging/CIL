@@ -24,7 +24,7 @@ except ImportError as ie:
 import os
 from cil.framework import AcquisitionGeometry, BlockDataContainer
 from cil.optimisation.operators import GradientOperator, LinearOperator
-import numpy
+import numpy as np
 import unittest
 
 def has_nvidia_smi():
@@ -36,7 +36,7 @@ def has_gpu_tigre():
     if not has_nvidia_smi():
         return False
     N = 3
-    angles = numpy.linspace(0, numpy.pi, 2, dtype='float32')
+    angles = np.linspace(0, np.pi, 2, dtype='float32')
 
     ag = AcquisitionGeometry.create_Cone2D([0,-100],[0,200])\
                             .set_angles(angles, angle_unit='radian')\
@@ -104,13 +104,13 @@ class GradientSIRF(object):
                 self.assertTrue(isinstance(res1[i], mr.ImageData))
                 self.assertTrue(isinstance(res2[i], mr.ImageData))                                 
             # test direct with and without out
-            numpy.testing.assert_array_almost_equal(res1[i].as_array(), res2[i].as_array())                         
+            np.testing.assert_array_almost_equal(res1[i].as_array(), res2[i].as_array())                         
 
         # test adjoint with and without out
         res3 = Grad_numpy.adjoint(res1)
         res4 = Grad_numpy.domain_geometry().allocate()
         Grad_numpy.adjoint(res2, out=res4)
-        numpy.testing.assert_array_almost_equal(res3.as_array(), res4.as_array()) 
+        np.testing.assert_array_almost_equal(res3.as_array(), res4.as_array()) 
 
         # test dot_test
         self.assertTrue(LinearOperator.dot_test(Grad_numpy, decimal=3))
@@ -134,10 +134,10 @@ class GradientSIRF(object):
         Grad_c.direct(self.image1, out=res6)
 
         for i in range(len(res5)):
-            numpy.testing.assert_array_almost_equal(res5[i].as_array(), res6[i].as_array())
+            np.testing.assert_array_almost_equal(res5[i].as_array(), res6[i].as_array())
 
             # compare c vs numpy gradient backends 
-            numpy.testing.assert_array_almost_equal(res6[i].as_array(), res2[i].as_array())
+            np.testing.assert_array_almost_equal(res6[i].as_array(), res2[i].as_array())
 
 
         # test dot_test
@@ -147,7 +147,7 @@ class GradientSIRF(object):
         res7 = Grad_c.adjoint(res5) 
         res8 = Grad_c.domain_geometry().allocate()*0.
         Grad_c.adjoint(res5, out=res8)
-        numpy.testing.assert_array_almost_equal(res7.as_array(), res8.as_array()) 
+        np.testing.assert_array_almost_equal(res7.as_array(), res8.as_array()) 
 
 
     

@@ -17,7 +17,7 @@
 
 from cil.optimisation.functions import Function, IndicatorBox
 from cil.optimisation.operators import GradientOperator
-import numpy 
+import numpy as np
 from numbers import Number
 import warnings
 
@@ -40,9 +40,9 @@ class TotalVariation(Function):
       :param backend: Backend to compute finite differences for the GradientOperator
       :type backend: str, default 'c'
       :param lower:lower bound for the orthogonal projection onto the convex set C
-      :type lower: Number, default `-numpy.inf`
+      :type lower: Number, default `-np.inf`
       :param upper: upper bound for the orthogonal projection onto the convex set C
-      :type upper: Number, default `+numpy.inf`
+      :type upper: Number, default `+np.inf`
       :param isotropic: isotropic setup for Total variation
       :type isotropic: bool, default `True`  
       :param split: splits the Gradient into spacial Gradienta and spectral Gradient for multichannel data
@@ -73,8 +73,8 @@ class TotalVariation(Function):
                  tolerance = None, 
                  correlation = "Space",
                  backend = "c",
-                 lower = -numpy.inf, 
-                 upper = numpy.inf,
+                 lower = -np.inf, 
+                 upper = np.inf,
                  isotropic = True,
                  split = False,
                  info = False):
@@ -197,7 +197,7 @@ class TotalVariation(Function):
             self.projection_C(tmp_x, out = tmp_x)                       
 
             self.gradient.direct(tmp_x, out=p1)
-            if isinstance (tau, (Number, numpy.float32, numpy.float64)):
+            if isinstance (tau, (Number, np.float32, np.float64)):
                 p1 *= self.L/(self.regularisation_parameter * tau)
             else:
                 p1 *= self.L/self.regularisation_parameter
@@ -223,7 +223,7 @@ class TotalVariation(Function):
             self.projection_P(p1, out=p1)
             
 
-            t = (1 + numpy.sqrt(1 + 4 * t0 ** 2)) / 2
+            t = (1 + np.sqrt(1 + 4 * t0 ** 2)) / 2
             
             #tmp_q.fill(p1 + (t0 - 1) / t * (p1 - tmp_p))
             p1.subtract(tmp_p, out=tmp_q)

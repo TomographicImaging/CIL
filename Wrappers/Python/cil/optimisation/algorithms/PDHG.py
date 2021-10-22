@@ -26,18 +26,16 @@ class PDHG(Algorithm):
     
         Solves the following problem: 
 
-            :math: $\omega$
+        .. math:: \min_{x} f(Kx) + g(x)
 
-            .. math:: X(e^{j\omega } ) = x(n)e^{ - j\omega n}
-        
-            .. math:: \min_{x} f(Kx) + g(x)
-
-        
         Parameters
-        ----------  
-
-        x : 
-        primal variable
+        ----------
+        x : `Ima`
+            Primal variable for the primal problem.
+        y : array
+            Dual variable for the dual problem.
+        f : function
+            Dual variable for the dual problem.            
 
 
         f: convex function with a "simple" `proximal_conjugate` method

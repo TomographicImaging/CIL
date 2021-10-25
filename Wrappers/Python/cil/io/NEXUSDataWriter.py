@@ -31,7 +31,18 @@ class NEXUSDataWriter(object):
     
     def __init__(self,
                  **kwargs):
-        
+
+        '''
+        Constructor 
+
+        :param data: The dataset to write to file
+        :type data: AquisitionData, ImageData
+        :param file_name: file name to read
+        :type file_name: os.path or string, default None
+        :param compression: The lossy compression to apply, default 0 will not compress data. 8 or 16 will compress to 8 and 16bit dtypes respectively.
+        :type compression: int, 0, 8 or 16
+        '''
+
         self.data = kwargs.get('data', None)
         self.file_name = kwargs.get('file_name', None)
         self.compression = kwargs.get('compression', 0)
@@ -43,8 +54,18 @@ class NEXUSDataWriter(object):
     def set_up(self,
                data = None,
                file_name = None,
-               compression = 0): #0,none, 8, 16
-        
+               compression = 0):
+
+        '''
+        set up witer
+
+        :param data: The dataset to write to file
+        :type data: AquisitionData, ImageData
+        :param file_name: file name to read
+        :type file_name: os.path or string, default None
+        :param compression: The lossy compression to apply, default 0 will not compress data. 8 or 16 will compress to 8 and 16bit dtypes respectively.
+        :type compression: int, 0, 8 or 16
+        '''        
         self.data = data
         self.file_name = file_name
         self.compression = compression
@@ -71,7 +92,10 @@ class NEXUSDataWriter(object):
             raise Exception('h5py is not available, cannot load NEXUS files.')
     
     def write(self):
-        
+
+        '''
+        write dataset to disk
+        '''   
         # if the folder does not exist, create the folder
         if not os.path.isdir(os.path.dirname(self.file_name)):
             os.mkdir(os.path.dirname(self.file_name))
@@ -100,10 +124,7 @@ class NEXUSDataWriter(object):
             nxentry = f.create_group('entry1/tomo_entry')
             nxentry.attrs['NX_class'] = 'NXentry'
 
-            if self.compress is False:
-                ds_data = f.create_dataset('entry1/tomo_entry/data/data',dtype=self.dtype, shape=self.data.shape)
-                ds_data.write_direct(self.data.array)
-            else:
+            if self.compress:
                 # create resizable data entry
                 chunk_shape = list(self.data.shape)
                 chunk_shape[0] = 1
@@ -116,6 +137,9 @@ class NEXUSDataWriter(object):
 
                     ds_data.attrs['scale'] = scale
                     ds_data.attrs['offset'] = offset
+            else:
+                ds_data = f.create_dataset('entry1/tomo_entry/data/data',dtype=self.dtype, shape=self.data.shape)
+                ds_data.write_direct(self.data.array)
 
             # set up dataset attributes
             if (isinstance(self.data, ImageData)):

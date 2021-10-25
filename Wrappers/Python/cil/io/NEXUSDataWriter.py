@@ -124,21 +124,16 @@ class NEXUSDataWriter(object):
             nxentry = f.create_group('entry1/tomo_entry')
             nxentry.attrs['NX_class'] = 'NXentry'
 
+            #create empty data entry
+            ds_data = f.create_dataset('entry1/tomo_entry/data/data',shape=self.data.shape, dtype=self.dtype)
+
             if self.compress:
-                # create resizable data entry
-                chunk_shape = list(self.data.shape)
-                chunk_shape[0] = 1
-                ds_data = f.create_dataset('entry1/tomo_entry/data/data',shape=chunk_shape, maxshape=self.data.shape, dtype=self.dtype)
+                ds_data.attrs['scale'] = scale
+                ds_data.attrs['offset'] = offset
 
-                ds_data[:] = self.data.array[0,:,:] * scale + offset
-                for i in range(1,self.data.shape[0]):
-                    ds_data.resize(i+chunk_shape[0], axis=0)
-                    ds_data[i:] = self.data.array[i,:,:] * scale + offset
-
-                    ds_data.attrs['scale'] = scale
-                    ds_data.attrs['offset'] = offset
+                for i in range(self.data.shape[0]):
+                    ds_data[i:(i+1)] = self.data.array[i] * scale + offset
             else:
-                ds_data = f.create_dataset('entry1/tomo_entry/data/data',dtype=self.dtype, shape=self.data.shape)
                 ds_data.write_direct(self.data.array)
 
             # set up dataset attributes

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Optimisation framework &mdash; CIL v21.2.0-22-gcf87ba97 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <title>Optimisation framework &mdash; CIL v21.2.0-23-gaaa570e3 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
@@ -29,7 +29,7 @@
             <a href="index.html" class="icon icon-home"> CIL
           </a>
               <div class="version">
-                v21.2.0-22-gcf87ba97
+                v21.2.0-23-gaaa570e3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -2647,13 +2647,13 @@ see <em>TranslateFunction</em>.</p>
 <h3>Total variation<a class="headerlink" href="#total-variation" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="cil.optimisation.functions.TotalVariation">
-<em class="property">class </em><code class="sig-prename descclassname">cil.optimisation.functions.</code><code class="sig-name descname">TotalVariation</code><span class="sig-paren">(</span><em class="sig-param">max_iteration=100</em>, <em class="sig-param">tolerance=None</em>, <em class="sig-param">correlation='Space'</em>, <em class="sig-param">backend='c'</em>, <em class="sig-param">lower=-inf</em>, <em class="sig-param">upper=inf</em>, <em class="sig-param">info=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/TotalVariation.html#TotalVariation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.optimisation.functions.TotalVariation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fast Gradient Projection algorithm for Total Variation(TV) Denoising (ROF problem)</p>
+<em class="property">class </em><code class="sig-prename descclassname">cil.optimisation.functions.</code><code class="sig-name descname">TotalVariation</code><span class="sig-paren">(</span><em class="sig-param">max_iteration=100</em>, <em class="sig-param">tolerance=None</em>, <em class="sig-param">correlation='Space'</em>, <em class="sig-param">backend='c'</em>, <em class="sig-param">lower=-inf</em>, <em class="sig-param">upper=inf</em>, <em class="sig-param">isotropic=True</em>, <em class="sig-param">split=False</em>, <em class="sig-param">info=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/TotalVariation.html#TotalVariation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.optimisation.functions.TotalVariation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fast Gradient Projection algorithm for Total Variation(TV) regularisation</p>
 <div class="math notranslate nohighlight">
-\[\min_{x} \alpha TV(x) + \frac{1}{2}||x-b||^{2}_{2}\]</div>
+\[\min_{x} \frac{1}{2}||x-b||^{2}_{2} + \tau\alpha TV(x)\]</div>
 <p>Parameters:</p>
 <blockquote>
-<div><dl class="field-list simple">
+<div><dl class="field-list">
 <dt class="field-odd">param max_iteration</dt>
 <dd class="field-odd"><p>max iterations of FGP algorithm</p>
 </dd>
@@ -2678,13 +2678,49 @@ see <em>TranslateFunction</em>.</p>
 <dt class="field-even">type backend</dt>
 <dd class="field-even"><p>str, default ‘c’</p>
 </dd>
+<dt class="field-odd">param lower</dt>
+<dd class="field-odd"><p>lower bound for the orthogonal projection onto the convex set C</p>
+</dd>
+<dt class="field-even">type lower</dt>
+<dd class="field-even"><p>Number, default <cite>-np.inf</cite></p>
+</dd>
+<dt class="field-odd">param upper</dt>
+<dd class="field-odd"><p>upper bound for the orthogonal projection onto the convex set C</p>
+</dd>
+<dt class="field-even">type upper</dt>
+<dd class="field-even"><p>Number, default <cite>+np.inf</cite></p>
+</dd>
+<dt class="field-odd">param isotropic</dt>
+<dd class="field-odd"><p>L2 norm is used for Gradient Operator (isotropic)</p>
+</dd>
+<dt class="field-even">type isotropic</dt>
+<dd class="field-even"><p>bool, default <cite>True</cite></p>
+<div class="math notranslate nohighlight">
+\[\sum \sqrt{(\partial_y u)^{2} + (\partial_x u)^2} \mbox{ (isotropic) }\]</div>
+<div class="math notranslate nohighlight">
+\[\sum |\partial_y u| + |\partial_x u| \mbox{ (anisotropic) }\]</div>
+</dd>
+<dt class="field-odd">param split</dt>
+<dd class="field-odd"><p>splits the Gradient into spatial Gradient and spectral Gradient for multichannel data</p>
+</dd>
+<dt class="field-even">type split</dt>
+<dd class="field-even"><p>bool, default <cite>False</cite></p>
+</dd>
+<dt class="field-odd">param info</dt>
+<dd class="field-odd"><p>force a print to screen stating the stop</p>
+</dd>
+<dt class="field-even">type info</dt>
+<dd class="field-even"><p>bool, default <cite>False</cite></p>
+</dd>
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p></p></dd>
 </dl>
-<p>:param lower:lower bound for the orthogonal projection onto the convex set C
-:type lower: Number, default <cite>-numpy.inf</cite>
-:param upper: upper bound for the orthogonal projection onto the convex set C
-:type upper: Number, default <cite>+numpy.inf</cite>
-:param info: force a print to screen stating the stop
-:type info: bool, default <cite>False</cite></p>
+<p>TV = alpha * TotalVariation()
+sol = TV.proximal(data, tau = 1.0)</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><cite>tau</cite> can be a number or an array. The latter case implies that step-size preconditioning is applied.</p>
+</div>
 </div></blockquote>
 <p>Reference:</p>
 <blockquote>
@@ -2708,7 +2744,7 @@ doi: 10.1109/TIP.2009.2028250.</p>
 
 <dl class="method">
 <dt id="cil.optimisation.functions.TotalVariation.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">max_iteration=100</em>, <em class="sig-param">tolerance=None</em>, <em class="sig-param">correlation='Space'</em>, <em class="sig-param">backend='c'</em>, <em class="sig-param">lower=-inf</em>, <em class="sig-param">upper=inf</em>, <em class="sig-param">info=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/TotalVariation.html#TotalVariation.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.optimisation.functions.TotalVariation.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">max_iteration=100</em>, <em class="sig-param">tolerance=None</em>, <em class="sig-param">correlation='Space'</em>, <em class="sig-param">backend='c'</em>, <em class="sig-param">lower=-inf</em>, <em class="sig-param">upper=inf</em>, <em class="sig-param">isotropic=True</em>, <em class="sig-param">split=False</em>, <em class="sig-param">info=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/TotalVariation.html#TotalVariation.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.optimisation.functions.TotalVariation.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 

@@ -275,7 +275,6 @@ class TestAlgorithms(unittest.TestCase):
         except ValueError as ve:
             print (ve)
             self.assertTrue(True)
-
     def test_PDHG_Denoising(self):
         print ("PDHG Denoising with 3 noises")
         # adapted from demo PDHG_TV_Color_Denoising.py in CIL-Demos repository

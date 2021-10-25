@@ -34,7 +34,7 @@ except ImportError as ie:
 
 class GradientSIRF(object):
     
-    @unittest.skipUnless(has_sirf, "Skipping as SIRF is not available")
+    @unittest.skipUnless(has_sirf, "Skipping as SIRF is not availale")
     def test_Gradient(self):
 
         #######################################

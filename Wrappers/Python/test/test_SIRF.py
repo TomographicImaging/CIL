@@ -16,14 +16,14 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import numpy
+import numpy as np
 from numpy.linalg import norm
 import os
-import sys
 import shutil
 import unittest
 from cil.framework import BlockDataContainer
-from utils import GradientSIRF
+from cil.optimisation.operators import GradientOperator, LinearOperator
+
 try:
     import sirf.STIR as pet
     import sirf.Gadgetron as mr
@@ -31,6 +31,79 @@ try:
     has_sirf = True
 except ImportError as ie:
     has_sirf = False
+
+class GradientSIRF(object):
+    
+    @unittest.skipUnless(has_sirf, "Skipping as SIRF is not available")
+    def test_Gradient(self):
+
+        #######################################
+        ##### Test Gradient numpy backend #####
+        #######################################
+
+        Grad_numpy = GradientOperator(self.image1, backend='numpy')
+
+        res1 = Grad_numpy.direct(self.image1)         
+        res2 = Grad_numpy.range_geometry().allocate()
+        Grad_numpy.direct(self.image1, out=res2)
+
+        self.assertTrue(isinstance(res1,BlockDataContainer))
+        self.assertTrue(isinstance(res2,BlockDataContainer))
+
+        for i in range(len(res1)):
+        
+            if isinstance(self.image1, pet.ImageData):
+                self.assertTrue(isinstance(res1[i], pet.ImageData))
+                self.assertTrue(isinstance(res2[i], pet.ImageData)) 
+            else:
+                self.assertTrue(isinstance(res1[i], mr.ImageData))
+                self.assertTrue(isinstance(res2[i], mr.ImageData))                                 
+            # test direct with and without out
+            np.testing.assert_array_almost_equal(res1[i].as_array(), res2[i].as_array())                         
+
+        # test adjoint with and without out
+        res3 = Grad_numpy.adjoint(res1)
+        res4 = Grad_numpy.domain_geometry().allocate()
+        Grad_numpy.adjoint(res2, out=res4)
+        np.testing.assert_array_almost_equal(res3.as_array(), res4.as_array()) 
+
+        # test dot_test
+        self.assertTrue(LinearOperator.dot_test(Grad_numpy, decimal=3))
+
+        # test shape of output of direct
+        
+        # check in the case of pseudo 2D data, e.g., (1, 155, 155)
+        if 1 in self.image1.shape:
+            self.assertEqual(res1.shape, (2,1))
+        else:
+            self.assertEqual(res1.shape, (3,1))            
+
+        ########################################
+        ##### Test Gradient c backend  #####
+        ########################################
+        Grad_c = GradientOperator(self.image1, backend='c')
+
+        # test direct with and without out
+        res5 = Grad_c.direct(self.image1) 
+        res6 = Grad_c.range_geometry().allocate()*0.
+        Grad_c.direct(self.image1, out=res6)
+
+        for i in range(len(res5)):
+            np.testing.assert_array_almost_equal(res5[i].as_array(), res6[i].as_array())
+
+            # compare c vs numpy gradient backends 
+            np.testing.assert_array_almost_equal(res6[i].as_array(), res2[i].as_array())
+
+
+        # test dot_test
+        self.assertTrue(LinearOperator.dot_test(Grad_c, decimal=3))
+
+        # test adjoint
+        res7 = Grad_c.adjoint(res5) 
+        res8 = Grad_c.domain_geometry().allocate()*0.
+        Grad_c.adjoint(res5, out=res8)
+        np.testing.assert_array_almost_equal(res7.as_array(), res8.as_array()) 
+
 
 
 class TestGradientPET_2D(unittest.TestCase, GradientSIRF):  
@@ -103,9 +176,9 @@ class TestSIRFCILIntegration(unittest.TestCase):
         image2.fill(2.)
         
         tmp = image1.divide(1.)
-        numpy.testing.assert_array_equal(image1.as_array(), tmp.as_array())
+        np.testing.assert_array_equal(image1.as_array(), tmp.as_array())
         tmp = image2.divide(1.)
-        numpy.testing.assert_array_equal(image2.as_array(), tmp.as_array())
+        np.testing.assert_array_equal(image2.as_array(), tmp.as_array())
         
 
         # image.fill(1.)
@@ -123,9 +196,9 @@ class TestSIRFCILIntegration(unittest.TestCase):
         image2.fill(2.)
         
         tmp = image1.multiply(1.)
-        numpy.testing.assert_array_equal(image1.as_array(), tmp.as_array())
+        np.testing.assert_array_equal(image1.as_array(), tmp.as_array())
         tmp = image2.multiply(1.)
-        numpy.testing.assert_array_equal(image2.as_array(), tmp.as_array())
+        np.testing.assert_array_equal(image2.as_array(), tmp.as_array())
         
 
         # image.fill(1.)
@@ -143,9 +216,9 @@ class TestSIRFCILIntegration(unittest.TestCase):
         image2.fill(1)
         
         tmp = image1.add(1.)
-        numpy.testing.assert_array_equal(image2.as_array(), tmp.as_array())
+        np.testing.assert_array_equal(image2.as_array(), tmp.as_array())
         tmp = image2.subtract(1.)
-        numpy.testing.assert_array_equal(image1.as_array(), tmp.as_array())
+        np.testing.assert_array_equal(image1.as_array(), tmp.as_array())
         
         bdc = BlockDataContainer(image1, image2)
         bdc1 = bdc.add(1.)
@@ -190,4 +263,4 @@ class TestSIRFCILIntegration(unittest.TestCase):
                 self.assertBlockDataContainerEqual(container1.get_item(col),container2.get_item(col))
     
     def assertNumpyArrayEqual(self, first, second):
-        numpy.testing.assert_array_equal(first, second)
+        np.testing.assert_array_equal(first, second)

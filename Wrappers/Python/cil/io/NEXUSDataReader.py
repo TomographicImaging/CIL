@@ -47,7 +47,7 @@ class NEXUSDataReader(object):
                file_name = None):
         
         self.file_name = os.path.abspath(file_name)
-        
+
         # check that h5py library is installed
         if (h5pyAvailable == False):
             raise Exception('h5py is not available, cannot load NEXUS files.')
@@ -211,29 +211,72 @@ class NEXUSDataReader(object):
 
         return self._geometry
     
-    def read(self):
-        
+    def get_data_scale(self):
+        '''Parse NEXUS file and returns the scale factor applied to compress the dataset'''
+
+        with h5py.File(self.file_name,'r') as dfile:
+            ds_data = dfile['entry1/tomo_entry/data/data'] 
+            try:
+                scale = ds_data.attrs['scale']
+            except:
+                scale = 1.0
+
+        return scale
+
+    def get_data_offset(self):
+        '''Parse NEXUS file and returns the offset factor applied to compress the dataset'''
+        with h5py.File(self.file_name,'r') as dfile:
+            ds_data = dfile['entry1/tomo_entry/data/data'] 
+            try:
+                offset = ds_data.attrs['offset']
+            except:
+                offset = 0.0
+
+        return offset
+
+    def __read_as(self, dtype=np.float32):
+        '''
+        Parse NEXUS file and returns either ImageData or Acquisition Data 
+        depending on file content
+        '''
         if self._geometry is None:
             self.get_geometry()
-            
-        with h5py.File(self.file_name,'r') as dfile:
-                
-            ds_data = dfile['entry1/tomo_entry/data/data']
-            data = np.array(ds_data, dtype = np.float32)
-            
-            # handle old files?
-            if self.is_old_file_version():
-                if isinstance(self._geometry , AcquisitionGeometry):
-                    return AcquisitionData(data, True, geometry=self._geometry, suppress_warning=True)
-                elif isinstance(self._geometry , ImageGeometry):
-                    return ImageData(data, True, geometry=self._geometry, suppress_warning=True)
-                else:
-                    raise TypeError("Unsupported geometry. Expected ImageGeometry or AcquisitionGeometry, got {}"\
-                        .format(type(self._geometry)))
 
-            output = self._geometry.allocate(None)
-            output.fill(data)
-            return output
+        #allocate data container as requested type
+        output = self._geometry.allocate(None,dtype=dtype)
+
+        with h5py.File(self.file_name,'r') as dfile:
+
+            ds_data = dfile['entry1/tomo_entry/data/data']   
+            ds_data.read_direct(output.array)
+
+        return output
+        
+    def read_as_original(self):
+        '''
+        Returns either an ImageData or AcquisitionData containing the compressed data
+        '''
+        with h5py.File(self.file_name,'r') as dfile:
+            ds_data = dfile['entry1/tomo_entry/data/data']
+            dtype = ds_data.dtype
+        
+        return self.__read_as(dtype)
+
+
+    def read(self):
+        '''
+        Returns either an ImageData or Acquisition Data containing the uncompressed data as numpy.float32
+        '''
+        output = self.__read_as(np.float32)
+        scale = self.get_data_scale()
+        offset = self.get_data_offset()
+
+        if offset != 0:
+            output -= offset
+        if scale != 1:
+            output /= scale
+        
+        return output
     
           
     def load_data(self):

@@ -34,23 +34,38 @@ class NEXUSDataWriter(object):
         
         self.data = kwargs.get('data', None)
         self.file_name = kwargs.get('file_name', None)
-        
+        self.compression = kwargs.get('compression', 0)
+
         if ((self.data is not None) and (self.file_name is not None)):
             self.set_up(data = self.data,
-                        file_name = self.file_name)
+                        file_name = self.file_name, compression=self.compression)
         
     def set_up(self,
                data = None,
-               file_name = None):
+               file_name = None,
+               compression = 0): #0,none, 8, 16
         
         self.data = data
         self.file_name = file_name
+        self.compression = compression
         
         if not ((isinstance(self.data, ImageData)) or 
                 (isinstance(self.data, AcquisitionData))):
             raise Exception('Writer supports only following data types:\n' +
                             ' - ImageData\n - AcquisitionData')
-        
+
+        if self.compression == 0:
+            self.dtype = data.dtype
+            self.compress = False
+        elif self.compression == 8:
+            self.dtype = np.uint8
+            self.compress = True
+        elif self.compression == 16:
+            self.dtype = np.uint16
+            self.compress = True
+        else:
+            raise Exception('Compression bits not valid. Got {0} expected value in {1}'.format(self.compression, [0,8,16]))
+
         # check that h5py library is installed
         if (h5pyAvailable == False):
             raise Exception('h5py is not available, cannot load NEXUS files.')
@@ -60,7 +75,16 @@ class NEXUSDataWriter(object):
         # if the folder does not exist, create the folder
         if not os.path.isdir(os.path.dirname(self.file_name)):
             os.mkdir(os.path.dirname(self.file_name))
-            
+
+        if self.compress is True:
+            save_range = np.iinfo(self.dtype).max
+
+            data_min = self.data.min()
+            data_range = self.data.max() - data_min
+
+            scale = save_range / data_range
+            offset = - data_min * scale
+                
         # create the file
         with h5py.File(self.file_name, 'w') as f:
             
@@ -75,13 +99,24 @@ class NEXUSDataWriter(object):
             # create the NXentry group
             nxentry = f.create_group('entry1/tomo_entry')
             nxentry.attrs['NX_class'] = 'NXentry'
-            
-            # create dataset to store data
-            ds_data = f.create_dataset('entry1/tomo_entry/data/data', 
-                                       (self.data.as_array().shape), 
-                                       dtype = 'float32', 
-                                       data = self.data.as_array())
-            
+
+            if self.compress is False:
+                ds_data = f.create_dataset('entry1/tomo_entry/data/data',dtype=self.dtype, shape=self.data.shape)
+                ds_data.write_direct(self.data.array)
+            else:
+                # create resizable data entry
+                chunk_shape = list(self.data.shape)
+                chunk_shape[0] = 1
+                ds_data = f.create_dataset('entry1/tomo_entry/data/data',shape=chunk_shape, maxshape=self.data.shape, dtype=self.dtype)
+
+                ds_data[:] = self.data.array[0,:,:] * scale + offset
+                for i in range(1,self.data.shape[0]):
+                    ds_data.resize(i+chunk_shape[0], axis=0)
+                    ds_data[i:] = self.data.array[i,:,:] * scale + offset
+
+                    ds_data.attrs['scale'] = scale
+                    ds_data.attrs['offset'] = offset
+
             # set up dataset attributes
             if (isinstance(self.data, ImageData)):
                 ds_data.attrs['data_type'] = 'ImageData'

@@ -1,4 +1,5 @@
 * 21.2.1
+  - GradientOperator can be now used with SIRF DataContainers, both PET and MR
   - Add anisotropy in TotalVariation function
   - CCPi Regularisation plugin is refactored, only FGP_TV, FGP_dTV, TGV and TNV are exposed. Docstrings and functionality unit tests are added. Tests of the functions are meant to be in the CCPi-Regularisation toolkit itself.
   - Add dtype for ImageGeometry, AcquisitionGeometry, VectorGeometry, BlockGeometry

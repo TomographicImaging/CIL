@@ -98,7 +98,7 @@ class GradientSIRF(object):
 
 
         # test dot_test
-        self.assertTrue(LinearOperator.dot_test(Grad_c, decimal=3))
+        self.assertTrue(LinearOperator.dot_test(Grad_c, decimal=3, seed=10))
 
         # test adjoint
         res7 = Grad_c.adjoint(res5) 
@@ -162,7 +162,6 @@ class TestGradientMR_2D(unittest.TestCase, GradientSIRF):
         np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal=3)
 
         # compare with FISTA algorithm   
-
         f =  0.5 * L2NormSquared(b=self.image1)
         fista = FISTA(initial=self.image1*0.0, f=f, g=TV, max_iteration=10, update_objective_interval=10)
         fista.run(verbose=0)

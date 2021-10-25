@@ -19,6 +19,7 @@ from cil.framework import AcquisitionGeometry, ImageGeometry
 import unittest
 import numpy as np
 from utils import has_gpu_tigre, has_gpu_astra
+from cil.utilities.display import show2D
 
 try:
     import tigre
@@ -70,6 +71,7 @@ class Test_convert_geometry(unittest.TestCase):
 
         #2D cone
         tg_geometry, tg_angles = CIL2TIGREGeometry.getTIGREGeometry(ig, ag)
+        self.assertTrue(tg_geometry.mode=='cone')
         np.testing.assert_allclose(tg_geometry.DSD, ag.dist_center_detector + ag.dist_source_center)
         np.testing.assert_allclose(tg_geometry.DSO, ag.dist_source_center)
         np.testing.assert_allclose(tg_angles, angles_rad)
@@ -91,6 +93,8 @@ class Test_convert_geometry(unittest.TestCase):
                                       .set_labels(['vertical', 'angle','horizontal'])\
                                       .set_panel((self.num_pixels_x,self.num_pixels_y), (self.pixel_size_x,self.pixel_size_y))
 
+        self.assertTrue(ag.system_description=='simple')
+
         ig = ag.get_ImageGeometry()
         ig.voxel_num_y = 50
         ig.voxel_size_y /= 2
@@ -99,6 +103,7 @@ class Test_convert_geometry(unittest.TestCase):
 
         tg_geometry, tg_angles = CIL2TIGREGeometry.getTIGREGeometry(ig, ag)
 
+        self.assertTrue(tg_geometry.mode=='cone')
         np.testing.assert_allclose(tg_geometry.DSD, ag.dist_center_detector + ag.dist_source_center)
         np.testing.assert_allclose(tg_geometry.DSO, ag.dist_source_center)
         np.testing.assert_allclose(tg_angles, angles_rad)
@@ -114,7 +119,7 @@ class Test_convert_geometry(unittest.TestCase):
         np.testing.assert_allclose(tg_geometry.dVoxel, [0.2/mag,0.05/mag,0.1/mag])
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
-    def test_cone3D_cofr(self):
+    def test_cone3D_offset(self):
 
         #3, 4, 5 triangle for source + object
         ag = AcquisitionGeometry.create_Cone3D(source_position=[0,-4,0], detector_position=[0,4,0], rotation_axis_position=[3,0, 0])\
@@ -122,6 +127,7 @@ class Test_convert_geometry(unittest.TestCase):
                                       .set_labels(['vertical', 'angle','horizontal'])\
                                       .set_panel((self.num_pixels_x,self.num_pixels_y), (self.pixel_size_x,self.pixel_size_y))
                                       
+        self.assertTrue(ag.system_description=='offset')
 
         ig = ag.get_ImageGeometry()
         ig.voxel_num_y = 50
@@ -146,6 +152,7 @@ class Test_convert_geometry(unittest.TestCase):
 
 
         np.testing.assert_allclose(tg_angles, angles_rad)
+        self.assertTrue(tg_geometry.mode=='cone')
         np.testing.assert_allclose(tg_geometry.dDetector, ag.config.panel.pixel_size[::-1])
         np.testing.assert_allclose(tg_geometry.nDetector, ag.config.panel.num_pixels[::-1])
         np.testing.assert_allclose(tg_geometry.sDetector, tg_geometry.dDetector * tg_geometry.nDetector)
@@ -154,6 +161,135 @@ class Test_convert_geometry(unittest.TestCase):
         mag = ag.magnification
         np.testing.assert_allclose(tg_geometry.nVoxel, [3,50,128])
         np.testing.assert_allclose(tg_geometry.dVoxel, [0.2/mag,0.05/mag,0.1/mag])
+
+    @unittest.skipUnless(has_tigre, "TIGRE not installed")
+    def test_cone3D_advanced(self):
+
+        ag = AcquisitionGeometry.create_Cone3D(source_position=[0,-10,0], detector_position=[0,10,0], rotation_axis_position=[0,0, 0],rotation_axis_direction=[0,-1,1])\
+                                      .set_angles(self.angles_deg, angle_unit='degree')\
+                                      .set_labels(['vertical', 'angle','horizontal'])\
+                                      .set_panel((self.num_pixels_x,self.num_pixels_y), (self.pixel_size_x,self.pixel_size_y))
+                                      
+        self.assertTrue(ag.system_description=='advanced')
+        ig = ag.get_ImageGeometry()
+        ig.voxel_num_y = 50
+        ig.voxel_size_y /= 2
+
+        tg_geometry, tg_angles= CIL2TIGREGeometry.getTIGREGeometry(ig, ag)
+
+        self.assertAlmostEqual(tg_geometry.DSO, ag.dist_source_center*np.sin(np.pi/4),5)
+
+        s2o = ag.dist_source_center * np.cos(np.pi/4)
+        np.testing.assert_allclose(tg_geometry.DSO, s2o)
+
+        s2d = (ag.dist_center_detector + ag.dist_source_center) * np.cos(np.pi/4)
+        np.testing.assert_allclose(tg_geometry.DSD, s2d)
+
+        det_rot = np.array([0,-np.pi/4,0])
+        np.testing.assert_allclose(tg_geometry.rotDetector,det_rot)
+
+        det_offset = np.array([-s2d,0,0])
+        np.testing.assert_allclose(tg_geometry.offDetector,det_offset)
+        
+        angles_rad = np.array([-np.pi/2, -np.pi, -3 *np.pi/2])
+
+        np.testing.assert_allclose(tg_angles, angles_rad)
+        self.assertTrue(tg_geometry.mode=='cone')
+        np.testing.assert_allclose(tg_geometry.dDetector, ag.config.panel.pixel_size[::-1])
+        np.testing.assert_allclose(tg_geometry.nDetector, ag.config.panel.num_pixels[::-1])
+        np.testing.assert_allclose(tg_geometry.sDetector, tg_geometry.dDetector * tg_geometry.nDetector)
+        np.testing.assert_allclose(tg_geometry.offOrigin,0)
+
+        mag = ag.magnification
+        np.testing.assert_allclose(tg_geometry.nVoxel, [3,50,128])
+        np.testing.assert_allclose(tg_geometry.dVoxel, [0.2/mag,0.05/mag,0.1/mag])
+
+    @unittest.skipUnless(has_tigre, "TIGRE not installed")
+    def test_parallel2D(self):
+
+        ag = AcquisitionGeometry.create_Parallel2D()\
+                                     .set_angles(self.angles_rad, angle_unit='radian')\
+                                     .set_labels(['angle','horizontal'])\
+                                     .set_panel(self.num_pixels_x, self.pixel_size_x)
+
+        ig = ag.get_ImageGeometry()
+        ig.voxel_num_y = 50
+        ig.voxel_size_y /= 2
+
+        angles_rad = np.array([-np.pi/2, -np.pi, -3 *np.pi/2])
+        
+        tg_geometry, tg_angles = CIL2TIGREGeometry.getTIGREGeometry(ig, ag)
+
+        np.testing.assert_allclose(tg_angles, angles_rad)
+        self.assertTrue(tg_geometry.mode=='parallel')
+        np.testing.assert_allclose(tg_geometry.dDetector, ag.config.panel.pixel_size[::-1])
+        np.testing.assert_allclose(tg_geometry.nDetector, ag.config.panel.num_pixels[::-1])
+        np.testing.assert_allclose(tg_geometry.sDetector, tg_geometry.dDetector * tg_geometry.nDetector)
+        np.testing.assert_allclose(tg_geometry.rotDetector,0)
+        np.testing.assert_allclose(tg_geometry.offDetector,0)
+        np.testing.assert_allclose(tg_geometry.offOrigin,0)
+
+        np.testing.assert_allclose(tg_geometry.nVoxel, [1,50,128])
+        np.testing.assert_allclose(tg_geometry.dVoxel, [0.1,0.05,0.1])
+
+    @unittest.skipUnless(has_tigre, "TIGRE not installed")
+    def test_parallel3D_simple(self):
+        ag = AcquisitionGeometry.create_Parallel3D()\
+                                      .set_angles(self.angles_deg, angle_unit='degree')\
+                                      .set_labels(['vertical', 'angle','horizontal'])\
+                                      .set_panel((self.num_pixels_x,self.num_pixels_y), (self.pixel_size_x,self.pixel_size_y))
+
+        ig = ag.get_ImageGeometry()
+        ig.voxel_num_y = 50
+        ig.voxel_size_y /= 2
+
+        angles_rad = np.array([-np.pi/2, -np.pi, -3 *np.pi/2])
+
+        tg_geometry, tg_angles = CIL2TIGREGeometry.getTIGREGeometry(ig, ag)
+
+        self.assertTrue(tg_geometry.mode=='parallel')
+        np.testing.assert_allclose(tg_angles, angles_rad)
+        np.testing.assert_allclose(tg_geometry.dDetector, ag.config.panel.pixel_size[::-1])
+        np.testing.assert_allclose(tg_geometry.nDetector, ag.config.panel.num_pixels[::-1])
+        np.testing.assert_allclose(tg_geometry.sDetector, tg_geometry.dDetector * tg_geometry.nDetector)
+        np.testing.assert_allclose(tg_geometry.rotDetector,0)
+        np.testing.assert_allclose(tg_geometry.offDetector,0)
+        np.testing.assert_allclose(tg_geometry.offOrigin,0)
+
+        mag = ag.magnification
+        np.testing.assert_allclose(tg_geometry.nVoxel, [3,50,128])
+        np.testing.assert_allclose(tg_geometry.dVoxel, [0.2,0.05,0.1])
+
+    @unittest.skipUnless(has_tigre, "TIGRE not installed")
+    def test_parallel3D_offset(self):
+
+        ag = AcquisitionGeometry.create_Parallel3D(detector_position=[2,0,0], rotation_axis_position=[3,0, 0])\
+                                      .set_angles(self.angles_deg, angle_unit='degree')\
+                                      .set_labels(['vertical', 'angle','horizontal'])\
+                                      .set_panel((self.num_pixels_x,self.num_pixels_y), (self.pixel_size_x,self.pixel_size_y))
+                                      
+        self.assertTrue(ag.system_description=='offset')
+
+        ig = ag.get_ImageGeometry()
+        ig.voxel_num_y = 50
+        ig.voxel_size_y /= 2
+
+        tg_geometry, tg_angles= CIL2TIGREGeometry.getTIGREGeometry(ig, ag)
+
+
+        det_offset = np.array([0,-1,0])
+        np.testing.assert_allclose(tg_geometry.offDetector,det_offset)
+
+        angles_rad = np.array([-np.pi/2, -np.pi, -3 *np.pi/2])
+        np.testing.assert_allclose(tg_angles, angles_rad)
+        self.assertTrue(tg_geometry.mode=='parallel')
+        np.testing.assert_allclose(tg_geometry.dDetector, ag.config.panel.pixel_size[::-1])
+        np.testing.assert_allclose(tg_geometry.nDetector, ag.config.panel.num_pixels[::-1])
+        np.testing.assert_allclose(tg_geometry.sDetector, tg_geometry.dDetector * tg_geometry.nDetector)
+        np.testing.assert_allclose(tg_geometry.offOrigin,0)
+
+        np.testing.assert_allclose(tg_geometry.nVoxel, [3,50,128])
+        np.testing.assert_allclose(tg_geometry.dVoxel, [0.2,0.05,0.1])
 
 class Test_ProjectionOperator(unittest.TestCase):
     def setUp(self): 
@@ -215,7 +351,134 @@ class Test_ProjectionOperator(unittest.TestCase):
         self.assertEqual(res.shape, self.ag.shape)
         np.testing.assert_allclose(res.as_array(),gold,atol=1e-6)
 
-class Test_results(unittest.TestCase):
+class Test_results_parallel(unittest.TestCase):
+    def setUp(self):
+        #%% Setup Geometry
+        voxel_num_xy = 255
+        voxel_num_z = 15
+        cs_ind = (voxel_num_z-1)//2
+
+        pix_size = 0.2
+        det_pix_x = voxel_num_xy
+        det_pix_y = voxel_num_z
+
+        num_projections = 1000
+        angles = np.linspace(0, 360, num=num_projections, endpoint=False)
+
+        self.ag = AcquisitionGeometry.create_Parallel2D()\
+                                           .set_angles(angles)\
+                                           .set_panel(det_pix_x, pix_size)\
+                                           .set_labels(['angle','horizontal'])
+
+        self.ig = self.ag.get_ImageGeometry()
+
+        self.ag3D = AcquisitionGeometry.create_Parallel3D()\
+                                     .set_angles(angles)\
+                                     .set_panel((det_pix_x,det_pix_y), (pix_size,pix_size))\
+                                     .set_labels(['angle','vertical','horizontal'])        
+        self.ig3D = self.ag3D.get_ImageGeometry()
+
+        #%% Create phantom
+        kernel_size = voxel_num_xy
+        kernel_radius = (kernel_size - 1) // 2
+        y, x = np.ogrid[-kernel_radius:kernel_radius+1, -kernel_radius:kernel_radius+1]
+
+        circle1 = [5,0,0] #r,x,y
+        dist1 = ((x - circle1[1])**2 + (y - circle1[2])**2)**0.5
+
+        circle2 = [5,80,0] #r,x,y
+        dist2 = ((x - circle2[1])**2 + (y - circle2[2])**2)**0.5
+
+        circle3 = [25,0,80] #r,x,y
+        dist3 = ((x - circle3[1])**2 + (y - circle3[2])**2)**0.5
+
+        mask1 =(dist1 - circle1[0]).clip(0,1) 
+        mask2 =(dist2 - circle2[0]).clip(0,1) 
+        mask3 =(dist3 - circle3[0]).clip(0,1) 
+        phantom = 1 - np.logical_and(np.logical_and(mask1, mask2),mask3)
+
+        self.golden_data = self.ig3D.allocate(0)
+        for i in range(4):
+            self.golden_data.fill(array=phantom, vertical=7+i)
+
+        self.golden_data_cs = self.golden_data.get_slice(vertical=cs_ind, force=True)
+
+        self.Op = ProjectionOperator(self.ig3D, self.ag3D)
+        self.fp = self.Op.direct(self.golden_data)
+
+    @unittest.skipUnless(has_tigre, "TIGRE not installed")
+    def test_FBP(self):
+        reco_out = FBP(self.ig, self.ag)(self.fp.get_slice(vertical='centre'))
+        mean_diff = (self.golden_data_cs-reco_out).abs().mean()
+        self.assertLess(mean_diff, 0.01)
+        np.testing.assert_allclose(self.golden_data_cs.as_array(),reco_out.as_array(),atol=1)
+
+        reco_out3D = FBP(self.ig3D, self.ag3D)(self.fp)
+        diff = (self.golden_data-reco_out3D).abs()
+        self.assertLess(diff.mean(), 0.01)
+        np.testing.assert_allclose(self.golden_data.as_array(),reco_out3D.as_array(),atol=1)
+
+
+    @unittest.skipUnless(has_tigre and has_astra, "TIGRE or ASTRA not installed")
+    def test_fp_with_Astra(self):
+        AOp = AstraProjectionOperator(self.ig, self.ag)
+        fp_ASTRA = AOp.direct(self.golden_data_cs)
+
+        TOp = ProjectionOperator(self.ig, self.ag)
+        fp_TIGRE = TOp.direct(self.golden_data_cs)
+
+        mean_diff = (fp_ASTRA-fp_TIGRE).abs().mean()
+        self.assertLess(mean_diff, 1e-2)
+        np.testing.assert_allclose(fp_TIGRE.as_array(),fp_ASTRA.as_array(),atol=1)
+
+        astra_ag3D = self.ag3D.copy()
+        astra_ag3D.set_labels(['vertical','angle','horizontal'])
+
+        AOp = AstraProjectionOperator(self.ig3D, astra_ag3D)
+        fp_ASTRA = AOp.direct(self.golden_data)
+
+        fp_ASTRA.reorder(['angle','vertical','horizontal'])
+        mean_diff = (fp_ASTRA-self.fp).abs().mean()
+        self.assertLess(mean_diff, 1)
+        np.testing.assert_allclose(self.fp.as_array(),fp_ASTRA.as_array(),atol=5)
+
+    @unittest.skipUnless(has_tigre and has_astra, "TIGRE or ASTRA not installed")
+    def test_bp_with_Astra(self):
+        AOp = AstraProjectionOperator(self.ig, self.ag)
+        bp_ASTRA = AOp.adjoint(self.fp.get_slice(vertical='centre'))
+        TOp = ProjectionOperator(self.ig, self.ag)
+        bp_TIGRE = TOp.adjoint(self.fp.get_slice(vertical='centre'))
+        mean_diff = (bp_ASTRA-bp_TIGRE).abs().mean()
+        self.assertLess(mean_diff, 1)
+        np.testing.assert_allclose(bp_ASTRA.as_array(),bp_TIGRE.as_array(),atol=10)
+
+        astra_fp = self.fp.copy()
+        astra_fp.reorder(['vertical','angle','horizontal'])
+
+        AOp = AstraProjectionOperator(self.ig3D, astra_fp.geometry)
+        bp_ASTRA = AOp.adjoint(astra_fp)
+        bp_TIGRE = self.Op.adjoint(self.fp)
+        mean_diff = (bp_ASTRA-bp_TIGRE).abs().mean()
+        self.assertLess(mean_diff, 1)
+        np.testing.assert_allclose(bp_ASTRA.as_array(),bp_TIGRE.as_array(),atol=5)
+
+    @unittest.skipUnless(has_tigre and has_astra, "TIGRE or ASTRA not installed")
+    def test_FBP_with_Astra(self):
+        reco_ASTRA = AstraFBP(self.ig, self.ag)(self.fp.get_slice(vertical='centre'))
+        reco_TIGRE = FBP(self.ig, self.ag)(self.fp.get_slice(vertical='centre'))
+        mean_diff = (reco_ASTRA-reco_TIGRE).abs().mean()
+        self.assertLess(mean_diff, 1e-4)
+        np.testing.assert_allclose(reco_ASTRA.as_array(),reco_TIGRE.as_array(),atol=1e-2)
+
+        astra_fp = self.fp.copy()
+        astra_fp.reorder(['vertical','angle','horizontal'])
+        reco_ASTRA3D = AstraFBP(self.ig3D, astra_fp.geometry)(astra_fp)
+        reco_TIGRE3D = FBP(self.ig3D, self.ag3D)(self.fp)
+        diff = (reco_ASTRA3D-reco_TIGRE3D).abs()
+        self.assertLess(diff.mean(), 1e-4)
+        np.testing.assert_allclose(reco_ASTRA3D.as_array(),reco_TIGRE3D.as_array(),atol=1e-2)
+
+class Test_results_cone(unittest.TestCase):
     def setUp(self):
         #%% Setup Geometry
         voxel_num_xy = 255
@@ -320,13 +583,11 @@ class Test_results(unittest.TestCase):
         self.assertLess(mean_diff, 1)
         np.testing.assert_allclose(bp_ASTRA.as_array(),bp_TIGRE.as_array(),atol=10)
 
-
         astra_fp = self.fp.copy()
         astra_fp.reorder(['vertical','angle','horizontal'])
 
         AOp = AstraProjectionOperator(self.ig3D, astra_fp.geometry)
         bp_ASTRA = AOp.adjoint(astra_fp)
-        
         bp_TIGRE = self.Op.adjoint(self.fp)
         mean_diff = (bp_ASTRA-bp_TIGRE).abs().mean()
         self.assertLess(mean_diff, 1)

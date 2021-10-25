@@ -926,24 +926,27 @@ class TestFunction(unittest.TestCase):
 
 class TestTotalVariation(unittest.TestCase):
 
+    def setUp(self) -> None:
+        self.tv = TotalVariation()
+        self.alpha = 0.15
+        self.tv_scaled = self.alpha * TotalVariation()
+        self.tv_iso = TotalVariation()
+        self.tv_aniso = TotalVariation(isotropic=False)
+        self.ig_real = ImageGeometry(3,4)
+        self.ig_complex = ImageGeometry(3,4, dtype=np.complex64)        
+        
     def test_regularisation_parameter(self):
-        tv = TotalVariation()
-        np.testing.assert_almost_equal(tv.regularisation_parameter, 1.)
+        np.testing.assert_almost_equal(self.tv.regularisation_parameter, 1.)
 
     def test_regularisation_parameter2(self):
-        alpha = 0.15
-        tv = alpha * TotalVariation()
-        np.testing.assert_almost_equal(tv.regularisation_parameter, alpha)
+        np.testing.assert_almost_equal(self.tv_scaled.regularisation_parameter, self.alpha)
     
     def test_rmul(self):
-        alpha = 0.15
-        tv = alpha * TotalVariation()
-        assert isinstance(tv, TotalVariation)
+        assert isinstance(self.tv_scaled, TotalVariation)
     
     def test_regularisation_parameter3(self):
-        tv = TotalVariation()
         try:
-            tv.regularisation_parameter = 'string'
+            self.tv.regularisation_parameter = 'string'
             assert False
         except TypeError as te:
             print (te)
@@ -956,7 +959,34 @@ class TestTotalVariation(unittest.TestCase):
         except TypeError as te:
             print (te)
             assert True
-    
+
+    def test_call_real(self):
+
+        x_real = self.ig_real.allocate('random')  
+        grad = GradientOperator(self.ig_real)
+
+        res1 = self.tv_iso(x_real)
+        res2 = grad.direct(x_real).pnorm(2).sum()
+        np.testing.assert_equal(res1, res2)  
+
+        res1 = self.tv_aniso(x_real)
+        res2 = grad.direct(x_real).pnorm(1).sum()
+        np.testing.assert_equal(res1, res2)                
+
+
+    def test_call_complex(self):
+
+        x_complex = self.ig_complex.allocate('random')  
+        grad = GradientOperator(self.ig_complex)
+
+        res1 = self.tv_iso(x_complex)
+        res2 = grad.direct(x_complex).pnorm(2).sum()
+        np.testing.assert_equal(res1, res2)  
+
+        res1 = self.tv_aniso(x_complex)
+        res2 = grad.direct(x_complex).pnorm(1).sum()
+        np.testing.assert_equal(res1, res2)   
+        
 
     @unittest.skipUnless(has_reg_toolkit, "Regularisation Toolkit not present")
     def test_compare_regularisation_toolkit(self):

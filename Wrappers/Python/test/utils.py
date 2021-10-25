@@ -13,17 +13,10 @@ try:
 except ModuleNotFoundError:
     has_astra = False
 
-try:
-    import sirf.STIR as pet
-    import sirf.Gadgetron as mr
-    from sirf.Utilities import examples_data_path
-    has_sirf = True
-except ImportError as ie:
-    has_sirf = False    
-
 import os
-from cil.framework import AcquisitionGeometry
+from cil.framework import AcquisitionGeometry, ImageGeometry
 import numpy as np
+
 
 def has_nvidia_smi():
     return os.system('nvidia-smi') == 0
@@ -74,8 +67,3 @@ def has_ipp():
         return False
     except TypeError:
         return True
-
-
-
-
-    

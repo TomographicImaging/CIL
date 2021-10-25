@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cil.optimisation.operators.GradientOperator &mdash; CIL v21.2.0-23-gaaa570e3 documentation</title><link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <title>cil.optimisation.operators.GradientOperator &mdash; CIL v21.2.0-24-g0aa84240 documentation</title><link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
@@ -27,7 +27,7 @@
             <a href="../../../../index.html" class="icon icon-home"> CIL
           </a>
               <div class="version">
-                v21.2.0-23-gaaa570e3
+                v21.2.0-24-g0aa84240
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -95,6 +95,7 @@
 <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">BlockGeometry</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">cil.utilities.multiprocessing</span> <span class="kn">import</span> <span class="n">NUM_THREADS</span>
+<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">ImageGeometry</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="n">NEUMANN</span> <span class="o">=</span> <span class="s1">&#39;Neumann&#39;</span>
@@ -154,13 +155,22 @@
 
         <span class="c1"># Default correlation for the gradient coupling</span>
         <span class="n">correlation</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;correlation&#39;</span><span class="p">,</span><span class="n">CORRELATION_SPACE</span><span class="p">)</span>
+
+        <span class="c1"># Add attributes for SIRF data where there is no CIL geometry</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">domain_geometry</span><span class="p">,</span> <span class="n">ImageGeometry</span><span class="p">):</span>
+            <span class="n">domain_geometry</span><span class="o">.</span><span class="n">channels</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">domain_geometry</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>        
                        
         <span class="c1"># Space correlation on multichannel data call numpy backend</span>
         <span class="k">if</span> <span class="n">correlation</span> <span class="o">==</span> <span class="n">CORRELATION_SPACE</span> <span class="ow">and</span> <span class="n">domain_geometry</span><span class="o">.</span><span class="n">channels</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="c1">#numpy implementation only for now</span>
             <span class="n">backend</span> <span class="o">=</span> <span class="n">NUMPY</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Warning: correlation=&#39;Space&#39; on multi-channel dataset will use `numpy` backend&quot;</span><span class="p">)</span>
-                     
+
+        <span class="c1"># Complex data will use numpy backend</span>
+        <span class="k">if</span> <span class="n">domain_geometry</span><span class="o">.</span><span class="n">dtype</span> <span class="ow">in</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">complex64</span><span class="p">]:</span>
+            <span class="n">backend</span> <span class="o">=</span> <span class="n">NUMPY</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Warning: Complex geometries will use `numpy` backend&quot;</span><span class="p">)</span>
         
         <span class="k">if</span> <span class="n">method</span> <span class="o">!=</span> <span class="s1">&#39;forward&#39;</span><span class="p">:</span>
             <span class="n">backend</span> <span class="o">=</span> <span class="n">NUMPY</span>
@@ -481,6 +491,7 @@
                 
         <span class="k">if</span> <span class="n">return_val</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">out</span>        
+
 </pre></div>
 
            </div>

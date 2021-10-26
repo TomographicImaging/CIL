@@ -36,11 +36,11 @@ class NEXUSDataWriter(object):
         Constructor 
 
         :param data: The dataset to write to file
-        :type data: AquisitionData, ImageData
-        :param file_name: file name to read
+        :type data: AcquisitionData, ImageData
+        :param file_name: file name to write
         :type file_name: os.path or string, default None
-        :param compression: The lossy compression to apply, default 0 will not compress data. 8 or 16 will compress to 8 and 16bit dtypes respectively.
-        :type compression: int, 0, 8 or 16
+        :param compression: The lossy compression to apply, default 0 will not compress data. 8 or 16 will compress to 8 and 16 bit dtypes respectively.
+        :type compression: int, default 0
         '''
 
         self.data = kwargs.get('data', None)
@@ -60,11 +60,11 @@ class NEXUSDataWriter(object):
         set up witer
 
         :param data: The dataset to write to file
-        :type data: AquisitionData, ImageData
-        :param file_name: file name to read
+        :type data: AcquisitionData, ImageData
+        :param file_name: file name to write
         :type file_name: os.path or string, default None
         :param compression: The lossy compression to apply, default 0 will not compress data. 8 or 16 will compress to 8 and 16bit dtypes respectively.
-        :type compression: int, 0, 8 or 16
+        :type compression: int, default 0
         '''        
         self.data = data
         self.file_name = file_name
@@ -89,7 +89,7 @@ class NEXUSDataWriter(object):
 
         # check that h5py library is installed
         if (h5pyAvailable == False):
-            raise Exception('h5py is not available, cannot load NEXUS files.')
+            raise Exception('h5py is not available, cannot write NEXUS files.')
     
     def write(self):
 

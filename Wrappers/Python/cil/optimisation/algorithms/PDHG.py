@@ -188,7 +188,7 @@ class PDHG(Algorithm):
         # Update sigma and tau based on the strong convexity of F
         # Following operations are reversed due to symmetry, sigma --> tau, tau -->sigma
         if self.gamma_fconj is not None:            
-            self.theta = float(1 / numpy.sqrt(1 + 2 * self.gamma_f * self.sigma))
+            self.theta = float(1 / numpy.sqrt(1 + 2 * self.gamma_fconj * self.sigma))
             self.sigma *= self.theta
             self.tau /= self.theta                       
         

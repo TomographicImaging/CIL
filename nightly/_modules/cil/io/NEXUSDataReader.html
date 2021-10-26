@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cil.io.NEXUSDataReader &mdash; CIL v21.2.0-24-g0aa84240 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <title>cil.io.NEXUSDataReader &mdash; CIL v21.2.0-25-g59ce3d15 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> CIL
           </a>
               <div class="version">
-                v21.2.0-24-g0aa84240
+                v21.2.0-25-g59ce3d15
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -122,7 +122,7 @@
                <span class="n">file_name</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
-        
+
         <span class="c1"># check that h5py library is installed</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">h5pyAvailable</span> <span class="o">==</span> <span class="kc">False</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;h5py is not available, cannot load NEXUS files.&#39;</span><span class="p">)</span>
@@ -286,29 +286,72 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span></div>
     
-    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        
+<div class="viewcode-block" id="NEXUSDataReader.get_data_scale"><a class="viewcode-back" href="../../../io.html#cil.io.NEXUSDataReader.get_data_scale">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_scale</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Parse NEXUS file and returns the scale factor applied to compress the dataset&#39;&#39;&#39;</span>
+
+        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">dfile</span><span class="p">:</span>
+            <span class="n">ds_data</span> <span class="o">=</span> <span class="n">dfile</span><span class="p">[</span><span class="s1">&#39;entry1/tomo_entry/data/data&#39;</span><span class="p">]</span> 
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">scale</span> <span class="o">=</span> <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;scale&#39;</span><span class="p">]</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">scale</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+        <span class="k">return</span> <span class="n">scale</span></div>
+
+<div class="viewcode-block" id="NEXUSDataReader.get_data_offset"><a class="viewcode-back" href="../../../io.html#cil.io.NEXUSDataReader.get_data_offset">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Parse NEXUS file and returns the offset factor applied to compress the dataset&#39;&#39;&#39;</span>
+        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">dfile</span><span class="p">:</span>
+            <span class="n">ds_data</span> <span class="o">=</span> <span class="n">dfile</span><span class="p">[</span><span class="s1">&#39;entry1/tomo_entry/data/data&#39;</span><span class="p">]</span> 
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">offset</span> <span class="o">=</span> <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;offset&#39;</span><span class="p">]</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">offset</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="k">return</span> <span class="n">offset</span></div>
+
+    <span class="k">def</span> <span class="nf">__read_as</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Parse NEXUS file and returns either ImageData or Acquisition Data </span>
+<span class="sd">        depending on file content</span>
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">get_geometry</span><span class="p">()</span>
-            
-        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">dfile</span><span class="p">:</span>
-                
-            <span class="n">ds_data</span> <span class="o">=</span> <span class="n">dfile</span><span class="p">[</span><span class="s1">&#39;entry1/tomo_entry/data/data&#39;</span><span class="p">]</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ds_data</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-            
-            <span class="c1"># handle old files?</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_old_file_version</span><span class="p">():</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span> <span class="p">,</span> <span class="n">AcquisitionGeometry</span><span class="p">):</span>
-                    <span class="k">return</span> <span class="n">AcquisitionData</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="p">,</span> <span class="n">suppress_warning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span> <span class="p">,</span> <span class="n">ImageGeometry</span><span class="p">):</span>
-                    <span class="k">return</span> <span class="n">ImageData</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="p">,</span> <span class="n">suppress_warning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Unsupported geometry. Expected ImageGeometry or AcquisitionGeometry, got </span><span class="si">{}</span><span class="s2">&quot;</span>\
-                        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="p">)))</span>
 
-            <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-            <span class="n">output</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">output</span>
+        <span class="c1">#allocate data container as requested type</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">dfile</span><span class="p">:</span>
+
+            <span class="n">ds_data</span> <span class="o">=</span> <span class="n">dfile</span><span class="p">[</span><span class="s1">&#39;entry1/tomo_entry/data/data&#39;</span><span class="p">]</span>   
+            <span class="n">ds_data</span><span class="o">.</span><span class="n">read_direct</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">output</span>
+        
+<div class="viewcode-block" id="NEXUSDataReader.read_as_original"><a class="viewcode-back" href="../../../io.html#cil.io.NEXUSDataReader.read_as_original">[docs]</a>    <span class="k">def</span> <span class="nf">read_as_original</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns either an ImageData or AcquisitionData containing the compressed data</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">dfile</span><span class="p">:</span>
+            <span class="n">ds_data</span> <span class="o">=</span> <span class="n">dfile</span><span class="p">[</span><span class="s1">&#39;entry1/tomo_entry/data/data&#39;</span><span class="p">]</span>
+            <span class="n">dtype</span> <span class="o">=</span> <span class="n">ds_data</span><span class="o">.</span><span class="n">dtype</span>
+        
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__read_as</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NEXUSDataReader.read"><a class="viewcode-back" href="../../../io.html#cil.io.NEXUSDataReader.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns either an ImageData or Acquisition Data containing the uncompressed data as numpy.float32</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__read_as</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data_scale</span><span class="p">()</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data_offset</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">offset</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">-=</span> <span class="n">offset</span>
+        <span class="k">if</span> <span class="n">scale</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">/=</span> <span class="n">scale</span>
+        
+        <span class="k">return</span> <span class="n">output</span></div>
     
           
 <div class="viewcode-block" id="NEXUSDataReader.load_data"><a class="viewcode-back" href="../../../io.html#cil.io.NEXUSDataReader.load_data">[docs]</a>    <span class="k">def</span> <span class="nf">load_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

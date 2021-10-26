@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cil.io.NEXUSDataWriter &mdash; CIL v21.2.0-24-g0aa84240 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <title>cil.io.NEXUSDataWriter &mdash; CIL v21.2.0-25-g59ce3d15 documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
@@ -27,7 +27,7 @@
             <a href="../../../index.html" class="icon icon-home"> CIL
           </a>
               <div class="version">
-                v21.2.0-24-g0aa84240
+                v21.2.0-25-g59ce3d15
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -92,8 +92,8 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">AcquisitionData</span><span class="p">,</span> <span class="n">AcquisitionGeometry</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">,</span> <span class="n">ImageGeometry</span>
+<span class="kn">from</span> <span class="nn">cil.version</span> <span class="kn">import</span> <span class="n">version</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
-
 
 <span class="n">h5pyAvailable</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="k">try</span><span class="p">:</span>
@@ -106,41 +106,94 @@
     
 <div class="viewcode-block" id="NEXUSDataWriter.__init__"><a class="viewcode-back" href="../../../io.html#cil.io.NEXUSDataWriter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Constructor </span>
+
+<span class="sd">        :param data: The dataset to write to file</span>
+<span class="sd">        :type data: AcquisitionData, ImageData</span>
+<span class="sd">        :param file_name: file name to write</span>
+<span class="sd">        :type file_name: os.path or string, default None</span>
+<span class="sd">        :param compression: The lossy compression to apply, default 0 will not compress data. 8 or 16 will compress to 8 and 16 bit dtypes respectively.</span>
+<span class="sd">        :type compression: int, default 0</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;file_name&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        
+        <span class="bp">self</span><span class="o">.</span><span class="n">compression</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;compression&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_up</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
-                        <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">)</span></div>
+                        <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">compression</span><span class="p">)</span></div>
         
-    <span class="k">def</span> <span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="NEXUSDataWriter.set_up"><a class="viewcode-back" href="../../../io.html#cil.io.NEXUSDataWriter.set_up">[docs]</a>    <span class="k">def</span> <span class="nf">set_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                <span class="n">data</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-               <span class="n">file_name</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-        
+               <span class="n">file_name</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+               <span class="n">compression</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        set up witer</span>
+
+<span class="sd">        :param data: The dataset to write to file</span>
+<span class="sd">        :type data: AcquisitionData, ImageData</span>
+<span class="sd">        :param file_name: file name to write</span>
+<span class="sd">        :type file_name: os.path or string, default None</span>
+<span class="sd">        :param compression: The lossy compression to apply, default 0 will not compress data. 8 or 16 will compress to 8 and 16bit dtypes respectively.</span>
+<span class="sd">        :type compression: int, default 0</span>
+<span class="sd">        &#39;&#39;&#39;</span>        
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compression</span> <span class="o">=</span> <span class="n">compression</span>
         
         <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">))</span> <span class="ow">or</span> 
                 <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">AcquisitionData</span><span class="p">))):</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Writer supports only following data types:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
                             <span class="s1">&#39; - ImageData</span><span class="se">\n</span><span class="s1"> - AcquisitionData&#39;</span><span class="p">)</span>
-        
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">compression</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dtype</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">compress</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">compression</span> <span class="o">==</span> <span class="mi">8</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">compress</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">compression</span> <span class="o">==</span> <span class="mi">16</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint16</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">compress</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Compression bits not valid. Got </span><span class="si">{0}</span><span class="s1"> expected value in </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compression</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">16</span><span class="p">]))</span>
+
         <span class="c1"># check that h5py library is installed</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">h5pyAvailable</span> <span class="o">==</span> <span class="kc">False</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;h5py is not available, cannot load NEXUS files.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;h5py is not available, cannot write NEXUS files.&#39;</span><span class="p">)</span></div>
     
-    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        
+<div class="viewcode-block" id="NEXUSDataWriter.write"><a class="viewcode-back" href="../../../io.html#cil.io.NEXUSDataWriter.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        write dataset to disk</span>
+<span class="sd">        &#39;&#39;&#39;</span>   
         <span class="c1"># if the folder does not exist, create the folder</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">)):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">))</span>
-            
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">compress</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">save_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">max</span>
+
+            <span class="n">data_min</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+            <span class="n">data_range</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">data_min</span>
+
+            <span class="k">if</span> <span class="n">data_range</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">scale</span> <span class="o">=</span> <span class="n">save_range</span> <span class="o">/</span> <span class="n">data_range</span>
+                <span class="n">offset</span> <span class="o">=</span> <span class="o">-</span> <span class="n">data_min</span> <span class="o">*</span> <span class="n">scale</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">scale</span> <span class="o">=</span> <span class="mf">1.0</span>
+                <span class="n">offset</span> <span class="o">=</span> <span class="mf">0.0</span>
+                
         <span class="c1"># create the file</span>
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             
             <span class="c1"># give the file some important attributes</span>
             <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;file_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;cil_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">version</span>
             <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;file_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">())</span>
             <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;creator&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">string_</span><span class="p">(</span><span class="s1">&#39;NEXUSDataWriter.py&#39;</span><span class="p">)</span>
             <span class="n">f</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;NeXus_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;4.3.0&#39;</span>
@@ -150,13 +203,19 @@
             <span class="c1"># create the NXentry group</span>
             <span class="n">nxentry</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry&#39;</span><span class="p">)</span>
             <span class="n">nxentry</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;NX_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;NXentry&#39;</span>
-            
-            <span class="c1"># create dataset to store data</span>
-            <span class="n">ds_data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/data/data&#39;</span><span class="p">,</span> 
-                                       <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> 
-                                       <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span> 
-                                       <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
-            
+
+            <span class="c1">#create empty data entry</span>
+            <span class="n">ds_data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;entry1/tomo_entry/data/data&#39;</span><span class="p">,</span><span class="n">shape</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">compress</span><span class="p">:</span>
+                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;scale&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scale</span>
+                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;offset&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">offset</span>
+
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                    <span class="n">ds_data</span><span class="p">[</span><span class="n">i</span><span class="p">:(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">scale</span> <span class="o">+</span> <span class="n">offset</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ds_data</span><span class="o">.</span><span class="n">write_direct</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+
             <span class="c1"># set up dataset attributes</span>
             <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">)):</span>
                 <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;data_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ImageData&#39;</span>
@@ -242,7 +301,7 @@
                 <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;center_y&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">center_y</span>
                 <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;center_z&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">center_z</span>
                 <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;channels&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">channels</span>
-                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;channel_spacing&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">channel_spacing</span></div>
+                <span class="n">ds_data</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;channel_spacing&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">channel_spacing</span></div></div>
 </pre></div>
 
            </div>

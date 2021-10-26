@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Read/ write AcquisitionData and ImageData &mdash; CIL v21.2.0-24-g0aa84240 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <title>Read/ write AcquisitionData and ImageData &mdash; CIL v21.2.0-25-g59ce3d15 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
@@ -29,7 +29,7 @@
             <a href="index.html" class="icon icon-home"> CIL
           </a>
               <div class="version">
-                v21.2.0-24-g0aa84240
+                v21.2.0-25-g59ce3d15
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -126,6 +126,18 @@ as NeXuS files.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="cil.io.NEXUSDataReader.get_data_offset">
+<code class="sig-name descname">get_data_offset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataReader.html#NEXUSDataReader.get_data_offset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.io.NEXUSDataReader.get_data_offset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse NEXUS file and returns the offset factor applied to compress the dataset</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cil.io.NEXUSDataReader.get_data_scale">
+<code class="sig-name descname">get_data_scale</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataReader.html#NEXUSDataReader.get_data_scale"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.io.NEXUSDataReader.get_data_scale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse NEXUS file and returns the scale factor applied to compress the dataset</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="cil.io.NEXUSDataReader.get_geometry">
 <code class="sig-name descname">get_geometry</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataReader.html#NEXUSDataReader.get_geometry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.io.NEXUSDataReader.get_geometry" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse NEXUS file and returns either ImageData or Acquisition Data 
@@ -138,6 +150,18 @@ depending on file content</p>
 <dd><p>alias of read</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="cil.io.NEXUSDataReader.read">
+<code class="sig-name descname">read</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataReader.html#NEXUSDataReader.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.io.NEXUSDataReader.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns either an ImageData or Acquisition Data containing the uncompressed data as numpy.float32</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cil.io.NEXUSDataReader.read_as_original">
+<code class="sig-name descname">read_as_original</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataReader.html#NEXUSDataReader.read_as_original"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.io.NEXUSDataReader.read_as_original" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns either an ImageData or AcquisitionData containing the compressed data</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -146,13 +170,43 @@ depending on file content</p>
 <dd><dl class="method">
 <dt id="cil.io.NEXUSDataWriter.__init__">
 <code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataWriter.html#NEXUSDataWriter.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.io.NEXUSDataWriter.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<dd><p>Constructor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference internal" href="framework.html#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a><em>, </em><a class="reference internal" href="framework.html#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a>) – The dataset to write to file</p></li>
+<li><p><strong>file_name</strong> (<em>os.path</em><em> or </em><em>string</em><em>, </em><em>default None</em>) – file name to write</p></li>
+<li><p><strong>compression</strong> (<em>int</em><em>, </em><em>default 0</em>) – The lossy compression to apply, default 0 will not compress data. 8 or 16 will compress to 8 and 16 bit dtypes respectively.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cil.io.NEXUSDataWriter.__weakref__">
 <code class="sig-name descname">__weakref__</code><a class="headerlink" href="#cil.io.NEXUSDataWriter.__weakref__" title="Permalink to this definition">¶</a></dt>
 <dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cil.io.NEXUSDataWriter.set_up">
+<code class="sig-name descname">set_up</code><span class="sig-paren">(</span><em class="sig-param">data=None</em>, <em class="sig-param">file_name=None</em>, <em class="sig-param">compression=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataWriter.html#NEXUSDataWriter.set_up"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.io.NEXUSDataWriter.set_up" title="Permalink to this definition">¶</a></dt>
+<dd><p>set up witer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference internal" href="framework.html#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a><em>, </em><a class="reference internal" href="framework.html#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a>) – The dataset to write to file</p></li>
+<li><p><strong>file_name</strong> (<em>os.path</em><em> or </em><em>string</em><em>, </em><em>default None</em>) – file name to write</p></li>
+<li><p><strong>compression</strong> (<em>int</em><em>, </em><em>default 0</em>) – The lossy compression to apply, default 0 will not compress data. 8 or 16 will compress to 8 and 16bit dtypes respectively.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="cil.io.NEXUSDataWriter.write">
+<code class="sig-name descname">write</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataWriter.html#NEXUSDataWriter.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.io.NEXUSDataWriter.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>write dataset to disk</p>
 </dd></dl>
 
 </dd></dl>

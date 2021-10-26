@@ -22,39 +22,13 @@ import numpy
 
 class PDHG(Algorithm):
 
-    r"""Primal Dual Hybrid Gradient Algorithm
+    r"""Primal Dual Hybrid Gradient
     
-        Solves the following problem: 
-
-        .. math:: \min_{x} f(Kx) + g(x)
-
-        Parameters
-        ----------
-        x : `Ima`
-            Primal variable for the primal problem.
-        y : array
-            Dual variable for the dual problem.
-        f : function
-            Dual variable for the dual problem.            
-
-
-        f: convex function with a "simple" `proximal_conjugate` method
-
-
-        g: convex function with a "simple" `proximal` method
-
-
-        operator: Linear operator with `direct` and `adjoint` properties
-
-
-        tau:
-
-
-        sigma:
-
-
-
-
+    Problem: 
+    
+    .. math::
+    
+      \min_{x} f(Kx) + g(x)
         
     :param operator: Linear Operator = K
     :param f: Convex function with "simple" proximal of its conjugate. 

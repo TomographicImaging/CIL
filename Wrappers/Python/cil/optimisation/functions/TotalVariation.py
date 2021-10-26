@@ -15,10 +15,8 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from cil.optimisation.functions import Function, MixedL21Norm, IndicatorBox
+from cil.optimisation.functions import Function, IndicatorBox
 from cil.optimisation.operators import GradientOperator
-import numpy 
-import functools
 import numpy as np
 from numbers import Number
 import warnings
@@ -27,9 +25,9 @@ import warnings
 
 class TotalVariation(Function):
     
-    r'''Fast Gradient Projection algorithm for Total Variation(TV) Denoising (ROF problem)
+    r'''Fast Gradient Projection algorithm for Total Variation(TV) regularisation
     
-    .. math::  \min_{x} \alpha TV(x) + \frac{1}{2}||x-b||^{2}_{2}
+    .. math::  \min_{x} \frac{1}{2}||x-b||^{2}_{2} + \tau\alpha TV(x)
                 
     Parameters:
       
@@ -41,12 +39,29 @@ class TotalVariation(Function):
       :type correlation: str, default 'Space'
       :param backend: Backend to compute finite differences for the GradientOperator
       :type backend: str, default 'c'
-      :param lower:lower bound for the orthogonal projection onto the convex set C
-      :type lower: Number, default `-numpy.inf`
+      :param lower: lower bound for the orthogonal projection onto the convex set C
+      :type lower: Number, default `-np.inf`
       :param upper: upper bound for the orthogonal projection onto the convex set C
-      :type upper: Number, default `+numpy.inf`
+      :type upper: Number, default `+np.inf`
+      :param isotropic: L2 norm is used for Gradient Operator (isotropic) 
+      :type isotropic: bool, default `True` 
+      
+                        .. math:: \sum \sqrt{(\partial_y u)^{2} + (\partial_x u)^2} \mbox{ (isotropic) }
+
+                        .. math:: \sum |\partial_y u| + |\partial_x u| \mbox{ (anisotropic) }
+       
+      :param split: splits the Gradient into spatial Gradient and spectral Gradient for multichannel data
+      :type split: bool, default `False`           
       :param info: force a print to screen stating the stop
       :type info: bool, default `False`
+
+      :Example:
+ 
+      TV = alpha * TotalVariation()
+      sol = TV.proximal(data, tau = 1.0) 
+
+      .. note:: `tau` can be a number or an array. The latter case implies that step-size preconditioning is applied.
+
     Reference:
       
         A. Beck and M. Teboulle, "Fast Gradient-Based Algorithms for Constrained Total Variation 
@@ -62,8 +77,10 @@ class TotalVariation(Function):
                  tolerance = None, 
                  correlation = "Space",
                  backend = "c",
-                 lower = -numpy.inf, 
-                 upper = numpy.inf,
+                 lower = -np.inf, 
+                 upper = np.inf,
+                 isotropic = True,
+                 split = False,
                  info = False):
         
 
@@ -77,9 +94,8 @@ class TotalVariation(Function):
         # Tolerance for FGP_TV
         self.tolerance = tolerance
         
-        # Define (ISOTROPIC) Total variation penalty ( Note it is without the regularisation paremeter)
-        # TODO add anisotropic???
-        self.TV = MixedL21Norm() 
+        # Total variation correlation (isotropic=Default)
+        self.isotropic = isotropic
         
         # correlation space or spacechannels
         self.correlation = correlation
@@ -90,7 +106,7 @@ class TotalVariation(Function):
         self.upper = upper
         self.tmp_proj_C = IndicatorBox(lower, upper).proximal
                         
-#         Setup GradientOperator as None. This is to avoid domain argument in the __init__     
+        # Setup GradientOperator as None. This is to avoid domain argument in the __init__     
 
         self._gradient = None
         self._domain = None
@@ -100,6 +116,10 @@ class TotalVariation(Function):
         
         # Print stopping information (iterations and tolerance error) of FGP_TV  
         self.info = info
+
+        # splitting Gradient
+        self.split = split
+
     @property
     def regularisation_parameter(self):
         return self._regularisation_parameter
@@ -115,7 +135,10 @@ class TotalVariation(Function):
         r''' Returns the value of the \alpha * TV(x)'''
         self._domain = x.geometry
         # evaluate objective function of TV gradient
-        return self.regularisation_parameter * self.TV(self.gradient.direct(x))
+        if self.isotropic:
+            return self.regularisation_parameter * self.gradient.direct(x).pnorm(2)
+        else:
+            return self.regularisation_parameter * self.gradient.direct(x).pnorm(1)   
     
     
     def projection_C(self, x, out=None):   
@@ -135,16 +158,23 @@ class TotalVariation(Function):
         tmp1 = self.pptmp1
         tmp1 *= 0
         
-
-        for i,el in enumerate(x.containers):
-            el.multiply(el, out=tmp)
-            tmp1.add(tmp, out=tmp1)
-        tmp1.sqrt(out=tmp1)
-        tmp1.maximum(1.0, out=tmp1)
-        if out is None:
-            return x.divide(tmp1)
+        if self.isotropic:
+            for el in x.containers:
+                el.multiply(el, out=tmp)
+                tmp1.add(tmp, out=tmp1)
+            tmp1.sqrt(out=tmp1)
+            tmp1.maximum(1.0, out=tmp1)
+            if out is None:
+                return x.divide(tmp1)
+            else:
+                x.divide(tmp1, out=out)
         else:
-            x.divide(tmp1, out=out)
+            tmp1 = x.abs()
+            tmp1.maximum(1.0, out=tmp1) 
+            if out is None:
+                return x.divide(tmp1)
+            else:
+                x.divide(tmp1, out=out)                   
     
     
     def proximal(self, x, tau, out = None):
@@ -196,9 +226,8 @@ class TotalVariation(Function):
 
             self.projection_P(p1, out=p1)
             
-            
 
-            t = (1 + numpy.sqrt(1 + 4 * t0 ** 2)) / 2
+            t = (1 + np.sqrt(1 + 4 * t0 ** 2)) / 2
             
             #tmp_q.fill(p1 + (t0 - 1) / t * (p1 - tmp_p))
             p1.subtract(tmp_p, out=tmp_q)

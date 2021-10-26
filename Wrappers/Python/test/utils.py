@@ -14,7 +14,7 @@ except ModuleNotFoundError:
     has_astra = False
 
 import os
-from cil.framework import AcquisitionGeometry, ImageGeometry
+from cil.framework import AcquisitionGeometry
 import numpy as np
 
 

@@ -54,13 +54,13 @@ class TestNexusReaderWriter(unittest.TestCase):
         im_size = 5
         ig = ImageGeometry(voxel_num_x = im_size,
         		           voxel_num_y = im_size)
-        im = ig.allocate()
+        im = ig.allocate('random',seed=9)
         writer = NEXUSDataWriter()
         writer.set_up(file_name = os.path.join(self.data_dir, 'test_nexus_im.nxs'),
                       data = im)
         writer.write()
         self.readImageDataAndTest()
-        
+    
     def test_writeAcquisitionData(self):
         writer = NEXUSDataWriter()
         writer.set_up(file_name = os.path.join(self.data_dir, 'test_nexus_ad2d.nxs'),
@@ -73,13 +73,29 @@ class TestNexusReaderWriter(unittest.TestCase):
         writer.write()
 
         self.readAcquisitionDataAndTest()
-	
-    def readImageDataAndTest(self):
+
+    def test_writeImageData_compressed(self):
+        im_size = 5
+        ig = ImageGeometry(voxel_num_x = im_size,
+        		           voxel_num_y = im_size)
+        im = ig.allocate('random',seed=9)
+
+        writer = NEXUSDataWriter()
+        writer.set_up(file_name = os.path.join(self.data_dir, 'test_nexus_im.nxs'),
+                      data = im, compression=16)
+        writer.write()
+
+        self.assertTrue(writer.dtype == numpy.uint16)
+        self.assertTrue(writer.compression == 16)
+
+        self.readImageDataAndTest(atol=1e-4)
+
+    def readImageDataAndTest(self,atol=0):
         
         im_size = 5
         ig_test = ImageGeometry(voxel_num_x = im_size,
                                 voxel_num_y = im_size)
-        im_test = ig_test.allocate()
+        im_test = ig_test.allocate('random',seed=9)
         
         reader = NEXUSDataReader()
         reader.set_up(file_name = os.path.join(self.data_dir, 'test_nexus_im.nxs'))
@@ -87,7 +103,7 @@ class TestNexusReaderWriter(unittest.TestCase):
         ig = reader.get_geometry()
 
         assert ig == ig_test
-        numpy.testing.assert_array_equal(im.as_array(), im_test.as_array(), 'Loaded image is not correct')
+        numpy.testing.assert_allclose(im.as_array(), im_test.as_array(),atol=atol, err_msg='Loaded image is not correct')
         self.assertEqual(ig.voxel_num_x, ig_test.voxel_num_x, 'ImageGeometry is not correct')
         self.assertEqual(ig.voxel_num_y, ig_test.voxel_num_y, 'ImageGeometry is not correct')
         

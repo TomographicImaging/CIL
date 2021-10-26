@@ -17,8 +17,8 @@
 import numpy as np
 import os
 from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
+from cil.version import version
 import datetime
-
 
 h5pyAvailable = True
 try:
@@ -31,41 +31,94 @@ class NEXUSDataWriter(object):
     
     def __init__(self,
                  **kwargs):
-        
+
+        '''
+        Constructor 
+
+        :param data: The dataset to write to file
+        :type data: AcquisitionData, ImageData
+        :param file_name: file name to write
+        :type file_name: os.path or string, default None
+        :param compression: The lossy compression to apply, default 0 will not compress data. 8 or 16 will compress to 8 and 16 bit dtypes respectively.
+        :type compression: int, default 0
+        '''
+
         self.data = kwargs.get('data', None)
         self.file_name = kwargs.get('file_name', None)
-        
+        self.compression = kwargs.get('compression', 0)
+
         if ((self.data is not None) and (self.file_name is not None)):
             self.set_up(data = self.data,
-                        file_name = self.file_name)
+                        file_name = self.file_name, compression=self.compression)
         
     def set_up(self,
                data = None,
-               file_name = None):
-        
+               file_name = None,
+               compression = 0):
+
+        '''
+        set up witer
+
+        :param data: The dataset to write to file
+        :type data: AcquisitionData, ImageData
+        :param file_name: file name to write
+        :type file_name: os.path or string, default None
+        :param compression: The lossy compression to apply, default 0 will not compress data. 8 or 16 will compress to 8 and 16bit dtypes respectively.
+        :type compression: int, default 0
+        '''        
         self.data = data
         self.file_name = file_name
+        self.compression = compression
         
         if not ((isinstance(self.data, ImageData)) or 
                 (isinstance(self.data, AcquisitionData))):
             raise Exception('Writer supports only following data types:\n' +
                             ' - ImageData\n - AcquisitionData')
-        
+
+        if self.compression == 0:
+            self.dtype = data.dtype
+            self.compress = False
+        elif self.compression == 8:
+            self.dtype = np.uint8
+            self.compress = True
+        elif self.compression == 16:
+            self.dtype = np.uint16
+            self.compress = True
+        else:
+            raise Exception('Compression bits not valid. Got {0} expected value in {1}'.format(self.compression, [0,8,16]))
+
         # check that h5py library is installed
         if (h5pyAvailable == False):
-            raise Exception('h5py is not available, cannot load NEXUS files.')
+            raise Exception('h5py is not available, cannot write NEXUS files.')
     
     def write(self):
-        
+
+        '''
+        write dataset to disk
+        '''   
         # if the folder does not exist, create the folder
         if not os.path.isdir(os.path.dirname(self.file_name)):
             os.mkdir(os.path.dirname(self.file_name))
-            
+
+        if self.compress is True:
+            save_range = np.iinfo(self.dtype).max
+
+            data_min = self.data.min()
+            data_range = self.data.max() - data_min
+
+            if data_range > 0:
+                scale = save_range / data_range
+                offset = - data_min * scale
+            else:
+                scale = 1.0
+                offset = 0.0
+                
         # create the file
         with h5py.File(self.file_name, 'w') as f:
             
             # give the file some important attributes
             f.attrs['file_name'] = self.file_name
+            f.attrs['cil_version'] = version
             f.attrs['file_time'] = str(datetime.datetime.utcnow())
             f.attrs['creator'] = np.string_('NEXUSDataWriter.py')
             f.attrs['NeXus_version'] = '4.3.0'
@@ -75,13 +128,19 @@ class NEXUSDataWriter(object):
             # create the NXentry group
             nxentry = f.create_group('entry1/tomo_entry')
             nxentry.attrs['NX_class'] = 'NXentry'
-            
-            # create dataset to store data
-            ds_data = f.create_dataset('entry1/tomo_entry/data/data', 
-                                       (self.data.as_array().shape), 
-                                       dtype = 'float32', 
-                                       data = self.data.as_array())
-            
+
+            #create empty data entry
+            ds_data = f.create_dataset('entry1/tomo_entry/data/data',shape=self.data.shape, dtype=self.dtype)
+
+            if self.compress:
+                ds_data.attrs['scale'] = scale
+                ds_data.attrs['offset'] = offset
+
+                for i in range(self.data.shape[0]):
+                    ds_data[i:(i+1)] = self.data.array[i] * scale + offset
+            else:
+                ds_data.write_direct(self.data.array)
+
             # set up dataset attributes
             if (isinstance(self.data, ImageData)):
                 ds_data.attrs['data_type'] = 'ImageData'

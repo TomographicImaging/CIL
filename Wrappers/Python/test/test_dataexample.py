@@ -161,3 +161,50 @@ class TestTestData(CCPiTestClass):
 
         self.assertTrue(res)
         
+    def test_load_SIMULATED_SPHERE_VOLUME(self):
+        res = False
+        try:
+            image = dataexample.SIMULATED_SPHERE_VOLUME.get()
+            if (image.shape[0] == 128) and (image.shape[1] == 128) and\
+                (image.shape[2] == 128):
+                res = True
+            else:
+                print("Image dimension mismatch")
+        except FileNotFoundError:
+            print("File not found")
+        except:
+            print("Failed to load file")
+
+        self.assertTrue(res)
+
+    def test_load_SIMULATED_PARALLEL_BEAM_DATA(self):
+        res = False
+        try:
+            image = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+            if (image.shape[0] == 300) and (image.shape[1] == 128) and\
+                (image.shape[2] == 128):
+                res = True
+            else:
+                print("Image dimension mismatch")
+        except FileNotFoundError:
+            print("File not found")
+        except:
+            print("Failed to load file")
+
+        self.assertTrue(res)
+
+    def test_load_SIMULATED_CONE_BEAM_DATA(self):
+        res = False
+        try:
+            image = dataexample.SIMULATED_CONE_BEAM_DATA.get()
+            if (image.shape[0] == 300) and (image.shape[1] == 128) and\
+                (image.shape[2] == 128):
+                res = True
+            else:
+                print("Image dimension mismatch")
+        except FileNotFoundError:
+            print("File not found")
+        except:
+            print("Failed to load file")
+
+        self.assertTrue(res)

@@ -17,8 +17,8 @@
 import numpy as np
 import os
 from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
+from cil.version import version
 import datetime
-
 
 h5pyAvailable = True
 try:
@@ -118,6 +118,7 @@ class NEXUSDataWriter(object):
             
             # give the file some important attributes
             f.attrs['file_name'] = self.file_name
+            f.attrs['cil_version'] = version
             f.attrs['file_time'] = str(datetime.datetime.utcnow())
             f.attrs['creator'] = np.string_('NEXUSDataWriter.py')
             f.attrs['NeXus_version'] = '4.3.0'

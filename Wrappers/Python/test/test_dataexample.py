@@ -43,11 +43,11 @@ class TestTestData(CCPiTestClass):
             if (image.shape[0] == 512) and (image.shape[1] == 512):
                 res = True
             else:
-                print("Image dimension mismatch")
+                self.assertFalse(msg="Image dimension mismatch")
         except FileNotFoundError:
-            print("File not found")
+            self.assertFalse(msg="File not found")
         except:
-            print("Failed to load file")
+            self.assertFalse(msg="Failed to load file")
 
         self.assertTrue(res)
 
@@ -60,11 +60,11 @@ class TestTestData(CCPiTestClass):
             if (image.shape[0] == 512) and (image.shape[1] == 512):
                 res = True
             else:
-                print("Image dimension mismatch")
+                self.assertFalse(msg="Image dimension mismatch")
         except FileNotFoundError:
-            print("File not found")
+            self.assertFalse(msg="File not found")
         except:
-            print("Failed to load file")
+            self.assertFalse(msg="Failed to load file")
 
         self.assertTrue(res)
 
@@ -76,11 +76,11 @@ class TestTestData(CCPiTestClass):
             if (image.shape[0] == 3) and (image.shape[1] == 512) and (image.shape[2] == 512):
                 res = True
             else:
-                print("Image dimension mismatch")
+                self.assertFalse(msg="Image dimension mismatch")
         except FileNotFoundError:
-            print("File not found")
+            self.assertFalse(msg="File not found")
         except:
-            print("Failed to load file")
+            self.assertFalse(msg="Failed to load file")
 
         self.assertTrue(res)
 
@@ -92,11 +92,11 @@ class TestTestData(CCPiTestClass):
             if (image.shape[0] == 3) and (image.shape[1] == 1353) and (image.shape[2] == 1194):
                 res = True
             else:
-                print("Image dimension mismatch")
+                self.assertFalse(msg="Image dimension mismatch")
         except FileNotFoundError:
-            print("File not found")
+            self.assertFalse(msg="File not found")
         except:
-            print("Failed to load file")
+            self.assertFalse(msg="Failed to load file")
 
         self.assertTrue(res)
     def test_load_RESOLUTION_CHART(self):
@@ -107,11 +107,11 @@ class TestTestData(CCPiTestClass):
             if (image.shape[0] == 256) and (image.shape[1] == 256):
                 res = True
             else:
-                print("Image dimension mismatch")
+                self.assertFalse(msg="Image dimension mismatch")
         except FileNotFoundError:
-            print("File not found")
+            self.assertFalse(msg="File not found")
         except:
-            print("Failed to load file")
+            self.assertFalse(msg="Failed to load file")
 
         self.assertTrue(res)
 
@@ -122,11 +122,11 @@ class TestTestData(CCPiTestClass):
             if (image.shape[0] == 512) and (image.shape[1] == 512):
                 res = True
             else:
-                print("Image dimension mismatch")
+                self.assertFalse(msg="Image dimension mismatch")
         except FileNotFoundError:
-            print("File not found")
+            self.assertFalse(msg="File not found")
         except:
-            print("Failed to load file")
+            self.assertFalse(msg="Failed to load file")
 
         self.assertTrue(res)
 
@@ -137,11 +137,11 @@ class TestTestData(CCPiTestClass):
             if (image.shape[0] == 200) and (image.shape[1] == 300):
                 res = True
             else:
-                print("Image dimension mismatch")
+                self.assertFalse(msg="Image dimension mismatch")
         except FileNotFoundError:
-            print("File not found")
+            self.assertFalse(msg="File not found")
         except:
-            print("Failed to load file")
+            self.assertFalse(msg="Failed to load file")
 
         self.assertTrue(res)
 
@@ -153,11 +153,11 @@ class TestTestData(CCPiTestClass):
                 (image.shape[2] == 160):
                 res = True
             else:
-                print("Image dimension mismatch")
+                self.assertFalse(msg="Image dimension mismatch")
         except FileNotFoundError:
-            print("File not found")
+            self.assertFalse(msg="File not found")
         except:
-            print("Failed to load file")
+            self.assertFalse(msg="Failed to load file")
 
         self.assertTrue(res)
         
@@ -169,11 +169,11 @@ class TestTestData(CCPiTestClass):
                 (image.shape[2] == 128):
                 res = True
             else:
-                print("Image dimension mismatch")
+                self.assertFalse(msg="Image dimension mismatch")
         except FileNotFoundError:
-            print("File not found")
+            self.assertFalse(msg="File not found")
         except:
-            print("Failed to load file")
+            self.assertFalse(msg="Failed to load file")
 
         self.assertTrue(res)
 
@@ -185,11 +185,11 @@ class TestTestData(CCPiTestClass):
                 (image.shape[2] == 128):
                 res = True
             else:
-                print("Image dimension mismatch")
+                self.assertFalse(msg="Image dimension mismatch")
         except FileNotFoundError:
-            print("File not found")
+            self.assertFalse(msg="File not found")
         except:
-            print("Failed to load file")
+            self.assertFalse(msg="Failed to load file")
 
         vol = dataexample.SIMULATED_SPHERE_VOLUME.get()
         self.assertTrue(vol.geometry == image.geometry.get_ImageGeometry())
@@ -204,11 +204,11 @@ class TestTestData(CCPiTestClass):
                 (image.shape[2] == 128):
                 res = True
             else:
-                print("Image dimension mismatch")
+                self.assertFalse(msg="Image dimension mismatch")
         except FileNotFoundError:
-            print("File not found")
+            self.assertFalse(msg="File not found")
         except:
-            print("Failed to load file")
+            self.assertFalse(msg="Failed to load file")
 
         vol = dataexample.SIMULATED_SPHERE_VOLUME.get()
         self.assertTrue(vol.geometry == image.geometry.get_ImageGeometry())

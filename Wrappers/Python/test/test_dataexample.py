@@ -15,14 +15,16 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import numpy
+from cil.framework.framework import ImageGeometry,AcquisitionGeometry
 from cil.utilities import dataexample
 from cil.utilities import noise
 import os, sys
+
+from numpy.testing._private.utils import assert_allclose, assert_array_equal, assert_equal
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from testclass import CCPiTestClass
-import unittest
 import platform
+import numpy as np
 
 class TestTestData(CCPiTestClass):
     def test_noise_gaussian(self):
@@ -34,183 +36,107 @@ class TestTestData(CCPiTestClass):
             decimal = 2
         self.assertAlmostEqual(norm, 48.881268, places=decimal)
 
-    def test_load_CAMERA(self):
 
-        
-        res = False
+    def check_load(self, example):
         try:
-            image = dataexample.CAMERA.get()
-            if (image.shape[0] == 512) and (image.shape[1] == 512):
-                res = True
-            else:
-                self.assertFalse(msg="Image dimension mismatch")
+            image = example.get()
         except FileNotFoundError:
             self.assertFalse(msg="File not found")
         except:
             self.assertFalse(msg="Failed to load file")
 
-        self.assertTrue(res)
+        return image
+
+
+    def test_load_CAMERA(self):
+
+        image = self.check_load(dataexample.CAMERA)
+
+        shape_expected = (512,512)
+        self.assertEquals(image.shape,shape_expected,msg="Image dimension mismatch")   
 
 
     def test_load_BOAT(self):
-        
-        res = False
-        try:
-            image = dataexample.BOAT.get()
-            if (image.shape[0] == 512) and (image.shape[1] == 512):
-                res = True
-            else:
-                self.assertFalse(msg="Image dimension mismatch")
-        except FileNotFoundError:
-            self.assertFalse(msg="File not found")
-        except:
-            self.assertFalse(msg="Failed to load file")
 
-        self.assertTrue(res)
+        image = self.check_load(dataexample.BOAT)
+
+        shape_expected = (512,512)
+        self.assertEquals(image.shape,shape_expected,msg="Image dimension mismatch")   
+
 
     def test_load_PEPPERS(self):
-        
-        res = False
-        try:
-            image = dataexample.PEPPERS.get()
-            if (image.shape[0] == 3) and (image.shape[1] == 512) and (image.shape[2] == 512):
-                res = True
-            else:
-                self.assertFalse(msg="Image dimension mismatch")
-        except FileNotFoundError:
-            self.assertFalse(msg="File not found")
-        except:
-            self.assertFalse(msg="Failed to load file")
+        image = self.check_load(dataexample.PEPPERS)
 
-        self.assertTrue(res)
+        shape_expected = (3,512,512)
+        self.assertEquals(image.shape,shape_expected,msg="Image dimension mismatch")   
+
 
     def test_load_RAINBOW(self):
-        
-        res = False
-        try:
-            image = dataexample.RAINBOW.get()
-            if (image.shape[0] == 3) and (image.shape[1] == 1353) and (image.shape[2] == 1194):
-                res = True
-            else:
-                self.assertFalse(msg="Image dimension mismatch")
-        except FileNotFoundError:
-            self.assertFalse(msg="File not found")
-        except:
-            self.assertFalse(msg="Failed to load file")
 
-        self.assertTrue(res)
+        image = self.check_load(dataexample.RAINBOW)
+
+        shape_expected = (3,1353,1194)
+        self.assertEquals(image.shape,shape_expected,msg="Image dimension mismatch")   
+
+
     def test_load_RESOLUTION_CHART(self):
-        
-        res = False
-        try:
-            image = dataexample.RESOLUTION_CHART.get()
-            if (image.shape[0] == 256) and (image.shape[1] == 256):
-                res = True
-            else:
-                self.assertFalse(msg="Image dimension mismatch")
-        except FileNotFoundError:
-            self.assertFalse(msg="File not found")
-        except:
-            self.assertFalse(msg="Failed to load file")
 
-        self.assertTrue(res)
+        image = self.check_load(dataexample.RESOLUTION_CHART)
+
+        shape_expected = (256,256)
+        self.assertEquals(image.shape,shape_expected,msg="Image dimension mismatch")   
+
 
     def test_load_SIMPLE_PHANTOM_2D(self):
-        res = False
-        try:
-            image = dataexample.SIMPLE_PHANTOM_2D.get()
-            if (image.shape[0] == 512) and (image.shape[1] == 512):
-                res = True
-            else:
-                self.assertFalse(msg="Image dimension mismatch")
-        except FileNotFoundError:
-            self.assertFalse(msg="File not found")
-        except:
-            self.assertFalse(msg="Failed to load file")
 
-        self.assertTrue(res)
+        image = self.check_load(dataexample.SIMPLE_PHANTOM_2D)
+
+        shape_expected = (512,512)
+        self.assertEquals(image.shape,shape_expected,msg="Image dimension mismatch")   
+
 
     def test_load_SHAPES(self):
-        res = False
-        try:
-            image = dataexample.SHAPES.get()
-            if (image.shape[0] == 200) and (image.shape[1] == 300):
-                res = True
-            else:
-                self.assertFalse(msg="Image dimension mismatch")
-        except FileNotFoundError:
-            self.assertFalse(msg="File not found")
-        except:
-            self.assertFalse(msg="Failed to load file")
 
-        self.assertTrue(res)
+        image = self.check_load(dataexample.SHAPES)
+
+        shape_expected = (200,300)
+        self.assertEquals(image.shape,shape_expected,msg="Image dimension mismatch")   
+
 
     def test_load_SYNCHROTRON_PARALLEL_BEAM_DATA(self):
-        res = False
-        try:
-            image = dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA.get()
-            if (image.shape[0] == 91) and (image.shape[1] == 135) and\
-                (image.shape[2] == 160):
-                res = True
-            else:
-                self.assertFalse(msg="Image dimension mismatch")
-        except FileNotFoundError:
-            self.assertFalse(msg="File not found")
-        except:
-            self.assertFalse(msg="Failed to load file")
 
-        self.assertTrue(res)
-        
+        image = self.check_load(dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA)
+
+        shape_expected = (91,135,160)
+        self.assertEquals(image.shape,shape_expected,msg="Image dimension mismatch")   
+
+
     def test_load_SIMULATED_SPHERE_VOLUME(self):
-        res = False
-        try:
-            image = dataexample.SIMULATED_SPHERE_VOLUME.get()
-            if (image.shape[0] == 128) and (image.shape[1] == 128) and\
-                (image.shape[2] == 128):
-                res = True
-            else:
-                self.assertFalse(msg="Image dimension mismatch")
-        except FileNotFoundError:
-            self.assertFalse(msg="File not found")
-        except:
-            self.assertFalse(msg="Failed to load file")
 
-        self.assertTrue(res)
+        image = self.check_load(dataexample.SIMULATED_SPHERE_VOLUME)
+
+        ig_expected = ImageGeometry(128,128,128,16,16,16)
+
+        self.assertEquals(ig_expected,image.geometry,msg="Image geometry mismatch")   
+
 
     def test_load_SIMULATED_PARALLEL_BEAM_DATA(self):
-        res = False
-        try:
-            image = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
-            if (image.shape[0] == 300) and (image.shape[1] == 128) and\
-                (image.shape[2] == 128):
-                res = True
-            else:
-                self.assertFalse(msg="Image dimension mismatch")
-        except FileNotFoundError:
-            self.assertFalse(msg="File not found")
-        except:
-            self.assertFalse(msg="Failed to load file")
 
-        vol = dataexample.SIMULATED_SPHERE_VOLUME.get()
-        self.assertTrue(vol.geometry == image.geometry.get_ImageGeometry())
+        image = self.check_load(dataexample.SIMULATED_PARALLEL_BEAM_DATA)
 
-        self.assertTrue(res)
+        ag_expected = AcquisitionGeometry.create_Parallel3D()\
+                                         .set_panel((128,128),(16,16))\
+                                         .set_angles(np.linspace(0,360,300,False))\
+
+        self.assertEquals(ag_expected,image.geometry,msg="Acquisition geometry mismatch")   
+
 
     def test_load_SIMULATED_CONE_BEAM_DATA(self):
-        res = False
-        try:
-            image = dataexample.SIMULATED_CONE_BEAM_DATA.get()
-            if (image.shape[0] == 300) and (image.shape[1] == 128) and\
-                (image.shape[2] == 128):
-                res = True
-            else:
-                self.assertFalse(msg="Image dimension mismatch")
-        except FileNotFoundError:
-            self.assertFalse(msg="File not found")
-        except:
-            self.assertFalse(msg="Failed to load file")
 
-        vol = dataexample.SIMULATED_SPHERE_VOLUME.get()
-        self.assertTrue(vol.geometry == image.geometry.get_ImageGeometry())
+        image = self.check_load(dataexample.SIMULATED_CONE_BEAM_DATA)
 
-        self.assertTrue(res)
+        ag_expected = AcquisitionGeometry.create_Cone3D([0,-20000,0],[0,60000,0])\
+                                         .set_panel((128,128),(64,64))\
+                                         .set_angles(np.linspace(0,360,300,False))
+
+        self.assertEquals(ag_expected,image.geometry,msg="Acquisition geometry mismatch")   

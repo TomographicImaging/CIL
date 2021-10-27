@@ -30,7 +30,7 @@ except ModuleNotFoundError:
 class ProjectionOperator(LinearOperator):
     '''TIGRE Projection Operator'''
 
-    def __init__(self, image_geometry, aquisition_geometry, direct_method='Siddon',adjoint_method='matched'):
+    def __init__(self, image_geometry, aquisition_geometry, direct_method='interpolated',adjoint_method='matched'):
         '''
         This class creates a configured TIGRE ProjectionOperator
         
@@ -42,12 +42,11 @@ class ProjectionOperator(LinearOperator):
         :type image_geometry: ImageGeometry
         :param aquisition_geometry: A description of the AcquisitionGeometry of your data
         :type aquisition_geometry: AcquisitionGeometry
-        :param direct_method: The method used by the foward projector, 'Siddon' for ray-driven intersection, 'interpolated' for interpolated projection, default 'Siddon'
-        :type direct_method: str
+        :param direct_method: The method used by the foward projector, 'Siddon' for ray-voxel intersection, 'interpolated' for interpolated projection
+        :type direct_method: str, default 'interpolated'
         :param adjoint_method: The weighting method used by the cone-beam backward projector, 'matched' for weights to approximatly match the interpolated foward projector, 'FDK' for FDK weights, default 'matched'
         :type adjoint_method: str    
         '''
-
 
         DataOrder.check_order_for_engine('tigre', image_geometry)
         DataOrder.check_order_for_engine('tigre', aquisition_geometry) 

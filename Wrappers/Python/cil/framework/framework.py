@@ -176,12 +176,12 @@ class ImageGeometry(object):
                  channels=1, 
                  **kwargs):
         
-        self.voxel_num_x = voxel_num_x
-        self.voxel_num_y = voxel_num_y
-        self.voxel_num_z = voxel_num_z
-        self.voxel_size_x = voxel_size_x
-        self.voxel_size_y = voxel_size_y
-        self.voxel_size_z = voxel_size_z
+        self.voxel_num_x = int(voxel_num_x)
+        self.voxel_num_y = int(voxel_num_y)
+        self.voxel_num_z = int(voxel_num_z)
+        self.voxel_size_x = float(voxel_size_x)
+        self.voxel_size_y = float(voxel_size_y)
+        self.voxel_size_z = float(voxel_size_z)
         self.center_x = center_x
         self.center_y = center_y
         self.center_z = center_z  

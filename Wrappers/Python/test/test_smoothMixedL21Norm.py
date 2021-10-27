@@ -104,10 +104,6 @@ class TestFunction(unittest.TestCase):
         res2 = f2(x)
         numpy.testing.assert_almost_equal(f1(x), f2(x)) 
         
-if __name__ == '__main__':
-    
-    t = TestFunction()
-    t.test_smoothL21Norm()
          
 
 

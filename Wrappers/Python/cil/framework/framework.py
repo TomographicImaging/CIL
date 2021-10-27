@@ -2626,11 +2626,6 @@ class DataContainer(object):
         '''Applies log pixel-wise to the DataContainer'''
         return self.pixel_wise_unary(numpy.log, *args, **kwargs)
     
-    #def __abs__(self):
-    #    operation = FM.OPERATION.ABS
-    #    return self.callFieldMath(operation, None, self.mask, self.maskOnValue)
-    # __abs__
-    
     ## reductions
     def sum(self, *args, **kwargs):
         return self.as_array().sum(*args, **kwargs)
@@ -3310,7 +3305,12 @@ class DataOrder():
             if isinstance(geometry, AcquisitionGeometry):
                 dim_order = DataOrder.TIGRE_AG_LABELS
             else:
-                dim_order = DataOrder.TIGRE_IG_LABELS   
+                dim_order = DataOrder.TIGRE_IG_LABELS
+        elif engine == 'cil':
+            if isinstance(geometry, AcquisitionGeometry):
+                dim_order = DataOrder.CIL_AG_LABELS
+            else:
+                dim_order = DataOrder.CIL_IG_LABELS
         else:
             raise ValueError("Unknown engine expected 'tigre' or 'astra' got {}".format(engine))
         

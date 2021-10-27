@@ -191,6 +191,9 @@ class TestTestData(CCPiTestClass):
         except:
             print("Failed to load file")
 
+        vol = dataexample.SIMULATED_SPHERE_VOLUME.get()
+        self.assertTrue(vol.geometry == image.geometry.get_ImageGeometry())
+
         self.assertTrue(res)
 
     def test_load_SIMULATED_CONE_BEAM_DATA(self):
@@ -206,5 +209,8 @@ class TestTestData(CCPiTestClass):
             print("File not found")
         except:
             print("Failed to load file")
+
+        vol = dataexample.SIMULATED_SPHERE_VOLUME.get()
+        self.assertTrue(vol.geometry == image.geometry.get_ImageGeometry())
 
         self.assertTrue(res)

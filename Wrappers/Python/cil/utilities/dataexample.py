@@ -79,7 +79,27 @@ class SYNCHROTRON_PARALLEL_BEAM_DATA(DATA):
         loader = NEXUSDataReader()
         loader.set_up(file_name=os.path.join(os.path.abspath(ddir), '24737_fd_normalised.nxs'))
         return loader.read()
-
+class SIMULATED_PARALLEL_BEAM_DATA(DATA):
+    @classmethod
+    def get(cls, **kwargs):
+        ddir = kwargs.get('data_dir', data_dir)
+        loader = NEXUSDataReader()
+        loader.set_up(file_name=os.path.join(os.path.abspath(ddir), 'sim_parallel_beam.nxs'))
+        return loader.read()
+class SIMULATED_CONE_BEAM_DATA(DATA):
+    @classmethod
+    def get(cls, **kwargs):
+        ddir = kwargs.get('data_dir', data_dir)
+        loader = NEXUSDataReader()
+        loader.set_up(file_name=os.path.join(os.path.abspath(ddir), 'sim_cone_beam.nxs'))
+        return loader.read()
+class SIMULATED_SPHERE_VOLUME(DATA):
+    @classmethod
+    def get(cls, **kwargs):
+        ddir = kwargs.get('data_dir', data_dir)
+        loader = NEXUSDataReader()
+        loader.set_up(file_name=os.path.join(os.path.abspath(ddir), 'sim_volume.nxs'))
+        return loader.read()
 
 class TestData(object):
     '''Class to return test data

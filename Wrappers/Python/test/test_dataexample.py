@@ -19,6 +19,7 @@ from cil.framework.framework import ImageGeometry,AcquisitionGeometry
 from cil.utilities import dataexample
 from cil.utilities import noise
 import os, sys
+from numpy.core.function_base import linspace
 
 from numpy.testing._private.utils import assert_allclose, assert_array_equal, assert_equal
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -52,63 +53,67 @@ class TestTestData(CCPiTestClass):
 
         image = self.check_load(dataexample.CAMERA)
 
-        shape_expected = (512,512)
-        self.assertEquals(image.shape,shape_expected,msg="Image dimension mismatch")   
+        ig_expected = ImageGeometry(512,512)
+        self.assertEqual(ig_expected,image.geometry,msg="Image geometry mismatch")   
 
 
     def test_load_BOAT(self):
 
         image = self.check_load(dataexample.BOAT)
 
-        shape_expected = (512,512)
-        self.assertEquals(image.shape,shape_expected,msg="Image dimension mismatch")   
+        ig_expected = ImageGeometry(512,512)
+        self.assertEqual(ig_expected,image.geometry,msg="Image geometry mismatch")   
 
 
     def test_load_PEPPERS(self):
         image = self.check_load(dataexample.PEPPERS)
 
-        shape_expected = (3,512,512)
-        self.assertEquals(image.shape,shape_expected,msg="Image dimension mismatch")   
+        ig_expected = ImageGeometry(512,512,channels=3,dimension_labels=['channel', 'horizontal_y', 'horizontal_x'])
+        self.assertEqual(ig_expected,image.geometry,msg="Image geometry mismatch")   
 
 
     def test_load_RAINBOW(self):
 
         image = self.check_load(dataexample.RAINBOW)
 
-        shape_expected = (3,1353,1194)
-        self.assertEquals(image.shape,shape_expected,msg="Image dimension mismatch")   
+        ig_expected = ImageGeometry(1194,1353,channels=3,dimension_labels=['channel', 'horizontal_y', 'horizontal_x'])
+        self.assertEqual(ig_expected,image.geometry,msg="Image geometry mismatch")   
 
 
     def test_load_RESOLUTION_CHART(self):
 
         image = self.check_load(dataexample.RESOLUTION_CHART)
 
-        shape_expected = (256,256)
-        self.assertEquals(image.shape,shape_expected,msg="Image dimension mismatch")   
+        ig_expected = ImageGeometry(256,256)
+        self.assertEqual(ig_expected,image.geometry,msg="Image geometry mismatch")   
 
 
     def test_load_SIMPLE_PHANTOM_2D(self):
 
         image = self.check_load(dataexample.SIMPLE_PHANTOM_2D)
 
-        shape_expected = (512,512)
-        self.assertEquals(image.shape,shape_expected,msg="Image dimension mismatch")   
+        ig_expected = ImageGeometry(512,512)
+        self.assertEqual(ig_expected,image.geometry,msg="Image geometry mismatch")   
 
 
     def test_load_SHAPES(self):
 
         image = self.check_load(dataexample.SHAPES)
 
-        shape_expected = (200,300)
-        self.assertEquals(image.shape,shape_expected,msg="Image dimension mismatch")   
+        ig_expected = ImageGeometry(300,200)
+        self.assertEqual(ig_expected,image.geometry,msg="Image geometry mismatch")   
 
 
     def test_load_SYNCHROTRON_PARALLEL_BEAM_DATA(self):
 
         image = self.check_load(dataexample.SYNCHROTRON_PARALLEL_BEAM_DATA)
 
-        shape_expected = (91,135,160)
-        self.assertEquals(image.shape,shape_expected,msg="Image dimension mismatch")   
+        ag_expected = AcquisitionGeometry.create_Parallel3D()\
+                                         .set_panel((160,135),(1,1))\
+                                         .set_angles(np.linspace(-88.2,91.8,91))
+
+        self.assertEqual(ag_expected.shape,image.geometry.shape,msg="Image geometry mismatch")   
+        np.testing.assert_allclose(ag_expected.angles, image.geometry.angles,atol=0.05)
 
 
     def test_load_SIMULATED_SPHERE_VOLUME(self):
@@ -117,7 +122,7 @@ class TestTestData(CCPiTestClass):
 
         ig_expected = ImageGeometry(128,128,128,16,16,16)
 
-        self.assertEquals(ig_expected,image.geometry,msg="Image geometry mismatch")   
+        self.assertEqual(ig_expected,image.geometry,msg="Image geometry mismatch")   
 
 
     def test_load_SIMULATED_PARALLEL_BEAM_DATA(self):
@@ -126,9 +131,9 @@ class TestTestData(CCPiTestClass):
 
         ag_expected = AcquisitionGeometry.create_Parallel3D()\
                                          .set_panel((128,128),(16,16))\
-                                         .set_angles(np.linspace(0,360,300,False))\
+                                         .set_angles(np.linspace(0,360,300,False))
 
-        self.assertEquals(ag_expected,image.geometry,msg="Acquisition geometry mismatch")   
+        self.assertEqual(ag_expected,image.geometry,msg="Acquisition geometry mismatch")   
 
 
     def test_load_SIMULATED_CONE_BEAM_DATA(self):
@@ -139,4 +144,4 @@ class TestTestData(CCPiTestClass):
                                          .set_panel((128,128),(64,64))\
                                          .set_angles(np.linspace(0,360,300,False))
 
-        self.assertEquals(ag_expected,image.geometry,msg="Acquisition geometry mismatch")   
+        self.assertEqual(ag_expected,image.geometry,msg="Acquisition geometry mismatch")   

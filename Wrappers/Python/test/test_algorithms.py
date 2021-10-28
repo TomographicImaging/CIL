@@ -395,6 +395,41 @@ class TestAlgorithms(unittest.TestCase):
             print ("RMSE", rmse)
         self.assertLess(rmse, 2e-4)
 
+    def test_PDHG_strongly_convex(self):
+
+        ig = ImageGeometry(3,3)
+        data = ig.allocate('random')
+
+        f = L2NormSquared(b=data)
+        g = L2NormSquared()
+        operator = IdentityOperator(ig)
+
+        sigma = 1.0
+        tau  = 1.0
+
+        pdhg = PDHG(f=f, g=g, operator=operator, max_iteration=10)
+        pdhg.run(verbose=0)
+        self.assertEqual(pdhg.sigma, sigma)
+        self.assertEqual(pdhg.tau, sigma)
+
+        pdhg = PDHG(f=f, g=g, operator=operator, max_iteration=10, gamma_g=0.5)
+        pdhg.run(verbose=0)
+        self.assertNotEqual(pdhg.sigma, sigma)
+        self.assertNotEqual(pdhg.tau, tau)       
+
+        pdhg = PDHG(f=f, g=g, operator=operator, max_iteration=10, gamma_fconj=0.5)
+        pdhg.run(verbose=0)
+        self.assertNotEqual(pdhg.sigma, sigma)
+        self.assertNotEqual(pdhg.tau, tau)   
+
+        try:
+            pdhg = PDHG(f=f, g=g, operator=operator, max_iteration=10, gamma_g = 0.5, gamma_fconj=0.5)
+            pdhg.run(verbose=0)
+        except NotImplementedError as err:
+            print(err)
+ 
+
+
     def test_FISTA_Denoising(self):
         if debug_print: 
             print ("FISTA Denoising Poisson Noise Tikhonov")

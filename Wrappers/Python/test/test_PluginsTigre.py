@@ -284,92 +284,67 @@ class Test_convert_geometry(unittest.TestCase):
         np.testing.assert_allclose(tg_geometry.dVoxel, [0.2,0.05,0.1])
 
 
-class Test_results_parallel(unittest.TestCase):
-
-    def setUp(self):
-       
-        self.acq_data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
-        self.img_data = dataexample.SIMULATED_SPHERE_VOLUME.get()
-
-        self.acq_data=np.log(self.acq_data)
-        self.acq_data*=-1.0
-
-        self.ig = self.img_data.geometry
-        self.ag = self.acq_data.geometry
+class TestCommon(unittest.TestCase):
 
 
-    @unittest.skipUnless(has_tigre, "TIGRE not installed")
-    def skip_test_foward_siddon(self):
+    def compare_foward(self, direct_method, atol):
 
-        #CURRENTLY BROKEN AT TIGRE IMPLEMENTATION FOR ALLIGNED VOXEL GRIDS
-        Op = ProjectionOperator(self.ig, self.ag, direct_method='Siddon')
+        Op = ProjectionOperator(self.ig, self.ag, direct_method=direct_method)
         fp = Op.direct(self.img_data)
-
-        diff = fp - self.acq_data
-        mean_diff = abs(diff.mean())
-        max_diff = diff.abs().max()
-
-        self.assertLess(mean_diff, 1e-4)
-        self.assertLess(max_diff, 0.35)
-
-        np.testing.assert_allclose(fp.as_array(), self.acq_data.as_array(),atol=0.35)        
+        np.testing.assert_allclose(fp.as_array(), self.acq_data.as_array(),atol=atol)        
 
 
-    @unittest.skipUnless(has_tigre, "TIGRE not installed")
-    def test_foward_interpolated(self):
+    def compare_backward(self, ag):
 
-        Op = ProjectionOperator(self.ig, self.ag, direct_method='interpolated')
-        fp = Op.direct(self.img_data)
+        #create checker-board projection
+        checker = np.zeros((16,16))
+        ones = np.ones((4,4))
+        for j in range(4):
+            for i in range(4):
+                if (i + j)% 2 == 0: 
+                    checker[j*4:(j+1)*4,i*4:(i+1)*4] = ones
 
-        diff = fp - self.acq_data
-        mean_diff = abs(diff.mean())
-        max_diff = diff.abs().max()
+        #create backprojection of checker-board
+        res = np.zeros((16,16,16))
+        ones = np.ones((4,16,4))
+        for k in range(4):
+            for i in range(4):
+                if (i + k)% 2 == 0: 
+                    res[k*4:(k+1)*4,:,i*4:(i+1)*4] = ones
 
-        self.assertLess(mean_diff, 1e-4)
-        self.assertLess(max_diff, 0.12)
+        if ag.dimension == '2D':
+            checker = checker[0]
+            res = res[0]
 
-        np.testing.assert_allclose(fp.as_array(), self.acq_data.as_array(),atol=0.12)       
+        ig = ag.get_ImageGeometry()
+        data = ag.allocate(0)
 
+        data.fill(checker)
 
-    @unittest.skipUnless(has_tigre, "TIGRE not installed")
-    def test_backward_matched(self):
+        Op = ProjectionOperator(ig,ag)
+        bp = Op.adjoint(data)
 
-        Op = ProjectionOperator(self.ig, self.ag, direct_method='interpolated', adjoint_method='matched')
+        if ag.geom_type == 'cone':
+            #as cone beam res is not perfect grid
+            bp.array = np.round(bp.array,0)
 
-        bp = Op.adjoint(self.acq_data)
-        #check not zeros
-        self.assertAlmostEqual(bp.mean(), 250.2045, places=2)
+        np.testing.assert_equal(bp.array, res)
 
-
-    @unittest.skipUnless(has_tigre, "TIGRE not installed")
-    def test_FBP(self):
+    def compare_FBP(self,atol):
 
         fbp = FBP(self.ig, self.ag)
         reco = fbp(self.acq_data)
-
-        diff = reco - self.img_data
-        mean_diff = abs(diff.mean())
-        max_diff = diff.abs().max()
-
-        self.assertLess(mean_diff, 1e-4)
-        self.assertLess(max_diff, 1e-3)
-
-        np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=1e-3)    
+        np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=atol)    
 
 
-    @unittest.skipUnless(has_tigre, "TIGRE not installed")
-    def test_norm(self):
+    def compare_norm(self,direct_method,norm):
 
-        Op = ProjectionOperator(self.ig, self.ag, direct_method='Siddon')
+        Op = ProjectionOperator(self.ig, self.ag, direct_method=direct_method)
         n = Op.norm()
-        self.assertAlmostEqual(n, 764.6795, places=2)
-
-        Op = ProjectionOperator(self.ig, self.ag, direct_method='interpolated')
-        n = Op.norm()
-        self.assertAlmostEqual(n, 766.6383, places=2)
+        self.assertAlmostEqual(n, norm, places=2)
 
 
-class Test_results_cone(unittest.TestCase):
+class Test_results_cone3D(TestCommon,unittest.TestCase):
     
     def setUp(self):
        
@@ -386,68 +361,178 @@ class Test_results_cone(unittest.TestCase):
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_foward_siddon(self):
 
-        Op = ProjectionOperator(self.ig, self.ag, direct_method='Siddon')
-        fp = Op.direct(self.img_data)
-
-        diff = fp - self.acq_data
-        mean_diff = abs(diff.mean())
-        max_diff = diff.abs().max()
-
-        self.assertLess(mean_diff, 1e-4)
-        self.assertLess(max_diff, 0.35)
-
-        np.testing.assert_allclose(fp.as_array(), self.acq_data.as_array(),atol=0.35)        
+        self.compare_foward('Siddon',0.35)
 
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_foward_interpolated(self):
-
-        Op = ProjectionOperator(self.ig, self.ag, direct_method='interpolated')
-        fp = Op.direct(self.img_data)
-
-        diff = fp - self.acq_data
-        mean_diff = abs(diff.mean())
-        max_diff = diff.abs().max()
-
-        self.assertLess(mean_diff, 1e-6)
-        self.assertLess(max_diff, 0.16)
-
-        np.testing.assert_allclose(fp.as_array(), self.acq_data.as_array(),atol=0.16)       
+    
+        self.compare_foward('interpolated',0.16)  
 
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_backward_matched(self):
 
-        Op = ProjectionOperator(self.ig, self.ag, adjoint_method='matched')
-        bp = Op.adjoint(self.acq_data)
-        #check not zeros
-        self.assertAlmostEqual(bp.mean(), 250.2045, places=2)
-
+        ag = AcquisitionGeometry.create_Cone3D([0,-1000,0],[0,0,0])
+        ag.set_panel((16,16))
+        ag.set_angles([0])
+        self.compare_backward(ag)
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_FBP(self):
 
-        fbp = FBP(self.ig, self.ag)
-        reco = fbp(self.acq_data)
-
-        diff = reco - self.img_data
-        mean_diff = abs(diff.mean())
-        max_diff = diff.abs().max()
-
-        self.assertLess(mean_diff, 1e-4)
-        self.assertLess(max_diff, 1e-3)
-
-        np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=1e-3)    
+        self.compare_FBP(1e-3)  
 
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_norm(self):
 
-        Op = ProjectionOperator(self.ig, self.ag, direct_method='Siddon')
-        n = Op.norm()
-        self.assertAlmostEqual(n, 3066.5686, places=2)
+        self.compare_norm('Siddon',3066.5686)
 
-        Op = ProjectionOperator(self.ig, self.ag, direct_method='interpolated')
-        n = Op.norm()
-        self.assertAlmostEqual(n, 3066.4844, places=2)
+        self.compare_norm('interpolated',3066.4844)
+
+class Test_results_parallel3D(TestCommon,unittest.TestCase):
+    
+    def setUp(self):
+       
+        self.acq_data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get()
+        self.img_data = dataexample.SIMULATED_SPHERE_VOLUME.get()
+
+        self.acq_data=np.log(self.acq_data)
+        self.acq_data*=-1.0
+
+        self.ig = self.img_data.geometry
+        self.ag = self.acq_data.geometry
+
+
+    @unittest.skipUnless(has_tigre, "TIGRE not installed")
+    def skip_test_foward_siddon(self):
+
+        #Siddon for parallel broken in tigre implementation for aligned voxel grids
+        self.compare_foward('Siddon',0.35)
+
+
+    @unittest.skipUnless(has_tigre, "TIGRE not installed")
+    def test_foward_interpolated(self):
+    
+        self.compare_foward('interpolated',0.12)  
+
+
+    @unittest.skipUnless(has_tigre, "TIGRE not installed")
+    def test_backward_matched(self):
+
+        ag = AcquisitionGeometry.create_Parallel3D()
+        ag.set_panel((16,16))
+        ag.set_angles([0])
+        self.compare_backward(ag)
+
+
+    @unittest.skipUnless(has_tigre, "TIGRE not installed")
+    def test_FBP(self):
+
+        self.compare_FBP(1e-3)  
+
+
+    @unittest.skipUnless(has_tigre, "TIGRE not installed")
+    def test_norm(self):
+
+        self.compare_norm('Siddon',764.6795)
+        self.compare_norm('interpolated',766.6383)
+
+
+class Test_results_cone2D(TestCommon,unittest.TestCase):
+    
+    def setUp(self):
+       
+        self.acq_data = dataexample.SIMULATED_CONE_BEAM_DATA.get().get_slice(vertical='centre')
+        self.img_data = dataexample.SIMULATED_SPHERE_VOLUME.get().get_slice(vertical='centre')
+
+        self.acq_data=np.log(self.acq_data)
+        self.acq_data*=-1.0
+
+        self.ig = self.img_data.geometry
+        self.ag = self.acq_data.geometry
+
+
+    @unittest.skipUnless(has_tigre, "TIGRE not installed")
+    def test_foward_siddon(self):
+
+        self.compare_foward('Siddon',0.19)
+
+
+    @unittest.skipUnless(has_tigre, "TIGRE not installed")
+    def test_foward_interpolated(self):
+    
+        self.compare_foward('interpolated',0.085)  
+
+
+    @unittest.skipUnless(has_tigre, "TIGRE not installed")
+    def test_backward_matched(self):
+
+        ag = AcquisitionGeometry.create_Cone2D([0,-1000],[0,0])
+        ag.set_panel((16))
+        ag.set_angles([0])
+        self.compare_backward(ag)
+
+    @unittest.skipUnless(has_tigre, "TIGRE not installed")
+    def test_FBP(self):
+
+        self.compare_FBP(1e-3)  
+
+
+    @unittest.skipUnless(has_tigre, "TIGRE not installed")
+    def test_norm(self):
+
+        self.compare_norm('Siddon',3069.6503)
+
+        self.compare_norm('interpolated',3069.6025)
+
+
+class Test_results_parallel2D(TestCommon,unittest.TestCase):
+        
+    def setUp(self):
+       
+        self.acq_data = dataexample.SIMULATED_PARALLEL_BEAM_DATA.get().get_slice(vertical='centre')
+        self.img_data = dataexample.SIMULATED_SPHERE_VOLUME.get().get_slice(vertical='centre')
+
+        self.acq_data=np.log(self.acq_data)
+        self.acq_data*=-1.0
+
+        self.ig = self.img_data.geometry
+        self.ag = self.acq_data.geometry
+
+
+    @unittest.skipUnless(has_tigre, "TIGRE not installed")
+    def skip_test_foward_siddon(self):
+
+        #Siddon for parallel broken in tigre implementation for aligned voxel grids
+        self.compare_foward('Siddon',0.35)
+
+
+    @unittest.skipUnless(has_tigre, "TIGRE not installed")
+    def test_foward_interpolated(self):
+    
+        self.compare_foward('interpolated',0.085)  
+
+
+    @unittest.skipUnless(has_tigre, "TIGRE not installed")
+    def test_backward_matched(self):
+
+        ag = AcquisitionGeometry.create_Parallel2D()
+        ag.set_panel((16))
+        ag.set_angles([0])
+        self.compare_backward(ag)
+
+
+    @unittest.skipUnless(has_tigre, "TIGRE not installed")
+    def test_FBP(self):
+
+        self.compare_FBP(1e-3)  
+
+
+    @unittest.skipUnless(has_tigre, "TIGRE not installed")
+    def test_norm(self):
+
+        self.compare_norm('Siddon',764.6795)
+        self.compare_norm('interpolated',766.6383)
 

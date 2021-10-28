@@ -42,12 +42,17 @@ class BaseReader(object):
                 Start and end also can be negative.
         '''
 
+        self.file_name = kwargs.get('file_name', None)
+        
+        if self.file_name is not None:
+            self.set_up(file_name = self.file_name)
+
     def set_up(self, file_name=None, slice_roi=None, binning_roi=None, **kwargs):
         
         self.file_name = os.path.abspath(file_name)
             
         if self.file_name == None:
-            raise Exception('Path to nexus file is required.')
+            raise Exception('Path to file is required.')
         
         # check if file exists
         if not(os.path.isfile(self.file_name)):

@@ -17,7 +17,7 @@
 
 from cil.optimisation.algorithms import Algorithm
 import warnings
-import numpy
+import numpy as np
 
 
 class PDHG(Algorithm):
@@ -35,6 +35,12 @@ class PDHG(Algorithm):
     :param g: Convex function with "simple" proximal 
     :param tau: Step size parameter for Primal problem
     :param sigma: Step size parameter for Dual problem
+
+    If the function g is strongly convex, you can use `gamma_g` to accelerate PDHG.
+    If the convex conjugate of f is strongly convex, you can use `gamma_fconj` to accelerate PDHG.
+
+    :param gamma_g: Strongly convex constant for the function
+    :param gamma_fconj: Strongly convex constant for the function
  
     Remark: Convergence is guaranted provided that
         
@@ -176,21 +182,31 @@ class PDHG(Algorithm):
 
         self.g.proximal(self.x_tmp, self.tau, out=self.x)
 
+        # update the step sizes for special cases
+        self.update_step_sizes()
+
+
+    def update_step_sizes(self):
+
         #update_previous_solution() called after update by base class
         #i.e current solution is now in x_old, previous solution is now in x
     
         # Update sigma and tau based on the strong convexity of G
         if self.gamma_g is not None:
-            self.theta = float(1 / numpy.sqrt(1 + 2 * self.gamma_g * self.tau))
+            self.theta = float(1 / np.sqrt(1 + 2 * self.gamma_g * self.tau))
             self.tau *= self.theta
-            self.sigma /= self.theta  
+            self.sigma /= self.theta 
 
         # Update sigma and tau based on the strong convexity of F
         # Following operations are reversed due to symmetry, sigma --> tau, tau -->sigma
         if self.gamma_fconj is not None:            
-            self.theta = float(1 / numpy.sqrt(1 + 2 * self.gamma_fconj * self.sigma))
+            self.theta = float(1 / np.sqrt(1 + 2 * self.gamma_fconj * self.sigma))
             self.sigma *= self.theta
-            self.tau /= self.theta                       
+            self.tau /= self.theta    
+
+        if self.gamma_g is not None and self.gamma_fconj is not None:
+            raise NotImplemented("This case is not implemented")
+                    
         
     def update_objective(self):
 

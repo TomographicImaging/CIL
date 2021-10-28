@@ -2804,7 +2804,20 @@ class ImageData(DataContainer):
             else:
                 raise ValueError ("Unable to return slice of requested ImageData. Use 'force=True' to return DataContainer instead.")
 
-        out = DataContainer.get_slice(self, channel=channel, vertical=vertical, horizontal_x=horizontal_x, horizontal_y=horizontal_y)
+        #if vertical = 'centre' slice convert to index and subset, this will interpolate 2 rows to get the center slice value
+        if vertical == 'centre':
+            dim = self.geometry.dimension_labels.index('vertical')  
+            centre_slice_pos = (self.geometry.shape[dim]-1) / 2.
+            ind0 = int(numpy.floor(centre_slice_pos))
+            
+            w2 = centre_slice_pos - ind0
+            out = DataContainer.get_slice(self, channel=channel, vertical=ind0, horizontal_x=horizontal_x, horizontal_y=horizontal_y)
+            
+            if w2 > 0:
+                out2 = DataContainer.get_slice(self, channel=channel, vertical=ind0 + 1, horizontal_x=horizontal_x, horizontal_y=horizontal_y)
+                out = out * (1 - w2) + out2 * w2
+        else:
+            out = DataContainer.get_slice(self, channel=channel, vertical=vertical, horizontal_x=horizontal_x, horizontal_y=horizontal_y)
 
         if len(out.shape) == 1 or geometry_new is None:
             return out
@@ -2861,9 +2874,6 @@ class AcquisitionData(DataContainer):
             
         if array.shape != geometry.shape:
             raise ValueError('Shape mismatch got {} expected {}'.format(array.shape, geometry.shape))
-
-        if array.ndim not in [2,3,4]:
-            raise ValueError('Number of dimensions are not 2 or 3 or 4 : {0}'.format(array.ndim))
     
         super(AcquisitionData, self).__init__(array, deep_copy, geometry=geometry,**kwargs)
   
@@ -2897,14 +2907,15 @@ class AcquisitionData(DataContainer):
         #if vertical = 'centre' slice convert to index and subset, this will interpolate 2 rows to get the center slice value
         if vertical == 'centre':
             dim = self.geometry.dimension_labels.index('vertical')
-            if self.geometry.shape[dim] > 1:   
-                centre_slice_pos = (self.geometry.shape[dim]-1) / 2.
-                ind0 = int(numpy.floor(centre_slice_pos))
-                w2 = centre_slice_pos - ind0
-                out = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=ind0, horizontal=horizontal)
-                if w2 > 0:
-                    out2 = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=ind0 + 1, horizontal=horizontal)
-                    out = out * (1 - w2) + out2 * w2
+            
+            centre_slice_pos = (self.geometry.shape[dim]-1) / 2.
+            ind0 = int(numpy.floor(centre_slice_pos))
+            w2 = centre_slice_pos - ind0
+            out = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=ind0, horizontal=horizontal)
+            
+            if w2 > 0:
+                out2 = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=ind0 + 1, horizontal=horizontal)
+                out = out * (1 - w2) + out2 * w2
         else:
             out = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=vertical, horizontal=horizontal)
 

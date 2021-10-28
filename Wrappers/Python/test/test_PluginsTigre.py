@@ -293,8 +293,23 @@ class TestCommon(unittest.TestCase):
         fp = Op.direct(self.img_data)
         np.testing.assert_allclose(fp.as_array(), self.acq_data.as_array(),atol=atol)        
 
+        fp2 = fp.copy()
+        fp2.fill(0)
+        Op.direct(self.img_data,out=fp2)
+        np.testing.assert_array_equal(fp.as_array(), fp2.as_array())    
 
-    def compare_backward(self, ag):
+    def compare_backward(self):
+        
+        #this checks mechanics but not value
+        Op = ProjectionOperator(self.ig, self.ag)
+        bp = Op.adjoint(self.acq_data)
+
+        bp2 = bp.copy()
+        bp2.fill(0)
+        Op.adjoint(self.acq_data,out=bp2)
+        np.testing.assert_array_equal(bp.as_array(), bp2.as_array())    
+
+    def compare_backward_results(self, ag):
 
         #create checker-board projection
         checker = np.zeros((16,16))
@@ -336,12 +351,16 @@ class TestCommon(unittest.TestCase):
         reco = fbp(self.acq_data)
         np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=atol)    
 
+        reco2 = reco.copy()
+        reco2.fill(0)
+        fbp(self.acq_data,out=reco2)
+        np.testing.assert_array_equal(reco.as_array(), reco2.as_array())   
 
     def compare_norm(self,direct_method,norm):
 
         Op = ProjectionOperator(self.ig, self.ag, direct_method=direct_method)
         n = Op.norm()
-        self.assertAlmostEqual(n, norm, places=2)
+        self.assertAlmostEqual(n, norm, places=1)
 
 
 class Test_results_cone3D(TestCommon,unittest.TestCase):
@@ -371,12 +390,16 @@ class Test_results_cone3D(TestCommon,unittest.TestCase):
 
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
-    def test_backward_matched(self):
+    def test_backward(self):
+        self.compare_backward()
+
+    @unittest.skipUnless(has_tigre, "TIGRE not installed")
+    def test_backward_result(self):
 
         ag = AcquisitionGeometry.create_Cone3D([0,-1000,0],[0,0,0])
         ag.set_panel((16,16))
         ag.set_angles([0])
-        self.compare_backward(ag)
+        self.compare_backward_results(ag)
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_FBP(self):
@@ -419,12 +442,17 @@ class Test_results_parallel3D(TestCommon,unittest.TestCase):
 
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
-    def test_backward_matched(self):
+    def test_backward(self):
+        self.compare_backward()
+
+
+    @unittest.skipUnless(has_tigre, "TIGRE not installed")
+    def test_backward_result(self):
 
         ag = AcquisitionGeometry.create_Parallel3D()
         ag.set_panel((16,16))
         ag.set_angles([0])
-        self.compare_backward(ag)
+        self.compare_backward_results(ag)
 
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
@@ -467,12 +495,17 @@ class Test_results_cone2D(TestCommon,unittest.TestCase):
 
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
-    def test_backward_matched(self):
+    def test_backward(self):
+        self.compare_backward()
+
+
+    @unittest.skipUnless(has_tigre, "TIGRE not installed")
+    def test_backward_result(self):
 
         ag = AcquisitionGeometry.create_Cone2D([0,-1000],[0,0])
         ag.set_panel((16))
         ag.set_angles([0])
-        self.compare_backward(ag)
+        self.compare_backward_results(ag)
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_FBP(self):
@@ -516,12 +549,17 @@ class Test_results_parallel2D(TestCommon,unittest.TestCase):
 
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
-    def test_backward_matched(self):
+    def test_backward(self):
+        self.compare_backward()
+
+
+    @unittest.skipUnless(has_tigre, "TIGRE not installed")
+    def test_backward_result(self):
 
         ag = AcquisitionGeometry.create_Parallel2D()
         ag.set_panel((16))
         ag.set_angles([0])
-        self.compare_backward(ag)
+        self.compare_backward_results(ag)
 
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")

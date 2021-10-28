@@ -15,7 +15,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from cil.framework import ImageData, AcquisitionData
+from cil.framework import ImageData, AcquisitionData, AcquisitionGeometry
 from cil.framework import DataOrder
 from cil.optimisation.operators import LinearOperator
 from cil.plugins.tigre import CIL2TIGREGeometry
@@ -67,6 +67,9 @@ class ProjectionOperator(LinearOperator):
         else:
             arr_out = Ax.Ax(x.as_array(), self.tigre_geom, self.tigre_angles, projection_type=self.method['direct'])
 
+        if arr_out.shape[0] == 1:
+            arr_out = np.squeeze(arr_out, axis=0)
+
         if out is None:
             out = AcquisitionData(arr_out, deep_copy=False, geometry=self._range_geometry.copy(), suppress_warning=True)
             return out
@@ -75,12 +78,16 @@ class ProjectionOperator(LinearOperator):
 
     def adjoint(self, x, out=None):
 
+        data = x.as_array()
+        if x.dimension_labels[0] != AcquisitionGeometry.ANGLE:
+            data = np.expand_dims(data,axis=0)
+
         if self.tigre_geom.is2D:
-            data_temp = np.expand_dims(x.as_array(),axis=1)
-            arr_out = Atb.Atb(data_temp, self.tigre_geom, self.tigre_angles, krylov=self.method['adjoint'])
+            data = np.expand_dims(data,axis=1)
+            arr_out = Atb.Atb(data, self.tigre_geom, self.tigre_angles, krylov=self.method['adjoint'])
             arr_out = np.squeeze(arr_out, axis=0)
         else:
-            arr_out = Atb.Atb(x.as_array(), self.tigre_geom, self.tigre_angles, krylov=self.method['adjoint'])
+            arr_out = Atb.Atb(data, self.tigre_geom, self.tigre_angles, krylov=self.method['adjoint'])
 
         if out is None:
             out = ImageData(arr_out, deep_copy=False, geometry=self._domain_geometry.copy(), suppress_warning=True)

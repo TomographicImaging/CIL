@@ -182,30 +182,30 @@ class PDHG(Algorithm):
 
         self.g.proximal(self.x_tmp, self.tau, out=self.x)
 
+        #update_previous_solution() called after update by base class
+        #i.e current solution is now in x_old, previous solution is now in x        
+
         # update the step sizes for special cases
         self.update_step_sizes()
 
 
     def update_step_sizes(self):
-
-        #update_previous_solution() called after update by base class
-        #i.e current solution is now in x_old, previous solution is now in x
     
         # Update sigma and tau based on the strong convexity of G
         if self.gamma_g is not None:
-            self.theta = float(1 / np.sqrt(1 + 2 * self.gamma_g * self.tau))
+            self.theta = 1.0/ np.sqrt(1 + 2 * self.gamma_g * self.tau)
             self.tau *= self.theta
             self.sigma /= self.theta 
 
         # Update sigma and tau based on the strong convexity of F
         # Following operations are reversed due to symmetry, sigma --> tau, tau -->sigma
         if self.gamma_fconj is not None:            
-            self.theta = float(1 / np.sqrt(1 + 2 * self.gamma_fconj * self.sigma))
+            self.theta = 1.0 / np.sqrt(1 + 2 * self.gamma_fconj * self.sigma)
             self.sigma *= self.theta
             self.tau /= self.theta    
 
         if self.gamma_g is not None and self.gamma_fconj is not None:
-            raise NotImplemented("This case is not implemented")
+            raise NotImplementedError("This case is not implemented")
                     
         
     def update_objective(self):
@@ -236,3 +236,4 @@ class PDHG(Algorithm):
     @property
     def primal_dual_gap(self):
         return [x[2] for x in self.loss]
+

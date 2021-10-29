@@ -19,7 +19,7 @@ test:
   requires:
     - {{ pin_compatible('numpy', min_pin='x.x', max_pin='x.x') }}
     - python-wget
-    - cvxpy              # [ unix and py36 and np115 ]
+    - cvxpy              # [ unix and py37 and np118 ]
     - scikit-image
     - tomophantom        # [ linux ]
     - cil-astra          # [ linux ] 

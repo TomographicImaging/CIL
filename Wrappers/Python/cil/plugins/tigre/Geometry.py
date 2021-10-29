@@ -63,49 +63,12 @@ class TIGREGeometry(Geometry):
         self.dDetector = np.array(ag_in.config.panel.pixel_size[::-1])
         self.sDetector = self.dDetector * self.nDetector    # total size of the detector    (mm)
 
-
         if ag_in.geom_type == 'cone':  
             self.mode = 'cone'
 
-            self.DSO = -system.source.position[1]
-            mag = ag_in.magnification
-        
+            self.DSO = -system.source.position[1]       
             self.DSD = self.DSO + system.detector.position[1]
         
-            if ag_in.dimension == '2D':
-                self.is2D = True
-
-                #fix IG to single slice in z
-                self.nVoxel[0]=1
-                self.dVoxel[0]= ag_in.config.panel.pixel_size[1] / mag
-
-                # Offsets Tigre (Z, Y, X) == CIL (X, -Y)
-                self.offOrigin = np.array( [0, system.rotation_axis.position[0], -system.rotation_axis.position[1]])
-                self.offDetector = np.array( [0, system.detector.position[0]-system.source.position[0], 0 ]) 
-                
-                #convert roll, pitch, yaw
-                U = [0, system.detector.direction_x[0], -system.detector.direction_x[1]]
-                roll = 0
-                pitch = 0
-                yaw = np.arctan2(-U[2],U[1])
-
-            else:
-                self.is2D = False
-                # Offsets Tigre (Z, Y, X) == CIL (Z, X, -Y)        
-                ind = np.asarray([2, 0, 1])
-                flip = np.asarray([1, 1, -1])
-
-                self.offOrigin = np.array( system.rotation_axis.position[ind] * flip )
-                self.offDetector = np.array( [system.detector.position[2]-system.source.position[2], system.detector.position[0]-system.source.position[0], 0])
-                
-                #convert roll, pitch, yaw
-                U = system.detector.direction_x[ind] * flip
-                V = system.detector.direction_y[ind] * flip
-
-                roll = np.arctan2(-V[1], V[0])
-                pitch = np.arcsin(V[2])
-                yaw = np.arctan2(-U[2],U[1])
- 
         else:
             if ag_in.system_description == 'advanced':
                 raise NotImplementedError ("CIL cannot use TIGRE to process parallel geometries with tilted axes")
@@ -115,44 +78,51 @@ class TIGREGeometry(Geometry):
             lenx = (ig.voxel_num_x * ig.voxel_size_x)
             leny = (ig.voxel_num_y * ig.voxel_size_y)
 
+            #to avoid clipping the ray the detector must be outside the reconstruction volume
             self.DSO = max(lenx,leny)
             self.DSD = self.DSO*2
 
-            if ag_in.dimension == '2D':
-    
-                self.is2D = True
+        if ag_in.dimension == '2D':
+            self.is2D = True
 
-                #fix IG to single slice in z
-                self.nVoxel[0]=1
-                self.dVoxel[0]= ag_in.config.panel.pixel_size[1]
+            #fix IG to single slice in z
+            self.nVoxel[0]=1
+            self.dVoxel[0]= ag_in.config.panel.pixel_size[1] / ag_in.magnification
 
-                # Offsets Tigre (Z, Y, X) == CIL (X, -Y)
-                self.offOrigin = np.array( [0, system.rotation_axis.position[0], 0])
-                self.offDetector = np.array( [0, system.detector.position[0], 0 ]) 
-                
-                #convert roll, pitch, yaw
-                U = [0, system.detector.direction_x[0], -system.detector.direction_x[1]]
-                roll = 0
-                pitch = 0
-                yaw = np.arctan2(-U[2],U[1])
+            # Offsets Tigre (Z, Y, X) == CIL (X, -Y)
+            self.offOrigin = np.array( [0, system.rotation_axis.position[0], -system.rotation_axis.position[1]])
 
+            if ag_in.geom_type == 'cone':  
+                self.offDetector = np.array( [0, system.detector.position[0]-system.source.position[0], 0 ])
             else:
-                self.is2D = False
+                self.offDetector = np.array( [0, system.detector.position[0], 0 ]) 
 
-                # Offsets Tigre (Z, Y, X) == CIL (Z, X, -Y)        
-                ind = np.asarray([2, 0, 1])
-                flip = np.asarray([1, 1, -1])
+            #convert roll, pitch, yaw
+            U = [0, system.detector.direction_x[0], -system.detector.direction_x[1]]
+            roll = 0
+            pitch = 0
+            yaw = np.arctan2(-U[2],U[1])
 
-                self.offOrigin = np.array( system.rotation_axis.position[ind] * flip )
+        else:
+            self.is2D = False
+            # Offsets Tigre (Z, Y, X) == CIL (Z, X, -Y)        
+            ind = np.asarray([2, 0, 1])
+            flip = np.asarray([1, 1, -1])
+
+            self.offOrigin = np.array( system.rotation_axis.position[ind] * flip )
+
+            if ag_in.geom_type == 'cone':  
+                self.offDetector = np.array( [system.detector.position[2]-system.source.position[2], system.detector.position[0]-system.source.position[0], 0])
+            else:
                 self.offDetector = np.array( [system.detector.position[2], system.detector.position[0], 0])
-                
-                #convert roll, pitch, yaw
-                U = system.detector.direction_x[ind] * flip
-                V = system.detector.direction_y[ind] * flip
 
-                roll = np.arctan2(-V[1], V[0])
-                pitch = np.arcsin(V[2])
-                yaw = np.arctan2(-U[2],U[1])
+            #convert roll, pitch, yaw
+            U = system.detector.direction_x[ind] * flip
+            V = system.detector.direction_y[ind] * flip
+
+            roll = np.arctan2(-V[1], V[0])
+            pitch = np.arcsin(V[2])
+            yaw = np.arctan2(-U[2],U[1])
 
         self.theta = yaw
         panel_origin = ag_in.config.panel.origin

@@ -35,12 +35,16 @@ class CIL2TIGREGeometry(object):
         if ag.config.angles.angle_unit == AcquisitionGeometry.DEGREE:
             angles *= (np.pi/180.) 
 
-        angles *= -1 #negate rotation
-        angles -= np.pi/2 #rotate imagegeometry 90deg
-        angles -= tg.theta #compensate for image geometry definitions
+        #convert CIL to TIGRE angles s
+        angles = -(angles + np.pi/2 +tg.theta )
 
-        #angles in range 0->2pi
-        angles = np.mod(angles, 2*np.pi)
+        #angles in range -pi->pi
+        for i, a in enumerate(angles):
+            while a < -np.pi:
+                a += 2 * np.pi
+            while a >= np.pi:
+                a -= 2 * np.pi
+            angles[i] = a
 
         return tg, angles
 

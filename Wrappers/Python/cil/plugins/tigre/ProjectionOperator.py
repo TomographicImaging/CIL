@@ -42,9 +42,9 @@ class ProjectionOperator(LinearOperator):
         :type image_geometry: ImageGeometry
         :param aquisition_geometry: A description of the AcquisitionGeometry of your data
         :type aquisition_geometry: AcquisitionGeometry
-        :param direct_method: The method used by the foward projector, 'Siddon' for ray-voxel intersection, 'interpolated' for interpolated projection
+        :param direct_method: The method used by the forward projector, 'Siddon' for ray-voxel intersection, 'interpolated' for interpolated projection
         :type direct_method: str, default 'interpolated'
-        :param adjoint_method: The weighting method used by the cone-beam backward projector, 'matched' for weights to approximatly match the interpolated foward projector, 'FDK' for FDK weights, default 'matched'
+        :param adjoint_method: The weighting method used by the cone-beam backward projector, 'matched' for weights to approximatly match the interpolated forward projector, 'FDK' for FDK weights, default 'matched'
         :type adjoint_method: str    
         '''
 
@@ -61,7 +61,7 @@ class ProjectionOperator(LinearOperator):
         #TIGRE bug workaround, when voxelgrid and panel are aligned ray tracing fails
         if direct_method=='Siddon' and aquisition_geometry.geom_type == AcquisitionGeometry.PARALLEL:
             for i, angle in enumerate(self.tigre_angles):
-                if angle % (np.pi/2.0) < 1e-4:
+                if abs(angle/np.pi) % 0.5 < 1e-4:
                     self.tigre_angles[i] += 1e-5
 
 

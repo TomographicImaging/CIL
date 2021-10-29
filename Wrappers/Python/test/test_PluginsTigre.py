@@ -59,7 +59,7 @@ class Test_convert_geometry(unittest.TestCase):
         ig.voxel_num_y = 50
         ig.voxel_size_y /= 2
 
-        angles_rad = np.array([-np.pi/2, -np.pi, -3 *np.pi/2])
+        angles_rad = np.array([-np.pi/2, np.pi, np.pi/2])
 
         #2D cone
         tg_geometry, tg_angles = CIL2TIGREGeometry.getTIGREGeometry(ig, ag)
@@ -91,7 +91,7 @@ class Test_convert_geometry(unittest.TestCase):
         ig.voxel_num_y = 50
         ig.voxel_size_y /= 2
 
-        angles_rad = np.array([-np.pi/2, -np.pi, -3 *np.pi/2])
+        angles_rad = np.array([-np.pi/2, np.pi, np.pi/2])
 
         tg_geometry, tg_angles = CIL2TIGREGeometry.getTIGREGeometry(ig, ag)
 
@@ -140,10 +140,9 @@ class Test_convert_geometry(unittest.TestCase):
         s2d = ag.dist_center_detector + ag.dist_source_center - 6 * 3 /5   
         np.testing.assert_allclose(tg_geometry.DSD, s2d)
 
-        angles_rad = np.array([-np.pi/2, -np.pi, -3 *np.pi/2]) - yaw
+        angles_rad = np.array([-np.pi/2, np.pi, np.pi/2]) - yaw
 
-
-        np.testing.assert_allclose(tg_angles, angles_rad)
+        np.testing.assert_allclose(tg_angles, angles_rad,atol=1e-6)
         self.assertTrue(tg_geometry.mode=='cone')
         np.testing.assert_allclose(tg_geometry.dDetector, ag.config.panel.pixel_size[::-1])
         np.testing.assert_allclose(tg_geometry.nDetector, ag.config.panel.num_pixels[::-1])
@@ -183,7 +182,8 @@ class Test_convert_geometry(unittest.TestCase):
         det_offset = np.array([-s2d,0,0])
         np.testing.assert_allclose(tg_geometry.offDetector,det_offset)
         
-        angles_rad = np.array([-np.pi/2, -np.pi, -3 *np.pi/2])
+        angles_rad = np.array([-np.pi/2, np.pi, np.pi/2])
+
 
         np.testing.assert_allclose(tg_angles, angles_rad)
         self.assertTrue(tg_geometry.mode=='cone')
@@ -208,7 +208,8 @@ class Test_convert_geometry(unittest.TestCase):
         ig.voxel_num_y = 50
         ig.voxel_size_y /= 2
 
-        angles_rad = np.array([-np.pi/2, -np.pi, -3 *np.pi/2])
+        angles_rad = np.array([-np.pi/2, np.pi, np.pi/2])
+
         
         tg_geometry, tg_angles = CIL2TIGREGeometry.getTIGREGeometry(ig, ag)
 
@@ -235,7 +236,7 @@ class Test_convert_geometry(unittest.TestCase):
         ig.voxel_num_y = 50
         ig.voxel_size_y /= 2
 
-        angles_rad = np.array([-np.pi/2, -np.pi, -3 *np.pi/2])
+        angles_rad = np.array([-np.pi/2, np.pi, np.pi/2])
 
         tg_geometry, tg_angles = CIL2TIGREGeometry.getTIGREGeometry(ig, ag)
 
@@ -272,7 +273,7 @@ class Test_convert_geometry(unittest.TestCase):
         det_offset = np.array([0,-1,0])
         np.testing.assert_allclose(tg_geometry.offDetector,det_offset)
 
-        angles_rad = np.array([-np.pi/2, -np.pi, -3 *np.pi/2])
+        angles_rad = np.array([-np.pi/2, np.pi, np.pi/2])
         np.testing.assert_allclose(tg_angles, angles_rad)
         self.assertTrue(tg_geometry.mode=='parallel')
         np.testing.assert_allclose(tg_geometry.dDetector, ag.config.panel.pixel_size[::-1])
@@ -462,7 +463,7 @@ class Test_results_parallel3D(TestCommon,unittest.TestCase):
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_norm(self):
 
-        self.compare_norm('Siddon',764.6795)
+        self.compare_norm('Siddon',766.6497)
         self.compare_norm('interpolated',766.6383)
 
 
@@ -569,6 +570,6 @@ class Test_results_parallel2D(TestCommon,unittest.TestCase):
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_norm(self):
 
-        self.compare_norm('Siddon',764.6795)
+        self.compare_norm('Siddon',766.6485)
         self.compare_norm('interpolated',766.6383)
 

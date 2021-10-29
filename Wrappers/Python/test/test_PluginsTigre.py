@@ -305,7 +305,7 @@ class Test_convert_geometry(unittest.TestCase):
 
 class TestCommon(object):
 
-    def compare_foward(self, direct_method, atol):
+    def compare_forward(self, direct_method, atol):
 
         Op = ProjectionOperator(self.ig, self.ag, direct_method=direct_method)
         fp = Op.direct(self.img_data)
@@ -396,15 +396,15 @@ class Test_results_cone3D(TestCommon,unittest.TestCase):
 
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
-    def test_foward_siddon(self):
+    def test_forward_siddon(self):
 
-        self.compare_foward('Siddon',0.35)
+        self.compare_forward('Siddon',0.35)
 
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
-    def test_foward_interpolated(self):
+    def test_forward_interpolated(self):
     
-        self.compare_foward('interpolated',0.16)  
+        self.compare_forward('interpolated',0.16)  
 
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
@@ -447,15 +447,15 @@ class Test_results_parallel3D(TestCommon,unittest.TestCase):
 
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
-    def test_foward_siddon(self):
+    def test_forward_siddon(self):
 
-        self.compare_foward('Siddon',0.24)
+        self.compare_forward('Siddon',0.24)
 
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
-    def test_foward_interpolated(self):
+    def test_forward_interpolated(self):
     
-        self.compare_foward('interpolated',0.12)  
+        self.compare_forward('interpolated',0.12)  
 
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
@@ -500,15 +500,15 @@ class Test_results_cone2D(TestCommon,unittest.TestCase):
 
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
-    def test_foward_siddon(self):
+    def test_forward_siddon(self):
 
-        self.compare_foward('Siddon',0.19)
+        self.compare_forward('Siddon',0.19)
 
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
-    def test_foward_interpolated(self):
+    def test_forward_interpolated(self):
     
-        self.compare_foward('interpolated',0.085)  
+        self.compare_forward('interpolated',0.085)  
 
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
@@ -552,15 +552,15 @@ class Test_results_parallel2D(TestCommon,unittest.TestCase):
 
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
-    def test_foward_siddon(self):
+    def test_forward_siddon(self):
 
-        self.compare_foward('Siddon',0.15)
+        self.compare_forward('Siddon',0.15)
 
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
-    def test_foward_interpolated(self):
+    def test_forward_interpolated(self):
     
-        self.compare_foward('interpolated',0.085)  
+        self.compare_forward('interpolated',0.085)  
 
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")

@@ -33,7 +33,7 @@ class FBP(DataProcessor):
     It is able to back-project circular trajectories with 2 PI anglar range and equally spaced anglular steps.
 
     This uses the ram-lak filter
-    This is provided for simple parallel-beam geometries only (offsets and rotations will be ignored)
+    This is provided for simple and offset parallel-beam geometries only
    
     Input: Volume Geometry
            Sinogram Geometry

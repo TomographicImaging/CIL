@@ -39,6 +39,9 @@ class CIL2TIGREGeometry(object):
         angles -= np.pi/2 #rotate imagegeometry 90deg
         angles -= tg.theta #compensate for image geometry definitions
 
+        #angles in range 0->2pi
+        angles = np.mod(angles, 2*np.pi)
+
         return tg, angles
 
 class TIGREGeometry(Geometry):

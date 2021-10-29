@@ -284,8 +284,7 @@ class Test_convert_geometry(unittest.TestCase):
         np.testing.assert_allclose(tg_geometry.dVoxel, [0.2,0.05,0.1])
 
 
-class TestCommon(unittest.TestCase):
-
+class TestCommon(object):
 
     def compare_foward(self, direct_method, atol):
 
@@ -410,9 +409,9 @@ class Test_results_cone3D(TestCommon,unittest.TestCase):
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_norm(self):
 
-        self.compare_norm('Siddon',3066.5686)
+        self.compare_norm('Siddon',766.4447)
 
-        self.compare_norm('interpolated',3066.4844)
+        self.compare_norm('interpolated',766.4248)
 
 class Test_results_parallel3D(TestCommon,unittest.TestCase):
     
@@ -429,10 +428,9 @@ class Test_results_parallel3D(TestCommon,unittest.TestCase):
 
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
-    def skip_test_foward_siddon(self):
+    def test_foward_siddon(self):
 
-        #Siddon for parallel broken in tigre implementation for aligned voxel grids
-        self.compare_foward('Siddon',0.35)
+        self.compare_foward('Siddon',0.24)
 
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
@@ -516,9 +514,9 @@ class Test_results_cone2D(TestCommon,unittest.TestCase):
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_norm(self):
 
-        self.compare_norm('Siddon',3069.6503)
+        self.compare_norm('Siddon',767.3118)
 
-        self.compare_norm('interpolated',3069.6025)
+        self.compare_norm('interpolated',767.2998)
 
 
 class Test_results_parallel2D(TestCommon,unittest.TestCase):
@@ -536,10 +534,9 @@ class Test_results_parallel2D(TestCommon,unittest.TestCase):
 
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
-    def skip_test_foward_siddon(self):
+    def test_foward_siddon(self):
 
-        #Siddon for parallel broken in tigre implementation for aligned voxel grids
-        self.compare_foward('Siddon',0.35)
+        self.compare_foward('Siddon',0.15)
 
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
@@ -550,6 +547,7 @@ class Test_results_parallel2D(TestCommon,unittest.TestCase):
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_backward(self):
+
         self.compare_backward()
 
 

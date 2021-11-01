@@ -30,7 +30,7 @@ except ModuleNotFoundError:
 class ProjectionOperator(LinearOperator):
     '''TIGRE Projection Operator'''
 
-    def __init__(self, image_geometry, aquisition_geometry, direct_method='interpolated',adjoint_method='matched'):
+    def __init__(self, image_geometry, aquisition_geometry, direct_method='interpolated',adjoint_weights='matched'):
         '''
         This class creates a configured TIGRE ProjectionOperator
         
@@ -44,8 +44,8 @@ class ProjectionOperator(LinearOperator):
         :type aquisition_geometry: AcquisitionGeometry
         :param direct_method: The method used by the forward projector, 'Siddon' for ray-voxel intersection, 'interpolated' for interpolated projection
         :type direct_method: str, default 'interpolated'
-        :param adjoint_method: The weighting method used by the cone-beam backward projector, 'matched' for weights to approximatly match the interpolated forward projector, 'FDK' for FDK weights, default 'matched'
-        :type adjoint_method: str    
+        :param adjoint_weights: The weighting method used by the cone-beam backward projector, 'matched' for weights to approximatly match the 'interpolated' forward projector, 'FDK' for FDK weights, default 'matched'
+        :type adjoint_weights: str    
         '''
 
         DataOrder.check_order_for_engine('tigre', image_geometry)
@@ -56,7 +56,13 @@ class ProjectionOperator(LinearOperator):
              
         self.tigre_geom, self.tigre_angles= CIL2TIGREGeometry.getTIGREGeometry(image_geometry,aquisition_geometry)
 
-        self.method = {'direct':direct_method,'adjoint':adjoint_method}
+        if direct_method not in ['interpolated','Siddon']:
+            raise ValueError("direct_method expected 'interpolated' or 'Siddon' got {}".format(direct_method))
+
+        if adjoint_weights not in ['matched','FDK']:
+            raise ValueError("adjoint_weights expected 'matched' or 'FDK' got {}".format(adjoint_weights))
+
+        self.method = {'direct':direct_method,'adjoint':adjoint_weights}
 
         #TIGRE bug workaround, when voxelgrid and panel are aligned ray tracing fails
         if direct_method=='Siddon' and aquisition_geometry.geom_type == AcquisitionGeometry.PARALLEL:
@@ -84,6 +90,7 @@ class ProjectionOperator(LinearOperator):
             out.fill(arr_out)
 
     def adjoint(self, x, out=None):
+        #note Atb.Atb optional parameter name and default changed betwen 2.1 and 2.2
 
         data = x.as_array()
         if x.dimension_labels[0] != AcquisitionGeometry.ANGLE:
@@ -91,10 +98,10 @@ class ProjectionOperator(LinearOperator):
 
         if self.tigre_geom.is2D:
             data = np.expand_dims(data,axis=1)
-            arr_out = Atb.Atb(data, self.tigre_geom, self.tigre_angles, krylov=self.method['adjoint'])
+            arr_out = Atb.Atb(data, self.tigre_geom, self.tigre_angles, self.method['adjoint'])
             arr_out = np.squeeze(arr_out, axis=0)
         else:
-            arr_out = Atb.Atb(data, self.tigre_geom, self.tigre_angles, krylov=self.method['adjoint'])
+            arr_out = Atb.Atb(data, self.tigre_geom, self.tigre_angles, self.method['adjoint'])
 
         if out is None:
             out = ImageData(arr_out, deep_copy=False, geometry=self._domain_geometry.copy(), suppress_warning=True)

@@ -136,9 +136,9 @@ class TotalVariation(Function):
         self._domain = x.geometry
         # evaluate objective function of TV gradient
         if self.isotropic:
-            return self.regularisation_parameter * self.gradient.direct(x).pnorm(2)
+            return self.regularisation_parameter * self.gradient.direct(x).pnorm(2).sum()
         else:
-            return self.regularisation_parameter * self.gradient.direct(x).pnorm(1)   
+            return self.regularisation_parameter * self.gradient.direct(x).pnorm(1).sum()  
     
     
     def projection_C(self, x, out=None):   

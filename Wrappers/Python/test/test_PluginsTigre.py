@@ -317,6 +317,7 @@ class TestCommon(object):
         Op.direct(self.img_data,out=fp2)
         np.testing.assert_array_equal(fp.as_array(), fp2.as_array())    
 
+    @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_backward(self):
         
         #this checks mechanics but not value
@@ -342,7 +343,7 @@ class TestCommon(object):
         diff = (bp3 - bp).abs().mean()
         self.assertGreater(diff,1000)
 
-
+    @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_backward_results(self):
 
         #create checker-board projection

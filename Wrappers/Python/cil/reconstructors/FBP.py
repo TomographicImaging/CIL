@@ -278,7 +278,7 @@ class FBP(Reconstructor):
 
         self.__pre_filtering(proj_filtered)
             
-        operator = ProjectionOperator(self.image_geometry,self.input.geometry,adjoint_method='FDK')
+        operator = ProjectionOperator(self.image_geometry,self.input.geometry,adjoint_weights='FDK')
         
         if out is None:
             return operator.adjoint(proj_filtered)

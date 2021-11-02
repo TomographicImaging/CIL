@@ -51,7 +51,7 @@ if has_ipp:
                                     ctypes.c_long, #num_proj
                                     ctypes.c_long] #pix_x
 
-class FBP(Reconstructor):
+class FBP_base(Reconstructor):
 
     @property
     def filter(self):
@@ -79,16 +79,7 @@ class FBP(Reconstructor):
 
     def __init__ (self,input):
         """
-        Creates an FBP/FDK reconstructor based on your acquisition data with a 'ram-lak' filter.
-
-        The reconstructor can be customised using:
-        self.set_input()
-        self.set_image_geometry()
-        self.set_backend()
-        self.set_filter()
-        self.get_filter_array()
-        self.set_fft_order()
-        self.set_filter_inplace()
+        The initialiser for abstract base class::FBP_base
 
         :param input: The input data to reconstruct. The reconstructor is set-up based on the geometry of the data. 
         :type input: AcquisitionData
@@ -97,19 +88,17 @@ class FBP(Reconstructor):
             raise ImportError("IPP libraries not found. Cannot use CIL FBP")
 
         #call parent initialiser
-        super(FBP, self).__init__(input)
+        super(FBP_base, self).__init__(input)
         
         #additional check
         if 'channel' in input.dimension_labels:
             raise ValueError("Input data cannot be multi-channel")
 
-        if  input.geometry.geom_type == AcquisitionGeometry.PARALLEL:
-            raise NotImplementedError("Currently not implemented for parallel beam data")
-
         #define defaults
         self.__filter = 'ram-lak' 
         self.__fft_order =self.__min_fft_order()
         self.__filter_inplace = False
+
 
     def set_filter_inplace(self, inplace):
         """
@@ -123,7 +112,8 @@ class FBP(Reconstructor):
             self.__filter_inplace= inplace
         else:
             raise TypeError("set_filter_inplace expected a boolian. Got {}".format(type(inplace)))
-        
+
+
     def __min_fft_order(self):
         min_order = 0
         while 2**min_order < self.input.geometry.pixel_num_h * 2:
@@ -131,6 +121,7 @@ class FBP(Reconstructor):
 
         min_order = max(8, min_order)
         return min_order
+
 
     def set_fft_order(self, order):
         """
@@ -158,6 +149,7 @@ class FBP(Reconstructor):
         
         self.__fft_order =fft_order
 
+
     def set_filter(self, filter):
         """
         Set the filter used by the reconstruction. This is set to 'ram-lak' by default.
@@ -184,7 +176,8 @@ class FBP(Reconstructor):
                 raise ValueError("Custom filter not compatible with input.")
         else:
             raise ValueError("Filter not recognised")
-            
+
+
     def get_filter_array(self):
         """
         Returns the filter in used in the frequency domain. The array can be modified and passed back using set_filter()
@@ -207,24 +200,12 @@ class FBP(Reconstructor):
             filter = self.__filter_array
         return filter
 
-    def __calculate_weights_fdk(self):
-        """
-        Calculates the pre-weighting used for FDK reconstruction.
 
-        :return: A single image containing the weights perpixel
-        :rtype: numpy.ndarray        
-        """
-        ag = self.input.geometry
-        xv = np.arange(-(ag.pixel_num_h -1)/2,(ag.pixel_num_h -1)/2 + 1,dtype=np.float32) * ag.pixel_size_h
-        yv = np.arange(-(ag.pixel_num_v -1)/2,(ag.pixel_num_v -1)/2 + 1,dtype=np.float32) * ag.pixel_size_v
-        (yy, xx) = np.meshgrid(xv, yv)
+    def calculate_weights(self):
+        return NotImplementedError
 
-        principal_ray_length = ag.dist_source_center + ag.dist_center_detector
-        scaling =  ag.magnification * (2 * np.pi/ ag.num_projections) / ( 4 * ag.pixel_size_h ) 
-        weights = scaling * principal_ray_length / np.sqrt((principal_ray_length ** 2 + xx ** 2 + yy ** 2))
-        return weights
 
-    def __pre_filtering(self,acquistion_data):
+    def pre_filtering(self,acquistion_data):
         """
         Filters and weights the projections inplace. The filtering
         can be configured by setting the properties:
@@ -239,10 +220,7 @@ class FBP(Reconstructor):
 
         filter=self.get_filter_array()
 
-        if AcquisitionGeometry.CONE:
-            weights = self.__calculate_weights_fdk()
-        else:
-            weights = self.__calculate_weights_fbp()
+        weights = self.calculate_weights()
 
         #call ext function
         data_ptr = nda.ctypes.data_as(c_float_p)
@@ -261,6 +239,54 @@ class FBP(Reconstructor):
 
         acquistion_data.fill(nda)
 
+
+    def run(self, out=None):
+        NotImplementedError
+
+
+class FDK(FBP_base):
+
+    def __init__ (self,input):
+        """
+        Creates an FDK reconstructor based on your acquisition data with a 'ram-lak' filter.
+
+        The reconstructor can be customised using:
+        self.set_input()
+        self.set_image_geometry()
+        self.set_backend()
+        self.set_filter()
+        self.get_filter_array()
+        self.set_fft_order()
+        self.set_filter_inplace()
+
+        :param input: The input data to reconstruct. The reconstructor is set-up based on the geometry of the data. 
+        :type input: AcquisitionData
+        """
+        #call parent initialiser
+        super(FDK, self).__init__(input)
+
+        if  input.geometry.geom_type != AcquisitionGeometry.CONE:
+            raise TypeError("This reconstructor is for cone-beam data only.")
+
+        
+    def calculate_weights(self):
+        """
+        Calculates the pre-weighting used for FDK reconstruction.
+
+        :return: A single image containing the weights perpixel
+        :rtype: numpy.ndarray        
+        """
+        ag = self.input.geometry
+        xv = np.arange(-(ag.pixel_num_h -1)/2,(ag.pixel_num_h -1)/2 + 1,dtype=np.float32) * ag.pixel_size_h
+        yv = np.arange(-(ag.pixel_num_v -1)/2,(ag.pixel_num_v -1)/2 + 1,dtype=np.float32) * ag.pixel_size_v
+        (yy, xx) = np.meshgrid(xv, yv)
+
+        principal_ray_length = ag.dist_source_center + ag.dist_center_detector
+        scaling =  ag.magnification * (2 * np.pi/ ag.num_projections) / ( 4 * ag.pixel_size_h ) 
+        weights = scaling * principal_ray_length / np.sqrt((principal_ray_length ** 2 + xx ** 2 + yy ** 2))
+        return weights
+
+
     def run(self, out=None):
         """
         Run the configured FBP/FDK reconstruction.
@@ -276,9 +302,74 @@ class FBP(Reconstructor):
         else:
             proj_filtered = self.input
 
-        self.__pre_filtering(proj_filtered)
+        self.pre_filtering(proj_filtered)
             
         operator = ProjectionOperator(self.image_geometry,self.input.geometry,adjoint_weights='FDK')
+        
+        if out is None:
+            return operator.adjoint(proj_filtered)
+        else:
+            operator.adjoint(proj_filtered, out = out)
+
+
+class FBP(FBP_base):
+
+    def __init__ (self,input):
+        """
+        Creates an FBP reconstructor based on your acquisition data with a 'ram-lak' filter.
+
+        The reconstructor can be customised using:
+        self.set_input()
+        self.set_image_geometry()
+        self.set_backend()
+        self.set_filter()
+        self.get_filter_array()
+        self.set_fft_order()
+        self.set_filter_inplace()
+
+        :param input: The input data to reconstruct. The reconstructor is set-up based on the geometry of the data. 
+        :type input: AcquisitionData
+        """
+
+        #call parent initialiser
+        super(FBP, self).__init__(input)
+
+        if  input.geometry.geom_type != AcquisitionGeometry.PARALLEL:
+            raise TypeError("This reconstructor is for parallel-beam data only.")
+
+        
+    def calculate_weights(self):
+        """
+        Calculates the pre-weighting used for FDK reconstruction.
+
+        :return: A single image containing the weights perpixel
+        :rtype: numpy.ndarray        
+        """
+        ag = self.input.geometry
+        weight = (2 * np.pi/ ag.num_projections) / ( 4 * ag.pixel_size_h ) 
+ 
+        weights = np.full((ag.pixel_num_v,ag.pixel_num_h),weight,dtype=np.float32)
+        return weights
+
+
+    def run(self, out=None):
+        """
+        Run the configured FBP/FDK reconstruction.
+
+        :param out: Fills the referenced array with the FBP/FDK reconstruction of the acquisition data
+        :type out: ImageData
+        :return: returns the FBP/FDK reconstruction of the AcquisitionData
+        :rtype: ImageData
+        """
+
+        if self.filter_inplace is False:
+            proj_filtered = self.input.copy()
+        else:
+            proj_filtered = self.input
+
+        self.pre_filtering(proj_filtered)
+            
+        operator = ProjectionOperator(self.image_geometry,self.input.geometry)
         
         if out is None:
             return operator.adjoint(proj_filtered)

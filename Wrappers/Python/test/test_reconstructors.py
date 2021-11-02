@@ -15,10 +15,11 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+from cil import reconstructors
 from cil.framework import AcquisitionGeometry
 from cil.reconstructors import Reconstructor
-from cil.reconstructors import FBP
-from cil.utilities.dataexample import SIMULATED_CONE_BEAM_DATA, SIMULATED_SPHERE_VOLUME
+from cil.reconstructors import FDK, FBP
+from cil.utilities.dataexample import SIMULATED_PARALLEL_BEAM_DATA, SIMULATED_CONE_BEAM_DATA, SIMULATED_SPHERE_VOLUME
 
 import unittest
 from scipy.fftpack  import fft, ifft
@@ -113,7 +114,7 @@ class Test_Reconstructor(unittest.TestCase):
         with self.assertRaises(ValueError):
             reconstructor = Reconstructor(self.ad3D)
 
-class Test_FBP(unittest.TestCase):
+class Test_FBP_base(unittest.TestCase):
 
     def setUp(self):
         #%% Setup Geometry
@@ -149,13 +150,13 @@ class Test_FBP(unittest.TestCase):
         
     @unittest.skipUnless(has_ipp, "IPP not installed")
     def test_defaults(self):
-        fbp = FBP(self.ad3D)
+        reconstructor = FDK(self.ad3D)
 
-        self.assertEqual(fbp.filter, 'ram-lak')
-        self.assertEqual(fbp.fft_order, 9)
-        self.assertFalse(fbp.filter_inplace)
+        self.assertEqual(reconstructor.filter, 'ram-lak')
+        self.assertEqual(reconstructor.fft_order, 9)
+        self.assertFalse(reconstructor.filter_inplace)
 
-        filter = fbp.get_filter_array()
+        filter = reconstructor.get_filter_array()
         self.assertEqual(type(filter), np.ndarray)
         self.assertEqual(len(filter), 2**9)
         self.assertEqual(filter[0], 0)
@@ -163,39 +164,39 @@ class Test_FBP(unittest.TestCase):
         self.assertEqual(filter[1],filter[511])
 
     def test_set_filter(self):
-        fbp = FBP(self.ad3D)
+        reconstructor = FDK(self.ad3D)
 
         with self.assertRaises(ValueError):
-            fbp.set_filter("gemma")
+            reconstructor.set_filter("gemma")
 
-        filter = fbp.get_filter_array()
+        filter = reconstructor.get_filter_array()
         filter_new =filter *0.5
-        fbp.set_filter(filter_new)
-        self.assertEqual(fbp.filter, 'custom')
-        filter = fbp.get_filter_array()
+        reconstructor.set_filter(filter_new)
+        self.assertEqual(reconstructor.filter, 'custom')
+        filter = reconstructor.get_filter_array()
         np.testing.assert_array_equal(filter,filter_new)
 
-        fbp.set_fft_order(10)
-        self.assertEqual(fbp.filter, 'ram-lak')
+        reconstructor.set_fft_order(10)
+        self.assertEqual(reconstructor.filter, 'ram-lak')
 
         with self.assertRaises(ValueError):
-            fbp.set_filter(filter[1:-1])
+            reconstructor.set_filter(filter[1:-1])
 
     def test_set_fft_order(self):
-        fbp = FBP(self.ad3D)
-        fbp.set_fft_order(10)
-        self.assertEqual(fbp.fft_order, 10)
+        reconstructor = FDK(self.ad3D)
+        reconstructor.set_fft_order(10)
+        self.assertEqual(reconstructor.fft_order, 10)
 
         with self.assertRaises(ValueError):
-            fbp.set_fft_order(2)
+            reconstructor.set_fft_order(2)
 
     def test_set_filter_inplace(self):
-        fbp = FBP(self.ad3D)
-        fbp.set_filter_inplace(True)
-        self.assertTrue(fbp.filter_inplace)
+        reconstructor = FDK(self.ad3D)
+        reconstructor.set_filter_inplace(True)
+        self.assertTrue(reconstructor.filter_inplace)
 
         with self.assertRaises(TypeError):
-            fbp.set_filter_inplace('gemma')
+            reconstructor.set_filter_inplace('gemma')
 
     @unittest.skipUnless(has_ipp, "IPP not installed")
     def test_filtering(self):
@@ -205,13 +206,13 @@ class Test_FBP(unittest.TestCase):
 
         ad = ag.allocate('random',seed=0)
 
-        fbp = FBP(ad)
+        reconstructor = FDK(ad)
         out1 = ad.copy()
-        fbp.pre_filtering(out1)
+        reconstructor.pre_filtering(out1)
 
         #by hand
-        filter = fbp.get_filter_array()
-        weights = fbp.calculate_weights()
+        filter = reconstructor.get_filter_array()
+        weights = reconstructor.calculate_weights()
         pad0 = (len(filter)-ag.pixel_num_h)//2
         pad1 = len(filter)-ag.pixel_num_h-pad0
 
@@ -234,8 +235,8 @@ class Test_FBP(unittest.TestCase):
             .set_angles([0,90])
         ad = ag.allocate(0)
 
-        fbp = FBP(ad)
-        weights = fbp.calculate_weights()
+        reconstructor = FDK(ad)
+        weights = reconstructor.calculate_weights()
 
         scaling =  7.5 * np.pi
         weights_new = np.ones_like(weights)
@@ -254,7 +255,7 @@ class Test_FBP(unittest.TestCase):
         diff = np.max(np.abs(weights - weights_new))
         self.assertLess(diff, 1e-5)
   
-class Test_FBP_results(unittest.TestCase):
+class Test_FDK_results(unittest.TestCase):
     
     def setUp(self):
 
@@ -271,14 +272,14 @@ class Test_FBP_results(unittest.TestCase):
     @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
     def test_results_3D(self):
 
-        fbp = FBP(self.acq_data)
+        reconstructor = FDK(self.acq_data)
 
-        reco = fbp.run()
+        reco = reconstructor.run()
         np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=1e-3)    
 
         reco2 = reco.copy()
         reco2.fill(0)
-        fbp.run(out=reco2)
+        reconstructor.run(out=reco2)
         np.testing.assert_array_equal(reco.as_array(), reco2.as_array())  
 
 
@@ -288,13 +289,13 @@ class Test_FBP_results(unittest.TestCase):
         data2D = self.acq_data.get_slice(vertical='centre')
         img_data2D = self.img_data.get_slice(vertical='centre')
 
-        fbp = FBP(data2D)
-        reco = fbp.run()
+        reconstructor = FDK(data2D)
+        reco = reconstructor.run()
         np.testing.assert_allclose(reco.as_array(), img_data2D.as_array(),atol=1e-3)    
 
         reco2 = reco.copy()
         reco2.fill(0)
-        fbp.run(out=reco2)
+        reconstructor.run(out=reco2)
         np.testing.assert_array_equal(reco.as_array(), reco2.as_array()) 
 
 
@@ -305,29 +306,108 @@ class Test_FBP_results(unittest.TestCase):
         reco_tigre = fbp_tigre(self.acq_data)
     
         #fbp CIL with TIGRE's filter
-        fbp_cil = FBP(self.acq_data)
-        n = 2**fbp_cil.fft_order
+        reconstructor_cil = FDK(self.acq_data)
+        n = 2**reconstructor_cil.fft_order
         ramp = ramp_flat(n)
         filt = filter('ram_lak',ramp[0],n,1,False)
 
-        fbp_cil = FBP(self.acq_data)
-        fbp_cil.set_filter(filt)
-        reco_cil = fbp_cil.run()
+        reconstructor_cil = FDK(self.acq_data)
+        reconstructor_cil.set_filter(filt)
+        reco_cil = reconstructor_cil.run()
 
         #with the same filter results should be virtually identical
-        np.testing.assert_array_equal(reco_cil.as_array(), reco_tigre.as_array(),atol=1e-8) 
+        np.testing.assert_allclose(reco_cil.as_array(), reco_tigre.as_array(),atol=1e-8) 
 
 
     @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
     def test_results_inplace_filtering(self):
 
-        fbp_cil_2D = FBP(self.acq_data)
-        reco_cil_2D = fbp_cil_2D.run()
+        reconstructor = FDK(self.acq_data)
+        reco = reconstructor.run()
 
         data_filtered= self.acq_data.copy()
-        fbp_cil_filter_inplace = FBP(data_filtered)
-        fbp_cil_filter_inplace.set_filter_inplace(True)
-        fbp_cil_filter_inplace.run(out=reco_cil_2D)
+        reconstructor_inplace = FDK(data_filtered)
+        reconstructor_inplace.set_filter_inplace(True)
+        reconstructor_inplace.run(out=reco)
+
+        diff = (data_filtered - self.acq_data).abs().mean()
+        self.assertGreater(diff,0.8)
+
+          
+class Test_FBP_results(unittest.TestCase):
+    
+    def setUp(self):
+
+        self.acq_data = SIMULATED_PARALLEL_BEAM_DATA.get()
+        self.img_data = SIMULATED_SPHERE_VOLUME.get()
+
+        self.acq_data=np.log(self.acq_data)
+        self.acq_data*=-1.0
+
+        self.ig = self.img_data.geometry
+        self.ag = self.acq_data.geometry
+
+
+    @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
+    def test_results_3D(self):
+
+        reconstructor = FBP(self.acq_data)
+
+        reco = reconstructor.run()
+        np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=1e-3)    
+
+        reco2 = reco.copy()
+        reco2.fill(0)
+        reconstructor.run(out=reco2)
+        np.testing.assert_array_equal(reco.as_array(), reco2.as_array())  
+
+
+    @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
+    def test_results_2D(self):
+
+        data2D = self.acq_data.get_slice(vertical='centre')
+        img_data2D = self.img_data.get_slice(vertical='centre')
+
+        reconstructor = FBP(data2D)
+        reco = reconstructor.run()
+        np.testing.assert_allclose(reco.as_array(), img_data2D.as_array(),atol=1e-3)    
+
+        reco2 = reco.copy()
+        reco2.fill(0)
+        reconstructor.run(out=reco2)
+        np.testing.assert_array_equal(reco.as_array(), reco2.as_array()) 
+
+
+    @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
+    def test_results_with_tigre(self):
+
+        fbp_tigre = FBP_tigre(self.ig, self.ag)
+        reco_tigre = fbp_tigre(self.acq_data)
+    
+        #fbp CIL with TIGRE's filter
+        reconstructor_cil = FBP(self.acq_data)
+        n = 2**reconstructor_cil.fft_order
+        ramp = ramp_flat(n)
+        filt = filter('ram_lak',ramp[0],n,1,False)
+
+        reconstructor_cil = FBP(self.acq_data)
+        reconstructor_cil.set_filter(filt)
+        reco_cil = reconstructor_cil.run()
+
+        #with the same filter results should be virtually identical
+        np.testing.assert_allclose(reco_cil.as_array(), reco_tigre.as_array(),atol=1e-8) 
+
+
+    @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
+    def test_results_inplace_filtering(self):
+
+        reconstructor = FBP(self.acq_data)
+        reco = reconstructor.run()
+
+        data_filtered= self.acq_data.copy()
+        reconstructor_inplace = FBP(data_filtered)
+        reconstructor_inplace.set_filter_inplace(True)
+        reconstructor_inplace.run(out=reco)
 
         diff = (data_filtered - self.acq_data).abs().mean()
         self.assertGreater(diff,0.8)

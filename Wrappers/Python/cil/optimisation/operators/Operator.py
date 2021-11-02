@@ -192,6 +192,10 @@ class LinearOperator(Operator):
         :type decimal: int, default 4
         '''
         seed = kwargs.get('seed',None)
+        if seed is not None:
+            seed2 = seed+1
+        else:
+            seed2 = None
         decimal = kwargs.get('decimal',4)
         
 
@@ -200,7 +204,7 @@ class LinearOperator(Operator):
         else:
             y = range_init
         if domain_init is None:
-            x = operator.domain_geometry().allocate('random',seed=seed+1)
+            x = operator.domain_geometry().allocate('random',seed=seed2)
         else:
             x = domain_init
             

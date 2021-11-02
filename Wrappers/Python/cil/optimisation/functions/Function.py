@@ -181,7 +181,7 @@ class Function(object):
     @gamma.setter
     def gamma(self, value):
         '''Setter for strongly convex constant for a function '''
-        if isinstance(value, (Number,)) and value >= 0:
+        if isinstance(value, (Number,)) and value > 0:
             self._gamma = value
         else:
             raise TypeError('The strongly convex constant is a real positive number') 
@@ -195,7 +195,7 @@ class Function(object):
     @gamma_conj.setter
     def gamma_conj(self, value):
         '''Setter for Strongly convex constant for the convex conjugate of a function '''
-        if isinstance(value, (Number,)) and value >= 0:
+        if isinstance(value, (Number,)) and value > 0:
             self._gamma_conj = value
         else:
             raise TypeError('The strongly convex constant is a real positive number')                                   
@@ -226,6 +226,58 @@ class SumFunction(Function):
     def L(self, value):
         # call base class setter
         super(SumFunction, self.__class__).L.fset(self, value )
+
+    @property
+    def gamma(self):
+        '''Strongly convex constant for the sum of two functions. If both are strongly convex
+        with constants a, b then the SumFunction is strongly convex with a+b.
+
+        If one is strongly convex with constant a and the other is convex then the SumFunction is strongly convex
+        with constant a.
+        
+        In the following, we assume that we always deal with convex functions.
+        '''
+
+        # TODO better to use a .convex member = False by default
+        if self.function1.gamma is not None and self.function2.gamma is not None:
+            self._gamma = self.function1.gamma + self.function2.gamma
+        elif self.function1.gamma is None and self.function2.gamma is not None:
+            self._gamma = self.function1.gamma 
+        elif self.function2.gamma is None and self.function1.gamma is not None: 
+            self._gamma = self.function1.gamma 
+        else:
+            self._gamma = None      
+        return self._gamma
+    @gamma.setter
+    def gamma(self, value):
+        # call base class setter
+        super(SumFunction, self.__class__).gamma.fset(self, value )    
+
+    @property
+    def gamma_conj(self):
+        '''Strongly convex constant for the sum of two functions. If both are strongly convex
+        with constants a, b then the SumFunction is strongly convex with a+b.
+        If one is strongly convex (a) and the other is convex then the SumFunction is strongly convex
+        with constant a.
+        
+        In the following, we assume that we always deal with convex functions.
+        '''
+
+        # TODO better to use a .convex member = False by default
+        if self.function1.gamma_conj is not None and self.function2.gamma_conj is not None:
+            self._gamma_conj = self.function1.gamma_conj + self.function2.gamma_conj
+        elif self.function1.gamma_conj is None and self.function2.gamma_conj is not None:
+            self._gamma_conj= self.function1.gamma_conj 
+        elif self.function2.gamma_conj is None and self.function1.gamma_conj is not None: 
+            self._gamma_conj = self.function1.gamma_conj 
+        else:
+            self._gamma_conj = None      
+        return self._gamma_conj
+    @gamma_conj.setter
+    def gamma_conj(self, value):
+        # call base class setter
+        super(SumFunction, self.__class__).gamma_conj.fset(self, value )              
+
 
     def __call__(self,x):
         r"""Returns the value of the sum of functions :math:`F_{1}` and :math:`F_{2}` at x

@@ -338,7 +338,7 @@ class ScaledFunction(Function):
     @L.setter
     def L(self, value):
         # call base class setter
-        super(ScaledFunction, self.__class__).L.fset(self, value )
+        super(ScaledFunction, self.__class__).L.fset(self, value )               
 
     @property
     def scalar(self):
@@ -475,6 +475,32 @@ class SumScalarFunction(SumFunction):
     def L(self, value):
         # call base class setter
         super(SumScalarFunction, self.__class__).L.fset(self, value )
+
+    @property
+    def gamma(self):
+        if self._gamma is None:
+            if self.function.gamma is not None:
+                self._gamma = self.function.gamma
+            else:
+                self._gamma = None
+        return self._gamma
+    @gamma.setter
+    def gamma(self, value):
+        # call base class setter
+        super(SumScalarFunction, self.__class__).gamma.fset(self, value )   
+
+    @property
+    def gamma_conj(self):
+        if self._gamma_conj is None:
+            if self.function.gamma_conj is not None:
+                self._gamma_conj = self.function.gamma_conj
+            else:
+                self._gamma_conj = None
+        return self._gamma_conj
+    @gamma_conj.setter
+    def gamma_conj(self, value):
+        # call base class setter
+        super(SumScalarFunction, self.__class__).gamma_conj.fset(self, value )                  
 
 class ConstantFunction(Function):
     

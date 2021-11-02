@@ -33,9 +33,15 @@ class Function(object):
     """
     
     
-    def __init__(self, L = None):
+    def __init__(self, L = None, gamma = None, gamma_conj = None):
         # overrides the type check to allow None as initial value
         self._L = L
+
+        # Strongly convexity constant value is None, by default
+        self._gamma = gamma
+
+        # Strongly convexity constant for the conjugate of the function is None, by default
+        self._gamma_conj= gamma_conj        
         
     def __call__(self,x):
         

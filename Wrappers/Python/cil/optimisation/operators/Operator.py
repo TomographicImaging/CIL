@@ -188,14 +188,19 @@ class LinearOperator(Operator):
         :returns: boolean, True if the test is passed.
         :param decimal: desired precision
         :type decimal: int, optional, default 4
+        :param decimal: precision for the float comparison
+        :type decimal: int, default 4
         '''
         seed = kwargs.get('seed',None)
+        decimal = kwargs.get('decimal',4)
+        
+
         if range_init is None:
             y = operator.range_geometry().allocate('random', seed=seed)
         else:
             y = range_init
         if domain_init is None:
-            x = operator.domain_geometry().allocate('random',seed=seed)
+            x = operator.domain_geometry().allocate('random',seed=seed+1)
         else:
             x = domain_init
             
@@ -203,14 +208,17 @@ class LinearOperator(Operator):
         by = operator.adjoint(y)
         a = fx.dot(y)
         b = by.dot(x).conjugate()
+        # relative difference
+        c = abs((a-b)/a)
+        
         if verbose:
-            print ('Left hand side  {}, \nRight hand side {}'.format(a, b))
-            print ("decimal ", kwargs.get('decimal', 4))
+            print ('Left hand side  {}, \nRight hand side {}'.format(c, 0.))
+            print ("decimal ", decimal)
         try:
-            numpy.testing.assert_almost_equal(abs((a-b)/a), 0., decimal=kwargs.get('decimal',4))
+            numpy.testing.assert_almost_equal(c, 0., decimal=decimal)
             return True
         except AssertionError as ae:
-            print (ae)
+            print ("Value {} not equal to {} within expected decimal precision {}".format(c,0.,decimal))
             return False
         
         

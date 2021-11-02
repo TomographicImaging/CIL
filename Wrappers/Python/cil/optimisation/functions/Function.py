@@ -171,6 +171,34 @@ class Function(object):
             self._L = value
         else:
             raise TypeError('The Lipschitz constant is a real positive number')
+
+    @property
+    def gamma(self):
+        '''Strongly convex constant of a function.'''
+                
+        return self._gamma
+
+    @gamma.setter
+    def gamma(self, value):
+        '''Setter for strongly convex constant for a function '''
+        if isinstance(value, (Number,)) and value >= 0:
+            self._gamma = value
+        else:
+            raise TypeError('The strongly convex constant is a real positive number') 
+
+    @property
+    def gamma_conj(self):
+        '''Strongly convex constant of the convex conjugate of a function.
+        '''
+        return self._gamma_conj
+
+    @gamma_conj.setter
+    def gamma_conj(self, value):
+        '''Setter for Strongly convex constant for the convex conjugate of a function '''
+        if isinstance(value, (Number,)) and value >= 0:
+            self._gamma_conj = value
+        else:
+            raise TypeError('The strongly convex constant is a real positive number')                                   
     
 class SumFunction(Function):
     

@@ -184,7 +184,7 @@ class Function(object):
         if isinstance(value, (Number,)) and value > 0:
             self._gamma = value
         else:
-            raise TypeError('The strongly convex constant is a real positive number') 
+            raise TypeError('The strongly convex constant is strictly positive number') 
 
     @property
     def gamma_conj(self):
@@ -198,7 +198,7 @@ class Function(object):
         if isinstance(value, (Number,)) and value > 0:
             self._gamma_conj = value
         else:
-            raise TypeError('The strongly convex constant is a real positive number')                                   
+            raise TypeError('The strongly convex constant is strictly positive number')                                   
     
 class SumFunction(Function):
     
@@ -242,7 +242,7 @@ class SumFunction(Function):
         if self.function1.gamma is not None and self.function2.gamma is not None:
             self._gamma = self.function1.gamma + self.function2.gamma
         elif self.function1.gamma is None and self.function2.gamma is not None:
-            self._gamma = self.function1.gamma 
+            self._gamma = self.function2.gamma 
         elif self.function2.gamma is None and self.function1.gamma is not None: 
             self._gamma = self.function1.gamma 
         else:
@@ -338,7 +338,39 @@ class ScaledFunction(Function):
     @L.setter
     def L(self, value):
         # call base class setter
-        super(ScaledFunction, self.__class__).L.fset(self, value )               
+        super(ScaledFunction, self.__class__).L.fset(self, value )  
+
+    @property
+    def gamma(self):
+        if self._gamma is None:
+            if self.function.gamma is not None:
+                if self.scalar <= 0:
+                    self._gamma = None
+                else:
+                    self._gamma = self.scalar * self.function.gamma
+            else:
+                self._gamma = None
+        return self._gamma
+    @gamma.setter
+    def gamma(self, value):
+        # call base class setter
+        super(ScaledFunction, self.__class__).gamma.fset(self, value )   
+
+    @property
+    def gamma_conj(self):
+        if self._gamma_conj is None:
+            if self.function.gamma_conj is not None:
+                if self.scalar <= 0:
+                    self._gamma_conj= None
+                else:
+                    self._gamma_conj = self.scalar * self.function.gamma_conj
+            else:
+                self._gamma_conj = None
+        return self._gamma_conj
+    @gamma_conj.setter
+    def gamma_conj(self, value):
+        # call base class setter
+        super(ScaledFunction, self.__class__).gamma_conj.fset(self, value )                                
 
     @property
     def scalar(self):
@@ -441,7 +473,8 @@ class SumScalarFunction(SumFunction):
     
     def __init__(self, function, constant):
         
-        super(SumScalarFunction, self).__init__(function, ConstantFunction(constant))        
+        super(SumScalarFunction, self).__init__(function, 
+                                                ConstantFunction(constant))        
         self.constant = constant
         self.function = function
         
@@ -607,11 +640,10 @@ class TranslateFunction(Function):
     """
     
     def __init__(self, function, center):
-        try:
-            L = function.L
-        except NotImplementedError as nie:
-            L = None
-        super(TranslateFunction, self).__init__(L = L) 
+
+        super(TranslateFunction, self).__init__(L = function.L, 
+                                                gamma = function.gamma,
+                                                gamma_conj= function.gamma_conj) 
                         
         self.function = function
         self.center = center
@@ -697,3 +729,115 @@ class TranslateFunction(Function):
         """        
         
         return self.function.convex_conjugate(x) + self.center.dot(x)
+
+
+if __name__ == "__main__":
+
+    # F is not strongly convex, cc of F is not strongle convex
+    f = Function()
+    print(f.gamma)
+    print(f.gamma_conj)
+
+    # F is strongly convex, cc of F is not strongle convex
+    f1 = Function()
+    f1.gamma = 2.0
+    print(f1.gamma)
+    print(f1.gamma_conj)    
+
+    # F is not strongly convex, cc of F is  strongle convex
+    f2 = Function()
+    f2.gamma_conj = 2.0
+    print(f2.gamma)
+    print(f2.gamma_conj) 
+
+    # Both Functions are strongly convex
+    f3 = Function()
+    f3.gamma = 2.0
+
+    f4 = Function()
+    f4.gamma = 2.0 
+
+    h1 = f3 + f4
+    print(h1.gamma)
+    print(h1.gamma_conj)
+
+    # Both cc of Functions are strongly convex
+    f3 = Function()
+    f3.gamma_conj = 2.0
+
+    f4 = Function()
+    f4.gamma_conj = 2.0 
+
+    h1 = f3 + f4
+    print(h1.gamma)
+    print(h1.gamma_conj)   
+
+    # first fucntion is convex , other strongly convex
+    f3 = Function()
+    f3.gamma = 2.0
+
+    f4 = Function()
+
+    h1 = f3 + f4
+    print(h1.gamma)
+    print(h1.gamma_conj)     
+
+    # first fucntion is strongly convex , other  convex
+    f3 = Function()    
+
+    f4 = Function()
+    f4.gamma = 2.0
+
+    h1 = f3 + f4
+    print(h1.gamma)
+    print(h1.gamma_conj)             
+
+    g = Function()
+    g.gamma = 10.
+    g.gamma_conj = 3.0
+    h = g + 3
+    print(h.gamma)
+    print(h.gamma_conj)
+
+    from cil.framework import ImageGeometry
+    ig = ImageGeometry(3,3)
+    x = ig.allocate('random')
+
+    g = Function()
+    f = TranslateFunction(function=g, center=x)
+    print(f.gamma)
+    print(f.gamma_conj)
+
+    g.gamma = 1.0
+    f = TranslateFunction(function=g, center=x)
+    print(f.gamma)
+    print(f.gamma_conj)   
+
+    g.gamma = 1.0
+    g.gamma_conj = 10.0
+    f = TranslateFunction(function=g, center=x)
+    print(f.gamma)
+    print(f.gamma_conj)     
+
+
+    f = Function()
+    g = 3 * f   
+    print(g.gamma)
+    print(g.gamma_conj)
+
+    f = Function()
+    f.gamma = 3
+    f.gamma_conj = 4
+    g = 3 * f   
+    print(g.gamma)
+    print(g.gamma_conj)   
+
+    f = Function()
+    f.gamma = 3
+    f.gamma_conj = 4
+    g = -3 * f   
+    print(g.gamma)
+    print(g.gamma_conj)        
+    
+
+

@@ -167,7 +167,7 @@ class LinearOperator(Operator):
         return s1
 
     @staticmethod
-    def dot_test(operator, domain_init=None, range_init=None, verbose=False, **kwargs):
+    def dot_test(operator, domain_init=None, range_init=None, verbose=False, tol=1e-6, **kwargs):
         r'''Does a dot linearity test on the operator
         
         Evaluates if the following equivalence holds
@@ -187,45 +187,35 @@ class LinearOperator(Operator):
         :param domain_init: optional initialisation container in the operator domain 
         :returns: boolean, True if the test is passed.
         :param decimal: desired precision
-        :type decimal: int, optional, default 4
-        :param decimal: precision for the float comparison
-        :type decimal: int, default 4
+        :type decimal: int, optional, default 4        
         '''
-        seed = kwargs.get('seed',None)
-        if seed is not None:
-            seed2 = seed+1
-        else:
-            seed2 = None
-        decimal = kwargs.get('decimal',4)
-        
 
-        if range_init is None:
-            y = operator.range_geometry().allocate('random', seed=seed)
-        else:
-            y = range_init
-        if domain_init is None:
-            x = operator.domain_geometry().allocate('random',seed=seed2)
-        else:
-            x = domain_init
+        lst = [1,2,3]
+        for i in lst:
+        # seed = kwargs.get('seed',None)
+            if range_init is None:
+                y = operator.range_geometry().allocate('random', seed = i)
+            else:
+                y = range_init
+            if domain_init is None:
+                x = operator.domain_geometry().allocate('random',seed = i)
+            else:
+                x = domain_init
             
-        fx = operator.direct(x)
-        by = operator.adjoint(y)
-        a = fx.dot(y)
-        b = by.dot(x).conjugate()
-        # relative difference
-        c = abs((a-b)/a)
-        
-        if verbose:
-            print ('Left hand side  {}, \nRight hand side {}'.format(c, 0.))
-            print ("decimal ", decimal)
-        try:
-            numpy.testing.assert_almost_equal(c, 0., decimal=decimal)
-            return True
-        except AssertionError as ae:
-            print ("Value {} not equal to {} within expected decimal precision {}".format(c,0.,decimal))
-            return False
-        
-        
+            fx = operator.direct(x)
+            by = operator.adjoint(y)
+            a = fx.dot(y)
+            b = by.dot(x).conjugate()
+
+            # similar to numpy all close, but normalised with respect to operator, x and y
+            error = numpy.abs( a - b )/ (operator.norm()*x.norm()*y.norm() + 1e-12)
+
+            if error < tol:
+                return True
+            else:
+                print ('Left hand side  {}, \nRight hand side {}'.format(a, b))
+                return False    
+      
 class ScaledOperator(Operator):
     
     

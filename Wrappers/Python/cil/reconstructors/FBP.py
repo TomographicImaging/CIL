@@ -77,6 +77,14 @@ class FBP_base(Reconstructor):
     def fft_order(self, val):
         self.set_fft_order(val)
 
+    @property
+    def weights(self):
+        return self.__weights
+
+    @weights.setter
+    def weights(self, val):
+        self.__weights = val
+
     def __init__ (self,input):
         """
         The initialiser for abstract base class::FBP_base
@@ -95,9 +103,10 @@ class FBP_base(Reconstructor):
             raise ValueError("Input data cannot be multi-channel")
 
         #define defaults
-        self.__filter = 'ram-lak' 
-        self.__fft_order =self.__min_fft_order()
+        self.__fft_order = self.__default_fft_order()
+        self.set_filter('ram-lak')
         self.__filter_inplace = False
+        self.__weights = None
 
 
     def set_filter_inplace(self, inplace):
@@ -114,8 +123,9 @@ class FBP_base(Reconstructor):
             raise TypeError("set_filter_inplace expected a boolian. Got {}".format(type(inplace)))
 
 
-    def __min_fft_order(self):
+    def __default_fft_order(self):
         min_order = 0
+
         while 2**min_order < self.input.geometry.pixel_num_h * 2:
             min_order+=1
 
@@ -138,18 +148,20 @@ class FBP_base(Reconstructor):
         except TypeError:
             raise TypeError("fft order expected type `int`. Got{}".format(type(order)))
         
-        min_order = self.__min_fft_order()
+        min_order = self.__default_fft_order()
         if fft_order < min_order:
             raise ValueError("Minimum fft width 2^order is order = {0}. Got{1}".format(min_order,order))
 
-        if self.filter=='custom' and fft_order != self.fft_order:
-            print("Filter length changed - resetting filter array to ram-lak")
-            self.__filter='ram-lak'
-            del self.__filter_array
+        if fft_order != self.fft_order:
+            self.__fft_order =fft_order
+
+            if self.filter=='custom':
+                print("Filter length changed - resetting filter array to ram-lak")
+                self.set_filter('ram-lak')
+            else:
+                self.set_filter(self.__filter)
         
-        self.__fft_order =fft_order
-
-
+ 
     def set_filter(self, filter):
         """
         Set the filter used by the reconstruction. This is set to 'ram-lak' by default.
@@ -166,7 +178,13 @@ class FBP_base(Reconstructor):
         """
 
         if filter in ['ram-lak']:
-            self.__filter == filter
+            self.__filter = filter
+
+            if filter == 'ram-lak':
+                filter_length = 2**self.fft_order
+                freq = fftfreq(filter_length)
+                self.__filter_array = np.asarray( [ np.abs(2*el) for el in freq ] ,dtype=np.float32)
+
         elif type(filter)==np.ndarray:
             try:
                 filter_array = np.asarray(filter,dtype=np.float32).reshape(2**self.fft_order) 
@@ -181,24 +199,16 @@ class FBP_base(Reconstructor):
     def get_filter_array(self):
         """
         Returns the filter in used in the frequency domain. The array can be modified and passed back using set_filter()
-
         The filter length N is 2^self.fft_order.
-
         The indices of the array are interpreted as:
         0 The DC frequency component
         1:N/2 positive frequencies
         N/2:N-1 negative frequencies
-
         :return: An array containing the filter values
         :rtype: numpy.ndarray
         """
-        if self.filter == 'ram-lak':
-            filter_length = 2**self.fft_order
-            freq = fftfreq(filter_length)
-            filter = np.asarray( [ np.abs(2*el) for el in freq ] ,dtype=np.float32)
-        elif self.filter == 'custom':
-            filter = self.__filter_array
-        return filter
+    
+        return self.__filter_array
 
 
     def calculate_weights(self):
@@ -216,28 +226,31 @@ class FBP_base(Reconstructor):
         :type acquistion_data: AcquisitionData
     '''
         """
-        nda = acquistion_data.as_array()
+        if self.weights is None or self.weights.shape[0] != acquistion_data.geometry.pixel_num_v:
+            self.calculate_weights(acquistion_data.geometry)
 
-        filter=self.get_filter_array()
+        filter_array = self.get_filter_array()
 
-        weights = self.calculate_weights()
+        if self.weights.shape[1] != acquistion_data.shape[-1]: #horizontal
+            raise ValueError("Weights not compatible")
+
+        if filter_array.size != 2**self.fft_order:
+            raise ValueError("Filter not compatible")
 
         #call ext function
-        data_ptr = nda.ctypes.data_as(c_float_p)
-        filter_ptr = filter.ctypes.data_as(c_float_p)
-        weights_ptr = weights.ctypes.data_as(c_float_p)
+        data_ptr = acquistion_data.array.ctypes.data_as(c_float_p)
+        filter_ptr = filter_array.ctypes.data_as(c_float_p)
+        weights_ptr = self.__weights.ctypes.data_as(c_float_p)
 
-        ag = self.input.geometry
+        ag = acquistion_data.geometry
         if ag.dimension_labels == ('angle','vertical','horizontal'):   
-            cilacc.filter_projections_avh(data_ptr, filter_ptr, weights_ptr, self.fft_order, *self.input.shape)
+            cilacc.filter_projections_avh(data_ptr, filter_ptr, weights_ptr, self.fft_order, *acquistion_data.shape)
         elif ag.dimension_labels == ('angle','horizontal'): 
-            cilacc.filter_projections_vah(data_ptr, filter_ptr, weights_ptr, self.fft_order, 1, *self.input.shape) 
+            cilacc.filter_projections_vah(data_ptr, filter_ptr, weights_ptr, self.fft_order, 1, *acquistion_data.shape) 
         elif ag.dimension_labels == ('vertical','horizontal'): 
-            cilacc.filter_projections_avh(data_ptr, filter_ptr, weights_ptr, self.fft_order, 1, *self.input.shape) 
+            cilacc.filter_projections_avh(data_ptr, filter_ptr, weights_ptr, self.fft_order, 1, *acquistion_data.shape) 
         else:
             raise ValueError ("The data is not in a compatible order. Try reordering the data with data.reorder({})".format(self.backend))
-
-        acquistion_data.fill(nda)
 
 
     def run(self, out=None):
@@ -264,27 +277,22 @@ class FDK(FBP_base):
         """
         #call parent initialiser
         super(FDK, self).__init__(input)
-
         if  input.geometry.geom_type != AcquisitionGeometry.CONE:
             raise TypeError("This reconstructor is for cone-beam data only.")
 
         
-    def calculate_weights(self):
+    def calculate_weights(self, acquistion_geometry):
         """
-        Calculates the pre-weighting used for FDK reconstruction.
-
-        :return: A single image containing the weights perpixel
-        :rtype: numpy.ndarray        
+        Calculates the pre-weighting used for FDK reconstruction.   
         """
-        ag = self.input.geometry
+        ag = acquistion_geometry
         xv = np.arange(-(ag.pixel_num_h -1)/2,(ag.pixel_num_h -1)/2 + 1,dtype=np.float32) * ag.pixel_size_h
         yv = np.arange(-(ag.pixel_num_v -1)/2,(ag.pixel_num_v -1)/2 + 1,dtype=np.float32) * ag.pixel_size_v
         (yy, xx) = np.meshgrid(xv, yv)
 
         principal_ray_length = ag.dist_source_center + ag.dist_center_detector
         scaling =  ag.magnification * (2 * np.pi/ ag.num_projections) / ( 4 * ag.pixel_size_h ) 
-        weights = scaling * principal_ray_length / np.sqrt((principal_ray_length ** 2 + xx ** 2 + yy ** 2))
-        return weights
+        self.weights = scaling * principal_ray_length / np.sqrt((principal_ray_length ** 2 + xx ** 2 + yy ** 2))
 
 
     def run(self, out=None):
@@ -303,7 +311,6 @@ class FDK(FBP_base):
             proj_filtered = self.input
 
         self.pre_filtering(proj_filtered)
-            
         operator = ProjectionOperator(self.image_geometry,self.input.geometry,adjoint_weights='FDK')
         
         if out is None:
@@ -313,6 +320,42 @@ class FDK(FBP_base):
 
 
 class FBP(FBP_base):
+
+    @property
+    def by_slice(self):
+        return self.__by_slice
+
+    @by_slice.setter
+    def by_slice(self, val):
+        self.set_by_slice(val)
+
+    def set_split_processing(self, slice_data):
+        """
+        False (default) will process the data in a single call.
+        True will process the data slice-by-slice, this will reduce memory use, but increase computation time.
+
+        it can only be used on simple data-geometries
+        :param slice_data: Sets the split processing of the data.
+        :type inplace: boolian
+        """
+        if type(slice_data) is not bool:
+            raise TypeError("set_split_processing expected a boolian. Got {}".format(type(slice_data)))
+
+        if slice_data == True:
+            if self.input.geometry.dimension != '3D':
+                print("Only 3D data can be processed in chunks, setting slice_data to `False`")
+                slice_data = False
+
+            if self.input.geometry.system_description == 'advanced':
+                print("Only simple and offset geometries can be processed in chunks, setting slice_data to `False`")
+                slice_data = False
+
+            if self.input.geometry.get_ImageGeometry != self.image_geometry:
+                print("Only default image geometries can be processed in chunks, setting slice_data to `False`")
+                slice_data = False
+
+        self.__by_slice= slice_data
+
 
     def __init__ (self,input):
         """
@@ -326,30 +369,28 @@ class FBP(FBP_base):
         self.get_filter_array()
         self.set_fft_order()
         self.set_filter_inplace()
+        self.set_split_processing()
+
 
         :param input: The input data to reconstruct. The reconstructor is set-up based on the geometry of the data. 
         :type input: AcquisitionData
         """
-
-        #call parent initialiser
         super(FBP, self).__init__(input)
+
 
         if  input.geometry.geom_type != AcquisitionGeometry.PARALLEL:
             raise TypeError("This reconstructor is for parallel-beam data only.")
 
-        
-    def calculate_weights(self):
+        self.set_split_processing(False)
+         
+    def calculate_weights(self, acquistion_geometry):
         """
-        Calculates the pre-weighting used for FDK reconstruction.
-
-        :return: A single image containing the weights perpixel
-        :rtype: numpy.ndarray        
+        Calculates the weights used for FBP reconstruction.     
         """
-        ag = self.input.geometry
+        ag = acquistion_geometry
         weight = (2 * np.pi/ ag.num_projections) / ( 4 * ag.pixel_size_h ) 
  
-        weights = np.full((ag.pixel_num_v,ag.pixel_num_h),weight,dtype=np.float32)
-        return weights
+        self.weights = np.full((ag.pixel_num_v,ag.pixel_num_h),weight,dtype=np.float32)
 
 
     def run(self, out=None):
@@ -361,17 +402,45 @@ class FBP(FBP_base):
         :return: returns the FBP/FDK reconstruction of the AcquisitionData
         :rtype: ImageData
         """
-
-        if self.filter_inplace is False:
-            proj_filtered = self.input.copy()
-        else:
-            proj_filtered = self.input
-
-        self.pre_filtering(proj_filtered)
-            
-        operator = ProjectionOperator(self.image_geometry,self.input.geometry)
         
-        if out is None:
-            return operator.adjoint(proj_filtered)
+        if self.by_slice:
+            if out is None:
+                ret = self.image_geometry.allocate()
+            else:
+                ret = out
+
+            data_slice = self.input.get_slice(vertical=0)               
+            ag_slice = data_slice.geometry
+            ig_slice = self.image_geometry.get_slice(vertical=0)
+            operator = ProjectionOperator(ig_slice,ag_slice)
+
+            if self.filter_inplace:
+                self.pre_filtering(self.input)
+
+                for i in range(self.image_geometry.shape[0]):
+                    data_slice.fill(self.input.get_slice(vertical=i))
+                    ret.array[i,:,:] = operator.adjoint(data_slice).array[:,:]
+            else:
+                for i in range(self.image_geometry.shape[0]):
+                    data_slice.fill(self.input.get_slice(vertical=i))
+                    self.pre_filtering(data_slice)
+                    ret.array[i,:,:] = operator.adjoint(data_slice).array[:,:]
+
+            if out is None:
+                return ret
+
         else:
-            operator.adjoint(proj_filtered, out = out)
+
+            if self.filter_inplace is False:
+                proj_filtered = self.input.copy()
+            else:
+                proj_filtered = self.input
+
+            self.pre_filtering(proj_filtered)
+
+            operator = ProjectionOperator(self.image_geometry,self.input.geometry)
+
+            if out is None:
+                return operator.adjoint(proj_filtered)
+            else:
+                operator.adjoint(proj_filtered, out = out)

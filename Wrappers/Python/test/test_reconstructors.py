@@ -212,12 +212,12 @@ class Test_FBP_base(unittest.TestCase):
 
         #by hand
         filter = reconstructor.get_filter_array()
-        weights = reconstructor.calculate_weights()
+        reconstructor.calculate_weights(ag)
         pad0 = (len(filter)-ag.pixel_num_h)//2
         pad1 = len(filter)-ag.pixel_num_h-pad0
 
         out2 = ad.array.copy()
-        out2*=weights
+        out2*=reconstructor.weights
         for i in range(2):
             proj_padded = np.zeros((ag.pixel_num_v,len(filter)))
             proj_padded[:,pad0:-pad1] = out2[i]
@@ -236,7 +236,8 @@ class Test_FBP_base(unittest.TestCase):
         ad = ag.allocate(0)
 
         reconstructor = FDK(ad)
-        weights = reconstructor.calculate_weights()
+        reconstructor.calculate_weights(ag)
+        weights = reconstructor.weights
 
         scaling =  7.5 * np.pi
         weights_new = np.ones_like(weights)

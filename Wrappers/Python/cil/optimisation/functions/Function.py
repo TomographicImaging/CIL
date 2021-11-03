@@ -26,7 +26,11 @@ class Function(object):
     
         :param L: Lipschitz constant of the gradient of the function F(x), when it is differentiable.
         :type L: number, positive, default None
-        :param domain: The domain of the function.
+        :param gamma: Strongly convex constant of the function F(x)
+        :type gamma: number, strictly positive, default None  
+        :param gamma_conj: Strongly convex constant of the convex conjugate function of F(x)
+        :type gamma_conj: number, strictly positive, default None                
+
 
         Lipschitz of the gradient of the function; it is a positive real number, such that |f'(x) - f'(y)| <= L ||x-y||, assuming f: IG --> R
 
@@ -34,7 +38,7 @@ class Function(object):
     
     
     def __init__(self, L = None, gamma = None, gamma_conj = None):
-        # overrides the type check to allow None as initial value
+        # Lipschitz constant for the gradient of f, default is None
         self._L = L
 
         # Strongly convexity constant value is None, by default
@@ -195,8 +199,14 @@ class Function(object):
     @gamma_conj.setter
     def gamma_conj(self, value):
         '''Setter for Strongly convex constant for the convex conjugate of a function '''
+
         if isinstance(value, (Number,)) and value > 0:
-            self._gamma_conj = value
+            if self.L is not None:
+                if self._gamma_conj != 1.0/self.L:
+                    raise ValueError('If a function is convex, and its gradient Lipschitz with constant L, then\
+                                     the conjugate of f is 1/L strongly convex. [Hiriart-Urruty, Lemarechal, Theorem 4.2.2]')
+                else: 
+                    self._gamma_conj = value   
         else:
             raise TypeError('The strongly convex constant is strictly positive number')                                   
     
@@ -267,7 +277,7 @@ class SumFunction(Function):
         if self.function1.gamma_conj is not None and self.function2.gamma_conj is not None:
             self._gamma_conj = self.function1.gamma_conj + self.function2.gamma_conj
         elif self.function1.gamma_conj is None and self.function2.gamma_conj is not None:
-            self._gamma_conj= self.function1.gamma_conj 
+            self._gamma_conj= self.function2.gamma_conj 
         elif self.function2.gamma_conj is None and self.function1.gamma_conj is not None: 
             self._gamma_conj = self.function1.gamma_conj 
         else:
@@ -642,8 +652,8 @@ class TranslateFunction(Function):
     def __init__(self, function, center):
 
         super(TranslateFunction, self).__init__(L = function.L, 
-                                                gamma = function.gamma,
-                                                gamma_conj= function.gamma_conj) 
+                                                gamma = function.gamma, 
+                                                gamma_conj = function.gamma_conj) 
                         
         self.function = function
         self.center = center
@@ -729,115 +739,4 @@ class TranslateFunction(Function):
         """        
         
         return self.function.convex_conjugate(x) + self.center.dot(x)
-
-
-if __name__ == "__main__":
-
-    # F is not strongly convex, cc of F is not strongle convex
-    f = Function()
-    print(f.gamma)
-    print(f.gamma_conj)
-
-    # F is strongly convex, cc of F is not strongle convex
-    f1 = Function()
-    f1.gamma = 2.0
-    print(f1.gamma)
-    print(f1.gamma_conj)    
-
-    # F is not strongly convex, cc of F is  strongle convex
-    f2 = Function()
-    f2.gamma_conj = 2.0
-    print(f2.gamma)
-    print(f2.gamma_conj) 
-
-    # Both Functions are strongly convex
-    f3 = Function()
-    f3.gamma = 2.0
-
-    f4 = Function()
-    f4.gamma = 2.0 
-
-    h1 = f3 + f4
-    print(h1.gamma)
-    print(h1.gamma_conj)
-
-    # Both cc of Functions are strongly convex
-    f3 = Function()
-    f3.gamma_conj = 2.0
-
-    f4 = Function()
-    f4.gamma_conj = 2.0 
-
-    h1 = f3 + f4
-    print(h1.gamma)
-    print(h1.gamma_conj)   
-
-    # first fucntion is convex , other strongly convex
-    f3 = Function()
-    f3.gamma = 2.0
-
-    f4 = Function()
-
-    h1 = f3 + f4
-    print(h1.gamma)
-    print(h1.gamma_conj)     
-
-    # first fucntion is strongly convex , other  convex
-    f3 = Function()    
-
-    f4 = Function()
-    f4.gamma = 2.0
-
-    h1 = f3 + f4
-    print(h1.gamma)
-    print(h1.gamma_conj)             
-
-    g = Function()
-    g.gamma = 10.
-    g.gamma_conj = 3.0
-    h = g + 3
-    print(h.gamma)
-    print(h.gamma_conj)
-
-    from cil.framework import ImageGeometry
-    ig = ImageGeometry(3,3)
-    x = ig.allocate('random')
-
-    g = Function()
-    f = TranslateFunction(function=g, center=x)
-    print(f.gamma)
-    print(f.gamma_conj)
-
-    g.gamma = 1.0
-    f = TranslateFunction(function=g, center=x)
-    print(f.gamma)
-    print(f.gamma_conj)   
-
-    g.gamma = 1.0
-    g.gamma_conj = 10.0
-    f = TranslateFunction(function=g, center=x)
-    print(f.gamma)
-    print(f.gamma_conj)     
-
-
-    f = Function()
-    g = 3 * f   
-    print(g.gamma)
-    print(g.gamma_conj)
-
-    f = Function()
-    f.gamma = 3
-    f.gamma_conj = 4
-    g = 3 * f   
-    print(g.gamma)
-    print(g.gamma_conj)   
-
-    f = Function()
-    f.gamma = 3
-    f.gamma_conj = 4
-    g = -3 * f   
-    print(g.gamma)
-    print(g.gamma_conj)        
-    
-
 

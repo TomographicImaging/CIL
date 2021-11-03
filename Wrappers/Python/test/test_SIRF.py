@@ -70,7 +70,7 @@ class GradientSIRF(object):
         np.testing.assert_array_almost_equal(res3.as_array(), res4.as_array()) 
 
         # test dot_test
-        self.assertTrue(LinearOperator.dot_test(Grad_numpy, decimal=3))
+        self.assertTrue(LinearOperator.dot_test(Grad_numpy))
 
         # test shape of output of direct
         

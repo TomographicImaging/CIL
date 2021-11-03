@@ -949,7 +949,6 @@ class TestTotalVariation(unittest.TestCase):
             self.tv.regularisation_parameter = 'string'
             assert False
         except TypeError as te:
-            print (te)
             assert True
     def test_rmul2(self):
         alpha = 'string'
@@ -957,12 +956,11 @@ class TestTotalVariation(unittest.TestCase):
             tv = alpha * TotalVariation()
             assert False
         except TypeError as te:
-            print (te)
             assert True
 
     def test_call_real(self):
 
-        x_real = self.ig_real.allocate('random')  
+        x_real = self.ig_real.allocate('random', seed=4)  
         grad = GradientOperator(self.ig_real)
 
         res1 = self.tv_iso(x_real)

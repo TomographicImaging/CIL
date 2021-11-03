@@ -15,7 +15,6 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import warnings
 
 from numbers import Number
 import numpy as np
@@ -32,19 +31,23 @@ class Function(object):
         :type gamma_conj: number, strictly positive, default None                
 
 
-        Lipschitz of the gradient of the function; it is a positive real number, such that |f'(x) - f'(y)| <= L ||x-y||, assuming f: IG --> R
+        # TODO Add definition of Lipschitz
+        #  Lipschitz of the gradient of the function; it is a positive real number, such that |f'(x) - f'(y)| <= L ||x-y||, assuming f: IG --> R
+
+        # TODO Add definition of Strongly convex constant
 
     """
     
     
     def __init__(self, L = None, gamma = None, gamma_conj = None):
-        # Lipschitz constant for the gradient of f, default is None
+
+        # Lipschitz constant for the gradient of f
         self._L = L
 
-        # Strongly convexity constant value is None, by default
+        # Strongly convexity constant for the Function
         self._gamma = gamma
 
-        # Strongly convexity constant for the conjugate of the function is None, by default
+        # Strongly convexity constant for the conjugate of the Function 
         self._gamma_conj= gamma_conj        
         
     def __call__(self,x):
@@ -163,11 +166,10 @@ class Function(object):
     
     @property
     def L(self):
-        '''Lipschitz of the gradient of function f.
-        
-        L is positive real number, such that |f'(x) - f'(y)| <= L ||x-y||, assuming f: IG --> R'''
+        '''Lipschitz constant of the gradient of function f.'''
+    
         return self._L
-        # return self._L
+
     @L.setter
     def L(self, value):
         '''Setter for Lipschitz constant'''
@@ -203,8 +205,8 @@ class Function(object):
         if isinstance(value, (Number,)) and value > 0:
             if self.L is not None:
                 if self._gamma_conj != 1.0/self.L:
-                    raise ValueError('If a function is convex, and its gradient Lipschitz with constant L, then\
-                                     the conjugate of f is 1/L strongly convex. [Hiriart-Urruty, Lemarechal, Theorem 4.2.2]')
+                    raise ValueError('If Function is convex, and its gradient Lipschitz with constant L, then\
+                                     the conjugate of the Function is 1/L strongly convex. [Hiriart-Urruty, Lemarechal, Theorem 4.2.2]')
                 else: 
                     self._gamma_conj = value   
         else:
@@ -355,6 +357,7 @@ class ScaledFunction(Function):
         if self._gamma is None:
             if self.function.gamma is not None:
                 if self.scalar <= 0:
+                    # If it strongly convex and multiply with a number <=0, it is not strongl convex
                     self._gamma = None
                 else:
                     self._gamma = self.scalar * self.function.gamma

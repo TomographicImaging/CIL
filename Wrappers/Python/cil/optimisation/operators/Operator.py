@@ -207,7 +207,7 @@ class LinearOperator(Operator):
             a = fx.dot(y)
             b = by.dot(x).conjugate()
 
-            # similar to numpy all close, but normalised with respect to operator, x and y
+            # Check relative tolerance but normalised with respect to operator, x and y norms and avoid zero division
             error = numpy.abs( a - b )/ (operator.norm()*x.norm()*y.norm() + 1e-12)
 
             if error < tol:

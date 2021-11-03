@@ -426,7 +426,7 @@ class TestOperator(CCPiTestClass):
         for i in range(len(bg.geometries)):
 
             if i!=index:
-                numpy.testing.assert_array_almost_equal(res1[i].array, bg.geometries[i].allocate().array)   
+                numpy.testing.assert_array_almost_equal(res1[i].as_array(), bg.geometries[i].allocate().as_array())   
 
         # Check error messages
         # Check if index is correct wrt length of Cartesian Product

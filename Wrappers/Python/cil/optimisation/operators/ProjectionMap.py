@@ -54,7 +54,7 @@ class ProjectionMap(LinearOperator):
     def adjoint(self,x, out=None):
         
         if out is None:
-            tmp = self.domain_geometry().allocate()
+            tmp = self.domain_geometry().allocate(0)
             tmp[self.index].fill(x)            
             return tmp
         else:

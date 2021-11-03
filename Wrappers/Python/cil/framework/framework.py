@@ -176,12 +176,12 @@ class ImageGeometry(object):
                  channels=1, 
                  **kwargs):
         
-        self.voxel_num_x = voxel_num_x
-        self.voxel_num_y = voxel_num_y
-        self.voxel_num_z = voxel_num_z
-        self.voxel_size_x = voxel_size_x
-        self.voxel_size_y = voxel_size_y
-        self.voxel_size_z = voxel_size_z
+        self.voxel_num_x = int(voxel_num_x)
+        self.voxel_num_y = int(voxel_num_y)
+        self.voxel_num_z = int(voxel_num_z)
+        self.voxel_size_x = float(voxel_size_x)
+        self.voxel_size_y = float(voxel_size_y)
+        self.voxel_size_z = float(voxel_size_z)
         self.center_x = center_x
         self.center_y = center_y
         self.center_z = center_z  
@@ -351,7 +351,11 @@ class ComponentDescription(object):
     @staticmethod   
     def CreateUnitVector(val):
         vec = ComponentDescription.CreateVector(val)
-        vec = (vec/numpy.sqrt(vec.dot(vec)))
+        dot_product = vec.dot(vec)
+        if abs(dot_product)>1e-8:
+            vec = (vec/numpy.sqrt(dot_product))
+        else:
+            raise ValueError("Can't return a unit vector of a zero magnitude vector")
         return vec
 
     def length_check(self, val):
@@ -449,6 +453,11 @@ class Detector2D(PositionVector):
 class SystemConfiguration(object):
     r'''This is a generic class to hold the description of a tomography system
      '''
+
+    SYSTEM_SIMPLE = 'simple' 
+    SYSTEM_OFFSET = 'offset' 
+    SYSTEM_ADVANCED = 'advanced' 
+
     @property
     def dimension(self):
         if self._dimension == 2:
@@ -520,6 +529,13 @@ class SystemConfiguration(object):
         :rtype: list
         '''
         raise NotImplementedError
+  
+    def system_description(self):
+        r'''Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,
+            \nReturns `offset` if the the geometry matches the default definitions with centre-of-rotation or detector offsets
+            \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
+        '''         
+        raise NotImplementedError
 
     def copy(self):
         '''returns a copy of SystemConfiguration'''
@@ -557,6 +573,54 @@ class Parallel2D(SystemConfiguration):
         '''         
         self.detector.position -= self.rotation_axis.position
         self.rotation_axis.position = [0,0]
+
+
+    def align_reference_frame(self):
+        r'''Transforms the system origin to the rotate axis and aligns the ray along the positive Y direction
+        '''          
+        self.update_reference_frame()
+
+        ray_vec = -self.ray.direction
+
+        axis_rotation = numpy.eye(2)
+        if numpy.allclose(ray_vec,[0,-1]):
+            pass
+        elif numpy.allclose(ray_vec,[0,1]):
+            axis_rotation[0][0] = -1
+            axis_rotation[1][1] = -1
+        else:
+            theta = math.atan2(ray_vec[0],-ray_vec[1])
+            axis_rotation[0][0] = axis_rotation[1][1] = math.cos(theta)
+            axis_rotation[0][1] = math.sin(theta)
+            axis_rotation[1][0] = -math.sin(theta)
+
+        rotation_matrix = numpy.matrix(axis_rotation)
+        
+        self.ray.direction = rotation_matrix.dot(self.ray.direction.reshape(2,1))
+        self.detector.position = rotation_matrix.dot(self.detector.position.reshape(2,1))
+        self.detector.direction_x = rotation_matrix.dot(self.detector.direction_x.reshape(2,1))
+
+    def system_description(self):
+        r'''Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,
+            \nReturns `offset` if the the geometry matches the default definitions with centre-of-rotation or detector offsets
+            \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
+        '''       
+        new = self.copy()
+        new.align_reference_frame()
+
+        try:
+            det_unit = ComponentDescription.CreateUnitVector(new.detector.position)
+        except ValueError: #pass test if detector is on origin
+            det_unit = [0,1]
+
+        if not numpy.allclose(new.ray.direction,[0,1]) or\
+            not numpy.allclose(new.detector.direction_x,[1,0]):
+            return SystemConfiguration.SYSTEM_ADVANCED
+        elif not numpy.allclose(det_unit,[0,1]):
+            return SystemConfiguration.SYSTEM_OFFSET
+        else:
+            return SystemConfiguration.SYSTEM_SIMPLE
+
 
     def __str__(self):
         def csv(val):
@@ -657,6 +721,61 @@ class Parallel3D(SystemConfiguration):
         new_y = rotation_matrix.dot(self.detector.direction_y.reshape(3,1))
         self.detector.set_direction(new_x, new_y)
 
+    def align_reference_frame(self):
+        r'''Transforms the system origin to the rotate axis with z direction aligned to the rotate axis direction, and aligns the ray direction along the positive Y direction
+        '''          
+        self.update_reference_frame()
+
+        ray_vec = -self.ray.direction
+        axis_rotation = numpy.eye(3)
+
+        if numpy.allclose(ray_vec,[0,-1,0]):
+            pass
+        elif numpy.allclose(ray_vec,[0,1,0]):
+            axis_rotation[0][0] = -1
+            axis_rotation[1][1] = -1
+        else:
+            theta = math.atan2(ray_vec[0],ray_vec[1])
+            axis_rotation[0][0] = axis_rotation[1][1] = math.cos(theta)
+            axis_rotation[0][1] = -math.sin(theta)
+            axis_rotation[1][0] = math.sin(theta)
+
+        rotation_matrix = numpy.matrix(axis_rotation)
+        
+        self.ray.direction = rotation_matrix.dot(self.ray.direction.reshape(3,1))
+        self.detector.position = rotation_matrix.dot(self.detector.position.reshape(3,1))
+
+        new_direction_x = rotation_matrix.dot(self.detector.direction_x.reshape(3,1))
+        new_direction_y = rotation_matrix.dot(self.detector.direction_y.reshape(3,1))
+
+        self.detector.set_direction(new_direction_x, new_direction_y)
+
+    def system_description(self):
+        r'''Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,
+            \nReturns `offset` if the the geometry matches the default definitions with centre-of-rotation or detector offsets
+            \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
+        '''              
+        new = self.copy()
+        new.align_reference_frame()
+
+        try:
+            det_unit = ComponentDescription.CreateUnitVector(new.detector.position)
+        except ValueError: #pass test if detector is on origin
+            det_unit = [0,1,0]
+
+        if not numpy.allclose(new.ray.direction,[0,1,0]) or\
+            not numpy.allclose(new.detector.direction_x,[1,0,0]) or\
+            not numpy.allclose(new.detector.direction_y,[0,0,1]) or\
+            not numpy.allclose(new.rotation_axis.direction,[0,0,1]):
+            return SystemConfiguration.SYSTEM_ADVANCED
+        elif not numpy.allclose(det_unit,[0,1,0]):
+            return SystemConfiguration.SYSTEM_OFFSET
+        else:
+            return SystemConfiguration.SYSTEM_SIMPLE
+        
+        return False
+
+
     def __str__(self):
         def csv(val):
             return numpy.array2string(val, separator=', ')
@@ -747,6 +866,49 @@ class Cone2D(SystemConfiguration):
         self.source.position -= self.rotation_axis.position
         self.detector.position -= self.rotation_axis.position
         self.rotation_axis.position = [0,0]
+
+    def align_reference_frame(self):
+        r'''Transforms the system origin to the rotate axis and aligns the source position along the negative Y direction
+        '''          
+        self.update_reference_frame()
+
+        src_dir = ComponentDescription.CreateUnitVector(self.source.position)
+
+        axis_rotation = numpy.eye(2)
+        if numpy.allclose(src_dir,[0,-1]):
+            pass
+        elif numpy.allclose(src_dir,[0,1]):
+            axis_rotation[0][0] = -1
+            axis_rotation[1][1] = -1
+        else:
+            theta = math.atan2(src_dir[0],src_dir[1])
+            axis_rotation[0][0] = axis_rotation[1][1] = math.cos(theta)
+            axis_rotation[0][1] = -math.sin(theta)
+            axis_rotation[1][0] = math.sin(theta)
+
+        rotation_matrix = numpy.matrix(axis_rotation)
+        
+        self.source.position = rotation_matrix.dot(self.source.position.reshape(2,1))
+        self.detector.position = rotation_matrix.dot(self.detector.position.reshape(2,1))
+        self.detector.direction_x = rotation_matrix.dot(self.detector.direction_x.reshape(2,1))
+
+
+    def system_description(self):
+        r'''Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,
+            \nReturns `offset` if the the geometry matches the default definitions with centre-of-rotation or detector offsets
+            \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
+        '''           
+        new = self.copy()
+        new.align_reference_frame()
+        dot_prod = (new.detector.position - new.source.position).dot(new.detector.direction_x)
+
+        if abs(dot_prod)>1e-6:
+            return SystemConfiguration.SYSTEM_ADVANCED
+        elif abs(new.source.position[0])>1e-6 or\
+            abs(new.detector.position[0])>1e-6:
+            return SystemConfiguration.SYSTEM_OFFSET 
+        else:
+            return SystemConfiguration.SYSTEM_SIMPLE
 
     def __str__(self):
         def csv(val):
@@ -869,10 +1031,67 @@ class Cone3D(SystemConfiguration):
         new_y = rotation_matrix.dot(self.detector.direction_y.reshape(3,1))
         self.detector.set_direction(new_x, new_y)
 
+    def align_reference_frame(self):
+        r'''Transforms the system origin to the rotate axis with z direction aligned to the rotate axis direction, and aligns the source direction along the negative Y direction
+        '''          
+        self.update_reference_frame()
+
+        src_dir = ComponentDescription.CreateUnitVector(self.source.position)
+
+        axis_rotation = numpy.eye(3)
+        if numpy.allclose(src_dir,[0,-1,0]):
+            pass
+        elif numpy.allclose(src_dir,[0,1,0]):
+            axis_rotation[0][0] = -1
+            axis_rotation[1][1] = -1
+        else:
+            theta = math.atan2(src_dir[0],-src_dir[1])
+            axis_rotation[0][0] = axis_rotation[1][1] = math.cos(theta)
+            axis_rotation[0][1] = math.sin(theta)
+            axis_rotation[1][0] = -math.sin(theta)
+
+        rotation_matrix = numpy.matrix(axis_rotation)
+        
+        self.source.position = rotation_matrix.dot(self.source.position.reshape(3,1))
+        self.detector.position = rotation_matrix.dot(self.detector.position.reshape(3,1))
+
+        new_direction_x = rotation_matrix.dot(self.detector.direction_x.reshape(3,1))
+        new_direction_y = rotation_matrix.dot(self.detector.direction_y.reshape(3,1))
+
+        self.detector.set_direction(new_direction_x, new_direction_y)
+
+    def system_description(self):
+        r'''Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,
+            \nReturns `offset` if the the geometry matches the default definitions with centre-of-rotation or detector offsets
+            \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
+        '''       
+        new = self.copy()
+        new.align_reference_frame()
+
+        dot_prod_a = (new.detector.position - new.source.position).dot(new.detector.direction_x)
+        dot_prod_b = (new.detector.position - new.source.position).dot(new.detector.direction_y)
+        dot_prod_c = (new.detector.direction_x).dot(new.rotation_axis.direction)
+        dot_prod_d = (new.detector.position - new.source.position).dot(new.rotation_axis.direction)
+
+        if abs(dot_prod_a)>1e-6 or\
+            abs(dot_prod_b)>1e-6 or\
+            abs(dot_prod_c)>1e-6 or\
+            abs(dot_prod_d)>1e-6: 
+            return SystemConfiguration.SYSTEM_ADVANCED
+
+        elif abs(new.source.position[0])>1e-6 or\
+            abs(new.source.position[2])>1e-6 or\
+            abs(new.detector.position[0])>1e-6 or\
+            abs(new.detector.position[2])>1e-6:
+            return SystemConfiguration.SYSTEM_OFFSET
+        else:
+            return SystemConfiguration.SYSTEM_SIMPLE
+
+
     def get_centre_slice(self):
         """Returns the 2D system configuration corersponding to the centre slice
         """ 
-        #requires the rotate axis to be perpendicular to the detector, and parallel to detector_direction_y
+        #requires the rotate axis to be perpendicular to the normal of the detector, and perpendicular to detector_direction_x
         vec1= numpy.cross(self.detector.direction_x, self.detector.direction_y)  
         dp1 = self.rotation_axis.direction.dot(vec1)
         dp2 = self.rotation_axis.direction.dot(self.detector.direction_x)
@@ -1273,6 +1492,7 @@ class Configuration(object):
 
         return False
 
+
 class AcquisitionGeometry(object):
     r'''This class holds the AcquisitionGeometry of the system.
     
@@ -1444,12 +1664,17 @@ class AcquisitionGeometry(object):
 
 
     @property
+    def system_description(self):
+        return self.config.system.system_description()
+
+    @property
     def dtype(self):
         return self.__dtype
 
     @dtype.setter
     def dtype(self, val):
         self.__dtype = val       
+
 
     def __init__(self,
                 geom_type, 
@@ -1827,10 +2052,10 @@ class DataContainer(object):
     def dimension_labels(self, val):
         if val is None:
             self.__dimension_labels = None
-        elif len(val)==self.number_of_dimensions:
+        elif len(list(val))==self.number_of_dimensions:
             self.__dimension_labels = tuple(val)
         else:
-            raise ValueError("dimension_labels expected a list containing {0} strings got {1}".format(self.number_of_dimensions, labels))
+            raise ValueError("dimension_labels expected a list containing {0} strings got {1}".format(self.number_of_dimensions, val))
 
     @property
     def shape(self):
@@ -2579,7 +2804,20 @@ class ImageData(DataContainer):
             else:
                 raise ValueError ("Unable to return slice of requested ImageData. Use 'force=True' to return DataContainer instead.")
 
-        out = DataContainer.get_slice(self, channel=channel, vertical=vertical, horizontal_x=horizontal_x, horizontal_y=horizontal_y)
+        #if vertical = 'centre' slice convert to index and subset, this will interpolate 2 rows to get the center slice value
+        if vertical == 'centre':
+            dim = self.geometry.dimension_labels.index('vertical')  
+            centre_slice_pos = (self.geometry.shape[dim]-1) / 2.
+            ind0 = int(numpy.floor(centre_slice_pos))
+            
+            w2 = centre_slice_pos - ind0
+            out = DataContainer.get_slice(self, channel=channel, vertical=ind0, horizontal_x=horizontal_x, horizontal_y=horizontal_y)
+            
+            if w2 > 0:
+                out2 = DataContainer.get_slice(self, channel=channel, vertical=ind0 + 1, horizontal_x=horizontal_x, horizontal_y=horizontal_y)
+                out = out * (1 - w2) + out2 * w2
+        else:
+            out = DataContainer.get_slice(self, channel=channel, vertical=vertical, horizontal_x=horizontal_x, horizontal_y=horizontal_y)
 
         if len(out.shape) == 1 or geometry_new is None:
             return out
@@ -2636,9 +2874,6 @@ class AcquisitionData(DataContainer):
             
         if array.shape != geometry.shape:
             raise ValueError('Shape mismatch got {} expected {}'.format(array.shape, geometry.shape))
-
-        if array.ndim not in [2,3,4]:
-            raise ValueError('Number of dimensions are not 2 or 3 or 4 : {0}'.format(array.ndim))
     
         super(AcquisitionData, self).__init__(array, deep_copy, geometry=geometry,**kwargs)
   
@@ -2672,14 +2907,15 @@ class AcquisitionData(DataContainer):
         #if vertical = 'centre' slice convert to index and subset, this will interpolate 2 rows to get the center slice value
         if vertical == 'centre':
             dim = self.geometry.dimension_labels.index('vertical')
-            if self.geometry.shape[dim] > 1:   
-                centre_slice_pos = (self.geometry.shape[dim]-1) / 2.
-                ind0 = int(numpy.floor(centre_slice_pos))
-                w2 = centre_slice_pos - ind0
-                out = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=ind0, horizontal=horizontal)
-                if w2 > 0:
-                    out2 = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=ind0 + 1, horizontal=horizontal)
-                    out = out * (1 - w2) + out2 * w2
+            
+            centre_slice_pos = (self.geometry.shape[dim]-1) / 2.
+            ind0 = int(numpy.floor(centre_slice_pos))
+            w2 = centre_slice_pos - ind0
+            out = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=ind0, horizontal=horizontal)
+            
+            if w2 > 0:
+                out2 = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=ind0 + 1, horizontal=horizontal)
+                out = out * (1 - w2) + out2 * w2
         else:
             out = DataContainer.get_slice(self, channel=channel, angle=angle, vertical=vertical, horizontal=horizontal)
 
@@ -3105,5 +3341,3 @@ class DataOrder():
         else:
             raise ValueError("Expected dimension_label order {0}, got {1}.\nTry using `data.reorder('{2}')` to permute for {2}"
                  .format(order_requested, list(geometry.dimension_labels), engine))
-
-

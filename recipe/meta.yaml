@@ -23,6 +23,7 @@ test:
     - scikit-image
     - tomophantom        # [ linux ]
     - cil-astra          # [ linux ] 
+    - cil-data >=21.3.0
     - tigre              # [ linux or win ] 
     - numba
     - packaging

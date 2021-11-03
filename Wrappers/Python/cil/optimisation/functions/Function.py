@@ -203,12 +203,13 @@ class Function(object):
         '''Setter for Strongly convex constant for the convex conjugate of a function '''
 
         if isinstance(value, (Number,)) and value > 0:
+
+            self._gamma_conj = value  
+
             if self.L is not None:
-                if self._gamma_conj != 1.0/self.L:
+                if value != 1.0/self.L:
                     raise ValueError('If Function is convex, and its gradient Lipschitz with constant L, then\
-                                     the conjugate of the Function is 1/L strongly convex. [Hiriart-Urruty, Lemarechal, Theorem 4.2.2]')
-                else: 
-                    self._gamma_conj = value   
+                                     the conjugate of the Function is 1/L strongly convex. [Hiriart-Urruty, Lemarechal, Theorem 4.2.2]')                                                      
         else:
             raise TypeError('The strongly convex constant is strictly positive number')                                   
     
@@ -743,3 +744,5 @@ class TranslateFunction(Function):
         
         return self.function.convex_conjugate(x) + self.center.dot(x)
 
+
+   

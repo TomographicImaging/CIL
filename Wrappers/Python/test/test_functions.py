@@ -246,7 +246,7 @@ class TestFunction(unittest.TestCase):
         f.gamma_conj = 2.0
         g = scalar * f
         self.assertEquals(g.gamma, scalar*f.gamma)  
-        self.assertIsNone(g.gamma_conj, scalar*f.gamma_conj)   
+        self.assertEquals(g.gamma_conj, scalar*f.gamma_conj)   
 
         # Check is scalar is Negative, hence ScaledFunction is not convex
         f.gamma = 3.0
@@ -268,20 +268,7 @@ class TestFunction(unittest.TestCase):
         f.gamma_conj = 2.0
         g = f + 3
         self.assertEquals(g.gamma, f.gamma)  
-        self.assertIsNone(g.gamma_conj, f.gamma_conj)  
-
-
-
-
-
-
-
-
-             
-
-
-    
-
+        self.assertEquals(g.gamma_conj, f.gamma_conj)  
 
     
     def test_L2NormSquared(self):

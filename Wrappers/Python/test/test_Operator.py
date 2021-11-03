@@ -402,11 +402,11 @@ class TestOperator(CCPiTestClass):
 
             # Depending on which index is used, check if x0, x1, x2 are the same with res2
             if i==0:            
-                numpy.testing.assert_array_almost_equal(x0.array, res2.array)
+                numpy.testing.assert_array_almost_equal(x0.as_array(), res2.as_array())
             elif i==1: 
-                numpy.testing.assert_array_almost_equal(x1.array, res2.array)   
+                numpy.testing.assert_array_almost_equal(x1.as_array(), res2.as_array())   
             elif i==2:
-                numpy.testing.assert_array_almost_equal(x2.array, res2.array)  
+                numpy.testing.assert_array_almost_equal(x2.as_array(), res2.as_array())  
             else:
                 pass      
 

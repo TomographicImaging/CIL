@@ -398,7 +398,7 @@ class TestOperator(CCPiTestClass):
             proj_map.direct(x, out=res2)
 
             # Check with and without out
-            numpy.testing.assert_array_almost_equal(res1.array, res2.array)
+            numpy.testing.assert_array_almost_equal(res1.as_array(), res2.as_array())
 
             # Depending on which index is used, check if x0, x1, x2 are the same with res2
             if i==0:            
@@ -443,6 +443,10 @@ class TestOperator(CCPiTestClass):
             proj_map = ProjectionMap(ig, index)               
         except ValueError as err:
             print(err)           
+
+        # check adjoint 
+         
+            
     
 class TestGradients(CCPiTestClass): 
     def setUp(self):

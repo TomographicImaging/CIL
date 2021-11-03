@@ -208,7 +208,7 @@ class LinearOperator(Operator):
             b = by.dot(x).conjugate()
 
             # similar to numpy all close, but normalised with respect to operator, x and y
-            error = numpy.abs( a - b )/ (operator.norm()*x.norm()*y.norm() + 1e-12)
+            error = numpy.abs( a - b )/ (operator.norm() * x.norm() * y.norm() + 1e-12)
 
             if error < tol:
                 return True

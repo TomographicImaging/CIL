@@ -24,7 +24,7 @@ test:
     - tomophantom        # [ linux ]
     - cil-astra          # [ linux ] 
     - cil-data >=21.3.0
-    - tigre =2.2         # [ linux or win ] 
+    - tigre              # [ linux or win ] 
     - numba
     - packaging
     - ccpi-regulariser   # [ not osx ]

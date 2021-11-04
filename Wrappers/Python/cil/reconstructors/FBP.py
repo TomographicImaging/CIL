@@ -350,7 +350,7 @@ class FBP(FBP_base):
                 print("Only simple and offset geometries can be processed in chunks, setting slice_data to `False`")
                 slice_data = False
 
-            if self.input.geometry.get_ImageGeometry != self.image_geometry:
+            if self.input.geometry.get_ImageGeometry() != self.image_geometry:
                 print("Only default image geometries can be processed in chunks, setting slice_data to `False`")
                 slice_data = False
 

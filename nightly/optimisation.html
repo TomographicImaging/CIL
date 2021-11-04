@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Optimisation framework &mdash; CIL v21.2.0-31-gdfea50bd documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <title>Optimisation framework &mdash; CIL v21.2.0-32-g40f5dbac documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
@@ -29,7 +29,7 @@
             <a href="index.html" class="icon icon-home"> CIL
           </a>
               <div class="version">
-                v21.2.0-31-gdfea50bd
+                v21.2.0-32-g40f5dbac
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -957,28 +957,29 @@ starting point or both you need to set <code class="code docutils literal notran
 
 <dl class="method">
 <dt id="cil.optimisation.operators.LinearOperator.dot_test">
-<em class="property">static </em><code class="sig-name descname">dot_test</code><span class="sig-paren">(</span><em class="sig-param">operator</em>, <em class="sig-param">domain_init=None</em>, <em class="sig-param">range_init=None</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#LinearOperator.dot_test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.optimisation.operators.LinearOperator.dot_test" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">dot_test</code><span class="sig-paren">(</span><em class="sig-param">operator</em>, <em class="sig-param">domain_init=None</em>, <em class="sig-param">range_init=None</em>, <em class="sig-param">tolerance=1e-06</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#LinearOperator.dot_test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.optimisation.operators.LinearOperator.dot_test" title="Permalink to this definition">¶</a></dt>
 <dd><p>Does a dot linearity test on the operator</p>
 <p>Evaluates if the following equivalence holds</p>
 <div class="math notranslate nohighlight">
 \[Ax\times y = y \times A^Tx\]</div>
-<p>The equivalence is tested within a user specified precision</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">abs</span><span class="p">(</span><span class="n">desired</span><span class="o">-</span><span class="n">actual</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="mi">10</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="n">decimal</span><span class="p">)</span>
-</pre></div>
-</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>operator</strong> – operator to test</p></li>
+<li><p><strong>operator</strong> – operator to test the dot_test</p></li>
 <li><p><strong>range_init</strong> – optional initialisation container in the operator range</p></li>
 <li><p><strong>domain_init</strong> – optional initialisation container in the operator domain</p></li>
-<li><p><strong>decimal</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default 4</em>) – desired precision</p></li>
+<li><p><strong>seed</strong> – Seed random generator</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>boolean, True if the test is passed.</p>
-</dd>
 </dl>
+<p>:type : int, default = 1
+:param tolerance: Check if the following expression is below the tolerance
+.. math:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span><span class="n">Ax</span>\<span class="n">times</span> <span class="n">y</span> <span class="o">-</span> <span class="n">y</span> \<span class="n">times</span> <span class="n">A</span><span class="o">^</span><span class="n">Tx</span><span class="o">|/</span><span class="p">(</span>\<span class="o">|</span><span class="n">A</span>\<span class="o">|</span>\<span class="o">|</span><span class="n">x</span>\<span class="o">|</span>\<span class="o">|</span><span class="n">y</span>\<span class="o">|</span> <span class="o">+</span> <span class="mf">1e-12</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tolerance</span>
+</pre></div>
+</div>
+<p>:type : float, default 1e-6
+:returns: boolean, True if the test is passed.</p>
 </dd></dl>
 
 <dl class="method">

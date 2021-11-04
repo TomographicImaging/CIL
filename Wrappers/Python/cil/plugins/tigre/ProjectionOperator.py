@@ -24,12 +24,16 @@ import numpy as np
 try:
     from _Atb import _Atb_ext as Atb
     from _Ax import _Ax_ext as Ax
-    from tigre.utilities.gpu import GpuIds
-
-
+    
 except ModuleNotFoundError:
     raise ModuleNotFoundError("This plugin requires the additional package TIGRE\n" +
             "Please install it via conda as tigre from the ccpi channel")
+
+try:
+    from tigre.utilities.gpu import GpuIds
+    has_gpu_sel = True
+except ModuleNotFoundError:
+    has_gpu_sel = False
 
 class ProjectionOperator(LinearOperator):
     '''TIGRE Projection Operator'''
@@ -80,18 +84,29 @@ class ProjectionOperator(LinearOperator):
         self.tigre_geom = tigre_geom
 
         #set up TIGRE GPU targets (from 2.2)
-        self.gpuids = GpuIds()
+        if has_gpu_sel:
+            self.gpuids = GpuIds()
+
+
+    def __call_Ax(self, data):
+        if has_gpu_sel:
+            return Ax(data, self.tigre_geom, self.tigre_geom.angles, self.method['direct'], self.tigre_geom.mode, self.gpuids)
+        else:
+            return Ax(data, self.tigre_geom, self.tigre_geom.angles, self.method['direct'], self.tigre_geom.mode)
 
 
     def direct(self, x, out=None):
 
+        data = x.as_array()
+
         if self.tigre_geom.is2D:
-            data_temp = np.expand_dims(x.as_array(),axis=0)
-            arr_out = Ax(data_temp, self.tigre_geom, self.tigre_geom.angles, self.method['direct'], self.tigre_geom.mode, self.gpuids)
+            data_temp = np.expand_dims(data,axis=0)
+            arr_out = self.__call_Ax(data_temp)
             arr_out = np.squeeze(arr_out, axis=1)
         else:
-            arr_out = Ax(x.as_array(), self.tigre_geom, self.tigre_geom.angles, self.method['direct'], self.tigre_geom.mode, self.gpuids)
+            arr_out = self.__call_Ax(data)
 
+        #if single angle projection remove the dimension for CIL
         if arr_out.shape[0] == 1:
             arr_out = np.squeeze(arr_out, axis=0)
 
@@ -101,19 +116,28 @@ class ProjectionOperator(LinearOperator):
         else:
             out.fill(arr_out)
 
+
+    def __call_Atb(self, data):
+        if has_gpu_sel:
+            return Atb(data, self.tigre_geom, self.tigre_geom.angles, self.method['adjoint'], self.tigre_geom.mode, self.gpuids)
+        else:
+            return Atb(data, self.tigre_geom, self.tigre_geom.angles, self.method['adjoint'], self.tigre_geom.mode)
+
+
     def adjoint(self, x, out=None):
-        #note Atb.Atb optional parameter name and default changed betwen 2.1 and 2.2
 
         data = x.as_array()
+        
+        #if single angle projection add the dimension in for TIGRE
         if x.dimension_labels[0] != AcquisitionGeometry.ANGLE:
             data = np.expand_dims(data,axis=0)
 
         if self.tigre_geom.is2D:
             data = np.expand_dims(data,axis=1)
-            arr_out = Atb(data, self.tigre_geom, self.tigre_geom.angles, self.method['adjoint'], self.tigre_geom.mode, self.gpuids)
+            arr_out = self.__call_Atb(data)
             arr_out = np.squeeze(arr_out, axis=0)
         else:
-            arr_out = Atb(data, self.tigre_geom, self.tigre_geom.angles, self.method['adjoint'], self.tigre_geom.mode, self.gpuids)
+            arr_out = self.__call_Atb(data)
 
         if out is None:
             out = ImageData(arr_out, deep_copy=False, geometry=self._domain_geometry.copy(), suppress_warning=True)
@@ -121,9 +145,11 @@ class ProjectionOperator(LinearOperator):
         else:
             out.fill(arr_out)
 
+
     def domain_geometry(self):
         return self._domain_geometry
-    
+
+
     def range_geometry(self):
         return self._range_geometry
         

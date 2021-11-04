@@ -186,13 +186,13 @@ class LinearOperator(Operator):
         :param range_init: optional initialisation container in the operator range 
         :param domain_init: optional initialisation container in the operator domain 
         :param seed: Seed random generator
-        :type : int, default = None
+        :type : int, default = 1
         :param tol: tolerance 
         :type : float, default 1e-6
         :returns: boolean, True if the test is passed.       
         '''
 
-        seed = kwargs.get('seed',None)
+        seed = kwargs.get('seed',1)
     
         if range_init is None:
             y = operator.range_geometry().allocate('random', seed = seed + 10)

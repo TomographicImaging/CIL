@@ -167,7 +167,7 @@ class LinearOperator(Operator):
         return s1
 
     @staticmethod
-    def dot_test(operator, domain_init=None, range_init=None, tol=1e-6, **kwargs):
+    def dot_test(operator, domain_init=None, range_init=None, tolerance=1e-6, **kwargs):
         r'''Does a dot linearity test on the operator
         
         Evaluates if the following equivalence holds
@@ -176,23 +176,21 @@ class LinearOperator(Operator):
         
           Ax\times y = y \times A^Tx
         
-        The equivalence is tested within a user specified precision
-
-        .. code::
-        
-          abs(desired-actual) < 1.5 * 10**(-decimal)
-
         :param operator: operator to test the dot_test
         :param range_init: optional initialisation container in the operator range 
         :param domain_init: optional initialisation container in the operator domain 
         :param seed: Seed random generator
         :type : int, default = 1
-        :param tol: tolerance 
+        :param tolerance: Check if the following expression is below the tolerance
+        .. math:: 
+        
+            |Ax\times y - y \times A^Tx|/(\|A\|\|x\|\|y\| + 1e-12) < tolerance
+        
         :type : float, default 1e-6
         :returns: boolean, True if the test is passed.       
         '''
 
-        seed = kwargs.get('seed',1)
+        seed = kwargs.get('seed', 1)
     
         if range_init is None:
             y = operator.range_geometry().allocate('random', seed = seed + 10)
@@ -212,7 +210,7 @@ class LinearOperator(Operator):
         # operator, x and y norms and avoid zero division
         error = numpy.abs( a - b )/ (operator.norm()*x.norm()*y.norm() + 1e-12)
             
-        if error < tol:
+        if error < tolerance:
             return True
         else:
             print ('Left hand side  {}, \nRight hand side {}'.format(a, b))

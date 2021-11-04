@@ -209,7 +209,7 @@ class Function(object):
             if self.L is not None:
                 if value != 1.0/self.L:
                     raise ValueError('If Function is convex, and its gradient Lipschitz with constant L, then\
-                                     the conjugate of the Function is 1/L strongly convex. [Hiriart-Urruty, Lemarechal, Theorem 4.2.2]')                                                      
+                                     the conjugate of the Function is 1/L strongly convex. [Hiriart-Urruty, Lemarechal, Theorem 4.2.2]')                                                                                         
         else:
             raise TypeError('The strongly convex constant is strictly positive number')                                   
     

@@ -45,6 +45,12 @@ class BlockFunction(Function):
         super(BlockFunction, self).__init__()
         self.functions = functions      
         self.length = len(self.functions)
+
+        tmp_gamma_conj = sum(filter(None, [func.gamma_conj for func in functions]))
+        if tmp_gamma_conj == 0:
+            self.gamma_conj = None
+        else:
+            self.gamma_conj = tmp_gamma_conj   
        
     @property        
     def L(self):
@@ -57,6 +63,31 @@ class BlockFunction(Function):
                 tmp_L = None 
                 break 
         return tmp_L     
+
+    # @property
+    # def gamma_conj(self):
+    #     sum_gamma_conj = 0
+    #     for func in self.functions:
+    #         if func.gamma_conj is not None:
+    #             sum_gamma_conj += func.gamma_conj
+    #         else:
+    #             pass
+    #     if sum_gamma_conj==0:
+    #         return None
+    #     else:
+    #         return sum_gamma_conj
+            
+    @gamma_conj.setter
+    def gamma_conj(self, value):
+        # call base class setter
+
+        if self.gamma_conj==0:
+            if value is not None:
+                raise ValueError("No strongly convex functions in this direct sum. `gamma_conj` should be None. {} is passed".format(value))
+        if value!=self.gamma_conj:
+            raise ValueError("The strongly convex constant of a direct sum of strongly convex or convex functions should agree with the sum of the strongly convex constants of the strongly convex functions. {} is passed. {} is needed".format(value, self.gamma_conj))
+
+        super(BlockFunction, self.__class__).gamma_conj.fset(self, value )           
                                 
     def __call__(self, x):
         
@@ -204,4 +235,22 @@ class BlockFunction(Function):
 
                             
     
+    
+if __name__ == "__main__":
+
+    from cil.framework import ImageGeometry
+    from cil.optimisation.functions import L1Norm, L2NormSquared
+
+    f = BlockFunction(L2NormSquared())
+
+    # print(f.gamma_conj)
+    # f.gamma_conj = None
+
+    f = BlockFunction(L1Norm(), L1Norm()) 
+
+    print(f.gamma_conj)    
+    # f.gamma_conj = None
+
+
+
     

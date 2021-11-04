@@ -381,7 +381,7 @@ class TestOperator(CCPiTestClass):
 
         # Create BlockGeometry
         bg = BlockGeometry(ig1,ig2, ig3)
-        x = bg.allocate('random')
+        x = bg.allocate(10)
 
         # Extract containers
         x0, x1, x2 = x[0], x[1], x[2]
@@ -413,7 +413,7 @@ class TestOperator(CCPiTestClass):
         # Check if adjoint is correct
 
         bg = BlockGeometry(ig1, ig2, ig3, ig1, ig2, ig3)
-        x = ig1.allocate('random')
+        x = ig1.allocate(20)
 
         index=3
         proj_map = ProjectionMap(bg, index)
@@ -444,7 +444,6 @@ class TestOperator(CCPiTestClass):
         except ValueError as err:
             print(err)           
 
-        # check adjoint 
          
             
     

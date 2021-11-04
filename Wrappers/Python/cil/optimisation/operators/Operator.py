@@ -167,7 +167,7 @@ class LinearOperator(Operator):
         return s1
 
     @staticmethod
-    def dot_test(operator, domain_init=None, range_init=None, verbose=False, tol=1e-6, **kwargs):
+    def dot_test(operator, domain_init=None, range_init=None, tol=1e-6, **kwargs):
         r'''Does a dot linearity test on the operator
         
         Evaluates if the following equivalence holds
@@ -182,39 +182,41 @@ class LinearOperator(Operator):
         
           abs(desired-actual) < 1.5 * 10**(-decimal)
 
-        :param operator: operator to test
+        :param operator: operator to test the dot_test
         :param range_init: optional initialisation container in the operator range 
         :param domain_init: optional initialisation container in the operator domain 
-        :returns: boolean, True if the test is passed.
-        :param decimal: desired precision
-        :type decimal: int, optional, default 4        
+        :param seed: Seed random generator
+        :type : int, default = None
+        :param tol: tolerance 
+        :type : float, default 1e-6
+        :returns: boolean, True if the test is passed.       
         '''
 
-        lst = [1,2,3]
-        for i in lst:
-        # seed = kwargs.get('seed',None)
-            if range_init is None:
-                y = operator.range_geometry().allocate('random', seed = i)
-            else:
-                y = range_init
-            if domain_init is None:
-                x = operator.domain_geometry().allocate('random',seed = i)
-            else:
-                x = domain_init
+        seed = kwargs.get('seed',None)
+    
+        if range_init is None:
+            y = operator.range_geometry().allocate('random', seed = seed)
+        else:
+            y = range_init
+        if domain_init is None:
+            x = operator.domain_geometry().allocate('random',seed = seed)
+        else:
+            x = domain_init
+        
+        fx = operator.direct(x)
+        by = operator.adjoint(y)
+        a = fx.dot(y)
+        b = by.dot(x).conjugate()
+
+        # Check relative tolerance but normalised with respect to 
+        # operator, x and y norms and avoid zero division
+        error = numpy.abs( a - b )/ (operator.norm()*x.norm()*y.norm() + 1e-12)
             
-            fx = operator.direct(x)
-            by = operator.adjoint(y)
-            a = fx.dot(y)
-            b = by.dot(x).conjugate()
-
-            # Check relative tolerance but normalised with respect to operator, x and y norms and avoid zero division
-            error = numpy.abs( a - b )/ (operator.norm()*x.norm()*y.norm() + 1e-12)
-
-            if error < tol:
-                return True
-            else:
-                print ('Left hand side  {}, \nRight hand side {}'.format(a, b))
-                return False    
+        if error < tol:
+            return True
+        else:
+            print ('Left hand side  {}, \nRight hand side {}'.format(a, b))
+            return False    
         
         
 class ScaledOperator(Operator):

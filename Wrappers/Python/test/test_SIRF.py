@@ -68,7 +68,8 @@ class GradientSIRF(object):
         np.testing.assert_array_almost_equal(res3.as_array(), res4.as_array()) 
 
         # test dot_test
-        self.assertTrue(LinearOperator.dot_test(Grad_numpy, decimal=3))
+        for sd in [5,10]:
+            self.assertTrue(LinearOperator.dot_test(Grad_numpy, seed=sd))
 
         # test shape of output of direct
         
@@ -96,7 +97,8 @@ class GradientSIRF(object):
 
 
         # test dot_test
-        self.assertTrue(LinearOperator.dot_test(Grad_c, decimal=3))
+        for sd in [5,10]:
+            self.assertTrue(LinearOperator.dot_test(Grad_c, seed=sd))
 
         # test adjoint
         res7 = Grad_c.adjoint(res5) 

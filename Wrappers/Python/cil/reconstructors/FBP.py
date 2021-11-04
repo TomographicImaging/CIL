@@ -322,39 +322,41 @@ class FDK(FBP_base):
 class FBP(FBP_base):
 
     @property
-    def by_slice(self):
-        return self.__by_slice
+    def slices_per_chunk(self):
+        return self.__slices_per_chunk
 
-    @by_slice.setter
+    @slices_per_chunk.setter
     def by_slice(self, val):
-        self.set_by_slice(val)
+        self.slices_per_chunk(val)
 
-    def set_split_processing(self, slice_data):
+    def set_split_processing(self, slices_per_chunk=None):
         """
-        False (default) will process the data in a single call.
-        True will process the data slice-by-slice, this will reduce memory use, but increase computation time.
+        slices_per_chunk=False (default) will process the data in a single call.
+        Otherwise it will process the data in chunks of n slices, this will reduce memory use but may increase computation time.
+        It is recommended to use value of poer-of-tw.
 
         it can only be used on simple data-geometries
-        :param slice_data: Sets the split processing of the data.
-        :type inplace: boolian
+        :param slice_data: Sets the number of slices to be processed per chunk, all sata will be processed
+        :type inplace: integer
         """
-        if type(slice_data) is not bool:
-            raise TypeError("set_split_processing expected a boolian. Got {}".format(type(slice_data)))
+        
+        try:
+            num_slices = int(slices_per_chunk)
+        except:
+            num_slices = False
 
-        if slice_data == True:
-            if self.input.geometry.dimension != '3D':
-                print("Only 3D data can be processed in chunks, setting slice_data to `False`")
-                slice_data = False
+        if self.input.geometry.system_description == 'advanced':
+            print("Only simple and offset geometries can be processed in chunks, setting slice_data to `False`")
+            num_slices = False
 
-            if self.input.geometry.system_description == 'advanced':
-                print("Only simple and offset geometries can be processed in chunks, setting slice_data to `False`")
-                slice_data = False
+        if self.input.geometry.get_ImageGeometry() != self.image_geometry:
+            print("Only default image geometries can be processed in chunks, setting slice_data to `False`")
+            num_slices = False
 
-            if self.input.geometry.get_ImageGeometry() != self.image_geometry:
-                print("Only default image geometries can be processed in chunks, setting slice_data to `False`")
-                slice_data = False
+        if num_slices >= self.input.geometry.pixel_num_v:
+            num_slices = False
 
-        self.__by_slice= slice_data
+        self.__slices_per_chunk = num_slices
 
 
     def __init__ (self,input):
@@ -392,6 +394,28 @@ class FBP(FBP_base):
  
         self.weights = np.full((ag.pixel_num_v,ag.pixel_num_h),weight,dtype=np.float32)
 
+    def __setup_PO_for_chunks(self, num_slices):
+        
+        if num_slices > 1:
+            ag_slice = self.input.geometry.copy()
+            ag_slice.pixel_num_v = num_slices
+        else:
+            ag_slice = self.input.geometry.get_slice(vertical=0)
+                
+        ig_slice = ag_slice.get_ImageGeometry()
+        self.data_slice = ag_slice.allocate()
+        self.operator = ProjectionOperator(ig_slice,ag_slice)
+
+    def __call_with_filtering(self,i,tot_slices,num_slices, ret):
+        print('\rprocessing slices {0}-{1} of {2}'.format(i,i+num_slices,tot_slices), end='')
+        self.data_slice.fill(np.squeeze(self.input.array[:,i:i+num_slices,:]))
+        self.pre_filtering(self.data_slice)
+        ret.array[i:i+num_slices,:,:] = self.operator.adjoint(self.data_slice).array[:]
+
+    def __call_without_filtering(self,i,tot_slices,num_slices, ret):
+        print('\rprocessing slices {0}-{1} of {2}'.format(i,i+num_slices,tot_slices), end='')
+        self.data_slice.fill(np.squeeze(self.input.array[:,i:i+num_slices,:]))
+        ret.array[i:i+num_slices,:,:] = self.operator.adjoint(self.data_slice).array[:]
 
     def run(self, out=None):
         """
@@ -403,29 +427,37 @@ class FBP(FBP_base):
         :rtype: ImageData
         """
         
-        if self.by_slice:
+        if self.slices_per_chunk:
             if out is None:
                 ret = self.image_geometry.allocate()
             else:
                 ret = out
 
-            data_slice = self.input.get_slice(vertical=0)               
-            ag_slice = data_slice.geometry
-            ig_slice = self.image_geometry.get_slice(vertical=0)
-            operator = ProjectionOperator(ig_slice,ag_slice)
+            tot_slices = self.input.geometry.pixel_num_v
+            remainder = tot_slices % self.slices_per_chunk
+
+            self.__setup_PO_for_chunks(self.slices_per_chunk)
 
             if self.filter_inplace:
                 self.pre_filtering(self.input)
 
-                for i in range(self.image_geometry.shape[0]):
-                    data_slice.fill(self.input.get_slice(vertical=i))
-                    ret.array[i,:,:] = operator.adjoint(data_slice).array[:,:]
-            else:
-                for i in range(self.image_geometry.shape[0]):
-                    data_slice.fill(self.input.get_slice(vertical=i))
-                    self.pre_filtering(data_slice)
-                    ret.array[i,:,:] = operator.adjoint(data_slice).array[:,:]
+                for i in range(0, tot_slices-remainder, self.slices_per_chunk):
+                    self.__call_without_filtering(i, tot_slices, self.slices_per_chunk, ret)
 
+                remainder = tot_slices % self.slices_per_chunk
+                if remainder:
+                    self.__setup_PO_for_chunks(remainder)
+                    self.__call_without_filtering(tot_slices-remainder, tot_slices, remainder, ret)
+
+            else:
+                for i in range(0, tot_slices-remainder, self.slices_per_chunk):
+                    self.__call_with_filtering(i, tot_slices, self.slices_per_chunk, ret)
+   
+                if remainder:
+                    self.__setup_PO_for_chunks(remainder)
+                    self.__call_with_filtering(tot_slices-remainder, tot_slices, remainder, ret)
+
+            print('\r', end='')
             if out is None:
                 return ret
 

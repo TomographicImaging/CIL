@@ -69,10 +69,13 @@ class PDHG(Algorithm):
 
         :param operator: a Linear Operator
         :param f: Convex function with "simple" proximal of its conjugate. 
-        :param g: Convex function with "simple" proximal 
+        :param g: Convex function with "simple" proximal .
         :param tau: Step size parameter for Primal problem
         :param sigma: Step size parameter for Dual problem
         :param initial: Initial guess ( Default initial = 0)
+        :param gamma_g: Strongly convex constant for the function g.     
+        :param gamma_fconj: Strongly convex constant for the convex conjugate of the function f.
+
         '''
         super(PDHG, self).__init__(**kwargs)
         if kwargs.get('x_init', None) is not None:
@@ -130,13 +133,21 @@ class PDHG(Algorithm):
         # relaxation parameter, default value is 1.0
         self.theta = kwargs.get('theta',1.0)
 
-        # Strongly convex case g
+        # Primal Acceleration: Function g is strongly convex 
         self.gamma_g = kwargs.get('gamma_g', None)
 
-        # Strongly convex case f
+        # Dual Acceleration : Convex conjugate of f is strongly convex
         self.gamma_fconj = kwargs.get('gamma_fconj', None) 
+
+        if self.gamma_g is not None:
+            warnings.warn("Primal Acceleration of PDHG: The function f is assumed to be strongly convex \
+                           with parameter `gamma_g`. Need to be sure that gamma_g = {} is the correct strongly convex constant for g".format(self.gamma_g))
         
+        if self.gamma_fconj is not None:
+            warnings.warn("Dual Acceleration of PDHG: The convex conjugate of function f is assumed to be strongly convex \
+                           with parameter `gamma_fconj`. Need to be sure that gamma_fconj = {} is the correct strongly convex constant".format(self.gamma_fconj))
         
+
         self.configured = True
         print("{} configured".format(self.__class__.__name__, ))
 

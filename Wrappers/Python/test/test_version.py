@@ -5,7 +5,6 @@ class TestModuleBase(unittest.TestCase):
         try:
             from cil import version
             a = version.version
-            print ("version", a)
             self.assertTrue(isinstance(a, str))
         except ImportError as ie:
             self.assertFalse(True, str(ie))

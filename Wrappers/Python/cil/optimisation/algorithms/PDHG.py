@@ -29,16 +29,9 @@ class PDHG(Algorithm):
     .. math::
     
       \min_{x} f(Kx) + g(x)
-        
-    :param operator: Linear Operator = K
-    :param f: Convex function with "simple" proximal of its conjugate. 
-    :param g: Convex function with "simple" proximal 
-    :param tau: Step size parameter for Primal problem
-    :param sigma: Step size parameter for Dual problem
-    :param gamma_g: Strongly convex constant for the function g. It can be used to accelerate PDHG: Primal Acceleration.
-    :type gamma_g: Default is None
-    :param gamma_g: Strongly convex constant for the convex conjugate of the function f. It can be used to accelerate PDHG: Dual Acceleration.
-    :type gamma_fconj: Default is None    
+
+    #TODO Add general information about PDHG, e.g, proximal, proximal conjugate, saddle point
+    #TODO Mention acceleration cases.
 
     Note: A function f is strongly convex with parameter :math: $\gamma$ iff the function 
     

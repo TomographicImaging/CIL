@@ -24,31 +24,18 @@ class Function(object):
     """ Abstract class representing a function 
     
         :param L: Lipschitz constant of the gradient of the function F(x), when it is differentiable.
-        :type L: number, positive, default None
-        :param gamma: Strongly convex constant of the function F(x)
-        :type gamma: number, strictly positive, default None  
-        :param gamma_conj: Strongly convex constant of the convex conjugate function of F(x)
-        :type gamma_conj: number, strictly positive, default None                
-
+        :type L: number, positive, default None             
 
         # TODO Add definition of Lipschitz
         #  Lipschitz of the gradient of the function; it is a positive real number, such that |f'(x) - f'(y)| <= L ||x-y||, assuming f: IG --> R
 
-        # TODO Add definition of Strongly convex constant
-
     """
     
     
-    def __init__(self, L = None, gamma = None, gamma_conj = None):
+    def __init__(self, L = None):
 
-        # Lipschitz constant for the gradient of f
-        self._L = L
-
-        # Strongly convexity constant for the Function
-        self._gamma = gamma
-
-        # Strongly convexity constant for the conjugate of the Function 
-        self._gamma_conj= gamma_conj        
+        # Lipschitz constant for the gradient of the Function
+        self._L = L     
         
     def __call__(self,x):
         
@@ -113,8 +100,6 @@ class Function(object):
         if out is None:
             return val
 
-
-
     # Algebra for Function Class
     
         # Add functions
@@ -178,40 +163,6 @@ class Function(object):
         else:
             raise TypeError('The Lipschitz constant is a real positive number')
 
-    @property
-    def gamma(self):
-        '''Strongly convex constant of a function.'''
-                
-        return self._gamma
-
-    @gamma.setter
-    def gamma(self, value):
-        '''Setter for strongly convex constant for a function '''
-        if isinstance(value, (Number,)) and value > 0:
-            self._gamma = value
-        else:
-            raise TypeError('The strongly convex constant is strictly positive number') 
-
-    @property
-    def gamma_conj(self):
-        '''Strongly convex constant of the convex conjugate of a function.
-        '''
-        return self._gamma_conj
-
-    @gamma_conj.setter
-    def gamma_conj(self, value):
-        '''Setter for Strongly convex constant for the convex conjugate of a function '''
-
-        if isinstance(value, (Number,)) and value > 0:
-
-            self._gamma_conj = value  
-
-            if self.L is not None:
-                if value != 1.0/self.L:
-                    raise ValueError('If Function is convex, and its gradient Lipschitz with constant L, then\
-                                     the conjugate of the Function is 1/L strongly convex. [Hiriart-Urruty, Lemarechal, Theorem 4.2.2]')                                                                                         
-        else:
-            raise TypeError('The strongly convex constant is strictly positive number')                                   
     
 class SumFunction(Function):
     
@@ -239,58 +190,6 @@ class SumFunction(Function):
     def L(self, value):
         # call base class setter
         super(SumFunction, self.__class__).L.fset(self, value )
-
-    @property
-    def gamma(self):
-        '''Strongly convex constant for the sum of two functions. If both are strongly convex
-        with constants a, b then the SumFunction is strongly convex with a+b.
-
-        If one is strongly convex with constant a and the other is convex then the SumFunction is strongly convex
-        with constant a.
-        
-        In the following, we assume that we always deal with convex functions.
-        '''
-
-        # TODO better to use a .convex member = False by default
-        if self.function1.gamma is not None and self.function2.gamma is not None:
-            self._gamma = self.function1.gamma + self.function2.gamma
-        elif self.function1.gamma is None and self.function2.gamma is not None:
-            self._gamma = self.function2.gamma 
-        elif self.function2.gamma is None and self.function1.gamma is not None: 
-            self._gamma = self.function1.gamma 
-        else:
-            self._gamma = None      
-        return self._gamma
-    @gamma.setter
-    def gamma(self, value):
-        # call base class setter
-        super(SumFunction, self.__class__).gamma.fset(self, value )    
-
-    @property
-    def gamma_conj(self):
-        '''Strongly convex constant for the sum of two functions. If both are strongly convex
-        with constants a, b then the SumFunction is strongly convex with a+b.
-        If one is strongly convex (a) and the other is convex then the SumFunction is strongly convex
-        with constant a.
-        
-        In the following, we assume that we always deal with convex functions.
-        '''
-
-        # TODO better to use a .convex member = False by default
-        if self.function1.gamma_conj is not None and self.function2.gamma_conj is not None:
-            self._gamma_conj = self.function1.gamma_conj + self.function2.gamma_conj
-        elif self.function1.gamma_conj is None and self.function2.gamma_conj is not None:
-            self._gamma_conj= self.function2.gamma_conj 
-        elif self.function2.gamma_conj is None and self.function1.gamma_conj is not None: 
-            self._gamma_conj = self.function1.gamma_conj 
-        else:
-            self._gamma_conj = None      
-        return self._gamma_conj
-    @gamma_conj.setter
-    def gamma_conj(self, value):
-        # call base class setter
-        super(SumFunction, self.__class__).gamma_conj.fset(self, value )              
-
 
     def __call__(self,x):
         r"""Returns the value of the sum of functions :math:`F_{1}` and :math:`F_{2}` at x
@@ -354,39 +253,6 @@ class ScaledFunction(Function):
         super(ScaledFunction, self.__class__).L.fset(self, value )  
 
     @property
-    def gamma(self):
-        if self._gamma is None:
-            if self.function.gamma is not None:
-                if self.scalar <= 0:
-                    # If it strongly convex and multiply with a number <=0, it is not strongl convex
-                    self._gamma = None
-                else:
-                    self._gamma = self.scalar * self.function.gamma
-            else:
-                self._gamma = None
-        return self._gamma
-    @gamma.setter
-    def gamma(self, value):
-        # call base class setter
-        super(ScaledFunction, self.__class__).gamma.fset(self, value )   
-
-    @property
-    def gamma_conj(self):
-        if self._gamma_conj is None:
-            if self.function.gamma_conj is not None:
-                if self.scalar <= 0:
-                    self._gamma_conj= None
-                else:
-                    self._gamma_conj = self.scalar * self.function.gamma_conj
-            else:
-                self._gamma_conj = None
-        return self._gamma_conj
-    @gamma_conj.setter
-    def gamma_conj(self, value):
-        # call base class setter
-        super(ScaledFunction, self.__class__).gamma_conj.fset(self, value )                                
-
-    @property
     def scalar(self):
         return self._scalar
     @scalar.setter
@@ -446,29 +312,6 @@ class ScaledFunction(Function):
         return self.function.proximal(x, tau*self.scalar, out=out)     
 
 
-    def proximal_conjugate(self, x, tau, out = None):
-        r"""This returns the proximal operator for the function at x, tau
-        """
-        try:
-            tmp = x
-            x.divide(tau, out = tmp)
-        except TypeError:
-            tmp = x.divide(tau, dtype=np.float32)
-
-        if out is None:
-            val = self.function.proximal(tmp, self.scalar/tau )
-        else:
-            self.function.proximal(tmp, self.scalar/tau, out = out)
-            val = out     
-
-        if id(tmp) == id(x):
-            x.multiply(tau, out = x)
-
-        val.axpby(-tau, 1.0, x, out=val)
-
-        if out is None:
-            return val
-
 class SumScalarFunction(SumFunction):
           
     """ SumScalarFunction represents the sum a function with a scalar. 
@@ -522,32 +365,6 @@ class SumScalarFunction(SumFunction):
     def L(self, value):
         # call base class setter
         super(SumScalarFunction, self.__class__).L.fset(self, value )
-
-    @property
-    def gamma(self):
-        if self._gamma is None:
-            if self.function.gamma is not None:
-                self._gamma = self.function.gamma
-            else:
-                self._gamma = None
-        return self._gamma
-    @gamma.setter
-    def gamma(self, value):
-        # call base class setter
-        super(SumScalarFunction, self.__class__).gamma.fset(self, value )   
-
-    @property
-    def gamma_conj(self):
-        if self._gamma_conj is None:
-            if self.function.gamma_conj is not None:
-                self._gamma_conj = self.function.gamma_conj
-            else:
-                self._gamma_conj = None
-        return self._gamma_conj
-    @gamma_conj.setter
-    def gamma_conj(self, value):
-        # call base class setter
-        super(SumScalarFunction, self.__class__).gamma_conj.fset(self, value )                  
 
 class ConstantFunction(Function):
     
@@ -655,9 +472,7 @@ class TranslateFunction(Function):
     
     def __init__(self, function, center):
 
-        super(TranslateFunction, self).__init__(L = function.L, 
-                                                gamma = function.gamma, 
-                                                gamma_conj = function.gamma_conj) 
+        super(TranslateFunction, self).__init__(L = function.L) 
                         
         self.function = function
         self.center = center

@@ -111,14 +111,9 @@ class PDHG(Algorithm):
         self.g = g
         self.operator = operator
 
-        self.tau = tau
-        self.sigma = sigma
-
-        if self.tau is None:
-            # Compute operator Norm
-            normK = self.operator.norm()
-            # Primal & dual stepsizes
-            self.tau = 1 / (self.sigma * normK ** 2)
+        normK = self.operator.norm()
+        self.tau = 1./normK
+        self.sigma = 1./normK
         
         if initial is None:
             self.x_old = self.operator.domain_geometry().allocate(0)
@@ -138,6 +133,17 @@ class PDHG(Algorithm):
 
         # Dual Acceleration : Convex conjugate of f is strongly convex
         self.gamma_fconj = kwargs.get('gamma_fconj', None) 
+
+        try:
+            self.gamma_g = self.g.gamma
+        except AttributeError:
+            pass
+
+        try:
+            self.gamma_fconj = self.f.conjugate.gamma
+        except AttributeError:
+            pass        
+
 
         if self.gamma_g is not None:
             warnings.warn("Primal Acceleration of PDHG: The function f is assumed to be strongly convex \

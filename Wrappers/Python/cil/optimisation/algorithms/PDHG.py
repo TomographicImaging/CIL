@@ -35,12 +35,20 @@ class PDHG(Algorithm):
     :param g: Convex function with "simple" proximal 
     :param tau: Step size parameter for Primal problem
     :param sigma: Step size parameter for Dual problem
+    :param gamma_g: Strongly convex constant for the function g. It can be used to accelerate PDHG: Primal Acceleration.
+    :type gamma_g: Default is None
+    :param gamma_g: Strongly convex constant for the convex conjugate of the function f. It can be used to accelerate PDHG: Dual Acceleration.
+    :type gamma_fconj: Default is None    
 
-    If the function g is strongly convex, you can use `gamma_g` to accelerate PDHG.
-    If the convex conjugate of f is strongly convex, you can use `gamma_fconj` to accelerate PDHG.
+    Note: A function f is strongly convex with parameter :math: $\gamma$ iff the function 
+    
+    .. math:: 
+    
+        f(x) - \frac{\gamma}{2}\|x\|^{2}
+    
+    is convex.
 
-    :param gamma_g: Strongly convex constant for the function
-    :param gamma_fconj: Strongly convex constant for the function
+    For more information, see https://en.wikipedia.org/wiki/Convex_function#Strongly_convex_functions    
  
     Remark: Convergence is guaranted provided that
         

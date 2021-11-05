@@ -49,7 +49,7 @@ class L2NormSquared(Function):
         :param b:  translation of the function
         :type b: :code:`DataContainer`, optional
         '''                        
-        super(L2NormSquared, self).__init__(L = 2, gamma=2, gamma_conj=1/2)
+        super(L2NormSquared, self).__init__(L = 2)
         self.b = kwargs.get('b',None) 
         
                             

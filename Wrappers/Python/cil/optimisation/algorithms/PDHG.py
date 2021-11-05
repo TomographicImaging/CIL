@@ -152,14 +152,11 @@ class PDHG(Algorithm):
         except AttributeError:
             pass        
 
-
         if self.gamma_g is not None:
-            warnings.warn("Primal Acceleration of PDHG: The function f is assumed to be strongly convex \
-                           with parameter `gamma_g`. Need to be sure that gamma_g = {} is the correct strongly convex constant for g".format(self.gamma_g))
+            warnings.warn("Primal Acceleration of PDHG: The function g is assumed to be strongly convex with parameter `gamma_g`. Need to be sure that gamma_g = {} is the correct strongly convex constant for g. ".format(self.gamma_g))
         
         if self.gamma_fconj is not None:
-            warnings.warn("Dual Acceleration of PDHG: The convex conjugate of function f is assumed to be strongly convex \
-                           with parameter `gamma_fconj`. Need to be sure that gamma_fconj = {} is the correct strongly convex constant".format(self.gamma_fconj))
+            warnings.warn("Dual Acceleration of PDHG: The convex conjugate of function f is assumed to be strongly convex with parameter `gamma_fconj`. Need to be sure that gamma_fconj = {} is the correct strongly convex constant".format(self.gamma_fconj))
         
 
         self.configured = True

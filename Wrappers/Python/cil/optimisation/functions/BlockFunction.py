@@ -155,39 +155,39 @@ class BlockFunction(Function):
             
         return  BlockDataContainer(*out)     
 
-    # def proximal_conjugate(self, x, tau, out = None):
+    def proximal_conjugate(self, x, tau, out = None):
         
-    #     r"""Proximal operator of the convex conjugate of BlockFunction at x:
+        r"""Proximal operator of the convex conjugate of BlockFunction at x:
         
-    #         .. math:: \mathrm{prox}_{\tau F^{*}}(x) = (\mathrm{prox}_{\tau f^{*}_{i}}(x^{*}_{i}))_{i=1}^{m}
+            .. math:: \mathrm{prox}_{\tau F^{*}}(x) = (\mathrm{prox}_{\tau f^{*}_{i}}(x^{*}_{i}))_{i=1}^{m}
             
-    #         Parameter:
+            Parameter:
             
-    #             x : BlockDataContainer and must have as many rows as self.length            
-    #     """
+                x : BlockDataContainer and must have as many rows as self.length            
+        """
 
-    #     if self.length != x.shape[0]:
-    #         raise ValueError('BlockFunction and BlockDataContainer have incompatible size')
+        if self.length != x.shape[0]:
+            raise ValueError('BlockFunction and BlockDataContainer have incompatible size')
 
-    #     if out is not None:
-    #         if isinstance(tau, Number):
-    #             for i in range(self.length):
-    #                 self.functions[i].proximal_conjugate(x.get_item(i), tau, out=out.get_item(i))
-    #         else:
-    #             for i in range(self.length):
-    #                 self.functions[i].proximal_conjugate(x.get_item(i), tau.get_item(i),out=out.get_item(i))
+        if out is not None:
+            if isinstance(tau, Number):
+                for i in range(self.length):
+                    self.functions[i].proximal_conjugate(x.get_item(i), tau, out=out.get_item(i))
+            else:
+                for i in range(self.length):
+                    self.functions[i].proximal_conjugate(x.get_item(i), tau.get_item(i),out=out.get_item(i))
             
-    #     else:
+        else:
                 
-    #         out = [None]*self.length
-    #         if isinstance(tau, Number):
-    #             for i in range(self.length):
-    #                 out[i] = self.functions[i].proximal_conjugate(x.get_item(i), tau)
-    #         else:
-    #             for i in range(self.length):
-    #                 out[i] = self.functions[i].proximal_conjugate(x.get_item(i), tau.get_item(i))
+            out = [None]*self.length
+            if isinstance(tau, Number):
+                for i in range(self.length):
+                    out[i] = self.functions[i].proximal_conjugate(x.get_item(i), tau)
+            else:
+                for i in range(self.length):
+                    out[i] = self.functions[i].proximal_conjugate(x.get_item(i), tau.get_item(i))
             
-    #         return BlockDataContainer(*out)
+            return BlockDataContainer(*out)
         
     def __getitem__(self, row):
         return self.functions[row]
@@ -204,22 +204,4 @@ class BlockFunction(Function):
 
                             
     
-    
-if __name__ == "__main__":
-
-    from cil.framework import ImageGeometry
-    from cil.optimisation.functions import L1Norm, L2NormSquared
-
-    f = BlockFunction(L2NormSquared())
-
-    # print(f.gamma_conj)
-    # f.gamma_conj = None
-
-    f = BlockFunction(L1Norm(), L1Norm()) 
-
-    print(f.gamma_conj)    
-    # f.gamma_conj = None
-
-
-
-    
+ 

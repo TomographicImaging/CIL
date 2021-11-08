@@ -26,7 +26,7 @@ class Reconstructor(object):
     #__input is a weakreference object
     @property
     def input(self):
-        if self.__input is None:
+        if self.__input() is None:
             raise ValueError("Input has been deallocated")
         else:
             return self.__input()

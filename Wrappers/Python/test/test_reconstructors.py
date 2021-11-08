@@ -15,10 +15,9 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from cil import reconstructors
 from cil.framework import AcquisitionGeometry
-from cil.reconstructors import Reconstructor
-from cil.reconstructors import FDK, FBP
+from cil.recon.Reconstructor import Reconstructor # checks on baseclass
+from cil.recon import FDK, FBP
 from cil.utilities.dataexample import SIMULATED_PARALLEL_BEAM_DATA, SIMULATED_CONE_BEAM_DATA, SIMULATED_SPHERE_VOLUME
 
 import unittest

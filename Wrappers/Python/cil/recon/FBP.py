@@ -16,14 +16,12 @@
 #   limitations under the License.
 from cil.framework import cilacc
 from cil.framework import AcquisitionGeometry
-from cil.reconstructors import Reconstructor
+from cil.recon import Reconstructor
 from scipy.fft import fftfreq
 from cil.plugins.tigre import ProjectionOperator
 
 import numpy as np
-import ctypes, platform
-from ctypes import util
-
+import ctypes
 
 c_float_p = ctypes.POINTER(ctypes.c_float)
 c_double_p = ctypes.POINTER(ctypes.c_double)
@@ -51,7 +49,7 @@ if has_ipp:
                                     ctypes.c_long, #num_proj
                                     ctypes.c_long] #pix_x
 
-class FBP_base(Reconstructor):
+class GenericFilteredBackProjection(Reconstructor):
 
     @property
     def filter(self):
@@ -87,7 +85,7 @@ class FBP_base(Reconstructor):
 
     def __init__ (self,input):
         """
-        The initialiser for abstract base class::FBP_base
+        The initialiser for abstract base class::GenericFilteredBackProjection
 
         :param input: The input data to reconstruct. The reconstructor is set-up based on the geometry of the data. 
         :type input: AcquisitionData
@@ -96,7 +94,7 @@ class FBP_base(Reconstructor):
             raise ImportError("IPP libraries not found. Cannot use CIL FBP")
 
         #call parent initialiser
-        super(FBP_base, self).__init__(input)
+        super(GenericFilteredBackProjection, self).__init__(input)
         
         #additional check
         if 'channel' in input.dimension_labels:
@@ -257,7 +255,7 @@ class FBP_base(Reconstructor):
         NotImplementedError
 
 
-class FDK(FBP_base):
+class FDK(GenericFilteredBackProjection):
 
     def __init__ (self,input):
         """
@@ -319,7 +317,7 @@ class FDK(FBP_base):
             operator.adjoint(proj_filtered, out = out)
 
 
-class FBP(FBP_base):
+class FBP(GenericFilteredBackProjection):
 
     @property
     def slices_per_chunk(self):

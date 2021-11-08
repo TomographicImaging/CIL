@@ -15,10 +15,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from cil.framework import AcquisitionGeometry, AcquisitionData, ImageGeometry, DataOrder
-import warnings
-import numpy as np
-from numpy.lib.function_base import extract
+from cil.framework import AcquisitionData, ImageGeometry, DataOrder
 
 class Reconstructor(object):
     

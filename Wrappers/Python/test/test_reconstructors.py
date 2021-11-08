@@ -99,15 +99,18 @@ class Test_Reconstructor(unittest.TestCase):
 
     def test_weak_input(self):
 
-        reconstructor = Reconstructor(self.ad3D)
-        self.assertEqual(id(reconstructor.input),id(self.ad3D))
+        data = self.ad3D.copy()
+        reconstructor = Reconstructor(data)
+        self.assertEqual(id(reconstructor.input),id(data))
 
-        del self.ad3D
+        del data
         gc.collect()
 
         with self.assertRaises(ValueError):
             reconstructor.input
 
+        reconstructor.set_input(self.ad3D)
+        self.assertEqual(id(reconstructor.input),id(self.ad3D))
 
     def test_set_image_data(self):
         reconstructor = Reconstructor(self.ad3D)

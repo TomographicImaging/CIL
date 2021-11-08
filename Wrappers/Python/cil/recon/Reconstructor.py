@@ -37,7 +37,7 @@ class Reconstructor(object):
 
     @property
     def acquisition_geometry(self):
-        return self.input.geometry
+        return self.__acquisition_geometry
 
     @property
     def image_geometry(self):
@@ -69,9 +69,9 @@ class Reconstructor(object):
         if not DataOrder.check_order_for_engine(self.backend, input.geometry):
             raise ValueError("Input data must be reordered for use with selected backed. Use input.reorder{'{0}')".format(self.__backend))
 
-        self.__input = weakref.ref(input)
+        self.__acquisition_geometry = input.geometry.copy()
         self.__image_geometry = None
-
+        self.set_input(input)
     
     def set_input(self, input):
         """

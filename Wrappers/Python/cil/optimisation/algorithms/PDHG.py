@@ -22,44 +22,102 @@ import numpy as np
 
 class PDHG(Algorithm):
 
-    r"""Primal Dual Hybrid Gradient
-    
-    Problem: 
-    
-    .. math::
-    
-      \min_{x} f(Kx) + g(x)
+    r"""Primal Dual Hybrid Gradient (PDHG) algorithm, see :cite:`CP2010`.
 
-    #TODO Add general information about PDHG, e.g, proximal, proximal conjugate, saddle point
-    #TODO Mention acceleration cases.
+    A first-order primal-dual algorithm for convex optimization problems with known saddle-point structure with applications in imaging. 
 
-    Note: A function f is strongly convex with parameter :math: $\gamma$ iff the function 
-    
-    .. math:: 
-    
-        f(x) - \frac{\gamma}{2}\|x\|^{2}
-    
-    is convex.
+    The general problem considered in the PDHG algorithm is the generic saddle-point problem 
 
-    For more information, see https://en.wikipedia.org/wiki/Convex_function#Strongly_convex_functions    
- 
-    Remark: Convergence is guaranted provided that
+    .. math:: \min_{x\in X}\max_{y\in Y} \langle Kx, y \rangle + g(x) - f^{*}(x)
+
+    where :math:`f` and :math:`g` are convex functions with "simple" proximal operators. 
+    
+    :math:`X` and :math:`Y` are two two finite-dimensional vector spaces with an inner product and representing the domain of :math:`g` and :math:`f^{*}`, the convex conjugate of :math:`f`, respectively.
+
+    The operator :math:`K` is a continuous linear operator with operator norm defined as 
+
+    .. math:: \|K\| = \max\{ \|Kx\| : x\in X, \|x\|\leq1\}
+
+
+    The saddle point problem is decomposed into the primal problem:
+
+    .. math:: \min_{x\in X} f(Kx) + g(x), 
+
+    and its corresponding dual problem 
+
+    .. math:: \max_{y\in Y} - g^{*}(-K^{*}y) - f^{*}(y).
+
+    The PDHG algorithm consists of three steps:
+
+        a) gradient ascent step for the dual problem,
+        b) gradient descent step for the primal problem and
+        c) an over-relaxation of the primal variable.
+
+
+    Notes
+    -----    
+
+        - Convergence is guaranteed if the operator norm :math:`\|K\|`, \the dual step size :math:`\sigma` and the primal step size :math:`\tau`, satisfy the following inequality:
+
+        .. math:: 
+    
+            \tau \sigma \|L\|^2 < 1
+
+        - By default, the step sizes :math:`\sigma` and :math:`\tau` are:
+
+        .. math::
+
+            \sigma = \frac{1}{\|K\|},  \tau = \frac{1}{\|K\|}
+
+        - PDHG algorithm can be accelerated if the functions :math:`f^{*}` and/or :math:`g` are strongly convex.
         
-    .. math:: 
-    
-      \tau \sigma \|K\|^{2} <1
-        
+            A function :math:`f` is strongly convex with constant :math:`\gamma>0` if
+
+            .. math::
+
+                f(x) - \frac{\gamma}{2}\|x\|^{2}
+
+            is convex. 
             
-    Reference:
+            For instance the :math:`\frac{1}{2}\|x\|^{2}_{2}` is :math:`\gamma` strongly convex\
+            for :math:`\gamma\in(-\infty,1]`. We say it is 1-strongly convex because it is the largest constant for which \
+            :math:`f - \frac{1}{2}\|\cdot\|^{2}` is convex.
+
+            The :math:`\|\cdot\|_{1}` norm is not strongly convex.
+
+            For more information, see https://en.wikipedia.org/wiki/Convex_function#Strongly_convex_functions    
+
+    Example
+    -------
+    Least Squares minimisation with PDHG.
+
+    .. math:: \min_{u\in X} \|A u - g\|^{2}
+
+    >>> operator = A
+    >>> f = L2NormSquared(b = g)
+    >>> g = ZeroFunction()
+    >>> pdhg = PDHG(f = f, g = g, operator = operator)
+    >>> pdhg.run(10)
+
+    Example 
+    -------
+    Total variation denoising with with PDHG.  
+
+    .. math:: \min_{x\in X} \|u - g\|^{2} + \alpha\|\nabla u\|_{2,1}
+
+    >>> ig = g.geometry
+    >>> operator = GradientOperator(ig)
+    >>> f = MixedL21Norm()
+    >>> g = L2NormSquared(b=g)
+    >>> pdhg = PDHG(f = f, g = g, operator = operator)
+    >>> pdhg.run(10)        
+            
+    References
+    ----------
         
+        .. [1] A. Chambolle and T. Pock (2011), "A first-order primal–dual algorithm for convex problems with applications to imaging", J. Math. Imaging Vision 40, 120–145.        
         
-        (a) A. Chambolle and T. Pock (2011), "A first-order primal–dual algorithm for convex
-        problems with applications to imaging", J. Math. Imaging Vision 40, 120–145.        
-        
-        
-        (b) E. Esser, X. Zhang and T. F. Chan (2010), "A general framework for a class of first
-        order primal–dual algorithms for convex optimization in imaging science",
-        SIAM J. Imaging Sci. 3, 1015–1046.
+        .. [2] E. Esser, X. Zhang and T. F. Chan (2010), "A general framework for a class of first order primal–dual algorithms for convex optimization in imaging science", SIAM J. Imaging Sci. 3, 1015–1046.
 
     """
 

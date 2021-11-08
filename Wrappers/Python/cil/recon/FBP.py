@@ -91,15 +91,17 @@ class GenericFilteredBackProjection(Reconstructor):
         :param input: The input data to reconstruct. The reconstructor is set-up based on the geometry of the data. 
         :type input: AcquisitionData
         """
-        if has_ipp == False:
-            raise ImportError("IPP libraries not found. Cannot use CIL FBP")
 
         #call parent initialiser
         super(GenericFilteredBackProjection, self).__init__(input)
-        
+                
+        if has_ipp == False:
+            raise ImportError("IPP libraries not found. Cannot use CIL FBP")
+
         #additional check
         if 'channel' in input.dimension_labels:
             raise ValueError("Input data cannot be multi-channel")
+
 
         #define defaults
         self.__fft_order = self.__default_fft_order()
@@ -125,7 +127,7 @@ class GenericFilteredBackProjection(Reconstructor):
     def __default_fft_order(self):
         min_order = 0
 
-        while 2**min_order < self.input.geometry.pixel_num_h * 2:
+        while 2**min_order < self.acquisition_geometry.pixel_num_h * 2:
             min_order+=1
 
         min_order = max(8, min_order)
@@ -155,9 +157,9 @@ class GenericFilteredBackProjection(Reconstructor):
             self.__fft_order =fft_order
 
             if self.filter=='custom':
-                print("Filter length changed - resetting filter array to ram-lak")
-                self.set_filter('ram-lak')
+                print("Filter length changed - please update your custom filter")
             else:
+                #create default filter type of new length
                 self.set_filter(self.__filter)
         
  
@@ -228,13 +230,13 @@ class GenericFilteredBackProjection(Reconstructor):
         if self.weights is None or self.weights.shape[0] != acquistion_data.geometry.pixel_num_v:
             self.calculate_weights(acquistion_data.geometry)
 
-        filter_array = self.get_filter_array()
-
         if self.weights.shape[1] != acquistion_data.shape[-1]: #horizontal
             raise ValueError("Weights not compatible")
 
+        filter_array = self.get_filter_array()
         if filter_array.size != 2**self.fft_order:
-            raise ValueError("Filter not compatible")
+            raise ValueError("Custom filter has length {0} and is not compatible with requested fft_order {1}. Expected filter length 2^{1}"\
+                            .format(filter_array.size,self.fft_order))
 
         #call ext function
         data_ptr = acquistion_data.array.ctypes.data_as(c_float_p)
@@ -276,15 +278,16 @@ class FDK(GenericFilteredBackProjection):
         """
         #call parent initialiser
         super(FDK, self).__init__(input)
+
         if  input.geometry.geom_type != AcquisitionGeometry.CONE:
             raise TypeError("This reconstructor is for cone-beam data only.")
 
         
-    def calculate_weights(self, acquistion_geometry):
+    def calculate_weights(self, acquisition_geometry):
         """
         Calculates the pre-weighting used for FDK reconstruction.   
         """
-        ag = acquistion_geometry
+        ag = acquisition_geometry
         xv = np.arange(-(ag.pixel_num_h -1)/2,(ag.pixel_num_h -1)/2 + 1,dtype=np.float32) * ag.pixel_size_h
         yv = np.arange(-(ag.pixel_num_v -1)/2,(ag.pixel_num_v -1)/2 + 1,dtype=np.float32) * ag.pixel_size_v
         (yy, xx) = np.meshgrid(xv, yv)
@@ -310,7 +313,7 @@ class FDK(GenericFilteredBackProjection):
             proj_filtered = self.input
 
         self.pre_filtering(proj_filtered)
-        operator = ProjectionOperator(self.image_geometry,self.input.geometry,adjoint_weights='FDK')
+        operator = ProjectionOperator(self.image_geometry,self.acquisition_geometry,adjoint_weights='FDK')
         
         if out is None:
             return operator.adjoint(proj_filtered)
@@ -331,7 +334,7 @@ class FBP(GenericFilteredBackProjection):
 
     def set_split_processing(self, slices_per_chunk=None):
         """
-        slices_per_chunk=False (default) will process the data in a single call.
+        slices_per_chunk=0 (default) will process the data in a single call.
         Otherwise it will process the data in chunks of n slices, this will reduce memory use but may increase computation time.
         It is recommended to use value of poer-of-tw.
 
@@ -339,22 +342,14 @@ class FBP(GenericFilteredBackProjection):
         :param slice_data: Sets the number of slices to be processed per chunk, all sata will be processed
         :type inplace: integer
         """
-        
+
         try:
             num_slices = int(slices_per_chunk)
         except:
-            num_slices = False
+            num_slices = 0
 
-        if self.input.geometry.system_description == 'advanced':
-            print("Only simple and offset geometries can be processed in chunks, setting slice_data to `False`")
-            num_slices = False
-
-        if self.input.geometry.get_ImageGeometry() != self.image_geometry:
-            print("Only default image geometries can be processed in chunks, setting slice_data to `False`")
-            num_slices = False
-
-        if num_slices >= self.input.geometry.pixel_num_v:
-            num_slices = False
+        if  num_slices >= self.acquisition_geometry.pixel_num_v:
+            num_slices = self.acquisition_geometry.pixel_num_v
 
         self.__slices_per_chunk = num_slices
 
@@ -377,20 +372,19 @@ class FBP(GenericFilteredBackProjection):
         :param input: The input data to reconstruct. The reconstructor is set-up based on the geometry of the data. 
         :type input: AcquisitionData
         """
+        
         super(FBP, self).__init__(input)
-
+        self.set_split_processing(False)
 
         if  input.geometry.geom_type != AcquisitionGeometry.PARALLEL:
             raise TypeError("This reconstructor is for parallel-beam data only.")
 
-        self.set_split_processing(False)
 
-
-    def calculate_weights(self, acquistion_geometry):
+    def calculate_weights(self, acquisition_geometry):
         """
         Calculates the weights used for FBP reconstruction.     
         """
-        ag = acquistion_geometry
+        ag = acquisition_geometry
         weight = (2 * np.pi/ ag.num_projections) / ( 4 * ag.pixel_size_h ) 
  
         self.weights = np.full((ag.pixel_num_v,ag.pixel_num_h),weight,dtype=np.float32)
@@ -399,10 +393,10 @@ class FBP(GenericFilteredBackProjection):
     def __setup_PO_for_chunks(self, num_slices):
         
         if num_slices > 1:
-            ag_slice = self.input.geometry.copy()
+            ag_slice = self.acquisition_geometry.copy()
             ag_slice.pixel_num_v = num_slices
         else:
-            ag_slice = self.input.geometry.get_slice(vertical=0)
+            ag_slice = self.acquisition_geometry.get_slice(vertical=0)
                 
         ig_slice = ag_slice.get_ImageGeometry()
         self.data_slice = ag_slice.allocate()
@@ -433,12 +427,19 @@ class FBP(GenericFilteredBackProjection):
         """
         
         if self.slices_per_chunk:
+
+            if self.acquisition_geometry.system_description == 'advanced':
+                raise ValueError("Only simple and offset geometries can be processed in chunks with `set_split_processing`")
+
+            if self.acquisition_geometry.get_ImageGeometry() != self.image_geometry:
+                raise ValueError("Only default image geometries can be processed in chunks `set_split_processing`")
+
             if out is None:
                 ret = self.image_geometry.allocate()
             else:
                 ret = out
 
-            tot_slices = self.input.geometry.pixel_num_v
+            tot_slices = self.acquisition_geometry.pixel_num_v
             remainder = tot_slices % self.slices_per_chunk
 
             self.__setup_PO_for_chunks(self.slices_per_chunk)
@@ -475,7 +476,7 @@ class FBP(GenericFilteredBackProjection):
 
             self.pre_filtering(proj_filtered)
 
-            operator = ProjectionOperator(self.image_geometry,self.input.geometry)
+            operator = ProjectionOperator(self.image_geometry,self.acquisition_geometry)
 
             if out is None:
                 return operator.adjoint(proj_filtered)

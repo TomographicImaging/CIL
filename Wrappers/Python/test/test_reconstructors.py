@@ -24,6 +24,7 @@ import unittest
 from scipy.fftpack  import fft, ifft
 import numpy as np
 from utils import has_gpu_tigre, has_ipp
+import gc
 
 try:
     from cil.plugins.tigre import ProjectionOperator as ProjectionOperator
@@ -95,6 +96,18 @@ class Test_Reconstructor(unittest.TestCase):
 
         with self.assertRaises(TypeError):
             reconstructor = Reconstructor(self.ag3D)
+
+    def test_weak_input(self):
+
+        reconstructor = Reconstructor(self.ad3D)
+        self.assertEqual(id(reconstructor.input),id(self.ad3D))
+
+        del self.ad3D
+        gc.collect()
+
+        with self.assertRaises(ValueError):
+            reconstructor.input
+
 
     def test_set_image_data(self):
         reconstructor = Reconstructor(self.ad3D)
@@ -176,7 +189,8 @@ class Test_FBP_base(unittest.TestCase):
         np.testing.assert_array_equal(filter,filter_new)
 
         reconstructor.set_fft_order(10)
-        self.assertEqual(reconstructor.filter, 'ram-lak')
+        with self.assertRaises(ValueError):
+            reconstructor.run()
 
         with self.assertRaises(ValueError):
             reconstructor.set_filter(filter[1:-1])

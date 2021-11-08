@@ -60,7 +60,7 @@ def has_gpu_astra():
 
 def has_ipp():
     print ("has_ipp")
-    from cil.reconstructors import FBP
+    from cil.recon import FBP
     try:
         fbp = FBP('fail')
     except ImportError:

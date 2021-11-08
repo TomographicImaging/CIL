@@ -16,22 +16,35 @@
 #   limitations under the License.
 
 from cil.framework import AcquisitionData, ImageGeometry, DataOrder
+import weakref
 
 class Reconstructor(object):
     
     """ Abstract class representing a reconstructor 
     """
+
+    #__input is a weakreference object
     @property
     def input(self):
-        return self.__input
+        if self.__input is None:
+            raise ValueError("Input has been deallocated")
+        else:
+            return self.__input()
 
     @input.setter
     def input(self, val):
         self.set_input(val)
 
     @property
+    def acquisition_geometry(self):
+        return self.input.geometry
+
+    @property
     def image_geometry(self):
-        return self.__image_geometry
+        if self.__image_geometry is None:
+            return self.acquisition_geometry.get_ImageGeometry()
+        else:
+            return self.__image_geometry
 
     @image_geometry.setter
     def image_geometry(self, val):
@@ -56,8 +69,8 @@ class Reconstructor(object):
         if not DataOrder.check_order_for_engine(self.backend, input.geometry):
             raise ValueError("Input data must be reordered for use with selected backed. Use input.reorder{'{0}')".format(self.__backend))
 
-        self.__input = input
-        self.__image_geometry = input.geometry.get_ImageGeometry()
+        self.__input = weakref.ref(input)
+        self.__image_geometry = None
 
     
     def set_input(self, input):
@@ -68,10 +81,10 @@ class Reconstructor(object):
         :param input: A dataset with the same geometry
         :type input: AcquisitionData
         """
-        if input.geometry != self.input.geometry:
+        if input.geometry != self.acquisition_geometry:
             raise ValueError ("Input not compatible with configured reconstructor. Initialise a new reconstructor with this geometry")
         else:
-            self.__input = input
+            self.__input = weakref.ref(input)
 
 
     def set_image_geometry(self, image_geometry):
@@ -79,13 +92,14 @@ class Reconstructor(object):
         :param image_geometry: Set the ImageGeometry of the reconstructor
         :type image_geometry: ImageGeometry
         """
-
-        if not issubclass(type(image_geometry), ImageGeometry):
+        if image_geometry is None:
+            self.__image_geometry = None
+        elif issubclass(type(image_geometry), ImageGeometry):
+            self.__image_geometry = image_geometry.copy()
+        else:
             raise TypeError("ImageGeometry type mismatch: got {0} expecting {1}"\
-                            .format(type(input), ImageGeometry))   
-
-        self.__image_geometry = image_geometry.copy()
-
+                                .format(type(input), ImageGeometry))   
+           
 
     def set_backend(self, backend):
         """
@@ -99,11 +113,7 @@ class Reconstructor(object):
 
 
     def run(self):
-        raise NotImplementedError('Implement run for reconstructor')
-
-
-    def clear_input(self):
-        self.__input = None
+        raise NotImplementedError()
 
 
 

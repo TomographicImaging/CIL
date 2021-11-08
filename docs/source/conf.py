@@ -193,4 +193,7 @@ todo_include_todos = True
 
 bibtex_bibfiles = ['refs.bib']
 bibtex_encoding = 'latin'
-bibtex_default_style = 'unsrt'
+bibtex_reference_style = 'label'
+bibtex_default_style = 'plain'
+
+

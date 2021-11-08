@@ -22,7 +22,7 @@ import numpy as np
 
 class PDHG(Algorithm):
 
-    r"""Primal Dual Hybrid Gradient (PDHG) algorithm, see :cite:`CP2010`.
+    r"""Primal Dual Hybrid Gradient (PDHG) algorithm, see :cite:`CP2011`, :cite:`EZXC2010`.
 
     A first-order primal-dual algorithm for convex optimization problems with known saddle-point structure with applications in imaging. 
 
@@ -110,14 +110,13 @@ class PDHG(Algorithm):
     >>> f = MixedL21Norm()
     >>> g = L2NormSquared(b=g)
     >>> pdhg = PDHG(f = f, g = g, operator = operator)
-    >>> pdhg.run(10)        
-            
+    >>> pdhg.run(10) 
+
     References
     ----------
-        
-        .. [1] A. Chambolle and T. Pock (2011), "A first-order primal–dual algorithm for convex problems with applications to imaging", J. Math. Imaging Vision 40, 120–145.        
-        
-        .. [2] E. Esser, X. Zhang and T. F. Chan (2010), "A general framework for a class of first order primal–dual algorithms for convex optimization in imaging science", SIAM J. Imaging Sci. 3, 1015–1046.
+
+    .. bibliography::    
+            
 
     """
 

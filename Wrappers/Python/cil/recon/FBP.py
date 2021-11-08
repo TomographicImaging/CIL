@@ -83,6 +83,7 @@ class GenericFilteredBackProjection(Reconstructor):
     def weights(self, val):
         self.__weights = val
 
+
     def __init__ (self,input):
         """
         The initialiser for abstract base class::GenericFilteredBackProjection
@@ -327,6 +328,7 @@ class FBP(GenericFilteredBackProjection):
     def by_slice(self, val):
         self.slices_per_chunk(val)
 
+
     def set_split_processing(self, slices_per_chunk=None):
         """
         slices_per_chunk=False (default) will process the data in a single call.
@@ -382,7 +384,8 @@ class FBP(GenericFilteredBackProjection):
             raise TypeError("This reconstructor is for parallel-beam data only.")
 
         self.set_split_processing(False)
-         
+
+
     def calculate_weights(self, acquistion_geometry):
         """
         Calculates the weights used for FBP reconstruction.     
@@ -391,6 +394,7 @@ class FBP(GenericFilteredBackProjection):
         weight = (2 * np.pi/ ag.num_projections) / ( 4 * ag.pixel_size_h ) 
  
         self.weights = np.full((ag.pixel_num_v,ag.pixel_num_h),weight,dtype=np.float32)
+
 
     def __setup_PO_for_chunks(self, num_slices):
         
@@ -404,16 +408,19 @@ class FBP(GenericFilteredBackProjection):
         self.data_slice = ag_slice.allocate()
         self.operator = ProjectionOperator(ig_slice,ag_slice)
 
+
     def __call_with_filtering(self,i,tot_slices,num_slices, ret):
         print('\rprocessing slices {0}-{1} of {2}'.format(i,i+num_slices,tot_slices), end='')
         self.data_slice.fill(np.squeeze(self.input.array[:,i:i+num_slices,:]))
         self.pre_filtering(self.data_slice)
         ret.array[i:i+num_slices,:,:] = self.operator.adjoint(self.data_slice).array[:]
 
+
     def __call_without_filtering(self,i,tot_slices,num_slices, ret):
         print('\rprocessing slices {0}-{1} of {2}'.format(i,i+num_slices,tot_slices), end='')
         self.data_slice.fill(np.squeeze(self.input.array[:,i:i+num_slices,:]))
         ret.array[i:i+num_slices,:,:] = self.operator.adjoint(self.data_slice).array[:]
+
 
     def run(self, out=None):
         """

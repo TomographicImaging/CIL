@@ -45,6 +45,7 @@ class Reconstructor(object):
     def backend(self, val):
         self.set_backend(val)
 
+
     def __init__(self, input):
         self.__backend = 'tigre'
 
@@ -58,6 +59,7 @@ class Reconstructor(object):
         self.__input = input
         self.__image_geometry = input.geometry.get_ImageGeometry()
 
+    
     def set_input(self, input):
         """
         Update the data to run the reconstructor on. The new data must
@@ -71,6 +73,7 @@ class Reconstructor(object):
         else:
             self.__input = input
 
+
     def set_image_geometry(self, image_geometry):
         """
         :param image_geometry: Set the ImageGeometry of the reconstructor
@@ -83,6 +86,7 @@ class Reconstructor(object):
 
         self.__image_geometry = image_geometry.copy()
 
+
     def set_backend(self, backend):
         """
         :param backend: Set the backend used for the foward/backward projectors
@@ -93,8 +97,10 @@ class Reconstructor(object):
             raise ValueError("Backend unsupported. Supported backends: {}", supported_backends)
         self.__backend = backend
 
+
     def run(self):
         raise NotImplementedError('Implement run for reconstructor')
+
 
     def clear_input(self):
         self.__input = None

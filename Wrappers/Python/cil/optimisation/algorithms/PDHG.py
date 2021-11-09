@@ -24,6 +24,61 @@ class PDHG(Algorithm):
 
     r"""Primal Dual Hybrid Gradient (PDHG) algorithm, see :cite:`CP2011`, :cite:`EZXC2010`.
 
+    Parameters
+    ----------
+    f : Function
+        A convex function with a "simple" proximal method of its conjugate.
+    g : Function
+        A convex function with a "simple" proximal.
+    operator : LinearOperator    
+        A Linear Operator.
+    sigma : :obj:`float`, optional, default=1
+        Step size for the dual problem.
+    tau : :obj:`float`, optional, default=None
+        Step size for the primal problem.
+    initial : DataContainer, optional, default=None
+        Initial point for the PDHG algorithm.
+    use_axbpy: :obj:`bool`, optional, default=True
+        Computes a*x + b*y in C.
+    gamma_g : :obj:`float`, optional, default=None
+        Strongly convex constant if the function g is strongly convex. Allows primal acceleration of the PDHG algorithm.
+    gamma_fconj : :obj:`float`, optional, default=None
+        Strongly convex constant if the convex conjugate of f is strongly convex. Allows dual acceleration of the PDHG algorithm.
+
+
+    **kwargs:
+        Keyward arguments used from the base class :class:`Algorithm`.    
+    
+        max_iteration : :obj:`int`, optional, default=0
+            Maximum number of iterations of the PDHG.
+        update_objective_interval : :obj:`int`, optional, default=1
+            Evaluates objectives, e.g., primal/dual/primal-dual gap every ``update_objective_interval``.
+
+    Example 
+    -------
+    Total variation denoising with with PDHG.  
+
+    .. math:: \min_{x\in X} \|u - b\|^{2} + \alpha\|\nabla u\|_{2,1}
+
+    >>> data = dataexample.CAMERA.get()
+    >>> noisy_data = noise.gaussian(data, seed = 10, var = 0.02)
+    >>> ig = data.geometry
+    >>> operator = GradientOperator(ig)
+    >>> f = MixedL21Norm()
+    >>> g = L2NormSquared(b=g)
+    >>> pdhg = PDHG(f = f, g = g, operator = operator, max_iteration = 10)
+    >>> pdhg.run(10) 
+    >>> solution = pdhg.solution
+
+    Primal acceleration can be used, since :math:`g` is strongly convex with parameter ``gamma_g = 2``.
+
+    >>> pdhg = PDHG(f = f, g = g, operator = operator, gamma_g = 2)
+
+    For TV tomography reconstruction, see `CIL-Demos <https://github.com/TomographicImaging/CIL-Demos/blob/main/binder/TomographyReconstruction.ipynb>`_.
+
+
+
+
     A first-order primal-dual algorithm for convex optimization problems with known saddle-point structure with applications in imaging. 
 
     The general problem considered in the PDHG algorithm is the generic saddle-point problem 
@@ -49,9 +104,9 @@ class PDHG(Algorithm):
 
     The PDHG algorithm consists of three steps:
 
-        a) gradient ascent step for the dual problem,
-        b) gradient descent step for the primal problem and
-        c) an over-relaxation of the primal variable.
+    * gradient ascent step for the dual problem,
+    * gradient descent step for the primal problem and
+    * an over-relaxation of the primal variable.
 
 
     Notes
@@ -69,49 +124,21 @@ class PDHG(Algorithm):
 
             \sigma = \frac{1}{\|K\|},  \tau = \frac{1}{\|K\|}
 
-        - PDHG algorithm can be accelerated if the functions :math:`f^{*}` and/or :math:`g` are strongly convex.
+        PDHG algorithm can be accelerated if the functions :math:`f^{*}` and/or :math:`g` are strongly convex. A function :math:`f` is strongly convex with constant :math:`\gamma>0` if
+
+        .. math::
+
+            f(x) - \frac{\gamma}{2}\|x\|^{2}
+
+        is convex. 
         
-            A function :math:`f` is strongly convex with constant :math:`\gamma>0` if
+        For instance the :math:`\frac{1}{2}\|x\|^{2}_{2}` is :math:`\gamma` strongly convex\
+        for :math:`\gamma\in(-\infty,1]`. We say it is 1-strongly convex because it is the largest constant for which \
+        :math:`f - \frac{1}{2}\|\cdot\|^{2}` is convex.
 
-            .. math::
+        The :math:`\|\cdot\|_{1}` norm is not strongly convex. For more information, see `Strongly Convex <https://en.wikipedia.org/wiki/Convex_function#Strongly_convex_functions>`_.    
 
-                f(x) - \frac{\gamma}{2}\|x\|^{2}
-
-            is convex. 
-            
-            For instance the :math:`\frac{1}{2}\|x\|^{2}_{2}` is :math:`\gamma` strongly convex\
-            for :math:`\gamma\in(-\infty,1]`. We say it is 1-strongly convex because it is the largest constant for which \
-            :math:`f - \frac{1}{2}\|\cdot\|^{2}` is convex.
-
-            The :math:`\|\cdot\|_{1}` norm is not strongly convex.
-
-            For more information, see https://en.wikipedia.org/wiki/Convex_function#Strongly_convex_functions    
-
-    Example
-    -------
-    Least Squares minimisation with PDHG.
-
-    .. math:: \min_{u\in X} \|A u - g\|^{2}
-
-    >>> operator = A
-    >>> f = L2NormSquared(b = g)
-    >>> g = ZeroFunction()
-    >>> pdhg = PDHG(f = f, g = g, operator = operator)
-    >>> pdhg.run(10)
-
-    Example 
-    -------
-    Total variation denoising with with PDHG.  
-
-    .. math:: \min_{x\in X} \|u - g\|^{2} + \alpha\|\nabla u\|_{2,1}
-
-    >>> ig = g.geometry
-    >>> operator = GradientOperator(ig)
-    >>> f = MixedL21Norm()
-    >>> g = L2NormSquared(b=g)
-    >>> pdhg = PDHG(f = f, g = g, operator = operator)
-    >>> pdhg.run(10) 
-
+    
     References
     ----------
 
@@ -120,21 +147,12 @@ class PDHG(Algorithm):
 
     """
 
-    def __init__(self, f=None, g=None, operator=None, tau=None, sigma=1.,initial=None, use_axpby=True, **kwargs):
-        '''PDHG algorithm creator
+    def __init__(self, f, g, operator, tau=None, sigma=1.,initial=None, use_axpby=True, **kwargs):
+        """
+        Constructor method
+        """
 
-        Optional parameters
 
-        :param operator: a Linear Operator
-        :param f: Convex function with "simple" proximal of its conjugate. 
-        :param g: Convex function with "simple" proximal .
-        :param tau: Step size parameter for Primal problem
-        :param sigma: Step size parameter for Dual problem
-        :param initial: Initial guess ( Default initial = 0)
-        :param gamma_g: Strongly convex constant for the function g.     
-        :param gamma_fconj: Strongly convex constant for the convex conjugate of the function f.
-
-        '''
         super(PDHG, self).__init__(**kwargs)
         if kwargs.get('x_init', None) is not None:
             if initial is None:
@@ -150,15 +168,8 @@ class PDHG(Algorithm):
             self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, initial=initial, **kwargs)
 
     def set_up(self, f, g, operator, tau=None, sigma=1., initial=None, **kwargs):
-        '''initialisation of the algorithm
-
-        :param operator: a Linear Operator
-        :param f: Convex function with "simple" proximal of its conjugate. 
-        :param g: Convex function with "simple" proximal 
-        :param tau: Step size parameter for Primal problem
-        :param sigma: Step size parameter for Dual problem
-        :param initial: Initial guess ( Default initial = 0)'''
-
+        """initialisation of the algorithm
+        """
         print("{} setting up".format(self.__class__.__name__, ))
         
         # can't happen with default sigma
@@ -224,6 +235,29 @@ class PDHG(Algorithm):
 
     def update(self):
 
+        r"""
+
+        Performs a single iteration of the PDHG algorithm
+
+
+        .. math:: 
+        
+            y^{n+1} = \mathrm{prox}_{\sigma f^{*}}(y^{n} + \sigma K \bar{x}^{n})
+
+        .. math:: 
+        
+            x^{n+1} = \mathrm{prox}_{\tau g}(x^{n} + \tau K^{*}y^{n+1})            
+
+        .. math:: 
+        
+            \bar{x}^{n+1} = x^{n+1} + \theta (x^{n+1} - x^{n})
+
+        In the case of primal/dual acceleration using the strongly convexity property of function :math:`f^{*}` or :math:`g` \
+        the stepsize :math:`\sigma` and :math:`\tau` are updated using the :meth:`update_step_sizes` method.
+        
+
+        """
+
         #calculate x-bar and store in self.x_tmp
         if self._use_axpby:
             self.x_old.axpby((self.theta + 1.0), -self.theta , self.x, out=self.x_tmp) 
@@ -262,6 +296,20 @@ class PDHG(Algorithm):
 
 
     def update_step_sizes(self):
+
+        r"""
+        
+        Updates the step sizes :math:`\sigma` and :math:`\tau` and :math:`\theta` in the cases of primal or dual acceleration using the strongly convexity property.
+        
+        - :math:`g` is strongly convex with constant :math:`\gamma=`  ``gamma_g``.
+        - :math:`f^{*}` is strongly convex with constant :math:`\gamma=`  ``gamma_fconj``.
+
+        Note
+        ----
+
+        The case where both functions are strongly convex is not available at the moment.    
+         
+        """
     
         # Update sigma and tau based on the strong convexity of G
         if self.gamma_g is not None:
@@ -281,6 +329,48 @@ class PDHG(Algorithm):
                     
         
     def update_objective(self):
+
+        """
+
+        Evaluate the primal objective, the dual objective and the primal-dual gap
+
+        Primal objective
+
+        .. math:: 
+            
+            f(Kx) + g(x)
+
+        Dual objective:     
+        
+        .. math:: 
+            
+            - g^{*}(-K^{*}y) - f^{*}(y)
+
+        Primal-Dual gap (or Duality gap) 
+        
+        .. math:: 
+        
+            f(Kx) + g(x) + g^{*}(-K^{*}y) + f^{*}(y)
+
+        Note
+        ----
+
+            - The primal objective is printed if `verbose=1`.
+            - All the objective are printed if `verbose=2`.
+
+            Computing these objective can be costly, so it is better to compute every some iterations. To do this, use ``update_objective_interval = #number``.
+
+        Note
+        ----
+
+            The primal-dual gap (or duality gap) measures how close is the primal-dual pair (x,y) to the primal-dual solution. \
+            It is always non-negative and is used to monitor convergence of the PDHG algorithm. 
+            
+
+        
+        For more information, see `Duality Gap <https://en.wikipedia.org/wiki/Duality_gap>`_.
+
+        """
 
         self.operator.direct(self.x_old, out=self.y_tmp)
         f_eval_p = self.f(self.y_tmp)

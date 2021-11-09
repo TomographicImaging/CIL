@@ -561,7 +561,7 @@ class TestAlgorithms(unittest.TestCase):
     def test_exception_initial_PDHG(self):
         initial = 1
         try:
-            algo = PDHG(initial = initial, x_init=initial)
+            algo = PDHG(initial = initial, x_init=initial, f=None, g=None, operator=None)
             assert False
         except ValueError as ve:
             assert True

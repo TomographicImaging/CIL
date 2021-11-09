@@ -231,10 +231,7 @@ class PDHG(Algorithm):
 
     def update(self):
 
-        r"""
-
-        Performs a single iteration of the PDHG algorithm
-
+        r""" Performs a single iteration of the PDHG algorithm
 
         .. math:: 
         

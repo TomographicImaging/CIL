@@ -74,9 +74,8 @@ class PDHG(Algorithm):
 
     >>> pdhg = PDHG(f = f, g = g, operator = operator, gamma_g = 2)
 
-    For TV tomography reconstruction, see `CIL-Demos <https://github.com/TomographicImaging/CIL-Demos/blob/main/binder/TomographyReconstruction.ipynb>`_.
-
-
+    For a TV tomography reconstruction example, see `CIL-Demos <https://github.com/TomographicImaging/CIL-Demos/blob/main/binder/TomographyReconstruction.ipynb>`_.
+    More examples can be found in :cite:`Jorgensen_et_al_2021`, :cite:`Papoutsellis_et_al_2021`.
 
 
     A first-order primal-dual algorithm for convex optimization problems with known saddle-point structure with applications in imaging. 

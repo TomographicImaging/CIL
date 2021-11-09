@@ -149,8 +149,6 @@ class PDHG(Algorithm):
     def __init__(self, f, g, operator, tau=None, sigma=1.,initial=None, use_axpby=True, **kwargs):
         """Constructor method
         """
-
-
         super(PDHG, self).__init__(**kwargs)
         if kwargs.get('x_init', None) is not None:
             if initial is None:

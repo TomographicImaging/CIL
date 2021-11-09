@@ -147,8 +147,7 @@ class PDHG(Algorithm):
     """
 
     def __init__(self, f, g, operator, tau=None, sigma=1.,initial=None, use_axpby=True, **kwargs):
-        """
-        Constructor method
+        """Constructor method
         """
 
 

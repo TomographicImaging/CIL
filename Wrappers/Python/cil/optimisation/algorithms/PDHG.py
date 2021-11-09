@@ -32,17 +32,17 @@ class PDHG(Algorithm):
         A convex function with a "simple" proximal.
     operator : LinearOperator    
         A Linear Operator.
-    sigma : :obj:`float`, optional, default=1
+    sigma : positive :obj:`float`, optional, default=None
         Step size for the dual problem.
-    tau : :obj:`float`, optional, default=None
+    tau : positive :obj:`float`, optional, default=None
         Step size for the primal problem.
     initial : DataContainer, optional, default=None
         Initial point for the PDHG algorithm.
     use_axbpy: :obj:`bool`, optional, default=True
         Computes a*x + b*y in C.
-    gamma_g : :obj:`float`, optional, default=None
+    gamma_g : positive :obj:`float`, optional, default=None
         Strongly convex constant if the function g is strongly convex. Allows primal acceleration of the PDHG algorithm.
-    gamma_fconj : :obj:`float`, optional, default=None
+    gamma_fconj : positive :obj:`float`, optional, default=None
         Strongly convex constant if the convex conjugate of f is strongly convex. Allows dual acceleration of the PDHG algorithm.
 
 
@@ -115,7 +115,7 @@ class PDHG(Algorithm):
 
         .. math:: 
     
-            \tau \sigma \|L\|^2 < 1
+            \tau \sigma \|K\|^2 < 1
 
         - By default, the step sizes :math:`\sigma` and :math:`\tau` are:
 
@@ -123,19 +123,15 @@ class PDHG(Algorithm):
 
             \sigma = \frac{1}{\|K\|},  \tau = \frac{1}{\|K\|}
 
-        PDHG algorithm can be accelerated if the functions :math:`f^{*}` and/or :math:`g` are strongly convex. A function :math:`f` is strongly convex with constant :math:`\gamma>0` if
+        - PDHG algorithm can be accelerated if the functions :math:`f^{*}` and/or :math:`g` are strongly convex. A function :math:`f` is strongly convex with constant :math:`\gamma>0` if
 
         .. math::
 
-            f(x) - \frac{\gamma}{2}\|x\|^{2}
-
-        is convex. 
+            f(x) - \frac{\gamma}{2}\|x\|^{2} \quad\mbox{ is convex. }
         
-        For instance the :math:`\frac{1}{2}\|x\|^{2}_{2}` is :math:`\gamma` strongly convex\
-        for :math:`\gamma\in(-\infty,1]`. We say it is 1-strongly convex because it is the largest constant for which \
-        :math:`f - \frac{1}{2}\|\cdot\|^{2}` is convex.
+        - For instance the function :math:`\frac{1}{2}\|x\|^{2}_{2}` is :math:`\gamma` strongly convex for :math:`\gamma\in(-\infty,1]`. We say it is 1-strongly convex because it is the largest constant for which :math:`f - \frac{1}{2}\|\cdot\|^{2}` is convex.
 
-        The :math:`\|\cdot\|_{1}` norm is not strongly convex. For more information, see `Strongly Convex <https://en.wikipedia.org/wiki/Convex_function#Strongly_convex_functions>`_.    
+        - The :math:`\|\cdot\|_{1}` norm is not strongly convex. For more information, see `Strongly Convex <https://en.wikipedia.org/wiki/Convex_function#Strongly_convex_functions>`_.    
 
     
     References
@@ -146,7 +142,7 @@ class PDHG(Algorithm):
 
     """
 
-    def __init__(self, f, g, operator, tau=None, sigma=1.,initial=None, use_axpby=True, **kwargs):
+    def __init__(self, f, g, operator, tau=None, sigma=None,initial=None, use_axpby=True, **kwargs):
         """Constructor method
         """
         super(PDHG, self).__init__(**kwargs)
@@ -163,22 +159,22 @@ class PDHG(Algorithm):
         if f is not None and operator is not None and g is not None:
             self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, initial=initial, **kwargs)
 
-    def set_up(self, f, g, operator, tau=None, sigma=1., initial=None, **kwargs):
-        """initialisation of the algorithm
+    def set_up(self, f, g, operator, tau=None, sigma=None, initial=None, **kwargs):
+        """Initialisation of the algorithm
         """
         print("{} setting up".format(self.__class__.__name__, ))
         
-        # can't happen with default sigma
-        if sigma is None and tau is None:
-            raise ValueError('Need sigma*tau||K||^2<1')
-        # algorithmic parameters
+        # Triplet (f, g, K)
         self.f = f
         self.g = g
         self.operator = operator
 
-        normK = self.operator.norm()
-        self.tau = 1./normK
-        self.sigma = 1./normK
+        # step sizes
+        self.sigma = sigma
+        self.tau = tau
+
+        # Default values for the pdhg stepsizes
+        self.pdhg_step_sizes()
         
         if initial is None:
             self.x_old = self.operator.domain_geometry().allocate(0)
@@ -198,7 +194,7 @@ class PDHG(Algorithm):
 
         # Dual Acceleration : Convex conjugate of f is strongly convex
         self.gamma_fconj = kwargs.get('gamma_fconj', None) 
-
+        
         try:
             self.gamma_g = self.g.gamma
         except AttributeError:
@@ -209,13 +205,12 @@ class PDHG(Algorithm):
         except AttributeError:
             pass        
 
-        if self.gamma_g is not None:
-            warnings.warn("Primal Acceleration of PDHG: The function g is assumed to be strongly convex with parameter `gamma_g`. Need to be sure that gamma_g = {} is the correct strongly convex constant for g. ".format(self.gamma_g))
+        if self.gamma_g is not None:            
+            warnings.warn("Primal Acceleration of PDHG: The function g is assumed to be strongly convex with positive parameter `gamma_g`. Need to be sure that gamma_g = {} is the correct strongly convex constant for g. ".format(self.gamma_g))
         
         if self.gamma_fconj is not None:
-            warnings.warn("Dual Acceleration of PDHG: The convex conjugate of function f is assumed to be strongly convex with parameter `gamma_fconj`. Need to be sure that gamma_fconj = {} is the correct strongly convex constant".format(self.gamma_fconj))
+            warnings.warn("Dual Acceleration of PDHG: The convex conjugate of function f is assumed to be strongly convex with positive parameter `gamma_fconj`. Need to be sure that gamma_fconj = {} is the correct strongly convex constant".format(self.gamma_fconj))
         
-
         self.configured = True
         print("{} configured".format(self.__class__.__name__, ))
 
@@ -239,7 +234,7 @@ class PDHG(Algorithm):
 
         .. math:: 
         
-            x^{n+1} = \mathrm{prox}_{\tau g}(x^{n} + \tau K^{*}y^{n+1})            
+            x^{n+1} = \mathrm{prox}_{\tau g}(x^{n} - \tau K^{*}y^{n+1})            
 
         .. math:: 
         
@@ -287,6 +282,44 @@ class PDHG(Algorithm):
         # update the step sizes for special cases
         self.update_step_sizes()
 
+    def pdhg_step_sizes(self):
+
+        r"""Default step sizes for the PDHG algorithm
+
+        * If ``sigma`` is ``None`` and ``tau`` is ``None``:
+
+        .. math:: 
+    
+            \sigma = \frac{1}{\|K\|},  \tau = \frac{1}{\|K\|}
+
+        * If ``tau`` is ``None``:
+
+        .. math:: 
+    
+            \tau = \frac{1}{\sigma\|K\|^{2}}
+
+        * If ``sigma`` is ``None``:
+
+        .. math:: 
+    
+            \sigma = \frac{1}{\tau\|K\|^{2}}                
+
+
+        """
+
+        # Compute operator norm
+        self.norm_op = self.operator.norm()
+
+        if self.tau is None and self.sigma is None:            
+            self.sigma = 1./self.norm_op
+            self.tau = 1./self.norm_op
+        elif self.tau is None:
+            self.tau = 1./self.sigma*self.norm_op**2
+        elif self.sigma is None:
+            self.sigma = 1./self.tau*self.norm_op**2
+        else:
+            pass
+      
 
     def update_step_sizes(self):
 
@@ -325,9 +358,9 @@ class PDHG(Algorithm):
 
         """
 
-        Evaluate the primal objective, the dual objective and the primal-dual gap
+        Evaluates the primal objective, the dual objective and the primal-dual gap.
 
-        Primal objective
+        Primal objective:
 
         .. math:: 
             
@@ -339,7 +372,7 @@ class PDHG(Algorithm):
             
             - g^{*}(-K^{*}y) - f^{*}(y)
 
-        Primal-Dual gap (or Duality gap) 
+        Primal-Dual gap (or Duality gap): 
         
         .. math:: 
         
@@ -348,8 +381,8 @@ class PDHG(Algorithm):
         Note
         ----
 
-            - The primal objective is printed if `verbose=1`.
-            - All the objective are printed if `verbose=2`.
+            - The primal objective is printed if `verbose=1`, ``pdhg.run(verbose=1)``.
+            - All the objective are printed if `verbose=2`, ``pdhg.run(verbose=2)``.
 
             Computing these objective can be costly, so it is better to compute every some iterations. To do this, use ``update_objective_interval = #number``.
 

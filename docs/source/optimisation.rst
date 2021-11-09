@@ -64,7 +64,7 @@ print to screen of the status of the optimisation.
    :members:
    :special-members:
 .. autoclass:: cil.optimisation.algorithms.PDHG
-   :members: update, update_objective, update_step_sizes
+   :members: update, pdhg_step_sizes, update_step_sizes, update_objective
 .. autoclass:: cil.optimisation.algorithms.LADMM
    :members:
 .. autoclass:: cil.optimisation.algorithms.SPDHG

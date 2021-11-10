@@ -88,7 +88,7 @@ class GenericFilteredBackProjection(Reconstructor):
         self._weights = None
 
 
-    def set_filter_inplace(self, inplace):
+    def set_filter_inplace(self, inplace=False):
         """
         False (default) will allocate temporary memory for filtered projections.
         True will filter projections in-place.
@@ -151,7 +151,7 @@ class GenericFilteredBackProjection(Reconstructor):
                 self.set_filter(self._filter)
         
  
-    def set_filter(self, filter='ram=lak'):
+    def set_filter(self, filter='ram-lak'):
         """
         Set the filter used by the reconstruction. 
         

@@ -35,7 +35,9 @@ A number of demos can be found on the `CIL-Demos`_ repository.
    optimisation
    developer_guide
    processors
+   recon
    utilities
+
 
 .. Indices and tables
 .. ==================

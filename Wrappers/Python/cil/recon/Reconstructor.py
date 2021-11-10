@@ -99,7 +99,7 @@ class Reconstructor(object):
                                 .format(type(input), ImageGeometry))   
            
 
-    def set_backend(self, backend):
+    def set_backend(self, backend='tigre'):
         """
         Sets the backend used for the foward/backward projectors. Currently only TIGRE is supported
         
@@ -112,6 +112,13 @@ class Reconstructor(object):
         if backend not in supported_backends:
             raise ValueError("Backend unsupported. Supported backends: {}", supported_backends)
         self._backend = backend
+
+
+    def reset(self):
+        """
+        Resets all optional configuration parameters to their default values
+        """
+        raise NotImplementedError()
 
 
     def run(self, out=None, verbose=1):
@@ -132,6 +139,7 @@ class Reconstructor(object):
         """
 
         raise NotImplementedError()
+
 
     def _str_data_size(self):
 

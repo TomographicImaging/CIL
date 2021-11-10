@@ -15,8 +15,10 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+from cil import recon
 from cil.framework import AcquisitionGeometry
 from cil.recon.Reconstructor import Reconstructor # checks on baseclass
+from cil.recon.FBP import GenericFilteredBackProjection # checks on baseclass
 from cil.recon import FDK, FBP
 from cil.utilities.dataexample import SIMULATED_PARALLEL_BEAM_DATA, SIMULATED_CONE_BEAM_DATA, SIMULATED_SPHERE_VOLUME
 
@@ -75,12 +77,14 @@ class Test_Reconstructor(unittest.TestCase):
 
         self.ad3D = self.ag3D.allocate('random')
         self.ig3D = self.ag3D.get_ImageGeometry()
-        
+
+
     def test_defaults(self):
         reconstructor = Reconstructor(self.ad3D)
         self.assertEqual(id(reconstructor.input),id(self.ad3D))
         self.assertEqual(reconstructor.image_geometry,self.ig3D)
         self.assertEqual(reconstructor.backend, 'tigre')
+
 
     def test_set_input(self):
         reconstructor = Reconstructor(self.ad3D)
@@ -97,6 +101,7 @@ class Test_Reconstructor(unittest.TestCase):
         with self.assertRaises(TypeError):
             reconstructor = Reconstructor(self.ag3D)
 
+
     def test_weak_input(self):
 
         data = self.ad3D.copy()
@@ -112,12 +117,14 @@ class Test_Reconstructor(unittest.TestCase):
         reconstructor.set_input(self.ad3D)
         self.assertEqual(id(reconstructor.input),id(self.ad3D))
 
+
     def test_set_image_data(self):
         reconstructor = Reconstructor(self.ad3D)
 
         self.ig3D.voxel_num_z = 1
         reconstructor.set_image_geometry(self.ig3D)
         self.assertEqual(reconstructor.image_geometry,self.ig3D)
+
 
     def test_set_backend(self):
         reconstructor = Reconstructor(self.ad3D)
@@ -129,12 +136,13 @@ class Test_Reconstructor(unittest.TestCase):
         with self.assertRaises(ValueError):
             reconstructor = Reconstructor(self.ad3D)
 
-class Test_FBP_base(unittest.TestCase):
+
+class Test_GenericFilteredBackProjection(unittest.TestCase):
 
     def setUp(self):
         #%% Setup Geometry
-        voxel_num_xy = 255
-        voxel_num_z = 15
+        voxel_num_xy = 16
+        voxel_num_z = 4
 
         mag = 2
         src_to_obj = 50
@@ -144,7 +152,7 @@ class Test_FBP_base(unittest.TestCase):
         det_pix_x = voxel_num_xy
         det_pix_y = voxel_num_z
 
-        num_projections = 1000
+        num_projections = 36
         angles = np.linspace(0, 360, num=num_projections, endpoint=False)
 
         self.ag = AcquisitionGeometry.create_Cone2D([0,-src_to_obj],[0,src_to_det-src_to_obj])\
@@ -163,23 +171,52 @@ class Test_FBP_base(unittest.TestCase):
         self.ad3D = self.ag3D.allocate('random')
         self.ig3D = self.ag3D.get_ImageGeometry()
         
-    @unittest.skipUnless(has_ipp, "IPP not installed")
-    def test_defaults(self):
-        reconstructor = FDK(self.ad3D)
 
+    def check_defaults(self, reconstructor):
         self.assertEqual(reconstructor.filter, 'ram-lak')
-        self.assertEqual(reconstructor.fft_order, 9)
+        self.assertEqual(reconstructor.fft_order, 8)
         self.assertFalse(reconstructor.filter_inplace)
+        self.assertIsNone(reconstructor._weights)
 
         filter = reconstructor.get_filter_array()
         self.assertEqual(type(filter), np.ndarray)
-        self.assertEqual(len(filter), 2**9)
+        self.assertEqual(len(filter), 2**8)
         self.assertEqual(filter[0], 0)
-        self.assertEqual(filter[256],1.0)
-        self.assertEqual(filter[1],filter[511])
+        self.assertEqual(filter[128],1.0)
+        self.assertEqual(filter[1],filter[255])
 
+        self.assertEqual(reconstructor.image_geometry,self.ig3D)
+
+
+    @unittest.skipUnless(has_ipp, "IPP not installed")
+    def test_defaults(self):
+
+        reconstructor = GenericFilteredBackProjection(self.ad3D)
+        self.check_defaults(reconstructor)
+
+
+    @unittest.skipUnless(has_ipp, "IPP not installed")
+    def test_reset(self):
+        reconstructor = GenericFilteredBackProjection(self.ad3D)
+        reconstructor.set_fft_order(10)
+
+        arr = reconstructor.get_filter_array()
+        arr.fill(0)
+        reconstructor.set_filter(arr)
+
+        ig = self.ig3D.copy()
+        ig.num_voxels_x = 4
+        reconstructor.set_image_geometry(ig)
+
+        reconstructor.set_filter_inplace(True)
+
+        reconstructor.reset()
+        self.check_defaults(reconstructor)
+
+
+    @unittest.skipUnless(has_ipp, "IPP not installed")
     def test_set_filter(self):
-        reconstructor = FDK(self.ad3D)
+        reconstructor = GenericFilteredBackProjection(self.ad3D)
 
         with self.assertRaises(ValueError):
             reconstructor.set_filter("gemma")
@@ -191,28 +228,77 @@ class Test_FBP_base(unittest.TestCase):
         filter = reconstructor.get_filter_array()
         np.testing.assert_array_equal(filter,filter_new)
 
-        reconstructor.set_fft_order(10)
-        with self.assertRaises(ValueError):
-            reconstructor.run()
-
         with self.assertRaises(ValueError):
             reconstructor.set_filter(filter[1:-1])
 
+
+    @unittest.skipUnless(has_ipp, "IPP not installed")
     def test_set_fft_order(self):
-        reconstructor = FDK(self.ad3D)
+        reconstructor = GenericFilteredBackProjection(self.ad3D)
         reconstructor.set_fft_order(10)
         self.assertEqual(reconstructor.fft_order, 10)
 
         with self.assertRaises(ValueError):
             reconstructor.set_fft_order(2)
 
+
+    @unittest.skipUnless(has_ipp, "IPP not installed")
     def test_set_filter_inplace(self):
-        reconstructor = FDK(self.ad3D)
+        reconstructor = GenericFilteredBackProjection(self.ad3D)
         reconstructor.set_filter_inplace(True)
         self.assertTrue(reconstructor.filter_inplace)
 
         with self.assertRaises(TypeError):
             reconstructor.set_filter_inplace('gemma')
+
+
+class Test_FDK(unittest.TestCase):
+
+    def setUp(self):
+        #%% Setup Geometry
+        voxel_num_xy = 16
+        voxel_num_z = 4
+
+        mag = 2
+        src_to_obj = 50
+        src_to_det = src_to_obj * mag
+
+        pix_size = 0.2
+        det_pix_x = voxel_num_xy
+        det_pix_y = voxel_num_z
+
+        num_projections = 36
+        angles = np.linspace(0, 360, num=num_projections, endpoint=False)
+
+        self.ag = AcquisitionGeometry.create_Cone2D([0,-src_to_obj],[0,src_to_det-src_to_obj])\
+                                           .set_angles(angles)\
+                                           .set_panel(det_pix_x, pix_size)\
+                                           .set_labels(['angle','horizontal'])
+
+        self.ig = self.ag.get_ImageGeometry()
+
+        self.ag3D = AcquisitionGeometry.create_Cone3D([0,-src_to_obj,0],[0,src_to_det-src_to_obj,0])\
+                                     .set_angles(angles)\
+                                     .set_panel((det_pix_x,det_pix_y), (pix_size,pix_size))\
+                                     .set_labels(['angle','vertical','horizontal'])        
+        self.ig3D = self.ag3D.get_ImageGeometry()
+
+        self.ad3D = self.ag3D.allocate('random')
+        self.ig3D = self.ag3D.get_ImageGeometry()
+        
+
+    @unittest.skipUnless(has_ipp, "IPP not installed")
+    def test_set_filter(self):
+    
+        reconstructor = FDK(self.ad3D)
+        filter = reconstructor.get_filter_array()
+        filter_new =filter *0.5
+        reconstructor.set_filter(filter_new)
+
+        reconstructor.set_fft_order(10)
+        with self.assertRaises(ValueError):
+            reconstructor._pre_filtering(self.ad3D)
+
 
     @unittest.skipUnless(has_ipp, "IPP not installed")
     def test_filtering(self):
@@ -245,6 +331,8 @@ class Test_FBP_base(unittest.TestCase):
         diff = (out1-out2).abs().max()
         self.assertLess(diff, 1e-5)
 
+
+    @unittest.skipUnless(has_ipp, "IPP not installed")
     def test_weights(self):
         ag = AcquisitionGeometry.create_Cone3D([0,-1,0],[0,2,0])\
             .set_panel([3,4],[0.1,0.2])\
@@ -271,7 +359,114 @@ class Test_FBP_base(unittest.TestCase):
 
         diff = np.max(np.abs(weights - weights_new))
         self.assertLess(diff, 1e-5)
-  
+
+
+class Test_FBP(unittest.TestCase):
+    
+    def setUp(self):
+        #%% Setup Geometry
+        voxel_num_xy = 16
+        voxel_num_z = 4
+
+        pix_size = 0.2
+        det_pix_x = voxel_num_xy
+        det_pix_y = voxel_num_z
+
+        num_projections = 36
+        angles = np.linspace(0, 360, num=num_projections, endpoint=False)
+
+        self.ag = AcquisitionGeometry.create_Parallel2D()\
+                                           .set_angles(angles)\
+                                           .set_panel(det_pix_x, pix_size)\
+                                           .set_labels(['angle','horizontal'])
+
+        self.ig = self.ag.get_ImageGeometry()
+
+        self.ag3D = AcquisitionGeometry.create_Parallel3D()\
+                                     .set_angles(angles)\
+                                     .set_panel((det_pix_x,det_pix_y), (pix_size,pix_size))\
+                                     .set_labels(['angle','vertical','horizontal'])        
+        self.ig3D = self.ag3D.get_ImageGeometry()
+
+        self.ad3D = self.ag3D.allocate('random')
+        self.ig3D = self.ag3D.get_ImageGeometry()
+        
+
+    @unittest.skipUnless(has_ipp, "IPP not installed")
+    def test_set_filter(self):
+        reconstructor = FBP(self.ad3D)
+        filter = reconstructor.get_filter_array()
+        filter_new =filter *0.5
+        reconstructor.set_filter(filter_new)
+
+        reconstructor.set_fft_order(10)
+        with self.assertRaises(ValueError):
+            reconstructor._pre_filtering(self.ad3D)
+
+
+    @unittest.skipUnless(has_ipp, "IPP not installed")
+    def test_split_processing(self):
+        reconstructor = FBP(self.ad3D)
+        
+        self.assertEqual(reconstructor.slices_per_chunk, 0)
+
+        reconstructor.set_split_processing(1)
+        self.assertEqual(reconstructor.slices_per_chunk, 1)
+
+        reconstructor.reset()
+        self.assertEqual(reconstructor.slices_per_chunk, 0)
+
+
+    @unittest.skipUnless(has_ipp, "IPP not installed")
+    def test_filtering(self):
+        ag = AcquisitionGeometry.create_Parallel3D()\
+            .set_panel([64,3],[0.1,0.1])\
+            .set_angles([0,90])
+
+        ad = ag.allocate('random',seed=0)
+
+        reconstructor = FBP(ad)
+        out1 = ad.copy()
+        reconstructor._pre_filtering(out1)
+
+        #by hand
+        filter = reconstructor.get_filter_array()
+        reconstructor._calculate_weights(ag)
+        pad0 = (len(filter)-ag.pixel_num_h)//2
+        pad1 = len(filter)-ag.pixel_num_h-pad0
+
+        out2 = ad.array.copy()
+        out2*=reconstructor._weights
+        for i in range(2):
+            proj_padded = np.zeros((ag.pixel_num_v,len(filter)))
+            proj_padded[:,pad0:-pad1] = out2[i]
+            filtered_proj=fft(proj_padded,axis=-1)
+            filtered_proj*=filter
+            filtered_proj=ifft(filtered_proj,axis=-1)
+            out2[i]=np.real(filtered_proj)[:,pad0:-pad1]
+
+        diff = (out1-out2).abs().max()
+        self.assertLess(diff, 1e-5)
+
+
+    @unittest.skipUnless(has_ipp, "IPP not installed")
+    def test_weights(self):
+        ag = AcquisitionGeometry.create_Parallel3D()\
+            .set_panel([3,4],[0.1,0.2])\
+            .set_angles([0,90])
+        ad = ag.allocate(0)
+
+        reconstructor = FBP(ad)
+        reconstructor._calculate_weights(ag)
+        weights = reconstructor._weights
+
+        scaling =  (2 * np.pi/ ag.num_projections) / ( 4 * ag.pixel_size_h ) 
+        weights_new = np.ones_like(weights) * scaling
+
+        np.testing.assert_allclose(weights,weights_new)
+
+
+
 class Test_FDK_results(unittest.TestCase):
     
     def setUp(self):
@@ -369,6 +564,21 @@ class Test_FBP_results(unittest.TestCase):
     def test_results_3D(self):
 
         reconstructor = FBP(self.acq_data)
+
+        reco = reconstructor.run()
+        np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=1e-3)    
+
+        reco2 = reco.copy()
+        reco2.fill(0)
+        reconstructor.run(out=reco2)
+        np.testing.assert_array_equal(reco.as_array(), reco2.as_array())  
+
+
+    @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
+    def test_results_3D_split(self):
+
+        reconstructor = FBP(self.acq_data)
+        reconstructor.set_split_processing(1)
 
         reco = reconstructor.run()
         np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=1e-3)    

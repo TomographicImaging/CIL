@@ -257,6 +257,18 @@ class GenericFilteredBackProjection(Reconstructor):
             raise ValueError ("The data is not in a compatible order. Try reordering the data with data.reorder({})".format(self.backend))
 
 
+    def reset(self):
+        """
+        Resets all optional configuration parameters to their default values
+        """
+        self.set_filter()
+        self.set_fft_order()
+        self.set_backend()
+        self.set_filter_inplace()
+        self.set_image_geometry()
+        self._weights = None
+
+
     def run(self, out=None):
         NotImplementedError
 
@@ -540,6 +552,14 @@ class FBP(GenericFilteredBackProjection):
                 return operator.adjoint(proj_filtered)
             else:
                 operator.adjoint(proj_filtered, out = out)
+
+
+    def reset(self):
+        """
+        Resets all optional configuration parameters to their default values
+        """
+        super().reset()
+        self.set_split_processing(0)
 
 
     def __str__(self):

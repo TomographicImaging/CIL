@@ -23,56 +23,48 @@ class Reconstructor(object):
     """ Abstract class representing a reconstructor 
     """
 
-    #__input is a weakreference object
+    #_input is a weakreference object
     @property
     def input(self):
-        if self.__input() is None:
+        if self._input() is None:
             raise ValueError("Input has been deallocated")
         else:
-            return self.__input()
+            return self._input()
 
-    @input.setter
-    def input(self, val):
-        self.set_input(val)
 
     @property
     def acquisition_geometry(self):
-        return self.__acquisition_geometry
+        return self._acquisition_geometry
+
 
     @property
     def image_geometry(self):
-        if self.__image_geometry is None:
+        if self._image_geometry is None:
             return self.acquisition_geometry.get_ImageGeometry()
         else:
-            return self.__image_geometry
+            return self._image_geometry
 
-    @image_geometry.setter
-    def image_geometry(self, val):
-        self.set_image_geometry(val)
 
     @property
     def backend(self):
-        return self.__backend
-
-    @backend.setter
-    def backend(self, val):
-        self.set_backend(val)
+        return self._backend
 
 
     def __init__(self, input):
-        self.__backend = 'tigre'
+        self._backend = 'tigre'
 
         if not issubclass(type(input), AcquisitionData):
             raise TypeError("Input type mismatch: got {0} expecting {1}"
                             .format(type(input), AcquisitionData))
 
         if not DataOrder.check_order_for_engine(self.backend, input.geometry):
-            raise ValueError("Input data must be reordered for use with selected backed. Use input.reorder{'{0}')".format(self.__backend))
+            raise ValueError("Input data must be reordered for use with selected backed. Use input.reorder{'{0}')".format(self._backend))
 
-        self.__acquisition_geometry = input.geometry.copy()
-        self.__image_geometry = None
+        self._acquisition_geometry = input.geometry.copy()
+        self.set_image_geometry(None)
         self.set_input(input)
-    
+
+
     def set_input(self, input):
         """
         Update the data to run the reconstructor on. The new data must
@@ -84,7 +76,7 @@ class Reconstructor(object):
         if input.geometry != self.acquisition_geometry:
             raise ValueError ("Input not compatible with configured reconstructor. Initialise a new reconstructor with this geometry")
         else:
-            self.__input = weakref.ref(input)
+            self._input = weakref.ref(input)
 
 
     def set_image_geometry(self, image_geometry):
@@ -93,9 +85,9 @@ class Reconstructor(object):
         :type image_geometry: ImageGeometry
         """
         if image_geometry is None:
-            self.__image_geometry = None
+            self._image_geometry = None
         elif issubclass(type(image_geometry), ImageGeometry):
-            self.__image_geometry = image_geometry.copy()
+            self._image_geometry = image_geometry.copy()
         else:
             raise TypeError("ImageGeometry type mismatch: got {0} expecting {1}"\
                                 .format(type(input), ImageGeometry))   
@@ -109,11 +101,8 @@ class Reconstructor(object):
         supported_backends = ['tigre']
         if backend not in supported_backends:
             raise ValueError("Backend unsupported. Supported backends: {}", supported_backends)
-        self.__backend = backend
+        self._backend = backend
 
 
     def run(self):
         raise NotImplementedError()
-
-
-

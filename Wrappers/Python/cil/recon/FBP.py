@@ -53,37 +53,17 @@ class GenericFilteredBackProjection(Reconstructor):
 
     @property
     def filter(self):
-        return self.__filter
-
-    @filter.setter
-    def filter(self, val):
-        self.set_filter(val)
+        return self._filter
 
     @property
     def filter_inplace(self):
-        return self.__filter_inplace
-
-    @filter_inplace.setter
-    def filter_inplace(self, val):
-        self.set_filter_inplace(val)
+        return self._filter_inplace
 
     @property
     def fft_order(self):
-        return self.__fft_order
+        return self._fft_order
 
-    @fft_order.setter
-    def fft_order(self, val):
-        self.set_fft_order(val)
-
-    @property
-    def weights(self):
-        return self.__weights
-
-    @weights.setter
-    def weights(self, val):
-        self.__weights = val
-
-
+    
     def __init__ (self,input):
         """
         The initialiser for abstract base class::GenericFilteredBackProjection
@@ -104,10 +84,10 @@ class GenericFilteredBackProjection(Reconstructor):
 
 
         #define defaults
-        self.__fft_order = self.__default_fft_order()
+        self._fft_order = self._default_fft_order()
         self.set_filter('ram-lak')
-        self.__filter_inplace = False
-        self.__weights = None
+        self.set_filter_inplace(False)
+        self._weights = None
 
 
     def set_filter_inplace(self, inplace):
@@ -119,12 +99,12 @@ class GenericFilteredBackProjection(Reconstructor):
         :type inplace: boolian
         """
         if type(inplace) is bool:
-            self.__filter_inplace= inplace
+            self._filter_inplace= inplace
         else:
             raise TypeError("set_filter_inplace expected a boolian. Got {}".format(type(inplace)))
 
 
-    def __default_fft_order(self):
+    def _default_fft_order(self):
         min_order = 0
 
         while 2**min_order < self.acquisition_geometry.pixel_num_h * 2:
@@ -138,32 +118,35 @@ class GenericFilteredBackProjection(Reconstructor):
         """
         The width of the fourier transform N=2^order. Higher orders yield more accurate results.
 
-        The default is the max of 8, or power-of-2 greater than detector width * 2.
+        If `None` the default is the max of 8, or power-of-2 greater than detector width * 2.
 
         :param set_fft_order: The width of the fft N=2^order 
         :type set_fft_order: int
         """
-        try:
-            fft_order = int(order)
+        min_order = self._default_fft_order()
 
-        except TypeError:
-            raise TypeError("fft order expected type `int`. Got{}".format(type(order)))
+        if order is None:
+            fft_order = min_order
+        else:
+            try:
+                fft_order = int(order)
+            except TypeError:
+                raise TypeError("fft order expected type `int`. Got{}".format(type(order)))
         
-        min_order = self.__default_fft_order()
         if fft_order < min_order:
             raise ValueError("Minimum fft width 2^order is order = {0}. Got{1}".format(min_order,order))
 
         if fft_order != self.fft_order:
-            self.__fft_order =fft_order
+            self._fft_order = fft_order
 
             if self.filter=='custom':
                 print("Filter length changed - please update your custom filter")
             else:
                 #create default filter type of new length
-                self.set_filter(self.__filter)
+                self.set_filter(self._filter)
         
  
-    def set_filter(self, filter):
+    def set_filter(self, filter='ram=lak'):
         """
         Set the filter used by the reconstruction. This is set to 'ram-lak' by default.
 
@@ -178,19 +161,19 @@ class GenericFilteredBackProjection(Reconstructor):
         :type filter: string, numpy.ndarray
         """
 
-        if filter in ['ram-lak']:
-            self.__filter = filter
+        if type(filter)==str and filter in ['ram-lak']:
+            self._filter = filter
 
             if filter == 'ram-lak':
                 filter_length = 2**self.fft_order
                 freq = fftfreq(filter_length)
-                self.__filter_array = np.asarray( [ np.abs(2*el) for el in freq ] ,dtype=np.float32)
+                self._filter_array = np.asarray( [ np.abs(2*el) for el in freq ] ,dtype=np.float32)
 
         elif type(filter)==np.ndarray:
             try:
                 filter_array = np.asarray(filter,dtype=np.float32).reshape(2**self.fft_order) 
-                self.__filter_array = filter_array.copy()
-                self.__filter = 'custom'
+                self._filter_array = filter_array.copy()
+                self._filter = 'custom'
             except ValueError:
                 raise ValueError("Custom filter not compatible with input.")
         else:
@@ -209,7 +192,7 @@ class GenericFilteredBackProjection(Reconstructor):
         :rtype: numpy.ndarray
         """
     
-        return self.__filter_array
+        return self._filter_array
 
 
     def calculate_weights(self):
@@ -227,10 +210,10 @@ class GenericFilteredBackProjection(Reconstructor):
         :type acquistion_data: AcquisitionData
     '''
         """
-        if self.weights is None or self.weights.shape[0] != acquistion_data.geometry.pixel_num_v:
+        if self._weights is None or self._weights.shape[0] != acquistion_data.geometry.pixel_num_v:
             self.calculate_weights(acquistion_data.geometry)
 
-        if self.weights.shape[1] != acquistion_data.shape[-1]: #horizontal
+        if self._weights.shape[1] != acquistion_data.shape[-1]: #horizontal
             raise ValueError("Weights not compatible")
 
         filter_array = self.get_filter_array()
@@ -241,7 +224,7 @@ class GenericFilteredBackProjection(Reconstructor):
         #call ext function
         data_ptr = acquistion_data.array.ctypes.data_as(c_float_p)
         filter_ptr = filter_array.ctypes.data_as(c_float_p)
-        weights_ptr = self.__weights.ctypes.data_as(c_float_p)
+        weights_ptr = self._weights.ctypes.data_as(c_float_p)
 
         ag = acquistion_data.geometry
         if ag.dimension_labels == ('angle','vertical','horizontal'):   
@@ -282,7 +265,7 @@ class FDK(GenericFilteredBackProjection):
         if  input.geometry.geom_type != AcquisitionGeometry.CONE:
             raise TypeError("This reconstructor is for cone-beam data only.")
 
-        
+
     def calculate_weights(self, acquisition_geometry):
         """
         Calculates the pre-weighting used for FDK reconstruction.   
@@ -294,7 +277,7 @@ class FDK(GenericFilteredBackProjection):
 
         principal_ray_length = ag.dist_source_center + ag.dist_center_detector
         scaling =  ag.magnification * (2 * np.pi/ ag.num_projections) / ( 4 * ag.pixel_size_h ) 
-        self.weights = scaling * principal_ray_length / np.sqrt((principal_ray_length ** 2 + xx ** 2 + yy ** 2))
+        self._weights = scaling * principal_ray_length / np.sqrt((principal_ray_length ** 2 + xx ** 2 + yy ** 2))
 
 
     def run(self, out=None):
@@ -323,35 +306,10 @@ class FDK(GenericFilteredBackProjection):
 
 class FBP(GenericFilteredBackProjection):
 
+
     @property
     def slices_per_chunk(self):
-        return self.__slices_per_chunk
-
-    @slices_per_chunk.setter
-    def by_slice(self, val):
-        self.slices_per_chunk(val)
-
-
-    def set_split_processing(self, slices_per_chunk=None):
-        """
-        slices_per_chunk=0 (default) will process the data in a single call.
-        Otherwise it will process the data in chunks of n slices, this will reduce memory use but may increase computation time.
-        It is recommended to use value of poer-of-tw.
-
-        it can only be used on simple data-geometries
-        :param slice_data: Sets the number of slices to be processed per chunk, all sata will be processed
-        :type inplace: integer
-        """
-
-        try:
-            num_slices = int(slices_per_chunk)
-        except:
-            num_slices = 0
-
-        if  num_slices >= self.acquisition_geometry.pixel_num_v:
-            num_slices = self.acquisition_geometry.pixel_num_v
-
-        self.__slices_per_chunk = num_slices
+        return self._slices_per_chunk
 
 
     def __init__ (self,input):
@@ -380,6 +338,28 @@ class FBP(GenericFilteredBackProjection):
             raise TypeError("This reconstructor is for parallel-beam data only.")
 
 
+    def set_split_processing(self, slices_per_chunk=None):
+        """
+        slices_per_chunk=0 (default) will process the data in a single call.
+        Otherwise it will process the data in chunks of n slices, this will reduce memory use but may increase computation time.
+        It is recommended to use value of poer-of-tw.
+
+        it can only be used on simple data-geometries
+        :param slice_data: Sets the number of slices to be processed per chunk, all sata will be processed
+        :type inplace: integer
+        """
+
+        try:
+            num_slices = int(slices_per_chunk)
+        except:
+            num_slices = 0
+
+        if  num_slices >= self.acquisition_geometry.pixel_num_v:
+            num_slices = self.acquisition_geometry.pixel_num_v
+
+        self._slices_per_chunk = num_slices
+        
+
     def calculate_weights(self, acquisition_geometry):
         """
         Calculates the weights used for FBP reconstruction.     
@@ -387,10 +367,10 @@ class FBP(GenericFilteredBackProjection):
         ag = acquisition_geometry
         weight = (2 * np.pi/ ag.num_projections) / ( 4 * ag.pixel_size_h ) 
  
-        self.weights = np.full((ag.pixel_num_v,ag.pixel_num_h),weight,dtype=np.float32)
+        self._weights = np.full((ag.pixel_num_v,ag.pixel_num_h),weight,dtype=np.float32)
 
 
-    def __setup_PO_for_chunks(self, num_slices):
+    def _setup_PO_for_chunks(self, num_slices):
         
         if num_slices > 1:
             ag_slice = self.acquisition_geometry.copy()
@@ -403,14 +383,14 @@ class FBP(GenericFilteredBackProjection):
         self.operator = ProjectionOperator(ig_slice,ag_slice)
 
 
-    def __call_with_filtering(self,i,tot_slices,num_slices, ret):
+    def _call_with_filtering(self,i,tot_slices,num_slices, ret):
         print('\rprocessing slices {0}-{1} of {2}'.format(i,i+num_slices,tot_slices), end='')
         self.data_slice.fill(np.squeeze(self.input.array[:,i:i+num_slices,:]))
         self.pre_filtering(self.data_slice)
         ret.array[i:i+num_slices,:,:] = self.operator.adjoint(self.data_slice).array[:]
 
 
-    def __call_without_filtering(self,i,tot_slices,num_slices, ret):
+    def _call_without_filtering(self,i,tot_slices,num_slices, ret):
         print('\rprocessing slices {0}-{1} of {2}'.format(i,i+num_slices,tot_slices), end='')
         self.data_slice.fill(np.squeeze(self.input.array[:,i:i+num_slices,:]))
         ret.array[i:i+num_slices,:,:] = self.operator.adjoint(self.data_slice).array[:]
@@ -442,26 +422,26 @@ class FBP(GenericFilteredBackProjection):
             tot_slices = self.acquisition_geometry.pixel_num_v
             remainder = tot_slices % self.slices_per_chunk
 
-            self.__setup_PO_for_chunks(self.slices_per_chunk)
+            self._setup_PO_for_chunks(self.slices_per_chunk)
 
             if self.filter_inplace:
                 self.pre_filtering(self.input)
 
                 for i in range(0, tot_slices-remainder, self.slices_per_chunk):
-                    self.__call_without_filtering(i, tot_slices, self.slices_per_chunk, ret)
+                    self._call_without_filtering(i, tot_slices, self.slices_per_chunk, ret)
 
                 remainder = tot_slices % self.slices_per_chunk
                 if remainder:
-                    self.__setup_PO_for_chunks(remainder)
-                    self.__call_without_filtering(tot_slices-remainder, tot_slices, remainder, ret)
+                    self._setup_PO_for_chunks(remainder)
+                    self._call_without_filtering(tot_slices-remainder, tot_slices, remainder, ret)
 
             else:
                 for i in range(0, tot_slices-remainder, self.slices_per_chunk):
-                    self.__call_with_filtering(i, tot_slices, self.slices_per_chunk, ret)
+                    self._call_with_filtering(i, tot_slices, self.slices_per_chunk, ret)
    
                 if remainder:
-                    self.__setup_PO_for_chunks(remainder)
-                    self.__call_with_filtering(tot_slices-remainder, tot_slices, remainder, ret)
+                    self._setup_PO_for_chunks(remainder)
+                    self._call_with_filtering(tot_slices-remainder, tot_slices, remainder, ret)
 
             print('\r', end='')
             if out is None:

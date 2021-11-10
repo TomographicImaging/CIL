@@ -50,7 +50,7 @@ class Reconstructor(object):
         return self._backend
 
 
-    def __init__(self, input):
+    def __init__(self, input, image_geometry=None):
         self._backend = 'tigre'
 
         if not issubclass(type(input), AcquisitionData):
@@ -61,17 +61,19 @@ class Reconstructor(object):
             raise ValueError("Input data must be reordered for use with selected backed. Use input.reorder{'{0}')".format(self._backend))
 
         self._acquisition_geometry = input.geometry.copy()
-        self.set_image_geometry(None)
+        self.set_image_geometry(image_geometry)
         self.set_input(input)
 
 
     def set_input(self, input):
         """
-        Update the data to run the reconstructor on. The new data must
-        have the same geometry as the initial data used to configure the reconstructor.
+        Update the input data to run the reconstructor on. The geometry of the dataset must be compatible with the reconstructor.
 
-        :param input: A dataset with the same geometry
-        :type input: AcquisitionData
+        Parameters
+        ----------
+        input : AcquisitionData
+            A dataset with a compatible geometry
+
         """
         if input.geometry != self.acquisition_geometry:
             raise ValueError ("Input not compatible with configured reconstructor. Initialise a new reconstructor with this geometry")
@@ -79,10 +81,14 @@ class Reconstructor(object):
             self._input = weakref.ref(input)
 
 
-    def set_image_geometry(self, image_geometry):
+    def set_image_geometry(self, image_geometry=None):
         """
-        :param image_geometry: Set the ImageGeometry of the reconstructor
-        :type image_geometry: ImageGeometry
+        Sets a custom image geometry to be used by the reconstructor
+
+        Parameters
+        ----------
+        image_geometry : ImageGeometry, default used if None
+            A description of the area/volume to reconstruct
         """
         if image_geometry is None:
             self._image_geometry = None
@@ -95,9 +101,13 @@ class Reconstructor(object):
 
     def set_backend(self, backend):
         """
-        :param backend: Set the backend used for the foward/backward projectors
-        :type backend: string, 'tigre'
-        """
+        Sets the backend used for the foward/backward projectors. Currently only TIGRE is supported
+        
+        Parameters
+        ----------
+        backend: string
+            Set the backend to TIGRE 'tigre'
+        """        
         supported_backends = ['tigre']
         if backend not in supported_backends:
             raise ValueError("Backend unsupported. Supported backends: {}", supported_backends)

@@ -64,16 +64,13 @@ class GenericFilteredBackProjection(Reconstructor):
         return self._fft_order
 
     
-    def __init__ (self,input):
+    def __init__ (self, input, image_geometry=None, filter='ram-lak'):
         """
-        The initialiser for abstract base class::GenericFilteredBackProjection
-
-        :param input: The input data to reconstruct. The reconstructor is set-up based on the geometry of the data. 
-        :type input: AcquisitionData
+        The initialiser for Abstract Base Class GenericFilteredBackProjection
         """
 
         #call parent initialiser
-        super(GenericFilteredBackProjection, self).__init__(input)
+        super(GenericFilteredBackProjection, self).__init__(input, image_geometry)
                 
         if has_ipp == False:
             raise ImportError("IPP libraries not found. Cannot use CIL FBP")
@@ -85,7 +82,7 @@ class GenericFilteredBackProjection(Reconstructor):
 
         #define defaults
         self._fft_order = self._default_fft_order()
-        self.set_filter('ram-lak')
+        self.set_filter(filter)
         self.set_filter_inplace(False)
         self._weights = None
 
@@ -95,8 +92,10 @@ class GenericFilteredBackProjection(Reconstructor):
         False (default) will allocate temporary memory for filtered projections.
         True will filter projections in-place.
 
-        :param inplace: Sets the inplace filtering of projections.
-        :type inplace: boolian
+        Parameters
+        ----------
+        inplace: boolian
+            Sets the inplace filtering of projections
         """
         if type(inplace) is bool:
             self._filter_inplace= inplace
@@ -114,14 +113,19 @@ class GenericFilteredBackProjection(Reconstructor):
         return min_order
 
 
-    def set_fft_order(self, order):
+    def set_fft_order(self, order=None):
         """
-        The width of the fourier transform N=2^order. Higher orders yield more accurate results.
+        The width of the fourier transform N=2^order. 
+        
+        Parameters
+        ----------
+        order: int, optional
+            The width of the fft N=2^order 
 
-        If `None` the default is the max of 8, or power-of-2 greater than detector width * 2.
-
-        :param set_fft_order: The width of the fft N=2^order 
-        :type set_fft_order: int
+        Notes
+        -----      
+        If `None` the default used is the power-of-2 greater than 2 * detector width, or 8, whichever is greater
+        Higher orders will yield more accurate results but increase computation time.
         """
         min_order = self._default_fft_order()
 
@@ -148,17 +152,21 @@ class GenericFilteredBackProjection(Reconstructor):
  
     def set_filter(self, filter='ram=lak'):
         """
-        Set the filter used by the reconstruction. This is set to 'ram-lak' by default.
+        Set the filter used by the reconstruction. 
+        
+        Parameters
+        ----------
+        filter: string, numpy.ndarray, default='ram-lak'
+            The filter to be applied. Can be a string from: 'ram-lak' or a numpy array.
 
-        A custom filter can be set of length (N) 2^self.fft_order
+        Notes
+        -----
+        If passed a numpy array the filter must have length N = 2^self.fft_order
 
         The indices of the array are interpreted as:
         0 The DC frequency component
         1:N/2 positive frequencies
         N/2:N-1 negative frequencies
-
-        :param filter: The filter to be applied. Can be a string from: 'ram-lak' or a numpy array.
-        :type filter: string, numpy.ndarray
         """
 
         if type(filter)==str and filter in ['ram-lak']:
@@ -182,36 +190,47 @@ class GenericFilteredBackProjection(Reconstructor):
 
     def get_filter_array(self):
         """
-        Returns the filter in used in the frequency domain. The array can be modified and passed back using set_filter()
+        Returns the filter in used in the frequency domain. 
+        
+        Returns
+        -------
+        numpy.ndarray
+            An array containing the filter values
+
+        Notes
+        -----
         The filter length N is 2^self.fft_order.
+
         The indices of the array are interpreted as:
         0 The DC frequency component
         1:N/2 positive frequencies
         N/2:N-1 negative frequencies
-        :return: An array containing the filter values
-        :rtype: numpy.ndarray
+
+        The array can be modified and passed back using set_filter()
         """
-    
+
         return self._filter_array
-
-
-    def calculate_weights(self):
+        
+    def _calculate_weights(self):
         return NotImplementedError
 
 
-    def pre_filtering(self,acquistion_data):
+    def _pre_filtering(self,acquistion_data):
         """
-        Filters and weights the projections inplace. The filtering
-        can be configured by setting the properties:
-        self.fft_order
-        self.filter
+        Filters and weights the projections inplace
 
-        :param acquistion_data: The projections to be filtered
-        :type acquistion_data: AcquisitionData
-    '''
+        Parameters
+        ----------
+        acquistion_data : AcquisitionData
+            The projections to be filtered
+
+        Notes
+        -----
+        self.input is not used to allow processing in smaller chunks
+
         """
         if self._weights is None or self._weights.shape[0] != acquistion_data.geometry.pixel_num_v:
-            self.calculate_weights(acquistion_data.geometry)
+            self._calculate_weights(acquistion_data.geometry)
 
         if self._weights.shape[1] != acquistion_data.shape[-1]: #horizontal
             raise ValueError("Weights not compatible")
@@ -243,11 +262,27 @@ class GenericFilteredBackProjection(Reconstructor):
 
 class FDK(GenericFilteredBackProjection):
 
-    def __init__ (self,input):
+    def __init__ (self, input, image_geometry=None):
         """
-        Creates an FDK reconstructor based on your acquisition data with a 'ram-lak' filter.
+        Creates an FDK reconstructor based on your cone-beam acquisition data.
 
-        The reconstructor can be customised using:
+        Parameters
+        ----------
+        input : AcquisitionData
+            The input data to reconstruct. The reconstructor is set-up based on the geometry of the data.
+        image_geometry : ImageGeometry, default used if None
+            A description of the area/volume to reconstruct
+        filter : string, numpy.ndarray, default='ram-lak'
+            The filter to be applied. Can be a string from: 'ram-lak' or a numpy array.
+
+        Example 
+        -------
+        >>> fdk = FDK(data)
+        >>> out = fdk.run()
+
+        Notes
+        -----  
+        The reconstructor can be futher customised using additional 'set' methods provided.
         self.set_input()
         self.set_image_geometry()
         self.set_backend()
@@ -256,20 +291,15 @@ class FDK(GenericFilteredBackProjection):
         self.set_fft_order()
         self.set_filter_inplace()
 
-        :param input: The input data to reconstruct. The reconstructor is set-up based on the geometry of the data. 
-        :type input: AcquisitionData
         """
         #call parent initialiser
-        super(FDK, self).__init__(input)
+        super(FDK, self).__init__(input, image_geometry)
 
         if  input.geometry.geom_type != AcquisitionGeometry.CONE:
             raise TypeError("This reconstructor is for cone-beam data only.")
 
 
-    def calculate_weights(self, acquisition_geometry):
-        """
-        Calculates the pre-weighting used for FDK reconstruction.   
-        """
+    def _calculate_weights(self, acquisition_geometry):
         ag = acquisition_geometry
         xv = np.arange(-(ag.pixel_num_h -1)/2,(ag.pixel_num_h -1)/2 + 1,dtype=np.float32) * ag.pixel_size_h
         yv = np.arange(-(ag.pixel_num_v -1)/2,(ag.pixel_num_v -1)/2 + 1,dtype=np.float32) * ag.pixel_size_v
@@ -282,12 +312,17 @@ class FDK(GenericFilteredBackProjection):
 
     def run(self, out=None):
         """
-        Run the configured FBP/FDK reconstruction.
+        Runs the configured FDK reconstruction and returns the reconstuction
 
-        :param out: Fills the referenced array with the FBP/FDK reconstruction of the acquisition data
-        :type out: ImageData
-        :return: returns the FBP/FDK reconstruction of the AcquisitionData
-        :rtype: ImageData
+        Parameters
+        ----------
+        out : ImageData, optional
+           Fills the referenced array with the reconstruction of the acquisition data and suppresses the return
+        
+        Returns
+        -------
+        ImageData
+            The reconstructed volume. Supressed if `out` is passed
         """
 
         if self.filter_inplace is False:
@@ -295,7 +330,7 @@ class FDK(GenericFilteredBackProjection):
         else:
             proj_filtered = self.input
 
-        self.pre_filtering(proj_filtered)
+        self._pre_filtering(proj_filtered)
         operator = ProjectionOperator(self.image_geometry,self.acquisition_geometry,adjoint_weights='FDK')
         
         if out is None:
@@ -312,11 +347,27 @@ class FBP(GenericFilteredBackProjection):
         return self._slices_per_chunk
 
 
-    def __init__ (self,input):
+    def __init__ (self, input, image_geometry=None):
         """
-        Creates an FBP reconstructor based on your acquisition data with a 'ram-lak' filter.
+        Creates an FBP reconstructor based on your parallel-beam acquisition data.
 
-        The reconstructor can be customised using:
+        Parameters
+        ----------
+        input : AcquisitionData
+            The input data to reconstruct. The reconstructor is set-up based on the geometry of the data.
+        image_geometry : ImageGeometry, default used if None
+            A description of the area/volume to reconstruct
+        filter : string, numpy.ndarray, default='ram-lak'
+            The filter to be applied. Can be a string from: 'ram-lak' or a numpy array.
+
+        Example 
+        -------
+        >>> fbp = FBP(data)
+        >>> out = fbp.run()
+
+        Notes
+        -----  
+        The reconstructor can be futher customised using additional 'set' methods provided.
         self.set_input()
         self.set_image_geometry()
         self.set_backend()
@@ -325,28 +376,30 @@ class FBP(GenericFilteredBackProjection):
         self.set_fft_order()
         self.set_filter_inplace()
         self.set_split_processing()
-
-
-        :param input: The input data to reconstruct. The reconstructor is set-up based on the geometry of the data. 
-        :type input: AcquisitionData
         """
-        
-        super(FBP, self).__init__(input)
+       
+        super(FBP, self).__init__(input, image_geometry)
         self.set_split_processing(False)
 
         if  input.geometry.geom_type != AcquisitionGeometry.PARALLEL:
             raise TypeError("This reconstructor is for parallel-beam data only.")
 
 
-    def set_split_processing(self, slices_per_chunk=None):
+    def set_split_processing(self, slices_per_chunk=0):
         """
-        slices_per_chunk=0 (default) will process the data in a single call.
-        Otherwise it will process the data in chunks of n slices, this will reduce memory use but may increase computation time.
-        It is recommended to use value of poer-of-tw.
+        Splits the processing in to chunks. Default, 0 will process the data in a single call.
 
-        it can only be used on simple data-geometries
-        :param slice_data: Sets the number of slices to be processed per chunk, all sata will be processed
-        :type inplace: integer
+        Parameters
+        ----------
+        out : slices_per_chunk, optional
+            Process the data in chunks of n slices. It is recommended to use value of power-of-two.
+
+        Notes
+        -----
+        This will reduce memory use but may increase computation time.
+        It is recommended to tune it too your hardware requirements using 8, 16 or 32 slices.
+        
+        This can only be used on simple and offset data-geometries.
         """
 
         try:
@@ -360,10 +413,8 @@ class FBP(GenericFilteredBackProjection):
         self._slices_per_chunk = num_slices
         
 
-    def calculate_weights(self, acquisition_geometry):
-        """
-        Calculates the weights used for FBP reconstruction.     
-        """
+    def _calculate_weights(self, acquisition_geometry):
+
         ag = acquisition_geometry
         weight = (2 * np.pi/ ag.num_projections) / ( 4 * ag.pixel_size_h ) 
  
@@ -386,7 +437,7 @@ class FBP(GenericFilteredBackProjection):
     def _call_with_filtering(self,i,tot_slices,num_slices, ret):
         print('\rprocessing slices {0}-{1} of {2}'.format(i,i+num_slices,tot_slices), end='')
         self.data_slice.fill(np.squeeze(self.input.array[:,i:i+num_slices,:]))
-        self.pre_filtering(self.data_slice)
+        self._pre_filtering(self.data_slice)
         ret.array[i:i+num_slices,:,:] = self.operator.adjoint(self.data_slice).array[:]
 
 
@@ -398,12 +449,17 @@ class FBP(GenericFilteredBackProjection):
 
     def run(self, out=None):
         """
-        Run the configured FBP/FDK reconstruction.
+        Runs the configured FBP reconstruction and returns the reconstuction
 
-        :param out: Fills the referenced array with the FBP/FDK reconstruction of the acquisition data
-        :type out: ImageData
-        :return: returns the FBP/FDK reconstruction of the AcquisitionData
-        :rtype: ImageData
+        Parameters
+        ----------
+        out : ImageData, optional
+           Fills the referenced ImageData with the reconstructed volume and suppresses the return
+        
+        Returns
+        -------
+        ImageData
+            The reconstructed volume. Supressed if `out` is passed
         """
         
         if self.slices_per_chunk:
@@ -425,7 +481,7 @@ class FBP(GenericFilteredBackProjection):
             self._setup_PO_for_chunks(self.slices_per_chunk)
 
             if self.filter_inplace:
-                self.pre_filtering(self.input)
+                self._pre_filtering(self.input)
 
                 for i in range(0, tot_slices-remainder, self.slices_per_chunk):
                     self._call_without_filtering(i, tot_slices, self.slices_per_chunk, ret)
@@ -454,7 +510,7 @@ class FBP(GenericFilteredBackProjection):
             else:
                 proj_filtered = self.input
 
-            self.pre_filtering(proj_filtered)
+            self._pre_filtering(proj_filtered)
 
             operator = ProjectionOperator(self.image_geometry,self.acquisition_geometry)
 

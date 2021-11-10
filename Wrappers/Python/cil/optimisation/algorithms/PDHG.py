@@ -77,6 +77,16 @@ class PDHG(Algorithm):
     For a TV tomography reconstruction example, see `CIL-Demos <https://github.com/TomographicImaging/CIL-Demos/blob/main/binder/TomographyReconstruction.ipynb>`_.
     More examples can be found in :cite:`Jorgensen_et_al_2021`, :cite:`Papoutsellis_et_al_2021`.
 
+    Note
+    ----
+
+    Currently, the strongly convex constants are passed as parameters of PDHG. 
+    In the future, these parameters will be properties of the corresponding functions.
+
+    
+
+    Notes
+    -----
 
     A first-order primal-dual algorithm for convex optimization problems with known saddle-point structure with applications in imaging. 
 
@@ -107,7 +117,6 @@ class PDHG(Algorithm):
     * gradient descent step for the primal problem and
     * an over-relaxation of the primal variable.
 
-
     Notes
     -----    
 
@@ -133,7 +142,6 @@ class PDHG(Algorithm):
 
         - The :math:`\|\cdot\|_{1}` norm is not strongly convex. For more information, see `Strongly Convex <https://en.wikipedia.org/wiki/Convex_function#Strongly_convex_functions>`_.    
 
-    
     References
     ----------
 
@@ -213,12 +221,6 @@ class PDHG(Algorithm):
         
         self.configured = True
         print("{} configured".format(self.__class__.__name__, ))
-
-    def update_previous_solution(self):
-        # swap the pointers to current and previous solution
-        tmp = self.x_old
-        self.x_old = self.x
-        self.x = tmp
 
     def get_output(self):
         # returns the current solution
@@ -333,9 +335,13 @@ class PDHG(Algorithm):
         Note
         ----
 
-        The case where both functions are strongly convex is not available at the moment.    
-         
+        The case where both functions are strongly convex is not available at the moment.  
+        
+
+        .. todo:: Implement acceleration of PDHG when both functions are strongly convex.
+                 
         """
+
     
         # Update sigma and tau based on the strong convexity of G
         if self.gamma_g is not None:
@@ -390,11 +396,7 @@ class PDHG(Algorithm):
         ----
 
             The primal-dual gap (or duality gap) measures how close is the primal-dual pair (x,y) to the primal-dual solution. \
-            It is always non-negative and is used to monitor convergence of the PDHG algorithm. 
-            
-
-        
-        For more information, see `Duality Gap <https://en.wikipedia.org/wiki/Duality_gap>`_.
+            It is always non-negative and is used to monitor convergence of the PDHG algorithm. For more information, see `Duality Gap <https://en.wikipedia.org/wiki/Duality_gap>`_.
 
         """
 

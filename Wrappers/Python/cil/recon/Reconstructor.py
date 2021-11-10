@@ -114,5 +114,33 @@ class Reconstructor(object):
         self._backend = backend
 
 
-    def run(self):
+    def run(self, out=None, verbose=1):
+        """
+        Runs the configured recon and returns the reconstuction
+
+        Parameters
+        ----------
+        out : ImageData, optional
+           Fills the referenced ImageData with the reconstructed volume and suppresses the return
+        verbose : int
+           Contols the verbosity of the reconstructor. 0: No output is logged, 1: Full configuration is logged
+
+        Returns
+        -------
+        ImageData
+            The reconstructed volume. Supressed if `out` is passed
+        """
+
         raise NotImplementedError()
+
+    def _str_data_size(self):
+
+        repres = "\nInput Data:\n"
+        for dim in  zip(self.acquisition_geometry.dimension_labels,self.acquisition_geometry.shape):
+            repres += "\t" + str(dim[0]) + ': ' + str(dim[1])+'\n'
+
+        repres += "\nReconstruction Volume:\n"
+        for dim in zip(self.image_geometry.dimension_labels,self.image_geometry.shape):
+            repres += "\t" + str(dim[0]) + ': ' + str(dim[1]) +'\n'
+
+        return repres

@@ -22,6 +22,7 @@ from cil.plugins.tigre import ProjectionOperator
 
 import numpy as np
 import ctypes
+from tqdm import tqdm
 
 c_float_p = ctypes.POINTER(ctypes.c_float)
 c_double_p = ctypes.POINTER(ctypes.c_double)
@@ -310,20 +311,25 @@ class FDK(GenericFilteredBackProjection):
         self._weights = scaling * principal_ray_length / np.sqrt((principal_ray_length ** 2 + xx ** 2 + yy ** 2))
 
 
-    def run(self, out=None):
+    def run(self, out=None, verbose=1):
         """
-        Runs the configured FDK reconstruction and returns the reconstuction
+        Runs the configured FDK recon and returns the reconstuction
 
         Parameters
         ----------
         out : ImageData, optional
-           Fills the referenced array with the reconstruction of the acquisition data and suppresses the return
-        
+           Fills the referenced ImageData with the reconstructed volume and suppresses the return
+        verbose : int
+           Contols the verbosity of the reconstructor. 0: No output is logged, 1: Full configuration is logged
+
         Returns
         -------
         ImageData
             The reconstructed volume. Supressed if `out` is passed
         """
+
+        if verbose:
+            print(self)
 
         if self.filter_inplace is False:
             proj_filtered = self.input.copy()
@@ -338,6 +344,20 @@ class FDK(GenericFilteredBackProjection):
         else:
             operator.adjoint(proj_filtered, out = out)
 
+
+    def __str__(self):
+    
+        repres = "FDK recon\n"
+
+        repres += self._str_data_size()
+
+        repres += "\nReconstruction Options:\n"    
+        repres += "\tBackend: {}\n".format(self._backend)        
+        repres += "\tFilter: {}\n".format(self._filter)        
+        repres += "\tFFT order: {}\n".format(self._fft_order)        
+        repres += "\tFilter_inplace: {}\n".format(self._filter_inplace) 
+
+        return repres   
 
 class FBP(GenericFilteredBackProjection):
 
@@ -433,41 +453,40 @@ class FBP(GenericFilteredBackProjection):
         self.data_slice = ag_slice.allocate()
         self.operator = ProjectionOperator(ig_slice,ag_slice)
 
-
-    def _call_with_filtering(self,i,tot_slices,num_slices, ret):
-        print('\rprocessing slices {0}-{1} of {2}'.format(i,i+num_slices,tot_slices), end='')
-        self.data_slice.fill(np.squeeze(self.input.array[:,i:i+num_slices,:]))
-        self._pre_filtering(self.data_slice)
-        ret.array[i:i+num_slices,:,:] = self.operator.adjoint(self.data_slice).array[:]
-
-
-    def _call_without_filtering(self,i,tot_slices,num_slices, ret):
-        print('\rprocessing slices {0}-{1} of {2}'.format(i,i+num_slices,tot_slices), end='')
-        self.data_slice.fill(np.squeeze(self.input.array[:,i:i+num_slices,:]))
-        ret.array[i:i+num_slices,:,:] = self.operator.adjoint(self.data_slice).array[:]
+    def _process_chunk(self, i, step,  out):
+        self.data_slice.fill(np.squeeze(self.input.array[:,i:i+step,:]))
+        if not self.filter_inplace:
+            self._pre_filtering(self.data_slice)
+        out.array[i:i+step,:,:] = self.operator.adjoint(self.data_slice).array[:]
 
 
-    def run(self, out=None):
+    def run(self, out=None, verbose=1):
         """
-        Runs the configured FBP reconstruction and returns the reconstuction
+        Runs the configured FBP recon and returns the reconstuction
 
         Parameters
         ----------
         out : ImageData, optional
            Fills the referenced ImageData with the reconstructed volume and suppresses the return
-        
+        verbose : int
+           Contols the verbosity of the reconstructor. 0: No output is logged, 1: Full configuration is logged
+
         Returns
         -------
         ImageData
             The reconstructed volume. Supressed if `out` is passed
         """
+
+        if verbose:
+            print(self)
         
         if self.slices_per_chunk:
 
-            if self.acquisition_geometry.system_description == 'advanced':
+            if self.acquisition_geometry.dimension == '2D':
+                raise ValueError("Only 3D datasets can be processed in chunks with `set_split_processing`")
+            elif self.acquisition_geometry.system_description == 'advanced':
                 raise ValueError("Only simple and offset geometries can be processed in chunks with `set_split_processing`")
-
-            if self.acquisition_geometry.get_ImageGeometry() != self.image_geometry:
+            elif self.acquisition_geometry.get_ImageGeometry() != self.image_geometry:
                 raise ValueError("Only default image geometries can be processed in chunks `set_split_processing`")
 
             if out is None:
@@ -475,31 +494,34 @@ class FBP(GenericFilteredBackProjection):
             else:
                 ret = out
 
-            tot_slices = self.acquisition_geometry.pixel_num_v
-            remainder = tot_slices % self.slices_per_chunk
-
-            self._setup_PO_for_chunks(self.slices_per_chunk)
-
             if self.filter_inplace:
                 self._pre_filtering(self.input)
 
-                for i in range(0, tot_slices-remainder, self.slices_per_chunk):
-                    self._call_without_filtering(i, tot_slices, self.slices_per_chunk, ret)
+            tot_slices = self.acquisition_geometry.pixel_num_v
+            remainder = tot_slices % self.slices_per_chunk
+            num_chunks = int(np.ceil(self.image_geometry.shape[0] / self._slices_per_chunk))
 
-                remainder = tot_slices % self.slices_per_chunk
-                if remainder:
-                    self._setup_PO_for_chunks(remainder)
-                    self._call_without_filtering(tot_slices-remainder, tot_slices, remainder, ret)
+            if verbose:
+                pbar = tqdm(total=num_chunks)
 
-            else:
-                for i in range(0, tot_slices-remainder, self.slices_per_chunk):
-                    self._call_with_filtering(i, tot_slices, self.slices_per_chunk, ret)
-   
-                if remainder:
-                    self._setup_PO_for_chunks(remainder)
-                    self._call_with_filtering(tot_slices-remainder, tot_slices, remainder, ret)
+            #process dataset by requested chunk size
+            self._setup_PO_for_chunks(self.slices_per_chunk)
+            for i in range(0, tot_slices-remainder, self.slices_per_chunk):
+                self._process_chunk(i, self.slices_per_chunk, ret)
+                if verbose:
+                    pbar.update(1)
 
-            print('\r', end='')
+            #process excess rows
+            if remainder:
+                i = tot_slices-remainder
+                self._setup_PO_for_chunks(remainder)
+                self._process_chunk(i, remainder, ret)
+                if verbose:
+                    pbar.update(1)
+
+            if verbose:
+                pbar.close()
+
             if out is None:
                 return ret
 
@@ -518,3 +540,27 @@ class FBP(GenericFilteredBackProjection):
                 return operator.adjoint(proj_filtered)
             else:
                 operator.adjoint(proj_filtered, out = out)
+
+
+    def __str__(self):
+
+        repres = "FBP recon\n"
+
+        repres += self._str_data_size()
+
+        repres += "\nReconstruction Options:\n"    
+        repres += "\tBackend: {}\n".format(self._backend)        
+        repres += "\tFilter: {}\n".format(self._filter)        
+        repres += "\tFFT order: {}\n".format(self._fft_order)        
+        repres += "\tFilter_inplace: {}\n".format(self._filter_inplace) 
+        repres += "\tSplit processing: {}\n".format(self._slices_per_chunk) 
+
+        if self._slices_per_chunk:
+            num_chunks = int(np.ceil(self.image_geometry.shape[0] / self._slices_per_chunk))
+        else:
+            num_chunks = 1
+
+        repres +="\nReconstructing in {} chunk(s):\n".format(num_chunks)
+
+        return repres   
+

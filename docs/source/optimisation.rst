@@ -22,7 +22,8 @@ Gradient Descent (GD), Conjugate Gradient Least Squares (CGLS),
 Simultaneous Iterative Reconstruction Technique (SIRT), Primal Dual Hybrid 
 Gradient (PDHG) and Fast Iterative Shrinkage Thresholding Algorithm (FISTA).
 
-An algorithm is designed for a particular generic optimisation problem accepts and number of 
+An algorithm is designed for a 
+particular generic optimisation problem accepts and number of 
 :code:`Function`s and/or :code:`Operator`s as input to define a specific instance of 
 the generic optimisation problem to be solved.
 They are iterable objects which can be run in a for loop. 
@@ -63,8 +64,7 @@ print to screen of the status of the optimisation.
    :members:
    :special-members:
 .. autoclass:: cil.optimisation.algorithms.PDHG
-   :members: update, pdhg_step_sizes, update_step_sizes, update_objective
-   :member-order: bysource
+   :members:
 .. autoclass:: cil.optimisation.algorithms.LADMM
    :members:
 .. autoclass:: cil.optimisation.algorithms.SPDHG

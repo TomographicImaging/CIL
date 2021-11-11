@@ -140,18 +140,21 @@ class TestFunction(unittest.TestCase):
         
         d = ag.allocate(ImageGeometry.RANDOM)
         alpha = 0.5
-
         # scaled function
         g = alpha * L2NormSquared(b=noisy_data)
         
         # Compare call of g
         a2 = alpha*(d - noisy_data).power(2).sum()
-
+        #print(a2, g(d)) 
         self.assertEqual(a2, g(d))
         
         # Compare convex conjugate of g
         a3 = 0.5 * d.squared_norm() + d.dot(noisy_data)
         self.assertAlmostEqual(a3, g.convex_conjugate(d), places=7)
+        #print( a3, g.convex_conjugate(d))
+
+        #test proximal conjugate
+
     
     def test_L2NormSquared(self):
         # TESTS for L2 and scalar * L2
@@ -923,27 +926,29 @@ class TestFunction(unittest.TestCase):
 
 class TestTotalVariation(unittest.TestCase):
 
+    def setUp(self) -> None:
+        self.tv = TotalVariation()
+        self.alpha = 0.15
+        self.tv_scaled = self.alpha * TotalVariation()
+        self.tv_iso = TotalVariation()
+        self.tv_aniso = TotalVariation(isotropic=False)
+        self.ig_real = ImageGeometry(3,4)   
+        self.grad = GradientOperator(self.ig_real)  
+        
     def test_regularisation_parameter(self):
-        tv = TotalVariation()
-        np.testing.assert_almost_equal(tv.regularisation_parameter, 1.)
+        np.testing.assert_almost_equal(self.tv.regularisation_parameter, 1.)
 
     def test_regularisation_parameter2(self):
-        alpha = 0.15
-        tv = alpha * TotalVariation()
-        np.testing.assert_almost_equal(tv.regularisation_parameter, alpha)
+        np.testing.assert_almost_equal(self.tv_scaled.regularisation_parameter, self.alpha)
     
     def test_rmul(self):
-        alpha = 0.15
-        tv = alpha * TotalVariation()
-        assert isinstance(tv, TotalVariation)
+        assert isinstance(self.tv_scaled, TotalVariation)
     
     def test_regularisation_parameter3(self):
-        tv = TotalVariation()
         try:
-            tv.regularisation_parameter = 'string'
+            self.tv.regularisation_parameter = 'string'
             assert False
         except TypeError as te:
-            print (te)
             assert True
     def test_rmul2(self):
         alpha = 'string'
@@ -951,10 +956,25 @@ class TestTotalVariation(unittest.TestCase):
             tv = alpha * TotalVariation()
             assert False
         except TypeError as te:
-            print (te)
             assert True
-    
 
+    def test_call_real_isotropic(self):
+
+        x_real = self.ig_real.allocate('random', seed=4)  
+        
+
+        res1 = self.tv_iso(x_real)
+        res2 = self.grad.direct(x_real).pnorm(2).sum()
+        np.testing.assert_equal(res1, res2)  
+
+    def test_call_real_anisotropic(self):
+
+        x_real = self.ig_real.allocate('random', seed=4) 
+        
+        res1 = self.tv_aniso(x_real)
+        res2 = self.grad.direct(x_real).pnorm(1).sum()
+        np.testing.assert_equal(res1, res2)                
+    
     @unittest.skipUnless(has_reg_toolkit, "Regularisation Toolkit not present")
     def test_compare_regularisation_toolkit(self):
     
@@ -1048,7 +1068,7 @@ class TestTotalVariation(unittest.TestCase):
         noisy_data = noise.gaussian(data, seed=10)
         
         alpha = 0.1
-        iters = 1000
+        iters = 100
         
         # print("Use tau as an array of ones")
         # CIL_TotalVariation no tolerance

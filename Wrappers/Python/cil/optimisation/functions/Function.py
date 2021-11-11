@@ -15,6 +15,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+import warnings
 
 from numbers import Number
 import numpy as np
@@ -24,18 +25,17 @@ class Function(object):
     """ Abstract class representing a function 
     
         :param L: Lipschitz constant of the gradient of the function F(x), when it is differentiable.
-        :type L: number, positive, default None             
+        :type L: number, positive, default None
+        :param domain: The domain of the function.
 
-        # TODO Add definition of Lipschitz
-        #  Lipschitz of the gradient of the function; it is a positive real number, such that |f'(x) - f'(y)| <= L ||x-y||, assuming f: IG --> R
+        Lipschitz of the gradient of the function; it is a positive real number, such that |f'(x) - f'(y)| <= L ||x-y||, assuming f: IG --> R
 
     """
     
     
     def __init__(self, L = None):
-
-        # Lipschitz constant for the gradient of the Function
-        self._L = L     
+        # overrides the type check to allow None as initial value
+        self._L = L
         
     def __call__(self,x):
         
@@ -100,6 +100,8 @@ class Function(object):
         if out is None:
             return val
 
+
+
     # Algebra for Function Class
     
         # Add functions
@@ -151,10 +153,11 @@ class Function(object):
     
     @property
     def L(self):
-        '''Lipschitz constant of the gradient of function f.'''
-    
+        '''Lipschitz of the gradient of function f.
+        
+        L is positive real number, such that |f'(x) - f'(y)| <= L ||x-y||, assuming f: IG --> R'''
         return self._L
-
+        # return self._L
     @L.setter
     def L(self, value):
         '''Setter for Lipschitz constant'''
@@ -162,7 +165,6 @@ class Function(object):
             self._L = value
         else:
             raise TypeError('The Lipschitz constant is a real positive number')
-
     
 class SumFunction(Function):
     
@@ -250,7 +252,7 @@ class ScaledFunction(Function):
     @L.setter
     def L(self, value):
         # call base class setter
-        super(ScaledFunction, self.__class__).L.fset(self, value )  
+        super(ScaledFunction, self.__class__).L.fset(self, value )
 
     @property
     def scalar(self):
@@ -312,6 +314,29 @@ class ScaledFunction(Function):
         return self.function.proximal(x, tau*self.scalar, out=out)     
 
 
+    def proximal_conjugate(self, x, tau, out = None):
+        r"""This returns the proximal operator for the function at x, tau
+        """
+        try:
+            tmp = x
+            x.divide(tau, out = tmp)
+        except TypeError:
+            tmp = x.divide(tau, dtype=np.float32)
+
+        if out is None:
+            val = self.function.proximal(tmp, self.scalar/tau )
+        else:
+            self.function.proximal(tmp, self.scalar/tau, out = out)
+            val = out     
+
+        if id(tmp) == id(x):
+            x.multiply(tau, out = x)
+
+        val.axpby(-tau, 1.0, x, out=val)
+
+        if out is None:
+            return val
+
 class SumScalarFunction(SumFunction):
           
     """ SumScalarFunction represents the sum a function with a scalar. 
@@ -330,8 +355,7 @@ class SumScalarFunction(SumFunction):
     
     def __init__(self, function, constant):
         
-        super(SumScalarFunction, self).__init__(function, 
-                                                ConstantFunction(constant))        
+        super(SumScalarFunction, self).__init__(function, ConstantFunction(constant))        
         self.constant = constant
         self.function = function
         
@@ -471,8 +495,11 @@ class TranslateFunction(Function):
     """
     
     def __init__(self, function, center):
-
-        super(TranslateFunction, self).__init__(L = function.L) 
+        try:
+            L = function.L
+        except NotImplementedError as nie:
+            L = None
+        super(TranslateFunction, self).__init__(L = L) 
                         
         self.function = function
         self.center = center
@@ -558,6 +585,3 @@ class TranslateFunction(Function):
         """        
         
         return self.function.convex_conjugate(x) + self.center.dot(x)
-
-
-   

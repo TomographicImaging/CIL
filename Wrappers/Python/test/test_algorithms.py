@@ -395,88 +395,6 @@ class TestAlgorithms(unittest.TestCase):
             print ("RMSE", rmse)
         self.assertLess(rmse, 2e-4)
 
-    def test_PDHG_step_sizes(self):
-
-        ig = ImageGeometry(3,3)
-        data = ig.allocate('random')
-
-        f = L2NormSquared(b=data)
-        g = L2NormSquared()
-        operator = IdentityOperator(ig)
-
-        # sigma, tau no update. Operator norm is 1.
-        sigma = 1.0
-        tau  = 1.0
-
-        pdhg = PDHG(f=f, g=g, operator=operator, max_iteration=10)
-        pdhg.run(verbose=0)
-        self.assertEqual(pdhg.sigma, sigma)
-        self.assertEqual(pdhg.tau, tau)           
-
-    def test_PDHG_strongly_convex_gamma_g(self):
-
-        ig = ImageGeometry(3,3)
-        data = ig.allocate('random')
-
-        f = L2NormSquared(b=data)
-        g = L2NormSquared()
-        operator = IdentityOperator(ig)
-
-        # sigma, tau 
-        sigma = 1.0
-        tau  = 1.0        
-
-        pdhg = PDHG(f=f, g=g, operator=operator, sigma = sigma, tau=tau,
-                    max_iteration=5, gamma_g=0.5)
-        pdhg.run(1, verbose=0)
-        self.assertEquals(pdhg.theta, 1.0/ np.sqrt(1 + 2 * pdhg.gamma_g * tau))
-        self.assertEquals(pdhg.tau, tau * pdhg.theta)
-        self.assertEquals(pdhg.sigma, sigma / pdhg.theta)
-        pdhg.run(4, verbose=0)
-        self.assertNotEqual(pdhg.sigma, sigma)
-        self.assertNotEqual(pdhg.tau, tau)   
-
-    def test_PDHG_strongly_convex_gamma_fcong(self):
-
-        ig = ImageGeometry(3,3)
-        data = ig.allocate('random')
-
-        f = L2NormSquared(b=data)
-        g = L2NormSquared()
-        operator = IdentityOperator(ig)
-
-        # sigma, tau 
-        sigma = 1.0
-        tau  = 1.0        
-
-        pdhg = PDHG(f=f, g=g, operator=operator, sigma = sigma, tau=tau,
-                    max_iteration=5, gamma_fconj=0.5)
-        pdhg.run(1, verbose=0)
-        self.assertEquals(pdhg.theta, 1.0/ np.sqrt(1 + 2 * pdhg.gamma_fconj * sigma))
-        self.assertEquals(pdhg.tau, tau / pdhg.theta)
-        self.assertEquals(pdhg.sigma, sigma * pdhg.theta)
-        pdhg.run(4, verbose=0)
-        self.assertNotEqual(pdhg.sigma, sigma)
-        self.assertNotEqual(pdhg.tau, tau)   
-
-    def test_PDHG_strongly_convex_both_fconj_or_g(self):
-
-        ig = ImageGeometry(3,3)
-        data = ig.allocate('random')
-
-        f = L2NormSquared(b=data)
-        g = L2NormSquared()
-        operator = IdentityOperator(ig)
-    
-        try:
-            pdhg = PDHG(f=f, g=g, operator=operator, max_iteration=10, 
-                        gamma_g = 0.5, gamma_fconj=0.5)
-            pdhg.run(verbose=0)
-        except NotImplementedError as err:
-            print(err)
- 
-
-
     def test_FISTA_Denoising(self):
         if debug_print: 
             print ("FISTA Denoising Poisson Noise Tikhonov")
@@ -608,7 +526,7 @@ class TestAlgorithms(unittest.TestCase):
     def test_exception_initial_PDHG(self):
         initial = 1
         try:
-            algo = PDHG(initial = initial, x_init=initial, f=None, g=None, operator=None)
+            algo = PDHG(initial = initial, x_init=initial)
             assert False
         except ValueError as ve:
             assert True

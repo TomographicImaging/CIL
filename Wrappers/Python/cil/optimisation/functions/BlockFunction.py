@@ -57,7 +57,7 @@ class BlockFunction(Function):
                 tmp_L = None 
                 break 
         return tmp_L     
-                            
+                                
     def __call__(self, x):
         
         r""" Returns the value of the BlockFunction :math:`F`
@@ -204,4 +204,4 @@ class BlockFunction(Function):
 
                             
     
- 
+    

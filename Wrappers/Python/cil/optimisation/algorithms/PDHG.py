@@ -45,7 +45,6 @@ class PDHG(Algorithm):
     gamma_fconj : positive :obj:`float`, optional, default=None
         Strongly convex constant if the convex conjugate of f is strongly convex. Allows dual acceleration of the PDHG algorithm.
 
-
     **kwargs:
         Keyward arguments used from the base class :class:`Algorithm`.    
     
@@ -53,6 +52,13 @@ class PDHG(Algorithm):
             Maximum number of iterations of the PDHG.
         update_objective_interval : :obj:`int`, optional, default=1
             Evaluates objectives, e.g., primal/dual/primal-dual gap every ``update_objective_interval``.
+
+
+
+
+    :param f1: A convex function with a "simple" proximal method of its conjugate.
+    :type f1: Function
+
 
     Example 
     -------
@@ -182,6 +188,7 @@ class PDHG(Algorithm):
         self.tau = tau
 
         # Default values for the pdhg stepsizes
+        # self.set_step_sizes(sigma, tau)
         self.pdhg_step_sizes()
         
         if initial is None:
@@ -426,4 +433,6 @@ class PDHG(Algorithm):
     @property
     def primal_dual_gap(self):
         return [x[2] for x in self.loss]
+
+
 

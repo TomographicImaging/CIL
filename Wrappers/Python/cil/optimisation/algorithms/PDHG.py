@@ -169,9 +169,18 @@ class PDHG(Algorithm):
                 raise ValueError('{} received both initial and the deprecated x_init parameter. It is not clear which one we should use.'\
                     .format(self.__class__.__name__))
         self._use_axpby = use_axpby
+        self._tau = None
+        self._sigma = None
 
         if f is not None and operator is not None and g is not None:
             self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, initial=initial, **kwargs)
+
+    @property
+    def tau(self):
+        return self._tau
+    @property
+    def sigma(self):
+        return self._sigma            
 
     def set_up(self, f, g, operator, tau=None, sigma=None, initial=None, **kwargs):
         """Initialisation of the algorithm
@@ -183,13 +192,8 @@ class PDHG(Algorithm):
         self.g = g
         self.operator = operator
 
-        # step sizes
-        self.sigma = sigma
-        self.tau = tau
-
         # Default values for the pdhg stepsizes
-        # self.set_step_sizes(sigma, tau)
-        self.pdhg_step_sizes()
+        self.set_step_sizes(sigma, tau)
         
         if initial is None:
             self.x_old = self.operator.domain_geometry().allocate(0)
@@ -291,7 +295,7 @@ class PDHG(Algorithm):
         # update the step sizes for special cases
         self.update_step_sizes()
 
-    def pdhg_step_sizes(self):
+    def set_step_sizes(self, sigma=None, tau=None):
 
         r"""Default step sizes for the PDHG algorithm
 
@@ -319,13 +323,13 @@ class PDHG(Algorithm):
         # Compute operator norm
         self.norm_op = self.operator.norm()
 
-        if self.tau is None and self.sigma is None:            
-            self.sigma = 1./self.norm_op
-            self.tau = 1./self.norm_op
-        elif self.tau is None:
-            self.tau = 1./self.sigma*self.norm_op**2
-        elif self.sigma is None:
-            self.sigma = 1./self.tau*self.norm_op**2
+        if tau is None and sigma is None:            
+            self._sigma = 1./self.norm_op
+            self._tau = 1./self.norm_op
+        elif tau is None:
+            self._tau = 1./(sigma*self.norm_op**2)
+        elif sigma is None:
+            self._sigma = 1./(tau*self.norm_op**2)
         else:
             pass
       
@@ -433,6 +437,5 @@ class PDHG(Algorithm):
     @property
     def primal_dual_gap(self):
         return [x[2] for x in self.loss]
-
 
 

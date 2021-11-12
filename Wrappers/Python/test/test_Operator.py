@@ -16,7 +16,7 @@
 #   limitations under the License.
 
 import unittest
-from cil.framework import ImageGeometry, VectorGeometry, ImageData, BlockDataContainer, DataContainer
+from cil.framework import ImageGeometry, BlockGeometry, VectorGeometry, ImageData, BlockDataContainer, DataContainer
 from cil.optimisation.operators import BlockOperator,\
     FiniteDifferenceOperator, SymmetrisedGradientOperator
 import numpy
@@ -25,7 +25,7 @@ from cil.optimisation.operators import GradientOperator, IdentityOperator,\
     DiagonalOperator, MaskOperator, ChannelwiseOperator, BlurringOperator
 from cil.optimisation.operators import LinearOperator, MatrixOperator
 import numpy   
-from cil.optimisation.operators import SumOperator,  ZeroOperator, CompositionOperator
+from cil.optimisation.operators import SumOperator,  ZeroOperator, CompositionOperator, ProjectionMap
 
 from cil.utilities import dataexample
 import os
@@ -200,7 +200,7 @@ class TestOperator(CCPiTestClass):
         
         # Parameters for point spread function PSF (size and std)
         ks          = 11; 
-        ksigma      = 5.0;
+        ksigma      = 5.0
         
         # Create 1D PSF and 2D as outer product, then normalise.
         w           = numpy.exp(-numpy.arange(-(ks-1)/2,(ks-1)/2+1)**2/(2*ksigma**2))
@@ -372,11 +372,81 @@ class TestOperator(CCPiTestClass):
         for n in [norm, norm2, norm3, norm4, norm5]:
             print ("norm {}", format(n))
 
+    def test_ProjectionMap(self):
+
+        # Check if direct is correct
+        ig1 = ImageGeometry(3,4)
+        ig2 = ImageGeometry(5,6)
+        ig3 = ImageGeometry(5,6,4)
+
+        # Create BlockGeometry
+        bg = BlockGeometry(ig1,ig2, ig3)
+        x = bg.allocate(10)
+
+        # Extract containers
+        x0, x1, x2 = x[0], x[1], x[2]
+
+        for i in range(3):
+
+            proj_map = ProjectionMap(bg, i)
+
+            # res1 is in ImageData from the X_{i} "ImageGeometry"
+            res1 = proj_map.direct(x)
+
+            # res2 is in ImageData from the X_{i} "ImageGeometry" using out
+            res2 = bg.geometries[i].allocate(0)
+            proj_map.direct(x, out=res2)
+
+            # Check with and without out
+            numpy.testing.assert_array_almost_equal(res1.as_array(), res2.as_array())
+
+            # Depending on which index is used, check if x0, x1, x2 are the same with res2
+            if i==0:            
+                numpy.testing.assert_array_almost_equal(x0.as_array(), res2.as_array())
+            elif i==1: 
+                numpy.testing.assert_array_almost_equal(x1.as_array(), res2.as_array())   
+            elif i==2:
+                numpy.testing.assert_array_almost_equal(x2.as_array(), res2.as_array())  
+            else:
+                pass      
+
+        # Check if adjoint is correct
+
+        bg = BlockGeometry(ig1, ig2, ig3, ig1, ig2, ig3)
+        x = ig1.allocate(20)
+
+        index=3
+        proj_map = ProjectionMap(bg, index)
+
+        res1 = bg.allocate(0)
+        proj_map.adjoint(x, out=res1)
+
+        # check if all indices return arrays filled with 0, except the input index
+
+        for i in range(len(bg.geometries)):
+
+            if i!=index:
+                numpy.testing.assert_array_almost_equal(res1[i].as_array(), bg.geometries[i].allocate().as_array())   
+
+        # Check error messages
+        # Check if index is correct wrt length of Cartesian Product
+        try:
+            ig = ImageGeometry(3,4)
+            bg = BlockGeometry(ig,ig)
+            index = 3
+            proj_map = ProjectionMap(bg, index)
+        except ValueError as err:
+                print(err) 
+
+        # Check error if an ImageGeometry is passed
+        try:
+            proj_map = ProjectionMap(ig, index)               
+        except ValueError as err:
+            print(err)           
+
+         
+            
     
-
-        
-
-
 class TestGradients(CCPiTestClass): 
     def setUp(self):
         N, M = 20, 30

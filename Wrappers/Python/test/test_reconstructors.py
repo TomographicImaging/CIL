@@ -486,12 +486,12 @@ class Test_FDK_results(unittest.TestCase):
 
         reconstructor = FDK(self.acq_data)
 
-        reco = reconstructor.run()
+        reco = reconstructor.run(verbose=0)
         np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=1e-3)    
 
         reco2 = reco.copy()
         reco2.fill(0)
-        reconstructor.run(out=reco2)
+        reconstructor.run(out=reco2, verbose=0)
         np.testing.assert_array_equal(reco.as_array(), reco2.as_array())  
 
 
@@ -502,12 +502,12 @@ class Test_FDK_results(unittest.TestCase):
         img_data2D = self.img_data.get_slice(vertical='centre')
 
         reconstructor = FDK(data2D)
-        reco = reconstructor.run()
+        reco = reconstructor.run(verbose=0)
         np.testing.assert_allclose(reco.as_array(), img_data2D.as_array(),atol=1e-3)    
 
         reco2 = reco.copy()
         reco2.fill(0)
-        reconstructor.run(out=reco2)
+        reconstructor.run(out=reco2, verbose=0)
         np.testing.assert_array_equal(reco.as_array(), reco2.as_array()) 
 
 
@@ -525,7 +525,7 @@ class Test_FDK_results(unittest.TestCase):
 
         reconstructor_cil = FDK(self.acq_data)
         reconstructor_cil.set_filter(filt)
-        reco_cil = reconstructor_cil.run()
+        reco_cil = reconstructor_cil.run(verbose=0)
 
         #with the same filter results should be virtually identical
         np.testing.assert_allclose(reco_cil.as_array(), reco_tigre.as_array(),atol=1e-8) 
@@ -535,12 +535,12 @@ class Test_FDK_results(unittest.TestCase):
     def test_results_inplace_filtering(self):
 
         reconstructor = FDK(self.acq_data)
-        reco = reconstructor.run()
+        reco = reconstructor.run(verbose=0)
 
         data_filtered= self.acq_data.copy()
         reconstructor_inplace = FDK(data_filtered)
         reconstructor_inplace.set_filter_inplace(True)
-        reconstructor_inplace.run(out=reco)
+        reconstructor_inplace.run(out=reco, verbose=0)
 
         diff = (data_filtered - self.acq_data).abs().mean()
         self.assertGreater(diff,0.8)
@@ -565,12 +565,12 @@ class Test_FBP_results(unittest.TestCase):
 
         reconstructor = FBP(self.acq_data)
 
-        reco = reconstructor.run()
+        reco = reconstructor.run(verbose=0)
         np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=1e-3)    
 
         reco2 = reco.copy()
         reco2.fill(0)
-        reconstructor.run(out=reco2)
+        reconstructor.run(out=reco2, verbose=0)
         np.testing.assert_array_equal(reco.as_array(), reco2.as_array())  
 
 
@@ -580,12 +580,12 @@ class Test_FBP_results(unittest.TestCase):
         reconstructor = FBP(self.acq_data)
         reconstructor.set_split_processing(1)
 
-        reco = reconstructor.run()
+        reco = reconstructor.run(verbose=0)
         np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=1e-3)    
 
         reco2 = reco.copy()
         reco2.fill(0)
-        reconstructor.run(out=reco2)
+        reconstructor.run(out=reco2, verbose=0)
         np.testing.assert_array_equal(reco.as_array(), reco2.as_array())  
 
 
@@ -596,12 +596,12 @@ class Test_FBP_results(unittest.TestCase):
         img_data2D = self.img_data.get_slice(vertical='centre')
 
         reconstructor = FBP(data2D)
-        reco = reconstructor.run()
+        reco = reconstructor.run(verbose=0)
         np.testing.assert_allclose(reco.as_array(), img_data2D.as_array(),atol=1e-3)    
 
         reco2 = reco.copy()
         reco2.fill(0)
-        reconstructor.run(out=reco2)
+        reconstructor.run(out=reco2, verbose=0)
         np.testing.assert_array_equal(reco.as_array(), reco2.as_array()) 
 
 
@@ -619,7 +619,7 @@ class Test_FBP_results(unittest.TestCase):
 
         reconstructor_cil = FBP(self.acq_data)
         reconstructor_cil.set_filter(filt)
-        reco_cil = reconstructor_cil.run()
+        reco_cil = reconstructor_cil.run(verbose=0)
 
         #with the same filter results should be virtually identical
         np.testing.assert_allclose(reco_cil.as_array(), reco_tigre.as_array(),atol=1e-8) 
@@ -629,12 +629,12 @@ class Test_FBP_results(unittest.TestCase):
     def test_results_inplace_filtering(self):
 
         reconstructor = FBP(self.acq_data)
-        reco = reconstructor.run()
+        reco = reconstructor.run(verbose=0)
 
         data_filtered= self.acq_data.copy()
         reconstructor_inplace = FBP(data_filtered)
         reconstructor_inplace.set_filter_inplace(True)
-        reconstructor_inplace.run(out=reco)
+        reconstructor_inplace.run(out=reco, verbose=0)
 
         diff = (data_filtered - self.acq_data).abs().mean()
         self.assertGreater(diff,0.8)

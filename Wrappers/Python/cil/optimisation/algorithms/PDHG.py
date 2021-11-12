@@ -54,12 +54,6 @@ class PDHG(Algorithm):
             Evaluates objectives, e.g., primal/dual/primal-dual gap every ``update_objective_interval``.
 
 
-
-
-    :param f1: A convex function with a "simple" proximal method of its conjugate.
-    :type f1: Function
-
-
     Example 
     -------
     Total variation denoising with with PDHG.  
@@ -89,7 +83,6 @@ class PDHG(Algorithm):
     Currently, the strongly convex constants are passed as parameters of PDHG. 
     In the future, these parameters will be properties of the corresponding functions.
 
-    
 
     Notes
     -----
@@ -134,9 +127,24 @@ class PDHG(Algorithm):
 
         - By default, the step sizes :math:`\sigma` and :math:`\tau` are:
 
-        .. math::
+        * If ``sigma`` is ``None`` and ``tau`` is ``None``:
 
+        .. math:: 
+    
             \sigma = \frac{1}{\|K\|},  \tau = \frac{1}{\|K\|}
+
+        * If ``tau`` is ``None``:
+
+        .. math:: 
+    
+            \tau = \frac{1}{\sigma\|K\|^{2}}
+
+        * If ``sigma`` is ``None``:
+
+        .. math:: 
+    
+            \sigma = \frac{1}{\tau\|K\|^{2}}                
+
 
         - PDHG algorithm can be accelerated if the functions :math:`f^{*}` and/or :math:`g` are strongly convex. A function :math:`f` is strongly convex with constant :math:`\gamma>0` if
 
@@ -256,7 +264,6 @@ class PDHG(Algorithm):
         In the case of primal/dual acceleration using the strongly convexity property of function :math:`f^{*}` or :math:`g` \
         the stepsize :math:`\sigma` and :math:`\tau` are updated using the :meth:`update_step_sizes` method.
         
-
         """
 
         #calculate x-bar and store in self.x_tmp
@@ -297,29 +304,8 @@ class PDHG(Algorithm):
 
     def set_step_sizes(self, sigma=None, tau=None):
 
-        r"""Default step sizes for the PDHG algorithm
-
-        * If ``sigma`` is ``None`` and ``tau`` is ``None``:
-
-        .. math:: 
-    
-            \sigma = \frac{1}{\|K\|},  \tau = \frac{1}{\|K\|}
-
-        * If ``tau`` is ``None``:
-
-        .. math:: 
-    
-            \tau = \frac{1}{\sigma\|K\|^{2}}
-
-        * If ``sigma`` is ``None``:
-
-        .. math:: 
-    
-            \sigma = \frac{1}{\tau\|K\|^{2}}                
-
-
-        """
-
+        """Default step sizes for the PDHG algorithm"""
+        
         # Compute operator norm
         self.norm_op = self.operator.norm()
 

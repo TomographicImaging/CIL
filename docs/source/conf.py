@@ -91,10 +91,9 @@ html_theme = 'pydata_sphinx_theme'
 # documentation.
 #
 html_theme_options = {
-    "github_url": "https://github.com/TomographicImaging/CIL",
     "show_prev_next": False,
-    "navbar_end": ["search-field.html", "navbar-icon-links.html"],
-    "navbar_align": "left"
+    "navbar_end": ["navbar-icon-links.html","search-field.html"],
+    "navbar_align": "right"
 }
 html_sidebars = {
     "**": [],

@@ -129,7 +129,8 @@ class Reconstructor(object):
         ----------
         out : ImageData, optional
            Fills the referenced ImageData with the reconstructed volume and suppresses the return
-        verbose : int
+        
+        verbose : int, default=1
            Contols the verbosity of the reconstructor. 0: No output is logged, 1: Full configuration is logged
 
         Returns

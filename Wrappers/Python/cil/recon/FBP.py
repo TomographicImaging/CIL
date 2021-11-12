@@ -275,36 +275,38 @@ class GenericFilteredBackProjection(Reconstructor):
 
 class FDK(GenericFilteredBackProjection):
 
+    """
+    Creates an FDK reconstructor based on your cone-beam acquisition data.
+
+    Parameters
+    ----------
+    input : AcquisitionData
+        The input data to reconstruct. The reconstructor is set-up based on the geometry of the data.
+    
+    image_geometry : ImageGeometry, default used if None
+        A description of the area/volume to reconstruct
+    
+    filter : string, numpy.ndarray, default='ram-lak'
+        The filter to be applied. Can be a string from: 'ram-lak' or a numpy array.
+
+    Example
+    -------
+    >>> fdk = FDK(data)
+    >>> out = fdk.run()
+
+    Notes
+    -----
+    The reconstructor can be futher customised using additional 'set' methods provided.
+    self.set_input()
+    self.set_image_geometry()
+    self.set_backend()
+    self.set_filter()
+    self.get_filter_array()
+    self.set_fft_order()
+    self.set_filter_inplace()
+    """
+    
     def __init__ (self, input, image_geometry=None):
-        """
-        Creates an FDK reconstructor based on your cone-beam acquisition data.
-
-        Parameters
-        ----------
-        input : AcquisitionData
-            The input data to reconstruct. The reconstructor is set-up based on the geometry of the data.
-        image_geometry : ImageGeometry, default used if None
-            A description of the area/volume to reconstruct
-        filter : string, numpy.ndarray, default='ram-lak'
-            The filter to be applied. Can be a string from: 'ram-lak' or a numpy array.
-
-        Example 
-        -------
-        >>> fdk = FDK(data)
-        >>> out = fdk.run()
-
-        Notes
-        -----  
-        The reconstructor can be futher customised using additional 'set' methods provided.
-        self.set_input()
-        self.set_image_geometry()
-        self.set_backend()
-        self.set_filter()
-        self.get_filter_array()
-        self.set_fft_order()
-        self.set_filter_inplace()
-
-        """
         #call parent initialiser
         super(FDK, self).__init__(input, image_geometry)
 
@@ -331,7 +333,7 @@ class FDK(GenericFilteredBackProjection):
         ----------
         out : ImageData, optional
            Fills the referenced ImageData with the reconstructed volume and suppresses the return
-        verbose : int
+        verbose : int, default=1
            Contols the verbosity of the reconstructor. 0: No output is logged, 1: Full configuration is logged
 
         Returns
@@ -373,6 +375,37 @@ class FDK(GenericFilteredBackProjection):
 
 class FBP(GenericFilteredBackProjection):
 
+    """
+     Creates an FBP reconstructor based on your parallel-beam acquisition data.
+
+    Parameters
+    ----------
+    input : AcquisitionData
+        The input data to reconstruct. The reconstructor is set-up based on the geometry of the data.
+        
+    image_geometry : ImageGeometry, default used if None
+        A description of the area/volume to reconstruct
+        
+    filter : string, numpy.ndarray, default='ram-lak'
+        The filter to be applied. Can be a string from: 'ram-lak' or a numpy array.
+
+    Example
+    -------
+    >>> fbp = FBP(data)
+    >>> out = fbp.run()
+
+    Notes
+    -----
+    The reconstructor can be futher customised using additional 'set' methods provided.
+    self.set_input()
+    self.set_image_geometry()
+    self.set_backend()
+    self.set_filter()
+    self.get_filter_array()
+    self.set_fft_order()
+    self.set_filter_inplace()
+    self.set_split_processing()
+    """
 
     @property
     def slices_per_chunk(self):
@@ -380,36 +413,7 @@ class FBP(GenericFilteredBackProjection):
 
 
     def __init__ (self, input, image_geometry=None):
-        """
-        Creates an FBP reconstructor based on your parallel-beam acquisition data.
-
-        Parameters
-        ----------
-        input : AcquisitionData
-            The input data to reconstruct. The reconstructor is set-up based on the geometry of the data.
-        image_geometry : ImageGeometry, default used if None
-            A description of the area/volume to reconstruct
-        filter : string, numpy.ndarray, default='ram-lak'
-            The filter to be applied. Can be a string from: 'ram-lak' or a numpy array.
-
-        Example 
-        -------
-        >>> fbp = FBP(data)
-        >>> out = fbp.run()
-
-        Notes
-        -----  
-        The reconstructor can be futher customised using additional 'set' methods provided.
-        self.set_input()
-        self.set_image_geometry()
-        self.set_backend()
-        self.set_filter()
-        self.get_filter_array()
-        self.set_fft_order()
-        self.set_filter_inplace()
-        self.set_split_processing()
-        """
-       
+      
         super(FBP, self).__init__(input, image_geometry)
         self.set_split_processing(False)
 
@@ -480,7 +484,8 @@ class FBP(GenericFilteredBackProjection):
         ----------
         out : ImageData, optional
            Fills the referenced ImageData with the reconstructed volume and suppresses the return
-        verbose : int
+
+        verbose : int, default=1
            Contols the verbosity of the reconstructor. 0: No output is logged, 1: Full configuration is logged
 
         Returns

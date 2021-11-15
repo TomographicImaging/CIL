@@ -18,7 +18,6 @@
 from cil.optimisation.algorithms import Algorithm
 import warnings
 import numpy as np
-from numpy.core.numeric import identity
 
 
 class PDHG(Algorithm):

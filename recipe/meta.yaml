@@ -19,10 +19,11 @@ test:
   requires:
     - {{ pin_compatible('numpy', min_pin='x.x', max_pin='x.x') }}
     - python-wget
-    - cvxpy              # [ unix and py36 and np115 ]
+    - cvxpy              # [ linux and py==37 and np==118 ]
     - scikit-image
     - tomophantom        # [ linux ]
     - cil-astra          # [ linux ] 
+    - cil-data >=21.3.0
     - tigre              # [ linux or win ] 
     - numba
     - packaging

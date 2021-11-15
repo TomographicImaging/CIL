@@ -72,8 +72,9 @@ class TestGradientOperator(unittest.TestCase):
                                                     bnd_cond = bnd,
                                                     backend = backend, 
                                                     correlation = corr, method = method)
-                            try:                                                    
-                                self.assertTrue(LinearOperator.dot_test(Grad, seed=5))
+                            try:  
+                                for sd in [5, 10, 15]:                                                  
+                                    self.assertTrue(LinearOperator.dot_test(Grad, seed=sd))
                             except:    
                                 self.print_assertion_info(geom,bnd,backend,corr,method,None)
                                 raise
@@ -361,7 +362,8 @@ class TestGradientOperator(unittest.TestCase):
                 numpy.testing.assert_array_almost_equal(res3.as_array(), res4.as_array()) 
 
                 # test dot_test
-                self.assertTrue(LinearOperator.dot_test(Grad_numpy))
+                for sd in [5, 10, 15]:
+                    self.assertTrue(LinearOperator.dot_test(Grad_numpy, seed=sd))
 
                 # test shape of output of direct
                 self.assertEqual(res1[0].shape, ig[i].shape)
@@ -387,7 +389,8 @@ class TestGradientOperator(unittest.TestCase):
                 numpy.testing.assert_array_almost_equal(res7.as_array(), res8.as_array()) 
 
                 # test dot_test
-                self.assertTrue(LinearOperator.dot_test(Grad_c))        
+                for sd in [5, 10, 15]:
+                    self.assertTrue(LinearOperator.dot_test(Grad_c, seed = sd))        
 
                 # test direct numpy vs direct c backends (with and without out)
                 numpy.testing.assert_array_almost_equal(res5[0].as_array(), res1[0].as_array()) 
@@ -410,4 +413,5 @@ class TestGradientOperator(unittest.TestCase):
         numpy.testing.assert_array_almost_equal(res1[1].as_array(), res2[1].as_array())  
 
         # check dot_test
-        self.assertTrue(LinearOperator.dot_test(Grad))
+        for sd in [5, 10, 15]:
+            self.assertTrue(LinearOperator.dot_test(Grad, seed=sd))

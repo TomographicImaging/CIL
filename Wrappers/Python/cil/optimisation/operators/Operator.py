@@ -167,7 +167,7 @@ class LinearOperator(Operator):
         return s1
 
     @staticmethod
-    def dot_test(operator, domain_init=None, range_init=None, verbose=False, **kwargs):
+    def dot_test(operator, domain_init=None, range_init=None, tolerance=1e-6, **kwargs):
         r'''Does a dot linearity test on the operator
         
         Evaluates if the following equivalence holds
@@ -176,42 +176,45 @@ class LinearOperator(Operator):
         
           Ax\times y = y \times A^Tx
         
-        The equivalence is tested within a user specified precision
-
-        .. code::
-        
-          abs(desired-actual) < 1.5 * 10**(-decimal)
-
-        :param operator: operator to test
+        :param operator: operator to test the dot_test
         :param range_init: optional initialisation container in the operator range 
         :param domain_init: optional initialisation container in the operator domain 
-        :returns: boolean, True if the test is passed.
-        :param decimal: desired precision
-        :type decimal: int, optional, default 4
+        :param seed: Seed random generator
+        :type : int, default = 1
+        :param tolerance: Check if the following expression is below the tolerance
+        .. math:: 
+        
+            |Ax\times y - y \times A^Tx|/(\|A\|\|x\|\|y\| + 1e-12) < tolerance
+        
+        :type : float, default 1e-6
+        :returns: boolean, True if the test is passed.       
         '''
-        seed = kwargs.get('seed',None)
+
+        seed = kwargs.get('seed', 1)
+    
         if range_init is None:
-            y = operator.range_geometry().allocate('random', seed=seed)
+            y = operator.range_geometry().allocate('random', seed = seed + 10)
         else:
             y = range_init
         if domain_init is None:
-            x = operator.domain_geometry().allocate('random',seed=seed)
+            x = operator.domain_geometry().allocate('random', seed = seed)
         else:
             x = domain_init
-            
+        
         fx = operator.direct(x)
         by = operator.adjoint(y)
         a = fx.dot(y)
         b = by.dot(x).conjugate()
-        if verbose:
-            print ('Left hand side  {}, \nRight hand side {}'.format(a, b))
-            print ("decimal ", kwargs.get('decimal', 4))
-        try:
-            numpy.testing.assert_almost_equal(abs((a-b)/a), 0., decimal=kwargs.get('decimal',4))
+
+        # Check relative tolerance but normalised with respect to 
+        # operator, x and y norms and avoid zero division
+        error = numpy.abs( a - b )/ (operator.norm()*x.norm()*y.norm() + 1e-12)
+            
+        if error < tolerance:
             return True
-        except AssertionError as ae:
-            print (ae)
-            return False
+        else:
+            print ('Left hand side  {}, \nRight hand side {}'.format(a, b))
+            return False    
         
         
 class ScaledOperator(Operator):

@@ -336,6 +336,9 @@ class PDHG(Algorithm):
                  
         """
 
+        if self.gamma_g is not None and self.gamma_fconj is not None:
+            raise NotImplementedError("This case is not implemented.")        
+
         # Update sigma and tau based on the strong convexity of G
         if self.gamma_g is not None:
             self.theta = 1.0/ np.sqrt(1 + 2 * self.gamma_g * self.tau)
@@ -348,11 +351,7 @@ class PDHG(Algorithm):
             self.theta = 1.0 / np.sqrt(1 + 2 * self.gamma_fconj * self.sigma)
             self._sigma *= self.theta
             self._tau /= self.theta    
-
-        if self.gamma_g is not None and self.gamma_fconj is not None:
-            raise NotImplementedError("This case is not implemented")
-                    
-        
+                        
     def update_objective(self):
 
         """

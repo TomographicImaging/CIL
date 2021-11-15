@@ -15,9 +15,11 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+from cil.framework.framework import DataContainer
 from cil.optimisation.algorithms import Algorithm
 import warnings
 import numpy as np
+from numbers import Number
 
 
 class PDHG(Algorithm):
@@ -175,10 +177,20 @@ class PDHG(Algorithm):
                 initial = kwargs.get('x_init', None)
             else:
                 raise ValueError('{} received both initial and the deprecated x_init parameter. It is not clear which one we should use.'\
-                    .format(self.__class__.__name__))
+                    .format(self.__class__.__name__))                    
         self._use_axpby = use_axpby
+
         self._tau = None
         self._sigma = None 
+        
+        # check for gamma_g, gamma_fconj, strongly convex constants
+        self._gamma_g = None
+        self._gamma_fconj = None
+
+        self.set_gamma_g(kwargs.get('gamma_g', None))
+        self.set_gamma_fconj(kwargs.get('gamma_fconj', None))  
+        if self.gamma_g is not None and self.gamma_fconj is not None:
+            raise ValueError("The adaptive update of the PDHG stepsizes in the case where both functions are strongly convex is not implemented at the moment.")                           
 
         if f is not None and operator is not None and g is not None:
             self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, initial=initial, **kwargs)
@@ -186,10 +198,33 @@ class PDHG(Algorithm):
     @property
     def tau(self):
         return self._tau   
+
     @property
     def sigma(self):
-        return self._sigma                  
+        return self._sigma   
 
+    @property
+    def gamma_g(self):
+        return self._gamma_g 
+
+    @property
+    def gamma_fconj(self):
+        return self._gamma_fconj    
+                       
+    def set_gamma_g(self, value):
+        
+        if isinstance (value, Number): 
+           if value <= 0:                      
+                raise ValueError("Strongly convex constant is a positive number, {} is passed for the strongly convex function g.".format(value))                   
+        self._gamma_g = value
+        
+    def set_gamma_fconj(self, value):
+  
+        if isinstance (value, Number): 
+            if value <= 0:                     
+                    raise ValueError("Strongly convex constant is positive, {} is passed for the strongly convex conjugate function of f.".format(value))   
+        self._gamma_fconj = value
+                  
     def set_up(self, f, g, operator, tau=None, sigma=None, initial=None, **kwargs):
         """Initialisation of the algorithm
         """
@@ -217,10 +252,10 @@ class PDHG(Algorithm):
         self.theta = kwargs.get('theta',1.0)
 
         # Primal Acceleration: Function g is strongly convex 
-        self.gamma_g = kwargs.get('gamma_g', None)
+        # self.gamma_g = kwargs.get('gamma_g', None)
 
         # Dual Acceleration : Convex conjugate of f is strongly convex
-        self.gamma_fconj = kwargs.get('gamma_fconj', None) 
+        # self.gamma_fconj = kwargs.get('gamma_fconj', None) 
           
         if self.gamma_g is not None:            
             warnings.warn("Primal Acceleration of PDHG: The function g is assumed to be strongly convex with positive parameter `gamma_g`. You need to be sure that gamma_g = {} is the correct strongly convex constant for g. ".format(self.gamma_g))
@@ -306,17 +341,28 @@ class PDHG(Algorithm):
         # Compute operator norm
         self.norm_op = self.operator.norm()
 
+        # check if tau/sigma are numbers positive
+        # check if the inequality is satisfied, raise a Warning if not
+        # check if there are array with the correct shape.   
+
+        if isinstance(tau, Number) and tau<=0:
+            raise ValueError("The step-sizes of PDHG are positive, {} is passed".format(tau))  
+
+        if isinstance(sigma, Number) and sigma<=0:
+            raise ValueError("The step-sizes of PDHG are positive, {} is passed".format(sigma))         
+
         if tau is None and sigma is None:            
-            self._sigma = 1./self.norm_op
-            self._tau = 1./self.norm_op
-        elif tau is None:
-            self._tau = 1./(self.sigma*self.norm_op**2)
-        elif sigma is None:
-            self._sigma = 1./(self.tau*self.norm_op**2)
+            self._sigma = 1.0/self.norm_op
+            self._tau = 1.0/self.norm_op            
+        elif tau is None and sigma>0:            
+            self._tau = 1./(sigma*self.norm_op**2)
+        elif sigma is None and tau>0:
+            self._sigma = 1./(tau*self.norm_op**2)
         else:
             self._sigma = sigma
             self._tau = tau
-      
+
+        
     def update_step_sizes(self):
 
         r"""
@@ -336,9 +382,6 @@ class PDHG(Algorithm):
                  
         """
 
-        if self.gamma_g is not None and self.gamma_fconj is not None:
-            raise NotImplementedError("This case is not implemented.")        
-
         # Update sigma and tau based on the strong convexity of G
         if self.gamma_g is not None:
             self.theta = 1.0/ np.sqrt(1 + 2 * self.gamma_g * self.tau)
@@ -347,7 +390,7 @@ class PDHG(Algorithm):
 
         # Update sigma and tau based on the strong convexity of F
         # Following operations are reversed due to symmetry, sigma --> tau, tau -->sigma
-        if self.gamma_fconj is not None:            
+        if self.gamma_fconj is not None:        
             self.theta = 1.0 / np.sqrt(1 + 2 * self.gamma_fconj * self.sigma)
             self._sigma *= self.theta
             self._tau /= self.theta    
@@ -418,3 +461,5 @@ class PDHG(Algorithm):
     @property
     def primal_dual_gap(self):
         return [x[2] for x in self.loss]
+
+

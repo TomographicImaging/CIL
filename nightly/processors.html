@@ -1,45 +1,138 @@
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Processors &mdash; CIL v21.2.0-35-g81c8d16d documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Processors &#8212; CIL v21.2.0-36-g31fed9b2 documentation</title>
+    
+  <link href="_static/css/theme.css" rel="stylesheet">
+  <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" href="_static/css/blank.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script src="_static/js/theme.js"></script>
+    
+  <link rel="preload" as="script" href="_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Utilities" href="utilities.html" />
-    <link rel="prev" title="Developer’s guide" href="developer_guide.html" /> 
-</head>
+    <link rel="prev" title="Developer’s guide" href="developer_guide.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en">
+    
 
-<body class="wy-body-for-nav"> 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> CIL
-          </a>
-              <div class="version">
-                v21.2.0-35-g81c8d16d
-              </div>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="index.html">
+<p class="title">CIL</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="framework.html">
+  Framework
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="io.html">
+  Read/ write AcquisitionData and ImageData
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="optimisation.html">
+  Optimisation framework
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="developer_guide.html">
+  Developer’s guide
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="current reference internal nav-link" href="#">
+  Processors
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="utilities.html">
+  Utilities
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+<h3><a href="index.html">Table of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="framework.html">Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="io.html">Read/ write AcquisitionData and ImageData</a></li>
@@ -50,30 +143,55 @@
 <li class="toctree-l1"><a class="reference internal" href="utilities.html">Utilities</a></li>
 </ul>
 
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">CIL</a>
-      </nav>
-
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Processors</li>
-      <li class="wy-breadcrumbs-aside">
-            <a href="_sources/processors.rst.txt" rel="nofollow"> View page source</a>
-      </li>
-  </ul>
-  <hr/>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/processors.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-             
+<script>$('#searchbox').show(0);</script>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+
+<nav id="bd-toc-nav">
+    
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
   <div class="section" id="processors">
 <h1>Processors<a class="headerlink" href="#processors" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
@@ -144,7 +262,7 @@
 <dt id="cil.processors.Normaliser">
 <em class="property">class </em><code class="sig-prename descclassname">cil.processors.</code><code class="sig-name descname">Normaliser</code><span class="sig-paren">(</span><em class="sig-param">flat_field=None</em>, <em class="sig-param">dark_field=None</em>, <em class="sig-param">tolerance=1e-05</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Normaliser.html#Normaliser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.processors.Normaliser" title="Permalink to this definition">¶</a></dt>
 <dd><p>Normalisation based on flat and dark</p>
-<p>This processor read in a AcquisitionData and normalises it based on 
+<p>This processor read in a AcquisitionData and normalises it based on
 the instrument reading with and without incident photons or neutrons.</p>
 <p>Input: AcquisitionData
 Parameter: 2D projection with flat field (or stack)</p>
@@ -244,20 +362,25 @@ if the expected input DataContainer is 3D and the Processor expects 2D.</p>
 <dl class="class">
 <dt id="cil.processors.RingRemover">
 <em class="property">class </em><code class="sig-prename descclassname">cil.processors.</code><code class="sig-name descname">RingRemover</code><span class="sig-paren">(</span><em class="sig-param">decNum</em>, <em class="sig-param">wname</em>, <em class="sig-param">sigma</em>, <em class="sig-param">info=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/RingRemover.html#RingRemover"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.processors.RingRemover" title="Permalink to this definition">¶</a></dt>
-<dd><p>RingRemover Processor: Removes vertical stripes from a DataContainer(ImageData/AcquisitionData) 
+<dd><p>RingRemover Processor: Removes vertical stripes from a DataContainer(ImageData/AcquisitionData)
 the algorithm in <a class="reference external" href="https://doi.org/10.1364/OE.17.008567">https://doi.org/10.1364/OE.17.008567</a></p>
 <dl class="method">
 <dt id="cil.processors.RingRemover.__init__">
 <code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">decNum</em>, <em class="sig-param">wname</em>, <em class="sig-param">sigma</em>, <em class="sig-param">info=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/RingRemover.html#RingRemover.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.processors.RingRemover.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>decNum : number of wavelet decompositions</p>
-<dl class="simple">
-<dt>wname<span class="classifier">(str) name of wavelet filter from pywt </span></dt><dd><p>Example: ‘db1’ – ‘db35’, ‘haar’</p>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>decNum</strong> (<em>number of wavelet decompositions</em>) – </p></li>
+<li><p><strong>wname</strong> (<em>(</em><em>str</em><em>) </em><em>name of wavelet filter from pywt</em>) – Example: ‘db1’ – ‘db35’, ‘haar’</p></li>
+<li><p><strong>sigma</strong> (<em>Damping parameter in Fourier space.</em>) – </p></li>
+<li><p><strong>info</strong> (<em>Prints ring remover end message</em>) – </p></li>
+</ul>
 </dd>
-</dl>
-<p>sigma : Damping parameter in Fourier space.</p>
-<p>info : Prints ring remover end message</p>
-<dl class="simple">
-<dt>Corrected ImageData/AcquisitionData 2D, 3D,</dt><dd><p>multi-spectral 2D, multi-spectral 3D</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>multi-spectral 2D, multi-spectral 3D</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Corrected ImageData/AcquisitionData 2D, 3D,</p>
 </dd>
 </dl>
 </dd></dl>
@@ -274,10 +397,17 @@ if the expected input DataContainer is 3D and the Processor expects 2D.</p>
 <dt id="cil.processors.RingRemover.xRemoveStripesVertical">
 <code class="sig-name descname">xRemoveStripesVertical</code><span class="sig-paren">(</span><em class="sig-param">ima</em>, <em class="sig-param">decNum</em>, <em class="sig-param">wname</em>, <em class="sig-param">sigma</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/RingRemover.html#RingRemover.xRemoveStripesVertical"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.processors.RingRemover.xRemoveStripesVertical" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="simple">
-<dt>Code from <a class="reference external" href="https://doi.org/10.1364/OE.17.008567">https://doi.org/10.1364/OE.17.008567</a> </dt><dd><p>translated in Python</p>
+<dt>Code from <a class="reference external" href="https://doi.org/10.1364/OE.17.008567">https://doi.org/10.1364/OE.17.008567</a></dt><dd><p>translated in Python</p>
 </dd>
 </dl>
-<p>Corrected 2D sinogram data (Numpy Array)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Corrected 2D sinogram data (Numpy Array)</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -341,39 +471,39 @@ if the expected input DataContainer is 3D and the Processor expects 2D.</p>
 <li><p>nan               test element-wise for nan</p></li>
 <li><p>inf               test element-wise for inf</p></li>
 <li><dl class="simple">
-<dt>threshold         test element-wise if array values are within boundaries</dt><dd><p>given by threshold_values = (float,float). 
+<dt>threshold         test element-wise if array values are within boundaries</dt><dd><p>given by threshold_values = (float,float).
 You can secify only lower threshold value by setting another to None
 such as threshold_values = (float,None), then
-upper boundary will be amax(data). Similarly, to specify only upper 
+upper boundary will be amax(data). Similarly, to specify only upper
 boundary, use threshold_values = (None,float). If both threshold_values
 are set to None, then original array will be returned.</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>quantile          test element-wise if array values are within boundaries</dt><dd><p>given by quantiles = (q1,q2), 0&lt;=q1,q2&lt;=1. 
+<dt>quantile          test element-wise if array values are within boundaries</dt><dd><p>given by quantiles = (q1,q2), 0&lt;=q1,q2&lt;=1.
 You can secify only lower quantile value by setting another to None
 such as quantiles = (float,q2), then
-upper boundary will be amax(data). Similarly, to specify only upper 
+upper boundary will be amax(data). Similarly, to specify only upper
 boundary, use quantiles = (None,q1). If both quantiles
 are set to None, then original array will be returned.</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>mean              test element-wise if </dt><dd><p>abs(A - mean(A)) &lt; threshold_factor * std(A).
-Default value of threshold_factor is 3. If no axis is specified, 
-then operates over flattened array. Alternatively operates along axis specified 
+<dt>mean              test element-wise if</dt><dd><p>abs(A - mean(A)) &lt; threshold_factor * std(A).
+Default value of threshold_factor is 3. If no axis is specified,
+then operates over flattened array. Alternatively operates along axis specified
 as dimension_label.</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>median            test element-wise if </dt><dd><p>abs(A - median(A)) &lt; threshold_factor * scaled MAD(A),
-scaled median absolute deviation (MAD) is defined as 
+<dt>median            test element-wise if</dt><dd><p>abs(A - median(A)) &lt; threshold_factor * scaled MAD(A),
+scaled median absolute deviation (MAD) is defined as
 c*median(abs(A-median(A))) where c=-1/(sqrt(2)*erfcinv(3/2))
-Default value of threshold_factor is 3. If no axis is specified, 
-then operates over flattened array. Alternatively operates along axis specified 
+Default value of threshold_factor is 3. If no axis is specified,
+then operates over flattened array. Alternatively operates along axis specified
 as dimension_label.</p>
 </dd>
 </dl>
@@ -635,34 +765,50 @@ if the expected input DataContainer is 3D and the Processor expects 2D.</p>
 </div>
 
 
-           </div>
-          </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="developer_guide.html" class="btn btn-neutral float-left" title="Developer’s guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="utilities.html" class="btn btn-neutral float-right" title="Utilities" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-    </div>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>&#169; Copyright 2017-2021 UKRI-STFC, University of Manchester.</p>
-  </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
-
-</footer>
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="developer_guide.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Developer’s guide</p>
         </div>
-      </div>
-    </section>
-  </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
+    </a>
+    <a class='right-next' id="next-link" href="utilities.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Utilities</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+              
+          </main>
+          
 
-</body>
+      </div>
+    </div>
+  
+  <script src="_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2017-2021 UKRI-STFC, University of Manchester.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
 </html>

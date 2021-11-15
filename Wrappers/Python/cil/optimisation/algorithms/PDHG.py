@@ -15,7 +15,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from cil.framework.framework import DataContainer
+from cil.framework import DataContainer, BlockDataContainer
 from cil.optimisation.algorithms import Algorithm
 import warnings
 import numpy as np
@@ -127,7 +127,7 @@ class PDHG(Algorithm):
     
             \tau \sigma \|K\|^2 < 1
 
-        - By default, the step sizes :math:`\sigma` and :math:`\tau` are:
+        - By default, the step sizes :math:`\sigma` and :math:`\tau` are positive scalars and defined as below:
 
         * If ``sigma`` is ``None`` and ``tau`` is ``None``:
 
@@ -145,8 +145,8 @@ class PDHG(Algorithm):
 
         .. math:: 
     
-            \sigma = \frac{1}{\tau\|K\|^{2}}                
-
+            \sigma = \frac{1}{\tau\|K\|^{2}}        
+                 
 
         - PDHG algorithm can be accelerated if the functions :math:`f^{*}` and/or :math:`g` are strongly convex. A function :math:`f` is strongly convex with constant :math:`\gamma>0` if
 
@@ -250,12 +250,6 @@ class PDHG(Algorithm):
 
         # relaxation parameter, default value is 1.0
         self.theta = kwargs.get('theta',1.0)
-
-        # Primal Acceleration: Function g is strongly convex 
-        # self.gamma_g = kwargs.get('gamma_g', None)
-
-        # Dual Acceleration : Convex conjugate of f is strongly convex
-        # self.gamma_fconj = kwargs.get('gamma_fconj', None) 
           
         if self.gamma_g is not None:            
             warnings.warn("Primal Acceleration of PDHG: The function g is assumed to be strongly convex with positive parameter `gamma_g`. You need to be sure that gamma_g = {} is the correct strongly convex constant for g. ".format(self.gamma_g))
@@ -341,15 +335,11 @@ class PDHG(Algorithm):
         # Compute operator norm
         self.norm_op = self.operator.norm()
 
-        # check if tau/sigma are numbers positive
-        # check if the inequality is satisfied, raise a Warning if not
-        # check if there are array with the correct shape.   
-
         if isinstance(tau, Number) and tau<=0:
             raise ValueError("The step-sizes of PDHG are positive, {} is passed".format(tau))  
 
         if isinstance(sigma, Number) and sigma<=0:
-            raise ValueError("The step-sizes of PDHG are positive, {} is passed".format(sigma))         
+            raise ValueError("The step-sizes of PDHG are positive, {} is passed".format(sigma)) 
 
         if tau is None and sigma is None:            
             self._sigma = 1.0/self.norm_op

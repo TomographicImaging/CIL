@@ -472,7 +472,7 @@ class TestAlgorithms(unittest.TestCase):
             pdhg = PDHG(f=f, g=g, operator=operator, max_iteration=10, 
                         gamma_g = 0.5, gamma_fconj=0.5)
             pdhg.run(verbose=0)
-        except NotImplementedError as err:
+        except ValueError as err:
             print(err)
  
 

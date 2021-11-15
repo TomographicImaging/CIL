@@ -51,6 +51,9 @@ if has_ipp:
                                     ctypes.c_long] #pix_x
 
 class GenericFilteredBackProjection(Reconstructor):
+    """
+    Abstract Base Class GenericFilteredBackProjection holding common and virtual methods for FBP and FDK
+    """
 
     @property
     def filter(self):
@@ -66,9 +69,7 @@ class GenericFilteredBackProjection(Reconstructor):
 
     
     def __init__ (self, input, image_geometry=None, filter='ram-lak'):
-        """
-        The initialiser for Abstract Base Class GenericFilteredBackProjection
-        """
+
 
         #call parent initialiser
         super(GenericFilteredBackProjection, self).__init__(input, image_geometry)
@@ -369,7 +370,7 @@ class FDK(GenericFilteredBackProjection):
 class FBP(GenericFilteredBackProjection):
 
     """
-     Creates an FBP reconstructor based on your parallel-beam acquisition data.
+    Creates an FBP reconstructor based on your parallel-beam acquisition data.
 
     Parameters
     ----------

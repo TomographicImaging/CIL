@@ -292,7 +292,7 @@ class PDHG(Algorithm):
 
         self.g.proximal(self.x_tmp, self.tau, out=self.x)
 
-        # update_previous_solution() #called after update by base class
+        # update_previous_solution() called after update by base class
         #i.e current solution is now in x_old, previous solution is now in x        
 
         # update the step sizes for special cases

@@ -932,13 +932,8 @@ class TestTotalVariation(unittest.TestCase):
         self.tv_scaled = self.alpha * TotalVariation()
         self.tv_iso = TotalVariation()
         self.tv_aniso = TotalVariation(isotropic=False)
-<<<<<<< HEAD
         self.ig_real = ImageGeometry(3,4)   
         self.grad = GradientOperator(self.ig_real)  
-=======
-        self.ig_real = ImageGeometry(3,4)
-        self.ig_complex = ImageGeometry(3,4, dtype=np.complex64)        
->>>>>>> 0a798366288bba5975762a43bb88f4319b336241
         
     def test_regularisation_parameter(self):
         np.testing.assert_almost_equal(self.tv.regularisation_parameter, 1.)
@@ -962,37 +957,6 @@ class TestTotalVariation(unittest.TestCase):
             assert False
         except TypeError as te:
             assert True
-<<<<<<< HEAD
-=======
-
-    def test_call_real(self):
-
-        x_real = self.ig_real.allocate('random')  
-        grad = GradientOperator(self.ig_real)
-
-        res1 = self.tv_iso(x_real)
-        res2 = grad.direct(x_real).pnorm(2).sum()
-        np.testing.assert_equal(res1, res2)  
-
-        res1 = self.tv_aniso(x_real)
-        res2 = grad.direct(x_real).pnorm(1).sum()
-        np.testing.assert_equal(res1, res2)                
-
-
-    def test_call_complex(self):
-
-        x_complex = self.ig_complex.allocate('random')  
-        grad = GradientOperator(self.ig_complex)
-
-        res1 = self.tv_iso(x_complex)
-        res2 = grad.direct(x_complex).pnorm(2).sum()
-        np.testing.assert_equal(res1, res2)  
-
-        res1 = self.tv_aniso(x_complex)
-        res2 = grad.direct(x_complex).pnorm(1).sum()
-        np.testing.assert_equal(res1, res2)   
-        
->>>>>>> 0a798366288bba5975762a43bb88f4319b336241
 
     def test_call_real_isotropic(self):
 

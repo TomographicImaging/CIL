@@ -141,11 +141,7 @@ class TotalVariation(Function):
         if self.isotropic:
             return self.regularisation_parameter * self.gradient.direct(x).pnorm(2).sum()
         else:
-<<<<<<< HEAD
-            return self.regularisation_parameter * self.gradient.direct(x).pnorm(1).sum()  
-=======
             return self.regularisation_parameter * self.gradient.direct(x).pnorm(1).sum() 
->>>>>>> 0a798366288bba5975762a43bb88f4319b336241
     
     
     def projection_C(self, x, out=None):   

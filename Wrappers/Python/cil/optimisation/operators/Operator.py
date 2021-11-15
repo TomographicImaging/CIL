@@ -167,11 +167,7 @@ class LinearOperator(Operator):
         return s1
 
     @staticmethod
-<<<<<<< HEAD
     def dot_test(operator, domain_init=None, range_init=None, tolerance=1e-6, **kwargs):
-=======
-    def dot_test(operator, domain_init=None, range_init=None, verbose=False, tol=1e-6, **kwargs):
->>>>>>> 0a798366288bba5975762a43bb88f4319b336241
         r'''Does a dot linearity test on the operator
         
         Evaluates if the following equivalence holds
@@ -183,7 +179,6 @@ class LinearOperator(Operator):
         :param operator: operator to test the dot_test
         :param range_init: optional initialisation container in the operator range 
         :param domain_init: optional initialisation container in the operator domain 
-<<<<<<< HEAD
         :param seed: Seed random generator
         :type : int, default = 1
         :param tolerance: Check if the following expression is below the tolerance
@@ -220,38 +215,6 @@ class LinearOperator(Operator):
         else:
             print ('Left hand side  {}, \nRight hand side {}'.format(a, b))
             return False    
-=======
-        :returns: boolean, True if the test is passed.
-        :param decimal: desired precision
-        :type decimal: int, optional, default 4        
-        '''
-
-        lst = [1,2,3]
-        for i in lst:
-        # seed = kwargs.get('seed',None)
-            if range_init is None:
-                y = operator.range_geometry().allocate('random', seed = i)
-            else:
-                y = range_init
-            if domain_init is None:
-                x = operator.domain_geometry().allocate('random',seed = i)
-            else:
-                x = domain_init
-            
-            fx = operator.direct(x)
-            by = operator.adjoint(y)
-            a = fx.dot(y)
-            b = by.dot(x).conjugate()
-
-            # similar to numpy all close, but normalised with respect to operator, x and y
-            error = numpy.abs( a - b )/ (operator.norm() * x.norm() * y.norm() + 1e-12)
-
-            if error < tol:
-                return True
-            else:
-                print ('Left hand side  {}, \nRight hand side {}'.format(a, b))
-                return False    
->>>>>>> 0a798366288bba5975762a43bb88f4319b336241
         
         
 class ScaledOperator(Operator):

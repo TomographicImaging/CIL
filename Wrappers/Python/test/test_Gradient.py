@@ -72,14 +72,9 @@ class TestGradientOperator(unittest.TestCase):
                                                     bnd_cond = bnd,
                                                     backend = backend, 
                                                     correlation = corr, method = method)
-<<<<<<< HEAD
                             try:  
                                 for sd in [5, 10, 15]:                                                  
                                     self.assertTrue(LinearOperator.dot_test(Grad, seed=sd))
-=======
-                            try:                                                    
-                                self.assertTrue(LinearOperator.dot_test(Grad))
->>>>>>> 0a798366288bba5975762a43bb88f4319b336241
                             except:    
                                 self.print_assertion_info(geom,bnd,backend,corr,method,None)
                                 raise

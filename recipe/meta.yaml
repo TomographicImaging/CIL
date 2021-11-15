@@ -73,6 +73,7 @@ requirements:
     - pywavelets
     - cil-data
     - ipp
+    - tqdm
   
 about:
   home: http://www.ccpi.ac.uk/cil

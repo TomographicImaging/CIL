@@ -18,6 +18,7 @@
 from cil.optimisation.algorithms import Algorithm
 import warnings
 import numpy as np
+from numpy.core.numeric import identity
 
 
 class PDHG(Algorithm):
@@ -179,16 +180,17 @@ class PDHG(Algorithm):
         self._use_axpby = use_axpby
         self._tau = None
         self._sigma = None
+        # Default values for the pdhg stepsizes    
 
         if f is not None and operator is not None and g is not None:
             self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, initial=initial, **kwargs)
 
     @property
     def tau(self):
-        return self._tau
+        return self._tau   
     @property
     def sigma(self):
-        return self._sigma            
+        return self._sigma                  
 
     def set_up(self, f, g, operator, tau=None, sigma=None, initial=None, **kwargs):
         """Initialisation of the algorithm
@@ -200,9 +202,9 @@ class PDHG(Algorithm):
         self.g = g
         self.operator = operator
 
-        # Default values for the pdhg stepsizes
-        self.set_step_sizes(sigma, tau)
-        
+        #Default step sizes
+        self.set_step_sizes(sigma=sigma, tau=tau) 
+
         if initial is None:
             self.x_old = self.operator.domain_geometry().allocate(0)
         else:
@@ -313,13 +315,13 @@ class PDHG(Algorithm):
             self._sigma = 1./self.norm_op
             self._tau = 1./self.norm_op
         elif tau is None:
-            self._tau = 1./(sigma*self.norm_op**2)
+            self._tau = 1./(self.sigma*self.norm_op**2)
         elif sigma is None:
-            self._sigma = 1./(tau*self.norm_op**2)
+            self._sigma = 1./(self.tau*self.norm_op**2)
         else:
-            pass
+            self._sigma = sigma
+            self._tau = tau
       
-
     def update_step_sizes(self):
 
         r"""
@@ -339,19 +341,18 @@ class PDHG(Algorithm):
                  
         """
 
-    
         # Update sigma and tau based on the strong convexity of G
         if self.gamma_g is not None:
             self.theta = 1.0/ np.sqrt(1 + 2 * self.gamma_g * self.tau)
-            self.tau *= self.theta
-            self.sigma /= self.theta 
+            self._tau *= self.theta
+            self._sigma /= self.theta 
 
         # Update sigma and tau based on the strong convexity of F
         # Following operations are reversed due to symmetry, sigma --> tau, tau -->sigma
         if self.gamma_fconj is not None:            
             self.theta = 1.0 / np.sqrt(1 + 2 * self.gamma_fconj * self.sigma)
-            self.sigma *= self.theta
-            self.tau /= self.theta    
+            self._sigma *= self.theta
+            self._tau /= self.theta    
 
         if self.gamma_g is not None and self.gamma_fconj is not None:
             raise NotImplementedError("This case is not implemented")
@@ -425,3 +426,80 @@ class PDHG(Algorithm):
         return [x[2] for x in self.loss]
 
 
+     
+
+
+if __name__ == "__main__":
+
+    from cil.optimisation.functions import L2NormSquared, MixedL21Norm, L1Norm, KullbackLeibler
+    from cil.optimisation.operators import IdentityOperator
+    from cil.framework import ImageGeometry
+    from cil.utilities import dataexample
+    from cil.utilities import noise as applynoise
+    from cil.optimisation.operators import GradientOperator
+
+    data = dataexample.PEPPERS.get(size=(256,256))
+    ig = data.geometry
+    ag = ig
+
+    which_noise = 0
+    # Create noisy data. 
+    noises = ['gaussian', 'poisson', 's&p']
+    dnoise = noises[which_noise]
+    
+    def setup(data, dnoise):
+        if dnoise == 's&p':
+            n1 = applynoise.saltnpepper(data, salt_vs_pepper = 0.9, amount=0.2, seed=10)
+        elif dnoise == 'poisson':
+            scale = 5
+            n1 = applynoise.poisson( data.as_array()/scale, seed = 10)*scale
+        elif dnoise == 'gaussian':
+            n1 = applynoise.gaussian(data.as_array(), seed = 10)
+        else:
+            raise ValueError('Unsupported Noise ', noise)
+        noisy_data = ig.allocate()
+        noisy_data.fill(n1)
+    
+        # Regularisation Parameter depending on the noise distribution
+        if dnoise == 's&p':
+            alpha = 0.8
+        elif dnoise == 'poisson':
+            alpha = 1
+        elif dnoise == 'gaussian':
+            alpha = .3
+            # fidelity
+        if dnoise == 's&p':
+            g = L1Norm(b=noisy_data)
+        elif dnoise == 'poisson':
+            g = KullbackLeibler(b=noisy_data)
+        elif dnoise == 'gaussian':
+            g = 0.5 * L2NormSquared(b=noisy_data)
+        return noisy_data, alpha, g
+
+    noisy_data, alpha, g = setup(data, dnoise)
+    operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE)
+
+    f1 =  alpha * MixedL21Norm()
+
+    
+                
+    # Compute operator Norm
+    normK = operator.norm()
+
+    # Primal & dual stepsizes
+    sigma = 1.
+    tau = 1/(sigma*normK**2)
+
+    # Setup and run the PDHG algorithm
+    pdhg1 = PDHG(f=f1,g=g,operator=operator, sigma=sigma, tau=tau)
+    pdhg1.max_iteration = 2000
+    pdhg1.update_objective_interval = 200
+    pdhg1.run(1000, verbose=0)
+    print(pdhg1.sigma)
+    print(pdhg1.tau)
+
+    rmse = (pdhg1.get_output() - data).norm() / data.as_array().size
+    print(rmse)
+    # if debug_print:
+        # print ("RMSE", rmse)
+    # self.assertLess(rmse, 2e-4)

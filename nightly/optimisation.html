@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Optimisation framework &#8212; CIL v21.2.0-36-g31fed9b2 documentation</title>
+    <title>Optimisation framework &#8212; CIL v21.2.0-37-gc7f177c5 documentation</title>
     
   <link href="_static/css/theme.css" rel="stylesheet">
   <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -34,7 +34,7 @@
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Developer’s guide" href="developer_guide.html" />
+    <link rel="next" title="Processors" href="processors.html" />
     <link rel="prev" title="Read/ write AcquisitionData and ImageData" href="io.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en">
@@ -89,20 +89,26 @@
 </li>
 
 <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="developer_guide.html">
-  Developer’s guide
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="processors.html">
   Processors
  </a>
 </li>
 
 <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="recon.html">
+  Recon
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="utilities.html">
   Utilities
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="developer_guide.html">
+  Developer’s guide
  </a>
 </li>
 
@@ -138,8 +144,26 @@
 <li class="toctree-l1"><a class="reference internal" href="io.html">Read/ write AcquisitionData and ImageData</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Optimisation framework</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#algorithm">Algorithm</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#operator">Operator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#function">Function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#operator">Operator</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#operator-base-classes">Operator base classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#trivial-operators">Trivial operators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#gradientoperator">GradientOperator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#function">Function</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#base-classes">Base classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#simple-functions">Simple functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#composition-of-operator-and-a-function">Composition of operator and a function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#indicator-box">Indicator box</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#kullbackleibler">KullbackLeibler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#l1-norm">L1 Norm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#squared-l2-norm-squared">Squared L2 norm squared</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#least-squares">Least Squares</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mixed-l21-norm">Mixed L21 norm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#smooth-mixed-l21-norm">Smooth Mixed L21 norm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#total-variation">Total variation</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="#block-framework">Block Framework</a><ul>
@@ -148,9 +172,10 @@
 <li class="toctree-l2"><a class="reference internal" href="#block-operator">Block Operator</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer’s guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="processors.html">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="recon.html">Recon</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utilities.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer’s guide</a></li>
 </ul>
 
   <div role="note" aria-label="source link">
@@ -3601,10 +3626,10 @@ AcquisitionModel’s we use PowerMethod if applicable, otherwise we raise an Err
             <p class="prev-next-title">Read/ write AcquisitionData and ImageData</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="developer_guide.html" title="next page">
+    <a class='right-next' id="next-link" href="processors.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Developer’s guide</p>
+        <p class="prev-next-title">Processors</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

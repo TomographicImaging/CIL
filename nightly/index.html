@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Welcome to CIL’s documentation! &#8212; CIL v21.2.0-36-g31fed9b2 documentation</title>
+    <title>Welcome to CIL’s documentation! &#8212; CIL v21.2.0-37-gc7f177c5 documentation</title>
     
   <link href="_static/css/theme.css" rel="stylesheet">
   <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -88,20 +88,26 @@
 </li>
 
 <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="developer_guide.html">
-  Developer’s guide
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="processors.html">
   Processors
  </a>
 </li>
 
 <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="recon.html">
+  Recon
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="utilities.html">
   Utilities
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="developer_guide.html">
+  Developer’s guide
  </a>
 </li>
 
@@ -137,9 +143,10 @@
 <li class="toctree-l1"><a class="reference internal" href="io.html">Read/ write AcquisitionData and ImageData</a></li>
 <li class="toctree-l1"><a class="reference internal" href="optimisation.html">Optimisation framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="optimisation.html#block-framework">Block Framework</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer’s guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="processors.html">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="recon.html">Recon</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utilities.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer’s guide</a></li>
 </ul>
 
   <div role="note" aria-label="source link">
@@ -225,12 +232,27 @@ constructed from operator and function objects.</p>
 <p class="caption"><span class="caption-text">Contents:</span><a class="headerlink" href="#mastertoc" title="Permalink to this toctree">¶</a></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="framework.html">Framework</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="framework.html#ct-geometry">CT Geometry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#ct-geometry">CT Geometry</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="framework.html#parallel-geometry">Parallel geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="framework.html#fan-beam-geometry">Fan-beam geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="framework.html#cone-beam-geometry">Cone-beam geometry</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="framework.html#acquisitongeometry-and-acquisitiondata">AcquisitonGeometry and AcquisitionData</a></li>
-<li class="toctree-l2"><a class="reference internal" href="framework.html#imagegeometry-and-imagedata">ImageGeometry and ImageData</a></li>
-<li class="toctree-l2"><a class="reference internal" href="framework.html#datacontainer-and-subclasses">DataContainer and subclasses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#imagegeometry-and-imagedata">ImageGeometry and ImageData</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="framework.html#d-parallel-geometry">3D parallel geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="framework.html#id1">Fan-beam geometry</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#datacontainer-and-subclasses">DataContainer and subclasses</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="framework.html#multi-channel-data">Multi channel data</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="framework.html#block-framework">Block Framework</a></li>
-<li class="toctree-l2"><a class="reference internal" href="framework.html#dataprocessor">DataProcessor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html#dataprocessor">DataProcessor</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="framework.html#calculation-of-center-of-rotation">Calculation of Center of Rotation</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="io.html">Read/ write AcquisitionData and ImageData</a><ul>
@@ -242,8 +264,26 @@ constructed from operator and function objects.</p>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="optimisation.html">Optimisation framework</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="optimisation.html#algorithm">Algorithm</a></li>
-<li class="toctree-l2"><a class="reference internal" href="optimisation.html#operator">Operator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="optimisation.html#function">Function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimisation.html#operator">Operator</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#operator-base-classes">Operator base classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#trivial-operators">Trivial operators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#gradientoperator">GradientOperator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimisation.html#function">Function</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#base-classes">Base classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#simple-functions">Simple functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#composition-of-operator-and-a-function">Composition of operator and a function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#indicator-box">Indicator box</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#kullbackleibler">KullbackLeibler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#l1-norm">L1 Norm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#squared-l2-norm-squared">Squared L2 norm squared</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#least-squares">Least Squares</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#mixed-l21-norm">Mixed L21 norm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#smooth-mixed-l21-norm">Smooth Mixed L21 norm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimisation.html#total-variation">Total variation</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="optimisation.html#block-framework">Block Framework</a><ul>
@@ -252,9 +292,17 @@ constructed from operator and function objects.</p>
 <li class="toctree-l2"><a class="reference internal" href="optimisation.html#block-operator">Block Operator</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer’s guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="processors.html">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="recon.html">Recon</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="recon.html#analytical-reconstruction">Analytical Reconstruction</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="recon.html#fbp-reconstructor-for-parallel-beam-geometry">FBP - Reconstructor for parallel-beam geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="recon.html#fdk-reconstructor-for-cone-beam-geometry">FDK - Reconstructor for cone-beam geometry</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="utilities.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer’s guide</a></li>
 </ul>
 </div>
 </div>

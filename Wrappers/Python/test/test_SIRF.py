@@ -71,6 +71,7 @@ class GradientSIRF(object):
 
         # test dot_test
         for sd in [5,10]:
+            
             self.assertTrue(LinearOperator.dot_test(Grad_numpy, seed=sd))
 
         # test shape of output of direct

@@ -197,4 +197,3 @@ bibtex_bibfiles = ['refs.bib']
 bibtex_encoding = 'latin'
 bibtex_reference_style = 'label'
 bibtex_default_style = 'plain'
-

@@ -1,12 +1,15 @@
-* 21.2.1
+* 21.3.0
+  - Simulated datasets and volume added to DataExamples
+  - TIGRE wrappers for parallel-beam geometry added
+  - NEXUSWriter and NEXUSReader offer (8bit and 16bit) compression of data
+  - show2D show_geom now return an object that can be saved with a `save` method
   - GradientOperator can be now used with SIRF DataContainers, both PET and MR
   - Add anisotropy in TotalVariation function
   - CCPi Regularisation plugin is refactored, only FGP_TV, FGP_dTV, TGV and TNV are exposed. Docstrings and functionality unit tests are added. Tests of the functions are meant to be in the CCPi-Regularisation toolkit itself.
   - Add dtype for ImageGeometry, AcquisitionGeometry, VectorGeometry, BlockGeometry
   - Fix GradientOperator to handle pseudo 2D CIL geometries
-  - Created Reconstructor base class for simpler use of CIL methods
+  - Created FBP Reconstructor class using fast filtering library and TIGRE backprojectors
   - Added Intel IPP based library for filtering step of FBP
-  - Created FBP Reconstructor class using IPP
   - PDHG memory optimisation
   - ScaledFunction memory Optimisation
 

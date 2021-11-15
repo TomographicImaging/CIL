@@ -25,7 +25,7 @@ constructed from operator and function objects.
 A number of demos can be found on the `CIL-Demos`_ repository.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Contents:
    :name: mastertoc
 

@@ -5,11 +5,11 @@ This module allows the user to run pre-configured reconstruction algorithms on t
 
 
 Analytical Reconstruction
-*************************
+=========================
 
 
 FBP - Reconstructor for parallel-beam geometry
-==============================================
+----------------------------------------------
 
 
 .. autoclass:: cil.recon.FBP
@@ -18,7 +18,7 @@ FBP - Reconstructor for parallel-beam geometry
 
 
 FDK - Reconstructor for cone-beam geometry
-==========================================
+------------------------------------------
 
 
 .. autoclass:: cil.recon.FDK

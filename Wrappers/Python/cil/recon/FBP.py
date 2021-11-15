@@ -166,9 +166,10 @@ class GenericFilteredBackProjection(Reconstructor):
         If passed a numpy array the filter must have length N = 2^self.fft_order
 
         The indices of the array are interpreted as:
-        0 The DC frequency component
-        1:N/2 positive frequencies
-        N/2:N-1 negative frequencies
+
+        - [0] The DC frequency component
+        - [1:N/2] positive frequencies
+        - [N/2:N-1] negative frequencies
         """
 
         if type(filter)==str and filter in ['ram-lak']:
@@ -204,9 +205,10 @@ class GenericFilteredBackProjection(Reconstructor):
         The filter length N is 2^self.fft_order.
 
         The indices of the array are interpreted as:
-        0 The DC frequency component
-        1:N/2 positive frequencies
-        N/2:N-1 negative frequencies
+        
+        - [0] The DC frequency component
+        - [1:N/2] positive frequencies
+        - [N/2:N-1] negative frequencies
 
         The array can be modified and passed back using set_filter()
         """

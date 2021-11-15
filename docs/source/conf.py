@@ -192,10 +192,8 @@ epub_exclude_files = ['search.html']
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
 
-
+# Add bibtex files and style
 bibtex_bibfiles = ['refs.bib']
 bibtex_encoding = 'latin'
 bibtex_reference_style = 'label'
 bibtex_default_style = 'plain'
-
-

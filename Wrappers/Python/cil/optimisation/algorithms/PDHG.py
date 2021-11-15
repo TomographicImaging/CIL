@@ -232,6 +232,12 @@ class PDHG(Algorithm):
         self.configured = True
         print("{} configured".format(self.__class__.__name__, ))
 
+    def update_previous_solution(self):
+        # swap the pointers to current and previous solution
+        tmp = self.x_old
+        self.x_old = self.x
+        self.x = tmp              
+
     def get_output(self):
         # returns the current solution
         return self.x_old
@@ -287,7 +293,7 @@ class PDHG(Algorithm):
 
         self.g.proximal(self.x_tmp, self.tau, out=self.x)
 
-        #update_previous_solution() called after update by base class
+        # update_previous_solution() #called after update by base class
         #i.e current solution is now in x_old, previous solution is now in x        
 
         # update the step sizes for special cases
@@ -334,15 +340,15 @@ class PDHG(Algorithm):
         # Update sigma and tau based on the strong convexity of G
         if self.gamma_g is not None:
             self.theta = 1.0/ np.sqrt(1 + 2 * self.gamma_g * self.tau)
-            self.tau *= self.theta
-            self.sigma /= self.theta 
+            self._tau *= self.theta
+            self._sigma /= self.theta 
 
         # Update sigma and tau based on the strong convexity of F
         # Following operations are reversed due to symmetry, sigma --> tau, tau -->sigma
         if self.gamma_fconj is not None:            
             self.theta = 1.0 / np.sqrt(1 + 2 * self.gamma_fconj * self.sigma)
-            self.sigma *= self.theta
-            self.tau /= self.theta    
+            self._sigma *= self.theta
+            self._tau /= self.theta    
 
         if self.gamma_g is not None and self.gamma_fconj is not None:
             raise NotImplementedError("This case is not implemented")
@@ -485,8 +491,6 @@ if __name__ == "__main__":
     pdhg1.max_iteration = 2000
     pdhg1.update_objective_interval = 200
     pdhg1.run(1000, verbose=0)
-    print(pdhg1.sigma)
-    print(pdhg1.tau)
 
     rmse = (pdhg1.get_output() - data).norm() / data.as_array().size
     print(rmse)

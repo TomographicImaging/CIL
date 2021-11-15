@@ -72,7 +72,7 @@ class GenericFilteredBackProjection(Reconstructor):
 
 
         #call parent initialiser
-        super(GenericFilteredBackProjection, self).__init__(input, image_geometry)
+        super().__init__(input, image_geometry)
                 
         if has_ipp == False:
             raise ImportError("IPP libraries not found. Cannot use CIL FBP")
@@ -300,9 +300,9 @@ class FDK(GenericFilteredBackProjection):
     The reconstructor can be futher customised using additional 'set' methods provided.
     """
     
-    def __init__ (self, input, image_geometry=None):
+    def __init__ (self, input, image_geometry=None, filter='ram-lak'):
         #call parent initialiser
-        super(FDK, self).__init__(input, image_geometry)
+        super().__init__(input, image_geometry, filter)
 
         if  input.geometry.geom_type != AcquisitionGeometry.CONE:
             raise TypeError("This reconstructor is for cone-beam data only.")
@@ -398,9 +398,9 @@ class FBP(GenericFilteredBackProjection):
         return self._slices_per_chunk
 
 
-    def __init__ (self, input, image_geometry=None):
+    def __init__ (self, input, image_geometry=None, filter='ram-lak'):
       
-        super(FBP, self).__init__(input, image_geometry)
+        super().__init__(input, image_geometry, filter)
         self.set_split_processing(False)
 
         if  input.geometry.geom_type != AcquisitionGeometry.PARALLEL:

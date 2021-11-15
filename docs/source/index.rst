@@ -33,11 +33,11 @@ A number of demos can be found on the `CIL-Demos`_ repository.
    framework
    io
    optimisation
-   developer_guide
    processors
    recon
    utilities
-
+   developer_guide
+   
 
 .. Indices and tables
 .. ==================

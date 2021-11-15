@@ -235,7 +235,7 @@ class PDHG(Algorithm):
         # swap the pointers to current and previous solution
         tmp = self.x_old
         self.x_old = self.x
-        self.x = tmp              
+        self.x = tmp
 
     def get_output(self):
         # returns the current solution

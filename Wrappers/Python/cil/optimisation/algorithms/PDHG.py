@@ -179,8 +179,7 @@ class PDHG(Algorithm):
                     .format(self.__class__.__name__))
         self._use_axpby = use_axpby
         self._tau = None
-        self._sigma = None
-        # Default values for the pdhg stepsizes    
+        self._sigma = None 
 
         if f is not None and operator is not None and g is not None:
             self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, initial=initial, **kwargs)
@@ -223,17 +222,7 @@ class PDHG(Algorithm):
 
         # Dual Acceleration : Convex conjugate of f is strongly convex
         self.gamma_fconj = kwargs.get('gamma_fconj', None) 
-        
-        try:
-            self.gamma_g = self.g.gamma
-        except AttributeError:
-            pass
-
-        try:
-            self.gamma_fconj = self.f.conjugate.gamma
-        except AttributeError:
-            pass        
-
+          
         if self.gamma_g is not None:            
             warnings.warn("Primal Acceleration of PDHG: The function g is assumed to be strongly convex with positive parameter `gamma_g`. Need to be sure that gamma_g = {} is the correct strongly convex constant for g. ".format(self.gamma_g))
         
@@ -304,6 +293,7 @@ class PDHG(Algorithm):
         # update the step sizes for special cases
         self.update_step_sizes()
 
+
     def set_step_sizes(self, sigma=None, tau=None):
 
         """Default step sizes for the PDHG algorithm"""
@@ -344,15 +334,15 @@ class PDHG(Algorithm):
         # Update sigma and tau based on the strong convexity of G
         if self.gamma_g is not None:
             self.theta = 1.0/ np.sqrt(1 + 2 * self.gamma_g * self.tau)
-            self._tau *= self.theta
-            self._sigma /= self.theta 
+            self.tau *= self.theta
+            self.sigma /= self.theta 
 
         # Update sigma and tau based on the strong convexity of F
         # Following operations are reversed due to symmetry, sigma --> tau, tau -->sigma
         if self.gamma_fconj is not None:            
             self.theta = 1.0 / np.sqrt(1 + 2 * self.gamma_fconj * self.sigma)
-            self._sigma *= self.theta
-            self._tau /= self.theta    
+            self.sigma *= self.theta
+            self.tau /= self.theta    
 
         if self.gamma_g is not None and self.gamma_fconj is not None:
             raise NotImplementedError("This case is not implemented")

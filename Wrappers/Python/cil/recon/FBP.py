@@ -297,13 +297,6 @@ class FDK(GenericFilteredBackProjection):
     Notes
     -----
     The reconstructor can be futher customised using additional 'set' methods provided.
-    self.set_input()
-    self.set_image_geometry()
-    self.set_backend()
-    self.set_filter()
-    self.get_filter_array()
-    self.set_fft_order()
-    self.set_filter_inplace()
     """
     
     def __init__ (self, input, image_geometry=None):
@@ -397,14 +390,6 @@ class FBP(GenericFilteredBackProjection):
     Notes
     -----
     The reconstructor can be futher customised using additional 'set' methods provided.
-    self.set_input()
-    self.set_image_geometry()
-    self.set_backend()
-    self.set_filter()
-    self.get_filter_array()
-    self.set_fft_order()
-    self.set_filter_inplace()
-    self.set_split_processing()
     """
 
     @property

@@ -7,8 +7,10 @@ Analytical Reconstuction
 ========================
 .. autoclass:: cil.recon.FBP
    :members:
+   :inherited-members:
+
 .. autoclass:: cil.recon.FDK
    :members:
-
+   :inherited-members:
 
 :ref:`Return Home <mastertoc>`

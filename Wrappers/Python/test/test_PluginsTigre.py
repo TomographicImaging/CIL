@@ -315,7 +315,7 @@ class TestCommon(object):
         fp2 = fp.copy()
         fp2.fill(0)
         Op.direct(self.img_data,out=fp2)
-        np.testing.assert_array_equal(fp.as_array(), fp2.as_array())    
+        np.testing.assert_allclose(fp.as_array(), fp2.as_array(),1e-8)    
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_backward(self):
@@ -327,7 +327,7 @@ class TestCommon(object):
         bp2 = bp.copy()
         bp2.fill(0)
         Op.adjoint(self.acq_data,out=bp2)
-        np.testing.assert_array_equal(bp.as_array(), bp2.as_array())    
+        np.testing.assert_allclose(bp.as_array(), bp2.as_array(), 1e-8)    
 
 
     def compare_backward_FDK_matched(self):
@@ -389,7 +389,7 @@ class TestCommon(object):
         reco2 = reco.copy()
         reco2.fill(0)
         fbp(self.acq_data,out=reco2)
-        np.testing.assert_array_equal(reco.as_array(), reco2.as_array())   
+        np.testing.assert_allclose(reco.as_array(), reco2.as_array(),atol=1e-8)   
 
     def compare_norm(self,direct_method,norm):
 

@@ -22,6 +22,7 @@ import numpy as np
 from numbers import Number
 
 
+
 class PDHG(Algorithm):
 
     r"""Primal Dual Hybrid Gradient (PDHG) algorithm, see :cite:`CP2011`, :cite:`EZXC2010`.
@@ -34,9 +35,9 @@ class PDHG(Algorithm):
         A convex function with a "simple" proximal.
     operator : LinearOperator    
         A Linear Operator.
-    sigma : positive :obj:`float`, optional, default=None
+    sigma : positive :obj:`float`, `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default=None
         Step size for the dual problem.
-    tau : positive :obj:`float`, optional, default=None
+    tau : positive :obj:`float`, `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default=None
         Step size for the primal problem.
     initial : DataContainer, optional, default=None
         Initial point for the PDHG algorithm.
@@ -213,7 +214,6 @@ class PDHG(Algorithm):
       .. math::
          :nowrap:
 
-
             \begin{aligned}
 
                 \theta_{n} & = \frac{1}{\sqrt{1 + 2\gamma\tau_{n}}}\\
@@ -267,8 +267,7 @@ class PDHG(Algorithm):
         if self.gamma_g is not None and self.gamma_fconj is not None:
             raise ValueError("The adaptive update of the PDHG stepsizes in the case where both functions are strongly convex is not implemented at the moment.")                           
 
-        if f is not None and operator is not None and g is not None:
-            self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, initial=initial, **kwargs)
+        self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, initial=initial, **kwargs)
 
     @property
     def tau(self):
@@ -291,6 +290,9 @@ class PDHG(Algorithm):
         if isinstance (value, Number): 
            if value <= 0:                      
                 raise ValueError("Strongly convex constant is a positive number, {} is passed for the strongly convex function g.".format(value))                   
+        else:
+            if value is not None:
+                raise ValueError("Positive float is expected for the strongly convex constant of function g, {} is passed".format(value))        
         self._gamma_g = value
         
     def set_gamma_fconj(self, value):
@@ -298,6 +300,9 @@ class PDHG(Algorithm):
         if isinstance (value, Number): 
             if value <= 0:                     
                     raise ValueError("Strongly convex constant is positive, {} is passed for the strongly convex conjugate function of f.".format(value))   
+        else:
+            if value is not None:
+                raise ValueError("Positive float is expected for the strongly convex constant of the convex conjugate of function f, {} is passed".format(value))                       
         self._gamma_fconj = value
                   
     def set_up(self, f, g, operator, tau=None, sigma=None, initial=None, **kwargs):
@@ -389,28 +394,48 @@ class PDHG(Algorithm):
 
     def set_step_sizes(self, sigma=None, tau=None):
 
-        """Default step sizes for the PDHG algorithm
+        """Default scalar step sizes for the PDHG algorithm
         """
         
         # Compute operator norm
         self.norm_op = self.operator.norm()
 
-        if isinstance(tau, Number) and tau<=0:
-            raise ValueError("The step-sizes of PDHG are positive, {} is passed".format(tau))  
-
-        if isinstance(sigma, Number) and sigma<=0:
-            raise ValueError("The step-sizes of PDHG are positive, {} is passed".format(sigma)) 
-
+        if isinstance(tau, Number):
+            if tau<=0:
+                raise ValueError("The step-sizes of PDHG are positive, {} is passed".format(tau))  
+        elif isinstance(tau, (DataContainer, np.ndarray, BlockDataContainer)):
+            if tau.shape!= self.operator.domain_geometry().shape:
+                raise ValueError(" The shape of tau = {} is not the same as the shape of the domain_geometry = {}".format(tau.shape, self.operator.domain_geometry().shape))
+        else:
+            raise ValueError( "Only scalar values and array-type objects are supported for the step-size tau , {} is passed".format(tau))        
+        
+        if isinstance(sigma, Number):
+            if sigma<=0:
+                raise ValueError("The step-sizes of PDHG are positive, {} is passed".format(sigma))  
+        elif isinstance(sigma, (DataContainer, np.ndarray, BlockDataContainer)):
+            if sigma.shape!= self.operator.range_geometry().shape:
+                raise ValueError(" The shape of sigma = {} is not the same as the shape of the range_geometry = {}".format(sigma.shape, self.operator.range_geometry().shape))
+        else:
+            raise ValueError( "Only scalar values and array-type objects are supported for the step-size sigma , {} is passed".format(tau))        
+        
         if tau is None and sigma is None:            
             self._sigma = 1.0/self.norm_op
             self._tau = 1.0/self.norm_op            
-        elif tau is None and sigma>0:            
+        elif tau is None:            
             self._tau = 1./(sigma*self.norm_op**2)
-        elif sigma is None and tau>0:
+        elif sigma is None:
             self._sigma = 1./(tau*self.norm_op**2)
         else:
             self._sigma = sigma
             self._tau = tau
+            try:
+                # convergence criterion for scalar step-sizes 
+                condition = sigma * tau * self.norm_op**2 <=1
+                if not condition:
+                    raise Warning("Convergence criterion of PDHG for scalar step-sizes is not satisfied.")                
+            except:
+                pass
+
 
         
     def update_step_sizes(self):
@@ -464,5 +489,91 @@ class PDHG(Algorithm):
     @property
     def primal_dual_gap(self):
         return [x[2] for x in self.loss]
+
+
+if __name__ == "__main__":
+
+    from cil.utilities import dataexample
+    from cil.utilities import noise as applynoise
+    from cil.framework import ImageGeometry
+    from cil.optimisation.operators import IdentityOperator, GradientOperator
+    from cil.optimisation.functions import L2NormSquared, MixedL21Norm    
+
+    data = dataexample.PEPPERS.get(size=(256,256))
+    ig = data.geometry
+    ag = ig
+
+    which_noise = 0
+    # Create noisy data. 
+    noises = ['gaussian', 'poisson', 's&p']
+    dnoise = noises[which_noise]
+    
+    def setup(data, dnoise):
+        if dnoise == 's&p':
+            n1 = applynoise.saltnpepper(data, salt_vs_pepper = 0.9, amount=0.2, seed=10)
+        elif dnoise == 'poisson':
+            scale = 5
+            n1 = applynoise.poisson( data.as_array()/scale, seed = 10)*scale
+        elif dnoise == 'gaussian':
+            n1 = applynoise.gaussian(data.as_array(), seed = 10)
+        else:
+            raise ValueError('Unsupported Noise ', noise)
+        noisy_data = ig.allocate()
+        noisy_data.fill(n1)
+    
+        # Regularisation Parameter depending on the noise distribution
+        if dnoise == 's&p':
+            alpha = 0.8
+        elif dnoise == 'poisson':
+            alpha = 1
+        elif dnoise == 'gaussian':
+            alpha = .3
+            # fidelity
+        if dnoise == 's&p':
+            g = L1Norm(b=noisy_data)
+        elif dnoise == 'poisson':
+            g = KullbackLeibler(b=noisy_data)
+        elif dnoise == 'gaussian':
+            g = 0.5 * L2NormSquared(b=noisy_data)
+        return noisy_data, alpha, g
+
+    noisy_data, alpha, g = setup(data, dnoise)
+    operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE)
+
+    f1 =  alpha * MixedL21Norm()
+                
+    # Compute operator Norm
+    normK = operator.norm()
+
+    # Primal & dual stepsizes
+    sigma = operator.range_geometry().allocate(3)
+    # print(sigma.dtype)
+    tau = operator.domain_geometry().allocate(3) #
+
+    # Setup and run the PDHG algorithm
+    pdhg1 = PDHG(f=f1,g=g,operator=operator, tau= tau , sigma=sigma, gamma_fconj = 1, use_axpby=False)
+    pdhg1.max_iteration = 2000
+    pdhg1.update_objective_interval = 200
+    pdhg1.run(1000, verbose=0)
+
+    rmse = (pdhg1.get_output() - data).norm() / data.as_array().size
+    # if debug_print:
+    print ("RMSE", rmse)
+    # self.assertLess(rmse, 2e-4)
+
+
+
+
+# from cil.framework import ImageGeometry
+# from cil.optimisation.operators import IdentityOperator, GradientOperator
+# from cil.optimisation.functions import L2NormSquared, MixedL21Norm
+# ig = ImageGeometry(3,3)
+# Id = IdentityOperator(ig)
+# b = ig.allocate('random')
+# G = GradientOperator(ig)
+# pdhg = PDHG(f=MixedL21Norm(b=b), g=L2NormSquared(), operator=G, max_iteration=10, 
+#             tau = ig.allocate(2), sigma = ig.allocate(4))
+# pdhg.run()
+# print(pdhg.tau)
 
 

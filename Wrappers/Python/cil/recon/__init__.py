@@ -17,3 +17,4 @@
 
 from .Reconstructor import Reconstructor
 from .FBP import FBP
+from .FBP import FDK

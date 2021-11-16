@@ -25,7 +25,7 @@ constructed from operator and function objects.
 A number of demos can be found on the `CIL-Demos`_ repository.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Contents:
    :name: mastertoc
 
@@ -33,9 +33,11 @@ A number of demos can be found on the `CIL-Demos`_ repository.
    framework
    io
    optimisation
-   developer_guide
    processors
+   recon
    utilities
+   developer_guide
+   
 
 .. Indices and tables
 .. ==================

@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>cil.optimisation.functions.Function &#8212; CIL v21.2.0-38-g29988d4e documentation</title>
+    <title>cil.optimisation.functions.Function &#8212; CIL v21.2.0-39-g1e345c83 documentation</title>
     
   <link href="../../../../_static/css/theme.css" rel="stylesheet">
   <link href="../../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -274,7 +274,10 @@
         <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">==</span> <span class="nb">id</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
             <span class="n">x</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">x</span><span class="p">)</span>
 
-        <span class="n">val</span><span class="o">.</span><span class="n">axpby</span><span class="p">(</span><span class="o">-</span><span class="n">tau</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">val</span><span class="p">)</span>
+        <span class="c1"># CIL issue #1078, cannot use axpby</span>
+        <span class="c1"># val.axpby(-tau, 1.0, x, out=val)</span>
+        <span class="n">val</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="o">-</span><span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">val</span><span class="p">)</span>
+        <span class="n">val</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">val</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">val</span></div>
@@ -511,7 +514,10 @@
         <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">==</span> <span class="nb">id</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
             <span class="n">x</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">x</span><span class="p">)</span>
 
-        <span class="n">val</span><span class="o">.</span><span class="n">axpby</span><span class="p">(</span><span class="o">-</span><span class="n">tau</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">val</span><span class="p">)</span>
+        <span class="c1"># CIL issue #1078, cannot use axpby</span>
+        <span class="c1">#val.axpby(-tau, 1.0, x, out=val)</span>
+        <span class="n">val</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="o">-</span><span class="n">tau</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">val</span><span class="p">)</span>
+        <span class="n">val</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">val</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">val</span></div></div>

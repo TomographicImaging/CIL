@@ -288,22 +288,26 @@ class PDHG(Algorithm):
     def set_gamma_g(self, value):
         
         if isinstance (value, Number): 
-           if value <= 0:                      
+            if value <= 0:                      
                 raise ValueError("Strongly convex constant is a positive number, {} is passed for the strongly convex function g.".format(value))                   
-        else:
-            if value is not None:
-                raise ValueError("Positive float is expected for the strongly convex constant of function g, {} is passed".format(value))        
-        self._gamma_g = value
+            self._gamma_g = value  
+        elif value is None:
+            pass             
+        else:            
+            raise ValueError("Positive float is expected for the strongly convex constant of function g, {} is passed".format(value))        
+        
         
     def set_gamma_fconj(self, value):
   
         if isinstance (value, Number): 
             if value <= 0:                     
-                    raise ValueError("Strongly convex constant is positive, {} is passed for the strongly convex conjugate function of f.".format(value))   
-        else:
-            if value is not None:
-                raise ValueError("Positive float is expected for the strongly convex constant of the convex conjugate of function f, {} is passed".format(value))                       
-        self._gamma_fconj = value
+                raise ValueError("Strongly convex constant is positive, {} is passed for the strongly convex conjugate function of f.".format(value))   
+            self._gamma_fconj = value    
+        elif value is None:
+            pass
+        else: 
+            raise ValueError("Positive float is expected for the strongly convex constant of the convex conjugate of function f, {} is passed".format(value))                       
+        
                   
     def set_up(self, f, g, operator, tau=None, sigma=None, initial=None, **kwargs):
         """Initialisation of the algorithm
@@ -400,35 +404,44 @@ class PDHG(Algorithm):
         # Compute operator norm
         self.norm_op = self.operator.norm()
 
-        if isinstance(tau, Number):
-            if tau<=0:
-                raise ValueError("The step-sizes of PDHG are positive, {} is passed".format(tau))  
-        elif isinstance(tau, (DataContainer, np.ndarray, BlockDataContainer)):
-            if tau.shape!= self.operator.domain_geometry().shape:
+        # Check acceptable type of the primal-dual step-sizes
+        if tau is not None:          
+            if isinstance(tau, Number):
+                if tau<=0:
+                    raise ValueError("The step-sizes of PDHG are positive, {} is passed".format(tau))                  
+            elif tau.shape!= self.operator.domain_geometry().shape:  
                 raise ValueError(" The shape of tau = {} is not the same as the shape of the domain_geometry = {}".format(tau.shape, self.operator.domain_geometry().shape))
- 
-        if isinstance(sigma, Number):
-            if sigma<=0:
-                raise ValueError("The step-sizes of PDHG are positive, {} is passed".format(sigma))  
-        elif isinstance(sigma, (DataContainer, np.ndarray, BlockDataContainer)):
-            if sigma.shape!= self.operator.range_geometry().shape:
-                raise ValueError(" The shape of sigma = {} is not the same as the shape of the range_geometry = {}".format(sigma.shape, self.operator.range_geometry().shape))
+
+        if sigma is not None:
+            if isinstance(sigma, Number):
+                if sigma<=0:
+                    raise ValueError("The step-sizes of PDHG are positive, {} is passed".format(sigma))                  
+            elif sigma.shape!= self.operator.range_geometry().shape:  
+                raise ValueError(" The shape of tau = {} is not the same as the shape of the domain_geometry = {}".format(sigma.shape, self.operator.range_geometry().shape))
 
         if tau is None and sigma is None:            
             self._sigma = 1.0/self.norm_op
             self._tau = 1.0/self.norm_op            
-        elif tau is None:            
-            self._tau = 1./(sigma*self.norm_op**2)
+        elif tau is None:
+            if isinstance(sigma, Number):            
+                self._tau = 1./(sigma*self.norm_op**2)
+                self._sigma = sigma
+            else:
+                raise ValueError(" Sigma is not a positive float, {} is passed".format(sigma))    
         elif sigma is None:
-            self._sigma = 1./(tau*self.norm_op**2)
+            if isinstance(tau, Number):
+                self._sigma = 1./(tau*self.norm_op**2)
+                self._tau = tau
+            else:
+                raise ValueError(" Tau is not a positive float, {} is passed".format(tau))                    
         else:
             self._sigma = sigma
             self._tau = tau
             try:
                 # convergence criterion for scalar step-sizes 
-                condition = sigma * tau * self.norm_op**2 <=1
-                if not condition:
-                    raise Warning("Convergence criterion of PDHG for scalar step-sizes is not satisfied.")                
+                condition = sigma * tau * self.norm_op**2 > 1
+                if condition:
+                    warnings.warn("Convergence criterion of PDHG for scalar step-sizes is not satisfied.")                
             except:
                 pass
         
@@ -484,4 +497,81 @@ class PDHG(Algorithm):
     def primal_dual_gap(self):
         return [x[2] for x in self.loss]
 
+
+if __name__ == "__main__":
+
+    from cil.utilities import dataexample
+    from cil.utilities import noise as applynoise  
+    from cil.optimisation.operators import IdentityOperator
+    from cil.optimisation.operators import GradientOperator, BlockOperator, FiniteDifferenceOperator
+
+    from cil.optimisation.functions import LeastSquares, ZeroFunction, \
+    L2NormSquared, OperatorCompositionFunction
+    from cil.optimisation.functions import MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler                     
+    from cil.optimisation.functions import IndicatorBox      
+
+    print ("PDHG Denoising with 3 noises")
+    # adapted from demo PDHG_TV_Color_Denoising.py in CIL-Demos repository
+    
+    data = dataexample.PEPPERS.get(size=(256,256))
+    ig = data.geometry
+    ag = ig
+
+    which_noise = 0
+    # Create noisy data. 
+    noises = ['gaussian', 'poisson', 's&p']
+    dnoise = noises[which_noise]
+    
+    def setup(data, dnoise):
+        if dnoise == 's&p':
+            n1 = applynoise.saltnpepper(data, salt_vs_pepper = 0.9, amount=0.2, seed=10)
+        elif dnoise == 'poisson':
+            scale = 5
+            n1 = applynoise.poisson( data.as_array()/scale, seed = 10)*scale
+        elif dnoise == 'gaussian':
+            n1 = applynoise.gaussian(data.as_array(), seed = 10)
+        else:
+            raise ValueError('Unsupported Noise ', noise)
+        noisy_data = ig.allocate()
+        noisy_data.fill(n1)
+    
+        # Regularisation Parameter depending on the noise distribution
+        if dnoise == 's&p':
+            alpha = 0.8
+        elif dnoise == 'poisson':
+            alpha = 1
+        elif dnoise == 'gaussian':
+            alpha = .3
+            # fidelity
+        if dnoise == 's&p':
+            g = L1Norm(b=noisy_data)
+        elif dnoise == 'poisson':
+            g = KullbackLeibler(b=noisy_data)
+        elif dnoise == 'gaussian':
+            g = 0.5 * L2NormSquared(b=noisy_data)
+        return noisy_data, alpha, g
+
+    noisy_data, alpha, g = setup(data, dnoise)
+    operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE)
+
+    f1 =  alpha * MixedL21Norm()
+
+    
+                
+    # Compute operator Norm
+    normK = operator.norm()
+
+    # Primal & dual stepsizes
+    # sigma = operator.range_geometry().allocate(4) #1
+    # tau = operator.domain_geometry().allocate(2) #1/(sigma*normK**2)
+
+    # Setup and run the PDHG algorithm
+    pdhg1 = PDHG(f=f1,g=g,operator=operator, sigma=100, tau=1)
+    pdhg1.max_iteration = 2000
+    pdhg1.update_objective_interval = 200
+    pdhg1.run(1000, verbose=0)
+
+    rmse = (pdhg1.get_output() - data).norm() / data.as_array().size
+
+    print ("RMSE", rmse)
 

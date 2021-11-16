@@ -95,7 +95,10 @@ class Function(object):
         if id(tmp) == id(x):
             x.multiply(tau, out = x)
 
-        val.axpby(-tau, 1.0, x, out=val)
+        # CIL issue #1078, cannot use axpby
+        # val.axpby(-tau, 1.0, x, out=val)
+        val.multiply(-tau, out = val)
+        val.add(x, out = val)
 
         if out is None:
             return val
@@ -332,7 +335,10 @@ class ScaledFunction(Function):
         if id(tmp) == id(x):
             x.multiply(tau, out = x)
 
-        val.axpby(-tau, 1.0, x, out=val)
+        # CIL issue #1078, cannot use axpby
+        #val.axpby(-tau, 1.0, x, out=val)
+        val.multiply(-tau, out = val)
+        val.add(x, out = val)
 
         if out is None:
             return val

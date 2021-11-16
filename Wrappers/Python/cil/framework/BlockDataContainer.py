@@ -272,13 +272,13 @@ class BlockDataContainer(object):
             else:
                 return type(self)(*res, shape=self.shape)
         elif isinstance(other, (list, tuple, numpy.ndarray, BlockDataContainer)):
-            # try to do algebra with one DataContainer. Will raise error if not compatible
             kw = kwargs.copy()
             res = []
             if isinstance(other, BlockDataContainer):
                 the_other = other.containers
             else:
                 the_other = other
+
             for i,zel in enumerate(zip ( self.containers, the_other) ):
                 el = zel[0]
                 ot = zel[1]
@@ -303,10 +303,18 @@ class BlockDataContainer(object):
                 else:
                     raise ValueError('Unsupported operation', operation)
                 if out is not None:
-                    kw['out'] = out.get_item(i)
                     if operation == BlockDataContainer.AXPBY:
-                        kw['y'] = ot
-                        el.axpby(kw['a'], kw['b'], kw['y'], kw['out'], dtype=kw['dtype'], num_threads=kw['num_threads'])
+                        if isinstance(kw['a'], BlockDataContainer):
+                            a = kw['a'].get_item(i)
+                        else:
+                            a = kw['a']
+
+                        if isinstance(kw['b'], BlockDataContainer):
+                            b = kw['b'].get_item(i)
+                        else:
+                            b = kw['b']
+
+                        el.axpby(a, b, ot, out.get_item(i), dtype=kw['dtype'], num_threads=kw['num_threads'])
                     else:
                         op(ot, *args, **kw)
                 else:
@@ -315,7 +323,6 @@ class BlockDataContainer(object):
                 return
             else:
                 return type(self)(*res, shape=self.shape)
-            return type(self)(*[ operation(ot, *args, **kwargs) for el,ot in zip(self.containers,other)], shape=self.shape)
         else:
             # try to do algebra with one DataContainer. Will raise error if not compatible
             kw = kwargs.copy()
@@ -342,11 +349,22 @@ class BlockDataContainer(object):
                 elif operation == BlockDataContainer.MINIMUM:
                     op = el.minimum
                 elif operation == BlockDataContainer.AXPBY:
-                    # As out cannot be None, it is safe to continue the 
-                    # for loop after the call to axpby
-                    kw['out'] = out.get_item(i)
-                    el.axpby(kw['a'], kw['b'], other, kw['out'], kw['dtype'], kw['num_threads'])
+
+                    if isinstance(kw['a'], BlockDataContainer):
+                        a = kw['a'].get_item(i)
+                    else:
+                        a = kw['a']
+
+                    if isinstance(kw['b'], BlockDataContainer):
+                        b = kw['b'].get_item(i)
+                    else:
+                        b = kw['b']
+
+                    el.axpby(a, b, other, out.get_item(i), kw['dtype'], kw['num_threads'])
+
+                    # As axpyb cannot return anything we `continue` to skip the rest of the code block
                     continue
+
                 else:
                     raise ValueError('Unsupported operation', operation)
                 if out is not None:
@@ -354,6 +372,7 @@ class BlockDataContainer(object):
                     op(other, *args, **kw)
                 else:
                     res.append(op(other, *args, **kw))
+
             if out is not None:
                 return
             else:

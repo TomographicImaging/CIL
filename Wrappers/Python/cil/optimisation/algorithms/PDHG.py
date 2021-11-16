@@ -35,9 +35,9 @@ class PDHG(Algorithm):
         A convex function with a "simple" proximal.
     operator : LinearOperator    
         A Linear Operator.
-    sigma : positive :obj:`float`, `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default=None
+    sigma : positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default=None
         Step size for the dual problem.
-    tau : positive :obj:`float`, `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default=None
+    tau : positive :obj:`float`, or `np.ndarray`, `DataContainer`, `BlockDataContainer`, optional, default=None
         Step size for the primal problem.
     initial : DataContainer, optional, default=None
         Initial point for the PDHG algorithm.

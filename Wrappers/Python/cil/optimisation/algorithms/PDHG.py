@@ -389,7 +389,8 @@ class PDHG(Algorithm):
 
     def set_step_sizes(self, sigma=None, tau=None):
 
-        """Default step sizes for the PDHG algorithm"""
+        """Default step sizes for the PDHG algorithm
+        """
         
         # Compute operator norm
         self.norm_op = self.operator.norm()

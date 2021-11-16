@@ -496,7 +496,3 @@ class PDHG(Algorithm):
     @property
     def primal_dual_gap(self):
         return [x[2] for x in self.loss]
-
-
-
-

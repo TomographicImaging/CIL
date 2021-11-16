@@ -63,7 +63,7 @@ print to screen of the status of the optimisation.
    :members:
    :special-members:
 .. autoclass:: cil.optimisation.algorithms.PDHG
-   :members: update, pdhg_step_sizes, update_step_sizes, update_objective
+   :members: update, set_step_sizes, update_step_sizes, update_objective
    :member-order: bysource
 .. autoclass:: cil.optimisation.algorithms.LADMM
    :members:

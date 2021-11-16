@@ -302,6 +302,7 @@ class BlockDataContainer(object):
                     op = el.axpby
                 else:
                     raise ValueError('Unsupported operation', operation)
+
                 if out is not None:
                     if operation == BlockDataContainer.AXPBY:
                         if isinstance(kw['a'], BlockDataContainer):
@@ -314,8 +315,9 @@ class BlockDataContainer(object):
                         else:
                             b = kw['b']
 
-                        el.axpby(a, b, ot, out.get_item(i), dtype=kw['dtype'], num_threads=kw['num_threads'])
+                        el.axpby(a, b, ot,  out.get_item(i), dtype=kw['dtype'], num_threads=kw['num_threads'])
                     else:
+                        kw['out'] = out.get_item(i)
                         op(ot, *args, **kw)
                 else:
                     res.append(op(ot, *args, **kw))

@@ -492,7 +492,7 @@ class Test_FDK_results(unittest.TestCase):
         reco2 = reco.copy()
         reco2.fill(0)
         reconstructor.run(out=reco2, verbose=0)
-        np.testing.assert_array_equal(reco.as_array(), reco2.as_array())  
+        np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)     
 
 
     @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
@@ -508,7 +508,7 @@ class Test_FDK_results(unittest.TestCase):
         reco2 = reco.copy()
         reco2.fill(0)
         reconstructor.run(out=reco2, verbose=0)
-        np.testing.assert_array_equal(reco.as_array(), reco2.as_array()) 
+        np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)   
 
 
     @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
@@ -571,7 +571,7 @@ class Test_FBP_results(unittest.TestCase):
         reco2 = reco.copy()
         reco2.fill(0)
         reconstructor.run(out=reco2, verbose=0)
-        np.testing.assert_array_equal(reco.as_array(), reco2.as_array())  
+        np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)  
 
 
     @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
@@ -586,7 +586,7 @@ class Test_FBP_results(unittest.TestCase):
         reco2 = reco.copy()
         reco2.fill(0)
         reconstructor.run(out=reco2, verbose=0)
-        np.testing.assert_array_equal(reco.as_array(), reco2.as_array())  
+        np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)   
 
 
     @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
@@ -602,7 +602,7 @@ class Test_FBP_results(unittest.TestCase):
         reco2 = reco.copy()
         reco2.fill(0)
         reconstructor.run(out=reco2, verbose=0)
-        np.testing.assert_array_equal(reco.as_array(), reco2.as_array()) 
+        np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)    
 
 
     @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")

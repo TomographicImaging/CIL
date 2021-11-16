@@ -196,10 +196,10 @@ class TotalVariation(Function):
         
         # initialise
         t = 1        
-        tmp_p = self.gradient.range_geometry().allocate()  
+        tmp_p = self.gradient.range_geometry().allocate(0)  
         tmp_q = tmp_p.copy()
-        tmp_x = self.gradient.domain_geometry().allocate()     
-        p1 = self.gradient.range_geometry().allocate()
+        tmp_x = self.gradient.domain_geometry().allocate(0)     
+        p1 = self.gradient.range_geometry().allocate(0)
         
 
         should_break = False

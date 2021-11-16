@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>cil.io.NEXUSDataWriter &#8212; CIL v21.2.0-37-gc7f177c5 documentation</title>
+    <title>cil.io.NEXUSDataWriter &#8212; CIL v21.2.0-38-g29988d4e documentation</title>
     
   <link href="../../../_static/css/theme.css" rel="stylesheet">
   <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -236,7 +236,7 @@
                <span class="n">compression</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
 
         <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        set up witer</span>
+<span class="sd">        set up writer</span>
 
 <span class="sd">        :param data: The dataset to write to file</span>
 <span class="sd">        :type data: AcquisitionData, ImageData</span>
@@ -246,7 +246,11 @@
 <span class="sd">        :type compression: int, default 0</span>
 <span class="sd">        &#39;&#39;&#39;</span>        
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;nxs&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;nex&#39;</span><span class="p">):</span>
+            <span class="n">file_name</span><span class="o">+=</span><span class="s1">&#39;.nxs&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">compression</span> <span class="o">=</span> <span class="n">compression</span>
         
         <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">))</span> <span class="ow">or</span> 

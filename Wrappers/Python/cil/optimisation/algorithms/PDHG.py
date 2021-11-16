@@ -406,18 +406,14 @@ class PDHG(Algorithm):
         elif isinstance(tau, (DataContainer, np.ndarray, BlockDataContainer)):
             if tau.shape!= self.operator.domain_geometry().shape:
                 raise ValueError(" The shape of tau = {} is not the same as the shape of the domain_geometry = {}".format(tau.shape, self.operator.domain_geometry().shape))
-        else:
-            raise ValueError( "Only scalar values and array-type objects are supported for the step-size tau , {} is passed".format(tau))        
-        
+ 
         if isinstance(sigma, Number):
             if sigma<=0:
                 raise ValueError("The step-sizes of PDHG are positive, {} is passed".format(sigma))  
         elif isinstance(sigma, (DataContainer, np.ndarray, BlockDataContainer)):
             if sigma.shape!= self.operator.range_geometry().shape:
                 raise ValueError(" The shape of sigma = {} is not the same as the shape of the range_geometry = {}".format(sigma.shape, self.operator.range_geometry().shape))
-        else:
-            raise ValueError( "Only scalar values and array-type objects are supported for the step-size sigma , {} is passed".format(tau))        
-        
+
         if tau is None and sigma is None:            
             self._sigma = 1.0/self.norm_op
             self._tau = 1.0/self.norm_op            
@@ -435,8 +431,6 @@ class PDHG(Algorithm):
                     raise Warning("Convergence criterion of PDHG for scalar step-sizes is not satisfied.")                
             except:
                 pass
-
-
         
     def update_step_sizes(self):
 

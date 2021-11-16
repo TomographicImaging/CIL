@@ -57,7 +57,7 @@ class NEXUSDataWriter(object):
                compression = 0):
 
         '''
-        set up witer
+        set up writer
 
         :param data: The dataset to write to file
         :type data: AcquisitionData, ImageData

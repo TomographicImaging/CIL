@@ -72,7 +72,7 @@ class PDHG(Algorithm):
     >>> pdhg.run(10) 
     >>> solution = pdhg.solution
 
-    Primal acceleration can be used, since :math:`g` is strongly convex with parameter ``gamma_g = 2``.
+    Primal acceleration can also be used, since :math:`g` is strongly convex with parameter ``gamma_g = 2``.
 
     >>> pdhg = PDHG(f = f, g = g, operator = operator, gamma_g = 2)
 
@@ -193,8 +193,6 @@ class PDHG(Algorithm):
 
         Computing these objectives can be costly, so it is better to compute every some iterations. To do this, use ``update_objective_interval = #number``.
 
-
-                        
 
     - PDHG algorithm can be accelerated if the functions :math:`f^{*}` and/or :math:`g` are strongly convex. In these cases, the step-sizes :math:`\sigma` and :math:`\tau` are updated using the :meth:`update_step_sizes` method. A function :math:`f` is strongly convex with constant :math:`\gamma>0` if
 

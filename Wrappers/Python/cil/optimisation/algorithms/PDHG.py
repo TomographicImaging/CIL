@@ -118,45 +118,122 @@ class PDHG(Algorithm):
     * gradient descent step for the primal problem and
     * an over-relaxation of the primal variable.
 
+    .. math:: 
+    
+        y^{n+1} = \mathrm{prox}_{\sigma f^{*}}(y^{n} + \sigma K \bar{x}^{n})
+
+    .. math:: 
+    
+        x^{n+1} = \mathrm{prox}_{\tau g}(x^{n} - \tau K^{*}y^{n+1})            
+
+    .. math:: 
+    
+        \bar{x}^{n+1} = x^{n+1} + \theta (x^{n+1} - x^{n})    
+
     Notes
     -----    
 
-        - Convergence is guaranteed if the operator norm :math:`\|K\|`, \the dual step size :math:`\sigma` and the primal step size :math:`\tau`, satisfy the following inequality:
+    - Convergence is guaranteed if :math:`\theta` = 1.0,  the operator norm :math:`\|K\|`, \the dual step size :math:`\sigma` and the primal step size :math:`\tau`, satisfy the following inequality:
 
-        .. math:: 
+    .. math:: 
+
+        \tau \sigma \|K\|^2 < 1
     
-            \tau \sigma \|K\|^2 < 1
 
-        - By default, the step sizes :math:`\sigma` and :math:`\tau` are positive scalars and defined as below:
+    - By default, the step sizes :math:`\sigma` and :math:`\tau` are positive scalars and defined as below: 
 
-        * If ``sigma`` is ``None`` and ``tau`` is ``None``:
+      * If ``sigma`` is ``None`` and ``tau`` is ``None``:
 
-        .. math:: 
+      .. math:: 
+      
+        \sigma = \frac{1}{\|K\|},  \tau = \frac{1}{\|K\|}
     
-            \sigma = \frac{1}{\|K\|},  \tau = \frac{1}{\|K\|}
+      * If ``tau`` is ``None``:
 
-        * If ``tau`` is ``None``:
+      .. math:: 
 
-        .. math:: 
+        \tau = \frac{1}{\sigma\|K\|^{2}}
+
+      * If ``sigma`` is ``None``:
+
+      .. math:: 
+
+        \sigma = \frac{1}{\tau\|K\|^{2}}   
+
+
+    - To monitor the convergence of the algorithm, we compute the primal/dual objectives and the primal-dual gap in :meth:`update_objective`.\
     
-            \tau = \frac{1}{\sigma\|K\|^{2}}
+      The primal objective is
 
-        * If ``sigma`` is ``None``:
-
-        .. math:: 
-    
-            \sigma = \frac{1}{\tau\|K\|^{2}}        
-                 
-
-        - PDHG algorithm can be accelerated if the functions :math:`f^{*}` and/or :math:`g` are strongly convex. A function :math:`f` is strongly convex with constant :math:`\gamma>0` if
-
-        .. math::
-
-            f(x) - \frac{\gamma}{2}\|x\|^{2} \quad\mbox{ is convex. }
+      .. math:: 
         
-        - For instance the function :math:`\frac{1}{2}\|x\|^{2}_{2}` is :math:`\gamma` strongly convex for :math:`\gamma\in(-\infty,1]`. We say it is 1-strongly convex because it is the largest constant for which :math:`f - \frac{1}{2}\|\cdot\|^{2}` is convex.
+        f(Kx) + g(x)
 
-        - The :math:`\|\cdot\|_{1}` norm is not strongly convex. For more information, see `Strongly Convex <https://en.wikipedia.org/wiki/Convex_function#Strongly_convex_functions>`_.    
+      and the dual objective is 
+
+      .. math:: 
+        
+        - g^{*}(-K^{*}y) - f^{*}(y)
+    
+      The primal-dual gap (or duality gap) is
+      
+      .. math:: 
+
+        f(Kx) + g(x) + g^{*}(-K^{*}y) + f^{*}(y)
+      
+      and measures how close is the primal-dual pair (x,y) to the primal-dual solution. It is always non-negative and is used to monitor convergence of the PDHG algorithm. \
+      For more information, see `Duality Gap <https://en.wikipedia.org/wiki/Duality_gap>`_.
+                
+
+    Note
+    ----
+
+        - The primal objective is printed if `verbose=1`, ``pdhg.run(verbose=1)``.
+        - All the objectives are printed if `verbose=2`, ``pdhg.run(verbose=2)``.
+
+        Computing these objectives can be costly, so it is better to compute every some iterations. To do this, use ``update_objective_interval = #number``.
+
+
+                        
+
+    - PDHG algorithm can be accelerated if the functions :math:`f^{*}` and/or :math:`g` are strongly convex. In these cases, the step-sizes :math:`\sigma` and :math:`\tau` are updated using the :meth:`update_step_sizes` method. A function :math:`f` is strongly convex with constant :math:`\gamma>0` if
+
+      .. math::
+
+          f(x) - \frac{\gamma}{2}\|x\|^{2} \quad\mbox{ is convex. }
+    
+        
+      * For instance the function :math:`\frac{1}{2}\|x\|^{2}_{2}` is :math:`\gamma` strongly convex for :math:`\gamma\in(-\infty,1]`. We say it is 1-strongly convex because it is the largest constant for which :math:`f - \frac{1}{2}\|\cdot\|^{2}` is convex.
+
+
+      * The :math:`\|\cdot\|_{1}` norm is not strongly convex. For more information, see `Strongly Convex <https://en.wikipedia.org/wiki/Convex_function#Strongly_convex_functions>`_.    
+
+      
+      * If :math:`g` is strongly convex with constant :math:`\gamma` then the step-sizes :math:`\sigma`, :math:`\tau` and :math:`\theta` are updated as:
+
+
+      .. math::
+         :nowrap:
+
+
+            \begin{aligned}
+
+                \theta_{n} & = \frac{1}{\sqrt{1 + 2\gamma\tau_{n}}}\\
+                \tau_{n+1} & = \theta_{n}\tau_{n}\\
+                \sigma_{n+1} & = \frac{\sigma_{n}}{\theta_{n}}
+        
+            \end{aligned}
+
+      * If :math:`f^{*}` is strongly convex, we swap :math:`\sigma` with :math:`\tau`.
+
+    Note
+    ----
+
+    The case where both functions are strongly convex is not available at the moment.  
+    
+
+    .. todo:: Implement acceleration of PDHG when both functions are strongly convex.
+                      
 
     References
     ----------
@@ -273,22 +350,6 @@ class PDHG(Algorithm):
     def update(self):
 
         r""" Performs a single iteration of the PDHG algorithm
-
-        .. math:: 
-        
-            y^{n+1} = \mathrm{prox}_{\sigma f^{*}}(y^{n} + \sigma K \bar{x}^{n})
-
-        .. math:: 
-        
-            x^{n+1} = \mathrm{prox}_{\tau g}(x^{n} - \tau K^{*}y^{n+1})            
-
-        .. math:: 
-        
-            \bar{x}^{n+1} = x^{n+1} + \theta (x^{n+1} - x^{n})
-
-        In the case of primal/dual acceleration using the strongly convexity property of function :math:`f^{*}` or :math:`g` \
-        the stepsize :math:`\sigma` and :math:`\tau` are updated using the :meth:`update_step_sizes` method.
-        
         """
 
         #calculate x-bar and store in self.x_tmp
@@ -355,21 +416,7 @@ class PDHG(Algorithm):
         
     def update_step_sizes(self):
 
-        r"""
-        
-        Updates the step sizes :math:`\sigma` and :math:`\tau` and :math:`\theta` in the cases of primal or dual acceleration using the strongly convexity property.
-        
-        - :math:`g` is strongly convex with constant :math:`\gamma=`  ``gamma_g``.
-        - :math:`f^{*}` is strongly convex with constant :math:`\gamma=`  ``gamma_fconj``.
-
-        Note
-        ----
-
-        The case where both functions are strongly convex is not available at the moment.  
-        
-
-        .. todo:: Implement acceleration of PDHG when both functions are strongly convex.
-                 
+        r""" Updates step sizes in the cases of primal or dual acceleration using the strongly convexity property. The case where both functions are strongly convex is not available at the moment.  
         """
 
         # Update sigma and tau based on the strong convexity of G
@@ -388,43 +435,10 @@ class PDHG(Algorithm):
     def update_objective(self):
 
         """
-
         Evaluates the primal objective, the dual objective and the primal-dual gap.
-
-        Primal objective:
-
-        .. math:: 
-            
-            f(Kx) + g(x)
-
-        Dual objective:     
-        
-        .. math:: 
-            
-            - g^{*}(-K^{*}y) - f^{*}(y)
-
-        Primal-Dual gap (or Duality gap): 
-        
-        .. math:: 
-        
-            f(Kx) + g(x) + g^{*}(-K^{*}y) + f^{*}(y)
-
-        Note
-        ----
-
-            - The primal objective is printed if `verbose=1`, ``pdhg.run(verbose=1)``.
-            - All the objective are printed if `verbose=2`, ``pdhg.run(verbose=2)``.
-
-            Computing these objective can be costly, so it is better to compute every some iterations. To do this, use ``update_objective_interval = #number``.
-
-        Note
-        ----
-
-            The primal-dual gap (or duality gap) measures how close is the primal-dual pair (x,y) to the primal-dual solution. \
-            It is always non-negative and is used to monitor convergence of the PDHG algorithm. For more information, see `Duality Gap <https://en.wikipedia.org/wiki/Duality_gap>`_.
-
         """
 
+        
         self.operator.direct(self.x_old, out=self.y_tmp)
         f_eval_p = self.f(self.y_tmp)
         g_eval_p = self.g(self.x_old)

@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>cil.framework.BlockDataContainer &#8212; CIL v21.2.0-41-g843b8995 documentation</title>
+    <title>cil.framework.BlockDataContainer &#8212; CIL v21.2.0-42-gbbb7d7f4 documentation</title>
     
   <link href="../../../_static/css/theme.css" rel="stylesheet">
   <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -632,7 +632,7 @@
         <span class="k">if</span> <span class="n">p</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>            
             <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">abs</span><span class="p">())</span>        
         <span class="k">elif</span> <span class="n">p</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span>                 
-            <span class="n">tmp</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="o">*</span><span class="n">b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">0</span> <span class="p">)</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span>            
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="o">.</span><span class="n">conjugate</span><span class="p">()</span><span class="o">*</span><span class="n">b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">containers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">0</span> <span class="p">)</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span>            
             <span class="k">return</span> <span class="n">tmp</span>      
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not implemented&#39;</span><span class="p">)</span>

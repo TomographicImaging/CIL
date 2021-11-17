@@ -453,7 +453,7 @@ class BlockDataContainer(object):
         if p==1:            
             return sum(self.abs())        
         elif p==2:                 
-            tmp = functools.reduce(lambda a,b: a + b*b, self.containers, self.get_item(0) * 0 ).sqrt()            
+            tmp = functools.reduce(lambda a,b: a + b.conjugate()*b, self.containers, self.get_item(0) * 0 ).sqrt()            
             return tmp      
         else:
             return ValueError('Not implemented')

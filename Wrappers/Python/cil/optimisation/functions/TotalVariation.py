@@ -133,25 +133,34 @@ class TotalVariation(Function):
     def __call__(self, x):
         
         r''' Returns the value of the \alpha * TV(x)'''
-        self._domain = x.geometry
+        try:
+            self._domain = x.geometry
+        except:
+            self._domain = x
         # evaluate objective function of TV gradient
         if self.isotropic:
             return self.regularisation_parameter * self.gradient.direct(x).pnorm(2).sum()
         else:
-            return self.regularisation_parameter * self.gradient.direct(x).pnorm(1).sum()  
+            return self.regularisation_parameter * self.gradient.direct(x).pnorm(1).sum() 
     
     
     def projection_C(self, x, out=None):   
                      
         r''' Returns orthogonal projection onto the convex set C'''
 
-        self._domain = x.geometry
+        try:
+            self._domain = x.geometry
+        except:
+            self._domain = x
         return self.tmp_proj_C(x, tau = None, out = out)
                         
     def projection_P(self, x, out=None):
                        
         r''' Returns the projection P onto \|\cdot\|_{\infty} '''  
-        self._domain = x.geometry
+        try:
+            self._domain = x.geometry
+        except:
+            self._domain = x
         
         # preallocated in proximal
         tmp = self.pptmp
@@ -160,7 +169,7 @@ class TotalVariation(Function):
         
         if self.isotropic:
             for el in x.containers:
-                el.multiply(el, out=tmp)
+                el.conjugate().multiply(el, out=tmp)
                 tmp1.add(tmp, out=tmp1)
             tmp1.sqrt(out=tmp1)
             tmp1.maximum(1.0, out=tmp1)
@@ -180,14 +189,17 @@ class TotalVariation(Function):
     def proximal(self, x, tau, out = None):
         
         ''' Returns the solution of the FGP_TV algorithm '''         
-        self._domain = x.geometry
+        try:
+            self._domain = x.geometry
+        except:
+            self._domain = x
         
         # initialise
         t = 1        
         tmp_p = self.gradient.range_geometry().allocate(0)  
         tmp_q = tmp_p.copy()
-        tmp_x = self.gradient.domain_geometry().allocate(None)     
-        p1 = self.gradient.range_geometry().allocate(None)
+        tmp_x = self.gradient.domain_geometry().allocate(0)     
+        p1 = self.gradient.range_geometry().allocate(0)
         
 
         should_break = False

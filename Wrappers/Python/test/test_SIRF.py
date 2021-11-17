@@ -23,6 +23,8 @@ import shutil
 import unittest
 from cil.framework import BlockDataContainer
 from cil.optimisation.operators import GradientOperator, LinearOperator
+from cil.optimisation.functions import TotalVariation, L2NormSquared
+from cil.optimisation.algorithms import FISTA
 
 try:
     import sirf.STIR as pet
@@ -69,6 +71,7 @@ class GradientSIRF(object):
 
         # test dot_test
         for sd in [5,10]:
+            
             self.assertTrue(LinearOperator.dot_test(Grad_numpy, seed=sd))
 
         # test shape of output of direct
@@ -149,6 +152,29 @@ class TestGradientMR_2D(unittest.TestCase, GradientSIRF):
     def tearDown(self):
         pass      
 
+    @unittest.skipUnless(has_sirf, "Has SIRF")
+    def test_TVdenoisingMR(self):
+        
+        # compare inplace proximal method of TV
+        alpha = 0.5
+        TV = alpha * TotalVariation(max_iteration=10)
+        res1 = TV.proximal(self.image1, tau=1.0)
+
+        res2 = self.image1*0.
+        TV.proximal(self.image1, tau=1.0, out=res2)   
+        np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal=3)
+
+        # compare with FISTA algorithm   
+        f =  0.5 * L2NormSquared(b=self.image1)
+        fista = FISTA(initial=self.image1*0.0, f=f, g=TV, max_iteration=10, update_objective_interval=10)
+        fista.run(verbose=0)
+        np.testing.assert_array_almost_equal(fista.solution.as_array(), res2.as_array(), decimal=3)      
+
+        
+
+  
+
+    
 class TestSIRFCILIntegration(unittest.TestCase):
     
     def setUp(self):

@@ -12,10 +12,7 @@ on:
 
 jobs:
   conda_build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
     - name: conda-build

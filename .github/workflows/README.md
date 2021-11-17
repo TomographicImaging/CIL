@@ -1,6 +1,8 @@
 # GitHub Actions
 
-## Building the Conda Package: [conda_build](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/conda_build.yml)
+There is a single github action file with multiple jobs, which builds both the conda package and documentation, and optionally publishes the documentation: [conda_and_docs_build](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/conda_and_docs_build.yml) 
+
+## Building the Conda Package: conda_build job
 This github action builds and tests the conda package, by using the [conda-package-publish-action](https://github.com/paskino/conda-package-publish-action)
 
 When pushing to master or creating an [annotated tag](https://git-scm.com/book/en/v2/Git-Basics-Tagging), *all* variants are built and tested.
@@ -9,26 +11,28 @@ When opening or modifying a pull request to master, a single variant is built an
 
 The action does not publish to conda, instead this is done by jenkins. This is because github-actions do not have a GPU.
 
-## Building/Publishing Documentation: [docs_build_and_publish](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/docs_build_and_publish.yml)
+An artifact of the resulting tar.bz2 file is made available in the 'Summary' section of the action. It is called `cil-package`. This can be downloaded to test locally, and is also used by the **docs_build** job.
+
+## Building/Publishing Documentation: docs_build and docs_publish jobs
 
 This github action builds and optionally publishes the documentation located in [docs/source](https://github.com/TomographicImaging/CIL/tree/master/docs/source). 
 
-The github action has two jobs:
-1. [build](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/docs_build_and_publish.yml#L12): 
+1. [docs_build](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/docs_build_and_publish.yml#L12): 
+-  creates a miniconda environment from [docs_environment.yml](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/docs/docs_environment.yml)
+-  installs cil into the miniconda environment, using the tar.bz2 artifact (cil-package) created in the **conda_build** job
 -  builds the documentation with sphinx
--  uses upload-artifact to upload the html files which may then be used by **publish**
+-  uses upload-artifact to upload the html files: HTMLDocumentation which may then be used by **docs_publish**
 
-2. [publish](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/docs_build_and_publish.yml#L40):
+2. [docs_publish](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/docs_build_and_publish.yml#L40):
 -  uses download-artifact to retrieve the built html files
 -  pushes the html files to the `nightly` folder on the gh-pages branch
 
-If opening or modifying a pull request to master, `build` is run, but not `publish`.
-If pushing to master or tagging, the documentation is built *and* published (both the `build` and `publish` jobs are run).
+If opening or modifying a pull request to master, `docs_build` is run, but not `publish`.
+If pushing to master or tagging, the documentation is built *and* published (both the `docs_build` and `docs_publish` jobs are run).
 
 ### Viewing Built Documentation
-The `build` job builds the documentation and uploads it as an [artifact](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/docs_build_and_publish.yml#L36),
-in a folder named `DocumentationHTML`.
-This can be found by going to the ‘Actions’ tab, and selecting the appropriate run of `.github/workflows/docs_build_and_publish.yml`.
+The `docs_build` job builds the documentation and uploads it as an artifact, in a folder named `DocumentationHTML`.
+This can be found by going to the ‘Actions’ tab, and selecting the appropriate run of `.github/workflows/conda_and_docs_build.yml`.
 
 When viewing the summary for the run of the action, there is an `Artifact` section at the bottom of the page.
 Clicking on `DocumentationHTML` allows you to download a zip folder containing the built html files. This allows you to preview the documentation site before it is published.

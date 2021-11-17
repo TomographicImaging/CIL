@@ -31,7 +31,7 @@ jobs:
         name: cil-package
         path: recipe/linux-64/cil*
   docs_build:
-    needs: build
+    needs: conda_build
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2

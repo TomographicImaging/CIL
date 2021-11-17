@@ -1,4 +1,5 @@
 * 21.3.0
+  - TotalVariation Function handles SIRF ImageData
   - Simulated datasets and volume added to DataExamples
   - TIGRE wrappers for parallel-beam geometry added
   - NEXUSWriter and NEXUSReader offer (8bit and 16bit) compression of data

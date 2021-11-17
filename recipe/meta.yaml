@@ -31,7 +31,7 @@ test:
     
   source_files:
     - ./Wrappers/Python/test     # [win]
-    - ./cil/Wrappers/Python/test # [not win] 
+    - ./Wrappers/Python/test # [not win] 
 
   commands:
     - python -c "import os; print ('TESTING IN THIS DIRECTORY' , os.getcwd())"

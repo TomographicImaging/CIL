@@ -1,0 +1,40 @@
+name: docs
+channels:
+  - conda-forge
+  - intel
+  - ccpi
+  - defaults
+  - astra-toolbox/label/dev
+dependencies:
+  - python=3.7
+  - numpy=1.18
+  - scipy
+  - matplotlib
+  - h5py
+  - pillow
+  - libgcc-ng # [linux]
+  - dxchange
+  - olefile
+  - pywavelets
+  - python-wget
+  - scikit-image
+  - scipy
+  - packaging
+  - tomophantom
+  - numba
+  - ipp
+  - ipp-devel
+  - ipp-include
+  - tigre
+  - sphinx_rtd_theme
+  - sphinxcontrib-bibtex
+  - pydata-sphinx-theme
+  - sphinx=3.5.*
+  - recommonmark=0.6.*
+  - sphinx-panels=0.5
+  - sphinx-autobuild=0.7
+  - sphinx-click=2.7
+  - sphinx-copybutton=0.3
+  - cil-astra
+  - ccpi-regulariser
+  - tomophantom

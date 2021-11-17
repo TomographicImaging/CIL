@@ -45,13 +45,14 @@ jobs:
     - uses: conda-incubator/setup-miniconda@v2
       with:
         python-version: 3.7
-    - uses: cascode-labs/build-sphinx-action@v0.1.0
+    - uses: lauramurgatroyd/build-sphinx-action@adjustments
       with:
         DOCS_PATH: 'docs'
         CONDA_BUILD_ENV_FILEPATH: 'docs/docs_environment.yml'
         ARTIFACT_NAME: 'DocumentationHTML'
         PACKAGE_FOLDER_PATH: 'conda_package'
         PACKAGE_NAME: 'cil'
+        PACKAGE_CONDA_CHANNELS: 'conda-forge -c astra-toolbox/label/dev -c ccpi'
   docs_publish:
     needs: docs_build
     runs-on: ubuntu-latest

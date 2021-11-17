@@ -52,7 +52,7 @@ jobs:
         ARTIFACT_NAME: 'DocumentationHTML'
         PACKAGE_FOLDER_PATH: 'conda_package'
         PACKAGE_NAME: 'cil'
-        PACKAGE_CONDA_CHANNELS: 'conda-forge -c astra-toolbox/label/dev -c ccpi'
+        PACKAGE_CONDA_CHANNELS: 'conda-forge -c intel -c astra-toolbox/label/dev -c cvxgrp -c ccpi'
   docs_publish:
     needs: docs_build
     runs-on: ubuntu-latest

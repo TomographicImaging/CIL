@@ -454,7 +454,7 @@ class TestAlgorithms(unittest.TestCase):
         try:
             pdhg = PDHG(f=f, g=g, operator=operator, tau = tau, max_iteration=10)
         except ValueError as ve:
-            print(ve)          
+            print(ve)    
 
         # check sigma not Number or array-Like object   
         try:
@@ -473,7 +473,7 @@ class TestAlgorithms(unittest.TestCase):
         tau = 1/3
         with warnings.catch_warnings(record=True) as wa:
             pdhg = PDHG(f=f, g=g, operator=operator, tau = tau, sigma = sigma, max_iteration=10)  
-            assert "Convergence criterion" in str(wa[0].message)  
+            assert "Convergence criterion" in str(wa[0].message)             
                   
     def test_PDHG_strongly_convex_gamma_g(self):
 

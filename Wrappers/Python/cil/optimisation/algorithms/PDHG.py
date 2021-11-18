@@ -235,7 +235,7 @@ class PDHG(Algorithm):
                 initial = kwargs.get('x_init', None)
             else:
                 raise ValueError('{} received both initial and the deprecated x_init parameter. It is not clear which one we should use.'\
-                    .format(self.__class__.__name__))                    
+                    .format(self.__class__.__name__))
         self._use_axpby = use_axpby
 
         self._tau = None
@@ -334,7 +334,6 @@ class PDHG(Algorithm):
         self.g = g
         self.operator = operator
 
-        #Set sigma and tau step-sizes for PDHG
         self.set_step_sizes(sigma=sigma, tau=tau) 
 
         if initial is None:

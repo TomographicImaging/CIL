@@ -274,7 +274,7 @@ class PDHG(Algorithm):
 
 
     def set_gamma_g(self, value):
-        '''Set the value of the strongly convex constant for function G
+        '''Set the value of the strongly convex constant for function `g`
 
         Parameters
         ----------
@@ -292,7 +292,7 @@ class PDHG(Algorithm):
         
         
     def set_gamma_fconj(self, value):
-        '''Set the value of the strongly convex constant for the convex conjugate of function F
+        '''Set the value of the strongly convex constant for the convex conjugate of function `f`
 
         Parameters
         ----------

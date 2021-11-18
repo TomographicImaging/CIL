@@ -11,7 +11,7 @@ When opening or modifying a pull request to master, a single variant is built an
 
 The action does not publish to conda, instead this is done by jenkins. This is because github-actions do not have a GPU.
 
-An artifact of the resulting tar.bz2 file is made available in the 'Summary' section of the action. It is called `cil-package`. This can be downloaded to test locally, and is also used by the **docs_build** job.
+An artifact of the resulting tar.bz2 file is made available in the 'Summary' section of the action. It is called `cil-package`. This is used by the **docs_build** job. It can be found by going to the ‘Actions’ tab, and selecting the appropriate run of `.github/workflows/conda_and_docs_build.yml`, or by clicking on the tick on the action in the "All checks have passed/failed" section of a PR. When viewing the summary for the run of the action, there is an `Artifact` section at the bottom of the page. Clicking on `cil-package` allows you to download a zip folder containing the tar.bz2 file.
 
 ## Building/Publishing Documentation: docs_build and docs_publish jobs
 
@@ -37,13 +37,6 @@ This can be found by going to the ‘Actions’ tab, and selecting the appropria
 When viewing the `Summary` for the run of the action, there is an `Artifact` section at the bottom of the page.
 Clicking on `DocumentationHTML` allows you to download a zip folder containing the built html files. This allows you to preview the documentation site before it is published.
 
-### Testing Built Package Locally
-The `conda_build` job builds the conda package and uploads it as an artifact, in a folder named `cil-package`.
-This can be found by going to the ‘Actions’ tab, and selecting the appropriate run of `.github/workflows/conda_and_docs_build.yml`, or by clicking on the tick on the action in the "All checks have passed/failed" section of a PR.
-
-When viewing the summary for the run of the action, there is an `Artifact` section at the bottom of the page.
-Clicking on `cil-package` allows you to download a zip folder containing the tar.bz2 file.
-
 ### Publication of the Documentation
 The documentation is hosted on the [github site](https://tomographicimaging.github.io/CIL/) associated with the repository.
 This is built from the [gh-pages branch](https://github.com/TomographicImaging/CIL/tree/gh-pages). 
@@ -52,7 +45,6 @@ If you are an admin of the CIL repository you are able to see the settings for t
 
 To publish the documentation, the publish job of the gh-action pushes the documentation changes to the `gh-pages` branch.
 Any push to this branch automatically updates the github site.
-
 
 ### Initial Setup of the Docs Site & Action
 To get the action to work I first had to:

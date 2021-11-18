@@ -59,27 +59,11 @@ class PDHG(Algorithm):
 
     Example 
     -------
-    Total variation denoising with with PDHG.  
 
-    .. math:: \min_{x\in X} \|u - b\|^{2} + \alpha\|\nabla u\|_{2,1}
-
-    >>> data = dataexample.CAMERA.get()
-    >>> noisy_data = noise.gaussian(data, seed = 10, var = 0.02)
-    >>> ig = data.geometry
-    >>> operator = GradientOperator(ig)
-    >>> f = MixedL21Norm()
-    >>> g = L2NormSquared(b=g)
-    >>> pdhg = PDHG(f = f, g = g, operator = operator, max_iteration = 10)
-    >>> pdhg.run(10) 
-    >>> solution = pdhg.solution
-
-    Primal acceleration can also be used, since :math:`g` is strongly convex with parameter ``gamma_g = 2``.
-
-    >>> pdhg = PDHG(f = f, g = g, operator = operator, gamma_g = 2)
-
-    For a TV tomography reconstruction example, see `CIL-Demos <https://github.com/TomographicImaging/CIL-Demos/blob/main/binder/TomographyReconstruction.ipynb>`_.
-    More examples can be found in :cite:`Jorgensen_et_al_2021`, :cite:`Papoutsellis_et_al_2021`.
-
+    In our `CIL-Demos <https://github.com/TomographicImaging/CIL-Demos/blob/main/binder/TomographyReconstruction.ipynb>`_ repository\
+    you can find examples using the PDHG algorithm for different imaging problems, such as Total Variation denoising, Total Generalised Variation inpainting\
+    and Total Variation Tomography reconstruction. More examples can also be found in :cite:`Jorgensen_et_al_2021`, :cite:`Papoutsellis_et_al_2021`.
+    
     Note
     ----
 
@@ -242,8 +226,7 @@ class PDHG(Algorithm):
     """
 
     def __init__(self, f, g, operator, tau=None, sigma=None,initial=None, use_axpby=True, **kwargs):
-        """Constructor method
-        """
+
         super(PDHG, self).__init__(**kwargs)
         if kwargs.get('x_init', None) is not None:
             if initial is None:
@@ -319,7 +302,7 @@ class PDHG(Algorithm):
         self.g = g
         self.operator = operator
 
-        #Default step sizes
+        #Set sigma and tau step-sizes for PDHG
         self.set_step_sizes(sigma=sigma, tau=tau) 
 
         if initial is None:
@@ -398,7 +381,7 @@ class PDHG(Algorithm):
 
     def set_step_sizes(self, sigma=None, tau=None):
 
-        """Default scalar step sizes for the PDHG algorithm
+        """ Sets sigma and tau step-sizes for the PDHG algorithm. The step sizes can be either scalar or array-objects.
         """
         
         # Compute operator norm
@@ -419,6 +402,7 @@ class PDHG(Algorithm):
             elif sigma.shape!= self.operator.range_geometry().shape:  
                 raise ValueError(" The shape of tau = {} is not the same as the shape of the domain_geometry = {}".format(sigma.shape, self.operator.range_geometry().shape))
 
+        # Default sigma and tau step-sizes
         if tau is None and sigma is None:            
             self._sigma = 1.0/self.norm_op
             self._tau = 1.0/self.norm_op            

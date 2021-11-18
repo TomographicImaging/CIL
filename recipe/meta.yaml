@@ -17,13 +17,11 @@ build:
 
 test:
   requires:
-    - {{ pin_compatible('numpy', min_pin='x.x', max_pin='x.x') }}
     - python-wget
     - cvxpy              # [ linux and py==37 and np==118 ]
     - scikit-image
     - tomophantom        # [ linux ]
-    - cil-astra          # [ linux ] 
-    - cil-data >=21.3.0
+    - cil-astra          # [ linux or win ] 
     - tigre              # [ linux or win ] 
     - numba
     - packaging
@@ -71,9 +69,10 @@ requirements:
     - dxchange
     - olefile >=0.46
     - pywavelets
-    - cil-data
+    - cil-data >=21.3.0
     - ipp
     - tqdm
+
   
 about:
   home: http://www.ccpi.ac.uk/cil

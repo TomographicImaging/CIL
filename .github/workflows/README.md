@@ -15,13 +15,13 @@ An artifact of the resulting tar.bz2 file is made available in the 'Summary' sec
 
 ## Building/Publishing Documentation: docs_build and docs_publish jobs
 
-This github action builds and optionally publishes the documentation located in [docs/source](https://github.com/TomographicImaging/CIL/tree/master/docs/source). 
+This github action builds and optionally publishes the documentation located in [docs/source](https://github.com/TomographicImaging/CIL/tree/master/docs/source). To do this it uses a forked version of the [build-sphinx-action](https://github.com/lauramurgatroyd/build-sphinx-action)
 
 1. [docs_build](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/docs_build_and_publish.yml#L12): 
 -  creates a miniconda environment from [docs_environment.yml](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/docs/docs_environment.yml)
 -  installs cil into the miniconda environment, using the tar.bz2 artifact (cil-package) created in the **conda_build** job
 -  builds the documentation with sphinx
--  uses upload-artifact to upload the html files: HTMLDocumentation which may then be used by **docs_publish**
+-  uses upload-artifact to upload the html files: HTMLDocumentation which may then be used by **docs_publish**. These can alos be downloaded to view.
 
 2. [docs_publish](https://github.com/TomographicImaging/CIL/blob/master/.github/workflows/docs_build_and_publish.yml#L40):
 -  uses download-artifact to retrieve the built html files
@@ -32,10 +32,17 @@ If pushing to master or tagging, the documentation is built *and* published (bot
 
 ### Viewing Built Documentation
 The `docs_build` job builds the documentation and uploads it as an artifact, in a folder named `DocumentationHTML`.
-This can be found by going to the ‘Actions’ tab, and selecting the appropriate run of `.github/workflows/conda_and_docs_build.yml`.
+This can be found by going to the ‘Actions’ tab, and selecting the appropriate run of `.github/workflows/conda_and_docs_build.yml`, or by clicking on the tick on the action in the "All checks have passed/failed" section of a PR.
+
+When viewing the `Summary` for the run of the action, there is an `Artifact` section at the bottom of the page.
+Clicking on `DocumentationHTML` allows you to download a zip folder containing the built html files. This allows you to preview the documentation site before it is published.
+
+### Testing Built Package Locally
+The `conda_build` job builds the conda package and uploads it as an artifact, in a folder named `cil-package`.
+This can be found by going to the ‘Actions’ tab, and selecting the appropriate run of `.github/workflows/conda_and_docs_build.yml`, or by clicking on the tick on the action in the "All checks have passed/failed" section of a PR.
 
 When viewing the summary for the run of the action, there is an `Artifact` section at the bottom of the page.
-Clicking on `DocumentationHTML` allows you to download a zip folder containing the built html files. This allows you to preview the documentation site before it is published.
+Clicking on `cil-package` allows you to download a zip folder containing the tar.bz2 file.
 
 ### Publication of the Documentation
 The documentation is hosted on the [github site](https://tomographicimaging.github.io/CIL/) associated with the repository.

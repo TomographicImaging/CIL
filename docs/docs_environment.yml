@@ -9,7 +9,6 @@ dependencies:
   - python-wget
   - scikit-image
   - packaging
-  - tomophantom
   - numba
   - tigre
   - sphinx_rtd_theme

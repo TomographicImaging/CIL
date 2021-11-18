@@ -12,6 +12,9 @@
   - Added Intel IPP based library for filtering step of FBP
   - PDHG memory optimisation
   - ScaledFunction memory Optimisation
+  - The github actions are merged into one action with multiple jobs
+  - The conda build job uploads an artifact of the build tar.bz file which is later used by the documentation build job - which installs the package into a miniconda environment.
+  - Documentation pages for recon, astra and cil-plugins are published.
 
 * 21.2.0
   - add version string from git describe

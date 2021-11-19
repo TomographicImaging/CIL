@@ -276,11 +276,11 @@ class PDHG(Algorithm):
 
         Parameters
         ----------
-            value : a positive number       
+            value : a positive number or None      
         '''
-        if self.gamma_fconj is not None:
+        if self.gamma_fconj is not None and value is not None:
             raise ValueError("The adaptive update of the PDHG stepsizes in the case where both functions are strongly convex is not implemented at the moment." +\
-                "Currently the strongly convex constant of the convex conjugate of the function f has been specified.")                           
+                "Currently the strongly convex constant of the convex conjugate of the function f has been specified as ", self.gamma_fconj)                           
 
         if isinstance (value, Number): 
             if value <= 0:                      
@@ -297,11 +297,11 @@ class PDHG(Algorithm):
 
         Parameters
         ----------
-            value : a positive number       
+            value : a positive number or None      
         '''
-        if self.gamma_g is not None:
+        if self.gamma_g is not None and value is not None:
             raise ValueError("The adaptive update of the PDHG stepsizes in the case where both functions are strongly convex is not implemented at the moment." +\
-                "Currently the strongly convex constant of the function g has been specified.")                           
+                "Currently the strongly convex constant of the function g has been specified as ", self.gamma_g)                           
 
         if isinstance (value, Number): 
             if value <= 0:                     

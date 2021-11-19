@@ -483,8 +483,8 @@ class TestAlgorithms(unittest.TestCase):
         self.assertAlmostEquals(pdhg.tau, tau * pdhg.theta)
         self.assertAlmostEquals(pdhg.sigma, sigma / pdhg.theta)
         pdhg.run(4, verbose=0)
-        self.assertAlmostEquals(pdhg.sigma, sigma)
-        self.assertAlmostEquals(pdhg.tau, tau)  
+        self.assertNotEqual(pdhg.sigma, sigma)
+        self.assertNotEqual(pdhg.tau, tau)  
 
         # check negative strongly convex constant
         with self.assertRaises(ValueError):

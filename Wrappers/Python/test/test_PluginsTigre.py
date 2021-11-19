@@ -19,23 +19,19 @@ from cil.framework import AcquisitionGeometry
 from cil.utilities import dataexample
 import unittest
 import numpy as np
-from utils import has_gpu_tigre
+from utils import has_gpu_tigre, has_tigre
 from cil.utilities.display import show2D
 
-try:
-    import tigre
+if has_tigre:
     from cil.plugins.tigre import CIL2TIGREGeometry
     from cil.plugins.tigre import ProjectionOperator
     from cil.plugins.tigre import FBP
-    has_tigre = True
-except ModuleNotFoundError:
-    print(  "This plugin requires the additional package TIGRE\n" +
-            "Please install it via conda as tigre from the ccpi channel\n"+
-            "Minimal version is 21.01")
-    has_tigre = False
 
+gpu_test = has_gpu_tigre()
+if  not gpu_test:
+    print("Unable to run TIGRE tests")
 
-has_tigre = has_tigre and has_gpu_tigre()
+has_tigre = has_tigre and gpu_test
 
 class Test_convert_geometry(unittest.TestCase):
     def setUp(self): 

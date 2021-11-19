@@ -25,24 +25,20 @@ from cil.utilities.dataexample import SIMULATED_PARALLEL_BEAM_DATA, SIMULATED_CO
 import unittest
 from scipy.fftpack  import fft, ifft
 import numpy as np
-from utils import has_gpu_tigre, has_ipp
+from utils import has_tigre, has_gpu_tigre, has_ipp
 import gc
 
-try:
+
+if has_tigre:
     from cil.plugins.tigre import ProjectionOperator as ProjectionOperator
     from cil.plugins.tigre import FBP as FBP_tigre
     from tigre.utilities.filtering import ramp_flat, filter
-    has_tigre = True
-except ModuleNotFoundError:
-    print(  "These reconstructors require the additional package TIGRE\n" +
-            "Please install it via conda as tigre from the ccpi channel\n"+
-            "Minimal version is 21.01")
-    has_tigre = False
 
-has_tigre = has_tigre and has_gpu_tigre()
+gpu_test = has_gpu_tigre()
+if  not gpu_test:
+    print("Unable to run TIGRE tests")
 
-has_ipp = has_ipp()
-
+has_tigre = has_tigre and gpu_test
 
 class Test_Reconstructor(unittest.TestCase):
 

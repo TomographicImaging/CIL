@@ -29,7 +29,7 @@ def has_gpu_tigre():
         return False
 
     has_gpu = True
-    if has_nvidia_smi:
+    if has_nvidia_smi():
         from cil.plugins.tigre import ProjectionOperator
         from tigre.utilities.errors import TigreCudaCallError
 
@@ -66,7 +66,7 @@ def has_gpu_astra():
         return False
 
     has_gpu = False
-    if has_nvidia_smi:
+    if has_nvidia_smi():
         try:
             astra.test_CUDA()
             has_gpu = True

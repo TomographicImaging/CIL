@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Optimisation framework &#8212; CIL v21.2.0-42-gbbb7d7f4 documentation</title>
+    <title>Optimisation framework &#8212; CIL v21.2.0-43-g42a030cd documentation</title>
     
   <link href="_static/css/theme.css" rel="stylesheet">
   <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -367,8 +367,7 @@
 Gradient Descent (GD), Conjugate Gradient Least Squares (CGLS),
 Simultaneous Iterative Reconstruction Technique (SIRT), Primal Dual Hybrid
 Gradient (PDHG) and Fast Iterative Shrinkage Thresholding Algorithm (FISTA).</p>
-<p>An algorithm is designed for a
-particular generic optimisation problem accepts and number of
+<p>An algorithm is designed for a particular generic optimisation problem accepts and number of
 :code:<a href="#id1"><span class="problematic" id="id2">`</span></a>Function`s and/or :code:<a href="#id3"><span class="problematic" id="id4">`</span></a>Operator`s as input to define a specific instance of
 the generic optimisation problem to be solved.
 They are iterable objects which can be run in a for loop.
@@ -837,84 +836,189 @@ proper variables are passed or later with set_up</p>
 
 <dl class="class">
 <dt id="cil.optimisation.algorithms.PDHG">
-<em class="property">class </em><code class="sig-prename descclassname">cil.optimisation.algorithms.</code><code class="sig-name descname">PDHG</code><span class="sig-paren">(</span><em class="sig-param">f=None</em>, <em class="sig-param">g=None</em>, <em class="sig-param">operator=None</em>, <em class="sig-param">tau=None</em>, <em class="sig-param">sigma=1.0</em>, <em class="sig-param">initial=None</em>, <em class="sig-param">use_axpby=True</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/PDHG.html#PDHG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.optimisation.algorithms.PDHG" title="Permalink to this definition">¶</a></dt>
-<dd><p>Primal Dual Hybrid Gradient</p>
-<p>Problem:</p>
-<div class="math notranslate nohighlight">
-\[\min_{x} f(Kx) + g(x)\]</div>
+<em class="property">class </em><code class="sig-prename descclassname">cil.optimisation.algorithms.</code><code class="sig-name descname">PDHG</code><span class="sig-paren">(</span><em class="sig-param">f</em>, <em class="sig-param">g</em>, <em class="sig-param">operator</em>, <em class="sig-param">tau=None</em>, <em class="sig-param">sigma=None</em>, <em class="sig-param">initial=None</em>, <em class="sig-param">use_axpby=True</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/PDHG.html#PDHG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.optimisation.algorithms.PDHG" title="Permalink to this definition">¶</a></dt>
+<dd><p>Primal Dual Hybrid Gradient (PDHG) algorithm, see <span id="id5">[<a class="reference internal" href="#id11" title="Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. Journal of Mathematical Imaging and Vision, 40(1):120-145, May 2011. URL: https://doi.org/10.1007/s10851-010-0251-1, doi:10.1007/s10851-010-0251-1.">1</a>]</span>, <span id="id6">[<a class="reference internal" href="#id12" title="Ernie Esser, Xiaoqun Zhang, and Tony F. Chan. A general framework for a class of first order primal-dual algorithms for convex optimization in imaging science. SIAM Journal on Imaging Sciences, 3(4):1015-1046, 2010. URL: https://doi.org/10.1137/09076934X, arXiv:https://doi.org/10.1137/09076934X, doi:10.1137/09076934X.">2</a>]</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>operator</strong> – Linear Operator = K</p></li>
-<li><p><strong>f</strong> – Convex function with “simple” proximal of its conjugate.</p></li>
-<li><p><strong>g</strong> – Convex function with “simple” proximal</p></li>
-<li><p><strong>tau</strong> – Step size parameter for Primal problem</p></li>
-<li><p><strong>sigma</strong> – Step size parameter for Dual problem</p></li>
+<li><p><strong>f</strong> (<a class="reference internal" href="#cil.optimisation.functions.Function" title="cil.optimisation.functions.Function"><em>Function</em></a>) – A convex function with a “simple” proximal method of its conjugate.</p></li>
+<li><p><strong>g</strong> (<a class="reference internal" href="#cil.optimisation.functions.Function" title="cil.optimisation.functions.Function"><em>Function</em></a>) – A convex function with a “simple” proximal.</p></li>
+<li><p><strong>operator</strong> (<a class="reference internal" href="#cil.optimisation.operators.LinearOperator" title="cil.optimisation.operators.LinearOperator"><em>LinearOperator</em></a>) – A Linear Operator.</p></li>
+<li><p><strong>sigma</strong> (positive <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, or <cite>np.ndarray</cite>, <cite>DataContainer</cite>, <cite>BlockDataContainer</cite>, optional, default=None) – Step size for the dual problem.</p></li>
+<li><p><strong>tau</strong> (positive <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, or <cite>np.ndarray</cite>, <cite>DataContainer</cite>, <cite>BlockDataContainer</cite>, optional, default=None) – Step size for the primal problem.</p></li>
+<li><p><strong>initial</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em><em>, </em><em>default=None</em>) – Initial point for the PDHG algorithm.</p></li>
+<li><p><strong>use_axbpy</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>, optional, default=True) – Computes a*x + b*y in C.</p></li>
+<li><p><strong>gamma_g</strong> (positive <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, optional, default=None) – Strongly convex constant if the function g is strongly convex. Allows primal acceleration of the PDHG algorithm.</p></li>
+<li><p><strong>gamma_fconj</strong> (positive <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, optional, default=None) – Strongly convex constant if the convex conjugate of f is strongly convex. Allows dual acceleration of the PDHG algorithm.</p></li>
+<li><p><strong>**kwargs</strong> – <p>Keyward arguments used from the base class <a class="reference internal" href="#cil.optimisation.algorithms.Algorithm" title="cil.optimisation.algorithms.Algorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">Algorithm</span></code></a>.</p>
+<dl>
+<dt>max_iteration<span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>, optional, default=0</span></dt><dd><p>Maximum number of iterations of the PDHG.</p>
+</dd>
+<dt>update_objective_interval<span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>, optional, default=1</span></dt><dd><p>Evaluates objectives, e.g., primal/dual/primal-dual gap every <code class="docutils literal notranslate"><span class="pre">update_objective_interval</span></code>.</p>
+</dd>
+</dl>
+</p></li>
 </ul>
 </dd>
 </dl>
-<p>Remark: Convergence is guaranted provided that</p>
+<p class="rubric">Example</p>
+<p>In our <a class="reference external" href="https://github.com/TomographicImaging/CIL-Demos/blob/main/binder/TomographyReconstruction.ipynb">CIL-Demos</a> repositoryyou can find examples using the PDHG algorithm for different imaging problems, such as Total Variation denoising, Total Generalised Variation inpaintingand Total Variation Tomography reconstruction. More examples can also be found in <span id="id7">[<a class="reference internal" href="#id14" title="J. S. Jörgensen, E. Ametova, G. Burca, G. Fardell, E. Papoutsellis, E. Pasca, K. Thielemans, M. Turner, R. Warr, W. R. B. Lionheart, and P. J. Withers. Core imaging library - part i: a versatile python framework for tomographic imaging. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200192, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192, doi:10.1098/rsta.2020.0192.">3</a>]</span>, <span id="id8">[<a class="reference internal" href="#id13" title="Evangelos Papoutsellis, Evelina Ametova, Claire Delplancke, Gemma Fardell, Jakob S. Jörgensen, Edoardo Pasca, Martin Turner, Ryan Warr, William R. B. Lionheart, and Philip J. Withers. Core imaging library - part ii: multichannel reconstruction for dynamic and spectral tomography. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 379(2204):20200193, 2021. URL: https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193, arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193, doi:10.1098/rsta.2020.0193.">4</a>]</span>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Currently, the strongly convex constants are passed as parameters of PDHG.
+In the future, these parameters will be properties of the corresponding functions.</p>
+</div>
+<p class="rubric">Notes</p>
+<p>A first-order primal-dual algorithm for convex optimization problems with known saddle-point structure with applications in imaging.</p>
+<p>The general problem considered in the PDHG algorithm is the generic saddle-point problem</p>
 <div class="math notranslate nohighlight">
-\[\tau \sigma \|K\|^{2} &lt;1\]</div>
-<p>Reference:</p>
-<blockquote>
-<div><p>(a) A. Chambolle and T. Pock (2011), “A first-order primal–dual algorithm for convex
-problems with applications to imaging”, J. Math. Imaging Vision 40, 120–145.</p>
-<p>(b) E. Esser, X. Zhang and T. F. Chan (2010), “A general framework for a class of first
-order primal–dual algorithms for convex optimization in imaging science”,
-SIAM J. Imaging Sci. 3, 1015–1046.</p>
-</div></blockquote>
-<dl class="method">
-<dt id="cil.optimisation.algorithms.PDHG.get_output">
-<code class="sig-name descname">get_output</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/PDHG.html#PDHG.get_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.optimisation.algorithms.PDHG.get_output" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the solution found</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cil.optimisation.algorithms.PDHG.objective">
-<em class="property">property </em><code class="sig-name descname">objective</code><a class="headerlink" href="#cil.optimisation.algorithms.PDHG.objective" title="Permalink to this definition">¶</a></dt>
-<dd><p>alias of loss</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cil.optimisation.algorithms.PDHG.set_up">
-<code class="sig-name descname">set_up</code><span class="sig-paren">(</span><em class="sig-param">f</em>, <em class="sig-param">g</em>, <em class="sig-param">operator</em>, <em class="sig-param">tau=None</em>, <em class="sig-param">sigma=1.0</em>, <em class="sig-param">initial=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/PDHG.html#PDHG.set_up"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.optimisation.algorithms.PDHG.set_up" title="Permalink to this definition">¶</a></dt>
-<dd><p>initialisation of the algorithm</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>operator</strong> – a Linear Operator</p></li>
-<li><p><strong>f</strong> – Convex function with “simple” proximal of its conjugate.</p></li>
-<li><p><strong>g</strong> – Convex function with “simple” proximal</p></li>
-<li><p><strong>tau</strong> – Step size parameter for Primal problem</p></li>
-<li><p><strong>sigma</strong> – Step size parameter for Dual problem</p></li>
-<li><p><strong>initial</strong> – Initial guess ( Default initial = 0)</p></li>
+\[\min_{x\in X}\max_{y\in Y} \langle Kx, y \rangle + g(x) - f^{*}(x)\]</div>
+<p>where <span class="math notranslate nohighlight">\(f\)</span> and <span class="math notranslate nohighlight">\(g\)</span> are convex functions with “simple” proximal operators.</p>
+<p><span class="math notranslate nohighlight">\(X\)</span> and <span class="math notranslate nohighlight">\(Y\)</span> are two two finite-dimensional vector spaces with an inner product and representing the domain of <span class="math notranslate nohighlight">\(g\)</span> and <span class="math notranslate nohighlight">\(f^{*}\)</span>, the convex conjugate of <span class="math notranslate nohighlight">\(f\)</span>, respectively.</p>
+<p>The operator <span class="math notranslate nohighlight">\(K\)</span> is a continuous linear operator with operator norm defined as</p>
+<div class="math notranslate nohighlight">
+\[\|K\| = \max\{ \|Kx\| : x\in X, \|x\|\leq1\}\]</div>
+<p>The saddle point problem is decomposed into the primal problem:</p>
+<div class="math notranslate nohighlight">
+\[\min_{x\in X} f(Kx) + g(x),\]</div>
+<p>and its corresponding dual problem</p>
+<div class="math notranslate nohighlight">
+\[\max_{y\in Y} - g^{*}(-K^{*}y) - f^{*}(y).\]</div>
+<p>The PDHG algorithm consists of three steps:</p>
+<ul class="simple">
+<li><p>gradient ascent step for the dual problem,</p></li>
+<li><p>gradient descent step for the primal problem and</p></li>
+<li><p>an over-relaxation of the primal variable.</p></li>
 </ul>
+<div class="math notranslate nohighlight">
+\[y^{n+1} = \mathrm{prox}_{\sigma f^{*}}(y^{n} + \sigma K \bar{x}^{n})\]</div>
+<div class="math notranslate nohighlight">
+\[x^{n+1} = \mathrm{prox}_{\tau g}(x^{n} - \tau K^{*}y^{n+1})\]</div>
+<div class="math notranslate nohighlight">
+\[\bar{x}^{n+1} = x^{n+1} + \theta (x^{n+1} - x^{n})\]</div>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>Convergence is guaranteed if <span class="math notranslate nohighlight">\(\theta\)</span> = 1.0,  the operator norm <span class="math notranslate nohighlight">\(\|K\|\)</span>, the dual step size <span class="math notranslate nohighlight">\(\sigma\)</span> and the primal step size <span class="math notranslate nohighlight">\(\tau\)</span>, satisfy the following inequality:</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[\tau \sigma \|K\|^2 &lt; 1\]</div>
+<ul>
+<li><p>By default, the step sizes <span class="math notranslate nohighlight">\(\sigma\)</span> and <span class="math notranslate nohighlight">\(\tau\)</span> are positive scalars and defined as below:</p>
+<ul class="simple">
+<li><p>If <code class="docutils literal notranslate"><span class="pre">sigma</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code> and <code class="docutils literal notranslate"><span class="pre">tau</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code>:</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[\sigma = \frac{1}{\|K\|},  \tau = \frac{1}{\|K\|}\]</div>
+<ul class="simple">
+<li><p>If <code class="docutils literal notranslate"><span class="pre">tau</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code>:</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[\tau = \frac{1}{\sigma\|K\|^{2}}\]</div>
+<ul class="simple">
+<li><p>If <code class="docutils literal notranslate"><span class="pre">sigma</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code>:</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[\sigma = \frac{1}{\tau\|K\|^{2}}\]</div>
+</li>
+<li><p>To monitor the convergence of the algorithm, we compute the primal/dual objectives and the primal-dual gap in <a class="reference internal" href="#cil.optimisation.algorithms.PDHG.update_objective" title="cil.optimisation.algorithms.PDHG.update_objective"><code class="xref py py-meth docutils literal notranslate"><span class="pre">update_objective()</span></code></a>.</p>
+<p>The primal objective is</p>
+<div class="math notranslate nohighlight">
+\[f(Kx) + g(x)\]</div>
+<p>and the dual objective is</p>
+<div class="math notranslate nohighlight">
+\[- g^{*}(-K^{*}y) - f^{*}(y)\]</div>
+<p>The primal-dual gap (or duality gap) is</p>
+<div class="math notranslate nohighlight">
+\[f(Kx) + g(x) + g^{*}(-K^{*}y) + f^{*}(y)\]</div>
+<p>and measures how close is the primal-dual pair (x,y) to the primal-dual solution. It is always non-negative and is used to monitor convergence of the PDHG algorithm. For more information, see <a class="reference external" href="https://en.wikipedia.org/wiki/Duality_gap">Duality Gap</a>.</p>
+</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>The primal objective is printed if <cite>verbose=1</cite>, <code class="docutils literal notranslate"><span class="pre">pdhg.run(verbose=1)</span></code>.</p></li>
+<li><p>All the objectives are printed if <cite>verbose=2</cite>, <code class="docutils literal notranslate"><span class="pre">pdhg.run(verbose=2)</span></code>.</p></li>
+</ul>
+<p>Computing these objectives can be costly, so it is better to compute every some iterations. To do this, use <code class="docutils literal notranslate"><span class="pre">update_objective_interval</span> <span class="pre">=</span> <span class="pre">#number</span></code>.</p>
+</div>
+<ul>
+<li><p>PDHG algorithm can be accelerated if the functions <span class="math notranslate nohighlight">\(f^{*}\)</span> and/or <span class="math notranslate nohighlight">\(g\)</span> are strongly convex. In these cases, the step-sizes <span class="math notranslate nohighlight">\(\sigma\)</span> and <span class="math notranslate nohighlight">\(\tau\)</span> are updated using the <a class="reference internal" href="#cil.optimisation.algorithms.PDHG.update_step_sizes" title="cil.optimisation.algorithms.PDHG.update_step_sizes"><code class="xref py py-meth docutils literal notranslate"><span class="pre">update_step_sizes()</span></code></a> method. A function <span class="math notranslate nohighlight">\(f\)</span> is strongly convex with constant <span class="math notranslate nohighlight">\(\gamma&gt;0\)</span> if</p>
+<div class="math notranslate nohighlight">
+\[f(x) - \frac{\gamma}{2}\|x\|^{2} \quad\mbox{ is convex. }\]</div>
+<ul class="simple">
+<li><p>For instance the function <span class="math notranslate nohighlight">\(\frac{1}{2}\|x\|^{2}_{2}\)</span> is <span class="math notranslate nohighlight">\(\gamma\)</span> strongly convex for <span class="math notranslate nohighlight">\(\gamma\in(-\infty,1]\)</span>. We say it is 1-strongly convex because it is the largest constant for which <span class="math notranslate nohighlight">\(f - \frac{1}{2}\|\cdot\|^{2}\)</span> is convex.</p></li>
+<li><p>The <span class="math notranslate nohighlight">\(\|\cdot\|_{1}\)</span> norm is not strongly convex. For more information, see <a class="reference external" href="https://en.wikipedia.org/wiki/Convex_function#Strongly_convex_functions">Strongly Convex</a>.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\(g\)</span> is strongly convex with constant <span class="math notranslate nohighlight">\(\gamma\)</span> then the step-sizes <span class="math notranslate nohighlight">\(\sigma\)</span>, <span class="math notranslate nohighlight">\(\tau\)</span> and <span class="math notranslate nohighlight">\(\theta\)</span> are updated as:</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+   \begin{aligned}
+
+       \theta_{n} &amp; = \frac{1}{\sqrt{1 + 2\gamma\tau_{n}}}\\
+       \tau_{n+1} &amp; = \theta_{n}\tau_{n}\\
+       \sigma_{n+1} &amp; = \frac{\sigma_{n}}{\theta_{n}}
+
+   \end{aligned}</div><ul class="simple">
+<li><p>If <span class="math notranslate nohighlight">\(f^{*}\)</span> is strongly convex, we swap <span class="math notranslate nohighlight">\(\sigma\)</span> with <span class="math notranslate nohighlight">\(\tau\)</span>.</p></li>
+</ul>
+</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The case where both functions are strongly convex is not available at the moment.</p>
+</div>
+<div class="admonition-todo admonition" id="id9">
+<p class="admonition-title">Todo</p>
+<p>Implement acceleration of PDHG when both functions are strongly convex.</p>
+</div>
+<p class="rubric">References</p>
+<p id="id10"><dl class="citation">
+<dt class="label" id="id11"><span class="brackets"><a class="fn-backref" href="#id5">1</a></span></dt>
+<dd><p>Antonin Chambolle and Thomas Pock. A first-order primal-dual algorithm for convex problems with applications to imaging. <em>Journal of Mathematical Imaging and Vision</em>, 40(1):120–145, May 2011. URL: <a class="reference external" href="https://doi.org/10.1007/s10851-010-0251-1">https://doi.org/10.1007/s10851-010-0251-1</a>, <a class="reference external" href="https://doi.org/10.1007/s10851-010-0251-1">doi:10.1007/s10851-010-0251-1</a>.</p>
+</dd>
+<dt class="label" id="id12"><span class="brackets"><a class="fn-backref" href="#id6">2</a></span></dt>
+<dd><p>Ernie Esser, Xiaoqun Zhang, and Tony F. Chan. A general framework for a class of first order primal-dual algorithms for convex optimization in imaging science. <em>SIAM Journal on Imaging Sciences</em>, 3(4):1015–1046, 2010. URL: <a class="reference external" href="https://doi.org/10.1137/09076934X">https://doi.org/10.1137/09076934X</a>, <a class="reference external" href="https://arxiv.org/abs/https://doi.org/10.1137/09076934X">arXiv:https://doi.org/10.1137/09076934X</a>, <a class="reference external" href="https://doi.org/10.1137/09076934X">doi:10.1137/09076934X</a>.</p>
+</dd>
+<dt class="label" id="id14"><span class="brackets"><a class="fn-backref" href="#id7">3</a></span></dt>
+<dd><p>J. S. Jörgensen, E. Ametova, G. Burca, G. Fardell, E. Papoutsellis, E. Pasca, K. Thielemans, M. Turner, R. Warr, W. R. B. Lionheart, and P. J. Withers. Core imaging library - part i: a versatile python framework for tomographic imaging. <em>Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences</em>, 379(2204):20200192, 2021. URL: <a class="reference external" href="https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192">https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0192</a>, <a class="reference external" href="https://arxiv.org/abs/https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192">arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0192</a>, <a class="reference external" href="https://doi.org/10.1098/rsta.2020.0192">doi:10.1098/rsta.2020.0192</a>.</p>
+</dd>
+<dt class="label" id="id13"><span class="brackets"><a class="fn-backref" href="#id8">4</a></span></dt>
+<dd><p>Evangelos Papoutsellis, Evelina Ametova, Claire Delplancke, Gemma Fardell, Jakob S. Jörgensen, Edoardo Pasca, Martin Turner, Ryan Warr, William R. B. Lionheart, and Philip J. Withers. Core imaging library - part ii: multichannel reconstruction for dynamic and spectral tomography. <em>Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences</em>, 379(2204):20200193, 2021. URL: <a class="reference external" href="https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193">https://royalsocietypublishing.org/doi/abs/10.1098/rsta.2020.0193</a>, <a class="reference external" href="https://arxiv.org/abs/https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193">arXiv:https://royalsocietypublishing.org/doi/pdf/10.1098/rsta.2020.0193</a>, <a class="reference external" href="https://doi.org/10.1098/rsta.2020.0193">doi:10.1098/rsta.2020.0193</a>.</p>
 </dd>
 </dl>
-</dd></dl>
-
+</p>
 <dl class="method">
 <dt id="cil.optimisation.algorithms.PDHG.update">
 <code class="sig-name descname">update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/PDHG.html#PDHG.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.optimisation.algorithms.PDHG.update" title="Permalink to this definition">¶</a></dt>
-<dd><p>A single iteration of the algorithm</p>
+<dd><p>Performs a single iteration of the PDHG algorithm</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cil.optimisation.algorithms.PDHG.set_step_sizes">
+<code class="sig-name descname">set_step_sizes</code><span class="sig-paren">(</span><em class="sig-param">sigma=None</em>, <em class="sig-param">tau=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/PDHG.html#PDHG.set_step_sizes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.optimisation.algorithms.PDHG.set_step_sizes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets sigma and tau step-sizes for the PDHG algorithm. The step sizes can be either scalar or array-objects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sigma</strong> (positive <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, or <cite>np.ndarray</cite>, <cite>DataContainer</cite>, <cite>BlockDataContainer</cite>, optional, default=None) – Step size for the dual problem.</p></li>
+<li><p><strong>tau</strong> (positive <code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>, or <cite>np.ndarray</cite>, <cite>DataContainer</cite>, <cite>BlockDataContainer</cite>, optional, default=None) – Step size for the primal problem.</p></li>
+</ul>
+</dd>
+</dl>
+<p>The user can set either, both or none. Values passed by the user will be accepted as long as they are positive numbers,
+or correct shape array like objects. Warnings may be given in the case the scalar values passed do not guarantee the algorithm
+convergence.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cil.optimisation.algorithms.PDHG.update_step_sizes">
+<code class="sig-name descname">update_step_sizes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/PDHG.html#PDHG.update_step_sizes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.optimisation.algorithms.PDHG.update_step_sizes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates step sizes in the cases of primal or dual acceleration using the strongly convexity property. The case where both functions are strongly convex is not available at the moment.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="cil.optimisation.algorithms.PDHG.update_objective">
 <code class="sig-name descname">update_objective</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/PDHG.html#PDHG.update_objective"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.optimisation.algorithms.PDHG.update_objective" title="Permalink to this definition">¶</a></dt>
-<dd><p>calculates the objective with the current solution</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cil.optimisation.algorithms.PDHG.update_previous_solution">
-<code class="sig-name descname">update_previous_solution</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/algorithms/PDHG.html#PDHG.update_previous_solution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.optimisation.algorithms.PDHG.update_previous_solution" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the previous solution with the current one</p>
-<p>The concrete algorithm calls update_previous_solution. Normally this would
-entail the swapping of pointers:</p>
-<p>tmp = self.x_old
-self.x_old = self.x
-self.x = tmp</p>
+<dd><p>Evaluates the primal objective, the dual objective and the primal-dual gap.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1859,12 +1963,12 @@ e.g. <code class="code docutils literal notranslate"><span class="pre">f(x)</spa
 </ul>
 </dd>
 </dl>
-<p>Lipschitz of the gradient of the function; it is a positive real number, such that <a href="#id10"><span class="problematic" id="id11">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
+<p>Lipschitz of the gradient of the function; it is a positive real number, such that <a href="#id20"><span class="problematic" id="id21">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
 <dl class="method">
 <dt id="cil.optimisation.functions.Function.L">
 <em class="property">property </em><code class="sig-name descname">L</code><a class="headerlink" href="#cil.optimisation.functions.Function.L" title="Permalink to this definition">¶</a></dt>
 <dd><p>Lipschitz of the gradient of function f.</p>
-<p>L is positive real number, such that <a href="#id12"><span class="problematic" id="id13">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
+<p>L is positive real number, such that <a href="#id22"><span class="problematic" id="id23">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
 </dd></dl>
 
 <dl class="method">
@@ -2011,7 +2115,7 @@ if both of them are differentiable</p>
 <dt id="cil.optimisation.functions.ScaledFunction.L">
 <em class="property">property </em><code class="sig-name descname">L</code><a class="headerlink" href="#cil.optimisation.functions.ScaledFunction.L" title="Permalink to this definition">¶</a></dt>
 <dd><p>Lipschitz of the gradient of function f.</p>
-<p>L is positive real number, such that <a href="#id14"><span class="problematic" id="id15">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
+<p>L is positive real number, such that <a href="#id24"><span class="problematic" id="id25">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
 </dd></dl>
 
 <dl class="method">
@@ -2167,7 +2271,7 @@ if both of them are differentiable</p>
 <dt id="cil.optimisation.functions.ConstantFunction.L">
 <em class="property">property </em><code class="sig-name descname">L</code><a class="headerlink" href="#cil.optimisation.functions.ConstantFunction.L" title="Permalink to this definition">¶</a></dt>
 <dd><p>Lipschitz of the gradient of function f.</p>
-<p>L is positive real number, such that <a href="#id16"><span class="problematic" id="id17">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
+<p>L is positive real number, such that <a href="#id26"><span class="problematic" id="id27">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
 </dd></dl>
 
 <dl class="method">
@@ -2272,7 +2376,7 @@ for convergence purposes.</p>
 <p>This class allows the user to write a function which does the following:</p>
 <div class="math notranslate nohighlight">
 \[F ( x ) = G ( Ax )\]</div>
-<p>where <span class="math notranslate nohighlight">\(A\)</span> is an operator. For instance the least squares function <a href="#id28"><span class="problematic" id="id29">l2norm_</span></a> <code class="code docutils literal notranslate"><span class="pre">Norm2Sq</span></code> can
+<p>where <span class="math notranslate nohighlight">\(A\)</span> is an operator. For instance the least squares function <a href="#id38"><span class="problematic" id="id39">l2norm_</span></a> <code class="code docutils literal notranslate"><span class="pre">Norm2Sq</span></code> can
 be expressed as</p>
 <div class="math notranslate nohighlight">
 \[F(x) = || Ax - b ||^2_2\]</div>
@@ -2296,7 +2400,7 @@ proximal and proximal_conjugate</p>
 <dt id="cil.optimisation.functions.OperatorCompositionFunction.L">
 <em class="property">property </em><code class="sig-name descname">L</code><a class="headerlink" href="#cil.optimisation.functions.OperatorCompositionFunction.L" title="Permalink to this definition">¶</a></dt>
 <dd><p>Lipschitz of the gradient of function f.</p>
-<p>L is positive real number, such that <a href="#id18"><span class="problematic" id="id19">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
+<p>L is positive real number, such that <a href="#id28"><span class="problematic" id="id29">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
 </dd></dl>
 
 <dl class="method">
@@ -2770,7 +2874,7 @@ see <em>TranslateFunction</em>.</p>
 <dt id="cil.optimisation.functions.LeastSquares.L">
 <em class="property">property </em><code class="sig-name descname">L</code><a class="headerlink" href="#cil.optimisation.functions.LeastSquares.L" title="Permalink to this definition">¶</a></dt>
 <dd><p>Lipschitz of the gradient of function f.</p>
-<p>L is positive real number, such that <a href="#id20"><span class="problematic" id="id21">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
+<p>L is positive real number, such that <a href="#id30"><span class="problematic" id="id31">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
 </dd></dl>
 
 <dl class="method">
@@ -2885,7 +2989,7 @@ see <em>TranslateFunction</em>.</p>
 <dt id="cil.optimisation.functions.SmoothMixedL21Norm.gradient">
 <code class="sig-name descname">gradient</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">out=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/MixedL21Norm.html#SmoothMixedL21Norm.gradient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cil.optimisation.functions.SmoothMixedL21Norm.gradient" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the value of the gradient of the SmoothMixedL21Norm function at x.</p>
-<p>frac{x}{<a href="#id22"><span class="problematic" id="id23">|x|</span></a>}</p>
+<p>frac{x}{<a href="#id32"><span class="problematic" id="id33">|x|</span></a>}</p>
 </dd></dl>
 
 </dd></dl>
@@ -2939,7 +3043,7 @@ doi: 10.1109/TIP.2009.2028250.</p>
 <dt id="cil.optimisation.functions.TotalVariation.L">
 <em class="property">property </em><code class="sig-name descname">L</code><a class="headerlink" href="#cil.optimisation.functions.TotalVariation.L" title="Permalink to this definition">¶</a></dt>
 <dd><p>Lipschitz of the gradient of function f.</p>
-<p>L is positive real number, such that <a href="#id24"><span class="problematic" id="id25">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
+<p>L is positive real number, such that <a href="#id34"><span class="problematic" id="id35">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
 </dd></dl>
 
 <dl class="method">
@@ -3013,7 +3117,7 @@ problems in the following form:</p>
 </ul>
 <div class="section" id="blockdatacontainer">
 <h2>BlockDataContainer<a class="headerlink" href="#blockdatacontainer" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="framework.html#cil.framework.BlockDataContainer">BlockDataContainer</a> holds <a href="#id30"><span class="problematic" id="id31">`DataContainer`_</span></a> as column vector. It is possible to
+<p><a class="reference external" href="framework.html#cil.framework.BlockDataContainer">BlockDataContainer</a> holds <a href="#id40"><span class="problematic" id="id41">`DataContainer`_</span></a> as column vector. It is possible to
 do basic algebra between <a class="reference external" href="framework.html#cil.framework.BlockDataContainer">BlockDataContainer</a> s and with numbers, list or numpy arrays.</p>
 <div class="math notranslate nohighlight">
 \[ \begin{align}\begin{aligned}x = [x_{1}, x_{2} ]\in (X_{1}\times X_{2})\\y = [y_{1}, y_{2}, y_{3} ]\in(Y_{1}\times Y_{2} \times Y_{3})\end{aligned}\end{align} \]</div>
@@ -3024,8 +3128,8 @@ do basic algebra between <a class="reference external" href="framework.html#cil.
 <p>Provides basic algebra between BlockDataContainer’s, DataContainer’s and
 subclasses and Numbers</p>
 <ol class="arabic simple">
-<li><p>algebra between <a href="#id5"><span class="problematic" id="id6">`</span></a>BlockDataContainer`s will be element-wise, only if
-the shape of the 2 <a href="#id7"><span class="problematic" id="id8">`</span></a>BlockDataContainer`s is the same, otherwise it
+<li><p>algebra between <a href="#id15"><span class="problematic" id="id16">`</span></a>BlockDataContainer`s will be element-wise, only if
+the shape of the 2 <a href="#id17"><span class="problematic" id="id18">`</span></a>BlockDataContainer`s is the same, otherwise it
 will fail</p></li>
 <li><p>algebra between <cite>BlockDataContainer`s and `list</cite> or <cite>numpy array</cite> will
 work as long as the number of <cite>rows</cite> and element of the arrays match,
@@ -3329,7 +3433,7 @@ can be decomposed along the proximal operators of each function <span class="mat
 <dt id="cil.optimisation.functions.BlockFunction.L">
 <em class="property">property </em><code class="sig-name descname">L</code><a class="headerlink" href="#cil.optimisation.functions.BlockFunction.L" title="Permalink to this definition">¶</a></dt>
 <dd><p>Lipschitz of the gradient of function f.</p>
-<p>L is positive real number, such that <a href="#id26"><span class="problematic" id="id27">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
+<p>L is positive real number, such that <a href="#id36"><span class="problematic" id="id37">|f'(x) - f'(y)|</span></a> &lt;= L ||x-y||, assuming f: IG –&gt; R</p>
 </dd></dl>
 
 <dl class="method">

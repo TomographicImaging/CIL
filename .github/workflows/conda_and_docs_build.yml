@@ -16,7 +16,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: conda-build
-      uses: paskino/conda-package-publish-action@v1.4.2
+      uses: paskino/conda-package-publish-action@v1.4.3
       with:
         subDir: 'recipe'
         channels: 'conda-forge -c intel -c astra-toolbox/label/dev -c cvxgrp -c ccpi'

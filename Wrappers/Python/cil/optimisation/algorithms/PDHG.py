@@ -247,9 +247,7 @@ class PDHG(Algorithm):
 
         self.set_gamma_g(kwargs.get('gamma_g', None))
         self.set_gamma_fconj(kwargs.get('gamma_fconj', None))  
-        if self.gamma_g is not None and self.gamma_fconj is not None:
-            raise ValueError("The adaptive update of the PDHG stepsizes in the case where both functions are strongly convex is not implemented at the moment.")                           
-
+        
         self.set_up(f=f, g=g, operator=operator, tau=tau, sigma=sigma, initial=initial, **kwargs)
 
 
@@ -280,7 +278,10 @@ class PDHG(Algorithm):
         ----------
             value : a positive number       
         '''
-        
+        if self.gamma_fconj is not None:
+            raise ValueError("The adaptive update of the PDHG stepsizes in the case where both functions are strongly convex is not implemented at the moment." +\
+                "Currently the strongly convex constant of the convex conjugate of the function f has been specified.")                           
+
         if isinstance (value, Number): 
             if value <= 0:                      
                 raise ValueError("Strongly convex constant is a positive number, {} is passed for the strongly convex function g.".format(value))                   
@@ -298,6 +299,10 @@ class PDHG(Algorithm):
         ----------
             value : a positive number       
         '''
+        if self.gamma_g is not None:
+            raise ValueError("The adaptive update of the PDHG stepsizes in the case where both functions are strongly convex is not implemented at the moment." +\
+                "Currently the strongly convex constant of the function g has been specified.")                           
+
         if isinstance (value, Number): 
             if value <= 0:                     
                 raise ValueError("Strongly convex constant is positive, {} is passed for the strongly convex conjugate function of f.".format(value))   

@@ -140,21 +140,18 @@ class TestFunction(unittest.TestCase):
         
         d = ag.allocate(ImageGeometry.RANDOM)
         alpha = 0.5
+
         # scaled function
         g = alpha * L2NormSquared(b=noisy_data)
         
         # Compare call of g
         a2 = alpha*(d - noisy_data).power(2).sum()
-        #print(a2, g(d)) 
+
         self.assertEqual(a2, g(d))
         
         # Compare convex conjugate of g
         a3 = 0.5 * d.squared_norm() + d.dot(noisy_data)
         self.assertAlmostEqual(a3, g.convex_conjugate(d), places=7)
-        #print( a3, g.convex_conjugate(d))
-
-        #test proximal conjugate
-
     
     def test_L2NormSquared(self):
         # TESTS for L2 and scalar * L2

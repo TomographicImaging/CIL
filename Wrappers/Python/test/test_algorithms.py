@@ -407,67 +407,55 @@ class TestAlgorithms(unittest.TestCase):
 
         #check if sigma, tau are None 
         pdhg = PDHG(f=f, g=g, operator=operator, max_iteration=10)
-        self.assertEqual(pdhg.sigma, 1./operator.norm())
-        self.assertEqual(pdhg.tau, 1./operator.norm())
+        self.assertAlmostEqual(pdhg.sigma, 1./operator.norm())
+        self.assertAlmostEqual(pdhg.tau, 1./operator.norm())
 
         #check if sigma is negative
-        try:
+        with self.assertRaises(ValueError):
             pdhg = PDHG(f=f, g=g, operator=operator, max_iteration=10, sigma = -1)
-        except ValueError as ve:
-            print(ve)
-
+        
         #check if tau is negative
-        try:
+        with self.assertRaises(ValueError):
             pdhg = PDHG(f=f, g=g, operator=operator, max_iteration=10, tau = -1)
-        except ValueError as ve:
-            print(ve)
-
+        
         #check if tau is None 
         sigma = 3.0
         pdhg = PDHG(f=f, g=g, operator=operator, sigma = sigma, max_iteration=10)
-        self.assertEqual(pdhg.sigma, sigma)
-        self.assertEqual(pdhg.tau, 1./(sigma * operator.norm()**2)) 
+        self.assertAlmostEqual(pdhg.sigma, sigma)
+        self.assertAlmostEqual(pdhg.tau, 1./(sigma * operator.norm()**2)) 
 
         #check if sigma is None 
         tau = 3.0
         pdhg = PDHG(f=f, g=g, operator=operator, tau = tau, max_iteration=10)
-        self.assertEqual(pdhg.tau, tau)
-        self.assertEqual(pdhg.sigma, 1./(tau * operator.norm()**2)) 
+        self.assertAlmostEqual(pdhg.tau, tau)
+        self.assertAlmostEqual(pdhg.sigma, 1./(tau * operator.norm()**2)) 
 
         #check if sigma/tau are not None 
         tau = 1.0
         sigma = 1.0
         pdhg = PDHG(f=f, g=g, operator=operator, tau = tau, sigma = sigma, max_iteration=10)
-        self.assertEqual(pdhg.tau, tau)
-        self.assertEqual(pdhg.sigma, sigma) 
+        self.assertAlmostEqual(pdhg.tau, tau)
+        self.assertAlmostEqual(pdhg.sigma, sigma) 
 
         #check sigma/tau as arrays, sigma wrong shape
         ig1 = ImageGeometry(2,2)
         sigma = ig1.allocate()
-        try:
+        with self.assertRaises(ValueError):
             pdhg = PDHG(f=f, g=g, operator=operator, sigma = sigma, max_iteration=10)
-        except ValueError as ve:
-            print(ve)
 
         #check sigma/tau as arrays, tau wrong shape
         tau = ig1.allocate()
-        try:
+        with self.assertRaises(ValueError):
             pdhg = PDHG(f=f, g=g, operator=operator, tau = tau, max_iteration=10)
-        except ValueError as ve:
-            print(ve)    
-
-        # check sigma not Number or array-Like object   
-        try:
+        
+        # check sigma not Number or object with correct shape
+        with self.assertRaises(AttributeError):
             pdhg = PDHG(f=f, g=g, operator=operator, sigma = "sigma", max_iteration=10)
-        except AttributeError as ve:
-            print(ve)
-
-        # check tau not Number or array-Like object   
-        try:
+        
+        # check tau not Number or object with correct shape
+        with self.assertRaises(AttributeError):
             pdhg = PDHG(f=f, g=g, operator=operator, tau = "tau", max_iteration=10)
-        except AttributeError as ve:
-            print(ve)            
-
+        
         # check warning message if condition is not satisfied
         sigma = 4
         tau = 1/3
@@ -491,26 +479,24 @@ class TestAlgorithms(unittest.TestCase):
         pdhg = PDHG(f=f, g=g, operator=operator, sigma = sigma, tau=tau,
                     max_iteration=5, gamma_g=0.5)
         pdhg.run(1, verbose=0)
-        self.assertEquals(pdhg.theta, 1.0/ np.sqrt(1 + 2 * pdhg.gamma_g * tau))
-        self.assertEquals(pdhg.tau, tau * pdhg.theta)
-        self.assertEquals(pdhg.sigma, sigma / pdhg.theta)
+        self.assertAlmostEquals(pdhg.theta, 1.0/ np.sqrt(1 + 2 * pdhg.gamma_g * tau))
+        self.assertAlmostEquals(pdhg.tau, tau * pdhg.theta)
+        self.assertAlmostEquals(pdhg.sigma, sigma / pdhg.theta)
         pdhg.run(4, verbose=0)
-        self.assertNotEqual(pdhg.sigma, sigma)
-        self.assertNotEqual(pdhg.tau, tau)  
+        self.assertAlmostEquals(pdhg.sigma, sigma)
+        self.assertAlmostEquals(pdhg.tau, tau)  
 
         # check negative strongly convex constant
-        try:
+        with self.assertRaises(ValueError):
             pdhg = PDHG(f=f, g=g, operator=operator, sigma = sigma, tau=tau,
                     max_iteration=5, gamma_g=-0.5)  
-        except ValueError as ve:
-            print(ve) 
+        
 
         # check strongly convex constant not a number
-        try:
+        with self.assertRaises(ValueError):
             pdhg = PDHG(f=f, g=g, operator=operator, sigma = sigma, tau=tau,
                     max_iteration=5, gamma_g="-0.5")  
-        except ValueError as ve:
-            print(ve)                               
+                              
 
     def test_PDHG_strongly_convex_gamma_fcong(self):
 

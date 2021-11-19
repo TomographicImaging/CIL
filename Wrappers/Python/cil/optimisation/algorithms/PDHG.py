@@ -429,7 +429,7 @@ class PDHG(Algorithm):
                 Step size for the primal problem.
 
         The user can set either, both or none. Values passed by the user will be accepted as long as they are positive numbers, 
-        or correct shape array like objects. Warnings will be given in the case the values passed do not guarantee the algorithm
+        or correct shape array like objects. Warnings may be given in the case the scalar values passed do not guarantee the algorithm
         convergence.
         """
         

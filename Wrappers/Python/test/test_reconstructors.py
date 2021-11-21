@@ -18,8 +18,6 @@
 
 from cil.framework import AcquisitionGeometry
 from cil.recon.Reconstructor import Reconstructor # checks on baseclass
-from cil.recon.FBP import GenericFilteredBackProjection # checks on baseclass
-from cil.recon import FDK, FBP
 from cil.utilities.dataexample import SIMULATED_PARALLEL_BEAM_DATA, SIMULATED_CONE_BEAM_DATA, SIMULATED_SPHERE_VOLUME
 
 import unittest
@@ -33,6 +31,9 @@ if has_tigre:
     from cil.plugins.tigre import ProjectionOperator as ProjectionOperator
     from cil.plugins.tigre import FBP as FBP_tigre
     from tigre.utilities.filtering import ramp_flat, filter
+
+    from cil.recon.FBP import GenericFilteredBackProjection # checks on baseclass
+    from cil.recon import FDK, FBP
 
 gpu_test = has_gpu_tigre()
 if  not gpu_test:

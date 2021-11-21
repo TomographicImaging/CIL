@@ -22,7 +22,7 @@ test:
     - scikit-image
     - tomophantom        # [ np<1.19 and linux ]
     - cil-astra >=21.3.0 # [ py!=39 and not osx ] 
-    - tigre >=2.2        # [ not osx ] 
+    - tigre =2.1         # [ not osx ] 
     - numba
     - packaging
     - ccpi-regulariser   # [ not osx ]

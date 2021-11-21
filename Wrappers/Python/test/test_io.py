@@ -38,19 +38,22 @@ try:
 except ImportError as ie:
     has_dxchange = False
 has_olefile = True
+
 try:
     import olefile
 except ImportError as ie:
     has_olefile = False
+
 has_wget = True
 try:
     import wget
 except ImportError as ie:
     has_wget = False
+except ModuleNotFoundError:
+    has_wget = False
+
 has_prerequisites = has_olefile and has_dxchange and has_tigre and has_file \
     and has_wget
-import wget
-
 
 from cil.utilities.quality_measures import mae, mse, psnr
 

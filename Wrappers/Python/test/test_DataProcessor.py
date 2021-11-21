@@ -34,7 +34,6 @@ from cil.io import NEXUSDataReader
 from cil.processors import CentreOfRotationCorrector, CofR_xcorrelation, CofR_image_sharpness
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
 from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder
-import wget
 import os
 
 from utils import has_gpu_tigre

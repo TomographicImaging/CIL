@@ -37,19 +37,11 @@ from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder
 import wget
 import os
 
-from utils import has_gpu_tigre, has_gpu_astra
+from utils import has_gpu_tigre
 
-
-try:
-    import tigre
+if has_gpu_tigre():
+    from cil.plugins.tigre import FBP, ProjectionOperator
     has_tigre = True
-except ModuleNotFoundError:
-    print(  "This plugin requires the additional package TIGRE\n" +
-            "Please install it via conda as tigre from the ccpi channel\n"+
-            "Minimal version is 21.01")
-    has_tigre = False
-else:
-    from cil.plugins.tigre import FBP as TigreFBP
 
 try:
     import tomophantom
@@ -60,14 +52,6 @@ except ModuleNotFoundError:
     has_tomophantom = False
 else:
     from cil.plugins import TomoPhantom
-
-try:
-    import astra
-    from cil.plugins.astra import FBP as AstraFBP
-    from cil.plugins.astra import ProjectionOperator
-    has_astra = True
-except ModuleNotFoundError:
-    has_astra = False
 
 
 class TestPadder(unittest.TestCase):
@@ -333,12 +317,6 @@ class TestPadder(unittest.TestCase):
         numpy.testing.assert_allclose(data_padded.as_array(), data_new, rtol=1E-6)
     
     
-
-
-has_astra = has_astra and has_gpu_astra()
-has_tigre = has_tigre and has_gpu_tigre()
-
-
 class TestBinner(unittest.TestCase):
     def test_Binner(self):
         #test parallel 2D case
@@ -742,7 +720,6 @@ class TestCentreOfRotation_parallel(unittest.TestCase):
         self.data_DLS *= -1
 
     def test_CofR_xcorrelation(self):       
-
         corr = CofR_xcorrelation(slice_index='centre', projection_index=0, ang_tol=0.1)
         corr.set_input(self.data_DLS.clone())
         ad_out = corr.get_output()
@@ -753,17 +730,10 @@ class TestCentreOfRotation_parallel(unittest.TestCase):
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)              
 
-    @unittest.skipUnless(has_astra, "ASTRA not installed")
-    def test_CofR_image_sharpness_astra(self):
-        corr = CofR_image_sharpness(search_range=20, FBP=AstraFBP)
-        corr.set_input(self.data_DLS.clone())
-        ad_out = corr.get_output()
-        self.assertAlmostEqual(6.48, ad_out.geometry.config.system.rotation_axis.position[0],places=1)     
 
-
-    @unittest.skipUnless(False, "TIGRE not installed")
-    def skiptest_test_CofR_image_sharpness_tigre(self): #currently not avaliable for parallel beam
-        corr = CofR_image_sharpness(search_range=20, FBP=TigreFBP)
+    @unittest.skipUnless(has_tigre, "TIGRE not installed")
+    def skiptest_test_CofR_image_sharpness(self): #currently not avaliable for parallel beam
+        corr = CofR_image_sharpness(search_range=20, FBP=FBP)
         corr.set_input(self.data_DLS.clone())
         ad_out = corr.get_output()
         self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=2)     
@@ -793,7 +763,7 @@ class TestCentreOfRotation_conebeam(unittest.TestCase):
         ig = ag_orig.get_ImageGeometry()
         phantom = TomoPhantom.get_ImageData(12, ig)
 
-        Op = ProjectionOperator(ig, ag_orig, device='gpu')
+        Op = ProjectionOperator(ig, ag_orig)
         self.data_0 = Op.direct(phantom)
 
         ag_offset = AcquisitionGeometry.create_Cone2D([0,-100],[0,100],rotation_axis_position=(-0.150,0))\
@@ -801,27 +771,18 @@ class TestCentreOfRotation_conebeam(unittest.TestCase):
             .set_angles(angles)\
             .set_labels(['angle', 'horizontal'])
 
-        Op = ProjectionOperator(ig, ag_offset, device='gpu')
+        Op = ProjectionOperator(ig, ag_offset)
         self.data_offset = Op.direct(phantom)
         self.data_offset.geometry = ag_orig
-
-    @unittest.skipUnless(has_tomophantom and has_astra, "Tomophantom or ASTRA not installed")
-    def test_CofR_image_sharpness_astra(self):
-        corr = CofR_image_sharpness(FBP=AstraFBP)
-        ad_out = corr(self.data_0)
-        self.assertAlmostEqual(0.000, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
-
-        corr = CofR_image_sharpness(FBP=AstraFBP)
-        ad_out = corr(self.data_offset)
-        self.assertAlmostEqual(-0.150, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
+  
 
     @unittest.skipUnless(has_tomophantom and has_tigre, "Tomophantom or TIGRE not installed")
-    def test_CofR_image_sharpness_tigre(self): #currently not avaliable for parallel beam
-        corr = CofR_image_sharpness(FBP=TigreFBP)
+    def test_CofR_image_sharpness(self): #currently not avaliable for parallel beam
+        corr = CofR_image_sharpness(FBP=FBP)
         ad_out = corr(self.data_0)
         self.assertAlmostEqual(0.000, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
 
-        corr = CofR_image_sharpness(FBP=TigreFBP)
+        corr = CofR_image_sharpness(FBP=FBP)
         ad_out = corr(self.data_offset)
         self.assertAlmostEqual(-0.150, ad_out.geometry.config.system.rotation_axis.position[0],places=3)     
 

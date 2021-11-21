@@ -22,11 +22,12 @@ import os
 import olefile
 from cil.framework import ImageGeometry
 from cil.io import TXRMDataReader, NEXUSDataReader
-has_astra = True
-try:
-    from cil.astra.processors import FBP
-except ImportError as ie:
-    has_astra = False
+from utils import has_gpu_tigre
+
+if has_gpu_tigre():
+    from cil.plugins.tigre import FBP
+    has_tigre = True
+
 from cil.utilities.dataexample import data_dir
 filename = os.path.join(data_dir, "valnut_tomo-A.txrm")
 has_file = os.path.isfile(filename)
@@ -46,14 +47,14 @@ try:
     import wget
 except ImportError as ie:
     has_wget = False
-has_prerequisites = has_olefile and has_dxchange and has_astra and has_file \
+has_prerequisites = has_olefile and has_dxchange and has_tigre and has_file \
     and has_wget
 import wget
 
 
 from cil.utilities.quality_measures import mae, mse, psnr
 
-print ("has_astra",has_astra)
+print ("has_tigre",has_tigre)
 print ("has_wget",has_wget)
 print ("has_olefile",has_olefile)
 print ("has_dxchange",has_dxchange)
@@ -65,7 +66,7 @@ if not has_file:
 class TestTXRMDataReader(unittest.TestCase):
     
     def setUp(self):
-        print ("has_astra",has_astra)
+        print ("has_tigre",has_tigre)
         print ("has_wget",has_wget)
         print ("has_olefile",has_olefile)
         print ("has_dxchange",has_dxchange)
@@ -131,7 +132,7 @@ class TestTXRMDataReader(unittest.TestCase):
                             voxel_size_y=self.voxel_size_h)
         if data2d.geometry is None:
             raise AssertionError('What? None?')
-        fbpalg = FDK(ig2d,data2d.geometry)
+        fbpalg = FBP(ig2d,data2d.geometry)
         fbpalg.set_input(data2d)
         
         recfbp = fbpalg.get_output()

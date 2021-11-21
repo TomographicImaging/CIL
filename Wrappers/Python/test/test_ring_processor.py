@@ -17,7 +17,6 @@
 
 from cil.processors import RingRemover
 from cil.framework import ImageData, ImageGeometry, AcquisitionGeometry
-# from ccpi.astra.operators import AstraProjectorSimple
 
 import os
 import numpy as np

@@ -11,14 +11,6 @@ except ModuleNotFoundError:
 print ("has_tigre\t{}".format(has_tigre))
 
 
-try:
-    import astra
-    has_astra = True
-except ModuleNotFoundError:
-    has_astra = False
-print ("has_astra\t{}".format(has_astra))
-
-
 def has_nvidia_smi():
     return os.system('nvidia-smi') == 0
 
@@ -59,22 +51,6 @@ def has_gpu_tigre():
     print ("has_gpu_tigre\t{}".format(has_gpu))
     return has_gpu
 
-
-def has_gpu_astra():
-
-    if not has_astra:
-        return False
-
-    has_gpu = False
-    if has_nvidia_smi():
-        try:
-            astra.test_CUDA()
-            has_gpu = True
-        except:
-            pass
-
-    print ("has_gpu_astra\t{}".format(has_gpu))
-    return has_gpu
 
 def has_ipp():
     from cil.recon import FBP

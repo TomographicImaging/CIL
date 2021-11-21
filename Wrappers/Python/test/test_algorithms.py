@@ -51,16 +51,11 @@ import warnings
 # Fast Gradient Projection algorithm for Total Variation(TV)
 from cil.optimisation.functions import TotalVariation
 
-from utils import has_gpu_tigre, has_gpu_astra
+from utils import has_gpu_tigre
 
-try:
-    from cil.plugins.astra import ProjectionOperator
-    has_astra = True    
-except ImportError as ie:
-    # skip test
-    has_astra = False
-
-has_astra = has_astra and has_gpu_astra()
+if has_gpu_tigre():
+    from cil.plugins.tigre import ProjectionOperator
+    has_tigre = True    
 
 debug_print = False
 
@@ -744,7 +739,7 @@ class TestSIRT(unittest.TestCase):
     
 class TestSPDHG(unittest.TestCase):
 
-    @unittest.skipUnless(has_astra, "cil-astra not available")
+    @unittest.skipUnless(has_tigre, "tigre not available")
     def test_SPDHG_vs_PDHG_implicit(self):
         
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
@@ -756,10 +751,8 @@ class TestSPDHG(unittest.TestCase):
         detectors = ig.shape[0]
         angles = np.linspace(0, np.pi, 90)
         ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1, angle_unit='radian')
-        # Select device
-        dev = 'cpu'
     
-        Aop = ProjectionOperator(ig, ag, dev)
+        Aop = ProjectionOperator(ig, ag)
         
         sin = Aop.direct(data)
         # Create noisy data. Apply Gaussian noise
@@ -808,7 +801,7 @@ class TestSPDHG(unittest.TestCase):
         list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1, angle_unit='radian') 
                         for i in range(len(list_angles))]
         # create with operators as many as the subsets
-        A = BlockOperator(*[ProjectionOperator(ig, list_geoms[i], dev) for i in range(subsets)])
+        A = BlockOperator(*[ProjectionOperator(ig, list_geoms[i]) for i in range(subsets)])
         ## number of subsets
         #(sub2ind, ind2sub) = divide_1Darray_equally(range(len(A)), subsets)
         #
@@ -843,7 +836,7 @@ class TestSPDHG(unittest.TestCase):
         np.testing.assert_almost_equal( mse(spdhg.get_output(), pdhg.get_output()), 
                                             5.51141e-06, decimal=3) 
         
-    @unittest.skipUnless(has_astra, "ccpi-astra not available")
+    @unittest.skipUnless(has_tigre, "tigre not available")
     def test_SPDHG_vs_PDHG_explicit(self):
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
 
@@ -854,10 +847,8 @@ class TestSPDHG(unittest.TestCase):
         detectors = ig.shape[0]
         angles = np.linspace(0, np.pi, 180)
         ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1, angle_unit='radian')
-        # Select device
-        dev = 'cpu'
 
-        Aop = ProjectionOperator(ig, ag, dev)
+        Aop = ProjectionOperator(ig, ag)
         
         sin = Aop.direct(data)
         # Create noisy data. Apply Gaussian noise
@@ -890,7 +881,7 @@ class TestSPDHG(unittest.TestCase):
         list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1, angle_unit='radian') 
         for i in range(len(list_angles))]
         # create with operators as many as the subsets
-        A = BlockOperator(*[ProjectionOperator(ig, list_geoms[i], dev) for i in range(subsets)] + [op1])
+        A = BlockOperator(*[ProjectionOperator(ig, list_geoms[i]) for i in range(subsets)] + [op1])
         ## number of subsets
         #(sub2ind, ind2sub) = divide_1Darray_equally(range(len(A)), subsets)
         #
@@ -950,7 +941,7 @@ class TestSPDHG(unittest.TestCase):
         np.testing.assert_almost_equal( mse(spdhg.get_output(), pdhg.get_output()), 
         1.68590e-05, decimal=3)
     
-    @unittest.skipUnless(has_astra, "ccpi-astra not available")
+    @unittest.skipUnless(has_tigre, "tigre not available")
     def test_SPDHG_vs_SPDHG_explicit_axpby(self):
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
         if debug_print:
@@ -962,15 +953,8 @@ class TestSPDHG(unittest.TestCase):
         detectors = ig.shape[0]
         angles = np.linspace(0, np.pi, 180)
         ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1, angle_unit='radian')
-        # Select device
-        # device = input('Available device: GPU==1 / CPU==0 ')
-        # if device=='1':
-        #     dev = 'gpu'
-        # else:
-        #     dev = 'cpu'
-        dev = 'cpu'
 
-        Aop = ProjectionOperator(ig, ag, dev)
+        Aop = ProjectionOperator(ig, ag)
         
         sin = Aop.direct(data)
         # Create noisy data. Apply Gaussian noise
@@ -1000,7 +984,7 @@ class TestSPDHG(unittest.TestCase):
         list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1, angle_unit='radian') 
         for i in range(len(list_angles))]
         # create with operators as many as the subsets
-        A = BlockOperator(*[ProjectionOperator(ig, list_geoms[i], dev) for i in range(subsets)] + [op1])
+        A = BlockOperator(*[ProjectionOperator(ig, list_geoms[i]) for i in range(subsets)] + [op1])
         ## number of subsets
         #(sub2ind, ind2sub) = divide_1Darray_equally(range(len(A)), subsets)
         #
@@ -1047,7 +1031,7 @@ class TestSPDHG(unittest.TestCase):
 
     
     
-    @unittest.skipUnless(has_astra, "ccpi-astra not available")
+    @unittest.skipUnless(has_tigre, "tigre not available")
     def test_PDHG_vs_PDHG_explicit_axpby(self):
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
         
@@ -1061,9 +1045,7 @@ class TestSPDHG(unittest.TestCase):
         angles = np.linspace(0, np.pi, 180)
         ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1, angle_unit='radian')
         
-        dev = 'cpu'
-
-        Aop = ProjectionOperator(ig, ag, dev)
+        Aop = ProjectionOperator(ig, ag)
         
         sin = Aop.direct(data)
         

@@ -21,8 +21,8 @@ test:
     - cvxpy              # [ linux and py==37 and np==118 ]
     - scikit-image
     - tomophantom        # [ linux ]
-    - cil-astra          # [ linux or win ] 
-    - tigre              # [ linux or win ] 
+    - cil-astra          # [ py!=39 and not osx ] 
+    - tigre              # [ not osx ] 
     - numba
     - packaging
     - ccpi-regulariser   # [ not osx ]

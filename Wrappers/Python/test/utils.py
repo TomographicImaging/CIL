@@ -8,6 +8,8 @@ try:
     has_tigre = True
 except ModuleNotFoundError:
     has_tigre = False
+except ImportError:
+    has_tigre = False
 print ("has_tigre\t{}".format(has_tigre))
 
 
@@ -16,6 +18,8 @@ try:
     has_astra = True
 except ModuleNotFoundError:
     has_astra = False
+except ImportError:
+    has_tigre = False
 print ("has_astra\t{}".format(has_astra))
 
 

@@ -57,7 +57,7 @@ jobs:
   docs_publish:
     needs: docs_build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/master'
     steps:
     - name: Download artifact of the html output.
       uses: actions/download-artifact@v2

@@ -300,7 +300,7 @@ class Test_FDK(unittest.TestCase):
             reconstructor._pre_filtering(self.ad3D)
 
 
-    @unittest.skipUnless(has_tigre and has_ipp and has_scipy, "Prerequisites not met")
+    @unittest.skipUnless(has_tigre and has_ipp, "Prerequisites not met")
     def test_filtering(self):
         ag = AcquisitionGeometry.create_Cone3D([0,-1,0],[0,2,0])\
             .set_panel([64,3],[0.1,0.1])\
@@ -417,7 +417,7 @@ class Test_FBP(unittest.TestCase):
         self.assertEqual(reconstructor.slices_per_chunk, 0)
 
 
-    @unittest.skipUnless(has_tigre and has_ipp and has_scipy, "Prerequisites not met")
+    @unittest.skipUnless(has_tigre and has_ipp, "Prerequisites not met")
     def test_filtering(self):
         ag = AcquisitionGeometry.create_Parallel3D()\
             .set_panel([64,3],[0.1,0.1])\

@@ -1,10 +1,11 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Recon &#8212; CIL v21.2.0-43-g42a030cd documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Recon &#8212; CIL v21.2.0-49-g71be9c30 documentation</title>
     
   <link href="_static/css/theme.css" rel="stylesheet">
   <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -21,8 +22,8 @@
       
 
     
-    <link rel="stylesheet" href="_static/css/blank.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/css/blank.css" type="text/css" />
     
   <link rel="preload" as="script" href="_static/js/index.be7d3bbb2ef33a8344ce.js">
 
@@ -30,8 +31,6 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Utilities" href="utilities.html" />
@@ -107,6 +106,18 @@
 </li>
 
 <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="astra.html">
+  Astra plugin
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="plugins.html">
+  CIL Plugins
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="developer_guide.html">
   Developer’s guide
  </a>
@@ -154,6 +165,8 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="utilities.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="astra.html">Astra plugin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plugins.html">CIL Plugins</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer’s guide</a></li>
 </ul>
 
@@ -235,9 +248,322 @@
 <h2>Analytical Reconstruction<a class="headerlink" href="#analytical-reconstruction" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="fbp-reconstructor-for-parallel-beam-geometry">
 <h3>FBP - Reconstructor for parallel-beam geometry<a class="headerlink" href="#fbp-reconstructor-for-parallel-beam-geometry" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="cil.recon.FBP">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.recon.</span></code><code class="sig-name descname"><span class="pre">FBP</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ram-lak'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/recon/FBP.html#FBP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.recon.FBP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an FBP reconstructor based on your parallel-beam acquisition data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input</strong> (<a class="reference internal" href="framework.html#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a>) – The input data to reconstruct. The reconstructor is set-up based on the geometry of the data.</p></li>
+<li><p><strong>image_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a><em>, </em><em>default used if None</em>) – A description of the area/volume to reconstruct</p></li>
+<li><p><strong>filter</strong> (<em>string</em><em>, </em><em>numpy.ndarray</em><em>, </em><em>default='ram-lak'</em>) – The filter to be applied. Can be a string from: ‘ram-lak’ or a numpy array.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fbp</span> <span class="o">=</span> <span class="n">FBP</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out</span> <span class="o">=</span> <span class="n">fbp</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="rubric">Notes</p>
+<p>The reconstructor can be futher customised using additional ‘set’ methods provided.</p>
+<dl class="py method">
+<dt id="cil.recon.FBP.get_filter_array">
+<code class="sig-name descname"><span class="pre">get_filter_array</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FBP.get_filter_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the filter in used in the frequency domain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>An array containing the filter values</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>numpy.ndarray</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The filter length N is 2^self.fft_order.</p>
+<p>The indices of the array are interpreted as:</p>
+<ul class="simple">
+<li><p>[0] The DC frequency component</p></li>
+<li><p>[1:N/2] positive frequencies</p></li>
+<li><p>[N/2:N-1] negative frequencies</p></li>
+</ul>
+<p>The array can be modified and passed back using set_filter()</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.recon.FBP.reset">
+<code class="sig-name descname"><span class="pre">reset</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/recon/FBP.html#FBP.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.recon.FBP.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets all optional configuration parameters to their default values</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.recon.FBP.run">
+<code class="sig-name descname"><span class="pre">run</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/recon/FBP.html#FBP.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.recon.FBP.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs the configured FBP recon and returns the reconstuction</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>out</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a><em>, </em><em>optional</em>) – Fills the referenced ImageData with the reconstructed volume and suppresses the return</p></li>
+<li><p><strong>verbose</strong> (<em>int</em><em>, </em><em>default=1</em>) – Contols the verbosity of the reconstructor. 0: No output is logged, 1: Full configuration is logged</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The reconstructed volume. Supressed if <cite>out</cite> is passed</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.ImageData" title="cil.framework.ImageData">ImageData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.recon.FBP.set_backend">
+<code class="sig-name descname"><span class="pre">set_backend</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tigre'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FBP.set_backend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the backend used for the foward/backward projectors. Currently only TIGRE is supported</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>backend</strong> (<em>string</em>) – Set the backend to TIGRE ‘tigre’</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.recon.FBP.set_fft_order">
+<code class="sig-name descname"><span class="pre">set_fft_order</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FBP.set_fft_order" title="Permalink to this definition">¶</a></dt>
+<dd><p>The width of the fourier transform N=2^order.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>order</strong> (<em>int</em><em>, </em><em>optional</em>) – The width of the fft N=2^order</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If <cite>None</cite> the default used is the power-of-2 greater than 2 * detector width, or 8, whichever is greater
+Higher orders will yield more accurate results but increase computation time.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.recon.FBP.set_filter">
+<code class="sig-name descname"><span class="pre">set_filter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ram-lak'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FBP.set_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the filter used by the reconstruction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filter</strong> (<em>string</em><em>, </em><em>numpy.ndarray</em><em>, </em><em>default='ram-lak'</em>) – The filter to be applied. Can be a string from: ‘ram-lak’ or a numpy array.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If passed a numpy array the filter must have length N = 2^self.fft_order</p>
+<p>The indices of the array are interpreted as:</p>
+<ul class="simple">
+<li><p>[0] The DC frequency component</p></li>
+<li><p>[1:N/2] positive frequencies</p></li>
+<li><p>[N/2:N-1] negative frequencies</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.recon.FBP.set_filter_inplace">
+<code class="sig-name descname"><span class="pre">set_filter_inplace</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FBP.set_filter_inplace" title="Permalink to this definition">¶</a></dt>
+<dd><p>False (default) will allocate temporary memory for filtered projections.
+True will filter projections in-place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>inplace</strong> (<em>boolian</em>) – Sets the inplace filtering of projections</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.recon.FBP.set_image_geometry">
+<code class="sig-name descname"><span class="pre">set_image_geometry</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FBP.set_image_geometry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets a custom image geometry to be used by the reconstructor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>image_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a><em>, </em><em>default used if None</em>) – A description of the area/volume to reconstruct</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.recon.FBP.set_input">
+<code class="sig-name descname"><span class="pre">set_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FBP.set_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the input data to run the reconstructor on. The geometry of the dataset must be compatible with the reconstructor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>input</strong> (<a class="reference internal" href="framework.html#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a>) – A dataset with a compatible geometry</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.recon.FBP.set_split_processing">
+<code class="sig-name descname"><span class="pre">set_split_processing</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slices_per_chunk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/recon/FBP.html#FBP.set_split_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.recon.FBP.set_split_processing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits the processing in to chunks. Default, 0 will process the data in a single call.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>out</strong> (<em>slices_per_chunk</em><em>, </em><em>optional</em>) – Process the data in chunks of n slices. It is recommended to use value of power-of-two.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This will reduce memory use but may increase computation time.
+It is recommended to tune it too your hardware requirements using 8, 16 or 32 slices.</p>
+<p>This can only be used on simple and offset data-geometries.</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="fdk-reconstructor-for-cone-beam-geometry">
 <h3>FDK - Reconstructor for cone-beam geometry<a class="headerlink" href="#fdk-reconstructor-for-cone-beam-geometry" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="cil.recon.FDK">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.recon.</span></code><code class="sig-name descname"><span class="pre">FDK</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ram-lak'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/recon/FBP.html#FDK"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.recon.FDK" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an FDK reconstructor based on your cone-beam acquisition data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input</strong> (<a class="reference internal" href="framework.html#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a>) – The input data to reconstruct. The reconstructor is set-up based on the geometry of the data.</p></li>
+<li><p><strong>image_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a><em>, </em><em>default used if None</em>) – A description of the area/volume to reconstruct</p></li>
+<li><p><strong>filter</strong> (<em>string</em><em>, </em><em>numpy.ndarray</em><em>, </em><em>default='ram-lak'</em>) – The filter to be applied. Can be a string from: ‘ram-lak’ or a numpy array.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fdk</span> <span class="o">=</span> <span class="n">FDK</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out</span> <span class="o">=</span> <span class="n">fdk</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="rubric">Notes</p>
+<p>The reconstructor can be futher customised using additional ‘set’ methods provided.</p>
+<dl class="py method">
+<dt id="cil.recon.FDK.get_filter_array">
+<code class="sig-name descname"><span class="pre">get_filter_array</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FDK.get_filter_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the filter in used in the frequency domain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>An array containing the filter values</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>numpy.ndarray</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The filter length N is 2^self.fft_order.</p>
+<p>The indices of the array are interpreted as:</p>
+<ul class="simple">
+<li><p>[0] The DC frequency component</p></li>
+<li><p>[1:N/2] positive frequencies</p></li>
+<li><p>[N/2:N-1] negative frequencies</p></li>
+</ul>
+<p>The array can be modified and passed back using set_filter()</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.recon.FDK.reset">
+<code class="sig-name descname"><span class="pre">reset</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FDK.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets all optional configuration parameters to their default values</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.recon.FDK.run">
+<code class="sig-name descname"><span class="pre">run</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/recon/FBP.html#FDK.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.recon.FDK.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs the configured FDK recon and returns the reconstuction</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>out</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a><em>, </em><em>optional</em>) – Fills the referenced ImageData with the reconstructed volume and suppresses the return</p></li>
+<li><p><strong>verbose</strong> (<em>int</em><em>, </em><em>default=1</em>) – Contols the verbosity of the reconstructor. 0: No output is logged, 1: Full configuration is logged</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The reconstructed volume. Supressed if <cite>out</cite> is passed</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.ImageData" title="cil.framework.ImageData">ImageData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.recon.FDK.set_backend">
+<code class="sig-name descname"><span class="pre">set_backend</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tigre'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FDK.set_backend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the backend used for the foward/backward projectors. Currently only TIGRE is supported</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>backend</strong> (<em>string</em>) – Set the backend to TIGRE ‘tigre’</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.recon.FDK.set_fft_order">
+<code class="sig-name descname"><span class="pre">set_fft_order</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FDK.set_fft_order" title="Permalink to this definition">¶</a></dt>
+<dd><p>The width of the fourier transform N=2^order.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>order</strong> (<em>int</em><em>, </em><em>optional</em>) – The width of the fft N=2^order</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If <cite>None</cite> the default used is the power-of-2 greater than 2 * detector width, or 8, whichever is greater
+Higher orders will yield more accurate results but increase computation time.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.recon.FDK.set_filter">
+<code class="sig-name descname"><span class="pre">set_filter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ram-lak'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FDK.set_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the filter used by the reconstruction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filter</strong> (<em>string</em><em>, </em><em>numpy.ndarray</em><em>, </em><em>default='ram-lak'</em>) – The filter to be applied. Can be a string from: ‘ram-lak’ or a numpy array.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If passed a numpy array the filter must have length N = 2^self.fft_order</p>
+<p>The indices of the array are interpreted as:</p>
+<ul class="simple">
+<li><p>[0] The DC frequency component</p></li>
+<li><p>[1:N/2] positive frequencies</p></li>
+<li><p>[N/2:N-1] negative frequencies</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.recon.FDK.set_filter_inplace">
+<code class="sig-name descname"><span class="pre">set_filter_inplace</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FDK.set_filter_inplace" title="Permalink to this definition">¶</a></dt>
+<dd><p>False (default) will allocate temporary memory for filtered projections.
+True will filter projections in-place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>inplace</strong> (<em>boolian</em>) – Sets the inplace filtering of projections</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.recon.FDK.set_image_geometry">
+<code class="sig-name descname"><span class="pre">set_image_geometry</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FDK.set_image_geometry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets a custom image geometry to be used by the reconstructor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>image_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a><em>, </em><em>default used if None</em>) – A description of the area/volume to reconstruct</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.recon.FDK.set_input">
+<code class="sig-name descname"><span class="pre">set_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FDK.set_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the input data to run the reconstructor on. The geometry of the dataset must be compatible with the reconstructor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>input</strong> (<a class="reference internal" href="framework.html#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a>) – A dataset with a compatible geometry</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 <p><a class="reference internal" href="index.html#mastertoc"><span class="std std-ref">Return Home</span></a></p>
 </div>
 </div>
@@ -283,7 +609,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br>
 </p>
     </div>
     

@@ -1,10 +1,11 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>CIL Plugins &#8212; CIL v21.2.0-43-g42a030cd documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CIL Plugins &#8212; CIL v21.2.0-49-g71be9c30 documentation</title>
     
   <link href="_static/css/theme.css" rel="stylesheet">
   <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -21,8 +22,8 @@
       
 
     
-    <link rel="stylesheet" href="_static/css/blank.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/css/blank.css" type="text/css" />
     
   <link rel="preload" as="script" href="_static/js/index.be7d3bbb2ef33a8344ce.js">
 
@@ -30,10 +31,11 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Developer’s guide" href="developer_guide.html" />
+    <link rel="prev" title="Astra plugin" href="astra.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en">
     
@@ -105,6 +107,18 @@
 </li>
 
 <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="astra.html">
+  Astra plugin
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="current reference internal nav-link" href="#">
+  CIL Plugins
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="developer_guide.html">
   Developer’s guide
  </a>
@@ -137,7 +151,7 @@
             <div class="col-12 col-md-3 bd-sidebar">
 <h3><a href="index.html">Table of Contents</a></h3>
 <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="framework.html">Framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="io.html">Read/ write AcquisitionData and ImageData</a></li>
 <li class="toctree-l1"><a class="reference internal" href="optimisation.html">Optimisation framework</a></li>
@@ -145,6 +159,18 @@
 <li class="toctree-l1"><a class="reference internal" href="processors.html">Processors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="recon.html">Recon</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utilities.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="astra.html">Astra plugin</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">CIL Plugins</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#ccpi-regularisation">CCPi Regularisation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#total-variation">Total variation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#other-regularisation-functions">Other regularisation functions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#tomophantom">TomoPhantom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tigre">TIGRE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#astra">ASTRA</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer’s guide</a></li>
 </ul>
 
@@ -244,9 +270,176 @@ a set of CPU/GPU optimised regularisation modules for iterative image reconstruc
 other image processing tasks.</p>
 <div class="section" id="total-variation">
 <h3>Total variation<a class="headerlink" href="#total-variation" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="cil.plugins.ccpi_regularisation.functions.FGP_TV">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.plugins.ccpi_regularisation.functions.</span></code><code class="sig-name descname"><span class="pre">FGP_TV</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isotropic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nonnegativity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cpu'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/ccpi_regularisation/functions/regularisers.html#FGP_TV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.FGP_TV" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt id="cil.plugins.ccpi_regularisation.functions.FGP_TV.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isotropic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nonnegativity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cpu'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/ccpi_regularisation/functions/regularisers.html#FGP_TV.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.FGP_TV.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creator of FGP_TV Function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>alpha</strong> (<em>number</em><em>, </em><em>default 1</em>) – regularisation parameter</p></li>
+<li><p><strong>isotropic</strong> (<em>boolean</em><em>, </em><em>default True</em><em>, </em><em>can range between 1 and 2</em>) – Whether it uses L2 (isotropic) or L1 (unisotropic) norm</p></li>
+<li><p><strong>nonnegativity</strong> (<em>boolean</em><em>, </em><em>default True</em>) – Whether to add the non-negativity constraint</p></li>
+<li><p><strong>max_iteration</strong> (<em>integer</em><em>, </em><em>default 100</em>) – max number of sub iterations. The algorithm will iterate up to this number of iteration or up to when the tolerance has been reached</p></li>
+<li><p><strong>tolerance</strong> (<em>float</em><em>, </em><em>default 0</em>) – minimum difference between previous iteration of the algorithm that determines the stop of the iteration earlier than max_iteration. If set to 0 only the max_iteration will be used as stop criterion.</p></li>
+<li><p><strong>device</strong> (<em>string</em><em>, </em><em>default 'cpu'</em><em>, </em><em>can be 'gpu' if GPU is installed</em>) – determines if the code runs on CPU or GPU</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.ccpi_regularisation.functions.FGP_TV.__rmul__">
+<code class="sig-name descname"><span class="pre">__rmul__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scalar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/ccpi_regularisation/functions/regularisers.html#FGP_TV.__rmul__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.FGP_TV.__rmul__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define the multiplication with a scalar</p>
+<p>this changes the regularisation parameter in the plugin</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="other-regularisation-functions">
 <h3>Other regularisation functions<a class="headerlink" href="#other-regularisation-functions" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="cil.plugins.ccpi_regularisation.functions.TGV">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.plugins.ccpi_regularisation.functions.</span></code><code class="sig-name descname"><span class="pre">TGV</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cpu'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/ccpi_regularisation/functions/regularisers.html#TGV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TGV" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt id="cil.plugins.ccpi_regularisation.functions.TGV.__call__">
+<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/ccpi_regularisation/functions/regularisers.html#TGV.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TGV.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of the function F at x: <span class="math notranslate nohighlight">\(F(x)\)</span></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.ccpi_regularisation.functions.TGV.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cpu'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/ccpi_regularisation/functions/regularisers.html#TGV.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TGV.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creator of Total Generalised Variation Function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>alpha</strong> (<em>number</em><em>, </em><em>default 1</em>) – regularisation parameter</p></li>
+<li><p><strong>gamma</strong> (<em>number</em><em>, </em><em>default 1</em><em>, </em><em>can range between 1 and 2</em>) – ratio of TGV terms</p></li>
+<li><p><strong>max_iteration</strong> (<em>integer</em><em>, </em><em>default 100</em>) – max number of sub iterations. The algorithm will iterate up to this number of iteration or up to when the tolerance has been reached</p></li>
+<li><p><strong>tolerance</strong> (<em>float</em><em>, </em><em>default 0</em>) – minimum difference between previous iteration of the algorithm that determines the stop of the iteration earlier than max_iteration. If set to 0 only the max_iteration will be used as stop criterion.</p></li>
+<li><p><strong>device</strong> (<em>string</em><em>, </em><em>default 'cpu'</em><em>, </em><em>can be 'gpu' if GPU is installed</em>) – determines if the code runs on CPU or GPU</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.ccpi_regularisation.functions.TGV.__rmul__">
+<code class="sig-name descname"><span class="pre">__rmul__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scalar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/ccpi_regularisation/functions/regularisers.html#TGV.__rmul__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TGV.__rmul__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define the multiplication with a scalar</p>
+<p>this changes the regularisation parameter in the plugin</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.ccpi_regularisation.functions.TGV.convex_conjugate">
+<code class="sig-name descname"><span class="pre">convex_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/ccpi_regularisation/functions/regularisers.html#TGV.convex_conjugate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TGV.convex_conjugate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the convex conjugate of function <span class="math notranslate nohighlight">\(F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[F^{*}(x^{*}) = \underset{x^{*}}{\sup} &lt;x^{*}, x&gt; - F(x)\]</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="cil.plugins.ccpi_regularisation.functions.FGP_dTV">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.plugins.ccpi_regularisation.functions.</span></code><code class="sig-name descname"><span class="pre">FGP_dTV</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reference</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isotropic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nonnegativity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cpu'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/ccpi_regularisation/functions/regularisers.html#FGP_dTV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.FGP_dTV" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creator of FGP_dTV Function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reference</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a>) – reference image</p></li>
+<li><p><strong>alpha</strong> (<em>number</em><em>, </em><em>default 1</em>) – regularisation parameter</p></li>
+<li><p><strong>max_iteration</strong> (<em>integer</em><em>, </em><em>default 100</em>) – max number of sub iterations. The algorithm will iterate up to this number of iteration or up to when the tolerance has been reached</p></li>
+<li><p><strong>tolerance</strong> (<em>float</em><em>, </em><em>default 0</em>) – minimum difference between previous iteration of the algorithm that determines the stop of the iteration earlier than max_iteration. If set to 0 only the max_iteration will be used as stop criterion.</p></li>
+<li><p><strong>eta</strong> (<em>number</em><em>, </em><em>default 0.01</em>) – smoothing constant to calculate gradient of the reference</p></li>
+<li><p><strong>isotropic</strong> (<em>boolean</em><em>, </em><em>default True</em><em>, </em><em>can range between 1 and 2</em>) – Whether it uses L2 (isotropic) or L1 (anisotropic) norm</p></li>
+<li><p><strong>nonnegativity</strong> (<em>boolean</em><em>, </em><em>default True</em>) – Whether to add the non-negativity constraint</p></li>
+<li><p><strong>device</strong> (<em>string</em><em>, </em><em>default 'cpu'</em><em>, </em><em>can be 'gpu' if GPU is installed</em>) – determines if the code runs on CPU or GPU</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="cil.plugins.ccpi_regularisation.functions.FGP_dTV.__call__">
+<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/ccpi_regularisation/functions/regularisers.html#FGP_dTV.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.FGP_dTV.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of the function F at x: <span class="math notranslate nohighlight">\(F(x)\)</span></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.ccpi_regularisation.functions.FGP_dTV.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reference</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isotropic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nonnegativity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cpu'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/ccpi_regularisation/functions/regularisers.html#FGP_dTV.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.FGP_dTV.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.ccpi_regularisation.functions.FGP_dTV.__rmul__">
+<code class="sig-name descname"><span class="pre">__rmul__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scalar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/ccpi_regularisation/functions/regularisers.html#FGP_dTV.__rmul__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.FGP_dTV.__rmul__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define the multiplication with a scalar</p>
+<p>this changes the regularisation parameter in the plugin</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.ccpi_regularisation.functions.FGP_dTV.convex_conjugate">
+<code class="sig-name descname"><span class="pre">convex_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/ccpi_regularisation/functions/regularisers.html#FGP_dTV.convex_conjugate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.FGP_dTV.convex_conjugate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the convex conjugate of function <span class="math notranslate nohighlight">\(F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[F^{*}(x^{*}) = \underset{x^{*}}{\sup} &lt;x^{*}, x&gt; - F(x)\]</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="cil.plugins.ccpi_regularisation.functions.TNV">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.plugins.ccpi_regularisation.functions.</span></code><code class="sig-name descname"><span class="pre">TNV</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/ccpi_regularisation/functions/regularisers.html#TNV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TNV" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt id="cil.plugins.ccpi_regularisation.functions.TNV.__call__">
+<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/ccpi_regularisation/functions/regularisers.html#TNV.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TNV.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of the function F at x: <span class="math notranslate nohighlight">\(F(x)\)</span></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.ccpi_regularisation.functions.TNV.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/ccpi_regularisation/functions/regularisers.html#TNV.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TNV.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creator of TNV Function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>alpha</strong> (<em>number</em><em>, </em><em>default 1</em>) – regularisation parameter</p></li>
+<li><p><strong>max_iteration</strong> (<em>integer</em><em>, </em><em>default 100</em>) – max number of sub iterations. The algorithm will iterate up to this number of iteration or up to when the tolerance has been reached</p></li>
+<li><p><strong>tolerance</strong> (<em>float</em><em>, </em><em>default 0</em>) – minimum difference between previous iteration of the algorithm that determines the stop of the iteration earlier than max_iteration. If set to 0 only the max_iteration will be used as stop criterion.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.ccpi_regularisation.functions.TNV.__rmul__">
+<code class="sig-name descname"><span class="pre">__rmul__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scalar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/ccpi_regularisation/functions/regularisers.html#TNV.__rmul__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TNV.__rmul__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define the multiplication with a scalar</p>
+<p>this changes the regularisation parameter in the plugin</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.ccpi_regularisation.functions.TNV.check_input">
+<code class="sig-name descname"><span class="pre">check_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/ccpi_regularisation/functions/regularisers.html#TNV.check_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TNV.check_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>TNV requires 2D+channel data with the first dimension as the channel dimension</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.ccpi_regularisation.functions.TNV.convex_conjugate">
+<code class="sig-name descname"><span class="pre">convex_conjugate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/ccpi_regularisation/functions/regularisers.html#TNV.convex_conjugate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.ccpi_regularisation.functions.TNV.convex_conjugate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the convex conjugate of function <span class="math notranslate nohighlight">\(F\)</span> at <span class="math notranslate nohighlight">\(x^{*}\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[F^{*}(x^{*}) = \underset{x^{*}}{\sup} &lt;x^{*}, x&gt; - F(x)\]</div>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 </div>
 <div class="section" id="tomophantom">
@@ -255,18 +448,245 @@ other image processing tasks.</p>
 (<a class="reference external" href="https://doi.org/10.1016/j.softx.2018.05.003">10.1016/j.softx.2018.05.003</a>,
 a toolbox written in C language to generate customisable 2D-4D phantoms (with a
 temporal capability).</p>
+<dl class="py function">
+<dt id="cil.plugins.TomoPhantom.get_ImageData">
+<code class="sig-prename descclassname"><span class="pre">cil.plugins.TomoPhantom.</span></code><code class="sig-name descname"><span class="pre">get_ImageData</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/TomoPhantom.html#get_ImageData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.TomoPhantom.get_ImageData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an ImageData relative to geometry with the model num_model from tomophantom</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_model</strong> (<em>int</em>) – model number</p></li>
+<li><p><strong>geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a>) – geometrical info that describes the phantom</p></li>
+</ul>
+</dd>
+</dl>
+<p>Example usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ndim</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">N</span><span class="o">=</span><span class="mi">128</span>
+<span class="n">angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">360</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+<span class="n">offset</span> <span class="o">=</span> <span class="mf">0.4</span>
+<span class="n">channels</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="k">if</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="n">ag</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Cone2D</span><span class="p">((</span><span class="n">offset</span><span class="p">,</span><span class="o">-</span><span class="mi">100</span><span class="p">),</span> <span class="p">(</span><span class="n">offset</span><span class="p">,</span><span class="mi">100</span><span class="p">))</span>
+    <span class="n">ag</span><span class="o">.</span><span class="n">set_panel</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">ag</span> <span class="o">=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">create_Cone3D</span><span class="p">((</span><span class="n">offset</span><span class="p">,</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="n">offset</span><span class="p">,</span><span class="mi">100</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+    <span class="n">ag</span><span class="o">.</span><span class="n">set_panel</span><span class="p">((</span><span class="n">N</span><span class="p">,</span><span class="n">N</span><span class="o">-</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="n">ag</span><span class="o">.</span><span class="n">set_channels</span><span class="p">(</span><span class="n">channels</span><span class="p">)</span>
+<span class="n">ag</span><span class="o">.</span><span class="n">set_angles</span><span class="p">(</span><span class="n">angles</span><span class="p">,</span> <span class="n">angle_unit</span><span class="o">=</span><span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">DEGREE</span><span class="p">)</span>
+
+
+<span class="n">ig</span> <span class="o">=</span> <span class="n">ag</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
+<span class="n">num_model</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">phantom</span> <span class="o">=</span> <span class="n">TomoPhantom</span><span class="o">.</span><span class="n">get_ImageData</span><span class="p">(</span><span class="n">num_model</span><span class="o">=</span><span class="n">num_model</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">ig</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
 </div>
 <div class="section" id="tigre">
 <h2>TIGRE<a class="headerlink" href="#tigre" title="Permalink to this headline">¶</a></h2>
 <p>This plugin allows the use of <a class="reference external" href="https://github.com/CERN/TIGRE">TIGRE</a>
 (<a class="reference external" href="http://iopscience.iop.org/article/10.1088/2057-1976/2/5/055010">10.1088/2057-1976/2/5/055010</a>
 for forward and back projections and filter back projection reconstruction.</p>
+<dl class="py class">
+<dt id="cil.plugins.tigre.FBP">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.plugins.tigre.</span></code><code class="sig-name descname"><span class="pre">FBP</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">volume_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sinogram_geometry</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/tigre/FBP.html#FBP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.tigre.FBP" title="Permalink to this definition">¶</a></dt>
+<dd><p>FBP Filtered Back Projection is a reconstructor for 2D and 3D parallel and cone-beam geometries.
+It is able to back-project circular trajectories with 2 PI anglar range and equally spaced anglular steps.</p>
+<p>This uses the ram-lak filter
+This is provided for simple and offset parallel-beam geometries only</p>
+<dl class="simple">
+<dt>Input: Volume Geometry</dt><dd><p>Sinogram Geometry</p>
+</dd>
+<dt>Example:  fbp = FBP(ig, ag, device)</dt><dd><p>fbp.set_input(data)
+reconstruction = fbp.get_ouput()</p>
+</dd>
+</dl>
+<p>Output: ImageData</p>
+<dl class="py method">
+<dt id="cil.plugins.tigre.FBP.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">volume_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sinogram_geometry</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/tigre/FBP.html#FBP.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.tigre.FBP.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.tigre.FBP.check_input">
+<code class="sig-name descname"><span class="pre">check_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/tigre/FBP.html#FBP.check_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.tigre.FBP.check_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks parameters of the input DataContainer</p>
+<p>Should raise an Error if the DataContainer does not match expectation, e.g.
+if the expected input DataContainer is 3D and the Processor expects 2D.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="cil.plugins.tigre.ProjectionOperator">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.plugins.tigre.</span></code><code class="sig-name descname"><span class="pre">ProjectionOperator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aquisition_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direct_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'interpolated'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjoint_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'matched'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/tigre/ProjectionOperator.html#ProjectionOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.tigre.ProjectionOperator" title="Permalink to this definition">¶</a></dt>
+<dd><p>TIGRE Projection Operator</p>
+<dl class="py method">
+<dt id="cil.plugins.tigre.ProjectionOperator.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aquisition_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direct_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'interpolated'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjoint_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'matched'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/tigre/ProjectionOperator.html#ProjectionOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.tigre.ProjectionOperator.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class creates a configured TIGRE ProjectionOperator</p>
+<p>Please refer to the TIGRE documentation for futher descriptions
+<a class="reference external" href="https://github.com/CERN/TIGRE">https://github.com/CERN/TIGRE</a>
+<a class="reference external" href="https://iopscience.iop.org/article/10.1088/2057-1976/2/5/055010">https://iopscience.iop.org/article/10.1088/2057-1976/2/5/055010</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a>) – A description of the ImageGeometry of your data</p></li>
+<li><p><strong>aquisition_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.AcquisitionGeometry" title="cil.framework.AcquisitionGeometry"><em>AcquisitionGeometry</em></a>) – A description of the AcquisitionGeometry of your data</p></li>
+<li><p><strong>direct_method</strong> (<em>str</em><em>, </em><em>default 'interpolated'</em>) – The method used by the forward projector, ‘Siddon’ for ray-voxel intersection, ‘interpolated’ for interpolated projection</p></li>
+<li><p><strong>adjoint_weights</strong> (<em>str</em>) – The weighting method used by the cone-beam backward projector, ‘matched’ for weights to approximatly match the ‘interpolated’ forward projector, ‘FDK’ for FDK weights, default ‘matched’</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.tigre.ProjectionOperator.adjoint">
+<code class="sig-name descname"><span class="pre">adjoint</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/tigre/ProjectionOperator.html#ProjectionOperator.adjoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.tigre.ProjectionOperator.adjoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the adjoint/inverse operation</p>
+<p>only available to linear operators</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.tigre.ProjectionOperator.direct">
+<code class="sig-name descname"><span class="pre">direct</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/tigre/ProjectionOperator.html#ProjectionOperator.direct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.tigre.ProjectionOperator.direct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the application of the Operator on x</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.tigre.ProjectionOperator.domain_geometry">
+<code class="sig-name descname"><span class="pre">domain_geometry</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/tigre/ProjectionOperator.html#ProjectionOperator.domain_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.tigre.ProjectionOperator.domain_geometry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the domain of the Operator: X space</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.tigre.ProjectionOperator.range_geometry">
+<code class="sig-name descname"><span class="pre">range_geometry</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/tigre/ProjectionOperator.html#ProjectionOperator.range_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.tigre.ProjectionOperator.range_geometry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the range of the Operator: Y space</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="astra">
 <h2>ASTRA<a class="headerlink" href="#astra" title="Permalink to this headline">¶</a></h2>
 <p>This plugin allows the use of <a class="reference external" href="https://github.com/astra-toolbox/astra-toolbox">ASTRA-toolbox</a>
 (<a class="reference external" href="http://dx.doi.org/10.1364/OE.24.025129">10.1364/OE.24.025129</a>
 for forward and back projections and filter back projection reconstruction.</p>
+<dl class="py class">
+<dt id="cil.plugins.astra.processors.FBP">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.plugins.astra.processors.</span></code><code class="sig-name descname"><span class="pre">FBP</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">volume_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sinogram_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gpu'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/processors/FBP.html#FBP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.processors.FBP" title="Permalink to this definition">¶</a></dt>
+<dd><p>FBP Filtered Back Projection is a reconstructor for 2D and 3D parallel and cone-beam geometries.
+It is able to back-project circular trajectories with 2 PI anglar range and equally spaced anglular steps.</p>
+<p>This uses the ram-lak filter
+A CPU version is provided for simple 2D parallel-beam geometries only (offsets and rotations will be ignored)</p>
+<dl class="simple">
+<dt>Input: Volume Geometry</dt><dd><p>Sinogram Geometry</p>
+</dd>
+<dt>Example:  fbp = FBP(ig, ag, device)</dt><dd><p>fbp.set_input(data)
+reconstruction = fbp.get_ouput()</p>
+</dd>
+</dl>
+<p>Output: ImageData</p>
+<dl class="py method">
+<dt id="cil.plugins.astra.processors.FBP.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">volume_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sinogram_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gpu'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/processors/FBP.html#FBP.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.processors.FBP.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.astra.processors.FBP.check_input">
+<code class="sig-name descname"><span class="pre">check_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/processors/FBP.html#FBP.check_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.processors.FBP.check_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks parameters of the input DataContainer</p>
+<p>Should raise an Error if the DataContainer does not match expectation, e.g.
+if the expected input DataContainer is 3D and the Processor expects 2D.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.astra.processors.FBP.get_input">
+<code class="sig-name descname"><span class="pre">get_input</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/processors/FBP.html#FBP.get_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.processors.FBP.get_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the input DataContainer</p>
+<p>It is useful in the case the user has provided a DataProcessor as
+input</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="cil.plugins.astra.operators.ProjectionOperator">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.plugins.astra.operators.</span></code><code class="sig-name descname"><span class="pre">ProjectionOperator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acquisition_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gpu'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/operators/ProjectionOperator.html#ProjectionOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.operators.ProjectionOperator" title="Permalink to this definition">¶</a></dt>
+<dd><p>ProjectionOperator wraps ASTRA 3D Projector for GPU, and ASTRA 2D Projectors for CPU. Broadcasts the operator accross all channels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a>) – The CIL ImageGeometry object describing your reconstruction volume</p></li>
+<li><p><strong>acquisition_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.AcquisitionGeometry" title="cil.framework.AcquisitionGeometry"><em>AcquisitionGeometry</em></a>) – The CIL AcquisitionGeometry object describing your sinogram data</p></li>
+<li><p><strong>device</strong> (<em>string</em><em>, </em><em>default='gpu'</em>) – The device to run on ‘gpu’ or ‘cpu’. ‘gpu’ will use the ASTRA 3D Projectors, ‘cpu’ will use the ASTRA 2D Projectors</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="cil.plugins.astra.operators.ProjectionOperator.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acquisition_geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gpu'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/operators/ProjectionOperator.html#ProjectionOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.operators.ProjectionOperator.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>domain_geometry</strong> – domain of the operator</p></li>
+<li><p><strong>range_geometry</strong> (<em>optional</em><em>, </em><em>default None</em>) – range of the operator</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.astra.operators.ProjectionOperator.adjoint">
+<code class="sig-name descname"><span class="pre">adjoint</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">DATA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/operators/ProjectionOperator.html#ProjectionOperator.adjoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.operators.ProjectionOperator.adjoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the adjoint/inverse operation</p>
+<p>only available to linear operators</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.astra.operators.ProjectionOperator.calculate_norm">
+<code class="sig-name descname"><span class="pre">calculate_norm</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/operators/ProjectionOperator.html#ProjectionOperator.calculate_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.operators.ProjectionOperator.calculate_norm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the norm of the LinearOperator as calculated by the PowerMethod</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default = 25</em>) – number of iterations to run</p></li>
+<li><p><strong>x_init</strong> (same type as domain, a subclass of <code class="code docutils literal notranslate"><span class="pre">DataContainer</span></code>, optional, None) – starting point for the iteration in the operator domain</p></li>
+<li><p><strong>force</strong> (boolean, default <code class="code docutils literal notranslate"><span class="pre">False</span></code>) – forces the recalculation of the norm</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.astra.operators.ProjectionOperator.direct">
+<code class="sig-name descname"><span class="pre">direct</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">IM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/operators/ProjectionOperator.html#ProjectionOperator.direct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.operators.ProjectionOperator.direct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the application of the Operator on x</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.astra.operators.ProjectionOperator.domain_geometry">
+<code class="sig-name descname"><span class="pre">domain_geometry</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/operators/ProjectionOperator.html#ProjectionOperator.domain_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.operators.ProjectionOperator.domain_geometry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the domain of the Operator: X space</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.plugins.astra.operators.ProjectionOperator.range_geometry">
+<code class="sig-name descname"><span class="pre">range_geometry</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/plugins/astra/operators/ProjectionOperator.html#ProjectionOperator.range_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.plugins.astra.operators.ProjectionOperator.range_geometry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the range of the Operator: Y space</p>
+</dd></dl>
+
+</dd></dl>
+
 <p><a class="reference internal" href="index.html#mastertoc"><span class="std std-ref">Return Home</span></a></p>
 </div>
 </div>
@@ -276,7 +696,21 @@ for forward and back projections and filter back projection reconstruction.</p>
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'>
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="astra.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Astra plugin</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="developer_guide.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Developer’s guide</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
 </div>
               
           </main>
@@ -297,7 +731,7 @@ for forward and back projections and filter back projection reconstruction.</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br>
 </p>
     </div>
     

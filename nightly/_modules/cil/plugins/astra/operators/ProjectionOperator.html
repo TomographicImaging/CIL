@@ -1,0 +1,304 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cil.plugins.astra.operators.ProjectionOperator &#8212; CIL v21.2.0-49-g71be9c30 documentation</title>
+    
+  <link href="../../../../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/css/blank.css" type="text/css" />
+    
+  <link rel="preload" as="script" href="../../../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../../../../index.html">
+<p class="title">CIL</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../../framework.html">
+  Framework
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../../io.html">
+  Read/ write AcquisitionData and ImageData
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../../optimisation.html">
+  Optimisation framework
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../../processors.html">
+  Processors
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../../recon.html">
+  Recon
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../../utilities.html">
+  Utilities
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../../astra.html">
+  Astra plugin
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../../plugins.html">
+  CIL Plugins
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../../../developer_guide.html">
+  Developer’s guide
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+<h3><a href="../../../../../index.html">Table of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../framework.html">Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../io.html">Read/ write AcquisitionData and ImageData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../optimisation.html">Optimisation framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../optimisation.html#block-framework">Block Framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../processors.html">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../recon.html">Recon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../utilities.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../astra.html">Astra plugin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../plugins.html">CIL Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../developer_guide.html">Developer’s guide</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <h1>Source code for cil.plugins.astra.operators.ProjectionOperator</h1><div class="highlight"><pre>
+<span></span><span class="c1">#========================================================================</span>
+<span class="c1"># Copyright 2019 Science Technology Facilities Council</span>
+<span class="c1"># Copyright 2019 University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1"># This work is part of the Core Imaging Library developed by Science Technology</span>
+<span class="c1"># Facilities Council and University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#         http://www.apache.org/licenses/LICENSE-2.0.txt</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="c1">#</span>
+<span class="c1">#=========================================================================</span>
+
+<span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">DataOrder</span>
+<span class="kn">from</span> <span class="nn">cil.optimisation.operators</span> <span class="kn">import</span> <span class="n">LinearOperator</span><span class="p">,</span> <span class="n">ChannelwiseOperator</span>
+<span class="kn">from</span> <span class="nn">cil.plugins.astra.operators</span> <span class="kn">import</span> <span class="n">AstraProjector3D</span>
+<span class="kn">from</span> <span class="nn">cil.plugins.astra.operators</span> <span class="kn">import</span> <span class="n">AstraProjector2D</span>
+
+<div class="viewcode-block" id="ProjectionOperator"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.operators.ProjectionOperator">[docs]</a><span class="k">class</span> <span class="nc">ProjectionOperator</span><span class="p">(</span><span class="n">LinearOperator</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;ProjectionOperator wraps ASTRA 3D Projector for GPU, and ASTRA 2D Projectors for CPU. Broadcasts the operator accross all channels.</span>
+<span class="sd">    </span>
+<span class="sd">    :param image_geometry: The CIL ImageGeometry object describing your reconstruction volume</span>
+<span class="sd">    :type image_geometry: ImageGeometry</span>
+<span class="sd">    :param acquisition_geometry: The CIL AcquisitionGeometry object describing your sinogram data</span>
+<span class="sd">    :type acquisition_geometry: AcquisitionGeometry</span>
+<span class="sd">    :param device: The device to run on &#39;gpu&#39; or &#39;cpu&#39;. &#39;gpu&#39; will use the ASTRA 3D Projectors, &#39;cpu&#39; will use the ASTRA 2D Projectors</span>
+<span class="sd">    :type device: string, default=&#39;gpu&#39;</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+<div class="viewcode-block" id="ProjectionOperator.__init__"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.operators.ProjectionOperator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;gpu&#39;</span><span class="p">):</span>
+        
+        <span class="nb">super</span><span class="p">(</span><span class="n">ProjectionOperator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">image_geometry</span><span class="p">,</span> <span class="n">range_geometry</span><span class="o">=</span><span class="n">acquisition_geometry</span><span class="p">)</span>
+
+        <span class="n">DataOrder</span><span class="o">.</span><span class="n">check_order_for_engine</span><span class="p">(</span><span class="s1">&#39;astra&#39;</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">)</span>
+        <span class="n">DataOrder</span><span class="o">.</span><span class="n">check_order_for_engine</span><span class="p">(</span><span class="s1">&#39;astra&#39;</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="p">)</span> 
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">volume_geometry</span> <span class="o">=</span> <span class="n">image_geometry</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sinogram_geometry</span> <span class="o">=</span> <span class="n">acquisition_geometry</span>
+
+        <span class="n">sinogram_geometry_sc</span> <span class="o">=</span> <span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">subset</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">volume_geometry_sc</span> <span class="o">=</span> <span class="n">image_geometry</span><span class="o">.</span><span class="n">subset</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">device</span> <span class="o">==</span> <span class="s1">&#39;gpu&#39;</span><span class="p">:</span>
+            <span class="n">operator</span> <span class="o">=</span> <span class="n">AstraProjector3D</span><span class="p">(</span><span class="n">volume_geometry_sc</span><span class="p">,</span> <span class="n">sinogram_geometry_sc</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">sinogram_geometry</span><span class="o">.</span><span class="n">dimension</span> <span class="o">==</span> <span class="s1">&#39;2D&#39;</span><span class="p">:</span>
+            <span class="n">operator</span> <span class="o">=</span> <span class="n">AstraProjector2D</span><span class="p">(</span><span class="n">volume_geometry_sc</span><span class="p">,</span> <span class="n">sinogram_geometry_sc</span><span class="p">,</span>  <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Cannot process 3D data without a GPU&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">channels</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span> 
+            <span class="n">operator_full</span> <span class="o">=</span> <span class="n">ChannelwiseOperator</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sinogram_geometry</span><span class="o">.</span><span class="n">channels</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="s1">&#39;prepend&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">operator</span> <span class="o">=</span> <span class="n">operator_full</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">operator</span> <span class="o">=</span> <span class="n">operator</span></div>
+
+<div class="viewcode-block" id="ProjectionOperator.direct"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.operators.ProjectionOperator.direct">[docs]</a>    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">IM</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">IM</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="ProjectionOperator.adjoint"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.operators.ProjectionOperator.adjoint">[docs]</a>    <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">DATA</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">DATA</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="ProjectionOperator.calculate_norm"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.operators.ProjectionOperator.calculate_norm">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>    </div>
+
+<div class="viewcode-block" id="ProjectionOperator.domain_geometry"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.operators.ProjectionOperator.domain_geometry">[docs]</a>    <span class="k">def</span> <span class="nf">domain_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">volume_geometry</span></div>
+    
+<div class="viewcode-block" id="ProjectionOperator.range_geometry"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.operators.ProjectionOperator.range_geometry">[docs]</a>    <span class="k">def</span> <span class="nf">range_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sinogram_geometry</span></div></div>
+</pre></div>
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="../../../../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2017-2021 UKRI-STFC, University of Manchester.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

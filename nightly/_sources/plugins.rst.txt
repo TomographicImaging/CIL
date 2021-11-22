@@ -50,8 +50,6 @@ a toolbox written in C language to generate customisable 2D-4D phantoms (with a
 temporal capability).
 
 .. autofunction:: cil.plugins.TomoPhantom.get_ImageData
-   :members:
-   :special-members:
 
 TIGRE
 =====

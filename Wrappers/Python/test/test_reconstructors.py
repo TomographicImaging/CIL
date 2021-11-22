@@ -20,10 +20,13 @@ from cil.framework import AcquisitionGeometry
 from cil.utilities.dataexample import SIMULATED_PARALLEL_BEAM_DATA, SIMULATED_CONE_BEAM_DATA, SIMULATED_SPHERE_VOLUME
 
 import unittest
-from scipy.fft  import fft, ifft
 import numpy as np
-from utils import has_tigre, has_gpu_tigre, has_ipp
+from utils import has_tigre, has_gpu_tigre, has_ipp, has_scipy
 import gc
+
+
+if has_scipy:
+    from scipy.fft  import fft, ifft
 
 
 if has_tigre:
@@ -301,7 +304,7 @@ class Test_FDK(unittest.TestCase):
             reconstructor._pre_filtering(self.ad3D)
 
 
-    @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
+    @unittest.skipUnless(has_tigre and has_ipp and has_scipy, "Prerequisites not met")
     def test_filtering(self):
         ag = AcquisitionGeometry.create_Cone3D([0,-1,0],[0,2,0])\
             .set_panel([64,3],[0.1,0.1])\
@@ -418,7 +421,7 @@ class Test_FBP(unittest.TestCase):
         self.assertEqual(reconstructor.slices_per_chunk, 0)
 
 
-    @unittest.skipUnless(has_tigre and has_ipp, "TIGRE or IPP not installed")
+    @unittest.skipUnless(has_tigre and has_ipp and has_scipy, "Prerequisites not met")
     def test_filtering(self):
         ag = AcquisitionGeometry.create_Parallel3D()\
             .set_panel([64,3],[0.1,0.1])\

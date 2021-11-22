@@ -1,4 +1,5 @@
 from cil.framework import AcquisitionGeometry
+from cil.framework import cilacc
 import numpy as np
 import os
 
@@ -23,8 +24,26 @@ except ImportError:
 print ("has_astra\t{}".format(has_astra))
 
 
+try:
+    cilacc.filter_projections_avh
+    has_ipp = True
+except:
+    has_ipp = False
+print ("has_ipp\t{}".format(has_ipp))
+
+
+try:
+    import scipy
+    has_scipy = True
+except:
+    has_scipy = False
+print ("has_scipy\t{}".format(has_scipy))
+
+
 def has_nvidia_smi():
     return os.system('nvidia-smi') == 0
+
+
 
 
 def has_gpu_tigre():
@@ -80,16 +99,4 @@ def has_gpu_astra():
     print ("has_gpu_astra\t{}".format(has_gpu))
     return has_gpu
 
-def has_ipp():
-    from cil.recon import FBP
-    try:
-        FBP('fail')
-        ipp = True
-    except ImportError:
-        ipp = False
-    except TypeError:
-        #passed ipp check, failed on dataset check
-        pass
 
-    print ("has_ipp\t{}".format(ipp))
-    return ipp

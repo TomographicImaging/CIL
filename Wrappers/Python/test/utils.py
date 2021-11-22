@@ -32,19 +32,8 @@ except:
 print ("has_ipp\t{}".format(has_ipp))
 
 
-try:
-    import scipy
-    has_scipy = True
-except:
-    has_scipy = False
-print ("has_scipy\t{}".format(has_scipy))
-
-
 def has_nvidia_smi():
     return os.system('nvidia-smi') == 0
-
-
-
 
 def has_gpu_tigre():
 

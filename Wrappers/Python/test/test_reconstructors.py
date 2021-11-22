@@ -20,14 +20,10 @@ from cil.framework import AcquisitionGeometry
 from cil.utilities.dataexample import SIMULATED_PARALLEL_BEAM_DATA, SIMULATED_CONE_BEAM_DATA, SIMULATED_SPHERE_VOLUME
 
 import unittest
+from scipy.fft  import fft, ifft
 import numpy as np
-from utils import has_tigre, has_gpu_tigre, has_ipp, has_scipy
+from utils import has_tigre, has_gpu_tigre, has_ipp
 import gc
-
-
-if has_scipy:
-    from scipy.fft  import fft, ifft
-
 
 if has_tigre:
     from cil.plugins.tigre import ProjectionOperator as ProjectionOperator

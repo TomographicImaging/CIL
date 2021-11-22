@@ -6,7 +6,6 @@ source:
   path: ..
 
 build:
-  skip: True # [py==38 and np==115]
   preserve_egg_dir: False
   number: {{ GIT_DESCRIBE_NUMBER }}
   missing_dso_whitelist:
@@ -20,9 +19,9 @@ test:
     - python-wget
     - cvxpy              # [ linux and py==37 and np==118 ]
     - scikit-image
-    - tomophantom        # [ linux ]
-    - cil-astra          # [ linux or win ] 
-    - tigre              # [ linux or win ] 
+    - tomophantom        # [ np<=1.18 and linux ]
+    - cil-astra ==21.3.0 # [ py!=39 and linux ] 
+    - tigre ==2.1        # [ not osx ] 
     - numba
     - packaging
     - ccpi-regulariser   # [ not osx ]

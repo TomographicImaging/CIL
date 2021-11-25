@@ -19,9 +19,9 @@ test:
     - python-wget
     - cvxpy              # [ linux and py==37 and np==118 ]
     - scikit-image
-    - tomophantom        # [ np<=1.18 and linux ]
-    - cil-astra ==21.3.0 # [ py!=39 and linux ] 
-    - tigre ==2.1        # [ not osx ] 
+    - tomophantom =1.4.9 # [ linux ]
+    - cil-astra =21.3.0  # [ linux ] 
+    - tigre =2.2         # [ not osx ] 
     - numba
     - packaging
     - ccpi-regulariser   # [ not osx ]

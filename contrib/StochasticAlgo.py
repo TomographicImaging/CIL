@@ -464,4 +464,26 @@ plt.show()
 # %%
 
 
+## Future Steps:
+#  more options on initialisation (SAGA aglo)
+#  more options on subset selection (SAGA aglo)
+#  check (1/n) scale factor (SAGA aglo)
+#  implement SVRG, SAG, SGD
+
+#  implement non-negativity constraint
+#  implement preconditioning: Not atm implemented. Should be implemented by the corresponding algo
+#  and used by the GradientDescent
+
+
+# Acceleration versions of algos above
+#    - Katyusha
+#    - Non-linear accel
+#    ** We have GradientDescent (similar to GD algo of CIL), and FISTA
+
+
+
+
+
+
+
 

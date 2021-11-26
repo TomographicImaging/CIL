@@ -463,19 +463,41 @@ plt.plot(gd.objective)
 plt.show()
 # %%
 
+#####################################################################################
+#####################################################################################
+#####################################################################################
 
 ## Future Steps:
+
+# on EstimatedGradientSumFunction class:
+#       RedefinedGradientSumFunction?
+#       ApproximatedGradientSumFunction?
+#  - extend SumFunction to a list of functions (see issue #1091)
+#  - implement ApproximatedGradientFunction as a child of SumFunction
+#  - add more methods for the Lipschitz constant (list of each, average, max...)
+
+
+
+#  ON SAGA
 #  more options on initialisation (SAGA aglo)
 #  more options on subset selection (SAGA aglo)
 #  check (1/n) scale factor (SAGA aglo)
 #  implement SVRG, SAG, SGD
+#  epochs counter
 
+
+# ON GradientDescent
 #  implement non-negativity constraint
-#  implement preconditioning: Not atm implemented. Should be implemented by the corresponding algo
-#  and used by the GradientDescent
+
+#  preconditioning : should be a part of ApproximatedGradientFunction or of Algorithm?
+
+#  test warm start -> in Reconstruction class?
+
 
 
 # Acceleration versions of algos above
+#    - ISTA?
+#    - FISTA-like 
 #    - Katyusha
 #    - Non-linear accel
 #    ** We have GradientDescent (similar to GD algo of CIL), and FISTA

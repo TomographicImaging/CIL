@@ -22,7 +22,6 @@ test:
     - tomophantom =1.4.9 # [ linux ]
     - cil-astra =21.3.0  # [ linux ] 
     - tigre =2.2         # [ not osx ] 
-    - numba
     - packaging
     - ccpi-regulariser   # [ not osx ]
     

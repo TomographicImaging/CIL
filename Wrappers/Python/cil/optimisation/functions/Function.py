@@ -19,6 +19,7 @@ import warnings
 
 from numbers import Number
 import numpy as np
+from functools import reduce
 
 class Function(object):
     
@@ -173,21 +174,22 @@ class SumFunction(Function):
     
     """ SumFunction represents the sum of two functions
     
-    .. math:: (F_{1} + F_{2})(x)  = F_{1}(x) + F_{2}(x)
+    .. math:: (F_{1} + F_{2} + ... + F_{n})(x)  = F_{1}(x) + F_{2}(x) + ... + F_{n}(x)
     
     """
     
-    def __init__(self, function1, function2 ):
+    def __init__(self, *functions ):
                 
         super(SumFunction, self).__init__()        
-
-        self.function1 = function1
-        self.function2 = function2
+        if len(functions < 2):
+            raise ValueError('At least 2 functions need to be passed')
+        self.functions = functions
     @property
     def L(self):
         '''Lipschitz constant'''
-        if self.function1.L is not None and self.function2.L is not None:
-            self._L = self.function1.L + self.function2.L
+        
+        if reduce(lambda x,y: y is not None and x.L, self.functions, True ):
+            self._L = reduce(lambda x,y: y + x.L, self.functions, 0. )
         else:
             self._L = None
         return self._L
@@ -197,30 +199,40 @@ class SumFunction(Function):
         super(SumFunction, self.__class__).L.fset(self, value )
 
     def __call__(self,x):
-        r"""Returns the value of the sum of functions :math:`F_{1}` and :math:`F_{2}` at x
+        r"""Returns the value of the sum of functions :math:`F_{1}`,  :math:`F_{2}` ... :math:`F_{n}`at x
         
-        .. math:: (F_{1} + F_{2})(x) = F_{1}(x) + F_{2}(x)
+        .. math:: (F_{1} + F_{2} + ... + F_{n})(x) = F_{1}(x) + F_{2}(x) + ... + F_{n}(x)
                 
         """  
-        return self.function1(x) + self.function2(x)
-    
+        ret = 0.
+        for f in self.functions:
+            ret += f(x)
+        return ret
+
+
     def gradient(self, x, out=None):
         
-        r"""Returns the value of the sum of the gradient of functions :math:`F_{1}` and :math:`F_{2}` at x, 
-        if both of them are differentiable
+        r"""Returns the value of the sum of the gradient of functions :math:`F_{1}`,  :math:`F_{2}` ... :math:`F_{n}` at x, 
+        if all of them are differentiable
         
-        .. math:: (F'_{1} + F'_{2})(x)  = F'_{1}(x) + F'_{2}(x)
+        .. math:: (F'_{1} + F'_{2} + ... + F'_{n})(x) = F'_{1}(x) + F'_{2}(x) + ... + F'_{n}(x)
         
         """
         
-#        try: 
         if out is None:            
-            return self.function1.gradient(x) +  self.function2.gradient(x)  
+            for i,f in enumerate(self.functions):
+                if i == 0:
+                    ret = f.gradient(x)
+                else:
+                    ret += f.gradient(x)  
         else:
+            for i,f in enumerate(self.functions):
+                if i == 0:
+                    f.gradient(x, out=out)
+                else:
+                    out += f.gradient(x)
 
-            self.function1.gradient(x, out=out)
-            out.add(self.function2.gradient(x), out=out)                
-            
+
 class ScaledFunction(Function):
     
     r""" ScaledFunction represents the scalar multiplication with a Function.

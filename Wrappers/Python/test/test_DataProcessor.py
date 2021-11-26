@@ -793,7 +793,7 @@ class TestCentreOfRotation_conebeam(unittest.TestCase):
         ig = ag_orig.get_ImageGeometry()
         phantom = TomoPhantom.get_ImageData(12, ig)
 
-        Op = ProjectionOperator(ig, ag_orig)
+        Op = ProjectionOperator(ig, ag_orig, direct_method='Siddon')
         self.data_0 = Op.direct(phantom)
 
         ag_offset = AcquisitionGeometry.create_Cone2D([0,-100],[0,100],rotation_axis_position=(-0.150,0))\
@@ -801,7 +801,7 @@ class TestCentreOfRotation_conebeam(unittest.TestCase):
             .set_angles(angles)\
             .set_labels(['angle', 'horizontal'])
 
-        Op = ProjectionOperator(ig, ag_offset)
+        Op = ProjectionOperator(ig, ag_offset, direct_method='Siddon')
         self.data_offset = Op.direct(phantom)
         self.data_offset.geometry = ag_orig
 

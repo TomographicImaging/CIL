@@ -15,7 +15,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from cil.optimisation.functions import L1Norm, ScaledFunction, \
+from cil.optimisation.functions import L1Norm, ScaledFunction, SumFunction,\
                                         LeastSquares, L2NormSquared, \
                                         KullbackLeibler, ZeroFunction, ConstantFunction
 from cil.optimisation.operators import IdentityOperator                                        
@@ -23,6 +23,7 @@ from cil.framework import ImageGeometry
 
 import unittest
 import numpy
+import numpy as np
 from numbers import Number
 
 ''' Here we test SumFunction class for different function
@@ -210,6 +211,41 @@ class TestFunction(unittest.TestCase):
                 self.assertNumpyArrayAlmostEqual(out_left.as_array(), out_right1.as_array() + tmp_fun_gradient_out)
             except NotImplementedError:
                 print("{} is not differentiable".format(type_fun))  
+
+        ### test less than 2 functions
+        # list1
+
+        try:
+            f = SumFunction(list1[0])
+            self.assertFalse(True, "passed only one function and SumFunction accepted it!")
+        except ValueError as ve:
+            self.assertTrue(True, "Correctly failed" + str(ve))
+
+        ### test with more than 2 functions
+        # list1
+        list2 = [f9, LeastSquares(operator, b, c=4), LeastSquares(operator, b, c=5)]
+        
+        F = SumFunction(*list2)
+        L = 0.
+        for f in list2:
+            L += f.L
+            
+        self.assertAlmostEqual(L , F.L)
+
+        ## test gradient
+        x = tmp
+        out = f9.gradient(x)
+        out += list2[1].gradient(x)
+        out += list2[2].gradient(x)
+
+        out2 = F.gradient(x)
+        np.testing.assert_allclose(out.as_array(), out2.as_array())
+        
+        out3 = x * 0.
+        F.gradient(x, out=out3)
+        np.testing.assert_allclose(out.as_array(), out3.as_array())
+
+
     def test_ConstantFunction(self):
 
         k = ConstantFunction(constant=1)

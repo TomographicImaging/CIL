@@ -181,18 +181,25 @@ class SumFunction(Function):
     def __init__(self, *functions ):
                 
         super(SumFunction, self).__init__()        
-        if len(functions < 2):
+        if len(functions) < 2:
             raise ValueError('At least 2 functions need to be passed')
         self.functions = functions
     @property
     def L(self):
         '''Lipschitz constant'''
         
-        if reduce(lambda x,y: y is not None and x.L, self.functions, True ):
-            self._L = reduce(lambda x,y: y + x.L, self.functions, 0. )
-        else:
-            self._L = None
+        L = 0.
+        for f in self.functions:
+            if f.L is not None:
+                L += f.L
+            else:
+                self._L = None
+                break
+        self._L = L
+            
         return self._L
+
+        
     @L.setter
     def L(self, value):
         # call base class setter
@@ -224,7 +231,8 @@ class SumFunction(Function):
                 if i == 0:
                     ret = f.gradient(x)
                 else:
-                    ret += f.gradient(x)  
+                    ret += f.gradient(x)
+            return ret
         else:
             for i,f in enumerate(self.functions):
                 if i == 0:

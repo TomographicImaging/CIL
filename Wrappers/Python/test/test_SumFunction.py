@@ -245,6 +245,12 @@ class TestFunction(unittest.TestCase):
         F.gradient(x, out=out3)
         np.testing.assert_allclose(out.as_array(), out3.as_array())
 
+        val = F(x)
+        val2 = 0.
+        for f in F.functions:
+            val2 += f(x)
+        np.testing.assert_almost_equal(val, val2)
+
 
     def test_ConstantFunction(self):
 

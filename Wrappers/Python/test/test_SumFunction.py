@@ -221,9 +221,20 @@ class TestFunction(unittest.TestCase):
         except ValueError as ve:
             self.assertTrue(True, "Correctly failed" + str(ve))
 
+    def test_SumFunction2(self):
+        M, N, K = 3,4,5
+        ig = ImageGeometry(M, N, K)
+        
+        x = ig.allocate('random', seed=1)
+        b = ig.allocate('random', seed=2)
+        
+        operator = IdentityOperator(ig)
+
         ### test with more than 2 functions
         # list1
-        list2 = [f9, LeastSquares(operator, b, c=4), LeastSquares(operator, b, c=5)]
+        list2 = [LeastSquares(operator, b, c=0.25), 
+                 LeastSquares(operator, b, c=4), 
+                 LeastSquares(operator, b, c=5)]
         
         F = SumFunction(*list2)
         L = 0.
@@ -233,8 +244,7 @@ class TestFunction(unittest.TestCase):
         self.assertAlmostEqual(L , F.L)
 
         ## test gradient
-        x = tmp
-        out = f9.gradient(x)
+        out =  list2[0].gradient(x)
         out += list2[1].gradient(x)
         out += list2[2].gradient(x)
 
@@ -250,6 +260,19 @@ class TestFunction(unittest.TestCase):
         for f in F.functions:
             val2 += f(x)
         np.testing.assert_almost_equal(val, val2)
+
+        scalar = 2.5
+        F2 = F + ConstantFunction(scalar)
+
+        assert len(F2.functions) == len(F.functions) + 1
+
+        np.testing.assert_almost_equal(F2(x), F(x) + scalar)
+
+        F3 = F + F2
+    
+        np.testing.assert_almost_equal(F2(x)+F(x), F3(x))
+        self.assertEqual(len(F3.functions) , len(F2.functions) + len(F.functions))
+
 
 
     def test_ConstantFunction(self):

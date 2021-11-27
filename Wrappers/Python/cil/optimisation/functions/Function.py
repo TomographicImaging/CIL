@@ -193,7 +193,7 @@ class SumFunction(Function):
             if f.L is not None:
                 L += f.L
             else:
-                self._L = None
+                L = None
                 break
         self._L = L
             
@@ -239,6 +239,24 @@ class SumFunction(Function):
                     f.gradient(x, out=out)
                 else:
                     out += f.gradient(x)
+    def __add__(self, other):
+        
+        """ Returns the sum of the functions.
+        
+            Cases: a) the sum of two functions :math:`(F_{1}+F_{2})(x) = F_{1}(x) + F_{2}(x)`
+                   b) the sum of a function with a scalar :math:`(F_{1}+scalar)(x) = F_{1}(x) + scalar`
+
+        """
+        
+        if isinstance(other, SumFunction):
+            functions = list(self.functions) + list(other.functions)
+            return SumFunction(*functions)
+        elif isinstance(other, Function):
+            functions = list(self.functions)
+            functions.append(other)
+            return SumFunction(*functions)
+        else:
+            return super(SumFunction, self).__add__(other)
 
 
 class ScaledFunction(Function):

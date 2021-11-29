@@ -72,19 +72,24 @@ class SAGA_Function(StochasticGradientAlgorithmFunction):
         # subset_grad = self.num_subsets * self.functions[self.subset_num].gradient(x)
         
         # subset_grad gradient of the current function
-        self.functions[self.subset_num].gradient(x, out=self.current_gradient)
+        self.functions[self.subset_num].gradient(x, out=self.tmp2)
 
         # the following line computes these and stores the result in tmp1
         # subset_grad = self.num_subsets * self.function[self.subset_num].gradient(x)
         # subset_grad - subset_grad_old
-        self.current_gradient.axpby(self.num_subsets, -1., subset_grad_old, out=self.tmp1)
-        # store the new subset_grad in self.subset_gradients[self.subset_num] 
-        self.tmp1.add(full_grad_old, out=subset_grad_old)
+        self.tmp2.axpby(self.num_subsets, -1., self.subset_gradients[self.subset_num], out=self.tmp1)
+        # store the new subset_grad in self.subset_gradients[self.subset_num]
+        self.tmp2.multiply(self.num_subsets, out=subset_grad_old)
         
-        # update full gradient, which needs subset_grad - subset_grad_old, which is stored in tmp2
+        if out is None:
+            ret = self.tmp1.add(full_grad_old)
+        else:
+            self.tmp1.add(full_grad_old, out=out)
+        # update full gradient, which needs subset_grad - subset_grad_old, which is stored in tmp1
         self.full_gradient.axpby(1., 1/self.num_subsets, self.tmp1, out=self.full_gradient)
-        
-        return self.current_gradient
+
+        if out is None:
+            return ret
 
 
     # def memory_update(self, subset_grad):
@@ -98,6 +103,7 @@ class SAGA_Function(StochasticGradientAlgorithmFunction):
         
         self.subset_num = int(np.random.choice(self.num_subsets))
 
+
     def memory_init(self, x):
         
         """        
@@ -109,6 +115,6 @@ class SAGA_Function(StochasticGradientAlgorithmFunction):
         self.subset_gradients = [ x * 0.0 for _ in range(self.num_subsets)]
         self.full_gradient = x * 0.0
         self.tmp1 = x * 0.0
-        self.current_gradient = x * 0.0
+        self.tmp2 = x * 0.0
 
         self.gradients_allocated = True

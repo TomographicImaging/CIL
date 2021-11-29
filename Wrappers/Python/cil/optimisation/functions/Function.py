@@ -179,22 +179,22 @@ class SumFunction(Function):
     """
     
     def __init__(self, *functions ):
-                
-        super(SumFunction, self).__init__()        
         if len(functions) < 2:
             raise ValueError('At least 2 functions need to be passed')
         self.functions = functions
+        
+        super(SumFunction, self).__init__(L=self.L)        
+        
     @property
     def L(self):
         '''Lipschitz constant'''
         
         L = 0.
         for f in self.functions:
-            if f.L is not None:
-                L += f.L
-            else:
+            if f.L is None:
                 L = None
                 break
+            L += f.L
         self._L = L
             
         return self._L

@@ -105,7 +105,6 @@ class TestFunction(unittest.TestCase):
         
         list1 = [f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12]
                 
-        print('###################  Check sum of two functions ################## \n')
         
         for func in list1:
                
@@ -124,14 +123,10 @@ class TestFunction(unittest.TestCase):
                              
             sumf = f1 + func           
             np.testing.assert_allclose( sumf(tmp), f1(tmp) + tmp_fun_eval ) 
-            print('{} = ( {} + {} ) is OK'.format(type(sumf).__name__, type(f1).__name__, type_fun))
             
             sumf1 = func + f1 
             np.testing.assert_allclose(sumf1(tmp), tmp_fun_eval + f1(tmp))
-            print('Checking commutative')
-            print('{} + ( {} + {} ) is OK\n'.format(type(sumf1).__name__, type_fun, type(f1).__name__))
             
-        print('###################  Check Lispchitz constant ################## \n')
         
         for i,func in enumerate(list1):
             
@@ -153,11 +148,12 @@ class TestFunction(unittest.TestCase):
                 try:
                     sumf.L==f1.L + tmp_fun_L
                 except TypeError:
-                    print('Function {} has L = None'.format(type_fun))
+                    # print('Function {} has L = None'.format(type_fun))
+                    pass
             except ValueError as nie:
-                print (func.__class__.__name__, nie)
+                # print (func.__class__.__name__, nie)
+                pass
                 
-        print('\n###################  Check Gradient ################## \n')   
               
               
         for func in list1:
@@ -177,9 +173,9 @@ class TestFunction(unittest.TestCase):
                     
                 self.assertNumpyArrayAlmostEqual(sumf.gradient(tmp).as_array(), (f1.gradient(tmp) + tmp_fun_gradient).as_array())
             except NotImplementedError:
-                print("{} is not differentiable".format(type_fun))
+                # print("{} is not differentiable".format(type_fun))
+                pass
                 
-        print('\n###################  Check Gradient Out ################## \n')  
          
         out_left = ig.allocate()
         out_right1 = ig.allocate()
@@ -210,7 +206,8 @@ class TestFunction(unittest.TestCase):
                 f1.gradient(tmp, out = out_right1)   
                 self.assertNumpyArrayAlmostEqual(out_left.as_array(), out_right1.as_array() + tmp_fun_gradient_out)
             except NotImplementedError:
-                print("{} is not differentiable".format(type_fun))  
+                # print("{} is not differentiable".format(type_fun))  
+                pass
 
         ### test less than 2 functions
         # list1

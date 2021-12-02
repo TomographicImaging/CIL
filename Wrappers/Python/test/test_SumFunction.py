@@ -123,11 +123,11 @@ class TestFunction(unittest.TestCase):
                 tmp_fun_eval = func(tmp)                
                              
             sumf = f1 + func           
-            self.assertNumpyArrayAlmostEqual(sumf(tmp), f1(tmp) + tmp_fun_eval )
+            np.testing.assert_allclose( sumf(tmp), f1(tmp) + tmp_fun_eval ) 
             print('{} = ( {} + {} ) is OK'.format(type(sumf).__name__, type(f1).__name__, type_fun))
             
             sumf1 = func + f1 
-            self.assertNumpyArrayAlmostEqual(sumf1(tmp), tmp_fun_eval + f1(tmp))
+            np.testing.assert_allclose(sumf1(tmp), tmp_fun_eval + f1(tmp))
             print('Checking commutative')
             print('{} + ( {} + {} ) is OK\n'.format(type(sumf1).__name__, type_fun, type(f1).__name__))
             

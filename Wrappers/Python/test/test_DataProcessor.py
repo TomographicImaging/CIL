@@ -50,6 +50,7 @@ except ModuleNotFoundError:
     has_tigre = False
 else:
     from cil.plugins.tigre import FBP as TigreFBP
+    from cil.plugins.tigre import ProjectionOperator
 
 try:
     import tomophantom
@@ -64,7 +65,6 @@ else:
 try:
     import astra
     from cil.plugins.astra import FBP as AstraFBP
-    from cil.plugins.astra import ProjectionOperator
     has_astra = True
 except ModuleNotFoundError:
     has_astra = False
@@ -793,7 +793,7 @@ class TestCentreOfRotation_conebeam(unittest.TestCase):
         ig = ag_orig.get_ImageGeometry()
         phantom = TomoPhantom.get_ImageData(12, ig)
 
-        Op = ProjectionOperator(ig, ag_orig, device='gpu')
+        Op = ProjectionOperator(ig, ag_orig, direct_method='Siddon')
         self.data_0 = Op.direct(phantom)
 
         ag_offset = AcquisitionGeometry.create_Cone2D([0,-100],[0,100],rotation_axis_position=(-0.150,0))\
@@ -801,7 +801,7 @@ class TestCentreOfRotation_conebeam(unittest.TestCase):
             .set_angles(angles)\
             .set_labels(['angle', 'horizontal'])
 
-        Op = ProjectionOperator(ig, ag_offset, device='gpu')
+        Op = ProjectionOperator(ig, ag_offset, direct_method='Siddon')
         self.data_offset = Op.direct(phantom)
         self.data_offset.geometry = ag_orig
 

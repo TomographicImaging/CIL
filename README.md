@@ -29,7 +29,7 @@ To install CIL and the additional packages and plugins needed to run the [CIL de
 
 ```bash
 
-conda create --name cil -c conda-forge -c intel -c astra-toolbox/label/dev -c ccpi cil cil-astra ccpi-regulariser tigre tomophantom cudatoolkit=9.2
+conda create --name cil -c conda-forge -c intel -c astra-toolbox/label/dev -c ccpi cil cil-astra ccpi-regulariser tigre tomophantom=1.4.10 cudatoolkit=9.2
 ```
 
 where,

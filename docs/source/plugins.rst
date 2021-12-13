@@ -73,11 +73,11 @@ This plugin allows the use of `ASTRA-toolbox
 (`10.1364/OE.24.025129 <http://dx.doi.org/10.1364/OE.24.025129>`_ 
 for forward and back projections and filter back projection reconstruction. 
 
-.. autoclass:: cil.plugins.astra.processors.FBP
+.. autoclass:: cil.plugins.astra.FBP
    :members:
    :special-members:
 
-.. autoclass:: cil.plugins.astra.operators.ProjectionOperator
+.. autoclass:: cil.plugins.astra.ProjectionOperator
    :members:
    :special-members:
 

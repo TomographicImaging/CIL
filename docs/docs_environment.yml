@@ -1,6 +1,7 @@
 name: docs
 channels:
   - conda-forge
+  - intel
   - ccpi
   - defaults
   - astra-toolbox/label/dev

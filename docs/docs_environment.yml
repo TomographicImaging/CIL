@@ -24,3 +24,6 @@ dependencies:
   - cil-astra
   - ccpi-regulariser
   - tomophantom
+  - ipywidgets
+  - tqdm
+  

@@ -2926,7 +2926,7 @@ class AcquisitionData(DataContainer):
 
 class Processor(object):
 
-    r'''Defines a generic DataContainer processor
+    '''Defines a generic DataContainer processor
                        
     accepts a DataContainer as input
     returns a DataContainer
@@ -2963,6 +2963,15 @@ class Processor(object):
             raise KeyError('Attribute {0} not found'.format(name))
     
     def set_input(self, dataset):
+        """
+        Set the input data to the processor
+
+        Parameters
+        ----------
+        input : DataContainer
+            The input DataContainer
+        """
+
         if issubclass(type(dataset), DataContainer):
             if self.check_input(dataset):
                 self.__dict__['input'] = dataset
@@ -2985,7 +2994,19 @@ class Processor(object):
         raise NotImplementedError('Implement basic checks for input DataContainer')
         
     def get_output(self, out=None):
+        """
+        Runs the configured processor and returns the processed data
+
+        Parameters
+        ----------
+        out : DataContainer, optional
+           Fills the referenced DataContainer with the processed data and suppresses the return
         
+        Returns
+        -------
+        DataContainer
+            The processed data. Suppressed if `out` is passed
+        """
         if self.output is None or self.shouldRun:
             if out is None:
                 out = self.process()

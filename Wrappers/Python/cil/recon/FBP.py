@@ -323,7 +323,7 @@ class FDK(GenericFilteredBackProjection):
 
     def run(self, out=None, verbose=1):
         """
-        Runs the configured FDK recon and returns the reconstuction
+        Runs the configured FDK recon and returns the reconstruction
 
         Parameters
         ----------
@@ -335,7 +335,7 @@ class FDK(GenericFilteredBackProjection):
         Returns
         -------
         ImageData
-            The reconstructed volume. Supressed if `out` is passed
+            The reconstructed volume. Suppressed if `out` is passed
         """
 
         if verbose:
@@ -466,7 +466,7 @@ class FBP(GenericFilteredBackProjection):
 
     def run(self, out=None, verbose=1):
         """
-        Runs the configured FBP recon and returns the reconstuction
+        Runs the configured FBP recon and returns the reconstruction
 
         Parameters
         ----------
@@ -479,7 +479,7 @@ class FBP(GenericFilteredBackProjection):
         Returns
         -------
         ImageData
-            The reconstructed volume. Supressed if `out` is passed
+            The reconstructed volume. Suppressed if `out` is passed
         """
 
         if verbose:

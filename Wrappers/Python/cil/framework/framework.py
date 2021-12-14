@@ -2964,11 +2964,12 @@ class Processor(object):
     
     def set_input(self, dataset):
         """
-        Set the input data to run the processor on
+        Set the input data to the processor
 
         Parameters
         ----------
-        input : DataContainer (ImageData/AcquisitionData)
+        input : DataContainer
+            The input DataContainer
         """
 
         if issubclass(type(dataset), DataContainer):
@@ -2998,12 +2999,12 @@ class Processor(object):
 
         Parameters
         ----------
-        out : DataContainer (ImageData/AcquisitionData), optional
+        out : DataContainer, optional
            Fills the referenced DataContainer with the processed data and suppresses the return
         
         Returns
         -------
-        DataContainer (ImageData/AcquisitionData)
+        DataContainer
             The processed data. Supressed if `out` is passed
         """
         if self.output is None or self.shouldRun:

@@ -80,7 +80,7 @@ class SYNCHROTRON_PARALLEL_BEAM_DATA(DATA):
 
         Parameters
         ----------
-        input : data_dir, optional
+        data_dir: str, optional
            The path to the data directory
 
         Returns
@@ -101,7 +101,7 @@ class SIMULATED_PARALLEL_BEAM_DATA(DATA):
 
         Parameters
         ----------
-        input : data_dir, optional
+        data_dir: str, optional
            The path to the data directory
 
         Returns
@@ -122,7 +122,7 @@ class SIMULATED_CONE_BEAM_DATA(DATA):
 
         Parameters
         ----------
-        input : data_dir, optional
+        data_dir: str, optional
            The path to the data directory
 
         Returns
@@ -143,7 +143,7 @@ class SIMULATED_SPHERE_VOLUME(DATA):
 
         Parameters
         ----------
-        input : data_dir, optional
+        data_dir: str, optional
            The path to the data directory
 
         Returns
@@ -181,6 +181,23 @@ class TestData(object):
         self.data_dir = kwargs.get('data_dir', data_dir)
         
     def load(self, which, size=None, scale=(0,1), **kwargs):
+        '''
+        Return a test data of the requested image
+
+        Parameters
+        ----------
+        which: str
+           Image selector: BOAT, CAMERA, PEPPERS, RESOLUTION_CHART, SIMPLE_PHANTOM_2D, SHAPES, RAINBOW
+        size: tuple, optional
+            The size of the returned ImageData. If None default will be used for each image type
+        scale: tuple, optional
+            The scale of the data values
+
+        Returns
+        -------
+        ImageData
+            The simulated spheres volume
+        '''
         if which not in [TestData.BOAT, TestData.CAMERA, 
                          TestData.PEPPERS, TestData.RESOLUTION_CHART,
                          TestData.SIMPLE_PHANTOM_2D, TestData.SHAPES,

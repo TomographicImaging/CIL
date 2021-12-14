@@ -16,12 +16,6 @@ Total variation
 .. autoclass:: cil.plugins.ccpi_regularisation.functions.FGP_TV
    :members:
    :special-members:
-.. autoclass:: cil.plugins.ccpi_regularisation.functions.ROF_TV
-   :members:
-   :special-members:
-.. autoclass:: cil.plugins.ccpi_regularisation.functions.SB_TV
-   :members:
-   :special-members:
 
 Other regularisation functions
 ------------------------------
@@ -29,13 +23,11 @@ Other regularisation functions
 .. autoclass:: cil.plugins.ccpi_regularisation.functions.TGV
    :members:
    :special-members:
-.. autoclass:: cil.plugins.ccpi_regularisation.functions.LLT_ROF
-   :members:
-   :special-members:
 
 .. autoclass:: cil.plugins.ccpi_regularisation.functions.FGP_dTV
    :members:
    :special-members:
+   
 .. autoclass:: cil.plugins.ccpi_regularisation.functions.TNV
    :members:
    :special-members:

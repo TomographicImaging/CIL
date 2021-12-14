@@ -32,9 +32,6 @@ class TransmissionAbsorptionConverter(DataProcessor):
     :return: returns AcquisitionData, ImageData or DataContainer depending on input data type
     :rtype: AcquisitionData, ImageData or DataContainer
     
-    '''
-    
-    '''
     Processor first divides by white_level (default=1) and then take negative logarithm. 
     Elements below threshold (after division by white_level) are set to threshold.
     '''

@@ -75,6 +75,20 @@ class RAINBOW(DATA):
 class SYNCHROTRON_PARALLEL_BEAM_DATA(DATA):
     @classmethod
     def get(cls, **kwargs):
+        '''
+        A DLS dataset
+
+        Parameters
+        ----------
+        input : data_dir, optional
+           The path to the data directory
+
+        Returns
+        -------
+        AcquisitionData
+            The DLS dataset
+        '''
+
         ddir = kwargs.get('data_dir', data_dir)
         loader = NEXUSDataReader()
         loader.set_up(file_name=os.path.join(os.path.abspath(ddir), '24737_fd_normalised.nxs'))
@@ -82,6 +96,20 @@ class SYNCHROTRON_PARALLEL_BEAM_DATA(DATA):
 class SIMULATED_PARALLEL_BEAM_DATA(DATA):
     @classmethod
     def get(cls, **kwargs):
+        '''
+        A simulated parallel-beam dataset generated from SIMULATED_SPHERE_VOLUME 
+
+        Parameters
+        ----------
+        input : data_dir, optional
+           The path to the data directory
+
+        Returns
+        -------
+        AcquisitionData
+            The simulated spheres dataset
+        '''
+
         ddir = kwargs.get('data_dir', data_dir)
         loader = NEXUSDataReader()
         loader.set_up(file_name=os.path.join(os.path.abspath(ddir), 'sim_parallel_beam.nxs'))
@@ -89,6 +117,20 @@ class SIMULATED_PARALLEL_BEAM_DATA(DATA):
 class SIMULATED_CONE_BEAM_DATA(DATA):
     @classmethod
     def get(cls, **kwargs):
+        '''
+        A cone-beam dataset generated from SIMULATED_SPHERE_VOLUME 
+
+        Parameters
+        ----------
+        input : data_dir, optional
+           The path to the data directory
+
+        Returns
+        -------
+        AcquisitionData
+            The simulated spheres dataset
+        '''
+
         ddir = kwargs.get('data_dir', data_dir)
         loader = NEXUSDataReader()
         loader.set_up(file_name=os.path.join(os.path.abspath(ddir), 'sim_cone_beam.nxs'))
@@ -96,6 +138,20 @@ class SIMULATED_CONE_BEAM_DATA(DATA):
 class SIMULATED_SPHERE_VOLUME(DATA):
     @classmethod
     def get(cls, **kwargs):
+        '''
+        A simulated volume of spheres
+
+        Parameters
+        ----------
+        input : data_dir, optional
+           The path to the data directory
+
+        Returns
+        -------
+        ImageData
+            The simulated spheres volume
+        '''
+        
         ddir = kwargs.get('data_dir', data_dir)
         loader = NEXUSDataReader()
         loader.set_up(file_name=os.path.join(os.path.abspath(ddir), 'sim_volume.nxs'))

@@ -82,20 +82,30 @@ def display_slice(container, direction, title, cmap, size, axis_labels, origin):
     return get_slice_3D
 
     
-def islicer(data, direction, title="", slice_number=None, cmap='gray', minmax=None, size=None, axis_labels=None, origin='lower-left'):
+def islicer(data, direction=0, title="", slice_number=None, cmap='gray', minmax=None, size=None, axis_labels=None, origin='lower-left'):
 
     '''Creates an interactive integer slider that slices a 3D volume along direction
     
-    :param data: DataContainer or numpy array
-    :param direction: slice direction, int, should be 0,1,2 or the axis label
-    :param title: optional title for the display
-    :slice_number: int start slice number, optional. If None defaults to center slice
-    :param cmap: matplotlib color map
-    :param minmax: colorbar min and max values, defaults to min max of container
-    :param size: int or tuple specifying the figure size in inch. If int it specifies the width and scales the height keeping the standard matplotlib aspect ratio
-    :param origin: Sets the display origin. 'lower/upper-left/right' 
-    :type origin: string, default 'lower-left' 
+    
+    Parameters
+    ----------
+    data: DataContainer or numpy array
+    direction: int
+        Axis to slice on. Can be 0,1,2 or the axis label 
+    title: str
+        optional title for the display
+    slice_number: int, optional
+        start slice number, defaults to center slice
+    cmap: matplotlib color map
+        set the colour map
+    minmax: tuple
+        colorbar (min, max) values, defaults to min max of container
+    size: int or tuple 
+        specify the figure size in inch. If int it specifies the width and scales the height keeping the standard matplotlib aspect ratio
+    origin: str, default 'lower-left'
+        Sets the display origin in form 'lower/upper-left/right' 
     '''
+
     
     if axis_labels is None:
         if hasattr(data, "dimension_labels"):
@@ -157,7 +167,12 @@ def islicer(data, direction, title="", slice_number=None, cmap='gray', minmax=No
     
 
 def link_islicer(*args):
-    '''links islicers IntSlider widgets'''
+    '''links islicers IntSlider widgets
+
+    Parameters
+    ----------
+    args: islicer objects to link
+    '''
     linked = [(widg, 'value') for widg in args]
     # link pair-wise
     pairs = [(linked[i+1],linked[i]) for i in range(len(linked)-1)]

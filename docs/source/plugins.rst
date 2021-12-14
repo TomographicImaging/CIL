@@ -51,8 +51,9 @@ This plugin allows the use of `TIGRE
 for forward and back projections and filter back projection reconstruction. 
 
 .. autoclass:: cil.plugins.tigre.FBP
+   :exclude-members: check_input, get_input
    :members:
-   :special-members:
+   :inherited-members: set_input, get_output
 
 .. autoclass:: cil.plugins.tigre.ProjectionOperator
    :members:
@@ -66,8 +67,9 @@ This plugin allows the use of `ASTRA-toolbox
 for forward and back projections and filter back projection reconstruction. 
 
 .. autoclass:: cil.plugins.astra.FBP
+   :exclude-members: check_input, get_input
    :members:
-   :special-members:
+   :inherited-members: set_input, get_output
 
 .. autoclass:: cil.plugins.astra.ProjectionOperator
    :members:

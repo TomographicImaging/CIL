@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.plugins.astra.operators.ProjectionOperator &#8212; CIL v21.3.0-2-g66a2c789 documentation</title>
+    <title>cil.plugins.astra.operators.ProjectionOperator &#8212; CIL v21.3.0-3-g37b01d16 documentation</title>
     
   <link href="../../../../../_static/css/theme.css" rel="stylesheet">
   <link href="../../../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -104,12 +104,6 @@
 </li>
 
 <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../../../../astra.html">
-  Astra plugin
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../../../../plugins.html">
   CIL Plugins
  </a>
@@ -156,7 +150,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../processors.html">Processors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../recon.html">Recon</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../utilities.html">Utilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../astra.html">Astra plugin</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../plugins.html">CIL Plugins</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../developer_guide.html">Developer’s guide</a></li>
 </ul>
@@ -216,7 +209,7 @@
 <span class="kn">from</span> <span class="nn">cil.plugins.astra.operators</span> <span class="kn">import</span> <span class="n">AstraProjector3D</span>
 <span class="kn">from</span> <span class="nn">cil.plugins.astra.operators</span> <span class="kn">import</span> <span class="n">AstraProjector2D</span>
 
-<div class="viewcode-block" id="ProjectionOperator"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.operators.ProjectionOperator">[docs]</a><span class="k">class</span> <span class="nc">ProjectionOperator</span><span class="p">(</span><span class="n">LinearOperator</span><span class="p">):</span>
+<div class="viewcode-block" id="ProjectionOperator"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.ProjectionOperator">[docs]</a><span class="k">class</span> <span class="nc">ProjectionOperator</span><span class="p">(</span><span class="n">LinearOperator</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&#39;&#39;&#39;ProjectionOperator wraps ASTRA 3D Projector for GPU, and ASTRA 2D Projectors for CPU. Broadcasts the operator accross all channels.</span>
 <span class="sd">    </span>
 <span class="sd">    :param image_geometry: The CIL ImageGeometry object describing your reconstruction volume</span>
@@ -227,7 +220,7 @@
 <span class="sd">    :type device: string, default=&#39;gpu&#39;</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
-<div class="viewcode-block" id="ProjectionOperator.__init__"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.operators.ProjectionOperator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;gpu&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="ProjectionOperator.__init__"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.ProjectionOperator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;gpu&#39;</span><span class="p">):</span>
         
         <span class="nb">super</span><span class="p">(</span><span class="n">ProjectionOperator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">image_geometry</span><span class="p">,</span> <span class="n">range_geometry</span><span class="o">=</span><span class="n">acquisition_geometry</span><span class="p">)</span>
 
@@ -253,19 +246,19 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">operator</span> <span class="o">=</span> <span class="n">operator</span></div>
 
-<div class="viewcode-block" id="ProjectionOperator.direct"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.operators.ProjectionOperator.direct">[docs]</a>    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">IM</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ProjectionOperator.direct"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.ProjectionOperator.direct">[docs]</a>    <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">IM</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">IM</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span></div>
     
-<div class="viewcode-block" id="ProjectionOperator.adjoint"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.operators.ProjectionOperator.adjoint">[docs]</a>    <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">DATA</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ProjectionOperator.adjoint"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.ProjectionOperator.adjoint">[docs]</a>    <span class="k">def</span> <span class="nf">adjoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">DATA</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">DATA</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span></div>
     
-<div class="viewcode-block" id="ProjectionOperator.calculate_norm"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.operators.ProjectionOperator.calculate_norm">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ProjectionOperator.calculate_norm"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.ProjectionOperator.calculate_norm">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>    </div>
 
-<div class="viewcode-block" id="ProjectionOperator.domain_geometry"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.operators.ProjectionOperator.domain_geometry">[docs]</a>    <span class="k">def</span> <span class="nf">domain_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ProjectionOperator.domain_geometry"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.ProjectionOperator.domain_geometry">[docs]</a>    <span class="k">def</span> <span class="nf">domain_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">volume_geometry</span></div>
     
-<div class="viewcode-block" id="ProjectionOperator.range_geometry"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.operators.ProjectionOperator.range_geometry">[docs]</a>    <span class="k">def</span> <span class="nf">range_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ProjectionOperator.range_geometry"><a class="viewcode-back" href="../../../../../plugins.html#cil.plugins.astra.ProjectionOperator.range_geometry">[docs]</a>    <span class="k">def</span> <span class="nf">range_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sinogram_geometry</span></div></div>
 </pre></div>
 

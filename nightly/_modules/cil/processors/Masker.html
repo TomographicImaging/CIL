@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.processors.Masker &#8212; CIL v21.3.0-2-g66a2c789 documentation</title>
+    <title>cil.processors.Masker &#8212; CIL v21.3.0-3-g37b01d16 documentation</title>
     
   <link href="../../../_static/css/theme.css" rel="stylesheet">
   <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -104,12 +104,6 @@
 </li>
 
 <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../../astra.html">
-  Astra plugin
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../../plugins.html">
   CIL Plugins
  </a>
@@ -156,7 +150,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../processors.html">Processors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../recon.html">Recon</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../utilities.html">Utilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../astra.html">Astra plugin</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../plugins.html">CIL Plugins</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../developer_guide.html">Developer’s guide</a></li>
 </ul>
@@ -275,7 +268,7 @@
 
         <span class="k">return</span> <span class="n">processor</span></div>
 
-<div class="viewcode-block" id="Masker.__init__"><a class="viewcode-back" href="../../../processors.html#cil.processors.Masker.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">mask</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;value&#39;</span><span class="p">,</span>
                  <span class="n">value</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
@@ -304,9 +297,9 @@
                   <span class="s1">&#39;axis&#39;</span><span class="p">:</span> <span class="n">axis</span><span class="p">,</span>
                   <span class="s1">&#39;method&#39;</span><span class="p">:</span> <span class="n">method</span><span class="p">}</span>
 
-        <span class="nb">super</span><span class="p">(</span><span class="n">Masker</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Masker</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     
-<div class="viewcode-block" id="Masker.check_input"><a class="viewcode-back" href="../../../processors.html#cil.processors.Masker.check_input">[docs]</a>    <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Please, provide a mask.&#39;</span><span class="p">)</span>
@@ -323,7 +316,7 @@
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Wrong mode. One of the following is expected:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> 
                             <span class="s2">&quot;value, mean, median, interpolate&quot;</span><span class="p">)</span>
     
-        <span class="k">return</span> <span class="kc">True</span> </div>
+        <span class="k">return</span> <span class="kc">True</span> 
 
     <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         

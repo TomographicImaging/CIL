@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.processors.Slicer &#8212; CIL v21.3.0-2-g66a2c789 documentation</title>
+    <title>cil.processors.Slicer &#8212; CIL v21.3.0-3-g37b01d16 documentation</title>
     
   <link href="../../../_static/css/theme.css" rel="stylesheet">
   <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -104,12 +104,6 @@
 </li>
 
 <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../../astra.html">
-  Astra plugin
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../../plugins.html">
   CIL Plugins
  </a>
@@ -156,7 +150,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../processors.html">Processors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../recon.html">Recon</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../utilities.html">Utilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../astra.html">Astra plugin</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../plugins.html">CIL Plugins</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../developer_guide.html">Developer’s guide</a></li>
 </ul>
@@ -221,12 +214,11 @@
 <span class="sd">    :type force: bool, default=False</span>
 <span class="sd">    :return: returns a DataContainer (AcquisitionData or ImageData) object with an updated AcquisitionGeometry or ImageGeometry where applicable</span>
 <span class="sd">    :rtype: DataContainer (AcquisitionData or ImageData)</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    
-    <span class="sd">&#39;&#39;&#39;                 </span>
+
+
 <span class="sd">    Start inclusive, Stop exclusive</span>
 <span class="sd">    </span>
-<span class="sd">    -1 is ashortcut to include all elemnts along the specified axis</span>
+<span class="sd">    -1 is a shortcut to include all elements along the specified axis</span>
 <span class="sd">    </span>
 <span class="sd">    Input is used to contruct Python slice object using slice() function</span>
 <span class="sd">    </span>
@@ -240,17 +232,17 @@
 <span class="sd">                        </span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
-<div class="viewcode-block" id="Slicer.__init__"><a class="viewcode-back" href="../../../processors.html#cil.processors.Slicer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">roi</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">force</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;roi&#39;</span><span class="p">:</span> <span class="n">roi</span><span class="p">,</span>
                   <span class="s1">&#39;force&#39;</span><span class="p">:</span> <span class="n">force</span><span class="p">}</span>
 
-        <span class="nb">super</span><span class="p">(</span><span class="n">Slicer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Slicer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     
 
-<div class="viewcode-block" id="Slicer.check_input"><a class="viewcode-back" href="../../../processors.html#cil.processors.Slicer.check_input">[docs]</a>    <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         
         <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ImageData</span><span class="p">))</span> <span class="ow">or</span> 
                 <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">AcquisitionData</span><span class="p">))):</span>
@@ -261,7 +253,7 @@
         <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">roi</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Please, specify roi&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">True</span> </div>
+            <span class="k">return</span> <span class="kc">True</span> 
     
 
     <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.plugins.tigre.FBP &#8212; CIL v21.3.0-2-g66a2c789 documentation</title>
+    <title>cil.plugins.tigre.FBP &#8212; CIL v21.3.0-3-g37b01d16 documentation</title>
     
   <link href="../../../../_static/css/theme.css" rel="stylesheet">
   <link href="../../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -104,12 +104,6 @@
 </li>
 
 <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../../../astra.html">
-  Astra plugin
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../../../plugins.html">
   CIL Plugins
  </a>
@@ -156,7 +150,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../processors.html">Processors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../recon.html">Recon</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../utilities.html">Utilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../astra.html">Astra plugin</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../plugins.html">CIL Plugins</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../developer_guide.html">Developer’s guide</a></li>
 </ul>
@@ -238,7 +231,7 @@
 
 <span class="sd">        &#39;&#39;&#39;</span>
     
-<div class="viewcode-block" id="FBP.__init__"><a class="viewcode-back" href="../../../../plugins.html#cil.plugins.tigre.FBP.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">volume_geometry</span><span class="p">,</span> <span class="n">sinogram_geometry</span><span class="p">):</span> 
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">volume_geometry</span><span class="p">,</span> <span class="n">sinogram_geometry</span><span class="p">):</span> 
         
         <span class="n">DataOrder</span><span class="o">.</span><span class="n">check_order_for_engine</span><span class="p">(</span><span class="s1">&#39;tigre&#39;</span><span class="p">,</span> <span class="n">volume_geometry</span><span class="p">)</span>
         <span class="n">DataOrder</span><span class="o">.</span><span class="n">check_order_for_engine</span><span class="p">(</span><span class="s1">&#39;tigre&#39;</span><span class="p">,</span> <span class="n">sinogram_geometry</span><span class="p">)</span> 
@@ -246,17 +239,17 @@
         <span class="n">tigre_geom</span><span class="p">,</span> <span class="n">tigre_angles</span> <span class="o">=</span> <span class="n">CIL2TIGREGeometry</span><span class="o">.</span><span class="n">getTIGREGeometry</span><span class="p">(</span><span class="n">volume_geometry</span><span class="p">,</span><span class="n">sinogram_geometry</span><span class="p">)</span>
 
         <span class="nb">super</span><span class="p">(</span><span class="n">FBP</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>  <span class="n">volume_geometry</span> <span class="o">=</span> <span class="n">volume_geometry</span><span class="p">,</span> <span class="n">sinogram_geometry</span> <span class="o">=</span> <span class="n">sinogram_geometry</span><span class="p">,</span>\
-                                    <span class="n">tigre_geom</span><span class="o">=</span><span class="n">tigre_geom</span><span class="p">,</span> <span class="n">tigre_angles</span><span class="o">=</span><span class="n">tigre_angles</span><span class="p">)</span></div>
+                                    <span class="n">tigre_geom</span><span class="o">=</span><span class="n">tigre_geom</span><span class="p">,</span> <span class="n">tigre_angles</span><span class="o">=</span><span class="n">tigre_angles</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="FBP.check_input"><a class="viewcode-back" href="../../../../plugins.html#cil.plugins.tigre.FBP.check_input">[docs]</a>    <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
         
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sinogram_geometry</span><span class="o">.</span><span class="n">channels</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected input data to be single channel, got </span><span class="si">{0}</span><span class="s2">&quot;</span>\
                  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sinogram_geometry</span><span class="o">.</span><span class="n">channels</span><span class="p">))</span>  
 
         <span class="n">DataOrder</span><span class="o">.</span><span class="n">check_order_for_engine</span><span class="p">(</span><span class="s1">&#39;tigre&#39;</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
-        <span class="k">return</span> <span class="kc">True</span></div>
+        <span class="k">return</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Welcome to CIL’s documentation! &#8212; CIL v21.3.0-2-g66a2c789 documentation</title>
+    <title>Welcome to CIL’s documentation! &#8212; CIL v21.3.0-3-g37b01d16 documentation</title>
     
   <link href="_static/css/theme.css" rel="stylesheet">
   <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -105,12 +105,6 @@
 </li>
 
 <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="astra.html">
-  Astra plugin
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="plugins.html">
   CIL Plugins
  </a>
@@ -157,7 +151,6 @@
 <li class="toctree-l1"><a class="reference internal" href="processors.html">Processors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="recon.html">Recon</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utilities.html">Utilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="astra.html">Astra plugin</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plugins.html">CIL Plugins</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer’s guide</a></li>
 </ul>
@@ -305,7 +298,25 @@ constructed from operator and function objects.</p>
 <li class="toctree-l2"><a class="reference internal" href="optimisation.html#block-operator">Block Operator</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="processors.html">Processors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="processors.html">Processors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="processors.html#data-manipulation">Data Manipulation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="processors.html#data-slicer">Data Slicer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="processors.html#data-binner">Data Binner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="processors.html#data-padder">Data Padder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="processors.html#mask-generator-from-data">Mask Generator from Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="processors.html#data-masking">Data Masking</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="processors.html#pre-processors">Pre-processors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="processors.html#centre-of-rotation-correction">Centre Of Rotation Correction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="processors.html#data-normaliser">Data Normaliser</a></li>
+<li class="toctree-l3"><a class="reference internal" href="processors.html#transmission-to-absorption-converter">Transmission to Absorption Converter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="processors.html#absorption-to-transmission-converter">Absorption to Transmission Converter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="processors.html#ring-remover">Ring Remover</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="recon.html">Recon</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="recon.html#analytical-reconstruction">Analytical Reconstruction</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="recon.html#fbp-reconstructor-for-parallel-beam-geometry">FBP - Reconstructor for parallel-beam geometry</a></li>
@@ -314,10 +325,21 @@ constructed from operator and function objects.</p>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="utilities.html">Utilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="astra.html">Astra plugin</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="astra.html#processors">Processors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="astra.html#operators">Operators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utilities.html">Utilities</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="utilities.html#test-datasets">Test datasets</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="utilities.html#a-set-of-simulated-volumes-and-ct-data">A set of simulated volumes and CT data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utilities.html#a-ct-dataset-from-the-diamond-light-source">A CT dataset from the Diamond Light Source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utilities.html#simulated-image-data">Simulated image data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utilities.html#module-cil.utilities.quality_measures">Image Quality metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities.html#visualisation">Visualisation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="utilities.html#show2d-display-2d-slices">show2D - Display 2D slices</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utilities.html#show-geometry-display-system-geometry">show_geometry - Display system geometry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utilities.html#islicer-interactive-display-of-2d-slices">islicer - interactive display of 2D slices</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utilities.html#link-islicer-link-islicer-objects-by-index">link_islicer - link islicer objects by index</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="plugins.html">CIL Plugins</a><ul>
@@ -327,8 +349,16 @@ constructed from operator and function objects.</p>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="plugins.html#tomophantom">TomoPhantom</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plugins.html#tigre">TIGRE</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plugins.html#astra">ASTRA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plugins.html#tigre">TIGRE</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="plugins.html#fbp">FBP</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins.html#projection-operator">Projection Operator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="plugins.html#astra">ASTRA</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="plugins.html#id4">FBP</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins.html#id5">Projection Operator</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer’s guide</a></li>

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.processors.AbsorptionTransmissionConverter &#8212; CIL v21.3.0-2-g66a2c789 documentation</title>
+    <title>cil.processors.AbsorptionTransmissionConverter &#8212; CIL v21.3.0-3-g37b01d16 documentation</title>
     
   <link href="../../../_static/css/theme.css" rel="stylesheet">
   <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -104,12 +104,6 @@
 </li>
 
 <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../../astra.html">
-  Astra plugin
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../../plugins.html">
   CIL Plugins
  </a>
@@ -156,7 +150,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../processors.html">Processors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../recon.html">Recon</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../utilities.html">Utilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../astra.html">Astra plugin</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../plugins.html">CIL Plugins</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../developer_guide.html">Developer’s guide</a></li>
 </ul>
@@ -215,32 +208,31 @@
 
 <div class="viewcode-block" id="AbsorptionTransmissionConverter"><a class="viewcode-back" href="../../../processors.html#cil.processors.AbsorptionTransmissionConverter">[docs]</a><span class="k">class</span> <span class="nc">AbsorptionTransmissionConverter</span><span class="p">(</span><span class="n">DataProcessor</span><span class="p">):</span>
 
-    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Processor to convert from absorption measurements to transmission</span>
+    <span class="sd">&#39;&#39;&#39;Processor to convert from absorption measurements to transmission</span>
+<span class="sd">    </span>
 <span class="sd">    :param white_level: A float defining incidence intensity in the Beer-Lambert law.</span>
 <span class="sd">    :type white_level: float, optional</span>
 <span class="sd">    :return: returns AcquisitionData, ImageData or DataContainer depending on input data type</span>
 <span class="sd">    :rtype: AcquisitionData, ImageData or DataContainer</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    
-    <span class="sd">&#39;&#39;&#39;</span>
+
 <span class="sd">    Processor first multiplies data by -1, then calculates exponent </span>
 <span class="sd">    and scales result by white_level (default=1)</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
-<div class="viewcode-block" id="AbsorptionTransmissionConverter.__init__"><a class="viewcode-back" href="../../../processors.html#cil.processors.AbsorptionTransmissionConverter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">white_level</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;white_level&#39;</span><span class="p">:</span> <span class="n">white_level</span><span class="p">}</span>
 
-        <span class="nb">super</span><span class="p">(</span><span class="n">AbsorptionTransmissionConverter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">(</span><span class="n">AbsorptionTransmissionConverter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<div class="viewcode-block" id="AbsorptionTransmissionConverter.check_input"><a class="viewcode-back" href="../../../processors.html#cil.processors.AbsorptionTransmissionConverter.check_input">[docs]</a>    <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">check_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">DataContainer</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Processor supports only following data types:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
                             <span class="s1">&#39; - ImageData</span><span class="se">\n</span><span class="s1"> - AcquisitionData</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
                             <span class="s1">&#39; - DataContainer&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="kc">True</span> </div>
+        <span class="k">return</span> <span class="kc">True</span> 
 
     <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 

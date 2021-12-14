@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Processors &#8212; CIL v21.3.0-2-g66a2c789 documentation</title>
+    <title>Processors &#8212; CIL v21.3.0-3-g37b01d16 documentation</title>
     
   <link href="_static/css/theme.css" rel="stylesheet">
   <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -106,12 +106,6 @@
 </li>
 
 <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="astra.html">
-  Astra plugin
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="plugins.html">
   CIL Plugins
  </a>
@@ -155,10 +149,27 @@
 <li class="toctree-l1"><a class="reference internal" href="io.html">Read/ write AcquisitionData and ImageData</a></li>
 <li class="toctree-l1"><a class="reference internal" href="optimisation.html">Optimisation framework</a></li>
 <li class="toctree-l1"><a class="reference internal" href="optimisation.html#block-framework">Block Framework</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Processors</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Processors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#data-manipulation">Data Manipulation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#data-slicer">Data Slicer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#data-binner">Data Binner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#data-padder">Data Padder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mask-generator-from-data">Mask Generator from Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#data-masking">Data Masking</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#pre-processors">Pre-processors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#centre-of-rotation-correction">Centre Of Rotation Correction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#data-normaliser">Data Normaliser</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#transmission-to-absorption-converter">Transmission to Absorption Converter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#absorption-to-transmission-converter">Absorption to Transmission Converter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ring-remover">Ring Remover</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="recon.html">Recon</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utilities.html">Utilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="astra.html">Astra plugin</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plugins.html">CIL Plugins</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer’s guide</a></li>
 </ul>
@@ -190,9 +201,78 @@
               
               <div class="toc-item">
                 
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
 
 <nav id="bd-toc-nav">
-    
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#data-manipulation">
+   Data Manipulation
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#data-slicer">
+     Data Slicer
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#data-binner">
+     Data Binner
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#data-padder">
+     Data Padder
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#mask-generator-from-data">
+     Mask Generator from Data
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#data-masking">
+     Data Masking
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#pre-processors">
+   Pre-processors
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#centre-of-rotation-correction">
+     Centre Of Rotation Correction
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#data-normaliser">
+     Data Normaliser
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#transmission-to-absorption-converter">
+     Transmission to Absorption Converter
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#absorption-to-transmission-converter">
+     Absorption to Transmission Converter
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#ring-remover">
+     Ring Remover
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
 </nav>
               </div>
               
@@ -214,106 +294,12 @@
                 
   <div class="section" id="processors">
 <h1>Processors<a class="headerlink" href="#processors" title="Permalink to this headline">¶</a></h1>
-<dl class="py class">
-<dt id="cil.processors.CentreOfRotationCorrector">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.processors.</span></code><code class="sig-name descname"><span class="pre">CentreOfRotationCorrector</span></code><a class="reference internal" href="_modules/cil/processors/CentreOfRotationCorrector.html#CentreOfRotationCorrector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.CentreOfRotationCorrector" title="Permalink to this definition">¶</a></dt>
-<dd><p>This class contains factory methods to create a CentreOfRotationCorrector object using the desired algorithm.</p>
-<dl class="py attribute">
-<dt id="cil.processors.CentreOfRotationCorrector.__weakref__">
-<code class="sig-name descname"><span class="pre">__weakref__</span></code><a class="headerlink" href="#cil.processors.CentreOfRotationCorrector.__weakref__" title="Permalink to this definition">¶</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.processors.CentreOfRotationCorrector.image_sharpness">
-<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">image_sharpness</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slice_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'centre'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">FBP</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.005</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_binning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/CentreOfRotationCorrector.html#CentreOfRotationCorrector.image_sharpness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.CentreOfRotationCorrector.image_sharpness" title="Permalink to this definition">¶</a></dt>
-<dd><p>This creates a CentreOfRotationCorrector processor which will find the centre by maximising the sharpness of a reconstructed slice.</p>
-<p>Can be used on single slice parallel-beam, and centre slice cone beam geometry. For use only with datasets that can be reconstructed with FBP.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>slice_index</strong> (<em>int</em><em>, </em><em>str='centre'</em><em>, </em><em>optional</em>) – An integer defining the vertical slice to run the algorithm on.</p></li>
-<li><p><strong>FBP</strong> (<em>class</em>) – A CIL FBP class imported from cil.plugins.tigre or cil.plugins.astra</p></li>
-<li><p><strong>tolerance</strong> (<em>float</em><em>, </em><em>default = 0.001</em>) – The tolerance of the fit in pixels, the default is 1/200 of a pixel. Note this is a stopping critera, not a statement of accuracy of the algorithm.</p></li>
-<li><p><strong>search_range</strong> (<em>int</em>) – The range in pixels to search either side of the panel centre. If <cite>None</cite> the width of the panel/4 is used.</p></li>
-<li><p><strong>initial_binning</strong> (<em>int</em>) – The size of the bins for the initial grid. If <cite>None</cite> will bin the image to a step corresponding to &lt;128 pixels. Note the fine search will be on unbinned data.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>returns an AcquisitionData object with an updated AcquisitionGeometry</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>AcquisitionDataS</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.processors.CentreOfRotationCorrector.xcorr">
-<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">xcorr</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slice_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'centre'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ang_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/CentreOfRotationCorrector.html#CentreOfRotationCorrector.xcorr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.CentreOfRotationCorrector.xcorr" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias of xcorrelation. This method has been deprecated. Please use xcorrelation</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.processors.CentreOfRotationCorrector.xcorrelation">
-<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">xcorrelation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slice_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'centre'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ang_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/CentreOfRotationCorrector.html#CentreOfRotationCorrector.xcorrelation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.CentreOfRotationCorrector.xcorrelation" title="Permalink to this definition">¶</a></dt>
-<dd><p>This creates a CentreOfRotationCorrector processor using the cross-correlation algorithm.</p>
-<p>For use on parallel-beam geometry it requires two projections 180 degree apart.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>slice_index</strong> (<em>int</em><em>, </em><em>str='centre'</em><em>, </em><em>optional</em>) – An integer defining the vertical slice to run the algorithm on.</p></li>
-<li><p><strong>projection_index</strong> (<em>int</em><em>, </em><em>optional</em>) – An integer defining the first projection the algorithm will use. The second projection at 180 degrees will be located automatically.</p></li>
-<li><p><strong>ang_tol</strong> (<em>float</em><em>, </em><em>optional</em>) – The angular tolerance in degrees between the two input projections 180degree gap</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>returns an AcquisitionData object with an updated AcquisitionGeometry</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData">AcquisitionData</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt id="cil.processors.Normaliser">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.processors.</span></code><code class="sig-name descname"><span class="pre">Normaliser</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flat_field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dark_field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Normaliser.html#Normaliser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Normaliser" title="Permalink to this definition">¶</a></dt>
-<dd><p>Normalisation based on flat and dark</p>
-<p>This processor read in a AcquisitionData and normalises it based on
-the instrument reading with and without incident photons or neutrons.</p>
-<p>Input: AcquisitionData
-Parameter: 2D projection with flat field (or stack)</p>
-<blockquote>
-<div><p>2D projection with dark field (or stack)</p>
-</div></blockquote>
-<p>Output: AcquisitionDataSetn</p>
-<dl class="py method">
-<dt id="cil.processors.Normaliser.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flat_field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dark_field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Normaliser.html#Normaliser.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Normaliser.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.processors.Normaliser.check_input">
-<code class="sig-name descname"><span class="pre">check_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Normaliser.html#Normaliser.check_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Normaliser.check_input" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks parameters of the input DataContainer</p>
-<p>Should raise an Error if the DataContainer does not match expectation, e.g.
-if the expected input DataContainer is 3D and the Processor expects 2D.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.processors.Normaliser.estimate_normalised_error">
-<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">estimate_normalised_error</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_flat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_dark</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Normaliser.html#Normaliser.estimate_normalised_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Normaliser.estimate_normalised_error" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns the estimated relative error of the normalised projection</p>
-<p>n = (projection - dark) / (flat - dark)
-Dn/n = (flat-dark + projection-dark)/((flat-dark)*(projection-dark))*(Df/f + Dd/d)</p>
-</dd></dl>
-
-</dd></dl>
-
+<p>This module allows the user to manipulate or pre-process their data.</p>
+<div class="section" id="data-manipulation">
+<h2>Data Manipulation<a class="headerlink" href="#data-manipulation" title="Permalink to this headline">¶</a></h2>
+<p>These processors can be used on <cite>ImageData</cite> or <cite>AcquisitionData</cite> objects.</p>
+<div class="section" id="data-slicer">
+<h3>Data Slicer<a class="headerlink" href="#data-slicer" title="Permalink to this headline">¶</a></h3>
 <dl class="py class">
 <dt id="cil.processors.Slicer">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.processors.</span></code><code class="sig-name descname"><span class="pre">Slicer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">roi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Slicer.html#Slicer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Slicer" title="Permalink to this definition">¶</a></dt>
@@ -332,22 +318,47 @@ Dn/n = (flat-dark + projection-dark)/((flat-dark)*(projection-dark))*(Df/f + Dd/
 <dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a> (<a class="reference internal" href="framework.html#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData">AcquisitionData</a> or <a class="reference internal" href="framework.html#cil.framework.ImageData" title="cil.framework.ImageData">ImageData</a>)</p>
 </dd>
 </dl>
+<p>Start inclusive, Stop exclusive</p>
+<p>-1 is a shortcut to include all elements along the specified axis</p>
+<p>Input is used to contruct Python slice object using slice() function</p>
+<p>Start: Starting index where the slicing of object starts
+Stop: Ending index where the slicing of object stops.
+Step: Determines the increment between each index for slicing</p>
+<p>Both Start and Step are optional</p>
+<p>Supports negative indexing</p>
 <dl class="py method">
-<dt id="cil.processors.Slicer.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">roi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Slicer.html#Slicer.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Slicer.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<dt id="cil.processors.Slicer.get_output">
+<code class="sig-name descname"><span class="pre">get_output</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.Slicer.get_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs the configured processor and returns the processed data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>out</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Fills the referenced DataContainer with the processed data and suppresses the return</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The processed data. Suppressed if <cite>out</cite> is passed</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cil.processors.Slicer.check_input">
-<code class="sig-name descname"><span class="pre">check_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Slicer.html#Slicer.check_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Slicer.check_input" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks parameters of the input DataContainer</p>
-<p>Should raise an Error if the DataContainer does not match expectation, e.g.
-if the expected input DataContainer is 3D and the Processor expects 2D.</p>
+<dt id="cil.processors.Slicer.set_input">
+<code class="sig-name descname"><span class="pre">set_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.Slicer.set_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the input data to the processor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>input</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – The input DataContainer</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
+</div>
+<div class="section" id="data-binner">
+<h3>Data Binner<a class="headerlink" href="#data-binner" title="Permalink to this headline">¶</a></h3>
 <dl class="py class">
 <dt id="cil.processors.Binner">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.processors.</span></code><code class="sig-name descname"><span class="pre">Binner</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">roi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Binner.html#Binner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Binner" title="Permalink to this definition">¶</a></dt>
@@ -364,189 +375,228 @@ if the expected input DataContainer is 3D and the Processor expects 2D.</p>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="cil.processors.Binner.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">roi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Binner.html#Binner.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Binner.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.processors.Binner.check_input">
-<code class="sig-name descname"><span class="pre">check_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Binner.html#Binner.check_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Binner.check_input" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks parameters of the input DataContainer</p>
-<p>Should raise an Error if the DataContainer does not match expectation, e.g.
-if the expected input DataContainer is 3D and the Processor expects 2D.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt id="cil.processors.RingRemover">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.processors.</span></code><code class="sig-name descname"><span class="pre">RingRemover</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decNum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/RingRemover.html#RingRemover"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.RingRemover" title="Permalink to this definition">¶</a></dt>
-<dd><p>RingRemover Processor: Removes vertical stripes from a DataContainer(ImageData/AcquisitionData)
-the algorithm in <a class="reference external" href="https://doi.org/10.1364/OE.17.008567">https://doi.org/10.1364/OE.17.008567</a></p>
-<dl class="py method">
-<dt id="cil.processors.RingRemover.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decNum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/RingRemover.html#RingRemover.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.RingRemover.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dt id="cil.processors.Binner.get_output">
+<code class="sig-name descname"><span class="pre">get_output</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.Binner.get_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs the configured processor and returns the processed data</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>decNum</strong> (<em>number of wavelet decompositions</em>) – </p></li>
-<li><p><strong>wname</strong> (<em>(</em><em>str</em><em>) </em><em>name of wavelet filter from pywt</em>) – Example: ‘db1’ – ‘db35’, ‘haar’</p></li>
-<li><p><strong>sigma</strong> (<em>Damping parameter in Fourier space.</em>) – </p></li>
-<li><p><strong>info</strong> (<em>Prints ring remover end message</em>) – </p></li>
-</ul>
+<dd class="field-odd"><p><strong>out</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Fills the referenced DataContainer with the processed data and suppresses the return</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>multi-spectral 2D, multi-spectral 3D</p>
+<dd class="field-even"><p>The processed data. Suppressed if <cite>out</cite> is passed</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Corrected ImageData/AcquisitionData 2D, 3D,</p>
+<dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cil.processors.RingRemover.check_input">
-<code class="sig-name descname"><span class="pre">check_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/RingRemover.html#RingRemover.check_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.RingRemover.check_input" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks parameters of the input DataContainer</p>
-<p>Should raise an Error if the DataContainer does not match expectation, e.g.
-if the expected input DataContainer is 3D and the Processor expects 2D.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.processors.RingRemover.xRemoveStripesVertical">
-<code class="sig-name descname"><span class="pre">xRemoveStripesVertical</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ima</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decNum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/RingRemover.html#RingRemover.xRemoveStripesVertical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.RingRemover.xRemoveStripesVertical" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="simple">
-<dt>Code from <a class="reference external" href="https://doi.org/10.1364/OE.17.008567">https://doi.org/10.1364/OE.17.008567</a></dt><dd><p>translated in Python</p>
-</dd>
-</dl>
+<dt id="cil.processors.Binner.set_input">
+<code class="sig-name descname"><span class="pre">set_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.Binner.set_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the input data to the processor</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>Corrected 2D sinogram data (Numpy Array)</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>input</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – The input DataContainer</p>
 </dd>
 </dl>
 </dd></dl>
 
 </dd></dl>
 
+</div>
+<div class="section" id="data-padder">
+<h3>Data Padder<a class="headerlink" href="#data-padder" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="cil.processors.Padder">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.processors.</span></code><code class="sig-name descname"><span class="pre">Padder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'constant'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constant_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Padder.html#Padder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Padder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Processor to pad an array, wrapping numpy.pad
+See <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.pad.html">https://numpy.org/doc/stable/reference/generated/numpy.pad.html</a></p>
+<dl class="py method">
+<dt id="cil.processors.Padder.constant">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">constant</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pad_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constant_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Padder.html#Padder.constant"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Padder.constant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Padder processor wrapping numpy.pad with mode <cite>constant</cite>
+Pads with a constant value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pad_width</strong> (<em>int</em><em>, </em><em>tuple</em><em>, </em><em>dict</em>) – The number of values padded to the edges of each axis</p></li>
+<li><p><strong>constant_values</strong> (<em>float</em><em>, </em><em>tuple</em><em>, </em><em>dict</em>) – The values to set the padded values for each axis</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If passed a single value it will pad symmetrically in all dimensions.
+If passed a tuple it will apply asymmetric padding in all dimensions. (before, after)
+If passed a dictionary it will apply the specified padding to the required dimension label: e.g.
+{‘horizontal’:(8, 23), ‘vertical’: 10}</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.processors.Padder.edge">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">edge</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pad_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Padder.html#Padder.edge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Padder.edge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Padder processor wrapping numpy.pad with mode <cite>edge</cite>
+Pads with the edge values of array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pad_width</strong> (<em>int</em><em>, </em><em>tuple</em><em>, </em><em>dict</em>) – The number of values padded to the edges of each axis</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If passed a single value it will pad symmetrically in all dimensions.
+If passed a tuple it will apply asymmetric padding in all dimensions. (before, after)
+If passed a dictionary it will apply the specified padding to the required dimension label: e.g.
+{‘horizontal’:(8, 23), ‘vertical’: 10}</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.processors.Padder.linear_ramp">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">linear_ramp</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pad_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Padder.html#Padder.linear_ramp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Padder.linear_ramp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Padder processor wrapping numpy.pad with mode <cite>linear_ramp</cite>
+Pads with the linear ramp between end_value and the array edge value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pad_width</strong> (<em>int</em><em>, </em><em>tuple</em><em>, </em><em>dict</em>) – The number of values padded to the edges of each axis</p></li>
+<li><p><strong>end_values</strong> (<em>float</em><em>, </em><em>tuple</em><em>, </em><em>dict</em>) – The values used for the ending value of the linear_ramp</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If passed a single value it will pad symmetrically in all dimensions.
+If passed a tuple it will apply asymmetric padding in all dimensions. (before, after)
+If passed a dictionary it will apply the specified padding to the required dimension label: e.g.
+{‘horizontal’:(8, 23), ‘vertical’: 10}</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.processors.Padder.reflect">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">reflect</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pad_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Padder.html#Padder.reflect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Padder.reflect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Padder processor wrapping numpy.pad with mode <cite>reflect</cite>
+Pads with the reflection of the vector mirrored on the first and last values of the vector along each axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pad_width</strong> (<em>int</em><em>, </em><em>tuple</em><em>, </em><em>dict</em>) – The number of values padded to the edges of each axis</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If passed a single value it will pad symmetrically in all dimensions.
+If passed a tuple it will apply asymmetric padding in all dimensions. (before, after)
+If passed a dictionary it will apply the specified padding to the required dimension label: e.g.
+{‘horizontal’:(8, 23), ‘vertical’: 10}</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.processors.Padder.symmetric">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">symmetric</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pad_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Padder.html#Padder.symmetric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Padder.symmetric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Padder processor wrapping numpy.pad with mode <cite>symmetric</cite>
+Pads with the reflection of the vector mirrored along the edge of the array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pad_width</strong> (<em>int</em><em>, </em><em>tuple</em><em>, </em><em>dict</em>) – The number of values padded to the edges of each axis</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If passed a single value it will pad symmetrically in all dimensions.
+If passed a tuple it will apply asymmetric padding in all dimensions. (before, after)
+If passed a dictionary it will apply the specified padding to the required dimension label: e.g.
+{‘horizontal’:(8, 23), ‘vertical’: 10}</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.processors.Padder.wrap">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">wrap</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pad_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Padder.html#Padder.wrap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Padder.wrap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Padder processor wrapping numpy.pad with mode <cite>wrap</cite>
+Pads with the wrap of the vector along the axis. The first values are used to pad the end and the end values are used to pad the beginning.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pad_width</strong> (<em>int</em><em>, </em><em>tuple</em><em>, </em><em>dict</em>) – The number of values padded to the edges of each axis</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If passed a single value it will pad symmetrically in all dimensions.
+If passed a tuple it will apply asymmetric padding in all dimensions. (before, after)
+If passed a dictionary it will apply the specified padding to the required dimension label: e.g.
+{‘horizontal’:(8, 23), ‘vertical’: 10}</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.processors.Padder.get_output">
+<code class="sig-name descname"><span class="pre">get_output</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.Padder.get_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs the configured processor and returns the processed data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>out</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Fills the referenced DataContainer with the processed data and suppresses the return</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The processed data. Suppressed if <cite>out</cite> is passed</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.processors.Padder.set_input">
+<code class="sig-name descname"><span class="pre">set_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.Padder.set_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the input data to the processor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>input</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – The input DataContainer</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="mask-generator-from-data">
+<h3>Mask Generator from Data<a class="headerlink" href="#mask-generator-from-data" title="Permalink to this headline">¶</a></h3>
 <dl class="py class">
 <dt id="cil.processors.MaskGenerator">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.processors.</span></code><code class="sig-name descname"><span class="pre">MaskGenerator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'special_values'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(None,</span> <span class="pre">None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantiles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(None,</span> <span class="pre">None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/MaskGenerator.html#MaskGenerator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.MaskGenerator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Processor to detect outliers and return a mask with 0 where outliers were detected, and 1 for other pixels. Please use the desiried method to configure a processor for your needs.</p>
 <dl class="py method">
-<dt id="cil.processors.MaskGenerator.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'special_values'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(None,</span> <span class="pre">None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantiles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(None,</span> <span class="pre">None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/MaskGenerator.html#MaskGenerator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.MaskGenerator.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Processor to detect outliers and return mask with 0 where outliers were detected and 1 for other pixels.</p>
-<blockquote>
-<div><dl class="field-list simple">
-<dt class="field-odd">param mode</dt>
-<dd class="field-odd"><p>a method for detecting outliers (special_values, nan, inf, threshold, quantile, mean, median, movmean, movmedian)</p>
-</dd>
-<dt class="field-even">type mode</dt>
-<dd class="field-even"><p>string, default=’special_values’</p>
-</dd>
-<dt class="field-odd">param threshold_value</dt>
-<dd class="field-odd"><p>specify lower and upper boundaries if ‘threshold’ mode is selected</p>
-</dd>
-<dt class="field-even">type threshold_value</dt>
-<dd class="field-even"><p>tuple</p>
-</dd>
-<dt class="field-odd">param quantiles</dt>
-<dd class="field-odd"><p>specify lower and upper quantiles if ‘quantile’ mode is selected</p>
-</dd>
-<dt class="field-even">type quantiles</dt>
-<dd class="field-even"><p>tuple</p>
-</dd>
-<dt class="field-odd">param threshold_factor</dt>
-<dd class="field-odd"><p>scales detection threshold (standard deviation in case of ‘mean’, ‘movmean’ and median absolute deviation in case of ‘median’, movmedian’)</p>
-</dd>
-<dt class="field-even">type threshold_factor</dt>
-<dd class="field-even"><p>float, default=3</p>
-</dd>
-<dt class="field-odd">param window</dt>
-<dd class="field-odd"><p>specify running window if ‘movmean’ or ‘movmedian’ mode is selected</p>
-</dd>
-<dt class="field-even">type window</dt>
-<dd class="field-even"><p>int, default=5</p>
-</dd>
-<dt class="field-odd">param axis</dt>
-<dd class="field-odd"><p>specify axis to alculate statistics for ‘mean’, ‘median’, ‘movmean’, ‘movmean’ modes</p>
-</dd>
-<dt class="field-even">type axis</dt>
-<dd class="field-even"><p>int, string</p>
-</dd>
-<dt class="field-odd">return</dt>
-<dd class="field-odd"><p>returns a DataContainer with boolean mask with 0 where outliers were detected</p>
-</dd>
-<dt class="field-even">rtype</dt>
-<dd class="field-even"><p>DataContainer</p>
-</dd>
-</dl>
-</div></blockquote>
-<ul class="simple">
-<li><p>special_values    test element-wise for both inf and nan</p></li>
-<li><p>nan               test element-wise for nan</p></li>
-<li><p>inf               test element-wise for inf</p></li>
-<li><dl class="simple">
-<dt>threshold         test element-wise if array values are within boundaries</dt><dd><p>given by threshold_values = (float,float).
-You can secify only lower threshold value by setting another to None
-such as threshold_values = (float,None), then
-upper boundary will be amax(data). Similarly, to specify only upper
-boundary, use threshold_values = (None,float). If both threshold_values
-are set to None, then original array will be returned.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>quantile          test element-wise if array values are within boundaries</dt><dd><p>given by quantiles = (q1,q2), 0&lt;=q1,q2&lt;=1.
-You can secify only lower quantile value by setting another to None
-such as quantiles = (float,q2), then
-upper boundary will be amax(data). Similarly, to specify only upper
-boundary, use quantiles = (None,q1). If both quantiles
-are set to None, then original array will be returned.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>mean              test element-wise if</dt><dd><p>abs(A - mean(A)) &lt; threshold_factor * std(A).
-Default value of threshold_factor is 3. If no axis is specified,
-then operates over flattened array. Alternatively operates along axis specified
-as dimension_label.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>median            test element-wise if</dt><dd><p>abs(A - median(A)) &lt; threshold_factor * scaled MAD(A),
-scaled median absolute deviation (MAD) is defined as
-c*median(abs(A-median(A))) where c=-1/(sqrt(2)*erfcinv(3/2))
-Default value of threshold_factor is 3. If no axis is specified,
-then operates over flattened array. Alternatively operates along axis specified
-as dimension_label.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>movmean           the same as mean but uses rolling mean with a specified window,</dt><dd><p>default window value is 5</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>movmedian         the same as mean but uses rolling median with a specified window,</dt><dd><p>default window value is 5</p>
-</dd>
-</dl>
-</li>
+<dt id="cil.processors.MaskGenerator.special_values">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">special_values</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/MaskGenerator.html#MaskGenerator.special_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.MaskGenerator.special_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>This creates a MaskGenerator processor which generates a mask for inf and/or nan values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nan</strong> (<em>bool</em><em>, </em><em>default=True</em>) – mask NaN values</p></li>
+<li><p><strong>inf</strong> (<em>bool</em><em>, </em><em>default=True</em>) – mask INF values</p></li>
 </ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cil.processors.MaskGenerator.check_input">
-<code class="sig-name descname"><span class="pre">check_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/MaskGenerator.html#MaskGenerator.check_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.MaskGenerator.check_input" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks parameters of the input DataContainer</p>
-<p>Should raise an Error if the DataContainer does not match expectation, e.g.
-if the expected input DataContainer is 3D and the Processor expects 2D.</p>
+<dt id="cil.processors.MaskGenerator.threshold">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">threshold</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/MaskGenerator.html#MaskGenerator.threshold"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.MaskGenerator.threshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>This creates a MaskGenerator processor which generates a mask for values outside boundaries</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>min_val</strong> (<em>float</em><em>, </em><em>default=None</em>) – lower boundary</p></li>
+<li><p><strong>max_val</strong> (<em>float</em><em>, </em><em>default=None</em>) – upper boundary</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.processors.MaskGenerator.quantile">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">quantile</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_quantile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_quantile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/MaskGenerator.html#MaskGenerator.quantile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.MaskGenerator.quantile" title="Permalink to this definition">¶</a></dt>
+<dd><p>This creates a MaskGenerator processor which generates a mask for values outside boundaries</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>min_quantile</strong> (<em>float</em><em>, </em><em>default=None</em>) – lower quantile, 0-1</p></li>
+<li><p><strong>max_quantile</strong> (<em>float</em><em>, </em><em>default=None</em>) – upper quantile, 0-1</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -583,96 +633,51 @@ MAD = c*median(abs(A-median(A))) where c=-1/(sqrt(2)*erfcinv(3/2))</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cil.processors.MaskGenerator.quantile">
-<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">quantile</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_quantile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_quantile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/MaskGenerator.html#MaskGenerator.quantile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.MaskGenerator.quantile" title="Permalink to this definition">¶</a></dt>
-<dd><p>This creates a MaskGenerator processor which generates a mask for values outside boundaries</p>
+<dt id="cil.processors.MaskGenerator.get_output">
+<code class="sig-name descname"><span class="pre">get_output</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.MaskGenerator.get_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs the configured processor and returns the processed data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>min_quantile</strong> (<em>float</em><em>, </em><em>default=None</em>) – lower quantile, 0-1</p></li>
-<li><p><strong>max_quantile</strong> (<em>float</em><em>, </em><em>default=None</em>) – upper quantile, 0-1</p></li>
-</ul>
+<dd class="field-odd"><p><strong>out</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Fills the referenced DataContainer with the processed data and suppresses the return</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The processed data. Suppressed if <cite>out</cite> is passed</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cil.processors.MaskGenerator.special_values">
-<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">special_values</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/MaskGenerator.html#MaskGenerator.special_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.MaskGenerator.special_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>This creates a MaskGenerator processor which generates a mask for inf and/or nan values.</p>
+<dt id="cil.processors.MaskGenerator.set_input">
+<code class="sig-name descname"><span class="pre">set_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.MaskGenerator.set_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the input data to the processor</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>nan</strong> (<em>bool</em><em>, </em><em>default=True</em>) – mask NaN values</p></li>
-<li><p><strong>inf</strong> (<em>bool</em><em>, </em><em>default=True</em>) – mask INF values</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.processors.MaskGenerator.threshold">
-<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">threshold</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/MaskGenerator.html#MaskGenerator.threshold"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.MaskGenerator.threshold" title="Permalink to this definition">¶</a></dt>
-<dd><p>This creates a MaskGenerator processor which generates a mask for values outside boundaries</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>min_val</strong> (<em>float</em><em>, </em><em>default=None</em>) – lower boundary</p></li>
-<li><p><strong>max_val</strong> (<em>float</em><em>, </em><em>default=None</em>) – upper boundary</p></li>
-</ul>
+<dd class="field-odd"><p><strong>input</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – The input DataContainer</p>
 </dd>
 </dl>
 </dd></dl>
 
 </dd></dl>
 
+</div>
+<div class="section" id="data-masking">
+<h3>Data Masking<a class="headerlink" href="#data-masking" title="Permalink to this headline">¶</a></h3>
 <dl class="py class">
 <dt id="cil.processors.Masker">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.processors.</span></code><code class="sig-name descname"><span class="pre">Masker</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'value'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Masker.html#Masker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Masker" title="Permalink to this definition">¶</a></dt>
 <dd><p>Processor to fill missing values provided by mask. Please use the desiried method to configure a processor for your needs.</p>
 <dl class="py method">
-<dt id="cil.processors.Masker.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'value'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Masker.html#Masker.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Masker.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Processor to fill missing values provided by mask.</p>
+<dt id="cil.processors.Masker.value">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">value</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Masker.html#Masker.value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Masker.value" title="Permalink to this definition">¶</a></dt>
+<dd><p>This sets the masked values of the input data to the requested value.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>mask</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><a class="reference internal" href="framework.html#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a><em>, </em><a class="reference internal" href="framework.html#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a><em>, </em><em>numpy.ndarray</em>) – A boolean array with the same dimensions as input, where ‘False’ represents masked values. Mask can be generated using ‘MaskGenerator’ processor to identify outliers.</p></li>
-<li><p><strong>mode</strong> (<em>str</em><em>, </em><em>default=value</em>) – a method to fill in missing values (value, mean, median, interpolate)</p></li>
-<li><p><strong>value</strong> (<em>float</em><em>, </em><em>default=0</em>) – substitute all outliers with a specific value</p></li>
-<li><p><strong>axis</strong> (<em>str</em><em> or </em><em>int</em>) – specify axis as int or from ‘dimension_labels’ to calculate mean or median in respective modes</p></li>
-<li><p><strong>method</strong> – One of the following interpoaltion methods: linear, nearest, zeros, linear, quadratic, cubic, previous, next</p></li>
-<li><p><strong>method</strong> – str, default=’linear’</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>DataContainer or it’s subclass with masked outliers</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a> or it’s subclass</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.processors.Masker.check_input">
-<code class="sig-name descname"><span class="pre">check_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Masker.html#Masker.check_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Masker.check_input" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks parameters of the input DataContainer</p>
-<p>Should raise an Error if the DataContainer does not match expectation, e.g.
-if the expected input DataContainer is 3D and the Processor expects 2D.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.processors.Masker.interpolate">
-<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">interpolate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Masker.html#Masker.interpolate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Masker.interpolate" title="Permalink to this definition">¶</a></dt>
-<dd><p>This operates over the specified axis and uses 1D interpolation over remaining flattened array to fill in missing vaues.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>mask</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><a class="reference internal" href="framework.html#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a><em>, </em><a class="reference internal" href="framework.html#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a><em>, </em><em>numpy.ndarray</em>) – A boolean array with the same dimensions as input, where ‘False’ represents masked values. Mask can be generated using ‘MaskGenerator’ processor to identify outliers.</p></li>
-<li><p><strong>axis</strong> (<em>str</em><em>, </em><em>int</em>) – specify axis as int or from ‘dimension_labels’ to loop over and perform 1D interpolation.</p></li>
-<li><p><strong>method</strong> – One of the following interpoaltion methods: linear, nearest, zeros, linear, quadratic, cubic, previous, next</p></li>
-<li><p><strong>method</strong> – str, default=’linear’</p></li>
+<li><p><strong>value</strong> (<em>float</em><em>, </em><em>default=0</em>) – values to be assigned to missing elements</p></li>
 </ul>
 </dd>
 </dl>
@@ -707,21 +712,172 @@ if the expected input DataContainer is 3D and the Processor expects 2D.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cil.processors.Masker.value">
-<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">value</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Masker.html#Masker.value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Masker.value" title="Permalink to this definition">¶</a></dt>
-<dd><p>This sets the masked values of the input data to the requested value.</p>
+<dt id="cil.processors.Masker.interpolate">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">interpolate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Masker.html#Masker.interpolate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Masker.interpolate" title="Permalink to this definition">¶</a></dt>
+<dd><p>This operates over the specified axis and uses 1D interpolation over remaining flattened array to fill in missing vaues.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>mask</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><a class="reference internal" href="framework.html#cil.framework.ImageData" title="cil.framework.ImageData"><em>ImageData</em></a><em>, </em><a class="reference internal" href="framework.html#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a><em>, </em><em>numpy.ndarray</em>) – A boolean array with the same dimensions as input, where ‘False’ represents masked values. Mask can be generated using ‘MaskGenerator’ processor to identify outliers.</p></li>
-<li><p><strong>value</strong> (<em>float</em><em>, </em><em>default=0</em>) – values to be assigned to missing elements</p></li>
+<li><p><strong>axis</strong> (<em>str</em><em>, </em><em>int</em>) – specify axis as int or from ‘dimension_labels’ to loop over and perform 1D interpolation.</p></li>
+<li><p><strong>method</strong> – One of the following interpoaltion methods: linear, nearest, zeros, linear, quadratic, cubic, previous, next</p></li>
+<li><p><strong>method</strong> – str, default=’linear’</p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.processors.Masker.get_output">
+<code class="sig-name descname"><span class="pre">get_output</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.Masker.get_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs the configured processor and returns the processed data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>out</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Fills the referenced DataContainer with the processed data and suppresses the return</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The processed data. Suppressed if <cite>out</cite> is passed</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.processors.Masker.set_input">
+<code class="sig-name descname"><span class="pre">set_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.Masker.set_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the input data to the processor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>input</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – The input DataContainer</p>
 </dd>
 </dl>
 </dd></dl>
 
 </dd></dl>
 
+</div>
+</div>
+<div class="section" id="pre-processors">
+<h2>Pre-processors<a class="headerlink" href="#pre-processors" title="Permalink to this headline">¶</a></h2>
+<p>These processors can be used with <cite>AcquisitionData</cite> objects</p>
+<div class="section" id="centre-of-rotation-correction">
+<h3>Centre Of Rotation Correction<a class="headerlink" href="#centre-of-rotation-correction" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="cil.processors.CentreOfRotationCorrector">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.processors.</span></code><code class="sig-name descname"><span class="pre">CentreOfRotationCorrector</span></code><a class="reference internal" href="_modules/cil/processors/CentreOfRotationCorrector.html#CentreOfRotationCorrector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.CentreOfRotationCorrector" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class contains factory methods to create a CentreOfRotationCorrector object using the desired algorithm.</p>
+<dl class="py method">
+<dt id="cil.processors.CentreOfRotationCorrector.xcorr">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">xcorr</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slice_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'centre'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ang_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/CentreOfRotationCorrector.html#CentreOfRotationCorrector.xcorr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.CentreOfRotationCorrector.xcorr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias of xcorrelation. This method has been deprecated. Please use xcorrelation</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.processors.CentreOfRotationCorrector.xcorrelation">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">xcorrelation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slice_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'centre'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ang_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/CentreOfRotationCorrector.html#CentreOfRotationCorrector.xcorrelation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.CentreOfRotationCorrector.xcorrelation" title="Permalink to this definition">¶</a></dt>
+<dd><p>This creates a CentreOfRotationCorrector processor using the cross-correlation algorithm.</p>
+<p>For use on parallel-beam geometry it requires two projections 180 degree apart.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>slice_index</strong> (<em>int</em><em>, </em><em>str='centre'</em><em>, </em><em>optional</em>) – An integer defining the vertical slice to run the algorithm on.</p></li>
+<li><p><strong>projection_index</strong> (<em>int</em><em>, </em><em>optional</em>) – An integer defining the first projection the algorithm will use. The second projection at 180 degrees will be located automatically.</p></li>
+<li><p><strong>ang_tol</strong> (<em>float</em><em>, </em><em>optional</em>) – The angular tolerance in degrees between the two input projections 180degree gap</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>returns an AcquisitionData object with an updated AcquisitionGeometry</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData">AcquisitionData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.processors.CentreOfRotationCorrector.image_sharpness">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">image_sharpness</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slice_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'centre'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">FBP</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.005</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_binning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/CentreOfRotationCorrector.html#CentreOfRotationCorrector.image_sharpness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.CentreOfRotationCorrector.image_sharpness" title="Permalink to this definition">¶</a></dt>
+<dd><p>This creates a CentreOfRotationCorrector processor which will find the centre by maximising the sharpness of a reconstructed slice.</p>
+<p>Can be used on single slice parallel-beam, and centre slice cone beam geometry. For use only with datasets that can be reconstructed with FBP.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>slice_index</strong> (<em>int</em><em>, </em><em>str='centre'</em><em>, </em><em>optional</em>) – An integer defining the vertical slice to run the algorithm on.</p></li>
+<li><p><strong>FBP</strong> (<em>class</em>) – A CIL FBP class imported from cil.plugins.tigre or cil.plugins.astra</p></li>
+<li><p><strong>tolerance</strong> (<em>float</em><em>, </em><em>default = 0.001</em>) – The tolerance of the fit in pixels, the default is 1/200 of a pixel. Note this is a stopping critera, not a statement of accuracy of the algorithm.</p></li>
+<li><p><strong>search_range</strong> (<em>int</em>) – The range in pixels to search either side of the panel centre. If <cite>None</cite> the width of the panel/4 is used.</p></li>
+<li><p><strong>initial_binning</strong> (<em>int</em>) – The size of the bins for the initial grid. If <cite>None</cite> will bin the image to a step corresponding to &lt;128 pixels. Note the fine search will be on unbinned data.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>returns an AcquisitionData object with an updated AcquisitionGeometry</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>AcquisitionDataS</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="data-normaliser">
+<h3>Data Normaliser<a class="headerlink" href="#data-normaliser" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="cil.processors.Normaliser">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.processors.</span></code><code class="sig-name descname"><span class="pre">Normaliser</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flat_field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dark_field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Normaliser.html#Normaliser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Normaliser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalisation based on flat and dark</p>
+<p>This processor read in a AcquisitionData and normalises it based on
+the instrument reading with and without incident photons or neutrons.</p>
+<p>Input: AcquisitionData
+Parameter: 2D projection with flat field (or stack)</p>
+<blockquote>
+<div><p>2D projection with dark field (or stack)</p>
+</div></blockquote>
+<p>Output: AcquisitionDataSetn</p>
+<dl class="py method">
+<dt id="cil.processors.Normaliser.estimate_normalised_error">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">estimate_normalised_error</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_flat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_dark</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/Normaliser.html#Normaliser.estimate_normalised_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.Normaliser.estimate_normalised_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the estimated relative error of the normalised projection</p>
+<p>n = (projection - dark) / (flat - dark)
+Dn/n = (flat-dark + projection-dark)/((flat-dark)*(projection-dark))*(Df/f + Dd/d)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.processors.Normaliser.get_output">
+<code class="sig-name descname"><span class="pre">get_output</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.Normaliser.get_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs the configured processor and returns the processed data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>out</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Fills the referenced DataContainer with the processed data and suppresses the return</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The processed data. Suppressed if <cite>out</cite> is passed</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.processors.Normaliser.set_input">
+<code class="sig-name descname"><span class="pre">set_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.Normaliser.set_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the input data to the processor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>input</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – The input DataContainer</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="transmission-to-absorption-converter">
+<h3>Transmission to Absorption Converter<a class="headerlink" href="#transmission-to-absorption-converter" title="Permalink to this headline">¶</a></h3>
 <dl class="py class">
 <dt id="cil.processors.TransmissionAbsorptionConverter">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.processors.</span></code><code class="sig-name descname"><span class="pre">TransmissionAbsorptionConverter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">white_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/TransmissionAbsorptionConverter.html#TransmissionAbsorptionConverter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.TransmissionAbsorptionConverter" title="Permalink to this definition">¶</a></dt>
@@ -741,47 +897,146 @@ based on the Beer-Lambert law</p>
 <dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData">AcquisitionData</a>, <a class="reference internal" href="framework.html#cil.framework.ImageData" title="cil.framework.ImageData">ImageData</a> or <a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
 </dd>
 </dl>
+<p>Processor first divides by white_level (default=1) and then take negative logarithm.
+Elements below threshold (after division by white_level) are set to threshold.</p>
 <dl class="py method">
-<dt id="cil.processors.TransmissionAbsorptionConverter.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">white_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/TransmissionAbsorptionConverter.html#TransmissionAbsorptionConverter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.TransmissionAbsorptionConverter.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<dt id="cil.processors.TransmissionAbsorptionConverter.get_output">
+<code class="sig-name descname"><span class="pre">get_output</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.TransmissionAbsorptionConverter.get_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs the configured processor and returns the processed data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>out</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Fills the referenced DataContainer with the processed data and suppresses the return</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The processed data. Suppressed if <cite>out</cite> is passed</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cil.processors.TransmissionAbsorptionConverter.check_input">
-<code class="sig-name descname"><span class="pre">check_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/TransmissionAbsorptionConverter.html#TransmissionAbsorptionConverter.check_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.TransmissionAbsorptionConverter.check_input" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks parameters of the input DataContainer</p>
-<p>Should raise an Error if the DataContainer does not match expectation, e.g.
-if the expected input DataContainer is 3D and the Processor expects 2D.</p>
+<dt id="cil.processors.TransmissionAbsorptionConverter.set_input">
+<code class="sig-name descname"><span class="pre">set_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.TransmissionAbsorptionConverter.set_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the input data to the processor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>input</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – The input DataContainer</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
+</div>
+<div class="section" id="absorption-to-transmission-converter">
+<h3>Absorption to Transmission Converter<a class="headerlink" href="#absorption-to-transmission-converter" title="Permalink to this headline">¶</a></h3>
 <dl class="py class">
 <dt id="cil.processors.AbsorptionTransmissionConverter">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.processors.</span></code><code class="sig-name descname"><span class="pre">AbsorptionTransmissionConverter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">white_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/AbsorptionTransmissionConverter.html#AbsorptionTransmissionConverter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.AbsorptionTransmissionConverter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Processor to convert from absorption measurements to transmission
-:param white_level: A float defining incidence intensity in the Beer-Lambert law.
-:type white_level: float, optional
-:return: returns AcquisitionData, ImageData or DataContainer depending on input data type
-:rtype: AcquisitionData, ImageData or DataContainer</p>
+<dd><p>Processor to convert from absorption measurements to transmission</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>white_level</strong> (<em>float</em><em>, </em><em>optional</em>) – A float defining incidence intensity in the Beer-Lambert law.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>returns AcquisitionData, ImageData or DataContainer depending on input data type</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData">AcquisitionData</a>, <a class="reference internal" href="framework.html#cil.framework.ImageData" title="cil.framework.ImageData">ImageData</a> or <a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
+<p>Processor first multiplies data by -1, then calculates exponent
+and scales result by white_level (default=1)</p>
 <dl class="py method">
-<dt id="cil.processors.AbsorptionTransmissionConverter.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">white_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/AbsorptionTransmissionConverter.html#AbsorptionTransmissionConverter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.AbsorptionTransmissionConverter.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<dt id="cil.processors.AbsorptionTransmissionConverter.get_output">
+<code class="sig-name descname"><span class="pre">get_output</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.AbsorptionTransmissionConverter.get_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs the configured processor and returns the processed data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>out</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Fills the referenced DataContainer with the processed data and suppresses the return</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The processed data. Suppressed if <cite>out</cite> is passed</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cil.processors.AbsorptionTransmissionConverter.check_input">
-<code class="sig-name descname"><span class="pre">check_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/AbsorptionTransmissionConverter.html#AbsorptionTransmissionConverter.check_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.AbsorptionTransmissionConverter.check_input" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks parameters of the input DataContainer</p>
-<p>Should raise an Error if the DataContainer does not match expectation, e.g.
-if the expected input DataContainer is 3D and the Processor expects 2D.</p>
+<dt id="cil.processors.AbsorptionTransmissionConverter.set_input">
+<code class="sig-name descname"><span class="pre">set_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.AbsorptionTransmissionConverter.set_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the input data to the processor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>input</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – The input DataContainer</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="ring-remover">
+<h3>Ring Remover<a class="headerlink" href="#ring-remover" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="cil.processors.RingRemover">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.processors.</span></code><code class="sig-name descname"><span class="pre">RingRemover</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decNum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/RingRemover.html#RingRemover"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.RingRemover" title="Permalink to this definition">¶</a></dt>
+<dd><p>RingRemover Processor: Removes vertical stripes from a DataContainer(ImageData/AcquisitionData)
+the algorithm in <a class="reference external" href="https://doi.org/10.1364/OE.17.008567">https://doi.org/10.1364/OE.17.008567</a></p>
+<dl class="py method">
+<dt id="cil.processors.RingRemover.xRemoveStripesVertical">
+<code class="sig-name descname"><span class="pre">xRemoveStripesVertical</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ima</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decNum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/RingRemover.html#RingRemover.xRemoveStripesVertical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.RingRemover.xRemoveStripesVertical" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Code from <a class="reference external" href="https://doi.org/10.1364/OE.17.008567">https://doi.org/10.1364/OE.17.008567</a></dt><dd><p>translated in Python</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Corrected 2D sinogram data (Numpy Array)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.processors.RingRemover.get_output">
+<code class="sig-name descname"><span class="pre">get_output</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.RingRemover.get_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs the configured processor and returns the processed data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>out</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>optional</em>) – Fills the referenced DataContainer with the processed data and suppresses the return</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The processed data. Suppressed if <cite>out</cite> is passed</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.processors.RingRemover.set_input">
+<code class="sig-name descname"><span class="pre">set_input</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.processors.RingRemover.set_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the input data to the processor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>input</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – The input DataContainer</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <p><a class="reference internal" href="index.html#mastertoc"><span class="std std-ref">Return Home</span></a></p>
+</div>
+</div>
 </div>
 
 

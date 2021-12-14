@@ -95,7 +95,7 @@ class show_base(object):
 class show2D(show_base):
     '''This plots 2D slices from cil DataContainer types.
 
-    Plots 1 or more 2D plots in an (n x num_cols) matix.
+    Plots 1 or more 2D plots in an (n x num_cols) matrix.
     Can plot multiple slices from one 3D dataset, or compare multiple datasets
     Inputs can be single arguments or list of arguments that will be sequentally applied to subplots
     If no slice_list is passed a 3D dataset will display the centre slice of the outer dimension, a 4D dataset will show the centre slices of the two outer dimension.
@@ -108,7 +108,7 @@ class show2D(show_base):
     title: string, list of strings, optional
         The title for each figure
     slice_list: tuple, int, list of tuples, list of ints, optional
-        The slices to show. A list of intergers will show slices for the outer dimension. For 3D datacontainers single slice: (direction, index). For 4D datacontainers two slices: [(direction0, index),(direction1, index)].
+        The slices to show. A list of integers will show slices for the outer dimension. For 3D datacontainers single slice: (direction, index). For 4D datacontainers two slices: [(direction0, index),(direction1, index)].
     fix_range: boolian, tuple, list of tuples
         Sets the display range of the data. `True` sets all plots to the global (min, max). 
     axis_labels: tuple, list of tuples, optional

@@ -44,7 +44,7 @@ Image Quality metrics
    :members:
 
 
-Visulisation
+Visualisation
 ============
 
 show2D - Display 2D slices

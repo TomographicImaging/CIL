@@ -50,10 +50,18 @@ This plugin allows the use of `TIGRE
 (`10.1088/2057-1976/2/5/055010 <http://iopscience.iop.org/article/10.1088/2057-1976/2/5/055010>`_ 
 for forward and back projections and filter back projection reconstruction. 
 
+FBP
+---
+This reconstructs with FBP for parallel-beam data, and with FDK weights for cone-beam data
+
 .. autoclass:: cil.plugins.tigre.FBP
    :exclude-members: check_input, get_input
    :members:
    :inherited-members: set_input, get_output
+
+
+Projection Operator
+-------------------
 
 .. autoclass:: cil.plugins.tigre.ProjectionOperator
    :members:
@@ -66,10 +74,19 @@ This plugin allows the use of `ASTRA-toolbox
 (`10.1364/OE.24.025129 <http://dx.doi.org/10.1364/OE.24.025129>`_ 
 for forward and back projections and filter back projection reconstruction. 
 
+
+FBP
+---
+This reconstructs with FBP for parallel-beam data, and with FDK weights for cone-beam data
+
 .. autoclass:: cil.plugins.astra.FBP
    :exclude-members: check_input, get_input
    :members:
    :inherited-members: set_input, get_output
+
+
+Projection Operator
+-------------------
 
 .. autoclass:: cil.plugins.astra.ProjectionOperator
    :members:

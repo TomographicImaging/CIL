@@ -2995,7 +2995,7 @@ class Processor(object):
         
     def get_output(self, out=None):
         """
-        Runs the configured processor and returns the reconstuction
+        Runs the configured processor and returns the processed data
 
         Parameters
         ----------
@@ -3005,7 +3005,7 @@ class Processor(object):
         Returns
         -------
         DataContainer
-            The processed data. Supressed if `out` is passed
+            The processed data. Suppressed if `out` is passed
         """
         if self.output is None or self.shouldRun:
             if out is None:

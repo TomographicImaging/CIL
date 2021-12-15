@@ -14,14 +14,13 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-from cil.framework import AcquisitionData, AcquisitionGeometry
+from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
 import numpy as np
 import os
 import olefile
 import logging
-    
-        
-class TXRMDataReader(object):
+
+class TXRMTXMDataReader(object):
     
     def __init__(self, 
                  **kwargs):
@@ -30,6 +29,8 @@ class TXRMDataReader(object):
         
         :param file_name: file name to read
         :type file_name: os.path or string, default None
+        :param slice_range: list with range to slice data, [start,stop,step(optional)]
+        :type slice_range: list, default None
         :param angle_unit: describe what the unit is, angle or degree
         :type angle_unit: string, default degree
         :param logging_level: Logging messages which are less severe than level will be ignored.
@@ -38,20 +39,25 @@ class TXRMDataReader(object):
         '''
         
         self.txrm_file = kwargs.get('file_name', None)
+        slice_range = kwargs.get('slice_range',None)
         angle_unit = kwargs.get('angle_unit', AcquisitionGeometry.DEGREE)
         level = kwargs.get('logging_level', 40)
         if self.txrm_file is not None:
             self.set_up(file_name = self.txrm_file, angle_unit=angle_unit, logging_level=level)
         self._metadata = None
-            
+        
+
     def set_up(self, 
                file_name = None,
+               slice_range = None,
                angle_unit = AcquisitionGeometry.DEGREE,
                logging_level=40):
         '''Set up the reader
         
         :param file_name: file name to read
         :type file_name: os.path or string, default None
+        :param slice_range: list with range to slice data, [start,stop,step(optional)]
+        :type slice_range: list, default None
         :param angle_unit: describe what the unit is, angle or degree
         :type angle_unit: string, default degree
         :param logging_level: Logging messages which are less severe than level will be ignored.
@@ -69,20 +75,26 @@ class TXRMDataReader(object):
         
         # check if txrm file exists
         if not(os.path.isfile(self.txrm_file)):
-            raise FileNotFoundError('{}'.format(self.txrm_file))  
+            raise FileNotFoundError('{}'.format(self.txrm_file))
+        self.slice_range = slice_range
         possible_units = [AcquisitionGeometry.DEGREE, AcquisitionGeometry.RADIAN]
         if angle_unit in possible_units:
             self.angle_unit = angle_unit
         else:
             raise ValueError('angle_unit should be one of {}'.format(possible_units))
 
-    def get_geometry(self):
+    def get_acq_geometry(self):
         '''
         Return AcquisitionGeometry object
         '''
-        
         return self._ag
-        
+
+    def get_img_geometry(self):
+        '''
+        Return ImageGeometry object
+        '''
+        return self._ig
+
     def read(self):
         '''
         Reads projections and return AcquisitionData container
@@ -90,8 +102,24 @@ class TXRMDataReader(object):
         # the import will raise an ImportError if dxchange is not installed
         import dxchange
         # Load projections and most metadata
-        data, metadata = dxchange.read_txrm(self.txrm_file)
-        number_of_images = data.shape[0]
+        if self.slice_range:
+            self.slice_range[1] = self.slice_range[1]+1
+            slice_range = ((self.slice_range),(None),(None))
+        else:
+            slice_range = None
+        data, metadata = dxchange.read_txrm(self.txrm_file,slice_range)
+        number_of_images = metadata['number_of_images']
+
+        if self.slice_range:
+            image_range = range(*self.slice_range)
+        else:
+            image_range = range(0,number_of_images,1)
+        
+        # convert angles to requested unit measure, Zeiss stores in radians
+        if self.angle_unit == AcquisitionGeometry.DEGREE:
+            angles = np.degrees(metadata['thetas'])
+        else:
+            angles = np.asarray(metadata['thetas'])
         
         # Read source to center and detector to center distances
         with olefile.OleFileIO(self.txrm_file) as ole:
@@ -100,46 +128,59 @@ class TXRMDataReader(object):
             DtoRADistance = dxchange.reader._read_ole_arr(ole, \
                     'ImageInfo/DtoRADistance', "<{0}f".format(number_of_images))
             
-        dist_source_center   = np.abs( StoRADistance[0] )
-        dist_center_detector = np.abs( DtoRADistance[0] )
-        
-        # normalise data by flatfield
-        data = data / metadata['reference']
-        
-        # circularly shift data by rounded x and y shifts
-        for k in range(number_of_images):
-            data[k,:,:] = np.roll(data[k,:,:], \
-                (int(metadata['x-shifts'][k]),int(metadata['y-shifts'][k])), \
-                axis=(1,0))
-        
-        # Pixelsize loaded in metadata is really the voxel size in um.
-        # We can compute the effective detector pixel size as the geometric
-        # magnification times the voxel size.
-        d_pixel_size = ((dist_source_center+dist_center_detector)/dist_source_center)*metadata['pixel_size']
-        
-        # convert angles to requested unit measure, Zeiss stores in radians
-        if self.angle_unit == AcquisitionGeometry.DEGREE:
-            angles = np.degrees(metadata['thetas'])
-        else:
-            angles = np.asarray(metadata['thetas'])
+            dist_source_center   = np.abs( StoRADistance[0] )
+            dist_center_detector = np.abs( DtoRADistance[0] )
 
-        self._ag = AcquisitionGeometry.create_Cone3D(
-            [0,-dist_source_center, 0] , [ 0, dist_center_detector, 0] \
-            ) \
-                .set_panel([metadata['image_width'], metadata['image_height']],\
-                    pixel_size=[d_pixel_size/1000,d_pixel_size/1000])\
-                .set_angles(angles, angle_unit=self.angle_unit)
-        self._ag.dimension_labels =  ['angle', 'vertical', 'horizontal']
+        if dist_source_center != dist_center_detector:
+            # Pixelsize loaded in metadata is really the voxel size in um.
+            # We can compute the effective detector pixel size as the geometric
+            # magnification times the voxel size.
+            d_pixel_size = ((dist_source_center+dist_center_detector)/dist_source_center)*metadata['pixel_size']
                 
+            self._ag = AcquisitionGeometry.create_Cone3D(
+                [0,-dist_source_center, 0] , [ 0, dist_center_detector, 0] \
+                ) \
+                    .set_panel([metadata['image_width'], metadata['image_height']],\
+                        pixel_size=[d_pixel_size/1000,d_pixel_size/1000])\
+                    .set_angles(angles[image_range],angle_unit=self.angle_unit)
+        else:
+            self._ag = AcquisitionGeometry.create_Parallel3D()\
+                        .set_panel([metadata['image_width'], metadata['image_height']])\
+                        .set_angles(angles[image_range],angle_unit=self.angle_unit)
+        self._ag.dimension_labels =  ['angle', 'vertical', 'horizontal']
 
-        acq_data = AcquisitionData(array=data, deep_copy=False, geometry=self._ag.copy(),\
-            suppress_warning=True)
-        self._metadata = metadata
-        return acq_data
+        ext = os.path.splitext(self.txrm_file)
+        if ext[1] == '.txrm':
+            # normalise data by flatfield
+            data = data / metadata['reference']
+
+            for num,k in enumerate(image_range):
+                data[num,:,:] = np.roll(data[num,:,:], \
+                    (int(metadata['x-shifts'][k]),int(metadata['y-shifts'][k])), \
+                    axis=(1,0))
+
+            acq_data = AcquisitionData(array=data, deep_copy=False, geometry=self._ag.copy(),\
+                suppress_warning=True)
+            self._metadata = metadata
+            return acq_data
+        else:
+            slices,width,height = data.shape
+            voxel_size = metadata["pixel_size"]
+            self._ig = ImageGeometry(voxel_num_x=height,
+                                    voxel_size_x=voxel_size,
+                                    voxel_num_y=width,
+                                    voxel_size_y=voxel_size,
+                                    voxel_num_z=slices,
+                                    voxel_size_z=voxel_size)
+            
+            ig_data = ImageData(array=data, deep_copy=False, geometry=self._ig)
+            self._metadata = metadata
+            return ig_data
+
     def load_projections(self):
         '''alias of read for backward compatibility'''
         return self.read()
-        
+
     def get_metadata(self):
         '''return the metadata of the loaded file'''
         return self._metadata

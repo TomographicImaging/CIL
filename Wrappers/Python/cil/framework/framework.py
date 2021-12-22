@@ -1270,7 +1270,7 @@ class Panel(object):
         if not isinstance(other, self.__class__):
             return False
         
-        if numpy.equal(self.pixel_size, other.pixel_size) \
+        if numpy.all(self.pixel_size == other.pixel_size) \
             and numpy.allclose(self.pixel_size, other.pixel_size) \
             and self.origin == other.origin:   
             return True

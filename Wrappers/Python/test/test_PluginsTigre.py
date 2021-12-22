@@ -16,6 +16,7 @@
 #   limitations under the License.
 
 from cil.framework import AcquisitionGeometry
+from cil.framework.framework import ImageGeometry
 from cil.utilities import dataexample
 import unittest
 import numpy as np
@@ -35,10 +36,12 @@ has_tigre = has_tigre and gpu_test
 
 class Test_convert_geometry(unittest.TestCase):
     def setUp(self): 
-        self.num_pixels_x = 128
-        self.num_pixels_y = 3
+        self.num_pixels_x = 12
+        self.num_pixels_y = 6
         self.pixel_size_x = 0.1
         self.pixel_size_y = 0.2
+
+        self.ig = ImageGeometry(3,4,5,0.1,0.2,0.3)
         
         self.angles_deg = np.asarray([0,90.0,180.0], dtype='float32')
         self.angles_rad = self.angles_deg * np.pi /180.0
@@ -57,18 +60,13 @@ class Test_convert_geometry(unittest.TestCase):
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_cone2D(self):
 
-        ag = AcquisitionGeometry.create_Cone2D(source_position=[0,-2], detector_position=[0,1])\
+        ag = AcquisitionGeometry.create_Cone2D(source_position=[0,-6], detector_position=[0,16])\
                                      .set_angles(self.angles_rad, angle_unit='radian')\
                                      .set_labels(['angle','horizontal'])\
                                      .set_panel(self.num_pixels_x, self.pixel_size_x)
 
-        ig = ag.get_ImageGeometry()
-        ig.voxel_num_y = 50
-        ig.voxel_size_y /= 2
-
-
         #2D cone
-        tg_geometry, tg_angles = CIL2TIGREGeometry.getTIGREGeometry(ig, ag)
+        tg_geometry, tg_angles = CIL2TIGREGeometry.getTIGREGeometry(self.ig, ag)
 
         for i, ang in enumerate(tg_angles):
             ang2 = -(self.angles_rad[i] + np.pi/2)
@@ -84,24 +82,19 @@ class Test_convert_geometry(unittest.TestCase):
         np.testing.assert_allclose(tg_geometry.offDetector,0)
         np.testing.assert_allclose(tg_geometry.offOrigin,0)
 
-        mag = ag.magnification
-        np.testing.assert_allclose(tg_geometry.nVoxel, [1,50,128])
-        np.testing.assert_allclose(tg_geometry.dVoxel, [0.1/mag,0.05/mag,0.1/mag])
+        np.testing.assert_allclose(tg_geometry.nVoxel, [1,self.ig.voxel_num_y,self.ig.voxel_num_x])
+        np.testing.assert_allclose(tg_geometry.dVoxel, [ag.config.panel.pixel_size[1]/ag.magnification,self.ig.voxel_size_y,self.ig.voxel_size_x])
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_cone3D_simple(self):
-        ag = AcquisitionGeometry.create_Cone3D(source_position=[0,-2,0], detector_position=[0,1,0])\
+        ag = AcquisitionGeometry.create_Cone3D(source_position=[0,-6,0], detector_position=[0,16,0])\
                                       .set_angles(self.angles_deg, angle_unit='degree')\
                                       .set_labels(['vertical', 'angle','horizontal'])\
                                       .set_panel((self.num_pixels_x,self.num_pixels_y), (self.pixel_size_x,self.pixel_size_y))
 
         self.assertTrue(ag.system_description=='simple')
 
-        ig = ag.get_ImageGeometry()
-        ig.voxel_num_y = 50
-        ig.voxel_size_y /= 2
-
-        tg_geometry, tg_angles = CIL2TIGREGeometry.getTIGREGeometry(ig, ag)
+        tg_geometry, tg_angles = CIL2TIGREGeometry.getTIGREGeometry(self.ig, ag)
 
         for i, ang in enumerate(tg_angles):
             ang2 = -(self.angles_rad[i] + np.pi/2)
@@ -117,9 +110,8 @@ class Test_convert_geometry(unittest.TestCase):
         np.testing.assert_allclose(tg_geometry.offDetector,0)
         np.testing.assert_allclose(tg_geometry.offOrigin,0)
 
-        mag = ag.magnification
-        np.testing.assert_allclose(tg_geometry.nVoxel, [3,50,128])
-        np.testing.assert_allclose(tg_geometry.dVoxel, [0.2/mag,0.05/mag,0.1/mag])
+        np.testing.assert_allclose(tg_geometry.nVoxel, [self.ig.voxel_num_z,self.ig.voxel_num_y,self.ig.voxel_num_x])
+        np.testing.assert_allclose(tg_geometry.dVoxel, [self.ig.voxel_size_z,self.ig.voxel_size_y,self.ig.voxel_size_x])
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_cone3D_offset(self):
@@ -132,11 +124,7 @@ class Test_convert_geometry(unittest.TestCase):
                                       
         self.assertTrue(ag.system_description=='offset')
 
-        ig = ag.get_ImageGeometry()
-        ig.voxel_num_y = 50
-        ig.voxel_size_y /= 2
-
-        tg_geometry, tg_angles= CIL2TIGREGeometry.getTIGREGeometry(ig, ag)
+        tg_geometry, tg_angles= CIL2TIGREGeometry.getTIGREGeometry(self.ig, ag)
 
         np.testing.assert_allclose(tg_geometry.DSO, ag.dist_source_center)
 
@@ -161,9 +149,9 @@ class Test_convert_geometry(unittest.TestCase):
         np.testing.assert_allclose(tg_geometry.sDetector, tg_geometry.dDetector * tg_geometry.nDetector)
         np.testing.assert_allclose(tg_geometry.offOrigin,0)
 
-        mag = ag.magnification
-        np.testing.assert_allclose(tg_geometry.nVoxel, [3,50,128])
-        np.testing.assert_allclose(tg_geometry.dVoxel, [0.2/mag,0.05/mag,0.1/mag])
+        np.testing.assert_allclose(tg_geometry.nVoxel, [self.ig.voxel_num_z,self.ig.voxel_num_y,self.ig.voxel_num_x])
+        np.testing.assert_allclose(tg_geometry.dVoxel, [self.ig.voxel_size_z,self.ig.voxel_size_y,self.ig.voxel_size_x])
+
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_cone3D_advanced(self):
@@ -174,11 +162,8 @@ class Test_convert_geometry(unittest.TestCase):
                                       .set_panel((self.num_pixels_x,self.num_pixels_y), (self.pixel_size_x,self.pixel_size_y))
                                       
         self.assertTrue(ag.system_description=='advanced')
-        ig = ag.get_ImageGeometry()
-        ig.voxel_num_y = 50
-        ig.voxel_size_y /= 2
 
-        tg_geometry, tg_angles= CIL2TIGREGeometry.getTIGREGeometry(ig, ag)
+        tg_geometry, tg_angles= CIL2TIGREGeometry.getTIGREGeometry(self.ig, ag)
 
         self.assertAlmostEqual(tg_geometry.DSO, ag.dist_source_center*np.sin(np.pi/4),5)
 
@@ -204,9 +189,9 @@ class Test_convert_geometry(unittest.TestCase):
         np.testing.assert_allclose(tg_geometry.sDetector, tg_geometry.dDetector * tg_geometry.nDetector)
         np.testing.assert_allclose(tg_geometry.offOrigin,0)
 
-        mag = ag.magnification
-        np.testing.assert_allclose(tg_geometry.nVoxel, [3,50,128])
-        np.testing.assert_allclose(tg_geometry.dVoxel, [0.2/mag,0.05/mag,0.1/mag])
+        np.testing.assert_allclose(tg_geometry.nVoxel, [self.ig.voxel_num_z,self.ig.voxel_num_y,self.ig.voxel_num_x])
+        np.testing.assert_allclose(tg_geometry.dVoxel, [self.ig.voxel_size_z,self.ig.voxel_size_y,self.ig.voxel_size_x])
+
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_parallel2D(self):
@@ -216,11 +201,7 @@ class Test_convert_geometry(unittest.TestCase):
                                      .set_labels(['angle','horizontal'])\
                                      .set_panel(self.num_pixels_x, self.pixel_size_x)
 
-        ig = ag.get_ImageGeometry()
-        ig.voxel_num_y = 50
-        ig.voxel_size_y /= 2
-
-        tg_geometry, tg_angles = CIL2TIGREGeometry.getTIGREGeometry(ig, ag)
+        tg_geometry, tg_angles = CIL2TIGREGeometry.getTIGREGeometry(self.ig, ag)
 
         for i, ang in enumerate(tg_angles):
             ang2 = -(self.angles_rad[i] + np.pi/2)
@@ -234,8 +215,9 @@ class Test_convert_geometry(unittest.TestCase):
         np.testing.assert_allclose(tg_geometry.offDetector,0)
         np.testing.assert_allclose(tg_geometry.offOrigin,0)
 
-        np.testing.assert_allclose(tg_geometry.nVoxel, [1,50,128])
-        np.testing.assert_allclose(tg_geometry.dVoxel, [0.1,0.05,0.1])
+        np.testing.assert_allclose(tg_geometry.nVoxel, [1,self.ig.voxel_num_y,self.ig.voxel_num_x])
+        np.testing.assert_allclose(tg_geometry.dVoxel, [ag.config.panel.pixel_size[1],self.ig.voxel_size_y,self.ig.voxel_size_x])
+
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_parallel3D_simple(self):
@@ -244,11 +226,7 @@ class Test_convert_geometry(unittest.TestCase):
                                       .set_labels(['vertical', 'angle','horizontal'])\
                                       .set_panel((self.num_pixels_x,self.num_pixels_y), (self.pixel_size_x,self.pixel_size_y))
 
-        ig = ag.get_ImageGeometry()
-        ig.voxel_num_y = 50
-        ig.voxel_size_y /= 2
-
-        tg_geometry, tg_angles = CIL2TIGREGeometry.getTIGREGeometry(ig, ag)
+        tg_geometry, tg_angles = CIL2TIGREGeometry.getTIGREGeometry(self.ig, ag)
 
         for i, ang in enumerate(tg_angles):
             ang2 = -(self.angles_rad[i] + np.pi/2)
@@ -262,9 +240,9 @@ class Test_convert_geometry(unittest.TestCase):
         np.testing.assert_allclose(tg_geometry.offDetector,0)
         np.testing.assert_allclose(tg_geometry.offOrigin,0)
 
-        mag = ag.magnification
-        np.testing.assert_allclose(tg_geometry.nVoxel, [3,50,128])
-        np.testing.assert_allclose(tg_geometry.dVoxel, [0.2,0.05,0.1])
+        np.testing.assert_allclose(tg_geometry.nVoxel, [self.ig.voxel_num_z,self.ig.voxel_num_y,self.ig.voxel_num_x])
+        np.testing.assert_allclose(tg_geometry.dVoxel, [self.ig.voxel_size_z,self.ig.voxel_size_y,self.ig.voxel_size_x])
+
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_parallel3D_offset(self):
@@ -276,11 +254,8 @@ class Test_convert_geometry(unittest.TestCase):
                                       
         self.assertTrue(ag.system_description=='offset')
 
-        ig = ag.get_ImageGeometry()
-        ig.voxel_num_y = 50
-        ig.voxel_size_y /= 2
 
-        tg_geometry, tg_angles= CIL2TIGREGeometry.getTIGREGeometry(ig, ag)
+        tg_geometry, tg_angles= CIL2TIGREGeometry.getTIGREGeometry(self.ig, ag)
 
         det_offset = np.array([0,-1,0])
         np.testing.assert_allclose(tg_geometry.offDetector,det_offset)
@@ -295,8 +270,8 @@ class Test_convert_geometry(unittest.TestCase):
         np.testing.assert_allclose(tg_geometry.sDetector, tg_geometry.dDetector * tg_geometry.nDetector)
         np.testing.assert_allclose(tg_geometry.offOrigin,0)
 
-        np.testing.assert_allclose(tg_geometry.nVoxel, [3,50,128])
-        np.testing.assert_allclose(tg_geometry.dVoxel, [0.2,0.05,0.1])
+        np.testing.assert_allclose(tg_geometry.nVoxel, [self.ig.voxel_num_z,self.ig.voxel_num_y,self.ig.voxel_num_x])
+        np.testing.assert_allclose(tg_geometry.dVoxel, [self.ig.voxel_size_z,self.ig.voxel_size_y,self.ig.voxel_size_x])
 
 
 class TestCommon(object):
@@ -443,7 +418,7 @@ class Test_results_cone3D(TestCommon,unittest.TestCase):
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_norm_interpolated(self):
 
-        self.compare_norm('interpolated',2.8786)
+        self.compare_norm('interpolated',3.9965)
 
 class Test_results_parallel3D(TestCommon,unittest.TestCase):
     
@@ -544,7 +519,7 @@ class Test_results_cone2D(TestCommon,unittest.TestCase):
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_norm_interpolated(self):
 
-        self.compare_norm('interpolated',2.8812)
+        self.compare_norm('interpolated',3.9973)
 
 
 class Test_results_parallel2D(TestCommon,unittest.TestCase):

@@ -1209,7 +1209,7 @@ class Panel(object):
         if num_pixels_temp[0] < 1 or num_pixels_temp[1] < 1:
             raise ValueError('num_pixels (x,y) must be >= (1,1). Got {}'.format(num_pixels_temp))
         else:
-            self.__num_pixels = num_pixels_temp
+            self.__num_pixels = numpy.array(num_pixels_temp, dtype=numpy.int16)
 
     @property
     def pixel_size(self):
@@ -1244,7 +1244,7 @@ class Panel(object):
             if pixel_size_temp[0] <= 0 or pixel_size_temp[1] <= 0:
                 raise ValueError('pixel_size (x,y) at must be > (0.,0.). Got {}'.format(pixel_size_temp)) 
 
-        self.__pixel_size = pixel_size_temp
+        self.__pixel_size = numpy.array(pixel_size_temp, dtype=numpy.float32)
 
     @property
     def origin(self):

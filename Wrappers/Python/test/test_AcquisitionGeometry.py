@@ -186,13 +186,13 @@ class Test_AcquisitionGeometry(unittest.TestCase):
 
         #default
         AG.set_panel([1000,2000])
-        self.assertEqual(AG.config.panel.num_pixels, [1000,2000])
-        self.assertEqual(AG.config.panel.pixel_size, [1.,1.])
+        numpy.testing.assert_array_equal(AG.config.panel.num_pixels, [1000,2000])
+        numpy.testing.assert_array_almost_equal(AG.config.panel.pixel_size, [1,1])
 
         #values
         AG.set_panel([1000,2000],[0.1,0.2])
-        self.assertEqual(AG.config.panel.num_pixels, [1000,2000])
-        self.assertEqual(AG.config.panel.pixel_size, [0.1,0.2])
+        numpy.testing.assert_array_equal(AG.config.panel.num_pixels, [1000,2000])
+        numpy.testing.assert_array_almost_equal(AG.config.panel.pixel_size, [0.1,0.2])
 
         #set 2D panel with 3D geometry
         with self.assertRaises(ValueError):

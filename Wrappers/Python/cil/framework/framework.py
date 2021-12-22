@@ -1244,7 +1244,7 @@ class Panel(object):
             if pixel_size_temp[0] <= 0 or pixel_size_temp[1] <= 0:
                 raise ValueError('pixel_size (x,y) at must be > (0.,0.). Got {}'.format(pixel_size_temp)) 
 
-        self.__pixel_size = numpy.array(pixel_size_temp, dtype=numpy.float32)
+        self.__pixel_size = numpy.array(pixel_size_temp)
 
     @property
     def origin(self):
@@ -1270,7 +1270,7 @@ class Panel(object):
         if not isinstance(other, self.__class__):
             return False
         
-        if numpy.all(self.pixel_size == other.pixel_size) \
+        if numpy.array_equal(self.num_pixels, other.num_pixels) \
             and numpy.allclose(self.pixel_size, other.pixel_size) \
             and self.origin == other.origin:   
             return True

@@ -23,6 +23,7 @@ import ctypes, platform
 from ctypes import util
 import math
 from cil.utilities.multiprocessing import NUM_THREADS
+import cupy as cp
 # check for the extension
 
 if platform.system() == 'Linux':
@@ -308,7 +309,7 @@ class ImageGeometry(object):
 
         if isinstance(value, Number):
             # it's created empty, so we make it 0
-            out.array.fill(value)
+            out.fill(value)
         else:
             if value == ImageGeometry.RANDOM:
                 seed = kwargs.get('seed', None)
@@ -2088,14 +2089,10 @@ class DataContainer(object):
                   **kwargs):
         '''Holds the data'''
         
-        if type(array) == numpy.ndarray:
-            if deep_copy:
-                self.array = array.copy()
-            else:
-                self.array = array    
+        if deep_copy:
+            self.array = array.copy()
         else:
-            raise TypeError('Array must be NumpyArray, passed {0}'\
-                            .format(type(array)))
+            self.array = array    
 
         #Don't set for derived classes
         if type(self) is DataContainer:
@@ -2233,13 +2230,24 @@ class DataContainer(object):
                     raise ValueError('Cannot fill with the provided array.' + \
                                      'Expecting {0} got {1}'.format(
                                      self.shape,array.shape))
+                if hasattr(self, 'backend'):
+                    if self.backend == cp:
+                        self.array = cp.array(array)
                 numpy.copyto(self.array, array)
             elif isinstance(array, Number):
                 self.array.fill(array) 
             elif issubclass(array.__class__ , DataContainer):
                 if hasattr(self, 'geometry') and hasattr(array, 'geometry'):
                     if self.geometry != array.geometry:
+                        if hasattr(self, 'backend'):
+                            if self.backend == cp:
+                                self.array = cp.array(array)
+                                return
                         numpy.copyto(self.array, array.subset(dimensions=array.dimension_labels).as_array())
+                        return
+                if hasattr(self, 'backend'):
+                    if self.backend == cp:
+                        self.array = cp.array(array.as_array())
                         return
                 numpy.copyto(self.array, array.as_array())
             else:
@@ -2743,26 +2751,32 @@ class ImageData(DataContainer):
     def __init__(self, 
                  array = None, 
                  deep_copy=False, 
-                 geometry=None, 
+                 geometry=None,
+                 dtype=numpy.float32,
+                 suppress_warning=False,
+                 backend='numpy', 
+                 dimension_labels=None,
                  **kwargs):
 
-        if not kwargs.get('suppress_warning', False):
+        if not suppress_warning:
             warnings.warn('Direct invocation is deprecated and will be removed in following version. Use allocate from ImageGeometry instead',
               DeprecationWarning)
 
-        dtype = kwargs.get('dtype', numpy.float32)
-    
 
         if geometry is None:
             raise AttributeError("ImageData requires a geometry")
             
 
-        labels = kwargs.get('dimension_labels', None)
+        labels = dimension_labels
         if labels is not None and labels != geometry.dimension_labels:
                 raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
+        bknd = numpy
+        if backend == 'cupy':
+            bknd = cp
+        self._backend = bknd
 
         if array is None:                                   
-            array = numpy.empty(geometry.shape, dtype=dtype)
+            array = bknd.empty(geometry.shape, dtype=dtype)
         elif issubclass(type(array) , DataContainer):
             array = array.as_array()
         elif issubclass(type(array) , numpy.ndarray):
@@ -2777,7 +2791,12 @@ class ImageData(DataContainer):
             raise ValueError('Number of dimensions are not 2 or 3 or 4 : {0}'.format(array.ndim))
     
         super(ImageData, self).__init__(array, deep_copy, geometry=geometry, **kwargs)
-                               
+
+
+    @property
+    def backend(self):
+        return self._backend
+
     def subset(self, dimensions=None, **kw):
         '''returns a subset of ImageData and regenerates the geometry'''
         

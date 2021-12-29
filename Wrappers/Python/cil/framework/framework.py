@@ -2233,6 +2233,7 @@ class DataContainer(object):
                 if hasattr(self, 'backend'):
                     if self.backend == cp:
                         self.array = cp.array(array)
+                        return
                 numpy.copyto(self.array, array)
             elif isinstance(array, Number):
                 self.array.fill(array) 
@@ -2489,7 +2490,40 @@ class DataContainer(object):
     def minimum(self,x2, out=None, *args, **kwargs):
         return self.pixel_wise_binary(numpy.minimum, x2=x2, out=out, *args, **kwargs)
 
+
+    def sapyb(self, a, y, b, out=None, dtype=numpy.float32, num_threads=NUM_THREADS):
+        do_numpy = False
+        ret_out = False
+        if self.dtype in [numpy.complex]:
+            do_numpy = True
+        else:
+            if self.backend == cp:
+                do_numpy = True
+        if out is None:
+            out = self * 0.
+            ret_out = True
+
+        if do_numpy:
+            ax = self * a
+            # I need to make the DataContainer Array Like
+            tmp = numpy.multiply(y, b)
+            print("\n\ninside sapyb\ntmp {}\ny {}\nself {}\n\n".format(tmp.backend, y.backend, self.backend))
+            tmp.add(ax, out=tmp)
+            out.fill(tmp)
+        else:
+            self._axpby(a,b,y,out, dtype, num_threads)
+
+        if ret_out:
+            return out
+
     def axpby(self, a, b, y, out, dtype=numpy.float32, num_threads=NUM_THREADS):
+        '''Deprecated. Alias of _axpby'''
+        warnings.warn('The use of axpby is deprecated and will be removed in following version. Use sapyb instead',
+              DeprecationWarning)
+        self._axpby(a,b,y,out, dtype, num_threads)
+
+
+    def _axpby(self, a, b, y, out, dtype=numpy.float32, num_threads=NUM_THREADS):
         '''performs axpby with cilacc C library, can be done in-place.
         
         Does the operation .. math:: a*x+b*y and stores the result in out, where x is self
@@ -2781,6 +2815,8 @@ class ImageData(DataContainer):
             array = array.as_array()
         elif issubclass(type(array) , numpy.ndarray):
             pass
+        elif issubclass(type(array), cp.ndarray):
+            pass
         else:
             raise TypeError('array must be a CIL type DataContainer or numpy.ndarray got {}'.format(type(array)))
             
@@ -2841,7 +2877,17 @@ class ImageData(DataContainer):
         if len(out.shape) == 1 or geometry_new is None:
             return out
         else:
-            return ImageData(out.array, deep_copy=False, geometry=geometry_new, suppress_warning=True)                            
+            return ImageData(out.array, deep_copy=False, geometry=geometry_new, suppress_warning=True)  
+
+    def copy(self):
+        if self.backend == numpy:
+            backend = 'numpy'
+        elif self.backend == cp:
+            backend = 'cupy'
+        else:
+            backend = None
+        return ImageData(array=self.array.copy(), deep_copy=False, geometry=self.geometry,\
+             dtype=self.dtype, suppress_warning=True, backend=backend)                          
 
 class AcquisitionData(DataContainer):
     '''DataContainer for holding 2D or 3D sinogram'''

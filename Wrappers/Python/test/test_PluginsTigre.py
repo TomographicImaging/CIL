@@ -187,7 +187,10 @@ class Test_convert_geometry(unittest.TestCase):
         np.testing.assert_allclose(tg_geometry.dDetector, ag.config.panel.pixel_size[::-1])
         np.testing.assert_allclose(tg_geometry.nDetector, ag.config.panel.num_pixels[::-1])
         np.testing.assert_allclose(tg_geometry.sDetector, tg_geometry.dDetector * tg_geometry.nDetector)
-        np.testing.assert_allclose(tg_geometry.offOrigin,0)
+
+
+        height = 10 / np.sqrt(2)
+        np.testing.assert_allclose(tg_geometry.offOrigin,[-height,0,0])
 
         np.testing.assert_allclose(tg_geometry.nVoxel, [self.ig.voxel_num_z,self.ig.voxel_num_y,self.ig.voxel_num_x])
         np.testing.assert_allclose(tg_geometry.dVoxel, [self.ig.voxel_size_z,self.ig.voxel_size_y,self.ig.voxel_size_x])

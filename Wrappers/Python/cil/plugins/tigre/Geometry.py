@@ -116,7 +116,7 @@ class TIGREGeometry(Geometry):
             self.dVoxel[0]= ag_in.config.panel.pixel_size[1] / ag_in.magnification
 
             # Offsets Tigre (Z, Y, X) == CIL (X, -Y)
-            self.offOrigin = np.array( [0, system.rotation_axis.position[0], -system.rotation_axis.position[1]])
+            self.offOrigin = np.array( [0, 0, 0] )
 
             if ag_in.geom_type == 'cone':  
                 self.offDetector = np.array( [0, system.detector.position[0]-system.source.position[0], 0 ])
@@ -135,12 +135,20 @@ class TIGREGeometry(Geometry):
             ind = np.asarray([2, 0, 1])
             flip = np.asarray([1, 1, -1])
 
-            self.offOrigin = np.array( system.rotation_axis.position[ind] * flip )
-
-            if ag_in.geom_type == 'cone':  
+            if ag_in.geom_type == 'cone':
+                #TIGRE origin is at a point on the rotate axis that is in a perpendicular plane containing the source
+                #As rotation axis is aligned with z this is the x-y plane
+                #We have aligned the y axis with the source->rotate axis direction
+                self.offOrigin = np.array( [-system.source.position[2], 0, 0])
                 self.offDetector = np.array( [system.detector.position[2]-system.source.position[2], system.detector.position[0]-system.source.position[0], 0])
             else:
+                self.offOrigin = np.array( system.rotation_axis.position[ind] * flip )
                 self.offDetector = np.array( [system.detector.position[2], system.detector.position[0], 0])
+
+            #shift origin to match image geometry
+            self.offOrigin[0] += ig.center_z
+            self.offOrigin[1] += ig.center_x
+            self.offOrigin[2] -= ig.center_y
 
             #convert roll, pitch, yaw
             U = system.detector.direction_x[ind] * flip

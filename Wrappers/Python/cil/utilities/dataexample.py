@@ -286,7 +286,7 @@ class TestData(object):
         return data
 
     @staticmethod
-    def random_noise(image, mode='gaussian', seed=None, clip=True, **kwargs):
+    def random_noise(image, mode='gaussian', seed=None, clip=True, dtype=numpy.float32, **kwargs):
         '''Function to add noise to input image
 
         :param image: input dataset, DataContainer of numpy.ndarray
@@ -300,13 +300,15 @@ class TestData(object):
             arr = TestData.scikit_random_noise(image.as_array(), mode=mode, seed=seed, clip=clip,
                   **kwargs)
             out = image.copy()
-            if arr.dtype != out.dtype:
-                arr = numpy.asarray(arr, dtype=out.dtype)
+            if arr.dtype != dtype:
+                arr = numpy.asarray(arr, dtype=dtype)
             out.fill(arr)
             return out
         elif issubclass(type(image), numpy.ndarray):
-            return TestData.scikit_random_noise(image, mode=mode, seed=seed, clip=clip, 
-                   **kwargs)
+            arr = TestData.scikit_random_noise(image, mode=mode, seed=seed, clip=clip, **kwargs)
+            if dtype != arr.dtype:
+                return numpy.asarray(arr, dtype=dtype)
+            return arr
 
     @staticmethod
     def scikit_random_noise(image, mode='gaussian', seed=None, clip=True, **kwargs):
@@ -449,7 +451,7 @@ class TestData(object):
             'poisson_values': []}
 
         for key in kwargs:
-            if key not in allowedkwargs[allowedtypes[mode]] + ['dtype']:
+            if key not in allowedkwargs[allowedtypes[mode]]:
                 raise ValueError('%s keyword not in allowed keywords %s' %
                                 (key, allowedkwargs[allowedtypes[mode]]))
 

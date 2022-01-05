@@ -82,7 +82,7 @@ class TestOperator(CCPiTestClass):
         
         vg = VectorGeometry(n)
         
-        Amat = numpy.random.randn(m, n)
+        Amat = numpy.asarray(numpy.random.randn(m, n), dtype=numpy.float32)
         A = MatrixOperator(Amat)
         
         b = vg.allocate('random')

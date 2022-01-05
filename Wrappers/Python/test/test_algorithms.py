@@ -146,7 +146,7 @@ class TestAlgorithms(unittest.TestCase):
         vg = VectorGeometry(2)
         x = vg.allocate('random_int', seed=2)
         # x = vg.allocate('random', seed=1) 
-        x.fill(numpy.asarray([10.,-3.]))
+        x.fill(numpy.asarray([10.,-3.], dtype=numpy.float32))
         
         max_iter = 10000
         update_interval = 1000
@@ -196,7 +196,7 @@ class TestAlgorithms(unittest.TestCase):
         initial = ig.allocate()
         b = initial.copy()
         # fill with random numbers
-        b.fill(numpy.random.random(initial.shape))
+        b.fill(numpy.asarray(numpy.random.random(initial.shape), dtype=numpy.float32))
         initial = ig.allocate(ImageGeometry.RANDOM)
         identity = IdentityOperator(ig)
         
@@ -256,7 +256,7 @@ class TestAlgorithms(unittest.TestCase):
         initial = ig.allocate()
         b = initial.copy()
         # fill with random numbers  
-        b.fill(numpy.random.random(initial.shape))
+        b.fill(numpy.asarray(numpy.random.random(initial.shape), dtype=numpy.float32))
         initial = ig.allocate(ImageGeometry.RANDOM)
         identity = IdentityOperator(ig)
         
@@ -291,12 +291,12 @@ class TestAlgorithms(unittest.TestCase):
         
         def setup(data, dnoise):
             if dnoise == 's&p':
-                n1 = applynoise.saltnpepper(data, salt_vs_pepper = 0.9, amount=0.2, seed=10)
+                n1 = applynoise.saltnpepper(data, salt_vs_pepper = 0.9, amount=0.2, seed=10, dtype=ig.dtype)
             elif dnoise == 'poisson':
                 scale = 5
-                n1 = applynoise.poisson( data.as_array()/scale, seed = 10)*scale
+                n1 = applynoise.poisson( data.as_array()/scale, seed = 10, dtype=ig.dtype) * scale
             elif dnoise == 'gaussian':
-                n1 = applynoise.gaussian(data.as_array(), seed = 10)
+                n1 = applynoise.gaussian(data.as_array(), seed = 10, dtype=ig.dtype)
             else:
                 raise ValueError('Unsupported Noise ', noise)
             noisy_data = ig.allocate()
@@ -634,7 +634,7 @@ class TestAlgorithms(unittest.TestCase):
         initial = ig.allocate()
         b = initial.copy()
         # fill with random numbers
-        b.fill(numpy.random.random(initial.shape))
+        b.fill(numpy.asarray(numpy.random.random(initial.shape), dtype=numpy.float32))
         initial = ig.allocate(ImageGeometry.RANDOM)
         identity = IdentityOperator(ig)
         
@@ -654,7 +654,10 @@ class TestAlgorithms(unittest.TestCase):
         initial = ig.allocate()
         b = initial.copy()
         # fill with random numbers
-        b.fill(numpy.random.random(initial.shape))
+        b.fill(numpy.asarray(
+            numpy.random.random(initial.shape), 
+            dtype=numpy.float32)
+            )
         initial = ig.allocate(ImageGeometry.RANDOM)
         identity = IdentityOperator(ig)
         

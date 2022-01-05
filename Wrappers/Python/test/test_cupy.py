@@ -231,7 +231,11 @@ class TDataContainerAlgebra(object):
     def test_cupy_array_fill_with_numpy(self):
         out = self.image1 * 0
 
-        arr = np.arange(0,self.image1.size).reshape(self.image1.shape)
+        arr = np.asarray(
+            np.arange(0,self.image1.size).reshape(self.image1.shape),
+            dtype=out.dtype
+            )
+
 
         out.fill(arr)
 

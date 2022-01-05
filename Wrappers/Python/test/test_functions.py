@@ -387,7 +387,7 @@ class TestFunction(unittest.TestCase):
        
         
         print('Check call with MatrixOperator... OK\n')  
-        mat = np.random.randn(M, N)
+        mat = numpy.asarray(np.random.randn(M, N), dtype=numpy.float32)
         operator = MatrixOperator(mat)   
         vg = VectorGeometry(N)
         b = vg.allocate('random')    

@@ -228,6 +228,14 @@ class TDataContainerAlgebra(object):
         except error:
             self.assertTrue(True)
 
+    def test_cupy_array_fill_with_numpy(self):
+        out = self.image1 * 0
+
+        arr = np.arange(0,self.image1.size).reshape(self.image1.shape)
+
+        out.fill(arr)
+
+        np.testing.assert_array_equal(arr, out.as_array().get())
 
     def test_sapyb_scalars(self):
 
@@ -329,15 +337,16 @@ class TDataContainerAlgebra(object):
     def test_sapyb_mixed(self):
 
 
-        image1 = self.image1.copy()
-        image2 = self.image2.copy()
+        image1 = ImageData(geometry=self.image1.geometry, backend='cupy')
+        # image2 = self.image2.copy()
+        image2 = ImageData(geometry=self.image1.geometry, backend='cupy')
 
 
         arr = np.arange(0,image1.size).reshape(image1.shape)
         image1.fill(arr)
         image2.fill(-arr)
  
-        a = 2.0
+        a = 2
         b = image1.copy()
         b.fill(-3)
 
@@ -368,6 +377,26 @@ class TDataContainerAlgebra(object):
         np.testing.assert_allclose(out.as_array().get(), gold)
         np.testing.assert_allclose(image1.as_array().get(), arr)
 
+    def test_algebra_different_type(self):
+
+        ig = self.image1.geometry.copy()
+        ig.dtype = np.int32
+
+        image1 = ImageData(geometry=self.image1.geometry, backend='cupy')
+        # image2 = self.image2.copy()
+
+        image2 = ImageData(geometry=self.image1.geometry, backend='cupy')
+
+        arr = self.image1.as_array()
+
+        image1.fill(arr)
+        image2.fill(-arr)
+ 
+        a = 2
+        b = image1.copy()
+        b.fill(-3)
+
+
 class TestCupyIntegrationImageData(TestCase, TDataContainerAlgebra):
 
     def setUp(self):
@@ -394,7 +423,7 @@ class TestCupyIntegrationImageData(TestCase, TDataContainerAlgebra):
         pass
 
     def test_backend(self):
-        assert self.image1.backend == cp
+        assert self.image1.backend == 'cupy'
     def test_copy(self):
 
         cpy = self.image1.copy()
@@ -405,8 +434,15 @@ class TestCupyIntegrationImageData(TestCase, TDataContainerAlgebra):
     def test_creation_and_copy_ImageData(self):
 
         camera = dataexample.CAMERA.get((100,100))
+        new = camera.geometry.allocate(0, dtype=self.image1.dtype)
+        arr = np.array(camera.as_array(), dtype=new.dtype)
+        print (arr.dtype)
+        new.fill(arr)
         
-        self.image1.fill(camera)
+        # should assert that fails
+        # self.image1.fill(camera)
+        
+        self.image1.fill(new)
         # garr = datag.array
         # print (type(garr))
 

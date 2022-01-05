@@ -15,8 +15,9 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 from cil.utilities.dataexample import TestData
+import numpy as np
 
-def gaussian(image, seed=None, clip=True, **kwargs):
+def gaussian(image, seed=None, clip=True, dtype=np.float32, **kwargs):
     '''Gaussian-distributed additive noise.
     
         seed : int, optional
@@ -34,9 +35,9 @@ def gaussian(image, seed=None, clip=True, **kwargs):
             Note: variance = (standard deviation) ** 2. Default : 0.01
         
         '''
-    return TestData.random_noise(image, mode='gaussian', seed=seed, clip=clip, **kwargs)
+    return TestData.random_noise(image, mode='gaussian', seed=seed, clip=clip, dtype=dtype, **kwargs)
 
-def poisson(image, seed=None, clip=True, **kwargs):
+def poisson(image, seed=None, clip=True, dtype=np.float32, **kwargs):
     '''Poisson-distributed noise generated from the data.
     
         seed : int, optional
@@ -48,9 +49,9 @@ def poisson(image, seed=None, clip=True, **kwargs):
             is not applied, and the output may extend beyond the range [-1, 1].
         
         '''
-    return TestData.random_noise(image, mode='poisson', seed=seed, clip=clip, **kwargs)
+    return TestData.random_noise(image, mode='poisson', seed=seed, clip=clip, dtype=dtype, **kwargs)
 
-def salt(image, seed=None, **kwargs):
+def salt(image, seed=None, dtype=np.float32, **kwargs):
     '''Replaces random pixels with 1.
     
         seed : int, optional
@@ -60,9 +61,9 @@ def salt(image, seed=None, **kwargs):
             Proportion of image pixels to replace with noise on range [0, 1].
             Used in 'salt', 'pepper', and 'salt & pepper'. Default : 0.05
         '''
-    return TestData.random_noise(image, mode='salt', seed=seed, clip=True, **kwargs)
+    return TestData.random_noise(image, mode='salt', seed=seed, clip=True, dtype=dtype, **kwargs)
 
-def pepper(image, seed=None, **kwargs):
+def pepper(image, seed=None, dtype=np.float32, **kwargs):
     '''Replaces random pixels with 0 (for unsigned images) or -1 (for signed images).
     
         seed : int, optional
@@ -72,9 +73,9 @@ def pepper(image, seed=None, **kwargs):
             Proportion of image pixels to replace with noise on range [0, 1].
             Used in 'salt', 'pepper', and 'salt & pepper'. Default : 0.05
         '''
-    return TestData.random_noise(image, mode='pepper', seed=seed, clip=True, **kwargs)
+    return TestData.random_noise(image, mode='pepper', seed=seed, clip=True, dtype=dtype, **kwargs)
 
-def saltnpepper(image, seed=None, **kwargs):
+def saltnpepper(image, seed=None, dtype=np.float32, **kwargs):
     '''Replaces random pixels with either 1 or `low_val`
     
     `low_val` is 0 for unsigned images or -1 for signed images.
@@ -88,9 +89,9 @@ def saltnpepper(image, seed=None, **kwargs):
         salt_vs_pepper : float, optional
             Proportion of salt vs. pepper noise for 's&p' on range [0, 1].
             Higher values represent more salt. Default : 0.5 (equal amounts)'''
-    return TestData.random_noise(image, mode='s&p', seed=seed, clip=True, **kwargs)
+    return TestData.random_noise(image, mode='s&p', seed=seed, clip=True, dtype=dtype, **kwargs)
 
-def speckle(image, seed=None, clip=True, **kwargs):
+def speckle(image, seed=None, clip=True, dtype=np.float32, **kwargs):
     '''Multiplicative noise
     
     using out = image + n*image, where
@@ -110,9 +111,9 @@ def speckle(image, seed=None, clip=True, **kwargs):
             Variance of random distribution.
             Note: variance = (standard deviation) ** 2. Default : 0.01
         '''
-    return TestData.random_noise(image, mode='speckle', seed=seed, clip=clip, **kwargs)
+    return TestData.random_noise(image, mode='speckle', seed=seed, clip=clip, dtype=dtype, **kwargs)
 
-def localvar(image, seed=None, clip=True, **kwargs):
+def localvar(image, seed=None, clip=True, dtype=np.float32, **kwargs):
     '''Gaussian-distributed additive noise, with specified
                         local variance at each point of `image`.
                         
@@ -132,4 +133,4 @@ def localvar(image, seed=None, clip=True, **kwargs):
             Array of positive floats, same shape as `image`, defining the local
             variance at every image point. Used in 'localvar'.
         '''
-    return TestData.random_noise(image, mode='localvar', seed=seed, clip=clip, **kwargs)
+    return TestData.random_noise(image, mode='localvar', seed=seed, clip=clip, dtype=dtype, **kwargs)

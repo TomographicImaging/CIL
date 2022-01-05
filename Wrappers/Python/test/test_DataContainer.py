@@ -655,13 +655,10 @@ class TestDataContainer(unittest.TestCase):
         numpy.testing.assert_almost_equal(data.abs().array, numpy.abs(r))              
 
         data1 = geometry.allocate(dtype=numpy.float32)
-        try:
-            data1.fill(r)
-            self.assertTrue(False)
-        except TypeError as err:
-            print(err)    
-            self.assertTrue(True)
 
+        with self.assertRaises(ValueError):
+            data1.fill(r)
+        
     def test_ImageGeometry_allocate_complex(self):
 
         ig = ImageGeometry(2,2)
@@ -805,7 +802,7 @@ class TestDataContainer(unittest.TestCase):
         import functools
         ig = ImageGeometry(10,11,12)
         u = ig.allocate()
-        a = numpy.ones(u.shape)
+        a = numpy.ones(u.shape, dtype=numpy.float32)
         
         u.fill(a)
         
@@ -900,8 +897,11 @@ class TestDataContainer(unittest.TestCase):
         a = ig.allocate()                                                  
         b = ig.allocate()         
 
-        d1.fill(numpy.arange(1,101).reshape(10,10))
-        d2.fill(numpy.arange(1,101).reshape(10,10))
+        d1.fill(numpy.asarray(
+            numpy.arange(1,101).reshape(10,10),
+            dtype=numpy.float32))
+        d2.fill(numpy.asarray(numpy.arange(1,101).reshape(10,10),
+            dtype=numpy.float32))
         a.fill(1.0/d1.as_array())                                                  
         b.fill(-1.0/d2.as_array())   
 
@@ -920,8 +920,8 @@ class TestDataContainer(unittest.TestCase):
         a = ig.allocate()                                                  
         b = ig.allocate()         
 
-        d1.fill(numpy.arange(1,101).reshape(10,10))
-        d2.fill(numpy.arange(1,101).reshape(10,10))
+        d1.fill(numpy.asarray(numpy.arange(1,101).reshape(10,10), dtype=numpy.float32))
+        d2.fill(numpy.asarray(numpy.arange(1,101).reshape(10,10), dtype=numpy.float32))
         a.fill(1.0/d1.as_array())                                                  
         b.fill(-1.0/d2.as_array())   
 

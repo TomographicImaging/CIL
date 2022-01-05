@@ -319,7 +319,7 @@ class ImageGeometry(object):
                     r = numpy.random.random_sample(self.shape) + 1j * numpy.random.random_sample(self.shape)
                     out.fill(r)
                 else: 
-                    out.fill(numpy.random.random_sample(self.shape))
+                    out.fill(numpy.asarray(numpy.random.random_sample(self.shape), dtype=dtype))
             elif value == ImageGeometry.RANDOM_INT:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
@@ -2009,7 +2009,7 @@ class AcquisitionGeometry(object):
                     r = numpy.random.random_sample(self.shape) + 1j * numpy.random.random_sample(self.shape)
                     out.fill(r)
                 else:
-                    out.fill(numpy.random.random_sample(self.shape))
+                    out.fill(numpy.asarray(numpy.random.random_sample(self.shape),dtype=dtype))
             elif value == AcquisitionGeometry.RANDOM_INT:
                 seed = kwargs.get('seed', None)
                 if seed is not None:
@@ -2058,19 +2058,23 @@ class DataContainer(object):
         else:
             raise ValueError("dimension_labels expected a list containing {0} strings got {1}".format(self.number_of_dimensions, val))
 
+
     @property
     def shape(self):
         '''Returns the shape of the  of the DataContainer'''
         return self.array.shape
 
+
     @shape.setter
     def shape(self, val):
         print("Deprecated - shape will be set automatically")
+
 
     @property
     def number_of_dimensions(self):
         '''Returns the shape of the  of the DataContainer'''
         return len(self.array.shape)
+
 
     @property
     def dtype(self):
@@ -2079,13 +2083,20 @@ class DataContainer(object):
         self.geometry.dtype = self.array.dtype       
         return self.array.dtype
 
+
     @property
     def size(self):
         '''Returns the number of elements of the DataContainer'''
         return self.array.size
 
+
+    @property
+    def backend(self):
+        return self._backend
+
+
     __container_priority__ = 1
-    def __init__ (self, array, deep_copy=True, dimension_labels=None, 
+    def __init__ (self, array, deep_copy=True, dimension_labels=None, backend='numpy',
                   **kwargs):
         '''Holds the data'''
         
@@ -2104,8 +2115,11 @@ class DataContainer(object):
             try:
                 self.geometry.dtype = self.dtype            
             except:
-                pass    
+                pass
+
+        self._backend = backend
         
+
     def get_dimension_size(self, dimension_label):
 
         if dimension_label in self.dimension_labels:
@@ -2224,35 +2238,46 @@ class DataContainer(object):
         '''
         if id(array) == id(self.array):
             return
+        
+        
         if dimension == {}:
-            if isinstance(array, numpy.ndarray):
-                if array.shape != self.shape:
-                    raise ValueError('Cannot fill with the provided array.' + \
-                                     'Expecting {0} got {1}'.format(
-                                     self.shape,array.shape))
-                if hasattr(self, 'backend'):
-                    if self.backend == cp:
-                        self.array = cp.array(array)
-                        return
-                numpy.copyto(self.array, array)
-            elif isinstance(array, Number):
-                self.array.fill(array) 
-            elif issubclass(array.__class__ , DataContainer):
-                if hasattr(self, 'geometry') and hasattr(array, 'geometry'):
-                    if self.geometry != array.geometry:
-                        if hasattr(self, 'backend'):
-                            if self.backend == cp:
-                                self.array = cp.array(array)
-                                return
-                        numpy.copyto(self.array, array.subset(dimensions=array.dimension_labels).as_array())
-                        return
-                if hasattr(self, 'backend'):
-                    if self.backend == cp:
-                        self.array = cp.array(array.as_array())
-                        return
-                numpy.copyto(self.array, array.as_array())
+            if isinstance(array, Number):
+                self.array.fill(array)
             else:
-                raise TypeError('Can fill only with number, numpy array or DataContainer and subclasses. Got {}'.format(type(array)))
+                # If the type is different we need to crash
+                if array.dtype != self.dtype:
+                    # arr = numpy.array(array.get(), dtype=self.dtype)
+                    raise ValueError("Cannot fill with the given data: wrong type. Expecting {}, got {}".format(self.dtype, array.dtype))
+                if isinstance(array, numpy.ndarray) or isinstance(array, cp.ndarray):
+                    if array.shape != self.shape:
+                        raise ValueError('Cannot fill with the provided array.' + \
+                                        'Expecting {0} got {1}'.format(
+                                        self.shape,array.shape))
+                    if self.backend == 'cupy':
+                        self.array = cp.array(array)
+                    elif self.backend == 'numpy':
+                        numpy.copyto(self.array, array)
+                    else:
+                        raise ValueError('Unsupported backend {}'.format(self.backend))
+                
+                elif issubclass(array.__class__ , DataContainer):
+                    if hasattr(self, 'geometry') and hasattr(array, 'geometry'):
+                        if self.geometry != array.geometry:
+                            
+                            if self.backend == 'cupy':
+                                self.array = cp.array(array)
+                            elif self.backend == 'numpy':
+                                numpy.copyto(self.array, array.subset(dimensions=array.dimension_labels).as_array())
+                            else:
+                                raise ValueError('Unsupported backend {}'.format(self.backend))
+                            return
+                    
+                    if self.backend == 'cupy':
+                        self.array = cp.array(array.as_array())
+                    elif self.backend == 'numpy':
+                        numpy.copyto(self.array, array.as_array())
+                else:
+                    raise TypeError('Can fill only with number, numpy array, cupy array or DataContainer and subclasses. Got {}'.format(type(array)))
         else:
             
             axis = [':']* self.number_of_dimensions
@@ -2269,7 +2294,7 @@ class DataContainer(object):
                 command += str(el)
                 i+=1
             
-            if isinstance(array, numpy.ndarray):
+            if isinstance(array, numpy.ndarray) or isinstance(array, cp.ndarray):
                 command = command + "] = array[:]" 
             elif issubclass(array.__class__, DataContainer):
                 command = command + "] = array.as_array()[:]" 
@@ -2421,7 +2446,8 @@ class DataContainer(object):
                    deep_copy=False, 
                    dimension_labels=self.dimension_labels,
                    geometry= None if self.geometry is None else self.geometry.copy(), 
-                   suppress_warning=True)
+                   suppress_warning=True,
+                   backend=self.backend)
             
         
         elif issubclass(type(out), DataContainer) and issubclass(type(x2), DataContainer):
@@ -2497,7 +2523,7 @@ class DataContainer(object):
         if self.dtype in [numpy.complex]:
             do_numpy = True
         else:
-            if self.backend == cp:
+            if self.backend == 'cupy':
                 do_numpy = True
         if out is None:
             out = self * 0.
@@ -2507,7 +2533,7 @@ class DataContainer(object):
             ax = self * a
             # I need to make the DataContainer Array Like
             tmp = numpy.multiply(y, b)
-            print("\n\ninside sapyb\ntmp {}\ny {}\nself {}\n\n".format(tmp.backend, y.backend, self.backend))
+            print("\n\ninside sapyb\ntmp {}\ny {}\nself {}\nax {}\n".format(tmp.backend, y.backend, self.backend, ax.backend))
             tmp.add(ax, out=tmp)
             out.fill(tmp)
         else:
@@ -2634,7 +2660,8 @@ class DataContainer(object):
                        deep_copy=False, 
                        dimension_labels=self.dimension_labels,
                        geometry=self.geometry, 
-                       suppress_warning=True)
+                       suppress_warning=True,
+                       backend=self.backend)
         elif issubclass(type(out), DataContainer):
             if self.check_dimensions(out):
                 kwargs['out'] = out.as_array()
@@ -2804,12 +2831,14 @@ class ImageData(DataContainer):
         labels = dimension_labels
         if labels is not None and labels != geometry.dimension_labels:
                 raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
-        bknd = numpy
-        if backend == 'cupy':
-            bknd = cp
-        self._backend = bknd
 
-        if array is None:                                   
+        # self._backend = backend
+
+        if array is None:
+            if backend == 'numpy':
+                bknd = numpy
+            elif backend == 'cupy':
+                bknd = cp
             array = bknd.empty(geometry.shape, dtype=dtype)
         elif issubclass(type(array) , DataContainer):
             array = array.as_array()
@@ -2826,12 +2855,7 @@ class ImageData(DataContainer):
         if array.ndim not in [2,3,4]:
             raise ValueError('Number of dimensions are not 2 or 3 or 4 : {0}'.format(array.ndim))
     
-        super(ImageData, self).__init__(array, deep_copy, geometry=geometry, **kwargs)
-
-
-    @property
-    def backend(self):
-        return self._backend
+        super(ImageData, self).__init__(array, deep_copy, geometry=geometry, backend=backend, **kwargs)
 
     def subset(self, dimensions=None, **kw):
         '''returns a subset of ImageData and regenerates the geometry'''
@@ -2880,14 +2904,8 @@ class ImageData(DataContainer):
             return ImageData(out.array, deep_copy=False, geometry=geometry_new, suppress_warning=True)  
 
     def copy(self):
-        if self.backend == numpy:
-            backend = 'numpy'
-        elif self.backend == cp:
-            backend = 'cupy'
-        else:
-            backend = None
         return ImageData(array=self.array.copy(), deep_copy=False, geometry=self.geometry,\
-             dtype=self.dtype, suppress_warning=True, backend=backend)                          
+             dtype=self.dtype, suppress_warning=True, backend=self.backend)                          
 
 class AcquisitionData(DataContainer):
     '''DataContainer for holding 2D or 3D sinogram'''
@@ -3368,7 +3386,7 @@ class VectorGeometry(object):
                 seed = kwargs.get('seed', None)
                 if seed is not None:
                     numpy.random.seed(seed) 
-                out.fill(numpy.random.random_sample(self.shape))
+                out.fill(numpy.asarray(numpy.random.random_sample(self.shape), dtype=dtype))
             elif value == VectorGeometry.RANDOM_INT:
                 seed = kwargs.get('seed', None)
                 if seed is not None:

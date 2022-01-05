@@ -180,7 +180,7 @@ class TestData(object):
     def __init__(self, **kwargs):
         self.data_dir = kwargs.get('data_dir', data_dir)
         
-    def load(self, which, size=None, scale=(0,1), **kwargs):
+    def load(self, which, size=None, scale=(0,1), dtype=numpy.float32):
         '''
         Return a test data of the requested image
 
@@ -192,6 +192,8 @@ class TestData(object):
             The size of the returned ImageData. If None default will be used for each image type
         scale: tuple, optional
             The scale of the data values
+        dtype: numpy types
+            The type required. Default is float32
 
         Returns
         -------
@@ -211,7 +213,7 @@ class TestData(object):
                 N = size[0]
                 M = size[1]
 
-            sdata = numpy.zeros((N, M))
+            sdata = numpy.zeros((N, M), dtype=dtype)
             sdata[int(round(N/4)):int(round(3*N/4)), int(round(M/4)):int(round(3*M/4))] = 0.5
             sdata[int(round(N/8)):int(round(7*N/8)), int(round(3*M/8)):int(round(5*M/8))] = 1
             ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
@@ -231,7 +233,7 @@ class TestData(object):
                 
                 ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
                 data = ig.allocate()
-                tmp = numpy.array(f.convert('L').resize((M,N)))
+                tmp = numpy.array(f.convert('L').resize((M,N)), dtype=numpy.float32)
                 data.fill(tmp/numpy.max(tmp))
             
         else:
@@ -253,13 +255,17 @@ class TestData(object):
                     ig = ImageGeometry(voxel_num_x=M, voxel_num_y=N, channels=len(bands), 
                     dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X,ImageGeometry.CHANNEL])
                     data = ig.allocate()
-                    data.fill(numpy.array(tmp.resize((M,N))))
+                    data.fill(numpy.array(tmp.resize((M,N)), dtype=dtype))
                     data.reorder([ImageGeometry.CHANNEL,ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
                     data.geometry.channel_labels = bands
                 else:
                     ig = ImageGeometry(voxel_num_x = M, voxel_num_y = N, dimension_labels=[ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X])
-                    data = ig.allocate()
-                    data.fill(numpy.array(tmp.resize((M,N))))
+                    data = ig.allocate(dtype=dtype)
+                    arr = numpy.asarray(
+                        numpy.array(tmp.resize((M,N))), 
+                        dtype=dtype)
+                    print (arr.dtype, data.dtype)
+                    data.fill(arr)
 
 
             if scale is not None:
@@ -272,6 +278,11 @@ class TestData(object):
                     data *= (scale[1]-scale[0])
                     data += scale[0]
         # print ("data.geometry", data.geometry)
+        if dtype is not None:
+            arr = numpy.array(data.as_array(), dtype=dtype)
+            data = data.geometry.allocate(None, dtype=dtype)
+            data.fill(arr)
+
         return data
 
     @staticmethod
@@ -289,6 +300,8 @@ class TestData(object):
             arr = TestData.scikit_random_noise(image.as_array(), mode=mode, seed=seed, clip=clip,
                   **kwargs)
             out = image.copy()
+            if arr.dtype != out.dtype:
+                arr = numpy.asarray(arr, dtype=out.dtype)
             out.fill(arr)
             return out
         elif issubclass(type(image), numpy.ndarray):
@@ -436,7 +449,7 @@ class TestData(object):
             'poisson_values': []}
 
         for key in kwargs:
-            if key not in allowedkwargs[allowedtypes[mode]]:
+            if key not in allowedkwargs[allowedtypes[mode]] + ['dtype']:
                 raise ValueError('%s keyword not in allowed keywords %s' %
                                 (key, allowedkwargs[allowedtypes[mode]]))
 

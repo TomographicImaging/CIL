@@ -249,7 +249,7 @@ class TDataContainerAlgebra(object):
 
         print ("type image1 ", type(image1), image1.backend)
 
-        arr = np.arange(0,image1.size).reshape(image1.shape)
+        arr = np.asarray(np.arange(0,image1.size).reshape(image1.shape), dtype=np.float32)
         image1.fill(arr)
         image2.fill(-arr)
         print ("type image1 ", type(image1), image1.backend)
@@ -299,7 +299,10 @@ class TDataContainerAlgebra(object):
         image2 = self.image2.copy()
 
 
-        arr = np.arange(0,image1.size).reshape(image1.shape)
+        arr = np.asarray(
+            np.arange(0,image1.size).reshape(image1.shape),
+            dtype=np.float32
+            )
         image1.fill(arr)
         image2.fill(-arr)
 
@@ -346,7 +349,10 @@ class TDataContainerAlgebra(object):
         image2 = ImageData(geometry=self.image1.geometry, backend='cupy')
 
 
-        arr = np.arange(0,image1.size).reshape(image1.shape)
+        arr = np.asarray(
+            np.arange(0,image1.size).reshape(image1.shape),
+            dtype=np.float32
+            )
         image1.fill(arr)
         image2.fill(-arr)
  

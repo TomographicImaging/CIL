@@ -142,13 +142,14 @@ class TIGREGeometry(Geometry):
                 self.offOrigin = np.array( [-system.source.position[2], 0, 0])
                 self.offDetector = np.array( [system.detector.position[2]-system.source.position[2], system.detector.position[0]-system.source.position[0], 0])
             else:
-                self.offOrigin = np.array( system.rotation_axis.position[ind] * flip )
+                self.offOrigin = np.array( [0,0,0] )
                 self.offDetector = np.array( [system.detector.position[2], system.detector.position[0], 0])
 
             #shift origin to match image geometry
+            #this is in CIL reference frames as the TIGRE geometry rotates the reconstrcution volume to match our definitions
             self.offOrigin[0] += ig.center_z
-            self.offOrigin[1] += ig.center_x
-            self.offOrigin[2] -= ig.center_y
+            self.offOrigin[1] += ig.center_y
+            self.offOrigin[2] += ig.center_x
 
             #convert roll, pitch, yaw
             U = system.detector.direction_x[ind] * flip

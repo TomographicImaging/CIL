@@ -1,4 +1,5 @@
 * 21.3.1
+  - Added matplotlib version dependency to conda recipe
   - Fixed TIGRE wrappers for geometry with a virtual detector
   - Fixed TIGRE wrappers for cone-beam geometry with tilted rotation axis
 

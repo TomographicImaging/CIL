@@ -310,35 +310,49 @@ class TestOperator(CCPiTestClass):
             print("Check for 2D chan for FiniteDiff label {}".format(labels[i]))        
         
     def test_PowerMethod(self):
-        print ("test_BlockOperator")
+
+        # 2x2 real matrix, dominant eigenvalue = 2
+        M1 = numpy.array([[1,0],[1,2]], dtype=float)
+        M1op = MatrixOperator(M1)
+        res1 = M1op.PowerMethod(M1op,100)
+        numpy.testing.assert_almost_equal(res1,2., decimal=4)
+
+        # Test with the norm       
+        res2 = M1op.norm()
+        numpy.testing.assert_almost_equal(res1,res2, decimal=4)
+
+
+        # 2x3 real matrix, dominant eigenvalue = 4.711479432297657
+        M1 = numpy.array([[1.,0.,3],[1,2.,3]])
+        M1op = MatrixOperator(M1)
+        res1 = M1op.PowerMethod(M1op,100)
+        numpy.testing.assert_almost_equal(res1,4.711479432297657, decimal=4)        
         
-        N, M = 200, 300
-        niter = 10
-        ig = ImageGeometry(N, M)
+        # 2x3 complex matrix, (real eigenvalues), dominant eigenvalue = 5.417602365823937
+        M1 = numpy.array([[2,1j,0],[2j,5j,0]])
+        M1op = MatrixOperator(M1)
+        res1 = M1op.PowerMethod(M1op,100)
+        numpy.testing.assert_almost_equal(res1,5.417602365823937, decimal=4) 
+
+        # 3x3 complex matrix, (real+complex eigenvalue), dominant eigenvalue = 3.1624439599276974
+        M1 = numpy.array([[2,0,0],[1,2j,1j],[3, 3-1j,3]])
+        M1op = MatrixOperator(M1)
+        res1 = M1op.PowerMethod(M1op,100)
+        numpy.testing.assert_almost_equal(res1,3.1624439599276974, decimal=4)                
+
+        # Gradient Operator
+        ig = ImageGeometry(30,30)
+        Grad = GradientOperator(ig)
+        res1 = Grad.PowerMethod(Grad,500, tolerance=1e-6)
+        numpy.testing.assert_almost_equal(res1, numpy.sqrt(8), decimal=2)                
+
+        # Identity Operator
         Id = IdentityOperator(ig)
-        
-        G = GradientOperator(ig)
-        
-        uid = Id.domain_geometry().allocate(ImageGeometry.RANDOM, seed=1)
-        
-        a = LinearOperator.PowerMethod(Id, niter, uid)
-        #b = LinearOperator.PowerMethodNonsquare(Id, niter, uid)
-        b = LinearOperator.PowerMethod(Id, niter)
-        print ("Edo impl", a[0])
-        print ("None impl", b[0])
-        
-        #self.assertAlmostEqual(a[0], b[0])
-        self.assertNumpyArrayAlmostEqual(a[0],b[0],decimal=6)
-        
-        a = LinearOperator.PowerMethod(G, niter, uid)
-        b = LinearOperator.PowerMethod(G, niter)
-        #b = LinearOperator.PowerMethodNonsquare(G, niter, uid)
-        
-        print ("Edo impl", a[0])
-        #print ("old impl", b[0])
-        self.assertNumpyArrayAlmostEqual(a[0],b[0],decimal=2)
-        #self.assertAlmostEqual(a[0], b[0])
-        
+        res1 = Id.PowerMethod(Id,100)
+        numpy.testing.assert_almost_equal(res1,1.0, decimal=4)                
+
+
+             
     def test_Norm(self):
         print ("test_BlockOperator")
         ##

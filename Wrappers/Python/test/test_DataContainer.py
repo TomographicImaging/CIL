@@ -933,9 +933,8 @@ class TestDataContainer(unittest.TestCase):
 
 
     def test_sapyb_datacontainer_f(self):
-        print ("test sapyb")
         #a vec, b vec
-        #daxpby
+        
         ig = ImageGeometry(10,10)                                               
         d1 = ig.allocate(dtype=numpy.float32)                                                     
         d2 = ig.allocate(dtype=numpy.float32)   
@@ -959,9 +958,7 @@ class TestDataContainer(unittest.TestCase):
         numpy.testing.assert_array_equal(res, out.as_array())
 
     def test_sapyb_scalar_f(self):
-        print ("test sapyb")
-        #a vec, b vec
-        #daxpby
+        # a,b scalar
         ig = ImageGeometry(10,10)                                               
         d1 = ig.allocate(1, dtype=numpy.float32)                                                     
         d2 = ig.allocate(2, dtype=numpy.float32)   
@@ -978,10 +975,43 @@ class TestDataContainer(unittest.TestCase):
         d1.sapyb(a,d2,b, out)
         numpy.testing.assert_array_equal(res, out.as_array())
 
+        d1.sapyb(a,d2,b, out=d1)
+        numpy.testing.assert_array_equal(res, d1.as_array())
+
+        d1.fill(1)
+        d1.sapyb(a,d2,b, out=d2)
+        numpy.testing.assert_array_equal(res, d2.as_array())
+    
+    def test_sapyb_datacontainer_scalar_f(self):
+        #mix: a scalar and b DataContainer and a DataContainer and b scalar
+        ig = ImageGeometry(10,10)                                               
+        d1 = ig.allocate(1., dtype=numpy.complex64)                                                     
+        d2 = ig.allocate(2.,dtype=numpy.complex64)   
+        a = 2.+2j                                                
+        b = ig.allocate(-1.-1j, dtype=numpy.complex64)         
+
+
+        out = ig.allocate(-1,dtype=numpy.complex64)
+        # equals to (2+2j)*[1] + -(1+j)*[2] = 0
+        
+        out = d1.sapyb(a,d2,b)
+        res = ig.allocate(0, dtype=numpy.complex64)
+        numpy.testing.assert_array_equal(res.as_array(), out.as_array())
+
+        out.fill(-1)
+        d1.sapyb(a,d2,b, out)
+        numpy.testing.assert_array_equal(res.as_array(), out.as_array())
+
+        out = d2.sapyb(b,d1,a)
+        res = ig.allocate(0, dtype=numpy.complex64)
+        numpy.testing.assert_array_equal(res.as_array(), out.as_array())
+
+        out.fill(-1)
+        d2.sapyb(b,d1,a, out)
+        numpy.testing.assert_array_equal(res.as_array(), out.as_array())
+
     def test_sapyb_scalar_c(self):
-        print ("test sapyb")
-        #a vec, b vec
-        #daxpby
+        # a, b scalar
         ig = ImageGeometry(10,10)                                               
         d1 = ig.allocate(1, dtype=numpy.complex64)                                                     
         d2 = ig.allocate(2, dtype=numpy.complex64)   
@@ -998,10 +1028,16 @@ class TestDataContainer(unittest.TestCase):
         d1.sapyb(a,d2,b, out)
         numpy.testing.assert_array_equal(res, out.as_array())
 
+        d1.sapyb(a,d2,b, out=d1)
+        numpy.testing.assert_array_equal(res, d1.as_array())
+
+        d1.fill(1)
+        d1.sapyb(a,d2,b, out=d2)
+        numpy.testing.assert_array_equal(res, d2.as_array())
+
+
     def test_sapyb_datacontainer_c(self):
-        print ("test sapyb")
         #a vec, b vec
-        #daxpby
         ig = ImageGeometry(10,10)                                               
         d1 = ig.allocate(dtype=numpy.complex64)                                                     
         d2 = ig.allocate(dtype=numpy.complex64)   
@@ -1029,6 +1065,35 @@ class TestDataContainer(unittest.TestCase):
         out.fill(0)
         d1.sapyb(a,d2,b, out)
         numpy.testing.assert_array_equal(res, out.as_array())
+
+
+    def test_sapyb_datacontainer_scalar_c(self):
+        #mix: a scalar and b DataContainer and a DataContainer and b scalar
+        ig = ImageGeometry(10,10)                                               
+        d1 = ig.allocate(1., dtype=numpy.complex64)                                                     
+        d2 = ig.allocate(2.,dtype=numpy.complex64)   
+        a = 2.+2j                                                
+        b = ig.allocate(-1.-1j, dtype=numpy.complex64)         
+
+
+        out = ig.allocate(-1,dtype=numpy.complex64)
+        # equals to (2+2j)*[1] + -(1+j)*[2] = 0
+        
+        out = d1.sapyb(a,d2,b)
+        res = ig.allocate(0, dtype=numpy.complex64)
+        numpy.testing.assert_array_equal(res.as_array(), out.as_array())
+
+        out.fill(-1)
+        d1.sapyb(a,d2,b, out)
+        numpy.testing.assert_array_equal(res.as_array(), out.as_array())
+
+        out = d2.sapyb(b,d1,a)
+        res = ig.allocate(0, dtype=numpy.complex64)
+        numpy.testing.assert_array_equal(res.as_array(), out.as_array())
+
+        out.fill(-1)
+        d2.sapyb(b,d1,a, out)
+        numpy.testing.assert_array_equal(res.as_array(), out.as_array())
 
     def test_min(self):
         print ("test min")

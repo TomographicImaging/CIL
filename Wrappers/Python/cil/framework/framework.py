@@ -2483,14 +2483,15 @@ class DataContainer(object):
 
 
     def sapyb(self, a, y, b, out=None, dtype=numpy.float32, num_threads=NUM_THREADS):
-        '''performs a*self + b * y
+        '''performs a*self + b * y. It is inline safe
         
         Parameters
         ----------
         a : multiplier for self, can be a number or a numpy array or a DataContainer
         y : DataContainer 
         b : multiplier for y, can be a number or a numpy array or a DataContainer
-        out : return DataContainer, if None a new DataContainer is returned, default None
+        out : return DataContainer, if None a new DataContainer is returned, default None. 
+            out can be self or y.
         dtype : forces the output to the type, default numpy float32
         num_threads : number of threads to use during the calculation, using the CIL C library
         
@@ -2508,9 +2509,8 @@ class DataContainer(object):
 
         if do_numpy:
             ax = self * a
-            tmp = numpy.multiply(y, b)
-            tmp.add(ax, out=tmp)
-            out.fill(tmp)
+            y.multiply(b, out=out)
+            out.add(ax, out=out)
         else:
             self._axpby(a,b,y,out, dtype, num_threads)
 

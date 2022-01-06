@@ -118,38 +118,120 @@ class LinearOperator(Operator):
         raise NotImplementedError
     
     @staticmethod
-    def PowerMethod(operator, iterations, x_init=None):
-        '''Power method to calculate iteratively the Lipschitz constant
+    def PowerMethod(operator, iterations=10, tolerance = 1e-5, initial=None, verbose=False):
         
-        :param operator: input operator
-        :type operator: :code:`LinearOperator`
-        :param iterations: number of iterations to run
-        :type iteration: int
-        :param x_init: starting point for the iteration in the operator domain
-        :returns: tuple with: L, list of L at each iteration, the data the iteration worked on.
-        '''
+
+        r"""Power method or Power iteration algorithm 
         
-        # Initialise random
-        if x_init is None:
+        The Power method computes the largest (dominant) eigenvalue of a square matrix in magnitude, e.g.,
+        absolute value in the real case and module in the complex case.        
+        For the non-square case, the power method is applied for the matrix :math: A^{T}*A.
+
+        Parameters
+        ----------
+
+        operator: LinearOperator
+        iterations: positive:`int`, default=10
+            Number of iterations for the Power method
+        tolerance: positive:`float`, default = 1e-4
+            Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below this tolerance.
+        initial: DataContainer, default = None
+            Starting point for the Power method
+        verbose: boolean, default = False
+            Returns: dominant eigenvalue (False) or dominant eigenvalue, number of iterations, corresponding eigenvector, list of eigenvalue estimations
+
+        Notes
+        -----
+
+        Returns
+        -------
+
+        dominant eigenvalue: positive:`float`
+        number of iterations: positive:`int`
+            Number of iterations to reach tolerance, if verbose = True
+        eigenvector: DataContainer
+            Corresponding eigenvector of the dominant eigenvalue, if verbose = True
+        list of eigenvalues: :obj:`list`
+            List of eigenvalues
+
+        Examples
+        --------    
+
+        >>> M = np.array([[1.,0],[1.,2.]])
+        >>> Mop = MatrixOperator(M)
+        >>> Mop_norm = Mop.PowerMethod(Mop)
+        >>> Mop_norm
+        array([ 0,  2,  6, 12, 20])
+
+        `PowerMethod` is called when we compute the norm of a matrix or a `LinearOperator`.
+
+        >>> Mop_norm = Mop.norm()
+        
+
+
+        Note
+        ----
+
+
+        """
+
+        # Default case: non-symmetric
+        symmetric = False
+
+        # symmetric case   
+        if set(operator.domain_geometry().shape)==set(operator.range_geometry().shape):
+            symmetric = True
+        
+        # Initialise random or by the user
+        if initial is None:
             x0 = operator.domain_geometry().allocate('random')
         else:
-            x0 = x_init.copy()
+            x0 = initial.copy()
+
+        # Normalize first eigenvector
+        x0_norm = x0.norm()
+        x0 /= x0_norm
             
-        x1 = operator.domain_geometry().allocate()
+        # allocate space on the range geometry
         y_tmp = operator.range_geometry().allocate()
-        s = numpy.zeros(iterations)
-        # Loop
-        for it in numpy.arange(iterations):
-            operator.direct(x0,out=y_tmp)
-            operator.adjoint(y_tmp,out=x1)
-            x1norm = x1.norm()
-            if hasattr(x0, 'squared_norm'):
-                s[it] = x1.dot(x0) / x0.squared_norm()
+
+        # initial guess for dominant eigenvalue
+        eig_old = 1.
+
+        # list of eigenvalues
+        eig_list = []
+
+        for i in range(iterations):
+
+            if symmetric:                
+                operator.direct(x0, y_tmp)
+                # in-place?
+                x0 = y_tmp.copy()
             else:
-                x0norm = x0.norm()
-                s[it] = x1.dot(x0) / (x0norm * x0norm) 
-            x1.multiply((1.0/x1norm), out=x0)
-        return numpy.sqrt(s[-1]), numpy.sqrt(s), x0
+                operator.direct(x0, out = y_tmp)
+                operator.adjoint(y_tmp,out=x0)
+            
+            # Get eigenvalue using Rayleigh quotient: denominator=1, due to normalization
+            x0_norm = x0.norm()
+            x0 /= x0_norm
+
+            if symmetric:
+                eig_new =  numpy.abs(x0_norm)
+            else:
+                eig_new = numpy.sqrt(numpy.abs(x0_norm))
+            
+            # Stopping criterion of two consecutive eigenvalues
+            if numpy.abs(eig_new - eig_old) < tolerance :
+                break
+            eig_old = eig_new
+            
+            eig_list.append(eig_new)
+
+        if verbose:
+            return eig_new, i, x0, eig_list
+        else:
+            return eig_new
+            
 
     def calculate_norm(self, **kwargs):
         '''Returns the norm of the LinearOperator as calculated by the PowerMethod
@@ -161,9 +243,11 @@ class LinearOperator(Operator):
         :parameter force: forces the recalculation of the norm
         :type force: boolean, default :code:`False`
         '''
-        x0 = kwargs.get('x_init', None)
-        iterations = kwargs.get('iterations', 25)
-        s1, sall, svec = LinearOperator.PowerMethod(self, iterations, x_init=x0)
+        initial = kwargs.get('initial', None)
+        tolerance = kwargs.get('tolerance', 1e-5)
+        iterations = kwargs.get('iterations', 10)
+        verbose = kwargs.get('verbose', False)
+        s1 = LinearOperator.PowerMethod(self, iterations=iterations, tolerance=tolerance, initial=initial, verbose=verbose)
         return s1
 
     @staticmethod

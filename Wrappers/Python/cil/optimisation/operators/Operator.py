@@ -161,13 +161,13 @@ class LinearOperator(Operator):
         >>> Mop = MatrixOperator(M)
         >>> Mop_norm = Mop.PowerMethod(Mop)
         >>> Mop_norm
-        array([ 0,  2,  6, 12, 20])
+        2.0000654846240296
 
         `PowerMethod` is called when we compute the norm of a matrix or a `LinearOperator`.
 
         >>> Mop_norm = Mop.norm()
+        2.0005647295658866
         
-
 
         Note
         ----

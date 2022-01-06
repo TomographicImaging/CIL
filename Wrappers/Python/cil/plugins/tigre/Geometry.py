@@ -115,9 +115,9 @@ class TIGREGeometry(Geometry):
             self.nVoxel[0]=1
             self.dVoxel[0]= ag_in.config.panel.pixel_size[1] / ag_in.magnification
 
-            # Offsets Tigre (Z, Y, X) == CIL (X, -Y)
             self.offOrigin = np.array( [0, 0, 0] )
 
+            # Offsets Tigre (Z, Y, X) == CIL (X, -Y)
             if ag_in.geom_type == 'cone':  
                 self.offDetector = np.array( [0, system.detector.position[0]-system.source.position[0], 0 ])
             else:

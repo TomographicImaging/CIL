@@ -1,3 +1,7 @@
+* 21.3.1
+  - Fixed TIGRE wrappers for geometry with a virtual detector
+  - Fixed TIGRE wrappers for cone-beam geometry with tilted rotation axis
+
 * 21.3.0
   - Accelerated PDHG which handles strong convexity of functions
   - TotalVariation Function handles SIRF ImageData

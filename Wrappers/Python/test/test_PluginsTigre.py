@@ -443,6 +443,7 @@ class Test_results_cone3D(TestCommon,unittest.TestCase):
         self.compare_norm('interpolated',3.9965)
 
 
+    @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_reconstruct_roi(self):
         self.compare_FBP_roi(1e-3)  
 
@@ -495,6 +496,7 @@ class Test_results_parallel3D(TestCommon,unittest.TestCase):
         self.compare_norm('interpolated',4.000)
 
 
+    @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_reconstruct_roi(self):
         self.compare_FBP_roi(1e-3)  
 

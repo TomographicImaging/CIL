@@ -1012,7 +1012,6 @@ class TestTotalVariation(unittest.TestCase):
         
         
         np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal = 4)
-        # np.testing.assert_allclose(res1.as_array(), res2.as_array(), atol=2.5e-3)
 
         ###################################################################
         ###################################################################

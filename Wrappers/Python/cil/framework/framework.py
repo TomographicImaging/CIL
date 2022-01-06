@@ -2481,7 +2481,51 @@ class DataContainer(object):
     def minimum(self,x2, out=None, *args, **kwargs):
         return self.pixel_wise_binary(numpy.minimum, x2=x2, out=out, *args, **kwargs)
 
+
+    def sapyb(self, a, y, b, out=None, dtype=numpy.float32, num_threads=NUM_THREADS):
+        '''performs a*self + b * y
+        
+        Parameters
+        ----------
+        a : multiplier for self, can be a number or a numpy array or a DataContainer
+        y : DataContainer 
+        b : multiplier for y, can be a number or a numpy array or a DataContainer
+        out : return DataContainer, if None a new DataContainer is returned, default None
+        dtype : forces the output to the type, default numpy float32
+        num_threads : number of threads to use during the calculation, using the CIL C library
+        
+        It will try to use the CIL C library and default to numpy operations, in case the C library does
+        not handle the types.
+        '''
+        do_numpy = False
+        ret_out = False
+        if self.dtype in [complex, numpy.complex, numpy.complex64]:
+            do_numpy = True
+        
+        if out is None:
+            out = self * 0.
+            ret_out = True
+
+        if do_numpy:
+            ax = self * a
+            tmp = numpy.multiply(y, b)
+            tmp.add(ax, out=tmp)
+            out.fill(tmp)
+        else:
+            self._axpby(a,b,y,out, dtype, num_threads)
+
+        if ret_out:
+            return out
+
+
     def axpby(self, a, b, y, out, dtype=numpy.float32, num_threads=NUM_THREADS):
+        '''Deprecated. Alias of _axpby'''
+        warnings.warn('The use of axpby is deprecated and will be removed in following version. Use sapyb instead',
+              DeprecationWarning)
+        self._axpby(a,b,y,out, dtype, num_threads)
+
+
+    def _axpby(self, a, b, y, out, dtype=numpy.float32, num_threads=NUM_THREADS):
         '''performs axpby with cilacc C library, can be done in-place.
         
         Does the operation .. math:: a*x+b*y and stores the result in out, where x is self

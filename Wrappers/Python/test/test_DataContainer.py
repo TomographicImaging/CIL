@@ -931,6 +931,105 @@ class TestDataContainer(unittest.TestCase):
         res = numpy.zeros_like(d1.as_array())
         numpy.testing.assert_array_equal(res, out.as_array())
 
+
+    def test_sapyb_datacontainer_f(self):
+        print ("test sapyb")
+        #a vec, b vec
+        #daxpby
+        ig = ImageGeometry(10,10)                                               
+        d1 = ig.allocate(dtype=numpy.float32)                                                     
+        d2 = ig.allocate(dtype=numpy.float32)   
+        a = ig.allocate(dtype=numpy.float32)                                                  
+        b = ig.allocate(dtype=numpy.float32)         
+
+        d1.fill(numpy.asarray(numpy.arange(1,101).reshape(10,10), dtype=numpy.float32))
+        d2.fill(numpy.asarray(numpy.arange(1,101).reshape(10,10), dtype=numpy.float32))
+        a.fill(1.0/d1.as_array())                                                  
+        b.fill(-1.0/d2.as_array())   
+
+        out = ig.allocate(-1,dtype=numpy.float32)                                                 
+        # equals to 1 + -1 = 0
+        out = d1.sapyb(a,d2,b)
+        res = numpy.zeros_like(d1.as_array())
+        numpy.testing.assert_array_equal(res, out.as_array())
+
+        out.fill(0)
+        d1.sapyb(a,d2,b, out)
+        res = numpy.zeros_like(d1.as_array())
+        numpy.testing.assert_array_equal(res, out.as_array())
+
+    def test_sapyb_scalar_f(self):
+        print ("test sapyb")
+        #a vec, b vec
+        #daxpby
+        ig = ImageGeometry(10,10)                                               
+        d1 = ig.allocate(1, dtype=numpy.float32)                                                     
+        d2 = ig.allocate(2, dtype=numpy.float32)   
+        a = 2.
+        b = -1.
+
+        out = ig.allocate(-1,dtype=numpy.float32)                                                 
+        # equals to 2*[1] + -1*[2] = 0
+        out = d1.sapyb(a,d2,b)
+        res = numpy.zeros_like(d1.as_array())
+        numpy.testing.assert_array_equal(res, out.as_array())
+
+        out.fill(0)
+        d1.sapyb(a,d2,b, out)
+        numpy.testing.assert_array_equal(res, out.as_array())
+
+    def test_sapyb_scalar_c(self):
+        print ("test sapyb")
+        #a vec, b vec
+        #daxpby
+        ig = ImageGeometry(10,10)                                               
+        d1 = ig.allocate(1, dtype=numpy.complex64)                                                     
+        d2 = ig.allocate(2, dtype=numpy.complex64)   
+        a = 2.+2j
+        b = -1.-1j
+
+        out = ig.allocate(-1,dtype=numpy.complex64)                                                 
+        # equals to (2+2j)*[1] + -(1+j)*[2] = 0
+        out = d1.sapyb(a,d2,b)
+        res = numpy.zeros_like(d1.as_array())
+        numpy.testing.assert_array_equal(res, out.as_array())
+
+        out.fill(0)
+        d1.sapyb(a,d2,b, out)
+        numpy.testing.assert_array_equal(res, out.as_array())
+
+    def test_sapyb_datacontainer_c(self):
+        print ("test sapyb")
+        #a vec, b vec
+        #daxpby
+        ig = ImageGeometry(10,10)                                               
+        d1 = ig.allocate(dtype=numpy.complex64)                                                     
+        d2 = ig.allocate(dtype=numpy.complex64)   
+        a = ig.allocate(dtype=numpy.complex64)                                                  
+        b = ig.allocate(dtype=numpy.complex64)         
+
+        arr = numpy.empty(ig.shape, dtype=numpy.complex64)
+        arr.real = numpy.asarray(numpy.arange(1,101).reshape(10,10), dtype=numpy.float32)
+        arr.imag = numpy.asarray(numpy.arange(1,101).reshape(10,10), dtype=numpy.float32)
+
+        d1.fill(arr)
+
+        arr.imag = -1* arr.imag
+        d2.fill(arr)
+
+        a.fill(d2.as_array())                                                  
+        b.fill(d1.as_array())   
+
+        out = ig.allocate(-1,dtype=numpy.complex64)
+        # equals to d1^ * d1 + d2^*d2 = d1**2 + d2**2 = 2* arr.norm = 2 * (arr.real **2 + arr.imag **2)
+        out = d1.sapyb(a,d2,b)
+        res = 2* (arr.real * arr.real + arr.imag * arr.imag)
+        numpy.testing.assert_array_equal(res, out.as_array())
+
+        out.fill(0)
+        d1.sapyb(a,d2,b, out)
+        numpy.testing.assert_array_equal(res, out.as_array())
+
     def test_min(self):
         print ("test min")
         ig = ImageGeometry(10,10)     

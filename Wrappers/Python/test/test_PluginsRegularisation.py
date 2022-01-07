@@ -38,7 +38,7 @@ class TestPlugin(unittest.TestCase):
         #Default test image
         self.data = dataexample.SIMPLE_PHANTOM_2D.get(size=(64,64))
         self.alpha = 2.0
-        self.iterations = 500     
+        self.iterations = 1000     
     def tearDown(self):
         pass
     @unittest.skipUnless(has_regularisation_toolkit, "Skipping as CCPi Regularisation Toolkit is not installed")

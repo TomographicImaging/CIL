@@ -2497,17 +2497,27 @@ class DataContainer(object):
         
         It will try to use the CIL C library and default to numpy operations, in case the C library does
         not handle the types.
+        
+        Example:
+        -------
+
+        a = 2
+        b = 3
+        ig = ImageGeometry(10,11)
+        x = ig.allocate(1)
+        y = ig.allocate(2)
+        out = x.sapyb(a,y,b)
         '''
-        do_numpy = False
+        use_c_lib = True
         ret_out = False
-        if self.dtype in [complex, numpy.complex, numpy.complex64]:
-            do_numpy = True
+        if self.dtype in numpy.sctypes['complex']:
+            use_c_lib = False
         
         if out is None:
             out = self * 0.
             ret_out = True
 
-        if do_numpy:
+        if not use_c_lib:
             ax = self * a
             y.multiply(b, out=out)
             out.add(ax, out=out)

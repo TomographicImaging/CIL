@@ -1095,6 +1095,38 @@ class TestDataContainer(unittest.TestCase):
         d2.sapyb(b,d1,a, out)
         numpy.testing.assert_array_equal(res.as_array(), out.as_array())
 
+    def test_sapyb_scalar_f_c(self):
+        # a,b scalar
+        ig = ImageGeometry(10,10)                                               
+        d1 = ig.allocate(1, dtype=numpy.complex64)                                                     
+        d2 = ig.allocate(2, dtype=numpy.float32)   
+        a = 2.+1j
+        b = -1.
+
+        # equals to 2*[1] + -1*[2] = 0
+        out = d1.sapyb(a,d2,b)
+        res = numpy.zeros_like(d1.as_array()) + 1j
+        numpy.testing.assert_array_equal(res, out.as_array())
+
+        out.fill(0)
+        d1.sapyb(a,d2,b, out)
+        numpy.testing.assert_array_equal(res, out.as_array())
+
+        d1.sapyb(a,d2,b, out=d1)
+        numpy.testing.assert_array_equal(res, d1.as_array())
+
+        d1.fill(1)
+        with self.assertRaises(numpy.core._exceptions.UFuncTypeError) as context:
+            d1.sapyb(a,d2,b, out=d2)
+        # print ("Exception thrown:", str(context.exception))
+        
+        # out is complex
+        # d1.fill(1+0j)
+        d2.fill(2)
+        d1.sapyb(a,d2,b,out=d1)
+        # 2+1j * [1+0j] -1 * [2]
+        numpy.testing.assert_array_equal(1j * numpy.ones_like(d1.as_array()), d1.as_array())
+            
     def test_min(self):
         print ("test min")
         ig = ImageGeometry(10,10)     

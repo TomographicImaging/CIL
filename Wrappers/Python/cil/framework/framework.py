@@ -2483,7 +2483,7 @@ class DataContainer(object):
 
 
     def sapyb(self, a, y, b, out=None, dtype=numpy.float32, num_threads=NUM_THREADS):
-        '''performs a*self + b * y. It is inline safe
+        '''performs a*self + b * y. Can be done in-place
         
         Parameters
         ----------
@@ -2508,22 +2508,32 @@ class DataContainer(object):
         y = ig.allocate(2)
         out = x.sapyb(a,y,b)
         '''
-        use_c_lib = True
         ret_out = False
-        if self.dtype in numpy.sctypes['complex']:
-            use_c_lib = False
         
         if out is None:
             out = self * 0.
             ret_out = True
 
-        if not use_c_lib:
-            ax = self * a
-            y.multiply(b, out=out)
-            out.add(ax, out=out)
-        else:
-            self._axpby(a,b,y,out, dtype, num_threads)
+        if out.dtype in [ numpy.float32, numpy.float64 ]:
+            # handle with C-lib _axpby
+            try:
+                self._axpby(a, b, y, out, dtype, num_threads)
+                if ret_out:
+                    return out
+                return
+            except RuntimeError as rte:
+                warnings.warn("sapyb defaulting to Python due to: {}".format(rte))
+            except TypeError as te:
+                warnings.warn("sapyb defaulting to Python due to: {}".format(te))
+            finally:
+                pass
+        
 
+        # cannot be handled by _axpby
+        ax = self * a
+        y.multiply(b, out=out)
+        out.add(ax, out=out)
+        
         if ret_out:
             return out
 
@@ -2583,13 +2593,13 @@ class DataContainer(object):
             raise Warning("out array of type {0} does not match requested dtype {1}. Using {0}".format(ndout.dtype, dtype))
             dtype = ndout.dtype
         if ndx.dtype != dtype:
-            ndx = ndx.astype(dtype)
+            ndx = ndx.astype(dtype, casting='safe')
         if ndy.dtype != dtype:
-            ndy = ndy.astype(dtype)
+            ndy = ndy.astype(dtype, casting='safe')
         if nda.dtype != dtype:
-            nda = nda.astype(dtype)
+            nda = nda.astype(dtype, casting='safe')
         if ndb.dtype != dtype:
-            ndb = ndb.astype(dtype)
+            ndb = ndb.astype(dtype, casting='safe')
 
         if dtype == numpy.float32:
             x_p = ndx.ctypes.data_as(c_float_p)

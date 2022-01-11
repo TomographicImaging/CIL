@@ -23,6 +23,7 @@ from cvxpy import *
 
 import numpy as np
 import scipy.sparse as sp
+
 import unittest
 
 class Test_CIL_vs_CVXPy(unittest.TestCase):

@@ -51,6 +51,7 @@ requirements:
     - ipp-include
     - ipp-devel
     - ipp
+    - cvxpy
 
   run:
     - python

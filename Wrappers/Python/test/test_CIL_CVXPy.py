@@ -19,7 +19,7 @@ from cil.optimisation.functions import L2NormSquared
 from cil.optimisation.functions import TotalVariation
 
 from cil.utilities import dataexample
-from cvxpy import *
+import cvxpy as cp
 
 import numpy as np
 import scipy.sparse as sp
@@ -83,61 +83,61 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
         DX, DY = G[1], G[0]
     
         if isotropic:
-            return sum(norm(vstack([DX @ vec(u), DY @ vec(u)]), 2, axis = 0))
+            return cp.sum(cp.norm(cp.vstack([DX @ cp.vec(u), DY @ cp.vec(u)]), 2, axis = 0))
         else:
-            return sum(norm(vstack([DX @ vec(u), DY @ vec(u)]), 1, axis = 0)) 
+            return cp.sum(cp.norm(cp.vstack([DX @ cp.vec(u), DY @ cp.vec(u)]), 1, axis = 0)) 
 
     def test_cil_vs_cvxpy_totalvariation_isotropic(self):
 
         # solution
-        u_cvx = Variable(self.data.shape)
+        u_cvx = cp.Variable(self.data.shape)
 
         # regularisation parameter
         alpha = 0.1
 
         # fidelity term
-        fidelity = 0.5 * sum_squares(u_cvx - self.data.array)   
+        fidelity = 0.5 * cp.sum_squares(u_cvx - self.data.array)   
         regulariser = alpha * self.tv_cvxpy_regulariser(u_cvx)
 
         # objective
-        obj =  Minimize( regulariser +  fidelity)
-        prob = Problem(obj, constraints = [])
+        obj =  cp.Minimize( regulariser +  fidelity)
+        prob = cp.Problem(obj, constraints = [])
 
         # Choose solver ( SCS, MOSEK(license needed) )
-        tv_cvxpy = prob.solve(verbose = True, solver = SCS)        
+        tv_cvxpy = prob.solve(verbose = True, solver = cp.SCS)        
 
         # use TotalVariation from CIL (with Fast Gradient Projection algorithm)
         TV = alpha * TotalVariation(max_iteration=200)
         tv_cil = TV.proximal(self.data, tau=1.0)     
 
         # compare solution
-        np.testing.assert_almost_equal(tv_cil.array, u_cvx.value, decimal=3)   
+        np.testing.assert_allclose(tv_cil.array, u_cvx.value,atol=1e-3)   
 
     def test_cil_vs_cvxpy_totalvariation_anisotropic(self):
 
             # solution
-            u_cvx = Variable(self.data.shape)
+            u_cvx = cp.Variable(self.data.shape)
 
             # regularisation parameter
             alpha = 0.1
 
             # fidelity term
-            fidelity = 0.5 * sum_squares(u_cvx - self.data.array)   
+            fidelity = 0.5 * cp.sum_squares(u_cvx - self.data.array)   
             regulariser = alpha * self.tv_cvxpy_regulariser(u_cvx, isotropic=False)
 
             # objective
-            obj =  Minimize( regulariser +  fidelity)
-            prob = Problem(obj, constraints = [])
+            obj =  cp.Minimize( regulariser +  fidelity)
+            prob = cp.Problem(obj, constraints = [])
 
             # Choose solver ( SCS, MOSEK(license needed) )
-            tv_cvxpy = prob.solve(verbose = True, solver = SCS)        
+            tv_cvxpy = prob.solve(verbose = True, solver = cp.SCS)        
 
             # use TotalVariation from CIL (with Fast Gradient Projection algorithm)
             TV = alpha * TotalVariation(max_iteration=200, isotropic=False)
             tv_cil = TV.proximal(self.data, tau=1.0)     
 
             # compare solution
-            np.testing.assert_almost_equal(tv_cil.array, u_cvx.value, decimal=3)   
+            np.testing.assert_allclose(tv_cil.array, u_cvx.value, atol=1e-3)   
 
 
 

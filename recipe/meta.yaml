@@ -17,7 +17,7 @@ build:
 test:
   requires:
     - python-wget
-    - cvxpy               # [ linux and py==37 and np==118 ]
+    - cvxpy               
     - scikit-image
     - tomophantom =1.4.10 # [ linux ]
     - cil-astra =21.3.0   # [ linux ] 
@@ -51,7 +51,6 @@ requirements:
     - ipp-include
     - ipp-devel
     - ipp
-    - cvxpy
 
   run:
     - python
@@ -71,7 +70,6 @@ requirements:
     - cil-data >=21.3.0
     - ipp
     - tqdm
-    - cvxpy
 
   
 about:

@@ -179,8 +179,9 @@ class LinearOperator(Operator):
         symmetric = False
 
         # symmetric case   
-        if set(operator.domain_geometry().shape)==set(operator.range_geometry().shape):
-            symmetric = True
+        if operator.domain_geometry().__class__.__name__ == operator.range_geometry().__class__.__name__:
+            if set(operator.domain_geometry().shape) == set(operator.range_geometry().shape):
+                symmetric = True
         
         # Initialise random or by the user
         if initial is None:

@@ -71,6 +71,7 @@ requirements:
     - cil-data >=21.3.0
     - ipp
     - tqdm
+    - cvxpy
 
   
 about:

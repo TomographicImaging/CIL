@@ -174,7 +174,7 @@ class SPDHG(Algorithm):
         # else:
         #     y_k.multiply(self.sigma[i], out=y_k)
         #     y_k.add(self.y_old[i], out=y_k)
-        y_k.sapyb(self.sigma[i], 1., self.y_old[i], out=y_k)
+        y_k.sapyb(self.sigma[i], self.y_old[i], 1., out=y_k)
             
         y_k = self.f[i].proximal_conjugate(y_k, self.sigma[i])
         
@@ -194,7 +194,7 @@ class SPDHG(Algorithm):
         # else:
         #     self.x_tmp.multiply(self.theta / self.prob[i], out=self.x_tmp)
         #     self.z.add(self.x_tmp, out=self.zbar)
-        self.z.sapyb(1., self.theta / self.prob[i], self.x_tmp, out = self.zbar)
+        self.z.sapyb(1., self.x_tmp, self.theta / self.prob[i], out = self.zbar)
         
         # save previous iteration
         self.save_previous_iteration(i, y_k)

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Optimisation framework &#8212; CIL v21.3.0-7-g6edf48ae documentation</title>
+    <title>Optimisation framework &#8212; CIL v21.3.1-1-g222d3e46 documentation</title>
     
   <link href="_static/css/theme.css" rel="stylesheet">
   <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -863,6 +863,8 @@ proper variables are passed or later with set_up</p>
 </dd>
 <dt>update_objective_interval<span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>, optional, default=1</span></dt><dd><p>Evaluates objectives, e.g., primal/dual/primal-dual gap every <code class="docutils literal notranslate"><span class="pre">update_objective_interval</span></code>.</p>
 </dd>
+<dt>check_convergence<span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">boolean</span></code>, default=True</span></dt><dd><p>Checks scalar sigma and tau values satisfy convergence criterion</p>
+</dd>
 </dl>
 </p></li>
 </ul>
@@ -1012,8 +1014,7 @@ In the future, these parameters will be properties of the corresponding function
 </dd>
 </dl>
 <p>The user can set either, both or none. Values passed by the user will be accepted as long as they are positive numbers,
-or correct shape array like objects. Warnings may be given in the case the scalar values passed do not guarantee the algorithm
-convergence.</p>
+or correct shape array like objects.</p>
 </dd></dl>
 
 <dl class="py method">

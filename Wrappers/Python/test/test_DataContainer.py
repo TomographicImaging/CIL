@@ -1116,8 +1116,13 @@ class TestDataContainer(unittest.TestCase):
         numpy.testing.assert_array_equal(res, d1.as_array())
 
         d1.fill(1)
-        with self.assertRaises(numpy.core._exceptions.UFuncTypeError) as context:
-            d1.sapyb(a,d2,b, out=d2)
+        try:
+
+            with self.assertRaises(numpy.core._exceptions.UFuncTypeError) as context:
+                d1.sapyb(a,d2,b, out=d2)
+        except AttributeError as ae:
+            print ("Probably numpy version too low:", ae)
+
         # print ("Exception thrown:", str(context.exception))
         
         # out is complex

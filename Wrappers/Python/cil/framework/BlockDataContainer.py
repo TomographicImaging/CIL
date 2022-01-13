@@ -242,7 +242,7 @@ class BlockDataContainer(object):
 
     def axpby(self, a, b, y, out, dtype=numpy.float32, num_threads = NUM_THREADS):
         '''Deprecated method. Alias of sapyb'''
-        return self.sapyb(a,b,y,out,dtype,num_threads)
+        return self.sapyb(a,y,b,out,dtype,num_threads)
 
 
 

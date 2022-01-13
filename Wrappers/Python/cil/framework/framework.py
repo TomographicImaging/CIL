@@ -2482,7 +2482,7 @@ class DataContainer(object):
         return self.pixel_wise_binary(numpy.minimum, x2=x2, out=out, *args, **kwargs)
 
 
-    def sapyb(self, a, y, b, out=None, dtype=numpy.float32, num_threads=NUM_THREADS):
+    def sapyb(self, a, y, b, out=None, num_threads=NUM_THREADS):
         '''performs a*self + b * y. Can be done in-place
         
         Parameters
@@ -2492,7 +2492,6 @@ class DataContainer(object):
         b : multiplier for y, can be a number or a numpy array or a DataContainer
         out : return DataContainer, if None a new DataContainer is returned, default None. 
             out can be self or y.
-        dtype : forces the output to the type, default numpy float32
         num_threads : number of threads to use during the calculation, using the CIL C library
         
         It will try to use the CIL C library and default to numpy operations, in case the C library does
@@ -2517,7 +2516,7 @@ class DataContainer(object):
         if out.dtype in [ numpy.float32, numpy.float64 ]:
             # handle with C-lib _axpby
             try:
-                self._axpby(a, b, y, out, dtype, num_threads)
+                self._axpby(a, b, y, out, out.dtype, num_threads)
                 if ret_out:
                     return out
                 return

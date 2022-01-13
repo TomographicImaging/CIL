@@ -43,12 +43,15 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
 
         if order == 1:
 
+            # loop over the different directions
             for i in range(0,len_shape):
 
                 if direction == 'forward':
-
+                
+                    # create a sparse matrix with -1 in the main diagonal and 1 in the 1st diagonal
                     mat = 1/discretization[i] * sp.spdiags(np.vstack([-np.ones((1,shape[i])),np.ones((1,shape[i]))]), [0,1], shape[i], shape[i], format = 'lil')
 
+                    # boundary conditions
                     if boundaries == 'Neumann':
                         mat[-1,:] = 0
                     elif boundaries == 'Periodic':
@@ -56,13 +59,19 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
 
                 elif direction == 'backward':
 
+                    # create a sparse matrix with -1 in the -1 and 1 in the main diagonal
                     mat = 1/discretization[i] * sp.spdiags(np.vstack([-np.ones((1,shape[i])),np.ones((1,shape[i]))]), [-1,0], shape[i], shape[i], format = 'lil')
 
+                    # boundary conditions
                     if boundaries == 'Neumann':
                         mat[:,-1] = 0
                     elif boundaries == 'Periodic':
                         mat[0,-1] = -1
 
+                # use Kronecker product to compute the full sparse matrix for the finite difference according to the direction
+                # Dx = I_n x D -->  Sparse Eye x mat
+                # Dy = D x I_m -->   mat x Sparse Eye
+                # Reference: Infimal Convolution Regularizations with Discrete l1-type Functionals, S. Setzer, G. Steidl and T. Teuber                
                 tmpGrad = mat if i == 0 else sp.eye(shape[0])
 
                 for j in range(1, len_shape):
@@ -111,7 +120,13 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
         tv_cil = TV.proximal(self.data, tau=1.0)     
 
         # compare solution
-        np.testing.assert_allclose(tv_cil.array, u_cvx.value,atol=1e-3)   
+        np.testing.assert_allclose(tv_cil.array, u_cvx.value,atol=1e-3)  
+
+        # compare objectives
+        f = 0.5*L2NormSquared(b=self.data)
+        cil_objective = TV(tv_cil) + f(tv_cil)
+        np.testing.assert_allclose(cil_objective, obj.value, atol=1e-3)  
+
 
     def test_cil_vs_cvxpy_totalvariation_anisotropic(self):
 
@@ -138,6 +153,11 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
 
             # compare solution
             np.testing.assert_allclose(tv_cil.array, u_cvx.value, atol=1e-3)   
+
+            # compare objectives
+            f = 0.5*L2NormSquared(b=self.data)
+            cil_objective = TV(tv_cil) + f(tv_cil)
+            np.testing.assert_allclose(cil_objective, obj.value, atol=1e-3)              
 
 
 

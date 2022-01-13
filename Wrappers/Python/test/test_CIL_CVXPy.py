@@ -19,12 +19,16 @@ from cil.optimisation.functions import L2NormSquared
 from cil.optimisation.functions import TotalVariation
 
 from cil.utilities import dataexample
-import cvxpy as cp
 
 import numpy as np
 import scipy.sparse as sp
 
 import unittest
+
+from utils import has_cvxpy
+
+if has_cvxpy:
+    import cvxpy as cp
 
 class Test_CIL_vs_CVXPy(unittest.TestCase):
 
@@ -85,6 +89,7 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
 
         return allMat        
 
+    @unittest.skipUnless(has_cvxpy, "CVXpy not installed")
     def tv_cvxpy_regulariser(self, u, isotropic=True, direction = "forward", boundaries = "Neumann"):
 
         G = self.sparse_gradient_matrix(u.shape, direction = direction, order = 1, boundaries = boundaries)   
@@ -96,6 +101,7 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
         else:
             return cp.sum(cp.norm(cp.vstack([DX @ cp.vec(u), DY @ cp.vec(u)]), 1, axis = 0)) 
 
+    @unittest.skipUnless(has_cvxpy, "CVXpy not installed")
     def test_cil_vs_cvxpy_totalvariation_isotropic(self):
 
         # solution
@@ -127,7 +133,7 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
         cil_objective = TV(tv_cil) + f(tv_cil)
         np.testing.assert_allclose(cil_objective, obj.value, atol=1e-3)  
 
-
+    @unittest.skipUnless(has_cvxpy, "CVXpy not installed")
     def test_cil_vs_cvxpy_totalvariation_anisotropic(self):
 
             # solution

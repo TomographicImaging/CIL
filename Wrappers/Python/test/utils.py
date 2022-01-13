@@ -3,6 +3,13 @@ from cil.framework import cilacc
 import numpy as np
 import os
 
+#import cvxpy
+
+try:
+    import cvxpy
+    has_cvxpy = True
+except ModuleNotFoundError:
+    has_cvxpy = False
 
 try:
     import tigre

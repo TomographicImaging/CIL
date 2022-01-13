@@ -212,7 +212,7 @@ class BlockDataContainer(object):
         else:
             return self.binary_operations(BlockDataContainer.MINIMUM, other, *args, **kwargs)
 
-    def axpby(self, a, b, y, out, dtype=numpy.float32, num_threads = NUM_THREADS):
+    def sapyb(self, a, y, b, out, dtype=numpy.float32, num_threads = NUM_THREADS):
         r'''performs axpby element-wise on the BlockDataContainer containers
         
         Does the operation .. math:: a*x+b*y and stores the result in out, where x is self
@@ -222,11 +222,28 @@ class BlockDataContainer(object):
         :param y: compatible (Block)DataContainer
         :param out: (Block)DataContainer to store the result
         :param dtype: optional, data type of the DataContainers
+
+
+        Example:
+        a = 2
+        b = 3
+        ig = ImageGeometry(10,11)
+        x = ig.allocate(1)
+        y = ig.allocate(2)
+        bdc1 = BlockDataContainer(2*x, y)
+        bdc2 = BlockDataContainer(x, 2*y)
+        out = bdc1.sapyb(a,bdc2,b)
         '''
         if out is None:
             raise ValueError("out container cannot be None")
         kwargs = {'a':a, 'b':b, 'out':out, 'dtype': dtype, 'num_threads': NUM_THREADS}
         self.binary_operations(BlockDataContainer.AXPBY, y, **kwargs)
+
+
+    def axpby(self, a, b, y, out, dtype=numpy.float32, num_threads = NUM_THREADS):
+        '''Deprecated method. Alias of sapyb'''
+        return self.sapyb(a,b,y,out,dtype,num_threads)
+
 
 
     def binary_operations(self, operation, other, *args, **kwargs):

@@ -10,6 +10,7 @@ try:
     has_cvxpy = True
 except ModuleNotFoundError:
     has_cvxpy = False
+print ("has_cvxpy\t{}".format(has_cvxpy))    
 
 try:
     import tigre

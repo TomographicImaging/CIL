@@ -983,7 +983,7 @@ class TestSPDHG(unittest.TestCase):
             noisy_data = AcquisitionData(np.random.poisson( scale * (eta + sin.as_array()))/scale, geometry=ag)
         elif noise == 'gaussian':
             np.random.seed(10)
-            n1 = np.random.normal(0, 0.1, size = ag.shape)
+            n1 = np.asarray(np.random.normal(0, 0.1, size = ag.shape), dtype=np.float32)
             noisy_data = AcquisitionData(n1 + sin.as_array(), geometry=ag)
             
         else:

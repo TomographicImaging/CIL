@@ -169,12 +169,12 @@ class SPDHG(Algorithm):
         # Gradient ascent for the dual variable
         # y_k = y_old[i] + sigma[i] * K[i] x
         y_k = self.operator[i].direct(self.x)
-        # if self._use_axpby:
-        #     y_k.axpby(self.sigma[i], 1., self.y_old[i], out=y_k)
-        # else:
-        #     y_k.multiply(self.sigma[i], out=y_k)
-        #     y_k.add(self.y_old[i], out=y_k)
-        y_k.sapyb(self.sigma[i], self.y_old[i], 1., out=y_k)
+        if self._use_axpby:
+            y_k.axpby(self.sigma[i], 1., self.y_old[i], out=y_k)
+        else:
+            y_k.multiply(self.sigma[i], out=y_k)
+            y_k.add(self.y_old[i], out=y_k)
+        # y_k.sapyb(self.sigma[i], self.y_old[i], 1., out=y_k)
             
         y_k = self.f[i].proximal_conjugate(y_k, self.sigma[i])
         
@@ -189,12 +189,12 @@ class SPDHG(Algorithm):
         # z = z + x_tmp
         self.z.add(self.x_tmp, out =self.z)
         # zbar = z + (theta/p[i]) * x_tmp
-        # if self._use_axpby:
-        #     self.z.axpby(1., self.theta / self.prob[i], self.x_tmp, out = self.zbar)
-        # else:
-        #     self.x_tmp.multiply(self.theta / self.prob[i], out=self.x_tmp)
-        #     self.z.add(self.x_tmp, out=self.zbar)
-        self.z.sapyb(1., self.x_tmp, self.theta / self.prob[i], out = self.zbar)
+        if self._use_axpby:
+            self.z.axpby(1., self.theta / self.prob[i], self.x_tmp, out = self.zbar)
+        else:
+            self.x_tmp.multiply(self.theta / self.prob[i], out=self.x_tmp)
+            self.z.add(self.x_tmp, out=self.zbar)
+        # self.z.sapyb(1., self.x_tmp, self.theta / self.prob[i], out = self.zbar)
         
         # save previous iteration
         self.save_previous_iteration(i, y_k)

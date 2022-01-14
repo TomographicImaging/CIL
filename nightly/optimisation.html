@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Optimisation framework &#8212; CIL v21.3.1-1-g222d3e46 documentation</title>
+    <title>Optimisation framework &#8212; CIL v21.3.1-2-g0a434c8b documentation</title>
     
   <link href="_static/css/theme.css" rel="stylesheet">
   <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -3268,8 +3268,8 @@ A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cil.framework.BlockDataContainer.axpby">
-<code class="sig-name descname"><span class="pre">axpby</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">a</span></em>, <em class="sig-param"><span class="pre">b</span></em>, <em class="sig-param"><span class="pre">y</span></em>, <em class="sig-param"><span class="pre">out</span></em>, <em class="sig-param"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></em>, <em class="sig-param"><span class="pre">num_threads=1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/framework/BlockDataContainer.html#BlockDataContainer.axpby"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.BlockDataContainer.axpby" title="Permalink to this definition">¶</a></dt>
+<dt id="cil.framework.BlockDataContainer.sapyb">
+<code class="sig-name descname"><span class="pre">sapyb</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_threads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/framework/BlockDataContainer.html#BlockDataContainer.sapyb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.BlockDataContainer.sapyb" title="Permalink to this definition">¶</a></dt>
 <dd><p>performs axpby element-wise on the BlockDataContainer containers</p>
 <p>Does the operation .. math:: a*x+b*y and stores the result in out, where x is self</p>
 <dl class="field-list simple">
@@ -3279,10 +3279,23 @@ A * 3 = [ 3 * [B,C] , 3* D] = [ [ 3*B, 3*C]  , 3*D ]</p>
 <li><p><strong>b</strong> – scalar</p></li>
 <li><p><strong>y</strong> – compatible (Block)DataContainer</p></li>
 <li><p><strong>out</strong> – (Block)DataContainer to store the result</p></li>
-<li><p><strong>dtype</strong> – optional, data type of the DataContainers</p></li>
 </ul>
 </dd>
 </dl>
+<p>a = 2
+b = 3
+ig = ImageGeometry(10,11)
+x = ig.allocate(1)
+y = ig.allocate(2)
+bdc1 = BlockDataContainer(2*x, y)
+bdc2 = BlockDataContainer(x, 2*y)
+out = bdc1.sapyb(a,bdc2,b)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.framework.BlockDataContainer.axpby">
+<code class="sig-name descname"><span class="pre">axpby</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">a</span></em>, <em class="sig-param"><span class="pre">b</span></em>, <em class="sig-param"><span class="pre">y</span></em>, <em class="sig-param"><span class="pre">out</span></em>, <em class="sig-param"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></em>, <em class="sig-param"><span class="pre">num_threads=1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/framework/BlockDataContainer.html#BlockDataContainer.axpby"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.framework.BlockDataContainer.axpby" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deprecated method. Alias of sapyb</p>
 </dd></dl>
 
 <dl class="py method">

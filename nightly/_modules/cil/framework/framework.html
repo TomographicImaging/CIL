@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.framework.framework &#8212; CIL v21.3.1-1-g222d3e46 documentation</title>
+    <title>cil.framework.framework &#8212; CIL v21.3.1-2-g0a434c8b documentation</title>
     
   <link href="../../../_static/css/theme.css" rel="stylesheet">
   <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -2666,7 +2666,70 @@
     <span class="k">def</span> <span class="nf">minimum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pixel_wise_binary</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">minimum</span><span class="p">,</span> <span class="n">x2</span><span class="o">=</span><span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
+
+<div class="viewcode-block" id="DataContainer.sapyb"><a class="viewcode-back" href="../../../framework.html#cil.framework.DataContainer.sapyb">[docs]</a>    <span class="k">def</span> <span class="nf">sapyb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_threads</span><span class="o">=</span><span class="n">NUM_THREADS</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;performs a*self + b * y. Can be done in-place</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        a : multiplier for self, can be a number or a numpy array or a DataContainer</span>
+<span class="sd">        y : DataContainer </span>
+<span class="sd">        b : multiplier for y, can be a number or a numpy array or a DataContainer</span>
+<span class="sd">        out : return DataContainer, if None a new DataContainer is returned, default None. </span>
+<span class="sd">            out can be self or y.</span>
+<span class="sd">        num_threads : number of threads to use during the calculation, using the CIL C library</span>
+<span class="sd">        </span>
+<span class="sd">        It will try to use the CIL C library and default to numpy operations, in case the C library does</span>
+<span class="sd">        not handle the types.</span>
+<span class="sd">        </span>
+<span class="sd">        Example:</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        a = 2</span>
+<span class="sd">        b = 3</span>
+<span class="sd">        ig = ImageGeometry(10,11)</span>
+<span class="sd">        x = ig.allocate(1)</span>
+<span class="sd">        y = ig.allocate(2)</span>
+<span class="sd">        out = x.sapyb(a,y,b)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">ret_out</span> <span class="o">=</span> <span class="kc">False</span>
+        
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span> <span class="o">*</span> <span class="mf">0.</span>
+            <span class="n">ret_out</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">dtype</span> <span class="ow">in</span> <span class="p">[</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float64</span> <span class="p">]:</span>
+            <span class="c1"># handle with C-lib _axpby</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_axpby</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">num_threads</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">ret_out</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">out</span>
+                <span class="k">return</span>
+            <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">rte</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;sapyb defaulting to Python due to: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rte</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">te</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;sapyb defaulting to Python due to: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">te</span><span class="p">))</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="k">pass</span>
+        
+
+        <span class="c1"># cannot be handled by _axpby</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="bp">self</span> <span class="o">*</span> <span class="n">a</span>
+        <span class="n">y</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">ret_out</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">out</span></div>
+
+
 <div class="viewcode-block" id="DataContainer.axpby"><a class="viewcode-back" href="../../../framework.html#cil.framework.DataContainer.axpby">[docs]</a>    <span class="k">def</span> <span class="nf">axpby</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">num_threads</span><span class="o">=</span><span class="n">NUM_THREADS</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Deprecated. Alias of _axpby&#39;&#39;&#39;</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;The use of axpby is deprecated and will be removed in following version. Use sapyb instead&#39;</span><span class="p">,</span>
+              <span class="ne">DeprecationWarning</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_axpby</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">out</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">num_threads</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataContainer._axpby"><a class="viewcode-back" href="../../../framework.html#cil.framework.DataContainer._axpby">[docs]</a>    <span class="k">def</span> <span class="nf">_axpby</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">num_threads</span><span class="o">=</span><span class="n">NUM_THREADS</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;performs axpby with cilacc C library, can be done in-place.</span>
 <span class="sd">        </span>
 <span class="sd">        Does the operation .. math:: a*x+b*y and stores the result in out, where x is self</span>
@@ -2714,13 +2777,13 @@
             <span class="k">raise</span> <span class="ne">Warning</span><span class="p">(</span><span class="s2">&quot;out array of type </span><span class="si">{0}</span><span class="s2"> does not match requested dtype </span><span class="si">{1}</span><span class="s2">. Using </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ndout</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">dtype</span><span class="p">))</span>
             <span class="n">dtype</span> <span class="o">=</span> <span class="n">ndout</span><span class="o">.</span><span class="n">dtype</span>
         <span class="k">if</span> <span class="n">ndx</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">dtype</span><span class="p">:</span>
-            <span class="n">ndx</span> <span class="o">=</span> <span class="n">ndx</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="n">ndx</span> <span class="o">=</span> <span class="n">ndx</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">casting</span><span class="o">=</span><span class="s1">&#39;safe&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">ndy</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">dtype</span><span class="p">:</span>
-            <span class="n">ndy</span> <span class="o">=</span> <span class="n">ndy</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="n">ndy</span> <span class="o">=</span> <span class="n">ndy</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">casting</span><span class="o">=</span><span class="s1">&#39;safe&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">nda</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">dtype</span><span class="p">:</span>
-            <span class="n">nda</span> <span class="o">=</span> <span class="n">nda</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="n">nda</span> <span class="o">=</span> <span class="n">nda</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">casting</span><span class="o">=</span><span class="s1">&#39;same_kind&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">ndb</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">dtype</span><span class="p">:</span>
-            <span class="n">ndb</span> <span class="o">=</span> <span class="n">ndb</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="n">ndb</span> <span class="o">=</span> <span class="n">ndb</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">casting</span><span class="o">=</span><span class="s1">&#39;same_kind&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">:</span>
             <span class="n">x_p</span> <span class="o">=</span> <span class="n">ndx</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">c_float_p</span><span class="p">)</span>

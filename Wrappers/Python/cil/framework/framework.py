@@ -2481,7 +2481,70 @@ class DataContainer(object):
     def minimum(self,x2, out=None, *args, **kwargs):
         return self.pixel_wise_binary(numpy.minimum, x2=x2, out=out, *args, **kwargs)
 
+
+    def sapyb(self, a, y, b, out=None, num_threads=NUM_THREADS):
+        '''performs a*self + b * y. Can be done in-place
+        
+        Parameters
+        ----------
+        a : multiplier for self, can be a number or a numpy array or a DataContainer
+        y : DataContainer 
+        b : multiplier for y, can be a number or a numpy array or a DataContainer
+        out : return DataContainer, if None a new DataContainer is returned, default None. 
+            out can be self or y.
+        num_threads : number of threads to use during the calculation, using the CIL C library
+        
+        It will try to use the CIL C library and default to numpy operations, in case the C library does
+        not handle the types.
+        
+        Example:
+        -------
+
+        a = 2
+        b = 3
+        ig = ImageGeometry(10,11)
+        x = ig.allocate(1)
+        y = ig.allocate(2)
+        out = x.sapyb(a,y,b)
+        '''
+        ret_out = False
+        
+        if out is None:
+            out = self * 0.
+            ret_out = True
+
+        if out.dtype in [ numpy.float32, numpy.float64 ]:
+            # handle with C-lib _axpby
+            try:
+                self._axpby(a, b, y, out, out.dtype, num_threads)
+                if ret_out:
+                    return out
+                return
+            except RuntimeError as rte:
+                warnings.warn("sapyb defaulting to Python due to: {}".format(rte))
+            except TypeError as te:
+                warnings.warn("sapyb defaulting to Python due to: {}".format(te))
+            finally:
+                pass
+        
+
+        # cannot be handled by _axpby
+        ax = self * a
+        y.multiply(b, out=out)
+        out.add(ax, out=out)
+        
+        if ret_out:
+            return out
+
+
     def axpby(self, a, b, y, out, dtype=numpy.float32, num_threads=NUM_THREADS):
+        '''Deprecated. Alias of _axpby'''
+        warnings.warn('The use of axpby is deprecated and will be removed in following version. Use sapyb instead',
+              DeprecationWarning)
+        self._axpby(a,b,y,out, dtype, num_threads)
+
+
+    def _axpby(self, a, b, y, out, dtype=numpy.float32, num_threads=NUM_THREADS):
         '''performs axpby with cilacc C library, can be done in-place.
         
         Does the operation .. math:: a*x+b*y and stores the result in out, where x is self
@@ -2529,13 +2592,13 @@ class DataContainer(object):
             raise Warning("out array of type {0} does not match requested dtype {1}. Using {0}".format(ndout.dtype, dtype))
             dtype = ndout.dtype
         if ndx.dtype != dtype:
-            ndx = ndx.astype(dtype)
+            ndx = ndx.astype(dtype, casting='safe')
         if ndy.dtype != dtype:
-            ndy = ndy.astype(dtype)
+            ndy = ndy.astype(dtype, casting='safe')
         if nda.dtype != dtype:
-            nda = nda.astype(dtype)
+            nda = nda.astype(dtype, casting='same_kind')
         if ndb.dtype != dtype:
-            ndb = ndb.astype(dtype)
+            ndb = ndb.astype(dtype, casting='same_kind')
 
         if dtype == numpy.float32:
             x_p = ndx.ctypes.data_as(c_float_p)

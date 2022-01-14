@@ -952,7 +952,7 @@ class TestSPDHG(unittest.TestCase):
     
     @unittest.skipUnless(has_astra, "ccpi-astra not available")
     def test_SPDHG_vs_SPDHG_explicit_axpby(self):
-        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
+        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128), dtype=numpy.float32)
         if debug_print:
             print ("test_SPDHG_vs_SPDHG_explicit_axpby here")
         ig = data.geometry
@@ -981,8 +981,10 @@ class TestSPDHG(unittest.TestCase):
             scale = 5
             eta = 0
             noisy_data = AcquisitionData(np.asarray(
-                np.random.poisson( scale * (eta + sin.as_array()))/scale, geometry=ag),
-                dtype=np.float32
+                                            np.random.poisson( scale * (eta + sin.as_array()))/scale, 
+                                            dtype=np.float32
+                                            ), 
+                                         geometry=ag
             )
         elif noise == 'gaussian':
             np.random.seed(10)

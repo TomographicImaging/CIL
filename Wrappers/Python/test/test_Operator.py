@@ -340,12 +340,18 @@ class TestOperator(CCPiTestClass):
         res1 = M1op.PowerMethod(M1op,100)
         numpy.testing.assert_almost_equal(res1,3.1624439599276974, decimal=4)                
 
-        # Gradient Operator
+        # Gradient Operator (float)
         ig = ImageGeometry(30,30)
         Grad = GradientOperator(ig)
         res1 = Grad.PowerMethod(Grad,500, tolerance=1e-6)
-        numpy.testing.assert_almost_equal(res1, numpy.sqrt(8), decimal=2)                
+        numpy.testing.assert_almost_equal(res1, numpy.sqrt(8), decimal=2) 
 
+        # Gradient Operator (complex)
+        ig = ImageGeometry(30,30, dtype=numpy.complex)
+        Grad = GradientOperator(ig)
+        res1 = Grad.PowerMethod(Grad,500, tolerance=1e-6)
+        numpy.testing.assert_almost_equal(res1, numpy.sqrt(8), decimal=2)         
+                    
         # Identity Operator
         Id = IdentityOperator(ig)
         res1 = Id.PowerMethod(Id,100)

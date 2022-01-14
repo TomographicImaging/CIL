@@ -48,7 +48,7 @@ class BlockDataContainer(object):
     MULTIPLY  = 'multiply'
     DIVIDE    = 'divide'
     POWER     = 'power'
-    AXPBY     = 'axpby'
+    SAPYB     = 'sapyb'
     MAXIMUM   = 'maximum'
     MINIMUM   = 'minimum'
     ABS       = 'abs'
@@ -212,7 +212,7 @@ class BlockDataContainer(object):
         else:
             return self.binary_operations(BlockDataContainer.MINIMUM, other, *args, **kwargs)
 
-    def sapyb(self, a, y, b, out, dtype=numpy.float32, num_threads = NUM_THREADS):
+    def sapyb(self, a, y, b, out, num_threads = NUM_THREADS):
         r'''performs axpby element-wise on the BlockDataContainer containers
         
         Does the operation .. math:: a*x+b*y and stores the result in out, where x is self
@@ -221,10 +221,11 @@ class BlockDataContainer(object):
         :param b: scalar
         :param y: compatible (Block)DataContainer
         :param out: (Block)DataContainer to store the result
-        :param dtype: optional, data type of the DataContainers
-
+        
 
         Example:
+        --------
+
         a = 2
         b = 3
         ig = ImageGeometry(10,11)
@@ -236,13 +237,13 @@ class BlockDataContainer(object):
         '''
         if out is None:
             raise ValueError("out container cannot be None")
-        kwargs = {'a':a, 'b':b, 'out':out, 'dtype': dtype, 'num_threads': NUM_THREADS}
-        self.binary_operations(BlockDataContainer.AXPBY, y, **kwargs)
+        kwargs = {'a':a, 'b':b, 'out':out, 'num_threads': NUM_THREADS}
+        self.binary_operations(BlockDataContainer.SAPYB, y, **kwargs)
 
 
     def axpby(self, a, b, y, out, dtype=numpy.float32, num_threads = NUM_THREADS):
         '''Deprecated method. Alias of sapyb'''
-        return self.sapyb(a,y,b,out,dtype,num_threads)
+        return self.sapyb(a,y,b,out,num_threads)
 
 
 
@@ -313,15 +314,15 @@ class BlockDataContainer(object):
                     op = el.maximum
                 elif operation == BlockDataContainer.MINIMUM:
                     op = el.minimum
-                elif operation == BlockDataContainer.AXPBY:
+                elif operation == BlockDataContainer.SAPYB:
                     if not isinstance(other, BlockDataContainer):
                         raise ValueError("{} cannot handle {}".format(operation, type(other)))
-                    op = el.axpby
+                    op = el.sapyb
                 else:
                     raise ValueError('Unsupported operation', operation)
 
                 if out is not None:
-                    if operation == BlockDataContainer.AXPBY:
+                    if operation == BlockDataContainer.SAPYB:
                         if isinstance(kw['a'], BlockDataContainer):
                             a = kw['a'].get_item(i)
                         else:
@@ -332,7 +333,7 @@ class BlockDataContainer(object):
                         else:
                             b = kw['b']
 
-                        el.axpby(a, b, ot,  out.get_item(i), dtype=kw['dtype'], num_threads=kw['num_threads'])
+                        el.sapyb(a, ot, b, out.get_item(i), num_threads=kw['num_threads'])
                     else:
                         kw['out'] = out.get_item(i)
                         op(ot, *args, **kw)
@@ -345,8 +346,8 @@ class BlockDataContainer(object):
         else:
             # try to do algebra with one DataContainer. Will raise error if not compatible
             kw = kwargs.copy()
-            if operation != BlockDataContainer.AXPBY:
-                # remove keyworded argument related to AXPBY
+            if operation != BlockDataContainer.SAPYB:
+                # remove keyworded argument related to SAPYB
                 for k in ['a','b','y', 'num_threads', 'dtype']:
                     if k in kw.keys():
                         kw.pop(k)
@@ -367,7 +368,7 @@ class BlockDataContainer(object):
                     op = el.maximum
                 elif operation == BlockDataContainer.MINIMUM:
                     op = el.minimum
-                elif operation == BlockDataContainer.AXPBY:
+                elif operation == BlockDataContainer.SAPYB:
 
                     if isinstance(kw['a'], BlockDataContainer):
                         a = kw['a'].get_item(i)
@@ -379,7 +380,7 @@ class BlockDataContainer(object):
                     else:
                         b = kw['b']
 
-                    el.axpby(a, b, other, out.get_item(i), kw['dtype'], kw['num_threads'])
+                    el.sapyb(a, other, b, out.get_item(i), kw['num_threads'])
 
                     # As axpyb cannot return anything we `continue` to skip the rest of the code block
                     continue

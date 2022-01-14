@@ -2596,9 +2596,9 @@ class DataContainer(object):
         if ndy.dtype != dtype:
             ndy = ndy.astype(dtype, casting='safe')
         if nda.dtype != dtype:
-            nda = nda.astype(dtype, casting='safe')
+            nda = nda.astype(dtype, casting='same_kind')
         if ndb.dtype != dtype:
-            ndb = ndb.astype(dtype, casting='safe')
+            ndb = ndb.astype(dtype, casting='same_kind')
 
         if dtype == numpy.float32:
             x_p = ndx.ctypes.data_as(c_float_p)

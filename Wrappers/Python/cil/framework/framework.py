@@ -289,7 +289,7 @@ class ImageGeometry(object):
             repres += "center : x{0},y{1}\n".format(self.center_x, self.center_y)
 
         return repres
-    def allocate(self, value=0, **kwargs):
+    def allocate(self, value=0, dtype=numpy.float32, backend='numpy'):
         '''allocates an ImageData according to the size expressed in the instance
         
         :param value: accepts numbers to allocate an uniform array, or a string as 'random' or 'random_int' to create a random array or None.
@@ -304,7 +304,8 @@ class ImageGeometry(object):
             raise ValueError("Deprecated: 'dimension_labels' cannot be set with 'allocate()'. Use 'geometry.set_labels()' to modify the geometry before using allocate.")
 
         out = ImageData(geometry=self.copy(), 
-                            dtype=dtype, 
+                            dtype=dtype,
+                            backend=backend,
                             suppress_warning=True)
 
         if isinstance(value, Number):

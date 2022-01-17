@@ -99,7 +99,12 @@ class TotalVariation(Function):
         
         # correlation space or spacechannels
         self.correlation = correlation
-        self.backend = backend        
+        if backend == 'cupy':
+            self.backend = 'numpy'
+            self.tv_backend = 'cupy'
+        else:
+            self.backend = backend  
+            self.tv_backend = 'numpy'      
         
         # Define orthogonal projection onto the convex set C
         self.lower = lower
@@ -267,13 +272,28 @@ class TotalVariation(Function):
             tmp_x *= tau
             tmp_x *= self.regularisation_parameter 
             x.subtract(tmp_x, out=tmp_x)
-            return self.projection_C(tmp_x)
+            out = self.projection_C(tmp_x)
+            if self.tv_backend == 'numpy':
+                return out
+            else:
+                outnp = out.geometry.allocate(backend='numpy')
+                outnp.fill(out.as_array().get())
+                return outnp
         else:          
-            self.gradient.adjoint(tmp_q, out = out)
-            out*=tau
-            out*=self.regularisation_parameter
-            x.subtract(out, out=out)
-            self.projection_C(out, out=out)
+            
+            if self.tv_backend == 'cupy':
+                tmp = self.gradient.adjoint(tmp_q)
+            else:
+                tmp = out
+                self.gradient.adjoint(tmp_q, out = tmp)
+            tmp*=tau
+            tmp*=self.regularisation_parameter
+            x.subtract(tmp, out=tmp)
+            self.projection_C(tmp, out=tmp)
+            if self.tv_backend == 'cupy':
+                out.fill(tmp.as_array().get())
+            
+                
     
     def convex_conjugate(self,x):        
         return 0.0    

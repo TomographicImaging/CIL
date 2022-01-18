@@ -178,10 +178,9 @@ class LinearOperator(Operator):
         # Default case: non-symmetric
         symmetric = False
 
-        # symmetric case   
-        if operator.domain_geometry().__class__.__name__ == operator.range_geometry().__class__.__name__:
-            if set(operator.domain_geometry().shape) == set(operator.range_geometry().shape):
-                symmetric = True
+        # symmetric case  
+        if operator.domain_geometry()==operator.range_geometry():
+            symmetric = True
         
         # Initialise random or by the user
         if initial is None:
@@ -222,7 +221,7 @@ class LinearOperator(Operator):
                 eig_new = numpy.sqrt(numpy.abs(x0_norm))
             
             # Stopping criterion of two consecutive eigenvalues
-            if numpy.abs(eig_new - eig_old) < tolerance :
+            if i>0 and numpy.abs(eig_new - eig_old) < tolerance :
                 break
             eig_old = eig_new
             

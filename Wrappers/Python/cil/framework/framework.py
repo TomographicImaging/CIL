@@ -289,7 +289,7 @@ class ImageGeometry(object):
             repres += "center : x{0},y{1}\n".format(self.center_x, self.center_y)
 
         return repres
-    def allocate(self, value=0, dtype=numpy.float32, backend='numpy'):
+    def allocate(self, value=0, dtype=numpy.float32, backend='numpy', **kwargs):
         '''allocates an ImageData according to the size expressed in the instance
         
         :param value: accepts numbers to allocate an uniform array, or a string as 'random' or 'random_int' to create a random array or None.
@@ -2549,6 +2549,7 @@ class DataContainer(object):
             out = self * 0.
             ret_out = True
 
+        
         if out.dtype in [ numpy.float32, numpy.float64 ]:
             # handle with C-lib _axpby
             try:
@@ -2560,6 +2561,8 @@ class DataContainer(object):
                 warnings.warn("sapyb defaulting to Python due to: {}".format(rte))
             except TypeError as te:
                 warnings.warn("sapyb defaulting to Python due to: {}".format(te))
+            except AttributeError as ae:
+                warnings.warn("sapyb defaulting to Python due to: {}".format(ae))
             finally:
                 pass
         
@@ -2934,9 +2937,15 @@ class ImageData(DataContainer):
         else:
             return ImageData(out.array, deep_copy=False, geometry=geometry_new, suppress_warning=True)  
 
-    def copy(self):
+    def copy(self, backend=None):
+        if backend is None:
+            backend = self.backend
+        elif backend in ['cupy', 'numpy']:
+            pass
+        else:
+            raise ValueError('Unsupported backend. Expected cupy or numpy, got {}'.format(backend))
         return ImageData(array=self.array.copy(), deep_copy=False, geometry=self.geometry,\
-             dtype=self.dtype, suppress_warning=True, backend=self.backend)                          
+             dtype=self.dtype, suppress_warning=True, backend=backend)                          
 
 class AcquisitionData(DataContainer):
     '''DataContainer for holding 2D or 3D sinogram'''

@@ -199,12 +199,14 @@ class TotalVariation(Function):
         except:
             self._domain = x
         
+        if x.backend == 'cupy':
+            pass
         # initialise
         t = 1        
-        tmp_p = self.gradient.range_geometry().allocate(0)  
+        tmp_p = self.gradient.range_geometry().allocate(0, backend=self.tv_backend)  
         tmp_q = tmp_p.copy()
-        tmp_x = self.gradient.domain_geometry().allocate(0)     
-        p1 = self.gradient.range_geometry().allocate(0)
+        tmp_x = self.gradient.domain_geometry().allocate(0, backend=self.tv_backend)     
+        p1 = self.gradient.range_geometry().allocate(0, backend=self.tv_backend)
         
 
         should_break = False
@@ -271,11 +273,16 @@ class TotalVariation(Function):
             self.gradient.adjoint(tmp_q, out=tmp_x)
             tmp_x *= tau
             tmp_x *= self.regularisation_parameter 
-            x.subtract(tmp_x, out=tmp_x)
-            out = self.projection_C(tmp_x)
+            
             if self.tv_backend == 'numpy':
+                x.subtract(tmp_x, out=tmp_x)
+                out = self.projection_C(tmp_x)
                 return out
             else:
+                # need to create an ImageData from another one with different backend.
+                xx = x.copy(backend='cupy')
+                x.subtract(tmp_x, out=tmp_x)
+                out = self.projection_C(tmp_x)
                 outnp = out.geometry.allocate(backend='numpy')
                 outnp.fill(out.as_array().get())
                 return outnp

@@ -465,4 +465,11 @@ class TestCupyIntegrationImageData(TestCase, TDataContainerAlgebra):
         
         np.testing.assert_almost_equal(self.image1.as_array().get(), camera.as_array())
         
+    
+    def test_ImageGeometry_allocate_cupy(self):
+        ig = ImageGeometry(19,22,21)
+        data = ig.allocate(0, backend='cupy')
+        import cupy as cp
+        assert isinstance (data.as_array(), cp.ndarray)
 
+        

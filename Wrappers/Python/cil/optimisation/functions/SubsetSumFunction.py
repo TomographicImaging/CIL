@@ -234,45 +234,36 @@ class SAGAGradientFunction(SubsetSumFunction):
         # random choice of subset
         self.next_subset()
 
-        subset_grad_old = self.subset_gradients[self.subset_num]
-
         full_grad_old = self.full_gradient
 
-        # This is step 6 of the SAGA algo, and we multiply by the num_subsets to take care the (1/n) weight
-        # step below to be optimised --> multiplication
-        # subset_grad = self.num_subsets * self.functions[self.subset_num].gradient(x)
-        
-        # subset_grad gradient of the current function
+        # Compute new gradient for current subset, store in tmp2
+        # subset_grad = self.function[self.subset_num].gradient(x)
         self.functions[self.subset_num].gradient(x, out=self.tmp2)
 
-        # the following line computes these and stores the result in tmp1
-        # subset_grad = self.num_subsets * self.function[self.subset_num].gradient(x)
+        # Compute difference between new and old gradient for current subset, store in tmp1
+        # subset_grad_old = self.subset_gradients[self.subset_num]
         # subset_grad - subset_grad_old
-        self.tmp2.axpby(self.num_subsets, -1., self.subset_gradients[self.subset_num], out=self.tmp1)
-        # store the new subset_grad in self.subset_gradients[self.subset_num]
-        self.tmp2.multiply(self.num_subsets, out=subset_grad_old)
-        
+        self.tmp2.axpby(1., -1., self.subset_gradients[self.subset_num], out=self.tmp1)
+
+        # Compute output subset_grad - subset_grad_old + 1/num_subsets * full_grad
         if out is None:
-            ret = self.tmp1.add(full_grad_old)
+            ret = 0.0 * self.tmp1
+            self.tmp1.axpby(1., 1./self.num_subsets, full_grad_old, out=ret)
         else:
-            self.tmp1.add(full_grad_old, out=out)
-        # update full gradient, which needs subset_grad - subset_grad_old, which is stored in tmp1
-        self.full_gradient.axpby(1., 1/self.num_subsets, self.tmp1, out=self.full_gradient)
+            self.tmp1.axpby(1., 1./self.num_subsets, full_grad_old, out=out)
 
         if out is None:
             return ret
 
+        # update subset gradient: store subset_grad in self.subset_gradients[self.subset_num]
+        self.subset_gradients[self.subset_num].fill(self.tmp2)
 
-    # def memory_update(self, subset_grad):
+        # update full gradient: needs subset_grad - subset_grad_old, which is stored in tmp1
+        # full_gradient = full_gradient + subset_grad - subset_grad_old
+        self.full_gradient.axpby(1., 1., self.tmp1, out=self.full_gradient)
 
-    #     # step below to be optimised --> div
-    #     self.full_gradient += (subset_grad - self.subset_gradients[self.subset_num])/self.num_subsets
-    #     self.subset_gradients[self.subset_num] = subset_grad 
-        
-
-    def next_subset(self):
-        
-        self.subset_num = int(np.random.choice(self.num_subsets))
+        if out is None:
+            return ret
 
 
     def memory_init(self, x):

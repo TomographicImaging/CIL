@@ -133,10 +133,16 @@ class SubsetSumFunction(SumFunction):
     -----------
 
 
+    - (optional) 
+        subset_select_function: function which takes two integers and outputs an integer
+        defines how the subset is chosen at each iteration
+        default is uniformly at random    
 
     '''
     
-    def __init__(self, functions, **kwargs):
+    def __init__(self, functions, subset_select_function=(lambda a,b: int(np.random.choice(b))), subset_init=-1, **kwargs):
+        self.subset_select_function = subset_select_function
+        self.subset_num = subset_init
         # should not have docstring
         super(SubsetSumFunction, self).__init__(*functions)
         
@@ -162,7 +168,7 @@ class SubsetSumFunction(SumFunction):
 
     def next_subset(self):
 
-        raise NotImplemented
+        self.subset_num = self.subset_select_function(self.subset_num, self.num_subsets)
 
 
 class SAGAGradientFunction(SubsetSumFunction):

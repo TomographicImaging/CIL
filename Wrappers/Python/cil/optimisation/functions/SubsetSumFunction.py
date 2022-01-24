@@ -189,9 +189,10 @@ class SAGAGradientFunction(SubsetSumFunction):
         default None
            
     '''
+    def __init__(self, functions, precond=None, **kwargs):
+
         self.gradients_allocated = False
-        
-        
+        self.precond = precond
         super(SAGAGradientFunction, self).__init__(functions)
 
     def gradient(self, x, out=None):
@@ -252,8 +253,12 @@ class SAGAGradientFunction(SubsetSumFunction):
         else:
             self.tmp1.axpby(1., 1./self.num_subsets, full_grad_old, out=out)
 
-        if out is None:
-            return ret
+        # Apply preconditioning
+        if self.precond is not None:
+            if out is None:
+                ret.multiply(self.precond(self.subset_num,x),out=ret)
+            else:
+                out.multiply(self.precond(self.subset_num,x),out=out)
 
         # update subset gradient: store subset_grad in self.subset_gradients[self.subset_num]
         self.subset_gradients[self.subset_num].fill(self.tmp2)

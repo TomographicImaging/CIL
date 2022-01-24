@@ -239,7 +239,7 @@ class LinearOperator(Operator):
             return eig_new
             
 
-    def calculate_norm(self, **kwargs):
+    def calculate_norm(self, iterations=10, initial=None, tolerance = 1e-5, verbose=False, x_init=None):
         '''Returns the norm of the LinearOperator as calculated by the PowerMethod
         
         :param iterations: number of iterations to run
@@ -249,12 +249,9 @@ class LinearOperator(Operator):
         :parameter force: forces the recalculation of the norm
         :type force: boolean, default :code:`False`
         '''
-        initial = kwargs.get('initial', None)
-        tolerance = kwargs.get('tolerance', 1e-5)
-        iterations = kwargs.get('iterations', 10)
-        verbose = kwargs.get('verbose', False)
-        s1 = LinearOperator.PowerMethod(self, iterations=iterations, tolerance=tolerance, initial=initial, verbose=verbose)
+        s1 = LinearOperator.PowerMethod(self, iterations=iterations, initial=initial, tolerance=tolerance, verbose=verbose, x_init = x_init)
         return s1
+
 
     @staticmethod
     def dot_test(operator, domain_init=None, range_init=None, tolerance=1e-6, **kwargs):

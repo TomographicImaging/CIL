@@ -285,3 +285,15 @@ class SAGAGradientFunction(SubsetSumFunction):
         self.tmp2 = x * 0.0
 
         self.gradients_allocated = True
+    def memory_reset(self):
+        """        
+            resets subset gradients and full gradient in memory.
+
+        """
+        if self.gradients_allocated == True:
+            del(self.subset_gradients)
+            del(self.full_gradient)
+            del(self.tmp1)
+            del(self.tmp2)
+
+            self.gradients_allocated = False

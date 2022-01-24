@@ -1,7 +1,7 @@
-from cil.optimisation.functions import Function, SumFunction
+from cil.optimisation.functions import Function
 import numpy as np
 
-class SubsetGradientAlgorithmFunction(SumFunction):
+class SubsetSumFunction(SumFunction):
     
     '''Class for use as objective function in gradient type algorithms to enable the use of subsets.
 
@@ -14,14 +14,9 @@ class SubsetGradientAlgorithmFunction(SumFunction):
 
     '''
     
-    # name suggestions: CustomGradientFunction, 
-    #                   A name with the subsets word
-    #     
-
-    
     def __init__(self, functions, **kwargs):
         # should not have docstring
-        super(SubsetGradientAlgorithmFunction, self).__init__(*functions)
+        super(SubsetSumFunction, self).__init__(*functions)
         
     @property
     def num_subsets(self):
@@ -29,7 +24,7 @@ class SubsetGradientAlgorithmFunction(SumFunction):
         
     def _full_gradient(self, x, out=None):
         '''Return full gradient'''
-        return super(SubsetGradientAlgorithmFunction, self).gradient(x, out=out)
+        return super(SubsetSumFunction, self).gradient(x, out=out)
         
     def gradient(self, x, out=None):
         """        
@@ -48,14 +43,14 @@ class SubsetGradientAlgorithmFunction(SumFunction):
         raise NotImplemented
 
 
-class SAGA_Function(SubsetGradientAlgorithmFunction):
+class SAGAGradientFunction(SubsetSumFunction):
 
     def __init__(self, functions):
 
         self.gradients_allocated = False
         
         
-        super(SAGA_Function, self).__init__(functions)
+        super(SAGAGradientFunction, self).__init__(functions)
 
     def gradient(self, x, out=None):
 

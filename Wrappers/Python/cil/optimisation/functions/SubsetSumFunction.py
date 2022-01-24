@@ -132,6 +132,7 @@ class SubsetSumFunction(SumFunction):
     Parameters:
     -----------
 
+    - functions: f1, f2, 
 
     - (optional) 
         subset_select_function: function which takes two integers and outputs an integer
@@ -181,18 +182,18 @@ class SAGAGradientFunction(SubsetSumFunction):
     Parameters:
     -----------
 
-    - functions: a list of functions
-
     - (optional) 
         precond: function taking into input an integer (subset_num) and a DataContainer and outputting a DataContainer
         serves as diagonal preconditioner
         default None
            
     '''
+
     def __init__(self, functions, precond=None, **kwargs):
 
         self.gradients_allocated = False
         self.precond = precond
+        
         super(SAGAGradientFunction, self).__init__(functions)
 
     def gradient(self, x, out=None):
@@ -285,6 +286,7 @@ class SAGAGradientFunction(SubsetSumFunction):
         self.tmp2 = x * 0.0
 
         self.gradients_allocated = True
+    
     def memory_reset(self):
         """        
             resets subset gradients and full gradient in memory.
@@ -297,3 +299,5 @@ class SAGAGradientFunction(SubsetSumFunction):
             del(self.tmp2)
 
             self.gradients_allocated = False
+
+

@@ -239,7 +239,7 @@ class LinearOperator(Operator):
             return eig_new
             
 
-    def calculate_norm(self, iterations=10, initial=None, tolerance = 1e-5, verbose=False, x_init=None, force=False):
+    def calculate_norm(self, iterations=10, initial=None, tolerance = 1e-5, verbose=False, x_init=None, **kwargs):
         
         r""" Returns the norm of the LinearOperator calculated by the PowerMethod.
         

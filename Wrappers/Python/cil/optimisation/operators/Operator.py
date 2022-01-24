@@ -18,6 +18,7 @@
 from numbers import Number
 import numpy
 import functools
+import warnings
 
 class Operator(object):
     '''Operator that maps from a space X -> Y'''
@@ -118,8 +119,7 @@ class LinearOperator(Operator):
         raise NotImplementedError
     
     @staticmethod
-    def PowerMethod(operator, iterations=10, tolerance = 1e-5, initial=None, verbose=False):
-        
+    def PowerMethod(operator, iterations=10, initial=None, tolerance = 1e-5, verbose=False, x_init=None):
 
         r"""Power method or Power iteration algorithm 
         
@@ -132,13 +132,15 @@ class LinearOperator(Operator):
 
         operator: LinearOperator
         iterations: positive:`int`, default=10
-            Number of iterations for the Power method
-        tolerance: positive:`float`, default = 1e-4
-            Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below this tolerance.
+            Number of iterations for the Power method.
         initial: DataContainer, default = None
-            Starting point for the Power method
+            Starting point for the Power method.
+        tolerance: positive:`float`, default = 1e-5
+            Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below this tolerance.                    
         verbose: boolean, default = False
-            Returns: dominant eigenvalue (False) or dominant eigenvalue, number of iterations, corresponding eigenvector, list of eigenvalue estimations
+            Returns: dominant eigenvalue (False) or dominant eigenvalue, number of iterations, corresponding eigenvector, list of eigenvalue estimations.
+        x_init: DataContainer, default = None
+            Starting point for the Power method (deprecated).        
 
         Notes
         -----
@@ -174,6 +176,10 @@ class LinearOperator(Operator):
 
 
         """
+
+        if x_init is not None:
+            warnings.warn('The x_init parameter is deprecated and will be removed in following version. Use initial instead.')
+            initial = x_init.copy()
 
         # Default case: non-symmetric
         symmetric = False

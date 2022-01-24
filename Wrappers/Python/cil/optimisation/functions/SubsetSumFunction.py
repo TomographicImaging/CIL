@@ -172,15 +172,61 @@ class SubsetSumFunction(SumFunction):
 
 
 class SAGAGradientFunction(SubsetSumFunction):
+    '''Class for use as objective function in gradient type algorithms to enable the use of subsets.
 
-    def __init__(self, functions):
+    The `gradient` method doesn't the mathematical gradient of the sum of functions, 
+    but a variance-reduced approximated gradient corresponding to the SAGA algorithm.
+    More details below, in the gradient method.
 
+    Parameters:
+    -----------
+
+    - functions: a list of functions
+
+    - (optional) 
+        precond: function taking into input an integer (subset_num) and a DataContainer and outputting a DataContainer
+        serves as diagonal preconditioner
+        default None
+           
+    '''
         self.gradients_allocated = False
         
         
         super(SAGAGradientFunction, self).__init__(functions)
 
     def gradient(self, x, out=None):
+        """
+        Returns a variance-reduced approximate gradient, defined below.
+
+        For f = \sum f_i, the output is computed as follows:
+            - choose a subset j with function next_subset()
+            - compute
+                subset_grad - subset_grad_old + 1/num_subsets * full_grad
+                with 
+                - subset_grad is the gradient of function number j at current point
+                - subset_grad_old is the gradient of function number j in memory
+                - full_grad is the approximation of the gradient of f in memory
+            - update subset_grad and full)grad
+        
+        Combined with the gradient step, the algorithm is guaranteed 
+        to converge if the functions f_i are convex and the step-size 
+        gamma satisfies to
+            gamma <= 1/(3 * max L_i)
+        where the gradient of each f_i is L_i - Lipschitz.
+
+        Reference:
+        Defazio, Aaron, Bach, Francis, and Simon Lacoste-Julien. 
+        "SAGA: A fast incremental gradient method with support 
+        for non-strongly convex composite objectives." 
+        Advances in neural information processing systems. 2014.
+
+        NB: 
+        contrarily to the convention in the above article, 
+        the objective function used here is 
+            \sum f_i
+        and not
+            1/num_subsets \sum f_i
+        """
 
         if not self.gradients_allocated:
             self.memory_init(x) 

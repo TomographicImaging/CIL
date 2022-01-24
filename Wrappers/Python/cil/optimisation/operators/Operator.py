@@ -239,16 +239,25 @@ class LinearOperator(Operator):
             return eig_new
             
 
-    def calculate_norm(self, iterations=10, initial=None, tolerance = 1e-5, verbose=False, x_init=None):
-        '''Returns the norm of the LinearOperator as calculated by the PowerMethod
+    def calculate_norm(self, iterations=10, initial=None, tolerance = 1e-5, verbose=False, x_init=None, force=False):
         
-        :param iterations: number of iterations to run
-        :type iterations: int, optional, default = 25
-        :param x_init: starting point for the iteration in the operator domain
-        :type x_init: same type as domain, a subclass of :code:`DataContainer`, optional, None
-        :parameter force: forces the recalculation of the norm
-        :type force: boolean, default :code:`False`
-        '''
+        r""" Returns the norm of the LinearOperator calculated by the PowerMethod.
+        
+        Parameters
+        ----------
+        iterations: positive:`int`, default=10
+            Number of iterations for the Power method.
+        initial: DataContainer, default = None
+            Starting point for the Power method.
+        tolerance: positive:`float`, default = 1e-5
+            Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below this tolerance.                    
+        verbose: boolean, default = False
+            Returns: dominant eigenvalue (False) or dominant eigenvalue, number of iterations, corresponding eigenvector, list of eigenvalue estimations.
+        x_init: DataContainer, default = None
+            Starting point for the Power method (deprecated).   
+
+
+        """
         s1 = LinearOperator.PowerMethod(self, iterations=iterations, initial=initial, tolerance=tolerance, verbose=verbose, x_init = x_init)
         return s1
 

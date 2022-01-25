@@ -72,15 +72,50 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
                     elif boundaries == 'Periodic':
                         mat[0,-1] = -1
 
-                # use Kronecker product to compute the full sparse matrix for the finite difference according to the direction
-                # Dx = I_n x D -->  Sparse Eye x mat
-                # Dy = D x I_m -->   mat x Sparse Eye
-                # Reference: Infimal Convolution Regularizations with Discrete l1-type Functionals, S. Setzer, G. Steidl and T. Teuber                
-                tmpGrad = mat if i == 0 else sp.eye(shape[0])
+                # Use Kronecker product to compute the full sparse matrix for the finite difference operator according to the direction.
+                # For a n x m array, the forward difference operator in y-direction (x-direction) (with Neumann/Periodic bc) is a (n*m x n*m) sparse array containing -1,1.
+                # Example, for a 3x3 array U, the forward difference operator in y-direction with Neumann bc is a 9x9 sparse array containing -1,1.
+                # To create this sparse matrix, we first create a "kernel" matrix, shown below:
+                # mat = [-1, 1, 0
+                # 0, -1, 1,
+                # 0, 0, 0].
+                # and then use the Kronecker product: allMat[0] = mat x I_m =
+                # matrix([[-1., 1., 0., 0., 0., 0., 0., 0., 0.],
+                # [ 0., -1., 1., 0., 0., 0., 0., 0., 0.],
+                # [ 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+                # [ 0., 0., 0., -1., 1., 0., 0., 0., 0.],
+                # [ 0., 0., 0., 0., -1., 1., 0., 0., 0.],
+                # [ 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+                # [ 0., 0., 0., 0., 0., 0., -1., 1., 0.],
+                # [ 0., 0., 0., 0., 0., 0., 0., -1., 1.],
+                # [ 0., 0., 0., 0., 0., 0., 0., 0., 0.]])
+                # where I_m is an sparse array with ones in the diagonal.
+                # Then allmat can be applied to a (3x3) array "flatten" columnwise
+                # and represent the forward differences in y direction,i.e.,
+                # [U_{21} - U_{11},
+                # U_{31} - U_{21},
+                # 0 ,
+                # ... ,
+                # ... ,
+                # ... ,
+                # ... ,
+                # ... ,
+                # ... ]
+
+                # For the x-direction, we have allmat[1] = I_n x mat.
+                # Reference: Infimal Convolution Regularizations with Discrete l1-type Functionals, S. Setzer, G. Steidl and T. Teuber
+          
+                if i==0:
+                    tmpGrad = mat
+                else: 
+                    tmpGrad = sp.eye(shape[0])
 
                 for j in range(1, len_shape):
 
-                    tmpGrad = sp.kron(mat, tmpGrad ) if j == i else sp.kron(sp.eye(shape[j]), tmpGrad )
+                    if j == i:
+                        tmpGrad = sp.kron(mat, tmpGrad ) 
+                    else:
+                        tmpGrad = sp.kron(sp.eye(shape[j]), tmpGrad )
 
                 allMat[i] = tmpGrad
 
@@ -112,7 +147,7 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
 
         # fidelity term
         fidelity = 0.5 * cp.sum_squares(u_cvx - self.data.array)   
-        regulariser = alpha * self.tv_cvxpy_regulariser(u_cvx)
+        regulariser = (alpha**2) * self.tv_cvxpy_regulariser(u_cvx)
 
         # objective
         obj =  cp.Minimize( regulariser +  fidelity)
@@ -122,15 +157,15 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
         tv_cvxpy = prob.solve(verbose = True, solver = cp.SCS)        
 
         # use TotalVariation from CIL (with Fast Gradient Projection algorithm)
-        TV = alpha * TotalVariation(max_iteration=200)
-        tv_cil = TV.proximal(self.data, tau=1.0)     
+        TV = TotalVariation(max_iteration=200)
+        tv_cil = TV.proximal(self.data, tau=alpha**2)     
 
         # compare solution
         np.testing.assert_allclose(tv_cil.array, u_cvx.value,atol=1e-3)  
 
-        # compare objectives
+        # # compare objectives
         f = 0.5*L2NormSquared(b=self.data)
-        cil_objective = TV(tv_cil) + f(tv_cil)
+        cil_objective = f(tv_cil) + TV(tv_cil)*(alpha**2)
         np.testing.assert_allclose(cil_objective, obj.value, atol=1e-3)  
 
     @unittest.skipUnless(has_cvxpy, "CVXpy not installed")
@@ -154,15 +189,15 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
             tv_cvxpy = prob.solve(verbose = True, solver = cp.SCS)        
 
             # use TotalVariation from CIL (with Fast Gradient Projection algorithm)
-            TV = alpha * TotalVariation(max_iteration=200, isotropic=False)
-            tv_cil = TV.proximal(self.data, tau=1.0)     
+            TV = (alpha/3.0)*TotalVariation(max_iteration=200, isotropic=False)
+            tv_cil = TV.proximal(self.data, tau=3.0)     
 
             # compare solution
             np.testing.assert_allclose(tv_cil.array, u_cvx.value, atol=1e-3)   
 
             # compare objectives
             f = 0.5*L2NormSquared(b=self.data)
-            cil_objective = TV(tv_cil) + f(tv_cil)
+            cil_objective = f(tv_cil) + TV(tv_cil)*(3)
             np.testing.assert_allclose(cil_objective, obj.value, atol=1e-3)              
 
 

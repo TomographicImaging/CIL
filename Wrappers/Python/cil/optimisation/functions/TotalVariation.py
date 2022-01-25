@@ -81,7 +81,7 @@ class TotalVariation(Function):
                  upper = np.inf,
                  isotropic = True,
                  split = False,
-                 info = False):
+                 info = False, strongly_convex_constant = 0):
         
 
         super(TotalVariation, self).__init__(L = None)
@@ -119,6 +119,9 @@ class TotalVariation(Function):
 
         # splitting Gradient
         self.split = split
+
+        # Strong convexity for TV
+        self.strongly_convex_constant = strongly_convex_constant
 
     @property
     def regularisation_parameter(self):
@@ -200,8 +203,11 @@ class TotalVariation(Function):
         tmp_q = tmp_p.copy()
         tmp_x = self.gradient.domain_geometry().allocate(0)     
         p1 = self.gradient.range_geometry().allocate(0)
-        
 
+        if self.strongly_convex_constant>0:
+            tau /= (1+tau*self.strongly_convex_constant)
+            x /= (1 + tau*self.strongly_convex_constant)
+        
         should_break = False
         for k in range(self.iterations):
                                                                                    

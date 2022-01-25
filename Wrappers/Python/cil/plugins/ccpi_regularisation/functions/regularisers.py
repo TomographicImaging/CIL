@@ -90,7 +90,7 @@ class TV_Base(RegulariserFunction):
 
 
 class FGP_TV(TV_Base):
-    def __init__(self, alpha=1, max_iteration=100, tolerance=0, isotropic=True, nonnegativity=True, device='cpu'):
+    def __init__(self, alpha=1, max_iteration=100, tolerance=0, isotropic=True, nonnegativity=True, device='cpu', strongly_convex_constant=0):
         '''Creator of FGP_TV Function
 
 
@@ -122,8 +122,14 @@ class FGP_TV(TV_Base):
         self.tolerance = tolerance
         self.nonnegativity = nonnegativity
         self.device = device # string for 'cpu' or 'gpu'
+        self.strongly_convex_constant = strongly_convex_constant
 
     def proximal_numpy(self, in_arr, tau):
+
+        if self.strongly_convex_constant>0:
+            tau /= (1+tau*self.strongly_convex_constant)
+            in_arr /= (1 + tau*self.strongly_convex_constant)
+
         res , info = regularisers.FGP_TV(\
               in_arr,\
               self.alpha * tau,\

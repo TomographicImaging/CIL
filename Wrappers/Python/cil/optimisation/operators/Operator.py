@@ -225,13 +225,13 @@ class LinearOperator(Operator):
                 eig_new =  numpy.abs(x0_norm)
             else:
                 eig_new = numpy.sqrt(numpy.abs(x0_norm))
+
+            eig_list.append(eig_new)                
             
             # Stopping criterion of two consecutive eigenvalues
             if i>0 and numpy.abs(eig_new - eig_old) < tolerance :
                 break
-            eig_old = eig_new
-            
-            eig_list.append(eig_new)
+            eig_old = eig_new            
 
         if verbose:
             return eig_new, i, x0, eig_list

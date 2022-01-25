@@ -132,29 +132,26 @@ class LinearOperator(Operator):
 
         operator: LinearOperator
         iterations: positive:`int`, default=10
-            Number of iterations for the Power method.
+            Number of iterations for the Power method algorithm.
         initial: DataContainer, default = None
             Starting point for the Power method.
         tolerance: positive:`float`, default = 1e-5
-            Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below this tolerance.                    
+            Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below the tolerance.                    
         verbose: boolean, default = False
-            Returns: dominant eigenvalue (False) or dominant eigenvalue, number of iterations, corresponding eigenvector, list of eigenvalue estimations.
+            Returns: dominant eigenvalue, number of iterations, corresponding eigenvector, list of eigenvalue estimations.
         x_init: DataContainer, default = None
             Starting point for the Power method (deprecated).        
-
-        Notes
-        -----
 
         Returns
         -------
 
         dominant eigenvalue: positive:`float`
         number of iterations: positive:`int`
-            Number of iterations to reach tolerance, if verbose = True
+            Number of iterations for the Power method algorithm, if verbose = True
         eigenvector: DataContainer
             Corresponding eigenvector of the dominant eigenvalue, if verbose = True
         list of eigenvalues: :obj:`list`
-            List of eigenvalues
+            List of eigenvalues, if verbose = True
 
         Examples
         --------    
@@ -169,11 +166,6 @@ class LinearOperator(Operator):
 
         >>> Mop_norm = Mop.norm()
         2.0005647295658866
-        
-
-        Note
-        ----
-
 
         """
 
@@ -231,7 +223,7 @@ class LinearOperator(Operator):
             # Stopping criterion of two consecutive eigenvalues
             if i>0 and numpy.abs(eig_new - eig_old) < tolerance :
                 break
-            eig_old = eig_new            
+            eig_old = eig_new       
 
         if verbose:
             return eig_new, i, x0, eig_list

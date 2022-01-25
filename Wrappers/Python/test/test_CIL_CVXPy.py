@@ -73,38 +73,41 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
                         mat[0,-1] = -1
 
                 # Use Kronecker product to compute the full sparse matrix for the finite difference operator according to the direction.
-                # For a n x m array, the forward difference operator in y-direction (x-direction) (with Neumann/Periodic bc) is a (n*m x n*m) sparse array containing -1,1.
+                # For a (n x m) array, the forward difference operator in y-direction (x-direction) (with Neumann/Periodic bc) is a (n*m x n*m) sparse array containing -1,1.
                 # Example, for a 3x3 array U, the forward difference operator in y-direction with Neumann bc is a 9x9 sparse array containing -1,1.
                 # To create this sparse matrix, we first create a "kernel" matrix, shown below:
                 # mat = [-1, 1, 0
-                # 0, -1, 1,
-                # 0, 0, 0].
+                #        0, -1, 1,
+                #        0, 0, 0].
                 # and then use the Kronecker product: allMat[0] = mat x I_m =
                 # matrix([[-1., 1., 0., 0., 0., 0., 0., 0., 0.],
-                # [ 0., -1., 1., 0., 0., 0., 0., 0., 0.],
-                # [ 0., 0., 0., 0., 0., 0., 0., 0., 0.],
-                # [ 0., 0., 0., -1., 1., 0., 0., 0., 0.],
-                # [ 0., 0., 0., 0., -1., 1., 0., 0., 0.],
-                # [ 0., 0., 0., 0., 0., 0., 0., 0., 0.],
-                # [ 0., 0., 0., 0., 0., 0., -1., 1., 0.],
-                # [ 0., 0., 0., 0., 0., 0., 0., -1., 1.],
-                # [ 0., 0., 0., 0., 0., 0., 0., 0., 0.]])
-                # where I_m is an sparse array with ones in the diagonal.
+                #         [ 0., -1., 1., 0., 0., 0., 0., 0., 0.],
+                #         [ 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+                #         [ 0., 0., 0., -1., 1., 0., 0., 0., 0.],
+                #         [ 0., 0., 0., 0., -1., 1., 0., 0., 0.],
+                #         [ 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+                #         [ 0., 0., 0., 0., 0., 0., -1., 1., 0.],
+                #         [ 0., 0., 0., 0., 0., 0., 0., -1., 1.],
+                #         [ 0., 0., 0., 0., 0., 0., 0., 0., 0.]])
+                # where I_m is an (mxm) sparse array with ones in the diagonal.
                 # Then allmat can be applied to a (3x3) array "flatten" columnwise
                 # and represent the forward differences in y direction,i.e.,
                 # [U_{21} - U_{11},
-                # U_{31} - U_{21},
-                # 0 ,
-                # ... ,
-                # ... ,
-                # ... ,
-                # ... ,
-                # ... ,
-                # ... ]
+                #  U_{31} - U_{21},
+                #        0        ,
+                #       ...       ,
+                #       ...       ,
+                #       ...       ,
+                #       ...       ,
+                #       ...       ,
+                #       ...       ]
 
                 # For the x-direction, we have allmat[1] = I_n x mat.
-                # Reference: Infimal Convolution Regularizations with Discrete l1-type Functionals, S. Setzer, G. Steidl and T. Teuber
+
+                # For more details, see "Infimal Convolution Regularizations with Discrete l1-type Functionals, S. Setzer, G. Steidl and T. Teuber"
           
+                # According to the directions, tmpGrad is either a kernel matrix or sparse eye array, which is updated 
+                # using the kronecker product to derive the sparse matrices.
                 if i==0:
                     tmpGrad = mat
                 else: 

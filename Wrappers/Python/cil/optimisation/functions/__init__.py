@@ -33,4 +33,4 @@ from .IndicatorBox import IndicatorBox
 from .KullbackLeibler import KullbackLeibler
 from .Rosenbrock import Rosenbrock
 from .TotalVariation import TotalVariation
-from .SubsetSumFunction import SAGA_Function
+from .SubsetSumFunction import SAGAGradientFunction

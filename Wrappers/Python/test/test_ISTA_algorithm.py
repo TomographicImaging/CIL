@@ -103,16 +103,16 @@ class TestISTA(unittest.TestCase):
     @unittest.skipUnless(has_cvxpy, "CVXpy not installed") 
     def test_with_cvxpy(self):
 
-        ista = ISTA(initial = self.initial, f = self.f, g = self.g, max_iteration=10000)  
+        ista = ISTA(initial = self.initial, f = self.f, g = self.g, max_iteration=2000)  
         ista.run(verbose=0)        
 
-        u_cvxpy = cvxpy.Variable(self.ig.shape[1])
+        u_cvxpy = cvxpy.Variable(self.ig.shape[0])
         objective = cvxpy.Minimize(0.5 * cvxpy.sum_squares(self.Aop.A @ u_cvxpy - self.bop.array))
         p = cvxpy.Problem(objective)
-        p.solve(verbose=True, solver=cvxpy.SCS)
+        p.solve(verbose=True, solver=cvxpy.SCS, eps=1e-4)
 
-        np.testing.assert_allclose(p.value, ista.objective[-1])
-        np.testing.assert_allclose(u_cvxpy.value, ista.solution.array)
+        np.testing.assert_allclose(p.value, ista.objective[-1], atol=1e-3)
+        np.testing.assert_allclose(u_cvxpy.value, ista.solution.array, atol=1e-3)
 
 
 

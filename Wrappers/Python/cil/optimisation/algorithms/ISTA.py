@@ -87,6 +87,10 @@ class ISTA(Algorithm):
             self.step_size = step_size
         
         self.t = 1
+
+        self.configured = True
+        print("{} configured".format(self.__class__.__name__, ))
+
                     
     def update(self):
         

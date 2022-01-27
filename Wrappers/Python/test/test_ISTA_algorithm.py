@@ -17,27 +17,83 @@
 
 
 from cil.optimisation.algorithms import ISTA
+from cil.optimisation.operators import MatrixOperator
+from cil.framework import VectorData
+from cil.optimisation.functions import LeastSquares, ZeroFunction
+
+import numpy as np
+
 
 import unittest
 
 class TestISTA(unittest.TestCase):
 
     def setUp(self):
+        
+        n = 100
+        m = 1000
 
-        pass
+        A = np.random.uniform(0,10, (m, n)).astype('float32')
+        b = (A.dot(np.random.randn(n)) + 0.1*np.random.randn(m)).astype('float32')
 
+        self.Aop = MatrixOperator(A)
+        self.bop = VectorData(b) 
+
+        self.f = LeastSquares(self.Aop, b=self.bop, c=0.5)
+        self.g = ZeroFunction()
+
+        self.ig = self.Aop.domain
+
+        self.initial = self.ig.allocate()
+  
     def tearDown(self):
-
         pass   
 
     def test_signature(self):
 
-        pass
+        # check required arguments (initial, f, g)
+        with np.testing.assert_raises(TypeError):
+            ista = ISTA(f = self.f, g = self.g)
+
+        with np.testing.assert_raises(TypeError):
+            ista = ISTA(initial = self.initial, f = self.f)            
+
+        with np.testing.assert_raises(TypeError):
+            ista = ISTA(initial = self.initial, g = self.g) 
+
+        # ista no step-size
+        ista = ISTA(initial = self.initial, f = self.f, g = self.g)  
+        np.testing.assert_equal(ista.step_size, 1./self.f.L)
+
+        # ista step-size
+        tmp_step_size = 10.
+        ista = ISTA(initial = self.initial, f = self.f, g = self.g, step_size=tmp_step_size)  
+        np.testing.assert_equal(ista.step_size, tmp_step_size)    
+
+        # check initialisation
+        self.assertTrue( id(ista.x)!=id(ista.initial) )   
+        self.assertTrue( id(ista.x_old)!=id(ista.initial))              
 
     def test_update(self):
 
-        pass
+        # ista run 1 iteration
 
-    def test_update_objective(self):
+        tmp_initial = self.ig.allocate()
+        ista = ISTA(initial = tmp_initial, f = self.f, g = self.g)  
+        ista.run(1)
 
-        pass 
+        x = tmp_initial.copy()
+        x_old = tmp_initial.copy()
+
+        for _ in range(11):         
+            x = ista.g.proximal(x_old - (1./ista.f.L) * ista.f.gradient(x_old), (1./ista.f.L))
+            x_old.fill(x)
+
+
+        np.testing.assert_allclose(ista.solution.array, x.array, atol=1e-3)      
+    
+        # # check objective
+        # res1 = ista.objective[-1]
+        # res2 = self.f(x) + self.g(x)
+        # self.assertTrue( res1==res2) 
+

@@ -23,17 +23,22 @@ from cil.optimisation.functions import LeastSquares, ZeroFunction
 
 import numpy as np
 
-
 import unittest
+
+from utils import has_cvxpy
+
+if has_cvxpy:
+    import cvxpy
 
 class TestISTA(unittest.TestCase):
 
     def setUp(self):
         
-        n = 100
-        m = 1000
+        np.random.seed(10)
+        n = 50
+        m = 500
 
-        A = np.random.uniform(0,10, (m, n)).astype('float32')
+        A = np.random.uniform(0,1, (m, n)).astype('float32')
         b = (A.dot(np.random.randn(n)) + 0.1*np.random.randn(m)).astype('float32')
 
         self.Aop = MatrixOperator(A)
@@ -76,24 +81,38 @@ class TestISTA(unittest.TestCase):
 
     def test_update(self):
 
-        # ista run 1 iteration
-
+        # ista run 10 iteration
         tmp_initial = self.ig.allocate()
-        ista = ISTA(initial = tmp_initial, f = self.f, g = self.g)  
-        ista.run(1)
+        ista = ISTA(initial = tmp_initial, f = self.f, g = self.g, max_iteration=10)  
+        ista.run()
 
         x = tmp_initial.copy()
         x_old = tmp_initial.copy()
 
-        for _ in range(11):         
+        for _ in range(10):         
             x = ista.g.proximal(x_old - (1./ista.f.L) * ista.f.gradient(x_old), (1./ista.f.L))
             x_old.fill(x)
 
-
-        np.testing.assert_allclose(ista.solution.array, x.array, atol=1e-3)      
+        np.testing.assert_allclose(ista.solution.array, x.array, atol=1e-2)      
     
-        # # check objective
-        # res1 = ista.objective[-1]
-        # res2 = self.f(x) + self.g(x)
-        # self.assertTrue( res1==res2) 
+        # check objective
+        res1 = ista.objective[-1]
+        res2 = self.f(x) + self.g(x)
+        self.assertTrue( res1==res2) 
+
+    @unittest.skipUnless(has_cvxpy, "CVXpy not installed") 
+    def test_with_cvxpy(self):
+
+        ista = ISTA(initial = self.initial, f = self.f, g = self.g, max_iteration=10000)  
+        ista.run(verbose=0)        
+
+        u_cvxpy = cvxpy.Variable(self.ig.shape[1])
+        objective = cvxpy.Minimize(0.5 * cvxpy.sum_squares(self.Aop.A @ u_cvxpy - self.bop.array))
+        p = cvxpy.Problem(objective)
+        p.solve(verbose=True, solver=cvxpy.SCS)
+
+        np.testing.assert_allclose(p.value, ista.objective[-1])
+        np.testing.assert_allclose(u_cvxpy.value, ista.solution.array)
+
+
 

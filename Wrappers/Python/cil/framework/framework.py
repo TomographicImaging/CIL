@@ -512,23 +512,23 @@ class SystemConfiguration(object):
         raise NotImplementedError
 
     @staticmethod
-    def rotation_vec_to_negy(vec):
-        ''' returns a rotation matrix that will rotate the projection of vec on the x-y plane to the -y direction [0,-1, Z]'''
+    def rotation_vec_to_y(vec):
+        ''' returns a rotation matrix that will rotate the projection of vec on the x-y plane to the +y direction [0,1, Z]'''
     
         vec = ComponentDescription.CreateUnitVector(vec)
 
         axis_rotation = numpy.eye(len(vec))
 
-        if numpy.allclose(vec[:2],[0,-1]):
+        if numpy.allclose(vec[:2],[0,1]):
             pass
-        elif numpy.allclose(vec[:2],[0,1]):
+        elif numpy.allclose(vec[:2],[0,-1]):
             axis_rotation[0][0] = -1
             axis_rotation[1][1] = -1
         else:
-            theta = math.atan2(vec[0],-vec[1])
+            theta = math.atan2(vec[0],vec[1])
             axis_rotation[0][0] = axis_rotation[1][1] = math.cos(theta)
-            axis_rotation[0][1] = math.sin(theta)
-            axis_rotation[1][0] = -math.sin(theta)
+            axis_rotation[0][1] = -math.sin(theta)
+            axis_rotation[1][0] = math.sin(theta)
 
         return numpy.matrix(axis_rotation)
 
@@ -632,7 +632,7 @@ class Parallel2D(SystemConfiguration):
         r'''Transforms and rotates the system to backend definitions
         '''          
         self.set_origin(self.rotation_axis.position)
-        rotation_matrix = SystemConfiguration.rotation_vec_to_negy(-self.ray.direction)
+        rotation_matrix = SystemConfiguration.rotation_vec_to_y(self.ray.direction)
                 
         self.ray.direction = rotation_matrix.dot(self.ray.direction.reshape(2,1))
         self.detector.position = rotation_matrix.dot(self.detector.position.reshape(2,1))
@@ -748,7 +748,7 @@ class Parallel3D(SystemConfiguration):
         r'''Transforms and rotates the system to backend definitions
         '''          
         self.align_z()
-        rotation_matrix = SystemConfiguration.rotation_vec_to_negy(-self.ray.direction)
+        rotation_matrix = SystemConfiguration.rotation_vec_to_y(self.ray.direction)
                 
         self.ray.direction = rotation_matrix.dot(self.ray.direction.reshape(3,1))
         self.detector.position = rotation_matrix.dot(self.detector.position.reshape(3,1))
@@ -879,9 +879,9 @@ class Cone2D(SystemConfiguration):
         self.set_origin(self.rotation_axis.position)
 
         if definition=='cil':
-            rotation_matrix = SystemConfiguration.rotation_vec_to_negy(self.source.position - self.detector.position)
+            rotation_matrix = SystemConfiguration.rotation_vec_to_y(self.detector.position - self.source.position)
         if definition=='tigre':
-            rotation_matrix = SystemConfiguration.rotation_vec_to_negy(self.source.position- self.rotation_axis.position)
+            rotation_matrix = SystemConfiguration.rotation_vec_to_y(self.rotation_axis.position - self.source.position)
                 
         self.source.position = rotation_matrix.dot(self.source.position.reshape(2,1))
         self.detector.position = rotation_matrix.dot(self.detector.position.reshape(2,1))
@@ -1015,9 +1015,9 @@ class Cone3D(SystemConfiguration):
         self.align_z()
 
         if definition=='cil':
-            rotation_matrix = SystemConfiguration.rotation_vec_to_negy(self.source.position - self.detector.position)
+            rotation_matrix = SystemConfiguration.rotation_vec_to_y(self.detector.position - self.source.position)
         if definition=='tigre':
-            rotation_matrix = SystemConfiguration.rotation_vec_to_negy(self.source.position - self.rotation_axis.position)
+            rotation_matrix = SystemConfiguration.rotation_vec_to_y(self.rotation_axis.position - self.source.position)
                 
         self.source.position = rotation_matrix.dot(self.source.position.reshape(3,1))
         self.detector.position = rotation_matrix.dot(self.detector.position.reshape(3,1))

@@ -638,9 +638,6 @@ class Parallel2D(SystemConfiguration):
         self.detector.position = rotation_matrix.dot(self.detector.position.reshape(2,1))
         self.detector.direction_x = rotation_matrix.dot(self.detector.direction_x.reshape(2,1))
 
-        if definition=='cil':
-            self.set_origin([self.detector.position[0], self.rotation_axis.position[1]])
-
 
     def system_description(self):
         r'''Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,
@@ -648,20 +645,16 @@ class Parallel2D(SystemConfiguration):
             \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
         '''       
         new = self.copy()
-        new.align_reference_frame()
+        new.align_reference_frame('cil')
 
-
-        new = self.copy()
-        new.align_reference_frame()
         dot_prod = new.ray.direction.dot(new.detector.direction_x)
 
-        if abs(dot_prod)>1e-6:
+        if abs(dot_prod)>1e-10:
             return SystemConfiguration.SYSTEM_ADVANCED
-        elif abs(new.rotation_axis.position[0])>1e-6:
+        elif abs(new.detector.position[0])>1e-10:
             return SystemConfiguration.SYSTEM_OFFSET 
         else:
             return SystemConfiguration.SYSTEM_SIMPLE
-
 
 
     def __str__(self):
@@ -756,9 +749,6 @@ class Parallel3D(SystemConfiguration):
         new_direction_y = rotation_matrix.dot(self.detector.direction_y.reshape(3,1))
         self.detector.set_direction(new_direction_x, new_direction_y)
 
-        if definition=='cil':
-            self.set_origin([self.detector.position[0], self.rotation_axis.position[1],self.detector.position[2]])
-
 
     def system_description(self):
         r'''Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,
@@ -766,7 +756,7 @@ class Parallel3D(SystemConfiguration):
             \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
         '''              
         new = self.copy()
-        new.align_reference_frame()
+        new.align_reference_frame('cil'))
 
 
         dot_prod_a = new.ray.direction.dot(new.detector.direction_x)
@@ -774,19 +764,16 @@ class Parallel3D(SystemConfiguration):
         dot_prod_c = new.detector.direction_x.dot(new.rotation_axis.direction)
         dot_prod_d = new.ray.direction.dot(new.rotation_axis.direction)
 
-        if abs(dot_prod_a)>1e-6 or\
-            abs(dot_prod_b)>1e-6 or\
-            abs(dot_prod_c)>1e-6 or\
-            abs(dot_prod_d)>1e-6: 
+        if abs(dot_prod_a)>1e-10 or\
+            abs(dot_prod_b)>1e-10 or\
+            abs(dot_prod_c)>1e-10 or\
+            abs(dot_prod_d)>1e-10: 
             return SystemConfiguration.SYSTEM_ADVANCED
-
-        elif abs(new.rotation_axis.position[0])>1e-6:
+        elif abs(new.detector.position[0])>1e-6:
             return SystemConfiguration.SYSTEM_OFFSET
         else:
             return SystemConfiguration.SYSTEM_SIMPLE
         
-        return False
-
 
     def __str__(self):
         def csv(val):
@@ -887,9 +874,6 @@ class Cone2D(SystemConfiguration):
         self.detector.position = rotation_matrix.dot(self.detector.position.reshape(2,1))
         self.detector.direction_x = rotation_matrix.dot(self.detector.direction_x.reshape(2,1))
 
-        if definition=='cil':
-            self.set_origin([self.detector.position[0], self.rotation_axis.position[1]])
-
 
     def system_description(self):
         r'''Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,
@@ -897,12 +881,12 @@ class Cone2D(SystemConfiguration):
             \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
         '''           
         new = self.copy()
-        new.align_reference_frame()
+        new.align_reference_frame('cil')
         dot_prod = (new.detector.position - new.source.position).dot(new.detector.direction_x)
 
-        if abs(dot_prod)>1e-6:
+        if abs(dot_prod)>1e-10:
             return SystemConfiguration.SYSTEM_ADVANCED
-        elif abs(new.rotation_axis.position[0])>1e-6:
+        elif abs(new.detector.position[0])>1e-10:
             return SystemConfiguration.SYSTEM_OFFSET 
         else:
             return SystemConfiguration.SYSTEM_SIMPLE
@@ -1025,9 +1009,6 @@ class Cone3D(SystemConfiguration):
         new_direction_y = rotation_matrix.dot(self.detector.direction_y.reshape(3,1))
         self.detector.set_direction(new_direction_x, new_direction_y)
 
-        if definition=='cil':
-            self.set_origin([self.detector.position[0], *self.rotation_axis.position[1:]])
-
 
     def system_description(self):
         r'''Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,
@@ -1035,20 +1016,20 @@ class Cone3D(SystemConfiguration):
             \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
         '''       
         new = self.copy()
-        new.align_reference_frame()
+        new.align_reference_frame('cil')
 
         dot_prod_a = (new.detector.position - new.source.position).dot(new.detector.direction_x)
         dot_prod_b = (new.detector.position - new.source.position).dot(new.detector.direction_y)
         dot_prod_c = (new.detector.direction_x).dot(new.rotation_axis.direction)
         dot_prod_d = (new.detector.position - new.source.position).dot(new.rotation_axis.direction)
 
-        if abs(dot_prod_a)>1e-6 or\
-            abs(dot_prod_b)>1e-6 or\
-            abs(dot_prod_c)>1e-6 or\
-            abs(dot_prod_d)>1e-6: 
+        if abs(dot_prod_a)>1e-10 or\
+            abs(dot_prod_b)>1e-10 or\
+            abs(dot_prod_c)>1e-10 or\
+            abs(dot_prod_d)>1e-10: 
             return SystemConfiguration.SYSTEM_ADVANCED
 
-        elif abs(new.rotation_axis.position[0])>1e-6:
+        elif abs(new.detector.position[0])>1e-10:
             return SystemConfiguration.SYSTEM_OFFSET
         else:
             return SystemConfiguration.SYSTEM_SIMPLE

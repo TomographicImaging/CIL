@@ -756,7 +756,7 @@ class Parallel3D(SystemConfiguration):
             \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
         '''              
         new = self.copy()
-        new.align_reference_frame('cil'))
+        new.align_reference_frame('cil')
 
 
         dot_prod_a = new.ray.direction.dot(new.detector.direction_x)

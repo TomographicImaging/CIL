@@ -28,7 +28,7 @@ import unittest
 from utils import has_cvxpy
 
 if has_cvxpy:
-    import cvxpy as cp
+    import cvxpy
 
 class Test_CIL_vs_CVXPy(unittest.TestCase):
 
@@ -135,29 +135,29 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
         DX, DY = G[1], G[0]
     
         if isotropic:
-            return cp.sum(cp.norm(cp.vstack([DX @ cp.vec(u), DY @ cp.vec(u)]), 2, axis = 0))
+            return cvxpy.sum(cvxpy.norm(cvxpy.vstack([DX @ cvxpy.vec(u), DY @ cvxpy.vec(u)]), 2, axis = 0))
         else:
-            return cp.sum(cp.norm(cp.vstack([DX @ cp.vec(u), DY @ cp.vec(u)]), 1, axis = 0)) 
+            return cvxpy.sum(cvxpy.norm(cvxpy.vstack([DX @ cvxpy.vec(u), DY @ cvxpy.vec(u)]), 1, axis = 0)) 
 
     @unittest.skipUnless(has_cvxpy, "CVXpy not installed")
     def test_cil_vs_cvxpy_totalvariation_isotropic(self):
 
         # solution
-        u_cvx = cp.Variable(self.data.shape)
+        u_cvx = cvxpy.Variable(self.data.shape)
 
         # regularisation parameter
         alpha = 0.1
 
         # fidelity term
-        fidelity = 0.5 * cp.sum_squares(u_cvx - self.data.array)   
+        fidelity = 0.5 * cvxpy.sum_squares(u_cvx - self.data.array)   
         regulariser = (alpha**2) * self.tv_cvxpy_regulariser(u_cvx)
 
         # objective
-        obj =  cp.Minimize( regulariser +  fidelity)
-        prob = cp.Problem(obj, constraints = [])
+        obj =  cvxpy.Minimize( regulariser +  fidelity)
+        prob = cvxpy.Problem(obj, constraints = [])
 
         # Choose solver ( SCS, MOSEK(license needed) )
-        tv_cvxpy = prob.solve(verbose = True, solver = cp.SCS)        
+        tv_cvxpy = prob.solve(verbose = True, solver = cvxpy.SCS)        
 
         # use TotalVariation from CIL (with Fast Gradient Projection algorithm)
         TV = TotalVariation(max_iteration=200)
@@ -175,21 +175,21 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
     def test_cil_vs_cvxpy_totalvariation_anisotropic(self):
 
             # solution
-            u_cvx = cp.Variable(self.data.shape)
+            u_cvx = cvxpy.Variable(self.data.shape)
 
             # regularisation parameter
             alpha = 0.1
 
             # fidelity term
-            fidelity = 0.5 * cp.sum_squares(u_cvx - self.data.array)   
+            fidelity = 0.5 * cvxpy.sum_squares(u_cvx - self.data.array)   
             regulariser = alpha * self.tv_cvxpy_regulariser(u_cvx, isotropic=False)
 
             # objective
-            obj =  cp.Minimize( regulariser +  fidelity)
-            prob = cp.Problem(obj, constraints = [])
+            obj =  cvxpy.Minimize( regulariser +  fidelity)
+            prob = cvxpy.Problem(obj, constraints = [])
 
             # Choose solver ( SCS, MOSEK(license needed) )
-            tv_cvxpy = prob.solve(verbose = True, solver = cp.SCS)        
+            tv_cvxpy = prob.solve(verbose = True, solver = cvxpy.SCS)        
 
             # use TotalVariation from CIL (with Fast Gradient Projection algorithm)
             TV = (alpha/3.0)*TotalVariation(max_iteration=200, isotropic=False)

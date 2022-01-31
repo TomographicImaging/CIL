@@ -56,7 +56,7 @@ class TIGREGeometry(Geometry):
 
         ag_in = ag.copy()
         system = ag_in.config.system
-        system.align_reference_frame()
+        system.align_reference_frame('tigre')
 
 
         #TIGRE's interpolation fp must have the detector outside the reconstruction volume otherwise the ray is clipped 

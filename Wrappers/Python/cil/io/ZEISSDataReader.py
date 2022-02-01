@@ -61,71 +61,6 @@ class ZEISSDataReader(object):
         if file_name is not None:
             self.set_up(file_name = file_name, roi = roi)
 
-    @property
-    def file_name(self):
-        return self._file_name
-
-    def set_file_name(self, file_name):
-        # check if file exists
-        file_name = os.path.abspath(file_name)
-        if not(os.path.isfile(file_name)):
-            raise FileNotFoundError('{}'.format(file_name))
-        
-        file_type = os.path.basename(file_name).split('.')[-1].lower()
-        if file_type not in ['txrm','txm']:
-            raise TypeError('This reader can only process TXRM or TXM files. Got {}'.format(os.path.basename(self.file_name)))
-
-        self._file_type = file_type
-        self._file_name = file_name
-
-
-    @property
-    def full_roi(self):
-
-        default_roi = [ [0,self._metadata_full['number_of_images'],1], 
-                        [0,self._metadata_full['image_height'],1],
-                        [0,self._metadata_full['image_width'],1]] 
-
-        return default_roi
-
-
-    @property
-    def roi(self):
-        return self._roi
-
-    def set_roi(self, roi=None):
-
-        if roi == None:
-            self._roi = roi
-        else:
-
-            if self._file_type == 'txrm':
-                allowed_labels = DataOrder.CIL_AG_LABELS
-                zeis_data_order = {'angle':0, 'vertical':1, 'horizontal':2}
-            else:
-                allowed_labels = DataOrder.CIL_IG_LABELS
-                zeis_data_order = {'vertical':0, 'horizontal_y':1, 'horizontal_x':2}
-
-            # check roi labels and create tuple for slicing    
-            roi_tmp = self.full_roi.copy()   
-
-            for key in roi.keys():
-                if key not in allowed_labels:
-                    raise Exception("Wrong label. Expected dimension labels in {0}, {1}, {2}, Got {}".format(**self.full_roi.keys()), key)
-
-                idx = zeis_data_order[key]
-                if roi[key] != -1:
-                    for i, x in enumerate(roi[key]):
-                        if x is None:
-                            continue
-
-                        if i != 2: #start and stop
-                            roi_tmp[idx][i] = x if x >= 0 else roi_tmp[idx][1] - x
-                        else: #step
-                            roi_tmp[idx][i] =  x if x > 0 else 1
-                                
-            self._roi = roi_tmp
-
 
     def set_up(self, 
                file_name,
@@ -148,15 +83,51 @@ class ZEISSDataReader(object):
         :type roi: dictionary, default None
         '''
 
-        self.set_file_name(file_name)
+        # check if file exists
+        file_name = os.path.abspath(file_name)
+        if not(os.path.isfile(file_name)):
+            raise FileNotFoundError('{}'.format(file_name))
+        
+        file_type = os.path.basename(file_name).split('.')[-1].lower()
+        if file_type not in ['txrm','txm']:
+            raise TypeError('This reader can only process TXRM or TXM files. Got {}'.format(os.path.basename(self.file_name)))
 
-        self._metadata_full = self.read_metadata()
-    
-        self.set_roi(roi)
+        self._file_name = file_name
 
-        if self.roi:       
+
+        metadata_full = self.read_metadata()
+        default_roi = [ [0,metadata_full['number_of_images'],1], 
+                        [0,metadata_full['image_height'],1],
+                        [0,metadata_full['image_width'],1]] 
+
+        if roi is not None:
+            if self._file_type == metadata_full['data geometry'] == 'acquisition':
+                allowed_labels = DataOrder.CIL_AG_LABELS
+                zeis_data_order = {'angle':0, 'vertical':1, 'horizontal':2}
+            else:
+                allowed_labels = DataOrder.CIL_IG_LABELS
+                zeis_data_order = {'vertical':0, 'horizontal_y':1, 'horizontal_x':2}
+
+            # check roi labels and create tuple for slicing    
+            for key in roi.keys():
+                if key not in allowed_labels:
+                    raise Exception("Wrong label. Expected dimension labels in {0}, {1}, {2}, Got {}".format(**allowed_labels, key))
+
+                idx = zeis_data_order[key]
+                if roi[key] != -1:
+                    for i, x in enumerate(roi[key]):
+                        if x is None:
+                            continue
+
+                        if i != 2: #start and stop
+                            default_roi[idx][i] = x if x >= 0 else default_roi[idx][1] - x
+                        else: #step
+                            default_roi[idx][i] =  x if x > 0 else 1
+                                
+            self._roi = default_roi
             self._metadata = self.slice_metadata(self._metadata_full)
         else:
+            self._roi = None
             self._metadata = self._metadata_full
         
         #setup geometry using metadata

@@ -90,18 +90,18 @@ class ZEISSDataReader(object):
         
         file_type = os.path.basename(file_name).split('.')[-1].lower()
         if file_type not in ['txrm','txm']:
-            raise TypeError('This reader can only process TXRM or TXM files. Got {}'.format(os.path.basename(self.file_name)))
+            raise TypeError('This reader can only process TXRM or TXM files. Got {}'.format(os.path.basename(file_name)))
 
-        self._file_name = file_name
+        self.file_name = file_name
 
 
-        metadata_full = self.read_metadata()
-        default_roi = [ [0,metadata_full['number_of_images'],1], 
-                        [0,metadata_full['image_height'],1],
-                        [0,metadata_full['image_width'],1]] 
+        metadata = self.read_metadata()
+        default_roi = [ [0,metadata['number_of_images'],1], 
+                        [0,metadata['image_height'],1],
+                        [0,metadata['image_width'],1]] 
 
         if roi is not None:
-            if self._file_type == metadata_full['data geometry'] == 'acquisition':
+            if metadata['data geometry'] == 'acquisition':
                 allowed_labels = DataOrder.CIL_AG_LABELS
                 zeis_data_order = {'angle':0, 'vertical':1, 'horizontal':2}
             else:
@@ -111,7 +111,7 @@ class ZEISSDataReader(object):
             # check roi labels and create tuple for slicing    
             for key in roi.keys():
                 if key not in allowed_labels:
-                    raise Exception("Wrong label. Expected dimension labels in {0}, {1}, {2}, Got {}".format(**allowed_labels, key))
+                    raise Exception("Wrong label, got {0}. Expected dimension labels in {1}, {2}, {3}".format(key,**allowed_labels))
 
                 idx = zeis_data_order[key]
                 if roi[key] != -1:
@@ -125,13 +125,13 @@ class ZEISSDataReader(object):
                             default_roi[idx][i] =  x if x > 0 else 1
                                 
             self._roi = default_roi
-            self._metadata = self.slice_metadata(self._metadata_full)
+            self._metadata = self.slice_metadata(metadata)
         else:
-            self._roi = None
-            self._metadata = self._metadata_full
+            self._roi = False
+            self._metadata = metadata
         
         #setup geometry using metadata
-        if self._metadata_full['data geometry'] == 'acquisition':
+        if metadata['data geometry'] == 'acquisition':
             self._setup_acq_geometry()
         else:
             self._setup_image_geometry()
@@ -235,7 +235,7 @@ class ZEISSDataReader(object):
         '''
         # Load projections or slices from file
         slice_range = None
-        if self.roi:
+        if self._roi:
             slice_range = tuple(self._roi)
         data, _ = dxchange.read_txrm(self.file_name,slice_range)
         

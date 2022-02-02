@@ -630,10 +630,15 @@ class Parallel2D(SystemConfiguration):
 
     def align_reference_frame(self, definition='cil'):
         r'''Transforms and rotates the system to backend definitions
-        '''          
+        '''
+        #in this instance defintions are the same
+        if definition not in ['cil','tigre']:
+            raise ValueError("Geometry can be configured for definition = 'cil' or 'tigre'  only. Got {}".format(definition))
+
         self.set_origin(self.rotation_axis.position)
+
         rotation_matrix = SystemConfiguration.rotation_vec_to_y(self.ray.direction)
-                
+
         self.ray.direction = rotation_matrix.dot(self.ray.direction.reshape(2,1))
         self.detector.position = rotation_matrix.dot(self.detector.position.reshape(2,1))
         self.detector.direction_x = rotation_matrix.dot(self.detector.direction_x.reshape(2,1))
@@ -739,7 +744,11 @@ class Parallel3D(SystemConfiguration):
 
     def align_reference_frame(self, definition='cil'):
         r'''Transforms and rotates the system to backend definitions
-        '''          
+        '''
+        #in this instance defintions are the same
+        if definition not in ['cil','tigre']:
+            raise ValueError("Geometry can be configured for definition = 'cil' or 'tigre'  only. Got {}".format(definition))
+
         self.align_z()
         rotation_matrix = SystemConfiguration.rotation_vec_to_y(self.ray.direction)
                 
@@ -867,9 +876,11 @@ class Cone2D(SystemConfiguration):
 
         if definition=='cil':
             rotation_matrix = SystemConfiguration.rotation_vec_to_y(self.detector.position - self.source.position)
-        if definition=='tigre':
+        elif definition=='tigre':
             rotation_matrix = SystemConfiguration.rotation_vec_to_y(self.rotation_axis.position - self.source.position)
-                
+        else:
+            raise ValueError("Geometry can be configured for definition = 'cil' or 'tigre'  only. Got {}".format(definition))
+
         self.source.position = rotation_matrix.dot(self.source.position.reshape(2,1))
         self.detector.position = rotation_matrix.dot(self.detector.position.reshape(2,1))
         self.detector.direction_x = rotation_matrix.dot(self.detector.direction_x.reshape(2,1))
@@ -1000,9 +1011,11 @@ class Cone3D(SystemConfiguration):
 
         if definition=='cil':
             rotation_matrix = SystemConfiguration.rotation_vec_to_y(self.detector.position - self.source.position)
-        if definition=='tigre':
+        elif definition=='tigre':
             rotation_matrix = SystemConfiguration.rotation_vec_to_y(self.rotation_axis.position - self.source.position)
-                
+        else:
+            raise ValueError("Geometry can be configured for definition = 'cil' or 'tigre'  only. Got {}".format(definition))
+                            
         self.source.position = rotation_matrix.dot(self.source.position.reshape(3,1))
         self.detector.position = rotation_matrix.dot(self.detector.position.reshape(3,1))
         new_direction_x = rotation_matrix.dot(self.detector.direction_x.reshape(3,1))

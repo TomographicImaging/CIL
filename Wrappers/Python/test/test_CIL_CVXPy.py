@@ -38,7 +38,7 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
         self.data = dataexample.CAMERA.get(size=(32, 32))
 
     
-    # Create gradient operator as sparse matrix that will be used in CVXpy
+    # Create gradient operator as a sparse matrix that will be used in CVXpy to define Gradient based regularisers
     def sparse_gradient_matrix(self, shape, direction='forward', order=1, boundaries='Neumann', **kwargs):
         
         len_shape = len(shape)    
@@ -72,14 +72,31 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
                     elif boundaries == 'Periodic':
                         mat[0,-1] = -1
 
-                # Use Kronecker product to compute the full sparse matrix for the finite difference operator according to the direction.
+                # Use Kronecker product to compute the full sparse matrix representing the GradientOperator. This will be applied
+                # to a "flatten" array, i.e., a vector and "the reshaped" result describes the forward/backward differences for all
+                # the directions from "len_shape" and under different boundary conditions, e.g., Neumann and Periodic.
+
+                # The difference with the GradientOperator.py and FiniteDifferenceOperator.py is that we do not store in memory a matrix
+                # in order to compute the matrix-vector multiplication "A*x". This is also known as "matrix free" optimisation problem.
+                # However, to set up and use the API of CVXpy, we need this matrix representation of a linear operator such as the GradientOperator.
+                # 
+                # The following constructs the finite complete difference matrix for all (len_shape) dimensions and store the ith finite 
+                # difference matrix in allmat[i].  In 2D we have
+                # allmat[0] = D kron I
+                # allmat[1] = I kron D
+                # and in 3D
+                # allmat[0] = D kron I kron I
+                # allmat[1] = I kron D kron I
+                # allmat[2] = I kron I kron D
+                # and so on, for kron meaning the kronecker product.
+                
                 # For a (n x m) array, the forward difference operator in y-direction (x-direction) (with Neumann/Periodic bc) is a (n*m x n*m) sparse array containing -1,1.
                 # Example, for a 3x3 array U, the forward difference operator in y-direction with Neumann bc is a 9x9 sparse array containing -1,1.
                 # To create this sparse matrix, we first create a "kernel" matrix, shown below:
                 # mat = [-1, 1, 0
                 #        0, -1, 1,
                 #        0, 0, 0].
-                # and then use the Kronecker product: allMat[0] = mat x I_m =
+                # where the last row is filled with zeros due to the Neumann boundary condition. Then, we use the Kronecker product: allMat[0] = mat x I_m =
                 # matrix([[-1., 1., 0., 0., 0., 0., 0., 0., 0.],
                 #         [ 0., -1., 1., 0., 0., 0., 0., 0., 0.],
                 #         [ 0., 0., 0., 0., 0., 0., 0., 0., 0.],
@@ -101,12 +118,11 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
                 #       ...       ,
                 #       ...       ,
                 #       ...       ]
-
                 # For the x-direction, we have allmat[1] = I_n x mat.
 
                 # For more details, see "Infimal Convolution Regularizations with Discrete l1-type Functionals, S. Setzer, G. Steidl and T. Teuber"
           
-                # According to the directions, tmpGrad is either a kernel matrix or sparse eye array, which is updated 
+                # According to the direction, tmpGrad is either a kernel matrix or sparse eye array, which is updated 
                 # using the kronecker product to derive the sparse matrices.
                 if i==0:
                     tmpGrad = mat

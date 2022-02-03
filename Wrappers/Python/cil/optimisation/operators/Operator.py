@@ -52,8 +52,8 @@ class Operator(object):
         so in case you want to recalculate by setting a higher number of iterations or changing the
         starting point or both you need to set :code:`force=True`
 
-        :param iterations: number of iterations to run
-        :type iterations: int, optional, default = 25
+        :param max_iteration: number of iterations to run the Power method
+        :type max_iteration: int, optional, default = 25
         :param x_init: starting point for the iteration in the operator domain
         :type x_init: same type as domain, a subclass of :code:`DataContainer`, optional, default None
         :parameter force: forces the recalculation of the norm

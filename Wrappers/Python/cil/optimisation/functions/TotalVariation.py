@@ -54,6 +54,8 @@ class TotalVariation(Function):
       :type split: bool, default `False`           
       :param info: force a print to screen stating the stop
       :type info: bool, default `False`
+      :param strongly_convex_constant: Adds a strongly convex function to the TotalVariation functional.
+      :type: float, default = 0
 
       :Example:
  
@@ -81,7 +83,8 @@ class TotalVariation(Function):
                  upper = np.inf,
                  isotropic = True,
                  split = False,
-                 info = False, strongly_convex_constant = 0):
+                 info = False, 
+                 strongly_convex_constant = 0):
         
 
         super(TotalVariation, self).__init__(L = None)
@@ -107,7 +110,6 @@ class TotalVariation(Function):
         self.tmp_proj_C = IndicatorBox(lower, upper).proximal
                         
         # Setup GradientOperator as None. This is to avoid domain argument in the __init__     
-
         self._gradient = None
         self._domain = None
 
@@ -140,11 +142,16 @@ class TotalVariation(Function):
             self._domain = x.geometry
         except:
             self._domain = x
+        
+        if self.strongly_convex_constant>0:
+            tmp = ((self.strongly_convex_constant/2)*x.squared_norm())
+        else:
+            tmp = 0
         # evaluate objective function of TV gradient
         if self.isotropic:
-            return self.regularisation_parameter * self.gradient.direct(x).pnorm(2).sum()
+            return self.regularisation_parameter * (self.gradient.direct(x).pnorm(2).sum() + tmp)
         else:
-            return self.regularisation_parameter * self.gradient.direct(x).pnorm(1).sum() 
+            return self.regularisation_parameter * self.gradient.direct(x).pnorm(1).sum() + tmp
     
     
     def projection_C(self, x, out=None):   

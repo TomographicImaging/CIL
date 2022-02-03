@@ -959,7 +959,6 @@ class TestTotalVariation(unittest.TestCase):
 
         x_real = self.ig_real.allocate('random', seed=4)  
         
-
         res1 = self.tv_iso(x_real)
         res2 = self.grad.direct(x_real).pnorm(2).sum()
         np.testing.assert_equal(res1, res2)  
@@ -970,7 +969,47 @@ class TestTotalVariation(unittest.TestCase):
         
         res1 = self.tv_aniso(x_real)
         res2 = self.grad.direct(x_real).pnorm(1).sum()
-        np.testing.assert_equal(res1, res2)                
+        np.testing.assert_equal(res1, res2)     
+
+    def test_strongly_convex_TV(self):
+
+        TV_no_strongly_convex = self.alpha * TotalVariation()
+        self.assertEqual(TV_no_strongly_convex.strongly_convex_constant, 0)
+
+        # TV as strongly convex, with "small" strongly convex constant
+        TV_strongly_convex = self.alpha * TotalVariation(strongly_convex_constant=1e-3)
+
+        # check call
+        x_real = self.ig_real.allocate('random', seed=4) 
+        res1 = TV_strongly_convex(x_real)
+        res2 = TV_no_strongly_convex(x_real) + (TV_strongly_convex.strongly_convex_constant/2)*x_real.squared_norm()
+        np.testing.assert_allclose(res1, res2, atol=1e-3)
+
+        # check proximal
+        res1 = TV_no_strongly_convex.proximal(x_real, tau=1.0)
+        res2 = TV_strongly_convex.proximal(x_real, tau=1.0)  
+        np.testing.assert_allclose(res1.array, res2.array, atol=1e-3) 
+
+    @unittest.skipUnless(has_reg_toolkit, "Regularisation Toolkit not present")
+    def test_strongly_convex_CIL_FGP_TV(self):
+
+        FGP_TV_no_strongly_convex = self.alpha * FGP_TV()
+        self.assertEqual(FGP_TV_no_strongly_convex.strongly_convex_constant, 0)
+
+        # TV as strongly convex, with "small" strongly convex constant
+        FGP_TV_strongly_convex = self.alpha * FGP_TV(strongly_convex_constant=1e-3)
+
+        # check call
+        x_real = self.ig_real.allocate('random', seed=4) 
+        res1 = FGP_TV_strongly_convex(x_real)
+        res2 = FGP_TV_no_strongly_convex(x_real) + (FGP_TV_strongly_convex.strongly_convex_constant/2)*x_real.squared_norm()
+        np.testing.assert_allclose(res1, res2, atol=1e-3)
+
+        # check proximal
+        res1 = FGP_TV_no_strongly_convex.proximal(x_real, tau=1.0)
+        res2 = FGP_TV_strongly_convex.proximal(x_real, tau=1.0)  
+        np.testing.assert_allclose(res1.array, res2.array, atol=1e-3)           
+
     
     @unittest.skipUnless(has_reg_toolkit, "Regularisation Toolkit not present")
     def test_compare_regularisation_toolkit(self):
@@ -1093,6 +1132,7 @@ class TestTotalVariation(unittest.TestCase):
         # print (t3-t2)
         
         np.testing.assert_allclose(res1.as_array(), res2.as_array(), atol=7.5e-2)
+
 
 
 class TestKullbackLeiblerNumba(unittest.TestCase):

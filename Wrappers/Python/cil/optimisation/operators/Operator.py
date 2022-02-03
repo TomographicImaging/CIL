@@ -119,7 +119,7 @@ class LinearOperator(Operator):
         raise NotImplementedError
     
     @staticmethod
-    def PowerMethod(operator, iterations=10, initial=None, tolerance = 1e-5, verbose=False, x_init=None):
+    def PowerMethod(operator, max_iteration=10, initial=None, tolerance = 1e-5, verbose=False, x_init=None):
 
         r"""Power method or Power iteration algorithm 
         
@@ -131,14 +131,15 @@ class LinearOperator(Operator):
         ----------
 
         operator: LinearOperator
-        iterations: positive:`int`, default=10
+        max_iteration: positive:`int`, default=10
             Number of iterations for the Power method algorithm.
         initial: DataContainer, default = None
             Starting point for the Power method.
         tolerance: positive:`float`, default = 1e-5
             Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below the tolerance.                    
         verbose: boolean, default = False
-            Returns: dominant eigenvalue, number of iterations, corresponding eigenvector, list of eigenvalue estimations.
+            Returns: dominant eigenvalue, number of iterations (either maximum number of iterations or number of iterations if tolerance is reached),
+            corresponding eigenvector, list of eigenvalue estimations.
         x_init: DataContainer, default = None
             Starting point for the Power method (deprecated).        
 
@@ -169,10 +170,6 @@ class LinearOperator(Operator):
 
         """
 
-        if x_init is not None:
-            warnings.warn('The x_init parameter is deprecated and will be removed in following version. Use initial instead.')
-            initial = x_init.copy()
-
         # Default case: non-symmetric
         symmetric = False
 
@@ -181,10 +178,18 @@ class LinearOperator(Operator):
             symmetric = True
         
         # Initialise random or by the user
-        if initial is None:
-            x0 = operator.domain_geometry().allocate('random')
+        if x_init is not None:
+            warnings.warn('The use of the x_init parameter is deprecated and will be removed in following version. Use initial instead.')
+            if initial is None:
+                x0 = x_init.copy()
+            else:
+                raise ValueError('Received both initial and the deprecated x_init parameter. It is not clear which one we should use.')                                          
         else:
-            x0 = initial.copy()
+            if initial is None:
+                x0 = operator.domain_geometry().allocate('random')
+            else:
+                x0 = initial.copy()
+
 
         # Normalize first eigenvector
         x0_norm = x0.norm()
@@ -199,7 +204,11 @@ class LinearOperator(Operator):
         # list of eigenvalues
         eig_list = []
 
-        for i in range(iterations):
+
+        diff = numpy.finfo('d').max
+        i = 0
+
+        while (i < max_iteration and diff > tolerance):
 
             if symmetric:                
                 operator.direct(x0, y_tmp)
@@ -218,26 +227,24 @@ class LinearOperator(Operator):
             else:
                 eig_new = numpy.sqrt(numpy.abs(x0_norm))
 
-            eig_list.append(eig_new)                
-            
-            # Stopping criterion of two consecutive eigenvalues
-            if i>0 and numpy.abs(eig_new - eig_old) < tolerance :
-                break
+            diff = numpy.abs(eig_new - eig_old)
+                    
             eig_old = eig_new       
 
         if verbose:
+            eig_list.append(eig_new)                    
             return eig_new, i, x0, eig_list
         else:
             return eig_new
             
 
-    def calculate_norm(self, iterations=10, initial=None, tolerance = 1e-5, verbose=False, x_init=None, **kwargs):
+    def calculate_norm(self, max_iteration=10, initial=None, tolerance = 1e-5, verbose=False, x_init=None, **kwargs):
         
         r""" Returns the norm of the LinearOperator calculated by the PowerMethod.
         
         Parameters
         ----------
-        iterations: positive:`int`, default=10
+        max_iteration: positive:`int`, default=10
             Number of iterations for the Power method.
         initial: DataContainer, default = None
             Starting point for the Power method.
@@ -250,7 +257,7 @@ class LinearOperator(Operator):
 
 
         """
-        s1 = LinearOperator.PowerMethod(self, iterations=iterations, initial=initial, tolerance=tolerance, verbose=verbose, x_init = x_init)
+        s1 = LinearOperator.PowerMethod(self, max_iteration=max_iteration, initial=initial, tolerance=tolerance, verbose=verbose, x_init = x_init)
         return s1
 
 
@@ -547,13 +554,6 @@ class CompositionOperator(Operator):
     def is_linear(self):
         return self.linear_flag             
             
-    def calculate_norm(self, **kwargs):
-        if self.is_linear():
-            #return LinearOperator.calculate_norm(self, **kwargs)
-            x0 = kwargs.get('x_init', None)
-            iterations = kwargs.get('iterations', 25)
-            s1, sall, svec = LinearOperator.PowerMethod(self, iterations, x_init=x0)
-            return s1
 
 
 

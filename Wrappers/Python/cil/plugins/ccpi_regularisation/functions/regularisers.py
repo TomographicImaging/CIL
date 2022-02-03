@@ -80,10 +80,18 @@ class RegulariserFunction(Function):
         pass
 
 class TV_Base(RegulariserFunction):
+
+    def __init__(self, strongly_convex_constant = 0):
+
+        self.strongly_convex_constant = strongly_convex_constant
+
     def __call__(self,x):
         in_arr = np.asarray(x.as_array(), dtype=np.float32, order='C')
         EnergyValTV = TV_ENERGY(in_arr, in_arr, self.alpha, 2)
-        return 0.5*EnergyValTV[0]
+        if self.strongly_convex_constant>0:
+            return 0.5*EnergyValTV[0] + (self.strongly_convex_constant/2)*(in_arr**2).sum()
+        else:
+            return 0.5*EnergyValTV[0]
 
     def convex_conjugate(self,x):     
         return 0.0
@@ -106,6 +114,9 @@ class FGP_TV(TV_Base):
         :type tolerance: float, default 0
         :param device: determines if the code runs on CPU or GPU
         :type device: string, default 'cpu', can be 'gpu' if GPU is installed
+        :param strongly_convex_constant: Adds a strongly convex function to the TotalVariation functional.
+        :type: float, default = 0
+
         '''
         if isotropic == True:
             self.methodTV = 0
@@ -122,7 +133,9 @@ class FGP_TV(TV_Base):
         self.tolerance = tolerance
         self.nonnegativity = nonnegativity
         self.device = device # string for 'cpu' or 'gpu'
-        self.strongly_convex_constant = strongly_convex_constant
+
+        super(FGP_TV, self).__init__(strongly_convex_constant=strongly_convex_constant)
+
 
     def proximal_numpy(self, in_arr, tau):
 
@@ -365,3 +378,4 @@ class TNV(RegulariserFunction):
         if ( input.geometry.channels == 1 ) or ( not input.geometry.length == 3) :
             raise ValueError('TNV requires 2D+channel data. Got {}'.format(input.geometry.dimension_labels))
         
+

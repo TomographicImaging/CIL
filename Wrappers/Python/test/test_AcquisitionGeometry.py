@@ -360,90 +360,92 @@ class AlignGeometries(unittest.TestCase):
     def test_rotation_vec_to_y(self):
 
         M = SystemConfiguration.rotation_vec_to_y([0,1])
-        a = numpy.matrix('1 0; 0 1')
+        a = numpy.array([[1, 0],[0, 1]])
         numpy.testing.assert_allclose(M,a, atol=1e-6)
         
         M = SystemConfiguration.rotation_vec_to_y([0,-1])
-        a = numpy.matrix('-1 0; 0 -1')
+        a = numpy.array([[-1, 0],[0, -1]])
         numpy.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_y([1,1])
-        a = numpy.matrix('0.70710678 -0.70710678; 0.70710678 0.70710678')
+        a = numpy.array([[0.70710678, -0.70710678],[0.70710678, 0.70710678]])
         numpy.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_y([1,-1])
-        a = numpy.matrix('-0.70710678 -0.70710678; 0.70710678 -0.70710678')
+        a = numpy.array([[-0.70710678, -0.70710678],[0.70710678, -0.70710678]])
         numpy.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_y([0,1,0])
-        a = numpy.matrix('1 0 0; 0 1 0; 0 0 1')
+        a = numpy.array([[1, 0, 0],[0, 1, 0],[0, 0, 1]])        
         numpy.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_y([0,-1,0])
-        a = numpy.matrix('-1 0 0; 0 -1 0; 0 0 1')
+        a = numpy.array([[-1, 0, 0],[0, -1, 0],[0, 0, 1]])             
         numpy.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_y([0,1,1])
-        a = numpy.matrix('1 0 0; 0 1 0; 0 0 1')
+        a = numpy.array([[1, 0, 0],[0, 1, 0],[0, 0, 1]])     
         numpy.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_y([0,-1,1])
-        a = numpy.matrix('-1 0 0; 0 -1 0; 0 0 1')
+        a = numpy.array([[-1, 0, 0],[0, -1, 0],[0, 0, 1]])             
         numpy.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_y([1,1,0])
-        a = numpy.matrix('0.70710678 -0.70710678 0; 0.70710678 0.70710678 0; 0 0 1')
+        a = numpy.array([[0.70710678, -0.70710678, 0],[0.70710678, 0.70710678, 0],[0, 0, 1]])       
         numpy.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_y([1,-1,0])
-        a = numpy.matrix('-0.70710678 -0.70710678 0; 0.70710678 -0.70710678 0; 0 0 1')
+        a = numpy.array([[-0.70710678, -0.70710678, 0],[0.70710678, -0.70710678, 0],[0, 0, 1]])               
         numpy.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_y([1,-1,1])
-        a = numpy.matrix('-0.70710678 -0.70710678 0; 0.70710678 -0.70710678 0; 0 0 1')
+        a = numpy.array([[-0.70710678, -0.70710678, 0],[0.70710678, -0.70710678, 0],[0, 0, 1]])       
         numpy.testing.assert_allclose(M,a, atol=1e-6)
 
 
     def test_rotation_vec_z(self):
 
         M = SystemConfiguration.rotation_vec_to_z([0,0,1])
-        a = numpy.matrix('1 0 0; 0 1 0; 0 0 1')
+        a = numpy.array([[1, 0, 0],[0, 1, 0],[0, 0, 1]])   
         numpy.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_z([0,0,-1])
-        a = numpy.matrix('1 0 0; 0 -1 0; 0 0 -1')
+        a = numpy.array([[1, 0, 0],[0, -1, 0],[0, 0, -1]])           
         numpy.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_z([1,0,0])
-        a = numpy.matrix('0 0 -1; 0 1 0; 1 0 0')
+        a = numpy.array([[0, 0, -1],[0, 1, 0],[1, 0, 0]])           
         numpy.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_z([-1,0,0])
-        a = numpy.matrix('0 0 1; 0 1 0; -1 0 0')
+        a = numpy.array([[0, 0, 1],[0, 1, 0],[-1, 0, 0]])           
         numpy.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_z([0,1,0])
-        a = numpy.matrix('1 0 0; 0 0 -1; 0 1 0')
+        a = numpy.array([[1, 0, 0],[0, 0, -1],[0, 1, 0]])           
         numpy.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_z([0,-1,0])
-        a = numpy.matrix('1 0 0; 0 0 1; 0 -1 0')
+        a = numpy.array([[1, 0, 0],[0, 0, 1],[0, -1, 0]])  
         numpy.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_z([1,-1,0])
-        a = numpy.matrix('0.5  0.5 -0.70710678; 0.5 0.5 0.70710678; 0.70710678 -0.70710678 0')
+        a = numpy.array([[0.5, 0.5, -0.70710678],[0.5, 0.5, 0.70710678],[0.70710678, -0.70710678, 0]])          
         numpy.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_z([1,0,1])
-        a = numpy.matrix('0.70710678  0 -0.70710678; 0 1 0; 0.70710678 0 0.70710678')
+        a = numpy.array([[0.70710678, 0, -0.70710678],[0,1,0],[0.70710678, 0, 0.70710678]])          
         numpy.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_z([0,1,-1])
-        a = numpy.matrix('1 0 0; 0 -0.70710678 -0.70710678; 0 0.70710678 -0.70710678')
+        a = numpy.array([[1,0,0],[0, -0.70710678, -0.70710678],[0, 0.70710678, -0.70710678]])          
+
         numpy.testing.assert_allclose(M,a, atol=1e-6)
 
         M = SystemConfiguration.rotation_vec_to_z([-1,-1,-1])
-        a = numpy.matrix('0.21132491 -0.78867509 0.57735025; -0.78867509 0.21132491 0.57735025; -0.57735025 -0.57735025 -0.57735025')
+        a = numpy.array([[0.21132491, -0.78867509, 0.57735025],[ -0.78867509, 0.21132491, 0.57735025],[-0.57735025, -0.57735025, -0.57735025]])          
+
         numpy.testing.assert_allclose(M,a, atol=1e-6)
 
 

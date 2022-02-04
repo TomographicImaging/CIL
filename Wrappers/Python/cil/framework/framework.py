@@ -539,7 +539,7 @@ class SystemConfiguration(object):
         vec = ComponentDescription.CreateUnitVector(vec)
 
         if len(vec) == 2:
-            return numpy.matrix('1 0; 0 1')
+            return numpy.array([[1, 0],[0, 1]])
 
         elif len(vec) == 3:
             axis_rotation = numpy.eye(3)

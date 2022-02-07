@@ -548,10 +548,8 @@ class TestGradients(CCPiTestClass):
         
         E3 = SymmetrisedGradientOperator(Grad3.range_geometry())
 
-        norm1 = E3.norm()
-        norm2 = E3.calculate_norm(iterations=100)
-        print (norm1,norm2)
-        numpy.testing.assert_almost_equal(norm2, numpy.sqrt(12), decimal = self.decimal)
+        norm = LinearOperator.PowerMethod(E3,max_iteration=100, tolerance = 0)
+        numpy.testing.assert_almost_equal(norm, numpy.sqrt(12), decimal = self.decimal)
         
     def test_SymmetrisedGradientOperator3b(self):
         ###########################################################################

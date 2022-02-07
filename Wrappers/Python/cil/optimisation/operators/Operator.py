@@ -40,29 +40,32 @@ class Operator(object):
     def direct(self,x, out=None):
         '''Returns the application of the Operator on x'''
         raise NotImplementedError
-    def norm(self, **kwargs):
-        '''Returns the norm of the Operator
-        
-        Calling norm triggers the calculation of the norm of the operator. Normally this
-        is a computationally expensive task, therefore we store the result of norm into 
-        a member of the class. If the calculation has already run, following calls to 
-        norm just return the saved member. 
-        It is possible to force recalculation by setting the optional force parameter. Notice that
-        norm doesn't take notice of how many iterations or of the initialisation of the PowerMethod, 
-        so in case you want to recalculate by setting a higher number of iterations or changing the
-        starting point or both you need to set :code:`force=True`
 
-        :param max_iteration: number of iterations to run the Power method
-        :type max_iteration: int, optional, default = 25
-        :param x_init: starting point for the iteration in the operator domain
-        :type x_init: same type as domain, a subclass of :code:`DataContainer`, optional, default None
-        :parameter force: forces the recalculation of the norm
-        :type force: boolean, default :code:`False`
+
+    def norm(self, **kwargs):
+        '''Returns the norm of the Operator. On first call the norm will be calculated using the operator's calculate_norm
+        method. Subsequent calls will return the cached norm.
+
+        Returns
+        -------
+        norm: positive:`float`
         '''
-        if self._norm is None or kwargs.get('force', False):
-            self._norm = self.calculate_norm(**kwargs)
+
+        if len(kwargs) != 0:
+            warnings.warn('norm: the norm method does not use any parameters.\n\
+                For LinearOperators you can use PowerMethod to calculate the norm with non-default parameters and use set_norm to set it')
+
+        if self._norm is None:
+            self._norm = self.calculate_norm()
+
         return self._norm
-    def calculate_norm(self, **kwargs):
+
+    def set_norm(self,norm=None):
+        '''Sets the norm of the operator to a custom value.
+        '''
+        self._norm = norm
+
+    def calculate_norm(self):
         '''Calculates the norm of the Operator'''
         raise NotImplementedError
     def range_geometry(self):
@@ -119,7 +122,7 @@ class LinearOperator(Operator):
         raise NotImplementedError
     
     @staticmethod
-    def PowerMethod(operator, max_iteration=10, initial=None, tolerance = 1e-5, verbose=False, x_init=None):
+    def PowerMethod(operator, max_iteration=10, initial=None, tolerance = 1e-5,  verbose=False,  **deprecated_args):
 
         r"""Power method or Power iteration algorithm 
         
@@ -138,21 +141,18 @@ class LinearOperator(Operator):
         tolerance: positive:`float`, default = 1e-5
             Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below the tolerance.                    
         verbose: boolean, default = False
-            Returns: dominant eigenvalue, number of iterations (either maximum number of iterations or number of iterations if tolerance is reached),
-            corresponding eigenvector, list of eigenvalue estimations.
-        x_init: DataContainer, default = None
-            Starting point for the Power method (deprecated).        
+            Toggles the verbosity of the return
+    
 
         Returns
         -------
-
         dominant eigenvalue: positive:`float`
         number of iterations: positive:`int`
-            Number of iterations for the Power method algorithm, if verbose = True
+            Number of iterations run. Only returned if verbose = True.
         eigenvector: DataContainer
-            Corresponding eigenvector of the dominant eigenvalue, if verbose = True
+            Corresponding eigenvector of the dominant eigenvalue. Only returned if verbose = True.
         list of eigenvalues: :obj:`list`
-            List of eigenvalues, if verbose = True
+            List of eigenvalues. Only returned if verbose = True.
 
         Examples
         --------    
@@ -170,95 +170,79 @@ class LinearOperator(Operator):
 
         """
 
+        #deal with deprecated arguments
+        if deprecated_args.get('x_init') is not None:
+            warnings.warn('PowerMethod: The use of the x_init parameter is deprecated and will be removed in following version. Please use initial instead.')
+            if initial is None:
+                initial = deprecated_args.get('x_init')
+            else:
+                raise ValueError('PowerMethod: received both initial and the deprecated x_init parameter. Please use initial only.')
+
+        if deprecated_args.get('iterations') is not None:
+            warnings.warn('PowerMethod: The use of the iterations parameter is deprecated and will be removed in following version. Please use max_iteration instead.')      
+            max_iteration = deprecated_args.get('iterations')
+
+
         # Default case: non-symmetric
         symmetric = False
-
-        # symmetric case  
         if operator.domain_geometry()==operator.range_geometry():
             symmetric = True
-        
-        # Initialise random or by the user
-        if x_init is not None:
-            warnings.warn('The use of the x_init parameter is deprecated and will be removed in following version. Use initial instead.')
-            if initial is None:
-                x0 = x_init.copy()
-            else:
-                raise ValueError('Received both initial and the deprecated x_init parameter. It is not clear which one we should use.')                                          
-        else:
-            if initial is None:
-                x0 = operator.domain_geometry().allocate('random')
-            else:
-                x0 = initial.copy()
 
+        if initial is None:
+            x0 = operator.domain_geometry().allocate('random')
+        else:
+            x0 = initial.copy()
+
+        y_tmp = operator.range_geometry().allocate()
 
         # Normalize first eigenvector
         x0_norm = x0.norm()
         x0 /= x0_norm
-            
-        # allocate space on the range geometry
-        y_tmp = operator.range_geometry().allocate()
+
+
+
 
         # initial guess for dominant eigenvalue
         eig_old = 1.
 
-        # list of eigenvalues
         eig_list = []
-
-
         diff = numpy.finfo('d').max
         i = 0
-
         while (i < max_iteration and diff > tolerance):
 
+            operator.direct(x0, out = y_tmp)
+
             if symmetric:                
-                operator.direct(x0, y_tmp)
-                # in-place?
-                x0 = y_tmp.copy()
+                #swap datacontainer references
+                tmp = x0
+                x0 = y_tmp
+                y_tmp = tmp
             else:
-                operator.direct(x0, out = y_tmp)
                 operator.adjoint(y_tmp,out=x0)
             
             # Get eigenvalue using Rayleigh quotient: denominator=1, due to normalization
             x0_norm = x0.norm()
             x0 /= x0_norm
 
-            if symmetric:
-                eig_new =  numpy.abs(x0_norm)
-            else:
-                eig_new = numpy.sqrt(numpy.abs(x0_norm))
+            eig_new =  numpy.abs(x0_norm)
+            if not symmetric:
+                eig_new = numpy.sqrt(eig_new)
 
             diff = numpy.abs(eig_new - eig_old)
-                    
+            eig_list.append(eig_new)   
             eig_old = eig_new       
 
         if verbose:
-            eig_list.append(eig_new)                    
             return eig_new, i, x0, eig_list
         else:
             return eig_new
             
 
-    def calculate_norm(self, max_iteration=10, initial=None, tolerance = 1e-5, verbose=False, x_init=None, **kwargs):
+    def calculate_norm(self):
         
-        r""" Returns the norm of the LinearOperator calculated by the PowerMethod.
-        
-        Parameters
-        ----------
-        max_iteration: positive:`int`, default=10
-            Number of iterations for the Power method.
-        initial: DataContainer, default = None
-            Starting point for the Power method.
-        tolerance: positive:`float`, default = 1e-5
-            Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below this tolerance.                    
-        verbose: boolean, default = False
-            Returns: dominant eigenvalue (False) or dominant eigenvalue, number of iterations, corresponding eigenvector, list of eigenvalue estimations.
-        x_init: DataContainer, default = None
-            Starting point for the Power method (deprecated).   
-
-
-        """
-        s1 = LinearOperator.PowerMethod(self, max_iteration=max_iteration, initial=initial, tolerance=tolerance, verbose=verbose, x_init = x_init)
-        return s1
+        r""" Returns the norm of the LinearOperator calculated by the PowerMethod with default values.
+                """
+        return LinearOperator.PowerMethod(self)
 
 
     @staticmethod
@@ -412,7 +396,6 @@ class SumOperator(Operator):
         if out is None:
             return self.operator1.direct(x) + self.operator2.direct(x)
         else:
-            #TODO check if allcating with tmp is faster            
             self.operator1.direct(x, out=out)
             out.add(self.operator2.direct(x), out=out)     
 
@@ -422,7 +405,6 @@ class SumOperator(Operator):
             if out is None:
                 return self.operator1.adjoint(x) + self.operator2.adjoint(x)
             else:
-                #TODO check if allcating with tmp is faster            
                 self.operator1.adjoint(x, out=out)
                 out.add(self.operator2.adjoint(x), out=out) 
         else:
@@ -431,9 +413,11 @@ class SumOperator(Operator):
     def is_linear(self):
         return self.linear_flag 
     
-    def calculate_norm(self, **kwargs):
+    def calculate_norm(self):
         if self.is_linear():
-            return LinearOperator.calculate_norm(self, **kwargs)
+            return LinearOperator.calculate_norm(self)
+
+        return super().calculate_norm(self)
 
 ###############################################################################
 ################   Composition  ###########################################

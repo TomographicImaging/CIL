@@ -122,7 +122,7 @@ class LinearOperator(Operator):
         raise NotImplementedError
     
     @staticmethod
-    def PowerMethod(operator, max_iteration=10, initial=None, tolerance = 1e-5,  verbose=False,  **deprecated_args):
+    def PowerMethod(operator, max_iteration=10, initial=None, tolerance = 1e-5,  return_all=False,  **deprecated_args):
 
         r"""Power method or Power iteration algorithm 
         
@@ -140,7 +140,7 @@ class LinearOperator(Operator):
             Starting point for the Power method.
         tolerance: positive:`float`, default = 1e-5
             Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below the tolerance.                    
-        verbose: boolean, default = False
+        return_all: boolean, default = False
             Toggles the verbosity of the return
     
 
@@ -148,11 +148,11 @@ class LinearOperator(Operator):
         -------
         dominant eigenvalue: positive:`float`
         number of iterations: positive:`int`
-            Number of iterations run. Only returned if verbose = True.
+            Number of iterations run. Only returned if return_all is True.
         eigenvector: DataContainer
-            Corresponding eigenvector of the dominant eigenvalue. Only returned if verbose = True.
+            Corresponding eigenvector of the dominant eigenvalue. Only returned if return_all is True.
         list of eigenvalues: :obj:`list`
-            List of eigenvalues. Only returned if verbose = True.
+            List of eigenvalues. Only returned if return_all is True.
 
         Examples
         --------    
@@ -232,7 +232,7 @@ class LinearOperator(Operator):
             eig_list.append(eig_new)   
             eig_old = eig_new       
 
-        if verbose:
+        if return_all:
             return eig_new, i, x0, eig_list
         else:
             return eig_new

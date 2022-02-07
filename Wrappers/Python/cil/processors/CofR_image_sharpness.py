@@ -74,6 +74,9 @@ class CofR_image_sharpness(Processor):
         if data.geometry.geom_type == 'cone' and self.slice_index != 'centre':
             raise ValueError("Only the centre slice is supported with this alogrithm")
 
+        if data.geometry.system_description not in ['simple','offset']:
+            raise NotImplementedError("Not implemented for advanced systsem geometries")
+            
         if data.geometry.channels > 1:
             raise ValueError("Only single channel data is supported with this algorithm")
 
@@ -197,7 +200,7 @@ class CofR_image_sharpness(Processor):
         else:
             data = data_full
 
-        data.geometry.config.system.update_reference_frame()
+        data.geometry.config.system.align_reference_frame('cil')
 
         width = data.geometry.config.panel.num_pixels[0]
 

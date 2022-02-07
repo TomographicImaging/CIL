@@ -7,6 +7,35 @@
 
 The Core Imaging Library (CIL) is an open-source Python framework for tomographic imaging with particular emphasis on reconstruction of challenging datasets. Conventional filtered backprojection reconstruction tends to be insufficient for highly noisy, incomplete, non-standard or multichannel data arising for example in dynamic, spectral and in situ tomography. CIL provides an extensive modular optimization framework for prototyping reconstruction methods including sparsity and total variation regularization, as well as tools for loading, preprocessing and visualizing tomographic data.
 
+### Quick Example
+
+Reconstructs a 3D cone beam X-Ray CT dataset acquired with a ZEISS scanner. The [data](https://zenodo.org/record/4822516) is available on Zenodo and must be downloaded from https://zenodo.org/record/4822516/files/walnut.zip and stored locally; the script must be modified to point to the location of the data.
+
+```python
+import os
+from cil.io import TXRMDataReader
+from cil.processors import TransmissionAbsorptionConverter
+from cil.utilities.display import show2D
+from cil.recon import FDK
+
+# File Paths
+base_dir = os.path.abspath("/path/to/data/")
+filename = os.path.join(base_dir, "valnut_tomo-A.txrm")
+
+# Read the data
+data = TXRMDataReader(file_name=filename).read()
+data = TransmissionAbsorptionConverter()(data)
+data.reorder('tigre')
+
+# run fdk
+fdk = FDK(data, ig)
+recon = fdk.run()
+
+# display the reconstruction
+show2D(recon, fix_range=(-0.01, 0.06), cmap='gray')
+```
+![image](https://user-images.githubusercontent.com/14138589/152884755-67b43adb-36c6-4d10-aad7-bcdaf64da138.png)
+
 ## CIL on binder
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TomographicImaging/CIL-Demos/HEAD?urlpath=lab/tree/binder%2Findex.ipynb)

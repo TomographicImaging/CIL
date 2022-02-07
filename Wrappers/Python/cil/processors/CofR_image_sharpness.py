@@ -199,9 +199,7 @@ class CofR_image_sharpness(Processor):
         else:
             data = data_full
 
-        ##data.geometry.config.system.align_reference_frame('cil')
-        data.geometry.config.system.update_reference_frame()
-
+        data.geometry.config.system.align_reference_frame('cil')
         width = data.geometry.config.panel.num_pixels[0]
 
         #initial grid search

@@ -360,37 +360,28 @@ class TestOperator(CCPiTestClass):
 
              
     def test_Norm(self):
-        print ("test_BlockOperator")
-        ##
         numpy.random.seed(1)
         N, M = 200, 300
 
         ig = ImageGeometry(N, M)
         G = GradientOperator(ig)
-        t0 = timer()
-        norm = G.norm()
-        t1 = timer()
-        norm2 = G.norm()
-        t2 = timer()
-        norm3 = G.norm(force=True)
-        t3 = timer()
-        print ("Norm dT1 {} dT2 {} dT3 {}".format(t1-t0,t2-t1, t3-t2))
-        self.assertLess(t2-t1, t1-t0)
-        self.assertLess(t2-t1, t3-t2)
 
-        numpy.random.seed(1)
-        t4 = timer()
-        norm4 = G.norm(iterations=50, force=True)
-        t5 = timer()
-        self.assertLess(t2-t1, t5-t4)
+        self.assertIsNone(G._norm)
+        
+        #calculates norm
+        self.assertAlmostEqual(G.norm(), 2.825, 3)
 
-        numpy.random.seed(1)
-        t4 = timer()
-        norm5 = G.norm(x_init=ig.allocate('random'), iterations=50, force=True)
-        t5 = timer()
-        self.assertLess(t2-t1, t5-t4)
-        for n in [norm, norm2, norm3, norm4, norm5]:
-            print ("norm {}", format(n))
+        #sets_norm
+        G.set_norm(4)
+        self.assertEqual(G._norm, 4)
+
+        #gets chached norm
+        self.assertEqual(G.norm(), 4)
+
+        #sets cache to None
+        G.set_norm(None)
+        #recalculates norm
+        self.assertAlmostEqual(G.norm(), 2.825, 3)
 
     def test_ProjectionMap(self):
 
@@ -490,7 +481,8 @@ class TestGradients(CCPiTestClass):
         Grad = GradientOperator(self.ig)
         
         E1 = SymmetrisedGradientOperator(Grad.range_geometry())
-        numpy.testing.assert_almost_equal(E1.norm(iterations=self.iterations), numpy.sqrt(8), decimal = self.decimal)
+        norm = LinearOperator.PowerMethod(E1, max_iteration=self.iterations)
+        numpy.testing.assert_almost_equal(norm, numpy.sqrt(8), decimal = self.decimal)
         
     def test_SymmetrisedGradientOperator1b(self):
         ###########################################################################  
@@ -536,7 +528,8 @@ class TestGradients(CCPiTestClass):
         Grad2 = GradientOperator(self.ig2, correlation = 'Space')
         
         E2 = SymmetrisedGradientOperator(Grad2.range_geometry())
-        numpy.testing.assert_almost_equal(E2.norm(iterations=self.iterations), 
+        norm = LinearOperator.PowerMethod(E2, max_iterations=self.iterations)
+        numpy.testing.assert_almost_equal(norm, 
            numpy.sqrt(8), decimal = self.decimal)
         
     

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Optimisation framework &#8212; CIL v21.3.1-5-g7f281faa documentation</title>
+    <title>Optimisation framework &#8212; CIL v21.3.1-6-g0b52f200 documentation</title>
     
     <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -1194,29 +1194,27 @@ A <code class="code docutils literal notranslate"><span class="pre">ScaledOperat
 <dl class="py method">
 <dt id="cil.optimisation.operators.Operator.norm">
 <code class="sig-name descname"><span class="pre">norm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#Operator.norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.Operator.norm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the norm of the Operator</p>
-<p>Calling norm triggers the calculation of the norm of the operator. Normally this
-is a computationally expensive task, therefore we store the result of norm into
-a member of the class. If the calculation has already run, following calls to
-norm just return the saved member.
-It is possible to force recalculation by setting the optional force parameter. Notice that
-norm doesn’t take notice of how many iterations or of the initialisation of the PowerMethod,
-so in case you want to recalculate by setting a higher number of iterations or changing the
-starting point or both you need to set <code class="code docutils literal notranslate"><span class="pre">force=True</span></code></p>
+<dd><p>Returns the norm of the Operator. On first call the norm will be calculated using the operator’s calculate_norm
+method. Subsequent calls will return the cached norm.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default = 25</em>) – number of iterations to run</p></li>
-<li><p><strong>x_init</strong> (same type as domain, a subclass of <code class="code docutils literal notranslate"><span class="pre">DataContainer</span></code>, optional, default None) – starting point for the iteration in the operator domain</p></li>
-<li><p><strong>force</strong> (boolean, default <code class="code docutils literal notranslate"><span class="pre">False</span></code>) – forces the recalculation of the norm</p></li>
-</ul>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>norm</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>positive:<cite>float</cite></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
+<dt id="cil.optimisation.operators.Operator.set_norm">
+<code class="sig-name descname"><span class="pre">set_norm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#Operator.set_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.Operator.set_norm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the norm of the operator to a custom value.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="cil.optimisation.operators.Operator.calculate_norm">
-<code class="sig-name descname"><span class="pre">calculate_norm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#Operator.calculate_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.Operator.calculate_norm" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">calculate_norm</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#Operator.calculate_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.Operator.calculate_norm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the norm of the Operator</p>
 </dd></dl>
 
@@ -1292,35 +1290,50 @@ starting point or both you need to set <code class="code docutils literal notran
 
 <dl class="py method">
 <dt id="cil.optimisation.operators.LinearOperator.PowerMethod">
-<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">PowerMethod</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#LinearOperator.PowerMethod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.LinearOperator.PowerMethod" title="Permalink to this definition">¶</a></dt>
-<dd><p>Power method to calculate iteratively the Lipschitz constant</p>
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">PowerMethod</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iteration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">deprecated_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#LinearOperator.PowerMethod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.LinearOperator.PowerMethod" title="Permalink to this definition">¶</a></dt>
+<dd><p>Power method or Power iteration algorithm</p>
+<p>The Power method computes the largest (dominant) eigenvalue of a square matrix in magnitude, e.g.,
+absolute value in the real case and module in the complex case.
+For the non-square case, the power method is applied for the matrix :math: A^{T}*A.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>operator</strong> (<code class="code docutils literal notranslate"><span class="pre">LinearOperator</span></code>) – input operator</p></li>
-<li><p><strong>iterations</strong> – number of iterations to run</p></li>
-<li><p><strong>x_init</strong> – starting point for the iteration in the operator domain</p></li>
+<li><p><strong>operator</strong> (<a class="reference internal" href="#cil.optimisation.operators.LinearOperator" title="cil.optimisation.operators.LinearOperator"><em>LinearOperator</em></a>) – </p></li>
+<li><p><strong>max_iteration</strong> (positive:<cite>int</cite>, default=10) – Number of iterations for the Power method algorithm.</p></li>
+<li><p><strong>initial</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a><em>, </em><em>default = None</em>) – Starting point for the Power method.</p></li>
+<li><p><strong>tolerance</strong> (positive:<cite>float</cite>, default = 1e-5) – Stopping criterion for the Power method. Check if two consecutive eigenvalue evaluations are below the tolerance.</p></li>
+<li><p><strong>return_all</strong> (<em>boolean</em><em>, </em><em>default = False</em>) – Toggles the verbosity of the return</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>tuple with: L, list of L at each iteration, the data the iteration worked on.</p>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>dominant eigenvalue</strong> (positive:<cite>float</cite>)</p></li>
+<li><p><strong>number of iterations</strong> (positive:<cite>int</cite>) – Number of iterations run. Only returned if return_all is True.</p></li>
+<li><p><strong>eigenvector</strong> (<em>DataContainer</em>) – Corresponding eigenvector of the dominant eigenvalue. Only returned if return_all is True.</p></li>
+<li><p><strong>list of eigenvalues</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code>) – List of eigenvalues. Only returned if return_all is True.</p></li>
+</ul>
+</p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mf">1.</span><span class="p">,</span><span class="mf">2.</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Mop</span> <span class="o">=</span> <span class="n">MatrixOperator</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Mop_norm</span> <span class="o">=</span> <span class="n">Mop</span><span class="o">.</span><span class="n">PowerMethod</span><span class="p">(</span><span class="n">Mop</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Mop_norm</span>
+<span class="go">2.0000654846240296</span>
+</pre></div>
+</div>
+<p><cite>PowerMethod</cite> is called when we compute the norm of a matrix or a <cite>LinearOperator</cite>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Mop_norm</span> <span class="o">=</span> <span class="n">Mop</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
+<span class="go">2.0005647295658866</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.operators.LinearOperator.calculate_norm">
-<code class="sig-name descname"><span class="pre">calculate_norm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#LinearOperator.calculate_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.LinearOperator.calculate_norm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the norm of the LinearOperator as calculated by the PowerMethod</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default = 25</em>) – number of iterations to run</p></li>
-<li><p><strong>x_init</strong> (same type as domain, a subclass of <code class="code docutils literal notranslate"><span class="pre">DataContainer</span></code>, optional, None) – starting point for the iteration in the operator domain</p></li>
-<li><p><strong>force</strong> (boolean, default <code class="code docutils literal notranslate"><span class="pre">False</span></code>) – forces the recalculation of the norm</p></li>
-</ul>
-</dd>
-</dl>
+<code class="sig-name descname"><span class="pre">calculate_norm</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#LinearOperator.calculate_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.LinearOperator.calculate_norm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the norm of the LinearOperator calculated by the PowerMethod with default values.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1449,12 +1462,6 @@ For the rest it behaves like the operator it holds.</p>
 <dt id="cil.optimisation.operators.CompositionOperator.is_linear">
 <code class="sig-name descname"><span class="pre">is_linear</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#CompositionOperator.is_linear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.CompositionOperator.is_linear" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns if the operator is linear</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.operators.CompositionOperator.calculate_norm">
-<code class="sig-name descname"><span class="pre">calculate_norm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/Operator.html#CompositionOperator.calculate_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.CompositionOperator.calculate_norm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates the norm of the Operator</p>
 </dd></dl>
 
 </dd></dl>
@@ -1691,21 +1698,6 @@ Y : gm_range ( Default: Y = X )</p>
 <code class="sig-name descname"><span class="pre">adjoint</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/MatrixOperator.html#MatrixOperator.adjoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.MatrixOperator.adjoint" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns the adjoint/inverse operation</p>
 <p>only available to linear operators</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cil.optimisation.operators.MatrixOperator.calculate_norm">
-<code class="sig-name descname"><span class="pre">calculate_norm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/MatrixOperator.html#MatrixOperator.calculate_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.MatrixOperator.calculate_norm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the norm of the LinearOperator as calculated by the PowerMethod</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>optional</em><em>, </em><em>default = 25</em>) – number of iterations to run</p></li>
-<li><p><strong>x_init</strong> (same type as domain, a subclass of <code class="code docutils literal notranslate"><span class="pre">DataContainer</span></code>, optional, None) – starting point for the iteration in the operator domain</p></li>
-<li><p><strong>force</strong> (boolean, default <code class="code docutils literal notranslate"><span class="pre">False</span></code>) – forces the recalculation of the norm</p></li>
-</ul>
-</dd>
-</dl>
 </dd></dl>
 
 </dd></dl>

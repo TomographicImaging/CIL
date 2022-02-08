@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.operators.MatrixOperator &#8212; CIL v21.3.1-5-g7f281faa documentation</title>
+    <title>cil.optimisation.operators.MatrixOperator &#8212; CIL v21.3.1-6-g0b52f200 documentation</title>
     
     <link href="../../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -223,8 +223,8 @@
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">A</span>
         <span class="n">M_A</span><span class="p">,</span> <span class="n">N_A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span>
-        <span class="n">domain_geometry</span> <span class="o">=</span> <span class="n">VectorGeometry</span><span class="p">(</span><span class="n">N_A</span><span class="p">)</span>
-        <span class="n">range_geometry</span> <span class="o">=</span> <span class="n">VectorGeometry</span><span class="p">(</span><span class="n">M_A</span><span class="p">)</span>
+        <span class="n">domain_geometry</span> <span class="o">=</span> <span class="n">VectorGeometry</span><span class="p">(</span><span class="n">N_A</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">A</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">range_geometry</span> <span class="o">=</span> <span class="n">VectorGeometry</span><span class="p">(</span><span class="n">M_A</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">A</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">s1</span> <span class="o">=</span> <span class="kc">None</span>   <span class="c1"># Largest singular value, initially unknown</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MatrixOperator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">domain_geometry</span><span class="p">,</span>
                                                    <span class="n">range_geometry</span><span class="o">=</span><span class="n">range_geometry</span><span class="p">)</span></div>
@@ -250,11 +250,7 @@
             <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">transpose</span><span class="p">(),</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">()))</span></div>
 
     <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span>
-    
-<div class="viewcode-block" id="MatrixOperator.calculate_norm"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.MatrixOperator.calculate_norm">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="c1"># If unknown, compute and store. If known, simply return it.</span>
-        <span class="k">return</span> <span class="n">svds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">return_singular_vectors</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span></div>
     
 </pre></div>
 

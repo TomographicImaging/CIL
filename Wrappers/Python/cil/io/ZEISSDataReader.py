@@ -140,39 +140,39 @@ class ZEISSDataReader(object):
         # Read one image to get the metadata
         _,metadata = dxchange.read_txrm(self.file_name,((0,1),(None),(None)))
 
-        # Read extra metadata
         with olefile.OleFileIO(self.file_name) as ole:
-            # Read source to center and detector to center distances
-            StoRADistance = dxchange.reader._read_ole_arr(ole, \
-                    'ImageInfo/StoRADistance', "<{0}f".format(metadata['number_of_images']))
-            DtoRADistance = dxchange.reader._read_ole_arr(ole, \
-                    'ImageInfo/DtoRADistance', "<{0}f".format(metadata['number_of_images']))
-            
-            dist_source_center = np.abs(StoRADistance[0])
-            dist_center_detector = np.abs(DtoRADistance[0])
-
-            # Read xray geometry (cone or parallel beam) and file type (TXRM or TXM)
+            #Configure beam geometry
             xray_geometry = dxchange.reader._read_ole_value(ole, 'ImageInfo/XrayGeometry', '<i')
-            file_type = dxchange.reader._read_ole_value(ole, 'ImageInfo/AcquisitionMode', '<i')
 
-            # Pixelsize loaded in metadata is really the voxel size in um.
-            # We can compute the effective detector pixel size as the geometric
-            # magnification times the voxel size.
-            metadata['dist_source_center'] = dist_source_center
-            metadata['dist_center_detector'] = dist_center_detector
-            metadata['detector_pixel_size'] = ((dist_source_center+dist_center_detector)/dist_source_center)*metadata['pixel_size']
-
-            #Configure beam and data geometries
             if xray_geometry == 1:
-                logger.info('setting up cone beam geometry')
                 metadata['beam geometry'] ='cone'
             else:
-                logger.info('setting up parallel beam geometry')
                 metadata['beam geometry'] = 'parallel'
+
+            #Configure data geometry
+            file_type = dxchange.reader._read_ole_value(ole, 'ImageInfo/AcquisitionMode', '<i')
+
             if file_type == 0:
                 metadata['data geometry'] = 'acquisition'
+        
+                # Read source to center and detector to center distances
+                StoRADistance = dxchange.reader._read_ole_arr(ole, \
+                        'ImageInfo/StoRADistance', "<{0}f".format(metadata['number_of_images']))
+                DtoRADistance = dxchange.reader._read_ole_arr(ole, \
+                        'ImageInfo/DtoRADistance', "<{0}f".format(metadata['number_of_images']))
+
+                dist_source_center = np.abs(StoRADistance[0])
+                dist_center_detector = np.abs(DtoRADistance[0])
+
+                # Pixelsize loaded in metadata is really the voxel size in um.
+                # We can compute the effective detector pixel size as the geometric
+                # magnification times the voxel size.
+                metadata['dist_source_center'] = dist_source_center
+                metadata['dist_center_detector'] = dist_center_detector
+                metadata['detector_pixel_size'] = ((dist_source_center+dist_center_detector)/dist_source_center)*metadata['pixel_size']
             else:
                 metadata['data geometry'] = 'image'
+
         return metadata
     
     def slice_metadata(self,metadata):

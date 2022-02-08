@@ -2,6 +2,7 @@
   - added sapyb and deprecated axpby
 
 * 21.3.1
+  - Fixed PowerMethod for square/non-square, complex/float matrices with stopping criterion.
   - Added matplotlib version dependency to conda recipe
   - Fixed TIGRE wrappers for geometry with a virtual detector
   - Fixed TIGRE wrappers for cone-beam geometry with tilted rotation axis

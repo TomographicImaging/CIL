@@ -368,7 +368,7 @@ class TestCommon(object):
     def compare_norm(self,direct_method,norm):
         ig = self.ag_small.get_ImageGeometry()
         Op = ProjectionOperator(ig, self.ag_small, direct_method=direct_method)
-        n = Op.norm(seed=0.52)
+        n = Op.norm()
         self.assertAlmostEqual(n, norm, places=1)
 
 

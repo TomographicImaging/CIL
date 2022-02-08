@@ -15,6 +15,8 @@ Reconstructs a 3D cone beam X-Ray CT dataset acquired with a ZEISS scanner. The 
 import os
 from cil.io import TXRMDataReader
 from cil.processors import TransmissionAbsorptionConverter
+from cil.processors import CentreOfRotationCorrector
+from cil.plugins.tigre import FBP
 from cil.utilities.display import show2D
 from cil.recon import FDK
 
@@ -27,14 +29,17 @@ data = TXRMDataReader(file_name=filename).read()
 data = TransmissionAbsorptionConverter()(data)
 data.reorder('tigre')
 
+# correct for the centre of rotation offset
+data = CentreOfRotationCorrector.image_sharpness(FBP=FBP)(data)
+
 # run fdk
 fdk = FDK(data, ig)
 recon = fdk.run()
 
 # display the reconstruction
-show2D(recon, fix_range=(-0.01, 0.06), cmap='gray')
+show2D(recon, fix_range=(-0.01, 0.06), cmap='plasma')
 ```
-![image](https://user-images.githubusercontent.com/14138589/152884755-67b43adb-36c6-4d10-aad7-bcdaf64da138.png)
+![image](https://user-images.githubusercontent.com/14138589/152979615-64dcc94d-1836-4cf2-8c75-cf02a5f38813.png)
 
 ## CIL on binder
 

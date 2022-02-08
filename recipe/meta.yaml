@@ -17,7 +17,7 @@ build:
 test:
   requires:
     - python-wget
-    - cvxpy               # [ linux and py==37 and np==118 ]
+    - cvxpy         # [ linux and not py36]     
     - scikit-image
     - tomophantom =1.4.10 # [ linux ]
     - cil-astra =21.3.0   # [ linux ] 

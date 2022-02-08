@@ -16,7 +16,7 @@
 #   limitations under the License.
 
 #   Authored by:    Jakob S. Jørgensen (DTU)
-#                   Andrew
+#                   Andrew Sharits (UES,Inc.)
 #                   Edoardo Pasca (UKRI-STFC)
 #                   Gemma Fardell (UKRI-STFC)
 
@@ -103,17 +103,17 @@ class ZEISSDataReader(object):
         if roi is not None:
             if metadata['data geometry'] == 'acquisition':
                 allowed_labels = DataOrder.CIL_AG_LABELS
-                zeis_data_order = {'angle':0, 'vertical':1, 'horizontal':2}
+                zeiss_data_order = {'angle':0, 'vertical':1, 'horizontal':2}
             else:
                 allowed_labels = DataOrder.CIL_IG_LABELS
-                zeis_data_order = {'vertical':0, 'horizontal_y':1, 'horizontal_x':2}
+                zeiss_data_order = {'vertical':0, 'horizontal_y':1, 'horizontal_x':2}
 
             # check roi labels and create tuple for slicing    
             for key in roi.keys():
                 if key not in allowed_labels:
                     raise Exception("Wrong label, got {0}. Expected dimension labels in {1}, {2}, {3}".format(key,**allowed_labels))
 
-                idx = zeis_data_order[key]
+                idx = zeiss_data_order[key]
                 if roi[key] != -1:
                     for i, x in enumerate(roi[key]):
                         if x is None:

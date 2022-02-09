@@ -20,11 +20,19 @@ class ISTA(Algorithm):
       :param g: Convex function with " simple " proximal operator
 
 
-    Reference:
+    References :
+
+        P. L. Combettes and V. A. L. Erie, 2005.
+        Signal Recovery by Proximal Forward-Backward Splitting. 
+        Multiscale Model. Simul., vol. 4, no. 4, pp. 1168–1200
       
         Beck, A. and Teboulle, M., 2009. A fast iterative shrinkage-thresholding 
         algorithm for linear inverse problems. 
         SIAM journal on imaging sciences,2(1), pp.183-202.
+
+    Convergence conditions in Combettes-Erie 2009:
+        f and g convex and f differentiable with L-Lipschitz gradient
+        step-size < 2/L
     '''
     
     
@@ -82,7 +90,7 @@ class ISTA(Algorithm):
 
         # Check option for step-size            
         if self.step_size is None:
-            self.step_size = 1./f.L
+            self.step_size = 0.99 * 2/f.L
         else:
             self.step_size = step_size
         

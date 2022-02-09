@@ -172,7 +172,7 @@ class SubsetSumFunction(SumFunction):
         self.subset_num = self.subset_select_function(self.subset_num, self.num_subsets)
 
 
-class SAGAGradientFunction(SubsetSumFunction):
+class SAGAFunction(SubsetSumFunction):
     '''Class for use as objective function in gradient type algorithms to enable the use of subsets.
 
     The `gradient` method doesn't the mathematical gradient of the sum of functions, 
@@ -194,7 +194,7 @@ class SAGAGradientFunction(SubsetSumFunction):
         self.gradients_allocated = False
         self.precond = precond
         
-        super(SAGAGradientFunction, self).__init__(functions)
+        super(SAGAFunction, self).__init__(functions)
 
     def gradient(self, x, out=None):
         """

@@ -185,8 +185,12 @@ class LinearOperator(Operator):
 
         # Default case: non-symmetric
         symmetric = False
-        if operator.domain_geometry()==operator.range_geometry():
-            symmetric = True
+        try:
+            if operator.domain_geometry()==operator.range_geometry():
+                symmetric = True
+        except AssertionError:
+            # catch AssertionError for SIRF objects https://github.com/SyneRBI/SIRF-SuperBuild/runs/5110228626?check_suite_focus=true#step:8:972
+            pass
 
         if initial is None:
             x0 = operator.domain_geometry().allocate('random')

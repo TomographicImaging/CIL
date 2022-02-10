@@ -52,6 +52,10 @@ class TransmissionAbsorptionConverter(DataProcessor):
             raise TypeError('Processor supports only following data types:\n' +
                             ' - ImageData\n - AcquisitionData\n' +
                             ' - DataContainer')
+
+        if data.min() <= 0 and self.min_intensity <= 0:
+            raise ValueError('Zero or negative values found in the dataset. Please use `min_intensity` to provide a clipping value.')
+
         return True 
 
     def process(self, out=None):
@@ -76,16 +80,10 @@ class TransmissionAbsorptionConverter(DataProcessor):
             numpy.clip(arr_in, self.min_intensity, None, out=arr_out)
             arr_in = arr_out
 
-        #log, filter to catch warning
-        with warnings.catch_warnings():
-            warnings.filterwarnings('error')
-            try:
-                numpy.log(arr_in,out=arr_out)
-            except:
-                raise ValueError('Zero or negative value encountered in log. Please use the `threshold` to to avoid this.')
-            
-        #negative
+        #beer-lambert
+        numpy.log(arr_in,out=arr_out)
         numpy.negative(arr_out,out=arr_out)
+        
         out.fill(arr_out)
 
         if return_val:

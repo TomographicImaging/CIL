@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Processors &#8212; CIL v21.3.1-9-g42c2804c documentation</title>
+    <title>Processors &#8212; CIL v21.3.1-10-gcf15c7a2 documentation</title>
     
     <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -884,7 +884,7 @@ Dn/n = (flat-dark + projection-dark)/((flat-dark)*(projection-dark))*(Df/f + Dd/
 <h3>Transmission to Absorption Converter<a class="headerlink" href="#transmission-to-absorption-converter" title="Permalink to this headline">¶</a></h3>
 <dl class="py class">
 <dt id="cil.processors.TransmissionAbsorptionConverter">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.processors.</span></code><code class="sig-name descname"><span class="pre">TransmissionAbsorptionConverter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">white_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/TransmissionAbsorptionConverter.html#TransmissionAbsorptionConverter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.TransmissionAbsorptionConverter" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.processors.</span></code><code class="sig-name descname"><span class="pre">TransmissionAbsorptionConverter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">white_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/processors/TransmissionAbsorptionConverter.html#TransmissionAbsorptionConverter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.processors.TransmissionAbsorptionConverter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Processor to convert from transmission measurements to absorption
 based on the Beer-Lambert law</p>
 <dl class="field-list simple">
@@ -895,7 +895,7 @@ based on the Beer-Lambert law</p>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>returns AcquisitionData, ImageData or DataContainer depending on input data type</p>
+<dd class="field-even"><p>returns AcquisitionData, ImageData or DataContainer depending on input data type, return is suppressed if ‘out’ is passed</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData">AcquisitionData</a>, <a class="reference internal" href="framework.html#cil.framework.ImageData" title="cil.framework.ImageData">ImageData</a> or <a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer">DataContainer</a></p>

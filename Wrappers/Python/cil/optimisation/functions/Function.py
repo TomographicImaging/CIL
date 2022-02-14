@@ -15,71 +15,91 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import warnings
 
 from numbers import Number
 import numpy as np
 
 class Function(object):
     
-    """ Abstract class representing a function 
-    
-        :param L: Lipschitz constant of the gradient of the function F(x), when it is differentiable.
-        :type L: number, positive, default None
-        :param domain: The domain of the function.
+    """ Abstract class representing a function.
 
-        Lipschitz of the gradient of the function; it is a positive real number, such that |f'(x) - f'(y)| <= L ||x-y||, assuming f: IG --> R
+    Attributes
+    ----------
+    L : positive :obj:`float`, default = `None`
+        The Lipschitz constant of the gradient of the function, when it is differentiable.
 
     """
     
-    
     def __init__(self, L = None):
-        # overrides the type check to allow None as initial value
+
+        # value for the Lipschitz constant
         self._L = L
         
     def __call__(self,x):
+                
+        """ Abstract method that returns the value of the function F at :code:`x`.
         
-        r"""Returns the value of the function F at x: :math:`F(x)`
-        
+        .. math:: F(x)
+
         """        
         
         raise NotImplementedError
 
     def gradient(self, x, out=None):
         
-        r"""Returns the value of the gradient of function F at x, if it is differentiable
+        """ Abstract method that returns the value of the gradient of function F at :code:`x` .
         
         .. math:: F'(x)
-        
-        """
+                    
+        """    
         raise NotImplementedError
 
     def proximal(self, x, tau, out=None):
+
+        r""" Abstract method that returns the proximal operator of the function F at :code:`x` .
         
-        r"""Returns the proximal operator of function :math:`\tau F` at x        
-        .. math:: \mathrm{prox}_{\tau F}(x) = \underset{z}{\mathrm{argmin}} \frac{1}{2}\|z - x\|^{2} + \tau F(z)
-        """
+        .. math:: \mathrm{prox}_{\tau F}(x) = \underset{z}{\mathrm{argmin}}  \frac{1}{2\tau}\|z - x\|^{2} + F(z)
+                    
+        """            
+       
         raise NotImplementedError
 
     def convex_conjugate(self, x):
-        r""" Returns the convex conjugate of function :math:`F` at :math:`x^{*}`,
+
+        r""" Abstract method that returns the value of the convex conjugate of the function F at :code:`x` .
         
         .. math:: F^{*}(x^{*}) = \underset{x^{*}}{\sup} <x^{*}, x> - F(x)
-                
-        """
+                    
+        """     
+
         raise NotImplementedError
 
     def proximal_conjugate(self, x, tau, out = None):
-        
-        r"""Returns the proximal operator of the convex conjugate of function :math:`\tau F` at :math:`x^{*}`
-        
+
+        r""" Abstract method that returns the proximal operator of the convex conjugate of the function F at :code:`x` .
+
         .. math:: \mathrm{prox}_{\tau F^{*}}(x^{*}) = \underset{z^{*}}{\mathrm{argmin}} \frac{1}{2}\|z^{*} - x^{*}\|^{2} + \tau F^{*}(z^{*})
-        
-        Due to Moreau’s identity, we have an analytic formula to compute the proximal operator of the convex conjugate :math:`F^{*}`
+
+        Moreau's decomposition is used to compute the proximal operator of the convex conjugate F^{*} using the proximal operator of F.
         
         .. math:: \mathrm{prox}_{\tau F^{*}}(x) = x - \tau\mathrm{prox}_{\tau^{-1} F}(\tau^{-1}x)
-                
-        """
+                         
+
+        Parameters
+        ----------
+        x : DataContainer
+            Point where `proximal_conjugate` is evaluated.
+        tau : positive :obj:`float` 
+            Step size       
+        
+        Returns
+        -------
+
+        DataContainer 
+            Returns the proximal operator of the convex conjugate of the function F at :code:`x` .
+   
+        """            
+        
         try:
             tmp = x
             x.divide(tau, out = tmp)
@@ -102,8 +122,6 @@ class Function(object):
 
         if out is None:
             return val
-
-
 
     # Algebra for Function Class
     
@@ -128,9 +146,8 @@ class Function(object):
         else:
             raise ValueError('Not implemented')   
             
-    def __radd__(self, other):
-        
-        """ Making addition commutative. """
+    def __radd__(self, other):        
+        """ Addition commutative. """
         return self + other 
                           
     def __sub__(self, other):
@@ -156,14 +173,13 @@ class Function(object):
     
     @property
     def L(self):
-        '''Lipschitz of the gradient of function f.
-        
-        L is positive real number, such that |f'(x) - f'(y)| <= L ||x-y||, assuming f: IG --> R'''
+        """ Lipschitz constant of the gradient of function F.
+        """
         return self._L
-        # return self._L
+
     @L.setter
     def L(self, value):
-        '''Setter for Lipschitz constant'''
+        """Setter for Lipschitz constant"""
         if isinstance(value, (Number,)) and value >= 0:
             self._L = value
         else:

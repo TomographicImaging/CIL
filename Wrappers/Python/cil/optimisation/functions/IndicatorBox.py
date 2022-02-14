@@ -21,32 +21,58 @@ import numpy
 class IndicatorBox(Function):
     
     
-    r'''Indicator function for box constraint
-            
-      .. math:: 
+    r"""IndicatorBox Function with constraints
+
+
+    Parameters
+    ----------
+
+    lower : Real number, default = :code:`-numpy.inf`
+            Lower bound 
+    upper : Real number, default = :code:`numpy.inf`
+            Upper bound
+
+    .. math:: 
          
          f(x) = \mathbb{I}_{[a, b]} = \begin{cases}  
                                             0, \text{ if } x \in [a, b] \\
                                             \infty, \text{otherwise}
                                      \end{cases}
+
+    Examples
+    --------
+
+    >> f = IndicatorBox(lower=0.5, upper=10.0)
+                                       
     
-    '''
+    References
+    ----------
+
+    `Characteristic function <https://en.wikipedia.org/wiki/Characteristic_function_(convex_analysis)>`_
+     
+    """
     
     def __init__(self,lower=-numpy.inf,upper=numpy.inf):
-        '''creator
 
-        :param lower: lower bound
-        :type lower: float, default = :code:`-numpy.inf`
-        :param upper: upper bound
-        :type upper: float, optional, default = :code:`numpy.inf`
-        '''
         super(IndicatorBox, self).__init__()
         self.lower = lower
         self.upper = upper
 
     def __call__(self,x):
-        
-        '''Evaluates IndicatorBox at x'''
+
+        """
+        Parameters
+        ----------
+
+        x : DataContainer
+
+        Returns
+        -------
+
+        float 
+            Returns the value of IndicatorBox at :code:`x`. Either is 0 or :code:`numpy.inf`.
+
+        """     
                 
         if (numpy.all(x.as_array() >= self.lower) and 
             numpy.all(x.as_array() <= self.upper) ):
@@ -55,21 +81,56 @@ class IndicatorBox(Function):
             val = numpy.inf
         return val
     
-    def gradient(self,x):
-        return ValueError('Not Differentiable') 
+    def gradient(self, x):
+
+        """
+        
+        Parameters
+        ----------
+        x : DataContainer
+
+        Raises
+        -------
+        ValueError 
+            IndicatorBox function is not differentiable.
+
+        """
+        return ValueError('IndicatorBox function is not differentiable') 
     
     def convex_conjugate(self,x):
         
-        '''Convex conjugate of IndicatorBox at x'''
+        """
+
+        Parameters
+        ----------
+        x : DataContainer 
+
+        Returns
+        -------
+
+        float 
+            Returns the value of the convex conjugate of the IndicatorBox at :code:`x`. 
+
+        .. math:: 
+            
+            f^{*}(x) = \mathbb{I}_{[a, b]} = \begin{cases}  
+                                                0, \text{ if } x \in [a, b] \\
+                                                \infty, \text{otherwise}
+                                        \end{cases}            
+
+        """
 
         return x.maximum(0).sum()
          
     def proximal(self, x, tau, out=None):
+
+        r"""
         
-        r'''Proximal operator of IndicatorBox at x
+        Proximal operator of IndicatorBox at x
 
             .. math:: prox_{\tau * f}(x)
-        '''
+        
+        """
         
         if out is None:
             return (x.maximum(self.lower)).minimum(self.upper)        

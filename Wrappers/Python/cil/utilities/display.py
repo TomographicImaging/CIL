@@ -761,3 +761,91 @@ class show_geometry(show_base):
 
         self.display = _ShowGeometry(acquisition_geometry, image_geometry)
         self.figure = self.display.draw(elev=elevation, azim=azimuthal, view_distance=view_distance, grid=grid, figsize=figsize, fontsize=fontsize)
+        
+        
+def _extract_single_line(data, **kwargs):
+    '''Extracts a line plot from the specified data and coordinates'''
+    
+    try:
+        geometry = data.geometry
+        possible_dimensions = geometry.dimension_labels
+    except AttributeError:
+        possible_dimensions = ['x','y','z']
+    i = 0
+    for k,v in kwargs.items():
+        if k not in possible_dimensions:
+            raise ValueError(f'Unexpected key {k}, not in {possible_dimensions}')
+        sliceme = {k:v}
+        if i > 0:
+            data_plot = data_plot.get_slice(**sliceme)
+        else:
+            data_plot = data.get_slice(**sliceme)
+        i += 1
+    return data_plot.as_array()
+
+def line_plot(data, line_coords=None, label=None, title=None, color=None, size=(15,15)):
+    '''Creates a 1D plot of data given some coordinates
+
+    Parameters
+    ----------
+    data : ImageData, AcquisitionData, generic DataContainer or a list of such
+           data from which to extract the line plot. 
+    line_coords : tuple, list of tuples
+        Specifies the line plot to show. 
+        For 3D datacontainers two slices: [(direction0, index0),(direction1, index1)]. 
+        For 4D datacontainers three slices: [(direction0, index0),(direction1, index1),(direction2, index2)].
+    label : string or list of strings, optional
+        Label for the line plot. If passed a list of data, label must be a list of matching length.
+    title : string, optiona
+        Title for the whole plot
+    color : string or list of strings, optional
+        Color for each line in the plot. If passed a list of data, color must be a list of matching length.
+    size : tuple or list of ints, optional
+        Specifies the size of the plot
+
+
+    Example Usage:
+    --------------
+
+    line_plot( [gt, fbp_recon, algo1.solution * A1.norm()], 
+                label=['Ground Truth', 'FBP', 'PDHG + TV + nn'],
+                line_coords=(('horizontal_x',64), ('vertical',64)), 
+                title=f'Comparison alpha {alpha}',
+                color=('cyan', 'purple', 'orange'), 
+                size=(15,9)
+           )
+
+    '''
+    kwargs = {}
+    for i, el in enumerate(line_coords):
+        kwargs[el[0]] = el[1]
+    data_plot = []
+
+    if issubclass(data.__class__, (list, tuple)):
+        for el in data:
+            data_plot.append( _extract_single_line(el, **kwargs))
+            axes_labels = list(el.dimension_labels)
+    else:
+        data_plot.append( _extract_single_line(data, **kwargs))
+        axes_labels = list(el.dimension_labels)
+
+    fig, ax = plt.subplots(1, 1, figsize=size)
+    for i,el in enumerate(data_plot):
+        try:
+            if color is None:
+                color = [None for _ in data]
+            ax.plot(el, color=color[i], label=label[i])
+            
+        except:
+            ax.plot(el, label=label, color=color)
+    ax.set_title(title)
+
+    xaxis = []
+    for i, el in enumerate(axes_labels):
+        if el not in kwargs.keys():
+            xaxis.append(el)
+    ax.set_xlabel(xaxis[0])
+    ax.set_ylabel('Pixel value')
+
+    plt.legend()
+    plt.show()

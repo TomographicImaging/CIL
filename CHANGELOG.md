@@ -1,4 +1,5 @@
 * 2x.x.x
+  - Add line_plot to plot lines from 2D/3D/4D data
   - Fixed PowerMethod for square/non-square, complex/float matrices with stopping criterion.
   - CofR image_sharpness improved for large datasets
   - Geometry alignmentment fix for 2D datasets

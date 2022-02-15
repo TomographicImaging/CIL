@@ -786,8 +786,8 @@ def _extract_single_line(data, **kwargs):
 def line_plot(data, line_coords=None, label=None, title=None, color=None, size=(15,15)):
     '''Creates a 1D plot of data given some coordinates
 
-    Parameters
-    ----------
+    Parameters:
+    -----------
     data : ImageData, AcquisitionData, generic DataContainer or a list of such
            data from which to extract the line plot. 
     line_coords : tuple, list of tuples
@@ -803,10 +803,8 @@ def line_plot(data, line_coords=None, label=None, title=None, color=None, size=(
     size : tuple or list of ints, optional
         Specifies the size of the plot
 
-
     Example Usage:
     --------------
-
     line_plot( [gt, fbp_recon, algo1.solution * A1.norm()], 
                 label=['Ground Truth', 'FBP', 'PDHG + TV + nn'],
                 line_coords=(('horizontal_x',64), ('vertical',64)), 
@@ -814,7 +812,6 @@ def line_plot(data, line_coords=None, label=None, title=None, color=None, size=(
                 color=('cyan', 'purple', 'orange'), 
                 size=(15,9)
            )
-
     '''
     kwargs = {}
     for i, el in enumerate(line_coords):

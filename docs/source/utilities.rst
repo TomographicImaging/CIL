@@ -62,6 +62,12 @@ show_geometry - Display system geometry
    :members:
    :inherited-members:
 
+line_plot - Display a line plot from 2D/3D/4D data
+--------------------------------------------------
+
+.. autoclass:: cil.utilities.display.line_plot
+   :members:
+   :inherited-members:
 
 islicer - interactive display of 2D slices
 ------------------------------------------

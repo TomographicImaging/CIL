@@ -128,9 +128,7 @@ class L1Norm(Function):
         *  :math:`\mathrm{prox}_{\tau F}(x) = \mathrm{soft}(x - b, \tau) + b`
         
         
-        where,
-        
-        .. math :: \mathrm{soft}(x, \tau) := ( |x| - \tau )_{+} \mathrm{sign}(x)
+        where, :math:`\mathrm{soft}(x, \tau) := ( |x| - \tau )_{+} \mathrm{sign}(x)\,.`
                             
         """  
 

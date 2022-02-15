@@ -123,19 +123,19 @@ class Function(object):
         if out is None:
             return val
 
-    # Algebra for Function Class
+    # Algebra for the Function Class
     
-        # Add functions
-        # Subtract functions
-        # Add/Substract with Scalar
+        # Sum two functions
+        # Subtract two functions
+        # Add/Substract Function with Scalar
         # Multiply with Scalar
     
     def __add__(self, other):
         
         """ Returns the sum of the functions.
         
-            Cases: a) the sum of two functions :math:`(F_{1}+F_{2})(x) = F_{1}(x) + F_{2}(x)`
-                   b) the sum of a function with a scalar :math:`(F_{1}+scalar)(x) = F_{1}(x) + scalar`
+            *  Sum of two functions :math:`(F_{1}+F_{2})(x) = F_{1}(x) + F_{2}(x)`
+            *  Sum of a function with a scalar c :math:`(F_{1} + c)(x) = F_{1}(x) + c`
 
         """
         
@@ -147,11 +147,11 @@ class Function(object):
             raise ValueError('Not implemented')   
             
     def __radd__(self, other):        
-        """ Addition commutative. """
+        """ Addition is commutative. """
         return self + other 
                           
     def __sub__(self, other):
-        """ Returns the subtraction of the functions."""
+        """ Subtract two functions."""
         return self + (-1) * other    
 
     def __rmul__(self, scalar):
@@ -159,13 +159,11 @@ class Function(object):
         return ScaledFunction(self, scalar)
     
     def __mul__(self, scalar):
+        """Multiply a function with a scalar."""  
         return self.__rmul__(scalar)
     
-   
     def centered_at(self, center):
-        """ Returns a translated function, namely if we have a function :math:`F(x)` the center is at the origin.         
-            TranslateFunction is :math:`F(x - b)` and the center is at point b."""
-            
+        """ Returns a function translated from the origin, at the :code:'center' point."""
         if center is None:
             return self
         else:
@@ -179,7 +177,7 @@ class Function(object):
 
     @L.setter
     def L(self, value):
-        """Setter for Lipschitz constant"""
+        """Setter for the Lipschitz constant"""
         if isinstance(value, (Number,)) and value >= 0:
             self._L = value
         else:
@@ -187,8 +185,21 @@ class Function(object):
     
 class SumFunction(Function):
     
-    """ SumFunction represents the sum of two functions
-    
+    """ Abstract class representing the sum of functions.
+
+    Parameters
+    ----------
+
+    self : Function
+           Left function
+    other : Function
+           Right function
+
+    Returns
+    -------
+    SumFunction
+        The sum of two functions.
+
     .. math:: (F_{1} + F_{2})(x)  = F_{1}(x) + F_{2}(x)
     
     """
@@ -199,9 +210,14 @@ class SumFunction(Function):
 
         self.function1 = function1
         self.function2 = function2
+
     @property
     def L(self):
-        '''Lipschitz constant'''
+        """ Lipschitz constant 
+        
+        .. math:: L = L_{1} + L_{2}, L_{1}, L_{2} the corresponding Lipschitz contants.
+        
+        """
         if self.function1.L is not None and self.function2.L is not None:
             self._L = self.function1.L + self.function2.L
         else:
@@ -213,6 +229,7 @@ class SumFunction(Function):
         super(SumFunction, self.__class__).L.fset(self, value )
 
     def __call__(self,x):
+
         r"""Returns the value of the sum of functions :math:`F_{1}` and :math:`F_{2}` at x
         
         .. math:: (F_{1} + F_{2})(x) = F_{1}(x) + F_{2}(x)
@@ -222,14 +239,12 @@ class SumFunction(Function):
     
     def gradient(self, x, out=None):
         
-        r"""Returns the value of the sum of the gradient of functions :math:`F_{1}` and :math:`F_{2}` at x, 
-        if both of them are differentiable
-        
+        r"""Returns the value of the sum of the gradient of functions :math:`F_{1}` and :math:`F_{2}` at x, if both of them are differentiable
+
         .. math:: (F'_{1} + F'_{2})(x)  = F'_{1}(x) + F'_{2}(x)
         
         """
         
-#        try: 
         if out is None:            
             return self.function1.gradient(x) +  self.function2.gradient(x)  
         else:
@@ -238,28 +253,37 @@ class SumFunction(Function):
             out.add(self.function2.gradient(x), out=out)                
             
 class ScaledFunction(Function):
+
+
+    r""" Abstract class representing the scalar multiplication with a Function.
+
+    Parameters
+    ----------
+
+    self : Function
+           Function that is multiplied with a scalar
+    scalar : :obj:`float`
+           Scalar
+
+    Returns
+    -------
+    ScaledFunction
+        Scalar multiplication with a function.
+
+    .. math:: G  = \alpha F
     
-    r""" ScaledFunction represents the scalar multiplication with a Function.
+    """    
     
-    Let a function F then and a scalar :math:`\alpha`.
-    
-    If :math:`G(x) = \alpha F(x)` then:
-    
-    1. :math:`G(x) = \alpha  F(x)` ( __call__ method )
-    2. :math:`G'(x) = \alpha  F'(x)` ( gradient method ) 
-    3. :math:`G^{*}(x^{*}) = \alpha  F^{*}(\frac{x^{*}}{\alpha})` ( convex_conjugate method )   
-    4. :math:`\mathrm{prox}_{\tau G}(x) = \mathrm{prox}_{(\tau\alpha) F}(x)` ( proximal method ) 
-           
-    """
     def __init__(self, function, scalar):
         
         super(ScaledFunction, self).__init__() 
                                                      
         if not isinstance (scalar, Number):
-            raise TypeError('expected scalar: got {}'.format(type(scalar)))
+            raise TypeError('Expected scalar. Got {}'.format(type(scalar)))
         
         self.scalar = scalar
-        self.function = function       
+        self.function = function  
+
     @property
     def L(self):
         if self._L is None:
@@ -268,6 +292,7 @@ class ScaledFunction(Function):
             else:
                 self._L = None
         return self._L
+
     @L.setter
     def L(self, value):
         # call base class setter
@@ -276,14 +301,17 @@ class ScaledFunction(Function):
     @property
     def scalar(self):
         return self._scalar
+
     @scalar.setter
     def scalar(self, value):
         if isinstance(value, (Number, )):
             self._scalar = value
         else:
-            raise TypeError('Expecting scalar type as a number type. Got {}'.format(type(value)))
+            raise TypeError('Expecting scalar. Got {}'.format(type(value)))
+
     def __call__(self,x, out=None):
-        r"""Returns the value of the scaled function.
+
+        r"""Returns the value of the scaled function at :code:'x'.
         
         .. math:: G(x) = \alpha F(x)
         
@@ -291,11 +319,13 @@ class ScaledFunction(Function):
         return self.scalar * self.function(x)
 
     def convex_conjugate(self, x):
-        r"""Returns the convex conjugate of the scaled function.
+
+        r"""Returns the value of the convex conjugate of the scaled function at :code:'x'.
         
-        .. math:: G^{*}(x^{*}) = \alpha  F^{*}(\frac{x^{*}}{\alpha})
+        .. math:: G^{*}(x) = \alpha  F^{*}(\frac{x}{\alpha})
         
         """
+
         try:
             x.divide(self.scalar, out = x)
             tmp = x
@@ -311,7 +341,8 @@ class ScaledFunction(Function):
 
     
     def gradient(self, x, out=None):
-        r"""Returns the gradient of the scaled function.
+
+        r"""Returns the value of the gradient of the scaled function at :code:'x'.
         
         .. math:: G'(x) = \alpha  F'(x)
         
@@ -324,7 +355,7 @@ class ScaledFunction(Function):
 
     def proximal(self, x, tau, out=None):
         
-        r"""Returns the proximal operator of the scaled function.
+        r"""Returns the proximal operator of the scaled function at :code:'x'.
         
         .. math:: \mathrm{prox}_{\tau G}(x) = \mathrm{prox}_{(\tau\alpha) F}(x)
         
@@ -334,8 +365,11 @@ class ScaledFunction(Function):
 
 
     def proximal_conjugate(self, x, tau, out = None):
-        r"""This returns the proximal operator for the function at x, tau
-        """
+
+        r"""Returns the proximal operator of the convex conjugate of the scaled function at :code:'x'
+        using the Moreau Decomposition.
+        """  
+
         try:
             tmp = x
             x.divide(tau, out = tmp)
@@ -360,21 +394,26 @@ class ScaledFunction(Function):
             return val
 
 class SumScalarFunction(SumFunction):
-          
-    """ SumScalarFunction represents the sum a function with a scalar. 
+
+    r""" Abstract class representing the sum of a Function with a scalar.
+
+    Parameters
+    ----------
+
+    self : Function
+           Function is added with a scalar
+    constant : :obj:`float`
+           Scalar
+
+    Returns
+    -------
+    SumScalarFunction
+        Sum of a Function with a scalar.
+
+    .. math:: G  = F + constant
     
-        .. math:: (F + scalar)(x)  = F(x) + scalar
-    
-        Although SumFunction has no general expressions for 
-        
-        i) convex_conjugate
-        ii) proximal
-        iii) proximal_conjugate
-            
-        if the second argument is a ConstantFunction then we can derive the above analytically.
-    
-    """    
-    
+    """        
+             
     def __init__(self, function, constant):
         
         super(SumScalarFunction, self).__init__(function, ConstantFunction(constant))        
@@ -382,21 +421,23 @@ class SumScalarFunction(SumFunction):
         self.function = function
         
     def convex_conjugate(self,x):
+
+        r"""Returns the value of the convex conjugate of the sum of function with a scaled at :code:'x'.
         
-        r""" Returns the convex conjugate of a :math:`(F+scalar)`
-                
-        .. math:: (F+scalar)^{*}(x^{*}) = F^{*}(x^{*}) - scalar
-                        
+        .. math:: (G)^{*}(x^{*}) = F^{*}(x^{*}) - scalar
+        
         """        
+                 
         return self.function.convex_conjugate(x) - self.constant
     
     def proximal(self, x, tau, out=None):
-        
-        """ Returns the proximal operator of :math:`F+scalar`
 
-        .. math:: \mathrm{prox}_{\tau (F+scalar)}(x) = \mathrm{prox}_{\tau F}
-                        
-        """                
+        r"""Returns the proximal operator of the scaled function at :code:'x'.
+        
+        .. math:: \mathrm{prox}_{\tau G}(x) = \mathrm{prox}_{\tau F}(x)
+        
+        """            
+                       
         return self.function.proximal(x, tau, out=out)        
     
     @property
@@ -413,57 +454,70 @@ class SumScalarFunction(SumFunction):
         super(SumScalarFunction, self.__class__).L.fset(self, value )
 
 class ConstantFunction(Function):
+
+    r"""  Function representing the Constant Function.
+
+    Parameters
+    ----------
+
+    constant : :obj:`float`
+           Contant value of the function.
+
+    .. math:: F = constant
     
-            
-    r""" ConstantFunction: :math:`F(x) = constant, constant\in\mathbb{R}`         
-        
-    """
+    """     
     
     def __init__(self, constant = 0):
         self.constant = constant
         super(ConstantFunction, self).__init__(L=0)
-        
-        
-              
+         
     def __call__(self,x):
         
-        """ Returns the value of the function, :math:`F(x) = constant`"""
+        r""" Returns the value of the constant function at :code:'x'.
+        
+        .. math:: F(x) = constant
+        
+        """
         return self.constant
         
     def gradient(self, x, out=None):
         
-        """ Returns the value of the gradient of the function, :math:`F'(x)=0`"""       
+        r""" Returns the value of the gradient of the constant function at :code:'x'.
+        
+         .. math:: F'(x) = 0
+         
+        """       
         if out is None:
             return x * 0.
         else:
             out.fill(0)
     
     def convex_conjugate(self, x):
-                        
-        r""" The convex conjugate of constant function :math:`F(x) = c\in\mathbb{R}` is
+
+        r""" Returns the value of the convex conjugate of the constant function at :code:'x'.
         
         .. math:: 
-            F(x^{*}) 
+            F^{*}(x^{*}) 
             =
             \begin{cases}
-                -c, & if x^{*} = 0\\
+                - constant, & \mbox{ if } x^{*} = 0\\
                 \infty, & \mbox{otherwise}
             \end{cases}
-                                                          
-                    
-        However, :math:`x^{*} = 0` only in the limit of iterations, so in fact this can be infinity.
-        We do not want to have inf values in the convex conjugate, so we have to penalise this value accordingly.
-        The following penalisation is useful in the PDHG algorithm, when we compute primal & dual objectives
-        for convergence purposes.
+
+        Note
+        ----
+        However, :math:`x^{*} = 0` is true only in the limit of iterations, so in fact this can be infinity.
+        To avoid infinity values in the convex conjugate, we penalise this value accordingly.
+        The following penalisation is useful when computing objectives, e.g., primal and dual objectives in the PDHG algorithm, for convergence purposes.
         
         .. math:: F^{*}(x^{*}) = \sum \max\{x^{*}, 0\}
-        
-        """               
+                         
+        """           
         return x.maximum(0).sum()
                 
     def proximal(self, x, tau, out=None):
         
-        """Returns the proximal operator of the constant function, which is the same element, i.e.,
+        """Returns the proximal operator of the constant function at :code:'x'.
         
         .. math:: \mathrm{prox}_{\tau F}(x) = x 
         
@@ -479,7 +533,7 @@ class ConstantFunction(Function):
     @constant.setter
     def constant(self, value):
         if not isinstance (value, Number):
-            raise TypeError('expected scalar: got {}'.format(type(value)))
+            raise TypeError('Expected scalar. Got {}'.format(type(value)))
         self._constant = value
     @property
     def L(self):
@@ -493,29 +547,36 @@ class ConstantFunction(Function):
 
 class ZeroFunction(ConstantFunction):
     
-    """ ZeroFunction represents the zero function, :math:`F(x) = 0`        
+    """ Function representing the Zero Function. 
+    
+    .. math:: F = 0
+
     """
     
     def __init__(self):
         super(ZeroFunction, self).__init__(constant = 0.) 
         
 class TranslateFunction(Function):
+
+    r""" Abstract class representing the translation of the Function.
+
+    Parameters
+    ----------
+
+    self : Function
+           Function to be translated
+    center : :obj:`float`
+           Point of translation
+
+    Returns
+    -------
+    TranslateFunction
+        Translates the Function from the center.
+
+    .. math:: G  = F(\cdot - center) 
     
-    r""" TranslateFunction represents the translation of function F with respect to the center b.
-    
-    Let a function F and consider :math:`G(x) = F(x - center)`. 
-    
-    Function F is centered at 0, whereas G is centered at point b.
-    
-    If :math:`G(x) = F(x - b)` then:
-    
-    1. :math:`G(x) = F(x - b)` ( __call__ method )
-    2. :math:`G'(x) = F'(x - b)` ( gradient method ) 
-    3. :math:`G^{*}(x^{*}) = F^{*}(x^{*}) + <x^{*}, b >` ( convex_conjugate method )   
-    4. :math:`\mathrm{prox}_{\tau G}(x) = \mathrm{prox}_{\tau F}(x - b)  + b` ( proximal method ) 
-               
-    """
-    
+    """      
+        
     def __init__(self, function, center):
         try:
             L = function.L
@@ -528,7 +589,7 @@ class TranslateFunction(Function):
         
     def __call__(self, x):
         
-        r"""Returns the value of the translated function.
+        r"""Returns the value of the translated function at :code:`x`.
         
         .. math:: G(x) = F(x - b)
         
@@ -549,7 +610,7 @@ class TranslateFunction(Function):
     
     def gradient(self, x, out = None):
         
-        r"""Returns the gradient of the translated function.
+        r"""Returns the value of the gradient of the translated function :code:`x`.
         
         .. math:: G'(x) =  F'(x - b)
         
@@ -574,7 +635,7 @@ class TranslateFunction(Function):
     
     def proximal(self, x, tau, out = None):
         
-        r"""Returns the proximal operator of the translated function.
+        r"""Returns the proximal operator of the translated function at :code:`x`.
         
         .. math:: \mathrm{prox}_{\tau G}(x) = \mathrm{prox}_{\tau F}(x-b) + b
         
@@ -600,7 +661,7 @@ class TranslateFunction(Function):
 
     def convex_conjugate(self, x):
         
-        r"""Returns the convex conjugate of the translated function.
+        r"""Returns the value of the convex conjugate of the translated function at :code:`x`.
         
         .. math:: G^{*}(x^{*}) = F^{*}(x^{*}) + <x^{*}, b >
         

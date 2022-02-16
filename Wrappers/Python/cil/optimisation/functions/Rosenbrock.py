@@ -35,6 +35,7 @@ class Rosenbrock(Function):
 
     Examples
     --------
+    >>> from cil.optimisation.functions import Rosenbrock
     >>> f = Rosenbrock(alpha = 1, beta = 100)   
 
     Note
@@ -55,7 +56,7 @@ class Rosenbrock(Function):
         """
         if not isinstance(x, VectorData):
             raise TypeError('Rosenbrock function works on VectorData only')
-            
+
         vec = x.as_array()
         a = (self.alpha - vec[0])
         b = (vec[1] - (vec[0]*vec[0]))

@@ -21,7 +21,7 @@ from cil.optimisation.operators import DiagonalOperator
 
 class L2NormSquared(Function):
     
-    r""" L2NormSquared Function: :math:`F(x) = \| x\|^{2}_{2} = \underset{i}{\sum}x_{i}^{2}`
+    r""" L2NormSquared Function
           
     The following cases are considered:
 
@@ -80,6 +80,10 @@ class L2NormSquared(Function):
 
         *  :math:`F'(x) = 2*(x-b)`
 
+        Note
+        ----        
+        If :code:`b is not None`, the same formula of the gradient of :py:meth:`TranslateFunction.gradient` is used.
+
         """
                 
         if out is not None:
@@ -109,7 +113,7 @@ class L2NormSquared(Function):
 
         Note
         ----        
-        If :code:`b is not None`, the convex conjugate of TranslateFunction is used.
+        If :code:`b is not None`, the same formula of the convex conjugate of :py:meth:`TranslateFunction.convex_conjugate` is used.
 
         """
               
@@ -132,8 +136,11 @@ class L2NormSquared(Function):
 
         *  :math:`\mathrm{prox}_{\tau F}(x) = \frac{x-b}{1+2\tau} + b`
                 
-        
-        """            
+        Note
+        ----        
+        If :code:`b is not None`, the same formula of the proximal operator of :py:meth:`TranslateFunction.proximal` is used.
+
+        """          
 
         if out is None:
             

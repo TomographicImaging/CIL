@@ -86,7 +86,7 @@ class L1Norm(Function):
             \infty, \mbox{ otherwise }
             \end{cases}
 
-        If :code:`b is not None`, we use the same formula as the convex conjugate of :py:meth:`TranslateFunction.convex_conjugate`.
+        If :code:`b is not None`, the same formula as the convex conjugate of :py:meth:`TranslateFunction.convex_conjugate` is used.
     
         """        
         
@@ -129,7 +129,7 @@ class L1Norm(Function):
 
         Note
         ----
-        If :code:`b is not None`, we use the same formula as the proximal method of :py:meth:`TranslateFunction.proximal`.
+        If :code:`b is not None`, the same formula as the proximal operator of :py:meth:`TranslateFunction.proximal` is used.
                              
         """  
 

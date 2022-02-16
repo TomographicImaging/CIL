@@ -21,14 +21,24 @@ from numbers import Number
 
 class BlockFunction(Function):
     
-    r""" BlockFunction represents a *separable sum* function :math:`F` defined as
+    r""" BlockFunction 
+    
+    Represents a *separable sum* function defined as
     
     .. math:: F:X_{1}\times X_{2}\cdots\times X_{m} \rightarrow (-\infty, \infty]
     
     where :math:`F` is the separable sum of functions :math:`(f_{i})_{i=1}^{m}`,
     
     .. math:: F(x_{1}, x_{2}, \cdots, x_{m}) = \overset{m}{\underset{i=1}{\sum}}f_{i}(x_{i}), \mbox{ with } f_{i}: X_{i} \rightarrow (-\infty, \infty].
-    
+
+    Parameters
+    ----------
+
+    *functions : Function
+                 Functions to set up a separable sum.
+                 
+    Note
+    ----
     A nice property (due to it's separability structure) is that the proximal operator 
     can be decomposed along the proximal operators of each function :math:`f_{i}`.
     
@@ -37,6 +47,19 @@ class BlockFunction(Function):
     In addition, if :math:`\tau := (\tau_{1},\dots,\tau_{m})`, then 
     
     .. math:: \mathrm{prox}_{\tau F}(x) = ( \mathrm{prox}_{\tau_{i} f_{i}}(x_{i}) )_{i=1}^{m}
+
+    Examples
+    --------
+    :math:`F(x_{1}, x_{2}) = ||x_{1}||_{2}^{2} + ||x_{2}||_{1}`
+
+    >>> from cil.optimisation.functions import BlockFunction, L1Norm, L2NormSquared
+    >>> f1 = L2NormSquared()
+    >>> f2 = L1Norm()
+    >>> F = BlockFunction(f1, f2)
+
+    See also
+    --------
+    :class:`.BlockOperator`      
     
     """
     
@@ -60,16 +83,16 @@ class BlockFunction(Function):
                                 
     def __call__(self, x):
         
-        r""" Returns the value of the BlockFunction :math:`F`
+        r""" Returns the value of the BlockFunction at :code:`x`.
         
-        .. math:: F(x) = \overset{m}{\underset{i=1}{\sum}}f_{i}(x_{i}), \mbox{ where } x = (x_{1}, x_{2}, \cdots, x_{m}), \quad i = 1,2,\dots,m
-                
-        Parameter:
-            
-            x : BlockDataContainer and must have as many rows as self.length
+        :math:`F(x) = \overset{m}{\underset{i=1}{\sum}}f_{i}(x_{i}), \mbox{ where } x = (x_{1}, x_{2}, \cdots, x_{m}), \quad i = 1,2,\dots,m .`
 
-            returns ..math:: \sum(f_i(x_i))
-            
+        Raises
+        ------
+        ValueError
+            If the length of the BlockFunction is not the same as the length of the BlockDataContainer :code:`x`.
+        
+                            
         """
         
         if self.length != x.shape[0]:
@@ -81,14 +104,17 @@ class BlockFunction(Function):
     
     def convex_conjugate(self, x):
         
-        r"""Returns the value of the convex conjugate of the BlockFunction at :math:`x^{*}`.       
+        r"""Returns the value of the convex conjugate of the BlockFunction at :math:`x`.       
         
-            .. math:: F^{*}(x^{*}) = \overset{m}{\underset{i=1}{\sum}}f_{i}^{*}(x^{*}_{i})
+        :math:`F^{*}(x^{*}) = \overset{m}{\underset{i=1}{\sum}}f_{i}^{*}(x^{*}_{i})`
             
-            Parameter:
-            
-                x : BlockDataContainer and must have as many rows as self.length            
+  
+        Raises
+        ------
+        ValueError
+            If the length of the BlockFunction is not the same as the length of the BlockDataContainer :code:`x`.
         
+
         """     
         
         if self.length != x.shape[0]:
@@ -100,13 +126,15 @@ class BlockFunction(Function):
     
     def proximal(self, x, tau, out = None):
         
-        r"""Proximal operator of the BlockFunction at x:
+        r"""Returns the value of the proximal operator of the BlockFunction at :code:`x`.
         
-            .. math:: \mathrm{prox}_{\tau F}(x) =  (\mathrm{prox}_{\tau f_{i}}(x_{i}))_{i=1}^{m}
+        :math:`\mathrm{prox}_{\tau F}(x) =  (\mathrm{prox}_{\tau f_{i}}(x_{i}))_{i=1}^{m}`
             
-            Parameter:
-            
-                x : BlockDataContainer and must have as many rows as self.length            
+        Raises
+        ------
+        ValueError
+            If the length of the BlockFunction is not the same as the length of the BlockDataContainer :code:`x`.
+                        
         """
         
         if self.length != x.shape[0]:
@@ -130,20 +158,19 @@ class BlockFunction(Function):
                     self.functions[i].proximal(x.get_item(i), tau, out[i])
             else:
                 for i in range(self.length):
-                    self.functions[i].proximal(x.get_item(i), tau.get_item(i), out[i])
-            
-            
+                    self.functions[i].proximal(x.get_item(i), tau.get_item(i), out[i])            
     
     def gradient(self, x, out=None):
         
-        r"""Returns the value of the gradient of the BlockFunction function at x.
+        r"""Returns the value of the gradient of the BlockFunction function at :code:`x`.
         
-        .. math:: F'(x) = [f_{1}'(x_{1}), ... , f_{m}'(x_{m})]        
-        
-        Parameter:
+        :math:`F'(x) = [f_{1}'(x_{1}), ... , f_{m}'(x_{m})]`
             
-            x : BlockDataContainer and must have as many rows as self.length
-                
+        Raises
+        ------
+        ValueError
+            If the length of the BlockFunction is not the same as the length of the BlockDataContainer :code:`x`.
+                           
         """        
         
         if self.length != x.shape[0]:
@@ -154,43 +181,11 @@ class BlockFunction(Function):
             out[i] = self.functions[i].gradient(x.get_item(i))
             
         return  BlockDataContainer(*out)     
-
-    def proximal_conjugate(self, x, tau, out = None):
         
-        r"""Proximal operator of the convex conjugate of BlockFunction at x:
-        
-            .. math:: \mathrm{prox}_{\tau F^{*}}(x) = (\mathrm{prox}_{\tau f^{*}_{i}}(x^{*}_{i}))_{i=1}^{m}
-            
-            Parameter:
-            
-                x : BlockDataContainer and must have as many rows as self.length            
+    def __getitem__(self, ind):
+        """Returns the function of the separable sum at the :code:`ind` place.
         """
-
-        if self.length != x.shape[0]:
-            raise ValueError('BlockFunction and BlockDataContainer have incompatible size')
-
-        if out is not None:
-            if isinstance(tau, Number):
-                for i in range(self.length):
-                    self.functions[i].proximal_conjugate(x.get_item(i), tau, out=out.get_item(i))
-            else:
-                for i in range(self.length):
-                    self.functions[i].proximal_conjugate(x.get_item(i), tau.get_item(i),out=out.get_item(i))
-            
-        else:
-                
-            out = [None]*self.length
-            if isinstance(tau, Number):
-                for i in range(self.length):
-                    out[i] = self.functions[i].proximal_conjugate(x.get_item(i), tau)
-            else:
-                for i in range(self.length):
-                    out[i] = self.functions[i].proximal_conjugate(x.get_item(i), tau.get_item(i))
-            
-            return BlockDataContainer(*out)
-        
-    def __getitem__(self, row):
-        return self.functions[row]
+        return self.functions[ind]
         
     def __rmul__(self, other):
         '''Define multiplication with a scalar

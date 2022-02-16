@@ -37,6 +37,10 @@ class L2NormSquared(Function):
     Examples
     --------
 
+    :math:`F(x) = \|x\|_{2}^{2}`
+
+    :math:`F(x) = \|x - b\|_{2}^{2}`    
+
     >>> from cil.optimisation.functions import L2NormSquared 
     >>> from cil.framework import ImageGeometry   
     >>> F = L2NormSquared() # ( no data )

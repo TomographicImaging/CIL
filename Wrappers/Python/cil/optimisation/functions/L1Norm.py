@@ -36,6 +36,10 @@ class L1Norm(Function):
         Examples
         --------
 
+        :math:`F(x) = \|x\|_{1}`
+
+        :math:`F(x) = \|x - b\|_{1}`
+
         >>> from cil.optimisation.functions import L1Norm 
         >>> from cil.framework import ImageGeometry   
         >>> F = L1Norm() # ( no data )

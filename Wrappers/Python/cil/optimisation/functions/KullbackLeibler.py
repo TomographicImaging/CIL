@@ -268,15 +268,15 @@ class KullbackLeibler(Function):
     acquired data follow Poisson distribution. If we denote the acquired data with :code:`b`
     then, we write
     
-     .. math:: \underset{i}{\sum} F(b_{i}, (v + \eta)_{i})
-     
-     where, :math:`\eta` is an additional noise. 
-     
-     In the case of Positron Emission Tomography reconstruction :math:`\eta` represents 
-     scatter and random events contribution during the PET acquisition. Hence, in that case the KullbackLeibler
-     fidelity measures the distance between :math:`\mathcal{A}v + \eta` and acquisition data :math:`b`, where
-     :math:`\mathcal{A}` is the projection operator. This is related to `PoissonLogLikelihoodWithLinearModelForMean <http://stir.sourceforge.net/documentation/doxy/html/classstir_1_1PoissonLogLikelihoodWithLinearModelForMean.html>`_ ,
-     definition that is used in PET reconstruction in the `SIRF <https://github.com/SyneRBI/SIRF>`_ software.
+    .. math:: \underset{i}{\sum} F(b_{i}, (v + \eta)_{i})
+    
+    where, :math:`\eta` is an additional noise. 
+    
+    In the case of Positron Emission Tomography reconstruction :math:`\eta` represents 
+    scatter and random events contribution during the PET acquisition. Hence, in that case the KullbackLeibler
+    fidelity measures the distance between :math:`\mathcal{A}v + \eta` and acquisition data :math:`b`, where
+    :math:`\mathcal{A}` is the projection operator. This is related to `PoissonLogLikelihoodWithLinearModelForMean <http://stir.sourceforge.net/documentation/doxy/html/classstir_1_1PoissonLogLikelihoodWithLinearModelForMean.html>`_ ,
+    definition that is used in PET reconstruction in the `SIRF <https://github.com/SyneRBI/SIRF>`_ software.
     
        
     Note
@@ -406,13 +406,6 @@ class KullbackLeibler(Function):
         
         :math:`\mathrm{prox}_{\tau F}(x) = \frac{1}{2}\bigg( (x - \eta - \tau) + \sqrt{ (x + \eta - \tau)^2 + 4\tau b} \bigg)`
 
-
-        Note
-        ----
-
-        The proximal operator of the convex conjugate of the KullbackLeiber function is computed
-        using the Moreau decomposition of :py:meth:`Function.proximal_conjugate` of the base class :class:`.Function`.
-
                             
         """
         if self.use_numba and has_numba:
@@ -470,76 +463,69 @@ class KullbackLeibler(Function):
                 out *= 0.5            
         
                             
-    # def proximal_conjugate(self, x, tau, out=None):
+    def proximal_conjugate(self, x, tau, out=None):
         
-    #     r"""Returns the value of the proximal operator of the convex conjugate of KullbackLeibler at x:
+        r"""Returns the value of the proximal operator of the convex conjugate of KullbackLeibler at :math:`(b, x + \eta)`.
            
-    #        .. math::     prox_{\tau * f^{*}}(x)
+        :math:`\mathrm{prox}_{\tau F^{*}}(x) = 0.5*((z + 1) - \sqrt{(z-1)^2 + 4 * \tau b})`, where :math:`z = x + \tau \eta`.
 
-    #     The proximal for the convex conjugate of :math:`F` is 
-        
-    #     .. math:: \mathrm{prox}_{\tau F^{*}}(x) = 0.5*((z + 1) - \sqrt{(z-1)^2 + 4 * \tau b})
-        
-    #     where :math:`z = x + \tau \eta`
+        """
 
-
-    #     """
-
-    #     if self.use_numba and has_numba:
-    #         if out is None:
-    #             out = (x * 0.)
-    #             # out_np = numpy.empty(out.shape, dtype=numpy.float64)
-    #             out_np = out.as_array()
-    #             if isinstance(tau, Number):
-    #                 if self.mask is not None:
-    #                     kl_proximal_conjugate_mask(x.as_array(), self.b_np, self.eta_np, \
-    #                         tau, out_np, self.mask)
-    #                 else:
-    #                     kl_proximal_conjugate(x.as_array(), self.b_np, self.eta_np, \
-    #                         tau, out_np)
-    #             else:
-    #                 if self.mask is not None:
-    #                     kl_proximal_conjugate_arr_mask(x.as_array(), self.b_np, self.eta_np, \
-    #                         tau.as_array(), out_np, self.mask)
-    #                 else:
-    #                     kl_proximal_conjugate_arr(x.as_array(), self.b_np, self.eta_np, \
-    #                         tau.as_array(), out_np)
-    #             out.fill(out_np)
-    #             return out
-    #         else:
-    #             out_np = out.as_array()
-    #             if isinstance(tau, Number):
-    #                 if self.mask is not None:
-    #                     kl_proximal_conjugate_mask(x.as_array(), self.b_np, self.eta_np, \
-    #                         tau, out_np, self.mask)
-    #                 else:
-    #                     kl_proximal_conjugate(x.as_array(), self.b_np, self.eta_np, tau, \
-    #                         out_np)
-    #             else:
-    #                 if self.mask is not None:
-    #                     kl_proximal_conjugate_arr_mask(x.as_array(), self.b_np, self.eta_np, \
-    #                         tau.as_array(), out_np, self.mask)
-    #                 else:
-    #                     kl_proximal_conjugate_arr(x.as_array(), self.b_np, self.eta_np, \
-    #                         tau.as_array(), out_np)
-    #             out.fill(out_np)
-    #     else:
-    #         if out is None:
-    #             z = x + tau * self.eta
-    #             return 0.5*((z + 1) - ((z-1).power(2) + 4 * tau * self.b).sqrt())
-    #         else:            
-    #             tmp = tau * self.eta
-    #             tmp += x
-    #             tmp -= 1
+        if self.use_numba and has_numba:
+            if out is None:
+                out = (x * 0.)
+                # out_np = numpy.empty(out.shape, dtype=numpy.float64)
+                out_np = out.as_array()
+                if isinstance(tau, Number):
+                    if self.mask is not None:
+                        kl_proximal_conjugate_mask(x.as_array(), self.b_np, self.eta_np, \
+                            tau, out_np, self.mask)
+                    else:
+                        kl_proximal_conjugate(x.as_array(), self.b_np, self.eta_np, \
+                            tau, out_np)
+                else:
+                    if self.mask is not None:
+                        kl_proximal_conjugate_arr_mask(x.as_array(), self.b_np, self.eta_np, \
+                            tau.as_array(), out_np, self.mask)
+                    else:
+                        kl_proximal_conjugate_arr(x.as_array(), self.b_np, self.eta_np, \
+                            tau.as_array(), out_np)
+                out.fill(out_np)
+                return out
+            else:
+                out_np = out.as_array()
+                if isinstance(tau, Number):
+                    if self.mask is not None:
+                        kl_proximal_conjugate_mask(x.as_array(), self.b_np, self.eta_np, \
+                            tau, out_np, self.mask)
+                    else:
+                        kl_proximal_conjugate(x.as_array(), self.b_np, self.eta_np, tau, \
+                            out_np)
+                else:
+                    if self.mask is not None:
+                        kl_proximal_conjugate_arr_mask(x.as_array(), self.b_np, self.eta_np, \
+                            tau.as_array(), out_np, self.mask)
+                    else:
+                        kl_proximal_conjugate_arr(x.as_array(), self.b_np, self.eta_np, \
+                            tau.as_array(), out_np)
+                out.fill(out_np)
+        else:
+            if out is None:
+                z = x + tau * self.eta
+                return 0.5*((z + 1) - ((z-1).power(2) + 4 * tau * self.b).sqrt())
+            else:            
+                tmp = tau * self.eta
+                tmp += x
+                tmp -= 1
                 
-    #             self.b.multiply(4*tau, out=out)    
+                self.b.multiply(4*tau, out=out)    
                 
-    #             out.add(tmp.power(2), out=out)
-    #             out.sqrt(out=out)
-    #             out *= -1
-    #             tmp += 2
-    #             out += tmp
-    #             out *= 0.5
+                out.add(tmp.power(2), out=out)
+                out.sqrt(out=out)
+                out *= -1
+                tmp += 2
+                out += tmp
+                out *= 0.5
 
 
 

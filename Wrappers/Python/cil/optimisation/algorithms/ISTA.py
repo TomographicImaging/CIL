@@ -53,14 +53,13 @@ class ISTA(Algorithm):
     >>> n, m = 50, 500
     >>> A = np.random.uniform(0,1, (m, n)).astype('float32') # (numpy array)
     >>> b = (A.dot(np.random.randn(n)) + 0.1*np.random.randn(m)).astype('float32') # (numpy vector)
-
+    
     >>> Aop = MatrixOperator(A) # (CIL operator)
     >>> bop = VectorData(b) # (CIL VectorData)
-
+    
     >>> f = LeastSquares(Aop, b=bop, c=0.5)
     >>> g = ZeroFunction()
     >>> ig = Aop.domain
-    
     >>> ista = ISTA(initial = ig.allocate(), f = f, g = g, max_iteration=10)     
     >>> ista.run()
       

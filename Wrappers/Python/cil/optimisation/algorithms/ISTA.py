@@ -56,7 +56,7 @@ class ISTA(Algorithm):
     
     >>> Aop = MatrixOperator(A) # (CIL operator)
     >>> bop = VectorData(b) # (CIL VectorData)
-    
+
     >>> f = LeastSquares(Aop, b=bop, c=0.5)
     >>> g = ZeroFunction()
     >>> ig = Aop.domain
@@ -106,7 +106,7 @@ class ISTA(Algorithm):
 
         # Check option for step-size            
         if self.step_size is None:
-            self.step_size = 1./f.L
+            self.step_size = 0.99 * 2/f.L
         else:
             self.step_size = step_size
         

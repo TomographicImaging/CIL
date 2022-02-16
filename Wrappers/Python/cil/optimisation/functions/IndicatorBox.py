@@ -34,7 +34,7 @@ class IndicatorBox(Function):
 
     .. math:: 
          
-         f(x) = \mathbb{I}_{[a, b]} = \begin{cases}  
+         F(x) = \mathbb{I}_{[a, b]} = \begin{cases}  
                                             0, \text{ if } x \in [a, b] \\
                                             \infty, \text{otherwise}
                                      \end{cases}
@@ -42,7 +42,8 @@ class IndicatorBox(Function):
     Examples
     --------
 
-    >> f = IndicatorBox(lower=0.5, upper=10.0)
+    >>> from cil.optimisation.functions import IndicatorBox
+    >>> F = IndicatorBox(lower=0.5, upper=10.0)
                                        
     
     References
@@ -60,18 +61,7 @@ class IndicatorBox(Function):
 
     def __call__(self,x):
 
-        """
-        Parameters
-        ----------
-
-        x : DataContainer
-
-        Returns
-        -------
-
-        float 
-            Returns the value of IndicatorBox at :code:`x`. Either is 0 or :code:`numpy.inf`.
-
+        r"""Returns the value of the IndicatorBox function at :code:`x`.
         """     
                 
         if (numpy.all(x.as_array() >= self.lower) and 
@@ -84,10 +74,6 @@ class IndicatorBox(Function):
     def gradient(self, x):
 
         """
-        
-        Parameters
-        ----------
-        x : DataContainer
 
         Raises
         -------
@@ -99,17 +85,7 @@ class IndicatorBox(Function):
     
     def convex_conjugate(self,x):
         
-        """
-
-        Parameters
-        ----------
-        x : DataContainer 
-
-        Returns
-        -------
-
-        float 
-            Returns the value of the convex conjugate of the IndicatorBox at :code:`x`. 
+        r"""Returns the value of the convex conjugate of the IndicatorBox function at :code:`x`.
 
         .. math:: 
             
@@ -124,12 +100,10 @@ class IndicatorBox(Function):
          
     def proximal(self, x, tau, out=None):
 
-        r"""
+        r"""Returns the value of the proximal operator of the IndicatorBox function at :code:`x`. 
         
-        Proximal operator of IndicatorBox at x
-
-            .. math:: prox_{\tau * f}(x)
-        
+        :math:`prox_{\tau \,F}(x) = \min\{\max\{x, \mbox{lower}\}, \mbox{upper}\}`
+                
         """
         
         if out is None:
@@ -138,19 +112,3 @@ class IndicatorBox(Function):
             x.maximum(self.lower, out=out)
             out.minimum(self.upper, out=out) 
             
-    def proximal_conjugate(self, x, tau, out=None):
-        
-        r'''Proximal operator of the convex conjugate of IndicatorBox at x:
-
-          ..math:: prox_{\tau * f^{*}}(x)
-        '''
-
-        if out is None:
-            
-            return x - tau * self.proximal(x/tau, tau)
-        
-        else:
-            
-            self.proximal(x/tau, tau, out=out)
-            out *= -1*tau
-            out += x

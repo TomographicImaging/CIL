@@ -36,7 +36,11 @@ class L1Norm(Function):
         Examples
         --------
 
+        >>> from cil.optimisation.functions import L1Norm 
+        >>> from cil.framework import ImageGeometry   
         >>> F = L1Norm() # ( no data )
+        >>> ig = ImageGeometry(3,4)
+        >>> data = ig.allocate('random')
         >>> F = L1Norm(b=data) # ( with data )
     
                     

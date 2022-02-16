@@ -37,7 +37,11 @@ class L2NormSquared(Function):
     Examples
     --------
 
+    >>> from cil.optimisation.functions import L2NormSquared 
+    >>> from cil.framework import ImageGeometry   
     >>> F = L2NormSquared() # ( no data )
+    >>> ig = ImageGeometry(3,4)
+    >>> data = ig.allocate('random')
     >>> F = L2NormSquared(b=data) # ( with data )
         
                                                   
@@ -163,7 +167,7 @@ class L2NormSquared(Function):
 
 class WeightedL2NormSquared(Function):
     
-    r""" WeightedL2NormSquared function:
+    r""" WeightedL2NormSquared function
 
     The following cases are considered:   
 

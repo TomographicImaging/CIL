@@ -3,43 +3,71 @@ import warnings
 
 class ISTA(Algorithm):
     
-    r''' Iterative Shrinkage-Thresholding Algorithm 
+    r"""Iterative Shrinkage-Thresholding Algorithm, see :cite:`BeckTeboulle_a`, :cite:`BeckTeboulle_b`.
     
-    Problem : 
+    Iterative Shrinkage-Thresholding Algorithm (ISTA) 
     
-    .. math::
+    .. math:: x^{k+1} = \mathrm{prox}_{L g}(x^{k} - \frac{1}{L}\nabla f(x^{k}))
     
-      \min_{x} f(x) + g(x)
+    is used to solve 
     
-    |
-    
-    Parameters :
-        
-      :param initial: Initial guess ( Default initial = 0)
-      :param f: Differentiable function
-      :param g: Convex function with " simple " proximal operator
+    .. math:: \min_{x} f(x) + g(x)
+
+    where :math:`f` is differentiable, :math:`g` has a *simple* proximal operator and :math:`L`
+    is the Lipshcitz constant of the function :math:`f`.
+
+    Parameters
+    ----------
+
+    initial : DataContainer
+              Initial guess of ISTA.
+    f : Function
+        Differentiable function 
+    g : Function
+        Convex function with *simple* proximal operator
+    step_size : positive :obj:`float`, default = None
+                Step size for the gradient step of ISTA
 
 
-    Reference:
+    **kwargs:
+        Keyward arguments used from the base class :class:`.Algorithm`.    
+    
+        max_iteration : :obj:`int`, optional, default=0
+            Maximum number of iterations of ISTA.
+        update_objective_interval : :obj:`int`, optional, default=1
+            Evaluates objective every ``update_objective_interval``.
+             
+
+    Examples
+    --------
+
+    .. math:: \underset{x}{\mathrm{argmin}}\|A x - b\|^{2}_{2}
+
+
+    >>> from cil.optimisation.algorithms import ISTA
+    >>> import numpy as np
+    >>> from cil.framework import VectorData
+    >>> from cil.optimisation.operators import MatrixOperator
+
+    >>> np.random.seed(10)
+    >>> n, m = 50, 500
+    >>> A = np.random.uniform(0,1, (m, n)).astype('float32') # (numpy array)
+    >>> b = (A.dot(np.random.randn(n)) + 0.1*np.random.randn(m)).astype('float32') # (numpy vector)
+
+    >>> Aop = MatrixOperator(A) # (CIL operator)
+    >>> bop = VectorData(b) # (CIL VectorData)
+
+    >>> f = LeastSquares(Aop, b=bop, c=0.5)
+    >>> g = ZeroFunction()
+    >>> ig = Aop.domain
+    
+    >>> ista = ISTA(initial = ig.allocate(), f = f, g = g, max_iteration=10)     
+    >>> ista.run()
       
-        Beck, A. and Teboulle, M., 2009. A fast iterative shrinkage-thresholding 
-        algorithm for linear inverse problems. 
-        SIAM journal on imaging sciences,2(1), pp.183-202.
-    '''
+    """
     
     
     def __init__(self, initial, f, g, step_size = None, **kwargs):
-        
-        '''ISTA algorithm creator 
-        
-        initialisation can be done at creation time if all 
-        proper variables are passed or later with set_up
-        
-        Optional parameters:
-
-        :param initial: Initial guess ( Default initial = 0)
-        :param f: Differentiable function
-        :param g: Convex function with " simple " proximal operator'''
         
         super(ISTA, self).__init__(**kwargs)
 
@@ -55,11 +83,8 @@ class ISTA(Algorithm):
         self.set_up(initial=initial, f=f, g=g, step_size=step_size)
 
     def set_up(self, initial, f, g, step_size):
-        '''initialisation of the algorithm
-
-        :param initial: Initial guess ( Default initial = 0)
-        :param f: Differentiable function
-        :param g: Convex function with " simple " proximal operator'''
+        """ Set up of the algorithm
+        """
 
         print("{} setting up".format(self.__class__.__name__, ))
         
@@ -93,6 +118,9 @@ class ISTA(Algorithm):
 
                     
     def update(self):
+
+        r"""Performs a single iteration of ISTA
+        """
         
         # gradient step
         self.f.gradient(self.x_old, out=self.x)
@@ -106,4 +134,6 @@ class ISTA(Algorithm):
         self.x_old.fill(self.x)
         
     def update_objective(self):
+        """Computes the objective 
+        """
         self.loss.append( self.f(self.x) + self.g(self.x) )    

@@ -19,24 +19,6 @@ from cil.optimisation.functions import Function
 import numpy as np
 
  
-def soft_shrinkage(x, tau, out=None):
-    
-    r"""Returns the value of the proximal operator of the function :math: `F(x) = \|x\|_{1}` at :code:'x'. 
-    Also referred as soft-shrinkage operator.
-
-    .. math:: \mathrm{prox}_{\tau \|\cdot\|_{1}}(x) = \mathrm{soft}(x, \tau) = ( |x| - \tau )_{+} \mathrm{sign}(x)
-
-    """
-    
-    if out is None:
-        return x.sign() * (x.abs() - tau).maximum(0) 
-    else:
-        x.abs(out = out)
-        out -= tau
-        out.maximum(0, out = out)
-        out *= x.sign()  
-        
-
 class L1Norm(Function):
     
     r"""L1Norm Function
@@ -104,7 +86,7 @@ class L1Norm(Function):
             \infty, \mbox{ otherwise }
             \end{cases}
 
-        If :code:`b is not None`, the convex conjugate of TranslateFunction is used.
+        If :code:`b is not None`, we use the same formula as the convex conjugate of :py:meth:`TranslateFunction.convex_conjugate`.
     
         """        
         
@@ -116,6 +98,22 @@ class L1Norm(Function):
                 return 0.
         return np.inf    
 
+    def _soft_shrinkage(self, x, tau, out=None):
+        
+        r"""Returns the value of the proximal operator of the function :math: `F(x) = \|x\|_{1}` at :code:'x'. 
+        Also referred as soft-shrinkage operator.
+
+        .. math:: \mathrm{prox}_{\tau \|\cdot\|_{1}}(x) = \mathrm{soft}(x, \tau) = ( |x| - \tau )_{+} \mathrm{sign}(x)
+
+        """
+        
+        if out is None:
+            return x.sign() * (x.abs() - tau).maximum(0) 
+        else:
+            x.abs(out = out)
+            out -= tau
+            out.maximum(0, out = out)
+            out *= x.sign()  
                     
     def proximal(self, x, tau, out=None):
         
@@ -126,23 +124,26 @@ class L1Norm(Function):
         *  :math:`\mathrm{prox}_{\tau F}(x) = \mathrm{soft}(x, \tau)`
 
         *  :math:`\mathrm{prox}_{\tau F}(x) = \mathrm{soft}(x - b, \tau) + b`
-        
-        
+                
         where, :math:`\mathrm{soft}(x, \tau) := ( |x| - \tau )_{+} \mathrm{sign}(x)\,.`
-                            
+
+        Note
+        ----
+        If :code:`b is not None`, we use the same formula as the proximal method of :py:meth:`TranslateFunction.proximal`.
+                             
         """  
 
                     
         if out is None:                                                
             if self.b is not None:                                
-                return self.b + soft_shrinkage(x - self.b, tau)
+                return self.b + self._soft_shrinkage(x - self.b, tau)
             else:
-                return soft_shrinkage(x, tau)             
+                return self._soft_shrinkage(x, tau)             
         else: 
             
             if self.b is not None:
-                soft_shrinkage(x - self.b, tau, out = out)
+                self._soft_shrinkage(x - self.b, tau, out = out)
                 out += self.b
             else:
-                soft_shrinkage(x, tau, out = out)       
+                self._soft_shrinkage(x, tau, out = out)       
 

@@ -40,7 +40,7 @@ class OperatorCompositionFunction(Function):
 
     .. todo:: If the operator is unitary, i.e., :math:`A\circ A^{T} = \mathbb{I}`, there is an explicit formula for these methods.
 
-    See Chapter 6 in :cite:`Beck2017` and :cite:`Combettes2011`.
+    See Chapter 6 in :cite:`Beck2017` and Tables 1,2 in :cite:`Combettes2011`.
 
     Examples
     --------

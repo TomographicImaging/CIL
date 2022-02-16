@@ -175,11 +175,7 @@ class WeightedL2NormSquared(Function):
 
     *  :math:`F(\cdot) = ||\cdot - \,b||_{w,2}^{2}`,
 
-    where,
-
-    .. math::
-    
-        \| x\|_{w}^{2}_{2} = \sum w * |x|^{2} 
+    where, :math:`\| x\|_{w}^{2}_{2} = \sum w * |x|^{2}`.
 
     **kwargs
         b : DataContainer, default = None      
@@ -190,7 +186,11 @@ class WeightedL2NormSquared(Function):
     Examples
     --------
 
+    >>> from cil.optimisation.functions import WeightedL2NormSquared 
+    >>> from cil.framework import ImageGeometry 
     >>> F = WeightedL2NormSquared(weight = 5.0) # ( no data )
+    >>> ig = ImageGeometry(3,4)    
+    >>> data = ig.allocate('random')    
     >>> F = WeightedL2NormSquared(b = data, weight = 2.0) # ( with data )             
                                                               
     """                 

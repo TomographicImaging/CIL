@@ -44,7 +44,11 @@ class OperatorCompositionFunction(Function):
 
     Examples
     --------
+    >>> from cil.framework import ImageGeometry     
+    >>> from cil.optimisation.functions import MixedL21Norm, OperatorCompositionFunction 
+    >>> from cil.optimisation.operators import GradientOperator 
     >>> F = MixedL21Norm()
+    >>> ig = ImageGeometry(3,4)
     >>> G = GradientOperator(ig)
     >>> H = OperatorCompositionFunction(F, G) # The L21 norm of the gradient, i.e., the TotalVariation 
     

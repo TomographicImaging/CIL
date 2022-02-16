@@ -16,31 +16,41 @@
 #   limitations under the License.
 
 from cil.optimisation.functions import Function
-from cil.optimisation.operators import Operator, ScaledOperator
 
-import warnings
 
 class OperatorCompositionFunction(Function):
     
-    """ Composition of a function with an operator as : :math:`(F \otimes A)(x) = F(Ax)`
-    
-            :parameter function: :code:`Function` F
-            :parameter operator: :code:`Operator` A
-            
-            
-        For general operator, we have no explicit formulas for convex_conjugate,
-        proximal and proximal_conjugate            
+    """ OperatorCompositionFunction
+
+    :math:`F = H \circ A, (H \circ A)(\cdot) = H(A(\cdot))`
+
+    Parameters
+    ----------
+
+    function : Function
+               A function to be composed with an operator
+    operator : Operator
+               A general operator
+
+
+    Note
+    ----
+    For a general operator, we have no explicit formulas for the :code:`convex_conjugate`,
+    the :code:`proximal` and :code:`proximal_conjugate` methods.
+
+    .. todo:: If the operator is unitary, i.e., :math:`A\circ A^{T} = \mathbb{I}`, there is an explicit formula for these methods.
+
+    See Chapter 6 in :cite:`Beck2017` and :cite:`Combettes2011`.
+
+    Examples
+    --------
+    >>> F = MixedL21Norm()
+    >>> G = GradientOperator(ig)
+    >>> H = OperatorCompositionFunction(F, G) # The L21 norm of the gradient, i.e., the TotalVariation 
     
     """
     
     def __init__(self, function, operator):
-        '''creator
-
-    :param A: operator
-    :type A: :code:`Operator`
-    :param f: function
-    :type f: :code:`Function`
-    '''
 
         super(OperatorCompositionFunction, self).__init__()    
         
@@ -58,16 +68,19 @@ class OperatorCompositionFunction(Function):
     
     def __call__(self, x):
         
-        """ Returns :math:`F(Ax)`
+        """ Returns the value of the OperatorCompositionFunction at :code:`x`.
+
+        :math:`(H \circ A)(x) = H(A(x))`
+
         """
     
         return self.function(self.operator.direct(x))  
     
     def gradient(self, x, out=None):
+
+        r"""Returns the value of the gradient of the OperatorCompositionFunction at :code:`x`.
         
-        """ Return the gradient of F(Ax), 
-        
-        ..math ::  (F(Ax))' = A^{T}F'(Ax)
+        :math:`(H(Ax))' = A^{T}H'(Ax)`
             
         """
         
@@ -78,4 +91,3 @@ class OperatorCompositionFunction(Function):
             return self.operator.adjoint(tmp)
         else: 
             self.operator.adjoint(tmp, out=out)
-

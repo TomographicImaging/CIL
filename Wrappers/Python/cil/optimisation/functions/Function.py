@@ -629,3 +629,30 @@ class TranslateFunction(Function):
         """        
         
         return self.function.convex_conjugate(x) + self.center.dot(x)
+
+
+if __name__ == "__main__":
+
+    F1 = Function()
+    F2 = Function()
+
+    res1 = F1 + F2
+    print("sum two function", res1.__class__) # SumFunction
+    
+    res2 = F1 + 5
+    print("sum function and scalar",res2.__class__) # SumScalarFunction
+    
+    res3 = 5 + F1
+    print("sum scalar and function",res3.__class__) # SumScalarFunction
+
+    res4 = F1 + ConstantFunction(5)
+    print("sum function and constant",res4.__class__) # SumFunction
+
+    res4 = ConstantFunction(5) + 5
+    print("sum constant and function",res4.__class__) # SumScalarFunction
+
+    res4 = ZeroFunction() + 5
+    print("sum zero function and function",res4.__class__) # SumScalarFunction 
+
+    res3 = res1 + (F1+F2)
+    print(res3.__class__)

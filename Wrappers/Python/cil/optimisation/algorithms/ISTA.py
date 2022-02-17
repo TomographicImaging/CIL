@@ -26,7 +26,8 @@ class ISTA(Algorithm):
     g : Function
         Convex function with *simple* proximal operator
     step_size : positive :obj:`float`, default = None
-                Step size for the gradient step of ISTA
+                Step size for the gradient step of ISTA. 
+                The default :code:`step_size` is :math:`\frac{0.99 * 2}{L}`, see []
 
 
     **kwargs:
@@ -48,20 +49,21 @@ class ISTA(Algorithm):
     >>> import numpy as np
     >>> from cil.framework import VectorData
     >>> from cil.optimisation.operators import MatrixOperator
-
     >>> np.random.seed(10)
     >>> n, m = 50, 500
     >>> A = np.random.uniform(0,1, (m, n)).astype('float32') # (numpy array)
     >>> b = (A.dot(np.random.randn(n)) + 0.1*np.random.randn(m)).astype('float32') # (numpy vector)
-    
     >>> Aop = MatrixOperator(A) # (CIL operator)
     >>> bop = VectorData(b) # (CIL VectorData)
-
     >>> f = LeastSquares(Aop, b=bop, c=0.5)
     >>> g = ZeroFunction()
     >>> ig = Aop.domain
     >>> ista = ISTA(initial = ig.allocate(), f = f, g = g, max_iteration=10)     
     >>> ista.run()
+
+    References
+    ----------
+
       
     """
     

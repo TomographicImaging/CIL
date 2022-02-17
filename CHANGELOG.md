@@ -1,4 +1,8 @@
 * 2x.x.x
+  - Fixed PowerMethod for square/non-square, complex/float matrices with stopping criterion.
+  - CofR image_sharpness improved for large datasets
+  - Geometry alignmentment fix for 2D datasets
+  - CGLS update for sapyb to enable complex data
   - added sapyb and deprecated axpby
 
 * 21.3.1

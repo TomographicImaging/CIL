@@ -3,18 +3,18 @@ import warnings
 
 class ISTA(Algorithm):
     
-    r"""Iterative Shrinkage-Thresholding Algorithm, see :cite:`BeckTeboulle_a`, :cite:`BeckTeboulle_b`.
+    r"""Iterative Shrinkage-Thresholding Algorithm, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`.
     
     Iterative Shrinkage-Thresholding Algorithm (ISTA) 
-    
-    .. math:: x^{k+1} = \mathrm{prox}_{L g}(x^{k} - \frac{1}{L}\nabla f(x^{k}))
+        
+    .. math:: x^{k+1} = \mathrm{prox}_{\alpha g}(x^{k} - \alpha\nabla f(x^{k}))
     
     is used to solve 
     
     .. math:: \min_{x} f(x) + g(x)
 
-    where :math:`f` is differentiable, :math:`g` has a *simple* proximal operator and :math:`L`
-    is the Lipshcitz constant of the function :math:`f`.
+    where :math:`f` is differentiable, :math:`g` has a *simple* proximal operator and :math:`\alpha`
+    is the :code:`step_size`.
 
     Parameters
     ----------
@@ -27,7 +27,7 @@ class ISTA(Algorithm):
         Convex function with *simple* proximal operator
     step_size : positive :obj:`float`, default = None
                 Step size for the gradient step of ISTA. 
-                The default :code:`step_size` is :math:`\frac{0.99 * 2}{L}`, see []
+                The default :code:`step_size` is :math:`\frac{0.99 * 2}{L}`, see :cite:`CombettesValerie`.
 
 
     **kwargs:
@@ -60,10 +60,6 @@ class ISTA(Algorithm):
     >>> ig = Aop.domain
     >>> ista = ISTA(initial = ig.allocate(), f = f, g = g, max_iteration=10)     
     >>> ista.run()
-
-    References
-    ----------
-
       
     """
     
@@ -121,6 +117,9 @@ class ISTA(Algorithm):
     def update(self):
 
         r"""Performs a single iteration of ISTA
+
+        .. math:: x^{k+1} = \mathrm{prox}_{\alpha g}(x^{k} - \alpha\nabla f(x^{k}))
+    
         """
         
         # gradient step
@@ -135,6 +134,6 @@ class ISTA(Algorithm):
         self.x_old.fill(self.x)
         
     def update_objective(self):
-        """Computes the objective 
+        """Computes the objective :math:`f(x) + g(x)` .
         """
         self.loss.append( self.f(self.x) + self.g(self.x) )    

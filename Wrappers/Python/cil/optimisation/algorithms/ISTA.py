@@ -1,5 +1,6 @@
 from cil.optimisation.algorithms import Algorithm
 import warnings
+from numbers import Number
 
 class ISTA(Algorithm):
     
@@ -7,14 +8,24 @@ class ISTA(Algorithm):
     
     Iterative Shrinkage-Thresholding Algorithm (ISTA) 
         
-    .. math:: x^{k+1} = \mathrm{prox}_{\alpha g}(x^{k} - \alpha\nabla f(x^{k}))
+    .. math:: x^{k+1} = \mathrm{prox}_{\alpha^{k} g}(x^{k} - \alpha^{k}\nabla f(x^{k}))
     
     is used to solve 
     
     .. math:: \min_{x} f(x) + g(x)
 
-    where :math:`f` is differentiable, :math:`g` has a *simple* proximal operator and :math:`\alpha`
-    is the :code:`step_size`.
+    where :math:`f` is differentiable, :math:`g` has a *simple* proximal operator and :math:`\alpha^{k}`
+    is the :code:`step_size` per iteration.
+
+    Note
+    ----
+
+    For a constant step size, i.e., :math:`a^{k}=a` for :math:`k\geq1`, convergence of ISTA
+    is guaranteed if
+
+    .. math:: \alpha\in(0, \frac{2}{L}), 
+    
+    where :math:`L` is the Lipschitz constant of :math:`f`, see :cite:`CombettesValerie`.
 
     Parameters
     ----------
@@ -27,8 +38,7 @@ class ISTA(Algorithm):
         Convex function with *simple* proximal operator
     step_size : positive :obj:`float`, default = None
                 Step size for the gradient step of ISTA. 
-                The default :code:`step_size` is :math:`\frac{0.99 * 2}{L}`, see :cite:`CombettesValerie`.
-
+                The default :code:`step_size` is :math:`\frac{0.99 * 2}{L}`.    
 
     **kwargs:
         Keyward arguments used from the base class :class:`.Algorithm`.    
@@ -49,6 +59,7 @@ class ISTA(Algorithm):
     >>> import numpy as np
     >>> from cil.framework import VectorData
     >>> from cil.optimisation.operators import MatrixOperator
+    >>> from cil.optimisation.functions import LeastSquares, ZeroFunction
     >>> np.random.seed(10)
     >>> n, m = 50, 500
     >>> A = np.random.uniform(0,1, (m, n)).astype('float32') # (numpy array)
@@ -71,6 +82,14 @@ class ISTA(Algorithm):
 
       
     """
+
+    def check_stepsize(self):
+        if isinstance(self.step_size, Number) and self.step_size<=0:
+            raise ValueError("Positive step size is required. Got {}".format(self.step_size))
+
+    def check_convergence(self):
+        if self.step_size >= 0.99*2/f.L:
+            warnings.warn("Convergence criterion of ISTA is not satisfied.")
     
     
     def __init__(self, initial, f, g, step_size = None, **kwargs):
@@ -85,6 +104,10 @@ class ISTA(Algorithm):
             else:
                 raise ValueError('{} received both initial and the deprecated x_init parameter. It is not clear which one we should use.'\
                     .format(self.__class__.__name__))
+
+        self.line_search = kwargs.get('line_search', False)
+        if self.line_search:
+            self.beta = 0.5
                 
         self.set_up(initial=initial, f=f, g=g, step_size=step_size)
 
@@ -117,7 +140,11 @@ class ISTA(Algorithm):
         else:
             self.step_size = step_size
         
-        self.t = 1
+        #check value of step_size
+        self.check_stepsize()
+
+        #check convergence criterion
+        self.check_convergence()
 
         self.configured = True
         print("{} configured".format(self.__class__.__name__, ))
@@ -146,3 +173,29 @@ class ISTA(Algorithm):
         """Computes the objective :math:`f(x) + g(x)` .
         """
         self.loss.append( self.f(self.x) + self.g(self.x) )    
+
+
+
+if __name__ == "__main__":
+    
+    # from cil.optimisation.algorithms import ISTA
+    import numpy as np
+    from cil.framework import VectorData
+    from cil.optimisation.operators import MatrixOperator
+    from cil.optimisation.functions import LeastSquares, ZeroFunction
+    np.random.seed(10)
+    n, m = 50, 500
+    A = np.random.uniform(0,1, (m, n)).astype('float32') # (numpy array)
+    b = (A.dot(np.random.randn(n)) + 0.1*np.random.randn(m)).astype('float32') # (numpy vector)
+    Aop = MatrixOperator(A) # (CIL operator)
+    bop = VectorData(b) # (CIL VectorData)
+    f = LeastSquares(Aop, b=bop, c=0.5)
+    g = ZeroFunction()
+    ig = Aop.domain
+    print(f.L)
+    ista = ISTA(initial = ig.allocate(), f = f, g = g, max_iteration=10, line_search = True)     
+    # ista.step_size = -4
+    # print(ista.step_size)
+    print(ista.line_search)
+    # ista.run()    
+

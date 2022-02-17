@@ -34,8 +34,8 @@ class MatrixOperator(LinearOperator):
         '''
         self.A = A
         M_A, N_A = self.A.shape
-        domain_geometry = VectorGeometry(N_A)
-        range_geometry = VectorGeometry(M_A)
+        domain_geometry = VectorGeometry(N_A, dtype=A.dtype)
+        range_geometry = VectorGeometry(M_A, dtype=A.dtype)
         self.s1 = None   # Largest singular value, initially unknown
         super(MatrixOperator, self).__init__(domain_geometry=domain_geometry,
                                                    range_geometry=range_geometry)
@@ -62,8 +62,4 @@ class MatrixOperator(LinearOperator):
 
     def size(self):
         return self.A.shape
-    
-    def calculate_norm(self, **kwargs):
-        # If unknown, compute and store. If known, simply return it.
-        return svds(self.A,1,return_singular_vectors=False)[0]
     

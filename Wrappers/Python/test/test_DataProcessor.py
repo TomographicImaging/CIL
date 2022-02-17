@@ -758,7 +758,7 @@ class TestCentreOfRotation_parallel(unittest.TestCase):
         corr = CofR_image_sharpness(search_range=20, FBP=AstraFBP)
         corr.set_input(self.data_DLS.clone())
         ad_out = corr.get_output()
-        self.assertAlmostEqual(6.48, ad_out.geometry.config.system.rotation_axis.position[0],places=1)     
+        self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=1)     
 
 
     @unittest.skipUnless(False, "TIGRE not installed")

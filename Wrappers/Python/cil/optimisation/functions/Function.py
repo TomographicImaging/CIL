@@ -195,7 +195,7 @@ class SumFunction(Function):
     >>> from cil.optimisation.functions import L2NormSquared
     >>> from cil.framework import ImageGeometry
     >>> f1 = L2NormSquared()
-    >>> f2 = 0.5 * L2NormSquared(b = 1)
+    >>> f2 = 0.5 * L2NormSquared(b = ig.allocate(1))
     >>> F = SumFunction(f1, f2)
 
     .. math:: F(x) = \sum_{i=1}^{50} \|x - i\|^{2}

@@ -116,7 +116,7 @@ class TestFunction(unittest.TestCase):
             np.testing.assert_allclose(sumf1(self.x), tmp_fun_eval + self.f1(self.x))
 
             # check if the sum is SumFunction 
-            self.assertIsInstance(sumf1, SumFunction)            
+            self.assertIsInstance(sumf1, SumFunction)                                
 
     def test_SumFunction_Lipschitz(self):
             
@@ -204,8 +204,12 @@ class TestFunction(unittest.TestCase):
         L = 0.
         for f in list2:
             L += f.L
-            
+                    
         self.assertAlmostEqual(L , F.L)
+
+        # assert Lmax property
+        self.assertAlmostEqual(max(f.L for f in list2) , F.Lmax)
+
 
         ## test value of the gradient
         out =  list2[0].gradient(self.x)

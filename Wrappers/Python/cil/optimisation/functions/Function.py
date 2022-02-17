@@ -302,7 +302,7 @@ class SumFunction(Function):
 
     def __add__(self, other):
         
-        """ Returns the sum of the functions.
+        """ Addition for the SumFunction.
         
         *  :code:`SumFunction` + :code:`SumFunction` is a :code:`SumFunction`.
          

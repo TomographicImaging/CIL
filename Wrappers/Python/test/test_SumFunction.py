@@ -19,25 +19,12 @@ from cil.optimisation.functions import L1Norm, ScaledFunction, SumFunction,\
                                         LeastSquares, L2NormSquared, \
                                         KullbackLeibler, ZeroFunction, ConstantFunction
 from cil.optimisation.operators import IdentityOperator                                        
-from cil.framework import ImageGeometry
+from cil.framework import ImageGeometry, DataContainer
 
 import unittest
 import numpy
 import numpy as np
 from numbers import Number
-
-''' Here we test SumFunction class for different function
-
-L2Norm, L1Norm, KullbackLeibler, ZeroFunction, ConstantFunction, Scalar
-
-for call method
-for gradient method
-
-
-
-'''
-
-
 
 class TestFunction(unittest.TestCase):
     
@@ -106,8 +93,12 @@ class TestFunction(unittest.TestCase):
     def test_SumFunction_call(self):
         
         for func in self.list1:
-               
-            
+
+            if isinstance(func, ScaledFunction):
+                type_fun = ' scalar * ' + type(func.function).__name__
+            else:    
+                type_fun = type(func).__name__            
+                           
             # check sum of two functions   
                 
             if isinstance(func, Number):
@@ -115,11 +106,17 @@ class TestFunction(unittest.TestCase):
             else:
                 tmp_fun_eval = func(self.x)                
                              
-            sumf = self.f1 + func           
+            sumf = self.f1 + func        
             np.testing.assert_allclose( sumf(self.x), self.f1(self.x) + tmp_fun_eval ) 
-            
+
+            # check if the sum is SumFunction 
+            self.assertIsInstance(sumf, SumFunction)
+                        
             sumf1 = func + self.f1 
             np.testing.assert_allclose(sumf1(self.x), tmp_fun_eval + self.f1(self.x))
+
+            # check if the sum is SumFunction 
+            self.assertIsInstance(sumf1, SumFunction)            
 
     def test_SumFunction_Lipschitz(self):
             
@@ -371,17 +368,5 @@ def test_ConstantFunction(self):
             
         
         
-        # check call
-        
-        
-        
-     
-        
-                
-if __name__ == '__main__':
-#    
-    t = TestFunction()
-    t.test_SumFunction()
-#    t.test_SumFunctionScalar()
 
                 

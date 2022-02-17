@@ -465,3 +465,10 @@ Which in Python would be like
 .. _BlockDataContainer: framework.html#cil.framework.BlockDataContainer
 .. _BlockFunction: optimisation.html#cil.optimisation.functions.BlockFunction
 .. _BlockOperator: optimisation.html#cil.optimisation.operators.BlockOperators
+
+
+References
+----------
+
+.. bibliography::    
+            

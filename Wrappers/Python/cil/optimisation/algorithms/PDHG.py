@@ -218,12 +218,6 @@ class PDHG(Algorithm):
     .. todo:: Implement acceleration of PDHG when both functions are strongly convex.
                       
 
-    References
-    ----------
-
-    .. bibliography::    
-            
-
     """
 
     def __init__(self, f, g, operator, tau=None, sigma=None,initial=None, use_axpby=True, **kwargs):

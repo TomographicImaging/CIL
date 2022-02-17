@@ -68,7 +68,7 @@ class TestISTA(unittest.TestCase):
 
         # ista no step-size
         ista = ISTA(initial = self.initial, f = self.f, g = self.g)  
-        np.testing.assert_equal(ista.step_size, 1./self.f.L)
+        np.testing.assert_equal(ista.step_size, 0.99*2./self.f.L)
 
         # ista step-size
         tmp_step_size = 10.
@@ -90,7 +90,7 @@ class TestISTA(unittest.TestCase):
         x_old = tmp_initial.copy()
 
         for _ in range(10):         
-            x = ista.g.proximal(x_old - (1./ista.f.L) * ista.f.gradient(x_old), (1./ista.f.L))
+            x = ista.g.proximal(x_old - (0.99*2/ista.f.L) * ista.f.gradient(x_old), (1./ista.f.L))
             x_old.fill(x)
 
         np.testing.assert_allclose(ista.solution.array, x.array, atol=1e-2)      

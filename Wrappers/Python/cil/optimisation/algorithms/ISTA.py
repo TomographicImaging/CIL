@@ -60,6 +60,15 @@ class ISTA(Algorithm):
     >>> ig = Aop.domain
     >>> ista = ISTA(initial = ig.allocate(), f = f, g = g, max_iteration=10)     
     >>> ista.run()
+
+
+    See also
+    --------
+
+    :class:`.FISTA`
+
+    :class:`.GD`
+
       
     """
     

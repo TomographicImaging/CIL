@@ -102,13 +102,11 @@ class FISTA(Algorithm):
         
         self.set_up(initial=initial, f=f, g=g, step_size=step_size)
 
-    def set_up(self, initial, f, g=ZeroFunction()):
-        '''initialisation of the algorithm
+    def set_up(self, initial, f, g, step_size):
 
-        :param initial: Initial guess ( Default initial = 0)
-        :param f: Differentiable function
-        :param g: Convex function with " simple " proximal operator'''
-
+        """ Set up of the algorithm
+        """        
+        
         print("{} setting up".format(self.__class__.__name__, ))
         
         self.y = initial.copy()

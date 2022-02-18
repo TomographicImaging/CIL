@@ -503,7 +503,7 @@ class TestGradients(CCPiTestClass):
         rhs = u1.dot(E1.adjoint(w1))
         print ("lhs {} rhs {}".format (lhs, rhs))
         # self.assertAlmostEqual(lhs, rhs)
-        numpy.testing.assert_almost_equal(lhs, rhs, decimal=4)
+        numpy.testing.assert_allclose(lhs, rhs, rtol=1e-3)
             
     def test_SymmetrisedGradientOperator2(self):        
         ###########################################################################
@@ -519,7 +519,7 @@ class TestGradients(CCPiTestClass):
         lhs2 = E2.direct(u2).dot(w2)
         rhs2 = u2.dot(E2.adjoint(w2))
             
-        numpy.testing.assert_almost_equal(lhs2, rhs2, decimal=4)
+        numpy.testing.assert_allclose(lhs2, rhs2, rtol=1e-3)
         
     def test_SymmetrisedGradientOperator2a(self):        
         ###########################################################################

@@ -24,44 +24,72 @@ from numbers import Number
 
 class FISTA(Algorithm):
     
-    r""" Fast Iterative Shrinkage-Thresholding Algorithm (FISTA), see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`. 
+    r"""Fast Iterative Shrinkage-Thresholding Algorithm, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`.
     
-    Problem : 
-    
-    .. math::
-    
-      \min_{x} f(x) + g(x)
-    
-    |
-    
-    Parameters :
+    Fast Iterative Shrinkage-Thresholding Algorithm (ISTA) 
         
-      :param initial: Initial guess ( Default initial = 0)
-      :param f: Differentiable function
-      :param g: Convex function with " simple " proximal operator
+
+    Note
+    ----
+    
+
+    Parameters
+    ----------
+
+    initial : DataContainer
+              Initial guess of FISTA.
+    f : Function
+        Differentiable function 
+    g : Function
+        Convex function with *simple* proximal operator
+    step_size : positive :obj:`float`, default = None
+                Step size for the gradient step. 
+                The default :code:`step_size` is :math:`\frac{0.99 * 2}{L}`.    
+
+    **kwargs:
+        Keyward arguments used from the base class :class:`.Algorithm`.    
+    
+        max_iteration : :obj:`int`, optional, default=0
+            Maximum number of iterations.
+        update_objective_interval : :obj:`int`, optional, default=1
+            Evaluates objective every ``update_objective_interval``.
+             
+
+    Examples
+    --------
+
+    .. math:: \underset{x}{\mathrm{argmin}}\|A x - b\|^{2}_{2}
 
 
-    Reference:
-      
-        Beck, A. and Teboulle, M., 2009. A fast iterative shrinkage-thresholding 
-        algorithm for linear inverse problems. 
-        SIAM journal on imaging sciences,2(1), pp.183-202.
+    >>> from cil.optimisation.algorithms import ISTA
+    >>> import numpy as np
+    >>> from cil.framework import VectorData
+    >>> from cil.optimisation.operators import MatrixOperator
+    >>> from cil.optimisation.functions import LeastSquares, ZeroFunction
+    >>> np.random.seed(10)
+    >>> n, m = 50, 500
+    >>> A = np.random.uniform(0,1, (m, n)).astype('float32') # (numpy array)
+    >>> b = (A.dot(np.random.randn(n)) + 0.1*np.random.randn(m)).astype('float32') # (numpy vector)
+    >>> Aop = MatrixOperator(A) # (CIL operator)
+    >>> bop = VectorData(b) # (CIL VectorData)
+    >>> f = LeastSquares(Aop, b=bop, c=0.5)
+    >>> g = ZeroFunction()
+    >>> ig = Aop.domain
+    >>> fista = FISTA(initial = ig.allocate(), f = f, g = g, max_iteration=10)     
+    >>> fista.run()
+
+
+    See also
+    --------
+
+    :class:`.FISTA`
+
+    :class:`.GD`
+
     """
-    
-    
+        
     def __init__(self, initial, f, g, step_size = None, **kwargs):
-        
-        """ FISTA algorithm 
-        
-        initialisation can be done at creation time if all 
-        proper variables are passed or later with set_up
-        
-        Optional parameters:
-
-        :param initial: Initial guess ( Default initial = 0)
-        :param f: Differentiable function
-        :param g: Convex function with " simple " proximal operator"""
-        
+                
         super(FISTA, self).__init__(**kwargs)
         if kwargs.get('x_init', None) is not None:
             if initial is None:

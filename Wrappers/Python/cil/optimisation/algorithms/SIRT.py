@@ -72,21 +72,21 @@ class SIRT(Algorithm):
     
     Examples
     --------
-    .. math:: \underset{x}{\mathrm{argmin}} \| x - 1\|^{2}
+    .. math:: \underset{x}{\mathrm{argmin}} \| x - 5\|^{2}
     
     >>> from cil.framework import ImageGeometry
     >>> from cil.optimisation.operators import IdentityOperator    
     >>> from cil.optimisation.algorithms import SIRT
     >>> ig = ImageGeometry(3,4)
     >>> A = IdentityOperator(ig)
-    >>> b = ig.allocate(1.0)
+    >>> b = ig.allocate(5.0)
     >>> sirt = SIRT(initial = ig.allocate(0), operator = A, data=b, max_iteration=5)  
     >>> sirt.run() 
-    # sirt.solution.array
-    # array([[1., 1., 1.],
-    #        [1., 1., 1.],
-    #        [1., 1., 1.],
-    #        [1., 1., 1.]], dtype=float32)
+    >>> sirt.solution.array
+    array([[5., 5., 5.],
+           [5., 5., 5.],
+           [5., 5., 5.],
+           [5., 5., 5.]], dtype=float32)
     
     
     

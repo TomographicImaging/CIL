@@ -87,10 +87,6 @@ class SIRT(Algorithm):
            [5., 5., 5.],
            [5., 5., 5.],
            [5., 5., 5.]], dtype=float32)
-    
-    
-    
-    
 
 
     """    

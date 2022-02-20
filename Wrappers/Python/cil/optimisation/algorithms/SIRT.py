@@ -68,6 +68,14 @@ class SIRT(Algorithm):
     If :code:`constraint` is passed, then :code:`lower` and :code:`upper` are looked at, 
     and if at least one is not None, then an :class:`.IndicatorBox` is set up which 
     provides the proximal mapping to enforce lower and upper bounds.
+    
+    
+    Examples
+    --------
+    
+    >>> from cil.optimisation.algorithms import SIRT
+    >>>
+    
 
     """    
 
@@ -117,7 +125,7 @@ class SIRT(Algorithm):
 
         # fix for possible inf values
         self.M.array[self.M.array==inf] = 1
-        self.D.array[self.M.array==inf] = 1
+        self.D.array[self.D.array==inf] = 1
 
         self.configured = True
         print("{} configured".format(self.__class__.__name__, ))
@@ -142,3 +150,59 @@ class SIRT(Algorithm):
         """
         self.loss.append(self.r.squared_norm())
 
+
+
+if __name__ == "__main__":
+    
+    import numpy as np
+    
+    from cil.optimisation.operators import MatrixOperator
+    from cil.framework import VectorData
+    from cil.optimisation.functions import LeastSquares, ZeroFunction
+    
+    np.random.seed(10)
+    n = 50
+    m = 500
+
+    A = np.random.uniform(0,1, (m, n)).astype('float32')
+    b = (A.dot(np.random.randn(n)) + 0.1*np.random.randn(m)).astype('float32')
+
+    Aop = MatrixOperator(A)
+    bop = VectorData(b) 
+
+    f = LeastSquares(Aop, b=bop)    
+    g = ZeroFunction()
+
+    ig = Aop.domain
+
+    initial = ig.allocate()    
+    
+    sirt = SIRT(initial = initial, operator=Aop, data = bop, max_iteration=10)
+    sirt.run(verbose=1)   
+    
+    x = initial.copy()
+    x_old = initial.copy()
+    
+    sirtsirt.operator.adjoint(sirt.M*(sirt.data - sirt.operator.direct(x_old)))
+
+    # for _ in range(10):  
+    #     x = sirt.D(sirt.operator.adjoint(sirt.M*(sirt.data - sirt.operator.direct(x_old))))
+    #     x_old.fill(x)    
+     
+    # import inspect
+    # print(len(inspect.signature(SIRT).parameters))
+    # print(dir(inspect.signature(SIRT).parameters.values))
+    # z = inspect.signature(SIRT).parameters.values().kind
+    # print(z)
+    
+    
+    # with np.testing.assert_raises(AssertionError):
+        # np.testing.assertTrue inspect.signature(SIRT).parameters['initial']
+        
+        
+    # print(z)
+    # print({p.name: p.kind for p in inspect.signature(SIRT).parameters.values()})
+    
+    # print(Parameter["initial"] in inspect.signature(SIRT).parameters.values())
+    
+    

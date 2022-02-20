@@ -18,7 +18,7 @@
 import unittest
 import numpy
 import numpy as np
-from cil.framework import DataContainer
+from cil.framework import VectorData
 from cil.framework import ImageData
 from cil.framework import AcquisitionData
 from cil.framework import ImageGeometry
@@ -26,7 +26,7 @@ from cil.framework import AcquisitionGeometry
 from cil.framework import BlockDataContainer
 
 from cil.optimisation.operators import IdentityOperator
-from cil.optimisation.operators import GradientOperator, BlockOperator, FiniteDifferenceOperator
+from cil.optimisation.operators import GradientOperator, BlockOperator, FiniteDifferenceOperator, MatrixOperator
 
 from cil.optimisation.functions import LeastSquares, ZeroFunction, \
    L2NormSquared, OperatorCompositionFunction
@@ -693,55 +693,71 @@ class TestAlgorithms(unittest.TestCase):
             assert False
         except ValueError as ve:
             assert True
+            
 class TestSIRT(unittest.TestCase):
-    def test_SIRT(self):
-        if debug_print:
-            print ("Test CGLS")
-        #ig = ImageGeometry(124,153,154)
-        ig = ImageGeometry(10,2)
-        numpy.random.seed(2)
-        initial = ig.allocate(0.)
-        b = ig.allocate('random')
-        # b = initial.copy()
-        # fill with random numbers
-        # b.fill(numpy.random.random(initial.shape))
-        # b = ig.allocate()
-        # bdata = numpy.reshape(numpy.asarray([i for i in range(20)]), (2,10))
-        # b.fill(bdata)
-        identity = IdentityOperator(ig)
-        
-        alg = SIRT(initial=initial, operator=identity, data=b)
-        alg.max_iteration = 200
-        alg.run(20, verbose=0)
-        np.testing.assert_array_almost_equal(alg.x.as_array(), b.as_array())
-        
-        alg2 = SIRT(initial=initial, operator=identity, data=b, upper=0.3)
-        alg2.max_iteration = 200
-        alg2.run(20, verbose=0)
-        # equal 
-        try:
-            numpy.testing.assert_equal(alg2.get_output().max(), 0.3)
-            if debug_print:
-                print ("Equal OK, returning")
-            return
-        except AssertionError as ae:
-            if debug_print:
-                print ("Not equal, trying almost equal")
-        # almost equal to 7 digits or less
-        try:
-            numpy.testing.assert_almost_equal(alg2.get_output().max(), 0.3)
-            if debug_print:
-                print ("Almost Equal OK, returning")
-            return
-        except AssertionError as ae:
-            if debug_print:
-                print ("Not almost equal, trying less")
-        numpy.testing.assert_array_less(alg2.get_output().max(), 0.3)
-
-        # self.assertLessEqual(alg2.get_output().max(), 0.3)
-	# maybe we could add a test to compare alg.get_output() when < upper bound is 
-	# the same as alg2.get_output() and otherwise 0.3
     
+    def setUp(self):
+        
+        np.random.seed(10)
+        
+        # set up matrix, vectordata
+        n, m = 50, 50
+
+        A = np.random.uniform(0, 1,(m, n)).astype('float32')
+        b = A.dot(np.random.randn(n))
+
+        self.Aop = MatrixOperator(A)
+        self.bop = VectorData(b) 
+
+        self.ig = self.Aop.domain
+
+        self.initial = self.ig.allocate()
+        
+        # set up with linear operator
+        self.ig2 = ImageGeometry(3,4,5)
+        self.initial2 = self.ig2.allocate(0.)
+        self.b2 = self.ig2.allocate('random') 
+        self.A2 = IdentityOperator(self.ig2)       
+
+    def tearDown(self):
+        pass     
+    
+    def test_update_matrix_op(self):
+        
+        # sirt run 5 iterations
+        tmp_initial = self.ig.allocate()
+        sirt = SIRT(initial = tmp_initial, operator=self.Aop, data=self.bop, max_iteration=5)  
+        sirt.run()
+
+        x = tmp_initial.copy()
+        x_old = tmp_initial.copy()
+
+        for _ in range(5):  
+            x = x_old + sirt.D*(sirt.operator.adjoint(sirt.M*(sirt.data - sirt.operator.direct(x_old))))
+            x_old.fill(x)
+
+        np.testing.assert_allclose(sirt.solution.array, x.array, atol=1e-2)      
+        
+    def test_update_constraints(self):
+        
+        alg = SIRT(initial=self.initial2, operator=self.A2, data=self.b2,max_iteration=20)
+        alg.run(verbose=0)
+        np.testing.assert_array_almost_equal(alg.x.array, self.b2.array)    
+        
+        alg = SIRT(initial=self.initial2, operator=self.A2, data=self.b2,max_iteration=20, upper=0.3)
+        alg.run(verbose=0)
+        np.testing.assert_almost_equal(alg.solution.max(), 0.3)     
+        
+        alg = SIRT(initial=self.initial2, operator=self.A2, data=self.b2,max_iteration=20, lower=0.7)
+        alg.run(verbose=0)
+        np.testing.assert_almost_equal(alg.solution.min(), 0.7)  
+        
+        alg = SIRT(initial=self.initial2, operator=self.A2, data=self.b2,max_iteration=20, constraint=IndicatorBox(lower=0.1, upper=0.3))
+        alg.run(verbose=0)
+        np.testing.assert_almost_equal(alg.solution.max(), 0.3)  
+        np.testing.assert_almost_equal(alg.solution.min(), 0.1) 
+                                
+        
 class TestSPDHG(unittest.TestCase):
 
     @unittest.skipUnless(has_astra, "cil-astra not available")

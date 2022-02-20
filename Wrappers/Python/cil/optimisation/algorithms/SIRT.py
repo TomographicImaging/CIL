@@ -19,36 +19,61 @@ from cil.optimisation.functions import IndicatorBox
 from numpy import inf
 import warnings
 
-class SIRT(Algorithm):
+class SIRT(Algorithm):    
 
-    r'''Simultaneous Iterative Reconstruction Technique
-    
-    Problem: 
-    
-    .. math::  
-    
-      A x = b
-    
-    :param initial: Initial guess
-    :param operator: Linear operator for the inverse problem
-    :param data: Acquired data to reconstruct       
-    :param constraint: Function proximal method
-                e.g.  :math:`x\in[0, 1]`, :code:`IndicatorBox` to enforce box constraints
-                        Default is :code:`None`).
-    '''
-    def __init__(self, initial=None, operator=None, data=None, lower=None, upper=None, constraint=None, **kwargs):
-        '''SIRT algorithm creator
+    r"""Simultaneous Iterative Reconstruction Technique 
 
-       Optional parameters:
+    Simultaneous Iterative Reconstruction Technique (SIRT) used to solve
+    the following problem
 
-      :param initial: Initial guess
-      :param operator: Linear operator for the inverse problem
-      :param data: Acquired data to reconstruct 
-      :param lower: Scalar specifying lower bound constraint on pixel values, default -inf
-      :param upper: Scalar specifying upper bound constraint on pixel values, default +inf
-      :param constraint: More general constraint, given as Function proximal method
-                   e.g.  :math:`x\in[0, 1]`, :code:`IndicatorBox` to enforce box constraints
-                         Default is :code:`None`). constraint takes priority over lower and upper.'''
+    .. math:: A x = b
+
+    .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + D ( A^{T} ( M * (b - Ax) ) ) ),
+
+    where :math:`M = A*\mathbb{1}`, :math:`D = A^{T}\mathbb{1}`, :math:`\mathbb{1}` is a :code:`DataContainer` of ones
+    and :math:`\mathrm{prox}_{C}` is the projection over a set :math:`C`.
+
+    Parameters
+    ----------
+
+    initial : DataContainer, default = None
+              Starting point of the algorithm, default value = :math:`0` 
+    operator : LinearOperator or MatrixLinearOperator
+              The operator A .
+    data : DataContainer
+           The data b .
+    lower : :obj:`float`, default = None
+            Lower bound constraint, default value = :code:`-inf`
+    upper : :obj:`float`, default = None
+            Upper bound constraint, default value = :code:`-inf`.
+    constraint : IndicatorBox function, default = None
+                 Enforce box constraint using the :class:`.IndicatorBox` function.
+
+
+    
+    **kwargs:
+        Keyword arguments used from the base class :class:`.Algorithm`.    
+    
+        max_iteration : :obj:`int`, optional, default=0
+            Maximum number of iterations.
+        update_objective_interval : :obj:`int`, optional, default=1
+            Evaluates the objective: :math:`\|A x - b\|^{2}` every             
+
+    Note 
+    ----
+    
+    If :code:`constraint` is passed, it should be an :class:`.IndicatorBox` function, 
+    and in that case :code:`lower` and :code:`upper` inputs are ignored. 
+    
+    If :code:`constraint` is passed, then :code:`lower` and :code:`upper` are looked at, 
+    and if at least one is not None, then an :class:`.IndicatorBox` is set up which 
+    provides the proximal mapping to enforce lower and upper bounds.
+
+    """    
+
+
+    def __init__(self, initial, operator, data, lower=None, upper=None, constraint=None, **kwargs):
+
         super(SIRT, self).__init__(**kwargs)
         if kwargs.get('x_init', None) is not None:
             if initial is None:
@@ -58,20 +83,15 @@ class SIRT(Algorithm):
             else:
                 raise ValueError('{} received both initial and the deprecated x_init parameter. It is not clear which one we should use.'\
                     .format(self.__class__.__name__))
-        if initial is not None and operator is not None and data is not None:
-            self.set_up(initial=initial, operator=operator, data=data, lower=lower, upper=upper, constraint=constraint)
+        
+        self.set_up(initial=initial, operator=operator, data=data, lower=lower, upper=upper, constraint=constraint)         
 
     def set_up(self, initial, operator, data, lower=None, upper=None, constraint=None):
-        '''initialisation of the algorithm
 
-        :param initial: Initial guess
-        :param operator: Linear operator for the inverse problem
-        :param data: Acquired data to reconstruct
-        :param lower: Scalar specifying lower bound constraint on pixel values, default -inf
-        :param upper: Scalar specifying upper bound constraint on pixel values, default +inf
-        :param constraint: More general constraint, given as Function proximal method
-                   e.g.  :math:`x\in[0, 1]`, :code:`IndicatorBox` to enforce box constraints
-                         Default is :code:`None`). constraint takes priority over lower and upper.'''
+        """
+        Initialisation of the algorithm    
+        """
+
         print("{} setting up".format(self.__class__.__name__, ))
         
         self.x = initial.copy()
@@ -82,11 +102,6 @@ class SIRT(Algorithm):
         
         self.relax_par = 1.0
         
-        # Set constraints. If "constraint" is given, it should be an indicator
-        # function, and in that case "lower" and "upper" inputs are ignored. If
-        # "constraint" is not given, then "lower" and "upper" are looked at, 
-        # and if at least one is not None, then an IndicatorBox is set up which 
-        # provides the proximal mapping to enforce lower and upper bounds.
         self.constraint = constraint
         if constraint is None:
             if lower is not None or upper is not None:
@@ -97,14 +112,23 @@ class SIRT(Algorithm):
                 self.constraint=IndicatorBox(lower=lower,upper=upper)
                 
         # Set up scaling matrices D and M.
-        self.M = 1/self.operator.direct(self.operator.domain_geometry().allocate(value=1.0))        
-        self.D = 1/self.operator.adjoint(self.operator.range_geometry().allocate(value=1.0))
+        self.M = 1./self.operator.direct(self.operator.domain_geometry().allocate(value=1.0))                
+        self.D = 1./self.operator.adjoint(self.operator.range_geometry().allocate(value=1.0))
+
+        # fix for possible inf values
+        self.M.array[self.M.array==inf] = 1
+        self.D.array[self.M.array==inf] = 1
+
         self.configured = True
         print("{} configured".format(self.__class__.__name__, ))
-
-
-
+          
     def update(self):
+
+        r""" Performs a single iteration of the SIRT algorithm
+
+        .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + D ( A^{T} ( M * (b - Ax) ) ) )
+
+        """
         
         self.r = self.data - self.operator.direct(self.x)
         
@@ -112,7 +136,9 @@ class SIRT(Algorithm):
         
         if self.constraint is not None:
             self.x = self.constraint.proximal(self.x, None)
-            # self.constraint.proximal(self.x,None, out=self.x)
 
     def update_objective(self):
+        r"""Returns the objective 
+        """
         self.loss.append(self.r.squared_norm())
+

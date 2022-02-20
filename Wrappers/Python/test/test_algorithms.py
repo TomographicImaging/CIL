@@ -599,20 +599,6 @@ class TestAlgorithms(unittest.TestCase):
             print(err)
         self.assertTrue(res)
 
-    def test_exception_initial_SIRT(self):
-        if debug_print:
-            print ("Test CGLS")
-        ig = ImageGeometry(10,2)
-        numpy.random.seed(2)
-        initial = ig.allocate(0.)
-        b = ig.allocate('random')
-        identity = IdentityOperator(ig)
-        
-        try:
-            alg = SIRT(initial=initial, operator=identity, data=b, x_init=initial)
-            assert False
-        except ValueError as ve:
-            assert True
     def test_exception_initial_CGLS(self):
         if debug_print:
             print ("Test CGLS")
@@ -722,7 +708,7 @@ class TestSIRT(unittest.TestCase):
     def tearDown(self):
         pass     
     
-    def test_update_matrix_op(self):
+    def test_update(self):
         
         # sirt run 5 iterations
         tmp_initial = self.ig.allocate()
@@ -756,6 +742,14 @@ class TestSIRT(unittest.TestCase):
         alg.run(verbose=0)
         np.testing.assert_almost_equal(alg.solution.max(), 0.3)  
         np.testing.assert_almost_equal(alg.solution.min(), 0.1) 
+        
+    def test_exception_initial_SIRT(self):
+
+        try:
+            alg = SIRT(initial=self.initial2, operator=self.A2, data=self.b2, x_init=self.initial2)
+            assert False
+        except ValueError as ve:
+            assert True        
                                 
         
 class TestSPDHG(unittest.TestCase):

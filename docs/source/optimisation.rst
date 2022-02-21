@@ -17,25 +17,25 @@ The fundamental components are:
 Algorithm
 =========
 
-A number of generic algorithm implementations are provided including 
-Gradient Descent (GD), Conjugate Gradient Least Squares (CGLS), 
-Simultaneous Iterative Reconstruction Technique (SIRT), Primal Dual Hybrid 
+A number of generic algorithm implementations are provided including
+Gradient Descent (GD), Conjugate Gradient Least Squares (CGLS),
+Simultaneous Iterative Reconstruction Technique (SIRT), Primal Dual Hybrid
 Gradient (PDHG) and Fast Iterative Shrinkage Thresholding Algorithm (FISTA).
 
-An algorithm is designed for a particular generic optimisation problem accepts and number of 
-:code:`Function`s and/or :code:`Operator`s as input to define a specific instance of 
+An algorithm is designed for a particular generic optimisation problem accepts and number of
+:code:`Function`s and/or :code:`Operator`s as input to define a specific instance of
 the generic optimisation problem to be solved.
-They are iterable objects which can be run in a for loop. 
+They are iterable objects which can be run in a for loop.
 The user can provide a stopping criterion different than the default max_iteration.
 
-New algorithms can be easily created by extending the :code:`Algorithm` class. 
+New algorithms can be easily created by extending the :code:`Algorithm` class.
 The user is required to implement only 4 methods: set_up, __init__, update and update_objective.
 
 + :code:`set_up` and :code:`__init__` are used to configure the algorithm
 + :code:`update` is the actual iteration updating the solution
 + :code:`update_objective` defines how the objective is calculated.
 
-For example, the implementation of the update of the Gradient Descent 
+For example, the implementation of the update of the Gradient Descent
 algorithm to minimise a Function will only be:
 
 .. code-block :: python
@@ -45,8 +45,8 @@ algorithm to minimise a Function will only be:
     def update_objective(self):
         self.loss.append(self.objective_function(self.x))
 
-The :code:`Algorithm` provides the infrastructure to continue iteration, to access the values of the 
-objective function in subsequent iterations, the time for each iteration, and to provide a nice 
+The :code:`Algorithm` provides the infrastructure to continue iteration, to access the values of the
+objective function in subsequent iterations, the time for each iteration, and to provide a nice
 print to screen of the status of the optimisation.
 
 .. autoclass:: cil.optimisation.algorithms.Algorithm
@@ -61,10 +61,9 @@ print to screen of the status of the optimisation.
    :members:
 .. autoclass:: cil.optimisation.algorithms.FISTA
    :members:
-   :special-members:
 .. autoclass:: cil.optimisation.algorithms.ISTA
    :members: update, update_objective
-   :member-order: bysource  
+   :member-order: bysource
 .. autoclass:: cil.optimisation.algorithms.PDHG
    :members: update, set_step_sizes, update_step_sizes, update_objective
    :member-order: bysource
@@ -75,11 +74,11 @@ print to screen of the status of the optimisation.
 
 Operator
 ========
-The two most important methods are :code:`direct` and :code:`adjoint` 
-methods that describe the result of applying the operator, and its 
-adjoint respectively, onto a compatible :code:`DataContainer` input. 
-The output is another :code:`DataContainer` object or subclass 
-hereof. An important special case is to represent the tomographic 
+The two most important methods are :code:`direct` and :code:`adjoint`
+methods that describe the result of applying the operator, and its
+adjoint respectively, onto a compatible :code:`DataContainer` input.
+The output is another :code:`DataContainer` object or subclass
+hereof. An important special case is to represent the tomographic
 forward and backprojection operations.
 
 
@@ -136,7 +135,7 @@ Trivial operators are the following.
    :special-members:
 
 
-GradientOperator 
+GradientOperator
 -----------------
 
 In the following the required classes for the implementation of the :code:`GradientOperator` operator.
@@ -166,17 +165,17 @@ In the following the required classes for the implementation of the :code:`Gradi
 Function
 ========
 
-A :code:`Function` represents a mathematical function of one or more inputs 
-and is intended to accept :code:`DataContainers` as input as well as any 
-additional parameters. 
+A :code:`Function` represents a mathematical function of one or more inputs
+and is intended to accept :code:`DataContainers` as input as well as any
+additional parameters.
 
-Fixed parameters can be passed in during the creation of the function object. 
+Fixed parameters can be passed in during the creation of the function object.
 The methods of the function reflect the properties of it, for example, if the function
-represented is differentiable the function should contain a method :code:`gradient` 
-which should return the gradient of the function evaluated at an input point. 
-If the function is not differentiable but allows a simple proximal operator, 
+represented is differentiable the function should contain a method :code:`gradient`
+which should return the gradient of the function evaluated at an input point.
+If the function is not differentiable but allows a simple proximal operator,
 the method :code:`proximal` should return the proximal operator evaluated at an
-input point. The function value is evaluated by calling the function itself, 
+input point. The function value is evaluated by calling the function itself,
 e.g. :code:`f(x)` for a :code:`Function f` and input point :code:`x`.
 
 
@@ -189,7 +188,7 @@ Base classes
 
 .. autoclass:: cil.optimisation.functions.SumFunction
    :members:
-   :special-members: 
+   :special-members:
 
 .. autoclass:: cil.optimisation.functions.ScaledFunction
    :members:
@@ -197,25 +196,25 @@ Base classes
 
 .. autoclass:: cil.optimisation.functions.SumScalarFunction
    :members:
-   :special-members: 
+   :special-members:
 
 .. autoclass:: cil.optimisation.functions.TranslateFunction
    :members:
-   :special-members: 
-   
+   :special-members:
+
 Simple functions
 ----------------
 .. autoclass:: cil.optimisation.functions.ConstantFunction
    :members:
-   :special-members: 
+   :special-members:
 
 .. autoclass:: cil.optimisation.functions.ZeroFunction
    :members:
-   :special-members: 
+   :special-members:
 
 .. autoclass:: cil.optimisation.functions.Rosenbrock
    :members:
-   :special-members: 
+   :special-members:
 
 Composition of operator and a function
 --------------------------------------
@@ -227,7 +226,7 @@ This class allows the user to write a function which does the following:
   F ( x ) = G ( Ax )
 
 where :math:`A` is an operator. For instance the least squares function l2norm_ :code:`Norm2Sq` can
-be expressed as 
+be expressed as
 
 .. math::
 
@@ -242,7 +241,7 @@ be expressed as
 
 .. autoclass:: cil.optimisation.functions.OperatorCompositionFunction
   :members:
-  :special-members: 
+  :special-members:
 
 Indicator box
 -------------
@@ -252,7 +251,7 @@ Indicator box
    :special-members:
 
 
-KullbackLeibler 
+KullbackLeibler
 ---------------
 
 .. autoclass:: cil.optimisation.functions.KullbackLeibler
@@ -277,7 +276,7 @@ Squared L2 norm squared
 .. autoclass:: cil.optimisation.functions.WeightedL2NormSquared
    :members:
    :special-members:
-   
+
 
 Least Squares
 -------------
@@ -292,30 +291,30 @@ Mixed L21 norm
 .. autoclass:: cil.optimisation.functions.MixedL21Norm
    :members:
    :special-members:
-   
+
 Smooth Mixed L21 norm
 ---------------------
 
 .. autoclass:: cil.optimisation.functions.SmoothMixedL21Norm
    :members:
-   :special-members:   
+   :special-members:
 
 Total variation
 ---------------
 
 .. autoclass:: cil.optimisation.functions.TotalVariation
    :members:
-   :special-members: 
+   :special-members:
 
 Block Framework
 ***************
 
 To be able to express more advanced optimisation problems we developed the
-`Block Framework`_, which provides a generic strategy to treat variational 
+`Block Framework`_, which provides a generic strategy to treat variational
 problems in the following form:
 
 .. math::
-    \min \text{Regulariser} + \text{Fidelity} 
+    \min \text{Regulariser} + \text{Fidelity}
 
 The block framework consists of:
 
@@ -331,10 +330,10 @@ The block framework consists of:
 BlockDataContainer
 ==================
 
-`BlockDataContainer`_ holds `DataContainer`_ as column vector. It is possible to 
-do basic algebra between `BlockDataContainer`_ s and with numbers, list or numpy arrays. 
+`BlockDataContainer`_ holds `DataContainer`_ as column vector. It is possible to
+do basic algebra between `BlockDataContainer`_ s and with numbers, list or numpy arrays.
 
-.. math:: 
+.. math::
 
   x = [x_{1}, x_{2} ]\in (X_{1}\times X_{2})
 
@@ -346,12 +345,12 @@ do basic algebra between `BlockDataContainer`_ s and with numbers, list or numpy
    :special-members:
 
 
-Block Function  
+Block Function
 ==============
 
 `BlockFunction`_ acts on `BlockDataContainer`_ as a separable sum function:
-    
-      .. math:: 
+
+      .. math::
 
           f = [f_1,...,f_n] \newline
 
@@ -359,7 +358,7 @@ Block Function
 
 
 .. math::
-  
+
   Y = \begin{bmatrix}
   y_{1}\\
   y_{2}\\
@@ -378,7 +377,7 @@ Block Operator
 
 `BlockOperator`_ represent a block matrix with operators
 
-.. math:: 
+.. math::
   K = \begin{bmatrix}
       A_{1} & A_{2} \\
       A_{3} & A_{4} \\
@@ -403,7 +402,7 @@ Rows: Share the same ranges :math:`Y_{1}, Y_{2}, Y_{3}`
 .. math::
  K : (X_{1}\times X_{2}) \rightarrow (Y_{1}\times Y_{2} \times Y_{3})
 
-:math:`A_{1}, A_{3}, A_{5}`: share the same domain :math:`X_{1}` and 
+:math:`A_{1}, A_{3}, A_{5}`: share the same domain :math:`X_{1}` and
 :math:`A_{2}, A_{4}, A_{6}`: share the same domain :math:`X_{2}`
 
 .. math::
@@ -411,19 +410,19 @@ Rows: Share the same ranges :math:`Y_{1}, Y_{2}, Y_{3}`
  A_{1}: X_{1} \rightarrow Y_{1} \\
  A_{3}: X_{1} \rightarrow Y_{2} \\
  A_{5}: X_{1} \rightarrow Y_{3} \\
- A_{2}: X_{2} \rightarrow Y_{1} \\ 
+ A_{2}: X_{2} \rightarrow Y_{1} \\
  A_{4}: X_{2} \rightarrow Y_{2} \\
  A_{6}: X_{2} \rightarrow Y_{3}
 
-For instance with these ingredients one may write the following objective 
+For instance with these ingredients one may write the following objective
 function,
 
 .. math::
    \alpha ||\nabla u||_{2,1} + ||u - g||_2^2
 
 where :math:`g` represent the measured values, :math:`u` the solution
-:math:`\nabla` is the gradient operator, :math:`|| ~~ ||_{2,1}` is a norm for 
-the output of the gradient operator and :math:`|| x-g ||^2_2` is 
+:math:`\nabla` is the gradient operator, :math:`|| ~~ ||_{2,1}` is a norm for
+the output of the gradient operator and :math:`|| x-g ||^2_2` is
 least squares fidelity function as
 
 .. math::
@@ -433,7 +432,7 @@ least squares fidelity function as
          \end{bmatrix}
 
  F(x) = \Big[ \alpha \lVert ~x~ \rVert_{2,1} ~~ , ~~ || x - g||_2^2 \Big]
- 
+
  w = [ u ]
 
 Then we have rewritten the problem as
@@ -451,13 +450,13 @@ Which in Python would be like
    # Create BlockOperator
    K = BlockOperator(op1, op2, shape=(2,1) )
 
-   # Create functions      
+   # Create functions
    F = BlockFunction(alpha * MixedL21Norm(), 0.5 * L2NormSquared(b=noisy_data))
 
 
 .. autoclass:: cil.optimisation.operators.BlockOperator
    :members:
-   :special-members: 
+   :special-members:
 
 
 :ref:`Return Home <mastertoc>`
@@ -470,5 +469,5 @@ Which in Python would be like
 References
 ----------
 
-.. bibliography::    
-            
+.. bibliography::
+

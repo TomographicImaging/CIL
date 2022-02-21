@@ -60,10 +60,6 @@ class FISTA(Algorithm):
     kwargs: Keyward arguments
         Arguments from the base class :class:`.Algorithm`.
 
-        max_iteration : :obj:`int`, optional, default=0
-            Maximum number of iterations.
-        update_objective_interval : :obj:`int`, optional, default=1
-            Evaluates objective every ``update_objective_interval``.
 
 
     Examples
@@ -109,7 +105,7 @@ class FISTA(Algorithm):
         else:
             raise ValueError("Step size is not a number. Got {}".format(val))
 
-    def set_step_size(self, step_size):
+    def _set_step_size(self, step_size):
 
         """Set the default step size
         """
@@ -125,7 +121,7 @@ class FISTA(Algorithm):
     def convergence_criterion(self):
         return self.step_size > 1./self.f.L
 
-    def check_convergence_criterion(self):
+    def _check_convergence_criterion(self):
         """Check convergence criterion
         """
         if isinstance(self.f.L, Number):
@@ -162,11 +158,11 @@ class FISTA(Algorithm):
         self.g = g
 
         # set step_size
-        self.set_step_size(step_size=step_size)
+        self._set_step_size(step_size=step_size)
 
         # check convergence criterion for FISTA is satisfied
         if kwargs.get('check_convergence_criterion', True):
-            self.check_convergence_criterion()
+            self._check_convergence_criterion()
 
         print("{} setting up".format(self.__class__.__name__, ))
 
@@ -261,11 +257,6 @@ class ISTA(FISTA):
     kwargs: Keyward arguments
         Arguments from the base class :class:`.Algorithm`.
 
-        max_iteration : :obj:`int`, optional, default=0
-            Maximum number of iterations.
-        update_objective_interval : :obj:`int`, optional, default=1
-            Evaluates objective every ``update_objective_interval``.
-
 
 
     Examples
@@ -309,7 +300,7 @@ class ISTA(FISTA):
 
         super(ISTA, self).__init__(initial=initial, f=f, g=g, step_size=step_size, **kwargs)
 
-    def set_step_size(self, step_size):
+    def _set_step_size(self, step_size):
         """ Set default step size.
         """
         if step_size is None:
@@ -338,5 +329,4 @@ class ISTA(FISTA):
 
         # update
         self.x_old.fill(self.x)
-
 

@@ -340,33 +340,3 @@ class ISTA(FISTA):
         self.x_old.fill(self.x)
 
 
-
-if __name__ == "__main__":
-
-    # from cil.optimisation.algorithms import FISTA, Algorithm
-
-    z = FISTA.__doc__
-    # z += Algorithm.__init__.__doc__
-    print(z)
-#     import numpy as np
-#     from cil.framework import VectorData
-#     from cil.optimisation.operators import MatrixOperator
-#     from cil.optimisation.functions import LeastSquares, L1Norm,ZeroFunction
-#     np.random.seed(10)
-#     n, m = 50, 500
-#     A = np.random.uniform(0,1, (m, n)).astype('float32') # (numpy array)
-#     b = (A.dot(np.random.randn(n)) + 0.1*np.random.randn(m)).astype('float32') # (numpy vector)
-#     Aop = MatrixOperator(A) # (CIL operator)
-#     bop = VectorData(b) # (CIL VectorData)
-#     f = LeastSquares(Aop, b=bop, c=0.5)
-#     g = ZeroFunction()
-#     ig = Aop.domain
-#     print(f.L)
-#     ista = FISTA(initial = ig.allocate(), f = f, g = g, max_iteration=10, step_size = 1)
-#     ista.step_size =- 4
-#     print(ista.step_size)
-#     # print(ista.line_search)
-#     # ista.run()
-
-
-

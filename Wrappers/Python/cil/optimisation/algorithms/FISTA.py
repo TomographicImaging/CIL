@@ -256,13 +256,16 @@ class ISTA(FISTA):
                 Step size for the gradient step of ISTA.
                 The default :code:`step_size` is :math:`\frac{0.99 * 2}{L}`.
 
-    **kwargs:
-        Keyward arguments used from the base class :class:`.Algorithm`.
+
+
+    kwargs: Keyward arguments
+        Arguments from the base class :class:`.Algorithm`.
 
         max_iteration : :obj:`int`, optional, default=0
             Maximum number of iterations.
         update_objective_interval : :obj:`int`, optional, default=1
             Evaluates objective every ``update_objective_interval``.
+
 
 
     Examples

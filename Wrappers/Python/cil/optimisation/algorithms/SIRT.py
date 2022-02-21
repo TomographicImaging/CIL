@@ -23,10 +23,12 @@ class SIRT(Algorithm):
 
     r"""Simultaneous Iterative Reconstruction Technique 
 
-    Simultaneous Iterative Reconstruction Technique (SIRT) used to solve
+    Simultaneous Iterative Reconstruction Technique (SIRT) solves
     the following problem
 
     .. math:: A x = b
+
+    The SIRT algorithm is 
 
     .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + D ( A^{T} ( M * (b - Ax) ) ) ),
 
@@ -37,27 +39,19 @@ class SIRT(Algorithm):
     ----------
 
     initial : DataContainer, default = None
-              Starting point of the algorithm, default value = :math:`0` 
-    operator : LinearOperator or MatrixLinearOperator
-              The operator A .
+              Starting point of the algorithm, default value = Zero DataContainer 
+    operator : LinearOperator
+              The operator A.
     data : DataContainer
-           The data b .
+           The data b.
     lower : :obj:`float`, default = None
-            Lower bound constraint, default value = :code:`-inf`
+            Lower bound constraint, default value = :code:`-inf`.
     upper : :obj:`float`, default = None
             Upper bound constraint, default value = :code:`-inf`.
     constraint : IndicatorBox function, default = None
                  Enforce box constraint using the :class:`.IndicatorBox` function.
-
-
-    
-    **kwargs:
+    kwargs:
         Keyword arguments used from the base class :class:`.Algorithm`.    
-    
-        max_iteration : :obj:`int`, optional, default=0
-            Maximum number of iterations.
-        update_objective_interval : :obj:`int`, optional, default=1
-            Evaluates the objective: :math:`\|A x - b\|^{2}` every             
 
     Note 
     ----
@@ -159,6 +153,9 @@ class SIRT(Algorithm):
 
     def update_objective(self):
         r"""Returns the objective 
+
+        .. math:: \|A x - b\|^{2}
+        
         """
         self.loss.append(self.r.squared_norm())
 

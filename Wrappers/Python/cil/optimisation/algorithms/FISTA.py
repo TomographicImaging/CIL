@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
+#   This work is part of the Core Imaging Library (CIL) developed by CCPi
+#   (Collaborative Computational Project in Tomographic Imaging), with
 #   substantial contributions by UKRI-STFC and University of Manchester.
 
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,78 +18,46 @@
 from cil.optimisation.algorithms import Algorithm
 import numpy
 import warnings
-from cil.optimisation.algorithms import Algorithm
-import warnings
 from numbers import Number
 
 class FISTA(Algorithm):
-    
-    r"""Fast Iterative Shrinkage-Thresholding Algorithm, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`.
-    
-    Fast Iterative Shrinkage-Thresholding Algorithm (ISTA) 
-        
 
-    Note
-    ----
-    
+    @property
+    def step_size(self):
+        return self._step_size
 
-    Parameters
-    ----------
+    @step_size.setter
+    def step_size(self, val):
+        if isinstance(val, Number):
+            if val<=0:
+                raise ValueError("Positive step size is required. Got {}".format(val))
+        else:
+            raise ValueError("Step size is not a number. Got {}".format(val))
+        self._step_size = val
 
-    initial : DataContainer
-              Initial guess of FISTA.
-    f : Function
-        Differentiable function 
-    g : Function
-        Convex function with *simple* proximal operator
-    step_size : positive :obj:`float`, default = None
-                Step size for the gradient step. 
-                The default :code:`step_size` is :math:`\frac{0.99 * 2}{L}`.    
+    def set_step_size(self, step_size):
+        # Check option for step-size
+        if step_size is None:
+            if isinstance(self.f.L, Number):
+                self.step_size = 1./self.f.L
+            else:
+                raise ValueError("Function f is not differentiable")
+        else:
+            self.step_size = step_size
 
-    **kwargs:
-        Keyward arguments used from the base class :class:`.Algorithm`.    
-    
-        max_iteration : :obj:`int`, optional, default=0
-            Maximum number of iterations.
-        update_objective_interval : :obj:`int`, optional, default=1
-            Evaluates objective every ``update_objective_interval``.
-             
+    def check_convergence_criterion(self):
 
-    Examples
-    --------
-
-    .. math:: \underset{x}{\mathrm{argmin}}\|A x - b\|^{2}_{2}
+        if isinstance(self.f.L, Number):
+            if self.step_size > 1./self.f.L:
+                warnings.warn("Convergence criterion of FISTA is not satisfied.")
+                return False
+            return True
+        else:
+            raise ValueError("Function f is not differentiable")
 
 
-    >>> from cil.optimisation.algorithms import ISTA
-    >>> import numpy as np
-    >>> from cil.framework import VectorData
-    >>> from cil.optimisation.operators import MatrixOperator
-    >>> from cil.optimisation.functions import LeastSquares, ZeroFunction
-    >>> np.random.seed(10)
-    >>> n, m = 50, 500
-    >>> A = np.random.uniform(0,1, (m, n)).astype('float32') # (numpy array)
-    >>> b = (A.dot(np.random.randn(n)) + 0.1*np.random.randn(m)).astype('float32') # (numpy vector)
-    >>> Aop = MatrixOperator(A) # (CIL operator)
-    >>> bop = VectorData(b) # (CIL VectorData)
-    >>> f = LeastSquares(Aop, b=bop, c=0.5)
-    >>> g = ZeroFunction()
-    >>> ig = Aop.domain
-    >>> fista = FISTA(initial = ig.allocate(), f = f, g = g, max_iteration=10)     
-    >>> fista.run()
-
-
-    See also
-    --------
-
-    :class:`.FISTA`
-
-    :class:`.GD`
-
-    """
-        
     def __init__(self, initial, f, g, step_size = None, **kwargs):
-                
+
         super(FISTA, self).__init__(**kwargs)
         if kwargs.get('x_init', None) is not None:
             if initial is None:
@@ -99,61 +67,70 @@ class FISTA(Algorithm):
             else:
                 raise ValueError('{} received both initial and the deprecated x_init parameter. It is not clear which one we should use.'\
                     .format(self.__class__.__name__))
-        
+
+        self._step_size = None
+
+        # set up FISTA
         self.set_up(initial=initial, f=f, g=g, step_size=step_size)
 
-    def set_up(self, initial, f, g, step_size):
-
+    def set_up(self, initial, f, g, step_size, **kwargs):
         """ Set up of the algorithm
-        """        
-        
+        """
+
+        self.initial = initial
+        self.f = f
+        self.g = g
+
+        # set step_size
+        self.set_step_size(step_size=step_size)
+
+        # check convergence criterion for FISTA is satisfied
+        if kwargs.get('check_convergence_criterion', True):
+            self.check_convergence_criterion()
+
         print("{} setting up".format(self.__class__.__name__, ))
-        
+
         self.y = initial.copy()
         self.x_old = initial.copy()
         self.x = initial.copy()
         self.u = initial.copy()
 
-        self.f = f
-        self.g = g
-        if f.L is None:
-            raise ValueError('Error: Fidelity Function\'s Lipschitz constant is set to None')
-        self.invL = 1/f.L
         self.t = 1
         self.configured = True
+
         print("{} configured".format(self.__class__.__name__, ))
 
-            
+
     def update(self):
         self.t_old = self.t
         self.f.gradient(self.y, out=self.u)
-        self.u.__imul__( -self.invL )
-        self.u.__iadd__( self.y )
+        self.u *= -self.step_size
+        self.u += self.y
 
-        self.g.proximal(self.u, self.invL, out=self.x)
-        
+        self.g.proximal(self.u, self.step_size, out=self.x)
+
         self.t = 0.5*(1 + numpy.sqrt(1 + 4*(self.t_old**2)))
-        
+
         self.x.subtract(self.x_old, out=self.y)
         self.y.axpby(((self.t_old-1)/self.t), 1, self.x, out=self.y)
-        
+
         self.x_old.fill(self.x)
 
-        
+
     def update_objective(self):
-        self.loss.append( self.f(self.x) + self.g(self.x) )    
-    
+        self.loss.append( self.f(self.x) + self.g(self.x) )
+
 
 class ISTA(FISTA):
-    
+
     r"""Iterative Shrinkage-Thresholding Algorithm, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`.
-    
-    Iterative Shrinkage-Thresholding Algorithm (ISTA) 
-        
+
+    Iterative Shrinkage-Thresholding Algorithm (ISTA)
+
     .. math:: x^{k+1} = \mathrm{prox}_{\alpha^{k} g}(x^{k} - \alpha^{k}\nabla f(x^{k}))
-    
-    is used to solve 
-    
+
+    is used to solve
+
     .. math:: \min_{x} f(x) + g(x)
 
     where :math:`f` is differentiable, :math:`g` has a *simple* proximal operator and :math:`\alpha^{k}`
@@ -165,8 +142,8 @@ class ISTA(FISTA):
     For a constant step size, i.e., :math:`a^{k}=a` for :math:`k\geq1`, convergence of ISTA
     is guaranteed if
 
-    .. math:: \alpha\in(0, \frac{2}{L}), 
-    
+    .. math:: \alpha\in(0, \frac{2}{L}),
+
     where :math:`L` is the Lipschitz constant of :math:`f`, see :cite:`CombettesValerie`.
 
     Parameters
@@ -175,21 +152,21 @@ class ISTA(FISTA):
     initial : DataContainer
               Initial guess of ISTA.
     f : Function
-        Differentiable function 
+        Differentiable function
     g : Function
         Convex function with *simple* proximal operator
     step_size : positive :obj:`float`, default = None
-                Step size for the gradient step of ISTA. 
-                The default :code:`step_size` is :math:`\frac{0.99 * 2}{L}`.    
+                Step size for the gradient step of ISTA.
+                The default :code:`step_size` is :math:`\frac{0.99 * 2}{L}`.
 
     **kwargs:
-        Keyward arguments used from the base class :class:`.Algorithm`.    
-    
+        Keyward arguments used from the base class :class:`.Algorithm`.
+
         max_iteration : :obj:`int`, optional, default=0
             Maximum number of iterations of ISTA.
         update_objective_interval : :obj:`int`, optional, default=1
             Evaluates objective every ``update_objective_interval``.
-             
+
 
     Examples
     --------
@@ -211,7 +188,7 @@ class ISTA(FISTA):
     >>> f = LeastSquares(Aop, b=bop, c=0.5)
     >>> g = ZeroFunction()
     >>> ig = Aop.domain
-    >>> ista = ISTA(initial = ig.allocate(), f = f, g = g, max_iteration=10)     
+    >>> ista = ISTA(initial = ig.allocate(), f = f, g = g, max_iteration=10)
     >>> ista.run()
 
 
@@ -222,121 +199,76 @@ class ISTA(FISTA):
 
     :class:`.GD`
 
-      
+
     """
 
-    def check_stepsize(self):
-        if isinstance(self.step_size, Number) and self.step_size<=0:
-            raise ValueError("Positive step size is required. Got {}".format(self.step_size))
-
-    def check_convergence(self):
-        if self.step_size >= 0.99*2/f.L:
-            warnings.warn("Convergence criterion of ISTA is not satisfied.")
-    
-    
-    def __init__(self, initial, f, g, step_size = None, **kwargs):
-        
-        super(ISTA, self).__init__(**kwargs)
-
-        # if kwargs.get('x_init', None) is not None:
-        #     if initial is None:
-        #         warnings.warn('The use of the x_init parameter is deprecated and will be removed in following version. Use initial instead',
-        #            DeprecationWarning, stacklevel=4)
-        #         initial = kwargs.get('x_init', None)
-        #     else:
-        #         raise ValueError('{} received both initial and the deprecated x_init parameter. It is not clear which one we should use.'\
-        #             .format(self.__class__.__name__))
-
-                
-        self.set_up(initial=initial, f=f, g=g, step_size=step_size)
-
-    def set_up(self, initial, f, g, step_size):
-        """ Set up of the algorithm
-        """
-
-        print("{} setting up".format(self.__class__.__name__, ))
-        
-        # starting point        
-        self.initial = initial
-
-        # step size
-        self.step_size = step_size        
-
-        # allocate 
-        self.x_old = initial.copy()
-        self.x = initial.copy()
-
-        # functions
-        self.f = f
-        self.g = g
-
-        if f.L is None:
-            raise ValueError('Error: Fidelity Function\'s Lipschitz constant is set to None')
-
-        # Check option for step-size            
-        if self.step_size is None:
-            self.step_size = 0.99 * 2/f.L
+    def set_step_size(self, step_size):
+        # Check option for step-size
+        if step_size is None:
+            if isinstance(self.f.L, Number):
+                self.step_size = 0.99*2.0/self.f.L
+            else:
+                raise ValueError("Function f is not differentiable")
         else:
             self.step_size = step_size
-        
-        #check value of step_size
-        self.check_stepsize()
 
-        #check convergence criterion
-        self.check_convergence()
+    def check_convergence_criterion(self):
 
-        self.configured = True
-        print("{} configured".format(self.__class__.__name__, ))
+        if isinstance(self.f.L, Number):
+            if self.step_size > 0.99*2.0/self.f.L:
+                warnings.warn("Convergence criterion of FISTA is not satisfied.")
+                return False
+            return True
+        else:
+            raise ValueError("Function f is not differentiable")
 
-                    
+    def __init__(self, initial, f, g, step_size = None, **kwargs):
+
+        super(ISTA, self).__init__(initial=initial, f=f, g=g, step_size=step_size, **kwargs)
+
+        self.set_up(initial=initial, f=f, g=g, step_size=step_size)
+
     def update(self):
 
         r"""Performs a single iteration of ISTA
 
         .. math:: x^{k+1} = \mathrm{prox}_{\alpha g}(x^{k} - \alpha\nabla f(x^{k}))
-    
+
         """
-        
+
         # gradient step
         self.f.gradient(self.x_old, out=self.x)
         self.x *= -self.step_size
         self.x += self.x_old
-        
+
         # proximal step
         self.g.proximal(self.x, self.step_size, out=self.x)
 
         # update
         self.x_old.fill(self.x)
-        
-    # def update_objective(self):
-    #     """Computes the objective :math:`f(x) + g(x)` .
-    #     """
-    #     self.loss.append( self.f(self.x) + self.g(self.x) )    
-
-
 
 if __name__ == "__main__":
-    
+
     # from cil.optimisation.algorithms import ISTA
     import numpy as np
     from cil.framework import VectorData
     from cil.optimisation.operators import MatrixOperator
-    from cil.optimisation.functions import LeastSquares, ZeroFunction
+    from cil.optimisation.functions import LeastSquares, L1Norm,ZeroFunction
     np.random.seed(10)
     n, m = 50, 500
     A = np.random.uniform(0,1, (m, n)).astype('float32') # (numpy array)
     b = (A.dot(np.random.randn(n)) + 0.1*np.random.randn(m)).astype('float32') # (numpy vector)
     Aop = MatrixOperator(A) # (CIL operator)
     bop = VectorData(b) # (CIL VectorData)
-    f = LeastSquares(Aop, b=bop, c=0.5)
+    f = L1Norm() #LeastSquares(Aop, b=bop, c=0.5)
     g = ZeroFunction()
     ig = Aop.domain
     print(f.L)
-    ista = ISTA(initial = ig.allocate(), f = f, g = g, max_iteration=10, line_search = True)     
+    ista = FISTA(initial = ig.allocate(), f = f, g = g, max_iteration=10,step_size = 1)
     # ista.step_size = -4
     # print(ista.step_size)
-    print(ista.line_search)
-    # ista.run()    
+    # print(ista.line_search)
+    # ista.run()
 
 
 

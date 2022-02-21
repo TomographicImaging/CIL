@@ -60,10 +60,9 @@ print to screen of the status of the optimisation.
 .. autoclass:: cil.optimisation.algorithms.SIRT
    :members:
 .. autoclass:: cil.optimisation.algorithms.FISTA
-   :members:
+   :members: update, update_objective
 .. autoclass:: cil.optimisation.algorithms.ISTA
    :members: update, update_objective
-   :member-order: bysource
 .. autoclass:: cil.optimisation.algorithms.PDHG
    :members: update, set_step_sizes, update_step_sizes, update_objective
    :member-order: bysource

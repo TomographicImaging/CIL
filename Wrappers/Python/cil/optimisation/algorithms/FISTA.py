@@ -57,7 +57,7 @@ class FISTA(Algorithm):
 
 
 
-    kwargs: Keyward arguments
+    kwargs: Keyword arguments
         Arguments from the base class :class:`.Algorithm`.
 
 
@@ -244,17 +244,17 @@ class ISTA(FISTA):
 
     initial : DataContainer
               Initial guess of ISTA.
-    f : Function .
+    f : Function
         Differentiable function
     g : Function
         Convex function with *simple* proximal operator
     step_size : positive :obj:`float`, default = None
                 Step size for the gradient step of ISTA.
-                The default :code:`step_size` is :math:`\frac{0.99 * 2}{L}`.
+                The default :code:`step_size` is :math:`\frac{0.99 * 2}{L}.`
 
 
 
-    kwargs: Keyward arguments
+    kwargs: Keyword arguments
         Arguments from the base class :class:`.Algorithm`.
 
 

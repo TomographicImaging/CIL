@@ -55,8 +55,10 @@ class FISTA(Algorithm):
                 Step size for the gradient step of FISTA.
                 The default :code:`step_size` is :math:`\frac{1}{L}`.
 
-    **kwargs:
-        Keyward arguments used from the base class :class:`.Algorithm`.
+
+
+    kwargs: Keyward arguments
+        Arguments from the base class :class:`.Algorithm`.
 
         max_iteration : :obj:`int`, optional, default=0
             Maximum number of iterations.
@@ -133,7 +135,6 @@ class FISTA(Algorithm):
             return True
         else:
             raise ValueError("Function f is not differentiable")
-
 
     def __init__(self, initial, f, g, step_size = None, **kwargs):
 
@@ -339,10 +340,10 @@ class ISTA(FISTA):
 
 if __name__ == "__main__":
 
-    from cil.optimisation.algorithms import ISTA, Algorithm
+    # from cil.optimisation.algorithms import FISTA, Algorithm
 
-    z = ISTA.__doc__
-    z += Algorithm.__init__._
+    z = FISTA.__doc__
+    # z += Algorithm.__init__.__doc__
     print(z)
 #     import numpy as np
 #     from cil.framework import VectorData

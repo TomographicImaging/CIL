@@ -54,9 +54,6 @@ class FISTA(Algorithm):
     step_size : positive :obj:`float`, default = None
                 Step size for the gradient step of FISTA.
                 The default :code:`step_size` is :math:`\frac{1}{L}`.
-
-
-
     kwargs: Keyword arguments
         Arguments from the base class :class:`.Algorithm`.
 
@@ -251,9 +248,6 @@ class ISTA(FISTA):
     step_size : positive :obj:`float`, default = None
                 Step size for the gradient step of ISTA.
                 The default :code:`step_size` is :math:`\frac{0.99 * 2}{L}.`
-
-
-
     kwargs: Keyword arguments
         Arguments from the base class :class:`.Algorithm`.
 

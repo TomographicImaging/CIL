@@ -130,8 +130,8 @@ class SIRT(Algorithm):
         self.D = 1./self.operator.adjoint(self.operator.range_geometry().allocate(value=1.0))
 
         # fix for possible inf values
-        numpy.nan_to_num(self.M, neginf=1, posinf=1) 
-        numpy.nan_to_num(self.D, neginf=1, posinf=1) 
+        numpy.nan_to_num(self.M, copy = False, neginf=1, posinf=1) 
+        numpy.nan_to_num(self.D, copy = False, neginf=1, posinf=1) 
 
         self.configured = True
         print("{} configured".format(self.__class__.__name__, ))

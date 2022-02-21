@@ -31,9 +31,9 @@ class FISTA(Algorithm):
         if isinstance(val, Number):
             if val<=0:
                 raise ValueError("Positive step size is required. Got {}".format(val))
+            self._step_size = val
         else:
             raise ValueError("Step size is not a number. Got {}".format(val))
-        self._step_size = val
 
     def set_step_size(self, step_size):
         # Check option for step-size
@@ -68,7 +68,7 @@ class FISTA(Algorithm):
                 raise ValueError('{} received both initial and the deprecated x_init parameter. It is not clear which one we should use.'\
                     .format(self.__class__.__name__))
 
-        self._step_size = None
+        # self._step_size = None
 
         # set up FISTA
         self.set_up(initial=initial, f=f, g=g, step_size=step_size)
@@ -260,13 +260,13 @@ if __name__ == "__main__":
     b = (A.dot(np.random.randn(n)) + 0.1*np.random.randn(m)).astype('float32') # (numpy vector)
     Aop = MatrixOperator(A) # (CIL operator)
     bop = VectorData(b) # (CIL VectorData)
-    f = L1Norm() #LeastSquares(Aop, b=bop, c=0.5)
+    f = LeastSquares(Aop, b=bop, c=0.5)
     g = ZeroFunction()
     ig = Aop.domain
     print(f.L)
-    ista = FISTA(initial = ig.allocate(), f = f, g = g, max_iteration=10,step_size = 1)
-    # ista.step_size = -4
-    # print(ista.step_size)
+    ista = FISTA(initial = ig.allocate(), f = f, g = g, max_iteration=10, step_size = 1)
+    ista.step_size =- 4
+    print(ista.step_size)
     # print(ista.line_search)
     # ista.run()
 

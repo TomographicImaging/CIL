@@ -130,8 +130,8 @@ class SIRT(Algorithm):
         self.D = 1./self.operator.adjoint(self.operator.range_geometry().allocate(value=1.0))
 
         # fix for possible inf values
-        self.M.array[self.M.array==inf] = 1
-        self.D.array[self.D.array==inf] = 1
+        numpy.nan_to_num(self.M, neginf=1, posinf=1) 
+        numpy.nan_to_num(self.D, neginf=1, posinf=1) 
 
         self.configured = True
         print("{} configured".format(self.__class__.__name__, ))
@@ -155,7 +155,7 @@ class SIRT(Algorithm):
         r"""Returns the objective 
 
         .. math:: \|A x - b\|^{2}
-        
+
         """
         self.loss.append(self.r.squared_norm())
 

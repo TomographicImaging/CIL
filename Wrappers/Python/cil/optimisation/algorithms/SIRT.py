@@ -17,6 +17,7 @@
 from cil.optimisation.algorithms import Algorithm
 from cil.optimisation.functions import IndicatorBox
 from numpy import inf
+import numpy
 import warnings
 
 class SIRT(Algorithm):    

@@ -591,7 +591,7 @@ class Test_FBP_results(unittest.TestCase):
         np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)  
 
 
-    @unittest.skipUnless(has_astra and has_gpu_astra and has_ipp, "ASTRA or IPP not installed")
+    @unittest.skipUnless(has_astra and has_astra_gpu and has_ipp, "ASTRA or IPP not installed")
     def test_results_3D_astra(self):
 
         self.acq_data.reorder('astra')

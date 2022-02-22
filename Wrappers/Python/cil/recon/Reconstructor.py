@@ -24,6 +24,8 @@ class Reconstructor(object):
     """ Abstract class representing a reconstructor 
     """
 
+    supported_backends = ['tigre']
+    
     #_input is a weakreference object
     @property
     def input(self):

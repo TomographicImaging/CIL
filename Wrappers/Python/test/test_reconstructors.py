@@ -22,7 +22,7 @@ from cil.utilities.dataexample import SIMULATED_PARALLEL_BEAM_DATA, SIMULATED_CO
 import unittest
 from scipy.fft  import fft, ifft
 import numpy as np
-from utils import has_tigre, has_gpu_tigre, has_ipp
+from utils import has_tigre, has_gpu_tigre, has_ipp, has_astra, has_gpu_astra
 import gc
 
 if has_tigre:
@@ -126,14 +126,9 @@ class Test_Reconstructor(unittest.TestCase):
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_set_backend(self):
-        reconstructor = Reconstructor(self.ad3D)
-
+        
         with self.assertRaises(ValueError):
-            reconstructor.set_backend('gemma')
-
-        self.ad3D.reorder('astra')
-        with self.assertRaises(ValueError):
-            reconstructor = Reconstructor(self.ad3D)
+            reconstructor = Reconstructor(self.ad3D, backend='gemma')
 
 
 class Test_GenericFilteredBackProjection(unittest.TestCase):
@@ -250,6 +245,7 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
 
         with self.assertRaises(TypeError):
             reconstructor.set_filter_inplace('gemma')
+
 
 
 class Test_FDK(unittest.TestCase):
@@ -466,6 +462,23 @@ class Test_FBP(unittest.TestCase):
         np.testing.assert_allclose(weights,weights_new)
 
 
+    @unittest.skipUnless(has_astra, "ASTRA not installed")
+    def test_set_backend(self):
+
+        ag = AcquisitionGeometry.create_Parallel3D()\
+            .set_panel([3,4],[0.1,0.2])\
+            .set_angles([0,90])\
+            .set_labels(['vertical','angle','horizontal'])
+        ad = ag.allocate(0)
+
+        reconstructor = FBP(ad, backend='astra')
+
+        with self.assertRaises(ValueError):
+            reconstructor = FBP(ad, backend='gemma')
+
+        with self.assertRaises(ValueError):
+            reconstructor = FBP(ad, backend='tigre')
+
 
 class Test_FDK_results(unittest.TestCase):
     
@@ -561,12 +574,27 @@ class Test_FBP_results(unittest.TestCase):
 
 
     @unittest.skipUnless(has_tigre and has_tigre_gpu and has_ipp, "TIGRE or IPP not installed")
-    def test_results_3D(self):
+    def test_results_3D_tigre(self):
 
         reconstructor = FBP(self.acq_data)
 
         reco = reconstructor.run(verbose=0)
         np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=1e-3)    
+
+        reco2 = reco.copy()
+        reco2.fill(0)
+        reconstructor.run(out=reco2, verbose=0)
+        np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)  
+
+
+    @unittest.skipUnless(has_astra and has_gpu_astra and has_ipp, "ASTRA or IPP not installed")
+    def test_results_3D_astra(self):
+
+        self.acq_data.reorder('astra')
+        reconstructor = FBP(self.acq_data, backend='astra')
+
+        reco = reconstructor.run(verbose=0)
+        np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=1e-1)    
 
         reco2 = reco.copy()
         reco2.fill(0)

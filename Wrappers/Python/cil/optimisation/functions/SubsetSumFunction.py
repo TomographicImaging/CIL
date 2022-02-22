@@ -186,12 +186,23 @@ class SAGAFunction(SubsetSumFunction):
         precond: function taking into input an integer (subset_num) and a DataContainer and outputting a DataContainer
         serves as diagonal preconditioner
         default None
+    - (optional)
+        gradient_initialization_point: point to initialize the gradient of each subset
+        and the full gradient
+        default None
            
     '''
 
-    def __init__(self, functions, precond=None, **kwargs):
+    def __init__(self, functions, precond=None, gradient_initialization_point=None, **kwargs):
 
-        self.gradients_allocated = False
+        if gradient_initialization_point is None:
+            self.gradients_allocated = False
+        else:
+            self.subset_gradients = [ fi.gradient(gradient_initialization_point) for i, fi in enumerate(functions)]
+            self.full_gradient = sum(self.subset_gradients)
+            self.tmp1 = gradient_initialization_point * 0.0
+            self.tmp2 = gradient_initialization_point * 0.0
+            self.gradients_allocated = True
         self.precond = precond
         
         super(SAGAFunction, self).__init__(functions)

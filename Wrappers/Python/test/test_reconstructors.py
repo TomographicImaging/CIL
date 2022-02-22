@@ -36,8 +36,12 @@ if has_tigre:
 
 has_tigre_gpu = has_gpu_tigre()
 if  not has_tigre_gpu:
-    print("Unable to run TIGRE tests")
+    print("Unable to run ASTRA tests")
 
+has_astra_gpu = has_gpu_astra()
+if  not has_tigre_gpu:
+    print("Unable to run ASTRA tests")
+    
 class Test_Reconstructor(unittest.TestCase):
 
     def setUp(self):

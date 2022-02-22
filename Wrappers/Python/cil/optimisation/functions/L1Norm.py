@@ -19,50 +19,51 @@ from cil.optimisation.functions import Function
 import numpy as np
 
  
-def soft_shrinkage(x, tau, out=None):
-    
-    r"""Returns the value of the soft-shrinkage operator at x.
-    """
-    
-    if out is None:
-        return x.sign() * (x.abs() - tau).maximum(0) 
-    else:
-        x.abs(out = out)
-        out -= tau
-        out.maximum(0, out = out)
-        out *= x.sign()  
-        
-
 class L1Norm(Function):
     
-    r"""L1Norm function
-            
-        Consider the following cases:           
-            a) .. math:: F(x) = ||x||_{1}
-            b) .. math:: F(x) = ||x - b||_{1}
-                                
+    r"""L1Norm Function
+
+        The following cases are considered:   
+
+        *  :math:`F(\cdot) = ||\cdot||_{1}`
+
+        *  :math:`F(\cdot) = ||\cdot - \,b||_{1}`
+
+        **kwargs
+            b : DataContainer, default = None      
+                Translates the function at point :code:`b`.
+
+        Examples
+        --------
+
+        :math:`F(x) = \|x\|_{1}`
+
+        :math:`F(x) = \|x - b\|_{1}`
+
+        >>> from cil.optimisation.functions import L1Norm 
+        >>> from cil.framework import ImageGeometry   
+        >>> F = L1Norm() # ( no data )
+        >>> ig = ImageGeometry(3,4)
+        >>> data = ig.allocate('random')
+        >>> F = L1Norm(b=data) # ( with data )
+    
+                    
     """   
            
     def __init__(self, **kwargs):
-        '''creator
 
-        Cases considered (with/without data):            
-        a) :math:`f(x) = ||x||_{1}`
-        b) :math:`f(x) = ||x - b||_{1}`
-
-        :param b: translation of the function
-        :type b: :code:`DataContainer`, optional
-        '''
         super(L1Norm, self).__init__()
         self.b = kwargs.get('b',None)
         
     def __call__(self, x):
         
-        r"""Returns the value of the L1Norm function at x.
+        r"""Returns the value of the L1Norm function at :code:`x`.
         
-        Consider the following cases:           
-            a) .. math:: F(x) = ||x||_{1}
-            b) .. math:: F(x) = ||x - b||_{1}        
+        The following cases are considered:   
+
+        *  :math:`F(x) = ||x||_{1}`
+
+        *  :math:`F(x) = ||x - b||_{1}`      
         
         """
         
@@ -73,21 +74,27 @@ class L1Norm(Function):
           
     def convex_conjugate(self,x):
         
-        r"""Returns the value of the convex conjugate of the L1Norm function at x.
-        Here, we need to use the convex conjugate of L1Norm, which is the Indicator of the unit 
-        :math:`L^{\infty}` norm
-        
-        Consider the following cases:
-                
-                a) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*}) 
-                b) .. math:: F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*}) + <x^{*},b>      
-        
-    
+        r"""Returns the value of the convex conjugate of the L1Norm function at :code:`x`.
+
+        The following cases are considered:  
+
+        *  :math:`F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*})`
+
+        *  :math:`F^{*}(x^{*}) = \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*}) \,+ <x^{*},b>`
+
+        Note
+        ----
+
+        The convex conjugate of the L1Norm function, is the Indicator function of the unit ball of the
+        :math:`L^{\infty}` norm: 
+
         .. math:: \mathbb{I}_{\{\|\cdot\|_{\infty}\leq1\}}(x^{*}) 
             = \begin{cases} 
-            0, \mbox{if } \|x^{*}\|_{\infty}\leq1\\
-            \infty, \mbox{otherwise}
+            0, \mbox{ if } \|x^{*}\|_{\infty}\leq1\\
+            \infty, \mbox{ otherwise }
             \end{cases}
+
+        If :code:`b is not None`, the same formula as the convex conjugate of :py:meth:`TranslateFunction.convex_conjugate` is used.
     
         """        
         
@@ -99,34 +106,52 @@ class L1Norm(Function):
                 return 0.
         return np.inf    
 
+    def _soft_shrinkage(self, x, tau, out=None):
+        
+        r"""Returns the value of the proximal operator of the function :math: `F(x) = \|x\|_{1}` at :code:'x'. 
+        Also referred as soft-shrinkage operator.
+
+        .. math:: \mathrm{prox}_{\tau \|\cdot\|_{1}}(x) = \mathrm{soft}(x, \tau) = ( |x| - \tau )_{+} \mathrm{sign}(x)
+
+        """
+        
+        if out is None:
+            return x.sign() * (x.abs() - tau).maximum(0) 
+        else:
+            x.abs(out = out)
+            out -= tau
+            out.maximum(0, out = out)
+            out *= x.sign()  
                     
     def proximal(self, x, tau, out=None):
         
-        r"""Returns the value of the proximal operator of the L1Norm function at x.
-        
-        
-        Consider the following cases:
+        r"""Returns the value of the proximal operator of the L1Norm function at :code:`x`.
+
+        The following cases are considered:  
+
+        *  :math:`\mathrm{prox}_{\tau F}(x) = \mathrm{soft}(x, \tau)`
+
+        *  :math:`\mathrm{prox}_{\tau F}(x) = \mathrm{soft}(x - b, \tau) + b`
                 
-                a) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x)
-                b) .. math:: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) + b   
-    
-        where,
-        
-        .. math :: \mathrm{prox}_{\tau F}(x) = \mathrm{ShinkOperator}(x) = sgn(x) * \max\{ |x| - \tau, 0 \}
-                            
+        where, :math:`\mathrm{soft}(x, \tau) := ( |x| - \tau )_{+} \mathrm{sign}(x)\,.`
+
+        Note
+        ----
+        If :code:`b is not None`, the same formula as the proximal operator of :py:meth:`TranslateFunction.proximal` is used.
+                             
         """  
 
                     
         if out is None:                                                
             if self.b is not None:                                
-                return self.b + soft_shrinkage(x - self.b, tau)
+                return self.b + self._soft_shrinkage(x - self.b, tau)
             else:
-                return soft_shrinkage(x, tau)             
+                return self._soft_shrinkage(x, tau)             
         else: 
             
             if self.b is not None:
-                soft_shrinkage(x - self.b, tau, out = out)
+                self._soft_shrinkage(x - self.b, tau, out = out)
                 out += self.b
             else:
-                soft_shrinkage(x, tau, out = out)       
+                self._soft_shrinkage(x, tau, out = out)       
 

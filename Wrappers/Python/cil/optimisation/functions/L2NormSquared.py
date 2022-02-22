@@ -21,52 +21,54 @@ from cil.optimisation.operators import DiagonalOperator
 
 class L2NormSquared(Function):
     
-    r""" L2NormSquared function: :math:`F(x) = \| x\|^{2}_{2} = \underset{i}{\sum}x_{i}^{2}`
+    r""" L2NormSquared Function
           
-    Following cases are considered:
-                
-        a) :math:`F(x) = \|x\|^{2}_{2}`
-        b) :math:`F(x) = \|x - b\|^{2}_{2}`
+    The following cases are considered:
+
+    *  :math:`F(\cdot) = \|\cdot\|^{2}_{2}`
+
+    *  :math:`F(\cdot) = \|\cdot - b\|^{2}_{2}`
+
+
+    **kwargs
+        b : DataContainer, default = None      
+            Translates the function at point :code:`b`.
+
+    Examples
+    --------
+
+    :math:`F(x) = \|x\|_{2}^{2}`
+
+    :math:`F(x) = \|x - b\|_{2}^{2}`    
+
+    >>> from cil.optimisation.functions import L2NormSquared 
+    >>> from cil.framework import ImageGeometry   
+    >>> F = L2NormSquared() # ( no data )
+    >>> ig = ImageGeometry(3,4)
+    >>> data = ig.allocate('random')
+    >>> F = L2NormSquared(b=data) # ( with data )
         
-    .. note::  For case b) case we can use :code:`F = L2NormSquared().centered_at(b)`,
-               see *TranslateFunction*.
-        
-    :Example:
-        
-        >>> F = L2NormSquared()
-        >>> F = L2NormSquared(b=b) 
-        >>> F = L2NormSquared().centered_at(b)
-                                                          
+                                                  
     """    
     
     def __init__(self, **kwargs):
-        '''creator
-
-        Cases considered (with/without data):            
-                a) .. math:: f(x) = \|x\|^{2}_{2} 
-                b) .. math:: f(x) = \|\|x - b\|\|^{2}_{2}
-
-        :param b:  translation of the function
-        :type b: :code:`DataContainer`, optional
-        '''                        
+                      
         super(L2NormSquared, self).__init__(L = 2)
         self.b = kwargs.get('b',None) 
         
                             
     def __call__(self, x):
 
-        r"""Returns the value of the L2NormSquared function at x.
+        r"""Returns the value of the L2NormSquared function at :code:`x`.
         
-        Following cases are considered:
-            
-            a) :math:`F(x) = \|x\|^{2}_{2}`
-            b) :math:`F(x) = \|x - b\|^{2}_{2}`
-    
-        :param: :math:`x`
-        :returns: :math:`\underset{i}{\sum}x_{i}^{2}`
-                
-        """          
-            
+        The following cases are considered:   
+
+        *  :math:`F(x) = \|x\|^{2}_{2}`
+
+        *  :math:`F(x) = \|x - b\|^{2}_{2}`      
+        
+        """        
+                  
         y = x
         if self.b is not None: 
             y = x - self.b
@@ -77,14 +79,19 @@ class L2NormSquared(Function):
             return (y.norm()**2)
                 
     def gradient(self, x, out=None):        
-        
-        r"""Returns the value of the gradient of the L2NormSquared function at x.
-        
-        Following cases are considered:
-                
-            a) :math:`F'(x) = 2x`
-            b) :math:`F'(x) = 2(x-b)`
-                
+
+        r"""Returns the value of the gradient of the L2NormSquared function at :code:`x`.
+
+        The following cases are considered:  
+
+        *  :math:`F'(x) = 2*x`
+
+        *  :math:`F'(x) = 2*(x-b)`
+
+        Note
+        ----        
+        If :code:`b is not None`, the same formula of the gradient of :py:meth:`TranslateFunction.gradient` is used.
+
         """
                 
         if out is not None:
@@ -103,15 +110,21 @@ class L2NormSquared(Function):
         
                                                        
     def convex_conjugate(self, x):
-        
-        r"""Returns the value of the convex conjugate of the L2NormSquared function at x.
-        
-        Consider the following cases:
-                
-                a) .. math:: F^{*}(x^{*}) = \frac{1}{4}\|x^{*}\|^{2}_{2} 
-                b) .. math:: F^{*}(x^{*}) = \frac{1}{4}\|x^{*}\|^{2}_{2} + <x^{*}, b>
-                
-        """                
+
+        r"""Returns the value of the convex conjugate of the L2NormSquared function at :code:`x`.
+
+        The following cases are considered:  
+
+        *  :math:`F^{*}(x^{*}) = \frac{1}{4}\|x^{*}\|^{2}_{2}`
+
+        *  :math:`F^{*}(x^{*}) = \frac{1}{4}\|x^{*}\|^{2}_{2} + <x^{*}, b>`
+
+        Note
+        ----        
+        If :code:`b is not None`, the same formula of the convex conjugate of :py:meth:`TranslateFunction.convex_conjugate` is used.
+
+        """
+              
         tmp = 0
         
         if self.b is not None:
@@ -122,15 +135,20 @@ class L2NormSquared(Function):
 
     def proximal(self, x, tau, out = None):
         
-        r"""Returns the value of the proximal operator of the L2NormSquared function at x.
+        r"""Returns the value of the proximal operator of the L2NormSquared function at :code:`x`.
         
         
-        Consider the following cases:
+        The following cases are considered:  
+
+        *  :math:`\mathrm{prox}_{\tau F}(x) = \frac{x}{1+2\tau}`  
+
+        *  :math:`\mathrm{prox}_{\tau F}(x) = \frac{x-b}{1+2\tau} + b`
                 
-                a) .. math:: \mathrm{prox}_{\tau F}(x) = \frac{x}{1+2\tau}
-                b) .. math:: \mathrm{prox}_{\tau F}(x) = \frac{x-b}{1+2\tau} + b      
-                        
-        """            
+        Note
+        ----        
+        If :code:`b is not None`, the same formula of the proximal operator of :py:meth:`TranslateFunction.proximal` is used.
+
+        """          
 
         if out is None:
             
@@ -153,15 +171,36 @@ class L2NormSquared(Function):
 
 class WeightedL2NormSquared(Function):
     
-    r""" WeightedL2NormSquared function: :math:`F(x) = \| x\|_{w}^{2}_{2} = \underset{i}{\sum}w_{i}*x_{i}^{2} = <x, w*x> = x^{T}*w*x`
-                                                                    
+    r""" WeightedL2NormSquared function
+
+    The following cases are considered:   
+
+    *  :math:`F(\cdot) = \| \cdot\|_{w}^{2}_{2}`
+
+    *  :math:`F(\cdot) = ||\cdot - \,b||_{w,2}^{2}`,
+
+    where, :math:`\| x\|_{w}^{2}_{2} = \sum w * |x|^{2}`.
+
+    **kwargs
+        b : DataContainer, default = None      
+            Translates the function at point :code:`b`.
+        weight: DataContainer, default = 1.0
+            Weight for the L2NormSquared
+
+    Examples
+    --------
+
+    >>> from cil.optimisation.functions import WeightedL2NormSquared 
+    >>> from cil.framework import ImageGeometry 
+    >>> F = WeightedL2NormSquared(weight = 5.0) # ( no data )
+    >>> ig = ImageGeometry(3,4)    
+    >>> data = ig.allocate('random')    
+    >>> F = WeightedL2NormSquared(b = data, weight = 2.0) # ( with data )             
+                                                              
     """                 
               
     def __init__(self, **kwargs):
-        
-       # Weight can be either a scalar or a DataContainer
-       # Lispchitz constant L = 2 *||weight||         
-                   
+                                 
        self.weight = kwargs.get('weight', 1.0) 
        self.b = kwargs.get('b', None) 
        tmp_norm = 1.0  

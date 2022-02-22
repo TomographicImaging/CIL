@@ -20,15 +20,30 @@ from cil.optimisation.functions import Function
 from cil.framework import VectorData, VectorGeometry
 
 class Rosenbrock(Function):
-    r'''Rosenbrock function
+    r"""Rosenbrock function 
 
-    .. math:: 
+    :math:`F(x,y) = (\alpha - x)^2 + \beta(y-x^2)^2`
 
-    F(x,y) = (\alpha - x)^2 + \beta(y-x^2)^2
+    Parameters
+    ----------
 
-    The function has a global minimum at .. math:: (x,y)=(\alpha, \alpha^2)
+    alpha : :obj:`float`
+            First parameter
 
-    '''
+    beta : :obj:`float`
+            Second parameter 
+
+    Examples
+    --------
+    >>> from cil.optimisation.functions import Rosenbrock
+    >>> f = Rosenbrock(alpha = 1, beta = 100)   
+
+    Note
+    ----           
+    The function has a global minimum at :math:`(x,y)=(\alpha, \alpha^2)` .
+    For more information see `Rosenbrock function <https://en.wikipedia.org/wiki/Rosenbrock_function>`_.
+
+    """
     def __init__(self, alpha, beta):
         super(Rosenbrock, self).__init__()
 
@@ -36,21 +51,23 @@ class Rosenbrock(Function):
         self.beta = beta
 
     def __call__(self, x):
+
+        """Returns the value of the Rosenbrock function at :code:`x`.
+        """
         if not isinstance(x, VectorData):
             raise TypeError('Rosenbrock function works on VectorData only')
+
         vec = x.as_array()
         a = (self.alpha - vec[0])
         b = (vec[1] - (vec[0]*vec[0]))
         return a * a + self.beta * b * b
 
     def gradient(self, x, out=None):
-        r'''Gradient of the Rosenbrock function
+        r"""Returns the value of the gradient of the Rosenbrock function at :code:`x`.
         
-        .. math::
+        :math:`\nabla f(x,y) = \left[ 2*((x-\alpha) - 2\beta x(y-x^2)) , 2\beta (y - x^2)  \right]`
 
-        \nabla f(x,y) = \left[ 2*((x-\alpha) - 2\beta x(y-x^2)) ; 2\beta (y - x^2)  \right]
-
-        '''
+        """
         if not isinstance(x, VectorData):
             raise TypeError('Rosenbrock function works on VectorData only')
 

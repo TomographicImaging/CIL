@@ -18,7 +18,6 @@ from cil.framework import cilacc
 from cil.framework import AcquisitionGeometry
 from cil.recon import Reconstructor
 from scipy.fft import fftfreq
-from cil.plugins.tigre import ProjectionOperator
 
 import numpy as np
 import ctypes
@@ -67,12 +66,10 @@ class GenericFilteredBackProjection(Reconstructor):
     def fft_order(self):
         return self._fft_order
 
-    
-    def __init__ (self, input, image_geometry=None, filter='ram-lak'):
-
+    def __init__ (self, input, image_geometry=None, filter='ram-lak', backend='tigre'):
 
         #call parent initialiser
-        super().__init__(input, image_geometry)
+        super().__init__(input, image_geometry, backend)
                 
         if has_ipp == False:
             raise ImportError("IPP libraries not found. Cannot use CIL FBP")
@@ -252,12 +249,14 @@ class GenericFilteredBackProjection(Reconstructor):
         ag = acquistion_data.geometry
         if ag.dimension_labels == ('angle','vertical','horizontal'):   
             cilacc.filter_projections_avh(data_ptr, filter_ptr, weights_ptr, self.fft_order, *acquistion_data.shape)
+        elif ag.dimension_labels == ('vertical','angle','horizontal'):   
+            cilacc.filter_projections_vah(data_ptr, filter_ptr, weights_ptr, self.fft_order, *acquistion_data.shape)
         elif ag.dimension_labels == ('angle','horizontal'): 
             cilacc.filter_projections_vah(data_ptr, filter_ptr, weights_ptr, self.fft_order, 1, *acquistion_data.shape) 
         elif ag.dimension_labels == ('vertical','horizontal'): 
             cilacc.filter_projections_avh(data_ptr, filter_ptr, weights_ptr, self.fft_order, 1, *acquistion_data.shape) 
         else:
-            raise ValueError ("The data is not in a compatible order. Try reordering the data with data.reorder({})".format(self.backend))
+            raise ValueError ("Could not determine correct function call from dimension labels")
 
 
     def reset(self):
@@ -266,7 +265,6 @@ class GenericFilteredBackProjection(Reconstructor):
         """
         self.set_filter()
         self.set_fft_order()
-        self.set_backend()
         self.set_filter_inplace()
         self.set_image_geometry()
         self._weights = None
@@ -279,7 +277,7 @@ class GenericFilteredBackProjection(Reconstructor):
 class FDK(GenericFilteredBackProjection):
 
     """
-    Creates an FDK reconstructor based on your cone-beam acquisition data.
+    Creates an FDK reconstructor based on your cone-beam acquisition data using TIGRE as a backend.
 
     Parameters
     ----------
@@ -294,6 +292,9 @@ class FDK(GenericFilteredBackProjection):
 
     Example
     -------
+    >>> from cil.utilities.dataexample import SIMULATED_CONE_BEAM_DATA
+    >>> from cil.recon import FDK
+    >>> data = SIMULATED_CONE_BEAM_DATA.get()
     >>> fdk = FDK(data)
     >>> out = fdk.run()
 
@@ -301,10 +302,11 @@ class FDK(GenericFilteredBackProjection):
     -----
     The reconstructor can be futher customised using additional 'set' methods provided.
     """
-    
+    supported_backends = ['tigre']
+
     def __init__ (self, input, image_geometry=None, filter='ram-lak'):
         #call parent initialiser
-        super().__init__(input, image_geometry, filter)
+        super().__init__(input, image_geometry, filter, backend='tigre')
 
         if  input.geometry.geom_type != AcquisitionGeometry.CONE:
             raise TypeError("This reconstructor is for cone-beam data only.")
@@ -323,7 +325,7 @@ class FDK(GenericFilteredBackProjection):
 
     def run(self, out=None, verbose=1):
         """
-        Runs the configured FDK recon and returns the reconstruction
+        Runs the configured FDK recon and returns the reconstruction.
 
         Parameters
         ----------
@@ -347,7 +349,7 @@ class FDK(GenericFilteredBackProjection):
             proj_filtered = self.input
 
         self._pre_filtering(proj_filtered)
-        operator = ProjectionOperator(self.image_geometry,self.acquisition_geometry,adjoint_weights='FDK')
+        operator = self._PO_class(self.image_geometry,self.acquisition_geometry,adjoint_weights='FDK')
         
         if out is None:
             return operator.adjoint(proj_filtered)
@@ -385,8 +387,14 @@ class FBP(GenericFilteredBackProjection):
     filter : string, numpy.ndarray, default='ram-lak'
         The filter to be applied. Can be a string from: 'ram-lak' or a numpy array.
 
+    backend : string
+        The backend to use, can be 'astra' or 'tigre'. Data must be in the correct order for requested backend.
+
     Example
     -------
+    >>> from cil.utilities.dataexample import SIMULATED_PARALLEL_BEAM_DATA
+    >>> from cil.recon import FBP
+    >>> data = SIMULATED_PARALLEL_BEAM_DATA.get()
     >>> fbp = FBP(data)
     >>> out = fbp.run()
 
@@ -395,14 +403,16 @@ class FBP(GenericFilteredBackProjection):
     The reconstructor can be futher customised using additional 'set' methods provided.
     """
 
+    supported_backends = ['tigre', 'astra']
+
     @property
     def slices_per_chunk(self):
         return self._slices_per_chunk
 
 
-    def __init__ (self, input, image_geometry=None, filter='ram-lak'):
+    def __init__ (self, input, image_geometry=None, filter='ram-lak', backend='tigre'):
       
-        super().__init__(input, image_geometry, filter)
+        super().__init__(input, image_geometry, filter, backend)
         self.set_split_processing(False)
 
         if  input.geometry.geom_type != AcquisitionGeometry.PARALLEL:
@@ -455,7 +465,7 @@ class FBP(GenericFilteredBackProjection):
                 
         ig_slice = ag_slice.get_ImageGeometry()
         self.data_slice = ag_slice.allocate()
-        self.operator = ProjectionOperator(ig_slice,ag_slice)
+        self.operator = self._PO_class(ig_slice,ag_slice)
 
     def _process_chunk(self, i, step,  out):
         self.data_slice.fill(np.squeeze(self.input.array[:,i:i+step,:]))
@@ -539,7 +549,7 @@ class FBP(GenericFilteredBackProjection):
 
             self._pre_filtering(proj_filtered)
 
-            operator = ProjectionOperator(self.image_geometry,self.acquisition_geometry)
+            operator = self._PO_class(self.image_geometry,self.acquisition_geometry)
 
             if out is None:
                 return operator.adjoint(proj_filtered)

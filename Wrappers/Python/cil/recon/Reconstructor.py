@@ -16,6 +16,7 @@
 #   limitations under the License.
 
 from cil.framework import AcquisitionData, ImageGeometry, DataOrder
+import importlib
 import weakref
 
 class Reconstructor(object):
@@ -39,10 +40,7 @@ class Reconstructor(object):
 
     @property
     def image_geometry(self):
-        if self._image_geometry is None:
-            return self.acquisition_geometry.get_ImageGeometry()
-        else:
-            return self._image_geometry
+        return self._image_geometry
 
 
     @property
@@ -50,17 +48,15 @@ class Reconstructor(object):
         return self._backend
 
 
-    def __init__(self, input, image_geometry=None):
-        self._backend = 'tigre'
+    def __init__(self, input, image_geometry=None, backend='tigre'):
+
 
         if not issubclass(type(input), AcquisitionData):
             raise TypeError("Input type mismatch: got {0} expecting {1}"
                             .format(type(input), AcquisitionData))
 
-        if not DataOrder.check_order_for_engine(self.backend, input.geometry):
-            raise ValueError("Input data must be reordered for use with selected backed. Use input.reorder{'{0}')".format(self._backend))
-
         self._acquisition_geometry = input.geometry.copy()
+        self._configure_for_backend(backend)
         self.set_image_geometry(image_geometry)
         self.set_input(input)
 
@@ -91,7 +87,7 @@ class Reconstructor(object):
             A description of the area/volume to reconstruct
         """
         if image_geometry is None:
-            self._image_geometry = None
+            self._image_geometry = self.acquisition_geometry.get_ImageGeometry()
         elif issubclass(type(image_geometry), ImageGeometry):
             self._image_geometry = image_geometry.copy()
         else:
@@ -99,18 +95,26 @@ class Reconstructor(object):
                                 .format(type(input), ImageGeometry))   
            
 
-    def set_backend(self, backend='tigre'):
+    def _configure_for_backend(self, backend='tigre'):
         """
-        Sets the backend used for the foward/backward projectors. Currently only TIGRE is supported
-        
-        Parameters
-        ----------
-        backend: string
-            Set the backend to TIGRE 'tigre'
+        Configures the class for the right engine. Checks the dataorder.
         """        
-        supported_backends = ['tigre']
-        if backend not in supported_backends:
-            raise ValueError("Backend unsupported. Supported backends: {}", supported_backends)
+        if backend not in self.supported_backends:
+            raise ValueError("Backend unsupported. Supported backends: {}".format(self.supported_backends))
+
+        if not DataOrder.check_order_for_engine(backend, self.acquisition_geometry):
+            raise ValueError("Input data must be reordered for use with selected backend. Use input.reorder{'{0}')".format(backend))
+
+        #set ProjectionOperator class from backend
+        try:
+            module = importlib.import_module('cil.plugins.'+backend)
+        except ImportError:
+            if backend == 'tigre':
+                raise ImportError("Cannot import the {} plugin module. Please install TIGRE or select a different backend".format(self.backend))
+            if backend == 'astra':
+                raise ImportError("Cannot import the {} plugin module. Please install CIL-ASTRA or select a different backend".format(self.backend))
+
+        self._PO_class = module.ProjectionOperator
         self._backend = backend
 
 

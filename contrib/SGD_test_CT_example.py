@@ -27,7 +27,7 @@ import numpy as np
 
 import importlib
 
-# Define SAGAGradientFunction
+# Define SAGAFunction
 import sys
 cil_path = '/store/CIA/jt814/cil_codes/CIL-master/Wrappers'
 fun_path = 'Wrappers/Python/cil/optimisation/functions'
@@ -216,10 +216,10 @@ F = BlockFunction(*f_subsets)
 
 importlib.reload(SubsetSumFunction)
 from SubsetSumFunction import SumFunction
-from SubsetSumFunction import SAGAGradientFunction, SGDGradientFunction
+from SubsetSumFunction import SAGAFunction, SGDFunction
 
 num_epochs = 20
-F_saga = SAGAGradientFunction(F)
+F_saga = SAGAFunction(F)
 # admissible step-size is gamma = 1/ (3 max_i L_i)
 step_size = 1 / (3*F_saga.Lmax)
 initial = ig.allocate(0)
@@ -231,7 +231,7 @@ saga = ISTA(initial=initial,
             max_iteration=10000)
 saga.run(num_epochs * n_subsets, verbose=0)
 
-F_sgd = SGDGradientFunction(F)
+F_sgd = SGDFunction(F)
 # admissible step-size is gamma = 1/ (3 max_i L_i)
 step_size = 1 / (1*F_sgd.Lmax)
 initial = ig.allocate(0)
@@ -248,7 +248,7 @@ sgd.run(num_epochs * n_subsets, verbose=0)
 # subsequent subsets: 1, 2, etc...
 def subset_select_function(a,b):
     return (a+1)%b
-F_saga = SAGAGradientFunction(F, subset_select_function=subset_select_function)
+F_saga = SAGAFunction(F, subset_select_function=subset_select_function)
 step_size = 1 / (3*F_saga.Lmax)
 initial = ig.allocate(0)
 F_saga.memory_reset()
@@ -270,7 +270,7 @@ cst = A.adjoint(A.range.allocate(1.))
 precond = lambda i, x: x.divide(cst)
 # csts = [Ai.adjoint(Ai.range.allocate(1.))  for Ai in A_subsets]
 # precond = lambda i, x: x.divide(csts[i])
-F_saga = SAGAGradientFunction(F, precond=precond)
+F_saga = SAGAFunction(F, precond=precond)
 step_size = 0.2
 initial = ig.allocate(1.)
 F_saga.memory_reset()
@@ -318,7 +318,7 @@ ista_tv.run(num_epochs, verbose=0)
 
 # SAGA
 num_epochs = 20
-F_saga = SAGAGradientFunction(F)
+F_saga = SAGAFunction(F)
 # admissible step-size is gamma = 1/ (3 max_i L_i)
 step_size = 1 / (3*F_saga.Lmax)
 initial = ig.allocate(0)
@@ -333,7 +333,7 @@ saga_tv.run(num_epochs * n_subsets, verbose=0)
 
 # SGD
 num_epochs = 20
-F_sgd = SGDGradientFunction(F)
+F_sgd = SGDFunction(F)
 # admissible step-size is gamma = 1/ (3 max_i L_i)
 step_size = 1 / (1*F_sgd.Lmax)
 initial = ig.allocate(0)

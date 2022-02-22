@@ -301,7 +301,7 @@ class SAGAFunction(SubsetSumFunction):
             self.gradients_allocated = False
             
             
-class SGDGradientFunction(SubsetSumFunction):
+class SGDFunction(SubsetSumFunction):
     '''Class for use as objective function in gradient type algorithms to enable the use of subsets.
     The `gradient` method doesn't the mathematical gradient of the sum of functions,
     but a approximated gradient corresponding to the minibatch SGD algorithm. --Billy 15/2/2022
@@ -320,7 +320,7 @@ class SGDGradientFunction(SubsetSumFunction):
         self.gradients_allocated = False
         self.precond = precond
 
-        super(SGDGradientFunction, self).__init__(functions)
+        super(SGDFunction, self).__init__(functions)
 
     def gradient(self, x, out=None):
         """

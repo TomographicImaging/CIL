@@ -1,8 +1,11 @@
 '''
 
-This is a test for SGD comparing to ISTA and SAGA on CT example. 
-Seems that SGD can be even faster than SAGA in this example.
---Billy 15/2/2022
+This is a test for SGD comparing to ISTA and SAGA on noisy CT example.
+Seems that SGD can be even faster than SAGA in this example. (There is a further need of implementing shrinking step-sizes for SGD)
+
+Here ISTA function is modified to take into account the n_subsets (default=1 for detereministic ISTA) to ensure right scaling factor
+
+--Billy 23/2/2022
 
 '''
 
@@ -59,7 +62,10 @@ A = ProjectionOperator(ig, ag, device='gpu')
 sino = A.direct(phantom)
 
 # Simulate Gaussian noise for the sinogram
-gaussian_var = 0.5
+noise_scale = 5
+tv_reg_scale = 100
+
+gaussian_var = 0.5 * noise_scale
 gaussian_mean = 0
 
 n1 = np.random.normal(gaussian_mean, gaussian_var, size=ag.shape)
@@ -133,12 +139,12 @@ class ISTA(Algorithm):
         SIAM journal on imaging sciences 2.1 (2009)
     """
 
-    def __init__(self, initial=None, f=None, g=None, step_size=1, **kwargs):
+    def __init__(self, initial=None, f=None, g=None, step_size=1, n_subsets=1, **kwargs):
         super(ISTA, self).__init__(**kwargs)
 
-        self.set_up(initial=initial, f=f, g=g, step_size=step_size)
+        self.set_up(initial=initial, f=f, g=g, step_size=step_size, n_subsets=n_subsets)
 
-    def set_up(self, initial, f, g, step_size):
+    def set_up(self, initial, f, g, step_size, n_subsets):
         self.f = f
         self.g = g
         self.x = initial.copy()
@@ -148,6 +154,7 @@ class ISTA(Algorithm):
         self.update_objective()
         self.update_step_size = False
         self.configured = True
+        self.n_subsets = n_subsets
 
     def update(self):
         '''Single iteration'''
@@ -155,7 +162,7 @@ class ISTA(Algorithm):
         self.x_update = self.f.gradient(self.x)
         self.x_update *= -self.step_size
         self.x += self.x_update
-        self.x = self.g.proximal(self.x, self.step_size)
+        self.x = self.g.proximal(self.x, self.step_size/self.n_subsets)
 
     def update_objective(self):
         self.loss.append(self.objective_function(self.x))
@@ -235,7 +242,7 @@ F_sgd = SGDFunction(F)
 # admissible step-size is gamma = 1/ (3 max_i L_i)
 step_size = 1 / (1*F_sgd.Lmax)
 initial = ig.allocate(0)
-F_sgd.memory_reset()
+#F_sgd.memory_reset()
 sgd = ISTA(initial=initial,
             f=F_sgd,
             g=g,
@@ -248,47 +255,10 @@ sgd.run(num_epochs * n_subsets, verbose=0)
 # subsequent subsets: 1, 2, etc...
 def subset_select_function(a,b):
     return (a+1)%b
-F_saga = SAGAFunction(F, subset_select_function=subset_select_function)
-step_size = 1 / (3*F_saga.Lmax)
-initial = ig.allocate(0)
-F_saga.memory_reset()
-saga_ss = ISTA(initial=initial,
-            f=F_saga,
-            g=g,
-            step_size=step_size, update_objective_interval=n_subsets,
-            max_iteration=10000)
-saga_ss.run(num_epochs * n_subsets, verbose=0)
 
 
 
 
-# With diagonal preconditioning
-
-# D(x) = diag(x / A^T \1)
-num_epochs = 20
-cst = A.adjoint(A.range.allocate(1.))
-precond = lambda i, x: x.divide(cst)
-# csts = [Ai.adjoint(Ai.range.allocate(1.))  for Ai in A_subsets]
-# precond = lambda i, x: x.divide(csts[i])
-F_saga = SAGAFunction(F, precond=precond)
-step_size = 0.2
-initial = ig.allocate(1.)
-F_saga.memory_reset()
-saga_precond = ISTA(initial=initial,
-            f=F_saga,
-            g=g,
-            step_size=step_size, update_objective_interval=n_subsets,
-            max_iteration=10000)
-saga_precond.run(num_epochs * n_subsets, verbose=0)
-
-
-
-# Look at results
-show2D([ista.solution, saga.solution, sgd.solution, saga_ss.solution, saga_precond.solution],
-       origin="upper",
-       title=["ISTA","SAGA", 'SGD', "SAGA subsequent subsets","SAGA precond"],
-       fix_range=(0,1), num_cols=1,
-       cmap='inferno')
 
 
 # compare results
@@ -296,28 +266,28 @@ plt.figure()
 plt.semilogy(ista.objective, label="ISTA")
 plt.semilogy(saga.objective, label="SAGA")
 plt.semilogy(sgd.objective, label="SGD")
-plt.semilogy(saga_ss.objective, label="SAGA subsequent subsets")
-plt.semilogy(saga_precond.objective, label="SAGA precond")
+
+
 plt.legend()
 plt.ylabel('Epochs')
 plt.xlabel('Objective function')
 plt.show()
 
 # ISTA
-num_epochs = 20
+num_epochs = 60
 f_gd = LeastSquares(A, noisy_sino)
 initial = ig.allocate(0)
 step_size = 1 / f_gd.L
-lb = 0.01
+lb = 0.01 * tv_reg_scale
 g = lb * TotalVariation(lower=0)
 ista_tv = ISTA(initial=initial, f=f_gd, g=g,
                      step_size=step_size, update_objective_interval=1,
-                     max_iteration=1000)
+                     max_iteration=3000)
 ista_tv.run(num_epochs, verbose=0)
 
 
 # SAGA
-num_epochs = 20
+num_epochs = 60
 F_saga = SAGAFunction(F)
 # admissible step-size is gamma = 1/ (3 max_i L_i)
 step_size = 1 / (3*F_saga.Lmax)
@@ -326,24 +296,39 @@ F_saga.memory_reset()
 saga_tv = ISTA(initial=initial,
             f=F_saga,
             g=g,
-            step_size=step_size, update_objective_interval=n_subsets,
-            max_iteration=10000)
+            step_size=step_size, n_subsets=n_subsets, update_objective_interval=n_subsets,
+            max_iteration=30000)
 saga_tv.run(num_epochs * n_subsets, verbose=0)
 
 
 # SGD
-num_epochs = 20
+num_epochs = 60
 F_sgd = SGDFunction(F)
 # admissible step-size is gamma = 1/ (3 max_i L_i)
 step_size = 1 / (1*F_sgd.Lmax)
 initial = ig.allocate(0)
-F_sgd.memory_reset()
+#F_sgd.memory_reset()
 sgd_tv = ISTA(initial=initial,
             f=F_sgd,
             g=g,
-            step_size=step_size, update_objective_interval=n_subsets,
-            max_iteration=10000)
+            step_size=step_size, n_subsets=n_subsets, update_objective_interval=n_subsets,
+            max_iteration=30000)
 sgd_tv.run(num_epochs * n_subsets, verbose=0)
+
+
+# SGD2 
+num_epochs = 60
+F_sgd2 = SGDFunction(F)
+# admissible step-size is gamma = 1/ (3 max_i L_i)
+step_size2 = 1 / (3*F_sgd2.Lmax)
+initial = ig.allocate(0)
+#F_sgd.memory_reset()
+sgd_tv2 = ISTA(initial=initial,
+            f=F_sgd2,
+            g=g,
+            step_size=step_size2, n_subsets=n_subsets, update_objective_interval=n_subsets,
+            max_iteration=30000)
+sgd_tv2.run(num_epochs * n_subsets, verbose=0)
 
 
 show2D([ista.solution, ista_tv.solution, saga.solution, saga_tv.solution, sgd.solution, sgd_tv.solution],
@@ -356,12 +341,22 @@ show2D([ista.solution, ista_tv.solution, saga.solution, saga_tv.solution, sgd.so
 plt.figure()
 plt.semilogy(ista_tv.objective, label="ISTA TV")
 plt.semilogy(saga_tv.objective, label="SAGA TV")
-plt.semilogy(sgd_tv.objective, label="SGD TV")
+plt.semilogy(sgd_tv.objective, label="SGD TV (1/L)")
+plt.semilogy(sgd_tv2.objective, label="SGD TV (1/3L)")
 plt.legend()
-plt.ylabel('Epochs')
-plt.xlabel('Objective function')
+plt.xlabel('Epochs')
+plt.ylabel('Objective function')
 plt.show()
 
-
+plt.figure()
+plt.semilogy(ista_tv.objective, label="ISTA TV")
+plt.semilogy(saga_tv.objective, label="SAGA TV")
+plt.semilogy(sgd_tv.objective, label="SGD TV (1/L)")
+plt.semilogy(sgd_tv2.objective, label="SGD TV (1/3L)")
+plt.ylim([250000, 500000])
+plt.legend()
+plt.xlabel('Epochs')
+plt.ylabel('Objective function')
+plt.show()
 
 

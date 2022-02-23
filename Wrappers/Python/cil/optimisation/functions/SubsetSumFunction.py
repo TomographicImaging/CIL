@@ -315,7 +315,7 @@ class SAGAFunction(SubsetSumFunction):
 class SGDFunction(SubsetSumFunction):
     '''Class for use as objective function in gradient type algorithms to enable the use of subsets.
     The `gradient` method doesn't the mathematical gradient of the sum of functions,
-    but a approximated gradient corresponding to the minibatch SGD algorithm. --Billy 15/2/2022
+    but a approximated gradient corresponding to the minibatch SGD algorithm. --Billy 23/2/2022
     More details below, in the gradient method.
     Parameters:
     -----------
@@ -323,7 +323,6 @@ class SGDFunction(SubsetSumFunction):
         precond: function taking into input an integer (subset_num) and a DataContainer and outputting a DataContainer
         serves as diagonal preconditioner
         default None
-
     '''
 
     def __init__(self, functions, precond=None, **kwargs):
@@ -335,59 +334,19 @@ class SGDFunction(SubsetSumFunction):
 
     def gradient(self, x, out=None):
         """
-        Returns a non-variance-reduced approximate gradient, defined below.
+        Returns a vanilla stochastic gradient estimate, defined below.
         For f = \sum f_i, the output is computed as follows:
             - choose a subset j with function next_subset()
             - compute
-                subset_grad - subset_grad_old + 1/num_subsets * full_grad
+                subset_grad
                 with
                 - subset_grad is the gradient of function number j at current point
-                - subset_grad_old is the gradient of function number j in memory
-                - full_grad is the approximation of the gradient of f in memory
-            - update subset_grad and full)grad
-
 
         where the gradient of each f_i is L_i - Lipschitz.
-        NB:
-        contrarily to the convention in the above article,
-        the objective function used here is
-            \sum f_i
-        and not
-            1/num_subsets \sum f_i
         """
 
-        if not self.gradients_allocated:
-            self.memory_init(x)
-
-            # random choice of subset
+        output = x * 0.0
         self.next_subset()
+        self.functions[self.subset_num].gradient(x, out=output)
 
-        #full_grad_old = self.full_gradient
-
-        # Compute new gradient for current subset, store in tmp2
-        # subset_grad = self.function[self.subset_num].gradient(x)
-        self.functions[self.subset_num].gradient(x, out=self.tmp2)
-
-        return self.tmp2
-
-    def memory_init(self, x):
-
-        """
-            initialize subset gradient (v_i_s) and full gradient (g_bar) and store in memory.
-        """
-
-        self.tmp2 = x * 0.0
-
-        self.gradients_allocated = True
-
-    def memory_reset(self):
-        """
-            resets subset gradients and full gradient in memory.
-        """
-        if self.gradients_allocated == True:
-            del (self.tmp2)
-
-            self.gradients_allocated = False
-            
-
-
+        return output

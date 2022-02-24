@@ -81,24 +81,22 @@ class RegulariserFunction(Function):
 
 class TV_Base(RegulariserFunction):
 
-    def __init__(self, strongly_convex_constant = 0):
+    def __init__(self, strong_convexity_constant = 0):
 
-        self.strongly_convex_constant = strongly_convex_constant
+        self.strong_convexity_constant = strong_convexity_constant
 
     def __call__(self,x):
         in_arr = np.asarray(x.as_array(), dtype=np.float32, order='C')
         EnergyValTV = TV_ENERGY(in_arr, in_arr, self.alpha, 2)
-        if self.strongly_convex_constant>0:
-            return 0.5*EnergyValTV[0] + (self.strongly_convex_constant/2)*(in_arr**2).sum()
-        else:
-            return 0.5*EnergyValTV[0]
+
+        return 0.5*EnergyValTV[0]
 
     def convex_conjugate(self,x):     
         return 0.0
 
 
 class FGP_TV(TV_Base):
-    def __init__(self, alpha=1, max_iteration=100, tolerance=0, isotropic=True, nonnegativity=True, device='cpu', strongly_convex_constant=0):
+    def __init__(self, alpha=1, max_iteration=100, tolerance=0, isotropic=True, nonnegativity=True, device='cpu', strong_convexity_constant=0):
         '''Creator of FGP_TV Function
 
 
@@ -114,7 +112,7 @@ class FGP_TV(TV_Base):
         :type tolerance: float, default 0
         :param device: determines if the code runs on CPU or GPU
         :type device: string, default 'cpu', can be 'gpu' if GPU is installed
-        :param strongly_convex_constant: Adds a strongly convex function to the TotalVariation functional.
+        :param strong_convexity_constant: Adds a strongly convex function to the TotalVariation functional.
         :type: float, default = 0
 
         '''

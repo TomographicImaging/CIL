@@ -54,7 +54,7 @@ class TotalVariation(Function):
       :type split: bool, default `False`           
       :param info: force a print to screen stating the stop
       :type info: bool, default `False`
-      :param strongly_convex_constant: Adds a strongly convex function to the TotalVariation functional.
+      :param strong_convexity_constant: Adds a strongly convex function to the TotalVariation functional.
       :type: float, default = 0
 
       :Example:
@@ -84,7 +84,7 @@ class TotalVariation(Function):
                  isotropic = True,
                  split = False,
                  info = False, 
-                 strongly_convex_constant = 0):
+                 strong_convexity_constant = 0):
         
 
         super(TotalVariation, self).__init__(L = None)
@@ -123,7 +123,7 @@ class TotalVariation(Function):
         self.split = split
 
         # Strong convexity for TV
-        self.strongly_convex_constant = strongly_convex_constant
+        self.strong_convexity_constant = strong_convexity_constant
 
     @property
     def regularisation_parameter(self):
@@ -207,9 +207,9 @@ class TotalVariation(Function):
         tmp_x = self.gradient.domain_geometry().allocate(0)     
         p1 = self.gradient.range_geometry().allocate(0)
 
-        if self.strongly_convex_constant>0:
-            tau /= (1+tau*self.strongly_convex_constant)
-            x /= (1 + tau*self.strongly_convex_constant)
+        if self.strong_convexity_constant>0:
+            tau /= (1+tau*self.strong_convexity_constant)
+            x /= (1 + tau*self.strong_convexity_constant)
         
         should_break = False
         for k in range(self.iterations):

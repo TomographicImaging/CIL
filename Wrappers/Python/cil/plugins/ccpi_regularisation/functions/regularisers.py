@@ -132,14 +132,14 @@ class FGP_TV(TV_Base):
         self.nonnegativity = nonnegativity
         self.device = device # string for 'cpu' or 'gpu'
 
-        super(FGP_TV, self).__init__(strongly_convex_constant=strongly_convex_constant)
+        super(FGP_TV, self).__init__(strong_convexity_constant=strong_convexity_constant)
 
 
     def proximal_numpy(self, in_arr, tau):
 
-        if self.strongly_convex_constant>0:
-            tau /= (1+tau*self.strongly_convex_constant)
-            in_arr /= (1 + tau*self.strongly_convex_constant)
+        if self.strong_convexity_constant>0:
+            tau /= (1+tau*self.strong_convexity_constant)
+            in_arr /= (1 + tau*self.strong_convexity_constant)
 
         res , info = regularisers.FGP_TV(\
               in_arr,\

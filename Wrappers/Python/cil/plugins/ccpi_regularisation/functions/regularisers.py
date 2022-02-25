@@ -89,6 +89,9 @@ class TV_Base(RegulariserFunction):
         in_arr = np.asarray(x.as_array(), dtype=np.float32, order='C')
         EnergyValTV = TV_ENERGY(in_arr, in_arr, self.alpha, 2)
         if self.strong_convexity_constant>0:
+
+            # EnergyValTV[0] is multiplied by alpha, need to divide the 
+            # second term below by alpha
             return 0.5*EnergyValTV[0] + (self.strong_convexity_constant/2)*(in_arr**2).sum()
         else:
             return 0.5*EnergyValTV[0]

@@ -88,8 +88,10 @@ class TV_Base(RegulariserFunction):
     def __call__(self,x):
         in_arr = np.asarray(x.as_array(), dtype=np.float32, order='C')
         EnergyValTV = TV_ENERGY(in_arr, in_arr, self.alpha, 2)
-
-        return 0.5*EnergyValTV[0]
+        if self.strong_convexity_constant>0:
+            return 0.5*EnergyValTV[0] + (self.strong_convexity_constant/2)*(in_arr**2).sum()
+        else:
+            return 0.5*EnergyValTV[0]
 
     def convex_conjugate(self,x):     
         return 0.0

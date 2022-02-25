@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Optimisation framework &#8212; CIL v21.3.1-11-gf5c06566 documentation</title>
+    <title>Optimisation framework &#8212; CIL v21.3.1-12-g26f863ae documentation</title>
     
     <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -2068,37 +2068,81 @@ TranslateFunction is <span class="math notranslate nohighlight">\(F(x - b)\)</sp
 
 <dl class="py class">
 <dt id="cil.optimisation.functions.SumFunction">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.functions.</span></code><code class="sig-name descname"><span class="pre">SumFunction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#SumFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SumFunction" title="Permalink to this definition">¶</a></dt>
-<dd><p>SumFunction represents the sum of two functions</p>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.functions.</span></code><code class="sig-name descname"><span class="pre">SumFunction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">functions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#SumFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SumFunction" title="Permalink to this definition">¶</a></dt>
+<dd><p>SumFunction represents the sum of <span class="math notranslate nohighlight">\(n\geq2\)</span> functions</p>
 <div class="math notranslate nohighlight">
-\[(F_{1} + F_{2})(x)  = F_{1}(x) + F_{2}(x)\]</div>
+\[(F_{1} + F_{2} + ... + F_{n})(\cdot)  = F_{1}(\cdot) + F_{2}(\cdot) + ... + F_{n}(\cdot)\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>*functions</strong> (<em>Functions</em>) – Functions to set up a <a class="reference internal" href="#cil.optimisation.functions.SumFunction" title="cil.optimisation.functions.SumFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">SumFunction</span></code></a></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the number of function is strictly less than 2.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="math notranslate nohighlight">
+\[F(x) = \|x\|^{2} + \frac{1}{2}\|x - 1\|^{2}\]</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.optimisation.functions</span> <span class="kn">import</span> <span class="n">L2NormSquared</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">ImageGeometry</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f1</span> <span class="o">=</span> <span class="n">L2NormSquared</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f2</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">L2NormSquared</span><span class="p">(</span><span class="n">b</span> <span class="o">=</span> <span class="n">ig</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span> <span class="o">=</span> <span class="n">SumFunction</span><span class="p">(</span><span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math notranslate nohighlight">
+\[F(x) = \sum_{i=1}^{50} \|x - i\|^{2}\]</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">F</span> <span class="o">=</span> <span class="n">SumFunction</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">L2NormSquared</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">)])</span>
+</pre></div>
+</div>
 <dl class="py method">
 <dt id="cil.optimisation.functions.SumFunction.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#SumFunction.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SumFunction.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">functions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#SumFunction.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SumFunction.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.functions.SumFunction.L">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.SumFunction.L" title="Permalink to this definition">¶</a></dt>
-<dd><p>Lipschitz constant</p>
+<dd><p>Returns the Lipschitz constant for the SumFunction</p>
+<div class="math notranslate nohighlight">
+\[L = \sum_{i} L_{i}\]</div>
+<p>where <span class="math notranslate nohighlight">\(L_{i}\)</span> is the Lipschitz constant of the smooth function <span class="math notranslate nohighlight">\(F_{i}\)</span>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.SumFunction.Lmax">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">Lmax</span></code><a class="headerlink" href="#cil.optimisation.functions.SumFunction.Lmax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the maximum Lipschitz constant for the SumFunction</p>
+<div class="math notranslate nohighlight">
+\[L = \max_{i}\{L_{i}\}\]</div>
+<p>where <span class="math notranslate nohighlight">\(L_{i}\)</span> is the Lipschitz constant of the smooth function <span class="math notranslate nohighlight">\(F_{i}\)</span>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.functions.SumFunction.__call__">
 <code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#SumFunction.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SumFunction.__call__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the value of the sum of functions <span class="math notranslate nohighlight">\(F_{1}\)</span> and <span class="math notranslate nohighlight">\(F_{2}\)</span> at x</p>
+<dd><p>Returns the value of the sum of functions at <span class="math notranslate nohighlight">\(x\)</span>.</p>
 <div class="math notranslate nohighlight">
-\[(F_{1} + F_{2})(x) = F_{1}(x) + F_{2}(x)\]</div>
+\[(F_{1} + F_{2} + ... + F_{n})(x) = F_{1}(x) + F_{2}(x) + ... + F_{n}(x)\]</div>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.functions.SumFunction.gradient">
 <code class="sig-name descname"><span class="pre">gradient</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#SumFunction.gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SumFunction.gradient" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the value of the sum of the gradient of functions <span class="math notranslate nohighlight">\(F_{1}\)</span> and <span class="math notranslate nohighlight">\(F_{2}\)</span> at x,
-if both of them are differentiable</p>
+<dd><p>Returns the value of the sum of the gradient of functions at <span class="math notranslate nohighlight">\(x\)</span>, if all of them are differentiable.</p>
 <div class="math notranslate nohighlight">
-\[(F'_{1} + F'_{2})(x)  = F'_{1}(x) + F'_{2}(x)\]</div>
+\[(F'_{1} + F'_{2} + ... + F'_{n})(x) = F'_{1}(x) + F'_{2}(x) + ... + F'_{n}(x)\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.optimisation.functions.SumFunction.__add__">
+<code class="sig-name descname"><span class="pre">__add__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/functions/Function.html#SumFunction.__add__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.functions.SumFunction.__add__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Addition for the SumFunction.</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">SumFunction</span></code> + <code class="code docutils literal notranslate"><span class="pre">SumFunction</span></code> is a <code class="code docutils literal notranslate"><span class="pre">SumFunction</span></code>.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">SumFunction</span></code> + <code class="code docutils literal notranslate"><span class="pre">Function</span></code> is a <code class="code docutils literal notranslate"><span class="pre">SumFunction</span></code>.</p></li>
+</ul>
 </dd></dl>
 
 </dd></dl>
@@ -2206,7 +2250,10 @@ if both of them are differentiable</p>
 <dl class="py method">
 <dt id="cil.optimisation.functions.SumScalarFunction.L">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">L</span></code><a class="headerlink" href="#cil.optimisation.functions.SumScalarFunction.L" title="Permalink to this definition">¶</a></dt>
-<dd><p>Lipschitz constant</p>
+<dd><p>Returns the Lipschitz constant for the SumFunction</p>
+<div class="math notranslate nohighlight">
+\[L = \sum_{i} L_{i}\]</div>
+<p>where <span class="math notranslate nohighlight">\(L_{i}\)</span> is the Lipschitz constant of the smooth function <span class="math notranslate nohighlight">\(F_{i}\)</span>.</p>
 </dd></dl>
 
 </dd></dl>

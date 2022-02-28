@@ -325,3 +325,74 @@ class ISTA(FISTA):
         # update
         self.x_old.fill(self.x)
 
+
+class AdaptiveMomentumISTA(Algorithm):
+    """
+        Momentum ISTA with iteration-dependent step-size and momentum
+
+        'Accelerating variance-reduced stochastic gradient methods'
+        Derek Driggs · Matthias J. Ehrhardt · Carola-Bibiane Schönlieb
+        Mathematical Programming 2020
+
+
+        Parameters
+        ----------
+        initial : DataContainer
+                Starting point of the algorithm
+        f : Function
+            Differentiable function
+        g : Function
+            Convex function with *simple* proximal operator
+        step_size : Function
+            Function wich outputs the step-size at iteration k, gamma = step_size(k)
+        momentum : Function
+            Function wich outputs the momentum at iteration k, tau = momentum(k)
+        kwargs: Keyword arguments
+            Arguments from the base class :class:`.Algorithm`.
+    """
+
+    def  __init__(self, initial=None, f=None, g=None, step_size=None, momentum=None, **kwargs):
+
+        super(AdaptiveMomentumISTA, self).__init__(**kwargs)
+
+        self.set_up(initial=initial, f=f, g=g, step_size=step_size, momentum=momentum)
+
+
+    def set_up(self, initial, f, g, step_size, momentum):
+
+        self.f = f
+        self.g = g
+        self.x = initial.copy()
+        self.grad_x = initial.copy()
+        self.y = initial.copy()
+        self.z = initial.copy()
+        self.step_size = step_size
+        self.momentum = momentum
+        self.configured = True
+
+    def update(self):
+        '''Single iteration'''
+
+        # get current step-size
+        gamma = self.step_size(self.iteration)
+        # get current momentum  
+        tau = self.momentum(self.iteration)
+
+        # apply momentum, store in x
+        self.z.axpby(tau, 1-tau, self.y, out=self.x)
+        # compute the gradient at x, store in grad_x
+        self.f.gradient(self.x, out=self.grad_x)
+        # take the gradient step, store in z
+        self.z.axpby(1, -gamma, self.grad_x, out=self.z)
+        # take the proximal step, store in z
+        self.z = self.g.proximal(self.z, gamma)
+        # apply momentum, store in y
+        self.z.axpby(tau, 1-tau, self.y, out=self.y)
+
+    def update_objective(self):
+        """ Updates the objective
+
+        .. math:: f(x) + g(x)
+
+        """
+        self.loss.append( self.f(self.x) + self.g(self.x) )

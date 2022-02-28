@@ -319,7 +319,8 @@ class ISTA(FISTA):
         self.x += self.x_old
 
         # proximal step
-        self.g.proximal(self.x, self.step_size, out=self.x)
+        # self.g.proximal(self.x, self.step_size, out=self.x)
+        self.x = self.g.proximal(self.x, self.step_size)
 
         # update
         self.x_old.fill(self.x)

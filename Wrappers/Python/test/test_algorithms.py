@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
+#   This work is part of the Core Imaging Library (CIL) developed by CCPi
+#   (Collaborative Computational Project in Tomographic Imaging), with
 #   substantial contributions by UKRI-STFC and University of Manchester.
 
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,7 +30,7 @@ from cil.optimisation.operators import GradientOperator, BlockOperator, FiniteDi
 
 from cil.optimisation.functions import LeastSquares, ZeroFunction, \
    L2NormSquared, OperatorCompositionFunction
-from cil.optimisation.functions import MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler                     
+from cil.optimisation.functions import MixedL21Norm, BlockFunction, L1Norm, KullbackLeibler
 from cil.optimisation.functions import IndicatorBox
 
 from cil.optimisation.algorithms import Algorithm
@@ -55,7 +55,7 @@ from utils import has_gpu_tigre, has_gpu_astra
 
 try:
     from cil.plugins.astra import ProjectionOperator
-    has_astra = True    
+    has_astra = True
 except ImportError as ie:
     # skip test
     has_astra = False
@@ -68,12 +68,12 @@ class TestAlgorithms(unittest.TestCase):
     def setUp(self):
         #wget.download('https://github.com/DiamondLightSource/Savu/raw/master/test_data/data/24737_fd.nxs')
         #self.filename = '24737_fd.nxs'
-        # we use Identity as the operator and solve the simple least squares 
-        # problem for a random-valued ImageData or AcquisitionData b?  
+        # we use Identity as the operator and solve the simple least squares
+        # problem for a random-valued ImageData or AcquisitionData b?
         # Then we know the minimiser is b itself
-        
+
         # || I x -b ||^2
-        
+
         # create an ImageGeometry
         ig = ImageGeometry(12,13,14)
         pass
@@ -81,7 +81,7 @@ class TestAlgorithms(unittest.TestCase):
     def tearDown(self):
         #os.remove(self.filename)
         pass
-    
+
     def test_GD(self):
         print ("Test GD")
         ig = ImageGeometry(12,13,14)
@@ -91,18 +91,18 @@ class TestAlgorithms(unittest.TestCase):
         # b.fill(numpy.random.random(initial.shape))
         b = ig.allocate('random')
         identity = IdentityOperator(ig)
-        
+
         norm2sq = LeastSquares(identity, b)
         rate = norm2sq.L / 3.
-        
-        alg = GD(initial=initial, 
-                              objective_function=norm2sq, 
+
+        alg = GD(initial=initial,
+                              objective_function=norm2sq,
                               rate=rate, atol=1e-9, rtol=1e-6)
         alg.max_iteration = 1000
         alg.run(verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-        alg = GD(initial=initial, 
-                              objective_function=norm2sq, 
+        alg = GD(initial=initial,
+                              objective_function=norm2sq,
                               rate=rate, max_iteration=20,
                               update_objective_interval=2,
                               atol=1e-9, rtol=1e-6)
@@ -120,17 +120,17 @@ class TestAlgorithms(unittest.TestCase):
         # b.fill(numpy.random.random(initial.shape))
         b = ig.allocate('random')
         identity = IdentityOperator(ig)
-        
+
         norm2sq = LeastSquares(identity, b)
         rate = None
-        
-        alg = GD(initial=initial, 
+
+        alg = GD(initial=initial,
                               objective_function=norm2sq, rate=rate)
         alg.max_iteration = 100
         alg.run(verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-        alg = GD(initial=initial, 
-                              objective_function=norm2sq, 
+        alg = GD(initial=initial,
+                              objective_function=norm2sq,
                               max_iteration=20,
                               update_objective_interval=2)
         #alg.max_iteration = 20
@@ -145,16 +145,16 @@ class TestAlgorithms(unittest.TestCase):
         f = Rosenbrock (alpha = 1., beta=100.)
         vg = VectorGeometry(2)
         x = vg.allocate('random_int', seed=2)
-        # x = vg.allocate('random', seed=1) 
+        # x = vg.allocate('random', seed=1)
         x.fill(numpy.asarray([10.,-3.]))
-        
+
         max_iter = 10000
         update_interval = 1000
 
         alg = GD(x, f, max_iteration=max_iter, update_objective_interval=update_interval, alpha=1e6)
-        
+
         alg.run(verbose=0)
-        
+
         print (alg.get_output().as_array(), alg.step_size, alg.kmax, alg.k)
 
         # this with 10k iterations
@@ -177,7 +177,7 @@ class TestAlgorithms(unittest.TestCase):
         # bdata = numpy.reshape(numpy.asarray([i for i in range(20)]), (2,10))
         # b.fill(bdata)
         identity = IdentityOperator(ig)
-        
+
         alg = CGLS(initial=initial, operator=identity, data=b)
         alg.max_iteration = 200
         alg.run(20, verbose=0)
@@ -188,8 +188,8 @@ class TestAlgorithms(unittest.TestCase):
         self.assertTrue(alg.update_objective_interval==2)
         alg.run(20, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-    
-        
+
+
     def test_FISTA(self):
         print ("Test FISTA")
         ig = ImageGeometry(127,139,149)
@@ -199,7 +199,7 @@ class TestAlgorithms(unittest.TestCase):
         b.fill(numpy.random.random(initial.shape))
         initial = ig.allocate(ImageGeometry.RANDOM)
         identity = IdentityOperator(ig)
-        
+
 	#### it seems FISTA does not work with Nowm2Sq
         # norm2sq = Norm2Sq(identity, b)
         # norm2sq.L = 2 * norm2sq.c * identity.norm()**2
@@ -213,22 +213,22 @@ class TestAlgorithms(unittest.TestCase):
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
         alg = FISTA(initial=initial, f=norm2sq, g=ZeroFunction(), max_iteration=2, update_objective_interval=2)
-        
+
         self.assertTrue(alg.max_iteration == 2)
         self.assertTrue(alg.update_objective_interval==2)
 
         alg.run(20, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
-               
+
     def test_FISTA_Norm2Sq(self):
         print ("Test FISTA Norm2Sq")
-        ig = ImageGeometry(127,139,149)
+        ig = ImageGeometry(3,4,5)
         b = ig.allocate(ImageGeometry.RANDOM)
         # fill with random numbers
         initial = ig.allocate(ImageGeometry.RANDOM)
         identity = IdentityOperator(ig)
-        
+
 	    #### it seems FISTA does not work with Nowm2Sq
         norm2sq = LeastSquares(identity, b)
         #norm2sq.L = 2 * norm2sq.c * identity.norm()**2
@@ -251,15 +251,15 @@ class TestAlgorithms(unittest.TestCase):
     def test_FISTA_catch_Lipschitz(self):
         if debug_print:
             print ("Test FISTA catch Lipschitz")
-        ig = ImageGeometry(127,139,149)
+        ig = ImageGeometry(3,4,5)
         initial = ImageData(geometry=ig)
         initial = ig.allocate()
         b = initial.copy()
-        # fill with random numbers  
+        # fill with random numbers
         b.fill(numpy.random.random(initial.shape))
         initial = ig.allocate(ImageGeometry.RANDOM)
         identity = IdentityOperator(ig)
-        
+
 	    #### it seems FISTA does not work with Nowm2Sq
         norm2sq = LeastSquares(identity, b)
         if debug_print:
@@ -279,16 +279,16 @@ class TestAlgorithms(unittest.TestCase):
     def test_PDHG_Denoising(self):
         print ("PDHG Denoising with 3 noises")
         # adapted from demo PDHG_TV_Color_Denoising.py in CIL-Demos repository
-        
+
         data = dataexample.PEPPERS.get(size=(256,256))
         ig = data.geometry
         ag = ig
 
         which_noise = 0
-        # Create noisy data. 
+        # Create noisy data.
         noises = ['gaussian', 'poisson', 's&p']
         dnoise = noises[which_noise]
-        
+
         def setup(data, dnoise):
             if dnoise == 's&p':
                 n1 = applynoise.saltnpepper(data, salt_vs_pepper = 0.9, amount=0.2, seed=10)
@@ -301,7 +301,7 @@ class TestAlgorithms(unittest.TestCase):
                 raise ValueError('Unsupported Noise ', noise)
             noisy_data = ig.allocate()
             noisy_data.fill(n1)
-        
+
             # Regularisation Parameter depending on the noise distribution
             if dnoise == 's&p':
                 alpha = 0.8
@@ -323,8 +323,8 @@ class TestAlgorithms(unittest.TestCase):
 
         f1 =  alpha * MixedL21Norm()
 
-        
-                    
+
+
         # Compute operator Norm
         normK = operator.norm()
 
@@ -350,8 +350,8 @@ class TestAlgorithms(unittest.TestCase):
 
         f1 =  alpha * MixedL21Norm()
 
-        
-                    
+
+
         # Compute operator Norm
         normK = operator.norm()
 
@@ -360,24 +360,24 @@ class TestAlgorithms(unittest.TestCase):
         tau = 1/(sigma*normK**2)
 
         # Setup and run the PDHG algorithm
-        pdhg1 = PDHG(f=f1,g=g,operator=operator, tau=tau, sigma=sigma, 
+        pdhg1 = PDHG(f=f1,g=g,operator=operator, tau=tau, sigma=sigma,
                      max_iteration=2000, update_objective_interval=200)
-        
+
         pdhg1.run(1000, verbose=0)
 
         rmse = (pdhg1.get_output() - data).norm() / data.as_array().size
         if debug_print:
             print ("RMSE", rmse)
         self.assertLess(rmse, 2e-4)
-        
-        
+
+
         which_noise = 2
         noise = noises[which_noise]
         noisy_data, alpha, g = setup(data, noise)
         operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE)
 
         f1 =  alpha * MixedL21Norm()
-   
+
         # Compute operator Norm
         normK = operator.norm()
 
@@ -392,7 +392,7 @@ class TestAlgorithms(unittest.TestCase):
         pdhg1.run(1000, verbose=0)
 
         rmse = (pdhg1.get_output() - data).norm() / data.as_array().size
-        if debug_print: 
+        if debug_print:
             print ("RMSE", rmse)
         self.assertLess(rmse, 2e-4)
 
@@ -405,7 +405,7 @@ class TestAlgorithms(unittest.TestCase):
         g = L2NormSquared()
         operator = 3*IdentityOperator(ig)
 
-        #check if sigma, tau are None 
+        #check if sigma, tau are None
         pdhg = PDHG(f=f, g=g, operator=operator, max_iteration=10)
         self.assertAlmostEqual(pdhg.sigma, 1./operator.norm())
         self.assertAlmostEqual(pdhg.tau, 1./operator.norm())
@@ -413,29 +413,29 @@ class TestAlgorithms(unittest.TestCase):
         #check if sigma is negative
         with self.assertRaises(ValueError):
             pdhg = PDHG(f=f, g=g, operator=operator, max_iteration=10, sigma = -1)
-        
+
         #check if tau is negative
         with self.assertRaises(ValueError):
             pdhg = PDHG(f=f, g=g, operator=operator, max_iteration=10, tau = -1)
-        
-        #check if tau is None 
+
+        #check if tau is None
         sigma = 3.0
         pdhg = PDHG(f=f, g=g, operator=operator, sigma = sigma, max_iteration=10)
         self.assertAlmostEqual(pdhg.sigma, sigma)
-        self.assertAlmostEqual(pdhg.tau, 1./(sigma * operator.norm()**2)) 
+        self.assertAlmostEqual(pdhg.tau, 1./(sigma * operator.norm()**2))
 
-        #check if sigma is None 
+        #check if sigma is None
         tau = 3.0
         pdhg = PDHG(f=f, g=g, operator=operator, tau = tau, max_iteration=10)
         self.assertAlmostEqual(pdhg.tau, tau)
-        self.assertAlmostEqual(pdhg.sigma, 1./(tau * operator.norm()**2)) 
+        self.assertAlmostEqual(pdhg.sigma, 1./(tau * operator.norm()**2))
 
-        #check if sigma/tau are not None 
+        #check if sigma/tau are not None
         tau = 1.0
         sigma = 1.0
         pdhg = PDHG(f=f, g=g, operator=operator, tau = tau, sigma = sigma, max_iteration=10)
         self.assertAlmostEqual(pdhg.tau, tau)
-        self.assertAlmostEqual(pdhg.sigma, sigma) 
+        self.assertAlmostEqual(pdhg.sigma, sigma)
 
         #check sigma/tau as arrays, sigma wrong shape
         ig1 = ImageGeometry(2,2)
@@ -447,22 +447,22 @@ class TestAlgorithms(unittest.TestCase):
         tau = ig1.allocate()
         with self.assertRaises(ValueError):
             pdhg = PDHG(f=f, g=g, operator=operator, tau = tau, max_iteration=10)
-        
+
         # check sigma not Number or object with correct shape
         with self.assertRaises(AttributeError):
             pdhg = PDHG(f=f, g=g, operator=operator, sigma = "sigma", max_iteration=10)
-        
+
         # check tau not Number or object with correct shape
         with self.assertRaises(AttributeError):
             pdhg = PDHG(f=f, g=g, operator=operator, tau = "tau", max_iteration=10)
-        
+
         # check warning message if condition is not satisfied
         sigma = 4
         tau = 1/3
         with warnings.catch_warnings(record=True) as wa:
-            pdhg = PDHG(f=f, g=g, operator=operator, tau = tau, sigma = sigma, max_iteration=10)  
-            assert "Convergence criterion" in str(wa[0].message)             
-                  
+            pdhg = PDHG(f=f, g=g, operator=operator, tau = tau, sigma = sigma, max_iteration=10)
+            assert "Convergence criterion" in str(wa[0].message)
+
     def test_PDHG_strongly_convex_gamma_g(self):
 
         ig = ImageGeometry(3,3)
@@ -472,9 +472,9 @@ class TestAlgorithms(unittest.TestCase):
         g = L2NormSquared()
         operator = IdentityOperator(ig)
 
-        # sigma, tau 
+        # sigma, tau
         sigma = 1.0
-        tau  = 1.0        
+        tau  = 1.0
 
         pdhg = PDHG(f=f, g=g, operator=operator, sigma = sigma, tau=tau,
                     max_iteration=5, gamma_g=0.5)
@@ -484,19 +484,19 @@ class TestAlgorithms(unittest.TestCase):
         self.assertAlmostEquals(pdhg.sigma, sigma / pdhg.theta)
         pdhg.run(4, verbose=0)
         self.assertNotEqual(pdhg.sigma, sigma)
-        self.assertNotEqual(pdhg.tau, tau)  
+        self.assertNotEqual(pdhg.tau, tau)
 
         # check negative strongly convex constant
         with self.assertRaises(ValueError):
             pdhg = PDHG(f=f, g=g, operator=operator, sigma = sigma, tau=tau,
-                    max_iteration=5, gamma_g=-0.5)  
-        
+                    max_iteration=5, gamma_g=-0.5)
+
 
         # check strongly convex constant not a number
         with self.assertRaises(ValueError):
             pdhg = PDHG(f=f, g=g, operator=operator, sigma = sigma, tau=tau,
-                    max_iteration=5, gamma_g="-0.5")  
-                              
+                    max_iteration=5, gamma_g="-0.5")
+
 
     def test_PDHG_strongly_convex_gamma_fcong(self):
 
@@ -507,9 +507,9 @@ class TestAlgorithms(unittest.TestCase):
         g = L2NormSquared()
         operator = IdentityOperator(ig)
 
-        # sigma, tau 
+        # sigma, tau
         sigma = 1.0
-        tau  = 1.0        
+        tau  = 1.0
 
         pdhg = PDHG(f=f, g=g, operator=operator, sigma = sigma, tau=tau,
                     max_iteration=5, gamma_fconj=0.5)
@@ -519,21 +519,21 @@ class TestAlgorithms(unittest.TestCase):
         self.assertEquals(pdhg.sigma, sigma * pdhg.theta)
         pdhg.run(4, verbose=0)
         self.assertNotEqual(pdhg.sigma, sigma)
-        self.assertNotEqual(pdhg.tau, tau) 
+        self.assertNotEqual(pdhg.tau, tau)
 
         # check negative strongly convex constant
         try:
             pdhg = PDHG(f=f, g=g, operator=operator, sigma = sigma, tau=tau,
-                max_iteration=5, gamma_fconj=-0.5) 
+                max_iteration=5, gamma_fconj=-0.5)
         except ValueError as ve:
-            print(ve) 
+            print(ve)
 
         # check strongly convex constant not a number
         try:
             pdhg = PDHG(f=f, g=g, operator=operator, sigma = sigma, tau=tau,
-                max_iteration=5, gamma_fconj="-0.5") 
+                max_iteration=5, gamma_fconj="-0.5")
         except ValueError as ve:
-            print(ve)                         
+            print(ve)
 
     def test_PDHG_strongly_convex_both_fconj_and_g(self):
 
@@ -543,16 +543,16 @@ class TestAlgorithms(unittest.TestCase):
         f = L2NormSquared(b=data)
         g = L2NormSquared()
         operator = IdentityOperator(ig)
-    
+
         try:
-            pdhg = PDHG(f=f, g=g, operator=operator, max_iteration=10, 
+            pdhg = PDHG(f=f, g=g, operator=operator, max_iteration=10,
                         gamma_g = 0.5, gamma_fconj=0.5)
             pdhg.run(verbose=0)
         except ValueError as err:
             print(err)
 
     def test_FISTA_Denoising(self):
-        if debug_print: 
+        if debug_print:
             print ("FISTA Denoising Poisson Noise Tikhonov")
         # adapted from demo FISTA_Tikhonov_Poisson_Denoising.py in CIL-Demos repository
         data = dataexample.SHAPES.get()
@@ -607,7 +607,7 @@ class TestAlgorithms(unittest.TestCase):
         initial = ig.allocate(0.)
         b = ig.allocate('random')
         identity = IdentityOperator(ig)
-        
+
         try:
             alg = SIRT(initial=initial, operator=identity, data=b, x_init=initial)
             assert False
@@ -621,7 +621,7 @@ class TestAlgorithms(unittest.TestCase):
         initial = ig.allocate(0.)
         b = ig.allocate('random')
         identity = IdentityOperator(ig)
-        
+
         try:
             alg = CGLS(initial=initial, operator=identity, data=b, x_init=initial)
             assert False
@@ -637,7 +637,7 @@ class TestAlgorithms(unittest.TestCase):
         b.fill(numpy.random.random(initial.shape))
         initial = ig.allocate(ImageGeometry.RANDOM)
         identity = IdentityOperator(ig)
-        
+
         norm2sq = OperatorCompositionFunction(L2NormSquared(b=b), identity)
         opt = {'tol': 1e-4, 'memopt':False}
         if debug_print:
@@ -657,7 +657,7 @@ class TestAlgorithms(unittest.TestCase):
         b.fill(numpy.random.random(initial.shape))
         initial = ig.allocate(ImageGeometry.RANDOM)
         identity = IdentityOperator(ig)
-        
+
         norm2sq = OperatorCompositionFunction(L2NormSquared(b=b), identity)
         opt = {'tol': 1e-4, 'memopt':False}
         if debug_print:
@@ -709,16 +709,16 @@ class TestSIRT(unittest.TestCase):
         # bdata = numpy.reshape(numpy.asarray([i for i in range(20)]), (2,10))
         # b.fill(bdata)
         identity = IdentityOperator(ig)
-        
+
         alg = SIRT(initial=initial, operator=identity, data=b)
         alg.max_iteration = 200
         alg.run(20, verbose=0)
         np.testing.assert_array_almost_equal(alg.x.as_array(), b.as_array())
-        
+
         alg2 = SIRT(initial=initial, operator=identity, data=b, upper=0.3)
         alg2.max_iteration = 200
         alg2.run(20, verbose=0)
-        # equal 
+        # equal
         try:
             numpy.testing.assert_equal(alg2.get_output().max(), 0.3)
             if debug_print:
@@ -739,28 +739,28 @@ class TestSIRT(unittest.TestCase):
         numpy.testing.assert_array_less(alg2.get_output().max(), 0.3)
 
         # self.assertLessEqual(alg2.get_output().max(), 0.3)
-	# maybe we could add a test to compare alg.get_output() when < upper bound is 
+	# maybe we could add a test to compare alg.get_output() when < upper bound is
 	# the same as alg2.get_output() and otherwise 0.3
-    
+
 class TestSPDHG(unittest.TestCase):
 
     @unittest.skipUnless(has_astra, "cil-astra not available")
     def test_SPDHG_vs_PDHG_implicit(self):
-        
+
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
 
         ig = data.geometry
         ig.voxel_size_x = 0.1
         ig.voxel_size_y = 0.1
-            
+
         detectors = ig.shape[0]
         angles = np.linspace(0, np.pi, 90)
         ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1, angle_unit='radian')
         # Select device
         dev = 'cpu'
-    
+
         Aop = ProjectionOperator(ig, ag, dev)
-        
+
         sin = Aop.direct(data)
         # Create noisy data. Apply Gaussian noise
         noises = ['gaussian', 'poisson']
@@ -775,37 +775,37 @@ class TestSPDHG(unittest.TestCase):
             np.random.seed(10)
             n1 = np.random.normal(0, 0.1, size = ag.shape)
             noisy_data.fill(n1 + sin.as_array())
-            
+
         else:
             raise ValueError('Unsupported Noise ', noise)
-    
-           
+
+
         # Create BlockOperator
-        operator = Aop 
-        f = KullbackLeibler(b=noisy_data)        
+        operator = Aop
+        f = KullbackLeibler(b=noisy_data)
         alpha = 0.005
-        g =  alpha * TotalVariation(50, 1e-4, lower=0)   
+        g =  alpha * TotalVariation(50, 1e-4, lower=0)
         normK = operator.norm()
-            
+
         #% 'implicit' PDHG, preconditioned step-sizes
         tau_tmp = 1.
         sigma_tmp = 1.
         tau = sigma_tmp / operator.adjoint(tau_tmp * operator.range_geometry().allocate(1.))
         sigma = tau_tmp / operator.direct(sigma_tmp * operator.domain_geometry().allocate(1.))
     #    initial = operator.domain_geometry().allocate()
-    
+
     #    # Setup and run the PDHG algorithm
         pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma,
                     max_iteration = 1000,
                     update_objective_interval = 500)
         pdhg.run(verbose=0)
-           
+
         subsets = 10
         size_of_subsets = int(len(angles)/subsets)
         # take angles and create uniform subsets in uniform+sequential setting
         list_angles = [angles[i:i+size_of_subsets] for i in range(0, len(angles), size_of_subsets)]
         # create acquisitioin geometries for each the interval of splitting angles
-        list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1, angle_unit='radian') 
+        list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1, angle_unit='radian')
                         for i in range(len(list_angles))]
         # create with operators as many as the subsets
         A = BlockOperator(*[ProjectionOperator(ig, list_geoms[i], dev) for i in range(subsets)])
@@ -822,11 +822,11 @@ class TestSPDHG(unittest.TestCase):
         g = BlockDataContainer(*AD_list)
 
         ## block function
-        F = BlockFunction(*[KullbackLeibler(b=g[i]) for i in range(subsets)]) 
-        G = alpha * TotalVariation(50, 1e-4, lower=0) 
-    
+        F = BlockFunction(*[KullbackLeibler(b=g[i]) for i in range(subsets)])
+        G = alpha * TotalVariation(50, 1e-4, lower=0)
+
         prob = [1/len(A)]*len(A)
-        spdhg = SPDHG(f=F,g=G,operator=A, 
+        spdhg = SPDHG(f=F,g=G,operator=A,
                     max_iteration = 1000,
                     update_objective_interval=200, prob = prob)
         spdhg.run(1000, verbose=0)
@@ -837,12 +837,12 @@ class TestSPDHG(unittest.TestCase):
             )
         if debug_print:
             print ("Quality measures", qm)
-            
-        np.testing.assert_almost_equal( mae(spdhg.get_output(), pdhg.get_output()), 
+
+        np.testing.assert_almost_equal( mae(spdhg.get_output(), pdhg.get_output()),
                                             0.000335, decimal=3)
-        np.testing.assert_almost_equal( mse(spdhg.get_output(), pdhg.get_output()), 
-                                            5.51141e-06, decimal=3) 
-        
+        np.testing.assert_almost_equal( mse(spdhg.get_output(), pdhg.get_output()),
+                                            5.51141e-06, decimal=3)
+
     @unittest.skipUnless(has_astra, "ccpi-astra not available")
     def test_SPDHG_vs_PDHG_explicit(self):
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
@@ -850,7 +850,7 @@ class TestSPDHG(unittest.TestCase):
         ig = data.geometry
         ig.voxel_size_x = 0.1
         ig.voxel_size_y = 0.1
-            
+
         detectors = ig.shape[0]
         angles = np.linspace(0, np.pi, 180)
         ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1, angle_unit='radian')
@@ -858,7 +858,7 @@ class TestSPDHG(unittest.TestCase):
         dev = 'cpu'
 
         Aop = ProjectionOperator(ig, ag, dev)
-        
+
         sin = Aop.direct(data)
         # Create noisy data. Apply Gaussian noise
         noises = ['gaussian', 'poisson']
@@ -875,10 +875,10 @@ class TestSPDHG(unittest.TestCase):
             # np.random.seed(10)
             # n1 = np.random.normal(0, 0.1, size = ag.shape)
             # noisy_data = AcquisitionData(n1 + sin.as_array(), ag)
-            
+
         else:
             raise ValueError('Unsupported Noise ', noise)
-        
+
         #%% 'explicit' SPDHG, scalar step-sizes
         subsets = 10
         size_of_subsets = int(len(angles)/subsets)
@@ -887,7 +887,7 @@ class TestSPDHG(unittest.TestCase):
         # take angles and create uniform subsets in uniform+sequential setting
         list_angles = [angles[i:i+size_of_subsets] for i in range(0, len(angles), size_of_subsets)]
         # create acquisitioin geometries for each the interval of splitting angles
-        list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1, angle_unit='radian') 
+        list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1, angle_unit='radian')
         for i in range(len(list_angles))]
         # create with operators as many as the subsets
         A = BlockOperator(*[ProjectionOperator(ig, list_geoms[i], dev) for i in range(subsets)] + [op1])
@@ -905,11 +905,11 @@ class TestSPDHG(unittest.TestCase):
         g = BlockDataContainer(*AD_list)
         alpha = 0.5
         ## block function
-        F = BlockFunction(*[*[KullbackLeibler(b=g[i]) for i in range(subsets)] + [alpha * MixedL21Norm()]]) 
+        F = BlockFunction(*[*[KullbackLeibler(b=g[i]) for i in range(subsets)] + [alpha * MixedL21Norm()]])
         G = IndicatorBox(lower=0)
 
         prob = [1/(2*subsets)]*(len(A)-1) + [1/2]
-        spdhg = SPDHG(f=F,g=G,operator=A, 
+        spdhg = SPDHG(f=F,g=G,operator=A,
                     max_iteration = 1000,
                     update_objective_interval=200, prob = prob)
         spdhg.run(1000, verbose=0)
@@ -918,15 +918,15 @@ class TestSPDHG(unittest.TestCase):
         op1 = GradientOperator(ig)
         op2 = Aop
         # Create BlockOperator
-        operator = BlockOperator(op1, op2, shape=(2,1) ) 
-        f2 = KullbackLeibler(b=noisy_data)  
-        g =  IndicatorBox(lower=0)    
+        operator = BlockOperator(op1, op2, shape=(2,1) )
+        f2 = KullbackLeibler(b=noisy_data)
+        g =  IndicatorBox(lower=0)
         normK = operator.norm()
         sigma = 1/normK
         tau = 1/normK
-            
-        f1 = alpha * MixedL21Norm() 
-        f = BlockFunction(f1, f2)   
+
+        f1 = alpha * MixedL21Norm()
+        f = BlockFunction(f1, f2)
         # Setup and run the PDHG algorithm
         pdhg = PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma)
         pdhg.max_iteration = 1000
@@ -947,9 +947,9 @@ class TestSPDHG(unittest.TestCase):
             print ("Quality measures", qm)
         np.testing.assert_almost_equal( mae(spdhg.get_output(), pdhg.get_output()),
          0.00150 , decimal=3)
-        np.testing.assert_almost_equal( mse(spdhg.get_output(), pdhg.get_output()), 
+        np.testing.assert_almost_equal( mse(spdhg.get_output(), pdhg.get_output()),
         1.68590e-05, decimal=3)
-    
+
     @unittest.skipUnless(has_astra, "ccpi-astra not available")
     def test_SPDHG_vs_SPDHG_explicit_axpby(self):
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128), dtype=numpy.float32)
@@ -958,7 +958,7 @@ class TestSPDHG(unittest.TestCase):
         ig = data.geometry
         ig.voxel_size_x = 0.1
         ig.voxel_size_y = 0.1
-            
+
         detectors = ig.shape[0]
         angles = np.linspace(0, np.pi, 180)
         ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1, angle_unit='radian')
@@ -971,7 +971,7 @@ class TestSPDHG(unittest.TestCase):
         dev = 'cpu'
 
         Aop = ProjectionOperator(ig, ag, dev)
-        
+
         sin = Aop.direct(data)
         # Create noisy data. Apply Gaussian noise
         noises = ['gaussian', 'poisson']
@@ -981,19 +981,19 @@ class TestSPDHG(unittest.TestCase):
             scale = 5
             eta = 0
             noisy_data = AcquisitionData(np.asarray(
-                                            np.random.poisson( scale * (eta + sin.as_array()))/scale, 
+                                            np.random.poisson( scale * (eta + sin.as_array()))/scale,
                                             dtype=np.float32
-                                            ), 
+                                            ),
                                          geometry=ag
             )
         elif noise == 'gaussian':
             np.random.seed(10)
             n1 = np.asarray(np.random.normal(0, 0.1, size = ag.shape), dtype=np.float32)
             noisy_data = AcquisitionData(n1 + sin.as_array(), geometry=ag)
-            
+
         else:
             raise ValueError('Unsupported Noise ', noise)
-        
+
         #%% 'explicit' SPDHG, scalar step-sizes
         subsets = 10
         size_of_subsets = int(len(angles)/subsets)
@@ -1002,7 +1002,7 @@ class TestSPDHG(unittest.TestCase):
         # take angles and create uniform subsets in uniform+sequential setting
         list_angles = [angles[i:i+size_of_subsets] for i in range(0, len(angles), size_of_subsets)]
         # create acquisitioin geometries for each the interval of splitting angles
-        list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1, angle_unit='radian') 
+        list_geoms = [AcquisitionGeometry('parallel','2D',list_angles[i], detectors, pixel_size_h = 0.1, angle_unit='radian')
         for i in range(len(list_angles))]
         # create with operators as many as the subsets
         A = BlockOperator(*[ProjectionOperator(ig, list_geoms[i], dev) for i in range(subsets)] + [op1])
@@ -1017,27 +1017,27 @@ class TestSPDHG(unittest.TestCase):
                 arr = noisy_data.as_array()[i:i+size_of_subsets,:]
                 AD_list.append(AcquisitionData(arr, geometry=list_geoms[sub_num]))
 
-        g = BlockDataContainer(*AD_list)        
+        g = BlockDataContainer(*AD_list)
 
         alpha = 0.5
         ## block function
-        F = BlockFunction(*[*[KullbackLeibler(b=g[i]) for i in range(subsets)] + [alpha * MixedL21Norm()]]) 
+        F = BlockFunction(*[*[KullbackLeibler(b=g[i]) for i in range(subsets)] + [alpha * MixedL21Norm()]])
         G = IndicatorBox(lower=0)
 
         prob = [1/(2*subsets)]*(len(A)-1) + [1/2]
         algos = []
-        algos.append( SPDHG(f=F,g=G,operator=A, 
+        algos.append( SPDHG(f=F,g=G,operator=A,
                     max_iteration = 1000,
                     update_objective_interval=200, prob = prob.copy(), use_axpby=True)
         )
         algos[0].run(1000, verbose=0)
 
-        algos.append( SPDHG(f=F,g=G,operator=A, 
+        algos.append( SPDHG(f=F,g=G,operator=A,
                     max_iteration = 1000,
                     update_objective_interval=200, prob = prob.copy(), use_axpby=False)
         )
         algos[1].run(1000, verbose=0)
-        
+
 
         # np.testing.assert_array_almost_equal(algos[0].get_output().as_array(), algos[1].get_output().as_array())
         from cil.utilities.quality_measures import mae, mse, psnr
@@ -1050,28 +1050,28 @@ class TestSPDHG(unittest.TestCase):
         assert qm[0] < 0.005
         assert qm[1] < 3.e-05
 
-    
-    
+
+
     @unittest.skipUnless(has_astra, "ccpi-astra not available")
     def test_PDHG_vs_PDHG_explicit_axpby(self):
         data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
-        
+
         if debug_print:
             print ("test_PDHG_vs_PDHG_explicit_axpby here")
         ig = data.geometry
         ig.voxel_size_x = 0.1
         ig.voxel_size_y = 0.1
-            
+
         detectors = ig.shape[0]
         angles = np.linspace(0, np.pi, 180)
         ag = AcquisitionGeometry('parallel','2D',angles, detectors, pixel_size_h = 0.1, angle_unit='radian')
-        
+
         dev = 'cpu'
 
         Aop = ProjectionOperator(ig, ag, dev)
-        
+
         sin = Aop.direct(data)
-        
+
         # Create noisy data. Apply Gaussian noise
         noises = ['gaussian', 'poisson']
         noise = noises[1]
@@ -1085,39 +1085,39 @@ class TestSPDHG(unittest.TestCase):
             np.random.seed(10)
             n1 = np.random.normal(0, 0.1, size = ag.shape)
             noisy_data = AcquisitionData(numpy.asarray(n1 + sin.as_array(), dtype=numpy.float32), geometry=ag)
-            
+
         else:
             raise ValueError('Unsupported Noise ', noise)
-         
-        
+
+
         alpha = 0.5
         op1 = GradientOperator(ig)
         op2 = Aop
         # Create BlockOperator
-        operator = BlockOperator(op1, op2, shape=(2,1) ) 
-        f2 = KullbackLeibler(b=noisy_data)  
-        g =  IndicatorBox(lower=0)    
+        operator = BlockOperator(op1, op2, shape=(2,1) )
+        f2 = KullbackLeibler(b=noisy_data)
+        g =  IndicatorBox(lower=0)
         normK = operator.norm()
         sigma = 1./normK
         tau = 1./normK
-            
-        f1 = alpha * MixedL21Norm() 
-        f = BlockFunction(f1, f2)   
+
+        f1 = alpha * MixedL21Norm()
+        f = BlockFunction(f1, f2)
         # Setup and run the PDHG algorithm
-        
+
         algos = []
-        algos.append( PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma,  
+        algos.append( PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma,
                     max_iteration = 1000,
                     update_objective_interval=200, use_axpby=True)
         )
         algos[0].run(1000, verbose=0)
 
-        algos.append( PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma,  
+        algos.append( PDHG(f=f,g=g,operator=operator, tau=tau, sigma=sigma,
                     max_iteration = 1000,
                     update_objective_interval=200, use_axpby=False)
         )
         algos[1].run(1000, verbose=0)
-        
+
 
         from cil.utilities.quality_measures import mae, mse, psnr
         qm = (mae(algos[0].get_output(), algos[1].get_output()),
@@ -1128,7 +1128,7 @@ class TestSPDHG(unittest.TestCase):
             print ("Quality measures", qm)
         np.testing.assert_array_less( qm[0], 0.005 )
         np.testing.assert_array_less( qm[1], 3e-05)
-        
+
 
 
 class PrintAlgo(Algorithm):
@@ -1141,7 +1141,7 @@ class PrintAlgo(Algorithm):
     def update(self):
         self.x = - self.iteration
         time.sleep(0.03)
-    
+
     def update_objective(self):
         self.loss.append(self.iteration * self.iteration)
 
@@ -1153,21 +1153,21 @@ class TestPrint(unittest.TestCase):
 
         algo.run(20, verbose=2, print_interval = 2)
         # it 0
-        # it 10 
+        # it 10
         # it 20
         # --- stop
         algo.run(3, verbose=1, print_interval = 2)
         # it 20
         # --- stop
-        
+
         algo.run(20, verbose=1, print_interval = 7)
         # it 20
         # it 30
         # -- stop
-        
+
         algo.run(20, verbose=1, very_verbose=False)
         algo.run(20, verbose=2, print_interval=7, callback=callback)
-        
+
         print (algo._iteration)
         print (algo.objective)
         np.testing.assert_array_equal([-1, 10, 20, 30, 40, 50, 60, 70, 80], algo.iterations)
@@ -1182,7 +1182,7 @@ class TestPrint(unittest.TestCase):
 
         print (algo.iteration)
         algo.run(10, verbose=2, print_interval=2)
-        
+
         print (algo._iteration, algo.objective)
 
         algo = PrintAlgo(update_objective_interval = 4, max_iteration = 1000)
@@ -1194,18 +1194,18 @@ class TestADMM(unittest.TestCase):
         ig = ImageGeometry(2,3,2)
         data = ig.allocate(1, dtype=np.float32)
         noisy_data = data+1
-        
+
         # TV regularisation parameter
         self.alpha = 1
 
-    
 
-        self.fidelities = [ 0.5 * L2NormSquared(b=noisy_data), L1Norm(b=noisy_data), 
+
+        self.fidelities = [ 0.5 * L2NormSquared(b=noisy_data), L1Norm(b=noisy_data),
             KullbackLeibler(b=noisy_data, use_numba=False)]
 
         F = self.alpha * MixedL21Norm()
         K = GradientOperator(ig)
-        
+
         # Compute operator Norm
         normK = K.norm()
 
@@ -1224,7 +1224,7 @@ class TestADMM(unittest.TestCase):
     def do_test_with_fidelity(self, fidelity):
         alpha = self.alpha
         # F = BlockFunction(alpha * MixedL21Norm(),fidelity)
-        
+
         G = fidelity
         K = self.K
         F = self.F
@@ -1236,13 +1236,13 @@ class TestADMM(unittest.TestCase):
         admm_noaxpby = LADMM(f=G, g=F, operator=K, tau=self.tau, sigma=self.sigma,
                     max_iteration = 100, update_objective_interval = 10, use_axpby=False)
         admm_noaxpby.run(1, verbose=0)
-        
+
         np.testing.assert_array_almost_equal(admm.solution.as_array(), admm_noaxpby.solution.as_array())
 
     def test_compare_with_PDHG(self):
-        # Load an image from the CIL gallery. 
+        # Load an image from the CIL gallery.
         data = dataexample.SHAPES.get(size=(64,64))
-        ig = data.geometry    
+        ig = data.geometry
         # Add gaussian noise
         noisy_data = applynoise.gaussian(data, seed = 10, var = 0.0005)
 
@@ -1280,4 +1280,3 @@ class TestADMM(unittest.TestCase):
     def tearDown(self):
         pass
 
-    

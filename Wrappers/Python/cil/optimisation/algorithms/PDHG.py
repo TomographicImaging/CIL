@@ -55,7 +55,8 @@ class PDHG(Algorithm):
             Maximum number of iterations of the PDHG.
         update_objective_interval : :obj:`int`, optional, default=1
             Evaluates objectives, e.g., primal/dual/primal-dual gap every ``update_objective_interval``.
-
+        check_convergence : :obj:`boolean`, default=True
+            Checks scalar sigma and tau values satisfy convergence criterion 
 
     Example 
     -------
@@ -339,7 +340,10 @@ class PDHG(Algorithm):
         self.g = g
         self.operator = operator
 
-        self.set_step_sizes(sigma=sigma, tau=tau) 
+        self.set_step_sizes(sigma=sigma, tau=tau)
+
+        if kwargs.get('check_convergence', True):
+            self.check_convergence()
 
         if initial is None:
             self.x_old = self.operator.domain_geometry().allocate(0)
@@ -418,6 +422,24 @@ class PDHG(Algorithm):
         self.update_step_sizes()
 
 
+    def check_convergence(self):
+        """  Check whether convergence criterion for PDHG is satisfied with scalar values of tau and sigma
+
+        Returns
+        -------
+        Boolean
+            True if convergence criterion is satisfied. False if not satisfied or convergence is unknown.
+        """    
+        if isinstance(self.tau, Number) and isinstance(self.sigma, Number):
+            if self.sigma * self.tau * self.operator.norm()**2 > 1:
+                warnings.warn("Convergence criterion of PDHG for scalar step-sizes is not satisfied.")
+                return False
+            return True
+        else:
+            warnings.warn("Convergence criterion can only be checked for scalar values of tau and sigma.")   
+            return False             
+
+
     def set_step_sizes(self, sigma=None, tau=None):
         """ Sets sigma and tau step-sizes for the PDHG algorithm. The step sizes can be either scalar or array-objects.
 
@@ -429,54 +451,38 @@ class PDHG(Algorithm):
                 Step size for the primal problem.
 
         The user can set either, both or none. Values passed by the user will be accepted as long as they are positive numbers, 
-        or correct shape array like objects. Warnings may be given in the case the scalar values passed do not guarantee the algorithm
-        convergence.
+        or correct shape array like objects.
         """
-        
-        # Compute operator norm
-        self.norm_op = self.operator.norm()
-
-        # Check acceptable type of the primal-dual step-sizes
+        # Check acceptable values of the primal-dual step-sizes
         if tau is not None:          
             if isinstance(tau, Number):
-                if tau<=0:
-                    raise ValueError("The step-sizes of PDHG are positive, {} is passed".format(tau))                  
-            elif tau.shape!= self.operator.domain_geometry().shape:  
-                raise ValueError(" The shape of tau = {} is not the same as the shape of the domain_geometry = {}".format(tau.shape, self.operator.domain_geometry().shape))
+                if tau <= 0:
+                    raise ValueError("The step-sizes of PDHG must be positive, passed tau = {}".format(tau))                  
+            elif tau.shape != self.operator.domain_geometry().shape:  
+                raise ValueError(" The shape of tau = {0} is not the same as the shape of the domain_geometry = {1}".format(tau.shape, self.operator.domain_geometry().shape))
 
         if sigma is not None:
             if isinstance(sigma, Number):
-                if sigma<=0:
-                    raise ValueError("The step-sizes of PDHG are positive, {} is passed".format(sigma))                  
-            elif sigma.shape!= self.operator.range_geometry().shape:  
-                raise ValueError(" The shape of tau = {} is not the same as the shape of the domain_geometry = {}".format(sigma.shape, self.operator.range_geometry().shape))
+                if sigma <= 0:
+                    raise ValueError("The step-sizes of PDHG are positive, passed sigma = {}".format(sigma))                  
+            elif sigma.shape != self.operator.range_geometry().shape:  
+                raise ValueError(" The shape of sigma = {0} is not the same as the shape of the range_geometry = {1}".format(sigma.shape, self.operator.range_geometry().shape))
 
         # Default sigma and tau step-sizes
-        if tau is None and sigma is None:            
-            self._sigma = 1.0/self.norm_op
-            self._tau = 1.0/self.norm_op            
-        elif tau is None:
-            if isinstance(sigma, Number):            
-                self._tau = 1./(sigma*self.norm_op**2)
-                self._sigma = sigma
-            else:
-                raise ValueError(" Sigma is not a positive float, {} is passed".format(sigma))    
-        elif sigma is None:
-            if isinstance(tau, Number):
-                self._sigma = 1./(tau*self.norm_op**2)
-                self._tau = tau
-            else:
-                raise ValueError(" Tau is not a positive float, {} is passed".format(tau))                    
-        else:
+        if tau is None and sigma is None:
+            self._sigma = 1.0/self.operator.norm()
+            self._tau = 1.0/self.operator.norm()
+        elif tau is not None and sigma is not None: 
             self._sigma = sigma
             self._tau = tau
-            try:
-                # convergence criterion for scalar step-sizes 
-                condition = sigma * tau * self.norm_op**2 > 1
-                if condition:
-                    warnings.warn("Convergence criterion of PDHG for scalar step-sizes is not satisfied.")                
-            except:
-                pass
+        elif sigma is None and isinstance(tau, Number):
+            self._sigma = 1./(tau*self.operator.norm()**2)
+            self._tau = tau
+        elif tau is None and isinstance(sigma, Number):
+            self._sigma = sigma
+            self._tau = 1./(self.sigma*self.operator.norm()**2)
+        else:
+            raise NotImplementedError("If using arrays for sigma or tau both must arrays must be provided.")
 
 
     def update_step_sizes(self):

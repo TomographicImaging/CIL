@@ -102,9 +102,9 @@ class CGLS(Algorithm):
         delta = self.q.squared_norm()
         alpha = self.gamma/delta
          
-        self.x.axpby(1, alpha, self.p, out=self.x)
+        self.x.sapyb(1, self.p, alpha, out=self.x)
         #self.x += alpha * self.p
-        self.r.axpby(1, -alpha, self.q, out=self.r)
+        self.r.sapyb(1, self.q, -alpha, out=self.r)
         #self.r -= alpha * self.q
         
         self.operator.adjoint(self.r, out=self.s)
@@ -114,12 +114,12 @@ class CGLS(Algorithm):
         self.gamma = self.norms**2
         self.beta = self.gamma/self.gamma1
         #self.p = self.s + self.beta * self.p   
-        self.p.axpby(self.beta, 1, self.s, out=self.p)
-        
+        self.p.sapyb(self.beta, self.s, 1, out=self.p)
+
         self.normx = self.x.norm()
         self.xmax = numpy.maximum(self.xmax, self.normx)
                     
-
+                    
     def update_objective(self):
         a = self.r.squared_norm()
         if a is numpy.nan:

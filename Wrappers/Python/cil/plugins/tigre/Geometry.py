@@ -56,7 +56,44 @@ class TIGREGeometry(Geometry):
 
         ag_in = ag.copy()
         system = ag_in.config.system
-        system.align_reference_frame()
+        system.align_reference_frame('tigre')
+
+
+        #TIGRE's interpolation fp must have the detector outside the reconstruction volume otherwise the ray is clipped 
+        #https://github.com/CERN/TIGRE/issues/353
+        lenx = (ig.voxel_num_x * ig.voxel_size_x)
+        leny = (ig.voxel_num_y * ig.voxel_size_y)
+        lenz = (ig.voxel_num_z * ig.voxel_size_z)
+    
+        panel_width = max(ag_in.config.panel.num_pixels * ag_in.config.panel.pixel_size)*0.5
+        clearance_len =  np.sqrt(lenx**2 + leny**2 + lenz**2)/2 + panel_width
+
+        if ag_in.geom_type == 'cone':  
+
+            if system.detector.position[1] < clearance_len:
+        
+                src = system.source.position.astype(np.float64)
+                vec1 = system.detector.position.astype(np.float64) - src
+
+                mag_new = (clearance_len - src[1]) /-src[1]
+                scale = mag_new / ag_in.magnification
+                scale=np.ceil(scale)
+
+                system.detector.position = src + vec1 * scale
+                ag_in.config.panel.pixel_size[0] *= scale
+                ag_in.config.panel.pixel_size[1] *= scale            
+
+            self.DSO = -system.source.position[1]       
+            self.DSD = self.DSO + system.detector.position[1]
+            self.mode = 'cone'
+
+        else:
+            if ag_in.system_description == 'advanced':
+                raise NotImplementedError ("CIL cannot use TIGRE to process parallel geometries with tilted axes")
+
+            self.DSO = clearance_len
+            self.DSD = 2*clearance_len
+            self.mode = 'parallel'
 
         # number of voxels (vx)
         self.nVoxel = np.array( [ig.voxel_num_z, ig.voxel_num_y, ig.voxel_num_x] )
@@ -70,24 +107,6 @@ class TIGREGeometry(Geometry):
         self.dDetector = np.array(ag_in.config.panel.pixel_size[::-1])
         self.sDetector = self.dDetector * self.nDetector    # total size of the detector    (mm)
 
-        if ag_in.geom_type == 'cone':  
-            self.mode = 'cone'
-
-            self.DSO = -system.source.position[1]       
-            self.DSD = self.DSO + system.detector.position[1]
-        
-        else:
-            if ag_in.system_description == 'advanced':
-                raise NotImplementedError ("CIL cannot use TIGRE to process parallel geometries with tilted axes")
-
-            self.mode = 'parallel'
-            
-            lenx = (ig.voxel_num_x * ig.voxel_size_x)
-            leny = (ig.voxel_num_y * ig.voxel_size_y)
-
-            #to avoid clipping the ray the detector must be outside the reconstruction volume
-            self.DSO = max(lenx,leny)
-            self.DSD = self.DSO*2
 
         if ag_in.dimension == '2D':
             self.is2D = True
@@ -96,9 +115,9 @@ class TIGREGeometry(Geometry):
             self.nVoxel[0]=1
             self.dVoxel[0]= ag_in.config.panel.pixel_size[1] / ag_in.magnification
 
-            # Offsets Tigre (Z, Y, X) == CIL (X, -Y)
-            self.offOrigin = np.array( [0, system.rotation_axis.position[0], -system.rotation_axis.position[1]])
+            self.offOrigin = np.array( [0, 0, 0] )
 
+            # Offsets Tigre (Z, Y, X) == CIL (X, -Y)
             if ag_in.geom_type == 'cone':  
                 self.offDetector = np.array( [0, system.detector.position[0]-system.source.position[0], 0 ])
             else:
@@ -116,12 +135,21 @@ class TIGREGeometry(Geometry):
             ind = np.asarray([2, 0, 1])
             flip = np.asarray([1, 1, -1])
 
-            self.offOrigin = np.array( system.rotation_axis.position[ind] * flip )
-
-            if ag_in.geom_type == 'cone':  
+            if ag_in.geom_type == 'cone':
+                #TIGRE origin is at a point on the rotate axis that is in a perpendicular plane containing the source
+                #As rotation axis is aligned with z this is the x-y plane
+                #We have aligned the y axis with the source->rotate axis direction
+                self.offOrigin = np.array( [-system.source.position[2], 0, 0])
                 self.offDetector = np.array( [system.detector.position[2]-system.source.position[2], system.detector.position[0]-system.source.position[0], 0])
             else:
+                self.offOrigin = np.array( [0,0,0] )
                 self.offDetector = np.array( [system.detector.position[2], system.detector.position[0], 0])
+
+            #shift origin to match image geometry
+            #this is in CIL reference frames as the TIGRE geometry rotates the reconstrcution volume to match our definitions
+            self.offOrigin[0] += ig.center_z
+            self.offOrigin[1] += ig.center_y
+            self.offOrigin[2] += ig.center_x
 
             #convert roll, pitch, yaw
             U = system.detector.direction_x[ind] * flip

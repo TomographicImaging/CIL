@@ -952,7 +952,7 @@ class TestSPDHG(unittest.TestCase):
     
     @unittest.skipUnless(has_astra, "ccpi-astra not available")
     def test_SPDHG_vs_SPDHG_explicit_axpby(self):
-        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128))
+        data = dataexample.SIMPLE_PHANTOM_2D.get(size=(128,128), dtype=numpy.float32)
         if debug_print:
             print ("test_SPDHG_vs_SPDHG_explicit_axpby here")
         ig = data.geometry
@@ -980,10 +980,15 @@ class TestSPDHG(unittest.TestCase):
             np.random.seed(10)
             scale = 5
             eta = 0
-            noisy_data = AcquisitionData(np.random.poisson( scale * (eta + sin.as_array()))/scale, geometry=ag)
+            noisy_data = AcquisitionData(np.asarray(
+                                            np.random.poisson( scale * (eta + sin.as_array()))/scale, 
+                                            dtype=np.float32
+                                            ), 
+                                         geometry=ag
+            )
         elif noise == 'gaussian':
             np.random.seed(10)
-            n1 = np.random.normal(0, 0.1, size = ag.shape)
+            n1 = np.asarray(np.random.normal(0, 0.1, size = ag.shape), dtype=np.float32)
             noisy_data = AcquisitionData(n1 + sin.as_array(), geometry=ag)
             
         else:
@@ -1236,13 +1241,13 @@ class TestADMM(unittest.TestCase):
 
     def test_compare_with_PDHG(self):
         # Load an image from the CIL gallery. 
-        data = dataexample.SHAPES.get()
+        data = dataexample.SHAPES.get(size=(64,64))
         ig = data.geometry    
         # Add gaussian noise
-        noisy_data = applynoise.gaussian(data, seed = 10, var = 0.005)
+        noisy_data = applynoise.gaussian(data, seed = 10, var = 0.0005)
 
         # TV regularisation parameter
-        alpha = 1
+        alpha = 0.1
 
         # fidelity = 0.5 * L2NormSquared(b=noisy_data)
         # fidelity = L1Norm(b=noisy_data)
@@ -1261,20 +1266,16 @@ class TestADMM(unittest.TestCase):
         tau = 1./normK
 
         pdhg = PDHG(f=F, g=G, operator=K, tau=tau, sigma=sigma,
-                    max_iteration = 100, update_objective_interval = 10)
+                    max_iteration = 500, update_objective_interval = 10)
         pdhg.run(verbose=0)
 
         sigma = 1
         tau = sigma/normK**2
 
         admm = LADMM(f=G, g=F, operator=K, tau=tau, sigma=sigma,
-                    max_iteration = 100, update_objective_interval = 10)
+                    max_iteration = 500, update_objective_interval = 10)
         admm.run(verbose=0)
-
-        from cil.utilities.quality_measures import psnr
-        if debug_print:
-            print ("PSNR" , psnr(admm.solution, pdhg.solution))
-        np.testing.assert_almost_equal(psnr(admm.solution, pdhg.solution), 84.55162459062069, decimal=4)
+        np.testing.assert_almost_equal(admm.solution.array, pdhg.solution.array,  decimal=3)
 
     def tearDown(self):
         pass

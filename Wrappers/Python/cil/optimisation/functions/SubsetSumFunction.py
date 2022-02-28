@@ -1,134 +1,24 @@
 from cil.optimisation.functions import Function
 import numpy as np
 
-# Temporarily redefine SumFunction (PR #1093)
-class SumFunction(Function):
-    
-    """ SumFunction represents the sum of two functions
-    
-    .. math:: (F_{1} + F_{2} + ... + F_{n})(x)  = F_{1}(x) + F_{2}(x) + ... + F_{n}(x)
-    
-    """
-    
-    def __init__(self, *functions ):
-                
-        super(SumFunction, self).__init__()        
-        if len(functions) < 2:
-            raise ValueError('At least 2 functions need to be passed')
-        self.functions = functions
-
-    @property
-    def L(self):
-        '''Lipschitz constant of the gradient of the sum of the functions'''
-        
-        L = 0.
-        for f in self.functions:
-            if f.L is not None:
-                L += f.L
-            else:
-                L = None
-                break
-        self._L = L
-            
-        return self._L
-
-        
-    @L.setter
-    def L(self, value):
-        # call base class setter
-        super(SumFunction, self.__class__).L.fset(self, value )
-
-    def __call__(self,x):
-        r"""Returns the value of the sum of functions :math:`F_{1}`,  :math:`F_{2}` ... :math:`F_{n}`at x
-        
-        .. math:: (F_{1} + F_{2} + ... + F_{n})(x) = F_{1}(x) + F_{2}(x) + ... + F_{n}(x)
-                
-        """  
-        ret = 0.
-        for f in self.functions:
-            ret += f(x)
-        return ret
-
-    @property
-    def Lmax(self):
-        '''Maximum of the Lipschitz constants of the gradients of each function in the sum'''
-        
-        l = []
-        for f in self.functions:
-            if f.L is not None:
-                l.append(f.L)
-            else:
-                l = None
-                break
-        self._Lmax = max(l)
-            
-        return self._Lmax
-
-        
-    @Lmax.setter
-    def Lmax(self, value):
-        # call base class setter
-        super(SumFunction, self.__class__).Lmax.fset(self, value )
-
-    def __call__(self,x):
-        r"""Returns the value of the sum of functions :math:`F_{1}`,  :math:`F_{2}` ... :math:`F_{n}`at x
-        
-        .. math:: (F_{1} + F_{2} + ... + F_{n})(x) = F_{1}(x) + F_{2}(x) + ... + F_{n}(x)
-                
-        """  
-        ret = 0.
-        for f in self.functions:
-            ret += f(x)
-        return ret
-
-
-    def gradient(self, x, out=None):
-        
-        r"""Returns the value of the sum of the gradient of functions :math:`F_{1}`,  :math:`F_{2}` ... :math:`F_{n}` at x, 
-        if all of them are differentiable
-        
-        .. math:: (F'_{1} + F'_{2} + ... + F'_{n})(x) = F'_{1}(x) + F'_{2}(x) + ... + F'_{n}(x)
-        
-        """
-        
-        if out is None:            
-            for i,f in enumerate(self.functions):
-                if i == 0:
-                    ret = f.gradient(x)
-                else:
-                    ret += f.gradient(x)
-            return ret
-        else:
-            for i,f in enumerate(self.functions):
-                if i == 0:
-                    f.gradient(x, out=out)
-                else:
-                    out += f.gradient(x)
-    def __add__(self, other):
-        
-        """ Returns the sum of the functions.
-        
-            Cases: a) the sum of two functions :math:`(F_{1}+F_{2})(x) = F_{1}(x) + F_{2}(x)`
-                   b) the sum of a function with a scalar :math:`(F_{1}+scalar)(x) = F_{1}(x) + scalar`
-        """
-        
-        if isinstance(other, SumFunction):
-            functions = list(self.functions) + list(other.functions)
-            return SumFunction(*functions)
-        elif isinstance(other, Function):
-            functions = list(self.functions)
-            functions.append(other)
-            return SumFunction(*functions)
-        else:
-            return super(SumFunction, self).__add__(other)
-
 class AveragedSumFunction(Function):
     
-    """ SumFunction represents the sum of functions
+    """ AveragedSumFunction represents the sum of :math:`n\geq2` functions
     
     .. math:: (1/n*(F_{1} + F_{2} + ... + F_{n}))(x)  = 1/n*( F_{1}(x) + F_{2}(x) + ... + F_{n}(x))
-    
+
+    		    
+    Parameters		
+    ----------		
+    *functions : Functions		
+                 Functions to set up a :class:`.SumFunction`		
+    Raises		
+    ------		
+    ValueError		
+            If the number of function is strictly less than 2.		    
     """
+
+    
     
     def __init__(self, *functions ):
                 
@@ -140,7 +30,12 @@ class AveragedSumFunction(Function):
 
     @property
     def L(self):
-        '''Lipschitz constant of the averaged gradient of the sum of the functions'''
+        """Returns the Lipschitz constant for the gradient of the  AveragedSumFunction		       
+        		
+        .. math:: L = \frac{1}{n} \sum_{i=1}^n L_{i}		
+        where :math:`L_{i}` is the Lipschitz constant of the gradient of the smooth function :math:`F_{i}`.		
+        		
+        """
         
         L = 0.
         for f in self.functions:
@@ -159,20 +54,14 @@ class AveragedSumFunction(Function):
         # call base class setter
         super(AveragedSumFunction, self.__class__).L.fset(self, value )
 
-    def __call__(self,x):
-        r"""Returns the value of the sum of functions :math:`F_{1}`,  :math:`F_{2}` ... :math:`F_{n}`at x
-        
-        .. math::(1/n*(F_{1} + F_{2} + ... + F_{n}))(x) = 1/n*( F_{1}(x) + F_{2}(x) + ... + F_{n}(x))
-                
-        """  
-        ret = 0.
-        for f in self.functions:
-            ret += f(x)
-        return 1/self.num_functions * ret
-
     @property
     def Lmax(self):
-        '''Maximum of the Lipschitz constants of the gradients of each function f_i in the averaged sum'''
+        """Returns the maximum Lipschitz constant for the AveragedSumFunction		
+        		
+        .. math:: L = \max_{i}\{L_{i}\}		
+        where :math:`L_{i}` is the Lipschitz constant of the gradient of the smooth function :math:`F_{i}`.		
+        		        
+        """
         
         l = []
         for f in self.functions:
@@ -191,12 +80,21 @@ class AveragedSumFunction(Function):
         # call base class setter
         super(AveragedSumFunction, self.__class__).Lmax.fset(self, value )
 
+    def __call__(self,x):
+        r"""Returns the value of the averaged sum of functions at :math:`x`.		
+        		
+        .. math:: ( \frac{1}{n}(F_{1} + F_{2} + ... + F_{n}))(x) = \frac{1}{n} *( F_{1}(x) + F_{2}(x) + ... + F_{n}(x))
+                		
+        """ 
+        ret = 0.
+        for f in self.functions:
+            ret += f(x)
+        return 1/self.num_functions * ret
 
 
     def gradient(self, x, out=None):
         
-        r"""Returns the value of the sum of the gradient of functions :math:`F_{1}`,  :math:`F_{2}` ... :math:`F_{n}` at x, 
-        if all of them are differentiable
+        r"""Returns the value of the averaged sum of the gradient of functions at :math:`x`, if all of them are differentiable.
         
         .. math::(1/n* (F'_{1} + F'_{2} + ... + F'_{n}))(x) = 1/n * (F'_{1}(x) + F'_{2}(x) + ... + F'_{n}(x))
         

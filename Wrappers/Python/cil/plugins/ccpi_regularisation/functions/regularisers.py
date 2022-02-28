@@ -92,7 +92,7 @@ class TV_Base(RegulariserFunction):
 
             # EnergyValTV[0] is multiplied by alpha, need to divide the 
             # second term below by alpha
-            return 0.5*EnergyValTV[0] + (self.strong_convexity_constant/2)*(in_arr**2).sum()
+            return 0.5*EnergyValTV[0] + (self.strong_convexity_constant/2)*x.squared_norm()
         else:
             return 0.5*EnergyValTV[0]
 

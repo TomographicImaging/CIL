@@ -144,7 +144,7 @@ class TotalVariation(Function):
             self._domain = x
         
         if self.strong_convexity_constant>0:
-            tmp = ((self.strong_convexity_constant/2)*x.squared_norm())
+            tmp = (self.strong_convexity_constant/2)*x.squared_norm()
         else:
             tmp = 0
         # evaluate objective function of TV gradient
@@ -324,4 +324,98 @@ class TotalVariation(Function):
         return self
 
     
+if __name__ == "__main__":
+
+    from cil.optimisation.operators import GradientOperator
+    from cil.optimisation.functions import MixedL21Norm, TotalVariation
+    from cil.framework import ImageGeometry, AcquisitionGeometry
+    from cil.plugins.ccpi_regularisation.functions import FGP_TV
+    from cil.plugins import TomoPhantom
+    
+
+
+    # Detectors 
+    N = 128
+    detectors =  N
+
+    # Angles
+    angles = np.linspace(0,180,180, dtype='float32')
+
+    # Setup acquisition geometry
+    ag = AcquisitionGeometry.create_Parallel2D()\
+                            .set_angles(angles)\
+                            .set_panel(detectors, 0.1)
+    # Get image geometry
+    ig = ag.get_ImageGeometry()
+
+    phantom = TomoPhantom.get_ImageData(12, ig)
+ 
+
+    alpha = 2.
+
+    F1 = alpha * TotalVariation(isotropic=True)
+    F2 = (alpha/ig.voxel_size_x) *  FGP_TV(isotropic=True)
+    print(F1.regularisation_parameter, F2.alpha)
+
+    res1 = F1(phantom)
+    res2 = F2(phantom)
+
+    print("With TV {} ".format(res1))
+    print("With FGP_TV {} ".format(res2))
+
+    tmp_ig = ImageGeometry(3,3)
+    x1 = tmp_ig.allocate('random')
+    print(x1.array)
+
+    # if I remove the lines below I get nan values
+    # F1 = alpha * TotalVariation(isotropic=True)
+    # F2 = (alpha) *  FGP_TV(isotropic=True)
+    res1 = F1(x1)
+    res2 = F2(x1)
+    print(F1.regularisation_parameter, F2.alpha)
+
+    Grad = GradientOperator(tmp_ig, backend='numpy')
+    tmp = alpha * MixedL21Norm()
+    res3 = tmp(Grad.direct(x1))
+
+    print(res1, res2, res3)    
+
+    tmp_ig = ImageGeometry(3,3, voxel_size_x=3., voxel_size_y=3.)
+    x1 = tmp_ig.allocate('random')
+    
+    F1 = alpha * TotalVariation(isotropic=True, strong_convexity_constant=3.)
+    F2 = (alpha/tmp_ig.voxel_size_x) *  FGP_TV(isotropic=True, strong_convexity_constant=3.)
+    res1 = F1(x1)
+    res2 = F2(x1)
+    print(res1, res2)
+
+
+
+    
+
+
+    # ############################################################
+    # # ig = ImageGeometry(3,4)
+    # # x = ig.allocate('random')
+    
+    # # alpha = 2.
+    # # # Grad = GradientOperator(ig)
+    # # # tmp1 = alpha * MixedL21Norm()
+    # # # res1 = tmp1(Grad.direct(x))
+
+    # # # print( " With MixedL21Norm : {}".format(res1))
+
+    # # TV1 = alpha * FGP_TV()
+
+    # # res3 = TV1(x)
+
+    # # print( " With FGP_TV : {}".format(res3))   
+
+    # # TV = alpha * TotalVariation()
+    # # res2 = TV(x)
+
+    # # print( " With TotalVariation : {}".format(res2))           
+
+
+
 

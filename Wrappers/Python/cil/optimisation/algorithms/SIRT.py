@@ -33,7 +33,7 @@ class SIRT(Algorithm):
 
     .. math:: x^{k+1} =  \mathrm{proj}_{C}( x^{k} + D ( A^{T} ( M * (b - Ax) ) ) ),
 
-    where :math:`M = A*\mathbb{1}`, :math:`D = A^{T}\mathbb{1}`, :math:`\mathbb{1}` is a :code:`DataContainer` of ones
+    where :math:`M = \frac{1}{A*\mathbb{1}}`, :math:`D = \frac{1}{A^{T}\mathbb{1}}`, :math:`\mathbb{1}` is a :code:`DataContainer` of ones
     and :math:`\mathrm{prox}_{C}` is the projection over a set :math:`C`.
 
     Parameters
@@ -50,19 +50,24 @@ class SIRT(Algorithm):
     upper : :obj:`float`, default = None
             Upper bound constraint, default value = :code:`-inf`.
     constraint : IndicatorBox function, default = None
-                 Enforce box constraint using the :class:`.IndicatorBox` function.
+                A constraint, e.g., :class:`.IndicatorBox` function is enforced in every iteration.
     kwargs:
         Keyword arguments used from the base class :class:`.Algorithm`.    
 
     Note 
     ----
     
+    If :code:`constraint` is not passed, then :code:`lower` and :code:`upper` are looked at.
+
     If :code:`constraint` is passed, it should be an :class:`.IndicatorBox` function, 
     and in that case :code:`lower` and :code:`upper` inputs are ignored. 
+
+    If :math:`M = \frac{1}{A*\mathbb{1}}`, :math:`D = \frac{1}{A^{T}\mathbb{1}}` contain :code:`NaN`, :math:`\pm\inf`
+    they are replaced by :math:`1`.
+
+
     
-    If :code:`constraint` is passed, then :code:`lower` and :code:`upper` are looked at, 
-    and if at least one is not None, then an :class:`.IndicatorBox` is set up which 
-    provides the proximal mapping to enforce lower and upper bounds.
+
     
     
     Examples
@@ -131,8 +136,8 @@ class SIRT(Algorithm):
         self.D = 1./self.operator.adjoint(self.operator.range_geometry().allocate(value=1.0))
 
         # fix for possible inf values
-        numpy.nan_to_num(self.M, copy = False, neginf=1, posinf=1) 
-        numpy.nan_to_num(self.D, copy = False, neginf=1, posinf=1) 
+        numpy.nan_to_num(self.M, copy = False, nan = 1, neginf=1, posinf=1) 
+        numpy.nan_to_num(self.D, copy = False, nan = 1, neginf=1, posinf=1) 
 
         self.configured = True
         print("{} configured".format(self.__class__.__name__, ))

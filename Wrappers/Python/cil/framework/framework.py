@@ -3508,8 +3508,10 @@ class VectorGeometry(object):
     def dimension_labels(self, val):
         if val is None:
             self.__dimension_labels = None
+        elif type(val) == str:
+            self.__dimension_labels = (val)
         else:
-            self.__dimension_labels = tuple([val])
+            self.__dimension_labels = tuple(val)
 
     def __init__(self, 
                  length, **kwargs):

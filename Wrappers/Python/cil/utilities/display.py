@@ -93,66 +93,46 @@ class show_base(object):
             print("Unable to save image")
 
 class show2D(show_base):
-    r'''This class plots and saves 2D slices from cil DataContainer types.
-     '''
+    '''This plots 2D slices from cil DataContainer types.
+
+    Plots 1 or more 2D plots in an (n x num_cols) matrix.
+    Can plot multiple slices from one 3D dataset, or compare multiple datasets
+    Inputs can be single arguments or list of arguments that will be sequentally applied to subplots
+    If no slice_list is passed a 3D dataset will display the centre slice of the outer dimension, a 4D dataset will show the centre slices of the two outer dimension.
+
+
+    Parameters
+    ----------
+    datacontainers: ImageData, AcquisitionData, list of  ImageData / AcquisitionData, BlockDataContainer
+        The DataContainers to be displayed
+    title: string, list of strings, optional
+        The title for each figure
+    slice_list: tuple, int, list of tuples, list of ints, optional
+        The slices to show. A list of integers will show slices for the outer dimension. For 3D datacontainers single slice: (direction, index). For 4D datacontainers two slices: [(direction0, index),(direction1, index)].
+    fix_range: boolian, tuple, list of tuples
+        Sets the display range of the data. `True` sets all plots to the global (min, max). 
+    axis_labels: tuple, list of tuples, optional
+        The axis labels for each figure e.g. ('x','y')
+    origin: string, list of strings
+        Sets the display origin. 'lower/upper-left/right'
+    cmap: str
+        Sets the colour map of the plot (see matplotlib.pyplot)
+    num_cols: int
+        Sets the number of columns of subplots to display
+    size: tuple
+        Figure size in inches
+
+    Returns
+    -------
+    matplotlib.figure.Figure
+        returns a matplotlib.pyplot figure object
+    '''
+
     def __init__(self,datacontainers, title=None, slice_list=None, fix_range=False, axis_labels=None, origin='lower-left', cmap='gray', num_cols=2, size=(15,15)):
-        r'''This plots 2D slices from cil DataContainer types.
 
-        Plots 1 or more 2D plots in an (n x num_cols) matix.
-        Can plot multiple slices from one 3D dataset, or compare multiple datasets
-        Inputs can be single arguments or list of arguments that will be sequentally applied to subplots
-        If no slice_list is passed a 3D dataset will display the centre slice of the outer dimension, a 4D dataset will show the centre slices of the two outer dimension.
-
-        :param datacontainers: The DataContainers to be displayed.
-        :type datacontainers: ImageData, AcquisitionData, list of  Image/AcquisitionData, BlockDataContainer
-        :param title: The title for each figure
-        :type title: string, list of strings
-        :param slice_list: The slices to show. A list of intergers will show slices for the outer dimension. For 3D datacontainers single slice: (direction, index). For 4D datacontainers two slices: [(direction0, index),(direction1, index)].
-        :type slice_list: tuple, int, list of tuples, list of ints
-        :param fix_range: Sets the display range of the data. `True` sets all plots to the global (min, max). 
-        :type fix_range: boolian, tuple, list of tuples
-        :param axis_labels: The axis labels for each figure e.g. ('x','y')
-        :type axis_labels: tuple, list of tuples
-        :param origin: Sets the display origin. 'lower/upper-left/right'
-        :type origin: string, list of strings
-        :param cmap: Sets the colour map of the plot (see matplotlib.pyplot)
-        :param num_cols: Sets the number of columns of subplots to display
-        :type num_cols: int
-        :param size: Figure size in inches
-        :type size: tuple of floats
-        :return: returns an matplotlib.pyplot figure object
-        :rtype: matplotlib.figure.Figure
-        '''
         self.figure = self.__show2D(datacontainers, title=title, slice_list=slice_list, fix_range=fix_range, axis_labels=axis_labels, origin=origin, cmap=cmap, num_cols=num_cols, size=size)
 
     def __show2D(self,datacontainers, title=None, slice_list=None, fix_range=False, axis_labels=None, origin='lower-left', cmap='gray', num_cols=2, size=(15,15)):
-        r'''This function plots 2D slices from cil DataContainer types. It returns a matplotlib figure that can be saved with the pyplot 'savefig()' method.
-
-        Plots 1 or more 2D plots in an (n x num_cols) matix.
-        Can plot multiple slices from one 3D dataset, or compare multiple datasets
-        Inputs can be single arguments or list of arguments that will be sequentally applied to subplots
-        If no slice_list is passed a 3D dataset will display the centre slice of the outer dimension, a 4D dataset will show the centre slices of the two outer dimension.
-
-        :param datacontainers: The DataContainers to be displayed.
-        :type datacontainers: ImageData, AcquisitionData, list of  Image/AcquisitionData, BlockDataContainer
-        :param title: The title for each figure
-        :type title: string, list of strings
-        :param slice_list: The slices to show. A list of intergers will show slices for the outer dimension. For 3D datacontainers single slice: (direction, index). For 4D datacontainers two slices: [(direction0, index),(direction1, index)].
-        :type slice_list: tuple, int, list of tuples, list of ints
-        :param fix_range: Sets the display range of the data. `True` sets all plots to the global (min, max). 
-        :type fix_range: boolian, tuple, list of tuples
-        :param axis_labels: The axis labels for each figure e.g. ('x','y')
-        :type axis_labels: tuple, list of tuples
-        :param origin: Sets the display origin. 'lower/upper-left/right'
-        :type origin: string, list of strings
-        :param cmap: Sets the colour map of the plot (see matplotlib.pyplot)
-        :param num_cols: Sets the number of columns of subplots to display
-        :type num_cols: int
-        :param size: Figure size in inches
-        :type size: tuple of floats
-        :return: returns an matplotlib.pyplot figure object
-        :rtype: matplotlib.figure.Figure
-        '''
 
         #get number of subplots, number of input datasets, or number of slices requested
         if isinstance(datacontainers, (list, BlockDataContainer)):
@@ -742,32 +722,39 @@ class _ShowGeometry(object):
         self.labels.append(h0.get_label())
 
 class show_geometry(show_base):
-    r'''This class plots and saves a schematic of the acquisition geometry.
-     '''
-    def __init__(self,acquisition_geometry, image_geometry=None, elevation=20, azimuthal=-35, view_distance=10, grid=False, figsize=(10,10), fontsize=10):
-        r'''Displays a schematic of the acquisition geometry
-        for 2D geometries elevation and azimuthal cannot be changed
+    '''
+    Displays a schematic of the acquisition geometry
+    for 2D geometries elevation and azimuthal cannot be changed
 
-        :acquisition_geometry: CIL acquisition geometry
-        :type acquisition_geometry: AcquisitionGeometry     
-        :image_geometry: CIL image geometry
-        :type image_geometry: ImageGeometry, optional 
-        :elevation: Camera elevation in degrees, 3D geometries only
-        :type elevation: float, default=20  
-        :azimuthal: Camera azimuthal in degrees, 3D geometries only
-        :type azimuthal: float, default=-35  
-        :view_distance: Camera view distance
-        :type view_distance: float, default=10  
-        :grid: Show figure axis
-        :type grid: boolean, default=False
-        :figsize: Set figure size (inches)
-        :type figsize: tuple (x, y), default (6,6)    
-        :type grid: boolean, default=False
-        :fontsize: Set fontsize, default 7
-        :type fontsize: int 
-        :return: returns an matplotlib.pyplot figure object
-        :rtype: matplotlib.figure.Figure
-        '''
+
+    Parameters
+    ----------
+    acquisition_geometry: AcquisitionGeometry
+        CIL acquisition geometry
+    image_geometry: ImageGeometry, optional 
+        CIL image geometry
+    elevation: float
+        Camera elevation in degrees, 3D geometries only, default=20 
+    azimuthal: float
+        Camera azimuthal in degrees, 3D geometries only, default=-35  
+    view_distance: float
+        Camera view distance, default=10  
+    grid: boolean
+        Show figure axis, default=False
+    figsize: tuple (x, y)
+        Set figure size (inches), default (10,10)  
+    fontsize: int 
+        Set fontsize, default 10
+
+    Returns
+    -------
+    matplotlib.figure.Figure
+        returns a matplotlib.pyplot figure object
+    '''
+
+
+    def __init__(self,acquisition_geometry, image_geometry=None, elevation=20, azimuthal=-35, view_distance=10, grid=False, figsize=(10,10), fontsize=10):
+
         if acquisition_geometry.dimension == '2D':
             elevation = 90
             azimuthal = 0

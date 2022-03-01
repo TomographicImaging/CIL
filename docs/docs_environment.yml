@@ -1,6 +1,7 @@
 name: docs
 channels:
   - conda-forge
+  - intel
   - ccpi
   - defaults
   - astra-toolbox/label/dev
@@ -23,3 +24,6 @@ dependencies:
   - cil-astra
   - ccpi-regulariser
   - tomophantom
+  - ipywidgets
+  - tqdm
+  

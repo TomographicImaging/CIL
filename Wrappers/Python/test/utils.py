@@ -3,13 +3,26 @@ from cil.framework import cilacc
 import numpy as np
 import os
 
+#import cvxpy
+
+try:
+    import cvxpy
+    has_cvxpy = True
+except ModuleNotFoundError:
+    has_cvxpy = False
+print ("has_cvxpy\t{}".format(has_cvxpy))    
+
+try:
+    import cvxpy
+    has_cvxpy = True
+except ModuleNotFoundError:
+    has_cvxpy = False
+print ("has_cvxpy\t{}".format(has_cvxpy)) 
 
 try:
     import tigre
     has_tigre = True
 except ModuleNotFoundError:
-    has_tigre = False
-except ImportError:
     has_tigre = False
 print ("has_tigre\t{}".format(has_tigre))
 
@@ -19,8 +32,6 @@ try:
     has_astra = True
 except ModuleNotFoundError:
     has_astra = False
-except ImportError:
-    has_tigre = False
 print ("has_astra\t{}".format(has_astra))
 
 

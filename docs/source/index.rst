@@ -36,7 +36,6 @@ A number of demos can be found on the `CIL-Demos`_ repository.
    processors
    recon
    utilities
-   astra
    plugins
    developer_guide
    

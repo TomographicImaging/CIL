@@ -15,7 +15,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from cil.framework import Processor, AcquisitionData
+from cil.framework import Processor, AcquisitionData, AcquisitionGeometry
 from cil.processors.Binner import Binner
 import matplotlib.pyplot as plt
 import scipy
@@ -25,7 +25,6 @@ import logging
 import math
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
 
 class CofR_image_sharpness(Processor):
 
@@ -74,6 +73,9 @@ class CofR_image_sharpness(Processor):
         if data.geometry.geom_type == 'cone' and self.slice_index != 'centre':
             raise ValueError("Only the centre slice is supported with this alogrithm")
 
+        if data.geometry.system_description not in ['simple','offset']:
+            raise NotImplementedError("Not implemented for advanced systsem geometries")
+            
         if data.geometry.channels > 1:
             raise ValueError("Only single channel data is supported with this algorithm")
 
@@ -197,8 +199,7 @@ class CofR_image_sharpness(Processor):
         else:
             data = data_full
 
-        data.geometry.config.system.update_reference_frame()
-
+        data.geometry.config.system.align_reference_frame('cil')
         width = data.geometry.config.panel.num_pixels[0]
 
         #initial grid search
@@ -217,24 +218,31 @@ class CofR_image_sharpness(Processor):
         data_filtered.fill(scipy.ndimage.sobel(data.as_array(), axis=1, mode='reflect', cval=0.0))
 
         if self.initial_binning > 1:
-            #padding to keep centre when binning
-            temp = (width)/self.initial_binning
-            pad = int((np.ceil(temp) * self.initial_binning - width)/2)
-            logger.debug("padding by %d", pad)
+
+            #gaussian filter data
+            data_temp = data_filtered.copy()
+            data_temp.fill(scipy.ndimage.gaussian_filter(data_filtered.as_array(), [0,self.initial_binning//2]))
+
+            #bin data whilst preserving centres
+            num_pix_new = np.ceil(width/self.initial_binning)
+
+            new_half_panel = (num_pix_new - 1)/2
+            half_panel = (width - 1)/2
+
+            sampling_points = np.mgrid[-self.initial_binning*new_half_panel:self.initial_binning*new_half_panel+1:self.initial_binning]
+            initial_cordinates = np.mgrid[-half_panel:half_panel+1:1]
 
             new_geom = data.geometry.copy()
-            new_geom.config.panel.num_pixels[0] +=2*pad
-            data_padded = new_geom.allocate()
-            data_padded.fill(np.pad(data.array,((0,0),(pad,pad)),'edge'))
-            
-            #bin
-            data_temp = data_padded.copy()
-            data_temp.fill(scipy.ndimage.gaussian_filter(data_padded.as_array(), [0,self.initial_binning//2]))
-            data_temp = Binner({'horizontal':(None,None,self.initial_binning)})(data_temp)
-                
+            new_geom.config.panel.num_pixels[0] = num_pix_new
+            new_geom.config.panel.pixel_size[0] *= self.initial_binning
+            data_binned = new_geom.allocate()
+
+            for i in range(data.shape[0]):
+                data_binned.fill(np.interp(sampling_points, initial_cordinates, data.array[i,:]),angle=i)
+
             #filter 
-            data_binned_filtered = data_temp.copy()
-            data_binned_filtered.fill(scipy.ndimage.sobel(data_temp.as_array(), axis=1, mode='reflect', cval=0.0))
+            data_binned_filtered = data_binned.copy()
+            data_binned_filtered.fill(scipy.ndimage.sobel(data_binned.as_array(), axis=1, mode='reflect', cval=0.0))
             data_processed = data_binned_filtered
         else:
             data_processed = data_filtered
@@ -277,8 +285,6 @@ class CofR_image_sharpness(Processor):
         new_geometry = data_full.geometry.copy()
         new_geometry.config.system.rotation_axis.position[0] = centre
         
-        voxel_offset = centre/ig.voxel_size_x
-
         logger.info("Centre of rotation correction found using image_sharpness")
         logger.info("Calculated from slice: %s", str(self.slice_index))
         logger.info("Centre of rotation shift = %f pixels", centre/ig.voxel_size_x)

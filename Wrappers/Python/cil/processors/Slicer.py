@@ -29,12 +29,11 @@ class Slicer(DataProcessor):
     :type force: bool, default=False
     :return: returns a DataContainer (AcquisitionData or ImageData) object with an updated AcquisitionGeometry or ImageGeometry where applicable
     :rtype: DataContainer (AcquisitionData or ImageData)
-    '''
-    
-    '''                 
+
+
     Start inclusive, Stop exclusive
     
-    -1 is ashortcut to include all elemnts along the specified axis
+    -1 is a shortcut to include all elements along the specified axis
     
     Input is used to contruct Python slice object using slice() function
     

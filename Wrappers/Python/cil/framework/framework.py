@@ -222,9 +222,28 @@ class ImageGeometry(object):
         return length
 
     def get_slice(self,channel=None, vertical=None, horizontal_x=None, horizontal_y=None):
-        '''
-        Returns a new ImageGeometry of a single slice of in the requested direction.
-        '''
+        """
+        Returns a new ImageGeometry consistent with slicing in the requested directions.
+        
+        Slices can be in any combination of:
+            <dimension label> = index
+            <dimension label> = slice(index0,indexn,step)
+            <dimension label> = [index0,...,indexn]
+
+        Supports fancy indexing.
+        
+        Parameters
+        ----------
+        channel : int, list, slice
+            The requested slices in the channel 'direction' 
+        vertical : int, list, slice
+            The requested slices in the vertical 'direction' 
+        horizontal_x : int, list, slice
+            The requested slices in the horizontal_x 'direction' 
+        horizontal_y : int, list, slice
+            The requested slices in the horizontal_y 'direction'             
+        """
+        
         geometry_new = self.copy()
         if channel is not None:
             geometry_new.channels = self.__get_sliced_size(channel, self.channels)
@@ -1950,9 +1969,38 @@ class AcquisitionGeometry(object):
         return length
     
     def get_slice(self, channel=None, angle=None, vertical=None, horizontal=None):
-        '''
-        Returns a new AcquisitionGeometry of a single slice of in the requested direction. Will only return reconstructable geometries.
-        '''
+        """
+        Returns a new AcquisitionGeometry consistent with slicing in the requested directions.
+        
+        Slices can be in any combination of:
+            <dimension label> = index
+            <dimension label> = slice(index0,indexn,step)
+            <dimension label> = [index0,...,indexn]
+
+        Supports fancy indexing.
+
+        Parameters
+        ----------
+        channel : int, list, slice
+            The requested slices in the channel direction
+        angle : int, list, slice
+            The requested slices in the angle direction
+        vertical : int, list, slice, str
+            The requested slices in the vertical direction, additionally supports special value 'centre'\
+            which returns centre slice of the dataset
+        horizontal : slice
+            The requested slices in the horizontal 'direction', must be a symmetric crop with a slice object i.e. `horizontal=slice(n,-n,1)` 
+            
+        Notes
+        -----
+        For cone-beam geometry or advanced parallel-beam geometry a new geometry can only be returned if either:
+         - 'vertical' is the centre slice i.e. `vertical='centre'`
+         - 'vertical' is a symmetric crop with a slice object i.e. `vertical=slice(n,-n,1)`
+         
+        In these cases it is advised the new geometry including detector offsets is configured by hand and the data filled by the user.
+
+        """    
+        
         geometry_new = self.copy()
         
         if channel is not None:
@@ -2174,10 +2222,25 @@ class DataContainer(object):
             return temp
 
     def get_slice(self,**kw):
-        '''
-        Returns a new DataContainer containing a single slice of in the requested direction. \
-        Pass keyword arguments <dimension label>=index, <dimension label>=slice(index0,indexn,step), <dimension label>=[index0,...,indexn]
-        '''
+        """
+        Returns a new DataContainer containing data sliced in the requested directions.
+        
+        slices can be in any combination of:
+        <dimension label> = index
+        <dimension label> = slice(index0,indexn,step)
+        <dimension label> = [index0,...,indexn]
+            
+        This supports fancy indexing.
+        
+        Keyword Arguments
+        -----------------
+        <dimension label> : int, list, slice
+            The requested slice will be applied in the <dimension label> direction
+
+        Notes
+        -----
+        The keyword arguments must be taken from  DataContainer.dimension_labels to define the axis to slice on.
+        """
         shape_new = list(self.shape)
         indices_in = [None] * self.number_of_dimensions
        
@@ -2908,9 +2971,36 @@ class ImageData(DataContainer):
             return temp
 
     def get_slice(self,channel=None, vertical=None, horizontal_x=None, horizontal_y=None, force=False):
-        '''
-        Returns a new ImageData of a single slice of in the requested direction.
-        '''
+        """
+        Returns a new ImageData containing a data sliced in the requested directions.
+        
+        Slices can be in any combination of:
+            <dimension label> = index
+            <dimension label> = slice(index0,indexn,step)
+            <dimension label> = [index0,...,indexn]
+
+        Supports fancy indexing.
+        
+        Parameters
+        ----------
+        channel : int, list, slice
+            The requested slices in the channel 'direction' 
+        vertical : int, list, slice
+            The requested slices in the vertical 'direction' 
+        horizontal_x : int, list, slice
+            The requested slices in the horizontal_x 'direction' 
+        horizontal_y : int, list, slice
+            The requested slices in the horizontal_y 'direction' 
+        force : boolian, default = False 
+            If the sliced geometry cannot be computed returns a DataContainer of sliced data
+            
+        Example
+        -------
+        Get the data for channel index 1, a list of vertical slices, crop in the horizontal_x direction        
+        >>> image_data_new = image_data.get_slice(channel=1, vertical=[4,10,25], horizontal_x=slice(5,-5))
+        
+        """
+        
         if force == True:
             geometry_new = None
         else:
@@ -3007,9 +3097,46 @@ class AcquisitionData(DataContainer):
             return temp
 
     def get_slice(self,channel=None, angle=None, vertical=None, horizontal=None, force=False):
-        '''
-        Returns a new dataset of a single slice of in the requested direction. \
-        '''
+        """
+        Returns a new AcquisitionData containing containing data sliced in the requested directions.
+        If the requested geometry can not be computed an error is raised. This behaviour can be changed with the 'force' argument.
+        
+        Slices can be in any combination of:
+            <dimension label> = index
+            <dimension label> = slice(index0,indexn,step)
+            <dimension label> = [index0,...,indexn]
+
+        Supports fancy indexing.
+  
+        Parameters
+        ----------
+        channel : int, list, slice
+            The requested slices in the channel 'direction' 
+        angle : int, list, slice
+            The requested slices in the angle 'direction' 
+        vertical : int, list, slice, str
+            The requested slices in the vertical 'direction', additionally supports special value 'centre'\
+            which returns centre slice of the dataset, interpolated if there is an even number of rows.
+        horizontal : int, list, slice
+            The requested slices in the horizontal 'direction', only symmetric slice objects will return a geometry 
+        force : boolian, default = False 
+            If the sliced geometry cannot be computed returns a DataContainer of sliced data
+
+        Notes
+        -----
+        A geometry can only be returned in the case:
+         - 'horizontal' is be a symmetric crop with a slice object i.e. `horizontal=slice(n,-n,1)` 
+
+        For cone-beam geometry or advanced parallel-beam geometry a new geometry can only be returned if either:
+         - 'vertical' is the centre slice i.e. `vertical='centre'`
+         - 'vertical' is a symmetric crop with a slice object i.e. `vertical=slice(n,-n,1)`
+
+        Example
+        -------
+        Get the centre slice of data for reordered list of angles, and crop in the horizonatl direction        
+        >>> acquisition_data_new = acquisition_data.get_slice(vertical='centre', angle=[0,5,2,1], horizontal=slice(1,-1))
+        """
+        
         if force == True:
             geometry_new = None
         else:

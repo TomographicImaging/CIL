@@ -49,18 +49,20 @@ class SIRT(Algorithm):
             Lower bound constraint, default value = :code:`-inf`.
     upper : :obj:`float`, default = None
             Upper bound constraint, default value = :code:`-inf`.
-    constraint : IndicatorBox function, default = None
-                A constraint, e.g., :class:`.IndicatorBox` function is enforced in every iteration.
+    constraint : Function, default = None
+                A function with :code:`proximal` method, e.g., :class:`.IndicatorBox` function and :meth:`.IndicatorBox.proximal`,
+                or :class:`.TotalVariation` function and :meth:`.TotalVariation.proximal`.
+
     kwargs:
         Keyword arguments used from the base class :class:`.Algorithm`.    
 
     Note 
     ----
     
-    If :code:`constraint` is not passed, then :code:`lower` and :code:`upper` are looked at.
+    If :code:`constraint` is not passed, then :code:`lower` and :code:`upper` are looked at and an :class:`.IndicatorBox`
+    function is created.
 
-    If :code:`constraint` is passed, it should be an :class:`.IndicatorBox` function, 
-    and in that case :code:`lower` and :code:`upper` inputs are ignored. 
+    If :code:`constraint` is passed, :code:`proximal` method is required to be implemented.
 
     If :math:`M = \frac{1}{A*\mathbb{1}}`, :math:`D = \frac{1}{A^{T}\mathbb{1}}` contain :code:`NaN`, :math:`\pm\inf`
     they are replaced by :math:`1`.
@@ -141,15 +143,15 @@ class SIRT(Algorithm):
         # numpy.nan_to_num(self.D, copy = False, nan = 1, neginf=1, posinf=1) 
 
         idx_nan1 = numpy.isnan(self.M.as_array())
-        idx_pinf1 = numpy.isnan(self.M.as_array())
-        idx_ninf1 = numpy.isnan(self.M.as_array())        
+        idx_pinf1 = numpy.isposinf(self.M.as_array())
+        idx_ninf1 = numpy.isneginf(self.M.as_array())        
         numpy.copyto(self.M.as_array(), 1., where=idx_nan1)
         numpy.copyto(self.M.as_array(), 1., where=idx_pinf1)
         numpy.copyto(self.M.as_array(), 1., where=idx_ninf1)
 
         idx_nan2 = numpy.isnan(self.D.as_array())
-        idx_pinf2 = numpy.isnan(self.D.as_array())
-        idx_ninf2 = numpy.isnan(self.D.as_array())        
+        idx_pinf2 = numpy.isposinf(self.D.as_array())
+        idx_ninf2 = numpy.isneginf(self.D.as_array())        
         numpy.copyto(self.D.as_array(), 1., where=idx_nan2)
         numpy.copyto(self.D.as_array(), 1., where=idx_pinf2)
         numpy.copyto(self.D.as_array(), 1., where=idx_ninf2)
@@ -170,7 +172,7 @@ class SIRT(Algorithm):
         self.x += self.relax_par * (self.D*self.operator.adjoint(self.M*self.r))
         
         if self.constraint is not None:
-            self.x = self.constraint.proximal(self.x, None)
+            self.x = self.constraint.proximal(self.x, tau=1)
 
     def update_objective(self):
         r"""Returns the objective 

@@ -3495,13 +3495,29 @@ class VectorGeometry(object):
     def dtype(self, val):
         self.__dtype = val      
         
+    @property
+    def dimension_labels(self):
+
+        if self.__dimension_labels is None:
+            default_labels = ('dimension_00')
+            return default_labels
+        else:
+            return self.__dimension_labels
+      
+    @dimension_labels.setter
+    def dimension_labels(self, val):
+        if val is None:
+            self.__dimension_labels = None
+        else:
+            self.__dimension_labels = tuple([val])
+
     def __init__(self, 
                  length, **kwargs):
         
         self.length = length
         self.shape = (length, )
-        self.dtype = kwargs.get('dtype', numpy.float32)
-        self.dimension_labels = tuple(kwargs.get('dimension_labels', None))
+        self.dtype = kwargs.get('dtype', numpy.float32)        
+        self.dimension_labels = kwargs.get('dimension_labels', None)
         
     def clone(self):
         '''returns a copy of VectorGeometry'''

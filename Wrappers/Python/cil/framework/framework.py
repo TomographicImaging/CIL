@@ -1973,7 +1973,7 @@ class AcquisitionGeometry(object):
         if horizontal is not None:
             if isinstance(horizontal, slice):
                 new_range = range(self.pixel_num_h)[horizontal]
-                if new_range.step == 1 and  new_range.start != self.pixel_num_h - new_range.stop:
+                if new_range.step == 1 and  new_range.start == (self.pixel_num_h - new_range.stop):
                     geometry_new.pixel_num_h = len(new_range) 
                 else:
                     raise NotImplementedError("Can currently only symmetrically crop geometry in the horizontal direction. Please use a symmetric slice object with step 1.")

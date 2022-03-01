@@ -135,9 +135,24 @@ class SIRT(Algorithm):
         self.M = 1./self.operator.direct(self.operator.domain_geometry().allocate(value=1.0))                
         self.D = 1./self.operator.adjoint(self.operator.range_geometry().allocate(value=1.0))
 
-        # fix for possible inf values
-        numpy.nan_to_num(self.M, copy = False, nan = 1, neginf=1, posinf=1) 
-        numpy.nan_to_num(self.D, copy = False, nan = 1, neginf=1, posinf=1) 
+        # fix for possible inf values (code from numpy.nan_to_nam)
+        # TODO replace with
+        # numpy.nan_to_num(self.M, copy = False, nan = 1, neginf=1, posinf=1) 
+        # numpy.nan_to_num(self.D, copy = False, nan = 1, neginf=1, posinf=1) 
+
+        idx_nan1 = numpy.isnan(self.M.as_array())
+        idx_pinf1 = numpy.isnan(self.M.as_array())
+        idx_ninf1 = numpy.isnan(self.M.as_array())        
+        numpy.copyto(self.M.as_array(), 1., where=idx_nan1)
+        numpy.copyto(self.M.as_array(), 1., where=idx_pinf1)
+        numpy.copyto(self.M.as_array(), 1., where=idx_ninf1)
+
+        idx_nan2 = numpy.isnan(self.D.as_array())
+        idx_pinf2 = numpy.isnan(self.D.as_array())
+        idx_ninf2 = numpy.isnan(self.D.as_array())        
+        numpy.copyto(self.D.as_array(), 1., where=idx_nan2)
+        numpy.copyto(self.D.as_array(), 1., where=idx_pinf2)
+        numpy.copyto(self.D.as_array(), 1., where=idx_ninf2)
 
         self.configured = True
         print("{} configured".format(self.__class__.__name__, ))

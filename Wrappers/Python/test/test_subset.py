@@ -150,25 +150,86 @@ class Test_get_slice(unittest.TestCase):
         arr = numpy.arange(0,120).reshape(2,3,4,5)
         data = DataContainer(arr, True,dimension_labels=['c','z','y','x'])
 
-        data_new = data.get_slice(c=1)
-        self.assertEquals(data_new.shape,(3,4,5))
-        numpy.testing.assert_array_equal(data_new.array, arr[1])
+        #different argument methods
+        gold = arr[:,:,1,:]
+        labels = ('c','z','x')
+        data_new = data.get_slice(y=1)
+        self.assertEquals(data_new.shape,gold.shape)
+        numpy.testing.assert_array_equal(data_new.array, gold)
+        self.assertEquals(data_new.dimension_labels,labels)
 
+        data_new = data.get_slice(y=-3)
+        self.assertEquals(data_new.shape,gold.shape)
+        numpy.testing.assert_array_equal(data_new.array, gold)
+        self.assertEquals(data_new.dimension_labels,labels)
+        
+        data_new = data.get_slice(y=[1])
+        self.assertEquals(data_new.shape,gold.shape)
+        numpy.testing.assert_array_equal(data_new.array, gold)
+        self.assertEquals(data_new.dimension_labels,labels)
+        
+        data_new = data.get_slice(y=slice(1,2))
+        self.assertEquals(data_new.shape,gold.shape)
+        numpy.testing.assert_array_equal(data_new.array, gold)
+        self.assertEquals(data_new.dimension_labels,labels)
+        
+        #list functionality
+        data_new = data.get_slice(y=[0,2,3])
+        self.assertEquals(data_new.shape,(2,3,3,5))
+        out = numpy.stack((arr[:,:,0,:], arr[:,:,2,:], arr[:,:,3,:]), axis=2)
+        numpy.testing.assert_array_equal(data_new.array, out)
+        self.assertEquals(data_new.dimension_labels,data.dimension_labels)
+
+        data_new = data.get_slice(y=[3,2,0])
+        self.assertEquals(data_new.shape,(2,3,3,5))
+        out = numpy.stack((arr[:,:,3,:], arr[:,:,2,:], arr[:,:,0,:]), axis=2)
+        numpy.testing.assert_array_equal(data_new.array, out)
+        self.assertEquals(data_new.dimension_labels,data.dimension_labels)
+        
+        data_new = data.get_slice(y=[0,2,-1])
+        self.assertEquals(data_new.shape,(2,3,3,5))        
+        out = numpy.stack((arr[:,:,0,:], arr[:,:,2,:], arr[:,:,3,:]), axis=2)
+        numpy.testing.assert_array_equal(data_new.array, out)
+        self.assertEquals(data_new.dimension_labels,data.dimension_labels)
+        
+        #multiple cuts
         data_new = data.get_slice(c=1,y=3)
         self.assertEquals(data_new.shape,(3,5))
         numpy.testing.assert_array_equal(data_new.array, arr[1,:,3,:])
-
+        self.assertEquals(data_new.dimension_labels,('z','x'))
+        
         data_new = data.get_slice(c=1,y=3,z=1)
         self.assertEquals(data_new.shape,(5,))
         numpy.testing.assert_array_equal(data_new.array, arr[1,1,3,:])
-
+        self.assertEquals(data_new.dimension_labels,('x',))
+        
+        #mixed calls
+        data_new = data.get_slice(c=1,z=[0,2],y=slice(None,None,2), x=slice(1,-1))
+        self.assertEquals(data_new.shape,(2,2,3))
+        numpy.testing.assert_array_equal(data_new.array, arr[1,0:3:2,::2,1:-1])
+        self.assertEquals(data_new.dimension_labels,('z','y','x'))
+        
+        #no cuts returns a copy
+        data_new = data.get_slice()
+        self.assertEquals(data_new.shape,data.shape)
+        numpy.testing.assert_array_equal(data_new.array, data.array)
+        self.assertEquals(data_new.dimension_labels,data.dimension_labels)      
+                  
     def test_ImageData(self):
         ig = ImageGeometry(voxel_num_x=5, voxel_num_y=4, voxel_num_z=3, channels=2,  dimension_labels=['channel','vertical','horizontal_y','horizontal_x'])
-        data = ig.allocate(None)
-        data_new = data.get_slice(vertical=1)
-        self.assertEquals(data_new.shape,(2,4,5))
-        self.assertEquals(data_new.geometry.dimension_labels,('channel','horizontal_y','horizontal_x'))
+        data = ig.allocate('random')
+        
+        data_new = data.get_slice(channel=1,vertical=[0,2],horizontal_y=slice(None,None,2), horizontal_x=slice(1,-1))
+        self.assertTrue(isinstance(data_new, ImageData))
 
+        self.assertEquals(data_new.shape,(2,2,3))
+        numpy.testing.assert_array_equal(data_new.array, data.array[1,0:3:2,::2,1:-1])
+        self.assertEquals(data_new.dimension_labels,('vertical','horizontal_y','horizontal_x'))
+
+        data_new = data.get_slice(channel=1,vertical=[0,2],horizontal_y=slice(None,None,2), horizontal_x=slice(1,-1), force=True)  
+        self.assertTrue(isinstance(data_new, DataContainer))
+    
+            
     def test_AcquisitionData(self):
         ag = AcquisitionGeometry.create_Parallel3D().set_panel([5,4]).set_angles([0,1,2]).set_channels(2).set_labels(['channel','angle','vertical','horizontal'])
         data = ag.allocate(None)
@@ -177,19 +238,31 @@ class Test_get_slice(unittest.TestCase):
         self.assertEquals(data_new.geometry.dimension_labels,('channel','vertical','horizontal'))
 
         #won't return a geometry for un-reconstructable slice
-        ag = AcquisitionGeometry.create_Cone3D([0,-200,0],[0,200,0]).set_panel([5,4]).set_angles([0,1,2]).set_channels(2).set_labels(['channel','angle','vertical','horizontal'])
+        ag = AcquisitionGeometry.create_Cone3D([0,-200,0],[0,200,0]).set_panel([5,4]).set_angles(list(range(0,36))).set_channels(2).set_labels(['channel','angle','vertical','horizontal'])
         data = ag.allocate('random')
+        
+        with self.assertRaises(ValueError):
+            data_new = data.get_slice(vertical=1)
+                
         data_new = data.get_slice(vertical=1,force=True)
-        self.assertEquals(data_new.shape,(2,3,5))
+        self.assertEquals(data_new.shape,(2,36,5))
         self.assertTrue(isinstance(data_new,(DataContainer)))
         self.assertIsNone(data_new.geometry)
         self.assertEquals(data_new.dimension_labels,('channel','angle','horizontal'))
 
         #if 'centre' is between pixels interpolates
         data_new = data.get_slice(vertical='centre')
-        self.assertEquals(data_new.shape,(2,3,5))
+        self.assertEquals(data_new.shape,(2,36,5))
         self.assertEquals(data_new.geometry.dimension_labels,('channel','angle','horizontal'))
         numpy.testing.assert_allclose(data_new.array, (data.array[:,:,1,:] +data.array[:,:,2,:])/2 )
+        
+        #get centre slice for list of angles, and crop on horizontal
+        data_new = data.get_slice(channel=0, vertical='centre', angle=[0,-10,1,0], horizontal=slice(1,-1))
+        arr = (data.array[0,:,1,1:-1] +data.array[0,:,2,1:-1])/2
+        out = numpy.stack((arr[0,:], arr[-10,:], arr[1,:],arr[0,:]), axis=0)
+        self.assertEquals(data_new.shape,out.shape)
+        self.assertEquals(data_new.geometry.dimension_labels,('angle','horizontal')) 
+        numpy.testing.assert_allclose(data_new.array, out )
 
 class TestSubset(unittest.TestCase):
     def setUp(self):

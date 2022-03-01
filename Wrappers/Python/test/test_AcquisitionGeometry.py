@@ -196,7 +196,7 @@ class Test_AcquisitionGeometry(unittest.TestCase):
         numpy.testing.assert_array_almost_equal(AG.config.panel.pixel_size, [0.1,0.2])
 
         #set 2D panel with 3D geometry
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             AG.config.panel.num_pixels = [5]
 
     def test_set_channels(self):

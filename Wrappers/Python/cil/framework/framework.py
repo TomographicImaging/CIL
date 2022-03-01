@@ -208,28 +208,56 @@ class ImageGeometry(object):
             temp.set_labels(dimensions)
             return temp      
 
+    def __get_sliced_size(self, cut, arr_in_length):
+        if isinstance(cut,slice):
+            length = len(range(arr_in_length)[cut])
+        else:
+            if cut == 'centre':
+                length = 1
+            else:
+                try:
+                    length = len(cut)
+                except TypeError:
+                    length = 1
+        return length
+
     def get_slice(self,channel=None, vertical=None, horizontal_x=None, horizontal_y=None):
         '''
         Returns a new ImageGeometry of a single slice of in the requested direction.
         '''
         geometry_new = self.copy()
         if channel is not None:
-            geometry_new.channels = 1
+            geometry_new.channels = self.__get_sliced_size(channel, self.channels)
             
-            try:
+        if hasattr(self, 'channel_labels') and self.channel_labels is not None:
+            if geometry_new.channels == 1:   
                 geometry_new.channel_labels = [self.channel_labels[channel]]
-            except:
-                geometry_new.channel_labels = None
-
+            elif isinstance(channel,slice):
+                geometry_new.channel_labels = self.channel_labels[channel]       
+            else:
+                geometry_new.channel_labels = [self.channel_labels[i] for i in channel]
+            
         if vertical is not None:
-            geometry_new.voxel_num_z = 0
-                
+            length = self.__get_sliced_size(vertical, self.voxel_num_z)
+            if length > 1:
+                geometry_new.voxel_num_z = length
+            else:
+                geometry_new.voxel_num_z = 0
+ 
         if horizontal_y is not None:
-            geometry_new.voxel_num_y = 0
-
+            length = self.__get_sliced_size(horizontal_y, self.voxel_num_y)
+            if length > 1:
+                geometry_new.voxel_num_y = length
+            else:
+                geometry_new.voxel_num_y = 0
+                
         if horizontal_x is not None:
-            geometry_new.voxel_num_x = 0
-
+            length = self.__get_sliced_size(horizontal_x, self.voxel_num_x)
+            if length > 1:
+                geometry_new.voxel_num_x = length
+            else:
+                geometry_new.voxel_num_x = 0
+                
         return geometry_new
 
     def get_order_by_label(self, dimension_labels, default_dimension_labels):
@@ -1144,26 +1172,20 @@ class Panel(object):
     @num_pixels.setter
     def num_pixels(self, val):
 
-        if isinstance(val,int):
+        try:
+            if len(val) != 2:
+                raise TypeError('num_pixels expected int x or [int x, int y]. Got {0}'.format(val))
+            num_pixels_temp = list(val)
+        except:
+            #if has no length, then single value
             num_pixels_temp = [val, 1]
-        else:
-            try:
-                length_val = len(val)
-            except:
-                raise TypeError('num_pixels expected int x or [int x, int y]. Got {}'.format(type(val)))
 
+        try:
+            num_pixels_temp[0] = int(num_pixels_temp[0])
+            num_pixels_temp[1] = int(num_pixels_temp[1])
+        except:
+            raise TypeError('num_pixels expected integer or list of integers. Got {}'.format(type(val[0])))
 
-            if length_val == 2:
-                try:
-                    val0 = int(val[0])
-                    val1 = int(val[1])
-                except:
-                    raise TypeError('num_pixels expected int x or [int x, int y]. Got {0},{1}'.format(type(val[0]), type(val[1])))
-
-                num_pixels_temp = [val0, val1]
-            else:
-                raise ValueError('num_pixels expected int x or [int x, int y]. Got {}'.format(val))
-   
         if num_pixels_temp[1] > 1 and self._dimension == 2:
             raise ValueError('2D acquisitions expects a 1D panel. Expected num_pixels[1] = 1. Got {}'.format(num_pixels_temp[1]))
         if num_pixels_temp[0] < 1 or num_pixels_temp[1] < 1:
@@ -1914,29 +1936,75 @@ class AcquisitionGeometry(object):
             temp.set_labels(dimensions)
             return temp        
 
+    def __get_sliced_size(self, cut,arr_in_length):
+        if isinstance(cut,slice):
+            length = len(range(arr_in_length)[cut])
+        else:
+            if cut == 'centre':
+                length = 1
+            else:
+                try:
+                    length = len(cut)
+                except TypeError:
+                    length = 1
+        return length
+    
     def get_slice(self, channel=None, angle=None, vertical=None, horizontal=None):
         '''
         Returns a new AcquisitionGeometry of a single slice of in the requested direction. Will only return reconstructable geometries.
         '''
         geometry_new = self.copy()
-
+        
         if channel is not None:
-            geometry_new.config.channels.num_channels = 1
-            if hasattr(geometry_new.config.channels,'channel_labels'):
-                geometry_new.config.panel.channel_labels = geometry_new.config.panel.channel_labels[channel]
-
+            geometry_new.config.channels.num_channels = self.__get_sliced_size(channel, self.config.channels.num_channels)
+            
+        if hasattr(self.config.channels, 'channel_labels') and self.config.channels.channel_labels is not None:
+            labels = geometry_new.config.panel.channels.channel_labels
+            if geometry_new.channels == 1:   
+                geometry_new.config.panel.channel_labels = [labels[channel]]
+            elif isinstance(channel,slice):
+                geometry_new.config.panel.channel_labels = labels[channel]       
+            else:
+                geometry_new.config.panel.channel_labels = [labels[i] for i in channel]
+                
         if angle is not None:
             geometry_new.config.angles.angle_data = geometry_new.config.angles.angle_data[angle]
-        
-        if vertical is not None:
-            if geometry_new.geom_type == AcquisitionGeometry.PARALLEL or vertical == 'centre' or vertical == geometry_new.pixel_num_v//2:
-                geometry_new = geometry_new.get_centre_slice()
-            else:
-                raise ValueError("Can only subset centre slice geometry on cone-beam data. Expected vertical = 'centre'. Got vertical = {0}".format(vertical))
-        
-        if horizontal is not None:
-            raise ValueError("Cannot calculate system geometry for a horizontal slice")
 
+        if horizontal is not None:
+            if isinstance(horizontal, slice):
+                new_range = range(self.pixel_num_h)[horizontal]
+                if new_range.step == 1 and  new_range.start != self.pixel_num_h - new_range.stop:
+                    geometry_new.pixel_num_h = len(new_range) 
+                else:
+                    raise NotImplementedError("Can currently only symmetrically crop geometry in the horizontal direction. Please use a symmetric slice object with step 1.")
+            else:
+                raise NotImplementedError("Can currently only symmetrically crop geometry in the horizontal direction. Please use a symmetric slice object with step 1.")
+
+        if vertical is not None: 
+            length = self.__get_sliced_size(vertical, self.pixel_num_v)   
+            
+            if self.geom_type == AcquisitionGeometry.PARALLEL and self.system_description != SystemConfiguration.SYSTEM_ADVANCED:
+                if length == 1:
+                    geometry_new = geometry_new.get_centre_slice()
+                else:
+                    geometry_new.pixel_num_v = length
+                        
+            elif self.geom_type == AcquisitionGeometry.CONE and length == 1:
+                if vertical == 'centre' or vertical == geometry_new.pixel_num_v//2:
+                    geometry_new = geometry_new.get_centre_slice()
+                else:
+                    raise ValueError("Cannot retrieve geometry for an off-centre slice for cone-beam geometries. Use vertical='centre'.")
+         
+            else:    
+                if isinstance(vertical, slice):
+                    new_range = range(self.pixel_num_v)[vertical]
+                    if new_range.step == 1 and  new_range.start != self.pixel_num_v - new_range.stop:
+                        geometry_new.pixel_num_v = len(new_range) 
+                    else:
+                        raise ValueError("Can only symmetrically crop geometry. Please use a symmetric slice object with step 1.")
+                else:
+                    raise ValueError("Can only symmetrically crop geometry. Please use a symmetric slice object with step 1.")
+        
         return geometry_new
 
     def allocate(self, value=0, **kwargs):
@@ -2108,27 +2176,51 @@ class DataContainer(object):
     def get_slice(self,**kw):
         '''
         Returns a new DataContainer containing a single slice of in the requested direction. \
-        Pass keyword arguments <dimension label>=index
+        Pass keyword arguments <dimension label>=index, <dimension label>=slice(index0,indexn,step), <dimension label>=[index0,...,indexn]
         '''
-        new_array = None
-
-        #get ordered list of current dimensions
-        dimension_labels_list = list(self.dimension_labels)
-
-        #remove axes from array and labels
-        for key, value in kw.items():
-            if value is not None:
-                axis = dimension_labels_list.index(key)
-                dimension_labels_list.remove(key)
-                if new_array is None:
-                    new_array = self.as_array().take(indices=value, axis=axis)
+        shape_new = list(self.shape)
+        indices_in = [None] * self.number_of_dimensions
+       
+        for i, label in enumerate(self.dimension_labels):
+            val = kw.get(label, None)
+            if val is not None: 
+                if isinstance(val, slice):
+                    temp = list(range(self.shape[i])[val])
                 else:
-                    new_array = new_array.take(indices=value, axis=axis)
+                    try: #int like
+                        temp=[int(val)]
+                    except TypeError:                
+                        try: #list like
+                            temp = [int(x) for x in val]
+                        except:
+                            raise ValueError("Requested slice(s) must be integer, or list of integer values. Got {0} for {1} axis".format(self.slice_indices, label))
 
+                indices_in[i] = numpy.array(temp,dtype=int)
+                shape_new[i] = indices_in[i].shape[0]
+
+        new_array = None
+        for i in range(self.number_of_dimensions):
+            if indices_in[i] is not None:
+                if new_array is None:
+                    new_array = self.as_array().take(indices=indices_in[i], axis=i, mode='raise')
+                else:
+                    new_array = new_array.take(indices=indices_in[i], axis=i, mode='raise')
+        
+        if new_array is None:
+            return self.copy()
+
+        #clean up reduced dimensions
+        new_dimension_labels = []
+        for i, x in enumerate(shape_new):
+            if x !=1:
+                new_dimension_labels.append(self.dimension_labels[i])
+        
+        new_array=numpy.squeeze(new_array)
+                 
         if new_array.ndim > 1:
-            return DataContainer(new_array, False, dimension_labels_list, suppress_warning=True)
+            return DataContainer(new_array, False, new_dimension_labels, suppress_warning=True)
         else:
-            return VectorData(new_array, dimension_labels=dimension_labels_list)
+            return VectorData(new_array, dimension_labels=new_dimension_labels)
                     
     def reorder(self, order=None):
         '''
@@ -2819,12 +2911,12 @@ class ImageData(DataContainer):
         '''
         Returns a new ImageData of a single slice of in the requested direction.
         '''
-        try:
-            geometry_new = self.geometry.get_slice(channel=channel, vertical=vertical, horizontal_x=horizontal_x, horizontal_y=horizontal_y)
-        except ValueError:
-            if force:
-                geometry_new = None
-            else:
+        if force == True:
+            geometry_new = None
+        else:
+            try:
+                geometry_new = self.geometry.get_slice(channel=channel, vertical=vertical, horizontal_x=horizontal_x, horizontal_y=horizontal_y)
+            except ValueError:
                 raise ValueError ("Unable to return slice of requested ImageData. Use 'force=True' to return DataContainer instead.")
 
         #if vertical = 'centre' slice convert to index and subset, this will interpolate 2 rows to get the center slice value
@@ -2918,12 +3010,12 @@ class AcquisitionData(DataContainer):
         '''
         Returns a new dataset of a single slice of in the requested direction. \
         '''
-        try:
-            geometry_new = self.geometry.get_slice(channel=channel, angle=angle, vertical=vertical, horizontal=horizontal)
-        except ValueError:
-            if force:
-                geometry_new = None
-            else:
+        if force == True:
+            geometry_new = None
+        else:
+            try:
+                geometry_new = self.geometry.get_slice(channel=channel, angle=angle, vertical=vertical, horizontal=horizontal)
+            except ValueError:
                 raise ValueError ("Unable to return slice of requested AcquisitionData. Use 'force=True' to return DataContainer instead.")
 
         #get new data
@@ -3282,7 +3374,7 @@ class VectorGeometry(object):
         self.length = length
         self.shape = (length, )
         self.dtype = kwargs.get('dtype', numpy.float32)
-        self.dimension_labels = kwargs.get('dimension_labels', None)
+        self.dimension_labels = tuple(kwargs.get('dimension_labels', None))
         
     def clone(self):
         '''returns a copy of VectorGeometry'''

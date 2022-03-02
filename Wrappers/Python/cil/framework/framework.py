@@ -224,6 +224,7 @@ class ImageGeometry(object):
     def get_slice(self,channel=None, vertical=None, horizontal_x=None, horizontal_y=None):
         """
         Returns a new ImageGeometry consistent with slicing in the requested directions.
+        Does not modify `voxel_size` or `center` attributes.
         
         Slices can be in any combination of:
             <dimension label> = index
@@ -234,14 +235,35 @@ class ImageGeometry(object):
         
         Parameters
         ----------
-        channel : int, list, slice
+        channel : int, list, slice, default None
             The requested slices in the channel 'direction' 
-        vertical : int, list, slice
+        vertical : int, list, slice, default None
             The requested slices in the vertical 'direction' 
-        horizontal_x : int, list, slice
+        horizontal_x : int, list, slice, default None
             The requested slices in the horizontal_x 'direction' 
-        horizontal_y : int, list, slice
-            The requested slices in the horizontal_y 'direction'             
+        horizontal_y : int, list, slice, default None
+            The requested slices in the horizontal_y 'direction'
+             
+        Examples
+        --------
+        Get the geometry consistent with slicing the data
+        for channel index 1, a list of vertical slices, crop in the horizontal_x direction     
+        
+        >>> from cil.framework import ImageGeometry
+        >>> image_geometry = ImageGeometry(voxel_num_x=1000, voxel_num_y = 1000, voxel_num_z=1000, channels=3)
+        >>> print(image_geometry)
+        Number of channels: 3
+        channel_spacing: 1.0
+        voxel_num : x1000,y1000,z1000
+        voxel_size : x1.0,y1.0,z1.0
+        center : x0,y0,z0
+        >>> image_geometry_new = image_geometry.get_slice(channel=1, vertical=[4,10,25], horizontal_x=slice(5,-5)) 
+        >>> print(image_geometry_new)
+        Number of channels: 1
+        channel_spacing: 1.0
+        voxel_num : x990,y1000,z3
+        voxel_size : x1.0,y1.0,z1.0
+        center : x0,y0,z0         
         """
         
         geometry_new = self.copy()
@@ -1981,23 +2003,70 @@ class AcquisitionGeometry(object):
 
         Parameters
         ----------
-        channel : int, list, slice
+        channel : int, list, slice, default None
             The requested slices in the channel direction
-        angle : int, list, slice
+        angle : int, list, slice, default None
             The requested slices in the angle direction
-        vertical : int, list, slice, str
+        vertical : int, list, slice, str, default None
             The requested slices in the vertical direction, additionally supports special value 'centre'\
             which returns centre slice of the dataset
-        horizontal : slice
+        horizontal : slice, default None
             The requested slices in the horizontal 'direction', must be a symmetric crop with a slice object i.e. `horizontal=slice(n,-n,1)` 
             
-        Notes
-        -----
+        Note
+        ----
         For cone-beam geometry or advanced parallel-beam geometry a new geometry can only be returned if either:
          - 'vertical' is the centre slice i.e. `vertical='centre'`
          - 'vertical' is a symmetric crop with a slice object i.e. `vertical=slice(n,-n,1)`
          
         In these cases it is advised the new geometry including detector offsets is configured by hand and the data filled by the user.
+
+        Examples
+        --------
+        Get the centre slice of data for reordered list of angles, and crop in the horizontal direction       
+        >>> from cil.framework import AcquisitionGeometry
+        >>> acquisition_geometry = AcquisitionGeometry.create_Parallel3D()\
+        ...                                           .set_panel([1000,1000])\
+        ...                                           .set_angles(list(range(0,36)))
+        >>> print(acquisition_geometry)
+        3D Parallel-beam tomography
+        System configuration:
+                Ray direction: [0., 1., 0.]
+                Rotation axis position: [0., 0., 0.]
+                Rotation axis direction: [0., 0., 1.]
+                Detector position: [0., 0., 0.]
+                Detector direction x: [1., 0., 0.]
+                Detector direction y: [0., 0., 1.]
+        Panel configuration:
+                Number of pixels: [1000 1000]
+                Pixel size: [1. 1.]
+                Pixel origin: bottom-left
+        Channel configuration:
+                Number of channels: 1
+        Acquisition description:
+                Number of positions: 36
+                Angles 0-20 in degrees:
+        [ 0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10., 11., 12., 13., 14.,
+        15., 16., 17., 18., 19.]
+
+        >>> acquisition_geometry_new = acquisition_geometry.get_slice(vertical='centre', angle=[0,5,2,1], horizontal=slice(50,-50))
+        >>> print(acquisition_geometry_new)
+        2D Parallel-beam tomography
+        System configuration:
+                Ray direction: [0., 1.]
+                Rotation axis position: [0., 0.]
+                Detector position: [0., 0.]
+                Detector direction x: [1., 0.]
+        Panel configuration:
+                Number of pixels: [900   1]
+                Pixel size: [1. 1.]
+                Pixel origin: bottom-left
+        Channel configuration:
+                Number of channels: 1
+        Acquisition description:
+                Number of positions: 4
+                Angles 0-4 in degrees:
+        [0., 5., 2., 1.]
 
         """    
         
@@ -2238,12 +2307,38 @@ class DataContainer(object):
         
         Keyword Arguments
         -----------------
-        <dimension label> : int, list, slice
+        <dimension label> : int, list, slice, default None
             The requested slice will be applied in the <dimension label> direction
 
-        Notes
-        -----
+        Note
+        ----
         The keyword arguments must be taken from  DataContainer.dimension_labels to define the axis to slice on.
+        
+        Examples
+        --------       
+        >>> from cil.framework import DataContainer
+        >>> import numpy
+        >>> arr = numpy.arange(12).reshape(2,2,3)
+        >>> data_container = DataContainer(arr,dimension_labels=['a','b','c'])
+        >>> print(data_container)
+        Number of dimensions: 3
+        Shape: (2, 2, 3)
+        Axis labels: ('a', 'b', 'c')
+        >>> print(data_container.array)
+        [[[ 0  1  2]
+        [ 3  4  5]]
+
+        [[ 6  7  8]
+        [ 9 10 11]]]
+        >>> data_container_new = data_container.get_slice(a=0,b=[0,1],c=slice(0,3,2))
+        >>> print(data_container_new)
+        Number of dimensions: 2
+        Shape: (2, 2)
+        Axis labels: ('b', 'c')
+        >>> print(data_container_new.array)
+        [[0 2]
+        [3 5]]  
+                 
         """
         shape_new = list(self.shape)
         indices_in = [None] * self.number_of_dimensions
@@ -2987,22 +3082,33 @@ class ImageData(DataContainer):
         
         Parameters
         ----------
-        channel : int, list, slice
+        channel : int, list, slice, default None
             The requested slices in the channel 'direction' 
-        vertical : int, list, slice
+        vertical : int, list, slice, default None
             The requested slices in the vertical 'direction' 
-        horizontal_x : int, list, slice
+        horizontal_x : int, list, slice, default None
             The requested slices in the horizontal_x 'direction' 
-        horizontal_y : int, list, slice
+        horizontal_y : int, list, slice, default None
             The requested slices in the horizontal_y 'direction' 
         force : boolian, default = False 
             If the sliced geometry cannot be computed returns a DataContainer of sliced data
             
-        Example
-        -------
-        Get the data for channel index 1, a list of vertical slices, crop in the horizontal_x direction        
-        >>> image_data_new = image_data.get_slice(channel=1, vertical=[4,10,25], horizontal_x=slice(5,-5))
-        
+        Examples
+        --------
+        Get the data for channel index 1, a list of vertical slices, and crop in the horizontal_x direction  
+              
+        >>> from cil.framework import ImageGeometry                                     
+        >>> image_geometry = ImageGeometry(voxel_num_x=128, voxel_num_y = 128, voxel_num_z=128, channels=4)
+        >>> image_data = image_geometry.allocate('random')                              
+        >>> print(image_data)
+        Number of dimensions: 4
+        Shape: (4, 128, 128, 128)
+        Axis labels: ('channel', 'vertical', 'horizontal_y', 'horizontal_x')
+        >>> image_data_new = image_data.get_slice(channel=1, vertical=[10,100,-10], horizontal_x=slice(32,-32,1))
+        >>> print(image_data_new)
+        Number of dimensions: 3
+        Shape: (3, 128, 64)
+        Axis labels: ('vertical', 'horizontal_y', 'horizontal_x')  
         """
         
         if force == True:
@@ -3114,20 +3220,20 @@ class AcquisitionData(DataContainer):
   
         Parameters
         ----------
-        channel : int, list, slice
+        channel : int, list, slice, default None
             The requested slices in the channel 'direction' 
-        angle : int, list, slice
+        angle : int, list, slice, default None
             The requested slices in the angle 'direction' 
-        vertical : int, list, slice, str
+        vertical : int, list, slice, str, default None
             The requested slices in the vertical 'direction', additionally supports special value 'centre'\
             which returns centre slice of the dataset, interpolated if there is an even number of rows.
-        horizontal : int, list, slice
+        horizontal : int, list, slice, default None
             The requested slices in the horizontal 'direction', only symmetric slice objects will return a geometry 
         force : boolian, default = False 
             If the sliced geometry cannot be computed returns a DataContainer of sliced data
 
-        Notes
-        -----
+        Note
+        ----
         A geometry can only be returned in the case:
          - 'horizontal' is be a symmetric crop with a slice object i.e. `horizontal=slice(n,-n,1)` 
 
@@ -3135,10 +3241,25 @@ class AcquisitionData(DataContainer):
          - 'vertical' is the centre slice i.e. `vertical='centre'`
          - 'vertical' is a symmetric crop with a slice object i.e. `vertical=slice(n,-n,1)`
 
-        Example
-        -------
-        Get the centre slice of data for reordered list of angles, and crop in the horizonatl direction        
-        >>> acquisition_data_new = acquisition_data.get_slice(vertical='centre', angle=[0,5,2,1], horizontal=slice(1,-1))
+        Examples
+        --------
+        Get the centre slice of data for reordered list of angles, and crop in the horizontal direction        
+       
+        >>> from cil.framework import AcquisitionGeometry                               
+        >>> acquisition_geometry = AcquisitionGeometry.create_Parallel3D()\
+        ...                                           .set_panel([1000,1000])\
+        ...                                           .set_angles(list(range(0,36)))\
+        ...                                           .set_labels(['angle','vertical','horizontal'])
+        >>> acquisition_data = acquisition_geometry.allocate('random')
+        >>> print(acquisition_data)
+        Number of dimensions: 3
+        Shape: (36, 1000, 1000)
+        Axis labels: ('angle', 'vertical', 'horizontal')
+        >>> acquisition_data_new = acquisition_data.get_slice(vertical='centre',angle=[0,5,2,1],horizontal=slice(50,-50))
+        >>> print(acquisition_data_new)
+        Number of dimensions: 2
+        Shape: (4, 900)
+        Axis labels: ('angle', 'horizontal')
         """
         
         if force == True:

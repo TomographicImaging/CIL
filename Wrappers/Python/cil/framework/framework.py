@@ -2024,9 +2024,11 @@ class AcquisitionGeometry(object):
                 if new_range.step == 1 and  new_range.start == (self.pixel_num_h - new_range.stop):
                     geometry_new.pixel_num_h = len(new_range) 
                 else:
-                    raise NotImplementedError("Can currently only symmetrically crop geometry in the horizontal direction. Please use a symmetric slice object with step 1.")
+                    raise NotImplementedError("Can currently only symmetrically crop geometry in the horizontal direction.\n\
+                                              Please use a symmetric slice object with step 1 i.e. slice(10,-10,1)")
             else:
-                raise NotImplementedError("Can currently only symmetrically crop geometry in the horizontal direction. Please use a symmetric slice object with step 1.")
+                raise NotImplementedError("Can currently only symmetrically crop geometry in the horizontal direction.\n\
+                                          Please use a symmetric slice object with step 1 i.e. slice(10,-10,1)")
 
         if vertical is not None: 
             length = self.__get_sliced_size(vertical, self.pixel_num_v)   
@@ -2049,9 +2051,11 @@ class AcquisitionGeometry(object):
                     if new_range.step == 1 and  new_range.start != self.pixel_num_v - new_range.stop:
                         geometry_new.pixel_num_v = len(new_range) 
                     else:
-                        raise ValueError("Can only symmetrically crop geometry. Please use a symmetric slice object with step 1.")
+                        raise ValueError("Can only symmetrically crop geometry.\n\
+                                          Please use a symmetric slice object with step 1 i.e. slice(10,-10,1)")
                 else:
-                    raise ValueError("Can only symmetrically crop geometry. Please use a symmetric slice object with step 1.")
+                    raise ValueError("Can only symmetrically crop geometry.\n\
+                                     Please use a symmetric slice object with step 1 i.e. slice(10,-10,1)")
         
         return geometry_new
 
@@ -3498,20 +3502,20 @@ class VectorGeometry(object):
     @property
     def dimension_labels(self):
 
-        if self.__dimension_labels is None:
+        if self._dimension_labels is None:
             default_labels = ('dimension_00')
             return default_labels
         else:
-            return self.__dimension_labels
+            return self._dimension_labels
       
     @dimension_labels.setter
     def dimension_labels(self, val):
         if val is None:
-            self.__dimension_labels = None
+            self._dimension_labels = None
         elif type(val) == str:
-            self.__dimension_labels = (val)
+            self._dimension_labels = (val)
         else:
-            self.__dimension_labels = tuple(val)
+            self._dimension_labels = tuple(val)
 
     def __init__(self, 
                  length, **kwargs):

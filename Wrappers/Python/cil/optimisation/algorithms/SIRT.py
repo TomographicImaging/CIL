@@ -82,15 +82,15 @@ class SIRT(Algorithm):
     >>> ig = ImageGeometry(3,4)
     >>> A = IdentityOperator(ig)
     >>> b = ig.allocate(5.0)
-    >>> sirt = SIRT(initial = ig.allocate(0), operator = A, data=b, max_iteration=5)  
-    >>> sirt.run() 
+    >>> sirt = SIRT(initial = ig.allocate(0), operator = A, data=b, max_iteration=5) 
+    SIRT setting up
+    SIRT configured
+    >>> sirt.run(verbose=0)
     >>> sirt.solution.array
     array([[5., 5., 5.],
            [5., 5., 5.],
            [5., 5., 5.],
            [5., 5., 5.]], dtype=float32)
-
-
     """    
 
 
@@ -139,22 +139,23 @@ class SIRT(Algorithm):
 
         # fix for possible inf values (code from numpy.nan_to_nam)
         # TODO replace with
-        # numpy.nan_to_num(self.M, copy = False, nan = 1, neginf=1, posinf=1) 
-        # numpy.nan_to_num(self.D, copy = False, nan = 1, neginf=1, posinf=1) 
 
-        idx_nan1 = numpy.isnan(self.M.as_array())
-        idx_pinf1 = numpy.isposinf(self.M.as_array())
-        idx_ninf1 = numpy.isneginf(self.M.as_array())        
-        numpy.copyto(self.M.as_array(), 1., where=idx_nan1)
-        numpy.copyto(self.M.as_array(), 1., where=idx_pinf1)
-        numpy.copyto(self.M.as_array(), 1., where=idx_ninf1)
+        np_version = numpy.__version__.split('.')
+        if np_version[0]=='1' and np_version[1]=='15':
+            for arr in [self.M, self.D]:
+                tmp = arr.as_array()
+                idx_nan = numpy.isnan(tmp)
+                idx_pinf = numpy.isposinf(tmp)
+                idx_ninf = numpy.isneginf(tmp)        
+            
+                numpy.copyto(tmp, 1., where=idx_nan)
+                numpy.copyto(tmp, 1., where=idx_pinf)
+                numpy.copyto(tmp, 1., where=idx_ninf)
+        else:            
+            numpy.nan_to_num(self.M.as_array(), copy = False, nan = 1, neginf=1, posinf=1) 
+            numpy.nan_to_num(self.D.as_array(), copy = False, nan = 1, neginf=1, posinf=1) 
 
-        idx_nan2 = numpy.isnan(self.D.as_array())
-        idx_pinf2 = numpy.isposinf(self.D.as_array())
-        idx_ninf2 = numpy.isneginf(self.D.as_array())        
-        numpy.copyto(self.D.as_array(), 1., where=idx_nan2)
-        numpy.copyto(self.D.as_array(), 1., where=idx_pinf2)
-        numpy.copyto(self.D.as_array(), 1., where=idx_ninf2)
+
 
         self.configured = True
         print("{} configured".format(self.__class__.__name__, ))
@@ -181,4 +182,11 @@ class SIRT(Algorithm):
 
         """
         self.loss.append(self.r.squared_norm())
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod(verbose=True)
+
+
+
 

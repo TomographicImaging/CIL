@@ -18,6 +18,7 @@
 import unittest
 import numpy
 import numpy as np
+from numpy import nan, inf
 from cil.framework import VectorData
 from cil.framework import ImageData
 from cil.framework import AcquisitionData
@@ -749,7 +750,22 @@ class TestSIRT(unittest.TestCase):
             alg = SIRT(initial=self.initial2, operator=self.A2, data=self.b2, x_init=self.initial2)
             assert False
         except ValueError as ve:
-            assert True        
+            assert True     
+
+    def test_SIRT_nan_inf_values(self):
+        Aop_nan_inf = self.Aop
+        Aop_nan_inf.A[0:10,:] = 0.
+        Aop_nan_inf.A[:,10:20] = 0.
+
+        tmp_initial = self.ig.allocate()
+        sirt = SIRT(initial = tmp_initial, operator=Aop_nan_inf, data=self.bop, max_iteration=5)  
+        
+        self.assertFalse(np.any(sirt.M == inf))
+        self.assertFalse(np.any(sirt.D == inf))   
+             
+
+        
+
                                 
         
 class TestSPDHG(unittest.TestCase):

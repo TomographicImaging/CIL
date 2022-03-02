@@ -141,16 +141,17 @@ class SIRT(Algorithm):
         # TODO replace with
 
         np_version = numpy.__version__.split('.')
-        if np_version[0]=='1' and np_version[1]=='15':
+        if np_version[0]=='1' and np_version[1]<='17':
             for arr in [self.M, self.D]:
                 tmp = arr.as_array()
                 idx_nan = numpy.isnan(tmp)
                 idx_pinf = numpy.isposinf(tmp)
                 idx_ninf = numpy.isneginf(tmp)        
+                arr[idx_nan] = 1.
+                arr[idx_pinf] = 1.
+                arr[idx_ninf] = 1.
+                tmp.fill(arr)
             
-                numpy.copyto(tmp, 1., where=idx_nan)
-                numpy.copyto(tmp, 1., where=idx_pinf)
-                numpy.copyto(tmp, 1., where=idx_ninf)
         else:            
             numpy.nan_to_num(self.M.as_array(), copy = False, nan = 1, neginf=1, posinf=1) 
             numpy.nan_to_num(self.D.as_array(), copy = False, nan = 1, neginf=1, posinf=1) 

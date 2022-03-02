@@ -309,9 +309,8 @@ class TotalVariation(Function):
         '''creates a gradient operator if not instantiated yet
 
         There is no check that the variable _domain is changed after instantiation (should not be the case)'''
-        if self._gradient is None:
-            if self._domain is not None:
-                self._gradient = GradientOperator(self._domain, correlation = self.correlation, backend = self.backend)
+        if self._domain is not None:
+            self._gradient = GradientOperator(self._domain, correlation = self.correlation, backend = self.backend)
         return self._gradient
     def __rmul__(self, scalar):
         if not isinstance (scalar, Number):

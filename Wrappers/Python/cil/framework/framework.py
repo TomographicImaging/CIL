@@ -208,17 +208,23 @@ class ImageGeometry(object):
             temp.set_labels(dimensions)
             return temp      
 
-    def __get_sliced_size(self, cut, arr_in_length):
+    def __get_sliced_size(self, cut, label):
+        
+        dim = self.dimension_labels.index(label)
         if isinstance(cut,slice):
-            length = len(range(arr_in_length)[cut])
+            length = len(range(self.shape[dim])[cut])
+        elif cut == 'centre':
+            length = 1
         else:
-            if cut == 'centre':
+            try:#int like
+                tmp = int(cut)
                 length = 1
-            else:
+            except TypeError: #list like
                 try:
+                    tmp = [int(x) for x in cut]
                     length = len(cut)
-                except TypeError:
-                    length = 1
+                except:
+                    raise ValueError("Requested slice(s) must be integer, or list of integer values. Got {0} for {1} axis".format(cut, label))
         return length
 
     def get_slice(self,channel=None, vertical=None, horizontal_x=None, horizontal_y=None):
@@ -237,7 +243,7 @@ class ImageGeometry(object):
         ----------
         channel : int, list, slice, default None
             The requested slices in the channel 'direction' 
-        vertical : int, list, slice, default None
+        vertical : int, list, slice, str='centre', default None
             The requested slices in the vertical 'direction' 
         horizontal_x : int, list, slice, default None
             The requested slices in the horizontal_x 'direction' 
@@ -268,7 +274,7 @@ class ImageGeometry(object):
         
         geometry_new = self.copy()
         if channel is not None:
-            geometry_new.channels = self.__get_sliced_size(channel, self.channels)
+            geometry_new.channels = self.__get_sliced_size(channel, 'channel')
             
         if hasattr(self, 'channel_labels') and self.channel_labels is not None:
             if geometry_new.channels == 1:   
@@ -279,21 +285,21 @@ class ImageGeometry(object):
                 geometry_new.channel_labels = [self.channel_labels[i] for i in channel]
             
         if vertical is not None:
-            length = self.__get_sliced_size(vertical, self.voxel_num_z)
+            length = self.__get_sliced_size(vertical, 'vertical')
             if length > 1:
                 geometry_new.voxel_num_z = length
             else:
                 geometry_new.voxel_num_z = 0
  
         if horizontal_y is not None:
-            length = self.__get_sliced_size(horizontal_y, self.voxel_num_y)
+            length = self.__get_sliced_size(horizontal_y, 'horizontal_y')
             if length > 1:
                 geometry_new.voxel_num_y = length
             else:
                 geometry_new.voxel_num_y = 0
                 
         if horizontal_x is not None:
-            length = self.__get_sliced_size(horizontal_x, self.voxel_num_x)
+            length = self.__get_sliced_size(horizontal_x, 'horizontal_x')
             if length > 1:
                 geometry_new.voxel_num_x = length
             else:
@@ -1977,17 +1983,23 @@ class AcquisitionGeometry(object):
             temp.set_labels(dimensions)
             return temp        
 
-    def __get_sliced_size(self, cut,arr_in_length):
+    def __get_sliced_size(self, cut, label):
+        dim = self.dimension_labels.index(label)
+
         if isinstance(cut,slice):
-            length = len(range(arr_in_length)[cut])
+            length = len(range(self.shape[dim])[cut])
+        elif cut == 'centre':
+            length = 1
         else:
-            if cut == 'centre':
+            try:#int like
+                tmp = int(cut)
                 length = 1
-            else:
+            except TypeError: #list like
                 try:
+                    tmp = [int(x) for x in cut]
                     length = len(cut)
-                except TypeError:
-                    length = 1
+                except:
+                    raise ValueError("Requested slice(s) must be integer, or list of integer values. Got {0} for {1} axis".format(cut, label))
         return length
     
     def get_slice(self, channel=None, angle=None, vertical=None, horizontal=None):
@@ -2007,7 +2019,7 @@ class AcquisitionGeometry(object):
             The requested slices in the channel direction
         angle : int, list, slice, default None
             The requested slices in the angle direction
-        vertical : int, list, slice, str, default None
+        vertical : int, list, slice, str='centre', default None
             The requested slices in the vertical direction, additionally supports special value 'centre'\
             which returns centre slice of the dataset
         horizontal : slice, default None
@@ -2073,7 +2085,7 @@ class AcquisitionGeometry(object):
         geometry_new = self.copy()
         
         if channel is not None:
-            geometry_new.config.channels.num_channels = self.__get_sliced_size(channel, self.config.channels.num_channels)
+            geometry_new.config.channels.num_channels = self.__get_sliced_size(channel, 'channel')
             
         if hasattr(self.config.channels, 'channel_labels') and self.config.channels.channel_labels is not None:
             labels = geometry_new.config.panel.channels.channel_labels
@@ -2100,7 +2112,7 @@ class AcquisitionGeometry(object):
                                           Please use a symmetric slice object with step 1 i.e. slice(10,-10,1)")
 
         if vertical is not None: 
-            length = self.__get_sliced_size(vertical, self.pixel_num_v)   
+            length = self.__get_sliced_size(vertical, 'vertical')   
             
             if self.geom_type == AcquisitionGeometry.PARALLEL and self.system_description != SystemConfiguration.SYSTEM_ADVANCED:
                 if length == 1:

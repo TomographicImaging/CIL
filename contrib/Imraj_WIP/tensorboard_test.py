@@ -1,6 +1,7 @@
 from tensorboardX import SummaryWriter
 import numpy as np
-writer = SummaryWriter()
+
+writer = SummaryWriter(log_dir="log")
 
 
 for n_iter in range(100):

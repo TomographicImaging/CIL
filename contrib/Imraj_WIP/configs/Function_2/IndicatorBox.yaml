@@ -3,11 +3,10 @@ hydra:
     dir: outputs/${Experiment.name}/${Regulariser.name}/${now:%Y-%m-%d_%H%M%S}
 
 defaults:
-  - Model: U_net
-  - Experiment: CT_MRI
-  - Function_1: 
-  - Function_2:
-  - Algorithm: 
+  - Experiment: Phantom
+  - Function_1: LeastSquares
+  - Function_2: IndicatorBox
+  - Algorithm: ISTA
   - Hyperparameters: Hyperparameters 
   - override hydra/job_logging: colorlog
   - override hydra/hydra_logging: colorlog

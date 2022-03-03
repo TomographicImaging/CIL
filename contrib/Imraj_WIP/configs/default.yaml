@@ -1,0 +1,11 @@
+hydra: 
+  run:
+    dir: outputs/${Experiment.name}/${Regulariser.name}/${now:%Y-%m-%d_%H%M%S}
+
+defaults:
+  - Model: U_net
+  - Experiment: CT_MRI
+  - Regulariser: TNV
+  - Hyper: Hyper 
+  - override hydra/job_logging: colorlog
+  - override hydra/hydra_logging: colorlog

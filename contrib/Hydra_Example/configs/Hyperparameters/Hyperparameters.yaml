@@ -1,5 +1,5 @@
 RNA_reg: 1e-5
 N: 5
 Beta: -1
-Epochs: 100
+Epochs: 10000
 RNA: True

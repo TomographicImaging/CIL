@@ -36,7 +36,7 @@ if has_tigre:
 
 has_tigre_gpu = has_gpu_tigre()
 if  not has_tigre_gpu:
-    print("Unable to run ASTRA tests")
+    print("Unable to run TIGRE tests")
 
 has_astra_gpu = has_gpu_astra()
 if  not has_tigre_gpu:
@@ -132,7 +132,7 @@ class Test_Reconstructor(unittest.TestCase):
     def test_set_backend(self):
         
         with self.assertRaises(ValueError):
-            reconstructor = Reconstructor(self.ad3D, backend='gemma')
+            reconstructor = Reconstructor(self.ad3D, backend='unsupported_backend')
 
 
 class Test_GenericFilteredBackProjection(unittest.TestCase):
@@ -218,7 +218,7 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
         reconstructor = GenericFilteredBackProjection(self.ad3D)
 
         with self.assertRaises(ValueError):
-            reconstructor.set_filter("gemma")
+            reconstructor.set_filter("unsupported_filter")
 
         filter = reconstructor.get_filter_array()
         filter_new =filter *0.5
@@ -248,7 +248,7 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
         self.assertTrue(reconstructor.filter_inplace)
 
         with self.assertRaises(TypeError):
-            reconstructor.set_filter_inplace('gemma')
+            reconstructor.set_filter_inplace('unsupported_value')
 
 
 
@@ -477,9 +477,11 @@ class Test_FBP(unittest.TestCase):
 
         reconstructor = FBP(ad, backend='astra')
 
+        #Reconstructor backend raises an error if backend isn't supported
         with self.assertRaises(ValueError):
-            reconstructor = FBP(ad, backend='gemma')
+            reconstructor = FBP(ad, backend='unsupported_backend')
 
+        #Reconstructor backend raises an error if dataorder isn't compatible
         with self.assertRaises(ValueError):
             reconstructor = FBP(ad, backend='tigre')
 

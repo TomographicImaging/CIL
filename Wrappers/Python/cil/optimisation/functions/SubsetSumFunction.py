@@ -118,7 +118,6 @@ class AveragedSumFunction(Function):
  
 
 class SubsetSumFunction(AveragedSumFunction):
-    
     '''Class for use as objective function in gradient type algorithms to enable the use of subsets.
 
     The `gradient` method is implemented in children classes and allows to return an approximation of the gradient based on subset gradients.
@@ -126,7 +125,7 @@ class SubsetSumFunction(AveragedSumFunction):
     Parameters:
     -----------
 
-    - functions: f1, f2, 
+    - functions: F_{1}, F_{2}, ..., F_{num_subsets}
 
     - (optional) 
         subset_select_function: function which takes two integers and outputs an integer
@@ -170,9 +169,9 @@ class SubsetSumFunction(AveragedSumFunction):
 class SAGAFunction(SubsetSumFunction):
     '''Class for use as objective function in gradient type algorithms to enable the use of subsets.
 
-    The `gradient` method doesn't the mathematical gradient of the sum of functions, 
-    but a variance-reduced approximated gradient corresponding to the SAGA algorithm.
-    More details below, in the gradient method.
+    The `gradient` method does not correspond to the mathematical gradient of a sum of functions, 
+    but rather to a variance-reduced approximated gradient corresponding to the minibatch SAGA algorithm.
+    More details can be found below, in the gradient method.
 
     Parameters:
     -----------
@@ -182,48 +181,42 @@ class SAGAFunction(SubsetSumFunction):
         serves as diagonal preconditioner
         default None
     - (optional)
-        gradient_initialization_point: point to initialize the gradient of each subset
+        gradient_initialisation_point: point to initialize the gradient of each subset
         and the full gradient
         default None
            
     '''
 
-    def __init__(self, functions, precond=None, gradient_initialization_point=None, **kwargs):
+    def __init__(self, functions, precond=None, gradient_initialisation_point=None, **kwargs):
         
         super(SAGAFunction, self).__init__(functions)
 
-        if gradient_initialization_point is None:
-            self.gradients_allocated = False
-        else:
-            self.subset_gradients = [ fi.gradient(gradient_initialization_point) for i, fi in enumerate(functions)]
-            self.full_gradient = 1/self.num_subsets * sum(self.subset_gradients)
-            self.tmp1 = gradient_initialization_point * 0.0
-            self.tmp2 = gradient_initialization_point * 0.0
-            self.gradients_allocated = True
+        self.gradient_initialisation_point = gradient_initialisation_point
+        self.gradients_allocated = False
         self.precond = precond
 
     def gradient(self, x, out=None):
         """
         Returns a variance-reduced approximate gradient, defined below.
 
-        For f = \sum f_i, the output is computed as follows:
-            - choose a subset j with function next_subset()
+        For f = 1/num_subsets \sum_{i=1}^num_subsets F_{i}, the output is computed as follows:
+            - choose a subset j with the method next_subset()
             - compute
-                subset_grad - subset_grad_old +  full_grad
-                with 
-                - subset_grad is the gradient of function number j at current point
-                - subset_grad_old is the gradient of function number j in memory
-                - full_grad is the approximation of the gradient of f in memory
-            - update subset_grad and full_grad
+                subset_gradient - subset_gradient_old +  full_gradient
+                where
+                - subset_gradient is the gradient of the j-th function at current iterate
+                - subset_gradient_old is the gradient of the j-th function, in memory
+                - full_gradient is the approximation of the gradient of f in memory
+            - update subset_gradient and full_gradient
+            - this gives an unbiased estimator of the gradient
         
-        Combined with the gradient step, the algorithm is guaranteed 
-        to converge if the functions f_i are convex and the step-size 
-        gamma satisfies to
+        Combined with the gradient step, the algorithm is guaranteed to converge if 
+        the functions f_i are convex and the step-size gamma satisfies
             gamma <= 1/(3 * max L_i)
-        where the gradient of each f_i is L_i - Lipschitz.
+        where L_i is the Lipschitz constant of the gradient of F_{i}
 
         Reference:
-        Defazio, Aaron, Bach, Francis, and Simon Lacoste-Julien. 
+        Defazio, Aaron; Bach, Francis; Lacoste-Julien, Simon 
         "SAGA: A fast incremental gradient method with support 
         for non-strongly convex composite objectives." 
         Advances in neural information processing systems. 2014.
@@ -232,26 +225,21 @@ class SAGAFunction(SubsetSumFunction):
         if not self.gradients_allocated:
             self.memory_init(x) 
 
-        # random choice of subset
+        # Select the next subset (uniformly at random by default). This generates self.subset_num
         self.next_subset()
 
-        full_grad_old = self.full_gradient
+        # Compute new gradient for current subset, store in new_gradient
+        self.functions[self.subset_num].gradient(x, out=self.tmp1)
 
-        # Compute new gradient for current subset, store in tmp2
-        # subset_grad = self.function[self.subset_num].gradient(x)
-        self.functions[self.subset_num].gradient(x, out=self.tmp2)
-
-        # Compute difference between new and old gradient for current subset, store in tmp1
-        # subset_grad_old = self.subset_gradients[self.subset_num]
-        # tmp1 = subset_grad - subset_grad_old
-        self.tmp2.axpby(1., -1., self.subset_gradients[self.subset_num], out=self.tmp1)
+        # Compute difference between new and old gradient for current subset, store in gradient_change
+        self.tmp1.axpby(1., -1., self.subset_gradients[self.subset_num], out=self.tmp2)
 
         # Compute output subset_grad - subset_grad_old +  full_grad
         if out is None:
-            ret = 0.0 * self.tmp1
-            self.tmp1.axpby(1., 1., full_grad_old, out=ret)
+            ret = 0.0 * self.tmp2
+            self.tmp2.axpby(1., 1., self.full_gradient, out=ret)
         else:
-            self.tmp1.axpby(1., 1., full_grad_old, out=out)
+            self.tmp2.axpby(1., 1., self.full_gradient, out=out)
 
         # Apply preconditioning
         if self.precond is not None:
@@ -260,28 +248,31 @@ class SAGAFunction(SubsetSumFunction):
             else:
                 out.multiply(self.precond(self.subset_num,x),out=out)
 
-        # update subset gradient: store subset_grad in self.subset_gradients[self.subset_num]
-        self.subset_gradients[self.subset_num].fill(self.tmp2)
+        # Update subset gradient: store subset_grad in self.subset_gradients[self.subset_num]
+        self.subset_gradients[self.subset_num].fill(self.tmp1)
 
-        # update full gradient by adding to 1/num_subsets *  (subset_grad - subset_grad_old) to last value
-        # full_gradient = full_gradient + 1/num_subsets * (subset_grad - subset_grad_old)
-        # ubset_grad - subset_grad_old is stored in tmp1
-        self.full_gradient.axpby(1., 1./self.num_subsets, self.tmp1, out=self.full_gradient)
+        # Update full gradient by adding to 1/num_subsets *  (subset_grad - subset_grad_old) to last value
+        self.full_gradient.axpby(1., 1./self.num_subsets, self.tmp2, out=self.full_gradient)
 
         if out is None:
             return ret
 
 
     def memory_init(self, x):
-        
         """        
             initialize subset gradient (v_i_s) and full gradient (g_bar) and store in memory.
 
         """
         
-        # this is the memory init = subsets_gradients + full gradient
-        self.subset_gradients = [ x * 0.0 for _ in range(self.num_subsets)]
-        self.full_gradient = x * 0.0
+        # If the initialisation point is not provided, set to 0
+        if self.gradient_initialisation_point is None:
+            self.subset_gradients = [ x * 0.0 for _ in range(self.num_subsets)]
+            self.full_gradient = x * 0.0
+        # Otherwise, initialise at provided gradient_initialisation_point
+        else:
+            self.subset_gradients = [ fi.gradient(self.gradient_initialisation_point) for i, fi in enumerate(self.functions)]
+            self.full_gradient = 1/self.num_subsets * sum(self.subset_gradients)
+
         self.tmp1 = x * 0.0
         self.tmp2 = x * 0.0
 
@@ -303,39 +294,351 @@ class SAGAFunction(SubsetSumFunction):
             
 class SGDFunction(SubsetSumFunction):
     '''Class for use as objective function in gradient type algorithms to enable the use of subsets.
-    The `gradient` method doesn't the mathematical gradient of the sum of functions,
-    but a approximated gradient corresponding to the minibatch SGD algorithm. --Billy 23/2/2022
-    More details below, in the gradient method.
+
+    The `gradient` method does not correspond to the mathematical gradient of a sum of functions, 
+    but rather to a variance-reduced approximated gradient corresponding to the minibatch SGD algorithm.
+    More details can be found below, in the gradient method.
+
     Parameters:
     -----------
-    - (optional)
+
+    - (optional) 
         precond: function taking into input an integer (subset_num) and a DataContainer and outputting a DataContainer
         serves as diagonal preconditioner
         default None
+    - (optional)
+        gradient_initialisation_point: point to initialize the gradient of each subset
+        and the full gradient
+        default None
+           
     '''
-
+  
     def __init__(self, functions, precond=None, **kwargs):
 
-        self.gradients_allocated = False
-        self.precond = precond
-
         super(SGDFunction, self).__init__(functions)
+        self.precond = precond
 
     def gradient(self, x, out=None):
         """
         Returns a vanilla stochastic gradient estimate, defined below.
-        For f = \sum f_i, the output is computed as follows:
+        For f = 1/num_subsets \sum_{i=1}^num_subsets f_i, the output is computed as follows:
             - choose a subset j with function next_subset()
-            - compute
-                subset_grad
-                with
-                - subset_grad is the gradient of function number j at current point
+            - compute the gradient of the j-th function at current iterate
+            - this gives an unbiased estimator of the gradient
 
-        where the gradient of each f_i is L_i - Lipschitz.
         """
 
-        output = x * 0.0
+        # Select the next subset (uniformly at random by default). This generates self.subset_num
         self.next_subset()
-        self.functions[self.subset_num].gradient(x, out=output)
 
-        return output
+        # Compute new gradient for current subset, store in ret
+        if out is None:
+            ret = 0.0 * x
+            self.functions[self.subset_num].gradient(x, out=ret)
+        else:
+            self.functions[self.subset_num].gradient(x, out=out)
+
+        # Apply preconditioning
+        if self.precond is not None:
+            if out is None:
+                ret.multiply(self.precond(self.subset_num,x),out=ret)
+            else:
+                out.multiply(self.precond(self.subset_num,x),out=out)
+
+        if out is None:
+            return ret
+
+class SAGFunction(SAGAFunction):
+    '''Class for use as objective function in gradient type algorithms to enable the use of subsets.
+
+    The `gradient` method does not correspond to the mathematical gradient of a sum of functions, 
+    but rather to a variance-reduced approximated gradient corresponding to the minibatch SAG algorithm.
+    More details can be found below, in the gradient method.
+
+    Parameters:
+    -----------
+
+    - (optional) 
+        precond: function taking into input an integer (subset_num) and a DataContainer and outputting a DataContainer
+        serves as diagonal preconditioner
+        default None
+    - (optional)
+        gradient_initialisation_point: point to initialize the gradient of each subset
+        and the full gradient
+        default None
+           
+    '''
+    def __init__(self, functions, precond=None, gradient_initialisation_point=None, **kwargs):
+        
+        super(SAGFunction, self).__init__(functions)
+
+    def gradient(self, x, out=None):
+        """
+        Returns a variance-reduced approximate gradient, defined below.
+
+        For f = 1/num_subsets \sum_{i=1}^num_subsets F_{i}, the output is computed as follows:
+            - choose a subset j with the method next_subset()
+            - compute
+                1/num_subsets(subset_gradient - subset_gradient_old) +  full_gradient
+                where
+                - subset_gradient is the gradient of the j-th function at current iterate
+                - subset_gradient_old is the gradient of the j-th function, in memory
+                - full_gradient is the approximation of the gradient of f in memory
+            - update subset_gradient and full_gradient
+            - this gives a biased estimator of the gradient
+        
+        Reference:
+        Schmidt, Mark; Le Roux, Nicolas; Bach, Francis. 
+        "Minimizing finite sums with the stochastic average gradient."
+        Mathematical Programming (162) pp.83-112. 2017.
+        """
+
+        if not self.gradients_allocated:
+            self.memory_init(x) 
+
+        # Select the next subset (uniformly at random by default). This generates self.subset_num
+        self.next_subset()
+
+        # Compute new gradient for current subset, store in new_gradient
+        self.functions[self.subset_num].gradient(x, out=self.tmp1)
+
+        # Compute difference between new and old gradient for current subset, store in tmp1
+        self.tmp1.axpby(1., -1., self.subset_gradients[self.subset_num], out=self.tmp2)
+
+        # Compute output: 1/num_subsets(subset_grad - subset_tmp3) + 1/num_subsets * full_grad
+        if out is None:
+            ret = 0.0 * self.tmp2
+            self.tmp2.axpby(1./self.num_subsets, 1., self.full_gradient, out=ret)
+        else:
+            self.tmp2.axpby(1./self.num_subsets, 1., self.full_gradient, out=out)
+
+        # Apply preconditioning
+        if self.precond is not None:
+            if out is None:
+                ret.multiply(self.precond(self.subset_num,x),out=ret)
+            else:
+                out.multiply(self.precond(self.subset_num,x),out=out)
+
+        # Update subset gradient: store subset_grad in self.subset_gradients[self.subset_num]
+        self.subset_gradients[self.subset_num].fill(self.tmp1)
+
+        # Update full gradient by adding to 1/num_subsets *  (subset_grad - subset_grad_old) to last value
+        self.full_gradient.axpby(1., 1./self.num_subsets, self.tmp2, out=self.full_gradient)
+
+        if out is None:
+            return ret
+
+class SVRGFunction(SubsetSumFunction):
+    '''Class for use as objective function in gradient type algorithms to enable the use of subsets.
+
+    The `gradient` method does not correspond to the mathematical gradient of a sum of functions, 
+    but rather to a variance-reduced approximated gradient corresponding to the minibatch SVRG algorithm.
+    More details can be found below, in the gradient method.
+
+    Parameters:
+    -----------
+
+    - (optional) 
+        precond: function taking into input an integer (subset_num) and a DataContainer and outputting a DataContainer
+        serves as diagonal preconditioner
+        default None
+    - (optional)
+        gradient_initialisation_point: point to initialize the gradient of each subset
+        and the full gradient
+        default None
+           
+    '''
+
+    def __init__(self, functions, precond=None, update_frequency = 2, **kwargs):
+
+        super(SVRGFunction, self).__init__(functions)
+
+        self.gradients_allocated = False
+    
+        self.precond = precond
+        self.update_frequency = update_frequency
+
+        # initialise the internal iteration counter. Used to check when to update the full gradient
+        self.iter = 0
+
+    def gradient(self, x, out=None):
+        """
+        Returns a variance-reduced approximate gradient, defined below.
+        For f = 1/num_subsets \sum_{i=1}^num_subsets f_i, the output is computed as follows:
+            - choose a subset j with function next_subset()
+            - check if full_grad_at_snapshot and snapshot should be updated
+            - if they shouldn't then compute
+                subset_gradient - subset_gradient_at_snapshot + full_grad_at_snapshot
+                where 
+                - subset_grad is the gradient of function number j at current_iterate
+                - subset_grad_at_snapshot is the gradient of function number j at snapshot in memory
+                - full_grad_at_snapshot is the approximation of the gradient of f in memory
+            - otherwise update full_grad_at_snapshot and snapshot
+            - this gives an unbiased estimator of the gradient
+        
+        Combined with the gradient step, the algorithm is guaranteed 
+        to converge if the functions f_i are convex and the step-size 
+        gamma satisfies
+            gamma <= 1/(4 * max L_i (P + 2))
+        where the gradient of each f_i is L_i - Lipschitz, and P is the number of inner iterations, that is, update_frequency * num_sebsets
+
+        Reference:
+        Johnson, Rie; Zhang, Tong. 
+        "Accelerating stochastic gradient descent using predictive variance reduction." 
+        Advances in neural information processing systems. 2013.
+        """
+
+        if not self.gradients_allocated:
+            self.memory_init(x)         
+        # Select the next subset (uniformly at random by default). This generates self.subset_num
+        self.next_subset()
+
+        # In the first iteration, or if the snapshot image has just been updated, the current iterate and snapshot will be the same
+        # thus tmp2 = 0
+        if self.iter == 0 or self.iter % (self.update_frequency * self.num_subsets) == 0:
+            self.tmp2 = 0.0 * self.full_gradient
+        else:
+            # Compute new gradient for current subset, store in tmp1
+            self.functions[self.subset_num].gradient(x, out=self.tmp1) 
+
+            # Compute difference between current subset function gradient at current iterate (tmp1) and at snapshot, store in tmp2
+            self.tmp1.axpby(1., -1., self.functions[self.subset_num].gradient(self.snapshot), out=self.tmp2) 
+
+        # Compute the output: gradient_change + full_grad
+        if out is None:
+            ret = 0.0 * self.tmp2
+            self.tmp2.axpby(1., 1., self.full_gradient, out=ret)
+        else:
+            self.tmp2.axpby(1., 1., self.full_gradient, out=out)
+
+        self.iter += 1
+
+        # Check whether to update the full gradient and snapshot image
+        # Setting self.update_frequency to inf indicates that we never want to conduct the update
+        if np.isinf(self.update_frequency) == False and self.iter % (self.update_frequency * self.num_subsets) == 0: 
+            self.memory_update(x)
+
+        # Apply preconditioning
+        if self.precond is not None:
+            if out is None:
+                ret.multiply(self.precond(self.subset_num,x),out=ret)
+            else:
+                out.multiply(self.precond(self.subset_num,x),out=out)
+
+        if out is None:
+            return ret
+
+    def memory_init(self, x):
+        
+        """        
+            initialise the full gradient and the snapshot, and store in memory.
+        """
+        # Setting the gradient variables with the correct acquisition geometry
+        self.full_gradient = x * 0.0
+        self.tmp2 = x * 0.0
+        self.tmp1 = x * 0.0
+
+        # Initialise the gradient and the snapshot
+        self.memory_update(x)        
+        self.gradients_allocated = True # maybe change flag name since svrg stores more than just the gradients  (less memory req)
+    
+    def memory_update(self, x):
+        """
+            update snapshot and full gradient estimator stored in memory
+        """
+        self._full_gradient(x, out = self.full_gradient)
+        self.snapshot = x.clone()
+
+    def memory_reset(self):
+        """        
+            resets subset gradients and full gradient in memory.
+        """
+        if self.gradients_allocated == True:
+            del(self.subset_gradients)
+            del(self.full_gradient)
+            del(self.tmp2)
+            del(self.tmp1)
+
+            self.gradients_allocated = False
+
+
+class LSVRGFunction(SVRGFunction):
+    '''Class for use as objective function in gradient type algorithms to enable the use of subsets.
+    The `gradient` method doesn't return the mathematical gradient of the sum of functions, 
+    but rather a variance-reduced approximated gradient corresponding to the minibatch SVRG algorithm.
+    More details can be found below, in the gradient method.
+    Parameters:
+    -----------
+    - (optional) 
+        precond: function taking into input an integer (subset_num) and a DataContainer and outputting a DataContainer
+        serves as diagonal preconditioner
+        default None
+           
+    '''
+    def __init__(self, functions, precond=None, update_frequency = 2, **kwargs):
+
+        super(LSVRGFunction, self).__init__(functions, precond=None, update_frequency = 2, **kwargs)
+        self.probability_threshold = 1.0/(self.update_frequency*self.num_subsets)
+        self.update_probability = 1.0
+
+    def gradient(self, x, out=None):
+        """
+        Returns a variance-reduced approximate gradient, defined below.
+        For f = 1/num_subsets \sum_{i=1}^num_subsets f_i, the output is computed as follows:
+            - choose a subset j with function next_subset()
+            - check if full_grad_at_snapshot and snapshot should be updated
+            - if they shouldn't then compute
+                subset_gradient - subset_gradient_at_snapshot + full_grad_at_snapshot
+                where 
+                - subset_grad is the gradient of function number j at current_iterate
+                - subset_grad_at_snapshot is the gradient of function number j at snapshot in memory
+                - full_grad_at_snapshot is the approximation of the gradient of f in memory
+            - otherwise update full_grad_at_snapshot and snapshot
+            - this gives an unbiased estimator of the gradient
+
+        Reference:
+        Kovalev, Dmitry; Horvath, Samuel; Richtarik, Peter
+        "Don’t Jump Through Hoops and Remove Those Loops:
+        SVRG and Katyusha are Better Without the Outer Loop." 
+        International Conference on algorithmioc Learning Theory. 2020.
+        """
+        if not self.gradients_allocated:
+            self.memory_init(x)         
+        # Select the next subset (uniformly at random by default). This generates self.subset_num
+        self.next_subset()
+
+        # In first iteration, or if the snapshot image has just been updated, the current iterate and snapshot will be the same
+        # thus tmp2 = 0
+        if self.iter == 0 or self.update_probability < self.probability_threshold:
+            self.tmp2 = 0.0 * self.full_gradient
+        else:
+            # Compute new gradient for current subset, store in tmp1
+            self.functions[self.subset_num].gradient(x, out=self.tmp1) 
+
+            # Compute difference between current subset function gradient at current iterate (tmp1) and at snapshot, store in tmp2
+            self.tmp1.axpby(1., -1., self.functions[self.subset_num].gradient(self.snapshot), out=self.tmp2)
+
+        # Compute the output: tmp2 + full_gradient
+        if out is None:
+            ret = 0.0 * self.tmp2
+            self.tmp2.axpby(1., 1., self.full_gradient, out=ret)
+        else:
+            self.tmp2.axpby(1., 1., self.full_gradient, out=out)
+
+        self.iter +=1 # L-SVRG in principle does not need this variable
+
+        # Check whether to update the full gradient and snapshot image
+        # Setting self.update_frequency to inf indicates that we we never want to conduct the update
+        self.update_probability = np.random.uniform() 
+        if np.isinf(self.update_frequency) == False and self.update_probability < self.probability_threshold: 
+            self.memory_update(x)
+
+        # Apply preconditioning
+        if self.precond is not None:
+            if out is None:
+                ret.multiply(self.precond(self.subset_num,x),out=ret)
+            else:
+                out.multiply(self.precond(self.subset_num,x),out=out)
+
+        if out is None:
+            return ret

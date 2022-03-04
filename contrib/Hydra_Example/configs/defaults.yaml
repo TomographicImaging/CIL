@@ -1,0 +1,12 @@
+hydra: 
+  run:
+    dir: outputs/RNA/${Experiment.name}/${Algorithm.name}
+  sweep:
+    dir: outputs/RNA/${Experiment.name}/${Algorithm.name}/${Hyperparameters.N}
+
+
+defaults:
+  - Experiment: Phantom
+  - Function: Leastsquares
+  - Algorithm: ISTA
+  - Hyperparameters: Hyperparameters

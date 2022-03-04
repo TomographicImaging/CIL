@@ -1,0 +1,15 @@
+Experiment:
+  _target_: src.Experiment.Tomophantom.Tomophantom
+  name: Tomophantom
+Function:
+  _target_: src.Function.Leastsquares.Leastsquares
+  name: Least Squares
+Algorithm:
+  _target_: src.Algorithm.ISTA.ISTA_Algo
+  name: ISTA
+Hyperparameters:
+  RNA_reg: 1.0e-05
+  'N': 20
+  Beta: -1
+  Epochs: 100
+  RNA: true

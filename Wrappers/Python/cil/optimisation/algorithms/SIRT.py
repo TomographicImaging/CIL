@@ -19,10 +19,11 @@ from cil.optimisation.functions import IndicatorBox
 from numpy import inf
 import numpy
 import warnings
+import logging
 
 class SIRT(Algorithm):    
 
-    r"""Simultaneous Iterative Reconstruction Technique 
+    r"""Simultaneous Iterative Reconstruction Technique
 
     Simultaneous Iterative Reconstruction Technique (SIRT) solves
     the following problem
@@ -114,7 +115,7 @@ class SIRT(Algorithm):
         Initialisation of the algorithm    
         """
 
-        print("{} setting up".format(self.__class__.__name__, ))
+        logging.info("{} setting up".format(self.__class__.__name__, ))
         
         self.x = initial.copy()
         self.operator = operator
@@ -159,7 +160,7 @@ class SIRT(Algorithm):
 
 
         self.configured = True
-        print("{} configured".format(self.__class__.__name__, ))
+        logging.info("{} configured".format(self.__class__.__name__, ))
           
     def update(self):
 

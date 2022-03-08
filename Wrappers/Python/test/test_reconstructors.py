@@ -624,12 +624,29 @@ class Test_FBP_results(unittest.TestCase):
 
 
     @unittest.skipUnless(has_tigre and has_tigre_gpu and has_ipp, "TIGRE or IPP not installed")
-    def test_results_2D(self):
+    def test_results_2D_tigre(self):
 
         data2D = self.acq_data.get_slice(vertical='centre')
         img_data2D = self.img_data.get_slice(vertical='centre')
 
         reconstructor = FBP(data2D)
+        reco = reconstructor.run(verbose=0)
+        np.testing.assert_allclose(reco.as_array(), img_data2D.as_array(),atol=1e-3)    
+
+        reco2 = reco.copy()
+        reco2.fill(0)
+        reconstructor.run(out=reco2, verbose=0)
+        np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)    
+
+
+    @unittest.skipUnless(has_astra and has_astra_gpu and has_ipp, "ASTRA or IPP not installed")
+    def test_results_2D_astra(self):
+
+        data2D = self.acq_data.get_slice(vertical='centre')
+        data2D.reorder('astra')
+        img_data2D = self.img_data.get_slice(vertical='centre')
+
+        reconstructor = FBP(data2D, backend='astra')
         reco = reconstructor.run(verbose=0)
         np.testing.assert_allclose(reco.as_array(), img_data2D.as_array(),atol=1e-3)    
 

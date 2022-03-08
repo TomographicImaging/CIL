@@ -45,7 +45,7 @@ class TotalVariation(Function):
     .. math:: \mathrm{prox}_{\tau \mathrm{TV}}(b) := \underset{u}{\mathrm{argmin}} \frac{1}{2\tau}\|u - b\|^{2} + \mathrm{TV}(u)
     
     The algorithm used for the proximal operator of TV is the Fast Gradient Projection algorithm (or FISTA)
-    applied to the "dual" form of the above problem, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`.
+    applied to the _dual problem_ of the above problem, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`.
 
 
 
@@ -88,6 +88,16 @@ class TotalVariation(Function):
         .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\tau}\|u - b\|^{2} + \mathrm{TV}(u) + \frac{\gamma}{2}\|u\|^{2} \Leftrightarrow
 
         .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\frac{\tau}{1+\gamma\tau}}\|u - \frac{b}{1+\gamma\tau}\|^{2} + \mathrm{TV}(u) 
+
+    Note
+    ----
+
+    In the case where the Total variation becomes a :math:`\gamma` - strongly convex function, i.e.,
+
+    .. math:: \mathrm{TV}(u) + \frac{\gamma}{2}\|u\|^{2}
+
+    \gamma should be _relatively small_, so as the second term above will not act as an additional regulariser.
+    For more information, see :cite:`Rasch2020`, :cite:`CP2011`.
 
 
 

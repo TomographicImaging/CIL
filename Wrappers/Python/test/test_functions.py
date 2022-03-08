@@ -979,6 +979,12 @@ class TestTotalVariation(unittest.TestCase):
         # TV as strongly convex, with "small" strongly convex constant
         TV_strongly_convex = self.alpha * TotalVariation(strong_convexity_constant=1e-4)
 
+        # check call
+        x_real = self.ig_real.allocate('random', seed=4) 
+        res1 = TV_strongly_convex(x_real)
+        res2 = TV_no_strongly_convex(x_real) + (TV_strongly_convex.strong_convexity_constant/2)*x_real.squared_norm()
+        np.testing.assert_allclose(res1, res2, atol=1e-3)        
+
         # check proximal
         x_real = self.ig_real.allocate('random', seed=4) 
         res1 = TV_no_strongly_convex.proximal(x_real, tau=1.0)
@@ -993,6 +999,12 @@ class TestTotalVariation(unittest.TestCase):
 
         # TV as strongly convex, with "small" strongly convex constant
         FGP_TV_strongly_convex = self.alpha * FGP_TV(strong_convexity_constant=1e-3)
+
+        # check call
+        x_real = self.ig_real.allocate('random', seed=4) 
+        res1 = FGP_TV_strongly_convex(x_real)
+        res2 = FGP_TV_no_strongly_convex(x_real) + (FGP_TV_strongly_convex.strong_convexity_constant/2)*x_real.squared_norm()
+        np.testing.assert_allclose(res1, res2, atol=1e-3)        
 
         # check proximal
         x_real = self.ig_real.allocate('random', seed=4)         

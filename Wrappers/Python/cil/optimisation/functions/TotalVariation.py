@@ -15,7 +15,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from cil.optimisation.functions import Function, IndicatorBox
+from cil.optimisation.functions import Function, IndicatorBox, MixedL21Norm
 from cil.optimisation.operators import GradientOperator
 import numpy as np
 from numbers import Number
@@ -161,8 +161,8 @@ class TotalVariation(Function):
         # Define orthogonal projection onto the convex set C
         self.lower = lower
         self.upper = upper
-        self.tmp_proj_C = IndicatorBox(lower, upper).proximal
-                        
+        self.projection_C = IndicatorBox(lower, upper).proximal
+             
         # Setup GradientOperator as None. This is to avoid domain argument in the __init__     
         self._gradient = None
         self._domain = None
@@ -207,20 +207,11 @@ class TotalVariation(Function):
         else:
             return self.regularisation_parameter * self.gradient.direct(x).pnorm(1).sum() + tmp
     
-    
-    def projection_C(self, x, out=None):   
-                     
-        r""" Returns the proximal operator of the :class:`.IndicatorBox` at :code:`x` ."""
-
-        try:
-            self._domain = x.geometry
-        except:
-            self._domain = x
-        return self.tmp_proj_C(x, tau = None, out = out)
                         
     def projection_P(self, x, out=None):
                        
-        r""" Returns the proximal operator of the :class:`.MixedL21Norm` at :code:`x` ."""
+        r""" Returns the proximal operator of the convex conjugate of the :class:`.MixedL21Norm` at :code:`x`.
+        """
 
         try:
             self._domain = x.geometry
@@ -278,7 +269,7 @@ class TotalVariation(Function):
             
             # axpby now works for matrices
             tmp_x.axpby(-self.regularisation_parameter*tau, 1.0, x, out=tmp_x)
-            self.projection_C(tmp_x, out = tmp_x)                       
+            self.projection_C(tmp_x, tau=None, out = tmp_x)                       
 
             self.gradient.direct(tmp_x, out=p1)
             if isinstance (tau, (Number, np.float32, np.float64)):
@@ -336,7 +327,7 @@ class TotalVariation(Function):
         tmp_x *= self.regularisation_parameter 
         x.subtract(tmp_x, out=tmp_x)
 
-        return self.projection_C(tmp_x, out=out)  
+        return self.projection_C(tmp_x, tau=None, out=out)  
     
     def convex_conjugate(self,x):   
         r""" Returns the value of convex conjugate of the TotalVariation function at :code:`x` ."""             

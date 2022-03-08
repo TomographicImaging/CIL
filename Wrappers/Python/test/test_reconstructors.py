@@ -600,7 +600,7 @@ class Test_FBP_results(unittest.TestCase):
         reconstructor = FBP(self.acq_data, backend='astra')
 
         reco = reconstructor.run(verbose=0)
-        np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=1e-1)    
+        np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=1e-3)    
 
         reco2 = reco.copy()
         reco2.fill(0)

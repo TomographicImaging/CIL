@@ -22,6 +22,7 @@ import warnings
 from cil.utilities.multiprocessing import NUM_THREADS
 from cil.framework import ImageGeometry
 import numpy as np
+import logging
 
 NEUMANN = 'Neumann'
 PERIODIC = 'Periodic'
@@ -181,7 +182,7 @@ class Gradient_numpy(LinearOperator):
         super(Gradient_numpy, self).__init__(domain_geometry = domain_geometry, 
                                              range_geometry = range_geometry) 
         
-        print("Initialised GradientOperator with numpy backend")               
+        logging.info("Initialised GradientOperator with numpy backend")           
         
     def direct(self, x, out=None): 
          if out is not None:  
@@ -326,7 +327,9 @@ class Gradient_C(LinearOperator):
         
         super(Gradient_C, self).__init__(domain_geometry=domain_geometry, 
                                          range_geometry=range_geometry) 
-        print("Initialised GradientOperator with C backend running with ", cilacc.openMPtest(self.num_threads)," threads")               
+                                         
+        logging.info("Initialised GradientOperator with C backend running with ", cilacc.openMPtest(self.num_threads)," threads")                                            
+            
 
     @staticmethod 
     def datacontainer_as_c_pointer(x):

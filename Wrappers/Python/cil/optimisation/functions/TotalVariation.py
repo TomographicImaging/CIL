@@ -82,7 +82,7 @@ class TotalVariation(Function):
         Information is printed for the stopping criterion of the FGP algorithm
 
     strong_convexity_constant : :obj:`float`, default = 0
-        A strongly convex term weighted by the :code:`strong_convexity_constant` (:math:`gamma`) parameter is added to the Total variation. 
+        A strongly convex term weighted by the :code:`strong_convexity_constant` (:math:`\gamma`) parameter is added to the Total variation. 
         Now the :code:`TotalVariation` function is :math:`\gamma` - strongly convex and the proximal operator is
 
         .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\tau}\|u - b\|^{2} + \mathrm{TV}(u) + \frac{\gamma}{2}\|u\|^{2} \Leftrightarrow
@@ -96,7 +96,7 @@ class TotalVariation(Function):
 
     .. math:: \mathrm{TV}(u) + \frac{\gamma}{2}\|u\|^{2}
 
-    \gamma should be _relatively small_, so as the second term above will not act as an additional regulariser.
+    :math:`\gamma` should be relatively small, so as the second term above will not act as an additional regulariser.
     For more information, see :cite:`Rasch2020`, :cite:`CP2011`.
 
 
@@ -114,7 +114,7 @@ class TotalVariation(Function):
     Examples
     --------
 
-    .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\tau}\|u - b\|^{2} + \alpha\|\nabla u\|_{1,1} + \mathbb{I}_{C}(u)
+    .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2}\|u - b\|^{2} + \alpha\|\nabla u\|_{1,1} + \mathbb{I}_{C}(u)
 
     where :math:`C = \{1.0\leq u\leq 2.0\}`.
 
@@ -129,7 +129,7 @@ class TotalVariation(Function):
     .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2}\|u - b\|^{2} + (\alpha\|\nabla u\|_{2,1} + \frac{\gamma}{2}\|u\|^{2})
 
     >>> alpha = 2.0
-    >>> gamma = 0.5
+    >>> gamma = 1e-3
     >>> TV = alpha * TotalVariation(isotropic=False, strong_convexity_constant=gamma)
     >>> sol = TV.proxima(b, tau = 1.0)    
 

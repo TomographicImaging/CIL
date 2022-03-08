@@ -25,53 +25,107 @@ import warnings
 
 class TotalVariation(Function):
     
-    r'''Fast Gradient Projection algorithm for Total Variation(TV) regularisation
+    r""" Total variation Function
+
+    .. math:: \mathrm{TV}(u) := \|\nabla u\|_{2,1} = \sum \|\nabla u\|_{2},\, (\mbox{isotropic})
+
+    .. math:: \mathrm{TV}(u) := \|\nabla u\|_{1,1} = \sum \|\nabla u\|_{1}\, (\mbox{anisotropic})
+
+    Notes
+    -----
+
+    The :code:`TotalVariation` (TV) :code:`Function` acts as a compositite function, i.e.,
+    the composition of the :class:`.MixedL21Norm` fuction and the :class:`.GradientOperator` operator,
+
+    .. math:: f(u) = \|u\|_{2,1}, \Rightarrow (f\circ\nabla)(u) = f(\nabla x) = \mathrm{TV}(u)
+
+    In that case, the proximal operator of TV does not have an exact solution and we use an iterative 
+    algorithm to solve:
+
+    .. math:: \mathrm{prox}_{\tau \mathrm{TV}}(b) := \underset{u}{\mathrm{argmin}} \frac{1}{2\tau}\|u - b\|^{2} + \mathrm{TV}(u)
     
-    .. math::  \min_{x} \frac{1}{2}||x-b||^{2}_{2} + \tau\alpha TV(x)
-                
-    Parameters:
-      
-      :param max_iteration: max iterations of FGP algorithm
-      :type max_iteration: int, default 100
-      :param tolerance: Stopping criterion
-      :type tolerance: float, default `None` 
-      :param correlation: Correlation between `Space` and/or `SpaceChannels` for the GradientOperator
-      :type correlation: str, default 'Space'
-      :param backend: Backend to compute finite differences for the GradientOperator
-      :type backend: str, default 'c'
-      :param lower: lower bound for the orthogonal projection onto the convex set C
-      :type lower: Number, default `-np.inf`
-      :param upper: upper bound for the orthogonal projection onto the convex set C
-      :type upper: Number, default `+np.inf`
-      :param isotropic: L2 norm is used for Gradient Operator (isotropic) 
-      :type isotropic: bool, default `True` 
-      
-                        .. math:: \sum \sqrt{(\partial_y u)^{2} + (\partial_x u)^2} \mbox{ (isotropic) }
+    The algorithm used for the proximal operator of TV is the Fast Gradient Projection algorithm (or FISTA)
+    applied to the "dual" form of the above problem, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`.
 
-                        .. math:: \sum |\partial_y u| + |\partial_x u| \mbox{ (anisotropic) }
-       
-      :param split: splits the Gradient into spatial Gradient and spectral Gradient for multichannel data
-      :type split: bool, default `False`           
-      :param info: force a print to screen stating the stop
-      :type info: bool, default `False`
-      :param strong_convexity_constant: Adds a strongly convex function to the TotalVariation functional.
-      :type: float, default = 0
 
-      :Example:
- 
-      TV = alpha * TotalVariation()
-      sol = TV.proximal(data, tau = 1.0) 
 
-      .. note:: `tau` can be a number or an array. The latter case implies that step-size preconditioning is applied.
 
-    Reference:
-      
-        A. Beck and M. Teboulle, "Fast Gradient-Based Algorithms for Constrained Total Variation 
-        Image Denoising and Deblurring Problems," in IEEE Transactions on Image Processing,
-        vol. 18, no. 11, pp. 2419-2434, Nov. 2009, 
-        doi: 10.1109/TIP.2009.2028250.
+    Parameters
+    ----------
+
+    max_iteration : :obj:`int`, default = 100
+        Maximum number of iterations for the FGP algorithm.
+    tolerance : :obj:`float`, default = None
+        Stopping criterion for the FGP algorithm.
         
-    '''    
+        .. math:: \|x^{k+1} - x^{k}\|_{2} < \mathrm{tolerance}
+
+    correlation : :obj:`str`, default = `Space`
+        Correlation between `Space` and/or `SpaceChannels` for the :class:`.GradientOperator`.
+    backend :  :obj:`str`, default = `c`      
+        Backend to compute the :class:`.GradientOperator`
+    lower : :obj:`'float`, default = `-np.inf`
+        A constraint is enforced using the :class:`.IndicatorBox` function, e.g., :code:`IndicatorBox(lower, upper)`.
+    upper : :obj:`'float`, default = `np.inf`
+        A constraint is enforced using the :class:`.IndicatorBox` function, e.g., :code:`IndicatorBox(lower, upper)`.  
+    isotropic : :obj:`boolean`, default = True
+        Use either isotropic or anisotropic definition of TV.
+
+        .. math:: |x|_{2} = \sqrt{x_{1}^{2} + x_{2}^{2}},\, (\mbox{isotropic})
+
+        .. math:: |x|_{1} = |x_{1}| + |x_{2}|\, (\mbox{anisotropic})
+
+    split : :obj:`boolean`, default = False
+        Splits the Gradient into spatial gradient and spectral or temporal gradient for multichannel data.
+
+    info : :obj:`boolean`, default = False
+        Information is printed for the stopping criterion of the FGP algorithm
+
+    strong_convexity_constant : :obj:`float`, default = 0
+        A strongly convex term weighted by the :code:`strong_convexity_constant` (:math:`gamma`) parameter is added to the Total variation. 
+        Now the :code:`TotalVariation` function is :math:`\gamma` - strongly convex and the proximal operator is
+
+        .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\tau}\|u - b\|^{2} + \mathrm{TV}(u) + \frac{\gamma}{2}\|u\|^{2} \Leftrightarrow
+
+        .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\frac{\tau}{1+\gamma\tau}}\|u - \frac{b}{1+\gamma\tau}\|^{2} + \mathrm{TV}(u) 
+
+
+
+
+    Examples
+    --------
+
+    .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2}\|u - b\|^{2} + \alpha\|\nabla u\|_{2,1}
+
+    >>> alpha = 2.0
+    >>> TV = TotalVariation()
+    >>> sol = TV.proxima(b, tau = alpha)
+
+    Examples
+    --------
+
+    .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\tau}\|u - b\|^{2} + \alpha\|\nabla u\|_{1,1} + \mathbb{I}_{C}(u)
+
+    where :math:`C = \{1.0\leq u\leq 2.0\}`.
+
+    >>> alpha = 2.0
+    >>> TV = TotalVariation(isotropic=False, lower=1.0, upper=2.0)
+    >>> sol = TV.proxima(b, tau = alpha)    
+
+
+    Examples
+    --------
+
+    .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2}\|u - b\|^{2} + (\alpha\|\nabla u\|_{2,1} + \frac{\gamma}{2}\|u\|^{2})
+
+    >>> alpha = 2.0
+    >>> gamma = 0.5
+    >>> TV = alpha * TotalVariation(isotropic=False, strong_convexity_constant=gamma)
+    >>> sol = TV.proxima(b, tau = 1.0)    
+
+
+
+    """   
     
     
     def __init__(self,
@@ -137,7 +191,7 @@ class TotalVariation(Function):
 
     def __call__(self, x):
         
-        r''' Returns the value of the \alpha * TV(x)'''
+        r""" Returns the value of the TotalVariation function at :code:`x` ."""
         try:
             self._domain = x.geometry
         except:
@@ -156,7 +210,7 @@ class TotalVariation(Function):
     
     def projection_C(self, x, out=None):   
                      
-        r''' Returns orthogonal projection onto the convex set C'''
+        r""" Returns the proximal operator of the :class:`.IndicatorBox` at :code:`x` ."""
 
         try:
             self._domain = x.geometry
@@ -166,7 +220,8 @@ class TotalVariation(Function):
                         
     def projection_P(self, x, out=None):
                        
-        r''' Returns the projection P onto \|\cdot\|_{\infty} '''  
+        r""" Returns the proximal operator of the :class:`.MixedL21Norm` at :code:`x` ."""
+
         try:
             self._domain = x.geometry
         except:
@@ -198,7 +253,7 @@ class TotalVariation(Function):
     
     def proximal(self, x, tau, out = None):
         
-        ''' Returns the solution of the FGP_TV algorithm '''         
+        r""" Returns the proximal operator of the TotalVariation function at :code:`x` ."""        
         try:
             self._domain = x.geometry
         except:
@@ -283,11 +338,13 @@ class TotalVariation(Function):
 
         return self.projection_C(tmp_x, out=out)  
     
-    def convex_conjugate(self,x):        
+    def convex_conjugate(self,x):   
+        r""" Returns the value of convex conjugate of the TotalVariation function at :code:`x` ."""             
         return 0.0    
 
     @property
     def L(self):
+        r""" Lipschitz constant of the "dual" TV-problem used in the FGP algorithm."""         
         if self._L is None:
             self.calculate_Lipschitz()
         return self._L
@@ -300,14 +357,15 @@ class TotalVariation(Function):
             raise TypeError('The Lipschitz constant is a real positive number')
 
     def calculate_Lipschitz(self):
+        r""" Default value for the Lipschitz constant."""
+        
         # Compute the Lipschitz parameter from the operator if possible
         # Leave it initialised to None otherwise
         self._L = (1./self.gradient.norm())**2  
     
     @property
     def gradient(self):
-        """
-            GradientOperator is created using the self._domain
+        r""" GradientOperator is created using the self._domain.
         """
         if self._domain is not None:
             self._gradient = GradientOperator(self._domain, correlation = self.correlation, backend = self.backend)

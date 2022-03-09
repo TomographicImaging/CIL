@@ -151,7 +151,11 @@ class SIRT(Algorithm):
         self.configured = True
         logging.info("{} configured".format(self.__class__.__name__, ))
 
-    def _fix_weights(self):
+    def fix_weights(self):
+
+        r""" In case of division error when the preconditioning arrays :code:`M` and :code:`D`
+        are defined, the :code:`np.nan`, :code:`+np.inf` and :code:`-np.inf` values are replaced with one.
+        """
         
         # fix for possible inf values (code from numpy.nan_to_nam)
         np_version = numpy.__version__.split('.')

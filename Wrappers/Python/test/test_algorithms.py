@@ -759,7 +759,7 @@ class TestSIRT(unittest.TestCase):
 
         tmp_initial = self.ig.allocate()
         sirt = SIRT(initial = tmp_initial, operator=Aop_nan_inf, data=self.bop, max_iteration=5)  
-        sirt._fix_weights()
+        sirt.fix_weights()
         
         self.assertFalse(np.any(sirt.M == inf))
         self.assertFalse(np.any(sirt.D == inf))   

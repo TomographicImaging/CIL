@@ -23,7 +23,7 @@ import logging
 
 class SIRT(Algorithm):    
 
-    r"""Simultaneous Iterative Reconstruction Technique
+    r"""Simultaneous Iterative Reconstruction Technique, see :cite:`Kak2001`.
 
     Simultaneous Iterative Reconstruction Technique (SIRT) solves
     the following problem
@@ -65,8 +65,18 @@ class SIRT(Algorithm):
 
     If :code:`constraint` is passed, :code:`proximal` method is required to be implemented.
 
-    If :math:`M = \frac{1}{A*\mathbb{1}}`, :math:`D = \frac{1}{A^{T}\mathbb{1}}` contain :code:`NaN`, :math:`\pm\inf`
-    they are replaced by :math:`1`.
+    Note
+    ----
+
+    The preconditioning arrays (weights) :code:`M` and :code:`D` used in SIRT are defined as
+
+    .. math:: M = \frac{1}{A*\mathbb{1}} = \frac{1}{\sum_{j}a_{i,j}}
+
+    .. math:: D = \frac{1}{A*\mathbb{1}} = \frac{1}{\sum_{i}a_{i,j}}
+
+    In case of division errors above, :meth:`._fix_weights` can be used, where :code:`np.nan`, :code:`+np.inf` and :code:`-np.inf` values
+    are replaced with 1.0.
+
 
 
     
@@ -138,9 +148,12 @@ class SIRT(Algorithm):
         self.M = 1./self.operator.direct(self.operator.domain_geometry().allocate(value=1.0))                
         self.D = 1./self.operator.adjoint(self.operator.range_geometry().allocate(value=1.0))
 
-        # fix for possible inf values (code from numpy.nan_to_nam)
-        # TODO replace with
+        self.configured = True
+        logging.info("{} configured".format(self.__class__.__name__, ))
 
+    def _fix_weights(self):
+        
+        # fix for possible inf values (code from numpy.nan_to_nam)
         np_version = numpy.__version__.split('.')
         if np_version[0]=='1' and np_version[1]<='17':
             for arr in [self.M, self.D]:
@@ -151,17 +164,11 @@ class SIRT(Algorithm):
                 arr[idx_nan] = 1.
                 arr[idx_pinf] = 1.
                 arr[idx_ninf] = 1.
-                tmp.fill(arr)
-            
+                tmp.fill(arr)            
         else:            
             numpy.nan_to_num(self.M.as_array(), copy = False, nan = 1, neginf=1, posinf=1) 
             numpy.nan_to_num(self.D.as_array(), copy = False, nan = 1, neginf=1, posinf=1) 
 
-
-
-        self.configured = True
-        logging.info("{} configured".format(self.__class__.__name__, ))
-          
     def update(self):
 
         r""" Performs a single iteration of the SIRT algorithm
@@ -185,9 +192,9 @@ class SIRT(Algorithm):
         """
         self.loss.append(self.r.squared_norm())
 
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod(verbose=True)
+# if __name__ == "__main__":
+#     import doctest
+#     doctest.testmod(verbose=True)
 
 
 

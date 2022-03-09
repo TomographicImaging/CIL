@@ -1,11 +1,8 @@
 '''
 
 This is a test for SGD comparing to ISTA and SAGA on noisy CT example.
-Seems that SGD can be even faster than SAGA in this example. (There is a further need of implementing shrinking step-sizes for SGD)
-
-Here ISTA function is modified to take into account the n_subsets (default=1 for detereministic ISTA) to ensure right scaling factor
-
---Billy 23/2/2022
+Seems that SGD can be even faster than SAGA in this example.
+--Billy 9/3/2022
 
 '''
 
@@ -32,7 +29,7 @@ import importlib
 
 # Define SAGAFunction
 import sys
-cil_path = '/store/CIA/jt814/cil_codes/CIL-master/Wrappers'
+cil_path = '/store/CIA/jt814/cil_codes/CIL-StochasticDev/Wrappers'
 fun_path = 'Wrappers/Python/cil/optimisation/functions'
 sys.path.append(cil_path + fun_path)
 import SubsetSumFunction
@@ -62,8 +59,8 @@ A = ProjectionOperator(ig, ag, device='gpu')
 sino = A.direct(phantom)
 
 # Simulate Gaussian noise for the sinogram
-noise_scale = 5
-tv_reg_scale = 100
+noise_scale = 5 #/ 5
+tv_reg_scale = 10#100 #/ 5
 
 gaussian_var = 0.5 * noise_scale
 gaussian_mean = 0
@@ -122,7 +119,7 @@ class GradientDescent(Algorithm):
 
 
 importlib.reload(SubsetSumFunction)
-from SubsetSumFunction import SumFunction
+from SubsetSumFunction import AveragedSumFunction
 
 
 class ISTA(Algorithm):
@@ -139,22 +136,22 @@ class ISTA(Algorithm):
         SIAM journal on imaging sciences 2.1 (2009)
     """
 
-    def __init__(self, initial=None, f=None, g=None, step_size=1, n_subsets=1, **kwargs):
+    def __init__(self, initial=None, f=None, g=None, step_size=1, **kwargs):
         super(ISTA, self).__init__(**kwargs)
 
-        self.set_up(initial=initial, f=f, g=g, step_size=step_size, n_subsets=n_subsets)
+        self.set_up(initial=initial, f=f, g=g, step_size=step_size)
 
-    def set_up(self, initial, f, g, step_size, n_subsets):
+    def set_up(self, initial, f, g, step_size):
         self.f = f
         self.g = g
         self.x = initial.copy()
-        self.objective_function = SumFunction(f, g)
+        self.objective_function = AveragedSumFunction(f, g)
         self.x_update = initial.copy()
         self.step_size = step_size
         self.update_objective()
         self.update_step_size = False
         self.configured = True
-        self.n_subsets = n_subsets
+
 
     def update(self):
         '''Single iteration'''
@@ -162,12 +159,56 @@ class ISTA(Algorithm):
         self.x_update = self.f.gradient(self.x)
         self.x_update *= -self.step_size
         self.x += self.x_update
-        self.x = self.g.proximal(self.x, self.step_size/self.n_subsets)
+        self.x = self.g.proximal(self.x, self.step_size)
 
     def update_objective(self):
         self.loss.append(self.objective_function(self.x))
 
 
+
+class ISTA_shrinkingstepsize(Algorithm):
+    """
+        Iterative Shrinkage-Thresholding Algorithm with shrinking step size 1/sqrt(1+ nIter*sf) L
+        Goal: minimize f + g with f smooth, g simple
+
+        Convergence guarantee:
+        - f,g convex
+        - step-size < 1/L where the gradient of f is L-Lipschitz
+
+        The shrinking step-size is necessary for ensuring the convergence of vanilla stochastic gradients
+    """
+
+    def __init__(self, initial=None, f=None, g=None, sf=1.0/50, step_size=1, **kwargs):
+        super(ISTA_shrinkingstepsize, self).__init__(**kwargs)
+
+        self.set_up(initial=initial, f=f, g=g, sf=sf, step_size=step_size)
+
+    def set_up(self, initial, f, g, step_size, sf):
+        self.f = f
+        self.g = g
+        self.x = initial.copy()
+        self.objective_function = AveragedSumFunction(f, g)
+        self.x_update = initial.copy()
+        self.step_size = step_size
+        self.update_objective()
+        self.update_step_size = False
+        self.configured = True
+        self.nIter = 1
+        self.sf = sf
+
+
+    def update(self):
+        '''Single iteration'''
+
+        scaled_step_size = self.step_size / np.sqrt(1 + self.nIter * self.sf)
+        self.x_update = self.f.gradient(self.x)
+        self.x_update *= -scaled_step_size
+        self.x += self.x_update
+        self.x = self.g.proximal(self.x, scaled_step_size)
+        self.nIter += 1
+
+    def update_objective(self):
+        self.loss.append(self.objective_function(self.x))
 
 # gradient descent (no non-neg constraint)
 # num_epochs = 20
@@ -179,21 +220,23 @@ class ISTA(Algorithm):
 #                      max_iteration=1000)
 # gd.run(num_epochs, verbose=0)
 
+# Define number of subsets
+n_subsets = 10
+nsc = 1/n_subsets
 
 # ISTA
-num_epochs = 20
-f_gd = LeastSquares(A, noisy_sino)
+num_epochs = 60
+f_gd = LeastSquares(A, noisy_sino) * nsc
 initial = ig.allocate(0)
 step_size = 1 / f_gd.L
 g = IndicatorBox(lower=0)
 ista = ISTA(initial=initial, f=f_gd, g=g,
                      step_size=step_size, update_objective_interval=1,
-                     max_iteration=1000)
+                     max_iteration=3000)
 ista.run(num_epochs, verbose=0)
 
 
-# Define number of subsets
-n_subsets = 10
+
 
 # Initialize the lists containing the F_i's and A_i's
 f_subsets = []
@@ -222,10 +265,10 @@ F = BlockFunction(*f_subsets)
 
 
 importlib.reload(SubsetSumFunction)
-from SubsetSumFunction import SumFunction
+from SubsetSumFunction import AveragedSumFunction
 from SubsetSumFunction import SAGAFunction, SGDFunction
 
-num_epochs = 20
+num_epochs = 60
 F_saga = SAGAFunction(F)
 # admissible step-size is gamma = 1/ (3 max_i L_i)
 step_size = 1 / (3*F_saga.Lmax)
@@ -235,7 +278,7 @@ saga = ISTA(initial=initial,
             f=F_saga,
             g=g,
             step_size=step_size, update_objective_interval=n_subsets,
-            max_iteration=10000)
+            max_iteration=30000)
 saga.run(num_epochs * n_subsets, verbose=0)
 
 F_sgd = SGDFunction(F)
@@ -247,7 +290,7 @@ sgd = ISTA(initial=initial,
             f=F_sgd,
             g=g,
             step_size=step_size, update_objective_interval=n_subsets,
-            max_iteration=10000)
+            max_iteration=30000)
 sgd.run(num_epochs * n_subsets, verbose=0)
 
 
@@ -275,7 +318,7 @@ plt.show()
 
 # ISTA
 num_epochs = 60
-f_gd = LeastSquares(A, noisy_sino)
+f_gd = LeastSquares(A, noisy_sino) * nsc
 initial = ig.allocate(0)
 step_size = 1 / f_gd.L
 lb = 0.01 * tv_reg_scale
@@ -296,7 +339,7 @@ F_saga.memory_reset()
 saga_tv = ISTA(initial=initial,
             f=F_saga,
             g=g,
-            step_size=step_size, n_subsets=n_subsets, update_objective_interval=n_subsets,
+            step_size=step_size, update_objective_interval=n_subsets,
             max_iteration=30000)
 saga_tv.run(num_epochs * n_subsets, verbose=0)
 
@@ -311,27 +354,27 @@ initial = ig.allocate(0)
 sgd_tv = ISTA(initial=initial,
             f=F_sgd,
             g=g,
-            step_size=step_size, n_subsets=n_subsets, update_objective_interval=n_subsets,
+            step_size=step_size, update_objective_interval=n_subsets,
             max_iteration=30000)
 sgd_tv.run(num_epochs * n_subsets, verbose=0)
 
 
-# SGD2 
+# SGD2 #*(1.0/n_subsets)
 num_epochs = 60
 F_sgd2 = SGDFunction(F)
 # admissible step-size is gamma = 1/ (3 max_i L_i)
-step_size2 = 1 / (3*F_sgd2.Lmax)
+step_size2 = 1 / (1*F_sgd2.Lmax)
 initial = ig.allocate(0)
 #F_sgd.memory_reset()
-sgd_tv2 = ISTA(initial=initial,
+sgd_tv2 = ISTA_shrinkingstepsize(initial=initial,
             f=F_sgd2,
             g=g,
-            step_size=step_size2, n_subsets=n_subsets, update_objective_interval=n_subsets,
+            step_size=step_size2, update_objective_interval=n_subsets,
             max_iteration=30000)
 sgd_tv2.run(num_epochs * n_subsets, verbose=0)
 
 
-show2D([ista.solution, ista_tv.solution, saga.solution, saga_tv.solution, sgd.solution, sgd_tv.solution],
+show2D([ista.solution, ista_tv.solution, saga.solution, saga_tv.solution, sgd.solution, sgd_tv2.solution],
        title=["ISTA","ISTA TV", "SAGA","SAGA TV","SGD","SGD TV"],
        origin="upper",
        fix_range=(0,1), num_cols=2,
@@ -342,7 +385,7 @@ plt.figure()
 plt.semilogy(ista_tv.objective, label="ISTA TV")
 plt.semilogy(saga_tv.objective, label="SAGA TV")
 plt.semilogy(sgd_tv.objective, label="SGD TV (1/L)")
-plt.semilogy(sgd_tv2.objective, label="SGD TV (1/3L)")
+plt.semilogy(sgd_tv2.objective, label="SGD TV (shrinking step size)")
 plt.legend()
 plt.xlabel('Epochs')
 plt.ylabel('Objective function')
@@ -352,8 +395,8 @@ plt.figure()
 plt.semilogy(ista_tv.objective, label="ISTA TV")
 plt.semilogy(saga_tv.objective, label="SAGA TV")
 plt.semilogy(sgd_tv.objective, label="SGD TV (1/L)")
-plt.semilogy(sgd_tv2.objective, label="SGD TV (1/3L)")
-plt.ylim([250000, 500000])
+plt.semilogy(sgd_tv2.objective, label="SGD TV (shrinking step size)")
+plt.ylim([12000, 20000])
 plt.legend()
 plt.xlabel('Epochs')
 plt.ylabel('Objective function')

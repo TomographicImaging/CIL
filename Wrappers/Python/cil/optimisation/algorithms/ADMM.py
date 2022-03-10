@@ -53,7 +53,7 @@ class LADMM(Algorithm):
         :param g: Convex function with "simple" proximal 
         :param sigma: Positive step size parameter 
         :param tau: Positive step size parameter
-        :param initial: Initial guess ( Default initial_guess = 0)'''        
+        :param initial: Initial guess ( Default initial_guess = 0)'''       
         
         super(LADMM, self).__init__(**kwargs)
         if kwargs.get('x_init', None) is not None:
@@ -89,16 +89,17 @@ class LADMM(Algorithm):
             self.tau = self.sigma / normK ** 2
             
         if initial is None:
-            self.x = self.operator.domain_geometry().allocate()
+            self.x = self.operator.domain_geometry().allocate(0)
         else:
             self.x = initial.copy()
-         
-        # allocate space for operator direct & adjoint    
-        self.tmp_dir = self.operator.range_geometry().allocate()
-        self.tmp_adj = self.operator.domain_geometry().allocate()            
+        
+        self.b = self.operator.range_geometry().allocate(0) 	 # Ax^k
+        self.b_old = self.operator.range_geometry().allocate(0)  # Ax^{k-1}
+        self.x_old = self.operator.domain_geometry().allocate(0) # x^{k-1}           
             
-        self.z = self.operator.range_geometry().allocate() 
-        self.u = self.operator.range_geometry().allocate() 
+        self.z = self.operator.range_geometry().allocate(0)
+        self.u = self.operator.range_geometry().allocate(0) 
+
 
         self.configured = True  
         
@@ -106,30 +107,27 @@ class LADMM(Algorithm):
         
     def update(self):
 
-        self.tmp_dir += self.u
-        self.tmp_dir -= self.z
-        self.operator.adjoint(self.tmp_dir, out = self.tmp_adj)
+        self.x_old = self.x
+        self.b_old = self.b
         
-        if self._use_axpby:
-            self.x.axpby(1,-(self.tau/self.sigma), self.tmp_adj, out=self.x)
-        else:
-            self.tmp_adj *= -(self.tau/self.sigma)
-            self.x += self.tmp_adj
-        # apply proximal of f
-        tmp = self.f.proximal(self.x, self.tau)
-        self.operator.direct(tmp, out=self.tmp_dir)
-        # store the result in x
-        self.x.fill(tmp)
-        del tmp
-
-        self.u += self.tmp_dir
-        
-        # apply proximal of g   
-        self.g.proximal(self.u, self.sigma, out = self.z)
-
-        # update 
+        # proximal map for z
+        self.z = self.f.proximal((self.b_old+self.u), self.sigma)
+       
+        # update u
+        self.u += self.b_old
         self.u -= self.z
+        
+        # proximal map for x
+        self.b_old -= self.z
+        self.b_old += self.u
+        self.x = self.operator.adjoint(self.b_old)
+        self.x *= (self.tau/self.sigma)
+        self.x_old -= self.x
+        self.x = self.g.proximal(self.x_old, self.tau)
+        
+        # new data estimate
+        self.b = self.operator.direct(self.x)
         
     def update_objective(self):
         
-        self.loss.append(self.f(self.x) +  self.g(self.operator.direct(self.x)) )                 
+         self.loss.append(self.g(self.x) +  self.f(self.operator.direct(self.x)) )              

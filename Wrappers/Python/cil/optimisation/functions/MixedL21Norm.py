@@ -126,7 +126,7 @@ class MixedL21Norm(Function):
 
             out.fill(out)
 
-class SmoothMixedL21Norm(Function):
+class SmoothMixedL21Norm(MixedL21Norm):
     
     """ SmoothMixedL21Norm function: :math:`F(x) = ||x||_{2,1} = \sum |x|_{2} = \sum \sqrt{ (x^{1})^{2} + (x^{2})^{2} + \epsilon^2 + \dots}`                  
     

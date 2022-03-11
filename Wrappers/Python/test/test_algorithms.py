@@ -1229,11 +1229,11 @@ class TestADMM(unittest.TestCase):
         K = self.K
         F = self.F
 
-        admm = LADMM(f=G, g=F, operator=K, tau=self.tau, sigma=self.sigma,
+        admm = LADMM(f=F, g=G, operator=K, tau=self.tau, sigma=self.sigma,
                     max_iteration = 100, update_objective_interval = 10)
         admm.run(1, verbose=0)
 
-        admm_noaxpby = LADMM(f=G, g=F, operator=K, tau=self.tau, sigma=self.sigma,
+        admm_noaxpby = LADMM(f=F, g=G, operator=K, tau=self.tau, sigma=self.sigma,
                     max_iteration = 100, update_objective_interval = 10, use_axpby=False)
         admm_noaxpby.run(1, verbose=0)
         
@@ -1272,7 +1272,7 @@ class TestADMM(unittest.TestCase):
         sigma = 1
         tau = sigma/normK**2
 
-        admm = LADMM(f=G, g=F, operator=K, tau=tau, sigma=sigma,
+        admm = LADMM(f=F, g=G, operator=K, tau=tau, sigma=sigma,
                     max_iteration = 500, update_objective_interval = 10)
         admm.run(verbose=0)
         np.testing.assert_almost_equal(admm.solution.array, pdhg.solution.array,  decimal=3)

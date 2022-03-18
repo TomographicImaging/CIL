@@ -123,7 +123,7 @@ class Reconstructor(object):
 
     def run(self, out=None, verbose=1):
         """
-        Runs the configured recon and returns the reconstuction
+        Runs the configured recon and returns the reconstruction
 
         Parameters
         ----------
@@ -136,7 +136,7 @@ class Reconstructor(object):
         Returns
         -------
         ImageData
-            The reconstructed volume. Supressed if `out` is passed
+            The reconstructed volume. Suppressed if `out` is passed
         """
 
         raise NotImplementedError()

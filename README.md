@@ -22,14 +22,14 @@ The documentation for CIL can be accessed [here](https://tomographicimaging.gith
 Binary installation of CIL can be done with `conda`. Install a new environment using:
 
 ```bash
-conda create --name cil -c conda-forge -c ccpi cil
+conda create --name cil -c conda-forge -c intel -c ccpi cil
 ```
 
-To install CIL and the aditional packages and plugins needed to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) install the environment with:
+To install CIL and the additional packages and plugins needed to run the [CIL demos](https://github.com/TomographicImaging/CIL-Demos) install the environment with:
 
 ```bash
 
-conda create --name cil -c conda-forge -c astra-toolbox/label/dev -c ccpi cil cil-astra ccpi-regulariser tigre tomophantom cudatoolkit=9.2
+conda create --name cil -c conda-forge -c intel -c astra-toolbox/label/dev -c ccpi cil cil-astra ccpi-regulariser tigre tomophantom=1.4.10
 ```
 
 where,
@@ -43,6 +43,12 @@ where,
 ```tigre``` will allow you to use CIL wrappers to the [TIGRE](https://github.com/CERN/TIGRE) toolbox projectors (BSD license).
 
 ```cudatoolkit``` If you have GPU drivers compatible with more recent CUDA versions you can modify this package selector (installing tigre via conda requires 9.2).
+
+### Dependency
+
+CIL's [optimised FDK/FBP](https://github.com/TomographicImaging/CIL/discussions/1070) `recon` module requires:
+1. the Intel [Integrated Performance Primitives](https://www.intel.com/content/www/us/en/developer/tools/oneapi/ipp.html#gs.gxwq5p) Library ([license](https://www.intel.com/content/dam/develop/external/us/en/documents/pdf/intel-simplified-software-license-version-august-2021.pdf)) which can be installed via conda from the `intel` [channel](https://anaconda.org/intel/ipp).
+2. [TIGRE](https://github.com/CERN/TIGRE), which can be installed via conda from the `ccpi` channel.
 
 ## Building from source code 
 

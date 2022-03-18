@@ -1,4 +1,17 @@
+* 2x.x.x
+  - Fixed PowerMethod for square/non-square, complex/float matrices with stopping criterion.
+  - CofR image_sharpness improved for large datasets
+  - Geometry alignmentment fix for 2D datasets
+  - CGLS update for sapyb to enable complex data
+  - added sapyb and deprecated axpby
+
+* 21.3.1
+  - Added matplotlib version dependency to conda recipe
+  - Fixed TIGRE wrappers for geometry with a virtual detector
+  - Fixed TIGRE wrappers for cone-beam geometry with tilted rotation axis
+
 * 21.3.0
+  - Accelerated PDHG which handles strong convexity of functions
   - TotalVariation Function handles SIRF ImageData
   - Simulated datasets and volume added to DataExamples
   - TIGRE wrappers for parallel-beam geometry added
@@ -9,10 +22,13 @@
   - CCPi Regularisation plugin is refactored, only FGP_TV, FGP_dTV, TGV and TNV are exposed. Docstrings and functionality unit tests are added. Tests of the functions are meant to be in the CCPi-Regularisation toolkit itself.
   - Add dtype for ImageGeometry, AcquisitionGeometry, VectorGeometry, BlockGeometry
   - Fix GradientOperator to handle pseudo 2D CIL geometries
-  - Created FBP and FDK Reconstructor class using fast filtering library and TIGRE backprojectors
+  - Created recon module with FBP and FDK using fast filtering library and TIGRE backprojectors
   - Added Intel IPP based library for filtering step of FBP
   - PDHG memory optimisation
   - ScaledFunction memory Optimisation
+  - The github actions are merged into one action with multiple jobs
+  - The conda build job uploads an artifact of the build tar.bz file which is later used by the documentation build job - which installs the package into a miniconda environment.
+  - Documentation pages for recon, astra and cil-plugins are published.
 
 * 21.2.0
   - add version string from git describe

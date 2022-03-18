@@ -16,7 +16,7 @@ import os
 import sys
 import re
 
-sys.path.insert(0, os.path.abspath('../../Wrappers/Python/'))
+sys.path.insert(0, os.path.abspath('../Wrappers/Python/'))
 
 from cil import version
 
@@ -186,6 +186,7 @@ epub_exclude_files = ['search.html']
 
 
 # -- Extension configuration -------------------------------------------------
+autodoc_member_order = 'bysource'
 
 # -- Options for todo extension ----------------------------------------------
 

@@ -6,7 +6,6 @@ source:
   path: ..
 
 build:
-  skip: True # [py==38 and np==115]
   preserve_egg_dir: False
   number: {{ GIT_DESCRIBE_NUMBER }}
   missing_dso_whitelist:
@@ -17,26 +16,23 @@ build:
 
 test:
   requires:
-    - {{ pin_compatible('numpy', min_pin='x.x', max_pin='x.x') }}
     - python-wget
-    - cvxpy              # [ linux and py==37 and np==118 ]
+    - cvxpy         # [ linux and not py36]     
     - scikit-image
-    - tomophantom        # [ linux ]
-    - cil-astra          # [ linux ] 
-    - cil-data >=21.3.0
-    - tigre              # [ linux or win ] 
-    - numba
+    - tomophantom =1.4.10 # [ linux ]
+    - cil-astra =21.3.0   # [ linux ] 
+    - tigre =2.2          # [ not osx ] 
     - packaging
-    - ccpi-regulariser   # [ not osx ]
+    - ccpi-regulariser=21.0.0   # [ not osx ]
     
   source_files:
     - ./Wrappers/Python/test     # [win]
-    - ./cil/Wrappers/Python/test # [not win] 
+    - ./Wrappers/Python/test # [not win] 
 
   commands:
     - python -c "import os; print ('TESTING IN THIS DIRECTORY' , os.getcwd())"
     - python -m unittest discover Wrappers/Python/test        # [win]
-    - python -m unittest discover -s cil/Wrappers/Python/test # [not win]
+    - python -m unittest discover -s Wrappers/Python/test # [not win]
     
 requirements:
   build:
@@ -60,7 +56,7 @@ requirements:
     - python
     - {{ pin_compatible('numpy', min_pin='x.x', max_pin='x.x') }}
     - scipy >=1.4.0
-    - matplotlib >=3.3.0
+    - matplotlib >=3.3.0,<3.5
     - h5py
     - pillow
     - libgcc-ng     # [linux]
@@ -71,9 +67,10 @@ requirements:
     - dxchange
     - olefile >=0.46
     - pywavelets
-    - cil-data
+    - cil-data >=21.3.0
     - ipp
     - tqdm
+
   
 about:
   home: http://www.ccpi.ac.uk/cil

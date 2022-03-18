@@ -24,82 +24,91 @@ from numbers import Number
 class Padder(DataProcessor):
     r'''
     Processor to pad an array, wrapping numpy.pad
+    See https://numpy.org/doc/stable/reference/generated/numpy.pad.html
     '''
 
     @staticmethod
     def constant(pad_width=None, constant_values=0):
-        r'''Padder processor wrapping numpy.pad with mode `linear_ramp` 
-        
-        :param pad_width: number of values padded to the edges of each axis.
-        If passed an int it will pad symmetrically in all dimensions.
+        '''
+        Padder processor wrapping numpy.pad with mode `constant` 
+        Pads with a constant value.
+
+        Parameters
+        ----------
+        pad_width: int, tuple, dict
+            The number of values padded to the edges of each axis
+        constant_values: float, tuple, dict
+            The values to set the padded values for each axis
+
+        Notes
+        -----
+        If passed a single value it will pad symmetrically in all dimensions.
         If passed a tuple it will apply asymmetric padding in all dimensions. (before, after)
         If passed a dictionary it will apply the specified padding to the required dimension label: e.g.
         {'horizontal':(8, 23), 'vertical': 10}
-        :type pad_width: int or tuple or dict
-        :param constant_values: pads with a constant value.
-        edge of the padded array. They can be passed in the same format as `pad_width`.
-        :type constant_values: float or tuple or dict
-
-        https://numpy.org/doc/stable/reference/generated/numpy.pad.html
-        
-        
-        This creates a Padder processor which pads with a constant value.
-
-        :param pad_width: number of values padded to the edges of each axis, specified as a dictionary containing a tuple (before, after) or an int (before=after). A tuple (before, after) yields same before and after pad for each axis. int is a shortcut for before = after = pad width for all axes.
-        :type pad_width: int or tuple or dict
-        :param constant_values: The values to set the padded values for each axis, specified as a dictionary containing a tuple (before, after). A tuple (before, after) yields same before and after pad for each axis. float is a shortcut for before = after = pad value for all axes. Default is 0.
-        :type constant_values: float or tuple or dict
         '''
         processor = Padder(pad_width=pad_width, mode='constant', constant_values=constant_values)
         return processor
 
     @staticmethod
     def edge(pad_width=None):
-        r'''Padder processor wrapping numpy.pad with mode `edge` 
-        
-        :param pad_width: number of values padded to the edges of each axis.
-        If passed an int it will pad symmetrically in all dimensions.
+        '''Padder processor wrapping numpy.pad with mode `edge` 
+        Pads with the edge values of array.
+
+        Parameters
+        ----------
+        pad_width: int, tuple, dict
+            The number of values padded to the edges of each axis
+
+        Notes
+        -----
+        If passed a single value it will pad symmetrically in all dimensions.
         If passed a tuple it will apply asymmetric padding in all dimensions. (before, after)
         If passed a dictionary it will apply the specified padding to the required dimension label: e.g.
         {'horizontal':(8, 23), 'vertical': 10}
-        :type pad_width: int or tuple or dict
-
-        https://numpy.org/doc/stable/reference/generated/numpy.pad.html
         '''
+
         processor = Padder(pad_width=pad_width, mode='edge')
         return processor
     
     @staticmethod
     def linear_ramp(pad_width=None, end_values=0):
-        r'''Padder processor wrapping numpy.pad with mode `linear_ramp` 
-        
-        :param pad_width: number of values padded to the edges of each axis.
-        If passed an int it will pad symmetrically in all dimensions.
+        '''Padder processor wrapping numpy.pad with mode `linear_ramp` 
+        Pads with the linear ramp between end_value and the array edge value.
+
+        Parameters
+        ----------
+        pad_width: int, tuple, dict
+            The number of values padded to the edges of each axis
+        end_values: float, tuple, dict
+            The values used for the ending value of the linear_ramp
+ 
+        Notes
+        -----
+        If passed a single value it will pad symmetrically in all dimensions.
         If passed a tuple it will apply asymmetric padding in all dimensions. (before, after)
         If passed a dictionary it will apply the specified padding to the required dimension label: e.g.
         {'horizontal':(8, 23), 'vertical': 10}
-        :type pad_width: int or tuple or dict
-        :param end_values: The values used for the ending value of the linear_ramp and that will form the 
-        edge of the padded array. They can be passed in the same format as `pad_width`.
-        :type end_values: float or tuple or dict
-
-        https://numpy.org/doc/stable/reference/generated/numpy.pad.html
         '''
         processor = Padder(pad_width=pad_width, mode='linear_ramp', end_values=end_values)
         return processor
     
     @staticmethod
     def reflect(pad_width=None):
-        r'''Padder processor wrapping numpy.pad with mode `reflect` 
+        '''Padder processor wrapping numpy.pad with mode `reflect` 
+        Pads with the reflection of the vector mirrored on the first and last values of the vector along each axis.
         
-        :param pad_width: number of values padded to the edges of each axis.
-        If passed an int it will pad symmetrically in all dimensions.
+        Parameters
+        ----------
+        pad_width: int, tuple, dict
+            The number of values padded to the edges of each axis
+
+        Notes
+        -----
+        If passed a single value it will pad symmetrically in all dimensions.
         If passed a tuple it will apply asymmetric padding in all dimensions. (before, after)
         If passed a dictionary it will apply the specified padding to the required dimension label: e.g.
         {'horizontal':(8, 23), 'vertical': 10}
-        :type pad_width: int or tuple or dict
-
-        https://numpy.org/doc/stable/reference/generated/numpy.pad.html
         '''
         processor = Padder(pad_width=pad_width, mode='reflect')
         return processor
@@ -107,33 +116,39 @@ class Padder(DataProcessor):
     @staticmethod
     def symmetric(pad_width=None):
         r'''Padder processor wrapping numpy.pad with mode `symmetric`
-        
-        :param pad_width: number of values padded to the edges of each axis.
-        If passed an int it will pad symmetrically in all dimensions.
+        Pads with the reflection of the vector mirrored along the edge of the array.
+
+        Parameters
+        ----------
+        pad_width: int, tuple, dict
+            The number of values padded to the edges of each axis
+
+        Notes
+        -----
+        If passed a single value it will pad symmetrically in all dimensions.
         If passed a tuple it will apply asymmetric padding in all dimensions. (before, after)
         If passed a dictionary it will apply the specified padding to the required dimension label: e.g.
         {'horizontal':(8, 23), 'vertical': 10}
-        :type pad_width: int or tuple or dict
-
-        https://numpy.org/doc/stable/reference/generated/numpy.pad.html
-
         '''
         processor = Padder(pad_width=pad_width, mode='symmetric')
         return processor
     
     @staticmethod
     def wrap(pad_width=None):
-        r'''Padder processor wrapping numpy.pad with mode `wrap`
-        
-        :param pad_width: number of values padded to the edges of each axis.
-        If passed an int it will pad symmetrically in all dimensions.
+        '''Padder processor wrapping numpy.pad with mode `wrap`
+        Pads with the wrap of the vector along the axis. The first values are used to pad the end and the end values are used to pad the beginning.
+
+        Parameters
+        ----------
+        pad_width: int, tuple, dict
+            The number of values padded to the edges of each axis
+
+        Notes
+        -----
+        If passed a single value it will pad symmetrically in all dimensions.
         If passed a tuple it will apply asymmetric padding in all dimensions. (before, after)
         If passed a dictionary it will apply the specified padding to the required dimension label: e.g.
         {'horizontal':(8, 23), 'vertical': 10}
-        :type pad_width: int or tuple or dict
-
-        https://numpy.org/doc/stable/reference/generated/numpy.pad.html
-
         '''
         processor = Padder(pad_width=pad_width, mode='wrap')
         return processor
@@ -143,30 +158,6 @@ class Padder(DataProcessor):
                  pad_width=None,
                  constant_values=0,
                  end_values=0):
-        r'''
-        Processor to pad an array wrapping numpy.pad.
-
-        :param mode: specifies the method to use for padding. Available methods: constant, 
-        edge, linear_ramp, reflect, symmetric, wrap.
-        :type mode: string, default 'constant'.
-        :param pad_width: number of values padded to the edges of each axis, specified as 
-        a dictionary containing a tuple (before, after) or an int (before=after). The dictionary keys
-        must be the dimension_labels of the DataContainer (ImageData or AcquisitionData) that one wants
-        to pad.
-         A tuple (before, after) yields same before and after pad for each axis. 
-         int is a shortcut for before = after = pad width for all axes.
-        :type pad_width: int or tuple or dict
-        :param constant_values: Used in 'constant' mode. The values to set the padded values for each axis, 
-        specified as a dictionary containing a tuple (before, after). 
-        A tuple (before, after) yields same before and after pad for each axis. 
-        float is a shortcut for before = after = pad value for all axes. Default is 0.
-        :type constant_values: float or tuple or dict
-        :param edge_values: Used in 'linear_ramp'. The values used for the ending value of the linear_ramp
-         and that will form the edge of the padded array, specified as a dictionary containing a tuple
-         (before, after). A tuple (before, after) yields same before and after pad for each axis.
-         float is a shortcut for before = after = pad value for all axes. Default is 0.
-        :type edge_values: float or tuple or dict
-        '''
 
         kwargs = {'mode': mode,
                 'pad_width': pad_width,

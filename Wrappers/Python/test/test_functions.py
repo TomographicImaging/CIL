@@ -140,21 +140,18 @@ class TestFunction(unittest.TestCase):
         
         d = ag.allocate(ImageGeometry.RANDOM)
         alpha = 0.5
+
         # scaled function
         g = alpha * L2NormSquared(b=noisy_data)
         
         # Compare call of g
         a2 = alpha*(d - noisy_data).power(2).sum()
-        #print(a2, g(d)) 
+
         self.assertEqual(a2, g(d))
         
         # Compare convex conjugate of g
         a3 = 0.5 * d.squared_norm() + d.dot(noisy_data)
         self.assertAlmostEqual(a3, g.convex_conjugate(d), places=7)
-        #print( a3, g.convex_conjugate(d))
-
-        #test proximal conjugate
-
     
     def test_L2NormSquared(self):
         # TESTS for L2 and scalar * L2
@@ -980,18 +977,18 @@ class TestTotalVariation(unittest.TestCase):
     
         # print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV no tolerance (2D)")
 
-        data = dataexample.SHAPES.get()
+        data = dataexample.SHAPES.get(size=(64,64))
         ig = data.geometry
         ag = ig
 
         np.random.seed(0)
         # Create noisy data. 
-        n1 = np.random.normal(0, 0.1, size = ig.shape)
+        n1 = np.random.normal(0, 0.0005, size = ig.shape)
         noisy_data = ig.allocate()
         noisy_data.fill(n1+data.as_array())
         
         alpha = 0.1
-        iters = 100
+        iters = 500
             
         # CIL_FGP_TV no tolerance
         g_CIL = alpha * TotalVariation(iters, tolerance=None, lower = 0, info = True)
@@ -1014,8 +1011,7 @@ class TestTotalVariation(unittest.TestCase):
         # print(t3-t1)
         
         
-        # np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal = 4)
-        np.testing.assert_allclose(res1.as_array(), res2.as_array(), atol=2.5e-3)
+        np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal = 4)
 
         ###################################################################
         ###################################################################

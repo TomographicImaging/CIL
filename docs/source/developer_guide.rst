@@ -11,6 +11,7 @@ For each class there are **essential**, and **non-essential** parameters. The no
 
 * essential
 * non-essential
+  
   * often-configured
   * advanced
 
@@ -37,8 +38,10 @@ Other methods
 -------------
 
 Methods that are not meant to be used by the user should have a `_` (underscore) at the beginning of the name. 
-All methods should follow the convention of small caps underscore separated words.Docstrings
-----------
+All methods should follow the convention of small caps underscore separated words.
+
+Docstrings
+==========
 
 
 The Core Imaging Library follows the `NumpyDoc <https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard>`_

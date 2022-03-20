@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Developer’s guide &#8212; CIL v21.3.1-13-g26801d6d documentation</title>
+    <title>Developer’s guide &#8212; CIL v21.3.1-14-g37931e4e documentation</title>
     
     <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -160,6 +160,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#other-methods">Other methods</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#docstrings">Docstrings</a></li>
 </ul>
 </li>
 </ul>
@@ -222,6 +223,11 @@
    </li>
   </ul>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#docstrings">
+   Docstrings
+  </a>
+ </li>
 </ul>
 
 </nav>
@@ -252,9 +258,12 @@ the following.</p>
 <p>For each class there are <strong>essential</strong>, and <strong>non-essential</strong> parameters. The non-essential can be further be divided in <strong>often configured</strong> and <strong>advanced</strong> parameters:</p>
 <ul class="simple">
 <li><p>essential</p></li>
-<li><p>non-essential
-* often-configured
-* advanced</p></li>
+<li><p>non-essential</p>
+<ul>
+<li><p>often-configured</p></li>
+<li><p>advanced</p></li>
+</ul>
+</li>
 </ul>
 <p>The definition of what are the essential, often-configured and advanced parameters depends on the actual class.</p>
 <div class="section" id="creator">
@@ -272,13 +281,15 @@ Setter methods should be named <cite>set_&lt;parameter&gt;</cite>. The use of <c
 <div class="section" id="other-methods">
 <h3>Other methods<a class="headerlink" href="#other-methods" title="Permalink to this headline">¶</a></h3>
 <p>Methods that are not meant to be used by the user should have a <cite>_</cite> (underscore) at the beginning of the name.
-All methods should follow the convention of small caps underscore separated words.Docstrings
-———-</p>
+All methods should follow the convention of small caps underscore separated words.</p>
+</div>
+</div>
+<div class="section" id="docstrings">
+<h2>Docstrings<a class="headerlink" href="#docstrings" title="Permalink to this headline">¶</a></h2>
 <p>The Core Imaging Library follows the <a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard">NumpyDoc</a>
 style with the <a class="reference external" href="https://pydata-sphinx-theme.readthedocs.io/en/latest/">PyData Sphinx html theme</a>.</p>
 <p>When contributing your code please refer to <a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard">this</a> link
 for docstring formatting and this rendered <a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/example.html#example">example</a> .</p>
-</div>
 </div>
 </div>
 

@@ -203,9 +203,6 @@ class LinearOperator(Operator):
         x0_norm = x0.norm()
         x0 /= x0_norm
 
-
-
-
         # initial guess for dominant eigenvalue
         eig_old = 1.
 
@@ -213,7 +210,8 @@ class LinearOperator(Operator):
         diff = numpy.finfo('d').max
         i = 0
         while (i < max_iteration and diff > tolerance):
-
+            i+=1
+            
             operator.direct(x0, out = y_tmp)
 
             if symmetric:                

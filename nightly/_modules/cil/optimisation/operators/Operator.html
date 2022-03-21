@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.operators.Operator &#8212; CIL v21.3.1-14-g37931e4e documentation</title>
+    <title>cil.optimisation.operators.Operator &#8212; CIL v21.3.1-15-g3f0cb9dd documentation</title>
     
     <link href="../../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -392,9 +392,6 @@
         <span class="n">x0_norm</span> <span class="o">=</span> <span class="n">x0</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
         <span class="n">x0</span> <span class="o">/=</span> <span class="n">x0_norm</span>
 
-
-
-
         <span class="c1"># initial guess for dominant eigenvalue</span>
         <span class="n">eig_old</span> <span class="o">=</span> <span class="mf">1.</span>
 
@@ -402,7 +399,8 @@
         <span class="n">diff</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">max</span>
         <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">max_iteration</span> <span class="ow">and</span> <span class="n">diff</span> <span class="o">&gt;</span> <span class="n">tolerance</span><span class="p">):</span>
-
+            <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
+            
             <span class="n">operator</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="n">y_tmp</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">symmetric</span><span class="p">:</span>                

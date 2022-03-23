@@ -1,5 +1,4 @@
 import numpy as np
-from cil.utilities.display import show2D
 from cil.optimisation.operators import LinearOperator
 from cil.utilities import dataexample
 from cil.framework import AcquisitionGeometry
@@ -406,8 +405,6 @@ class TestCommon_ProjectionOperator_SIM(SimData):
         Op.direct(self.img_data,out=fp2)
         np.testing.assert_allclose(fp.as_array(), fp2.as_array(),1e-8)    
 
-        show2D([fp.as_array(),fp2.as_array(),self.acq_data.as_array()])
-
 
     def test_backward_projectors_functionality(self):
         #this checks mechanics but not value
@@ -418,8 +415,6 @@ class TestCommon_ProjectionOperator_SIM(SimData):
         bp2.fill(0)
         Op.adjoint(self.acq_data,out=bp2)
         np.testing.assert_allclose(bp.as_array(), bp2.as_array(), 1e-8)    
-
-        show2D([bp.as_array(),bp2.as_array(),self.img_data.as_array()])
 
 
 class TestCommon_FBP_SIM(SimData):
@@ -437,10 +432,8 @@ class TestCommon_FBP_SIM(SimData):
         self.FBP(self.acq_data,out=reco2)
         np.testing.assert_allclose(reco.as_array(), reco2.as_array(),atol=1e-8)   
 
-        show2D([reco.as_array(),reco2.as_array(),self.img_data.as_array()])
 
     def test_FBP_roi(self):
         self.FBP = self.FBP(self.ig_roi, self.ag, **self.FBP_args)
         reco = self.FBP(self.acq_data)
         np.testing.assert_allclose(reco.as_array(), self.gold_roi, atol=self.tolerance_fbp_roi)    
-        show2D([reco.as_array(),self.gold_roi])

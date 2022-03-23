@@ -133,11 +133,6 @@ class ProjectionOperator(LinearOperator):
         else:
             arr_out = self.__call_Atb(data)
 
-        if self._range_geometry.geom_type == 'parallel':
-            #TIGRE Atb non linearity fix
-            if  abs(self.tigre_geom.weights -1) >1e-8:
-                arr_out *=  self.tigre_geom.weights
-
         if out is None:
             out = ImageData(arr_out, deep_copy=False, geometry=self._domain_geometry.copy(), suppress_warning=True)
             return out

@@ -114,7 +114,8 @@ class Test_Parallel3D_Projectors_sim(unittest.TestCase, TestCommon_ProjectionOpe
 
 class Test_Parallel3D_Projectors_toy(unittest.TestCase, TestCommon_ProjectionOperator_TOY):
 
-    @unittest.skipUnless(has_tigre_gpu, "Requires TIGRE GPU")
+    #@unittest.skipUnless(has_tigre_gpu, "Requires TIGRE GPU")
+    @unittest.skip("TIGRE backprojector weights bug")
     def setUp(self):
         setup_parameters(self)
         self.Parallel3D()
@@ -142,7 +143,8 @@ class Test_Parallel2D_Projectors_sim(unittest.TestCase, TestCommon_ProjectionOpe
 
 class Test_Parallel2D_Projectors_toy(unittest.TestCase, TestCommon_ProjectionOperator_TOY):
 
-    @unittest.skipUnless(has_tigre_gpu, "Requires TIGRE GPU")
+#    @unittest.skipUnless(has_tigre_gpu, "Requires TIGRE GPU")
+    @unittest.skip("TIGRE backprojector weights bug")
     def setUp(self):
         setup_parameters(self)
         self.Parallel2D()

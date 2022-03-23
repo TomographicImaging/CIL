@@ -157,9 +157,6 @@ class TIGREGeometry(Geometry):
             pitch = np.arcsin(V[2])
             yaw = np.arctan2(-U[2],U[1])
 
-        if self.mode == 'parallel':
-            self.weights = self.dVoxel.prod() /self.dDetector.prod()
-
         #shift origin to match image geometry
         self.offOrigin[1] += ig.center_y
         self.offOrigin[2] += ig.center_x

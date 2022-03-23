@@ -23,7 +23,6 @@ import unittest
 from scipy.fft  import fft, ifft
 import numpy as np
 from utils import has_tigre, has_gpu_tigre, has_ipp, has_astra, has_gpu_astra
-import gc
 
 if has_tigre:
     from cil.plugins.tigre import ProjectionOperator as ProjectionOperator
@@ -39,7 +38,7 @@ if  not has_tigre_gpu:
     print("Unable to run TIGRE tests")
 
 has_astra_gpu = has_gpu_astra()
-if  not has_tigre_gpu:
+if  not has_astra_gpu:
     print("Unable to run ASTRA tests")
     
 class Test_Reconstructor(unittest.TestCase):
@@ -108,9 +107,7 @@ class Test_Reconstructor(unittest.TestCase):
         data = self.ad3D.copy()
         reconstructor = Reconstructor(data)
         self.assertEqual(id(reconstructor.input),id(data))
-
         del data
-        gc.collect()
 
         with self.assertRaises(ValueError):
             reconstructor.input

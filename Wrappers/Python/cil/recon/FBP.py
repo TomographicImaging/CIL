@@ -453,7 +453,7 @@ class FBP(GenericFilteredBackProjection):
         weight = 0.5 * np.pi/ ag.num_projections
         if self.backend=='tigre':
             weight /= ag.pixel_size_h
-        else: #astra projector scales as 1/pixel_area
+        else:
             weight /= ag.pixel_size_h * ag.pixel_size_v
         self._weights = np.full((ag.pixel_num_v,ag.pixel_num_h),weight,dtype=np.float32)
 

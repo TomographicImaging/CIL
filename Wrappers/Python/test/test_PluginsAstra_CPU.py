@@ -37,7 +37,6 @@ def setup_parameters(self):
     self.PO_args={'device':'cpu'}
 
 
-
 class Test_Cone2D_Projectors_CPU_basic(unittest.TestCase, TestCommon_ProjectionOperator):
 
     @unittest.skipUnless(has_astra, "Requires ASTRA ")

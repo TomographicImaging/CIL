@@ -73,12 +73,6 @@ class ProjectionOperator(LinearOperator):
         #set up TIGRE geometry
         tigre_geom, tigre_angles= CIL2TIGREGeometry.getTIGREGeometry(image_geometry,aquisition_geometry)
 
-        #TIGRE bug workaround, when voxelgrid and panel are aligned ray tracing fails
-        if direct_method=='Siddon' and aquisition_geometry.geom_type == AcquisitionGeometry.PARALLEL:
-            for i, angle in enumerate(tigre_angles):
-                if abs(angle/np.pi) % 0.5 < 1e-4:
-                    tigre_angles[i] += 1e-5
-
         tigre_geom.check_geo(tigre_angles)
         tigre_geom.cast_to_single()
         self.tigre_geom = tigre_geom
@@ -138,6 +132,11 @@ class ProjectionOperator(LinearOperator):
             arr_out = np.squeeze(arr_out, axis=0)
         else:
             arr_out = self.__call_Atb(data)
+
+        if self._range_geometry.geom_type == 'parallel':
+            #TIGRE Atb non linearity fix
+            if  abs(self.tigre_geom.weights -1) >1e-8:
+                arr_out *=  self.tigre_geom.weights
 
         if out is None:
             out = ImageData(arr_out, deep_copy=False, geometry=self._domain_geometry.copy(), suppress_warning=True)

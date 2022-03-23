@@ -145,11 +145,9 @@ class TIGREGeometry(Geometry):
                 self.offOrigin = np.array( [0,0,0] )
                 self.offDetector = np.array( [system.detector.position[2], system.detector.position[0], 0])
 
-            #shift origin to match image geometry
-            #this is in CIL reference frames as the TIGRE geometry rotates the reconstrcution volume to match our definitions
+            #shift origin z to match image geometry
+            #this is in CIL reference frames as the TIGRE geometry rotates the reconstruction volume to match our definitions
             self.offOrigin[0] += ig.center_z
-            self.offOrigin[1] += ig.center_y
-            self.offOrigin[2] += ig.center_x
 
             #convert roll, pitch, yaw
             U = system.detector.direction_x[ind] * flip
@@ -158,6 +156,13 @@ class TIGREGeometry(Geometry):
             roll = np.arctan2(-V[1], V[0])
             pitch = np.arcsin(V[2])
             yaw = np.arctan2(-U[2],U[1])
+
+        if self.mode == 'parallel':
+            self.weights = self.dVoxel.prod() /self.dDetector.prod()
+
+        #shift origin to match image geometry
+        self.offOrigin[1] += ig.center_y
+        self.offOrigin[2] += ig.center_x
 
         self.theta = yaw
         panel_origin = ag_in.config.panel.origin

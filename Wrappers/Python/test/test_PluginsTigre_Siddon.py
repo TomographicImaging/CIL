@@ -24,7 +24,6 @@ from utils import has_gpu_tigre, has_tigre
 
 if has_tigre:
     from cil.plugins.tigre import ProjectionOperator
-    from cil.plugins.tigre import FBP
 
 has_tigre_gpu = has_gpu_tigre()
 if not has_tigre_gpu:

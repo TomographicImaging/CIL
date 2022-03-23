@@ -15,9 +15,8 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from cil.framework import AcquisitionGeometry,AcquisitionData
+from cil.framework import AcquisitionGeometry
 from cil.framework.framework import ImageGeometry
-from cil.utilities.projector_tests import TestCommon_FBP_SIM
 
 import unittest
 import numpy as np
@@ -27,7 +26,6 @@ from utils import has_gpu_tigre, has_tigre
 
 if has_tigre:
     from cil.plugins.tigre import ProjectionOperator
-    from cil.plugins.tigre import FBP
     from cil.plugins.tigre import CIL2TIGREGeometry
 
 has_tigre_gpu = has_gpu_tigre()
@@ -280,6 +278,7 @@ class Test_convert_geometry(unittest.TestCase):
 
 class TestMechanics(unittest.TestCase):
 
+    @unittest.skipUnless(has_tigre_gpu, "Requires TIGRE GPU")
     def setUp(self):
         self.ag = AcquisitionGeometry.create_Cone2D([0,-500],[0,500]).set_angles([0]).set_panel(5,1)
 

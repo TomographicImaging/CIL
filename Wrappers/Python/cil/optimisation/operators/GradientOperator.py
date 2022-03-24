@@ -417,5 +417,4 @@ class Gradient_C(LinearOperator):
                 
         if return_val is True:
             return out        
-
     

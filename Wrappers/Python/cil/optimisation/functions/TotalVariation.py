@@ -81,7 +81,8 @@ class TotalVariation(Function):
                  upper = np.inf,
                  isotropic = True,
                  split = False,
-                 info = False):
+                 info = False,
+                 warmstart = False):
         
 
         super(TotalVariation, self).__init__(L = None)
@@ -119,6 +120,11 @@ class TotalVariation(Function):
 
         # splitting Gradient
         self.split = split
+
+        # warm-start
+        self.warmstart  = warmstart
+        if self.warmstart:
+            self.hasstarted = False
 
     @property
     def regularisation_parameter(self):
@@ -195,58 +201,67 @@ class TotalVariation(Function):
             self._domain = x
         
         # initialise
-        t = 1        
-        tmp_p = self.gradient.range_geometry().allocate(0)  
-        tmp_q = tmp_p.copy()
-        tmp_x = self.gradient.domain_geometry().allocate(0)     
-        p1 = self.gradient.range_geometry().allocate(0)
+        t = 1
+        if not self.warmstart:   
+            self.tmp_p = self.gradient.range_geometry().allocate(0)  
+            self.tmp_q = self.tmp_p.copy()
+            self.tmp_x = self.gradient.domain_geometry().allocate(0)     
+            self.p1 = self.gradient.range_geometry().allocate(0)
+        else:
+            if not self.hasstarted:
+                self.tmp_p = self.gradient.range_geometry().allocate(0)  
+                self.tmp_q = self.tmp_p.copy()
+                self.tmp_x = self.gradient.domain_geometry().allocate(0)     
+                self.p1 = self.gradient.range_geometry().allocate(0)
+                self.hasstarted = True
+
         
 
         should_break = False
         for k in range(self.iterations):
                                                                                    
             t0 = t
-            self.gradient.adjoint(tmp_q, out = tmp_x)
+            self.gradient.adjoint(self.tmp_q, out = self.tmp_x)
             
             # axpby now works for matrices
-            tmp_x.axpby(-self.regularisation_parameter*tau, 1.0, x, out=tmp_x)
-            self.projection_C(tmp_x, out = tmp_x)                       
+            self.tmp_x.axpby(-self.regularisation_parameter*tau, 1.0, x, out=self.tmp_x)
+            self.projection_C(self.tmp_x, out = self.tmp_x)                       
 
-            self.gradient.direct(tmp_x, out=p1)
+            self.gradient.direct(self.tmp_x, out=self.p1)
             if isinstance (tau, (Number, np.float32, np.float64)):
-                p1 *= self.L/(self.regularisation_parameter * tau)
+                self.p1 *= self.L/(self.regularisation_parameter * tau)
             else:
-                p1 *= self.L/self.regularisation_parameter
-                p1 /= tau
+                self.p1 *= self.L/self.regularisation_parameter
+                self.p1 /= tau
 
             if self.tolerance is not None:
                 
                 if k%5==0:
-                    error = p1.norm()
-                    p1 += tmp_q
-                    error /= p1.norm()
+                    error = self.p1.norm()
+                    self.p1 += self.tmp_q
+                    error /= self.p1.norm()
                     if error<=self.tolerance:                           
                         should_break = True
                 else:
-                    p1 += tmp_q
+                    self.p1 += self.tmp_q
             else:
-                p1 += tmp_q
+                self.p1 += self.tmp_q
             if k == 0:
                 # preallocate for projection_P
-                self.pptmp = p1.get_item(0) * 0
+                self.pptmp = self.p1.get_item(0) * 0
                 self.pptmp1 = self.pptmp.copy()
 
-            self.projection_P(p1, out=p1)
+            self.projection_P(self.p1, out=self.p1)
             
 
             t = (1 + np.sqrt(1 + 4 * t0 ** 2)) / 2
             
-            #tmp_q.fill(p1 + (t0 - 1) / t * (p1 - tmp_p))
-            p1.subtract(tmp_p, out=tmp_q)
-            tmp_q *= (t0-1)/t
-            tmp_q += p1
+            #self.tmp_q.fill(self.p1 + (t0 - 1) / t * (self.p1 - self.tmp_p))
+            self.p1.subtract(self.tmp_p, out=self.tmp_q)
+            self.tmp_q *= (t0-1)/t
+            self.tmp_q += self.p1
             
-            tmp_p.fill(p1)
+            self.tmp_p.fill(self.p1)
 
             if should_break:
                 break
@@ -263,13 +278,13 @@ class TotalVariation(Function):
                 print("Stop at {} iterations.".format(k))                
             
         if out is None:                        
-            self.gradient.adjoint(tmp_q, out=tmp_x)
-            tmp_x *= tau
-            tmp_x *= self.regularisation_parameter 
-            x.subtract(tmp_x, out=tmp_x)
-            return self.projection_C(tmp_x)
+            self.gradient.adjoint(self.tmp_q, out=self.tmp_x)
+            self.tmp_x *= tau
+            self.tmp_x *= self.regularisation_parameter 
+            x.subtract(self.tmp_x, out=self.tmp_x)
+            return self.projection_C(self.tmp_x)
         else:          
-            self.gradient.adjoint(tmp_q, out = out)
+            self.gradient.adjoint(self.tmp_q, out = out)
             out*=tau
             out*=self.regularisation_parameter
             x.subtract(out, out=out)

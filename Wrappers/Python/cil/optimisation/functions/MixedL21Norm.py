@@ -89,12 +89,18 @@ class MixedL21Norm(Function):
         
         
         if out is None:
-            tmp = (x/tau).pnorm(2)
-            res = (tmp - 1).maximum(0.0) * x/tmp
+            # tmp = (x/tau).pnorm(2)
+            tmp = x.pnorm(2)
+            tmp /= np.abs(tau)
+            # res = (tmp - 1).maximum(0.0) * x/tmp
+            res = tmp - 1
+            res.maximum(0.0, out=res)
+            res /= tmp
+            res = x * res
 
             # TODO avoid using numpy, add operation in the framework
             # This will be useful when we add cupy 
-                                 
+                                    
             for el in res.containers:
 
                 elarray = el.as_array()
@@ -105,18 +111,13 @@ class MixedL21Norm(Function):
             
         else:
             
-            try:
-                x.divide(tau,out=x)
-                tmp = x.pnorm(2)
-                x.multiply(tau,out=x)
-            except TypeError:
-                x_scaled = x.divide(tau)
-                tmp = x_scaled.pnorm(2)
- 
-            tmp_ig = 0.0 * tmp
-            (tmp - 1).maximum(0.0, out = tmp_ig)
-            tmp_ig.multiply(x, out = out)
-            out.divide(tmp, out = out)
+            tmp = x.pnorm(2)
+            tmp /= np.abs(tau)
+
+            res = tmp - 1
+            res.maximum(0.0, out=res)
+            res /= tmp
+            x.multiply(res, out = out)
             
             for el in out.containers:
                 
@@ -124,7 +125,7 @@ class MixedL21Norm(Function):
                 elarray[np.isnan(elarray)]=0
                 el.fill(elarray)  
 
-            out.fill(out)
+            # out.fill(out)
 
 class SmoothMixedL21Norm(Function):
     

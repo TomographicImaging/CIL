@@ -87,45 +87,29 @@ class MixedL21Norm(Function):
         # Note: we divide x/tau so the cases of both scalar and 
         # datacontainers of tau to be able to run
         
-        
+        tmp = x.pnorm(2)
+        tmp /= np.abs(tau)
+        # res = (tmp - 1).maximum(0.0) * x/tmp
+        res = tmp - 1
+        res.maximum(0.0, out=res)
+        res /= tmp
         if out is None:
-            # tmp = (x/tau).pnorm(2)
-            tmp = x.pnorm(2)
-            tmp /= np.abs(tau)
-            # res = (tmp - 1).maximum(0.0) * x/tmp
-            res = tmp - 1
-            res.maximum(0.0, out=res)
-            res /= tmp
-            res = x * res
-
-            # TODO avoid using numpy, add operation in the framework
-            # This will be useful when we add cupy 
-                                    
-            for el in res.containers:
-
-                elarray = el.as_array()
-                elarray[np.isnan(elarray)]=0
-                el.fill(elarray)
-
-            return res
-            
+            res = x.multiply(res)
         else:
-            
-            tmp = x.pnorm(2)
-            tmp /= np.abs(tau)
-
-            res = tmp - 1
-            res.maximum(0.0, out=res)
-            res /= tmp
             x.multiply(res, out = out)
-            
-            for el in out.containers:
-                
-                elarray = el.as_array()
-                elarray[np.isnan(elarray)]=0
-                el.fill(elarray)  
+            res = out
+        
+        
+        # TODO avoid using numpy, add operation in the framework
+        # This will be useful when we add cupy                         
+        for el in res.containers:
+            elarray = el.as_array()
+            elarray[np.isnan(elarray)] = 0
+            el.fill(elarray)
 
-            # out.fill(out)
+        if out is None:
+            return res
+        
 
 class SmoothMixedL21Norm(Function):
     

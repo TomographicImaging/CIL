@@ -87,29 +87,44 @@ class MixedL21Norm(Function):
         # Note: we divide x/tau so the cases of both scalar and 
         # datacontainers of tau to be able to run
         
-        tmp = x.pnorm(2)
-        tmp /= np.abs(tau)
-        # res = (tmp - 1).maximum(0.0) * x/tmp
-        res = tmp - 1
-        res.maximum(0.0, out=res)
-        res /= tmp
+        
         if out is None:
-            res = x.multiply(res)
-        else:
-            x.multiply(res, out = out)
-            res = out
-        
-        
-        # TODO avoid using numpy, add operation in the framework
-        # This will be useful when we add cupy                         
-        for el in res.containers:
-            elarray = el.as_array()
-            elarray[np.isnan(elarray)] = 0
-            el.fill(elarray)
+            tmp = (x/tau).pnorm(2)
+            res = (tmp - 1).maximum(0.0) * x/tmp
 
-        if out is None:
+            # TODO avoid using numpy, add operation in the framework
+            # This will be useful when we add cupy 
+                                 
+            for el in res.containers:
+
+                elarray = el.as_array()
+                elarray[np.isnan(elarray)]=0
+                el.fill(elarray)
+
             return res
-        
+            
+        else:
+            
+            try:
+                x.divide(tau,out=x)
+                tmp = x.pnorm(2)
+                x.multiply(tau,out=x)
+            except TypeError:
+                x_scaled = x.divide(tau)
+                tmp = x_scaled.pnorm(2)
+ 
+            tmp_ig = 0.0 * tmp
+            (tmp - 1).maximum(0.0, out = tmp_ig)
+            tmp_ig.multiply(x, out = out)
+            out.divide(tmp, out = out)
+            
+            for el in out.containers:
+                
+                elarray = el.as_array()
+                elarray[np.isnan(elarray)]=0
+                el.fill(elarray)  
+
+            out.fill(out)
 
 class SmoothMixedL21Norm(Function):
     

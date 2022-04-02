@@ -245,7 +245,33 @@ class BlockDataContainer(object):
         '''Deprecated method. Alias of sapyb'''
         return self.sapyb(a,y,b,out,num_threads)
 
-
+    def _binary_with_number(self, operation, el, other, i, res, out, kw, *args, **kwargs):
+        if operation == BlockDataContainer.ADD:
+            op = el.add
+        elif operation == BlockDataContainer.SUBTRACT:
+            op = el.subtract
+        elif operation == BlockDataContainer.MULTIPLY:
+            op = el.multiply
+        elif operation == BlockDataContainer.DIVIDE:
+            op = el.divide
+        elif operation == BlockDataContainer.POWER:
+            op = el.power
+        elif operation == BlockDataContainer.MAXIMUM:
+            op = el.maximum
+        elif operation == BlockDataContainer.MINIMUM:
+            op = el.minimum
+        else:
+            raise ValueError('Unsupported operation', operation)
+        if out is not None:
+            kw['out'] = out.get_item(i)
+            op(other, *args, **kw)
+        else:
+            res.append(op(other, *args, **kw))
+            
+    def _binary_with_iterable(self, operation, el, res, out, *args, **kwargs):
+        pass
+    def _binary_with_DataContainer(self, operation, other, *args, **kwargs):
+        pass
 
     def binary_operations(self, operation, other, *args, **kwargs):
         '''Algebra: generic method of algebric operation with BlockDataContainer with number/DataContainer or BlockDataContainer

@@ -65,12 +65,8 @@ from cil.utilities.quality_measures import mae
 has_numba = True
 try:
     import numba
-except ImportError as ie:
-    has_numba = False
-
-has_numba = True
-try:
-    import numba
+    # imports the function that uses numba
+    from cil.optimisation.functions.MixedL21Norm import _proximal_step_numba, _proximal_step_numpy
 except ImportError as ie:
     has_numba = False
 
@@ -399,7 +395,7 @@ class TestFunction(unittest.TestCase):
         self.assertNumpyArrayAlmostEqual(func1(u), func2(u))       
         numpy.testing.assert_almost_equal(func1.L, func2.L)         
             
-    def test_mixedL12Norm(self):
+    def test_MixedL21Norm(self):
         numpy.random.seed(1)
         M, N, K = 2,3,5
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
@@ -432,6 +428,31 @@ class TestFunction(unittest.TestCase):
         
         f_no_scaled.proximal_conjugate(U, 1, out=z3)
         self.assertBlockDataContainerAlmostEqual(z3,z1, decimal=5)
+
+
+    @unittest.skipUnless(has_numba, 'Skipping as numba is not installed')
+    def test_MixedL21Norm_step(self):
+        data = dataexample.SIMULATED_SPHERE_VOLUME.get()
+        g = GradientOperator(data.geometry)
+
+        y = g.direct(data)
+        gamma = 2.
+
+        # test proximax step with numba
+        absgamma = np.abs(gamma, dtype=np.float32)
+        # test numba
+        tmp = y.pnorm(2)
+        tmp = np.asarray(tmp.as_array(), order='C', dtype=np.float32)
+        
+        res1 = _proximal_step_numba(tmp, absgamma)
+            
+        # test proximax step with numpy
+        tmp = y.pnorm(2)
+        res2= _proximal_step_numpy(tmp, gamma)
+
+        # check they are the same
+        np.testing.assert_allclose(res1, res2.as_array(), atol=1e-5, rtol=1e-6 )
+            
 
     def test_KullbackLeibler(self):
         print ("test_KullbackLeibler")

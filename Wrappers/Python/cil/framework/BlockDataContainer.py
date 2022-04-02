@@ -19,6 +19,12 @@ from numbers import Number
 import functools
 from cil.framework import DataContainer
 from cil.utilities.multiprocessing import NUM_THREADS
+has_dask = True
+try:
+    import dask
+    from dask import delayed
+except ImportError:
+    has_dask = False
 
 class BlockDataContainer(object):
     '''Class to hold DataContainers as column vector
@@ -245,7 +251,10 @@ class BlockDataContainer(object):
         '''Deprecated method. Alias of sapyb'''
         return self.sapyb(a,y,b,out,num_threads)
 
-    def _binary_with_number(self, operation, el, other, i, res, out, kw, *args, **kwargs):
+    def _binary_with_number(self, operation, el, other, i, *args, **kwargs):
+        kw = kwargs.copy()
+        out = kwargs.get('out', None)
+        print ("################## out is ", out)
         if operation == BlockDataContainer.ADD:
             op = el.add
         elif operation == BlockDataContainer.SUBTRACT:
@@ -266,9 +275,9 @@ class BlockDataContainer(object):
             kw['out'] = out.get_item(i)
             op(other, *args, **kw)
         else:
-            res.append(op(other, *args, **kw))
+             return op(other, *args, **kw)
             
-    def _binary_with_iterable(self, operation, el, res, out, *args, **kwargs):
+    def _binary_with_iterable(self, operation, el, res, *args, **kwargs):
         pass
     def _binary_with_DataContainer(self, operation, other, *args, **kwargs):
         pass
@@ -287,30 +296,41 @@ class BlockDataContainer(object):
         out = kwargs.get('out', None)
         if isinstance(other, Number):
             # try to do algebra with one DataContainer. Will raise error if not compatible
-            kw = kwargs.copy()
-            res = []
-            for i,el in enumerate(self.containers):
-                if operation == BlockDataContainer.ADD:
-                    op = el.add
-                elif operation == BlockDataContainer.SUBTRACT:
-                    op = el.subtract
-                elif operation == BlockDataContainer.MULTIPLY:
-                    op = el.multiply
-                elif operation == BlockDataContainer.DIVIDE:
-                    op = el.divide
-                elif operation == BlockDataContainer.POWER:
-                    op = el.power
-                elif operation == BlockDataContainer.MAXIMUM:
-                    op = el.maximum
-                elif operation == BlockDataContainer.MINIMUM:
-                    op = el.minimum
-                else:
-                    raise ValueError('Unsupported operation', operation)
-                if out is not None:
-                    kw['out'] = out.get_item(i)
-                    op(other, *args, **kw)
-                else:
-                    res.append(op(other, *args, **kw))
+            
+            
+            if not has_dask:
+                res = []
+                for i,el in enumerate(self.containers):
+                    # operation, el, other, i, out, kw, *args, **kwargs
+                    res.append( self._binary_with_number(operation, el, other, i, *args, **kwargs) )
+            else:
+                # set up delayed computation and
+                # compute in parallel processes
+                i = 0
+                max_proc = len(self.containers)
+                num_parallel_processes = NUM_THREADS
+                # # tqdm progress bar on the while loop
+                # with tqdm(total=max_proc) as pbar:
+                
+                while (i < max_proc):
+                    j = 0
+                    while j < num_parallel_processes:
+                        if j + i == max_proc:
+                            break
+                        j += 1
+                    # set up j delayed computation
+                    procs = []
+                    for idx in range(j):
+                        el = self.containers[i+idx]
+                        procs.append(
+                            delayed(self._binary_with_number)(operation, el, other, i+idx, *args, **kwargs)
+                            )
+                    # call compute on j (< num_parallel_processes) processes concurrently
+                    # this limits the amount of memory required to store the output 
+                    res = dask.compute(*procs[:j])
+                    # pbar.update(1) # update the progress bar
+                    i += j
+            
             if out is not None:
                 return
             else:

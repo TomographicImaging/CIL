@@ -22,38 +22,39 @@ from numbers import Number
 has_numba = True
 try:
     import numba
+    @numba.jit(nopython=True)
+    def _proximal_step_numba(arr, abstau):
+        '''Numba implementation of a step in the calculation of the proximal of MixedL21Norm
+        
+        Parameters:
+        -----------
+        arr : numpy array, best if contiguous memory. 
+        abstau: float >= 0
+
+        Returns:
+        --------
+        Stores the output in the input array. Returns the modified input numpy array. 
+
+        Note:
+        -----
+        
+        Input arr should be contiguous for best performance'''
+        tmp = arr.ravel()
+        for i in numba.prange(tmp.size):
+            if tmp[i] == 0:
+                continue
+            a = tmp[i] / abstau
+            el = a - 1
+            if el <= 0.0:
+                el = 0.
+            
+            tmp[i] = el / a 
+        return arr
 except ImportError:
     has_numba = False
     
 
-@numba.jit(nopython=True)
-def _proximal_step_numba(arr, abstau):
-    '''Numba implementation of a step in the calculation of the proximal of MixedL21Norm
-    
-    Parameters:
-    -----------
-    arr : numpy array, best if contiguous memory. 
-    abstau: float >= 0
 
-    Returns:
-    --------
-    Stores the output in the input array. Returns the modified input numpy array. 
-
-    Note:
-    -----
-    
-    Input arr should be contiguous for best performance'''
-    tmp = arr.ravel()
-    for i in numba.prange(tmp.size):
-        if tmp[i] == 0:
-            continue
-        a = tmp[i] / abstau
-        el = a - 1
-        if el <= 0.0:
-            el = 0.
-        
-        tmp[i] = el / a 
-    return arr
 def _proximal_step_numpy(tmp, tau):
     '''Numpy implementation of a step in the calculation of the proximal of MixedL21Norm
     

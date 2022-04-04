@@ -251,9 +251,10 @@ class BlockDataContainer(object):
         '''Deprecated method. Alias of sapyb'''
         return self.sapyb(a,y,b,out,num_threads)
 
-    def _binary_with_number(self, operation, el, other, i, *args, **kwargs):
+    def _binary_with_number(self, operation, el, other, out, *args, **kwargs):
         kw = kwargs.copy()
-        out = kwargs.get('out', None)
+        # out = kwargs.get('out', None)
+        
         print ("################## out is ", out)
         if operation == BlockDataContainer.ADD:
             op = el.add
@@ -272,7 +273,6 @@ class BlockDataContainer(object):
         else:
             raise ValueError('Unsupported operation', operation)
         if out is not None:
-            kw['out'] = out.get_item(i)
             op(other, *args, **kw)
         else:
              return op(other, *args, **kw)
@@ -293,7 +293,15 @@ class BlockDataContainer(object):
         '''
         if not self.is_compatible(other):
             raise ValueError('Incompatible for operation {}'.format(operation))
-        out = kwargs.get('out', None)
+        # out = kwargs.get('out', None)
+        kw = {}
+        out = None
+        for k,v in kwargs.items():
+            if k == 'out':
+                out = v
+            else:
+                kw[k] = v
+        kwargs = kw
         if isinstance(other, Number):
             # try to do algebra with one DataContainer. Will raise error if not compatible
             
@@ -322,8 +330,11 @@ class BlockDataContainer(object):
                     procs = []
                     for idx in range(j):
                         el = self.containers[i+idx]
+                        outdbc = None
+                        if out is not None:
+                            outdbc = out[i+idx]
                         procs.append(
-                            delayed(self._binary_with_number)(operation, el, other, i+idx, *args, **kwargs)
+                            delayed(self._binary_with_number)(operation, el, other, outdbc, *args, **kwargs)
                             )
                     # call compute on j (< num_parallel_processes) processes concurrently
                     # this limits the amount of memory required to store the output 

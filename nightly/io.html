@@ -5,28 +5,26 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Read/ write AcquisitionData and ImageData &#8212; CIL v21.3.1-15-g3f0cb9dd documentation</title>
+    <title>Read/ write AcquisitionData and ImageData &#8212; CIL v21.3.1-16-g701c4999 documentation</title>
     
-    <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
-  
+
     
-    <link rel="stylesheet"
-      href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
-    <link rel="preload" as="font" type="font/woff2" crossorigin
-      href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
-    <link rel="preload" as="font" type="font/woff2" crossorigin
-      href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
-  
-    
-      
-  
-    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/styles/pydata-sphinx-theme.css" type="text/css" />
     
-    <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
-  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
@@ -42,7 +40,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -193,7 +191,7 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -241,9 +239,9 @@
               <div>
                 
   <div class="section" id="read-write-acquisitiondata-and-imagedata">
-<h1>Read/ write AcquisitionData and ImageData<a class="headerlink" href="#read-write-acquisitiondata-and-imagedata" title="Permalink to this headline">¶</a></h1>
+<h1>Read/ write AcquisitionData and ImageData<a class="headerlink" href="#read-write-acquisitiondata-and-imagedata" title="Permalink to this headline">#</a></h1>
 <div class="section" id="nexus">
-<h2>NeXuS<a class="headerlink" href="#nexus" title="Permalink to this headline">¶</a></h2>
+<h2>NeXuS<a class="headerlink" href="#nexus" title="Permalink to this headline">#</a></h2>
 <p>The CCPi Framework provides classes to read and write <code class="code docutils literal notranslate"><span class="pre">AcquisitionData</span></code> and <code class="code docutils literal notranslate"><span class="pre">ImageData</span></code>
 as NeXuS files.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># imports</span>
@@ -268,10 +266,10 @@ as NeXuS files.</p>
 </div>
 <dl class="py class">
 <dt id="cil.io.NEXUSDataReader">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.io.</span></code><code class="sig-name descname"><span class="pre">NEXUSDataReader</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataReader.html#NEXUSDataReader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataReader" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.io.</span></code><code class="sig-name descname"><span class="pre">NEXUSDataReader</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataReader.html#NEXUSDataReader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataReader" title="Permalink to this definition">#</a></dt>
 <dd><dl class="py method">
 <dt id="cil.io.NEXUSDataReader.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataReader.html#NEXUSDataReader.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataReader.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataReader.html#NEXUSDataReader.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataReader.__init__" title="Permalink to this definition">#</a></dt>
 <dd><p>Constructor</p>
 <p>Input:</p>
 <blockquote>
@@ -281,44 +279,44 @@ as NeXuS files.</p>
 
 <dl class="py method">
 <dt id="cil.io.NEXUSDataReader.get_geometry">
-<code class="sig-name descname"><span class="pre">get_geometry</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataReader.html#NEXUSDataReader.get_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataReader.get_geometry" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_geometry</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataReader.html#NEXUSDataReader.get_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataReader.get_geometry" title="Permalink to this definition">#</a></dt>
 <dd><p>Parse NEXUS file and returns either ImageData or Acquisition Data
 depending on file content</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.io.NEXUSDataReader.get_data_scale">
-<code class="sig-name descname"><span class="pre">get_data_scale</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataReader.html#NEXUSDataReader.get_data_scale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataReader.get_data_scale" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_data_scale</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataReader.html#NEXUSDataReader.get_data_scale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataReader.get_data_scale" title="Permalink to this definition">#</a></dt>
 <dd><p>Parse NEXUS file and returns the scale factor applied to compress the dataset</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.io.NEXUSDataReader.get_data_offset">
-<code class="sig-name descname"><span class="pre">get_data_offset</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataReader.html#NEXUSDataReader.get_data_offset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataReader.get_data_offset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_data_offset</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataReader.html#NEXUSDataReader.get_data_offset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataReader.get_data_offset" title="Permalink to this definition">#</a></dt>
 <dd><p>Parse NEXUS file and returns the offset factor applied to compress the dataset</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.io.NEXUSDataReader.read_as_original">
-<code class="sig-name descname"><span class="pre">read_as_original</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataReader.html#NEXUSDataReader.read_as_original"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataReader.read_as_original" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">read_as_original</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataReader.html#NEXUSDataReader.read_as_original"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataReader.read_as_original" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns either an ImageData or AcquisitionData containing the compressed data</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.io.NEXUSDataReader.read">
-<code class="sig-name descname"><span class="pre">read</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataReader.html#NEXUSDataReader.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataReader.read" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">read</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataReader.html#NEXUSDataReader.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataReader.read" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns either an ImageData or Acquisition Data containing the uncompressed data as numpy.float32</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.io.NEXUSDataReader.load_data">
-<code class="sig-name descname"><span class="pre">load_data</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataReader.html#NEXUSDataReader.load_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataReader.load_data" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">load_data</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataReader.html#NEXUSDataReader.load_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataReader.load_data" title="Permalink to this definition">#</a></dt>
 <dd><p>alias of read</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt id="cil.io.NEXUSDataReader.__weakref__">
-<code class="sig-name descname"><span class="pre">__weakref__</span></code><a class="headerlink" href="#cil.io.NEXUSDataReader.__weakref__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__weakref__</span></code><a class="headerlink" href="#cil.io.NEXUSDataReader.__weakref__" title="Permalink to this definition">#</a></dt>
 <dd><p>list of weak references to the object (if defined)</p>
 </dd></dl>
 
@@ -326,10 +324,10 @@ depending on file content</p>
 
 <dl class="py class">
 <dt id="cil.io.NEXUSDataWriter">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.io.</span></code><code class="sig-name descname"><span class="pre">NEXUSDataWriter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataWriter.html#NEXUSDataWriter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataWriter" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.io.</span></code><code class="sig-name descname"><span class="pre">NEXUSDataWriter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataWriter.html#NEXUSDataWriter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataWriter" title="Permalink to this definition">#</a></dt>
 <dd><dl class="py method">
 <dt id="cil.io.NEXUSDataWriter.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataWriter.html#NEXUSDataWriter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataWriter.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataWriter.html#NEXUSDataWriter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataWriter.__init__" title="Permalink to this definition">#</a></dt>
 <dd><p>Constructor</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -344,7 +342,7 @@ depending on file content</p>
 
 <dl class="py method">
 <dt id="cil.io.NEXUSDataWriter.set_up">
-<code class="sig-name descname"><span class="pre">set_up</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compression</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataWriter.html#NEXUSDataWriter.set_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataWriter.set_up" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">set_up</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compression</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataWriter.html#NEXUSDataWriter.set_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataWriter.set_up" title="Permalink to this definition">#</a></dt>
 <dd><p>set up writer</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -359,13 +357,13 @@ depending on file content</p>
 
 <dl class="py method">
 <dt id="cil.io.NEXUSDataWriter.write">
-<code class="sig-name descname"><span class="pre">write</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataWriter.html#NEXUSDataWriter.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataWriter.write" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">write</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NEXUSDataWriter.html#NEXUSDataWriter.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NEXUSDataWriter.write" title="Permalink to this definition">#</a></dt>
 <dd><p>write dataset to disk</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt id="cil.io.NEXUSDataWriter.__weakref__">
-<code class="sig-name descname"><span class="pre">__weakref__</span></code><a class="headerlink" href="#cil.io.NEXUSDataWriter.__weakref__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__weakref__</span></code><a class="headerlink" href="#cil.io.NEXUSDataWriter.__weakref__" title="Permalink to this definition">#</a></dt>
 <dd><p>list of weak references to the object (if defined)</p>
 </dd></dl>
 
@@ -376,13 +374,13 @@ depending on file content</p>
 </div>
 </div>
 <div class="section" id="nikon">
-<h2>Nikon<a class="headerlink" href="#nikon" title="Permalink to this headline">¶</a></h2>
+<h2>Nikon<a class="headerlink" href="#nikon" title="Permalink to this headline">#</a></h2>
 <dl class="py class">
 <dt id="cil.io.NikonDataReader">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.io.</span></code><code class="sig-name descname"><span class="pre">NikonDataReader</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NikonDataReader.html#NikonDataReader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NikonDataReader" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.io.</span></code><code class="sig-name descname"><span class="pre">NikonDataReader</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NikonDataReader.html#NikonDataReader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NikonDataReader" title="Permalink to this definition">#</a></dt>
 <dd><dl class="py method">
 <dt id="cil.io.NikonDataReader.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NikonDataReader.html#NikonDataReader.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NikonDataReader.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NikonDataReader.html#NikonDataReader.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NikonDataReader.__init__" title="Permalink to this definition">#</a></dt>
 <dd><p>Basic reader for xtekct files</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -427,31 +425,31 @@ output array size in bin mode != output array size in slice mode</p></li>
 
 <dl class="py method">
 <dt id="cil.io.NikonDataReader.get_geometry">
-<code class="sig-name descname"><span class="pre">get_geometry</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NikonDataReader.html#NikonDataReader.get_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NikonDataReader.get_geometry" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_geometry</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NikonDataReader.html#NikonDataReader.get_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NikonDataReader.get_geometry" title="Permalink to this definition">#</a></dt>
 <dd><p>Return AcquisitionGeometry object</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.io.NikonDataReader.get_roi">
-<code class="sig-name descname"><span class="pre">get_roi</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NikonDataReader.html#NikonDataReader.get_roi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NikonDataReader.get_roi" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_roi</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NikonDataReader.html#NikonDataReader.get_roi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NikonDataReader.get_roi" title="Permalink to this definition">#</a></dt>
 <dd><p>returns the roi</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.io.NikonDataReader.read">
-<code class="sig-name descname"><span class="pre">read</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NikonDataReader.html#NikonDataReader.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NikonDataReader.read" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">read</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NikonDataReader.html#NikonDataReader.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NikonDataReader.read" title="Permalink to this definition">#</a></dt>
 <dd><p>Reads projections and return AcquisitionData container</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt id="cil.io.NikonDataReader.__weakref__">
-<code class="sig-name descname"><span class="pre">__weakref__</span></code><a class="headerlink" href="#cil.io.NikonDataReader.__weakref__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__weakref__</span></code><a class="headerlink" href="#cil.io.NikonDataReader.__weakref__" title="Permalink to this definition">#</a></dt>
 <dd><p>list of weak references to the object (if defined)</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.io.NikonDataReader.load_projections">
-<code class="sig-name descname"><span class="pre">load_projections</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NikonDataReader.html#NikonDataReader.load_projections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NikonDataReader.load_projections" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">load_projections</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/NikonDataReader.html#NikonDataReader.load_projections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.NikonDataReader.load_projections" title="Permalink to this definition">#</a></dt>
 <dd><p>alias of read for backward compatibility</p>
 </dd></dl>
 
@@ -459,13 +457,13 @@ output array size in bin mode != output array size in slice mode</p></li>
 
 </div>
 <div class="section" id="zeiss">
-<h2>ZEISS<a class="headerlink" href="#zeiss" title="Permalink to this headline">¶</a></h2>
+<h2>ZEISS<a class="headerlink" href="#zeiss" title="Permalink to this headline">#</a></h2>
 <dl class="py class">
 <dt id="cil.io.TXRMDataReader">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.io.</span></code><code class="sig-name descname"><span class="pre">TXRMDataReader</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TXRMDataReader.html#TXRMDataReader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TXRMDataReader" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.io.</span></code><code class="sig-name descname"><span class="pre">TXRMDataReader</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TXRMDataReader.html#TXRMDataReader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TXRMDataReader" title="Permalink to this definition">#</a></dt>
 <dd><dl class="py method">
 <dt id="cil.io.TXRMDataReader.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TXRMDataReader.html#TXRMDataReader.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TXRMDataReader.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TXRMDataReader.html#TXRMDataReader.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TXRMDataReader.__init__" title="Permalink to this definition">#</a></dt>
 <dd><p>Constructor</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -480,7 +478,7 @@ output array size in bin mode != output array size in slice mode</p></li>
 
 <dl class="py method">
 <dt id="cil.io.TXRMDataReader.set_up">
-<code class="sig-name descname"><span class="pre">set_up</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'degree'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logging_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">40</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TXRMDataReader.html#TXRMDataReader.set_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TXRMDataReader.set_up" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">set_up</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'degree'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logging_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">40</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TXRMDataReader.html#TXRMDataReader.set_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TXRMDataReader.set_up" title="Permalink to this definition">#</a></dt>
 <dd><p>Set up the reader</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -495,31 +493,31 @@ output array size in bin mode != output array size in slice mode</p></li>
 
 <dl class="py method">
 <dt id="cil.io.TXRMDataReader.get_geometry">
-<code class="sig-name descname"><span class="pre">get_geometry</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TXRMDataReader.html#TXRMDataReader.get_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TXRMDataReader.get_geometry" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_geometry</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TXRMDataReader.html#TXRMDataReader.get_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TXRMDataReader.get_geometry" title="Permalink to this definition">#</a></dt>
 <dd><p>Return AcquisitionGeometry object</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.io.TXRMDataReader.read">
-<code class="sig-name descname"><span class="pre">read</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TXRMDataReader.html#TXRMDataReader.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TXRMDataReader.read" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">read</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TXRMDataReader.html#TXRMDataReader.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TXRMDataReader.read" title="Permalink to this definition">#</a></dt>
 <dd><p>Reads projections and return AcquisitionData container</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.io.TXRMDataReader.load_projections">
-<code class="sig-name descname"><span class="pre">load_projections</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TXRMDataReader.html#TXRMDataReader.load_projections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TXRMDataReader.load_projections" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">load_projections</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TXRMDataReader.html#TXRMDataReader.load_projections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TXRMDataReader.load_projections" title="Permalink to this definition">#</a></dt>
 <dd><p>alias of read for backward compatibility</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.io.TXRMDataReader.get_metadata">
-<code class="sig-name descname"><span class="pre">get_metadata</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TXRMDataReader.html#TXRMDataReader.get_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TXRMDataReader.get_metadata" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_metadata</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TXRMDataReader.html#TXRMDataReader.get_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TXRMDataReader.get_metadata" title="Permalink to this definition">#</a></dt>
 <dd><p>return the metadata of the loaded file</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt id="cil.io.TXRMDataReader.__weakref__">
-<code class="sig-name descname"><span class="pre">__weakref__</span></code><a class="headerlink" href="#cil.io.TXRMDataReader.__weakref__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__weakref__</span></code><a class="headerlink" href="#cil.io.TXRMDataReader.__weakref__" title="Permalink to this definition">#</a></dt>
 <dd><p>list of weak references to the object (if defined)</p>
 </dd></dl>
 
@@ -527,13 +525,13 @@ output array size in bin mode != output array size in slice mode</p></li>
 
 </div>
 <div class="section" id="tiff-reader-writer">
-<h2>TIFF Reader/Writer<a class="headerlink" href="#tiff-reader-writer" title="Permalink to this headline">¶</a></h2>
+<h2>TIFF Reader/Writer<a class="headerlink" href="#tiff-reader-writer" title="Permalink to this headline">#</a></h2>
 <dl class="py class">
 <dt id="cil.io.TIFFStackReader">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.io.</span></code><code class="sig-name descname"><span class="pre">TIFFStackReader</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TIFF.html#TIFFStackReader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFStackReader" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.io.</span></code><code class="sig-name descname"><span class="pre">TIFFStackReader</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TIFF.html#TIFFStackReader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFStackReader" title="Permalink to this definition">#</a></dt>
 <dd><dl class="py method">
 <dt id="cil.io.TIFFStackReader.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TIFF.html#TIFFStackReader.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFStackReader.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TIFF.html#TIFFStackReader.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFStackReader.__init__" title="Permalink to this definition">#</a></dt>
 <dd><p>Basic TIFF redaer which loops through all riff files in a specific
 folder and load them in alphabetic order</p>
 <p>:param :
@@ -592,7 +590,7 @@ in slice mode</p>
 
 <dl class="py method">
 <dt id="cil.io.TIFFStackReader.set_up">
-<code class="sig-name descname"><span class="pre">set_up</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">file_name=None</span></em>, <em class="sig-param"><span class="pre">roi={'axis_0':</span> <span class="pre">-1</span></em>, <em class="sig-param"><span class="pre">'axis_1':</span> <span class="pre">-1</span></em>, <em class="sig-param"><span class="pre">'axis_2':</span> <span class="pre">-1}</span></em>, <em class="sig-param"><span class="pre">transpose=False</span></em>, <em class="sig-param"><span class="pre">mode='bin'</span></em>, <em class="sig-param"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TIFF.html#TIFFStackReader.set_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFStackReader.set_up" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">set_up</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">file_name=None</span></em>, <em class="sig-param"><span class="pre">roi={'axis_0':</span> <span class="pre">-1</span></em>, <em class="sig-param"><span class="pre">'axis_1':</span> <span class="pre">-1</span></em>, <em class="sig-param"><span class="pre">'axis_2':</span> <span class="pre">-1}</span></em>, <em class="sig-param"><span class="pre">transpose=False</span></em>, <em class="sig-param"><span class="pre">mode='bin'</span></em>, <em class="sig-param"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TIFF.html#TIFFStackReader.set_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFStackReader.set_up" title="Permalink to this definition">#</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -631,19 +629,19 @@ the type of the saved file.</p></li>
 
 <dl class="py method">
 <dt id="cil.io.TIFFStackReader.read">
-<code class="sig-name descname"><span class="pre">read</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TIFF.html#TIFFStackReader.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFStackReader.read" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">read</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TIFF.html#TIFFStackReader.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFStackReader.read" title="Permalink to this definition">#</a></dt>
 <dd><p>Reads images and return numpy array</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt id="cil.io.TIFFStackReader.__weakref__">
-<code class="sig-name descname"><span class="pre">__weakref__</span></code><a class="headerlink" href="#cil.io.TIFFStackReader.__weakref__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__weakref__</span></code><a class="headerlink" href="#cil.io.TIFFStackReader.__weakref__" title="Permalink to this definition">#</a></dt>
 <dd><p>list of weak references to the object (if defined)</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.io.TIFFStackReader.read_as_ImageData">
-<code class="sig-name descname"><span class="pre">read_as_ImageData</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TIFF.html#TIFFStackReader.read_as_ImageData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFStackReader.read_as_ImageData" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">read_as_ImageData</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TIFF.html#TIFFStackReader.read_as_ImageData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFStackReader.read_as_ImageData" title="Permalink to this definition">#</a></dt>
 <dd><p>reads the TIFF stack as an ImageData with the provided geometry</p>
 <p>Notice that the data will be reshaped to what requested in the geometry but there is
 no warranty that the data will be read in the right order!
@@ -653,7 +651,7 @@ leads to sensible data.</p>
 
 <dl class="py method">
 <dt id="cil.io.TIFFStackReader.read_as_AcquisitionData">
-<code class="sig-name descname"><span class="pre">read_as_AcquisitionData</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">acquisition_geometry</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TIFF.html#TIFFStackReader.read_as_AcquisitionData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFStackReader.read_as_AcquisitionData" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">read_as_AcquisitionData</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">acquisition_geometry</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TIFF.html#TIFFStackReader.read_as_AcquisitionData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFStackReader.read_as_AcquisitionData" title="Permalink to this definition">#</a></dt>
 <dd><p>reads the TIFF stack as an AcquisitionData with the provided geometry</p>
 <p>Notice that the data will be reshaped to what requested in the geometry but there is
 no warranty that the data will be read in the right order!
@@ -665,11 +663,11 @@ leads to sensible data.</p>
 
 <dl class="py class">
 <dt id="cil.io.TIFFWriter">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.io.</span></code><code class="sig-name descname"><span class="pre">TIFFWriter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TIFF.html#TIFFWriter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFWriter" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.io.</span></code><code class="sig-name descname"><span class="pre">TIFFWriter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TIFF.html#TIFFWriter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFWriter" title="Permalink to this definition">#</a></dt>
 <dd><p>Write a DataSet to disk as a TIFF file or stack</p>
 <dl class="py method">
 <dt id="cil.io.TIFFWriter.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TIFF.html#TIFFWriter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFWriter.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/io/TIFF.html#TIFFWriter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.io.TIFFWriter.__init__" title="Permalink to this definition">#</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -685,7 +683,7 @@ By counter_offset you can offset the index: from <cite>counter_offset</cite> to 
 
 <dl class="py attribute">
 <dt id="cil.io.TIFFWriter.__weakref__">
-<code class="sig-name descname"><span class="pre">__weakref__</span></code><a class="headerlink" href="#cil.io.TIFFWriter.__weakref__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__weakref__</span></code><a class="headerlink" href="#cil.io.TIFFWriter.__weakref__" title="Permalink to this definition">#</a></dt>
 <dd><p>list of weak references to the object (if defined)</p>
 </dd></dl>
 
@@ -723,8 +721,9 @@ By counter_offset you can offset the index: from <cite>counter_offset</cite> to 
       </div>
     </div>
   
-    <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
-  <footer class="footer mt-5 mt-md-0">
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
   <div class="container">
     
     <div class="footer-item">

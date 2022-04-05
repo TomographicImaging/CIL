@@ -5,28 +5,26 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Developer’s guide &#8212; CIL v21.3.1-15-g3f0cb9dd documentation</title>
+    <title>Developer’s guide &#8212; CIL v21.3.1-16-g701c4999 documentation</title>
     
-    <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
-  
+
     
-    <link rel="stylesheet"
-      href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
-    <link rel="preload" as="font" type="font/woff2" crossorigin
-      href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
-    <link rel="preload" as="font" type="font/woff2" crossorigin
-      href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
-  
-    
-      
-  
-    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/styles/pydata-sphinx-theme.css" type="text/css" />
     
-    <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
-  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
@@ -41,7 +39,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -195,7 +193,7 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -250,11 +248,11 @@
               <div>
                 
   <div class="section" id="developer-s-guide">
-<h1>Developer’s guide<a class="headerlink" href="#developer-s-guide" title="Permalink to this headline">¶</a></h1>
+<h1>Developer’s guide<a class="headerlink" href="#developer-s-guide" title="Permalink to this headline">#</a></h1>
 <p>CIL is an Object Orientated software. It has evolved during the years and it currently does not fully adheres to the following conventions. New additions must comply with
 the following.</p>
 <div class="section" id="conventions-on-new-cil-objects">
-<h2>Conventions on new CIL objects<a class="headerlink" href="#conventions-on-new-cil-objects" title="Permalink to this headline">¶</a></h2>
+<h2>Conventions on new CIL objects<a class="headerlink" href="#conventions-on-new-cil-objects" title="Permalink to this headline">#</a></h2>
 <p>For each class there are <strong>essential</strong>, and <strong>non-essential</strong> parameters. The non-essential can be further be divided in <strong>often configured</strong> and <strong>advanced</strong> parameters:</p>
 <ul class="simple">
 <li><p>essential</p></li>
@@ -267,25 +265,25 @@ the following.</p>
 </ul>
 <p>The definition of what are the essential, often-configured and advanced parameters depends on the actual class.</p>
 <div class="section" id="creator">
-<h3>Creator<a class="headerlink" href="#creator" title="Permalink to this headline">¶</a></h3>
+<h3>Creator<a class="headerlink" href="#creator" title="Permalink to this headline">#</a></h3>
 <p>To create an instance of a class, the creator of a class should require the <strong>essential</strong> and <strong>often-configured</strong> parameters as named parameters.</p>
 <p>It should not accept positional arguments <cite>*args</cite> or keyworded arguments <cite>**kwargs</cite> so that the user can clearly understand what parameters are necessary to
 create the instance.</p>
 </div>
 <div class="section" id="setter-methods-and-properties">
-<h3>Setter methods and properties<a class="headerlink" href="#setter-methods-and-properties" title="Permalink to this headline">¶</a></h3>
+<h3>Setter methods and properties<a class="headerlink" href="#setter-methods-and-properties" title="Permalink to this headline">#</a></h3>
 <p>Use of <cite>property</cite> is favoured instead of class members to store parameters so that the parameters can be protected.</p>
 <p>The class should provide setter methods to change all the parameters at any time. Setter methods to set multiple parameters at the same time is also accepted.
 Setter methods should be named <cite>set_&lt;parameter&gt;</cite>. The use of <cite>set_</cite> helps IDEs and user to find what they should change in an instance of a class.</p>
 </div>
 <div class="section" id="other-methods">
-<h3>Other methods<a class="headerlink" href="#other-methods" title="Permalink to this headline">¶</a></h3>
+<h3>Other methods<a class="headerlink" href="#other-methods" title="Permalink to this headline">#</a></h3>
 <p>Methods that are not meant to be used by the user should have a <cite>_</cite> (underscore) at the beginning of the name.
 All methods should follow the convention of small caps underscore separated words.</p>
 </div>
 </div>
 <div class="section" id="docstrings">
-<h2>Docstrings<a class="headerlink" href="#docstrings" title="Permalink to this headline">¶</a></h2>
+<h2>Docstrings<a class="headerlink" href="#docstrings" title="Permalink to this headline">#</a></h2>
 <p>The Core Imaging Library follows the <a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard">NumpyDoc</a>
 style with the <a class="reference external" href="https://pydata-sphinx-theme.readthedocs.io/en/latest/">PyData Sphinx html theme</a>.</p>
 <p>When contributing your code please refer to <a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard">this</a> link
@@ -314,8 +312,9 @@ for docstring formatting and this rendered <a class="reference external" href="h
       </div>
     </div>
   
-    <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
-  <footer class="footer mt-5 mt-md-0">
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
   <div class="container">
     
     <div class="footer-item">

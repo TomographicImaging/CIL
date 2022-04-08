@@ -253,9 +253,7 @@ class BlockDataContainer(object):
 
     def _binary_with_number(self, operation, el, other, out, *args, **kwargs):
         kw = kwargs.copy()
-        # out = kwargs.get('out', None)
         
-        print ("################## out is ", out)
         if operation == BlockDataContainer.ADD:
             op = el.add
         elif operation == BlockDataContainer.SUBTRACT:
@@ -289,6 +287,15 @@ class BlockDataContainer(object):
         class's reverse algebric methods take precedence w.r.t. direct algebric
         methods of DataContainer and subclasses.
         
+
+        Note:
+        -----
+
+        The dask parallelisation does not allow to modify the input parameters, so passing out
+        will be useless. This means that in case out is passed, we will allocate the output
+        BlockDataContainer and then copy its content in the output of the parallel
+        Note:
+        -----
         This method is not to be used directly
         '''
         if not self.is_compatible(other):
@@ -306,7 +313,7 @@ class BlockDataContainer(object):
             # try to do algebra with one DataContainer. Will raise error if not compatible
             
             
-            if not has_dask:
+            if not ( has_dask or operation == BlockDataContainer.SAPYB) :
                 res = []
                 for i,el in enumerate(self.containers):
                     # operation, el, other, i, out, kw, *args, **kwargs
@@ -320,29 +327,24 @@ class BlockDataContainer(object):
                 # # tqdm progress bar on the while loop
                 # with tqdm(total=max_proc) as pbar:
                 
-                while (i < max_proc):
-                    j = 0
-                    while j < num_parallel_processes:
-                        if j + i == max_proc:
-                            break
-                        j += 1
-                    # set up j delayed computation
-                    procs = []
-                    for idx in range(j):
-                        el = self.containers[i+idx]
-                        outdbc = None
-                        if out is not None:
-                            outdbc = out[i+idx]
-                        procs.append(
-                            delayed(self._binary_with_number)(operation, el, other, outdbc, *args, **kwargs)
-                            )
-                    # call compute on j (< num_parallel_processes) processes concurrently
-                    # this limits the amount of memory required to store the output 
-                    res = dask.compute(*procs[:j])
-                    # pbar.update(1) # update the progress bar
-                    i += j
-            
+                # set up j delayed computation
+                procs = []
+                for j in range(max_proc):
+                    el = self.containers[j]
+                    # dask delayed do not play well with modifying the input, which is a shame
+                    # because it means we will allocate more stuff instead of saving memory by passing the out
+                    # https://docs.dask.org/en/stable/delayed-best-practices.html#don-t-mutate-inputs
+                    procs.append(
+                        delayed(self._binary_with_number)(operation, el, other, None, *args, **kwargs)
+                        )
+                
+                res = dask.compute(*procs)
+
+
             if out is not None:
+                # store in the output array
+                for j in range(max_proc):
+                    out[j].fill(res[j])
                 return
             else:
                 return type(self)(*res, shape=self.shape)

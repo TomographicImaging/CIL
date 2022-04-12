@@ -288,7 +288,7 @@ class BlockDataContainer(object):
             
     def _binary_with_iterable(self, operation, el, res, *args, **kwargs):
         pass
-    def _binary_with_DataContainer(self, operation, el, other, out, *args, **kwargs):
+    def _binary_with_DataContainer(self, operation, el, other, out, i,*args, **kwargs):
         # try to do algebra with one DataContainer. Will raise error if not compatible
         kw = kwargs.copy()
         if operation != BlockDataContainer.SAPYB:
@@ -463,7 +463,7 @@ class BlockDataContainer(object):
                     if out is not None:
                         dout = out[i]
                     res.append(
-                        self._binary_with_DataContainer(operation, el, other, dout, **kw)
+                        self._binary_with_DataContainer(operation, el, other, dout, i, **kw)
                     )
             else:
                 # set up delayed computation and
@@ -476,7 +476,7 @@ class BlockDataContainer(object):
                         delayed(self._binary_with_DataContainer, 
                                 name="bdc{}".format(i),
                                 traverse=False
-                                )(operation, el, other, dout, **kw)
+                                )(operation, el, other, dout, i, **kw)
                         )
                 
                 res = dask.compute(*procs)

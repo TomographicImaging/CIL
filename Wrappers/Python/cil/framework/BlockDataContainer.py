@@ -282,7 +282,7 @@ class BlockDataContainer(object):
         else:
             raise ValueError('Unsupported operation', operation)
         if out is not None:
-            op(other, *args, **kw)
+            op(other, out=out, *args, **kw)
         else:
              return op(other, *args, **kw)
             
@@ -330,11 +330,13 @@ class BlockDataContainer(object):
 
         else:
             raise ValueError('Unsupported operation', operation)
-        if out is not None:
-            kw['out'] = out.get_item(i)
-            op(other, *args, **kw)
-        else:
-            res = op(other, *args, **kw)
+
+        if operation != BlockDataContainer.SAPYB:
+            if out is not None:
+                kw['out'] = out.get_item(i)
+                op(other, *args, **kw)
+            else:
+                res = op(other, *args, **kw)
         
         if out is None:
             return res
@@ -457,10 +459,30 @@ class BlockDataContainer(object):
                 return type(self)(*res, shape=self.shape)
         else:
             # try to do algebra with one DataContainer. Will raise error if not compatible
-            for i, el in enumerate(self.containers):
-                res.append(
-                    self._binary_with_DataContainer(operation, el, other, out, i)
-                )
+            if (not has_dask) or operation == BlockDataContainer.SAPYB or self.is_nested :
+                for i, el in enumerate(self.containers):
+                    res.append(
+                        self._binary_with_DataContainer(operation, el, other, out, i, **kw)
+                    )
+            else:
+                # set up delayed computation and
+                procs = []
+                for i,el in enumerate(self.containers):
+                    if (isinstance(el, tuple)):
+                        raise ValueError('Why tuple???')
+                    dout = None
+                    if out is not None:
+                        dout = out[i]
+                    procs.append(
+                        delayed(self._binary_with_DataContainer, 
+                                name="bdc{}".format(i),
+                                traverse=False
+                                )(operation, el, other, dout, i, **kw)
+                        )
+                
+                res = dask.compute(*procs)
+
+            
         if out is not None:
             return
         else:

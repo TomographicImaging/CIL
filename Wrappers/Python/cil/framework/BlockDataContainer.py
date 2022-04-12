@@ -70,7 +70,12 @@ class BlockDataContainer(object):
 
     def __init__(self, *args, **kwargs):
         ''''''
-        self.containers = args
+        self.containers = []
+        self._is_nested = False
+        for el in args:
+            if isinstance(el ,BlockDataContainer):
+                self._is_nested = True
+            self.containers.append(el)
         self.index = 0        
         self.geometry = None
         #if len(set([i.shape for i in self.containers])):
@@ -140,6 +145,12 @@ class BlockDataContainer(object):
     def __getitem__(self, row):
         return self.get_item(row)
                 
+    @property
+    def is_nested(self):
+        '''Returns whether the BlockDataContainer contains BlockDataContainers'''
+        return self._is_nested
+
+
     def add(self, other, *args, **kwargs):
         '''Algebra: add method of BlockDataContainer with number/DataContainer or BlockDataContainer
         
@@ -277,8 +288,57 @@ class BlockDataContainer(object):
             
     def _binary_with_iterable(self, operation, el, res, *args, **kwargs):
         pass
-    def _binary_with_DataContainer(self, operation, other, *args, **kwargs):
-        pass
+    def _binary_with_DataContainer(self, operation, el, other, out, i, *args, **kwargs):
+        # try to do algebra with one DataContainer. Will raise error if not compatible
+        kw = kwargs.copy()
+        if operation != BlockDataContainer.SAPYB:
+            # remove keyworded argument related to SAPYB
+            for k in ['a','b','y', 'num_threads', 'dtype']:
+                if k in kw.keys():
+                    kw.pop(k)
+            
+        if operation == BlockDataContainer.ADD:
+            op = el.add
+        elif operation == BlockDataContainer.SUBTRACT:
+            op = el.subtract
+        elif operation == BlockDataContainer.MULTIPLY:
+            op = el.multiply
+        elif operation == BlockDataContainer.DIVIDE:
+            op = el.divide
+        elif operation == BlockDataContainer.POWER:
+            op = el.power
+        elif operation == BlockDataContainer.MAXIMUM:
+            op = el.maximum
+        elif operation == BlockDataContainer.MINIMUM:
+            op = el.minimum
+        elif operation == BlockDataContainer.SAPYB:
+
+            if isinstance(kw['a'], BlockDataContainer):
+                a = kw['a'].get_item(i)
+            else:
+                a = kw['a']
+
+            if isinstance(kw['b'], BlockDataContainer):
+                b = kw['b'].get_item(i)
+            else:
+                b = kw['b']
+
+            el.sapyb(a, other, b, out.get_item(i), kw['num_threads'])
+
+            # As axpyb cannot return anything we `continue` to skip the rest of the code block
+            # continue
+
+        else:
+            raise ValueError('Unsupported operation', operation)
+        if out is not None:
+            kw['out'] = out.get_item(i)
+            op(other, *args, **kw)
+        else:
+            res = op(other, *args, **kw)
+        
+        if out is None:
+            return res
+
 
     def binary_operations(self, operation, other, *args, **kwargs):
         '''Algebra: generic method of algebric operation with BlockDataContainer with number/DataContainer or BlockDataContainer
@@ -309,48 +369,41 @@ class BlockDataContainer(object):
             else:
                 kw[k] = v
         kwargs = kw
+        res = []
         if isinstance(other, Number):
             # try to do algebra with one DataContainer. Will raise error if not compatible
             
             
-            if not ( has_dask or operation == BlockDataContainer.SAPYB) :
-                res = []
+            if (not has_dask) or operation == BlockDataContainer.SAPYB or self.is_nested :
                 for i,el in enumerate(self.containers):
                     # operation, el, other, i, out, kw, *args, **kwargs
-                    res.append( self._binary_with_number(operation, el, other, i, *args, **kwargs) )
+                    res.append( self._binary_with_number(operation, el, other, out, *args, **kwargs) )
             else:
                 # set up delayed computation and
-                # compute in parallel processes
-                i = 0
-                max_proc = len(self.containers)
-                num_parallel_processes = NUM_THREADS
-                # # tqdm progress bar on the while loop
-                # with tqdm(total=max_proc) as pbar:
-                
-                # set up j delayed computation
                 procs = []
-                for j in range(max_proc):
-                    el = self.containers[j]
-                    # dask delayed do not play well with modifying the input, which is a shame
-                    # because it means we will allocate more stuff instead of saving memory by passing the out
-                    # https://docs.dask.org/en/stable/delayed-best-practices.html#don-t-mutate-inputs
+                for i,el in enumerate(self.containers):
+                    if (isinstance(el, tuple)):
+                        raise ValueError('Why tuple???')
+                    dout = None
+                    if out is not None:
+                        dout = out[i]
                     procs.append(
-                        delayed(self._binary_with_number)(operation, el, other, None, *args, **kwargs)
+                        delayed(self._binary_with_number, 
+                                name="bdc{}".format(i),
+                                traverse=False
+                                )(operation, el, other, dout, *args, **kwargs)
                         )
                 
                 res = dask.compute(*procs)
 
 
             if out is not None:
-                # store in the output array
-                for j in range(max_proc):
-                    out[j].fill(res[j])
                 return
             else:
                 return type(self)(*res, shape=self.shape)
         elif isinstance(other, (list, tuple, numpy.ndarray, BlockDataContainer)):
             kw = kwargs.copy()
-            res = []
+            
             if isinstance(other, BlockDataContainer):
                 the_other = other.containers
             else:
@@ -404,58 +457,14 @@ class BlockDataContainer(object):
                 return type(self)(*res, shape=self.shape)
         else:
             # try to do algebra with one DataContainer. Will raise error if not compatible
-            kw = kwargs.copy()
-            if operation != BlockDataContainer.SAPYB:
-                # remove keyworded argument related to SAPYB
-                for k in ['a','b','y', 'num_threads', 'dtype']:
-                    if k in kw.keys():
-                        kw.pop(k)
-                
-            res = []
-            for i,el in enumerate(self.containers):
-                if operation == BlockDataContainer.ADD:
-                    op = el.add
-                elif operation == BlockDataContainer.SUBTRACT:
-                    op = el.subtract
-                elif operation == BlockDataContainer.MULTIPLY:
-                    op = el.multiply
-                elif operation == BlockDataContainer.DIVIDE:
-                    op = el.divide
-                elif operation == BlockDataContainer.POWER:
-                    op = el.power
-                elif operation == BlockDataContainer.MAXIMUM:
-                    op = el.maximum
-                elif operation == BlockDataContainer.MINIMUM:
-                    op = el.minimum
-                elif operation == BlockDataContainer.SAPYB:
-
-                    if isinstance(kw['a'], BlockDataContainer):
-                        a = kw['a'].get_item(i)
-                    else:
-                        a = kw['a']
-
-                    if isinstance(kw['b'], BlockDataContainer):
-                        b = kw['b'].get_item(i)
-                    else:
-                        b = kw['b']
-
-                    el.sapyb(a, other, b, out.get_item(i), kw['num_threads'])
-
-                    # As axpyb cannot return anything we `continue` to skip the rest of the code block
-                    continue
-
-                else:
-                    raise ValueError('Unsupported operation', operation)
-                if out is not None:
-                    kw['out'] = out.get_item(i)
-                    op(other, *args, **kw)
-                else:
-                    res.append(op(other, *args, **kw))
-
-            if out is not None:
-                return
-            else:
-                return type(self)(*res, shape=self.shape)
+            for i, el in enumerate(self.containers):
+                res.append(
+                    self._binary_with_DataContainer(operation, el, other, out, i)
+                )
+        if out is not None:
+            return
+        else:
+            return type(self)(*res, shape=self.shape)
 
     ## unary operations
 

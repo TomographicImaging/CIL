@@ -288,7 +288,7 @@ class BlockDataContainer(object):
             
     def _binary_with_iterable(self, operation, el, res, *args, **kwargs):
         pass
-    def _binary_with_DataContainer(self, operation, el, other, out, i, *args, **kwargs):
+    def _binary_with_DataContainer(self, operation, el, other, out, *args, **kwargs):
         # try to do algebra with one DataContainer. Will raise error if not compatible
         kw = kwargs.copy()
         if operation != BlockDataContainer.SAPYB:
@@ -323,7 +323,7 @@ class BlockDataContainer(object):
             else:
                 b = kw['b']
 
-            el.sapyb(a, other, b, out.get_item(i), kw['num_threads'])
+            el.sapyb(a, other, b, out, kw['num_threads'])
 
             # As axpyb cannot return anything we `continue` to skip the rest of the code block
             # continue
@@ -333,7 +333,7 @@ class BlockDataContainer(object):
 
         if operation != BlockDataContainer.SAPYB:
             if out is not None:
-                kw['out'] = out.get_item(i)
+                kw['out'] = out
                 op(other, *args, **kw)
             else:
                 res = op(other, *args, **kw)
@@ -384,8 +384,6 @@ class BlockDataContainer(object):
                 # set up delayed computation and
                 procs = []
                 for i,el in enumerate(self.containers):
-                    if (isinstance(el, tuple)):
-                        raise ValueError('Why tuple???')
                     dout = None
                     if out is not None:
                         dout = out[i]
@@ -461,15 +459,16 @@ class BlockDataContainer(object):
             # try to do algebra with one DataContainer. Will raise error if not compatible
             if (not has_dask) or operation == BlockDataContainer.SAPYB or self.is_nested :
                 for i, el in enumerate(self.containers):
+                    dout = None
+                    if out is not None:
+                        dout = out[i]
                     res.append(
-                        self._binary_with_DataContainer(operation, el, other, out, i, **kw)
+                        self._binary_with_DataContainer(operation, el, other, dout, **kw)
                     )
             else:
                 # set up delayed computation and
                 procs = []
                 for i,el in enumerate(self.containers):
-                    if (isinstance(el, tuple)):
-                        raise ValueError('Why tuple???')
                     dout = None
                     if out is not None:
                         dout = out[i]
@@ -477,7 +476,7 @@ class BlockDataContainer(object):
                         delayed(self._binary_with_DataContainer, 
                                 name="bdc{}".format(i),
                                 traverse=False
-                                )(operation, el, other, dout, i, **kw)
+                                )(operation, el, other, dout, **kw)
                         )
                 
                 res = dask.compute(*procs)

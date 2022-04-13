@@ -286,8 +286,60 @@ class BlockDataContainer(object):
         else:
              return op(other, *args, **kw)
             
-    def _binary_with_iterable(self, operation, el, res, *args, **kwargs):
-        pass
+    def _binary_with_iterable(self, operation, el, other, out, i, res, *args, **kwargs):
+        kw = kwargs.copy()
+            
+        if isinstance(other, BlockDataContainer):
+            the_other = other.containers
+        else:
+            the_other = other
+
+        ot = other
+        if operation == BlockDataContainer.ADD:
+            op = el.add
+        elif operation == BlockDataContainer.SUBTRACT:
+            op = el.subtract
+        elif operation == BlockDataContainer.MULTIPLY:
+            op = el.multiply
+        elif operation == BlockDataContainer.DIVIDE:
+            op = el.divide
+        elif operation == BlockDataContainer.POWER:
+            op = el.power
+        elif operation == BlockDataContainer.MAXIMUM:
+            op = el.maximum
+        elif operation == BlockDataContainer.MINIMUM:
+            op = el.minimum
+        elif operation == BlockDataContainer.SAPYB:
+            if not isinstance(other, BlockDataContainer):
+                raise ValueError("{} cannot handle {}".format(operation, type(other)))
+            op = el.sapyb
+        else:
+            raise ValueError('Unsupported operation', operation)
+
+        if out is not None:
+            if operation == BlockDataContainer.SAPYB:
+                if isinstance(kw['a'], BlockDataContainer):
+                    a = kw['a'].get_item(i)
+                else:
+                    a = kw['a']
+
+                if isinstance(kw['b'], BlockDataContainer):
+                    b = kw['b'].get_item(i)
+                else:
+                    b = kw['b']
+
+                el.sapyb(a, ot, b, out.get_item(i), num_threads=kw['num_threads'])
+            else:
+                kw['out'] = out.get_item(i)
+                op(ot, *args, **kw)
+        else:
+            return op(ot, *args, **kw)
+        if out is not None:
+            return
+        else:
+            return type(self)(*res, shape=self.shape)
+
+
     def _binary_with_DataContainer(self, operation, el, other, out, i,*args, **kwargs):
         # try to do algebra with one DataContainer. Will raise error if not compatible
         kw = kwargs.copy()
@@ -402,59 +454,37 @@ class BlockDataContainer(object):
             else:
                 return type(self)(*res, shape=self.shape)
         elif isinstance(other, (list, tuple, numpy.ndarray, BlockDataContainer)):
-            kw = kwargs.copy()
-            
             if isinstance(other, BlockDataContainer):
                 the_other = other.containers
             else:
                 the_other = other
 
-            for i,zel in enumerate(zip ( self.containers, the_other) ):
-                el = zel[0]
-                ot = zel[1]
-                if operation == BlockDataContainer.ADD:
-                    op = el.add
-                elif operation == BlockDataContainer.SUBTRACT:
-                    op = el.subtract
-                elif operation == BlockDataContainer.MULTIPLY:
-                    op = el.multiply
-                elif operation == BlockDataContainer.DIVIDE:
-                    op = el.divide
-                elif operation == BlockDataContainer.POWER:
-                    op = el.power
-                elif operation == BlockDataContainer.MAXIMUM:
-                    op = el.maximum
-                elif operation == BlockDataContainer.MINIMUM:
-                    op = el.minimum
-                elif operation == BlockDataContainer.SAPYB:
-                    if not isinstance(other, BlockDataContainer):
-                        raise ValueError("{} cannot handle {}".format(operation, type(other)))
-                    op = el.sapyb
-                else:
-                    raise ValueError('Unsupported operation', operation)
-
-                if out is not None:
-                    if operation == BlockDataContainer.SAPYB:
-                        if isinstance(kw['a'], BlockDataContainer):
-                            a = kw['a'].get_item(i)
-                        else:
-                            a = kw['a']
-
-                        if isinstance(kw['b'], BlockDataContainer):
-                            b = kw['b'].get_item(i)
-                        else:
-                            b = kw['b']
-
-                        el.sapyb(a, ot, b, out.get_item(i), num_threads=kw['num_threads'])
-                    else:
-                        kw['out'] = out.get_item(i)
-                        op(ot, *args, **kw)
-                else:
-                    res.append(op(ot, *args, **kw))
-            if out is not None:
-                return
+            
+            if (not has_dask) or operation == BlockDataContainer.SAPYB or self.is_nested :
+                for i,zel in enumerate(zip ( self.containers, the_other) ):
+                    el = zel[0]
+                    ot = zel[1]
+                    dout = None
+                    if out is not None:
+                        dout = out[i]
+                    res.append(
+                        self._binary_with_iterable(operation, el, other, dout, i, **kw)
+                    )
             else:
-                return type(self)(*res, shape=self.shape)
+                # set up delayed computation and
+                procs = []
+                for i,el in enumerate(self.containers):
+                    dout = None
+                    if out is not None:
+                        dout = out[i]
+                    procs.append(
+                        delayed(self._binary_with_DataContainer, 
+                                name="bdc{}".format(i),
+                                traverse=False
+                                )(operation, el, other, dout, i, **kw)
+                        )
+                
+                res = dask.compute(*procs)
         else:
             # try to do algebra with one DataContainer. Will raise error if not compatible
             if (not has_dask) or operation == BlockDataContainer.SAPYB or self.is_nested :

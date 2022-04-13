@@ -597,20 +597,37 @@ class BlockDataContainer(object):
         '''
         out = kwargs.get('out', None)
         kw = kwargs.copy()
+        disable_dask = (not has_dask) or BlockDataContainer.disable_dask
         if out is None:
-            res = []
-            for el in self.containers:
+            if not disable_dask or self.is_nested:
+                res = []
+                for el in self.containers:
+                    res.append(
+                        self._unary_operation(operation, el, **kw)
+                    )
                 
-                res.append(
-                    self._unary_operation(operation, el, **kw)
-                )
+            else:
+                procs = []
+                for el in self.containers:
+                    procs.append(
+                        delayed(self._unary_operation)(operation, el, **kw)
+                    )
+                res = dask.compute(*procs)
             return BlockDataContainer(*res)
         else:
             kw.pop('out')
-            for el,elout in zip(self.containers, out.containers):
-                kw['out'] = elout
-                self._unary_operation(operation, el, *args, **kw)
-                
+            if not disable_dask or self.is_nested:
+                for el,elout in zip(self.containers, out.containers):
+                    kw['out'] = elout
+                    self._unary_operation(operation, el, *args, **kw)
+            else:
+                procs = []
+                for el,elout in zip(self.containers, out.containers):
+                    kw['out'] = elout
+                    procs.append(
+                        delayed(self._unary_operation)(operation, el, *args, **kw)
+                    )
+                dask.compute(*procs)
     def _unary_operation(self, operation, el, *args, **kwargs):
         out = kwargs.get('out', None)
         if operation == BlockDataContainer.ABS:

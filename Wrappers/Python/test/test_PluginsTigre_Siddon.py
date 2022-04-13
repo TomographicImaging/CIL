@@ -16,8 +16,8 @@
 #   limitations under the License.
 
 
-from cil.utilities.projector_tests import TestCommon_ProjectionOperator_SIM
-from cil.utilities.projector_tests import TestCommon_ProjectionOperator_TOY, TestCommon_ProjectionOperator
+from utils_projectors import TestCommon_ProjectionOperator_SIM
+from utils_projectors import TestCommon_ProjectionOperator_TOY, TestCommon_ProjectionOperator
 import unittest
 from utils import has_gpu_tigre, has_tigre
 

@@ -15,7 +15,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from cil.utilities.projector_tests import TestCommon_FBP_SIM
+from utils_projectors import TestCommon_FBP_SIM
 import unittest
 from utils import has_gpu_tigre, has_tigre
 

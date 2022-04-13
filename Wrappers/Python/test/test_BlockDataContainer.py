@@ -871,3 +871,24 @@ class TestOutParameter(BDCUnittest):
         res = BlockDataContainer(res0, res2)
 
         self.assertBlockDataContainerEqual(out, res)
+
+class TestOutParameter_nodask(TestOutParameter):
+    def setUp(self):
+        BlockDataContainer.disable_dask = True
+        ig0 = ImageGeometry(2,3,4)
+        ig1 = ImageGeometry(2,3,5)
+        
+        data0 = ig0.allocate(-1)
+        data2 = ig1.allocate(1)
+
+        # data1 = ig0.allocate(2)
+        # data3 = ig1.allocate(3)
+        
+        cp0 = BlockDataContainer(data0,data2)
+        self.ig0 = ig0
+        self.ig1 = ig1
+        self.cp0 = cp0
+
+class TestBlockDataContainer_nodask(TestBlockDataContainer):
+    def setUp(self):
+        BlockDataContainer.disable_dask = True

@@ -518,7 +518,7 @@ class BlockDataContainer(object):
                 res = dask.compute(*procs)
         else:
             # try to do algebra with one DataContainer. Will raise error if not compatible
-            if (not has_dask) or operation == BlockDataContainer.SAPYB or self.is_nested :
+            if (not has_dask) or self.is_nested :
                 for i, el in enumerate(self.containers):
                     dout = None
                     if out is not None:

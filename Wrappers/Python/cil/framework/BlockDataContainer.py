@@ -286,7 +286,7 @@ class BlockDataContainer(object):
         else:
              return op(other, *args, **kw)
             
-    def _binary_with_iterable(self, operation, el, other, out, i, res, *args, **kwargs):
+    def _binary_with_iterable(self, operation, el, other, out, i,  *args, **kwargs):
         kw = kwargs.copy()
             
         if isinstance(other, BlockDataContainer):
@@ -310,8 +310,8 @@ class BlockDataContainer(object):
         elif operation == BlockDataContainer.MINIMUM:
             op = el.minimum
         elif operation == BlockDataContainer.SAPYB:
-            if not isinstance(other, BlockDataContainer):
-                raise ValueError("{} cannot handle {}".format(operation, type(other)))
+            # if not isinstance(other, BlockDataContainer):
+            #     raise ValueError("{} cannot handle {}".format(operation, type(other)))
             op = el.sapyb
         else:
             raise ValueError('Unsupported operation', operation)
@@ -328,17 +328,13 @@ class BlockDataContainer(object):
                 else:
                     b = kw['b']
 
-                el.sapyb(a, ot, b, out.get_item(i), num_threads=kw['num_threads'])
+                el.sapyb(a, ot, b, out, num_threads=kw['num_threads'])
             else:
-                kw['out'] = out.get_item(i)
+                kw['out'] = out
                 op(ot, *args, **kw)
         else:
             return op(ot, *args, **kw)
-        if out is not None:
-            return
-        else:
-            return type(self)(*res, shape=self.shape)
-
+        
 
     def _binary_with_DataContainer(self, operation, el, other, out, i,*args, **kwargs):
         # try to do algebra with one DataContainer. Will raise error if not compatible
@@ -439,6 +435,7 @@ class BlockDataContainer(object):
                     dout = None
                     if out is not None:
                         dout = out[i]
+                    
                     procs.append(
                         delayed(self._binary_with_number, 
                                 name="bdc{}".format(i),
@@ -456,11 +453,14 @@ class BlockDataContainer(object):
         elif isinstance(other, (list, tuple, numpy.ndarray, BlockDataContainer)):
             if isinstance(other, BlockDataContainer):
                 the_other = other.containers
+                are_nested = other.is_nested and self.is_nested
             else:
                 the_other = other
+                are_nested = self.is_nested
 
             
-            if (not has_dask) or operation == BlockDataContainer.SAPYB or self.is_nested :
+
+            if (not has_dask) or operation == BlockDataContainer.SAPYB or are_nested:
                 for i,zel in enumerate(zip ( self.containers, the_other) ):
                     el = zel[0]
                     ot = zel[1]
@@ -468,12 +468,14 @@ class BlockDataContainer(object):
                     if out is not None:
                         dout = out[i]
                     res.append(
-                        self._binary_with_iterable(operation, el, other, dout, i, **kw)
+                        self._binary_with_iterable(operation, el, ot, dout, i, **kw)
                     )
             else:
                 # set up delayed computation and
                 procs = []
-                for i,el in enumerate(self.containers):
+                for i,zel in enumerate(zip ( self.containers, the_other) ):
+                    el = zel[0]
+                    ot = zel[1]
                     dout = None
                     if out is not None:
                         dout = out[i]
@@ -481,7 +483,7 @@ class BlockDataContainer(object):
                         delayed(self._binary_with_DataContainer, 
                                 name="bdc{}".format(i),
                                 traverse=False
-                                )(operation, el, other, dout, i, **kw)
+                                )(operation, el, ot, dout, i, **kw)
                         )
                 
                 res = dask.compute(*procs)

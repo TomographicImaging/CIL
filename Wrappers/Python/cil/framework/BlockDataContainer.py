@@ -279,9 +279,28 @@ class BlockDataContainer(object):
             op = el.maximum
         elif operation == BlockDataContainer.MINIMUM:
             op = el.minimum
+        elif operation == BlockDataContainer.SAPYB:
+            # if not isinstance(other, BlockDataContainer):
+            #     raise ValueError("{} cannot handle {}".format(operation, type(other)))
+            op = el.sapyb
         else:
             raise ValueError('Unsupported operation', operation)
         if out is not None:
+            if operation == BlockDataContainer.SAPYB:
+                if isinstance(kw['a'], (BlockDataContainer, tuple, list)):
+                    a = kw['a'][i]
+                else:
+                    a = kw['a']
+
+                if isinstance(kw['b'], (BlockDataContainer, tuple, list)):
+                    b = kw['b'][i]
+                else:
+                    b = kw['b']
+
+                el.sapyb(a, other, b, out, num_threads=kw['num_threads'])
+            else:
+                # kw['out'] = out
+                op(other, *args, **kw)
             op(other, out=out, *args, **kw)
         else:
              return op(other, *args, **kw)
@@ -313,21 +332,13 @@ class BlockDataContainer(object):
             # if not isinstance(other, BlockDataContainer):
             #     raise ValueError("{} cannot handle {}".format(operation, type(other)))
             op = el.sapyb
+            a = kw['a']
+            b = kw['b']
         else:
             raise ValueError('Unsupported operation', operation)
 
         if out is not None:
             if operation == BlockDataContainer.SAPYB:
-                if isinstance(kw['a'], BlockDataContainer):
-                    a = kw['a'].get_item(i)
-                else:
-                    a = kw['a']
-
-                if isinstance(kw['b'], BlockDataContainer):
-                    b = kw['b'].get_item(i)
-                else:
-                    b = kw['b']
-
                 el.sapyb(a, ot, b, out, num_threads=kw['num_threads'])
             else:
                 kw['out'] = out
@@ -360,16 +371,8 @@ class BlockDataContainer(object):
         elif operation == BlockDataContainer.MINIMUM:
             op = el.minimum
         elif operation == BlockDataContainer.SAPYB:
-
-            if isinstance(kw['a'], BlockDataContainer):
-                a = kw['a'].get_item(i)
-            else:
-                a = kw['a']
-
-            if isinstance(kw['b'], BlockDataContainer):
-                b = kw['b'].get_item(i)
-            else:
-                b = kw['b']
+            a = kw['a']
+            b = kw['b']
 
             el.sapyb(a, other, b, out, kw['num_threads'])
 
@@ -420,22 +423,36 @@ class BlockDataContainer(object):
                 kw[k] = v
         kwargs = kw
         res = []
+
+        
         if isinstance(other, Number):
             # try to do algebra with one DataContainer. Will raise error if not compatible
             
             
-            if (not has_dask) or operation == BlockDataContainer.SAPYB or self.is_nested :
+            if (not has_dask) or self.is_nested :
                 for i,el in enumerate(self.containers):
                     # operation, el, other, i, out, kw, *args, **kwargs
                     res.append( self._binary_with_number(operation, el, other, out, *args, **kwargs) )
             else:
                 # set up delayed computation and
                 procs = []
+                if operation == BlockDataContainer.SAPYB:
+                    kwargs['num_threads'] = 1
+                    a = kw['a']
+                    b = kw['b']
                 for i,el in enumerate(self.containers):
                     dout = None
                     if out is not None:
                         dout = out[i]
-                    
+                    if operation == BlockDataContainer.SAPYB:
+                        if isinstance(a, BlockDataContainer):
+                            kw['a'] = a[i]
+                        else:
+                            kw['a'] = a
+                        if isinstance(b, BlockDataContainer):
+                            kw['b'] = b[i]
+                        else:
+                            kw['b'] = b
                     procs.append(
                         delayed(self._binary_with_number, 
                                 name="bdc{}".format(i),
@@ -458,29 +475,41 @@ class BlockDataContainer(object):
                 the_other = other
                 are_nested = self.is_nested
 
-            
-
-            if (not has_dask) or operation == BlockDataContainer.SAPYB or are_nested:
+            if (not has_dask) or are_nested:
                 for i,zel in enumerate(zip ( self.containers, the_other) ):
                     el = zel[0]
                     ot = zel[1]
                     dout = None
                     if out is not None:
                         dout = out[i]
+                    
                     res.append(
                         self._binary_with_iterable(operation, el, ot, dout, i, **kw)
                     )
             else:
                 # set up delayed computation and
                 procs = []
+                if operation == BlockDataContainer.SAPYB:
+                    kw['num_threads'] = 1
+                    a = kw['a']
+                    b = kw['b']
                 for i,zel in enumerate(zip ( self.containers, the_other) ):
                     el = zel[0]
                     ot = zel[1]
                     dout = None
                     if out is not None:
                         dout = out[i]
+                    if operation == BlockDataContainer.SAPYB:
+                        if isinstance(a, BlockDataContainer):
+                            kw['a'] = a[i]
+                        else:
+                            kw['a'] = a
+                        if isinstance(b, BlockDataContainer):
+                            kw['b'] = b[i]
+                        else:
+                            kw['b'] = b
                     procs.append(
-                        delayed(self._binary_with_DataContainer, 
+                        delayed(self._binary_with_iterable, 
                                 name="bdc{}".format(i),
                                 traverse=False
                                 )(operation, el, ot, dout, i, **kw)
@@ -500,10 +529,23 @@ class BlockDataContainer(object):
             else:
                 # set up delayed computation and
                 procs = []
+                if operation == BlockDataContainer.SAPYB:
+                    kw['num_threads'] = 1
+                    a = kw['a']
+                    b = kw['b']
                 for i,el in enumerate(self.containers):
                     dout = None
                     if out is not None:
                         dout = out[i]
+                    if operation == BlockDataContainer.SAPYB:
+                        if isinstance(a, BlockDataContainer):
+                            kw['a'] = a[i]
+                        else:
+                            kw['a'] = a
+                        if isinstance(b, BlockDataContainer):
+                            kw['b'] = b[i]
+                        else:
+                            kw['b'] = b
                     procs.append(
                         delayed(self._binary_with_DataContainer, 
                                 name="bdc{}".format(i),

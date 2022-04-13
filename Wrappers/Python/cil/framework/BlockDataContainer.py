@@ -431,8 +431,10 @@ class BlockDataContainer(object):
             
             if (not has_dask) or self.is_nested :
                 for i,el in enumerate(self.containers):
-                    # operation, el, other, i, out, kw, *args, **kwargs
-                    res.append( self._binary_with_number(operation, el, other, out, *args, **kwargs) )
+                    dout = None
+                    if out is not None:
+                        dout = out[i]
+                    res.append( self._binary_with_number(operation, el, other, dout, *args, **kwargs) )
             else:
                 # set up delayed computation and
                 procs = []

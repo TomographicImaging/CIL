@@ -61,6 +61,7 @@ class BlockDataContainer(object):
     SIGN      = 'sign'
     SQRT      = 'sqrt'
     CONJUGATE = 'conjugate'
+    disable_dask = False
     __array_priority__ = 1
     __container_priority__ = 2
 
@@ -424,12 +425,12 @@ class BlockDataContainer(object):
         kwargs = kw
         res = []
 
-        
+        disable_dask = (not has_dask) or BlockDataContainer.disable_dask
         if isinstance(other, Number):
             # try to do algebra with one DataContainer. Will raise error if not compatible
             
             
-            if (not has_dask) or self.is_nested :
+            if disable_dask or self.is_nested :
                 for i,el in enumerate(self.containers):
                     dout = None
                     if out is not None:
@@ -476,15 +477,25 @@ class BlockDataContainer(object):
             else:
                 the_other = other
                 are_nested = self.is_nested
-
-            if (not has_dask) or are_nested:
+            if operation == BlockDataContainer.SAPYB:
+                a = kw['a']
+                b = kw['b']
+            if disable_dask or are_nested:
                 for i,zel in enumerate(zip ( self.containers, the_other) ):
                     el = zel[0]
                     ot = zel[1]
                     dout = None
                     if out is not None:
                         dout = out[i]
-                    
+                    if operation == BlockDataContainer.SAPYB:
+                        if isinstance(a, BlockDataContainer):
+                            kw['a'] = a[i]
+                        else:
+                            kw['a'] = a
+                        if isinstance(b, BlockDataContainer):
+                            kw['b'] = b[i]
+                        else:
+                            kw['b'] = b
                     res.append(
                         self._binary_with_iterable(operation, el, ot, dout, i, **kw)
                     )
@@ -520,11 +531,24 @@ class BlockDataContainer(object):
                 res = dask.compute(*procs)
         else:
             # try to do algebra with one DataContainer. Will raise error if not compatible
-            if (not has_dask) or self.is_nested :
+            if operation == BlockDataContainer.SAPYB:
+                a = kw['a']
+                b = kw['b']
+            if disable_dask or self.is_nested :
                 for i, el in enumerate(self.containers):
                     dout = None
                     if out is not None:
                         dout = out[i]
+                    if operation == BlockDataContainer.SAPYB:
+                        if isinstance(a, BlockDataContainer):
+                            kw['a'] = a[i]
+                        else:
+                            kw['a'] = a
+                        if isinstance(b, BlockDataContainer):
+                            kw['b'] = b[i]
+                        else:
+                            kw['b'] = b
+                    
                     res.append(
                         self._binary_with_DataContainer(operation, el, other, dout, i, **kw)
                     )
@@ -533,8 +557,7 @@ class BlockDataContainer(object):
                 procs = []
                 if operation == BlockDataContainer.SAPYB:
                     kw['num_threads'] = 1
-                    a = kw['a']
-                    b = kw['b']
+                    
                 for i,el in enumerate(self.containers):
                     dout = None
                     if out is not None:
@@ -577,29 +600,31 @@ class BlockDataContainer(object):
         if out is None:
             res = []
             for el in self.containers:
-                if operation == BlockDataContainer.ABS:
-                    op = el.abs
-                elif operation == BlockDataContainer.SIGN:
-                    op = el.sign
-                elif operation == BlockDataContainer.SQRT:
-                    op = el.sqrt
-                elif operation == BlockDataContainer.CONJUGATE:
-                    op = el.conjugate
-                res.append(op(*args, **kw))
+                
+                res.append(
+                    self._unary_operation(operation, el, **kw)
+                )
             return BlockDataContainer(*res)
         else:
             kw.pop('out')
             for el,elout in zip(self.containers, out.containers):
-                if operation == BlockDataContainer.ABS:
-                    op = el.abs
-                elif operation == BlockDataContainer.SIGN:
-                    op = el.sign
-                elif operation == BlockDataContainer.SQRT:
-                    op = el.sqrt
-                elif operation == BlockDataContainer.CONJUGATE:
-                    op = el.conjugate
                 kw['out'] = elout
-                op(*args, **kw)
+                self._unary_operation(operation, el, *args, **kw)
+                
+    def _unary_operation(self, operation, el, *args, **kwargs):
+        out = kwargs.get('out', None)
+        if operation == BlockDataContainer.ABS:
+            op = el.abs
+        elif operation == BlockDataContainer.SIGN:
+            op = el.sign
+        elif operation == BlockDataContainer.SQRT:
+            op = el.sqrt
+        elif operation == BlockDataContainer.CONJUGATE:
+            op = el.conjugate
+        if out is None:
+            return op(*args, **kwargs)
+        else:
+            op(*args, **kwargs)
 
     def abs(self, *args, **kwargs):
         return self.unary_operations(BlockDataContainer.ABS, *args, **kwargs)

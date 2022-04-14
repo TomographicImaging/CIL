@@ -271,10 +271,10 @@ class TIFFStackReader(object):
         elif os.path.isfile(file_name):
             self._tiff_files = [file_name]
         elif os.path.isdir(file_name): 
-            self._tiff_files = glob.glob(os.path.join(file_name,"*.tif"))
+            self._tiff_files = glob.glob(os.path.join(glob.escape(file_name),"*.tif"))
             
             if not self._tiff_files:
-                self._tiff_files = glob.glob(os.path.join(file_name,"*.tiff"))
+                self._tiff_files = glob.glob(os.path.join(glob.escape(file_name),"*.tiff"))
 
             if not self._tiff_files:
                 raise Exception("No tiff files were found in the directory \n{}".format(file_name))

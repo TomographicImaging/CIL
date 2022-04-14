@@ -1,5 +1,6 @@
 * 2x.x.x
   - Adds dask delayed computation of binary and unary methods of non-nested BlockDataContainer
+  - Recon.FBP allows 'astra' backend 
   - Fixed PowerMethod for square/non-square, complex/float matrices with stopping criterion.
   - CofR image_sharpness improved for large datasets
   - Geometry alignmentment fix for 2D datasets

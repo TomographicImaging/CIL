@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Welcome to CIL's documentation!
-==========================================
+###############################
 
 The aim of this package is to enable rapid prototyping of optimisation-based 
 reconstruction problems, i.e. defining and solving different optimization problems to enforce different properties on the reconstructed image, while being
@@ -22,7 +22,33 @@ Further, it provides a number of high-level generic implementations of
 optimisation algorithms to solve genericlly formulated optimisation problems 
 constructed from operator and function objects.
 
-A number of demos can be found on the `CIL-Demos`_ repository.
+Demos and Examples
+==================
+A number of demos can be found in the `CIL-Demos`_ repository.
+
+For detailed information refer to our articles and the repositories
+with the code to reproduce the article's results.
+
+#. Jørgensen JS et al. 2021 Core Imaging Library Part I: a versatile python framework for tomographic imaging 
+https://doi.org/10.1098/rsta.2020.0192 . Phil. Trans. R. Soc. A 20200192. 
+The code to reproduce the article results. https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-I
+
+#. Papoutsellis E et al. 2021 Core Imaging Library - Part II: multichannel reconstruction for dynamic and spectral
+tomography https://doi.org/10.1098/rsta.2020.0193 Phil. Trans. R. Soc. A 20200193. 
+The code to reproduce the article results. https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-II
+
+Contacts
+========
+
+You can interact with the developers on the CIL's GitHub repository page https://github.com/TomographicImaging/CIL.git and on the Discord channel https://discord.gg/9NTWu9MEGq
+
+Cite this work
+==============
+
+If you use this software please consider citing one or both of the articles above.
+
+Software documentation Index
+****************************
 
 .. toctree::
    :maxdepth: 3
@@ -57,3 +83,4 @@ The CCPi developers may be contacted joining the `devel mailing list`_
 .. _devel mailing list: https://www.jiscmail.ac.uk/cgi-bin/webadmin?A0=CCPI-DEVEL
 .. _CCPi website: https://www.ccpi.ac.uk
 .. _CIL-Demos: https://github.com/vais-ral/CIL-Demos
+

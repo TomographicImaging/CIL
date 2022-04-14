@@ -62,7 +62,7 @@ if (BUILD_PYTHON_WRAPPER)
       
       if (CONDA_BUILD)
         add_custom_target(pythonsetup ALL
-                        COMMAND ${CMAKE_COMMAND} -E env ${PYTHON_EXECUTABLE} ${SETUP_PY} -vv install
+                        COMMAND ${CMAKE_COMMAND} -E env ${PYTHON_EXECUTABLE} -m pip install .
                         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                         COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT}
                         DEPENDS cilacc)
@@ -78,8 +78,7 @@ if (BUILD_PYTHON_WRAPPER)
                         COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT}
                         DEPENDS cilacc)
 
-          install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/build/lib/cil
-                DESTINATION ${PYTHON_DEST} )
+          
                 
         else()
           add_custom_target(pythonsetup ALL  
@@ -93,20 +92,14 @@ if (BUILD_PYTHON_WRAPPER)
                         DEPENDS cilacc 
                         )
         endif()
-        #set (PYTHON_DEST ${CMAKE_INSTALL_PREFIX}/python/)
-
-        if (NOT WIN32)
-          install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/build/lib/cil
-                DESTINATION ${PYTHON_DEST} )
-
-        endif()
+        
+        # install step
+        install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/build/lib/cil
+              DESTINATION ${PYTHON_DEST} )
         install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/ DESTINATION ${CMAKE_INSTALL_PREFIX}/share/cil)
-        #file(TOUCH ${PYTHON_DEST}/edo/__init__.py)
         
       endif()
       
-      
-      #add_custom_target(PythonWrapper ALL DEPENDS ${OUTPUT})
       add_custom_target(PythonWrapper ALL DEPENDS pythonsetup)
        
   endif()

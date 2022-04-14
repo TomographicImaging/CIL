@@ -20,7 +20,7 @@ test:
     - cvxpy         # [ linux and not py36]     
     - scikit-image
     - tomophantom =1.4.10 # [ linux ]
-    - cil-astra =21.3.0   # [ linux ] 
+    - cil-astra =21.4   # [ linux ] 
     - tigre =2.2          # [ not osx ] 
     - packaging
     - ccpi-regulariser=21.0.0   # [ not osx ]
@@ -72,7 +72,13 @@ requirements:
     - ipp
     - tqdm
 
-  
+  #optional packages with version dependancies
+  run_constrained:
+    - tomophantom=1.4.10
+    - cil-astra=21.4
+    - tigre=2.2
+    - ccpi-regulariser=21.0.0
+
 about:
   home: http://www.ccpi.ac.uk/cil
   license:  Apache 2.0 License

@@ -3,9 +3,9 @@ abstract: "The Core Imaging Library (CIL) is an open-source Python framework for
            with particular emphasis on reconstruction of challenging datasets. Conventional filtered 
            backprojection reconstruction tends to be insufficient for highly noisy, incomplete, non-standard
            or multichannel data arising for example in dynamic, spectral and in situ tomography. CIL 
-           provides an extensive modular optimization framework for prototyping reconstruction methods 
-           including sparsity and total variation regularization, as well as tools for loading, preprocessing 
-           and visualizing tomographic data."
+           provides an extensive modular optimisation framework for prototyping reconstruction methods 
+           including sparsity and total variation regularisation, as well as tools for loading, preprocessing 
+           and visualising tomographic data."
 authors:
   - name: UK Research and Innovation and University of Manchester
 date-released: "08-01-18"
@@ -61,7 +61,7 @@ preferred-citation:
   doi: 10.1098/rsta.2020.0192
   issue: 2204
   volume: 379
-  journal: "Phylosophical Transaction of The Royal Society A"
+  journal: "Philosophical Transactions of The Royal Society A"
   year: 2021
 repository-code: "https://github.com/TomographicImaging/CIL.git"
 title: "CIL"

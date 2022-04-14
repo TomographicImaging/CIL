@@ -114,8 +114,9 @@ class TestCommon_ProjectionOperator_TOY(object):
     '''
     def Cone3D(self):
         '''
-        These are all single projection geometries approximating parallel beam. Voxels of 1, 2, 0.5
+            These are all single cone beam projection geometries. Pixels of  1, 2, 0.5, 0.5, Voxels of 1, 2, 0.5, 0.25
         '''
+
         self.test_geometries=[]
         ag_test_1 = AcquisitionGeometry.create_Cone3D(source_position=[0,-1000,0],detector_position=[0,0,0])\
                                             .set_panel([16,16],[1,1])\
@@ -159,6 +160,9 @@ class TestCommon_ProjectionOperator_TOY(object):
 
 
     def Cone2D(self):
+        '''
+            These are all single cone beam projection geometries. Pixels of  1, 2, 0.5, 0.5, Voxels of 1, 2, 0.5, 0.25
+        '''
 
         self.test_geometries=[]
         ag_test_1 = AcquisitionGeometry.create_Cone2D(source_position=[0,-1000],detector_position=[0,0])\
@@ -203,6 +207,9 @@ class TestCommon_ProjectionOperator_TOY(object):
 
 
     def Parallel3D(self):
+        '''
+            These are all single parallel beam projection geometries. Pixels & voxels of  1, 2, 0.5
+        '''
 
         self.test_geometries=[]
         ag_test_1 = AcquisitionGeometry.create_Parallel3D()\
@@ -238,6 +245,9 @@ class TestCommon_ProjectionOperator_TOY(object):
 
 
     def Parallel2D(self):
+        '''
+            These are all single parallel beam projection geometries. Pixels & voxels of  1, 2, 0.5
+        '''
 
         self.test_geometries=[]
         ag_test_1 = AcquisitionGeometry.create_Parallel2D()\
@@ -331,7 +341,7 @@ class TestCommon_ProjectionOperator(object):
                 if (i + k)% 2 == 0: 
                     res[k*4:(k+1)*4,:,i*4:(i+1)*4] = ones
 
-        #create checker-board foward projection for parallel rays
+        #create checker-board forward projection for parallel rays
         checker = np.zeros((16,16))
         ones = np.ones((4,4))
         for j in range(4):
@@ -393,9 +403,9 @@ class TestCommon_ProjectionOperator(object):
 
 class TestCommon_ProjectionOperator_SIM(SimData):
     '''
-    Tests foward and backward operators function with and without 'out'
+    Tests forward and backward operators function with and without 'out'
     '''
-    def test_foward_projector(self):
+    def test_forward_projector(self):
         Op = self.ProjectionOperator(self.ig, self.ag, **self.PO_args)
         fp = Op.direct(self.img_data)
         np.testing.assert_allclose(fp.as_array(), self.acq_data.as_array(),atol=self.tolerance_fp)        

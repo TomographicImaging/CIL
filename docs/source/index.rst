@@ -29,18 +29,14 @@ A number of demos can be found in the `CIL-Demos`_ repository.
 For detailed information refer to our articles and the repositories
 with the code to reproduce the article's results.
 
-#. Jørgensen JS et al. 2021 Core Imaging Library Part I: a versatile python framework for tomographic imaging 
+1. Jørgensen JS et al. 2021 Core Imaging Library Part I: a versatile python framework for tomographic imaging 
 https://doi.org/10.1098/rsta.2020.0192 . Phil. Trans. R. Soc. A 20200192. 
 The code to reproduce the article results. https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-I
 
-#. Papoutsellis E et al. 2021 Core Imaging Library - Part II: multichannel reconstruction for dynamic and spectral
+2. Papoutsellis E et al. 2021 Core Imaging Library - Part II: multichannel reconstruction for dynamic and spectral
 tomography https://doi.org/10.1098/rsta.2020.0193 Phil. Trans. R. Soc. A 20200193. 
 The code to reproduce the article results. https://github.com/TomographicImaging/Paper-2021-RSTA-CIL-Part-II
 
-Contacts
-========
-
-You can interact with the developers on the CIL's GitHub repository page https://github.com/TomographicImaging/CIL.git and on the Discord channel https://discord.gg/9NTWu9MEGq
 
 Cite this work
 ==============
@@ -78,7 +74,11 @@ Contacts
 
 Please refer to the main `CCPi website`_ for up-to-date information.
 
-The CCPi developers may be contacted joining the `devel mailing list`_
+The CCPi developers may be contacted:
+
+* by joining the `devel mailing list`_ 
+* on the CIL's GitHub repository page https://github.com/TomographicImaging/CIL.git or
+* on the CIL Discord channel https://discord.gg/9NTWu9MEGq
 
 .. _devel mailing list: https://www.jiscmail.ac.uk/cgi-bin/webadmin?A0=CCPI-DEVEL
 .. _CCPi website: https://www.ccpi.ac.uk

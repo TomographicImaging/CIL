@@ -101,7 +101,7 @@ class FISTA(Algorithm):
         self.t_old = self.t
         self.f.gradient(self.y, out=self.u)
 
-        self.u.sapyb(-self.invL, self.y, 1.0)
+        self.u.sapyb(-self.invL, self.y, 1.0, out=self.u)
 
         self.g.proximal(self.u, self.invL, out=self.x)
         

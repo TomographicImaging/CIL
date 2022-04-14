@@ -5,6 +5,7 @@
   - Geometry alignmentment fix for 2D datasets
   - CGLS update for sapyb to enable complex data
   - added sapyb and deprecated axpby
+  - Allow use of square brackets in file paths to TIFF and Nikon datasets
 
 * 21.3.1
   - Added matplotlib version dependency to conda recipe

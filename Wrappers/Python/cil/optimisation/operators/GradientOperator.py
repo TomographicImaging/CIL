@@ -18,7 +18,6 @@
 from cil.optimisation.operators import LinearOperator
 from cil.optimisation.operators import FiniteDifferenceOperator
 from cil.framework import BlockGeometry
-import warnings
 import logging
 from cil.utilities.multiprocessing import NUM_THREADS
 from cil.framework import ImageGeometry
@@ -91,16 +90,16 @@ class GradientOperator(LinearOperator):
         if correlation == CORRELATION_SPACE and domain_geometry.channels > 1:
             #numpy implementation only for now
             backend = NUMPY
-            logging.warning("Warning: correlation='Space' on multi-channel dataset will use `numpy` backend")
+            logging.info("correlation='Space' on multi-channel dataset will use `numpy` backend")
 
         # Complex data will use numpy backend
         if domain_geometry.dtype in [np.complex, np.complex64]:
             backend = NUMPY
-            logging.warning("Warning: Complex geometries will use `numpy` backend")
+            logging.info("Complex geometries will use `numpy` backend")
         
         if method != 'forward':
             backend = NUMPY
-            logging.warning("Warning: method = {} implemented on `numpy` backend. Other methods are backward/centered.".format(method))            
+            logging.info("Method = {} implemented on `numpy` backend. Other methods are backward/centered.".format(method))            
             
         if backend == NUMPY:
             self.operator = Gradient_numpy(domain_geometry, bnd_cond=bnd_cond, **kwargs)
@@ -418,3 +417,8 @@ class Gradient_C(LinearOperator):
         if return_val is True:
             return out        
     
+
+
+
+      
+

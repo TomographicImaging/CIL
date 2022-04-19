@@ -140,8 +140,8 @@ class SIRT(Algorithm):
         """
         
         # fix for possible inf values (code from numpy.nan_to_nam)
-        np_version = numpy.__version__.split('.')
-        if np_version[0]=='1' and np_version[1]<='17':
+        np_version = [int(i) for i in numpy.__version__.split('.')]
+        if np_version[0]==1 and np_version[1]<=17:
             for arr in [self.M, self.D]:
                 tmp = arr.as_array()
                 idx_nan = numpy.isnan(tmp)

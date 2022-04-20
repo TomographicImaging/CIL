@@ -73,7 +73,7 @@ class CGLS(Algorithm):
         '''
         print("{} setting up".format(self.__class__.__name__, ))
         
-        self.x = initial * 0.
+        self.x = initial.copy()
         self.operator = operator
         self.tolerance = tolerance
 

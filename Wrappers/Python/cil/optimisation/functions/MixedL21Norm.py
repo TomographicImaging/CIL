@@ -33,7 +33,7 @@ try:
 
         Returns:
         --------
-        Stores the output in the input array. Returns the modified input numpy array. 
+        Stores the output in the input array.
 
         Note:
         -----
@@ -49,7 +49,7 @@ try:
                 el = 0.
             
             tmp[i] = el / a 
-        return arr
+        return 0
 except ImportError:
     has_numba = False
     
@@ -149,11 +149,12 @@ class MixedL21Norm(Function):
             try: 
                 # may involve a copy if the data is not contiguous
                 tmparr = np.asarray(tmp.as_array(), order='C', dtype=tmp.dtype)
-                resarray = _proximal_step_numba(tmparr, np.abs(tau))
+                if _proximal_step_numba(tmparr, np.abs(tau)) != 0:
+                    # if numba silently crashes
+                    raise RuntimeError('MixedL21Norm.proximal: numba silently crashed.')
+                
                 res = tmp
-                # if the data is not contiguous we should use tmparr? The following will 
-                # just copy the data in a non contiguous array.
-                res.fill(resarray)
+                res.fill(tmparr)
             except:
                 res = _proximal_step_numpy(tmp, tau)
         else:

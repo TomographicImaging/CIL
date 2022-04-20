@@ -146,11 +146,16 @@ class MixedL21Norm(Function):
                 
         tmp = x.pnorm(2)
         if has_numba and isinstance(tau, Number):
-            resarray = _proximal_step_numba(np.asarray(tmp.as_array(), order='C', dtype=np.float32), 
-                                np.abs(tau, dtype=np.float32))
-            res = tmp
-            # may involve a copy if the data is not contiguous
-            res.fill(resarray)
+            try: 
+                # may involve a copy if the data is not contiguous
+                tmparr = np.asarray(tmp.as_array(), order='C', dtype=tmp.dtype)
+                resarray = _proximal_step_numba(tmparr, np.abs(tau))
+                res = tmp
+                # if the data is not contiguous we should use tmparr? The following will 
+                # just copy the data in a non contiguous array.
+                res.fill(resarray)
+            except:
+                res = _proximal_step_numpy(tmp, tau)
         else:
             res = _proximal_step_numpy(tmp, tau)
         

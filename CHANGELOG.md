@@ -1,10 +1,10 @@
-* 2x.x.x
+* 21.4.0
   - Recon.FBP allows 'astra' backend 
   - Fixed PowerMethod for square/non-square, complex/float matrices with stopping criterion.
   - CofR image_sharpness improved for large datasets
   - Geometry alignmentment fix for 2D datasets
   - CGLS update for sapyb to enable complex data
-  - added sapyb and deprecated axpby
+  - added sapyb and deprecated axpby. All algorithm updated to use sapyb.
 
 * 21.3.1
   - Added matplotlib version dependency to conda recipe

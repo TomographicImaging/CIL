@@ -41,8 +41,6 @@ class PDHG(Algorithm):
         Step size for the primal problem.
     initial : DataContainer, optional, default=None
         Initial point for the PDHG algorithm.
-    use_axbpy: :obj:`bool`, optional, default=True
-        Computes a*x + b*y in C.
     gamma_g : positive :obj:`float`, optional, default=None
         Strongly convex constant if the function g is strongly convex. Allows primal acceleration of the PDHG algorithm.
     gamma_fconj : positive :obj:`float`, optional, default=None
@@ -226,7 +224,7 @@ class PDHG(Algorithm):
 
     """
 
-    def __init__(self, f, g, operator, tau=None, sigma=None,initial=None, use_axpby=True, **kwargs):
+    def __init__(self, f, g, operator, tau=None, sigma=None,initial=None, **kwargs):
 
         super(PDHG, self).__init__(**kwargs)
         if kwargs.get('x_init', None) is not None:
@@ -237,7 +235,10 @@ class PDHG(Algorithm):
             else:
                 raise ValueError('{} received both initial and the deprecated x_init parameter. It is not clear which one we should use.'\
                     .format(self.__class__.__name__))
-        self._use_axpby = use_axpby
+
+        if kwargs.get('use_axpby', None) is not None:
+                warnings.warn('The use of the "use_axpby" parameter is deprecated and will not be used by this algorithm',
+                   DeprecationWarning, stacklevel=4)
 
         self._tau = None
         self._sigma = None 
@@ -386,32 +387,19 @@ class PDHG(Algorithm):
         """
 
         #calculate x-bar and store in self.x_tmp
-        if self._use_axpby:
-            self.x_old.axpby((self.theta + 1.0), -self.theta , self.x, out=self.x_tmp) 
-        else:
-            self.x_old.subtract(self.x, out=self.x_tmp)
-            self.x_tmp *= self.theta
-            self.x_tmp += self.x_old
+        self.x_old.sapyb((self.theta + 1.0), self.x, -self.theta, out=self.x_tmp) 
 
         # Gradient ascent for the dual variable
         self.operator.direct(self.x_tmp, out=self.y_tmp)
-        
-        if self._use_axpby:
-            self.y_tmp.axpby(self.sigma, 1.0 , self.y, out=self.y_tmp)
-        else:
-            self.y_tmp *= self.sigma
-            self.y_tmp += self.y
+
+        self.y_tmp.sapyb(self.sigma, self.y, 1.0 , out=self.y_tmp)
 
         self.f.proximal_conjugate(self.y_tmp, self.sigma, out=self.y)
 
         # Gradient descent for the primal variable
         self.operator.adjoint(self.y, out=self.x_tmp)
 
-        if self._use_axpby:
-            self.x_tmp.axpby(-self.tau, 1.0 , self.x_old, self.x_tmp)
-        else:
-            self.x_tmp *= -1.0*self.tau
-            self.x_tmp += self.x_old
+        self.x_tmp.sapyb(-self.tau, self.x_old, 1.0 , self.x_tmp)
 
         self.g.proximal(self.x_tmp, self.tau, out=self.x)
 

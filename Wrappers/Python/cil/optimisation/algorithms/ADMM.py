@@ -64,7 +64,6 @@ class LADMM(Algorithm):
             else:
                 raise ValueError('{} received both initial and the deprecated x_init parameter. It is not clear which one we should use.'\
                     .format(self.__class__.__name__))
-        self._use_axpby = kwargs.get('use_axpby', True)
 
         self.set_up(f = f, g = g, operator = operator, tau = tau,\
              sigma = sigma, initial=initial)        
@@ -110,11 +109,8 @@ class LADMM(Algorithm):
         self.tmp_dir -= self.z
         self.operator.adjoint(self.tmp_dir, out = self.tmp_adj)
         
-        if self._use_axpby:
-            self.x.axpby(1,-(self.tau/self.sigma), self.tmp_adj, out=self.x)
-        else:
-            self.tmp_adj *= -(self.tau/self.sigma)
-            self.x += self.tmp_adj
+        self.x.sapyb(1, self.tmp_adj, -(self.tau/self.sigma), out=self.x)
+
         # apply proximal of f
         tmp = self.f.proximal(self.x, self.tau)
         self.operator.direct(tmp, out=self.tmp_dir)

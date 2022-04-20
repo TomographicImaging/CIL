@@ -168,7 +168,7 @@ class TestAlgorithms(unittest.TestCase):
         #ig = ImageGeometry(124,153,154)
         ig = ImageGeometry(10,2)
         numpy.random.seed(2)
-        initial = ig.allocate(0.)
+        initial = ig.allocate(1.)
         b = ig.allocate('random')
         # b = initial.copy()
         # fill with random numbers
@@ -181,7 +181,7 @@ class TestAlgorithms(unittest.TestCase):
         alg = CGLS(initial=initial, operator=identity, data=b)
         
         np.testing.assert_array_equal(initial.as_array(), alg.solution.as_array())
-        
+
         alg.max_iteration = 200      
         alg.run(20, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
@@ -192,30 +192,7 @@ class TestAlgorithms(unittest.TestCase):
         alg.run(20, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
     
-    def test_CGLS_initial(self):
-        #ig = ImageGeometry(124,153,154)
-        ig = ImageGeometry(10,2)
-        numpy.random.seed(2)
-        initial = ig.allocate(0.)
-        b = ig.allocate('random')
-        # b = initial.copy()
-        # fill with random numbers
-        # b.fill(numpy.random.random(initial.shape))
-        # b = ig.allocate()
-        # bdata = numpy.reshape(numpy.asarray([i for i in range(20)]), (2,10))
-        # b.fill(bdata)
-        identity = IdentityOperator(ig)
-        
-        alg = CGLS(initial=initial, operator=identity, data=b)
-        alg.max_iteration = 200
-        alg.run(20, verbose=0)
-        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
-
-        alg = CGLS(initial=initial, operator=identity, data=b, max_iteration=200, update_objective_interval=2)
-        self.assertTrue(alg.max_iteration == 200)
-        self.assertTrue(alg.update_objective_interval==2)
-        alg.run(20, verbose=0)
-        self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+    
     
         
     def test_FISTA(self):

@@ -24,6 +24,7 @@ test:
     - tigre =2.2          # [ not osx ] 
     - packaging
     - ccpi-regulariser=21.0.0   # [ not osx ]
+    - numba  # [not osx]
     
   source_files:
     - ./Wrappers/Python/test     # [win]

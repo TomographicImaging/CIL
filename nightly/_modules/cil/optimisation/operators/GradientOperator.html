@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.operators.GradientOperator &#8212; CIL v21.3.1-25-gcb10ad2b documentation</title>
+    <title>cil.optimisation.operators.GradientOperator &#8212; CIL v21.3.1-26-g07f53ed5 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -205,7 +205,7 @@
 <span class="kn">from</span> <span class="nn">cil.optimisation.operators</span> <span class="kn">import</span> <span class="n">LinearOperator</span>
 <span class="kn">from</span> <span class="nn">cil.optimisation.operators</span> <span class="kn">import</span> <span class="n">FiniteDifferenceOperator</span>
 <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">BlockGeometry</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">cil.utilities.multiprocessing</span> <span class="kn">import</span> <span class="n">NUM_THREADS</span>
 <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">ImageGeometry</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -277,16 +277,16 @@
         <span class="k">if</span> <span class="n">correlation</span> <span class="o">==</span> <span class="n">CORRELATION_SPACE</span> <span class="ow">and</span> <span class="n">domain_geometry</span><span class="o">.</span><span class="n">channels</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="c1">#numpy implementation only for now</span>
             <span class="n">backend</span> <span class="o">=</span> <span class="n">NUMPY</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Warning: correlation=&#39;Space&#39; on multi-channel dataset will use `numpy` backend&quot;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;correlation=&#39;Space&#39; on multi-channel dataset will use `numpy` backend&quot;</span><span class="p">)</span>
 
         <span class="c1"># Complex data will use numpy backend</span>
         <span class="k">if</span> <span class="n">domain_geometry</span><span class="o">.</span><span class="n">dtype</span> <span class="ow">in</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">complex64</span><span class="p">]:</span>
             <span class="n">backend</span> <span class="o">=</span> <span class="n">NUMPY</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Warning: Complex geometries will use `numpy` backend&quot;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Complex geometries will use `numpy` backend&quot;</span><span class="p">)</span>
         
         <span class="k">if</span> <span class="n">method</span> <span class="o">!=</span> <span class="s1">&#39;forward&#39;</span><span class="p">:</span>
             <span class="n">backend</span> <span class="o">=</span> <span class="n">NUMPY</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Warning: method = </span><span class="si">{}</span><span class="s2"> implemented on `numpy` backend. Other methods are backward/centered.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">method</span><span class="p">))</span>            
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Method = </span><span class="si">{}</span><span class="s2"> implemented on `numpy` backend. Other methods are backward/centered.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">method</span><span class="p">))</span>            
             
         <span class="k">if</span> <span class="n">backend</span> <span class="o">==</span> <span class="n">NUMPY</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">operator</span> <span class="o">=</span> <span class="n">Gradient_numpy</span><span class="p">(</span><span class="n">domain_geometry</span><span class="p">,</span> <span class="n">bnd_cond</span><span class="o">=</span><span class="n">bnd_cond</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -368,7 +368,7 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">Gradient_numpy</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span> <span class="o">=</span> <span class="n">domain_geometry</span><span class="p">,</span> 
                                              <span class="n">range_geometry</span> <span class="o">=</span> <span class="n">range_geometry</span><span class="p">)</span> 
         
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Initialised GradientOperator with numpy backend&quot;</span><span class="p">)</span>               
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Initialised GradientOperator with numpy backend&quot;</span><span class="p">)</span>               
         
     <span class="k">def</span> <span class="nf">direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span> 
          <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  
@@ -513,7 +513,7 @@
         
         <span class="nb">super</span><span class="p">(</span><span class="n">Gradient_C</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">domain_geometry</span><span class="o">=</span><span class="n">domain_geometry</span><span class="p">,</span> 
                                          <span class="n">range_geometry</span><span class="o">=</span><span class="n">range_geometry</span><span class="p">)</span> 
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Initialised GradientOperator with C backend running with &quot;</span><span class="p">,</span> <span class="n">cilacc</span><span class="o">.</span><span class="n">openMPtest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_threads</span><span class="p">),</span><span class="s2">&quot; threads&quot;</span><span class="p">)</span>               
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Initialised GradientOperator with C backend running with &quot;</span><span class="p">,</span> <span class="n">cilacc</span><span class="o">.</span><span class="n">openMPtest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_threads</span><span class="p">),</span><span class="s2">&quot; threads&quot;</span><span class="p">)</span>               
 
     <span class="nd">@staticmethod</span> 
     <span class="k">def</span> <span class="nf">datacontainer_as_c_pointer</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
@@ -603,6 +603,11 @@
                 
         <span class="k">if</span> <span class="n">return_val</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">out</span>        
+    
+
+
+
+      
 
 </pre></div>
 

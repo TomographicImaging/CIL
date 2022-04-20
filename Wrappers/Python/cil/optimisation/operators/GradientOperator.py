@@ -18,7 +18,7 @@
 from cil.optimisation.operators import LinearOperator
 from cil.optimisation.operators import FiniteDifferenceOperator
 from cil.framework import BlockGeometry
-import warnings
+import logging
 from cil.utilities.multiprocessing import NUM_THREADS
 from cil.framework import ImageGeometry
 import numpy as np
@@ -90,16 +90,16 @@ class GradientOperator(LinearOperator):
         if correlation == CORRELATION_SPACE and domain_geometry.channels > 1:
             #numpy implementation only for now
             backend = NUMPY
-            warnings.warn("Warning: correlation='Space' on multi-channel dataset will use `numpy` backend")
+            logging.info("correlation='Space' on multi-channel dataset will use `numpy` backend")
 
         # Complex data will use numpy backend
         if domain_geometry.dtype in [np.complex, np.complex64]:
             backend = NUMPY
-            warnings.warn("Warning: Complex geometries will use `numpy` backend")
+            logging.info("Complex geometries will use `numpy` backend")
         
         if method != 'forward':
             backend = NUMPY
-            warnings.warn("Warning: method = {} implemented on `numpy` backend. Other methods are backward/centered.".format(method))            
+            logging.info("Method = {} implemented on `numpy` backend. Other methods are backward/centered.".format(method))            
             
         if backend == NUMPY:
             self.operator = Gradient_numpy(domain_geometry, bnd_cond=bnd_cond, **kwargs)
@@ -181,7 +181,7 @@ class Gradient_numpy(LinearOperator):
         super(Gradient_numpy, self).__init__(domain_geometry = domain_geometry, 
                                              range_geometry = range_geometry) 
         
-        print("Initialised GradientOperator with numpy backend")               
+        logging.info("Initialised GradientOperator with numpy backend")               
         
     def direct(self, x, out=None): 
          if out is not None:  
@@ -326,7 +326,7 @@ class Gradient_C(LinearOperator):
         
         super(Gradient_C, self).__init__(domain_geometry=domain_geometry, 
                                          range_geometry=range_geometry) 
-        print("Initialised GradientOperator with C backend running with ", cilacc.openMPtest(self.num_threads)," threads")               
+        logging.info("Initialised GradientOperator with C backend running with ", cilacc.openMPtest(self.num_threads)," threads")               
 
     @staticmethod 
     def datacontainer_as_c_pointer(x):
@@ -416,4 +416,9 @@ class Gradient_C(LinearOperator):
                 
         if return_val is True:
             return out        
+    
+
+
+
+      
 

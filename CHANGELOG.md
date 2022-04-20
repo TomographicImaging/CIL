@@ -3,7 +3,7 @@
   - Fixed PowerMethod for square/non-square, complex/float matrices with stopping criterion.
   - CofR image_sharpness improved for large datasets
   - Geometry alignmentment fix for 2D datasets
-  - CGLS update for sapyb to enable complex data
+  - CGLS update for sapyb to enable complex data, bugfix in use of initial 
   - added sapyb and deprecated axpby. All algorithm updated to use sapyb.
   - Allow use of square brackets in file paths to TIFF and Nikon datasets
 

@@ -139,18 +139,11 @@ class SIRT(Algorithm):
         are defined, the :code:`np.nan`, :code:`+np.inf` and :code:`-np.inf` values are replaced with one.
         """
         
-# fix for possible inf values (code from numpy.nan_to_nam)
-        np_version = [int(i) for i in numpy.__version__.split('.')]
-        if np_version[0]==1 and np_version[1]<=17:
-            for arr in [self.M, self.D]:
-                tmp = arr.as_array()         
-                numpy.copyto(tmp, 1.0, where=numpy.isnan(tmp)) 
-                numpy.copyto(tmp, 1.0, where=numpy.isposinf(tmp)) 
-                numpy.copyto(tmp, 1.0, where=numpy.isneginf(tmp)) 
-        else:            
-            numpy.nan_to_num(self.M.as_array(), copy = False, nan = 1, neginf=1, posinf=1) 
-            numpy.nan_to_num(self.D.as_array(), copy = False, nan = 1, neginf=1, posinf=1) 
+        # fix for possible inf values 
+        for arr in [self.M, self.D]:  
 
+            arr_replace = numpy.isfinite(arr.as_array())
+            tmp[~arr_replace] = 1                          
 
     def update(self):
 

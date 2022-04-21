@@ -139,12 +139,13 @@ class SIRT(Algorithm):
         are defined, the :code:`np.nan`, :code:`+np.inf` and :code:`-np.inf` values are replaced with one.
         """
         
-        # fix for possible inf values 
+        # fix for possible +inf, -inf, nan values 
         for arr in [self.M, self.D]:  
-
+ 
             tmp = arr.as_array()
             arr_replace = numpy.isfinite(tmp)
-            tmp[~arr_replace] = 1.0                          
+            tmp[~arr_replace] = 1.0     
+            arr.fill(tmp)                     
 
     def update(self):
 

@@ -20,22 +20,32 @@ from cil.framework import ImageData
 from cil.optimisation.operators import LinearOperator
 
 class DiagonalOperator(LinearOperator):
-    
-    r'''DiagonalOperator:  D: X -> X,  takes in a DataContainer or subclass 
-    thereof, diag, representing elements on the diagonal of a diagonal 
-    operator. Maps an element of :math:`x\in X` onto the element 
+
+    r'''DiagonalOperator
+    D: X -> X
+    Maps an element of :math:`x\in X` onto the element 
     :math:`y \in X,  y = diag*x`, where * denotes elementwise multiplication.
-    In matrix-vector interpretation, if x is a vector of length N, then diag is 
-    also a vector of length N, and D will be an NxN diagonal matrix with diag 
+
+    In matrix-vector interpretation, if x is a vector of length N, then diagonal is 
+    also a vector of length N, and D  will be an NxN diagonal matrix with diag 
     on its diagonal and zeros everywhere else.
-                       
-        :param diagonal: DataContainer with diagonal elements
-                       
+
+    Parameters
+    ----------
+    diagonal : DataContainer
+        DataContainer with the same dimensions as the data to be operated on
+    domain_geometry : ImageGeometry
+        Specifies the geometry of the operator domain. If 'None' will use the diagonal geometry directly.
      '''
+
     
-    def __init__(self, diagonal):
-        super(DiagonalOperator, self).__init__(domain_geometry=diagonal.geometry, 
-                                           range_geometry=diagonal.geometry)
+    def __init__(self, diagonal, domain_geometry=None):
+
+        if domain_geometry is None:
+            domain_geometry = diagonal.geometry.copy()
+
+        super(DiagonalOperator, self).__init__(domain_geometry=domain_geometry, 
+                                    range_geometry=domain_geometry)
         self.diagonal = diagonal
 
         
@@ -48,12 +58,14 @@ class DiagonalOperator(LinearOperator):
         else:
             self.diagonal.multiply(x,out=out)
     
+
     def adjoint(self,x, out=None):
         
         '''Returns D^{*}(y), which is identical to direct, so use direct.'''        
         
         return self.direct(x, out=out)
-        
+
+  
     def calculate_norm(self, **kwargs):
         
         '''Evaluates operator norm of DiagonalOperator'''

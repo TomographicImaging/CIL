@@ -142,8 +142,9 @@ class SIRT(Algorithm):
         # fix for possible inf values 
         for arr in [self.M, self.D]:  
 
-            arr_replace = numpy.isfinite(arr.as_array())
-            tmp[~arr_replace] = 1.0                         
+            tmp = arr.as_array()
+            arr_replace = numpy.isfinite(tmp)
+            tmp[~arr_replace] = 1.0                          
 
     def update(self):
 

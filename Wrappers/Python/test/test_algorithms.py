@@ -169,7 +169,7 @@ class TestAlgorithms(unittest.TestCase):
         #ig = ImageGeometry(124,153,154)
         ig = ImageGeometry(10,2)
         numpy.random.seed(2)
-        initial = ig.allocate(0.)
+        initial = ig.allocate(1.)
         b = ig.allocate('random')
         # b = initial.copy()
         # fill with random numbers
@@ -180,7 +180,10 @@ class TestAlgorithms(unittest.TestCase):
         identity = IdentityOperator(ig)
         
         alg = CGLS(initial=initial, operator=identity, data=b)
-        alg.max_iteration = 200
+        
+        np.testing.assert_array_equal(initial.as_array(), alg.solution.as_array())
+
+        alg.max_iteration = 200      
         alg.run(20, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
 
@@ -189,6 +192,8 @@ class TestAlgorithms(unittest.TestCase):
         self.assertTrue(alg.update_objective_interval==2)
         alg.run(20, verbose=0)
         self.assertNumpyArrayAlmostEqual(alg.x.as_array(), b.as_array())
+    
+    
     
         
     def test_FISTA(self):

@@ -216,13 +216,7 @@ class PDHG(Algorithm):
     
 
     .. todo:: Implement acceleration of PDHG when both functions are strongly convex.
-                      
-
-    References
-    ----------
-
-    .. bibliography::    
-            
+                                  
 
     """
 

@@ -38,8 +38,8 @@ class DiagonalOperator(LinearOperator):
     diagonal : DataContainer
         DataContainer with the same dimensions as the data to be operated on.
     domain_geometry : ImageGeometry
-        Specifies the geometry of the operator domain. If 'None' will use the diagonal geometry directly. default=None
-        
+        Specifies the geometry of the operator domain. If 'None' will use the diagonal geometry directly. default=None .
+
     """
 
     
@@ -55,7 +55,7 @@ class DiagonalOperator(LinearOperator):
         
     def direct(self,x,out=None):
         
-        " Returns D(x)"
+        "Returns :math:`D\circ x` "
         
         if out is None:
             return self.diagonal * x
@@ -65,13 +65,13 @@ class DiagonalOperator(LinearOperator):
 
     def adjoint(self,x, out=None):
         
-        '''Returns D^{*}(y), which is identical to direct, so use direct.'''        
+        "Returns :math:`D^{T}\circ x` "
         
         return self.direct(x, out=out)
 
   
     def calculate_norm(self, **kwargs):
         
-        '''Evaluates operator norm of DiagonalOperator'''
+        " Returns the operator norm of DiagonalOperator which is the maximum element in the `diagonal`."
         
         return self.diagonal.max()

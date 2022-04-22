@@ -21,19 +21,15 @@ from cil.optimisation.operators import DiagonalOperator
 
 class MaskOperator(DiagonalOperator):
     
-    r'''MaskOperator
-    D: X -> X
-    Maps an element of 
-    :math:`x\in X` onto the element :math:`y \in X,  y = mask*x`, 
-    where * denotes elementwise multiplication.
-
+    r""" MaskOperator
+   
     Parameters
     ----------
     mask : DataContainer
-        Boolean array with the same dimensions as the data to be operated on
+        Boolean array with the same dimensions as the data to be operated on.
     domain_geometry : ImageGeometry
-        Specifies the geometry of the operator domain. If 'None' will use the mask geometry size and spacing as float32
-     '''
+        Specifies the geometry of the operator domain. If 'None' will use the mask geometry size and spacing as float32. default = None .
+    """
     
     def __init__(self, mask, domain_geometry=None):
 

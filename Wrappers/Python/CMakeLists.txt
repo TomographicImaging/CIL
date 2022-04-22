@@ -59,45 +59,16 @@ if (BUILD_PYTHON_WRAPPER)
       # as a hack I remove ${OUTPUT}. This should trigger the new build.
       file( REMOVE ${OUTPUT} )
       
-      
-      if (CONDA_BUILD)
-        add_custom_target(pythonsetup ALL
+      add_custom_target(pythonsetup ALL
                         COMMAND ${CMAKE_COMMAND} -E env ${PYTHON_EXECUTABLE} -m pip install .
                         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                         COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT}
                         DEPENDS cilacc)
-
-      else()
-        if (WIN32)
-          add_custom_target(pythonsetup ALL
-                        COMMAND ${CMAKE_COMMAND} -E env PREFIX=${CMAKE_SOURCE_DIR}/src/
-                                                 LIBRARY_INC=${CMAKE_SOURCE_DIR}/src/include
-                                                 LIBRARY_LIB=${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}
-                                                 ${PYTHON_EXECUTABLE} ${SETUP_PY} build_py
-                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                        COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT}
-                        DEPENDS cilacc)
-
-          
-                
-        else()
-          add_custom_target(pythonsetup ALL  
-                        COMMAND ${CMAKE_COMMAND} -E env PREFIX=${CMAKE_SOURCE_DIR}/src/
-                                                 LIBRARY_INC=${CMAKE_SOURCE_DIR}/src/include
-                                                 LIBRARY_LIB=${CMAKE_BINARY_DIR}/
-                                                 ${PYTHON_EXECUTABLE} ${SETUP_PY} build_py --verbose --build-lib=${CMAKE_CURRENT_BINARY_DIR}/build/lib
-                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                        
-                        COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT}
-                        DEPENDS cilacc 
-                        )
-        endif()
-        
-        # install step
-        install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/build/lib/cil DESTINATION ${PYTHON_DEST} )
+      
+      if (NOT CONDA_BUILD)
         install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/ DESTINATION ${CMAKE_INSTALL_PREFIX}/share/cil)
-        
       endif()
+          
       
       add_custom_target(PythonWrapper ALL DEPENDS pythonsetup)
        

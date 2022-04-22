@@ -94,8 +94,7 @@ if (BUILD_PYTHON_WRAPPER)
         endif()
         
         # install step
-        install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/build/lib/cil
-              DESTINATION ${PYTHON_DEST} )
+        install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/build/lib/cil DESTINATION ${PYTHON_DEST} )
         install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/ DESTINATION ${CMAKE_INSTALL_PREFIX}/share/cil)
         
       endif()

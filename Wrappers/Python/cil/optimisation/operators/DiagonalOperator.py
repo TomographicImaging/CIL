@@ -28,10 +28,10 @@ class DiagonalOperator(LinearOperator):
 
     .. math:: (D\circ x) = \sum_{i,j}^{M,N} D_{i,j} x_{i, j}
 
-    In matrix-vector interpretation, if `D` is a :math:`M\timesN` dense matrix and is flattened, we have a :math:`M*N\times M*N` vector.
-    A sparse diagonal matrix, i.e., :class:`DigaonalOperator can be created if we add the vector above to the main diagonal.
+    In matrix-vector interpretation, if `D` is a :math:`M\times N` dense matrix and is flattened, we have a :math:`M*N \times M*N` vector.
+    A sparse diagonal matrix, i.e., :class:`DigaonalOperator` can be created if we add the vector above to the main diagonal.
     If the :class:`DataContainer` `x` is also flattened, we have a :math:`M*N` vector.
-    Now, matrix-vector multiplcation is allowed and results to a :math:`(M*N,1)` vector. After reshaping we recover a :math:`M\timesxN` :class:`DataContainer`. 
+    Now, matrix-vector multiplcation is allowed and results to a :math:`(M*N,1)` vector. After reshaping we recover a :math:`M\times N` :class:`DataContainer`. 
 
     Parameters
     ----------
@@ -65,7 +65,7 @@ class DiagonalOperator(LinearOperator):
 
     def adjoint(self,x, out=None):
         
-        "Returns :math:`D^{T}\circ x` "
+        "Returns :math:`D\circ x` "
         
         return self.direct(x, out=out)
 

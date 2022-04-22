@@ -21,22 +21,26 @@ from cil.optimisation.operators import LinearOperator
 
 class DiagonalOperator(LinearOperator):
 
-    r'''DiagonalOperator
-    D: X -> X
-    Maps an element of :math:`x\in X` onto the element 
-    :math:`y \in X,  y = diag*x`, where * denotes elementwise multiplication.
+    r"""DiagonalOperator 
 
-    In matrix-vector interpretation, if x is a vector of length N, then diagonal is 
-    also a vector of length N, and D  will be an NxN diagonal matrix with diag 
-    on its diagonal and zeros everywhere else.
+    Performs an element-wise multiplication, i.e., `Hadamard Product <https://en.wikipedia.org/wiki/Hadamard_product_(matrices)#:~:text=In%20mathematics%2C%20the%20Hadamard%20product,elements%20i%2C%20j%20of%20the>`_ 
+    of a :class:`DataContainer` `x` and :class:`DataContainer` `diagonal`, `d` .
+
+    .. math:: (D\circ x) = \sum_{i,j}^{M,N} D_{i,j} x_{i, j}
+
+    In matrix-vector interpretation, if `D` is a :math:`M\timesN` dense matrix and is flattened, we have a :math:`M*N\times M*N` vector.
+    A sparse diagonal matrix, i.e., :class:`DigaonalOperator can be created if we add the vector above to the main diagonal.
+    If the :class:`DataContainer` `x` is also flattened, we have a :math:`M*N` vector.
+    Now, matrix-vector multiplcation is allowed and results to a :math:`(M*N,1)` vector. After reshaping we recover a :math:`M\timesxN` :class:`DataContainer`. 
 
     Parameters
     ----------
     diagonal : DataContainer
-        DataContainer with the same dimensions as the data to be operated on
+        DataContainer with the same dimensions as the data to be operated on.
     domain_geometry : ImageGeometry
-        Specifies the geometry of the operator domain. If 'None' will use the diagonal geometry directly.
-     '''
+        Specifies the geometry of the operator domain. If 'None' will use the diagonal geometry directly. default=None
+        
+    """
 
     
     def __init__(self, diagonal, domain_geometry=None):
@@ -51,7 +55,7 @@ class DiagonalOperator(LinearOperator):
         
     def direct(self,x,out=None):
         
-        '''Returns D(x)'''
+        " Returns D(x)"
         
         if out is None:
             return self.diagonal * x

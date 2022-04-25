@@ -1,7 +1,7 @@
 package:
   name: cil
   # add dev to the latest stable release version if this is a nightly build
-  version: {{ environ.get('GIT_DESCRIBE_TAG','v')[1:].split('-')[0] + '' if len(environ.get('GIT_DESCRIBE_TAG','v')[1:].split('-')) == 1 else 'dev' }}
+  version: {{ environ.get('GIT_DESCRIBE_TAG','v')[1:].split('-')[0] }}
 
 source:
   path: ..

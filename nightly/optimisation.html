@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Optimisation framework &#8212; CIL v21.3.1-29-g233a88b3 documentation</title>
+    <title>Optimisation framework &#8212; CIL v21.3.1-30-g9d07ef1f documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -1500,24 +1500,26 @@ For the rest it behaves like the operator it holds.</p>
 
 <dl class="py class">
 <dt id="cil.optimisation.operators.DiagonalOperator">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.operators.</span></code><code class="sig-name descname"><span class="pre">DiagonalOperator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diagonal</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/DiagonalOperator.html#DiagonalOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.DiagonalOperator" title="Permalink to this definition">#</a></dt>
-<dd><p>DiagonalOperator:  D: X -&gt; X,  takes in a DataContainer or subclass
-thereof, diag, representing elements on the diagonal of a diagonal
-operator. Maps an element of <span class="math notranslate nohighlight">\(x\in X\)</span> onto the element
-<span class="math notranslate nohighlight">\(y \in X,  y = diag*x\)</span>, where * denotes elementwise multiplication.
-In matrix-vector interpretation, if x is a vector of length N, then diag is
-also a vector of length N, and D will be an NxN diagonal matrix with diag
-on its diagonal and zeros everywhere else.</p>
-<blockquote>
-<div><dl class="field-list simple">
-<dt class="field-odd">param diagonal</dt>
-<dd class="field-odd"><p>DataContainer with diagonal elements</p>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.operators.</span></code><code class="sig-name descname"><span class="pre">DiagonalOperator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diagonal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/DiagonalOperator.html#DiagonalOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.DiagonalOperator" title="Permalink to this definition">#</a></dt>
+<dd><p>Performs an element-wise multiplication, i.e., <a class="reference external" href="https://en.wikipedia.org/wiki/Hadamard_product_(matrices)#:~:text=In%20mathematics%2C%20the%20Hadamard%20product,elements%20i%2C%20j%20of%20the">Hadamard Product</a>
+of a <code class="xref py py-class docutils literal notranslate"><span class="pre">DataContainer</span></code> <cite>x</cite> and <code class="xref py py-class docutils literal notranslate"><span class="pre">DataContainer</span></code> <cite>diagonal</cite>, <cite>d</cite> .</p>
+<div class="math notranslate nohighlight">
+\[(D\circ x) = \sum_{i,j}^{M,N} D_{i,j} x_{i, j}\]</div>
+<p>In matrix-vector interpretation, if <cite>D</cite> is a <span class="math notranslate nohighlight">\(M\times N\)</span> dense matrix and is flattened, we have a <span class="math notranslate nohighlight">\(M*N \times M*N\)</span> vector.
+A sparse diagonal matrix, i.e., <code class="xref py py-class docutils literal notranslate"><span class="pre">DigaonalOperator</span></code> can be created if we add the vector above to the main diagonal.
+If the <code class="xref py py-class docutils literal notranslate"><span class="pre">DataContainer</span></code> <cite>x</cite> is also flattened, we have a <span class="math notranslate nohighlight">\(M*N\)</span> vector.
+Now, matrix-vector multiplcation is allowed and results to a <span class="math notranslate nohighlight">\((M*N,1)\)</span> vector. After reshaping we recover a <span class="math notranslate nohighlight">\(M\times N\)</span> <code class="xref py py-class docutils literal notranslate"><span class="pre">DataContainer</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>diagonal</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – DataContainer with the same dimensions as the data to be operated on.</p></li>
+<li><p><strong>domain_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a>) – Specifies the geometry of the operator domain. If ‘None’ will use the diagonal geometry directly. default=None .</p></li>
+</ul>
 </dd>
 </dl>
-</div></blockquote>
 <dl class="py method">
 <dt id="cil.optimisation.operators.DiagonalOperator.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diagonal</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/DiagonalOperator.html#DiagonalOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.DiagonalOperator.__init__" title="Permalink to this definition">#</a></dt>
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diagonal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/DiagonalOperator.html#DiagonalOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.DiagonalOperator.__init__" title="Permalink to this definition">#</a></dt>
 <dd><p>Creator</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1532,19 +1534,19 @@ on its diagonal and zeros everywhere else.</p>
 <dl class="py method">
 <dt id="cil.optimisation.operators.DiagonalOperator.direct">
 <code class="sig-name descname"><span class="pre">direct</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/DiagonalOperator.html#DiagonalOperator.direct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.DiagonalOperator.direct" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns D(x)</p>
+<dd><p>Returns <span class="math notranslate nohighlight">\(D\circ x\)</span></p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.operators.DiagonalOperator.adjoint">
 <code class="sig-name descname"><span class="pre">adjoint</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/DiagonalOperator.html#DiagonalOperator.adjoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.DiagonalOperator.adjoint" title="Permalink to this definition">#</a></dt>
-<dd><p>Returns D^{*}(y), which is identical to direct, so use direct.</p>
+<dd><p>Returns <span class="math notranslate nohighlight">\(D\circ x\)</span></p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cil.optimisation.operators.DiagonalOperator.calculate_norm">
 <code class="sig-name descname"><span class="pre">calculate_norm</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/DiagonalOperator.html#DiagonalOperator.calculate_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.DiagonalOperator.calculate_norm" title="Permalink to this definition">#</a></dt>
-<dd><p>Evaluates operator norm of DiagonalOperator</p>
+<dd><p>Returns the operator norm of DiagonalOperator which is the maximum element in the <cite>diagonal</cite>.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1736,22 +1738,18 @@ Y : gm_range ( Default: Y = X )</p>
 
 <dl class="py class">
 <dt id="cil.optimisation.operators.MaskOperator">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.operators.</span></code><code class="sig-name descname"><span class="pre">MaskOperator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/MaskOperator.html#MaskOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.MaskOperator" title="Permalink to this definition">#</a></dt>
-<dd><p>MaskOperator:  D: X -&gt; X,  takes in a DataContainer or subclass
-thereof, mask, with True or 1.0 representing a value to be
-kept and False or 0.0 a value to be lost/set to zero. Maps an element of
-<span class="math notranslate nohighlight">\(x\in X\)</span> onto the element <span class="math notranslate nohighlight">\(y \in X,  y = mask*x\)</span>,
-where * denotes elementwise multiplication.</p>
-<blockquote>
-<div><dl class="field-list simple">
-<dt class="field-odd">param mask</dt>
-<dd class="field-odd"><p>DataContainer of datatype bool or with 1/0 elements</p>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.optimisation.operators.</span></code><code class="sig-name descname"><span class="pre">MaskOperator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/MaskOperator.html#MaskOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.MaskOperator" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mask</strong> (<a class="reference internal" href="framework.html#cil.framework.DataContainer" title="cil.framework.DataContainer"><em>DataContainer</em></a>) – Boolean array with the same dimensions as the data to be operated on.</p></li>
+<li><p><strong>domain_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a>) – Specifies the geometry of the operator domain. If ‘None’ will use the mask geometry size and spacing as float32. default = None .</p></li>
+</ul>
 </dd>
 </dl>
-</div></blockquote>
 <dl class="py method">
 <dt id="cil.optimisation.operators.MaskOperator.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/MaskOperator.html#MaskOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.MaskOperator.__init__" title="Permalink to this definition">#</a></dt>
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/optimisation/operators/MaskOperator.html#MaskOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.optimisation.operators.MaskOperator.__init__" title="Permalink to this definition">#</a></dt>
 <dd><p>Creator</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

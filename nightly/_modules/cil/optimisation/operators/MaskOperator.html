@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.operators.MaskOperator &#8212; CIL v21.3.1-29-g233a88b3 documentation</title>
+    <title>cil.optimisation.operators.MaskOperator &#8212; CIL v21.3.1-30-g9d07ef1f documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -208,20 +208,24 @@
 
 <div class="viewcode-block" id="MaskOperator"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.MaskOperator">[docs]</a><span class="k">class</span> <span class="nc">MaskOperator</span><span class="p">(</span><span class="n">DiagonalOperator</span><span class="p">):</span>
     
-    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;MaskOperator:  D: X -&gt; X,  takes in a DataContainer or subclass </span>
-<span class="sd">    thereof, mask, with True or 1.0 representing a value to be</span>
-<span class="sd">    kept and False or 0.0 a value to be lost/set to zero. Maps an element of </span>
-<span class="sd">    :math:`x\in X` onto the element :math:`y \in X,  y = mask*x`, </span>
-<span class="sd">    where * denotes elementwise multiplication.</span>
-<span class="sd">                       </span>
-<span class="sd">        :param mask: DataContainer of datatype bool or with 1/0 elements</span>
-<span class="sd">                       </span>
-<span class="sd">     &#39;&#39;&#39;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot; MaskOperator</span>
+<span class="sd">   </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mask : DataContainer</span>
+<span class="sd">        Boolean array with the same dimensions as the data to be operated on.</span>
+<span class="sd">    domain_geometry : ImageGeometry</span>
+<span class="sd">        Specifies the geometry of the operator domain. If &#39;None&#39; will use the mask geometry size and spacing as float32. default = None .</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     
-<div class="viewcode-block" id="MaskOperator.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.MaskOperator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
-        <span class="c1"># Special case of DiagonalOperator which is the superclass of</span>
-        <span class="c1"># MaskOperator, so simply instanciate a DiagonalOperator with mask.</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">MaskOperator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+<div class="viewcode-block" id="MaskOperator.__init__"><a class="viewcode-back" href="../../../../optimisation.html#cil.optimisation.operators.MaskOperator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">domain_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="c1">#if domain_geometry is not specified assume float32 for domain_geometry data type</span>
+        <span class="k">if</span> <span class="n">domain_geometry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">domain_geometry</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">domain_geometry</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">MaskOperator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">domain_geometry</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">diagonal</span></div></div>
         
         

@@ -8,7 +8,7 @@ source:
 
 build:
   preserve_egg_dir: False
-  # number: {{ GIT_DESCRIBE_NUMBER }}
+  number: {{ GIT_DESCRIBE_NUMBER }}
   missing_dso_whitelist:
     - /lib64/libc.so.6            # [linux]
     - /lib64/libm.so.6            # [linux]

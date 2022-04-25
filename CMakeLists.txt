@@ -25,15 +25,29 @@ set(CMAKE_BUILD_TYPE "Release")
 # https://docs.conda.io/projects/conda-build/en/stable/resources/define-metadata.html#templating-with-jinja 
 # https://stackoverflow.com/questions/38919840/get-package-version-for-conda-meta-yaml-from-source-file
 
+find_package(Python COMPONENTS Interpreter REQUIRED)
 
-execute_process(COMMAND git describe 
+if (Python_FOUND)
+  execute_process(COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/Wrappers/Python/CMake/parse_git_describe.py 
                 RESULT_VARIABLE worked 
                 OUTPUT_VARIABLE CIL_VERSION
                 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
-if (NOT worked EQUAL 0)
-  message(FATAL_ERROR "git describe returned ${worked}")
+  if (NOT worked EQUAL 0)
+    message(FATAL_ERROR "git describe returned ${worked}")
+  else()
+    string(REPLACE " " ";" CIL_VERSION ${CIL_VERSION})
+    list(LENGTH CIL_VERSION CIL_version_len)
+    
+    list(GET CIL_VERSION 0 CIL_VERSION_MAJOR)
+    list(GET CIL_VERSION 1 CIL_VERSION_MINOR)
+    list(GET CIL_VERSION 2 CIL_VERSION_PATCH)
+    list(GET CIL_VERSION 3 CIL_NUM_COMMIT)
+    list(GET CIL_VERSION 4 CIL_COMMIT_HASH)
+
+  endif()
 endif()
+
 
 add_subdirectory(src/Core)
 add_subdirectory(Wrappers/Python)

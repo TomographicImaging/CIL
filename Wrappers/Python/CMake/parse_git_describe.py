@@ -25,11 +25,4 @@ if version[2] != '':
 else:
     patch = 0
     
-
-# print (f"Major {major} minor {minor} patch {patch}")
-# print (version)
-# for i,v in enumerate(versions.groups()):
-#     print ("group" ,i, v)
-
-# print (git_commit_number, git_hash)
 print (major, minor, patch, git_commit_number, git_hash)

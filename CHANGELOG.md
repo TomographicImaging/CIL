@@ -1,4 +1,5 @@
 * 21.4.0
+  - CMake fix due to use of pip install. 
   - Recon.FBP allows 'astra' backend 
   - Fixed PowerMethod for square/non-square, complex/float matrices with stopping criterion.
   - CofR image_sharpness improved for large datasets

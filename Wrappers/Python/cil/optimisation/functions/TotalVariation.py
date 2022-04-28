@@ -204,8 +204,8 @@ class TotalVariation(Function):
             if not self.hasstarted:  
                 self.p1 = self.gradient.range_geometry().allocate(0)
                 self.hasstarted = True
-        tmp_p = self.gradient.range_geometry().allocate(0)  
-        tmp_q = tmp_p.copy()
+        tmp_p = self.p1.copy() 
+        tmp_q = self.p1.copy()
         tmp_x = self.gradient.domain_geometry().allocate(0)
 
         should_break = False

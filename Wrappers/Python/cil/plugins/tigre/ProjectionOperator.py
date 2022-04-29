@@ -38,7 +38,7 @@ except ModuleNotFoundError:
 class ProjectionOperator(LinearOperator):
     '''TIGRE Projection Operator'''
 
-    def __init__(self, image_geometry, aquisition_geometry, direct_method='interpolated',adjoint_weights='matched'):
+    def __init__(self, image_geometry, acquisition_geometry, direct_method='interpolated',adjoint_weights='matched'):
         '''
         This class creates a configured TIGRE ProjectionOperator
         
@@ -48,8 +48,8 @@ class ProjectionOperator(LinearOperator):
                         
         :param image_geometry: A description of the ImageGeometry of your data
         :type image_geometry: ImageGeometry
-        :param aquisition_geometry: A description of the AcquisitionGeometry of your data
-        :type aquisition_geometry: AcquisitionGeometry
+        :param acquisition_geometry: A description of the AcquisitionGeometry of your data
+        :type acquisition_geometry: AcquisitionGeometry
         :param direct_method: The method used by the forward projector, 'Siddon' for ray-voxel intersection, 'interpolated' for interpolated projection
         :type direct_method: str, default 'interpolated'
         :param adjoint_weights: The weighting method used by the cone-beam backward projector, 'matched' for weights to approximatly match the 'interpolated' forward projector, 'FDK' for FDK weights, default 'matched'
@@ -57,10 +57,10 @@ class ProjectionOperator(LinearOperator):
         '''
 
         DataOrder.check_order_for_engine('tigre', image_geometry)
-        DataOrder.check_order_for_engine('tigre', aquisition_geometry) 
+        DataOrder.check_order_for_engine('tigre', acquisition_geometry) 
 
         super(ProjectionOperator,self).__init__(domain_geometry=image_geometry,\
-             range_geometry=aquisition_geometry)
+             range_geometry=acquisition_geometry)
              
         if direct_method not in ['interpolated','Siddon']:
             raise ValueError("direct_method expected 'interpolated' or 'Siddon' got {}".format(direct_method))
@@ -71,7 +71,7 @@ class ProjectionOperator(LinearOperator):
         self.method = {'direct':direct_method,'adjoint':adjoint_weights}
 
         #set up TIGRE geometry
-        tigre_geom, tigre_angles= CIL2TIGREGeometry.getTIGREGeometry(image_geometry,aquisition_geometry)
+        tigre_geom, tigre_angles= CIL2TIGREGeometry.getTIGREGeometry(image_geometry,acquisition_geometry)
 
         tigre_geom.check_geo(tigre_angles)
         tigre_geom.cast_to_single()

@@ -186,7 +186,7 @@ class NEXUSDataReader(object):
                                                 detector_position, detector_direction_x, detector_direction_y,\
                                                 rotation_axis_position, rotation_axis_direction)
 
-                # for all Aquisition data
+                # for all Acquisition data
                 #set angles
                 angles = list(ds_angles)
                 angle_unit = ds_angles.attrs.get('angle_unit','degree')

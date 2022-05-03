@@ -1,3 +1,7 @@
+* 22.0.0
+ - TIFF writer uses logging
+ - Added unittests for TIFF functionality
+
 * 21.4.0
   - PEP 440 compliant version
   - CMake fix due to use of pip install. 

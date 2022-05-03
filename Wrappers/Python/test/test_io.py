@@ -226,4 +226,25 @@ class TestTIFF(unittest.TestCase):
 
         np.testing.assert_allclose(data.as_array()[:2], read_array)
 
+    def test_tiff_stack_ImageData_wrong_file(self):
+        data = dataexample.SIMULATED_SPHERE_VOLUME.get()
+        
+        fname = os.path.join(self.cwd, "unittest")
+
+        writer = TIFFWriter(data=data, file_name=fname)
+        writer.write()
+
+        import glob
+        for el in glob.glob(os.path.join(self.cwd , "unittest*.tiff")):
+            # print (f"modifying {el}")
+            with open(el, 'w') as f:
+                f.write('BOOM')
+            break
+                
+        reader = TIFFStackReader(file_name=self.cwd)
+        try:
+            read_array = reader.read()
+            assert False, 'WHAT???? Files should not load'
+        except:
+            assert True, 'I blasted the files, so this is fine'
 

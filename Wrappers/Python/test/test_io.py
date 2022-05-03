@@ -16,12 +16,12 @@
 #   limitations under the License.
 
 import unittest
-from cil.framework import AcquisitionData, AcquisitionGeometry
+from cil.framework import AcquisitionGeometry
 import numpy as np
 import os
-import olefile
 from cil.framework import ImageGeometry
 from cil.io import TXRMDataReader, NEXUSDataReader
+from cil.io import TIFFWriter, TIFFStackReader
 has_astra = True
 try:
     from cil.astra.processors import FBP
@@ -52,6 +52,11 @@ has_prerequisites = has_olefile and has_dxchange and has_astra and has_file \
 
 
 from cil.utilities.quality_measures import mae, mse, psnr
+from cil.utilities import dataexample
+import shutil
+import logging
+
+
 
 print ("has_astra",has_astra)
 print ("has_wget",has_wget)
@@ -149,4 +154,76 @@ class TestTXRMDataReader(unittest.TestCase):
         np.testing.assert_almost_equal(qm, 0, decimal=3)
         fname = os.path.join(data_dir, 'walnut_slice512.nxs')
         os.remove(fname)
+
+
+
+class TestTIFF(unittest.TestCase):
+    def setUp(self) -> None:
+        self.logger = logging.getLogger('cil.io')
+        self.logger.setLevel(logging.DEBUG)
+        self.cwd = os.path.join(os.getcwd(), 'tifftest')
+        # print("creating {}".format(self.cwd))
+        os.mkdir(self.cwd)
+    def tearDown(self) -> None:
+        # print("removing {}".format(self.cwd))
+        shutil.rmtree(self.cwd)
+        # print("done")
+
+    def test_tiff_stack_ImageData(self):
+        data = dataexample.SIMULATED_SPHERE_VOLUME.get()
+        
+        fname = os.path.join(self.cwd, "unittest")
+
+        writer = TIFFWriter(data=data, file_name=fname)
+        writer.write()
+
+        reader = TIFFStackReader(file_name=self.cwd)
+        read_array = reader.read()
+
+        np.testing.assert_allclose(data.as_array(), read_array)
+
+        read = reader.read_as_ImageData(data.geometry)
+        np.testing.assert_allclose(data.as_array(), read.as_array())
+
+    def test_tiff_stack_AcquisitionData(self):
+        data = dataexample.SIMULATED_CONE_BEAM_DATA.get()
+        
+        fname = os.path.join(self.cwd, "unittest")
+
+        writer = TIFFWriter(data=data, file_name=fname)
+        writer.write()
+
+        reader = TIFFStackReader(file_name=self.cwd)
+        read_array = reader.read()
+
+        np.testing.assert_allclose(data.as_array(), read_array)
+
+        read = reader.read_as_AcquisitionData(data.geometry)
+        np.testing.assert_allclose(data.as_array(), read.as_array())
+
+    def test_tiff_stack_ImageDataSlice(self):
+        data = dataexample.SIMULATED_SPHERE_VOLUME.get()
+        
+        fname = os.path.join(self.cwd, "unittest")
+
+        writer = TIFFWriter(data=data, file_name=fname)
+        writer.write()
+
+        roi = {'axis_0': -1, 'axis_1': -1, 'axis_2': (None, None, 2)}
+
+        reader = TIFFStackReader(file_name=self.cwd, roi=roi, mode='slice')
+        read_array = reader.read()
+
+        shape = [el for el in data.shape]
+        shape[2] /= 2
+
+        np.testing.assert_allclose(shape, read_array.shape )
+        
+        roi = {'axis_0': (0, 2, None), 'axis_1': -1, 'axis_2': -1}
+
+        reader = TIFFStackReader(file_name=self.cwd, roi=roi, mode='slice')
+        read_array = reader.read()
+
+        np.testing.assert_allclose(data.as_array()[:2], read_array)
+
 

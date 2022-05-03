@@ -30,6 +30,10 @@ import glob
 import re
 import numpy as np
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 class TIFFWriter(object):
     '''Write a DataSet to disk as a TIFF file or stack'''
     
@@ -69,8 +73,8 @@ class TIFFWriter(object):
             )[0]
         
         self.dir_name = os.path.dirname(file_name)
-        print ("dir_name" , self.dir_name)
-        print ("file_name", self.file_name)
+        logger.info ("dir_name {}".format(self.dir_name))
+        logger.info ("file_name {}".format(self.file_name))
         self.counter_offset = counter_offset
         
         if not ((isinstance(self.data_container, ImageData)) or 
@@ -366,9 +370,9 @@ class TIFFStackReader(object):
 
                     try:
                         raw += np.asarray(Image.open(filename), dtype = self.dtype)
-                    except:
-                        print('Error reading\n {}\n file.'.format(filename))
-                        raise
+                    except Exception as err:
+                        logger.error('Error reading\n {}\n file.'.format(filename))
+                        raise err
                         
                 shape = (n_rows, roi_par[1][2], 
                          n_cols, roi_par[2][2])

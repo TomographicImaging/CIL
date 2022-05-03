@@ -368,11 +368,9 @@ class TIFFStackReader(object):
                     index = int(roi_par[0][0] + i * roi_par[0][2] + j)
                     filename = os.path.abspath(self._tiff_files[index])
 
-                    try:
-                        raw += np.asarray(Image.open(filename), dtype = self.dtype)
-                    except Exception as err:
-                        logger.error('Error reading\n {}\n file.'.format(filename))
-                        raise err
+                    arr = Image.open(filename)
+                    raw += np.asarray(arr, dtype = self.dtype)
+                    
                         
                 shape = (n_rows, roi_par[1][2], 
                          n_cols, roi_par[2][2])

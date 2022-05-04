@@ -270,7 +270,7 @@ class TestTIFF(unittest.TestCase):
         reader = TIFFStackReader(file_name=self.cwd)
         try:
             read_array = reader.read()
-            assert False, 'WHAT???? Files should not load'
+            assert False
         except:
-            assert True, 'I blasted the files, so this is fine'
+            assert True
 

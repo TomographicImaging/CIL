@@ -270,11 +270,11 @@ class TotalVariation(Function):
             else:
                 print("Stop at {} iterations.".format(k))                
                  
-        self.gradient.adjoint(tmp_q, out = out)
-        out*=tau
-        out*=self.regularisation_parameter
-        x.subtract(out, out=out)
-        return self.projection_C(out, out=out)
+        self.gradient.adjoint(tmp_q, out = tmp_x)
+        tmp_x*=tau
+        tmp_x*=self.regularisation_parameter
+        x.subtract(tmp_x, out=tmp_x)
+        return self.projection_C(tmp_x, out=out)
     
     def convex_conjugate(self,x):        
         return 0.0    

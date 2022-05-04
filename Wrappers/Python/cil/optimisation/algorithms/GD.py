@@ -100,10 +100,8 @@ class GD(Algorithm):
             # the next update and solution are calculated within the armijo_rule
             self.step_size = self.armijo_rule()
         else:
-            self.x_update *= -self.step_size
-            self.x += self.x_update
+            self.x.sapyb(1.0, self.x_update, -self.step_size, out=self.x)
         
-    
 
     def update_objective(self):
         self.loss.append(self.objective_function(self.x))

@@ -78,6 +78,11 @@ cmake --build . --target install
 
 The user then needs to add the path to `<install_directory>/lib` where the library is installed to the environment variable `PATH` or `LD_LIBRARY_PATH`, depending on system
 
+By default the location of the IPP library and includes is `${CMAKE_INSTALL_PREFIX}/lib` and `${CMAKE_INSTALL_PREFIX}/include` respectively. To pass the location of the IPP library and headers please pass the following parameters 
+```bash
+
+cmake .. -DCMAKE_INSTALL_PREFIX=<install_directory> -DIPP_LIBRARY=<path_to_ipp_library> -DIPP_INCLUDE=<path_to_ipp_includes>
+```
 
 ## References
 

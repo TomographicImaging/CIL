@@ -1,11 +1,15 @@
 * 2x.x.x
   - Adds dask delayed computation of binary and unary methods of non-nested BlockDataContainer
+* 21.4.0
+  - PEP 440 compliant version
+  - CMake fix due to use of pip install. 
   - Recon.FBP allows 'astra' backend 
   - Fixed PowerMethod for square/non-square, complex/float matrices with stopping criterion.
   - CofR image_sharpness improved for large datasets
   - Geometry alignmentment fix for 2D datasets
-  - CGLS update for sapyb to enable complex data
-  - added sapyb and deprecated axpby
+  - CGLS update for sapyb to enable complex data, bugfix in use of initial 
+  - added sapyb and deprecated axpby. All algorithm updated to use sapyb.
+  - Allow use of square brackets in file paths to TIFF and Nikon datasets
 
 * 21.3.1
   - Added matplotlib version dependency to conda recipe

@@ -37,7 +37,9 @@ class TIFFReadWriter(unittest.TestCase):
                 k += 1
         data.fill(arr)
         self.cwd = os.getcwd()
-        fname = os.path.join(self.cwd, 'test_tiff','myfile.tif')
+        # filename contains brackets to test if previous problems 
+        # with use of glob in the tiff reader have been resolved:
+        fname = os.path.join(self.cwd, 'test_tiff [0]','myfile.tif')
         self.data_dir = os.path.dirname(fname)
         writer = TIFFWriter(data=data, file_name=fname, counter_offset=0)
         writer.write()
@@ -52,7 +54,7 @@ class TIFFReadWriter(unittest.TestCase):
         data = self.data
         print (data.shape)
         print ("expecting {} files".format(data.shape[0]*data.shape[1]))
-        files = glob.glob(os.path.join(self.data_dir, '*'))
+        files = glob.glob(os.path.join(glob.escape(self.data_dir), '*'))
         assert len(files) == data.shape[0]*data.shape[1]
     
     def test_read1(self):

@@ -48,7 +48,7 @@ except ImportError as ie:
     has_wget = False
 has_prerequisites = has_olefile and has_dxchange and has_astra and has_file \
     and has_wget
-import wget
+
 
 
 from cil.utilities.quality_measures import mae, mse, psnr

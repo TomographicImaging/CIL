@@ -2,13 +2,15 @@
 #include <stdio.h>
 #include <ipp.h>
 #include <ipps.h>
+#include <ippcore.h>
 #include <chrono>
 #include <omp.h>
 #include <random>
 #include "dll_export.h"
 #include "utilities.h"
 
-
+ippInit() 
+	
 #ifdef __cplusplus
 extern "C" {
 #endif

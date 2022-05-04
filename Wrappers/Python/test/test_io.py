@@ -22,14 +22,14 @@ import os
 from cil.framework import ImageGeometry
 from cil.io import TXRMDataReader, NEXUSDataReader
 from cil.io import TIFFWriter, TIFFStackReader
-has_astra = True
-try:
-    from cil.astra.processors import FBP
-except ImportError as ie:
-    has_astra = False
+from cil.processors import Slicer
+from utils import has_gpu_astra, has_astra
 from cil.utilities.dataexample import data_dir
-filename = os.path.join(data_dir, "valnut_tomo-A.txrm")
-has_file = os.path.isfile(filename)
+from cil.utilities.quality_measures import mae, mse, psnr
+from cil.utilities import dataexample
+import shutil
+import logging
+
 
 has_dxchange = True
 try:
@@ -46,35 +46,43 @@ try:
     import wget
 except ImportError as ie:
     has_wget = False
-has_prerequisites = has_olefile and has_dxchange and has_astra and has_file \
+if has_astra:
+    from cil.plugins.astra import FBP
+has_astra_gpu = has_gpu_astra()
+
+# change basedir to point to the location of the walnut dataset which can
+# be downloaded from https://zenodo.org/record/4822516
+# basedir = os.path.abspath('/home/edo/scratch/Data/Walnut/valnut_2014-03-21_643_28/tomo-A/')
+basedir = data_dir
+filename = os.path.join(basedir, "valnut_tomo-A.txrm")
+has_file = os.path.isfile(filename)
+
+
+has_prerequisites = has_olefile and has_dxchange and has_astra and has_astra_gpu and has_file \
     and has_wget
 
 
+logging.basicConfig(level=logging.ERROR)
 
-from cil.utilities.quality_measures import mae, mse, psnr
-from cil.utilities import dataexample
-import shutil
-import logging
-
-
-
-print ("has_astra",has_astra)
-print ("has_wget",has_wget)
-print ("has_olefile",has_olefile)
-print ("has_dxchange",has_dxchange)
-print ("has_file",has_file)
+logging.info ("has_astra {}".format(has_astra))
+logging.info ("has_wget {}".format(has_wget))
+logging.info ("has_olefile {}".format(has_olefile))
+logging.info ("has_dxchange {}".format(has_dxchange))
+logging.info ("has_file {}".format(has_file))
 
 if not has_file:
-    print("This unittest requires the walnut Zeiss dataset saved in {}".format(data_dir))
+    logging.info("This unittest requires the walnut Zeiss dataset saved in {}".format(data_dir))
+
 
 class TestTXRMDataReader(unittest.TestCase):
     
+
     def setUp(self):
-        print ("has_astra",has_astra)
-        print ("has_wget",has_wget)
-        print ("has_olefile",has_olefile)
-        print ("has_dxchange",has_dxchange)
-        print ("has_file",has_file)
+        logging.info ("has_astra {}".format(has_astra))
+        logging.info ("has_wget {}".format(has_wget))
+        logging.info ("has_olefile {}".format(has_olefile))
+        logging.info ("has_dxchange {}".format(has_dxchange))
+        logging.info ("has_file {}".format(has_file))
         if has_file:
             self.reader = TXRMDataReader()
             angle_unit = AcquisitionGeometry.RADIAN
@@ -107,19 +115,15 @@ class TestTXRMDataReader(unittest.TestCase):
     def tearDown(self):
         pass
 
+
     def test_run_test(self):
         print("run test Zeiss Reader")
         self.assertTrue(True)
     
-    @unittest.skipIf(True, 'skip test by default')
-    def test_not_run_test(self):
-        print("run test Zeiss Reader")
-        self.assertTrue(True)
 
     @unittest.skipIf(not has_prerequisites, "Prerequisites not met")
     def test_read_and_reconstruct_2D(self):
-        print (type(self.data))
-
+        
         # get central slice
         data2d = self.data.subset(vertical='centre')
         # d512 = self.data.subset(vertical=512)
@@ -136,7 +140,7 @@ class TestTXRMDataReader(unittest.TestCase):
                             voxel_size_y=self.voxel_size_h)
         if data2d.geometry is None:
             raise AssertionError('What? None?')
-        fbpalg = FDK(ig2d,data2d.geometry)
+        fbpalg = FBP(ig2d,data2d.geometry)
         fbpalg.set_input(data2d)
         
         recfbp = fbpalg.get_output()
@@ -149,28 +153,40 @@ class TestTXRMDataReader(unittest.TestCase):
         gt = reader.read()
 
         qm = mse(gt, recfbp)
-        print ("MSE" , qm )
+        logging.info ("MSE {}".format(qm) )
 
         np.testing.assert_almost_equal(qm, 0, decimal=3)
         fname = os.path.join(data_dir, 'walnut_slice512.nxs')
         os.remove(fname)
 
 
-
 class TestTIFF(unittest.TestCase):
     def setUp(self) -> None:
-        self.logger = logging.getLogger('cil.io')
-        self.logger.setLevel(logging.DEBUG)
+        # self.logger = logging.getLogger('cil.io')
+        # self.logger.setLevel(logging.DEBUG)
         self.cwd = os.path.join(os.getcwd(), 'tifftest')
-        # print("creating {}".format(self.cwd))
         os.mkdir(self.cwd)
+
+
     def tearDown(self) -> None:
-        # print("removing {}".format(self.cwd))
         shutil.rmtree(self.cwd)
-        # print("done")
+        
+
+    def get_slice_imagedata(self, data):
+        '''Returns only 2 slices of data'''
+        # data = dataexample.SIMULATED_SPHERE_VOLUME.get()
+        data.dimension_labels[0]
+        roi = {data.dimension_labels[0]: (0,2,1), 
+               data.dimension_labels[1]: (None, None, None), 
+               data.dimension_labels[2]: (None, None, None)}
+        return Slicer(roi=roi)(data)
+
 
     def test_tiff_stack_ImageData(self):
-        data = dataexample.SIMULATED_SPHERE_VOLUME.get()
+        # data = dataexample.SIMULATED_SPHERE_VOLUME.get()
+        data = self.get_slice_imagedata(
+            dataexample.SIMULATED_SPHERE_VOLUME.get()
+        )
         
         fname = os.path.join(self.cwd, "unittest")
 
@@ -185,8 +201,13 @@ class TestTIFF(unittest.TestCase):
         read = reader.read_as_ImageData(data.geometry)
         np.testing.assert_allclose(data.as_array(), read.as_array())
 
+
     def test_tiff_stack_AcquisitionData(self):
-        data = dataexample.SIMULATED_CONE_BEAM_DATA.get()
+        # data = dataexample.SIMULATED_CONE_BEAM_DATA.get()
+        data = self.get_slice_imagedata(
+            dataexample.SIMULATED_CONE_BEAM_DATA.get()
+        )
+        
         
         fname = os.path.join(self.cwd, "unittest")
 
@@ -200,6 +221,7 @@ class TestTIFF(unittest.TestCase):
 
         read = reader.read_as_AcquisitionData(data.geometry)
         np.testing.assert_allclose(data.as_array(), read.as_array())
+
 
     def test_tiff_stack_ImageDataSlice(self):
         data = dataexample.SIMULATED_SPHERE_VOLUME.get()
@@ -226,8 +248,12 @@ class TestTIFF(unittest.TestCase):
 
         np.testing.assert_allclose(data.as_array()[:2], read_array)
 
+
     def test_tiff_stack_ImageData_wrong_file(self):
-        data = dataexample.SIMULATED_SPHERE_VOLUME.get()
+        # data = dataexample.SIMULATED_SPHERE_VOLUME.get()
+        data = self.get_slice_imagedata(
+            dataexample.SIMULATED_SPHERE_VOLUME.get()
+        )
         
         fname = os.path.join(self.cwd, "unittest")
 

@@ -15,18 +15,17 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from cil.optimisation.functions import Function, L1Norm, ScaledFunction, \
-                                        LeastSquares, L2NormSquared, \
-                                        KullbackLeibler, ZeroFunction, \
-                                        ConstantFunction, TranslateFunction, \
+from cil.optimisation.functions import L1Norm, \
+                                        L2NormSquared, \
+                                        TranslateFunction, \
                                         MixedL21Norm
 from cil.optimisation.operators import GradientOperator
-from cil.framework import ImageGeometry, BlockGeometry
+from cil.framework import ImageGeometry, DataContainer
 
 import unittest
-import numpy
-from numbers import Number
-
+import numpy as np
+import logging
+from testclass import CCPiTestClass as TestFunction
 
 ''' Here we test SumFunction class for different function
 
@@ -41,42 +40,9 @@ for gradient method
 
 
 
-class TestFunction(unittest.TestCase):
+class TestTranslaateFunction(TestFunction):
     
-    def assertBlockDataContainerEqual(self, container1, container2):
-        print ("assert Block Data Container Equal")
-        self.assertTrue(issubclass(container1.__class__, container2.__class__))
-        for col in range(container1.shape[0]):
-            if issubclass(container1.get_item(col).__class__, DataContainer):
-                print ("Checking col ", col)
-                self.assertNumpyArrayEqual(
-                    container1.get_item(col).as_array(), 
-                    container2.get_item(col).as_array()
-                    )
-            else:
-                self.assertBlockDataContainerEqual(container1.get_item(col),container2.get_item(col))
-    
-    def assertNumpyArrayEqual(self, first, second):
-        res = True
-        try:
-            numpy.testing.assert_array_equal(first, second)
-        except AssertionError as err:
-            res = False
-            print(err)
-        self.assertTrue(res)
-
-    def assertNumpyArrayAlmostEqual(self, first, second, decimal=6):
-        res = True
-        try:
-            numpy.testing.assert_array_almost_equal(first, second, decimal)
-        except AssertionError as err:
-            res = False
-            print(err)
-            print("expected " , second)
-            print("actual " , first)
-
-        self.assertTrue(res)
-        
+            
     def test_TranslateFunction(self):   
         
         # Test TranslationFunction
@@ -121,7 +87,7 @@ class TestFunction(unittest.TestCase):
                 self.assertNumpyArrayAlmostEqual(out_gradient1.as_array(), out_gradient2.as_array())
                 
             except NotImplementedError:
-                print('Function is not differentiable')
+                logging.info('Function is not differentiable')
                              
             # check proximal     
             func.proximal(tmp, tau, out = out_proximal1)

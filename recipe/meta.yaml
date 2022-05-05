@@ -33,7 +33,7 @@ test:
 
   commands:
     - python -c "import os; print ('TESTING IN THIS DIRECTORY' , os.getcwd())"
-    - python -m unittest discover Wrappers/Python/test        # [win]
+    - python -m unittest discover -v -s Wrappers/Python/test  # [win]
     - python -m unittest discover -s Wrappers/Python/test -v  # [not win]
     
 requirements:

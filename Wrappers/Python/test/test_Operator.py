@@ -243,7 +243,6 @@ class TestOperator(CCPiTestClass):
         # 2D  + chan     
         M, N, K = 2,3,4
         ig1 = ImageGeometry(voxel_num_x=M, voxel_num_y=N, channels=K, voxel_size_x=0.1, voxel_size_y=0.4)
-        print(ig1.dimension_labels)
         x = ig1.allocate('random')
         
         labels = ["channel","horizontal_y", "horizontal_x"]
@@ -541,11 +540,6 @@ class TestBlockOperator(CCPiTestClass):
         #res = z1.copy()
         B.direct(u, out=res)
         
-        
-        print (type(z1), type(res))
-        print (z1.shape)
-        print(z1[0][0].as_array())
-        print(res[0][0].as_array())   
         self.assertBlockDataContainerEqual(z1, res)
         
         z1 = B.range_geometry().allocate(ImageGeometry.RANDOM)
@@ -704,7 +698,6 @@ class TestBlockOperator(CCPiTestClass):
         z1 = B.direct(u)
         #B.adjoint(z1, out=resd)
         
-        print (type(res))
         while (i < n):
             steps.append(timer())
             w1 = B.adjoint(z1)

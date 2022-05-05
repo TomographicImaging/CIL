@@ -35,6 +35,7 @@ logging.info("has_regularisation_toolkit {}".format(has_regularisation_toolkit))
 
 TNV_fixed = False
 
+
 class TestPlugin(unittest.TestCase):
     def setUp(self):
         #Default test image
@@ -56,6 +57,7 @@ class TestPlugin(unittest.TestCase):
             print (ie)
             assert False
     
+
     @unittest.skipUnless(has_regularisation_toolkit, "Skipping as CCPi Regularisation Toolkit is not installed")
     def test_import_TGV(self):
         try:

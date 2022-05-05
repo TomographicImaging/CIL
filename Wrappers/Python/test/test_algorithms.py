@@ -254,15 +254,12 @@ class TestAlgorithms(unittest.TestCase):
         #norm2sq = OperatorCompositionFunction(L2NormSquared(b=b), identity)
         opt = {'tol': 1e-4, 'memopt':False}
         logging.info ("initial objective".format(norm2sq(initial)))
-        try:
-            alg = FISTA(initial=initial, f=L1Norm(), g=ZeroFunction())
-            self.assertTrue(False)
-        except ValueError as ve:
-            logging.info(str(ve))
-            self.assertTrue(True)
-    def test_PDHG_Denoising(self):
-        # adapted from demo PDHG_TV_Color_Denoising.py in CIL-Demos repository
+        with self.assertRaises(ValueError):
+            alg = FISTA(initial=initial, f=L1Norm(), g=ZeroFunction()) 
         
+
+    def test_PDHG_Denoising(self):
+        # adapted from demo PDHG_TV_Color_Denoising.py in CIL-Demos repository   
         data = dataexample.PEPPERS.get(size=(256,256))
         ig = data.geometry
         ag = ig
@@ -305,9 +302,7 @@ class TestAlgorithms(unittest.TestCase):
         operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE)
 
         f1 =  alpha * MixedL21Norm()
-
-        
-                    
+         
         # Compute operator Norm
         normK = operator.norm()
 
@@ -330,9 +325,7 @@ class TestAlgorithms(unittest.TestCase):
         noisy_data, alpha, g = setup(data, noise)
         operator = GradientOperator(ig, correlation=GradientOperator.CORRELATION_SPACE)
 
-        f1 =  alpha * MixedL21Norm()
-
-        
+        f1 =  alpha * MixedL21Norm() 
                     
         # Compute operator Norm
         normK = operator.norm()

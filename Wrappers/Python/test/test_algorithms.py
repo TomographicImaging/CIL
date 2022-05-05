@@ -52,6 +52,7 @@ import warnings
 # Fast Gradient Projection algorithm for Total Variation(TV)
 from cil.optimisation.functions import TotalVariation
 import logging
+from testclass import CCPiTestClass
 from utils import has_gpu_tigre, has_gpu_astra
 
 try:
@@ -65,7 +66,7 @@ has_astra = has_astra and has_gpu_astra()
 
 
 
-class TestAlgorithms(unittest.TestCase):
+class TestAlgorithms(CCPiTestClass):
     def setUp(self):
         #wget.download('https://github.com/DiamondLightSource/Savu/raw/master/test_data/data/24737_fd.nxs')
         #self.filename = '24737_fd.nxs'
@@ -550,23 +551,6 @@ class TestAlgorithms(unittest.TestCase):
         logging.info("RMSE {}".format(rmse))
         self.assertLess(rmse, 4.2e-4)
 
-    def assertNumpyArrayEqual(self, first, second):
-        res = True
-        try:
-            numpy.testing.assert_array_equal(first, second)
-        except AssertionError as err:
-            res = False
-            logging.info(str(err))
-        self.assertTrue(res)
-
-    def assertNumpyArrayAlmostEqual(self, first, second, decimal=6):
-        res = True
-        try:
-            numpy.testing.assert_array_almost_equal(first, second, decimal)
-        except AssertionError as err:
-            res = False
-            logging.info(str(err))
-        self.assertTrue(res)
 
     def test_exception_initial_CGLS(self):
         ig = ImageGeometry(10,2)

@@ -41,8 +41,7 @@ from timeit import default_timer as timer
 import numpy as np                         
 from cil.utilities import dataexample
 from cil.utilities import noise
-import os
-import sys
+from testclass import CCPiTestClass
 try:
     from ccpi.filters import regularisers
     has_reg_toolkit = True
@@ -71,39 +70,8 @@ except ImportError as ie:
     has_numba = False
 
 
-class TestFunction(unittest.TestCase):
-    def assertBlockDataContainerEqual(self, container1, container2):
-        self.assertTrue(issubclass(container1.__class__, container2.__class__))
-        for col in range(container1.shape[0]):
-            if issubclass(container1.get_item(col).__class__, DataContainer):
-                self.assertNumpyArrayEqual(
-                    container1.get_item(col).as_array(), 
-                    container2.get_item(col).as_array()
-                    )
-            else:
-                self.assertBlockDataContainerEqual(container1.get_item(col),container2.get_item(col))
-
-
-    def assertBlockDataContainerAlmostEqual(self, container1, container2, decimal=7):
-        self.assertTrue(issubclass(container1.__class__, container2.__class__))
-        for col in range(container1.shape[0]):
-            if issubclass(container1.get_item(col).__class__, DataContainer):
-                self.assertNumpyArrayAlmostEqual(
-                    container1.get_item(col).as_array(), 
-                    container2.get_item(col).as_array(), 
-                    decimal = decimal
-                    )
-            else:
-                self.assertBlockDataContainerEqual(container1.get_item(col),
-                container2.get_item(col), decimal=decimal)
-    
-    def assertNumpyArrayEqual(self, first, second):
-        numpy.testing.assert_array_equal(first, second)
-        
-
-    def assertNumpyArrayAlmostEqual(self, first, second, decimal=6):
-        numpy.testing.assert_array_almost_equal(first, second, decimal)
-        
+class TestFunction(CCPiTestClass):
+           
 
     def test_Function(self):
         numpy.random.seed(10)

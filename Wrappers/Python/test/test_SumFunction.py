@@ -25,28 +25,10 @@ import unittest
 import numpy
 import numpy as np
 from numbers import Number
+from testclass import CCPiTestClass
 
-class TestFunction(unittest.TestCase):
-    
-    def assertBlockDataContainerEqual(self, container1, container2):
-        self.assertTrue(issubclass(container1.__class__, container2.__class__))
-        for col in range(container1.shape[0]):
-            if issubclass(container1.get_item(col).__class__, DataContainer):
-                self.assertNumpyArrayEqual(
-                    container1.get_item(col).as_array(), 
-                    container2.get_item(col).as_array()
-                    )
-            else:
-                self.assertBlockDataContainerEqual(container1.get_item(col),container2.get_item(col))
-    
-
-    def assertNumpyArrayEqual(self, first, second):
-        numpy.testing.assert_array_equal(first, second)
-        
-        
-    def assertNumpyArrayAlmostEqual(self, first, second, decimal=6):
-        numpy.testing.assert_array_almost_equal(first, second, decimal)
-        
+class TestFunction(CCPiTestClass):
+            
         
     def setUp(self):   
         M, N, K = 3,4,5

@@ -26,6 +26,8 @@ from cil.optimisation.operators import GradientOperator, LinearOperator
 from cil.optimisation.functions import TotalVariation, L2NormSquared
 from cil.optimisation.algorithms import FISTA
 
+from testclass import CCPiTestClass
+
 try:
     import sirf.STIR as pet
     import sirf.Gadgetron as mr
@@ -175,7 +177,7 @@ class TestGradientMR_2D(unittest.TestCase, GradientSIRF):
   
 
     
-class TestSIRFCILIntegration(unittest.TestCase):
+class TestSIRFCILIntegration(CCPiTestClass):
     
     def setUp(self):
         if has_sirf:
@@ -281,19 +283,5 @@ class TestSIRFCILIntegration(unittest.TestCase):
         self.assertBlockDataContainerEqual(bdc , bdc1)
 
 
-    def assertBlockDataContainerEqual(self, container1, container2):
-        self.assertTrue(issubclass(container1.__class__, container2.__class__))
-        for col in range(container1.shape[0]):
-            if hasattr(container1.get_item(col), 'as_array'):
-                self.assertNumpyArrayEqual(
-                    container1.get_item(col).as_array(), 
-                    container2.get_item(col).as_array()
-                    )
-            else:
-                self.assertBlockDataContainerEqual(container1.get_item(col),container2.get_item(col))
-    
-
-    def assertNumpyArrayEqual(self, first, second):
-        np.testing.assert_array_equal(first, second)
 
         

@@ -25,6 +25,7 @@ from cil.framework import ImageGeometry, BlockGeometry, VectorGeometry
 from cil.framework import AcquisitionGeometry
 from timeit import default_timer as timer
 import logging
+from testclass import CCPiTestClass
 
 def dt(steps):
     return steps[-1] - steps[-2]
@@ -35,7 +36,7 @@ def aid(x):
 
 
 
-class TestDataContainer(unittest.TestCase):
+class TestDataContainer(CCPiTestClass):
     def create_simple_ImageData(self):
         N = 64
         ig = ImageGeometry(voxel_num_x=N, voxel_num_y=N)
@@ -713,20 +714,6 @@ class TestDataContainer(unittest.TestCase):
         ss3 = vol.get_slice(channel=0)
         self.assertListEqual([ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X], list(ss3.geometry.dimension_labels))
 
-
-    def assertNumpyArrayEqual(self, first, second):
-        res = True
-        try:
-            numpy.testing.assert_array_equal(first, second)
-        except AssertionError as err:
-            res = False
-            logging.info(str(err))
-        self.assertTrue(res)
-
-
-    def assertNumpyArrayAlmostEqual(self, first, second, decimal=6):
-        numpy.testing.assert_array_almost_equal(first, second, decimal)
-        
 
     def test_DataContainerChaining(self):
         dc = self.create_DataContainer(256,256,256,1)

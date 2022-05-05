@@ -29,46 +29,10 @@ from cil.optimisation.operators import SumOperator,  ZeroOperator, CompositionOp
 
 from cil.utilities import dataexample
 import logging
+from testclass import CCPiTestClass
 
 def dt(steps):
     return steps[-1] - steps[-2]
-
-class CCPiTestClass(unittest.TestCase):
-    def assertBlockDataContainerEqual(self, container1, container2):
-        print ("assert Block Data Container Equal")
-        self.assertTrue(issubclass(container1.__class__, container2.__class__))
-        for col in range(container1.shape[0]):
-            if issubclass(container1.get_item(col).__class__, DataContainer):
-                print ("Checking col ", col)
-                self.assertNumpyArrayEqual(
-                    container1.get_item(col).as_array(), 
-                    container2.get_item(col).as_array()
-                    )
-            else:
-                self.assertBlockDataContainerEqual(container1.get_item(col),container2.get_item(col))
-    
-
-    def assertNumpyArrayEqual(self, first, second):
-        res = True
-        try:
-            numpy.testing.assert_array_equal(first, second)
-        except AssertionError as err:
-            res = False
-            print(err)
-        self.assertTrue(res)
-
-
-    def assertNumpyArrayAlmostEqual(self, first, second, decimal=6):
-        res = True
-        try:
-            numpy.testing.assert_array_almost_equal(first, second, decimal)
-        except AssertionError as err:
-            res = False
-            print(err)
-            print("expected " , second)
-            print("actual " , first)
-
-        self.assertTrue(res)
 
 
 class TestOperator(CCPiTestClass):
@@ -555,31 +519,10 @@ class TestGradients(CCPiTestClass):
         self.assertTrue( LinearOperator.dot_test(Grad3 , decimal=4, verbose=True))
 
 
-class TestBlockOperator(unittest.TestCase):
+class TestBlockOperator(CCPiTestClass):
     def setUp(self):
         numpy.random.seed(1)
 
-
-    def assertBlockDataContainerEqual(self, container1, container2):
-        self.assertTrue(issubclass(container1.__class__, container2.__class__))
-        for col in range(container1.shape[0]):
-            if issubclass(container1.get_item(col).__class__, DataContainer):
-                logging.info ("Checking col {}".format(col))
-                self.assertNumpyArrayEqual(
-                    container1.get_item(col).as_array(), 
-                    container2.get_item(col).as_array()
-                    )
-            else:
-                self.assertBlockDataContainerEqual(container1.get_item(col),container2.get_item(col))
-    
-
-    def assertNumpyArrayEqual(self, first, second):
-        numpy.testing.assert_array_equal(first, second)
-        
-        
-    def assertNumpyArrayAlmostEqual(self, first, second, decimal=6):
-        numpy.testing.assert_array_almost_equal(first, second, decimal)
-    
 
     def test_BlockOperator(self):    
         M, N  = 3, 4

@@ -23,6 +23,8 @@ from cil.framework import ImageGeometry
 
 import numpy.testing
 
+from testclass import CCPiTestClass
+
 try:
     from cvxpy import *
     cvx_not_installable = False
@@ -40,21 +42,8 @@ def dt(steps):
     return steps[-1] - steps[-2]
 
 
-
-
-class TestAlgorithms(unittest.TestCase):
-    def assertNumpyArrayEqual(self, first, second):
-        numpy.testing.assert_array_equal(first, second)
-        
-
-    def assertNumpyArrayAlmostEqual(self, first, second, decimal=6):
-        numpy.testing.assert_array_almost_equal(first, second, decimal)
-        
+class TestFunction(CCPiTestClass):
     
-class TestFunction(unittest.TestCase):
-    def assertNumpyArrayEqual(self, first, second):
-        numpy.testing.assert_array_equal(first, second)
-        
         
     def create_simple_ImageData(self):
         N = 64

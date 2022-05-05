@@ -23,35 +23,7 @@ from cil.framework import BlockDataContainer, DataContainer
 import functools
 
 from cil.optimisation.operators import GradientOperator, IdentityOperator, BlockOperator
-class BDCUnittest(unittest.TestCase):
-    def assertBlockDataContainerEqual(self, container1, container2):
-        self.assertTrue(issubclass(container1.__class__, container2.__class__))
-        for col in range(container1.shape[0]):
-            if issubclass(container1.get_item(col).__class__, DataContainer):
-                self.assertNumpyArrayEqual(
-                    container1.get_item(col).as_array(), 
-                    container2.get_item(col).as_array()
-                    )
-            else:
-                self.assertBlockDataContainerEqual(container1.get_item(col),container2.get_item(col))
-
-    def assertNumpyArrayEqual(self, first, second):
-        numpy.testing.assert_array_equal(first, second)
-
-    def assertBlockDataContainerAlmostEqual(self, container1, container2, decimal=7):
-        self.assertTrue(issubclass(container1.__class__, container2.__class__))
-        for col in range(container1.shape[0]):
-            if issubclass(container1.get_item(col).__class__, DataContainer):
-                self.assertNumpyArrayAlmostEqual(
-                    container1.get_item(col).as_array(), 
-                    container2.get_item(col).as_array(), 
-                    decimal=decimal
-                    )
-            else:
-                self.assertBlockDataContainerAlmostEqual(container1.get_item(col),container2.get_item(col), decimal=decimal)
-
-    def assertNumpyArrayAlmostEqual(self, first, second, decimal):
-        numpy.testing.assert_array_almost_equal(first, second, decimal)
+from testclass import CCPiTestClass as BDCUnittest
 
 class TestBlockDataContainer(BDCUnittest):
     def skiptest_BlockDataContainerShape(self):

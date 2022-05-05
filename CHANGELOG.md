@@ -1,4 +1,5 @@
 * 22.0.0
+ - Removed prints from unittests and cleanup of unittest code.
  - TIFF writer uses logging
  - Added unittests for TIFF functionality
 

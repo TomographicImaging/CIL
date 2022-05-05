@@ -26,7 +26,7 @@ from cil.optimisation.operators import GradientOperator
 
 from cil.optimisation.functions import Function, KullbackLeibler, WeightedL2NormSquared, L2NormSquared,\
                                          L1Norm, MixedL21Norm, LeastSquares, \
-                                         ZeroFunction, OperatorCompositionFunction,\
+                                         SmoothMixedL21Norm, OperatorCompositionFunction,\
                                          Rosenbrock, IndicatorBox, TotalVariation       
 from cil.optimisation.functions import BlockFunction                              
 
@@ -34,7 +34,7 @@ import unittest
 import numpy
 import scipy.special
 
-from cil.framework import ImageGeometry
+from cil.framework import ImageGeometry, BlockGeometry
 from cil.optimisation.functions import TranslateFunction
 from timeit import default_timer as timer
 
@@ -422,8 +422,47 @@ class TestFunction(unittest.TestCase):
 
         # check they are the same
         np.testing.assert_allclose(res1, res2.as_array(), atol=1e-5, rtol=1e-6 )
-            
 
+
+    def test_smoothL21Norm(self):
+        ig = ImageGeometry(4, 5)
+        bg = BlockGeometry(ig, ig)
+        
+        epsilon = 0.5
+        
+        f1 = SmoothMixedL21Norm(epsilon)    
+        x = bg.allocate('random', seed=10)
+        
+        # check call
+        res1 = f1(x)        
+        res2 = (x.pnorm(2)**2 + epsilon**2).sqrt().sum()
+
+        # alternative        
+        tmp1 = x.copy()
+        tmp1.containers += (epsilon,)        
+        res3 = tmp1.pnorm(2).sum()
+                        
+        np.testing.assert_almost_equal(res1, res2, decimal=5) 
+        np.testing.assert_almost_equal(res1, res3, decimal=5) 
+
+        res1 = f1.gradient(x)
+        res2 = x.divide((x.pnorm(2)**2 + epsilon**2).sqrt())
+        np.testing.assert_array_almost_equal(res1.get_item(0).as_array(), 
+                                                res2.get_item(0).as_array()) 
+        
+        np.testing.assert_array_almost_equal(res1.get_item(1).as_array(), 
+                                                res2.get_item(1).as_array()) 
+        
+        # check with MixedL21Norm, when epsilon close to 0
+        
+        f1 = SmoothMixedL21Norm(1e-12)   
+        f2 = MixedL21Norm()
+        
+        res1 = f1(x)
+        res2 = f2(x)
+        np.testing.assert_almost_equal(f1(x), f2(x)) 
+        
+         
     def test_KullbackLeibler(self):
         #numpy.random.seed(1)
         M, N, K =  2, 3, 4

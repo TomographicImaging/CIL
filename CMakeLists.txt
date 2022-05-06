@@ -30,7 +30,7 @@ find_package(Git REQUIRED)
 find_package(Python COMPONENTS Interpreter REQUIRED)
 
 if (Python_FOUND)
-  execute_process(COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/Wrappers/Python/CMake/parse_git_describe.py ${GIT_EXECUTABLE}
+  execute_process(COMMAND "${Python_EXECUTABLE}" ${CMAKE_CURRENT_SOURCE_DIR}/Wrappers/Python/CMake/parse_git_describe.py "${GIT_EXECUTABLE}"
                 RESULT_VARIABLE worked 
                 OUTPUT_VARIABLE CIL_VERSION
                 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}

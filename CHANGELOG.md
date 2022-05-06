@@ -1,5 +1,8 @@
-* 2x.x.x
-  - Adds dask delayed computation of binary and unary methods of non-nested BlockDataContainer
+* 22.0.0
+ - TIFF writer uses logging
+ - Added unittests for TIFF functionality
+ - Adds dask delayed computation of binary and unary methods of non-nested BlockDataContainer
+
 * 21.4.0
   - PEP 440 compliant version
   - CMake fix due to use of pip install. 

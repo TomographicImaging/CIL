@@ -50,8 +50,6 @@ except ImportError as ie:
 if has_reg_toolkit:
     from cil.plugins.ccpi_regularisation.functions import FGP_TV
 
-print ("Has Reg Toolkit", has_reg_toolkit)
-
 try:
     import tomophantom
     from tomophantom import TomoP3D
@@ -996,7 +994,6 @@ class TestTotalVariation(unittest.TestCase):
 
 class TestKullbackLeiblerNumba(unittest.TestCase):
     def setUp(self):
-        print ("test_KullbackLeibler numba")
         #numpy.random.seed(1)
         M, N, K =  2, 3, 4
         ig = ImageGeometry(N, M)

@@ -1,4 +1,6 @@
 * 22.0.0
+ - CMake: 
+   - install script re-allows selection of non default install directory ([#1246](https://github.com/TomographicImaging/CIL/issues/1246))
  - TIFF writer uses logging
  - Added unittests for TIFF functionality
 

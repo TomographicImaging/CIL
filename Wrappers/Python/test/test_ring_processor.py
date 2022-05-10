@@ -29,14 +29,16 @@ try:
     has_tomophantom = True
 except ImportError as ie:
     has_tomophantom = False
-print ("has_tomophantom", has_tomophantom)
 
 
 class TestL1NormRR(unittest.TestCase):
     def setUp(self):
         pass
+
+
     def tearDown(self):
         pass
+
 
     @unittest.skipUnless(has_tomophantom, "Tomophantom not installed")
     def test_L1Norm_2D(self):
@@ -70,5 +72,5 @@ class TestL1NormRR(unittest.TestCase):
         ring_recon = RingRemover(20, "db15", 21, info = True)(sin_stripe)
 
         error = (ring_recon - sin).abs().as_array().mean()
-        print ("L1Norm ", error)
         np.testing.assert_almost_equal(error, 83.20592, 4)
+        

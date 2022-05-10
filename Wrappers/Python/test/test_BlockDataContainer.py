@@ -23,35 +23,7 @@ from cil.framework import BlockDataContainer, DataContainer
 import functools
 
 from cil.optimisation.operators import GradientOperator, IdentityOperator, BlockOperator
-class BDCUnittest(unittest.TestCase):
-    def assertBlockDataContainerEqual(self, container1, container2):
-        self.assertTrue(issubclass(container1.__class__, container2.__class__))
-        for col in range(container1.shape[0]):
-            if issubclass(container1.get_item(col).__class__, DataContainer):
-                self.assertNumpyArrayEqual(
-                    container1.get_item(col).as_array(), 
-                    container2.get_item(col).as_array()
-                    )
-            else:
-                self.assertBlockDataContainerEqual(container1.get_item(col),container2.get_item(col))
-
-    def assertNumpyArrayEqual(self, first, second):
-        numpy.testing.assert_array_equal(first, second)
-
-    def assertBlockDataContainerAlmostEqual(self, container1, container2, decimal=7):
-        self.assertTrue(issubclass(container1.__class__, container2.__class__))
-        for col in range(container1.shape[0]):
-            if issubclass(container1.get_item(col).__class__, DataContainer):
-                self.assertNumpyArrayAlmostEqual(
-                    container1.get_item(col).as_array(), 
-                    container2.get_item(col).as_array(), 
-                    decimal=decimal
-                    )
-            else:
-                self.assertBlockDataContainerAlmostEqual(container1.get_item(col),container2.get_item(col), decimal=decimal)
-
-    def assertNumpyArrayAlmostEqual(self, first, second, decimal):
-        numpy.testing.assert_array_almost_equal(first, second, decimal)
+from testclass import CCPiTestClass as BDCUnittest
 
 class TestBlockDataContainer(BDCUnittest):
     def skiptest_BlockDataContainerShape(self):
@@ -479,7 +451,7 @@ class TestBlockDataContainer(BDCUnittest):
 
     
 
-    def test_axpby(self):
+    def test_sapyb(self):
         # test axpby between BlockDataContainers
         ig0 = ImageGeometry(2,3,4)
         ig1 = ImageGeometry(2,3,5)
@@ -495,7 +467,7 @@ class TestBlockDataContainer(BDCUnittest):
         
         out = cp0 * 0. - 10
 
-        cp0.axpby(3,-2,cp1,out, num_threads=4)
+        cp0.sapyb(3,cp1, -2,out, num_threads=4)
 
         # operation should be [  3 * -1 + (-2) * 2 , 3 * 1 + (-2) * 3 ] 
         # output should be [ -7 , -3 ]
@@ -505,7 +477,7 @@ class TestBlockDataContainer(BDCUnittest):
 
         self.assertBlockDataContainerEqual(out, res)
 
-    def test_axpby2(self):
+    def test_sapyb2(self):
         # test axpby with BlockDataContainer and DataContainer
         ig0 = ImageGeometry(2,3,4)
         # ig1 = ImageGeometry(2,3,5)
@@ -521,7 +493,7 @@ class TestBlockDataContainer(BDCUnittest):
         
         out = cp0 * 0. - 10
 
-        cp0.axpby(3,-2,data1,out)
+        cp0.sapyb(3,data1,-2,out)
 
         # operation should be [  3 * -1 + (-2) * 2 , 3 * 1 + (-2) * 2 ] 
         # output should be [ -7 , -1 ]
@@ -532,7 +504,7 @@ class TestBlockDataContainer(BDCUnittest):
         self.assertBlockDataContainerEqual(out, res)
 
 
-    def test_axpby3(self):
+    def test_sapyb3(self):
         # test axpby with nested BlockDataContainer
         ig0 = ImageGeometry(2,3,4)
         ig1 = ImageGeometry(2,3,5)
@@ -549,7 +521,7 @@ class TestBlockDataContainer(BDCUnittest):
         out = cp1 * 0. 
         cp2 = out + [1,3]
 
-        cp2.axpby(3,-2, cp1 ,out)
+        cp2.sapyb(3,cp1, -2 ,out)
 
         # output should be [ [ -1 , 7 ] , 3]
         res0 = ig0.allocate(-1)
@@ -559,7 +531,7 @@ class TestBlockDataContainer(BDCUnittest):
 
         self.assertBlockDataContainerEqual(out, res)
 
-    def test_axpby4(self):
+    def test_sapyb4(self):
         # test axpby with nested BlockDataContainer
         ig0 = ImageGeometry(2,3,4)
         ig1 = ImageGeometry(2,3,5)
@@ -739,7 +711,7 @@ class TestOutParameter(BDCUnittest):
         res = BlockDataContainer(self.ig0.allocate(1), self.ig1.allocate(1))
         self.assertBlockDataContainerAlmostEqual(res, cp1)
 
-    def test_axpby_a_blockdc(self):
+    def test_sapyb_a_blockdc(self):
         # test axpby between BlockDataContainers, with a as a blockdatacontainer
 
         ig0 = ImageGeometry(2,3,4)
@@ -760,7 +732,8 @@ class TestOutParameter(BDCUnittest):
 
         out = cp0 * 0. - 10
 
-        cp0.axpby(a,-2,cp1,out, num_threads=4)
+        # cp0.axpby(a,-2,cp1,out, num_threads=4)
+        cp0.sapyb(a, cp1,-2,out, num_threads=1)
 
         # operation should be [  3 * -1 + (-2) * 2 , 2 * 1 + (-2) * 3 ] 
         # output should be [ -7 , -4 ]
@@ -771,7 +744,7 @@ class TestOutParameter(BDCUnittest):
         self.assertBlockDataContainerEqual(out, res)
 
 
-    def test_axpby_b_blockdc(self):
+    def test_sapyb_b_blockdc(self):
         # test axpby between BlockDataContainers, with b as a blockdatacontainer
 
         ig0 = ImageGeometry(2,3,4)
@@ -792,7 +765,7 @@ class TestOutParameter(BDCUnittest):
 
         out = cp0 * 0. - 10
 
-        cp0.axpby(3,b,cp1,out, num_threads=4)
+        cp0.sapyb(3,cp1, b,out, num_threads=4)
 
         # operation should be [  3 * -1 + (-2) * 2 , 3 * 1 + (-3) * 3 ] 
         # output should be [ -7 , -3 ]
@@ -802,7 +775,7 @@ class TestOutParameter(BDCUnittest):
 
         self.assertBlockDataContainerEqual(out, res)
 
-    def test_axpby_ab_blockdc(self):
+    def test_sapyb_ab_blockdc(self):
         # test axpby between BlockDataContainers, with a and b as a blockdatacontainer
 
         ig0 = ImageGeometry(2,3,4)
@@ -827,7 +800,7 @@ class TestOutParameter(BDCUnittest):
 
         out = cp0 * 0. - 10
 
-        cp0.axpby(a,b,cp1,out, num_threads=4)
+        cp0.sapyb(a,cp1,b,out, num_threads=4)
 
         # operation should be [  3 * -1 + (-2) * 2 , 2 * 1 + (-3) * 3 ] 
         # output should be [ -7 , -7 ]
@@ -838,7 +811,7 @@ class TestOutParameter(BDCUnittest):
         self.assertBlockDataContainerEqual(out, res)
 
 
-    def test_axpby_ab_blockdc_y_dc(self):
+    def test_sapyb_ab_blockdc_y_dc(self):
         # test axpby between BlockDataContainers, with a and b as a blockdatacontainer, and y as a dc
 
         ig0 = ImageGeometry(2,3,4)
@@ -861,7 +834,7 @@ class TestOutParameter(BDCUnittest):
 
         out = cp0 * 0. - 10
 
-        cp0.axpby(a,b,data1,out, num_threads=4)
+        cp0.sapyb(a,data1,b,out, num_threads=4)
 
         # operation should be [  3 * -1 + (-2) * 2 , 2 * 1 + (-3) * 2 ] 
         # output should be [ -7 , -4 ]

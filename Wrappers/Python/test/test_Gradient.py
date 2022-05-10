@@ -22,10 +22,11 @@ from cil.framework import ImageGeometry
 from cil.optimisation.operators import GradientOperator
 from cil.optimisation.operators import LinearOperator
 
+import logging
+
 class TestGradientOperator(unittest.TestCase):
 
     def setUp(self, *args, **kwargs):
-
         N, M, K = 10, 11, 12
         channels = 13
 
@@ -48,16 +49,17 @@ class TestGradientOperator(unittest.TestCase):
         self.correlation = ['Space','SpaceChannels']
         self.method = ['forward', 'backward', 'centered']
 
+
     def print_assertion_info(self, geom = None, bnd = None, backend = None, method = None, corr = None, split = None):
 
-        print( " Test Failed ")
-        print( " ImageGeometry {} \n".format(geom))
-        print( " Bnd Cond {} ".format(bnd))                                
-        print( " Backend {} ".format(backend))
-        print( " Method {} ".format(method))
-        print( " Correlation {} ".format(corr)) 
+        logging.info( " Test Failed ")
+        logging.info( " ImageGeometry {} \n".format(geom))
+        logging.info( " Bnd Cond {} ".format(bnd))                                
+        logging.info( " Backend {} ".format(backend))
+        logging.info( " Method {} ".format(method))
+        logging.info( " Correlation {} ".format(corr)) 
         if split is not None:
-            print( " Split {} ".format(split))        
+            logging.info( " Split {} ".format(split))        
             
 
     def test_GradientOperator_linearity(self):
@@ -80,9 +82,7 @@ class TestGradientOperator(unittest.TestCase):
                                 raise
                                                             
                             
-
     def test_GradientOperator_norm(self):
-
         for geom in self.list_geometries:            
             for bnd in self.bconditions:
                 for backend in self.backend:
@@ -122,8 +122,8 @@ class TestGradientOperator(unittest.TestCase):
                                 self.print_assertion_info(geom,bnd,backend,corr,method,None) 
                                 raise
 
-    def test_GradientOperator_in_place_vs_allocate_direct(self):
 
+    def test_GradientOperator_in_place_vs_allocate_direct(self):
         for geom in self.list_geometries:            
             for bnd in self.bconditions:
                 for backend in self.backend:
@@ -147,8 +147,8 @@ class TestGradientOperator(unittest.TestCase):
                                     self.print_assertion_info(geom,bnd,backend,corr,method,None) 
                                     raise   
 
-    def test_GradientOperator_in_place_vs_allocate_adjoint(self):
 
+    def test_GradientOperator_in_place_vs_allocate_adjoint(self):
         for geom in self.list_geometries:            
             for bnd in self.bconditions:
                 for backend in self.backend:
@@ -170,8 +170,8 @@ class TestGradientOperator(unittest.TestCase):
                                 self.print_assertion_info(geom,bnd,backend,corr,method, None) 
                                 raise  
 
-    def test_GradientOperator_range_shape(self):
 
+    def test_GradientOperator_range_shape(self):
         Grad2D = GradientOperator(self.ig_2D)
         numpy.testing.assert_equal(Grad2D.range.shape, (2,1)) 
 
@@ -190,8 +190,8 @@ class TestGradientOperator(unittest.TestCase):
         Grad3D_chan = GradientOperator(self.ig_3D_chan, correlation="SpaceChannels")
         numpy.testing.assert_equal(Grad3D_chan.range.shape, (4,1))  
 
-    def test_GradientOperator_split_shape(self):
 
+    def test_GradientOperator_split_shape(self):
         for geom in [self.ig_2D, self.ig_2D_chan, self.ig_3D, self.ig_3D_chan]:
 
             for split in [True, False]:
@@ -219,8 +219,8 @@ class TestGradientOperator(unittest.TestCase):
                     self.print_assertion_info(geom, None, None, None, split=split)
                     raise
 
-    def test_GradientOperator_split_direct_adjoint(self):
-        
+
+    def test_GradientOperator_split_direct_adjoint(self):        
         # Test split for direct and adjoint in 2D + channels geometry
         geom = self.ig_2D_chan
         Grad2D_split_false = GradientOperator(geom, split = False, correlation="SpaceChannels")
@@ -254,8 +254,8 @@ class TestGradientOperator(unittest.TestCase):
         numpy.testing.assert_array_almost_equal(res1[3].array, res2[1][2].array) 
         numpy.testing.assert_array_almost_equal(res1_adj.array, res2_adj.array)                  
             
-    def test_Gradient_operator_numpy_vs_c(self):
 
+    def test_Gradient_operator_numpy_vs_c(self):
         for geom in self.list_geometries:
             for bnd in self.bconditions:
                 for corr in self.correlation:
@@ -273,7 +273,6 @@ class TestGradientOperator(unittest.TestCase):
                             numpy.testing.assert_array_almost_equal(res1_c[m].array, 
                                                             res1_np[m].array)                            
                         except:
-                            print("Check direct of numpy vs c in place")
                             self.print_assertion_info(geom, bnd, None, None, corr, None) 
                             raise   
 
@@ -289,7 +288,6 @@ class TestGradientOperator(unittest.TestCase):
                             numpy.testing.assert_array_almost_equal(res1_c_out[m].array, 
                                                             res1_np_out[m].array)                            
                         except:
-                            print("Check direct of numpy vs c allocate")
                             self.print_assertion_info(geom, bnd, None, None, corr, None) 
                             raise  
 
@@ -302,7 +300,6 @@ class TestGradientOperator(unittest.TestCase):
                         numpy.testing.assert_array_almost_equal(res1_c.array, 
                                                         res1_np.array, decimal=5)                            
                     except:
-                        print("Check adjoint of numpy vs c in place")
                         self.print_assertion_info(geom, bnd, None, None, corr, None) 
                         raise   
 
@@ -317,12 +314,11 @@ class TestGradientOperator(unittest.TestCase):
                         numpy.testing.assert_array_almost_equal(res1_c_out.array, 
                                                         res1_np_out.array, decimal=5)                            
                     except:
-                        print("Check adjoint of numpy vs c allocate")
                         self.print_assertion_info(geom, bnd, None, None, corr, None) 
                         raise    
 
-    def test_GradientOperator_for_pseudo_2D_geometries(self):   
 
+    def test_GradientOperator_for_pseudo_2D_geometries(self):   
             numpy.random.seed(1)
             # ImageGeometry shape (5,5,1)
             ig1 = ImageGeometry(voxel_num_x = 1, voxel_num_y = 5, voxel_num_z=5,
@@ -398,7 +394,6 @@ class TestGradientOperator(unittest.TestCase):
 
 
     def test_GradientOperator_complex_data(self):
- 
         # make complex dtype        
         self.ig_2D.dtype = numpy.complex
         x = self.ig_2D.allocate('random')
@@ -415,3 +410,5 @@ class TestGradientOperator(unittest.TestCase):
         # check dot_test
         for sd in [5, 10, 15]:
             self.assertTrue(LinearOperator.dot_test(Grad, seed=sd))
+
+            

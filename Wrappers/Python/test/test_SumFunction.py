@@ -25,45 +25,12 @@ import unittest
 import numpy
 import numpy as np
 from numbers import Number
+from testclass import CCPiTestClass
 
-class TestFunction(unittest.TestCase):
-    
-    def assertBlockDataContainerEqual(self, container1, container2):
-        print ("assert Block Data Container Equal")
-        self.assertTrue(issubclass(container1.__class__, container2.__class__))
-        for col in range(container1.shape[0]):
-            if issubclass(container1.get_item(col).__class__, DataContainer):
-                print ("Checking col ", col)
-                self.assertNumpyArrayEqual(
-                    container1.get_item(col).as_array(), 
-                    container2.get_item(col).as_array()
-                    )
-            else:
-                self.assertBlockDataContainerEqual(container1.get_item(col),container2.get_item(col))
-    
-    def assertNumpyArrayEqual(self, first, second):
-        res = True
-        try:
-            numpy.testing.assert_array_equal(first, second)
-        except AssertionError as err:
-            res = False
-            print(err)
-        self.assertTrue(res)
-
-    def assertNumpyArrayAlmostEqual(self, first, second, decimal=6):
-        res = True
-        try:
-            numpy.testing.assert_array_almost_equal(first, second, decimal)
-        except AssertionError as err:
-            res = False
-            print(err)
-            print("expected " , second)
-            print("actual " , first)
-
-        self.assertTrue(res)
-
-    def setUp(self, *args, **kwargs):   
-
+class TestFunction(CCPiTestClass):
+            
+        
+    def setUp(self):   
         M, N, K = 3,4,5
         self.ig = ImageGeometry(M, N, K)
         
@@ -90,8 +57,8 @@ class TestFunction(unittest.TestCase):
         self.list1 = [self.f1, self.f2, self.f3, self.f4, self.f5, \
                     self.f6, self.f7, self.f8, self.f9, self.f10, self.f11, self.f12]                  
         
+
     def test_SumFunction_call(self):
-        
         for func in self.list1:
 
             if isinstance(func, ScaledFunction):
@@ -118,9 +85,8 @@ class TestFunction(unittest.TestCase):
             # check if the sum is SumFunction 
             self.assertIsInstance(sumf1, SumFunction)                                
 
-    def test_SumFunction_Lipschitz(self):
-            
-        
+
+    def test_SumFunction_Lipschitz(self):        
         for func in self.list1:
                            
             try:
@@ -141,10 +107,9 @@ class TestFunction(unittest.TestCase):
                 # print (func.__class__.__name__, nie)
                 pass
                 
+
     def test_SumFunction_gradient(self):              
-              
         for func in self.list1:
-                                                      
             sumf = self.f1 + func
             # check gradient          
             try:
@@ -164,11 +129,8 @@ class TestFunction(unittest.TestCase):
         out_right2 = self.ig.allocate()  
             
         for func in self.list1:               
-                            
             sumf = self.f1 + func
-            
             try:
-                
                 if isinstance(func, Number):
                     tmp_fun_gradient_out = 0
                 else:
@@ -184,17 +146,16 @@ class TestFunction(unittest.TestCase):
                 # print("{} is not differentiable".format(type_fun))  
                 pass
 
-    def test_SumFunction_inputs(self):
 
+    def test_SumFunction_inputs(self):
         try:
             f = SumFunction(self.list1[0])
             self.assertFalse(True, "passed only one function and SumFunction accepted it!")
         except ValueError as ve:
             self.assertTrue(True, "Correctly failed" + str(ve))
 
+
     def test_SumFunction_more_inputs(self):
-
-
         # Test Lipshchitz value with more than 2 functions
         list2 = [LeastSquares(self.operator, self.b, c=0.25), 
                  LeastSquares(self.operator, self.b, c=4), 
@@ -209,7 +170,6 @@ class TestFunction(unittest.TestCase):
 
         # assert Lmax property
         self.assertAlmostEqual(max(f.L for f in list2) , F.Lmax)
-
 
         ## test value of the gradient
         out =  list2[0].gradient(self.x)
@@ -255,9 +215,7 @@ class TestFunction(unittest.TestCase):
         self.assertIsInstance(F3, SumFunction)        
 
 
-
     def test_ConstantFunction(self):
-
         k = ConstantFunction(constant=1)
         ig = ImageGeometry(1,2,3)
         x = ig.allocate(2)
@@ -271,7 +229,8 @@ class TestFunction(unittest.TestCase):
         self.assertNumpyArrayEqual(numpy.zeros(x.shape), grad.as_array())
         
         self.assertNumpyArrayEqual(out.as_array(), grad.as_array())
-                
+
+
     def test_SumFunctionScalar(self):      
         numpy.random.seed(1)
         M, N, K = 3,4,5
@@ -285,10 +244,8 @@ class TestFunction(unittest.TestCase):
         f2 = 5
            
         f = f1 + f2
-        print(f)
         
         g = f2 + f1
-        print(g)
 
         tau = 0.03
         
@@ -308,7 +265,6 @@ class TestFunction(unittest.TestCase):
         f.gradient(tmp, out=out1)
         f1.gradient(tmp, out=out2)
         self.assertNumpyArrayAlmostEqual(out1.as_array(), out2.as_array())
-        
 
         res1 = f.proximal(tmp, tau)
         res2 = f1.proximal(tmp, tau)
@@ -337,8 +293,7 @@ class TestFunction(unittest.TestCase):
         self.assertNumpyArrayAlmostEqual(res1_out.as_array(), res2_out.as_array())        
             
         
-def test_ConstantFunction(self):      
-        
+def test_ConstantFunction(self):              
         M, N, K = 3,4,5
         ig = ImageGeometry(M, N, K)
         
@@ -371,6 +326,3 @@ def test_ConstantFunction(self):
         self.assertNumpyArrayAlmostEqual(res1.as_array(), tmp.as_array()) 
             
         
-        
-
-                

@@ -26,7 +26,7 @@ from cil.optimisation.operators import GradientOperator
 
 from cil.optimisation.functions import Function, KullbackLeibler, WeightedL2NormSquared, L2NormSquared,\
                                          L1Norm, MixedL21Norm, LeastSquares, \
-                                         ZeroFunction, OperatorCompositionFunction,\
+                                         SmoothMixedL21Norm, OperatorCompositionFunction,\
                                          Rosenbrock, IndicatorBox, TotalVariation       
 from cil.optimisation.functions import BlockFunction                              
 
@@ -34,15 +34,14 @@ import unittest
 import numpy
 import scipy.special
 
-from cil.framework import ImageGeometry
+from cil.framework import ImageGeometry, BlockGeometry
 from cil.optimisation.functions import TranslateFunction
 from timeit import default_timer as timer
 
 import numpy as np                         
 from cil.utilities import dataexample
 from cil.utilities import noise
-import os
-import sys
+from testclass import CCPiTestClass
 try:
     from ccpi.filters import regularisers
     has_reg_toolkit = True
@@ -50,8 +49,6 @@ except ImportError as ie:
     has_reg_toolkit = False
 if has_reg_toolkit:
     from cil.plugins.ccpi_regularisation.functions import FGP_TV
-
-print ("Has Reg Toolkit", has_reg_toolkit)
 
 try:
     import tomophantom
@@ -71,56 +68,10 @@ except ImportError as ie:
     has_numba = False
 
 
-class TestFunction(unittest.TestCase):
-    def assertBlockDataContainerEqual(self, container1, container2):
-        print ("assert Block Data Container Equal")
-        self.assertTrue(issubclass(container1.__class__, container2.__class__))
-        for col in range(container1.shape[0]):
-            if issubclass(container1.get_item(col).__class__, DataContainer):
-                print ("Checking col ", col)
-                self.assertNumpyArrayEqual(
-                    container1.get_item(col).as_array(), 
-                    container2.get_item(col).as_array()
-                    )
-            else:
-                self.assertBlockDataContainerEqual(container1.get_item(col),container2.get_item(col))
-    def assertBlockDataContainerAlmostEqual(self, container1, container2, decimal=7):
-        print ("assert Block Data Container Equal")
-        self.assertTrue(issubclass(container1.__class__, container2.__class__))
-        for col in range(container1.shape[0]):
-            if issubclass(container1.get_item(col).__class__, DataContainer):
-                print ("Checking col ", col)
-                self.assertNumpyArrayAlmostEqual(
-                    container1.get_item(col).as_array(), 
-                    container2.get_item(col).as_array(), 
-                    decimal = decimal
-                    )
-            else:
-                self.assertBlockDataContainerEqual(container1.get_item(col),
-                container2.get_item(col), decimal=decimal)
-    
-    def assertNumpyArrayEqual(self, first, second):
-        res = True
-        try:
-            numpy.testing.assert_array_equal(first, second)
-        except AssertionError as err:
-            res = False
-            print(err)
-        self.assertTrue(res)
+class TestFunction(CCPiTestClass):
+           
 
-    def assertNumpyArrayAlmostEqual(self, first, second, decimal=6):
-        res = True
-        try:
-            numpy.testing.assert_array_almost_equal(first, second, decimal)
-        except AssertionError as err:
-            res = False
-            print(err)
-            print("expected " , second)
-            print("actual " , first)
-
-        self.assertTrue(res)
     def test_Function(self):
-    
         numpy.random.seed(10)
         N = 3
         ig = ImageGeometry(N,N)
@@ -151,7 +102,6 @@ class TestFunction(unittest.TestCase):
     
     def test_L2NormSquared(self):
         # TESTS for L2 and scalar * L2
-        print ("Test L2NormSquared")
         numpy.random.seed(1)
         M, N, K = 2,3,5
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N, voxel_num_z = K)
@@ -343,33 +293,20 @@ class TestFunction(unittest.TestCase):
         # numpy.testing.assert_array_almost_equal(f_scaled_data.proximal_conjugate(u, tau).as_array(), \
         #                                         ((u - tau * b)/(1 + tau/(2*scalar) )).as_array(), decimal=4)    
            
-    def test_Norm2sq_as_OperatorCompositionFunction(self):
-        
-        print('Test for OperatorCompositionFunction')         
-            
+    def test_Norm2sq_as_OperatorCompositionFunction(self):    
         M, N = 50, 50
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
         #numpy.random.seed(1)
         b = ig.allocate('random', seed=1)
         
-        print('Check call with IdentityOperator operator... OK\n')
         operator = 3 * IdentityOperator(ig)
             
         u = ig.allocate('random', seed = 50)
         f = 0.5 * L2NormSquared(b = b)
         func1 = OperatorCompositionFunction(f, operator)
         func2 = LeastSquares(operator, b, 0.5)
-        print("f.L {}".format(f.L))
-        print("0.5*f.L {}".format((0.5*f).L))
-        print("type func1 {}".format(type(func1)))
-        print("func1.L {}".format(func1.L))
-        print("func2.L {}".format(func2.L))
-        print("operator.norm() {}".format(operator.norm()))
-  
+        
         numpy.testing.assert_almost_equal(func1(u), func2(u))
-        
-        
-        print('Check gradient with IdentityOperator operator... OK\n')
         
         tmp1 = ig.allocate()
         tmp2 = ig.allocate()
@@ -381,8 +318,6 @@ class TestFunction(unittest.TestCase):
         self.assertNumpyArrayAlmostEqual(res_gradient1.as_array(), res_gradient2.as_array())
         self.assertNumpyArrayAlmostEqual(tmp1.as_array(), tmp2.as_array())
        
-        
-        print('Check call with MatrixOperator... OK\n')  
         mat = np.random.randn(M, N)
         operator = MatrixOperator(mat)   
         vg = VectorGeometry(N)
@@ -394,7 +329,8 @@ class TestFunction(unittest.TestCase):
          
         self.assertNumpyArrayAlmostEqual(func1(u), func2(u))       
         numpy.testing.assert_almost_equal(func1.L, func2.L)         
-            
+
+
     def test_MixedL21Norm(self):
         numpy.random.seed(1)
         M, N, K = 2,3,5
@@ -452,10 +388,48 @@ class TestFunction(unittest.TestCase):
 
         # check they are the same
         np.testing.assert_allclose(res1, res2.as_array(), atol=1e-5, rtol=1e-6 )
-            
 
+
+    def test_smoothL21Norm(self):
+        ig = ImageGeometry(4, 5)
+        bg = BlockGeometry(ig, ig)
+        
+        epsilon = 0.5
+        
+        f1 = SmoothMixedL21Norm(epsilon)    
+        x = bg.allocate('random', seed=10)
+        
+        # check call
+        res1 = f1(x)        
+        res2 = (x.pnorm(2)**2 + epsilon**2).sqrt().sum()
+
+        # alternative        
+        tmp1 = x.copy()
+        tmp1.containers += (epsilon,)        
+        res3 = tmp1.pnorm(2).sum()
+                        
+        np.testing.assert_almost_equal(res1, res2, decimal=5) 
+        np.testing.assert_almost_equal(res1, res3, decimal=5) 
+
+        res1 = f1.gradient(x)
+        res2 = x.divide((x.pnorm(2)**2 + epsilon**2).sqrt())
+        np.testing.assert_array_almost_equal(res1.get_item(0).as_array(), 
+                                                res2.get_item(0).as_array()) 
+        
+        np.testing.assert_array_almost_equal(res1.get_item(1).as_array(), 
+                                                res2.get_item(1).as_array()) 
+        
+        # check with MixedL21Norm, when epsilon close to 0
+        
+        f1 = SmoothMixedL21Norm(1e-12)   
+        f2 = MixedL21Norm()
+        
+        res1 = f1(x)
+        res2 = f2(x)
+        np.testing.assert_almost_equal(f1(x), f2(x)) 
+        
+         
     def test_KullbackLeibler(self):
-        print ("test_KullbackLeibler")
         #numpy.random.seed(1)
         M, N, K =  2, 3, 4
         ig = ImageGeometry(N, M, K)
@@ -465,30 +439,21 @@ class TestFunction(unittest.TestCase):
         b1 = ig.allocate('random', seed = 1000)
         
         # with no data
-        try:
+        with self.assertRaises(ValueError):
             f = KullbackLeibler()   
-        except ValueError:
-            print('Give data b=...\n')
             
-        print('With negative data, no background\n')   
-        try:        
+        with self.assertRaises(ValueError):        
             f = KullbackLeibler(b=-1*g1)
-        except ValueError:
-            print('We have negative data\n') 
             
         f = KullbackLeibler(b=g1)        
-            
-        print('Check KullbackLeibler(x,x)=0\n') 
         self.assertNumpyArrayAlmostEqual(0.0, f(g1))
                 
-        print('Check gradient .... is OK \n')
         res_gradient = f.gradient(u1)
         res_gradient_out = u1.geometry.allocate()
         f.gradient(u1, out = res_gradient_out) 
         self.assertNumpyArrayAlmostEqual(res_gradient.as_array(), \
                                                 res_gradient_out.as_array(),decimal = 4)  
         
-        print('Check proximal ... is OK\n')        
         tau = 400.4
         res_proximal = f.proximal(u1, tau)
         res_proximal_out = u1.geometry.allocate()   
@@ -496,15 +461,8 @@ class TestFunction(unittest.TestCase):
         self.assertNumpyArrayAlmostEqual(res_proximal.as_array(), \
                                                 res_proximal_out.as_array(), decimal =5)  
         
-        print('Check conjugate ... is OK\n')  
-        
-        if (1 - u1.as_array()).all():
-            print('If 1-x<=0, Convex conjugate returns 0.0')
         u2 = u1 * 0 + 2.
         self.assertNumpyArrayAlmostEqual(0.0, f.convex_conjugate(u2))   
-
-
-        print('Check KullbackLeibler with background\n')      
         eta = b1
         
         f1 = KullbackLeibler(b=g1, eta=b1) 
@@ -517,10 +475,7 @@ class TestFunction(unittest.TestCase):
         res_proximal_conj_out = u1.geometry.allocate()
         proxc = f.proximal_conjugate(u1,tau)
         f.proximal_conjugate(u1, tau, out=res_proximal_conj_out)
-        print(res_proximal_conj_out.as_array())
-        print(proxc.as_array())
         numpy.testing.assert_array_almost_equal(proxc.as_array(), res_proximal_conj_out.as_array())
-
 
 
     def test_Rosenbrock(self):
@@ -528,6 +483,8 @@ class TestFunction(unittest.TestCase):
         x = VectorData(numpy.asarray([1,1]))
         assert f(x) == 0.
         numpy.testing.assert_array_almost_equal( f.gradient(x).as_array(), numpy.zeros(shape=(2,), dtype=numpy.float32))
+
+
     def test_IndicatorBox(self):
         ig = ImageGeometry(10,10)
         im = ig.allocate(-1)
@@ -541,6 +498,7 @@ class TestFunction(unittest.TestCase):
         a = ib(im)
         numpy.testing.assert_equal(a, numpy.inf)
         
+
     def tests_for_L2NormSq_and_weighted(self):
         numpy.random.seed(1)
         M, N, K = 2,3,1
@@ -597,10 +555,8 @@ class TestFunction(unittest.TestCase):
         l1 = f1.proximal_conjugate(u, tau)
         l2 = (u - tau * b)/(1 + tau/2 )
         numpy.testing.assert_array_almost_equal(l1.as_array(), l2.as_array(), decimal=4)     
-        
-            
-        # check scaled function properties
-        
+
+        # check scaled function properties      
         # scalar 
         scalar = 100
         f_scaled_no_data = scalar * L2NormSquared()
@@ -638,25 +594,14 @@ class TestFunction(unittest.TestCase):
                                                 ((u - tau * b)/(1 + tau/(2*scalar) )).as_array(), decimal=4)   
         
         
-        
-        print( " ####### check without out ######### " )
-              
-              
         u_out_no_out = ig.allocate('random_int')         
         res_no_out = f_scaled_data.proximal_conjugate(u_out_no_out, 0.5)          
-        print(res_no_out.as_array())
-        
-        print( " ####### check with out ######### " ) 
               
         res_out = ig.allocate()        
         f_scaled_data.proximal_conjugate(u_out_no_out, 0.5, out = res_out)
         
-        print(res_out.as_array())   
-    
         numpy.testing.assert_array_almost_equal(res_no_out.as_array(), \
                                                 res_out.as_array(), decimal=4)  
-        
-        
         
         ig1 = ImageGeometry(2,3)
         
@@ -673,14 +618,10 @@ class TestFunction(unittest.TestCase):
         res1 = f_scaled.proximal(u, tau)
         res2 = f_noscaled.proximal(u, tau*scalar)
         
-    #    res2 = (u + tau*b)/(1+tau)
+        # res2 = (u + tau*b)/(1+tau)
         
         numpy.testing.assert_array_almost_equal(res1.as_array(), \
                                                 res2.as_array(), decimal=4)
-        
-                    
-        print("Checks for WeightedL2NormSquared")
-
         
         # Tests for weighted L2NormSquared
         ig = ImageGeometry(voxel_num_x = 3, voxel_num_y = 3)
@@ -693,8 +634,6 @@ class TestFunction(unittest.TestCase):
         res2 = (weight * (x**2)).sum()
         numpy.testing.assert_almost_equal(res1, res2, decimal=4)
         
-        print("Call of WeightedL2NormSquared is ... ok")
-        
         # gradient for weighted L2NormSquared    
         res1 = f.gradient(x)
         res2 = 2*weight*x
@@ -705,15 +644,12 @@ class TestFunction(unittest.TestCase):
         numpy.testing.assert_array_almost_equal(res2.as_array(), \
                                                 out.as_array(), decimal=4)  
         
-        print("GradientOperator of WeightedL2NormSquared is ... ok")    
         
         # convex conjugate for weighted L2NormSquared       
         res1 = f.convex_conjugate(x)
         res2 = 1/4 * (x/weight.sqrt()).squared_norm()
         numpy.testing.assert_array_almost_equal(res1, \
                                                 res2, decimal=4)   
-        
-        print("Convex conjugate of WeightedL2NormSquared is ... ok")        
         
         # proximal for weighted L2NormSquared       
         tau = 0.3
@@ -723,28 +659,19 @@ class TestFunction(unittest.TestCase):
         res2 = x/(1+2*tau*weight)
         numpy.testing.assert_array_almost_equal(res1.as_array(), \
                                                 res2.as_array(), decimal=4)  
-        
-        print("Proximal of WeightedL2NormSquared is ... ok")  
-        
-        
         tau = 0.3
         out = ig.allocate()
         res1 = f.proximal_conjugate(x, tau)   
         res2 = x/(1 + tau/(2*weight))    
         numpy.testing.assert_array_almost_equal(res1.as_array(), \
                                                 res2.as_array(), decimal=4)  
-        
-        print("Proximal conjugate of WeightedL2NormSquared is ... ok")  
-    
-    
+            
         b = ig.allocate('random')
         f1 = TranslateFunction(WeightedL2NormSquared(weight=weight), b) 
         f2 = WeightedL2NormSquared(weight = weight, b=b)
         res1 = f1(x)
         res2 = f2(x)
         numpy.testing.assert_almost_equal(res1, res2, decimal=4)
-        
-        print("Call of WeightedL2NormSquared vs TranslateFunction is ... ok") 
         
         f1 = WeightedL2NormSquared(b=b)
         f2 = L2NormSquared(b=b)
@@ -753,12 +680,8 @@ class TestFunction(unittest.TestCase):
         numpy.testing.assert_almost_equal(f1.L, 2, decimal=4)
         numpy.testing.assert_almost_equal(f2.L, 2, decimal=4)
         
-        print("Check Lip constants ... ok")          
         
-
-
-    def tests_for_LS_weightedLS(self):
-                        
+    def tests_for_LS_weightedLS(self):                
         ig = ImageGeometry(40,30)
         
         numpy.random.seed(1)
@@ -772,32 +695,24 @@ class TestFunction(unittest.TestCase):
         
         D = DiagonalOperator(weight)
         norm_weight = numpy.float64(D.norm())
-        print("norm_weight", norm_weight)
         
         f1 = LeastSquares(A, b, c, weight) 
         f2 = LeastSquares(A, b, c)
         
-        print("Check LS vs wLS")        
-        
         # check Lipshitz    
         numpy.testing.assert_almost_equal(f2.L, 2 * c * (A.norm()**2))   
-        print ("unwrapped", 2. * c * norm_weight * (A.norm()**2))
-        print ("f1.L", f1.L)
         numpy.testing.assert_almost_equal(f1.L, numpy.float64(2.) * c * norm_weight * (A.norm()**2)) 
-        print("Lipschitz is ... OK")
             
         # check call with weight                   
         res1 = c * (A.direct(x)-b).dot(weight * (A.direct(x) - b))
         res2 = f1(x)    
         numpy.testing.assert_almost_equal(res1, res2)
-        print("Call is ... OK")        
         
         # check call without weight                  
         #res1 = c * (A.direct(x)-b).dot((A.direct(x) - b))
         res1 = c * (A.direct(x)-b).squared_norm()
         res2 = f2(x)    
         numpy.testing.assert_almost_equal(res1, res2) 
-        print("Call without weight is ... OK")        
         
         # check gradient with weight             
         out = ig.allocate(None)
@@ -807,7 +722,6 @@ class TestFunction(unittest.TestCase):
         res2 = 2 * c * A.adjoint(weight*(A.direct(x)-b))
         numpy.testing.assert_array_almost_equal(res1.as_array(), res2.as_array())
         numpy.testing.assert_array_almost_equal(out.as_array(), res2.as_array())
-        print("GradientOperator is ... OK")          
         
         # check gradient without weight             
         out = ig.allocate()
@@ -817,11 +731,7 @@ class TestFunction(unittest.TestCase):
         numpy.testing.assert_array_almost_equal(res1.as_array(), res2.as_array())
         numpy.testing.assert_array_almost_equal(out.as_array(), res2.as_array())
         
-        print("GradientOperator without weight is ... OK")   
 
-
-        print("Compare Least Squares with DiagonalOperator + CompositionOperator")
-        
         ig2 = ImageGeometry(100,100,100)
         A = IdentityOperator(ig2)
         b = ig2.allocate('random')
@@ -840,39 +750,31 @@ class TestFunction(unittest.TestCase):
         t0 = timer()
         res1 = f1(x)
         t1 = timer()
-        print("Time with Composition+Diagonal is {}".format(t1-t0))
-        
+
         t2 = timer()
         res2 = f2(x)
         t3 = timer()
-        print("Time with LS + weight is {}".format(t3-t2))
         
         numpy.testing.assert_almost_equal(res1, res2, decimal=2)          
 
-    def test_Lipschitz(self):
-        print('Test for OperatorCompositionFunction')         
-            
+
+    def test_Lipschitz(self):            
         M, N = 50, 50
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
         b = ig.allocate('random', seed=1)
-        
-        print('Check call with IdentityOperator operator... OK\n')
         operator = 3 * IdentityOperator(ig)
             
         u = ig.allocate('random_int', seed = 50)
         func2 = LeastSquares(operator, b, 0.5)
         assert func2.L != 2
-        print (func2.L)
         func2.L = 2
         assert func2.L == 2
+    
+    
     def test_Lipschitz2(self):
-        print('Test for test_Lipschitz2')         
-            
         M, N = 50, 50
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
         b = ig.allocate('random', seed=1)
-        
-        print('Check call with IdentityOperator operator... OK\n')
         operator = 3 * IdentityOperator(ig)
             
         u = ig.allocate('random_int', seed = 50)
@@ -880,17 +782,14 @@ class TestFunction(unittest.TestCase):
         func1 = ConstantFunction(0.3)
         f3 = func1 + func2
         assert f3.L != 2
-        print (func2.L)
         func2.L = 2
         assert func2.L == 2
+    
+    
     def test_Lipschitz3(self):
-        print('Test for test_Lipschitz3')         
-            
         M, N = 50, 50
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
         b = ig.allocate('random', seed=1)
-        
-        print('Check call with IdentityOperator operator... OK\n')
         operator = 3 * IdentityOperator(ig)
             
         u = ig.allocate('random_int', seed = 50)
@@ -898,17 +797,14 @@ class TestFunction(unittest.TestCase):
         func1 = ConstantFunction(0.3)
         f3 = TranslateFunction(func1, 3)
         assert f3.L != 2
-        print (f3.L)
         f3.L = 2
         assert f3.L == 2
+    
+    
     def test_Lipschitz4(self):
-        print('Test for test_Lipschitz4')         
-            
         M, N = 50, 50
         ig = ImageGeometry(voxel_num_x=M, voxel_num_y = N)
         b = ig.allocate('random', seed=1)
-        
-        print('Check call with IdentityOperator operator... OK\n')
         operator = 3 * IdentityOperator(ig)
             
         u = ig.allocate('random_int', seed = 50)
@@ -916,28 +812,19 @@ class TestFunction(unittest.TestCase):
         func1 = ConstantFunction(0.3)
         f3 = func1 + 3
         assert f3.L == 0
-        print ("OK")
-        print (f3.L)
         f3.L = 2
         assert f3.L == 2
-        print ("OK")
         assert func1.L == 0
-        print ("OK")
-        try:
+        with self.assertRaises(AttributeError):
             func1.L = 2
-            assert False
-        except AttributeError as ve:
-            assert True
-        print ("OK")
+            
         f2 = LeastSquares(operator, b, 0.5)
         f4 = 2 * f2
         assert f4.L == 2 * f2.L
         
-        print ("OK")
         f4.L = 10
         assert f4.L != 2 * f2.L  
-        print ("OK")
-
+        
         f4 = -2 * f2
         assert f4.L == 2 * f2.L
 
@@ -956,48 +843,44 @@ class TestTotalVariation(unittest.TestCase):
     def test_regularisation_parameter(self):
         np.testing.assert_almost_equal(self.tv.regularisation_parameter, 1.)
 
+
     def test_regularisation_parameter2(self):
         np.testing.assert_almost_equal(self.tv_scaled.regularisation_parameter, self.alpha)
-    
+
+
     def test_rmul(self):
         assert isinstance(self.tv_scaled, TotalVariation)
-    
+
+
     def test_regularisation_parameter3(self):
-        try:
+        with self.assertRaises(TypeError):
             self.tv.regularisation_parameter = 'string'
-            assert False
-        except TypeError as te:
-            assert True
+            
+
     def test_rmul2(self):
         alpha = 'string'
-        try:
+        with self.assertRaises(TypeError):
             tv = alpha * TotalVariation()
-            assert False
-        except TypeError as te:
-            assert True
+            
 
     def test_call_real_isotropic(self):
-
         x_real = self.ig_real.allocate('random', seed=4)  
         
-
         res1 = self.tv_iso(x_real)
         res2 = self.grad.direct(x_real).pnorm(2).sum()
         np.testing.assert_equal(res1, res2)  
 
-    def test_call_real_anisotropic(self):
 
+    def test_call_real_anisotropic(self):
         x_real = self.ig_real.allocate('random', seed=4) 
         
         res1 = self.tv_aniso(x_real)
         res2 = self.grad.direct(x_real).pnorm(1).sum()
         np.testing.assert_equal(res1, res2)                
     
+
     @unittest.skipUnless(has_reg_toolkit, "Regularisation Toolkit not present")
     def test_compare_regularisation_toolkit(self):
-    
-        # print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV no tolerance (2D)")
-
         data = dataexample.SHAPES.get(size=(64,64))
         ig = data.geometry
         ag = ig
@@ -1029,8 +912,6 @@ class TestTotalVariation(unittest.TestCase):
         t2 = timer()
         res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
         t3 = timer()
-        # print(t3-t1)
-        
         
         np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal = 4)
 
@@ -1060,20 +941,16 @@ class TestTotalVariation(unittest.TestCase):
         res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
         t3 = timer()
         # print(t3-t2)
-        
-        
-        # print(mae(res1, res2))
         np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal=3)    
         
         ###################################################################
         ###################################################################
         ###################################################################
         ###################################################################
+    
+    
     @unittest.skipUnless(has_tomophantom and has_reg_toolkit, "Missing Tomophantom or Regularisation-Toolkit")
     def test_compare_regularisation_toolkit_tomophantom(self):
-    
-        # print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV no tolerance (3D)") 
-            
         # print ("Building 3D phantom using TomoPhantom software")
         model = 13 # select a model number from the library
         N_size = 64 # Define phantom dimensions using a scalar value (cubic phantom)
@@ -1117,7 +994,6 @@ class TestTotalVariation(unittest.TestCase):
 
 class TestKullbackLeiblerNumba(unittest.TestCase):
     def setUp(self):
-        print ("test_KullbackLeibler numba")
         #numpy.random.seed(1)
         M, N, K =  2, 3, 4
         ig = ImageGeometry(N, M)
@@ -1137,12 +1013,8 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
         mask_c = ig.allocate(0)
         mask_c.fill(1, horizontal_x=0)
 
-        # print ("mask\n", mask.as_array())
-        # print ("mask_c\n", mask_c.as_array())
-
         f = KullbackLeibler(b=g1, use_numba=True, eta=eta)
         f_np = KullbackLeibler(b=g1, use_numba=False, eta=eta)
-
 
         # mask is on vartical=0
         # separate the u1 vertical=0
@@ -1150,7 +1022,6 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
         f_mask_c = KullbackLeibler(b=g1.copy(), use_numba=True, mask=mask_c.copy(), eta=eta.copy())
         f_on_mask = KullbackLeibler(b=g1.subset(horizontal_x=0), use_numba=True, eta=eta.subset(horizontal_x=0))
         u1_on_mask = u1.subset(horizontal_x=0)
-
 
         tau = 400.4
         self.tau = tau
@@ -1166,7 +1037,8 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
         self.f_mask_c = f_mask_c
         self.f_on_mask = f_on_mask
         self.u1_on_mask = u1_on_mask
-        
+
+
     @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
     def test_KullbackLeibler_numba_call(self):
         f = self.f
@@ -1175,7 +1047,8 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
         u1 = self.u1
 
         numpy.testing.assert_allclose(f(u1), f_np(u1),  rtol=1e-5)
-    
+
+
     @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
     def test_KullbackLeibler_numba_call_mask(self):
         f = self.f
@@ -1191,6 +1064,7 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
         f_mask_c = self.f_mask_c
         
         numpy.testing.assert_allclose(f_mask(u1) + f_mask_c(u1), f(u1),  rtol=1e-5)
+
 
     @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
     def test_KullbackLeibler_numba_proximal(self):
@@ -1218,7 +1092,8 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
                                       f.proximal(u1,tau=tau).as_array(), rtol=7e-3)
         numpy.testing.assert_array_almost_equal(f.proximal(u1,tau=self.tau).as_array(), 
                                                 f.proximal(u1,tau=tau).as_array(), decimal=4)
-        
+
+
     @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
     def test_KullbackLeibler_numba_gradient(self):
         f = self.f
@@ -1227,7 +1102,8 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
         u1 = self.u1
 
         numpy.testing.assert_allclose(f.gradient(u1).as_array(), f_np.gradient(u1).as_array(), rtol=1e-3)
-        
+
+
     @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
     def test_KullbackLeibler_numba_convex_conjugate(self):
         f = self.f
@@ -1236,7 +1112,8 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
         u1 = self.u1
 
         numpy.testing.assert_allclose(f.convex_conjugate(u1), f_np.convex_conjugate(u1), rtol=1e-3)
-        
+
+
     @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
     def test_KullbackLeibler_numba_proximal_conjugate_arr(self):
         f = self.f
@@ -1246,7 +1123,8 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
 
         numpy.testing.assert_allclose(f.proximal_conjugate(u1,tau=tau).as_array(), 
                         f_np.proximal_conjugate(u1,tau=tau).as_array(), rtol=1e-3)
-    
+
+
     @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
     def test_KullbackLeibler_numba_convex_conjugate_mask(self):
         f = self.f
@@ -1259,14 +1137,11 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
         f_on_mask = self.f_on_mask
         u1_on_mask = self.u1_on_mask
 
-        print (f.convex_conjugate(u1))
-        print (f_mask.convex_conjugate(u1))
-        print (f_mask_c.convex_conjugate(u1))
-
         numpy.testing.assert_allclose(
             f.convex_conjugate(u1), 
             f_mask.convex_conjugate(u1) + f_mask_c.convex_conjugate(u1) ,\
                  rtol=1e-3)
+
 
     @unittest.skipUnless(has_numba, "Skipping because numba isn't installed")
     def test_KullbackLeibler_numba_proximal_conjugate_mask(self):
@@ -1292,7 +1167,8 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
         numpy.testing.assert_allclose(f.proximal_conjugate(x,tau=tau).as_array(), 
                                       (f_mask.proximal_conjugate(x,tau=tau) +\
                                       f_mask_c.proximal_conjugate(x, tau=tau)) .as_array(), rtol=7e-3)
-        
+
+
     def tearDown(self):
         pass
 
@@ -1329,6 +1205,8 @@ class TestLeastSquares(unittest.TestCase):
         twicels = constant * ls
 
         np.testing.assert_almost_equal( constant * ls(x) , twicels(x))
+
+
     def test_rmul_with_Lipschitz(self):
         ig = self.ig
         A = self.A
@@ -1340,6 +1218,7 @@ class TestLeastSquares(unittest.TestCase):
         twicels = constant * ls
 
         np.testing.assert_almost_equal( constant * ls.L , twicels.L)
+
 
     def test_rmul_with_gradient(self):
         ig = self.ig
@@ -1371,60 +1250,55 @@ class TestOperatorCompositionFunctionWithWrongInterfaceFunction(unittest.TestCas
             pass
         ocf = OperatorCompositionFunction(NotAFunction(), I)
         self.pars = (ig, I, x, ocf)
+
+
     def tearDown(self):
         pass
+
 
     def test_call(self):
         ig , I, x, ocf = self.pars
         
-        try:
+        with self.assertRaises(TypeError):
             ocf(x)
-            self.assertFalse(True)
-        except TypeError as te:
-            self.assertFalse(False)
+            
+
     def test_L(self):
         ig , I, x, ocf = self.pars
-        try:
+        with self.assertRaises(AttributeError):
             ocf.L
-            self.assertTrue(False)
-        except AttributeError as ae:
-            self.assertTrue(True)
+
+
     def test_gradient(self):
         ig , I, x, ocf = self.pars
-        try:
+        with self.assertRaises(AttributeError):
             ocf.gradient(x)
-            self.assertTrue(False)
-        except AttributeError as ae:
-            self.assertTrue(True)
+            
+            
     def test_proximal(self):
         ig , I, x, ocf = self.pars
-        try:
+        with self.assertRaises(NotImplementedError):
             ocf.proximal(x, tau=1)
-            self.assertTrue(False)
-        except NotImplementedError as ae:
-            self.assertTrue(True)
+            
+            
     def test_proximal_conjugate(self):
         ig , I, x, ocf = self.pars
-        try:
+        with self.assertRaises(NotImplementedError):
             ocf.proximal_conjugate(x, tau=1)
-            self.assertTrue(False)
-        except NotImplementedError as ae:
-            self.assertTrue(True)
+            
+            
     def test_convex_conjugate(self):
         ig , I, x, ocf = self.pars
-        try:
+        with self.assertRaises(NotImplementedError):
             ocf.convex_conjugate(x)
-            self.assertTrue(False)
-        except NotImplementedError as ae:
-            self.assertTrue(True)
+            
+            
     def test_proximal_conjugate(self):
         ig , I, x, ocf = self.pars
-        try:
+        with self.assertRaises(NotImplementedError):
             ocf.proximal_conjugate(x, tau=1)
-            self.assertTrue(False)
-        except NotImplementedError as ae:
-            self.assertTrue(True)
-    
+            
+            
 class TestOperatorCompositionFunctionWithWrongInterfaceFunctionAddScalar(TestOperatorCompositionFunctionWithWrongInterfaceFunction):
     def setUp(self):
         ig = ImageGeometry(2,2)
@@ -1435,6 +1309,8 @@ class TestOperatorCompositionFunctionWithWrongInterfaceFunctionAddScalar(TestOpe
             pass
         ocf = OperatorCompositionFunction(NotAFunction(), I) + 1
         self.pars = (ig, I, x, ocf)
+
+
 class TestOperatorCompositionFunctionWithWrongInterfaceFunctionMultiplyScalar(TestOperatorCompositionFunctionWithWrongInterfaceFunction):
     def setUp(self):
         ig = ImageGeometry(2,2)
@@ -1445,6 +1321,8 @@ class TestOperatorCompositionFunctionWithWrongInterfaceFunctionMultiplyScalar(Te
             pass
         ocf = OperatorCompositionFunction(NotAFunction(), I) * 2.
         self.pars = (ig, I, x, ocf)
+
+
 class TestOperatorCompositionFunctionWithWrongInterfaceFunctionAddFunction(TestOperatorCompositionFunctionWithWrongInterfaceFunction):
     def setUp(self):
         ig = ImageGeometry(2,2)
@@ -1455,6 +1333,7 @@ class TestOperatorCompositionFunctionWithWrongInterfaceFunctionAddFunction(TestO
             pass
         ocf = OperatorCompositionFunction(NotAFunction(), I) + IndicatorBox()
         self.pars = (ig, I, x, ocf)
+
 
 class TestOperatorCompositionFunctionWithWrongInterfaceOperator(TestOperatorCompositionFunctionWithWrongInterfaceFunction):
     def setUp(self):
@@ -1467,16 +1346,19 @@ class TestOperatorCompositionFunctionWithWrongInterfaceOperator(TestOperatorComp
         nao = NotAnOperator()
         ocf = OperatorCompositionFunction(F, nao)
         self.pars = (ig, nao, x, ocf)
+
+
     def tearDown(self):
         pass
+
+
     def test_call(self):
         ig , I, x, ocf = self.pars
         
-        try:
+        with self.assertRaises(AttributeError):
             ocf(x)
-            self.assertFalse(True)
-        except AttributeError as te:
-            self.assertFalse(False)
+            
+            
 class TestOperatorCompositionFunctionWithWrongInterfaceOperatorScaled(TestOperatorCompositionFunctionWithWrongInterfaceOperator):
     def setUp(self):
         ig = ImageGeometry(2,2)
@@ -1489,6 +1371,7 @@ class TestOperatorCompositionFunctionWithWrongInterfaceOperatorScaled(TestOperat
         nao = NotAnOperator() * 2
         ocf = OperatorCompositionFunction(F, nao)
         self.pars = (ig, nao, x, ocf)
+
 
 class TestBlockFunction(unittest.TestCase):
     def setUp(self):
@@ -1506,18 +1389,22 @@ class TestBlockFunction(unittest.TestCase):
         self.funcs = [ func1 , func2 ]
         # self.ig = ig
 
+
     def tearDown(self) -> None:
         return super().tearDown()
+
 
     def test_iterator(self):
         bf = BlockFunction(*self.funcs)
         for el in bf:
             assert isinstance(el, ConstantFunction)
 
+
     def test_rmul_with_scalar_return(self):
         bf = BlockFunction(*self.funcs)
         bf2 = 2*bf
         assert isinstance(bf2, BlockFunction)
+
 
     def test_getitem(self):
         bf = BlockFunction(*self.funcs)
@@ -1525,16 +1412,14 @@ class TestBlockFunction(unittest.TestCase):
         assert isinstance(bf[1], ConstantFunction)
         
         
-
     def test_rmul_with_scalar1(self):
         bf0 = BlockFunction(*self.funcs)
         bf = 2*bf0
 
-        print (bf[0].constant, bf0[0].constant)
-        print (bf[1].constant, bf0[1].constant)
-
         for i in range(2):
             assert bf[i].constant == 2*bf0[i].constant
+
+
     def test_rmul_with_scalar2(self):
         bf0 = BlockFunction(L1Norm())
         bf = 2*bf0

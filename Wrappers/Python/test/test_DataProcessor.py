@@ -19,10 +19,7 @@
 import sys
 import unittest
 import numpy
-from cil.framework import DataProcessor
 from cil.framework import DataContainer
-from cil.framework import ImageData
-from cil.framework import AcquisitionData
 from cil.framework import ImageGeometry
 from cil.framework import AcquisitionGeometry
 from cil.utilities import dataexample
@@ -30,7 +27,6 @@ from timeit import default_timer as timer
 
 from cil.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 
-from cil.io import NEXUSDataReader
 from cil.processors import CentreOfRotationCorrector, CofR_xcorrelation, CofR_image_sharpness
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
 from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder

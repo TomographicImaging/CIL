@@ -15,6 +15,7 @@ class TestModuleBase(unittest.TestCase):
         except ImportError as ie:
             self.assertFalse(True, str(ie))
 
+
     def test_version_major(self):
         try:
             from cil import version
@@ -22,6 +23,8 @@ class TestModuleBase(unittest.TestCase):
             self.assertTrue(isinstance(a, str))
         except ImportError as ie:
             self.assertFalse(True, str(ie))
+
+
     def test_version_minor(self):
         try:
             from cil import version
@@ -29,6 +32,8 @@ class TestModuleBase(unittest.TestCase):
             self.assertTrue(isinstance(a, str))
         except ImportError as ie:
             self.assertFalse(True, str(ie))
+
+
     def test_version_patch(self):
         try:
             from cil import version
@@ -36,6 +41,8 @@ class TestModuleBase(unittest.TestCase):
             self.assertTrue(isinstance(a, str))
         except ImportError as ie:
             self.assertFalse(True, str(ie))
+
+
     def test_version_num_commit(self):
         try:
             from cil import version
@@ -43,6 +50,8 @@ class TestModuleBase(unittest.TestCase):
             self.assertTrue(isinstance(a, str))
         except ImportError as ie:
             self.assertFalse(True, str(ie))
+
+
     def test_version_commit_hash(self):
         try:
             from cil import version

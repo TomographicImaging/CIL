@@ -2,9 +2,12 @@ from cil.framework import AcquisitionGeometry
 from cil.framework import cilacc
 import numpy as np
 import os
+import logging
+
+#set output level for all tests
+logging.basicConfig(level=logging.WARNING)
 
 #import cvxpy
-
 try:
     import cvxpy
     has_cvxpy = True

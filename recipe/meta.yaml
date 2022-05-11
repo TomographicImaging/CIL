@@ -21,7 +21,7 @@ test:
     - cvxpy         # [ linux and not py36]     
     - scikit-image
     - tomophantom =1.4.10 # [ linux ]
-    - cil-astra =21.4   # [ linux ] 
+    - cil-astra =21.4   # [ not osx ] 
     - tigre =2.2          # [ not osx ] 
     - packaging
     - ccpi-regulariser=21.0.0   # [ not osx ]

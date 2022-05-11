@@ -134,6 +134,62 @@ class GradientOperator(LinearOperator):
         """            
         return self.operator.adjoint(x, out=out)
 
+class AnisotropicGradientOperator(GradientOperator):
+    '''
+    Computes anisotropic gradient operator
+    param ksi: anistropy field, must be a BlockDataContainer object
+    .. math::
+        \nabla : X -> Y \\
+        u\in X, D \nabla(u) = \sum_{i=1}^n D_i \nabla_i(u)\\
+            = \sum_{i=1}^n  \nabla_i(u) - <ksi_i, \nabla_i(u)> ksi_i
+    where :math: `n` is the number of dimensions of the image.
+
+    Reference:
+    Multicontrast MRI Reconstruction with Structure-Guided Total Variation, 
+    Matthias J. Ehrhardt and Marta M. Betcke, SIAM Imaging Sciences 2016
+    '''
+
+    def __init__(self, domain_geometry, method='forward', bnd_cond='Neumann', backend=None, correlation=None, ksi=None):
+
+        if not isinstance(ksi, cil.framework.BlockDataContainer):
+            raise ValueError('Anisotropy field ksi should be a BlockDataContainer')
+            
+        self.ksi = ksi
+        self.ndim = self.ksi.shape[0]
+        super(AnisotropicGradientOperator, self).__init__(
+                                        domain_geometry=domain_geometry, 
+                                        method=method,
+                                        bnd_cond=bnd_cond,
+                                        backend=backend,
+                                        correlation=correlation) 
+
+    def direct(self, x, out=None):
+        if out is None:
+            # compute gradient
+            out = super().direct(x)
+            # compute anisotropic gradient
+            for i in range(self.ndim):
+                out[i].sapyb(1, self.ksi[i], - (self.ksi[i] * out[i]).sum(), out=out[i])
+            return out
+        else:
+            # compute gradient
+            super().direct(x, out=out)
+            # compute anisotropic gradient
+            for i in range(self.ndim):
+                out[i].sapyb(1, self.ksi[i], - (self.ksi[i] * out[i]).sum(), out=out[i])
+    
+    def adjoint(self, x, out=None):
+        # compute anisotropy
+        tmp_x = x.clone()
+        for i in range(self.ndim):
+            x[i].sapyb(1, self.ksi[i], - (self.ksi[i] * x[i]).sum(), out=tmp_x[i])
+        # compute divergence
+        if out is None:
+            return super().adjoint(tmp_x)
+        else:
+            super().adjoint(tmp_x, out=out) 
+
+
 class Gradient_numpy(LinearOperator):
     
     def __init__(self, domain_geometry, method = 'forward', bnd_cond = 'Neumann', **kwargs):

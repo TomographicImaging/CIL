@@ -1148,7 +1148,7 @@ class TestPrint(unittest.TestCase):
         logging.info (algo.iteration)
 
         algo.run(10, verbose=2, print_interval=2)
-        logging.info (algo._iteration, algo.objective)
+        logging.info("{} {}".format(algo._iteration, algo.objective))
 
         algo = PrintAlgo(update_objective_interval = 4, max_iteration = 1000)
         algo.run(20, verbose=2, print_interval=2)

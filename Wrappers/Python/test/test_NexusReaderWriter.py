@@ -19,7 +19,7 @@ import unittest
 import os
 from cil.io import NEXUSDataReader
 from cil.io import NEXUSDataWriter
-from cil.framework import AcquisitionData, AcquisitionGeometry, ImageData, ImageGeometry
+from cil.framework import AcquisitionGeometry, ImageGeometry
 import numpy
 import shutil
     
@@ -27,7 +27,6 @@ import shutil
 class TestNexusReaderWriter(unittest.TestCase):
     
     def setUp(self):
-
         self.data_dir = os.path.join(os.getcwd(), 'test_nxs')
         if not os.path.exists(self.data_dir):
             os.mkdir(self.data_dir)
@@ -40,16 +39,17 @@ class TestNexusReaderWriter(unittest.TestCase):
 
         self.ad2d = self.ag2d.allocate('random_int')
 
-
         self.ag3d = AcquisitionGeometry.create_Cone3D([0.1,-500,2], [3,600,-1], [0,1,0],[0,0,-1],[0.2,-0.1,0.5],[-0.1,0.2,0.9])\
                                     .set_angles([0, 90, 180])\
                                     .set_panel([5,10],[0.1,0.3])\
 
         self.ad3d = self.ag3d.allocate('random_int')
 
+
     def tearDown(self):
         shutil.rmtree(self.data_dir)
-    
+
+
     def test_writeImageData(self):
         im_size = 5
         ig = ImageGeometry(voxel_num_x = im_size,
@@ -60,7 +60,8 @@ class TestNexusReaderWriter(unittest.TestCase):
                       data = im)
         writer.write()
         self.readImageDataAndTest()
-    
+
+
     def test_writeAcquisitionData(self):
         writer = NEXUSDataWriter()
         writer.set_up(file_name = os.path.join(self.data_dir, 'test_nexus_ad2d.nxs'),
@@ -73,6 +74,7 @@ class TestNexusReaderWriter(unittest.TestCase):
         writer.write()
 
         self.readAcquisitionDataAndTest()
+
 
     def test_writeImageData_compressed(self):
         im_size = 5
@@ -90,8 +92,8 @@ class TestNexusReaderWriter(unittest.TestCase):
 
         self.readImageDataAndTest(atol=1e-4)
 
-    def readImageDataAndTest(self,atol=0):
-        
+
+    def readImageDataAndTest(self,atol=0):        
         im_size = 5
         ig_test = ImageGeometry(voxel_num_x = im_size,
                                 voxel_num_y = im_size)
@@ -107,8 +109,8 @@ class TestNexusReaderWriter(unittest.TestCase):
         self.assertEqual(ig.voxel_num_x, ig_test.voxel_num_x, 'ImageGeometry is not correct')
         self.assertEqual(ig.voxel_num_y, ig_test.voxel_num_y, 'ImageGeometry is not correct')
         
+
     def readAcquisitionDataAndTest(self):
-        
         reader2d = NEXUSDataReader()
         reader2d.set_up(file_name = os.path.join(self.data_dir, 'test_nexus_ad2d.nxs'))
         ad2d = reader2d.read()
@@ -142,6 +144,7 @@ class TestNexusReaderWriter(unittest.TestCase):
         self.assertEqual(ag3d.channels, self.ag3d.channels, 'AcquisitionGeometry.channels is not correct')
 
         assert ag3d == self.ag3d
+        
         
 if __name__ == '__main__':
     unittest.main()

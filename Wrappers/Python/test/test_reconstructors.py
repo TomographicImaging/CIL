@@ -22,8 +22,7 @@ from cil.utilities.dataexample import SIMULATED_PARALLEL_BEAM_DATA, SIMULATED_CO
 import unittest
 from scipy.fft  import fft, ifft
 import numpy as np
-from utils import has_tigre, has_gpu_tigre, has_ipp
-import gc
+from utils import has_tigre, has_gpu_tigre, has_ipp, has_astra, has_gpu_astra
 
 if has_tigre:
     from cil.plugins.tigre import ProjectionOperator as ProjectionOperator
@@ -38,6 +37,10 @@ has_tigre_gpu = has_gpu_tigre()
 if  not has_tigre_gpu:
     print("Unable to run TIGRE tests")
 
+has_astra_gpu = has_gpu_astra()
+if  not has_astra_gpu:
+    print("Unable to run ASTRA tests")
+    
 class Test_Reconstructor(unittest.TestCase):
 
     def setUp(self):
@@ -104,9 +107,7 @@ class Test_Reconstructor(unittest.TestCase):
         data = self.ad3D.copy()
         reconstructor = Reconstructor(data)
         self.assertEqual(id(reconstructor.input),id(data))
-
         del data
-        gc.collect()
 
         with self.assertRaises(ValueError):
             reconstructor.input
@@ -126,14 +127,9 @@ class Test_Reconstructor(unittest.TestCase):
 
     @unittest.skipUnless(has_tigre, "TIGRE not installed")
     def test_set_backend(self):
-        reconstructor = Reconstructor(self.ad3D)
-
+        
         with self.assertRaises(ValueError):
-            reconstructor.set_backend('gemma')
-
-        self.ad3D.reorder('astra')
-        with self.assertRaises(ValueError):
-            reconstructor = Reconstructor(self.ad3D)
+            reconstructor = Reconstructor(self.ad3D, backend='unsupported_backend')
 
 
 class Test_GenericFilteredBackProjection(unittest.TestCase):
@@ -219,7 +215,7 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
         reconstructor = GenericFilteredBackProjection(self.ad3D)
 
         with self.assertRaises(ValueError):
-            reconstructor.set_filter("gemma")
+            reconstructor.set_filter("unsupported_filter")
 
         filter = reconstructor.get_filter_array()
         filter_new =filter *0.5
@@ -249,7 +245,8 @@ class Test_GenericFilteredBackProjection(unittest.TestCase):
         self.assertTrue(reconstructor.filter_inplace)
 
         with self.assertRaises(TypeError):
-            reconstructor.set_filter_inplace('gemma')
+            reconstructor.set_filter_inplace('unsupported_value')
+
 
 
 class Test_FDK(unittest.TestCase):
@@ -466,6 +463,25 @@ class Test_FBP(unittest.TestCase):
         np.testing.assert_allclose(weights,weights_new)
 
 
+    @unittest.skipUnless(has_astra, "ASTRA not installed")
+    def test_set_backend(self):
+
+        ag = AcquisitionGeometry.create_Parallel3D()\
+            .set_panel([3,4],[0.1,0.2])\
+            .set_angles([0,90])\
+            .set_labels(['vertical','angle','horizontal'])
+        ad = ag.allocate(0)
+
+        reconstructor = FBP(ad, backend='astra')
+
+        #Reconstructor backend raises an error if backend isn't supported
+        with self.assertRaises(ValueError):
+            reconstructor = FBP(ad, backend='unsupported_backend')
+
+        #Reconstructor backend raises an error if dataorder isn't compatible
+        with self.assertRaises(ValueError):
+            reconstructor = FBP(ad, backend='tigre')
+
 
 class Test_FDK_results(unittest.TestCase):
     
@@ -561,9 +577,24 @@ class Test_FBP_results(unittest.TestCase):
 
 
     @unittest.skipUnless(has_tigre and has_tigre_gpu and has_ipp, "TIGRE or IPP not installed")
-    def test_results_3D(self):
+    def test_results_3D_tigre(self):
 
         reconstructor = FBP(self.acq_data)
+
+        reco = reconstructor.run(verbose=0)
+        np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=1e-3)    
+
+        reco2 = reco.copy()
+        reco2.fill(0)
+        reconstructor.run(out=reco2, verbose=0)
+        np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)  
+
+
+    @unittest.skipUnless(has_astra and has_astra_gpu and has_ipp, "ASTRA or IPP not installed")
+    def test_results_3D_astra(self):
+
+        self.acq_data.reorder('astra')
+        reconstructor = FBP(self.acq_data, backend='astra')
 
         reco = reconstructor.run(verbose=0)
         np.testing.assert_allclose(reco.as_array(), self.img_data.as_array(),atol=1e-3)    
@@ -590,12 +621,29 @@ class Test_FBP_results(unittest.TestCase):
 
 
     @unittest.skipUnless(has_tigre and has_tigre_gpu and has_ipp, "TIGRE or IPP not installed")
-    def test_results_2D(self):
+    def test_results_2D_tigre(self):
 
         data2D = self.acq_data.get_slice(vertical='centre')
         img_data2D = self.img_data.get_slice(vertical='centre')
 
         reconstructor = FBP(data2D)
+        reco = reconstructor.run(verbose=0)
+        np.testing.assert_allclose(reco.as_array(), img_data2D.as_array(),atol=1e-3)    
+
+        reco2 = reco.copy()
+        reco2.fill(0)
+        reconstructor.run(out=reco2, verbose=0)
+        np.testing.assert_allclose(reco.as_array(), reco2.as_array(), atol=1e-8)    
+
+
+    @unittest.skipUnless(has_astra and has_astra_gpu and has_ipp, "ASTRA or IPP not installed")
+    def test_results_2D_astra(self):
+
+        data2D = self.acq_data.get_slice(vertical='centre')
+        data2D.reorder('astra')
+        img_data2D = self.img_data.get_slice(vertical='centre')
+
+        reconstructor = FBP(data2D, backend='astra')
         reco = reconstructor.run(verbose=0)
         np.testing.assert_allclose(reco.as_array(), img_data2D.as_array(),atol=1e-3)    
 

@@ -5,7 +5,7 @@
 
 # CIL - Core Imaging Library
 
-The Core Imaging Library (CIL) is an open-source Python framework for tomographic imaging with particular emphasis on reconstruction of challenging datasets. Conventional filtered backprojection reconstruction tends to be insufficient for highly noisy, incomplete, non-standard or multichannel data arising for example in dynamic, spectral and in situ tomography. CIL provides an extensive modular optimization framework for prototyping reconstruction methods including sparsity and total variation regularization, as well as tools for loading, preprocessing and visualizing tomographic data.
+The Core Imaging Library (CIL) is an open-source Python framework for tomographic imaging with particular emphasis on reconstruction of challenging datasets. Conventional filtered backprojection reconstruction tends to be insufficient for highly noisy, incomplete, non-standard or multichannel data arising for example in dynamic, spectral and in situ tomography. CIL provides an extensive modular optimisation framework for prototyping reconstruction methods including sparsity and total variation regularisation, as well as tools for loading, preprocessing and visualising tomographic data.
 
 ## CIL on binder
 
@@ -29,7 +29,7 @@ To install CIL and the additional packages and plugins needed to run the [CIL de
 
 ```bash
 
-conda create --name cil -c conda-forge -c intel -c astra-toolbox/label/dev -c ccpi cil cil-astra ccpi-regulariser tigre tomophantom=1.4.10
+conda create --name cil -c conda-forge -c intel -c astra-toolbox -c ccpi cil cil-astra ccpi-regulariser tigre tomophantom=1.4.10
 ```
 
 where,
@@ -78,6 +78,11 @@ cmake --build . --target install
 
 The user then needs to add the path to `<install_directory>/lib` where the library is installed to the environment variable `PATH` or `LD_LIBRARY_PATH`, depending on system
 
+By default the location of the IPP library and includes is `${CMAKE_INSTALL_PREFIX}/lib` and `${CMAKE_INSTALL_PREFIX}/include` respectively. To pass the location of the IPP library and headers please pass the following parameters 
+```bash
+
+cmake .. -DCMAKE_INSTALL_PREFIX=<install_directory> -DIPP_LIBRARY=<path_to_ipp_library> -DIPP_INCLUDE=<path_to_ipp_includes>
+```
 
 ## References
 

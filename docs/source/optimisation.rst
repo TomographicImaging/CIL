@@ -58,7 +58,7 @@ print to screen of the status of the optimisation.
 .. autoclass:: cil.optimisation.algorithms.CGLS
    :members:
 .. autoclass:: cil.optimisation.algorithms.SIRT
-   :members:
+   :members: update, update_objective
 .. autoclass:: cil.optimisation.algorithms.FISTA
    :members:
    :special-members:
@@ -462,3 +462,9 @@ Which in Python would be like
 .. _BlockDataContainer: framework.html#cil.framework.BlockDataContainer
 .. _BlockFunction: optimisation.html#cil.optimisation.functions.BlockFunction
 .. _BlockOperator: optimisation.html#cil.optimisation.operators.BlockOperators
+
+
+References
+----------
+
+.. bibliography::    

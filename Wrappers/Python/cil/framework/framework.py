@@ -511,10 +511,69 @@ class SystemConfiguration(object):
         """   
         raise NotImplementedError
 
+    @staticmethod
+    def rotation_vec_to_y(vec):
+        ''' returns a rotation matrix that will rotate the projection of vec on the x-y plane to the +y direction [0,1, Z]'''
+    
+        vec = ComponentDescription.CreateUnitVector(vec)
+
+        axis_rotation = numpy.eye(len(vec))
+
+        if numpy.allclose(vec[:2],[0,1]):
+            pass
+        elif numpy.allclose(vec[:2],[0,-1]):
+            axis_rotation[0][0] = -1
+            axis_rotation[1][1] = -1
+        else:
+            theta = math.atan2(vec[0],vec[1])
+            axis_rotation[0][0] = axis_rotation[1][1] = math.cos(theta)
+            axis_rotation[0][1] = -math.sin(theta)
+            axis_rotation[1][0] = math.sin(theta)
+
+        return numpy.matrix(axis_rotation)
+
+    @staticmethod
+    def rotation_vec_to_z(vec):
+        ''' returns a rotation matrix that will align vec with the z-direction [0,0,1]'''
+
+        vec = ComponentDescription.CreateUnitVector(vec)
+
+        if len(vec) == 2:
+            return numpy.array([[1, 0],[0, 1]])
+
+        elif len(vec) == 3:
+            axis_rotation = numpy.eye(3)
+
+            if numpy.allclose(vec,[0,0,1]):
+                pass
+            elif numpy.allclose(vec,[0,0,-1]):
+                axis_rotation = numpy.eye(3)
+                axis_rotation[1][1] = -1
+                axis_rotation[2][2] = -1
+            else:
+                vx = numpy.array([[0, 0, -vec[0]], [0, 0, -vec[1]], [vec[0], vec[1], 0]])
+                axis_rotation = numpy.eye(3) + vx + vx.dot(vx) *  1 / (1 + vec[2])
+
+        else:
+            raise ValueError("Vec must have length 3, got {}".format(len(vec)))
+    
+        return numpy.matrix(axis_rotation)
+
     def update_reference_frame(self):
-        """Returns the components of the system in the reference frame of the rotation axis at position 0
-        """      
-        raise NotImplementedError
+        r'''Transforms the system origin to the rotation_axis position
+        '''   
+        self.set_origin(self.rotation_axis.position)
+
+
+    def set_origin(self, origin):
+        r'''Transforms the system origin to the input origin
+        '''   
+        if hasattr(self,'source'):              
+            self.source.position -= origin
+
+        self.detector.position -= origin
+        self.rotation_axis.position -= origin
+
 
     def get_centre_slice(self):
         """Returns the 2D system configuration corersponding to the centre slice
@@ -568,37 +627,22 @@ class Parallel2D(SystemConfiguration):
         #rotate axis
         self.rotation_axis.position = rotation_axis_pos
 
-    def update_reference_frame(self):
-        r'''Transforms the system origin to the rotate axis
-        '''         
-        self.detector.position -= self.rotation_axis.position
-        self.rotation_axis.position = [0,0]
 
+    def align_reference_frame(self, definition='cil'):
+        r'''Transforms and rotates the system to backend definitions
+        '''
+        #in this instance defintions are the same
+        if definition not in ['cil','tigre']:
+            raise ValueError("Geometry can be configured for definition = 'cil' or 'tigre'  only. Got {}".format(definition))
 
-    def align_reference_frame(self):
-        r'''Transforms the system origin to the rotate axis and aligns the ray along the positive Y direction
-        '''          
-        self.update_reference_frame()
+        self.set_origin(self.rotation_axis.position)
 
-        ray_vec = -self.ray.direction
+        rotation_matrix = SystemConfiguration.rotation_vec_to_y(self.ray.direction)
 
-        axis_rotation = numpy.eye(2)
-        if numpy.allclose(ray_vec,[0,-1]):
-            pass
-        elif numpy.allclose(ray_vec,[0,1]):
-            axis_rotation[0][0] = -1
-            axis_rotation[1][1] = -1
-        else:
-            theta = math.atan2(ray_vec[0],-ray_vec[1])
-            axis_rotation[0][0] = axis_rotation[1][1] = math.cos(theta)
-            axis_rotation[0][1] = math.sin(theta)
-            axis_rotation[1][0] = -math.sin(theta)
-
-        rotation_matrix = numpy.matrix(axis_rotation)
-        
         self.ray.direction = rotation_matrix.dot(self.ray.direction.reshape(2,1))
         self.detector.position = rotation_matrix.dot(self.detector.position.reshape(2,1))
         self.detector.direction_x = rotation_matrix.dot(self.detector.direction_x.reshape(2,1))
+
 
     def system_description(self):
         r'''Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,
@@ -606,18 +650,14 @@ class Parallel2D(SystemConfiguration):
             \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
         '''       
         new = self.copy()
-        new.align_reference_frame()
+        new.align_reference_frame('cil')
 
-        try:
-            det_unit = ComponentDescription.CreateUnitVector(new.detector.position)
-        except ValueError: #pass test if detector is on origin
-            det_unit = [0,1]
+        dot_prod = new.ray.direction.dot(new.detector.direction_x)
 
-        if not numpy.allclose(new.ray.direction,[0,1]) or\
-            not numpy.allclose(new.detector.direction_x,[1,0]):
+        if abs(dot_prod)>1e-10:
             return SystemConfiguration.SYSTEM_ADVANCED
-        elif not numpy.allclose(det_unit,[0,1]):
-            return SystemConfiguration.SYSTEM_OFFSET
+        elif abs(new.detector.position[0])>1e-10:
+            return SystemConfiguration.SYSTEM_OFFSET 
         else:
             return SystemConfiguration.SYSTEM_SIMPLE
 
@@ -685,33 +725,13 @@ class Parallel3D(SystemConfiguration):
         self.rotation_axis.position = rotation_axis_pos
         self.rotation_axis.direction = rotation_axis_direction
 
-    def update_reference_frame(self):
+    def align_z(self):
         r'''Transforms the system origin to the rotate axis with z direction aligned to the rotate axis direction
         '''          
-        #shift detector
-        self.detector.position = (self.detector.position - self.rotation_axis.position)
-        self.rotation_axis.position = [0,0,0]
+        self.set_origin(self.rotation_axis.position)
 
         #calculate rotation matrix to align rotation axis direction with z
-        a = self.rotation_axis.direction
-
-        if numpy.allclose(a,[0,0,1]):
-            return
-        elif numpy.allclose(a,[0,0,-1]):
-            axis_rotation = numpy.eye(3)
-            axis_rotation[1][1] = -1
-            axis_rotation[2][2] = -1
-        else:
-            vx = numpy.array([[0, 0, -a[0]], [0, 0, -a[1]], [a[0], a[1], 0]])
-            axis_rotation = numpy.eye(3) + vx + vx.dot(vx) *  1 / (1 + a[2])
-        
-        rotation_matrix = numpy.matrix(axis_rotation)
-
-        #sanity check
-        new_rotation_axis_direction = rotation_matrix.dot(self.rotation_axis.direction.reshape(3,1))
-
-        if not numpy.allclose(new_rotation_axis_direction.flatten(), [0,0,1], atol=1e-7):
-            raise ValueError("Failed to align reference frame")
+        rotation_matrix = SystemConfiguration.rotation_vec_to_z(self.rotation_axis.direction)
 
         #apply transform
         self.rotation_axis.direction = [0,0,1]
@@ -721,34 +741,23 @@ class Parallel3D(SystemConfiguration):
         new_y = rotation_matrix.dot(self.detector.direction_y.reshape(3,1))
         self.detector.set_direction(new_x, new_y)
 
-    def align_reference_frame(self):
-        r'''Transforms the system origin to the rotate axis with z direction aligned to the rotate axis direction, and aligns the ray direction along the positive Y direction
-        '''          
-        self.update_reference_frame()
 
-        ray_vec = -self.ray.direction
-        axis_rotation = numpy.eye(3)
+    def align_reference_frame(self, definition='cil'):
+        r'''Transforms and rotates the system to backend definitions
+        '''
+        #in this instance defintions are the same
+        if definition not in ['cil','tigre']:
+            raise ValueError("Geometry can be configured for definition = 'cil' or 'tigre'  only. Got {}".format(definition))
 
-        if numpy.allclose(ray_vec,[0,-1,0]):
-            pass
-        elif numpy.allclose(ray_vec,[0,1,0]):
-            axis_rotation[0][0] = -1
-            axis_rotation[1][1] = -1
-        else:
-            theta = math.atan2(ray_vec[0],ray_vec[1])
-            axis_rotation[0][0] = axis_rotation[1][1] = math.cos(theta)
-            axis_rotation[0][1] = -math.sin(theta)
-            axis_rotation[1][0] = math.sin(theta)
-
-        rotation_matrix = numpy.matrix(axis_rotation)
-        
+        self.align_z()
+        rotation_matrix = SystemConfiguration.rotation_vec_to_y(self.ray.direction)
+                
         self.ray.direction = rotation_matrix.dot(self.ray.direction.reshape(3,1))
         self.detector.position = rotation_matrix.dot(self.detector.position.reshape(3,1))
-
         new_direction_x = rotation_matrix.dot(self.detector.direction_x.reshape(3,1))
         new_direction_y = rotation_matrix.dot(self.detector.direction_y.reshape(3,1))
-
         self.detector.set_direction(new_direction_x, new_direction_y)
+
 
     def system_description(self):
         r'''Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,
@@ -756,25 +765,24 @@ class Parallel3D(SystemConfiguration):
             \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
         '''              
         new = self.copy()
-        new.align_reference_frame()
+        new.align_reference_frame('cil')
 
-        try:
-            det_unit = ComponentDescription.CreateUnitVector(new.detector.position)
-        except ValueError: #pass test if detector is on origin
-            det_unit = [0,1,0]
 
-        if not numpy.allclose(new.ray.direction,[0,1,0]) or\
-            not numpy.allclose(new.detector.direction_x,[1,0,0]) or\
-            not numpy.allclose(new.detector.direction_y,[0,0,1]) or\
-            not numpy.allclose(new.rotation_axis.direction,[0,0,1]):
+        dot_prod_a = new.ray.direction.dot(new.detector.direction_x)
+        dot_prod_b = new.ray.direction.dot(new.detector.direction_y)
+        dot_prod_c = new.detector.direction_x.dot(new.rotation_axis.direction)
+        dot_prod_d = new.ray.direction.dot(new.rotation_axis.direction)
+
+        if abs(dot_prod_a)>1e-10 or\
+            abs(dot_prod_b)>1e-10 or\
+            abs(dot_prod_c)>1e-10 or\
+            abs(dot_prod_d)>1e-10: 
             return SystemConfiguration.SYSTEM_ADVANCED
-        elif not numpy.allclose(det_unit,[0,1,0]):
+        elif abs(new.detector.position[0])>1e-6:
             return SystemConfiguration.SYSTEM_OFFSET
         else:
             return SystemConfiguration.SYSTEM_SIMPLE
         
-        return False
-
 
     def __str__(self):
         def csv(val):
@@ -819,7 +827,7 @@ class Parallel3D(SystemConfiguration):
             temp = self.copy()
 
             #convert to rotation axis reference frame
-            temp.update_reference_frame()
+            temp.align_reference_frame()
 
             ray_direction = temp.ray.direction[0:2]
             detector_position = temp.detector.position[0:2]
@@ -860,34 +868,19 @@ class Cone2D(SystemConfiguration):
         #rotate axis
         self.rotation_axis.position = rotation_axis_pos
 
-    def update_reference_frame(self):
-        r'''Transforms the system origin to the rotate axis
-        '''                  
-        self.source.position -= self.rotation_axis.position
-        self.detector.position -= self.rotation_axis.position
-        self.rotation_axis.position = [0,0]
 
-    def align_reference_frame(self):
-        r'''Transforms the system origin to the rotate axis and aligns the source position along the negative Y direction
-        '''          
-        self.update_reference_frame()
+    def align_reference_frame(self, definition='cil'):
+        r'''Transforms and rotates the system to backend definitions
+        '''
+        self.set_origin(self.rotation_axis.position)
 
-        src_dir = ComponentDescription.CreateUnitVector(self.source.position)
-
-        axis_rotation = numpy.eye(2)
-        if numpy.allclose(src_dir,[0,-1]):
-            pass
-        elif numpy.allclose(src_dir,[0,1]):
-            axis_rotation[0][0] = -1
-            axis_rotation[1][1] = -1
+        if definition=='cil':
+            rotation_matrix = SystemConfiguration.rotation_vec_to_y(self.detector.position - self.source.position)
+        elif definition=='tigre':
+            rotation_matrix = SystemConfiguration.rotation_vec_to_y(self.rotation_axis.position - self.source.position)
         else:
-            theta = math.atan2(src_dir[0],src_dir[1])
-            axis_rotation[0][0] = axis_rotation[1][1] = math.cos(theta)
-            axis_rotation[0][1] = -math.sin(theta)
-            axis_rotation[1][0] = math.sin(theta)
+            raise ValueError("Geometry can be configured for definition = 'cil' or 'tigre'  only. Got {}".format(definition))
 
-        rotation_matrix = numpy.matrix(axis_rotation)
-        
         self.source.position = rotation_matrix.dot(self.source.position.reshape(2,1))
         self.detector.position = rotation_matrix.dot(self.detector.position.reshape(2,1))
         self.detector.direction_x = rotation_matrix.dot(self.detector.direction_x.reshape(2,1))
@@ -899,16 +892,16 @@ class Cone2D(SystemConfiguration):
             \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
         '''           
         new = self.copy()
-        new.align_reference_frame()
+        new.align_reference_frame('cil')
         dot_prod = (new.detector.position - new.source.position).dot(new.detector.direction_x)
 
-        if abs(dot_prod)>1e-6:
+        if abs(dot_prod)>1e-10:
             return SystemConfiguration.SYSTEM_ADVANCED
-        elif abs(new.source.position[0])>1e-6 or\
-            abs(new.detector.position[0])>1e-6:
+        elif abs(new.detector.position[0])>1e-10:
             return SystemConfiguration.SYSTEM_OFFSET 
         else:
             return SystemConfiguration.SYSTEM_SIMPLE
+
 
     def __str__(self):
         def csv(val):
@@ -995,33 +988,11 @@ class Cone3D(SystemConfiguration):
         self.rotation_axis.position = rotation_axis_pos
         self.rotation_axis.direction = rotation_axis_direction
 
-    def update_reference_frame(self):
+    def align_z(self):
         r'''Transforms the system origin to the rotate axis with z direction aligned to the rotate axis direction
-        '''                  
-        #shift 
-        self.detector.position = (self.detector.position - self.rotation_axis.position)
-        self.source.position = (self.source.position - self.rotation_axis.position)
-        self.rotation_axis.position = [0,0,0]
-
-        #calculate rotation matrix to align rotation axis direction with z
-        a = self.rotation_axis.direction
-        if numpy.allclose(a,[0,0,1]):
-            return
-        elif numpy.allclose(a,[0,0,-1]):
-            axis_rotation = numpy.eye(3)
-            axis_rotation[1][1] = -1
-            axis_rotation[2][2] = -1
-        else:
-            vx = numpy.array([[0, 0, -a[0]], [0, 0, -a[1]], [a[0], a[1], 0]])
-            axis_rotation = numpy.eye(3) + vx + vx.dot(vx) *  1 / (1 + a[2])
-    
-        rotation_matrix = numpy.matrix(axis_rotation)
-
-        #sanity check
-        new_rotation_axis_direction = rotation_matrix.dot(self.rotation_axis.direction.reshape(3,1))
-
-        if not numpy.allclose(new_rotation_axis_direction.flatten(), [0,0,1], atol=1e-7):
-            raise ValueError("Failed to align reference frame")
+        '''
+        self.set_origin(self.rotation_axis.position)   
+        rotation_matrix = SystemConfiguration.rotation_vec_to_z(self.rotation_axis.direction)
     
         #apply transform
         self.rotation_axis.direction = [0,0,1]
@@ -1031,34 +1002,26 @@ class Cone3D(SystemConfiguration):
         new_y = rotation_matrix.dot(self.detector.direction_y.reshape(3,1))
         self.detector.set_direction(new_x, new_y)
 
-    def align_reference_frame(self):
-        r'''Transforms the system origin to the rotate axis with z direction aligned to the rotate axis direction, and aligns the source direction along the negative Y direction
-        '''          
-        self.update_reference_frame()
 
-        src_dir = ComponentDescription.CreateUnitVector(self.source.position)
+    def align_reference_frame(self, definition='cil'):
+        r'''Transforms and rotates the system to backend definitions
+        '''            
 
-        axis_rotation = numpy.eye(3)
-        if numpy.allclose(src_dir,[0,-1,0]):
-            pass
-        elif numpy.allclose(src_dir,[0,1,0]):
-            axis_rotation[0][0] = -1
-            axis_rotation[1][1] = -1
+        self.align_z()
+
+        if definition=='cil':
+            rotation_matrix = SystemConfiguration.rotation_vec_to_y(self.detector.position - self.source.position)
+        elif definition=='tigre':
+            rotation_matrix = SystemConfiguration.rotation_vec_to_y(self.rotation_axis.position - self.source.position)
         else:
-            theta = math.atan2(src_dir[0],-src_dir[1])
-            axis_rotation[0][0] = axis_rotation[1][1] = math.cos(theta)
-            axis_rotation[0][1] = math.sin(theta)
-            axis_rotation[1][0] = -math.sin(theta)
-
-        rotation_matrix = numpy.matrix(axis_rotation)
-        
+            raise ValueError("Geometry can be configured for definition = 'cil' or 'tigre'  only. Got {}".format(definition))
+                            
         self.source.position = rotation_matrix.dot(self.source.position.reshape(3,1))
         self.detector.position = rotation_matrix.dot(self.detector.position.reshape(3,1))
-
         new_direction_x = rotation_matrix.dot(self.detector.direction_x.reshape(3,1))
         new_direction_y = rotation_matrix.dot(self.detector.direction_y.reshape(3,1))
-
         self.detector.set_direction(new_direction_x, new_direction_y)
+
 
     def system_description(self):
         r'''Returns `simple` if the the geometry matches the default definitions with no offsets or rotations,
@@ -1066,23 +1029,20 @@ class Cone3D(SystemConfiguration):
             \nReturns `advanced` if the the geometry has rotated or tilted rotation axis or detector, can also have offsets
         '''       
         new = self.copy()
-        new.align_reference_frame()
+        new.align_reference_frame('cil')
 
         dot_prod_a = (new.detector.position - new.source.position).dot(new.detector.direction_x)
         dot_prod_b = (new.detector.position - new.source.position).dot(new.detector.direction_y)
         dot_prod_c = (new.detector.direction_x).dot(new.rotation_axis.direction)
         dot_prod_d = (new.detector.position - new.source.position).dot(new.rotation_axis.direction)
 
-        if abs(dot_prod_a)>1e-6 or\
-            abs(dot_prod_b)>1e-6 or\
-            abs(dot_prod_c)>1e-6 or\
-            abs(dot_prod_d)>1e-6: 
+        if abs(dot_prod_a)>1e-10 or\
+            abs(dot_prod_b)>1e-10 or\
+            abs(dot_prod_c)>1e-10 or\
+            abs(dot_prod_d)>1e-10: 
             return SystemConfiguration.SYSTEM_ADVANCED
 
-        elif abs(new.source.position[0])>1e-6 or\
-            abs(new.source.position[2])>1e-6 or\
-            abs(new.detector.position[0])>1e-6 or\
-            abs(new.detector.position[2])>1e-6:
+        elif abs(new.detector.position[0])>1e-10:
             return SystemConfiguration.SYSTEM_OFFSET
         else:
             return SystemConfiguration.SYSTEM_SIMPLE
@@ -1098,7 +1058,7 @@ class Cone3D(SystemConfiguration):
         
         if numpy.isclose(dp1, 0) and numpy.isclose(dp2, 0):
             temp = self.copy()
-            temp.update_reference_frame()
+            temp.align_reference_frame()
             source_position = temp.source.position[0:2]
             detector_position = temp.detector.position[0:2]
             detector_direction_x = temp.detector.direction_x[0:2]
@@ -2178,7 +2138,7 @@ class DataContainer(object):
         :type order: list, sting     
         '''
 
-        if order == 'astra' or order == 'tigre':
+        if order in DataOrder.ENGINES:
             order = DataOrder.get_order_for_engine(order, self.geometry)  
 
         try:
@@ -3381,6 +3341,9 @@ class VectorGeometry(object):
         return out
 
 class DataOrder():
+
+    ENGINES = ['astra','tigre','cil']
+
     ASTRA_IG_LABELS = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
     TIGRE_IG_LABELS = [ImageGeometry.CHANNEL, ImageGeometry.VERTICAL, ImageGeometry.HORIZONTAL_Y, ImageGeometry.HORIZONTAL_X]
     ASTRA_AG_LABELS = [AcquisitionGeometry.CHANNEL, AcquisitionGeometry.VERTICAL, AcquisitionGeometry.ANGLE, AcquisitionGeometry.HORIZONTAL]
@@ -3407,7 +3370,7 @@ class DataOrder():
             else:
                 dim_order = DataOrder.CIL_IG_LABELS
         else:
-            raise ValueError("Unknown engine expected 'tigre' or 'astra' got {}".format(engine))
+            raise ValueError("Unknown engine expected one of {0} got {1}".format(DataOrder.ENGINES, engine))
         
         dimensions = []
         for label in dim_order:

@@ -19,10 +19,7 @@
 import sys
 import unittest
 import numpy
-from cil.framework import DataProcessor
 from cil.framework import DataContainer
-from cil.framework import ImageData
-from cil.framework import AcquisitionData
 from cil.framework import ImageGeometry
 from cil.framework import AcquisitionGeometry
 from cil.utilities import dataexample
@@ -30,12 +27,9 @@ from timeit import default_timer as timer
 
 from cil.framework import AX, CastDataContainer, PixelByPixelDataProcessor
 
-from cil.io import NEXUSDataReader
 from cil.processors import CentreOfRotationCorrector, CofR_xcorrelation, CofR_image_sharpness
 from cil.processors import TransmissionAbsorptionConverter, AbsorptionTransmissionConverter
 from cil.processors import Slicer, Binner, MaskGenerator, Masker, Padder
-import wget
-import os
 
 from utils import has_gpu_tigre, has_gpu_astra
 
@@ -758,7 +752,7 @@ class TestCentreOfRotation_parallel(unittest.TestCase):
         corr = CofR_image_sharpness(search_range=20, FBP=AstraFBP)
         corr.set_input(self.data_DLS.clone())
         ad_out = corr.get_output()
-        self.assertAlmostEqual(6.48, ad_out.geometry.config.system.rotation_axis.position[0],places=1)     
+        self.assertAlmostEqual(6.33, ad_out.geometry.config.system.rotation_axis.position[0],places=1)     
 
 
     @unittest.skipUnless(False, "TIGRE not installed")

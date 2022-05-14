@@ -15,12 +15,16 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from distutils.core import setup
+from setuptools import setup
 import os
 import sys
 
 
-cil_version='@CIL_VERSION@'
+
+cil_version = '@CIL_VERSION_MAJOR@.@CIL_VERSION_MINOR@.@CIL_VERSION_PATCH@'
+if '@CIL_NUM_COMMIT@' != '-1':
+    cil_version += '.dev@CIL_NUM_COMMIT@'
+
 
 setup(
     name="cil",

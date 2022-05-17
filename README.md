@@ -16,12 +16,12 @@ Jupyter Notebooks usage examples without any local installation are provided in 
 
 ## CIL Videos
 
- - [PyCon De & PyData Berlin 2022 ]( https://2022.pycon.de/):  [Abstract](https://2022.pycon.de/program/GSLJUY/) ,  [Video](https://www.youtube.com/watch?v=Xd4erPj0uEs), [Material](https://github.com/TomographicImaging/CIL-Demos/blob/main/binder/PyData22_deblurring.ipynb).
+ - [<u>PyCon De & PyData Berlin 2022</u>]( https://2022.pycon.de/):  [Abstract](https://2022.pycon.de/program/GSLJUY/) ,  [Video](https://www.youtube.com/watch?v=Xd4erPj0uEs), [Material](https://github.com/TomographicImaging/CIL-Demos/blob/main/binder/PyData22_deblurring.ipynb).
 
 
- - [Training School for the Synergistic Image Reconstruction Framework (SIRF) and Core Imaging Library (CIL)](https://www.ccpsynerbi.ac.uk/SIRFCIL2021): [Videos](https://www.youtube.com/playlist?list=PLTuAla-OP8WVNPWZfis6BRsWFq_S0bqvp), [Material](https://github.com/TomographicImaging/CIL-Demos/tree/main/training/2021_Fully3D).
+ - [<u>Training School for the Synergistic Image Reconstruction Framework (SIRF) and Core Imaging Library (CIL)</u>](https://www.ccpsynerbi.ac.uk/SIRFCIL2021): [Videos](https://www.youtube.com/playlist?list=PLTuAla-OP8WVNPWZfis6BRsWFq_S0bqvp), [Material](https://github.com/TomographicImaging/CIL-Demos/tree/main/training/2021_Fully3D).
 
-- [Synergistic Reconstruction Symposium](https://www.ccpsynerbi.ac.uk/symposium2019): [Slides](https://www.ccppetmr.ac.uk/sites/www.ccppetmr.ac.uk/files/Papoutsellis%202.pdf), [Videos](https://www.youtube.com/playlist?list=PLyxAZuV8tuKsOY4DTDzy04DRrwkxBkTYh), [Material](https://github.com/TomographicImaging/CIL-Demos/tree/main/training/2019_SynergisticSymposium).
+- [<u>Synergistic Reconstruction Symposium</u>](https://www.ccpsynerbi.ac.uk/symposium2019): [Slides](https://www.ccppetmr.ac.uk/sites/www.ccppetmr.ac.uk/files/Papoutsellis%202.pdf), [Videos](https://www.youtube.com/playlist?list=PLyxAZuV8tuKsOY4DTDzy04DRrwkxBkTYh), [Material](https://github.com/TomographicImaging/CIL-Demos/tree/main/training/2019_SynergisticSymposium).
 
 ## Documentation
 

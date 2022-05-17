@@ -58,7 +58,8 @@ Make sure that each contributed file contains the following text enclosed in the
 
 ::
 
-  Copyright 2022 United Kingdom Research and Innovation, The University of Manchester
+  Copyright 2022 United Kingdom Research and Innovation
+  Copyright 2022 The University of Manchester
   Copyright [yyyy] [name of copyright owner]
 
   Author(s): [Author name, Author email (optional)]

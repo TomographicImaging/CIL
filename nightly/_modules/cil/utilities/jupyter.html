@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.utilities.jupyter &#8212; CIL 21.4.0 documentation</title>
+    <title>cil.utilities.jupyter &#8212; CIL v21.3.0 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -202,13 +202,8 @@
 <span class="c1">#   See the License for the specific language governing permissions and</span>
 <span class="c1">#   limitations under the License.</span>
 
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
-    <span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
-<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">ie</span><span class="p">:</span>
-    <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="n">ie</span> <span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">,</span> 
-                      <span class="s2">&quot;islicer requires the additional package ipywidgets</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
-                      <span class="s2">&quot;Please install it via conda as ipywidgets from the conda-forge channel</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">gridspec</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
@@ -274,30 +269,20 @@
     <span class="k">return</span> <span class="n">get_slice_3D</span>
 
     
-<div class="viewcode-block" id="islicer"><a class="viewcode-back" href="../../../utilities.html#cil.utilities.jupyter.islicer">[docs]</a><span class="k">def</span> <span class="nf">islicer</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">slice_number</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">minmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower-left&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="islicer"><a class="viewcode-back" href="../../../utilities.html#cil.utilities.jupyter.islicer">[docs]</a><span class="k">def</span> <span class="nf">islicer</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">direction</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">slice_number</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">minmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axis_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower-left&#39;</span><span class="p">):</span>
 
     <span class="sd">&#39;&#39;&#39;Creates an interactive integer slider that slices a 3D volume along direction</span>
 <span class="sd">    </span>
-<span class="sd">    </span>
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    data: DataContainer or numpy array</span>
-<span class="sd">    direction: int</span>
-<span class="sd">        Axis to slice on. Can be 0,1,2 or the axis label </span>
-<span class="sd">    title: str</span>
-<span class="sd">        optional title for the display</span>
-<span class="sd">    slice_number: int, optional</span>
-<span class="sd">        start slice number, defaults to center slice</span>
-<span class="sd">    cmap: matplotlib color map</span>
-<span class="sd">        set the colour map</span>
-<span class="sd">    minmax: tuple</span>
-<span class="sd">        colorbar (min, max) values, defaults to min max of container</span>
-<span class="sd">    size: int or tuple </span>
-<span class="sd">        specify the figure size in inch. If int it specifies the width and scales the height keeping the standard matplotlib aspect ratio</span>
-<span class="sd">    origin: str, default &#39;lower-left&#39;</span>
-<span class="sd">        Sets the display origin in form &#39;lower/upper-left/right&#39; </span>
+<span class="sd">    :param data: DataContainer or numpy array</span>
+<span class="sd">    :param direction: slice direction, int, should be 0,1,2 or the axis label</span>
+<span class="sd">    :param title: optional title for the display</span>
+<span class="sd">    :slice_number: int start slice number, optional. If None defaults to center slice</span>
+<span class="sd">    :param cmap: matplotlib color map</span>
+<span class="sd">    :param minmax: colorbar min and max values, defaults to min max of container</span>
+<span class="sd">    :param size: int or tuple specifying the figure size in inch. If int it specifies the width and scales the height keeping the standard matplotlib aspect ratio</span>
+<span class="sd">    :param origin: Sets the display origin. &#39;lower/upper-left/right&#39; </span>
+<span class="sd">    :type origin: string, default &#39;lower-left&#39; </span>
 <span class="sd">    &#39;&#39;&#39;</span>
-
     
     <span class="k">if</span> <span class="n">axis_labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;dimension_labels&quot;</span><span class="p">):</span>
@@ -359,12 +344,7 @@
     
 
 <div class="viewcode-block" id="link_islicer"><a class="viewcode-back" href="../../../utilities.html#cil.utilities.jupyter.link_islicer">[docs]</a><span class="k">def</span> <span class="nf">link_islicer</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;links islicers IntSlider widgets</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    args: islicer objects to link</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="sd">&#39;&#39;&#39;links islicers IntSlider widgets&#39;&#39;&#39;</span>
     <span class="n">linked</span> <span class="o">=</span> <span class="p">[(</span><span class="n">widg</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">widg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">]</span>
     <span class="c1"># link pair-wise</span>
     <span class="n">pairs</span> <span class="o">=</span> <span class="p">[(</span><span class="n">linked</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span><span class="n">linked</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">linked</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)]</span>

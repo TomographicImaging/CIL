@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.utilities.display &#8212; CIL 21.4.0 documentation</title>
+    <title>cil.utilities.display &#8212; CIL v21.3.0 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -280,46 +280,66 @@
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unable to save image&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="show2D"><a class="viewcode-back" href="../../../utilities.html#cil.utilities.display.show2D">[docs]</a><span class="k">class</span> <span class="nc">show2D</span><span class="p">(</span><span class="n">show_base</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;This plots 2D slices from cil DataContainer types.</span>
-
-<span class="sd">    Plots 1 or more 2D plots in an (n x num_cols) matrix.</span>
-<span class="sd">    Can plot multiple slices from one 3D dataset, or compare multiple datasets</span>
-<span class="sd">    Inputs can be single arguments or list of arguments that will be sequentally applied to subplots</span>
-<span class="sd">    If no slice_list is passed a 3D dataset will display the centre slice of the outer dimension, a 4D dataset will show the centre slices of the two outer dimension.</span>
-
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    datacontainers: ImageData, AcquisitionData, list of  ImageData / AcquisitionData, BlockDataContainer</span>
-<span class="sd">        The DataContainers to be displayed</span>
-<span class="sd">    title: string, list of strings, optional</span>
-<span class="sd">        The title for each figure</span>
-<span class="sd">    slice_list: tuple, int, list of tuples, list of ints, optional</span>
-<span class="sd">        The slices to show. A list of integers will show slices for the outer dimension. For 3D datacontainers single slice: (direction, index). For 4D datacontainers two slices: [(direction0, index),(direction1, index)].</span>
-<span class="sd">    fix_range: boolian, tuple, list of tuples</span>
-<span class="sd">        Sets the display range of the data. `True` sets all plots to the global (min, max). </span>
-<span class="sd">    axis_labels: tuple, list of tuples, optional</span>
-<span class="sd">        The axis labels for each figure e.g. (&#39;x&#39;,&#39;y&#39;)</span>
-<span class="sd">    origin: string, list of strings</span>
-<span class="sd">        Sets the display origin. &#39;lower/upper-left/right&#39;</span>
-<span class="sd">    cmap: str</span>
-<span class="sd">        Sets the colour map of the plot (see matplotlib.pyplot)</span>
-<span class="sd">    num_cols: int</span>
-<span class="sd">        Sets the number of columns of subplots to display</span>
-<span class="sd">    size: tuple</span>
-<span class="sd">        Figure size in inches</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    matplotlib.figure.Figure</span>
-<span class="sd">        returns a matplotlib.pyplot figure object</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-
+    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;This class plots and saves 2D slices from cil DataContainer types.</span>
+<span class="sd">     &#39;&#39;&#39;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">datacontainers</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">axis_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower-left&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">15</span><span class="p">)):</span>
+        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;This plots 2D slices from cil DataContainer types.</span>
 
+<span class="sd">        Plots 1 or more 2D plots in an (n x num_cols) matix.</span>
+<span class="sd">        Can plot multiple slices from one 3D dataset, or compare multiple datasets</span>
+<span class="sd">        Inputs can be single arguments or list of arguments that will be sequentally applied to subplots</span>
+<span class="sd">        If no slice_list is passed a 3D dataset will display the centre slice of the outer dimension, a 4D dataset will show the centre slices of the two outer dimension.</span>
+
+<span class="sd">        :param datacontainers: The DataContainers to be displayed.</span>
+<span class="sd">        :type datacontainers: ImageData, AcquisitionData, list of  Image/AcquisitionData, BlockDataContainer</span>
+<span class="sd">        :param title: The title for each figure</span>
+<span class="sd">        :type title: string, list of strings</span>
+<span class="sd">        :param slice_list: The slices to show. A list of intergers will show slices for the outer dimension. For 3D datacontainers single slice: (direction, index). For 4D datacontainers two slices: [(direction0, index),(direction1, index)].</span>
+<span class="sd">        :type slice_list: tuple, int, list of tuples, list of ints</span>
+<span class="sd">        :param fix_range: Sets the display range of the data. `True` sets all plots to the global (min, max). </span>
+<span class="sd">        :type fix_range: boolian, tuple, list of tuples</span>
+<span class="sd">        :param axis_labels: The axis labels for each figure e.g. (&#39;x&#39;,&#39;y&#39;)</span>
+<span class="sd">        :type axis_labels: tuple, list of tuples</span>
+<span class="sd">        :param origin: Sets the display origin. &#39;lower/upper-left/right&#39;</span>
+<span class="sd">        :type origin: string, list of strings</span>
+<span class="sd">        :param cmap: Sets the colour map of the plot (see matplotlib.pyplot)</span>
+<span class="sd">        :param num_cols: Sets the number of columns of subplots to display</span>
+<span class="sd">        :type num_cols: int</span>
+<span class="sd">        :param size: Figure size in inches</span>
+<span class="sd">        :type size: tuple of floats</span>
+<span class="sd">        :return: returns an matplotlib.pyplot figure object</span>
+<span class="sd">        :rtype: matplotlib.figure.Figure</span>
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">figure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__show2D</span><span class="p">(</span><span class="n">datacontainers</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="n">slice_list</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="n">fix_range</span><span class="p">,</span> <span class="n">axis_labels</span><span class="o">=</span><span class="n">axis_labels</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="n">origin</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="n">num_cols</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__show2D</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">datacontainers</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">slice_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fix_range</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">axis_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower-left&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">num_cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">15</span><span class="p">)):</span>
+        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;This function plots 2D slices from cil DataContainer types. It returns a matplotlib figure that can be saved with the pyplot &#39;savefig()&#39; method.</span>
+
+<span class="sd">        Plots 1 or more 2D plots in an (n x num_cols) matix.</span>
+<span class="sd">        Can plot multiple slices from one 3D dataset, or compare multiple datasets</span>
+<span class="sd">        Inputs can be single arguments or list of arguments that will be sequentally applied to subplots</span>
+<span class="sd">        If no slice_list is passed a 3D dataset will display the centre slice of the outer dimension, a 4D dataset will show the centre slices of the two outer dimension.</span>
+
+<span class="sd">        :param datacontainers: The DataContainers to be displayed.</span>
+<span class="sd">        :type datacontainers: ImageData, AcquisitionData, list of  Image/AcquisitionData, BlockDataContainer</span>
+<span class="sd">        :param title: The title for each figure</span>
+<span class="sd">        :type title: string, list of strings</span>
+<span class="sd">        :param slice_list: The slices to show. A list of intergers will show slices for the outer dimension. For 3D datacontainers single slice: (direction, index). For 4D datacontainers two slices: [(direction0, index),(direction1, index)].</span>
+<span class="sd">        :type slice_list: tuple, int, list of tuples, list of ints</span>
+<span class="sd">        :param fix_range: Sets the display range of the data. `True` sets all plots to the global (min, max). </span>
+<span class="sd">        :type fix_range: boolian, tuple, list of tuples</span>
+<span class="sd">        :param axis_labels: The axis labels for each figure e.g. (&#39;x&#39;,&#39;y&#39;)</span>
+<span class="sd">        :type axis_labels: tuple, list of tuples</span>
+<span class="sd">        :param origin: Sets the display origin. &#39;lower/upper-left/right&#39;</span>
+<span class="sd">        :type origin: string, list of strings</span>
+<span class="sd">        :param cmap: Sets the colour map of the plot (see matplotlib.pyplot)</span>
+<span class="sd">        :param num_cols: Sets the number of columns of subplots to display</span>
+<span class="sd">        :type num_cols: int</span>
+<span class="sd">        :param size: Figure size in inches</span>
+<span class="sd">        :type size: tuple of floats</span>
+<span class="sd">        :return: returns an matplotlib.pyplot figure object</span>
+<span class="sd">        :rtype: matplotlib.figure.Figure</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="c1">#get number of subplots, number of input datasets, or number of slices requested</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">datacontainers</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">)):</span>
@@ -909,39 +929,32 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">h0</span><span class="o">.</span><span class="n">get_label</span><span class="p">())</span>
 
 <div class="viewcode-block" id="show_geometry"><a class="viewcode-back" href="../../../utilities.html#cil.utilities.display.show_geometry">[docs]</a><span class="k">class</span> <span class="nc">show_geometry</span><span class="p">(</span><span class="n">show_base</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Displays a schematic of the acquisition geometry</span>
-<span class="sd">    for 2D geometries elevation and azimuthal cannot be changed</span>
-
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    acquisition_geometry: AcquisitionGeometry</span>
-<span class="sd">        CIL acquisition geometry</span>
-<span class="sd">    image_geometry: ImageGeometry, optional </span>
-<span class="sd">        CIL image geometry</span>
-<span class="sd">    elevation: float</span>
-<span class="sd">        Camera elevation in degrees, 3D geometries only, default=20 </span>
-<span class="sd">    azimuthal: float</span>
-<span class="sd">        Camera azimuthal in degrees, 3D geometries only, default=-35  </span>
-<span class="sd">    view_distance: float</span>
-<span class="sd">        Camera view distance, default=10  </span>
-<span class="sd">    grid: boolean</span>
-<span class="sd">        Show figure axis, default=False</span>
-<span class="sd">    figsize: tuple (x, y)</span>
-<span class="sd">        Set figure size (inches), default (10,10)  </span>
-<span class="sd">    fontsize: int </span>
-<span class="sd">        Set fontsize, default 10</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    matplotlib.figure.Figure</span>
-<span class="sd">        returns a matplotlib.pyplot figure object</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-
-
+    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;This class plots and saves a schematic of the acquisition geometry.</span>
+<span class="sd">     &#39;&#39;&#39;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">acquisition_geometry</span><span class="p">,</span> <span class="n">image_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">elevation</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">azimuthal</span><span class="o">=-</span><span class="mi">35</span><span class="p">,</span> <span class="n">view_distance</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Displays a schematic of the acquisition geometry</span>
+<span class="sd">        for 2D geometries elevation and azimuthal cannot be changed</span>
 
+<span class="sd">        :acquisition_geometry: CIL acquisition geometry</span>
+<span class="sd">        :type acquisition_geometry: AcquisitionGeometry     </span>
+<span class="sd">        :image_geometry: CIL image geometry</span>
+<span class="sd">        :type image_geometry: ImageGeometry, optional </span>
+<span class="sd">        :elevation: Camera elevation in degrees, 3D geometries only</span>
+<span class="sd">        :type elevation: float, default=20  </span>
+<span class="sd">        :azimuthal: Camera azimuthal in degrees, 3D geometries only</span>
+<span class="sd">        :type azimuthal: float, default=-35  </span>
+<span class="sd">        :view_distance: Camera view distance</span>
+<span class="sd">        :type view_distance: float, default=10  </span>
+<span class="sd">        :grid: Show figure axis</span>
+<span class="sd">        :type grid: boolean, default=False</span>
+<span class="sd">        :figsize: Set figure size (inches)</span>
+<span class="sd">        :type figsize: tuple (x, y), default (6,6)    </span>
+<span class="sd">        :type grid: boolean, default=False</span>
+<span class="sd">        :fontsize: Set fontsize, default 7</span>
+<span class="sd">        :type fontsize: int </span>
+<span class="sd">        :return: returns an matplotlib.pyplot figure object</span>
+<span class="sd">        :rtype: matplotlib.figure.Figure</span>
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="n">acquisition_geometry</span><span class="o">.</span><span class="n">dimension</span> <span class="o">==</span> <span class="s1">&#39;2D&#39;</span><span class="p">:</span>
             <span class="n">elevation</span> <span class="o">=</span> <span class="mi">90</span>
             <span class="n">azimuthal</span> <span class="o">=</span> <span class="mi">0</span>

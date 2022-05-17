@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.optimisation.functions.KullbackLeibler &#8212; CIL 21.4.0 documentation</title>
+    <title>cil.optimisation.functions.KullbackLeibler &#8212; CIL v21.3.0 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -521,12 +521,12 @@
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">kl_gradient_mask</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">out_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
                 <span class="n">kl_gradient</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">out_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
-                <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">out_np</span><span class="p">)</span>
+                <span class="c1"># out.fill(out_np)</span>
                 <span class="k">return</span> <span class="n">out</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">out_np</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
                 <span class="n">kl_gradient</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">as_array</span><span class="p">(),</span> <span class="n">out_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="o">.</span><span class="n">as_array</span><span class="p">())</span>
-                <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">out_np</span><span class="p">)</span>
+                <span class="c1"># out.fill(out_np)</span>
         <span class="k">else</span><span class="p">:</span>                           
             <span class="n">tmp_sum_array</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="p">)</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>   

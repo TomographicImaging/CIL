@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.recon.FBP &#8212; CIL 21.4.0 documentation</title>
+    <title>cil.recon.FBP &#8212; CIL v21.3.0 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -205,6 +205,7 @@
 <span class="kn">from</span> <span class="nn">cil.framework</span> <span class="kn">import</span> <span class="n">AcquisitionGeometry</span>
 <span class="kn">from</span> <span class="nn">cil.recon</span> <span class="kn">import</span> <span class="n">Reconstructor</span>
 <span class="kn">from</span> <span class="nn">scipy.fft</span> <span class="kn">import</span> <span class="n">fftfreq</span>
+<span class="kn">from</span> <span class="nn">cil.plugins.tigre</span> <span class="kn">import</span> <span class="n">ProjectionOperator</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">ctypes</span>
@@ -253,10 +254,12 @@
     <span class="k">def</span> <span class="nf">fft_order</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fft_order</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="s1">&#39;ram-lak&#39;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;tigre&#39;</span><span class="p">):</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="s1">&#39;ram-lak&#39;</span><span class="p">):</span>
+
 
         <span class="c1">#call parent initialiser</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">,</span> <span class="n">backend</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">)</span>
                 
         <span class="k">if</span> <span class="n">has_ipp</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;IPP libraries not found. Cannot use CIL FBP&quot;</span><span class="p">)</span>
@@ -436,14 +439,12 @@
         <span class="n">ag</span> <span class="o">=</span> <span class="n">acquistion_data</span><span class="o">.</span><span class="n">geometry</span>
         <span class="k">if</span> <span class="n">ag</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">==</span> <span class="p">(</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">):</span>   
             <span class="n">cilacc</span><span class="o">.</span><span class="n">filter_projections_avh</span><span class="p">(</span><span class="n">data_ptr</span><span class="p">,</span> <span class="n">filter_ptr</span><span class="p">,</span> <span class="n">weights_ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">,</span> <span class="o">*</span><span class="n">acquistion_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">ag</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">==</span> <span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">):</span>   
-            <span class="n">cilacc</span><span class="o">.</span><span class="n">filter_projections_vah</span><span class="p">(</span><span class="n">data_ptr</span><span class="p">,</span> <span class="n">filter_ptr</span><span class="p">,</span> <span class="n">weights_ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">,</span> <span class="o">*</span><span class="n">acquistion_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">ag</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">==</span> <span class="p">(</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">):</span> 
             <span class="n">cilacc</span><span class="o">.</span><span class="n">filter_projections_vah</span><span class="p">(</span><span class="n">data_ptr</span><span class="p">,</span> <span class="n">filter_ptr</span><span class="p">,</span> <span class="n">weights_ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="n">acquistion_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> 
         <span class="k">elif</span> <span class="n">ag</span><span class="o">.</span><span class="n">dimension_labels</span> <span class="o">==</span> <span class="p">(</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span><span class="s1">&#39;horizontal&#39;</span><span class="p">):</span> 
             <span class="n">cilacc</span><span class="o">.</span><span class="n">filter_projections_avh</span><span class="p">(</span><span class="n">data_ptr</span><span class="p">,</span> <span class="n">filter_ptr</span><span class="p">,</span> <span class="n">weights_ptr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft_order</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="n">acquistion_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> 
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span> <span class="p">(</span><span class="s2">&quot;Could not determine correct function call from dimension labels&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span> <span class="p">(</span><span class="s2">&quot;The data is not in a compatible order. Try reordering the data with data.reorder(</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">))</span>
 
 
     <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -452,6 +453,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_filter</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_fft_order</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_backend</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_filter_inplace</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_image_geometry</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="kc">None</span>
@@ -464,7 +466,7 @@
 <div class="viewcode-block" id="FDK"><a class="viewcode-back" href="../../../recon.html#cil.recon.FDK">[docs]</a><span class="k">class</span> <span class="nc">FDK</span><span class="p">(</span><span class="n">GenericFilteredBackProjection</span><span class="p">):</span>
 
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Creates an FDK reconstructor based on your cone-beam acquisition data using TIGRE as a backend.</span>
+<span class="sd">    Creates an FDK reconstructor based on your cone-beam acquisition data.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -479,9 +481,6 @@
 
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
-<span class="sd">    &gt;&gt;&gt; from cil.utilities.dataexample import SIMULATED_CONE_BEAM_DATA</span>
-<span class="sd">    &gt;&gt;&gt; from cil.recon import FDK</span>
-<span class="sd">    &gt;&gt;&gt; data = SIMULATED_CONE_BEAM_DATA.get()</span>
 <span class="sd">    &gt;&gt;&gt; fdk = FDK(data)</span>
 <span class="sd">    &gt;&gt;&gt; out = fdk.run()</span>
 
@@ -489,11 +488,10 @@
 <span class="sd">    -----</span>
 <span class="sd">    The reconstructor can be futher customised using additional &#39;set&#39; methods provided.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">supported_backends</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;tigre&#39;</span><span class="p">]</span>
-
+    
     <span class="k">def</span> <span class="fm">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="s1">&#39;ram-lak&#39;</span><span class="p">):</span>
         <span class="c1">#call parent initialiser</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">,</span> <span class="nb">filter</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;tigre&#39;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">,</span> <span class="nb">filter</span><span class="p">)</span>
 
         <span class="k">if</span>  <span class="nb">input</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">geom_type</span> <span class="o">!=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">CONE</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;This reconstructor is for cone-beam data only.&quot;</span><span class="p">)</span>
@@ -512,7 +510,7 @@
 
 <div class="viewcode-block" id="FDK.run"><a class="viewcode-back" href="../../../recon.html#cil.recon.FDK.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Runs the configured FDK recon and returns the reconstruction.</span>
+<span class="sd">        Runs the configured FDK recon and returns the reconstuction</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -524,7 +522,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        ImageData</span>
-<span class="sd">            The reconstructed volume. Suppressed if `out` is passed</span>
+<span class="sd">            The reconstructed volume. Supressed if `out` is passed</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
@@ -536,7 +534,7 @@
             <span class="n">proj_filtered</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_pre_filtering</span><span class="p">(</span><span class="n">proj_filtered</span><span class="p">)</span>
-        <span class="n">operator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_PO_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_geometry</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="p">,</span><span class="n">adjoint_weights</span><span class="o">=</span><span class="s1">&#39;FDK&#39;</span><span class="p">)</span>
+        <span class="n">operator</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_geometry</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="p">,</span><span class="n">adjoint_weights</span><span class="o">=</span><span class="s1">&#39;FDK&#39;</span><span class="p">)</span>
         
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">proj_filtered</span><span class="p">)</span>
@@ -574,14 +572,8 @@
 <span class="sd">    filter : string, numpy.ndarray, default=&#39;ram-lak&#39;</span>
 <span class="sd">        The filter to be applied. Can be a string from: &#39;ram-lak&#39; or a numpy array.</span>
 
-<span class="sd">    backend : string</span>
-<span class="sd">        The backend to use, can be &#39;astra&#39; or &#39;tigre&#39;. Data must be in the correct order for requested backend.</span>
-
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
-<span class="sd">    &gt;&gt;&gt; from cil.utilities.dataexample import SIMULATED_PARALLEL_BEAM_DATA</span>
-<span class="sd">    &gt;&gt;&gt; from cil.recon import FBP</span>
-<span class="sd">    &gt;&gt;&gt; data = SIMULATED_PARALLEL_BEAM_DATA.get()</span>
 <span class="sd">    &gt;&gt;&gt; fbp = FBP(data)</span>
 <span class="sd">    &gt;&gt;&gt; out = fbp.run()</span>
 
@@ -590,16 +582,14 @@
 <span class="sd">    The reconstructor can be futher customised using additional &#39;set&#39; methods provided.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">supported_backends</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;tigre&#39;</span><span class="p">,</span> <span class="s1">&#39;astra&#39;</span><span class="p">]</span>
-
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">slices_per_chunk</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_slices_per_chunk</span>
 
 
-    <span class="k">def</span> <span class="fm">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="s1">&#39;ram-lak&#39;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;tigre&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="s1">&#39;ram-lak&#39;</span><span class="p">):</span>
       
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">,</span> <span class="nb">filter</span><span class="p">,</span> <span class="n">backend</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">image_geometry</span><span class="p">,</span> <span class="nb">filter</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_split_processing</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="k">if</span>  <span class="nb">input</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">geom_type</span> <span class="o">!=</span> <span class="n">AcquisitionGeometry</span><span class="o">.</span><span class="n">PARALLEL</span><span class="p">:</span>
@@ -637,11 +627,8 @@
     <span class="k">def</span> <span class="nf">_calculate_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acquisition_geometry</span><span class="p">):</span>
 
         <span class="n">ag</span> <span class="o">=</span> <span class="n">acquisition_geometry</span>
-        <span class="n">weight</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span> <span class="n">ag</span><span class="o">.</span><span class="n">num_projections</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">==</span><span class="s1">&#39;tigre&#39;</span><span class="p">:</span>
-            <span class="n">weight</span> <span class="o">/=</span> <span class="n">ag</span><span class="o">.</span><span class="n">pixel_size_h</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">weight</span> <span class="o">/=</span> <span class="n">ag</span><span class="o">.</span><span class="n">pixel_size_h</span> <span class="o">*</span> <span class="n">ag</span><span class="o">.</span><span class="n">pixel_size_v</span>
+        <span class="n">weight</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span> <span class="n">ag</span><span class="o">.</span><span class="n">num_projections</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">ag</span><span class="o">.</span><span class="n">pixel_size_h</span> <span class="p">)</span> 
+ 
         <span class="bp">self</span><span class="o">.</span><span class="n">_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">ag</span><span class="o">.</span><span class="n">pixel_num_v</span><span class="p">,</span><span class="n">ag</span><span class="o">.</span><span class="n">pixel_num_h</span><span class="p">),</span><span class="n">weight</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 
 
@@ -655,7 +642,7 @@
                 
         <span class="n">ig_slice</span> <span class="o">=</span> <span class="n">ag_slice</span><span class="o">.</span><span class="n">get_ImageGeometry</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_slice</span> <span class="o">=</span> <span class="n">ag_slice</span><span class="o">.</span><span class="n">allocate</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">operator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_PO_class</span><span class="p">(</span><span class="n">ig_slice</span><span class="p">,</span><span class="n">ag_slice</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">operator</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="n">ig_slice</span><span class="p">,</span><span class="n">ag_slice</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_process_chunk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span>  <span class="n">out</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_slice</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">array</span><span class="p">[:,</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">step</span><span class="p">,:]))</span>
@@ -666,7 +653,7 @@
 
 <div class="viewcode-block" id="FBP.run"><a class="viewcode-back" href="../../../recon.html#cil.recon.FBP.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Runs the configured FBP recon and returns the reconstruction</span>
+<span class="sd">        Runs the configured FBP recon and returns the reconstuction</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -679,7 +666,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        ImageData</span>
-<span class="sd">            The reconstructed volume. Suppressed if `out` is passed</span>
+<span class="sd">            The reconstructed volume. Supressed if `out` is passed</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
@@ -739,7 +726,7 @@
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_pre_filtering</span><span class="p">(</span><span class="n">proj_filtered</span><span class="p">)</span>
 
-            <span class="n">operator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_PO_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_geometry</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="p">)</span>
+            <span class="n">operator</span> <span class="o">=</span> <span class="n">ProjectionOperator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_geometry</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">acquisition_geometry</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">operator</span><span class="o">.</span><span class="n">adjoint</span><span class="p">(</span><span class="n">proj_filtered</span><span class="p">)</span>

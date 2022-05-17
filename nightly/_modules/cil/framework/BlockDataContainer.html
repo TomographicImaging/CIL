@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.framework.BlockDataContainer &#8212; CIL 21.4.0 documentation</title>
+    <title>cil.framework.BlockDataContainer &#8212; CIL v21.3.0 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -235,7 +235,7 @@
     <span class="n">MULTIPLY</span>  <span class="o">=</span> <span class="s1">&#39;multiply&#39;</span>
     <span class="n">DIVIDE</span>    <span class="o">=</span> <span class="s1">&#39;divide&#39;</span>
     <span class="n">POWER</span>     <span class="o">=</span> <span class="s1">&#39;power&#39;</span>
-    <span class="n">SAPYB</span>     <span class="o">=</span> <span class="s1">&#39;sapyb&#39;</span>
+    <span class="n">AXPBY</span>     <span class="o">=</span> <span class="s1">&#39;axpby&#39;</span>
     <span class="n">MAXIMUM</span>   <span class="o">=</span> <span class="s1">&#39;maximum&#39;</span>
     <span class="n">MINIMUM</span>   <span class="o">=</span> <span class="s1">&#39;minimum&#39;</span>
     <span class="n">ABS</span>       <span class="o">=</span> <span class="s1">&#39;abs&#39;</span>
@@ -399,7 +399,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">MINIMUM</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BlockDataContainer.sapyb"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.sapyb">[docs]</a>    <span class="k">def</span> <span class="nf">sapyb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">num_threads</span> <span class="o">=</span> <span class="n">NUM_THREADS</span><span class="p">):</span>
+<div class="viewcode-block" id="BlockDataContainer.axpby"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.axpby">[docs]</a>    <span class="k">def</span> <span class="nf">axpby</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">num_threads</span> <span class="o">=</span> <span class="n">NUM_THREADS</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&#39;&#39;&#39;performs axpby element-wise on the BlockDataContainer containers</span>
 <span class="sd">        </span>
 <span class="sd">        Does the operation .. math:: a*x+b*y and stores the result in out, where x is self</span>
@@ -408,30 +408,12 @@
 <span class="sd">        :param b: scalar</span>
 <span class="sd">        :param y: compatible (Block)DataContainer</span>
 <span class="sd">        :param out: (Block)DataContainer to store the result</span>
-<span class="sd">        </span>
-
-<span class="sd">        Example:</span>
-<span class="sd">        --------</span>
-
-<span class="sd">        a = 2</span>
-<span class="sd">        b = 3</span>
-<span class="sd">        ig = ImageGeometry(10,11)</span>
-<span class="sd">        x = ig.allocate(1)</span>
-<span class="sd">        y = ig.allocate(2)</span>
-<span class="sd">        bdc1 = BlockDataContainer(2*x, y)</span>
-<span class="sd">        bdc2 = BlockDataContainer(x, 2*y)</span>
-<span class="sd">        out = bdc1.sapyb(a,bdc2,b)</span>
+<span class="sd">        :param dtype: optional, data type of the DataContainers</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;out container cannot be None&quot;</span><span class="p">)</span>
-        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span><span class="n">a</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span><span class="n">b</span><span class="p">,</span> <span class="s1">&#39;out&#39;</span><span class="p">:</span><span class="n">out</span><span class="p">,</span> <span class="s1">&#39;num_threads&#39;</span><span class="p">:</span> <span class="n">NUM_THREADS</span><span class="p">}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">SAPYB</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="BlockDataContainer.axpby"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.axpby">[docs]</a>    <span class="k">def</span> <span class="nf">axpby</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">num_threads</span> <span class="o">=</span> <span class="n">NUM_THREADS</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Deprecated method. Alias of sapyb&#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">out</span><span class="p">,</span><span class="n">num_threads</span><span class="p">)</span></div>
-
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span><span class="n">a</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span><span class="n">b</span><span class="p">,</span> <span class="s1">&#39;out&#39;</span><span class="p">:</span><span class="n">out</span><span class="p">,</span> <span class="s1">&#39;dtype&#39;</span><span class="p">:</span> <span class="n">dtype</span><span class="p">,</span> <span class="s1">&#39;num_threads&#39;</span><span class="p">:</span> <span class="n">NUM_THREADS</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">binary_operations</span><span class="p">(</span><span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">AXPBY</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="BlockDataContainer.binary_operations"><a class="viewcode-back" href="../../../optimisation.html#cil.framework.BlockDataContainer.binary_operations">[docs]</a>    <span class="k">def</span> <span class="nf">binary_operations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operation</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -501,15 +483,15 @@
                     <span class="n">op</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">maximum</span>
                 <span class="k">elif</span> <span class="n">operation</span> <span class="o">==</span> <span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">MINIMUM</span><span class="p">:</span>
                     <span class="n">op</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">minimum</span>
-                <span class="k">elif</span> <span class="n">operation</span> <span class="o">==</span> <span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">SAPYB</span><span class="p">:</span>
+                <span class="k">elif</span> <span class="n">operation</span> <span class="o">==</span> <span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">AXPBY</span><span class="p">:</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
                         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> cannot handle </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)))</span>
-                    <span class="n">op</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">sapyb</span>
+                    <span class="n">op</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">axpby</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unsupported operation&#39;</span><span class="p">,</span> <span class="n">operation</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">operation</span> <span class="o">==</span> <span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">SAPYB</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">operation</span> <span class="o">==</span> <span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">AXPBY</span><span class="p">:</span>
                         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kw</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">],</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
                             <span class="n">a</span> <span class="o">=</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
                         <span class="k">else</span><span class="p">:</span>
@@ -520,7 +502,7 @@
                         <span class="k">else</span><span class="p">:</span>
                             <span class="n">b</span> <span class="o">=</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]</span>
 
-                        <span class="n">el</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">ot</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">num_threads</span><span class="o">=</span><span class="n">kw</span><span class="p">[</span><span class="s1">&#39;num_threads&#39;</span><span class="p">])</span>
+                        <span class="n">el</span><span class="o">.</span><span class="n">axpby</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">ot</span><span class="p">,</span>  <span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">kw</span><span class="p">[</span><span class="s1">&#39;dtype&#39;</span><span class="p">],</span> <span class="n">num_threads</span><span class="o">=</span><span class="n">kw</span><span class="p">[</span><span class="s1">&#39;num_threads&#39;</span><span class="p">])</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;out&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
                         <span class="n">op</span><span class="p">(</span><span class="n">ot</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
@@ -533,8 +515,8 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># try to do algebra with one DataContainer. Will raise error if not compatible</span>
             <span class="n">kw</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">operation</span> <span class="o">!=</span> <span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">SAPYB</span><span class="p">:</span>
-                <span class="c1"># remove keyworded argument related to SAPYB</span>
+            <span class="k">if</span> <span class="n">operation</span> <span class="o">!=</span> <span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">AXPBY</span><span class="p">:</span>
+                <span class="c1"># remove keyworded argument related to AXPBY</span>
                 <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span><span class="s1">&#39;b&#39;</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;num_threads&#39;</span><span class="p">,</span> <span class="s1">&#39;dtype&#39;</span><span class="p">]:</span>
                     <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kw</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                         <span class="n">kw</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
@@ -555,7 +537,7 @@
                     <span class="n">op</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">maximum</span>
                 <span class="k">elif</span> <span class="n">operation</span> <span class="o">==</span> <span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">MINIMUM</span><span class="p">:</span>
                     <span class="n">op</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">minimum</span>
-                <span class="k">elif</span> <span class="n">operation</span> <span class="o">==</span> <span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">SAPYB</span><span class="p">:</span>
+                <span class="k">elif</span> <span class="n">operation</span> <span class="o">==</span> <span class="n">BlockDataContainer</span><span class="o">.</span><span class="n">AXPBY</span><span class="p">:</span>
 
                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kw</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">],</span> <span class="n">BlockDataContainer</span><span class="p">):</span>
                         <span class="n">a</span> <span class="o">=</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
@@ -567,7 +549,7 @@
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">b</span> <span class="o">=</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]</span>
 
-                    <span class="n">el</span><span class="o">.</span><span class="n">sapyb</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;num_threads&#39;</span><span class="p">])</span>
+                    <span class="n">el</span><span class="o">.</span><span class="n">axpby</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;dtype&#39;</span><span class="p">],</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;num_threads&#39;</span><span class="p">])</span>
 
                     <span class="c1"># As axpyb cannot return anything we `continue` to skip the rest of the code block</span>
                     <span class="k">continue</span>

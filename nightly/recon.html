@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Recon &#8212; CIL 21.4.0 documentation</title>
+    <title>Recon &#8212; CIL v21.3.0 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -245,7 +245,7 @@
 <h3>FBP - Reconstructor for parallel-beam geometry<a class="headerlink" href="#fbp-reconstructor-for-parallel-beam-geometry" title="Permalink to this headline">#</a></h3>
 <dl class="py class">
 <dt id="cil.recon.FBP">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.recon.</span></code><code class="sig-name descname"><span class="pre">FBP</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ram-lak'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tigre'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/recon/FBP.html#FBP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.recon.FBP" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.recon.</span></code><code class="sig-name descname"><span class="pre">FBP</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ram-lak'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/recon/FBP.html#FBP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.recon.FBP" title="Permalink to this definition">#</a></dt>
 <dd><p>Creates an FBP reconstructor based on your parallel-beam acquisition data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -253,15 +253,11 @@
 <li><p><strong>input</strong> (<a class="reference internal" href="framework.html#cil.framework.AcquisitionData" title="cil.framework.AcquisitionData"><em>AcquisitionData</em></a>) – The input data to reconstruct. The reconstructor is set-up based on the geometry of the data.</p></li>
 <li><p><strong>image_geometry</strong> (<a class="reference internal" href="framework.html#cil.framework.ImageGeometry" title="cil.framework.ImageGeometry"><em>ImageGeometry</em></a><em>, </em><em>default used if None</em>) – A description of the area/volume to reconstruct</p></li>
 <li><p><strong>filter</strong> (<em>string</em><em>, </em><em>numpy.ndarray</em><em>, </em><em>default='ram-lak'</em>) – The filter to be applied. Can be a string from: ‘ram-lak’ or a numpy array.</p></li>
-<li><p><strong>backend</strong> (<em>string</em>) – The backend to use, can be ‘astra’ or ‘tigre’. Data must be in the correct order for requested backend.</p></li>
 </ul>
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.utilities.dataexample</span> <span class="kn">import</span> <span class="n">SIMULATED_PARALLEL_BEAM_DATA</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.recon</span> <span class="kn">import</span> <span class="n">FBP</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">SIMULATED_PARALLEL_BEAM_DATA</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fbp</span> <span class="o">=</span> <span class="n">FBP</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fbp</span> <span class="o">=</span> <span class="n">FBP</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">out</span> <span class="o">=</span> <span class="n">fbp</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -285,7 +281,7 @@ It is recommended to tune it too your hardware requirements using 8, 16 or 32 sl
 <dl class="py method">
 <dt id="cil.recon.FBP.run">
 <code class="sig-name descname"><span class="pre">run</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/recon/FBP.html#FBP.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.recon.FBP.run" title="Permalink to this definition">#</a></dt>
-<dd><p>Runs the configured FBP recon and returns the reconstruction</p>
+<dd><p>Runs the configured FBP recon and returns the reconstuction</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -294,7 +290,7 @@ It is recommended to tune it too your hardware requirements using 8, 16 or 32 sl
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The reconstructed volume. Suppressed if <cite>out</cite> is passed</p>
+<dd class="field-even"><p>The reconstructed volume. Supressed if <cite>out</cite> is passed</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.ImageData" title="cil.framework.ImageData">ImageData</a></p>
@@ -329,6 +325,17 @@ It is recommended to tune it too your hardware requirements using 8, 16 or 32 sl
 <li><p>[N/2:N-1] negative frequencies</p></li>
 </ul>
 <p>The array can be modified and passed back using set_filter()</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.recon.FBP.set_backend">
+<code class="sig-name descname"><span class="pre">set_backend</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tigre'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FBP.set_backend" title="Permalink to this definition">#</a></dt>
+<dd><p>Sets the backend used for the foward/backward projectors. Currently only TIGRE is supported</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>backend</strong> (<em>string</em>) – Set the backend to TIGRE ‘tigre’</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -406,7 +413,7 @@ True will filter projections in-place.</p>
 <dl class="py class">
 <dt id="cil.recon.FDK">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cil.recon.</span></code><code class="sig-name descname"><span class="pre">FDK</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_geometry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ram-lak'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/recon/FBP.html#FDK"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.recon.FDK" title="Permalink to this definition">#</a></dt>
-<dd><p>Creates an FDK reconstructor based on your cone-beam acquisition data using TIGRE as a backend.</p>
+<dd><p>Creates an FDK reconstructor based on your cone-beam acquisition data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -417,10 +424,7 @@ True will filter projections in-place.</p>
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.utilities.dataexample</span> <span class="kn">import</span> <span class="n">SIMULATED_CONE_BEAM_DATA</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cil.recon</span> <span class="kn">import</span> <span class="n">FDK</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">SIMULATED_CONE_BEAM_DATA</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fdk</span> <span class="o">=</span> <span class="n">FDK</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fdk</span> <span class="o">=</span> <span class="n">FDK</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">out</span> <span class="o">=</span> <span class="n">fdk</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -429,7 +433,7 @@ True will filter projections in-place.</p>
 <dl class="py method">
 <dt id="cil.recon.FDK.run">
 <code class="sig-name descname"><span class="pre">run</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cil/recon/FBP.html#FDK.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cil.recon.FDK.run" title="Permalink to this definition">#</a></dt>
-<dd><p>Runs the configured FDK recon and returns the reconstruction.</p>
+<dd><p>Runs the configured FDK recon and returns the reconstuction</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -438,7 +442,7 @@ True will filter projections in-place.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The reconstructed volume. Suppressed if <cite>out</cite> is passed</p>
+<dd class="field-even"><p>The reconstructed volume. Supressed if <cite>out</cite> is passed</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="framework.html#cil.framework.ImageData" title="cil.framework.ImageData">ImageData</a></p>
@@ -473,6 +477,17 @@ True will filter projections in-place.</p>
 <dt id="cil.recon.FDK.reset">
 <code class="sig-name descname"><span class="pre">reset</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FDK.reset" title="Permalink to this definition">#</a></dt>
 <dd><p>Resets all optional configuration parameters to their default values</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cil.recon.FDK.set_backend">
+<code class="sig-name descname"><span class="pre">set_backend</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tigre'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cil.recon.FDK.set_backend" title="Permalink to this definition">#</a></dt>
+<dd><p>Sets the backend used for the foward/backward projectors. Currently only TIGRE is supported</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>backend</strong> (<em>string</em>) – Set the backend to TIGRE ‘tigre’</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">

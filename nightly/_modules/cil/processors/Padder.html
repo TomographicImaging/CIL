@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.processors.Padder &#8212; CIL 21.4.0 documentation</title>
+    <title>cil.processors.Padder &#8212; CIL v21.3.0 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -211,91 +211,82 @@
 <div class="viewcode-block" id="Padder"><a class="viewcode-back" href="../../../processors.html#cil.processors.Padder">[docs]</a><span class="k">class</span> <span class="nc">Padder</span><span class="p">(</span><span class="n">DataProcessor</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Processor to pad an array, wrapping numpy.pad</span>
-<span class="sd">    See https://numpy.org/doc/stable/reference/generated/numpy.pad.html</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
 <div class="viewcode-block" id="Padder.constant"><a class="viewcode-back" href="../../../processors.html#cil.processors.Padder.constant">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">constant</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">constant_values</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Padder processor wrapping numpy.pad with mode `constant` </span>
-<span class="sd">        Pads with a constant value.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        pad_width: int, tuple, dict</span>
-<span class="sd">            The number of values padded to the edges of each axis</span>
-<span class="sd">        constant_values: float, tuple, dict</span>
-<span class="sd">            The values to set the padded values for each axis</span>
-
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
-<span class="sd">        If passed a single value it will pad symmetrically in all dimensions.</span>
+        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Padder processor wrapping numpy.pad with mode `linear_ramp` </span>
+<span class="sd">        </span>
+<span class="sd">        :param pad_width: number of values padded to the edges of each axis.</span>
+<span class="sd">        If passed an int it will pad symmetrically in all dimensions.</span>
 <span class="sd">        If passed a tuple it will apply asymmetric padding in all dimensions. (before, after)</span>
 <span class="sd">        If passed a dictionary it will apply the specified padding to the required dimension label: e.g.</span>
 <span class="sd">        {&#39;horizontal&#39;:(8, 23), &#39;vertical&#39;: 10}</span>
+<span class="sd">        :type pad_width: int or tuple or dict</span>
+<span class="sd">        :param constant_values: pads with a constant value.</span>
+<span class="sd">        edge of the padded array. They can be passed in the same format as `pad_width`.</span>
+<span class="sd">        :type constant_values: float or tuple or dict</span>
+
+<span class="sd">        https://numpy.org/doc/stable/reference/generated/numpy.pad.html</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        This creates a Padder processor which pads with a constant value.</span>
+
+<span class="sd">        :param pad_width: number of values padded to the edges of each axis, specified as a dictionary containing a tuple (before, after) or an int (before=after). A tuple (before, after) yields same before and after pad for each axis. int is a shortcut for before = after = pad width for all axes.</span>
+<span class="sd">        :type pad_width: int or tuple or dict</span>
+<span class="sd">        :param constant_values: The values to set the padded values for each axis, specified as a dictionary containing a tuple (before, after). A tuple (before, after) yields same before and after pad for each axis. float is a shortcut for before = after = pad value for all axes. Default is 0.</span>
+<span class="sd">        :type constant_values: float or tuple or dict</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">processor</span> <span class="o">=</span> <span class="n">Padder</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="n">pad_width</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;constant&#39;</span><span class="p">,</span> <span class="n">constant_values</span><span class="o">=</span><span class="n">constant_values</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">processor</span></div>
 
 <div class="viewcode-block" id="Padder.edge"><a class="viewcode-back" href="../../../processors.html#cil.processors.Padder.edge">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">edge</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Padder processor wrapping numpy.pad with mode `edge` </span>
-<span class="sd">        Pads with the edge values of array.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        pad_width: int, tuple, dict</span>
-<span class="sd">            The number of values padded to the edges of each axis</span>
-
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
-<span class="sd">        If passed a single value it will pad symmetrically in all dimensions.</span>
+        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Padder processor wrapping numpy.pad with mode `edge` </span>
+<span class="sd">        </span>
+<span class="sd">        :param pad_width: number of values padded to the edges of each axis.</span>
+<span class="sd">        If passed an int it will pad symmetrically in all dimensions.</span>
 <span class="sd">        If passed a tuple it will apply asymmetric padding in all dimensions. (before, after)</span>
 <span class="sd">        If passed a dictionary it will apply the specified padding to the required dimension label: e.g.</span>
 <span class="sd">        {&#39;horizontal&#39;:(8, 23), &#39;vertical&#39;: 10}</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        :type pad_width: int or tuple or dict</span>
 
+<span class="sd">        https://numpy.org/doc/stable/reference/generated/numpy.pad.html</span>
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">processor</span> <span class="o">=</span> <span class="n">Padder</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="n">pad_width</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;edge&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">processor</span></div>
     
 <div class="viewcode-block" id="Padder.linear_ramp"><a class="viewcode-back" href="../../../processors.html#cil.processors.Padder.linear_ramp">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">linear_ramp</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end_values</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Padder processor wrapping numpy.pad with mode `linear_ramp` </span>
-<span class="sd">        Pads with the linear ramp between end_value and the array edge value.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        pad_width: int, tuple, dict</span>
-<span class="sd">            The number of values padded to the edges of each axis</span>
-<span class="sd">        end_values: float, tuple, dict</span>
-<span class="sd">            The values used for the ending value of the linear_ramp</span>
-<span class="sd"> </span>
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
-<span class="sd">        If passed a single value it will pad symmetrically in all dimensions.</span>
+        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Padder processor wrapping numpy.pad with mode `linear_ramp` </span>
+<span class="sd">        </span>
+<span class="sd">        :param pad_width: number of values padded to the edges of each axis.</span>
+<span class="sd">        If passed an int it will pad symmetrically in all dimensions.</span>
 <span class="sd">        If passed a tuple it will apply asymmetric padding in all dimensions. (before, after)</span>
 <span class="sd">        If passed a dictionary it will apply the specified padding to the required dimension label: e.g.</span>
 <span class="sd">        {&#39;horizontal&#39;:(8, 23), &#39;vertical&#39;: 10}</span>
+<span class="sd">        :type pad_width: int or tuple or dict</span>
+<span class="sd">        :param end_values: The values used for the ending value of the linear_ramp and that will form the </span>
+<span class="sd">        edge of the padded array. They can be passed in the same format as `pad_width`.</span>
+<span class="sd">        :type end_values: float or tuple or dict</span>
+
+<span class="sd">        https://numpy.org/doc/stable/reference/generated/numpy.pad.html</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">processor</span> <span class="o">=</span> <span class="n">Padder</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="n">pad_width</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;linear_ramp&#39;</span><span class="p">,</span> <span class="n">end_values</span><span class="o">=</span><span class="n">end_values</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">processor</span></div>
     
 <div class="viewcode-block" id="Padder.reflect"><a class="viewcode-back" href="../../../processors.html#cil.processors.Padder.reflect">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">reflect</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Padder processor wrapping numpy.pad with mode `reflect` </span>
-<span class="sd">        Pads with the reflection of the vector mirrored on the first and last values of the vector along each axis.</span>
+        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Padder processor wrapping numpy.pad with mode `reflect` </span>
 <span class="sd">        </span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        pad_width: int, tuple, dict</span>
-<span class="sd">            The number of values padded to the edges of each axis</span>
-
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
-<span class="sd">        If passed a single value it will pad symmetrically in all dimensions.</span>
+<span class="sd">        :param pad_width: number of values padded to the edges of each axis.</span>
+<span class="sd">        If passed an int it will pad symmetrically in all dimensions.</span>
 <span class="sd">        If passed a tuple it will apply asymmetric padding in all dimensions. (before, after)</span>
 <span class="sd">        If passed a dictionary it will apply the specified padding to the required dimension label: e.g.</span>
 <span class="sd">        {&#39;horizontal&#39;:(8, 23), &#39;vertical&#39;: 10}</span>
+<span class="sd">        :type pad_width: int or tuple or dict</span>
+
+<span class="sd">        https://numpy.org/doc/stable/reference/generated/numpy.pad.html</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">processor</span> <span class="o">=</span> <span class="n">Padder</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="n">pad_width</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;reflect&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">processor</span></div>
@@ -303,39 +294,33 @@
 <div class="viewcode-block" id="Padder.symmetric"><a class="viewcode-back" href="../../../processors.html#cil.processors.Padder.symmetric">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">symmetric</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Padder processor wrapping numpy.pad with mode `symmetric`</span>
-<span class="sd">        Pads with the reflection of the vector mirrored along the edge of the array.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        pad_width: int, tuple, dict</span>
-<span class="sd">            The number of values padded to the edges of each axis</span>
-
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
-<span class="sd">        If passed a single value it will pad symmetrically in all dimensions.</span>
+<span class="sd">        </span>
+<span class="sd">        :param pad_width: number of values padded to the edges of each axis.</span>
+<span class="sd">        If passed an int it will pad symmetrically in all dimensions.</span>
 <span class="sd">        If passed a tuple it will apply asymmetric padding in all dimensions. (before, after)</span>
 <span class="sd">        If passed a dictionary it will apply the specified padding to the required dimension label: e.g.</span>
 <span class="sd">        {&#39;horizontal&#39;:(8, 23), &#39;vertical&#39;: 10}</span>
+<span class="sd">        :type pad_width: int or tuple or dict</span>
+
+<span class="sd">        https://numpy.org/doc/stable/reference/generated/numpy.pad.html</span>
+
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">processor</span> <span class="o">=</span> <span class="n">Padder</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="n">pad_width</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;symmetric&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">processor</span></div>
     
 <div class="viewcode-block" id="Padder.wrap"><a class="viewcode-back" href="../../../processors.html#cil.processors.Padder.wrap">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">wrap</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Padder processor wrapping numpy.pad with mode `wrap`</span>
-<span class="sd">        Pads with the wrap of the vector along the axis. The first values are used to pad the end and the end values are used to pad the beginning.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        pad_width: int, tuple, dict</span>
-<span class="sd">            The number of values padded to the edges of each axis</span>
-
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
-<span class="sd">        If passed a single value it will pad symmetrically in all dimensions.</span>
+        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Padder processor wrapping numpy.pad with mode `wrap`</span>
+<span class="sd">        </span>
+<span class="sd">        :param pad_width: number of values padded to the edges of each axis.</span>
+<span class="sd">        If passed an int it will pad symmetrically in all dimensions.</span>
 <span class="sd">        If passed a tuple it will apply asymmetric padding in all dimensions. (before, after)</span>
 <span class="sd">        If passed a dictionary it will apply the specified padding to the required dimension label: e.g.</span>
 <span class="sd">        {&#39;horizontal&#39;:(8, 23), &#39;vertical&#39;: 10}</span>
+<span class="sd">        :type pad_width: int or tuple or dict</span>
+
+<span class="sd">        https://numpy.org/doc/stable/reference/generated/numpy.pad.html</span>
+
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">processor</span> <span class="o">=</span> <span class="n">Padder</span><span class="p">(</span><span class="n">pad_width</span><span class="o">=</span><span class="n">pad_width</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wrap&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">processor</span></div>
@@ -345,6 +330,30 @@
                  <span class="n">pad_width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">constant_values</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                  <span class="n">end_values</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Processor to pad an array wrapping numpy.pad.</span>
+
+<span class="sd">        :param mode: specifies the method to use for padding. Available methods: constant, </span>
+<span class="sd">        edge, linear_ramp, reflect, symmetric, wrap.</span>
+<span class="sd">        :type mode: string, default &#39;constant&#39;.</span>
+<span class="sd">        :param pad_width: number of values padded to the edges of each axis, specified as </span>
+<span class="sd">        a dictionary containing a tuple (before, after) or an int (before=after). The dictionary keys</span>
+<span class="sd">        must be the dimension_labels of the DataContainer (ImageData or AcquisitionData) that one wants</span>
+<span class="sd">        to pad.</span>
+<span class="sd">         A tuple (before, after) yields same before and after pad for each axis. </span>
+<span class="sd">         int is a shortcut for before = after = pad width for all axes.</span>
+<span class="sd">        :type pad_width: int or tuple or dict</span>
+<span class="sd">        :param constant_values: Used in &#39;constant&#39; mode. The values to set the padded values for each axis, </span>
+<span class="sd">        specified as a dictionary containing a tuple (before, after). </span>
+<span class="sd">        A tuple (before, after) yields same before and after pad for each axis. </span>
+<span class="sd">        float is a shortcut for before = after = pad value for all axes. Default is 0.</span>
+<span class="sd">        :type constant_values: float or tuple or dict</span>
+<span class="sd">        :param edge_values: Used in &#39;linear_ramp&#39;. The values used for the ending value of the linear_ramp</span>
+<span class="sd">         and that will form the edge of the padded array, specified as a dictionary containing a tuple</span>
+<span class="sd">         (before, after). A tuple (before, after) yields same before and after pad for each axis.</span>
+<span class="sd">         float is a shortcut for before = after = pad value for all axes. Default is 0.</span>
+<span class="sd">        :type edge_values: float or tuple or dict</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;mode&#39;</span><span class="p">:</span> <span class="n">mode</span><span class="p">,</span>
                 <span class="s1">&#39;pad_width&#39;</span><span class="p">:</span> <span class="n">pad_width</span><span class="p">,</span>

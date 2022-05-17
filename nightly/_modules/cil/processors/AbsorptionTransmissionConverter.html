@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cil.processors.AbsorptionTransmissionConverter &#8212; CIL 21.4.0 documentation</title>
+    <title>cil.processors.AbsorptionTransmissionConverter &#8212; CIL v21.3.0 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -210,13 +210,14 @@
 
 <div class="viewcode-block" id="AbsorptionTransmissionConverter"><a class="viewcode-back" href="../../../processors.html#cil.processors.AbsorptionTransmissionConverter">[docs]</a><span class="k">class</span> <span class="nc">AbsorptionTransmissionConverter</span><span class="p">(</span><span class="n">DataProcessor</span><span class="p">):</span>
 
-    <span class="sd">&#39;&#39;&#39;Processor to convert from absorption measurements to transmission</span>
-<span class="sd">    </span>
+    <span class="sa">r</span><span class="sd">&#39;&#39;&#39;Processor to convert from absorption measurements to transmission</span>
 <span class="sd">    :param white_level: A float defining incidence intensity in the Beer-Lambert law.</span>
 <span class="sd">    :type white_level: float, optional</span>
 <span class="sd">    :return: returns AcquisitionData, ImageData or DataContainer depending on input data type</span>
 <span class="sd">    :rtype: AcquisitionData, ImageData or DataContainer</span>
-
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Processor first multiplies data by -1, then calculates exponent </span>
 <span class="sd">    and scales result by white_level (default=1)</span>
 <span class="sd">    &#39;&#39;&#39;</span>

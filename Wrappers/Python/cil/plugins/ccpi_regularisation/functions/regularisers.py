@@ -46,7 +46,7 @@ class RegulariserFunction(Function):
         tau : Number
             Positive parameter of the proximal operator
         out : DataContainer
-            Output `Datacontainer` in which the result is placed.
+            Output :class:`Datacontainer` in which the result is placed.
 
         Note
         ----    
@@ -95,11 +95,20 @@ class TV_Base(RegulariserFunction):
 
     .. math:: TV(u) = \alpha \|\nabla u\|_{2,1}
 
+    Parameters
+    ----------
+    
+    strong_convexity_constant : Number 
+                              Positive parameter that allows Total variation regulariser to be strongly convex. Default = 0.
+
     Note
     ----
 
-    Total variation is a convex function
+    By definition, Total variation is a convex function. However,
+    adding a strongly convex term makes it a strongly convex function.
+    Then, we say that `TV` is a :math:`\gamma>0` strongly convex function i.e., 
 
+    .. math:: TV(u) = \alpha \|\nabla u\|_{2,1} + \frac{\gamma}{2}\|u\|^{2}
 
     """
 

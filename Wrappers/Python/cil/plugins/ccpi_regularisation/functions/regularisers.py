@@ -33,18 +33,28 @@ from numbers import Number
 
 class RegulariserFunction(Function):
     def proximal(self, x, tau, out=None):
-        '''Generic proximal method for a RegulariserFunction
+ 
+        r""" Generic proximal method for a RegulariserFunction
+
+        .. math:: \mathrm{prox}_{\tau f}(x) := \argmin_{z} f(x) + \frac{1}{2}\|z - x \|^{2}
         
-        :param x: image to be regularised
-        :type x: an ImageData
-        :param tau: 
-        :type tau: Number
-        :param out: a placeholder for the result
-        :type out: same as x: ImageData
+        Parameters
+        ----------
+
+        x : DataContainer
+            Input of the proximal operator
+        tau : Number
+            Positive parameter of the proximal operator
+        out : DataContainer
+            Output :class:`Datacontainer` in which the result is placed.
+
+        Note
+        ----    
         
-        If the ImageData contains complex data, rather than the default float32, the regularisation
-        is run indipendently on the real and imaginary part.
-        '''
+        If the :class:`ImageData` contains complex data, rather than the default `float32`, the regularisation
+        is run independently on the real and imaginary part.
+
+        """
 
         self.check_input(x)
         arr = x.as_array()
@@ -81,6 +91,27 @@ class RegulariserFunction(Function):
 
 class TV_Base(RegulariserFunction):
 
+    r""" Total Variation regulariser
+
+    .. math:: TV(u) = \alpha \|\nabla u\|_{2,1}
+
+    Parameters
+    ----------
+    
+    strong_convexity_constant : Number 
+                              Positive parameter that allows Total variation regulariser to be strongly convex. Default = 0.
+
+    Note
+    ----
+
+    By definition, Total variation is a convex function. However,
+    adding a strongly convex term makes it a strongly convex function.
+    Then, we say that `TV` is a :math:`\gamma>0` strongly convex function i.e., 
+
+    .. math:: TV(u) = \alpha \|\nabla u\|_{2,1} + \frac{\gamma}{2}\|u\|^{2}
+
+    """
+
     def __init__(self, strong_convexity_constant = 0):
 
         self.strong_convexity_constant = strong_convexity_constant
@@ -98,26 +129,60 @@ class TV_Base(RegulariserFunction):
 
 
 class FGP_TV(TV_Base):
+
+    r""" Fast Gradient Projection Total Variation (FGP_TV)
+
+        The :class:`FGP_TV` computes the proximal operator of the Total variation regulariser
+
+        .. math:: \mathrm{prox}_{\tau (\alpha TV)}(x) = \underset{z}{\mathrm{argmin}} \,\alpha\,\mathrm{TV}(z) + \frac{1}{2}\|z - x\|^{2} .
+        
+        The algorithm used for the proximal operator of TV is the Fast Gradient Projection algorithm 
+        applied to the _dual problem_ of the above problem, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`.
+
+
+        Parameters
+        ----------
+
+        alpha : :obj:`Number` (positive), default = 1.0 .
+                Total variation regularisation parameter. 
+        max_iteration : :obj:`int`. Default = 100 .
+                Maximum number of iterations for the Fast Gradient Projection algorithm.
+        isotropic : :obj:`boolean`. Default = True .
+                    Isotropic or Anisotropic definition of the Total variation regulariser.
+
+                    .. math:: |x|_{2} = \sqrt{x_{1}^{2} + x_{2}^{2}},\, (\mbox{isotropic})
+
+                    .. math:: |x|_{1} = |x_{1}| + |x_{2}|\, (\mbox{anisotropic})
+
+        nonnegativity : :obj:`boolean`. Default = True .
+                        Non-negativity constraint for the solution of the FGP algorithm.
+
+        tolerance : :obj:`float`, Default = 0 .
+                    Stopping criterion for the FGP algorithm.
+                    
+                    .. math:: \|x^{k+1} - x^{k}\|_{2} < \mathrm{tolerance}
+
+        device : :obj:`str`, Default = 'cpu' .
+                FGP_TV algorithm runs on `cpu` or `gpu`.
+
+        strong_convexity_constant : :obj:`float`, default = 0
+                A strongly convex term weighted by the :code:`strong_convexity_constant` (:math:`\gamma`) parameter is added to the Total variation. 
+                Now the :code:`TotalVariation` function is :math:`\gamma` - strongly convex and the proximal operator is
+
+                .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\tau}\|u - b\|^{2} + \mathrm{TV}(u) + \frac{\gamma}{2}\|u\|^{2} \Leftrightarrow
+
+                .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\frac{\tau}{1+\gamma\tau}}\|u - \frac{b}{1+\gamma\tau}\|^{2} + \mathrm{TV}(u) 
+
+        See Also
+        --------
+        :class:`~cil.optimisation.functions.TotalVariation`
+
+
+        """
+
+
     def __init__(self, alpha=1, max_iteration=100, tolerance=0, isotropic=True, nonnegativity=True, device='cpu', strong_convexity_constant=0):
-        '''Creator of FGP_TV Function
-
-
-        :param alpha: regularisation parameter
-        :type alpha: number, default 1
-        :param isotropic: Whether it uses L2 (isotropic) or L1 (unisotropic) norm
-        :type isotropic: boolean, default True, can range between 1 and 2
-        :param nonnegativity: Whether to add the non-negativity constraint
-        :type nonnegativity: boolean, default True
-        :param max_iteration: max number of sub iterations. The algorithm will iterate up to this number of iteration or up to when the tolerance has been reached
-        :type max_iteration: integer, default 100
-        :param tolerance: minimum difference between previous iteration of the algorithm that determines the stop of the iteration earlier than max_iteration. If set to 0 only the max_iteration will be used as stop criterion.
-        :type tolerance: float, default 0
-        :param device: determines if the code runs on CPU or GPU
-        :type device: string, default 'cpu', can be 'gpu' if GPU is installed
-        :param strong_convexity_constant: Adds a strongly convex function to the TotalVariation functional.
-        :type: float, default = 0
-
-        '''
+        
         if isotropic == True:
             self.methodTV = 0
         else:
@@ -132,7 +197,7 @@ class FGP_TV(TV_Base):
         self.max_iteration = max_iteration
         self.tolerance = tolerance
         self.nonnegativity = nonnegativity
-        self.device = device # string for 'cpu' or 'gpu'
+        self.device = device 
 
         super(FGP_TV, self).__init__(strong_convexity_constant=strong_convexity_constant)
 

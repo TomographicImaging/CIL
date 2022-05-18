@@ -33,18 +33,28 @@ from numbers import Number
 
 class RegulariserFunction(Function):
     def proximal(self, x, tau, out=None):
-        '''Generic proximal method for a RegulariserFunction
+ 
+        r""" Generic proximal method for a RegulariserFunction
+
+        .. math:: \mathrm{prox}_{\tau f}(x) := \argmin_{z} f(x) + \frac{1}{2}\|z - x \|^{2}
         
-        :param x: image to be regularised
-        :type x: an ImageData
-        :param tau: 
-        :type tau: Number
-        :param out: a placeholder for the result
-        :type out: same as x: ImageData
+        Parameters
+        ----------
+
+        x : DataContainer
+            Input of the proximal operator
+        tau : Number
+            Positive parameter of the proximal operator
+        out : DataContainer
+            Output `Datacontainer` in which the result is placed.
+
+        Note
+        ----    
         
-        If the ImageData contains complex data, rather than the default float32, the regularisation
-        is run indipendently on the real and imaginary part.
-        '''
+        If the :class:`ImageData` contains complex data, rather than the default `float32`, the regularisation
+        is run independently on the real and imaginary part.
+
+        """
 
         self.check_input(x)
         arr = x.as_array()
@@ -80,6 +90,18 @@ class RegulariserFunction(Function):
         pass
 
 class TV_Base(RegulariserFunction):
+
+    r""" Total Variation regulariser
+
+    .. math:: TV(u) = \alpha \|\nabla u\|_{2,1}
+
+    Note
+    ----
+
+    Total variation is a convex function
+
+
+    """
 
     def __init__(self, strong_convexity_constant = 0):
 

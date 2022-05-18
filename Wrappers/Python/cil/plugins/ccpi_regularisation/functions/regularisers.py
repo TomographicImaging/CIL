@@ -205,7 +205,7 @@ class FGP_TV(TV_Base):
     def proximal_numpy(self, in_arr, tau):
 
         if self.strong_convexity_constant>0:
-            tau /= (1+tau*self.strong_convexity_constant)
+            tau /= (1 + tau*self.strong_convexity_constant)
             in_arr /= (1 + tau*self.strong_convexity_constant)
 
         res , info = regularisers.FGP_TV(\

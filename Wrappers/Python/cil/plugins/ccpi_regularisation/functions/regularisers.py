@@ -191,7 +191,7 @@ class FGP_TV(TV_Base):
         The :class:`FGP_TV` regularisation does not incorparate information on the :class:`ImageGeometry`, i.e., pixel/voxel size.
         Therefore a rescaled parameter should be used to match the same solution computed using :class:`~cil.optimisation.functions.TotalVariation`.
 
-        >>> G1 = (alpha/ig2D.voxel_size_x) * FGP_TV(max_iteration=100, device='gpu')
+        >>> G1 = (alpha/ig.voxel_size_x) * FGP_TV(max_iteration=100, device='gpu')
         >>> G2 = alpha * TotalVariation(max_iteration=100, lower=0.)
         
         

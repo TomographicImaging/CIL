@@ -132,35 +132,35 @@ class FGP_TV(TV_Base):
 
     r""" Fast Gradient Projection Total Variation (FGP_TV)
 
-        The :code:`FGP_TV` computes the proximal operator of the Total variation regulariser
+        The :class:`FGP_TV` computes the proximal operator of the Total variation regulariser
 
-        .. math:: \mathrm{prox}_{\tau (\alpha TV)}(x) = \underset{z}{\mathrm{argmin}} \alpha TV(z) + \frac{1}{2}\|z - x\|^{2} .
+        .. math:: \mathrm{prox}_{\tau (\alpha TV)}(x) = \underset{z}{\mathrm{argmin}} \,\alpha\,\mathrm{TV}(z) + \frac{1}{2}\|z - x\|^{2} .
         
         The algorithm used for the proximal operator of TV is the Fast Gradient Projection algorithm 
-        applied to the _dual problem_ of the above problem, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`, i.e.,
+        applied to the _dual problem_ of the above problem, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`.
 
 
         Parameters
         ----------
 
-        alpha : Number (positive). Default = 1.0 .
+        alpha : :obj:`Number` (positive), default = 1.0 .
                 Total variation regularisation parameter. 
         max_iteration : :obj:`int`. Default = 100 .
                 Maximum number of iterations for the Fast Gradient Projection algorithm.
         isotropic : :obj:`boolean`. Default = True .
-        Isotropic or Anisotropic definition of the Total variation regulariser.
+                    Isotropic or Anisotropic definition of the Total variation regulariser.
 
-        .. math:: |x|_{2} = \sqrt{x_{1}^{2} + x_{2}^{2}},\, (\mbox{isotropic})
+                    .. math:: |x|_{2} = \sqrt{x_{1}^{2} + x_{2}^{2}},\, (\mbox{isotropic})
 
-        .. math:: |x|_{1} = |x_{1}| + |x_{2}|\, (\mbox{anisotropic})
+                    .. math:: |x|_{1} = |x_{1}| + |x_{2}|\, (\mbox{anisotropic})
 
         nonnegativity : :obj:`boolean`. Default = True .
                         Non-negativity constraint for the solution of the FGP algorithm.
 
         tolerance : :obj:`float`, Default = 0 .
-                Stopping criterion for the FGP algorithm.
-                
-                .. math:: \|x^{k+1} - x^{k}\|_{2} < \mathrm{tolerance}
+                    Stopping criterion for the FGP algorithm.
+                    
+                    .. math:: \|x^{k+1} - x^{k}\|_{2} < \mathrm{tolerance}
 
         device : :obj:`str`, Default = 'cpu' .
                 FGP_TV algorithm runs on `cpu` or `gpu`.
@@ -172,6 +172,10 @@ class FGP_TV(TV_Base):
                 .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\tau}\|u - b\|^{2} + \mathrm{TV}(u) + \frac{\gamma}{2}\|u\|^{2} \Leftrightarrow
 
                 .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\frac{\tau}{1+\gamma\tau}}\|u - \frac{b}{1+\gamma\tau}\|^{2} + \mathrm{TV}(u) 
+
+        See Also
+        --------
+        :class:`TotalVariation`
 
         """
 

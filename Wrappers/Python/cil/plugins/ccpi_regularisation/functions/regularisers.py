@@ -175,7 +175,8 @@ class FGP_TV(TV_Base):
 
         See Also
         --------
-        :class:`TotalVariation`
+        :class:`~cil.optimisation.functions.TotalVariation`
+
 
         """
 

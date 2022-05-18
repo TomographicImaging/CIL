@@ -130,25 +130,52 @@ class TV_Base(RegulariserFunction):
 
 class FGP_TV(TV_Base):
     def __init__(self, alpha=1, max_iteration=100, tolerance=0, isotropic=True, nonnegativity=True, device='cpu', strong_convexity_constant=0):
-        '''Creator of FGP_TV Function
+
+        r""" Fast Gradient Projection Total Variation (FGP_TV)
+
+        The :code:`FGP_TV` computes the proximal operator of the Total variation regulariser
+
+        .. math:: \mathrm{prox}_{\tau (\alpha TV)}(x) = \underset{z}{\mathrm{argmin}} \alpha TV(z) + \frac{1}{2}\|z - x\|^{2} .
+        
+        The algorithm used for the proximal operator of TV is the Fast Gradient Projection algorithm 
+        applied to the _dual problem_ of the above problem, see :cite:`BeckTeboulle_b`, :cite:`BeckTeboulle_a`, i.e.,
 
 
-        :param alpha: regularisation parameter
-        :type alpha: number, default 1
-        :param isotropic: Whether it uses L2 (isotropic) or L1 (unisotropic) norm
-        :type isotropic: boolean, default True, can range between 1 and 2
-        :param nonnegativity: Whether to add the non-negativity constraint
-        :type nonnegativity: boolean, default True
-        :param max_iteration: max number of sub iterations. The algorithm will iterate up to this number of iteration or up to when the tolerance has been reached
-        :type max_iteration: integer, default 100
-        :param tolerance: minimum difference between previous iteration of the algorithm that determines the stop of the iteration earlier than max_iteration. If set to 0 only the max_iteration will be used as stop criterion.
-        :type tolerance: float, default 0
-        :param device: determines if the code runs on CPU or GPU
-        :type device: string, default 'cpu', can be 'gpu' if GPU is installed
-        :param strong_convexity_constant: Adds a strongly convex function to the TotalVariation functional.
-        :type: float, default = 0
+        Parameters
+        ----------
 
-        '''
+        alpha : Number (positive). Default = 1.0 .
+                Total variation regularisation parameter. 
+        max_iteration : :obj:`int`. Default = 100 .
+                Maximum number of iterations for the Fast Gradient Projection algorithm.
+        isotropic : :obj:`boolean`. Default = True .
+        Isotropic or Anisotropic definition of the Total variation regulariser.
+
+        .. math:: |x|_{2} = \sqrt{x_{1}^{2} + x_{2}^{2}},\, (\mbox{isotropic})
+
+        .. math:: |x|_{1} = |x_{1}| + |x_{2}|\, (\mbox{anisotropic})
+
+        nonnegativity : :obj:`boolean`. Default = True .
+                        Non-negativity constraint for the solution of the FGP algorithm.
+
+        tolerance : :obj:`float`, Default = 0 .
+                Stopping criterion for the FGP algorithm.
+                
+                .. math:: \|x^{k+1} - x^{k}\|_{2} < \mathrm{tolerance}
+
+        device : :obj:`str`, Default = 'cpu' .
+                FGP_TV algorithm runs on `cpu` or `gpu`.
+
+        strong_convexity_constant : :obj:`float`, default = 0
+                A strongly convex term weighted by the :code:`strong_convexity_constant` (:math:`\gamma`) parameter is added to the Total variation. 
+                Now the :code:`TotalVariation` function is :math:`\gamma` - strongly convex and the proximal operator is
+
+                .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\tau}\|u - b\|^{2} + \mathrm{TV}(u) + \frac{\gamma}{2}\|u\|^{2} \Leftrightarrow
+
+                .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\frac{\tau}{1+\gamma\tau}}\|u - \frac{b}{1+\gamma\tau}\|^{2} + \mathrm{TV}(u) 
+
+        """
+
         if isotropic == True:
             self.methodTV = 0
         else:
@@ -163,7 +190,7 @@ class FGP_TV(TV_Base):
         self.max_iteration = max_iteration
         self.tolerance = tolerance
         self.nonnegativity = nonnegativity
-        self.device = device # string for 'cpu' or 'gpu'
+        self.device = device 
 
         super(FGP_TV, self).__init__(strong_convexity_constant=strong_convexity_constant)
 

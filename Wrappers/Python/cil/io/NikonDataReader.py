@@ -31,7 +31,7 @@ class NikonDataReader(object):
         ----------
 
             
-        xtek_file: str with full path to .xtexct file
+        file_name: str with full path to .xtexct file
             
         roi: dictionary with roi to load 
                 {'angle': (start, end, step), 

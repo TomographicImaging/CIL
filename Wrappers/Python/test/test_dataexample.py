@@ -19,13 +19,11 @@ from cil.framework.framework import ImageGeometry,AcquisitionGeometry
 from cil.utilities import dataexample
 from cil.utilities import noise
 import os, sys
-from numpy.core.function_base import linspace
-
-from numpy.testing._private.utils import assert_allclose, assert_array_equal, assert_equal
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from testclass import CCPiTestClass
 import platform
 import numpy as np
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 class TestTestData(CCPiTestClass):
     def test_noise_gaussian(self):

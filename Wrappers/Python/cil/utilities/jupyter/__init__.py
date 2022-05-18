@@ -15,8 +15,13 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from ipywidgets import interact, interactive, fixed, interact_manual
-import ipywidgets as widgets
+try:
+    from ipywidgets import interact, interactive, fixed, interact_manual
+    import ipywidgets as widgets
+except ImportError as ie:
+    raise ImportError(ie , "\n\n", 
+                      "islicer requires the additional package ipywidgets\n" +
+                      "Please install it via conda as ipywidgets from the conda-forge channel\n")
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
 import numpy

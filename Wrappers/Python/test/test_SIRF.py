@@ -26,6 +26,8 @@ from cil.optimisation.operators import GradientOperator, LinearOperator
 from cil.optimisation.functions import TotalVariation, L2NormSquared
 from cil.optimisation.algorithms import FISTA
 
+from testclass import CCPiTestClass
+
 try:
     import sirf.STIR as pet
     import sirf.Gadgetron as mr
@@ -175,10 +177,9 @@ class TestGradientMR_2D(unittest.TestCase, GradientSIRF):
   
 
     
-class TestSIRFCILIntegration(unittest.TestCase):
+class TestSIRFCILIntegration(CCPiTestClass):
     
     def setUp(self):
-
         if has_sirf:
             os.chdir(examples_data_path('PET'))
             # Copy files to a working folder and change directory to where these files are.
@@ -194,6 +195,7 @@ class TestSIRFCILIntegration(unittest.TestCase):
     def tearDown(self):
         if has_sirf:
             shutil.rmtree(self.cwd)
+
 
     @unittest.skipUnless(has_sirf, "Has SIRF")
     def test_BlockDataContainer_with_SIRF_DataContainer_divide(self):
@@ -215,6 +217,7 @@ class TestSIRFCILIntegration(unittest.TestCase):
 
         self.assertBlockDataContainerEqual(bdc , bdc1)
 
+
     @unittest.skipUnless(has_sirf, "Has SIRF")
     def test_BlockDataContainer_with_SIRF_DataContainer_multiply(self):
         os.chdir(self.cwd)
@@ -235,6 +238,7 @@ class TestSIRFCILIntegration(unittest.TestCase):
 
         self.assertBlockDataContainerEqual(bdc , bdc1)
     
+
     @unittest.skipUnless(has_sirf, "Has SIRF")
     def test_BlockDataContainer_with_SIRF_DataContainer_add(self):
         os.chdir(self.cwd)
@@ -258,6 +262,7 @@ class TestSIRFCILIntegration(unittest.TestCase):
 
         self.assertBlockDataContainerEqual(bdc , bdc1)
 
+
     @unittest.skipUnless(has_sirf, "Has SIRF")
     def test_BlockDataContainer_with_SIRF_DataContainer_subtract(self):
         os.chdir(self.cwd)
@@ -277,18 +282,6 @@ class TestSIRFCILIntegration(unittest.TestCase):
 
         self.assertBlockDataContainerEqual(bdc , bdc1)
 
-    def assertBlockDataContainerEqual(self, container1, container2):
-        print ("assert Block Data Container Equal")
-        self.assertTrue(issubclass(container1.__class__, container2.__class__))
-        for col in range(container1.shape[0]):
-            if hasattr(container1.get_item(col), 'as_array'):
-                print ("Checking col ", col)
-                self.assertNumpyArrayEqual(
-                    container1.get_item(col).as_array(), 
-                    container2.get_item(col).as_array()
-                    )
-            else:
-                self.assertBlockDataContainerEqual(container1.get_item(col),container2.get_item(col))
-    
-    def assertNumpyArrayEqual(self, first, second):
-        np.testing.assert_array_equal(first, second)
+
+
+        

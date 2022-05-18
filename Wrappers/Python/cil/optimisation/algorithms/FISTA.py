@@ -100,20 +100,27 @@ class FISTA(Algorithm):
     def update(self):
         self.t_old = self.t
         self.f.gradient(self.y, out=self.u)
-        self.u.__imul__( -self.invL )
-        self.u.__iadd__( self.y )
+
+        self.u.sapyb(-self.invL, self.y, 1.0, out=self.u)
 
         self.g.proximal(self.u, self.invL, out=self.x)
         
         self.t = 0.5*(1 + numpy.sqrt(1 + 4*(self.t_old**2)))
         
         self.x.subtract(self.x_old, out=self.y)
-        self.y.axpby(((self.t_old-1)/self.t), 1, self.x, out=self.y)
-        
-        self.x_old.fill(self.x)
+        self.y.sapyb(((self.t_old-1)/self.t), self.x, 1, out=self.y)
 
-        
+        # update_previous_solution() called after update by base class
+        #i.e current solution is now in x_old, previous solution is now in x       
+
+    def update_previous_solution(self):
+        # swap the pointers to current and previous solution
+        tmp = self.x_old
+        self.x_old = self.x
+        self.x = tmp
+
+
     def update_objective(self):
-        self.loss.append( self.f(self.x) + self.g(self.x) )    
+        self.loss.append( self.f(self.x_old) + self.g(self.x_old) )    
     
 

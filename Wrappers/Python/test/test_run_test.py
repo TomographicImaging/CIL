@@ -18,20 +18,12 @@
 import unittest
 import numpy
 import numpy as np
-from cil.framework import DataContainer
 from cil.framework import ImageData
-from cil.framework import AcquisitionData, VectorData
-from cil.framework import ImageGeometry,VectorGeometry
-from cil.framework import AcquisitionGeometry
-from cil.optimisation.algorithms import FISTA
-from cil.optimisation.functions import LeastSquares
-from cil.optimisation.functions import ZeroFunction
-from cil.optimisation.functions import L1Norm
-
-from cil.optimisation.operators import MatrixOperator
-from cil.optimisation.operators import LinearOperator
+from cil.framework import ImageGeometry
 
 import numpy.testing
+
+from testclass import CCPiTestClass
 
 try:
     from cvxpy import *
@@ -50,38 +42,9 @@ def dt(steps):
     return steps[-1] - steps[-2]
 
 
-
-
-class TestAlgorithms(unittest.TestCase):
-    def assertNumpyArrayEqual(self, first, second):
-        res = True
-        try:
-            numpy.testing.assert_array_equal(first, second)
-        except AssertionError as err:
-            res = False
-            print(err)
-        self.assertTrue(res)
-
-    def assertNumpyArrayAlmostEqual(self, first, second, decimal=6):
-        res = True
-        try:
-            numpy.testing.assert_array_almost_equal(first, second, decimal)
-        except AssertionError as err:
-            res = False
-            print(err)
-        self.assertTrue(res)
-
+class TestFunction(CCPiTestClass):
     
-class TestFunction(unittest.TestCase):
-    def assertNumpyArrayEqual(self, first, second):
-        res = True
-        try:
-            numpy.testing.assert_array_equal(first, second)
-        except AssertionError as err:
-            res = False
-            print(err)
-        self.assertTrue(res)
-
+        
     def create_simple_ImageData(self):
         N = 64
         ig = ImageGeometry(voxel_num_x=N, voxel_num_y=N)
@@ -97,13 +60,9 @@ class TestFunction(unittest.TestCase):
         return (ig, Phantom)
 
     def _test_Norm2(self):
-        print("test Norm2")
-        opt = {'memopt': True}
         ig, Phantom = self.create_simple_ImageData()
         x = Phantom.as_array()
-        print(Phantom)
-        print(Phantom.as_array())
-
+        
         norm2 = Norm2()
         v1 = norm2(x)
         v2 = norm2(Phantom)

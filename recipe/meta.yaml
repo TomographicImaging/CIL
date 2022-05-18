@@ -1,6 +1,7 @@
 package:
   name: cil
-  version: {{ environ.get('GIT_DESCRIBE_TAG','v')[1:] }}
+  # use the latest stable release version
+  version: {{ environ.get('GIT_DESCRIBE_TAG','v')[1:].split('-')[0] }}
 
 source:
   path: ..
@@ -17,13 +18,14 @@ build:
 test:
   requires:
     - python-wget
-    - cvxpy               # [ linux and py==37 and np==118 ]
+    - cvxpy         # [ linux and not py36]     
     - scikit-image
     - tomophantom =1.4.10 # [ linux ]
-    - cil-astra =21.3.0   # [ linux ] 
+    - cil-astra =21.4   # [ linux ] 
     - tigre =2.2          # [ not osx ] 
     - packaging
     - ccpi-regulariser=21.0.0   # [ not osx ]
+    - numba  # [not osx]
     
   source_files:
     - ./Wrappers/Python/test     # [win]
@@ -31,8 +33,8 @@ test:
 
   commands:
     - python -c "import os; print ('TESTING IN THIS DIRECTORY' , os.getcwd())"
-    - python -m unittest discover Wrappers/Python/test        # [win]
-    - python -m unittest discover -s Wrappers/Python/test # [not win]
+    - python -m unittest discover -v -s Wrappers/Python/test  # [win]
+    - python -m unittest discover -s Wrappers/Python/test -v  # [not win]
     
 requirements:
   build:
@@ -71,7 +73,13 @@ requirements:
     - ipp
     - tqdm
 
-  
+  #optional packages with version dependancies
+  run_constrained:
+    - tomophantom=1.4.10
+    - cil-astra=21.4
+    - tigre=2.2
+    - ccpi-regulariser=21.0.0
+
 about:
   home: http://www.ccpi.ac.uk/cil
   license:  Apache 2.0 License

@@ -29,7 +29,7 @@ class TransmissionAbsorptionConverter(DataProcessor):
     :type white_level: float, optional
     :param min_intensity: A float defining some threshold to avoid 0 in log, is applied after normalisation by white_level
     :type min_intensity: float, optional
-    :return: returns AcquisitionData, ImageData or DataContainer depending on input data type
+    :return: returns AcquisitionData, ImageData or DataContainer depending on input data type, return is suppressed if 'out' is passed
     :rtype: AcquisitionData, ImageData or DataContainer
     
     Processor first divides by white_level (default=1) and then take negative logarithm. 
@@ -37,8 +37,8 @@ class TransmissionAbsorptionConverter(DataProcessor):
     '''
 
     def __init__(self,
-                 min_intensity = 0,
-                 white_level = 1
+                 min_intensity = 0.0,
+                 white_level = 1.0
                  ):
 
         kwargs = {'min_intensity': min_intensity,
@@ -52,29 +52,39 @@ class TransmissionAbsorptionConverter(DataProcessor):
             raise TypeError('Processor supports only following data types:\n' +
                             ' - ImageData\n - AcquisitionData\n' +
                             ' - DataContainer')
+
+        if data.min() <= 0 and self.min_intensity <= 0:
+            raise ValueError('Zero or negative values found in the dataset. Please use `min_intensity` to provide a clipping value.')
+
         return True 
 
     def process(self, out=None):
 
         data = self.get_input()
 
-        white_level = numpy.float32(self.white_level)
-
+        return_val = False
         if out is None:
-            out = data.divide(white_level)
-        else:
-            data.divide(white_level, out=out)
+            out = data.geometry.allocate(None)
+            return_val = True
 
-        arr = out.as_array()
-        threshold = numpy.float32(self.min_intensity)
-        threshold_indices = arr < threshold
-        arr[threshold_indices] = threshold
-        out.fill(arr)
+        arr_in = data.as_array()
+        arr_out = out.as_array()
 
-        try:
-            out.log(out=out)
-        except RuntimeWarning:
-            raise ValueError('Zero encountered in log. Please set threshold to some value to avoid this.')
-                
-        out.multiply(-1.0,out=out)
-        return out
+        #whitelevel
+        if self.white_level != 1:
+            numpy.divide(arr_in, self.white_level, out=arr_out)
+            arr_in = arr_out
+
+        #threshold
+        if self.min_intensity > 0:
+            numpy.clip(arr_in, self.min_intensity, None, out=arr_out)
+            arr_in = arr_out
+
+        #beer-lambert
+        numpy.log(arr_in,out=arr_out)
+        numpy.negative(arr_out,out=arr_out)
+        
+        out.fill(arr_out)
+
+        if return_val:
+            return out

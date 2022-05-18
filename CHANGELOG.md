@@ -1,5 +1,20 @@
-* 2x.x.x
-  - added sapyb and deprecated axpby
+* 21.4.1
+ - Removed prints from unittests and cleanup of unittest code.
+ - CMake: 
+   - install script re-allows selection of non default install directory ([#1246](https://github.com/TomographicImaging/CIL/issues/1246))
+ - TIFF writer uses logging
+ - Added unittests for TIFF functionality
+
+* 21.4.0
+  - PEP 440 compliant version
+  - CMake fix due to use of pip install. 
+  - Recon.FBP allows 'astra' backend 
+  - Fixed PowerMethod for square/non-square, complex/float matrices with stopping criterion.
+  - CofR image_sharpness improved for large datasets
+  - Geometry alignmentment fix for 2D datasets
+  - CGLS update for sapyb to enable complex data, bugfix in use of initial 
+  - added sapyb and deprecated axpby. All algorithm updated to use sapyb.
+  - Allow use of square brackets in file paths to TIFF and Nikon datasets
 
 * 21.3.1
   - Added matplotlib version dependency to conda recipe

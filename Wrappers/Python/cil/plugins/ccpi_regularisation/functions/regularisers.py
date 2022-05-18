@@ -145,8 +145,10 @@ class FGP_TV(TV_Base):
 
         alpha : :obj:`Number` (positive), default = 1.0 .
                 Total variation regularisation parameter. 
+
         max_iteration : :obj:`int`. Default = 100 .
                 Maximum number of iterations for the Fast Gradient Projection algorithm.
+
         isotropic : :obj:`boolean`. Default = True .
                     Isotropic or Anisotropic definition of the Total variation regulariser.
 
@@ -173,6 +175,26 @@ class FGP_TV(TV_Base):
 
                 .. math:: \underset{u}{\mathrm{argmin}} \frac{1}{2\frac{\tau}{1+\gamma\tau}}\|u - \frac{b}{1+\gamma\tau}\|^{2} + \mathrm{TV}(u) 
 
+
+        Examples
+        --------
+
+        .. math:: \underset{u\qeq0}{\mathrm{argmin}} \frac{1}{2}\|u - b\|^{2} + \alpha TV(u)
+
+
+        >>> G = alpha * FGP_TV(max_iteration=100, device='gpu')
+        >>> sol = G.proximal(b)
+
+        Note
+        ----
+
+        The :class:`FGP_TV` regularisation does not incorparate information on the :class:`ImageGeometry`, i.e., pixel/voxel size.
+        Therefore a rescaled parameter should be used to match the same solution computed using :class:`~cil.optimisation.functions.TotalVariation`.
+
+        >>> G1 = (alpha/ig2D.voxel_size_x) * FGP_TV(max_iteration=100, device='gpu')
+        >>> G2 = alpha * TotalVariation(max_iteration=100, lower=0.)
+        
+        
         See Also
         --------
         :class:`~cil.optimisation.functions.TotalVariation`

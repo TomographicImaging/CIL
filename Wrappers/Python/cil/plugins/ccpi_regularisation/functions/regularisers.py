@@ -129,9 +129,8 @@ class TV_Base(RegulariserFunction):
 
 
 class FGP_TV(TV_Base):
-    def __init__(self, alpha=1, max_iteration=100, tolerance=0, isotropic=True, nonnegativity=True, device='cpu', strong_convexity_constant=0):
 
-        r""" Fast Gradient Projection Total Variation (FGP_TV)
+    r""" Fast Gradient Projection Total Variation (FGP_TV)
 
         The :code:`FGP_TV` computes the proximal operator of the Total variation regulariser
 
@@ -176,6 +175,9 @@ class FGP_TV(TV_Base):
 
         """
 
+
+    def __init__(self, alpha=1, max_iteration=100, tolerance=0, isotropic=True, nonnegativity=True, device='cpu', strong_convexity_constant=0):
+        
         if isotropic == True:
             self.methodTV = 0
         else:

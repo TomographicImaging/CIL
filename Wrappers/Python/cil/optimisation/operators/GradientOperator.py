@@ -164,25 +164,30 @@ class AnisotropicGradientOperator(GradientOperator):
                                         correlation=correlation) 
 
     def direct(self, x, out=None):
+        grad_x = super().direct(x)
+        # compute local field
+        scalar_field_np = sum([self.ksi[i].as_array()*grad_x[i].as_array() for i in range(self.ndim)])
+        scalar_field = x.clone()
+        scalar_field.fill(scalar_field_np)
+        # compute anisotropic gradient
         if out is None:
-            # compute gradient
-            out = super().direct(x)
-            # compute anisotropic gradient
+            out = grad_x.clone()
             for i in range(self.ndim):
-                out[i].sapyb(1, self.ksi[i], - (self.ksi[i] * out[i]).sum(), out=out[i])
+                grad_x[i].sapyb(1, self.ksi[i], - scalar_field, out=out[i])
             return out
         else:
-            # compute gradient
-            super().direct(x, out=out)
-            # compute anisotropic gradient
             for i in range(self.ndim):
-                out[i].sapyb(1, self.ksi[i], - (self.ksi[i] * out[i]).sum(), out=out[i])
+                grad_x[i].sapyb(1, self.ksi[i], - scalar_field, out=out[i])
     
     def adjoint(self, x, out=None):
+        # compute local field
+        scalar_field_np = sum([self.ksi[i].as_array()*x[i].as_array() for i in range(self.ndim)])
+        scalar_field = x[0].clone()
+        scalar_field.fill(scalar_field_np)
         # compute anisotropy
         tmp_x = x.clone()
         for i in range(self.ndim):
-            x[i].sapyb(1, self.ksi[i], - (self.ksi[i] * x[i]).sum(), out=tmp_x[i])
+            x[i].sapyb(1, self.ksi[i], - scalar_field, out=tmp_x[i])
         # compute divergence
         if out is None:
             return super().adjoint(tmp_x)

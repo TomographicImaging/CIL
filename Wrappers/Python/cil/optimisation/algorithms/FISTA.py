@@ -19,6 +19,7 @@ from cil.optimisation.algorithms import Algorithm
 from cil.optimisation.functions import ZeroFunction
 import numpy
 import warnings
+import logging
 
 class FISTA(Algorithm):
     
@@ -80,7 +81,7 @@ class FISTA(Algorithm):
         :param f: Differentiable function
         :param g: Convex function with " simple " proximal operator'''
 
-        print("{} setting up".format(self.__class__.__name__, ))
+        logging.info("{} setting up".format(self.__class__.__name__, ))
         
         self.y = initial.copy()
         self.x_old = initial.copy()
@@ -94,7 +95,7 @@ class FISTA(Algorithm):
         self.invL = 1/f.L
         self.t = 1
         self.configured = True
-        print("{} configured".format(self.__class__.__name__, ))
+        logging.info("{} configured".format(self.__class__.__name__, ))
 
             
     def update(self):

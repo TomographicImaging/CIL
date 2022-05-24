@@ -359,7 +359,9 @@ class TotalVariation(Function):
     
     @property
     def gradient(self):
-        r""" GradientOperator is created using the self._domain.
+        r""" GradientOperator is created if it is not instantiated yet. The domain of the `_gradient`,
+        is created in the `__call__` and `proximal` methods. 
+
         """
         if self._domain is not None:
             self._gradient = GradientOperator(self._domain, correlation = self.correlation, backend = self.backend)

@@ -220,11 +220,6 @@ class TotalVariation(Function):
                        
         r""" Returns the proximal operator of the convex conjugate of the :class:`.MixedL21Norm` at :code:`x`.
         """
-
-        try:
-            self._domain = x.geometry
-        except:
-            self._domain = x
         
         # preallocated in proximal
         tmp = self.pptmp

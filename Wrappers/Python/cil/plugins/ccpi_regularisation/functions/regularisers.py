@@ -1,8 +1,5 @@
 # Copyright 2022 United Kingdom Research and Innovation
 # Copyright 2022 The University of Manchester
-# Copyright [yyyy] [name of copyright owner]
-
-# Author(s): [Author name, Author email (optional)]
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.

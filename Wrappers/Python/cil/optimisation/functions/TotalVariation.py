@@ -266,7 +266,7 @@ class TotalVariation(Function):
         p1 = self.gradient.range_geometry().allocate(0)
 
         if self.strong_convexity_constant>0:
-            tau /= (1+tau*self.strong_convexity_constant)
+            tau /= (1 + tau*self.strong_convexity_constant)
             x /= (1 + tau*self.strong_convexity_constant)
         
         should_break = False

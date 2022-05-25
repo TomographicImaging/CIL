@@ -326,7 +326,7 @@ class Gradient_C(LinearOperator):
         
         super(Gradient_C, self).__init__(domain_geometry=domain_geometry, 
                                          range_geometry=range_geometry) 
-        logging.info("Initialised GradientOperator with C backend running with ", cilacc.openMPtest(self.num_threads)," threads")               
+        logging.info("Initialised GradientOperator with C backend running with {} threads".format(cilacc.openMPtest(self.num_threads)))
 
     @staticmethod 
     def datacontainer_as_c_pointer(x):

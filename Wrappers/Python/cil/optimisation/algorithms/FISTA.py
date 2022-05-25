@@ -17,6 +17,7 @@ from cil.optimisation.algorithms import Algorithm
 import numpy
 import warnings
 import logging
+from numbers import Number
 
 
 class ISTA(Algorithm):

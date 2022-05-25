@@ -98,7 +98,7 @@ class ISTA(Algorithm):
             raise ValueError("Function f is not differentiable")
 
     # Set default step size
-    def _set_step_size(self, step_size):
+    def set_step_size(self, step_size):
         """ Set default step size.
         """
         if step_size is None:
@@ -138,7 +138,7 @@ class ISTA(Algorithm):
         self.g = g
 
         # set step_size
-        self._set_step_size(step_size=step_size)
+        self.set_step_size(step_size=step_size)
 
         # check convergence criterion for ISTA is satisfied
         if kwargs.get('check_convergence_criterion', True):
@@ -235,7 +235,7 @@ class FISTA(ISTA):
 
     """
 
-    def _set_step_size(self, step_size):
+    def set_step_size(self, step_size):
 
         """Set the default step size
         """

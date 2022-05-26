@@ -297,12 +297,19 @@ Smooth Mixed L21 norm
    :members:
    :special-members:   
 
-Total variation
+Total Variation
 ---------------
 
 .. autoclass:: cil.optimisation.functions.TotalVariation
    :members:
    :special-members: 
+
+Total Generalised Variation
+---------------
+
+.. autoclass:: cil.optimisation.functions.TotalGeneralisedVariation
+   :members:
+   :special-members:    
 
 Block Framework
 ***************

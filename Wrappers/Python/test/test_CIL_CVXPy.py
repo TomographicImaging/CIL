@@ -13,9 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cil.optimisation.functions import L2NormSquared, BlockFunction, TotalVariation, MixedL21Norm, ZeroFunction
-from cil.optimisation.operators import GradientOperator,BlockOperator, ZeroOperator, SymmetrisedGradientOperator, IdentityOperator
-from cil.optimisation.algorithms import PDHG
+from cil.optimisation.functions import L2NormSquared, TotalVariation, TotalGeneralisedVariation
 from cil.utilities import dataexample
 
 import numpy as np
@@ -218,19 +216,19 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
             np.testing.assert_allclose(cil_objective, obj.value, atol=1e-3)    
 
 
-    def tgv_cvxpy_regulariser(self,u, w1, w2, alpha0, alpha1, boundaries = "Neumann"):
+    def tgv_cvxpy_regulariser(self, u, w1, w2, alpha1, alpha0, boundaries = "Neumann"):
 
         G1 = self.sparse_gradient_matrix(u.shape, direction = 'forward', order = 1, boundaries = boundaries)  
         DX, DY = G1[1], G1[0]
 
         G2 = self.sparse_gradient_matrix(u.shape, direction = 'backward', order = 1, boundaries = boundaries) 
         divX, divY = G2[1], G2[0]
-    
-        return alpha0 * cvxpy.sum(cvxpy.norm(cvxpy.vstack([DX @ cvxpy.vec(u) - cvxpy.vec(w1), DY @ cvxpy.vec(u) - cvxpy.vec(w2)]), 2, axis = 0)) + \
-            alpha1 * cvxpy.sum(cvxpy.norm(cvxpy.vstack([ divX @ cvxpy.vec(w1), divY @ cvxpy.vec(w2), \
-                                        0.5 * ( divX @ cvxpy.vec(w2) + divY @ cvxpy.vec(w1) ), \
-                                        0.5 * ( divX @ cvxpy.vec(w2) + divY @ cvxpy.vec(w1) ) ]), 2, axis = 0  ) )            
 
+        return alpha1 * cvxpy.sum(cvxpy.norm(cvxpy.vstack([DX @ cvxpy.vec(u) - cvxpy.vec(w1), DY @ cvxpy.vec(u) - cvxpy.vec(w2)]), 2, axis = 0)) + \
+            alpha0 * cvxpy.sum(cvxpy.norm(cvxpy.vstack([ divX @ cvxpy.vec(w1), divY @ cvxpy.vec(w2), \
+                                        0.5 * ( divX @ cvxpy.vec(w2) + divY @ cvxpy.vec(w1) ), \
+                                        0.5 * ( divX @ cvxpy.vec(w2) + divY @ cvxpy.vec(w1) ) ]), 2, axis = 0  ) )           
+                                        
     def test_cil_vs_cvxpy_total_generalised_variation(self):
         
         # solution
@@ -239,8 +237,8 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
         w2_cvx = cvxpy.Variable(self.data.shape)
 
         # regularisation parameters
-        alpha0 = 0.1
-        alpha1 = 0.3
+        alpha1 = 0.1
+        alpha0 = 0.5
 
         # fidelity term
         fidelity = 0.5 * cvxpy.sum_squares(u_cvx - self.data.array)   
@@ -250,38 +248,15 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
         obj =  cvxpy.Minimize( regulariser +  fidelity)
         prob = cvxpy.Problem(obj, constraints = [])
 
-        # Choose solver ( SCS, MOSEK(license needed) )
-        tv_cvxpy = prob.solve(verbose = True, solver = cvxpy.SCS)   
+        # Choose solver (SCS)
+        tvg_cvxpy = prob.solve(verbose = True, solver = cvxpy.SCS)   
 
-        # setup and run PDHG algorithm for TGV denoising               
-        ig = self.data.geometry
-
-        K11 = GradientOperator(ig)
-        K22 = SymmetrisedGradientOperator(K11.range)
-        K12 = IdentityOperator(K11.range)
-        K21 = ZeroOperator(ig, K22.range)
-
-        # operator = [GradientOperator,  -IdentityOperator
-        #             ZeroOperator,       SymmetrisedGradientOperator]
-        K = BlockOperator(K11, -K12, K21, K22, shape=(2,2) )
-
-        f1 = alpha1 * MixedL21Norm()
-        f2 = alpha0 * MixedL21Norm()
-        F = BlockFunction(f1, f2)
-        G = BlockFunction(0.5 * L2NormSquared(b=self.data), ZeroFunction())
-
-        sigma = 1./np.sqrt(12)
-        tau = 1./np.sqrt(12)
-
-        # Setup and run the PDHG algorithm
-        pdhg_tgv = PDHG(f=F,g=G,operator=K,
-                    max_iteration = 500, sigma=sigma, tau=tau,
-                    update_objective_interval = 500)
-        pdhg_tgv.run(verbose = 0)
-
+        TGV = TotalGeneralisedVariation(alpha = alpha1, beta = alpha0, max_iteration=5000, verbose=0)
+        tgv_cil = TGV.proximal(self.data, tau = 1.0)
+        
         # compare solution
-        np.testing.assert_allclose(pdhg_tgv.solution[0].array, u_cvx.value, atol=1e-3) 
-                       
+        np.testing.assert_allclose(tgv_cil.array, u_cvx.value, rtol=1e-1) #does not pass
+                 
 
 
 

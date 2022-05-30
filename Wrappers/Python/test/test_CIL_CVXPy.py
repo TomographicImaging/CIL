@@ -215,7 +215,7 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
             cil_objective = f(tv_cil) + TV(tv_cil)*(3)
             np.testing.assert_allclose(cil_objective, obj.value, atol=1e-3)    
 
-
+    @unittest.skipUnless(has_cvxpy, "CVXpy not installed")
     def tgv_cvxpy_regulariser(self, u, w1, w2, alpha1, alpha0, boundaries = "Neumann"):
 
         G1 = self.sparse_gradient_matrix(u.shape, direction = 'forward', order = 1, boundaries = boundaries)  
@@ -228,7 +228,8 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
             alpha0 * cvxpy.sum(cvxpy.norm(cvxpy.vstack([ divX @ cvxpy.vec(w1), divY @ cvxpy.vec(w2), \
                                         0.5 * ( divX @ cvxpy.vec(w2) + divY @ cvxpy.vec(w1) ), \
                                         0.5 * ( divX @ cvxpy.vec(w2) + divY @ cvxpy.vec(w1) ) ]), 2, axis = 0  ) )           
-                                        
+
+    @unittest.skipUnless(has_cvxpy, "CVXpy not installed")                                    
     def test_cil_vs_cvxpy_total_generalised_variation(self):
         
         # solution
@@ -255,7 +256,9 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
         tgv_cil = TGV.proximal(self.data, tau = 1.0)
         
         # compare solution
-        np.testing.assert_allclose(tgv_cil.array, u_cvx.value, atol=1e-1) #does not pass
+        np.testing.assert_allclose(tgv_cil.array, u_cvx.value, atol=1e-1) 
+        np.testing.assert_allclose(TGV.pdhg.objective[-1], obj.value, atol=1e-2)   
+
                  
 
 

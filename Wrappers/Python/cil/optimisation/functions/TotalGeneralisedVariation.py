@@ -97,12 +97,13 @@ class TotalGeneralisedVariation(Function):
                  alpha1 = 1.0,
                  alpha0 = 2.0,
                  max_iteration = 100, 
+                 update_objective_interval = 50,
                  correlation = "Space",
                  backend = "c",
                  split = False,
                  verbose = 0, 
-                 warmstart=False,
-                 **kwargs):
+                 
+                 warmstart=False):
         
         super(TotalGeneralisedVariation, self).__init__(L = None)
 
@@ -124,7 +125,7 @@ class TotalGeneralisedVariation(Function):
         self.split = split
                         
         self.verbose = verbose
-        self.update_objective_interval = kwargs.get('update_objective_interval', self.iterations)
+        self.update_objective_interval = update_objective_interval
 
         # warm-start
         self.warmstart  = warmstart

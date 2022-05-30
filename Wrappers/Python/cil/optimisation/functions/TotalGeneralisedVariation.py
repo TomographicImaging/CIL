@@ -94,20 +94,21 @@ class TotalGeneralisedVariation(Function):
             
     def __init__(self,
                  reg_parameter=1.0,
-                 alpha = 1.0,
-                 beta = 2.0,
+                 alpha1 = 1.0,
+                 alpha0 = 2.0,
                  max_iteration = 100, 
                  correlation = "Space",
                  backend = "c",
                  split = False,
                  verbose = 0, 
+                 warmstart=False,
                  **kwargs):
         
         super(TotalGeneralisedVariation, self).__init__(L = None)
 
         # regularisation parameters for TGV
-        self.alpha = alpha
-        self.beta = beta
+        self.alpha1 = alpha1
+        self.alpha0 = alpha0
         self.reg_parameter = reg_parameter
                 
         # Iterations for PDHG_TGV
@@ -122,14 +123,13 @@ class TotalGeneralisedVariation(Function):
         # splitting Gradient
         self.split = split
                         
-        # parameters to set up PDHG algorithm
-        self.f1 = self.alpha * MixedL21Norm()
-        self.f2 = self.beta * MixedL21Norm()
-        self.f = BlockFunction(self.f1, self.f2)  
-        self.g2 = ZeroFunction()
-
         self.verbose = verbose
         self.update_objective_interval = kwargs.get('update_objective_interval', self.iterations)
+
+        # warm-start
+        self.warmstart  = warmstart
+        if self.warmstart:
+            self.hasstarted = False        
 
 
     def __call__(self, x):
@@ -143,6 +143,8 @@ class TotalGeneralisedVariation(Function):
             return tmp
 
     def _setup_solver(self, x, tau=1.0):
+
+        # tau_sqrt = np.sqrt(tau)
         
         if not hasattr(self, 'domain'):
             
@@ -162,22 +164,40 @@ class TotalGeneralisedVariation(Function):
             #    BlockOperator = [ Gradient      - Identity  ]
             #                    [ ZeroOperator   SymGradient] 
             self.operator = BlockOperator(self.Gradient, self.IdentityOperator, 
-                                               self.ZeroOperator, self.SymGradient, 
-                                               shape=(2,2))   
+                                          self.ZeroOperator,self.SymGradient,shape=(2,2)) 
 
-        if not all(hasattr(self, attr) for attr in ["g1", "g"]):
-            self.g1 = (0.5/tau)*L2NormSquared(b = x)
+        if not all(hasattr(self, attr) for attr in ["g"]):
+            self.g1 = 0.5*L2NormSquared(b = x)
+            self.g2 = ZeroFunction()               
             self.g = BlockFunction(self.g1, self.g2)
 
+
+        if not all(hasattr(self, attr) for attr in ["f"]):
+            # parameters to set up PDHG algorithm
+            self.f1 = tau*self.alpha1 * MixedL21Norm()
+            self.f2 = tau*self.alpha0 * MixedL21Norm()
+            self.f = BlockFunction(self.f1, self.f2)  
+         
+
+        if self.warmstart:     
+            if self.hasstarted:
+                tmp_initial = self.pdhg.solution
+            else:
+                tmp_initial = None
+                self.hasstarted = True 
+        else:
+            tmp_initial = None
+
         # setup PDHG                           
-        self.pdhg = PDHG(f = self.f, g=self.g, operator = self.operator,
-                   update_objective_interval = self.update_objective_interval,
-                   max_iteration = self.iterations) 
-        self.pdhg.run(verbose=self.verbose)                              
-        
+        self.pdhg = PDHG(initial = tmp_initial, f = self.f, g=self.g, operator = self.operator,
+                update_objective_interval = self.update_objective_interval,
+                max_iteration = self.iterations) 
+        self.pdhg.run(verbose=self.verbose) 
+
+                                     
     def proximal(self, x, tau = 1.0, out = None):
         
-        self._setup_solver(x, tau)        
+        self._setup_solver(x, tau)  
                     
         if out is None:
             return self.pdhg.solution[0]

@@ -209,9 +209,6 @@ class TGV(RegulariserFunction):
             self.alpha *= scalar
             return self
 
-        # f = TGV()
-        # f = alpha * f
-
     def check_input(self, input):
         if len(input.dimension_labels) == 2:
             self.LipshitzConstant = 12

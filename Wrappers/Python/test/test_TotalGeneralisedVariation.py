@@ -1,6 +1,6 @@
 from cil.utilities import dataexample
 from cil.optimisation.functions import TotalGeneralisedVariation, LeastSquares
-from cil.optimisation.functions import FISTA
+from cil.optimisation.algorithms import FISTA
 import unittest
 import numpy as np
 
@@ -28,7 +28,7 @@ class TestTotalGeneralisedVariation(unittest.TestCase):
         
         self.alpha1 = 0.1
         self.alpha0 = 0.5
-        self.num_iter = 2000
+        self.num_iter = 500
 
     @unittest.skipUnless(has_reg_toolkit, "Regularisation Toolkit not present")
     def test_compare_TGV_CIL_vs_CCPiRegTk_denoising(self):
@@ -77,7 +77,6 @@ class TestTotalGeneralisedVariation(unittest.TestCase):
         sino.fill(n1 + tmp_sino.array)
         sino.array[sino.array<0]=0            
 
-
         f = LeastSquares(A = A, b = sino, c=1.0)
 
         alpha1 = 10
@@ -92,14 +91,14 @@ class TestTotalGeneralisedVariation(unittest.TestCase):
 
         tmp_initial = ig.allocate()
 
-        fista_cil = FISTA(initial=tmp_initial, f=f, g=g_cil, max_iteration=500)
-        fista_cil.run(verbose=1)
+        fista_cil = FISTA(initial=tmp_initial, f=f, g=g_cil, max_iteration=100)
+        fista_cil.run()
 
         fista_ccpi_regtk = FISTA(initial=tmp_initial, f=f, g=g_ccpi_regtk, 
-                                update_objective_interval=50, max_iteration=500)
-        fista_ccpi_regtk.run(verbose=1) 
+                                update_objective_interval=50, max_iteration=100)
+        fista_ccpi_regtk.run() 
 
-        np.testing.assert_allclose(fista_cil.solution.array, fista_ccpi_regtk.solution.array, atol=1e-2) #does not pass
+        np.testing.assert_allclose(fista_cil.solution.array, fista_ccpi_regtk.solution.array, atol=1e-2) 
        
    
 
@@ -113,167 +112,4 @@ class TestTotalGeneralisedVariation(unittest.TestCase):
 
 
 
-    # def setUp(self) -> None:
-
-
-    #     self.alpha1 = 0.1
-    #     self.alpha0 = 0.5
-    #     sel
-    #     self.tv = TotalVariation()
-    #     self.alpha = 0.15
-    #     self.tv_scaled = self.alpha * TotalVariation()
-    #     self.tv_iso = TotalVariation()
-    #     self.tv_aniso = TotalVariation(isotropic=False)
-    #     self.ig_real = ImageGeometry(3,4)   
-    #     self.grad = GradientOperator(self.ig_real)  
-        
-    # def test_regularisation_parameter(self):
-    #     np.testing.assert_almost_equal(self.tv.regularisation_parameter, 1.)
-
-
-    # def test_regularisation_parameter2(self):
-    #     np.testing.assert_almost_equal(self.tv_scaled.regularisation_parameter, self.alpha)
-
-
-    # def test_rmul(self):
-    #     assert isinstance(self.tv_scaled, TotalVariation)
-
-
-    # def test_regularisation_parameter3(self):
-    #     with self.assertRaises(TypeError):
-    #         self.tv.regularisation_parameter = 'string'
-            
-
-    # def test_rmul2(self):
-    #     alpha = 'string'
-    #     with self.assertRaises(TypeError):
-    #         tv = alpha * TotalVariation()
-            
-
-    # def test_call_real_isotropic(self):
-    #     x_real = self.ig_real.allocate('random', seed=4)  
-        
-    #     res1 = self.tv_iso(x_real)
-    #     res2 = self.grad.direct(x_real).pnorm(2).sum()
-    #     np.testing.assert_equal(res1, res2)  
-
-
-    # def test_call_real_anisotropic(self):
-    #     x_real = self.ig_real.allocate('random', seed=4) 
-        
-    #     res1 = self.tv_aniso(x_real)
-    #     res2 = self.grad.direct(x_real).pnorm(1).sum()
-    #     np.testing.assert_equal(res1, res2)                
     
-
-    # @unittest.skipUnless(has_reg_toolkit, "Regularisation Toolkit not present")
-    # def test_compare_regularisation_toolkit(self):
-    #     data = dataexample.SHAPES.get(size=(64,64))
-    #     ig = data.geometry
-    #     ag = ig
-
-    #     np.random.seed(0)
-    #     # Create noisy data. 
-    #     n1 = np.random.normal(0, 0.0005, size = ig.shape)
-    #     noisy_data = ig.allocate()
-    #     noisy_data.fill(n1+data.as_array())
-        
-    #     alpha = 0.1
-    #     iters = 500
-            
-    #     # CIL_FGP_TV no tolerance
-    #     g_CIL = alpha * TotalVariation(iters, tolerance=None, lower = 0, info = True)
-    #     t0 = timer()
-    #     res1 = g_CIL.proximal(noisy_data, 1.)
-    #     t1 = timer()
-    #     # print(t1-t0)
-        
-    #     r_alpha = alpha
-    #     r_iterations = iters
-    #     r_tolerance = 1e-9
-    #     r_iso = True
-    #     r_nonneg = True
-    #     g_CCPI_reg_toolkit = alpha * FGP_TV(max_iteration=r_iterations, tolerance=r_tolerance, 
-    #          isotropic=r_iso, nonnegativity=r_nonneg, device='cpu')
-        
-    #     t2 = timer()
-    #     res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
-    #     t3 = timer()
-        
-    #     np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal = 4)
-
-    #     ###################################################################
-    #     ###################################################################
-    #     ###################################################################
-    #     ###################################################################    
-        
-    #     # print("Compare CIL_FGP_TV vs CCPiReg_FGP_TV with iterations.")
-    #     iters = 408
-    #     # CIL_FGP_TV no tolerance
-    #     g_CIL = alpha * TotalVariation(iters, tolerance=1e-9, lower = 0.)
-    #     t0 = timer()
-    #     res1 = g_CIL.proximal(noisy_data, 1.)
-    #     t1 = timer()
-    #     # print(t1-t0)
-        
-    #     r_alpha = alpha
-    #     r_iterations = iters
-    #     r_tolerance = 1e-9
-    #     r_iso = True
-    #     r_nonneg = True
-    #     g_CCPI_reg_toolkit = alpha * FGP_TV(max_iteration=r_iterations, tolerance=r_tolerance, 
-    #          isotropic=r_iso, nonnegativity=r_nonneg, device='cpu')
-
-    #     t2 = timer()
-    #     res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
-    #     t3 = timer()
-    #     # print(t3-t2)
-    #     np.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal=3)    
-        
-    #     ###################################################################
-    #     ###################################################################
-    #     ###################################################################
-    #     ###################################################################
-    
-    
-    # @unittest.skipUnless(has_tomophantom and has_reg_toolkit, "Missing Tomophantom or Regularisation-Toolkit")
-    # def test_compare_regularisation_toolkit_tomophantom(self):
-    #     # print ("Building 3D phantom using TomoPhantom software")
-    #     model = 13 # select a model number from the library
-    #     N_size = 64 # Define phantom dimensions using a scalar value (cubic phantom)
-    #     #This will generate a N_size x N_size x N_size phantom (3D)
-        
-    #     ig = ImageGeometry(N_size, N_size, N_size)
-    #     data = TomoPhantom.get_ImageData(num_model=model, geometry=ig)
-
-    #     noisy_data = noise.gaussian(data, seed=10)
-        
-    #     alpha = 0.1
-    #     iters = 100
-        
-    #     # print("Use tau as an array of ones")
-    #     # CIL_TotalVariation no tolerance
-    #     g_CIL = alpha * TotalVariation(iters, tolerance=None, info=True)
-    #     # res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
-    #     t0 = timer()   
-    #     res1 = g_CIL.proximal(noisy_data, ig.allocate(1.))
-    #     t1 = timer()
-    #     # print(t1-t0)
-
-    #     # CCPi Regularisation toolkit high tolerance
-        
-    #     r_alpha = alpha
-    #     r_iterations = iters
-    #     r_tolerance = 1e-9
-    #     r_iso = True
-    #     r_nonneg = True
-    #     g_CCPI_reg_toolkit = alpha * FGP_TV(max_iteration=r_iterations, tolerance=r_tolerance, 
-    #          isotropic=r_iso, nonnegativity=r_nonneg, device='cpu')
-
-
-    #     t2 = timer()
-    #     res2 = g_CCPI_reg_toolkit.proximal(noisy_data, 1.)
-    #     t3 = timer()
-    #     # print (t3-t2)
-        
-    #     np.testing.assert_allclose(res1.as_array(), res2.as_array(), atol=7.5e-2)

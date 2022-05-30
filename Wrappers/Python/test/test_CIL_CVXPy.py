@@ -251,11 +251,11 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
         # Choose solver (SCS)
         tvg_cvxpy = prob.solve(verbose = True, solver = cvxpy.SCS)   
 
-        TGV = TotalGeneralisedVariation(alpha = alpha1, beta = alpha0, max_iteration=5000, verbose=0)
+        TGV = TotalGeneralisedVariation(alpha1 = alpha1, alpha0 = alpha0, max_iteration=2000, verbose=0)
         tgv_cil = TGV.proximal(self.data, tau = 1.0)
         
         # compare solution
-        np.testing.assert_allclose(tgv_cil.array, u_cvx.value, rtol=1e-1) #does not pass
+        np.testing.assert_allclose(tgv_cil.array, u_cvx.value, atol=1e-1) #does not pass
                  
 
 

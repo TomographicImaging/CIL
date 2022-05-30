@@ -83,9 +83,9 @@ class TotalGeneralisedVariation(Function):
         .. math:: \mathrm{prox}_{\tau\mathrm{TGV}_{\alpha, \beta}}(b) = \underset{u}{\mathrm{argmin}} \frac{1}{2\tau}\|u - b\|^{2} + \mathrm{TGV}_{\alpha, \beta}(u) 
 
 
-        >>> alpha = 1.0
-        >>> beta = 2.0
-        >>> TGV = TotalGeneralisedVariation(alpha = alpha, beta = beta)
+        >>> alpha1 = 1.0
+        >>> alpha0 = 2.0
+        >>> TGV = TotalGeneralisedVariation(alpha1 = alpha1, alpha0 = alpha0)
         >>> sol = TGV.proximal(b, tau = 1.0)
 
 
@@ -101,8 +101,7 @@ class TotalGeneralisedVariation(Function):
                  correlation = "Space",
                  backend = "c",
                  split = False,
-                 verbose = 0, 
-                 
+                 verbose = 0,                  
                  warmstart=False):
         
         super(TotalGeneralisedVariation, self).__init__(L = None)
@@ -138,7 +137,7 @@ class TotalGeneralisedVariation(Function):
         if not hasattr(self, 'pdhg'):   
             return 0.0        
         else:              
-            # Compute alpha * || Du - w || + beta * ||Ew||, 
+            # Compute alpha1 * || Du - w || + alpha0 * ||Ew||, 
             # where (u,w) are solutions coming from the proximal method below.
             tmp = self.f(self.pdhg.operator.direct(self.pdhg.solution))
             return tmp
@@ -179,7 +178,6 @@ class TotalGeneralisedVariation(Function):
             self.f2 = tau*self.alpha0 * MixedL21Norm()
             self.f = BlockFunction(self.f1, self.f2)  
          
-
         if self.warmstart:     
             if self.hasstarted:
                 tmp_initial = self.pdhg.solution

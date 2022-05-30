@@ -257,7 +257,7 @@ class Test_CIL_vs_CVXPy(unittest.TestCase):
         
         # compare solution
         np.testing.assert_allclose(tgv_cil.array, u_cvx.value, atol=1e-1) 
-        np.testing.assert_allclose(TGV.pdhg.objective[-1], obj.value, atol=1e-2)   
+        np.testing.assert_allclose(TGV.pdhg.objective[-1], obj.value, atol=1e-1)   
 
                  
 

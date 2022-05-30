@@ -1,19 +1,19 @@
-# -*- coding: utf-8 -*-
-#   This work is part of the Core Imaging Library (CIL) developed by CCPi 
-#   (Collaborative Computational Project in Tomographic Imaging), with 
-#   substantial contributions by UKRI-STFC and University of Manchester.
+# Copyright 2022 United Kingdom Research and Innovation
+# Copyright 2022 The University of Manchester
 
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 
-#   http://www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
 
 import unittest
 import numpy as np
@@ -87,14 +87,14 @@ class TestPlugin(unittest.TestCase):
 
     @unittest.skipUnless(has_regularisation_toolkit, "Skipping as CCPi Regularisation Toolkit is not installed")
     def test_FGP_TV_complex(self):
-        data = dataexample.CAMERA.get(size=(256,256))
-        datarr = data.as_array()
-        cmpx = np.zeros(data.shape, dtype=np.complex)
+ 
+        datarr = self.data.as_array()
+        cmpx = np.zeros(self.data.shape, dtype=np.complex)
         cmpx.real = datarr[:]
         cmpx.imag = datarr[:]
-        data.array = cmpx
+        self.data.array = cmpx
         reg = FGP_TV()
-        out = reg.proximal(data, 1)
+        out = reg.proximal(self.data, 1)
         outarr = out.as_array()
         np.testing.assert_almost_equal(outarr.imag, outarr.real)
 
@@ -135,22 +135,22 @@ class TestPlugin(unittest.TestCase):
     @unittest.skipUnless(has_regularisation_toolkit, "Skipping as CCPi Regularisation Toolkit is not installed")
     def test_FGP_dTV_rmul(self):
         from cil.plugins.ccpi_regularisation.functions import FGP_dTV
-        data = dataexample.CAMERA.get(size=(256,256))
-        f = FGP_dTV(data)
+
+        f = FGP_dTV(self.data)
 
         self.rmul_test(f)
         
 
     @unittest.skipUnless(has_regularisation_toolkit, "Skipping as CCPi Regularisation Toolkit is not installed")
     def test_functionality_FGP_TV(self):
-        data = dataexample.CAMERA.get(size=(256,256))
-        datarr = data.as_array()
+
+        datarr = self.data.as_array()
         from cil.plugins.ccpi_regularisation.functions import FGP_TV
         from ccpi.filters import regularisers
 
         tau = 1.
         fcil = FGP_TV()
-        outcil = fcil.proximal(data, tau=tau)
+        outcil = fcil.proximal(self.data, tau=tau)
         # use CIL defaults
         outrgl, info = regularisers.FGP_TV(datarr, fcil.alpha*tau, fcil.max_iteration, fcil.tolerance, 0, 1, 'cpu' )
         np.testing.assert_almost_equal(outrgl, outcil.as_array())
@@ -158,16 +158,19 @@ class TestPlugin(unittest.TestCase):
 
     @unittest.skipUnless(has_regularisation_toolkit, "Skipping as CCPi Regularisation Toolkit is not installed")
     def test_functionality_TGV(self):
-        data = dataexample.CAMERA.get(size=(256,256))
-        datarr = data.as_array()
+
+        
         from cil.plugins.ccpi_regularisation.functions import TGV
         from ccpi.filters import regularisers
 
         tau = 1.
+        # default params: alpha1 = 1.0, alpha0 = 2.0, iter=100
         fcil = TGV()
-        outcil = fcil.proximal(data, tau=tau)
+        outcil = fcil.proximal(self.data, tau=tau)
         # use CIL defaults
-        outrgl, info = regularisers.TGV(datarr, fcil.alpha*tau, 1,1, fcil.max_iteration, 12, fcil.tolerance, 'cpu' )
+        datarr = self.data.as_array()
+        # default params: data, alpha, alpha1, alpha0, iters, lipschitz, tolerance, device
+        outrgl, info = regularisers.TGV(datarr, 1.0, 1.0, 2.0, 100, 12.0, 0, 'cpu')
 
         np.testing.assert_almost_equal(outrgl, outcil.as_array())
 

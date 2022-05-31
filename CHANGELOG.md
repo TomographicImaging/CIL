@@ -1,4 +1,5 @@
 * 21.4.1
+ - Strong convexity functionality in TotalVariation and FGP_TV
  - Removed prints from unittests and cleanup of unittest code.
  - CMake: 
    - install script re-allows selection of non default install directory ([#1246](https://github.com/TomographicImaging/CIL/issues/1246))

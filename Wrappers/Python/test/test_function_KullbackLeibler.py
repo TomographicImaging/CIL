@@ -25,11 +25,11 @@ class Test_KL_Function(unittest.TestCase):
     def setUp(self):
         
         M, N, K =  2, 3, 4
-        ig = ImageGeometry(N, M, K)
+        self.ig = ImageGeometry(N, M, K)
         
-        self.u1 = ig.allocate('random', seed = 500)    
-        self.g1 = ig.allocate('random', seed = 100)
-        self.b1 = ig.allocate('random', seed = 1000)
+        self.u1 = self.ig.allocate('random', seed = 500)    
+        self.g1 = self.ig.allocate('random', seed = 100)
+        self.b1 = self.ig.allocate('random', seed = 1000)
 
         self.f = KullbackLeibler(b = self.g1, backend='numpy')  
         self.f1 = KullbackLeibler(b = self.g1, eta = self.b1,  backend='numpy') 
@@ -57,41 +57,64 @@ class Test_KL_Function(unittest.TestCase):
 
     def test_gradient_method(self): 
 
+        # without eta
         res1 = self.f.gradient(self.u1)
         res2 = self.u1.geometry.allocate()
         self.f.gradient(self.u1, out = res2) 
-        numpy.testing.assert_allclose(res1.as_array(), res2.as_array())        
+        numpy.testing.assert_allclose(res1.as_array(), res2.as_array())  
+
+        # with eta
+        res1 = self.f1.gradient(self.u1)
+        res2 = self.u1.geometry.allocate()
+        self.f1.gradient(self.u1, out = res2) 
+        numpy.testing.assert_allclose(res1.as_array(), res2.as_array())   
 
     def test_proximal_method(self):
 
+        # without eta
         res1 = self.f.proximal(self.u1, self.tau)
         res2 = self.u1.geometry.allocate()   
         self.f.proximal(self.u1, self.tau, out = res2)
         numpy.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal=4)  
 
+        # with eta
+        res1 = self.f1.proximal(self.u1, self.tau)
+        res2 = self.u1.geometry.allocate()   
+        self.f1.proximal(self.u1, self.tau, out = res2)
+        numpy.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal=4)          
+
     def test_proximal_conjugate_method(self):
 
+        # without eta
         res1 = self.f.proximal_conjugate(self.u1, self.tau)
         res2 = self.u1.geometry.allocate()   
         self.f.proximal_conjugate(self.u1, self.tau, out = res2)
         numpy.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal=4)  
 
+        # with eta
+        res1 = self.f1.proximal_conjugate(self.u1, self.tau)
+        res2 = self.u1.geometry.allocate()   
+        self.f1.proximal_conjugate(self.u1, self.tau, out = res2)
+        numpy.testing.assert_array_almost_equal(res1.as_array(), res2.as_array(), decimal=4)          
+
     def test_convex_conjugate_method(self):
 
-        pass
+        # with eta
+        tmp = 1 - self.u1.as_array()
+        ind = tmp>0
+        xlogy = - scipy.special.xlogy(self.f1.b.as_array()[ind], tmp[ind])          
+        res1 = numpy.sum(xlogy) - self.f1.eta.dot(self.u1)                
+        res2 = self.f1.convex_conjugate(self.u1)  
+        numpy.testing.assert_equal(res1, res2)   
+
+        # without eta
+        tmp = 1 - self.u1.as_array()
+        ind = tmp>0
+        xlogy = - scipy.special.xlogy(self.f.b.as_array()[ind], tmp[ind])          
+        res1 = numpy.sum(xlogy) - self.f.eta.dot(self.u1)                
+        res2 = self.f.convex_conjugate(self.u1)  
+        numpy.testing.assert_equal(res1, res2)                  
+               
 
     def test_call_method_numba(self):
         pass
-
-
-        
-#         u2 = u1 * 0 + 2.
-#         self.assertNumpyArrayAlmostEqual(0.0, f.convex_conjugate(u2))   
-#         eta = b1
-        
-      
-        
-#         res_proximal_conj_out = u1.geometry.allocate()
-#         proxc = f.proximal_conjugate(u1,tau)
-#         f.proximal_conjugate(u1, tau, out=res_proximal_conj_out)
-#         numpy.testing.assert_array_almost_equal(proxc.as_array(), res_proximal_conj_out.as_array())

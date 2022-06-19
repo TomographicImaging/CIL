@@ -299,7 +299,6 @@ class KullbackLeibler(Function):
         To avoid infinity values, we consider only pixels/voxels for :math:`x+\eta\geq0`.
         """
         if self.use_numba and has_numba:
-            # tmp = numpy.empty_like(x.as_array())
             if self.mask is not None:
                 return kl_div_mask(self.b_np, x.as_array(), self.eta_np, self.mask)
             return kl_div(self.b_np, x.as_array(), self.eta_np)
@@ -309,12 +308,6 @@ class KullbackLeibler(Function):
             tmp = scipy.special.kl_div(self.b.as_array()[ind], tmp_sum[ind])             
             return numpy.sum(tmp)         
         
-    def log(self, datacontainer):
-        '''calculates the in-place log of the datacontainer'''
-        if not functools.reduce(lambda x,y: x and y>0, datacontainer.as_array().ravel(), True):
-            raise ValueError('KullbackLeibler. Cannot calculate log of negative number')
-        datacontainer.fill( numpy.log(datacontainer.as_array()) )
-
         
     def gradient(self, x, out=None):
         

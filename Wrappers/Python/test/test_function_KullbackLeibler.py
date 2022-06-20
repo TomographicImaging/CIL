@@ -19,7 +19,6 @@ from cil.framework import ImageGeometry
 import numpy
 import scipy
 
-
 class Test_KL_Function(unittest.TestCase):
     
     def setUp(self):
@@ -38,7 +37,7 @@ class Test_KL_Function(unittest.TestCase):
     def test_signature(self):
 
         # with no data
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             f = KullbackLeibler()   
             
         with self.assertRaises(ValueError):        
@@ -115,6 +114,3 @@ class Test_KL_Function(unittest.TestCase):
         res2 = self.f.convex_conjugate(self.u1)  
         numpy.testing.assert_equal(res1, res2)                  
                
-
-    def test_call_method_numba(self):
-        pass

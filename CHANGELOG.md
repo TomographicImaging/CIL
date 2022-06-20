@@ -1,3 +1,9 @@
+* 22.0.0
+ - Merged CIL-ASTRA code in to CIL repository simplifying test, build and install procedures
+   - Modules not moved should be considered deprecated
+   - CIL remains licenced as APACHE-2
+   - Minor bug fixes to the CPU 2D Parallel-beam FBP
+
 * 21.4.1
  - Removed prints from unittests and cleanup of unittest code.
  - CMake: 

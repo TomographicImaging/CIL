@@ -86,7 +86,7 @@ class TestAstraConeBeamProjectors(unittest.TestCase):
         self.golden_data_cs = self.golden_data.subset(vertical=self.cs_ind, force=True)
 
 
-    @unittest.skipUnless(has_astra, "Requires ASTRA")
+    @unittest.skipUnless(has_astra_gpu, "Requires ASTRA GPU")
     def test_consistency(self):
     
         # #%% AstraProjector2D cpu

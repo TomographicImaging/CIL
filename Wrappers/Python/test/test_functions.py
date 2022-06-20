@@ -439,7 +439,7 @@ class TestFunction(CCPiTestClass):
         b1 = ig.allocate('random', seed = 1000)
         
         # with no data
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             f = KullbackLeibler()   
             
         with self.assertRaises(ValueError):        

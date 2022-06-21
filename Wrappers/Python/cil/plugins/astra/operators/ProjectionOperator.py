@@ -49,7 +49,7 @@ class ProjectionOperator(LinearOperator):
 
     Notes
     -----
-    For multichannel data the ProjectionOperator will broadcast accross all channels.
+    For multichannel data the ProjectionOperator will broadcast across all channels.
     """
 
     def __init__(self, image_geometry, acquisition_geometry, device='gpu'):

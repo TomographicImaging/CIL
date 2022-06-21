@@ -24,7 +24,7 @@ import numpy as np
 class FDK_Flexible(DataProcessor):
 
     '''FDK_Flexible Filtered Back Projection is a reconstructor for 2D and 3D cone-beam geometries.
-    It is able to back-project circular trajectories with 2 PI anglar range and equally spaced anglular steps.
+    It is able to back-project circular trajectories with 2 PI angular range and equally spaced anglular steps.
 
     This uses the ram-lak filter
     This is a GPU version only

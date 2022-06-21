@@ -25,7 +25,7 @@ import numpy as np
 class FBP_Flexible(FDK_Flexible):
 
     '''FBP_Flexible Filtered Back Projection is a reconstructor for 2D and 3D parallel-beam geometries.
-    It is able to back-project circular trajectories with 2 PI anglar range and equally spaced anglular steps.
+    It is able to back-project circular trajectories with 2 PI anuglar range and equally spaced anglular steps.
 
     This uses the ram-lak filter
     This is a GPU version only
@@ -85,7 +85,7 @@ class FBP_Flexible(FDK_Flexible):
 class FBP_CPU(Processor):
 
     '''FBP_CPU Filtered Back Projection is a reconstructor for 2D parallel-beam geometries.
-    It is able to back-project circular trajectories with equally spaced anglular steps.
+    It is able to back-project circular trajectories with equally spaced angular steps.
 
     This uses the ram-lak filter
     This is a CPU version only

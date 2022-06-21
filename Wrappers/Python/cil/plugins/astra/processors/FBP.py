@@ -25,7 +25,7 @@ class FBP(DataProcessor):
     """
     FBP configures and calls an appropriate ASTRA FBP or FDK algorithm for your dataset.
 
-    The best results will be on data with circular trajectories of a 2PI anglar range and equally spaced small anglular steps.
+    The best results will be on data with circular trajectories of a 2PI angular range and equally spaced small anglular steps.
 
     Parameters
     ----------

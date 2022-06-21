@@ -1,15 +1,15 @@
 * 22.0.0
- - Merged CIL-ASTRA code in to CIL repository simplifying test, build and install procedures
-   - Modules not moved should be considered deprecated
-   - CIL remains licenced as APACHE-2
-   - Minor bug fixes to the CPU 2D Parallel-beam FBP
+  - Merged CIL-ASTRA code in to CIL repository simplifying test, build and install procedures
+    - Modules not moved should be considered deprecated
+    - CIL remains licenced as APACHE-2.0
+    - Minor bug fixes to the CPU 2D Parallel-beam FBP
 
 * 21.4.1
- - Removed prints from unittests and cleanup of unittest code.
- - CMake: 
-   - install script re-allows selection of non default install directory ([#1246](https://github.com/TomographicImaging/CIL/issues/1246))
- - TIFF writer uses logging
- - Added unittests for TIFF functionality
+  - Removed prints from unittests and cleanup of unittest code.
+  - CMake: 
+    - install script re-allows selection of non default install directory ([#1246](https://github.com/TomographicImaging/CIL/issues/1246))
+  - TIFF writer uses logging
+  - Added unittests for TIFF functionality
 
 * 21.4.0
   - PEP 440 compliant version

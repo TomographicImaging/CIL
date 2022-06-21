@@ -117,7 +117,7 @@ class Test_Parallel3D_Projectors_GPU_toy(unittest.TestCase, TestCommon_Projectio
     def setUp(self):
         setup_parameters(self)
         self.Parallel3D()
-        self.tolerance_linearity = 1e-10
+        self.tolerance_linearity = 1e-7
         self.tolerance_norm = 1e-6
 
 

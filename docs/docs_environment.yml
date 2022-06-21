@@ -4,7 +4,7 @@ channels:
   - intel
   - ccpi
   - defaults
-  - astra-toolbox/label/dev
+  - astra-toolbox
 dependencies:
   - dxchange
   - python-wget
@@ -21,7 +21,7 @@ dependencies:
   - sphinx-autobuild=0.7
   - sphinx-click=2.7
   - sphinx-copybutton=0.3
-  - cil-astra
+  - astra-toolbox
   - ccpi-regulariser
   - tomophantom
   - ipywidgets

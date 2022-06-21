@@ -22,21 +22,40 @@ from cil.plugins.astra.processors.FBP_Flexible import FBP_CPU
 
 class FBP(DataProcessor):
 
-    '''FBP Filtered Back Projection is a reconstructor for 2D and 3D parallel and cone-beam geometries.
-    It is able to back-project circular trajectories with 2 PI anglar range and equally spaced anglular steps.
+    """
+    FBP configures and calls an appropriate ASTRA FBP or FDK algorithm for your dataset.
 
-    This uses the ram-lak filter
-    A CPU version is provided for simple 2D parallel-beam geometries only (offsets and rotations will be ignored)
-    
-    Input: Volume Geometry
-           Sinogram Geometry
-                             
-    Example:  fbp = FBP(ig, ag, device)
-              fbp.set_input(data)
-              reconstruction = fbp.get_ouput()
-                           
-    Output: ImageData                             
-    '''
+    The best results will be on data with circular trajectories of a 2PI anglar range and equally spaced small anglular steps.
+
+    Parameters
+    ----------
+    volume_geometry : ImageGeometry
+        A description of the area/volume to reconstruct
+
+    sinogram_geometry : AcquisitionGeometry
+        A description of the acquisition data
+
+    device : string, default='gpu'
+        'gpu' will run on a compatible CUDA capable device using the ASTRA FDK_CUDA algorithm
+        'cpu' will run on CPU using the ASTRA FBP algorithm - see Notes for limitations
+
+
+    Example
+    -------
+    >>> from cil.plugins.astra import FBP
+    >>> fbp = FBP(image_geometry, data.geometry)
+    >>> fbp.set_input(data)
+    >>> reconstruction = fbp.get_ouput()
+
+
+    Notes
+    -----
+    A CPU version is provided for simple 2D parallel-beam geometries only any offsets and rotations in the acquisition geometry will be ignored
+
+    This uses the ram-lak filter only.
+
+    """
+
     
     def __init__(self, volume_geometry, sinogram_geometry, device='gpu'): 
         
@@ -73,7 +92,7 @@ class FBP(DataProcessor):
     def get_input(self):       
         return self.processor.get_input()
 
-    def get_output(self, out=None):       
+    def get_output(self, out=None):
         return self.processor.get_output(out=out)
 
     def check_input(self, dataset):       

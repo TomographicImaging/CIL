@@ -21,15 +21,36 @@ from cil.plugins.astra.operators import AstraProjector3D
 from cil.plugins.astra.operators import AstraProjector2D
 
 class ProjectionOperator(LinearOperator):
-    r'''ProjectionOperator wraps ASTRA 3D Projector for GPU, and ASTRA 2D Projectors for CPU. Broadcasts the operator accross all channels.
-    
-    :param image_geometry: The CIL ImageGeometry object describing your reconstruction volume
-    :type image_geometry: ImageGeometry
-    :param acquisition_geometry: The CIL AcquisitionGeometry object describing your sinogram data
-    :type acquisition_geometry: AcquisitionGeometry
-    :param device: The device to run on 'gpu' or 'cpu'. 'gpu' will use the ASTRA 3D Projectors, 'cpu' will use the ASTRA 2D Projectors
-    :type device: string, default='gpu'
-    '''
+
+    """
+    ProjectionOperator configures and calls appropriate ASTRA Projectors for your dataset.
+
+
+    Parameters
+    ----------
+
+    image_geometry : ImageGeometry
+        A description of the area/volume to reconstruct
+
+    acquisition_geometry : AcquisitionGeometry
+        A description of the acquisition data
+
+    device : string, default='gpu'
+        'gpu' will run on a compatible CUDA capable device using the ASTRA 3D CUDA Projectors, 'cpu' will run on CPU using the ASTRA 2D CPU Projectors
+
+
+    Example
+    -------
+
+    >>> from cil.plugins.astra import ProjectionOperator
+    >>> PO = ProjectionOperator(image.geometry, data.geometry)
+    >>> foward_projection = PO.direct(image)
+    >>> backward_projection = PO.adjoint(data)
+
+    Notes
+    -----
+    For multichannel data the ProjectionOperator will broadcast accross all channels.
+    """
 
     def __init__(self, image_geometry, acquisition_geometry, device='gpu'):
         

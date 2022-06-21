@@ -67,11 +67,12 @@ Projection Operator
    :members:
    :special-members:
 
+
 ASTRA
 =====
 This plugin allows the use of `ASTRA-toolbox
 <https://github.com/astra-toolbox/astra-toolbox>`_ 
-(`10.1364/OE.24.025129 <http://dx.doi.org/10.1364/OE.24.025129>`_ 
+(`10.1364/OE.24.025129 <http://dx.doi.org/10.1364/OE.24.025129>`_) 
 for forward and back projections and filter back projection reconstruction. 
 
 

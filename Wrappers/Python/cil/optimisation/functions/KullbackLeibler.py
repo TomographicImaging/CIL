@@ -29,7 +29,7 @@ except ImportError as ie:
 
 class KullbackLeibler(Function):
 
-    r""" Kullback Leibler divergence function is defined as:
+    r""" Kullback Leibler
             
     .. math:: F(u, v)
             = \begin{cases} 
@@ -37,31 +37,56 @@ class KullbackLeibler(Function):
             v & \mbox{ if } u = 0, v \ge 0 \\
             \infty, & \mbox{otherwise}
             \end{cases}  
-            
-    where we use the :math:`0\log0 := 0` convention. 
 
-    At the moment, we use build-in implemention of scipy, see
-    https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.kl_div.html
+    where the :math:`0\log0 := 0` convention is used.  
+              
+    **kwargs
+        b : DataContainer, non-negative      
+            Translates the function at point :code:`b`.
+        mask : DataContainer, default = None
+               Mask for the data :code:`b`
+        eta : DataContainer, default = array of zeros
+              Background noise
+
+    Raises
+    ------
+    ValueError
+        If :code:`b` is None.
+    ValueError
+        If :code:`b` is not None and has negative values.        
+                                            
     
-    The Kullback-Leibler function is used as a fidelity term in minimisation problems where the
-    acquired data follow Poisson distribution. If we denote the acquired data with :math:`b`
+    Note
+    ----
+    The Kullback-Leibler function is used in practice as a fidelity term in minimisation problems where the
+    acquired data follow Poisson distribution. If we denote the acquired data with :code:`b`
     then, we write
     
-     .. math:: \underset{i}{\sum} F(b_{i}, (v + \eta)_{i})
-     
-     where, :math:`\eta` is an additional noise. 
-     
-     Example: In the case of Positron Emission Tomography reconstruction :math:`\eta` represents 
-     scatter and random events contribution during the PET acquisition. Hence, in that case the KullbackLeibler
-     fidelity measures the distance between :math:`\mathcal{A}v + \eta` and acquisition data :math:`b`, where
-     :math:`\mathcal{A}` is the projection operator.
-     
-     This is related to PoissonLogLikelihoodWithLinearModelForMean definition that is used in PET reconstruction
-     in the PET-MR software , see https://github.com/CCPPETMR and for more details in
+    .. math:: \underset{i}{\sum} F(b_{i}, (v + \eta)_{i})
     
-    http://stir.sourceforge.net/documentation/doxy/html/classstir_1_1PoissonLogLikelihoodWithLinearModelForMean.html
+    where, :math:`\eta` is an additional noise. 
+    
+    In the case of Positron Emission Tomography reconstruction :math:`\eta` represents 
+    scatter and random events contribution during the PET acquisition. Hence, in that case the KullbackLeibler
+    fidelity measures the distance between :math:`\mathcal{A}v + \eta` and acquisition data :math:`b`, where
+    :math:`\mathcal{A}` is the projection operator. This is related to `PoissonLogLikelihoodWithLinearModelForMean <http://stir.sourceforge.net/documentation/doxy/html/classstir_1_1PoissonLogLikelihoodWithLinearModelForMean.html>`_ ,
+    definition that is used in PET reconstruction in the `SIRF <https://github.com/SyneRBI/SIRF>`_ software.
+    
+       
+    Note
+    ----
+    The default implementation uses the build-in function `kl_div <https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.kl_div.html>`_ from scipy.
+    The methods of the :class:`.KullbackLeibler` are accelerated provided that `numba <https://numba.pydata.org/>`_ library is installed.
+           
+    Examples
+    --------
+    >>> from cil.optimisation.functions import KullbackLeibler 
+    >>> from cil.framework import ImageGeometry   
+    >>> ig = ImageGeometry(3,4)
+    >>> data = ig.allocate('random')
+    >>> F = KullbackLeibler(b = data)
                         
-    """      
+    """     
 
     def __new__(cls, **kwargs):
 
@@ -103,12 +128,29 @@ class KullbackLeibler_numpy(KullbackLeibler):
        
     def __call__(self, x):
 
+        r"""Returns the value of the KullbackLeibler function at :math:`(b, x + \eta)`.
+
+        Note
+        ----
+        To avoid infinity values, we consider only pixels/voxels for :math:`x+\eta\geq0`.
+        """
+
         tmp_sum = (x + self.eta).as_array()
         ind = tmp_sum >= 0
         tmp = scipy.special.kl_div(self.b.as_array()[ind], tmp_sum[ind])             
         return numpy.sum(tmp) 
 
     def gradient(self, x, out = None):
+
+        r"""Returns the value of the gradient of the KullbackLeibler function at :math:`(b, x + \eta)`.                
+        
+        :math:`F'(b, x + \eta) = 1 - \frac{b}{x+\eta}`
+        
+        Note
+        ----
+        To avoid inf values, we :math:`x+\eta>0` is required. 
+        
+        """         
 
         tmp_sum_array = (x + self.eta).as_array()
         if out is None:   
@@ -123,12 +165,24 @@ class KullbackLeibler_numpy(KullbackLeibler):
 
     def convex_conjugate(self, x):
 
+        r"""Returns the value of the convex conjugate of the KullbackLeibler function at :math:`(b, x + \eta)`.                
+        
+        :math:`F^{*}(b, x + \eta) = - b \log(1-x^{*}) - <x^{*}, \eta>`
+        
+        """          
+
         tmp = 1 - x.as_array()
         ind = tmp>0
         xlogy = - scipy.special.xlogy(self.b.as_array()[ind], tmp[ind])  
         return numpy.sum(xlogy) - self.eta.dot(x)
 
     def proximal(self, x, tau, out = None):
+
+        r"""Returns the value of the proximal operator of the KullbackLeibler function at :math:`(b, x + \eta)`.
+        
+        :math:`\mathrm{prox}_{\tau F}(x) = \frac{1}{2}\bigg( (x - \eta - \tau) + \sqrt{ (x + \eta - \tau)^2 + 4\tau b} \bigg)`
+                            
+        """        
         
         if out is None:        
             return 0.5 *( (x - self.eta - tau) + \
@@ -147,6 +201,11 @@ class KullbackLeibler_numpy(KullbackLeibler):
 
 
     def proximal_conjugate(self, x, tau, out = None):
+
+        r"""Returns the value of the proximal operator of the convex conjugate of KullbackLeibler at :math:`(b, x + \eta)`.
+           
+        :math:`\mathrm{prox}_{\tau F^{*}}(x) = 0.5*((z + 1) - \sqrt{(z-1)^2 + 4 * \tau b})`, where :math:`z = x + \tau \eta`.
+        """        
         
         if out is None:
             z = x + tau * self.eta
@@ -165,7 +224,7 @@ class KullbackLeibler_numpy(KullbackLeibler):
             out += tmp
             out *= 0.5
 
-# KullbackLeibler numba routine
+# KullbackLeibler numba routines
 if has_numba:
     
     @jit(nopython=True)
@@ -372,17 +431,39 @@ class KullbackLeibler_numba(KullbackLeibler):
 
     def __call__(self, x):
 
+        r"""Returns the value of the KullbackLeibler function at :math:`(b, x + \eta)`.
+        Note
+        ----
+        To avoid infinity values, we consider only pixels/voxels for :math:`x+\eta\geq0`.
+        """        
+
         if self.mask is not None:
             return kl_div_mask(self.b_np, x.as_array(), self.eta_np, self.mask)
         return kl_div(self.b_np, x.as_array(), self.eta_np)
 
     def convex_conjugate(self, x):
 
+        r"""Returns the value of the convex conjugate of the KullbackLeibler function at :math:`(b, x + \eta)`.                
+        
+        :math:`F^{*}(b, x + \eta) = - b \log(1-x^{*}) - <x^{*}, \eta>`
+        
+        """          
+
         if self.mask is not None:
             return kl_convex_conjugate_mask(x.as_array(), self.b_np, self.eta_np, self.mask)
         return kl_convex_conjugate(x.as_array(), self.b_np, self.eta_np)
 
     def gradient(self, x, out = None):
+
+        r"""Returns the value of the gradient of the KullbackLeibler function at :math:`(b, x + \eta)`.                
+        
+        :math:`F'(b, x + \eta) = 1 - \frac{b}{x+\eta}`
+        
+        Note
+        ----
+        To avoid inf values, we :math:`x+\eta>0` is required. 
+        
+        """           
 
         if out is None:
             out = (x * 0.)
@@ -398,6 +479,12 @@ class KullbackLeibler_numba(KullbackLeibler):
             out.fill(out_np)
 
     def proximal(self, x, tau, out = None):
+
+        r"""Returns the value of the proximal operator of the KullbackLeibler function at :math:`(b, x + \eta)`.
+        
+        :math:`\mathrm{prox}_{\tau F}(x) = \frac{1}{2}\bigg( (x - \eta - \tau) + \sqrt{ (x + \eta - \tau)^2 + 4\tau b} \bigg)`
+                            
+        """        
         
         if out is None:
             out = (x * 0.)
@@ -438,6 +525,11 @@ class KullbackLeibler_numba(KullbackLeibler):
             out.fill(out_np)
 
     def proximal_conjugate(self, x, tau, out = None):
+
+        r"""Returns the value of the proximal operator of the convex conjugate of KullbackLeibler at :math:`(b, x + \eta)`.
+           
+        :math:`\mathrm{prox}_{\tau F^{*}}(x) = 0.5*((z + 1) - \sqrt{(z-1)^2 + 4 * \tau b})`, where :math:`z = x + \tau \eta`.
+        """        
 
         if out is None:
             out = (x * 0.)

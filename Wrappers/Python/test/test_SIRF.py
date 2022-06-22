@@ -23,7 +23,7 @@ import shutil
 import unittest
 from cil.framework import BlockDataContainer
 from cil.optimisation.operators import GradientOperator, LinearOperator
-from cil.optimisation.functions import TotalVariation, L2NormSquared
+from cil.optimisation.functions import TotalVariation, L2NormSquared, KullbackLeibler
 from cil.optimisation.algorithms import FISTA
 
 from testclass import CCPiTestClass
@@ -35,6 +35,82 @@ try:
     has_sirf = True
 except ImportError as ie:
     has_sirf = False
+
+class KullbackLeiblerSIRF(unittest.TestCase):
+
+    def setUp(self):
+
+        if has_sirf:
+            self.image1 = pet.ImageData(os.path.join(
+                examples_data_path('PET'),'thorax_single_slice','emission.hv')
+                )
+
+            #template = pet.AcquisitionData(os.path.join(
+            #                examples_data_path('PET'),'thorax_single_slice','template_sinogram.hs')
+            #                )   
+            #self.sinogram1 = template.get_uniform_copy(10.)
+            #self.eta = template.get_uniform_copy(1.) 
+            #self.x = self.sinogram1 + 1.0
+
+            self.sinogram1 = self.image1
+            self.x = self.image1 + 0.3
+            self.eta = self.image1 + 0.9                       
+
+        self.f_np = KullbackLeibler(b = self.image1, backend='numpy')  
+        self.f1_np = KullbackLeibler(b = self.image1, eta = self.eta,  backend='numpy') 
+        self.out_np = self.image1.get_uniform_copy(0.)
+        self.out_nb = self.image1.get_uniform_copy(0.)
+
+        self.f_nb = KullbackLeibler(b = self.image1, backend='numba')  
+        self.f1_nb = KullbackLeibler(b = self.image1, eta = self.eta,  backend='numba')         
+        self.out1_np = self.image1.get_uniform_copy(0.)
+        self.out1_nb = self.image1.get_uniform_copy(0.)
+
+        self.tau = 400.4      
+
+    def tearDown(self):
+        pass    
+
+    def test_KullbackLeibler_call(self):
+        np.testing.assert_almost_equal(self.f_np(self.x), self.f_nb(self.x), decimal = 2)
+        np.testing.assert_almost_equal(self.f1_np(self.x), self.f1_nb(self.x), decimal = 2)
+
+    def test_KullbackLeibler_gradient(self):
+
+        self.f_np.gradient(self.x, out = self.out_np)
+        self.f_nb.gradient(self.x, out = self.out_nb)
+        self.f1_np.gradient(self.x, out = self.out1_np)
+        self.f1_nb.gradient(self.x, out = self.out1_nb)        
+
+        np.testing.assert_array_almost_equal(self.out_np.as_array(), self.out_nb.as_array(), decimal = 2)
+        np.testing.assert_array_almost_equal(self.out1_np.as_array(), self.out1_nb.as_array(), decimal = 2)
+
+    def test_KullbackLeibler_convex_conjugate(self):
+
+        np.testing.assert_almost_equal(self.f_np.convex_conjugate(self.x), self.f_nb.convex_conjugate(self.x), decimal = 2)
+        np.testing.assert_almost_equal(self.f1_np.convex_conjugate(self.x), self.f1_nb.convex_conjugate(self.x), decimal = 2)
+
+    def test_KullbackLeibler_proximal(self):
+
+        self.f_np.proximal(self.x, self.tau, out = self.out_np)
+        self.f_nb.proximal(self.x, self.tau, out = self.out_nb)
+        self.f1_np.proximal(self.x, self.tau, out = self.out1_np)
+        self.f1_nb.proximal(self.x, self.tau, out = self.out1_nb)  
+
+
+        np.testing.assert_array_almost_equal(self.out_np.as_array(), self.out_nb.as_array(), decimal = 2)
+        np.testing.assert_array_almost_equal(self.out1_np.as_array(), self.out1_nb.as_array(), decimal = 2)
+
+    def test_KullbackLeibler_proximal_conjugate(self):
+
+        self.f_np.proximal_conjugate(self.x, self.tau, out = self.out_np)
+        self.f_nb.proximal_conjugate(self.x, self.tau, out = self.out_nb)
+        self.f1_np.proximal_conjugate(self.x, self.tau, out = self.out1_np)
+        self.f1_nb.proximal_conjugate(self.x, self.tau, out = self.out1_nb)  
+
+        np.testing.assert_array_almost_equal(self.out_np.as_array(), self.out_nb.as_array(), decimal = 2)
+        np.testing.assert_array_almost_equal(self.out1_np.as_array(), self.out1_nb.as_array(), decimal = 2)
+
 
 class GradientSIRF(object):
     

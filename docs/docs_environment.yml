@@ -26,4 +26,6 @@ dependencies:
   - tomophantom=1.4.10
   - ipywidgets
   - tqdm
+  - cil-data
+  
   

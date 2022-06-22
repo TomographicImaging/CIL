@@ -153,15 +153,18 @@ class KullbackLeibler_numpy(KullbackLeibler):
         """         
 
         tmp_sum_array = (x + self.eta).as_array()
+
         if out is None:   
-            tmp_out = x.geometry.allocate() 
+            tmp_out = x * 0.0
             tmp_out.as_array()[tmp_sum_array>0] = \
                 1 - self.b.as_array()[tmp_sum_array>0]/tmp_sum_array[tmp_sum_array>0]
             return tmp_out
         else:
             x.add(self.eta, out=out)
-            out.as_array()[tmp_sum_array>0] = \
-                1 - self.b.as_array()[tmp_sum_array>0]/tmp_sum_array[tmp_sum_array>0]
+            out_array = out.clone().as_array()
+            out_array[tmp_sum_array>0] = 1 - self.b.as_array()[tmp_sum_array>0]/tmp_sum_array[tmp_sum_array>0]
+            out.fill(out_array)
+
 
     def convex_conjugate(self, x):
 

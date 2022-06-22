@@ -176,7 +176,7 @@ class KullbackLeibler_numpy(KullbackLeibler):
 
         tmp = 1 - x.as_array()
         ind = tmp>0
-        xlogy = - scipy.special.xlogy(self.b.as_array()[ind], tmp[ind])  
+        xlogy = - scipy.special.xlogy(self.b.as_array()[ind], tmp[ind])
         return numpy.sum(xlogy) - self.eta.dot(x)
 
     def proximal(self, x, tau, out = None):

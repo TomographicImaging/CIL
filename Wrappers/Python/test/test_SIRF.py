@@ -45,9 +45,8 @@ class KullbackLeiblerSIRF(unittest.TestCase):
                 examples_data_path('PET'),'thorax_single_slice','emission.hv')
                 )
 
-            self.sinogram1 = self.image1
             self.x = self.image1 + 0.3
-            self.eta = self.image1 + 0.9                       
+            self.eta = self.image1 + 0.4                      
 
         self.f_np = KullbackLeibler(b = self.image1, backend='numpy')  
         self.f1_np = KullbackLeibler(b = self.image1, eta = self.eta,  backend='numpy') 
@@ -86,6 +85,7 @@ class KullbackLeiblerSIRF(unittest.TestCase):
     def test_KullbackLeibler_convex_conjugate(self):
 
         np.testing.assert_almost_equal(self.f_np.convex_conjugate(self.x), self.f_nb.convex_conjugate(self.x), decimal = 2)
+        
         np.testing.assert_almost_equal(self.f1_np.convex_conjugate(self.x), self.f1_nb.convex_conjugate(self.x), decimal = 2)
 
 

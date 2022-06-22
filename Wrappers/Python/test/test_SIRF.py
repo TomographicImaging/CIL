@@ -45,13 +45,6 @@ class KullbackLeiblerSIRF(unittest.TestCase):
                 examples_data_path('PET'),'thorax_single_slice','emission.hv')
                 )
 
-            #template = pet.AcquisitionData(os.path.join(
-            #                examples_data_path('PET'),'thorax_single_slice','template_sinogram.hs')
-            #                )   
-            #self.sinogram1 = template.get_uniform_copy(10.)
-            #self.eta = template.get_uniform_copy(1.) 
-            #self.x = self.sinogram1 + 1.0
-
             self.sinogram1 = self.image1
             self.x = self.image1 + 0.3
             self.eta = self.image1 + 0.9                       
@@ -69,12 +62,15 @@ class KullbackLeiblerSIRF(unittest.TestCase):
         self.tau = 400.4      
 
     def tearDown(self):
-        pass    
-
+        pass
+    
+    @unittest.skipUnless(has_sirf, "Skipping as SIRF is not available")
     def test_KullbackLeibler_call(self):
         np.testing.assert_almost_equal(self.f_np(self.x), self.f_nb(self.x), decimal = 2)
         np.testing.assert_almost_equal(self.f1_np(self.x), self.f1_nb(self.x), decimal = 2)
 
+
+    @unittest.skipUnless(has_sirf, "Skipping as SIRF is not available")
     def test_KullbackLeibler_gradient(self):
 
         self.f_np.gradient(self.x, out = self.out_np)
@@ -85,11 +81,15 @@ class KullbackLeiblerSIRF(unittest.TestCase):
         np.testing.assert_array_almost_equal(self.out_np.as_array(), self.out_nb.as_array(), decimal = 2)
         np.testing.assert_array_almost_equal(self.out1_np.as_array(), self.out1_nb.as_array(), decimal = 2)
 
+
+    @unittest.skipUnless(has_sirf, "Skipping as SIRF is not available")
     def test_KullbackLeibler_convex_conjugate(self):
 
         np.testing.assert_almost_equal(self.f_np.convex_conjugate(self.x), self.f_nb.convex_conjugate(self.x), decimal = 2)
         np.testing.assert_almost_equal(self.f1_np.convex_conjugate(self.x), self.f1_nb.convex_conjugate(self.x), decimal = 2)
 
+
+    @unittest.skipUnless(has_sirf, "Skipping as SIRF is not available")
     def test_KullbackLeibler_proximal(self):
 
         self.f_np.proximal(self.x, self.tau, out = self.out_np)
@@ -101,6 +101,8 @@ class KullbackLeiblerSIRF(unittest.TestCase):
         np.testing.assert_array_almost_equal(self.out_np.as_array(), self.out_nb.as_array(), decimal = 2)
         np.testing.assert_array_almost_equal(self.out1_np.as_array(), self.out1_nb.as_array(), decimal = 2)
 
+
+    @unittest.skipUnless(has_sirf, "Skipping as SIRF is not available")
     def test_KullbackLeibler_proximal_conjugate(self):
 
         self.f_np.proximal_conjugate(self.x, self.tau, out = self.out_np)

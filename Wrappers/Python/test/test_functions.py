@@ -1013,14 +1013,14 @@ class TestKullbackLeiblerNumba(unittest.TestCase):
         mask_c = ig.allocate(0)
         mask_c.fill(1, horizontal_x=0)
 
-        f = KullbackLeibler(b=g1, use_numba=True, eta=eta)
-        f_np = KullbackLeibler(b=g1, use_numba=False, eta=eta)
+        f = KullbackLeibler(b=g1, backend="numba", eta=eta)
+        f_np = KullbackLeibler(b=g1, backend="numpy", eta=eta)
 
         # mask is on vartical=0
         # separate the u1 vertical=0
-        f_mask = KullbackLeibler(b=g1.copy(), use_numba=True, mask=mask.copy(), eta=eta.copy())
-        f_mask_c = KullbackLeibler(b=g1.copy(), use_numba=True, mask=mask_c.copy(), eta=eta.copy())
-        f_on_mask = KullbackLeibler(b=g1.subset(horizontal_x=0), use_numba=True, eta=eta.subset(horizontal_x=0))
+        f_mask = KullbackLeibler(b=g1.copy(), backend="numba", mask=mask.copy(), eta=eta.copy())
+        f_mask_c = KullbackLeibler(b=g1.copy(), backend="numba", mask=mask_c.copy(), eta=eta.copy())
+        f_on_mask = KullbackLeibler(b=g1.subset(horizontal_x=0), backend="numba", eta=eta.subset(horizontal_x=0))
         u1_on_mask = u1.subset(horizontal_x=0)
 
         tau = 400.4

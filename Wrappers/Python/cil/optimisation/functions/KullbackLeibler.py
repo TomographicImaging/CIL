@@ -17,6 +17,7 @@ import numpy
 from cil.optimisation.functions import Function
 from numbers import Number
 import scipy.special
+import logging
 
 try:
     import numba
@@ -86,21 +87,28 @@ class KullbackLeibler(Function):
                         
     """     
 
-    def __new__(cls, **kwargs):
+    def __new__(cls, b, eta = None, mask = None, backend = None):
 
         # default backend numba
-        cls.backend = kwargs.get('backend', 'numba')  
+        cls.backend = backend
+        # cls.backend = kwargs.get('backend', 'numba')  
+        # if backend in kwargs
+        # cls.backend = kwargs.pop('backend', 'numba')  
+        # cls.backend = backend
+        # inspect.getargspec(func).keywords is not Non
         
         if cls.backend == 'numba':
 
             if not has_numba:
                 raise ValueError(" Numba is not installed. ")
-            else:                
+            else:          
+                logging.info(" Numba backend is used. ")      
                 return super(KullbackLeibler, cls).__new__(KullbackLeibler_numba)
         else:
+            logging.info(" Numpy backend is used. ") 
             return super(KullbackLeibler, cls).__new__(KullbackLeibler_numpy)
 
-    def __init__(self, b, eta = None, mask = None, **kwargs):
+    def __init__(self, b, eta = None, mask = None, backend = None):
 
         self.b = b
         self.eta = eta

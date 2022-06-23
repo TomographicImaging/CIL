@@ -45,8 +45,8 @@ class KullbackLeiblerSIRF(unittest.TestCase):
                 examples_data_path('PET'),'thorax_single_slice','emission.hv')
                 )
 
-            self.x = self.image1 + 0.3
-            self.eta = self.image1 + 0.4                      
+            self.eta = self.image1.get_uniform_copy(0.1)
+            self.x = self.image1.get_uniform_copy(0.4)                    
 
         self.f_np = KullbackLeibler(b = self.image1, backend='numpy')  
         self.f1_np = KullbackLeibler(b = self.image1, eta = self.eta,  backend='numpy') 
@@ -83,20 +83,8 @@ class KullbackLeiblerSIRF(unittest.TestCase):
 
     @unittest.skipUnless(has_sirf, "Skipping as SIRF is not available")
     def test_KullbackLeibler_convex_conjugate(self):
-
-        import scipy, numpy
-        tmp = 1 - self.x.as_array()
-        ind = tmp>0
-        xlogy = - scipy.special.xlogy(self.f1_np.b.as_array()[ind], tmp[ind])  
-        print(numpy.sum(xlogy) - self.eta.dot(self.x))
-
-        tmp = 1 - self.x.as_array()
-        ind = tmp>0
-        xlogy = - scipy.special.xlogy(self.f1_nb.b.as_array()[ind], tmp[ind])  
-        print(numpy.sum(xlogy) - self.eta.dot(self.x))        
-
-        np.testing.assert_almost_equal(self.f_np.convex_conjugate(self.x), self.f_nb.convex_conjugate(self.x), decimal = 2)
-        
+       
+        np.testing.assert_almost_equal(self.f_np.convex_conjugate(self.x), self.f_nb.convex_conjugate(self.x), decimal = 2)        
         np.testing.assert_almost_equal(self.f1_np.convex_conjugate(self.x), self.f1_nb.convex_conjugate(self.x), decimal = 2)
 
 
@@ -107,7 +95,6 @@ class KullbackLeiblerSIRF(unittest.TestCase):
         self.f_nb.proximal(self.x, self.tau, out = self.out_nb)
         self.f1_np.proximal(self.x, self.tau, out = self.out1_np)
         self.f1_nb.proximal(self.x, self.tau, out = self.out1_nb)  
-
 
         np.testing.assert_array_almost_equal(self.out_np.as_array(), self.out_nb.as_array(), decimal = 2)
         np.testing.assert_array_almost_equal(self.out1_np.as_array(), self.out1_nb.as_array(), decimal = 2)

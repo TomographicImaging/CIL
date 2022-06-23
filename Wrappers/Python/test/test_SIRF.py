@@ -34,7 +34,7 @@ try:
     from sirf.Utilities import examples_data_path
     has_sirf = True
 except ImportError as ie:
-    has_sirf = False
+    has_sirf = True
 
 class KullbackLeiblerSIRF(unittest.TestCase):
 
@@ -83,6 +83,17 @@ class KullbackLeiblerSIRF(unittest.TestCase):
 
     @unittest.skipUnless(has_sirf, "Skipping as SIRF is not available")
     def test_KullbackLeibler_convex_conjugate(self):
+
+        import scipy, numpy
+        tmp = 1 - self.x.as_array()
+        ind = tmp>0
+        xlogy = - scipy.special.xlogy(self.f1_np.b.as_array()[ind], tmp[ind])  
+        print(numpy.sum(xlogy) - self.eta.dot(self.x))
+
+        tmp = 1 - self.x.as_array()
+        ind = tmp>0
+        xlogy = - scipy.special.xlogy(self.f1_nb.b.as_array()[ind], tmp[ind])  
+        print(numpy.sum(xlogy) - self.eta.dot(self.x))        
 
         np.testing.assert_almost_equal(self.f_np.convex_conjugate(self.x), self.f_nb.convex_conjugate(self.x), decimal = 2)
         
@@ -362,4 +373,11 @@ class TestSIRFCILIntegration(CCPiTestClass):
 
 
 
-        
+if __name__=="__main__":
+
+    d = KullbackLeiblerSIRF()
+    d.setUp()
+    # d.test_KullbackLeibler_call()
+    d.test_KullbackLeibler_convex_conjugate()
+
+

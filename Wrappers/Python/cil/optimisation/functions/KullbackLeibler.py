@@ -16,9 +16,7 @@
 import numpy
 from cil.optimisation.functions import Function
 from numbers import Number
-import functools
 import scipy.special
-import logging
 
 try:
     import numba

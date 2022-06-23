@@ -1167,7 +1167,7 @@ class TestADMM(unittest.TestCase):
     
 
         self.fidelities = [ 0.5 * L2NormSquared(b=noisy_data), L1Norm(b=noisy_data), 
-            KullbackLeibler(b=noisy_data, use_numba=False)]
+            KullbackLeibler(b=noisy_data, backend="numpy")]
 
         F = self.alpha * MixedL21Norm()
         K = GradientOperator(ig)
@@ -1225,7 +1225,7 @@ class TestADMM(unittest.TestCase):
 
         # fidelity = 0.5 * L2NormSquared(b=noisy_data)
         # fidelity = L1Norm(b=noisy_data)
-        fidelity = KullbackLeibler(b=noisy_data, use_numba=False)
+        fidelity = KullbackLeibler(b=noisy_data, backend="numpy")
 
         # Setup and run the PDHG algorithm
         F = BlockFunction(alpha * MixedL21Norm(),fidelity)

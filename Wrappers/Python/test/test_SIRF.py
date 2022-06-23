@@ -36,7 +36,7 @@ try:
 except ImportError as ie:
     has_sirf = False
 
-class KullbackLeiblerSIRF(unittest.TestCase):
+class KullbackLeiblerSIRF(object):
 
     def setUp(self):
 

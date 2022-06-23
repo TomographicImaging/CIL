@@ -34,7 +34,7 @@ try:
     from sirf.Utilities import examples_data_path
     has_sirf = True
 except ImportError as ie:
-    has_sirf = True
+    has_sirf = False
 
 class KullbackLeiblerSIRF(unittest.TestCase):
 

@@ -98,17 +98,23 @@ class ISTA(Algorithm):
         else:
             raise ValueError("Function f is not differentiable")
 
+
+    @property
+    def step_size(self):
+
+       return self._step_size
+
     # Set default step size
     def set_step_size(self, step_size):
         """ Set default step size.
         """
         if step_size is None:
             if isinstance(self.f.L, Number):
-                self.step_size = 0.99*2.0/self.f.L
+                self._step_size = 0.99*2.0/self.f.L
             else:
                 raise ValueError("Function f is not differentiable")
         else:
-            self.step_size = step_size            
+            self._step_size = step_size            
         
     def __init__(self, initial, f, g, step_size = None, **kwargs):
 
@@ -124,15 +130,15 @@ class ISTA(Algorithm):
 
         self._step_size = None
 
-        # set up ISTA
-        self.x_old = initial.copy()
-        self.x = initial.copy() 
-
         self.set_up(initial=initial, f=f, g=g, step_size=step_size, **kwargs)
 
     def set_up(self, initial, f, g, step_size, **kwargs):
         """ Set up of the algorithm
         """
+
+        # set up ISTA
+        self.x_old = initial.copy()
+        self.x = initial.copy()         
 
         self.initial = initial
         self.f = f
@@ -161,13 +167,17 @@ class ISTA(Algorithm):
         """
 
         # gradient step
-        self.x.sapyb(1., self.f.gradient(self.x_old), -self.step_size, out=self.x)
+        self.x_old.sapyb(1., self.f.gradient(self.x_old), -self.step_size, out=self.x)
 
         # proximal step
         self.x = self.g.proximal(self.x, self.step_size)
 
-        # update
-        self.x_old.fill(self.x)
+
+    def update_previous_solution(self):        
+        # swap the pointers to current and previous solution
+        tmp = self.x_old
+        self.x_old = self.x
+        self.x = tmp
 
     def update_objective(self):
         """ Updates the objective
@@ -175,7 +185,7 @@ class ISTA(Algorithm):
         .. math:: f(x) + g(x)
 
         """
-        self.loss.append( self.f(self.x) + self.g(self.x) )
+        self.loss.append( self.f(self.x_old) + self.g(self.x_old) )
 
 
 class FISTA(ISTA):

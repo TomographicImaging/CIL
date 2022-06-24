@@ -17,6 +17,7 @@
 
 from cil.optimisation.algorithms import Algorithm
 import warnings
+import logging
 
 class LADMM(Algorithm):
         
@@ -71,7 +72,7 @@ class LADMM(Algorithm):
     def set_up(self, f, g, operator, tau = None, sigma=1., \
         initial=None):
 
-        print("{} setting up".format(self.__class__.__name__, ))
+        logging.info("{} setting up".format(self.__class__.__name__, ))
         
         if sigma is None and tau is None:
             raise ValueError('Need tau <= sigma / ||K||^2')
@@ -101,7 +102,7 @@ class LADMM(Algorithm):
 
         self.configured = True  
         
-        print("{} configured".format(self.__class__.__name__, ))
+        logging.info("{} configured".format(self.__class__.__name__, ))
         
     def update(self):
 

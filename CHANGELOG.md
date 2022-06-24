@@ -3,7 +3,10 @@
     - Modules not moved should be considered deprecated
     - CIL remains licenced as APACHE-2.0
     - Minor bug fixes to the CPU 2D Parallel-beam FBP
-
+  - Fixes show_geometry compatibility issue with matplotlib 3.5
+  - Added ZEISSDataReader with cone/parallel beam, slicing, TXM Functionality.
+  - Deprecated:
+    - TXRMDataReader is deprecated in favour of ZEISSDataReader 
 
 * 21.4.1
   - Removed prints from unittests and cleanup of unittest code.

@@ -59,6 +59,9 @@ print to screen of the status of the optimisation.
    :members:
 .. autoclass:: cil.optimisation.algorithms.SIRT
    :members: update, update_objective
+.. autoclass:: cil.optimisation.algorithms.ISTA
+   :members:
+   :special-members:   
 .. autoclass:: cil.optimisation.algorithms.FISTA
    :members:
    :special-members:

@@ -1,3 +1,6 @@
+* 22.0.0
+ - Fixes show_geometry compatibility issue with matplotlib 3.5
+
 * 21.4.1
  - Removed prints from unittests and cleanup of unittest code.
  - CMake: 

@@ -26,4 +26,5 @@ dependencies:
   - tomophantom
   - ipywidgets
   - tqdm
+  - jinja2<3.1
   

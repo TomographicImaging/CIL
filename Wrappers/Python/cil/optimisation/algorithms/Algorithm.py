@@ -128,15 +128,20 @@ class Algorithm(object):
             
 
     def update_previous_solution(self):
-        '''Update the previous solution with the current one
+        """ Update the previous solution with the current one
         
         The concrete algorithm calls update_previous_solution. Normally this would 
         entail the swapping of pointers:
 
-        tmp = self.x_old
-        self.x_old = self.x
-        self.x = tmp 
-        '''
+        .. highlight:: python
+        .. code-block:: python
+
+            tmp = self.x_old
+            self.x_old = self.x
+            self.x = tmp 
+        
+
+        """
         pass
         
     def get_output(self):

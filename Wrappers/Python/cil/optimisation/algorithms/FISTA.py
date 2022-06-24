@@ -134,11 +134,10 @@ class ISTA(Algorithm):
         """ Set up of the algorithm
         """
 
-        # set up ISTA
-        self.x_old = initial.copy()
-        self.x = initial.copy()         
-
+        # set up ISTA      
         self.initial = initial
+        self.x_old = initial.copy()
+        self.x = initial.copy()           
         self.f = f
         self.g = g
 
@@ -293,5 +292,3 @@ class FISTA(ISTA):
         
         self.x.subtract(self.x_old, out=self.y)
         self.y.sapyb(((self.t_old-1)/self.t), self.x, 1.0, out=self.y) 
-
-        self.x_old.fill(self.x)

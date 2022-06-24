@@ -65,7 +65,7 @@ class ISTA(Algorithm):
 
     .. math:: \underset{x}{\mathrm{argmin}}\|A x - b\|^{2}_{2}
 
-    >>> f = LeastSquares(Aop, b=bop, c=0.5)
+    >>> f = LeastSquares(A, b=b, c=0.5)
     >>> g = ZeroFunction()
     >>> ig = Aop.domain
     >>> ista = ISTA(initial = ig.allocate(), f = f, g = g, max_iteration=10)
@@ -100,8 +100,7 @@ class ISTA(Algorithm):
 
 
     @property
-    def step_size(self):
-
+    def step_size(self):        
        return self._step_size
 
     # Set default step size
@@ -129,7 +128,6 @@ class ISTA(Algorithm):
                     .format(self.__class__.__name__))
 
         self._step_size = None
-
         self.set_up(initial=initial, f=f, g=g, step_size=step_size, **kwargs)
 
     def set_up(self, initial, f, g, step_size, **kwargs):
@@ -173,8 +171,9 @@ class ISTA(Algorithm):
         self.x = self.g.proximal(self.x, self.step_size)
 
 
-    def update_previous_solution(self):        
-        # swap the pointers to current and previous solution
+    def update_previous_solution(self):  
+        """ Swap the pointers to current and previous solution based on the :func:`~Algorithm.update_previous_solution` of the base class :class:`Algorithm`.
+        """        
         tmp = self.x_old
         self.x_old = self.x
         self.x = tmp
@@ -252,11 +251,11 @@ class FISTA(ISTA):
         """
         if step_size is None:
             if isinstance(self.f.L, Number):
-                self.step_size = 1./self.f.L
+                self._step_size = 1./self.f.L
             else:
                 raise ValueError("Function f is not differentiable")
         else:
-            self.step_size = step_size
+            self._step_size = step_size
 
     @property
     def provable_convergence_condition(self):

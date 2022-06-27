@@ -20,5 +20,5 @@
 ## Contribution Notes
 
 Please read and adhere to the [developer guide](https://tomographicimaging.github.io/CIL/nightly/developer_guide.html) and local patterns and conventions.
-
  - [ ] The content of this Pull Request (the Contribution) is intentionally submitted for inclusion in CIL (the Work) under the terms and conditions of the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0) License.
+ - [ ] To the best of my knowledge, the proposed patch is not patented or based on a code under GPL or another license that is incompatible with [CIL's license](https://www.apache.org/licenses/LICENSE-2.0)

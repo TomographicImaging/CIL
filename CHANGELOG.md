@@ -1,3 +1,7 @@
+* 21.x.x
+ - GitHub Actions:
+   - Update to version 0.1.1 of lauramurgatroyd/build-sphinx-action for building the documentation - ensures docs are always built from cil master.
+
 * 21.4.1
  - Removed prints from unittests and cleanup of unittest code.
  - CMake: 
